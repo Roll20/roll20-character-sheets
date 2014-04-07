@@ -33,4 +33,4 @@ Due to copyright restrctions, please don't attempt to include functionality for 
 License
 =======
 
-All of the code (HTML/CSS) of the sheets in this repository is released under the MIT license (see LICENSE.md for details). If you contribute a new sheet or help improve an existing sheet, you agree that your contribution is released under the MIT License as well.
+All of the code (HTML/CSS) of the sheets in this repository is released under the MIT license (see LICENSE file for details). If you contribute a new sheet or help improve an existing sheet, you agree that your contribution is released under the MIT License as well.
