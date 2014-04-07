@@ -6,7 +6,7 @@ This repository is the collection of all the community-contributed character she
 Contributing
 ============
 
-If you would like to contribute a sheet for the community to use, just clone this repository and create a new folder with the name of the game system that the sheet is for. Then send a pull request. If you have any questions or aren't familiar with Github or git in general, feel free to drop us a line at team@roll20.net and we can help you get setup.
+If you want to help improve an existing sheet, just clone this repository, make your changes, and submit a pull request. If you would like to contribute a new sheet for the community to use, just clone this repository and create a new folder with the name of the game system that the sheet is for. Then send a pull request. If you have any questions or aren't familiar with Github or git in general, feel free to drop us a line at team@roll20.net and we can help you get set up.
 
 Guidelines
 ==========
@@ -26,5 +26,7 @@ We only need one sheet for each system. For some major systems like Pathfinder o
 Whenever possible, use standard names for attributes, spelled out. For example, "Intelligence", "Strength", and "Wisdom". This is important so that if a Character is imported into a game with a different sheet, most of the values will be able to transition. If the attribute names are all different, then nothing can be imported. Your best bet is to look at existing sheets and whenever possible use the same attribute names that are already in use.
 
 
+**No Character Creation or Advancement**
 
+Due to copyright restrctions, please don't attempt to include functionality for advancing a character automatically to the next level or creating a new character from scratch automatically. It's fine to have attributes that auto-calculate based on other attributes (including the current level). We'll let you know if your submitted sheet violates this rule.
 
