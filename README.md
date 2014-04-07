@@ -30,3 +30,7 @@ Whenever possible, use standard names for attributes, spelled out. For example, 
 
 Due to copyright restrctions, please don't attempt to include functionality for advancing a character automatically to the next level or creating a new character from scratch automatically. It's fine to have attributes that auto-calculate based on other attributes (including the current level). We'll let you know if your submitted sheet violates this rule.
 
+License
+=======
+
+All of the code (HTML/CSS) of the sheets in this repository is released under the MIT license (see LICENSE.md for details). If you contribute a new sheet or help improve an existing sheet, you agree that your contribution is released under the MIT License as well.
