@@ -1,0 +1,1 @@
+This character sheet is building towards Spycraft 2.0, a d20 espionage game.  I suspect much of it will be easily adaptable to other d20 type systems.  I'm editing from the 'kitchenSink' example as I go, so there might be some clearly unused bits of sheet.

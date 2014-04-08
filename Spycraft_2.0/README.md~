@@ -1,0 +1,1 @@
+This is a simple example character sheet. It's based on a simple Savage Worlds sheet, but it's by no means complete. Shows how to use most of the basic controls available when creating a Roll20 sheet.
