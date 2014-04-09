@@ -6,8 +6,16 @@ Would a TODO file be useful for co-ordinating what everyone might be working on,
 
 F.ex.
 
-General layout //Unfinished, getting to it ASAP -Ville S
+General layout //Unfinished, getting to it ASAP -Ville S  //Done -Alex L.
 
-Ability Scores //Added basic scores, working on modifiers / mod + ½ level, defenses. -Ville S
+Ability Scores //Added basic scores, working on modifiers / mod + ½ level, defenses. -Ville S  //Done -Alex L.
 
-Skills //To do, soon. -Someone else
+Skills //To do, soon. -Someone else  //Done -Alex L.
+
+2014-04-09 20:23 :
+Updated html and css to resemble classic B/W 4th Edition character sheet.
+
+ToDo:
+Rolls - Waiting on Rileys response re:Buttons with text.
+
+-Alex L.
