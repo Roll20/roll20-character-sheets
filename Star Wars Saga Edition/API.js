@@ -14,23 +14,19 @@
  
  
 var attr = [ // Attributes
-    { name: "HP", current: 0, max: 0 } ,
-    { name: "CT", current: 0, max: "" } ,
-    { name: "Level", current: 0, max: "[[floor(@{level}/2)]]" } ,
+    { name: "HP", current: 0, max: 0 },
+    { name: "CT", current: 0, max: ""},
+    { name: "Level", current: 0, max: "[[floor(@{level}/2)]]"},
     { name: "BAB", current: 0, max:  ""},
-    { name: "Force Points", current: 0, max: 0 } ,
-    { name: "Destiny Points", current: 0, max: "" } ,
-    { name: "Dark Side Score", current: 0, max: "" }  ,
-    { name: "STR", current: 8, max: "[[floor(@{str}/2-5)]])" ,
+    { name: "Force Points", current: 0, max: 0 },
+    { name: "Destiny Points", current: 0, max: "" },
+    { name: "Dark Side Score", current: 0, max: "" } ,
+    { name: "STR", current: 8, max: "[[floor(@{str}/2-5)]]"} ,
     { name: "DEX", current: 8, max: "[[floor(@{dex}/2-5)]]" } ,
     { name: "CON", current: 8, max: "[[floor(@{con}/2-5)]]" } ,
     { name: "INT", current: 8, max: "[[floor(@{int}/2-5)]]" } ,
     { name: "WIS", current: 8, max: "[[floor(@{wis}/2-5)]]" } ,
-    { name: "CHA", current: 8, max: "[[floor(@{cha}/2-5)]]" } ,
-    { name: "Reflex", current: 0, max: "" } ,
-    { name: "Fortitude", current: 0, max: "" } ,
-    { name: "Will", current: 0, max: ""} ,
-    { name: "DT", current: 0, max: ""} 
+    { name: "CHA", current: 8, max: "[[floor(@{cha}/2-5)]]" }
 ];
  
 var abil = [ // Abilities
@@ -74,6 +70,6 @@ on("ready", function() {
         for (i=0 ; i < abil.length; i++) {
             log (abil[i].name + " " + abil[i].current + " " + abil[i].max);
             createObj("ability", {name: abil[i].name, description: abil[i].description, action: abil[i].action, _characterid: character.id, istokenaction: abil[i].istokenaction});
-		};	
+    	};	
 	});
 });
