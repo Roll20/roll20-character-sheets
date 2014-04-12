@@ -18,15 +18,18 @@ var attr = [ // Attributes
     { name: "CT", current: 0, max: ""},
     { name: "Level", current: 0, max: "[[floor(@{level}/2)]]"},
     { name: "BAB", current: 0, max:  ""},
-    { name: "Force Points", current: 0, max: 0 },
-    { name: "Destiny Points", current: 0, max: "" },
-    { name: "Dark Side Score", current: 0, max: "" } ,
+    { name: "FP", current: 5, max: 5 },
+    { name: "DP", current: 0, max: "" },
+    { name: "DarkSideScore", current: 0, max: "" } ,
     { name: "STR", current: 8, max: "[[floor(@{str}/2-5)]]"} ,
     { name: "DEX", current: 8, max: "[[floor(@{dex}/2-5)]]" } ,
     { name: "CON", current: 8, max: "[[floor(@{con}/2-5)]]" } ,
     { name: "INT", current: 8, max: "[[floor(@{int}/2-5)]]" } ,
     { name: "WIS", current: 8, max: "[[floor(@{wis}/2-5)]]" } ,
-    { name: "CHA", current: 8, max: "[[floor(@{cha}/2-5)]]" }
+    { name: "CHA", current: 8, max: "[[floor(@{cha}/2-5)]]" },,
+    { name: "DR", current: 0, max: "" },
+    { name: "SR", current: 0, max: "0" },
+    { name: "Speed", current: 0, max: "0" }
 ];
  
 var abil = [ // Abilities
