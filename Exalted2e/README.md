@@ -13,3 +13,4 @@ Character sheet for _Exalted, Second Edition_ by White Wolf Publishing.
 If you feel you've contributed to the development of this character sheet, don't forget to add your name here!
 
 * Brian Shields
+* Benjamin Bandelow
