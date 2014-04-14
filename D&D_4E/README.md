@@ -1,16 +1,5 @@
-This will be a D&D 4th Edition character sheet. It's currently just a copy of the Kitchen sink sample sheet, so by no means complete. Feel free to contribute as you see fit.
-
--Ville S
-
-Would a TODO file be useful for co-ordinating what everyone might be working on, or is there a better way to do it on Git?
-
-F.ex.
-
-General layout //Unfinished, getting to it ASAP -Ville S  //Done -Alex L.
-
-Ability Scores //Added basic scores, working on modifiers / mod + ½ level, defenses. -Ville S  //Done -Alex L.
-
-Skills //To do, soon. -Someone else  //Done -Alex L.
+2014-04-12 21:25 :
+As everything in the D&D 4E sheet is now pretty much in working order, a proper readme file detailing special use cases and general how-to's could be useful? Intent would be for someone with zero knowledge of code should be familiar with how to use the sheet after reading this file. -Ville S.
 
 2014-04-09 20:23 :
 Updated html and css to resemble classic B/W 4th Edition character sheet.
