@@ -1,4 +1,4 @@
-Character sheet for Mage the Ascention, Second Edition, revised, by White Wolf Publishing.
+Character sheet for Mage the Ascension, Second Edition, revised, by White Wolf Publishing.
 
 I still need to figure out how to do the Quintessence wheel.
 
