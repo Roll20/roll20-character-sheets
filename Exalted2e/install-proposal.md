@@ -20,7 +20,7 @@ Rollable tables are available from the second tab from the right in the campaign
         1. Press "+ Add" in the Table Items section of the table window.
         1. Name the third item "1", give it a weight of 3, and click "Save Changes".
         1. Press "+ Add" in the Table Items section of the table window.
-        1. Name the fourth item "2", give it a weight of 1, and click "Save Changes".
+        1. Name the fourth item "2", and click "Save Changes".
     1. Click "Save Changes".
 1. Create a table named `exalted-damage`:
     1. Press "+ Add" in the Rollable Tables section of the tab.
