@@ -1,5 +1,10 @@
-Early stages of the character sheet for 13th Age.
+Functional 13th Age Sheet
 
-I am for now focusing on functionality for now. Far from complete
+Important field data for macros. 
 
-known issues, auto fields are not added to attributes, meaning the auto field for mods+level is not going to show till that works
+@{STRMOD} represents the strength mod on its own.
+@{STRMODLevel} is the same mod with the current level attached
+
+This works with str replaced with any 3 letter stat abreviation (Dex, CHA, etc)
+
+I reccomend using [[]] around these fields when added to your macros or else you see the whole math formula in the roll.
