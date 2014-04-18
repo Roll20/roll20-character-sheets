@@ -1,16 +1,66 @@
-This will be a D&D 4th Edition character sheet. It's currently just a copy of the Kitchen sink sample sheet, so by no means complete. Feel free to contribute as you see fit.
+Useful Attributes:
 
--Ville S
+level // current level.
+halflevel // current half level.
 
-Would a TODO file be useful for co-ordinating what everyone might be working on, or is there a better way to do it on Git?
+hp // current and max hit points.
+hp-bloodied // bloodied value.
+surge-value // your surge value.
+surges // current and max number of surges daily.
+tmp-hp // temporary hit points.
 
-F.ex.
+initiative // your initiative mod, this + 1d20 = your initiative. (Todo: Add roll button if Riley adds buttons with text.) 
 
-General layout //Unfinished, getting to it ASAP -Ville S  //Done -Alex L.
+speed // your speed in squares.
 
-Ability Scores //Added basic scores, working on modifiers / mod + ½ level, defenses. -Ville S  //Done -Alex L.
+action-points // your current number of action points.
 
-Skills //To do, soon. -Someone else  //Done -Alex L.
+ac // your amour class.
+fort // your fortitude.
+ref // your reflex.
+will // your will.
+
+// attribute scores:
+strength
+constitution
+dexterity
+intelligence
+wisdom
+charisma
+*attribute from above*-mod // (ie strength-mod) attribute modifier.
+*attribute from above*-mod-level // (ie strength-mod-level) attribute modifier with half level.
+
+passive-insight // your passive insight.
+passive-perception // your passive perception.
+
+// skills (all with half level). (Todo: Add roll button if Riley adds buttons with text.) 
+acrobatics
+arcana
+athletics
+bluff
+diplomacy
+dungeoneering
+endurance
+heal
+history
+insight
+intimidate
+nature
+perception
+religion
+stealth
+streetwise
+thievery
+
+Updates:
+
+2014-04-16 19:26 :
+Full CSS reworking, almost all styles now controlled by css file (not dependant on roll20's base css file).
+
+-Alex L.
+
+2014-04-12 21:25 :
+As everything in the D&D 4E sheet is now pretty much in working order, a proper readme file detailing special use cases and general how-to's could be useful? Intent would be for someone with zero knowledge of code should be familiar with how to use the sheet after reading this file. -Ville S.
 
 2014-04-09 20:23 :
 Updated html and css to resemble classic B/W 4th Edition character sheet.
