@@ -10,7 +10,7 @@ If you want to help improve an existing sheet, just clone this repository, make 
 
 **Creating a sheet.json File**
 
-When you are ready to submit your template for **public use**, create a `sheet.json` file in your sheet's folder (see the kitchensink folder for an example sheet.json file). Please don't create a sheet.json file until you think your sheet is ready for public consumption. The file has the following fields:
+When you are ready to submit your template for **public use**, create a `sheet.json` file in your sheet's folder (see the kitchensink folder for an example sheet.json file). The file has the following fields:
 
 * `html`: The name of the HTML file for the sheet (e.g. `kitchensink.html`)
 * `css`: The name of the CSS file for the sheet (e.g. `kitchensink.css`)
