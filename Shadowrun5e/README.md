@@ -56,8 +56,8 @@ As a suggestions:
 * set **bar3** as @{armor}
 
 With this you can make one character sheet for a whole group of NPCs (like one sheet for all Grunts with the Professional Rating 1) - and while still being able to access their weapons and stuff you can make a Wound-Modifier macro that circumvents the fact that their stats (Wounds) are linked together:
-* #woundmod - >[[floor(@{target|bar1}/@{target|paintolerance})+floor(@{target|bar2})/@{target|paintolerance})]]
-* #attackprimary - as an example
+* woundmod - [[floor(@{target|bar1}/@{target|paintolerance})+floor(@{target|bar2})/@{target|paintolerance})]]
+* attackprimary - as an example
     /emas @{target|token_name} attacks @{target|Victim|token_name}!
     /roll ([[@{target|primaryweaponskill}+@{target|agility}+?{Modifier|0}]] - #woundmod )d6>5s
     /desc AP: [[ @{target|primaryweaponap} ]] || Damage Value:[[ @{target|primaryweapondam} ]] || Acc: [[ @{target|primaryweaponacc} ]]
@@ -68,9 +68,3 @@ With this you can make one character sheet for a whole group of NPCs (like one s
 * Skills - see above
 * Text input fields can't be referenced into another field
 * Might want a complete css rework / too many hard coded css styles
-
-
-
-Design input for the borders around the Statblocks would be appreciated (for something closer to the original)
-
-20.April.2014 - 15:18 - Neirin D.
