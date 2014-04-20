@@ -65,9 +65,9 @@ With this you can make one character sheet for a whole group of NPCs (like one s
 
 ##Known Problems / Bugs / ToDo
 
-*Skills - see above
-*Text input fields can't be referenced into another field
-*Might want a complete css rework / too many hard coded css styles
+* Skills - see above
+* Text input fields can't be referenced into another field
+* Might want a complete css rework / too many hard coded css styles
 
 
 
