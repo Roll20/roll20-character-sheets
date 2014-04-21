@@ -1,6 +1,6 @@
-#### If you want to use an (all) attribute(s) from the sheet with macros (you HAVE TO do this for woundmod and paintolerance or no roll will work), you have to *select* them in the sheet at least once
-#### Values are inserted like they show in the book - so negative numbers should be written with a "-" in front
-#### In most Rolls there will be an option to include modifiers - the negative/positive value also counts here
+###### If you want to use an (all) attribute(s) from the sheet with macros (you HAVE TO do this for woundmod and paintolerance or no roll will work), you have to *select* them in the sheet at least once
+###### Values are inserted like they show in the book - so negative numbers should be written with a "-" in front
+###### In most Rolls there will be an option to include modifiers - the negative/positive value also counts here
 #####
 
 ##Useful Attributes
