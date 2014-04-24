@@ -54,6 +54,9 @@ thievery
 
 Updates:
 
+2014-04-23 14:27 :
+Added Attack workspace and started item management.
+
 2014-04-16 19:26 :
 Full CSS reworking, almost all styles now controlled by css file (not dependant on roll20's base css file).
 
