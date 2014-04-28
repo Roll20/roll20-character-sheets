@@ -29,6 +29,10 @@ Here are a few guidelines that you should follow when contributing sheets for th
 
 The sheet for each game type should be familiar to players who are used to seeing the paper version of that sheet. It shouldn't be identical or violate any copyright, but it also shouldn't be laid out in such a crazy way that players will have a hard time understanding how to use it. **Design for ease of us first and foremost.** Along those lines, keep your UI changes simple -- please don't change the basic functionality of how a checkbox works, for example.
 
+**Add Rolls**
+
+The best sheets not only keep track of character stats, they have most of the rolls for the game system embedded in them. This makes it much easier for new players to play the game (just "click on that button on the sheet" versus "Make a macro, okay put slash roll one dee twenty..."). While you don't have to include every roll in the whole system, including the most common ones where appropriate can really help elevate your sheet to the next level.
+
 **Don't Duplicate Work**
 
 We only need one sheet for each system. For some major systems like Pathfinder or D&D, we may allow more than one sheet if they are different enough, but contact us in advance before you spend a lot of time working on a new sheet for a game we already have a sheet for. We should focus on improving existing sheets, not creating totally new ones. Along those lines, this is a community effort, so if you want to help improve an existing sheet, just jump in and do so.
