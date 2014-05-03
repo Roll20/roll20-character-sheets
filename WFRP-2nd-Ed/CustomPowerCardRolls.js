@@ -12,7 +12,7 @@ var POWERCARD_USE_PLAYER_COLOR = true;
 
 
 on("chat:message", function(msg) {
-    if (msg.type != "api") return;
+	if (msg.type != "api") return;
 
 	// Get the API Chat Command
 	msg.who = msg.who.replace(" (GM)", "");
@@ -26,6 +26,8 @@ on("chat:message", function(msg) {
 	var parameters = {};
 	var Tag = "";
 	var Content = "";
+	var RollObject = {};
+	var operator = "<=";
 	
 	// CREATE OBJECT ARRAY
 	var a = 1;
@@ -35,87 +37,74 @@ on("chat:message", function(msg) {
 		parameters[Tag] = Content;
 		a++;
 	}
-	log("parameters");
-	log(parameters);
 
-	/*
-	var attribute = "WeaponSkill";
-	var expression = attribute;
-	var characterName = "1 - Gustav the Agitator";
-	var modifier = 20;
-	var rollType = "Attack";
-	var damageAdd = Number("3");
-	var oper = "<=";
-	var rollExpression = "1d100";
-	var damageExpression = "1d10";
-	var msgContent = "--desc --name|Standard Attack --leftsub|Melee --rightsub|Half Action";
-	*/
-	var attribute = parameters.versus;
-	var expression = attribute;
-	var characterName = parameters.charactername;
-	var tokenName = parameters.tokenname;
-	var modifier = parameters.modifier;
-	var rollType = parameters.type;
-	var damageAdd = Number("3");
-	var weapon = "Placeholder";
-	var primaryWeapon = true;
-	if (parameters.weapon == "Secondary") {primaryWeapon = false};
-	var impactWeapon = false;
-	var rangedAttack = false;
-	if ((attribute == "BallisticSkill") && (rollType == "Attack")) {rangedAttack = true};
-	var ammoCount = 0;
-	var ammoMax = 0;
+	// Define RollObject Variables
+	RollObject.AttributeName = parameters.versus;
+	RollObject.AttributeValue = "";
+	RollObject.CharacterName = parameters.charactername;
+	RollObject.DisplayName = parameters.tokenname;
+	RollObject.TestModifier = parameters.modifier;
+	RollObject.RollType = parameters.type;
+	RollObject.DamageAdd = Number("3");
+	RollObject.WeaponName = "Placeholder";
+	RollObject.PrimaryWeapon = true; if (parameters.weapon == "Secondary") {RollObject.PrimaryWeapon = false};
+	RollObject.ImpactWeapon = false;
+	RollObject.RangedAttack = false; if ((RollObject.AttributeName == "BallisticSkill") && (RollObject.RollType == "Attack")) {RollObject.RangedAttack = true};
+	RollObject.AmmoCount = 0;
+	RollObject.AmmoMax = 0;
+	RollObject.DiceRollExpression = "1d100";
+	RollObject.DamageRollExpression = "1d10";
+	RollObject.TestSuccess = "false";
+	RollObject.HitLocation = "";
+	RollObject.HitLocationToolTip = "";
+	RollObject.DiceRollResultToolTip = "";
+	RollObject.PowerCardContent = ""		
 
-	var oper = "<=";
-	var rollExpression = "1d100";
-	var damageExpression = "1d10";
-	var msgContent = ""
-	if (rollType == "Attack") {
-		msgContent = "--desc --name|" + tokenName + " --leftsub|" + (rangedAttack ? "Ranged Attack" : "Melee Attack") + " --rightsub|Half Action  --diceroll|";
-	} else if (rollType == "Parry") {
-		msgContent = "--desc --name|" + tokenName + " --leftsub|Parry" + " --rightsub|Reaction  --diceroll|";
-	} else if (rollType == "Dodge") {
-		msgContent = "--desc --name|" + tokenName + " --leftsub|Dodge" + " --rightsub|Reaction  --diceroll|";
-	} else if (rollType == "Attribute") {
-		msgContent = "--desc --name|" + tokenName + " --leftsub|"+ attribute + "" + " --rightsub|Test  --diceroll|";
+	if (RollObject.RollType == "Attack") {
+		RollObject.PowerCardContent = "--desc --name|" + RollObject.DisplayName + " --leftsub|" + (RollObject.RangedAttack ? "Ranged Attack" : "Melee Attack") + " --rightsub|Half Action  --custom_diceroll|";
+	} else if (RollObject.RollType == "Parry") {
+		RollObject.PowerCardContent = "--desc --name|" + RollObject.DisplayName + " --leftsub|Parry" + " --rightsub|Reaction  --custom_diceroll|";
+	} else if (RollObject.RollType == "Dodge") {
+		RollObject.PowerCardContent = "--desc --name|" + RollObject.DisplayName + " --leftsub|Dodge" + " --rightsub|Reaction  --custom_diceroll|";
+	} else if (RollObject.RollType == "Attribute") {
+		RollObject.PowerCardContent = "--desc --name|" + RollObject.DisplayName + " --leftsub|"+ RollObject.AttributeName + "" + " --rightsub|Stat Test  --custom_diceroll|";
 	} else if (rollType == "Skill") {
 		msgContent = "--desc --name|" + tokenName + " --leftsub|"+ attribute + "" + " --rightsub|Test  --diceroll|";
-	}	
+	}
+ 
 	
-	var characters = findObjs({ _type: "character", name: characterName });
+	var characters = findObjs({ _type: "character", name: RollObject.CharacterName });
 	var character = characters.shift();
 
-	
-	var rollDice = function (rollExpression){
-		sendChat("", "[[" + rollExpression + " ]]", function (m) {
+	var rollDice = function (){
+		sendChat("", "[[" + RollObject.DiceRollExpression + " ]]", function (m) {
 			var rolldata = m[0].inlinerolls[1];
-			var diceRoll = rolldata.results.rolls;
+			RollObject.RawDiceRoll = rolldata.results.rolls;
 			
-			sendChat("", "[[" + damageExpression + " ]]", function (d) {
+			sendChat("", "[[" + RollObject.DamageRollExpression + " ]]", function (d) {
 				var rolldata = d[0].inlinerolls[1];
-				var damageRoll = rolldata.results.rolls;
+				RollObject.RawDamageRoll = rolldata.results.rolls;
 							
-				sendChat("", "[[" + damageExpression + " ]]", function (d) {
+				sendChat("", "[[" + RollObject.DamageRollExpression + " ]]", function (d) {
 					var rolldata = d[0].inlinerolls[1];
-					var impactRoll = rolldata.results.rolls;
+					RollObject.RawImpactRoll = rolldata.results.rolls;
 								
-					rollResult(diceRoll, damageRoll, impactRoll);
+					rollResult();
 									
 				});								
 			});
 		});
+		
+
 	}
 	
 	if (command == "!roll") {
-		rollDice(rollExpression);
+		rollDice();
 	}
-	
-	/*
-
-	*/
   
-	var rollResult = function(diceRoll, damageRoll, impactRoll) {
-		diceTotal = getResult(diceRoll);
+	var rollResult = function() {
+		
+		RollObject.DiceRollResult = getResult(RollObject.RawDiceRoll);
 							
 		if (character) {
 			var attributes = findObjs({ _type: "attribute", _characterid: character.get('_id') });
@@ -123,57 +112,57 @@ on("chat:message", function(msg) {
 			_.each(attributes, function(obj) {    
 				var attributeName = obj.get("name");
 				
-				if (rangedAttack == false) {
-					if (primaryWeapon) {
+				if (attributeName == RollObject.AttributeName) {
+					RollObject.AttributeValue = obj.get("current");
+				}				
+				
+				if (RollObject.RangedAttack == false) {
+					if (RollObject.PrimaryWeapon) {
 						if (attributeName == "MeleeWeapon") {
-							weapon = obj.get("current");
+							RollObject.WeaponName = obj.get("current");
 						}
 						if (attributeName == "MeleeDamage") {
-							damageAdd = Number(obj.get("current"));
+							RollObject.DamageAdd = Number(obj.get("current"));
 						}
 					} else {
 						if (attributeName == "MeleeWeapon") {
-							weapon = obj.get("max");
+							RollObject.WeaponName = obj.get("max");
 						}
 						if (attributeName == "MeleeDamage") {
-							damageAdd = Number(obj.get("max"));
+							RollObject.DamageAdd = Number(obj.get("max"));
 						}
 					}
 				} else {
-					if (primaryWeapon) {
+					if (RollObject.PrimaryWeapon) {
 						if (attributeName == "RangedWeapon") {
-							weapon = obj.get("current");
+							RollObject.WeaponName = obj.get("current");
 						}
 						if (attributeName == "RangedDamage") {
-							damageAdd = Number(obj.get("current"));
+							RollObject.DamageAdd = Number(obj.get("current"));
 						}
 					} else {
 						if (attributeName == "RangedWeapon") {
-							weapon = obj.get("max");
+							RollObject.WeaponName = obj.get("max");
 						}
 						if (attributeName == "RangedDamage") {
-							damageAdd = Number(obj.get("max"));
+							RollObject.DamageAdd = Number(obj.get("max"));
 						}
 					}
 					if (attributeName == "Ammo") {
-						ammoCount = Number(obj.get("current"));
-						ammoMax = Number(obj.get("max"));
+						RollObject.AmmoCount = Number(obj.get("current"));
+						RollObject.AmmoMax = Number(obj.get("max"));
 					}
 				}
 			});
-			
-			for (var i = 0; i < attributes.length; i++) {
-				var current_attribute = attributes[i];
-				expression = expression.replace(current_attribute.get('name'), current_attribute.get('current'));			
-			}
+					
 		}
 		
-		modifiedExpression = Number(expression) + Number(modifier);
+		modifiedExpression = Number(RollObject.AttributeValue) + Number(RollObject.TestModifier);
 		
 		var result = null;
 		var difference = 0;
 		var degrees = 0;
-		var new_expression = 'result = (' + diceTotal + ' ' + oper + ' ' + modifiedExpression + ');';
+		var new_expression = 'result = (' + RollObject.DiceRollResult + ' ' + operator + ' ' + modifiedExpression + ');';
 		
 		try {
 			eval(new_expression);
@@ -182,7 +171,7 @@ on("chat:message", function(msg) {
 		}
 		
 		try {
-		   difference = Math.abs(diceTotal - eval(modifiedExpression));
+		   difference = Math.abs(RollObject.DiceRollResult - eval(modifiedExpression));
 		} catch (e) {
 			//log(e);
 		}
@@ -193,15 +182,11 @@ on("chat:message", function(msg) {
 			//log(e);
 		}
 		
-		var finalResult = false;
-		var hitLocation = false;
-		var locationToolTip = false;
-		
 		if (result) {
-			finalResult = true;
-			if(rollType == "Attack") {
+			RollObject.TestSuccess = true;
+			if(RollObject.RollType == "Attack") {
 				
-				var x = diceTotal;
+				var x = RollObject.DiceRollResult;
 				var y = x.toString();
 				if (y.length == 2) {
 					var z = y.split("").reverse().join("");
@@ -212,55 +197,52 @@ on("chat:message", function(msg) {
 				var reverseRoll = Number(z);
 				
 				if(reverseRoll < 11) {
-					hitLocation = "Head";
-					locationToolTip = diceTotal + " reversed is " + reverseRoll + "; 01-10 strikes Head location";
+					RollObject.HitLocation = "Head";
+					RollObject.HitLocationToolTip = RollObject.DiceRollResult + " reversed is " + reverseRoll + "; 01-10 strikes Head location";
 				} else if (reverseRoll < 26) {
-					hitLocation = "Right Arm";
-					locationToolTip = diceTotal + " reversed is " + reverseRoll + "; 11-25 strikes Right Arm location";					
+					RollObject.HitLocation = "Right Arm";
+					RollObject.HitLocationToolTip = RollObject.DiceRollResult + " reversed is " + reverseRoll + "; 11-25 strikes Right Arm location";					
 				} else if (reverseRoll < 41) {
-					hitLocation = "Left Arm";
-					locationToolTip = diceTotal + " reversed is " + reverseRoll + "; 26-40 strikes Left Arm location";
+					RollObject.HitLocation = "Left Arm";
+					RollObject.HitLocationToolTip = RollObject.DiceRollResult + " reversed is " + reverseRoll + "; 26-40 strikes Left Arm location";
 				} else if (reverseRoll < 81) {
-					hitLocation = "Body";
-					locationToolTip = diceTotal + " reversed is " + reverseRoll + "; 41-80 strikes Body location";
+					RollObject.HitLocation = "Body";
+					RollObject.HitLocationToolTip = RollObject.DiceRollResult + " reversed is " + reverseRoll + "; 41-80 strikes Body location";
 				} else if (reverseRoll < 91) {
-					hitLocation = "Right Leg";
-					locationToolTip = diceTotal + " reversed is " + reverseRoll + "; 81-90 strikes Right Leg location";
+					RollObject.HitLocation = "Right Leg";
+					RollObject.HitLocationToolTip = RollObject.DiceRollResult + " reversed is " + reverseRoll + "; 81-90 strikes Right Leg location";
 				} else if (reverseRoll < 101) {
-					hitLocation = "Left Leg";
-					locationToolTip = diceTotal + " reversed is " + reverseRoll + "; 91-100 strikes Left Arm location";
+					RollObject.HitLocation = "Left Leg";
+					RollObject.HitLocationToolTip = RollObject.DiceRollResult + " reversed is " + reverseRoll + "; 91-100 strikes Left Arm location";
 				}
 				
-				if (finalResult) {
-					msgContent += " --dmgroll| ";
+				if (RollObject.TestSuccess) {
+					RollObject.PowerCardContent += " --custom_dmgroll| ";
 				};				
 			} 			
 		}
 		
 
-		if(rangedAttack == true) {  
+		if(RollObject.RangedAttack == true) {  
 			reduceAmmo(character);
 		}		
 		
-		var degreesOfSuccess = (degrees + 1);
-		var degreesToolTip = "Difference of " + difference;
+		RollObject.DegreesOfSuccess = (degrees + 1);
+		RollObject.DegreesOfSuccessToolTip = "Difference of " + difference;
 		
 		
-		var diceToolTip = "Rolling 1d100(" + diceTotal + ") versus " + attribute + " (" + expression + ") " + ( (modifier>0) ? " + " : "") + modifier;
+		RollObject.DiceRollResultToolTip = "Rolling 1d100(" + RollObject.DiceRollResult + ") versus " + RollObject.AttributeName + " (" + RollObject.AttributeValue + ") " + ( (RollObject.TestModifier > -1) ? " + " : "") + RollObject.TestModifier;
 		
-		var damageResult = getResult(damageRoll)
-		var damageTotal = damageResult + damageAdd;
-		var damageToolTip = "Rolling 1d10(" + damageResult + ") " + ((damageAdd > -1) ? "+ " : "- ") + Math.abs(damageAdd) + " = (" + damageTotal + ")";
+		RollObject.DamageRollResult = getResult(RollObject.RawDamageRoll)
+		RollObject.DamageRollTotal = RollObject.DamageRollResult + RollObject.DamageAdd;
+		RollObject.DamageRollTotalToolTip = "Rolling 1d10(" + RollObject.DamageRollResult + ") " + ((RollObject.DamageAdd > -1) ? "+ " : "- ") + Math.abs(RollObject.DamageAdd) + " = (" + RollObject.DamageRollTotal + ")";
 		
-		if (weapon == "Pistol") {impactWeapon = true};
-		var impactResult = getResult(impactRoll)
-		var impactTotal = impactResult + damageAdd;
-		var impactToolTip = "Rolling 1d10(" + impactResult + ") " + ((damageAdd > -1) ? "+ " : "- ") + Math.abs(damageAdd) + " = (" + impactTotal + ")";
-		
-
-
+		if (RollObject.WeaponName == "Pistol") {RollObject.ImpactWeapon = true};
+		RollObject.ImpactRollResult = getResult(RollObject.RawImpactRoll)
+		RollObject.ImpactRollTotal = RollObject.ImpactRollResult + RollObject.DamageAdd;
+		RollObject.ImpactRollTotalToolTip = "Rolling 1d10(" + RollObject.ImpactRollResult + ") " + ((RollObject.DamageAdd > -1) ? "+ " : "- ") + Math.abs(RollObject.DamageAdd) + " = (" + RollObject.ImpactRollTotal + ")";
 					
-		createPowerCard(msg, msgContent, finalResult, hitLocation, locationToolTip, diceTotal, diceToolTip, modifier, degreesOfSuccess, degreesToolTip, damageTotal, damageToolTip, damageAdd, damageResult, weapon, rangedAttack, ammoCount, ammoMax, impactRoll, impactResult, impactTotal, impactToolTip, impactWeapon, rollType, modifiedExpression, attribute, expression);
+		createPowerCard(msg, RollObject);
 	}
 });
 
@@ -390,12 +372,13 @@ function hexDec(hex_string) {
 	return parseInt(hex_string, 16);
 }
 
-function createPowerCard (msg, msgContent, rollSuccess, locationHit, locationToolTip, diceTotal, diceToolTip, modifier, degreesOfSuccess, degreesToolTip, damageTotal, damageToolTip, damageAdd, damageResult, weapon, rangedAttack, ammoCount, ammoMax, impactRoll, impactResult, impactTotal, impactToolTip, impactWeapon, rollType, modifiedExpression, attribute, expression) {
+function createPowerCard (msg, RollObject) {
+	//Custom Variables 
 	var critRoll = false;
 	var failRoll = false;
 	
 	// DEFINE VARIABLES
-	var n = msgContent.split(" --");
+	var n = RollObject.PowerCardContent.split(" --"); //Customised this line
 	var PowerCard = {};
 	var DisplayCard = "";
 	var NumberOfAttacks = 1;
@@ -479,7 +462,7 @@ function createPowerCard (msg, msgContent, rollSuccess, locationHit, locationToo
 	
 	// KEY LOOP
 	var Keys = Object.keys(PowerCard);
-	var ReservedTags = "attack, damage, diceroll, dmgroll";
+	var ReservedTags = "attack, damage, custom_diceroll, custom_dmgroll"; //Note - Have to add in the custom tags here.
 	var IgnoredTags = "emote, name, usage, action, defense, dmgtype, txcolor, bgcolor, leftsub, rightsub, ddn, desc, crit";
 	while (KeyCount < Keys.length) {
 		Tag = Keys[KeyCount];
@@ -509,55 +492,55 @@ function createPowerCard (msg, msgContent, rollSuccess, locationHit, locationToo
 					}
 				}
 			
-			// Dice Rolls
-			if (Tag.toLowerCase() == "diceroll") {
+			// Custom Dice Rolls
+			if (Tag.toLowerCase() == "custom_diceroll") {
 				critRoll = false;
 				failRoll = false;
-				if (diceTotal > 95) {failRoll = true};
-				if (diceTotal < 6) {critRoll = true};
+				if (RollObject.DiceRollResult > 95) {failRoll = true};
+				if (RollObject.DiceRollResult < 6) {critRoll = true};
 								
-				if (rollType == "Attack") {
+				if (RollObject.RollType == "Attack") {
 					RowBackground = (RowNumber % 2 == 1) ? OddRow : EvenRow;
 					RowNumber += 1;
-					DisplayCard += "<div style='" + RowStyle + RowBackground + "'><b>Weapon:</b> " + weapon + "</div>";
-				} else if (rollType == "Attribute") {
+					DisplayCard += "<div style='" + RowStyle + RowBackground + "'><b>Weapon:</b> " + RollObject.WeaponName + "</div>";
+				} else if (RollObject.RollType == "Attribute") {
 					RowBackground = (RowNumber % 2 == 1) ? OddRow : EvenRow;
 					RowNumber += 1;
-					DisplayCard += "<div style='" + RowStyle + RowBackground + "'><b>" + attribute + ":</b> " + expression + "</div>";
+					DisplayCard += "<div style='" + RowStyle + RowBackground + "'><b>" + RollObject.AttributeName + ":</b> " + RollObject.AttributeValue + "</div>";
 				}
 				
 				RowBackground = (RowNumber % 2 == 1) ? OddRow : EvenRow;
 				RowNumber += 1;
-				DisplayCard += "<div style='" + RowStyle + RowBackground + "'><b>" + ((rollType == "Attack") ? "Attack" : "Skill") + " Modifier:</b> " + ( (modifier>0) ? "+" : "") + modifier + "</div>";
+				DisplayCard += "<div style='" + RowStyle + RowBackground + "'><b>" + ((RollObject.RollType == "Attack") ? "Attack" : "Skill") + " Modifier:</b> " + ( (RollObject.TestModifier>0) ? "+" : "") + RollObject.TestModifier + "</div>";
 				
-				if (rangedAttack == true) {
+				if (RollObject.RangedAttack == true) {
 					RowBackground = (RowNumber % 2 == 1) ? OddRow : EvenRow;
 					RowNumber += 1;
-					DisplayCard += "<div style='" + RowStyle + RowBackground + "'><b>Ammo:</b> " + ammoCount + "/" + ammoMax + " subtract 1</div>";	
+					DisplayCard += "<div style='" + RowStyle + RowBackground + "'><b>Ammo:</b> " + RollObject.AmmoCount + "/" + RollObject.AmmoMax + " subtract 1</div>";	
 				}
 				
 				RowBackground = (RowNumber % 2 == 1) ? OddRow : EvenRow;
 				RowNumber += 1;
-				DisplayCard += "<div style='" + RowStyle + RowBackground + "'> Rolled a <span style=\"text-align: center; vertical-align: text-middle; display: inline-block; min-width: 1.75em; border-radius: 5px; padding: 2px 0px 0px 0px;\" title=\"" + diceToolTip + "\" class=\"a inlinerollresult showtip tipsy-n " + (critRoll && failRoll ? ' importantroll' : (critRoll ? ' fullcrit' : (failRoll ? ' fullfail' : ''))) + "\">" + diceTotal + "</span> </div>";
+				DisplayCard += "<div style='" + RowStyle + RowBackground + "'> Rolled a <span style=\"text-align: center; vertical-align: text-middle; display: inline-block; min-width: 1.75em; border-radius: 5px; padding: 2px 0px 0px 0px;\" title=\"" + RollObject.DiceRollResultToolTip + "\" class=\"a inlinerollresult showtip tipsy-n " + (critRoll && failRoll ? ' importantroll' : (critRoll ? ' fullcrit' : (failRoll ? ' fullfail' : ''))) + "\">" + RollObject.DiceRollResult + "</span> </div>";
 				
 				RowBackground = (RowNumber % 2 == 1) ? OddRow : EvenRow;
 				RowNumber += 1;
-				DisplayCard += "<div style='" + RowStyle + RowBackground + "'>" + ((rollType == "Attack") ? (rollSuccess ? 'Hit' : 'Missed') : (rollSuccess ? 'Succeeded' : 'Failed')) + " with <span style=\"text-align: center; vertical-align: text-middle; display: inline-block; min-width: 1.75em; border-radius: 5px; padding: 2px 0px 0px 0px;\" title=\"" + degreesToolTip + "\" class=\"a inlinerollresult showtip tipsy-n\">" + degreesOfSuccess + "</span> degrees of " + (rollSuccess ? 'success' : 'failure') + "</div>";
+				DisplayCard += "<div style='" + RowStyle + RowBackground + "'>" + ((RollObject.RollType == "Attack") ? (RollObject.TestSuccess ? 'Hit' : 'Missed') : (RollObject.TestSuccess ? 'Succeeded' : 'Failed')) + " with <span style=\"text-align: center; vertical-align: text-middle; display: inline-block; min-width: 1.75em; border-radius: 5px; padding: 2px 0px 0px 0px;\" title=\"" + RollObject.DegreesOfSuccessToolTip + "\" class=\"a inlinerollresult showtip tipsy-n\">" + RollObject.DegreesOfSuccess + "</span> degrees of " + (RollObject.TestSuccess ? 'success' : 'failure') + "</div>";
 				
 			}
 			
-			// Damage Roll
-			if (Tag.toLowerCase() == "dmgroll") {
+			// Custom Damage Roll
+			if (Tag.toLowerCase() == "custom_dmgroll") {
 				critRoll = false;
 				failRoll = false;
-				if (damageResult == 1) {failRoll = true};
-				if (damageResult == 10) {critRoll = true};
+				if (RollObject.DamageRollResult == 1) {failRoll = true};
+				if (RollObject.DamageRollResult == 10) {critRoll = true};
 				
 				RowBackground = (RowNumber % 2 == 1) ? OddRow : EvenRow;
 				RowNumber += 1;
-				DisplayCard += "<div style='" + RowStyle + RowBackground + "'><b>Damage:</b> " + "1d10 " + ((damageAdd > -1) ? "+ " : "- ") + Math.abs(damageAdd) + "</div>";				
+				DisplayCard += "<div style='" + RowStyle + RowBackground + "'><b>Damage:</b> " + "1d10 " + ((RollObject.DamageAdd > -1) ? "+ " : "- ") + Math.abs(RollObject.DamageAdd) + "</div>";				
 
-				if (impactWeapon == true) {
+				if (RollObject.ImpactWeapon == true) {
 					RowBackground = (RowNumber % 2 == 1) ? OddRow : EvenRow;
 					RowNumber += 1;
 					DisplayCard += "<div style='" + RowStyle + RowBackground + "'><b>Qualities:</b> " + "Impact" + "</div>";				
@@ -565,13 +548,13 @@ function createPowerCard (msg, msgContent, rollSuccess, locationHit, locationToo
 				
 				RowBackground = (RowNumber % 2 == 1) ? OddRow : EvenRow;
 				RowNumber += 1;
-				DisplayCard += "<div style='" + RowStyle + RowBackground + "'>Target takes <span style=\"text-align: center; vertical-align: text-middle; display: inline-block; min-width: 1.75em; border-radius: 5px; padding: 2px 0px 0px 0px;\" title=\"" + damageToolTip + "\" class=\"a inlinerollresult showtip tipsy-n" + (critRoll ? ' fullcrit' : (failRoll ? ' fullfail' : '')) + "\">" + damageTotal + "</span> damage to the <span style=\"text-align: center; vertical-align: text-middle; display: inline-block; min-width: 1.75em; border-radius: 5px; padding: 2px 0px 0px 0px;\" title=\"" + locationToolTip + "\" class=\"a inlinerollresult showtip tipsy-n\">" + locationHit + "</span>" + "</div>";
+				DisplayCard += "<div style='" + RowStyle + RowBackground + "'>Target takes <span style=\"text-align: center; vertical-align: text-middle; display: inline-block; min-width: 1.75em; border-radius: 5px; padding: 2px 0px 0px 0px;\" title=\"" + RollObject.DamageRollTotalToolTip + "\" class=\"a inlinerollresult showtip tipsy-n" + (critRoll ? ' fullcrit' : (failRoll ? ' fullfail' : '')) + "\">" + RollObject.DamageRollTotal + "</span> damage to the <span style=\"text-align: center; vertical-align: text-middle; display: inline-block; min-width: 1.75em; border-radius: 5px; padding: 2px 0px 0px 0px;\" title=\"" + RollObject.HitLocationToolTip + "\" class=\"a inlinerollresult showtip tipsy-n\">" + RollObject.HitLocation + "</span>" + "</div>";
 				
-				if (impactWeapon == true) {
+				if (RollObject.ImpactWeapon == true) {
 					critRoll = false;
 					failRoll = false;
-					if (impactResult == 1) {failRoll = true};
-					if (impactResult == 10) {critRoll = true};
+					if (RollObject.ImpactRollResult == 1) {failRoll = true};
+					if (RollObject.ImpactRollResult == 10) {critRoll = true};
 				
 					RowBackground = (RowNumber % 2 == 1) ? OddRow : EvenRow;
 					RowNumber += 1;
@@ -579,7 +562,7 @@ function createPowerCard (msg, msgContent, rollSuccess, locationHit, locationToo
 					
 					RowBackground = (RowNumber % 2 == 1) ? OddRow : EvenRow;
 					RowNumber += 1;
-					DisplayCard += "<div style='" + RowStyle + RowBackground + "'>Target takes <span style=\"text-align: center; vertical-align: text-middle; display: inline-block; min-width: 1.75em; border-radius: 5px; padding: 2px 0px 0px 0px;\" title=\"" + impactToolTip + "\" class=\"a inlinerollresult showtip tipsy-n" + (critRoll ? ' fullcrit' : (failRoll ? ' fullfail' : '')) + "\">" + impactTotal + "</span> damage to the <span style=\"text-align: center; vertical-align: text-middle; display: inline-block; min-width: 1.75em; border-radius: 5px; padding: 2px 0px 0px 0px;\" title=\"" + locationToolTip + "\" class=\"a inlinerollresult showtip tipsy-n\">" + locationHit + "</span>" + "</div>";
+					DisplayCard += "<div style='" + RowStyle + RowBackground + "'>Target takes <span style=\"text-align: center; vertical-align: text-middle; display: inline-block; min-width: 1.75em; border-radius: 5px; padding: 2px 0px 0px 0px;\" title=\"" + RollObject.ImpactRollTotalToolTip + "\" class=\"a inlinerollresult showtip tipsy-n" + (critRoll ? ' fullcrit' : (failRoll ? ' fullfail' : '')) + "\">" + RollObject.ImpactRollTotal + "</span> damage to the <span style=\"text-align: center; vertical-align: text-middle; display: inline-block; min-width: 1.75em; border-radius: 5px; padding: 2px 0px 0px 0px;\" title=\"" + RollObject.HitLocationToolTip + "\" class=\"a inlinerollresult showtip tipsy-n\">" + RollObject.HitLocation + "</span>" + "</div>";
 				}
 				
 			}
