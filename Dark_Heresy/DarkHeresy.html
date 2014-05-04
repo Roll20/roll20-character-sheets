@@ -8,7 +8,7 @@
 <br>       
         <div class="sheet-baseinfo"><label>Home World</label></div>
             <div class="sheet-baseinfo sheet-basetwo"><input type="text" name="attr_homeworld" /> </div>
-    	<div class="sheet-baseinfo"><label>Career Path</label></div>
+        <div class="sheet-baseinfo"><label>Career Path</label></div>
         	<div class="sheet-baseinfo sheet-basetwo"><input type="text" name="attr_careerpath" /> </div>
 		<div class="sheet-baseinfo"><label>Rank</label></div>
         	<div class="sheet-baseinfo sheet-basetwo"><input type="text" name="attr_rank" /> </div>
@@ -187,8 +187,13 @@
     </div>
     <div class="sheet-baseinfo">
         <h3>Talents & Traits</h3>
+            	<input type="text" name="attr_weapontrainingclass" style="width:15%; border:0;" /><p> Weapon Training (</p><input type="text" name="attr_weapontraining" style="width:47%;"/><p>)</p>        
         	<fieldset class="repeating_weapontraining">
-            	<input type="text" name="attr_weapontrainingclass" style="width:15%; border:0;" /><p> Weapon Training (</p><input type="text" name="attr_weapontraining" style="width:47%;"/><p>)</p>
+            	<input type="text" name="attr_repweapontrainingclass" style="width:15%; border:0;" /><p> Weapon Training (</p><input type="text" name="attr_repweapontraining" style="width:47%;"/><p>)</p>
+            </fieldset>
+            	<input type="text" name="attr_fixtalent" style="100%" />
+            <fieldset class="repeating_talents">
+            	<input type="text" name="attr_reptalent" style="100%" />
             </fieldset>
             
     </div>
@@ -243,13 +248,24 @@
                 <td><button type="roll" name="roll_speaklow" value="/em rolls Speak Low Gothic \n[[(((@{speaklow1}+0.5)*@{int}+@{speaklow2}+@{speaklow3})+?{Modifier|0}-1d100)/10]] degree(s) of success!"></button></td>
             </tr> 
         </table>
-    	<fieldset class="repeating_basicskills" style="margin-top:5px;">
+        <fieldset class="repeating_advancedskills" style="margin-top:5px;">
           <table><tr>
-            	<td><input class="sheet-baseinfo" type="text" name="attr_basicskillname" style="width:100%"/></td>
-                <td><input type="checkbox" name="attr_basicskillbox1" value="0.5" /></td>
-                <td><input type="checkbox" name="attr_basicskillbox2" value="10" /></td>
-                <td><input type="checkbox" name="attr_basicskillbox3" value="10" /></td>
-                <td><button type="roll" name="roll_basicskillroll" value="/em rolls @{basicskillname}\n[[(((@{basicskillbox1}+0.5)*?{Characteristic Value|30}+@{basicskillbox2}+@{basicskillbox3})+?{Modifier|0}-1d100)/10]] degree(s) of success!"></button></td>                				
+                <td><input class="sheet-baseinfo" type="text" name="attr_advancedskillname" style="width:65%; display:inline-block;"/>
+                <p>(</p><select name="attr_skillcharacteristic" class="charaselect" style="margin:auto; height:2em; width:27%; display:inline-block">
+                    <option value="@{ws}">WS</option>
+                    <option value="@{bs}">BS</option>
+                    <option value="@{strength}">S</option>
+                    <option value="@{toughness}">T</option>
+                    <option value="@{ag}">Ag</option>
+                    <option value="@{int}">Int</option>
+                    <option value="@{per}">Per</option>
+                    <option value="@{wp}">Wp</option>
+                    <option value="@{fel}">Fel</option>
+            </select><p>)</p></td>
+                <td><input type="checkbox" name="attr_advancedskillbox1" value="0.5" /></td>
+                <td><input type="checkbox" name="attr_advancedskillbox2" value="10" /></td>
+                <td><input type="checkbox" name="attr_advancedskillbox3" value="10" /></td>
+                <td><button type="roll" name="roll_advancedskillroll" value="/em rolls @{advancedskillname}\n[[(((@{advancedskillbox1}+0.5)*?{Characteristic Value|30}+@{advancedskillbox2}+@{advancedskillbox3})+?{Modifier|0}-1d100)/10]] degree(s) of success!"></button></td>                				
           </table></tr>        
         </fieldset>
         </div>
@@ -257,7 +273,11 @@
         
         <div class="sheet-baseinfo">
         <h3>Psychic Powers</h3>
-            <p style="width:40%">Psychic Discipline</p><input type="text" name="attr_psychicdiscipline" style="width:60%;"/>
+            <p style="width:38%">Psychic Discipline</p><input type="text" name="attr_psychicdiscipline" style="width:50%;"/>
+            <button type="roll" name="roll_psycicpower" value="/me draws on the power of the Warp!\n/r ((?{Psy Rating|1}d10)+[[floor(34/10)]]+?{Modifier|0})"></button>
+            <fieldset class="repeating_psychicdiscipline">
+                <p style="width:40%">Psychic Discipline</p><input type="text" name="attr_reppsychicdiscipline" style="width:60%;"/>                
+            </fieldset>
             <p>Minor Psychic Power (</p><input type="text" name="attr_minorpsychicpower" style="width:54%;"/><p>)</p>
             <fieldset class="repeating_minorpsychicpowers">
             	<p>Minor Psychic Power (</p><input type="text" name="attr_repminorpsychicpower" style="width:54%;" /><p>)</p>
@@ -437,22 +457,24 @@
     </div>
     <hr>
     <div class="1colrow">
+    <div class="colrow">
         <h3>Experience Points</h3>
-            <div style="float:left; width:10%; border:1px solid gray; text-align:center; margin-right:5px;">
-                <p style="font-weight:bold">XP to <br>spend</p><br><input type="number" name="attr_xptospent" />
-            </div>
-            <div style="float:right; width:10%; border:1px solid gray; text-align:center;">
-                <p style="font-weight:bold">Total XP spent</p><br><input type="number" name="attr_totalxpspent" />                
-            </div>  
+            <div class="sheet-footer" style="width:100%; font-size:1em;">
+                <div style="width:100%;">
+                    <p style="font-weight:bold">XP to spend</p><input style="margin-right:20%;" type="number" name="attr_xptospent" />
+                    <p style="font-weight:bold">Total XP spent</p><input type="number" name="attr_totalxpspent" />                
+                </div>
+            </div><br />
             <p>Advancements Taken:</p>
-        <fieldset class="repeating_advancements" >
-            <input type="text" style="width:18%" name="attr_advancement1" />(<input type="number" name="advancement1xp" />)
-            <input type="text" style="width:18%" name="attr_advancement2" />(<input type="number" name="advancement2xp" />)
-            <input type="text" style="width:18%" name="attr_advancement3" />(<input type="number" name="advancement3xp" />)            
-        </fieldset>
+            <fieldset class="repeating_advancements">
+                <input type="text" style="width:25%" name="attr_advancement1" />(<input type="number" name="advancement1xp" />)
+                <input type="text" style="width:25%" name="attr_advancement2" />(<input type="number" name="advancement2xp" />)
+                <input type="text" style="width:25%" name="attr_advancement3" />(<input type="number" name="advancement3xp" />)            
+            </fieldset>
         <hr>
         <h3>Other Notes:</h3>
         <textarea name="attr_othernotes"></textarea>
+    </div>
     </div>
 
 
