@@ -1,15 +1,7 @@
-The lay out is most done with tables, though everything has a class so it's enough to rework what you want with the CSS.
+- Lay out and color scheme based on in put from 20 users.
+- Run through the gauntlet as every field, button and input was tested during game play in multiple groups with varying player bases.
+- Intended to be a standard vanilla template using the same game terms and references as presented in the D&D Next play test packet. Used the D&D Next character sheet presented in the play test packet as a reference for this design.
 
-The check boxes for skills are simply to denote a character is proficient with that skill.
-The player will still need to fill their total bonus in the input field.
-
-Most buttons will prompt for Misc. modifiers. The Healing Dice button will prompt to select a target.
-I mostly implemented that to test how much of a hassle it is switch between chracter sheets,
-and choose targets. The sheet gets in the way of the table top, making accessing tokens kind of annoying.
-
-The Initiative Button does require the players character token to be selected.
-It's meant to be used th be used with intiative tracking script available in the API library.
-
-Anyway, have tweaking this and look forward to seeing what changes and improvements people will make.
+- I expect to be making no further revisions to this sheet until the next edition of D&D is published this summer.
 
 -David Hawkins "The Story Teller"
