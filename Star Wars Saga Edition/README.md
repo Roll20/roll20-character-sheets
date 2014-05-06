@@ -10,11 +10,11 @@ TO DO
 ============
 * ~~List out all Skills with modifiers and rolls~~
 * ~~Use repeating function to include weapons and attacks having the user choose which Ability Mod and damage for pre-filled rolls~~
-* Fix Attack Repeating function (overall this won't be working the way I want till a repeating roll function is included)
+* Fix Attack Repeating function
 * ~~Make it prettier with CSS (~~incorporate logos~~, etc)~~
 * ~~Equipment and credits section~~
 * ~~Languages~~
-* Feats, Talents and Force Powers area
+* ~~Feats, Talents and Force Powers area~~
 * ~~Experience~~
 
 Suggestions
