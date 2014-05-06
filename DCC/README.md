@@ -6,6 +6,7 @@ by bripod and sturtus
 5/5/14
 added preview image
 working on formula to calc modifiers based on DCC abilities
+added attribute names for saving
 
 
 5/3/14
