@@ -14,9 +14,7 @@ on("chat:message", function(msg) {
             total = 0;
         }
         var finalresult = 0;
-        log(total);
-        if (content.rolls[0].results[0]['v'] == 10) {
-            sendChat(msg.who,'<large><b>Open Ended Roll...</b></large>')
+         if (content.rolls[0].results[0]['v'] == 10) {
             var rerolls = 0;
             var finalroll = 0;
             while (rerolls < 4 && finalroll == 0) {
@@ -29,20 +27,15 @@ on("chat:message", function(msg) {
                     finalroll = roll;
                 }
             }
-            sendChat(msg.who, '<i>' + rerolls + ' aditional rolls<br>final roll of ' + finalroll +'</i><br/>')
             if (isEven(finalroll)) {
                 finalresult = 10 + ((rerolls -1) * 10) + finalroll;
-                log(finalresult);
             }
             else
             {
                 finalresult = 0 - ((rerolls -1) *10) - finalroll;
             }
-            
-            sendChat(userwho, 'The roll had a value of <huge><b>' + finalresult + '</huge></b>')
-            overall = finalresult + total;
-            sendChat(userwho, 'for a net roll of <huge><b>' + overall + '</huge></b>')
-            
+            var overall = finalresult + total;
+            sendChat(userwho, '<large><b>Open Ended Roll...</b></large> <i>' + rerolls + ' aditional rolls with a final roll of ' + finalroll +'.</i><br/>  The roll had a value of <huge><b>' + finalresult + '</huge></b> for a net roll of <huge><b>' + overall + '</huge></b>')
         }
     }
     function isEven(n) {
