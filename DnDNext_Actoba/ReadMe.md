@@ -10,8 +10,6 @@ This sheet started as a reworking of another DnD Next sheet authored by David L.
 
 * More help text and tooltips
 * Make saving throw action macro prettier once newline bug is fixed.
-* Roll 20 Wiki page
-* Instructions in JSON file need updating
 
 ---
 
