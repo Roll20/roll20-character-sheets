@@ -5,12 +5,8 @@ This character sheet was built for the last playtest packet released for DnD Nex
 This sheet started as a reworking of another DnD Next sheet authored by David L. Hawkins (@The Story Teller)& Aaron C. Meadows and that original sheet can be found [here](https://github.com/Roll20/roll20-character-sheets/tree/master/DnDNext).
 
 ---
-
-###TODO (Still being worked on)
-
-* More help text and tooltips
+###TODO 
 * Make saving throw action macro prettier once newline bug is fixed.
-
 ---
 
 John Myles ([@Actoba](https://app.roll20.net/users/427494/actoba) on roll20)
