@@ -122,16 +122,37 @@
 				<td><input type="number" name="attr_Speed" value="0" /></td>
 				
 				<td><input type="number" name="attr_DP" value="0" /></td>
-			</tr>	
+			</tr>			
 		</table>
-		<br />
 		<table style="text-align:left">
 			<tr>	
-				<td><label style="width:80px">Perception</label>	<button type="roll" name="roll_PerceptionShort" value="/roll 1d20 + @{Perception}"></button></td>
+				<td><button type="roll" name="roll_PerceptionShort" value="/roll 1d20 + @{Perception}"></button>	<label style="width:80px">Perception</label>	</td>
 			</tr>
 			<tr>
-				<td><label style="width:80px">Initiative</label>	<button type="roll" name="roll_InitiativeShort" value="/roll 1d20 + @{Initiative} &{tracker}"></button></td>
+				<td><button type="roll" name="roll_InitiativeShort" value="/roll 1d20 + @{Initiative} &{tracker}"></button>		<label>Initiative (tracker)</label>	</td>
 			</tr>	
+		</table>
+		<table>
+			<tr>		
+				<td colspan="6"><div class="textHead">Grapple</div></td>		
+			</tr>
+			<tr>		
+				<th colspan="3"></th>
+				<th>Mod</th>		
+				<th></th>
+				<th>Misc</th>
+			</tr>			
+			<tr>
+				<td><button type="roll" name="roll_GrappleCheck" value="/roll 1d20 + @{Grapple}"></button></td>		
+				<td><input type="number" name="attr_Grapple" value="@{GrpMod} + @{GrpMod|max}" disabled="true" /></td>
+				<td>&nbsp;=&nbsp;</td>
+				<td> <select name="attr_GrpMod" class="defenseMod">
+				  <option value="@{str|max}">STR</option>
+				  <option value="@{dex|max}">DEX</option>
+				</select></td>				
+				<td>&nbsp;+&nbsp;</td>
+				<td><input type="number" name="attr_GrpMod_max" value="0" /></td>
+			</tr>
 		</table>
 
 	</div>
@@ -154,7 +175,7 @@
 			</thead>	
 		  <tbody>
 			<tr>
-				<td class="col1">Reflex</td>
+				<td class="col1" rowspan="2">Reflex</td>
 				<td><input type="number" name="attr_Reflex" value="10+@{RefMod}+@{RefLevel}+@{RefClass}+@{RefMisc}+@{CT}" disabled="true" /></td> 
 				<td>&nbsp;=&nbsp;10&nbsp;+&nbsp;</td>
 				<td><input type="number" name="attr_RefLevel" value="0" /></td>				
@@ -168,6 +189,12 @@
 				  <option value="@{cha|max}">CHA</option>
 				</select></td>
 				<td><input type="number" name="attr_RefMisc" value="0" /></td>
+			</tr>
+			<tr>
+				<td class="col1"><div class="small">Flatfooted</div></td>
+				<td><input type="number" name="attr_ReflexFlatFooted" value="10+@{RefLevel}+@{RefClass}+@{RefFlatFootedMisc}+@{CT}" disabled="true" /></td>
+				<td colspan="3"></td>
+				<td><input type="number" name="attr_RefFlatFootedMisc" value="0" /></td>
 			</tr>
 			<tr>
 				<td class="col1">Fortitude</td>
@@ -214,22 +241,22 @@
 				<td><input type="number" name="attr_Speed_max" value="0" /></td>
 			</tr>	
 			<tr>		
-				<td colspan="5"><label>Notes</label><textarea type="text" name="attr_ArmorNotes" class="atkNotes" style="width:82%" rows="1"></textarea></td>
+				<td colspan="5"><label>Notes</label><textarea type="text" name="attr_ArmorNotes" class="atkNotes" style="width:82%"></textarea></td>
 			</tr>
 		</table>
 		<div class="textHead">Attacks</div>
 			<fieldset class="repeating_attack">	
 				<table class="spacing">
 					<tr>
-						<td colspan="6" width="75%">	<input type="text" name="attr_WeaponName" placeholder="Weapon Name" style="width:100%" />		</td>
-						<td colspan="2">				<input type="text" name="attr_WeaponName_max" placeholder="Type" style="width:100%"/>			</td>
+						<td colspan="5" width="75%">	<input type="text" name="attr_WeaponName" placeholder="Weapon Name" style="width:100%" />		</td>
+						<td colspan="3">				<input type="text" name="attr_WeaponName_max" placeholder="Type" style="width:100%"/>			</td>
 					</tr>
 					<tr>
-						<td width="10px" rowspan="2"></td>
+						<td rowspan="3" width="15px"></td>
 						<td class="col1">Attack</td>						
-						<td><input type="number" name="attr_AttackBAB" value="@{BAB}" disabled="true" /></td>
+						<td width="60px"><input type="number" name="attr_AttackBAB" value="@{BAB}" disabled="true" /></td>
 						<td>&nbsp;+&nbsp;</td>
-						<td width="125px"><input type="number" name="attr_attackMod_max" value="@{attackMod}" disabled="true" />
+						<td width="80px">
 							<select name="attr_attackMod" class="modtype">                
 							  <option value="@{str|max}">STR</option>
 							  <option value="@{dex|max}">DEX</option>
@@ -237,29 +264,38 @@
 							</select>
 						</td>		  
 						<td>&nbsp;+&nbsp;</td>
-						<td><input type="number" name="attr_attackModMisc" placeholder="Misc" value="0" /></td>
-						<td><button type="roll" name="roll_WeaponCheck" value="@{WeaponName}\n/roll 1d20 + @{BAB} + @{attackMod} + @{attackModMisc} + @{CT} \n/roll @{damage} + @{damageMod} + @{damageMisc}"> </button></td>
+						<td><input type="number" name="attr_attackModMisc" placeholder="Misc" value="0" style="width:40px" /></td>
+						
+						<td rowspan="2"> <button type="roll" name="roll_WeaponCheck" value="Attacking with: @{WeaponName} &#8226; Type: @{WeaponName|max}
+						&#x00A;Attack Result: [[1d20 + @{BAB} + @{attackMod} + @{attackModMisc} + @{CT}]] 
+						&#x00A;Damage Result:  [[@{damage} + @{damageMod} + @{damageMisc}]]
+						&#x00A;Attack Notes: @{WeaponNotes|max}"> </button>
+						</td>
 					</tr>
 					<tr>					
 						<!-- rowspan placholder -->
 						<td class="col1">Damage</td>
-						<td><input type="number" name="attr_damage" placeholder="2d8" />	</td>	  
+						<td><input type="text" name="attr_damage" placeholder="2d8"  style="width:60px" />	</td>	  
 						<td>&nbsp;+&nbsp;</td>
-						<td><input type="number" name="attr_damageMod" value="[[@{level|max}+@{damageMod|max}]]" disabled="true" />
-							<select name="attr_damageMod_max" class="modtype">
-							  <option value="0" selected>None</option>                
-							  <option value="@{str|max}">STR</option>
-							  <option value="[[@{str|max}*2]]">STRx2</option>
-							  <option value="@{dex|max}">DEX</option>
-							  <option value="@{cha|max}">CHA</option>
+						<td>
+							<select name="attr_damageMod" class="modtype" style="width:80px">
+							  <option value="@{level|max}" selected>None</option>                
+							  <option value="@{level|max}+@{str|max}">STR</option>
+							  <option value="@{str|max}*2">STRx2</option>
+							  <option value="@{level|max}+@{dex|max}">DEX</option>
+							  <option value="@{level|max}+@{cha|max}">CHA</option>
 							</select>
 						</td>		  
 						<td>&nbsp;+&nbsp;</td> 
-						<td><input type="number" name="attr_damageMisc" placeholder="Misc" value="0" /></td>
-						<td></td>
+						<td><input type="number" name="attr_damageMisc" placeholder="Misc" value="0" style="width:40px" /></td>
+						<!-- rowspan placholder -->
 					</tr>
-					<tr>		
-						<td colspan="8"><textarea type="text" name="attr_WeaponNotes" placeholder="Notes" class="atkNotes" rows="1"></textarea></td>
+					<tr>					
+						<!-- rowspan placholder -->
+						<td colspan="7">
+							<textarea type="text" name="attr_WeaponNotes_max" placeholder="Attack Notes" class="atkNotes"></textarea>
+							<textarea type="text" name="attr_WeaponNotes" placeholder="Weapon Notes" class="atkNotes"></textarea>
+						</td>
 					</tr>	
 				</table>
 			</fieldset>
@@ -348,7 +384,7 @@
 					<td><input type="number" name="attr_JumpMisc" value="0" /></td>
 				</tr>
 				<tr>
-					<td class="skillsCol1">Knowledge<br />(Bureaucracy)</td>
+					<td class="skillsCol1">Bureaucracy<br /><div class="small">Knowledge</div></td>
 					<td><button type="roll" name="roll_Knowledge-BureaucracyCheck" value="Knowledge (Bureaucracy)\n/roll 1d20 + @{Knowledge-Bureaucracy}"></button></td>
 					<td><input type="number" name="attr_Knowledge-Bureaucracy" value="@{level|max}+@{Knowledge-BureaucracyMod}+@{Knowledge-BureaucracyFeat}+@{Knowledge-BureaucracyFeat|max}+@{Knowledge-BureaucracyMisc}+@{CT}" disabled="true" /></td> <td> = </td>	
 					<td><input type="number" name="attr_Knowledge-BureaucracyMod" value="@{int|max}" disabled="true" /></td>
@@ -357,7 +393,7 @@
 					<td><input type="number" name="attr_Knowledge-BureaucracyMisc" value="0" /></td>
 				</tr>
 				<tr>
-					<td class="skillsCol1">Knowledge<br />(Galactic Lore)</td>
+					<td class="skillsCol1">Galactic Lore<br /><div class="small">Knowledge</div></td>
 					<td><button type="roll" name="roll_Knowledge-GalacticLoreCheck" value="Knowledge (Galactic Lore)\n/roll 1d20 + @{Knowledge-GalacticLore}"></button></td>
 					<td><input type="number" name="attr_Knowledge-GalacticLore" value="@{level|max}+@{Knowledge-GalacticLoreMod}+@{Knowledge-GalacticLoreFeat}+@{Knowledge-GalacticLoreFeat|max}+@{Knowledge-GalacticLoreMisc}+@{CT}" disabled="true" /></td> <td> = </td>	
 					<td><input type="number" name="attr_Knowledge-GalacticLoreMod" value="@{int|max}" disabled="true" /></td>
@@ -366,7 +402,7 @@
 					<td><input type="number" name="attr_Knowledge-GalacticLoreMisc" value="0" /></td>
 				</tr>
 				<tr>
-					<td class="skillsCol1">Knowledge<br />(Life Sciences)</td>
+					<td class="skillsCol1">Life Sciences<br /><div class="small">Knowledge</div></td>
 					<td><button type="roll" name="roll_Knowledge-LifeSciencesCheck" value="Knowledge (Life Sciences)\n/roll 1d20 + @{Knowledge-LifeSciences}"></button></td>
 					<td><input type="number" name="attr_Knowledge-LifeSciences" value="@{level|max}+@{Knowledge-LifeSciencesMod}+@{Knowledge-LifeSciencesFeat}+@{Knowledge-LifeSciencesFeat|max}+@{Knowledge-LifeSciencesMisc}+@{CT}" disabled="true" /></td> <td> = </td>	
 					<td><input type="number" name="attr_Knowledge-LifeSciencesMod" value="@{int|max}" disabled="true" /></td>
@@ -375,7 +411,7 @@
 					<td><input type="number" name="attr_Knowledge-LifeSciencesMisc" value="0" /></td>
 				</tr>
 				<tr>
-					<td class="skillsCol1">Knowledge<br />(Physical Science)</td>
+					<td class="skillsCol1">Physical Science<br /><div class="small">Knowledge</div></td>
 					<td><button type="roll" name="roll_Knowledge-PhysicalScienceCheck" value="Knowledge (Physical Science)\n/roll 1d20 + @{Knowledge-PhysicalScience}"></button></td>
 					<td><input type="number" name="attr_Knowledge-PhysicalScience" value="@{level|max}+@{Knowledge-PhysicalScienceMod}+@{Knowledge-PhysicalScienceFeat}+@{Knowledge-PhysicalScienceFeat|max}+@{Knowledge-PhysicalScienceMisc}+@{CT}" disabled="true" /></td> <td> = </td>	
 					<td><input type="number" name="attr_Knowledge-PhysicalScienceMod" value="@{int|max}" disabled="true" /></td>
@@ -384,7 +420,7 @@
 					<td><input type="number" name="attr_Knowledge-PhysicalScienceMisc" value="0" /></td>
 				</tr>
 				<tr>
-					<td class="skillsCol1">Knowledge<br />(Social Science)</td>
+					<td class="skillsCol1">Social Science<br /><div class="small">Knowledge</div></td>
 					<td><button type="roll" name="roll_Knowledge-SocialScienceCheck" value="Knowledge (Social Science)\n/roll 1d20 + @{Knowledge-SocialScience}"></button></td>
 					<td><input type="number" name="attr_Knowledge-SocialScience" value="@{level|max}+@{Knowledge-SocialScienceMod}+@{Knowledge-SocialScienceFeat}+@{Knowledge-SocialScienceFeat|max}+@{Knowledge-SocialScienceMisc}+@{CT}" disabled="true" /></td> <td> = </td>	
 					<td><input type="number" name="attr_Knowledge-SocialScienceMod" value="@{int|max}" disabled="true" /></td>
@@ -393,7 +429,7 @@
 					<td><input type="number" name="attr_Knowledge-SocialScienceMisc" value="0" /></td>
 				</tr>
 				<tr>
-					<td class="skillsCol1">Knowledge<br />(Tactics)</td>
+					<td class="skillsCol1">Tactics<br /><div class="small">Knowledge</div></td>
 					<td><button type="roll" name="roll_Knowledge-TacticsCheck" value="Knowledge (Tactics)\n/roll 1d20 + @{Knowledge-Tactics}"></button></td>
 					<td><input type="number" name="attr_Knowledge-Tactics" value="@{level|max}+@{Knowledge-TacticsMod}+@{Knowledge-TacticsFeat}+@{Knowledge-TacticsFeat|max}+@{Knowledge-TacticsMisc}+@{CT}" disabled="true" /></td> <td> = </td>	
 					<td><input type="number" name="attr_Knowledge-TacticsMod" value="@{int|max}" disabled="true" /></td>
@@ -402,7 +438,7 @@
 					<td><input type="number" name="attr_Knowledge-TacticsMisc" value="0" /></td>
 				</tr>
 				<tr>
-					<td class="skillsCol1">Knowledge<br />(Technology)</td>
+					<td class="skillsCol1">Technology<br /><div class="small">Knowledge</div></td>
 					<td><button type="roll" name="roll_Knowledge-TechnologyCheck" value="Knowledge (Technology)\n/roll 1d20 + @{Knowledge-Technology}"></button></td>
 					<td><input type="number" name="attr_Knowledge-Technology" value="@{level|max}+@{Knowledge-TechnologyMod}+@{Knowledge-TechnologyFeat}+@{Knowledge-TechnologyFeat|max}+@{Knowledge-TechnologyMisc}+@{CT}" disabled="true" /></td> <td> = </td>	
 					<td><input type="number" name="attr_Knowledge-TechnologyMod" value="@{int|max}" disabled="true" /></td>
@@ -538,10 +574,10 @@
 			</fieldset>
 			</td>	</tr>		
 				<tr>	<td class="col1">Total Equipment Wt</td>	
-					<td><input type="number" name="attr_EquipmentWt" value="0" /></td>	
+					<td><input type="number" name="attr_EquipmentWt" value="0" style="width:100%" /></td>	
 				</tr>
 				<tr>	<td class="col1">Carrying Capacity</td>	
-					<td><input type="number" name="attr_CarryingCapacity" value="(@{Str}/2)*(@{Str}/2)" disabled="true" /></td>	
+					<td><input type="number" name="attr_CarryingCapacity" value="(@{Str}/2)*(@{Str}/2)" disabled="true" style="width:100%" /></td>	
 				</tr>
 		</table>	
 	</div>
@@ -553,9 +589,9 @@
 				<td width="225px"><div class="textHead">Languages</div></td>		
 			</tr>
 			<tr>
-				<td><input type="number" name="attr_XP" value="0" /></td>
+				<td><input type="number" name="attr_XP" value="0" style="width:70px" /></td>
 				<td>&nbsp;/&nbsp;</td>				
-				<td><input type="number" name="attr_XP_max" value="0" /></td>
+				<td><input type="number" name="attr_XP_max" value="0" style="width:70px" /></td>
 				<td rowspan="3"><textarea type="text" name="attr_Language" style="height:80px"></textarea></td>				
 			</tr>
 			<tr>
