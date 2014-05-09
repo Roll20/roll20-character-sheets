@@ -3,6 +3,20 @@ Character Sheet for Dungeon Crawl Classics
 by bripod and sturtus
 
 ===============================================
+Roadmap/Unfinished
+- Built in Abilities/macros
+- Enable buttons
+- Selected class shows/hides sections at bottom
+
+5/9/14
+threw top stats into 2 column layout
+smaller fonts overall
+bigger logo
+added final equation for ability score modifiers
+updated preview image
+fixed some typos
+
+
 5/5/14
 added preview image
 working on formula to calc modifiers based on DCC abilities
@@ -20,8 +34,3 @@ added attribute names for saving
 First upload of test sheet, unfinished.
 Requires layout changes and automatic stat adjustment for Ability scores
 
-Roadmap
-- Auto adjusting ability score modifiers
-- Built in Abilities
-- Enable buttons
-- Selected class shows/hides sections at bottom
