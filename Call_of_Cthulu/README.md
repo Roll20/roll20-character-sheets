@@ -1,0 +1,1 @@
+Investigator Sheet for Call of Cthulu 5th edition. I hope you'll find it useful. There is a lot to be said of styling but as of now it should fill the basic needs. Further updates can be expected, and of course, any help would be most welcome. (Roll20 rocks!)
