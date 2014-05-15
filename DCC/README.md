@@ -3,10 +3,28 @@ Character Sheet for Dungeon Crawl Classics
 by bripod and sturtus
 
 ===============================================
+Roadmap/Unfinished
+- Built in Abilities/macros
+- Enable buttons
+- Selected class shows/hides sections at bottom
+- Define weapon as ranged/melee and make appropriate buttons
+- class tabs or show/hide
+- mighty deed resolution
+- optional API checkbox in case of DCC HELPER usage, change buttons to API compatible buttons
+
+5/9/14
+- threw top stats into 2 column layout
+- smaller fonts overall
+- bigger logo
+- added final equation for ability score modifiers
+- updated preview image
+- fixed some typos
+
+
 5/5/14
-added preview image
-working on formula to calc modifiers based on DCC abilities
-added attribute names for saving
+- added preview image
+- working on formula to calc modifiers based on DCC abilities
+- added attribute names for saving
 
 
 5/3/14
@@ -17,11 +35,6 @@ added attribute names for saving
 - Spell table with level, check, description
 
 4/23/14
-First upload of test sheet, unfinished.
-Requires layout changes and automatic stat adjustment for Ability scores
+- First upload of test sheet, unfinished.
+- Requires layout changes and automatic stat adjustment for Ability scores
 
-Roadmap
-- Auto adjusting ability score modifiers
-- Built in Abilities
-- Enable buttons
-- Selected class shows/hides sections at bottom
