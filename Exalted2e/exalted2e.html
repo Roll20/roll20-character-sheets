@@ -1,4 +1,4 @@
-﻿<div class="bio sheet-3colrow">
+<div class="bio sheet-3colrow">
     <div class="sheet-col center">
         <img src="http://i.imgur.com/RgaO9Ft.gif" class="banner" />
     </div>
@@ -148,12 +148,12 @@
             <span class="ability">Martial Arts</span>
             <div class="dots">
                 <input type="checkbox" name="attr_MartialArts_max" value="1" /><span></span>
-                <input type="radio" name="attr_Martial_Arts" value="0" checked="checked" />
-                <input type="radio" name="attr_Martial_Arts" value="1" /><span></span>
-                <input type="radio" name="attr_Martial_Arts" value="2" /><span></span>
-                <input type="radio" name="attr_Martial_Arts" value="3" /><span></span>
-                <input type="radio" name="attr_Martial_Arts" value="4" /><span></span>
-                <input type="radio" name="attr_Martial_Arts" value="5" /><span></span>
+                <input type="radio" name="attr_MartialArts" value="0" checked="checked" />
+                <input type="radio" name="attr_MartialArts" value="1" /><span></span>
+                <input type="radio" name="attr_MartialArts" value="2" /><span></span>
+                <input type="radio" name="attr_MartialArts" value="3" /><span></span>
+                <input type="radio" name="attr_MartialArts" value="4" /><span></span>
+                <input type="radio" name="attr_MartialArts" value="5" /><span></span>
             </div>
         </div>
         <div class="ability">
@@ -690,23 +690,130 @@
     </div>
 </div>
 
-<!--div class="sheet-col">
-    <h3 style="text-align: center;">Derived Stats</h3>
-    <table style="width: 100%;">
-        <tr>
-            <td><input type="number" name="attr_move" class="sheet-short" value="@{dex}" disabled="true" /></td>
-            <td style="text-align: center;">Move | Dash</td>
-            <td><input type="number" name="attr_sprint" class="sheet-short" value="@{dex}+6" disabled="true"/></td>
-        </tr>
-        <tr>
-            <td><input type="number" name="attr_ParryDV" class="sheet-short" /></td>
-            <td style="text-align: center;">Parry DV | Dodge DV</td>
-            <td><input type="number" name="attr_DodgeDV" class="sheet-short" value="(@{dex}+@{dodge}+@{essence})/2" disabled="true" /></td>
-        </tr>
-        <tr>
-            <td><input type="number" name="attr_BashingSoak" class="sheet-short" value="@{sta}" disabled="true" /></td>
-            <td style="text-align: center;">Bashing Soak | Lethal Soak</td>
-            <td><input type="number" name="attr_LethalSoak" class="sheet-short" value="@{sta}/2" disabled="true"  /></td>
-        </tr>
-    </table>
-</div-->
+<h1 class="separator"><span>Quick Reference</span></h1>
+
+<p class="disclaimer">Calculations do not include applicable specialties or stunts.</p>
+
+<div class="sheet-3colrow">
+    <div class="sheet-col">
+        <h1 class="separator"><span>Defense</span></h1>
+        <div>Dodge DV: <input type="number" name="attr_DodgeDV" value="ceil((@{Dexterity}+@{Dodge}+@{Essence})/2)" disabled="true" /></div>
+        <div>
+            Parry DV:
+            <select name="attr_ParryDVAbility" class="fancy narrow">
+                <option value="@{Melee}">Melee</option>
+                <option value="@{MartialArts}">Martial Arts</option>
+                <option value="@{Archery}">Archery*</option>
+                <option value="@{Thrown}">Thrown*</option>
+            </select>
+            <input type="number" title="Weapon Defense Value" name="attr_WeaponDefense" class="fancy" value="0" />
+            <input type="number" name="attr_ParryDV" value="ceil((@{Dexterity}+@{ParryDVAbility}+@{WeaponDefense})/2)" disabled="true" />
+            <p class="disclaimer">* Stunt or charm required</p>
+        </div>
+        <div>Dodge MDV: <input type="number" name="attr_DodgeMDV" value="floor((@{Willpower}+@{Integrity}+@{Essence})/2)" disabled="true" /></div>
+        <div>
+            Parry MDV:
+            <select name="attr_ParryMDVAttribute" class="fancy very-narrow">
+                <option value="@{Charisma}">Charisma</option>
+                <option value="@{Manipulation}">Manipulation</option>
+            </select>
+            <select name="attr_ParryMDVAbility" class="fancy narrow">
+                <option value="@{Performance}">Performance</option>
+                <option value="@{Presence}">Presence</option>
+                <option value="@{Bureaucracy}">Bureaucracy</option>
+                <option value="@{Socialize}">Socialize</option>
+                <option value="@{Investigation}">Investigation*</option>
+                <option value="@{Lore}">Lore*</option>
+                <option value="@{Medicine}">Medicine*</option>
+                <option value="@{Occult}">Occult*</option>
+                <option value="@{Linguistics}">Linguistics*</option>
+            </select>
+            <input type="number" name="attr_ParryMDV" value="ceil((@{ParryMDVAttribute}+@{ParryMDVAbility})/2)" disabled="true" />
+            <p class="disclaimer">* Stunt or charm most likely required</p>
+        </div>
+        <div>Natural Bashing Soak: <input type="number" name="attr_NaturalBashingSoak" value="@{Stamina}" disabled="true" /></div>
+        <div>Natural Lethal Soak: <input type="number" name="attr_NaturalLethalSoak" value="floor(@{Stamina}/2)" disabled="true" /></div>
+        <div>Natural Aggravated Soak: <input type="number" name="attr_NaturalAggravatedSoak" value="0" disabled="true" /></div>
+    </div>
+    
+    <div class="sheet-col">
+        <h1 class="separator"><span>Movement</span></h1>
+        <p class="disclaimer">Calculations do not include mobility penalties. Speeds are in yards</p>
+        <div>Move (land): <input type="number" name="attr_MoveLand" value="@{Dexterity}" disabled="true" /></div>
+        <div>
+            Move (climb/swim):
+            <input type="number" name="attr_MoveSlow" value="floor(@{Dexterity}/2)" disabled="true" />
+            <p class="disclaimer">Speed 0, DV -0 reflexive action; used during another action.</p>
+        </div>
+        <div>Dash (land): <input type="number" name="attr_DashLand" value="@{Dexterity}+6" disabled="true" /></div>
+        <div>
+            Dash (climb/swim):
+            <input type="number" name="attr_DashSlow" value="@{Dexterity}" disabled="true" />
+            <p class="disclaimer">Speed 3, DV -2 action; used up to once per flurry, voids parry without stunt or charm.</p>
+        </div>
+        <div>Jump (vertical): <input type="number" name="attr_JumpVertical" value="@{Strength}+@{Athletics}" disabled="true" /></div>
+        <div>
+            Jump (horizontal):
+            <input type="number" name="attr_JumpHorizontal" value="(@{Strength}+@{Athletics})*2" disabled="true" />
+            <p class="disclaimer">Speed 5, DV -1 miscellaneous action; used up to once per flurry, may combine with move</p>
+        </div>
+    </div>
+    
+    <div class="sheet-col">
+        <h1 class="separator"><span>Offense</span></h1>
+        <div>
+            Join Battle/Debate:
+            <button class="tokenaction" type="roll" name="roll_JoinBattle" value="/me joins the conflict\n/r (@{Wits}+@{Awareness}+?{Stunt or Specialty|0})t[exalted] &{tracker}"></button>
+        </div>
+        <div>
+            Join War:
+            <button class="tokenaction" type="roll" name="roll_JoinWar" value="/me joins the war\n/r (@{Wits}+@{War}+?{Stunt or Specialty|0})t[exalted] &{tracker}"></button>
+        </div>
+        <fieldset class="repeating_attack">
+            <div class="attack">
+                <select name="attr_GenericRollAttribute" class="fancy narrow">
+                    <option value="@{Strength}">Strength</option>
+                    <option value="@{Dexterity}">Dexterity</option>
+                    <option value="@{Stamina}">Stamina</option>
+                    <option value="@{Charisma}">Charisma</option>
+                    <option value="@{Manipulation}">Manipulation</option>
+                    <option value="@{Appearance}">Appearance</option>
+                    <option value="@{Intelligence}">Intelligence</option>
+                    <option value="@{Wits}">Wits</option>
+                    <option value="@{Perception}">Perception</option>
+                </select>
+                <select name="attr_GenericRollAbility" class="fancy narrow">
+                    <option value="@{Archery}">Archery</option>
+                    <option value="@{MartialArts}">Martial Arts</option>
+                    <option value="@{Melee}">Melee</option>
+                    <option value="@{Thrown}">Thrown</option>
+                    <option value="@{War}">War</option>
+                    <option value="@{Integrity}">Integrity</option>
+                    <option value="@{Performance}">Performance</option>
+                    <option value="@{Presence}">Presence</option>
+                    <option value="@{Resistance}">Resistance</option>
+                    <option value="@{Survival}">Survival</option>
+                    <option value="@{Craft}">Craft</option>
+                    <option value="@{Investigation}">Investigation</option>
+                    <option value="@{Lore}">Lore</option>
+                    <option value="@{Medicine}">Medicine</option>
+                    <option value="@{Occult}">Occult</option>
+                    <option value="@{Athletics}">Athletics</option>
+                    <option value="@{Awareness}">Awareness</option>
+                    <option value="@{Dodge}">Dodge</option>
+                    <option value="@{Larceny}">Larceny</option>
+                    <option value="@{Stealth}">Stealth</option>
+                    <option value="@{Bureaucracy}">Bureaucracy</option>
+                    <option value="@{Linguistics}">Linguistics</option>
+                    <option value="@{Ride}">Ride</option>
+                    <option value="@{Sail}">Sail</option>
+                    <option value="@{Socialize}">Socialize</option>
+                </select>
+                <button type="roll" name="roll_GenericRoll" value="/r (@{GenericRollAttribute}+@{GenericRollAbility}+?{Stunt, Specialty, Charm, etc.|0})t[exalted]"></button>
+            </div>
+        </fieldset>
+        <div>
+            Damage: <button type="roll" name="roll_GenericDamage" value="/r [[{(@{Strength}+?{Weapon Damage|0}+?{Extra Successes|1}+?{Charm Bonuses|0}-?{Target Soak|0}),1}k1]]t[exalted-damage]"></button>
+        </div>
+    </div>
+</div>
