@@ -979,6 +979,7 @@
 					<div class="sheet-item sheet-puny">
 						<input type="number" name="attr_melee-weight" value="0"/>
 					</div>
+					<input type="hidden" name="attr_melee-com" value="@{melee-prof}+@{melee-enh}" disabled="true"/>
 				</div>
 				<div class="sheet-row">
 					<div class="sheet-item sheet-med">
@@ -1011,6 +1012,7 @@
 					<div class="sheet-item sheet-puny">
 						<input type="number" name="attr_ranged-weight" value="0"/>
 					</div>
+					<input type="hidden" name="attr_ranged-com" value="@{ranged-prof}+@{ranged-enh}" disabled="true"/>
 				</div>
 				<div class="sheet-row">
 					<div class="sheet-item sheet-med">
@@ -1043,6 +1045,7 @@
 					<div class="sheet-item sheet-puny">
 						<input type="number" name="attr_implement-weight" value="0"/>
 					</div>
+					<input type="hidden" name="attr_implement-com" value="@{implement-prof}+@{implement-enh}" disabled="true"/>
 				</div>
 			</div>
 		</div>
@@ -1131,7 +1134,7 @@
 							<label>Basic Powers</label> 
 						</div>
 						<div class="sheet-item sheet-small">
-							<label>Attribute</label> 
+							<label>Ability</label> 
 						</div>
 						<div class="sheet-item sheet-tiny sheet-multiline">
 							<label>Attack Bonus</label> 
@@ -1247,13 +1250,13 @@
 				<!-- Other -->
 				<fieldset class="repeating_powers">
 					<div class="sheet-header">
-						<div class="sheet-item sheet-med">
+						<div class="sheet-item sheet-large">
 							<label>Power Name</label> 
 						</div>
 						<div class="sheet-item sheet-med">
 							<label>Usage</label> 
 						</div>
-						<div class="sheet-item sheet-tiny">
+						<div class="sheet-item sheet-small">
 							<label>Level</label> 
 						</div>
 						<div class="sheet-item sheet-tiny">
@@ -1261,7 +1264,7 @@
 						</div>
 					</div>
 					<div class="sheet-row">
-						<div class="sheet-item sheet-med">
+						<div class="sheet-item sheet-large">
 							<input type="text" name="attr_power-name"/>
 						</div>
 						<div class="sheet-item sheet-med">
@@ -1271,7 +1274,7 @@
 								<option value="Daily">Daily</option>
 							</select>
 						</div>
-						<div class="sheet-item sheet-tiny">
+						<div class="sheet-item sheet-small">
 							<input type="number" name="attr_power-level"/>
 						</div>
 						<div class="sheet-item sheet-tiny">
@@ -1279,11 +1282,98 @@
 						</div>
 					</div>
 					<div class="sheet-header">
-						<div class="sheet-item sheet-huge">
-							<label>Power Description</label>
+						<div class="sheet-item sheet-small">
+							<label>Defence</label> 
+						</div>
+						<div class="sheet-item sheet-large">
+							<label>Ability</label> 
+						</div>
+						<div class="sheet-item sheet-small">
+							<label>Weapon</label> 
+						</div>
+						<div class="sheet-item sheet-tiny sheet-multiline">
+							<label>Attack Bonus</label> 
+						</div>
+						<div class="sheet-item sheet-tiny">
+							<label>Attack</label> 
 						</div>
 					</div>
-					<textarea name="attr_power"></textarea>
+					<div class="sheet-row">
+						<div class="sheet-item sheet-small">
+							<select name="attr_power-def">
+								<option value="AC">AC</option>
+								<option value="Fort">Ref</option>
+								<option value="Ref">Ref</option>
+								<option value="Will" selected="selected">Will</option>
+							</select>
+						</div>
+						<div class="sheet-item sheet-large">
+							<select name="attr_power-mod">
+								<option value="@{strength-mod}">Strength</option>
+								<option value="@{constitution-mod}">Constitution</option>
+								<option value="@{dexterity-mod}">Dexterity</option>
+								<option value="@{intelligence-mod}" selected="selected">Intelligence</option>
+								<option value="@{wisdom-mod}">Wisdom</option>
+								<option value="@{charisma-mod}">Charisma</option>
+							</select>
+						</div>
+						<div class="sheet-item sheet-small">
+							<select name="attr_power-weapon">
+								<option value="@{melee-com}">Melee</option>
+								<option value="@{ranged-com}">Ranged</option>
+								<option value="@{implement-com}" selected="selected">Implement</option>
+							</select>
+						</div>
+						<div class="sheet-item sheet-tiny">
+							<input type="number" name="attr_power-misc" value="0"/>
+						</div>
+						<div class="sheet-item sheet-tiny">
+							<input type="number" name="attr_power-tohit" value="@{halflevel}+@{power-mod}+@{power-weapon}+@{power-misc}" disabled="true"/>
+						</div>
+					</div>
+					<div class="sheet-header">
+						<div class="sheet-item sheet-huge">
+							<label>Power Damage</label> 
+						</div>
+					</div>
+					<div class="sheet-row">
+						<div class="sheet-item sheet-huge">
+							<input type="text" name="attr_power-damage" value="[[1d6]] Untyped Damage"/>
+						</div>
+					</div>
+					<div class="sheet-header">
+						<div class="sheet-item sheet-huge">
+							<label>Power Hit</label>
+						</div>
+					</div>
+					<textarea name="attr_power-hit"></textarea>
+					<div class="sheet-header">
+						<div class="sheet-item sheet-huge">
+							<label>Power Effect</label>
+						</div>
+					</div>
+					<textarea name="attr_power-effect"></textarea>
+					<div class="sheet-header">
+						<div class="sheet-item sheet-huge">
+							<label>Power Miss</label>
+						</div>
+					</div>
+					<textarea name="attr_power-miss"></textarea>
+					<div class="sheet-row">
+						<div class="sheet-item sheet-huge">
+							<button type='roll' value="/me uses @{power-name} 
+							
+								[[1d20+@{power-tohit}]] vs @{power-def} 
+								Hit: @{power-damage}, 
+								@{power-hit}
+								Effect:
+								@{power-effect}
+								Miss:
+								@{power-miss}" name="rba" >
+								<label>Roll</label> 
+							</button>
+						</div>
+					</div>
 					<hr/>
 				</fieldset>
 			</div>
