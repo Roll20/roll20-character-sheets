@@ -1164,7 +1164,12 @@ var createDicePool = function(commandArgv) {
     //!eed downgrade(proficiency|4)
     //!eed downgrade(challenge|4)
 
-    
+    var isRoll = commandArgv[0].match(/!eed$/);
+	
+	if (!isRoll) {
+		return commandArgv;
+	}
+	
     commandArgv = commandArgv.filter(function(e){return e});//clean array of empty null undefined
     
     Argv = {
@@ -1180,7 +1185,7 @@ var createDicePool = function(commandArgv) {
     var regexSkill = /skill\((.*?)\)/;
     var regexUpgrade = /upgrade\((.*?)\)/;
     var regexDowngrade = /downgrade\((.*?)\)/;
-    var regexAlphaStr = /[!eed]$|[blk]$|[b]$|[g]$|[y]$|[p]$|[r]$|[w]$/; 
+    var regexAlphaStr = /blk$|b$|g$|y$|p$|r$|w$/; 
     
     var skillDice = function(dice) {
         
@@ -1192,34 +1197,7 @@ var createDicePool = function(commandArgv) {
             
             Argv.Ability = Argv.Ability + totalAbil;
             Argv.Proficiency = Argv.Proficiency + totalProf;
-        
-        /*
-        var diceArray = dice.split('|');
-        var type = diceArray[0];
-        var num1 = expr(diceArray[1]);
-        var num2 = expr(diceArray[2]);
-        
-        switch (type) {
-            case "difficulty" : //purple
-                    
-                var totalDiff = Math.abs(num1-num2);
-                var totalChall = (num1 < num2 ? num1 : num2);
-                Argv.Difficulty = Argv.Difficulty + totalDiff;
-                Argv.Challenge = Argv.Challenge + totalChall;
-                 
-                break;
-            case "ability" : //green
-                
-                var totalAbil = Math.abs(num1-num2);
-                var totalProf = (num1 < num2 ? num1 : num2);
-                Argv.Ability = Argv.Ability + totalAbil;
-                Argv.Proficiency = Argv.Proficiency + totalProf;
-                
-                break;
-        }
-        
-        return null;
-        */
+
     }
     
     //Create skills
@@ -1239,6 +1217,8 @@ var createDicePool = function(commandArgv) {
         var diceColor = commandArgv[i].match(regexAlphaStr);
         var diceQty = 0;
         
+		//console.log(diceColor);
+		
         if (diceColor) {
             diceQty  = expr(commandArgv[i].replace(diceColor[0],''));
             diceQty = (isNaN(diceQty) ? 0 : diceQty);
@@ -1442,3 +1422,5 @@ on("chat:message", function(msg) {
     }
     return processScriptTabs(createDicePool(argv), msg.who);
 });
+
+
