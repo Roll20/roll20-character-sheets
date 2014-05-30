@@ -6,9 +6,11 @@ by bripod and sturtus
 Roadmap/Unfinished
 - Selected class shows/hides sections at bottom
 - Define weapon as ranged/melee and make appropriate buttons
+- Basic Attack
 - Armor Check Penalty resolution
 - mighty deed resolution
 - optional API checkbox in case of DCC HELPER usage, change buttons to API compatible buttons
+- Hafling Stealth update
 
 5/29/14
 - Built in Abilities/macros
@@ -24,6 +26,7 @@ Roadmap/Unfinished
 - default values for a lot of fields
 - consistent names for buttons
 - moved Cleric spells to default spell table
+- combined modifier enty with button to save space
 
 5/9/14
 - threw top stats into 2 column layout
