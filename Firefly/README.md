@@ -1,5 +1,9 @@
 # Firefly RPG Character Sheet
 
+*This sheet has a website with an interactive preview!*
+
+[View Interactive Sheet Preview](https://ramblurr.github.io/roll20-character-sheets/)
+
 ### Usage
 
 This character sheet requires a modern web browser. You must be the latest
