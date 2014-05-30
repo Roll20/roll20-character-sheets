@@ -2,8 +2,16 @@
 
 ### Usage
 
+This character sheet requires a modern web browser. You must be the latest
+version of Chrome, Firefox or Internet Explorer to get the full experience.
+
 Editing attributes, skills, distinctions, etc is straightforward, simply fill
 out the text fields and  mouseover the dice image to change its value.
+
+#### Bugs and Suggestions
+
+Report bugs or suggestions to the project’s [issue
+tracker](https://github.com/Ramblurr/roll20-character-sheets/issues).
 
 ### Dice Pool Rolling
 
@@ -30,5 +38,4 @@ lessc styles.less > firefly.css
 ```
 
 A pre-compiled stylesheet is included in the source repo.
-
 
