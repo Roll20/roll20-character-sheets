@@ -1,7 +1,5 @@
 ## _Exalted, Second Edition_ Character Sheet
 
-This character sheet is a work in progress.
-
 Character sheet for _Exalted, Second Edition_ by White Wolf Publishing.
 
 ### NOTE
