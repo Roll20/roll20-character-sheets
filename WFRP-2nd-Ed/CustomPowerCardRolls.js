@@ -68,7 +68,10 @@ on("chat:message", function(msg) {
 		RollObject.PowerCardContent = "--desc --name|" + RollObject.DisplayName + " --leftsub|Dodge" + " --rightsub|Reaction  --custom_diceroll|";
 	} else if (RollObject.RollType == "Attribute") {
 		RollObject.PowerCardContent = "--desc --name|" + RollObject.DisplayName + " --leftsub|"+ RollObject.AttributeName + "" + " --rightsub|Stat Test  --custom_diceroll|";
-	} 
+	} else if (rollType == "Skill") {
+		msgContent = "--desc --name|" + tokenName + " --leftsub|"+ attribute + "" + " --rightsub|Test  --diceroll|";
+	}
+ 
 	
 	var characters = findObjs({ _type: "character", name: RollObject.CharacterName });
 	var character = characters.shift();
