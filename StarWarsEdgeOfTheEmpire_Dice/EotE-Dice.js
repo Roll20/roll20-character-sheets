@@ -9,7 +9,7 @@
 // changed to randomInteger()
 //
 // !eed log on|multi|single|off  // default:on and single
-    							// outputs dice rolled to the chat window if "on", only the result if "off"
+            					// outputs dice rolled to the chat window if "on", only the result if "off"
 								// dice rolled will be on single line if "single" and on multiple lines if "multi"
 // !eed graphics on|off|s|m|l  //default:on and m
 								// shows dice rolled as graphic, small, medium, or large if "on" or as text if "off"
@@ -1185,6 +1185,7 @@ var createDicePool = function(commandArgv) {
     var regexSkill = /skill\((.*?)\)/;
     var regexUpgrade = /upgrade\((.*?)\)/;
     var regexDowngrade = /downgrade\((.*?)\)/;
+    var regexEncum = /encum\((.*?)\)/;
     var regexAlphaStr = /blk$|b$|g$|y$|p$|r$|w$/; 
     
     var skillDice = function(dice) {
@@ -1198,6 +1199,24 @@ var createDicePool = function(commandArgv) {
             Argv.Ability = Argv.Ability + totalAbil;
             Argv.Proficiency = Argv.Proficiency + totalProf;
 
+    }
+    
+    //Create Encumbrance
+    for (var i = 0; i < commandArgv.length; i++) {
+        
+        var encumMatch = commandArgv[i].match(regexEncum);
+            encumMatch = (encumMatch ? encumMatch[1] : false);
+        
+        if (encumMatch) {
+            
+            var diceArray = encumMatch.split('|');
+            var num1 = expr(diceArray[0]);
+            var num2 = expr(diceArray[1]);
+            
+            if (num2 > num1) {
+               Argv.SetBack = num2 - num1;
+            }
+        } 
     }
     
     //Create skills
@@ -1422,5 +1441,4 @@ on("chat:message", function(msg) {
     }
     return processScriptTabs(createDicePool(argv), msg.who);
 });
-
 
