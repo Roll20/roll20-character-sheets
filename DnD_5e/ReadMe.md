@@ -12,7 +12,7 @@ This is a **work in progress sheet** for use on Roll20.net and with the latest (
 
 ### Feedback
 
-If you have any problems, suggestions or features you'd like to see added to the sheet (bearing in mind the key goals above) then please let me know either by logging an issue on the github repo or by sending me a private message via roll20.  Please be patient when waiting for a reply, those locations are checked fairly often but, as is often the case, real life has a tendancy to get in the way!
+If you have any problems, suggestions or features you'd like to see added to the sheet then please let me know either by logging an issue on the github repo or by sending me a private message via roll20.  Please be patient when waiting for a reply, those locations are checked fairly often but, as is often the case, real life has a tendancy to get in the way!
 
 Lastly, should anyone need it, you can find the old (and no longer updated) [DnD Next playtest version of the sheet here.](https://github.com/Actoba/roll20-character-sheets/tree/master/DnDNext_Actoba) It is based of the last publicly available playtest dated October 2013.
 
