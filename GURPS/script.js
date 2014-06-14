@@ -8,7 +8,7 @@ if (ENABLE_ROLL_PARSER) {
             return;
         }
 
-        log(message);
+        log("ROLLCOMP/ Received "+message);
 
         if (message.content.indexOf("rolls") == -1) {
             // The GURPS will include the keyword "rolls" at the beginning of each emote. 
@@ -43,14 +43,12 @@ if (COMMANDS && COMMANDS.length > 0) {
             return;
         }
 
-        log(message)
+        log("ROLLCOMP/ Received "+message);
 
         var command;
         for (var i in COMMANDS) {
-            log("Consider "+COMMANDS[i]);
             if (message.content.indexOf("!"+COMMANDS[i]) == 0) {
                 command = COMMANDS[i];
-                log("Recognized command "+command);
                 break;
             }
         }
@@ -75,7 +73,7 @@ if (COMMANDS && COMMANDS.length > 0) {
 }
 
 function roll_comparison(roll, target) {
-    log("Compare "+roll+" vs "+target);
+    log("ROLLCOMP/ Compare "+roll+" vs "+target);
 
     // Calculate the difference between the rolls.
     var difference = target - roll;
@@ -104,6 +102,6 @@ function roll_comparison(roll, target) {
         result = "Success by "+difference;
     }
 
-    log(result);
+    log("ROLLCOMP/ "+result);
     sendChat("Roll Result", "/direct "+result);
 }
