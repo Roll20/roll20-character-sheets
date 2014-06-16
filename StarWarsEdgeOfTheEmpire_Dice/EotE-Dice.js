@@ -1442,3 +1442,24 @@ on("chat:message", function(msg) {
     return processScriptTabs(createDicePool(argv), msg.who);
 });
 
+
+//Create new "-DicePool" character for GM
+on('ready', function() {
+   
+    if (findObjs({ _type: "character", name: "-DicePool" }).length == 0){
+       
+        createObj("character", {
+            name: "-DicePool",
+            bio: "GM Dice Pool"
+        });
+       
+        Char_dicePoolObject = findObjs({ _type: "character", name: "-DicePool" });
+        
+        createObj("attribute", {
+            name: "pcgm",
+            current: 1,
+            characterid: Char_dicePoolObject[0].id
+        });
+
+    }; 
+});
