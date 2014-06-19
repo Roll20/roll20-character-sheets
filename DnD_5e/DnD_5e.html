@@ -143,7 +143,7 @@
 						
 						<div class="sheet-row sheet-padb">
 							<div class="sheet-col-1-2 sheet-small-label sheet-center" title="This is auto calculated from the armour you have equipped in the inventory section and some class options in the class section"><input class="sheet-underlined" type="number" name="attr_AC" value="@{armourtotalACequipped}" disabled="disabled" ><br/>AC</div>
-							<div class="sheet-col-1-2 sheet-small-label sheet-center" title="This is auto calculated from your dexterity modifier and some class options in the class section"><input class="sheet-underlined" type="number" name="attr_AC_no_armour" value="10+@{dexterity_mod}" disabled="disabled"><br/>AC (no armour)</div>
+							<div class="sheet-col-1-2 sheet-small-label sheet-center" title="This is auto calculated from your dexterity modifier and some class options in the class section"><input class="sheet-underlined" type="number" name="attr_AC_no_armour" value="10+@{dexterity_mod} + @{barb_thick_hide_bonus}" disabled="disabled"><br/>AC (no armour)</div>
 						</div>
 					</div>
 					
@@ -645,7 +645,7 @@
 						<div class="sheet-col-1 sheet-center sheet-small-label">Barbarian</div>
 					</div>
 					
-					<!-- Hidden calcs to power rage usage and rage damage bonus -->
+					<!-- Hidden Barbarian Calcs -->
 					<!-- Num rages breakpoints at barbarian levels 3, 6, 12, 17 and 20 (unlimited use...using 999 to represent that) -->
 					<input type="hidden" name="attr_base_barb_rage" value="2" disabled="disabled">
 					<input type="hidden" name="attr_barb_rage_3" value="ceil((@{barbarian_level}/1e10) - (2/1e10))" disabled="disabled">
@@ -659,19 +659,39 @@
 					<input type="hidden" name="attr_barb_rage_dmg_9" value="ceil((@{barbarian_level}/1e10) - (8/1e10))" disabled="disabled">
 					<input type="hidden" name="attr_barb_rage_dmg_16" value="ceil((@{barbarian_level}/1e10) - (15/1e10))" disabled="disabled">
 					<input type="hidden" name="attr_barb_rage_dmg_total" value="@{base_barb_rage_dmg} + @{barb_rage_dmg_9} + @{barb_rage_dmg_16}" disabled="disabled">
+					<!-- Add barbarian thick hide feature to no armour AC if barb level >= 1 -->
+					<input type="hidden" name="attr_barb_thick_hide_weight" value="ceil(((@{barbarian_level}+1)/1e10) - (1/1e10))" disabled="disabled">
+					<input type="hidden" name="attr_barb_thick_hide_bonus" value="@{barb_thick_hide_weight} * @{constitution_mod}" disabled="disabled">
 					
 					<div class="sheet-row">
-						<div class="sheet-col-1-4 sheet-center sheet-small-label"><input class="sheet-underlined" type="number" name="attr_rage_damage_bonus" value="@{barb_rage_dmg_total}" disabled="disabled"><br/>Rage Damage Bonus</div>
-						<div class="sheet-col-1-4 sheet-center sheet-small-label"><input class="sheet-underlined" type="number" name="attr_thick_hide_ac" value="10 + @{dexterity_mod} + @{constitution_mod}" disabled="disabled"><br/>Thick Hide AC</div>
-						<div class="sheet-col-1-4 sheet-center sheet-margin-top">Barbarian Path : </div>
-						<div class="sheet-col-1-4 sheet-center sheet-padl">
-							<select name="attr_barbarian_path">
-								<option value="0">None</option>
-								<option value="Beserker">Beserker</option>
-								<option value="Totem Warrior">Totem Warrior</option>
-							</select>
+						<div class="sheet-col-2-3">
+							The sheet will auto update the following Barbarian class features at the appropriate barbarian level
+							<ul>
+								<li>"AC (no armour)" for Thick Skin feature</li>
+								<li>Max per day usage of Rage</li>
+								<li>Rage damage bonus</li>
+							</ul>
+						</div>
+						
+						<div class="sheet-col-1-3">
+							<div class="sheet-row">
+								<div class="sheet-col-1 sheet-center sheet-small-label"><input class="sheet-underlined" type="number" name="attr_rage_damage_bonus" value="@{barb_rage_dmg_total}" disabled="disabled"><br/>Rage Damage Bonus</div>
+							</div>
+							
+							<div class="sheet-row">
+								<div class="sheet-col-1-2 sheet-center sheet-margin-top"><b>Barbarian Path : </b></div>
+								<div class="sheet-col-1-2 sheet-center sheet-padl">
+									<select name="attr_barbarian_path">
+										<option value="0">None</option>
+										<option value="Beserker">Beserker</option>
+										<option value="Totem Warrior">Totem Warrior</option>
+									</select>
+								</div>
+							</div>
+							
 						</div>
 					</div>
+					
 					<hr/>
 				</div>
 			
