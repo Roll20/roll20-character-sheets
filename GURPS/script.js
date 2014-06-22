@@ -2,12 +2,10 @@ var ENABLE_ROLL_PARSER = true;
 var COMMANDS = ["roll vs", "r vs", "gmroll vs", "gmr vs", "roll", "r", "gmroll", "gmr"];
 
 on("chat:message", function(message) {
-    if (ENABLE_ROLL_PARSER && (message.type == "emote" || message.type == "whisper")) {
+    if (ENABLE_ROLL_PARSER && (message.type != "api")) {
         parse_chat(message);
         return;
-    }
-
-    if (COMMANDS.length > 0 && (message.type == "api")) {
+    } else if (COMMANDS.length > 0 && (message.type == "api")) {
         parse_command(message);
         return;
     }
