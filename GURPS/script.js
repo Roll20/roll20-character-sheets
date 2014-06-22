@@ -41,7 +41,11 @@ function parse_chat(message) {
         roll_comparison(roll, target, "/w "+message.who);
     } else {
         if (loud) {
-            sendChat("API", message.who+" is rolling.");
+            // Strip the original method of all inline rolls and print it to chat.
+            strippedMessage = message.content.replace(/ \$\[\[\d*\]\]/g, "");
+            strippedMessage = strippedMessage.replace(/--. /g, "");
+            strippedMessage = strippedMessage.replace(/vs:/g, "vs.");
+            sendChat("API", strippedMessage);
         }
         
         roll_comparison(roll, target);
