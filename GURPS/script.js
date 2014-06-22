@@ -1,79 +1,94 @@
 var ENABLE_ROLL_PARSER = true;
-var COMMANDS = false; //["roll", "r"];
+var COMMANDS = ["roll vs", "r vs", "gmroll vs", "gmr vs", "roll", "r", "gmroll", "gmr"];
 
-if (ENABLE_ROLL_PARSER) {
-    on("chat:message", function(message) {
-        if (message.type != "emote") {
-            // The GURPS sheet sends out all rolls as emotes, if this isn't an emote, we aren't interested.
-            return;
+on("chat:message", function(message) {
+    if (ENABLE_ROLL_PARSER && (message.type == "emote" || message.type == "whisper")) {
+        parse_chat(message);
+        return;
+    }
+
+    if (COMMANDS.length > 0 && (message.type == "api")) {
+        parse_command(message);
+        return;
+    }
+});
+
+
+function parse_chat(message) {
+    if (message.content.indexOf("vs:") == -1) {
+        // The GURPS sheet will include the keyword "vs:" in all rolls that should use roll comparison. 
+        // If the message doesn't include that word, we aren't interested.
+        return;
+    }
+
+    if (message.inlinerolls != undefined && message.inlinerolls.length < 2) {
+        // We need at least two numbers to make a comparison.
+        return;
+    }
+
+    log("ROLLCOMP/ Received CHAT "+JSON.stringify(message));
+
+    // We'll take the first number to be the user's roll.
+    var roll = message.inlinerolls[0].results.total;
+    // We'll take the second number to be the target value.
+    var target = message.inlinerolls[1].results.total;
+
+    // Has the loud flag been set? If so we'll want to print out some messages.
+    var loud = (message.content.indexOf("--l") != -1);
+
+    if (message.type == "whisper" && !loud) {
+        roll_comparison(roll, target, "/w "+message.target_name);
+        roll_comparison(roll, target, "/w "+message.who);
+    } else {
+        if (loud) {
+            sendChat("API", message.who+" is rolling.");
         }
-
-        log("ROLLCOMP/ Received "+message);
-
-        if (message.content.indexOf("rolls") == -1) {
-            // The GURPS will include the keyword "rolls" at the beginning of each emote. 
-            // If the message doesn't include that word, we aren't interested.
-            return;
-        }
-
-        if (message.content.indexOf("vs.") == -1) {
-            // The GURPS will include the keyword "vs." in all rolls that should use roll comparison. 
-            // If the message doesn't include that word, we aren't interested.
-            return;
-        }
-
-        if (message.inlinerolls.length < 2) {
-            // We need at least two numbers to make a comparison.
-            return;
-        }
-
-        // We'll take the first number to be the user's roll.
-        var roll = message.inlinerolls[0].results.total;
-        // We'll take the second number to be the target value.
-        var target = message.inlinerolls[1].results.total;
-
-        roll_comparison(roll, target)
-    });
-}
-
-if (COMMANDS && COMMANDS.length > 0) {
-    on("chat:message", function(message) {
-        if (message.type != "api") {
-            // This function is only interested in API calls.
-            return;
-        }
-
-        log("ROLLCOMP/ Received "+message);
-
-        var command;
-        for (var i in COMMANDS) {
-            if (message.content.indexOf("!"+COMMANDS[i]) == 0) {
-                command = COMMANDS[i];
-                break;
-            }
-        }
-
-        if (command == undefined) {
-            // No recognized command was found.
-            return;
-        }
-
-        var content = message.content.substring(command.length+1);
-        content = content.trim();
-        log(content);
-
-        //var test = eval("3d6");
-        // We'll take the first number to be the user's roll.
-        var roll = 2;//eval("3d6").results.total;
-        // We'll take the second number to be the target value.
-        var target = 5;//eval(content).results.total;
-
+        
         roll_comparison(roll, target);
-    });
+    }
 }
 
-function roll_comparison(roll, target) {
-    log("ROLLCOMP/ Compare "+roll+" vs "+target);
+function parse_command(message) {
+    var command;
+    for (var i in COMMANDS) {
+        if (message.content.indexOf("!"+COMMANDS[i]) == 0) {
+            command = COMMANDS[i];
+            break;
+        }
+    }
+
+    if (command == undefined) {
+        // No recognized command was found.
+        return;
+    }
+
+    log("ROLLCOMP/ Received API "+JSON.stringify(message));
+
+    var content = message.content.substring(command.length+1);
+    content = content.trim();
+
+    try {
+        sendChat("", "[[3d6]] [["+content+"]]", function(results) {
+            var roll = results[0].inlinerolls[1].results.total;
+            var target = results[0].inlinerolls[2].results.total;
+
+            if (command.indexOf("gm") == 0) {
+                roll_comparison(roll, target, "/w gm [["+roll+"]] vs [["+target+"]]\n/w gm");
+            } else {
+                roll_comparison(roll, target, "Rolling [["+roll+"]] vs [["+target+"]]\n");
+            }
+        });
+    } catch (error) {
+        log("ROLLCOMP/ Error: \""+error+"\"");
+    }
+}
+
+function roll_comparison(roll, target, output) {
+    log("ROLLCOMP/ Compare "+JSON.stringify(roll)+" vs "+JSON.stringify(target));
+
+    if (output == undefined) {
+        output = "/direct";
+    }
 
     // Calculate the difference between the rolls.
     var difference = target - roll;
@@ -103,5 +118,5 @@ function roll_comparison(roll, target) {
     }
 
     log("ROLLCOMP/ "+result);
-    sendChat("Roll Result", "/direct "+result);
+    sendChat("API", output+" "+result);
 }
