@@ -7,6 +7,14 @@ I've used this sheet (http://www.mad-irishman.net/pub_starwars.html) as a refere
 
 Change log
 ============
+June 23, 2014 - 
+* Included a tab for NPCs. Includes very limited auto-calculations as it's meant to be a shortcut to just adding an NPC. There is however the capability to add very basic calculations. For Attacks, Damage and Skills. The prefix "npc-" must be used to reference NPC Attributes
+
+June 20, 2014 - 
+* Fixed the quick Perception and Initiative rolls
+* Added a prompt to all rolls for those last minute adjustments
+* Included a tab for Vehicles. This was originally meant to use stand alone. The vehicle would have it's own sheet, but could be used as an addition to a PC/NPC. The prefix "vehicle-" must be used to reference Vehicle Attributes
+
 May 15, 2014 - 
 * Made XP, Credits and Carrying Wt text fields for more diverse inputs
 * Included tooltip titles for inputs
@@ -21,6 +29,7 @@ May 7, 2014 -
 
 TO DO
 ============
+* Create NPC format
 * ~~List out all Skills with modifiers and rolls~~
 * ~~Use repeating function to include weapons and attacks having the user choose which Ability Mod and damage for pre-filled rolls~~
 * ~~Fix Attack Repeating function~~
