@@ -24,5 +24,4 @@ Movement, attack and mental penalties are not autocalculated from the wound loca
 
 A lot of autocalculation had to be removed due to errors created in die rollers, we may add more autocalc back at a later date.
 
-Open eneded d10 rolls of the type used in NUD10 are not currently supported by Roll20, but we are working on a script for that.  Open ended rolls must be done manually at the moment.
-
+Open eneded d10 rolls of the type used in NUD10 are not currently supported by Roll20, the API script included in this definition appears to work now. It scans the chat for dice rolls, looks for values of 10 and then makes rerolls and outputs results.
