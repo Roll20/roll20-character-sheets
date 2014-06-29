@@ -21,6 +21,8 @@ When you are ready to submit your template for **public use**, create a `sheet.j
 
 After we have reviewed your sheet if we approve it we will add it to the `approved.yaml` file in the root directory which will cause it to be available to everyone on the main Roll20 site. If we reject your sheet, we will comment on your Github commit and let you know what changes need to be made before it can be accepted. 
 
+PLEASE VERIFY YOUR SHEET.JSON IS VALID JSON at http://jsonlint.com before you submit it!
+
 Guidelines
 ==========
 
