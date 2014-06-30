@@ -145,7 +145,10 @@
 						
 						<div class="sheet-row sheet-padb">
 							<div class="sheet-col-1-2 sheet-small-label sheet-center" title="This is auto calculated from the armour you have equipped in the inventory section and some class options in the class section"><input class="sheet-underlined" type="number" name="attr_AC" value="@{armourtotalACequipped}" disabled="disabled" ><br/>AC</div>
-							<div class="sheet-col-1-2 sheet-small-label sheet-center" title="This is auto calculated from your dexterity modifier and some class options in the class section"><input class="sheet-underlined" type="number" name="attr_AC_no_armour" value="10+@{dexterity_mod} + @{barb_thick_hide_bonus}" disabled="disabled"><br/>AC (no armour)</div>
+							<!-- Hidden no armour calcs -->
+							<input type="hidden" name="attr_base_noarmour_AC" value="10+@{dexterity_mod}" disabled="disabled">
+							<input type="hidden" name="attr_noarmour_AC_bonus" value="((@{barb_thick_hide_bonus} + @{monk_unarmoured_bonus}) + abs(@{barb_thick_hide_bonus} - @{monk_unarmoured_bonus})) / 2" disabled="disabled">
+							<div class="sheet-col-1-2 sheet-small-label sheet-center" title="This is auto calculated from your dexterity modifier and some class options in the class section"><input class="sheet-underlined" type="number" name="attr_AC_no_armour" value="@{base_noarmour_AC} + @{noarmour_AC_bonus}" disabled="disabled"><br/>AC (no armour)</div>
 						</div>
 					</div>
 					
@@ -684,7 +687,7 @@
 						<div class="sheet-col-1-4 sheet-center">Thick Skin AC</div>
 						<div class="sheet-col-1-4 sheet-center">-</div>
 						<div class="sheet-col-1-6">&nbsp;</div>
-						<div class="sheet-col-1-6"><input class="sheet-underlined" type="number" name="attr_barb_thick_hide_AC" value="@{AC_no_armour}" disabled="disabled"></div>
+						<div class="sheet-col-1-6"><input class="sheet-underlined" type="number" name="attr_barb_thick_hide_AC" value="@{base_noarmour_AC} + @{constitution_mod}" disabled="disabled"></div>
 						<div class="sheet-col-1-6">&nbsp;</div>
 					</div>
 					<p class="sheet-small-note">Your AC (no armour) value is auto updated with the Thick Hide class feature</p>
@@ -793,6 +796,37 @@
 				</div>
 				
 				<div class="sheet-class-section-monk">
+				
+					<!-- Hidden Monk Calcs -->
+					<input type="hidden" name="attr_ki_total" value="(2 * ceil(@{monk_level}/1e10)) + floor(@{monk_level}/3)" disabled="disabled">
+					<!-- Add monk unarmoured defense feature to no armour AC if monk level >= 1 -->
+					<input type="hidden" name="attr_monk_unarmoured_weight" value="ceil(@{monk_level}/1e10)" disabled="disabled">
+					<input type="hidden" name="attr_monk_unarmoured_bonus" value="@{monk_unarmoured_weight} * @{wisdom_mod}" disabled="disabled">
+		
+					<div class="sheet-row sheet-sub-header">
+						<div class="sheet-col-1-4 sheet-center sheet-small-label">Monk Resource</div>
+						<div class="sheet-col-1-4 sheet-center sheet-small-label">Recharges on a</div>
+						<div class="sheet-col-1-6 sheet-center sheet-small-label">Current</div>
+						<div class="sheet-col-1-6 sheet-center sheet-small-label">Max</div>
+						<div class="sheet-col-1-6 sheet-center sheet-small-label">Macro</div>
+					</div>
+				
+					<div class="sheet-row">
+						<div class="sheet-col-1-4 sheet-center sheet-margin-top">Ki points</div>
+						<div class="sheet-col-1-4 sheet-center sheet-margin-top">Short Rest</div>
+						<div class="sheet-col-1-6"><input type="number" name="attr_ki" value="0" min="0" step="1"></div>
+						<div class="sheet-col-1-6"><input type="number" name="attr_ki_max" value="@{ki_total}" disabled="disabled"></div>
+						<div class="sheet-col-1-6 sheet-center">-</div>
+					</div>
+					
+					<div class="sheet-row">
+						<div class="sheet-col-1-4 sheet-center">Unarmoured Def.</div>
+						<div class="sheet-col-1-4 sheet-center">-</div>
+						<div class="sheet-col-1-6">&nbsp;</div>
+						<div class="sheet-col-1-6"><input class="sheet-underlined" type="number" name="attr_monk_unarmoured_defence_AC" value="@{base_noarmour_AC} + @{wisdom_mod}" disabled="disabled"></div>
+						<div class="sheet-col-1-6">&nbsp;</div>
+					</div>
+					<p class="sheet-small-note">Your AC (no armour) value is auto updated with the Unarmoured Defense class feature</p>
 					
 				</div>
 				
