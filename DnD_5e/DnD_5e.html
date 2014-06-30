@@ -567,8 +567,8 @@
 		
 		<div class="sheet-row">
 			
-			<div class="sheet-col-1">
-				<p class="sheet-small-note">Now use the buttons below to toggle the display of sections that are useful for each class you have levels in.  Note that this section is not yet complete and is awaiting the full rules release.  Some examples have been added to the Barbarian and Bard sections though.</p>
+			<div class="sheet-col-1-2 sheet-padr">
+				<p class="sheet-small-note">Use the buttons below to toggle the display of sections that are useful for each class</p>
 							
 				<input type="checkbox" name="attr_class_checkbox_barbarian" class="sheet-class-checkbox sheet-class-checkbox-barbarian" value="1" title="Barbarian"/>
 				<input type="checkbox" name="attr_class_checkbox_bard" class="sheet-class-checkbox sheet-class-checkbox-bard" value="1" title="Bard"/>
@@ -581,7 +581,7 @@
 				<input type="checkbox" name="attr_class_checkbox_ranger" class="sheet-class-checkbox sheet-class-checkbox-ranger" value="1" title="Ranger"/>
 				<input type="checkbox" name="attr_class_checkbox_rogue" class="sheet-class-checkbox sheet-class-checkbox-rogue" value="1" title="Rogue"/>
 				
-				<h4 class="sheet-center">Limited Use Class Features <span class="sheet-pictos">l</span></h4>
+				<h4 class="sheet-center">Class Features <span class="sheet-pictos">l</span></h4>
 				<div class="sheet-row sheet-sub-header">
 					<div class="sheet-col-1-4 sheet-center sheet-small-label">Feature</div>
 					<div class="sheet-col-1-4 sheet-center sheet-small-label">Recharges on a</div>
@@ -591,14 +591,49 @@
 				</div>
 				
 				<div class="sheet-class-section-barbarian">
+				
+					<!-- Hidden Barbarian Calcs -->
+					<!-- Num rages breakpoints at barbarian levels 3, 6, 12, 17 and 20 (unlimited use...using 999 to represent that) -->
+					<input type="hidden" name="attr_base_barb_rage" value="2" disabled="disabled">
+					<input type="hidden" name="attr_barb_rage_3" value="ceil((@{barbarian_level}/1e10) - (2/1e10))" disabled="disabled">
+					<input type="hidden" name="attr_barb_rage_6" value="ceil((@{barbarian_level}/1e10) - (5/1e10))" disabled="disabled">
+					<input type="hidden" name="attr_barb_rage_12" value="ceil((@{barbarian_level}/1e10) - (11/1e10))" disabled="disabled">
+					<input type="hidden" name="attr_barb_rage_17" value="ceil((@{barbarian_level}/1e10) - (16/1e10))" disabled="disabled">
+					<input type="hidden" name="attr_barb_rage_20" value="ceil((@{barbarian_level}/1e10) - (19/1e10)) * 999" disabled="disabled">
+					<input type="hidden" name="attr_barb_rage_total" value="@{base_barb_rage} + @{barb_rage_3} + @{barb_rage_6} + @{barb_rage_12} + @{barb_rage_17} + @{barb_rage_20}" disabled="disabled">
+					<!-- Rage damage bonus breakpoints at barbarian levels 9 and 16 -->
+					<input type="hidden" name="attr_base_barb_rage_dmg" value="2" disabled="disabled">
+					<input type="hidden" name="attr_barb_rage_dmg_9" value="ceil((@{barbarian_level}/1e10) - (8/1e10))" disabled="disabled">
+					<input type="hidden" name="attr_barb_rage_dmg_16" value="ceil((@{barbarian_level}/1e10) - (15/1e10))" disabled="disabled">
+					<input type="hidden" name="attr_barb_rage_dmg_total" value="@{base_barb_rage_dmg} + @{barb_rage_dmg_9} + @{barb_rage_dmg_16}" disabled="disabled">
+					<!-- Add barbarian thick hide feature to no armour AC if barb level >= 1 -->
+					<input type="hidden" name="attr_barb_thick_hide_weight" value="ceil(((@{barbarian_level}+1)/1e10) - (1/1e10))" disabled="disabled">
+					<input type="hidden" name="attr_barb_thick_hide_bonus" value="@{barb_thick_hide_weight} * @{constitution_mod}" disabled="disabled">
 		
 					<div class="sheet-row">
 						<div class="sheet-col-1-4 sheet-center sheet-margin-top">Barbarian Rage</div>
 						<div class="sheet-col-1-4 sheet-center sheet-margin-top">Long Rest</div>
-						<div class="sheet-col-1-6 sheet-center sheet-small-label"><input type="number" name="attr_rage_current" value="0" min="0" step="1"></div>
-						<div class="sheet-col-1-6 sheet-center sheet-small-label"><input type="number" name="attr_rage_max" value="@{barb_rage_total}" disabled="disabled"></div>
-						<div class="sheet-col-1-6 sheet-center"><button type="roll" class="sheet-roll" name="roll_Barbarian_Rage" value="/em flies into a Rage\n\nBenefits while raging - \nAdvantage on STR checks/saves\n[[@{rage_damage_bonus}]] bonus to melee damage\n[[2*@{barbarian_level}]] temp HP until the rage ends\nDuration 1 min.  Ends early if no damage taken or no creature attacked since last turn">Use</button></div>
+						<div class="sheet-col-1-6"><input type="number" name="attr_rage_current" value="0" min="0" step="1"></div>
+						<div class="sheet-col-1-6"><input type="number" name="attr_rage_max" value="@{barb_rage_total}" disabled="disabled"></div>
+						<div class="sheet-col-1-6"><button type="roll" class="sheet-roll" name="roll_Barbarian_Rage" value="/em goes into a Rage\n\nBenefits while raging - \nAdvantage on STR checks/saves\n[[@{rage_damage_bonus}]] bonus to melee damage\n[[2*@{barbarian_level}]] temp HP until the rage ends\nDuration 1 min.  Ends early if no damage taken or no creature attacked since last turn">Use</button></div>
 					</div>
+					
+					<div class="sheet-row">
+						<div class="sheet-col-1-4 sheet-center">Rage Dmg Bonus</div>
+						<div class="sheet-col-1-4 sheet-center">-</div>
+						<div class="sheet-col-1-6">&nbsp;</div>
+						<div class="sheet-col-1-6"><input type="number" name="attr_rage_damage_bonus" value="@{barb_rage_dmg_total}" disabled="disabled"></div>
+						<div class="sheet-col-1-6">&nbsp;</div>
+					</div>
+					
+					<div class="sheet-row">
+						<div class="sheet-col-1-4 sheet-center">Thick Skin AC</div>
+						<div class="sheet-col-1-4 sheet-center">-</div>
+						<div class="sheet-col-1-6">&nbsp;</div>
+						<div class="sheet-col-1-6"><input class="sheet-underlined" type="number" name="attr_barb_thick_hide_AC" value="@{AC_no_armour}" disabled="disabled"></div>
+						<div class="sheet-col-1-6">&nbsp;</div>
+					</div>
+					<p class="sheet-small-note">Your AC (no armour) value is auto updated with the Thick Hide class feature</p>
 					
 				</div>
 				
@@ -640,63 +675,8 @@
 				
 				<hr/>
 				
-				<h4 class="sheet-center">Other Class Features <span class="sheet-pictos">z</span></h4>
-				
-				<div class="sheet-class-section-barbarian">
-					<div class="sheet-row sheet-sub-header">
-						<div class="sheet-col-1 sheet-center sheet-small-label">Barbarian</div>
-					</div>
-					
-					<!-- Hidden Barbarian Calcs -->
-					<!-- Num rages breakpoints at barbarian levels 3, 6, 12, 17 and 20 (unlimited use...using 999 to represent that) -->
-					<input type="hidden" name="attr_base_barb_rage" value="2" disabled="disabled">
-					<input type="hidden" name="attr_barb_rage_3" value="ceil((@{barbarian_level}/1e10) - (2/1e10))" disabled="disabled">
-					<input type="hidden" name="attr_barb_rage_6" value="ceil((@{barbarian_level}/1e10) - (5/1e10))" disabled="disabled">
-					<input type="hidden" name="attr_barb_rage_12" value="ceil((@{barbarian_level}/1e10) - (11/1e10))" disabled="disabled">
-					<input type="hidden" name="attr_barb_rage_17" value="ceil((@{barbarian_level}/1e10) - (16/1e10))" disabled="disabled">
-					<input type="hidden" name="attr_barb_rage_20" value="ceil((@{barbarian_level}/1e10) - (19/1e10)) * 999" disabled="disabled">
-					<input type="hidden" name="attr_barb_rage_total" value="@{base_barb_rage} + @{barb_rage_3} + @{barb_rage_6} + @{barb_rage_12} + @{barb_rage_17} + @{barb_rage_20}" disabled="disabled">
-					<!-- Rage damage bonus breakpoints at barbarian levels 9 and 16 -->
-					<input type="hidden" name="attr_base_barb_rage_dmg" value="2" disabled="disabled">
-					<input type="hidden" name="attr_barb_rage_dmg_9" value="ceil((@{barbarian_level}/1e10) - (8/1e10))" disabled="disabled">
-					<input type="hidden" name="attr_barb_rage_dmg_16" value="ceil((@{barbarian_level}/1e10) - (15/1e10))" disabled="disabled">
-					<input type="hidden" name="attr_barb_rage_dmg_total" value="@{base_barb_rage_dmg} + @{barb_rage_dmg_9} + @{barb_rage_dmg_16}" disabled="disabled">
-					<!-- Add barbarian thick hide feature to no armour AC if barb level >= 1 -->
-					<input type="hidden" name="attr_barb_thick_hide_weight" value="ceil(((@{barbarian_level}+1)/1e10) - (1/1e10))" disabled="disabled">
-					<input type="hidden" name="attr_barb_thick_hide_bonus" value="@{barb_thick_hide_weight} * @{constitution_mod}" disabled="disabled">
-					
-					<div class="sheet-row">
-						<div class="sheet-col-2-3">
-							The sheet will auto update the following Barbarian class features at the appropriate barbarian level
-							<ul>
-								<li>"AC (no armour)" for Thick Skin feature</li>
-								<li>Max per day usage of Rage</li>
-								<li>Rage damage bonus</li>
-							</ul>
-						</div>
-						
-						<div class="sheet-col-1-3">
-							<div class="sheet-row">
-								<div class="sheet-col-1 sheet-center sheet-small-label"><input class="sheet-underlined" type="number" name="attr_rage_damage_bonus" value="@{barb_rage_dmg_total}" disabled="disabled"><br/>Rage Damage Bonus</div>
-							</div>
+				<h4 class="sheet-center">Auto Calc Class Features <span class="sheet-pictos">z</span></h4>
 							
-							<div class="sheet-row">
-								<div class="sheet-col-1-2 sheet-center sheet-margin-top"><b>Barbarian Path : </b></div>
-								<div class="sheet-col-1-2 sheet-center sheet-padl">
-									<select name="attr_barbarian_path">
-										<option value="0">None</option>
-										<option value="Beserker">Beserker</option>
-										<option value="Totem Warrior">Totem Warrior</option>
-									</select>
-								</div>
-							</div>
-							
-						</div>
-					</div>
-					
-					<hr/>
-				</div>
-			
 				<div class="sheet-class-section-bard">
 					
 					<div class="sheet-row sheet-sub-header">
@@ -801,12 +781,13 @@
 			
 			</div>
 			
+			<div class="sheet-col-1-2">
+				<h4 class="sheet-center">Other Class Features, Notes and Feats <span class="sheet-pictos">U</span></h4>
+				<textarea name="attr_class_abilities_and_feats" class="sheet-large-textarea"></textarea>
+			</div>
+			
 		</div>
-		
-		<div class="sheet-row">
-			<div class="sheet-col-1"><h4 class="sheet-center">Feats and any other class notes <span class="sheet-pictos">U</span></h4><textarea name="attr_class_abilities_and_feats"></textarea></div>
-		</div>
-		
+				
 		<div class="sheet-row">
 			<div class="sheet-col-1-3"><h4 class="sheet-center">Arnour Proficiencies  <span class="sheet-pictos">2</span></h4><textarea name="attr_pro_armour"></textarea></div>
 			<div class="sheet-col-1-3"><h4 class="sheet-center">Weapon Proficiencies  <span class="sheet-pictos">2</span></h4><textarea name="attr_pro_weapons"></textarea></div>
@@ -825,7 +806,6 @@
 		<input type="hidden" name="attr_finesse_mod" value="(@{finesse_str_weight} * @{strength_mod}) + (@{finesse_dex_weight} * @{dexterity_mod}) + ((@{finesse_tie_weight}) * (@{strength_mod}))" disabled="disabled">
 		
 		<!-- BEGIN AUTO GENERATED WEAPON SECTION -->
-		
 				<h4 class="sheet-center">Melee Weapons <span class="sheet-pictos">D</span></h4>
 		<div class="sheet-row sheet-sub-header">
 			<div class="sheet-col-1-24 sheet-center sheet-small-label sheet-vert-bottom">Prof?</div>
