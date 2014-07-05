@@ -7,6 +7,9 @@ I've used this sheet (http://www.mad-irishman.net/pub_starwars.html) as a refere
 
 Change log
 ============
+July 4, 2014 - 
+* Added Dropdown to choose the Defense used for Damage Threshold for PCs and NPCs
+
 June 23, 2014 - 
 * Included a tab for NPCs. Includes very limited auto-calculations as it's meant to be a shortcut to just adding an NPC. There is however the capability to add very basic calculations. For Attacks, Damage and Skills. The prefix "npc-" must be used to reference NPC Attributes
 
