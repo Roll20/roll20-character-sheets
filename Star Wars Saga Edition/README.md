@@ -9,6 +9,8 @@ Change log
 ============
 July 4, 2014 - 
 * Added Dropdown to choose the Defense used for Damage Threshold for PCs and NPCs
+* Included total previews for skills section, quick skills and attacks in the event calculations are used. Preview with npc-CT.
+* More CSS and cosmetic fixes.
 
 June 23, 2014 - 
 * Included a tab for NPCs. Includes very limited auto-calculations as it's meant to be a shortcut to just adding an NPC. There is however the capability to add very basic calculations. For Attacks, Damage and Skills. The prefix "npc-" must be used to reference NPC Attributes
