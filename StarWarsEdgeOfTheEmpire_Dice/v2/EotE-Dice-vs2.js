@@ -10,7 +10,7 @@
 //
 // !eed log on|multi|single|off  // default:on and single
                                 // outputs dice rolled to the chat window if "on", only the result if "off"
-								// dice rolled will be on single line if "single" and on multiple lines if "multi"
+                    			// dice rolled will be on single line if "single" and on multiple lines if "multi"
 // !eed graphics on|off|s|m|l  //default:on and m
 								// shows dice rolled as graphic, small, medium, or large if "on" or as text if "off"
 // !eed #b #g #y #blk #p #r #w
@@ -1424,41 +1424,43 @@ var createDicePool = function(msg, who, playerid) {
 
     }
 	
-	var getCritName = function() {
+	var getCritID = function() {
 		
 		return {
-			1 : getAttrByName(characterId, 'critName1'),
-			2 : getAttrByName(characterId, 'critName2'),
-			3 : getAttrByName(characterId, 'critName3'),
-			4 : getAttrByName(characterId, 'critName4'),
-			5 : getAttrByName(characterId, 'critName5'),
-			6 : getAttrByName(characterId, 'critName6'),
-			7 : getAttrByName(characterId, 'critName7'),
-			8 : getAttrByName(characterId, 'critName8'),
-			9 : getAttrByName(characterId, 'critName9'),
-			10 : getAttrByName(characterId, 'critName10'),
-			11 : getAttrByName(characterId, 'critName11'),
-			12 : getAttrByName(characterId, 'critName12'),
-			13 : getAttrByName(characterId, 'critName13'),
-			14 : getAttrByName(characterId, 'critName14'),
-			15 : getAttrByName(characterId, 'critName15')
+			1 : getAttrByName(characterId, 'critOn1'),
+			2 : getAttrByName(characterId, 'critOn2'),
+			3 : getAttrByName(characterId, 'critOn3'),
+			4 : getAttrByName(characterId, 'critOn4'),
+			5 : getAttrByName(characterId, 'critOn5'),
+			6 : getAttrByName(characterId, 'critOn6'),
+			7 : getAttrByName(characterId, 'critOn7'),
+			8 : getAttrByName(characterId, 'critOn8'),
+			9 : getAttrByName(characterId, 'critOn9'),
+			10 : getAttrByName(characterId, 'critOn10'),
+			11 : getAttrByName(characterId, 'critOn11'),
+			12 : getAttrByName(characterId, 'critOn12'),
+			13 : getAttrByName(characterId, 'critOn13'),
+			14 : getAttrByName(characterId, 'critOn14'),
+			15 : getAttrByName(characterId, 'critOn15')
 		}
 	}
 	
 	var critRoll = function(addCritNum) {
 		
 		// Check for criticals
-		var critObj = getCritName();
+		var critObj = getCritID();
         
 		//add exsiting crits
 		var totalcrits = 0;
 		var openSlot = '';
-		
+
 		for (var key in critObj)  {
-			if (critObj[key].length > 0) {
+			
+            if (parseInt(critObj[key]) > 0) {
 				totalcrits = totalcrits + 1;
 			} else {
 				openSlot = key;
+                log(openSlot);
 			}
 		}
         
@@ -1524,9 +1526,9 @@ var createDicePool = function(msg, who, playerid) {
 				
 				critNameObj.set({current : critTable[key].name});
 				critSeverityObj.set({current : critTable[key].severity});
-				critRangeObj.set({current : rollTotal});
+				critRangeObj.set({current : critTable[key].percent});
 				critSummaryObj.set({current : critTable[key].Result});
-				critOnObj.set({current : 1});
+				critOnObj.set({current : openSlot});
                 
                 var chat = '/direct <br><b>Rolls Critical Injury</b><br>';
                     chat = chat + '<img src="http://i.imgur.com/z51hRwd.png" /><br/>'
@@ -1545,13 +1547,13 @@ var createDicePool = function(msg, who, playerid) {
 		//use sendChat /direct + html		
 	}
 	
-	var critHeal = function(critName) {
+	var critHeal = function(critID) {
 		
-		var critObj = getCritName();
+		var critObj = getCritID();
 		
 		for (var key in critObj) {
 			
-			if (critObj[key] == critName) {
+			if (critObj[key] == critID) {
 				
 				var critNameObj = findObjs({
 					type: 'attribute',
@@ -1891,6 +1893,25 @@ var setupCharacters = function(charObj) {
 	
     var charactersObj = charObj;
     
+    //---------------------------------- createObj bug fix for add attributes
+        var oldCreateObj = createObj;
+        createObj = function() {
+            var obj = oldCreateObj.apply(this, arguments);
+            var id = obj.id;
+            var characterID = obj.get('characterid');
+            var type = obj.get('type');
+
+            if (obj && !obj.fbpath && obj.changed) {
+                obj.fbpath = obj.changed._fbpath.replace(/([^\/]*\/){4}/, "/");
+            } else if (obj && !obj.changed && type == 'attribute') { //fix for dynamic attribute after in character created in game
+                obj.fbpath = '/char-attribs/char/'+ characterID +'/'+ id;
+            }
+            
+            // /char-attribs/char/characterID/attributeID
+            
+            return obj;
+        }
+    
 	//Create Default Attributes for each character
 	//Attribute list
 	var createAttributeList = [
@@ -1922,21 +1943,21 @@ var setupCharacters = function(charObj) {
 		if (!attrObj) {
 			//create Attribute
 
-				createObj('attribute', {
+				attrObj = createObj('attribute', {
 					characterid: character,
 					name: prop.name + '' + index,
 					current: prop.current,
 					max: prop.max
 				});
 			    
-                log('Creating Attribute...'+ prop.name + '' + index);
+               // log('Creating Attribute...'+ prop.name + '' + index);
 		
 		} else {
     	    if (prop.update) {
                 
                 attrObj.set({current: prop.current});
                 
-                log('Updating Attribute...'+ prop.name + '' + index);
+               // log('Updating Attribute...'+ prop.name + '' + index);
     	    }
 		}
 		
@@ -1953,6 +1974,7 @@ var setupCharacters = function(charObj) {
             
     		var characterId = charactersObj[charKey].id;//charactersObj[charKey].id;
     		
+            
             log('Character: --------------------> ' + charactersObj[charKey].get('name'));
 
             createAttributeList[0].current = characterId;
@@ -2020,11 +2042,16 @@ var setupCharacters = function(charObj) {
 }
 
 
+
 //---------------------------------- END UPDATE
+
+
 
 
 //Create new "-DicePool" character for GM
 on('ready', function() {
+	
+
 	
 	//create character dicepool
     if (findObjs({ _type: "character", name: "-DicePool" }).length == 0){
