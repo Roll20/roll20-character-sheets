@@ -1,10 +1,11 @@
 # D&D 5E Character Sheet
 
-This is a **work in progress sheet** for use on Roll20.net and with the latest (5th) edition of Dungeons & Dragons.  This sheet is designed to be compatible with the full release of 5th edition and I will try to keep it as up to date as possible with the system as and when rules become publicly available.  The sheet is also designed to be usable by all Roll20 users regarless of subscription level.  An API enhanced version of the sheet is planned for the future.
+This is a **work in progress sheet** for use on Roll20.net and with the latest (5th) edition of Dungeons & Dragons.  This sheet is designed to be compatible with the full release of 5th edition and I will try to keep it as up to date as possible with the system as and when rules become publicly available.  The sheet is also designed to be usable by all Roll20 users regardless of subscription level.  An API enhanced version of the sheet is planned for the future.
 
 ### Changelog
 
-* Entries to be added here once the sheet is ready for release.  This wont happen until the basic (free pdf) and Starter box set rules are available.
+* Initial release - 11th July 2014
+First release of the sheet.  It should support the majority of the Basic 5e rules (available as a free downloadable PDF).  Whilst the sheet cannot possibly cover every situation, and nor can it replace a basic understanding of the game rules/mechanics, it should be a helpful tool for new players whilst still providing more experienced players with some useful facilities too.
 
 ### Other resources
 
