@@ -1,95 +1,138 @@
+// Thanks to HoneyBadger for creating the original import script.
+// His script was written for importing DDI 4e .monster files
+// This script is for using Custom XML Output from Hero Lab
+// The Hero Lab plugin for Castles & Crusades was written by BoomerET
+// This script was adapted from HoneyBadger's script by BoomerET
+
 // VARIABLE & FUNCTION DECLARATIONS
 var AddAttribute = AddAttribute || {};
 var AddSkill = AddSkill || {};
 var AddPower = AddPower || {};
 
 on("chat:message", function (msg) {
-    // Exit if not an api command
-    if (msg.type != "api") return;
+   // Exit if not an api command
+   if (msg.type != "api") return;
 
-    // Get the API Chat Command
-	msg.who = msg.who.replace(" (GM)", "");
-	msg.content = msg.content.replace("(GM) ", "");
-	var command = msg.content.split(" ", 1);
-    if (command == "!build-character") {
+   // Get the API Chat Command
+   msg.who = msg.who.replace(" (GM)", "");
+   msg.content = msg.content.replace("(GM) ", "");
+   var command = msg.content.split(" ", 1);
+   if (command == "!build-character") {
+      if (!msg.selected) return;
+      var n = msg.content.split(" ", 2);
+      var Token = getObj("graphic", n[1])
+      if (Token.get("subtype") != "token") return;
+      if (Token.get("gmnotes").indexOf("xml") == -1) return;
         
-    	if (!msg.selected) return;
-		var n = msg.content.split(" ", 2);
-		var Token = getObj("graphic", n[1])
-		if (Token.get("subtype") != "token") return;
-		if (Token.get("gmnotes").indexOf("xml") == -1) return;
+      // USER CONFIGURATION
+      var USE_POWER_CARDS = false; // Uses power cards instead of text only macros
+      var SHOW_DEFENSES = false;   // Adds monster defenses as token actions
         
-        // USER CONFIGURATION
-        var USE_POWER_CARDS = false; // Uses power cards instead of text only macros
-        var SHOW_DEFENSES = false;   // Adds monster defenses as token actions
+      // REPLACE SPECIAL CHARACTERS StatBlock = StatBlock.replace(//g, "");
+      var StatBlock = Token.get("gmnotes");
+         StatBlock = StatBlock.replace(/%20/g, " "); // Replace %20 with a space
+         StatBlock = StatBlock.replace(/%22/g, "'"); // Replace %22 (quotation) with '
+         StatBlock = StatBlock.replace(/%26lt/g, "<"); // Replace %26lt with <
+         StatBlock = StatBlock.replace(/%26gt/g, ">"); // Replace %26gt with >
+         StatBlock = StatBlock.replace(/%26amp/g, "&"); // Replace ampersand
+         StatBlock = StatBlock.replace(/%27/g, "'"); // Replace %27 with '
+         StatBlock = StatBlock.replace(/%28/g, "("); // Replace %28 with (
+         StatBlock = StatBlock.replace(/%29/g, ")"); // Replace %29 with )
+         StatBlock = StatBlock.replace(/%2C/g, ","); // Replace %2C with ,
+         StatBlock = StatBlock.replace(/%3A/g, ":"); // Replace %3A with :
+         StatBlock = StatBlock.replace(/%3B/g, ""); // Remove %3B (semi-colon)
+         StatBlock = StatBlock.replace(/%3Cbr/g, ""); // Remove carriage returns
+         StatBlock = StatBlock.replace(/%3D/g, "="); // Replace %3D with =
+         StatBlock = StatBlock.replace(/%3E/g, ""); // Remove %3E (???)
+         StatBlock = StatBlock.replace(/%3F/g, "?"); // Replace %3F with ?
+         StatBlock = StatBlock.replace(/\s{2,}/g, " "); // Replace multiple spaces with one space
+         StatBlock = StatBlock.replace(/%u2019/g, "'"); // Replace %u2019 with '
+      // END SPECIAL CHARACTER REPLACEMENT or REMOVAL
+      var CharacterName = StatBlock.match(/<character.*name=\'(.*)\' play.*/)[1];
+      // CHECK FOR DUPLICATE CHARACTERS
+      var CheckSheet = findObjs({
+         _type: "character",
+         name: CharacterName
+      });
         
-        // REPLACE SPECIAL CHARACTERS StatBlock = StatBlock.replace(//g, "");
-    	var StatBlock = Token.get("gmnotes");
-		    StatBlock = StatBlock.replace(/%20/g, " "); // Replace %20 with a space
-		    StatBlock = StatBlock.replace(/%22/g, "'"); // Replace %22 (quotation) with '
-		    StatBlock = StatBlock.replace(/%26lt/g, "<"); // Replace %26lt with <
-		    StatBlock = StatBlock.replace(/%26gt/g, ">"); // Replace %26gt with >
-            StatBlock = StatBlock.replace(/%26amp/g, "&"); // Replace ampersand
-		    StatBlock = StatBlock.replace(/%27/g, "'"); // Replace %27 with '
-		    StatBlock = StatBlock.replace(/%28/g, "("); // Replace %28 with (
-		    StatBlock = StatBlock.replace(/%29/g, ")"); // Replace %29 with )
-		    StatBlock = StatBlock.replace(/%2C/g, ","); // Replace %2C with ,
-		    StatBlock = StatBlock.replace(/%3A/g, ":"); // Replace %3A with :
-		    StatBlock = StatBlock.replace(/%3B/g, ""); // Remove %3B (semi-colon)
-		    StatBlock = StatBlock.replace(/%3Cbr/g, ""); // Remove carriage returns
-		    StatBlock = StatBlock.replace(/%3D/g, "="); // Replace %3D with =
-		    StatBlock = StatBlock.replace(/%3E/g, ""); // Remove %3E (???)
-		    StatBlock = StatBlock.replace(/%3F/g, "?"); // Replace %3F with ?
-		    StatBlock = StatBlock.replace(/\s{2,}/g, " "); // Replace multiple spaces with one space
-		    StatBlock = StatBlock.replace(/%u2019/g, "'"); // Replace %u2019 with '
-		// END SPECIAL CHARACTER REPLACEMENT or REMOVAL
-        var CharacterName = StatBlock.match(/<character.*name=\'(.*)\' play.*/)[1];
-        // CHECK FOR DUPLICATE CHARACTERS
-        var CheckSheet = findObjs({
-			_type: "character",
-			name: CharacterName
-		});
+      // DO NOT CREATE IF SHEET EXISTS
+      if (CheckSheet.length > 0) {
+         sendChat("ERROR", "This character already exists.");
+         return;
+      }
         
-		// DO NOT CREATE IF SHEET EXISTS
-		if (CheckSheet.length > 0) {
-			sendChat("ERROR", "This character already exists.");
-			return;
-		}
+      // CREATE CHARACTER SHEET & LINK TOKEN TO SHEET
+      var Character = createObj("character", {
+         avatar: Token.get("imgsrc"),
+         name: CharacterName,
+         gmnotes: Token.get("gmnotes"),
+         archived: false
+      });
         
-		// CREATE CHARACTER SHEET & LINK TOKEN TO SHEET
-		var Character = createObj("character", {
-			avatar: Token.get("imgsrc"),
-			name: CharacterName,
-			gmnotes: Token.get("gmnotes"),
-			archived: false
-		});
-        
-        // GET LEVEL, ROLE, & XP
-        var CharLevel = parseInt(StatBlock.match(/<class name=\'.*\' level=\'(\d*)\'\/>/)[1]);
-    	var CharClass = StatBlock.match(/<class name=\'(.*)\' level=\'\d*\'\/>/)[1];
-		var CharXP = parseInt(StatBlock.match(/<xp total=\'(\d*)\' next=\'\d*\'\/>/)[1]);
+      // GET LEVEL, ROLE, & XP
+      var CharLevel = parseInt(StatBlock.match(/<class name=\'.*\' level=\'(\d+)\'\/>/)[1]);
+      var CharClass = StatBlock.match(/<class name=\'(.*)\' level=\'\d*\'\/>/)[1];
+      var CharXP = parseInt(StatBlock.match(/<xp total=\'(\d*)\' next=\'\d*\'\/>/)[1]);
       var CharXPnext = parseInt(StatBlock.match(/<xp total=\'\d*\' next=\'(\d*)\'\/>/)[1]);
-		AddAttribute("CharacterName", CharacterName, Character.id);
-		AddAttribute("Class", CharClass, Character.id);
-		AddAttribute("Experience", CharXP, Character.id);
+      var CharRace = StatBlock.match(/<race name=\'(.*)\'\/><class/)[1];
+      var CharAlignment = StatBlock.match(/<alignment text=\'(.*)\'\/><size/)[1];
+      var CharMovement = parseInt(StatBlock.match(/<charmove.*value=\'(\d*)\'\/><\/pers/)[1]);
+      var CharHPwounds = parseInt(StatBlock.match(/<hitpoints.*wounds=\'(\d+)\'/)[1]);
+      var CharHP = parseInt(StatBlock.match(/<hitpoints total=\'(\d+)\'/)[1]);
+      var CharHPcurrent = CharHP - CharHPwounds;
+      //log("HP wounds: " + CharHPwounds + "; HP Total: " + CharHP + "; Current HP" + CharHPcurrent);
+
+      var myRegex = /<language name=\'(.*?)\'\/>/g;
+      var matchLanguages = getMatches(StatBlock, myRegex, 1);
+      var CharLanguages = matchLanguages.join();
+      
+      myRegex = /<attribute name='(.*?)' value='(\d+?)' bonus='\d+' primary='(\d+?)/g;
+      var matchAttributes = getMatches(StatBlock, myRegex, 1);
+      var matchAttrValue = getMatches(StatBlock, myRegex, 2);
+      var matchPrimary = getMatches(StatBlock, myRegex, 3);
+      for (var i = 0; i < matchAttributes.length; i++) {
+         AddAttribute(matchAttributes[i], matchAttrValue[i], Character.id);
+         AddAttribute(matchAttributes[i] + "Pri", matchPrimary[i], Character.id);
+      }
+         
+      AddAttribute("CharacterName", CharacterName, Character.id);
+      AddAttribute("Class", CharClass, Character.id);
+      AddAttribute("Experience", CharXP, Character.id);
       AddAttribute("NextLevel", CharXPnext, Character.id);
-    }
+      AddAttribute("Race", CharRace, Character.id);
+      AddAttribute("Alignment", CharAlignment, Character.id);
+      AddAttribute("Movement", CharMovement, Character.id);
+      AddAttribute("HP_max", CharHP, Character.id);
+      AddAttribute("HP", CharHPcurrent, Character.id);
+      AddAttribute("Level", CharLevel, Character.id);
+      AddAttribute("Languages", CharLanguages, Character.id);
+   }
 });
 
 function AddAttribute(attr, value, charid) {
-    if (attr === "Hit Points") {
-		createObj("attribute", {
-			name: attr,
-			current: value,
-			max: value,
-			characterid: charid
-		});
-	} else {
-		createObj("attribute", {
-			name: attr,
-			current: value,
-			characterid: charid
-		});
-	}
-	return;
+   if (attr === "Hit Points") {
+      createObj("attribute", {
+         name: attr,
+         current: value,
+         max: value,
+         characterid: charid
+      });
+   } else {
+      createObj("attribute", {
+         name: attr,
+         current: value,
+         characterid: charid
+      });
+   }
+   return;
+}
+
+function getMatches(string, regex, index) {
+   index || (index = 1);
+   var matches = [];
+   var match;
+   while (match = regex.exec(string)) {
+      matches.push(match[index]);
+   }
+   return matches;
 }
