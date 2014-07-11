@@ -17,7 +17,7 @@ on("chat:message", function (msg) {
    msg.who = msg.who.replace(" (GM)", "");
    msg.content = msg.content.replace("(GM) ", "");
    var command = msg.content.split(" ", 1);
-   if (command == "!build-character") {
+   if (command == "!createPC") {
       if (!msg.selected) return;
       var n = msg.content.split(" ", 2);
       var Token = getObj("graphic", n[1])
@@ -77,24 +77,11 @@ on("chat:message", function (msg) {
       var CharRace = StatBlock.match(/<race name=\'(.*)\'\/><class/)[1];
       var CharAlignment = StatBlock.match(/<alignment text=\'(.*)\'\/><size/)[1];
       var CharMovement = parseInt(StatBlock.match(/<charmove.*value=\'(\d*)\'\/><\/pers/)[1]);
-      var CharHPwounds = parseInt(StatBlock.match(/<hitpoints.*wounds=\'(\d+)\'/)[1]);
+      var CharHPwounds = parseInt(StatBlock.match(/<hitpoints total=\'\d+' wounds=\'(\d+)\'/)[1]);
       var CharHP = parseInt(StatBlock.match(/<hitpoints total=\'(\d+)\'/)[1]);
       var CharHPcurrent = CharHP - CharHPwounds;
-      //log("HP wounds: " + CharHPwounds + "; HP Total: " + CharHP + "; Current HP" + CharHPcurrent);
-
-      var myRegex = /<language name=\'(.*?)\'\/>/g;
-      var matchLanguages = getMatches(StatBlock, myRegex, 1);
-      var CharLanguages = matchLanguages.join();
       
-      myRegex = /<attribute name='(.*?)' value='(\d+?)' bonus='\d+' primary='(\d+?)/g;
-      var matchAttributes = getMatches(StatBlock, myRegex, 1);
-      var matchAttrValue = getMatches(StatBlock, myRegex, 2);
-      var matchPrimary = getMatches(StatBlock, myRegex, 3);
-      for (var i = 0; i < matchAttributes.length; i++) {
-         AddAttribute(matchAttributes[i], matchAttrValue[i], Character.id);
-         AddAttribute(matchAttributes[i] + "Pri", matchPrimary[i], Character.id);
-      }
-         
+      
       AddAttribute("CharacterName", CharacterName, Character.id);
       AddAttribute("Class", CharClass, Character.id);
       AddAttribute("Experience", CharXP, Character.id);
@@ -102,10 +89,40 @@ on("chat:message", function (msg) {
       AddAttribute("Race", CharRace, Character.id);
       AddAttribute("Alignment", CharAlignment, Character.id);
       AddAttribute("Movement", CharMovement, Character.id);
-      AddAttribute("HP_max", CharHP, Character.id);
+      AddAttribute("HPmax", CharHP, Character.id);
       AddAttribute("HP", CharHPcurrent, Character.id);
       AddAttribute("Level", CharLevel, Character.id);
+
+      var myRegex = /<language name=\'(.*?)\'\/>/g;
+      var matchLanguages = getMatches(StatBlock, myRegex, 1);
+      var CharLanguages = matchLanguages.join();
       AddAttribute("Languages", CharLanguages, Character.id);
+      
+      myRegex = /<attribute name='(.*?)' value='(\d+?)' bonus='(-?\d+?)' primary='(\d+?)/g;
+      var matchAttributes = getMatches(StatBlock, myRegex, 1);
+      var matchAttrValue = getMatches(StatBlock, myRegex, 2);
+      var matchAttrMod = getMatches(StatBlock, myRegex, 3);
+      var matchPrimary = getMatches(StatBlock, myRegex, 4);
+      for (var i = 0; i < matchAttributes.length; i++) {
+         AddAttribute(matchAttributes[i], matchAttrValue[i], Character.id);
+         AddAttribute(matchAttributes[i] + "Pri", matchPrimary[i], Character.id);
+         AddAttribute(matchAttributes[i] + "Mod", matchAttrMod[i], Character.id);
+      }
+      
+      myRegex = /<defense name='(.*?)' defense='(-?\d+?)' equipped='(.*?)' type='(.*?)'/g;
+      var matchArmorName = getMatches(StatBlock, myRegex, 1);
+      var matchArmorValue = getMatches(StatBlock, myRegex, 2);
+      var matchArmorEquipped = getMatches(StatBlock, myRegex, 3);
+      var matchArmorType = getMatches(StatBlock, myRegex, 4);
+      for (var j = 0; j < matchArmorName.length; j++) {
+         if ((matchArmorEquipped[j] == 'yes') && (matchArmorType[j] == 'armor')) {
+            AddAttribute("ArmorAC", matchArmorValue[j], Character.id);
+         }
+         if ((matchArmorEquipped[j] == 'yes') && (matchArmorType[j] == 'shield')) {
+            AddAttribute("ShieldAC", matchArmorValue[j], Character.id);
+         }
+         
+      }
    }
 });
 
