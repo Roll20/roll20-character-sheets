@@ -109,6 +109,8 @@ on("chat:message", function (msg) {
          AddAttribute(matchAttributes[i] + "Mod", matchAttrMod[i], Character.id);
       }
       
+      var totalAC = 10;
+      
       myRegex = /<defense name='(.*?)' defense='(-?\d+?)' equipped='(.*?)' type='(.*?)'/g;
       var matchArmorName = getMatches(StatBlock, myRegex, 1);
       var matchArmorValue = getMatches(StatBlock, myRegex, 2);
@@ -117,12 +119,15 @@ on("chat:message", function (msg) {
       for (var j = 0; j < matchArmorName.length; j++) {
          if ((matchArmorEquipped[j] == 'yes') && (matchArmorType[j] == 'armor')) {
             AddAttribute("ArmorAC", matchArmorValue[j], Character.id);
+            totalAC += parseInt(matchArmorValue[j]);
          }
          if ((matchArmorEquipped[j] == 'yes') && (matchArmorType[j] == 'shield')) {
             AddAttribute("ShieldAC", matchArmorValue[j], Character.id);
+            totalAC += parseInt(matchArmorValue[j]);
          }
-         
       }
+      
+      AddAttribute("AC", totalAC, Character.id);
    }
 });
 
