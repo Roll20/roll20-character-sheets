@@ -100,6 +100,14 @@ on("chat:message", function (msg) {
          AddAttribute(matchAttributes[i], matchAttrValue[i], Character.id);
          AddAttribute(matchAttributes[i] + "Pri", matchPrimary[i], Character.id);
          AddAttribute(matchAttributes[i] + "Mod", matchAttrMod[i], Character.id);
+         if (matchAttributes[i] == "Wisdom") {
+            if ((CharClass == "Cleric") || (CharClass == "Paladin")) {
+               AddAttribute("TurnUndeadTurned", "d12 + " + matchAttrMod[i], Character.id);
+            } else {
+               AddAttribute("TurnUndeadTurned", "Not a Cleric/Paladin", Character.id);
+               AddAttribute("TurnUndeadCheck", "Not a Cleric/Paladin", Character.id);
+            }
+         }
       }
       
       myRegex = /<defense name='(.*?)' defense='(-?\d+?)' equipped='(.*?)' type='(.*?)'/g;
