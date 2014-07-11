@@ -6,8 +6,6 @@
 
 // VARIABLE & FUNCTION DECLARATIONS
 var AddAttribute = AddAttribute || {};
-var AddSkill = AddSkill || {};
-var AddPower = AddPower || {};
 
 on("chat:message", function (msg) {
    // Exit if not an api command
@@ -23,10 +21,6 @@ on("chat:message", function (msg) {
       var Token = getObj("graphic", n[1])
       if (Token.get("subtype") != "token") return;
       if (Token.get("gmnotes").indexOf("xml") == -1) return;
-        
-      // USER CONFIGURATION
-      var USE_POWER_CARDS = false; // Uses power cards instead of text only macros
-      var SHOW_DEFENSES = false;   // Adds monster defenses as token actions
         
       // REPLACE SPECIAL CHARACTERS StatBlock = StatBlock.replace(//g, "");
       var StatBlock = Token.get("gmnotes");
@@ -81,7 +75,6 @@ on("chat:message", function (msg) {
       var CharHP = parseInt(StatBlock.match(/<hitpoints total=\'(\d+)\'/)[1]);
       var CharHPcurrent = CharHP - CharHPwounds;
       
-      
       AddAttribute("CharacterName", CharacterName, Character.id);
       AddAttribute("Class", CharClass, Character.id);
       AddAttribute("Experience", CharXP, Character.id);
@@ -109,24 +102,27 @@ on("chat:message", function (msg) {
          AddAttribute(matchAttributes[i] + "Mod", matchAttrMod[i], Character.id);
       }
       
-      var totalAC = 10;
-      
       myRegex = /<defense name='(.*?)' defense='(-?\d+?)' equipped='(.*?)' type='(.*?)'/g;
       var matchArmorName = getMatches(StatBlock, myRegex, 1);
       var matchArmorValue = getMatches(StatBlock, myRegex, 2);
       var matchArmorEquipped = getMatches(StatBlock, myRegex, 3);
       var matchArmorType = getMatches(StatBlock, myRegex, 4);
+      var totalAC = 10;
       for (var j = 0; j < matchArmorName.length; j++) {
          if ((matchArmorEquipped[j] == 'yes') && (matchArmorType[j] == 'armor')) {
             AddAttribute("ArmorAC", matchArmorValue[j], Character.id);
             totalAC += parseInt(matchArmorValue[j]);
+            AddAttribute("ArmorWorn", matchArmorName[j], Character.id);
          }
          if ((matchArmorEquipped[j] == 'yes') && (matchArmorType[j] == 'shield')) {
             AddAttribute("ShieldAC", matchArmorValue[j], Character.id);
             totalAC += parseInt(matchArmorValue[j]);
+            AddAttribute("ShieldWorn", matchArmorName[j], Character.id);
+         }
+         if ((matchArmorEquipped[j] == 'yes') && (matchArmorType[j] == 'helm')) {
+            AddAttribute("HelmWorn", matchArmorName[j], Character.id);
          }
       }
-      
       AddAttribute("AC", totalAC, Character.id);
    }
 });
