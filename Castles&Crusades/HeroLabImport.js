@@ -133,23 +133,28 @@ on("chat:message", function (msg) {
       }
       AddAttribute("AC", totalAC, Character.id);
       
-      myRegex = /<attack name='(.*?)' damage='(.*?)' dambon='(-?\d+?)' hitbon='(-?\d+?)' magicdam='(-?\d+?)' magichit='(-?\d+?)' equipped='(.*?)'.*?<description>(.*?) weapon<\/description>/;
+      //var myRegex = /<attack name=\'(.*?)\' damage=\'/g;
+      var myRegex = /<attack name='(.*?)' damage='(.*?)' dambon='(-?\d+?)' hitbon='(-?\d+?)' magicdam='(-?\d+?)' magichit='(-?\d+?)' equipped='(.*?)'.*?<description>(.*?) weapon<\/description>/g;
       var weapName = getMatches(StatBlock, myRegex, 1);
-      var weapDamage = getMatches(StatBlock, myRegex, 2);
-      var weapDamBonus = getMatches(StatBlock, myRegex, 3);
-      var weapHitBonus = getMatches(StatBlock, myRegex, 4);
-      var weapMagicDam = getMatches(StatBlock, myRegex, 5);
-      var weapMagicHit = getMatches(StatBlock, myRegex, 6);
-      var weapEquipped = getMatches(StatBlock, myRegex, 7);
-      var weapType = getMatches(StatBlock, myRegex, 8);
-      var weapCounter = 0;
+      //log(weapName.join());
+      //log(StatBlock);
+      //var weapName = getMatches(StatBlock, myRegex, 1);
+      //var weapDamage = getMatches(StatBlock, myRegex, 2);
+      //var weapDamBonus = getMatches(StatBlock, myRegex, 3);
+      //var weapHitBonus = getMatches(StatBlock, myRegex, 4);
+      //var weapMagicDam = getMatches(StatBlock, myRegex, 5);
+      //var weapMagicHit = getMatches(StatBlock, myRegex, 6);
+      //var weapEquipped = getMatches(StatBlock, myRegex, 7);
+      //var weapType = getMatches(StatBlock, myRegex, 8);
+      //var weapCounter = 0;
       if (weapName.length > 5) {
          weapCounter = 5;
       } else {
          weapCounter = weapName.length;
       }
       for (var k = 0; k < weapCounter; k++) {
-         AddAttribute("WeaponName_" + k.toString(), weapName[k], Character.id);
+         AddAttribute("WeaponName_" + (k+1).toString(), weapName[k], Character.id);
+         
       }
    }
 });
