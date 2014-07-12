@@ -143,9 +143,11 @@ on("chat:message", function (msg) {
       var abilityType = getMatches(StatBlock, myRegex, 5);
       log(abilityType.join());
       for (var l = 0; l < abilityName.length; l++) {
-         if (abilityType[l] == "class") {
-            AddAttribute("repeating_classabilities_" + l.toString() + "_ClassAbility", abilityName[l], Character.id);
-         }
+           if (abilityType[l] == "class") {
+              AddAttribute("repeating_classabilities_" + l.toString() + "_ClassAbility", abilityName[l], Character.id);
+           } else if (abilityType[l] == "racial") {
+              AddAttribute("repeating_raceabilities_" + l.toString() + "_RaceAbility", abilityName[l], Character.id);
+           }
       }
       
       myRegex = /<attack name='(.*?)' damage='(.*?)' dambon='(-?\d+?)' hitbon='(-?\d+?)' magicdam='(-?\d+?)' magichit='(-?\d+?)' equipped='(.*?)'.*?<description>(.*?) weapon<\/description>/g;
