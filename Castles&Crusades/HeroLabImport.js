@@ -73,6 +73,7 @@ on("chat:message", function (msg) {
       var CharMovement = parseInt(StatBlock.match(/<charmove.*value=\'(\d*)\'\/><\/pers/)[1]);
       var CharHPwounds = parseInt(StatBlock.match(/<hitpoints total=\'\d+' wounds=\'(\d+)\'/)[1]);
       var CharHP = parseInt(StatBlock.match(/<hitpoints total=\'(\d+)\'/)[1]);
+      var CharBtH = parseInt(StatBlock.match(/<bth value=\'(-?\d+?)\'/)[1]);
       var CharHPcurrent = CharHP - CharHPwounds;
       
       AddAttribute("CharacterName", CharacterName, Character.id);
@@ -135,26 +136,41 @@ on("chat:message", function (msg) {
       
       //var myRegex = /<attack name=\'(.*?)\' damage=\'/g;
       var myRegex = /<attack name='(.*?)' damage='(.*?)' dambon='(-?\d+?)' hitbon='(-?\d+?)' magicdam='(-?\d+?)' magichit='(-?\d+?)' equipped='(.*?)'.*?<description>(.*?) weapon<\/description>/g;
-      var weapName = getMatches(StatBlock, myRegex, 1);
+      //var weapName = getMatches(StatBlock, myRegex, 1);
       //log(weapName.join());
       //log(StatBlock);
-      //var weapName = getMatches(StatBlock, myRegex, 1);
-      //var weapDamage = getMatches(StatBlock, myRegex, 2);
-      //var weapDamBonus = getMatches(StatBlock, myRegex, 3);
-      //var weapHitBonus = getMatches(StatBlock, myRegex, 4);
-      //var weapMagicDam = getMatches(StatBlock, myRegex, 5);
-      //var weapMagicHit = getMatches(StatBlock, myRegex, 6);
-      //var weapEquipped = getMatches(StatBlock, myRegex, 7);
-      //var weapType = getMatches(StatBlock, myRegex, 8);
-      //var weapCounter = 0;
+      var weapName = getMatches(StatBlock, myRegex, 1);
+      var weapDamage = getMatches(StatBlock, myRegex, 2);
+      var weapDamBonus = getMatches(StatBlock, myRegex, 3);
+      var weapHitBonus = getMatches(StatBlock, myRegex, 4);
+      var weapMagicDam = getMatches(StatBlock, myRegex, 5);
+      var weapMagicHit = getMatches(StatBlock, myRegex, 6);
+      var weapEquipped = getMatches(StatBlock, myRegex, 7);
+      var weapType = getMatches(StatBlock, myRegex, 8);
+      var weapCounter = 0;
       if (weapName.length > 5) {
          weapCounter = 5;
       } else {
          weapCounter = weapName.length;
       }
+      //WeaponName
+      //WeaponBth_1
+      //WeaponHitMod_1
+      //WeaponHitMisc_1
+      //WeaponHitMagic_1
+      //WeaponHitTotal_1
+      //
+      //WeaponDmg_1
+      //WeaponDmgMod_1
+      //WeaponDmgMisc_1
+      //WeaponDmgMagic_1
+      //WeaponDmgTotal_1
       for (var k = 0; k < weapCounter; k++) {
          AddAttribute("WeaponName_" + (k+1).toString(), weapName[k], Character.id);
-         
+         AddAttribute("WeaponDmg_" + (k+1).toString(), weapDamage[k], Character.id);
+         AddAttribute("WeaponBth_" + (k+1).toString(), CharBtH, Character.id);
+         AddAttribute("WeaponDmgMagic_" + (k+1).toString(), weapMagicDam[k], Character.id);
+         AddAttribute("WeaponHitMagic_" + (K+1).toString(), weapMagicHit[k], Character.id);
       }
    }
 });
