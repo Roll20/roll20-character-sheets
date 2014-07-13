@@ -110,7 +110,7 @@ on("chat:message", function (msg) {
             }
          }
       }
-      
+
       myRegex = /<defense name='(.*?)' defense='(-?\d+?)' equipped='(.*?)' type='(.*?)'/g;
       var matchArmorName = getMatches(StatBlock, myRegex, 1);
       var matchArmorValue = getMatches(StatBlock, myRegex, 2);
@@ -219,6 +219,13 @@ on("chat:message", function (msg) {
          weapDmgTotal = 0;
          StrMod = 0;
          DexMod = 0;
+      }
+      //log(StatBlock);
+      myRegex = /<sense name='(.*?)'><desc/g;
+      var senseNames = getMatches(StatBlock, myRegex, 1);
+      //log(senseNames.join());
+      for (var m = 0; m < senseNames.length; m++) {
+        AddAttribute("repeating_senses_" + m.toString() + "_Senses", senseNames[m], Character.id);
       }
    }
 });
