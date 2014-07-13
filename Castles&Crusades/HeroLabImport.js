@@ -175,18 +175,6 @@ on("chat:message", function (msg) {
       var weapDmgMod = 0;
       var DexMod = 0;
       var StrMod = 0;
-      //WeaponName
-      //WeaponBth_1
-      //WeaponHitMod_1
-      //WeaponHitMisc_1
-      //WeaponHitMagic_1
-      //WeaponHitTotal_1
-      //
-      //WeaponDmg_1
-      //WeaponDmgMod_1
-      //WeaponDmgMisc_1
-      //WeaponDmgMagic_1
-      //WeaponDmgTotal_1
       for (var k = 0; k < Math.min(weapName.length, 5); k++) {
          if (weapSpecialization[1] == weapName[k]) {
             weapDmgMisc += 1;
@@ -220,10 +208,8 @@ on("chat:message", function (msg) {
          StrMod = 0;
          DexMod = 0;
       }
-      //log(StatBlock);
       myRegex = /<sense name='(.*?)'><desc/g;
       var senseNames = getMatches(StatBlock, myRegex, 1);
-      //log(senseNames.join());
       for (var m = 0; m < senseNames.length; m++) {
         AddAttribute("repeating_senses_" + m.toString() + "_Senses", senseNames[m], Character.id);
       }
