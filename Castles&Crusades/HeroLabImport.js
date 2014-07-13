@@ -129,25 +129,29 @@ on("chat:message", function (msg) {
             AddAttribute("ShieldWorn", matchArmorName[j], Character.id);
          }
          if ((matchArmorEquipped[j] == 'yes') && (matchArmorType[j] == 'helm')) {
-            AddAttribute("HelmWorn", matchArmorName[j], Character.id);
+           AddAttribute("HelmWorn", matchArmorName[j], Character.id);
          }
       }
       AddAttribute("AC", totalAC, Character.id);
       
       // Abilities
       myRegex = /<ability name=\'(.*?)\' value=\'(-?\d+?)\' bonus=\'(-?\d+?)\' primary=\'-?\d+?\' attrabil=\'(.*?)\' clorra=\'(.*?)\'/g;
+      var weapSpecialization = "";
       var abilityName = getMatches(StatBlock, myRegex, 1);
       var abilityValue = getMatches(StatBlock, myRegex, 2);
       var abilityBonus = getMatches(StatBlock, myRegex, 3);
       var abilityAttribute = getMatches(StatBlock, myRegex, 4);
       var abilityType = getMatches(StatBlock, myRegex, 5);
-      log(abilityType.join());
       for (var l = 0; l < abilityName.length; l++) {
-           if (abilityType[l] == "class") {
-              AddAttribute("repeating_classabilities_" + l.toString() + "_ClassAbility", abilityName[l], Character.id);
-           } else if (abilityType[l] == "racial") {
-              AddAttribute("repeating_raceabilities_" + l.toString() + "_RaceAbility", abilityName[l], Character.id);
-           }
+         if (abilityType[l] == "class") {
+            AddAttribute("repeating_classabilities_" + l.toString() + "_ClassAbility", abilityName[l], Character.id);
+            if (abilityName[l].match(/Weapon Specialization/)) {
+               var wepRegex = /\((.*?)\)/g;
+               weapSpecialization = wepRegex.exec(abilityName[l]);
+            }
+         } else if (abilityType[l] == "racial") {
+            AddAttribute("repeating_raceabilities_" + l.toString() + "_RaceAbility", abilityName[l], Character.id);
+         }
       }
       
       myRegex = /<attack name='(.*?)' damage='(.*?)' dambon='(-?\d+?)' hitbon='(-?\d+?)' magicdam='(-?\d+?)' magichit='(-?\d+?)' equipped='(.*?)'.*?<description>(.*?) weapon<\/description>/g;
@@ -159,12 +163,14 @@ on("chat:message", function (msg) {
       var weapMagicHit = getMatches(StatBlock, myRegex, 6);
       var weapEquipped = getMatches(StatBlock, myRegex, 7);
       var weapType = getMatches(StatBlock, myRegex, 8);
-      //var weapCounter = 0;
-      //if (weapName.length > 5) {
-      //   weapCounter = 5;
-      //} else {
-      //   weapCounter = weapName.length;
-      //}
+      var weapHitMisc = 0;
+      var weapDmgMisc = 0;
+      var weapHitTotal = 0;
+      var weapDmgTotal = 0;
+      var weapHitMod = 0;
+      var weapDmgMod = 0;
+      var DexMod = 0;
+      var StrMod = 0;
       //WeaponName
       //WeaponBth_1
       //WeaponHitMod_1
@@ -178,11 +184,37 @@ on("chat:message", function (msg) {
       //WeaponDmgMagic_1
       //WeaponDmgTotal_1
       for (var k = 0; k < Math.min(weapName.length, 5); k++) {
+         if (weapSpecialization[1] == weapName[k]) {
+            weapDmgMisc += 1;
+            weapHitMisc += 1;
+         }
          AddAttribute("WeaponName_" + (k+1).toString(), weapName[k], Character.id);
          AddAttribute("WeaponDmg_" + (k+1).toString(), weapDamage[k], Character.id);
          AddAttribute("WeaponBth_" + (k+1).toString(), CharBtH, Character.id);
          AddAttribute("WeaponDmgMagic_" + (k+1).toString(), weapMagicDam[k], Character.id);
          AddAttribute("WeaponHitMagic_" + (k+1).toString(), weapMagicHit[k], Character.id);
+         AddAttribute("WeaponDmgMisc_" + (k+1).toString(), weapDmgMisc, Character.id);
+         AddAttribute("WeaponHitMisc_" + (k+1).toString(), weapHitMisc, Character.id);
+         StrMod = parseInt(getAttrByName(Character.id, "StrengthMod"));
+         DexMod = parseInt(getAttrByName(Character.id, "DexterityMod"));
+         if (weapType[k] == "Melee") {
+            AddAttribute("WeaponDmgMod_" + (k+1).toString(), StrMod, Character.id);
+            AddAttribute("WeaponHitMod_" + (k+1).toString(), StrMod, Character.id);
+            weapHitTotal = parseInt(CharBtH) + parseInt(weapMagicHit[k]) + weapHitMisc + StrMod;
+            weapDmgTotal = parseInt(weapMagicDam[k]) + weapDmgMisc + parseInt(StrMod);
+         } else if (weapType[k] == "Ranged") {
+            AddAttribute("WeaponHitMod_" + (k+1).toString(), DexMod, Character.id);
+            weapHitTotal = parseInt(CharBtH) + parseInt(weapMagicHit[k]) + weapHitMisc + DexMod;
+            weapDmgTotal = parseInt(weapMagicDam[k]) + weapDmgMisc;
+         }
+         AddAttribute("WeaponHitTotal_" + (k+1).toString(), weapHitTotal, Character.id);
+         AddAttribute("WeaponDmgTotal_" + (k+1).toString(), weapDmgTotal, Character.id);
+         weapHitMisc = 0;
+         weapDmgMisc = 0;
+         weapHitTotal = 0;
+         weapDmgTotal = 0;
+         StrMod = 0;
+         DexMod = 0;
       }
    }
 });
