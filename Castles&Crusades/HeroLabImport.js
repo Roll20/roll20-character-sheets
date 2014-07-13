@@ -142,15 +142,19 @@ on("chat:message", function (msg) {
       var abilityBonus = getMatches(StatBlock, myRegex, 3);
       var abilityAttribute = getMatches(StatBlock, myRegex, 4);
       var abilityType = getMatches(StatBlock, myRegex, 5);
+      var numClassAbilities = 0;
+      var numRaceAbilities = 0;
       for (var l = 0; l < abilityName.length; l++) {
          if (abilityType[l] == "class") {
-            AddAttribute("repeating_classabilities_" + l.toString() + "_ClassAbility", abilityName[l], Character.id);
+            AddAttribute("repeating_classabilities_" + numClassAbilities.toString() + "_ClassAbility", abilityName[l], Character.id);
+            numClassAbilities += 1;
             if (abilityName[l].match(/Weapon Specialization/)) {
                var wepRegex = /\((.*?)\)/g;
                weapSpecialization = wepRegex.exec(abilityName[l]);
             }
-         } else if (abilityType[l] == "racial") {
-            AddAttribute("repeating_raceabilities_" + l.toString() + "_RaceAbility", abilityName[l], Character.id);
+         } else if (abilityType[l] == "race") {
+            AddAttribute("repeating_raceabilities_" + numRaceAbilities.toString() + "_RaceAbility", abilityName[l], Character.id);
+            numRaceAbilities =+ 1;
          }
       }
       
