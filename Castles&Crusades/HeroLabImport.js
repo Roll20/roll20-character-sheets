@@ -175,6 +175,7 @@ on("chat:message", function (msg) {
       var weapDmgMod = 0;
       var DexMod = 0;
       var StrMod = 0;
+
       for (var k = 0; k < Math.min(weapName.length, 5); k++) {
          if (weapSpecialization[1] == weapName[k]) {
             weapDmgMisc += 1;
