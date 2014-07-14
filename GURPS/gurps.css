@@ -58,6 +58,11 @@
     width: 100%;
 }
 
+/* This is a work-around, not sure what's causing the bug. */
+.repitem {
+    max-height: 44px;
+}
+
 
 /* ===== ROW COLOURING ===== */
 input {
@@ -142,9 +147,19 @@ input.sheet-tab:checked::before {
     color: #AE4D4D;
 }
 
+.sheet-box .sheet-toggle {
+    position: absolute;
+    left: 0;
+    z-index: 1;
+}
+
+.sheet-toggle:checked ~ .sheet-row-details { display: inline-block; }
+.sheet-toggle ~ .sheet-row-details { display: none; }
+/*
 .sheet-box .sheet-row-details:hover,
 .sheet-box .sheet-row:hover + .sheet-row-details { display: block; }
 .sheet-box .sheet-row-details { display: none; }
+*/
 
 
 /* ===== BUTTONS ===== */
@@ -169,17 +184,17 @@ input.sheet-tab:checked::before {
 
 
 /* ===== INPUTS ===== */
-.sheet-box input[type=number]::-webkit-inner-spin-button,
-.sheet-box input[type=number]::-webkit-outer-spin-button {
+.sheet-row input[type=number]::-webkit-inner-spin-button,
+.sheet-row input[type=number]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
 
-.sheet-box input[type=number] {
+.sheet-row input[type=number] {
     -moz-appearance: textfield;
 }
 
-.sheet-box select {
+.sheet-row select {
     width: 100%;
     height: 20px;
     padding: 0;
@@ -187,8 +202,11 @@ input.sheet-tab:checked::before {
     margin-top: -2px;
 }
 
-.sheet-box input {
+.sheet-row input:not(.sheet-inline) {
     width: 100% !important;
+}
+
+.sheet-row input {
     height: 20px;
     margin-top: -2px;
     padding: 0 2px;
@@ -200,7 +218,7 @@ input.sheet-tab:checked::before {
     cursor: initial;
 }
 
-.sheet-box input:not(:disabled) {
+.sheet-row input:not(:disabled) {
     border-radius: 2px;
 
     -webkit-box-shadow: inset 0px 0px 1px 0px rgba(98, 98, 94, 0.75);
@@ -208,17 +226,17 @@ input.sheet-tab:checked::before {
     box-shadow:         inset 0px 0px 1px 0px rgba(98, 98, 94, 0.75);
 }
 
-.sheet-textarea {
+.sheet-row .sheet-textarea {
     text-align: center;
 }
 
-.sheet-textarea .sheet-label {
+.sheet-row .sheet-textarea .sheet-label {
     text-align: center;
     font-variant: small-caps;
     text-transform: lowercase;
 }
 
-.sheet-textarea textarea {
+.sheet-row .sheet-textarea textarea {
     text-align: initial;
     outline: none;
     resize: none;
@@ -230,12 +248,17 @@ input.sheet-tab:checked::before {
 }
 
 
+/* ===== DIFFERENCE COLOURING ===== */
+.sheet-diff[value="0"] + input {
+    color: green;
+}
+
+
 /* ===== CUSTOM CHECKBOXES ===== */
 .sheet-box input[type="checkbox"] {
     opacity: 0;
     width: 22px;
     height: 22px;
-    position: relative;
     cursor: pointer;
     z-index: 1;
 }
@@ -248,18 +271,20 @@ input.sheet-tab:checked::before {
     margin: 0;
     padding: 0;
 
-    position: relative;
-    top: -23px;
-    left: -1px;
-
-    border: solid 1px #a8a8a8;
     text-align: center;
     display: inline-block;
     vertical-align: middle;
 
     font-size: 18px;
     font-family: "Pictos";
-    content: "";
+}
+
+.sheet-box .sheet-boolean ~ .sheet-checkbox:before {
+    border: solid 1px #a8a8a8;
+
+    position: relative;
+    top: -23px;
+    left: -1px;
     
     -moz-box-shadow: 0 0 2px #ccc;
     -webkit-box-shadow: 0 0 2px #ccc;
@@ -277,8 +302,22 @@ input.sheet-tab:checked::before {
     background: radial-gradient(#f6f6f6, #dfdfdf);
 }
 
-.sheet-box input[type="checkbox"]:checked ~ .sheet-checkbox:before {
+.sheet-box .sheet-boolean:checked ~ .sheet-checkbox:before {
     content: "3";
+}
+
+.sheet-box .sheet-toggle ~ .sheet-checkbox:before {
+    content: "4";
+}
+
+.sheet-box .sheet-toggle ~ .sheet-checkbox {
+    position: absolute;
+}
+
+.sheet-box .sheet-toggle:checked ~ .sheet-checkbox:before {
+    transform:rotate(90deg);
+    -ms-transform:rotate(90deg); /* IE 9 */
+    -webkit-transform:rotate(90deg); /* Opera, Chrome, and Safari */
 }
 
 
@@ -289,6 +328,10 @@ input.sheet-tab:checked::before {
 
 .sheet-left {
     float: left;
+}
+
+.sheet-inline {
+    display: inline;
 }
 
 .sheet-clearfix:before,
@@ -384,18 +427,20 @@ input.sheet-module-roll:checked ~ .sheet-wrapper .sheet-module-off-roll,
 .sheet-ranged-attacks .sheet-col1 .sheet-tooltip { margin-left: -40px; }
 
 /* -- GENERAL -- */
-.sheet-attribute { width: 130px; }
+.sheet-attribute { width: 160px; }
 .sheet-attribute .sheet-header .sheet-col0 { width: 78px; }
-.sheet-attribute .sheet-header .sheet-col1 { width: 52px; }
+.sheet-attribute .sheet-header .sheet-col1 { width: 30px; }
+.sheet-attribute .sheet-header .sheet-col2 { width: 52px; }
 .sheet-attribute .sheet-row .sheet-col0 { width: 48px; }
 .sheet-attribute .sheet-row .sheet-col1 { width: 30px; }
 .sheet-attribute .sheet-row .sheet-col2 { width: 30px; }
-.sheet-attribute .sheet-row .sheet-col3 { width: 22px; }
-.sheet-attribute .sheet-row-basic-move .sheet-col2 { width: 52px; }
-.sheet-attribute .sheet-row-basic-lift .sheet-col1 { width: 82px; }
-.sheet-attribute .sheet-row-dodge .sheet-col1 { width: 82px; }
-.sheet-attribute .sheet-row-thrust-damage .sheet-col1 { width: 60px; }
-.sheet-attribute .sheet-row-swing-damage .sheet-col1 { width: 60px; }
+.sheet-attribute .sheet-row .sheet-col3 { width: 30px; }
+.sheet-attribute .sheet-row .sheet-col4 { width: 22px; }
+.sheet-attribute .sheet-row-basic-move .sheet-col3 { width: 52px; }
+.sheet-attribute .sheet-row-basic-lift .sheet-col2 { width: 82px; }
+.sheet-attribute .sheet-row-dodge .sheet-col2 { width: 82px; }
+.sheet-attribute .sheet-row-thrust-damage .sheet-col1 { width: 90px; }
+.sheet-attribute .sheet-row-swing-damage .sheet-col1 { width: 90px; }
 
 .sheet-stats { width: 118px; }
 .sheet-stats .sheet-header .sheet-col0 { width: 48px; }
@@ -409,7 +454,7 @@ input.sheet-module-roll:checked ~ .sheet-wrapper .sheet-module-off-roll,
 .sheet-stats .sheet-tooltip table { text-align: left; }
 .sheet-stats .sheet-tooltip table .sheet-label { text-align: left; }
 
-.sheet-miscelleneous { width: calc(100% - 130px - 118px - 100px - 1.6em); }
+.sheet-miscelleneous { width: calc(100% - 160px - 118px - 100px - 1.6em); }
 .sheet-miscelleneous .sheet-header .sheet-col0 { width: calc(100% - 30px); }
 .sheet-miscelleneous .sheet-header .sheet-col1 { width: 30px; }
 .sheet-miscelleneous .sheet-row .sheet-col0 { width: 80px; }
@@ -425,11 +470,11 @@ input.sheet-module-roll:checked ~ .sheet-wrapper .sheet-module-off-roll,
 .sheet-points .sheet-row .sheet-col0 { width: 60px; }
 .sheet-points .sheet-row .sheet-col1 { width: 40px; }
 
-.sheet-lift { width: calc(100% - 130px - 0.8em); }
+.sheet-lift { width: calc(100% - 160px - 0.8em); }
 .sheet-lift .sheet-col0 { width: 175px; }
 .sheet-lift .sheet-col1 { width: calc(100% - 175px); text-align: center; }
 
-.sheet-encumberance { width: calc(100% - 130px - 0.8em); }
+.sheet-encumberance { width: calc(100% - 160px - 0.8em); }
 .sheet-encumberance .sheet-col0 { width: 100px; }
 .sheet-encumberance .sheet-col1 { width: calc((100% - 100px) * 0.4); }
 .sheet-encumberance .sheet-col2 { width: calc((100% - 100px) * 0.3); }
@@ -453,12 +498,21 @@ input.sheet-module-roll:checked ~ .sheet-wrapper .sheet-module-off-roll,
 .sheet-traits .sheet-col1 { width: 30px; }
 .sheet-traits .sheet-col2 { width: 30px; }
 .sheet-traits .sheet-col3 { width: 40px; }
+.sheet-traits .sheet-row-stats .sheet-col0 { margin-left: 20px; width: calc(100% - 120px); }
 
 .sheet-disadvantages { width: calc(100% - 0.4em); }
-.sheet-disadvantages .sheet-col0 { width: calc(100% - 100px); }
+.sheet-disadvantages .sheet-col0 { width: calc(100% - 120px); }
 .sheet-disadvantages .sheet-col1 { width: 30px; }
 .sheet-disadvantages .sheet-col2 { width: 30px; }
 .sheet-disadvantages .sheet-col3 { width: 40px; }
+.sheet-disadvantages .sheet-row-stats .sheet-col0 { margin-left: 20px; width: calc(100% - 120px); }
+
+.sheet-racial { width: calc(100% - 0.4em); }
+.sheet-racial .sheet-col0 { width: calc(100% - 100px); }
+.sheet-racial .sheet-col1 { width: 30px; }
+.sheet-racial .sheet-col2 { width: 30px; }
+.sheet-racial .sheet-col3 { width: 40px; }
+.sheet-racial .sheet-row-stats .sheet-col0 { margin-left: 20px; width: calc(100% - 120px); }
 
 /* -- SKILLS -- */
 .sheet-skills { width: calc(100% - 0.4em); }
@@ -471,10 +525,11 @@ input.sheet-module-roll:checked ~ .sheet-wrapper .sheet-module-off-roll,
 .sheet-skills .sheet-col6 { width: 30px; }
 .sheet-skills .sheet-col7 { width: 40px; }
 .sheet-skills .sheet-col8 { width: 22px; }
+.sheet-skills .sheet-row-stats .sheet-col0 { margin-left: 20px; width: calc(100% - 327px); }
 
 .sheet-techniques { width: calc(100% - 0.4em); }
-.sheet-techniques .sheet-col0 { width: calc((100% - 240px) * 0.5); }
-.sheet-techniques .sheet-col1 { width: calc((100% - 240px) * 0.5); }
+.sheet-techniques .sheet-col0 { width: calc((100% - 240px) * 0.55); }
+.sheet-techniques .sheet-col1 { width: calc((100% - 240px) * 0.45); }
 .sheet-techniques .sheet-col2 { width: 30px; }
 .sheet-techniques .sheet-col3 { width: 30px; }
 .sheet-techniques .sheet-col4 { width: 40px; }
@@ -482,6 +537,7 @@ input.sheet-module-roll:checked ~ .sheet-wrapper .sheet-module-off-roll,
 .sheet-techniques .sheet-col6 { width: 40px; }
 .sheet-techniques .sheet-col7 { width: 30px; }
 .sheet-techniques .sheet-col8 { width: 40px; }
+.sheet-techniques .sheet-row-stats .sheet-col0 { margin-left: 20px; width: calc((100% - 240px) * 0.55 - 20px); }
 
 /* -- COMBAT -- */
 .sheet-active-defense { width: calc(100% - 140px - 0.8em); }
@@ -501,6 +557,7 @@ input.sheet-module-roll:checked ~ .sheet-wrapper .sheet-module-off-roll,
 .sheet-melee-attacks .sheet-col6 { width: 22px; }
 .sheet-melee-attacks .sheet-header .sheet-col5 { width: 52px; }
 .sheet-melee-attacks .sheet-header .sheet-col5 { margin-left: 22px; }
+.sheet-melee-attacks .sheet-row-stats .sheet-col0 { margin-left: 20px; width: calc(100% - 254px); }
 
 .sheet-ranged-attacks { width: calc(100% - 140px - 0.8em); }
 .sheet-ranged-attacks .sheet-col0 { width: calc(100% - 404px); }
@@ -517,6 +574,7 @@ input.sheet-module-roll:checked ~ .sheet-wrapper .sheet-module-off-roll,
 .sheet-ranged-attacks .sheet-col11 { width: 22px; }
 .sheet-ranged-attacks .sheet-header .sheet-col10 { width: 52px; }
 .sheet-ranged-attacks .sheet-header .sheet-col10 { margin-left: 22px; }
+.sheet-ranged-attacks .sheet-row-stats .sheet-col0 { margin-left: 20px; width: calc(100% - 424px); }
 
 .sheet-damage-reduction { float: right; width: 140px; }
 .sheet-damage-reduction .sheet-col0 { width: 50px; }
@@ -537,6 +595,7 @@ input.sheet-module-roll:checked ~ .sheet-wrapper .sheet-module-off-roll,
 .sheet-items .sheet-col4 { width: 50px; }
 .sheet-items .sheet-col5 { width: 50px; }
 .sheet-items .sheet-col6 { width: 50px; }
+.sheet-items .sheet-row-stats .sheet-col0 { margin-left: 20px; width: calc(100% - 290px); }
 .sheet-items .sheet-row-totals .sheet-col0 { width: calc(100% - 300px); }
 .sheet-items .sheet-row-totals .sheet-col1 { width: 100px; }
 .sheet-items .sheet-row-totals .sheet-col2 { width: 100px; }
