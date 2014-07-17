@@ -7,20 +7,11 @@ I've used this sheet (http://www.mad-irishman.net/pub_starwars.html) as a refere
 
 Change log
 ============
-May 15, 2014 - 
-* Made XP, Credits and Carrying Wt text fields for more diverse inputs
-* Included tooltip titles for inputs
-* Created Size modifier drop down for Reflex and Carrying Capacity
-
-May 7, 2014 - 
-* Adjusted field size for Equipment weight, carrying capacity, XP & Max.
-* Added calculations for Grapple with roll
-* Added calculations for Reflex flat-footed
-* Damage field changed to text input
-* Fixed Attack roll button to correctly create new lines using ASCII code. Included descriptive text.
+see Wiki: https://wiki.roll20.net/Star_Wars_Saga_Edition_Character_Sheet
 
 TO DO
 ============
+* Create NPC format
 * ~~List out all Skills with modifiers and rolls~~
 * ~~Use repeating function to include weapons and attacks having the user choose which Ability Mod and damage for pre-filled rolls~~
 * ~~Fix Attack Repeating function~~

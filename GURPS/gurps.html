@@ -1,25 +1,12 @@
-<input type="checkbox" name="attr_modifier" value="?{Modifier|0}" />
-<span class="sheet-popup">Modifier Prompt</span>
-<span class="sheet-tooltip">
-	Ask for a bonus or penalty to be added to dice rolls.
-	<br />
-	This will not affect damage rolls.
-</span>
-<br />
-<br />
 
 <div class="sheet-wrapper">
     <!-- HIDDEN FIELDS -->
     <input type="hidden" name="attr_10" value="10" disabled="disabled" />
-    <input class="sheet-enc0" type="hidden" name="attr__enc0" value="[[floor(@{total_weight}/@{lift_0})]]" disabled="disabled" />
-    <input class="sheet-enc1" type="hidden" name="attr__enc1" value="[[floor(@{total_weight}/@{lift_1})]]" disabled="disabled" />
-    <input class="sheet-enc2" type="hidden" name="attr__enc2" value="[[floor(@{total_weight}/@{lift_2})]]" disabled="disabled" />
-    <input class="sheet-enc3" type="hidden" name="attr__enc3" value="[[floor(@{total_weight}/@{lift_3})]]" disabled="disabled" />
-    <input class="sheet-enc4" type="hidden" name="attr__enc4" value="[[floor(@{total_weight}/@{lift_4})]]" disabled="disabled" />
+    <input type="hidden" name="attr_VS" value="vs:" disabled="disabled" />
     <!-- /HIDDEN FIELDS -->
     
     <!-- ===== ===== ===== ===== TABS ===== ===== ===== ===== -->
-	<input type="radio" name="attr_tab" class="sheet-tab sheet-tab1" value="1" title="General" checked="checked" />
+    <input type="radio" name="attr_tab" class="sheet-tab sheet-tab1" value="1" title="General" checked="checked" />
 	<input type="radio" name="attr_tab" class="sheet-tab sheet-tab2" value="2" title="Traits" />
 	<input type="radio" name="attr_tab" class="sheet-tab sheet-tab3" value="3" title="Skills" />
 	<input type="radio" name="attr_tab" class="sheet-tab sheet-tab4" value="4" title="Combat" />
@@ -31,12 +18,23 @@
     <div class="sheet-tab1">
 
 	    <!-- _____ _____ ATTRIBUTE BOX _____ _____ -->
-    
+    	
 	    <div class="sheet-box sheet-attribute">
 	        <div class="sheet-table">
 	            <div class="sheet-header">
 					<div class="sheet-cell sheet-col0">Attributes</div>
-					<div class="sheet-cell sheet-col1">Pts</div>
+					<div class="sheet-cell sheet-col1">
+						<div class="sheet-popup">Mod</div>
+						<span class="sheet-tooltip">
+							A modifier that will be applied to your attribute.
+							<br />
+							All derived attributes draw their base from your<br />
+							unmodified attributes. Therefore this MOD will<br />
+							generally only affect direct attribute rolls and<br />
+							skills rolls.
+						</span>
+					</div>
+					<div class="sheet-cell sheet-col2">Pts</div>
 				</div> <!-- .sheet-header -->
 				<div class="sheet-row sheet-row-strength">
 					<div class="sheet-cell sheet-col0 sheet-label">
@@ -45,16 +43,21 @@
 							Strength
 							<br />
 							10pts/level
+							<br />
+							Unmodified <input class="sheet-inline" type="text" name="attr_strength_max" value="10 + floor(abs(@{strength_points}) / 10) * (@{strength_points}+1)/abs(@{strength_points}+1)" disabled="disabled" />
 						</span>
 					</div>
 					<div class="sheet-cell sheet-col1">
-	                    <input type="text" name="attr_strength" value="10 + floor(abs(@{strength_points}) / 10) * (@{strength_points}+1)/abs(@{strength_points}+1)" disabled="disabled" />
+	                    <input type="text" name="attr_strength" value="@{strength|max} + @{strength_mod}" disabled="disabled" />
 	                </div>
 					<div class="sheet-cell sheet-col2">
-	                    <input type="number" name="attr_strength_points" value="0" />
+	                    <input type="number" name="attr_strength_mod" value="0" />
 	                </div>
 					<div class="sheet-cell sheet-col3">
-	                    <button type="roll" value="/em rolls [[3d6]] vs. ST [[@{strength} + @{modifier}]]" name="roll_vsST" />
+	                    <input type="number" name="attr_strength_points" value="0" />
+	                </div>
+					<div class="sheet-cell sheet-col4">
+	                    <button type="roll" value="@{roll} [[3d6]] @{VS} ST [[@{strength} + @{modifier}]]" name="roll_vsST" />
 	                </div>
 	            </div> <!-- .sheet-row -->
 	            <div class="sheet-row sheet-row-dexterity">
@@ -64,16 +67,21 @@
 							Dexterity
 							<br />
 							20pts/level
+							<br />
+							Unmodified: <input class="sheet-inline" type="text" name="attr_dexterity_max" value="10 + floor(abs(@{dexterity_points}) / 20) * (@{dexterity_points}+1)/abs(@{dexterity_points}+1)" disabled="disabled" />
 						</span>
 					</div>
 					<div class="sheet-cell sheet-col1">
-	                    <input type="text" name="attr_dexterity" value="10 + floor(abs(@{dexterity_points}) / 20) * (@{dexterity_points}+1)/abs(@{dexterity_points}+1)" disabled="disabled" />
+	                    <input type="text" name="attr_dexterity" value="@{dexterity|max} + @{dexterity_mod}" disabled="disabled" />
 	                </div>
 					<div class="sheet-cell sheet-col2">
-	                    <input type="number" name="attr_dexterity_points" value="0" />
+	                    <input type="number" name="attr_dexterity_mod" value="0" />
 	                </div>
 					<div class="sheet-cell sheet-col3">
-	                    <button type="roll" value="/em rolls [[3d6]] vs. DX [[@{dexterity} + @{modifier}]]" name="roll_vsDX" />
+	                    <input type="number" name="attr_dexterity_points" value="0" />
+	                </div>
+					<div class="sheet-cell sheet-col4">
+	                    <button type="roll" value="@{roll} [[3d6]] @{VS} DX [[@{dexterity} + @{modifier}]]" name="roll_vsDX" />
 	                </div>
 	            </div> <!-- .sheet-row -->
 	            <div class="sheet-row sheet-row-intelligence">
@@ -83,16 +91,21 @@
 							Intelligence
 							<br />
 							20pts/level
+							<br />
+							Unmodified: <input class="sheet-inline" type="text" name="attr_intelligence_max" value="10 + floor(abs(@{intelligence_points}) / 20) * (@{intelligence_points}+1)/abs(@{intelligence_points}+1)" disabled="disabled" />
 						</span>
 					</div>
 					<div class="sheet-cell sheet-col1">
-	                    <input type="text" name="attr_intelligence" value="10 + floor(abs(@{intelligence_points}) / 20) * (@{intelligence_points}+1)/abs(@{intelligence_points}+1)" disabled="disabled" />
+	                    <input type="text" name="attr_intelligence" value="@{intelligence|max} + @{intelligence_mod}" disabled="disabled" />
 	                </div>
 					<div class="sheet-cell sheet-col2">
-	                    <input type="number" name="attr_intelligence_points" value="0" />
+	                    <input type="number" name="attr_intelligence_mod" value="0" />
 	                </div>
 					<div class="sheet-cell sheet-col3">
-	                    <button type="roll" value="/em rolls [[3d6]] vs. IQ [[@{intelligence} + @{modifier}]]" name="roll_vsIQ" />
+	                    <input type="number" name="attr_intelligence_points" value="0" />
+	                </div>
+					<div class="sheet-cell sheet-col4">
+	                    <button type="roll" value="@{roll} [[3d6]] @{VS} IQ [[@{intelligence} + @{modifier}]]" name="roll_vsIQ" />
 	                </div>
 	            </div> <!-- .sheet-row -->
 	            <div class="sheet-row sheet-row-health">
@@ -102,16 +115,21 @@
 							Health
 							<br />
 							10pts/level
+							<br />
+							Unmodified: <input class="sheet-inline" type="text" name="attr_health_max" value="10 + floor(abs(@{health_points}) / 10) * (@{health_points}+1)/abs(@{health_points}+1)" disabled="disabled" />
 						</span>
 					</div>
 					<div class="sheet-cell sheet-col1">
-	                    <input type="text" name="attr_health" value="10 + floor(abs(@{health_points}) / 10) * (@{health_points}+1)/abs(@{health_points}+1)" disabled="disabled" />
+	                    <input type="text" name="attr_health" value="@{health|max} + @{health_mod}" disabled="disabled" />
 	                </div>
 					<div class="sheet-cell sheet-col2">
-	                    <input type="number" name="attr_health_points" value="0" />
+	                    <input type="number" name="attr_health_mod" value="0" />
 	                </div>
 					<div class="sheet-cell sheet-col3">
-	                    <button type="roll" value="/em rolls [[3d6]] vs. HT [[@{health} + @{modifier}]]" name="roll_vsHT" />
+	                    <input type="number" name="attr_health_points" value="0" />
+	                </div>
+					<div class="sheet-cell sheet-col4">
+	                    <button type="roll" value="@{roll} [[3d6]] @{VS} HT [[@{health} + @{modifier}]]" name="roll_vsHT" />
 	                </div>
 	            </div> <!-- .sheet-row -->
 	            <div class="sheet-row sheet-row-perception sheet-hr">
@@ -123,16 +141,21 @@
 							Based on Intelligence
 							<br />
 							5pts/level
+							<br />
+							Unmodified: <input class="sheet-inline" type="text" name="attr_perception_max" value="@{intelligence|max} + floor(abs(@{perception_points}) / 5) * (@{perception_points}+1)/abs(@{perception_points}+1)" disabled="disabled" />
 						</span>
 					</div>
 					<div class="sheet-cell sheet-col1">
-	                    <input type="text" name="attr_perception" value="@{intelligence} + floor(abs(@{perception_points}) / 5) * (@{perception_points}+1)/abs(@{perception_points}+1)" disabled="disabled" />
+	                    <input type="text" name="attr_perception" value="@{perception|max} + @{perception_mod}" disabled="disabled" />
 	                </div>
 					<div class="sheet-cell sheet-col2">
-	                    <input type="number" name="attr_perception_points" value="0" />
+	                    <input type="text" name="attr_perception_mod" value="0" />
 	                </div>
 					<div class="sheet-cell sheet-col3">
-	                    <button type="roll" value="/em rolls [[3d6]] vs. Per [[@{perception} + @{modifier}]]" name="roll_vsPer" />
+	                    <input type="number" name="attr_perception_points" value="0" />
+	                </div>
+					<div class="sheet-cell sheet-col4">
+	                    <button type="roll" value="@{roll} [[3d6]] @{VS} Per [[@{perception} + @{modifier}]]" name="roll_vsPer" />
 	                </div>
 	            </div> <!-- .sheet-row -->
 	            <div class="sheet-row sheet-sub-row sheet-row-vision">
@@ -144,16 +167,21 @@
 							Based on Perception
 							<br />
 							2pts/level
+							<br />
+							Unmodified: <input class="sheet-inline" type="text" name="attr_vision_max" value="@{perception|max} + floor(abs(@{vision_points}) / 2) * (@{vision_points}+1)/abs(@{vision_points}+1)" disabled="disabled" />
 						</span>
 					</div>
 					<div class="sheet-cell sheet-col1">
-	                    <input type="text" name="attr_vision" value="@{perception} + floor(abs(@{vision_points}) / 2) * (@{vision_points}+1)/abs(@{vision_points}+1)" disabled="disabled" />
+	                    <input type="text" name="attr_vision" value="@{vision|max} + @{vision_mod}" disabled="disabled" />
 	                </div>
 					<div class="sheet-cell sheet-col2">
-	                    <input type="number" name="attr_vision_points" value="0" />
+	                    <input type="text" name="attr_vision_mod" value="0" />
 	                </div>
 					<div class="sheet-cell sheet-col3">
-	                    <button type="roll" value="/em rolls [[3d6]] vs. Vision [[@{vision} + @{modifier}]]" name="roll_vsVision" />
+	                    <input type="number" name="attr_vision_points" value="0" />
+	                </div>
+					<div class="sheet-cell sheet-col4">
+	                    <button type="roll" value="@{roll} [[3d6]] @{VS} Vision [[@{vision} + @{modifier}]]" name="roll_vsVision" />
 	                </div>
 	            </div> <!-- .sheet-row -->
 	            <div class="sheet-row sheet-sub-row sheet-row-hearing">
@@ -165,16 +193,21 @@
 							Based on Perception
 							<br />
 							2pts/level
+							<br />
+							Unmodified: <input class="sheet-inline" type="text" name="attr_hearing_max" value="@{perception|max} + floor(abs(@{hearing_points}) / 2) * (@{hearing_points}+1)/abs(@{hearing_points}+1)" disabled="disabled" />
 						</span>
 					</div>
 					<div class="sheet-cell sheet-col1">
-	                    <input type="text" name="attr_hearing" value="@{perception} + floor(abs(@{hearing_points}) / 2) * (@{hearing_points}+1)/abs(@{hearing_points}+1)" disabled="disabled" />
+	                    <input type="text" name="attr_hearing" value="@{hearing|max} + @{hearing_mod}" disabled="disabled" />
 	                </div>
 					<div class="sheet-cell sheet-col2">
-	                    <input type="number" name="attr_hearing_points" value="0" />
+	                    <input type="text" name="attr_hearing_mod" value="0" />
 	                </div>
 					<div class="sheet-cell sheet-col3">
-	                    <button type="roll" value="/em rolls [[3d6]] vs. Hearing [[@{hearing} + @{modifier}]]" name="roll_vsHearing" />
+	                    <input type="number" name="attr_hearing_points" value="0" />
+	                </div>
+					<div class="sheet-cell sheet-col4">
+	                    <button type="roll" value="@{roll} [[3d6]] @{VS} Hearing [[@{hearing} + @{modifier}]]" name="roll_vsHearing" />
 	                </div>
 	            </div> <!-- .sheet-row -->
 	            <div class="sheet-row sheet-sub-row sheet-row-taste-smell">
@@ -186,16 +219,21 @@
 							Based on Perception
 							<br />
 							2pts/level
+							<br />
+							Unmodified: <input class="sheet-inline" type="text" name="attr_taste_smell_max" value="@{perception|max} + floor(abs(@{taste_smell_points}) / 2) * (@{taste_smell_points}+1)/abs(@{taste_smell_points}+1)" disabled="disabled" />
 						</span>
 					</div>
 					<div class="sheet-cell sheet-col1">
-	                    <input type="text" name="attr_taste_smell" value="@{perception} + floor(abs(@{taste_smell_points}) / 2) * (@{taste_smell_points}+1)/abs(@{taste_smell_points}+1)" disabled="disabled" />
+	                    <input type="text" name="attr_taste_smell" value="@{taste_smell|max} + @{taste_smell_mod}" disabled="disabled" />
 	                </div>
 					<div class="sheet-cell sheet-col2">
-	                    <input type="number" name="attr_taste_smell_points" value="0" />
+	                    <input type="text" name="attr_taste_smell_mod" value="0" />
 	                </div>
 					<div class="sheet-cell sheet-col3">
-	                    <button type="roll" value="/em rolls [[3d6]] vs. Taste or Smell [[@{taste_smell} + @{modifier}]]" name="roll_vsTasteSmell" />
+	                    <input type="number" name="attr_taste_smell_points" value="0" />
+	                </div>
+					<div class="sheet-cell sheet-col4">
+	                    <button type="roll" value="@{roll} [[3d6]] @{VS} Taste or Smell [[@{taste_smell} + @{modifier}]]" name="roll_vsTasteSmell" />
 	                </div>
 	            </div> <!-- .sheet-row -->
 	            <div class="sheet-row sheet-sub-row sheet-row-touch">
@@ -207,16 +245,21 @@
 							Based on Perception
 							<br />
 							2pts/level
+							<br />
+							Unmodified: <input class="sheet-inline" type="text" name="attr_touch_max" value="@{perception|max} + floor(abs(@{touch_points}) / 2) * (@{touch_points}+1)/abs(@{touch_points}+1)" disabled="disabled" />
 						</span>
 					</div>
 					<div class="sheet-cell sheet-col1">
-	                    <input type="text" name="attr_touch" value="@{perception} + floor(abs(@{touch_points}) / 2) * (@{touch_points}+1)/abs(@{touch_points}+1)" disabled="disabled" />
+	                    <input type="text" name="attr_touch" value="@{touch|max} + @{touch_mod}" disabled="disabled" />
 	                </div>
 					<div class="sheet-cell sheet-col2">
-	                    <input type="number" name="attr_touch_points" value="0" />
+	                    <input type="text" name="attr_touch_mod" value="0" />
 	                </div>
 					<div class="sheet-cell sheet-col3">
-	                    <button type="roll" value="/em rolls [[3d6]] vs. Touch [[@{touch} + @{modifier}]]" name="roll_vsTasteSmell" />
+	                    <input type="number" name="attr_touch_points" value="0" />
+	                </div>
+					<div class="sheet-cell sheet-col4">
+	                    <button type="roll" value="@{roll} [[3d6]] @{VS} Touch [[@{touch} + @{modifier}]]" name="roll_vsTasteSmell" />
 	                </div>
 	            </div> <!-- .sheet-row -->
 	            <div class="sheet-row sheet-row-willpower">
@@ -228,16 +271,21 @@
 							Based on Intelligence
 							<br />
 							5pts/level
+							<br />
+							Unmodified: <input class="sheet-inline" type="text" name="attr_willpower_max" value="@{intelligence|max} + floor(abs(@{willpower_points}) / 5) * (@{willpower_points}+1)/abs(@{willpower_points}+1)" disabled="disabled" />
 						</span>
 					</div>
 					<div class="sheet-cell sheet-col1">
-	                    <input type="text" name="attr_willpower" value="@{intelligence} + floor(abs(@{willpower_points}) / 5) * (@{willpower_points}+1)/abs(@{willpower_points}+1)" disabled="disabled" />
+	                    <input type="text" name="attr_willpower" value="@{willpower|max} + @{willpower_mod}" disabled="disabled" />
 	                </div>
 					<div class="sheet-cell sheet-col2">
-	                    <input type="number" name="attr_willpower_points" value="0" />
+	                    <input type="text" name="attr_willpower_mod" value="0" />
 	                </div>
 					<div class="sheet-cell sheet-col3">
-	                    <button type="roll" value="/em rolls [[3d6]] vs. Will [[@{willpower} + @{modifier}]]" name="roll_vsWill" />
+	                    <input type="number" name="attr_willpower_points" value="0" />
+	                </div>
+					<div class="sheet-cell sheet-col4">
+	                    <button type="roll" value="@{roll} [[3d6]] @{VS} Will [[@{willpower} + @{modifier}]]" name="roll_vsWill" />
 	                </div>
 	            </div> <!-- .sheet-row -->
 	            <div class="sheet-row sheet-sub-row sheet-row-willpower">
@@ -249,16 +297,21 @@
 							Based on Willpower
 							<br />
 							2pts/level
+							<br />
+							Unmodified: <input class="sheet-inline" type="text" name="attr_fear_check_max" value="@{willpower|max} + floor(abs(@{fear_check_points}) / 2) * (@{fear_check_points}+1)/abs(@{fear_check_points}+1)" disabled="disabled" />
 						</span>
 					</div>
 					<div class="sheet-cell sheet-col1">
-	                    <input type="text" name="attr_fear_check" value="@{intelligence} + floor(abs(@{fear_check_points}) / 2) * (@{fear_check_points}+1)/abs(@{fear_check_points}+1)" disabled="disabled" />
+	                    <input type="text" name="attr_fear_check" value="@{fear_check|max} + @{fear_check_mod}" disabled="disabled" />
 	                </div>
 					<div class="sheet-cell sheet-col2">
-	                    <input type="number" name="attr_fear_check_points" value="0" />
+	                    <input type="text" name="attr_fear_check_mod" value="0" />
 	                </div>
 					<div class="sheet-cell sheet-col3">
-	                    <button type="roll" value="/em rolls [[3d6]] vs. Will [[@{fear_check} + @{modifier}]]" name="roll_vsFearCheck" />
+	                    <input type="number" name="attr_fear_check_points" value="0" />
+	                </div>
+					<div class="sheet-cell sheet-col4">
+	                    <button type="roll" value="@{roll} [[3d6]] @{VS} Will [[@{fear_check} + @{modifier}]]" name="roll_vsFearCheck" />
 	                </div>
 	            </div> <!-- .sheet-row -->
 	            <div class="sheet-row sheet-row-basic-speed sheet-hr">
@@ -270,15 +323,20 @@
 							Based on Health and Dexterity
 							<br />
 							5pts/0.25
+							<br />
+							Unmodified: <input class="sheet-inline" type="text" name="attr_basic_speed_max" value="(@{dexterity|max} + @{health|max})/4 + floor(abs(@{basic_speed_points}) / 5) * 0.25 * (@{basic_speed_points}+1)/abs(@{basic_speed_points}+1)" disabled="disabled" />
 						</span>
 					</div>
 					<div class="sheet-cell sheet-col1">
-	                    <input type="text" name="attr_basic_speed" value="(@{dexterity} + @{health})/4 + floor(abs(@{basic_speed_points}) / 5) * 0.25 * (@{basic_speed_points}+1)/abs(@{basic_speed_points}+1)" disabled="disabled" />
+	                    <input type="text" name="attr_basic_speed" value="@{basic_speed|max} + @{basic_speed_mod}" disabled="disabled" />
 	                </div>
 					<div class="sheet-cell sheet-col2">
-	                    <input type="number" name="attr_basic_speed_points" value="0" />
+	                    <input type="text" name="attr_basic_speed_mod" value="0" />
 	                </div>
 					<div class="sheet-cell sheet-col3">
+	                    <input type="number" name="attr_basic_speed_points" value="0" />
+	                </div>
+					<div class="sheet-cell sheet-col4">
 	                    <button class="sheet-roll-tracker" type="roll" value="/em has a speed of [[@{basic_speed} &{tracker}]]" name="roll_init" />
 	                </div>
 	            </div> <!-- .sheet-row -->
@@ -291,12 +349,17 @@
 							Based on Basic Speed
 							<br />
 							5pts/level
+							<br />
+							Unmodified: <input class="sheet-inline" type="text" name="basic_move_max" value="floor(@{basic_speed|max}) + floor(abs(@{basic_move_points}) / 5) * (@{basic_move_points}+1)/abs(@{basic_move_points}+1)" disabled="disabled" />
 						</span>
 					</div>
 					<div class="sheet-cell sheet-col1">
-	                    <input type="text" name="attr_basic_move" value="floor(@{basic_speed}) + floor(abs(@{basic_move_points}) / 5) * (@{basic_move_points}+1)/abs(@{basic_move_points}+1)" disabled="disabled" />
+	                    <input type="text" name="attr_basic_move" value="@{basic_move|max} - @{basic_move_mod}" disabled="disabled" />
 	                </div>
 					<div class="sheet-cell sheet-col2">
+	                    <input type="text" name="attr_basic_move_mod" value="0" />
+	                </div>
+					<div class="sheet-cell sheet-col3">
 	                    <input type="number" name="attr_basic_move_points" value="0" />
 	                </div>
 	            </div> <!-- .sheet-row -->
@@ -307,10 +370,15 @@
 							Basic Lift
 							<br />
 							Based on Strength
+							<br />
+							Unmodified: <input class="sheet-inline" type="text" name="attr_basic_lift_max" value="floor(((@{strength|max}) * (@{strength|max}))/5 * 10)/10" disabled="disabled" />
 						</span>
 					</div>
 					<div class="sheet-cell sheet-col1">
-	                    <input type="text" name="attr_basic_lift" value="floor(((@{strength}) * (@{strength}))/5 * 10)/10" disabled="disabled" />
+	                    <input type="text" name="attr_basic_lift" value="@{basic_lift|max} + @{basic_lift_mod}" disabled="disabled" />
+	                </div>
+					<div class="sheet-cell sheet-col2">
+	                    <input type="text" name="attr_basic_lift_mod" value="0" />
 	                </div>
 	            </div> <!-- .sheet-row -->
 	            <div class="sheet-row sheet-row-dodge">
@@ -320,10 +388,15 @@
 							Dodge
 							<br />
 							Based on Basic Speed
+							<br />
+							Unmodified: <input class="sheet-inline" type="text" name="attr_dodge_max" value="floor(@{basic_speed}) + 3" disabled="disabled" />
 						</span>
 					</div>
 					<div class="sheet-cell sheet-col1">
-	                    <input type="text" name="attr_dodge" value="floor(@{basic_speed}) + 3" disabled="disabled" />
+	                    <input type="text" name="attr_dodge" value="@{dodge|max} + @{dodge_mod}" disabled="disabled" />
+	                </div>
+					<div class="sheet-cell sheet-col2">
+	                    <input type="text" name="attr_dodge_mod" value="0" />
 	                </div>
 	            </div> <!-- .sheet-row -->
 	            <div class="sheet-row sheet-row-thrust-damage">
@@ -374,7 +447,7 @@
 					<div class="sheet-cell sheet-col1">
 	                    <input type="text" name="attr_thrust" value="1d6-2" />
 	                </div>
-					<div class="sheet-cell sheet-col3">
+					<div class="sheet-cell sheet-col4">
 						<button type="roll" value="/roll @{thrust}" name="roll_dmgThrust" />
 	                </div>
 	            </div> <!-- .sheet-row -->
@@ -426,7 +499,7 @@
 					<div class="sheet-cell sheet-col1">
 	                    <input type="text" name="attr_swing" value="1d6" />
 	                </div>
-					<div class="sheet-cell sheet-col3">
+					<div class="sheet-cell sheet-col4">
 						<button type="roll" value="/roll @{swing}" name="roll_dmgSwing" />
 	                </div>
 	            </div> <!-- .sheet-row -->
@@ -484,7 +557,7 @@
 									</tr>
 									<tr>
 										<td colspan="2">
-											 - Roll every turn vs. HT or fall unconscious.
+											 - Roll every turn @{VS} HT or fall unconscious.
 											<br />
 											 - Your HT roll is at -1 for every 1xHP you are below 0.
 											<br />
@@ -497,7 +570,7 @@
 									</tr>
 									<tr>
 										<td colspan="2">
-											 - Roll once vs. HT to stay alive.
+											 - Roll once @{VS} HT to stay alive.
 											<br />
 											 - If you fail by 1 or 2 you are mortally wounded, but not dead.
 											<br />
@@ -581,7 +654,7 @@
 											<br />
 											 - If you fail your Will roll, you fall unconscious.
 											<br />
-											 - On a critical failure, roll vs. HT or suffer a heart attack.
+											 - On a critical failure, roll @{VS} HT or suffer a heart attack.
 										</td>
 									</tr>
 									<tr>
@@ -1006,6 +1079,7 @@
 							<select name="attr_spoken">
 								<option value="3">Native</option>
 								<option value="2">Accented</option>
+								<option value="1.0">One-Way</option>
 								<option value="1">Broken</option>
 								<option value="0">None</option>
 							</select>
@@ -1014,6 +1088,7 @@
 							<select name="attr_written">
 								<option value="3">Native</option>
 								<option value="2">Accented</option>
+								<option value="1.0">One-Way</option>
 								<option value="1">Broken</option>
 								<option value="0">None</option>
 							</select>
@@ -1077,6 +1152,8 @@
 					<div class="sheet-cell sheet-col3">Ref</div>
 				</div> <!-- .sheet-header -->
 				<fieldset class="repeating_traits">
+					<input class="sheet-toggle" type="checkbox" />
+					<span class="sheet-checkbox"></span>
 					<div class="sheet-row sheet-row-stats">
 						<div class="sheet-cell sheet-col0">
 							<input type="text" name="attr_name" />
@@ -1126,6 +1203,59 @@
 					<div class="sheet-cell sheet-col3">Ref</div>
 				</div> <!-- .sheet-header -->
 				<fieldset class="repeating_disadvantages">
+					<input class="sheet-toggle" type="checkbox" />
+					<span class="sheet-checkbox"></span>
+					<div class="sheet-row sheet-row-stats">
+						<div class="sheet-cell sheet-col0">
+							<input type="text" name="attr_name" />
+						</div>
+						<div class="sheet-cell sheet-col1">
+							<input type="number" name="attr_control_rating" />
+						</div>
+						<div class="sheet-cell sheet-col2">
+							<input type="number" name="attr_points" />
+						</div>
+						<div class="sheet-cell sheet-col3">
+							<input type="text" name="attr_ref" />
+						</div>
+					</div> <!-- .sheet-row -->
+					<div class="sheet-row sheet-row-details">
+						<div class="sheet-cell sheet-col0 sheet-label">
+							Notes
+						</div>
+						<div class="sheet-cell sheet-col1">
+							<input type="text" name="attr_notes" />
+						</div>
+					</div> <!-- .sheet-row -->
+				</fieldset> <!-- .repeating_disadvantages -->
+			</div> <!-- .sheet-table -->
+		</div> <!-- .sheet-box .sheet-disadvantages -->
+
+		<div class="sheet-box sheet-racial">
+			<div class="sheet-table">
+				<div class="sheet-header">
+					<div class="sheet-cell sheet-col0">Racial Traits</div>
+					<div class="sheet-cell sheet-col1">
+                        <div class="sheet-popup">CR</div>
+						<span class="sheet-tooltip">
+	                        Control Rating
+	                        <br />
+	                        <table>
+	                            <tbody>
+	                                <tr><td>6 or less</td><td>2x</td></tr>
+	                                <tr><td>9 or less</td><td>1.5x</td></tr>
+	                                <tr><td>12 or less</td><td>1x</td></tr>
+	                                <tr><td>15 or less</td><td>0.5x</td></tr>
+	                            </tbody>
+	                        </table>
+						</span>
+					</div>
+					<div class="sheet-cell sheet-col2">Pts</div>
+					<div class="sheet-cell sheet-col3">Ref</div>
+				</div> <!-- .sheet-header -->
+				<fieldset class="repeating_racial">
+					<input class="sheet-toggle" type="checkbox" />
+					<span class="sheet-checkbox"></span>
 					<div class="sheet-row sheet-row-stats">
 						<div class="sheet-cell sheet-col0">
 							<input type="text" name="attr_name" />
@@ -1173,6 +1303,8 @@
 					<div class="sheet-cell sheet-col7">Ref</div>
 				</div> <!-- .sheet-header -->
 				<fieldset class="repeating_skills">
+					<input class="sheet-toggle" type="checkbox" />
+					<span class="sheet-checkbox"></span>
 					<div class="sheet-row sheet-row-stats">
 						<div class="sheet-cell sheet-col0">
 							<input type="text" name="attr_name" />
@@ -1212,7 +1344,7 @@
 							<input type="text" name="attr_ref" />
 						</div>
 						<div class="sheet-cell sheet-col8">
-		                    <button type="roll" value="/em rolls [[3d6]] vs. @{name} [[@{level} + @{modifier}]]" name="roll_vsSL" />
+		                    <button type="roll" value="@{roll} [[3d6]] @{VS} @{name} [[@{level} + @{modifier}]]" name="roll_vsSL" />
 		                </div>
 					</div> <!-- .sheet-row -->
 					<div class="sheet-row sheet-row-details">
@@ -1244,6 +1376,8 @@
 					<div class="sheet-cell sheet-col8">Ref</div>
 				</div> <!-- .sheet-header -->
 				<fieldset class="repeating_techniques">
+					<input class="sheet-toggle" type="checkbox" />
+					<span class="sheet-checkbox"></span>
 					<div class="sheet-row sheet-row-stats">
 						<div class="sheet-cell sheet-col0">
 							<input type="text" name="attr_name" />
@@ -1474,7 +1608,7 @@
 					</div>
 				</div> <!-- .sheet-row -->
 				<fieldset class="repeating_location">
-					<div class="sheet-row sheet-row-r-foot">
+					<div class="sheet-row sheet-row-stats">
 						<div class="sheet-cell sheet-col0 sheet-label">
 							<input type="text" name="attr_name" />
 						</div>
@@ -1517,7 +1651,7 @@
 					<div class="sheet-cell sheet-col2"></div>
 					<div class="sheet-cell sheet-col3"><input type="text" name="attr_ad_dodge_skill" value="@{dodge}" disabled="disabled" /></div>
 					<div class="sheet-cell sheet-col4">
-	                    <button type="roll" value="/em rolls [[3d6]] vs. Dodge [[@{dodge} + @{modifier}]]" name="roll_vsDodge" />
+	                    <button type="roll" value="@{roll} [[3d6]] @{VS} Dodge [[@{dodge} + @{modifier}]]" name="roll_vsDodge" />
 	                </div>
 				</div> <!-- .sheet-row -->
 				<div class="sheet-row sheet-row-stats sheet-row-standard">
@@ -1526,7 +1660,7 @@
 					<div class="sheet-cell sheet-col2"></div>
 					<div class="sheet-cell sheet-col3"><input type="text" name="attr_ad_dodge_skill" value="@{dodge} + 3" disabled="disabled" /></div>
 					<div class="sheet-cell sheet-col4">
-	                    <button type="roll" value="/em rolls [[3d6]] vs. Dodge and Retreat [[@{dodge} + @{modifier} + 3]]" name="roll_vsDodge" />
+	                    <button type="roll" value="@{roll} [[3d6]] @{VS} Dodge and Retreat [[@{dodge} + @{modifier} + 3]]" name="roll_vsDodge" />
 	                </div>
 				</div> <!-- .sheet-row -->
 				<fieldset class="repeating_defense">
@@ -1550,7 +1684,7 @@
 							<input type="text" name="attr_skill" />
 						</div>
 						<div class="sheet-cell sheet-col4">
-		                    <button type="roll" value="/em rolls [[3d6]] vs. @{name} [[@{skill} + @{modifier}]]" name="roll_vsSL" />
+		                    <button type="roll" value="@{roll} [[3d6]] @{VS} @{name} [[@{skill} + @{modifier}]]" name="roll_vsSL" />
 		                </div>
 					</div> <!-- .sheet-row -->
 				</fieldset> <!-- .repeating_defense -->
@@ -1615,8 +1749,11 @@
 	                        </table>
 						</span>
 					</div>
+					<div class="sheet-cell sheet-col5">Skill</div>
 				</div> <!-- .sheet-header -->
 				<fieldset class="repeating_melee">
+					<input class="sheet-toggle" type="checkbox" />
+					<span class="sheet-checkbox"></span>
 					<div class="sheet-row sheet-row-stats">
 						<div class="sheet-cell sheet-col0">
 							<input type="text" name="attr_name" />
@@ -1645,7 +1782,13 @@
 							</select>
 						</div>
 						<div class="sheet-cell sheet-col4">
-		                    <button type="roll" value="/em rolls [[@{damage}]] @{type} damage. (@{name})" name="roll_damage" />
+		                    <button type="roll" value="@{roll} [[@{damage}]] @{type} damage. (@{name})" name="roll_damage" />
+		                </div>
+						<div class="sheet-cell sheet-col5">
+							<input type="text" name="attr_skill" />
+						</div>
+						<div class="sheet-cell sheet-col6">
+		                    <button type="roll" value="@{roll} [[3d6]] @{VS} @{name} [[@{skill} + @{modifier}]]" name="roll_damage" />
 		                </div>
 					</div> <!-- .sheet-row -->
 					<div class="sheet-row sheet-row-details">
@@ -1700,7 +1843,7 @@
 	                        The parenthetical number indicates the number of 1 second ready maneuvers<br />
 	                        required to reload the weapon.
 	                        <br />
-	                        <strong>T</strong>: the weapon is divrown. To "reload" it, pick it up.
+	                        <strong>T</strong>: the weapon is thrown. To "reload" it, pick it up.
 	                        <br />
 	                        <strong>i</strong>: you must load the shots individually. the listed time<br />
 	                        is for each shot.
@@ -1746,8 +1889,11 @@
 	                        </table>
 						</span>
 					</div>
+					<div class="sheet-cell sheet-col10">Skill</div>
 				</div> <!-- .sheet-header -->
 				<fieldset class="repeating_ranged">
+					<input class="sheet-toggle" type="checkbox" />
+					<span class="sheet-checkbox"></span>
 					<div class="sheet-row sheet-row-stats">
 						<div class="sheet-cell sheet-col0">
 							<input type="text" name="attr_name" />
@@ -1789,7 +1935,13 @@
 							</select>
 						</div>
 						<div class="sheet-cell sheet-col9">
-		                    <button type="roll" value="/em rolls [[@{damage}]] @{type} damage. (For @{name})" name="roll_damage" />
+		                    <button type="roll" value="@{roll} [[@{damage}]] @{type} damage. (For @{name})" name="roll_damage" />
+		                </div>
+						<div class="sheet-cell sheet-col10">
+							<input type="text" name="attr_skill" />
+						</div>
+						<div class="sheet-cell sheet-col11">
+		                    <button type="roll" value="@{roll} [[3d6]] @{VS} @{name} [[@{skill} + @{modifier}]]" name="roll_damage" />
 		                </div>
 					</div> <!-- .sheet-row -->
 					<div class="sheet-row sheet-row-details">
@@ -1838,12 +1990,14 @@
 					<div class="sheet-cell sheet-col6">W+</div>
 				</div>
 				<fieldset class="repeating_item">
+					<input class="sheet-toggle" type="checkbox" />
+					<span class="sheet-checkbox"></span>
 					<div class="sheet-row sheet-row-stats">
 						<div class="sheet-cell sheet-col0">
 							<input type="text" name="attr_name" />
 						</div>
 						<div class="sheet-cell sheet-col1">
-							<input type="checkbox" name="attr_carried" value="1" checked />
+							<input class="sheet-boolean" type="checkbox" name="attr_carried" value="1" checked />
 							<span class="sheet-checkbox"></span>
 						</div>
 						<div class="sheet-cell sheet-col2">
@@ -1893,6 +2047,60 @@
     <!-- ===== ===== ===== ===== LOGO ===== ===== ===== ===== -->
 	
 	<div style="text-align: center; margin-top: 10px;">
-		<img height="60px" src="http://www.sjgames.com/poweredbygurps/img/logo.gif" />
+		<img height="30px" src="http://www.sjgames.com/poweredbygurps/img/logo.gif" />
 	</div>
 </div>
+
+<hr />
+<input type="radio" name="attr_modifier" value="0" checked="true" />
+<span class="sheet-popup">No Modifier Prompt</span>
+<span class="sheet-tooltip">
+	Rolls will be made immediately with no prompt.
+</span>
+<br /><input type="radio" name="attr_modifier" value="?{Modifier|0}" />
+<span class="sheet-popup">Single Modifier Prompt</span>
+<span class="sheet-tooltip">
+	Ask for a bonus or penalty to be added to dice rolls.
+	<br />
+	This will not affect damage rolls.
+</span>
+<br />
+<input type="radio" name="attr_modifier" value="?{Modifier|0} + ?{Shock|0} + ?{Reeling or Staggered|0} + ?{Off-Hand|0} + ?{Familiarity|0}" />
+<span class="sheet-popup">Extended Modifier Prompts</span>
+<span class="sheet-tooltip">
+	Instead of a single modifier, rolls will ask for a series of modifiers,<br />
+	to remind you about potential bonuses/penalties.
+	<br />
+	This will not affect damage rolls.
+</span>
+
+<br />
+<br />
+
+<input type="radio" name="attr_roll" value="@{character_name} rolls" checked="true" />
+<span class="sheet-popup">Public Rolls</span>
+<span class="sheet-tooltip">
+    All players will be able to see<br />
+    your skill level, roll and results.
+</span>
+<br />
+<input type="radio" name="attr_roll" value="/w gm --l @{character_name} rolls" />
+<span class="sheet-popup">Private Skill Levels</span>
+<span class="sheet-tooltip">
+	Only the GM will be able to see<br />
+    your skill level, but all players<br />
+    will see the result.
+	<br />
+	This will not affect damage rolls.
+</span>
+<br />
+<input type="radio" name="attr_roll" value="/w gm @{character_name} rolls" />
+<span class="sheet-popup">Private Rolls</span>
+<span class="sheet-tooltip">
+	Only the GM will see your skill<br />
+    level and the result.
+	<br />
+	This will not affect damage rolls.
+</span>
+
+<br />
