@@ -1,3 +1,8 @@
+// GIST: https://gist.github.com/shdwjk/4064a6b2e12bcfc46f49
+// Aaron's updated version.
+// Fixed: character update to only do one findObjs() call, instead of
+//   (((15*5)+1)*NUM Characters) times (that's 2280 times for 30 characters).
+//
 // Edge of the Empire RPG Dice Mechanics
 //
 // copyright pug games 2014
@@ -10,7 +15,7 @@
 //
 // !eed log on|multi|single|off  // default:on and single
                                 // outputs dice rolled to the chat window if "on", only the result if "off"
-                    			// dice rolled will be on single line if "single" and on multiple lines if "multi"
+                        		// dice rolled will be on single line if "single" and on multiple lines if "multi"
 // !eed graphics on|off|s|m|l  //default:on and m
 								// shows dice rolled as graphic, small, medium, or large if "on" or as text if "off"
 // !eed #b #g #y #blk #p #r #w
@@ -1629,7 +1634,7 @@ var createDicePool = function(msg, who, playerid) {
 	var critMatch = msg.match(regexCrit);
 
 	if (critMatch) {
-		// crit(heal|@critName1})
+		// crit(heal|@critName1)
 		// crit(add|@{critAddRangeNum})
 		// crit(roll)
 		var critArray = critMatch[1].split('|');
@@ -1911,7 +1916,7 @@ var setupCharacters = function(charObj) {
             
             return obj;
         }
-    
+
 	//Create Default Attributes for each character
 	//Attribute list
 	var createAttributeList = [
@@ -1926,119 +1931,60 @@ var setupCharacters = function(charObj) {
 				{name:'critOn', current: '0', max: '', update: false}
 			]
 		}//,
-		
 	];
 
-	//log(charactersObj);
-	//log(attributesObj);
-	
-	var updateCreateAttribute = function(index, prop, character) {
-		
-		var attrObj = findObjs({
-			type: 'attribute',
-			characterid: character,
-			name: prop.name +''+index
-		})[0];
-	
-		if (!attrObj) {
-			//create Attribute
+	var charIDs=_.pluck(charactersObj,'id');
+	var attrNames = _.pluck(createAttributeList[1].attributes, 'name');
+	var attrMatcher = new RegExp('^'+createAttributeList[0].name+'$|^'+attrNames.join('|^') );
 
-				attrObj = createObj('attribute', {
-					characterid: character,
-					name: prop.name + '' + index,
-					current: prop.current,
-					max: prop.max
-				});
-			    
-               // log('Creating Attribute...'+ prop.name + '' + index);
-		
+	var attrs = _.filter(findObjs({type: 'attribute'}), function(a) {
+		return ( _.contains(charIDs, a.get('characterid')) && attrMatcher.test(a.get('name')));
+	});
+
+	_.each(charactersObj, function(c) {
+		log('Character: --------------------> ' + c.get('name'));
+		//log('Character ID: --------------------> ' + c.id);
+        
+        createAttributeList[0].current = c.id; //Adds character id to the createAttributeList object, needed for dynamic created characters in game play
+        
+        var attr = _.find(attrs, function(a) {
+			return (a.get('characterid')  === c.id && a.get('name') === createAttributeList[0].name);
+		});
+        
+        //log(attr);
+        
+		if( attr ) {
+			attr.set({current: c.id});
 		} else {
-    	    if (prop.update) {
-                
-                attrObj.set({current: prop.current});
-                
-               // log('Updating Attribute...'+ prop.name + '' + index);
-    	    }
+			createObj('attribute', {
+				characterid: c.id,
+				name: createAttributeList[0].name,
+				current: createAttributeList[0].current,
+				max: createAttributeList[0].max
+			});
 		}
-		
-	}
-	
-    
-    
-    
-    //how to batch js calls
-    //for (var charKey in charactersObj) {
-    var batchAttrs = function(startVal, endVal, callback) {
 
-    	for (var charKey = (startVal - 1); charKey <= (endVal - 1); charKey++) {
-            
-    		var characterId = charactersObj[charKey].id;//charactersObj[charKey].id;
-    		
-            
-            log('Character: --------------------> ' + charactersObj[charKey].get('name'));
-
-            createAttributeList[0].current = characterId;
-            //log(createAttributeList[0].current); //name
-            
-    		for (var attrListKey in createAttributeList) {
-                
-    			if (createAttributeList[attrListKey].index) {
-    				
-    				for (var i = 1; i <= createAttributeList[attrListKey].index; i++) {
-    				
-    					for (var attrKey in createAttributeList[attrListKey].attributes) {
-    						
-    						updateCreateAttribute(i, createAttributeList[attrListKey].attributes[attrKey], characterId);
-    					}	
-    				}
-    			} else {
-    				updateCreateAttribute('', createAttributeList[attrListKey], characterId);
-    			}
-    			
-    		}
-    	}
-        
-       callback( true );
-    }
-    
-    
-    var totalItems = 0;
-    var batchNum = 2;
-    
-    for (var charKey in charactersObj) {
-        totalItems = totalItems + 1;
-    }
-    
-    var numOfBatches = Math.ceil(totalItems / batchNum);
-    var batchIndex = 0;
-    var remainderItems = totalItems % batchNum; 
-    
-    //log('total: ' + totalItems);
-    
-    var nextBatch = function() {
-
-        var startNum = (batchIndex * batchNum) + 1; //1, 11, 21
-        var endNum = (batchIndex * batchNum) + batchNum; //10, 20, 
-        
-        if (endNum > totalItems) {
-            endNum = (batchIndex * batchNum) + remainderItems;
-        }
-        
-        batchAttrs(startNum, endNum, function(){
-            batchIndex++;
-            if (batchIndex >= numOfBatches) {
-                return false;
-            }
-            setTimeout(function(){
-                nextBatch();
-                
-            },500);
-            
-        });
-    }
-    
-    nextBatch();
-    
+		_.each(createAttributeList[1].attributes, function(ap) {
+			for(var i = 1; i <= createAttributeList[1].index; ++i) {
+				attr = _.find(attrs, function(a) {
+					return (a.get('characterid') === c.id && a.get('name') === ap.name+i);
+				});
+				if(attr) {
+					if(ap.update) {
+						a.set({current: ap.current});
+					}
+				}
+				else {
+					createObj('attribute', {
+						characterid: c.id,
+						name: ap.name+i,
+						current: ap.current,
+						max: ap.max
+					});
+				}
+			}
+		});
+	});
 }
 
 
@@ -2096,7 +2042,6 @@ on('ready', function() {
         }
 		
 		createDicePool(msg.content, msg.who, msg.playerid)
-		
     });
 
     
