@@ -4,12 +4,18 @@ by bripod and sturtus
 
 ===============================================
 Roadmap/Unfinished
-- Selected class shows/hides sections at bottom
-- Define weapon as ranged/melee and make appropriate buttons
-- Basic Attack
 - Armor Check Penalty resolution
 - mighty deed resolution
 - optional API checkbox in case of DCC HELPER usage, change buttons to API compatible buttons
+
+7/17/14
+- Added ranger, paladin, gnome, bard
+- fixed typos
+
+6/2/14
+- Selected class shows/hides sections at bottom
+- Define weapon as ranged/melee and make appropriate buttons
+- Basic Attack
 - Hafling Stealth update
 
 5/29/14
@@ -35,7 +41,6 @@ Roadmap/Unfinished
 - added final equation for ability score modifiers
 - updated preview image
 - fixed some typos
-
 
 5/5/14
 - added preview image
