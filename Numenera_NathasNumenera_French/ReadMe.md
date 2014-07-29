@@ -5,6 +5,7 @@ Basée sur la feuille de personnage "Numenera" déjà présente sur Roll20 (merci au
 Voir en fin de fichier pour les notes de versions.
 
 # Utilisation basique : 
+
 ## Mettre en place la feuille de personnage
 1. Dans la campagne Roll20 concernée, cliquer sur _"Voir les détails"_
 2. Cliquer sur _"Campaign Settings"_
@@ -13,6 +14,7 @@ Voir en fin de fichier pour les notes de versions.
 5. Dans l'onglet _"HTML Layout"_, coller le contenu de _"NathasNumenera_Roll20_CharacterSheet_Layout_French.htm"_
 6. Dans l'onglet _"CSS Styling"_, coller le contenu de _"NathasNumenera_Roll20_CharacterSheet_CSS.css"_
 7. Descendre en bas de la page et cliquer sur _"Save Changes"_
+
 ## Créer un personnage
 1. Créer un _"Character"_ dans le journal
 2. Remplir le nom, et dans l'onglet _"Character Sheet"_, remplir à minima les 3 Attributs (Valeur et Max) : Robustesse, Vivacité et Mental
@@ -41,6 +43,7 @@ Voir en fin de fichier pour les notes de versions.
 7. Répéter les étapes 4 à 6 pour les autres personnages.
 
 # Notes de version
+
 ## Version 2.0 (29/07/2014)
 1. Mise à jour de **NathasNumenera_Roll20_CharacterSheet_Layout_French.htm** :
   1. Section "Avancement" plus détaillées, avec un attribut par avancement et par tiers.
