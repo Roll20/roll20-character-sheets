@@ -36,7 +36,7 @@ Voir en fin de fichier pour les notes de versions.
   3. Donner un nom au script dans _"Name"_ (par exemple : _"NathasNumenera"_)
   4. Dans la section noire de script, coller le contenu de _"NathasNumenera_Roll20_API_French.js"_
   5. Cliquer sur _"Save Script"_
-3. Démarrer la campagne et créer les macros (voir le fichier _"NathasNumenera_Roll20_Macros_French.txt"_)
+3. Démarrer la campagne et créer les macros (voir le fichier _"NathasNumenera_Roll20_Macros_French.md"_)
 4. Créer une personnage  et associer un pion (cf. Utilisation basique) 
 5. **COMPLETER LA FEUILLE DE PERSONNAGE** (important) : en plus des Attributs (valeur et max), à minima renseigner les Atouts (même si égaux à 0), le bonus de Récupération, la réduction de Vivacité dûe à l'armure (même si égale à 0), l'état de Récuparation (cliquer sur "1 Action"), l'état général (cliquer sur "Normal")
 6. Sélectionner le pion et tester une macro. Si rien ne passe, tenter de désactiver/réactiver le script API et recommencer.
@@ -51,3 +51,4 @@ Voir en fin de fichier pour les notes de versions.
 2. Refonte et traduction du "ReadMe.md"
 3. Nouvelle capture d'écran / feuille
 4. Mise à jour de sheet.json pour intégrer la nouvelle capture d'écran
+5. Remplacement du fichier texte (.txt) des macros par un fichier markdown (.md) pour une meilleure lisibilité sur Github ("NathasNumenera_Roll20_Macros_French.md")

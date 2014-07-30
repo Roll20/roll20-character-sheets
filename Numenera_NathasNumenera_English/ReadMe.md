@@ -53,4 +53,4 @@ See [Numenera_NathasNumenera_French](https://github.com/Roll20/roll20-character-
 3. More detailed "Readme.md" with better layout 
 4. New screenshot/image
 5. Updated sheet.json with the new screenshot
-6. Replaced the macros file for a better layout ("NathasNumenera_Roll20_Macros.md")
+6. Replaced the txt macros file for a better layout ("NathasNumenera_Roll20_Macros.md")
