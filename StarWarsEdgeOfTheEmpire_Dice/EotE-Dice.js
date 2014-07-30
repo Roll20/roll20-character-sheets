@@ -15,14 +15,17 @@
 //
 // !eed log on|multi|single|off  // default:on and single
                                 // outputs dice rolled to the chat window if "on", only the result if "off"
-                        		// dice rolled will be on single line if "single" and on multiple lines if "multi"
+                                // dice rolled will be on single line if "single" and on multiple lines if "multi"
 // !eed graphics on|off|s|m|l  //default:on and m
-								// shows dice rolled as graphic, small, medium, or large if "on" or as text if "off"
+        						// shows dice rolled as graphic, small, medium, or large if "on" or as text if "off"
 // !eed #b #g #y #blk #p #r #w
 //
 // !eed w #b #g #y #blk #p #r #w  	// whisper not really working very well right now, please ignore this option for now
 									// will roll the dice and whisper them only to the GM, gm can't whisper dice rolls to other players
 									// due to the way the API currently works we can only send a whisper dice roll via text output, even if you have graphics rolling turned on
+// !eed npcinit #b #g #y #blk #p #r #w  //Will roll for a NPC initiative slot in the form of "SUCCESS:ADVANTAGE".  Auto sorts baed on rules in the CRB.
+
+// !eed pcinit #b #g #y #blk #p #r #w  //Will roll for a PC initiative slot in the form of "SUCCESS:ADVANTAGE". Auto sorts baed on rules in the CRB.
 //
 // !eed test // this will output every side of every die to the chat window
 //
@@ -111,8 +114,58 @@ var eedGlobal = {
 	diceGraphicResult : "",
 	diceGraphicResultLog : "",
 	diceTestEnabled : false,
-	diceLogRolledOnOneLine : true
+	diceLogRolledOnOneLine : true,
+    diceNPCInit : false,
+    dicePCInit : false
 };
+
+function sendToTurnOrder(type, NumSuccess, NumAdvantage) {
+    var turnorder;
+   if(Campaign().get("turnorder") == "") turnorder = []; //NOTE: We check to make sure that the turnorder isn't just an empty string first. If it is treat it like an empty array.
+    else turnorder = JSON.parse(Campaign().get("turnorder"));
+
+    //Add a new custom entry to the end of the turn order.
+    
+    turnorder.push({
+        id: "-1",
+        pr: NumSuccess + ":" + NumAdvantage,
+        custom: type
+    });
+    
+    turnorder.sort(function(x,y) {
+        var a = x.pr.split(":");
+        var b = y.pr.split(":");
+        
+		//First rank on successes
+        if (b[0] - a[0] != 0)
+        {
+            return b[0] - a[0];
+        }
+		//Then rank on Advantage
+        else if (b[1] - a[1] != 0)
+        {
+            return b[1] - a[1];
+        }
+        else
+        {
+			//If they are still tied, PC goes first
+            if (x.custom == y.custom)
+            {
+                return 0;
+            }
+            else if (x.custom =="NPC")
+            {
+                return 1;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+    });
+    
+    Campaign().set("turnorder", JSON.stringify(turnorder));
+}
 
 function rollBoost(diceQty, who){
 	//Blue "Boost" die (d6)
@@ -1083,6 +1136,13 @@ function processEdgeEmpireDiceScript(diceToRoll, who, label){
 	if (eedGlobal.diceGraphicsChat === true && eedGlobal.diceLogChatWhisper === false) {
 		chatGlobal = chatGlobal + '<br>Roll:' + diceGraphicsResults;
 		sendChat(who, chatGlobal );
+        
+        if (eedGlobal.diceNPCInit === true) {
+            sendToTurnOrder("NPC", diceTotals.success, diceTotals.advantage)
+        }
+        else if (eedGlobal.dicePCInit === true) {
+            sendToTurnOrder("PC", diceTotals.success, diceTotals.advantage)
+        }
 	}
 	else {
 		if (eedGlobal.diceLogChatWhisper === true) {
@@ -1147,6 +1207,14 @@ var processScriptTabs = function(argv, character, label) {
 							break;
 					}
 					break;
+                case "npcinit":
+                    eedGlobal.diceNPCInit = true;
+					eedGlobal.dicePCInit = false;
+                    break;
+                case "pcinit":
+                    eedGlobal.dicePCInit = true;
+					eedGlobal.diceNPCInit = false;
+                    break;
 				case "test":
 					eedGlobal.diceTestEnabled = true;
 					tmpLogChat = eedGlobal.diceLogChat;
@@ -1159,6 +1227,8 @@ var processScriptTabs = function(argv, character, label) {
 					eedGlobal.diceGraphicsChat = tmpGraphicsChat;
 					break;
 				default:
+                    eedGlobal.dicePCInit = false;
+                    eedGlobal.diceNPCInit = false;
 					//argv.splice(1,2);
 					//processEdgeEmpireDiceScript(argv, character, label);
 					//eedGlobal.diceLogChatWhisper = false;
