@@ -19,7 +19,7 @@ Voir en fin de fichier pour les notes de versions.
 1. Créer un _"Character"_ dans le journal
 2. Remplir le nom, et dans l'onglet _"Character Sheet"_, remplir à minima les 3 Attributs (Valeur et Max) : Robustesse, Vivacité et Mental
 3. Utiliser un pion (token)et : (voir la capture d'écran _"NathasNumenera_setup_the_character_token.jpg"_)
-  1. S'assurer que le pion représente le personnage Make sure it representents the character you've created
+  1. S'assurer que le pion représente le personnage
   2. Sélectionner l'attribut _"might"_ pour la bar 1
   3. Sélectionner l'attribut _"speed"_ pour la bar 2
   4. Sélectionner l'attribut _"intellect"_ pour la bar
@@ -44,7 +44,7 @@ Voir en fin de fichier pour les notes de versions.
 
 # Notes de version
 
-## Version 2.0 (29/07/2014)
+## Version 2.01 (29/07/2014)
 1. Mise à jour de **NathasNumenera_Roll20_CharacterSheet_Layout_French.htm** :
   1. Section "Avancement" plus détaillées, avec un attribut par avancement et par tiers.
   2. Vous pouvez supprimer des personnages existants les attributs xp-stats, xp-edge etc... qui ne seront plus utilisés.
