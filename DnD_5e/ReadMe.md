@@ -4,8 +4,11 @@ This is a **work in progress sheet** for use on Roll20.net and with the latest (
 
 ### Changelog
 
-* Bugfix - 19th July 2014
-Updates to fix an order of operations bug that would cause things like skill expertise and some weapon attacks/damage rolls to be incorrectly calculated.  Completely reworked the tabs used accross the sheet so they should now be cross browser compatible.  Re-added the class resource repeating section.  Some other minor layout tweaks to try and prevent wrapping/layout issues some have reported.
+* Bugfix and PHB release prep - TBC
+Fixed some minor labelling/spelling issues. Fixed weapon wielded selection not being saved.  Added warlock and sorcerer classes to class and hit dice sections.  Updated bard to be a d8 hit die as per PHB previews.  Added functionality for NPC sheet.  Moved sheet last updated date to the sheet header.
+
+* Build 2 (bugfixes) - 19th July 2014
+Updates to fix an order of operations bug that would cause things like skill expertise and some weapon attacks/damage rolls to be incorrectly calculated.  Completely reworked the tabs used across the sheet so they should now be cross browser compatible.  Re-added the class resource repeating section.  Some other minor layout tweaks to try and prevent wrapping/layout issues some have reported.
 
 * Initial release - 10th July 2014
 First release of the sheet.  It should support the majority of the Basic 5e rules (available as a free downloadable PDF).  Whilst the sheet cannot possibly cover every situation, and nor can it replace a basic understanding of the game rules/mechanics, it should be a helpful tool for new players whilst still providing more experienced players with some useful facilities too.  At this stage the sheet supports the D&D 5th edition basic and starter set rules...with some legacy support for the D&D Next playtest rules in the form of classes that are not yet released for 5th edition.  The sheet will be updated with the full 5th edition classes/rules as soon as time allows when the Player Handbook is available
