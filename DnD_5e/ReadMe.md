@@ -5,7 +5,7 @@ This is a **work in progress sheet** for use on Roll20.net and with the latest (
 ### Changelog
 
 * Bugfix and PHB release prep - TBC
-Fixed some minor labelling/spelling issues. Fixed weapon wielded selection not being saved.  Added warlock and sorcerer classes to class and hit dice sections.  Updated bard to be a d8 hit die as per PHB previews.  Added functionality for NPC sheet.  Moved sheet last updated date to the sheet header.
+Fixed some minor labelling/spelling issues. Fixed weapon wielded selection not being saved.  Added warlock and sorcerer classes to class and hit dice sections.  Updated bard to be a d8 hit die as per PHB previews.  Added functionality for NPC sheet.  Moved sheet last updated date to the sheet header.  Added support for a few custom skills/tools in the skills section.  Added option to allow the weights entered in the inventory to be treated as unit weights instead of total weight for that row
 
 * Build 2 (bugfixes) - 19th July 2014
 Updates to fix an order of operations bug that would cause things like skill expertise and some weapon attacks/damage rolls to be incorrectly calculated.  Completely reworked the tabs used across the sheet so they should now be cross browser compatible.  Re-added the class resource repeating section.  Some other minor layout tweaks to try and prevent wrapping/layout issues some have reported.
