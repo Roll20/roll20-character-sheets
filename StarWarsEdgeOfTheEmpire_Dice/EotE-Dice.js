@@ -13,11 +13,11 @@
 // dice graphics borrowed from the awesome google+ hangouts EotE Dice App
 // changed to randomInteger()
 //
-// !eed log on|multi|single|off  // default:on and single
-                                // outputs dice rolled to the chat window if "on", only the result if "off"
-                        		// dice rolled will be on single line if "single" and on multiple lines if "multi"
-// !eed graphics on|off|s|m|l  //default:on and m
-								// shows dice rolled as graphic, small, medium, or large if "on" or as text if "off"
+// !eed log on|multi|single|off  	// default:on and single
+									// outputs dice rolled to the chat window if "on", only the result if "off"
+									// dice rolled will be on single line if "single" and on multiple lines if "multi"
+// !eed graphics on|off|s|m|l  		// default:on and m
+									// shows dice rolled as graphic, small, medium, or large if "on" or as text if "off"
 // !eed #b #g #y #blk #p #r #w
 //
 // !eed w #b #g #y #blk #p #r #w  	// whisper not really working very well right now, please ignore this option for now
@@ -26,6 +26,10 @@
 //
 // !eed test // this will output every side of every die to the chat window
 //
+
+// !eed npcinit #b #g #y #blk #p #r #w  //Will roll for a NPC initiative slot in the form of "SUCCESS:ADVANTAGE".  Auto sorts baed on rules in the CRB.
+// !eed pcinit #b #g #y #blk #p #r #w  	//Will roll for a PC initiative slot in the form of "SUCCESS:ADVANTAGE". Auto sorts baed on rules in the CRB.
+
 // you only need to specify the dice to roll, in any order
 // b is blue, g is green, y is yellow, blk is black, p is purple, r is red, w is white
 // currently no error checking so you can break it if you type in unsupported arguments
@@ -111,8 +115,58 @@ var eedGlobal = {
 	diceGraphicResult : "",
 	diceGraphicResultLog : "",
 	diceTestEnabled : false,
-	diceLogRolledOnOneLine : true
+	diceLogRolledOnOneLine : true,
+    diceNPCInit : false,
+    dicePCInit : false
 };
+
+function sendToTurnOrder(type, NumSuccess, NumAdvantage) {
+    var turnorder;
+   if(Campaign().get("turnorder") == "") turnorder = []; //NOTE: We check to make sure that the turnorder isn't just an empty string first. If it is treat it like an empty array.
+    else turnorder = JSON.parse(Campaign().get("turnorder"));
+ 
+    //Add a new custom entry to the end of the turn order.
+    
+    turnorder.push({
+        id: "-1",
+        pr: NumSuccess + ":" + NumAdvantage,
+        custom: type
+    });
+    
+    turnorder.sort(function(x,y) {
+        var a = x.pr.split(":");
+        var b = y.pr.split(":");
+        
+        //First rank on successes
+        if (b[0] - a[0] != 0)
+        {
+            return b[0] - a[0];
+        }
+        //Then rank on Advantage
+        else if (b[1] - a[1] != 0)
+        {
+            return b[1] - a[1];
+        }
+        else
+        {
+            //If they are still tied, PC goes first
+            if (x.custom == y.custom)
+            {
+                return 0;
+            }
+            else if (x.custom =="NPC")
+            {
+                return 1;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+    });
+    
+    Campaign().set("turnorder", JSON.stringify(turnorder));
+}
 
 function rollBoost(diceQty, who){
 	//Blue "Boost" die (d6)
@@ -1019,7 +1073,7 @@ function processEdgeEmpireDiceScript(diceToRoll, who, label){
 		}
 		else {
 			
-			chatGlobal = "/direct <br><b>Skill:</b> " + label + '<br>' + diceToRoll;
+			chatGlobal = "/direct <br><b>Skill:</b> " + label + '<br>';//+ diceToRoll;
 
 		}
 	}
@@ -1083,6 +1137,15 @@ function processEdgeEmpireDiceScript(diceToRoll, who, label){
 	if (eedGlobal.diceGraphicsChat === true && eedGlobal.diceLogChatWhisper === false) {
 		chatGlobal = chatGlobal + '<br>Roll:' + diceGraphicsResults;
 		sendChat(who, chatGlobal );
+		
+		
+        if (eedGlobal.diceNPCInit === true) {
+            sendToTurnOrder("NPC", diceTotals.success, diceTotals.advantage)
+        }
+        else if (eedGlobal.dicePCInit === true) {
+            sendToTurnOrder("PC", diceTotals.success, diceTotals.advantage)
+        }
+		
 	}
 	else {
 		if (eedGlobal.diceLogChatWhisper === true) {
@@ -1147,6 +1210,14 @@ var processScriptTabs = function(argv, character, label) {
 							break;
 					}
 					break;
+				case "npcinit":
+                    eedGlobal.diceNPCInit = true;
+                    eedGlobal.dicePCInit = false;
+                    break;
+                case "pcinit":
+                    eedGlobal.dicePCInit = true;
+                    eedGlobal.diceNPCInit = false;
+                    break;
 				case "test":
 					eedGlobal.diceTestEnabled = true;
 					tmpLogChat = eedGlobal.diceLogChat;
@@ -1159,6 +1230,8 @@ var processScriptTabs = function(argv, character, label) {
 					eedGlobal.diceGraphicsChat = tmpGraphicsChat;
 					break;
 				default:
+					eedGlobal.dicePCInit = false;
+                    eedGlobal.diceNPCInit = false;
 					//argv.splice(1,2);
 					//processEdgeEmpireDiceScript(argv, character, label);
 					//eedGlobal.diceLogChatWhisper = false;
@@ -1166,6 +1239,147 @@ var processScriptTabs = function(argv, character, label) {
 			break;
     }
 };
+
+//--------------------------------- Vehicle Critical
+
+var critShipTable = [
+	{
+		percent : '1 to 9',
+		severity : 1,
+		name : 'Mechanical Stress',
+		Result : 'Ship or vehicle suffers 1 system strain.',
+		effect : '',
+	},
+	{
+		percent : '10 to 18',
+		severity : 1,
+		name : 'Jostled',
+		Result : 'All crew members suffer 1 strain.',
+		effect : '',
+	},
+	{
+		percent : '19 to 27',
+		severity : 1,
+		name : 'Losing Power to Shields',
+		Result : 'Decrease defense in affected defense zone by 1 until repaired. If ship or vehicle has no defense, suffer 1 system strain.',
+		effect : '',
+	},
+	{
+		percent : '28 to 36',
+		severity : 1,
+		name : 'Knocked Off Course',
+		Result : 'On next turn, pilot cannot execute any maneuvers. Instead, must make a Piloting check to regain bearings and resume course. Difficulty depends on current speed.',
+		effect : '',
+	},
+	{
+		percent : '37 to 45',
+		severity : 1,
+		name : 'Tailspin',
+		Result : 'All firing from ship or vehicle suffers 2 setback dice until end of pilot\'s next turn.',
+		effect : '',
+	},
+	{
+		percent : '46 to 54',
+		severity : 1,
+		name : 'Component Hit',
+		Result : 'One component of the attacker\'s choice is knocked offline, and is rendered inoperable until the end of the following round. See page 245 CRB for Small/Large Vehicle and Ship Component tables. ',
+		effect : '',
+	},
+	// --------------- severity : 2
+	{
+		percent : '55 to 63',
+		severity : 2,
+		name : 'Shields Failing',
+		Result : 'Decrease defense in all defense zones by 1 until repaired. If ship or vehicle has no defense, suffer 2 system strain.',
+		effect : '',
+	},
+	{
+		percent : '64 to 72',
+		severity : 2,
+		name : 'Hyperdrive or Navicomputer Failure',
+		Result : 'Cannot make any jump to hyperspace until repaired. If ship or vehicle has no hyperdrive, navigation systems fail leaving it unable to tell where it is or is going.',
+		effect : '',
+	},
+	{
+		percent : '73 to 81',
+		severity : 2,
+		name : 'Power Fluctuations',
+		Result : 'Pilot cannot voluntarily inflict system strain on the ship until repaired.',
+		effect : '',
+	},
+	// --------------- severity : 3
+	{
+		percent : '82 to 90',
+		severity : 3,
+		name : 'Shields Down',
+		Result : 'Decrease defense in affected defense zone to 0 and all other defense zones by 1 point until repaired. If ship or vehicle has no defense, suffer 4 system strain.',
+		effect : '',
+	},
+	{
+		percent : '91 to 99',
+		severity : 3,
+		name : 'Engine Damaged',
+		Result : 'Ship or vehicle\'s maximum speed reduced by 1, to a minimum of 1, until repaired.',
+		effect : '',
+	},
+	{
+		percent : '100 to 108',
+		severity : 3,
+		name : 'Shield Overload',
+		Result : 'Decrease defense in all defense zones to 0 until repaired. In addition, suffer 2 system strain. Cannot be repaired until end of encounter. If ship or vehicle has no defense, reduce armor by 1 until repaired.',
+		effect : '',
+	},
+	{
+		percent : '109 to 117',
+		severity : 3,
+		name : 'Engines Down',
+		Result : 'Ship or vehicle\'s maximum speed reduced to 0. In addition, ship or vehicle cannot execute maneuvers until repaired. Ship continues on course at current speed and cannot be stopped or course changed until repaired.',
+		effect : '',
+	},
+	{
+		percent : '118 to 126',
+		severity : 3,
+		name : 'Major System Failure',
+		Result : 'One component of the attacker\'s choice is heavily damages, and is inoperable until the critical hit is repaired. See page 245 CRB for Small/Large Vehicle and Ship Component tables. ',
+		effect : '',
+	},
+	// --------------- severity : 4
+	{
+		percent : '127 to 133',
+		severity : 4,
+		name : 'Major Hull Breach',
+		Result : 'Ships and vehicles of silhouette 4 and smaller depressurize in a number of rounds equal to silhouette. Ships of silhouette 5 and larger don\'t completely depressurize, but parts do (specifics at GM discretion). Ships and vehicles operating in atmosphere instead suffer a Destabilized Critical.',
+		effect : '',
+	},
+	{
+		percent : '134 to 138',
+		severity : 4,
+		name : 'Destabilised',
+		Result : 'Reduce ship or vehicle\'s hull integrity threshold and system strain threshold to half original values until repaired.',
+		effect : '',
+	},
+	{
+		percent : '139 to 144',
+		severity : 4,
+		name : 'Fire!',
+		Result : 'Fire rages through ship or vehicle and it immediately takes 2 system strain. Fire can be extinguished with appropriate skill, Vigilance or Cool checks at GM\'s discretion. Takes one round per two silhouette to put out.',
+		effect : '',
+	},
+	{
+		percent : '145 to 153',
+		severity : 4,
+		name : 'Breaking Up',
+		Result : 'At the end of next round, ship is completely destroyed. Anyone aboard has one round to reach escape pod or bail out before they are lost.',
+		effect : '',
+	},
+	{
+		percent : '154+',
+		severity : 4,
+		name : 'Vaporized',
+		Result : 'The ship or Vehicle is completely destroyed.',
+		effect : '',
+	}
+]
 
 //--------------------------------- Critical Injury
 
@@ -1388,6 +1602,7 @@ var createDicePool = function(msg, who, playerid) {
     //!eed downgrade(proficiency|4)
     //!eed downgrade(challenge|4)
 	
+	
 
 	if (!msg.match(/!eed/)) {
 		return false;
@@ -1415,6 +1630,7 @@ var createDicePool = function(msg, who, playerid) {
     var regexEncum = /encum\((.*?)\)/;
     var regexAlphaStr = /blk$|b$|g$|y$|p$|r$|w$/;
 	var regexCrit = /crit\((.*?)\)/;
+	var regexCritShip = /critship\((.*?)\)/;
     
     var skillDice = function(dice) {
         
@@ -1428,6 +1644,181 @@ var createDicePool = function(msg, who, playerid) {
             Argv.Proficiency = Argv.Proficiency + totalProf;
 
     }
+	
+	//CritShip
+	var getCritShipID = function() {
+		
+		return {
+			1 : getAttrByName(characterId, 'critShipOn1'),
+			2 : getAttrByName(characterId, 'critShipOn2'),
+			3 : getAttrByName(characterId, 'critShipOn3'),
+			4 : getAttrByName(characterId, 'critShipOn4'),
+			5 : getAttrByName(characterId, 'critShipOn5'),
+			6 : getAttrByName(characterId, 'critShipOn6'),
+			7 : getAttrByName(characterId, 'critShipOn7'),
+			8 : getAttrByName(characterId, 'critShipOn8'),
+			9 : getAttrByName(characterId, 'critShipOn9'),
+			10 : getAttrByName(characterId, 'critShipOn10'),
+			11 : getAttrByName(characterId, 'critShipOn11'),
+			12 : getAttrByName(characterId, 'critShipOn12'),
+			13 : getAttrByName(characterId, 'critShipOn13'),
+			14 : getAttrByName(characterId, 'critShipOn14'),
+			15 : getAttrByName(characterId, 'critShipOn15')
+		}
+	}
+	
+	var critShipRoll = function(addCritNum) {
+		
+		// Check for criticals
+		var critObj = getCritShipID();
+        
+		//add exsiting crits
+		var totalcrits = 0;
+		var openSlot = '';
+
+		for (var key in critObj)  {
+			
+            if (parseInt(critObj[key]) > 0) {
+				totalcrits = totalcrits + 1;
+			} else {
+				openSlot = key;
+                //log(openSlot);
+			}
+		}
+        
+        if (!openSlot) {
+            sendChat("Alert", "Why are you not dead!");
+    		return false;
+        }
+        
+		var diceRoll = '';
+		var critMod = '';
+		var rollTotal = '';
+		
+		//roll random
+		if (!addCritNum) {
+			diceRoll = randomInteger(100);
+			critMod = (totalcrits * 10);
+			rollTotal = diceRoll + critMod;
+		} else {
+			rollTotal = parseInt(addCritNum);
+		}
+        
+        //log(rollTotal);
+        
+		//find crit in crital table
+		for (var key in critShipTable)  {
+			var percent = critShipTable[key].percent.split(' to ');
+			var low = parseInt(percent[0]);
+			var high = percent[1] ? parseInt(percent[1]) : 1000;
+			
+			if ((rollTotal >= low) && (rollTotal <= high)) {
+				//openSlot
+				log(critShipTable[key].name);
+                
+				var critNameObj = findObjs({
+					type: 'attribute',
+					characterid: characterId,
+					name:'critShipName'+openSlot,
+				})[0];
+				
+				var critSeverityObj = findObjs({
+					type: 'attribute',
+					characterid: characterId,
+					name:'critShipSeverity'+openSlot,
+				})[0];
+				
+				var critRangeObj = findObjs({
+					type: 'attribute',
+					characterid: characterId,
+					name:'critShipRange'+openSlot,
+				})[0];
+				
+				var critSummaryObj = findObjs({
+					type: 'attribute',
+					characterid: characterId,
+					name:'critShipSummary'+openSlot,
+				})[0];
+				
+				var critOnObj = findObjs({
+					type: 'attribute',
+					characterid: characterId,
+					name:'critShipOn'+openSlot,
+				})[0];
+				
+				critNameObj.set({current : critShipTable[key].name});
+				critSeverityObj.set({current : critShipTable[key].severity});
+				critRangeObj.set({current : critShipTable[key].percent});
+				critSummaryObj.set({current : critShipTable[key].Result});
+				critOnObj.set({current : openSlot});
+                
+                var chat = '/direct <br><b>Rolls Vehicle Critical</b><br>';
+                    chat = chat + '<img src="http://i.imgur.com/JO3pOr8.png" /><br>';//need new graphic
+                    chat = chat + 'Current Criticals: (' + totalcrits + ' x 10)<br>';
+                    chat = chat + 'Dice Roll: ' + diceRoll + '<br>';
+                    chat = chat + 'Total: ' + rollTotal + '<br>';
+                    chat = chat + '<br>';
+                    chat = chat + '<b>' + critShipTable[key].name + '</b><br>';
+                    chat = chat +  critShipTable[key].Result + '<br>';
+                
+                sendChat(characterName,  chat);
+               
+			}
+		}
+		
+		//use sendChat /direct + html		
+	}
+	
+	var critShipHeal = function(critID) {
+		
+		var critObj = getCritShipID();
+		
+		for (var key in critObj) {
+			
+			if (critObj[key] == critID) {
+				
+				var critNameObj = findObjs({
+					type: 'attribute',
+					characterid: characterId,
+					name:'critShipName'+key,
+				})[0];
+				
+				var critSeverityObj = findObjs({
+					type: 'attribute',
+					characterid: characterId,
+					name:'critShipSeverity'+key,
+				})[0];
+				
+				var critRangeObj = findObjs({
+					type: 'attribute',
+					characterid: characterId,
+					name:'critShipRange'+key,
+				})[0];
+				
+				var critSummaryObj = findObjs({
+					type: 'attribute',
+					characterid: characterId,
+					name:'critShipSummary'+key,
+				})[0];
+				
+				var critOnObj = findObjs({
+					type: 'attribute',
+					characterid: characterId,
+					name:'critShipOn'+key,
+				})[0];
+
+				critNameObj.set({current : null});
+				critSeverityObj.set({current : null});
+				critRangeObj.set({current : null});
+				critSummaryObj.set({current : null});
+				critOnObj.set({current : 0});
+				
+			}
+		}
+		
+	}
+	
+	//Crit injury
 	
 	var getCritID = function() {
 		
@@ -1487,7 +1878,7 @@ var createDicePool = function(msg, who, playerid) {
 			rollTotal = parseInt(addCritNum);
 		}
         
-        log(rollTotal);
+        //log(rollTotal);
         
 		//find crit in crital table
 		for (var key in critTable)  {
@@ -1629,6 +2020,31 @@ var createDicePool = function(msg, who, playerid) {
 		
 	}
 
+	
+	
+	//Create Crit Ship
+
+	var critShipMatch = msg.match(regexCritShip);
+	
+	if (critShipMatch) {
+		// crit(heal|@critName1)
+		// crit(add|@{critAddRangeNum})
+		// crit(roll)
+		var critArray = critShipMatch[1].split('|');
+		var prop1 = critArray[0];
+		var prop2 = critArray[1] ? critArray[1] : null;
+		
+		if (prop1 == 'heal') {
+			critShipHeal(prop2);
+		} else if (prop1 == 'add') {
+			critShipRoll(prop2);
+		} else { // crit(roll)
+            critShipRoll();
+		}
+		
+		return false;//
+	} 
+	
 	//Create Crit
 
 	var critMatch = msg.match(regexCrit);
@@ -1650,8 +2066,7 @@ var createDicePool = function(msg, who, playerid) {
 		}
 		
 		return false;//
-	} 
-
+	}
 	
 	//split message on spaces ------------------------------------------ old code split into array
 	
@@ -1662,6 +2077,8 @@ var createDicePool = function(msg, who, playerid) {
 	
 	//Settings ------------------------------------------ old code
 	
+    
+    
 	processScriptTabs(commandArgv, characterName, rollLabel);
 	
 	//End Settings --------------------------------------
@@ -1924,23 +2341,35 @@ var setupCharacters = function(charObj) {
         {
 			index: 15,
 			attributes: [
+				//crit roll table
 				{name:'critName', current: '', max: '', update: false},
 				{name:'critSeverity', current: '', max: '', update: false},
 				{name:'critRange', current: '', max: '', update: false},
 				{name:'critSummary', current: '', max: '', update: false},
-				{name:'critOn', current: '0', max: '', update: false}
+				{name:'critOn', current: '0', max: '', update: false},
+				//ship crit roll table
+				{name:'critShipName', current: '', max: '', update: false},
+				{name:'critShipSeverity', current: '', max: '', update: false},
+				{name:'critShipRange', current: '', max: '', update: false},
+				{name:'critShipSummary', current: '', max: '', update: false},
+				{name:'critShipOn', current: '0', max: '', update: false},
 			]
 		}//,
 	];
 
 	var charIDs=_.pluck(charactersObj,'id');
+	//log(charIDs);
 	var attrNames = _.pluck(createAttributeList[1].attributes, 'name');
+	//log(attrNames);
 	var attrMatcher = new RegExp('^'+createAttributeList[0].name+'$|^'+attrNames.join('|^') );
-
+	//log(attrMatcher);
+	
 	var attrs = _.filter(findObjs({type: 'attribute'}), function(a) {
 		return ( _.contains(charIDs, a.get('characterid')) && attrMatcher.test(a.get('name')));
 	});
-
+	
+	//log(attrs);
+	
 	_.each(charactersObj, function(c) {
 		log('Character: --------------------> ' + c.get('name'));
 		//log('Character ID: --------------------> ' + c.id);
