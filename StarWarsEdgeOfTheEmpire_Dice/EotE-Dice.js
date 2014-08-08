@@ -1,3 +1,8 @@
+// GIST: https://gist.github.com/shdwjk/4064a6b2e12bcfc46f49
+// Aaron's updated version.
+// Fixed: character update to only do one findObjs() call, instead of
+//   (((15*5)+1)*NUM Characters) times (that's 2280 times for 30 characters).
+//
 // Edge of the Empire RPG Dice Mechanics
 //
 // copyright pug games 2014
@@ -9,8 +14,8 @@
 // changed to randomInteger()
 //
 // !eed log on|multi|single|off  // default:on and single
-            					// outputs dice rolled to the chat window if "on", only the result if "off"
-								// dice rolled will be on single line if "single" and on multiple lines if "multi"
+                                // outputs dice rolled to the chat window if "on", only the result if "off"
+                        		// dice rolled will be on single line if "single" and on multiple lines if "multi"
 // !eed graphics on|off|s|m|l  //default:on and m
 								// shows dice rolled as graphic, small, medium, or large if "on" or as text if "off"
 // !eed #b #g #y #blk #p #r #w
@@ -786,7 +791,6 @@ function rollForce(diceQty, who){
 	return diceResult;
 }
 
-
 function diceAddition(diceTotals, diceResult){
 	diceTotals.success = diceTotals.success + diceResult.success;
 	diceTotals.failure = diceTotals.failure + diceResult.failure;
@@ -836,7 +840,7 @@ function diceTotalsSummed(diceTotals) {
 	return diceTS;
 }
 
-function processEdgeEmpireDiceScript(diceToRoll, who){
+function processEdgeEmpireDiceScript(diceToRoll, who, label){
 	var diceQty = "";
 	var diceColor = "";
 	var diceTotals = {
@@ -890,6 +894,7 @@ function processEdgeEmpireDiceScript(diceToRoll, who){
 	var s3 = '" height="';
 	var s4 = '" width="';
 	var s5 = '"/>';
+	var chatGlobal = '';
 	
 	// won't work with >9 dice of one colour yet!
 	for (i=0, j;i<j;i++){
@@ -1002,17 +1007,20 @@ function processEdgeEmpireDiceScript(diceToRoll, who){
 	}
 
 	diceTextResults = diceTextResults + "]";
+	
+	
 		
 	if (eedGlobal.diceTestEnabled === true) {
 		sendChat("", "/desc " + who + ": 6b 8g 12y 6blk 8p 12r 12w");
-	}
-	else {
+	} else {
 		if (eedGlobal.diceLogChatWhisper === true) {
 			//sendChat(who, "/w gm " + diceToRoll);
 			//sendChat(who, "/w " + who + " " + diceToRoll);
 		}
 		else {
-			sendChat(who, "/em " + diceToRoll);
+			
+			chatGlobal = "/direct <br><b>Skill:</b> " + label + '<br>' + diceToRoll;
+
 		}
 	}
 	
@@ -1028,7 +1036,9 @@ function processEdgeEmpireDiceScript(diceToRoll, who){
 			if (diceRolledTextLog.Force !="") diceTextRolled = diceTextRolled + "Force:"+diceRolledTextLog.Force;
 
 			if (eedGlobal.diceGraphicsChat === true && eedGlobal.diceLogChatWhisper === false) {
-				sendChat("", "/direct " + diceGraphicsRolled);
+				
+				chatGlobal = chatGlobal + '<br>' + diceGraphicsRolled;
+				//sendChat("", "/direct " + diceGraphicsRolled);
 			}
 			else {
 				if (eedGlobal.diceLogChatWhisper === true) {
@@ -1042,13 +1052,13 @@ function processEdgeEmpireDiceScript(diceToRoll, who){
 		}
 		else {
 			if (eedGlobal.diceGraphicsChat === true && eedGlobal.diceLogChatWhisper === false) {
-				if (diceRolledGraphicsLog.Boost !="") sendChat("", "/direct " + diceRolledGraphicsLog.Boost);
-				if (diceRolledGraphicsLog.Ability !="") sendChat("", "/direct " + diceRolledGraphicsLog.Ability);
-				if (diceRolledGraphicsLog.Proficiency !="") sendChat("", "/direct " + diceRolledGraphicsLog.Proficiency);
-				if (diceRolledGraphicsLog.SetBack !="") sendChat("", "/direct " + diceRolledGraphicsLog.SetBack);
-				if (diceRolledGraphicsLog.Difficulty !="") sendChat("", "/direct " + diceRolledGraphicsLog.Difficulty);
-				if (diceRolledGraphicsLog.Challenge !="") sendChat("", "/direct " + diceRolledGraphicsLog.Challenge);
-				if (diceRolledGraphicsLog.Force !="") sendChat("", "/direct " + diceRolledGraphicsLog.Force);
+				if (diceRolledGraphicsLog.Boost !="") chatGlobal = sendChat("", "/direct " + diceRolledGraphicsLog.Boost);
+				if (diceRolledGraphicsLog.Ability !="") chatGlobal = sendChat("", "/direct " + diceRolledGraphicsLog.Ability);
+				if (diceRolledGraphicsLog.Proficiency !="") chatGlobal = sendChat("", "/direct " + diceRolledGraphicsLog.Proficiency);
+				if (diceRolledGraphicsLog.SetBack !="") chatGlobal = sendChat("", "/direct " + diceRolledGraphicsLog.SetBack);
+				if (diceRolledGraphicsLog.Difficulty !="") chatGlobal = sendChat("", "/direct " + diceRolledGraphicsLog.Difficulty);
+				if (diceRolledGraphicsLog.Challenge !="") chatGlobal = sendChat("", "/direct " + diceRolledGraphicsLog.Challenge);
+				if (diceRolledGraphicsLog.Force !="") chatGlobal = sendChat("", "/direct " + diceRolledGraphicsLog.Force);
 			}
 			else {
 				if (eedGlobal.diceLogChatWhisper === true) {
@@ -1071,7 +1081,8 @@ function processEdgeEmpireDiceScript(diceToRoll, who){
 	}
 
 	if (eedGlobal.diceGraphicsChat === true && eedGlobal.diceLogChatWhisper === false) {
-		sendChat("", "/direct Roll:" + diceGraphicsResults);
+		chatGlobal = chatGlobal + '<br>Roll:' + diceGraphicsResults;
+		sendChat(who, chatGlobal );
 	}
 	else {
 		if (eedGlobal.diceLogChatWhisper === true) {
@@ -1084,13 +1095,13 @@ function processEdgeEmpireDiceScript(diceToRoll, who){
 	}
 }
 
-var processScriptTabs = function(argv, who) {
+var processScriptTabs = function(argv, character, label) {
     // this will run the various other scripts depending upon the chat
     // window command.  Just add another Case statement to add a new command.
 	var tmpLogChat = false;
 	var tmpGraphicsChat = false;
-	
-    var script = argv.shift();
+	var	script = argv.shift();
+
     switch(script) {
     	case eedCONSTANTS.EEDCOMMAND:
 			switch(argv[0]) {
@@ -1114,7 +1125,7 @@ var processScriptTabs = function(argv, who) {
 				case "w":
 					eedGlobal.diceLogChatWhisper = true;
 					argv.shift();
-					processEdgeEmpireDiceScript(argv, who);
+					processEdgeEmpireDiceScript(argv, character, label);
 					eedGlobal.diceLogChatWhisper = false;
 					break;
 				case "graphics":
@@ -1142,20 +1153,233 @@ var processScriptTabs = function(argv, who) {
 					tmpGraphicsChat = eedGlobal.diceGraphicsChat;
 					eedGlobal.diceLogChat = true;
 					eedGlobal.diceGraphicsChat = true;
-					processEdgeEmpireDiceScript(["1b", "1g", "1y", "1blk", "1p", "1r", "1w"], who);
+					processEdgeEmpireDiceScript(["1b", "1g", "1y", "1blk", "1p", "1r", "1w"], character, label);
 					eedGlobal.diceTestEnabled = false;
 					eedGlobal.diceLogChat = tmpLogChat;
 					eedGlobal.diceGraphicsChat = tmpGraphicsChat;
 					break;
 				default:
-					processEdgeEmpireDiceScript(argv, who);
-					eedGlobal.diceLogChatWhisper = false;
+					//argv.splice(1,2);
+					//processEdgeEmpireDiceScript(argv, character, label);
+					//eedGlobal.diceLogChatWhisper = false;
 			}
 			break;
     }
 };
+
+//--------------------------------- Critical Injury
+
+var critTable = [
+	{
+		percent : '1 to 5',
+		severity : 1,
+		name : 'Minor Nick',
+		Result : 'Suffer 1 strain.',
+		effect : '',
+	},
+	{
+		percent : '6 to 10',
+		severity : 1,
+		name : 'Slowed Down',
+		Result : 'May only act during last allied Initiative slot on next turn.',
+		effect : '',
+	},
+	{
+		percent : '11 to 15',
+		severity : 1,
+		name : 'Sudden Jolt',
+		Result : 'May only act during last hero Initiative slot on next turn.',
+		effect : '',
+	},
+	{
+		percent : '16 to 20',
+		severity : 1,
+		name : 'Distracted',
+		Result : 'Cannot perform free maneuver on next turn.',
+		effect : '',
+	},
+	{
+		percent : '21 to 25',
+		severity : 1,
+		name : 'Off-Balance',
+		Result : 'Add 1 Setback die to next skill check.',
+		effect : '',
+	},
+	{
+		percent : '26 to 30',
+		severity : 1,
+		name : 'Discouraging Wound',
+		Result : 'Flip one light destiny to dark.',
+		effect : '',
+	},
+	{
+		percent : '31 to 35',
+		severity : 1,
+		name : 'Stunned',
+		Result : 'Staggered, cannot perform action on next turn.',
+		effect : '',
+	},
+	{
+		percent : '36 to 40',
+		severity : 1,
+		name : 'Stinger',
+		Result : 'Increase difficulty of next check by 1 Difficulty die.',
+		effect : '',
+	},
+	//----------------------------- Severity 2
+	{
+		percent : '41 to 45',
+		severity : 2,
+		name : 'Bowled Over',
+		Result : 'Knocked prone and suffer 1 strain.',
+		effect : '',
+	},
+	{
+		percent : '46 to 50',
+		severity : 2,
+		name : 'Head Ringer',
+		Result : 'Increase difficulty of all Intellect and Cunning checks by 1 Difficulty die until end of encounter.',
+		effect : '',
+	},
+	{
+		percent : '51 to 55',
+		severity : 2,
+		name : 'Fearsome Wound',
+		Result : 'Increase difficulty of all Presence and Willpower checks by 1 Difficulty die until end of encounter.',
+		effect : '',
+	},
+	{
+		percent : '56 to 60',
+		severity : 2,
+		name : 'Agonizing Wound',
+		Result : 'Increase difficulty of all Brawn and Agility checks by 1 Difficulty die until end of encounter.',
+		effect : '',
+	},
+	{
+		percent : '61 to 65',
+		severity : 2,
+		name : 'Slightly Dazed',
+		Result : 'Add 1 Setback die to all skill checks until end of encounter.',
+		effect : '',
+	},
+	{
+		percent : '66 to 70',
+		severity : 2,
+		name : 'Scattered Senses',
+		Result : 'Remove all Boost dice from all skill checks until end of encounter.',
+		effect : '',
+	},
+	{
+		percent : '71 to 75',
+		severity : 2,
+		name : 'Hamstrung',
+		Result : 'Lose free maneuver until end of encounter.',
+		effect : '',
+	},
+	{
+		percent : '76 to 80',
+		severity : 2,
+		name : 'Staggered',
+		Result : 'Attacker may immediately attempt another free attack against you using same dice pool as original attack.',
+		effect : '',
+	},
+	{
+		percent : '81 to 85',
+		severity : 2,
+		name : 'Winded',
+		Result : 'Cannot voluntarily suffer strain to activate abilities or gain additional maneuvers until end of encounter.',
+		effect : '',
+	},
+	{
+		percent : '86 to 90',
+		severity : 2,
+		name : 'Compromised',
+		Result : 'Increase difficulty of all skill checks by 1 Difficulty die until end of encounter.',
+		effect : '',
+	},
+	//---------------------------------------- Severity 3
+	{
+		percent : '91 to 95',
+		severity : 3,
+		name : 'At the Brink',
+		Result : 'Suffer 1 strain each time you perform an action.',
+		effect : '',
+	},
+	{
+		percent : '96 to 100',
+		severity : 3,
+		name : 'Crippled',
+		Result : 'Limb crippled until healed or replaced. Increase difficulty of all checks that use that limb by 1 Difficulty die.',
+		effect : '',
+	},
+	{
+		percent : '101 to 105',
+		severity : 3,
+		name : 'Maimed',
+		Result : 'Limb permanently lost. Unless you have a cybernetic replacement, cannot perform actions that use that limb. Add 1 Setback to all other actions.',
+		effect : '',
+	},
+	{
+		percent : '106 to 110',
+		severity : 3,
+		name : 'Horrific Injury',
+		Result : 'Roll 1d10 to determine one wounded characteristic -- roll results(1-3 = Brawn, 4-6 = Agility, 7 = Intellect, 8 = Cunning, 9 = Presence, 10 = Willpower. Until Healed, treat characteristic as one point lower.',
+		effect : '',
+	},
+	{
+		percent : '111 to 115',
+		severity : 3,
+		name : 'Temporarily Lame',
+		Result : 'Until healed, may not perform more than one maneuver each turn.',
+		effect : '',
+	},
+	{
+		percent : '116 to 120',
+		severity : 3,
+		name : 'Blinded',
+		Result : 'Can no longer see. Upgrade the difficulty of Perception and Vigilance checks three times, and all other checks twice.',
+		effect : '',
+	},
+	{
+		percent : '121 to 125',
+		severity : 3,
+		name : 'Knocked Senseless',
+		Result : 'You can no longer upgrade dice for checks.',
+		effect : '',
+	},
+	//---------------------------------------- Severity 4
+	{
+		percent : '126 to 130',
+		severity : 4,
+		name : 'Gruesome Injury',
+		Result : 'Roll 1d10 to determine one wounded characteristic -- roll results(1-3 = Brawn, 4-6 = Agility, 7 = Intellect, 8 = Cunning, 9 = Presence, 10 = Willpower. Characteristic is permanently one point lower.',
+		effect : '',
+	},
+	{
+		percent : '131 to 140',
+		severity : 4,
+		name : 'Bleeding Out',
+		Result : 'Suffer 1 wound and 1 strain every round at the beginning of turn. For every 5 wounds suffered beyond wound threshold, suffer one additional Critical Injury (ignore the details for any result below this result).',
+		effect : '',
+	},
+	{
+		percent : '141 to 150',
+		severity : 4,
+		name : 'The End is Nigh',
+		Result : 'Die after the last Initiative slot during the next round.',
+		effect : '',
+	},
+	{
+		percent : '151',
+		severity : 4,
+		name : 'Dead',
+		Result : 'Complete, absolute death.',
+		effect : '',
+	}
+]
+
 //--------------------------------- UPDATE
-var createDicePool = function(commandArgv) {
+var createDicePool = function(msg, who, playerid) {
     
 
     //!eed skill(1|6)
@@ -1163,15 +1387,12 @@ var createDicePool = function(commandArgv) {
     //!eed upgrade(difficulty|4)
     //!eed downgrade(proficiency|4)
     //!eed downgrade(challenge|4)
-
-    var isRoll = commandArgv[0].match(/!eed$/);
 	
-	if (!isRoll) {
-		return commandArgv;
+
+	if (!msg.match(/!eed/)) {
+		return false;
 	}
 	
-    commandArgv = commandArgv.filter(function(e){return e});//clean array of empty null undefined
-    
     Argv = {
             Boost: 0,
             Ability: 0,
@@ -1182,11 +1403,18 @@ var createDicePool = function(commandArgv) {
             Force: 0
         };
     
+	var characterId = '';
+    var characterName = '';
+	var rollLabel = '';
+	
+	var regexCharacterID = /characterID\((.*?)\)/;
+	var regexLabel = /label\((.*?)\)/;
     var regexSkill = /skill\((.*?)\)/;
     var regexUpgrade = /upgrade\((.*?)\)/;
     var regexDowngrade = /downgrade\((.*?)\)/;
     var regexEncum = /encum\((.*?)\)/;
-    var regexAlphaStr = /blk$|b$|g$|y$|p$|r$|w$/; 
+    var regexAlphaStr = /blk$|b$|g$|y$|p$|r$|w$/;
+	var regexCrit = /crit\((.*?)\)/;
     
     var skillDice = function(dice) {
         
@@ -1200,7 +1428,244 @@ var createDicePool = function(commandArgv) {
             Argv.Proficiency = Argv.Proficiency + totalProf;
 
     }
-    
+	
+	var getCritID = function() {
+		
+		return {
+			1 : getAttrByName(characterId, 'critOn1'),
+			2 : getAttrByName(characterId, 'critOn2'),
+			3 : getAttrByName(characterId, 'critOn3'),
+			4 : getAttrByName(characterId, 'critOn4'),
+			5 : getAttrByName(characterId, 'critOn5'),
+			6 : getAttrByName(characterId, 'critOn6'),
+			7 : getAttrByName(characterId, 'critOn7'),
+			8 : getAttrByName(characterId, 'critOn8'),
+			9 : getAttrByName(characterId, 'critOn9'),
+			10 : getAttrByName(characterId, 'critOn10'),
+			11 : getAttrByName(characterId, 'critOn11'),
+			12 : getAttrByName(characterId, 'critOn12'),
+			13 : getAttrByName(characterId, 'critOn13'),
+			14 : getAttrByName(characterId, 'critOn14'),
+			15 : getAttrByName(characterId, 'critOn15')
+		}
+	}
+	
+	var critRoll = function(addCritNum) {
+		
+		// Check for criticals
+		var critObj = getCritID();
+        
+		//add exsiting crits
+		var totalcrits = 0;
+		var openSlot = '';
+
+		for (var key in critObj)  {
+			
+            if (parseInt(critObj[key]) > 0) {
+				totalcrits = totalcrits + 1;
+			} else {
+				openSlot = key;
+                log(openSlot);
+			}
+		}
+        
+        if (!openSlot) {
+            sendChat("Alert", "Why are you not dead!");
+    		return false;
+        }
+        
+		var diceRoll = '';
+		var critMod = '';
+		var rollTotal = '';
+		
+		//roll random
+		if (!addCritNum) {
+			diceRoll = randomInteger(100);
+			critMod = (totalcrits * 10);
+			rollTotal = diceRoll + critMod;
+		} else {
+			rollTotal = parseInt(addCritNum);
+		}
+        
+        log(rollTotal);
+        
+		//find crit in crital table
+		for (var key in critTable)  {
+			var percent = critTable[key].percent.split(' to ');
+			var low = parseInt(percent[0]);
+			var high = percent[1] ? parseInt(percent[1]) : 1000;
+			
+			if ((rollTotal >= low) && (rollTotal <= high)) {
+				//openSlot
+				log(critTable[key].name);
+                
+				var critNameObj = findObjs({
+					type: 'attribute',
+					characterid: characterId,
+					name:'critName'+openSlot,
+				})[0];
+				
+				var critSeverityObj = findObjs({
+					type: 'attribute',
+					characterid: characterId,
+					name:'critSeverity'+openSlot,
+				})[0];
+				
+				var critRangeObj = findObjs({
+					type: 'attribute',
+					characterid: characterId,
+					name:'critRange'+openSlot,
+				})[0];
+				
+				var critSummaryObj = findObjs({
+					type: 'attribute',
+					characterid: characterId,
+					name:'critSummary'+openSlot,
+				})[0];
+				
+				var critOnObj = findObjs({
+					type: 'attribute',
+					characterid: characterId,
+					name:'critOn'+openSlot,
+				})[0];
+				
+				critNameObj.set({current : critTable[key].name});
+				critSeverityObj.set({current : critTable[key].severity});
+				critRangeObj.set({current : critTable[key].percent});
+				critSummaryObj.set({current : critTable[key].Result});
+				critOnObj.set({current : openSlot});
+                
+                var chat = '/direct <br><b>Rolls Critical Injury</b><br>';
+                    chat = chat + '<img src="http://i.imgur.com/z51hRwd.png" /><br/>'
+                    chat = chat + 'Current Criticals: (' + totalcrits + ' x 10)<br>';
+                    chat = chat + 'Dice Roll: ' + diceRoll + '<br>';
+                    chat = chat + 'Total: ' + rollTotal + '<br>';
+                    chat = chat + '<br>';
+                    chat = chat + '<b>' + critTable[key].name + '</b><br>';
+                    chat = chat +  critTable[key].Result + '<br>';
+                
+                sendChat(characterName,  chat);
+               
+			}
+		}
+		
+		//use sendChat /direct + html		
+	}
+	
+	var critHeal = function(critID) {
+		
+		var critObj = getCritID();
+		
+		for (var key in critObj) {
+			
+			if (critObj[key] == critID) {
+				
+				var critNameObj = findObjs({
+					type: 'attribute',
+					characterid: characterId,
+					name:'critName'+key,
+				})[0];
+				
+				var critSeverityObj = findObjs({
+					type: 'attribute',
+					characterid: characterId,
+					name:'critSeverity'+key,
+				})[0];
+				
+				var critRangeObj = findObjs({
+					type: 'attribute',
+					characterid: characterId,
+					name:'critRange'+key,
+				})[0];
+				
+				var critSummaryObj = findObjs({
+					type: 'attribute',
+					characterid: characterId,
+					name:'critSummary'+key,
+				})[0];
+				
+				var critOnObj = findObjs({
+					type: 'attribute',
+					characterid: characterId,
+					name:'critOn'+key,
+				})[0];
+
+				critNameObj.set({current : null});
+				critSeverityObj.set({current : null});
+				critRangeObj.set({current : null});
+				critSummaryObj.set({current : null});
+				critOnObj.set({current : 0});
+				
+			}
+		}
+		
+	}
+
+	//Create Character ID
+	var charMatch = msg.match(regexCharacterID);
+
+    if (charMatch) {
+		
+		if (charMatch[1]) {
+			characterId = charMatch[1];
+            characterName = getObj("character", characterId).get('name');
+           
+            log(characterName);
+            characterName = characterName;
+		} else {
+			characterId = false;
+            characterName = false;
+			sendChat("Alert", "Character sheet name doesn't match sheet name. Update and try again.");
+			return false;
+		}
+	}
+	
+	//Create Character ID
+	var labelMatch = msg.match(regexLabel);
+
+    if (labelMatch) {
+		
+		rollLabel = labelMatch[1];
+		
+	}
+
+	//Create Crit
+
+	var critMatch = msg.match(regexCrit);
+
+	if (critMatch) {
+		// crit(heal|@critName1)
+		// crit(add|@{critAddRangeNum})
+		// crit(roll)
+		var critArray = critMatch[1].split('|');
+		var prop1 = critArray[0];
+		var prop2 = critArray[1] ? critArray[1] : null;
+		
+		if (prop1 == 'heal') {
+			critHeal(prop2);
+		} else if (prop1 == 'add') {
+			critRoll(prop2);
+		} else { // crit(roll)
+            critRoll();
+		}
+		
+		return false;//
+	} 
+
+	
+	//split message on spaces ------------------------------------------ old code split into array
+	
+	var chatCommand = msg.toLowerCase();
+	var commandArgv = chatCommand.split(' ');
+	
+    commandArgv = commandArgv.filter(function(e){return e});//clean array of empty null undefined
+	
+	//Settings ------------------------------------------ old code
+	
+	processScriptTabs(commandArgv, characterName, rollLabel);
+	
+	//End Settings --------------------------------------
+	
     //Create Encumbrance
     for (var i = 0; i < commandArgv.length; i++) {
         
@@ -1314,7 +1779,6 @@ var createDicePool = function(commandArgv) {
         } 
     }
 
-
     //Downgrade dice  
     for (var i = 0; i < commandArgv.length; i++) {
         var downgradeMatch = commandArgv[i].match(regexDowngrade);
@@ -1375,9 +1839,11 @@ var createDicePool = function(commandArgv) {
     }
     
     //Output Argv object in array
+	
+    var diceRollArray = ['!eed', Argv.Boost+'b', Argv.Ability+'g', Argv.Proficiency+'y', Argv.SetBack+'blk', Argv.Difficulty+'p', Argv.Challenge+'r', Argv.Force+'w'];
     
-    return ['!eed', Argv.Boost+'b', Argv.Ability+'g', Argv.Proficiency+'y', Argv.SetBack+'blk', Argv.Difficulty+'p', Argv.Challenge+'r', Argv.Force+'w'];
-    
+	processEdgeEmpireDiceScript(diceRollArray, characterName, rollLabel);
+	eedGlobal.diceLogChatWhisper = false;// old code but whisper not setup
 }
 
 //Evaluates a mathematical expression (as a string) and return the result
@@ -1426,26 +1892,114 @@ var expr = function (expr) {
 }
 
 
+// ------------------------------------ Reset Characters Attr
+
+var setupCharacters = function(charObj) {
+	
+    var charactersObj = charObj;
+    
+    //---------------------------------- createObj bug fix for add attributes
+        var oldCreateObj = createObj;
+        createObj = function() {
+            var obj = oldCreateObj.apply(this, arguments);
+            var id = obj.id;
+            var characterID = obj.get('characterid');
+            var type = obj.get('type');
+
+            if (obj && !obj.fbpath && obj.changed) {
+                obj.fbpath = obj.changed._fbpath.replace(/([^\/]*\/){4}/, "/");
+            } else if (obj && !obj.changed && type == 'attribute') { //fix for dynamic attribute after in character created in game
+                obj.fbpath = '/char-attribs/char/'+ characterID +'/'+ id;
+            }
+            
+            // /char-attribs/char/characterID/attributeID
+            
+            return obj;
+        }
+
+	//Create Default Attributes for each character
+	//Attribute list
+	var createAttributeList = [
+		{name:'characterID', current: 'characterID', max: '', update: true},
+        {
+			index: 15,
+			attributes: [
+				{name:'critName', current: '', max: '', update: false},
+				{name:'critSeverity', current: '', max: '', update: false},
+				{name:'critRange', current: '', max: '', update: false},
+				{name:'critSummary', current: '', max: '', update: false},
+				{name:'critOn', current: '0', max: '', update: false}
+			]
+		}//,
+	];
+
+	var charIDs=_.pluck(charactersObj,'id');
+	var attrNames = _.pluck(createAttributeList[1].attributes, 'name');
+	var attrMatcher = new RegExp('^'+createAttributeList[0].name+'$|^'+attrNames.join('|^') );
+
+	var attrs = _.filter(findObjs({type: 'attribute'}), function(a) {
+		return ( _.contains(charIDs, a.get('characterid')) && attrMatcher.test(a.get('name')));
+	});
+
+	_.each(charactersObj, function(c) {
+		log('Character: --------------------> ' + c.get('name'));
+		//log('Character ID: --------------------> ' + c.id);
+        
+        createAttributeList[0].current = c.id; //Adds character id to the createAttributeList object, needed for dynamic created characters in game play
+        
+        var attr = _.find(attrs, function(a) {
+			return (a.get('characterid')  === c.id && a.get('name') === createAttributeList[0].name);
+		});
+        
+        //log(attr);
+        
+		if( attr ) {
+			attr.set({current: c.id});
+		} else {
+			createObj('attribute', {
+				characterid: c.id,
+				name: createAttributeList[0].name,
+				current: createAttributeList[0].current,
+				max: createAttributeList[0].max
+			});
+		}
+
+		_.each(createAttributeList[1].attributes, function(ap) {
+			for(var i = 1; i <= createAttributeList[1].index; ++i) {
+				attr = _.find(attrs, function(a) {
+					return (a.get('characterid') === c.id && a.get('name') === ap.name+i);
+				});
+				if(attr) {
+					if(ap.update) {
+						a.set({current: ap.current});
+					}
+				}
+				else {
+					createObj('attribute', {
+						characterid: c.id,
+						name: ap.name+i,
+						current: ap.current,
+						max: ap.max
+					});
+				}
+			}
+		});
+	});
+}
+
+
+
 //---------------------------------- END UPDATE
 
 
-on("chat:message", function(msg) {
-    // returns the chat window command entered, all in lowercase.
-    
-    var chatCommand = msg.content;
-    chatCommand = chatCommand.toLowerCase(); //make all characters lowercase
-
-    var argv = chatCommand.split(' ');
-    if (msg.type != 'api') {
-        return;
-    }
-    return processScriptTabs(createDicePool(argv), msg.who);
-});
 
 
 //Create new "-DicePool" character for GM
 on('ready', function() {
-   
+	
+
+	
+	//create character dicepool
     if (findObjs({ _type: "character", name: "-DicePool" }).length == 0){
        
         createObj("character", {
@@ -1461,5 +2015,34 @@ on('ready', function() {
             characterid: Char_dicePoolObject[0].id
         });
 
-    }; 
+    };
+    
+    //Setup Characters
+    var allCharacters = findObjs({ _type: "character"});
+        setupCharacters(allCharacters);
+    
+    
+    
+    //EVENTS
+    
+    on("add:character", function(obj) {
+       var character = [obj];
+       setupCharacters(character);
+    });
+	
+    on("chat:roll", function(roll) {
+        log('chat:roll - '+ roll);
+    });
+
+    on("chat:message", function(msg) {
+        // returns the chat window command entered, all in lowercase.
+    	
+    	if (msg.type != 'api') {
+            return;
+        }
+		
+		createDicePool(msg.content, msg.who, msg.playerid)
+    });
+
+    
 });
