@@ -146,7 +146,11 @@ on("chat:message", function (msg) {
       var numRaceAbilities = 0;
       for (var l = 0; l < abilityName.length; l++) {
          if (abilityType[l] == "class") {
-            AddAttribute("repeating_classabilities_" + numClassAbilities.toString() + "_ClassAbility", abilityName[l], Character.id);
+            if (abilityAttribute[l] == "") {
+               AddAttribute("repeating_classabilities_" + numClassAbilities.toString() + "_ClassAbility", abilityName[l], Character.id);
+            } else {
+               AddAttribute("repeating_classabilities_" + numClassAbilities.toString() + "_ClassAbility", abilityName[l] + " (" + abilityAttribute[l].substring(0,3) + ")", Character.id);
+            }
             numClassAbilities += 1;
             if (abilityName[l].match(/Weapon Specialization/)) {
                var wepRegex = /\((.*?)\)/g;
@@ -154,7 +158,7 @@ on("chat:message", function (msg) {
             }
          } else if (abilityType[l] == "race") {
             AddAttribute("repeating_raceabilities_" + numRaceAbilities.toString() + "_RaceAbility", abilityName[l], Character.id);
-            numRaceAbilities =+ 1;
+            numRaceAbilities += 1;
          }
       }
       
@@ -213,6 +217,63 @@ on("chat:message", function (msg) {
       var senseNames = getMatches(StatBlock, myRegex, 1);
       for (var m = 0; m < senseNames.length; m++) {
         AddAttribute("repeating_senses_" + m.toString() + "_Senses", senseNames[m], Character.id);
+      }
+      
+      var whatTypeSpells = "N";
+      if ((CharClass == "Cleric") || (CharClass == "Druid")) {
+         whatTypeSpells = "D";
+      } else if ((CharClass == "Wizard") || (CharClass == "Illusionist")) {
+         whatTypeSpells = "A";
+      }
+      if ((whatTypeSpells == "A") || (whatTypeSpells == "D")) {
+         myRegex = /<availablelevel(\d) value=\'(\d+)\'/g;
+         var spellLvl = getMatches(StatBlock, myRegex, 1);
+         var totalSpells= getMatches(StatBlock, myRegex, 2);
+         var IntVal = parseInt(getAttrByName(Character.id, "Intelligence"));
+         var WisVal = parseInt(getAttrByName(Character.id, "Wisdom"));
+         for (var n = 0; n < 10; n++) {
+            if (n == 0) {
+               AddAttribute("numspells_0", totalSpells[n].toString(), Character.id);
+               AddAttribute("bonusspells_0", "0", Character.id);
+            } else if (n ==1) {
+               if (((whatTypeSpells == "D") && (WisVal < 13)) || ((whatTypeSpells == "A") && (IntVal < 13))) {
+                  AddAttribute("numspells_1", totalSpells[n].toString(), Character.id);
+                  AddAttribute("bonusspells_1", "0", Character.id);
+               } else {
+                  AddAttribute("numspells_1", (parseInt(totalSpells[n]) - 1).toString(), Character.id);
+                  AddAttribute("bonusspells_1", "1", Character.id);
+               }
+            } else if (n == 2) {
+               if (((whatTypeSpells == "D") && (WisVal < 16)) || ((whatTypeSpells == "A") && (IntVal < 16))) {
+                  AddAttribute("numspells_2", totalSpells[n].toString(), Character.id);
+                  AddAttribute("bonusspells_2", "0", Character.id);
+               } else {
+                  if (parseInt(totalSpells[n]) > 0) {
+                     AddAttribute("numspells_2", (parseInt(totalSpells[n]) - 1).toString(), Character.id);
+                     AddAttribute("bonusspells_2", "1", Character.id);
+                  } else {
+                     AddAttribute("numspells_2", (parseInt(totalSpells[n])).toString(), Character.id);
+                     AddAttribute("bonusspells_2", "0", Character.id);
+                  }
+               }
+            } else if (n == 3) {
+               if (((whatTypeSpells == "D") && (WisVal < 18)) || ((whatTypeSpells == "A") && (IntVal < 18))) {
+                  AddAttribute("numspells_3", totalSpells[n].toString(), Character.id);
+                  AddAttribute("bonusspells_3", "0", Character.id);
+               } else {
+                  if (parseInt(totalSpells[n]) > 0) {
+                     AddAttribute("numspells_3", (parseInt(totalSpells[n]) - 1).toString(), Character.id);
+                     AddAttribute("bonusspells_3", "1", Character.id);
+                  } else {
+                     AddAttribute("numspells_3", (parseInt(totalSpells[n])).toString(), Character.id);
+                     AddAttribute("bonusspells_3", "0", Character.id);
+                  }
+               }
+            } else {
+               AddAttribute("numspells_" + n.toString(), totalSpells[n].toString(), Character.id);
+               AddAttribute("bonusspells_" + n.toString(), "0", Character.id);
+            }
+         }
       }
    }
 });
