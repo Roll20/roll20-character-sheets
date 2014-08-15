@@ -384,7 +384,7 @@
         
             if (initiativeMatch) {
                 eote.process.initiative(initiativeMatch, diceObj);
-                return false;
+                //return false;
             }
         
         var critMatch = cmd.match(eote.defaults.regex.crit);
@@ -597,7 +597,8 @@
         
         Campaign().set("turnorder", JSON.stringify(turnorder));
         
-        sendChat(diceObj.vars.characterName, 'Rolls initiative');
+        //sendChat(diceObj.vars.characterName, 'Rolls initiative');
+        
     }
     
     eote.process.crit = function(cmd, diceObj){
