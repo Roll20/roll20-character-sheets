@@ -5,7 +5,7 @@ This is a **work in progress sheet** for use on Roll20.net and with the latest (
 ### Changelog
 
 * PHB release - 16th August 2014
-Added sorcerer and Warlock support throughout the sheet.  Added support for the bard's "Jack of all trades" feature to skills.  Added passive scores for all skills to the sheet and found space for a 4th custom slot for tools/skills as a result.  Reworked spell dashboard section to provide better support for the wider casting styles now that there are more classes.  Updated spellbook section for new spell casting (sub)classes.  Updated Armour section so unarmoured AC is now also auto calculated.
+Added sorcerer and Warlock support throughout the sheet.  Added support for the bard's "Jack of all trades" feature to skills.  Added passive scores for all skills to the sheet and found space for a 4th custom slot for tools/skills as a result.  Reworked spell dashboard section to provide better support for the wider casting styles now that there are more classes.  Updated spellbook section for new spell casting (sub)classes.  Updated Armour section so unarmoured AC is now also auto calculated.  First part of NPC sheet functionality added (core stats).
 
 * Bugfix and PHB release prep - 3rd August 2014
 Fixed some minor labelling/spelling issues. Fixed weapon wielded selection not being saved.  Added warlock and sorcerer classes to class and hit dice sections.  Updated bard to be a d8 hit die as per PHB previews.  Added functionality for NPC sheet.  Moved sheet last updated date to the sheet header.  Added support for a few custom skills/tools in the skills section.  Added option to allow the weights entered in the inventory to be treated as unit weights instead of total weight for that row
