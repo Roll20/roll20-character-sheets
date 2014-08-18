@@ -103,6 +103,7 @@
             log : /log (on|multi|single|off)/,
             graphics : /graphics (on|off|s|m|l)/,
             test : /test/,
+            resetdice : /(resetgmdice|resetdice)/,
             initiative : /\bnpcinit|\bpcinit/,
             characterID : /characterID\((.*?)\)/,
             label : /label\((.*?)\)/,
@@ -380,6 +381,13 @@
          * Description: Custom dice components have thier own message, results and
          * often will return false to not allow proceeding scripts to fire
          * --------------------------------------------------------------*/
+        var resetdiceMatch = cmd.match(eote.defaults.regex.resetdice);
+        
+            if (resetdiceMatch) {
+                eote.process.resetdice(resetdiceMatch, diceObj);
+                return false;
+            }
+        
         var initiativeMatch = cmd.match(eote.defaults.regex.initiative);
         
             if (initiativeMatch) {
@@ -537,6 +545,158 @@
         
 		return diceObj;
 
+    }
+    
+    eote.process.resetdice = function(cmd, diceObj){
+        
+        var characterObj = [{name: diceObj.vars.characterName, id: diceObj.vars.characterID}];
+        
+        //log(cmd);
+        
+        if (cmd[1] == 'resetdice') {
+            var resetdice = [
+                {
+                    name : "b",
+                    current : 0,
+                    max : "",
+                    update : true
+                },
+                {
+                    name : "g",
+                    current : 0,
+                    max : "",
+                    update : true
+                },
+                {
+                    name : "y",
+                    current : 0,
+                    max : "",
+                    update : true
+                },
+                {
+                    name : "blk",
+                    current : 0,
+                    max : "",
+                    update : true
+                },
+                {
+                    name : "r",
+                    current : 0,
+                    max : "",
+                    update : true
+                },
+                {
+                    name : "p",
+                    current : 0,
+                    max : "",
+                    update : true
+                },
+                {
+                    name : "w",
+                    current : 0,
+                    max : "",
+                    update : true
+                },
+                {
+                    name : "upgradeAbility",
+                    current : 0,
+                    max : "",
+                    update : true
+                },
+                {
+                    name : "downgradeProficiency",
+                    current : 0,
+                    max : "",
+                    update : true
+                },
+                {
+                    name : "upgradeDifficulty",
+                    current : 0,
+                    max : "",
+                    update : true
+                },
+                {
+                    name : "downgradeChallenge",
+                    current : 0,
+                    max : "",
+                    update : true
+                }
+            ]
+        }
+        
+        if (cmd[1] == 'resetgmdice') {
+            var resetdice = [
+                {
+                    name : "bgm",
+                    current : 0,
+                    max : "",
+                    update : true
+                },
+                {
+                    name : "ggm",
+                    current : 0,
+                    max : "",
+                    update : true
+                },
+                {
+                    name : "ygm",
+                    current : 0,
+                    max : "",
+                    update : true
+                },
+                {
+                    name : "blkgm",
+                    current : 0,
+                    max : "",
+                    update : true
+                },
+                {
+                    name : "rgm",
+                    current : 0,
+                    max : "",
+                    update : true
+                },
+                {
+                    name : "pgm",
+                    current : 0,
+                    max : "",
+                    update : true
+                },
+                {
+                    name : "wgm",
+                    current : 0,
+                    max : "",
+                    update : true
+                },
+                {
+                    name : "upgradeAbilitygm",
+                    current : 0,
+                    max : "",
+                    update : true
+                },
+                {
+                    name : "downgradeProficiencygm",
+                    current : 0,
+                    max : "",
+                    update : true
+                },
+                {
+                    name : "upgradeDifficultygm",
+                    current : 0,
+                    max : "",
+                    update : true
+                },
+                {
+                    name : "downgradeChallengegm",
+                    current : 0,
+                    max : "",
+                    update : true
+                }
+            ]
+        }
+        
+        eote.updateAddAttribute(characterObj, resetdice);
+        
     }
     
     eote.process.initiative = function(cmd, diceObj){
