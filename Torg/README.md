@@ -1,6 +1,6 @@
 First draft of Torg Character sheet (v0.1)
 
-I started off with the basic Fantasy Craft character sheet (thanks to whoever Jason Miller who created it)
+I started off with the basic Fantasy Craft character sheet (thanks to Jason Miller who created it)
 
 I made some modifications, and I'm pretty happy with everything below the top section.
 
