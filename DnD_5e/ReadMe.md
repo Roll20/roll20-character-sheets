@@ -5,7 +5,7 @@ This is a **work in progress sheet** for use on Roll20.net and with the latest (
 ### Changelog
 
 * Minor update - 25th August 2014
-Added Damage Vulnerability field and initiative button/fields on npc sheet
+Added Damage Vulnerability field and initiative button/fields on npc sheet.  Changed the way finesse mod was calculated behind the scenes to try and improve performance a little
 
 * PHB release - 20th August 2014
 Added sorcerer and Warlock support throughout the sheet.  Added support for the bard's "Jack of all trades" feature to skills.  Added passive scores for all skills to the sheet and found space for a 4th custom slot for tools/skills as a result.  Reworked spell dashboard section to provide better support for the wider casting styles now that there are more classes.  Updated spellbook section for new spell casting (sub)classes.  Updated Armour section so unarmoured AC is now also auto calculated.  NPC sheet functionality added (very much designed for use by experienced GM/DM's who are comfortable using the roll20 system).
