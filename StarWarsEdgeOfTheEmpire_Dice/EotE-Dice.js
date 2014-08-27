@@ -108,6 +108,7 @@
             characterID : /characterID\((.*?)\)/,
             label : /label\((.*?)\)/,
             skill : /skill\((.*?)\)/g,
+			opposed : /opposed\((.*?)\)/g,
             upgrade : /upgrade\((.*?)\)/g,
             downgrade : /downgrade\((.*?)\)/g,
             encum : /encum\((.*?)\)/g,
@@ -353,6 +354,12 @@
                 diceObj = eote.process.skill(skillMatch, diceObj);
             }
         
+		var opposedMatch = cmd.match(eote.defaults.regex.opposed);
+			
+			if (opposedMatch) {
+				diceObj = eote.process.opposed(opposedMatch, diceObj);
+			}
+
         var diceMatch = cmd.match(eote.defaults.regex.dice);
             
             if (diceMatch) {
@@ -1486,6 +1493,34 @@
 
     }
     
+	eote.process.opposed = function(cmd, diceObj){
+		/*Opposed
+		* default: 
+		* Description: create the difficulty and challenge dice for an opposed skill check
+		* Command: !eed opposed(char_value|skill_value)
+		* ---------------------------------------------------------------- */
+		
+		//log(cmd);
+		
+		_.each(cmd, function(opposed) {
+			
+			var diceArray = opposed.match(/\((.*?)\|(.*?)\)/);
+			
+			if (diceArray && diceArray[1] && diceArray[2]) {
+				var num1 = eote.process.math(diceArray[1]);
+				var num2 = eote.process.math(diceArray[2]);
+				var totalOppDiff = Math.abs(num1-num2);
+				var totalOppChal = (num1 < num2 ? num1 : num2);
+				var opposeddifficultyDice = diceObj.count.difficulty;
+				var opposedchallengeDice = diceObj.count.challenge;
+				diceObj.count.difficulty = opposeddifficultyDice + totalOppDiff;
+				diceObj.count.challenge = opposedchallengeDice + totalOppChal;
+			}
+		});
+		
+		return diceObj;
+	}
+	
     eote.process.setDice = function(cmd, diceObj){
         
         /* setDice
