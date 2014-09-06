@@ -1,3 +1,78 @@
+/*
+	Current Version: 2.5
+	Last updated: 8.28.2014
+	Character Sheet and Script Maintained by: Steve Day
+	Current Verion: https://github.com/Roll20/roll20-character-sheets/tree/master/StarWarsEdgeOfTheEmpire_Dice
+	Development and Older Verions: https://github.com/dayst/StarWarsEdgeOfTheEmpire_Dice
+	
+	Credits:
+		Original creator: Konrad J.
+		Helped with Dice specs: Alicia G. and Blake the Lake
+		Dice graphics hosted by Alicia G. at galacticcampaigns.com
+		Dice graphics borrowed from the awesome google+ hangouts EotE Dice App
+		Character Sheet and Advanced Dice Roller: Steve Day
+		Debugger: Arron
+		Initiative Roller: Andrew H.
+		Opposed Roller: Tom F.
+		Skill Description by: Gribble - https://dl.dropboxusercontent.com/u/9077657/SW-EotE-Reference-Sheets.pdf
+		Critical Descriptions by: Gribble - https://dl.dropboxusercontent.com/u/9077657/SW-EotE-Reference-Sheets.pdf
+	
+	API Chat Commands
+
+	Settings:
+		Log
+			* default: 'on' and 'single'
+			* Description: Sets the visual output in the chat window for the dice rolls
+			* Command: !eed log on|off|multi|single
+		
+		Graphics
+			* default: 'on' and 'm'
+			* Description: Sets chat window dice output as graphic, small, medium, or large if "on" or as text if "off"
+			* Command: !eed graphics on|off|s|m|l
+		
+		Test
+			* Description: Output every side of every die to the chat window
+			* !eed test
+	
+	Roll:
+		Label
+			* default: null
+			* Description: set the skill name of the roll
+			* Command: !eed label(Name of Skill)
+		
+		Initiative
+			* default: false
+			* Description: Set NPC/PC initiative true
+			* Command: !eed npcinit or pcinit and #b #g #y #blk #p #r #w
+		
+		Skill
+			* default: 
+			* Description: create the ability and proficiency dice for a skill check
+			* Command: !eed skill(char_value|skill_value)
+		
+		Opposed
+			* default: 
+			* Description: create the difficulty and challenge dice for an opposed skill check
+			* Command: !eed opposed(char_value|skill_value)
+		
+		Dice
+			* default: 
+			* Description: Loop thru the dice and adds or subtracts them from the dice object
+			* Command: !eed #g #y #b #blk #r #p #w 
+		
+		Upgrade
+			* default: 
+			* Description: upgrades ability and difficulty dice
+			* Command: !eed upgrade(ability|#) or upgrade(difficulty|#)
+		
+		Downgrade
+			* default: 
+			* Description: downgrades proficiency and challenge dice
+			* Command: !eed downgrade(proficiency|#) or downgrade(challenge|#)
+
+	
+*/
+
     var eote = {}
 
     eote.init = function() {
@@ -108,6 +183,7 @@
             characterID : /characterID\((.*?)\)/,
             label : /label\((.*?)\)/,
             skill : /skill\((.*?)\)/g,
+			opposed : /opposed\((.*?)\)/g,
             upgrade : /upgrade\((.*?)\)/g,
             downgrade : /downgrade\((.*?)\)/g,
             encum : /encum\((.*?)\)/g,
@@ -353,6 +429,12 @@
                 diceObj = eote.process.skill(skillMatch, diceObj);
             }
         
+		var opposedMatch = cmd.match(eote.defaults.regex.opposed);
+			
+			if (opposedMatch) {
+				diceObj = eote.process.opposed(opposedMatch, diceObj);
+			}
+
         var diceMatch = cmd.match(eote.defaults.regex.dice);
             
             if (diceMatch) {
@@ -532,7 +614,7 @@
 
         /* Label
          * default: null
-         * Description: set the skill name
+         * Description: set the skill name of the roll
          * Command: !eed label(Name of Skill)
          * ---------------------------------------------------------------- */
         //log(cmd);
@@ -1486,6 +1568,34 @@
 
     }
     
+	eote.process.opposed = function(cmd, diceObj){
+		/*Opposed
+		* default: 
+		* Description: create the difficulty and challenge dice for an opposed skill check
+		* Command: !eed opposed(char_value|skill_value)
+		* ---------------------------------------------------------------- */
+		
+		//log(cmd);
+		
+		_.each(cmd, function(opposed) {
+			
+			var diceArray = opposed.match(/\((.*?)\|(.*?)\)/);
+			
+			if (diceArray && diceArray[1] && diceArray[2]) {
+				var num1 = eote.process.math(diceArray[1]);
+				var num2 = eote.process.math(diceArray[2]);
+				var totalOppDiff = Math.abs(num1-num2);
+				var totalOppChal = (num1 < num2 ? num1 : num2);
+				var opposeddifficultyDice = diceObj.count.difficulty;
+				var opposedchallengeDice = diceObj.count.challenge;
+				diceObj.count.difficulty = opposeddifficultyDice + totalOppDiff;
+				diceObj.count.challenge = opposedchallengeDice + totalOppChal;
+			}
+		});
+		
+		return diceObj;
+	}
+	
     eote.process.setDice = function(cmd, diceObj){
         
         /* setDice
