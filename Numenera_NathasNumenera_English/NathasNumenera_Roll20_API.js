@@ -2,7 +2,7 @@
 function attrib(characterObj,attributeObjArray,newValue,tokenObj) {
         //Change the value of one character's attribute
         var attributeName = attributeObjArray[0].get("name");
-				var attributeValue = attributeObjArray[0].get("current");
+    			var attributeValue = attributeObjArray[0].get("current");
 				var characterName = characterObj.get("name");
         var maxValue = 0;
         var finalValue = 0;
@@ -179,7 +179,7 @@ function initRoll(characterObj,tokenObj,efforts,rollBonus,statexp) {
     if ((effortsUsed > 0) || (statExpense > 0)) {
         if (effortsUsed > 0) {
             if (effortsUsed > attrEffort) {
-                sendChat("character|"+charId, "<span style='color:red;'>tries to 	apply more effort ("+effortsUsed+") than (s)he's able to ("+attrEffort+").</span>");
+                sendChat("character|"+charId, "<span style='color:red;'>tries to apply more effort ("+effortsUsed+") than (s)he's able to ("+attrEffort+").</span>");
                 return;        
             } else {
                 effortCost = 1 + (effortsUsed * (2+damagetrack) );    
@@ -291,7 +291,7 @@ function numeneRoll(characterObj,tokenObj,statName,difficulty,efforts,rollBonus,
     //Checking the bonus to roll
     var bonusToRoll = parseInt(rollBonus);
     if( bonusToRoll >= 3 ) {
-        sendChat("character|"+charId, "<span style='color:red;'>bonus of 3+ ("+bonusToRoll+") are not authorized (lower the Level/Difficulty with an Asset instead)</span>.");
+        sendChat("character|"+charId, "<span style='color:red;'>bonus of 3 or more ("+bonusToRoll+") are not authorized (lower the Level/Difficulty with an Asset instead)</span>.");
         return;
     };
     // Rolling the dice
@@ -308,7 +308,7 @@ function numeneRoll(characterObj,tokenObj,statName,difficulty,efforts,rollBonus,
     if ((effortsUsed > 0) || (statExpense > 0)) {
         if (effortsUsed > 0) {
             if (effortsUsed > attrEffort) {
-                sendChat("character|"+charId, "<span style='color:red;'>tries to 	apply more effort ("+effortsUsed+") than (s)he's able to ("+attrEffort+").</span>");
+                sendChat("character|"+charId, "<span style='color:red;'>tries to apply more effort ("+effortsUsed+") than (s)he's able to ("+attrEffort+").</span>");
                 return;        
             } else {
                 effortCost = 1 + (effortsUsed * (2+damagetrack) );    
@@ -379,12 +379,12 @@ function numeneRoll(characterObj,tokenObj,statName,difficulty,efforts,rollBonus,
                 }
             } else if (diceRoll == 20) {
                     // if character is impaired
-                    specialEffect = "<li><u>Effect</u> : <span style='color:green;'> Stat pool points not spent.</span></li>";
+                    specialEffect = "<li><u>Effect</u> : <span style='color:green;'>Stat pool points not spent.</span></li>";
             };
         };
     } else {     // automatic success or no known difficulty
         if (parseInt(difficulty) > 0) {
-            success = success + "<li><strong><span style='color:green;'>And  automatically succeeds (Difficulté " + difficulty + ")!</span></strong></li>";
+            success = success + "<li><strong><span style='color:green;'>And automatically succeeds (Difficulty " + difficulty + ")!</span></strong></li>";
         } else {
             success = success + "<li><u>Result</u> : <strong>" + finalRoll + ".</strong></li>";
         };
@@ -441,7 +441,7 @@ on("chat:message", function(msg) {
     if (msg.type == "api") {
         // sendChat("", "/desc TEST API.");
         if(!msg.selected) {
-    		sendChat("", "/desc Select a character token and try again ...");
+    		sendChat("", "/desc Select a character token and try again...");
 			return; //quit if nothing selected
 		};
         if (msg.content.indexOf("!nathanum-") !== 0) {
