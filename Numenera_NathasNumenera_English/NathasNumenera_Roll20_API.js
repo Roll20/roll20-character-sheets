@@ -1,9 +1,134 @@
-//---------------------------------------------------------------------------------------------------------------------------------------------
+/*
+Natha's Numenera rolls functions for Natha's Roll20 Numenera Character Sheet.
+v2.7 - 2014/09/22
+ 
+Documentation needed ...
+ 
+*/
+//------------------------------------------------------------------------------
+on("chat:message", function(msg) {
+    if (msg.type == "api") {
+        // sendChat("Natha", "/desc DEBUG:TEST API.");
+        if(!msg.selected) {
+            sendChat("", "/desc Select a character token and try again...");
+			return; //quit if nothing selected
+		};
+        if (msg.content.indexOf("!nathanum-") !== 0) {
+        	// sendChat("Natha", "/desc DEBUG:unknown function.");
+            return;
+        } else {
+            var functionCalled = msg.content.split(" ")[0];
+        };
+        if (functionCalled == "!nathanum-numeneroll") {
+            var Parameters = msg.content.split("!nathanum-numeneroll ")[1];
+            var tokenId = Parameters.split("|")[0];
+            var tokenObj=getObj("graphic", tokenId);
+            var charId = tokenObj.get("represents");
+            if(charId != "") {
+                var characterObj = getObj("character", charId);
+            } else {
+                sendChat("","The selected token doesn't represent a character.");
+                return false;
+            };
+            var statName = Parameters.split("|")[1];
+            var difficulty = parseInt(Parameters.split("|")[2]);
+            var effortsOnRoll = parseInt(Parameters.split("|")[3]);
+            var rollbonus = parseInt(Parameters.split("|")[4]);
+            var statexp = parseInt(Parameters.split("|")[5]);
+			var effortsOnDmg = parseInt(Parameters.split("|")[6]);
+            numeneRoll(characterObj,tokenObj,statName,difficulty,effortsOnRoll,rollbonus,statexp,msg.who,effortsOnDmg);
+            return;
+        };
+        if (functionCalled == "!nathanum-attrib") {
+            var Parameters = msg.content.split("!nathanum-attrib ")[1];
+            var tokenId = Parameters.split("|")[0];
+            var attributeName = Parameters.split("|")[1];
+    		var newValue = Parameters.split("|")[2];
+            var tokenObj=getObj("graphic", tokenId);
+            var charId = tokenObj.get("represents");
+            if(charId != "") {
+                var characterObj = getObj("character", charId);
+            } else {
+                sendChat("","The selected token doesn't represent a character.");
+                return false;
+            };
+            var attributeObjArray = findObjs({
+                _type: 'attribute',
+                name: attributeName,
+                _characterid: characterObj.id
+            });                    
+			if (attributeObjArray == false) return;
+			attrib(characterObj,attributeObjArray,newValue,tokenObj);
+            return;
+        }; 
+        if (functionCalled == "!nathanum-recoveryroll") {
+            var tokenId = msg.content.split("!nathanum-recoveryroll ")[1];
+            var tokenObj=getObj("graphic", tokenId);
+            var charId = tokenObj.get("represents");
+            if(charId != "") {
+                var characterObj = getObj("character", charId);
+            } else {
+                sendChat("","The selected token doesn't represent a character.");
+                return false;
+            };
+    		recoveryRoll(characterObj,tokenObj);        
+            return;
+        };
+        if (functionCalled == "!nathanum-initroll") {
+            var Parameters = msg.content.split("!nathanum-initroll ")[1];
+            var tokenId = Parameters.split("|")[0];
+            var tokenObj=getObj("graphic", tokenId);
+            var charId = tokenObj.get("represents");
+            if(charId != "") {
+                var characterObj = getObj("character", charId);
+            } else {
+                sendChat("","The selected token doesn't represent a character.");
+                return false;
+            };
+            var effortsUsed = parseInt(Parameters.split("|")[1]);
+            var rollbonus = parseInt(Parameters.split("|")[2]);
+            var statexp = parseInt(Parameters.split("|")[3]);
+			initRoll(characterObj,tokenObj,effortsUsed,rollbonus,statexp);        
+            return;
+        };
+        if (functionCalled == "!nathanum-restchar") {
+            var Parameters = msg.content.split("!nathanum-restchar ")[1];
+            var tokenId = Parameters.split("|")[0];
+            var tokenObj=getObj("graphic", tokenId);
+            var charId = tokenObj.get("represents");
+            if(charId != "") {
+                var characterObj = getObj("character", charId);
+            } else {
+                sendChat("","The selected token doesn't represent a character.");
+                return false;
+            };
+    		restChar(characterObj,tokenObj);
+            return;
+        }; 
+        if (functionCalled == "!nathanum-npcdmg") {
+            var Parameters = msg.content.split("!nathanum-npcdmg ")[1];
+            var tokenId = Parameters.split("|")[0];
+            var dmgDealt = Parameters.split("|")[1];
+            var applyArmor =  Parameters.split("|")[2];
+            var tokenObj=getObj("graphic", tokenId);
+            var charId = tokenObj.get("represents");
+            if(charId != "") {
+                var characterObj = getObj("character", charId);
+            } else {
+                sendChat("","The selected token doesn't represent a character.");
+                return false;
+            };
+        	npcDamage(characterObj,tokenObj,dmgDealt,applyArmor);
+            return;
+        }; 
+    };
+});
+//------------------------------------------------------------------------------
 function attrib(characterObj,attributeObjArray,newValue,tokenObj) {
         //Change the value of one character's attribute
         var attributeName = attributeObjArray[0].get("name");
-    			var attributeValue = attributeObjArray[0].get("current");
-				var characterName = characterObj.get("name");
+    	var attributeValue = attributeObjArray[0].get("current");
+		var characterName = characterObj.get("name");
         var maxValue = 0;
         var finalValue = 0;
         var attributeLib = "";
@@ -51,7 +176,7 @@ function attrib(characterObj,attributeObjArray,newValue,tokenObj) {
 		//output
 		sendChat("character|"+characterObj.get("id"), "<span style='color:blue;'>" + attributeLib + "("+attributeName+")" + "</span> : " + attributeValue + " -> " + finalValue + ".");
 };
-//---------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 function checkCharStates(characterObj,tokenObj) {
     // check and sets the damage track, and markers on the character's token, according to the stats
     var might = 0;
@@ -101,7 +226,73 @@ function checkCharStates(characterObj,tokenObj) {
         }
     };
 };
-//---------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+function npcDamage(characterObj,tokenObj,dmgDealt, applyArmor) {
+    // Apply damage (or healing if dmdDeal is negative ...) to Numenera NPC/Creature
+    // And set "death" marker if health is 0 or less.
+    // The Mook or Non Player full Character must have the following attributes :
+    //  - Level (token bar1)
+    //  - Health (token bar2)
+    //  - Armor (token bar3)
+    // Armor will diminish damage unless "applyArmor"='n'
+    var dmg = parseInt(dmgDealt);
+    if (isNaN(dmg)) {dmg=0;};
+    var npcName = characterObj.get("name");    
+    var npcHealth = 0;
+    var npcMaxHealth = 0;
+    if (applyArmor=="n"){
+        var npcArmor = 0;
+    } else {
+        var npcArmor = parseInt(getAttrByName(characterObj.id, "Armor", "current"));
+        if (isNaN(npcArmor)) {npcArmor=0;};
+    };
+    // Is the token linked to the character ("full NPC") or a Mook ?
+    var isChar = tokenObj.get("bar1_link");
+    if (isChar == "") {
+        // It's a Mook : get the bars value
+        npcHealth = parseInt(tokenObj.get("bar2_value"));
+        npcMaxHealth = parseInt(tokenObj.get("bar2_max"));
+    } else {
+        // It's a "full" character NPC : get the attributes values
+        var attObjArray = findObjs({
+                        _type: 'attribute',
+                        name: "Health",
+                        _characterid: characterObj.id
+                    });
+        if (attObjArray == false) {
+            sendChat("GM", "/w gm npcDamage() Error : this character has no Health attribute!");
+            return;
+        } else {
+            npcHealth=parseInt(attObjArray[0].get("current"));
+            npcMaxHealth=parseInt(attObjArray[0].get("max"));
+        };
+    };
+    if (isNaN(npcHealth)) {npcHealth=0;};
+    if (isNaN(npcMaxHealth)) {npcMaxHealth=0;};
+    // In case the Health attribute / bar has no maximum value
+    npcMaxHealth = Math.max(npcHealth, npcMaxHealth);
+    if (dmg > 0) {
+        dmg = Math.max((dmg - npcArmor),0);
+    };
+    var npcHealthFinal = Math.min(Math.max((npcHealth - dmg),0),npcMaxHealth);
+    if (isChar == "") {
+        // Mook : update bars onbly    
+        tokenObj.set("bar2_max", npcMaxHealth);
+        tokenObj.set("bar2_value",npcHealthFinal);
+    } else {
+        // Update character attributes
+        attObjArray[0].set("max",npcMaxHealth);
+        attObjArray[0].set("current",npcHealthFinal);
+    };
+    if (npcHealthFinal == 0){
+        tokenObj.set("status_dead", true);
+    } else {
+        tokenObj.set("status_dead", false);
+    };
+    sendChat("GM", "/w gm " + npcName + " takes " + dmg + "/" + dmgDealt + " damage. Health: " + npcHealth + "->" + npcHealthFinal + ".");
+    return;    
+};
+//------------------------------------------------------------------------------
 function restChar(characterObj,tokenObj) {
   //Total rest for the character/10 hours sleep
 	var characterName = characterObj.get("name");    
@@ -138,9 +329,9 @@ function restChar(characterObj,tokenObj) {
     //Markers & States & Damage track
     checkCharStates(characterObj,tokenObj);
     //output
-	sendChat("character|"+characterObj.get("id"), "<span style='color:green;'>is completly rested.</span>");
+	sendChat("character|"+characterObj.get("id"), "<span style='color:green;'>is fully rested.</span>");
 };
-//---------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 function initRoll(characterObj,tokenObj,efforts,rollBonus,statexp) {
   // WARNING : 
   ///    - Not the standard Numenera initiative roll : Add the effort and rollbonus to the roll and add it to the tracker.
@@ -229,17 +420,17 @@ function initRoll(characterObj,tokenObj,efforts,rollBonus,statexp) {
     };    
     sendChat("character|"+charId, ""+success+"</ul>");
 };
-//---------------------------------------------------------------------------------------------------------------------------------------------
-function numeneRoll(characterObj,tokenObj,statName,difficulty,efforts,rollBonus,statexp,whoRolled) {
-    // ROll D20 with eventual might, speed or intellect effort(s), versus a difficulty (optional),
+//------------------------------------------------------------------------------
+function numeneRoll(characterObj,tokenObj,statName,difficulty,effortsOnRoll,rollBonus,statexp,whoRolled,effortsOnDmg) {
+    // ROll D20 with eventual might, speed or intellect effort to roll and/or to damage
+    //versus a difficulty (optional),
     // with optional appiable effort, optional bonus to the roll, 
     // and optional more stat points expenditure (like a special ability cost and/or damage effort)
     // difficulty is the level of difficulty, not the target number. The target number is calculated by the function.
     // if difficulty is 0, the roll still happens, but is not confronted to any difficulty
     // stat pool is diminished except if it rolls 20
-    // checkstate is called is stat pool is dimished
-    
-    var charId = characterObj.get("id");
+    // checkstate is called if stat pool is dimished
+        var charId = characterObj.get("id");
     //checking the character damage track
     var damagetrack=parseInt(getAttrByName(characterObj.id, "damage-track", "current"));
     if (damagetrack > 1) {
@@ -287,7 +478,7 @@ function numeneRoll(characterObj,tokenObj,statName,difficulty,efforts,rollBonus,
     };
     attrEdge = parseInt(getAttrByName(characterObj.id, edgename, "current"));
     attrEffort = parseInt(getAttrByName(characterObj.id, "effort", "current"));
-
+ 
     //Checking the bonus to roll
     var bonusToRoll = parseInt(rollBonus);
     if( bonusToRoll >= 3 ) {
@@ -297,11 +488,13 @@ function numeneRoll(characterObj,tokenObj,statName,difficulty,efforts,rollBonus,
     // Rolling the dice
     var diceRoll = randomInteger(20);
     var finalRoll = diceRoll + bonusToRoll;
-
+ 
     // checking for appliable effort 
     // and calculating statpool cost        
     var effortsUsed = 0;
-    effortsUsed = parseInt(efforts);
+    var effortRoll = parseInt(0 || effortsOnRoll);
+    var effortDmg = parseInt(0 || effortsOnDmg),
+    effortsUsed = effortRoll + effortDmg;
     var statExpense = parseInt(statexp);
     var effortCost = 0;
     var totalCost = 0;
@@ -331,24 +524,31 @@ function numeneRoll(characterObj,tokenObj,statName,difficulty,efforts,rollBonus,
     //computing target task
     var targetRoll = 0;
     if (parseInt(difficulty) > 0) {
-        targetRoll = (parseInt(difficulty)-effortsUsed)*3;
+        targetRoll = (parseInt(difficulty)-effortRoll)*3;
     };
     
     // Checking result
-    var success = "<b><span style='color:blue;'>" + attNameInChat + " roll</span></b><ul style='list-style-type : disc;'>";
+    var success = "<b><span style='color:blue;'>" + attNameInChat + " roll</span></b> (Edge:"+attrEdge+")<ul style='list-style-type : disc;'>";
     var specialEffect = "";
-    if ((effortsUsed > 0) || (statExpense > 0)) {
-        success = success + "<li>Spending " + totalCost + " point(s) (" + effortCost + "+" + statExpense + "-" + attrEdge + ").</li>";
-    };
-    if (effortsUsed > 0) {
-        success = success + "<li>Applying " + effortsUsed + " <u>Effort(s)</u>.</li>";
+    if ( ( (effortsUsed > 0) || (statExpense > 0) ) && (diceRoll != 20) ) {
+        success = success + "<li>Spending " + totalCost + " point(s) (" + effortCost + "+" + statExpense + "-" + attrEdge + "):<ul>";
+        if (effortRoll > 0) {
+            success = success + "<li><u>Effort</u> to roll: " + effortRoll + "</li>";
+        };
+        if (effortDmg > 0) {
+            success = success + "<li><u>Effort</u> to damage: " + effortDmg + " (+"+(effortDmg*3)+" points of damage)</li>";
+        };
+        if (statExpense > 0) {
+            success = success + "<li><u>Additionnal cost</u>: " + statExpense + "</li>";
+        };
+        success = success + "</ul></li>";
     };
     if (bonusToRoll != 0) {
-        success = success + "<li>With a <u>Bonus</u> of " + bonusToRoll + ".</li>";
+        success = success + "<li>With a <u>Bonus</u> of " + bonusToRoll + "</li>";
     };    
     // If not an automatic success or a known difficulty
     if (targetRoll > 0) {
-        success = success + "<li>Against a <u>Difficulty</u> of " + difficulty + " (final target : " + targetRoll + ").</li>";
+        success = success + "<li>Against a <u>Difficulty</u> of " + difficulty + " (final target: " + targetRoll + ")</li>";
         if( finalRoll >= targetRoll) {
             success = success + "<li><strong><span style='color:green;'>Success (" + diceRoll+"+"+bonusToRoll+" = "+finalRoll + ")!</span></strong></li>";
         }
@@ -363,36 +563,36 @@ function numeneRoll(characterObj,tokenObj,statName,difficulty,efforts,rollBonus,
                 // if character is haled, special success is possible
                 switch (diceRoll) {
                     case 17:
-                        specialEffect = "<li><u>Effect</u>: <span style='color:green;'>+1 damage (Attack/Ability roll).</span></li>";
+                        specialEffect = "<li><u>Effect</u>: <span style='color:green;'>+1 damage (Attack/Ability roll)</span></li>";
                         break;
                     case 18:
-                        specialEffect = "<li><u>Effect</u>: <span style='color:green;'>+2 damage (Attack/Ability roll).</span></li>";
+                        specialEffect = "<li><u>Effect</u>: <span style='color:green;'>+2 damage (Attack/Ability roll)</span></li>";
                         break;
                     case 19:
-                        specialEffect = "<li><u>Effect</u>: <span style='color:green;'>+3 damage (Attack/Ability roll) or Minor Effect.</span></li>";
+                        specialEffect = "<li><u>Effect</u>: <span style='color:green;'>+3 damage (Attack/Ability roll) or Minor Effect</span></li>";
                         break;
                     case 20:
-                        specialEffect = "<li><u>Effect</u>: <span style='color:green;'>+3 damage (Attack/Ability roll) or Major Effect. Stat pool points not spent.</span></li>";
+                        specialEffect = "<li><u>Effecs</u>: <span style='color:green;'>+3 damage (Attack/Ability roll) or Major Effect<br/>Stat pool points not spent</span></li>";
                         break;
                      default:
                         specialEffect = "";
                 }
             } else if (diceRoll == 20) {
                     // if character is impaired
-                    specialEffect = "<li><u>Effect</u> : <span style='color:green;'>Stat pool points not spent.</span></li>";
+                    specialEffect = "<li><u>Effect</u>: <span style='color:green;'>Stat pool points not spent</span></li>";
             };
         };
     } else {     // automatic success or no known difficulty
         if (parseInt(difficulty) > 0) {
-            success = success + "<li><strong><span style='color:green;'>And automatically succeeds (Difficulty " + difficulty + ")!</span></strong></li>";
+            success = success + "<li><strong><span style='color:green;'>And automatically succeeds (Difficulty " + difficulty + " / final target: " + targetRoll + ")!</span></strong></li>";
         } else {
-            success = success + "<li><u>Result</u> : <strong>" + finalRoll + ".</strong></li>";
+            success = success + "<li><u>Result</u>: <strong>" + finalRoll + ".</strong></li>";
         };
     };    
     //output
     sendChat("character|"+charId, ""+success+specialEffect+"</ul>");
 };
-//---------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 function recoveryRoll(characterObj,tokenObj){
     var charId = characterObj.get("id");
     var recovObjArray = findObjs({
@@ -436,105 +636,4 @@ function recoveryRoll(characterObj,tokenObj){
     output = output + "<li>Next rest will require : <b>" + nextRecLib + "</b>.</li>";
     sendChat("character|" + charId, "" + output +"</ul>");
 };
-//---------------------------------------------------------------------------------------------------------------------------------------------
-on("chat:message", function(msg) {
-    if (msg.type == "api") {
-        // sendChat("", "/desc TEST API.");
-        if(!msg.selected) {
-    		sendChat("", "/desc Select a character token and try again...");
-			return; //quit if nothing selected
-		};
-        if (msg.content.indexOf("!nathanum-") !== 0) {
-        	// sendChat("", "/desc Fonction inconnue.");
-            return;
-        } else {
-            var functionCalled = msg.content.split(" ")[0];
-        };
-        if (functionCalled == "!nathanum-numeneroll") {
-            var Parameters = msg.content.split("!nathanum-numeneroll ")[1];
-            var tokenId = Parameters.split("|")[0];
-            var tokenObj=getObj("graphic", tokenId);
-            var charId = tokenObj.get("represents");
-            if(charId != "") {
-                var characterObj = getObj("character", charId);
-            } else {
-                sendChat("","The selected token doesn't represent a character.");
-                return false;
-            };
-            var statName = Parameters.split("|")[1];
-            var difficulty = parseInt(Parameters.split("|")[2]);
-            var effortsUsed = parseInt(Parameters.split("|")[3]);
-            var rollbonus = parseInt(Parameters.split("|")[4]);
-            var statexp = parseInt(Parameters.split("|")[5]);
-			numeneRoll(characterObj,tokenObj,statName,difficulty,effortsUsed,rollbonus,statexp,msg.who);        
-            return;
-        };
-        if (functionCalled == "!nathanum-attrib") {
-            var Parameters = msg.content.split("!nathanum-attrib ")[1];
-            var tokenId = Parameters.split("|")[0];
-            var attributeName = Parameters.split("|")[1];
-    		var newValue = Parameters.split("|")[2];
-            var tokenObj=getObj("graphic", tokenId);
-            var charId = tokenObj.get("represents");
-            if(charId != "") {
-                var characterObj = getObj("character", charId);
-            } else {
-                sendChat("","The selected token doesn't represent a character.");
-                return false;
-            };
-            var attributeObjArray = findObjs({
-                _type: 'attribute',
-                name: attributeName,
-                _characterid: characterObj.id
-            });                    
-			if (attributeObjArray == false) return;
-			attrib(characterObj,attributeObjArray,newValue,tokenObj);
-            return;
-        }; 
-        if (functionCalled == "!nathanum-recoveryroll") {
-            var tokenId = msg.content.split("!nathanum-recoveryroll ")[1];
-            var tokenObj=getObj("graphic", tokenId);
-            var charId = tokenObj.get("represents");
-            if(charId != "") {
-                var characterObj = getObj("character", charId);
-            } else {
-                sendChat("","The selected token doesn't represent a character.");
-                return false;
-            };
-    		recoveryRoll(characterObj,tokenObj);        
-            return;
-        };
-        if (functionCalled == "!nathanum-initroll") {
-            var Parameters = msg.content.split("!nathanum-initroll ")[1];
-            var tokenId = Parameters.split("|")[0];
-            var tokenObj=getObj("graphic", tokenId);
-            var charId = tokenObj.get("represents");
-            if(charId != "") {
-                var characterObj = getObj("character", charId);
-            } else {
-                sendChat("","The selected token doesn't represent a character.");
-                return false;
-            };
-            var effortsUsed = parseInt(Parameters.split("|")[1]);
-            var rollbonus = parseInt(Parameters.split("|")[2]);
-            var statexp = parseInt(Parameters.split("|")[3]);
-			initRoll(characterObj,tokenObj,effortsUsed,rollbonus,statexp);        
-            return;
-        };
-        if (functionCalled == "!nathanum-restchar") {
-            var Parameters = msg.content.split("!nathanum-restchar ")[1];
-            var tokenId = Parameters.split("|")[0];
-            var tokenObj=getObj("graphic", tokenId);
-            var charId = tokenObj.get("represents");
-            if(charId != "") {
-                var characterObj = getObj("character", charId);
-            } else {
-                sendChat("","The selected token doesn't represent a character.");
-                return false;
-            };
-    		restChar(characterObj,tokenObj);
-            return;
-        }; 
-    };
-});
-//---------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------

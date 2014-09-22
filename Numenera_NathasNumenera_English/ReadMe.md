@@ -44,8 +44,13 @@ See [Numenera_NathasNumenera_French](https://github.com/Roll20/roll20-character-
 7. Repeat steps 4 to 6 for every other characters and you're set. 
 
 # Release Notes
+##Release 2.7 (09/22/2014)
+No change to the character sheet.
+Updates to the API functions (NathasNumenera_Roll20_API.js) and macros (NathasNumenera_Roll20_Macros.md) :
+1. New function/macro to apply damage to NPC (Character doit avoir les attributs : Health et Armor)
+2. Update to the stats rolls (function and macros) : now handles damage effort and the chat output has been corrected.
 
-## Release 2.01 (07/29/2014)
+## Release 2.1 (07/29/2014)
 1. Updated **NathasNumenera_Roll20_CharacterSheet_Layout.htm**
   1. More detailed "Advancement" section, with one field/attribute per advancement per tier
   2. After updating the layout in campaigns with existing characters, you can delete the prospective old advancement attributes like "xp-edge", "xp-stat"... (don't delete the "xp" attribute though!)
