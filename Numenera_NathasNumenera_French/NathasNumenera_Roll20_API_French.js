@@ -1,8 +1,133 @@
-//---------------------------------------------------------------------------------------------------------------------------------------------
+/*
+Natha's Numenera rolls functions for Natha's Roll20 Numenera Character Sheet.
+French
+v2.7 - 2014/09/22
+ 
+Documentation needed ...
+ */
+//-----------------------------------------------------------------------------
+on("chat:message", function(msg) {
+    if (msg.type == "api") {
+        // sendChat("", "/desc TEST API.");
+        if(!msg.selected) {
+        	sendChat("", "/desc S&eacute;lectionnez un pion et essayez encore.");
+			return; //quit if nothing selected
+		};
+        if (msg.content.indexOf("!nathanum-") !== 0) {
+        	// sendChat("", "/desc Fonction inconnue.");
+            return;
+        } else {
+            var functionCalled = msg.content.split(" ")[0];
+        };
+        if (functionCalled == "!nathanum-numeneroll") {
+            var Parameters = msg.content.split("!nathanum-numeneroll ")[1];
+            var tokenId = Parameters.split("|")[0];
+            var tokenObj=getObj("graphic", tokenId);
+            var charId = tokenObj.get("represents");
+            if(charId != "") {
+                var characterObj = getObj("character", charId);
+            } else {
+                sendChat(""," Le pion s&eacute;lectionn&eacute; n'est pas un personnage.");
+                return false;
+            };
+            var statName = Parameters.split("|")[1];
+            var difficulty = parseInt(Parameters.split("|")[2]);
+            var effortsOnRoll = parseInt(Parameters.split("|")[3]);
+            var rollbonus = parseInt(Parameters.split("|")[4]);
+            var statexp = parseInt(Parameters.split("|")[5]);
+    		var effortsOnDmg = parseInt(Parameters.split("|")[6]);
+            numeneRoll(characterObj,tokenObj,statName,difficulty,effortsOnRoll,rollbonus,statexp,msg.who,effortsOnDmg);
+            return;
+        };
+        if (functionCalled == "!nathanum-attrib") {
+            var Parameters = msg.content.split("!nathanum-attrib ")[1];
+            var tokenId = Parameters.split("|")[0];
+            var attributeName = Parameters.split("|")[1];
+    		var newValue = Parameters.split("|")[2];
+            var tokenObj=getObj("graphic", tokenId);
+            var charId = tokenObj.get("represents");
+            if(charId != "") {
+                var characterObj = getObj("character", charId);
+            } else {
+                sendChat(""," Le pion s&eacute;lectionn&eacute; n'est pas un personnage.");
+                return false;
+            };
+            var attributeObjArray = findObjs({
+                _type: 'attribute',
+                name: attributeName,
+                _characterid: characterObj.id
+            });
+			if (attributeObjArray == false) return;
+			attrib(characterObj,attributeObjArray,newValue,tokenObj);
+            return;
+        };
+        if (functionCalled == "!nathanum-recoveryroll") {
+            var tokenId = msg.content.split("!nathanum-recoveryroll ")[1];
+            var tokenObj=getObj("graphic", tokenId);
+            var charId = tokenObj.get("represents");
+            if(charId != "") {
+                var characterObj = getObj("character", charId);
+            } else {
+                sendChat(""," Le pion s&eacute;lectionn&eacute; n'est pas un personnage.");
+                return false;
+            };
+    		recoveryRoll(characterObj,tokenObj);
+            return;
+        };
+        if (functionCalled == "!nathanum-initroll") {
+            var Parameters = msg.content.split("!nathanum-initroll ")[1];
+            var tokenId = Parameters.split("|")[0];
+            var tokenObj=getObj("graphic", tokenId);
+            var charId = tokenObj.get("represents");
+            if(charId != "") {
+                var characterObj = getObj("character", charId);
+            } else {
+                sendChat(""," Le pion s&eacute;lectionn&eacute; n'est pas un personnage.");
+                return false;
+            };
+            var effortsUsed = parseInt(Parameters.split("|")[1]);
+            var rollbonus = parseInt(Parameters.split("|")[2]);
+            var statexp = parseInt(Parameters.split("|")[3]);
+			initRoll(characterObj,tokenObj,effortsUsed,rollbonus,statexp);
+            return;
+        };
+        if (functionCalled == "!nathanum-restchar") {
+            var Parameters = msg.content.split("!nathanum-restchar ")[1];
+            var tokenId = Parameters.split("|")[0];
+            var tokenObj=getObj("graphic", tokenId);
+            var charId = tokenObj.get("represents");
+            if(charId != "") {
+                var characterObj = getObj("character", charId);
+            } else {
+                sendChat(""," Le pion s&eacute;lectionn&eacute; n'est pas un personnage.");
+                return false;
+            };
+    		restChar(characterObj,tokenObj);
+            return;
+        };
+        if (functionCalled == "!nathanum-npcdmg") {
+            var Parameters = msg.content.split("!nathanum-npcdmg ")[1];
+            var tokenId = Parameters.split("|")[0];
+            var dmgDealt = Parameters.split("|")[1];
+            var applyArmor =  Parameters.split("|")[2];
+            var tokenObj=getObj("graphic", tokenId);
+            var charId = tokenObj.get("represents");
+            if(charId != "") {
+                var characterObj = getObj("character", charId);
+            } else {
+                sendChat("","The selected token doesn't represent a character.");
+                return false;
+            };
+            npcDamage(characterObj,tokenObj,dmgDealt,applyArmor);
+            return;
+        }; 
+    };
+});
+//-----------------------------------------------------------------------------
 function attrib(characterObj,attributeObjArray,newValue,tokenObj) {
         //modification d'un attribut d'un personnage
         var attributeName = attributeObjArray[0].get("name");
-		var attributeValue = attributeObjArray[0].get("current");
+    	var attributeValue = attributeObjArray[0].get("current");
 		var characterName = characterObj.get("name");
         var maxValue = 0;
         var finalValue = 0;
@@ -52,7 +177,7 @@ function attrib(characterObj,attributeObjArray,newValue,tokenObj) {
 		//output
 		sendChat("character|"+characterObj.get("id"), "<span style='color:blue;'>" + attributeLib + "("+attributeName+")" + "</span> : " + attributeValue + " -> " + finalValue + ".");
 };
-//---------------------------------------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 function checkCharStates(characterObj,tokenObj) {
     //var tokenObj = getObj("graphic", tokenId);
     var might = 0;
@@ -102,7 +227,7 @@ function checkCharStates(characterObj,tokenObj) {
         }
     };
 };
-//---------------------------------------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 function restChar(characterObj,tokenObj) {
     //repos total d'un personnage
     //DEBUG : sendChat("", "/desc Repos");
@@ -142,7 +267,7 @@ function restChar(characterObj,tokenObj) {
     //output
 	sendChat("character|"+characterObj.get("id"), "<span style='color:green;'>est compl&egrave;tement repos&eacute;.</span>");
 };
-//---------------------------------------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 function initRoll(characterObj,tokenObj,efforts,rollBonus,statexp) {
   // BEWARE : Not the standard Numenera initiative roll !
   // Add the effort and rollbonus to the roll and add it to the tracker.
@@ -229,8 +354,8 @@ function initRoll(characterObj,tokenObj,efforts,rollBonus,statexp) {
     };
     sendChat("character|"+charId, ""+success+"</ul>");
 };
-//---------------------------------------------------------------------------------------------------------------------------------------------
-function numeneRoll(characterObj,tokenObj,statName,difficulty,efforts,rollBonus,statexp,whoRolled) {
+//-----------------------------------------------------------------------------
+function numeneRoll(characterObj,tokenObj,statName,difficulty,effortsOnRoll,rollBonus,statexp,whoRolled,effortsOnDmg) {
     // ROll D20 with eventual might, speed or intellect effort(s), versus a difficulty (optional)
     // use "!numeneroll" in the chat or macro with parameters like these, separated with pipes : name-of-the-stat|efforts-used|difficulty
     // name-of-the-stat might be one of : might or speed or intellect
@@ -300,7 +425,9 @@ function numeneRoll(characterObj,tokenObj,statName,difficulty,efforts,rollBonus,
     // checking for appliable effort
     // and calculating statpool cost
     var effortsUsed = 0;
-    effortsUsed = parseInt(efforts);
+    var effortRoll = parseInt(0 || effortsOnRoll);
+    var effortDmg = parseInt(0 || effortsOnDmg),
+    effortsUsed = effortRoll + effortDmg;
     var statExpense = parseInt(statexp);
     var effortCost = 0;
     var totalCost = 0;
@@ -330,17 +457,24 @@ function numeneRoll(characterObj,tokenObj,statName,difficulty,efforts,rollBonus,
     //computing target task
     var targetRoll = 0;
     if (parseInt(difficulty) > 0) {
-        targetRoll = (parseInt(difficulty)-effortsUsed)*3;
+        targetRoll = (parseInt(difficulty)-effortRoll)*3;
     };
 
     // Checking result
-    var success = "<b><span style='color:blue;'>Jet de " + attNameInChat + "</span></b><ul style='list-style-type : disc;'>";
+    var success = "<b><span style='color:blue;'>Jet de " + attNameInChat + "</span></b> (Atout :"+attrEdge+")<ul style='list-style-type : disc;'>";
     var specialEffect = "";
     if ((effortsUsed > 0) || (statExpense > 0)) {
-        success = success + "<li>D&eacute;pense " + totalCost + " point(s) (" + effortCost + "+" + statExpense + "-" + attrEdge + ").</li>";
-    };
-    if (effortsUsed > 0) {
-        success = success + "<li>En appliquant " + effortsUsed + " <u>Effort(s)</u>.</li>";
+        success = success + "<li><u>D&eacute;pense</u> " + totalCost + " point(s) (" + effortCost + "+" + statExpense + "-" + attrEdge + ") :<ul>";
+        if (effortRoll > 0) {
+            success = success + "<li>Effort(s) au <u>jet</u> : " + effortRoll + "</li>";
+        };
+        if (effortDmg > 0) {
+            success = success + "<li>Effort(s) aux <u>d&eacute;g&acirc;ts</u> : " + effortDmg + " (+"+(effortDmg*3)+" points de d&eacute;g&acirc;ts)</li>";
+        };
+        if (statExpense > 0) {
+            success = success + "<li>Co&ucirc;t suppl&eacute;mentaire : " + statExpense + "</li>";
+        };
+        success = success + "</ul></li>";
     };
     if (bonusToRoll != 0) {
         success = success + "<li>Avec un <u>Bonus</u> de " + bonusToRoll + ".</li>";
@@ -356,34 +490,34 @@ function numeneRoll(characterObj,tokenObj,statName,difficulty,efforts,rollBonus,
         };
         //special dice roll result treatment
         if (diceRoll == 1) {
-                specialEffect = "<li><u>Effet suppl&eacute;mentaire</u> : <span style='color:red;'>subit d&eacute;gâts +2 (en d&eacute;fense) ou une intrusion du MJ !</span></li>";
+                specialEffect = "<li><u>Effet suppl&eacute;mentaire</u> : <span style='color:red;'>subit d&eacute;g&acirc;ts +2 (en d&eacute;fense) ou une intrusion du MJ !</span></li>";
         } else {
             if (damagetrack == 0) {
                 // if character is haled, special success is possible
                 switch (diceRoll) {
                     case 17:
-                        specialEffect = "<li><u>Effet suppl&eacute;mentaire</u> : <span style='color:green;'>si jet d'attaque : D&eacute;gâts +1.</span></li>";
+                        specialEffect = "<li><u>Effet suppl&eacute;mentaire</u> : <span style='color:green;'>si jet d'attaque : D&eacute;g&acirc;ts +1.</span></li>";
                         break;
                     case 18:
-                        specialEffect = "<li><u>Effet suppl&eacute;mentaire</u> : <span style='color:green;'>si jet d'attaque : D&eacute;gâts +2.</span></li>";
+                        specialEffect = "<li><u>Effet suppl&eacute;mentaire</u> : <span style='color:green;'>si jet d'attaque : D&eacute;g&acirc;ts +2.</span></li>";
                         break;
                     case 19:
-                        specialEffect = "<li><u>Effet suppl&eacute;mentaire</u> : <span style='color:green;'>si jet d'attaque : D&eacute;gâts +3, ou un Effet Mineur.</span></li>";
+                        specialEffect = "<li><u>Effet suppl&eacute;mentaire</u> : <span style='color:green;'>si jet d'attaque : D&eacute;g&acirc;ts +3, ou un Effet Mineur.</span></li>";
                         break;
                     case 20:
-                        specialEffect = "<li><u>Effet suppl&eacute;mentaire</u> : <span style='color:green;'>si jet d'attaque : D&eacute;gâts +4,  ou un Effet Majeur. Attribut non diminu&eacute;.</span></li>";
+                        specialEffect = "<li><u>Effets suppl&eacute;mentaires</u> : <span style='color:green;'>si jet d'attaque : D&eacute;g&acirc;ts +4, ou un Effet Majeur.<br/>Points d'Attribut non d&eacute;pens&eacute;s.</span></li>";
                         break;
                      default:
                         specialEffect = "";
                 }
             } else if (diceRoll == 20) {
                     // if character is impaired
-                    specialEffect = "<li><u>Effet suppl&eacute;mentaire</u> : <span style='color:green;'> Attribut non diminu&eacute;.</span></li>";
+                    specialEffect = "<li><u>Effet suppl&eacute;mentaire</u> : <span style='color:green;'>Points d'Attribut non d&eacute;pens&eacute;s.</span></li>";
             };
         };
     } else {     // automatic success or no known difficulty
         if (parseInt(difficulty) > 0) {
-            success = success + "<li><strong><span style='color:green;'>Et r&eacute;ussit automatiquement (Difficult&eacute; " + difficulty + ") !</span></strong></li>";
+            success = success + "<li><strong><span style='color:green;'>Et r&eacute;ussit automatiquement (Difficult&eacute; " + difficulty + " / cible : " + targetRoll + ") !</span></strong></li>";
         } else {
             success = success + "<li><u>R&eacute;sultat</u> : <strong>" + finalRoll + ".</strong></li>";
         };
@@ -391,7 +525,7 @@ function numeneRoll(characterObj,tokenObj,statName,difficulty,efforts,rollBonus,
     //output
     sendChat("character|"+charId, ""+success+specialEffect+"</ul>");
 };
-//---------------------------------------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 function recoveryRoll(characterObj,tokenObj){
     var charId = characterObj.get("id");
     var recovObjArray = findObjs({
@@ -435,105 +569,70 @@ function recoveryRoll(characterObj,tokenObj){
     output = output + "<li>Prochain jet/repos : <b>" + nextRecLib + "</b>.</li>";
     sendChat("character|" + charId, "" + output +"</ul>");
 };
-//---------------------------------------------------------------------------------------------------------------------------------------------
-on("chat:message", function(msg) {
-    if (msg.type == "api") {
-        // sendChat("", "/desc TEST API.");
-        if(!msg.selected) {
-    		sendChat("", "/desc S&eacute;lectionnez un pion et essayez encore.");
-			return; //quit if nothing selected
-		};
-        if (msg.content.indexOf("!nathanum-") !== 0) {
-        	// sendChat("", "/desc Fonction inconnue.");
+//------------------------------------------------------------------------------
+function npcDamage(characterObj,tokenObj,dmgDealt, applyArmor) {
+    // Apply damage (or healing if dmdDeal is negative ...) to Numenera NPC/Creature
+    // And set "death" marker if health is 0 or less.
+    // The Mook or Non Player full Character must have the following attributes :
+    //  - Level (token bar1)
+    //  - Health (token bar2)
+    //  - Armor (token bar3)
+    // Armor will diminish damage unless "applyArmor"='n'
+    var dmg = parseInt(dmgDealt);
+    if (isNaN(dmg)) {dmg=0;};
+    var npcName = characterObj.get("name");    
+    var npcHealth = 0;
+    var npcMaxHealth = 0;
+    if (applyArmor=="n"){
+        var npcArmor = 0;
+    } else {
+        var npcArmor = parseInt(getAttrByName(characterObj.id, "Armor", "current"));
+        if (isNaN(npcArmor)) {npcArmor=0;};
+    };
+    // Is the token linked to the character ("full NPC") or a Mook ?
+    var isChar = tokenObj.get("bar1_link");
+    if (isChar == "") {
+        // It's a Mook : get the bars value
+        npcHealth = parseInt(tokenObj.get("bar2_value"));
+        npcMaxHealth = parseInt(tokenObj.get("bar2_max"));
+    } else {
+        // It's a "full" character NPC : get the attributes values
+        var attObjArray = findObjs({
+                        _type: 'attribute',
+                        name: "Health",
+                        _characterid: characterObj.id
+                    });
+        if (attObjArray == false) {
+            sendChat("GM", "/w gm npcDamage() Error : this character has no Health attribute!");
             return;
         } else {
-            var functionCalled = msg.content.split(" ")[0];
-        };
-        if (functionCalled == "!nathanum-numeneroll") {
-            var Parameters = msg.content.split("!nathanum-numeneroll ")[1];
-            var tokenId = Parameters.split("|")[0];
-            var tokenObj=getObj("graphic", tokenId);
-            var charId = tokenObj.get("represents");
-            if(charId != "") {
-                var characterObj = getObj("character", charId);
-            } else {
-                sendChat(""," Le pion s&eacute;lectionn&eacute; n'est pas un personnage.");
-                return false;
-            };
-            var statName = Parameters.split("|")[1];
-            var difficulty = parseInt(Parameters.split("|")[2]);
-            var effortsUsed = parseInt(Parameters.split("|")[3]);
-            var rollbonus = parseInt(Parameters.split("|")[4]);
-            var statexp = parseInt(Parameters.split("|")[5]);
-			numeneRoll(characterObj,tokenObj,statName,difficulty,effortsUsed,rollbonus,statexp,msg.who);
-            return;
-        };
-        if (functionCalled == "!nathanum-attrib") {
-            var Parameters = msg.content.split("!nathanum-attrib ")[1];
-            var tokenId = Parameters.split("|")[0];
-            var attributeName = Parameters.split("|")[1];
-    		var newValue = Parameters.split("|")[2];
-            var tokenObj=getObj("graphic", tokenId);
-            var charId = tokenObj.get("represents");
-            if(charId != "") {
-                var characterObj = getObj("character", charId);
-            } else {
-                sendChat(""," Le pion s&eacute;lectionn&eacute; n'est pas un personnage.");
-                return false;
-            };
-            var attributeObjArray = findObjs({
-                _type: 'attribute',
-                name: attributeName,
-                _characterid: characterObj.id
-            });
-			if (attributeObjArray == false) return;
-			attrib(characterObj,attributeObjArray,newValue,tokenObj);
-            return;
-        };
-        if (functionCalled == "!nathanum-recoveryroll") {
-            var tokenId = msg.content.split("!nathanum-recoveryroll ")[1];
-            var tokenObj=getObj("graphic", tokenId);
-            var charId = tokenObj.get("represents");
-            if(charId != "") {
-                var characterObj = getObj("character", charId);
-            } else {
-                sendChat(""," Le pion s&eacute;lectionn&eacute; n'est pas un personnage.");
-                return false;
-            };
-    		recoveryRoll(characterObj,tokenObj);
-            return;
-        };
-        if (functionCalled == "!nathanum-initroll") {
-            var Parameters = msg.content.split("!nathanum-initroll ")[1];
-            var tokenId = Parameters.split("|")[0];
-            var tokenObj=getObj("graphic", tokenId);
-            var charId = tokenObj.get("represents");
-            if(charId != "") {
-                var characterObj = getObj("character", charId);
-            } else {
-                sendChat(""," Le pion s&eacute;lectionn&eacute; n'est pas un personnage.");
-                return false;
-            };
-            var effortsUsed = parseInt(Parameters.split("|")[1]);
-            var rollbonus = parseInt(Parameters.split("|")[2]);
-            var statexp = parseInt(Parameters.split("|")[3]);
-			initRoll(characterObj,tokenObj,effortsUsed,rollbonus,statexp);
-            return;
-        };
-        if (functionCalled == "!nathanum-restchar") {
-            var Parameters = msg.content.split("!nathanum-restchar ")[1];
-            var tokenId = Parameters.split("|")[0];
-            var tokenObj=getObj("graphic", tokenId);
-            var charId = tokenObj.get("represents");
-            if(charId != "") {
-                var characterObj = getObj("character", charId);
-            } else {
-                sendChat(""," Le pion s&eacute;lectionn&eacute; n'est pas un personnage.");
-                return false;
-            };
-    		restChar(characterObj,tokenObj);
-            return;
+            npcHealth=parseInt(attObjArray[0].get("current"));
+            npcMaxHealth=parseInt(attObjArray[0].get("max"));
         };
     };
-});
-//---------------------------------------------------------------------------------------------------------------------------------------------
+    if (isNaN(npcHealth)) {npcHealth=0;};
+    if (isNaN(npcMaxHealth)) {npcMaxHealth=0;};
+    // In case the Health attribute / bar has no maximum value
+    npcMaxHealth = Math.max(npcHealth, npcMaxHealth);
+    if (dmg > 0) {
+        dmg = Math.max((dmg - npcArmor),0);
+    };
+    var npcHealthFinal = Math.min(Math.max((npcHealth - dmg),0),npcMaxHealth);
+    if (isChar == "") {
+        // Mook : update bars onbly    
+        tokenObj.set("bar2_max", npcMaxHealth);
+        tokenObj.set("bar2_value",npcHealthFinal);
+    } else {
+        // Update character attributes
+        attObjArray[0].set("max",npcMaxHealth);
+        attObjArray[0].set("current",npcHealthFinal);
+    };
+    if (npcHealthFinal == 0){
+        tokenObj.set("status_dead", true);
+    } else {
+        tokenObj.set("status_dead", false);
+    };    
+    sendChat("GM", "/w gm " + npcName + " takes " + dmg + "/" + dmgDealt + " damage. Health: " + npcHealth + "->" + npcHealthFinal + ".");
+    return;    
+};
+//------------------------------------------------------------------------------

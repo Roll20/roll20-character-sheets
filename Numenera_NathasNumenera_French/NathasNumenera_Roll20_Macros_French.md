@@ -1,4 +1,5 @@
 # MACROS de NATHA pour NUMENERA sur ROLL20
+v2.7 2014/09/22
 
 **LISEZ MOI :**
 
@@ -39,21 +40,21 @@ _Demande d'&eacute;ventuels : nombre d'Efforts de Vivacit&eacute;, bonus au jet,
 ```
 
 ## Jet:Robu.
-_Jet de Robustesse, demandant les &eacute;ventuelles donn&eacute;es suivantes : Niveau/Difficult&eacute; (pas la Cible !), nombre d'efforts, bonus au jet et d&eacute;pense suppl&eacute;mentaire d'attribut (utilisation d'une capacit&eacute; sp&eacute;ciale par exemple). Cela diminuera l'attribut, v&eacute;rifiera l'&eacute;tat g&eacute;n&eacute;ral, l'&eacute;tat du pion etc. Le jet est calcul&eacute;, le succ&egrave;s ou l'&eacute;chec aussi, et s'affiche (avec un &eacute;ventuel effet suppl&eacute;mentaire) dans le chat._
+_Jet de Robustesse, demandant les &eacute;ventuelles donn&eacute;es suivantes : Niveau/Difficult&eacute; (pas la Cible !), nombre d'efforts au jet, bonus au jet, d&eacute;pense suppl&eacute;mentaire d'attribut (utilisation d'une capacit&eacute; sp&eacute;ciale par exemple) et nombre d'efforts aux d&eacute;g&acirc;ts. Cela diminuera l'attribut, v&eacute;rifiera l'&eacute;tat g&eacute;n&eacute;ral, l'&eacute;tat du pion etc. Le jet est calcul&eacute;, le succ&egrave;s ou l'&eacute;chec aussi, et s'affiche (avec un &eacute;ventuel effet suppl&eacute;mentaire) dans le chat._
 ```
-!nathanum-numeneroll @{selected|token_id}|might|?{Difficult&eacute;|0}|?{Effort de Robustesse|0}|?{Bonus au jet|0}|?{Co&ucirc;t suppl&eacute;mentaire|0}
+!nathanum-numeneroll @{selected|token_id}|might|?{Jet de Robustesse : Difficult&eacute;|0}|?{Effort(s) au jet|0}|?{Bonus au jet|0}|?{Co&ucirc;t suppl&eacute;mentaire|0}|?{Effort(s) aux d&eacute;g&acirc;ts|0}
 ```
 
 ## Jet:Viva.
-_Jet de Vivacit&eacute;, demandant les &eacute;ventuelles donn&eacute;es suivantes : Niveau/Difficult&eacute; (pas la Cible !), nombre d'efforts, bonus au jet et d&eacute;pense suppl&eacute;mentaire d'attribut (utilisation d'une capacit&eacute; sp&eacute;ciale par exemple). Cela diminuera l'attribut, v&eacute;rifiera l'&eacute;tat g&eacute;n&eacute;ral, l'&eacute;tat du pion etc. Le jet est calcul&eacute;, le succ&egrave;s ou l'&eacute;chec aussi, et s'affiche (avec un &eacute;ventuel effet suppl&eacute;mentaire) dans le chat._
+_Jet de Vivacit&eacute; : cf. Jet:Robu._
 ```
-!nathanum-numeneroll @{selected|token_id}|speed|?{Difficult&eacute;|0}|?{Effort de Vivacit&eacute;|0}|?{Bonus au jet|0}|?{Co&ucirc;t suppl&eacute;mentaire|0}
+!nathanum-numeneroll @{selected|token_id}|speed|?{Jet de Vivacit&eacute; : Difficult&eacute;|0}|?{Effort(s) au jet|0}|?{Bonus au jet|0}|?{Co&ucirc;t suppl&eacute;mentaire|0}|?{Effort(s) aux d&eacute;g&acirc;ts|0}
 ```
 
 ## Jet:Ment.
-_Jet de Mental, demandant les &eacute;ventuelles donn&eacute;es suivantes : Niveau/Difficult&eacute; (pas la Cible !), nombre d'efforts, bonus au jet et d&eacute;pense suppl&eacute;mentaire d'attribut (utilisation d'une capacit&eacute; sp&eacute;ciale par exemple). Cela diminuera l'attribut, v&eacute;rifiera l'&eacute;tat g&eacute;n&eacute;ral, l'&eacute;tat du pion etc. Le jet est calcul&eacute;, le succ&egrave;s ou l'&eacute;chec aussi, et s'affiche (avec un &eacute;ventuel effet suppl&eacute;mentaire) dans le chat._
+_Jet de Mental : cf. Jet:Robu._
 ```
-!nathanum-numeneroll @{selected|token_id}|intellect|?{Difficult&eacute;|0}|?{Effort de Mental|0}|?{Bonus au jet|0}|?{Co&ucirc;t suppl&eacute;mentaire|0}
+!nathanum-numeneroll @{selected|token_id}|intellect|?{Jet de Mental : Difficult&eacute;|0}|?{Effort(s) au jet|0}|?{Bonus au jet|0}|?{Co&ucirc;t suppl&eacute;mentaire|0}|?{Effort(s) aux d&eacute;g&acirc;ts|0}
 ```
 
 ## R&eacute;cup.
@@ -70,4 +71,10 @@ _Repos long. Je sugg&egrave;re que cette macro soit r&eacute;serv&eacute;e au MJ
 **ATTENTION :** ne demande rien / pas de confirmation ...
 ```
 !nathanum-restchar @{selected|token_id}
+```
+
+## D&eacute;g&acirc;ts-PNJ
+_D&eacute;g&acirc;ts au pion de PNJ : le pion doit &ecirc;tre li&eacute; &agrave; un Character (Mook ou non) et avoir les attributs suivants : Health et Armor. Health doit &ecirc;tre li&eacute; &agrave; la bar2. Demande si l'armure s'applique ou non._
+```
+!nathanum-npcdmg @{selected|token_id}|?{D&eacute;g&acirc;ts +/-|0}|?{Appliquer Armure (y/n)|y}
 ```

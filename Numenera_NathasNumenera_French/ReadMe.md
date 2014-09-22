@@ -44,10 +44,16 @@ Voir en fin de fichier pour les notes de versions.
 
 # Notes de version
 
-## Version 2.02 (23/08/2014)
+## Version 2.7 (22/09/2014)
+Pas de modifications de la feuille de personnage.
+Modifications des fonctions API (NathasNumenera_Roll20_API_French.js) et des macros (NathasNumenera_Roll20_Macros_French.md) :
+1. Nouvelle fonction/macro pour appliquer des d&eacute;g&acirc;ts au PNJ (Character doit avoir les attributs : Health et Armor)
+2. &Eacute;volution de la fonction et macros de jets : gestions des efforts aux d&eacute;g&acirc;ts et refonte de l'affichage dans le chat.
+
+## Version 2.2 (23/08/2014)
 Encodage HTML de tous les accents (ReadMe.md, NathasNumenera_Roll20_Macros_French.md, NathasNumenera_Roll20_API_French.js, NathasNumenera_Roll20_CharacterSheet_Layout_French.htm).
 
-## Version 2.01 (29/07/2014)
+## Version 2.1 (29/07/2014)
 1. Mise &agrave; jour de **NathasNumenera_Roll20_CharacterSheet_Layout_French.htm** :
   1. Section "Avancement" plus d&eacute;taill&eacute;es, avec un attribut par avancement et par tiers.
   2. Vous pouvez supprimer des personnages existants les attributs xp-stats, xp-edge etc... qui ne seront plus utilis&eacute;s.
