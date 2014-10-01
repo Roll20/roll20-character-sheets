@@ -11,14 +11,14 @@ Voir en fin de fichier pour les notes de versions.
 2. Cliquer sur _"Campaign Settings"_
 3. Descendre dans la page de Settings jusqu'&agrave; voir _"Character Sheet Template"_
 4. Dans la liste d&eacute;roulante, choisir _"Custom"_
-5. Dans l'onglet _"HTML Layout"_, coller le contenu de _"NathasNumenera_Roll20_CharacterSheet_Layout_French.htm"_
-6. Dans l'onglet _"CSS Styling"_, coller le contenu de _"NathasNumenera_Roll20_CharacterSheet_CSS.css"_
+5. Dans l'onglet _"HTML Layout"_, coller le contenu de ce [fichier HTML](https://github.com/Roll20/roll20-character-sheets/blob/master/Numenera_NathasNumenera_French/NathasNumenera_Roll20_CharacterSheet_Layout_French.htm)
+6. Dans l'onglet _"CSS Styling"_, coller le contenu de ce [fichier CSS](https://github.com/Roll20/roll20-character-sheets/blob/master/Numenera_NathasNumenera_French/NathasNumenera_Roll20_CharacterSheet_CSS.css)
 7. Descendre en bas de la page et cliquer sur _"Save Changes"_
 
 ## Cr&eacute;er un personnage
 1. Cr&eacute;er un _"Character"_ dans le journal
 2. Remplir le nom, et dans l'onglet _"Character Sheet"_, remplir &agrave; minima les 3 Attributs (Valeur et Max) : Robustesse, Vivacit&eacute; et Mental
-3. Utiliser un pion (token)et : (voir la capture d'&eacute;cran _"NathasNumenera_setup_the_character_token.jpg"_)
+3. Modifier un pion (token) comme sur cette [image](https://github.com/Roll20/roll20-character-sheets/blob/master/Numenera_NathasNumenera_French/NathasNumenera_setup_the_character_token.jpg) :
   1. S'assurer que le pion repr&eacute;sente le personnage
   2. S&eacute;lectionner l'attribut _"might"_ pour la bar 1
   3. S&eacute;lectionner l'attribut _"speed"_ pour la bar 2
@@ -34,9 +34,9 @@ Voir en fin de fichier pour les notes de versions.
   1. Dans la page d'affichage du d&eacute;tail de la campagne concern&eacute;e, cliquer sur _"API Scripts"_
   2. S'il existe d&eacute;j&agrave; d'autres scripts que vous avez ajout&eacute;s, cliquer sur _"New Script"_
   3. Donner un nom au script dans _"Name"_ (par exemple : _"NathasNumenera"_)
-  4. Dans la section noire de script, coller le contenu de _"NathasNumenera_Roll20_API_French.js"_
+  4. Dans la section noire de la page, coller le contenu de ce [script API](https://gist.github.com/NathaTerrien/14536ac9eea2ca30023c)
   5. Cliquer sur _"Save Script"_
-3. D&eacute;marrer la campagne et cr&eacute;er les macros (voir le fichier _"NathasNumenera_Roll20_Macros_French.md"_)
+3. D&eacute;marrer la campagne et cr&eacute;er les [Macros](https://gist.github.com/NathaTerrien/3198c37d2aa1eaff3c89)
 4. Cr&eacute;er une personnage  et associer un pion (cf. Utilisation basique) 
 5. **COMPLETER LA FEUILLE DE PERSONNAGE** (important) : en plus des Attributs (valeur et max), &agrave; minima renseigner les Atouts (même si &eacute;gaux &agrave; 0), le bonus de R&eacute;cup&eacute;ration, la r&eacute;duction de Vivacit&eacute; d&ucirc;e &agrave; l'armure (même si &eacute;gale &agrave; 0), l'&eacute;tat de R&eacute;cuparation (cliquer sur "1 Action"), l'&eacute;tat g&eacute;n&eacute;ral (cliquer sur "Normal")
 6. S&eacute;lectionner le pion et tester une macro. Si rien ne passe, tenter de d&eacute;sactiver/r&eacute;activer le script API et recommencer.
@@ -44,10 +44,18 @@ Voir en fin de fichier pour les notes de versions.
 
 # Notes de version
 
-## Version 2.02 (23/08/2014)
+## Version 2.7 (22/09/2014)
+Pas de modification de la feuille de personnage.
+D&eacute;placemet des fichiers de scripts API et de Macros vers Gist.
+Am&eacute;liorations du Readme.
+Modifications des fonctions [API](https://gist.github.com/NathaTerrien/14536ac9eea2ca30023c) et des [Macros](https://gist.github.com/NathaTerrien/3198c37d2aa1eaff3c89) :
+1. Nouvelle fonction/macro pour appliquer des d&eacute;g&acirc;ts au PNJ (le "Character" doit avoir les attributs "Health" et "Armor")
+2. &Eacute;volution de la fonction et macros de jets : gestions des efforts aux d&eacute;g&acirc;ts et am&eacute;lioration de l'affichage dans le Chat.
+
+## Version 2.2 (23/08/2014)
 Encodage HTML de tous les accents (ReadMe.md, NathasNumenera_Roll20_Macros_French.md, NathasNumenera_Roll20_API_French.js, NathasNumenera_Roll20_CharacterSheet_Layout_French.htm).
 
-## Version 2.01 (29/07/2014)
+## Version 2.1 (29/07/2014)
 1. Mise &agrave; jour de **NathasNumenera_Roll20_CharacterSheet_Layout_French.htm** :
   1. Section "Avancement" plus d&eacute;taill&eacute;es, avec un attribut par avancement et par tiers.
   2. Vous pouvez supprimer des personnages existants les attributs xp-stats, xp-edge etc... qui ne seront plus utilis&eacute;s.
