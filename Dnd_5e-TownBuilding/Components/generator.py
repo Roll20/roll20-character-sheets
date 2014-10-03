@@ -1,4 +1,4 @@
-import csv
+﻿import csv
 f = open('generated.html','w')
 
 def printSetup():
