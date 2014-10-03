@@ -1,6 +1,12 @@
 import csv
 f = open('generated.html','w')
 
+def printSetup():
+	print >>f, '''
+	
+	
+'''
+
 def turnMacros():
 	print >>f, '''
 <div class="sheet-row sheet-padr sheet-margin-top sheet-town-toggle">
