@@ -1,8 +1,17 @@
 # D&D 5E Character Sheet
 
-This is a **work in progress sheet** for use on Roll20.net and with the latest (5th) edition of Dungeons & Dragons.  This sheet is designed to be compatible with the full release of 5th edition and I will try to keep it as up to date as possible with the system as and when rules become publicly available.  The sheet is also designed to be usable by all Roll20 users regardless of subscription level.  An API enhanced version of the sheet is planned for the future.
+This is a character sheet for use on Roll20.net with the latest (5th) edition of Dungeons & Dragons.  This sheet is designed to be compatible with the full release of 5th edition and I will try to keep it as up to date as possible with the system as and when rules become publicly available.  The sheet is also designed to be usable by all Roll20 users regardless of subscription level.  An API enhanced version of the sheet is planned for the future.
 
 ### Changelog
+
+* Minor update - 10th September 2014
+FIxed bugs with the NPC animal handling and intimidation rolls.  Changed the labelling of Armoured AC value that is displayed above the armour table and in the core stats section following questions on the roll20 forum and the realisation that it was probably poorly labelled before.
+
+* Minor update - 25th August 2014
+Added Damage Vulnerability field and initiative button/fields on npc sheet.  Changed the way finesse mod was calculated behind the scenes to try and improve performance a little.  Updated the damage text accross the sheet to improve readability and added an option to suppress crit damage text on spells that can crit crit (such as magic missile, or spells that require a save throw)...find this in the damage line of a spells entry.  Removed built in help page and replaced it with a much more complete wiki page (linked in the footer of the sheet).  Moved armour table to it's own page
+
+* PHB release - 20th August 2014
+Added sorcerer and Warlock support throughout the sheet.  Added support for the bard's "Jack of all trades" feature to skills.  Added passive scores for all skills to the sheet and found space for a 4th custom slot for tools/skills as a result.  Reworked spell dashboard section to provide better support for the wider casting styles now that there are more classes.  Updated spellbook section for new spell casting (sub)classes.  Updated Armour section so unarmoured AC is now also auto calculated.  NPC sheet functionality added (very much designed for use by experienced GM/DM's who are comfortable using the roll20 system).
 
 * Bugfix and PHB release prep - 3rd August 2014
 Fixed some minor labelling/spelling issues. Fixed weapon wielded selection not being saved.  Added warlock and sorcerer classes to class and hit dice sections.  Updated bard to be a d8 hit die as per PHB previews.  Added functionality for NPC sheet.  Moved sheet last updated date to the sheet header.  Added support for a few custom skills/tools in the skills section.  Added option to allow the weights entered in the inventory to be treated as unit weights instead of total weight for that row

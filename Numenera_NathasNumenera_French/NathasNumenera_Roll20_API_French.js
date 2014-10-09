@@ -21,13 +21,13 @@ function attrib(characterObj,attributeObjArray,newValue,tokenObj) {
             case "speed" :
                 maxValue = parseInt(attributeObjArray[0].get("max"));
                 finalValue = parseInt(attributeValue) + parseInt(newValue);
-                attributeLib = "Vivacité";
+                attributeLib = "Vivacit&eacute;";
                 checkState = 1;
-                break;            
+                break;
             case "intellect" :
                 maxValue = parseInt(attributeObjArray[0].get("max"));
                 finalValue = parseInt(attributeValue) + parseInt(newValue);
-                attributeLib = "Mental";                
+                attributeLib = "Mental";
                 checkState = 1;
                 break;
             default:
@@ -42,7 +42,7 @@ function attrib(characterObj,attributeObjArray,newValue,tokenObj) {
             if (finalValue < 0) {
                 finalValue = 0;
             };
-        };		
+        };
         //set the attribute
         attributeObjArray[0].set("current", finalValue);
         //if attribute was one the stats, call the function to check state and markers
@@ -93,12 +93,12 @@ function checkCharStates(characterObj,tokenObj) {
                 tokenObj.set("status_yellow",true);
                 tokenObj.set("status_red",true);
                 tokenObj.set("status_dead",false);
-                break; 
+                break;
             case 3 : // dead
                 tokenObj.set("status_yellow",false);
                 tokenObj.set("status_red",false);
                 tokenObj.set("status_dead",true);
-                break;            
+                break;
         }
     };
 };
@@ -106,7 +106,7 @@ function checkCharStates(characterObj,tokenObj) {
 function restChar(characterObj,tokenObj) {
     //repos total d'un personnage
     //DEBUG : sendChat("", "/desc Repos");
-	var characterName = characterObj.get("name");    
+	var characterName = characterObj.get("name");
     // MIGHT
     var attObjArray = findObjs({
                     _type: 'attribute',
@@ -140,7 +140,7 @@ function restChar(characterObj,tokenObj) {
     //Markers & States & Damage track
     checkCharStates(characterObj,tokenObj);
     //output
-	sendChat("character|"+characterObj.get("id"), "<span style='color:green;'>est complètement reposé.</span>");
+	sendChat("character|"+characterObj.get("id"), "<span style='color:green;'>est compl&egrave;tement repos&eacute;.</span>");
 };
 //---------------------------------------------------------------------------------------------------------------------------------------------
 function initRoll(characterObj,tokenObj,efforts,rollBonus,statexp) {
@@ -158,7 +158,7 @@ function initRoll(characterObj,tokenObj,efforts,rollBonus,statexp) {
                     _characterid: characterObj.id
                 });
     if (attributeObjArray == false) {
-        sendChat("", "/desc  ERREUR : iniRoll() : attribute 'speed' inconnu.");        
+        sendChat("", "/desc  ERREUR : iniRoll() : attribute 'speed' inconnu.");
         return;
     } else {
         speedPool=parseInt(attributeObjArray[0].get("current"));
@@ -169,8 +169,8 @@ function initRoll(characterObj,tokenObj,efforts,rollBonus,statexp) {
     var bonusToRoll = parseInt(rollBonus);
     // Rolling the dice
     var diceRoll = randomInteger(20);
-    // checking for appliable effort 
-    // and calculating statpool cost        
+    // checking for appliable effort
+    // and calculating statpool cost
     var effortsUsed = 0;
     effortsUsed = parseInt(efforts);
     var statExpense = parseInt(statexp);
@@ -180,17 +180,17 @@ function initRoll(characterObj,tokenObj,efforts,rollBonus,statexp) {
         if (effortsUsed > 0) {
             if (effortsUsed > attrEffort) {
                 sendChat("character|"+charId, "<span style='color:red;'>essaie d'appliquer plus d'effort ("+effortsUsed+") qu'il ne peut ("+attrEffort+").</span>");
-                return;        
+                return;
             } else {
-                effortCost = 1 + (effortsUsed * (2+damagetrack) );    
+                effortCost = 1 + (effortsUsed * (2+damagetrack) );
             };
         };
         // effort cost is spent if the roll is not 20 and if the action succeeds
         if (diceRoll != 20) {
             totalCost = effortCost + statExpense - speedEdge;
             if (totalCost > speedPool) {
-                sendChat("character|"+charId, "<span style='color:red;'>essaie de dépenser plus de points de Vivacité ("+totalCost+") qu'il ne peut ("+speedPool+").</span>");
-                return;                    
+                sendChat("character|"+charId, "<span style='color:red;'>essaie de d&eacute;penser plus de points de Vivacit&eacute; ("+totalCost+") qu'il ne peut ("+speedPool+").</span>");
+                return;
             } else {
                 speedPool = speedPool - totalCost;
                 attributeObjArray[0].set("current",speedPool);
@@ -211,22 +211,22 @@ function initRoll(characterObj,tokenObj,efforts,rollBonus,statexp) {
     turnorder.sort(function(a,b) {
         first = a.pr;
         second = b.pr;
-        
+
         return second - first;
     });
-    Campaign().set("turnorder", JSON.stringify(turnorder));    
+    Campaign().set("turnorder", JSON.stringify(turnorder));
     //output
         // Checking result
     var success = "<b><span style='color:blue;'>Jet d'Initiative : " + finalRoll + "</span> (" + diceRoll + ")</b><ul style='list-style-type : disc;'>";
     if ((effortsUsed > 0) || (statExpense > 0)) {
-        success = success + "<li>Dépense " + totalCost + " point(s) de Vivacité (" + effortCost + "+" + statExpense + "-" + speedEdge + ").</li>";
+        success = success + "<li>D&eacute;pense " + totalCost + " point(s) de Vivacit&eacute; (" + effortCost + "+" + statExpense + "-" + speedEdge + ").</li>";
     };
     if (effortsUsed > 0) {
         success = success + "<li>En appliquant " + effortsUsed + " <u>Effort(s)</u>.</li>";
     };
     if (bonusToRoll != 0) {
         success = success + "<li>Avec un <u>Bonus</u> de " + bonusToRoll + ".</li>";
-    };    
+    };
     sendChat("character|"+charId, ""+success+"</ul>");
 };
 //---------------------------------------------------------------------------------------------------------------------------------------------
@@ -237,12 +237,12 @@ function numeneRoll(characterObj,tokenObj,statName,difficulty,efforts,rollBonus,
     // example : "!numeneroll might|1|3"
     // difficulty is the level of difficulty, not the target number. The target number is calculated by the function.
     // if difficulty is 0, the roll still happens, but is not confronted to any difficulty
-    
+
     var charId = characterObj.get("id");
     //checking the character damage track
     var damagetrack=parseInt(getAttrByName(characterObj.id, "damage-track", "current"));
     if (damagetrack > 1) {
-        sendChat("character|"+charId, "<span style='color:red;'>ne peut pas entreprendre d'action (épuisé ou mourrant).</span>");
+        sendChat("character|"+charId, "<span style='color:red;'>ne peut pas entreprendre d'action (&eacute;puis&eacute; ou mourrant).</span>");
         return;
     };
     // checking the stat
@@ -258,17 +258,17 @@ function numeneRoll(characterObj,tokenObj,statName,difficulty,efforts,rollBonus,
                 attNameInChat = "Robustesse";
                 break;
             case "speed" :
-                attNameInChat = "Vivacité";
+                attNameInChat = "Vivacit&eacute;";
                 break;
             case "intellect" :
                 attNameInChat = "Mental";
                 break;
         }
     } else {
-        sendChat("", "/desc ERREUR : numeneRoll() : " + statName + " n'est pas géré.");
-        return;        
+        sendChat("", "/desc ERREUR : numeneRoll() : " + statName + " n'est pas g&eacute;r&eacute;.");
+        return;
     };
-    
+
     //getting the stats values
     var attrPool = 0;
     var attrEdge = 0;
@@ -279,7 +279,7 @@ function numeneRoll(characterObj,tokenObj,statName,difficulty,efforts,rollBonus,
                     _characterid: characterObj.id
                 });
     if (attributeObjArray == false) {
-        sendChat("", "/desc  ERREUR : numeneRoll() : attribute '" + attributeName + "' inconnu.");        
+        sendChat("", "/desc  ERREUR : numeneRoll() : attribute '" + attributeName + "' inconnu.");
         return;
     } else {
         attrPool=parseInt(attributeObjArray[0].get("current"));
@@ -290,15 +290,15 @@ function numeneRoll(characterObj,tokenObj,statName,difficulty,efforts,rollBonus,
     //Checking the bonus to roll
     var bonusToRoll = parseInt(rollBonus);
     if( bonusToRoll >= 3 ) {
-        sendChat("character|"+charId, "<span style='color:red;'>un bonus supérieur à 2 ("+bonusToRoll+") n'est pas autorisé (utilisez un Avantage)</span>.");
+        sendChat("character|"+charId, "<span style='color:red;'>un bonus sup&eacute;rieur &agrave; 2 ("+bonusToRoll+") n'est pas autoris&eacute; (utilisez un Avantage)</span>.");
         return;
     };
     // Rolling the dice
     var diceRoll = randomInteger(20);
     var finalRoll = diceRoll + bonusToRoll;
 
-    // checking for appliable effort 
-    // and calculating statpool cost        
+    // checking for appliable effort
+    // and calculating statpool cost
     var effortsUsed = 0;
     effortsUsed = parseInt(efforts);
     var statExpense = parseInt(statexp);
@@ -308,17 +308,17 @@ function numeneRoll(characterObj,tokenObj,statName,difficulty,efforts,rollBonus,
         if (effortsUsed > 0) {
             if (effortsUsed > attrEffort) {
                 sendChat("character|"+charId, "<span style='color:red;'>essaie d'appliquer plus d'effort ("+effortsUsed+") qu'il ne peut ("+attrEffort+").</span>");
-                return;        
+                return;
             } else {
-                effortCost = 1 + (effortsUsed * (2+damagetrack) );    
+                effortCost = 1 + (effortsUsed * (2+damagetrack) );
             };
         };
         // effort cost is spent if the roll is not 20 and if the action succeeds
         if (diceRoll != 20) {
             totalCost = effortCost + statExpense - attrEdge;
             if (totalCost > attrPool) {
-                sendChat("character|"+charId, "<span style='color:red;'>essaie de dépenser plus de points d'attribut ("+totalCost+") qu'il ne peut ("+attrPool+").</span>");
-                return;                    
+                sendChat("character|"+charId, "<span style='color:red;'>essaie de d&eacute;penser plus de points d'attribut ("+totalCost+") qu'il ne peut ("+attrPool+").</span>");
+                return;
             } else {
                 attrPool = attrPool - totalCost;
                 attributeObjArray[0].set("current",attrPool);
@@ -326,68 +326,68 @@ function numeneRoll(characterObj,tokenObj,statName,difficulty,efforts,rollBonus,
             };
         };
     };
-    
+
     //computing target task
     var targetRoll = 0;
     if (parseInt(difficulty) > 0) {
         targetRoll = (parseInt(difficulty)-effortsUsed)*3;
     };
-    
+
     // Checking result
     var success = "<b><span style='color:blue;'>Jet de " + attNameInChat + "</span></b><ul style='list-style-type : disc;'>";
     var specialEffect = "";
     if ((effortsUsed > 0) || (statExpense > 0)) {
-        success = success + "<li>Dépense " + totalCost + " point(s) (" + effortCost + "+" + statExpense + "-" + attrEdge + ").</li>";
+        success = success + "<li>D&eacute;pense " + totalCost + " point(s) (" + effortCost + "+" + statExpense + "-" + attrEdge + ").</li>";
     };
     if (effortsUsed > 0) {
         success = success + "<li>En appliquant " + effortsUsed + " <u>Effort(s)</u>.</li>";
     };
     if (bonusToRoll != 0) {
         success = success + "<li>Avec un <u>Bonus</u> de " + bonusToRoll + ".</li>";
-    };    
+    };
     // If not an automatic success or a known difficulty
     if (targetRoll > 0) {
-        success = success + "<li>Contre une <u>Difficulté</u> initiale de " + difficulty + " (cible : " + targetRoll + ").</li>";
+        success = success + "<li>Contre une <u>Difficult&eacute;</u> initiale de " + difficulty + " (cible : " + targetRoll + ").</li>";
         if( finalRoll >= targetRoll) {
-            success = success + "<li><strong><span style='color:green;'>Réussite (" + diceRoll+"+"+bonusToRoll+" = "+finalRoll + ") !</span></strong></li>";
+            success = success + "<li><strong><span style='color:green;'>R&eacute;ussite (" + diceRoll+"+"+bonusToRoll+" = "+finalRoll + ") !</span></strong></li>";
         }
         else{
             success = success + "<li><strong><span style='color:red;'>Echec (" + diceRoll+"+"+bonusToRoll+" = "+finalRoll + ") !</span></strong></li>";
         };
         //special dice roll result treatment
         if (diceRoll == 1) {
-                specialEffect = "<li><u>Effet supplémentaire</u> : <span style='color:red;'>subit dégâts +2 (en défense) ou une intrusion du MJ !</span></li>";
+                specialEffect = "<li><u>Effet suppl&eacute;mentaire</u> : <span style='color:red;'>subit d&eacute;gâts +2 (en d&eacute;fense) ou une intrusion du MJ !</span></li>";
         } else {
             if (damagetrack == 0) {
                 // if character is haled, special success is possible
                 switch (diceRoll) {
                     case 17:
-                        specialEffect = "<li><u>Effet supplémentaire</u> : <span style='color:green;'>si jet d'attaque : Dégâts +1.</span></li>";
+                        specialEffect = "<li><u>Effet suppl&eacute;mentaire</u> : <span style='color:green;'>si jet d'attaque : D&eacute;gâts +1.</span></li>";
                         break;
                     case 18:
-                        specialEffect = "<li><u>Effet supplémentaire</u> : <span style='color:green;'>si jet d'attaque : Dégâts +2.</span></li>";
+                        specialEffect = "<li><u>Effet suppl&eacute;mentaire</u> : <span style='color:green;'>si jet d'attaque : D&eacute;gâts +2.</span></li>";
                         break;
                     case 19:
-                        specialEffect = "<li><u>Effet supplémentaire</u> : <span style='color:green;'>si jet d'attaque : Dégâts +3, ou un Effet Mineur.</span></li>";
+                        specialEffect = "<li><u>Effet suppl&eacute;mentaire</u> : <span style='color:green;'>si jet d'attaque : D&eacute;gâts +3, ou un Effet Mineur.</span></li>";
                         break;
                     case 20:
-                        specialEffect = "<li><u>Effet supplémentaire</u> : <span style='color:green;'>si jet d'attaque : Dégâts +4,  ou un Effet Majeur. Attribut non diminué.</span></li>";
+                        specialEffect = "<li><u>Effet suppl&eacute;mentaire</u> : <span style='color:green;'>si jet d'attaque : D&eacute;gâts +4,  ou un Effet Majeur. Attribut non diminu&eacute;.</span></li>";
                         break;
                      default:
                         specialEffect = "";
                 }
             } else if (diceRoll == 20) {
                     // if character is impaired
-                    specialEffect = "<li><u>Effet supplémentaire</u> : <span style='color:green;'> Attribut non diminué.</span></li>";
+                    specialEffect = "<li><u>Effet suppl&eacute;mentaire</u> : <span style='color:green;'> Attribut non diminu&eacute;.</span></li>";
             };
         };
     } else {     // automatic success or no known difficulty
         if (parseInt(difficulty) > 0) {
-            success = success + "<li><strong><span style='color:green;'>Et réussit automatiquement (Difficulté " + difficulty + ") !</span></strong></li>";
+            success = success + "<li><strong><span style='color:green;'>Et r&eacute;ussit automatiquement (Difficult&eacute; " + difficulty + ") !</span></strong></li>";
         } else {
-            success = success + "<li><u>Résultat</u> : <strong>" + finalRoll + ".</strong></li>";
+            success = success + "<li><u>R&eacute;sultat</u> : <strong>" + finalRoll + ".</strong></li>";
         };
-    };    
+    };
     //output
     sendChat("character|"+charId, ""+success+specialEffect+"</ul>");
 };
@@ -401,13 +401,13 @@ function recoveryRoll(characterObj,tokenObj){
                 });
     if (recovObjArray == false) {
         sendChat("", "ERREUR : pas d'attribut 'recovery-rolls' !");
-        return;  
-    };      
+        return;
+    };
     var recrolls=parseInt(recovObjArray[0].get("current"));
     //Is a complete rest of 10 hours needed ?
     if (recrolls == 3) {
-        sendChat("character|"+charId, "<span style='color:red;'>ne peut pas faire de jet de récupération (doit se reposer complètement pendant 10 heures).</span>");
-        return;  
+        sendChat("character|"+charId, "<span style='color:red;'>ne peut pas faire de jet de r&eacute;cup&eacute;ration (doit se reposer compl&egrave;tement pendant 10 heures).</span>");
+        return;
     };
     var recovbonus = parseInt(getAttrByName(charId, "recoverybonus", "current"));
     var curRecLib = "";
@@ -421,7 +421,7 @@ function recoveryRoll(characterObj,tokenObj){
             curRecLib = "10 minutes";
             nextRecLib = "1 heure";
             break;
-        case 2 : 
+        case 2 :
             curRecLib = "1 heure";
             nextRecLib = "Repos complet (10 heures)";
             break;
@@ -429,9 +429,9 @@ function recoveryRoll(characterObj,tokenObj){
     recrolls=recrolls+1;
     recovObjArray[0].set("current",recrolls);
     var recovery = randomInteger(6)+recovbonus;
-    var output = "<b><span style='color:blue;'>Jet de récupération</span></b> : <ul style='list-style-type : disc;'>";
+    var output = "<b><span style='color:blue;'>Jet de r&eacute;cup&eacute;ration</span></b> : <ul style='list-style-type : disc;'>";
     output = output + "<li>Repos de <b>" + curRecLib + "</b>.</li>"
-    output = output + "<li><b><span style='color:green;'>" + recovery + " points</span></b> à répartir dans les attributs.</li>"
+    output = output + "<li><b><span style='color:green;'>" + recovery + " points</span></b> &agrave; r&eacute;partir dans les attributs.</li>"
     output = output + "<li>Prochain jet/repos : <b>" + nextRecLib + "</b>.</li>";
     sendChat("character|" + charId, "" + output +"</ul>");
 };
@@ -440,7 +440,7 @@ on("chat:message", function(msg) {
     if (msg.type == "api") {
         // sendChat("", "/desc TEST API.");
         if(!msg.selected) {
-    		sendChat("", "/desc Sélectionnez un pion et essayez encore.");
+    		sendChat("", "/desc S&eacute;lectionnez un pion et essayez encore.");
 			return; //quit if nothing selected
 		};
         if (msg.content.indexOf("!nathanum-") !== 0) {
@@ -457,7 +457,7 @@ on("chat:message", function(msg) {
             if(charId != "") {
                 var characterObj = getObj("character", charId);
             } else {
-                sendChat(""," Le pion sélectionné n'est pas un personnage.");
+                sendChat(""," Le pion s&eacute;lectionn&eacute; n'est pas un personnage.");
                 return false;
             };
             var statName = Parameters.split("|")[1];
@@ -465,7 +465,7 @@ on("chat:message", function(msg) {
             var effortsUsed = parseInt(Parameters.split("|")[3]);
             var rollbonus = parseInt(Parameters.split("|")[4]);
             var statexp = parseInt(Parameters.split("|")[5]);
-			numeneRoll(characterObj,tokenObj,statName,difficulty,effortsUsed,rollbonus,statexp,msg.who);        
+			numeneRoll(characterObj,tokenObj,statName,difficulty,effortsUsed,rollbonus,statexp,msg.who);
             return;
         };
         if (functionCalled == "!nathanum-attrib") {
@@ -478,18 +478,18 @@ on("chat:message", function(msg) {
             if(charId != "") {
                 var characterObj = getObj("character", charId);
             } else {
-                sendChat(""," Le pion sélectionné n'est pas un personnage.");
+                sendChat(""," Le pion s&eacute;lectionn&eacute; n'est pas un personnage.");
                 return false;
             };
             var attributeObjArray = findObjs({
                 _type: 'attribute',
                 name: attributeName,
                 _characterid: characterObj.id
-            });                    
+            });
 			if (attributeObjArray == false) return;
 			attrib(characterObj,attributeObjArray,newValue,tokenObj);
             return;
-        }; 
+        };
         if (functionCalled == "!nathanum-recoveryroll") {
             var tokenId = msg.content.split("!nathanum-recoveryroll ")[1];
             var tokenObj=getObj("graphic", tokenId);
@@ -497,10 +497,10 @@ on("chat:message", function(msg) {
             if(charId != "") {
                 var characterObj = getObj("character", charId);
             } else {
-                sendChat(""," Le pion sélectionné n'est pas un personnage.");
+                sendChat(""," Le pion s&eacute;lectionn&eacute; n'est pas un personnage.");
                 return false;
             };
-    		recoveryRoll(characterObj,tokenObj);        
+    		recoveryRoll(characterObj,tokenObj);
             return;
         };
         if (functionCalled == "!nathanum-initroll") {
@@ -511,13 +511,13 @@ on("chat:message", function(msg) {
             if(charId != "") {
                 var characterObj = getObj("character", charId);
             } else {
-                sendChat(""," Le pion sélectionné n'est pas un personnage.");
+                sendChat(""," Le pion s&eacute;lectionn&eacute; n'est pas un personnage.");
                 return false;
             };
             var effortsUsed = parseInt(Parameters.split("|")[1]);
             var rollbonus = parseInt(Parameters.split("|")[2]);
             var statexp = parseInt(Parameters.split("|")[3]);
-			initRoll(characterObj,tokenObj,effortsUsed,rollbonus,statexp);        
+			initRoll(characterObj,tokenObj,effortsUsed,rollbonus,statexp);
             return;
         };
         if (functionCalled == "!nathanum-restchar") {
@@ -528,12 +528,12 @@ on("chat:message", function(msg) {
             if(charId != "") {
                 var characterObj = getObj("character", charId);
             } else {
-                sendChat(""," Le pion sélectionné n'est pas un personnage.");
+                sendChat(""," Le pion s&eacute;lectionn&eacute; n'est pas un personnage.");
                 return false;
             };
     		restChar(characterObj,tokenObj);
             return;
-        }; 
+        };
     };
 });
 //---------------------------------------------------------------------------------------------------------------------------------------------
