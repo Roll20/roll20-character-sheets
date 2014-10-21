@@ -89,7 +89,7 @@ If you feel you've contributed to the development of this character sheet, don't
 * Jason Miller
 * Dan W
 
-## Honorary Credit
-# Credit to those that have influenced the design of the sheet with input, feedback, or just good style:
+### Honorary Credit
+#### Credit to those that have influenced the design of the sheet with input, feedback, or just good style:
 * Delal of crafty-games forums' custom character sheet
 * Actoba's spell section and tabs from DnD 5e sheet
