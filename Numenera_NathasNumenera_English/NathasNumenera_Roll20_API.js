@@ -372,7 +372,7 @@ function numeneRoll(characterObj,tokenObj,statName,difficulty,efforts,rollBonus,
                         specialEffect = "<li><u>Effect</u>: <span style='color:green;'>+3 damage (Attack/Ability roll) or Minor Effect.</span></li>";
                         break;
                     case 20:
-                        specialEffect = "<li><u>Effect</u>: <span style='color:green;'>+3 damage (Attack/Ability roll) or Major Effect. Stat pool points not spent.</span></li>";
+                        specialEffect = "<li><u>Effect</u>: <span style='color:green;'>+4 damage (Attack/Ability roll) or Major Effect. Stat pool points not spent.</span></li>";
                         break;
                      default:
                         specialEffect = "";
