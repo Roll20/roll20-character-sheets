@@ -54,6 +54,10 @@ module.exports = function(grunt) {
             },
             src: 'sheet.html', dest: 'Gumshoe_TrailOfCthulhu.html'
         }
+  },
+  roll20: {
+      development:'testbed/gumshoe_toc.css',
+      production:'Gumshoe_TrailOfCthulhu.css'
   }
   });
 
@@ -61,11 +65,36 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-include-replace');
+  grunt.registerMultiTask('roll20', function () {
+      var evil = [
+          /(\bdata:\b|eval|cookie|\bwindow\b|\bparent\b|\bthis\b)/i, // suspicious javascript-type words
+          /behaviou?r|expression|moz-binding|@import|@charset|(java|vb)?script|[\<]|\\\w/i,
+          ///[\<>]/, // back slash, html tags,
+          /[\x7f-\xff]/, // high bytes -- suspect
+          /[\x00-\x08\x0B\x0C\x0E-\x1F]/, //low bytes -- suspect
+          /&\#/, // bad charset
+      ];
+      input = grunt.file.read(this.data);
+      input = input.replace(/\/\*[^\*]+\*\//g, ""); //remove all css comments
+      for(var i=0; i < evil.length; i++) {
+          var res = input.match(evil[i]);
+          if(res) {
+              grunt.log.error("Roll20 Check: Potential CSS security violation; character sheet template styling thrown out.");
+              grunt.log.error(res);
+              input = "";
+          }
+      }
+      if(input!= "")
+          grunt.log.ok('Roll20 CSS lint Ok!');
+      else
+          grunt.fail.warn("Roll 20 CSS lint failed");
+  });
 
   // Default task.
   grunt.registerTask('default', [
        'less:development',
        'includereplace:development',
+       'roll20:development'
   ]);
 
   grunt.registerTask('build', [
