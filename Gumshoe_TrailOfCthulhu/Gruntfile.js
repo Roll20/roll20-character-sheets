@@ -52,18 +52,38 @@ module.exports = function(grunt) {
                     img_prefix: 'https://ramblurr.github.io/roll20-character-sheets/img/'
                 }
             },
-            src: 'sheet.html', dest: 'Gumshoe_TrailOfCthulhu.html'
+            src: 'src/sheet.html',
+            dest: 'Gumshoe_TrailOfCthulhu.html'
         }
   },
   roll20: {
       development:'testbed/gumshoe_toc.css',
       production:'Gumshoe_TrailOfCthulhu.css'
+  },
+  watch: {
+      development: {
+          files: ['src/**/*less', 'src/**/*html'],
+          tasks: ['default'],
+          options: {
+              livereload:true
+          },
+      },
+  },
+  connect: {
+      server: {
+          options: {
+              port:9001,
+              base: '.',
+              livereload:35729,
+          }
+      }
   }
   });
 
   // These plugins provide necessary tasks.
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-include-replace');
   grunt.registerMultiTask('roll20', function () {
       var evil = [
@@ -100,7 +120,11 @@ module.exports = function(grunt) {
   grunt.registerTask('build', [
        'less:production',
        'includereplace:production',
+       'roll20:production'
   ]);
-
-
+  grunt.registerTask('serve', [
+      'default',
+      'connect:server',
+      'watch'
+  ]);
 };
