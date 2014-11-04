@@ -4,6 +4,9 @@ Scroll down to the end of this Readme for the Release Notes.
 Note: there's a french version of the very same sheet/macros/scripts, for those interested.
 See [Numenera_NathasNumenera_French](https://github.com/Roll20/roll20-character-sheets/tree/master/Numenera_NathasNumenera_French).
 
+# Current version:
+Version 3 (november 2014) : [Screenshot](NathasNumenera_tabs.jpg).
+
 # Basic use:
 
 ## How to set up the character sheet
@@ -11,15 +14,15 @@ See [Numenera_NathasNumenera_French](https://github.com/Roll20/roll20-character-
 2. Click on _"Campaign Settings"_
 3. Scroll down to _"Character Sheet Template"_
 4. Choose _"Custom"_
-5. In the _"HTML Layout"_ tab, paste the contents of the [HTML file](https://github.com/Roll20/roll20-character-sheets/blob/master/Numenera_NathasNumenera_English/NathasNumenera_Roll20_CharacterSheet_Layout.htm)
-6. In the _"CSS Styling"_ tab, paste the contents of the [CSS file](https://github.com/Roll20/roll20-character-sheets/blob/master/Numenera_NathasNumenera_English/NathasNumenera_Roll20_CharacterSheet_CSS.css)
+5. In the _"HTML Layout"_ tab, paste the contents of the [HTML file](NathasNumenera_tabs.htm)
+6. In the _"CSS Styling"_ tab, paste the contents of the [CSS file](NathasNumenera_tabs.css)
 7. Scroll down and click _"Save Changes"_
 
 ## How to set up a character and its token
 1. Start your campaign
 2. Create a new _"Character"_ in the _"Journal"_
 3. Fill at least the character's name and the 3 Stats (current and max values): Might, Speed and Intellect
-4. Create/use a token for the character as in this [screenshot](https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Numenera_NathasNumenera_English/NathasNumenera_setup_the_character_token.jpg):
+4. Create/use a token for the character as in this [screenshot](NathasNumenera_setup_the_character_token.jpg):
   1. Make sure it representents the character you've created
   2. Assign _"bar1"_ to the _"might"_ attribute
   3. Assign _"bar2"_ to the _"speed"_ attribute
@@ -44,6 +47,12 @@ See [Numenera_NathasNumenera_French](https://github.com/Roll20/roll20-character-
 7. Repeat steps 4 to 6 for every other characters and you're set. 
 
 # Release Notes
+
+##Release 3.0 (11/04/2014)
+*New tabbed character sheet*, with improved readability, over three tabs : Main (stats, attacks, skills, special abilities), Numen&eacute;ra & Equipment, Advancements & Background.
+The attributes are the same (so are the macros and API functions), so you can update your campaign with the new sheet (HTML and CSS) and existing character(s).
+The [old sheet](NathasNumenera_Roll20_CharacterSheet_Screenshot.jpg) files (3 columns on one page/tab) are still available, if needed : [HTML file](NathasNumenera_Roll20_CharacterSheet_Layout.htm) and [CSS file](NathasNumenera_Roll20_CharacterSheet_CSS.css).
+
 ##Release 2.7 (09/22/2014)
 No change to the character sheet.
 Moved the API scripts and Macros files to Git.
