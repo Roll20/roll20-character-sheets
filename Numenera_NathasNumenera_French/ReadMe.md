@@ -1,7 +1,7 @@
 **Note** : there's an english version of the very same sheet/macros/scripts, for those interested.
 See [Numenera_NathasNumenera_English](https://github.com/Roll20/roll20-character-sheets/tree/master/Numenera_NathasNumenera_English).
 
-Bas&eacute;e sur la feuille de personnage "Numenera" d&eacute;j&agrave; pr&eacute;sente sur Roll20 (merci aux auteurs originaux), cette version a une mise en page et des attributs diff&eacute;rents, et peut être utilis&eacute;e avec des scripts d'API et macros associ&eacute;es (voir ci-dessous).
+Bas&eacute;e sur la feuille de personnage "Numenera" d&eacute;j&agrave; pr&eacute;sente sur Roll20 (merci aux auteurs initiaux), cette version a une mise en page et des attributs diff&eacute;rents, et peut être utilis&eacute;e avec des scripts d'API et macros associ&eacute;es (voir ci-dessous).
 Voir en fin de fichier pour les notes de versions.
 
 # Utilisation basique : 
@@ -10,19 +10,26 @@ Voir en fin de fichier pour les notes de versions.
 1. Dans la campagne Roll20 concern&eacute;e, cliquer sur _"Voir les d&eacute;tails"_
 2. Cliquer sur _"Campaign Settings"_
 3. Descendre dans la page de Settings jusqu'&agrave; voir _"Character Sheet Template"_
+4. Dans la liste d&eacute;roulante, choisir _"Numenera (Nathas Version French)"_
+
+Alternative (permettant de modifier les sources &agrave; votre convenance) :
+
+1. Dans la campagne Roll20 concern&eacute;e, cliquer sur _"Voir les d&eacute;tails"_
+2. Cliquer sur _"Campaign Settings"_
+3. Descendre dans la page de Settings jusqu'&agrave; voir _"Character Sheet Template"_
 4. Dans la liste d&eacute;roulante, choisir _"Custom"_
-5. Dans l'onglet _"HTML Layout"_, coller le contenu de ce [fichier HTML](https://github.com/Roll20/roll20-character-sheets/blob/master/Numenera_NathasNumenera_French/NathasNumenera_Roll20_CharacterSheet_Layout_French.htm)
-6. Dans l'onglet _"CSS Styling"_, coller le contenu de ce [fichier CSS](https://github.com/Roll20/roll20-character-sheets/blob/master/Numenera_NathasNumenera_French/NathasNumenera_Roll20_CharacterSheet_CSS.css)
+5. Dans l'onglet _"HTML Layout"_, coller le contenu de ce [fichier HTML](NathasNumenera_tabs.htm)
+6. Dans l'onglet _"CSS Styling"_, coller le contenu de ce [fichier CSS](NathasNumenera_tabs.css)
 7. Descendre en bas de la page et cliquer sur _"Save Changes"_
 
 ## Cr&eacute;er un personnage
 1. Cr&eacute;er un _"Character"_ dans le journal
 2. Remplir le nom, et dans l'onglet _"Character Sheet"_, remplir &agrave; minima les 3 Attributs (Valeur et Max) : Robustesse, Vivacit&eacute; et Mental
-3. Modifier un pion (token) comme sur cette [image](https://github.com/Roll20/roll20-character-sheets/blob/master/Numenera_NathasNumenera_French/NathasNumenera_setup_the_character_token.jpg) :
+3. Modifier un pion (token) comme sur cette [image](NathasNumenera_setup_the_character_token.jpg) :
   1. S'assurer que le pion repr&eacute;sente le personnage
   2. S&eacute;lectionner l'attribut _"might"_ pour la bar 1
   3. S&eacute;lectionner l'attribut _"speed"_ pour la bar 2
-  4. S&eacute;lectionner l'attribut _"intellect"_ pour la bar
+  4. S&eacute;lectionner l'attribut _"intellect"_ pour la bar 3
 4. S&eacute;lectionner le pion
 5. Modifier le personnage (_"Edit"_) et cliquer _"Use Selected token"_ dans _"Default Token"_
 6. Cliquer _"Save Changes"_
@@ -38,11 +45,18 @@ Voir en fin de fichier pour les notes de versions.
   5. Cliquer sur _"Save Script"_
 3. D&eacute;marrer la campagne et cr&eacute;er les [Macros](https://gist.github.com/NathaTerrien/3198c37d2aa1eaff3c89)
 4. Cr&eacute;er une personnage  et associer un pion (cf. Utilisation basique) 
-5. **COMPLETER LA FEUILLE DE PERSONNAGE** (important) : en plus des Attributs (valeur et max), &agrave; minima renseigner les Atouts (même si &eacute;gaux &agrave; 0), le bonus de R&eacute;cup&eacute;ration, la r&eacute;duction de Vivacit&eacute; d&ucirc;e &agrave; l'armure (même si &eacute;gale &agrave; 0), l'&eacute;tat de R&eacute;cuparation (cliquer sur "1 Action"), l'&eacute;tat g&eacute;n&eacute;ral (cliquer sur "Normal")
+5. **COMPLETER LA FEUILLE DE PERSONNAGE** (important) : en plus des Attributs (valeur et max), &agrave; minima renseigner les Atouts (même si &eacute;gaux &agrave; 0), le bonus de R&eacute;cup&eacute;ration, la r&eacute;duction de Vivacit&eacute; due &agrave; l'armure (même si &eacute;gale &agrave; 0), l'&eacute;tat de R&eacute;cup&eacute;ration (cliquer sur "1 Action"), l'&eacute;tat g&eacute;n&eacute;ral (cliquer sur "Normal")
 6. S&eacute;lectionner le pion et tester une macro. Si rien ne passe, tenter de d&eacute;sactiver/r&eacute;activer le script API et recommencer.
 7. R&eacute;p&eacute;ter les &eacute;tapes 4 &agrave; 6 pour les autres personnages.
 
 # Notes de version
+
+##Release 3.0 (05/11/2014)
+*Nouvelle feuille de personnage avec onglets* (lisibilit&eacute; am&eacute;lior&eacute;e).<br/>Trois onglets : Principale (attributs, attaques, comp&eacute;tences, capacit&eacute;s sp&eacute;ciales), Numen&eacute;ra & &Eacute;quipement, Avancements & Background.
+
+Les attributs Roll20 restent identiques &agrave; la version pr&eacute;c&eacute;dente  (ainsi que les macros et fonctions API), donc il est possible de mettre &agrave; jour votre campagne avec la nouvelle feuille de personnage (HTML et CSS) et conserver les personnages existants.
+
+Les fichiers de l'[ancienne feuille de personnage](NathasNumenera_Roll20_CharacterSheet_Screenshot.jpg) (3 colonnes sur une seule page/onglet) sont toujours disponibles, au besoin : [HTML](NathasNumenera_Roll20_CharacterSheet_Layout.htm) et [CSS](NathasNumenera_Roll20_CharacterSheet_CSS.css).
 
 ## Version 2.7 (22/09/2014)
 Pas de modification de la feuille de personnage.
