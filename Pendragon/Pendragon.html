@@ -13,11 +13,29 @@
        <label style='display:inline-block; width:70px;'>Culture</label><input style='display:inline;' type="text" name="attr_culture" class="sheet-long" /><br/>
         <label style='display:inline-block; width:67px;'>Religion</label> 
         <select name="attr_religion" class="sheet-long" style='display:inline;'>
-            <option value="10">païenne</option>
-            <option value="20">chrétienne romaine</option>
-            <option value="10">chrétienne bretonne</option>
-            <option value="0">saxonne</option>
+            <option value="1">païenne</option>
+            <option value="2">chrétienne romaine</option>
+            <option value="3">chrétienne bretonne</option>
+            <option value="4">saxonne</option>
         </select><br/>
+        <!-- religious bonus, values > 0 only if right religion selected !-->
+        <input type="hidden" name="attr_BR-Pa-formule" disabled="disabled" value="(floor((@{TLux})/16)*floor(@{TEne}/16)*floor(@{TGen}/16)*floor(@{TSin}/16)*floor((@{TFie})/16)*floor(@{religion}/1)*floor(1/@{religion}))" />    
+        <input type="hidden" name="attr_BR-Pa" disabled="disabled" value="@{BR-Pa-formule}*2" />
+       
+        <input type="hidden" name="attr_BR-Ro-formule" disabled="disabled" value="(floor(@{TCha}/16)*floor(@{TCle}/16)*floor(@{TMis}/16)*floor(@{TMod}/16)*floor(@{TSob}/16)*floor(@{religion}/2)*floor(2/@{religion}))" />          
+        <input type="hidden" name="attr_BR-Ro" disabled="disabled" value="@{BR-Ro-formule}*6" />
+        
+        <input type="hidden" name="attr_BR-Br-formule" disabled="disabled" value="(floor(@{TCha}/16)*floor(@{TEne}/16)*floor(@{TGen}/16)*floor(@{TMod}/16)*floor(@{TSob}/16)*floor(@{religion}/3)*floor(3/@{religion}))" />    
+       <!-- Breton1 : HP +3 -->
+         <input type="hidden" name="attr_BR-Br1" disabled="disabled" value="(@{BR-Br-formule}*3)" />
+         <!-- Breton2 : Dommage +2-->
+        <input type="hidden" name="attr_BR-Br2" disabled="disabled" value="(@{BR-Br-formule}*2)" />
+        
+        
+        <input type="hidden" name="attr_BR-Sa" disabled="disabled" value="0" />
+         <!-- flag for religious bonus : 1 if yes, 0 otherwise -->
+         <input type="hidden" name="attr_flag-bonus" disabled="disabled" value="@{BR-Pa-formule}+@{BR-Ro-formule}+@{BR-Br-formule}" />
+        
         <label style='display:inline-block; width:70px;'>Age</label><input style='display:inline;' type="number" name="attr_age" class="sheet-carac" value="21" /><br/>
         <label style='display:inline-block;  width:67px;'>Statut</label>
         <select style='display:inline;' name="attr_religion" class="sheet-long">
@@ -43,7 +61,7 @@
         <p><label style='display:inline-block;  width:70px;'>Gloire</label><input style='display:inline; width:60px;' type="number" name="attr_gloire" /><br/></p>
       
         <p><label style='display:inline'>PV actuels</label><input style='display:inline; width:30px; font-color:red;' type="text" name="attr_PV-actuels" value="@{PV}-@{W1}-@{W2}-@{W3}-@{W4}-@{W5}-@{W6}-@{W7}-@{W8}-@{W9}}-@{W10}-@{W11}-@{W12}" disabled="true" />
-        <label style='display:inline'>/</label><input  style='display:inline;' type="text" name="attr_PV" class="sheet-carac3" value="@{CON}+@{TAI}" disabled="true"/><br/></p>
+        <label style='display:inline'>/</label><input  style='display:inline;' type="text" name="attr_PV" class="sheet-carac3" value="(@{CON}+@{TAI}+@{BR-Ro}+@{BR-Br1})" disabled="true"/><br/></p>
        <label style='display:inline'>Inconscience</label><input  style='display:inline;' type="text" name="attr_INC" class="sheet-carac3" value="round((@{PV})/4)" disabled="true"/><br />
        
     
@@ -103,10 +121,10 @@
       
         <h4 style="margin-bottom: 10px;">Caracs secondaires</h4>
         <input type="hidden" name="attr_DEG-dice" value="((@{FOR} + @{TAI}) / 6)" disabled="true"/>
-        <label  style='display:inline-block;  width:120px;'>DEGATS</label><input type="text" name="attr_DEG" class="sheet-carac3" value="round((@{FOR}+@{TAI})/6)" disabled="true" />
+        <label  style='display:inline-block;  width:120px;'>DEGATS</label><input type="text" name="attr_DEG" class="sheet-carac3" value="(round((@{FOR}+@{TAI})/6)+@{BR-Br2})" disabled="true" />
         <button style='margin-right:10px;' type='roll' name='roll_TestAttack2' value='/em @{MONNOM} touche son adversaire ! \n/r  @{DEG-dice}d6 [dégâts normaux] \n points de dégât '></button> <label  style='display:inline;'>critique :</label><button type='roll' name='roll_TestAttack2' value='/em @{MONNOM} porte un coup parfait ! \n/roll @{DEG-dice}d6 + @{DEG-dice}d6  [dégâts critiques] \n points de dégât'></button><br />
         <label style='display:inline-block;  width:120px;'>MOUVEMENT</label><input  style='display:inline;' type="text" name="attr_MOV" class="sheet-carac3" value="round((@{FOR}+@{DEX})/10)" disabled="true"/><br />
-        <label style='display:inline-block;  width:120px;'>GUERISON</label><input  style='display:inline;' type="text" name="attr_GUE" class="sheet-carac3" value="round((@{CON}+@{FOR})/10)" disabled="true"/><br /> 
+        <label style='display:inline-block;  width:120px;'>GUERISON</label><input  style='display:inline;' type="text" name="attr_GUE" class="sheet-carac3" value="round((@{CON}+@{FOR})/10)+@{BR-Pa}" disabled="true"/><br /> 
        
     </div>
     
@@ -161,14 +179,14 @@
         <label style='display:inline-block;  width:130px;'>CHASTE</label>
         <input  style=style='display:inline; text-align:center;  font-weight:bold;' type="number" name="attr_TCha" class="sheet-carac2" value="10" />
         <label style='display:inline-block;  width:30px; text-align:center'>/</label>
-        <input  style='display:inline; width:35px; text-align:center; font-weight:bold;' type="text" name="attr_TLux" class="sheet-carac2" value="20-@{TCha}" disabled="true"/>
+        <input  style='display:inline; width:35px; text-align:center; font-weight:bold;' type="text" name="attr_TLux" class="sheet-carac2" value="[[20-@{TCha}]]" disabled="true"/>
         <label style='display:inline-block;  width:130px; text-align:right'>LUXURIEUX</label>
         <input style='display:inline;  margin-left: 10px; margin-right: 10px;' type='checkbox' name='attr_CB-TLux' value='1' />
         <button type='roll' name='roll_Test-TLux' value='/em @{MONNOM} fait un test de LUXURE. \n/roll 1d20<[[@{TLux}+?{modif|0}]] \ jet de LUXURE @{TLux} modif. ?{modif|0}'></button>
         <br />
         <button type='roll' name='roll_Test-TEne' value="/em @{MONNOM} fait un test d\'ENERGIQUE. \n/roll 1d20<[[@{TEne}+?{modif|0}]] \ jet de ENERGIQUE @{TEne} modif. ?{modif|0}"></button>
         <input style='display:inline;  margin-left: 10px; margin-right: 10px;' type='checkbox' name='attr_CB-TEne' value='1' />
-        <label style='display:inline-block;  width:130px;'>ENERGIQUE</label>
+        <label style='display:inline-block;  width:130px;'>*ENERGIQUE</label>
         <input  style='display:inline; text-align:center;  font-weight:bold;' type="number" name="attr_TEne" class="sheet-carac2" value="10" />
         <label style='display:inline-block;  width:30px; text-align:center'>/</label>
         <input  style='display:inline; width:35px; text-align:center; font-weight:bold;' type="text" name="attr_TPar" class="sheet-carac2" value="20-@{TEne}" disabled="true"/>
@@ -190,7 +208,7 @@
         
         <button type='roll' name='roll_Test-TGen' value="/em @{MONNOM} fait un test de GENEREUX. \n/roll 1d20<[[@{TGen}+?{modif|0}]] \ jet de GENEREUX @{TGen} modif. ?{modif|0}"></button>
         <input style='display:inline;  margin-left: 10px; margin-right: 10px;' type='checkbox' name='attr_CB-TGen' value='1' />
-        <label style='display:inline-block;  width:130px;'>GENEREUX</label>
+        <label style='display:inline-block;  width:130px;'>*GENEREUX</label>
         <input  style='display:inline; text-align:center;  font-weight:bold;' type="number" name="attr_TGen" class="sheet-carac2" value="10" />
         <label style='display:inline-block;  width:30px; text-align:center'>/</label>
         <input  style='display:inline; width:35px; text-align:center; font-weight:bold;' type="text" name="attr_TEgo" class="sheet-carac2" value="20-@{TGen}" disabled="true"/>
@@ -212,7 +230,7 @@
         
         <button type='roll' name='roll_Test-TJus' value="/em @{MONNOM} fait un test de JUSTE. \n/roll 1d20<[[@{TJus}+?{modif|0}]] \ jet de JUSTE @{TJus} modif. ?{modif|0}"></button>
         <input style='display:inline;  margin-left: 10px; margin-right: 10px;' type='checkbox' name='attr_CB-TJus' value='1' />
-        <label style='display:inline-block;  width:130px;'>JUSTE</label>
+        <label style='display:inline-block;  width:130px;'>*JUSTE</label>
         <input  style='display:inline; text-align:center;  font-weight:bold;' type="number" name="attr_TJus" class="sheet-carac2" value="10" />
         <label style='display:inline-block;  width:30px; text-align:center'>/</label>
         <input  style='display:inline; width:35px; text-align:center; font-weight:bold;' type="text" name="attr_TArb" class="sheet-carac2" value="20-@{TJus}" disabled="true"/>
@@ -223,7 +241,7 @@
         
         <button type='roll' name='roll_Test-TMis' value="/em @{MONNOM} fait un test de MISERICORDIEUX. \n/roll 1d20<[[@{TMis}+?{modif|0}]] \ jet de MISERICORDIEUX @{TMis} modif. ?{modif|0}"></button>
         <input style='display:inline;  margin-left: 10px; margin-right: 10px;' type='checkbox' name='attr_CB-TMis' value='1' />
-        <label style='display:inline-block;  width:130px;'>MISERICORDIEUX</label>
+        <label style='display:inline-block;  width:130px;'>*MISERICORDIEUX</label>
         <input  style='display:inline; text-align:center;  font-weight:bold;' type="number" name="attr_TMis" class="sheet-carac2" value="10" />
         <label style='display:inline-block;  width:30px; text-align:center'>/</label>
         <input  style='display:inline; width:35px; text-align:center; font-weight:bold;' type="text" name="attr_TCru" class="sheet-carac2" value="20-@{TMis}" disabled="true"/>
@@ -234,7 +252,7 @@
         
         <button type='roll' name='roll_Test-TMod' value="/em @{MONNOM} fait un test de MODESTE. \n/roll 1d20<[[@{TMod}+?{modif|0}]] \ jet de MODESTE @{TMod} modif. ?{modif|0}"></button>
         <input style='display:inline;  margin-left: 10px; margin-right: 10px;' type='checkbox' name='attr_CB-TMod' value='1' />
-        <label style='display:inline-block;  width:130px;'>MODESTE</label>
+        <label style='display:inline-block;  width:130px;'>*MODESTE</label>
         <input  style='display:inline; text-align:center;  font-weight:bold;' type="number" name="attr_TMod" class="sheet-carac2" value="10" />
         <label style='display:inline-block;  width:30px; text-align:center'>/</label>
         <input  style='display:inline; width:35px; text-align:center; font-weight:bold;' type="text" name="attr_TFie" class="sheet-carac2" value="20-@{TMod}" disabled="true"/>
@@ -289,7 +307,7 @@
         
          <button type='roll' name='roll_Test-TVal' value="/em @{MONNOM} fait un test de VALEUREUX. \n/roll 1d20<[[@{TVal}+?{modif|0}]] \ jet de VALEUREUX @{TVal} modif. ?{modif|0}"></button>
         <input style='display:inline;  margin-left: 10px; margin-right: 10px;' type='checkbox' name='attr_CB-TVal' value='1' />
-        <label style='display:inline-block;  width:130px;'>VALEUREUX</label>
+        <label style='display:inline-block;  width:130px;'>*VALEUREUX</label>
         <input  style='display:inline; text-align:center;  font-weight:bold;' type="number" name="attr_TVal" class="sheet-carac2" value="10" />
         <label style='display:inline-block;  width:30px; text-align:center'>/</label>
         <input  style='display:inline; width:35px; text-align:center; font-weight:bold;' type="text" name="attr_TCou" class="sheet-carac2" value="20-@{TVal}" disabled="true"/>
@@ -298,7 +316,12 @@
         <button type='roll' name='roll_Test-TCou' value='/em @{MONNOM} fait un test de COUARD. \n/roll 1d20<[[@{TCou}+?{modif|0}]] \ jet de COUARD @{TCou} modif. ?{modif|0}'></button>
         <br />
        </p>
-       
+        <h4 style="margin-bottom: 10px;">Bonus de Chevalerie (80+)  <input  style='display:inline; width:35px; text-align:center; font-weight:bold;' type="text" name="attr_BChe" class="sheet-carac2" value="@{TEne}+@{TGen}+@{TJus}+@{TMis}+@{TMod}+@{TVal}" disabled="true"/>
+       actif <input style='display:inline;  margin-left: 10px; margin-right: 10px;' type='checkbox' name='attr_flag-BChe' value='1' />
+           
+       </h4>
+        <h4 style="margin-bottom: 10px;">Bonus religieux (tous >15) <input  style='display:inline; width:35px; text-align:center; font-weight:bold;' type="text" name="attr_BRel" class="sheet-carac2" value="@{flag-bonus}" disabled="true"/>(0 = non, 1 = oui)
+       </h4>
        <h4 style="margin-bottom: 10px;">Traits dirigés</h4>
          <fieldset class="repeating_TD">            
          <p> <select name="attr_TD-trait" class="sheet-long" style='display:inline; background: transparent; border: none;'>
@@ -332,6 +355,7 @@
          <button style='display:inline;'type='roll' name='roll_Test-TCou' value='/em @{MONNOM} fait un test de trait dirigé. \n/roll 1d20<[[@{TD-trait}+@{TD-value}+?{modif|0}]] \ trait @{TD-trait} , modif cible @{TD-value} modif ?{modif|0}'></button></p>
        
         </fieldset>
+        
        
     
 
@@ -529,7 +553,6 @@
 </div>
 
 <div class="sheet-tab-content sheet-tab4" style="align:center;">  
-     <h2 style="margin: 10px;">Famille</h2>
     <h2 style="margin: 10px;">Mes gens</h2>
     
                 <div style="display:inline-block; width: 100px; text-align:center;     border: 3px solid black; margin:0px;" >Nom</div>
@@ -538,6 +561,39 @@
                 <div style="display:inline-block; width: 250px; text-align:center; border: 3px solid black; margin:0px;">Notes</div>
           
     <fieldset class="repeating_gens" style="vertical-align:top; border: 3px solid black; padding: 5px;" >  
+        <div style="margin-top:5px; padding:5px; border: 3px solid black; width: 767px;">
+            <div  style="display:inline-block; width: 106px; padding-bottom:3px; vertical-align:top;">
+                <input  style="display:inline-block; text-align:left; vertical-align:top; width: 90px;  background:transparent; border-bottom: 1px solid black;" type="text" name="attr_GNom"  />
+            </div>
+             <div  style="display:inline-block; width: 106px;  padding-bottom:3px; vertical-align:top; ">
+                <input  style="display:inline-block; text-align:left; vertical-align:top; width: 90px;  background:transparent; border-bottom: 1px solid black;" type="text" name="attr_GRole"  />
+            </div>
+            <div style="display:inline-block; width: 300px;">
+               <div style="padding-bottom : 3px;"> <input style="display:inline-block; width: 150px; background:transparent; border-bottom: 1px solid black;" type="text" name="attr_GCName1" />
+                <input style='display:inline;' type="number" name="attr_GCValue1" value="0" /> 
+               <input style='display:inline;  margin-left: 10px; margin-right: 10px;' type='checkbox' name='attr_GC-CB1' value='1' />
+                <button style='display:inline;' type='roll' name='roll_TestFOR' value='/em @{GNom} fait un test de compétence @{GCName1}. \n/roll 1d20<[[@{GCValue1}+?{modif|0}]] \ jet de compétence  @{GCName1} @{GCValue1}  modif. ?{modif|0}'></button><br />
+               </div>
+                <div style="padding-bottom : 3px;"> <input style="display:inline-block; width: 150px; background:transparent; border-bottom: 1px solid black;" type="text" name="attr_GCName2" />
+                <input style='display:inline; ' type="number" name="attr_GCValue2" value="0" /> 
+               <input style='display:inline;  margin-left: 10px; margin-right: 10px;' type='checkbox' name='attr_GC-CB2' value='1' />
+                <button style='display:inline; ' type='roll' name='roll_TestFOR' value='/em @{GNom} fait un test de compétence @{GCName2}. \n/roll 1d20<[[@{GCValue2}+?{modif|0}]] \ jet de compétence  @{GCName2} @{GCValue2}  modif. ?{modif|0}'></button><br />
+               </div>
+                <div> <input style="display:inline-block; width: 150px; background:transparent; border-bottom: 1px solid black;" type="text" name="attr_GCName3" />
+                <input style='display:inline;' type="number" name="attr_GCValue3" value="0" /> 
+               <input style='display:inline;  margin-left: 10px; margin-right: 10px;' type='checkbox' name='attr_GC-CB3' value='1' />
+                <button style='display:inline;' type='roll' name='roll_TestFOR' value='/em @{GNom} fait un test de compétence @{GCName3}. \n/roll 1d20<[[@{GCValue3}+?{modif|0}]] \ jet de compétence  @{GCName3} @{GCValue3}  modif. ?{modif|0}'></button>
+                </div>    
+            </div> 
+
+            <textarea style="display:inline-block; width: 225px; height:90px; margin-left:5px; border: 1px solid black; background:transparent;" type="text" name="attr_GN1" /></textarea>
+
+       </div>
+    </fieldset>
+    
+     <h2 style="margin: 10px;">Famille</h2>
+     
+      <fieldset class="repeating_famille" style="vertical-align:top; border: 3px solid black; padding: 5px;" >  
         <div style="margin-top:5px; padding:5px; border: 3px solid black; width: 767px;">
             <div  style="display:inline-block; width: 106px; padding-bottom:3px; vertical-align:top;">
                 <input  style="display:inline-block; text-align:left; vertical-align:top; width: 90px;  background:transparent; border-bottom: 1px solid black;" type="text" name="attr_GNom"  />
