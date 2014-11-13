@@ -2665,6 +2665,7 @@
             			diceResult.diceTextLog = diceResult.diceTextLog + "(Despair)";
             			diceResult.diceGraphicsLog = diceResult.diceGraphicsLog + s1 + eote.defaults.graphics.CHALLENGE.DESPAIR + s2 + "Challenge Despair" + s3 + eote.defaults.globalVars.diceGraphicsChatSize + s4 + eote.defaults.globalVars.diceGraphicsChatSize + s5;
             			diceResult.despair = diceResult.despair + 1;
+						diceResult.failure = diceResult.failure + 1;
             			break;
             		case 3:
             			diceResult.diceTextLog = diceResult.diceTextLog + "(Failure)";
