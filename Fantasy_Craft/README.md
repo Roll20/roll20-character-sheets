@@ -5,6 +5,14 @@ This is my fork of Suldae's initial sheet.
 
 ### ChangeLog
 
+* Bug Fix Update - Nov 2014
+Fixed typos in Threat Range title attribute and Bull Rush, Disarm, Grapple, and Trip basic actions.
+Fixed confusing text fluff when rolling for attacks from weapons section
+'attr_acrobatics_bonus' and 'trip_base' appear to be a reserved words which caused them to be lost from die rolls.  Changed to 'attr_acrobatics__bonus' and 'attr_trip_base' which could impact pre-existing macros
+Fixed Bull Rush roll when using a weapon
+Fixed Bull Rush and Trip size difference calculations when using weapons
+Fixed spellcraft attribute name in Arcane magic session causing error when rolling to attack
+
 * Major Update - August 30 2014 thru October 
 * Changed default values for skills and attributes to help reduce data entry requirements.
 * New fonts!  But they don't work.  Boo, roll20! :-(
