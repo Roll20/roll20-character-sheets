@@ -2133,8 +2133,6 @@
     	}
         
         if (eote.defaults.globalVars.diceGraphicsChat === true ) {
-            
-			log(diceGraphicsResults);
 			
             chatGlobal = chatGlobal + '<br>Roll:' + diceGraphicsResults;
             
