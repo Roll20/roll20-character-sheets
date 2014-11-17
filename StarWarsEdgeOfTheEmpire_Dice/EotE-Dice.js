@@ -444,7 +444,6 @@
         var diceMatch = cmd.match(eote.defaults.regex.dice);
             
             if (diceMatch) {
-                log("dicematch");
                 diceObj = eote.process.setDice(diceMatch, diceObj);
             }
         
@@ -460,13 +459,9 @@
                 diceObj = eote.process.downgrade(downgradeMatch, diceObj);
             }
         
-        log("is this working");
         /* Roll dice and update success / fail 
          * ------------------------------------------------------------- */
         diceObj = eote.process.rollDice(diceObj);
-        
-        log("Dice Rolled");
-        log(diceObj);
         
         /* Custom rolls
          * Description: Custom dice components have thier own message, results and
@@ -2107,10 +2102,6 @@
                     if (diceObj.vars.label) {
                         sendChat(characterPlayer, "/direct <br><b>Skill:</b> " + diceObj.vars.label + '<br>');
                     }
-					
-					log(diceObj.graphicsLog.Advantage);
-					log(diceObj.graphicsLog.Success);
-					
                     
                     if (diceObj.graphicsLog.Boost !="") sendChat("", "/direct " + diceObj.graphicsLog.Boost);
     				if (diceObj.graphicsLog.Ability !="")  sendChat("", "/direct " + diceObj.graphicsLog.Ability);
@@ -2864,13 +2855,12 @@
         		diceTextLog : ""
         	};
 			
-            log("success : Test");
-			
 			diceResult.diceTextLog = diceTextLog + "(Success x" + diceQty +")";
 			diceResult.success = diceResult.success + diceQty;
+            for (i=0; i<diceQty; i++)
+			{
 			diceResult.diceGraphicsLog = diceResult.diceGraphicsLog + s1 + eote.defaults.graphics.SYMBOLS.S + s2 + "Success" + s3 + eote.defaults.globalVars.diceGraphicsChatSize + s4 + eote.defaults.globalVars.diceGraphicsChatSize + s5;
-        	
-			log(diceResult);
+            }
 			
 			return diceResult;
         },
@@ -2901,16 +2891,12 @@
         		diceTextLog : ""
         	};
 			
-			log("advantage : test");
-			          
 			diceResult.diceTextLog = diceTextLog + "(Advantage x" + diceQty +")";
 			diceResult.advantage = diceResult.advantage + diceQty;
 			for (i=0; i<diceQty; i++)
 			{
 				diceResult.diceGraphicsLog = diceResult.diceGraphicsLog + s1 + eote.defaults.graphics.SYMBOLS.A + s2 + "Advantage" + s3 + eote.defaults.globalVars.diceGraphicsChatSize + s4 + eote.defaults.globalVars.diceGraphicsChatSize + s5;
 			}
-        	
-			log(diceResult.diceGraphicsLog); 
 			
 			return diceResult;
         }
