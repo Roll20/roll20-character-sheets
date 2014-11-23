@@ -4,8 +4,14 @@ This sheet is created for use in Stars Without Number on Roll20. Based on the ch
 
 ### Changelog
 
-* Initial Release - 1st November 2014
-First release, supporting basic features.
+#### 0.0.2
+
+* Fixed bug with repeating Psionics rows by hard-coding the number of fields available.
+* Changed version naming scheme.
+
+#### 201411011226
+
+* First release, supporting basic features.
 
 ### Feedback
 
