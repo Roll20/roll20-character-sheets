@@ -187,7 +187,7 @@
             upgrade : /upgrade\((.*?)\)/g,
             downgrade : /downgrade\((.*?)\)/g,
             encum : /encum\((.*?)\)/g,
-            dice : /(\d{1,2}blk)\b|(\d{1,2}b)\b|(\d{1,2}g)\b|(\d{1,2}y)\b|(\d{1,2}p)\b|(\d{1,2}r)\b|(\d{1,2}w)\b|(\d{1,2}a)\b|(\d{1,2}s)\b|\d({1,2}t)\b|\d{1,2}f)/g, ///blk$|b$|g$|y$|p$|r$|w$|a$|s$/
+            dice : /(\d{1,2}blk)\b|(\d{1,2}b)\b|(\d{1,2}g)\b|(\d{1,2}y)\b|(\d{1,2}p)\b|(\d{1,2}r)\b|(\d{1,2}w)\b|(\d{1,2}a)\b|(\d{1,2}s)|(\d{1,2}t)\b|(\d{1,2}f)/g, ///blk$|b$|g$|y$|p$|r$|w$|suc$|adv$/, ///blk$|b$|g$|y$|p$|r$|w$|a$|s$/
         	crit : /crit\((.*?)\)/,
         	critShip : /critship\((.*?)\)/,
         }
@@ -1666,9 +1666,11 @@
                         diceObj.count.advantage = advantage + diceQty;
                         break;
                     case 't':
+                        log("DEBUG hit t");
                         diceObj.count.threat = threat + diceQty;
                         break;
                     case 'f':
+                        log("DEBUG hit f");
                         diceObj.count.failure = failure + diceQty;
                         break;
                 }
@@ -1991,7 +1993,7 @@
     		diceObj.textLog.Advantage = results.diceTextLog;
     		diceObj.totals = eote.process.addDiceValues(diceObj.totals, results);	
         }
-        // Free Threat (from skills)
+        //Free Threat (from skills)
     	 if (diceObj.count.threat > 0) {
     		results = eote.roll.threat(diceObj.count.threat);
     		diceObj.graphicsLog.Threat = results.diceGraphicsLog;
@@ -2142,7 +2144,7 @@
     				if (diceObj.graphicsLog.Force !="") sendChat("", "/direct " + diceObj.graphicsLog.Force);
 					if (diceObj.graphicsLog.Success !="") sendChat("", "/direct " + diceObj.graphicsLog.Success);
 					if (diceObj.graphicsLog.Advantage !="") sendChat("", "/direct " + diceObj.graphicsLog.Advantage);
-					if (diceObj.graphicsLog.Failure !="") sendChat("", "/direct " + diceObj.graphicsLog.Failure);    
+					if (diceObj.graphicsLog.Failure !="") sendChat("", "/direct " +  diceObj.graphicsLog.Failure);    
                     if (diceObj.graphicsLog.Threat !="") sendChat("", "/direct " + diceObj.graphicsLog.Threat);
                 } else {
     				
@@ -2931,9 +2933,8 @@
 			}
 			
 			return diceResult;
-        }
-    },
-        
+        },
+      
     threat : function(diceQty){
             //Free threat
             var i = 0;
@@ -2969,7 +2970,7 @@
 			
 			return diceResult;
         },
-    
+        
     failure : function(diceQty){
             //Free Faliure
             var i = 0;
@@ -3005,6 +3006,7 @@
 			
 			return diceResult;
         }
+    }
     
     eote.events = function() {
         
