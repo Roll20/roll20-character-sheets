@@ -1,8 +1,8 @@
 /*
-	Current Version: 2.5
-	Last updated: 8.28.2014
-	Character Sheet and Script Maintained by: Steve Day
-	Current Verion: https://github.com/Roll20/roll20-character-sheets/tree/master/StarWarsEdgeOfTheEmpire_Dice
+    Current Version: 2.5
+    Last updated: 8.28.2014
+    Character Sheet and Script Maintained by: Steve Day
+    Current Verion: https://github.com/Roll20/roll20-character-sheets/tree/master/StarWarsEdgeOfTheEmpire_Dice
 	Development and Older Verions: https://github.com/dayst/StarWarsEdgeOfTheEmpire_Dice
 	
 	Credits:
@@ -58,7 +58,7 @@
 		Dice
 			* default: 
 			* Description: Loop thru the dice and adds or subtracts them from the dice object
-			* Command: !eed #g #y #b #blk #r #p #w 
+			* Command: !eed #g #y #b #blk #r #p #w #s #a
 		
 		Upgrade
 			* default: 
@@ -187,7 +187,7 @@
             upgrade : /upgrade\((.*?)\)/g,
             downgrade : /downgrade\((.*?)\)/g,
             encum : /encum\((.*?)\)/g,
-            dice : /(\d{1,2}blk)\b|(\d{1,2}b)\b|(\d{1,2}g)\b|(\d{1,2}y)\b|(\d{1,2}p)\b|(\d{1,2}r)\b|(\d{1,2}w)\b/g, ///blk$|b$|g$|y$|p$|r$|w$/
+            dice : /(\d{1,2}blk)\b|(\d{1,2}b)\b|(\d{1,2}g)\b|(\d{1,2}y)\b|(\d{1,2}p)\b|(\d{1,2}r)\b|(\d{1,2}w)\b|(\d{1,2}a)\b|(\d{1,2}s)|(\d{1,2}t)\b|(\d{1,2}f)/g, ///blk$|b$|g$|y$|p$|r$|w$|suc$|adv$/, ///blk$|b$|g$|y$|p$|r$|w$|a$|s$/
         	crit : /crit\((.*?)\)/,
         	critShip : /critship\((.*?)\)/,
         }
@@ -335,7 +335,11 @@
 				SetBack : '',
 				Difficulty : '',
 				Challenge : '',
-				Force : ''
+				Force : '',
+                Success : '',
+                Advantage : '',
+                Threat : '',
+                Failure : ''
 			}
 		this.textLog = {
 				Boost: '',
@@ -344,7 +348,11 @@
 				SetBack : '',
 				Difficulty : '',
 				Challenge : '',
-				Force : ''
+				Force : '',
+                Success : '',
+                Advantage : '',
+                Threat : '',
+                Failure : ''
 			}
 		this.count = {
 				boost: 0,
@@ -353,7 +361,11 @@
 				setback: 0,
 				difficulty: 0,
 				challenge: 0,
-				force: 0
+				force: 0,
+                success: 0,
+                advantage: 0,
+                threat: 0,
+                failure: 0
 			}
 	}
 	
@@ -405,6 +417,10 @@
             
             if (characterIDMatch) {
                 diceObj = eote.process.characterID(characterIDMatch, diceObj);
+                //Once Character ID is parsed, remove it from the cmd.
+                //it is possible that the character ID could contain dice values
+                //for ex. characterID(-JMBFmYX1i0L259bjb-X)  will add 59 blue dice to the pool
+                cmd = cmd.substr(6+characterIDMatch[0].length);
             }
         
         var labelMatch = cmd.match(eote.defaults.regex.label);
@@ -456,8 +472,6 @@
         /* Roll dice and update success / fail 
          * ------------------------------------------------------------- */
         diceObj = eote.process.rollDice(diceObj);
-        
-        
         
         /* Custom rolls
          * Description: Custom dice components have thier own message, results and
@@ -1622,6 +1636,10 @@
                 var boostDice = diceObj.count.boost;
                 var setbackDice = diceObj.count.setback;
                 var forceDice = diceObj.count.force;
+                var success = diceObj.count.success;
+                var advantage = diceObj.count.advantage;
+                var threat = diceObj.count.threat;
+                var failure = diceObj.count.failure;
                 
                 switch(diceArray[2]) {
                     case 'b' :
@@ -1644,6 +1662,18 @@
                         break;
                     case 'w' :
                         diceObj.count.force = forceDice + diceQty;
+                        break;
+                    case 's':
+                        diceObj.count.success = success + diceQty;
+                        break;
+                    case 'a':
+                        diceObj.count.advantage = advantage + diceQty;
+                        break;
+                    case 't':
+                        diceObj.count.threat = threat + diceQty;
+                        break;
+                    case 'f':
+                        diceObj.count.failure = failure + diceQty;
                         break;
                 }
             }
@@ -1950,6 +1980,36 @@
     		diceObj.textLog.Force = results.diceTextLog;
     		diceObj.totals = eote.process.addDiceValues(diceObj.totals, results);	
         }   
+        
+        // Free Successes (from skills)
+        if (diceObj.count.success > 0) {
+    		results = eote.roll.success(diceObj.count.success);
+    		diceObj.graphicsLog.Success = results.diceGraphicsLog;
+    		diceObj.textLog.Success = results.diceTextLog;
+    		diceObj.totals = eote.process.addDiceValues(diceObj.totals, results);	
+        }
+		// Free Advantage (from skills)
+		 if (diceObj.count.advantage > 0) {
+    		results = eote.roll.advantage(diceObj.count.advantage);
+    		diceObj.graphicsLog.Advantage = results.diceGraphicsLog;
+    		diceObj.textLog.Advantage = results.diceTextLog;
+    		diceObj.totals = eote.process.addDiceValues(diceObj.totals, results);	
+        }
+        //Free Threat (from skills)
+    	 if (diceObj.count.threat > 0) {
+    		results = eote.roll.threat(diceObj.count.threat);
+    		diceObj.graphicsLog.Threat = results.diceGraphicsLog;
+    		diceObj.textLog.Threat = results.diceTextLog;
+    		diceObj.totals = eote.process.addDiceValues(diceObj.totals, results);	
+        }
+		// Free Failure (from skills)
+		 if (diceObj.count.failure > 0) {
+    		results = eote.roll.failure(diceObj.count.failure);
+    		diceObj.graphicsLog.Failure = results.diceGraphicsLog;
+    		diceObj.textLog.Failure = results.diceTextLog;
+    		diceObj.totals = eote.process.addDiceValues(diceObj.totals, results);	
+        }
+        
             //finds the sum of each dice attribute
             diceObj.totals = eote.process.totalDiceValues(diceObj.totals);
         
@@ -2049,7 +2109,7 @@
         if (eote.defaults.globalVars.diceLogChat === true) {
         	if (eote.defaults.globalVars.diceLogRolledOnOneLine === true) {
     			
-                diceGraphicsRolled = diceObj.graphicsLog.Boost + diceObj.graphicsLog.Ability + diceObj.graphicsLog.Proficiency + diceObj.graphicsLog.SetBack + diceObj.graphicsLog.Difficulty + diceObj.graphicsLog.Challenge + diceObj.graphicsLog.Force;
+                diceGraphicsRolled = diceObj.graphicsLog.Boost + diceObj.graphicsLog.Ability + diceObj.graphicsLog.Proficiency + diceObj.graphicsLog.SetBack + diceObj.graphicsLog.Difficulty + diceObj.graphicsLog.Challenge + diceObj.graphicsLog.Force + diceObj.graphicsLog.Success + diceObj.graphicsLog.Advantage + diceObj.graphicsLog.Failure + diceObj.graphicsLog.Threat;
                 
                 if (diceObj.textLog.Boost !="") diceTextRolled = diceTextRolled + "Boost:"+diceObj.textLog.Boost;
     			if (diceObj.textLog.Ability !="") diceTextRolled = diceTextRolled + "Ability:"+diceObj.textLog.Ability;
@@ -2058,6 +2118,10 @@
     			if (diceObj.textLog.Difficulty !="") diceTextRolled = diceTextRolled + "Difficulty:"+diceObj.textLog.Difficulty;
     			if (diceObj.textLog.Challenge !="") diceTextRolled = diceTextRolled + "Challenge:"+diceObj.textLog.Challenge;
     			if (diceObj.textLog.Force !="") diceTextRolled = diceTextRolled + "Force:"+diceObj.textLog.Force;
+				if (diceObj.textLog.Success !="") diceTextRolled = diceTextRolled + "Success:"+diceObj.textLog.Success;
+				if (diceObj.textLog.Advantage !="") diceTextRolled = diceTextRolled + "Advantage:"+diceObj.textLog.Advantage;
+                if (diceObj.textLog.Failure != "") diceTextRolled = diceGraphicsRolled + "Failure:"+diceObj.textLog.Failure;
+                if (diceObj.textLog.Threat != "") diceTextRolled = diceGraphicsRolled + "Threat:"+diceObj.textLog.Threat;
     
     			if (eote.defaults.globalVars.diceGraphicsChat === true) {	
                     chatGlobal = chatGlobal + '<br>' + diceGraphicsRolled;
@@ -2080,7 +2144,10 @@
     				if (diceObj.graphicsLog.Difficulty !="")  sendChat("", "/direct " + diceObj.graphicsLog.Difficulty);
     				if (diceObj.graphicsLog.Challenge !="") sendChat("", "/direct " + diceObj.graphicsLog.Challenge);
     				if (diceObj.graphicsLog.Force !="") sendChat("", "/direct " + diceObj.graphicsLog.Force);
-		
+					if (diceObj.graphicsLog.Success !="") sendChat("", "/direct " + diceObj.graphicsLog.Success);
+					if (diceObj.graphicsLog.Advantage !="") sendChat("", "/direct " + diceObj.graphicsLog.Advantage);
+					if (diceObj.graphicsLog.Failure !="") sendChat("", "/direct " +  diceObj.graphicsLog.Failure);    
+                    if (diceObj.graphicsLog.Threat !="") sendChat("", "/direct " + diceObj.graphicsLog.Threat);
                 } else {
     				
                     if (diceObj.vars.label) {
@@ -2094,13 +2161,17 @@
     				if (diceObj.textLog.Difficulty !="") sendChat("", "Difficulty:"+diceObj.textLog.Difficulty);
     				if (diceObj.textLog.Challenge !="") sendChat("", "Challenge:"+diceObj.textLog.Challenge);
     				if (diceObj.textLog.Force !="") sendChat("", "Force:"+diceObj.textLog.Force);
+					if (diceObj.textLog.Success !="") sendChat("", "Success:"+diceObj.textLog.Success);
+					if (diceObj.textLog.Advantage !="") sendChat("", "Advantage:"+diceObj.textLog.Advantage);
+					if (diceObj.textLog.Failure !="") sendChat("", "Failure:" + diceObj.textLog.Failure);    
+                    if (diceObj.textLog.Threat !="") sendChat("", "Threat:" + diceObj.textLog.Threat);
     			
     			}
     		}
     	}
         
         if (eote.defaults.globalVars.diceGraphicsChat === true ) {
-            
+			
             chatGlobal = chatGlobal + '<br>Roll:' + diceGraphicsResults;
             
             sendChat(characterPlayer, chatGlobal);
@@ -2621,6 +2692,7 @@
             			diceResult.diceTextLog = diceResult.diceTextLog + "(Despair)";
             			diceResult.diceGraphicsLog = diceResult.diceGraphicsLog + s1 + eote.defaults.graphics.CHALLENGE.DESPAIR + s2 + "Challenge Despair" + s3 + eote.defaults.globalVars.diceGraphicsChatSize + s4 + eote.defaults.globalVars.diceGraphicsChatSize + s5;
             			diceResult.despair = diceResult.despair + 1;
+						diceResult.failure = diceResult.failure + 1;
             			break;
             		case 3:
             			diceResult.diceTextLog = diceResult.diceTextLog + "(Failure)";
@@ -2791,8 +2863,151 @@
                 }
         	}
         	return diceResult;
-        }
+        },
         
+        success : function(diceQty){
+            //Free Success
+            var i = 0;
+        	var s1 = '<img src="';
+        	var s2 = '" title="';
+        	var s3 = '" height="';
+        	var s4 = '" width="';
+        	var s5 = '"/>';
+			
+			var roll = 0;
+        	var diceTextLog = "";
+        	var diceGraphicsLog = "";
+            
+			var diceResult = {
+        		success : 0,
+        		failure : 0,
+        		advantage : 0,
+        		threat : 0,
+        		triumph : 0,
+        		despair : 0,
+        		light : 0,
+        		dark : 0,
+        		diceGraphicsLog : "",
+        		diceTextLog : ""
+        	};
+			
+			diceResult.diceTextLog = diceTextLog + "(Success x" + diceQty +")";
+			diceResult.success = diceResult.success + diceQty;
+            for (i=0; i<diceQty; i++)
+			{
+			diceResult.diceGraphicsLog = diceResult.diceGraphicsLog + s1 + eote.defaults.graphics.SYMBOLS.S + s2 + "Success" + s3 + eote.defaults.globalVars.diceGraphicsChatSize + s4 + eote.defaults.globalVars.diceGraphicsChatSize + s5;
+            }
+			
+			return diceResult;
+        },
+        
+        advantage : function(diceQty){
+            //Free Advantage
+            var i = 0;
+        	var s1 = '<img src="';
+        	var s2 = '" title="';
+        	var s3 = '" height="';
+        	var s4 = '" width="';
+        	var s5 = '"/>';
+			
+			var roll = 0;
+        	var diceTextLog = "";
+        	var diceGraphicsLog = "";
+			
+			var diceResult = {
+        		success : 0,
+        		failure : 0,
+        		advantage : 0,
+        		threat : 0,
+        		triumph : 0,
+        		despair : 0,
+        		light : 0,
+        		dark : 0,
+        		diceGraphicsLog : "",
+        		diceTextLog : ""
+        	};
+			
+			diceResult.diceTextLog = diceTextLog + "(Advantage x" + diceQty +")";
+			diceResult.advantage = diceResult.advantage + diceQty;
+			for (i=0; i<diceQty; i++)
+			{
+				diceResult.diceGraphicsLog = diceResult.diceGraphicsLog + s1 + eote.defaults.graphics.SYMBOLS.A + s2 + "Advantage" + s3 + eote.defaults.globalVars.diceGraphicsChatSize + s4 + eote.defaults.globalVars.diceGraphicsChatSize + s5;
+			}
+			
+			return diceResult;
+        },
+      
+    threat : function(diceQty){
+            //Free threat
+            var i = 0;
+        	var s1 = '<img src="';
+        	var s2 = '" title="';
+        	var s3 = '" height="';
+        	var s4 = '" width="';
+        	var s5 = '"/>';
+			
+			var roll = 0;
+        	var diceTextLog = "";
+        	var diceGraphicsLog = "";
+            
+			var diceResult = {
+        		success : 0,
+        		failure : 0,
+        		advantage : 0,
+        		threat : 0,
+        		triumph : 0,
+        		despair : 0,
+        		light : 0,
+        		dark : 0,
+        		diceGraphicsLog : "",
+        		diceTextLog : ""
+        	};
+			
+			diceResult.diceTextLog = diceTextLog + "(Threat x" + diceQty +")";
+			diceResult.threat = diceResult.threat + diceQty;
+            for (i=0; i<diceQty; i++)
+			{
+			diceResult.diceGraphicsLog = diceResult.diceGraphicsLog + s1 + eote.defaults.graphics.SYMBOLS.T + s2 + "Threat" + s3 + eote.defaults.globalVars.diceGraphicsChatSize + s4 + eote.defaults.globalVars.diceGraphicsChatSize + s5;
+            }
+			
+			return diceResult;
+        },
+        
+    failure : function(diceQty){
+            //Free Faliure
+            var i = 0;
+        	var s1 = '<img src="';
+        	var s2 = '" title="';
+        	var s3 = '" height="';
+        	var s4 = '" width="';
+        	var s5 = '"/>';
+			
+			var roll = 0;
+        	var diceTextLog = "";
+        	var diceGraphicsLog = "";
+            
+			var diceResult = {
+        		success : 0,
+        		failure : 0,
+        		advantage : 0,
+        		threat : 0,
+        		triumph : 0,
+        		despair : 0,
+        		light : 0,
+        		dark : 0,
+        		diceGraphicsLog : "",
+        		diceTextLog : ""
+        	};
+			
+			diceResult.diceTextLog = diceTextLog + "(Failure x" + diceQty +")";
+			diceResult.failure = diceResult.failure + diceQty;
+            for (i=0; i<diceQty; i++)
+			{
+			diceResult.diceGraphicsLog = diceResult.diceGraphicsLog + s1 + eote.defaults.graphics.SYMBOLS.F + s2 + "Success" + s3 + eote.defaults.globalVars.diceGraphicsChatSize + s4 + eote.defaults.globalVars.diceGraphicsChatSize + s5;
+            }
+			
+			return diceResult;
+        }
     }
     
     eote.events = function() {
