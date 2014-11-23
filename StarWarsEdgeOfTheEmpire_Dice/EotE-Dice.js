@@ -414,8 +414,6 @@
          * Description: Set default dice roll information Character Name and Skill Label
          * --------------------------------------------------------------*/
         var characterIDMatch = cmd.match(eote.defaults.regex.characterID);
-        
-        log(characterIDMatch);
             
             if (characterIDMatch) {
                 diceObj = eote.process.characterID(characterIDMatch, diceObj);
@@ -1623,8 +1621,6 @@
         //log(cmd);
         
         _.each(cmd, function(dice) {
-            
-            log("DEBUG: + " + dice);
         
             var diceArray = dice.match(/(\d{1,2})(\w{1,3})/);
             
