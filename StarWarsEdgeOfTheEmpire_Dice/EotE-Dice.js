@@ -414,9 +414,15 @@
          * Description: Set default dice roll information Character Name and Skill Label
          * --------------------------------------------------------------*/
         var characterIDMatch = cmd.match(eote.defaults.regex.characterID);
+        
+        log(characterIDMatch);
             
             if (characterIDMatch) {
                 diceObj = eote.process.characterID(characterIDMatch, diceObj);
+                //Once Character ID is parsed, remove it from the cmd.
+                //it is possible that the character ID could contain dice values
+                //for ex. characterID(-JMBFmYX1i0L259bjb-X)  will add 59 blue dice to the pool
+                cmd = cmd.substr(6+characterIDMatch[0].length);
             }
         
         var labelMatch = cmd.match(eote.defaults.regex.label);
@@ -1617,6 +1623,8 @@
         //log(cmd);
         
         _.each(cmd, function(dice) {
+            
+            log("DEBUG: + " + dice);
         
             var diceArray = dice.match(/(\d{1,2})(\w{1,3})/);
             
@@ -1666,11 +1674,9 @@
                         diceObj.count.advantage = advantage + diceQty;
                         break;
                     case 't':
-                        log("DEBUG hit t");
                         diceObj.count.threat = threat + diceQty;
                         break;
                     case 'f':
-                        log("DEBUG hit f");
                         diceObj.count.failure = failure + diceQty;
                         break;
                 }
@@ -1980,7 +1986,7 @@
         }   
         
         // Free Successes (from skills)
-    	 if (diceObj.count.success > 0) {
+        if (diceObj.count.success > 0) {
     		results = eote.roll.success(diceObj.count.success);
     		diceObj.graphicsLog.Success = results.diceGraphicsLog;
     		diceObj.textLog.Success = results.diceTextLog;
