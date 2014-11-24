@@ -4,6 +4,11 @@ This sheet is created for use in Stars Without Number on Roll20. Based on the ch
 
 ### Changelog
 
+#### 0.0.3
+
+* Fixed bug with Artist and Combat Unarmed skill using the same value.
+* Added alternating color to skills rows to differentiate them easier.
+
 #### 0.0.2
 
 * Fixed bug with repeating Psionics rows by hard-coding the number of fields available.
