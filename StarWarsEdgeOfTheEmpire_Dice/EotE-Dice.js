@@ -1,9 +1,9 @@
 /*
     Current Version: 2.5
-    Last updated: 11.23.2014
+    Last updated: 8.28.2014
     Character Sheet and Script Maintained by: Steve Day
     Current Verion: https://github.com/Roll20/roll20-character-sheets/tree/master/StarWarsEdgeOfTheEmpire_Dice
-	Development and Older Verions: https://github.com/dayst/StarWarsEdgeOfTheEmpire_Dice
+    Development and Older Verions: https://github.com/dayst/StarWarsEdgeOfTheEmpire_Dice
 	
 	Credits:
 		Original creator: Konrad J.
@@ -435,7 +435,7 @@
                 //Once Character ID is parsed, remove it from the cmd.
                 //it is possible that the character ID could contain dice values
                 //for ex. characterID(-JMBFmYX1i0L259bjb-X)  will add 59 blue dice to the pool
-                cmd = cmd.substr(6+characterIDMatch[0].length);
+                cmd = cmd.replace(characterIDMatch[0], '');
             }
         
         var labelMatch = cmd.match(eote.defaults.regex.label);
