@@ -3,7 +3,7 @@
     Last updated: 8.28.2014
     Character Sheet and Script Maintained by: Steve Day
     Current Verion: https://github.com/Roll20/roll20-character-sheets/tree/master/StarWarsEdgeOfTheEmpire_Dice
-	Development and Older Verions: https://github.com/dayst/StarWarsEdgeOfTheEmpire_Dice
+    Development and Older Verions: https://github.com/dayst/StarWarsEdgeOfTheEmpire_Dice
 	
 	Credits:
 		Original creator: Konrad J.
@@ -95,12 +95,14 @@
         },
         character : {
             attributes : [
-                {
+                /* Don't need to update characterID
+                 * 
+                 *{
                     name : "characterID",
                     current : "UPDATES TO CURRENT ID",
                     max : "",
                     update : false
-                }
+                }*/
             ], 
             ablities : [],
         },
@@ -181,13 +183,14 @@
             resetdice : /(resetgmdice|resetdice)/,
             initiative : /\bnpcinit|\bpcinit/,
             characterID : /characterID\((.*?)\)/,
+            rollPlayer : /rollPlayer(\(.*?\))/,
             label : /label\((.*?)\)/,
             skill : /skill\((.*?)\)/g,
 			opposed : /opposed\((.*?)\)/g,
             upgrade : /upgrade\((.*?)\)/g,
             downgrade : /downgrade\((.*?)\)/g,
             encum : /encum\((.*?)\)/g,
-            dice : /(\d{1,2}blk)\b|(\d{1,2}b)\b|(\d{1,2}g)\b|(\d{1,2}y)\b|(\d{1,2}p)\b|(\d{1,2}r)\b|(\d{1,2}w)\b|(\d{1,2}a)\b|(\d{1,2}s)|(\d{1,2}t)\b|(\d{1,2}f)/g, ///blk$|b$|g$|y$|p$|r$|w$|suc$|adv$/, ///blk$|b$|g$|y$|p$|r$|w$|a$|s$/
+            dice : /(\d{1,2}blk)\b|(\d{1,2}b)\b|(\d{1,2}g)\b|(\d{1,2}y)\b|(\d{1,2}p)\b|(\d{1,2}r)\b|(\d{1,2}w)\b|(\d{1,2}a)\b|(\d{1,2}s)|(\d{1,2}t)\b|(\d{1,2}f)/g,
         	crit : /crit\((.*?)\)/,
         	critShip : /critship\((.*?)\)/,
         }
@@ -241,7 +244,7 @@
         _.each(charObj, function(charObj){
             
             //updates default attr:CharacterID to current character id
-            _.findWhere(eote.defaults.character.attributes, {'name':'characterID'}).current = charObj.id;
+            //_.findWhere(eote.defaults.character.attributes, {'name':'characterID'}).current = charObj.id;
             
             //Attributes
             eote.updateAddAttribute(charObj, eote.defaults.character.attributes);//Update Add Attribute defaults
@@ -413,6 +416,18 @@
         /* Roll information
          * Description: Set default dice roll information Character Name and Skill Label
          * --------------------------------------------------------------*/
+        
+        var rollPlayerMatch = cmd.match(eote.defaults.regex.rollPlayer);
+			
+			if (rollPlayerMatch) {
+                diceObj = eote.process.rollPlayer(rollPlayerMatch, diceObj);
+                
+                if (!diceObj) {
+                    return false;
+                }
+            }
+        
+        
         var characterIDMatch = cmd.match(eote.defaults.regex.characterID);
             
             if (characterIDMatch) {
@@ -420,7 +435,7 @@
                 //Once Character ID is parsed, remove it from the cmd.
                 //it is possible that the character ID could contain dice values
                 //for ex. characterID(-JMBFmYX1i0L259bjb-X)  will add 59 blue dice to the pool
-                cmd = cmd.substr(6+characterIDMatch[0].length);
+                cmd = cmd.replace(characterIDMatch[0], '');
             }
         
         var labelMatch = cmd.match(eote.defaults.regex.label);
@@ -601,6 +616,66 @@
         
     }
     
+    eote.process.rollPlayer = function(cmd, diceObj){
+		//Build cmd string
+		//get characterID
+		//get skills
+		//get encum
+		//remove rollPlayer(xxxx) from string
+		var match = {
+    	    skill : /skill:(.*?)[\|\)]/,
+            encum : /encum/,
+            character : /character:(.*?)[\|\)]/,
+		}
+        
+        var charcterMatch = cmd[1].match(match.character);
+        
+        if (charcterMatch) {
+            
+            var charObj = findObjs({ _type: "character", name: charcterMatch[1] });
+            
+            if (charObj.length > 0){
+            
+                diceObj.vars.characterName = charObj[0].get('name');
+                diceObj.vars.characterID = charObj[0].id;
+
+            } else {
+                sendChat("Alert", "Can't find character. Please update character name field to match sheet character name and try again.");
+                return false;
+            }
+        } else {
+            sendChat("Alert", "Please update character name field.");
+            return false;
+        }
+        
+        var encumMatch = cmd[1].match(match.encum);
+        
+        if (encumMatch) {
+            //encumbrance
+            var attr_1 = getAttrByName(diceObj.vars.characterID, 'encumbrance', 'max');
+            var attr_2 = getAttrByName(diceObj.vars.characterID, 'encumbrance');
+            var cmdEncum = ['encum('+attr_1+'|'+attr_2+')']; //["encum(3|5)"]
+
+            diceObj = eote.process.encum(cmdEncum, diceObj);
+          
+        }
+        
+        var skillMatch = cmd[1].match(match.skill);
+        
+        if (skillMatch) {
+            
+            var attrArray = skillMatch[1].split(',')
+            var attr_1 = getAttrByName(diceObj.vars.characterID, attrArray[0]);
+            var attr_2 = getAttrByName(diceObj.vars.characterID, attrArray[1]);
+            var cmdSkill = ['skill('+attr_1+'|'+attr_2+')']; //['skill(0|2)']
+            
+            diceObj = eote.process.skill(cmdSkill, diceObj);
+        }
+
+        return diceObj;
+		
+	}
+    
     eote.process.characterID = function(cmd, diceObj){
         
         /* CharacterId
@@ -636,7 +711,19 @@
         var label = cmd[1];
         
         if (label) {
-            diceObj.vars.label = label;
+            
+            var labelStr = '';
+            var labelArray = label.split('|');
+            
+            _.each(labelArray, function(labelVal){
+                var labelArray = labelVal.split(':');
+                var label = labelArray[0];
+                var message = labelArray[1];
+                
+                labelStr = labelStr + '<b>' + label + ':</b> ' + message + '<br>';
+            });
+            
+            diceObj.vars.label = labelStr;
         } 
         
 		return diceObj;
@@ -2090,7 +2177,7 @@
         if (eote.defaults.globalVars.diceTestEnabled === true) {
         	chatGlobal = "/direct <br>6b 8g 12y 6blk 8p 12r 12w <br>";
     	} else if (diceObj.vars.label) {
-            chatGlobal = "/direct <br><b>Skill:</b> " + diceObj.vars.label + '<br>';
+            chatGlobal = "/direct <br>" + diceObj.vars.label + '<br>';
     	} else {
             chatGlobal = "/direct <br>";
     	}
