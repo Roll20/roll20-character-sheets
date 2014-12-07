@@ -1,6 +1,6 @@
 /*
     Current Version: 2.5
-    Last updated: 12.02.2014
+    Last updated: 12.03.2014
     Character Sheet and Script Maintained by: Steve Day
     Current Verion: https://github.com/Roll20/roll20-character-sheets/tree/master/StarWarsEdgeOfTheEmpire_Dice
     Development and Older Verions: https://github.com/dayst/StarWarsEdgeOfTheEmpire_Dice
@@ -93,6 +93,7 @@
             diceTestEnabled : false,
             diceLogRolledOnOneLine : true
         },
+        '-DicePoolID' : '',
         character : {
             attributes : [
                 /* Don't need to update characterID
@@ -189,6 +190,7 @@
 			opposed : /opposed\((.*?)\)/g,
             upgrade : /upgrade\((.*?)\)/g,
             downgrade : /downgrade\((.*?)\)/g,
+            gmdice : /\(gmdice\)/,
             encum : /encum\((.*?)\)/g,
             dice : /(\d{1,2}blk)\b|(\d{1,2}b)\b|(\d{1,2}g)\b|(\d{1,2}y)\b|(\d{1,2}p)\b|(\d{1,2}r)\b|(\d{1,2}w)\b|(\d{1,2}a)\b|(\d{1,2}s)|(\d{1,2}t)\b|(\d{1,2}f)/g,
         	crit : /crit\((.*?)\)/,
@@ -199,6 +201,8 @@
     eote.createGMDicePool = function() {
         
         var charObj_DicePool = findObjs({ _type: "character", name: "-DicePool" });
+        
+        eote.defaults['-DicePoolID'] = charObj_DicePool[0].id;
         
         var attrObj_DicePool = [
             {
@@ -290,30 +294,33 @@
             //find attribute via character ID
             var characterAttributesObj = findObjs({ _type: "attribute", characterid: characterObj.id});
             
-            log('//------------------------------->'+ characterName);
-            
-           _.each(updateAddAttributesObj, function(updateAddAttrObj){ //loop attributes to update / add
+            if (updateAddAttributesObj.length != 0) {
                 
-                attr = _.find(characterAttributesObj, function(a) {
-                    return (a.get('name') === updateAddAttrObj.name);
+                log('UPDATE/ADD ATTRIBUTES FOR:----------------------->'+ characterName);
+            
+               _.each(updateAddAttributesObj, function(updateAddAttrObj){ //loop attributes to update / add
+                    
+                    attr = _.find(characterAttributesObj, function(a) {
+                        return (a.get('name') === updateAddAttrObj.name);
+                    });
+    
+                    if (attr) {
+                       if (updateAddAttrObj.update) {
+                            log('Update Attr: '+ updateAddAttrObj.name);
+                            attr.set({current: updateAddAttrObj.current});
+                            attr.set({max: updateAddAttrObj.max ? updateAddAttrObj.max : ''});
+            			}
+            		} else {
+            		    log('Add Attr: '+ updateAddAttrObj.name);
+                        eote.createObj('attribute', {
+                			characterid: characterObj.id,
+                			name: updateAddAttrObj.name,
+                			current: updateAddAttrObj.current,
+                			max: updateAddAttrObj.max ? updateAddAttrObj.max : ''
+            			});
+            		}
                 });
-
-                if (attr) {
-            	   if (updateAddAttrObj.update) {
-                        log('Update Attr: '+ updateAddAttrObj.name);
-                        attr.set({current: updateAddAttrObj.current});
-                        attr.set({max: updateAddAttrObj.max});
-        			}
-        		} else {
-        		    log('Add Attr: '+ updateAddAttrObj.name);
-                    eote.createObj('attribute', {
-            			characterid: characterObj.id,
-            			name: updateAddAttrObj.name,
-            			current: updateAddAttrObj.current,
-            			max: updateAddAttrObj.max
-        			});
-        		}
-            });
+            }
         }); 
         
     }
@@ -460,6 +467,12 @@
          * Description: Create dice pool before running any custom roll
          * script commands that may need dice evaluated.
          * --------------------------------------------------------------*/
+        var gmdiceMatch = cmd.match(eote.defaults.regex.gmdice);
+            
+            if (gmdiceMatch) {
+                cmd = eote.process.gmdice(cmd); // update the cmd string to contain the gmdice
+            }
+            
         var encumMatch = cmd.match(eote.defaults.regex.encum);
         
             if (encumMatch) {
@@ -1182,6 +1195,8 @@
             var diceRoll = '';
             var critMod = '';
     		var rollTotal = '';
+            var rollOffset = parseInt(getAttrByName(diceObj.vars.characterID, 'critAddOffset'));
+                rollOffset = rollOffset ? rollOffset : 0;
             var totalcrits = 0;
             
             //check open critical spot
@@ -1205,7 +1220,7 @@
     		if (!addCritNum) {
     			diceRoll = randomInteger(100);
     			critMod = (totalcrits * 10);
-    			rollTotal = diceRoll + critMod;
+    			rollTotal = diceRoll + critMod + rollOffset;
     		} else {
     			rollTotal = parseInt(addCritNum);
     		}
@@ -1257,6 +1272,9 @@
                     var chat = '/direct <br><b>Rolls Critical Injury</b><br>';
                         chat = chat + '<img src="http://i.imgur.com/z51hRwd.png" /><br/>'
                         chat = chat + 'Current Criticals: (' + totalcrits + ' x 10)<br>';
+                        if (rollOffset) {
+                            chat = chat + 'Dice Roll Offset: ' + rollOffset + '<br>';
+                        }
                         chat = chat + 'Dice Roll: ' + diceRoll + '<br>';
                         chat = chat + 'Total: ' + rollTotal + '<br>';
                         chat = chat + '<br>';
@@ -1478,6 +1496,8 @@
             var diceRoll = '';
             var critMod = '';
         	var rollTotal = '';
+            var rollOffset = parseInt(getAttrByName(diceObj.vars.characterID, 'critShipAddOffset'));
+                rollOffset = rollOffset ? rollOffset : 0;
             var totalcrits = 0;
             
             //check open critical spot
@@ -1501,7 +1521,7 @@
     		if (!addCritNum) {
     			diceRoll = randomInteger(100);
     			critMod = (totalcrits * 10);
-    			rollTotal = diceRoll + critMod;
+    			rollTotal = diceRoll + critMod + rollOffset;
     		} else {
     			rollTotal = parseInt(addCritNum);
     		}
@@ -1553,6 +1573,9 @@
                     var chat = '/direct <br><b>Rolls Vehicle Critical</b><br>';
                         chat = chat + '<img src="http://i.imgur.com/JO3pOr8.png" /><br>';//need new graphic
                         chat = chat + 'Current Criticals: (' + totalcrits + ' x 10)<br>';
+                        if (rollOffset) {
+                            chat = chat + 'Dice Roll Offset: ' + rollOffset + '<br>';
+                        }
                         chat = chat + 'Dice Roll: ' + diceRoll + '<br>';
                         chat = chat + 'Total: ' + rollTotal + '<br>';
                         chat = chat + '<br>';
@@ -1617,6 +1640,40 @@
             critRoll();
 		}
        
+    }
+    
+    eote.process.gmdice = function(cmd) {
+        
+        /* gmdice
+         * default: 
+         * Description: Update CMD string to include -DicePool dice
+         * Command: (gmdice)
+         * ---------------------------------------------------------------- */
+
+        //var charObj = findObjs({ _type: "character", name: "-DicePool" });
+        var charID = eote.defaults['-DicePoolID'];//charObj[0].id;
+        
+        var g   = getAttrByName(charID, 'ggm');
+        var y   = getAttrByName(charID, 'ygm');
+        var p   = getAttrByName(charID, 'pgm');
+        var r   = getAttrByName(charID, 'rgm');
+        var b   = getAttrByName(charID, 'bgm');
+        var blk = getAttrByName(charID, 'blkgm');
+        var w   = getAttrByName(charID, 'wgm');
+        var upAbility       = getAttrByName(charID, 'upgradeAbilitygm');
+        var upDifficulty    = getAttrByName(charID, 'upgradeDifficultygm');
+        var downProficiency = getAttrByName(charID, 'downgradeProficiencygm');
+        var downChallenge   = getAttrByName(charID, 'downgradeChallengegm');
+       
+        var gmdiceCMD = g+'g '+y+'y '+p+'p '+r+'r '+b+'b '+blk+'blk '+w+'w upgrade(ability|'+upAbility+') downgrade(proficiency|'+downProficiency+') upgrade(difficulty|'+upDifficulty+') downgrade(challenge|'+downChallenge+')';
+       
+        //log(charID);
+       
+        cmd = cmd.replace('(gmdice)', gmdiceCMD);
+        
+        //log(cmd);
+        
+        return cmd;
     }
     
     eote.process.encum = function(cmd, diceObj){
