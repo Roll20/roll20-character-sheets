@@ -1,10 +1,10 @@
 /*
     Current Version: 2.5
-    Last updated: 8.28.2014
+    Last updated: 12.02.2014
     Character Sheet and Script Maintained by: Steve Day
     Current Verion: https://github.com/Roll20/roll20-character-sheets/tree/master/StarWarsEdgeOfTheEmpire_Dice
     Development and Older Verions: https://github.com/dayst/StarWarsEdgeOfTheEmpire_Dice
-	
+    
 	Credits:
 		Original creator: Konrad J.
 		Helped with Dice specs: Alicia G. and Blake the Lake
@@ -198,22 +198,34 @@
     
     eote.createGMDicePool = function() {
         
+        var charObj_DicePool = findObjs({ _type: "character", name: "-DicePool" });
+        
+        var attrObj_DicePool = [
+            {
+                name : 'pcgm',
+                current : 3,
+                max : '',
+                update : true
+            },
+            {
+                name : 'gmdicepool',
+                current : 2,
+                max : '',
+                update : true
+            }   
+        ];
+        
         //create character -DicePool
-        if (findObjs({ _type: "character", name: "-DicePool" }).length == 0){
+        if (charObj_DicePool.length == 0){
            
-            createObj("character", {
+            charObj_DicePool = createObj("character", {
                 name: "-DicePool",
                 bio: "GM Dice Pool"
             });
-           
-            Char_dicePoolObject = findObjs({ _type: "character", name: "-DicePool" });
             
-            createObj("attribute", {
-                name: "pcgm",
-                current: 3,
-                characterid: Char_dicePoolObject[0].id
-            });
-        };
+        } 
+            
+        eote.updateAddAttribute(charObj_DicePool, attrObj_DicePool);
         
     }
     
