@@ -5,6 +5,14 @@ This is my fork of Suldae's initial sheet.
 
 ### ChangeLog
 
+* Update - Dec 2014
+Minor changes to Standard Character tab to fix shifting around and removal of out-of-date comments
+Changed Spellcasting skill to work like all the other skills (no longer need for checkbox at top of skill list)
+Cleaned up css elements no longer needed with Spellcasting skill changes
+Added Prep Cost to all Arcane spell levels
+Added Rolls for Saving Throws
+Added Bonus and Roll for Knowledge Checks
+
 * Bug Fix Update - Nov 2014
 Fixed typos in Threat Range title attribute and Bull Rush, Disarm, Grapple, and Trip basic actions.
 Fixed confusing text fluff when rolling for attacks from weapons section
@@ -59,7 +67,6 @@ Fixed spellcraft attribute name in Arcane magic session causing error when rolli
 ### TODO
 
 * Add roll button for Initiative
-* Add roll button for Saving Throws
 * Add mod for Knowledge checks
 * Add roll button for Knowledge checks
 * Compute Keen in conjunction with damage rolls
