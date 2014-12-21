@@ -9,6 +9,10 @@ Le jeu complet est disponible gratuitement en PDF sur le site du [Scriptorium](h
 
 # Notes de version
 
+##v1.2 (2014-12-21).
+Affichage des jets plus compacts dans le chat.
+Enrichissement de l'&eacute;quipement : richesses (pi&egrave;ces), encombrement et vitesses de d&eacute;placement.
+
 ##v1.1 (2014-12-16).
 Correction du HTML pour retirer les accents r&eacute;siduels et attributs inutiles.
 
