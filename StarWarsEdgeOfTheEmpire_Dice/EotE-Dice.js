@@ -200,9 +200,7 @@
     
     eote.createGMDicePool = function() {
         
-        var charObj_DicePool = findObjs({ _type: "character", name: "-DicePool" });
-        
-        eote.defaults['-DicePoolID'] = charObj_DicePool[0].id;
+        var charObj_DicePool = findObjs({ _type: "character", name: "-DicePool" })[0];
         
         var attrObj_DicePool = [
             {
@@ -220,7 +218,7 @@
         ];
         
         //create character -DicePool
-        if (charObj_DicePool.length == 0){
+        if ( ! charObj_DicePool ){
            
             charObj_DicePool = createObj("character", {
                 name: "-DicePool",
@@ -228,7 +226,9 @@
             });
             
         } 
-            
+		
+		eote.defaults['-DicePoolID'] = charObj_DicePool.id;
+                    
         eote.updateAddAttribute(charObj_DicePool, attrObj_DicePool);
         
     }
