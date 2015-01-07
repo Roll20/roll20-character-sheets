@@ -20,6 +20,8 @@ createObjFix = function() {
 // Addes don't count as changes so we need to handle the first change here
 on("add:attribute", function(obj) {
     var attributeName = obj.get("name");
+    var attributeNameLastFour = attributeName.slice(-4);
+    var attributeNameLastFive = attributeName.slice(-5);
 
     if (attributeName == "fatigue") {
         setFatigueEffects(obj.get('_characterid'), obj.get('current'));
@@ -27,12 +29,16 @@ on("add:attribute", function(obj) {
         setSpiritDamage(obj.get('_characterid'));
     }  else if (attributeName == "str_std" || attributeName == "str_temp" || attributeName == "siz_std" || attributeName == "siz_temp") {
         setStdDamageModifier(obj.get('_characterid'));
+    } else if (attributeNameLastFour == '_enc' || attributeNameLastFive == '_qnty') {
+        setLoadEffects(obj.get('_characterid'));
     }
 });
 
 // Handle all other changes to key values
 on("change:attribute", function(obj) {
     var attributeName = obj.get("name");
+    var attributeNameLastFour = attributeName.slice(-4);
+    var attributeNameLastFive = attributeName.slice(-5);
 
     if (attributeName == "fatigue") {
         setFatigueEffects(obj.get('_characterid'), obj.get('current'));
@@ -40,8 +46,87 @@ on("change:attribute", function(obj) {
         setSpiritDamage(obj.get('_characterid'));
     }  else if (attributeName == "str_std" || attributeName == "str_temp" || attributeName == "siz_std" || attributeName == "siz_temp") {
         setStdDamageModifier(obj.get('_characterid'));
+    } else if (attributeNameLastFour == '_enc' || attributeNameLastFive == '_qnty') {
+        setLoadEffects(obj.get('_characterid'));
     }
 });
+
+function setLoadEffects(characterID) {
+    var encSkillMod = findObjs({_type: 'attribute', _characterid: characterID, name: 'enc_skill_mod'})[0];
+    if (! encSkillMod) {
+        var encSkillMod = createObjFix('attribute', {
+            name: 'enc_skill_mod',
+            characterid: characterID,
+            current: 'Standard'
+        });
+    }
+    
+    var encMoveRateMod = findObjs({_type: 'attribute', _characterid: characterID, name: 'enc_move_rate_mod'})[0];
+    if (! encMoveRateMod) {
+        var encMoveRateMod = createObjFix('attribute', {
+            name: 'enc_move_rate_mod',
+            characterid: characterID,
+            current: '-0'
+        });
+    }
+    
+    var encCarryingLoad = findObjs({_type: 'attribute', _characterid: characterID, name: 'enc_carrying_load'})[0];
+    if (! encCarryingLoad) {
+        var encCarryingLoad = createObjFix('attribute', {
+            name: 'enc_carrying_load',
+            characterid: characterID,
+            current: 'Light'
+        });
+    }
+    
+    var encTotal = 0;
+    
+    // Add up hit location enc
+    for (i = 1; i <= 11; i++) {
+        iValue = parseInt(getAttrByName(characterID, "hitloc"+i+"_enc"));
+        encTotal = encTotal + iValue;
+    }
+    
+    // Add shield enc
+    encTotal = encTotal + parseInt(getAttrByName(characterID, "shield_enc"));
+    
+    // Add up weapon enc
+    for (i = 1; i <= 8; i++) {
+        iValue = parseInt(getAttrByName(characterID, "weapon"+i+"_enc"));
+        encTotal = encTotal + iValue;
+    }
+    
+    // Add up item enc
+    for (i = 1; i <= 20; i++) {
+        iValue = parseInt(getAttrByName(characterID, "item"+i+"_enc")) * parseInt(getAttrByName(characterID, "item"+i+"_qnty"));
+        encTotal = encTotal + iValue;
+    }
+    
+    var strStd = parseInt(getAttrByName(characterID, "str_std"));
+    var strTemp = parseInt(getAttrByName(characterID, "str_temp"));
+    var str = strStd + strTemp;
+    var encBurdened =  str * 2;
+    var encOverloaded =  str * 3;
+    var encMax =  str * 4;
+    
+    if (encTotal >= encMax) {
+        encSkillMod.set({current: 'Impossible'});
+        encMoveRateMod.set({current: '*0'});
+        encCarryingLoad.set({current: 'Too Much'});
+    } else if (encTotal >= encOverloaded) {
+        encSkillMod.set({current: '2 Grades Harder'});
+        encMoveRateMod.set({current: '*.5'});
+        encCarryingLoad.set({current: 'Strenuous'});
+    } else if (encTotal >= encBurdened) {
+        encSkillMod.set({current: '1 Grade Harder'});
+        encMoveRateMod.set({current: '-2'});
+        encCarryingLoad.set({current: 'Medium'});
+    } else {
+        encSkillMod.set({current: 'Standard'});
+        encMoveRateMod.set({current: '-0'});
+        encCarryingLoad.set({current: 'Light'});
+    }
+}
 
 function setFatigueEffects(characterID, currentFatigueValue) {
     var fatigueSkillGrade = findObjs({_type: 'attribute', _characterid: characterID, name: 'fatigue_skillgrade'})[0];
@@ -286,4 +371,3 @@ function setStdDamageModifier(characterID) {
         stdDamageModifier.set({current: '-1d8'});
     }
 }
-
