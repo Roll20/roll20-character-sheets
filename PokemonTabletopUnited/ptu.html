@@ -68,23 +68,23 @@
         <table class='sheet-table'>
             <tr class='sheet-banded'>
                 <td class='sheet-table-header'>Body</td>
-                <td><input type='number' name='attr_Body'/></td>
+                <td><input type='number' name='attr_Body' value = '0'/></td>
             </tr>
             <tr>
                 <td class='sheet-table-header'>Mind</td>
-                <td><input type='number' name='attr_Mind'/></td>
+                <td><input type='number' name='attr_Mind' value = '0'/></td>
             </tr>
             <tr class='sheet-banded'>
                 <td class='sheet-table-header'>Spirit</td>
-                <td><input type='number' name='attr_Spirit'/></td>
+                <td><input type='number' name='attr_Spirit' value = '0'/></td>
             </tr>
             <tr>
                 <td class='sheet-table-header'>Current AP</td>
-                <td><input type='number' name='attr_AP'/></td>
+                <td><input type='number' name='attr_AP' value = '0'/></td>
             </tr>
             <tr class='sheet-banded'>
                 <td class='sheet-table-header'>Max AP</td>
-                <td><input type='number' name='attr_AP_max' disabled='true' value='@{CharType}*(5*@{Level}+5)'/></td>
+                <td><input type='number' name='attr_AP_max' disabled='true' value='@{CharType}*(5+floor(@{Level}*.2))'/></td>
             </tr>
         </table>
         <br />
@@ -101,22 +101,8 @@
                 <td class='sheet-table-header'>HP</td>
                 <td align="center"><input type='number' name='attr_base_HP'></td>
                 <td align='center'><input type='number' name='attr_HP'/></td>
-                <td align='center'><select class='sheet-shortfield2' name='attr_HP_Stage'>
-                    <option value='.25'>-6</option>
-                    <option value='.375'>-5</option>
-                    <option value='.5'>-4</option>
-                    <option value='.625'>-3</option>
-                    <option value='.75'>-2</option>
-                    <option value='.875'>-1</option>
-                    <option value='1' selected>0</option>
-                    <option value='1.25'>1</option>
-                    <option value='1.5'>2</option>
-                    <option value='1.75'>3</option>
-                    <option value='2'>4</option>
-                    <option value='2.25'>5</option>
-                    <option value='2.5'>6</option>
-                </select></td>
-                <td align='center'><input type='number' name="attr_HP_total" value="floor((@{base_HP} + @{HP}) * @{HP_Stage})" disabled="true" /></td>
+                <td>&nbsp;</td>
+                <td align='center'><input type='number' name="attr_HP_total" value="floor(@{base_HP} + @{HP})" disabled="true" /></td>
             </tr>
             <tr>
                 <td class='sheet-table-header'>ATK</td>
@@ -234,7 +220,11 @@
             </tr>
             <tr>
                 <td class='sheet-table-header'>Max Hit Points</td>
-                <td><input type='number' name='attr_HitPoints_max' disabled='true' value='((@{Level}*(@{CharType}+1))+(@{HP}*3)+10)'></td>
+                <td><input type='number' name='attr_HitPoints_max' disabled='true' value='((@{Level}*(@{CharType}+1))+(@{HP_Total}*3)+10)'></td>
+            </tr>
+            <tr class="sheet-banded">
+                <td class='sheet-table-header'>Temporary Hit Points</td>
+                <td><input type='number' name='attr_TempHitPoints' value = "0"/></td>
             </tr>
             <tr class="sheet-banded">
                 <td class='sheet-table-header'>Injuries</td>
@@ -321,124 +311,483 @@
         </fieldset>
     </div>
 </div>
-<br/>
-<div class='sheet-3colrow'>
+<br />
+<div class='sheet-row'>
     <div class='sheet-col'>
-        <h3 class='sheet-header'>Edges</h3>
-        <br />
-        <table class='sheet-table'>
-            <tr class='sheet-banded'>
-                <td class='sheet-table-header'>Remaining Tutor Points</td>
-                <td><input type='number' name='attr_TutorPoints'/></td>
-            </tr>
-            <tr>
-                <td class='sheet-table-header'>Max Tutor Points</td>
-                <td><input type='number' name='attr_TutorPoints_max' disabled='true' value='(-1*(@{CharType}-1))*floor(@{Level} / 5)'/></td>
-            </tr>
-            <tr>
-                <th>Edge</th>
-                <th title='This is only used for Pokemon characters!'>Cost</th>
-            </tr>
-        </table>
-        <fieldset class='repeating_edges'>
-            <table class='sheet-table'>
-                <td class='sheet-shortfield5'><input class='sheet-shortfield'  name='attr_EdgeName' type='text' /></td>
-                <td><input type='number' name='attr_EdgeCost' title='This is only used for Pokemon characters!' /></td>
-            </table>
-        </fieldset>
-    </div>
-    <div class='sheet-col'>
-        <h3 class='sheet-header'>Features</h3>
-        <br />
-        <h4 class='sheet-minihead'>Feature</h4>
-        <table class='sheet-table'>
-            <tr class='sheet-banded'>
-                <td class='sheet-table-header'>Name:</td>
-                <td><input class='sheet-shortfield' name='attr_FeatureName' type='text'></td>
+        <h3 class="sheet-header">Standard Moves</h3>
+        <div class='sheet-col'>
+            <br/>
+                <h4 class='sheet-minihead'>Move #1</h4>
+                 <table class="sheet-table">
+                    <tr class='sheet-banded'>
+                <td class='sheet-table-header'>Move Name:</td>
+                <td><input class='sheet-shortfield' type='text' name="attr_Move1_Name"/></td>
             </tr>
             <tr>
                 <td class='sheet-table-header'>Frequency:</td>
-                <td><input class='sheet-shortfield' name='attr_FeatureFreq' type='text'></td>
+                <td><input class='sheet-shortfield' type='text' name="attr_Move1_Freq"/></td>
             </tr>
             <tr class='sheet-banded'>
-                <td class='sheet-table-header'>Target:</td>
-                <td><input class='sheet-shortfield' name='attr_FeatureTarget' type='text'></td>
+                <td class='sheet-table-header'>AC:</td>
+                <td><input type='number' name="attr_Move1_AC"/><button type='roll' value='/roll 1d20 Attacking with @{Move1_Name}, Wanting >= @{Move1_AC}+Evasion' name='roll_Move1Atk' /></td>
             </tr>
             <tr>
-                <td class='sheet-table-header'>Other Info:</td>
-                <td><textarea class='sheet-textarea-b' name='attr_FeatureInfo'></textarea></td>
+                <td class='sheet-table-header'>Type:</td>
+                <td><input class='sheet-shortfield' type='text' name="attr_Move1_Type"/></td>
+            </tr>
+            <tr class='sheet-banded'>
+                <td class='sheet-table-header'>Damage Base:</td>
+                <td><input type='number' name='attr_Move1_Amount'/><select class='sheet-shortfield2' name="attr_Move1_Dice" class="dtype">                
+                      <option value="d6">d6</option>
+                      <option value="d8">d8</option>
+                      <option value="d10">d10</option>
+                      <option value="d12">d12</option>
+                    </select>+<input class='sheet-shortfield' type='number' name='attr_Move1_Bonus'/>
+                    
+                </td>
+            </tr>
+            <tr>
+                <td class='sheet-table-header'>Damage<br/>Category:</td>
+                <td><input class='sheet-shortfield' type='text' name="attr_Move1_DType"/></td>
+            </tr>
+            <tr class='sheet-banded'>
+               <td class='sheet-table-header'>Damage Rolls:</td> 
+               <td>
+                <button type='roll' value='/roll @{Move1_Amount}@{Move1_Dice}+@{Move1_Bonus}+@{ATK_total} Damage from @{Move1_Name}, Physical' name='roll_Move1AtkPhys' />Physical
+                <button type='roll' value='/roll @{Move1_Amount}@{Move1_Dice}+@{Move1_Bonus}+@{SPATK_total} Damage from @{Move1_Name}, Special' name='roll_Move1AtkSpec' />Special
+               </td>
+            </tr>
+            <tr>
+                <td class='sheet-table-header'>Range:</td>
+                <td><input class='sheet-shortfield' name='attr_Move1_Range' type='text'/></td>
+            </tr>
+            <tr class='sheet-banded'>
+                <td class='sheet-table-header'>Effects:</td>
+                <td>
+                    <textarea class='sheet-textarea' name='attr_Move1_Effects'></textarea>
+                </td>
             </tr>
         </table>
-        <fieldset class='repeating_abilities'>
-            <br/>
-            <h4 class='sheet-minihead'>Feature</h4>
-            <table class='sheet-table'>
-                <tr class='sheet-banded'>
-                    <td class='sheet-table-header'>Name:</td>
-                    <td><input class='sheet-shortfield' name='attr_Feature_Name' type='text'></td>
-                </tr>
-                <tr>
-                    <td class='sheet-table-header'>Frequency:</td>
-                    <td><input class='sheet-shortfield' name='attr_Feature_Freq' type='text'></td>
-                </tr>
-                <tr class='sheet-banded'>
-                    <td class='sheet-table-header'>Target:</td>
-                    <td><input class='sheet-shortfield' name='attr_Feature_Target' type='text'></td>
-                </tr>
-                <tr>
-                    <td class='sheet-table-header'>Other Info:</td>
-                    <td><textarea class='sheet-textarea-b' name='attr_Feature_Info'></textarea></td>
-                </tr>
-            </table>
-        </fieldset>
-    </div>
-    <div class='sheet-col'>
-        <h3 class="sheet-header">Abilities</h3>
-        <br />
-        <h4 class='sheet-minihead'>Ability</h4>
+        <br/>
+        <h4 class='sheet-minihead'>Move #4</h4>
         <table class='sheet-table'>
             <tr class='sheet-banded'>
-                <td class='sheet-table-header'>Name:</td>
-                <td><input class='sheet-shortfield' name='attr_AbilityName' type='text'></td>
+                <td class='sheet-table-header'>Move Name:</td>
+                <td><input class='sheet-shortfield' type='text' name="attr_Move4_Name"/></td>
             </tr>
             <tr>
                 <td class='sheet-table-header'>Frequency:</td>
-                <td><input class='sheet-shortfield' name='attr_AbilityFreq' type='text'></td>
+                <td><input class='sheet-shortfield' type='text' name="attr_Move4_Freq"/></td>
             </tr>
             <tr class='sheet-banded'>
-                <td class='sheet-table-header'>Target:</td>
-                <td><input class='sheet-shortfield' name='attr_AbilityTarget' type='text'></td>
+                <td class='sheet-table-header'>AC:</td>
+                <td><input type='number' name="attr_Move4_AC"/><button type='roll' value='/roll 1d20 Attacking with @{Move4_Name}, Wanting >= @{Move4_AC}+Evasion' name='roll_Move4Atk' /></td>
             </tr>
             <tr>
-                <td class='sheet-table-header'>Other Info:</td>
-                <td><textarea class='sheet-textarea-b' name='attr_AbilityInfo'></textarea></td>
+                <td class='sheet-table-header'>Type:</td>
+                <td><input class='sheet-shortfield' type='text' name="attr_Move4_Type"/></td>
+            </tr>
+            <tr class='sheet-banded'>
+                <td class='sheet-table-header'>Damage Base:</td>
+                <td><input type='number' name='attr_Move4_Amount'/><select class='sheet-shortfield2' name="attr_Move4_Dice" class="dtype">                
+                      <option value="d6">d6</option>
+                      <option value="d8">d8</option>
+                      <option value="d10">d10</option>
+                      <option value="d12">d12</option>
+                    </select>+<input type='number' name='attr_Move4_Bonus'/>
+                    
+                </td>
+            </tr>
+            <tr>
+                <td class='sheet-table-header'>Damage<br/>Category:</td>
+                <td><input class='sheet-shortfield' type='text' name="attr_Move4_DType"/></td>
+            </tr>
+            <tr class='sheet-banded'>
+               <td class='sheet-table-header'>Damage Rolls:</td> 
+               <td>
+                    <button type='roll' value='/roll @{Move4_Amount}@{Move4_Dice}+@{Move4_Bonus}+@{ATK_total} Damage from @{Move4_Name}, Physical' name='roll_Move4AtkPhys' />Physcial  
+                    <button type='roll' value='/roll @{Move4_Amount}@{Move4_Dice}+@{Move4_Bonus}+@{SPATK_total} Damage from @{Move4_Name}, Special' name='roll_Move4AtkSpec' />Special
+                </td>
+            </tr>
+            <tr>
+                <td class='sheet-table-header'>Range:</td>
+                <td><input class='sheet-shortfield' name='attr_Move4_Range' type='text'/></td>
+            </tr>
+            <tr class='sheet-banded'>
+                <td class='sheet-table-header'>Effects:</td>
+                <td>
+                    <textarea class='sheet-textarea' name='attr_Move4_Effects'></textarea>
+                </td>
             </tr>
         </table>
-        <fieldset class='repeating_abilities'>
+    </div>
+     <div class='sheet-col'>
+     <br/>
+        <h4 class='sheet-minihead'>Move #2</h4>
+        <table class='sheet-table'>
+            <tr class='sheet-banded'>
+                <td class='sheet-table-header'>Move Name:</td>
+                <td><input class='sheet-shortfield' type='text' name="attr_Move2_Name"/></td>
+            </tr>
+            <tr>
+                <td class='sheet-table-header'>Frequency:</td>
+                <td><input class='sheet-shortfield' type='text' name="attr_Move2_Freq"/></td>
+            </tr>
+            <tr class='sheet-banded'>
+                <td class='sheet-table-header'>AC:</td>
+                <td><input type='number' name="attr_Move2_AC"/><button type='roll' value='/roll 1d20 Attacking with @{Move2_Name}, Wanting >= @{Move2_AC}+Evasion' name='roll_Move2Atk' /></td>
+            </tr>
+            <tr>
+                <td class='sheet-table-header'>Type:</td>
+                <td><input class='sheet-shortfield' type='text' name="attr_Move2_Type"/></td>
+            </tr>
+            <tr class='sheet-banded'>
+                <td class='sheet-table-header'>Damage Base:</td>
+                <td><input type='number' name='attr_Move2_Amount'/><select class='sheet-shortfield2' name="attr_Move2_Dice" class="dtype">                
+                      <option value="d6">d6</option>
+                      <option value="d8">d8</option>
+                      <option value="d10">d10</option>
+                      <option value="d12">d12</option>
+                    </select>+<input type='number' name='attr_Move2_Bonus'/>
+                    
+                </td>
+            </tr>
+            <tr>
+                <td class='sheet-table-header'>Damage<br/>Category:</td>
+                <td><input class='sheet-shortfield' type='text' name="attr_Move2_DType"/></td>
+            </tr>
+            <tr class='sheet-banded'>
+               <td class='sheet-table-header'>Damage Rolls:</td> 
+               <td><button type='roll' value='/roll @{Move2_Amount}@{Move2_Dice}+@{Move2_Bonus}+@{ATK_total} Damage from @{Move2_Name}, Physical' name='roll_Move2AtkPhys' />Physical
+               <button type='roll' value='/roll @{Move2_Amount}@{Move2_Dice}+@{Move2_Bonus}+@{SPATK_total} Damage from @{Move2_Name}, Special' name='roll_Move2AtkSpec' />Special
+                </td>
+            </tr>
+            <tr>
+                <td class='sheet-table-header'>Range:</td>
+                <td><input class='sheet-shortfield' name='attr_Move2_Range' type='text'/></td>
+            </tr>
+            <tr class='sheet-banded'>
+                <td class='sheet-table-header'>Effects:</td>
+                <td>
+                    <textarea class='sheet-textarea' name='attr_Move2_Effects'></textarea>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <h4 class='sheet-minihead'>Move #5</h4>
+        <table class='sheet-table'>
+            <tr class='sheet-banded'>
+                <td class='sheet-table-header'>Move Name:</td>
+                <td><input class='sheet-shortfield' type='text' name="attr_Move5_Name"/></td>
+            </tr>
+            <tr>
+                <td class='sheet-table-header'>Frequency:</td>
+                <td><input class='sheet-shortfield' type='text' name="attr_Move5_Freq"/></td>
+            </tr>
+            <tr class='sheet-banded'>
+                <td class='sheet-table-header'>AC:</td>
+                <td><input type='number' name="attr_Move5_AC"/><button type='roll' value='/roll 1d20 Attacking with @{Move5_Name}, Wanting >= @{Move5_AC}+Evasion' name='roll_Move5Atk' /></td>
+            </tr>
+            <tr>
+                <td class='sheet-table-header'>Type:</td>
+                <td><input class='sheet-shortfield' type='text' name="attr_Move5_Type"/></td>
+            </tr>
+            <tr class='sheet-banded'>
+                <td class='sheet-table-header'>Damage Base:</td>
+                <td><input type='number' name='attr_Move5_Amount'/><select class='sheet-shortfield2' name="attr_Move5_Dice" class="dtype">                
+                      <option value="d6">d6</option>
+                      <option value="d8">d8</option>
+                      <option value="d10">d10</option>
+                      <option value="d12">d12</option>
+                    </select>+<input type='number' name='attr_Move5_Bonus'/>
+                    
+                </td>
+            </tr>
+            <tr>
+                <td class='sheet-table-header'>Damage<br/>Category:</td>
+                <td><input class='sheet-shortfield' type='text' name="attr_Move5_DType"/></td>
+            </tr>
+            <tr class='sheet-banded'>
+               <td class='sheet-table-header'>Damage Rolls:</td> 
+               <td><button type='roll' value='/roll @{Move5_Amount}@{Move5_Dice}+@{Move5_Bonus}+@{ATK_total} Damage from @{Move5_Name}, Physical' name='roll_Move5AtkPhys' />Physical
+               <button type='roll' value='/roll @{Move5_Amount}@{Move5_Dice}+@{Move5_Bonus}+@{SPATK_total} Damage from @{Move5_Name}, Special' name='roll_Move5AtkSpec' />Special
+               </td>
+            </tr>
+            <tr>
+                <td class='sheet-table-header'>Range:</td>
+                <td><input class='sheet-shortfield' name='attr_Move5_Range' type='text'/></td>
+            </tr>
+            <tr class='sheet-banded'>
+                <td class='sheet-table-header'>Effects:</td>
+                <td>
+                    <textarea class='sheet-textarea' name='attr_Move5_Effects'></textarea>
+                </td>
+            </tr>
+        </table>
+    </div>
+     <div class='sheet-col'>
+     <br/>
+        <h4 class='sheet-minihead'>Move #3</h4>
+        <table class='sheet-table'>
+            <tr class='sheet-banded'>
+                <td class='sheet-table-header'>Move Name:</td>
+                <td><input class='sheet-shortfield' type='text' name="attr_Move3_Name"/></td>
+            </tr>
+            <tr>
+                <td class='sheet-table-header'>Frequency:</td>
+                <td><input class='sheet-shortfield' type='text' name="attr_Move3_Freq"/></td>
+            </tr>
+            <tr class='sheet-banded'>
+                <td class='sheet-table-header'>AC:</td>
+                <td><input type='number' name="attr_Move3_AC"/><button type='roll' value='/roll 1d20 Attacking with @{Move3_Name}, Wanting >= @{Move3_AC}+Evasion' name='roll_Move3Atk' /></td>
+            </tr>
+            <tr>
+                <td class='sheet-table-header'>Type:</td>
+                <td><input class='sheet-shortfield' type='text' name="attr_Move3_Type"/></td>
+            </tr>
+            <tr class='sheet-banded'>
+                <td class='sheet-table-header'>Damage Base:</td>
+                <td><input type='number' name='attr_Move3_Amount'/><select class='sheet-shortfield2' name="attr_Move3_Dice" class="dtype">                
+                      <option value="d6">d6</option>
+                      <option value="d8">d8</option>
+                      <option value="d10">d10</option>
+                      <option value="d12">d12</option>
+                    </select>+<input type='number' name='attr_Move3_Bonus'/>
+                    
+                </td>
+            </tr>
+            <tr>
+                <td class='sheet-table-header'>Damage<br/>Category:</td>
+                <td><input class='sheet-shortfield' type='text' name="attr_Move3_DType"/></td>
+            </tr>
+            <tr class='sheet-banded'>
+               <td class='sheet-table-header'>Damage Rolls:</td> 
+               <td><button type='roll' value='/roll @{Move3_Amount}@{Move3_Dice}+@{Move3_Bonus}+@{ATK_total} Damage from @{Move3_Name}, Physical' name='roll_Move3AtkPhys' />Physical
+               <button type='roll' value='/roll @{Move3_Amount}@{Move3_Dice}+@{Move3_Bonus}+@{SPATK_total} Damage from @{Move3_Name}, Special' name='roll_Move3AtkSpec' />Special
+               </td>
+            </tr>
+            <tr>
+                <td class='sheet-table-header'>Range:</td>
+                <td><input class='sheet-shortfield' name='attr_Move3_Range' type='text'/></td>
+            </tr>
+            <tr class='sheet-banded'>
+                <td class='sheet-table-header'>Effects:</td>
+                <td>
+                    <textarea class='sheet-textarea' name='attr_Move3_Effects'></textarea>
+                </td>
+            </tr>
+        </table>
+        <br/>
+        <h4 class='sheet-minihead'>Move #6</h4>
+        <table class='sheet-table'>
+            <tr class='sheet-banded'>
+                <td class='sheet-table-header'>Move Name:</td>
+                <td><input class='sheet-shortfield' type='text' name="attr_Move6_Name"/></td>
+            </tr>
+            <tr>
+                <td class='sheet-table-header'>Frequency:</td>
+                <td><input class='sheet-shortfield' type='text' name="attr_Move6_Freq"/></td>
+            </tr>
+            <tr class='sheet-banded'>
+                <td class='sheet-table-header'>AC:</td>
+                <td><input type='number' name="attr_Move6_AC"/><button type='roll' value='/roll 1d20 Attacking with @{Move6_Name}, Wanting >= @{Move6_AC}+Evasion' name='roll_Move6Atk' /></td>
+            </tr>
+            <tr>
+                <td class='sheet-table-header'>Type:</td>
+                <td><input class='sheet-shortfield' type='text' name="attr_Move6_Type"/></td>
+            </tr>
+            <tr class='sheet-banded'>
+                <td class='sheet-table-header'>Damage Base:</td>
+                <td><input type='number' name='attr_Move6_Amount'/><select class='sheet-shortfield2' name="attr_Move6_Dice" class="dtype">                
+                      <option value="d6">d6</option>
+                      <option value="d8">d8</option>
+                      <option value="d10">d10</option>
+                      <option value="d12">d12</option>
+                    </select>+<input type='number' name='attr_Move6_Bonus'/>
+                    
+                </td>
+            </tr>
+            <tr>
+                <td class='sheet-table-header'>Damage<br/>Category:</td>
+                <td><input class='sheet-shortfield' type='text' name="attr_Move6_DType"/></td>
+            </tr>
+            <tr class='sheet-banded'>
+                <td class='sheet-table-header'>Damage Rolls:</td> 
+               <td><button type='roll' value='/roll @{Move6_Amount}@{Move6_Dice}+@{Move6_Bonus}+@{ATK_total} Damage from @{Move6_Name}, Physical' name='roll_Move6AtkPhys' />Physical
+               <button type='roll' value='/roll @{Move6_Amount}@{Move6_Dice}+@{Move6_Bonus}+@{SPATK_total} Damage from @{Move6_Name}, Special' name='roll_Move6AtkSpec' />Special
+               </td>
+            </tr>
+            <tr>
+                <td class='sheet-table-header'>Range:</td>
+                <td><input class='sheet-shortfield' name='attr_Move6_Range' type='text'/></td>
+            </tr>
+            <tr class='sheet-banded'>
+                <td class='sheet-table-header'>Effects:</td>
+                <td>
+                    <textarea class='sheet-textarea' name='attr_Move6_Effects'></textarea>
+                </td>
+            </tr>
+        </table>
+    </div>
+        <h3 class="sheet-header">Additional Moves</h3>
+        <br/>
+        <h4 class='sheet-minihead'>Struggle</h4>
+        <table class="sheet-table">
+            <tr class='sheet-banded'>
+                <td class='sheet-table-header'>Move Name:</td>
+                <td>Struggle</td>
+            </tr>
+            <tr>
+                <td class='sheet-table-header'>Frequency:</td>
+                <td>At-Will</td>
+            </tr>
+            <tr class='sheet-banded'>
+                <td class='sheet-table-header'>AC:</td>
+                <td><input type='number' name="attr_Struggle_AC" value='4' /><button type='roll' value='/roll 1d20 Attacking with Struggle, Wanting >= @{Struggle_AC}+Evasion' name='roll_StruggleAtk' /></td>
+            </tr>
+            <tr>
+                <td class='sheet-table-header'>Type:</td>
+                <td><input class='sheet-shortfield' type='text' name="attr_Struggle_Type" value = "Normal"/></td>
+            </tr>
+            <tr class='sheet-banded'>
+                <td class='sheet-table-header'>Damage Base:</td>
+                <td><input type='number' name='attr_Struggle_Amount' value = "1" /><select class='sheet-shortfield2' name="attr_Struggle_Dice" class="dtype">
+                      <option value="d6">d6</option>
+                      <option value="d8" selected="selected">d8</option>
+                      <option value="d10">d10</option>
+                      <option value="d12">d12</option>
+                    </select>+<input class='sheet-shortfield' type='number' value = "6" name='attr_Struggle_Bonus'/>
+
+                </td>
+            </tr>
+            <tr>
+                <td class='sheet-table-header'>Damage Category:</td>
+                <td><input class='sheet-shortfield' type='text' name="attr_Struggle_DType" value = "Physical"/></td>
+            </tr>
+            <tr class='sheet-banded'>
+               <td class='sheet-table-header'>Damage Rolls:</td>
+               <td>
+                <button type='roll' value='/roll @{Struggle_Amount}@{Struggle_Dice}+@{Struggle_Bonus}+@{ATK_total} Damage from @{Struggle_Name}, Physical' name='roll_StruggleAtkPhys' />Physical
+                <button type='roll' value='/roll @{Struggle_Amount}@{Struggle_Dice}+@{Struggle_Bonus}+@{SPATK_total} Damage from @{Struggle_Name}, Special' name='roll_StruggleAtkSpec' />Special
+               </td>
+            </tr>
+            <tr>
+                <td class='sheet-table-header'>Range:</td>
+                <td><input class='sheet-shortfield' name='attr_Struggle_Range' type='text'/></td>
+            </tr>
+            <tr class='sheet-banded'>
+                <td class='sheet-table-header'>Effects:</td>
+                <td>
+                    <textarea class='sheet-textarea' name='attr_Struggle_Effects'></textarea>
+                </td>
+            </tr>
+        </table>
+        <fieldset class='repeating_moves'>
             <br/>
-            <h4 class='sheet-minihead'>Ability</h4>
-            <table class='sheet-table'>
+            <h4 class='sheet-minihead'>Additional Move</h4>
+            <table class="sheet-table">
                 <tr class='sheet-banded'>
-                    <td class='sheet-table-header'>Name:</td>
-                    <td><input class='sheet-shortfield' name='attr_Ability_Name' type='text'></td>
+                    <td class='sheet-table-header'>Move Name:</td>
+                    <td><input class='sheet-shortfield' type='text' name="attr_Move_Name"/></td>
                 </tr>
                 <tr>
                     <td class='sheet-table-header'>Frequency:</td>
-                    <td><input class='sheet-shortfield' name='attr_Ability_Freq' type='text'></td>
+                    <td><input class='sheet-shortfield' type='text' name="attr_Move_Freq"/></td>
                 </tr>
                 <tr class='sheet-banded'>
-                    <td class='sheet-table-header'>Target:</td>
-                    <td><input class='sheet-shortfield' name='attr_Ability_Target' type='text'></td>
+                    <td class='sheet-table-header'>AC:</td>
+                    <td><input type='number' name="attr_Move_AC"/><button type='roll' value='/roll 1d20 Attacking with @{Move_Name}, Wanting >= @{Move_AC}+Evasion' name='roll_MoveAtk' /></td>
                 </tr>
                 <tr>
-                    <td class='sheet-table-header'>Other Info:</td>
-                    <td><textarea class='sheet-textarea-b' name='attr_Ability_Info'></textarea></td>
+                    <td class='sheet-table-header'>Type:</td>
+                    <td><input class='sheet-shortfield' type='text' name="attr_Move_Type"/></td>
+                </tr>
+                <tr class='sheet-banded'>
+                    <td class='sheet-table-header'>Damage Base:</td>
+                    <td><input type='number' name='attr_Move_Amount'/><select class='sheet-shortfield2' name="attr_Move_Dice" class="dtype">
+                          <option value="d6">d6</option>
+                          <option value="d8">d8</option>
+                          <option value="d10">d10</option>
+                          <option value="d12">d12</option>
+                        </select>+<input class='sheet-shortfield' type='number' name='attr_Move_Bonus'/>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td class='sheet-table-header'>Damage Category:</td>
+                    <td><input class='sheet-shortfield' type='text' name="attr_Move_DType"/></td>
+                </tr>
+                <tr class='sheet-banded'>
+                   <td class='sheet-table-header'>Damage Rolls:</td>
+                   <td>
+                    <button type='roll' value='/roll @{Move_Amount}@{Move_Dice}+@{Move_Bonus}+@{ATK_total} Damage from @{Move_Name}, Physical' name='roll_MoveAtkPhys' />Physical
+                    <button type='roll' value='/roll @{Move_Amount}@{Move_Dice}+@{Move_Bonus}+@{SPATK_total} Damage from @{Move_Name}, Special' name='roll_MoveAtkSpec' />Special
+                   </td>
+                </tr>
+                <tr>
+                    <td class='sheet-table-header'>Range:</td>
+                    <td><input class='sheet-shortfield' name='attr_Move_Range' type='text'/></td>
+                </tr>
+                <tr class='sheet-banded'>
+                    <td class='sheet-table-header'>Effects:</td>
+                    <td>
+                        <textarea class='sheet-textarea' name='attr_Move_Effects'></textarea>
+                    </td>
                 </tr>
             </table>
         </fieldset>
     </div>
 </div>
-<br />
+<br/>
+<div class='sheet-row'>
+    <h3 class="sheet-header">Inheritance Moves</h3>
+            <table class='sheet-table' style="margin-top: 10px">
+                <tr class='sheet-banded'>
+                <td><textarea class='sheet-textarea' name='attr_Inherit'></textarea></td>
+                </tr>
+            </table>
+    </fieldset>
+</div>
+<br/>
+<!--<div class='sheet-row'>-->
+        <h3 class='sheet-header'>Contests</h3>
+        <table class='sheet-table' style="margin-top: 10px;margin-bottom: 10px;width:90%" align="center">
+            <tr class='sheet-banded'>
+            <td>
+                <td class='sheet-table-header'>Beauty</td>
+                <td><input type='number' name='attr_Beauty' /></td>
+            </td>
+            <td>
+                <td class='sheet-table-header'>Cool</td>
+                <td><input type='number' name='attr_Cool' /></td>
+            </td>
+            <td>
+                <td class='sheet-table-header'>Cute</td>
+                <td><input type='number' name='attr_Cute' /></td>
+            </td>
+            <td>
+                <td class='sheet-table-header'>Smart</td>
+                <td><input type='number' name='attr_Smart' /></td>
+            </td>
+            <td>
+                <td class='sheet-table-header'>Tough</td>
+                <td><input type='number' name='attr_Tough' /></td>
+            </td>
+            </tr>
+        </table>
+        <table class='sheet-table'>
+            <td>
+               <td class='sheet-table-header'>Poffins</td>
+               <td><textarea class='sheet-textarea-b' name='attr_Poffins'></textarea></td>
+            </td>
+            <td>
+               <td class='sheet-table-header'>Vitamins</td>
+               <td><textarea class='sheet-textarea-b' name='attr_Vitamins'></textarea></td>
+            </td>
+        </table>
+    <!--</div>-->
+<!--</div>-->
+<br/>
 <div class='sheet-row'>
     <h3 class="sheet-header">Skills</h3>
     <br />
@@ -570,481 +919,122 @@
             <td><button type='roll' value='/roll @{Intuition}d6 + @{Intuition_Attrib} + @{Intuition_bonus} Intuition Check' name='roll_IntuitionCheck' /></td>
         </tr>
 </div>
-<br />
-<div class='sheet-row'>
+<br/>
+<div class='sheet-3colrow'>
     <div class='sheet-col'>
-        <h3 class="sheet-header">Standard Moves</h3>
-        <div class='sheet-col'>
+        <h3 class='sheet-header'>Edges</h3>
+        <br />
+        <table class='sheet-table'>
+            <tr class='sheet-banded'>
+                <td class='sheet-table-header'>Remaining Tutor Points</td>
+                <td><input type='number' name='attr_TutorPoints'/></td>
+            </tr>
+            <tr>
+                <td class='sheet-table-header'>Max Tutor Points</td>
+                <td><input type='number' name='attr_TutorPoints_max' disabled='true' value='(-1*(@{CharType}-1))*floor(@{Level} / 5)'/></td>
+            </tr>
+            <tr>
+                <th>Edge</th>
+                <th title='This is only used for Pokemon characters!'>Cost</th>
+            </tr>
+        </table>
+        <fieldset class='repeating_edges'>
+            <table class='sheet-table'>
+                <td class='sheet-shortfield5'><input class='sheet-shortfield'  name='attr_EdgeName' type='text' /></td>
+                <td><input type='number' name='attr_EdgeCost' title='This is only used for Pokemon characters!' /></td>
+            </table>
+        </fieldset>
+    </div>
+    <div class='sheet-col'>
+        <h3 class='sheet-header'>Features</h3>
+        <br />
+        <h4 class='sheet-minihead'>Feature</h4>
+        <table class='sheet-table'>
+            <tr class='sheet-banded'>
+                <td class='sheet-table-header'>Name:</td>
+                <td><input class='sheet-shortfield' name='attr_FeatureName' type='text'></td>
+            </tr>
+            <tr>
+                <td class='sheet-table-header'>Frequency:</td>
+                <td><input class='sheet-shortfield' name='attr_FeatureFreq' type='text'></td>
+            </tr>
+            <tr class='sheet-banded'>
+                <td class='sheet-table-header'>Target:</td>
+                <td><input class='sheet-shortfield' name='attr_FeatureTarget' type='text'></td>
+            </tr>
+            <tr>
+                <td class='sheet-table-header'>Other Info:</td>
+                <td><textarea class='sheet-textarea-b' name='attr_FeatureInfo'></textarea></td>
+            </tr>
+        </table>
+        <fieldset class='repeating_abilities'>
             <br/>
-                <h4 class='sheet-minihead'>Move #1</h4>
-                 <table class="sheet-table">
-                    <tr class='sheet-banded'>
-                <td class='sheet-table-header'>Move Name:</td>
-                <td><input class='sheet-shortfield' type='text' name="attr_Move1_Name"/></td>
-            </tr>
-            <tr>
-                <td class='sheet-table-header'>Frequency:</td>
-                <td><input class='sheet-shortfield' type='text' name="attr_Move1_Freq"/></td>
-            </tr>
-            <tr class='sheet-banded'>
-                <td class='sheet-table-header'>AC:</td>
-                <td><input type='number' name="attr_Move1_AC"/><button type='roll' value='/roll 1d20 Attacking with @{Move1_Name}, Wanting >= @{Move1_AC}+Evasion' name='roll_Move1Atk' /></td>
-            </tr>
-            <tr>
-                <td class='sheet-table-header'>Type:</td>
-                <td><input class='sheet-shortfield' type='text' name="attr_Move1_Type"/></td>
-            </tr>
-            <tr class='sheet-banded'>
-                <td class='sheet-table-header'>Damage:</td>
-                <td><input type='number' name='attr_Move1_Amount'/><select class='sheet-shortfield2' name="attr_Move1_Dice" class="dtype">                
-                      <option value="d6">d6</option>
-                      <option value="d8">d8</option>
-                      <option value="d10">d10</option>
-                      <option value="d12">d12</option>
-                    </select>+<input class='sheet-shortfield' type='number' name='attr_Move1_Bonus'/>
-                    
-                </td>
-            </tr>
-            <tr>
-                <td class='sheet-table-header'>Damage Type:</td>
-                <td><input class='sheet-shortfield' type='text' name="attr_Move1_DType"/></td>
-            </tr>
-            <tr class='sheet-banded'>
-               <td class='sheet-table-header'>Damage Rolls:</td> 
-               <td>
-                <button type='roll' value='/roll @{Move1_Amount}@{Move1_Dice}+@{Move1_Bonus}+@{ATK_total} Damage from @{Move1_Name}, Physical' name='roll_Move1AtkPhys' />Physical
-                <button type='roll' value='/roll @{Move1_Amount}@{Move1_Dice}+@{Move1_Bonus}+@{SPATK_total} Damage from @{Move1_Name}, Special' name='roll_Move1AtkSpec' />Special
-               </td>
-            </tr>
-            <tr>
-                <td class='sheet-table-header'>Range:</td>
-                <td><input class='sheet-shortfield' name='attr_Move1_Range' type='text'/></td>
-            </tr>
-            <tr class='sheet-banded'>
-                <td class='sheet-table-header'>Effects:</td>
-                <td>
-                    <textarea class='sheet-textarea' name='attr_Move1_Effects'></textarea>
-                </td>
-            </tr>
-        </table>
-        <br/>
-        <h4 class='sheet-minihead'>Move #4</h4>
-        <table class='sheet-table'>
-            <tr class='sheet-banded'>
-                <td class='sheet-table-header'>Move Name:</td>
-                <td><input class='sheet-shortfield' type='text' name="attr_Move4_Name"/></td>
-            </tr>
-            <tr>
-                <td class='sheet-table-header'>Frequency:</td>
-                <td><input class='sheet-shortfield' type='text' name="attr_Move4_Freq"/></td>
-            </tr>
-            <tr class='sheet-banded'>
-                <td class='sheet-table-header'>AC:</td>
-                <td><input type='number' name="attr_Move4_AC"/><button type='roll' value='/roll 1d20 Attacking with @{Move4_Name}, Wanting >= @{Move4_AC}+Evasion' name='roll_Move4Atk' /></td>
-            </tr>
-            <tr>
-                <td class='sheet-table-header'>Type:</td>
-                <td><input class='sheet-shortfield' type='text' name="attr_Move4_Type"/></td>
-            </tr>
-            <tr class='sheet-banded'>
-                <td class='sheet-table-header'>Damage:</td>
-                <td><input type='number' name='attr_Move4_Amount'/><select class='sheet-shortfield2' name="attr_Move4_Dice" class="dtype">                
-                      <option value="d6">d6</option>
-                      <option value="d8">d8</option>
-                      <option value="d10">d10</option>
-                      <option value="d12">d12</option>
-                    </select>+<input type='number' name='attr_Move4_Bonus'/>
-                    
-                </td>
-            </tr>
-            <tr>
-                <td class='sheet-table-header'>Damage Type:</td>
-                <td><input class='sheet-shortfield' type='text' name="attr_Move4_DType"/></td>
-            </tr>
-            <tr class='sheet-banded'>
-               <td class='sheet-table-header'>Damage Rolls:</td> 
-               <td>
-                    <button type='roll' value='/roll @{Move4_Amount}@{Move4_Dice}+@{Move4_Bonus}+@{ATK_total} Damage from @{Move4_Name}, Physical' name='roll_Move4AtkPhys' />Physcial  
-                    <button type='roll' value='/roll @{Move4_Amount}@{Move4_Dice}+@{Move4_Bonus}+@{SPATK_total} Damage from @{Move4_Name}, Special' name='roll_Move4AtkSpec' />Special
-                </td>
-            </tr>
-            <tr>
-                <td class='sheet-table-header'>Range:</td>
-                <td><input class='sheet-shortfield' name='attr_Move4_Range' type='text'/></td>
-            </tr>
-            <tr class='sheet-banded'>
-                <td class='sheet-table-header'>Effects:</td>
-                <td>
-                    <textarea class='sheet-textarea' name='attr_Move4_Effects'></textarea>
-                </td>
-            </tr>
-        </table>
-    </div>
-     <div class='sheet-col'>
-     <br/>
-        <h4 class='sheet-minihead'>Move #2</h4>
-        <table class='sheet-table'>
-            <tr class='sheet-banded'>
-                <td class='sheet-table-header'>Move Name:</td>
-                <td><input class='sheet-shortfield' type='text' name="attr_Move2_Name"/></td>
-            </tr>
-            <tr>
-                <td class='sheet-table-header'>Frequency:</td>
-                <td><input class='sheet-shortfield' type='text' name="attr_Move2_Freq"/></td>
-            </tr>
-            <tr class='sheet-banded'>
-                <td class='sheet-table-header'>AC:</td>
-                <td><input type='number' name="attr_Move2_AC"/><button type='roll' value='/roll 1d20 Attacking with @{Move2_Name}, Wanting >= @{Move2_AC}+Evasion' name='roll_Move2Atk' /></td>
-            </tr>
-            <tr>
-                <td class='sheet-table-header'>Type:</td>
-                <td><input class='sheet-shortfield' type='text' name="attr_Move2_Type"/></td>
-            </tr>
-            <tr class='sheet-banded'>
-                <td class='sheet-table-header'>Damage:</td>
-                <td><input type='number' name='attr_Move2_Amount'/><select class='sheet-shortfield2' name="attr_Move2_Dice" class="dtype">                
-                      <option value="d6">d6</option>
-                      <option value="d8">d8</option>
-                      <option value="d10">d10</option>
-                      <option value="d12">d12</option>
-                    </select>+<input type='number' name='attr_Move2_Bonus'/>
-                    
-                </td>
-            </tr>
-            <tr>
-                <td class='sheet-table-header'>Damage Type:</td>
-                <td><input class='sheet-shortfield' type='text' name="attr_Move2_DType"/></td>
-            </tr>
-            <tr class='sheet-banded'>
-               <td class='sheet-table-header'>Damage Rolls:</td> 
-               <td><button type='roll' value='/roll @{Move2_Amount}@{Move2_Dice}+@{Move2_Bonus}+@{ATK_total} Damage from @{Move2_Name}, Physical' name='roll_Move2AtkPhys' />Physical
-               <button type='roll' value='/roll @{Move2_Amount}@{Move2_Dice}+@{Move2_Bonus}+@{SPATK_total} Damage from @{Move2_Name}, Special' name='roll_Move2AtkSpec' />Special
-                </td>
-            </tr>
-            <tr>
-                <td class='sheet-table-header'>Range:</td>
-                <td><input class='sheet-shortfield' name='attr_Move2_Range' type='text'/></td>
-            </tr>
-            <tr class='sheet-banded'>
-                <td class='sheet-table-header'>Effects:</td>
-                <td>
-                    <textarea class='sheet-textarea' name='attr_Move2_Effects'></textarea>
-                </td>
-            </tr>
-        </table>
-        <br/>
-        <h4 class='sheet-minihead'>Move #5</h4>
-        <table class='sheet-table'>
-            <tr class='sheet-banded'>
-                <td class='sheet-table-header'>Move Name:</td>
-                <td><input class='sheet-shortfield' type='text' name="attr_Move5_Name"/></td>
-            </tr>
-            <tr>
-                <td class='sheet-table-header'>Frequency:</td>
-                <td><input class='sheet-shortfield' type='text' name="attr_Move5_Freq"/></td>
-            </tr>
-            <tr class='sheet-banded'>
-                <td class='sheet-table-header'>AC:</td>
-                <td><input type='number' name="attr_Move5_AC"/><button type='roll' value='/roll 1d20 Attacking with @{Move5_Name}, Wanting >= @{Move5_AC}+Evasion' name='roll_Move5Atk' /></td>
-            </tr>
-            <tr>
-                <td class='sheet-table-header'>Type:</td>
-                <td><input class='sheet-shortfield' type='text' name="attr_Move5_Type"/></td>
-            </tr>
-            <tr class='sheet-banded'>
-                <td class='sheet-table-header'>Damage:</td>
-                <td><input type='number' name='attr_Move5_Amount'/><select class='sheet-shortfield2' name="attr_Move5_Dice" class="dtype">                
-                      <option value="d6">d6</option>
-                      <option value="d8">d8</option>
-                      <option value="d10">d10</option>
-                      <option value="d12">d12</option>
-                    </select>+<input type='number' name='attr_Move5_Bonus'/>
-                    
-                </td>
-            </tr>
-            <tr>
-                <td class='sheet-table-header'>Damage Type:</td>
-                <td><input class='sheet-shortfield' type='text' name="attr_Move5_DType"/></td>
-            </tr>
-            <tr class='sheet-banded'>
-               <td class='sheet-table-header'>Damage Rolls:</td> 
-               <td><button type='roll' value='/roll @{Move5_Amount}@{Move5_Dice}+@{Move5_Bonus}+@{ATK_total} Damage from @{Move5_Name}, Physical' name='roll_Move5AtkPhys' />Physical
-               <button type='roll' value='/roll @{Move5_Amount}@{Move5_Dice}+@{Move5_Bonus}+@{SPATK_total} Damage from @{Move5_Name}, Special' name='roll_Move5AtkSpec' />Special
-               </td>
-            </tr>
-            <tr>
-                <td class='sheet-table-header'>Range:</td>
-                <td><input class='sheet-shortfield' name='attr_Move5_Range' type='text'/></td>
-            </tr>
-            <tr class='sheet-banded'>
-                <td class='sheet-table-header'>Effects:</td>
-                <td>
-                    <textarea class='sheet-textarea' name='attr_Move5_Effects'></textarea>
-                </td>
-            </tr>
-        </table>
-    </div>
-     <div class='sheet-col'>
-     <br/>
-        <h4 class='sheet-minihead'>Move #3</h4>
-        <table class='sheet-table'>
-            <tr class='sheet-banded'>
-                <td class='sheet-table-header'>Move Name:</td>
-                <td><input class='sheet-shortfield' type='text' name="attr_Move3_Name"/></td>
-            </tr>
-            <tr>
-                <td class='sheet-table-header'>Frequency:</td>
-                <td><input class='sheet-shortfield' type='text' name="attr_Move3_Freq"/></td>
-            </tr>
-            <tr class='sheet-banded'>
-                <td class='sheet-table-header'>AC:</td>
-                <td><input type='number' name="attr_Move3_AC"/><button type='roll' value='/roll 1d20 Attacking with @{Move3_Name}, Wanting >= @{Move3_AC}+Evasion' name='roll_Move3Atk' /></td>
-            </tr>
-            <tr>
-                <td class='sheet-table-header'>Type:</td>
-                <td><input class='sheet-shortfield' type='text' name="attr_Move3_Type"/></td>
-            </tr>
-            <tr class='sheet-banded'>
-                <td class='sheet-table-header'>Damage:</td>
-                <td><input type='number' name='attr_Move3_Amount'/><select class='sheet-shortfield2' name="attr_Move3_Dice" class="dtype">                
-                      <option value="d6">d6</option>
-                      <option value="d8">d8</option>
-                      <option value="d10">d10</option>
-                      <option value="d12">d12</option>
-                    </select>+<input type='number' name='attr_Move3_Bonus'/>
-                    
-                </td>
-            </tr>
-            <tr>
-                <td class='sheet-table-header'>Damage Type:</td>
-                <td><input class='sheet-shortfield' type='text' name="attr_Move3_DType"/></td>
-            </tr>
-            <tr class='sheet-banded'>
-               <td class='sheet-table-header'>Damage Rolls:</td> 
-               <td><button type='roll' value='/roll @{Move3_Amount}@{Move3_Dice}+@{Move3_Bonus}+@{ATK_total} Damage from @{Move3_Name}, Physical' name='roll_Move3AtkPhys' />Physical
-               <button type='roll' value='/roll @{Move3_Amount}@{Move3_Dice}+@{Move3_Bonus}+@{SPATK_total} Damage from @{Move3_Name}, Special' name='roll_Move3AtkSpec' />Special
-               </td>
-            </tr>
-            <tr>
-                <td class='sheet-table-header'>Range:</td>
-                <td><input class='sheet-shortfield' name='attr_Move3_Range' type='text'/></td>
-            </tr>
-            <tr class='sheet-banded'>
-                <td class='sheet-table-header'>Effects:</td>
-                <td>
-                    <textarea class='sheet-textarea' name='attr_Move3_Effects'></textarea>
-                </td>
-            </tr>
-        </table>
-        <br/>
-        <h4 class='sheet-minihead'>Move #6</h4>
-        <table class='sheet-table'>
-            <tr class='sheet-banded'>
-                <td class='sheet-table-header'>Move Name:</td>
-                <td><input class='sheet-shortfield' type='text' name="attr_Move6_Name"/></td>
-            </tr>
-            <tr>
-                <td class='sheet-table-header'>Frequency:</td>
-                <td><input class='sheet-shortfield' type='text' name="attr_Move6_Freq"/></td>
-            </tr>
-            <tr class='sheet-banded'>
-                <td class='sheet-table-header'>AC:</td>
-                <td><input type='number' name="attr_Move6_AC"/><button type='roll' value='/roll 1d20 Attacking with @{Move6_Name}, Wanting >= @{Move6_AC}+Evasion' name='roll_Move6Atk' /></td>
-            </tr>
-            <tr>
-                <td class='sheet-table-header'>Type:</td>
-                <td><input class='sheet-shortfield' type='text' name="attr_Move6_Type"/></td>
-            </tr>
-            <tr class='sheet-banded'>
-                <td class='sheet-table-header'>Damage:</td>
-                <td><input type='number' name='attr_Move6_Amount'/><select class='sheet-shortfield2' name="attr_Move6_Dice" class="dtype">                
-                      <option value="d6">d6</option>
-                      <option value="d8">d8</option>
-                      <option value="d10">d10</option>
-                      <option value="d12">d12</option>
-                    </select>+<input type='number' name='attr_Move6_Bonus'/>
-                    
-                </td>
-            </tr>
-            <tr>
-                <td class='sheet-table-header'>Damage Type:</td>
-                <td><input class='sheet-shortfield' type='text' name="attr_Move6_DType"/></td>
-            </tr>
-            <tr class='sheet-banded'>
-                <td class='sheet-table-header'>Damage Rolls:</td> 
-               <td><button type='roll' value='/roll @{Move6_Amount}@{Move6_Dice}+@{Move6_Bonus}+@{ATK_total} Damage from @{Move6_Name}, Physical' name='roll_Move6AtkPhys' />Physical
-               <button type='roll' value='/roll @{Move6_Amount}@{Move6_Dice}+@{Move6_Bonus}+@{SPATK_total} Damage from @{Move6_Name}, Special' name='roll_Move6AtkSpec' />Special
-               </td>
-            </tr>
-            <tr>
-                <td class='sheet-table-header'>Range:</td>
-                <td><input class='sheet-shortfield' name='attr_Move6_Range' type='text'/></td>
-            </tr>
-            <tr class='sheet-banded'>
-                <td class='sheet-table-header'>Effects:</td>
-                <td>
-                    <textarea class='sheet-textarea' name='attr_Move6_Effects'></textarea>
-                </td>
-            </tr>
-        </table>
-    </div>
-        <h3 class="sheet-header">Additional Moves</h3>
-        <br/>
-        <h4 class='sheet-minihead'>Struggle</h4>
-        <table class="sheet-table">
-            <tr class='sheet-banded'>
-                <td class='sheet-table-header'>Move Name:</td>
-                <td>Struggle</td>
-            </tr>
-            <tr>
-                <td class='sheet-table-header'>Frequency:</td>
-                <td>At-Will</td>
-            </tr>
-            <tr class='sheet-banded'>
-                <td class='sheet-table-header'>AC:</td>
-                <td><input type='number' name="attr_Struggle_AC" disabled='true' value='4' /><button type='roll' value='/roll 1d20 Attacking with Struggle, Wanting >= @{Struggle_AC}+Evasion' name='roll_StruggleAtk' /></td>
-            </tr>
-            <tr>
-                <td class='sheet-table-header'>Type:</td>
-                <td><input class='sheet-shortfield' type='text' name="attr_Struggle_Type"/></td>
-            </tr>
-            <tr class='sheet-banded'>
-                <td class='sheet-table-header'>Damage:</td>
-                <td><input type='number' name='attr_Struggle_Amount'/><select class='sheet-shortfield2' name="attr_Struggle_Dice" class="dtype">
-                      <option value="d6">d6</option>
-                      <option value="d8">d8</option>
-                      <option value="d10">d10</option>
-                      <option value="d12">d12</option>
-                    </select>+<input class='sheet-shortfield' type='number' name='attr_Struggle_Bonus'/>
-
-                </td>
-            </tr>
-            <tr>
-                <td class='sheet-table-header'>Damage Type:</td>
-                <td><input class='sheet-shortfield' type='text' name="attr_Struggle_DType"/></td>
-            </tr>
-            <tr class='sheet-banded'>
-               <td class='sheet-table-header'>Damage Rolls:</td>
-               <td>
-                <button type='roll' value='/roll @{Struggle_Amount}@{Struggle_Dice}+@{Struggle_Bonus}+@{ATK_total} Damage from @{Struggle_Name}, Physical' name='roll_StruggleAtkPhys' />Physical
-                <button type='roll' value='/roll @{Struggle_Amount}@{Struggle_Dice}+@{Struggle_Bonus}+@{SPATK_total} Damage from @{Struggle_Name}, Special' name='roll_StruggleAtkSpec' />Special
-               </td>
-            </tr>
-            <tr>
-                <td class='sheet-table-header'>Range:</td>
-                <td><input class='sheet-shortfield' name='attr_Struggle_Range' type='text'/></td>
-            </tr>
-            <tr class='sheet-banded'>
-                <td class='sheet-table-header'>Effects:</td>
-                <td>
-                    <textarea class='sheet-textarea' name='attr_Struggle_Effects'></textarea>
-                </td>
-            </tr>
-        </table>
-        <fieldset class='repeating_moves'>
-            <br/>
-            <h4 class='sheet-minihead'>Additional Move</h4>
-            <table class="sheet-table">
+            <h4 class='sheet-minihead'>Feature</h4>
+            <table class='sheet-table'>
                 <tr class='sheet-banded'>
-                    <td class='sheet-table-header'>Move Name:</td>
-                    <td><input class='sheet-shortfield' type='text' name="attr_Move_Name"/></td>
+                    <td class='sheet-table-header'>Name:</td>
+                    <td><input class='sheet-shortfield' name='attr_Feature_Name' type='text'></td>
                 </tr>
                 <tr>
                     <td class='sheet-table-header'>Frequency:</td>
-                    <td><input class='sheet-shortfield' type='text' name="attr_Move_Freq"/></td>
+                    <td><input class='sheet-shortfield' name='attr_Feature_Freq' type='text'></td>
                 </tr>
                 <tr class='sheet-banded'>
-                    <td class='sheet-table-header'>AC:</td>
-                    <td><input type='number' name="attr_Move_AC"/><button type='roll' value='/roll 1d20 Attacking with @{Move_Name}, Wanting >= @{Move_AC}+Evasion' name='roll_MoveAtk' /></td>
+                    <td class='sheet-table-header'>Target:</td>
+                    <td><input class='sheet-shortfield' name='attr_Feature_Target' type='text'></td>
                 </tr>
                 <tr>
-                    <td class='sheet-table-header'>Type:</td>
-                    <td><input class='sheet-shortfield' type='text' name="attr_Move_Type"/></td>
-                </tr>
-                <tr class='sheet-banded'>
-                    <td class='sheet-table-header'>Damage:</td>
-                    <td><input type='number' name='attr_Move_Amount'/><select class='sheet-shortfield2' name="attr_Move_Dice" class="dtype">
-                          <option value="d6">d6</option>
-                          <option value="d8">d8</option>
-                          <option value="d10">d10</option>
-                          <option value="d12">d12</option>
-                        </select>+<input class='sheet-shortfield' type='number' name='attr_Move_Bonus'/>
-
-                    </td>
-                </tr>
-                <tr>
-                    <td class='sheet-table-header'>Damage Type:</td>
-                    <td><input class='sheet-shortfield' type='text' name="attr_Move_DType"/></td>
-                </tr>
-                <tr class='sheet-banded'>
-                   <td class='sheet-table-header'>Damage Rolls:</td>
-                   <td>
-                    <button type='roll' value='/roll @{Move_Amount}@{Move_Dice}+@{Move_Bonus}+@{ATK_total} Damage from @{Move_Name}, Physical' name='roll_MoveAtkPhys' />Physical
-                    <button type='roll' value='/roll @{Move_Amount}@{Move_Dice}+@{Move_Bonus}+@{SPATK_total} Damage from @{Move_Name}, Special' name='roll_MoveAtkSpec' />Special
-                   </td>
-                </tr>
-                <tr>
-                    <td class='sheet-table-header'>Range:</td>
-                    <td><input class='sheet-shortfield' name='attr_Move_Range' type='text'/></td>
-                </tr>
-                <tr class='sheet-banded'>
-                    <td class='sheet-table-header'>Effects:</td>
-                    <td>
-                        <textarea class='sheet-textarea' name='attr_Move_Effects'></textarea>
-                    </td>
+                    <td class='sheet-table-header'>Other Info:</td>
+                    <td><textarea class='sheet-textarea-b' name='attr_Feature_Info'></textarea></td>
                 </tr>
             </table>
         </fieldset>
     </div>
-</div>
-<br/>
-<!--<div class='sheet-row'>-->
-        <h3 class='sheet-header'>Contests</h3>
-        <table class='sheet-table' style="margin-top: 10px;margin-bottom: 10px;width:90%" align="center">
+    <div class='sheet-col'>
+        <h3 class="sheet-header">Abilities</h3>
+        <br />
+        <h4 class='sheet-minihead'>Ability</h4>
+        <table class='sheet-table'>
             <tr class='sheet-banded'>
-            <td>
-                <td class='sheet-table-header'>Beauty</td>
-                <td><input type='number' name='attr_Beauty' /></td>
-            </td>
-            <td>
-                <td class='sheet-table-header'>Cool</td>
-                <td><input type='number' name='attr_Cool' /></td>
-            </td>
-            <td>
-                <td class='sheet-table-header'>Cute</td>
-                <td><input type='number' name='attr_Cute' /></td>
-            </td>
-            <td>
-                <td class='sheet-table-header'>Smart</td>
-                <td><input type='number' name='attr_Smart' /></td>
-            </td>
-            <td>
-                <td class='sheet-table-header'>Tough</td>
-                <td><input type='number' name='attr_Tough' /></td>
-            </td>
+                <td class='sheet-table-header'>Name:</td>
+                <td><input class='sheet-shortfield' name='attr_AbilityName' type='text'></td>
+            </tr>
+            <tr>
+                <td class='sheet-table-header'>Frequency:</td>
+                <td><input class='sheet-shortfield' name='attr_AbilityFreq' type='text'></td>
+            </tr>
+            <tr class='sheet-banded'>
+                <td class='sheet-table-header'>Target:</td>
+                <td><input class='sheet-shortfield' name='attr_AbilityTarget' type='text'></td>
+            </tr>
+            <tr>
+                <td class='sheet-table-header'>Other Info:</td>
+                <td><textarea class='sheet-textarea-b' name='attr_AbilityInfo'></textarea></td>
             </tr>
         </table>
-        <table class='sheet-table'>
-            <td>
-               <td class='sheet-table-header'>Poffins</td>
-               <td><textarea class='sheet-textarea-b' name='attr_Poffins'></textarea></td>
-            </td>
-            <td>
-               <td class='sheet-table-header'>Vitamins</td>
-               <td><textarea class='sheet-textarea-b' name='attr_Vitamins'></textarea></td>
-            </td>
-        </table>
-    <!--</div>-->
-<!--</div>-->
-<br/>
-<div class='sheet-row'>
-    <h3 class="sheet-header">Inheritance Moves</h3>
-            <table class='sheet-table' style="margin-top: 10px">
+        <fieldset class='repeating_abilities'>
+            <br/>
+            <h4 class='sheet-minihead'>Ability</h4>
+            <table class='sheet-table'>
                 <tr class='sheet-banded'>
-                <td><textarea class='sheet-textarea' name='attr_Inherit'></textarea></td>
+                    <td class='sheet-table-header'>Name:</td>
+                    <td><input class='sheet-shortfield' name='attr_Ability_Name' type='text'></td>
+                </tr>
+                <tr>
+                    <td class='sheet-table-header'>Frequency:</td>
+                    <td><input class='sheet-shortfield' name='attr_Ability_Freq' type='text'></td>
+                </tr>
+                <tr class='sheet-banded'>
+                    <td class='sheet-table-header'>Target:</td>
+                    <td><input class='sheet-shortfield' name='attr_Ability_Target' type='text'></td>
+                </tr>
+                <tr>
+                    <td class='sheet-table-header'>Other Info:</td>
+                    <td><textarea class='sheet-textarea-b' name='attr_Ability_Info'></textarea></td>
                 </tr>
             </table>
-    </fieldset>
+        </fieldset>
+    </div>
 </div>
 <br/>
 <div class='sheet-row'>

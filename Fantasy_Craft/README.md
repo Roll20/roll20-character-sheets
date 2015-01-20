@@ -5,6 +5,9 @@ This is my fork of Suldae's initial sheet.
 
 ### ChangeLog
 
+* Bug Fix Update - Jan 2015
+Fixed typo in affecting fortitude save roll
+
 * Update - Dec 2014
 Minor changes to Standard Character tab to fix shifting around and removal of out-of-date comments
 Changed Spellcasting skill to work like all the other skills (no longer need for checkbox at top of skill list)
