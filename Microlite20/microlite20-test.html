@@ -26,8 +26,8 @@
                     </label>
                     <div class="col-sm-4">
                         <select class="form-control" name="attr_gender">
-                            <option value="1">Female</option>
-                            <option value="2">Male</option>
+                            <option value="1">Male</option>
+							<option value="2">Female</option>
                         </select>
                     </div>
                 </div>
@@ -36,22 +36,26 @@
                     <label class="col-sm-2 control-label">Race
                     </label>
                     <div class="col-sm-4">
-                        <select class="form-control" name="attr_race">
-                            <option value="1">Human</option>
-                            <option value="2">Elf</option>
-                            <option value="3">Dwarf</option>
-                            <option value="4">Halfling</option>
-                        </select>
+                        <!-- the numbers are assigned as such for a calculation later
+						this calculation will determine the racial skill bonus to all skills
+						if the race selected is human -->
+						<select class="form-control" name="attr_race">
+                            <option value="4">Human</option>
+                            <option value="3">Elf</option>
+                            <option value="2">Dwarf</option>
+                            <option value="1">Halfling</option>
                         </select>
                     </div>
                     <label class="col-sm-2 control-label">
                         Class</label>
                     <div class="col-sm-4">
+					<!-- These numbers are in reverse.  The reason is to accommodate a calculation
+						 for the Fighter damage roll and attack roll bonus.-->
                         <select class="form-control" name="attr_class">
-                            <option value="1">Fighter</option>
-                            <option value="2">Rogue</option>
-                            <option value="3">Mage</option>
-                            <option value="4">Cleric</option>
+                            <option value="4">Fighter</option>
+                            <option value="3">Rogue</option>
+                            <option value="2">Mage</option>
+                            <option value="1">Cleric</option>
                         </select>
                     </div>
                 </div>
@@ -113,11 +117,26 @@
             <div class="row">
                 <h3>Character Statistics</h3>
                 <div class="col-sm-6 col-sm-offset-3">
+				<!-- The calculation for the rolls does bear explaining.  the first part (d20+bonus) is 
+					standard towards the rules, but the part after it is what incorporates the racial
+					bonus.  If you chose a human, you get a +1 to all of your skill rolls.
+					So, if it's always a +1, then we can determine it through an equation.
+					The floor function will round a decimal down to its whole number.  So 1/4, 2/4, and 
+					3/4 will all round down to 0.  Thus, the only race assigned the number 4 is human, 
+					and it'll be the only race that evaluates to "1" in this equation.  With that in
+					mind, simply add the result of the equation to the end of the roll.  If you're
+					not a human, then 0 will get added.  If you ARE human, then 1 will get added.
+					-->
                     <table class="table">
                         <thead>
                             <th>Stat</th>
                             <th>Score</th>
                             <th>Bonus</th>
+							<th>Stat+Physical Roll</th>
+							<th>Stat+Subterfuge Roll</th>
+							<th>Stat+Knowledge Roll</th>
+							<th>Stat+Communication Roll</th>
+							
                         </thead>
                         <tbody>
                             <tr>
@@ -131,6 +150,26 @@
                                      disabled="true"
                                      value="floor((@{strength} - 10) / 2)">
                                 </td>
+								<td>
+									<button class="form-control" type="roll"
+										value="/roll d20+[physical rank]@{physical}+[strength bonus]@{strength_bonus}+[racial bonus]floor(@{race}/4) \ Strength + Physical Check - d20+physical rank+strength bonus+racial bonus">
+									</button>
+								</td>
+								<td>
+									<button class="form-control" type="roll"
+										value="/roll d20+[subterfuge rank]@{subterfuge}+[strength bonus]@{strength_bonus}+[racial bonus]floor(@{race}/4) \ Strength + Subterfuge Check - d20+subterfuge rank+strength bonus+racial bonus">
+									</button>
+								</td>
+								<td>
+									<button class="form-control" type="roll"
+										value="/roll d20+[knowledge rank]@{knowledge}+[strength bonus]@{strength_bonus}+[racial bonus]floor(@{race}/4) \ Strength + Knowledge Check - d20+knowledge rank+strength bonus+racial bonus">
+									</button>
+								</td>
+								<td>
+									<button class="form-control" type="roll"
+										value="/roll d20+[communication rank]@{communication}+[strength bonus]@{strength_bonus}+[racial bonus]floor(@{race}/4) \ Strength + Communication Check - d20+communication rank+strength bonus+racial bonus">
+									</button>
+								</td>
                             </tr>
                             <tr>
                                 <td><label class="control-label">Dexterity
@@ -144,6 +183,26 @@
                                      disabled="true"
                                      value="floor((@{dexterity} - 10) / 2)">
                                 </td>
+								<td>
+									<button class="form-control" type="roll"
+										value="/roll d20+[physical rank]@{physical}+[dexterity bonus]@{dexterity_bonus}+[racial bonus]floor(@{race}/4) \ Dexterity + Physical Check - d20+physical rank+dexterity bonus+racial bonus">
+									</button>
+								</td>
+								<td>
+									<button class="form-control" type="roll"
+										value="/roll d20+[subterfuge rank]@{subterfuge}+[dexterity bonus]@{dexterity_bonus}+[racial bonus]floor(@{race}/4) \ Dexterity + Subterfuge Check - d20+subterfuge rank+dexterity bonus+racial bonus">
+									</button>
+								</td>
+								<td>
+									<button class="form-control" type="roll"
+										value="/roll d20+[knowledge rank]@{knowledge}+[dexterity bonus]@{dexterity_bonus}+[racial bonus]floor(@{race}/4) \ Dexterity + Knowledge Check - d20+knowledge rank+dexterity bonus+racial bonus">
+									</button>
+								</td>
+								<td>
+									<button class="form-control" type="roll"
+										value="/roll d20+[communication rank]@{communication}+[dexterity bonus]@{dexterity_bonus}+[racial bonus]floor(@{race}/4) \ Dexterity + Communication Check - d20+communication rank+dexterity bonus+racial bonus">
+									</button>
+								</td>
                             </tr>
                             <tr>
                                 <td><label class="control-label">Mind</label>
@@ -153,7 +212,28 @@
                                 <td><input class="form-control" type="number"
                                      name="attr_mind_bonus"
                                      disabled="true"
-                                     value="floor((@{mind} - 10) / 2)"></td>
+                                     value="floor((@{mind} - 10) / 2)">
+								</td>
+								<td>
+									<button class="form-control" type="roll"
+										value="/roll d20+[physical rank]@{physical}+[mind bonus]@{mind_bonus}+[racial bonus]floor(@{race}/4) \ Mind + Physical Check - d20+physical rank+mind bonus+racial bonus">
+									</button>
+								</td>
+								<td>
+									<button class="form-control" type="roll"
+										value="/roll d20+[subterfuge rank]@{subterfuge}+[mind bonus]@{mind_bonus}+[racial bonus]floor(@{race}/4) \ Mind + Subterfuge Check - d20+subterfuge rank+mind bonus+racial bonus">
+									</button>
+								</td>
+								<td>
+									<button class="form-control" type="roll"
+										value="/roll d20+[knowledge rank]@{knowledge}+[mind bonus]@{mind_bonus}+[racial bonus]floor(@{race}/4) \ Mind + Knowledge Check - d20+knowledge rank+mind bonus+racial bonus">
+									</button>
+								</td>
+								<td>
+									<button class="form-control" type="roll"
+										value="/roll d20+[communication rank]@{communication}+[mind bonus]@{mind_bonus}+[racial bonus]floor(@{race}/4) \ Mind + Communication Check - d20+communication rank+mind bonus+racial bonus">
+									</button>
+								</td>
                             </tr>
                         </tbody>
                     </table>
@@ -176,29 +256,19 @@
                     <div class="form-group">
                         <label class="col-sm-6 col-sm-offset-1 control-label text-center">
                             Armor Class<br>
-                            <small>(1 + DEX Bonus + Armor Bonus)</small>
+                            <small>(10 + DEX Bonus + Armor Bonus)</small>
                         </label>
                         <div class="col-sm-2">
                             <input type="number" class="form-control"
                             name="attr_armor_class" disabled="true"
-                            value="1 + @{dexterity_bonus} + @{armor_bonus}">
+                            value="10 + @{dexterity_bonus} + @{armor_bonus}">
                         </div>
                     </div>
                 </form>
             </div>
-
-            <div class="row">
-                <h3 class="text-center">Armor Bonus</h3>
-                <div class="col-sm-4 col-sm-offset-4">
-                    <input type="number" class="form-control"
-                    name="attr_armor_bonus" placeholder="0">
-                </div>
-            </div>
-
-            <div class="row">
-                <h3>Skills <small>Rank = level + class / race bonus</small>
-                </h3>
-                <div class="col-sm-6 col-sm-offset-3">
+			<div class="row">
+                <h3>Skills</h3>
+				<div class="col-sm-6 col-sm-offset-3">
                     <table class="table">
                         <thead>
                             <th>Skill</th>
@@ -207,7 +277,8 @@
                         <tbody>
                         <tr><td>Physical</td>
                             <td><input type="number" class="form-control"
-                                 name="attr_physical" placeholder="0"></td>
+                                 name="attr_physical" placeholder="0">
+							</td>
                         </tr>
                         <tr><td>Subterfuge</td>
                             <td><input type="number" class="form-control"
@@ -228,16 +299,44 @@
         </div>
 
         <div class="col-sm-6">
+			<h3>Attack Bonuses and Rolls</h3>
             <form class="form-horizontal" role="form">
-                <div class="form-group">
+                <!-- The calculation has to take into account whether or not you chose the fighter 
+					class.  Since roll20 doesn't support conditional statements (yet?), this is the way 
+					around it.  This explanation is rather wordy, so either trust it, or read on.
+					The actual bonus fighters get is +1 to attack rolls, and an additional +1 on every
+					level ending in 5 or 0 (so at level 5, they get an additional +1, and again at
+					level 10, and again every 5 levels onward).
+					The floor function will basically round down any division result that isn't a 
+					whole number to a whole number.  1/5, 2/5, 3/5, 4/5 all equal 0 when floored.  
+					So, floor your level divided by 5, and add 1 to it (because at level 1, you get
+					your first +1 to attack rolls).  1+floor(level/5) will equal 1 at level 1-4, then 2 at level 5-9, then 3 at levels 10-15, and so on.  That resulting number is exactly
+					the same number of +1's to attack rolls you'd get at those levels.
+					
+					But, we have to determine whether or not you chose the fighter class.  The fighter
+					class attribute's value is 4, while the others are less than 4.
+					This means I can floor(class/4) and all but the fighter will return with 0.
+					Simply multiply the entire equation by that resulting number to determine whether
+					or not you actually GET the bonus at all.  If it's a 1 (fighter), then you're 
+					multiplying the equation by 1 (and thus not changing it at all).  But, if it's 0, 
+					it nullifies the whole equation to 0.
+					
+					I'm sure my wording of this is kinda confusing, and I do apologize, but that's the
+					explanation of how it works, and why it works.
+					
+					This bonus is only applied to melee and missile attack rolls, since fighters can't use magic, and the rule says "+1 to all attack rolls".  This means it's a +1 only to the rolls that a fighter could possibly make - melee and ranged. -->
+				<div class="form-group">
                     <label class="col-sm-6 control-label">
-                        Melee Attack Bonus <small>(STR + level)</small>
+                        Melee Attack Bonus <small>(STR + level + Class Bonus)</small>
                     </label>
                     <div class="col-sm-2">
                         <input type="number" class="form-control" 
                         placeholder="0"
                         name="attr_melee_attack_bonus" disabled="true"
                         value="@{strength_bonus} + @{level}">
+						<button class="form-control" type="roll"
+							value="/roll d20+[melee attack bonus]@{melee_attack_bonus}+[class bonus, if applicable]((floor(@{class}/4))*(1+floor(@{level}/5))) \ Melee Attack Check - d20+melee attack bonus+class bonus">
+						</button>
                     </div>
                 </div>
 
@@ -250,6 +349,9 @@
                         placeholder="0"
                         name="attr_missile_attack_bonus" disabled="true"
                         value="@{dexterity_bonus} + @{level}">
+						<button class="form-control" type="roll"
+							value="/roll d20+[ranged/missile attack bonus]@{missile_attack_bonus} + [class bonus, if applicable]((floor(@{class}/4))*(1+floor(@{level}/5))) \ Ranged/Missile Attack Check - d20+missile/ranged attack bonus+class bonus">
+						</button>
                     </div>
                 </div>
 
@@ -262,9 +364,33 @@
                         placeholder="0"
                         name="attr_magic_attack_bonus" disabled="true"
                         value="@{mind_bonus} + @{level}">
+						<button class="form-control" type="roll"
+							value="/roll d20+[magic attack bonus]@{magic_attack_bonus} \ Magic Attack Check">
+						</button>
+                </div>
                     </div>
                 </div>
             </form>
+			<div class="row">
+				<h3>Armor</h3>
+				<div class="col-sm-4 text-center">
+					<strong>Name</strong>
+				</div>
+				<div class="col-sm-2 text-center">
+					<strong>Armor Bonus</strong>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-4">
+					<input type="text" name="attr_armor_name"
+					class="form-control" placeholder="Armor Name"></input>
+				</div>
+				<div class="col-sm-2">
+					<input type="number" name="attr_armor_bonus"
+					class="form-control"
+					placeholder="0"></input>
+				</div>
+			</div>
 
             <div class="row">
                 <h3>Weapons</h3>
@@ -307,59 +433,21 @@
                          name="attr_weapon_range"
                          placeholder="0"></input>
                     </div>
-                    <div class="col-sm-2">
+					<div class="col-sm-2">
                         <button class="form-control" type="roll"
-                        value="/roll @{dnum}d@{dtype}">
+                        value="/roll @{dnum}d@{dtype} + [class bonus, if applicable]((floor(@{class}/4))*(1+floor(@{level}/5))) \ Damage Roll - damage dice + class bonus">
                         </button>
                     </div>
                 </fieldset>
             </div>
-
-            <div class="row">
-                <h3>Spells</h3>
-                <div class="col-sm-2 text-center">
-                    <strong>Name</strong>
+			<div class="row">
+				<h3>Caster Difficulty Class (DC)</h3>
+				<div class="col-sm-2 text-center">
+                    <input class="form-control" type="roll"
+						value="10+@{level}+@{mind_bonus}" />
                 </div>
-                <div class="col-sm-2 text-center">
-                    <strong>Level</strong>
-                </div>
-                <div class="col-sm-1 text-center">
-                    <strong>Signature</strong>
-                </div>
-                <div class="col-sm-4 text-center">
-                    <strong>Description</strong>
-                </div>
-            </div>
-
-            <div class="row">
-                <fieldset class="repeating_spells">
-                    <div class="col-sm-2">
-                        <input type="text" name="attr_spell_name"
-                        class="form-control" placeholder="Spell Name"></input>
-                    </div>
-                    <div class="col-sm-2">
-                        <input type="number" name="attr_spell_level"
-                        class="form-control" placeholder="0"></input>
-                    </div>
-                    <div class="col-sm-1" class="text-center">
-                        <input type="checkbox" name="attr_spell_signature"
-                        class="form-control"
-                        style="width:15px; height:15px;"
-                        value="1"></input>
-                    </div>
-                    <div class="col-sm-4">
-                        <input type="text" name="attr_spell_desc"
-                        class="form-control" placeholder="Spell Description">
-                        </input>
-                    </div>
-                    <div class="col-sm-2">
-                        <button class="form-control" type="roll"
-                            value="/me casts @{spell_name} at DC [[10 + @{level} + @{mind_modifier}]] costing [[1 + 2 * @{spell_level} - @{spell_signature}]] HP">
-                        </button>
-                    </div>
-                </fieldset>
-            </div>
-
+				
+			</div>
             <div class="row">
                 <h3>Equipment</h3>
                 <fieldset class="repeating_equipment">
@@ -416,5 +504,6 @@
         </div>
     </div>
 </div>
+
 </body>
 </html>
