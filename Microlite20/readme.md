@@ -5,7 +5,7 @@ use with Roll20.net and released open source under the MIT License.
 
 ### Changelog
 
-* Release 3 *
+*Release 3*
 
 - Flipped the order of female and male sexes... Not making a sexist
 statement here, but the default option should be the more common option.
