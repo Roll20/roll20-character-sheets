@@ -5631,29 +5631,43 @@ Have questions or feedback? <a href="https://app.roll20.net/forum/post/1047051/p
 <!-- Spell Roll Templates -->
 <rolltemplate class="sheet-rolltemplate-pf_spell">
   <table>
-    <tr><td class="sheet-header">{{name}}</td></tr>
+    {{#character_name}}
+            {{#name_link}}
+                <tr><td colspan="2" class="sheet-header">[{{character_name}}](http://journal.roll20.net/character/{{character_id}}): [{{name}}]({{name_link}})</td></tr>
+            {{/name_link}}
+            {{^name_link}}
+                <tr><td colspan="2" class="sheet-header">[{{character_name}}](http://journal.roll20.net/character/{{character_id}}): {{name}}</td></tr>
+            {{/name_link}}
+        {{/character_name}}
+        {{^character_name}}
+            {{#name_link}}
+                <tr><td colspan="2" class="sheet-header">[{{name}}]({{name_link}})</td></tr>
+            {{/name_link}}
+            {{^name_link}}
+        	<tr><td colspan="2" class="sheet-header">{{name}}</td></tr>
+    	{{/name_link}}
+    {{/character_name}}
+    
     <tr><td><span class="sheet-tcat">School</span> {{school}}<span class="tcat">; Level</span> {{level}}</td></tr>
     <tr><td><span class="sheet-tcat">Casting Time</span> {{casting_time}}</td></tr>
     <tr><td><span class="sheet-tcat">Components</span> {{components}}</td></tr>
     <tr><td><span class="sheet-tcat">Range</span> {{range}}</td></tr>
     <tr><td><span class="sheet-tcat">Effects/Target</span> {{target}}</td></tr>
     <tr><td><span class="sheet-tcat">Duration</span> {{duration}}</td></tr>
-    <tr><td><span class="sheet-tcat">Saving Throw</span> {{saving_throw}}</td></tr>
-    <tr><td><span class="sheet-tcat">Saving Throw</span> {{saving_throw}}<span class="sheet-tcat"> DC</span>{{dc}}</td></tr>
-    {{#rng_attack}}
-    <tr><td><span class="sheet-tcat">Ranged Attack</span> {{rng_attack}}</td></tr>{{/rng_attack}}
-    {{#mel_attack}}
-    <tr><td><span class="sheet-tcat">Melee Attack</span> {{mel_attack}}</td></tr>{{/mel_attack}}
-    {{#damage}}
-    <tr><td><span class="sheet-tcat">Damage</span> {{damage}}</td></tr>{{/damage}}
+    <tr><td><span class="sheet-tcat">Saving Throw</span> {{saving_throw}} **DC** {{dc}};<span class="sheet-tcat"> Spell Resistance</span> {{sr}}</td></tr>
+    
+    {{#allprops() character_name character_id name_link school level casting_time components range target duration saving_throw dc sr spell_description}}
+	   <tr><td><b>{{key}}</b> {{value}}</td></tr>
+    {{/allprops() character_name character_id name_link school level casting_time components range target duration saving_throw dc sr spell_description}}
+    
     <tr><td>{{spell_description}}</td></tr>
   </table>
 </rolltemplate>
 
 <!-- Checks Roll Templates -->
 <rolltemplate class="sheet-rolltemplate-pf_check">
-  <table>
-    <tr><td class="sheet-header">{{name}}</td></tr>
+    <table>
+    <tr><td colspan="2" class="sheet-header">{{name}}</td></tr>
     <tr><td><span class="sheet-tcat">Caster's Class/Lvl:</span> {{caster_class}}</td></tr>
     {{#caster_lvl_chk}}
     <tr><td><span class="sheet-tcat">Caster Level Check:</span> {{caster_lvl_chk}}</td></tr>{{/caster_lvl_chk}}
@@ -5665,51 +5679,100 @@ Have questions or feedback? <a href="https://app.roll20.net/forum/post/1047051/p
 <!-- Attack Roll Templates -->
 <rolltemplate class="sheet-rolltemplate-pf_attack">
     <table>
-     <tr><td colspan="2" class="sheet-header">{{name}}</td></tr>
+        {{#character_name}}
+            {{#name_link}}
+                <tr><td colspan="2" class="sheet-header">[{{character_name}}](http://journal.roll20.net/character/{{character_id}}): [{{name}}]({{name_link}})</td></tr>
+            {{/name_link}}
+            {{^name_link}}
+                <tr><td colspan="2" class="sheet-header">[{{character_name}}](http://journal.roll20.net/character/{{character_id}}): {{name}}</td></tr>
+            {{/name_link}}
+        {{/character_name}}
+        {{^character_name}}
+            {{#name_link}}
+                <tr><td colspan="2" class="sheet-header">[{{name}}]({{name_link}})</td></tr>
+            {{/name_link}}
+            {{^name_link}}
+                <tr><td colspan="2" class="sheet-header">{{name}}</td></tr>
+            {{/name_link}}
+        {{/character_name}}
+        
         {{#attack}}
             <tr><td>Attack</td><td>{{attack}}</td></tr>
+            {{#crit_confirm}}
+                {{#rollWasCrit() attack}}
+                    <tr><td style="text-indent:0.5em">Crit Confirm</td><td>{{crit_confirm}}</td></tr>
+                {{/rollWasCrit() attack}}
+            {{/crit_confirm}}
             {{#damage}}
                 <tr><td style="text-indent:0.5em">Damage</td><td>{{damage}}</td></tr>
             {{/damage}}
-            {{#crit_confirm}}
+            {{#crit_damage}}
                 {{#rollWasCrit() attack}}
-                    <tr><td style="text-indent:0.5em">Confirm</td><td>{{crit_confirm}}</td></tr>
-                    <tr><td style="text-indent:0.5em">Damage</td><td>{{crit_damage}}</td></tr>
+                    <tr><td style="text-indent:0.5em">Crit Damage</td><td><b>+</b>{{crit_damage}}</td></tr>
                 {{/rollWasCrit() attack}}
-            {{/crit_confirm}}
+            {{/crit_damage}}
         {{/attack}}
         {{^attack}}
             {{#damage}}
                 <tr><td>Damage</td><td>{{damage}}</td></tr>
             {{/damage}}
         {{/attack}}
+        
         {{#attack2}}
-            <tr><td>Attack</td><td>{{attack2}}</td></tr>
-            <tr><td style="text-indent:0.5em">Damage</td><td>{{damage2}}</td></tr>
-            {{#rollWasCrit() attack2}}
-                <tr><td style="text-indent:0.5em">Confirm</td><td>{{crit_confirm2}}</td></tr>
-                <tr><td style="text-indent:0.5em">Damage</td><td>{{crit_damage2}}</td></tr>
-            {{/rollWasCrit() attack2}}
+            <tr><td>Attack 2</td><td>{{attack2}}</td></tr>
+            {{#crit_confirm2}}
+                {{#rollWasCrit() attack2}}
+                    <tr><td style="text-indent:0.5em">Crit Confirm</td><td>{{crit_confirm2}}</td></tr>
+                {{/rollWasCrit() attack2}}
+            {{/crit_confirm2}}
+            {{#damage2}}
+                <tr><td style="text-indent:0.5em">Damage</td><td>{{damage2}}</td></tr>
+            {{/damage2}}
+            {{#crit_damage2}}
+                {{#rollWasCrit() attack2}}
+                    <tr><td style="text-indent:0.5em">Crit Damage</td><td><b>+</b>{{crit_damage2}}</td></tr>
+                {{/rollWasCrit() attack2}}
+            {{/crit_damage2}}
         {{/attack2}}
+        
         {{#attack3}}
-            <tr><td>Attack</td><td>{{attack3}}</td></tr>
-            <tr><td style="text-indent:0.5em">Damage</td><td>{{damage3}}</td></tr>
-            {{#rollWasCrit() attack3}}
-                <tr><td style="text-indent:0.5em">Confirm</td><td>{{crit_confirm3}}</td></tr>
-                <tr><td style="text-indent:0.5em">Damage</td><td>{{crit_damage3}}</td></tr>
-            {{/rollWasCrit() attack3}}
+            <tr><td>Attack 3</td><td>{{attack3}}</td></tr>
+            {{#crit_confirm3}}
+                {{#rollWasCrit() attack3}}
+                    <tr><td style="text-indent:0.5em">Crit Confirm</td><td>{{crit_confirm3}}</td></tr>
+                {{/rollWasCrit() attack3}}
+            {{/crit_confirm3}}
+            {{#damage3}}
+                <tr><td style="text-indent:0.5em">Damage</td><td>{{damage2}}</td></tr>
+            {{/damage3}}
+            {{#crit_damage3}}
+                {{#rollWasCrit() attack3}}
+                    <tr><td style="text-indent:0.5em">Crit Damage</td><td><b>+</b>{{crit_damage3}}</td></tr>
+                {{/rollWasCrit() attack3}}
+            {{/crit_damage3}}
         {{/attack3}}
+        
         {{#attack4}}
-            <tr><td>Attack</td><td>{{attack4}}</td></tr>
-            <tr><td style="text-indent:0.5em">Damage</td><td>{{damage4}}</td></tr>
-            {{#rollWasCrit() attack4}}
-                <tr><td style="text-indent:0.5em">Confirm</td><td>{{crit_confirm4}}</td></tr>
-                <tr><td style="text-indent:0.5em">Damage</td><td>{{crit_damage4}}</td></tr>
-            {{/rollWasCrit() attack4}}
+            <tr><td>Attack 4</td><td>{{attack4}}</td></tr>
+            {{#crit_confirm4}}
+                {{#rollWasCrit() attack4}}
+                    <tr><td style="text-indent:0.5em">Crit Confirm</td><td>{{crit_confirm4}}</td></tr>
+                {{/rollWasCrit() attack4}}
+            {{/crit_confirm4}}
+            {{#damage4}}
+                <tr><td style="text-indent:0.5em">Damage</td><td>{{damage4}}</td></tr>
+            {{/damage4}}
+            {{#crit_damage4}}
+                {{#rollWasCrit() attack4}}
+                    <tr><td style="text-indent:0.5em">Crit Damage</td><td><b>+</b>{{crit_damage4}}</td></tr>
+                {{/rollWasCrit() attack4}}
+            {{/crit_damage4}}
         {{/attack4}}
-        {{#allprops() attack damage crit_confirm crit_damage description attack2 damage2 crit_confirm2 crit_damage2 attack3 damage3 crit_confirm3 crit_damage3 attack4 damage4 crit_confirm4 crit_damage4}}
+        
+        {{#allprops() character_name character_id name_link attack damage crit_confirm crit_damage description attack2 damage2 crit_confirm2 crit_damage2 attack3 damage3 crit_confirm3 crit_damage3 attack4 damage4 crit_confirm4 crit_damage4}}
             <tr><td>{{key}}</td><td>{{value}}</td></tr>
-        {{/allprops() attack damage crit_confirm crit_damage description attack2 damage2 crit_confirm2 crit_damage2 attack3 damage3 crit_confirm3 crit_damage3 attack4 damage4 crit_confirm4 crit_damage4}}
+        {{/allprops() character_name character_id name_link attack damage crit_confirm crit_damage description attack2 damage2 crit_confirm2 crit_damage2 attack3 damage3 crit_confirm3 crit_damage3 attack4 damage4 crit_confirm4 crit_damage4}}
+        
         {{#description}}
             <tr><td colspan="2" style="font-weight:normal; text-align:center"><p>{{description}}</p></td></tr>
         {{/description}}
