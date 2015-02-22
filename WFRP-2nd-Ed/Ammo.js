@@ -5,7 +5,7 @@
 var Ammo = Ammo || (function() {
     'use strict';
 
-    var version = 0.21,
+    var version = 0.22,
 		schemaVersion = 0.1,
 
 	ch = function (c) {
@@ -34,13 +34,6 @@ var Ammo = Ammo || (function() {
 			+message
 			+'</div>'
 		);
-
-sendChat('','<div style="display: inline-block;position:relative; max-width:410px;">'
-  +'<span style="display: inline-block; padding: 2px 5px;position:absolute;left:0;background-color:#333; color: #fff; border:2px solid #333; border-radius: 30px 0 0 30px; width: 90px; height: calc(100% - 8px);">'
-      +'<span style="position: absolute; top:50%; left:50%; width:100%; text-align: center; transform: translate(-50%, -50%);">I am the title</span>'
-  +'</span>'
-+'</div>');
-
 	},
 
 	adjustAmmo = function (playerid,attr,amount) {
