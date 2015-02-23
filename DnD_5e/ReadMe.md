@@ -4,6 +4,9 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### Changelog
 
+* Roll templates update - date TBC
+Lots of changes to the sheet so that all the macro output now uses the new roll templates feaute on roll 20....more details here once completed
+
 * Minor update - 15th November 2014
 Tweaked the way the global bonus fields are used so the sheet wont break if people enter "+2" instead of just "2" in them.  Added support in the inventory section to allow players to indicate what pieces or inventory are actually carried so that it is included or excluded for the purposes of encumberance tracking.  Added support for the Draconic Resilience feature available in the Sorcerer Draconic Bloodline subclass.
 
