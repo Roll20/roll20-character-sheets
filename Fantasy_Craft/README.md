@@ -5,8 +5,16 @@ This is my fork of Suldae's initial sheet.
 
 ### ChangeLog
 
+* Bug Fix Update and Improvements - Feb 2015
+Added attribute name to coin-in-hand, stake, and Weapon placeholder names for weapon 2-4
+Made 'Knowledge Check' text part of button like with 'Effect' under spells
+Changed Weapons layout so that Damage roll button's purpose is more obvious
+Add Comp to gear
+Allow 0.5 increment to weight tracker
+Changed look&feel of gear, combat, and non-combat abilities slightly
+
 * Bug Fix Update - Jan 2015
-Fixed typo in affecting fortitude save roll
+Fixed typo in name affecting fortitude save roll
 
 * Update - Dec 2014
 Minor changes to Standard Character tab to fix shifting around and removal of out-of-date comments
@@ -24,59 +32,65 @@ Fixed Bull Rush and Trip size difference calculations when using weapons
 Fixed spellcraft attribute name in Arcane magic session causing error when rolling to attack
 
 * Major Update - August 30 2014 thru October 
-* Changed default values for skills and attributes to help reduce data entry requirements.
-* New fonts!  But they don't work.  Boo, roll20! :-(
-* Added missing Proficiency and Saving Throw data
-* Added min 0 to various number values that cannot go below 0
-* Added step of 1 to various number values
-* Added section for additional action dice that some characters can receive
-* Added Class/Origin checkbox to skills.
-* Added Max Skill ranks
-* Added automatic adjustment of Error range based on ranks added to the skill
-* Added Spellcasting skill to list of skills, access controlled by class skill checkbox
-* Added an attribute select element for each skill with appropriate default
-* Changed Defense calculation to include other bonuses
-* Added flat-footed Defense calculation
-* Added Spell Defense
-* Changed all type names to lower case.  Upper case appears to be breaking repeating sections.
-* Fixed repeating sections which previously resulted in data loss (see previous)
-* Changed Weapon titles to input fields with placeholders
-* Added Keen field to weapons (but not incorporated into rolls)
-* Added Subdual and Stress damage sections as well as Fatigue and Shaken conditions with grades, respectively.
-* Added conditions tracking
-* Added fittings repeating section to Armor
-* Corrected size-related footnote in Actions section to include other actions (and added the footnote :-) )
-* Added collapsible Spells section for Arcane and Divine magic
-* Added Tabbed per-level Spell sections within collapsible section.
-* Added FantasyCraft logo after receiving publishers permission.
-* Added Ground, Fly, and Travel speeds Character section (used Fly vice 'Other' as Drake is a standard character in FC which can fly)
-* Added Alignment details to Character section
-* Lifestyle section with Panache, Prudence, and Income
-* Made Attribute modifiers number type vice text
-* Cleaned up initial sheets CSS indenting
-* Began the process of removing singleton css class names, but more work needs to be done including removing unused css class names
-* Reworked location of various fields to reduce the amount of blank space and lateral scrolling required.
-* Added separate Special and Standard character sheet radio buttons
-* Prettified background images using style/colors evocative of published material. 
-* Renamed 'Gear, etc.' to 'Gear and Prizes' in keeping with official character sheet
-* Add Overloaded, Lift, Push/Drag weight limit calculations to Gear
-* Added Reputation and Renown to Gear and Prizes
-* Tweaked Encumbrance calculations, allowing size to be used for both effective str in encumbrance calculations and dodge.  
+ Changed default values for skills and attributes to help reduce data entry requirements.
+ New fonts!  But they don't work.  Boo, roll20! :-(
+ Added missing Proficiency and Saving Throw data
+ Added min 0 to various number values that cannot go below 0
+ Added step of 1 to various number values
+ Added section for additional action dice that some characters can receive
+ Added Class/Origin checkbox to skills.
+ Added Max Skill ranks
+ Added automatic adjustment of Error range based on ranks added to the skill
+ Added Spellcasting skill to list of skills, access controlled by class skill checkbox
+ Added an attribute select element for each skill with appropriate default
+ Changed Defense calculation to include other bonuses
+ Added flat-footed Defense calculation
+ Added Spell Defense
+ Changed all type names to lower case.  Upper case appears to be breaking repeating sections.
+ Fixed repeating sections which previously resulted in data loss (see previous)
+ Changed Weapon titles to input fields with placeholders
+ Added Keen field to weapons (but not incorporated into rolls)
+ Added Subdual and Stress damage sections as well as Fatigue and Shaken conditions with grades, respectively.
+ Added conditions tracking
+ Added fittings repeating section to Armor
+ Corrected size-related footnote in Actions section to include other actions (and added the footnote :-) )
+ Added collapsible Spells section for Arcane and Divine magic
+ Added Tabbed per-level Spell sections within collapsible section.
+ Added FantasyCraft logo after receiving publishers permission.
+ Added Ground, Fly, and Travel speeds Character section (used Fly vice 'Other' as Drake is a standard character in FC which can fly)
+ Added Alignment details to Character section
+ Lifestyle section with Panache, Prudence, and Income
+ Made Attribute modifiers number type vice text
+ Cleaned up initial sheets CSS indenting
+ Began the process of removing singleton css class names, but more work needs to be done including removing unused css class names
+ Reworked location of various fields to reduce the amount of blank space and lateral scrolling required.
+ Added separate Special and Standard character sheet radio buttons
+ Prettified background images using style/colors evocative of published material. 
+ Renamed 'Gear, etc.' to 'Gear and Prizes' in keeping with official character sheet
+ Add Overloaded, Lift, Push/Drag weight limit calculations to Gear
+ Added Reputation and Renown to Gear and Prizes
+ Tweaked Encumbrance calculations, allowing size to be used for both effective str in encumbrance calculations and dodge.  
   (Still a known issue with Vast size being off-by-one for encumbrance calculations, but probably not correctable.)
-* Fixed bug in size usage when calculating to-hit with a weapon for Bull Rush and Trip where absolute size was being used and not relative size difference (this doesn't matter if everyone uses absolute size difference, but not everyone does)
-* Added size difference Select to modify rolls
-* Added 2H mod when calculate Disarm bonus
+ Fixed bug in size usage when calculating to-hit with a weapon for Bull Rush and Trip where absolute size was being used and not relative size difference (this doesn't matter if everyone uses absolute size difference, but not everyone does)
+ Added size difference Select to modify rolls
+ Added 2H mod when calculate Disarm bonus
 
 ### TODO
 
 * Add roll button for Initiative
-* Add mod for Knowledge checks
-* Add roll button for Knowledge checks
 * Compute Keen in conjunction with damage rolls
 * Add Global Keen than just to individual weapons
 * What to do if > 4 weapons?  Repeating field?
-* Modify Skill checks for ACP
+* Modify Skill checks for ACP using default checkbox
 * Modify Skill checks for Fatigue
+* Add Effect field to gear
+* Change armor 'speed' value to 'speed penalty'
+* Add 'const' and 'comp' fields to armor
+* Simplify fittings by: Number or Quantity, Light/Heavy drop down, remove location, Change 'Fitting' to 'Fitting description' 
+						Add tooltip explaining 2-3 fitting gain light modification while 4-5 gain heavy, 
+						Change 'weight' to 'weight increase' or '+ weight'
+* Change combat and non-combat abilities so that one pair of fields appears with 'name' and 'notes' above it, and "+Add Modify" buttons underneath to add more
+* Change Weapons layout to add 'Const', 'Comp', 'Weight'
 * Armor resistances are still number type.  Should be changed to text/number
 * Consider adding individual conditions select element in order to create flexible macros
 * Need to add Contacts, Holdings, Magic Items, Mounts, and Vehicles section to Gear & Prizes
@@ -88,6 +102,8 @@ Fixed spellcraft attribute name in Arcane magic session causing error when rolli
 * Possibly create Feat Category select to help track how many feats of a tree a character has
 * Character Disposition tracking for both Special and Standard (See pg 373)
 * Standard Character sheet
+* Add Tooltip to Total Lifestyle explaining that the points are distributed to either Panache of Prudence
+* Merge 'Focus' into 'Skills' section?
 
 ### NOTE
 
