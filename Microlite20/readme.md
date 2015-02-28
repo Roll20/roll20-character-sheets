@@ -1,6 +1,6 @@
 # Microlite20 Character Sheet
 
-This is a Microlite20 character sheet.  It is designed for
+This is a **work in progress** Microlite20 character sheet.  It is designed for
 use with Roll20.net and released open source under the MIT License.
 
 ### Changelog ###
