@@ -5,7 +5,10 @@ use with Roll20.net and released open source under the MIT License.
 
 ### Changelog ###
 
-**Release 3**
+**Release 3.5 - February 26, 2015**
+- Changed the layout for more easier readability.
+
+**Release 3 - February 19, 2015**
 
 - Flipped the order of female and male sexes... Not making a sexist
 statement here, but the default option should be the more common option.
@@ -30,7 +33,7 @@ rolls, if fighter is selected.
 - Modified Missile Attack Rolls to include light weapons.
 
 
-**Release 2**
+**Release 2 - February 13, 2015**
 - Fixed a bug with Armor Class, and added buttons for skill rolls.
 
 **Initial release - August 12, 2014**
