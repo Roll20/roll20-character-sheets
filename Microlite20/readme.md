@@ -5,6 +5,18 @@ use with Roll20.net and released open source under the MIT License.
 
 ### Changelog ###
 
+**Release 4 - March 10, 2015**
+- Cut down on the verbosity of rolls (took up too much of the chat box)
+- Removed Light Weapons from Missile Attack Roll
+- Added a new section for special attack rolls: Light Weapons, and Dual Wield
+- Added in Microlite20 "Expert Rules"
+  - Added 4 new races: Gnomes, Half-orcs, Half-elves, and Lizardmen
+  - Added 5 new classes: Paladin, Ranger, Illusionist, Druid, Bard
+  - Added Paladin modifier to all save rolls (+1 at level 1, and +1 per every 5 levels)
+  - Added Ranger modifier to ranged attack rolls, ranged damage rolls, and dual-weild rolls
+  - Added an additional skill: Survival
+
+
 **Release 3.5 - February 26, 2015**
 - Changed the layout for more easier readability.
 
