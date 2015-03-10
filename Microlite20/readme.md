@@ -13,7 +13,7 @@ use with Roll20.net and released open source under the MIT License.
   - Added 4 new races: Gnomes, Half-orcs, Half-elves, and Lizardmen
   - Added 5 new classes: Paladin, Ranger, Illusionist, Druid, Bard
   - Added Paladin modifier to all save rolls (+1 at level 1, and +1 per every 5 levels)
-  - Added Ranger modifier to ranged attack rolls, ranged damage rolls, and dual-weild rolls
+  - Added Ranger modifier to ranged attack rolls, ranged damage rolls, and dual-wield rolls
   - Added an additional skill: Survival
 
 
