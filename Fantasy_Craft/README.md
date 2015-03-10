@@ -5,14 +5,42 @@ This is my fork of Suldae's initial sheet.
 
 ### ChangeLog
 
-* Bug Fix Update - Nov 2014
-Fixed typos in Threat Range title attribute and Bull Rush, Disarm, Grapple, and Trip basic actions.
-Fixed confusing text fluff when rolling for attacks from weapons section
-Fixed Bull Rush roll when using a weapon
-Fixed Bull Rush and Trip size difference calculations when using weapons
-Fixed spellcraft attribute name in Arcane magic session causing error when rolling to attack
+#### Bug Fix Update and Improvements - Feb 2015
+* Fixed up this README...
+* Added attribute name to coin-in-hand, stake, and Weapon placeholder names for weapon 2-4
+* Made 'Knowledge Check' text part of button like with 'Effect' under spells
+* Changed Weapons layout so that Damage roll button's purpose is more obvious
+* Add Comp field and Effect field to Gear section
+* Allow 0.5 increment to weight tracker
+* Changed look & feel of gear, combat, and non-combat abilities slightly
+* Put bounds on Threat value of weapons in weapon section
+* Added missing weapon proficiency mods to weapons 2-4
+* Added checkbox to add strength modification to damage roll
+* Corrected look & feel of weapon section slightly
+* Added min/max bounds on weapon threat value
+* Change armor 'speed' value to 'speed penalty'
+* Added tool tips to explain 'DP' and 'DR'
 
-* Major Update - August 30 2014 thru October 
+
+#### Bug Fix Update - Jan 2015
+* Fixed typo in name affecting fortitude save roll
+
+#### Update - Dec 2014
+* Minor changes to Standard Character tab to fix shifting around and removal of out-of-date comments
+* Changed Spellcasting skill to work like all the other skills (no longer need for checkbox at top of skill list)
+* Cleaned up css elements no longer needed with Spellcasting skill changes
+* Added Prep Cost to all Arcane spell levels
+* Added Rolls for Saving Throws
+* Added Bonus and Roll for Knowledge Checks
+
+#### Bug Fix Update - Nov 2014
+* Fixed typos in Threat Range title attribute and Bull Rush, Disarm, Grapple, and Trip basic actions.
+* Fixed confusing text fluff when rolling for attacks from weapons section
+* Fixed Bull Rush roll when using a weapon
+* Fixed Bull Rush and Trip size difference calculations when using weapons
+* Fixed spellcraft attribute name in Arcane magic session causing error when rolling to attack
+
+#### Major Update - August 30 2014 thru October 
 * Changed default values for skills and attributes to help reduce data entry requirements.
 * New fonts!  But they don't work.  Boo, roll20! :-(
 * Added missing Proficiency and Saving Throw data
@@ -59,15 +87,17 @@ Fixed spellcraft attribute name in Arcane magic session causing error when rolli
 ### TODO
 
 * Add roll button for Initiative
-* Add roll button for Saving Throws
-* Add mod for Knowledge checks
-* Add roll button for Knowledge checks
 * Compute Keen in conjunction with damage rolls
 * Add Global Keen than just to individual weapons
 * What to do if > 4 weapons?  Repeating field?
-* Modify Skill checks for ACP
+* Modify Skill checks for ACP using default checkbox
 * Modify Skill checks for Fatigue
+* Add 'const' and 'comp' fields to armor
+* Simplify fittings by: Number or Quantity, Light/Heavy drop down, remove location, Change 'Fitting' to 'Fitting description' 
+						Add tooltip explaining 2-3 fitting gain light modification while 4-5 gain heavy, 
+						Change 'weight' to 'weight increase' or '+ weight'
 * Armor resistances are still number type.  Should be changed to text/number
+* Add sneak attack damage dice to weapons section
 * Consider adding individual conditions select element in order to create flexible macros
 * Need to add Contacts, Holdings, Magic Items, Mounts, and Vehicles section to Gear & Prizes
 * Add input field for Edge?
@@ -78,6 +108,8 @@ Fixed spellcraft attribute name in Arcane magic session causing error when rolli
 * Possibly create Feat Category select to help track how many feats of a tree a character has
 * Character Disposition tracking for both Special and Standard (See pg 373)
 * Standard Character sheet
+* Add Tooltip to Total Lifestyle explaining that the points are distributed to either Panache of Prudence
+* Merge 'Focus' into 'Skills' section?
 
 ### NOTE
 

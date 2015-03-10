@@ -1,10 +1,10 @@
 /*
     Current Version: 2.5
-    Last updated: 8.28.2014
+    Last updated: 12.03.2014
     Character Sheet and Script Maintained by: Steve Day
     Current Verion: https://github.com/Roll20/roll20-character-sheets/tree/master/StarWarsEdgeOfTheEmpire_Dice
-	Development and Older Verions: https://github.com/dayst/StarWarsEdgeOfTheEmpire_Dice
-	
+    Development and Older Verions: https://github.com/dayst/StarWarsEdgeOfTheEmpire_Dice
+    
 	Credits:
 		Original creator: Konrad J.
 		Helped with Dice specs: Alicia G. and Blake the Lake
@@ -93,14 +93,17 @@
             diceTestEnabled : false,
             diceLogRolledOnOneLine : true
         },
+        '-DicePoolID' : '',
         character : {
             attributes : [
-                {
+                /* Don't need to update characterID
+                 * 
+                 *{
                     name : "characterID",
                     current : "UPDATES TO CURRENT ID",
                     max : "",
                     update : false
-                }
+                }*/
             ], 
             ablities : [],
         },
@@ -181,13 +184,15 @@
             resetdice : /(resetgmdice|resetdice)/,
             initiative : /\bnpcinit|\bpcinit/,
             characterID : /characterID\((.*?)\)/,
+            rollPlayer : /rollPlayer(\(.*?\))/,
             label : /label\((.*?)\)/,
             skill : /skill\((.*?)\)/g,
 			opposed : /opposed\((.*?)\)/g,
             upgrade : /upgrade\((.*?)\)/g,
             downgrade : /downgrade\((.*?)\)/g,
+            gmdice : /\(gmdice\)/,
             encum : /encum\((.*?)\)/g,
-            dice : /(\d{1,2}blk)\b|(\d{1,2}b)\b|(\d{1,2}g)\b|(\d{1,2}y)\b|(\d{1,2}p)\b|(\d{1,2}r)\b|(\d{1,2}w)\b|(\d{1,2}a)\b|(\d{1,2}s)|(\d{1,2}t)\b|(\d{1,2}f)/g, ///blk$|b$|g$|y$|p$|r$|w$|suc$|adv$/, ///blk$|b$|g$|y$|p$|r$|w$|a$|s$/
+            dice : /(\d{1,2}blk)\b|(\d{1,2}b)\b|(\d{1,2}g)\b|(\d{1,2}y)\b|(\d{1,2}p)\b|(\d{1,2}r)\b|(\d{1,2}w)\b|(\d{1,2}a)\b|(\d{1,2}s)|(\d{1,2}t)\b|(\d{1,2}f)/g,
         	crit : /crit\((.*?)\)/,
         	critShip : /critship\((.*?)\)/,
         }
@@ -195,22 +200,36 @@
     
     eote.createGMDicePool = function() {
         
+        var charObj_DicePool = findObjs({ _type: "character", name: "-DicePool" })[0];
+        
+        var attrObj_DicePool = [
+            {
+                name : 'pcgm',
+                current : 3,
+                max : '',
+                update : true
+            },
+            {
+                name : 'gmdicepool',
+                current : 2,
+                max : '',
+                update : true
+            }   
+        ];
+        
         //create character -DicePool
-        if (findObjs({ _type: "character", name: "-DicePool" }).length == 0){
+        if ( ! charObj_DicePool ){
            
-            createObj("character", {
+            charObj_DicePool = createObj("character", {
                 name: "-DicePool",
                 bio: "GM Dice Pool"
             });
-           
-            Char_dicePoolObject = findObjs({ _type: "character", name: "-DicePool" });
             
-            createObj("attribute", {
-                name: "pcgm",
-                current: 3,
-                characterid: Char_dicePoolObject[0].id
-            });
-        };
+        } 
+		
+		eote.defaults['-DicePoolID'] = charObj_DicePool.id;
+                    
+        eote.updateAddAttribute(charObj_DicePool, attrObj_DicePool);
         
     }
     
@@ -241,7 +260,7 @@
         _.each(charObj, function(charObj){
             
             //updates default attr:CharacterID to current character id
-            _.findWhere(eote.defaults.character.attributes, {'name':'characterID'}).current = charObj.id;
+            //_.findWhere(eote.defaults.character.attributes, {'name':'characterID'}).current = charObj.id;
             
             //Attributes
             eote.updateAddAttribute(charObj, eote.defaults.character.attributes);//Update Add Attribute defaults
@@ -275,30 +294,33 @@
             //find attribute via character ID
             var characterAttributesObj = findObjs({ _type: "attribute", characterid: characterObj.id});
             
-            log('//------------------------------->'+ characterName);
-            
-           _.each(updateAddAttributesObj, function(updateAddAttrObj){ //loop attributes to update / add
+            if (updateAddAttributesObj.length != 0) {
                 
-                attr = _.find(characterAttributesObj, function(a) {
-                    return (a.get('name') === updateAddAttrObj.name);
+                log('UPDATE/ADD ATTRIBUTES FOR:----------------------->'+ characterName);
+            
+               _.each(updateAddAttributesObj, function(updateAddAttrObj){ //loop attributes to update / add
+                    
+                    attr = _.find(characterAttributesObj, function(a) {
+                        return (a.get('name') === updateAddAttrObj.name);
+                    });
+    
+                    if (attr) {
+                       if (updateAddAttrObj.update) {
+                            log('Update Attr: '+ updateAddAttrObj.name);
+                            attr.set({current: updateAddAttrObj.current});
+                            attr.set({max: updateAddAttrObj.max ? updateAddAttrObj.max : ''});
+            			}
+            		} else {
+            		    log('Add Attr: '+ updateAddAttrObj.name);
+                        eote.createObj('attribute', {
+                			characterid: characterObj.id,
+                			name: updateAddAttrObj.name,
+                			current: updateAddAttrObj.current,
+                			max: updateAddAttrObj.max ? updateAddAttrObj.max : ''
+            			});
+            		}
                 });
-
-                if (attr) {
-            	   if (updateAddAttrObj.update) {
-                        log('Update Attr: '+ updateAddAttrObj.name);
-                        attr.set({current: updateAddAttrObj.current});
-                        attr.set({max: updateAddAttrObj.max});
-        			}
-        		} else {
-        		    log('Add Attr: '+ updateAddAttrObj.name);
-                    eote.createObj('attribute', {
-            			characterid: characterObj.id,
-            			name: updateAddAttrObj.name,
-            			current: updateAddAttrObj.current,
-            			max: updateAddAttrObj.max
-        			});
-        		}
-            });
+            }
         }); 
         
     }
@@ -413,6 +435,18 @@
         /* Roll information
          * Description: Set default dice roll information Character Name and Skill Label
          * --------------------------------------------------------------*/
+        
+        var rollPlayerMatch = cmd.match(eote.defaults.regex.rollPlayer);
+			
+			if (rollPlayerMatch) {
+                diceObj = eote.process.rollPlayer(rollPlayerMatch, diceObj);
+                
+                if (!diceObj) {
+                    return false;
+                }
+            }
+        
+        
         var characterIDMatch = cmd.match(eote.defaults.regex.characterID);
             
             if (characterIDMatch) {
@@ -420,7 +454,7 @@
                 //Once Character ID is parsed, remove it from the cmd.
                 //it is possible that the character ID could contain dice values
                 //for ex. characterID(-JMBFmYX1i0L259bjb-X)  will add 59 blue dice to the pool
-                cmd = cmd.substr(6+characterIDMatch[0].length);
+                cmd = cmd.replace(characterIDMatch[0], '');
             }
         
         var labelMatch = cmd.match(eote.defaults.regex.label);
@@ -433,6 +467,12 @@
          * Description: Create dice pool before running any custom roll
          * script commands that may need dice evaluated.
          * --------------------------------------------------------------*/
+        var gmdiceMatch = cmd.match(eote.defaults.regex.gmdice);
+            
+            if (gmdiceMatch) {
+                cmd = eote.process.gmdice(cmd); // update the cmd string to contain the gmdice
+            }
+            
         var encumMatch = cmd.match(eote.defaults.regex.encum);
         
             if (encumMatch) {
@@ -601,6 +641,66 @@
         
     }
     
+    eote.process.rollPlayer = function(cmd, diceObj){
+		//Build cmd string
+		//get characterID
+		//get skills
+		//get encum
+		//remove rollPlayer(xxxx) from string
+		var match = {
+    	    skill : /skill:(.*?)[\|\)]/,
+            encum : /encum/,
+            character : /character:(.*?)[\|\)]/,
+		}
+        
+        var charcterMatch = cmd[1].match(match.character);
+        
+        if (charcterMatch) {
+            
+            var charObj = findObjs({ _type: "character", name: charcterMatch[1] });
+            
+            if (charObj.length > 0){
+            
+                diceObj.vars.characterName = charObj[0].get('name');
+                diceObj.vars.characterID = charObj[0].id;
+
+            } else {
+                sendChat("Alert", "Can't find character. Please update character name field to match sheet character name and try again.");
+                return false;
+            }
+        } else {
+            sendChat("Alert", "Please update character name field.");
+            return false;
+        }
+        
+        var encumMatch = cmd[1].match(match.encum);
+        
+        if (encumMatch) {
+            //encumbrance
+            var attr_1 = getAttrByName(diceObj.vars.characterID, 'encumbrance', 'max');
+            var attr_2 = getAttrByName(diceObj.vars.characterID, 'encumbrance');
+            var cmdEncum = ['encum('+attr_1+'|'+attr_2+')']; //["encum(3|5)"]
+
+            diceObj = eote.process.encum(cmdEncum, diceObj);
+          
+        }
+        
+        var skillMatch = cmd[1].match(match.skill);
+        
+        if (skillMatch) {
+            
+            var attrArray = skillMatch[1].split(',')
+            var attr_1 = getAttrByName(diceObj.vars.characterID, attrArray[0]);
+            var attr_2 = getAttrByName(diceObj.vars.characterID, attrArray[1]);
+            var cmdSkill = ['skill('+attr_1+'|'+attr_2+')']; //['skill(0|2)']
+            
+            diceObj = eote.process.skill(cmdSkill, diceObj);
+        }
+
+        return diceObj;
+		
+	}
+    
     eote.process.characterID = function(cmd, diceObj){
         
         /* CharacterId
@@ -636,7 +736,19 @@
         var label = cmd[1];
         
         if (label) {
-            diceObj.vars.label = label;
+            
+            var labelStr = '';
+            var labelArray = label.split('|');
+            
+            _.each(labelArray, function(labelVal){
+                var labelArray = labelVal.split(':');
+                var label = labelArray[0];
+                var message = labelArray[1];
+                
+                labelStr = labelStr + '<b>' + label + ':</b> ' + message + '<br>';
+            });
+            
+            diceObj.vars.label = labelStr;
         } 
         
 		return diceObj;
@@ -1083,6 +1195,8 @@
             var diceRoll = '';
             var critMod = '';
     		var rollTotal = '';
+            var rollOffset = parseInt(getAttrByName(diceObj.vars.characterID, 'critAddOffset'));
+                rollOffset = rollOffset ? rollOffset : 0;
             var totalcrits = 0;
             
             //check open critical spot
@@ -1106,7 +1220,7 @@
     		if (!addCritNum) {
     			diceRoll = randomInteger(100);
     			critMod = (totalcrits * 10);
-    			rollTotal = diceRoll + critMod;
+    			rollTotal = diceRoll + critMod + rollOffset;
     		} else {
     			rollTotal = parseInt(addCritNum);
     		}
@@ -1158,6 +1272,9 @@
                     var chat = '/direct <br><b>Rolls Critical Injury</b><br>';
                         chat = chat + '<img src="http://i.imgur.com/z51hRwd.png" /><br/>'
                         chat = chat + 'Current Criticals: (' + totalcrits + ' x 10)<br>';
+                        if (rollOffset) {
+                            chat = chat + 'Dice Roll Offset: ' + rollOffset + '<br>';
+                        }
                         chat = chat + 'Dice Roll: ' + diceRoll + '<br>';
                         chat = chat + 'Total: ' + rollTotal + '<br>';
                         chat = chat + '<br>';
@@ -1379,6 +1496,8 @@
             var diceRoll = '';
             var critMod = '';
         	var rollTotal = '';
+            var rollOffset = parseInt(getAttrByName(diceObj.vars.characterID, 'critShipAddOffset'));
+                rollOffset = rollOffset ? rollOffset : 0;
             var totalcrits = 0;
             
             //check open critical spot
@@ -1402,7 +1521,7 @@
     		if (!addCritNum) {
     			diceRoll = randomInteger(100);
     			critMod = (totalcrits * 10);
-    			rollTotal = diceRoll + critMod;
+    			rollTotal = diceRoll + critMod + rollOffset;
     		} else {
     			rollTotal = parseInt(addCritNum);
     		}
@@ -1454,6 +1573,9 @@
                     var chat = '/direct <br><b>Rolls Vehicle Critical</b><br>';
                         chat = chat + '<img src="http://i.imgur.com/JO3pOr8.png" /><br>';//need new graphic
                         chat = chat + 'Current Criticals: (' + totalcrits + ' x 10)<br>';
+                        if (rollOffset) {
+                            chat = chat + 'Dice Roll Offset: ' + rollOffset + '<br>';
+                        }
                         chat = chat + 'Dice Roll: ' + diceRoll + '<br>';
                         chat = chat + 'Total: ' + rollTotal + '<br>';
                         chat = chat + '<br>';
@@ -1518,6 +1640,40 @@
             critRoll();
 		}
        
+    }
+    
+    eote.process.gmdice = function(cmd) {
+        
+        /* gmdice
+         * default: 
+         * Description: Update CMD string to include -DicePool dice
+         * Command: (gmdice)
+         * ---------------------------------------------------------------- */
+
+        //var charObj = findObjs({ _type: "character", name: "-DicePool" });
+        var charID = eote.defaults['-DicePoolID'];//charObj[0].id;
+        
+        var g   = getAttrByName(charID, 'ggm');
+        var y   = getAttrByName(charID, 'ygm');
+        var p   = getAttrByName(charID, 'pgm');
+        var r   = getAttrByName(charID, 'rgm');
+        var b   = getAttrByName(charID, 'bgm');
+        var blk = getAttrByName(charID, 'blkgm');
+        var w   = getAttrByName(charID, 'wgm');
+        var upAbility       = getAttrByName(charID, 'upgradeAbilitygm');
+        var upDifficulty    = getAttrByName(charID, 'upgradeDifficultygm');
+        var downProficiency = getAttrByName(charID, 'downgradeProficiencygm');
+        var downChallenge   = getAttrByName(charID, 'downgradeChallengegm');
+       
+        var gmdiceCMD = g+'g '+y+'y '+p+'p '+r+'r '+b+'b '+blk+'blk '+w+'w upgrade(ability|'+upAbility+') downgrade(proficiency|'+downProficiency+') upgrade(difficulty|'+upDifficulty+') downgrade(challenge|'+downChallenge+')';
+       
+        //log(charID);
+       
+        cmd = cmd.replace('(gmdice)', gmdiceCMD);
+        
+        //log(cmd);
+        
+        return cmd;
     }
     
     eote.process.encum = function(cmd, diceObj){
@@ -2090,7 +2246,7 @@
         if (eote.defaults.globalVars.diceTestEnabled === true) {
         	chatGlobal = "/direct <br>6b 8g 12y 6blk 8p 12r 12w <br>";
     	} else if (diceObj.vars.label) {
-            chatGlobal = "/direct <br><b>Skill:</b> " + diceObj.vars.label + '<br>';
+            chatGlobal = "/direct <br>" + diceObj.vars.label + '<br>';
     	} else {
             chatGlobal = "/direct <br>";
     	}
