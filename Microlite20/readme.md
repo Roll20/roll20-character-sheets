@@ -8,6 +8,10 @@ use with Roll20.net and released open source under the MIT License.
 **Release 4.1 - March 12, 2015**
 - Fixed logic on attack rolls.  M20's rulebook was worded in a confusing way, which resulted in an additional +1 roll per level on every attack roll.  So this fix removes that additional +1 per level.
 - Fixed Ranger bonus calculation.  Was missing an ending parenthesis, so it wasn't getting calculated.
+- Rearranged the sheet for easier readability
+- Added Shield section to add to AC
+- Added Stat rolls
+- Changed Equipment section to a single textarea... (nobody wants to painstakingly add every single inventory item to their sheet... much easier to just type it all out).
 
 **Release 4 - March 10, 2015**
 - Cut down on the verbosity of rolls (took up too much of the chat box)
