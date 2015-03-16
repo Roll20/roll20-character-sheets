@@ -5,6 +5,9 @@ use with Roll20.net and released open source under the MIT License.
 
 ### Changelog ###
 
+**Release 4.2 - March 16, 2015**
+- Added note to initiative roll to explain initiative roll calculation.
+
 **Release 4.1 - March 12, 2015**
 - Fixed logic on attack rolls.  M20's rulebook was worded in a confusing way, which resulted in an additional +1 roll per level on every attack roll.  So this fix removes that additional +1 per level.
 - Fixed Ranger bonus calculation.  Was missing an ending parenthesis, so it wasn't getting calculated.
