@@ -13,6 +13,8 @@ use with Roll20.net and released open source under the MIT License.
 - Added Stat rolls
 - Changed Equipment section to a single textarea... (nobody wants to painstakingly add every single inventory item to their sheet... much easier to just type it all out).
 - Changed title of Equipment Section to "Inventory"
+- Added Initiative roll (will automatically add to tracker)
+- Changed all roll buttons to use roll templates
 
 **Release 4 - March 10, 2015**
 - Cut down on the verbosity of rolls (took up too much of the chat box)
