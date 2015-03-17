@@ -8,6 +8,9 @@ use with Roll20.net and released open source under the MIT License.
 **Release 4.2 - March 16, 2015**
 - Added note to initiative roll to explain initiative roll calculation.
 - Moved all roll calculation explanations to title attributes.  Now the explanations display when you hover over the buttons.  You are all now delivered from the cursed wall of text.
+- Rearranged the sheet to make more use of real estate.  
+- Added css for tables in order to better separate fields
+- Standardized roll template output
 
 **Release 4.1 - March 12, 2015**
 - Fixed logic on attack rolls.  M20's rulebook was worded in a confusing way, which resulted in an additional +1 roll per level on every attack roll.  So this fix removes that additional +1 per level.
