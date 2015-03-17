@@ -11,6 +11,7 @@ use with Roll20.net and released open source under the MIT License.
 - Rearranged the sheet to make more use of real estate.  
 - Added css for tables in order to better separate fields
 - Standardized roll template output
+- Changed "racial bonus" to "human racial bonus"
 
 **Release 4.1 - March 12, 2015**
 - Fixed logic on attack rolls.  M20's rulebook was worded in a confusing way, which resulted in an additional +1 roll per level on every attack roll.  So this fix removes that additional +1 per level.
