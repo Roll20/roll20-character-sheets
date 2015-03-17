@@ -14,6 +14,7 @@ use with Roll20.net and released open source under the MIT License.
 - Changed "racial bonus" to "human racial bonus"
 - Removed "Dice Type" and "Dice Number" in favor of 1 field that'll do both: "Damage Dice"
 - Retitled some things for better display
+- Changed Height and Weight to text boxes... 
 
 **Release 4.1 - March 12, 2015**
 - Fixed logic on attack rolls.  M20's rulebook was worded in a confusing way, which resulted in an additional +1 roll per level on every attack roll.  So this fix removes that additional +1 per level.
