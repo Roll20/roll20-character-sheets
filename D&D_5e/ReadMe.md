@@ -7,7 +7,7 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 **Initial release - 19 March 2015**
 First release of the redesigned sheet.
 **Notable changes:**
-* Core page has been revamped to based on the design of the official paper sheet (http://1.bp.blogspot.com/-SIz9DByDeZw/U6M51aKP-OI/AAAAAAAAAzM/OZ72wWzJMTA/s1600/sheet1.jpg). The core sheet is meant to present the information in a more concise, readable way so that users can find information quickly. I'm not fully satisfied with everything (The initiative box is funky, skills are too tall, etc), but it leaves plenty of room to expand if anyone has suggestions for things to put in the holes.
+* Core page has been revamped based on the design of the official paper sheet (http://1.bp.blogspot.com/-SIz9DByDeZw/U6M51aKP-OI/AAAAAAAAAzM/OZ72wWzJMTA/s1600/sheet1.jpg). The core sheet is meant to present the information in a more concise, readable way so that users can find information quickly. I'm not fully satisfied with everything (The initiative box is funky, skills are too tall, etc), but it leaves plenty of room to expand if anyone has suggestions for things to put in the holes.
 * Header part of the sheet now includes information such as Character Name, Race, Class, Background, Level, Alignment, Vision, XP
 * Heart contains HP info.
 * Shield Contains AC info.
