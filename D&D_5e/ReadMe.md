@@ -25,21 +25,21 @@ First release of the redesigned sheet.
   * Death saves can be whispered to the DM
   * Initiative can have a tiebreaker. This adds a modifier based on your initiative bonus. For instance rolling a 14 on a d20 with a initiative bonus of 3 would be 17.03.
 
-## Future Changes:
+### Future Changes
 
 * The NPC sheet is my top priority after I fix any remaining issues with the PC sheet.
 * I plan to use something similar to "Weapons" for NPC attacks. I'll include open ended actions for more complex attacks, but most are fairly straight forward. I'm also looking to have a field that is always whispered to the GM for information like the DC of a save.
 * Custom settings: I'm willing to add custom options/variants as long as they are technically feasible and can be hidden away without effecting users who do not want it.
 
-## Requests and issues
+### Requests and issues
 
 As mentioned above please include the "Shaped" term when posting about this sheet. I will do my best to respond to posts. You can also open issues on ​github or contact me by PM, Twitter (@mlenser), gchat, or skype. If you have ideas/suggestions or want to work together I'm quite open.
 
-## ​Differences between this version and the current version:
+### ​Differences between this version and the current version
 
 ​I plan to watch the current version and port the changes to my version.
 ​
-​## Reason for a new sheet:
+### Reason for a new sheet
 
 ​I was looking to add some custom options to the sheet (Whispering Death Saves to the GM), but it did not work out with the current developer. As a result I decided to create my own sheet. As a result I examined how the sheet is currently a bit hard to get information at a glance so I decided to redesign it as listed above.​
 
