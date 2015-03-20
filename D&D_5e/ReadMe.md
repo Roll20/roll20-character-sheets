@@ -6,7 +6,9 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 **Initial release - 19 March 2015**
 First release of the redesigned sheet.
+
 **Notable changes:**
+
 * Core page has been revamped based on the design of the official paper sheet (http://1.bp.blogspot.com/-SIz9DByDeZw/U6M51aKP-OI/AAAAAAAAAzM/OZ72wWzJMTA/s1600/sheet1.jpg). The core sheet is meant to present the information in a more concise, readable way so that users can find information quickly. I'm not fully satisfied with everything (The initiative box is funky, skills are too tall, etc), but it leaves plenty of room to expand if anyone has suggestions for things to put in the holes.
 * Header part of the sheet now includes information such as Character Name, Race, Class, Background, Level, Alignment, Vision, XP
 * Heart contains HP info.
@@ -23,7 +25,7 @@ First release of the redesigned sheet.
   * Death saves can be whispered to the DM
   * Initiative can have a tiebreaker. This adds a modifier based on your initiative bonus. For instance rolling a 14 on a d20 with a initiative bonus of 3 would be 17.03.
 
-​## Future Changes:
+## Future Changes:
 
 * The NPC sheet is my top priority after I fix any remaining issues with the PC sheet.
 * I plan to use something similar to "Weapons" for NPC attacks. I'll include open ended actions for more complex attacks, but most are fairly straight forward. I'm also looking to have a field that is always whispered to the GM for information like the DC of a save.
