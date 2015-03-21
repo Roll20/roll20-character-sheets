@@ -4,7 +4,16 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### Changelog
 
-**Initial release - 19 March 2015**
+**22nd March 2015**
+
+* Ranged Weapons now have Ranges
+* NPC sheet is being depreciated. All of the items are put into the pain sheet besides the attacks as of 22nd March version. I plan to disable Background, Class, Weapons, Armor, and Inventory for the NPC sheet. I'll make a NPC version of the Weapons tab for "standard attacks" which is a mix of standardized attacks and open ended attacks.
+* Inventory expanded to 3 pages of 15 for a total of 45 (old was 40)
+* Gray background added
+* Updated the header info area to contain important info. Works for PCs and NPCs
+* Resistances and Immunities are now viewable by PCs
+
+**Initial release - 19th March 2015**
 First release of the redesigned sheet.
 
 **Notable changes:**
