@@ -6,6 +6,16 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 **22nd March 2015**
 
+* Merged changes from Actoba. See https://app.roll20.net/forum/post/1744887/dnd-5e-sheet-uoh-user-feedback-mini-update.
+* Added back class actions as per above.
+* Fixed alignment on ranged attacks' ranges.
+* AC takes the highest of either the normal AC_Calc or NPC_AC
+* Added Medicine back.
+* Added a setting to determine who the sheet rolls to - public or DM. Applies to both PCs and NPCs.
+
+
+**21st March 2015**
+
 * Ranged Weapons now have Ranges
 * NPC sheet is being depreciated. All of the items are put into the main sheet besides the attacks as of 22nd March version. For instance some items in the top header info switch, the AC field is editable, and the different forms of movement are shown for NPCs. I plan to disable Background, Class, Weapons, Armor, and Inventory for the NPC sheet. I'll make a NPC version of the Weapons tab for "standard attacks" which is a mix of standardized attacks and open ended attacks.
 * Inventory expanded to 3 pages of 15 for a total of 45 (old was 40)
