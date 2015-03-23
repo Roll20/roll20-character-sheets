@@ -4,6 +4,11 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### Changelog
 
+**23rd March 2015**
+
+* Resized shield and heart to make them smaller
+
+
 **22nd March 2015**
 
 * Merged changes from Actoba. See https://app.roll20.net/forum/post/1744887/dnd-5e-sheet-uoh-user-feedback-mini-update.
