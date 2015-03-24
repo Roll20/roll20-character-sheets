@@ -7,6 +7,7 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 **23rd March 2015**
 
 * Quick Attacks are added for melee and ranged weapons
+* Merged Actoba's subheaderright2 issue: https://github.com/Actoba/roll20-character-sheets/commit/36d300e4432ac61f83625675fc765d9e01f7feb6
 
 **23rd March 2015**
 
