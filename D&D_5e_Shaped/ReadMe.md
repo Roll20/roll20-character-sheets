@@ -6,6 +6,10 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 **23rd March 2015**
 
+* Quick Attacks are added for melee and ranged weapons
+
+**23rd March 2015**
+
 * Resized shield and heart to make them smaller. See https://app.roll20.net/forum/post/1734923/new-d-and-d-5e-shaped-character-sheet#post-1748932
 * Resized all of core to make it even more compact.
 * Core now have 5 columns - 2/5, 1/5, 1/5, and 1/5.
