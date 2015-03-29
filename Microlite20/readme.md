@@ -5,6 +5,17 @@ use with Roll20.net and released open source under the MIT License.
 
 ### Changelog ###
 
+**Release 4.5 - March 16, 2015**
+- Added note to initiative roll to explain initiative roll calculation.
+- Moved all roll calculation explanations to title attributes.  Now the explanations display when you hover over the buttons.  You are all now delivered from the cursed wall of text.
+- Rearranged the sheet to make more use of real estate.  
+- Added css for tables in order to better separate fields
+- Standardized roll template output
+- Changed "racial bonus" to "human racial bonus"
+- Removed "Dice Type" and "Dice Number" in favor of 1 field that'll do both: "Damage Dice"
+- Retitled some things for better display
+- Changed Height and Weight to text boxes... 
+
 **Release 4.1 - March 12, 2015**
 - Fixed logic on attack rolls.  M20's rulebook was worded in a confusing way, which resulted in an additional +1 roll per level on every attack roll.  So this fix removes that additional +1 per level.
 - Fixed Ranger bonus calculation.  Was missing an ending parenthesis, so it wasn't getting calculated.
