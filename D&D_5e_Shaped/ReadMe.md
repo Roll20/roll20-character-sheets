@@ -4,6 +4,14 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### Changelog
 
+**29th March 2015**
+
+* Merged Actoba's work
+
+**27th March 2015**
+
+* Attacks can now use target to display the target's AC. It's under the settings.
+
 **24th March 2015**
 
 * Quick Attacks are added for melee and ranged weapons
