@@ -1,10 +1,10 @@
 **Note** : there's an english version of the very same sheet/macros/scripts, for those interested.
 See [Numenera_NathasNumenera_English](https://github.com/Roll20/roll20-character-sheets/tree/master/Numenera_NathasNumenera_English).
 
-Bas&eacute;e sur la feuille de personnage "Numenera" d&eacute;j&agrave; pr&eacute;sente sur Roll20 (merci aux auteurs initiaux), cette version a une mise en page et des attributs diff&eacute;rents, et peut être utilis&eacute;e avec des scripts d'API et macros associ&eacute;es (voir ci-dessous).
+Bas&eacute;e sur la feuille de personnage "Numenera" d&eacute;j&agrave; pr&eacute;sente sur Roll20 (merci aux auteurs initiaux), cette version a une mise en page et des attributs diff&eacute;rents, et peut être utilis&eacute;e avec des scripts d'API (voir ci-dessous).
 Voir en fin de fichier pour les notes de versions.
 
-# Utilisation basique : 
+# Utilisation basique :
 
 ## Mettre en place la feuille de personnage
 1. Dans la campagne Roll20 concern&eacute;e, cliquer sur _"Voir les d&eacute;tails"_
@@ -25,7 +25,7 @@ Alternative (permettant de modifier les sources &agrave; votre convenance) :
 ## Cr&eacute;er un personnage
 1. Cr&eacute;er un _"Character"_ dans le journal
 2. Remplir le nom, et dans l'onglet _"Character Sheet"_, remplir &agrave; minima les 3 Attributs (Valeur et Max) : Robustesse, Vivacit&eacute; et Mental
-3. Modifier un pion (token) comme sur cette [image](NathasNumenera_setup_the_character_token.jpg) :
+3. (Optionnel) Modifier un pion (token) comme sur cette [image](NathasNumenera_setup_the_character_token.jpg) :
   1. S'assurer que le pion repr&eacute;sente le personnage
   2. S&eacute;lectionner l'attribut _"might"_ pour la bar 1
   3. S&eacute;lectionner l'attribut _"speed"_ pour la bar 2
@@ -35,28 +35,36 @@ Alternative (permettant de modifier les sources &agrave; votre convenance) :
 6. Cliquer _"Save Changes"_
 8. R&eacute;p&eacute;ter les &eacute;tapes 1 &agrave; 6 pour les autres personnages.
 
-# Utilisation avanc&eacute;e : 
+# Utilisation avanc&eacute;e :
 1. Mettre en place le HTML et le CSS pour la feuille de personnage (cf. Utilisation basique)
 2. Mettre en place les scripts API :
   1. Dans la page d'affichage du d&eacute;tail de la campagne concern&eacute;e, cliquer sur _"API Scripts"_
   2. S'il existe d&eacute;j&agrave; d'autres scripts que vous avez ajout&eacute;s, cliquer sur _"New Script"_
   3. Donner un nom au script dans _"Name"_ (par exemple : _"NathasNumenera"_)
-  4. Dans la section noire de la page, coller le contenu de ce [script API](https://gist.github.com/NathaTerrien/14536ac9eea2ca30023c)
+  4. Dans la section noire de la page, coller le contenu de ce [script API](NathasNumenera_API.js)
   5. Cliquer sur _"Save Script"_
-3. D&eacute;marrer la campagne et cr&eacute;er les [Macros](https://gist.github.com/NathaTerrien/3198c37d2aa1eaff3c89)
-4. Cr&eacute;er une personnage  et associer un pion (cf. Utilisation basique) 
-5. **COMPLETER LA FEUILLE DE PERSONNAGE** (important) : en plus des Attributs (valeur et max), &agrave; minima renseigner les Atouts (même si &eacute;gaux &agrave; 0), le bonus de R&eacute;cup&eacute;ration, la r&eacute;duction de Vivacit&eacute; due &agrave; l'armure (même si &eacute;gale &agrave; 0), l'&eacute;tat de R&eacute;cup&eacute;ration (cliquer sur "1 Action"), l'&eacute;tat g&eacute;n&eacute;ral (cliquer sur "Normal")
-6. S&eacute;lectionner le pion et tester une macro. Si rien ne passe, tenter de d&eacute;sactiver/r&eacute;activer le script API et recommencer.
-7. R&eacute;p&eacute;ter les &eacute;tapes 4 &agrave; 6 pour les autres personnages.
+3. Pas besoin de cr&eacute;er de macros, tous les boutons rouge sur la feuille utilisent les fonctions de l'API.
 
 # Notes de version
+
+##Release 4.0 (Mars 2015)
+*Plus besoin de macros ! Et des templates!*
+
+La feuille int&egrave;gre directement les boutons n&eacute;cessaires &agrave; la plupart des jets, et l'affichages des r&eacute;sultats se fait dans le chat avec la nouvelle fonctions de _templates_ de Roll20.
+
+Les valeurs variables n&eacute;cessaires aux jets sont inclues en tant qu'attributs dans la feuille de personnage, &eacute;vitant la n&eacute;cessit&eacute; de cr&eacute;er des macros avec demande
+
+Boutons verts : jets libres sans apppel de l'API et accessible &agrave; tous les types de comptes Roll20.
+
+Boutons rouges : jets avec appels de l'API (cf. ci-dessus) pour une mise &agrave; jour automatique des attributs et de la feuille de personnage (d&eacute;pense de points, actualisation de l'&eacute;tat etc.).
+
+Les autres attributs restent identiques à la version précédente, donc il est possible de mettre à jour votre campagne avec la nouvelle feuille de personnage (HTML et CSS) et conserver les personnages existants.
 
 ##Release 3.0 (05/11/2014)
 *Nouvelle feuille de personnage avec onglets* (lisibilit&eacute; am&eacute;lior&eacute;e).<br/>Trois onglets : Principale (attributs, attaques, comp&eacute;tences, capacit&eacute;s sp&eacute;ciales), Numen&eacute;ra & &Eacute;quipement, Avancements & Background.
 
 Les attributs Roll20 restent identiques &agrave; la version pr&eacute;c&eacute;dente  (ainsi que les macros et fonctions API), donc il est possible de mettre &agrave; jour votre campagne avec la nouvelle feuille de personnage (HTML et CSS) et conserver les personnages existants.
 
-Les fichiers de l'[ancienne feuille de personnage](NathasNumenera_Roll20_CharacterSheet_Screenshot.jpg) (3 colonnes sur une seule page/onglet) sont toujours disponibles, au besoin : [HTML](NathasNumenera_Roll20_CharacterSheet_Layout.htm) et [CSS](NathasNumenera_Roll20_CharacterSheet_CSS.css).
 
 ## Version 2.7 (22/09/2014)
 Pas de modification de la feuille de personnage.
