@@ -1,8 +1,11 @@
 **Note** : there's an english version of the very same sheet/macros/scripts, for those interested.
 See [Numenera_NathasNumenera_English](https://github.com/Roll20/roll20-character-sheets/tree/master/Numenera_NathasNumenera_English).
 
-Bas&eacute;e sur la feuille de personnage "Numenera" d&eacute;j&agrave; pr&eacute;sente sur Roll20 (merci aux auteurs initiaux), cette version a une mise en page et des attributs diff&eacute;rents, et peut être utilis&eacute;e avec des scripts d'API (voir ci-dessous).
+Bas&eacute;e sur la feuille de personnage "Numenera" d&eacute;j&agrave; pr&eacute;sente sur Roll20 (merci aux auteurs initiaux), cette version a une mise en page et des attributs diff&eacute;rents, et peut &ecirc;tre utilis&eacute;e avec des scripts d'API (voir ci-dessous).
 Voir en fin de fichier pour les notes de versions.
+
+# Version courante :
+Version 4 (mars 2015) : [Screenshot](NathasNumenera_tabs.jpg).
 
 # Utilisation basique :
 
@@ -47,8 +50,8 @@ Alternative (permettant de modifier les sources &agrave; votre convenance) :
 
 # Notes de version
 
-##Release 4.0 (Mars 2015)
-*Plus besoin de macros ! Et des templates!*
+##Version 4.0 (Mars 2015)
+*Plus besoin de macros ! Et des templates! Et une version PNJ  de la feuille !*
 
 La feuille int&egrave;gre directement les boutons n&eacute;cessaires &agrave; la plupart des jets, et l'affichages des r&eacute;sultats se fait dans le chat avec la nouvelle fonctions de _templates_ de Roll20.
 
@@ -58,15 +61,15 @@ Boutons verts : jets libres sans apppel de l'API et accessible &agrave; tous les
 
 Boutons rouges : jets avec appels de l'API (cf. ci-dessus) pour une mise &agrave; jour automatique des attributs et de la feuille de personnage (d&eacute;pense de points, actualisation de l'&eacute;tat etc.).
 
-Les autres attributs restent identiques à la version précédente, donc il est possible de mettre à jour votre campagne avec la nouvelle feuille de personnage (HTML et CSS) et conserver les personnages existants.
+Les autres attributs restent identiques &agrave; la version pr&eacute;c&eacute;dente, donc il est possible de mettre &agrave; jour votre campagne avec la nouvelle feuille de personnage (HTML et CSS) et conserver les personnages existants.
 
-##Release 3.0 (05/11/2014)
+##Version 3.0 (05/11/2014)
 *Nouvelle feuille de personnage avec onglets* (lisibilit&eacute; am&eacute;lior&eacute;e).<br/>Trois onglets : Principale (attributs, attaques, comp&eacute;tences, capacit&eacute;s sp&eacute;ciales), Numen&eacute;ra & &Eacute;quipement, Avancements & Background.
 
 Les attributs Roll20 restent identiques &agrave; la version pr&eacute;c&eacute;dente  (ainsi que les macros et fonctions API), donc il est possible de mettre &agrave; jour votre campagne avec la nouvelle feuille de personnage (HTML et CSS) et conserver les personnages existants.
 
 
-## Version 2.7 (22/09/2014)
+##Version 2.7 (22/09/2014)
 Pas de modification de la feuille de personnage.
 D&eacute;placemet des fichiers de scripts API et de Macros vers Gist.
 Am&eacute;liorations du Readme.
@@ -77,7 +80,7 @@ Modifications des fonctions [API](https://gist.github.com/NathaTerrien/14536ac9e
 ## Version 2.2 (23/08/2014)
 Encodage HTML de tous les accents (ReadMe.md, NathasNumenera_Roll20_Macros_French.md, NathasNumenera_Roll20_API_French.js, NathasNumenera_Roll20_CharacterSheet_Layout_French.htm).
 
-## Version 2.1 (29/07/2014)
+##Version 2.1 (29/07/2014)
 1. Mise &agrave; jour de **NathasNumenera_Roll20_CharacterSheet_Layout_French.htm** :
   1. Section "Avancement" plus d&eacute;taill&eacute;es, avec un attribut par avancement et par tiers.
   2. Vous pouvez supprimer des personnages existants les attributs xp-stats, xp-edge etc... qui ne seront plus utilis&eacute;s.
@@ -85,5 +88,4 @@ Encodage HTML de tous les accents (ReadMe.md, NathasNumenera_Roll20_Macros_Frenc
 3. Nouvelle capture d'&eacute;cran / feuille
 4. Mise &agrave; jour de sheet.json pour int&eacute;grer la nouvelle capture d'&eacute;cran
 5. Remplacement du fichier texte (.txt) des macros par un fichier markdown (.md) pour une meilleure lisibilit&eacute; sur Github ("NathasNumenera_Roll20_Macros_French.md")
-
 
