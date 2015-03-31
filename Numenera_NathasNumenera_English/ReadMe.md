@@ -5,7 +5,7 @@ Note: there's a french version of the very same sheet/macros/scripts, for those 
 Follow [this link](https://github.com/Roll20/roll20-character-sheets/tree/master/Numenera_NathasNumenera_French).
 
 # Current version:
-Version 4 (March 2014) : [Screenshot](NathasNumenera_tabs.jpg).
+Version 4 (March 2015) : [Screenshot](NathasNumenera_tabs.jpg).
 
 # Basic use:
 
