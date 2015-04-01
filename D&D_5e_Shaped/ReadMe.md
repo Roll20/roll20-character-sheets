@@ -10,7 +10,7 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 **31st March 2015**
 
-* NPC sheet now hides all the PC tabs except spellbook and the new "NPC Attacks"
+* NPC sheet now hides all the PC tabs except spellbook and the new "NPC Attacks".  The old NPC sheet can be shown via a toggle.
 * Started work on "NPC Attacks"
 
 **30th March 2015**
