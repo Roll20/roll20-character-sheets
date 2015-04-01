@@ -6,7 +6,7 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 **1st April 2015**
 
-* AC is now for PCs and npc_ac is for NPCs. AC still calculates the highest between armored and unarmored AC
+* AC is now for PCs and npc_ac is for NPCs. AC still calculates the highest between armored and unarmored AC. See https://app.roll20.net/forum/post/1759669/target-and-ac-on-5e-character-sheet#post-1784957
 
 **31st March 2015**
 
