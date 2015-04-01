@@ -4,6 +4,23 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### Changelog
 
+**1st April 2015**
+
+* AC is now for PCs and npc_ac is for NPCs. AC still calculates the highest between armored and unarmored AC
+
+**31st March 2015**
+
+* NPC sheet now hides all the PC tabs except spellbook and the new "NPC Attacks"
+* Started work on "NPC Attacks"
+
+**30th March 2015**
+
+* Fixed text scrunching on the spellbook
+
+**29th March 2015**
+
+* Merged Actoba's work
+
 **29th March 2015**
 
 * Merged Actoba's work
