@@ -5,6 +5,15 @@ This is my fork of Suldae's initial sheet.
 
 ### ChangeLog
 
+#### Minor update - Mar 2015
+* Darkened background as temporary 'fix' for larger UI changes
+* Removed/consolidated the last of dead css classes
+
+#### Bug Fix Update and Improvements - Feb 2015
+* Migrated single class definitions to general ones
+* Removed superfluous selector classes
+* Darkened background
+
 #### Bug Fix Update and Improvements - Feb 2015
 * Fixed up this README...
 * Added attribute name to coin-in-hand, stake, and Weapon placeholder names for weapon 2-4
@@ -86,6 +95,7 @@ This is my fork of Suldae's initial sheet.
 
 ### TODO
 
+* Received request to get rid of/change the background... which I didn't like either, but now that someone else has voiced a similar opinion I'll up the priority.
 * Add roll button for Initiative
 * Compute Keen in conjunction with damage rolls
 * Add Global Keen than just to individual weapons
@@ -102,14 +112,15 @@ This is my fork of Suldae's initial sheet.
 * Need to add Contacts, Holdings, Magic Items, Mounts, and Vehicles section to Gear & Prizes
 * Add input field for Edge?
 * Need to do comprehensive review of rolls and how they are computed
-* Migrate more individual class definitions in css to general ones
 * Move style definitions on elements in html to css
 * Possibly create dedicated Tricks/Stance section to track which abilities are tricks/stances (or use T/S checkbox)
 * Possibly create Feat Category select to help track how many feats of a tree a character has
 * Character Disposition tracking for both Special and Standard (See pg 373)
 * Standard Character sheet
-* Add Tooltip to Total Lifestyle explaining that the points are distributed to either Panache of Prudence
 * Merge 'Focus' into 'Skills' section?
+* Add Critical Injuries and heal time in addition to conditions tracker?
+* Update json file to provide more detail what is tracked and what is not
+
 
 ### NOTE
 
