@@ -1,8 +1,20 @@
 # D&D 5e Character Sheet
 
-This is a character sheet for use on Roll20.net with the latest (5th) edition of Dungeons & Dragons. The sheet is designed to be usable by all Roll20 users regardless of subscription level.
+This is a character sheet for use on Roll20.net with the latest (5th) edition of Dungeons & Dragons. The sheet is designed to be usable by all Roll20 users regardless of subscription level. It is not fully compatible with the default 5e sheet.
 
 ### Changelog
+
+**2nd April 2015**
+
+* Fix initiative/ac row breaking line
+* Prevent jumping on new death saves and other small adjustments
+* Added save bonus to NPCs
+* Moved AC note down for NPC sheets
+* Fixed which pages are shown on "Show All"
+* New Parenthesis for skills
+* Style resistances better
+* Style other textareas to match
+* Used -> Current to have consistency across the board. 4/5 slots instead of 4/5 slots used. It is more consistent with HP and makes sense.
 
 **1st April 2015**
 
