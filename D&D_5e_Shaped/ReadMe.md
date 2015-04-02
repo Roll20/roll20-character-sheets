@@ -1,8 +1,51 @@
 # D&D 5e Character Sheet
 
-This is a character sheet for use on Roll20.net with the latest (5th) edition of Dungeons & Dragons. The sheet is designed to be usable by all Roll20 users regardless of subscription level.
+This is a character sheet for use on Roll20.net with the latest (5th) edition of Dungeons & Dragons. The sheet is designed to be usable by all Roll20 users regardless of subscription level. It is not fully compatible with the default 5e sheet.
 
 ### Changelog
+
+**2nd April 2015**
+
+* Fix initiative/ac row breaking line
+* Prevent jumping on new death saves and other small adjustments
+* Added save bonus to NPCs
+* Moved AC note down for NPC sheets
+* Fixed which pages are shown on "Show All"
+* New Parenthesis for skills
+* Style resistances better
+* Style other textareas to match
+* Used -> Current to have consistency across the board. 4/5 slots instead of 4/5 slots used. It is more consistent with HP and makes sense.
+
+**1st April 2015**
+
+* AC is now for PCs and npc_ac is for NPCs. AC still calculates the highest between armored and unarmored AC. See https://app.roll20.net/forum/post/1759669/target-and-ac-on-5e-character-sheet#post-1784957
+* Cleaned up the sheet so it works better on firefox and iPad. The heart still needs to be fixed on iPad. see https://app.roll20.net/forum/post/1788374/targeting-tablet-devices-with-css
+* Added "Skin" to determine skin color.
+* Reduced the size of the shield
+* Redid the buttons for Inspiration and Death saves
+* Added Exhaustion
+* Added number spinners to hp, hd, exhaustion
+
+**31st March 2015**
+
+* NPC sheet now hides all the PC tabs except spellbook and the new "NPC Attacks".  The old NPC sheet can be shown via a toggle.
+* Started work on "NPC Attacks"
+
+**30th March 2015**
+
+* Fixed text scrunching on the spellbook
+
+**29th March 2015**
+
+* Merged Actoba's work
+
+**29th March 2015**
+
+* Merged Actoba's work
+
+**27th March 2015**
+
+* Attacks can now use target to display the target's AC. It's under the settings.
 
 **24th March 2015**
 
