@@ -19,7 +19,7 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 **1st April 2015**
 
 * AC is now for PCs and npc_ac is for NPCs. AC still calculates the highest between armored and unarmored AC. See https://app.roll20.net/forum/post/1759669/target-and-ac-on-5e-character-sheet#post-1784957
-* Cleaned up the sheet so it works better on firefox and iPad. The heart still needs to be fixed on iPad. see https://app.roll20.net/forum/post/1785922/targeting-tablet-devices-with-css
+* Cleaned up the sheet so it works better on firefox and iPad. The heart still needs to be fixed on iPad. see https://app.roll20.net/forum/post/1788374/targeting-tablet-devices-with-css
 * Added "Skin" to determine skin color.
 * Reduced the size of the shield
 * Redid the buttons for Inspiration and Death saves
