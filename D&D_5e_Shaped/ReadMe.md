@@ -4,6 +4,11 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### Changelog
 
+**3rd April 2015**
+
+* Added a testable version of NPC Attacks
+* Added a testable version of NPC Attacks
+
 **2nd April 2015**
 
 * Fix initiative/ac row breaking line
