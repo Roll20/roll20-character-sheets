@@ -49,3 +49,10 @@ grunt build
 
 This will create `13th_Age-neovatar.[css|html]` that you can copy and paste into Roll 20 directly.
 
+### Changelog
+
+**1.2.0:**
+
+  * added roll templates
+  * default macros now use roll templates
+
