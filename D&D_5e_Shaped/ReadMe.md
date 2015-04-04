@@ -7,7 +7,8 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 * -Set Proficiency for monsters (See MM 8)- Added April 4th, 2015
 * -Add Passive Perception to the header info- Added April 4th, 2015
 * -Split out senses to multiple fields- Added April 4th, 2015
-* Add Action type to NPC attacks (Reaction, lair, etc)
+* -Add Action type to NPC attacks (Reaction, lair, etc)- Added April 4th, 2015
+* Turn Lair Actions into actual attacks
 * Split Traits to repeatable
 * Redo weapons based on NPC attacks.
 
@@ -31,6 +32,8 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
     * "Class Levels and Resources"
     * "Class Features and Feats"
     * "Miscellaneous Notes"
+* Added "Recharge" to the NPC attacks
+* Added Lair Actions, Legendary Actions, and Reactions (need to turn Lair Actions into actual attacks)
 
 **3rd April 2015**
 
