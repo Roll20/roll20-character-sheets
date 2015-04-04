@@ -5,10 +5,10 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 ### TODO
 
 * -Set Proficiency for monsters (See MM 8)- Added April 4th, 2015
-* Add Action type to NPC attacks (Reaction, lair, etc)
-* Split Traits to repeatable
 * -Add Passive Perception to the header info- Added April 4th, 2015
 * -Split out senses to multiple fields- Added April 4th, 2015
+* Add Action type to NPC attacks (Reaction, lair, etc)
+* Split Traits to repeatable
 * Redo weapons based on NPC attacks.
 
 
@@ -17,14 +17,20 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 **4th April 2015**
 
 * Quick attacks' range bug fixed
-* NPC Attacks Duplicated out
+* NPC Attacks Duplicated out to 2 until I add action types
 * "Hidden Info" not possible as you can't send 2 rolls with 1 roll. see https://app.roll20.net/forum/post/1793729/show-certain-parts-of-a-roll-template-to-gm
 * Added Passive Perception to the header info
 * Split out senses to multiple fields in the header info
-* Added Background to the header info
-* Redid alignment the 2nd row of header info items with the addition of senses.
+* Added Background to the header info for PCs
+* Redid alignment the 2nd row of header info items with the addition of the new items.
 * Set Proficiency for monsters (See MM 8)
 * Removed save bonus to NPCs as they should simply use Proficiency. They should use Expertise if needed for skills
+* Renamed some titles of sections such as
+    * "Appearance"
+    * "Background and Race Info"
+    * "Class Levels and Resources"
+    * "Class Features and Feats"
+    * "Miscellaneous Notes"
 
 **3rd April 2015**
 
