@@ -8,9 +8,12 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 * -Add Passive Perception to the header info- Added April 4th, 2015
 * -Split out senses to multiple fields- Added April 4th, 2015
 * -Add Action type to NPC attacks (Reaction, lair, etc)- Added April 4th, 2015
+* Health inputs should show 3 digits
 * Turn Lair Actions into actual attacks
+* Add Custom Class Support
 * Split Traits to repeatable
 * Redo weapons based on NPC attacks.
+* Consider alternative sheet layout of skills under the stats
 
 
 ### Changelog
