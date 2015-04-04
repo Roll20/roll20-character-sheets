@@ -2,11 +2,21 @@
 
 This is a character sheet for use on Roll20.net with the latest (5th) edition of Dungeons & Dragons. The sheet is designed to be usable by all Roll20 users regardless of subscription level. It is not fully compatible with the default 5e sheet.
 
+### TODO
+
+* Add Action type to NPC attacks (Reaction, lair, etc)
+* Add a Passive Perception to the header info
+* Split out senses with a toggle to "show more" (div wrapper around darkvision with sheet-col and other divs in there that are hidden until toggle)
+* Redo weapons based on NPC attacks.
+
+
 ### Changelog
 
 **4th April 2015**
 
 * Quick attacks' range bug fixed
+* NPC Attacks Duplicated out
+* "Hidden Info" not possible as you can't send 2 rolls with 1 roll. see https://app.roll20.net/forum/post/1793729/show-certain-parts-of-a-roll-template-to-gm
 
 **3rd April 2015**
 
