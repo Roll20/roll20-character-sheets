@@ -4,7 +4,7 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### TODO
 
-* Set Proficiency for monsters (See MM 8)
+* -Set Proficiency for monsters (See MM 8)- Added April 4th, 2015
 * Add Action type to NPC attacks (Reaction, lair, etc)
 * Split Traits to repeatable
 * -Add Passive Perception to the header info- Added April 4th, 2015
@@ -22,6 +22,9 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 * Added Passive Perception to the header info
 * Split out senses to multiple fields in the header info
 * Added Background to the header info
+* Redid alignment the 2nd row of header info items with the addition of senses.
+* Set Proficiency for monsters (See MM 8)
+* Removed save bonus to NPCs as they should simply use Proficiency. They should use Expertise if needed for skills
 
 **3rd April 2015**
 
