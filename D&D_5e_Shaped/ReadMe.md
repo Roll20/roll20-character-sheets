@@ -4,6 +4,7 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### TODO
 
+* Fix custom classes to add them to the hit dice pool
 * Turn Lair Actions into actual attacks
 * Split Traits to repeatable
 * Redo weapons based on NPC attacks.
