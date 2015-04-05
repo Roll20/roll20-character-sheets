@@ -4,19 +4,23 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### TODO
 
+* Turn Lair Actions into actual attacks
+* Split Traits to repeatable
+* Redo weapons based on NPC attacks.
+* Consider alternative sheet layout of skills under the stats
 * -Set Proficiency for monsters (See MM 8)- Added April 4th, 2015
 * -Add Passive Perception to the header info- Added April 4th, 2015
 * -Split out senses to multiple fields- Added April 4th, 2015
 * -Add Action type to NPC attacks (Reaction, lair, etc)- Added April 4th, 2015
-* Health inputs should show 3 digits
-* Turn Lair Actions into actual attacks
-* Add Custom Class Support
-* Split Traits to repeatable
-* Redo weapons based on NPC attacks.
-* Consider alternative sheet layout of skills under the stats
+* -Health inputs should show 3 digits- Fixed April 5th, 2015
+* -Add Custom Class Support- Added April 5th, 2015
 
 
 ### Changelog
+
+**5th April 2015**
+
+* Added Custom Classes
 
 **4th April 2015**
 
