@@ -5,6 +5,7 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 ### TODO
 
 * Split Traits to repeatable
+* Spell Points
 * Redo weapons based on NPC attacks.
 * Consider alternative sheet layout of skills under the stats
 * -Set Proficiency for monsters (See MM 8)- Added April 4th, 2015
