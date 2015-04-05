@@ -27,6 +27,7 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 * Added Real Legendary Actions (3)
 * Added more NPC Attacks (total 11)
 * Cleaned up HD
+* Added Custom Skills toggle
 
 **4th April 2015**
 
