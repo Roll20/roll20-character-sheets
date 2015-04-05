@@ -4,7 +4,6 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### TODO
 
-* Turn Lair Actions into actual attacks
 * Split Traits to repeatable
 * Redo weapons based on NPC attacks.
 * Consider alternative sheet layout of skills under the stats
@@ -15,6 +14,7 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 * -Health inputs should show 3 digits- Fixed April 5th, 2015
 * -Add Custom Class Support- Added April 5th, 2015
 * -Fix custom classes to add them to the hit dice pool- Added April 5th, 2015
+* -Turn Lair Actions into actual attacks- Added April 5th, 2015
 
 
 ### Changelog
@@ -26,6 +26,7 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 * Added Real Lair Actions (3)
 * Added Real Legendary Actions (3)
 * Added more NPC Attacks (total 11)
+* Cleaned up HD
 
 **4th April 2015**
 
