@@ -22,7 +22,10 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 **5th April 2015**
 
 * Added Custom Classes
-* Fixed custom classes to add them to the hit dice pool
+* Fixed custom classes to add their level to the hit dice pool for the appropriately selected hit dice
+* Added Real Lair Actions (3)
+* Added Real Legendary Actions (3)
+* Added more NPC Attacks (total 11)
 
 **4th April 2015**
 
