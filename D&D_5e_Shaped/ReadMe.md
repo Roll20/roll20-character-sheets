@@ -4,7 +4,6 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### TODO
 
-* Fix custom classes to add them to the hit dice pool
 * Turn Lair Actions into actual attacks
 * Split Traits to repeatable
 * Redo weapons based on NPC attacks.
@@ -15,6 +14,7 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 * -Add Action type to NPC attacks (Reaction, lair, etc)- Added April 4th, 2015
 * -Health inputs should show 3 digits- Fixed April 5th, 2015
 * -Add Custom Class Support- Added April 5th, 2015
+* -Fix custom classes to add them to the hit dice pool- Added April 5th, 2015
 
 
 ### Changelog
@@ -22,6 +22,7 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 **5th April 2015**
 
 * Added Custom Classes
+* Fixed custom classes to add them to the hit dice pool
 
 **4th April 2015**
 
