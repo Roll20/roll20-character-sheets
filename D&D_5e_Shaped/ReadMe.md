@@ -4,9 +4,13 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### TODO
 
+* Import Script for Monsters
+* Tablet
+  * Make initiative work
+  * Fix Heart positioning
 * Split Traits to repeatable
 * Spell Points
-* Redo weapons based on NPC attacks.
+* Redo weapons based on NPC Actions.
 * Consider alternative sheet layout of skills under the stats
 * -Set Proficiency for monsters (See MM 8)- Added April 4th, 2015
 * -Add Passive Perception to the header info- Added April 4th, 2015
@@ -19,6 +23,13 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 
 ### Changelog
+
+**7th April 2015**
+
+* Previously hidden items are now shown by default: ability check bonuses, skill bonuses, initiative bonus.
+* Added Save Bonus
+* Renamed "Attacks" to "Actions" for NPC Attacks (now NPC Actions)
+* Added "Alt Dmg" to all NPC Actions to allow for cases like swarms or creatures holding versatile weapons.
 
 **6th April 2015**
 
