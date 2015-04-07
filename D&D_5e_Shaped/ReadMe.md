@@ -2,7 +2,74 @@
 
 This is a character sheet for use on Roll20.net with the latest (5th) edition of Dungeons & Dragons. The sheet is designed to be usable by all Roll20 users regardless of subscription level. It is not fully compatible with the default 5e sheet.
 
+### TODO
+
+* Import Script for Monsters
+* Tablet
+  * Make initiative work
+  * Fix Heart positioning
+* Split Traits to repeatable
+* Spell Points
+* Redo weapons based on NPC Actions.
+* Consider alternative sheet layout of skills under the stats
+* -Set Proficiency for monsters (See MM 8)- Added April 4th, 2015
+* -Add Passive Perception to the header info- Added April 4th, 2015
+* -Split out senses to multiple fields- Added April 4th, 2015
+* -Add Action type to NPC attacks (Reaction, lair, etc)- Added April 4th, 2015
+* -Health inputs should show 3 digits- Fixed April 5th, 2015
+* -Add Custom Class Support- Added April 5th, 2015
+* -Fix custom classes to add them to the hit dice pool- Added April 5th, 2015
+* -Turn Lair Actions into actual attacks- Added April 5th, 2015
+
+
 ### Changelog
+
+**7th April 2015**
+
+* Previously hidden items are now shown by default: ability check bonuses, skill bonuses, initiative bonus.
+* Added Save Bonus
+* Renamed "Attacks" to "Actions" for NPC Attacks (now NPC Actions)
+* Added "Alt Dmg" to all NPC Actions to allow for cases like swarms or creatures holding versatile weapons.
+
+**6th April 2015**
+
+* Wrote import script (Still a work in Progress)
+* Fixed NPC attacks to work even if the values are blank (See https://app.roll20.net/forum/post/1806911/empty-input-type-number-breaks-calculation)
+
+**5th April 2015**
+
+* Added Custom Classes
+* Fixed custom classes to add their level to the hit dice pool for the appropriately selected hit dice
+* Added Real Lair Actions (3)
+* Added Real Legendary Actions (3)
+* Added more NPC Attacks (total 11)
+* Cleaned up HD
+* Added Custom Skills toggle
+* Added Tooltips
+
+**4th April 2015**
+
+* Quick attacks' range bug fixed
+* NPC Attacks Duplicated out to 2 until I add action types
+* "Hidden Info" not possible as you can't send 2 rolls with 1 roll. see https://app.roll20.net/forum/post/1793729/show-certain-parts-of-a-roll-template-to-gm
+* Added Passive Perception to the header info
+* Split out senses to multiple fields in the header info
+* Added Background to the header info for PCs
+* Redid alignment the 2nd row of header info items with the addition of the new items.
+* Set Proficiency for monsters (See MM 8)
+* Removed save bonus to NPCs as they should simply use Proficiency. They should use Expertise if needed for skills
+* Renamed some titles of sections such as
+    * "Appearance"
+    * "Background and Race Info"
+    * "Class Levels and Resources"
+    * "Class Features and Feats"
+    * "Miscellaneous Notes"
+* Added "Recharge" to the NPC attacks
+* Added Lair Actions, Legendary Actions, and Reactions (need to turn Lair Actions into actual attacks)
+
+**3rd April 2015**
+
+* Added a testable version of NPC Attacks
 
 **2nd April 2015**
 
