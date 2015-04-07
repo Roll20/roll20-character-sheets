@@ -33,8 +33,8 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 **6th April 2015**
 
-* Wrote import script
-* Fixed NPC attacks to work even if the values are blank
+* Wrote import script (Still a work in Progress)
+* Fixed NPC attacks to work even if the values are blank (See https://app.roll20.net/forum/post/1806911/empty-input-type-number-breaks-calculation)
 
 **5th April 2015**
 
