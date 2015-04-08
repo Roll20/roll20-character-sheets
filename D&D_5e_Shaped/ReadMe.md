@@ -7,7 +7,7 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 * Import Script for Monsters
 * Tablet
   * -Make initiative work-
-  * Fix Heart positioning
+  * Fix Heart positioning (somewhat fixed)
 * Split Traits to repeatable
 * Spell Points
 * Redo weapons based on NPC Actions.
