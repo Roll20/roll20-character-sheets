@@ -24,6 +24,15 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### Changelog
 
+**9th April 2015**
+
+* Jack of All Trades now applies to Basic ability checks (Strength, Dex, Con, Int, Wis, Cha)
+
+**8th April 2015**
+
+* Added a setting to allow initiative to work on mobile.
+* Cut the heart's top off on mobile as there is no other fix currently.
+
 **7th April 2015**
 
 * Previously hidden items are now shown by default: ability check bonuses, skill bonuses, initiative bonus.
