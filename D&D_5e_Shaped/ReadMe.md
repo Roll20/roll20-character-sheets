@@ -24,6 +24,10 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### Changelog
 
+**10th April 2015**
+
+* All sheets use "AC" again. It is calculated correctly for everyone. "Target" under settings now uses this and will work to target NPC and PC sheets.
+
 **9th April 2015**
 
 * Jack of All Trades now applies to Basic ability checks (Strength, Dex, Con, Int, Wis, Cha)
