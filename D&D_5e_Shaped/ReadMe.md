@@ -24,6 +24,11 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### Changelog
 
+**12th April 2015**
+
+* Background attribute updated so that the textarea matches the default sheet and the background in the header is a new attribute.
+* Set the inventory to default to multiply
+
 **10th April 2015**
 
 * All sheets use "AC" again. It is calculated correctly for everyone. "Target" under settings now uses this and will work to target NPC and PC sheets.
