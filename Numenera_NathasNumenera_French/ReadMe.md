@@ -5,7 +5,7 @@ Bas&eacute;e sur la feuille de personnage "Numenera" d&eacute;j&agrave; pr&eacut
 Voir en fin de fichier pour les notes de versions.
 
 # Version courante :
-Version 4 (mars 2015) : [Screenshot](NathasNumenera_tabs.jpg).
+Version 4 (mars 2015) : [Screenshot](NathasNumenera_tabs_v4.jpg).
 
 # Utilisation basique :
 
@@ -13,9 +13,10 @@ Version 4 (mars 2015) : [Screenshot](NathasNumenera_tabs.jpg).
 1. Dans la campagne Roll20 concern&eacute;e, cliquer sur _"Voir les d&eacute;tails"_
 2. Cliquer sur _"Campaign Settings"_
 3. Descendre dans la page de Settings jusqu'&agrave; voir _"Character Sheet Template"_
-4. Dans la liste d&eacute;roulante, choisir _"Numenera (Nathas Version French)"_
+4. Dans la liste d&eacute;roulante, choisir _"Numenera (French)"_ sous _"Cypher System"_
+5. Descendre dans la page et cliquer sur _"Save changes"_
 
-Alternative (permettant de modifier les sources &agrave; votre convenance) :
+Alternative (permettant de modifier les sources &agrave; votre convenance si vous avez un compte _"Mentor"_) :
 
 1. Dans la campagne Roll20 concern&eacute;e, cliquer sur _"Voir les d&eacute;tails"_
 2. Cliquer sur _"Campaign Settings"_
@@ -27,7 +28,11 @@ Alternative (permettant de modifier les sources &agrave; votre convenance) :
 
 ## Cr&eacute;er un personnage
 1. Cr&eacute;er un _"Character"_ dans le journal
-2. Remplir le nom, et dans l'onglet _"Character Sheet"_, remplir &agrave; minima les 3 Attributs (Valeur et Max) : Robustesse, Vivacit&eacute; et Mental
+2. Remplir &agrave; minima (m&ecirc;me si &eacute;gal &agrave; z&eacute;ro) :
+  1. Robustesse, Vivacit&eacute;, Mental (Valeur, Max et Atout) et Effort.
+  2. Avant d'utiliser les boutons de Jet : Difficult&eacute;, Co&ucirc;t, Efforts (les deux) et Bonus.
+  3. Avant d'utiliser le bouton d'Initiative : Co&ucirc;t, Effort et Bonus.
+  4. Avant d'utiliser un jet de R&eacute;cup&eacute;ration : Bonus de r&eacute;cup&eacute;ration.
 3. (Optionnel) Modifier un pion (token) comme sur cette [image](NathasNumenera_setup_the_character_token.jpg) :
   1. S'assurer que le pion repr&eacute;sente le personnage
   2. S&eacute;lectionner l'attribut _"might"_ pour la bar 1
@@ -39,14 +44,14 @@ Alternative (permettant de modifier les sources &agrave; votre convenance) :
 8. R&eacute;p&eacute;ter les &eacute;tapes 1 &agrave; 6 pour les autres personnages.
 
 # Utilisation avanc&eacute;e :
-1. Mettre en place le HTML et le CSS pour la feuille de personnage (cf. Utilisation basique)
-2. Mettre en place les scripts API :
+1. Mettre en place les scripts API :
   1. Dans la page d'affichage du d&eacute;tail de la campagne concern&eacute;e, cliquer sur _"API Scripts"_
   2. S'il existe d&eacute;j&agrave; d'autres scripts que vous avez ajout&eacute;s, cliquer sur _"New Script"_
   3. Donner un nom au script dans _"Name"_ (par exemple : _"NathasNumenera"_)
-  4. Dans la section noire de la page, coller le contenu de ce [script API](NathasNumenera_API.js)
+  4. Dans la section noire de la page, coller le contenu de ce [script API](https://github.com/Roll20/roll20-api-scripts/blob/master/Numenera_Natha/Numenera_Natha.js)
   5. Cliquer sur _"Save Script"_
-3. Pas besoin de cr&eacute;er de macros, tous les boutons rouge sur la feuille utilisent les fonctions de l'API.
+2. Pas besoin de cr&eacute;er de macros, tous les boutons rouge sur la feuille utilisent les fonctions de l'API.
+3. Si n&eacute;cessaire, pour cr&eacute;er vos propres macros ou boutons, lisez le [Wiki](https://wiki.roll20.net/Script:Numenera_Natha).
 
 # Notes de version
 
