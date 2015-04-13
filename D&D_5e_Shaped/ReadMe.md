@@ -24,6 +24,12 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### Changelog
 
+**13th April 2015**
+
+* Fixed typo: "legendary_action_notess" to "legendary_action_notes"
+* Increased size on damage field for NPC Actions
+* Added an additional attack type to NPC Actions: "Line". I will add more in the future
+
 **12th April 2015**
 
 * Background attribute updated so that the textarea matches the default sheet and the background in the header is a new attribute.
