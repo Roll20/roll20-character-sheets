@@ -6,8 +6,8 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 * Import Script for Monsters
 * Tablet
-  * Make initiative work
-  * Fix Heart positioning
+  * -Make initiative work-
+  * Fix Heart positioning (somewhat fixed)
 * Split Traits to repeatable
 * Spell Points
 * Redo weapons based on NPC Actions.
@@ -23,6 +23,30 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 
 ### Changelog
+
+**13th April 2015**
+
+* Fixed typo: "legendary_action_notess" to "legendary_action_notes"
+* Increased size on damage field for NPC Actions
+* Added an additional attack type to NPC Actions: "Line". I will add more in the future
+
+**12th April 2015**
+
+* Background attribute updated so that the textarea matches the default sheet and the background in the header is a new attribute.
+* Set the inventory to default to multiply
+
+**10th April 2015**
+
+* All sheets use "AC" again. It is calculated correctly for everyone. "Target" under settings now uses this and will work to target NPC and PC sheets.
+
+**9th April 2015**
+
+* Jack of All Trades now applies to Basic ability checks (Strength, Dex, Con, Int, Wis, Cha)
+
+**8th April 2015**
+
+* Added a setting to allow initiative to work on mobile.
+* Cut the heart's top off on mobile as there is no other fix currently.
 
 **7th April 2015**
 
