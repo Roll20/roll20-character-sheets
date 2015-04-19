@@ -24,6 +24,11 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### Changelog
 
+**19th April 2015**
+
+* Added Save Damage and Save Damage Type
+* Reorganized the tabs for npc Attacks to have Alt Dmg, Secondary Dmg, and Crit to be "under" Dmg for instance
+
 **13th April 2015**
 
 * Fixed typo: "legendary_action_notess" to "legendary_action_notes"
