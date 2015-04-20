@@ -129,7 +129,9 @@
             <td style="font-weight:bold;" tile="Difficulty beaten by the roll">Beaten diff.</td>
             <td>{{diceRoll}}</td>
         </tr>
-        <tr><td COLSPAN="2" style="text-align:center;"><i>(1d20+{{bonusToRoll}}, {{effortRoll}} effort)</i></td></tr>
+        <tr><td><i>1d20</i></td><td><i>+ {{assets}} Asset(s)</i></td></tr>
+        <tr><td><i>+ {{effortRoll}} Effort</i></td><td><i>+ {{bonusToRoll}} Bonus</i></td></tr>
+        <tr><td COLSPAN="2"><hr/></td></tr>
         <tr class="rowcolor"><td><span class="tcat"><b>Difficulty</b></span></td><td>{{difficulty}} ({{target}})</td></tr>
         <tr><td COLSPAN="2"><hr/></td></tr>
         <tr class="rowcolor"><td><span class="tcat"><b>Extra damage</b></span></td><td>{{bonusDmg}} ({{effortDmg}} eff.)</td></tr>
@@ -181,7 +183,15 @@
             <tr><td COLSPAN="2"><hr/></td></tr>
             <tr class="rowcolor"><td><span class="tcat"><b>Difficulty</b></span></td><td>{{difficulty}} ({{target}})</td></tr>
             {{#effortRoll}}
-                <tr class="rowcolor"><td><span class="tcat">- {{effortRoll}} Effort(s)</span></td><td><b>{{finalDiff}} ({{targetRoll}})</b></td></tr>
+                {{#assets}}
+                    <tr class="rowcolor"><td><span class="tcat">- {{assets}} Asset(s)</span></td><td>&nbsp;</td></tr>
+                {{/assets}}
+                <tr class="rowcolor"><td><span class="tcat">- {{effortRoll}} Effort</span></td><td><b>{{finalDiff}} ({{targetRoll}})</b></td></tr>
+            {{/effortRoll}}
+            {{^effortRoll}}
+                {{#assets}}
+                    <tr class="rowcolor"><td><span class="tcat">- {{assets}} Asset(s)</span></td><td><b>{{finalDiff}} ({{targetRoll}})</b></td></tr>
+                {{/assets}}
             {{/effortRoll}}
         {{/difficulty}}
         {{^difficulty}}
@@ -189,6 +199,9 @@
                 <td style="font-weight:bold;" tile="Difficulty beaten by the roll">Beaten diff.</td>
                 <td>{{rollBeats}} ({{finalRoll}})</td>
             </tr>
+            {{#assets}}
+                <tr class="rowcolor"><td><span class="tcat">Asset(s)</span></td><td>{{assets}}</td></tr>
+            {{/assets}}
             {{#effortRoll}}
                 <tr class="rowcolor"><td><span class="tcat">Effort</span></td><td>{{effortRoll}}</td></tr>
             {{/effortRoll}}
@@ -239,7 +252,7 @@
         <span class="sheet-heavy">NAME</span>
         <input type="text" name="attr_character_name" style="width: 200px;" />
     </div>
-    <div class="sheet-col" align="center"><span style="font-size:0.8em;color:lightgrey;text-align:center;">Version 4.0 (2015-03-31)</span></div>
+    <div class="sheet-col" align="center"><span style="font-size:0.8em;color:lightgrey;text-align:center;">Version 4.1 (2015-04-20)</span></div>
     <div class="sheet-col" align="right">
         <img src="http://upload.wikimedia.org/wikipedia/en/8/8e/Numenera_Logo.png" width="250px"/>
     </div>
@@ -417,7 +430,7 @@
                         <td><input type="number" name="attr_mightedge" placeholder="1" /></td>
                         <td class="sheet-td-right"><button style="background-color:red;color:red" type="roll" title="Might Roll (API)" value="!nathanum-numeneroll @{character_id}|might" name="roll_MightCheck"></button></td>
                         <td class="sheet-td-right"><button style="background-color:green;color:green" type="roll" title="Might Roll"
-                        value="&{template:nathaNumBasicRoll} {{diceRoll=[[floor((1d20cs>17cf1+@{rollVarBonus})/3)+@{rollVarRollEff}]]}} {{attribute=Might}} {{attrEdge=@{mightedge}}} {{bonusToRoll=@{rollVarBonus}}} {{difficulty=@{rollVarDiff}}} {{target=[[@{rollVarDiff}*3]]}} {{finalDiff=[[@{rollVarDiff}-@{rollVarRollEff}]]}} {{targetRoll=[[(@{rollVarDiff}-@{rollVarRollEff})*3]]}} {{totalCost=[[ceil((@{rollVarRollEff}+@{rollVarRollDmg})/6)+(@{rollVarRollEff}+@{rollVarRollDmg})*2+@{rollVarCost}-@{mightedge}]]}} {{effortCost=[[ceil((@{rollVarRollEff}+@{rollVarRollDmg})/6)+(@{rollVarRollEff}+@{rollVarRollDmg})*2]]}} {{effortRoll=@{rollVarRollEff}}} {{effortDmg=@{rollVarRollDmg}}} {{statExpense=@{rollVarCost}}} {{bonusDmg=[[@{rollVarRollDmg}*3]]}}"
+                        value="&{template:nathaNumBasicRoll} {{diceRoll=[[floor((1d20cs>17cf1+@{rollVarBonus})/3)+@{rollVarAsset}+@{rollVarRollEff}]]}} {{attribute=Might}} {{attrEdge=@{mightedge}}} {{bonusToRoll=@{rollVarBonus}}} {{difficulty=@{rollVarDiff}}} {{target=[[@{rollVarDiff}*3]]}} {{finalDiff=[[@{rollVarDiff}-@{rollVarAsset}-@{rollVarRollEff}]]}} {{targetRoll=[[(@{rollVarDiff}-@{rollVarAsset}-@{rollVarRollEff})*3]]}} {{totalCost=[[ceil((@{rollVarRollEff}+@{rollVarRollDmg})/6)+(@{rollVarRollEff}+@{rollVarRollDmg})*2+@{rollVarCost}-@{mightedge}]]}} {{effortCost=[[ceil((@{rollVarRollEff}+@{rollVarRollDmg})/6)+(@{rollVarRollEff}+@{rollVarRollDmg})*2]]}} {{effortRoll=@{rollVarRollEff}}} {{effortDmg=@{rollVarRollDmg}}} {{statExpense=@{rollVarCost}}} {{assets=@{rollVarAsset}}} {{bonusDmg=[[@{rollVarRollDmg}*3]]}}"
                         name="roll_basicMightCheck"></button></td>
                     </tr>
                     <tr>
@@ -430,7 +443,7 @@
                         <td><input type="number" name="attr_speededge" placeholder="1" /></td>
                         <td class="sheet-td-right"><button style="background-color:red;color:red" type="roll" title="Speed Roll (API)" value="!nathanum-numeneroll @{character_id}|speed" name="roll_SpeedCheck"></button></td>
                         <td class="sheet-td-right"><button style="background-color:green;color:green" type="roll" title="Speed Roll"
-                        value="&{template:nathaNumBasicRoll} {{diceRoll=[[floor((1d20cs>17cf1+@{rollVarBonus})/3)+@{rollVarRollEff}]]}} {{attribute=Speed}} {{attrEdge=@{speededge}}} {{bonusToRoll=@{rollVarBonus}}} {{difficulty=@{rollVarDiff}}} {{target=[[@{rollVarDiff}*3]]}} {{finalDiff=[[@{rollVarDiff}-@{rollVarRollEff}]]}} {{targetRoll=[[(@{rollVarDiff}-@{rollVarRollEff})*3]]}} {{totalCost=[[ceil((@{rollVarRollEff}+@{rollVarRollDmg})/6)+(@{rollVarRollEff}+@{rollVarRollDmg})*2+@{rollVarCost}-@{speededge}]]}} {{effortCost=[[ceil((@{rollVarRollEff}+@{rollVarRollDmg})/6)+(@{rollVarRollEff}+@{rollVarRollDmg})*2]]}} {{effortRoll=@{rollVarRollEff}}} {{effortDmg=@{rollVarRollDmg}}} {{statExpense=@{rollVarCost}}} {{bonusDmg=[[@{rollVarRollDmg}*3]]}}"
+                        value="&{template:nathaNumBasicRoll} {{diceRoll=[[floor((1d20cs>17cf1+@{rollVarBonus})/3)+@{rollVarAsset}+@{rollVarRollEff}]]}} {{attribute=Speed}} {{attrEdge=@{speededge}}} {{bonusToRoll=@{rollVarBonus}}} {{difficulty=@{rollVarDiff}}} {{target=[[@{rollVarDiff}*3]]}} {{finalDiff=[[@{rollVarDiff}-@{rollVarAsset}-@{rollVarRollEff}]]}} {{targetRoll=[[(@{rollVarDiff}-@{rollVarAsset}-@{rollVarRollEff})*3]]}} {{totalCost=[[ceil((@{rollVarRollEff}+@{rollVarRollDmg})/6)+(@{rollVarRollEff}+@{rollVarRollDmg})*2+@{rollVarCost}-@{speededge}]]}} {{effortCost=[[ceil((@{rollVarRollEff}+@{rollVarRollDmg})/6)+(@{rollVarRollEff}+@{rollVarRollDmg})*2]]}} {{effortRoll=@{rollVarRollEff}}} {{effortDmg=@{rollVarRollDmg}}} {{statExpense=@{rollVarCost}}} {{bonusDmg=[[@{rollVarRollDmg}*3]]}} {{assets=@{rollVarAsset}}}"
                         name="roll_basicSpeedCheck"></button></td>
                     </tr>
                     <tr>
@@ -443,7 +456,7 @@
                         <td><input type="number" name="attr_intellectedge" placeholder="0" /></td>
                         <td class="sheet-td-right"><button style="background-color:red;color:red" type="roll" title="Intellect Roll (API)" value="!nathanum-numeneroll @{character_id}|intellect" name="roll_IntellectCheck"></button></td>
                         <td class="sheet-td-right"><button style="background-color:green;color:green" type="roll" title="Intellect Roll"
-                        value="&{template:nathaNumBasicRoll} {{diceRoll=[[floor((1d20cs>17cf1+@{rollVarBonus})/3)+@{rollVarRollEff}]]}} {{attribute=Intellect}} {{attrEdge=@{intellectedge}}} {{bonusToRoll=@{rollVarBonus}}} {{difficulty=@{rollVarDiff}}} {{target=[[@{rollVarDiff}*3]]}} {{finalDiff=[[@{rollVarDiff}-@{rollVarRollEff}]]}} {{targetRoll=[[(@{rollVarDiff}-@{rollVarRollEff})*3]]}} {{totalCost=[[ceil((@{rollVarRollEff}+@{rollVarRollDmg})/6)+(@{rollVarRollEff}+@{rollVarRollDmg})*2+@{rollVarCost}-@{intellectedge}]]}} {{effortCost=[[ceil((@{rollVarRollEff}+@{rollVarRollDmg})/6)+(@{rollVarRollEff}+@{rollVarRollDmg})*2]]}} {{effortRoll=@{rollVarRollEff}}} {{effortDmg=@{rollVarRollDmg}}} {{statExpense=@{rollVarCost}}} {{bonusDmg=[[@{rollVarRollDmg}*3]]}}"
+                        value="&{template:nathaNumBasicRoll} {{diceRoll=[[floor((1d20cs>17cf1+@{rollVarBonus})/3)+@{rollVarAsset}+@{rollVarRollEff}]]}} {{attribute=Intellect}} {{attrEdge=@{intellectedge}}} {{bonusToRoll=@{rollVarBonus}}} {{difficulty=@{rollVarDiff}}} {{target=[[@{rollVarDiff}*3]]}} {{finalDiff=[[@{rollVarDiff}-@{rollVarAsset}-@{rollVarRollEff}]]}} {{targetRoll=[[(@{rollVarDiff}-@{rollVarAsset}-@{rollVarRollEff})*3]]}} {{totalCost=[[ceil((@{rollVarRollEff}+@{rollVarRollDmg})/6)+(@{rollVarRollEff}+@{rollVarRollDmg})*2+@{rollVarCost}-@{intellectedge}]]}} {{effortCost=[[ceil((@{rollVarRollEff}+@{rollVarRollDmg})/6)+(@{rollVarRollEff}+@{rollVarRollDmg})*2]]}} {{effortRoll=@{rollVarRollEff}}} {{effortDmg=@{rollVarRollDmg}}} {{statExpense=@{rollVarCost}}} {{bonusDmg=[[@{rollVarRollDmg}*3]]}} {{assets=@{rollVarAsset}}}"
                         name="roll_basicIntellectCheck"></button></td>
                     </tr>
                 </table>
@@ -452,23 +465,26 @@
                 <table> <!-- BEGIN stat roll -->
                     <tr>
                         <td WIDTH="100%" class="sheet-tdsmall-left"><span class="sheet-heavy">ROLL</span></td>
-                        <td>&nbsp;&nbsp;</td>
                         <td class="sheet-tdsmall-right">
-                            Difficulty
+                            &nbsp;Diff.
                         </td>
                         <td class="sheet-tdsmall-left">
                             <input type="number" min="0" max="10" name="attr_rollVarDiff" title="Roll difficulty" placeholder="0"/>
                         </td>
-                        <td>&nbsp;&nbsp;</td>
                         <td class="sheet-tdsmall-right">
-                            Cost
+                            &nbsp;Cost
                         </td>
                         <td class="sheet-tdsmall-left">
                             <input type="number" min="0" max="12" name="attr_rollVarCost" title="Extra stat Pool cost (from power or ability)" placeholder="0" />
                         </td>
-                        <td>&nbsp;&nbsp;</td>
                         <td class="sheet-tdsmall-right">
-                            Effort
+                            &nbsp;Asset
+                        </td>
+                        <td class="sheet-tdsmall-left">
+                            <input type="number" min="0" max="2" name="attr_rollVarAsset" title="Asset(s) : position, equipment etc. (0, 1 or 2 maximum)" placeholder="0" default="0"/>
+                        </td>
+                        <td class="sheet-tdsmall-right">
+                            &nbsp;Effort
                         </td>
                         <td class="sheet-tdsmall-left">
                             <input  type="number" min="0" max="6" name="attr_rollVarRollEff" title="Effort applied to the ROLL" placeholder="0" />
@@ -479,14 +495,12 @@
                         <td class="sheet-tdsmall-left">
                             <input type="number" min="0" max="6" name="attr_rollVarRollDmg" title="Effort applied to DAMAGE" placeholder="0" />
                         </td>
-                        <td>&nbsp;&nbsp;</td>
                         <td class="sheet-tdsmall-right">
-                            Bonus
+                            &nbsp;Bonus
                         </td>
                         <td class="sheet-tdsmall-left">
                             <input  type="number" min="-2" max="2" name="attr_rollVarBonus" title="Bonus to the ROLL (0, 1 ou 2 maximum)" placeholder="0" />
                         </td>
-                        <td>&nbsp;&nbsp;</td>
                         <td class="sheet-tdsmall-right" style="vertical-align:top;">
                             <span style="font-size:200%;vertical-align:bottom;">&#x2934;</span>
                         </td>
