@@ -27,7 +27,8 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 **20th April 2015**
 
 * NPC Actions fixed details tabs so they show at the right times.
-* Restyled spellbook page a bit to match the Shaped style. Only slightly.
+* Restyled spellbook page a bit to match the Shaped style.
+* Filtered spells based on "Prepared", "Ritual", or "Concentration"
 
 **19th April 2015**
 
