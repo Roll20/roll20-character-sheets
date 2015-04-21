@@ -4,6 +4,10 @@ This sheet is created for use in Stars Without Number on Roll20. Based on the ch
 
 ### Changelog
 
+#### 0.0.5
+
+* Fixed Skill rows not aligning.
+
 #### 0.0.4
 
 * Changed logo to image at http://i.imgur.com/3U3Ibb7.png.
