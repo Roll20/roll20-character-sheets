@@ -24,6 +24,13 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### Changelog
 
+**21st-23rd April 2015**
+
+* Bars now clear before importing. They currently do not work with formula attributes (passive_perception).
+* Removed multiattack from each action
+* Added a button on the sheet for multiattack. Text and script are there and the token action just references that button. The import script will auto populate this.
+* BREAKING CHANGE: All actions have been renamed to follow the repeating syntax. I was really hoping to make repeating work, but it needs to be supported by roll20. This will make it easier to transition to repeating syntax if/when they do support it.
+
 **20th April 2015**
 
 * NPC Actions fixed details tabs so they show at the right times.
