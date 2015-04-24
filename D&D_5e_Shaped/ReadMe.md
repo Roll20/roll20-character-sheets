@@ -26,7 +26,7 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 **24th April 2015**
 
-* Added spell slots to the first page
+* Added spell slots to the Core page
 * Cleaned up a few pages by adding tooltips for the text that was there.
 * Changed colors on a lot of buttons and tabs
 
