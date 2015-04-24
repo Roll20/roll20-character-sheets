@@ -24,6 +24,12 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### Changelog
 
+**24th April 2015**
+
+* Added spell slots to the first page
+* Cleaned up a few pages by adding tooltips for the text that was there.
+* Changed colors on a lot of buttons and tabs
+
 **21st-23rd April 2015**
 
 * Bars now clear before importing. They currently do not work with formula attributes (passive_perception).
