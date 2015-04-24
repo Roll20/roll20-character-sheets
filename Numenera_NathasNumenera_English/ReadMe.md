@@ -5,7 +5,7 @@ Note: there's a french version of the very same sheet/macros/scripts, for those 
 Follow [this link](https://github.com/Roll20/roll20-character-sheets/tree/master/Numenera_NathasNumenera_French).
 
 # Current version:
-Version 4.1 (April 2015) : [Screenshot](NathasNumenera_tabs_v4.jpg).
+Version 4.2 (April 2015) : [Screenshot](NathasNumenera_tabs_v4-2.jpg).
 
 # Basic use:
 
@@ -44,6 +44,11 @@ Version 4.1 (April 2015) : [Screenshot](NathasNumenera_tabs_v4.jpg).
 3. If needed, to create you own macros or buttons, read the [Wiki page](https://wiki.roll20.net/Script:Numenera_Natha).
 
 # Release Notes
+
+##Release 4.2 (April 2015)
+Bug correction on NPC base difficulty display.
+
+Slight layout corrections.
 
 ##Release 4.1 (April 2015)
 New "Asset" attribute as stat roll parameter, used by both the API rolls (v4.2+) and the integrated standard rolls.
