@@ -51,6 +51,12 @@ This will create `13th_Age-neovatar.[css|html]` that you can copy and paste into
 
 ### Changelog
 
+**1.2.1:**
+
+  * character default macro references description
+  * npc power default macro uses roll template
+
+
 **1.2.0:**
 
   * added roll templates
