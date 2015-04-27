@@ -24,6 +24,30 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### Changelog
 
+**24th April 2015**
+
+* Added spell slots to the Core page
+* Cleaned up a few pages by adding tooltips for the text that was there.
+* Changed colors on a lot of buttons and tabs
+
+**21st-23rd April 2015**
+
+* Bars now clear before importing. They currently do not work with formula attributes (passive_perception).
+* Removed multiattack from each action
+* Added a button on the sheet for multiattack. Text and script are there and the token action just references that button. The import script will auto populate this.
+* BREAKING CHANGE: All actions have been renamed to follow the repeating syntax. I was really hoping to make repeating work, but it needs to be supported by roll20. This will make it easier to transition to repeating syntax if/when they do support it.
+
+**20th April 2015**
+
+* NPC Actions fixed details tabs so they show at the right times.
+* Restyled spellbook page a bit to match the Shaped style.
+* Filtered spells based on "Prepared", "Ritual", or "Concentration"
+
+**19th April 2015**
+
+* Added Save Damage and Save Damage Type
+* Reorganized the tabs for npc Attacks to have Alt Dmg, Secondary Dmg, and Crit to be "under" Dmg for instance
+
 **13th April 2015**
 
 * Fixed typo: "legendary_action_notess" to "legendary_action_notes"
