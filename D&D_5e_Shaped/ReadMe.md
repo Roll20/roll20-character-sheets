@@ -29,6 +29,7 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 * Actions now have "Details" tab split out to "Reach", "Range", and "Target". Old creature who still had "Details" will still work even if the fields do not show.
 * Added Multilingual support for other users to translate the sheet.
 * Adjusted tooltips so that they can work on plain text. Put them in for Strength and Athletics. I expect many more to be added soon.
+* Added tooltips for basic ability and skill checks.
 
 
 **24th April 2015**
