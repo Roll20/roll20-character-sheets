@@ -7,4 +7,4 @@ List your dice and pips next to the appropriate skills -  3pips equal another di
 
 The text areas are expandable for additional info. 
 
-This is my first attempt ever.
+This is my first attempt at it!
