@@ -4,16 +4,27 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### TODO
 
+* Show Bonuses / Penalties on the weapon and spell page as well.
 * Finish Implementing nested inline rolls
-* Allow for "Effects" to be whispered to the GM for Actions
+* Actions: Allow for "Effects" to be whispered to the GM for
 * Tooltip all the things
 * Revamp Traits. Keep fluff traits on the first page and for action like traits write "see Actions". Also include fluff traits on "Actions".
-* Spell Points
 * Revamp weapons based on Actions.
+* Spell Points
 * Consider alternative sheet layout of skills under the stats
 
 
 ### Changelog
+
+**30th April 2015**
+
+* Prevented weapons from erroring if the crit damage field did not have a value.
+* Made targetAC work on Actions and Spells
+* Spells can be removed again
+* Spells no longer have a (dis)advantage toggle. All attacks roll the second die.
+* Cleaned up how Actions send data to the roll templates
+* Cleaned up spellbook to show "-" when a class doesn't have cantrips, spells known, or spells prepared
+* Cleaned up roll templates
 
 **29th April 2015**
 
