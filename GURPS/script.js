@@ -75,9 +75,9 @@ function parse_command(message) {
             var target = results[0].inlinerolls[2].results.total;
 
             if (command.indexOf("gm") == 0) {
-                roll_comparison(roll, target, "/w gm [["+roll+"]] vs [["+target+"]]\n/w gm");
+                roll_comparison(roll, target, "/w gm Rolling [["+roll+"]] vs [["+target+"]]\n/w gm");
             } else {
-                roll_comparison(roll, target, "Rolling [["+roll+"]] vs [["+target+"]]\n");
+                roll_comparison(roll, target, message.who+" rolls [["+roll+"]] vs [["+target+"]]\n");
             }
         });
     } catch (error) {
