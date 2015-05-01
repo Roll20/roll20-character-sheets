@@ -14,6 +14,10 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### Changelog
 
+**2nd May 2015**
+
+* Weapons revamp v2.
+
 **1st May 2015**
 
 * Attacks: First revision of new weapons has been completed.
