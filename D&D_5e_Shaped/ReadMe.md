@@ -4,8 +4,6 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### TODO
 
-* Show Bonuses / Penalties on the weapon and spell page as well.
-* Finish Implementing nested inline rolls
 * Actions: Allow for "Effects" to be whispered to the GM for
 * Tooltip all the things
 * Revamp Traits. Keep fluff traits on the first page and for action like traits write "see Actions". Also include fluff traits on "Actions".
@@ -15,6 +13,12 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 
 ### Changelog
+
+**1st May 2015**
+
+* Attacks: First revision of new weapons has been completed.
+* Show Bonuses / Penalties on the weapon and spell page as well.
+
 
 **30th April 2015**
 
