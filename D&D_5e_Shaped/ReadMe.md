@@ -7,11 +7,14 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 * Actions: Allow for "Effects" to be whispered to the GM for
 * Revamp Traits. Keep fluff traits on the first page and for action like traits write "see Actions". Also include fluff traits on "Actions".
 * Revamp weapons based on Actions.
-* Spell Points
 * Consider alternative sheet layout of skills under the stats
 
 
 ### Changelog
+
+**4th May 2015**
+
+* Added Spell Points
 
 **2nd May 2015**
 
