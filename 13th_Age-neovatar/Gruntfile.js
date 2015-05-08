@@ -14,8 +14,10 @@ module.exports = function(grunt) {
                 }
             },
             files: [
-                {src: '*', dest: 'testbed/', expand: true, cwd: 'src/testbed'},
-                {src: 'src/13th_Age-neovatar.css', dest: 'testbed/13th_Age-neovatar.css'}
+                {src: 'src/index.html', dest: 'testbed/index.html'},
+                {src: 'src/13th_Age-neovatar.css', dest: 'testbed/13th_Age-neovatar.css'},
+                {src: 'src/editor.css', dest: 'testbed/editor.css'},
+                {src: 'src/base.css', dest: 'testbed/base.css'},
             ]
         },
         production: {
@@ -26,7 +28,7 @@ module.exports = function(grunt) {
                 }
             },
             files: [ 
-                {src: 'src/sheet.html', dest: '13th_Age-neovatar.html'},
+                {src: 'src/13th_Age-neovatar.html', dest: '13th_Age-neovatar.html'},
                 {src: 'src/13th_Age-neovatar.css', dest: '13th_Age-neovatar.css'},
                 {src: 'src/sheet.json', dest: 'sheet.json'}
             ]
