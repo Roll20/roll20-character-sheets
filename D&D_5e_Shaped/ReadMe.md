@@ -4,13 +4,19 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### TODO
 
+* Revamp weapons based on Actions.
 * Actions: Allow for "Effects" to be whispered to the GM for
 * Revamp Traits. Keep fluff traits on the first page and for action like traits write "see Actions". Also include fluff traits on "Actions".
-* Revamp weapons based on Actions.
 * Consider alternative sheet layout of skills under the stats
 
 
 ### Changelog
+
+**8th May 2015**
+
+* Added skill passive bonus
+* Cleaned up skills on core sheet
+* Shrunk Prof bonus and Exhaustion level inputs.
 
 **4th May 2015**
 
