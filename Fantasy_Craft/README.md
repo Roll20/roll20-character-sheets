@@ -5,6 +5,16 @@ This is my fork of Suldae's initial sheet.
 
 ### ChangeLog
 
+#### Major update - May 2015
+* Added sheet config controls to remove background image and control Logos (thanks to Rich Finder)
+* Added Initiative roll button which auto-populates Turn Tracker
+* Added attribute name to spell hide/reveal so it will remember previous state
+* Adjusted width of Combat/Non-combat abilities and made description fields variable height and scrollable text box, so text will always fit.
+* Adjusted width of Gear fields to occupy full 100% of width and added location field
+* Added Holdings section
+* Finally(!) fixed width control of spell section's repitems.  Now they always occupy 100% width
+* Added sheet version/date
+
 #### Minor update - Mar 2015
 * Darkened background as temporary 'fix' for larger UI changes
 * Removed/consolidated the last of dead css classes
