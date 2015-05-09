@@ -105,8 +105,6 @@ This is my fork of Suldae's initial sheet.
 
 ### TODO
 
-* Received request to get rid of/change the background... which I didn't like either, but now that someone else has voiced a similar opinion I'll up the priority.
-* Add roll button for Initiative
 * Compute Keen in conjunction with damage rolls
 * Add Global Keen than just to individual weapons
 * What to do if > 4 weapons?  Repeating field?
@@ -119,10 +117,9 @@ This is my fork of Suldae's initial sheet.
 * Armor resistances are still number type.  Should be changed to text/number
 * Add sneak attack damage dice to weapons section
 * Consider adding individual conditions select element in order to create flexible macros
-* Need to add Contacts, Holdings, Magic Items, Mounts, and Vehicles section to Gear & Prizes
+* Need to add Contacts, Magic Items, Mounts, and Vehicles section to Gear & Prizes
 * Add input field for Edge?
 * Need to do comprehensive review of rolls and how they are computed
-* Move style definitions on elements in html to css
 * Possibly create dedicated Tricks/Stance section to track which abilities are tricks/stances (or use T/S checkbox)
 * Possibly create Feat Category select to help track how many feats of a tree a character has
 * Character Disposition tracking for both Special and Standard (See pg 373)
@@ -130,6 +127,7 @@ This is my fork of Suldae's initial sheet.
 * Merge 'Focus' into 'Skills' section?
 * Add Critical Injuries and heal time in addition to conditions tracker?
 * Update json file to provide more detail what is tracked and what is not
+* Update json file to explain tooltip usage to provide table 'hints', special/standard sheet, Spellcasting incorporated into skills, what rolls auto-calculate, and where to find attribute names for creating macros
 
 
 ### NOTE
@@ -153,3 +151,4 @@ If you feel you've contributed to the development of this character sheet, don't
 #### Credit to those that have influenced the design of the sheet with input, feedback, or just good style:
 * Delal of crafty-games forums' custom character sheet
 * Actoba's spell section and tabs from DnD 5e sheet
+* Rich Finder's UI controls from SW sheet
