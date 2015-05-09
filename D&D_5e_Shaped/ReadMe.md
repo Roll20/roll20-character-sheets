@@ -12,6 +12,11 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### Changelog
 
+**9th May 2015**
+
+* Added more German translations from Rouby. Core, Background, and Spells
+* Split all the pages into their own html file which is all combined via GULP - this change only matters for contributors. It helps manage the pages to split the 20,000 lines to different files.
+
 **8th May 2015**
 
 * Added skill passive bonus
