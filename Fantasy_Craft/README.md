@@ -14,6 +14,7 @@ This is my fork of Suldae's initial sheet.
 * Added Holdings section
 * Finally(!) fixed width control of spell section's repitems.  Now they always occupy 100% width
 * Added sheet version/date
+* Adjusted Path text input to be wider and changed to textarea
 
 #### Minor update - Mar 2015
 * Darkened background as temporary 'fix' for larger UI changes
