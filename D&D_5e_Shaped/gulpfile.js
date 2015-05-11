@@ -1,5 +1,4 @@
 var gulp = require('gulp'),
-		fileinclude = require('gulp-file-include'),
 		include = require('gulp-include');
 
 
