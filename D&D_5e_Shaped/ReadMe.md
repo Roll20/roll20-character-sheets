@@ -12,6 +12,13 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### Changelog
 
+**12 May 2015**
+
+* Spell Effects on a new line instead of a column
+* Fix bug around printing out hd max values for players
+* Shrunk the "Higher Level" textarea for spells and increased the description textare.
+* Allowed for the "Effects" textarea to be resized
+
 **9th May 2015**
 
 * Added more German translations from Rouby. Core, Background, and Spells
