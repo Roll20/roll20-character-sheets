@@ -5,7 +5,7 @@ use with Roll20.net and released open source under the MIT License.
 
 ### Changelog ###
 
-**Release 5.0 - April 20, 2015**
+**Release 5.0 - May 12, 2015**
 - New layout with a tab-controlled interface
 - Added miscellaneous modifiers to stats, skills, weapons, and armor.
 - Moved all attack rolls to exist on a per-weapon basis.  
