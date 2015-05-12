@@ -18,6 +18,8 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 * Fix bug around printing out hd max values for players
 * Shrunk the "Higher Level" textarea for spells and increased the description textare.
 * Allowed for the "Effects" textarea to be resized
+* Revamped the spell roll template
+* Added icons for Ritual and Concentration on the spell roll template
 
 **9th May 2015**
 
