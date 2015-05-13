@@ -14,6 +14,11 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 **12 May 2015**
 
+* Cleaned up CSS and expanded the roll template 20 px to the left
+* Moved Ritual and Concentration icon to the top right of the roll template header
+
+**12 May 2015**
+
 * Spell Effects on a new line instead of a column
 * Fix bug around printing out hd max values for players
 * Shrunk the "Higher Level" textarea for spells and increased the description textare.
