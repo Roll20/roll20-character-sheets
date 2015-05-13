@@ -12,7 +12,7 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### Changelog
 
-**12 May 2015**
+**13 May 2015**
 
 * Cleaned up CSS and expanded the roll template 20 px to the left
 * Moved Ritual and Concentration icon to the top right of the roll template header
