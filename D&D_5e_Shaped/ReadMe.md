@@ -17,6 +17,7 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 * Fixed initiative
 * Removed name from the other roll templates as well as cleaned more up
+* Added an option setting to show the character name on all rolls. It is off by default.
 
 **13th May 2015**
 
