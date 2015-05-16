@@ -4,6 +4,7 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### TODO
 
+* Look into proficiency dice
 * Revamp weapons based on Actions.
 * Actions: Allow for "Effects" to be whispered to the GM for
 * Revamp Traits. Keep fluff traits on the first page and for action like traits write "see Actions". Also include fluff traits on "Actions".
@@ -11,6 +12,35 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 
 ### Changelog
+
+**16th May 2015**
+
+* Added spell components to the spell header
+* Made inputs smaller by default all over the sheet
+* Added toggle for Old weapons
+* Action name inputs are now big like spells and weapons
+
+
+**14th May 2015**
+
+* Fixed initiative
+* Removed name from the other roll templates as well as cleaned more up
+* Added an option setting to show the character name on all rolls. It is off by default.
+
+**13th May 2015**
+
+* Cleaned up CSS and expanded the roll template 20 px to the left
+* Moved Ritual and Concentration icon to the top right of the roll template header
+* Put Range, Reach, target, and spell details in the roll template header.
+
+**12th May 2015**
+
+* Spell Effects on a new line instead of a column
+* Fix bug around printing out hd max values for players
+* Shrunk the "Higher Level" textarea for spells and increased the description textarea.
+* Allowed for the "Effects" textarea to be resized
+* Revamped the spell roll template
+* Added icons for Ritual and Concentration on the spell roll template
 
 **9th May 2015**
 
