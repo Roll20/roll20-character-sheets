@@ -16,6 +16,9 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 **16th May 2015**
 
 * Added spell components to the spell header
+* Made inputs smaller by default all over the sheet
+* Added toggle for Old weapons
+* Action name inputs are now big like spells and weapons
 
 
 **14th May 2015**
