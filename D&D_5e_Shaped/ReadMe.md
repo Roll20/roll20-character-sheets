@@ -13,6 +13,11 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### Changelog
 
+**16th May 2015**
+
+* Added spell components to the spell header
+
+
 **14th May 2015**
 
 * Fixed initiative
