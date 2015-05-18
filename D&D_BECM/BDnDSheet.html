@@ -672,7 +672,10 @@
 					<div class="sheet-col-1-2 sheet-padr sheet-small-label sheet-right">Base Movement</div>
 					<div class="sheet-col-1-4 sheet-padl sheet-center"><input type="number" name="attr_basemove" value="120"></div>
 				</div>
-				
+				<div class="sheet-row">
+					<div class="sheet-col-1-2 sheet-padr sheet-small-label sheet-right">Natural AC</div>
+					<div class="sheet-col-1-4 sheet-padl sheet-center"><input type="number" name="attr_natAC" title="For most classes this value stays at 9, Mystics and many of the expanded classes from the Gazzeter and Creature Crucible Series will have other values" value="9"></div>
+				</div>
 				<div class="sheet-row">
 					<div class="sheet-col-1-4 sheet-right sheet-padr">
 						<input type="checkbox" class="sheet-right"  name="attr_magicresistance" value="1"/>
@@ -709,12 +712,22 @@
 	<!--Combat-->
 	<div class="sheet-section-combat">
 		<div class="sheet-row">
-				<div class="sheet-col-1-3 sheet-padr">
+				<div class="sheet-col-1-6 sheet-padr">
 					<h4 class="sheet-center">Hit Points <span class="sheet-pictos">k</span></h4>
 					<div class="sheet-row sheet-padb">
 						<div class="sheet-row">
 							<div class="sheet-col-1-2 sheet-small-label sheet-center"><input class="sheet-underlined" type="number" name="attr_HP" step="1"><br/>Current</div>
 							<div class="sheet-col-1-2 sheet-small-label sheet-center"><input class="sheet-underlined" type="number" name="attr_HP_max" min="1" step="1"><br/>Max</div>
+						</div>
+					</div>
+				</div>
+				<div class="sheet-col-1-6">
+					<h4 class="sheet-center">Wrestling <span class="sheet-pictos">g</span></h4>
+					<div class="sheet-row sheet-padr">
+						<div class="sheet-col-1-2 sheet-small-label sheet-center" title="Only enter additional bonuses to WR here from skills and weapon mastery. Your level, AC, and Ablity mods  are already included in the macro button"><input class="sheet-underlined sheet-center" type="number" name="attr_WRbonus" value="0" step="1"><br/>Bonus</div>
+						<input class="sheet-underlined" type="hidden" name="attr_WR" value="[[(ceil(@{level} / 2))]] + [[@{ACunmod}]] + [[@{strength_mod}]] + [[@{dexterity_mod}]] + @{WRbonus}" disabled="disabled">
+						<div class="sheet-col-1-2 sheet-center">
+							<button type="roll" class="sheet-initiative sheet-large-button" name="roll_Wrestling" value="&{template:5eDefault} {{title=Wrestling}} {{subheader=@{character_name}}} {{rollname=Wrestling Roll}} {{roll=[[ 1d20 + @{WR} ]]}}}">Wrestling</button>
 						</div>
 					</div>
 				</div>
@@ -829,7 +842,11 @@
 			<div class="sheet-col-1-2 sheet-padr">
 				<h4 class="sheet-center">Armour Class <span class="sheet-pictos-three">b</span></h4>
 					<div class="sheet-row"> 
-						<div class="sheet-col-1-4 sheet-small-label sheet-center"><input class="sheet-underlined" type="number" name="attr_AC_armour" step="1" value="@{eqACPA} * @{PAenabled} + @{eqarmourbaseac} * @{eqarmourfullsettoggle} - @{eqarmourmagic}" disabled="true"><br/>Armour</div>
+						<!--Mathy Bit to check to see if armour is greater than Natural AC-->
+						<input type="hidden" name="attr_ACunmod" value="@{eqACPA} * @{PAenabled} + @{eqarmourbaseac} * @{eqarmourfullsettoggle}" />
+						<input type="hidden" name="attr_acadjusted" value="@{eqACPA} * @{PAenabled} + @{eqarmourbaseac} * @{eqarmourfullsettoggle} - @{eqarmourmagic}" />
+						<input type="hidden" name="attr_acmin" value="(((@{acadjusted} + @{natAC}) - abs(@{acadjusted} - @{natAC})) / 2)" />
+						<div class="sheet-col-1-4 sheet-small-label sheet-center"><input class="sheet-underlined" type="number" name="attr_AC_armour" step="1" value="@{acmin}" disabled="true"><br/>Armour</div>
 						<div class="sheet-col-1-4 sheet-small-label sheet-center"><input class="sheet-underlined" type="number" name="attr_AC_shield" max="0" value="0" title="The total deduction from AC for shields including weapon mastery and magical sources " step="1"><br/>Shield</div>
 						<div class="sheet-col-1-4 sheet-small-label sheet-center"><input class="sheet-underlined" type="number" name="attr_AC_magic" min="0" value="0" title="All bonuses from rings of protection and other non shiled and armour sources" step="1"><br/>Magic</div>
 						<div class="sheet-col-1-4 sheet-small-label sheet-center"><input class="sheet-underlined" type="number" name="attr_AC" min="1" step="1" value="(@{AC_armour} + @{AC_shield} - @{AC_magic} - @{dexterity_mod})" disabled="true"><br/>Total</div>
@@ -858,6 +875,7 @@
 						<input type="hidden" name="attr_eqredux" value="((@{eqarmour})/ 100)" />
 						<!--Check if suit armour is worn to apply movement restrictions -->
 						<input type="hidden" name="attr_eqsuittoggle" value="(floor((@{eqarmour})/ 749))" />
+						<input type="hidden" name="attr_eqnosuittoggle" value="abs(@{eqsuittoggle} - 1)" />
 						<!--Fit the encumbrance to an AC value -->
 						<input type="hidden" name="attr_eqarmourbaseac" value="(round(0.0168237512 * @{eqredux} * @{eqredux} * @{eqredux} * @{eqredux}  - 0.2351937912 * @{eqredux} * @{eqredux} * @{eqredux} + 0.9378087321 * @{eqredux} * @{eqredux} - 2.1022659782 * @{eqredux} + 9.004497 ))" />
 						<div class="sheet-col-1-3 sheet-small-label sheet-center"><input class="sheet-underlined" type="number" name="attr_eqarmourmagic" value="0"min="0" step="1"><br/>Magic Bonus</div>
@@ -2797,7 +2815,10 @@
 					<input type="hidden" name="attr_nmbase" value="((@{total_weight}) / 400)" />
 					<input type="hidden" name="attr_nmsteep" value="((@{basemove}) - ((floor(@{nmbase})) * 30))" />
 					<input type="hidden" name="attr_nmshallow" value="((5 - (floor(@{nmbase}))) * ((@{basemove})/8))" />
-					<input type="hidden" name="attr_normal_movement" value="(((@{nmsteep} + @{nmshallow}) + abs(@{nmsteep} - @{nmshallow})) / 2)" />
+					<input type="hidden" name="attr_nmbasic" value="(((@{nmsteep} + @{nmshallow}) + abs(@{nmsteep} - @{nmshallow})) / 2)" />
+					<!-- Mathy bit to reduce movement for suit armour to max 30'-->
+					<input type="hidden" name="attr_nmsuit" value="(((@{nmbasic} + 30) - abs(@{nmbasic} - 30)) / 2)" />
+					<input type="hidden" name="attr_normal_movement" value="@{nmsuit} * @{eqsuittoggle} + @{nmbasic} * @{eqnosuittoggle}" />
 				</div>
 				<h4 class="sheet-center">Inventory Locations <span class="sheet-pictos">G</span></h4>
 				<div class="sheet-row sheet-sub-header">
