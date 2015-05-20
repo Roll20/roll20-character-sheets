@@ -15,7 +15,10 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 **17-20th May 2015**
 
-* Expanded weapons out to 6 each (8 for melee)
+* Quick Actions example done - need to think about this before duplicating it
+* Thrown weapons removed
+* Some NPC elements now show on the PC sheet (Blindsight, other speeds)
+* Expanded weapons out to 7 each
 * Resized all of the core page to allow for quick weapons
 * Weapons tab now has quick weapons as well
 
