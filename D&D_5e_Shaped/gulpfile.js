@@ -7,6 +7,7 @@ var numberOfActions = 12,
 	numberOfLairActions = 4,
 	numberOfLegendaryActions = 4,
 	numberOfWeapons = 7,
+	actionsPerPage = 10,
 	armorCount = 10,
 	inventoryPerPage = 15;
 
@@ -73,6 +74,18 @@ gulp.task('compile', function() {
 			starttag: '<!-- inject:ranged:{{ext}} -->',
 			transform: function (filePath, file) {
 				return duplicate(file, numberOfWeapons);
+			}
+		}))
+		.pipe( inject(gulp.src(['precompiled/components/class/class_action.html']), {
+			starttag: '<!-- inject:class_1:{{ext}} -->',
+			transform: function (filePath, file) {
+				return duplicate(file, actionsPerPage, 1);
+			}
+		}))
+		.pipe( inject(gulp.src(['precompiled/components/class/class_action.html']), {
+			starttag: '<!-- inject:class_2:{{ext}} -->',
+			transform: function (filePath, file) {
+				return duplicate(file, actionsPerPage, 1 + actionsPerPage);
 			}
 		}))
 		.pipe( inject(gulp.src(['precompiled/components/armor/armor.html']), {
