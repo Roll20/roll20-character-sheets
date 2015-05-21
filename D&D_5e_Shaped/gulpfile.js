@@ -3,11 +3,12 @@ var gulp = require('gulp'),
 	inject = require('gulp-inject');
 
 
-var numberOfActions = 12,
-	numberOfLairActions = 4,
-	numberOfLegendaryActions = 4,
-	numberOfWeapons = 7,
-	actionsPerPage = 10,
+var actionCount = 12,
+	lairActionCount = 4,
+	legendaryActionCount = 4,
+	weaponCount = 7,
+	classActionsPerPage = 10,
+	customClassCount = 6,
 	armorCount = 10,
 	inventoryPerPage = 15;
 
@@ -49,43 +50,49 @@ gulp.task('compile', function() {
 		.pipe( inject(gulp.src(['precompiled/components/actions/actions.html']), {
 			starttag: '<!-- inject:lairActions:{{ext}} -->',
 			transform: function (filePath, file) {
-				return actionsCompile(file, numberOfLairActions, 'lair_', 'Lair');
+				return actionsCompile(file, lairActionCount, 'lair_', 'Lair');
 			}
 		}))
 		.pipe( inject(gulp.src(['precompiled/components/actions/actions.html']), {
 			starttag: '<!-- inject:legendaryActions:{{ext}} -->',
 			transform: function (filePath, file) {
-				return actionsCompile(file, numberOfLegendaryActions, 'legendary_', 'Legendary');
+				return actionsCompile(file, legendaryActionCount, 'legendary_', 'Legendary');
 			}
 		}))
 		.pipe( inject(gulp.src(['precompiled/components/actions/actions.html']), {
 			starttag: '<!-- inject:actions:{{ext}} -->',
 			transform: function (filePath, file) {
-				return actionsCompile(file, numberOfActions, '', 'Action');
+				return actionsCompile(file, actionCount, '', 'Action');
 			}
 		}))
 		.pipe( inject(gulp.src(['precompiled/components/weapons/melee.html']), {
 			starttag: '<!-- inject:melee:{{ext}} -->',
 			transform: function (filePath, file) {
-				return duplicate(file, numberOfWeapons);
+				return duplicate(file, weaponCount);
 			}
 		}))
 		.pipe( inject(gulp.src(['precompiled/components/weapons/ranged.html']), {
 			starttag: '<!-- inject:ranged:{{ext}} -->',
 			transform: function (filePath, file) {
-				return duplicate(file, numberOfWeapons);
+				return duplicate(file, weaponCount);
 			}
 		}))
 		.pipe( inject(gulp.src(['precompiled/components/class/class_action.html']), {
 			starttag: '<!-- inject:class_1:{{ext}} -->',
 			transform: function (filePath, file) {
-				return duplicate(file, actionsPerPage, 1);
+				return duplicate(file, classActionsPerPage, 1);
 			}
 		}))
 		.pipe( inject(gulp.src(['precompiled/components/class/class_action.html']), {
 			starttag: '<!-- inject:class_2:{{ext}} -->',
 			transform: function (filePath, file) {
-				return duplicate(file, actionsPerPage, 1 + actionsPerPage);
+				return duplicate(file, classActionsPerPage, 1 + classActionsPerPage);
+			}
+		}))
+		.pipe( inject(gulp.src(['precompiled/components/class/custom_class.html']), {
+			starttag: '<!-- inject:custom_class:{{ext}} -->',
+			transform: function (filePath, file) {
+				return duplicate(file, customClassCount, 1);
 			}
 		}))
 		.pipe( inject(gulp.src(['precompiled/components/armor/armor.html']), {
