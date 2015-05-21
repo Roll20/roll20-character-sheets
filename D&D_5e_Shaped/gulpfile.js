@@ -6,7 +6,8 @@ var gulp = require('gulp'),
 var numberOfActions = 12,
 	numberOfLairActions = 4,
 	numberOfLegendaryActions = 4,
-	numberOfWeapons = 7;
+	numberOfWeapons = 7,
+	armorCount = 10;
 
 
 function actionsCompile (file, limit, action_type, action_name) {
@@ -21,10 +22,17 @@ function actionsCompile (file, limit, action_type, action_name) {
 	}
 	return s.join('\n\n');
 }
-function duplicate (file, limit) {
+function duplicate (file, limit, start) {
 	var template = file.contents.toString('utf8'),
 		s = [];
-	for (var i = 0; i < limit; i++) {
+
+	if(!start) {
+		start = 0;
+	} else if (start > 0) {
+		limit += start;
+	}
+
+	for (var i = start; i < limit; i++) {
 		s.push(template
 			.replace(/\x7B\x7Bnum\x7D\x7D/g, i.toString())
 		);
@@ -64,6 +72,12 @@ gulp.task('compile', function() {
 			starttag: '<!-- inject:ranged:{{ext}} -->',
 			transform: function (filePath, file) {
 				return duplicate(file, numberOfWeapons);
+			}
+		}))
+		.pipe( inject(gulp.src(['precompiled/components/armor/armor.html']), {
+			starttag: '<!-- inject:armor:{{ext}} -->',
+			transform: function (filePath, file) {
+				return duplicate(file, armorCount, 1);
 			}
 		}))
 		.pipe( gulp.dest('./') )
