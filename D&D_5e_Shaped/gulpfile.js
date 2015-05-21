@@ -9,6 +9,7 @@ var actionCount = 12,
 	weaponCount = 7,
 	classActionsPerPage = 10,
 	customClassCount = 6,
+	spellCount = 9,
 	armorCount = 10,
 	inventoryPerPage = 15;
 
@@ -93,6 +94,12 @@ gulp.task('compile', function() {
 			starttag: '<!-- inject:custom_class:{{ext}} -->',
 			transform: function (filePath, file) {
 				return duplicate(file, customClassCount, 1);
+			}
+		}))
+		.pipe( inject(gulp.src(['precompiled/components/spellbook/spell-page.html']), {
+			starttag: '<!-- inject:spells:{{ext}} -->',
+			transform: function (filePath, file) {
+				return duplicate(file, spellCount, 1);
 			}
 		}))
 		.pipe( inject(gulp.src(['precompiled/components/armor/armor.html']), {
