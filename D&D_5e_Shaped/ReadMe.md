@@ -13,6 +13,11 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### Changelog
 
+**21st May 2015**
+
+* Roll template's width is shrunk a bit to work with hidden chat avatars. Still larger than normal, but only by 6 pixels.
+* (dev) used gulp to compile many pages to reduce duplicate code while making changes (doesn't change length for the final ouput)
+
 **17-20th May 2015**
 
 * Quick Actions example done - need to think about this before duplicating it
