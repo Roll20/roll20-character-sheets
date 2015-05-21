@@ -66,8 +66,20 @@ gulp.task('compile', function() {
 				return actionsCompile(file, actionCount, '', 'Action');
 			}
 		}))
+		.pipe( inject(gulp.src(['precompiled/components/quick_weapons/melee_template.html']), {
+			starttag: '<!-- inject:quickMelee:{{ext}} -->',
+			transform: function (filePath, file) {
+				return duplicate(file, weaponCount);
+			}
+		}))
 		.pipe( inject(gulp.src(['precompiled/components/weapons/melee.html']), {
 			starttag: '<!-- inject:melee:{{ext}} -->',
+			transform: function (filePath, file) {
+				return duplicate(file, weaponCount);
+			}
+		}))
+		.pipe( inject(gulp.src(['precompiled/components/quick_weapons/ranged_template.html']), {
+			starttag: '<!-- inject:quickRanged:{{ext}} -->',
 			transform: function (filePath, file) {
 				return duplicate(file, weaponCount);
 			}
