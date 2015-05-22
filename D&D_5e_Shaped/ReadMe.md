@@ -15,6 +15,7 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 **22nd May 2015**
 
+* Ammo is now toggleable to show in the output.
 * Added an optional button to ranged weapons that will auto increment ammo if you also have my script installed. https://app.roll20.net/forum/post/1734923/new-d-and-d-5e-shaped-character-sheet
 
 **21st May 2015**
