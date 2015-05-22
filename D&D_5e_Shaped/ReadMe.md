@@ -13,6 +13,10 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### Changelog
 
+**22nd May 2015**
+
+* Added an optional button to ranged weapons that will auto increment ammo if you also have my script installed. https://app.roll20.net/forum/post/1734923/new-d-and-d-5e-shaped-character-sheet
+
 **21st May 2015**
 
 * Roll template's width is shrunk a bit to work with hidden chat avatars. Still larger than normal, but only by 6 pixels.
