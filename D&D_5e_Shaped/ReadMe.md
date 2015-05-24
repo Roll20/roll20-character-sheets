@@ -4,6 +4,8 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### TODO
 
+* Make spells automatically reduce the amount left
+* Add "Conditions" that make sheet-wide changes when a condition is toggled.
 * Look into proficiency dice
 * Revamp weapons based on Actions.
 * Actions: Allow for "Effects" to be whispered to the GM for
