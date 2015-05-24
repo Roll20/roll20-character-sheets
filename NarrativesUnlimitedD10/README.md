@@ -27,10 +27,15 @@ Narratives Unlimited D10 is a universal story focussed RPG published under a Cre
 ##Important Info
 ###Autocalculation
 When wounds are entered in locations, they are applied to the skill and attack rolls and adjusted for size and hit location type.
-Stats and skills are auto calculated now.
+
+Stats and skills are auto calculated now, no longer do you have to add them up by hand, additionally the Stat bonus is autocalculated and the stat portion of the skill score is selected from a list and dynamically linked to the stats.
+
 One handed weapon uses need to specify which hand is being used as well as whether they are left or right handed, ambidextrous, or lack hands (yes that is an option).  This will ensure that the right penalties are applied when your character is wounded, and auto applies the offhand penalty.
+
 When inventory locations are used, the encumbrence is auto calculated, as is the encumbrance penalties.  If a character has ranks in UA portage they can add it to the settings page to ensure proper encumbrance calculation.
+
 Temporary modifiers are available on the settings page, these can be used to create effects like magical boosts, stuns, and other conditions which are ephemeral.
+
 Armour penalties calculation requires the user to sum up the penalties from the list of armour pieces worn (max and min) and input the Armour UA, the calculation is automatically made and applied after this is done.
 ####Autocalc Settings
 The settings page contains a number of fields to set most of which are preset for human(oid) characters who are right handed. Ambidextrous characters, fish, birds, gigantic psycic mule deer and the like will have to modify hit location types, size settings and so forth here in order for things to calculate correctly.  Simply select the options from the lists that apply to your character.
@@ -38,9 +43,11 @@ The settings page contains a number of fields to set most of which are preset fo
 NUD10 open ended rolls are not supported in the basic Roll 20 die roller, however they can still be made manually.  The roll templates notify you when a roll is open ended and you can roll a d10 as many times as needed to complete the open ended roll.  An API script is avialable but at this time it does not yet support inline rolls.  I perfer to play without the automated roll since the schrodinger's cat like experience of open ended rolls is more fun that way.
 ###Migrating older character sheets
 A considerable amount of time was taken to ensure that most fields coppy across directly. including large lists.  Variable names are left mostly the same.
+
 A number of fields have been changed to autocalculating ones and as a result the saved variables for these fields can cause some conflicts.  There is a simple remedy however, you can use the Attributes and Abilites tab to delete any conflicting fields without harming your character.
 ##Limitations
 Situational bonuses (most UAs for example) are not applied automatically though UA:Armour and UA:portage have fields that can be filled in.
+
 Repeating sections can not currently be autocalculated or linked to other parts of the sheet.  The adding up of inventory and armour pieces can be accomplished with an api script (in the works) but this will be a mentor option only.
 The only linkage that is problematic at the moment is the linkage with the attack table when characters are boosted or have a condition applied, the skill score used is not auto updated.
 ##Known bugs
