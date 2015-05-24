@@ -17,7 +17,7 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 **24th May 2015**
 
-* Weapons can now run chat commands on each roll. Courtesy of Jason H.(jjsheets on github).
+* Weapons can now run chat commands on each roll. Courtesy of Jeff S.(jjsheets on github).
 
 **23rd May 2015**
 
