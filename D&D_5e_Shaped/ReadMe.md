@@ -4,6 +4,8 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### TODO
 
+* Make spells automatically reduce the amount left
+* Add "Conditions" that make sheet-wide changes when a condition is toggled.
 * Look into proficiency dice
 * Revamp weapons based on Actions.
 * Actions: Allow for "Effects" to be whispered to the GM for
@@ -12,6 +14,15 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 
 ### Changelog
+
+**23rd May 2015**
+
+* Spell points work on the core page as well now
+
+**22nd May 2015**
+
+* Ammo is now toggleable to show in the output.
+* Added an optional button to ranged weapons that will auto increment ammo if you also have my script installed. https://app.roll20.net/forum/post/1734923/new-d-and-d-5e-shaped-character-sheet
 
 **21st May 2015**
 
