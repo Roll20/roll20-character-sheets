@@ -15,6 +15,10 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### Changelog
 
+**24th May 2015**
+
+* Weapons can now run chat commands on each roll. Courtesy of Jason H.(jjsheets on github).
+
 **23rd May 2015**
 
 * Spell points work on the core page as well now
