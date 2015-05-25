@@ -3,6 +3,7 @@ var gulp = require('gulp'),
 	inject = require('gulp-inject');
 
 var customSkillCount = 4,
+	outputOtionsCount = 1,
 	traitsCount = 5,
 	actionCount = 12,
 	lairActionCount = 4,
@@ -125,7 +126,7 @@ gulp.task('compile', function() {
 		.pipe( inject(gulp.src(['precompiled/components/class/output_options.html']), {
 			starttag: '<!-- inject:outputOptions:{{ext}} -->',
 			transform: function (filePath, file) {
-				return includeFile(file);
+				return duplicate(file, outputOtionsCount);
 			}
 		}))
 		.pipe( inject(gulp.src(['precompiled/components/traits/traits.html']), {
