@@ -6,6 +6,7 @@ var customSkillCount = 4,
 	actionCount = 12,
 	lairActionCount = 4,
 	legendaryActionCount = 4,
+	actionsCount = 11,
 	weaponCount = 7,
 	classActionsPerPage = 10,
 	customClassCount = 6,
@@ -128,6 +129,12 @@ gulp.task('compile', function() {
 			starttag: '<!-- inject:legendaryActions:{{ext}} -->',
 			transform: function (filePath, file) {
 				return actionsCompile(file, legendaryActionCount, 'legendary_', 'Legendary');
+			}
+		}))
+		.pipe( inject(gulp.src(['precompiled/components/quick_weapons/actions_template.html']), {
+			starttag: '<!-- inject:quickActions:{{ext}} -->',
+			transform: function (filePath, file) {
+				return duplicate(file, actionsCount);
 			}
 		}))
 		.pipe( inject(gulp.src(['precompiled/components/actions/actions.html']), {
