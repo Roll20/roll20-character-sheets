@@ -28,7 +28,7 @@ Narratives Unlimited D10 is a universal story focussed RPG published under a Cre
 ###Autocalculation
 When wounds are entered in locations, they are applied to the skill and attack rolls and adjusted for size and hit location type.
 
-Stats and skills are auto calculated now, no longer do you have to add them up by hand, additionally the Stat bonus is autocalculated and the stat portion of the skill score is selected from a list and dynamically linked to the stats.
+Stats, skills, and derived rolls are auto calculated now, no longer do you have to add them up by hand, additionally the Stat bonus is autocalculated and the stat portion of the skill score is selected from a list and dynamically linked to the stats.
 
 One handed weapon uses need to specify which hand is being used as well as whether they are left or right handed, ambidextrous, or lack hands (yes that is an option).  This will ensure that the right penalties are applied when your character is wounded, and auto applies the offhand penalty.
 
@@ -39,6 +39,7 @@ Temporary modifiers are available on the settings page, these can be used to cre
 Armour penalties calculation requires the user to sum up the penalties from the list of armour pieces worn (max and min) and input the Armour UA, the calculation is automatically made and applied after this is done.
 ####Autocalc Settings
 The settings page contains a number of fields to set most of which are preset for human(oid) characters who are right handed. Ambidextrous characters, fish, birds, gigantic psycic mule deer and the like will have to modify hit location types, size settings and so forth here in order for things to calculate correctly.  Simply select the options from the lists that apply to your character.
+Since not all abilities have unconditional bonuses, those most that consistantly modify rolls have been added to the settings tab (UA:Armour is in the armour section on the combat tab), either check them or enter the bonus.  An api script will later automate this for mentor level users.
 ###Open Ended Rolls
 NUD10 open ended rolls are not supported in the basic Roll 20 die roller, however they can still be made manually.  The roll templates notify you when a roll is open ended and you can roll a d10 as many times as needed to complete the open ended roll.  An API script is avialable but at this time it does not yet support inline rolls.  I perfer to play without the automated roll since the schrodinger's cat like experience of open ended rolls is more fun that way.
 ###Migrating older character sheets
