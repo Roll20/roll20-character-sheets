@@ -95,7 +95,7 @@
 					<input type="hidden" name="attr_Pn_aptmin" value="((@{Pn_Apttally} + 3) - abs(@{Pn_Apttally} - 3)) /2" />
 					<input type="hidden" name="attr_Pn_aptmax" value="((@{Pn_aptmin} - 3) + abs(@{Pn_aptmin} + 3)) /2" />
 					<div class="sheet-col-1-16 sheet-center"><input type="number" name="attr_Pn_Apt" value="@{Pn_aptmax}" disabled="true"/></div>
-					<div class="sheet-col-1-16 sheet-center"><button type="roll" class="sheet-d10-roll-button" name="roll_Pn" value="&{template:nud10} {{title=Perception Roll}} {{subheader=@{character_name}}} {{rollname=Perception}} {{roll=[[1d10 + [[@{Pn}]] ]]}}" /></div>
+					<div class="sheet-col-1-16 sheet-center"><button type="roll" class="sheet-d10-roll-button" name="roll_Pn" value="&{template:nud10} {{title=Perception Roll}} {{subheader=@{character_name}}} {{rollname=Perception}} {{roll=[[1d10 + [[@{Pn}]] - @{blissig} ]]}}" /></div>
 				</div>
 				<div class="sheet-row">
 					<div class="sheet-col-1-4 sheet-sidehead sheet-padr sheet-right">Agility (Ag)</div>
@@ -157,7 +157,9 @@
 					<div class="sheet-col-1-4 sheet-sidehead sheet-padr sheet-right">Culture/Nationality</div>
 					<div class="sheet-col-1-2 sheet-left"><input type="text" name="attr_Culture" /></div>
 					<div class="sheet-col-1-8 sheet-sidehead sheet-padr sheet-right">Speed</div>
-					<div class="sheet-col-1-8 sheet-left"><input type="number" name="attr_Speed" min="0.5" value="3"/></div>
+					<input type="hidden" name="attr_basespeed" value="@{speedsizespec} +@{Ag_Apt} + @{quick}" />
+					<input type="hidden" name="attr_speedmax" value="((@{basespeed} + 0.5) + abs(@{basespeed} - 0.5)) /2" />
+					<div class="sheet-col-1-8 sheet-left"><input type="number" name="attr_Speed" min="" value="@{speedmax}" disabled="true"/></div>
 				</div>
 				<div class="sheet-row sheet-shade">
 					<div class="sheet-col-1-4 sheet-sidehead sheet-padr sheet-right">Species</div>
@@ -316,29 +318,29 @@
 			<div class="sheet-col-1-5">
 				<div class="sheet-row">
 					<div class="sheet-col-1-3 sheet-sub-header sheet-center">Defence</div>
-					<div class="sheet-col-1-3 sheet-center"><input type="number" name="attr_defence" class="sheet-tp"/></div>
-					<div class="sheet-col-1-3 sheet-center"><button type="roll" class="sheet-d10-roll-button" name="roll_defence" value="&{template:nud10} {{title=Defence Roll}} {{subheader=@{character_name}}} {{rollname=Defence}} {{roll=[[1d10+ @{defence} + @{TMDef}]]}}"/></div>
+					<div class="sheet-col-1-3 sheet-center"><input type="number" name="attr_defence" value="@{Ag} + @{dodge} + 2 * @{nimble} + @{sizedef}" class="sheet-tp" disabled="true"/></div>
+					<div class="sheet-col-1-3 sheet-center"><button type="roll" class="sheet-d10-roll-button" name="roll_defence" value="&{template:nud10} {{title=Defence Roll}} {{subheader=@{character_name}}} {{rollname=Defence}} {{roll=[[1d10+ [[@{defence}]] - [[@{Encpen} + @{Attackpen} + @{Movepen} + @{Mentalpen}]] [Penalties] + @{TMDef} [TM]]]}}"/></div>
 				</div>
 			</div>
 			<div class="sheet-col-1-5">
 				<div class="sheet-row">
 					<div class="sheet-col-1-3 sheet-sub-header sheet-center">Damage</div>
-					<div class="sheet-col-1-3 sheet-center"><input type="number" name="attr_damage" class="sheet-tp"/></div>
-					<div class="sheet-col-1-3 sheet-center"><button type="roll" class="sheet-d10-roll-button" name="roll_damage" value="&{template:nud10} {{title=Damage Roll}} {{subheader=@{character_name}}} {{rollname=Damage}} {{roll=[[1d10+  @{damage} + @{TMDam}]]}}"/></div>
+					<div class="sheet-col-1-3 sheet-center"><input type="number" name="attr_damage" class="sheet-tp" value="@{Sm} + @{toughness}" title="Does not include armour bonus for the hit location" disabled="true"/></div>
+					<div class="sheet-col-1-3 sheet-center"><button type="roll" class="sheet-d10-roll-button" name="roll_damage" value="&{template:nud10} {{title=Damage Roll}} {{subheader=@{character_name}}} {{rollname=Damage}} {{roll=[[1d10+ [[@{damage}]] [Score] + @{TMDam} [TM]]]}}"/></div>
 				</div>
 			</div>
 			<div class="sheet-col-1-5">
 				<div class="sheet-row">
 					<div class="sheet-col-1-3 sheet-sub-header sheet-center">Initiative</div>
-					<div class="sheet-col-1-3 sheet-center"><input type="number" name="attr_initiative" class="sheet-tp"/></div>
-					<div class="sheet-col-1-3 sheet-center"><button type="roll" class="sheet-d10-roll-button" name="roll_initiative" value="&{template:nud10} {{title=Initiative Roll}} {{subheader=@{character_name}}} {{rollname=Initiative}} {{roll=[[1d10+ @{initiative} + @{TMInit}  &{tracker}]]}}"/></div>
+					<div class="sheet-col-1-3 sheet-center"><input type="number" name="attr_initiative" value="@{Ag} + 2 * @{quick}" class="sheet-tp" disabled="true"/></div>
+					<div class="sheet-col-1-3 sheet-center"><button type="roll" class="sheet-d10-roll-button" name="roll_initiative" value="&{template:nud10} {{title=Initiative Roll}} {{subheader=@{character_name}}} {{rollname=Initiative}} {{roll=[[1d10+ [[@{initiative}]] [Score] + @{TMInit} [TM] &{tracker}]]}}"/></div>
 				</div>
 			</div>
 			<div class="sheet-col-1-5">
 				<div class="sheet-row">
 					<div class="sheet-col-1-3 sheet-sub-header sheet-center">Sanity</div>
-					<div class="sheet-col-1-3 sheet-center"><input type="number" name="attr_sanity" class="sheet-tp"/></div>
-					<div class="sheet-col-1-3 sheet-center"><button type="roll" class="sheet-d10-roll-button" name="roll_sanity" value="&{template:nud10} {{title=Sanity Roll}} {{subheader=@{character_name}}} {{rollname=Sanity}} {{roll=[[1d10+ @{sanity} + @{TMSan}]]}}"/></div>
+					<div class="sheet-col-1-3 sheet-center"><input type="number" name="attr_sanity" value="@{Wl} + @{mres} - @{darkknow} + 3 * @{blissig}" class="sheet-tp" disabled="true" /></div>
+					<div class="sheet-col-1-3 sheet-center"><button type="roll" class="sheet-d10-roll-button" name="roll_sanity" value="&{template:nud10} {{title=Sanity Roll}} {{subheader=@{character_name}}} {{rollname=Sanity}} {{roll=[[1d10+ [[@{sanity}]] [Score] + @{TMSan} [TM]]]}}"/></div>
 				</div>
 			</div>
 			<div class="sheet-col-1-5">
@@ -348,6 +350,7 @@
 				</div>
 			</div>
 		</div>
+		<!--Attacks Rituals and Wounds -->
 		<div class="sheet-row">
 			<!--Attacks et al -->
 			<div class="sheet-col-7-12 sheet-padr">
@@ -547,7 +550,7 @@
 					<div class="sheet-col-1-4 sheet-sidehead sheet-right sheet-padr">Current Bleeding</div>
 					<div class="sheet-col-1-8"><input type="number" name="attr_bleed" class="sheet-tp"/></div>
 					<div class="sheet-col-1-6 sheet-sidehead sheet-right sheet-padr">Bleed Max</div>
-					<div class="sheet-col-1-8"><input type="number" name="attr_bleed_max" class="sheet-tp" value="@{Sm}" disabled="true"/></div>
+					<div class="sheet-col-1-8"><input type="number" name="attr_bleed_max" class="sheet-tp" value="floor((@{Sm}) / (@{penadjust}))" disabled="true"/></div>
 					<div class="sheet-col-1-6 sheet-sidehead sheet-right sheet-padr">Wound Increments</div>
 					<div class="sheet-col-1-8"><input type="number" name="attr_woundinc" value="@{size}" class="sheet-tp" disabled="true"/></div>
 				</div>
@@ -1128,7 +1131,47 @@
 					<input type="hidden" name="attr_hfloat3" value="@{hfloat2} * (1 - @{rhand} )" />
 					<input type="hidden" name="attr_lhand" value="floor(@{hfloat3} / 0.09) " />
 				</div>
+				<div class="sheet-row sheet-shade">
+					<div class="sheet-col-1-6 sheet-sidehead sheet-right sheet-padr">Size Defencive Bonus</div>
+					<div class="sheet-col-1-6">
+						<select name="attr_sizedef">
+							<option value="10">10</option>
+							<option value="5">5</option>
+							<option value="2">2</option>
+							<option value="0" selected="selected">0</option>
+							<option value="-2">-2</option>
+							<option value="-5">-5</option>
+							<option value="-10">-10</option>
+							<option value="-15">-15</option>
+							<option value="-20">-20</option>
+							<option value="-25">-25</option>
+						</select>
+					</div>
+					<div class="sheet-col-1-6 sheet-sidehead sheet-right sheet-padr">Speed</div>
+					<div class="sheet-col-1-6"><input type="number" name="attr_speedsizespec" title="Species and size speed adjustment" value="3" min="0" /></div>
+				</div>
 				<div class="sheet-row">
+					<div class="sheet-col sheet-sub-header sheet-center">Important Abilities</div>
+				</div>
+				<div class="sheet-row">
+					<div class="sheet-col-1-6 sheet-sidehead sheet-right sheet-padr">Mental Resillience</div>
+					<div class="sheet-col-1-6"><input type="number" name="attr_mres" value="0" min="0" /></div>
+					<div class="sheet-col-1-6 sheet-sidehead sheet-right sheet-padr">Dark Knowledge</div>
+					<div class="sheet-col-1-6"><input type="number" name="attr_darkknow" value="0" min="0" /></div>
+					<div class="sheet-col-1-6 sheet-sidehead sheet-right sheet-padr">Blissful Ignorance</div>
+					<div class="sheet-col-1-6"><input type="checkbox" name="attr_blissig" value="1" min="0" /></div>
+				</div>
+				<div class="sheet-row sheet-shade">
+					<div class="sheet-col-1-6 sheet-sidehead sheet-right sheet-padr">Dodge</div>
+					<div class="sheet-col-1-6"><input type="number" name="attr_dodge" value="0" min="0" /></div>
+					<div class="sheet-col-1-6 sheet-sidehead sheet-right sheet-padr">Nimble</div>
+					<div class="sheet-col-1-6"><input type="checkbox" name="attr_nimble" value="1" /></div>
+					<div class="sheet-col-1-6 sheet-sidehead sheet-right sheet-padr">Quick</div>
+					<div class="sheet-col-1-6"><input type="checkbox" name="attr_quick" value="1" /></div>
+				</div>
+				<div class="sheet-row">
+					<div class="sheet-col-1-6 sheet-sidehead sheet-right sheet-padr">Toughness</div>
+					<div class="sheet-col-1-6"><input type="number" name="attr_toughness" title="Enter a 3 for the trained ability or the UA bonus, never both" value="0" min="0" /></div>
 					<div class="sheet-col-1-6 sheet-sidehead sheet-right sheet-padr">Portage</div>
 					<div class="sheet-col-1-6"><input type="number" name="attr_portage" value="0" min="0" /></div>
 				</div>
