@@ -3,10 +3,10 @@ var gulp = require('gulp'),
 	inject = require('gulp-inject');
 
 var customSkillCount = 4,
+	traitsCount = 5,
 	actionCount = 12,
 	lairActionCount = 4,
 	legendaryActionCount = 4,
-	actionsCount = 12,
 	weaponCount = 7,
 	classActionsPerPage = 10,
 	customClassCount = 6,
@@ -32,6 +32,9 @@ function actionsCompile (file, limit, action_type, action_name) {
 		);
 	}
 	return s.join('\n\n');
+}
+function includeFile (file) {
+	return file.contents.toString('utf8');
 }
 function duplicate (file, limit, start) {
 	var template = file.contents.toString('utf8'),
@@ -119,6 +122,18 @@ gulp.task('compile', function() {
 				return duplicate(file, customSkillCount, 1);
 			}
 		}))
+		.pipe( inject(gulp.src(['precompiled/components/class/output_options.html']), {
+			starttag: '<!-- inject:outputOptions:{{ext}} -->',
+			transform: function (filePath, file) {
+				return includeFile(file);
+			}
+		}))
+		.pipe( inject(gulp.src(['precompiled/components/traits/traits.html']), {
+			starttag: '<!-- inject:traits:{{ext}} -->',
+			transform: function (filePath, file) {
+				return duplicate(file, traitsCount);
+			}
+		}))
 		.pipe( inject(gulp.src(['precompiled/components/actions/actions.html']), {
 			starttag: '<!-- inject:lairActions:{{ext}} -->',
 			transform: function (filePath, file) {
@@ -134,7 +149,7 @@ gulp.task('compile', function() {
 		.pipe( inject(gulp.src(['precompiled/components/quick_weapons/actions_template.html']), {
 			starttag: '<!-- inject:quickActions:{{ext}} -->',
 			transform: function (filePath, file) {
-				return duplicate(file, actionsCount);
+				return duplicate(file, actionCount);
 			}
 		}))
 		.pipe( inject(gulp.src(['precompiled/components/actions/actions.html']), {
