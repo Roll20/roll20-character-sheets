@@ -6,6 +6,7 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 * Make spells automatically reduce the amount left
 * Add "Conditions" that make sheet-wide changes when a condition is toggled.
+* Use the new roll templates greater than to enhance ac targeting. https://app.roll20.net/forum/post/1977290/update-5-slash-20-improved-player-directory-and-new-roll-template-features
 * Look into proficiency dice
 * Revamp weapons based on Actions.
 * Actions: Allow for "Effects" to be whispered to the GM for
