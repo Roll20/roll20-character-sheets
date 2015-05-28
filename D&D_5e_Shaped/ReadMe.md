@@ -4,13 +4,72 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### TODO
 
-* Revamp weapons based on Actions.
-* Actions: Allow for "Effects" to be whispered to the GM for
+* Try to make settings global
 * Revamp Traits. Keep fluff traits on the first page and for action like traits write "see Actions". Also include fluff traits on "Actions".
+* Make spells automatically reduce the amount left
+* Add "Conditions" that make sheet-wide changes when a condition is toggled.
+* Use the new roll templates greater than to enhance ac targeting. https://app.roll20.net/forum/post/1977290/update-5-slash-20-improved-player-directory-and-new-roll-template-features
+* Look into proficiency dice
+* Actions: Allow for "Effects" to be whispered to the GM.
 * Consider alternative sheet layout of skills under the stats
 
 
 ### Changelog
+
+**24th May 2015**
+
+* Weapons can now run chat commands on each roll. Courtesy of Jeff S.(jjsheets on github).
+
+**23rd May 2015**
+
+* Spell points work on the core page as well now
+
+**22nd May 2015**
+
+* Ammo is now toggleable to show in the output.
+* Added an optional button to ranged weapons that will auto increment ammo if you also have my script installed. https://app.roll20.net/forum/post/1734923/new-d-and-d-5e-shaped-character-sheet
+
+**21st May 2015**
+
+* Roll template's width is shrunk a bit to work with hidden chat avatars. Still larger than normal, but only by 6 pixels.
+* (dev) used gulp to compile many pages to reduce duplicate code while making changes (doesn't change length for the final ouput)
+
+**17-20th May 2015**
+
+* Quick Actions example done - need to think about this before duplicating it
+* Thrown weapons removed
+* Some NPC elements now show on the PC sheet (Blindsight, other speeds)
+* Expanded weapons out to 7 each
+* Resized all of the core page to allow for quick weapons
+* Weapons tab now has quick weapons as well
+
+**16th May 2015**
+
+* Added spell components to the spell header
+* Made inputs smaller by default all over the sheet
+* Added toggle for Old weapons
+* Action name inputs are now big like spells and weapons
+
+**14th May 2015**
+
+* Fixed initiative
+* Removed name from the other roll templates as well as cleaned more up
+* Added an option setting to show the character name on all rolls. It is off by default.
+
+**13th May 2015**
+
+* Cleaned up CSS and expanded the roll template 20 px to the left
+* Moved Ritual and Concentration icon to the top right of the roll template header
+* Put Range, Reach, target, and spell details in the roll template header.
+
+**12th May 2015**
+
+* Spell Effects on a new line instead of a column
+* Fix bug around printing out hd max values for players
+* Shrunk the "Higher Level" textarea for spells and increased the description textarea.
+* Allowed for the "Effects" textarea to be resized
+* Revamped the spell roll template
+* Added icons for Ritual and Concentration on the spell roll template
 
 **9th May 2015**
 
