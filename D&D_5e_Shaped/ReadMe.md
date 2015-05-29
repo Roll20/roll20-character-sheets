@@ -16,6 +16,11 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### Changelog
 
+**29th May 2015**
+
+* Class actions work on new weapons
+* Character name is on its own line on the roll template now
+
 **24th May 2015**
 
 * Weapons can now run chat commands on each roll. Courtesy of Jeff S.(jjsheets on github).
