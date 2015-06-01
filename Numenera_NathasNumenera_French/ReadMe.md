@@ -5,7 +5,7 @@ Bas&eacute;e sur la feuille de personnage "Numenera" d&eacute;j&agrave; pr&eacut
 Voir en fin de fichier pour les notes de versions.
 
 # Version courante :
-Version 4.2 (avril 2015) : [Capture d'&eacute;cran](NathasNumenera_tabs_v4-2.jpg).
+Version 4.3 (Mai 2015) : [Capture d'&eacute;cran](NathasNumenera_tabs_v4-2.jpg).
 
 # Utilisation basique :
 
@@ -54,6 +54,10 @@ Alternative (permettant de modifier les sources &agrave; votre convenance si vou
 3. Si n&eacute;cessaire, pour cr&eacute;er vos propres macros ou boutons, lisez le [Wiki](https://wiki.roll20.net/Script:Numenera_Natha).
 
 # Notes de version
+
+##Version 4.3 (Mai 2015)
+Ajout du niveau de comp&eacute;tence dans les param&egrave;tres de Jet.
+Le script API &eacute;t&eacute; mis &agrave; jour en cons&eacute;quence.
 
 ##Version 4.2 (Avril 2015)
 D&eacute;but d'int&eacute;gration de la traduction officielle VF de [Black Book Editions](http://www.black-book-editions.fr/contenu/file/165_nu_feuille_de_personnage_v0.pdf).
