@@ -4,6 +4,7 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### TODO
 
+* Look into implementing halfling luck
 * Try to make settings global
 * Revamp Traits. Keep fluff traits on the first page and for action like traits write "see Actions". Also include fluff traits on "Actions".
 * Make spells automatically reduce the amount left
