@@ -16,6 +16,11 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### Changelog
 
+**7th June 2015**
+
+* Passive Perception in the header now corectly adds the bonus
+* Class Actions added to new weapons
+
 **29th May 2015**
 
 * Class actions work on new weapons
