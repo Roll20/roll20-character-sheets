@@ -17,6 +17,11 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### Changelog
 
+**8th June 2015**
+
+* Hide fields from weapons output now that class actions are added to the new weapons
+* Remove name from the emote
+
 **7th June 2015**
 
 * Passive Perception in the header now corectly adds the bonus
