@@ -4,6 +4,7 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### TODO
 
+* Look into implementing halfling luck
 * Try to make settings global
 * Revamp Traits. Keep fluff traits on the first page and for action like traits write "see Actions". Also include fluff traits on "Actions".
 * Make spells automatically reduce the amount left
@@ -15,6 +16,16 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 
 ### Changelog
+
+**8th June 2015**
+
+* Hide fields that shouldn't be displayed from weapons output now that class actions are added to the new weapons
+* Remove name from the emote
+
+**7th June 2015**
+
+* Passive Perception in the header now corectly adds the bonus
+* Class Actions added to new weapons
 
 **29th May 2015**
 
