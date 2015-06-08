@@ -8,7 +8,7 @@
 			<div class="sheet-row">
 				<span class="sheet-spacer"></span>
 				<div class="sheet-col-1-4 sheet-sidehead sheet-padr sheet-right">Name</div>
-				<div class="sheet-col-3-4 sheet-left"><input type="text" name="attr_character_name" /></div>
+				<div class="sheet-col-3-4 sheet-left"><input type="text" class="sheet-tp" name="attr_character_name" /></div>
 			</div>
 		</div>
 	</div>
@@ -20,11 +20,13 @@
 		<input type="radio" name="attr_tab" class="sheet-tab sheet-tab3" value="3"/>
 		<span class="sheet-tab sheet-tab3">Combat</span>
 		<input type="radio" name="attr_tab" class="sheet-tab sheet-tab4" value="4"/>
-		<span class="sheet-tab sheet-tab4">Equipment</span>
+		<span class="sheet-tab sheet-tab4">Magic &Psi;</span>
 		<input type="radio" name="attr_tab" class="sheet-tab sheet-tab5" value="5"/>
-		<span class="sheet-tab sheet-tab5">Notes</span>
+		<span class="sheet-tab sheet-tab5">Equipment</span>
 		<input type="radio" name="attr_tab" class="sheet-tab sheet-tab6" value="6"/>
-		<span class="sheet-tab sheet-tab6">Settings</span>
+		<span class="sheet-tab sheet-tab6">Notes</span>
+		<input type="radio" name="attr_tab" class="sheet-tab sheet-tab7" value="7"/>
+		<span class="sheet-tab sheet-tab7">Settings</span>
 		<input type="radio" name="attr_tab" class="sheet-tab sheet-tab99" value="99"/>
 		<span class="sheet-tab sheet-tab99">Show All</span>
 		<span class="sheet-spacer"></span>
@@ -353,24 +355,24 @@
 				</div>
 			</div>
 		</div>
-		<!--Attacks Rituals and Wounds -->
+		<!--Attacks -->
 		<div class="sheet-row">
 			<!--Attacks et al -->
-			<div class="sheet-col-7-12 sheet-padr">
+			<div class="sheet-col-1 sheet-padr">
 				<!--Attacks -->
 				<h3>Weapons/Attacks</h3>
 				<div class="sheet-row">
 					<div class="sheet-col-1-16 sheet-sub-header sheet-center">H</div>
 					<div class="sheet-col-1-16 sheet-sub-header sheet-center">I</div>
 					<div class="sheet-col-1-4 sheet-sub-header sheet-center">Weapon/Attack</div>
+					<div class="sheet-col-1-16 sheet-sub-header sheet-center">Bonus</div>
 					<div class="sheet-col-1-16 sheet-sub-header sheet-center">RI</div>
 					<div class="sheet-col-1-16 sheet-sub-header sheet-center">Reload</div>
-					<div class="sheet-col-1-8 sheet-sub-header sheet-center">Ammo</div>
+					<div class="sheet-col-1-8 sheet-sub-header sheet-center">Ammo Type</div>
+					<div class="sheet-col-1-16 sheet-sub-header sheet-center">Ammo Used</div>
 					<div class="sheet-col-1-16 sheet-sub-header sheet-center">Type</div>
-					<div class="sheet-col-1-8 sheet-sub-header sheet-center">Attack Size</div>
-					<!--This section works
-					<div class="sheet-col-1-8 sheet-sub-header sheet-center">Score</div>-->
-					<div class="sheet-col-1-8 sheet-sub-header sheet-center">Skill #</div>
+					<div class="sheet-col-1-16 sheet-sub-header sheet-center">Attack Size</div>
+					<div class="sheet-col-1-16 sheet-sub-header sheet-center">Skill #</div>
 					<div class="sheet-col-1-16 sheet-sub-header sheet-center">&nbsp;</div>
 				</div>
 				<fieldset class="repeating_attacks">
@@ -387,7 +389,7 @@
 						<input type="hidden" name="attr_hfloat4" value="@{attackhand} * (1 - @{woff} )" />
 						<input type="hidden" name="attr_wprim" value="floor(@{hfloat4} / 0.9)" />
 						<!--Now to finally make some numbers -->
-						<input type="hidden" name="attr_offpenalty" value="4*@{woff}*abs(1-@{ambidex})" />
+						<input type="hidden" name="attr_offpenalty" value="3*@{woff}*abs(1-@{ambidex})" />
 						<div class="sheet-col-1-16 sheet-left">
 							<select name="attr_attackig" title="Set to the hand to ignore penalties from for one handed weapons, all others choose none.">
 								<option value="@{WL6pen}">Right</option>
@@ -396,12 +398,14 @@
 							</select>
 						</div>
 						<div class="sheet-col-1-4 sheet-left"><input type="text" name="attr_attackname" /></div>
+						<div class="sheet-col-1-16 sheet-center"><input type="number" name="attr_attackbonus" value="0" title="Attack bonus from weapon quality or magical item enhancement"/></div>
 						<div class="sheet-col-1-16 sheet-center"><input type="text" name="attr_attackri"/></div>
 						<div class="sheet-col-1-16 sheet-center"><input type="text" name="attr_attackreload" /></div>
 						<div class="sheet-col-1-8 sheet-center"><input type="text" name="attr_attackmmo"  /></div>
+						<div class="sheet-col-1-16 sheet-center"><input type="number" name="attr_attackrof" value="0" title="If your wepaon has multiple ROF settings e.g. single shot, burst, etc... then make one attack entry for each ROF" /></div>
 						<div class="sheet-col-1-16 sheet-center"><input type="text" name="attr_attacktype" /></div>
-						<div class="sheet-col-1-8 sheet-center"><input type="number" name="attr_attacksize" /></div>
-						<div class="sheet-col-1-8 sheet-center">
+						<div class="sheet-col-1-16 sheet-center"><input type="number" name="attr_attacksize" /></div>
+						<div class="sheet-col-1-16 sheet-center">
 							<!--This section works and allows you to input a raw score or a formula but will not link TMs or changes
 							<input type="text" name="attr_attackscore" title="The total of the skill score associated with this attack" /></div> -->
 							<!--This section is highly experimental and links all changes by pulling raw values from the other repeating section for use in this one-->
@@ -436,294 +440,16 @@
 								<option value="@{repeating_skills_27_skillstat} + @{repeating_skills_27_skillranks} + @{repeating_skills_27_skillother}">28</option>
 								<option value="@{repeating_skills_28_skillstat} + @{repeating_skills_28_skillranks} + @{repeating_skills_28_skillother}">29</option>
 								<option value="@{repeating_skills_29_skillstat} + @{repeating_skills_29_skillranks} + @{repeating_skills_29_skillother}">30</option>
-							</select><!--End experimental section-->
+							</select>
 							</div>
-						<div class="sheet-col-1-16 sheet-center"><button type="roll" class="sheet-d10-roll-button" name="roll_attackroll" value="&{template:nud10} {{title=@{attackname} Roll}} {{subheader=@{character_name}}} {{subheaderright=RI @{attackri}}} {{subheader2=Type @{attacktype}}} {{subheaderright2=AS @{attacksize}}} {{rollname=Attack}} {{roll=[[1d10 + [[@{attackscore}]] [Score] - [[([[@{Encpen}]] + [[@{Attackpen}]] -@{attackig} + @{Mentalpen})]] [Penalties] - [[@{offpenalty}]] [Offhand] ]]}} " /></div>
+						<div class="sheet-col-1-16 sheet-center"><button type="roll" class="sheet-d10-roll-button" name="roll_attackroll" value="&{template:nud10} {{title=@{attackname} Roll}} {{subheader=@{character_name}}} {{subheaderright=RI @{attackri}}} {{subheader2=Type @{attacktype}}} {{subheaderright2=AS @{attacksize}}} {{rollname=Attack}} {{roll=[[1d10 + [[@{attackscore}]] [Score] + @{attackbonus} [Bonus]- [[([[@{Encpen}]] + [[@{Attackpen}]] -@{attackig} + @{Mentalpen})]] [Penalties] - [[@{offpenalty}]] [Offhand] ]]}} " /></div>
 					</div>
 				</fieldset>
-				<span class="sheet-spacer"></span>
-				<!-- Rituals et al-->
-				<h3>Rituals and Greater Disciplines</h3>
-				<input type="radio" name="attr_ritualtab" class="sheet-ritualtab sheet-ritualtab1" value="1" title="Page 1" checked="checked"/>
-				<span class="sheet-ritualtab sheet-ritualtab1">Minor</span>
-				<input type="radio" name="attr_ritualtab" class="sheet-ritualtab sheet-ritualtab2" value="2" title="Page 2"/>
-				<span class="sheet-ritualtab sheet-ritualtab2">Major</span>
-				<input type="radio" name="attr_ritualtab" class="sheet-ritualtab sheet-ritualtab3" value="3" title="Page 3"/>
-				<span class="sheet-ritualtab sheet-ritualtab3">Greater</span>
-				<input type="radio" name="attr_ritualtab" class="sheet-ritualtab sheet-ritualtab4" value="4" title="Page 4"/>
-				<span class="sheet-ritualtab sheet-ritualtab4">Disciplines</span>
-				<input type="radio" name="attr_ritualtab" class="sheet-ritualtab sheet-ritualtab99" value="99" title="Show All"/>
-				<span class="sheet-ritualtab sheet-ritualtab99">Show All</span>
-				<span class="sheet-spacer"></span>
-				<!-- Minor Rituals -->
-				<div class="sheet-ritual-page1">
-					<fieldset class="repeating_ritual">
-						<div class="sheet-row sheet-border-top">
-							<div class="sheet-col-1-3 sheet-sub-header sheet-center">Name</div>
-							<div class="sheet-col-1-6 sheet-sub-header sheet-center">Skill</div>
-							<div class="sheet-col-1-6 sheet-sub-header sheet-center">Skill #</div>
-							<div class="sheet-col-1-6 sheet-sub-header sheet-center">Attack Size</div>
-							<div class="sheet-col-1-6 sheet-sub-header sheet-center">&nbsp;</div>
-						</div>
-						<div class="sheet-row">
-							<div class="sheet-col-1-3 sheet-left"><input type="text" name="attr_ritualname" /></div>
-							<div class="sheet-col-1-6 sheet-center"><input type="text" name="attr_ritualskill"/></div>
-							<div class="sheet-col-1-6 sheet-center">
-								<!--<input type="number" name="attr_ritualscore" /></div>-->
-								<!--This section is highly experimental and links all changes by pulling raw values from the other repeating section for use in this one-->
-								<select name="attr_ritualscore" class="sheet-center" title="Set number of the skill as it apears in the skill list to dynamically link the attack to a skill">
-									<option value="@{repeating_skills_0_skillstat} + @{repeating_skills_0_skillranks} + @{repeating_skills_0_skillother}">1</option>
-									<option value="@{repeating_skills_1_skillstat} + @{repeating_skills_1_skillranks} + @{repeating_skills_1_skillother}">2</option>
-									<option value="@{repeating_skills_2_skillstat} + @{repeating_skills_2_skillranks} + @{repeating_skills_2_skillother}">3</option>
-									<option value="@{repeating_skills_3_skillstat} + @{repeating_skills_3_skillranks} + @{repeating_skills_3_skillother}">4</option>
-									<option value="@{repeating_skills_4_skillstat} + @{repeating_skills_4_skillranks} + @{repeating_skills_4_skillother}">5</option>
-									<option value="@{repeating_skills_5_skillstat} + @{repeating_skills_5_skillranks} + @{repeating_skills_5_skillother}">6</option>
-									<option value="@{repeating_skills_6_skillstat} + @{repeating_skills_6_skillranks} + @{repeating_skills_6_skillother}">7</option>
-									<option value="@{repeating_skills_7_skillstat} + @{repeating_skills_7_skillranks} + @{repeating_skills_7_skillother}">8</option>
-									<option value="@{repeating_skills_8_skillstat} + @{repeating_skills_8_skillranks} + @{repeating_skills_8_skillother}">9</option>
-									<option value="@{repeating_skills_9_skillstat} + @{repeating_skills_9_skillranks} + @{repeating_skills_9_skillother}">10</option>
-									<option value="@{repeating_skills_10_skillstat} + @{repeating_skills_10_skillranks} + @{repeating_skills_10_skillother}">11</option>
-									<option value="@{repeating_skills_11_skillstat} + @{repeating_skills_11_skillranks} + @{repeating_skills_11_skillother}">12</option>
-									<option value="@{repeating_skills_12_skillstat} + @{repeating_skills_12_skillranks} + @{repeating_skills_12_skillother}">13</option>
-									<option value="@{repeating_skills_13_skillstat} + @{repeating_skills_13_skillranks} + @{repeating_skills_13_skillother}">14</option>
-									<option value="@{repeating_skills_14_skillstat} + @{repeating_skills_14_skillranks} + @{repeating_skills_14_skillother}">15</option>
-									<option value="@{repeating_skills_15_skillstat} + @{repeating_skills_15_skillranks} + @{repeating_skills_15_skillother}">16</option>
-									<option value="@{repeating_skills_16_skillstat} + @{repeating_skills_16_skillranks} + @{repeating_skills_16_skillother}">17</option>
-									<option value="@{repeating_skills_17_skillstat} + @{repeating_skills_17_skillranks} + @{repeating_skills_17_skillother}">18</option>
-									<option value="@{repeating_skills_18_skillstat} + @{repeating_skills_18_skillranks} + @{repeating_skills_18_skillother}">19</option>
-									<option value="@{repeating_skills_19_skillstat} + @{repeating_skills_19_skillranks} + @{repeating_skills_19_skillother}">20</option>
-									<option value="@{repeating_skills_20_skillstat} + @{repeating_skills_20_skillranks} + @{repeating_skills_20_skillother}">21</option>
-									<option value="@{repeating_skills_21_skillstat} + @{repeating_skills_21_skillranks} + @{repeating_skills_21_skillother}">22</option>
-									<option value="@{repeating_skills_22_skillstat} + @{repeating_skills_22_skillranks} + @{repeating_skills_22_skillother}">23</option>
-									<option value="@{repeating_skills_23_skillstat} + @{repeating_skills_23_skillranks} + @{repeating_skills_23_skillother}">24</option>
-									<option value="@{repeating_skills_24_skillstat} + @{repeating_skills_24_skillranks} + @{repeating_skills_24_skillother}">25</option>
-									<option value="@{repeating_skills_25_skillstat} + @{repeating_skills_25_skillranks} + @{repeating_skills_25_skillother}">26</option>
-									<option value="@{repeating_skills_26_skillstat} + @{repeating_skills_26_skillranks} + @{repeating_skills_26_skillother}">27</option>
-									<option value="@{repeating_skills_27_skillstat} + @{repeating_skills_27_skillranks} + @{repeating_skills_27_skillother}">28</option>
-									<option value="@{repeating_skills_28_skillstat} + @{repeating_skills_28_skillranks} + @{repeating_skills_28_skillother}">29</option>
-									<option value="@{repeating_skills_29_skillstat} + @{repeating_skills_29_skillranks} + @{repeating_skills_29_skillother}">30</option>
-								</select><!--End experimental section-->
-							</div>
-							<div class="sheet-col-1-6 sheet-center"><input type="number" name="attr_ritualattacksize" /></div>
-							<div class="sheet-col-1-6 sheet-center"><button type="roll" class="sheet-d10-roll-button" name="roll_ritualroll" value="&{template:nud10} {{title=@{ritualname}}} {{subheader=@{character_name}}} {{subheaderright=@{ritualskill}}} {{subheader2=Range @{ritualrange}}} {{subheaderright2=AS @{ritualattacksize}}} {{rollname=Roll}} {{roll=[[1d10 + [[@{ritualscore}]] [Score] - [[(@{Mentalpen})]] [Penalties] > @{ritualdiff} [Difficulty] ]]}} {{description=@{ritualdesc}}} {{success=A successful matrix must be imbued or it will take effect immediately and last for @{ritualdur}}}" /></div>
-						</div>
-						<div class="sheet-row">
-							<div class="sheet-col-1-8 sheet-sub-header sheet-center">Time</div>
-							<div class="sheet-col-1-8 sheet-center"><input type="text" name="attr_ritualcast" /></div>
-							<div class="sheet-col-1-8 sheet-sub-header sheet-center">Diff.</div>
-							<div class="sheet-col-1-8 sheet-center"><input type="number" name="attr_ritualdiff" /></div>
-							<div class="sheet-col-1-8 sheet-sub-header sheet-center">Dur.</div>
-							<div class="sheet-col-1-8 sheet-center"><input type="text" name="attr_ritualdur" /></div>
-							<div class="sheet-col-1-8 sheet-sub-header sheet-center">Range</div>
-							<div class="sheet-col-1-8 sheet-center"><input type="text" name="attr_ritualrange"/></div>
-						</div>
-						<div class="sheet-row">
-							<div class="sheet-col-1"><textarea class="sheet-small-textarea" name="attr_ritualdesc"></textarea></div>
-						</div>
-					</fieldset>
-				</div>
-				<!-- Major Rituals -->
-				<div class="sheet-ritual-page2">
-					<fieldset class="repeating_ritualmajor">
-						<div class="sheet-row sheet-border-top">
-							<div class="sheet-col-1-3 sheet-sub-header sheet-center">Name</div>
-							<div class="sheet-col-1-6 sheet-sub-header sheet-center">Skill</div>
-							<div class="sheet-col-1-6 sheet-sub-header sheet-center">Skill #</div>
-							<div class="sheet-col-1-6 sheet-sub-header sheet-center">Attack Size</div>
-							<div class="sheet-col-1-6 sheet-sub-header sheet-center">&nbsp;</div>
-						</div>
-						<div class="sheet-row">
-							<div class="sheet-col-1-3 sheet-left"><input type="text" name="attr_ritualname" /></div>
-							<div class="sheet-col-1-6 sheet-center"><input type="text" name="attr_ritualskill"/></div>
-							<div class="sheet-col-1-6 sheet-center">
-								<!--<input type="number" name="attr_ritualscore" /></div>-->
-								<!--This section is highly experimental and links all changes by pulling raw values from the other repeating section for use in this one-->
-								<select name="attr_ritualscore" class="sheet-center" title="Set number of the skill as it apears in the skill list to dynamically link the attack to a skill">
-									<option value="@{repeating_skills_0_skillstat} + @{repeating_skills_0_skillranks} + @{repeating_skills_0_skillother}">1</option>
-									<option value="@{repeating_skills_1_skillstat} + @{repeating_skills_1_skillranks} + @{repeating_skills_1_skillother}">2</option>
-									<option value="@{repeating_skills_2_skillstat} + @{repeating_skills_2_skillranks} + @{repeating_skills_2_skillother}">3</option>
-									<option value="@{repeating_skills_3_skillstat} + @{repeating_skills_3_skillranks} + @{repeating_skills_3_skillother}">4</option>
-									<option value="@{repeating_skills_4_skillstat} + @{repeating_skills_4_skillranks} + @{repeating_skills_4_skillother}">5</option>
-									<option value="@{repeating_skills_5_skillstat} + @{repeating_skills_5_skillranks} + @{repeating_skills_5_skillother}">6</option>
-									<option value="@{repeating_skills_6_skillstat} + @{repeating_skills_6_skillranks} + @{repeating_skills_6_skillother}">7</option>
-									<option value="@{repeating_skills_7_skillstat} + @{repeating_skills_7_skillranks} + @{repeating_skills_7_skillother}">8</option>
-									<option value="@{repeating_skills_8_skillstat} + @{repeating_skills_8_skillranks} + @{repeating_skills_8_skillother}">9</option>
-									<option value="@{repeating_skills_9_skillstat} + @{repeating_skills_9_skillranks} + @{repeating_skills_9_skillother}">10</option>
-									<option value="@{repeating_skills_10_skillstat} + @{repeating_skills_10_skillranks} + @{repeating_skills_10_skillother}">11</option>
-									<option value="@{repeating_skills_11_skillstat} + @{repeating_skills_11_skillranks} + @{repeating_skills_11_skillother}">12</option>
-									<option value="@{repeating_skills_12_skillstat} + @{repeating_skills_12_skillranks} + @{repeating_skills_12_skillother}">13</option>
-									<option value="@{repeating_skills_13_skillstat} + @{repeating_skills_13_skillranks} + @{repeating_skills_13_skillother}">14</option>
-									<option value="@{repeating_skills_14_skillstat} + @{repeating_skills_14_skillranks} + @{repeating_skills_14_skillother}">15</option>
-									<option value="@{repeating_skills_15_skillstat} + @{repeating_skills_15_skillranks} + @{repeating_skills_15_skillother}">16</option>
-									<option value="@{repeating_skills_16_skillstat} + @{repeating_skills_16_skillranks} + @{repeating_skills_16_skillother}">17</option>
-									<option value="@{repeating_skills_17_skillstat} + @{repeating_skills_17_skillranks} + @{repeating_skills_17_skillother}">18</option>
-									<option value="@{repeating_skills_18_skillstat} + @{repeating_skills_18_skillranks} + @{repeating_skills_18_skillother}">19</option>
-									<option value="@{repeating_skills_19_skillstat} + @{repeating_skills_19_skillranks} + @{repeating_skills_19_skillother}">20</option>
-									<option value="@{repeating_skills_20_skillstat} + @{repeating_skills_20_skillranks} + @{repeating_skills_20_skillother}">21</option>
-									<option value="@{repeating_skills_21_skillstat} + @{repeating_skills_21_skillranks} + @{repeating_skills_21_skillother}">22</option>
-									<option value="@{repeating_skills_22_skillstat} + @{repeating_skills_22_skillranks} + @{repeating_skills_22_skillother}">23</option>
-									<option value="@{repeating_skills_23_skillstat} + @{repeating_skills_23_skillranks} + @{repeating_skills_23_skillother}">24</option>
-									<option value="@{repeating_skills_24_skillstat} + @{repeating_skills_24_skillranks} + @{repeating_skills_24_skillother}">25</option>
-									<option value="@{repeating_skills_25_skillstat} + @{repeating_skills_25_skillranks} + @{repeating_skills_25_skillother}">26</option>
-									<option value="@{repeating_skills_26_skillstat} + @{repeating_skills_26_skillranks} + @{repeating_skills_26_skillother}">27</option>
-									<option value="@{repeating_skills_27_skillstat} + @{repeating_skills_27_skillranks} + @{repeating_skills_27_skillother}">28</option>
-									<option value="@{repeating_skills_28_skillstat} + @{repeating_skills_28_skillranks} + @{repeating_skills_28_skillother}">29</option>
-									<option value="@{repeating_skills_29_skillstat} + @{repeating_skills_29_skillranks} + @{repeating_skills_29_skillother}">30</option>
-								</select><!--End experimental section-->
-							</div>
-							<div class="sheet-col-1-6 sheet-center"><input type="number" name="attr_ritualattacksize" /></div>
-							<div class="sheet-col-1-6 sheet-center"><button type="roll" class="sheet-d10-roll-button" name="roll_ritualroll" value="&{template:nud10} {{title=@{ritualname}}} {{subheader=@{character_name}}} {{subheaderright=@{ritualskill}}} {{subheader2=Range @{ritualrange}}} {{subheaderright2=AS @{ritualattacksize}}} {{rollname=Roll}} {{roll=[[1d10 + [[@{ritualscore}]] [Score] - [[(@{Mentalpen})]] [Penalties] > @{ritualdiff} [Difficulty] ]]}} {{description=@{ritualdesc}}} {{success=A successful matrix must be imbued or it will take effect immediately and last for @{ritualdur}}}" /></div>
-						</div>
-						<div class="sheet-row">
-							<div class="sheet-col-1-8 sheet-sub-header sheet-center">Time</div>
-							<div class="sheet-col-1-8 sheet-center"><input type="text" name="attr_ritualcast" /></div>
-							<div class="sheet-col-1-8 sheet-sub-header sheet-center">Diff.</div>
-							<div class="sheet-col-1-8 sheet-center"><input type="number" name="attr_ritualdiff" /></div>
-							<div class="sheet-col-1-8 sheet-sub-header sheet-center">Dur.</div>
-							<div class="sheet-col-1-8 sheet-center"><input type="text" name="attr_ritualdur" /></div>
-							<div class="sheet-col-1-8 sheet-sub-header sheet-center">Range</div>
-							<div class="sheet-col-1-8 sheet-center"><input type="text" name="attr_ritualrange"/></div>
-						</div>
-						<div class="sheet-row">
-							<div class="sheet-col-1"><textarea class="sheet-small-textarea" name="attr_ritualdesc"></textarea></div>
-						</div>
-					</fieldset>
-				</div>
-				<!-- Greater Rituals -->
-				<div class="sheet-ritual-page3">
-					<fieldset class="repeating_ritualgreat">
-						<div class="sheet-row sheet-border-top">
-							<div class="sheet-col-1-3 sheet-sub-header sheet-center">Name</div>
-							<div class="sheet-col-1-6 sheet-sub-header sheet-center">Skill</div>
-							<div class="sheet-col-1-6 sheet-sub-header sheet-center">Skill #</div>
-							<div class="sheet-col-1-6 sheet-sub-header sheet-center">Attack Size</div>
-							<div class="sheet-col-1-6 sheet-sub-header sheet-center">&nbsp;</div>
-						</div>
-						<div class="sheet-row">
-							<div class="sheet-col-1-3 sheet-left"><input type="text" name="attr_ritualname" /></div>
-							<div class="sheet-col-1-6 sheet-center"><input type="text" name="attr_ritualskill"/></div>
-							<div class="sheet-col-1-6 sheet-center">
-								<!--<input type="number" name="attr_ritualscore" /></div>-->
-								<!--This section is highly experimental and links all changes by pulling raw values from the other repeating section for use in this one-->
-								<select name="attr_ritualscore" class="sheet-center" title="Set number of the skill as it apears in the skill list to dynamically link the attack to a skill">
-									<option value="@{repeating_skills_0_skillstat} + @{repeating_skills_0_skillranks} + @{repeating_skills_0_skillother}">1</option>
-									<option value="@{repeating_skills_1_skillstat} + @{repeating_skills_1_skillranks} + @{repeating_skills_1_skillother}">2</option>
-									<option value="@{repeating_skills_2_skillstat} + @{repeating_skills_2_skillranks} + @{repeating_skills_2_skillother}">3</option>
-									<option value="@{repeating_skills_3_skillstat} + @{repeating_skills_3_skillranks} + @{repeating_skills_3_skillother}">4</option>
-									<option value="@{repeating_skills_4_skillstat} + @{repeating_skills_4_skillranks} + @{repeating_skills_4_skillother}">5</option>
-									<option value="@{repeating_skills_5_skillstat} + @{repeating_skills_5_skillranks} + @{repeating_skills_5_skillother}">6</option>
-									<option value="@{repeating_skills_6_skillstat} + @{repeating_skills_6_skillranks} + @{repeating_skills_6_skillother}">7</option>
-									<option value="@{repeating_skills_7_skillstat} + @{repeating_skills_7_skillranks} + @{repeating_skills_7_skillother}">8</option>
-									<option value="@{repeating_skills_8_skillstat} + @{repeating_skills_8_skillranks} + @{repeating_skills_8_skillother}">9</option>
-									<option value="@{repeating_skills_9_skillstat} + @{repeating_skills_9_skillranks} + @{repeating_skills_9_skillother}">10</option>
-									<option value="@{repeating_skills_10_skillstat} + @{repeating_skills_10_skillranks} + @{repeating_skills_10_skillother}">11</option>
-									<option value="@{repeating_skills_11_skillstat} + @{repeating_skills_11_skillranks} + @{repeating_skills_11_skillother}">12</option>
-									<option value="@{repeating_skills_12_skillstat} + @{repeating_skills_12_skillranks} + @{repeating_skills_12_skillother}">13</option>
-									<option value="@{repeating_skills_13_skillstat} + @{repeating_skills_13_skillranks} + @{repeating_skills_13_skillother}">14</option>
-									<option value="@{repeating_skills_14_skillstat} + @{repeating_skills_14_skillranks} + @{repeating_skills_14_skillother}">15</option>
-									<option value="@{repeating_skills_15_skillstat} + @{repeating_skills_15_skillranks} + @{repeating_skills_15_skillother}">16</option>
-									<option value="@{repeating_skills_16_skillstat} + @{repeating_skills_16_skillranks} + @{repeating_skills_16_skillother}">17</option>
-									<option value="@{repeating_skills_17_skillstat} + @{repeating_skills_17_skillranks} + @{repeating_skills_17_skillother}">18</option>
-									<option value="@{repeating_skills_18_skillstat} + @{repeating_skills_18_skillranks} + @{repeating_skills_18_skillother}">19</option>
-									<option value="@{repeating_skills_19_skillstat} + @{repeating_skills_19_skillranks} + @{repeating_skills_19_skillother}">20</option>
-									<option value="@{repeating_skills_20_skillstat} + @{repeating_skills_20_skillranks} + @{repeating_skills_20_skillother}">21</option>
-									<option value="@{repeating_skills_21_skillstat} + @{repeating_skills_21_skillranks} + @{repeating_skills_21_skillother}">22</option>
-									<option value="@{repeating_skills_22_skillstat} + @{repeating_skills_22_skillranks} + @{repeating_skills_22_skillother}">23</option>
-									<option value="@{repeating_skills_23_skillstat} + @{repeating_skills_23_skillranks} + @{repeating_skills_23_skillother}">24</option>
-									<option value="@{repeating_skills_24_skillstat} + @{repeating_skills_24_skillranks} + @{repeating_skills_24_skillother}">25</option>
-									<option value="@{repeating_skills_25_skillstat} + @{repeating_skills_25_skillranks} + @{repeating_skills_25_skillother}">26</option>
-									<option value="@{repeating_skills_26_skillstat} + @{repeating_skills_26_skillranks} + @{repeating_skills_26_skillother}">27</option>
-									<option value="@{repeating_skills_27_skillstat} + @{repeating_skills_27_skillranks} + @{repeating_skills_27_skillother}">28</option>
-									<option value="@{repeating_skills_28_skillstat} + @{repeating_skills_28_skillranks} + @{repeating_skills_28_skillother}">29</option>
-									<option value="@{repeating_skills_29_skillstat} + @{repeating_skills_29_skillranks} + @{repeating_skills_29_skillother}">30</option>
-								</select><!--End experimental section-->
-							</div>
-							<div class="sheet-col-1-6 sheet-center"><input type="number" name="attr_ritualattacksize" /></div>
-							<div class="sheet-col-1-6 sheet-center"><button type="roll" class="sheet-d10-roll-button" name="roll_ritualroll" value="&{template:nud10} {{title=@{ritualname}}} {{subheader=@{character_name}}} {{subheaderright=@{ritualskill}}} {{subheader2=Range @{ritualrange}}} {{subheaderright2=AS @{ritualattacksize}}} {{rollname=Roll}} {{roll=[[1d10 + [[@{ritualscore}]] [Score] - [[(@{Mentalpen})]] [Penalties] > @{ritualdiff} [Difficulty] ]]}} {{description=@{ritualdesc}}} {{success=A successful matrix must be imbued or it will take effect immediately and last for @{ritualdur}}}" /></div>
-						</div>
-						<div class="sheet-row">
-							<div class="sheet-col-1-8 sheet-sub-header sheet-center">Time</div>
-							<div class="sheet-col-1-8 sheet-center"><input type="text" name="attr_ritualcast" /></div>
-							<div class="sheet-col-1-8 sheet-sub-header sheet-center">Diff.</div>
-							<div class="sheet-col-1-8 sheet-center"><input type="number" name="attr_ritualdiff" /></div>
-							<div class="sheet-col-1-8 sheet-sub-header sheet-center">Dur.</div>
-							<div class="sheet-col-1-8 sheet-center"><input type="text" name="attr_ritualdur" /></div>
-							<div class="sheet-col-1-8 sheet-sub-header sheet-center">Range</div>
-							<div class="sheet-col-1-8 sheet-center"><input type="text" name="attr_ritualrange"/></div>
-						</div>
-						<div class="sheet-row">
-							<div class="sheet-col-1"><textarea class="sheet-small-textarea" name="attr_ritualdesc"></textarea></div>
-						</div>
-					</fieldset>
-				</div>
-				<!-- Greater Disciplines -->
-				<div class="sheet-ritual-page4">
-					<fieldset class="repeating_ritualdis">
-						<div class="sheet-row sheet-border-top">
-							<div class="sheet-col-1-3 sheet-sub-header sheet-center">Name</div>
-							<div class="sheet-col-1-6 sheet-sub-header sheet-center">Skill</div>
-							<div class="sheet-col-1-6 sheet-sub-header sheet-center">Skill #</div>
-							<div class="sheet-col-1-6 sheet-sub-header sheet-center">Attack Size</div>
-							<div class="sheet-col-1-6 sheet-sub-header sheet-center">&nbsp;</div>
-						</div>
-						<div class="sheet-row">
-							<div class="sheet-col-1-3 sheet-left"><input type="text" name="attr_ritualname" /></div>
-							<div class="sheet-col-1-6 sheet-center"><input type="text" name="attr_ritualskill"/></div>
-							<div class="sheet-col-1-6 sheet-center">
-								<!--<input type="number" name="attr_ritualscore" /></div>-->
-								<!--This section is highly experimental and links all changes by pulling raw values from the other repeating section for use in this one-->
-								<select name="attr_ritualscore" class="sheet-center" title="Set number of the skill as it apears in the skill list to dynamically link the attack to a skill">
-									<option value="@{repeating_skills_0_skillstat} + @{repeating_skills_0_skillranks} + @{repeating_skills_0_skillother}">1</option>
-									<option value="@{repeating_skills_1_skillstat} + @{repeating_skills_1_skillranks} + @{repeating_skills_1_skillother}">2</option>
-									<option value="@{repeating_skills_2_skillstat} + @{repeating_skills_2_skillranks} + @{repeating_skills_2_skillother}">3</option>
-									<option value="@{repeating_skills_3_skillstat} + @{repeating_skills_3_skillranks} + @{repeating_skills_3_skillother}">4</option>
-									<option value="@{repeating_skills_4_skillstat} + @{repeating_skills_4_skillranks} + @{repeating_skills_4_skillother}">5</option>
-									<option value="@{repeating_skills_5_skillstat} + @{repeating_skills_5_skillranks} + @{repeating_skills_5_skillother}">6</option>
-									<option value="@{repeating_skills_6_skillstat} + @{repeating_skills_6_skillranks} + @{repeating_skills_6_skillother}">7</option>
-									<option value="@{repeating_skills_7_skillstat} + @{repeating_skills_7_skillranks} + @{repeating_skills_7_skillother}">8</option>
-									<option value="@{repeating_skills_8_skillstat} + @{repeating_skills_8_skillranks} + @{repeating_skills_8_skillother}">9</option>
-									<option value="@{repeating_skills_9_skillstat} + @{repeating_skills_9_skillranks} + @{repeating_skills_9_skillother}">10</option>
-									<option value="@{repeating_skills_10_skillstat} + @{repeating_skills_10_skillranks} + @{repeating_skills_10_skillother}">11</option>
-									<option value="@{repeating_skills_11_skillstat} + @{repeating_skills_11_skillranks} + @{repeating_skills_11_skillother}">12</option>
-									<option value="@{repeating_skills_12_skillstat} + @{repeating_skills_12_skillranks} + @{repeating_skills_12_skillother}">13</option>
-									<option value="@{repeating_skills_13_skillstat} + @{repeating_skills_13_skillranks} + @{repeating_skills_13_skillother}">14</option>
-									<option value="@{repeating_skills_14_skillstat} + @{repeating_skills_14_skillranks} + @{repeating_skills_14_skillother}">15</option>
-									<option value="@{repeating_skills_15_skillstat} + @{repeating_skills_15_skillranks} + @{repeating_skills_15_skillother}">16</option>
-									<option value="@{repeating_skills_16_skillstat} + @{repeating_skills_16_skillranks} + @{repeating_skills_16_skillother}">17</option>
-									<option value="@{repeating_skills_17_skillstat} + @{repeating_skills_17_skillranks} + @{repeating_skills_17_skillother}">18</option>
-									<option value="@{repeating_skills_18_skillstat} + @{repeating_skills_18_skillranks} + @{repeating_skills_18_skillother}">19</option>
-									<option value="@{repeating_skills_19_skillstat} + @{repeating_skills_19_skillranks} + @{repeating_skills_19_skillother}">20</option>
-									<option value="@{repeating_skills_20_skillstat} + @{repeating_skills_20_skillranks} + @{repeating_skills_20_skillother}">21</option>
-									<option value="@{repeating_skills_21_skillstat} + @{repeating_skills_21_skillranks} + @{repeating_skills_21_skillother}">22</option>
-									<option value="@{repeating_skills_22_skillstat} + @{repeating_skills_22_skillranks} + @{repeating_skills_22_skillother}">23</option>
-									<option value="@{repeating_skills_23_skillstat} + @{repeating_skills_23_skillranks} + @{repeating_skills_23_skillother}">24</option>
-									<option value="@{repeating_skills_24_skillstat} + @{repeating_skills_24_skillranks} + @{repeating_skills_24_skillother}">25</option>
-									<option value="@{repeating_skills_25_skillstat} + @{repeating_skills_25_skillranks} + @{repeating_skills_25_skillother}">26</option>
-									<option value="@{repeating_skills_26_skillstat} + @{repeating_skills_26_skillranks} + @{repeating_skills_26_skillother}">27</option>
-									<option value="@{repeating_skills_27_skillstat} + @{repeating_skills_27_skillranks} + @{repeating_skills_27_skillother}">28</option>
-									<option value="@{repeating_skills_28_skillstat} + @{repeating_skills_28_skillranks} + @{repeating_skills_28_skillother}">29</option>
-									<option value="@{repeating_skills_29_skillstat} + @{repeating_skills_29_skillranks} + @{repeating_skills_29_skillother}">30</option>
-								</select><!--End experimental section-->
-							</div>
-							<div class="sheet-col-1-6 sheet-center"><input type="number" name="attr_ritualattacksize" /></div>
-							<div class="sheet-col-1-6 sheet-center"><button type="roll" class="sheet-d10-roll-button" name="roll_ritualroll" value="&{template:nud10} {{title=@{ritualname}}} {{subheader=@{character_name}}} {{subheaderright=@{ritualskill}}} {{subheader2=Range @{ritualrange}}} {{subheaderright2=AS @{ritualattacksize}}} {{rollname=Roll}} {{roll=[[1d10 + [[@{ritualscore}]] [Score] - [[(@{Mentalpen})]] [Penalties] > @{ritualdiff} [Difficulty] ]]}} {{description=@{ritualdesc}}} {{success=A successful matrix must be imbued or it will take effect immediately and last for @{ritualdur}}}"></button></div>
-						</div>
-						<div class="sheet-row">
-							<div class="sheet-col-1-8 sheet-sub-header sheet-center">Time</div>
-							<div class="sheet-col-1-8 sheet-center"><input type="text" name="attr_ritualcast" /></div>
-							<div class="sheet-col-1-8 sheet-sub-header sheet-center">Diff.</div>
-							<div class="sheet-col-1-8 sheet-center"><input type="number" name="attr_ritualdiff" /></div>
-							<div class="sheet-col-1-8 sheet-sub-header sheet-center">Dur.</div>
-							<div class="sheet-col-1-8 sheet-center"><input type="text" name="attr_ritualdur" /></div>
-							<div class="sheet-col-1-8 sheet-sub-header sheet-center">Range</div>
-							<div class="sheet-col-1-8 sheet-center"><input type="text" name="attr_ritualrange"/></div>
-						</div>
-						<div class="sheet-row">
-							<div class="sheet-col-1"><textarea class="sheet-small-textarea" name="attr_ritualdesc"></textarea></div>
-						</div>
-					</fieldset>
-				</div>
+				
 			</div>
+		</div>
+		<!--Wound Record, Armour, Ammo -->
+		<div class="sheet-row">
 			<!--Wound Record -->
 			<div class="sheet-col-5-12">
 				<h3>Wound Record</h3>
@@ -799,22 +525,23 @@
 					<div class="sheet-col-1-8 sheet-center"><input type="number" name="attr_WL7Wounds" value="0"/></div>
 					<div class="sheet-col-1-8 sheet-center"><input type="number" name="attr_WL7pen"  value="floor(@{WL7Wounds} * @{penadjust})" disabled="true"/></div>
 				</div>
-				<!-- Armour and shield-->
-				<span class="sheet-spacer"></span>
-				<h3>Armour/Sheild</h3>
+			</div>
+			<!-- Armour & Ammo-->
+			<div class="sheet-col-13-24 sheet-padl">
+				<h3>Armour</h3>
 				<div class="sheet-row">
 					<div class="sheet-col-1-4 sheet-sidehead sheet-right sheet-padr">Armour UA</div>
-					<div class="sheet-col-1-8"><input type="number" name="attr_uaarmour" value="0" min="0"/></div>
-					<div class="sheet-col-1-6 sheet-sidehead sheet-right sheet-padr">Total Max Pen.</div>
-					<div class="sheet-col-1-8"><input type="number" name="attr_maxarmourpen" value="0" min="0"/></div>
-					<div class="sheet-col-1-6 sheet-sidehead sheet-right sheet-padr">Total Min Pen.</div>
-					<div class="sheet-col-1-8"><input type="number" name="attr_minarmourpen" value="0" value="0" min="0"/></div>
+					<div class="sheet-col-1-8"><input type="number" class="sheet-tp" name="attr_uaarmour" value="0" min="0" step="0.1"/></div>
+					<div class="sheet-col-1-6 sheet-sidehead sheet-right sheet-padr">Max Pen.</div>
+					<div class="sheet-col-1-8"><input type="number" class="sheet-tp" name="attr_maxarmourpen" value="0" min="0" step="0.1"/></div>
+					<div class="sheet-col-1-6 sheet-sidehead sheet-right sheet-padr">Min Pen.</div>
+					<div class="sheet-col-1-8"><input type="number" class="sheet-tp" name="attr_minarmourpen" value="0" value="0" min="0" step="0.1"/></div>
 					<input type="hidden" name="attr_armouradjust" value="@{maxarmourpen} - @{uaarmour}" />
 					<input type="hidden" name="attr_armourpen" value="floor(((@{armouradjust} + @{minarmourpen}) + abs(@{armouradjust} - @{minarmourpen})) / 2)" />
 				</div>
 				<div class="sheet-row">
 					<div class="sheet-col-1-3 sheet-sub-header sheet-center">Name</div>
-					<div class="sheet-col-1-8 sheet-sub-header sheet-center">Coverage</div>
+					<div class="sheet-col-1-8 sheet-sub-header sheet-center">Cover.</div>
 					<div class="sheet-col-1-8 sheet-sub-header sheet-center">Frac.</div>
 					<div class="sheet-col-1-8 sheet-sub-header sheet-center">Max P.</div>
 					<div class="sheet-col-1-8 sheet-sub-header sheet-center">Min P.</div>
@@ -825,9 +552,414 @@
 						<div class="sheet-col-1-3 sheet-left"><input type="text" name="attr_armourname" /></div>
 						<div class="sheet-col-1-8 sheet-center"><input type="text" name="attr_armourcover" /></div>
 						<div class="sheet-col-1-8 sheet-center"><input type="text" name="attr_armourfrac"  /></div>
-						<div class="sheet-col-1-8 sheet-center"><input type="number" name="attr_armourmaxp" max="0"/></div>
-						<div class="sheet-col-1-8 sheet-center"><input type="number" name="attr_armourminp" max="0"/></div>
+						<div class="sheet-col-1-8 sheet-center"><input type="number" name="attr_armourmaxp" step="0.1"/></div>
+						<div class="sheet-col-1-8 sheet-center"><input type="number" name="attr_armourminp" step="0.1"/></div>
 						<div class="sheet-col-1-6 sheet-center"><input type="number" name="attr_armourbonus" /></div>
+					</div>
+				</fieldset>
+				<span class="sheet-spacer"></span>
+				<!-- Ammo-->
+				<h3>Ammo</h3>
+				<div class="sheet-row">
+					<div class="sheet-col-1-3 sheet-sub-header sheet-center">Type</div>
+					<div class="sheet-col-1-6 sheet-sub-header sheet-center">Total</div>
+					<div class="sheet-col-1-6 sheet-sub-header sheet-center">Clips</div>
+					<div class="sheet-col-1-6 sheet-sub-header sheet-center">Clip Size</div>
+					<div class="sheet-col-1-6 sheet-sub-header sheet-center">Clip Cur.</div>
+				</div>
+				<fieldset class="repeating_ammo">
+					<div class="sheet-row">
+						<div class="sheet-col-1-3 sheet-left"><input type="text" name="attr_ammotype" /></div>
+						<div class="sheet-col-1-6 sheet-center sheet-padl"><input type="number" name="attr_ammototal" /></div>
+						<div class="sheet-col-1-6 sheet-center sheet-padl"><input type="number" name="attr_ammonumclip" /></div>
+						<div class="sheet-col-1-6 sheet-center sheet-padl"><input type="number" name="attr_ammoclip_max"  /></div>
+						<div class="sheet-col-1-6 sheet-center sheet-padl"><input type="number" name="attr_ammoclip" /></div>
+					</div>
+				</fieldset>
+			</div>
+		</div>
+	</div>
+<!--Magic and Psi, foci, components, and storage -->
+	<div class="sheet-section-magic">
+		<div class="sheet-row">
+			<!-- Rituals et al-->
+			<div class="sheet-col-1">
+				<h3>Rituals and Greater Disciplines</h3>
+				<input type="radio" name="attr_ritualtab" class="sheet-ritualtab sheet-ritualtab1" value="1" title="Page 1" checked="checked"/>
+				<span class="sheet-ritualtab sheet-ritualtab1">Minor</span>
+				<input type="radio" name="attr_ritualtab" class="sheet-ritualtab sheet-ritualtab2" value="2" title="Page 2"/>
+				<span class="sheet-ritualtab sheet-ritualtab2">Major</span>
+				<input type="radio" name="attr_ritualtab" class="sheet-ritualtab sheet-ritualtab3" value="3" title="Page 3"/>
+				<span class="sheet-ritualtab sheet-ritualtab3">Greater</span>
+				<input type="radio" name="attr_ritualtab" class="sheet-ritualtab sheet-ritualtab4" value="4" title="Page 4"/>
+				<span class="sheet-ritualtab sheet-ritualtab4">Disciplines</span>
+				<input type="radio" name="attr_ritualtab" class="sheet-ritualtab sheet-ritualtab99" value="99" title="Show All"/>
+				<span class="sheet-ritualtab sheet-ritualtab99">Show All</span>
+				<span class="sheet-spacer"></span>
+				<!-- Minor Rituals -->
+				<div class="sheet-ritual-page1">
+					<fieldset class="repeating_ritual">
+						<div class="sheet-row sheet-border-top">
+							<div class="sheet-col-1-4 sheet-sub-header sheet-center">Name</div>
+							<div class="sheet-col-1-12 sheet-sub-header sheet-left">Skill</div>
+							<div class="sheet-col-1-12 sheet-sub-header sheet-left">Skill #</div>
+							<div class="sheet-col-1-12 sheet-sub-header sheet-left">Attack Size</div>
+							<div class="sheet-col-1-12 sheet-sub-header sheet-left">Time</div>
+							<div class="sheet-col-1-12 sheet-sub-header sheet-left">Diff.</div>
+							<div class="sheet-col-1-12 sheet-sub-header sheet-left">Dur.</div>
+							<div class="sheet-col-1-12 sheet-sub-header sheet-left">Range</div>
+							<div class="sheet-col-1-12 sheet-sub-header sheet-left">&nbsp;</div>
+						</div>
+						<div class="sheet-row">
+							<div class="sheet-col-1-4 sheet-left"><input type="text" name="attr_ritualname" /></div>
+							<div class="sheet-col-1-12 sheet-center"><input type="text" name="attr_ritualskill"/></div>
+							<div class="sheet-col-1-12 sheet-center">
+								
+								<select name="attr_ritualscore" class="sheet-center" title="Set number of the skill as it apears in the skill list to dynamically link the attack to a skill">
+									<option value="@{repeating_skills_0_skillstat} + @{repeating_skills_0_skillranks} + @{repeating_skills_0_skillother}">1</option>
+									<option value="@{repeating_skills_1_skillstat} + @{repeating_skills_1_skillranks} + @{repeating_skills_1_skillother}">2</option>
+									<option value="@{repeating_skills_2_skillstat} + @{repeating_skills_2_skillranks} + @{repeating_skills_2_skillother}">3</option>
+									<option value="@{repeating_skills_3_skillstat} + @{repeating_skills_3_skillranks} + @{repeating_skills_3_skillother}">4</option>
+									<option value="@{repeating_skills_4_skillstat} + @{repeating_skills_4_skillranks} + @{repeating_skills_4_skillother}">5</option>
+									<option value="@{repeating_skills_5_skillstat} + @{repeating_skills_5_skillranks} + @{repeating_skills_5_skillother}">6</option>
+									<option value="@{repeating_skills_6_skillstat} + @{repeating_skills_6_skillranks} + @{repeating_skills_6_skillother}">7</option>
+									<option value="@{repeating_skills_7_skillstat} + @{repeating_skills_7_skillranks} + @{repeating_skills_7_skillother}">8</option>
+									<option value="@{repeating_skills_8_skillstat} + @{repeating_skills_8_skillranks} + @{repeating_skills_8_skillother}">9</option>
+									<option value="@{repeating_skills_9_skillstat} + @{repeating_skills_9_skillranks} + @{repeating_skills_9_skillother}">10</option>
+									<option value="@{repeating_skills_10_skillstat} + @{repeating_skills_10_skillranks} + @{repeating_skills_10_skillother}">11</option>
+									<option value="@{repeating_skills_11_skillstat} + @{repeating_skills_11_skillranks} + @{repeating_skills_11_skillother}">12</option>
+									<option value="@{repeating_skills_12_skillstat} + @{repeating_skills_12_skillranks} + @{repeating_skills_12_skillother}">13</option>
+									<option value="@{repeating_skills_13_skillstat} + @{repeating_skills_13_skillranks} + @{repeating_skills_13_skillother}">14</option>
+									<option value="@{repeating_skills_14_skillstat} + @{repeating_skills_14_skillranks} + @{repeating_skills_14_skillother}">15</option>
+									<option value="@{repeating_skills_15_skillstat} + @{repeating_skills_15_skillranks} + @{repeating_skills_15_skillother}">16</option>
+									<option value="@{repeating_skills_16_skillstat} + @{repeating_skills_16_skillranks} + @{repeating_skills_16_skillother}">17</option>
+									<option value="@{repeating_skills_17_skillstat} + @{repeating_skills_17_skillranks} + @{repeating_skills_17_skillother}">18</option>
+									<option value="@{repeating_skills_18_skillstat} + @{repeating_skills_18_skillranks} + @{repeating_skills_18_skillother}">19</option>
+									<option value="@{repeating_skills_19_skillstat} + @{repeating_skills_19_skillranks} + @{repeating_skills_19_skillother}">20</option>
+									<option value="@{repeating_skills_20_skillstat} + @{repeating_skills_20_skillranks} + @{repeating_skills_20_skillother}">21</option>
+									<option value="@{repeating_skills_21_skillstat} + @{repeating_skills_21_skillranks} + @{repeating_skills_21_skillother}">22</option>
+									<option value="@{repeating_skills_22_skillstat} + @{repeating_skills_22_skillranks} + @{repeating_skills_22_skillother}">23</option>
+									<option value="@{repeating_skills_23_skillstat} + @{repeating_skills_23_skillranks} + @{repeating_skills_23_skillother}">24</option>
+									<option value="@{repeating_skills_24_skillstat} + @{repeating_skills_24_skillranks} + @{repeating_skills_24_skillother}">25</option>
+									<option value="@{repeating_skills_25_skillstat} + @{repeating_skills_25_skillranks} + @{repeating_skills_25_skillother}">26</option>
+									<option value="@{repeating_skills_26_skillstat} + @{repeating_skills_26_skillranks} + @{repeating_skills_26_skillother}">27</option>
+									<option value="@{repeating_skills_27_skillstat} + @{repeating_skills_27_skillranks} + @{repeating_skills_27_skillother}">28</option>
+									<option value="@{repeating_skills_28_skillstat} + @{repeating_skills_28_skillranks} + @{repeating_skills_28_skillother}">29</option>
+									<option value="@{repeating_skills_29_skillstat} + @{repeating_skills_29_skillranks} + @{repeating_skills_29_skillother}">30</option>
+								</select>
+							</div>
+							<div class="sheet-col-1-12 sheet-center"><input type="number" name="attr_ritualattacksize" /></div>
+							<div class="sheet-col-1-12 sheet-center"><input type="text" name="attr_ritualcast" /></div>
+							<div class="sheet-col-1-12 sheet-center"><input type="number" name="attr_ritualdiff" /></div>
+							<div class="sheet-col-1-12 sheet-center"><input type="text" name="attr_ritualdur" /></div>
+							<div class="sheet-col-1-12 sheet-center"><input type="text" name="attr_ritualrange"/></div>
+							<div class="sheet-col-1-12 sheet-center"><button type="roll" class="sheet-d10-roll-button" name="roll_ritualroll" value="&{template:nud10} {{title=@{ritualname}}} {{subheader=@{character_name}}} {{subheaderright=@{ritualskill}}} {{subheader2=Range @{ritualrange}}} {{subheaderright2=AS @{ritualattacksize}}} {{rollname=Roll}} {{roll=[[1d10 + [[@{ritualscore}]] [Score] - [[(@{Mentalpen})]] [Penalties] > @{ritualdiff} [Difficulty] ]]}} {{description=@{ritualdesc}}} {{success=A successful matrix must be imbued or it will take effect immediately and last for @{ritualdur}}}" /></div>
+						</div>
+						<div class="sheet-row">
+							<div class="sheet-col-1"><textarea class="sheet-small-textarea" name="attr_ritualdesc"></textarea></div>
+						</div>
+					</fieldset>
+				</div>
+				<!-- Major Rituals -->
+				<div class="sheet-ritual-page2">
+					<fieldset class="repeating_ritualmajor">
+						<div class="sheet-row sheet-border-top">
+							<div class="sheet-col-1-4 sheet-sub-header sheet-center">Name</div>
+							<div class="sheet-col-1-12 sheet-sub-header sheet-left">Skill</div>
+							<div class="sheet-col-1-12 sheet-sub-header sheet-left">Skill #</div>
+							<div class="sheet-col-1-12 sheet-sub-header sheet-left">Attack Size</div>
+							<div class="sheet-col-1-12 sheet-sub-header sheet-left">Time</div>
+							<div class="sheet-col-1-12 sheet-sub-header sheet-left">Diff.</div>
+							<div class="sheet-col-1-12 sheet-sub-header sheet-left">Dur.</div>
+							<div class="sheet-col-1-12 sheet-sub-header sheet-left">Range</div>
+							<div class="sheet-col-1-12 sheet-sub-header sheet-left">&nbsp;</div>
+						</div>
+						<div class="sheet-row">
+							<div class="sheet-col-1-4 sheet-left"><input type="text" name="attr_ritualname" /></div>
+							<div class="sheet-col-1-12 sheet-center"><input type="text" name="attr_ritualskill"/></div>
+							<div class="sheet-col-1-12 sheet-center">
+								
+								<select name="attr_ritualscore" class="sheet-center" title="Set number of the skill as it apears in the skill list to dynamically link the attack to a skill">
+									<option value="@{repeating_skills_0_skillstat} + @{repeating_skills_0_skillranks} + @{repeating_skills_0_skillother}">1</option>
+									<option value="@{repeating_skills_1_skillstat} + @{repeating_skills_1_skillranks} + @{repeating_skills_1_skillother}">2</option>
+									<option value="@{repeating_skills_2_skillstat} + @{repeating_skills_2_skillranks} + @{repeating_skills_2_skillother}">3</option>
+									<option value="@{repeating_skills_3_skillstat} + @{repeating_skills_3_skillranks} + @{repeating_skills_3_skillother}">4</option>
+									<option value="@{repeating_skills_4_skillstat} + @{repeating_skills_4_skillranks} + @{repeating_skills_4_skillother}">5</option>
+									<option value="@{repeating_skills_5_skillstat} + @{repeating_skills_5_skillranks} + @{repeating_skills_5_skillother}">6</option>
+									<option value="@{repeating_skills_6_skillstat} + @{repeating_skills_6_skillranks} + @{repeating_skills_6_skillother}">7</option>
+									<option value="@{repeating_skills_7_skillstat} + @{repeating_skills_7_skillranks} + @{repeating_skills_7_skillother}">8</option>
+									<option value="@{repeating_skills_8_skillstat} + @{repeating_skills_8_skillranks} + @{repeating_skills_8_skillother}">9</option>
+									<option value="@{repeating_skills_9_skillstat} + @{repeating_skills_9_skillranks} + @{repeating_skills_9_skillother}">10</option>
+									<option value="@{repeating_skills_10_skillstat} + @{repeating_skills_10_skillranks} + @{repeating_skills_10_skillother}">11</option>
+									<option value="@{repeating_skills_11_skillstat} + @{repeating_skills_11_skillranks} + @{repeating_skills_11_skillother}">12</option>
+									<option value="@{repeating_skills_12_skillstat} + @{repeating_skills_12_skillranks} + @{repeating_skills_12_skillother}">13</option>
+									<option value="@{repeating_skills_13_skillstat} + @{repeating_skills_13_skillranks} + @{repeating_skills_13_skillother}">14</option>
+									<option value="@{repeating_skills_14_skillstat} + @{repeating_skills_14_skillranks} + @{repeating_skills_14_skillother}">15</option>
+									<option value="@{repeating_skills_15_skillstat} + @{repeating_skills_15_skillranks} + @{repeating_skills_15_skillother}">16</option>
+									<option value="@{repeating_skills_16_skillstat} + @{repeating_skills_16_skillranks} + @{repeating_skills_16_skillother}">17</option>
+									<option value="@{repeating_skills_17_skillstat} + @{repeating_skills_17_skillranks} + @{repeating_skills_17_skillother}">18</option>
+									<option value="@{repeating_skills_18_skillstat} + @{repeating_skills_18_skillranks} + @{repeating_skills_18_skillother}">19</option>
+									<option value="@{repeating_skills_19_skillstat} + @{repeating_skills_19_skillranks} + @{repeating_skills_19_skillother}">20</option>
+									<option value="@{repeating_skills_20_skillstat} + @{repeating_skills_20_skillranks} + @{repeating_skills_20_skillother}">21</option>
+									<option value="@{repeating_skills_21_skillstat} + @{repeating_skills_21_skillranks} + @{repeating_skills_21_skillother}">22</option>
+									<option value="@{repeating_skills_22_skillstat} + @{repeating_skills_22_skillranks} + @{repeating_skills_22_skillother}">23</option>
+									<option value="@{repeating_skills_23_skillstat} + @{repeating_skills_23_skillranks} + @{repeating_skills_23_skillother}">24</option>
+									<option value="@{repeating_skills_24_skillstat} + @{repeating_skills_24_skillranks} + @{repeating_skills_24_skillother}">25</option>
+									<option value="@{repeating_skills_25_skillstat} + @{repeating_skills_25_skillranks} + @{repeating_skills_25_skillother}">26</option>
+									<option value="@{repeating_skills_26_skillstat} + @{repeating_skills_26_skillranks} + @{repeating_skills_26_skillother}">27</option>
+									<option value="@{repeating_skills_27_skillstat} + @{repeating_skills_27_skillranks} + @{repeating_skills_27_skillother}">28</option>
+									<option value="@{repeating_skills_28_skillstat} + @{repeating_skills_28_skillranks} + @{repeating_skills_28_skillother}">29</option>
+									<option value="@{repeating_skills_29_skillstat} + @{repeating_skills_29_skillranks} + @{repeating_skills_29_skillother}">30</option>
+								</select>
+							</div>
+							<div class="sheet-col-1-12 sheet-center"><input type="number" name="attr_ritualattacksize" /></div>
+							<div class="sheet-col-1-12 sheet-center"><input type="text" name="attr_ritualcast" /></div>
+							<div class="sheet-col-1-12 sheet-center"><input type="number" name="attr_ritualdiff" /></div>
+							<div class="sheet-col-1-12 sheet-center"><input type="text" name="attr_ritualdur" /></div>
+							<div class="sheet-col-1-12 sheet-center"><input type="text" name="attr_ritualrange"/></div>
+							<div class="sheet-col-1-12 sheet-center"><button type="roll" class="sheet-d10-roll-button" name="roll_ritualroll" value="&{template:nud10} {{title=@{ritualname}}} {{subheader=@{character_name}}} {{subheaderright=@{ritualskill}}} {{subheader2=Range @{ritualrange}}} {{subheaderright2=AS @{ritualattacksize}}} {{rollname=Roll}} {{roll=[[1d10 + [[@{ritualscore}]] [Score] - [[(@{Mentalpen})]] [Penalties] > @{ritualdiff} [Difficulty] ]]}} {{description=@{ritualdesc}}} {{success=A successful matrix must be imbued or it will take effect immediately and last for @{ritualdur}}}" /></div>
+						</div>
+						<div class="sheet-row">
+							<div class="sheet-col-1"><textarea class="sheet-small-textarea" name="attr_ritualdesc"></textarea></div>
+						</div>
+					</fieldset>
+				</div>
+				<!-- Greater Rituals -->
+				<div class="sheet-ritual-page3">
+					<fieldset class="repeating_ritualgreat">
+						<div class="sheet-row sheet-border-top">
+							<div class="sheet-col-1-4 sheet-sub-header sheet-center">Name</div>
+							<div class="sheet-col-1-12 sheet-sub-header sheet-left">Skill</div>
+							<div class="sheet-col-1-12 sheet-sub-header sheet-left">Skill #</div>
+							<div class="sheet-col-1-12 sheet-sub-header sheet-left">Attack Size</div>
+							<div class="sheet-col-1-12 sheet-sub-header sheet-left">Time</div>
+							<div class="sheet-col-1-12 sheet-sub-header sheet-left">Diff.</div>
+							<div class="sheet-col-1-12 sheet-sub-header sheet-left">Dur.</div>
+							<div class="sheet-col-1-12 sheet-sub-header sheet-left">Range</div>
+							<div class="sheet-col-1-12 sheet-sub-header sheet-left">&nbsp;</div>
+						</div>
+						<div class="sheet-row">
+							<div class="sheet-col-1-4 sheet-left"><input type="text" name="attr_ritualname" /></div>
+							<div class="sheet-col-1-12 sheet-center"><input type="text" name="attr_ritualskill"/></div>
+							<div class="sheet-col-1-12 sheet-center">
+								
+								<select name="attr_ritualscore" class="sheet-center" title="Set number of the skill as it apears in the skill list to dynamically link the attack to a skill">
+									<option value="@{repeating_skills_0_skillstat} + @{repeating_skills_0_skillranks} + @{repeating_skills_0_skillother}">1</option>
+									<option value="@{repeating_skills_1_skillstat} + @{repeating_skills_1_skillranks} + @{repeating_skills_1_skillother}">2</option>
+									<option value="@{repeating_skills_2_skillstat} + @{repeating_skills_2_skillranks} + @{repeating_skills_2_skillother}">3</option>
+									<option value="@{repeating_skills_3_skillstat} + @{repeating_skills_3_skillranks} + @{repeating_skills_3_skillother}">4</option>
+									<option value="@{repeating_skills_4_skillstat} + @{repeating_skills_4_skillranks} + @{repeating_skills_4_skillother}">5</option>
+									<option value="@{repeating_skills_5_skillstat} + @{repeating_skills_5_skillranks} + @{repeating_skills_5_skillother}">6</option>
+									<option value="@{repeating_skills_6_skillstat} + @{repeating_skills_6_skillranks} + @{repeating_skills_6_skillother}">7</option>
+									<option value="@{repeating_skills_7_skillstat} + @{repeating_skills_7_skillranks} + @{repeating_skills_7_skillother}">8</option>
+									<option value="@{repeating_skills_8_skillstat} + @{repeating_skills_8_skillranks} + @{repeating_skills_8_skillother}">9</option>
+									<option value="@{repeating_skills_9_skillstat} + @{repeating_skills_9_skillranks} + @{repeating_skills_9_skillother}">10</option>
+									<option value="@{repeating_skills_10_skillstat} + @{repeating_skills_10_skillranks} + @{repeating_skills_10_skillother}">11</option>
+									<option value="@{repeating_skills_11_skillstat} + @{repeating_skills_11_skillranks} + @{repeating_skills_11_skillother}">12</option>
+									<option value="@{repeating_skills_12_skillstat} + @{repeating_skills_12_skillranks} + @{repeating_skills_12_skillother}">13</option>
+									<option value="@{repeating_skills_13_skillstat} + @{repeating_skills_13_skillranks} + @{repeating_skills_13_skillother}">14</option>
+									<option value="@{repeating_skills_14_skillstat} + @{repeating_skills_14_skillranks} + @{repeating_skills_14_skillother}">15</option>
+									<option value="@{repeating_skills_15_skillstat} + @{repeating_skills_15_skillranks} + @{repeating_skills_15_skillother}">16</option>
+									<option value="@{repeating_skills_16_skillstat} + @{repeating_skills_16_skillranks} + @{repeating_skills_16_skillother}">17</option>
+									<option value="@{repeating_skills_17_skillstat} + @{repeating_skills_17_skillranks} + @{repeating_skills_17_skillother}">18</option>
+									<option value="@{repeating_skills_18_skillstat} + @{repeating_skills_18_skillranks} + @{repeating_skills_18_skillother}">19</option>
+									<option value="@{repeating_skills_19_skillstat} + @{repeating_skills_19_skillranks} + @{repeating_skills_19_skillother}">20</option>
+									<option value="@{repeating_skills_20_skillstat} + @{repeating_skills_20_skillranks} + @{repeating_skills_20_skillother}">21</option>
+									<option value="@{repeating_skills_21_skillstat} + @{repeating_skills_21_skillranks} + @{repeating_skills_21_skillother}">22</option>
+									<option value="@{repeating_skills_22_skillstat} + @{repeating_skills_22_skillranks} + @{repeating_skills_22_skillother}">23</option>
+									<option value="@{repeating_skills_23_skillstat} + @{repeating_skills_23_skillranks} + @{repeating_skills_23_skillother}">24</option>
+									<option value="@{repeating_skills_24_skillstat} + @{repeating_skills_24_skillranks} + @{repeating_skills_24_skillother}">25</option>
+									<option value="@{repeating_skills_25_skillstat} + @{repeating_skills_25_skillranks} + @{repeating_skills_25_skillother}">26</option>
+									<option value="@{repeating_skills_26_skillstat} + @{repeating_skills_26_skillranks} + @{repeating_skills_26_skillother}">27</option>
+									<option value="@{repeating_skills_27_skillstat} + @{repeating_skills_27_skillranks} + @{repeating_skills_27_skillother}">28</option>
+									<option value="@{repeating_skills_28_skillstat} + @{repeating_skills_28_skillranks} + @{repeating_skills_28_skillother}">29</option>
+									<option value="@{repeating_skills_29_skillstat} + @{repeating_skills_29_skillranks} + @{repeating_skills_29_skillother}">30</option>
+								</select>
+							</div>
+							<div class="sheet-col-1-12 sheet-center"><input type="number" name="attr_ritualattacksize" /></div>
+							<div class="sheet-col-1-12 sheet-center"><input type="text" name="attr_ritualcast" /></div>
+							<div class="sheet-col-1-12 sheet-center"><input type="number" name="attr_ritualdiff" /></div>
+							<div class="sheet-col-1-12 sheet-center"><input type="text" name="attr_ritualdur" /></div>
+							<div class="sheet-col-1-12 sheet-center"><input type="text" name="attr_ritualrange"/></div>
+							<div class="sheet-col-1-12 sheet-center"><button type="roll" class="sheet-d10-roll-button" name="roll_ritualroll" value="&{template:nud10} {{title=@{ritualname}}} {{subheader=@{character_name}}} {{subheaderright=@{ritualskill}}} {{subheader2=Range @{ritualrange}}} {{subheaderright2=AS @{ritualattacksize}}} {{rollname=Roll}} {{roll=[[1d10 + [[@{ritualscore}]] [Score] - [[(@{Mentalpen})]] [Penalties] > @{ritualdiff} [Difficulty] ]]}} {{description=@{ritualdesc}}} {{success=A successful matrix must be imbued or it will take effect immediately and last for @{ritualdur}}}" /></div>
+						</div>
+						<div class="sheet-row">
+							<div class="sheet-col-1"><textarea class="sheet-small-textarea" name="attr_ritualdesc"></textarea></div>
+						</div>
+					</fieldset>
+				</div>
+				<!-- Greater Disciplines -->
+				<div class="sheet-ritual-page4">
+					<fieldset class="repeating_ritualdis">
+						<div class="sheet-row sheet-border-top">
+							<div class="sheet-col-1-4 sheet-sub-header sheet-center">Name</div>
+							<div class="sheet-col-1-12 sheet-sub-header sheet-left">Skill</div>
+							<div class="sheet-col-1-12 sheet-sub-header sheet-left">Skill #</div>
+							<div class="sheet-col-1-12 sheet-sub-header sheet-left">Attack Size</div>
+							<div class="sheet-col-1-12 sheet-sub-header sheet-left">Time</div>
+							<div class="sheet-col-1-12 sheet-sub-header sheet-left">Diff.</div>
+							<div class="sheet-col-1-12 sheet-sub-header sheet-left">Dur.</div>
+							<div class="sheet-col-1-12 sheet-sub-header sheet-left">Range</div>
+							<div class="sheet-col-1-12 sheet-sub-header sheet-left">&nbsp;</div>
+						</div>
+						<div class="sheet-row">
+							<div class="sheet-col-1-4 sheet-left"><input type="text" name="attr_ritualname" /></div>
+							<div class="sheet-col-1-12 sheet-center"><input type="text" name="attr_ritualskill"/></div>
+							<div class="sheet-col-1-12 sheet-center">
+								
+								<select name="attr_ritualscore" class="sheet-center" title="Set number of the skill as it apears in the skill list to dynamically link the attack to a skill">
+									<option value="@{repeating_skills_0_skillstat} + @{repeating_skills_0_skillranks} + @{repeating_skills_0_skillother}">1</option>
+									<option value="@{repeating_skills_1_skillstat} + @{repeating_skills_1_skillranks} + @{repeating_skills_1_skillother}">2</option>
+									<option value="@{repeating_skills_2_skillstat} + @{repeating_skills_2_skillranks} + @{repeating_skills_2_skillother}">3</option>
+									<option value="@{repeating_skills_3_skillstat} + @{repeating_skills_3_skillranks} + @{repeating_skills_3_skillother}">4</option>
+									<option value="@{repeating_skills_4_skillstat} + @{repeating_skills_4_skillranks} + @{repeating_skills_4_skillother}">5</option>
+									<option value="@{repeating_skills_5_skillstat} + @{repeating_skills_5_skillranks} + @{repeating_skills_5_skillother}">6</option>
+									<option value="@{repeating_skills_6_skillstat} + @{repeating_skills_6_skillranks} + @{repeating_skills_6_skillother}">7</option>
+									<option value="@{repeating_skills_7_skillstat} + @{repeating_skills_7_skillranks} + @{repeating_skills_7_skillother}">8</option>
+									<option value="@{repeating_skills_8_skillstat} + @{repeating_skills_8_skillranks} + @{repeating_skills_8_skillother}">9</option>
+									<option value="@{repeating_skills_9_skillstat} + @{repeating_skills_9_skillranks} + @{repeating_skills_9_skillother}">10</option>
+									<option value="@{repeating_skills_10_skillstat} + @{repeating_skills_10_skillranks} + @{repeating_skills_10_skillother}">11</option>
+									<option value="@{repeating_skills_11_skillstat} + @{repeating_skills_11_skillranks} + @{repeating_skills_11_skillother}">12</option>
+									<option value="@{repeating_skills_12_skillstat} + @{repeating_skills_12_skillranks} + @{repeating_skills_12_skillother}">13</option>
+									<option value="@{repeating_skills_13_skillstat} + @{repeating_skills_13_skillranks} + @{repeating_skills_13_skillother}">14</option>
+									<option value="@{repeating_skills_14_skillstat} + @{repeating_skills_14_skillranks} + @{repeating_skills_14_skillother}">15</option>
+									<option value="@{repeating_skills_15_skillstat} + @{repeating_skills_15_skillranks} + @{repeating_skills_15_skillother}">16</option>
+									<option value="@{repeating_skills_16_skillstat} + @{repeating_skills_16_skillranks} + @{repeating_skills_16_skillother}">17</option>
+									<option value="@{repeating_skills_17_skillstat} + @{repeating_skills_17_skillranks} + @{repeating_skills_17_skillother}">18</option>
+									<option value="@{repeating_skills_18_skillstat} + @{repeating_skills_18_skillranks} + @{repeating_skills_18_skillother}">19</option>
+									<option value="@{repeating_skills_19_skillstat} + @{repeating_skills_19_skillranks} + @{repeating_skills_19_skillother}">20</option>
+									<option value="@{repeating_skills_20_skillstat} + @{repeating_skills_20_skillranks} + @{repeating_skills_20_skillother}">21</option>
+									<option value="@{repeating_skills_21_skillstat} + @{repeating_skills_21_skillranks} + @{repeating_skills_21_skillother}">22</option>
+									<option value="@{repeating_skills_22_skillstat} + @{repeating_skills_22_skillranks} + @{repeating_skills_22_skillother}">23</option>
+									<option value="@{repeating_skills_23_skillstat} + @{repeating_skills_23_skillranks} + @{repeating_skills_23_skillother}">24</option>
+									<option value="@{repeating_skills_24_skillstat} + @{repeating_skills_24_skillranks} + @{repeating_skills_24_skillother}">25</option>
+									<option value="@{repeating_skills_25_skillstat} + @{repeating_skills_25_skillranks} + @{repeating_skills_25_skillother}">26</option>
+									<option value="@{repeating_skills_26_skillstat} + @{repeating_skills_26_skillranks} + @{repeating_skills_26_skillother}">27</option>
+									<option value="@{repeating_skills_27_skillstat} + @{repeating_skills_27_skillranks} + @{repeating_skills_27_skillother}">28</option>
+									<option value="@{repeating_skills_28_skillstat} + @{repeating_skills_28_skillranks} + @{repeating_skills_28_skillother}">29</option>
+									<option value="@{repeating_skills_29_skillstat} + @{repeating_skills_29_skillranks} + @{repeating_skills_29_skillother}">30</option>
+								</select>
+							</div>
+							<div class="sheet-col-1-12 sheet-center"><input type="number" name="attr_ritualattacksize" /></div>
+							<div class="sheet-col-1-12 sheet-center"><input type="text" name="attr_ritualcast" /></div>
+							<div class="sheet-col-1-12 sheet-center"><input type="number" name="attr_ritualdiff" /></div>
+							<div class="sheet-col-1-12 sheet-center"><input type="text" name="attr_ritualdur" /></div>
+							<div class="sheet-col-1-12 sheet-center"><input type="text" name="attr_ritualrange"/></div>
+							<div class="sheet-col-1-12 sheet-center"><button type="roll" class="sheet-d10-roll-button" name="roll_ritualroll" value="&{template:nud10} {{title=@{ritualname}}} {{subheader=@{character_name}}} {{subheaderright=@{ritualskill}}} {{subheader2=Range @{ritualrange}}} {{subheaderright2=AS @{ritualattacksize}}} {{rollname=Roll}} {{roll=[[1d10 + [[@{ritualscore}]] [Score] - [[(@{Mentalpen})]] [Penalties] > @{ritualdiff} [Difficulty] ]]}} {{description=@{ritualdesc}}} {{success=A successful matrix must be imbued or it will take effect immediately and last for @{ritualdur}}}" /></div>
+						</div>
+						<div class="sheet-row">
+							<div class="sheet-col-1"><textarea class="sheet-small-textarea" name="attr_ritualdesc"></textarea></div>
+						</div>
+					</fieldset>
+				</div>
+			</div>
+		</div>
+		<div class="sheet-row">
+			<div class="sheet-col-1-3">
+				<h3>Foci</h3>
+				<div class="sheet-row">
+					<div class="sheet-col-1-3 sheet-sub-header sheet-center">Description</div>
+					<div class="sheet-col-1-8 sheet-sub-header sheet-center">Skill</div>
+					<div class="sheet-col-1-4 sheet-sub-header sheet-center">Disc.</div>
+					<div class="sheet-col-1-6 sheet-sub-header sheet-center">Bonus</div>
+				</div>
+				<fieldset class="repeating_foci">
+					<div class="sheet-col-1-3 sheet-left"><input type="text" name="attr_fociname" /></div>
+					<div class="sheet-col-1-8 sheet-center"><input type="text" name="attr_fociskill"/></div>
+					<div class="sheet-col-1-4 sheet-center"><input type="text" name="attr_focidisc" /></div>
+					<div class="sheet-col-1-8 sheet-left"><input type="text" name="attr_focibonus"/></div>
+				</fieldset>
+			</div>
+			<div class="sheet-col-1-3 sheet-padl">
+				<h3>Components</h3>
+				<div class="sheet-row">
+					<div class="sheet-col-1-3 sheet-sub-header sheet-center">Component</div>
+					<div class="sheet-col-1-6 sheet-sub-header sheet-center">Skill</div>
+					<div class="sheet-col-1-6 sheet-sub-header sheet-center">Disc.</div>
+					<div class="sheet-col-1-4 sheet-sub-header sheet-center">Notes</div>
+				</div>
+				<fieldset class="repeating_comp">
+					<div class="sheet-col-1-3 sheet-left"><input type="text" name="attr_compname" /></div>
+					<div class="sheet-col-1-6 sheet-center"><input type="text" name="attr_compskill"/></div>
+					<div class="sheet-col-1-6 sheet-center"><input type="text" name="attr_compdisc" /></div>
+					<div class="sheet-col-1-4 sheet-left"><input type="text" name="attr_compnotes"/></div>
+				</fieldset>
+			</div>
+			<div class="sheet-col-1-3 sheet-padl">
+				<h3>Matrix Locations</h3>
+				<div class="sheet-row">
+					<div class="sheet-col-1-3 sheet-sub-header sheet-center">Location</div>
+					<div class="sheet-col-1-6 sheet-sub-header sheet-center">Max Matix</div>
+					<div class="sheet-col-1-6 sheet-sub-header sheet-center">Cur. Matrx</div>
+					<div class="sheet-col-1-6 sheet-sub-header sheet-center">Avail.</div>
+				</div>
+				<fieldset class="repeating_matrixlocs">
+					<div class="sheet-col-1-3 sheet-left"><input type="text" name="attr_matrixlocname" /></div>
+					<div class="sheet-col-1-6 sheet-center"><input type="number" name="attr_matrixlocmatrix_max"/></div>
+					<div class="sheet-col-1-6 sheet-center"><input type="number" name="attr_matrixlocmatrix" /></div>
+					<div class="sheet-col-1-6 sheet-left"><input type="number" name="attr_matrixlocavail" /></div>
+				</fieldset>
+			</div>
+		</div>
+		<!-- Matrix Storage -->
+		<div class="sheet-row">
+			<div class="sheet-col-1">
+				<h3>Stored Matrixies</h3>
+				<div class="sheet-row">
+					<div class="sheet-col-1-24 sheet-sub-header sheet-left">Perm.</div>
+					<div class="sheet-col-1-4 sheet-sub-header sheet-center">Name</div>
+					<div class="sheet-col-1-12 sheet-sub-header sheet-left">Location</div>
+					<div class="sheet-col-1-12 sheet-sub-header sheet-left">Trigger</div>
+					<div class="sheet-col-1-12 sheet-sub-header sheet-left">Recharge</div>
+					<div class="sheet-col-1-12 sheet-sub-header sheet-left">Diff</div>
+					<div class="sheet-col-1-12 sheet-sub-header sheet-left">Craft Use #</div>
+					<div class="sheet-col-1-4 sheet-sub-header sheet-left">Description</div>
+					<div class="sheet-col-1-24 sheet-sub-header sheet-left">&nbsp;</div>
+				</div>
+				<fieldset class="repeating_storedmatrix">
+					<div class="sheet-row">
+						<div class="sheet-col-1-24 sheet-center"><input type="checkbox" name="attr_matrixperm" value="1"/></div>
+						<div class="sheet-col-1-4 sheet-left"><input type="text" name="attr_matrixname" /></div>
+						<div class="sheet-col-1-12 sheet-left"><input type="text" name="attr_matrixloc" /></div>
+						<div class="sheet-col-1-12 sheet-center"><input type="text" name="attr_matrixstrigger" title="Description of the trigger"/></div>
+						<div class="sheet-col-1-12 sheet-center"><input type="text" name="attr_matrixrecharge" title="For permanent matrices"/></div>
+						<div class="sheet-col-1-12 sheet-center"><input type="number" name="attr_matrixdiff" title="Standard triggers are Routine (5) for imbuers, single use items such as potions are 0"/></div>
+						<div class="sheet-col-1-12 sheet-center">
+							<select name="attr_matrixscore" class="sheet-center" title="Set number of the Craft/Use skill as it apears in the skill list to dynamically link the skill">
+								<option value="@{repeating_skills_0_skillstat} + @{repeating_skills_0_skillranks} + @{repeating_skills_0_skillother}">1</option>
+								<option value="@{repeating_skills_1_skillstat} + @{repeating_skills_1_skillranks} + @{repeating_skills_1_skillother}">2</option>
+								<option value="@{repeating_skills_2_skillstat} + @{repeating_skills_2_skillranks} + @{repeating_skills_2_skillother}">3</option>
+								<option value="@{repeating_skills_3_skillstat} + @{repeating_skills_3_skillranks} + @{repeating_skills_3_skillother}">4</option>
+								<option value="@{repeating_skills_4_skillstat} + @{repeating_skills_4_skillranks} + @{repeating_skills_4_skillother}">5</option>
+								<option value="@{repeating_skills_5_skillstat} + @{repeating_skills_5_skillranks} + @{repeating_skills_5_skillother}">6</option>
+								<option value="@{repeating_skills_6_skillstat} + @{repeating_skills_6_skillranks} + @{repeating_skills_6_skillother}">7</option>
+								<option value="@{repeating_skills_7_skillstat} + @{repeating_skills_7_skillranks} + @{repeating_skills_7_skillother}">8</option>
+								<option value="@{repeating_skills_8_skillstat} + @{repeating_skills_8_skillranks} + @{repeating_skills_8_skillother}">9</option>
+								<option value="@{repeating_skills_9_skillstat} + @{repeating_skills_9_skillranks} + @{repeating_skills_9_skillother}">10</option>
+								<option value="@{repeating_skills_10_skillstat} + @{repeating_skills_10_skillranks} + @{repeating_skills_10_skillother}">11</option>
+								<option value="@{repeating_skills_11_skillstat} + @{repeating_skills_11_skillranks} + @{repeating_skills_11_skillother}">12</option>
+								<option value="@{repeating_skills_12_skillstat} + @{repeating_skills_12_skillranks} + @{repeating_skills_12_skillother}">13</option>
+								<option value="@{repeating_skills_13_skillstat} + @{repeating_skills_13_skillranks} + @{repeating_skills_13_skillother}">14</option>
+								<option value="@{repeating_skills_14_skillstat} + @{repeating_skills_14_skillranks} + @{repeating_skills_14_skillother}">15</option>
+								<option value="@{repeating_skills_15_skillstat} + @{repeating_skills_15_skillranks} + @{repeating_skills_15_skillother}">16</option>
+								<option value="@{repeating_skills_16_skillstat} + @{repeating_skills_16_skillranks} + @{repeating_skills_16_skillother}">17</option>
+								<option value="@{repeating_skills_17_skillstat} + @{repeating_skills_17_skillranks} + @{repeating_skills_17_skillother}">18</option>
+								<option value="@{repeating_skills_18_skillstat} + @{repeating_skills_18_skillranks} + @{repeating_skills_18_skillother}">19</option>
+								<option value="@{repeating_skills_19_skillstat} + @{repeating_skills_19_skillranks} + @{repeating_skills_19_skillother}">20</option>
+								<option value="@{repeating_skills_20_skillstat} + @{repeating_skills_20_skillranks} + @{repeating_skills_20_skillother}">21</option>
+								<option value="@{repeating_skills_21_skillstat} + @{repeating_skills_21_skillranks} + @{repeating_skills_21_skillother}">22</option>
+								<option value="@{repeating_skills_22_skillstat} + @{repeating_skills_22_skillranks} + @{repeating_skills_22_skillother}">23</option>
+								<option value="@{repeating_skills_23_skillstat} + @{repeating_skills_23_skillranks} + @{repeating_skills_23_skillother}">24</option>
+								<option value="@{repeating_skills_24_skillstat} + @{repeating_skills_24_skillranks} + @{repeating_skills_24_skillother}">25</option>
+								<option value="@{repeating_skills_25_skillstat} + @{repeating_skills_25_skillranks} + @{repeating_skills_25_skillother}">26</option>
+								<option value="@{repeating_skills_26_skillstat} + @{repeating_skills_26_skillranks} + @{repeating_skills_26_skillother}">27</option>
+								<option value="@{repeating_skills_27_skillstat} + @{repeating_skills_27_skillranks} + @{repeating_skills_27_skillother}">28</option>
+								<option value="@{repeating_skills_28_skillstat} + @{repeating_skills_28_skillranks} + @{repeating_skills_28_skillother}">29</option>
+								<option value="@{repeating_skills_29_skillstat} + @{repeating_skills_29_skillranks} + @{repeating_skills_29_skillother}">30</option>
+							</select>
+						</div>
+						<div class="sheet-col-1-4 sheet-center"><input type="text" name="attr_matrixdesc" /></div>
+						<div class="sheet-col-1-24 sheet-center"><button type="roll" class="sheet-d10-roll-button" name="roll_matrixroll" value="&{template:nud10} {{title=@{matrixname}}} {{subheader=@{character_name}}} {{subheaderright=@{matrixloc}}}  {{rollname=Roll}} {{roll=[[1d10 + [[@{matrixscore}]] [Score] - [[(@{Mentalpen})]] [Penalties] > @{matrixdiff} [Difficulty] ]]}} {{description=@{matrixdesc}}}" /></div>
 					</div>
 				</fieldset>
 			</div>
@@ -1204,13 +1336,13 @@
 					<div class="sheet-col-1-6 sheet-sidehead sheet-right sheet-padr">Move</div>
 					<div class="sheet-col-1-6">
 						<select name="attr_MoveHL">
-							<option value="@{WL1pen} + @{WL2pen}" selected="selected">Humanoid</option>
+							<option value="@{WL1pen} + @{WL2pen} " selected="selected">Humanoid</option>
 							<option value="@{WL1pen} + @{WL2pen} + @{WL3pen} + @{WL4pen} + @{WL5pen} + @{WL6pen}">Quadruped</option>
 							<option value="@{WL1pen} + @{WL2pen} + @{WL3pen} + @{WL4pen} + @{WL5pen}">Avian Quadruped</option>
-							<option value="@{WL1pen} + @{WL2pen}">Avian</option>
+							<option value="@{WL1pen} + @{WL2pen}  ">Avian</option>
 							<option value="@{WL1pen} + @{WL2pen} + @{WL3pen}">Aquatic</option>
 							<option value="@{WL1pen} + @{WL2pen} + @{WL3pen} + @{WL4pen}">Serpentine</option>
-							<option value="@{WL1pen} + @{WL2pen}">Theropod</option>
+							<option value="@{WL1pen} + @{WL2pen}   ">Theropod</option>
 							<option value="@{WL1pen} + @{WL2pen} + @{WL3pen} + @{WL4pen}">Cephalopod</option>
 						</select>
 					</div>
@@ -1222,8 +1354,8 @@
 							<option value="@{WL1pen} + @{WL2pen} + @{WL5pen}">Avian Quadruped</option>
 							<option value="@{WL1pen} + @{WL2pen}">Avian</option>
 							<option value="">Aquatic</option>
-							<option value="">Serpentine</option>
-							<option value="@{WL3pen} + @{WL4pen} + @{WL5pen} + @{WL6pen}">Theropod</option>
+							<option value=" ">Serpentine</option>
+							<option value="@{WL3pen} + @{WL4pen} + @{WL5pen} + @{WL6pen}  ">Theropod</option>
 							<option value="@{WL1pen} + @{WL2pen} + @{WL3pen} + @{WL4pen}">Cephalopod</option>
 						</select>
 					</div>
@@ -1231,12 +1363,12 @@
 					<div class="sheet-col-1-6">
 						<select name="attr_MentalHL">
 							<option value="@{WL7pen}" selected="selected">Humanoid</option>
-							<option value="@{WL7pen}">Quadruped</option>
-							<option value="@{WL7pen}">Avian Quadruped</option>
-							<option value="@{WL7pen}">Avian</option>
+							<option value="@{WL7pen} ">Quadruped</option>
+							<option value="@{WL7pen}   ">Avian Quadruped</option>
+							<option value="@{WL7pen}  ">Avian</option>
 							<option value="@{WL4pen}">Aquatic</option>
 							<option value="@{WL5pen}">Serpentine</option>
-							<option value="@{WL7pen}">Theropod</option>
+							<option value="@{WL7pen}    ">Theropod</option>
 							<option value="@{WL5pen}">Cephalopod</option>
 						</select>
 					</div>
@@ -1244,7 +1376,7 @@
 				<div class="sheet-row sheet-shade">
 					<div class="sheet-col-1-6 sheet-sidehead sheet-right sheet-padr">Flight</div>
 					<div class="sheet-col-1-6">
-						<select name="attr_MoveHL">
+						<select name="attr_FlightHL">
 							<option value="" selected="selected">None</option>
 							<option value="@{WL6pen}">Avian Quadruped</option>
 							<option value="@{WL3pen} + @{WL4pen} + @{WL5pen} + @{WL6pen}">Avian</option>
@@ -1337,7 +1469,7 @@
 				<div class="sheet-row">
 					<div class="sheet-col-1-6 sheet-sidehead sheet-right sheet-padr">Mental Resillience</div>
 					<div class="sheet-col-1-6"><input type="number" name="attr_mres" value="0" min="0" /></div>
-					<div class="sheet-col-1-6 sheet-sidehead sheet-right sheet-padr">Dark Knowledge</div>
+					<div class="sheet-col-1-6 sheet-sidehead sheet-right sheet-padr">Dangerous Knowledge</div>
 					<div class="sheet-col-1-6"><input type="number" name="attr_darkknow" value="0" min="0" /></div>
 					<div class="sheet-col-1-6 sheet-sidehead sheet-right sheet-padr">Blissful Ignorance</div>
 					<div class="sheet-col-1-6"><input type="checkbox" name="attr_blissig" value="1" min="0" /></div>
