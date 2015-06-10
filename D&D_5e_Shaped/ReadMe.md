@@ -21,6 +21,7 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 * Resize quick fields to allow more room for hit and +dmg
 * Shrink saves and checks to match skills' height
+* Reorder pages to put Weapons, Actions, and Spellbook much earlier
 
 **8th June 2015**
 
