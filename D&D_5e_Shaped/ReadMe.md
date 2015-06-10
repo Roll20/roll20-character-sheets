@@ -17,6 +17,11 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### Changelog
 
+**9th June 2015**
+
+* Resize quick fields to allow more room for hit and +dmg
+* Shrink saves and checks to match skills' height
+
 **8th June 2015**
 
 * Hide fields that shouldn't be displayed from weapons output now that class actions are added to the new weapons
