@@ -244,7 +244,7 @@ gulp.task('preCompile', function() {
 				return duplicate(file, inventoryPerPage, 1 + inventoryPerPage + inventoryPerPage);
 			}
 		}))
-		//.pipe(minifyHTML())
+		.pipe(minifyHTML())
 		.pipe( gulp.dest('./') )
 });
 

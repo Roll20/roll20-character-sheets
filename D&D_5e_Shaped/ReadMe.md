@@ -17,6 +17,13 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### Changelog
 
+**18th June 2015**
+
+* (Dev) Refactored the grid system and cleaned up a lot of CSS - using scss now
+* (Dev) HTML is compiled to be smaller now
+* Removed the old NPC sheet
+* Moved bonuses for Abilities/Saves/Checks/Skills to the Settings tab.
+
 **9th June 2015**
 
 * Resize quick fields to allow more room for hit and +dmg
