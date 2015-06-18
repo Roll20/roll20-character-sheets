@@ -1,6 +1,8 @@
 var gulp = require('gulp'),
 	include = require('gulp-include'),
-	inject = require('gulp-inject');
+	inject = require('gulp-inject'),
+	minifyHTML = require('gulp-minify-html'),
+	concat = require('gulp-concat');
 
 var customSkillCount = 4,
 	outputOtionsCount = 1,
@@ -108,7 +110,7 @@ function skills (file) {
 	return skills.join('\n\n');
 }
 
-gulp.task('compile', function() {
+gulp.task('preCompile', function() {
 	gulp.src('precompiled/D&D_5e.html')
 		.pipe( include() )
 		.pipe( inject(gulp.src(['precompiled/components/skills/skill.html']), {
@@ -231,5 +233,12 @@ gulp.task('compile', function() {
 				return duplicate(file, inventoryPerPage, 1 + inventoryPerPage + inventoryPerPage);
 			}
 		}))
+		.pipe(minifyHTML())
+		.pipe( gulp.dest('./') )
+});
+
+gulp.task('compile', function() {
+	return gulp.src( ['D&D_5e.html', 'precompiled/pages/roll_template.html'] )
+		.pipe(concat('D&D_5e.html'))
 		.pipe( gulp.dest('./') )
 });
