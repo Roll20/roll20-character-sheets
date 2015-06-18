@@ -118,9 +118,20 @@ gulp.task('preCompile', function() {
 			transform: function (filePath, file) {
 				return skills(file);
 			}
+		})).pipe( inject(gulp.src(['precompiled/components/skills/skill_bonuses.html']), {
+			starttag: '<!-- inject:skillsBonuses:{{ext}} -->',
+			transform: function (filePath, file) {
+				return skills(file);
+			}
 		}))
 		.pipe( inject(gulp.src(['precompiled/components/skills/custom_skill.html']), {
 			starttag: '<!-- inject:customSkills:{{ext}} -->',
+			transform: function (filePath, file) {
+				return duplicate(file, customSkillCount, 1);
+			}
+		}))
+		.pipe( inject(gulp.src(['precompiled/components/skills/custom_skill_bonuses.html']), {
+			starttag: '<!-- inject:customSkillsBonuses:{{ext}} -->',
 			transform: function (filePath, file) {
 				return duplicate(file, customSkillCount, 1);
 			}
@@ -233,7 +244,7 @@ gulp.task('preCompile', function() {
 				return duplicate(file, inventoryPerPage, 1 + inventoryPerPage + inventoryPerPage);
 			}
 		}))
-		.pipe(minifyHTML())
+		//.pipe(minifyHTML())
 		.pipe( gulp.dest('./') )
 });
 
