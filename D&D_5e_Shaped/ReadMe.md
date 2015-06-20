@@ -21,6 +21,7 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 **19th-20th June 2015**
 
 * (Dev) Lots more cleanup
+* Monk DC added to spells
 * Added targetAC to Spells & Cantrips
 * Added a toggle for "Quick Weapons" on the weapons page
 
