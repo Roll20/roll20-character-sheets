@@ -2,6 +2,7 @@ var gulp = require('gulp'),
 	include = require('gulp-include'),
 	inject = require('gulp-inject'),
 	minifyHTML = require('gulp-minify-html'),
+	minifyCss = require('gulp-minify-css'),
 	concat = require('gulp-concat');
 
 var customSkillCount = 4,
@@ -245,11 +246,17 @@ gulp.task('preCompile', function() {
 			}
 		}))
 		.pipe(minifyHTML())
-		.pipe( gulp.dest('./') )
+		.pipe(gulp.dest('./'));
 });
 
 gulp.task('compile', function() {
 	return gulp.src( ['D&D_5e.html', 'precompiled/pages/roll_template.html'] )
 		.pipe(concat('D&D_5e.html'))
-		.pipe( gulp.dest('./') )
+		.pipe(gulp.dest('./'));
+});
+
+gulp.task('minify-css', function() {
+	return gulp.src('D&D_5e.css')
+		.pipe(minifyCss())
+		.pipe(gulp.dest('./'));
 });

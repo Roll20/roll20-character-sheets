@@ -4,7 +4,15 @@
 .sheet-overall-wrapper {
 	min-width: 834px;
 }
+
+input, select, textarea,
+[class*="sheet-col"] {
+	font-size: 12px;
+}
 button[type=roll] {
+	font-size: 12px !important;
+	padding-top: 1px !important;
+	padding-bottom: 1px !important;
 	background-color: #2C608C;
 	border-radius: 4px;
 	border: 1px solid;
@@ -12,14 +20,15 @@ button[type=roll] {
 	color: white;
 	background-image: linear-gradient(rgba(255,255,255,.3), rgba(255,255,255,0));
 	text-shadow: 0 1px 1px rgba(0,0,0,0.75);
-}
 
-button[type=roll]:before,
-button[type=roll] span {
-	vertical-align: middle;
-}
-button[type=roll] span {
-	padding-left: 2px;
+	& span {
+		padding-left: 2px;
+	}
+
+	&:before,
+	& span {
+		vertical-align: middle;
+	}
 }
 
 ul, ol {
@@ -55,27 +64,39 @@ textarea,
 	line-height: 100%;
 }
 
-input[type=number]:focus, input[type=text]:focus, select:focus {
+input[type=number]:focus,
+input[type=text]:focus,
+select:focus {
 	outline: none;
 }
 input[type=number] {
 	text-align: center;
 }
 
+
 input[disabled],
-input.sheet-pseudo-disabled{
+input.sheet-pseudo-disabled,
+input[type=number].sheet-no-spin {
+	-moz-appearance: textfield;
+}
+
+input[disabled],
+input.sheet-pseudo-disabled {
 	background-color: #F0FFF4;
 	cursor: not-allowed;
-	-moz-appearance: textfield;
+}
+
+input[type=number].sheet-no-spin::-webkit-outer-spin-button,
+input[type=number].sheet-no-spin::-webkit-inner-spin-button,
+input[disabled]::-webkit-inner-spin-button,
+input[disabled]::-webkit-outer-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
 }
 
 select {
 	font-size: 90%;
 	padding-right: 0;
-}
-
-.itemcontrol {
-	z-index: 101;
 }
 
 .sheet-float-right,
@@ -109,8 +130,10 @@ $padMar: (
 			}
 		}
 
-		.sheet-rolltemplate-5eDefault .sheet-pad-#{$side}-#{$size} {
-			padding-#{$sideValue}: #{$sizeValue}px !important;
+		@if ($side == l) or ($side == r) {
+			.sheet-rolltemplate-5eDefault .sheet-pad-#{$side}-#{$size} {
+				padding-#{$sideValue}: #{$sizeValue}px !important;
+			}
 		}
 	}
 }
@@ -156,17 +179,11 @@ input.sheet-tab-is-npc:checked ~ .sheet-npc-version-inline-block,
 input.sheet-tab-is-npc:not(:checked) ~ .sheet-pc-version-inline-block {
 	display: inline-block;
 }
-input.sheet-tab-is-npc:checked ~ .sheet-tab-is-old-npc.sheet-npc-version-inline-block,
-input.sheet-tab-is-npc:checked ~ div .sheet-tab-is-old-npc.sheet-npc-version-inline-block {
-	display: inline-block;
-}
 
-
-div.sheet-overall-wrapper [class *= "sheet-pc-version"],
-div.sheet-overall-wrapper [class *= "sheet-npc-version"] {
+div.sheet-overall-wrapper [class *="sheet-pc-version"],
+div.sheet-overall-wrapper [class *="sheet-npc-version"] {
 	display: none;
 }
-
 
 .sheet-small-note {
 	text-align: center;
@@ -182,36 +199,6 @@ div.sheet-overall-wrapper [class *= "sheet-npc-version"] {
 	padding: 1px;
 }
 
-[class*="sheet-checkbox-label"] {
-	cursor: pointer;
-	white-space: nowrap;
-	margin-bottom: 0;
-	padding-right: 0;
-	line-height: 100%;
-	font-weight: normal;
-}
-
-.sheet-checkbox-label-sm {
-	font-size: 75%;
-	height: 10px;
-}
-.sheet-checkbox-label-md {
-	font-size: 85%;
-}
-
-.sheet-checkbox-label-sm input[type=checkbox] {
-	-webkit-transform: scale(0.6);
-	transform: scale(0.6);
-	height: 10px;
-	margin-top: -1px;
-}
-.sheet-checkbox-label-md input[type=checkbox] {
-	-webkit-transform: scale(0.7);
-	transform: scale(0.7);
-	margin-top: -1px;
-}
-
-/**Tooltips**/
 .sheet-tooltip-position-wrapper,
 .sheet-rolltemplate-5eDefault .sheet-tooltip-position-wrapper {
 	position: absolute;
@@ -268,7 +255,7 @@ div.sheet-overall-wrapper [class *= "sheet-npc-version"] {
 }
 .sheet-tooltip [class*="sheet-tooltip-content"]:after,
 .sheet-rolltemplate-5eDefault .sheet-tooltip [class*="sheet-tooltip-content"]:after {
-	content: '';
+	content: "";
 	position: absolute;
 	top: 9px;
 	margin-top: -8px;
@@ -310,11 +297,24 @@ div.sheet-overall-wrapper [class *= "sheet-npc-version"] {
 	font-weight: bold;
 }
 
+.sheet-last-updated {
+	font-size: 85%!important;
+	line-height: 100%;
+	vertical-align: top;
+	font-style: italic;
+	font-weight: bold;
+	margin: 0;
+}
+
 .sheet-header-info input[type=text],
 .sheet-header-info input[type=number] {
 	margin-top: 5px;
 	margin-bottom: 0 !important;
 	padding: 2px 2px 0 2px;
+}
+.sheet-core-header {
+	margin-top: -5px;
+	margin-bottom: 2px;
 }
 
 
@@ -322,6 +322,21 @@ div.sheet-overall-wrapper [class *= "sheet-npc-version"] {
 	position: relative;
 	height: 63px;
 	margin-bottom: 12px;
+
+	& .sheet-ability-score {
+		position: absolute;
+		margin-right: auto;
+		margin-left: auto;
+		left: 0;
+		right: 0;
+		bottom: -10px;
+		padding: 5px;
+		border: 1px solid black;
+		border-radius: 50%;
+		width: 40px !important;
+		font-size: 11px;
+		background-color: white;
+	}
 }
 .sheet-ability-name {
 	font-size: 9px;
@@ -335,51 +350,48 @@ div.sheet-overall-wrapper [class *= "sheet-npc-version"] {
 	font-weight: bold;
 	font-size: 17px;
 }
-.sheet-ability-score-wrapper .sheet-ability-score {
-	position: absolute;
-	margin-right: auto;
-	margin-left: auto;
-	left: 0;
-	right: 0;
-	bottom: -10px;
-	padding: 5px;
-	border: 1px solid black;
-	border-radius: 50%;
-	width: 40px !important;
-	font-size: 11px;
-	background-color: white;
-}
 
 .sheet-spell-slots-points input[type=number] {
 	font-size: 10px;
-	padding: 1px;
+	padding: 0;
+	background-color: transparent;
 }
 
 .sheet-quick-attacks input {
 	font-size: 80%;
 }
 
-.sheet-save-check button[type=roll],
-.sheet-skills button[type=roll],
-.sheet-hit-dice button[type=roll],
-.sheet-initiative button[type=roll],
-.sheet-death-save button[type=roll],
-.sheet-quick-attacks button[type=roll] {
-	font-size: 12px;
-	padding: 1px 2px;
-	margin-left: 0;
-	margin-right: 0;
-	line-height: 100%;
+.sheet-section-core,
+.sheet-quick-attacks {
+	button[type=roll] {
+		padding: 1px 3px;
+		margin-left: 0;
+		margin-right: 0;
+		line-height: 100%;
+	}
 }
 
-.sheet-save-check input[type=checkbox] {
-	-webkit-transform: scale(0.8);
-	transform: scale(0.8);
-	margin-left: -1px;
+.sheet-save-check,
+.sheet-death-save {
+	input[type=checkbox] {
+		-webkit-transform: scale(0.8);
+		transform: scale(0.8);
+		margin-left: -1px;
+	}
+	button[type=roll] {
+		&:before {
+			content: "";
+		}
+		span {
+			padding-left: 0;
+		}
+	}
 }
 
-.sheet-hit-dice button[type=roll] span {
-	font-size: 11px;
+.sheet-hit-dice {
+	button[type=roll] span {
+		font-size: 11px;
+	}
 }
 
 .sheet-npc-hd-note {
@@ -392,10 +404,12 @@ div.sheet-overall-wrapper [class *= "sheet-npc-version"] {
 }
 .sheet-inline-block {
 	display: inline-block;
-}
+}.sheet-block {
+	 display: block;
+ }
 
-.sheet-rolltemplate-5eDefault .sheet-relative,
-.sheet-relative {
+.sheet-relative,
+.sheet-rolltemplate-5eDefault .sheet-relative {
 	position: relative;
 }
 .sheet-absolute {
@@ -404,7 +418,7 @@ div.sheet-overall-wrapper [class *= "sheet-npc-version"] {
 }
 .sheet-jack-of-all-trades {
 	position: absolute;
-	top: -1px;
+	top: 0;
 	right: 0;
 }
 .sheet-save-check .sheet-save-total,
@@ -416,23 +430,40 @@ div.sheet-overall-wrapper [class *= "sheet-npc-version"] {
 }
 input[disabled].sheet-passive-skill-score {
 	background-color: #E7F9FF;
-	cursor: not-allowed;
-	-moz-appearance: textfield;
 }
 
-.sheet-skills .sheet-passive-skill-score {
-	font-size: 10px;
-	padding: 0;
+.sheet-ability-save-check-name,
+.sheet-skill-name,
+.sheet-skills-attribute-selector-wrapper {
+	font-size: 11px !important;
 }
 
-.sheet-skills select {
-	line-height: 100%;
-	padding: 0;
-	font-size: 9px;
-	-webkit-appearance: none;
-	-moz-appearance: none;
-	appearance: none;
+.sheet-skills {
+	.sheet-passive-skill-score {
+		font-size: 10px;
+		padding: 0;
+	}
+	select {
+		line-height: 100%;
+		padding: 0;
+		font-size: 9px;
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		appearance: none;
+
+		&.sheet-skills-attribute-selector {
+			font-size: 9px;
+			height: 11px;
+			width: 25px !important;
+			border-bottom: 0;
+			color: #909090;
+			position: relative;
+			z-index: 2;
+			background: transparent;
+		}
+	}
 }
+
 select.sheet-select-no-arrow {
 	line-height: 100%;
 	padding-right: 2px;
@@ -441,49 +472,26 @@ select.sheet-select-no-arrow {
 	appearance: none;
 }
 
-.sheet-skills select.sheet-skills-attribute-selector {
-	font-size: 9px;
-	height: 11px;
-	width: 25px !important;
-	border-bottom: 0;
-	color: #909090;
-	position: relative;
-	z-index: 2;
-	background: transparent;
-}
-
 .sheet-skills-attribute-selector-wrapper {
 	display: inline-block;
 	position: relative;
-}
-.sheet-skills-attribute-selector-wrapper:before,
-.sheet-skills-attribute-selector-wrapper:after {
-	position: absolute;
-	color: #909090;
-	top: 0;
-}
-.sheet-skills-attribute-selector-wrapper:before {
-	content: "(";
-}
-.sheet-skills-attribute-selector-wrapper:after {
-	content: ")";
-	right: 1px;
+
+	&:before,
+	&:after {
+		position: absolute;
+		color: #909090;
+		top: 0;
+	}
+	&:before {
+		content: "(";
+	}
+	&:after {
+		content: ")";
+		right: 1px;
+	}
 }
 
-input[type=number].sheet-no-spin::-webkit-outer-spin-button,
-input[type=number].sheet-no-spin::-webkit-inner-spin-button,
-input[disabled]::-webkit-inner-spin-button,
-input[disabled]::-webkit-outer-spin-button {
-	-webkit-appearance: none;
-	margin: 0;
-}
 
-input[disabled],
-input[type=number].sheet-no-spin {
-	-moz-appearance: textfield;
-}
-
-/**shield**/
 .sheet-shield {
 	position: relative;
 	z-index: 10;
@@ -492,24 +500,47 @@ input[type=number].sheet-no-spin {
 	padding-right: 2px;
 	margin-left: auto;
 	margin-right: auto;
+
+	&:before {
+		position: absolute;
+		z-index: -1;
+		top: 3px;
+		left: -1px;
+		line-height: 51px;
+		content: "b";
+		font-family: "Pictos Three";
+		font-size: 72px;
+		color: white;
+		text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+	}
+
+	input[type=number] {
+		width: 89% !important;
+		padding: 1px;
+	}
+
+	.sheet-wrap-box-title {
+		margin-top: 1px;
+	}
+
+	&:hover .sheet-shield-note {
+		display: block;
+	}
 }
-.sheet-shield:before {
+.sheet-shield-note {
+	display: none;
 	position: absolute;
-	z-index: -1;
-	top: 3px;
-	left: -1px;
-	line-height: 51px;
-	content: "b";
-	font-family: "Pictos Three";
-	font-size: 72px;
-	color: white;
-	text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
-}
-.sheet-shield input[type=number] {
-	width: 91% !important;
-	border-bottom-left-radius: 5px;
-	border-bottom-right-radius: 5px;
-	padding: 1px;
+	top: -3px;
+	left: 0;
+	& input[type=text] {
+		font-size: 67%;
+		width: 85% !important;
+		height: 12px;
+		line-height: 60%;
+		padding: 0;
+		border-bottom-left-radius: 3px;
+		border-bottom-right-radius: 3px;
+	}
 }
 
 .sheet-bold,
@@ -520,7 +551,7 @@ input[type=number].sheet-no-spin {
 }
 
 .sheet-shield input[type=number],
-.sheet-initiative input[type=number].sheet-initiative-total,
+.sheet-initiative input[type=number],
 .sheet-speed input,
 .sheet-heart input[type=number].sheet-heart-hp-current,
 .sheet-heart input[type=number].sheet-heart-hp-max {
@@ -528,45 +559,23 @@ input[type=number].sheet-no-spin {
 	font-size: 14px;
 }
 
-.sheet-shield .sheet-wrap-box-title {
-	margin-top: 1px;
-}
-
-.sheet-shield:hover .sheet-shield-note {
-	display: block;
-}
-.sheet-shield-note {
-	display: none;
-	position: absolute;
-	top: -3px;
-	left: 0;
-}
-.sheet-shield-note input[type=text] {
-	font-size: 67%;
-	width: 85% !important;
-	height: 12px;
-	line-height: 60%;
-	padding: 0;
-	border-bottom-left-radius: 3px;
-	border-bottom-right-radius: 3px;
-}
 .sheet-col-speed-wrapper {
 	width: 130%;
 	margin-left: -30%;
 }
 
-.sheet-wrap-box-label {
-	font-size: 80%;
+.sheet-wrap-box-label,
+.sheet-wrap-box-title {
 	text-transform: uppercase;
 	line-height: 100%;
 	font-weight: bold;
-	margin-top: 1px;
+}
+
+.sheet-wrap-box-label {
+	font-size: 80%;
 }
 .sheet-wrap-box-title {
 	font-size: 9px;
-	text-transform: uppercase;
-	line-height: 100%;
-	font-weight: bold;
 	margin: 3px 0 1px 0;
 }
 
@@ -579,135 +588,169 @@ input[type=number].sheet-no-spin {
 	margin-left: auto;
 	margin-right: auto;
 	overflow: hidden;
+
+	&:before {
+		position: absolute;
+		z-index: -1;
+		top: 0;
+		left: 0;
+		line-height: 79px;
+		height: 97px;
+		content: "k";
+		font-family: "Pictos";
+		font-size: 130px;
+		color: white;
+		text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+	}
+	.sheet-first-row {
+		margin-top: 4px;
+	}
+
+	input[type=number] {
+		border-top-left-radius: 7px;
+		border-top-right-radius: 7px;
+		padding: 1px;
+		background-color: transparent;
+	}
 }
-.sheet-heart:before {
-	position: absolute;
-	z-index: -1;
-	top: 0;
-	left: 0;
-	line-height: 79px;
-	height: 97px;
-	content: "k";
-	font-family: "Pictos";
-	font-size: 130px;
-	color: white;
-	text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+.sheet-initiative {
+	.sheet-wrap-box-title {
+		font-size: 8px;
+	}
+	button[type=roll] {
+		width: 100%;
+	}
 }
 
-.sheet-heart .sheet-first-row {
-	margin-top: 4px;
-}
 
-.sheet-heart input[type=number] {
-	border-top-left-radius: 7px;
-	border-top-right-radius: 7px;
-	padding: 1px;
-	background-color: transparent;
-}
-
-.sheet-initiative .sheet-wrap-box-title {
-	font-size: 8px;
-}
-input[type=number].sheet-initiative-bonus {
-	font-size: 70%;
-	padding: 0;
+[class*="sheet-checkbox-label"] {
+	cursor: pointer;
+	white-space: nowrap;
+	margin-bottom: 0;
+	padding-right: 0;
 	line-height: 100%;
+	font-weight: normal;
+}
+.sheet-checkbox-label-sm {
+	font-size: 75%;
+	height: 10px;
+
+	& input[type=checkbox] {
+		-webkit-transform: scale(0.6);
+		transform: scale(0.6);
+		height: 10px;
+		margin-top: -1px;
+	}
+}
+.sheet-checkbox-label-md {
+	font-size: 85%;
+
+	& input[type=checkbox] {
+		-webkit-transform: scale(0.7);
+		transform: scale(0.7);
+		margin-top: -1px;
+	}
+}
+
+.sheet-checkbox-label {
+	display: inline-block;
+	font-size: 100%;
+
+	[type="checkbox"] {
+		display: none;
+		+ span {
+			display: inline-block;
+			padding: 1px;
+			text-align: center;
+			font-weight: bold;
+		}
+	}
 }
 
 .sheet-proficiency-bonus input[type=number],
+.sheet-inspiration .sheet-checkbox-label span,
 .sheet-exhaustion input[type=number] {
-	margin-bottom: 0 !important;
-	padding: 0;
-}
-
-/* Inspiration button Settings */
-.sheet-checkbox-label {
-	cursor: pointer;
-	width: auto;
-	display: inline-block;
-	font-weight: normal;
-	font-size: 100%;
-	line-height: 100%;
-	padding-right: 0;
-	margin-bottom: 0;
-}
-.sheet-checkbox-label [type="checkbox"] {
-	display: none;
-}
-.sheet-checkbox-label [type="checkbox"] + span {
-	display: inline-block;
-	padding: 1px;
-	text-align: center;
-	font-weight: bold;
-	border-radius: 4px;
+	border: 1px solid black;
+	border-radius: 50%;
+	position: absolute;
+	top: -3px;
+	left: -3px;
+	width: 20px !important;
+	height: 20px;
 }
 
 .sheet-inspiration .sheet-checkbox-label {
-	width: 100%;
+	[type="checkbox"] {
+		+ span {
+			background-color: #8c6075;
+			color: white;
+			padding: 2px;
+			font-size: 14px;
+
+			&:before {
+				content: "-";
+			}
+		}
+		&:checked {
+			+ span {
+				background-color: #879a6a;
+				padding: 3px;
+
+				&:before {
+					content: "+";
+				}
+			}
+		}
+	}
 }
 
-.sheet-inspiration .sheet-checkbox-label [type="checkbox"] + span {
-	width: 100%;
-	background-color: #8c6075;
-	color: white;
-}
-.sheet-inspiration .sheet-checkbox-label [type="checkbox"] + span::before {
-	content: "No";
-}
-.sheet-inspiration .sheet-checkbox-label [type="checkbox"]:checked + span {
-	background-color: #879a6a;
-}
-.sheet-inspiration .sheet-checkbox-label [type="checkbox"]:checked + span::before {
-	content: "Yes";
-}
+.sheet-death-save {
+	button[type=roll] {
+		height: 21px;
+	}
 
-.sheet-death-save button[type=roll] {
-	height: 32px;
-	margin: 0;
-}
+	$death-save-circle-size: 14px;
+	.sheet-checkbox-label {
+		height: $death-save-circle-size;
+		width: $death-save-circle-size;
+		margin: 0 2px;
+		position: relative;
+		z-index: 5;
 
-.sheet-death-save .sheet-checkbox-label [type="checkbox"] + span {
-	border: 1px solid;
-	width: 14px;
-	padding: 0 3px;
-	margin: 1px 0 1px 1px;
-}
-.sheet-death-save .sheet-checkbox-label [type="checkbox"] + span::before {
-	content: "?";
-	border-color: black;
-	font-size: 80%;
+		[type="checkbox"] {
+			+ span {
+				border: 1px solid black;
+				background-color: white;
+				height: $death-save-circle-size;
+				width: $death-save-circle-size;
+				border-radius: 50%;
+			}
+		}
+	}
 }
 .sheet-death-succeed .sheet-checkbox-label [type="checkbox"]:checked + span {
 	background-color: #879a6a;
-	border-color: #879a6a;
-	color: white;
-}
-.sheet-death-succeed .sheet-checkbox-label [type="checkbox"]:checked + span::before {
-	content: "+";
 }
 .sheet-death-fail .sheet-checkbox-label [type="checkbox"]:checked + span {
 	background-color: #8c6075;
-	border-color: #8c6075;
-	color: white;
 }
-.sheet-death-fail .sheet-checkbox-label [type="checkbox"]:checked + span::before {
-	content: "x";
-	margin-left: -1px;
+.sheet-death-save-hr {
+	top: 2px;
 }
 
-/* END Inspiration button Settings */
-
-.sheet-resistances-immunities textarea {
-	width: 100%;
-	height: 22px;
-	font-size: 90%;
-	line-height: 100%;
-	padding: 0 2px;
+.sheet-resistances-immunities {
+	textarea {
+		width: 100%;
+		height: 22px;
+		font-size: 90%;
+		line-height: 100%;
+		padding: 0 2px;
+	}
+	.sheet-small-label {
+		margin-bottom: 3px;
+	}
 }
 
-.sheet-resistances-immunities .sheet-small-label {
-	margin-bottom: 5px;
-}
 .sheet-npc-traits textarea {
 	width: 100%;
 	font-size: 80%;
@@ -753,7 +796,7 @@ input[type=number].sheet-initiative-bonus {
 
 		&:before,
 		&:after {
-			content: '';
+			content: "";
 			position: absolute;
 			border-style: solid;
 			border-color: transparent;
@@ -861,16 +904,6 @@ input[type=number].sheet-initiative-bonus {
 		margin-top: 2px;
 	}
 
-	.sheet-main-content hr.sheet-roll {
-		width: 80%;
-		margin-left: auto;
-		margin-right: auto;
-
-		color: #D64541;
-		background-color: #D64541;
-		height: 1px;
-	}
-
 	.sheet-rt-emote {
 		font-style: italic;
 		font-size: 11px;
@@ -885,9 +918,7 @@ input[type=number].sheet-initiative-bonus {
 	}
 }
 
-/*** ROLL TEMPLATE STYLING ENDS HERE **/
 
-/* Tweak repeating section buttons so they have a bottom margin and dont overflow when in edit mode. */
 div[class^="repcontrol"] {
 	margin-bottom: 5px;
 }
@@ -897,22 +928,15 @@ div[class="repcontainer editmode"] ~ div[class^="repcontrol"] button[class="btn 
 	visibility: hidden;
 }
 
-/* player/npc button Settings */
-
 div.sheet-npc {
 	display: none;
-}
-
-input.sheet-tab-is-old-npc:checked ~ div.sheet-npc
-{
-	display: block;
 }
 
 $tab-is-npc-width: 40px;
 input.sheet-tab-is-npc,
 span.sheet-tab-is-npc {
 	width: $tab-is-npc-width;
-	height: 13px;
+	height: 12px;
 	padding: 1px;
 }
 
@@ -922,7 +946,6 @@ span.sheet-tab-is-npc::before {
 
 span.sheet-tab-is-npc {
 	font-size: 10px !important;
-	line-height: 100%;
 
 	background-color: #65763c;
 	margin-left: -$tab-is-npc-width;
@@ -1035,6 +1058,7 @@ span[class*="sheet-tab"] {
 	font-weight: bold;
 	text-align: center;
 	border-radius: 4px;
+	line-height: 100%;
 }
 
 $tab-page-width: 82px;
@@ -1044,7 +1068,6 @@ span[class*="sheet-tab-page"] {
 	height: 16px;
 	vertical-align: top;
 	font-size: 12px;
-	line-height: 100%;
 	padding: 2px;
 }
 
@@ -1128,16 +1151,30 @@ $tab-spell-page-width: 70px;
 input.sheet-tab-spell-page,
 span.sheet-tab-spell-page {
 	width: $tab-spell-page-width;
-	height: 18px;
+	height: 14px;
 }
 span.sheet-tab-spell-page {
 	margin-left: -$tab-spell-page-width;
+	padding: 1px;
 }
 
 span.sheet-tab-spell-page,
 span.sheet-tab-inventory,
 span.sheet-tab-class-action {
 	background-color: #8E4644;
+}
+
+.sheet-spell-table {
+	input {
+		padding: 0;
+	}
+}
+
+.sheet-spell-header {
+	background-color: #c7d1bf;
+	vertical-align: bottom;
+	border-radius: 12px;
+	margin-bottom: 3px;
 }
 
 
@@ -1148,9 +1185,8 @@ span.sheet-tab-class-action {
 	border-radius: 5px;
 
 }
-/* END Spell Page Settings */
 
-/* Borders for spell page and class action repeating section rows */
+
 .sheet-npc-row {
 	border: 1px solid #000000;
 	border-radius: 5px;
@@ -1160,7 +1196,6 @@ span.sheet-tab-class-action {
 }
 
 
-/* NPC Actions */
 .sheet-section-weapons hr,
 .sheet-section-actions hr {
 	height: 5px;
@@ -1177,8 +1212,11 @@ span.sheet-tab-class-action {
 .sheet-action-button-group,
 .sheet-spell-button-group {
 	position: absolute;
-	top: 3px;
-	right: 0;
+	top: 2px;
+	right: 2px;
+	button[type=roll] {
+		margin: 0 0 0 3px;
+	}
 }
 
 .sheet-section-actions .sheet-wrap-box select {
@@ -1200,7 +1238,7 @@ span.sheet-tab-class-action {
 }
 
 .sheet-toggle-old-weapons button {
-	line-height: 130%;
+	line-height: 100%;
 }
 
 input.sheet-tab-action.sheet-toggle-crit,
@@ -1327,11 +1365,17 @@ input.sheet-tab-custom-skills-toggle:not(:checked) ~ div.sheet-tab-custom-skills
 input.sheet-toggle-bonuses:not(:checked) ~ div div.sheet-toggle-bonuses {
 	display: none !important;
 }
-/* spell type tab Settings */
+
+.sheet-spellbook-filter {
+	font-size: 11px;
+	display: inline-block;
+	line-height: 100%;
+}
+
 input[class*="sheet-tab-spellbook-filter"],
 span[class*="sheet-tab-spellbook-filter"] {
-	height: 16px;
-	padding: 3px;
+	height: 12px;
+	padding: 1px;
 }
 $spell-prepared-width: 103px;
 input.sheet-tab-spellbook-filter-prepared,
@@ -1397,7 +1441,7 @@ span.sheet-tab-spellbook-prep-con-rit-concentration {
 .sheet-action-name,
 .sheet-weapon-name {
 	font-size: 130%;
-	padding: 0;
+	padding: 0 !important;
 	border: 0;
 	background-color: transparent;
 	font-weight: bold;
@@ -1427,7 +1471,8 @@ input.sheet-tab-spell-points:checked + span.sheet-tab-spell-points,
 input[class*="sheet-tab-spell"]:checked + span[class*="sheet-tab-spell"],
 input[class*="sheet-tab-inventory"]:checked + span[class*="sheet-tab-inventory"],
 input[class*="sheet-tab-class-action"]:checked + span[class*="sheet-tab-class-action"] {
-	background-color: #591209; }
+	background-color: #591209;
+}
 
 $tab-action-alt-damage-width: 25px;
 input.sheet-tab-action.sheet-toggle-alt-damage,
@@ -1524,10 +1569,6 @@ input.sheet-tab-action-special-actions {
 	padding: 3px;
 }
 
-span.sheet-tab-weapon-toggle {
-	padding: 3px;
-}
-
 span.sheet-tab-action {
 	padding: 1px;
 }
@@ -1540,7 +1581,6 @@ span[class*="sheet-tab-spellbook-filter"],
 span[class*="sheet-tab-spellbook-prep-con-rit"],
 span.sheet-tab-custom-skills-toggle {
 	font-size: 10px;
-	line-height: 100%;
 	background-color: #8c6075;
 	vertical-align: top;
 }
@@ -1552,110 +1592,92 @@ span.sheet-tab-action {
 $tab-weapon-toggle-width: 60px;
 input.sheet-tab-weapon-toggle,
 span.sheet-tab-weapon-toggle {
-	height: 16px;
+	height: 14px;
 	width: $tab-weapon-toggle-width;
 }
 span.sheet-tab-weapon-toggle {
 	margin-left: -$tab-weapon-toggle-width;
+	padding: 2px;
 }
 
 
-input.sheet-tab-spell-type {
-	height: 18px;
+input.sheet-tab-spell-type,
+span.sheet-tab-spell-type {
+	height: 14px;
 }
-
 span.sheet-tab-spell-type {
 	background-color: #A19A91;
-	height: 18px;
+	padding: 1px;
 }
 
 input[class*="sheet-spelltype"]:checked + span[class*="sheet-spelltype"] {
 	background-color: #51624b;
 }
 
-
-
-/* END spell type tab Settings */
-
-/* Inventory Page Settings */
 div[class^="sheet-inventory-page"] {
 	display: none;
 }
-
 div[class^="sheet-inventory-page"] input {
 	line-height: 100%;
 }
-
 input.sheet-tab-inventory1:checked ~ div.sheet-inventory-page1,
 input.sheet-tab-inventory2:checked ~ div.sheet-inventory-page2,
 input.sheet-tab-inventory3:checked ~ div.sheet-inventory-page3,
-input.sheet-tab-inventory4:checked ~ div.sheet-inventory-page4 {
-	display: block;
-}
-
+input.sheet-tab-inventory4:checked ~ div.sheet-inventory-page4,
 input.sheet-tab-inventory99:checked ~ div[class^="sheet-inventory-page"] {
 	display: block;
 }
-
 $tab-inventory-width: 24%;
 input.sheet-tab-inventory,
 span.sheet-tab-inventory {
 	width: $tab-inventory-width;
-	height: 18px;
+	height: 16px;
 }
-
 span.sheet-tab-inventory {
 	margin-left: -$tab-inventory-width;
+	padding: 1px;
 }
 
-/* END Inventory Page Settings */
 
-/* class Action Page Settings */
 div[class^="sheet-classaction-page"] {
 	display: none;
 }
-
 input.sheet-tab-class-action1:checked ~ div.sheet-classaction-page1,
-input.sheet-tab-class-action2:checked ~ div.sheet-classaction-page2 {
+input.sheet-tab-class-action2:checked ~ div.sheet-classaction-page2,
+input.sheet-tab-class-action99:checked ~ div[class^="sheet-classaction-page"] {
 	display: block;
 }
-
-input.sheet-tab-class-action99:checked ~ div[class^="sheet-classaction-page"]{
-	display: block;
-}
-
 $tab-class-width: 155px;
 input.sheet-tab-class-action,
 span.sheet-tab-class-action {
 	width: $tab-class-width;
-	height: 18px;
+	height: 16px;
 }
 span.sheet-tab-class-action {
 	margin-left: -$tab-class-width;
+	padding: 2px;
 }
-
-
 .sheet-classaction-output-options {
 	display: none;
 }
-
 input[class^="sheet-classactionshowoptions"]:checked ~ div.sheet-classaction-output-options {
 	display: block;
 }
-
-.sheet-class-action-zebra .sheet-row:nth-child(even) {
-
-	background-color: #D5E3E7;
+.sheet-class-action-zebra {
+	.sheet-row:nth-child(even) {
+		background-color: #D5E3E7;
+	}
+}
+.sheet-spell-slots-points {
+	.sheet-row:nth-child(even) {
+		background-color: #EFF8FA;
+	}
 }
 
-
-/* END Class action Page Settings */
-
-/* General sheet/rolltemplate wide Styles */
-button, input, select, textarea,
-[class*="sheet-col"] {
-	font-size: 12px;
+.sheet-no-background {
+	background-color: transparent !important;
 }
+
 [class*="sheet-col"] {
 	line-height: 100%;
 }
@@ -1672,142 +1694,91 @@ button, input, select, textarea,
 	line-height: 100%;
 }
 
-.sheet-small-label input[type=text],
-.sheet-small-label input[type=number],
-.sheet-small-label select {
-	padding: 0;
-	font-size: 8px;
-	line-height: 100%;
-}
-.sheet-small-label select {
-	height: 12px;
-	-webkit-appearance: none;
-	-moz-appearance: none;
-	appearance: none;
+.sheet-small-label {
+	input[type=text],
+	input[type=number],
+	select {
+		height: 12px;
+		padding: 0;
+		font-size: 8px;
+		line-height: 100%;
+	}
 }
 
-.sheet-custom-class-hd select {
-	-webkit-appearance: none;
-	-moz-appearance: none;
-	appearance: none;
-	line-height: 100%;
-	padding: 0;
+.sheet-small-label,
+.sheet-custom-class-hd {
+	select {
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		appearance: none;
+	}
 }
 
-
-.sheet-last-updated {
-	font-size: 85%!important;
-	line-height: 100%;
-	vertical-align: top;
-	font-style: italic;
-	font-weight: bold;
-	margin: 0;
+.sheet-custom-class-hd {
+	select {
+		line-height: 100%;
+		padding: 0;
+	}
 }
 
-.sheet-core-header {
-	margin-top: -5px;
-	margin-bottom: 2px;
-}
 
 .sheet-hd-row {
 	font-size: 62% !important;
 	line-height: 100% !important;
 }
+[class*="sheet-pictos"],
+.sheet-rolltemplate-5eDefault [class*="sheet-pictos"] {
+	font-size: 14px;
+}
 
 .sheet-pictos,
 .sheet-rolltemplate-5eDefault .sheet-pictos {
 	font-family: "Pictos";
-	font-size: 14px;
 }
-
 .sheet-pictos-custom,
 .sheet-rolltemplate-5eDefault .sheet-pictos-custom {
 	font-family: "Pictos Custom";
-	font-size: 14px;
 }
-
 .sheet-pictos-three,
 .sheet-rolltemplate-5eDefault .sheet-pictos-three {
 	font-family: "Pictos Three";
-	font-size: 14px;
 }
 
 .sheet-concentration-icon,
 .sheet-rolltemplate-5eDefault .sheet-concentration-icon {
-	font-size: 14px;
+	font-size: 18px;
 }
-
 .sheet-ritual-icon,
 .sheet-rolltemplate-5eDefault .sheet-ritual-icon {
-	font-size: 16px;
+	font-size: 20px;
 }
 
-.sheet-d6-font,
-.sheet-rolltemplate-5eDefault .sheet-d6-font {
-	font-family: "dicefontd6";
-	font-size: 14px;
-}
-.sheet-d8-font,
-.sheet-rolltemplate-5eDefault .sheet-d8-font {
-	font-family: "dicefontd8";
-	font-size: 14px;
-}
-.sheet-d10-font,
-.sheet-rolltemplate-5eDefault .sheet-d10-font {
-	font-family: "dicefontd10";
-	font-size: 14px;
-}
-.sheet-d20-font,
-.sheet-rolltemplate-5eDefault .sheet-d20-font {
-	font-family: "dicefontd20";
-	font-size: 14px;
-}
-
-.sheet-border-top,
-.sheet-rolltemplate-5eDefault .sheet-border-top {
-	border-top: 1px solid #000;
-}
 .sheet-border-right,
 .sheet-rolltemplate-5eDefault .sheet-border-right {
 	border-right: 1px solid #000;
-}
-.sheet-border-bottom,
-.sheet-rolltemplate-5eDefault .sheet-border-bottom {
-	border-bottom: 1px solid #000;
 }
 .sheet-border-left,
 .sheet-rolltemplate-5eDefault .sheet-border-left {
 	border-left: 1px solid #000;
 }
 
-button.sheet-roll {
-	font-size: 12px !important;
-	padding-top: 1px !important;
-	padding-bottom: 1px !important;
-}
-
 hr,
 .sheet-rolltemplate-5eDefault hr {
 	border: 0;
 	height: 1px;
-	background-image: linear-gradient(left, transparent, rgba(0,0,0,.75), transparent);
+	background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
 	margin: 5px 0;
 }
 
-span.sheet-spacer,
-.sheet-rolltemplate-5eDefault span.sheet-spacer {
+span.sheet-spacer {
 	display: block;
 	margin-top: 5px;
-}
-.sheet-spacer-xl {
-	height: 20px;
 }
 
 .sheet-heading-row {
 	text-align: center;
 	font-weight: bold;
 }
-
 .sheet-footer-row {
 	text-align: center;
 	font-weight: bold;
@@ -1839,7 +1810,6 @@ textarea {
 	height: 150px;
 	resize:none;
 }
-
 .sheet-fluid-textarea {
 	height: 100%;
 }
@@ -1880,20 +1850,6 @@ textarea {
 	margin-top: 3px;
 }
 
-.sheet-spell-header {
-	background-color: #c7d1bf;
-	vertical-align: bottom;
-	border-radius: 12px;
-	margin-bottom: 3px;
-}
-
-.sheet-ability-save-check-name,
-.sheet-skill-name,
-.sheet-skills-attribute-selector-wrapper {
-	font-size: 11px !important;
-}
-
-
 
 
 
@@ -1905,11 +1861,6 @@ textarea {
 	text-rendering: optimizespeed; /* Webkit: fixes text-rendering: optimizeLegibility */
 }
 
-.sheet-opera-only :-o-prefocus,  .sheet-row,
-.sheet-rolltemplate-5eDefault .sheet-opera-only :-o-prefocus, .sheet-rolltemplate-5eDefault  .sheet-row {
-	word-spacing: -0.43em;
-}
-
 [class^="sheet-col"],
 .sheet-rolltemplate-5eDefault [class^="sheet-col"] {
 	display: inline-block;
@@ -1919,60 +1870,26 @@ textarea {
 	vertical-align: top;
 	text-rendering: auto;
 }
-
 .sheet-col-1,
 .sheet-rolltemplate-5eDefault .sheet-col-1 {
 	width: 100%;
 	display: block;
 }
-
 .sheet-col-1-3,
 .sheet-rolltemplate-5eDefault .sheet-col-1-3 {
 	width: 33.33333%;
 }
-.sheet-offset-1-3,
-.sheet-rolltemplate-5eDefault .sheet-offset-1-3 {
-	margin-left: 33.33333%;
-}
-
 .sheet-col-2-3,
 .sheet-rolltemplate-5eDefault .sheet-col-2-3 {
 	width: 66.66667%;
 }
-.sheet-offset-2-3,
-.sheet-rolltemplate-5eDefault .sheet-offset-2-3 {
-	margin-left: 66.66667%;
-}
-
 .sheet-col-1-6,
 .sheet-rolltemplate-5eDefault .sheet-col-1-6 {
 	width: 16.66667%;
 }
-.sheet-offset-1-6,
-.sheet-rolltemplate-5eDefault .sheet-offset-1-6 {
-	margin-left: 16.66667%;
-}
-
 .sheet-col-1-8,
 .sheet-rolltemplate-5eDefault .sheet-col-1-8 {
 	width: 12.5%;
-}
-.sheet-offset-1-8,
-.sheet-rolltemplate-5eDefault .sheet-offset-1-8 {
-	margin-left: 12.5%;
-}
-
-.sheet-col-045,
-.sheet-rolltemplate-5eDefault .sheet-col-045 {
-	width: 4.5%;
-}
-.sheet-col-095,
-.sheet-rolltemplate-5eDefault .sheet-col-095 {
-	width: 9.5%;
-}
-.sheet-col-535,
-.sheet-rolltemplate-5eDefault .sheet-col-535 {
-	width: 53.5%;
 }
 @for $i from 01 through 100 {
 	$widthName: $i;
@@ -1995,19 +1912,4 @@ textarea {
 .sheet-offset-40,
 .sheet-rolltemplate-5eDefault .sheet-offset-40 {
 	margin-left: 40%;
-}
-
-.sheet-row-r,
-.sheet-rolltemplate-5eDefault .sheet-row-r {
-	letter-spacing: -0.31em;
-	*letter-spacing: normal;
-	word-spacing: -0.43em;
-}
-.sheet-opera-only :-o-prefocus, .sheet-row-r,
-.sheet-rolltemplate-5eDefault .sheet-opera-only :-o-prefocus, .sheet-rolltemplate-5eDefault .sheet-row-r {
-	word-spacing: -0.43em;
-}
-.sheet-row-r img,
-.sheet-rolltemplate-5eDefault .sheet-row-r img {
-	max-width: 100%;
 }
