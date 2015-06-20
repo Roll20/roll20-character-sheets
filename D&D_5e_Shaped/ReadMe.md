@@ -24,6 +24,7 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 * Added targetAC to Spells & Cantrips
 * Added a toggle for "Quick Weapons" on the weapons page
 * Halfling Luck (works on everything but spell attacks)
+* Improved heart on tablets (still not great, but doesn't cut off at least)
 
 **18th June 2015**
 
