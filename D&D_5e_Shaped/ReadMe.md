@@ -4,7 +4,6 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### TODO
 
-* Look into implementing halfling luck
 * Try to make settings global
 * Revamp Traits. Keep fluff traits on the first page and for action like traits write "see Actions". Also include fluff traits on "Actions".
 * Actions: Allow for "Effects" to be whispered to the GM.
@@ -24,6 +23,7 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 * Monk DC added to spells
 * Added targetAC to Spells & Cantrips
 * Added a toggle for "Quick Weapons" on the weapons page
+* Halfling Luck (works on everything but spell attacks)
 
 **18th June 2015**
 
