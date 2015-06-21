@@ -17,6 +17,10 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### Changelog
 
+**22nd June 2015**
+
+* Added a bonus field for AC that works on PC pages.
+
 **21st June 2015**
 
 * Death saves & failures now fill from left to right (with a "X" to reset)
