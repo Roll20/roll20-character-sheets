@@ -1,6 +1,9 @@
 var gulp = require('gulp'),
 	include = require('gulp-include'),
-	inject = require('gulp-inject');
+	inject = require('gulp-inject'),
+	minifyHTML = require('gulp-minify-html'),
+	minifyCss = require('gulp-minify-css'),
+	concat = require('gulp-concat');
 
 var customSkillCount = 4,
 	outputOtionsCount = 1,
@@ -108,7 +111,7 @@ function skills (file) {
 	return skills.join('\n\n');
 }
 
-gulp.task('compile', function() {
+gulp.task('preCompile', function() {
 	gulp.src('precompiled/D&D_5e.html')
 		.pipe( include() )
 		.pipe( inject(gulp.src(['precompiled/components/skills/skill.html']), {
@@ -116,9 +119,20 @@ gulp.task('compile', function() {
 			transform: function (filePath, file) {
 				return skills(file);
 			}
+		})).pipe( inject(gulp.src(['precompiled/components/skills/skill_bonuses.html']), {
+			starttag: '<!-- inject:skillsBonuses:{{ext}} -->',
+			transform: function (filePath, file) {
+				return skills(file);
+			}
 		}))
 		.pipe( inject(gulp.src(['precompiled/components/skills/custom_skill.html']), {
 			starttag: '<!-- inject:customSkills:{{ext}} -->',
+			transform: function (filePath, file) {
+				return duplicate(file, customSkillCount, 1);
+			}
+		}))
+		.pipe( inject(gulp.src(['precompiled/components/skills/custom_skill_bonuses.html']), {
+			starttag: '<!-- inject:customSkillsBonuses:{{ext}} -->',
 			transform: function (filePath, file) {
 				return duplicate(file, customSkillCount, 1);
 			}
@@ -231,5 +245,18 @@ gulp.task('compile', function() {
 				return duplicate(file, inventoryPerPage, 1 + inventoryPerPage + inventoryPerPage);
 			}
 		}))
-		.pipe( gulp.dest('./') )
+		.pipe(minifyHTML())
+		.pipe(gulp.dest('./'));
+});
+
+gulp.task('compile', function() {
+	return gulp.src( ['D&D_5e.html', 'precompiled/pages/roll_template.html'] )
+		.pipe(concat('D&D_5e.html'))
+		.pipe(gulp.dest('./'));
+});
+
+gulp.task('minify-css', function() {
+	return gulp.src('D&D_5e.css')
+		.pipe(minifyCss())
+		.pipe(gulp.dest('./'));
 });

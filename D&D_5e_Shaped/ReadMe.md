@@ -4,23 +4,54 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### TODO
 
-* Look into implementing halfling luck
 * Try to make settings global
 * Revamp Traits. Keep fluff traits on the first page and for action like traits write "see Actions". Also include fluff traits on "Actions".
+* Actions: Allow for "Effects" to be whispered to the GM.
 * Make spells automatically reduce the amount left
 * Add "Conditions" that make sheet-wide changes when a condition is toggled.
 * Use the new roll templates greater than to enhance ac targeting. https://app.roll20.net/forum/post/1977290/update-5-slash-20-improved-player-directory-and-new-roll-template-features
+* Vitality Points
 * Look into proficiency dice
-* Actions: Allow for "Effects" to be whispered to the GM.
-* Consider alternative sheet layout of skills under the stats
+* Add support for crit fails/successes to weapons/spells/actions
 
 
 ### Changelog
+
+**22nd June 2015**
+
+* Added a bonus field for AC that works on PC pages.
+
+**21st June 2015**
+
+* Death saves & failures now fill from left to right (with a "X" to reset)
+
+**19th-20th June 2015**
+
+* (Dev) Lots more cleanup
+* Monk DC added to spells
+* Added targetAC to Spells & Cantrips
+* Added a toggle for "Quick Weapons" on the weapons page
+* Halfling Luck (works on everything but spell attacks)
+* Improved heart on tablets (still not great, but doesn't cut off at least)
+
+**18th June 2015**
+
+* (Dev) Refactored the grid system and cleaned up a lot of CSS - using scss now
+* (Dev) HTML is compiled to be smaller now
+* Removed the old NPC sheet
+* Moved bonuses for Abilities/Saves/Checks/Skills to the Settings tab.
+
+**9th June 2015**
+
+* Resize quick fields to allow more room for hit and +dmg
+* Shrink saves and checks to match skills' height
+* Reorder pages to put Weapons, Actions, and Spellbook much earlier
 
 **8th June 2015**
 
 * Hide fields that shouldn't be displayed from weapons output now that class actions are added to the new weapons
 * Remove name from the emote
+* Shrunk some elements on the core page - mainly skills
 
 **7th June 2015**
 
