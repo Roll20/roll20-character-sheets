@@ -17,6 +17,10 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### Changelog
 
+**23rd June 2015**
+
+* Added output all to the roll template
+
 **22nd June 2015**
 
 * Added a bonus field for AC that works on PC pages.
