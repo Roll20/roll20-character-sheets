@@ -17,6 +17,11 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### Changelog
 
+**24th June 2015**
+
+* Added Class Resources to the Core page for PC sheets
+* Added "Loot" to the Core page for NPC sheets
+
 **23rd June 2015**
 
 * Added output all to the roll template
