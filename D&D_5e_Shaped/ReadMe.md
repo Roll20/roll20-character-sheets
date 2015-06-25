@@ -20,6 +20,7 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 **25th June 2015**
 
 * Fixed delete buttons so they show on spellbook and quick class resources.
+* Added Class Actions to the Core page for PC sheets
 
 **24th June 2015**
 
