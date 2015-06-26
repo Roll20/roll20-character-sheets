@@ -17,6 +17,10 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### Changelog
 
+**26th June 2015**
+
+* Macro was added to Actions by Lucian.
+
 **25th June 2015**
 
 * Fixed delete buttons so they show on spellbook and quick class resources.
