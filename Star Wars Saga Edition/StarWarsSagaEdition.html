@@ -325,63 +325,103 @@
 			<br />			
 			<div class="textHead2Col">Attacks</div>
 				<fieldset class="repeating_attack">	
-					<table class="spacing table2col">
-						<tr>
-							<td colspan="5" width="75%">	<input type="text" name="attr_WeaponName" placeholder="Weapon Name" style="width:100%"  title="Weapon Name @{repeating_attack_X_WeaponName}" />		</td>
-							<td colspan="3">				<input type="text" name="attr_WeaponName_max" placeholder="Type" style="width:100%" title="Weapon Type @{repeating_attack_X_WeaponName|max}" />			</td>
-						</tr>
-						<tr>
-							<td rowspan="4" width="15px"></td>
-							<td class="col1">Attack</td>						
-							<td width="60px"><input type="number" name="attr_AttackBAB" value="@{BAB}" disabled="true"  title="Base Attack Bonus @{BAB}" /></td>
-							<td>&nbsp;+&nbsp;</td>
-							<td width="80px">
-								<select name="attr_attackMod" class="modtype" title="Attack Modifier @{repeating_attack_X_attackMod}">                
-								  <option value="@{str|max}">STR</option>
-								  <option value="@{dex|max}">DEX</option>
-								  <option value="@{cha|max}">CHA</option>
-								</select>
-							</td>		  
-							<td>&nbsp;+&nbsp;</td>
-							<td><input type="number" name="attr_attackModMisc" placeholder="Misc" value="0" style="width:40px"  title="Attack Miscellaneous Modifier @{repeating_attack_X_attackModMisc}" /></td>
-							
-							<td rowspan="2"> <button  type="roll" name="roll_WeaponCheck" value="&{template:attack} {{name=@{WeaponName}}} {{type=@{WeaponName|max}}} {{attack=[[1d20cs>@{WeaponCrit}[Critical Range] + @{BAB}[BAB] + @{attackMod}[Mod] + @{attackModMisc}[Misc] +@{CT}[CT] + ?{Other Modifiers (Attack)|0}[Other]]]}} {{atkeffect= @{WeaponNotes|max}}} {{damage=[[@{damage}[Damage] + @{level|max}[Half Level] + @{damageMod}[Mod] + @{damageMisc}[Misc]]]}} {{dmgcrit=[[(@{damage}[Damage] + @{damageMod}[Mod] + @{damageMisc}[Misc])*@{WeaponCrit|max}[Critical Multiplier]]]}}" title="Attack Roll"> </button>
-							</td>
-						</tr>
-						<tr>					
-							<!-- rowspan placholder -->
-							<td class="col1">Damage</td>
-							<td><input type="text" name="attr_damage" value="2d8"  style="width:60px" title="Weapon Damage @{repeating_attack_X_damage}"/>	</td>	  
-							<td>&nbsp;+&nbsp;</td>
-							<td>
-								<select name="attr_damageMod" class="modtype" style="width:75px" title="Weapon Damage modifier @{repeating_attack_X_damageMod}">
-								  <option value="0" selected>None</option>                
-								  <option value="@{str|max}">STR</option>
-								  <option value="[[@{str|max}*2]]">STRx2</option>
-								  <option value="@{dex|max}">DEX</option>
-								  <option value="[[@{dex|max}*2]]">DEXx2</option>
-								  <option value="@{cha|max}">CHA</option>
-								  <option value="[[@{cha|max}*2]]">CHAx2</option>
-								</select>
-							</td>		  
-							<td>&nbsp;+&nbsp;</td> 
-							<td><input type="number" name="attr_damageMisc" placeholder="Misc" value="0" style="width:40px" title="Weapon Damage Miscellaneous Modifier @{repeating_attack_X_damageMisc}"  /></td>
-							<!-- rowspan placholder -->
-						</tr>
-						<tr>				
-							<!-- rowspan placholder -->
-							<th>	Critical Info		</th>
-							<th class="small" colspan="2"> 	Range <input type="number" name="attr_WeaponCrit" placeholder="Crit" value="20" title="Weapon Critical Starting Range ie.20 @{repeating_attack_X_WeaponCrit}" />	</th>
-							<th class="small" colspan="2"> 	Multiplier <input type="number" name="attr_WeaponCrit_max" value="2" title="Weapon Crit Damage Multiplier @{repeating_attack_X_WeaponCrit|max}" />	</th>
-						</tr>
-						<tr>					
-							<!-- rowspan placholder -->
-							<td colspan="7">
-								<textarea type="text" name="attr_WeaponNotes_max" placeholder="Attack Notes" class="atkNotes" title="Attack Notes: ie Devesating Attack, Rapid Strike, Point Blank Shot @{repeating_attack_X_WeaponNotes|max}" ></textarea>
-								<textarea type="text" name="attr_WeaponNotes" placeholder="Weapon Notes" class="atkNotes" title="Weapon Notes @{repeating_attack_X_WeaponNotes}"></textarea>
-							</td>
-						</tr>	
-					</table>
+				<div class="table">	
+					<div class="table-row">
+						<div class="table">	
+							<div class="table-row">												
+								<span class="table-data">	<button  type="roll" name="roll_WeaponCheck" value="&{template:attack} @{AttackFormula}" title="Attack Roll"> </button>	</span>
+								<span class="table-data" style="width:55%">	<input type="text" name="attr_WeaponName" placeholder="Weapon Name" style="width:100%"  title="Weapon Name @{repeating_attack_X_WeaponName}" />	</span>
+								<span class="table-data">	<input type="text" name="attr_WeaponName_max" placeholder="Type" style="width:100%" title="Weapon Type @{repeating_attack_X_WeaponName|max}" />	</span>
+							</div>
+						</div>						
+					</div>					
+					<div class="table-row">
+						<span class="table-data">	<div class="table">	
+							<div class="table-row">
+								<span class="table-data" style="min-width:44px">		</span>
+								<span class="table-data col1"  style="min-width:110px">	<span>Attack</span>	<input type="checkbox" class="sect-show skillsHideCheckbox" title="Show/Hide Attack Formula" name="attr_attack-show" value="1" style="width: 38px; margin-left: -41px;" />	</span>
+								<span class="table-data" style="width:60px">	<input type="number" name="attr_AttackBAB" value="@{BAB}" disabled="true"  title="Base Attack Bonus @{BAB}" />	</span>
+								<span class="table-data">	&nbsp;+&nbsp;	</span>
+								<span class="table-data" style="width:80px">
+									<select name="attr_attackMod" class="modtype" title="Attack Modifier @{repeating_attack_X_attackMod}">           
+									  <option value="@{str|max}">STR</option>
+									  <option value="@{dex|max}">DEX</option>
+									  <option value="@{cha|max}">CHA</option>
+									</select>	</span>
+								<span class="table-data">	&nbsp;+&nbsp;	</span>
+								<span class="table-data">	<input type="number" name="attr_attackModMisc" placeholder="Misc" value="0" style="width:40px"  title="Attack Miscellaneous Modifier @{repeating_attack_X_attackModMisc}" />	</span>
+							</div>
+						</div>	</span>
+					</div>
+					<div style="width:100%">	<input type="checkbox" class="sect-show hidden" value="1" name="attr_attack-show" />
+						<div class="table-row sect">
+							<span class="table-data" style="min-width:44px">		</span> 
+							<span class="table-data atkFormula">							
+								<textarea type="text" name="attr_WeaponAttack" class="atkFormula" title="Attack formula @{repeating_attack_X_WeaponAttack}" >1d20cs>@{WeaponCrit}[Critical Range] + @{BAB}[BAB] + @{attackMod}[Mod] + @{attackModMisc}[Misc] +@{CT}[CT] + ?{Other Modifiers (Attack)|0}[Other]</textarea> 
+							</span>
+						</div>
+					</div>				
+					<div class="table-row">
+						<span class="table-data">	<div class="table">	
+							<div class="table-row">
+								<span class="table-data" style="min-width:44px">		</span>
+								<span class="table-data col1"  style="min-width:110px">	<span>Damage</span>	<input type="checkbox" class="sect-show skillsHideCheckbox" title="Show/Hide Attack Formula" name="attr_damage-show" value="1" style="width: 50px; margin-left: -53px;" />	</span>
+								<span class="table-data" style="width:60px">	<input type="text" name="attr_damage" value="2d8"  style="width:60px" title="Weapon Damage @{repeating_attack_X_damage}"/>	</span>
+								<span class="table-data">	&nbsp;+&nbsp;	</span>
+								<span class="table-data" style="width:80px">	
+									<select name="attr_damageMod" class="modtype" style="width:75px" title="Weapon Damage modifier @{repeating_attack_X_damageMod}">
+									  <option value="0" selected>None</option>                
+									  <option value="@{str|max}">STR</option>
+									  <option value="[[@{str|max}*2]]">STRx2</option>
+									  <option value="@{dex|max}">DEX</option>
+									  <option value="[[@{dex|max}*2]]">DEXx2</option>
+									  <option value="@{cha|max}">CHA</option>
+									  <option value="[[@{cha|max}*2]]">CHAx2</option>
+									</select>	</span>
+								<span class="table-data">	&nbsp;+&nbsp;	</span>
+								<span class="table-data">	<input type="number" name="attr_damageMisc" placeholder="Misc" value="0" style="width:40px" title="Weapon Damage Miscellaneous Modifier @{repeating_attack_X_damageMisc}"  />	</span>
+							</div>
+						</div>	</span>
+					</div>
+					<div style="width:100%">	<input type="checkbox" class="sect-show hidden" value="1" name="attr_damage-show" />
+						<div class="table-row sect">
+							<span class="table-data" style="width:44px">		</span> 
+							<span class="table-data atkFormula">							
+								<textarea type="text" name="attr_WeaponDamage" class="atkFormula" title="Damage formula @{repeating_attack_X_WeaponDamage}" >@{damage}[Damage] + @{level|max}[Half Level] + @{damageMod}[Mod] + @{damageMisc}[Misc]</textarea> 
+							</span>
+						</div>
+					</div>
+					<div class="table-row">
+						<span class="table-data">	<div class="table">	
+							<div class="table-row">
+								<span class="table-data" style="width:44px">		</span>
+								<span class="table-data"  style="min-width:110px">	<b>Critical Info</b>	</span>
+								<span class="table-data">	<span class="small"><b>Range</b></span> 	<input type="number" name="attr_WeaponCrit" placeholder="Crit" value="20" title="Weapon Critical Starting Range ie.20 @{repeating_attack_X_WeaponCrit}" />	</span>
+								<span class="table-data">		<span class="small"><b>Multiplier</b></span>	 <input type="number" name="attr_WeaponCrit_max" value="2" title="Weapon Crit Damage Multiplier @{repeating_attack_X_WeaponCrit|max}" />		</span>
+								<span class="table-data"  style="min-width:110px">	<b>Template Formula</b>	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" class="sect-show" title="Show/Hide Attack Template Formula" name="attr_AttackFormula-show" value="1" style="opacity:0;width: 35px;height: 16px;position: relative;top: 5px;left: 6px;margin: -32px;cursor: pointer;z-index: 1;" /><span></span>	</span>
+							</div>
+						</div>	</span>
+					</div>
+					<div style="width:100%">	<input type="checkbox" class="sect-show hidden" value="1" name="attr_AttackFormula-show" />
+						<div class="table-row sect">
+							<span class="table-data" style="width:44px">		</span> 
+							<span class="table-data atkFormula">							
+								<textarea type="text" name="attr_AttackFormula" class="atkFormula" title="Attack Template formula @{repeating_attack_X_AttackFormula}" >{{name=@{WeaponName}}} {{type=@{WeaponName|max}}}  {{atkeffect= @{WeaponNotes|max}}} {{attack=[[@{WeaponAttack}]]}} {{damage=[[@{WeaponDamage}]]}} {{dmgcrit=[[(@{WeaponDamage})*@{WeaponCrit|max}[Critical Multiplier]]]}}</textarea> 
+							</span>
+						</div>
+					</div>
+					<div class="table-row">						
+						<span class="table-data">	<div class="table">	
+							<div class="table-row">
+								<span class="table-data" style="width:44px">		</span> 
+								<span class="table-data">							
+									<textarea type="text" name="attr_WeaponNotes_max" placeholder="Attack Notes" class="atkNotes" title="Attack Notes: ie Devesating Attack, Rapid Strike, Point Blank Shot @{repeating_attack_X_WeaponNotes|max}" ></textarea>
+									<textarea type="text" name="attr_WeaponNotes" placeholder="Weapon Notes" class="atkNotes" title="Weapon Notes @{repeating_attack_X_WeaponNotes}"></textarea>
+								</span>
+							</div>
+						</div>	</span>
+					</div>
+				</div>
 				</fieldset>
 		</div>	
 		<div class="col">
@@ -1999,7 +2039,7 @@
 <!-- start help section --> 
 <div> 
 For Help, please see the wiki page. <input type="text" name="attr_vehicle-EquipmentLocation" style="width:30em" title="Wiki URL" value="https://wiki.roll20.net/Star_Wars_Saga_Edition_Character_Sheet"/> <br/>
-<b>Last updated</b> 06/24/2015
+<b>Last updated</b> 06/27/2015
 </div>
 
 <!-- start roll templates --> 
