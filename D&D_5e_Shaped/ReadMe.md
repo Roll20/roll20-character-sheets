@@ -5,6 +5,7 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 ### TODO
 
 * Try to make settings global - or do this via API
+* Weapon bonuses should not apply unless "bonuses is checked"
 * Custom gold values https://app.roll20.net/forum/post/2016392/#post-2126410
 * Actions: Allow for "Effects" to be whispered to the GM.
 * Revamp Traits. Keep fluff traits on the first page and for action like traits write "see Actions". Also include fluff traits on "Actions".
