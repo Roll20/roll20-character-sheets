@@ -4,9 +4,11 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### TODO
 
-* Try to make settings global
-* Revamp Traits. Keep fluff traits on the first page and for action like traits write "see Actions". Also include fluff traits on "Actions".
+* Try to make settings global - or do this via API
+* Weapon bonuses should not apply unless "bonuses is checked"
+* Custom gold values https://app.roll20.net/forum/post/2016392/#post-2126410
 * Actions: Allow for "Effects" to be whispered to the GM.
+* Revamp Traits. Keep fluff traits on the first page and for action like traits write "see Actions". Also include fluff traits on "Actions".
 * Make spells automatically reduce the amount left
 * Add "Conditions" that make sheet-wide changes when a condition is toggled.
 * Use the new roll templates greater than to enhance ac targeting. https://app.roll20.net/forum/post/1977290/update-5-slash-20-improved-player-directory-and-new-roll-template-features
@@ -16,6 +18,24 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 
 ### Changelog
+
+**26th June 2015**
+
+* Macro was added to Actions by Lucian.
+
+**25th June 2015**
+
+* Fixed delete buttons so they show on spellbook and quick class resources.
+* Added Class Actions to the Core page for PC sheets
+
+**24th June 2015**
+
+* Added Class Resources to the Core page for PC sheets
+* Added "Loot" to the Core page for NPC sheets
+
+**23rd June 2015**
+
+* Added output all to the roll template
 
 **22nd June 2015**
 
