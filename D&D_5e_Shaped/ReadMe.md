@@ -4,11 +4,15 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### TODO
 
-* Try to make settings global - or do this via API
+Short Term:
 * Weapon bonuses should not apply unless "bonuses is checked"
-* Custom gold values https://app.roll20.net/forum/post/2016392/#post-2126410
 * Actions: Allow for "Effects" to be whispered to the GM.
+* Custom gold values https://app.roll20.net/forum/post/2016392/#post-2126410
 * Revamp Traits. Keep fluff traits on the first page and for action like traits write "see Actions". Also include fluff traits on "Actions".
+* Explore icons for damage types/resistances/etc https://app.roll20.net/forum/post/2110339/icons-for-damage-types-5e
+* Allow for multiple attacks in 1 macro. See https://app.roll20.net/forum/post/2016392/#post-2128439
+
+Long term:
 * Make spells automatically reduce the amount left
 * Add "Conditions" that make sheet-wide changes when a condition is toggled.
 * Use the new roll templates greater than to enhance ac targeting. https://app.roll20.net/forum/post/1977290/update-5-slash-20-improved-player-directory-and-new-roll-template-features
@@ -18,6 +22,11 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 
 ### Changelog
+
+**29th June 2015**
+
+* Added a setting to always hide initiative
+* Refactored the settings page completely. See https://app.roll20.net/forum/post/2016392/#post-2128397 Removed from my TODO.
 
 **26th June 2015**
 
