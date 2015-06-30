@@ -5,14 +5,12 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 ### TODO
 
 Short Term:
-* Weapon bonuses should not apply unless "bonuses is checked"
 * Actions: Allow for "Effects" to be whispered to the GM.
-* Custom gold values https://app.roll20.net/forum/post/2016392/#post-2126410
 * Revamp Traits. Keep fluff traits on the first page and for action like traits write "see Actions". Also include fluff traits on "Actions".
-* Explore icons for damage types/resistances/etc https://app.roll20.net/forum/post/2110339/icons-for-damage-types-5e
-* Allow for multiple attacks in 1 macro. See https://app.roll20.net/forum/post/2016392/#post-2128439
 
 Long term:
+* Explore icons for damage types/resistances/etc https://app.roll20.net/forum/post/2110339/icons-for-damage-types-5e
+* Add saves and other stuff to class actions.
 * Make spells automatically reduce the amount left
 * Add "Conditions" that make sheet-wide changes when a condition is toggled.
 * Use the new roll templates greater than to enhance ac targeting. https://app.roll20.net/forum/post/1977290/update-5-slash-20-improved-player-directory-and-new-roll-template-features
@@ -22,6 +20,14 @@ Long term:
 
 
 ### Changelog
+
+**30th June 2015**
+
+* Change of how the line break for macro works for weapons and actions. Tried to set it up 
+* Added custom gold values. See https://app.roll20.net/forum/post/2016392/#post-2126410  Removed from my TODO.
+* Added Multiattack to the roll template. See See https://app.roll20.net/forum/post/2016392/#post-2128439  Removed from my TODO.
+* Second damage bonus for weapons was not being calculated. Fixed that.
+* Weapon bonuses do not apply unless bonuses is checked. Applied to to hit bonus, dmg bonus, secondary dmg bonus, bonus crit dmg.  Removed from my TODO.
 
 **29th June 2015**
 
