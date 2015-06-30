@@ -2,6 +2,7 @@ var gulp = require('gulp'),
 	include = require('gulp-include'),
 	inject = require('gulp-inject'),
 	minifyHTML = require('gulp-minify-html'),
+	htmlclean = require('gulp-htmlclean'),
 	minifyCss = require('gulp-minify-css'),
 	concat = require('gulp-concat');
 
@@ -251,8 +252,10 @@ gulp.task('preCompile', function() {
 			transform: function (filePath, file) {
 				return duplicate(file, inventoryPerPage, 1 + inventoryPerPage + inventoryPerPage);
 			}
+		})).pipe(htmlclean({
+			protect: /<\!--%fooTemplate\b.*?%-->/g,
+			edit: function(html) { return html.replace(/\begg(s?)\b/ig, 'omelet$1'); }
 		}))
-		.pipe(minifyHTML())
 		.pipe(gulp.dest('./'));
 });
 
