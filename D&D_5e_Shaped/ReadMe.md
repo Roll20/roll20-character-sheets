@@ -25,7 +25,7 @@ Long term:
 
 * Weapons and Actions will automatically have crit turned on by default.
 * Fixed several bugs - quick melee has "button" printed. Melee attacks had an error where no bonuses were being added.
-* Refactor's spells' buttons to match the styling of weapons and actions.
+* Refactored spells' buttons to match the styling of weapons and actions.
 
 **30th June 2015**
 
