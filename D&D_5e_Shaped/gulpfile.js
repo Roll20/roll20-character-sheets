@@ -114,7 +114,7 @@ function skills (file) {
 }
 
 gulp.task('preCompile', function() {
-	gulp.src('precompiled/D&D_5e.html')
+	return gulp.src('precompiled/D&D_5e.html')
 		.pipe( include() )
 		.pipe( inject(gulp.src(['precompiled/components/skills/skill.html']), {
 			starttag: '<!-- inject:skills:{{ext}} -->',
@@ -252,15 +252,19 @@ gulp.task('preCompile', function() {
 			transform: function (filePath, file) {
 				return duplicate(file, inventoryPerPage, 1 + inventoryPerPage + inventoryPerPage);
 			}
-		})).pipe(htmlclean({
+		}))
+		.pipe(minifyHTML())
+		/*
+		.pipe(htmlclean({
 			protect: /<\!--%fooTemplate\b.*?%-->/g,
 			edit: function(html) { return html.replace(/\begg(s?)\b/ig, 'omelet$1'); }
 		}))
+		*/
 		.pipe(gulp.dest('./'));
 });
 
-gulp.task('compile', function() {
-	return gulp.src( ['D&D_5e.html', 'precompiled/pages/roll_template.html'] )
+gulp.task('compile', ['preCompile'], function() {
+	return gulp.src(['D&D_5e.html', 'precompiled/pages/roll_template.html'])
 		.pipe(concat('D&D_5e.html'))
 		.pipe(gulp.dest('./'));
 });

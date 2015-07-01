@@ -21,6 +21,11 @@ Long term:
 
 ### Changelog
 
+**1st July 2015**
+
+* Weapons and Actions will automatically have crit turned on by default.
+* Fixed several bugs - quick melee has "button" printed. Melee attacks had an error where no bonuses were being added.
+
 **30th June 2015**
 
 * Change of how the line break for macro works for weapons and actions. Tried to set it up 
