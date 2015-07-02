@@ -7,6 +7,7 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 Short Term:
 * Actions: Allow for "Effects" to be whispered to the GM.
 * Revamp Traits. Keep fluff traits on the first page and for action like traits write "see Actions". Also include fluff traits on "Actions".
+* Refactor Actions to use damage die and bonus like weapons do
 
 Long term:
 * Explore icons for damage types/resistances/etc https://app.roll20.net/forum/post/2110339/icons-for-damage-types-5e
@@ -20,6 +21,16 @@ Long term:
 
 
 ### Changelog
+
+**2nd July 2015**
+
+* Fixed the HTML of spells so they no longer break any pages after it
+* (Dev) cleaned the tabs to use more consistent css
+* (Dev) small cleanup based on html vaidation (value on textareas removed, step on input type text removed)
+* Added a toggle to show HD rows
+* Slightly decreased the height of the speed wrap box (5px)
+* Added a notation so spell slots are current/max. Also changed color of the tab.
+* Added attacks and saves vs target's name with a setting and API support.  Removed from TODO
 
 **1st July 2015**
 
