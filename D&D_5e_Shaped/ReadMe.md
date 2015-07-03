@@ -22,6 +22,11 @@ Long term:
 
 ### Changelog
 
+**3rd July 2015**
+
+* Updated target name to show the token's name, not the character name
+* Small UI adjustments (Quick Resources, header padding, quick spell stuff)
+
 **2nd July 2015**
 
 * Fixed the HTML of spells so they no longer break any pages after it
