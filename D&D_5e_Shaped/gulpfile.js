@@ -8,7 +8,7 @@ var gulp = require('gulp'),
 
 var customSkillCount = 4,
 	outputOtionsCount = 1,
-	traitsCount = 5,
+	traitsCount = 1,
 	actionCount = 12,
 	lairActionCount = 4,
 	legendaryActionCount = 4,
