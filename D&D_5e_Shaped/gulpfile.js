@@ -2,16 +2,18 @@ var gulp = require('gulp'),
 	include = require('gulp-include'),
 	inject = require('gulp-inject'),
 	minifyHTML = require('gulp-minify-html'),
+	htmlclean = require('gulp-htmlclean'),
 	minifyCss = require('gulp-minify-css'),
 	concat = require('gulp-concat');
 
 var customSkillCount = 4,
 	outputOtionsCount = 1,
-	traitsCount = 5,
+	traitsCount = 1,
 	actionCount = 12,
 	lairActionCount = 4,
 	legendaryActionCount = 4,
 	weaponCount = 7,
+	quickClassActions = 5,
 	classActionsPerPage = 10,
 	customClassCount = 6,
 	spellCount = 9,
@@ -112,7 +114,7 @@ function skills (file) {
 }
 
 gulp.task('preCompile', function() {
-	gulp.src('precompiled/D&D_5e.html')
+	return gulp.src('precompiled/D&D_5e.html')
 		.pipe( include() )
 		.pipe( inject(gulp.src(['precompiled/components/skills/skill.html']), {
 			starttag: '<!-- inject:skills:{{ext}} -->',
@@ -203,6 +205,12 @@ gulp.task('preCompile', function() {
 				return duplicate(file, classActionsPerPage, 1);
 			}
 		}))
+		.pipe( inject(gulp.src(['precompiled/components/class/quick_class_action.html']), {
+			starttag: '<!-- inject:quickClassActions:{{ext}} -->',
+			transform: function (filePath, file) {
+				return duplicate(file, quickClassActions, 1);
+			}
+		}))
 		.pipe( inject(gulp.src(['precompiled/components/class/class_action.html']), {
 			starttag: '<!-- inject:class_2:{{ext}} -->',
 			transform: function (filePath, file) {
@@ -246,11 +254,17 @@ gulp.task('preCompile', function() {
 			}
 		}))
 		.pipe(minifyHTML())
+		/*
+		.pipe(htmlclean({
+			protect: /<\!--%fooTemplate\b.*?%-->/g,
+			edit: function(html) { return html.replace(/\begg(s?)\b/ig, 'omelet$1'); }
+		}))
+		*/
 		.pipe(gulp.dest('./'));
 });
 
-gulp.task('compile', function() {
-	return gulp.src( ['D&D_5e.html', 'precompiled/pages/roll_template.html'] )
+gulp.task('compile', ['preCompile'], function() {
+	return gulp.src(['D&D_5e.html', 'precompiled/pages/roll_template.html'])
 		.pipe(concat('D&D_5e.html'))
 		.pipe(gulp.dest('./'));
 });
