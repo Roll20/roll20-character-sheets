@@ -22,6 +22,10 @@ Long term:
 
 ### Changelog
 
+**12th July 2015**
+
+* Added back a blank variable because repeating sections are bad.
+
 **11th July 2015**
 
 Most of the changes are to allow for a spell importer that is in the works on my API script. Components is for the API and for cosmetic purposes.
