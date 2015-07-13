@@ -22,6 +22,10 @@ Long term:
 
 ### Changelog
 
+**13th July 2015**
+
+* Bonus crit damage is now added via the bonus crit toggle instead of the bonuses toggle.
+
 **12th July 2015**
 
 * Added back a blank variable because repeating sections are bad.
