@@ -22,6 +22,10 @@ Long term:
 
 ### Changelog
 
+**14th July 2015**
+
+* Spell points are now a different field. Was a bug.
+
 **13th July 2015**
 
 * Bonus crit damage is now added via the bonus crit toggle instead of the bonuses toggle.
