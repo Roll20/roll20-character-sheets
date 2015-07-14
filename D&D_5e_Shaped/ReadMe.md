@@ -22,6 +22,25 @@ Long term:
 
 ### Changelog
 
+**14th July 2015**
+
+* Spell points are now a different field. Was a bug.
+
+**13th July 2015**
+
+* Bonus crit damage is now added via the bonus crit toggle instead of the bonuses toggle.
+
+**12th July 2015**
+
+* Added back a blank variable because repeating sections are bad.
+
+**11th July 2015**
+
+Most of the changes are to allow for a spell importer that is in the works on my API script. Components is for the API and for cosmetic purposes.
+* Spells now have V,S,M toggles. The old syntax will still work as well (it appears in the materials field, but it is still named the same for compatability)
+* Added Spell Source so you can show where it's from (Example: "phb 241", "ee pc 20"). Also has a toggle. It appears in the header of the roll template.
+* Moved "Gained from" under a toggle
+
 **3rd July 2015**
 
 * Updated target name to show the token's name, not the character name
