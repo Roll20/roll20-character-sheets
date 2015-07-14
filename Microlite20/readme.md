@@ -5,6 +5,9 @@ use with Roll20.net and released open source under the MIT License.
 
 ### Changelog ###
 
+**Release 5.1 - July 13, 2015**
+- Bugfix: Armor Class now accounts for the miscellaneous modifiers.
+
 **Release 5.0 - May 12, 2015**
 - New layout with a tab-controlled interface
 - Added miscellaneous modifiers to stats, skills, weapons, and armor.
