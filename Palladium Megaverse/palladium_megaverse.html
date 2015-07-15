@@ -1,4 +1,4 @@
-Palladium Megaverse® Character Sheet <br>
+Palladium MegaverseÂ© Character Sheet <br>
 <input type="radio" name="attr_tab" class="sheet-tab sheet-tab1" value="1" title="Basic" checked="checked" />
 <input type="radio" name="attr_tab" class="sheet-tab sheet-tab2" value="2" title="Equipment" />
 <input type="radio" name="attr_tab" class="sheet-tab sheet-tab3" value="3" title="Magic & Psionics" />
@@ -30,16 +30,25 @@ Palladium Megaverse® Character Sheet <br>
                                 <td><div class="sheet-stats-nickname"><input class="sheet-input-center-aligned" type="text" value="" name="attr_occ" /></div></td>
                             </tr>
                             <tr>
+                                <td><div class="sheet-stats-nickname"><h5>Level</h5></div></td>
+                                <td><div class="sheet-stats-nickname"><input type="text" name="attr_level" /></div></td>
+                            </tr>
+                            <tr>
+                                <td><div class="sheet-stats-nickname"><h5>Experience</h5></div></td>
+                                <td><div class="sheet-stats-nickname"><input type="text" name="attr_experience" /></div></td>
+                            </tr>
+                            <tr>
                                 <td><div class="sheet-stats-nickname"><h5>Alignment</h5></div></td>
                                 <td><select class ="sheet-select" name="attr_alignment_select" value="0" style="width:100%">
                                         <option value="0"> </option>
+                                        <option value="Principled">Principled</option>
                                         <option value="Scrupulous">Scrupulous</option>
-                                        <option value="Unprincipaled">Unprincipaled</option>
+                                        <option value="Unprincipled">Unprincipaled</option>
                                         <option value="Anarchist">Anarchist</option>
+                                        <option value="Taoist">Taoist</option>
                                         <option value="Miscreant">Miscreant</option>
                                         <option value="Abberant">Abberant</option>
                                         <option value="Diabolic">Diabolic</option>
-                                        <option value="Taoist">Taoist</option>
                                     </select></td>
                             </tr>
                             <tr>
@@ -124,10 +133,6 @@ Palladium Megaverse® Character Sheet <br>
                                 <td><h5>Charm/Impress</h5></td>
                                 <td><input class="attribute" type="number" value="" name="attr_charm_impress"/>%</td>
                             </tr>
-                            <tr>
-                                <td><h5>Charm/Impress</h5></td>
-                                <td><input class="attribute" type="number" value="" name="attr_charm_impress"/>%</td>
-                            </tr>
                         </table>
                         <table border="2">
                             <tr>
@@ -186,6 +191,16 @@ Palladium Megaverse® Character Sheet <br>
                                 <td><h5>H.F.</h5></td>
                                 <td><input class="attribute" type="number" value="" name="attr_character_hf" /></td>
                             </tr>
+                            <tr>
+                                <td><h5>Initiative</h5></td>
+                                <td><input type="number" value="@{initiative}" disabled="true" /></td>
+                                <td><button type="roll" value="Initiative: [[d20+@{initiative}+0.1*@{initiative}&{tracker}]]" /></td>
+                            </tr>
+                            <tr>
+                                <td><h5>Perception</h5></td>
+                                <td><input type="number" value"0" name="attr_perception" /></td>
+                                <td><button type="roll" value="Perception: [[d20+@{perception}]]" /></td>
+                            </tr>
                         </table>
                     </div>
                 </div>
@@ -206,11 +221,20 @@ Palladium Megaverse® Character Sheet <br>
                 </tr>
                 <tr>
                     <td><h5>Run</h5></td>
-                    <td><input class="attribute" type="number" value="" name="attr_run_mph" /></td>
-                    <td><input class="attribute" type="number" value="" name="attr_run_ft_melee" /></td>
-                    <td><input class="attribute" type="number" value="" name="attr_run_ft_attack" /></td>
+                    <td><input class="attribute" type="number" value="round(@{spd}*0.68)" disabled="true" name="attr_run_mph" /></td>
+                    <td><input class="attribute" type="number" value="round(@{spd}*15)" disabled="true" name="attr_run_ft_melee" /></td>
+                    <td><input class="attribute" type="number" value="round(@{spd}*15/@{combatskill_numberattacks})" disabled="true" name="attr_run_ft_attack" /></td>
                     <td><input class="attribute" type="number" value="" name="attr_run_cruising" /></td>
-                    <td><input class="attribute" type="number" value="" name="attr_run_at_max" />minutes</td>
+                    <td><input class="attribute" type="number" value="@{pe}/2" disabled="true" name="attr_run_at_max" />minutes</td>
+                </tr>
+            </table>
+            <table>
+                <tr>
+                        <td><h5>Leaping Distance</h5></td>
+                        <td style="width:98px" ></td>
+                        <td><input type="number" name="attr_leapup" value="" />feet up?</td>
+                        <td style="width:98px" ></td>
+                        <td><input type="number" name="attr_leapout" value="" />feet out?</td>
                 </tr>
             </table>
             <fieldset class="repeating_movement">
@@ -480,24 +504,92 @@ Palladium Megaverse® Character Sheet <br>
 
 <div class="sheet-tab-content sheet-tab4">
     <h1>Skills</h1>
+    <button type="roll" value="/em attempts a ?{Skill name} check.&#x00A;[[d100<?{skill rating}]]&#x00A;Success = 1, Failure = 0" name="skill-roll" ></button> Universal Skill Roll
     <div class="sheet-tabbed-panel">
         <div class="sheet-row-panel">
-            <fieldset class="repeating_skill"> 
-                <table style="width:90%">
+            <input type="checkbox" name="attr_OCC-Skill-toggle" class="sheet-arrow" />
+            <h4>Occupational Class Skills</h4>
+            <div class="body">
+            <table style="width:90%">
+                <tr>
+                    <td style="width:10%"></td>
+                    <td style="width:25%"><h5>Name</h5></td>
+                    <td style="width:8%"><h5>Rating</h5></td>
+                    <td style="width:10%"><h5>Each Level</h5></td>
+                    <td><h5>Notes</h5></td>
+                </tr>
+            </table>
+            <fieldset class="repeating_skillocc">
+                <table>
                     <tr>
-                        <td><h5>Name</h5></td>
-                        <td><h5>Rating</h5></td>
-                        <td><h5>Book & Page Reference</h5></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td><div class="sheet-ability"><input class="sheet-input-center-aligned" type="text" value="" name="attr_skill_name" placeholder="Skill"/></div></td>
-                        <td><div class="sheet-ability"><input class="sheet-input-center-aligned" type="number" value="" name="attr_skill_rating" /></div></td>
-                        <td><div class="sheet-ability"><input class="sheet-input-center-aligned" type="text" value="" name="attr_skill_reference" placeholder="Book & page number"/></div></td>
+                        <td><div class="sheet-ability"><button type="roll" value="@{character_name}'s @{skill_name} check:&#x00a;/roll d100<@{skill_rating}"></button></div></td>
+                        <td><div class="sheet-ability"><input class="sheet-input-center-aligned" type="text" style="width:220px" value="" name="attr_skill_name" placeholder="Skill name"/></div></td>
+                        <td><div class="sheet-ability"><input class="sheet-input-center-aligned" type="number" value="" name="attr_skill_rating" /><b>%</b></div></td>
+                        <td><div class="sheet-ability"><input class="sheet-input-center-aligned" type="number" style="width:60px" value="+" name="attr_skill_level" /><b>%</b></div></td>
+                        <td><div class="sheet-ability"><input class="sheet-input-center-aligned" type="text" style="width:300px" value="" name="attr_skill_reference" placeholder="Book & page number"/></div></td>
                         <td></td>
                     </tr>
                 </table>
             </fieldset>
+            </div>
+        </div>
+    </div>
+    <div class="sheet-tabbed-panel">
+        <div class="sheet-row-panel">
+            <input type="checkbox" name="attr_Elective-Skill-toggle" class="sheet-arrow" />
+            <h4>Elective Skills</h4>
+            <div class="body">
+            <table style="width:90%">
+                <tr>
+                    <td style="width:10%"></td>
+                    <td style="width:25%"><h5>Name</h5></td>
+                    <td style="width:8%"><h5>Rating</h5></td>
+                    <td style="width:10%"><h5>Each Level</h5></td>
+                    <td><h5>Notes</h5></td>
+                </tr>
+            </table>
+            <fieldset class="repeating_skillelective">
+                <table>
+                    <tr>
+                        <td><div class="sheet-ability"><button type="roll" value="@{character_name}'s @{skill_name} check:&#x00a;/roll d100<@{skill_rating}"></button></div></td>
+                        <td><div class="sheet-ability"><input class="sheet-input-center-aligned" type="text" style="width:220px" value="" name="attr_skill_name" placeholder="Skill name"/></div></td>
+                        <td><div class="sheet-ability"><input class="sheet-input-center-aligned" type="number" value="" name="attr_skill_rating" /><b>%</b></div></td>
+                        <td><div class="sheet-ability"><input class="sheet-input-center-aligned" type="number" style="width:60px" value="+" name="attr_skill_level" /><b>%</b></div></td>
+                        <td><div class="sheet-ability"><input class="sheet-input-center-aligned" type="text" style="width:300px" value="" name="attr_skill_reference" placeholder="Book & page number"/></div></td>
+                        <td></td>
+                    </tr>
+                </table>
+            </fieldset>
+            </div>
+        </div>
+    </div>
+    <div class="sheet-tabbed-panel">
+        <div class="sheet-row-panel">
+            <input type="checkbox" name="attr_Secondary-Skill-toggle" class="sheet-arrow" />
+            <h4>Secondary Skills</h4>
+            <div class="body">
+            <table style="width:90%">
+                <tr>
+                    <td style="width:10%"></td>
+                    <td style="width:25%"><h5>Name</h5></td>
+                    <td style="width:8%"><h5>Rating</h5></td>
+                    <td style="width:10%"><h5>Each Level</h5></td>
+                    <td><h5>Notes</h5></td>
+                </tr>
+            </table>
+            <fieldset class="repeating_skillsecondary">
+                <table>
+                    <tr>
+                        <td><div class="sheet-ability"><button type="roll" value="@{character_name}'s @{skill_name} check:&#x00a;/roll d100<@{skill_rating}"></button></div></td>
+                        <td><div class="sheet-ability"><input class="sheet-input-center-aligned" type="text" style="width:220px" value="" name="attr_skill_name" placeholder="Skill name"/></div></td>
+                        <td><div class="sheet-ability"><input class="sheet-input-center-aligned" type="number" value="" name="attr_skill_rating" /><b>%</b></div></td>
+                        <td><div class="sheet-ability"><input class="sheet-input-center-aligned" type="number" style="width:60px" value="+" name="attr_skill_level" /><b>%</b></div></td>
+                        <td><div class="sheet-ability"><input class="sheet-input-center-aligned" type="text" style="width:300px" value="" name="attr_skill_reference" placeholder="Book & page number"/></div></td>
+                        <td></td>
+                    </tr>
+                </table>
+            </fieldset>
+            </div>
         </div>
     </div>
 </div>
@@ -506,53 +598,334 @@ Palladium Megaverse® Character Sheet <br>
     <h1>Combat</h1>
     <div class="sheet-tabbed-panel">
         <div class="sheet-row-panel"> 
-            <input type="checkbox" name="attr_weapon-toggle" class="sheet-arrow" />
-            <h4>Quick Combat Reference</h4>
+            <input type="checkbox" name="attr_ancient_weapon-toggle" class="sheet-arrow" />
+            <h4>Ancient Weapon Proficencies</h4>
+            <div class="body">
+                <fieldset class="repeating_weaponancient"> 
+                    <table style="width:75%">
+                        <tr>
+                            <td><h5>Weapon</h5></td>
+                            <td><h5>Strike</h5></td>
+                            <td></td>
+                            <td><h5>Parry</h5></td>
+                            <td></td>
+                            <td><h5>Damage</h5></td>
+                            <td></td>
+                            <td><h5>Range</h5></td>
+                            <td><h5>Reach</h5></td>
+                        </tr>
+                        <tr>
+                            <td><div class="sheet-inventory-weapon"><input class="sheet-input-center-aligned" type="text" value="" name="attr_weapon_name_ancient" placeholder="Weapon Name" /></div></td>
+                            <td><div class="sheet-inventory-weapon"><input class="sheet-input-center-aligned" type="number" value="0" name="attr_weapon_strike_ancient" /></div></td>
+                            <td><div class="sheet-inventory-weapon"><button type="roll" value="@{weapon_name_ancient} attack: [[d20+@{weapon_strike_ancient}+?{Situational bonus|0}]]"></button></div></td>
+                            <td><div class="sheet-inventory-weapon"><input class="sheet-input-center-aligned" type="number" value="0" name="attr_weapon_parry_ancient" /></div></td>
+                            <td><div class="sheet-inventory-weapon"><button type="roll" value="@{weapon_name_ancient} parry: [[d20+@{weapon_parry_ancient}+?{Situational bonus|0}]]"></button></div></td>
+                            <td><div class="sheet-inventory-weapon"><input class="sheet-input-center-aligned" type="text" value="" name="attr_weapon_damage_ancient" style="width:60px" placeholder="xdy+z" /></div></td>
+                            <td><div class="sheet-inventory-weapon"><button type="roll" value="@{weapon_name_ancient} damage: [[@{weapon_damage_ancient}]]"></button></div></td>
+                            <td><div class="sheet-inventory-weapon"><input class="sheet-input-center-aligned" type="number" value="" name="attr_weapon_range_ancient" /></div></td>
+                            <td><div class="sheet-inventory-weapon"><input class="sheet-input-center-aligned" type="number" value="" name="attr_weapon_reach_ancient" /></div></td>
+                        </tr>
+                    </table>         
+                </fieldset>
+            </div>
+        </div>
+    </div>
+    <div class="sheet-tabbed-panel">
+        <div class="sheet-row-panel"> 
+            <input type="checkbox" name="attr_modern_weapon-toggle" class="sheet-arrow" />
+            <h4>Modern Weapon Proficencies</h4>
+            <div class="body">
+                <fieldset class="repeating_weaponmodern"> 
+                    <table style="width:75%">
+                        <tr>
+                            <td><h5>Weapon</h5></td>
+                            <td><h5>Strike</h5></td>
+                            <td></td>
+                            <td><h5>Damage</h5></td>
+                            <td></td>
+                            <td><h5>Range</h5></td>
+                            <td><h5>Rate</h5></td>
+                            <td><h5>Payload</h5></td>
+                        </tr>
+                        <tr>
+                            <td><div class="sheet-inventory-weapon"><input class="sheet-input-center-aligned" type="text" value="" name="attr_weapon_name_modern" placeholder="Weapon Name" /></div></td>
+                            <td><div class="sheet-inventory-weapon"><input class="sheet-input-center-aligned" type="number" value="0" name="attr_weapon_strike_modern" /></div></td>
+                            <td><div class="sheet-inventory-weapon"><button type="roll" value="@{weapon_name_modern} attack: [[d20+@{weapon_strike_modern}+?{Situational bonus|0}]]"></button></div></td>
+                            <td><div class="sheet-inventory-weapon"><input class="sheet-input-center-aligned" type="text" value="" name="attr_weapon_damage_modern" style="width:60px" placeholder="xdy+z" /></div></td>
+                            <td><div class="sheet-inventory-weapon"><button type="roll" value="@{weapon_name_modern} damage: [[@{weapon_damage_modern}]]"></button></div></td>
+                            <td><div class="sheet-inventory-weapon"><input class="sheet-input-center-aligned" type="text" value="" name="attr_weapon_range_modern" placeholder="close, short, long, extreme" /></div></td>
+                            <td><div class="sheet-inventory-weapon"><input class="sheet-input-center-aligned" type="number" value="" name="attr_weapon_rate_modern" /></div></td>
+                            <td><div class="sheet-inventory-weapon"><input class="sheet-input-center-aligned" type="number" value="" name="attr_weapon_payload_modern" /></div></td>
+                        </tr>
+                    </table>         
+                </fieldset>
+            </div>
+        </div>
+    </div>
+    <div class="sheet-tabbed-panel">
+        <div class="sheet-row-panel"> 
+            <input type="checkbox" name="attr_combatskill-toggle" class="sheet-arrow" />
+            <h4>Hand to Hand Combat Skill</h4>
             <div class="body">
                 <table style="width:85%">
                     <tr>    
-                        <td><select class ="sheet-select" type="text" name="attr_combat_select" value="0" style="margin-bottom:0" >
+                        <td><select class ="sheet-select" type="text" name="attr_combatskill_select" value="0" style="margin-bottom:0" >
                                 <option value="0"> </option>
                                 <option value="non_combatant">Non-Combatant</option>
                                 <option value="basic">Hand to Hand: Basic</option>
                                 <option value="expert">Hand to Hand: Expert</option>
                                 <option value="martial">Hand to Hand: Martial Arts</option>
                                 <option value="assassin">Hand to Hand: Assassin</option>
+                                <option value="commando">Hand to Hand: Commando</option>
                                 <option value="zen">Hand to Hand: Zen</option>
-                            </select></td>
-                    </tr>
-                </table>
-                <table style="width:85%">
-                    <tr>
-                        <td><h5>APM</h5></td>
-                        <td><h5>Damage</h5></td>
-                        <td><h5>Strike</h5></td>
-                        <td><h5>Parry</h5></td>
-                        <td><h5>Dodge</h5></td>
-                        <td><h5>AutoDodge</h5></td>
-                        <td><h5>Roll</h5></td>
-                        <td><h5>Pull Punch</h5></td>
-                        <td><h5>Disarm</h5></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td><div class="sheet-inventory-weapon"><input class="sheet-input-center-aligned" type="number" value="" name="attr_combat_apm" /></div></td>
-                        <td><div class="sheet-inventory-weapon"><input class="sheet-input-center-aligned" type="number" value="" name="attr_combat_damage" /></div></td>
-                        <td><div class="sheet-inventory-weapon"><input class="sheet-input-center-aligned" type="number" value="" name="attr_combat_strike" /></div></td>
-                        <td><div class="sheet-inventory-weapon"><input class="sheet-input-center-aligned" type="number" value="" name="attr_combat_parry" /></div></td>
-                        <td><div class="sheet-inventory-weapon"><input class="sheet-input-center-aligned" type="number" value="" name="attr_combat_dodge" /></div></td>
-                        <td><div class="sheet-inventory-weapon"><input type="checkbox" name="attr_autodoge_checkbox" /><input class="sheet-input-center-aligned" type="number" value="" name="attr_combat_autododge" /></div></td>
-                        <td><div class="sheet-inventory-weapon"><input class="sheet-input-center-aligned" type="number" value="" name="attr_combat_roll" /></div></td>
-                        <td><div class="sheet-inventory-weapon"><input class="sheet-input-center-aligned" type="number" value="" name="attr_combat_pull_punch" /></div></td>
-                        <td><div class="sheet-inventory-weapon"><input type="checkbox" name="attr_disarm_checkbox" /><input class="sheet-input-center-aligned" type="number" value="" name="attr_combat_disarm" /></div></td>
-                        <td></td>
+                            </select>
+                            </td>
                     </tr>
                 </table>
                 <table>
-                    <tr>
-                        <textarea wrap="soft" class="sheet-textarea" value="" name="attr_combat_details" placeholder="Style Details" /></textarea>
+                     <tr>
+                        <textarea wrap="soft" class="sheet-textarea" value="" placeholder="Style Details" /></textarea>
                     </tr>
-                </table>            
+                </table>
+                <div class="sheet-2colrow">
+                    <div class="sheet-col">
+                        <table>
+                            <tr>
+                                <td><h5>Number of Attacks</h5></td>
+                                <td><input type="number" name="attr_hth_numberattacks" value="1" /></td>
+                            </tr>
+                            <tr>
+                                <td><h5>Initiative</h5></td>
+                                <td><input type="number" value="0" name="attr_initiative" /></td>
+                                <td><button type="roll" value="Initiative: [[d20+@{initiative}+0.1*@{initiative}&{tracker}]]" /></td>
+                            </tr>
+                            <tr>
+                                <td><h5>Strike</h5></td>
+                                <td><input type="number" name="attr_hth_strike" value="0" /></td>
+                                <td><button type="roll" value="Strike: [[d20+@{hth_strike}+?{Situational Bonus|0}]]"></button></td>
+                            </tr>
+                            <tr>
+                                <td><h5>Damage</h5></td>
+                                <td><input type="number" name="attr_hth_damage" value="0" /></td>
+                                <td><button type="roll" value="Damage: [[?{Number of Dice|1}d?{Number of Sides|6}+@{hth_damage}]]"></button></td>
+                            </tr>
+                            <tr>
+                                <td><h5>Parry</h5></td>
+                                <td><input type="number" name="attr_hth_parry" value="0" /></td>
+                                <td><button type="roll" value="Parry: [[d20+@{hth_Parry}+?{Situational Bonus|0}]]"></button></td>
+                            </tr>
+                            <tr>
+                                <td><h5>Dodge</h5></td>
+                                <td><input type="number" name="attr_hth_dodge" value="0" /></td>
+                                <td><button type="roll" value="Dodge: [[d20+@{hth_dodge}+?{Situational Bonus|0}]]"></button></td>
+                                <td><input type="checkbox" name="attr_autodoge_checkbox" /><b>Auto Dodge</b></td>
+                            </tr>
+                            <tr>
+                                <td><h5>Roll w Punch/Impact</h5></td>
+                                <td><input type="number" name="attr_hth_roll" value="0" /></td>
+                                <td><button type="roll" value="Roll w Punch/Impact: [[d20+@{hth_roll}+?{Situational Bonus|0}]]"></button></td>
+                            </tr>
+                            <tr>
+                                <td><h5>Pull Punch</h5></td>
+                                <td><input type="number" name="attr_hth_pullpunch" value="0" /></td>
+                                <td><button type="roll" value="Pull Punch: [[d20+@{hth_pullpunch}+?{Situational Bonus|0}]]"></button></td>
+                            </tr>
+                            <tr>
+                                <td><h5>Disarm</h5></td>
+                                <td><input type="number" name="attr_hth_disarm" value="0" /></td>
+                                <td><button type="roll" value="Disarm: [[d20+@{hth_disarm}+?{Situational Bonus|0}]]"></button></td>
+                            </tr>
+                            <tr>
+                                <td><h5>Entangle</h5></td>
+                                <td><input type="number" name="attr_hth_entangle" value="0" /></td>
+                                <td><button type="roll" value="Entangle: [[d20+@{hth_entangle}+?{Situational Bonus|0}]]"></button></td>
+                            </tr>
+                        </table>
+                        <table>
+                            <tr>
+                                <td><h5>Knockout/Stun</h5></td>
+                                <td><input type="text" name="attr_hth_knockout" value="none" /></td>
+                            </tr>
+                            <tr>
+                                <td><h5>Critical Strike</h5></td>
+                                <td><input type="text" name="attr_hth_critical" value="20" /></td>
+                            </tr>
+                            <tr>
+                                <td><h5>Death Blow</h5></td>
+                                <td><input type="text" name="attr_hth_death" value="none" /></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="sheet-col">
+                        <tr><td><img src="http://i732.photobucket.com/albums/ww321/Acyd69/Roll%2020%20Images/Martial%20Artist.png"></td></tr>
+                    </div>
+                </div>
+                <div class="sheet-tabbed-panel">
+                    <div class="sheet-row-panel">
+                        <input type="checkbox" class="sheet-arrow" name="attr_basiccombat-toggle"  /></td>
+                        <h4>Basic Combat Maneuvers </h4>
+                        <div class="body">
+                            <div class="sheet-2colrow">
+                                <div class="sheet-col">
+                                    <table>
+                                        <tr>    
+                                            <td><input type="checkbox" name="attr_checkbox_bodyblock" /></td>
+                                            <td><h5>Body Block/Tackle</h5></td>
+                                            <td><button type="roll" value="Body Block/Tackle [[d4+@{hth_damage}]] damage plus knockdown" ></td>
+                                        </tr>
+                                        <tr>
+                                            <td><input type="checkbox" name="attr_checkbox_bodyflip" /></td>
+                                            <td><h5>Body Flip/Throw</h5></td>
+                                            <td><button type="roll" value="Body Flip/Throw [[d6+@{hth_damage}]] damage and victim loses initiative and one attack." ></td>
+                                        </tr>
+                                        <tr>
+                                            <td><input type="checkbox" name="attr_checkbox_elbow" /></td>
+                                            <td><h5>Elbow/Forearm</h5></td>
+                                            <td><button type="roll" value="Elbow/Forearm [[d6+@{hth_damage}]] damage." ></button></td>
+                                        </tr>
+                                        <tr>    
+                                            <td><input type="checkbox" name="attr_checkbox_kick" /></td>
+                                            <td><h5>Kick</h5></td>
+                                            <td><button type="roll" value="Kick [[d8+@{hth_damage}]] damage."></button></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="sheet-col">
+                                    <table>
+                                        <tr>    
+                                            <td><input type="checkbox" name="attr_checkbox_knee" /></td>
+                                            <td><h5>Knee</h5></td>
+                                            <td><button type="roll" value="Knee [[d6+@{hth_damage}]] damage."></button></td>
+                                        </tr>
+                                        <tr>    
+                                            <td><input type="checkbox" name="attr_checkbox_punch" /></td>
+                                            <td><h5>Punch</h5></td>
+                                            <td><button type="roll" value="Punch [[d4+@{hth_damage}]] damage."></button></td>
+                                        </tr>
+                                        <tr>    
+                                            <td><input type="checkbox" name="attr_checkbox_powerpunch" /></td>
+                                            <td><h5>Power Punch</h5></td>
+                                            <td><button type="roll" value=" Power Punch [[(d4+@{hth_damage})*2]] damage."></button></td>
+                                            <td>(Costs 2 attacks)</td>
+                                        </tr>
+                                        <tr>    
+                                            <td><input type="checkbox" name="attr_checkbox_powerkick" /></td>
+                                            <td><h5>Power Kick</h5></td>
+                                            <td><button type="roll" value="Power Kick [[(d4+@{hth_damage})*2]] damage."></button></td>
+                                            <td>(Costs 2 attacks)</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="sheet-tabbed-panel">
+                    <div class="sheet-row-panel">
+                        <input type="checkbox" class="sheet-arrow" name="attr_martialcombat-toggle"  />
+                        <h4>Martial Combat Maneuvers </h4>
+                        <div class="body">
+                            <div class="sheet-2colrow">
+                                <div class="sheet-col">
+                                    <table>
+                                        <h4>Hand Strikes</h4>
+                                        <tr>
+                                            <td><input type="checkbox" name="attr_checkbox_backhand" /></td>
+                                            <td><h5>Backhand</h5></td>
+                                            <td><button type="roll" value="Backhand [[d6+@{hth_damage}]] damage."></button></td>
+                                        </tr>
+                                        <tr>    
+                                            <td><input type="checkbox" name="attr_checkbox_clawhand" /></td>
+                                            <td><h5>Claw Hand</h5></td>
+                                            <td><button type="roll" value="Claw Hand [[d6+@{hth_damage}]] damage."></button></td>
+                                        </tr>
+                                        <tr>    
+                                            <td><input type="checkbox" name="attr_checkbox_dblfist" /></td>
+                                            <td><h5>Double-Fist</h5></td>
+                                            <td><button type="roll" value="Double-fist [[d4+@{hth_damage}]] damage."></button></td>
+                                        </tr>
+                                        <tr>    
+                                            <td><input type="checkbox" name="attr_checkbox_dblknuc" /></td>
+                                            <td><h5>Double-Knuckle</h5></td>
+                                            <td><button type="roll" value="Double-knuckle [[d8+@{hth_damage}]] damage."></button></td>
+                                        </tr>
+                                        <tr>    
+                                            <td><input type="checkbox" name="attr_checkbox_foreknuc" /></td>
+                                            <td><h5>Fore-Knuckle</h5></td>
+                                            <td><button type="roll" value="Fore-knuckle [[d8+@{hth_damage}]] damage."></button></td>
+                                        </tr>
+                                        <tr>    
+                                            <td><input type="checkbox" name="attr_checkbox_knifehand" /></td>
+                                            <td><h5>Knife Hand</h5></td>
+                                            <td><button type="roll" value="Knife Hand [[2d4+@{hth_damage}]] damage."></button></td>
+                                        </tr>
+                                        <tr>    
+                                            <td><input type="checkbox" name="attr_checkbox_palm" /></td>
+                                            <td><h5>Palm Strike</h5></td>
+                                            <td><button type="roll" value="Palm Strike [[d6+@{hth_damage}]] damage."></button></td>
+                                        </tr>
+                                        <tr>    
+                                            <td><input type="checkbox" name="attr_checkbox_roundhousepunch" /></td>
+                                            <td><h5>Roundhouse Punch</h5></td>
+                                            <td><button type="roll" value="Roundhouse Punch [[d8+@{hth_damage}]] damage."></button></td>
+                                        </tr>
+                                        <tr>    
+                                            <td><input type="checkbox" name="attr_checkbox_uppercut" /></td>
+                                            <td><h5>Uppercut</h5></td>
+                                            <td><button type="roll" value="Uppercut [[d8+@{hth_damage}]] damage."></button></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="sheet-col">
+                                    <table>
+                                        <h4>Foot Strikes</h4>
+                                        <tr>
+                                            <td><input type="checkbox" name="attr_checkbox_axekick" /></td>
+                                            <td><h5>Axe Kick</h5></td>
+                                            <td><button type="roll" value="Axe Kick [[d10+@{hth_damage}]] damage."></button></td>
+                                        </tr>
+                                        <tr>    
+                                            <td><input type="checkbox" name="attr_checkbox_bwdsweep" /></td>
+                                            <td><h5>Backward Sweep</h5></td>
+                                            <td><button type="roll" value="Backward Sweep knockdown."></button></td>
+                                        </tr>
+                                        <tr>    
+                                            <td><input type="checkbox" name="attr_checkbox_crescentkick" /></td>
+                                            <td><h5>Crescent Kick</h5></td>
+                                            <td><button type="roll" value="Cresent Kick [[d10+@{hth_damage}]] damage."></button></td>
+                                        </tr>
+                                        <tr>
+                                            <td><input type="checkbox" name="attr_checkbox_leapkick" /></td>
+                                            <td><h5>Leap Kick</h5></td>
+                                            <td><button type="roll" value="Leap Kick [[3d8+@{hth_damage}]] damage."></button></td>
+                                            <td>(Costs 2 attacks)</td>
+                                        </tr>
+                                        <tr>    
+                                            <td><input type="checkbox" name="attr_checkbox_roundhousekick" /></td>
+                                            <td><h5>Roundhouse Kick</h5></td>
+                                            <td><button type="roll" value="Roundhouse Kick [[2d6+@{hth_damage}]] damage."></button></td>
+                                        </tr>
+                                        <tr>    
+                                            <td><input type="checkbox" name="attr_checkbox_snapkick" /></td>
+                                            <td><h5>Snap Kick</h5></td>
+                                            <td><button type="roll" value="Snap Kick [[d6+@{hth_damage}]] damage."></button></td>
+                                        </tr>
+                                        <tr>    
+                                            <td><input type="checkbox" name="attr_checkbox_tripkick" /></td>
+                                            <td><h5>Trip/Leg Hook</h5></td>
+                                            <td><button type="roll" value="Trip/Leg Hook knockdown."></button></td>
+                                        </tr>
+                                        <tr>    
+                                            <td><input type="checkbox" name="attr_checkbox_wheelkick" /></td>
+                                            <td><h5>Wheel Kick</h5></td>
+                                            <td><button type="roll" value="Wheel Kick [[d10+@{hth_damage}]] damage."></button></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -567,34 +940,42 @@ Palladium Megaverse® Character Sheet <br>
                             <tr>
                                 <td><h5>Magic: Circles (16)</h5></td>
                                 <td><input class="sheet-input-center-aligned" type="number" value="" name="attr_save_circle" /></td>
+                                <td><button type="roll" value="Save vs. Magic: Circles [[d20+@{save_circle}]]" ></button></td>
                             </tr>
                             <tr>
                                 <td><h5>Magic: Fumes (14)</h5></td>
                                 <td><input class="sheet-input-center-aligned" type="number" value="" name="attr_save_fumes" /></td>
+                                <td><button type="roll" value="Save vs. Magic: Fumes [[d20+@{save_fumes}]]" ></button></td>
                             </tr>
                             <tr>
                                 <td><h5>Magic: Ritual (16)</h5></td>
                                 <td><input class="sheet-input-center-aligned" type="number" value="" name="attr_save_ritual" /></td>
+                                <td><button type="roll" value="Save vs. Magic: Ritual [[d20+@{save_ritual}]]" ></button></td>
                             </tr>
                             <tr>
                                 <td><h5>Magic: Spells (12)</h5></td>
                                 <td><input class="sheet-input-center-aligned" type="number" value="" name="attr_save_spells" /></td>
+                                <td><button type="roll" value="Save vs. Magic: Spells [[d20+@{save_spells}]]" ></button></td>
                             </tr>
                             <tr>
                                 <td><h5>Magic: Wards (14)</h5></td>
                                 <td><input class="sheet-input-center-aligned" type="number" value="" name="attr_save_wards" /></td>
+                                <td><button type="roll" value="Save vs. Magic: Wards [[d20+@{save_wards}]]" ></button></td>
                             </tr>
                             <tr>
                                 <td><h5>Pain (16)</h5></td>
                                 <td><input class="sheet-input-center-aligned" type="number" value="" name="attr_save_pain" /></td>
+                                <td><button type="roll" value="Save vs. Pain [[d20+@{save_pain}]]" ></button></td>
                             </tr>
                             <tr>
                                 <td><h5>Electrocution (14)</h5></td>
                                 <td><input class="sheet-input-center-aligned" type="number" value="" name="attr_save_electrotion" /></td>
+                                <td><button type="roll" value="Save vs. Electrocution [[d20+@{save_electrocution}]]" ></button></td>
                             </tr>
                             <tr>
                                 <td><h5>Horror Factor</h5></td>
                                 <td><input class="sheet-input-center-aligned" type="number" value="" name="attr_save_horror" /></td>
+                                <td><button type="roll" value="Save vs. Horror Factor [[d20+@{save_horror}]]" ></button></td>
                             </tr>
                         </table>
                     </div>
@@ -603,374 +984,44 @@ Palladium Megaverse® Character Sheet <br>
                             <tr>
                                 <td><h5>Extreme Temp (14)</h5></td>
                                 <td><input class="sheet-input-center-aligned" type="number" value="" name="attr_save_temp" /></td>
+                                <td><button type="roll" value="Save vs. Extreme Temp [[d20+@{save_temp}]]" ></button></td>
                             </tr>
                             <tr>
                                 <td><h5>Harmful Drugs (15)</h5></td>
                                 <td><input class="sheet-input-center-aligned" type="number" value="" name="attr_save_drugs" /></td>
+                                <td><button type="roll" value="Save vs. Drugs [[d20+@{save_drugs}]]" ></button></td>
                             </tr>
                             <tr>
                                 <td><h5>Toxins: Lethal (14)</h5></td>
                                 <td><input class="sheet-input-center-aligned" type="number" value="" name="attr_save_toxin_lethal" /></td>
+                                <td><button type="roll" value="Save vs. Toxin: Lethal [[d20+@{save_toxin_lethal}]]" ></button></td>
                             </tr>
                             <tr>
                                 <td><h5>Toxins: non-Lethal (16)</h5></td>
                                 <td><input class="sheet-input-center-aligned" type="number" value="" name="attr_save_toxin_nonlethal" /></td>
+                                <td><button type="roll" value="Save vs. Toxin: Non-Lethal [[d20+@{save_toxin_nonlethal}]]" ></button></td>
                             </tr>
                             <tr>
                                 <td><h5>Insanity (12)</h5></td>
                                 <td><input class="sheet-input-center-aligned" type="number" value="" name="attr_save_insane" /></td>
+                                <td><button type="roll" value="Save vs. Insanity [[d20+@{save_insane}]]" ></button></td>
                             </tr>
                             <tr>
                                 <td><h5>Psionics (<input class="sheet-input-center-aligned" type="number" value="" name="attr_save_psi-class" />)</h5></td>
                                 <td><input class="sheet-input-center-aligned" type="number" value="" name="attr_save_psi" /></td>
+                                <td><button type="roll" value="Save vs. Psionics [[d20+@{save_psi}]]" ></button></td>
                             </tr>
                             <tr>
                                 <td><h5>Soul Drinking (14)</h5></td>
                                 <td><input class="sheet-input-center-aligned" type="number" value="" name="attr_save_souldrinking" /></td>
+                                <td><button type="roll" value="Save vs. Soul Drinking [[d20+@{save_souldrinking}]]" ></button></td>
                             </tr>
                             <tr>
-                                <td><h5>Coma/Daeth</h5></td>
+                                <td><h5>Coma/Death</h5></td>
                                 <td><input class="sheet-input-center-aligned" type="number" value="" name="attr_save_comadeath" /></td>
+                                <td><button type="roll" value="Save vs. Coma/Death [[d100-@{save_comadeath}]]" ></button></td>
                             </tr>
                         </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="sheet-tabbed-panel">
-        <div class="sheet-row-panel"> 
-            <input type="checkbox" name="attr_combatskill-toggle" class="sheet-arrow" />
-            <h4>Combat Skill</h4>
-            <div class="body">
-                <input class="sheet-input-center-aligned" type="text" name="attr_combat_skill_name" />
-                <table style="width:75%">
-                    <tr>    
-                        <td><h5># of Attacks</h5></td>
-                        <td><input type="number" name="attr_combatskill_numberattacks" value="" /></td>
-                        <td><h5>Initiative</h5></td>
-                        <td><input type="number" name="attr_combatskill_intitiative" value="" /></td>
-                    </tr>
-                    <tr>
-                        <td><h5>Damage</h5></td>
-                        <td><input type="number" name="attr_combatskill_damage" value="" /></td>
-                        <td><h5>Strike</h5></td>
-                        <td><input type="number" name="attr_combatskill_strike" value="" /></td>
-                    </tr>
-                    <tr>
-                        <td><h5>Parry</h5></td>
-                        <td><input type="number" name="attr_combatskill_parry" value="" /></td>
-                        <td><h5>Dodge</h5></td>
-                        <td><input type="number" name="attr_combatskill_dodge" value="" /></td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" name="attr_autodoge_checkbox" /><b>Auto Dodge</b></td>
-                        <td><input type="number" name="attr_combatskill_autododge" value="" /></td>
-                        <td><h5>Roll</h5></td>
-                        <td><input type="number" name="attr_combatskill_roll" value="" /></td>
-                    </tr>
-                    <tr>
-                        <td><h5>Pull Punch</h5></td>
-                        <td><input type="number" name="attr_combatskill_pullpunch" value="" /></td>
-                        <td><input type="checkbox" name="attr_disarm_checkbox" /><b>Disarm</b></td>
-                        <td><input type="number" name="attr_combatskill_disarm" value="" /></td>
-                    </tr>
-                    <tr>
-                        <td colspan="2"><h5>Maintain Balance</h5></td>
-                        <td><input type="number" name="attr_combatskill_maintainbalance" value="" /></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td colspan="2"><h5>Back Flip</h5></td>
-                        <td><input type="number" name="attr_combatskill_backflip1" value="" /><input type="number" name="attr_combatskill_backflip2" value="" />%</td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td><h5>Leap</h5></td>
-                        <td><input type="number" name="attr_combatskill_leap" value="" /></td>
-                        <td><input type="number" name="attr_combatskill_leapup" value="" />ft up ?</td>
-                        <td><input type="number" name="attr_combatskill_leapout" value="" />ft out ?</td>
-                    </tr>
-                    <tr>
-                        <td><h5>Death</h5></td>
-                        <td><input type="number" name="attr_combatskill_death" value="" /></td>
-                        <td><h5>Knockout</h5></td>
-                        <td><input type="number" name="attr_combatskill_knockout" value="" /></td>
-                    </tr>
-                    <tr>
-                        <td><h5>Critical</h5></td>
-                        <td colspan="2"><input type="text" name="attr_combatskill_" value="" /></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                </table>
-                <div class="sheet-tabbed-panel">
-                    <div class="sheet-row-panel"> 
-                        <input type="checkbox" class="sheet-arrow" name="attr_combatmaneuver-toggle"  />
-                        <h4>General Combat Maneuvers </h4>
-                        <div class="body">
-                            <table>
-                                <tr>    
-                                    <td><input type="checkbox" name="attr_checkbox_jumpkick" /></td>
-                                    <td><h5>Jump Kick</h5></td>
-                                    <td><h5>1d10</h5></td>
-                                    <td></td>
-                                </tr>
-                                <tr>    
-                                    <td><input type="checkbox" name="attr_checkbox_flyingjumpkick" /></td>
-                                    <td><h5>Flying Jump Kick</h5></td>
-                                    <td><h5>1d10</h5></td>
-                                    <td></td>
-                                </tr>
-                                <tr>    
-                                    <td><input type="checkbox" name="attr_checkbox_flyingreverse" /></td>
-                                    <td><h5>Flying Reverse Turning Kick</h5></td>
-                                    <td><h5>2d6</h5></td>
-                                    <td></td>
-                                </tr>
-                                <tr>    
-                                    <td><input type="checkbox" name="attr_checkbox_bodyblock" /></td>
-                                    <td><h5>Body Block/Tackle</h5></td>
-                                    <td><h5>1d4</h5></td>
-                                    <td>plus knockdown</td>
-                                </tr>
-                                <tr>    
-                                    <td><input type="checkbox" name="attr_checkbox_pin" /></td>
-                                    <td><h5>Pin/Incapacitate</h5></td>
-                                    <td><h5><input type="text" style="width:50px" name="attr_pin" value="18-20" /></h5></td>
-                                    <td></td>
-                                </tr>
-                                <tr>    
-                                    <td><input type="checkbox" name="attr_checkbox_autoflip" /></td>
-                                    <td><h5>Automatic Body Flip/Throw</h5></td>
-                                    <td><h5><input type="text" style="width:50px" name="attr_auto_flip" value="" /></h5></td>
-                                    <td></td>
-                                </tr>
-                                <tr>    
-                                    <td><input type="checkbox" name="attr_checkbox_criticalflip" /></td>
-                                    <td><h5>Critical Body Flip/Throw</h5></td>
-                                    <td><h5><input type="text" style="width:50px" name="attr_auto_flip" value="" /></h5></td>
-                                    <td></td>
-                                </tr>
-                                <tr>    
-                                    <td><input type="checkbox" name="attr_checkbox_dropkick" /></td>
-                                    <td><h5>Dropkick</h5></td>
-                                    <td><h5></h5></td>
-                                    <td>(no Dodge or Strike +)</td>
-                                </tr>
-                                <tr>    
-                                    <td><input type="checkbox" name="attr_checkbox_reverseturn" /></td>
-                                    <td><h5>Reverse Turn Kick</h5></td>
-                                    <td><h5></h5></td>
-                                    <td>(no Dodge or Strike +)</td>
-                                </tr>
-                                <tr>    
-                                    <td><input type="checkbox" name="attr_checkbox_comboparry" /></td>
-                                    <td><h5>Combination Parry/Attack</h5></td>
-                                    <td><h5></h5></td>
-                                    <td>(no Parry +)</td>
-                                </tr>
-                                <tr>    
-                                    <td><input type="checkbox" name="attr_checkbox_powerblock" /></td>
-                                    <td><h5>Power Block/Parry</h5></td>
-                                    <td><h5></h5></td>
-                                    <td>(no Strike or Damage +)</td>
-                                </tr>
-                                <tr>    
-                                    <td><input type="checkbox" name="attr_checkbox_combograb" /></td>
-                                    <td><h5>Combination Grab/Kick</h5></td>
-                                    <td><h5></h5></td>
-                                    <td>(Critical Strike)</td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <div class="sheet-tabbed-panel">
-                    <div class="sheet-row-panel"> 
-                        <input type="checkbox" name="attr_handstrike-toggle" class="sheet-arrow" />
-                        <h4>Hand Strikes</h4>
-                        <div class="body">
-                            <table>
-                                <tr>    
-                                    <td><input type="checkbox" name="attr_checkbox_backhand" /></td>
-                                    <td><h5>Backhand</h5></td>
-                                    <td><h5>1d6</h5></td>
-                                    <td></td>
-                                </tr>
-                                <tr>    
-                                    <td><input type="checkbox" name="attr_checkbox_bodyflip" /></td>
-                                    <td><h5>Body Flip</h5></td>
-                                    <td><h5>1d6</h5></td>
-                                    <td></td>
-                                </tr>
-                                <tr>    
-                                    <td><input type="checkbox" name="attr_checkbox_clawhand" /></td>
-                                    <td><h5>Claw Hand</h5></td>
-                                    <td><h5>1d6</h5></td>
-                                    <td></td>
-                                </tr>
-                                <tr>    
-                                    <td><input type="checkbox" name="attr_checkbox_dblfist" /></td>
-                                    <td><h5>Dbl-Fist</h5></td>
-                                    <td><h5>1d4</h5></td>
-                                    <td></td>
-                                </tr>
-                                <tr>    
-                                    <td><input type="checkbox" name="attr_checkbox_dblknuc" /></td>
-                                    <td><h5>Dbl-Knuckle</h5></td>
-                                    <td><h5>1d8</h5></td>
-                                    <td></td>
-                                </tr>
-                                <tr>    
-                                    <td><input type="checkbox" name="attr_checkbox_foreknuc" /></td>
-                                    <td><h5>Fore-Knuckle</h5></td>
-                                    <td><h5>1d8</h5></td>
-                                    <td></td>
-                                </tr>
-                                <tr>    
-                                    <td><input type="checkbox" name="attr_checkbox_knifehand" /></td>
-                                    <td><h5>Knife Hand</h5></td>
-                                    <td><h5>2d4</h5></td>
-                                    <td></td>
-                                </tr>
-                                <tr>    
-                                    <td><input type="checkbox" name="attr_checkbox_palm" /></td>
-                                    <td><h5>Palm Strike</h5></td>
-                                    <td><h5>1d6</h5></td>
-                                    <td></td>
-                                </tr>
-                                <tr>    
-                                    <td><input type="checkbox" name="attr_checkbox_punch" /></td>
-                                    <td><h5>Punch</h5></td>
-                                    <td><h5>1d4</h5></td>
-                                    <td></td>
-                                </tr>
-                                <tr>    
-                                    <td><input type="checkbox" name="attr_checkbox_roundhousepunch" /></td>
-                                    <td><h5>Roundhouse Punch</h5></td>
-                                    <td><h5>1d8</h5></td>
-                                    <td></td>
-                                </tr>
-
-                                <tr>    
-                                    <td><input type="checkbox" name="attr_checkbox_uppercut" /></td>
-                                    <td><h5>Uppercut</h5></td>
-                                    <td><h5>1d8</h5></td>
-                                    <td></td>
-                                </tr>
-                                <tr>    
-                                    <td><input type="checkbox" name="attr_checkbox_powerpunch" /></td>
-                                    <td><h5>Power</h5></td>
-                                    <td><h5>x2</h5></td>
-                                    <td>=2 APM</td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <div class="sheet-tabbed-panel">
-                    <div class="sheet-row-panel"> 
-                        <input type="checkbox" name="attr_footstrike-toggle" class="sheet-arrow" />
-                        <h4>Foot Strikes</h4>
-                        <div class="body">
-                            <table>
-                                <tr>    
-                                    <td><input type="checkbox" name="attr_checkbox_axekick" /></td>
-                                    <td><h5>Axe Kick</h5></td>
-                                    <td><h5>1d10</h5></td>
-                                    <td></td>
-                                </tr>
-                                <tr>    
-                                    <td><input type="checkbox" name="attr_checkbox_bwdsweep" /></td>
-                                    <td><h5>Backward Sweep</h5></td>
-                                    <td><h5>Knockdown</h5></td>
-                                    <td></td>
-                                </tr>
-                                <tr>    
-                                    <td><input type="checkbox" name="attr_checkbox_crescentkick" /></td>
-                                    <td><h5>Crescent Kick</h5></td>
-                                    <td><h5>1d10</h5></td>
-                                    <td></td>
-                                </tr>
-                                <tr>    
-                                    <td><input type="checkbox" name="attr_checkbox_kick" /></td>
-                                    <td><h5>Kick</h5></td>
-                                    <td><h5>1d8</h5></td>
-                                    <td></td>
-                                </tr>
-                                <tr>    
-                                    <td><input type="checkbox" name="attr_checkbox_roundhousekick" /></td>
-                                    <td><h5>Roundhouse Kick</h5></td>
-                                    <td><h5>2d6</h5></td>
-                                    <td></td>
-                                </tr>
-                                <tr>    
-                                    <td><input type="checkbox" name="attr_checkbox_snapkick" /></td>
-                                    <td><h5>Snap Kick</h5></td>
-                                    <td><h5>1d6</h5></td>
-                                    <td></td>
-                                </tr>
-                                <tr>    
-                                    <td><input type="checkbox" name="attr_checkbox_tripkick" /></td>
-                                    <td><h5>Trip/Leg Hook</h5></td>
-                                    <td><h5>1d6</h5></td>
-                                    <td></td>
-                                </tr>
-                                <tr>    
-                                    <td><input type="checkbox" name="attr_checkbox_wheelkick" /></td>
-                                    <td><h5>Wheel Kick</h5></td>
-                                    <td><h5>1d10</h5></td>
-                                    <td></td>
-                                </tr>
-                                <tr>    
-                                    <td><input type="checkbox" name="attr_checkbox_powerkick" /></td>
-                                    <td><h5>Power</h5></td>
-                                    <td><h5>x2</h5></td>
-                                    <td>(=2 APM)</td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <div class="sheet-tabbed-panel">
-                    <div class="sheet-row-panel"> 
-                        <input type="checkbox" name="attr_otherstrike-toggle" class="sheet-arrow" />
-                        <h4>Other Strikes</h4>
-                        <div class="body">
-                            <table>
-                                <tr>    
-                                    <td><input type="checkbox" name="attr_checkbox_elbow" /></td>
-                                    <td><h5>Elbow</h5></td>
-                                    <td><h5>1d6</h5></td>
-                                    <td></td>
-                                </tr>
-                                <tr>    
-                                    <td><input type="checkbox" name="attr_checkbox_forearm" /></td>
-                                    <td><h5>Forearm</h5></td>
-                                    <td><h5>1d6</h5></td>
-                                    <td></td>
-                                </tr>
-                                <tr>    
-                                    <td><input type="checkbox" name="attr_checkbox_knee" /></td>
-                                    <td><h5>Knee</h5></td>
-                                    <td><h5>1d6</h5></td>
-                                    <td></td>
-                                </tr>
-                                <tr>    
-                                    <td><input type="checkbox" name="attr_checkbox_holds" /></td>
-                                    <td><h5>Holds</h5></td>
-                                    <td><h5>Varies</h5></td>
-                                    <td></td>
-                                </tr>
-                                <tr>    
-                                    <td><input type="checkbox" name="attr_checkbox_choke" /></td>
-                                    <td><h5>Choke</h5></td>
-                                    <td><h5>1d6</h5></td>
-                                    <td>to HP!</td>
-                                </tr>
-                            </table>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -1073,8 +1124,10 @@ Palladium Megaverse® Character Sheet <br>
         </div>
     </div>
 </div>
-<div style="text-align:center;">         
-Sheet created by <a href="https://app.roll20.net/users/492849/john-w" target="_blank">John W. https://app.roll20.net/users/492849/john-w</a>
+<div style="text-align:center;">
+Sheet created by John W. https://app.roll20.net/users/492849/john-w
 <br>
-Copyright 2013 Palladium Books Inc. Megaverse® is a registered trademark of Palladium. 
+With updates by Phillip G. https://app.roll20.net/users/239016/phillip-g
+<br>
+Copyright 2013 Palladium Books Inc. MegaverseÂ© is a registered trademark of Palladium. 
 </div>

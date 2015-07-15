@@ -1,3 +1,5 @@
+<!-- version: 1.3.0 -->
+
 <div style="display:none;">
 	<b style="color:red;font-size:150%;">Attention: </b>
 </div>
@@ -29,6 +31,8 @@
   <span class="sheet-tab sheet-tab1">PC</span>
   <input type="radio" name="attr_tab" class="sheet-tab sheet-tab10" value="10" title="NPC"/>
   <span class="sheet-tab sheet-tab10">NPC</span>
+  <input type="radio" name="attr_tab" class="sheet-tab sheet-tab11" value="11" title="SETUP"/>
+  <span class="sheet-tab sheet-tab11">SETUP</span>
   <div class="sheet-section sheet-section-core">
   	<div class="sheet-2colrow">
       <!-- ability scores -->
@@ -63,13 +67,22 @@
             <span class="sheet-table-data sheet-center"><input style="width:100%;" title="@{CHA-misc}" type="number" name="attr_CHA-misc" value="0"></span>
           </div>
           <div class="sheet-table-row">
+            <span class="sheet-table-subheader sheet-table-padding">+Item</span>
+            <span class="sheet-table-data sheet-center"><input style="width:100%;" title="@{STR-item}" type="number" name="attr_STR-item" value="0"></span>
+            <span class="sheet-table-data sheet-center"><input style="width:100%;" title="@{CON-item}" type="number" name="attr_CON-item" value="0"></span>
+            <span class="sheet-table-data sheet-center"><input style="width:100%;" title="@{DEX-item}" type="number" name="attr_DEX-item" value="0"></span>
+            <span class="sheet-table-data sheet-center"><input style="width:100%;" title="@{INT-item}" type="number" name="attr_INT-item" value="0"></span>
+            <span class="sheet-table-data sheet-center"><input style="width:100%;" title="@{WIS-item}" type="number" name="attr_WIS-item" value="0"></span>
+            <span class="sheet-table-data sheet-center"><input style="width:100%;" title="@{CHA-item}" type="number" name="attr_CHA-item" value="0"></span>
+          </div>
+          <div class="sheet-table-row">
             <span class="sheet-table-header sheet-table-padding">Mod</span>
-            <span class="sheet-table-data sheet-center"><input style="width:100%;" title="@{STR-mod}" type="number" name="attr_STR-mod" value="floor((@{STR-base}+@{STR-misc})/2)-5" disabled="true"></span>
-            <span class="sheet-table-data sheet-center"><input style="width:100%;" title="@{CON-mod}" type="number" name="attr_CON-mod" value="floor((@{CON-base}+@{CON-misc})/2)-5" disabled="true"></span>
-            <span class="sheet-table-data sheet-center"><input style="width:100%;" title="@{DEX-mod}" type="number" name="attr_DEX-mod" value="floor((@{DEX-base}+@{DEX-misc})/2)-5" disabled="true"></span>
-            <span class="sheet-table-data sheet-center"><input style="width:100%;" title="@{INT-mod}" type="number" name="attr_INT-mod" value="floor((@{INT-base}+@{INT-misc})/2)-5" disabled="true"></span>
-            <span class="sheet-table-data sheet-center"><input style="width:100%;" title="@{WIS-mod}" type="number" name="attr_WIS-mod" value="floor((@{WIS-base}+@{WIS-misc})/2)-5" disabled="true"></span>
-            <span class="sheet-table-data sheet-center"><input style="width:100%;" title="@{CHA-mod}" type="number" name="attr_CHA-mod" value="floor((@{CHA-base}+@{CHA-misc})/2)-5" disabled="true"></span>
+            <span class="sheet-table-data sheet-center"><input style="width:100%;" title="@{STR-mod}" type="number" name="attr_STR-mod" value="(floor((@{STR-base}+@{STR-misc}+@{STR-item})/2)-5)" disabled="true"></span>
+            <span class="sheet-table-data sheet-center"><input style="width:100%;" title="@{CON-mod}" type="number" name="attr_CON-mod" value="(floor((@{CON-base}+@{CON-misc}+@{CON-item})/2)-5)" disabled="true"></span>
+            <span class="sheet-table-data sheet-center"><input style="width:100%;" title="@{DEX-mod}" type="number" name="attr_DEX-mod" value="(floor((@{DEX-base}+@{DEX-misc}+@{DEX-item})/2)-5)" disabled="true"></span>
+            <span class="sheet-table-data sheet-center"><input style="width:100%;" title="@{INT-mod}" type="number" name="attr_INT-mod" value="(floor((@{INT-base}+@{INT-misc}+@{INT-item})/2)-5)" disabled="true"></span>
+            <span class="sheet-table-data sheet-center"><input style="width:100%;" title="@{WIS-mod}" type="number" name="attr_WIS-mod" value="(floor((@{WIS-base}+@{WIS-misc}+@{WIS-item})/2)-5)" disabled="true"></span>
+            <span class="sheet-table-data sheet-center"><input style="width:100%;" title="@{CHA-mod}" type="number" name="attr_CHA-mod" value="(floor((@{CHA-base}+@{CHA-misc}+@{CHA-item})/2)-5)" disabled="true"></span>
           </div>
         </div>
         <br>
@@ -80,6 +93,7 @@
             <span class="sheet-table-header">&nbsp;Attack</span>
             <span class="sheet-table-header"></span>
             <span class="sheet-table-header"></span>
+            <span class="sheet-table-header"></span>
             <span class="sheet-table-header">&nbsp;DMG</span>
             <span class="sheet-table-header"></span>
             <span class="sheet-table-header"></span>
@@ -88,15 +102,13 @@
           </div>
           <div class="sheet-table-row">
             <span class="sheet-table-data sheet-center">
-              <button title="%{BM-check}" type="roll" value="/em attacks with basic melee!&#x00A;Attack result: [[1d20+@{BM-mod}+@{BM-misc}+@{level}]]" name="roll_BM-check"></button>
+              <button title="%{BM-check}" type="roll" value="&{template:13thage_generic} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=Basic melee}} {{Attack result=[[1d20+@{BM-mod}+@{BM-misc}+@{BM-item}+@{level}+@{escdie}]]}} {{Damage on hit=[[@{level}@{BMDMG-die}+@{BMDMG-mod}+@{BMDMG-misc}+@{BMDMG-item}]]}} {{Damage on miss=[[@{BMDMG-miss}]]}}" name="roll_BM-check"></button>
             </span>
             <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{BM-mod}" type="number" name="attr_BM-mod" value="1"></span>
             <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{BM-misc}" type="number" name="attr_BM-misc" value="0"></span>
-            <span class="sheet-table-data sheet-center">
-              <button title="%{BM-check}" type="roll" value="/em does basic melee damage!&#x00A;&#x00A; Damage on hit: [[@{level}@{BMDMG-die}+@{BMDMG-mod}+@{BMDMG-misc}]]&#x00A;Damage on miss: [[@{BMDMG-miss}]]" name="roll_BMDMG-check"></button>
-            </span>
+            <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{BM-item}" type="number" name="attr_BM-item" value="0"></span>
             <span class="sheet-table-data sheet-left">
-              <select name="attr_BMDMG-die" style="width:4.5em;display:inlineblock;">
+              <select name="attr_BMDMG-die" style="width:4.25em;display:inlineblock;">
                 <option value="d4">d4</option>
                 <option value="d6">d6</option>
                 <option value="d8">d8</option>
@@ -106,16 +118,18 @@
             </span>
             <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{BMDMG-mod}" type="number" name="attr_BMDMG-mod" value="1"></span>
             <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{BMDMG-misc}" type="number" name="attr_BMDMG-misc" value="0"></span>
+            <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{BMDMG-misc}" type="number" name="attr_BMDMG-item" value="0"></span>
             <span class="sheet-table-data sheet-right"><input style="width:100%;" class="sheet-total sheet-center" title="@{BMDMG-miss}" type="number" name="attr_BMDMG-miss" value="0"></span>
           </div>
           <div class="sheet-table-row">
             <span class="sheet-table-data sheet-center sheet-table-smallsub"></span>
             <span class="sheet-table-data sheet-center sheet-table-smallsub">Ability</span>
-            <span class="sheet-table-data sheet-center sheet-table-smallsub">+Misc.</span>
-            <span class="sheet-table-data sheet-center sheet-table-smallsub"></span>
+            <span class="sheet-table-data sheet-center sheet-table-smallsub">Misc.</span>
+            <span class="sheet-table-data sheet-center sheet-table-smallsub">Item</span>
             <span class="sheet-table-data sheet-center sheet-table-smallsub">Weapon</span>
             <span class="sheet-table-data sheet-center sheet-table-smallsub">Ability</span>
-            <span class="sheet-table-data sheet-center sheet-table-smallsub">+Misc.</span>
+            <span class="sheet-table-data sheet-center sheet-table-smallsub">Misc.</span>
+            <span class="sheet-table-data sheet-center sheet-table-smallsub">Item</span>
             <span class="sheet-table-data sheet-right sheet-table-smallsub">On&nbsp;Miss</span>
           </div>
         </div>
@@ -127,6 +141,7 @@
             <span class="sheet-table-header">&nbsp;Attack</span>
             <span class="sheet-table-header"></span>
             <span class="sheet-table-header"></span>
+            <span class="sheet-table-header"></span>
             <span class="sheet-table-header">&nbsp;DMG</span>
             <span class="sheet-table-header"></span>
             <span class="sheet-table-header"></span>
@@ -135,15 +150,13 @@
           </div>
           <div class="sheet-table-row">
             <span class="sheet-table-data sheet-center">
-              <button title="%{BR-check}" type="roll" value="/em attacks with basic ranged!&#x00A;Attack result: [[1d20+@{BR-mod}+@{BR-misc}+@{level}]]" name="roll_BR-check"></button>
+              <button title="%{BR-check}" type="roll" value="&{template:13thage_generic} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=Basic ranged}} {{Attack result=[[1d20+@{BR-mod}+@{BR-misc}+@{BR-item}+@{level}+@{escdie}]]}} {{Damage on hit=[[@{level}@{BRDMG-die}+@{BRDMG-mod}+@{BRDMG-misc}+@{BRDMG-item}]]}} {{Damage on miss=[[@{BRDMG-miss}]]}}" name="roll_BR-check"></button>
             </span>
             <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{BR-mod}" type="number" name="attr_BR-mod" value="1"></span>
             <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{BR-misc}" type="number" name="attr_BR-misc" value="0"></span>
-            <span class="sheet-table-data sheet-center">
-              <button title="%{BM-check}" type="roll" value="/em does basic ranged damage&#x00A;&#x00A; Damage on hit: [[@{level}@{BRDMG-die}+@{BRDMG-mod}+@{BRDMG-misc}]]&#x00A;Damage on miss: [[@{BRDMG-miss}]]" name="roll_BRDMG-check"></button>
-            </span>
+            <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{BR-item}" type="number" name="attr_BR-item" value="0"></span>
             <span class="sheet-table-data sheet-left">
-              <select name="attr_BRDMG-die" style="width:4.5em;display:inlineblock;">
+              <select name="attr_BRDMG-die" style="width:4.25em;display:inlineblock;">
                 <option value="d4">d4</option>
                 <option value="d6">d6</option>
                 <option value="d8">d8</option>
@@ -153,57 +166,125 @@
             </span>
             <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{BRDMG-mod}" type="number" name="attr_BRDMG-mod" value="1"></span>
             <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{BRDMG-misc}" type="number" name="attr_BRDMG-misc" value="0"></span>
+            <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{BRDMG-misc}" type="number" name="attr_BRDMG-item" value="0"></span>
             <span class="sheet-table-data sheet-right"><input style="width:100%;" class="sheet-total sheet-center" title="@{BRDMG-miss}" type="number" name="attr_BRDMG-miss" value="0"></span>
           </div>
           <div class="sheet-table-row">
             <span class="sheet-table-data sheet-center sheet-table-smallsub"></span>
             <span class="sheet-table-data sheet-center sheet-table-smallsub">Ability</span>
-            <span class="sheet-table-data sheet-center sheet-table-smallsub">+Misc.</span>
-            <span class="sheet-table-data sheet-center sheet-table-smallsub"></span>
+            <span class="sheet-table-data sheet-center sheet-table-smallsub">Misc.</span>
+            <span class="sheet-table-data sheet-center sheet-table-smallsub">Item</span>
             <span class="sheet-table-data sheet-center sheet-table-smallsub">Weapon</span>
             <span class="sheet-table-data sheet-center sheet-table-smallsub">Ability</span>
-            <span class="sheet-table-data sheet-center sheet-table-smallsub">+Misc.</span>
+            <span class="sheet-table-data sheet-center sheet-table-smallsub">Misc.</span>
+            <span class="sheet-table-data sheet-center sheet-table-smallsub">Item</span>
             <span class="sheet-table-data sheet-right sheet-table-smallsub">On&nbsp;Miss</span>
           </div>
         </div>
+        <br>
   		</div>
       <!-- defenses -->
       <div class="sheet-col">
         <div class="sheet-table sheet-sect">
           <span class="sheet-table-name sheet-round sheet-caps">Defenses & Saves</span>
           <div class="sheet-table-row">
-            <span class="sheet-table-header sheet-table-padding">AC</span>
-            <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{AC-base}" type="number" name="attr_AC" value="10"></span>
-            <span class="sheet-table-header sheet-table-padding">PD</span>
-            <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{PD-base}" type="number" name="attr_PD" value="0"></span>
-            <span class="sheet-table-header sheet-table-padding">MD</span>
-            <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{MD-base}" type="number" name="attr_MD" value="0"></span>
+            <span style="width:3%;" class="sheet-table-header sheet-table-padding">AC</span>
+            <span style="width:15%;" class="sheet-table-data sheet-center">
+            <input type="hidden" disabled="true" name="attr_AC-max-con-dex" value="((((@{CON-mod}) + (@{DEX-mod})) + abs((@{CON-mod}) - (@{DEX-mod}))) / 2)" />
+            <input type="hidden" disabled="true" name="attr_AC-max-con-dex-wis" value="(((@{AC-max-con-dex}) + (@{WIS-mod}) + abs((@{AC-max-con-dex}) - (@{WIS-mod}))) / 2)" />
+            <input type="hidden" disabled="true" name="attr_AC-min-con-dex" value="((((@{CON-mod}) + (@{DEX-mod})) - abs((@{CON-mod}) - (@{DEX-mod}))) / 2)" />
+            <input type="hidden" disabled="true" name="attr_AC-min-con-dex-wis" value="(((@{AC-min-con-dex}) + (@{WIS-mod}) - abs((@{AC-min-con-dex}) - (@{WIS-mod}))) / 2)" />
+            <input class="sheet-total sheet-center" title="@{AC}" type="number" name="attr_AC" value="@{AC-base}+@{level}+(@{CON-mod})+(@{DEX-mod})+(@{WIS-mod})-(@{AC-max-con-dex-wis})-(@{AC-min-con-dex-wis})+@{AC-misc}+@{AC-item}" disabled="true"></span>
+            <span style="width:15%;" class="sheet-table-data sheet-center"><input class="sheet-total sheet-center" title="@{AC-base}" type="number" name="attr_AC-base" value="10"></span>
+            <span style="width:3%;" class="sheet-table-header sheet-table-padding">PD</span>
+            <span style="width:15%;" class="sheet-table-data sheet-center"><input type="hidden" disabled="true" name="attr_PD-max-con-dex" value="((((@{CON-mod}) + (@{DEX-mod})) + abs((@{CON-mod}) - (@{DEX-mod}))) / 2)" />
+            <input type="hidden" disabled="true" name="attr_PD-max-con-dex-str" value="(((@{PD-max-con-dex}) + (@{STR-mod}) + abs((@{PD-max-con-dex}) - (@{STR-mod}))) / 2)" />
+            <input type="hidden" disabled="true" name="attr_PD-min-con-dex" value="((((@{CON-mod}) + (@{DEX-mod})) - abs((@{CON-mod}) - (@{DEX-mod}))) / 2)" />
+            <input type="hidden" disabled="true" name="attr_PD-min-con-dex-str" value="(((@{PD-min-con-dex}) + (@{STR-mod}) - abs((@{PD-min-con-dex}) - (@{STR-mod}))) / 2)" />
+            <input class="sheet-total sheet-center" title="@{PD}" type="number" name="attr_PD" value="@{PD-base}+@{level}+(@{CON-mod})+(@{DEX-mod})+(@{STR-mod})-(@{PD-max-con-dex-str})-(@{PD-min-con-dex-str})+@{PD-misc}+@{PD-item}" disabled="true"></span>
+            <span style="width:15%;" class="sheet-table-data sheet-center"><input class="sheet-total sheet-center" title="@{PD-base}" type="number" name="attr_PD-base" value="10"></span>
+            <span style="width:3%;" class="sheet-table-header sheet-table-padding">MD</span>
+            <span style="width:15%;" class="sheet-table-data sheet-center"><input type="hidden" disabled="true" name="attr_MD-max-int-wis" value="((((@{INT-mod}) + (@{WIS-mod})) + abs((@{INT-mod}) - (@{WIS-mod}))) / 2)" />
+            <input type="hidden" disabled="true" name="attr_MD-max-int-wis-cha" value="(((@{MD-max-int-wis}) + (@{CHA-mod}) + abs((@{MD-max-int-wis}) - (@{CHA-mod}))) / 2)" />
+            <input type="hidden" disabled="true" name="attr_MD-min-int-wis" value="((((@{INT-mod}) + (@{WIS-mod})) - abs((@{INT-mod}) - (@{WIS-mod}))) / 2)" />
+            <input type="hidden" disabled="true" name="attr_MD-min-int-wis-cha" value="(((@{MD-min-int-wis}) + (@{CHA-mod}) - abs((@{MD-min-int-wis}) - (@{CHA-mod}))) / 2)" />
+            <input class="sheet-total sheet-center" title="@{MD}" type="number" name="attr_MD" value="@{MD-base}+@{level}+(@{INT-mod})+(@{WIS-mod})+(@{CHA-mod})-(@{MD-max-int-wis-cha})-(@{MD-min-int-wis-cha})+@{MD-misc}+@{MD-item}" disabled="true"></span>
+            <span style="width:15%;" class="sheet-table-data sheet-center"><input class="sheet-total sheet-center" title="@{MD-base}" type="number" name="attr_MD-base" value="10"></span>
           </div>
           <div class="sheet-table-row">
-            <span class="sheet-table-data"></span>
-            <span class="sheet-table-data sheet-center sheet-table-smallsub">Armor Class</span>
-            <span class="sheet-table-data"></span>
-            <span class="sheet-table-data sheet-center sheet-table-smallsub">Physical Defense</span>
-            <span class="sheet-table-data"></span>
-            <span class="sheet-table-data sheet-center sheet-table-smallsub">Mental Defense</span>
+            <span class="sheet-table-header sheet-table-padding">&nbsp;</span>
+            <span class="sheet-table-data sheet-center sheet-table-smallsub sheet-bold">Total</span>
+            <span class="sheet-table-data sheet-center sheet-table-smallsub">Base</span>
+            <span class="sheet-table-header sheet-table-padding">&nbsp;</span>
+            <span class="sheet-table-data sheet-center sheet-table-smallsub sheet-bold">Total</span>
+            <span class="sheet-table-data sheet-center sheet-table-smallsub">Base</span>
+            <span class="sheet-table-header sheet-table-padding">&nbsp;</span>
+            <span class="sheet-table-data sheet-center sheet-table-smallsub sheet-bold">Total</span>
+            <span class="sheet-table-data sheet-center sheet-table-smallsub">Base</span>
+          </div>
+          <div class="sheet-table-row">
+            <span class="sheet-table-header sheet-table-padding">&nbsp;</span>
+            <span class="sheet-table-data sheet-center"><input class="sheet-total sheet-center" title="@{AC-misc}" type="number" name="attr_AC-misc" value="0"></span>
+            <span class="sheet-table-data sheet-center"><input class="sheet-total sheet-center" title="@{AC-item}" type="number" name="attr_AC-item" value="0"></span>
+            <span class="sheet-table-header sheet-table-padding">&nbsp;</span>
+            <span class="sheet-table-data sheet-center"><input class="sheet-total sheet-center" title="@{PD-misc}" type="number" name="attr_PD-misc" value="0"></span>
+            <span class="sheet-table-data sheet-center"><input class="sheet-total sheet-center" title="@{PD-item}" type="number" name="attr_PD-item" value="0"></span>
+            <span class="sheet-table-header sheet-table-padding">&nbsp;</span>
+            <span class="sheet-table-data sheet-center"><input class="sheet-total sheet-center" title="@{MD-misc}" type="number" name="attr_MD-misc" value="0"></span>
+            <span class="sheet-table-data sheet-center"><input class="sheet-total sheet-center" title="@{MD-item}" type="number" name="attr_MD-item" value="0"></span>
+          </div>
+          <div class="sheet-table-row">
+            <span class="sheet-table-header sheet-table-padding">&nbsp;</span>
+            <span class="sheet-table-data sheet-center sheet-table-smallsub">Misc.</span>
+            <span class="sheet-table-data sheet-center sheet-table-smallsub">Item</span>
+            <span class="sheet-table-header sheet-table-padding">&nbsp;</span>
+            <span class="sheet-table-data sheet-center sheet-table-smallsub">Misc.</span>
+            <span class="sheet-table-data sheet-center sheet-table-smallsub">Item</span>
+            <span class="sheet-table-header sheet-table-padding">&nbsp;</span>
+            <span class="sheet-table-data sheet-center sheet-table-smallsub">Misc</span>
+            <span class="sheet-table-data sheet-center sheet-table-smallsub">Item</span>
           </div>
         </div>
         <br>
-        <!-- hit points & recoveries -->
+        <!-- hit points -->
         <div class="sheet-table sheet-sect">
-          <span class="sheet-table-name sheet-round sheet-caps">Hit points & Recoveries</span>
+          <span class="sheet-table-name sheet-round sheet-caps">Hit Points</span>
         </div>
         <div class="sheet-table sheet-sect">
           <div class="sheet-table-row">
             <span class="sheet-table-header sheet-table-padding">HP</span>
             <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{HP}" type="number" name="attr_HP" value="10"></span>
             <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{HP-temp}" type="number" name="attr_HP-temp" value="0"></span>
-            <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{HP-max}" type="number" name="attr_HP-max" value="10"></span>
             <span class="sheet-table-data sheet-left">
+              <input style="width:100%;" title="@{HP-formula}" name="attr_HP-formula" value="((@{HP-base}+((@{CON-mod})+abs((@{CON-mod})))/2)*@{HP-lvlmod})+@{HP-misc}" type="hidden" />
+              <input style="width:100%;" class="sheet-total sheet-center" title="@{HP_max}" type="number" name="attr_HP_max" value="@{HP-formula}" disabled="true">
             </span>
-            <span class="sheet-table-header sheet-table-padding">Rec.</span>
-            <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{REC}" type="number" name="attr_REC" value="8"></span>
-            <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{REC-max}" type="number" name="attr_REC-max" value="8"></span>
+            <span class="sheet-table-data sheet-table-padding"></span>
+            <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{HP-base}" type="number" name="attr_HP-base" value="10"></span>
+            <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{HP-lvlmod}" type="number" name="attr_HP-lvlmod" value="0"></span>
+            <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{HP-misc}" type="number" name="attr_HP-misc" value="0"></span>
+            </span>
+          </div>
+          <div class="sheet-table-row">
+            <span class="sheet-table-data"></span>
+            <span class="sheet-table-data sheet-center sheet-table-smallsub">Current</span>
+            <span class="sheet-table-data sheet-center sheet-table-smallsub">Temp.</span>
+            <span class="sheet-table-data sheet-center sheet-table-smallsub">Max.</span>
+            <span class="sheet-table-data sheet-center sheet-table-smallsub"></span>
+            <span class="sheet-table-data sheet-center sheet-table-smallsub">Base</span>
+            <span class="sheet-table-data sheet-center sheet-table-smallsub">Lvlmod.</span>
+            <span class="sheet-table-data sheet-center sheet-table-smallsub">Misc.</span>
+          </div>
+        </div>
+        <br>
+        <!-- recoveries -->
+        <div class="sheet-table sheet-sect">
+          <span class="sheet-table-name sheet-round sheet-caps">Recoveries</span>
+        </div>
+        <div class="sheet-table sheet-sect">
+          <div class="sheet-table-row">
+            <span style="width:20%;" class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{REC}" type="number" name="attr_REC" value="8"></span>
+            <span style="width:20%;" class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{REC-max}" type="number" name="attr_REC-max" value="8"></span>
             <span class="sheet-table-data sheet-center">
               <select name="attr_REC-die" style="width:4.5em;display:inlineblock;">
                 <option value="d4">d4</option>
@@ -213,56 +294,48 @@
                 <option value="d12">d12</option>
               </select>
             </span>
-            <span class="sheet-table-data sheet-center">
-              <button title="%{REC-check}" type="roll" value="/em rolls for recovery!&#x00A; Recovery Value: [[@{level}@{REC-die}+@{CON-mod}]]" name="roll_REC-check"></button>
+            <span class="sheet-table-data sheet-right">
+              <button title="%{REC-check}" type="roll" value="&{template:13thage_generic} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=Recovery}} {{Recovery Value=[[@{level}@{REC-die}+@{CON-mod}]]}}" name="roll_REC-check">Roll Recovery!</button>
             </span>
           </div>
-           <div class="sheet-table-row">
-            <span class="sheet-table-data sheet-center sheet-table-smallsub"></span>
+          <div class="sheet-table-row">
             <span class="sheet-table-data sheet-center sheet-table-smallsub">Current</span>
-            <span class="sheet-table-data sheet-center sheet-table-smallsub">Temporary</span>
-            <span class="sheet-table-data sheet-center sheet-table-smallsub">Max</span>
-            <span class="sheet-table-data sheet-center sheet-table-smallsub">&nbsp;&nbsp;&nbsp;</span>
-            <span class="sheet-table-data sheet-center sheet-table-smallsub"></span>
-            <span class="sheet-table-data sheet-center sheet-table-smallsub">Current</span>
-            <span class="sheet-table-data sheet-center sheet-table-smallsub">Maxium</span>
+            <span class="sheet-table-data sheet-center sheet-table-smallsub">Max.</span>
             <span class="sheet-table-data sheet-center sheet-table-smallsub">Rec.&nbsp;Die</span>
             <span class="sheet-table-data sheet-center sheet-table-smallsub"></span>
           </div>
         </div>
         <br>
-        <!-- one unique thing -->
+        <!-- initiative -->
         <div class="sheet-table sheet-sect">
-          <span class="sheet-table-name sheet-round sheet-caps sheet-center">One Unique Thing</span>
-          <div class="sheet-table-row">
-            <textarea class="sheet-desc sheet-textarea-desc" name="attr_OUT" placeholder="Describe your characters one unique thing ..."></textarea>
-          </div>
+          <span class="sheet-table-name sheet-round sheet-caps sheet-center">Initiative</span>
         </div>
-        <!-- iniative -->
         <div class="sheet-table sheet-sect">
-          <div class="sheet-2colrow">
-            <div class="sheet-col">
-            </div>
-            <div class="sheet-col">
-              <div class="sheet-table">
-                <span class="sheet-table-name sheet-round sheet-caps sheet-center">Iniative</span>
-                <div class="sheet-table-row">
-                  <span class="sheet-table-header sheet-center">&nbsp;</span>
-                </div>
-                <div class="sheet-table-row">
-                  <span style="width:100%;" class="sheet-table-header sheet-center">
-                    <button title="@{INI-check}" type="roll" value="/roll 1d20+[[@{DEX-mod}+@{level}]] &{tracker}" name="roll_INI-check"> Roll Initiative!</button>
-                  </span>
-                </div>
-                <div class="sheet-table-row">
-                  <span class="sheet-table-header sheet-center">&nbsp;</span>
-                </div>
-              </div>
-            </div>
+          <div class="sheet-table-row">
+            <span style="width:20%;" class="sheet-table-data sheet-left">
+              <input style="width:100%;" class="sheet-total sheet-center" title="@{INI-mod}" type="number" name="attr_INI-mod" value="@{DEX-mod}" disabled="true">
+            </span>
+            <span style="width:20%;" class="sheet-table-data sheet-center">
+              <input style="width:100%;" class="sheet-total sheet-center" title="@{INI-misc}" type="number" name="attr_INI-misc" value="0">
+            </span>
+            <span style="width:20%;" class="sheet-table-data sheet-center">
+              <input style="width:100%;" class="sheet-total sheet-center" title="@{INI-item}" type="number" name="attr_INI-item" value="0">
+            </span>
+            <span style="width:40%;" class="sheet-table-data sheet-right">
+              <button title="@{INI-check}" type="roll" value="Initiative: [[1d20+@{INI-mod}+@{level}+@{INI-misc}+@{INI-item} &{tracker}]]" name="roll_INI-check"> Roll Initiative!</button>
+            </span>
+          </div>
+          <div class="sheet-table-row">
+            <span class="sheet-table-data sheet-center sheet-table-smallsub">DEX Mod.</span>
+            <span class="sheet-table-data sheet-center sheet-table-smallsub">Misc.</span>
+            <span class="sheet-table-data sheet-center sheet-table-smallsub">Item</span>
+            <span class="sheet-table-data sheet-center sheet-table-smallsub"></span>
           </div>
         </div>
       </div>
     </div>
+    <br>
+    <hr class="sheet-hr-fancy">
     <br>
     <div class="sheet-2colrow">
       <div class="sheet-col">
@@ -310,7 +383,7 @@
           Show&nbsp;Description&nbsp;<input type="checkbox" class="sheet-desc-show" title="@{repeating_class-feature_X_description-show}" name="attr_description-show" value="1"/>
           <textarea title="@{repeating_class-feature_X_desc}" class="sheet-desc" name="attr_description" placeholder = "Description"></textarea>
           Show&nbsp;Macro&nbsp;<input type="checkbox" class="sheet-macro-text-show" title="@{repeating_class-feature_X_macro-text-show}" name="attr_macro-text-show" value="1"/>
-          <textarea title="@{repeating_class-feature_X_macro-text}" class="sheet-macro-text" name="attr_macro-text" placeholder = "Macro">/em uses @{name}</textarea>
+          <textarea title="@{repeating_class-feature_X_macro-text}" class="sheet-macro-text" name="attr_macro-text" placeholder = "Macro">&{template:13thage_power} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=@{name}}} {{type=@{type}}} {{usage=@{usage}}} {{text=@{description}}}</textarea>
           <hr class="sheet-hr-fancy">
         </fieldset>
         <br>
@@ -358,7 +431,7 @@
           Show&nbsp;Description&nbsp;<input type="checkbox" class="sheet-desc-show" title="@{repeating_talent_X_description-show}" name="attr_description-show" value="1"/>
           <textarea title="@{repeating_power_X_desc}" class="sheet-desc" name="attr_description" placeholder = "Description"></textarea>
           Show&nbsp;Macro&nbsp;<input type="checkbox" class="sheet-macro-text-show" title="@{repeating_talent_X_macro-text-show}" name="attr_macro-text-show" value="1"/>
-          <textarea title="@{repeating_talent_X_macro-text}" class="sheet-macro-text" name="attr_macro-text" placeholder = "Macro">/em uses @{name}</textarea>
+          <textarea title="@{repeating_talent_X_macro-text}" class="sheet-macro-text" name="attr_macro-text" placeholder = "Macro">&{template:13thage_power} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=@{name}}} {{type=@{type}}} {{usage=@{usage}}} {{text=@{description}}}</textarea>
           <hr class="sheet-hr-fancy">
         </fieldset>
         <br>
@@ -406,7 +479,7 @@
           Show&nbsp;Description&nbsp;<input type="checkbox" class="sheet-desc-show" title="@{repeating_power_X_description-show}" name="attr_description-show" value="1"/>
           <textarea title="@{repeating_power_X_desc}" class="sheet-desc" name="attr_description" placeholder = "Description"></textarea>
           Show&nbsp;Macro&nbsp;<input type="checkbox" class="sheet-macro-text-show" title="@{repeating_power_X_macro-text-show}" name="attr_macro-text-show" value="1"/>
-          <textarea title="@{repeating_power_X_macro-text}" class="sheet-macro-text" name="attr_macro-text" placeholder = "Macro">/em uses @{name}</textarea>
+          <textarea title="@{repeating_power_X_macro-text}" class="sheet-macro-text" name="attr_macro-text" placeholder = "Macro">&{template:13thage_power} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=@{name}}} {{type=@{type}}} {{usage=@{usage}}} {{text=@{description}}}</textarea>
           <hr class="sheet-hr-fancy">
         </fieldset>
         <br>
@@ -454,11 +527,18 @@
           Show&nbsp;Description&nbsp;<input type="checkbox" class="sheet-desc-show" title="@{repeating_feat_X_description-show}" name="attr_description-show" value="1"/>
           <textarea title="@{repeating_feat_X_desc}" class="sheet-desc" name="attr_description" placeholder = "Description"></textarea>
           Show&nbsp;Macro&nbsp;<input type="checkbox" class="sheet-macro-text-show" title="@{repeating_feat_X_macro-text-show}" name="attr_macro-text-show" value="1"/>
-          <textarea title="@{repeating_feat_X_macro-text}" class="sheet-macro-text" name="attr_macro-text" placeholder = "Macro">/em uses @{name}</textarea>
+          <textarea title="@{repeating_feat_X_macro-text}" class="sheet-macro-text" name="attr_macro-text" placeholder = "Macro">&{template:13thage_power} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=@{name}}} {{type=@{type}}} {{usage=@{usage}}} {{text=@{description}}}</textarea>
           <hr class="sheet-hr-fancy">
         </fieldset>
       </div>
       <div class="sheet-col">
+        <!-- one unique thing -->
+        <div class="sheet-table sheet-sect">
+          <span class="sheet-table-name sheet-round sheet-caps sheet-center">One Unique Thing</span>
+          <div class="sheet-table-row">
+            <textarea class="sheet-desc sheet-textarea-desc" name="attr_OUT" placeholder="Describe your characters one unique thing ..."></textarea>
+          </div>
+        </div>
         <!-- icons -->
         <div class="sheet-table sheet-sect">
           <span class="sheet-table-name sheet-round sheet-caps sheet-center">Icon Relationships</span>
@@ -479,14 +559,14 @@
                 <input style="width:100%;" class="sheet-center" title="@{repeating_icon_X_points}" name="attr_points" value="number" type="number" />
               </span>
               <span style="width:30%" class="sheet-table-data sheet-center">
-                <select name="attr_iconcheck-macro" style="width:7em;display:inlineblock;">
-                  <option value="/em checks icon relationship with icon '@{name}' (positive)!&#x00A;/roll [[@{points}]]d6sd">Positive</option>
-                  <option value="/em checks icon relationship with icon '@{name}' (positive)!&#x00A;/roll [[@{points}]]d6sd">Conflicted</option>
-                  <option value="/em checks icon relationship with icon '@{name}' (positive)!&#x00A;/roll [[@{points}]]d6sd">Negative</option>
+                <select name="attr_reltype" style="width:7em;display:inlineblock;">
+                  <option value="positive">positive</option>
+                  <option value="conflicted">conflicted</option>
+                  <option value="negative">negative</option>
                 </select>
               </span>
               <span style="width:15%" class="sheet-table-data sheet-center">
-                <button title="@{repeating_icon_X_iconcheck}" type="roll" value="@{iconcheck-macro}"></button>
+                <button title="@{repeating_icon_X_iconcheck}" type="roll" value="&{template:13thage_generic} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=Icon check}} {{Icon=@{name}}} {{Type=@{reltype}}} {{Roll=[[@{points}d6sd]]}}"></button>
               </span>
             </div>
           </div>
@@ -513,12 +593,12 @@
               </span>
               <span style="width:20%" class="sheet-table-data sheet-center">
                 <select name="attr_skillcheck-macro" style="width:5em;display:inlineblock;">
-                  <option value="/em rolls skill check on '@{desc}' with STR!&#x00A;Check result: [[1d20+@{STR-mod}+@{level}+@{points}]]">STR</option>
-                  <option value="/em rolls skill check on '@{desc}' with CON!&#x00A;Check result: [[1d20+@{CON-mod}+@{level}+@{points}]]">CON</option>
-                  <option value="/em rolls skill check on '@{desc}' with DEX!&#x00A;Check result: [[1d20+@{DEX-mod}+@{level}+@{points}]]">DEX</option>
-                  <option value="/em rolls skill check on '@{desc}' with INT!&#x00A;Check result: [[1d20+@{INT-mod}+@{level}+@{points}]]">INT</option>
-                  <option value="/em rolls skill check on '@{desc}' with WIS!&#x00A;Check result: [[1d20+@{WIS-mod}+@{level}+@{points}]]">WIS</option>
-                  <option value="/em rolls skill check on '@{desc}' with CHA!&#x00A;Check result: [[1d20+@{CHA-mod}+@{level}+@{points}]]">CHA</option>
+                  <option value="&{template:13thage_generic} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=Skill check}} {{Attribute=Strength}} {{Background=@{desc}}} {{Check=[[1d20+@{STR-mod}+@{level}+@{points}]]}}">STR</option>
+                  <option value="&{template:13thage_generic} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=Skill check}} {{Attribute=Constitution}} {{Background=@{desc}}} {{Check=[[1d20+@{CON-mod}+@{level}+@{points}]]}}">CON</option>
+                  <option value="&{template:13thage_generic} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=Skill check}} {{Attribute=Dexterity}} {{Background=@{desc}}} {{Check=[[1d20+@{DEX-mod}+@{level}+@{points}]]}}">DEX</option>
+                  <option value="&{template:13thage_generic} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=Skill check}} {{Attribute=Intelligence}} {{Background=@{desc}}} {{Check=[[1d20+@{INT-mod}+@{level}+@{points}]]}}">INT</option>
+                  <option value="&{template:13thage_generic} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=Skill check}} {{Attribute=Wisdom}} {{Background=@{desc}}} {{Check=[[1d20+@{WIS-mod}+@{level}+@{points}]]}}">WIS</option>
+                  <option value="&{template:13thage_generic} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=Skill check}} {{Attribute=Charisma}} {{Background=@{desc}}} {{Check=[[1d20+@{CHA-mod}+@{level}+@{points}]]}}">CHA</option>
                 </select>
               </span>
               <span style="width:15%" class="sheet-table-data sheet-center">
@@ -572,7 +652,7 @@
           Show&nbsp;Description&nbsp;<input type="checkbox" class="sheet-desc-show" title="@{repeating_magic-item_X_description-show}" name="attr_description-show" value="1"/>
           <textarea title="@{repeating_magic-item_X_desc}" class="sheet-desc" name="attr_description" placeholder = "Description"></textarea>
           Show&nbsp;Macro&nbsp;<input type="checkbox" class="sheet-macro-text-show" title="@{repeating_magic-item_X_macro-text-show}" name="attr_macro-text-show" value="1"/>
-          <textarea title="@{repeating_magic-item_X_macro-text}" class="sheet-macro-text" name="attr_macro-text" placeholder = "Macro">/em uses @{name}</textarea>
+          <textarea title="@{repeating_magic-item_X_macro-text}" class="sheet-macro-text" name="attr_macro-text" placeholder = "Macro">&{template:13thage_power} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=@{name}}} {{type=@{type}}} {{usage=@{usage}}} {{text=@{description}}}</textarea>
           <hr class="sheet-hr-fancy">
         </fieldset>
         <br>
@@ -714,11 +794,11 @@
             <span class="sheet-table-name sheet-round sheet-caps">Defenses & Saves</span>
             <div class="sheet-table-row">
               <span class="sheet-table-header sheet-table-padding">AC</span>
-              <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{AC-base}" type="number" name="attr_AC" value="10"></span>
+              <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{npc_AC-base}" type="number" name="attr_npc_AC" value="10"></span>
               <span class="sheet-table-header sheet-table-padding">PD</span>
-              <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{PD-base}" type="number" name="attr_PD" value="0"></span>
+              <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{npc_PD-base}" type="number" name="attr_npc_PD" value="0"></span>
               <span class="sheet-table-header sheet-table-padding">MD</span>
-              <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{MD-base}" type="number" name="attr_MD" value="0"></span>
+              <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{npc_MD-base}" type="number" name="attr_npc_MD" value="0"></span>
             </div>
           </div>
           <br>
@@ -735,29 +815,29 @@
             <span class="sheet-table-name sheet-round sheet-caps">Hit points</span>
           <div class="sheet-table-row">
             <span class="sheet-table-header sheet-table-padding">HP</span>
-            <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{HP}" type="number" name="attr_HP" value="10"></span>
-            <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{HP-temp}" type="number" name="attr_HP-temp" value="0"></span>
-            <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{HP-max}" type="number" name="attr_HP-max" value="10"></span>
+            <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{npc_HP}" type="number" name="attr_npc_HP" value="10"></span>
+            <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{npc_HP-temp}" type="number" name="attr_npc_HP-temp" value="0"></span>
+            <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{npc_HP_max}" type="number" name="attr_npc_HP_max" value="10"></span>
           </div>
            <div class="sheet-table-row">
             <span class="sheet-table-data sheet-center sheet-table-smallsub"></span>
             <span class="sheet-table-data sheet-center sheet-table-smallsub">Current</span>
-            <span class="sheet-table-data sheet-center sheet-table-smallsub">Temporary</span>
-            <span class="sheet-table-data sheet-center sheet-table-smallsub">Max</span>
+            <span class="sheet-table-data sheet-center sheet-table-smallsub">Temp.</span>
+            <span class="sheet-table-data sheet-center sheet-table-smallsub">Max.</span>
           </div>
         </div>
         <br>
         <!-- npc initiative -->
         <div class="sheet-table sheet-sect">
           <div class="sheet-table">
-            <span class="sheet-table-name sheet-round sheet-caps sheet-center">Iniative</span>
+            <span class="sheet-table-name sheet-round sheet-caps sheet-center">Initiative</span>
             <div class="sheet-table-row">
               <span class="sheet-table-header sheet-left sheet-table-padding">Initiative</span>
               <span class="sheet-table-data sheet-center">
-                <input style="width:3.5em;" class="sheet-total sheet-center" title="@{initiative}" type="number" name="attr_initiative" value="0">
+                <input style="width:3.5em;" class="sheet-total sheet-center" title="@{npc_initiative}" type="number" name="attr_npc_initiative" value="0">
               </span>
               <span class="sheet-table-data sheet-right">
-                <button title="@{INI-check}" type="roll" value="/gmroll 1d20+@{initiative} &{tracker}" name="roll_INI-check">Roll Initiative!</button>
+                <button title="@{INI-check}" type="roll" value="/gmroll 1d20+@{npc_initiative} &{tracker}" name="roll_INI-check">Roll Initiative!</button>
               </span>
             </div>
           </div>
@@ -769,7 +849,7 @@
         <div class="sheet-table sheet-sect">
           <span class="sheet-table-name sheet-round sheet-caps sheet-center">NPC Attacks & Powers</span>
         </div>
-        <fieldset class="repeating_power">
+        <fieldset class="repeating_npcpower">
           <div class="sheet-table sheet-sect">
             <div class="sheet-table-row">
               <span class="sheet-table-data sheet-center">
@@ -809,7 +889,7 @@
           Show&nbsp;Description&nbsp;<input type="checkbox" class="sheet-desc-show" title="@{repeating_power_X_description-show}" name="attr_description-show" value="1"/>
           <textarea title="@{repeating_power_X_desc}" class="sheet-desc" name="attr_description" placeholder = "Description"></textarea>
           Show&nbsp;Macro&nbsp;<input type="checkbox" class="sheet-macro-text-show" title="@{repeating_power_X_macro-text-show}" name="attr_macro-text-show" value="1"/>
-          <textarea title="@{repeating_power_X_macro-text}" class="sheet-macro-text" name="attr_macro-text" placeholder = "Macro">/w gm @{character_name} uses @{name}</textarea>
+          <textarea title="@{repeating_power_X_macro-text}" class="sheet-macro-text" name="attr_macro-text" placeholder = "Macro">/w gm &{template:13thage_power} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=@{name}}} {{type=@{type}}} {{usage=@{usage}}} {{text=@{description}}}</textarea>
           <hr class="sheet-hr-fancy">
         </fieldset>
       </div>
@@ -817,4 +897,85 @@
       </div>
     </div>
   </div>
+  <!-- setup section -->
+  <div class="sheet-section sheet-section-setup">
+    <div class="sheet-2colrow">
+      <div style="width:60%;" class="sheet-col">
+        <div class="sheet-table sheet-sect">
+          <span class="sheet-table-name sheet-round sheet-caps sheet-center">Setup Basic Macros</span>
+          <div class="sheet-table-row">
+            <span style="width:30%" class="sheet-table-header sheet-left">Escalation Die Macro</span>
+            <span><input class="sheet-desc" title="@{escdie}" name="attr_escdie" value="?{Escalation die value|0}" type="text" /></span>
+          </div>
+        </div>
+      </div>
+      <div class="sheet-col">
+      </div>
+    </div>
+  </div>
+  <div style="font-size:8px" class="sheet-right"><br>Sheet Version: 1.3.0</div>
 </div>
+
+<!-- roll templates -->
+<!-- generic roll template -->
+<rolltemplate class="sheet-rolltemplate-13thage_generic">
+    <table>
+        <tr><td colspan="2" class="sheet-header">
+            {{#character_name}}
+                {{#character_id}}[{{character_name}}](http://journal.roll20.net/character/{{character_id}}){{/character_id}}
+                {{^character_id}}{{character_name}}{{/character_id}}
+                {{#name}}:{{/name}}
+            {{/character_name}}
+            {{#name}}
+                {{#name_link}}[{{name}}]({{name_link}}){{/name_link}}
+                {{^name_link}}{{name}}{{/name_link}}
+            {{/name}}
+        </td></tr>
+        {{#allprops() character_name character_id name_link}}
+            <tr><td>{{key}}</td><td>{{value}}</td></tr>
+        {{/allprops() character_name character_id name_link}}
+    </table>
+</rolltemplate>
+
+<!-- power roll template -->
+<rolltemplate class="sheet-rolltemplate-13thage_power">
+    <table>
+        <tr><td colspan="2" class="sheet-header">
+            {{#character_name}}
+                {{#character_id}}[{{character_name}}](http://journal.roll20.net/character/{{character_id}}){{/character_id}}
+                {{^character_id}}{{character_name}}{{/character_id}}
+                {{#name}}:{{/name}}
+            {{/character_name}}
+            {{#name}}
+                {{#name_link}}[{{name}}]({{name_link}}){{/name_link}}
+                {{^name_link}}{{name}}{{/name_link}}
+            {{/name}}
+        </td></tr>
+        <tr><td colspan="2" class="sheet-header-small">
+            {{usage}} - {{type}}
+        </td></tr>
+        {{#allprops() character_name character_id name_link usage type}}
+            <tr><td colspan="2" style="font-weight:normal;"><p>{{value}}</p></td></tr>
+        {{/allprops() character_name character_id name_link usage type}}
+    </table>
+</rolltemplate>
+
+<!-- block text roll templates -->
+<rolltemplate class="sheet-rolltemplate-13thage_block">
+    <table>
+        <tr><td colspan="2" class="sheet-header">
+            {{#character_name}}
+                {{#character_id}}[{{character_name}}](http://journal.roll20.net/character/{{character_id}}){{/character_id}}
+                {{^character_id}}{{character_name}}{{/character_id}}
+                {{#name}}:{{/name}}
+            {{/character_name}}
+            {{#name}}
+                {{#name_link}}[{{name}}]({{name_link}}){{/name_link}}
+                {{^name_link}}{{name}}{{/name_link}}
+            {{/name}}
+        </td></tr>
+        {{#allprops() character_name character_id name_link}}
+            <tr><td colspan="2" style="font-weight:normal; text-align:center"><p>{{value}}</p></td></tr>
+        {{/allprops() character_name character_id name_link}}
+    </table>
+</rolltemplate>
