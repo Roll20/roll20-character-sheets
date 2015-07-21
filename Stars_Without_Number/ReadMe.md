@@ -6,6 +6,7 @@ This sheet is created for use in Stars Without Number on Roll20. Based on the ch
 
 #### 0.0.7
 
+* Add support for multiple tabs
 * Add ship character sheet tab
 
 #### 0.0.6
