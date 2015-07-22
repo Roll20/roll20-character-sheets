@@ -4,6 +4,17 @@ This sheet is created for use in Stars Without Number on Roll20. Based on the ch
 
 ### Changelog
 
+#### 0.0.6
+
+* Added generic attack roll button.
+* Added attack and damage rolls for weapons.
+* Added initiative button.
+* Added roll buttons for skills.
+* Skills now default to -1.
+* Added AC field.
+* Added attribute bonus field.
+* Set maximum System Strain to unaltered Constitution.
+
 #### 0.0.5
 
 * Fixed Skill rows not aligning.
