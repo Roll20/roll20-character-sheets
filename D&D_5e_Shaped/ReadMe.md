@@ -22,6 +22,10 @@ Long term:
 
 ### Changelog
 
+**22nd July 2015**
+
+* Weapon & Action Macro no longer outputs a blank line. (It cannot be toggled off - though it never could be)
+
 **14th July 2015**
 
 * Spell points are now a different field. Was a bug.

@@ -253,24 +253,20 @@ gulp.task('preCompile', function() {
 				return duplicate(file, inventoryPerPage, 1 + inventoryPerPage + inventoryPerPage);
 			}
 		}))
-		.pipe(minifyHTML())
-		/*
-		.pipe(htmlclean({
-			protect: /<\!--%fooTemplate\b.*?%-->/g,
-			edit: function(html) { return html.replace(/\begg(s?)\b/ig, 'omelet$1'); }
+		.pipe(minifyHTML({
+			whitespace: true
 		}))
-		*/
-		.pipe(gulp.dest('./'));
-});
-
-gulp.task('compile', ['preCompile'], function() {
-	return gulp.src(['D&D_5e.html', 'precompiled/pages/roll_template.html'])
-		.pipe(concat('D&D_5e.html'))
 		.pipe(gulp.dest('./'));
 });
 
 gulp.task('minify-css', function() {
 	return gulp.src('D&D_5e.css')
 		.pipe(minifyCss())
+		.pipe(gulp.dest('./'));
+});
+
+gulp.task('compile', ['preCompile', 'minify-css'], function() {
+	return gulp.src(['D&D_5e.html', 'precompiled/pages/roll_template.html'])
+		.pipe(concat('D&D_5e.html'))
 		.pipe(gulp.dest('./'));
 });
