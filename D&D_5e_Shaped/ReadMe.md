@@ -22,6 +22,12 @@ Long term:
 
 ### Changelog
 
+**24th July 2015**
+
+* Initiative bonus can now text instead of just a number
+* Removed warning about settings changes
+* Made a new toggle for PC/NPC. The animation is super smooth outside of roll20, but in roll20 it is super laggy. I'll try to massage it more later.
+
 **22nd July 2015**
 
 * Weapon & Action Macro no longer outputs a blank line. (It cannot be toggled off - though it never could be)

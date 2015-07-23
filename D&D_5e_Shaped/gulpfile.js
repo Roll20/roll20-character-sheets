@@ -18,7 +18,7 @@ var customSkillCount = 4,
 	customClassCount = 6,
 	spellCount = 9,
 	armorCount = 10,
-	inventoryPerPage = 15;
+	inventoryPerPage = 20;
 
 String.prototype.capitalize = function() {
 	return this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1)});

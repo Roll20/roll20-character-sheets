@@ -1,4 +1,14 @@
+@mixin no-highlight() {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+$duration: .2s;
 $deepRed: #591209;
+$deepGreen: #51624b;
 $gray: #A19A91;
 
 *, .sheet-rolltemplate-5eDefault * {
@@ -173,17 +183,17 @@ $padMar: (
 	background: rgb(237, 237, 237) url("http://i.imgur.com/RggDtsN.png");
 }
 
-input.sheet-tab-is-npc:checked ~ div .sheet-npc-version,
-input.sheet-tab-is-npc:not(:checked) ~ div .sheet-pc-version,
-input.sheet-tab-is-npc:checked ~ .sheet-npc-version,
-input.sheet-tab-is-npc:not(:checked) ~ .sheet-pc-version {
+input.sheet-slide-input-pc:checked ~ div .sheet-npc-version,
+input.sheet-slide-input-pc:not(:checked) ~ div .sheet-pc-version,
+input.sheet-slide-input-pc:checked ~ .sheet-npc-version,
+input.sheet-slide-input-pc:not(:checked) ~ .sheet-pc-version {
 	display: block;
 }
 
-input.sheet-tab-is-npc:checked ~ div .sheet-npc-version-inline-block,
-input.sheet-tab-is-npc:not(:checked) ~ div .sheet-pc-version-inline-block,
-input.sheet-tab-is-npc:checked ~ .sheet-npc-version-inline-block,
-input.sheet-tab-is-npc:not(:checked) ~ .sheet-pc-version-inline-block {
+input.sheet-slide-input-pc:checked ~ div .sheet-npc-version-inline-block,
+input.sheet-slide-input-pc:not(:checked) ~ div .sheet-pc-version-inline-block,
+input.sheet-slide-input-pc:checked ~ .sheet-npc-version-inline-block,
+input.sheet-slide-input-pc:not(:checked) ~ .sheet-pc-version-inline-block {
 	display: inline-block;
 }
 
@@ -1040,29 +1050,6 @@ div.sheet-npc {
 	display: none;
 }
 
-$tab-is-npc-width: 40px;
-input.sheet-tab-is-npc,
-span.sheet-tab-is-npc {
-	width: $tab-is-npc-width;
-	height: 12px;
-	padding: 1px;
-}
-
-span.sheet-tab-is-npc::before {
-	content: "Player";
-}
-
-span.sheet-tab-is-npc {
-	font-size: 10px !important;
-
-	background-color: #65763c;
-	margin-left: -$tab-is-npc-width;
-}
-
-input.sheet-tab-is-npc:checked + span.sheet-tab-is-npc {
-	background-color: #93537c;
-}
-
 .sheet-english,
 .sheet-german {
 	display: none;
@@ -1349,6 +1336,117 @@ span.sheet-tab-class-action {
 	line-height: 100%;
 }
 
+$pcToggleWidth: 40px;
+$pcToggleHeight: 15px;
+
+$pcToggleLeftColor: $deepGreen;
+$pcToggleRightColor: $deepRed;
+
+input[class^='sheet-slide-input-'] {
+	cursor: pointer;
+	position: relative;
+	vertical-align: top;
+	display: inline-block;
+	margin: 0;
+	z-index: 99;
+	opacity: 0;
+}
+
+label[class^='sheet-slide-toggle-'] {
+	vertical-align: top;
+	font-size: 11px;
+	font-weight: bold;
+	display: inline-block;
+	position: relative;
+	padding: 0;
+	text-align: left;
+	box-sizing: border-box;
+	perspective: 300px;
+	@include no-highlight();
+
+	$brickColor: white;
+	background-color: $brickColor;
+	border: 1px solid  darken($brickColor, 15);
+	border-bottom-color: darken($brickColor, 10);
+	box-shadow: inset 0 0.1em 0.03em rgba(0,0,0,0.2),
+	inset 0 0.1em 0.3em rgba(0, 0, 0, 0.3),
+	0 0 2em rgba($brickColor,0.6);
+
+	&:before {
+		position: absolute;
+		right: 0;
+		top: 0;
+		background-color: #f5f5f5;
+		display: inline-block;
+		text-align: center;
+		content: "...";
+
+		color: #ffffff;
+		transition: all $duration ease-in-out;
+		box-shadow: 0.1em 0 0.2em rgba(0,0,0,0.3);
+
+		margin-right: -1px;
+		margin-top: -0.14em;
+		transition-duration: $duration/1.5;
+		transition-timing-function: cubic-bezier(0.52,-0.41, 0.55, 1.46);
+	}
+	span[class^='sheet-slide-toggle-'] {
+		display: inline-block;
+		width: 50%;
+		text-align: center;
+		line-height: inherit;
+		transition: all $duration ease-in-out;
+	}
+}
+
+input.sheet-slide-input-pc,
+label.sheet-slide-toggle-pc {
+	width: $pcToggleWidth*2;
+	height: $pcToggleHeight;
+}
+label.sheet-slide-toggle-pc {
+	margin-left: -($pcToggleWidth*2);
+	line-height: $pcToggleHeight;
+	&:before {
+		width: $pcToggleWidth;
+		height: $pcToggleHeight;
+		$volumeColor: darken($pcToggleLeftColor, 10);
+		box-shadow: 0 0.12em 0.01em rgba($volumeColor,1),
+		0 0.12em 0.3em rgba($volumeColor,0.6),
+		0 0.12em 2em rgba(0, 0, 0, 0.3),
+		-0.12em 0.15em 0.2em rgba(0, 0, 0, 0.2);
+	}
+}
+input[type='checkbox'].sheet-slide-input-pc + label.sheet-slide-toggle-pc {
+	&:before {
+		background-color: $pcToggleLeftColor;
+		text-shadow: 0 0.05em 0 darken($pcToggleLeftColor, 05);
+	}
+	span[class^="sheet-slide-toggle-"] {
+		color: $pcToggleLeftColor;
+	}
+}
+input[type='checkbox'].sheet-slide-input-pc:checked + label.sheet-slide-toggle-pc {
+	&:before {
+		background-color: $pcToggleRightColor;
+		margin-right: $pcToggleWidth;
+		border-bottom: 0.03em solid lighten($pcToggleRightColor, 10);
+		text-shadow: 0 0.05em 0 darken($pcToggleRightColor, 10);
+		$volumeColor: darken($pcToggleRightColor, 10);
+		box-shadow: 0 0.12em 0.01em rgba($volumeColor,1),
+		0 0.12em 0.3em rgba($volumeColor,0.6),
+		0 0.12em 2em rgba(0, 0, 0, 0.3),
+		0.12em 0.15em 0.2em rgba(0, 0, 0, 0.2);
+	}
+	span[class^="sheet-slide-toggle-"] {
+		color: $pcToggleRightColor;
+	}
+}
+
+
+
+
+
 .sheet-section-actions div[class*="sheet-toggle-"],
 .sheet-section-weapons div[class*="sheet-toggle-"] {
 	display: none;
@@ -1608,7 +1706,7 @@ input.sheet-tab-hd-d20:checked ~ div.sheet-tab-hd-d20 {
 input[class*="sheet-tab"]:checked + span[class*="sheet-tab"],
 input[class*="sheet-toggle"]:checked + span[class*="sheet-toggle"],
 input.sheet-tab-custom-skills-toggle:checked + span.sheet-tab-custom-skills-toggle {
-	background-color: #51624b;
+	background-color: $deepGreen;
 }
 
 input[class*="sheet-tab-spellbook"]:checked + span[class*="sheet-tab-spellbook"],
