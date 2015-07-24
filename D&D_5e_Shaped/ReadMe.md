@@ -22,6 +22,10 @@ Long term:
 
 ### Changelog
 
+**25th July 2015**
+
+* Changed spell slots/points toggle to the same slider used on PC/NPC. Still unsure about the colors
+
 **24th July 2015**
 
 * Initiative bonus can now text instead of just a number
