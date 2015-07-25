@@ -121,7 +121,8 @@ gulp.task('preCompile', function() {
 			transform: function (filePath, file) {
 				return skills(file);
 			}
-		})).pipe( inject(gulp.src(['precompiled/components/skills/skill_bonuses.html']), {
+		}))
+		.pipe( inject(gulp.src(['precompiled/components/skills/skill_bonuses.html']), {
 			starttag: '<!-- inject:skillsBonuses:{{ext}} -->',
 			transform: function (filePath, file) {
 				return skills(file);
