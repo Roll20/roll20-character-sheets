@@ -24,9 +24,14 @@ Long term:
 
 **25th July 2015**
 
-* Changed spell slots/points toggle to the same slider used on PC/NPC. Still unsure about the colors
+* Changed Custom Skills to the slider.
+* Removed Macro from weapons and actions.
 
 **24th July 2015**
+
+* Changed spell slots/points toggle to the same slider used on PC/NPC. Still unsure about the colors
+
+**23rd July 2015**
 
 * Initiative bonus can now text instead of just a number
 * Removed warning about settings changes
