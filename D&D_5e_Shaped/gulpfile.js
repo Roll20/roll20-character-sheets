@@ -4,7 +4,8 @@ var gulp = require('gulp'),
 	minifyHTML = require('gulp-minify-html'),
 	htmlclean = require('gulp-htmlclean'),
 	minifyCss = require('gulp-minify-css'),
-	concat = require('gulp-concat');
+	concat = require('gulp-concat'),
+	replace = require('gulp-replace-task');
 
 var customSkillCount = 4,
 	outputOtionsCount = 1,
@@ -16,7 +17,7 @@ var customSkillCount = 4,
 	quickClassActions = 5,
 	classActionsPerPage = 10,
 	customClassCount = 6,
-	spellCount = 9,
+	spellCount = 10,
 	armorCount = 10,
 	inventoryPerPage = 20;
 
@@ -41,6 +42,38 @@ function actionsCompile (file, limit, action_type, action_name) {
 }
 function includeFile (file) {
 	return file.contents.toString('utf8');
+}
+function spell (file, limit, start) {
+	var s = [];
+
+	if(!start) {
+		start = 0;
+	} else if (start > 0) {
+		limit += start;
+	}
+
+	for (var i = start; i < limit; i++) {
+		var template = file.contents.toString('utf8').replace(/\x7B\x7Bnum\x7D\x7D/g, i.toString());
+
+		if(i === 0) {
+			template = template
+				.replace(/\x7B\x7Blevel_num\x7D\x7D/g, 'cantrip')
+				.replace(/\x7B\x7Blevel_num_readable\x7D\x7D/g, 'Cantrip')
+				.replace(/\x7B\x7Blevel_num_readable_de\x7D\x7D/g, 'Zaubertrick')
+				.replace(/\x7B\x7Bhidden_if_cantrip\x7D\x7D/g, ' sheet-hidden')
+				.replace(/\x7B\x7Bchecked_if_cantrip\x7D\x7D/g, ' checked');
+		} else {
+			template = template
+				.replace(/\x7B\x7Blevel_num\x7D\x7D/g, 'level' + i.toString())
+				.replace(/\x7B\x7Blevel_num_readable\x7D\x7D/g, 'Level ' + i.toString())
+				.replace(/\x7B\x7Blevel_num_readable_de\x7D\x7D/g, 'Stufe ' + i.toString())
+				.replace(/\x7B\x7Bhidden_if_cantrip\x7D\x7D/g, '')
+				.replace(/\x7B\x7Bchecked_if_cantrip\x7D\x7D/g, '');
+		}
+
+		s.push(template);
+	}
+	return s.join('\n\n');
 }
 function duplicate (file, limit, start) {
 	var template = file.contents.toString('utf8'),
@@ -113,8 +146,37 @@ function skills (file) {
 	return skills.join('\n\n');
 }
 
+function ordinal(d) {
+	if(d>3 && d<21) return 'th';
+	switch (d % 10) {
+		case 1:  return "st";
+		case 2:  return "nd";
+		case 3:  return "rd";
+		default: return "th";
+	}
+}
+function processDate () {
+	var dt = new Date(),
+		months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+		month = dt.getMonth(),
+		date = dt.getDate(),
+		year = dt.getFullYear();
+
+	return date + ordinal(date) + ' ' + months[month] + ' ' + year;
+}
+
 gulp.task('preCompile', function() {
 	return gulp.src('precompiled/D&D_5e.html')
+		.pipe(replace({
+			patterns: [
+				{
+					match: /\x7B\x7Bdate\x7D\x7D/g,
+					replacement: function () {
+						return processDate();
+					}
+				}
+			]
+		}))
 		.pipe( include() )
 		.pipe( inject(gulp.src(['precompiled/components/skills/skill.html']), {
 			starttag: '<!-- inject:skills:{{ext}} -->',
@@ -227,7 +289,7 @@ gulp.task('preCompile', function() {
 		.pipe( inject(gulp.src(['precompiled/components/spellbook/spell-page.html']), {
 			starttag: '<!-- inject:spells:{{ext}} -->',
 			transform: function (filePath, file) {
-				return duplicate(file, spellCount, 1);
+				return spell(file, spellCount);
 			}
 		}))
 		.pipe( inject(gulp.src(['precompiled/components/armor/armor.html']), {
