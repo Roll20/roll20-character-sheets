@@ -2,9 +2,9 @@ var gulp = require('gulp'),
 	include = require('gulp-include'),
 	inject = require('gulp-inject'),
 	minifyHTML = require('gulp-minify-html'),
-	htmlclean = require('gulp-htmlclean'),
 	minifyCss = require('gulp-minify-css'),
 	concat = require('gulp-concat'),
+	sass = require('gulp-sass'),
 	replace = require('gulp-replace-task');
 
 var customSkillCount = 4,
@@ -39,9 +39,6 @@ function actionsCompile (file, limit, action_type, action_name) {
 		);
 	}
 	return s.join('\n\n');
-}
-function includeFile (file) {
-	return file.contents.toString('utf8');
 }
 function spell (file, limit, start) {
 	var s = [];
@@ -94,8 +91,8 @@ function duplicate (file, limit, start) {
 }
 function skills (file) {
 	var template = file.contents.toString('utf8'),
-		skillsJson = require('./precompiled/components/skills/skills.json').skills,
-		//skillsData = JSON.parse('precompiled/components/skills/skills.json'),
+		skillsJson = require('./components/skills/skills.json').skills,
+	//skillsData = JSON.parse('./components/skills/skills.json'),
 		skills = [];
 
 	var selectedString = ' selected="selected"';
@@ -166,7 +163,7 @@ function processDate () {
 }
 
 gulp.task('preCompile', function() {
-	return gulp.src('precompiled/D&D_5e.html')
+	return gulp.src('./D&D_5e.html')
 		.pipe(replace({
 			patterns: [
 				{
@@ -178,139 +175,139 @@ gulp.task('preCompile', function() {
 			]
 		}))
 		.pipe( include() )
-		.pipe( inject(gulp.src(['precompiled/components/skills/skill.html']), {
+		.pipe( inject(gulp.src(['./components/skills/skill.html']), {
 			starttag: '<!-- inject:skills:{{ext}} -->',
 			transform: function (filePath, file) {
 				return skills(file);
 			}
 		}))
-		.pipe( inject(gulp.src(['precompiled/components/skills/skill_bonuses.html']), {
+		.pipe( inject(gulp.src(['./components/skills/skill_bonuses.html']), {
 			starttag: '<!-- inject:skillsBonuses:{{ext}} -->',
 			transform: function (filePath, file) {
 				return skills(file);
 			}
 		}))
-		.pipe( inject(gulp.src(['precompiled/components/skills/custom_skill.html']), {
+		.pipe( inject(gulp.src(['./components/skills/custom_skill.html']), {
 			starttag: '<!-- inject:customSkills:{{ext}} -->',
 			transform: function (filePath, file) {
 				return duplicate(file, customSkillCount, 1);
 			}
 		}))
-		.pipe( inject(gulp.src(['precompiled/components/skills/custom_skill_bonuses.html']), {
+		.pipe( inject(gulp.src(['./components/skills/custom_skill_bonuses.html']), {
 			starttag: '<!-- inject:customSkillsBonuses:{{ext}} -->',
 			transform: function (filePath, file) {
 				return duplicate(file, customSkillCount, 1);
 			}
 		}))
-		.pipe( inject(gulp.src(['precompiled/components/class/output_options.html']), {
+		.pipe( inject(gulp.src(['./components/class/output_options.html']), {
 			starttag: '<!-- inject:outputOptions:{{ext}} -->',
 			transform: function (filePath, file) {
 				return duplicate(file, outputOtionsCount);
 			}
 		}))
-		.pipe( inject(gulp.src(['precompiled/components/traits/traits.html']), {
+		.pipe( inject(gulp.src(['./components/traits/traits.html']), {
 			starttag: '<!-- inject:traits:{{ext}} -->',
 			transform: function (filePath, file) {
 				return duplicate(file, traitsCount);
 			}
 		}))
-		.pipe( inject(gulp.src(['precompiled/components/actions/actions.html']), {
+		.pipe( inject(gulp.src(['./components/actions/actions.html']), {
 			starttag: '<!-- inject:lairActions:{{ext}} -->',
 			transform: function (filePath, file) {
 				return actionsCompile(file, lairActionCount, 'lair_', 'Lair');
 			}
 		}))
-		.pipe( inject(gulp.src(['precompiled/components/actions/actions.html']), {
+		.pipe( inject(gulp.src(['./components/actions/actions.html']), {
 			starttag: '<!-- inject:legendaryActions:{{ext}} -->',
 			transform: function (filePath, file) {
 				return actionsCompile(file, legendaryActionCount, 'legendary_', 'Legendary');
 			}
 		}))
-		.pipe( inject(gulp.src(['precompiled/components/quick_weapons/actions_template.html']), {
+		.pipe( inject(gulp.src(['./components/quick_weapons/actions_template.html']), {
 			starttag: '<!-- inject:quickActions:{{ext}} -->',
 			transform: function (filePath, file) {
 				return duplicate(file, actionCount);
 			}
 		}))
-		.pipe( inject(gulp.src(['precompiled/components/actions/actions.html']), {
+		.pipe( inject(gulp.src(['./components/actions/actions.html']), {
 			starttag: '<!-- inject:actions:{{ext}} -->',
 			transform: function (filePath, file) {
 				return actionsCompile(file, actionCount, '', 'Action');
 			}
 		}))
-		.pipe( inject(gulp.src(['precompiled/components/quick_weapons/melee_template.html']), {
+		.pipe( inject(gulp.src(['./components/quick_weapons/melee_template.html']), {
 			starttag: '<!-- inject:quickMelee:{{ext}} -->',
 			transform: function (filePath, file) {
 				return duplicate(file, weaponCount);
 			}
 		}))
-		.pipe( inject(gulp.src(['precompiled/components/weapons/melee.html']), {
+		.pipe( inject(gulp.src(['./components/weapons/melee.html']), {
 			starttag: '<!-- inject:melee:{{ext}} -->',
 			transform: function (filePath, file) {
 				return duplicate(file, weaponCount);
 			}
 		}))
-		.pipe( inject(gulp.src(['precompiled/components/quick_weapons/ranged_template.html']), {
+		.pipe( inject(gulp.src(['./components/quick_weapons/ranged_template.html']), {
 			starttag: '<!-- inject:quickRanged:{{ext}} -->',
 			transform: function (filePath, file) {
 				return duplicate(file, weaponCount);
 			}
 		}))
-		.pipe( inject(gulp.src(['precompiled/components/weapons/ranged.html']), {
+		.pipe( inject(gulp.src(['./components/weapons/ranged.html']), {
 			starttag: '<!-- inject:ranged:{{ext}} -->',
 			transform: function (filePath, file) {
 				return duplicate(file, weaponCount);
 			}
 		}))
-		.pipe( inject(gulp.src(['precompiled/components/class/class_action.html']), {
+		.pipe( inject(gulp.src(['./components/class/class_action.html']), {
 			starttag: '<!-- inject:class_1:{{ext}} -->',
 			transform: function (filePath, file) {
 				return duplicate(file, classActionsPerPage, 1);
 			}
 		}))
-		.pipe( inject(gulp.src(['precompiled/components/class/quick_class_action.html']), {
+		.pipe( inject(gulp.src(['./components/class/quick_class_action.html']), {
 			starttag: '<!-- inject:quickClassActions:{{ext}} -->',
 			transform: function (filePath, file) {
 				return duplicate(file, quickClassActions, 1);
 			}
 		}))
-		.pipe( inject(gulp.src(['precompiled/components/class/class_action.html']), {
+		.pipe( inject(gulp.src(['./components/class/class_action.html']), {
 			starttag: '<!-- inject:class_2:{{ext}} -->',
 			transform: function (filePath, file) {
 				return duplicate(file, classActionsPerPage, 1 + classActionsPerPage);
 			}
 		}))
-		.pipe( inject(gulp.src(['precompiled/components/class/custom_class.html']), {
+		.pipe( inject(gulp.src(['./components/class/custom_class.html']), {
 			starttag: '<!-- inject:custom_class:{{ext}} -->',
 			transform: function (filePath, file) {
 				return duplicate(file, customClassCount, 1);
 			}
 		}))
-		.pipe( inject(gulp.src(['precompiled/components/spellbook/spell-page.html']), {
+		.pipe( inject(gulp.src(['./components/spellbook/spell-page.html']), {
 			starttag: '<!-- inject:spells:{{ext}} -->',
 			transform: function (filePath, file) {
 				return spell(file, spellCount);
 			}
 		}))
-		.pipe( inject(gulp.src(['precompiled/components/armor/armor.html']), {
+		.pipe( inject(gulp.src(['./components/armor/armor.html']), {
 			starttag: '<!-- inject:armor:{{ext}} -->',
 			transform: function (filePath, file) {
 				return duplicate(file, armorCount, 1);
 			}
 		}))
-		.pipe( inject(gulp.src(['precompiled/components/inventory/inventory.html']), {
+		.pipe( inject(gulp.src(['./components/inventory/inventory.html']), {
 			starttag: '<!-- inject:inventory_1:{{ext}} -->',
 			transform: function (filePath, file) {
 				return duplicate(file, inventoryPerPage, 1);
 			}
 		}))
-		.pipe( inject(gulp.src(['precompiled/components/inventory/inventory.html']), {
+		.pipe( inject(gulp.src(['./components/inventory/inventory.html']), {
 			starttag: '<!-- inject:inventory_2:{{ext}} -->',
 			transform: function (filePath, file) {
 				return duplicate(file, inventoryPerPage, 1 + inventoryPerPage);
 			}
 		}))
-		.pipe( inject(gulp.src(['precompiled/components/inventory/inventory.html']), {
+		.pipe( inject(gulp.src(['./components/inventory/inventory.html']), {
 			starttag: '<!-- inject:inventory_3:{{ext}} -->',
 			transform: function (filePath, file) {
 				return duplicate(file, inventoryPerPage, 1 + inventoryPerPage + inventoryPerPage);
@@ -319,17 +316,23 @@ gulp.task('preCompile', function() {
 		.pipe(minifyHTML({
 			whitespace: true
 		}))
-		.pipe(gulp.dest('./'));
+		.pipe(gulp.dest('../'));
 });
 
-gulp.task('minify-css', function() {
-	return gulp.src('D&D_5e.css')
+gulp.task('sass', function () {
+	return gulp.src('./D&D_5e.scss')
+		.pipe(sass().on('error', sass.logError))
+		.pipe(gulp.dest('../'));
+});
+
+gulp.task('minify-css', ['sass'], function() {
+	return gulp.src('../D&D_5e.css')
 		.pipe(minifyCss())
-		.pipe(gulp.dest('./'));
+		.pipe(gulp.dest('../'));
 });
 
 gulp.task('compile', ['preCompile', 'minify-css'], function() {
-	return gulp.src(['D&D_5e.html', 'precompiled/pages/roll_template.html'])
+	return gulp.src(['../D&D_5e.html', './pages/roll_template.html'])
 		.pipe(concat('D&D_5e.html'))
-		.pipe(gulp.dest('./'));
+		.pipe(gulp.dest('../'));
 });
