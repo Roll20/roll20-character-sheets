@@ -76,9 +76,6 @@ function spell (file, limit, start) {
 				.replace(/\x7B\x7BhigherLevelQuery\x7D\x7D/g, higherLevelQuery);
 		}
 
-
-
-
 		s.push(template);
 	}
 	return s.join('\n\n');
