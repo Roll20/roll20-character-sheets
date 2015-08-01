@@ -58,15 +58,26 @@ function spell (file, limit, start) {
 				.replace(/\x7B\x7Blevel_num_readable\x7D\x7D/g, 'Cantrip')
 				.replace(/\x7B\x7Blevel_num_readable_de\x7D\x7D/g, 'Zaubertrick')
 				.replace(/\x7B\x7Bhidden_if_cantrip\x7D\x7D/g, ' sheet-hidden')
-				.replace(/\x7B\x7Bchecked_if_cantrip\x7D\x7D/g, ' checked');
+				.replace(/\x7B\x7Bchecked_if_cantrip\x7D\x7D/g, ' checked')
+				.replace(/\x7B\x7BhigherLevelQuery\x7D\x7D/g, '');
 		} else {
+			var higherLevelQuery = '?{Spell Level';
+			for(var j = i; j < limit; j++) {
+				higherLevelQuery += '|' + j;
+			}
+			higherLevelQuery += '}';
+
 			template = template
 				.replace(/\x7B\x7Blevel_num\x7D\x7D/g, 'level' + i.toString())
 				.replace(/\x7B\x7Blevel_num_readable\x7D\x7D/g, 'Level ' + i.toString())
 				.replace(/\x7B\x7Blevel_num_readable_de\x7D\x7D/g, 'Stufe ' + i.toString())
 				.replace(/\x7B\x7Bhidden_if_cantrip\x7D\x7D/g, '')
-				.replace(/\x7B\x7Bchecked_if_cantrip\x7D\x7D/g, '');
+				.replace(/\x7B\x7Bchecked_if_cantrip\x7D\x7D/g, '')
+				.replace(/\x7B\x7BhigherLevelQuery\x7D\x7D/g, higherLevelQuery);
 		}
+
+
+
 
 		s.push(template);
 	}
