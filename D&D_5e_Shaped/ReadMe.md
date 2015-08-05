@@ -22,6 +22,19 @@ Long term:
 
 ### Changelog
 
+**26th July - August 5th 2015**
+
+* Revamp of spells:
+  * Toggles are all redone and can be changed in the future
+  * Added Emote
+  * Added higher level for damage and heal
+  * Split damage to attack damage and save damage
+  * Aoe split from target
+  * Save condition
+  * Save failure
+  * Revamped roll template to match these new changes. For the most part spells now use action stuff
+* Added Query macros for Saves, Checks, and Skills
+
 **25th July 2015**
 
 * Changed Custom Skills to the slider.
