@@ -19,7 +19,8 @@ var customSkillCount = 4,
 	customClassCount = 6,
 	spellCount = 10,
 	armorCount = 10,
-	inventoryPerPage = 20;
+	inventoryPerPage = 20,
+	abilitiesName = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'];
 
 String.prototype.capitalize = function() {
 	return this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1)});
@@ -100,7 +101,6 @@ function duplicate (file, limit, start) {
 function skills (file) {
 	var template = file.contents.toString('utf8'),
 		skillsJson = require('./components/skills/skills.json').skills,
-	//skillsData = JSON.parse('./components/skills/skills.json'),
 		skills = [];
 
 	var selectedString = ' selected="selected"';
@@ -149,6 +149,51 @@ function skills (file) {
 		);
 	});
 	return skills.join('\n\n');
+}
+
+function saveQuery(file) {
+	var template = file.contents.toString('utf8'),
+		query = '';
+
+	for (var i = 0, len = abilitiesName.length; i < len; ++i) {
+		var ability = abilitiesName[i];
+		query += '|' + ability + ', &amp;#123;&amp;#123;title=' + ability + '&amp;#125;&amp;#125; &amp;#123;&amp;#123;roll=[[d20@{selected|d20_mod} + @{selected|' + ability.toLowerCase() + '_save_mod}]]&amp;#125;&amp;#125; &amp;#123;&amp;#123;rolladv=[[d20@{selected|d20_mod} + @{selected|' + ability.toLowerCase() + '_save_mod}]]&amp;#125;&amp;#125; @{selected|classaction' + ability.toLowerCase() + 'save}'
+	}
+	template = template.replace(/\x7B\x7BsaveQuery\x7D\x7D/g, query);
+
+	return template;
+}
+
+function checkQuery(file) {
+	var template = file.contents.toString('utf8'),
+		query = '';
+
+	for (var i = 0, len = abilitiesName.length; i < len; ++i) {
+		var ability = abilitiesName[i];
+		query += '|' + ability + ', &amp;#123;&amp;#123;title=' + ability + '&amp;#125;&amp;#125; &amp;#123;&amp;#123;roll=[[d20@{selected|d20_mod} + @{selected|basic_' + ability.toLowerCase() + '_check_mod}]]&amp;#125;&amp;#125; &amp;#123;&amp;#123;rolladv=[[d20@{selected|d20_mod} + @{selected|basic_' + ability.toLowerCase() + '_check_mod}]]&amp;#125;&amp;#125; @{selected|classactionunskilled' + ability.toLowerCase().substr(0,3) + '}'
+	}
+	template = template.replace(/\x7B\x7BcheckQuery\x7D\x7D/g, query);
+
+	return template;
+}
+
+function skillQuery(file) {
+	var template = file.contents.toString('utf8'),
+		skillsJson = require('./components/skills/skills.json').skills,
+		query = '';
+
+	skillsJson.forEach(function(skill) {
+		query += '|' + skill.name + ', &amp;#123;&amp;#123;title=' + skill.name + '&amp;#125;&amp;#125; &amp;#123;&amp;#123;roll=[[d20@{selected|d20_mod} + @{selected|' + skill.name.lowercase().replace(/ +/g, '') + '}]]&amp;#125;&amp;#125; &amp;#123;&amp;#123;rolladv=[[d20@{selected|d20_mod} + @{selected|' + skill.name.lowercase().replace(/ +/g, '') + '}]]&amp;#125;&amp;#125; @{selected|classaction' + skill.name.lowercase().replace(/ +/g, '') + '}'
+	});
+	for (var i = 1, len = customSkillCount; i <= len; ++i) {
+		query += '|@{custom_skill_' + i + '_name}, &amp;#123;&amp;#123;title=@{custom_skill_' + i + '_name}&amp;#125;&amp;#125; &amp;#123;&amp;#123;roll=[[d20@{selected|d20_mod} + @{selected|custom_skill_' + i + '}]]&amp;#125;&amp;#125; &amp;#123;&amp;#123;rolladv=[[d20@{selected|d20_mod} + @{selected|custom_skill_' + i + '}]]&amp;#125;&amp;#125; @{selected|classactioncustom' + i + 'skill}'
+	}
+
+
+	template = template.replace(/\x7B\x7BcheckQuery\x7D\x7D/g, query);
+
+
+	return template;
 }
 
 function ordinal(d) {
@@ -319,6 +364,24 @@ gulp.task('preCompile', function() {
 			starttag: '<!-- inject:inventory_3:{{ext}} -->',
 			transform: function (filePath, file) {
 				return duplicate(file, inventoryPerPage, 1 + inventoryPerPage + inventoryPerPage);
+			}
+		}))
+		.pipe( inject(gulp.src(['./components/macros/saves.html']), {
+			starttag: '<!-- inject:saveQuery:{{ext}} -->',
+			transform: function (filePath, file) {
+				return saveQuery(file);
+			}
+		}))
+		.pipe( inject(gulp.src(['./components/macros/checks.html']), {
+			starttag: '<!-- inject:checkQuery:{{ext}} -->',
+			transform: function (filePath, file) {
+				return checkQuery(file);
+			}
+		}))
+		.pipe( inject(gulp.src(['./components/macros/skills.html']), {
+			starttag: '<!-- inject:skillQuery:{{ext}} -->',
+			transform: function (filePath, file) {
+				return skillQuery(file);
 			}
 		}))
 		.pipe(minifyHTML({
