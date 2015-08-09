@@ -157,7 +157,7 @@ function saveQuery(file) {
 
 	for (var i = 0, len = abilitiesName.length; i < len; ++i) {
 		var ability = abilitiesName[i];
-		query += '|' + ability + ', &amp;#123;&amp;#123;title=' + ability + '&amp;#125;&amp;#125; &amp;#123;&amp;#123;roll=[[d20@{selected|d20_mod} + @{selected|' + ability.toLowerCase() + '_save_mod}]]&amp;#125;&amp;#125; &amp;#123;&amp;#123;rolladv=[[d20@{selected|d20_mod} + @{selected|' + ability.toLowerCase() + '_save_mod}]]&amp;#125;&amp;#125; @{selected|classaction' + ability.toLowerCase() + 'save}'
+		query += '|' + ability + ', &amp;#123;&amp;#123;title=' + ability + '&amp;#125;&amp;#125; &amp;#123;&amp;#123;roll=[[d20@{selected|d20_mod} + @{selected|' + ability.toLowerCase() + '_save_mod}]]&amp;#125;&amp;#125; &amp;#123;&amp;#123;rolladv=[[d20@{selected|d20_mod} + @{selected|' + ability.toLowerCase() + '_save_mod}]]&amp;#125;&amp;#125;}'
 	}
 	template = template.replace(/\x7B\x7BsaveQuery\x7D\x7D/g, query);
 
@@ -170,7 +170,7 @@ function checkQuery(file) {
 
 	for (var i = 0, len = abilitiesName.length; i < len; ++i) {
 		var ability = abilitiesName[i];
-		query += '|' + ability + ', &amp;#123;&amp;#123;title=' + ability + '&amp;#125;&amp;#125; &amp;#123;&amp;#123;roll=[[d20@{selected|d20_mod} + @{selected|basic_' + ability.toLowerCase() + '_check_mod}]]&amp;#125;&amp;#125; &amp;#123;&amp;#123;rolladv=[[d20@{selected|d20_mod} + @{selected|basic_' + ability.toLowerCase() + '_check_mod}]]&amp;#125;&amp;#125; @{selected|classactionunskilled' + ability.toLowerCase().substr(0,3) + '}'
+		query += '|' + ability + ', &amp;#123;&amp;#123;title=' + ability + '&amp;#125;&amp;#125; &amp;#123;&amp;#123;roll=[[d20@{selected|d20_mod} + @{selected|basic_' + ability.toLowerCase() + '_check_mod}]]&amp;#125;&amp;#125; &amp;#123;&amp;#123;rolladv=[[d20@{selected|d20_mod} + @{selected|basic_' + ability.toLowerCase() + '_check_mod}]]&amp;#125;&amp;#125;'
 	}
 	template = template.replace(/\x7B\x7BcheckQuery\x7D\x7D/g, query);
 
@@ -183,10 +183,10 @@ function skillQuery(file) {
 		query = '';
 
 	skillsJson.forEach(function(skill) {
-		query += '|' + skill.name + ', &amp;#123;&amp;#123;title=' + skill.name + '&amp;#125;&amp;#125; &amp;#123;&amp;#123;roll=[[d20@{selected|d20_mod} + @{selected|' + skill.name.lowercase().replace(/ +/g, '') + '}]]&amp;#125;&amp;#125; &amp;#123;&amp;#123;rolladv=[[d20@{selected|d20_mod} + @{selected|' + skill.name.lowercase().replace(/ +/g, '') + '}]]&amp;#125;&amp;#125; @{selected|classaction' + skill.name.lowercase().replace(/ +/g, '') + '}'
+		query += '|' + skill.name + ', &amp;#123;&amp;#123;title=' + skill.name + '&amp;#125;&amp;#125; &amp;#123;&amp;#123;roll=[[d20@{selected|d20_mod} + @{selected|' + skill.name.lowercase().replace(/ +/g, '') + '}]]&amp;#125;&amp;#125; &amp;#123;&amp;#123;rolladv=[[d20@{selected|d20_mod} + @{selected|' + skill.name.lowercase().replace(/ +/g, '') + '}]]&amp;#125;&amp;#125;}'
 	});
 	for (var i = 1, len = customSkillCount; i <= len; ++i) {
-		query += '|@{custom_skill_' + i + '_name}, &amp;#123;&amp;#123;title=@{custom_skill_' + i + '_name}&amp;#125;&amp;#125; &amp;#123;&amp;#123;roll=[[d20@{selected|d20_mod} + @{selected|custom_skill_' + i + '}]]&amp;#125;&amp;#125; &amp;#123;&amp;#123;rolladv=[[d20@{selected|d20_mod} + @{selected|custom_skill_' + i + '}]]&amp;#125;&amp;#125; @{selected|classactioncustom' + i + 'skill}'
+		query += '|@{custom_skill_' + i + '_name}, &amp;#123;&amp;#123;title=@{custom_skill_' + i + '_name}&amp;#125;&amp;#125; &amp;#123;&amp;#123;roll=[[d20@{selected|d20_mod} + @{selected|custom_skill_' + i + '}]]&amp;#125;&amp;#125; &amp;#123;&amp;#123;rolladv=[[d20@{selected|d20_mod} + @{selected|custom_skill_' + i + '}]]&amp;#125;&amp;#125;}'
 	}
 
 
