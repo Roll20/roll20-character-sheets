@@ -23,7 +23,7 @@ Long term:
 
 ### Changelog
 
-**26th July - August 10th 2015**
+**August 10th 2015**
 
 * Spell filters
 * Removed HD note
