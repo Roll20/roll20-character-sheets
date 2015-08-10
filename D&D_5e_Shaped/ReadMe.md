@@ -5,6 +5,7 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 ### TODO
 
 Short Term:
+* Create a short view of spells. See https://app.roll20.net/forum/permalink/2281579/
 * Actions: Allow for "Effects" to be whispered to the GM.
 * Revamp Traits. Keep fluff traits on the first page and for action like traits write "see Actions". Also include fluff traits on "Actions".
 * Refactor Actions to use damage die and bonus like weapons do
