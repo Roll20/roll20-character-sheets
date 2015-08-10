@@ -5,6 +5,7 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 ### TODO
 
 Short Term:
+* Create a short view of spells. See https://app.roll20.net/forum/permalink/2281579/
 * Actions: Allow for "Effects" to be whispered to the GM.
 * Revamp Traits. Keep fluff traits on the first page and for action like traits write "see Actions". Also include fluff traits on "Actions".
 * Refactor Actions to use damage die and bonus like weapons do
@@ -21,6 +22,43 @@ Long term:
 
 
 ### Changelog
+
+**August 10th 2015**
+
+* Spell filters
+* Removed HD note
+
+**26th July - August 5th 2015**
+
+* Revamp of spells:
+  * Toggles are all redone and can be changed in the future
+  * Added Emote
+  * Added higher level for damage and heal
+  * Split damage to attack damage and save damage
+  * Aoe split from target
+  * Save condition
+  * Save failure
+  * Revamped roll template to match these new changes. For the most part spells now use action stuff
+* Added Query macros for Saves, Checks, and Skills
+
+**25th July 2015**
+
+* Changed Custom Skills to the slider.
+* Removed Macro from weapons and actions.
+
+**24th July 2015**
+
+* Changed spell slots/points toggle to the same slider used on PC/NPC. Still unsure about the colors
+
+**23rd July 2015**
+
+* Initiative bonus can now text instead of just a number
+* Removed warning about settings changes
+* Made a new toggle for PC/NPC. The animation is super smooth outside of roll20, but in roll20 it is super laggy. I'll try to massage it more later.
+
+**22nd July 2015**
+
+* Weapon & Action Macro no longer outputs a blank line. (It cannot be toggled off - though it never could be)
 
 **14th July 2015**
 
