@@ -23,6 +23,11 @@ Long term:
 
 ### Changelog
 
+**26th July - August 10th 2015**
+
+* Spell filters
+* Removed HD note
+
 **26th July - August 5th 2015**
 
 * Revamp of spells:
