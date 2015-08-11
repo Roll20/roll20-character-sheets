@@ -4,6 +4,12 @@ This sheet is created for use in Stars Without Number on Roll20. Based on the ch
 
 ### Changelog
 
+#### 0.0.8
+
+* Fix errant initiative die.
+* Adds Roll Templates for all the roll buttons on the sheet.
+* Sets a default of '0' for all attribute bonus fields.
+
 #### 0.0.7
 
 * Add support for multiple tabs
@@ -47,5 +53,4 @@ This sheet is created for use in Stars Without Number on Roll20. Based on the ch
 
 Report any problems, suggestions or features by sending a private message on Roll20 or submitting an issue on Github.
 
-[Kevin the Barbarian](https://app.roll20.net/users/565104/kevin-the-barbarian) on Roll20
 [Joe Fredette](https://app.roll20.net/users/161749/joe-f) on Roll20
