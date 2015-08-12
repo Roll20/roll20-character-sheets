@@ -23,6 +23,11 @@ Long term:
 
 ### Changelog
 
+**August 12th 2015**
+
+* Renamed spell macro options to force it to update for some users which it wasn't updating for.
+* Added alt damage to weapons
+
 **August 11th 2015**
 
 * fixed global spell bonus damage - higher level stuff broke it.
