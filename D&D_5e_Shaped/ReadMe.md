@@ -23,6 +23,10 @@ Long term:
 
 ### Changelog
 
+**August 13th 2015**
+
+* hide GM info settings and styling
+
 **August 12th 2015**
 
 * Renamed spell macro options to force it to update for some users which it wasn't updating for.
