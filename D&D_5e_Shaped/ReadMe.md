@@ -23,6 +23,10 @@ Long term:
 
 ### Changelog
 
+**August 14th 2015**
+
+* output higher level query level to the roll template
+
 **August 13th 2015**
 
 * hide GM info settings and styling
