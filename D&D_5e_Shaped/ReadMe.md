@@ -5,7 +5,7 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 ### TODO
 
 Short Term:
-* Create a short view of spells. See https://app.roll20.net/forum/permalink/2281579/
+* Make spellfriendlylevel adjust based on query level if possible.
 * Actions: Allow for "Effects" to be whispered to the GM.
 * Revamp Traits. Keep fluff traits on the first page and for action like traits write "see Actions". Also include fluff traits on "Actions".
 * Refactor Actions to use damage die and bonus like weapons do
@@ -22,6 +22,15 @@ Long term:
 
 
 ### Changelog
+
+**August 12th 2015**
+
+* Renamed spell macro options to force it to update for some users which it wasn't updating for.
+* Added alt damage to weapons
+
+**August 11th 2015**
+
+* fixed global spell bonus damage - higher level stuff broke it.
 
 **August 10th 2015**
 
