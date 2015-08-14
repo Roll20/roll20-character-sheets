@@ -5,7 +5,8 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 ### TODO
 
 Short Term:
-* Make spellfriendlylevel adjust based on query level if possible.
+* Spell Crit damage should use higher level
+* Spell Crit damage should not roll 3D dice for secondary and other stuff that is toggled off.
 * Actions: Allow for "Effects" to be whispered to the GM.
 * Revamp Traits. Keep fluff traits on the first page and for action like traits write "see Actions". Also include fluff traits on "Actions".
 * Refactor Actions to use damage die and bonus like weapons do
@@ -22,6 +23,10 @@ Long term:
 
 
 ### Changelog
+
+**August 15th 2015**
+
+* Massive refactoring to all the toggle/tab buttons. They are all setup the same way now and have consistent padding. I have verified all the pages and I believe everything is still working
 
 **August 14th 2015**
 
