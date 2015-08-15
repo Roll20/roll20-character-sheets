@@ -28,6 +28,7 @@ Long term:
 
 * Massive refactoring to all the toggle/tab buttons. They are all setup the same way now and have consistent padding. I have verified all the pages and I believe everything is still working
 * Massive refactoring of the HTML structure for sheet-row stuff. Lots of changes. I've checked the whole UI and it all looks good, but I may have missed some things
+* Removed separate damage for the second crit. Both crits (normal and adv/dis) now show the same damage if both show.
 
 **August 14th 2015**
 
