@@ -336,7 +336,7 @@ gulp.task('preCompile', function() {
 				return duplicate(file, customClassCount, 1);
 			}
 		}))
-		.pipe( inject(gulp.src(['./components/spellbook/spell-page.html']), {
+		.pipe( inject(gulp.src(['./components/spells/spell-page.html']), {
 			starttag: '<!-- inject:spells:{{ext}} -->',
 			transform: function (filePath, file) {
 				return spell(file, spellCount);
