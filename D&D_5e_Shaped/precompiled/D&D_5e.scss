@@ -1,3 +1,9 @@
+$duration: .2s;
+$deepRed: #591209;
+$deepGreen: #51624b;
+$gray: #A19A91;
+$borderRadius: 4px;
+
 @mixin no-highlight() {
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
@@ -6,7 +12,7 @@
 	user-select: none;
 }
 
-@mixin toggleWidths($tab, $width, $padding) {
+@mixin tab-toggle($tab, $width, $padding) {
 	@if $padding == 'padding' {
 		$width: $width + 4;
 	}
@@ -20,11 +26,87 @@
 	}
 }
 
-$duration: .2s;
-$deepRed: #591209;
-$deepGreen: #51624b;
-$gray: #A19A91;
-$borderRadius: 4px;
+@mixin slide-toggle($name, $width, $height, $leftColor, $rightColor, $smallSides, $vertical) {
+	$multiplier: 2;
+	@if $smallSides {
+		$multiplier: 4;
+	}
+	input.sheet-slide-input-#{$name},
+	label.sheet-slide-toggle-#{$name} {
+		width: $width * $multiplier;
+		height: $height;
+	}
+	label.sheet-slide-toggle-#{$name} {
+		@if $vertical {
+			margin-top: -$height;
+		} @else {
+			margin-left: -$width * $multiplier;
+		}
+		line-height: $height;
+		.sheet-slide-cover {
+			@if $smallSides {
+				width: $width * 3;
+			} @else {
+				width: $width;
+			}
+			height: $height;
+			$volumeColor: darken($leftColor, 10);
+			box-shadow: 0 0.12em 0.01em rgba($volumeColor,1),
+			0 0.12em 0.3em rgba($volumeColor,0.6),
+			0 0.12em 2em rgba(0, 0, 0, 0.3),
+			-0.12em 0.15em 0.2em rgba(0, 0, 0, 0.2);
+		}
+	}
+	input[type='checkbox'].sheet-slide-input-#{$name} + label.sheet-slide-toggle-#{$name} {
+		.sheet-slide-cover {
+			background-color: $leftColor;
+			text-shadow: 0 0.05em 0 darken($leftColor, 05);
+			@if $smallSides {
+				margin-right: $width;
+			}
+		}
+		span[class^="sheet-slide-toggle-"] {
+			@if $smallSides {
+				width: 25%;
+			} @else {
+				width: 50%;
+			}
+			color: $leftColor;
+		}
+	}
+	span.sheet-slide-toggle-#{$name}-left {
+		@if $smallSides {
+			font-size: 11px;
+		}
+	}
+	span.sheet-slide-toggle-#{$name}-right {
+		@if $smallSides {
+			margin-left: 50%;
+			font-weight: bold;
+			font-size: 10px;
+		}
+	}
+	input[type='checkbox'].sheet-slide-input-#{$name}:checked + label.sheet-slide-toggle-#{$name} {
+		.sheet-slide-cover {
+			background-color: $rightColor;
+			@if $smallSides {
+				margin-right: 0;
+			} @else {
+				margin-right: $width;
+			}
+			border-bottom: 0.03em solid lighten($rightColor, 10);
+			text-shadow: 0 0.05em 0 darken($rightColor, 10);
+			$volumeColor: darken($rightColor, 10);
+			box-shadow: 0 0.12em 0.01em rgba($volumeColor,1),
+			0 0.12em 0.3em rgba($volumeColor,0.6),
+			0 0.12em 2em rgba(0, 0, 0, 0.3),
+			0.12em 0.15em 0.2em rgba(0, 0, 0, 0.2);
+		}
+		span[class^="sheet-slide-toggle-"] {
+			color: $rightColor;
+		}
+	}
+}
 
 *, .sheet-rolltemplate-5eDefault * {
 	box-sizing: border-box;
@@ -77,6 +159,17 @@ h4 {
 	padding: 1px;
 	margin-bottom: 2px;
 }
+
+select {
+	font-size: 90%;
+	padding-right: 0;
+	&.sheet-select-no-arrow {
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		appearance: none;
+	}
+}
+
 input[type=number],
 input[type=text],
 select,
@@ -103,7 +196,6 @@ input[type=number] {
 	text-align: center;
 }
 
-
 input[disabled],
 input.sheet-pseudo-disabled,
 input[type=number].sheet-no-spin {
@@ -124,10 +216,6 @@ input[disabled]::-webkit-outer-spin-button {
 	margin: 0;
 }
 
-select {
-	font-size: 90%;
-	padding-right: 0;
-}
 .sheet-float-right {
 	float: right;
 }
@@ -509,7 +597,6 @@ input[disabled].sheet-passive-skill-score {
 		appearance: none;
 
 		&.sheet-skills-attribute-selector {
-			font-size: 9px;
 			height: 11px;
 			width: 25px !important;
 			border-bottom: 0;
@@ -519,12 +606,6 @@ input[disabled].sheet-passive-skill-score {
 			background: transparent;
 		}
 	}
-}
-
-select.sheet-select-no-arrow {
-	-webkit-appearance: none;
-	-moz-appearance: none;
-	appearance: none;
 }
 
 .sheet-skills-attribute-selector-wrapper {
@@ -1072,103 +1153,103 @@ div[class*="sheet-toggle-"] {
 	display: none;
 }
 
-@include toggleWidths('page-core', 32px, 'padding');
-@include toggleWidths('page-weapons', 57px, 'padding');
-@include toggleWidths('page-actions', 96px, 'padding');
-@include toggleWidths('page-spells', 39px, 'padding');
-@include toggleWidths('page-class', 37px, 'padding');
-@include toggleWidths('page-armor', 41px, 'padding');
-@include toggleWidths('page-inventory', 58px, 'padding');
-@include toggleWidths('page-background', 74px, 'padding');
-@include toggleWidths('page-settings', 15px, 'padding');
-@include toggleWidths('page-98', 53px, 'padding');
-@include toggleWidths('page-99', 53px, 'padding');
+@include tab-toggle('page-core', 32px, 'padding');
+@include tab-toggle('page-weapons', 57px, 'padding');
+@include tab-toggle('page-actions', 96px, 'padding');
+@include tab-toggle('page-spells', 39px, 'padding');
+@include tab-toggle('page-class', 37px, 'padding');
+@include tab-toggle('page-armor', 41px, 'padding');
+@include tab-toggle('page-inventory', 58px, 'padding');
+@include tab-toggle('page-background', 74px, 'padding');
+@include tab-toggle('page-settings', 15px, 'padding');
+@include tab-toggle('page-98', 53px, 'padding');
+@include tab-toggle('page-99', 53px, 'padding');
 
-@include toggleWidths('traits', 32px, 'padding');
-@include toggleWidths('regional-effects', 91px, 'padding');
-@include toggleWidths('lair-actions', 66px, 'padding');
-@include toggleWidths('legendary-actions', 104px, 'padding');
-@include toggleWidths('reactions', 57px, 'padding');
-@include toggleWidths('multiattack', 60px, 'padding');
-@include toggleWidths('actions', 42px, 'padding');
-@include toggleWidths('melee-weapons', 36 + 8px, 'padding');
-@include toggleWidths('ranged-weapons', 46 + 8px, 'padding');
-@include toggleWidths('old-weapons', 21 + 8px, 'padding');
-@include toggleWidths('quick-weapons', 33 + 8px, 'padding');
+@include tab-toggle('traits', 32px, 'padding');
+@include tab-toggle('regional-effects', 91px, 'padding');
+@include tab-toggle('lair-actions', 66px, 'padding');
+@include tab-toggle('legendary-actions', 104px, 'padding');
+@include tab-toggle('reactions', 57px, 'padding');
+@include tab-toggle('multiattack', 60px, 'padding');
+@include tab-toggle('actions', 42px, 'padding');
+@include tab-toggle('melee-weapons', 36 + 8px, 'padding');
+@include tab-toggle('ranged-weapons', 46 + 8px, 'padding');
+@include tab-toggle('old-weapons', 21 + 8px, 'padding');
+@include tab-toggle('quick-weapons', 33 + 8px, 'padding');
 
 $toggle-inventory-width: 24.3%;
-@include toggleWidths('inventory-1', $toggle-inventory-width, 'noPadding');
-@include toggleWidths('inventory-2', $toggle-inventory-width, 'noPadding');
-@include toggleWidths('inventory-3', $toggle-inventory-width, 'noPadding');
-@include toggleWidths('inventory-99', $toggle-inventory-width, 'noPadding');
+@include tab-toggle('inventory-1', $toggle-inventory-width, 'noPadding');
+@include tab-toggle('inventory-2', $toggle-inventory-width, 'noPadding');
+@include tab-toggle('inventory-3', $toggle-inventory-width, 'noPadding');
+@include tab-toggle('inventory-99', $toggle-inventory-width, 'noPadding');
 
 $tab-class-width: 155px;
-@include toggleWidths('class-action-1', $tab-class-width, 'noPadding');
-@include toggleWidths('class-action-2', $tab-class-width, 'noPadding');
-@include toggleWidths('class-action-99', $tab-class-width, 'noPadding');
+@include tab-toggle('class-action-1', $tab-class-width, 'noPadding');
+@include tab-toggle('class-action-2', $tab-class-width, 'noPadding');
+@include tab-toggle('class-action-99', $tab-class-width, 'noPadding');
 
 $tab-hd-single-digit-width: 16px;
 $tab-hd-double-digit-width: 20px;
-@include toggleWidths('hd-d4', $tab-hd-single-digit-width, 'noPadding');
-@include toggleWidths('hd-d6', $tab-hd-single-digit-width, 'noPadding');
-@include toggleWidths('hd-d8', $tab-hd-single-digit-width, 'noPadding');
-@include toggleWidths('hd-d10', $tab-hd-double-digit-width, 'noPadding');
-@include toggleWidths('hd-d12', $tab-hd-double-digit-width, 'noPadding');
-@include toggleWidths('hd-d20', $tab-hd-double-digit-width, 'noPadding');
+@include tab-toggle('hd-d4', $tab-hd-single-digit-width, 'noPadding');
+@include tab-toggle('hd-d6', $tab-hd-single-digit-width, 'noPadding');
+@include tab-toggle('hd-d8', $tab-hd-single-digit-width, 'noPadding');
+@include tab-toggle('hd-d10', $tab-hd-double-digit-width, 'noPadding');
+@include tab-toggle('hd-d12', $tab-hd-double-digit-width, 'noPadding');
+@include tab-toggle('hd-d20', $tab-hd-double-digit-width, 'noPadding');
 
 $tab-spell-page-width: 8.6%;
-@include toggleWidths('spells-page-0', $tab-spell-page-width, 'noPadding');
-@include toggleWidths('spells-page-1', $tab-spell-page-width, 'noPadding');
-@include toggleWidths('spells-page-2', $tab-spell-page-width, 'noPadding');
-@include toggleWidths('spells-page-3', $tab-spell-page-width, 'noPadding');
-@include toggleWidths('spells-page-4', $tab-spell-page-width, 'noPadding');
-@include toggleWidths('spells-page-5', $tab-spell-page-width, 'noPadding');
-@include toggleWidths('spells-page-6', $tab-spell-page-width, 'noPadding');
-@include toggleWidths('spells-page-7', $tab-spell-page-width, 'noPadding');
-@include toggleWidths('spells-page-8', $tab-spell-page-width, 'noPadding');
-@include toggleWidths('spells-page-9', $tab-spell-page-width, 'noPadding');
-@include toggleWidths('spells-page-99', $tab-spell-page-width, 'noPadding');
+@include tab-toggle('spells-page-0', $tab-spell-page-width, 'noPadding');
+@include tab-toggle('spells-page-1', $tab-spell-page-width, 'noPadding');
+@include tab-toggle('spells-page-2', $tab-spell-page-width, 'noPadding');
+@include tab-toggle('spells-page-3', $tab-spell-page-width, 'noPadding');
+@include tab-toggle('spells-page-4', $tab-spell-page-width, 'noPadding');
+@include tab-toggle('spells-page-5', $tab-spell-page-width, 'noPadding');
+@include tab-toggle('spells-page-6', $tab-spell-page-width, 'noPadding');
+@include tab-toggle('spells-page-7', $tab-spell-page-width, 'noPadding');
+@include tab-toggle('spells-page-8', $tab-spell-page-width, 'noPadding');
+@include tab-toggle('spells-page-9', $tab-spell-page-width, 'noPadding');
+@include tab-toggle('spells-page-99', $tab-spell-page-width, 'noPadding');
 
-@include toggleWidths('spells-filter-condensed', 56px, 'padding');
-@include toggleWidths('spells-filter-prepared', 45px, 'padding');
-@include toggleWidths('spells-prep-con-rit-prepared', 45px, 'padding');
-@include toggleWidths('spells-filter-ritual', 28px, 'padding');
-@include toggleWidths('spells-prep-con-rit-ritual', 28px, 'padding');
-@include toggleWidths('spells-filter-concentration', 67px, 'padding');
-@include toggleWidths('spells-prep-con-rit-concentration', 67px, 'padding');
-@include toggleWidths('spells-filter-verbal', 32px, 'padding');
-@include toggleWidths('spells-filter-somatic', 39px, 'padding');
-@include toggleWidths('spells-filter-material', 38px, 'padding');
+@include tab-toggle('spells-filter-condensed', 56px, 'padding');
+@include tab-toggle('spells-filter-prepared', 45px, 'padding');
+@include tab-toggle('spells-prep-con-rit-prepared', 45px, 'padding');
+@include tab-toggle('spells-filter-ritual', 28px, 'padding');
+@include tab-toggle('spells-prep-con-rit-ritual', 28px, 'padding');
+@include tab-toggle('spells-filter-concentration', 67px, 'padding');
+@include tab-toggle('spells-prep-con-rit-concentration', 67px, 'padding');
+@include tab-toggle('spells-filter-verbal', 32px, 'padding');
+@include tab-toggle('spells-filter-somatic', 39px, 'padding');
+@include tab-toggle('spells-filter-material', 38px, 'padding');
 
-@include toggleWidths('emote', 32px, 'padding');
-@include toggleWidths('attack', 31px, 'padding');
-@include toggleWidths('reach', 32px, 'padding');
-@include toggleWidths('range', 33px, 'padding');
-@include toggleWidths('target', 32px, 'padding');
-@include toggleWidths('ammo', 31px, 'padding');
-@include toggleWidths('ammo-auto', 24px, 'padding');
-@include toggleWidths('damage', 23px, 'padding');
-@include toggleWidths('sv-damage', 23px, 'padding');
-@include toggleWidths('alt-damage', 14px, 'padding');
-@include toggleWidths('second-damage', 52px, 'padding');
-@include toggleWidths('sv-second-damage', 52px, 'padding');
-@include toggleWidths('crit', 17px, 'padding');
-@include toggleWidths('crit-bonus', 32px, 'padding');
-@include toggleWidths('bonus', 32px, 'padding');
-@include toggleWidths('bonuses', 43px, 'padding');
-@include toggleWidths('spell-vsm-v', 9px, 'padding');
-@include toggleWidths('spell-vsm-s', 9px, 'padding');
-@include toggleWidths('spell-vsm-m', 9px, 'padding');
-@include toggleWidths('description', 53px, 'padding');
-@include toggleWidths('spell-higherlvl', 48px, 'padding');
-@include toggleWidths('spell-higherlvl-query', 79px, 'padding');
-@include toggleWidths('spell-output-higherlvl-query', 34px, 'padding');
-@include toggleWidths('save', 26px, 'padding');
-@include toggleWidths('heal', 23px, 'padding');
-@include toggleWidths('effects', 34px, 'padding');
-@include toggleWidths('spell-source', 35px, 'padding');
-@include toggleWidths('spell-from', 25px, 'padding');
-@include toggleWidths('recharge', 47px, 'padding');
+@include tab-toggle('emote', 32px, 'padding');
+@include tab-toggle('attack', 31px, 'padding');
+@include tab-toggle('reach', 32px, 'padding');
+@include tab-toggle('range', 33px, 'padding');
+@include tab-toggle('target', 32px, 'padding');
+@include tab-toggle('ammo', 31px, 'padding');
+@include tab-toggle('ammo-auto', 24px, 'padding');
+@include tab-toggle('damage', 23px, 'padding');
+@include tab-toggle('sv-damage', 23px, 'padding');
+@include tab-toggle('alt-damage', 14px, 'padding');
+@include tab-toggle('second-damage', 52px, 'padding');
+@include tab-toggle('sv-second-damage', 52px, 'padding');
+@include tab-toggle('crit', 17px, 'padding');
+@include tab-toggle('crit-bonus', 32px, 'padding');
+@include tab-toggle('bonus', 32px, 'padding');
+@include tab-toggle('bonuses', 43px, 'padding');
+@include tab-toggle('spell-vsm-v', 9px, 'padding');
+@include tab-toggle('spell-vsm-s', 9px, 'padding');
+@include tab-toggle('spell-vsm-m', 9px, 'padding');
+@include tab-toggle('description', 53px, 'padding');
+@include tab-toggle('spell-higherlvl', 48px, 'padding');
+@include tab-toggle('spell-higherlvl-query', 79px, 'padding');
+@include tab-toggle('spell-output-higherlvl-query', 34px, 'padding');
+@include tab-toggle('save', 26px, 'padding');
+@include tab-toggle('heal', 23px, 'padding');
+@include tab-toggle('effects', 34px, 'padding');
+@include tab-toggle('spell-source', 35px, 'padding');
+@include tab-toggle('spell-from', 25px, 'padding');
+@include tab-toggle('recharge', 47px, 'padding');
 
 .sheet-en,
 .sheet-de {
@@ -1418,88 +1499,6 @@ label[class^='sheet-slide-toggle-'] {
 		display: inline-block;
 		text-align: center;
 		transition: all $duration ease-in-out;
-	}
-}
-
-@mixin slide-toggle($name, $width, $height, $leftColor, $rightColor, $smallSides, $vertical) {
-	$multiplier: 2;
-	@if $smallSides {
-		$multiplier: 4;
-	}
-	input.sheet-slide-input-#{$name},
-	label.sheet-slide-toggle-#{$name} {
-		width: $width * $multiplier;
-		height: $height;
-	}
-	label.sheet-slide-toggle-#{$name} {
-		@if $vertical {
-			margin-top: -$height;
-		} @else {
-			margin-left: -$width * $multiplier;
-		}
-		line-height: $height;
-		.sheet-slide-cover {
-			@if $smallSides {
-				width: $width * 3;
-			} @else {
-				width: $width;
-			}
-			height: $height;
-			$volumeColor: darken($leftColor, 10);
-			box-shadow: 0 0.12em 0.01em rgba($volumeColor,1),
-			0 0.12em 0.3em rgba($volumeColor,0.6),
-			0 0.12em 2em rgba(0, 0, 0, 0.3),
-			-0.12em 0.15em 0.2em rgba(0, 0, 0, 0.2);
-		}
-	}
-	input[type='checkbox'].sheet-slide-input-#{$name} + label.sheet-slide-toggle-#{$name} {
-		.sheet-slide-cover {
-			background-color: $leftColor;
-			text-shadow: 0 0.05em 0 darken($leftColor, 05);
-			@if $smallSides {
-				margin-right: $width;
-			}
-		}
-		span[class^="sheet-slide-toggle-"] {
-			@if $smallSides {
-				width: 25%;
-			} @else {
-				width: 50%;
-			}
-			color: $leftColor;
-		}
-	}
-	span.sheet-slide-toggle-#{$name}-left {
-		@if $smallSides {
-			font-size: 11px;
-		}
-	}
-	span.sheet-slide-toggle-#{$name}-right {
-		@if $smallSides {
-			margin-left: 50%;
-			font-weight: bold;
-			font-size: 10px;
-		}
-	}
-	input[type='checkbox'].sheet-slide-input-#{$name}:checked + label.sheet-slide-toggle-#{$name} {
-		.sheet-slide-cover {
-			background-color: $rightColor;
-			@if $smallSides {
-				margin-right: 0;
-			} @else {
-				margin-right: $width;
-			}
-			border-bottom: 0.03em solid lighten($rightColor, 10);
-			text-shadow: 0 0.05em 0 darken($rightColor, 10);
-			$volumeColor: darken($rightColor, 10);
-			box-shadow: 0 0.12em 0.01em rgba($volumeColor,1),
-			0 0.12em 0.3em rgba($volumeColor,0.6),
-			0 0.12em 2em rgba(0, 0, 0, 0.3),
-			0.12em 0.15em 0.2em rgba(0, 0, 0, 0.2);
-		}
-		span[class^="sheet-slide-toggle-"] {
-			color: $rightColor;
-		}
 	}
 }
 
