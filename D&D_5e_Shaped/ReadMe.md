@@ -4,9 +4,15 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### TODO
 
-* Try to make settings global
-* Revamp Traits. Keep fluff traits on the first page and for action like traits write "see Actions". Also include fluff traits on "Actions".
+Short Term:
+* Make spellfriendlylevel adjust based on query level if possible.
 * Actions: Allow for "Effects" to be whispered to the GM.
+* Revamp Traits. Keep fluff traits on the first page and for action like traits write "see Actions". Also include fluff traits on "Actions".
+* Refactor Actions to use damage die and bonus like weapons do
+
+Long term:
+* Explore icons for damage types/resistances/etc https://app.roll20.net/forum/post/2110339/icons-for-damage-types-5e
+* Add saves and other stuff to class actions.
 * Make spells automatically reduce the amount left
 * Add "Conditions" that make sheet-wide changes when a condition is toggled.
 * Use the new roll templates greater than to enhance ac targeting. https://app.roll20.net/forum/post/1977290/update-5-slash-20-improved-player-directory-and-new-roll-template-features
@@ -16,6 +22,123 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 
 ### Changelog
+
+**August 12th 2015**
+
+* Renamed spell macro options to force it to update for some users which it wasn't updating for.
+* Added alt damage to weapons
+
+**August 11th 2015**
+
+* fixed global spell bonus damage - higher level stuff broke it.
+
+**August 10th 2015**
+
+* Spell filters
+* Removed HD note
+
+**26th July - August 5th 2015**
+
+* Revamp of spells:
+  * Toggles are all redone and can be changed in the future
+  * Added Emote
+  * Added higher level for damage and heal
+  * Split damage to attack damage and save damage
+  * Aoe split from target
+  * Save condition
+  * Save failure
+  * Revamped roll template to match these new changes. For the most part spells now use action stuff
+* Added Query macros for Saves, Checks, and Skills
+
+**25th July 2015**
+
+* Changed Custom Skills to the slider.
+* Removed Macro from weapons and actions.
+
+**24th July 2015**
+
+* Changed spell slots/points toggle to the same slider used on PC/NPC. Still unsure about the colors
+
+**23rd July 2015**
+
+* Initiative bonus can now text instead of just a number
+* Removed warning about settings changes
+* Made a new toggle for PC/NPC. The animation is super smooth outside of roll20, but in roll20 it is super laggy. I'll try to massage it more later.
+
+**22nd July 2015**
+
+* Weapon & Action Macro no longer outputs a blank line. (It cannot be toggled off - though it never could be)
+
+**14th July 2015**
+
+* Spell points are now a different field. Was a bug.
+
+**13th July 2015**
+
+* Bonus crit damage is now added via the bonus crit toggle instead of the bonuses toggle.
+
+**12th July 2015**
+
+* Added back a blank variable because repeating sections are bad.
+
+**11th July 2015**
+
+Most of the changes are to allow for a spell importer that is in the works on my API script. Components is for the API and for cosmetic purposes.
+* Spells now have V,S,M toggles. The old syntax will still work as well (it appears in the materials field, but it is still named the same for compatability)
+* Added Spell Source so you can show where it's from (Example: "phb 241", "ee pc 20"). Also has a toggle. It appears in the header of the roll template.
+* Moved "Gained from" under a toggle
+
+**3rd July 2015**
+
+* Updated target name to show the token's name, not the character name
+* Small UI adjustments (Quick Resources, header padding, quick spell stuff)
+
+**2nd July 2015**
+
+* Fixed the HTML of spells so they no longer break any pages after it
+* (Dev) cleaned the tabs to use more consistent css
+* (Dev) small cleanup based on html vaidation (value on textareas removed, step on input type text removed)
+* Added a toggle to show HD rows
+* Slightly decreased the height of the speed wrap box (5px)
+* Added a notation so spell slots are current/max. Also changed color of the tab.
+* Added attacks and saves vs target's name with a setting and API support.  Removed from TODO
+
+**1st July 2015**
+
+* Weapons and Actions will automatically have crit turned on by default.
+* Fixed several bugs - quick melee has "button" printed. Melee attacks had an error where no bonuses were being added.
+* Refactored spells' buttons to match the styling of weapons and actions.
+
+**30th June 2015**
+
+* Change of how the line break for macro works for weapons and actions. Tried to set it up 
+* Added custom gold values. See https://app.roll20.net/forum/post/2016392/#post-2126410  Removed from my TODO.
+* Added Multiattack to the roll template. See See https://app.roll20.net/forum/post/2016392/#post-2128439  Removed from my TODO.
+* Second damage bonus for weapons was not being calculated. Fixed that.
+* Weapon bonuses do not apply unless bonuses is checked. Applied to to hit bonus, dmg bonus, secondary dmg bonus, bonus crit dmg.  Removed from my TODO.
+
+**29th June 2015**
+
+* Added a setting to always hide initiative
+* Refactored the settings page completely. See https://app.roll20.net/forum/post/2016392/#post-2128397 Removed from my TODO.
+
+**26th June 2015**
+
+* Macro was added to Actions by Lucian.
+
+**25th June 2015**
+
+* Fixed delete buttons so they show on spellbook and quick class resources.
+* Added Class Actions to the Core page for PC sheets
+
+**24th June 2015**
+
+* Added Class Resources to the Core page for PC sheets
+* Added "Loot" to the Core page for NPC sheets
+
+**23rd June 2015**
+
+* Added output all to the roll template
 
 **22nd June 2015**
 
@@ -356,23 +479,25 @@ First release of the redesigned sheet.
 
 ### Future Changes
 
-* The NPC sheet is my top priority after I fix any remaining issues with the PC sheet.
-* I plan to use something similar to "Weapons" for NPC attacks. I'll include open ended actions for more complex attacks, but most are fairly straight forward. I'm also looking to have a field that is always whispered to the GM for information like the DC of a save.
 * Custom settings: I'm willing to add custom options/variants as long as they are technically feasible and can be hidden away without effecting users who do not want it.
 
 ### Requests and issues
 
-As mentioned above please include the "Shaped" term when posting about this sheet. I will do my best to respond to posts. You can also open issues on ​github or contact me by PM, Twitter (@mlenser), gchat, or skype. If you have ideas/suggestions or want to work together I'm quite open.
+Please include the "Shaped" term when posting about this sheet. I will do my best to respond to posts here. You can also open issues on github or contact me by PM, Twitter (@mlenser), gchat, or skype. If you have ideas/suggestions or want to work together I'm quite open.
 
 ### ​Differences between this version and the current version
 
-​I plan to watch the current version and port the changes to my version.
-​
-### Reason for a new sheet
+PCs remain mostly the same. Things that have changed:
 
-​I was looking to add some custom options to the sheet (Whispering Death Saves to the GM), but it did not work out with the current developer. As a result I decided to create my own sheet. As a result I examined how the sheet is currently a bit hard to get information at a glance so I decided to redesign it as listed above.​
+* Armor
+* Vision
+* Spell Prepared, Ritual, Concentration
+* Class specific
+* * Expertise
+* * Jack of All Trades (retoggle it in 1 place)
+* * NPCs lose most everything, but the old NPC sheet is still included and you can use conversion/import scripts.
+
 
 ---
 
 Mark Lenser ([@mlenser](https://app.roll20.net/users/277007/mark) on roll20)
-
