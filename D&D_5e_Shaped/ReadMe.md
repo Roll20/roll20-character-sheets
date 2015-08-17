@@ -24,6 +24,16 @@ Long term:
 
 ### Changelog
 
+**August 17th 2015**
+
+* Moved speed up to the header.
+* Styled jack of all trades to be a button
+* Fixed ammo in roll template for new weapons
+
+**August 16th 2015**
+
+* CSS Cleanup
+
 **August 15th 2015**
 
 * Massive refactoring to all the toggle/tab buttons. They are all setup the same way now and have consistent padding. I have verified all the pages and I believe everything is still working
