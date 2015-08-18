@@ -24,6 +24,11 @@ Long term:
 
 ### Changelog
 
+**August 18th 2015**
+
+* Altered query macros to remove "selected"
+* Fixed multiattack macro to not display all the data
+
 **August 17th 2015**
 
 * Moved speed up to the header.
