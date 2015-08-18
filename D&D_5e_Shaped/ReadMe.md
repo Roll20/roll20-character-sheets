@@ -28,6 +28,7 @@ Long term:
 
 * Altered query macros to remove "selected"
 * Fixed multiattack macro to not display all the data
+* Add Range to melee weapons for thrown weapons
 
 **August 17th 2015**
 
