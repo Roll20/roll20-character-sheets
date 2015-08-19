@@ -24,6 +24,10 @@ Long term:
 
 ### Changelog
 
+**August 19th 2015**
+
+* Added casting time toggle. You can now toggle spells based on their casting time. Spells default to "1 action", but can be changed to "1 reaction", "1 bonus action", "1 minute" or "longer" which allows for any input. The roll template will always show the new value. The old value will be shown for a time (with a red error to tell you to fix it), but it will be removed soon.
+
 **August 18th 2015**
 
 * Altered query macros to remove "selected"
