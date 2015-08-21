@@ -94,6 +94,9 @@ This will create `13th_Age-neovatar.[css|html]` that you can copy and paste into
 
 ### Changelog
 
+**1.3.1:**
+  * fixed minor spelling typo
+
 **1.3.0:**
 
   * modified power template text style (justify instead of center)
