@@ -155,9 +155,9 @@ function saveQuery(file) {
 	var template = file.contents.toString('utf8'),
 		query = '';
 
-	for (var i = 0, len = abilitiesName.length; i < len; ++i) {
+	for (var i = 0; i < abilitiesName.length; ++i) {
 		var ability = abilitiesName[i];
-		query += '|' + ability + ', &amp;#123;&amp;#123;title=' + ability + '&amp;#125;&amp;#125; &amp;#123;&amp;#123;roll=[[d20@{selected|d20_mod} + @{selected|' + ability.toLowerCase() + '_save_mod}]]&amp;#125;&amp;#125; &amp;#123;&amp;#123;rolladv=[[d20@{selected|d20_mod} + @{selected|' + ability.toLowerCase() + '_save_mod}]]&amp;#125;&amp;#125;'
+		query += '|' + ability + ', &amp;#123;&amp;#123;title=' + ability + '&amp;#125;&amp;#125; &amp;#123;&amp;#123;roll=[[d20@{d20_mod} + @{' + ability.toLowerCase() + '_save_mod}]]&amp;#125;&amp;#125; &amp;#123;&amp;#123;rolladv=[[d20@{d20_mod} + @{' + ability.toLowerCase() + '_save_mod}]]&amp;#125;&amp;#125;'
 	}
 	template = template.replace(/\x7B\x7BsaveQuery\x7D\x7D/g, query);
 
@@ -168,9 +168,9 @@ function checkQuery(file) {
 	var template = file.contents.toString('utf8'),
 		query = '';
 
-	for (var i = 0, len = abilitiesName.length; i < len; ++i) {
+	for (var i = 0; i < abilitiesName.length; ++i) {
 		var ability = abilitiesName[i];
-		query += '|' + ability + ', &amp;#123;&amp;#123;title=' + ability + '&amp;#125;&amp;#125; &amp;#123;&amp;#123;roll=[[d20@{selected|d20_mod} + @{selected|basic_' + ability.toLowerCase() + '_check_mod}]]&amp;#125;&amp;#125; &amp;#123;&amp;#123;rolladv=[[d20@{selected|d20_mod} + @{selected|basic_' + ability.toLowerCase() + '_check_mod}]]&amp;#125;&amp;#125;'
+		query += '|' + ability + ', &amp;#123;&amp;#123;title=' + ability + '&amp;#125;&amp;#125; &amp;#123;&amp;#123;roll=[[d20@{d20_mod} + @{basic_' + ability.toLowerCase() + '_check_mod}]]&amp;#125;&amp;#125; &amp;#123;&amp;#123;rolladv=[[d20@{d20_mod} + @{basic_' + ability.toLowerCase() + '_check_mod}]]&amp;#125;&amp;#125;'
 	}
 	template = template.replace(/\x7B\x7BcheckQuery\x7D\x7D/g, query);
 
@@ -183,18 +183,33 @@ function skillQuery(file) {
 		query = '';
 
 	skillsJson.forEach(function(skill) {
-		query += '|' + skill.name + ', &amp;#123;&amp;#123;title=' + skill.name + '&amp;#125;&amp;#125; &amp;#123;&amp;#123;roll=[[d20@{selected|d20_mod} + @{selected|' + skill.name.lowercase().replace(/ +/g, '') + '}]]&amp;#125;&amp;#125; &amp;#123;&amp;#123;rolladv=[[d20@{selected|d20_mod} + @{selected|' + skill.name.lowercase().replace(/ +/g, '') + '}]]&amp;#125;&amp;#125;'
+		query += '|' + skill.name + ', &amp;#123;&amp;#123;title=' + skill.name + '&amp;#125;&amp;#125; &amp;#123;&amp;#123;roll=[[d20@{d20_mod} + @{' + skill.name.lowercase().replace(/ +/g, '') + '}]]&amp;#125;&amp;#125; &amp;#123;&amp;#123;rolladv=[[d20@{d20_mod} + @{' + skill.name.lowercase().replace(/ +/g, '') + '}]]&amp;#125;&amp;#125;'
 	});
 	for (var i = 1, len = customSkillCount; i <= len; ++i) {
-		query += '|@{custom_skill_' + i + '_name}, &amp;#123;&amp;#123;title=@{custom_skill_' + i + '_name}&amp;#125;&amp;#125; &amp;#123;&amp;#123;roll=[[d20@{selected|d20_mod} + @{selected|custom_skill_' + i + '}]]&amp;#125;&amp;#125; &amp;#123;&amp;#123;rolladv=[[d20@{selected|d20_mod} + @{selected|custom_skill_' + i + '}]]&amp;#125;&amp;#125;'
-	}
+		var skillName = '@{custom_skill_' + i + '_name}';
 
+		query += '|' + skillName + ', &amp;#123;&amp;#123;title=' + skillName + '&amp;#125;&amp;#125; &amp;#123;&amp;#123;roll=[[d20@{d20_mod} + @{custom_skill_' + i + '}]]&amp;#125;&amp;#125; &amp;#123;&amp;#123;rolladv=[[d20@{d20_mod} + @{custom_skill_' + i + '}]]&amp;#125;&amp;#125;'
+	}
 
 	template = template.replace(/\x7B\x7BcheckQuery\x7D\x7D/g, query);
 
+	return template;
+}
+
+function meleeQuery(file) {
+	var template = file.contents.toString('utf8'),
+		query = '';
+
+	for (var i = 0; i < weaponCount; ++i) {
+		var weaponName = '@{repeating_weapons_melee_' + i + '_name}';
+
+		query += '|' + weaponName + ', &amp;#123;&amp;#123;title=' + weaponName + '&amp;#125;&amp;#125;'
+	}
+	template = template.replace(/\x7B\x7BmeleeQuery\x7D\x7D/g, query);
 
 	return template;
 }
+
 
 function ordinal(d) {
 	if(d>3 && d<21) return 'th';
@@ -336,7 +351,7 @@ gulp.task('preCompile', function() {
 				return duplicate(file, customClassCount, 1);
 			}
 		}))
-		.pipe( inject(gulp.src(['./components/spellbook/spell-page.html']), {
+		.pipe( inject(gulp.src(['./components/spells/spell-page.html']), {
 			starttag: '<!-- inject:spells:{{ext}} -->',
 			transform: function (filePath, file) {
 				return spell(file, spellCount);
@@ -382,6 +397,12 @@ gulp.task('preCompile', function() {
 			starttag: '<!-- inject:skillQuery:{{ext}} -->',
 			transform: function (filePath, file) {
 				return skillQuery(file);
+			}
+		}))
+		.pipe( inject(gulp.src(['./components/macros/weapons/melee.html']), {
+			starttag: '<!-- inject:meleeWeaponQuery:{{ext}} -->',
+			transform: function (filePath, file) {
+				return meleeQuery(file);
 			}
 		}))
 		.pipe(minifyHTML({

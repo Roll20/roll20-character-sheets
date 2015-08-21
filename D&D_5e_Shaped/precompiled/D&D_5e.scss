@@ -1,3 +1,9 @@
+$duration: .2s;
+$deepRed: #591209;
+$deepGreen: #51624b;
+$gray: #A19A91;
+$borderRadius: 4px;
+
 @mixin no-highlight() {
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
@@ -6,42 +12,139 @@
 	user-select: none;
 }
 
-$duration: .2s;
-$deepRed: #591209;
-$deepGreen: #51624b;
-$gray: #A19A91;
-$borderRadius: 4px;
+@mixin tab-toggle($tab, $width, $padding) {
+	@if $padding == 'padding' {
+		$width: $width + 4;
+	}
+
+	input.sheet-toggle-#{$tab},
+	span.sheet-toggle-#{$tab} {
+		width: $width;
+	}
+	span.sheet-toggle-#{$tab} {
+		margin-left: -$width;
+	}
+}
+
+@mixin slide-toggle($name, $width, $height, $leftColor, $rightColor, $smallSides, $vertical) {
+	$multiplier: 2;
+	@if $smallSides {
+		$multiplier: 4;
+	}
+	input.sheet-slide-input-#{$name},
+	label.sheet-slide-toggle-#{$name} {
+		width: $width * $multiplier;
+		height: $height;
+	}
+	label.sheet-slide-toggle-#{$name} {
+		@if $vertical {
+			margin-top: -$height;
+		} @else {
+			margin-left: -$width * $multiplier;
+		}
+		line-height: $height;
+		.sheet-slide-cover {
+			@if $smallSides {
+				width: $width * 3;
+			} @else {
+				width: $width;
+			}
+			height: $height;
+			$volumeColor: darken($leftColor, 10);
+			box-shadow: 0 0.12em 0.01em rgba($volumeColor,1),
+			0 0.12em 0.3em rgba($volumeColor,0.6),
+			0 0.12em 2em rgba(0, 0, 0, 0.3),
+			-0.12em 0.15em 0.2em rgba(0, 0, 0, 0.2);
+		}
+	}
+	input[type='checkbox'].sheet-slide-input-#{$name} + label.sheet-slide-toggle-#{$name} {
+		.sheet-slide-cover {
+			background-color: $leftColor;
+			text-shadow: 0 0.05em 0 darken($leftColor, 05);
+			@if $smallSides {
+				margin-right: $width;
+			}
+		}
+		span[class^="sheet-slide-toggle-"] {
+			@if $smallSides {
+				width: 25%;
+			} @else {
+				width: 50%;
+			}
+			color: $leftColor;
+		}
+	}
+	span.sheet-slide-toggle-#{$name}-left {
+		@if $smallSides {
+			font-size: 11px;
+		}
+	}
+	span.sheet-slide-toggle-#{$name}-right {
+		@if $smallSides {
+			margin-left: 50%;
+			font-weight: bold;
+			font-size: 10px;
+		}
+	}
+	input[type='checkbox'].sheet-slide-input-#{$name}:checked + label.sheet-slide-toggle-#{$name} {
+		.sheet-slide-cover {
+			background-color: $rightColor;
+			@if $smallSides {
+				margin-right: 0;
+			} @else {
+				margin-right: $width;
+			}
+			border-bottom: 0.03em solid lighten($rightColor, 10);
+			text-shadow: 0 0.05em 0 darken($rightColor, 10);
+			$volumeColor: darken($rightColor, 10);
+			box-shadow: 0 0.12em 0.01em rgba($volumeColor,1),
+			0 0.12em 0.3em rgba($volumeColor,0.6),
+			0 0.12em 2em rgba(0, 0, 0, 0.3),
+			0.12em 0.15em 0.2em rgba(0, 0, 0, 0.2);
+		}
+		span[class^="sheet-slide-toggle-"] {
+			color: $rightColor;
+		}
+	}
+}
 
 *, .sheet-rolltemplate-5eDefault * {
 	box-sizing: border-box;
-}
-.sheet-overall-wrapper {
-	min-width: 834px;
+	line-height: 100%;
 }
 
 input, select, textarea,
 [class*="sheet-col"] {
 	font-size: 12px;
 }
-button[type=roll] {
-	font-size: 12px !important;
-	padding-top: 1px !important;
-	padding-bottom: 1px !important;
-	background-color: #2C608C;
-	border-radius: $borderRadius;
-	border: 1px solid;
-	border-color: #265379;
-	color: white;
-	background-image: linear-gradient(rgba(255,255,255,.3), rgba(255,255,255,0));
-	text-shadow: 0 1px 1px rgba(0,0,0,0.75);
+button {
+	&[type=roll] {
+		font-size: 12px !important;
+		padding-top: 1px !important;
+		padding-bottom: 1px !important;
+		background-color: #2C608C;
+		border-radius: $borderRadius;
+		border: 1px solid;
+		border-color: #265379;
+		color: white;
+		background-image: linear-gradient(rgba(255,255,255,.3), rgba(255,255,255,0));
+		text-shadow: 0 1px 1px rgba(0,0,0,0.75);
 
-	& span {
-		padding-left: 2px;
+		& span {
+			padding-left: 2px;
+		}
+
+		&::before,
+		& span {
+			vertical-align: middle;
+		}
 	}
 
-	&::before,
-	& span {
-		vertical-align: middle;
+	&.repcontrol_add,
+	&.repcontrol_edit,
+	&.repcontrol_del {
+		font-size: 12px;
+		padding: 3px 3px;
 	}
 }
 
@@ -49,17 +152,24 @@ ul, ol {
 	margin: 0 0 0 15px;
 }
 
-li {
-	line-height: 100%;
-}
-
 h4 {
 	background-color: #000000;
 	color: #ffffff;
 	font-size: 12px;
-	padding-left: 5px;
-	margin-bottom: 5px;
+	padding: 1px;
+	margin-bottom: 2px;
 }
+
+select {
+	font-size: 90%;
+	padding-right: 0;
+	&.sheet-select-no-arrow {
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		appearance: none;
+	}
+}
+
 input[type=number],
 input[type=text],
 select,
@@ -75,7 +185,6 @@ textarea,
 	box-shadow: none;
 
 	padding: 1px;
-	line-height: 100%;
 }
 
 input[type=number]:focus,
@@ -86,7 +195,6 @@ select:focus {
 input[type=number] {
 	text-align: center;
 }
-
 
 input[disabled],
 input.sheet-pseudo-disabled,
@@ -108,16 +216,7 @@ input[disabled]::-webkit-outer-spin-button {
 	margin: 0;
 }
 
-select {
-	font-size: 90%;
-	padding-right: 0;
-}
-.sheet-float-left,
-.sheet-rolltemplate-5eDefault .sheet-float-left {
-	float: left;
-}
-.sheet-float-right,
-.sheet-rolltemplate-5eDefault .sheet-float-right {
+.sheet-float-right {
 	float: right;
 }
 
@@ -138,7 +237,6 @@ $padMar: (
 	pad: 'padding',
 	mar: 'margin'
 );
-
 @each $side, $sideValue in $sides {
 	@each $size, $sizeValue in $sizes {
 		@each $type, $typeValue in $padMar {
@@ -147,7 +245,7 @@ $padMar: (
 			}
 		}
 
-		@if ($side == l) or ($side == r) {
+		@if ($side == l) or ($side == r) and ($size == xxl) {
 			.sheet-rolltemplate-5eDefault .sheet-pad-#{$side}-#{$size} {
 				padding-#{$sideValue}: #{$sizeValue}px !important;
 			}
@@ -159,18 +257,8 @@ $padMar: (
 	display: none !important;
 }
 
-.sheet-pad-t-seven {
-	padding-top: 7px;
-}
-.sheet-pad-t-twelve {
-	padding-top: 12px;
-}
 .sheet-mar-t-t {
 	margin-top: 1px;
-}
-.sheet-mar-t-md,
-.sheet-rolltemplate-5eDefault .sheet-mar-t-md {
-	margin-top: 5px;
 }
 .sheet-mar-t-nine {
 	margin-top: 9px;
@@ -182,37 +270,28 @@ $padMar: (
 .sheet-rolltemplate-5eDefault .sheet-smaller-letter-spacing {
 	letter-spacing: -.04em !important;
 }
+
+.sheet-wrapper {
+	min-width: 834px;
+}
+
 .charsheet {
 	padding: 2px 3px !important;
 	background: rgb(237, 237, 237) url("http://i.imgur.com/RggDtsN.png");
 }
 
-input.sheet-slide-input-pc:checked ~ div .sheet-npc-version,
-input.sheet-slide-input-pc:not(:checked) ~ div .sheet-pc-version,
-input.sheet-slide-input-pc:checked ~ .sheet-npc-version,
-input.sheet-slide-input-pc:not(:checked) ~ .sheet-pc-version {
-	display: block;
-}
-
-input.sheet-slide-input-pc:checked ~ div .sheet-npc-version-inline-block,
-input.sheet-slide-input-pc:not(:checked) ~ div .sheet-pc-version-inline-block,
-input.sheet-slide-input-pc:checked ~ .sheet-npc-version-inline-block,
-input.sheet-slide-input-pc:not(:checked) ~ .sheet-pc-version-inline-block {
-	display: inline-block;
-}
-
-div.sheet-overall-wrapper .sheet-npc-version,
-div.sheet-overall-wrapper .sheet-npc-version-inline-block,
-div.sheet-overall-wrapper .sheet-pc-version,
-div.sheet-overall-wrapper .sheet-pc-version-inline-block {
-	display: none;
+.sheet-slide-input-pc {
+	&:checked ~ div .sheet-pc,
+	&:checked ~ .sheet-pc,
+	&:not(:checked) ~ div .sheet-npc,
+	&:not(:checked) ~ .sheet-npc {
+		display: none;
+	}
 }
 
 .sheet-small-note {
 	text-align: center;
-	font-family: Arial;
 	font-size: 10px;
-	line-height: 100%;
 }
 
 .sheet-wrap-box {
@@ -236,7 +315,6 @@ div.sheet-overall-wrapper .sheet-pc-version-inline-block {
 .sheet-tooltip-toggle-text,
 .sheet-rolltemplate-5eDefault .sheet-tooltip-toggle-text {
 	border-radius: 50%;
-	line-height: 100%;
 	font-size: 77%;
 	height: 10px;
 	width: 10px;
@@ -245,8 +323,8 @@ div.sheet-overall-wrapper .sheet-pc-version-inline-block {
 	padding: 1px 2px;
 	font-weight: bold;
 }
-.sheet-tooltip [class*="sheet-tooltip-content"],
-.sheet-rolltemplate-5eDefault .sheet-tooltip [class*="sheet-tooltip-content"] {
+[class*="sheet-tooltip-content"],
+.sheet-rolltemplate-5eDefault [class*="sheet-tooltip-content"] {
 	z-index: 99;
 	position: absolute;
 	color: #FFFFFF;
@@ -259,39 +337,39 @@ div.sheet-overall-wrapper .sheet-pc-version-inline-block {
 	width: 260px;
 	margin-top: -15px;
 	text-align: left;
+	&::after {
+		content: "";
+		position: absolute;
+		top: 9px;
+		margin-top: -8px;
+		border-top: 8px solid transparent;
+		border-bottom: 8px solid transparent;
+	}
 }
-.sheet-tooltip .sheet-tooltip-small,
-.sheet-rolltemplate-5eDefault .sheet-tooltip .sheet-tooltip-small {
+.sheet-tooltip-small,
+.sheet-rolltemplate-5eDefault .sheet-tooltip-small {
 	width: 80px;
 }
-.sheet-tooltip .sheet-tooltip-content-left,
-.sheet-rolltemplate-5eDefault .sheet-tooltip .sheet-tooltip-content-left {
+.sheet-tooltip-content-left,
+.sheet-rolltemplate-5eDefault .sheet-tooltip-content-left {
 	right: 100%;
 	margin-right: 12px;
 	border-top-left-radius: 4px;
 }
-.sheet-tooltip .sheet-tooltip-content-right,
-.sheet-rolltemplate-5eDefault .sheet-tooltip .sheet-tooltip-content-right {
+.sheet-tooltip-content-right,
+.sheet-rolltemplate-5eDefault .sheet-tooltip-content-right {
 	left: 100%;
 	margin-left: 12px;
 	border-top-right-radius: 4px;
 }
-.sheet-tooltip [class*="sheet-tooltip-content"]::after,
-.sheet-rolltemplate-5eDefault .sheet-tooltip [class*="sheet-tooltip-content"]::after {
-	content: "";
-	position: absolute;
-	top: 9px;
-	margin-top: -8px;
-	border-top: 8px solid transparent;
-	border-bottom: 8px solid transparent;
-}
-.sheet-tooltip .sheet-tooltip-content-left::after,
-.sheet-rolltemplate-5eDefault .sheet-tooltip .sheet-tooltip-content-left::after {
+
+.sheet-tooltip-content-left::after,
+.sheet-rolltemplate-5eDefault .sheet-tooltip-content-left::after {
 	right: -8px;
 	border-left: 8px solid #000000;
 }
-.sheet-tooltip .sheet-tooltip-content-right::after,
-.sheet-rolltemplate-5eDefault .sheet-tooltip .sheet-tooltip-content-right::after {
+.sheet-tooltip-content-right::after,
+.sheet-rolltemplate-5eDefault .sheet-tooltip-content-right::after {
 	left: -8px;
 	border-right: 8px solid #000000;
 }
@@ -303,8 +381,6 @@ div.sheet-overall-wrapper .sheet-pc-version-inline-block {
 	z-index: 999;
 }
 
-
-
 .sheet-dnd-image-wrapper {
 	margin-bottom: 1px;
 	img {
@@ -313,22 +389,25 @@ div.sheet-overall-wrapper .sheet-pc-version-inline-block {
 	}
 }
 
-
-
 .sheet-character-name {
-	border-top-width: 1px !important;
-	border-left-width: 1px !important;
-	border-top-left-radius: 5px !important;
-	border-bottom-left-radius: 5px !important;
-	border: 1px solid black;
-	font-size: 140%;
-	font-weight: bold;
-	padding: 0 2px;
+	input[type=text] {
+		border-top-left-radius: 5px !important;
+		border-bottom-left-radius: 5px !important;
+		border: 1px solid black;
+		border-right-width: 0;
+		font-size: 22px;
+		font-weight: bold;
+		padding: 0 2px;
+	}
+	.sheet-wrap-box-label {
+		font-weight: bold;
+		margin-top: 1px;
+	}
 }
 
+
 .sheet-last-updated {
-	font-size: 85%!important;
-	line-height: 100%;
+	font-size: 85%;
 	vertical-align: top;
 	font-style: italic;
 	font-weight: bold;
@@ -338,25 +417,22 @@ div.sheet-overall-wrapper .sheet-pc-version-inline-block {
 .sheet-header-info {
 	input[type=text],
 	input[type=number] {
-		padding: 0 1px;
+		padding: 2px 1px 0;
 	}
-	.sheet-passive-skill-score {
-		height: 15px;
+	.sheet-passive-skill {
+		font-size: 12px;
 	}
-
-	.sheet-row:nth-child(2) {
-		input[type=text],
-		input[type=number] {
-			margin-top: 7px;
-		}
+	.sheet-wrap-box-label {
+		font-weight: bold;
 	}
 }
 
-.sheet-core-header {
-	margin-top: -5px;
-	margin-bottom: 2px;
+.sheet-speed,
+.sheet-sense {
+	input {
+		font-weight: bold;
+	}
 }
-
 
 .sheet-ability-score-wrapper {
 	position: relative;
@@ -381,7 +457,6 @@ div.sheet-overall-wrapper .sheet-pc-version-inline-block {
 .sheet-ability-name {
 	font-size: 9px;
 	text-transform: uppercase;
-	line-height: 100%;
 	font-weight: bold;
 	margin-top: 3px;
 	margin-bottom: 5px;
@@ -418,9 +493,9 @@ div.sheet-overall-wrapper .sheet-pc-version-inline-block {
 .sheet-quick-attacks {
 	button {
 		padding: 1px 3px;
-		line-height: 100%;
 		&.repcontrol_add,
-		&.repcontrol_edit {
+		&.repcontrol_edit,
+		&.repcontrol_del {
 			margin-top: 1px;
 			font-size: 10px;
 		}
@@ -457,45 +532,12 @@ div.sheet-overall-wrapper .sheet-pc-version-inline-block {
 	}
 }
 
-input[class*="sheet-tab-hd"],
-span[class*="sheet-tab-hd"] {
-	height: 10px;
+input[class^="sheet-toggle-hd-"],
+span[class^="sheet-toggle-hd-"] {
+	height: 11px;
 }
-span[class*="sheet-tab-hd"] {
+span[class^="sheet-toggle-hd-"] {
 	font-size: 9px;
-	padding: 1px;
-}
-$tab-hd-single-digit-width: 16px;
-input.sheet-tab-hd-d4,
-span.sheet-tab-hd-d4,
-input.sheet-tab-hd-d6,
-span.sheet-tab-hd-d6,
-input.sheet-tab-hd-d8,
-span.sheet-tab-hd-d8 {
-	width: $tab-hd-single-digit-width;
-}
-span.sheet-tab-hd-d4,
-span.sheet-tab-hd-d6,
-span.sheet-tab-hd-d8 {
-	margin-left: -$tab-hd-single-digit-width;
-}
-$tab-hd-double-digit-width: 20px;
-input.sheet-tab-hd-d10,
-span.sheet-tab-hd-d10,
-input.sheet-tab-hd-d12,
-span.sheet-tab-hd-d12,
-input.sheet-tab-hd-d20,
-span.sheet-tab-hd-d20 {
-	width: $tab-hd-double-digit-width;
-}
-span.sheet-tab-hd-d10,
-span.sheet-tab-hd-d12,
-span.sheet-tab-hd-d20 {
-	margin-left: -$tab-hd-double-digit-width;
-}
-
-.sheet-npc-hd-note {
-	font-size: 10px;
 }
 
 .sheet-inline {
@@ -517,14 +559,14 @@ span.sheet-tab-hd-d20 {
 }
 .sheet-jack-of-all-trades {
 	position: absolute;
-	top: 0;
+	top: -2px;
 	right: 0;
 }
 .sheet-skill-select-wrapper select,
-.sheet-skills .sheet-passive-skill-score {
+.sheet-skills .sheet-passive-skill {
 	height: 17px;
 }
-input[disabled].sheet-passive-skill-score {
+input[disabled].sheet-passive-skill {
 	background-color: #E7F9FF;
 }
 
@@ -533,13 +575,12 @@ input[disabled].sheet-passive-skill-score {
 .sheet-skills-attribute-selector-wrapper {
 	font-size: 11px !important;
 }
-.sheet-passive-skill-score {
+.sheet-passive-skill {
 	font-size: 10px;
 	padding: 0;
 }
 .sheet-skills {
 	select {
-		line-height: 100%;
 		padding: 0;
 		font-size: 9px;
 		-webkit-appearance: none;
@@ -547,7 +588,6 @@ input[disabled].sheet-passive-skill-score {
 		appearance: none;
 
 		&.sheet-skills-attribute-selector {
-			font-size: 9px;
 			height: 11px;
 			width: 25px !important;
 			border-bottom: 0;
@@ -557,12 +597,6 @@ input[disabled].sheet-passive-skill-score {
 			background: transparent;
 		}
 	}
-}
-
-select.sheet-select-no-arrow {
-	-webkit-appearance: none;
-	-moz-appearance: none;
-	appearance: none;
 }
 
 .sheet-skills-attribute-selector-wrapper {
@@ -589,7 +623,8 @@ select.sheet-select-no-arrow {
 	position: relative;
 	z-index: 10;
 	width: 52px;
-	height: 53px;
+	height: 55px;
+	padding-top: 7px;
 	padding-right: 2px;
 	margin-left: auto;
 	margin-right: auto;
@@ -645,27 +680,17 @@ select.sheet-select-no-arrow {
 
 .sheet-shield input[type=number],
 .sheet-initiative input[type=number],
-.sheet-speed input,
 .sheet-heart input[type=number].sheet-heart-hp-current,
 .sheet-heart input[type=number].sheet-heart-hp-max {
 	font-weight: bold;
 	font-size: 14px;
 }
 
-.sheet-speed input {
-	padding-top: 2px;
-	padding-bottom: 0;
-}
-
-.sheet-col-speed-wrapper {
-	width: 130%;
-	margin-left: -30%;
-}
-
 .sheet-wrap-box-label,
 .sheet-wrap-box-title {
 	text-transform: uppercase;
-	line-height: 100%;
+}
+.sheet-wrap-box-title {
 	font-weight: bold;
 }
 
@@ -708,21 +733,17 @@ select.sheet-select-no-arrow {
 .sheet-initiative {
 	position: relative;
 	z-index: 5;
-	.sheet-wrap-box-title {
-		font-size: 8px;
-	}
 	button[type=roll] {
 		width: 100%;
 	}
 }
 
 
-[class*="sheet-checkbox-label"] {
+[class^="sheet-checkbox-label"] {
 	cursor: pointer;
 	white-space: nowrap;
 	margin-bottom: 0;
 	padding-right: 0;
-	line-height: 100%;
 	font-weight: normal;
 }
 .sheet-checkbox-label-sm {
@@ -890,6 +911,7 @@ select.sheet-select-no-arrow {
 	}
 }
 .sheet-death-save-hr {
+	width: 100%;
 	top: 2px;
 }
 
@@ -898,7 +920,6 @@ select.sheet-select-no-arrow {
 		width: 100%;
 		height: 22px;
 		font-size: 90%;
-		line-height: 100%;
 		padding: 0 2px;
 	}
 	.sheet-small-label {
@@ -1020,7 +1041,7 @@ select.sheet-select-no-arrow {
 	}
 
 	.inlinerollresult {
-		padding: 0 2px;
+		padding: 0 1px;
 	}
 
 	.sheet-rt-title {
@@ -1031,7 +1052,7 @@ select.sheet-select-no-arrow {
 		line-height: 120%;
 	}
 
-	.sheet-row:nth-child(even) {
+	.sheet-shaped-row:nth-child(even) {
 		background-color: #E9EDEE;
 	}
 
@@ -1052,11 +1073,17 @@ select.sheet-select-no-arrow {
 		box-sizing: border-box;
 	}
 
-	.sheet-main-content .sheet-row:not(:first-child) {
+	.sheet-rt-content .sheet-shaped-row:not(:first-child) {
 		margin-top: 2px;
 	}
 
+	.sheet-shaped-row {
+		padding: 3px;
+	}
+
 	.sheet-rt-emote {
+		margin-left: 3px;
+		margin-right: 3px;
 		font-style: italic;
 		font-size: 11px;
 		font-family: Arial;
@@ -1081,106 +1108,17 @@ div[class="repcontainer editmode"] ~ div[class^="repcontrol"] button[class="btn 
 	visibility: hidden;
 }
 
-div.sheet-npc {
-	display: none;
-}
-
-.sheet-english,
-.sheet-german {
-	display: none;
-}
-
-input[value=English]:checked ~ span span.sheet-english,
-input[value=German]:checked ~ span span.sheet-german,
-input[value=Spanish]:checked ~ span span.sheet-spanish,
-input[value=English]:checked ~ div span.sheet-english,
-input[value=German]:checked ~ div span.sheet-german,
-input[value=Spanish]:checked ~ div span.sheet-spanish {
-	display: inline;
-}
-
-input[value=English]:checked ~ span div.sheet-english,
-input[value=German]:checked ~ span div.sheet-german,
-input[value=Spanish]:checked ~ span div.sheet-spanish,
-input[value=English]:checked ~ div div.sheet-english,
-input[value=German]:checked ~ div div.sheet-german,
-input[value=Spanish]:checked ~ div div.sheet-spanish {
-	display: block;
-}
-
-
-input.sheet-tab-language,
-span.sheet-tab-language {
-	width: 16px;
-	height: 11px;
-}
-span.sheet-tab-language {
-	margin-left: 2px;
-	margin-right: -16px;
-	opacity: 0.4;
-	background-repeat: no-repeat;
-}
-
-span.sheet-tab-language.sheet-english {
-	background: url("http://i.imgur.com/TniJIqt.png");
-}
-span.sheet-tab-language.sheet-german {
-	background: url("http://i.imgur.com/xUhfiqu.png");
-}
-span.sheet-tab-language.sheet-spanish {
-	background: url("http://i.imgur.com/UcndHqG.png");
-}
-
-input.sheet-tab-language:checked + span.sheet-tab-language {
-	opacity: 1;
-}
-
-
-input.sheet-tab-is-npc:checked + span.sheet-tab-is-npc::before {
-	content: "NPC";
-}
-
-
-/* Main Sheet Tabs */
-div.sheet-overall-wrapper div[class^="sheet-section"] {
-	display: none !important;
-}
-
-input.sheet-tab-page-core:checked ~ div.sheet-section-core,
-input.sheet-tab-page-background:checked ~ div.sheet-section-background,
-input.sheet-tab-page-class:checked ~ div.sheet-section-class,
-input.sheet-tab-page-weapons:checked ~ div.sheet-section-weapons,
-input.sheet-tab-page-actions:checked ~ div.sheet-section-actions,
-input.sheet-tab-page-spellbook:checked ~ div.sheet-section-spellbook,
-input.sheet-tab-page-armor:checked ~ div.sheet-section-armor,
-input.sheet-tab-page-inventory:checked ~ div.sheet-section-inventory,
-input.sheet-tab-page-settings:checked ~ div.sheet-section-settings {
-	display: block !important;
-}
-
-input.sheet-tab-page98:checked ~ div[class^="sheet-section"]:not(.sheet-pc-version) {
-	display: block !important;
-}
-input.sheet-tab-page99:checked ~ div[class^="sheet-section"]:not(.sheet-npc-version) {
-	display: block !important;
-}
-
-
-
-input[class*="sheet-tab"],
-span[class*="sheet-tab"] {
+input[class^="sheet-toggle-"],
+span[class^="sheet-toggle-"] {
 	vertical-align: top;
 }
-
-input[class*="sheet-tab"] {
+input[class^="sheet-toggle-"] {
 	cursor: pointer;
 	position: relative;
 	opacity: 0;
 	z-index: 9999;
 }
-
-
-span[class*="sheet-tab"] {
+span[class^="sheet-toggle-"] {
 	background-color: $gray;
 	display: inline-block;
 	position: relative;
@@ -1188,149 +1126,264 @@ span[class*="sheet-tab"] {
 	cursor: pointer;
 	text-align: center;
 	border-radius: $borderRadius;
-	line-height: 100%;
+	padding: 1px;
+	font-size: 10px;
 }
 
-$tab-page-width: 63px;
-input[class*="sheet-tab-page"],
-span[class*="sheet-tab-page"] {
-	width: $tab-page-width;
-	height: 16px;
+div[class*="sheet-toggle-"] {
+	/*display: none;*/
 }
-span[class*="sheet-tab-page"] {
+
+@include tab-toggle('page-core', 32px, 'padding');
+@include tab-toggle('page-weapons', 57px, 'padding');
+@include tab-toggle('page-actions', 96px, 'padding');
+@include tab-toggle('page-spells', 39px, 'padding');
+@include tab-toggle('page-class', 37px, 'padding');
+@include tab-toggle('page-armor', 41px, 'padding');
+@include tab-toggle('page-inventory', 58px, 'padding');
+@include tab-toggle('page-background', 74px, 'padding');
+@include tab-toggle('page-settings', 15px, 'padding');
+@include tab-toggle('page-98', 53px, 'padding');
+@include tab-toggle('page-99', 53px, 'padding');
+
+@include tab-toggle('traits', 32px, 'padding');
+@include tab-toggle('regional-effects', 91px, 'padding');
+@include tab-toggle('lair-actions', 66px, 'padding');
+@include tab-toggle('legendary-actions', 104px, 'padding');
+@include tab-toggle('reactions', 57px, 'padding');
+@include tab-toggle('multiattack', 60px, 'padding');
+@include tab-toggle('actions', 42px, 'padding');
+@include tab-toggle('melee-weapons', 36 + 8px, 'padding');
+@include tab-toggle('ranged-weapons', 46 + 8px, 'padding');
+@include tab-toggle('old-weapons', 21 + 8px, 'padding');
+@include tab-toggle('quick-weapons', 33 + 8px, 'padding');
+
+$toggle-inventory-width: 24.3%;
+@include tab-toggle('inventory-1', $toggle-inventory-width, 'noPadding');
+@include tab-toggle('inventory-2', $toggle-inventory-width, 'noPadding');
+@include tab-toggle('inventory-3', $toggle-inventory-width, 'noPadding');
+@include tab-toggle('inventory-99', $toggle-inventory-width, 'noPadding');
+
+$tab-class-width: 155px;
+@include tab-toggle('class-action-1', $tab-class-width, 'noPadding');
+@include tab-toggle('class-action-2', $tab-class-width, 'noPadding');
+@include tab-toggle('class-action-99', $tab-class-width, 'noPadding');
+
+$tab-hd-single-digit-width: 16px;
+$tab-hd-double-digit-width: 20px;
+@include tab-toggle('hd-d4', $tab-hd-single-digit-width, 'noPadding');
+@include tab-toggle('hd-d6', $tab-hd-single-digit-width, 'noPadding');
+@include tab-toggle('hd-d8', $tab-hd-single-digit-width, 'noPadding');
+@include tab-toggle('hd-d10', $tab-hd-double-digit-width, 'noPadding');
+@include tab-toggle('hd-d12', $tab-hd-double-digit-width, 'noPadding');
+@include tab-toggle('hd-d20', $tab-hd-double-digit-width, 'noPadding');
+
+$tab-spell-page-width: 8.6%;
+@include tab-toggle('spells-page-0', $tab-spell-page-width, 'noPadding');
+@include tab-toggle('spells-page-1', $tab-spell-page-width, 'noPadding');
+@include tab-toggle('spells-page-2', $tab-spell-page-width, 'noPadding');
+@include tab-toggle('spells-page-3', $tab-spell-page-width, 'noPadding');
+@include tab-toggle('spells-page-4', $tab-spell-page-width, 'noPadding');
+@include tab-toggle('spells-page-5', $tab-spell-page-width, 'noPadding');
+@include tab-toggle('spells-page-6', $tab-spell-page-width, 'noPadding');
+@include tab-toggle('spells-page-7', $tab-spell-page-width, 'noPadding');
+@include tab-toggle('spells-page-8', $tab-spell-page-width, 'noPadding');
+@include tab-toggle('spells-page-9', $tab-spell-page-width, 'noPadding');
+@include tab-toggle('spells-page-99', $tab-spell-page-width, 'noPadding');
+
+@include tab-toggle('emote', 32px, 'padding');
+@include tab-toggle('attack', 31px, 'padding');
+@include tab-toggle('reach', 32px, 'padding');
+@include tab-toggle('range', 33px, 'padding');
+@include tab-toggle('target', 32px, 'padding');
+@include tab-toggle('ammo', 31px, 'padding');
+@include tab-toggle('ammo-auto', 24px, 'padding');
+@include tab-toggle('damage', 23px, 'padding');
+@include tab-toggle('sv-damage', 23px, 'padding');
+@include tab-toggle('alt-damage', 14px, 'padding');
+@include tab-toggle('second-damage', 52px, 'padding');
+@include tab-toggle('sv-second-damage', 52px, 'padding');
+@include tab-toggle('crit', 17px, 'padding');
+@include tab-toggle('crit-bonus', 32px, 'padding');
+@include tab-toggle('bonus', 32px, 'padding');
+@include tab-toggle('bonuses', 43px, 'padding');
+@include tab-toggle('spells-filter-condensed', 56px, 'padding');
+@include tab-toggle('spells-filter-prepared', 44px, 'padding');
+@include tab-toggle('spells-prep-con-rit-prepared', 44px, 'padding');
+@include tab-toggle('spells-filter-ritual', 24px, 'padding');
+@include tab-toggle('spells-prep-con-rit-ritual', 24px, 'padding');
+@include tab-toggle('spells-filter-concentration', 65px, 'padding');
+@include tab-toggle('spells-prep-con-rit-concentration', 65px, 'padding');
+@include tab-toggle('spells-filter-verbal', 9px, 'padding');
+@include tab-toggle('spells-filter-somatic', 9px, 'padding');
+@include tab-toggle('spells-filter-material', 10px, 'padding');
+@include tab-toggle('spell-vsm-v', 9px, 'padding');
+@include tab-toggle('spell-vsm-s', 9px, 'padding');
+@include tab-toggle('spell-vsm-m', 10px, 'padding');
+@include tab-toggle('spells-filter-casting-time-any', 19px, 'padding');
+@include tab-toggle('spells-filter-casting-time-reaction', 39px, 'padding');
+@include tab-toggle('spells-filter-casting-time-bonus', 31px, 'padding');
+@include tab-toggle('spells-filter-casting-time-action', 30px, 'padding');
+@include tab-toggle('spells-filter-casting-time-minute', 27px, 'padding');
+@include tab-toggle('spells-filter-casting-time-longer', 31px, 'padding');
+@include tab-toggle('casting-time-reaction', 39px, 'padding');
+@include tab-toggle('casting-time-bonus', 31px, 'padding');
+@include tab-toggle('casting-time-action', 30px, 'padding');
+@include tab-toggle('casting-time-minute', 27px, 'padding');
+@include tab-toggle('casting-time-longer', 31px, 'padding');
+@include tab-toggle('description', 53px, 'padding');
+@include tab-toggle('spell-higherlvl', 48px, 'padding');
+@include tab-toggle('spell-higherlvl-query', 79px, 'padding');
+@include tab-toggle('spell-output-higherlvl-query', 34px, 'padding');
+@include tab-toggle('save', 26px, 'padding');
+@include tab-toggle('heal', 23px, 'padding');
+@include tab-toggle('effects', 34px, 'padding');
+@include tab-toggle('spell-source', 35px, 'padding');
+@include tab-toggle('spell-from', 25px, 'padding');
+@include tab-toggle('recharge', 47px, 'padding');
+
+span.sheet-toggle-spells-filter-casting-time-any,
+span.sheet-toggle-casting-time-reaction {
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+}
+span.sheet-toggle-spells-filter-casting-time-reaction,
+span.sheet-toggle-spells-filter-casting-time-bonus,
+span.sheet-toggle-spells-filter-casting-time-action,
+span.sheet-toggle-spells-filter-casting-time-minute,
+span.sheet-toggle-casting-time-bonus,
+span.sheet-toggle-casting-time-action,
+span.sheet-toggle-casting-time-minute {
+	border-radius: 0;
+}
+span.sheet-toggle-spells-filter-casting-time-longer,
+span.sheet-toggle-casting-time-longer {
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
+}
+.sheet-casting-time-longer {
+	position: absolute;
+	top: 14px;
+	left: -102px;
+	width: 100px;
+	input {
+		height: 14px;
+	}
+}
+
+
+@include tab-toggle('jack-of-all-trades', 78px, 'padding');
+
+input[value=English]:not(:checked) ~ span .sheet-en,
+input[value=German]:not(:checked) ~ span .sheet-de,
+input[value=Spanish]:not(:checked) ~ span .sheet-es,
+input[value=English]:not(:checked) ~ div .sheet-en,
+input[value=German]:not(:checked) ~ div .sheet-de,
+input[value=Spanish]:not(:checked) ~ div .sheet-es {
+	display: none;
+}
+input.sheet-toggle-language,
+span.sheet-toggle-language {
+	width: 16px;
+	height: 11px;
+}
+input.sheet-toggle-language:checked + span.sheet-toggle-language {
+	opacity: 1;
+}
+span.sheet-toggle-language {
+	margin-left: 2px;
+	margin-right: -16px;
+	opacity: 0.4;
+	background-repeat: no-repeat;
+
+	&.sheet-en {
+		background: url("http://i.imgur.com/TniJIqt.png");
+	}
+	&.sheet-de {
+		background: url("http://i.imgur.com/xUhfiqu.png");
+	}
+	&.sheet-es {
+		background: url("http://i.imgur.com/UcndHqG.png");
+	}
+
+}
+
+/* Main Sheet Tabs */
+[class^="sheet-section-"] {
+	display: none !important;
+}
+input.sheet-toggle-page-core:checked ~ div.sheet-section-core,
+input.sheet-toggle-page-background:checked ~ div.sheet-section-background,
+input.sheet-toggle-page-class:checked ~ div.sheet-section-class,
+input.sheet-toggle-page-weapons:checked ~ div.sheet-section-weapons,
+input.sheet-toggle-page-actions:checked ~ div.sheet-section-actions,
+input.sheet-toggle-page-spells:checked ~ div.sheet-section-spells,
+input.sheet-toggle-page-armor:checked ~ div.sheet-section-armor,
+input.sheet-toggle-page-inventory:checked ~ div.sheet-section-inventory,
+input.sheet-toggle-page-settings:checked ~ div.sheet-section-settings,
+input.sheet-toggle-page-98:checked ~ div[class^="sheet-section-"]:not(.sheet-pc),
+input.sheet-toggle-page-99:checked ~ div[class^="sheet-section-"]:not(.sheet-npc) {
+	display: block !important;
+}
+input[class^="sheet-toggle-page-"],
+span[class^="sheet-toggle-page-"] {
+	height: 16px;
+	margin-top: 2px;
+	margin-bottom: 2px;
+}
+span[class^="sheet-toggle-page-"] {
 	background-color: #416696;
-	margin-left: -$tab-page-width;
 	font-size: 12px;
 	padding: 2px;
 	font-weight: bold;
 }
-
-$tab-page-core-width: 42px;
-input.sheet-tab-page-core,
-span.sheet-tab-page-core {
-	width: $tab-page-core-width;
-}
-span.sheet-tab-page-core {
-	margin-left: -$tab-page-core-width;
-}
-$tab-page-weapons-width: 67px;
-input.sheet-tab-page-weapons,
-span.sheet-tab-page-weapons {
-	width: $tab-page-weapons-width;
-}
-span.sheet-tab-page-weapons {
-	margin-left: -$tab-page-weapons-width;
-}
-$tab-page-spellbook-width: 70px;
-input.sheet-tab-page-spellbook,
-span.sheet-tab-page-spellbook {
-	width: $tab-page-spellbook-width;
-}
-span.sheet-tab-page-spellbook {
-	margin-left: -$tab-page-spellbook-width;
-}
-$tab-page-background-width: 84px;
-input.sheet-tab-page-background,
-span.sheet-tab-page-background {
-	width: $tab-page-background-width;
-}
-span.sheet-tab-page-background {
-	margin-left: -$tab-page-background-width;
-}
-$tab-page-class-width: 47px;
-input.sheet-tab-page-class,
-span.sheet-tab-page-class {
-	width: $tab-page-class-width;
-}
-span.sheet-tab-page-class {
-	margin-left: -$tab-page-class-width;
-}
-$tab-page-armor-width: 51px;
-input.sheet-tab-page-armor,
-span.sheet-tab-page-armor {
-	width: $tab-page-armor-width;
-}
-span.sheet-tab-page-armor {
-	margin-left: -$tab-page-armor-width;
-}
-$tab-page-actions-width: 106px;
-input.sheet-tab-page-actions,
-span.sheet-tab-page-actions {
-	width: $tab-page-actions-width;
-}
-span.sheet-tab-page-actions {
-	margin-left: -$tab-page-actions-width;
-}
-$tab-page-inventory-width: 68px;
-input.sheet-tab-page-inventory,
-span.sheet-tab-page-inventory {
-	width: $tab-page-inventory-width;
-}
-span.sheet-tab-page-inventory {
-	margin-left: -$tab-page-inventory-width;
-}
-$tab-page-settings-width: 27px;
-input.sheet-tab-page-settings,
-span.sheet-tab-page-settings {
-	width: $tab-page-settings-width;
-}
-span.sheet-tab-page-settings {
-	margin-left: -$tab-page-settings-width;
-}
-
-input[class*="sheet-tab-page"]:checked + span[class*="sheet-tab-page"] {
+input[class^="sheet-toggle-page-"]:checked + span[class^="sheet-toggle-page-"] {
 	background-color: #101D30 !important;
 }
-
 /* END Main sheet tabs */
 
 .sheet-section-class select,
 .sheet-section-weapons select,
 .sheet-section-armor select,
-.sheet-section-spellbook select,
+.sheet-section-spells select,
 .sheet-section-weapons .sheet-checkbox-row-height {
 	height: 17px;
 }
 
 /* Spell Page Settings */
-div[class^="sheet-spell-page"] {
+div[class^="sheet-toggle-spells-page-"] {
 	display: none;
 }
 
-input.sheet-tab-spell0:checked ~ div.sheet-spell-page0,
-input.sheet-tab-spell1:checked ~ div.sheet-spell-page1,
-input.sheet-tab-spell2:checked ~ div.sheet-spell-page2,
-input.sheet-tab-spell3:checked ~ div.sheet-spell-page3,
-input.sheet-tab-spell4:checked ~ div.sheet-spell-page4,
-input.sheet-tab-spell5:checked ~ div.sheet-spell-page5,
-input.sheet-tab-spell6:checked ~ div.sheet-spell-page6,
-input.sheet-tab-spell7:checked ~ div.sheet-spell-page7,
-input.sheet-tab-spell8:checked ~ div.sheet-spell-page8,
-input.sheet-tab-spell9:checked ~ div.sheet-spell-page9 {
+input.sheet-toggle-spells-page-0:checked ~ div.sheet-toggle-spells-page-0,
+input.sheet-toggle-spells-page-1:checked ~ div.sheet-toggle-spells-page-1,
+input.sheet-toggle-spells-page-2:checked ~ div.sheet-toggle-spells-page-2,
+input.sheet-toggle-spells-page-3:checked ~ div.sheet-toggle-spells-page-3,
+input.sheet-toggle-spells-page-4:checked ~ div.sheet-toggle-spells-page-4,
+input.sheet-toggle-spells-page-5:checked ~ div.sheet-toggle-spells-page-5,
+input.sheet-toggle-spells-page-6:checked ~ div.sheet-toggle-spells-page-6,
+input.sheet-toggle-spells-page-7:checked ~ div.sheet-toggle-spells-page-7,
+input.sheet-toggle-spells-page-8:checked ~ div.sheet-toggle-spells-page-8,
+input.sheet-toggle-spells-page-9:checked ~ div.sheet-toggle-spells-page-9 {
 	display: block;
 }
 
-input.sheet-tab-spell99:checked ~ div[class^="sheet-spell-page"] {
+input.sheet-toggle-spells-page-99:checked ~ div[class^="sheet-toggle-spells-page-"] {
 	display: block;
 }
 
-$tab-spell-page-width: 72px;
-input.sheet-tab-spellbook-page,
-span.sheet-tab-spellbook-page {
-	width: $tab-spell-page-width;
-	height: 14px;
-}
-span.sheet-tab-spellbook-page {
-	margin-left: -$tab-spell-page-width;
-	font-size: 12px;
-	padding: 1px;
-}
-
-span.sheet-tab-spellbook-page,
-span.sheet-tab-inventory,
-span.sheet-tab-class-action {
+span[class^="sheet-toggle-spells-page-"],
+span[class^="sheet-toggle-inventory-"],
+span[class^="sheet-toggle-class-action-"] {
 	background-color: #8E4644;
 }
+
+/*
+.sheet-section-actions div[class^="sheet-toggle-"],
+.sheet-section-weapons div[class^="sheet-toggle-"] {
+	display: none;
+}
+*/
 
 .sheet-spell-table {
 	input {
@@ -1364,7 +1417,7 @@ span.sheet-tab-class-action {
 .sheet-section-actions hr {
 	height: 5px;
 }
-.sheet-section-spellbook .sheet-wrap-box,
+.sheet-section-spells .sheet-wrap-box,
 .sheet-section-class .sheet-wrap-box,
 .sheet-section-actions .sheet-wrap-box,
 .sheet-section-weapons .sheet-wrap-box {
@@ -1388,12 +1441,10 @@ span.sheet-tab-class-action {
 }
 .sheet-section-actions textarea {
 	font-size: 85%;
-	line-height: 100%;
 }
-.sheet-section-spellbook .sheet-wrap-box textarea,
+.sheet-section-spells .sheet-wrap-box textarea,
 .sheet-section-actions .sheet-wrap-box textarea {
 	font-size: 10px;
-	line-height: 100%;
 }
 
 $toggleHeight: 12px;
@@ -1450,332 +1501,119 @@ label[class^='sheet-slide-toggle-'] {
 	}
 }
 
-@mixin slide-toggle($name, $width, $height, $leftColor, $rightColor, $smallSides, $vertical) {
-	$multiplier: 2;
-	@if $smallSides {
-		$multiplier: 4;
-	}
-	input.sheet-slide-input-#{$name},
-	label.sheet-slide-toggle-#{$name} {
-		width: $width * $multiplier;
-		height: $height;
-	}
-	label.sheet-slide-toggle-#{$name} {
-		@if $vertical {
-			margin-top: -$height;
-		} @else {
-			margin-left: -$width * $multiplier;
-		}
-		line-height: $height;
-		.sheet-slide-cover {
-			@if $smallSides {
-				width: $width * 3;
-			} @else {
-				width: $width;
-			}
-			height: $height;
-			$volumeColor: darken($leftColor, 10);
-			box-shadow: 0 0.12em 0.01em rgba($volumeColor,1),
-			0 0.12em 0.3em rgba($volumeColor,0.6),
-			0 0.12em 2em rgba(0, 0, 0, 0.3),
-			-0.12em 0.15em 0.2em rgba(0, 0, 0, 0.2);
-		}
-	}
-	input[type='checkbox'].sheet-slide-input-#{$name} + label.sheet-slide-toggle-#{$name} {
-		.sheet-slide-cover {
-			background-color: $leftColor;
-			text-shadow: 0 0.05em 0 darken($leftColor, 05);
-			@if $smallSides {
-				margin-right: $width;
-			}
-		}
-		span[class^="sheet-slide-toggle-"] {
-			@if $smallSides {
-				width: 25%;
-			} @else {
-				width: 50%;
-			}
-			color: $leftColor;
-		}
-	}
-	span.sheet-slide-toggle-#{$name}-left {
-		@if $smallSides {
-			font-size: 11px;
-		}
-	}
-	span.sheet-slide-toggle-#{$name}-right {
-		@if $smallSides {
-			margin-left: 50%;
-			font-weight: bold;
-			font-size: 10px;
-		}
-	}
-	input[type='checkbox'].sheet-slide-input-#{$name}:checked + label.sheet-slide-toggle-#{$name} {
-		.sheet-slide-cover {
-			background-color: $rightColor;
-			@if $smallSides {
-				margin-right: 0;
-			} @else {
-				margin-right: $width;
-			}
-			border-bottom: 0.03em solid lighten($rightColor, 10);
-			text-shadow: 0 0.05em 0 darken($rightColor, 10);
-			$volumeColor: darken($rightColor, 10);
-			box-shadow: 0 0.12em 0.01em rgba($volumeColor,1),
-			0 0.12em 0.3em rgba($volumeColor,0.6),
-			0 0.12em 2em rgba(0, 0, 0, 0.3),
-			0.12em 0.15em 0.2em rgba(0, 0, 0, 0.2);
-		}
-		span[class^="sheet-slide-toggle-"] {
-			color: $rightColor;
-		}
-	}
-}
-
 @include slide-toggle('pc', 40px, $toggleHeight, $deepGreen, $deepRed, false, false);
 @include slide-toggle('spell-slots-points', 68px, $toggleHeight, #000000, #545454, false, true);
 @include slide-toggle('custom-skills', 23px, $toggleHeight, $gray, $deepGreen, true, false);
 
 
-
-
-
-
-
-.sheet-section-actions div[class*="sheet-toggle-"],
-.sheet-section-weapons div[class*="sheet-toggle-"] {
-	display: none;
-}
-
-.sheet-toggle-old-weapons button {
-	line-height: 100%;
-}
-
-input.sheet-tab-action.sheet-toggle-crit,
-span.sheet-tab-action.sheet-toggle-crit,
-input.sheet-tab-action.sheet-toggle-crit-bonus,
-span.sheet-tab-action.sheet-toggle-crit-bonus,
-input.sheet-tab-action.sheet-toggle-alt-damage,
-span.sheet-tab-action.sheet-toggle-alt-damage,
-input.sheet-tab-action.sheet-toggle-second-damage,
-span.sheet-tab-action.sheet-toggle-second-damage,
-input.sheet-tab-action.sheet-toggle-ammo,
-span.sheet-tab-action.sheet-toggle-ammo,
-input.sheet-tab-action.sheet-toggle-ammo-auto,
-span.sheet-tab-action.sheet-toggle-ammo-auto,
-input.sheet-tab-action.sheet-toggle-sv-damage,
-span.sheet-tab-action.sheet-toggle-sv-damage,
-input.sheet-tab-action.sheet-toggle-sv-second-damage,
-span.sheet-tab-action.sheet-toggle-sv-second-damage {
-	display: none;
-}
-
-input.sheet-slide-input-spell-slots-points:not(:checked) ~ div.sheet-spell-slots,
-input.sheet-slide-input-spell-slots-points:checked ~ div.sheet-spell-points,
-input.sheet-slide-input-spell-slots-points:not(:checked) ~ span .sheet-spell-toggle-slots,
-input.sheet-slide-input-spell-slots-points:checked ~ span .sheet-spell-toggle-points,
-input.sheet-slide-input-spell-slots-points:not(:checked) ~ div .sheet-spell-toggle-slots,
-input.sheet-slide-input-spell-slots-points:checked ~ div .sheet-spell-toggle-points {
-	display: block;
-}
-input.sheet-slide-input-spell-slots-points:not(:checked) ~ div.sheet-spell-points,
-input.sheet-slide-input-spell-slots-points:checked ~ div.sheet-spell-slots,
-input.sheet-slide-input-spell-slots-points:not(:checked) ~ span .sheet-spell-toggle-points,
-input.sheet-slide-input-spell-slots-points:checked ~ span .sheet-spell-toggle-slots,
-input.sheet-slide-input-spell-slots-points:not(:checked) ~ div .sheet-spell-toggle-points,
-input.sheet-slide-input-spell-slots-points:checked ~ div .sheet-spell-toggle-slots {
-	display: none;
-}
-
-input.sheet-tab-spellbook-filter-prepared:checked ~ div input.sheet-tab-spellbook-prep-con-rit-prepared:not(:checked) ~ .sheet-spellbook-toggle-spell,
-input.sheet-tab-spellbook-filter-ritual:checked ~ div input.sheet-tab-spellbook-prep-con-rit-ritual:not(:checked) ~ .sheet-spellbook-toggle-spell,
-input.sheet-tab-spellbook-filter-concentration:not(:checked) ~ div input.sheet-tab-spellbook-prep-con-rit-concentration:checked ~ .sheet-spellbook-toggle-spell,
-input.sheet-tab-spellbook-filter-verbal:not(:checked) ~ div input.sheet-toggle-spell-vsm-v:checked ~ .sheet-spellbook-toggle-spell,
-input.sheet-tab-spellbook-filter-somatic:not(:checked) ~ div input.sheet-toggle-spell-vsm-s:checked~ .sheet-spellbook-toggle-spell,
-input.sheet-tab-spellbook-filter-material:not(:checked) ~ div input.sheet-toggle-spell-vsm-m:checked ~ .sheet-spellbook-toggle-spell {
-	display: none;
-}
-
-input.sheet-tab-spellbook-filter-condensed:checked ~ div .sheet-spellbook-toggle-spell-details {
-	display: none;
-}
-
-input.sheet-toggle-range:checked ~ input.sheet-tab-action.sheet-toggle-ammo,
-input.sheet-toggle-range:checked ~ span.sheet-tab-action.sheet-toggle-ammo,
-input.sheet-toggle-ammo:checked ~ input.sheet-tab-action.sheet-toggle-ammo-auto,
-input.sheet-toggle-ammo:checked ~ span.sheet-tab-action.sheet-toggle-ammo-auto,
-input.sheet-toggle-damage:checked ~ input.sheet-tab-action.sheet-toggle-alt-damage,
-input.sheet-toggle-damage:checked ~ span.sheet-tab-action.sheet-toggle-alt-damage,
-input.sheet-toggle-damage:checked ~ input.sheet-tab-action.sheet-toggle-second-damage,
-input.sheet-toggle-damage:checked ~ span.sheet-tab-action.sheet-toggle-second-damage,
-input.sheet-toggle-damage:checked ~ input.sheet-tab-action.sheet-toggle-crit,
-input.sheet-toggle-damage:checked ~ span.sheet-tab-action.sheet-toggle-crit,
-input.sheet-toggle-crit:checked ~ input.sheet-tab-action.sheet-toggle-crit-bonus,
-input.sheet-toggle-crit:checked ~ span.sheet-tab-action.sheet-toggle-crit-bonus,
-input.sheet-toggle-save:checked ~ input.sheet-tab-action.sheet-toggle-sv-damage,
-input.sheet-toggle-save:checked ~ span.sheet-tab-action.sheet-toggle-sv-damage,
-input.sheet-toggle-save:checked ~ input.sheet-tab-action.sheet-toggle-sv-second-damage,
-input.sheet-toggle-save:checked ~ span.sheet-tab-action.sheet-toggle-sv-second-damage {
-	display: inline-block;
-}
-
-input.sheet-toggle-emote:checked ~ div.sheet-toggle-emote,
-input.sheet-toggle-effects:checked ~ div.sheet-toggle-effects,
 input.sheet-toggle-hidden-info:checked ~ div.sheet-toggle-hidden-info {
 	display: block;
 }
 
-input.sheet-toggle-attack:checked ~ div div.sheet-toggle-attack,
-input.sheet-toggle-details:checked ~ div div.sheet-toggle-details,
-input.sheet-toggle-reach:checked ~ div div.sheet-toggle-reach,
-input.sheet-toggle-range:checked ~ div div.sheet-toggle-range,
-input.sheet-toggle-ammo:checked ~ div div.sheet-toggle-ammo,
-input.sheet-toggle-target:checked ~ div div.sheet-toggle-target,
-input.sheet-toggle-damage:checked ~ div div.sheet-toggle-damage,
-input.sheet-toggle-alt-damage:checked ~ div div.sheet-toggle-alt-damage,
-input.sheet-toggle-second-damage:checked ~ div div.sheet-toggle-second-damage,
-input.sheet-toggle-crit:checked ~ div div.sheet-toggle-crit,
-input.sheet-toggle-crit-bonus:checked ~ div div.sheet-toggle-crit-bonus,
-input.sheet-toggle-bonuses:checked ~ div div.sheet-toggle-bonuses,
-input.sheet-toggle-save:checked ~ div div.sheet-toggle-save,
-input.sheet-toggle-sv-damage:checked ~ div div.sheet-toggle-sv-damage,
-input.sheet-toggle-sv-second-damage:checked ~ div div.sheet-toggle-sv-second-damage,
-input.sheet-toggle-spell-heal:checked ~ div div.sheet-toggle-spell-heal,
-input.sheet-toggle-recharge:checked ~ div div.sheet-toggle-recharge,
-input.sheet-toggle-melee-weapons:checked ~ div div.sheet-toggle-melee-weapons,
-input.sheet-toggle-ranged-weapons:checked ~ div div.sheet-toggle-ranged-weapons,
-input.sheet-toggle-old-weapons:checked ~ div div.sheet-toggle-old-weapons,
-input.sheet-toggle-quick-weapons:checked ~ div.sheet-toggle-quick-weapons,
-input.sheet-toggle-traits:checked ~ div div.sheet-toggle-traits,
-input.sheet-toggle-regional-effects:checked ~ div div.sheet-toggle-regional-effects,
-input.sheet-toggle-lair-actions:checked ~ div div.sheet-toggle-lair-actions,
-input.sheet-toggle-legendary-actions:checked ~ div div.sheet-toggle-legendary-actions,
-input.sheet-toggle-reactions:checked ~ div div.sheet-toggle-reactions,
-input.sheet-toggle-multiattack:checked ~ div div.sheet-toggle-multiattack,
-input.sheet-toggle-actions:checked ~ div div.sheet-toggle-actions,
-input.sheet-toggle-spell-vsm-m:checked ~ div div.sheet-toggle-spell-vsm-m {
-	display: inline-block;
+.sheet-slide-input-spell-slots-points {
+	&:checked {
+		~ .sheet-spell-slots,
+		~ div .sheet-spell-slots {
+			display: none;
+		}
+	}
+	&:not(:checked) {
+		~ .sheet-spell-points,
+		~ div .sheet-spell-points {
+			display: none;
+		}
+	}
 }
 
-
+/* Action specific stuff */
+input.sheet-toggle-traits:not(:checked) ~ div.sheet-toggle-traits,
+input.sheet-toggle-regional-effects:not(:checked) ~ div.sheet-toggle-regional-effects,
+input.sheet-toggle-lair-actions:not(:checked) ~ div.sheet-toggle-lair-actions,
+input.sheet-toggle-legendary-actions:not(:checked) ~ div.sheet-toggle-legendary-actions,
+input.sheet-toggle-reactions:not(:checked) ~ div.sheet-toggle-reactions,
+input.sheet-toggle-multiattack:not(:checked) ~ div.sheet-toggle-multiattack,
+input.sheet-toggle-actions:not(:checked) ~ div.sheet-toggle-actions,
+input.sheet-toggle-melee-weapons:not(:checked) ~ div.sheet-toggle-melee-weapons,
+input.sheet-toggle-ranged-weapons:not(:checked) ~ div.sheet-toggle-ranged-weapons,
+input.sheet-toggle-old-weapons:not(:checked) ~ div.sheet-toggle-old-weapons,
 input.sheet-toggle-quick-weapons:not(:checked) ~ div.sheet-toggle-quick-weapons,
+input.sheet-toggle-emote:not(:checked) ~ div.sheet-toggle-emote,
 input.sheet-toggle-attack:not(:checked) ~ div div.sheet-toggle-attack,
 input.sheet-toggle-reach:not(:checked) ~ div div.sheet-toggle-reach,
 input.sheet-toggle-range:not(:checked) ~ div div.sheet-toggle-range,
-input.sheet-toggle-range:not(:checked) ~ input.sheet-toggle-ammo-auto,
-input.sheet-toggle-range:not(:checked) ~ span.sheet-toggle-ammo-auto,
-input.sheet-toggle-range:not(:checked) ~ div div.sheet-toggle-ammo-auto,
+input.sheet-toggle-range:not(:checked) ~ .sheet-toggle-ammo,
+input.sheet-toggle-range:not(:checked) ~ .sheet-toggle-ammo-auto,
 input.sheet-toggle-ammo:not(:checked) ~ div div.sheet-toggle-ammo,
+input.sheet-toggle-ammo:not(:checked) ~ .sheet-toggle-ammo-auto,
 input.sheet-toggle-target:not(:checked) ~ div div.sheet-toggle-target,
 input.sheet-toggle-damage:not(:checked) ~ div div.sheet-toggle-damage,
+input.sheet-toggle-damage:not(:checked) ~ .sheet-toggle-alt-damage,
+input.sheet-toggle-damage:not(:checked) ~ .sheet-toggle-second-damage,
+input.sheet-toggle-damage:not(:checked) ~ .sheet-toggle-crit,
 input.sheet-toggle-alt-damage:not(:checked) ~ div div.sheet-toggle-alt-damage,
 input.sheet-toggle-second-damage:not(:checked) ~ div div.sheet-toggle-second-damage,
 input.sheet-toggle-crit:not(:checked) ~ div div.sheet-toggle-crit,
-input.sheet-toggle-damage:not(:checked) ~ input.sheet-toggle-crit-bonus,
-input.sheet-toggle-damage:not(:checked) ~ span.sheet-toggle-crit-bonus,
-input.sheet-toggle-damage:not(:checked) ~ div div.sheet-toggle-crit-bonus,
 input.sheet-toggle-crit-bonus:not(:checked) ~ div div.sheet-toggle-crit-bonus,
-input.sheet-toggle-save:not(:checked) ~ div div.sheet-toggle-save,
-input.sheet-toggle-sv-damage:not(:checked) ~ div div.sheet-toggle-sv-damage,
-input.sheet-toggle-sv-second-damage:not(:checked) ~ div div.sheet-toggle-sv-second-damage,
+input.sheet-toggle-bonuses:not(:checked) ~ div div.sheet-toggle-bonuses,
+input.sheet-toggle-effects:not(:checked) ~ div.sheet-toggle-effects,
+/* Spell specific stuff */
+input.sheet-toggle-spells-filter-condensed:checked ~ div .sheet-spells-toggle-spell-details,
+input.sheet-toggle-spells-filter-prepared:checked ~ div input.sheet-toggle-spells-prep-con-rit-prepared:not(:checked) ~ .sheet-spells-toggle-spell,
+input.sheet-toggle-spells-filter-ritual:checked ~ div input.sheet-toggle-spells-prep-con-rit-ritual:not(:checked) ~ .sheet-spells-toggle-spell,
+input.sheet-toggle-spells-filter-concentration:not(:checked) ~ div input.sheet-toggle-spells-prep-con-rit-concentration:checked ~ .sheet-spells-toggle-spell,
+input.sheet-toggle-spells-filter-verbal:not(:checked) ~ div input.sheet-toggle-spell-vsm-v:checked ~ .sheet-spells-toggle-spell,
+input.sheet-toggle-spells-filter-somatic:not(:checked) ~ div input.sheet-toggle-spell-vsm-s:checked ~ .sheet-spells-toggle-spell,
+input.sheet-toggle-spells-filter-material:not(:checked) ~ div input.sheet-toggle-spell-vsm-m:checked ~ .sheet-spells-toggle-spell,
+input.sheet-toggle-spells-filter-casting-time-reaction:checked ~ div input.sheet-toggle-casting-time-reaction:not(:checked) ~ .sheet-spells-toggle-spell,
+input.sheet-toggle-spells-filter-casting-time-bonus:checked ~ div input.sheet-toggle-casting-time-bonus:not(:checked) ~ .sheet-spells-toggle-spell,
+input.sheet-toggle-spells-filter-casting-time-action:checked ~ div input.sheet-toggle-casting-time-action:not(:checked) ~ .sheet-spells-toggle-spell,
+input.sheet-toggle-spells-filter-casting-time-minute:checked ~ div input.sheet-toggle-casting-time-minute:not(:checked) ~ .sheet-spells-toggle-spell,
+input.sheet-toggle-spells-filter-casting-time-longer:checked ~ div input.sheet-toggle-casting-time-longer:not(:checked) ~ .sheet-spells-toggle-spell,
+input.sheet-toggle-spell-vsm-m:not(:checked) ~ div div.sheet-toggle-spell-vsm-m,
+input.sheet-toggle-casting-time-longer:not(:checked) ~ div div.sheet-toggle-casting-time-longer,
+input.sheet-toggle-description:not(:checked) ~ div div.sheet-toggle-description,
 input.sheet-toggle-spell-higherlvl:not(:checked) ~ div div.sheet-toggle-spell-higherlvl,
 input.sheet-toggle-spell-higherlvl-query:not(:checked) ~ div div.sheet-toggle-spell-higherlvl-query,
+input.sheet-toggle-spell-higherlvl-query:not(:checked) ~ .sheet-toggle-spell-output-higherlvl-query,
+input.sheet-toggle-save:not(:checked) ~ div.sheet-toggle-save,
+input.sheet-toggle-save:not(:checked) ~ .sheet-toggle-sv-damage,
+input.sheet-toggle-save:not(:checked) ~ .sheet-toggle-sv-second-damage,
+input.sheet-toggle-sv-damage:not(:checked) ~ div div.sheet-toggle-sv-damage,
+input.sheet-toggle-sv-second-damage:not(:checked) ~ div div.sheet-toggle-sv-second-damage,
+input.sheet-toggle-heal:not(:checked) ~ div.sheet-toggle-heal,
+input.sheet-toggle-recharge:not(:checked) ~ div div.sheet-toggle-recharge,
+input.sheet-toggle-spell-from:not(:checked) ~ div div.sheet-toggle-spell-from,
+input.sheet-toggle-spell-source:not(:checked) ~ div div.sheet-toggle-spell-source,
 input.sheet-slide-input-custom-skills:not(:checked) ~ div.sheet-slide-toggle-custom-skills,
-input.sheet-tab-hd-d4:not(:checked) ~ div.sheet-tab-hd-d4,
-input.sheet-tab-hd-d6:not(:checked) ~ div.sheet-tab-hd-d6,
-input.sheet-tab-hd-d8:not(:checked) ~ div.sheet-tab-hd-d8,
-input.sheet-tab-hd-d10:not(:checked) ~ div.sheet-tab-hd-d10,
-input.sheet-tab-hd-d12:not(:checked) ~ div.sheet-tab-hd-d12,
-input.sheet-tab-hd-d20:not(:checked) ~ div.sheet-tab-hd-d20,
-input.sheet-toggle-bonuses:not(:checked) ~ div div.sheet-toggle-bonuses {
-	display: none !important;
+/* misc stuff */
+input.sheet-toggle-hd-d4:not(:checked) ~ div.sheet-toggle-hd-d4,
+input.sheet-toggle-hd-d6:not(:checked) ~ div.sheet-toggle-hd-d6,
+input.sheet-toggle-hd-d8:not(:checked) ~ div.sheet-toggle-hd-d8,
+input.sheet-toggle-hd-d10:not(:checked) ~ div.sheet-toggle-hd-d10,
+input.sheet-toggle-hd-d12:not(:checked) ~ div.sheet-toggle-hd-d12,
+input.sheet-toggle-hd-d20:not(:checked) ~ div.sheet-toggle-hd-d20,
+/* Class Action */
+input[class^="sheet-classactionshowoptions"]:not(:checked) ~ div.sheet-classaction-output-options {
+	display: none;
 }
 
-.sheet-section-spellbook {
+.sheet-section-spells {
   .repcontrol_del {
     position: relative;
     z-index: 100;
   }
 }
 
-.sheet-spellbook-filter {
+.sheet-spells-filter {
 	font-size: 11px;
 	display: inline-block;
-	line-height: 100%;
 }
 
-input[class*="sheet-tab-spellbook-filter"],
-span[class*="sheet-tab-spellbook-filter"],
-input[class*="sheet-tab-spellbook-prep-con-rit"],
-span[class*="sheet-tab-spellbook-prep-con-rit"] {
+input[class^="sheet-toggle-spells-filter"],
+span[class^="sheet-toggle-spells-filter"],
+input[class^="sheet-toggle-spells-prep-con-rit"],
+span[class^="sheet-toggle-spells-prep-con-rit"] {
 	height: 12px;
-	padding: 1px;
-}
-
-$spell-condensed-width: 62px;
-input.sheet-tab-spellbook-filter-condensed,
-span.sheet-tab-spellbook-filter-condensed {
-	width: $spell-condensed-width;
-}
-span.sheet-tab-spellbook-filter-condensed {
-	margin-left: -$spell-condensed-width;
-}
-$spell-prepared-width: 51px;
-input.sheet-tab-spellbook-filter-prepared,
-span.sheet-tab-spellbook-filter-prepared,
-input.sheet-tab-spellbook-prep-con-rit-prepared,
-span.sheet-tab-spellbook-prep-con-rit-prepared {
-	width: $spell-prepared-width;
-}
-span.sheet-tab-spellbook-filter-prepared,
-span.sheet-tab-spellbook-prep-con-rit-prepared {
-	margin-left: -$spell-prepared-width;
-}
-$spell-ritual-width: 34px;
-input.sheet-tab-spellbook-filter-ritual,
-span.sheet-tab-spellbook-filter-ritual,
-input.sheet-tab-spellbook-prep-con-rit-ritual,
-span.sheet-tab-spellbook-prep-con-rit-ritual {
-	width: $spell-ritual-width;
-}
-span.sheet-tab-spellbook-filter-ritual,
-span.sheet-tab-spellbook-prep-con-rit-ritual {
-	margin-left: -$spell-ritual-width;
-}
-$spell-concentration-width: 73px;
-input.sheet-tab-spellbook-filter-concentration,
-span.sheet-tab-spellbook-filter-concentration,
-input.sheet-tab-spellbook-prep-con-rit-concentration,
-span.sheet-tab-spellbook-prep-con-rit-concentration {
-	width: $spell-concentration-width;
-}
-span.sheet-tab-spellbook-filter-concentration,
-span.sheet-tab-spellbook-prep-con-rit-concentration {
-	margin-left: -$spell-concentration-width;
-}
-$spell-verbal-width: 38px;
-input.sheet-tab-spellbook-filter-verbal,
-span.sheet-tab-spellbook-filter-verbal {
-	width: $spell-verbal-width;
-}
-span.sheet-tab-spellbook-filter-verbal {
-	margin-left: -$spell-verbal-width;
-}
-$spell-somatic-width: 45px;
-input.sheet-tab-spellbook-filter-somatic,
-span.sheet-tab-spellbook-filter-somatic {
-	width: $spell-somatic-width;
-}
-span.sheet-tab-spellbook-filter-somatic {
-	margin-left: -$spell-somatic-width;
-}
-$spell-material-width: 44px;
-input.sheet-tab-spellbook-filter-material,
-span.sheet-tab-spellbook-filter-material {
-	width: $spell-material-width;
-}
-span.sheet-tab-spellbook-filter-material {
-	margin-left: -$spell-material-width;
 }
 
 .sheet-spell-name {
@@ -1793,313 +1631,102 @@ span.sheet-tab-spellbook-filter-material {
 	font-family: "Times New Roman";
 }
 
-
-div[class*="sheet-toggle-spell"] {
-	display: none;
-}
-input.sheet-toggle-spell-description:checked ~ div div.sheet-toggle-spell-description,
-input.sheet-toggle-spell-higherlvl:checked ~ div div.sheet-toggle-spell-higherlvl {
-	display: inline-block;
-}
-input.sheet-toggle-spell-higherlvl-query:checked ~ div.sheet-toggle-spell-higherlvl-query,
-input.sheet-toggle-spell-emote:checked ~ div.sheet-toggle-spell-emote,
-input.sheet-toggle-spell-attack:checked ~ div.sheet-toggle-spell-attack,
-input.sheet-toggle-spell-save:checked ~ div.sheet-toggle-spell-save,
-input.sheet-toggle-spell-heal:checked ~ div.sheet-toggle-spell-heal,
-input.sheet-toggle-spell-damage:checked ~ div.sheet-toggle-spell-damage,
-input.sheet-toggle-spell-effects:checked ~ div.sheet-toggle-spell-effects,
-input.sheet-toggle-spell-from:checked ~ div.sheet-toggle-spell-from,
-input.sheet-slide-toggle-custom-skills:checked ~ div.sheet-slide-toggle-custom-skills,
-input.sheet-tab-hd-d4:checked ~ div.sheet-tab-hd-d4,
-input.sheet-tab-hd-d6:checked ~ div.sheet-tab-hd-d6,
-input.sheet-tab-hd-d8:checked ~ div.sheet-tab-hd-d8,
-input.sheet-tab-hd-d10:checked ~ div.sheet-tab-hd-d10,
-input.sheet-tab-hd-d12:checked ~ div.sheet-tab-hd-d12,
-input.sheet-tab-hd-d20:checked ~ div.sheet-tab-hd-d20 {
-	display: block;
-}
-
-input[class*="sheet-tab"]:checked + span[class*="sheet-tab"],
-input[class*="sheet-toggle"]:checked + span[class*="sheet-toggle"] {
+input[class^="sheet-toggle"]:checked + span[class^="sheet-toggle"] {
 	background-color: $deepGreen;
 }
 
-input[class*="sheet-tab-spellbook"]:checked + span[class*="sheet-tab-spellbook"],
-input[class*="sheet-tab-inventory"]:checked + span[class*="sheet-tab-inventory"],
-input[class*="sheet-tab-class-action"]:checked + span[class*="sheet-tab-class-action"] {
+input[class^="sheet-toggle-spells"]:checked + span[class^="sheet-toggle-spells"],
+input[class^="sheet-toggle-inventory-"]:checked + span[class^="sheet-toggle-inventory-"],
+input[class^="sheet-toggle-class-action-"]:checked + span[class^="sheet-toggle-class-action-"] {
 	background-color: $deepRed;
 }
 
 
-$tab-action-alt-damage-width: 25px;
-input.sheet-tab-action.sheet-toggle-alt-damage,
-span.sheet-tab-action.sheet-toggle-alt-damage {
-	width: $tab-action-alt-damage-width;
-}
-span.sheet-tab-action.sheet-toggle-alt-damage {
-	margin-left: -$tab-action-alt-damage-width;
-}
-$tab-action-crit-width: 26px;
-input.sheet-tab-action.sheet-toggle-crit,
-span.sheet-tab-action.sheet-toggle-crit {
-	width: $tab-action-crit-width;
-}
-span.sheet-tab-action.sheet-toggle-crit {
-	margin-left: -$tab-action-crit-width;
-}
-$tab-action-bonuses-width: 46px;
-input.sheet-tab-action.sheet-toggle-bonuses,
-span.sheet-tab-action.sheet-toggle-bonuses {
-	width: $tab-action-bonuses-width;
-}
-span.sheet-tab-action.sheet-toggle-bonuses {
-	margin-left: -$tab-action-bonuses-width;
-}
 
-$tab-action-damage-width: 30px;
-input.sheet-tab-action.sheet-toggle-damage,
-input.sheet-tab-action.sheet-toggle-save,
-input.sheet-tab-action.sheet-toggle-sv-damage,
-span.sheet-tab-action.sheet-toggle-damage,
-span.sheet-tab-action.sheet-toggle-save,
-span.sheet-tab-action.sheet-toggle-sv-damage {
-	width: $tab-action-damage-width;
-}
-span.sheet-tab-action.sheet-toggle-damage,
-span.sheet-tab-action.sheet-toggle-save,
-span.sheet-tab-action.sheet-toggle-sv-damage {
-	margin-left: -$tab-action-damage-width;
-}
-$tab-action-second-damage-width: 57px;
-input.sheet-tab-action.sheet-toggle-second-damage,
-span.sheet-tab-action.sheet-toggle-second-damage,
-input.sheet-tab-action.sheet-toggle-sv-second-damage,
-span.sheet-tab-action.sheet-toggle-sv-second-damage {
-	width: $tab-action-second-damage-width;
-}
-span.sheet-tab-action.sheet-toggle-second-damage,
-span.sheet-tab-action.sheet-toggle-sv-second-damage {
-	margin-left: -$tab-action-second-damage-width;
-}
-$tab-action-recharge-width: 51px;
-input.sheet-tab-action.sheet-toggle-recharge,
-span.sheet-tab-action.sheet-toggle-recharge {
-	width: $tab-action-recharge-width;
-}
-span.sheet-tab-action.sheet-toggle-recharge {
-	margin-left: -$tab-action-recharge-width;
-}
-
-
-$tab-spell-type-description-width: 60px;
-input.sheet-tab-spell-type.sheet-toggle-spell-description,
-span.sheet-tab-spell-type.sheet-toggle-spell-description,
-input.sheet-tab-spell-type.sheet-toggle-spell-higherlvl,
-span.sheet-tab-spell-type.sheet-toggle-spell-higherlvl {
-	width: $tab-spell-type-description-width;
-}
-span.sheet-tab-spell-type.sheet-toggle-spell-description,
-span.sheet-tab-spell-type.sheet-toggle-spell-higherlvl {
-	margin-left: -$tab-spell-type-description-width;
-}
-
-$tab-spell-type-higher-level-query-width: 85px;
-input.sheet-tab-spell-type.sheet-toggle-spell-higherlvl-query,
-span.sheet-tab-spell-type.sheet-toggle-spell-higherlvl-query {
-	width: $tab-spell-type-higher-level-query-width;
-}
-span.sheet-tab-spell-type.sheet-toggle-spell-higherlvl-query {
-	margin-left: -$tab-spell-type-higher-level-query-width;
-}
-
-$tab-spell-type-vsm-width: 15px;
-input.sheet-tab-spell-type.sheet-toggle-spell-vsm,
-span.sheet-tab-spell-type.sheet-toggle-spell-vsm {
-	width: $tab-spell-type-vsm-width;
-}
-span.sheet-tab-spell-type.sheet-toggle-spell-vsm {
-	margin-left: -$tab-spell-type-vsm-width;
-}
-
-
-$tab-spell-type-width: 37px;
-input.sheet-tab-spell-type,
-span.sheet-tab-spell-type{
-	width: $tab-spell-type-width;
-}
-span.sheet-tab-spell-type {
-	margin-left: -$tab-spell-type-width;
-}
-
-$tab-action-special-actions-width: 100px;
-input.sheet-tab-action-special-actions,
-span.sheet-tab-action-special-actions {
-	width: $tab-action-special-actions-width;
-	height: 16px;
-}
-span.sheet-tab-action-special-actions {
-	margin-left: -$tab-action-special-actions-width;
-	font-size: 12px;
-	font-weight: bold;
-	padding: 2px;
-}
-$tab-action-traits-width: 50px;
-input.sheet-toggle-traits,
-span.sheet-toggle-traits {
-	width: $tab-action-traits-width;
-}
-span.sheet-toggle-traits {
-	margin-left: -$tab-action-traits-width;
-}
-
-$tab-action-legendary-actions-width: 120px;
-input.sheet-toggle-legendary-actions,
-span.sheet-toggle-legendary-actions {
-	width: $tab-action-legendary-actions-width;
-}
-span.sheet-toggle-legendary-actions {
-	margin-left: -$tab-action-legendary-actions-width;
-}
-$tab-action-reactions-width: 70px;
-input.sheet-toggle-reactions,
-span.sheet-toggle-reactions {
-	width: $tab-action-reactions-width;
-}
-span.sheet-toggle-reactions {
-	margin-left: -$tab-action-reactions-width;
-}
-$tab-action-multiattack-width: 75px;
-input.sheet-toggle-multiattack,
-span.sheet-toggle-multiattack {
-	width: $tab-action-multiattack-width;
-}
-span.sheet-toggle-multiattack {
-	margin-left: -$tab-action-multiattack-width;
-}
-$tab-action-action-width: 60px;
-input.sheet-toggle-actions,
-span.sheet-toggle-actions {
-	width: $tab-action-action-width;
-}
-span.sheet-toggle-actions {
-	margin-left: -$tab-action-action-width;
-}
-
-
-$tab-action-width: 37px;
-input.sheet-tab-action,
-span.sheet-tab-action {
-	width: $tab-action-width;
-}
-span.sheet-tab-action {
-	margin-left: -$tab-action-width;
-}
-
-span.sheet-tab-action {
-	padding: 1px;
-	font-size: 10px;
-}
-
-span[class*="sheet-tab-spellbook-filter"],
-span[class*="sheet-tab-spellbook-prep-con-rit"] {
-	font-size: 10px;
-}
-
-$tab-weapon-toggle-width: 60px;
-input.sheet-tab-weapon-toggle,
-span.sheet-tab-weapon-toggle {
-	height: 14px;
-	width: $tab-weapon-toggle-width;
-}
-span.sheet-tab-weapon-toggle {
-	margin-left: -$tab-weapon-toggle-width;
-	font-size: 12px;
-	padding: 1px;
-	font-weight: bold;
-}
-
-
-input.sheet-tab-spell-type,
-span.sheet-tab-spell-type {
-	height: 12px;
-}
-span.sheet-tab-spell-type {
-	background-color: $gray;
-	padding: 1px;
+span[class^="sheet-toggle-spells-filter"],
+span[class^="sheet-toggle-spells-prep-con-rit"] {
 	font-size: 10px;
 }
 
 div[class^="sheet-inventory-page"] {
 	display: none;
 }
-div[class^="sheet-inventory-page"] input {
-	line-height: 100%;
-}
-input.sheet-tab-inventory1:checked ~ div.sheet-inventory-page1,
-input.sheet-tab-inventory2:checked ~ div.sheet-inventory-page2,
-input.sheet-tab-inventory3:checked ~ div.sheet-inventory-page3,
-input.sheet-tab-inventory4:checked ~ div.sheet-inventory-page4,
-input.sheet-tab-inventory99:checked ~ div[class^="sheet-inventory-page"] {
+input.sheet-toggle-inventory-1:checked ~ div.sheet-inventory-page-1,
+input.sheet-toggle-inventory-2:checked ~ div.sheet-inventory-page-2,
+input.sheet-toggle-inventory-3:checked ~ div.sheet-inventory-page-3,
+input.sheet-toggle-inventory-99:checked ~ div[class^="sheet-inventory-page-"] {
 	display: block;
 }
-$tab-inventory-width: 24%;
-input.sheet-tab-inventory,
-span.sheet-tab-inventory {
-	width: $tab-inventory-width;
-	height: 16px;
-}
-span.sheet-tab-inventory {
-	margin-left: -$tab-inventory-width;
-	padding: 1px;
-}
-
-
-div[class^="sheet-classaction-page"] {
+div[class^="sheet-toggle-class-action-"] {
 	display: none;
 }
-input.sheet-tab-class-action1:checked ~ div.sheet-classaction-page1,
-input.sheet-tab-class-action2:checked ~ div.sheet-classaction-page2,
-input.sheet-tab-class-action99:checked ~ div[class^="sheet-classaction-page"] {
+.sheet-toggle-class-action-page-1:checked ~ div.sheet-toggle-class-action-page-1,
+.sheet-toggle-class-action-page-2:checked ~ div.sheet-toggle-class-action-page-2,
+.sheet-toggle-class-action-page-99:checked ~ div[class^="sheet-toggle-class-action-page-"] {
 	display: block;
 }
-$tab-class-width: 155px;
-input.sheet-tab-class-action,
-span.sheet-tab-class-action {
-	width: $tab-class-width;
-	height: 16px;
-}
-span.sheet-tab-class-action {
-	margin-left: -$tab-class-width;
-	padding: 2px;
-}
-.sheet-classaction-output-options {
-	display: none;
-}
-input[class^="sheet-classactionshowoptions"]:checked ~ div.sheet-classaction-output-options {
-	display: block;
-}
+
 .sheet-class-action-zebra {
-	.sheet-row:nth-child(even) {
+	.sheet-shaped-row:nth-child(even) {
 		background-color: #D5E3E7;
 	}
 }
+
+
+input,
+span {
+	&.sheet-toggle-melee-weapons,
+	&.sheet-toggle-ranged-weapons,
+	&.sheet-toggle-old-weapons,
+	&.sheet-toggle-quick-weapons,
+	&[class^="sheet-toggle-inventory-"],
+	&[class^="sheet-toggle-class-action-"],
+	&[class^="sheet-toggle-spells-page-"],
+	&.sheet-toggle-traits,
+	&.sheet-toggle-regional-effects,
+	&.sheet-toggle-lair-actions,
+	&.sheet-toggle-legendary-actions,
+	&.sheet-toggle-reactions,
+	&.sheet-toggle-multiattack,
+	&.sheet-toggle-actions {
+		height: 14px;
+		margin-top: 2px;
+		margin-bottom: 2px;
+	}
+}
+
+span {
+	&.sheet-toggle-melee-weapons,
+	&.sheet-toggle-ranged-weapons,
+	&.sheet-toggle-old-weapons,
+	&.sheet-toggle-quick-weapons,
+	&[class^="sheet-toggle-inventory-"],
+	&[class^="sheet-toggle-class-action-"],
+	&[class^="sheet-toggle-spells-page-"],
+	&.sheet-toggle-traits,
+	&.sheet-toggle-regional-effects,
+	&.sheet-toggle-lair-actions,
+	&.sheet-toggle-legendary-actions,
+	&.sheet-toggle-reactions,
+	&.sheet-toggle-multiattack,
+	&.sheet-toggle-actions {
+		font-size: 12px;
+	}
+}
+
+
 .sheet-spell-slots,
 .sheet-spell-points {
 	margin-top: -10px;
 }
-
 .sheet-spell-slots-points {
-	.sheet-row:nth-child(even) {
+	.sheet-shaped-row:nth-child(even) {
 		background-color: #EFF8FA;
 	}
 }
 
 .sheet-no-background {
 	background-color: transparent !important;
-}
-
-[class*="sheet-col"] {
-	line-height: 100%;
 }
 
 .sheet-spell-row-number,
@@ -2111,7 +1738,6 @@ input[class^="sheet-classactionshowoptions"]:checked ~ div.sheet-classaction-out
 .sheet-small-label,
 .sheet-rolltemplate-5eDefault .sheet-small-label {
 	font-size: 10px !important;
-	line-height: 100%;
 }
 
 .sheet-small-label {
@@ -2121,7 +1747,6 @@ input[class^="sheet-classactionshowoptions"]:checked ~ div.sheet-classaction-out
 		height: 12px;
 		padding: 0;
 		font-size: 8px;
-		line-height: 100%;
 	}
 }
 
@@ -2132,19 +1757,6 @@ input[class^="sheet-classactionshowoptions"]:checked ~ div.sheet-classaction-out
 		-moz-appearance: none;
 		appearance: none;
 	}
-}
-
-.sheet-custom-class-hd {
-	select {
-		line-height: 100%;
-		padding: 0;
-	}
-}
-
-
-.sheet-hd-row {
-	font-size: 62% !important;
-	line-height: 100% !important;
 }
 [class*="sheet-pictos"],
 .sheet-rolltemplate-5eDefault [class*="sheet-pictos"] {
@@ -2164,11 +1776,9 @@ input[class^="sheet-classactionshowoptions"]:checked ~ div.sheet-classaction-out
 	font-family: "Pictos Three";
 }
 
-.sheet-concentration-icon,
 .sheet-rolltemplate-5eDefault .sheet-concentration-icon {
 	font-size: 18px;
 }
-.sheet-ritual-icon,
 .sheet-rolltemplate-5eDefault .sheet-ritual-icon {
 	font-size: 20px;
 }
@@ -2182,8 +1792,7 @@ input[class^="sheet-classactionshowoptions"]:checked ~ div.sheet-classaction-out
 	border-left: 1px solid #000;
 }
 
-hr,
-.sheet-rolltemplate-5eDefault hr {
+hr {
 	border: 0;
 	height: 1px;
 	background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
@@ -2193,17 +1802,6 @@ hr,
 span.sheet-spacer {
 	display: block;
 	margin-top: 5px;
-}
-
-.sheet-heading-row {
-	text-align: center;
-	font-weight: bold;
-}
-.sheet-footer-row {
-	text-align: center;
-	font-weight: bold;
-	border-bottom: 1px solid #dddddd;
-	margin-bottom: 5px;
 }
 .sheet-vert-top,
 .sheet-rolltemplate-5eDefault .sheet-vert-top {
@@ -2249,25 +1847,18 @@ textarea {
 	resize: vertical;
 }
 
-.sheet-important-text {
+.sheet-important-text,
+.sheet-rolltemplate-5eDefault .sheet-important-text {
 	color: #ff0000;
-}
-
-.sheet-grey-row {
-	background-color: #eee;
 }
 
 .sheet-sub-header {
 	background-color: #cecece;
-	vertical-align: bottom;
-	line-height: 100%;
 	font-weight: bold;
 }
 
 .sheet-footer {
 	background-color: rgba(250, 202, 78, 0.2);
-	vertical-align: bottom;
-	margin-top: 3px;
 }
 
 
@@ -2275,18 +1866,10 @@ textarea {
 
 
 /* DO NOT EDIT BELOW THIS LINE OR RISK BREAKING FORMATTING */
-.sheet-row,
-.sheet-rolltemplate-5eDefault .sheet-row {
+.sheet-shaped-row,
+.sheet-rolltemplate-5eDefault .sheet-shaped-row {
 	letter-spacing: -0.31em; /* Webkit: collapse white-space between units */
 	text-rendering: optimizespeed; /* Webkit: fixes text-rendering: optimizeLegibility */
-}
-.sheet-rolltemplate-5eDefault .sheet-row {
-	padding-left: 3px;
-	padding-right: 3px;
-}
-.sheet-rolltemplate-5eDefault .sheet-rt-emote {
-	margin-left: 3px;
-	margin-right: 3px;
 }
 
 [class^="sheet-col"],
@@ -2297,11 +1880,6 @@ textarea {
 	word-spacing: normal;
 	vertical-align: top;
 	text-rendering: auto;
-}
-.sheet-col-1,
-.sheet-rolltemplate-5eDefault .sheet-col-1 {
-	width: 100%;
-	display: block;
 }
 .sheet-col-1-3,
 .sheet-rolltemplate-5eDefault .sheet-col-1-3 {
@@ -2315,8 +1893,7 @@ textarea {
 .sheet-rolltemplate-5eDefault .sheet-col-1-6 {
 	width: 16.66667%;
 }
-.sheet-col-1-8,
-.sheet-rolltemplate-5eDefault .sheet-col-1-8 {
+.sheet-col-1-8 {
 	width: 12.5%;
 }
 @for $i from 01 through 100 {
@@ -2329,15 +1906,22 @@ textarea {
 		width: round(percentage($i/100));
 	}
 }
-.sheet-offset-15,
-.sheet-rolltemplate-5eDefault .sheet-offset-15 {
+.sheet-offset-5 {
+	margin-left: 5%;
+}
+.sheet-offset-15 {
 	margin-left: 15%;
 }
-.sheet-offset-20,
-.sheet-rolltemplate-5eDefault .sheet-offset-20 {
+.sheet-offset-20 {
 	margin-left: 20%;
 }
-.sheet-offset-30,
-.sheet-rolltemplate-5eDefault .sheet-offset-30 {
+.sheet-offset-30 {
 	margin-left: 30%;
+}
+.sheet-gm-info-block,
+.sheet-gm-info-inline-block,
+.sheet-rolltemplate-5eDefault .sheet-gm-info-block,
+.sheet-rolltemplate-5eDefault .sheet-gm-info-inline-block {
+	background-color: #F2F5D3 !important;
+	display: none;
 }
