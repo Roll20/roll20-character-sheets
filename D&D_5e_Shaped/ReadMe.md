@@ -24,6 +24,10 @@ Long term:
 
 ### Changelog
 
+**August 26th 2015**
+
+* Fixed class action page tabs
+
 **August 22nd 2015**
 
 * Added global bonus for spell healing
