@@ -183,7 +183,8 @@ function skillQuery(file) {
 		query = '';
 
 	skillsJson.forEach(function(skill) {
-		query += '|' + skill.name + ', &amp;#123;&amp;#123;title=' + skill.name + '&amp;#125;&amp;#125; &amp;#123;&amp;#123;roll=[[d20@{d20_mod} + @{' + skill.name.lowercase().replace(/ +/g, '') + '}]]&amp;#125;&amp;#125; &amp;#123;&amp;#123;rolladv=[[d20@{d20_mod} + @{' + skill.name.lowercase().replace(/ +/g, '') + '}]]&amp;#125;&amp;#125;'
+		var skillName = skill.name.lowercase().replace(/ +/g, '');
+		query += '|' + skill.name + ', &amp;#123;&amp;#123;title=' + skill.name + '&amp;#125;&amp;#125; &amp;#123;&amp;#123;roll=[[d20@{d20_mod} + @{' + skillName + '}]]&amp;#125;&amp;#125; &amp;#123;&amp;#123;rolladv=[[d20@{d20_mod} + @{' + skillName + '}]]&amp;#125;&amp;#125;'
 	});
 	for (var i = 1, len = customSkillCount; i <= len; ++i) {
 		var skillName = '@{custom_skill_' + i + '_name}';
