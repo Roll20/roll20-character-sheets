@@ -24,6 +24,10 @@ Long term:
 
 ### Changelog
 
+**August 30th 2015**
+
+* Adjusted inline roll spacing for roll templates.
+
 **August 26th 2015**
 
 * Fixed class action page tabs
