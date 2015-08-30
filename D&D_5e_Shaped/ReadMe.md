@@ -26,6 +26,10 @@ Long term:
 
 **August 30th 2015**
 
+* Fixed roll template header colors.
+
+**August 29th 2015**
+
 * Adjusted inline roll spacing for roll templates.
 
 **August 26th 2015**
