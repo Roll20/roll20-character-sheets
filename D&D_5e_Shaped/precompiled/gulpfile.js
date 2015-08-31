@@ -8,7 +8,7 @@ var gulp = require('gulp'),
 	replace = require('gulp-replace-task');
 
 var customSkillCount = 4,
-	outputOtionsCount = 1,
+	outputOptionsCount = 1,
 	traitsCount = 1,
 	actionCount = 12,
 	lairActionCount = 4,
@@ -18,7 +18,7 @@ var customSkillCount = 4,
 	classActionsPerPage = 10,
 	customClassCount = 6,
 	spellCount = 10,
-	armorCount = 10,
+	armorCount = 6,
 	inventoryPerPage = 20,
 	abilitiesName = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'];
 
@@ -271,7 +271,7 @@ gulp.task('preCompile', function() {
 		.pipe( inject(gulp.src(['./components/class/output_options.html']), {
 			starttag: '<!-- inject:outputOptions:{{ext}} -->',
 			transform: function (filePath, file) {
-				return duplicate(file, outputOtionsCount);
+				return duplicate(file, outputOptionsCount);
 			}
 		}))
 		.pipe( inject(gulp.src(['./components/traits/traits.html']), {
