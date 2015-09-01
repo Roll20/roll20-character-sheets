@@ -5,6 +5,38 @@ use with Roll20.net and released open source under the MIT License.
 
 ### Changelog ###
 
+**Release 5.1 - July 13, 2015**
+- Bugfix: Armor Class now accounts for the miscellaneous modifiers.
+
+**Release 5.0 - May 12, 2015**
+- New layout with a tab-controlled interface
+- Added miscellaneous modifiers to stats, skills, weapons, and armor.
+- Moved all attack rolls to exist on a per-weapon basis.  
+- Reintroduced a spells section, now on a new tab.  Contains the full breakdown of the spell rolls.
+- Implemented inline rolls so hovering over results won't splash a big wall of math at you.
+
+**Release 4.5 - March 16, 2015**
+- Added note to initiative roll to explain initiative roll calculation.
+- Moved all roll calculation explanations to title attributes.  Now the explanations display when you hover over the buttons.  You are all now delivered from the cursed wall of text.
+- Rearranged the sheet to make more use of real estate.  
+- Added css for tables in order to better separate fields
+- Standardized roll template output
+- Changed "racial bonus" to "human racial bonus"
+- Removed "Dice Type" and "Dice Number" in favor of 1 field that'll do both: "Damage Dice"
+- Retitled some things for better display
+- Changed Height and Weight to text boxes... 
+
+**Release 4.1 - March 12, 2015**
+- Fixed logic on attack rolls.  M20's rulebook was worded in a confusing way, which resulted in an additional +1 roll per level on every attack roll.  So this fix removes that additional +1 per level.
+- Fixed Ranger bonus calculation.  Was missing an ending parenthesis, so it wasn't getting calculated.
+- Rearranged the sheet for easier readability
+- Added Shield section to add to AC
+- Added Stat rolls
+- Changed Equipment section to a single textarea... (nobody wants to painstakingly add every single inventory item to their sheet... much easier to just type it all out).
+- Changed title of Equipment Section to "Inventory"
+- Added Initiative roll (will automatically add to tracker)
+- Changed all roll buttons to use roll templates
+
 **Release 4 - March 10, 2015**
 - Cut down on the verbosity of rolls (took up too much of the chat box)
 - Removed Light Weapons from Missile Attack Roll
