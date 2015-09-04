@@ -1,4 +1,5 @@
 # Warhammer Fantasy Roleplay 2e Character Sheet
+version 0.1
 
 This work is based on original efforts by a Shawn Newsome.
 
@@ -29,6 +30,8 @@ Please submit bugs and feature requests to https://github.com/timothystone/roll2
 welcome.
 
 ## Future features
-1. HoneyBadger PowerCards
-2. Selectable Targets
-3. More documentation for player macros
+1. Roll Templates
+2. NPC Short Sheet/Tab
+3. Roll Widgets
+4. Combat and Spell API scripts
+5. More documentation for player macros
