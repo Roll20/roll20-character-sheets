@@ -24,6 +24,10 @@ Long term:
 
 ### Changelog
 
+**September 5th 2015**
+
+* Reduce number of attributes for spells.
+
 **August 30th 2015**
 
 * Fixed roll template header colors.
