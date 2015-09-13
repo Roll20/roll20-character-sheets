@@ -8,7 +8,7 @@ var gulp = require('gulp'),
 	replace = require('gulp-replace-task');
 
 var customSkillCount = 4,
-	outputOtionsCount = 1,
+	outputOptionsCount = 1,
 	traitsCount = 1,
 	actionCount = 12,
 	lairActionCount = 4,
@@ -18,7 +18,7 @@ var customSkillCount = 4,
 	classActionsPerPage = 10,
 	customClassCount = 6,
 	spellCount = 10,
-	armorCount = 10,
+	armorCount = 6,
 	inventoryPerPage = 20,
 	abilitiesName = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'];
 
@@ -183,7 +183,8 @@ function skillQuery(file) {
 		query = '';
 
 	skillsJson.forEach(function(skill) {
-		query += '|' + skill.name + ', &amp;#123;&amp;#123;title=' + skill.name + '&amp;#125;&amp;#125; &amp;#123;&amp;#123;roll=[[d20@{d20_mod} + @{' + skill.name.lowercase().replace(/ +/g, '') + '}]]&amp;#125;&amp;#125; &amp;#123;&amp;#123;rolladv=[[d20@{d20_mod} + @{' + skill.name.lowercase().replace(/ +/g, '') + '}]]&amp;#125;&amp;#125;'
+		var skillName = skill.name.lowercase().replace(/ +/g, '');
+		query += '|' + skill.name + ', &amp;#123;&amp;#123;title=' + skill.name + '&amp;#125;&amp;#125; &amp;#123;&amp;#123;roll=[[d20@{d20_mod} + @{' + skillName + '}]]&amp;#125;&amp;#125; &amp;#123;&amp;#123;rolladv=[[d20@{d20_mod} + @{' + skillName + '}]]&amp;#125;&amp;#125;'
 	});
 	for (var i = 1, len = customSkillCount; i <= len; ++i) {
 		var skillName = '@{custom_skill_' + i + '_name}';
@@ -270,7 +271,7 @@ gulp.task('preCompile', function() {
 		.pipe( inject(gulp.src(['./components/class/output_options.html']), {
 			starttag: '<!-- inject:outputOptions:{{ext}} -->',
 			transform: function (filePath, file) {
-				return duplicate(file, outputOtionsCount);
+				return duplicate(file, outputOptionsCount);
 			}
 		}))
 		.pipe( inject(gulp.src(['./components/traits/traits.html']), {
