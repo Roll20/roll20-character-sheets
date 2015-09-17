@@ -59,6 +59,7 @@ function spell (file, limit, start) {
 				.replace(/\x7B\x7Blevel_num\x7D\x7D/g, 'cantrip')
 				.replace(/\x7B\x7Blevel_num_readable\x7D\x7D/g, 'Cantrip')
 				.replace(/\x7B\x7Blevel_num_readable_de\x7D\x7D/g, 'Zaubertrick')
+				.replace(/\x7B\x7Blevel_num_readable_fr\x7D\x7D/g, 'Cantrip')
 				.replace(/\x7B\x7Bhidden_if_cantrip\x7D\x7D/g, ' sheet-hidden')
 				.replace(/\x7B\x7Bchecked_if_cantrip\x7D\x7D/g, ' checked')
 				.replace(/\x7B\x7BhigherLevelQuery\x7D\x7D/g, '');
@@ -73,6 +74,7 @@ function spell (file, limit, start) {
 				.replace(/\x7B\x7Blevel_num\x7D\x7D/g, 'level' + i.toString())
 				.replace(/\x7B\x7Blevel_num_readable\x7D\x7D/g, 'Level ' + i.toString())
 				.replace(/\x7B\x7Blevel_num_readable_de\x7D\x7D/g, 'Stufe ' + i.toString())
+				.replace(/\x7B\x7Blevel_num_readable_fr\x7D\x7D/g, 'Niveau ' + i.toString())
 				.replace(/\x7B\x7Bhidden_if_cantrip\x7D\x7D/g, '')
 				.replace(/\x7B\x7Bchecked_if_cantrip\x7D\x7D/g, '')
 				.replace(/\x7B\x7BhigherLevelQuery\x7D\x7D/g, higherLevelQuery);
@@ -145,8 +147,10 @@ function skills (file) {
 				.replace(/\x7B\x7Battribute\x7D\x7D/g, skill.attribute.capitalize())
 				.replace(/\x7B\x7Bfriendly_name\x7D\x7D/g, skill.name)
 				.replace(/\x7B\x7Bfriendly_name_de\x7D\x7D/g, skill.name_de)
+				.replace(/\x7B\x7Bfriendly_name_fr\x7D\x7D/g, skill.name_fr)
 				.replace(/\x7B\x7Bdescription\x7D\x7D/g, skill.description)
 				.replace(/\x7B\x7Bdescription_de\x7D\x7D/g, skill.description_de)
+				.replace(/\x7B\x7Bdescription_fr\x7D\x7D/g, skill.description_fr)
 		);
 	});
 	return skills.join('\n\n');
