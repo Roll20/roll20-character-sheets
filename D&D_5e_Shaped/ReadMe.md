@@ -26,6 +26,7 @@ Long term:
 **September 19th 2015**
 
 * Updated Save Macro
+* Updated Check Macro (Depreciate Skill macro)
 
 **September 17th 2015**
 

@@ -173,17 +173,27 @@ function saveQuery(file) {
 
 function checkQuery(file) {
 	var template = file.contents.toString('utf8'),
+		skillsJson = require('./components/skills/skills.json').skills,
 		query = '';
 
+	skillsJson.forEach(function(skill) {
+		var skillName = skill.name.lowercase().replace(/ +/g, '');
+		query += '|' + skill.name + ' (' + skill.attribute.capitalize() + ') , {{title=' + skill.name + '&amp;#125;&amp;#125; {{roll=[[d20@{d20_mod} + @{' + skillName + '}]]&amp;#125;&amp;#125; {{rolladv=[[d20@{d20_mod} + @{' + skillName + '}]]&amp;#125;&amp;#125;'
+	});
+	for (var i = 1, len = customSkillCount; i <= len; ++i) {
+		var skillName = '@{custom_skill_' + i + '_name}';
+
+		query += '|' + skillName + ', {{title=' + skillName + '&amp;#125;&amp;#125; {{roll=[[d20@{d20_mod} + @{custom_skill_' + i + '}]]&amp;#125;&amp;#125; {{rolladv=[[d20@{d20_mod} + @{custom_skill_' + i + '}]]&amp;#125;&amp;#125;'
+	}
+	query += '|-';
 	for (var i = 0; i < abilitiesName.length; ++i) {
 		var ability = abilitiesName[i];
-		query += '|' + ability + ', &amp;#123;&amp;#123;title=' + ability + '&amp;#125;&amp;#125; &amp;#123;&amp;#123;roll=[[d20@{d20_mod} + @{basic_' + ability.toLowerCase() + '_check_mod}]]&amp;#125;&amp;#125; &amp;#123;&amp;#123;rolladv=[[d20@{d20_mod} + @{basic_' + ability.toLowerCase() + '_check_mod}]]&amp;#125;&amp;#125;'
+		query += '|' + ability + ', {{title=' + ability + '&amp;#125;&amp;#125; {{roll=[[d20@{d20_mod} + @{basic_' + ability.toLowerCase() + '_check_mod}]]&amp;#125;&amp;#125; {{rolladv=[[d20@{d20_mod} + @{basic_' + ability.toLowerCase() + '_check_mod}]]&amp;#125;&amp;#125;';
 	}
-	template = template.replace(/\x7B\x7BcheckQuery\x7D\x7D/g, query);
+	query += '|Other, {{title=?{Other&amp;#124;Unspecified&amp;#125;&amp;#125;&amp;#125; {{roll=[[d20@{d20_mod} + ?{Modifiers&amp;#124;0&amp;#125;]]&amp;#125;&amp;#125; {{rolladv=[[d20@{d20_mod} + ?{Modifiers&amp;#124;0&amp;#125;]]&amp;#125;&amp;#125; ';
 
-	return template;
+	return template.replace(/\x7B\x7BcheckQuery\x7D\x7D/g, query);
 }
-
 function skillQuery(file) {
 	var template = file.contents.toString('utf8'),
 		skillsJson = require('./components/skills/skills.json').skills,
@@ -191,17 +201,15 @@ function skillQuery(file) {
 
 	skillsJson.forEach(function(skill) {
 		var skillName = skill.name.lowercase().replace(/ +/g, '');
-		query += '|' + skill.name + ', &amp;#123;&amp;#123;title=' + skill.name + '&amp;#125;&amp;#125; &amp;#123;&amp;#123;roll=[[d20@{d20_mod} + @{' + skillName + '}]]&amp;#125;&amp;#125; &amp;#123;&amp;#123;rolladv=[[d20@{d20_mod} + @{' + skillName + '}]]&amp;#125;&amp;#125;'
+		query += '|' + skill.name + ', {{title=' + skill.name + '&amp;#125;&amp;#125; {{roll=[[d20@{d20_mod} + @{' + skillName + '}]]&amp;#125;&amp;#125; {{rolladv=[[d20@{d20_mod} + @{' + skillName + '}]]&amp;#125;&amp;#125;'
 	});
 	for (var i = 1, len = customSkillCount; i <= len; ++i) {
 		var skillName = '@{custom_skill_' + i + '_name}';
 
-		query += '|' + skillName + ', &amp;#123;&amp;#123;title=' + skillName + '&amp;#125;&amp;#125; &amp;#123;&amp;#123;roll=[[d20@{d20_mod} + @{custom_skill_' + i + '}]]&amp;#125;&amp;#125; &amp;#123;&amp;#123;rolladv=[[d20@{d20_mod} + @{custom_skill_' + i + '}]]&amp;#125;&amp;#125;'
+		query += '|' + skillName + ', {{title=' + skillName + '&amp;#125;&amp;#125; {{roll=[[d20@{d20_mod} + @{custom_skill_' + i + '}]]&amp;#125;&amp;#125; {{rolladv=[[d20@{d20_mod} + @{custom_skill_' + i + '}]]&amp;#125;&amp;#125;'
 	}
 
-	template = template.replace(/\x7B\x7BcheckQuery\x7D\x7D/g, query);
-
-	return template;
+	return template.replace(/\x7B\x7BcheckQuery\x7D\x7D/g, query);
 }
 
 function meleeQuery(file) {
@@ -211,11 +219,10 @@ function meleeQuery(file) {
 	for (var i = 0; i < meleeCount; ++i) {
 		var weaponName = '@{repeating_weapons_melee_' + i + '_name}';
 
-		query += '|' + weaponName + ', &amp;#123;&amp;#123;title=' + weaponName + '&amp;#125;&amp;#125;'
+		query += '|' + weaponName + ', {{title=' + weaponName + '&amp;#125;&amp;#125;'
 	}
-	template = template.replace(/\x7B\x7BmeleeQuery\x7D\x7D/g, query);
 
-	return template;
+	return template.replace(/\x7B\x7BmeleeQuery\x7D\x7D/g, query);
 }
 
 
