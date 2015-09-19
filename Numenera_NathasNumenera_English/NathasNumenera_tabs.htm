@@ -4,7 +4,7 @@
         <span class="sheet-heavy">NAME</span>
         <input type="text" name="attr_character_name" style="width: 200px;" />
     </div>
-    <div class="sheet-col" align="center"><span style="font-size:0.8em;color:lightgrey;text-align:center;">Version 4.6 (2015-08-30)</span></div>
+    <div class="sheet-col" align="center"><span style="font-size:0.8em;color:lightgrey;text-align:center;">Version 4.7 (2015-09-19)</span></div>
     <div class="sheet-col" align="right">
         <img src="http://upload.wikimedia.org/wikipedia/en/8/8e/Numenera_Logo.png" width="250px"/>
     </div>
@@ -220,7 +220,7 @@
                         </td>
                         <td class="sheet-tdsmall-right">
                             <button type="roll" title="Initiative Roll" style="height:18px;background-color:green;color:green"
-                            value="&{template:nathaNumInit} {{stat=speed}} {{skilled=[[@{InitVarSkill}*3]]}} {{finalRoll=[[1d20+(@{InitVarEffort}*3)+(@{InitVarSkill}*3)+(@{InitVarAsset}*3)+@{InitVarBonus} &{tracker}]]}}  {{bonusToRoll=[[@{InitVarBonus}]]}} {{speedEdge=[[@{speededge}]]}} {{effortsUsed=[[@{InitVarEffort}]]}}  {{assets=[[@{InitVarAsset}]]}} {{effortCost=[[ceil(@{InitVarEffort}/6)+(@{InitVarEffort}*2)]]}} {{statExpense=[[@{InitVarCost}]]}} {{totalCost=[[ceil(@{InitVarEffort}/6)+(@{InitVarEffort}*2)+@{InitVarCost}-@{speededge}]]}}"
+                            value="&{template:nathaNumInit} {{charid=@{character_id}}} {{stat=speed}} {{skilled=[[@{InitVarSkill}*3]]}} {{finalRoll=[[1d20+(@{InitVarEffort}*3)+(@{InitVarSkill}*3)+(@{InitVarAsset}*3)+@{InitVarBonus} &{tracker}]]}}  {{bonusToRoll=[[@{InitVarBonus}]]}} {{speedEdge=[[@{speededge}]]}} {{effortsUsed=[[@{InitVarEffort}]]}}  {{assets=[[@{InitVarAsset}]]}} {{effortCost=[[ceil(@{InitVarEffort}/6)+(@{InitVarEffort}*2)]]}} {{statExpense=[[@{InitVarCost}]]}} {{totalCost=[[ceil(@{InitVarEffort}/6)+(@{InitVarEffort}*2)+@{InitVarCost}-@{speededge}]]}}"
                             name="roll_basicInitCheck"></button>
                         </td>
                     </tr>
@@ -400,7 +400,7 @@
                     <table WIDTH="100%">
                         <tr>
                             <td class="sheet-tdsmall-left"><input type="text" name="attr_artifact-name" style="font-weight:bold;" title="Name of the artifact" placeholder="Name" /></td>
-                            <td width="52px"><input type="number" name="attr_artifact-level" title="Level of the artifact" placeholder="Lvl" /></td>
+                            <td width="52px"><input type="number" name="attr_artifact-level" title="Level of the artifact" min="1" value="1" /></td>
                             <td width="120px"><input type="text" name="attr_artifact-depletion" title="Depletion (1 on 1d10 for example)" placeholder="Depletion" /></td>
                         </tr>
                         <tr>
@@ -674,48 +674,66 @@
             <td COLSPAN="2" style="text-align:center;font-size:105%;font-weight:bold;">{{finalRoll}}</td>
         </tr>
         <tr><td COLSPAN="2"><hr/></td></tr>
-        {{#rollGreater() bonusToRoll 0}}
-            <tr><td><span>Bonus</span></td><td>+ {{bonusToRoll}}</td></tr>
-        {{/rollGreater() bonusToRoll 0}}
-        {{#rollGreater() effortsUsed 0}}
-            <tr><td><span>Effort</span></td><td>{{effortsUsed}} (x3)</td></tr>
-        {{/rollGreater() effortsUsed 0}}
+        {{#diceRoll}}
+            <tr class="rowcolor">
+                <td><span class="tcat"><b>d20</b></span></td>
+                <td>
+                    <b>{{diceRoll}}</b>
+                </td>
+            </tr>
+        {{/diceRoll}}
+        {{#bonusToRoll}}
+	        {{#rollGreater() bonusToRoll 0}}
+	            <tr><td><span>Bonus</span></td><td>+ {{bonusToRoll}}</td></tr>
+	        {{/rollGreater() bonusToRoll 0}}
+        {{/bonusToRoll}}
+        {{#effortsUsed}}
+	        {{#rollGreater() effortsUsed 0}}
+	            <tr><td><span>Effort</span></td><td>{{effortsUsed}} (x3)</td></tr>
+	        {{/rollGreater() effortsUsed 0}}
+	    {{/effortsUsed}}
         {{#skilled}}
             <tr>
-                <td><span>Skill</span></td>
-                <td>
-                    {{#rollTotal() skilled -3}}
-                        Inability (-3)
-                    {{/rollTotal() skilled -3}}
-                    {{#rollTotal() skilled 0}}
-                        Untrained (+0)
-                    {{/rollTotal() skilled 0}}
-                    {{#rollTotal() skilled 3}}
-                        Trained (+3)
-                    {{/rollTotal() skilled 3}}
-                    {{#rollTotal() skilled 6}}
-                        Specialized (+6)
-                    {{/rollTotal() skilled 6}}
-                </td>
+                {{#rollTotal() skilled -1}}
+                    <td>Inability</td><td><i>-3</i></td>
+                {{/rollTotal() skilled -1}}
+                {{#rollTotal() skilled 0}}
+                    <td>Untrained</td><td><i>+0</i></td>
+                {{/rollTotal() skilled 0}}
+                {{#rollTotal() skilled 1}}
+                    <td>Trained</td><td><i>+3</i></td>
+                {{/rollTotal() skilled 1}}
+                {{#rollTotal() skilled 2}}
+                    <td>Specialized</td><td><i>+6</i></td>
+                {{/rollTotal() skilled 2}}
             </tr>
         {{/skilled}}
-        {{#rollGreater() assets 0}}
-            <tr><td><span>Asset(s)</span></td><td>{{assets}} (x3)</td></tr>
-        {{/rollGreater() assets 0}}
-        {{#rollGreater() totalCost 0}}
-            <tr><td COLSPAN="2"><hr/></td></tr>
-            <tr>
-                <td><span style="cursor: help;" title="{{#effortCost}} + Effort{{/effortCost}}{{#statExpense}} + extra cost{{/statExpense}} - Edge">
-                    <b>Cost</b></span>
-                </td>
-                <td>
-                    {{#effortCost}}+{{effortCost}}{{/effortCost}}
-                    {{#statExpense}}+{{statExpense}}{{/statExpense}}
-                    -{{speedEdge}}=<b>{{totalCost}}</b>
-                </td>
-            </tr>
-            <tr><td COLSPAN="2" style="text-align: center;">[Apply cost (API)](!nathanum-modstat {{charid}}|speed|{{totalCost}})</td></tr>
-        {{/rollGreater() totalCost 0}}
+        {{#assets}}
+	        {{#rollGreater() assets 0}}
+	            <tr><td><span>Asset(s)</span></td><td>{{assets}} (x3)</td></tr>
+	        {{/rollGreater() assets 0}}
+	    {{/assets}}
+	    {{#totalCost}}
+	        {{#rollGreater() totalCost 0}}
+	            <tr><td COLSPAN="2"><hr/></td></tr>
+	            <tr>
+	                <td><span style="cursor: help;" title="{{#effortCost}} + Effort{{/effortCost}}{{#statExpense}} + extra cost{{/statExpense}} - Edge">
+	                    <b>Cost</b></span>
+	                </td>
+	                <td>
+	                    {{#effortCost}}+{{effortCost}}{{/effortCost}}
+	                    {{#statExpense}}+{{statExpense}}{{/statExpense}}
+	                    -{{speedEdge}}=<b>{{totalCost}}</b>
+	                </td>
+	            </tr>
+	            {{#charid}}
+	            	<tr><td COLSPAN="2" style="text-align: center;">[Apply cost (API)](!nathanum-modstat {{charid}}|speed|{{totalCost}})</td></tr>
+				{{/charid}}
+				{{#attrPoolInit}}
+                	<tr><td><span>Speed</span></td><td>{{attrPoolInit}} &#8614; {{attrPool}}</td></tr>
+            	{{/attrPoolInit}}
+	        {{/rollGreater() totalCost 0}}
+        {{/totalCost}}
     </table>
 </rolltemplate> <!-- End template nathaNumInit !-->
 <rolltemplate class="sheet-rolltemplate-nathaNumRecovery">
@@ -798,7 +816,7 @@
                             {{#rollTotal() diceRoll 17}}+1 damage{{/rollTotal() diceRoll 17}}
                             {{#rollTotal() diceRoll 18}}+2 damage{{/rollTotal() diceRoll 18}}
                             {{#rollTotal() diceRoll 19}}Minor effect<br/>or +3 damage{{/rollTotal() diceRoll 19}}
-                            {{#rollTotal() diceRoll 20}}Major effect<br/>or +3 damage{{/rollTotal() diceRoll 20}}
+                            {{#rollTotal() diceRoll 20}}Major effect<br/>or +4 damage{{/rollTotal() diceRoll 20}}
                         </td>
                     </tr>
                 {{/rollWasCrit() diceRoll}}
@@ -812,7 +830,7 @@
                             {{#rollTotal() diceRoll 17}}+1 damage{{/rollTotal() diceRoll 17}}
                             {{#rollTotal() diceRoll 18}}+2 damage{{/rollTotal() diceRoll 18}}
                             {{#rollTotal() diceRoll 19}}Minor effect<br/>or +3 damage{{/rollTotal() diceRoll 19}}
-                            {{#rollTotal() diceRoll 20}}Major effect<br/>or +3 damage{{/rollTotal() diceRoll 20}}
+                            {{#rollTotal() diceRoll 20}}Major effect<br/>or +4 damage{{/rollTotal() diceRoll 20}}
                         </td>
                     </tr>
                 {{/rollWasCrit() diceRoll}}
@@ -841,7 +859,7 @@
                 </tr>
             {{/skilled}}
             {{#rollGreater() assets 0}}
-                <tr><td>Asset(s)</td><td><i>- {{assets}}</i></td>
+                <tr><td>Asset(s)</td><td><i>- {{assets}}</i></td></tr>
             {{/rollGreater() assets 0}}
             {{#rollGreater() effortRoll 0}}
                 <tr><td>Effort</td><td><i>- {{effortRoll}}</i></td></tr>
@@ -939,121 +957,106 @@
         {{#intellect}}
             <tr><th COLSPAN="2">Intellect Roll</th></tr>
         {{/intellect}}
-        {{#boolOK}}
-            <tr>
-                <td style="font-weight:bold;color:green;">Success</td>
-                <td>{{finalRoll}} &gt; {{targetRoll}}</td>
-            </tr>
-            {{#minorEffect}}
-                <tr class="rowcolor"><td><span class="tcat"><b>Effect</b></span></td><td>Minor</td></tr>
-            {{/minorEffect}}
-            {{#majorEffect}}
-                <tr class="rowcolor"><td><span class="tcat"><b>Effect</b></span></td><td>Major</td></tr>
-            {{/majorEffect}}
-            {{#bonusDmg}}
-                <tr class="rowcolor">
-                    <td><span class="tcat"><b>Extra damage</b></span></td>
-                    <td><b>{{bonusDmg}}</b> {{#effortDmg}}({{effortDmg}} eff.){{/effortDmg}}</td>
-                </tr>
-            {{/bonusDmg}}
-        {{/boolOK}}
-        {{#boolKO}}
-            <tr>
-                <td style="font-weight:bold;color:red;">Failure</td>
-                <td>{{finalRoll}} &lt; {{targetRoll}}</td>
-            </tr>
-        {{/boolKO}}
-        {{#difficulty}}
-            <tr><td COLSPAN="2"><hr/></td></tr>
-            <tr class="rowcolor"><td><span class="tcat"><b>Difficulty</b></span></td><td>{{difficulty}} ({{target}})</td></tr>
-            <tr class="rowcolor">
-                <td><span class="tcat">
-                    {{#Untrained}}
-                        Unskilled
-                    {{/Untrained}}
-                    {{#Trained}}
-                        - 1 (Trained)
-                    {{/Trained}}
-                    {{#Specialized}}
-                        - 2 (Specialized)
-                    {{/Specialized}}
-                    {{#Inability}}
-                        + 1 (Inability)
-                    {{/Inability}}
-                </span></td>
-                <td><span class="tcat">
-                    {{#assets}}
-                        - {{assets}} Asset(s)
-                    {{/assets}}
-                </span></td>
-            </tr>
-            <tr class="rowcolor">
-                <td><span class="tcat">
-                    {{#effortRoll}}
-                        - {{effortRoll}} Effort
-                    {{/effortRoll}}
-                </span></td>
-                <td><b>{{finalDiff}} ({{targetRoll}})</b></td>
-            </tr>
-        {{/difficulty}}
-        {{^difficulty}}
-            <tr>
-                <td style="font-weight:bold;" tile="Difficulty beaten by the roll">Beaten diff.</td>
-                <td>{{rollBeats}}</td>
-            </tr>
-            {{#Trained}}
-                <tr class="rowcolor"><td><span class="tcat">Skill</span></td><td>Trained</td></tr>
-            {{/Trained}}
-            {{#Specialized}}
-                <tr class="rowcolor"><td><span class="tcat">Skill</span></td><td>Specialized</td></tr>
-            {{/Specialized}}
-            {{#Inability}}
-                <tr class="rowcolor"><td><span class="tcat">Skill</span></td><td>Inability</td></tr>
-            {{/Inability}}
-            {{#assets}}
-                <tr class="rowcolor"><td><span class="tcat">Asset(s)</span></td><td>{{assets}}</td></tr>
-            {{/assets}}
-            {{#effortRoll}}
-                <tr class="rowcolor"><td><span class="tcat">Effort</span></td><td>{{effortRoll}}</td></tr>
-            {{/effortRoll}}
-            {{#bonusDmg}}
-                <tr class="rowcolor">
-                    <td><span class="tcat"><b>Extra damage</b></span></td>
-                    <td><b>{{bonusDmg}}</b> {{#effortDmg}}({{effortDmg}} eff.){{/effortDmg}}</td>
-                </tr>
-            {{/bonusDmg}}
-            {{#minorEffect}}
-                <tr class="rowcolor"><td><span class="tcat"><b>Effect</b></span></td><td>Minor</td></tr>
-            {{/minorEffect}}
-            {{#majorEffect}}
-                <tr class="rowcolor"><td><span class="tcat"><b>Effect</b></span></td><td>Major</td></tr>
-            {{/majorEffect}}
-        {{/difficulty}}
-        <tr><td COLSPAN="2"><hr/></td></tr>
-        <tr class="rowcolor">
-            <td><span class="tcat"><b>d20</b></span></td>
+        <tr>
+            <td>1d20</td>
             <td>
-                <b>{{diceRoll}}</b>
+                {{diceRoll}}
                 {{#bonusToRoll}}
                     + {{bonusToRoll}}
                 {{/bonusToRoll}}
             </td>
         </tr>
         {{#freeGMI}}
-            <tr class="rowcolor"><td COLSPAN="2" style="color:red;text-align:center;font-weight:bold;">GM Intrusion<br/>(or take +2 damage)</td></tr>
+            <tr><td COLSPAN="2" style="color:red;text-align:center;font-weight:bold;">GM Intrusion<br/>(or take +2 damage)</td></tr>
         {{/freeGMI}}
+        {{#boolOK}}
+            <tr>
+                <td  COLSPAN="2" style="font-size:105%;font-weight:bold;color:green;text-align:center;">Success: {{finalRoll}} &gt; {{targetRoll}}
+            </tr>
+            {{#minorEffect}}
+                <tr>
+                	<td style="color:green;text-align:center;font-weight:bold;">Special:</td>
+                	<td style="vertical-align: top;font-size: 95%;">Minor effect</td>
+				</tr>
+            {{/minorEffect}}
+            {{#majorEffect}}
+                <tr>
+                	<td style="color:green;text-align:center;font-weight:bold;">Special:</td>
+                	<td style="vertical-align: top;font-size: 95%;">Major effect</td>
+				</tr>
+            {{/majorEffect}}
+        {{/boolOK}}
+        {{#boolKO}}
+            <tr>
+                <td  COLSPAN="2" style="font-size:105%;font-weight:bold;color:red;text-align:center;">Failure: {{finalRoll}} &lt; {{targetRoll}}</td>
+            </tr>
+        {{/boolKO}}
+        {{#difficulty}}
+            <tr><td><span>Difficulty</span></td><td>{{difficulty}} ({{target}})</td></tr>
+            <tr>
+                {{#Inability}}
+                    <td>Inability</td><td><i>+1</i></td>
+                {{/Inability}}
+                {{#Trained}}
+                    <td>Trained</td><td><i>-1</i></td>
+                {{/Trained}}
+                {{#Specialized}}
+                    <td>Specialized</td><td><i>-2</i></td>
+                {{/Specialized}}
+            </tr>
+            <tr><td>Asset(s)</td><td><i>- {{assets}}</i></td></tr>
+            <tr><td>Effort</td><td><i>- {{effortRoll}}</i></td></tr>
+            <tr>
+                <td style="font-weight:bold;">Target</td>
+                <td style="font-weight:bold;">{{finalDiff}} ({{targetRoll}})</td>
+            </tr>
+        {{/difficulty}}
+        {{^difficulty}}
+            {{#Inability}}
+                <tr><td>Inability</td><td><i>-1 (x3)</i></td></tr>
+            {{/Inability}}
+            {{#Trained}}
+                <td>Trained</td><td><i>+1 (x3)</i></td>
+            {{/Trained}}
+            {{#Specialized}}
+                <td>Specialized</td><td><i>+2 (x3)</i></td>
+            {{/Specialized}}
+            {{#assets}}
+                <tr><td>Asset(s)</td><td><i>+ {{assets}} (x3)</i></td></tr>
+            {{/assets}}
+            {{#effortRoll}}
+                <tr><td>Effort</td><td><i>+ {{effortRoll}} (x3)</i></td></tr>
+            {{/effortRoll}}
+            <tr>
+                <td style="font-weight:bold;white-space: nowrap;" title="Difficulty beaten by the roll">Beaten diff.</td>
+                <td style="text-align:center;font-weight:bold;">= {{rollBeats}}</td>
+            </tr>
+            {{#minorEffect}}
+                <tr><td><span><b>Effect</b></span></td><td>Minor</td></tr>
+            {{/minorEffect}}
+            {{#majorEffect}}
+                <tr><td><span><b>Effect</b></span></td><td>Major</td></tr>
+            {{/majorEffect}}
+        {{/difficulty}}
+	    {{#bonusDmg}}
+            <tr><td COLSPAN="2"><hr/></td></tr>
+	        <tr>
+	            <td><span><b>Damage</b></span></td>
+	            <td><b>{{bonusDmg}}</b> {{#effortDmg}}({{effortDmg}} eff.){{/effortDmg}}</td>
+	        </tr>
+	    {{/bonusDmg}}
         {{^noExpense}}
             <tr><td COLSPAN="2"><hr/></td></tr>
-            <tr class="rowcolor">
-                <td><span class="tcat" style="cursor: help;" title="{{#effortCost}} + Effort{{/effortCost}}{{#statExpense}} + extra Cost{{/statExpense}} - Edge">
-                    <b>Total cost (?)</b></span>
+            <tr>
+                <td><span style="cursor: help;" title="{{#effortCost}} + Effort{{/effortCost}}{{#statExpense}} + extra Cost{{/statExpense}} - Edge">
+                    <b>Cost</b></span>
                 </td>
                 <td>
                     {{#effortCost}}+{{effortCost}}{{/effortCost}}
                     {{#statExpense}}+{{statExpense}}{{/statExpense}}
                     -{{attrEdge}}=<b>{{totalCost}}</b>
                 </td></tr>
-            <tr class="rowcolor"><td><span class="tcat">Stat Pool</span></td><td>{{attrPoolInit}} &#8614; {{attrPool}}</td></tr>
+            <tr><td><span>Stat Pool</span></td><td>{{attrPoolInit}} &#8614; {{attrPool}}</td></tr>
         {{/noExpense}}
     </table>
 </rolltemplate> <!-- End template nathaNumRoll !-->
