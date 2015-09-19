@@ -23,6 +23,10 @@ Long term:
 
 ### Changelog
 
+**September 19th 2015**
+
+* Updated Save Macro
+
 **September 17th 2015**
 
 * French translations
