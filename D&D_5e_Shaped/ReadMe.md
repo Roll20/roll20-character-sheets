@@ -23,6 +23,10 @@ Long term:
 
 ### Changelog
 
+**September 20th 2015**
+
+* Removed spellcastingtime from rolltemplate stuff
+
 **September 19th 2015**
 
 * Updated Save Macro
