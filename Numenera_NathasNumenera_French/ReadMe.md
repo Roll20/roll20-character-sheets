@@ -5,7 +5,7 @@ Bas&eacute;e sur la feuille de personnage "Numenera" d&eacute;j&agrave; pr&eacut
 Voir en fin de fichier pour les notes de versions.
 
 # Version courante :
-Version 4.5 (13 Juin 2015) : [Capture d'&eacute;cran](NathasNumenera_tabs_v4-5.jpg).
+Version 4.6 (30 Ao&ucirc;t 2015) : [Capture d'&eacute;cran](NathasNumenera_tabs_v4-5.jpg).
 
 # Utilisation basique :
 
@@ -54,6 +54,9 @@ Alternative (permettant de modifier les sources &agrave; votre convenance si vou
 3. Si n&eacute;cessaire, pour cr&eacute;er vos propres macros ou boutons, lisez le [Wiki](https://wiki.roll20.net/Script:Numenera_Natha).
 
 # Notes de version
+
+##Version 4.6 (30 Ao&ucirc;t 2015)
+Am&eacute;lioration de l'affichage des r&eacute;sultats des jets basiques d'attributs (hors API) avec indication de succ&egrave;s ou d'&eacute;chec.
 
 ##Version 4.5 (13 Juin 2015)
 Ajout des d&eacute;g&acirc;ts sp&eacute;ciaux dans la gestion de l'&Eacute;tat du personnage.

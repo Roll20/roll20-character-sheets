@@ -8,16 +8,16 @@
     <b>&nbsp; &nbsp; Combat</b>
     <input type="checkbox" class="sheet-combat-show" title="combat-show" name="attr_combat-show" value="1" checked/>
     <b>&nbsp; &nbsp; Span Log</b>
-    <input type="checkbox" class="sheet-span-log-show" title="span-log-show" name="attr_span-log-show" value="1" checked/>
+    OLD<input type="checkbox" class="sheet-span-log-show" title="span-log-show" name="attr_span-log-show" value="1" checked/>
+    NEW<input type="checkbox" class="sheet-log-show" title="span-log-show" name="attr_span-log-show" value="1" checked/>
     <b>&nbsp; &nbsp; Yet Log</b>
     <input type="checkbox" class="sheet-yet-show" title="yet-show" name="attr_yet-show" value="1" checked/>
+    <b>&nbsp; &nbsp; Warning</b>
+    <input type="checkbox" class="sheet-warning-show" title="warning-show" name="attr_warning-show" value="1" checked/>
+    <br><Div class="sheet-warning">Due to performance issues with the old style Span Log, a new version has been created. The new version only allows you to calculate 1 Span at a time, but allows you to output the relevant information to the chat pane and copy/paste into a repeating section of text fields for record keeping. Output of the end date to chat is not supported because it crashes chrome. I dont know why that happens. The old Span Log will be removed in a future update, so it is recomended to transfer all data to the recordkeeping area of the new span log.</Div>
     <div class="sheet-stats">
         Name<input type="text" name="attr_character_name">
-        Gender <select style="width: 85px" name="attr_gender">
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
-        </select>
+        Gender <input type="text" style="width: 85px" name="attr_gender"/>
         Race<input type="text" name="attr_race" style="width: 190px" />
         Height<input type="text" name="attr_height" style="width: 60px"/>
         Weight<input type="text" name="attr_weight" style="width: 60px"/>
@@ -779,6 +779,103 @@
             <hr>
         </fieldset>
     </div>
+    <div class="sheet-log">
+    Span log
+    <br>
+    <fieldset class="repeating_log" style="width:100%">
+        <textarea style="width: 100%" name="attr_span-detail" style="width:90%"></textarea>
+    </fieldset>
+    <hr style="width: 100%">
+        <br>
+            Direction &nbsp;&nbsp;<select name="attr_direction0" style="width: 140px">
+            <option value="(0)">Rest</option>
+            <option value="[[(@{when0}-@{when1}+@{prev-spanspent})]]">Down</option>
+            <option value="[[(@{when0}-@{when1}+@{prev-spanspent}-31536000)]]">Down(Crossing 0)</option>
+            <option value="0+@{prev-spanspent}">Level</option>
+            <option value="[[(@{when1}-@{when0}+@{prev-spanspent})]]">Up</option>
+            <option value="[[(@{when1}-@{when0}+@{prev-spanspent}-31536000)]]">Up(Crossing 0)</option>
+            </select>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Previous Span Spent Y <input type="number" name="attr_prev-years-spent" style="width: 70px"  value="0" >
+            D <input type="number" name="attr_prev-days-spent" style="width: 50px" value="0" >
+            h <input type="number" name="attr_prev-hours-spent" value="0" >
+            m <input type="number" name="attr_prev-minutes-spent" value="0" >
+            s <input type="number" name="attr_prev-seconds-spent" value="0" >
+            <input type="hidden" name="attr_prev-spanspent" value="(@{prev-years-spent}*31536000+@{prev-days-spent}*86400+@{prev-hours-spent}*3600+@{prev-minutes-spent}*60+@{prev-seconds-spent})" disabled="true">
+        <table>
+            <tr style="background-color: #00bfff"><td>Departing</td><td>Y <input type="number" name="attr_0-year" style="width: 70px"  value="0"/></td>
+            <td>M <select name="attr_0-month" style="width: 100px" >
+            <option value="0">January</option>
+            <option value="31">February</option>
+            <option value="59">March</option>
+            <option value="90">April</option>
+            <option value="120">May</option>
+            <option value="151">June</option>
+            <option value="181">July</option>
+            <option value="212">August</option>
+            <option value="243">September</option>
+            <option value="273">October</option>
+            <option value="304">November</option>
+            <option value="334">December</option>
+            </select></td>
+            <td>D <input type="number" name="attr_0-day" value="0"></td>
+            <td>h <input type="number" name="attr_0-hour" value="0"></td>
+            <td>m <input type="number" name="attr_0-minute" value="0"></td>
+            <td>s <input type="number" name="attr_0-second" value="0"></td>
+            <td><input type="hidden" name="attr_when0" value="((@{0-year}*31536000)+((@{0-month}+@{0-day})*86400)+(@{0-hour}*3600)+(@{0-minute}*60)+@{0-second})" disabled="true"></td></tr>
+            <tr style="background-color: #ffd700"><td>Arriving</td><td>Y <input type="number" name="attr_1-year" style="width: 70px" value="0"/></td><td>M <select name="attr_1-month" style="width: 100px" >
+            <option value="0">January</option>
+            <option value="31">February</option>
+            <option value="59">March</option>
+            <option value="90">April</option>
+            <option value="120">May</option>
+            <option value="151">June</option>
+            <option value="181">July</option>
+            <option value="212">August</option>
+            <option value="243">September</option>
+            <option value="273">October</option>
+            <option value="304">November</option>
+            <option value="334">December</option>
+            </select></td><td>D <input type="number" name="attr_1-day" value="0"></td>
+            <td>h <input type="number" name="attr_1-hour" value="0"></td>
+            <td>m <input type="number" name="attr_1-minute" value="0"></td>
+            <td>s <input type="number" name="attr_1-second" value="0"></td>
+            <td><input type="hidden" name="attr_when1" value="((@{1-year}*31536000)+((@{1-month}+@{1-day})*86400)+(@{1-hour}*3600)+(@{1-minute}*60)+@{1-second})" disabled="true"></td></tr>
+        </table>
+        Where / Events / Actions <input type="text" name="attr_where0" style="width:670px">
+            <br>Span Spent Y<input type="number" name="attr_years-spent0" style="width: 70px"  value="floor(@{spanspent0}/31536000)" disabled="true">
+            D <input type="number" name="attr_days-spent0" style="width: 50px" value="floor((@{spanspent0}-(@{years-spent0}*31536000))/86400)" disabled="true">
+            h<input type="number" name="attr_hours-spent0" value="floor((@{spanspent0}-(@{years-spent0}*31536000+@{days-spent0}*86400))/3600)" disabled="true">
+            m<input type="number" name="attr_minutes-spent0" value="floor((@{spanspent0}-(@{years-spent0}*31536000+@{days-spent0}*86400+@{hours-spent0}*3600))/60)" disabled="true">
+            s<input type="number" name="attr_seconds-spent0" value="@{spanspent0}-(@{years-spent0}*31536000+@{days-spent0}*86400+@{hours-spent0}*3600+@{minutes-spent0}*60)" disabled="true">
+            <input type="hidden" name="attr_spanspent0" value="(@{direction0})" disabled="true">
+            &nbsp;Span Remaining Y<input type="number" name="attr_years-remaining0" style="width: 70px"  value="floor(@{spanremaining0}/31536000)" disabled="true">
+            D <input type="number" name="attr_days-remaining0" style="width: 50px"  value="floor((@{spanremaining0}-(@{years-remaining0}*31536000))/86400)" disabled="true">
+            h<input type="number" name="attr_hours-remaining0" value="floor((@{spanremaining0}-(@{years-remaining0}*31536000+@{days-remaining0}*86400))/3600)" disabled="true">
+            m<input type="number" name="attr_minutes-remaining0" value="floor((@{spanremaining0}-(@{years-remaining0}*31536000+@{days-remaining0}*86400+@{hours-remaining0}*3600))/60)" disabled="true">
+            s<input type="number" name="attr_seconds-remaining0" value="@{spanremaining0}-(@{years-remaining0}*31536000+@{days-remaining0}*86400+@{hours-remaining0}*3600+@{minutes-remaining0}*60)" disabled="true">
+            <input type="hidden" name="attr_spanremaining0" value="((@{span}*31536000)-@{spanspent0})" disabled="true">
+            <br>Starting Age<input type="hidden" name="attr_age-0" value="(@{age-years-0}*31536000 + @{age-days-0}*86400)">
+            Y<input type="number" name="attr_age-years-0" value="0" style="width: 70px" >
+            D<input type="number" name="attr_age-days-0" value="0" style="width: 50px" >
+            Level for Y<input type="number" name="attr_dur-years-0" style="width: 70px"value="0">
+            D<input type="number" name="attr_dur-days-0" style="width: 50px" value="0" >
+            h <input type="number" name="attr_dur-hours-0" value="0" >
+            m <input type="number" name="attr_dur-minutes-0" value="0" >
+            s <input type="number" name="attr_dur-seconds-0" value="0" >
+            <input type="hidden" name="attr_duration0" value="(@{dur-years-0}*31536000+@{dur-days-0}*86400+@{dur-hours-0}*3600+@{dur-minutes-0}*60+@{dur-seconds-0})" disabled="true">
+            Ending Age <input type="hidden" name="attr_age-1" value="(@{age-0}+@{duration0})">
+            Y<input type="number" name="attr_age-years-1" value="(floor(@{age-1}/31536000))" style="width: 70px" disabled="true">
+            D<input type="number" name="attr_age-days-1" value="floor((@{age-1}-(@{age-years-1}*31536000))/86400)" style="width: 50px" disabled="true">
+            <br>
+            <input type="hidden" name="attr_e-date" value="(@{when1}+@{duration0})" disabled="true">
+            Ending date
+            Y<input type="number" name="attr_e-year" style="width: 70px" value="(floor(@{e-date}/31536000))" disabled="true">
+            D<input type="number" name="attr_e-day" style="width: 50px" value="(floor((@{e-date}-(@{e-year}*31536000))/86400))" disabled="true">
+            h<input type="number" name="attr_e-hour" value="(floor((@{e-date}-(@{e-year}*31536000+@{e-day}*86400))/3600))" disabled="true">
+            m<input type="number" name="attr_e-minutes" value="(floor((@{e-date}-(@{e-year}*31536000+@{e-day}*86400+@{e-hour}*3600))/60))" disabled="true">
+            s<input type="number" name="attr_e-seconds" value="(@{e-date}-(@{e-year}*31536000+@{e-day}*86400+@{e-hour}*3600+@{e-minutes}*60))" disabled="true">
+            <br><button type="roll" name="attr_output-to-chat" value="&{template:details} {{name=@{character_name} spans from:}} {{dyear=[[@{0-year}]]}}{{dmonth=[[@{0-month}]]}}{{dday=[[@{0-day}]]}}{{dhour=[[@{0-hour}]]}}{{dminute=[[@{0-minute}]]}}{{dsecond=[[@{0-second}]]}}{{ayear=[[@{1-year}]]}}{{amonth=[[@{1-month}]]}}{{aday=[[@{1-day}]]}}{{ahour=[[@{1-hour}]]}}{{aminute=[[@{1-minute}]]}}{{asecond=[[@{1-second}]]}}{{where=@{where0}}} {{syears=[[@{years-spent0}]]}}{{sdays=[[@{days-spent0}]]}}{{shours=[[@{hours-spent0}]]}}{{sminutes=[[@{minutes-spent0}]]}}{{sseconds=[[@{seconds-spent0}]]}}{{ryears=[[@{years-remaining0}]]}}{{rdays=[[@{days-remaining0}]]}}{{rhours=[[@{hours-remaining0}]]}}{{rminutes=[[@{minutes-remaining0}]]}}{{rseconds=[[@{seconds-remaining0}]]}} {{s-age=[[@{age-years-0}]]Years, [[@{age-days-0}]]Days old}} {{time-level=[[@{dur-years-0}]]Years,[[@{dur-days-0}]]Days, [[@{dur-hours-0}]]:[[@{dur-minutes-0}]]:[[@{dur-seconds-0}]]h:m:s level}}{{e-age=[[@{age-years-1}]]Years, [[@{age-days-1}]]Days old.}}">Output Span to Chat</button>
+    </div>
     <br><hr>
     <div class="sheet-yet">
             Young &nbsp;  &nbsp; Gemini &nbsp;  &nbsp;  This Span
@@ -807,3 +904,60 @@
     </div>
         
 </div>
+<rolltemplate class="sheet-rolltemplate-details">
+        <hr>
+        {{name}}
+        Y{{dyear}}
+        {{#rollTotal() dmonth 0}} January{{/rollTotal() dmonth 0}}
+        {{#rollTotal() dmonth 31}} February{{/rollTotal() dmonth 31}}
+        {{#rollTotal() dmonth 59}} March{{/rollTotal() dmonth 59}}
+        {{#rollTotal() dmonth 90}} April{{/rollTotal() dmonth 90}}
+        {{#rollTotal() dmonth 120}} May{{/rollTotal() dmonth 120}}
+        {{#rollTotal() dmonth 151}} June{{/rollTotal() dmonth 151}}
+        {{#rollTotal() dmonth 181}} July{{/rollTotal() dmonth 181}}
+        {{#rollTotal() dmonth 212}} August{{/rollTotal() dmonth 212}}
+        {{#rollTotal() dmonth 243}} September{{/rollTotal() dmonth 243}}
+        {{#rollTotal() dmonth 273}} October{{/rollTotal() dmonth 273}}
+        {{#rollTotal() dmonth 304}} November{{/rollTotal() dmonth 304}}
+        {{#rollTotal() dmonth 334}} December{{/rollTotal() dmonth 334}} 
+        {{dday}}, h:m:s{{dhour}}:{{dminute}}:{{dsecond}}
+        <br>
+        TO:
+        Y{{ayear}}
+        {{#rollTotal() amonth 0}} January{{/rollTotal() amonth 0}}
+        {{#rollTotal() amonth 31}} February{{/rollTotal() amonth 31}}
+        {{#rollTotal() amonth 59}} March{{/rollTotal() amonth 59}}
+        {{#rollTotal() amonth 90}} April{{/rollTotal() amonth 90}}
+        {{#rollTotal() amonth 120}} May{{/rollTotal() amonth 120}}
+        {{#rollTotal() amonth 151}} June{{/rollTotal() amonth 151}}
+        {{#rollTotal() amonth 181}} July{{/rollTotal() amonth 181}}
+        {{#rollTotal() amonth 212}} August{{/rollTotal() amonth 212}}
+        {{#rollTotal() amonth 243}} September{{/rollTotal() amonth 243}}
+        {{#rollTotal() amonth 273}} October{{/rollTotal() amonth 273}}
+        {{#rollTotal() amonth 304}} November{{/rollTotal() amonth 304}}
+        {{#rollTotal() amonth 334}} December{{/rollTotal() amonth 334}} 
+        {{aday}}, h:m:s{{ahour}}:{{aminute}}:{{asecond}}
+        <br>
+        Where? {{where}}
+        <br>
+        This cost {{syears}}Years,{{sdays}}Days, h:m:s{{shours}}:{{sminutes}}:{{sseconds}} of span and they have {{ryears}}Years,{{rdays}}Days, h:m:s{{rhours}}:{{rminutes}}:{{rseconds}} remaining.
+        <br>They were {{s-age}}, spent {{time-level}}, and are now {{e-age}}
+        
+</rolltemplate>
+<rolltemplate class="sheet-rolltemplate-end-date">
+        The ending date is Y {{eyear}}
+        {{#rollBetween() eday 0 30}} January {{jan}}{{/rollBetween() eday 0 30}}
+        {{#rollBetween() eday 31 58}} February {{feb}}{{/rollBetween() eday 31 58}}
+        {{#rollBetween() eday 59 89}} March {{mar}}{{/rollBetween() eday 59 89}}
+        {{#rollBetween() eday 90 119}} April {{apr}}{{/rollBetween() eday 90 119}}
+        {{#rollBetween() eday 120 150}} May {{may}}{{/rollBetween() eday 120 150}}
+        {{#rollBetween() eday 151 180}} June {{jun}}{{/rollBetween() eday 151 180}}
+        {{#rollBetween() eday 181 211}} July {{jul}}{{/rollBetween() eday 181 211}}
+        {{#rollBetween() eday 212 242}} August {{aug}}{{/rollBetween() eday 212 242}}
+        {{#rollBetween() eday 243 272}} September {{sep}}{{/rollBetween() eday 243 272}}
+        {{#rollBetween() eday 273 303}} October {{oct}}{{/rollBetween() eday 273 303}}
+        {{#rollBetween() eday 304 333}} November {{nov}}{{/rollBetween() eday 304 333}}
+        {{#rollBetween() eday 334 364}} December {{dec}}{{December}} {{/rollBetween() eday 334 364}}
+        , h:m:s:{{ehour}}:{{eminute}}:{{esecond}}
+        
+</rolltemplate>

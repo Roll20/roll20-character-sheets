@@ -5,6 +5,8 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 ### TODO
 
 Short Term:
+* Spell Crit damage should use higher level
+* Spell Crit damage should not roll 3D dice for secondary and other stuff that is toggled off.
 * Actions: Allow for "Effects" to be whispered to the GM.
 * Revamp Traits. Keep fluff traits on the first page and for action like traits write "see Actions". Also include fluff traits on "Actions".
 * Refactor Actions to use damage die and bonus like weapons do
@@ -21,6 +23,102 @@ Long term:
 
 
 ### Changelog
+
+**August 30th 2015**
+
+* Fixed roll template header colors.
+
+**August 29th 2015**
+
+* Adjusted inline roll spacing for roll templates.
+
+**August 26th 2015**
+
+* Fixed class action page tabs
+
+**August 22nd 2015**
+
+* Added global bonus for spell healing
+
+**August 19th 2015**
+
+* Added casting time toggle. You can now toggle spells based on their casting time. Spells default to "1 action", but can be changed to "1 reaction", "1 bonus action", "1 minute" or "longer" which allows for any input. The roll template will always show the new value. The old value will be shown for a time (with a red error to tell you to fix it), but it will be removed soon.
+
+**August 18th 2015**
+
+* Altered query macros to remove "selected"
+* Fixed multiattack macro to not display all the data
+* Add Range to melee weapons for thrown weapons
+
+**August 17th 2015**
+
+* Moved speed up to the header.
+* Styled jack of all trades to be a button
+* Fixed ammo in roll template for new weapons
+
+**August 16th 2015**
+
+* CSS Cleanup
+
+**August 15th 2015**
+
+* Massive refactoring to all the toggle/tab buttons. They are all setup the same way now and have consistent padding. I have verified all the pages and I believe everything is still working
+* Massive refactoring of the HTML structure for sheet-row stuff. Lots of changes. I've checked the whole UI and it all looks good, but I may have missed some things
+* Removed separate damage for the second crit. Both crits (normal and adv/dis) now show the same damage if both show.
+
+**August 14th 2015**
+
+* output higher level query level to the roll template
+
+**August 13th 2015**
+
+* hide GM info settings and styling
+
+**August 12th 2015**
+
+* Renamed spell macro options to force it to update for some users which it wasn't updating for.
+* Added alt damage to weapons
+
+**August 11th 2015**
+
+* fixed global spell bonus damage - higher level stuff broke it.
+
+**August 10th 2015**
+
+* Spell filters
+* Removed HD note
+
+**26th July - August 5th 2015**
+
+* Revamp of spells:
+  * Toggles are all redone and can be changed in the future
+  * Added Emote
+  * Added higher level for damage and heal
+  * Split damage to attack damage and save damage
+  * Aoe split from target
+  * Save condition
+  * Save failure
+  * Revamped roll template to match these new changes. For the most part spells now use action stuff
+* Added Query macros for Saves, Checks, and Skills
+
+**25th July 2015**
+
+* Changed Custom Skills to the slider.
+* Removed Macro from weapons and actions.
+
+**24th July 2015**
+
+* Changed spell slots/points toggle to the same slider used on PC/NPC. Still unsure about the colors
+
+**23rd July 2015**
+
+* Initiative bonus can now text instead of just a number
+* Removed warning about settings changes
+* Made a new toggle for PC/NPC. The animation is super smooth outside of roll20, but in roll20 it is super laggy. I'll try to massage it more later.
+
+**22nd July 2015**
+
+* Weapon & Action Macro no longer outputs a blank line. (It cannot be toggled off - though it never could be)
 
 **14th July 2015**
 
