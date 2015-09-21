@@ -3,9 +3,22 @@
 This is a re-creation of the "green-sheet" for the D&D Basic Moldvay Red box game.  It was created for the Roll20 Moldvay Basic Contest.
 
 ## Current Version
-1.11
+1.12
 
 ### Changelog
+
+#### 1.12
+* Moved Morale Check button next to Charisma in Ability section
+* Removed old Morale Check from Class Abilities and fixed line spacing
+* Fixed a format issue with drop-down select boxes in Chrome
+* Decreased font slightly for labels
+* Increased size of Prime Requisite field for demi-humans with multiple prime-requisite's, moved around boxes to make it fit
+* Placeholder for Prime Requisite is no longer 0
+* Starting value for Level is 1!
+* Fixed spacing issue with Saving Throw Bonus fields
+* Fixed bug with value for +/- Bonus not saving
+* Fixed odd spacing with Armor Class Text
+* Fixed bug with Initiative calculation - DEX bonus was not a straight mod, but instead was 3:-2, 4-5:-1, 6-8:-1, 9-12:0, 13-15:+1, 16-17:+1, 18:+2
 
 #### 1.11
 * Fixed more formatting issues found in Chrome Version 45.0.2454.85 m and Firefox 40.0.3
