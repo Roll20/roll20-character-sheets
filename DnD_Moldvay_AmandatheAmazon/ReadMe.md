@@ -19,6 +19,8 @@ This is a re-creation of the "green-sheet" for the D&D Basic Moldvay Red box gam
 * Fixed bug with value for +/- Bonus not saving
 * Fixed odd spacing with Armor Class Text
 * Fixed bug with Initiative calculation - DEX bonus was not a straight mod, but instead was 3:-2, 4-5:-1, 6-8:-1, 9-12:0, 13-15:+1, 16-17:+1, 18:+2
+* Added Character Name to all Roll Template Rolls - Now you know who is doing what!
+* Gussied up Roll Templates - centering the Title, Name and Line; adding a dash of color to the same categories; adding a black border around the Roll Template box
 
 #### 1.11
 * Fixed more formatting issues found in Chrome Version 45.0.2454.85 m and Firefox 40.0.3
