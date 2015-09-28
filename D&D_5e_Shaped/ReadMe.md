@@ -23,6 +23,10 @@ Long term:
 
 ### Changelog
 
+**September 28th 2015**
+
+* Prevent "freetextname" from showing on roll templates
+
 **September 20th 2015**
 
 * Removed spellcastingtime from rolltemplate stuff
