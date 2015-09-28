@@ -282,12 +282,6 @@ gulp.task('preCompile', function() {
 				return duplicate(file, customSkillCount, 1);
 			}
 		}))
-		.pipe( inject(gulp.src(['./components/class/output_options.html']), {
-			starttag: '<!-- inject:outputOptions:{{ext}} -->',
-			transform: function (filePath, file) {
-				return duplicate(file, outputOptionsCount);
-			}
-		}))
 		.pipe( inject(gulp.src(['./components/traits/traits.html']), {
 			starttag: '<!-- inject:traits:{{ext}} -->',
 			transform: function (filePath, file) {
