@@ -336,15 +336,15 @@ gulp.task('makeSpellDataJson', function() {
 var spellPropsHash;
 
 gulp.task('addSpellDataHash', ['makeSpellDataJson'], function() {
-	return gulp.src(['precompiled/spellDefaults.json'])
+	return gulp.src(['spellDefaults.json'])
 		.pipe(change(function(contents) {
 			spellPropsHash = md5(contents);
 			var object = JSON.parse(contents);
 			var objectWithHash = {hash:spellPropsHash, values:object};
 			return 'var ShapedSpellbookDefaults = ' + JSON.stringify(objectWithHash,null, 2) + ';';
 		}))
-		.pipe(rename('precompiled/spellDefaults.js'))
-		.pipe(gulp.dest('../'));
+		.pipe(rename('spellDefaults.js'))
+		.pipe(gulp.dest('./'));
 
 });
 
