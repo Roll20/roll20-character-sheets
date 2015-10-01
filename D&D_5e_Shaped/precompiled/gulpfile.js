@@ -5,8 +5,8 @@ var gulp = require('gulp'),
 	minifyCss = require('gulp-minify-css'),
 	concat = require('gulp-concat'),
 	sass = require('gulp-sass'),
-	replace = require('gulp-replace-task')
-	rename = require('gulp-rename')
+	replace = require('gulp-replace-task'),
+	rename = require('gulp-rename'),
 	wrap = require('gulp-wrap'),
 	md5 = require('md5'),
 	change = require('gulp-change');
@@ -233,10 +233,10 @@ function meleeQuery(file) {
 function ordinal(d) {
 	if(d>3 && d<21) return 'th';
 	switch (d % 10) {
-		case 1:  return "st";
-		case 2:  return "nd";
-		case 3:  return "rd";
-		default: return "th";
+		case 1:  return 'st';
+		case 2:  return 'nd';
+		case 3:  return 'rd';
+		default: return 'th';
 	}
 }
 function processDate () {
@@ -268,7 +268,7 @@ gulp.task('makeSpellDataJson', function() {
 			  {
 					match: /<(div|span) class="sheet-([\w]{2})">[\s\S]*?<\/\1>/g,
 					replacement: function(match, element, lang) {
-						return lang === 'en' ? match : "";
+						return lang === 'en' ? match : '';
 					}
 				}
 			]
@@ -302,28 +302,32 @@ gulp.task('makeSpellDataJson', function() {
 					var type = attributes.match(/type="([^"]+)"/);
 					type = (type !== null) ? type[1] : null;
 					switch (type) {
-						case "hidden":
-						case "number":
+						case 'hidden':
+						case 'number':
 							return '"' + name + '":"' + value + '",\n';
-						case "checkbox":
+						case 'checkbox':
 							return '"' + name + '":0,\n';
-						case "text":
+						case 'text':
 							return '"' + name + '":"",\n';
-						case "radio":
+						case 'radio':
 							if(attributes.match(/.*checked.*/)) {
 								return '"' + name + '":"' + value + '",\n';
 							}
-							return "";
+							return '';
 						default:
-							throw new Error("Unrecognised input type: " + type);
+							throw new Error('Unrecognised input type: ' + type);
 					}
 				}}
 			]
 		}))
-		.pipe(replace({patterns: [{
-				match: 	/,[\s]*<[\s\S]*/,
-				replacement: "" 				}
-			]}))
+		.pipe(replace({
+		  patterns: [
+			  {
+				  match: /,[\s]*<[\s\S]*/,
+				  replacement: ''
+			  }
+		  ]
+	  }))
 		.pipe(wrap('{\n<%= contents %>\n}\n' ))
 		.pipe(rename('spellDefaults.json'))
 		.pipe(gulp.dest('./'));
@@ -332,14 +336,14 @@ gulp.task('makeSpellDataJson', function() {
 var spellPropsHash;
 
 gulp.task('addSpellDataHash', ['makeSpellDataJson'], function() {
-	return gulp.src(['spellDefaults.json'])
+	return gulp.src(['precompiled/spellDefaults.json'])
 		.pipe(change(function(contents) {
 			spellPropsHash = md5(contents);
 			var object = JSON.parse(contents);
 			var objectWithHash = {hash:spellPropsHash, values:object};
-			return "var ShapedSpellbookDefaults = " + JSON.stringify(objectWithHash,null, 2) + ";";
+			return 'var ShapedSpellbookDefaults = ' + JSON.stringify(objectWithHash,null, 2) + ';';
 		}))
-		.pipe(rename("spellDefaults.js"))
+		.pipe(rename('precompiled/spellDefaults.js'))
 		.pipe(gulp.dest('../'));
 
 });
@@ -353,8 +357,8 @@ gulp.task('preCompile', ['addSpellDataHash'], function() {
 					replacement: function () {
 						return processDate();
 					}
-				}
-				,{
+				},
+				{
 					match:  /\x7B\x7BspellDataHash\x7D\x7D/g,
 					replacement: function() { return  spellPropsHash ; } 
 				}

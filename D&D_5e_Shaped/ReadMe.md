@@ -23,6 +23,10 @@ Long term:
 
 ### Changelog
 
+**October 1st 2015**
+
+* Setup some variables for Lucian
+
 **September 28th 2015**
 
 * Prevent "freetextname" from showing on roll templates
