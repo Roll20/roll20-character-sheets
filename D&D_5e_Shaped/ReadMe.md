@@ -23,6 +23,10 @@ Long term:
 
 ### Changelog
 
+**October 2nd 2015**
+
+* More French Translations
+
 **October 1st 2015**
 
 * Setup some variables for Lucian
