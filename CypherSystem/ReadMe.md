@@ -1,7 +1,13 @@
 Character sheet, with integrated rolls and optional API script, for the Cypher System, from [Monte Cook Games](http://www.montecookgames.com/games/).
 
+It can look like and be used as a sheet for _Numen&eacute;ra_ (except the armor stat cost, as per the CSR rule) or _The Strange_ (except the armor stat cost thing also, and the recursion management which requires several characters/sheets, one per recursion).
+
 # Current version:
-Version 1.1 (September 2015) : [Screenshot](CypherSystem.png).
+Version 1.2 (October 4th, 2015).
+
+* Screenshot [Generic Cypher System style](CypherSystem.png)
+* Screenshot [Numenera style](CypherSystem_style_Numenera.png)
+* Screenshot [The Strange style](CypherSystem_style_TheStrange.png)
 
 # Basic use:
 
@@ -35,6 +41,11 @@ Set up the API script:
 
 
 # Release Notes
+
+##Release 1.2 (October 4th, 2015)
+* It's now possible to change the style/look of the sheet to the ones of the generic Cypher System,  Numen&eacute;ra or The Strange.
+* By popular demand, the stat/skill roll template has been unified and only rolls one d20 dice (for the 3D dice users out there), whatever is the "Difficulty" roll parameter from the "Action" section. If the difficulty parameter has been set to 0, the beaten difficulty is no longer calculated (due to Roll20 limitations), but the raw d20 dice is shown, as the special natural rolls (1 or 17+), and the steps modifiying the difficulty are displayed (and summed).
+* New "Artifact" repeating section with integrated Depletion roll.
 
 ##Release 1.1 (September 2015)
 Layout changes: larger stat pools and slightly smaller buttons.

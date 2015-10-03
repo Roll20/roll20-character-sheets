@@ -1,7 +1,15 @@
-Feuille de personnage avec jets int&eacute;gr&eacute;s et script API optionnel pour le JdR g&eacute;n&eacute;rique Cypher System, par [Monte Cook Games](http://www.montecookgames.com/games/). La traduction VF se base sur la traduction de Numen&eacute;ra par Black Book Editions.
+Feuille de personnage avec jets int&eacute;gr&eacute;s et script API optionnel pour le JdR g&eacute;n&eacute;rique Cypher System, par [Monte Cook Games](http://www.montecookgames.com/games/).
+
+Elle est aussi utilisable (et styl&eacute;e) pour _Numen&eacute;ra_ (modulo la gestion du surco&ucirc;t de port de l'armure) ou _The Strange_ (modulo la gestion des r&eacute;cursions, qui n&eacute;cessitera plusieurs personnages/feuilles de personnage).
+
+La VF s'appuie sur la traduction de Numen&eacute;ra par Black Book Editions.
 
 # Version courante :
-Version 1.1 (September 2015) : [Capture d'&eacute;cran](CypherSystem.png).
+Version 1.2 (4 Octobre 2015) :
+
+* Capture d'&eacute;cran [style Cypher System g&eacute;n&eacute;rique](CypherSystem.png)
+* Capture d'&eacute;cran [style Numen&eacute;ra](CypherSystem_style_Numenera.png)
+* Capture d'&eacute;cran [style The Strange](CypherSystem_style_TheStrange.png)
 
 # Utilisation basique :
 
@@ -44,6 +52,11 @@ Alternative (permettant de modifier les sources &agrave; votre convenance si vou
 Le script API permet que l'&eacute;tat du personnage soit automatiquement mis &agrave; jour en fonction de la perte de points de caract&eacute;ristiques, d'appliquer la perte de caract&eacute;ristique &agrave; partir des jets dans le chat, de remettre &agrave; z&eacute;ro les param&egrave;tres de jet, de reposer compl&egrave;tement le personnage en un clic.
 
 # Notes de version
+
+##Version 1.2 (4 Octobre 2015)
+* Possibilit&eacute; de changer le style / l'apparence de la feuille en choisissant Cypher System, Numen&eacute;ra ou The Strange.
+* &Agrave; la demande d'utilisateurs de la FdP, le template de jet de stats et comp&eacute;tences a &eacute;t&eacute; unifi&eacute;, en ne lan&ccedil;ant qu'un seul d20 dont le r&eacute;sultat brut est affich&eacute;. Si le param&egrave;tre de difficult&eacute; n'est pas pas renseign&eacute; dans le groupe "Action" (=0), la difficult&eacute; battue n'est plus calcul&eacute;e (du fait de limitations technique de Roll20), mais seulement les niveaux la diminuant ou l'augmentant.
+* Ajout d'une section pour la saisie des Art&eacute;facts, avec un bouton de jet d'&eacute;puisement.
 
 ##Version 1.1 (Septembre 2015)
 Cr&eacute;ation de la FdP VF.
