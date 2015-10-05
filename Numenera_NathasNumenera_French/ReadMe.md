@@ -5,7 +5,7 @@ Bas&eacute;e sur la feuille de personnage "Numenera" d&eacute;j&agrave; pr&eacut
 Voir en fin de fichier pour les notes de versions.
 
 # Version courante :
-Version 4 (mars 2015) : [Screenshot](NathasNumenera_tabs_v4.jpg).
+Version 4.6 (30 Ao&ucirc;t 2015) : [Capture d'&eacute;cran](NathasNumenera_tabs_v4-5.jpg).
 
 # Utilisation basique :
 
@@ -41,7 +41,7 @@ Alternative (permettant de modifier les sources &agrave; votre convenance si vou
 4. S&eacute;lectionner le pion
 5. Modifier le personnage (_"Edit"_) et cliquer _"Use Selected token"_ dans _"Default Token"_
 6. Cliquer _"Save Changes"_
-8. R&eacute;p&eacute;ter les &eacute;tapes 1 &agrave; 6 pour les autres personnages.
+7. R&eacute;p&eacute;ter les &eacute;tapes 1 &agrave; 6 pour les autres personnages.
 
 # Utilisation avanc&eacute;e :
 1. Mettre en place les scripts API :
@@ -54,6 +54,33 @@ Alternative (permettant de modifier les sources &agrave; votre convenance si vou
 3. Si n&eacute;cessaire, pour cr&eacute;er vos propres macros ou boutons, lisez le [Wiki](https://wiki.roll20.net/Script:Numenera_Natha).
 
 # Notes de version
+
+##Version 4.6 (30 Ao&ucirc;t 2015)
+Am&eacute;lioration de l'affichage des r&eacute;sultats des jets basiques d'attributs (hors API) avec indication de succ&egrave;s ou d'&eacute;chec.
+
+##Version 4.5 (13 Juin 2015)
+Ajout des d&eacute;g&acirc;ts sp&eacute;ciaux dans la gestion de l'&Eacute;tat du personnage.
+Le script API &eacute;t&eacute; mis &agrave; jour en cons&eacute;quence.
+
+##Version 4.4 (Juin 2015)
+Ajout du niveau de comp&eacute;tence et des Atouts dans les param&egrave;tres de Jet d'Initiative.
+Le script API &eacute;t&eacute; mis &agrave; jour en cons&eacute;quence.
+
+##Version 4.3 (Mai 2015)
+Ajout du niveau de comp&eacute;tence dans les param&egrave;tres de Jet.
+Le script API &eacute;t&eacute; mis &agrave; jour en cons&eacute;quence.
+
+##Version 4.2 (Avril 2015)
+D&eacute;but d'int&eacute;gration de la traduction officielle VF de [Black Book Editions](http://www.black-book-editions.fr/contenu/file/165_nu_feuille_de_personnage_v0.pdf).
+
+Correction de l'affichage de la difficult&eacute; par d&eacute;faut des PNJs.
+
+Quelques ajustements visuels.
+
+##Version 4.1 (Avril 2015)
+Nouvel attribut "Avantage" en tant que param&egrave;tre de jet de caract&eacute;ristique, utilis&eacute; &agrave; la fois par les jets d'API (v4.2+) et standards/int&eacute;gr&eacute;s.
+
+NB : les fonctions API 4.2 int&egrave;grent aussi une nouvelle commande pour faire des jets de caract&eacute;ristique par macro, avec un pion s&eacute;lectionn&eacute; et en demandant tous les param&egrave;tres n&eacute;cessaires :  !nathanum-macroroll.
 
 ##Version 4.0 (Mars 2015)
 *Plus besoin de macros ! Et des templates! Et une version PNJ  de la feuille !*
