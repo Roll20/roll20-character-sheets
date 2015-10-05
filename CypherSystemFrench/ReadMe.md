@@ -54,7 +54,7 @@ Le script API permet que l'&eacute;tat du personnage soit automatiquement mis &a
 # Notes de version
 
 ##Version 1.2 (4 Octobre 2015)
-* Possibilit&eacute; de changer le style / l'apparence de la feuille en choisissant Cypher System, Numen&eacute;ra ou The Strange.
+* Possibilit&eacute; de changer le style / l'apparence de la feuille d'un PJ (en choisissant Cypher System, Numen&eacute;ra ou The Strange) ou en feuille de PNJ.
 * &Agrave; la demande d'utilisateurs de la FdP, le template de jet de stats et comp&eacute;tences a &eacute;t&eacute; unifi&eacute;, en ne lan&ccedil;ant qu'un seul d20 dont le r&eacute;sultat brut est affich&eacute;. Si le param&egrave;tre de difficult&eacute; n'est pas pas renseign&eacute; dans le groupe "Action" (=0), la difficult&eacute; battue n'est plus calcul&eacute;e (du fait de limitations technique de Roll20), mais seulement les niveaux la diminuant ou l'augmentant.
 * Ajout d'une section pour la saisie des Art&eacute;facts, avec un bouton de jet d'&eacute;puisement.
 
