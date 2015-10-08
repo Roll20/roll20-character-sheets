@@ -7,7 +7,6 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 Short Term:
 * Spell Crit damage should use higher level
 * Spell Crit damage should not roll 3D dice for secondary and other stuff that is toggled off.
-* Actions: Allow for "Effects" to be whispered to the GM.
 * Revamp Traits. Keep fluff traits on the first page and for action like traits write "see Actions". Also include fluff traits on "Actions".
 * Refactor Actions to use damage die and bonus like weapons do
 
@@ -23,6 +22,39 @@ Long term:
 
 
 ### Changelog
+
+**October 2nd 2015**
+
+* More French Translations
+
+**October 1st 2015**
+
+* Setup some variables for Lucian
+
+**September 28th 2015**
+
+* Prevent "freetextname" from showing on roll templates
+
+**September 20th 2015**
+
+* Removed spellcastingtime from rolltemplate stuff
+
+**September 19th 2015**
+
+* Updated Save Macro
+* Updated Check Macro (Depreciate Skill macro)
+
+**September 17th 2015**
+
+* French translations
+
+**September 13th 2015**
+
+* Removed old spell syntax
+
+**September 5th 2015**
+
+* Reduce number of attributes for spells.
 
 **August 30th 2015**
 
