@@ -13,6 +13,8 @@ Report any problems, suggestions or features by sending a private message on Rol
 #### 0.0.9
 
 * Fix weapon repeatable field widths
+* Fix attack roll failure due to null attack bonus
+* Added Languages text area
 
 #### 0.0.8
 
