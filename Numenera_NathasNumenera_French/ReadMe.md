@@ -5,7 +5,7 @@ Bas&eacute;e sur la feuille de personnage "Numenera" d&eacute;j&agrave; pr&eacut
 Voir en fin de fichier pour les notes de versions.
 
 # Version courante :
-Version 4.7 (19 Septembre 2015) : [Capture d'&eacute;cran](NathasNumenera_tabs_v4-5.jpg).
+Version 4.8 (10 Octobre 2015) : [Capture d'&eacute;cran](NathasNumenera_tabs_v4-5.jpg).
 
 # Utilisation basique :
 
@@ -50,7 +50,13 @@ Alternative (permettant de modifier les sources &agrave; votre convenance si vou
 
 # Notes de version
 
-##Release 4.7 (19 Septembre 2015)
+##Version 4.8 (10 Octobre 2015)
+Le script API doit &ecirc;tre mis &agrave; jour en version 4.8.
+
+* &Agrave; la demande d'utilisateurs de la FdP, le template de jet basique (non API) a &eacute;t&eacute; unifi&eacute;, en ne lan&ccedil;ant qu'un seul d20 dont le r&eacute;sultat brut est affich&eacute;. Si le param&egrave;tre de difficult&eacute; n'est pas pas renseign&eacute; dans le groupe "Action" (=0), la difficult&eacute; battue n'est plus calcul&eacute;e (du fait de limitations technique de Roll20), mais seulement les niveaux la diminuant ou l'augmentant.
+* Ajout d'un bouton de remise &agrave; z&eacute;ro des param&egrave;tres de jet dans la section "Action"
+
+##Version 4.7 (19 Septembre 2015)
 Notez que le [script API](https://github.com/Roll20/roll20-api-scripts/blob/master/Numenera_Natha/Numenera_Natha.js) doit &ecirc;tre mis &agrave; jour pour utiliser les boutons "rouges" !
 
 Les valeurs par d&eacute;faut sont d&eacute;sormais valu&eacute;es automatiquement par la fiche ou l'API, au besoin, et donc les boutons de jets sont imm&eacute;diatement utilisables apr&egrave;s la cr&eacute;tion du personnage.
