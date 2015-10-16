@@ -5,7 +5,7 @@ Note: there's a french version of the very same sheet/macros/scripts, for those 
 Follow [this link](https://github.com/Roll20/roll20-character-sheets/tree/master/Numenera_NathasNumenera_French).
 
 # Current version:
-Version 4.7 (September 2015) : [Screenshot](NathasNumenera_tabs_v4-5.jpg).
+Version 4.8 (October 10th, 2015) : [Screenshot](NathasNumenera_tabs_v4-5.jpg).
 
 # Basic use:
 
@@ -39,6 +39,12 @@ Version 4.7 (September 2015) : [Screenshot](NathasNumenera_tabs_v4-5.jpg).
 3. If needed, to create you own macros or buttons, read the [Wiki page](https://wiki.roll20.net/Script:Numenera_Natha).
 
 # Release Notes
+
+##Release 4.8 (October 10th, 2015)
+The API script must be updated in version 4.8.
+
+* By popular demand, the basic (non API) stat/skill roll template has been unified and only rolls one d20 dice (for the 3D dice users out there), whatever is the "Difficulty" roll parameter from the "Action" section. If the difficulty parameter has been set to 0, the beaten difficulty is no longer calculated (due to Roll20 limitations), but the raw d20 dice is shown, as the special natural rolls (1 or 17+), and the steps modifiying the difficulty are displayed (and summed).
+* New (small) API button to reset Action parameters
 
 ##Release 4.7 (September 2015)
 Note that the [API script](https://github.com/Roll20/roll20-api-scripts/blob/master/Numenera_Natha/Numenera_Natha.js) needs to be updated to use the red buttons!
