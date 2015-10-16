@@ -23,6 +23,10 @@ Long term:
 
 ### Changelog
 
+**October 16th 2015**
+
+* Spell higher levels are now a select. No data should be lost unless you used something other than d2,d4,d6,d8,d10,d12,d20
+
 **October 2nd 2015**
 
 * More French Translations
