@@ -14,6 +14,7 @@ This is a re-creation of the "green-sheet" for the D&D Basic Moldvay Red box gam
 * Fixed critical success/failure die rolls with Class ability skills: Find Trap, Listen, Detect Secret Doors, Stonecraft, Hear Noise
 * Fixed spacing issue with spell labels in Firefox
 * Added bonus/minus for Surprise Checks
+* Fixed Halflings not speaking their own language
 
 #### 1.12
 * Moved Morale Check button next to Charisma in Ability section
