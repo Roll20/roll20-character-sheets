@@ -28,6 +28,7 @@ Long term:
 * Added a setting for changing the passive skill base (instead of 10)
 * Removed skill macro as it's in the check macro
 * Fixed Lucian's spell thing after I changed spell higher level stuff to a select input
+* Move Jack of All Trades to the class page
 
 **October 16th 2015**
 
