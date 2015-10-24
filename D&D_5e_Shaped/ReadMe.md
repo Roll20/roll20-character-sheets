@@ -23,6 +23,10 @@ Long term:
 
 ### Changelog
 
+**October 24th 2015**
+
+* Added a setting for changing the passive skill base (instead of 10)
+
 **October 16th 2015**
 
 * Spell higher levels are now a select. No data should be lost unless you used something other than d2,d4,d6,d8,d10,d12,d20
