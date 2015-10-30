@@ -23,6 +23,10 @@ Long term:
 
 ### Changelog
 
+**October 30th 2015**
+
+* Added Russian
+
 **October 24th 2015**
 
 * Added a setting for changing the passive skill base (instead of 10)
