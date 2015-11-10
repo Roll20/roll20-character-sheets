@@ -8,9 +8,12 @@ PMT est une adaptation de **Labyrinth Lord**, r&eacute;alis&eacute;e par [Arasmo
 Le jeu complet est disponible gratuitement en PDF sur le site du [Scriptorium](http://www.le-scriptorium.com/index.php?page=Portes-Monstres-Tresors), et en version papier sur [Lulu](http://www.lulu.com/shop/daniel-proctor-and-james-manez/portes-monstres-tr%C3%A9sors/hardcover/product-22096059.html).
 
 # Version courante
-2.1 [Screenshot](pmt_v2.jpg)
+2.2 [Screenshot](pmt_v2.jpg)
 
 # Notes de version
+
+##v2.2 (Ao&ucirc;t 2015).
+Am&eacute;lioration de l'affichage des r&eacute;sultats des jets de caract&eacute;ristiques, sauvegardes et talents avec indication de succ&egrave;s ou d'&eacute;chec.
 
 ##v2.1 (Avril 2015).
 Correction d'une anomalie d'affichage du logo PMT avec Firefox.
