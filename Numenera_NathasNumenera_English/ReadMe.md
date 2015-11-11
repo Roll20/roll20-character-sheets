@@ -5,7 +5,7 @@ Note: there's a french version of the very same sheet/macros/scripts, for those 
 Follow [this link](https://github.com/Roll20/roll20-character-sheets/tree/master/Numenera_NathasNumenera_French).
 
 # Current version:
-Version 4 (March 2015) : [Screenshot](NathasNumenera_tabs.jpg).
+Version 4.5 (June 2015) : [Screenshot](NathasNumenera_tabs_v4-5.jpg).
 
 # Basic use:
 
@@ -13,36 +13,57 @@ Version 4 (March 2015) : [Screenshot](NathasNumenera_tabs.jpg).
 1. Go the _"Details"_ page of your campaign
 2. Click on _"Campaign Settings"_
 3. Scroll down to _"Character Sheet Template"_
-4. Choose _"Custom"_
-5. In the _"HTML Layout"_ tab, paste the contents of the [HTML file](NathasNumenera_tabs.htm)
-6. In the _"CSS Styling"_ tab, paste the contents of the [CSS file](NathasNumenera_tabs.css)
-7. Scroll down and click _"Save Changes"_
+4. Choose _"Numenera (tabbed)"_ under _"Cypher System"_
+5. Scroll down and click _"Save Changes"_
 
 ## How to set up a character and its token
-1. Start your campaign
-2. Create a new _"Character"_ in the _"Journal"_
-3. Fill at least the character's name and the 3 Stats (current and max values): Might, Speed and Intellect
-4. (Optionally) Create/use a token for the character as in this [screenshot](NathasNumenera_setup_the_character_token.jpg):
+1. Create a new _"Character"_ in the _"Journal"_
+2. Fill at least (even if it's zero):
+  1. Might, Speed and Intellect (current, max and edge) and Effort.
+  2. Before using the Roll buttons: Difficulty, Cost, Effort (both) and Bonus.
+  3. Before using the Initiative button: Cost, Effort and Bonus.
+  4. Before using the Recovery button: Recovery bonus.
+3. (Optionally) Create/use a token for the character as in this [screenshot](NathasNumenera_setup_the_character_token.jpg):
   1. Make sure it representents the character you've created
   2. Assign _"bar1"_ to the _"might"_ attribute
   3. Assign _"bar2"_ to the _"speed"_ attribute
   4. Assign _"bar3"_ to the _"intellect"_ attribute
-5. Select the token
-6. Edit the character and click _"Use Selected token"_ as _"Default Token"_
-7. Click _"Save Changes"_
-8. Repeat steps 2 to 7 for every other characters and you're set.
+4. Select the token
+5. Edit the character and click _"Use Selected token"_ as _"Default Token"_
+6. Click _"Save Changes"_
+7. Repeat steps 2 to 7 for every other characters and you're set.
 
 # Advanced use (API scripts and macros):
-1. Set up the character sheet layout (HTML and CSS) as explained above
-2. Set up the API scripts:
+1. Set up the API scripts:
   1. In the _"details"_ page of the campaign, click on _"API Scripts"_
   2. If you've already added scripts to this campaign, click on _"New Script"_
   3. Name the new script (ex : _"NathasNumenera"_)
-  4. Copy the contents of this [Javascript file](NathasNumenera_API.js) to the big black empty area
+  4. Copy the contents of this [Javascript file](https://github.com/Roll20/roll20-api-scripts/blob/master/Numenera_Natha/Numenera_Natha.js) to the big black empty area
   5. Click on _"Save Script"_
-3. No need to create macros, all the red buttons on the sheet use the API functions.
+2. No need to create macros, all the red buttons on the sheet use the API functions.
+3. If needed, to create you own macros or buttons, read the [Wiki page](https://wiki.roll20.net/Script:Numenera_Natha).
 
 # Release Notes
+
+##Release 4.5 (June 2015)
+Special Damage added. API script updated accordingly.
+
+##Release 4.4 (June 2015)
+Skill level and Assets added to the Initiative roll parameters. API script updated accordingly.
+
+##Release 4.3 (May 2015)
+Skill level added to the roll parameters. API script updated accordingly.
+"Tiers" corrected to "Tier".
+
+##Release 4.2 (April 2015)
+Bug correction on NPC base difficulty display.
+
+Slight layout corrections.
+
+##Release 4.1 (April 2015)
+New "Asset" attribute as stat roll parameter, used by both the API rolls (v4.2+) and the integrated standard rolls.
+
+NOTE: by popular demand (of one user, Hi marturin!) the version 4.2+ of the API functions now integrates a new chat command to make stat roll with macros, a selected token and asking all the necessary parameters: !nathanum-macroroll.
 
 ##Release 4.0 (March 2015)
 *No more need for macros! But templates added! And a new NPC tab on the sheet!*
