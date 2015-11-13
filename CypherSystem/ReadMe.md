@@ -3,7 +3,7 @@ Character sheet, with integrated rolls and optional API script, for the Cypher S
 It can look like and be used as a sheet for _Numen&eacute;ra_ (except the armor stat cost, as per the CSR rule) or _The Strange_ (except the armor stat cost thing also, and the recursion management which requires several characters/sheets, one per recursion).
 
 # Current version:
-Version 1.2 (October 4th, 2015).
+Version 1.3 (October 25th, 2015).
 
 * Screenshot [Generic Cypher System style](CypherSystem.png)
 * Screenshot [Numenera style](CypherSystem_style_Numenera.png)
@@ -41,6 +41,13 @@ Set up the API script:
 
 
 # Release Notes
+
+##Release 1.3 (October 25th, 2015)
+
+* Corrected roll with difficulty and inability: now compute the total difficulty
+* Replace "Action" parameter inputs by drop-down lists, to ensure that Roll20 updates correctly the attributes
+* Negative edge allowed (handicaps)
+* Removed the word "target" from the HTML and template roll code to avoid confusion with the Roll20 keyword "Target", allowing to create custom macros
 
 ##Release 1.2 (October 4th, 2015)
 The API script must be updated in version 1.2.
