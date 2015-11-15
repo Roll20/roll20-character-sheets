@@ -1,5 +1,5 @@
 var ShapedSpellbookDefaults = {
-  "hash": "05f980a318ca8ba28aa465d5fb34caac",
+  "hash": "4b74bc4cd175f58709f359ace809a196",
   "values": {
     "spellbaselevel": "{{num}}",
     "higher_level_query": "{{higherLevelQuery}}",
@@ -101,7 +101,7 @@ var ShapedSpellbookDefaults = {
     "spell_save_second_higher_level_dmg_die": "",
     "spellhealamount": "",
     "healbonus": "",
-    "healstatbonus": "0",
+    "healstatbonus": "@{casting_stat}",
     "spell_heal_higher_level_amount": "",
     "spell_heal_higher_level_dmg_dice": "0",
     "spell_heal_higher_level_dmg_die": "",
