@@ -23,6 +23,10 @@ Long term:
 
 ### Changelog
 
+**November 15th 2015**
+
+* Russian Indentation fixes
+
 **October 30th 2015**
 
 * Added Russian
