@@ -23,6 +23,21 @@ Long term:
 
 ### Changelog
 
+**October 30th 2015**
+
+* Added Russian
+
+**October 24th 2015**
+
+* Added a setting for changing the passive skill base (instead of 10)
+* Removed skill macro as it's in the check macro
+* Fixed Lucian's spell thing after I changed spell higher level stuff to a select input
+* Move Jack of All Trades to the class page
+
+**October 16th 2015**
+
+* Spell higher levels are now a select. No data should be lost unless you used something other than d2,d4,d6,d8,d10,d12,d20
+
 **October 2nd 2015**
 
 * More French Translations
