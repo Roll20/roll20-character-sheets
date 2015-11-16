@@ -1,4 +1,4 @@
-# Sacage Worlds (french)
+# Savage Worlds (french)
 
 Feuille de personnage (FdP) avec jets intégrés pour **Savage Worlds**, basée sur le Livre de Base (LdB) de la version éditée en français par [Black Book Editions](http://www.black-book-editions.fr/index.php?site_id=278).
 
