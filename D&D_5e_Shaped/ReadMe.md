@@ -23,6 +23,10 @@ Long term:
 
 ### Changelog
 
+**November 16th 2015**
+
+* Add Halfling to NPC Actions
+
 **November 15th 2015**
 
 * Russian Indentation fixes
