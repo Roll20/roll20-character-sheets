@@ -227,7 +227,7 @@
 						<div class="sheet-row">
 							<div class="sheet-col-2-7 sheet-right sheet-hd-row">Crit Range :</br></div>
 							<div class="sheet-col-1-6">
-								<select name="attr_WarriorThreat">
+								<select name="attr_CritThreat">
 									<option value="20" selected="selected">20</option>
 									<option value="19">19-20</option>
 									<option value="18">18-20</option>
@@ -4062,11 +4062,14 @@
 					<div class="sheet-col-1-24 sheet-checkbox-row" title="Check the box if you have the Lucky Roll for Melee to Hit"><input type="checkbox" value="@{LCK_Starting}" name="attr_MeleeAtkLuckyRoll1"></div>
 					<div class="sheet-col-1-16 sheet-padr" title="The magic bonus will be added as a bonus to BOTH the attack and damage rolls"><input type="number" name="attr_MeleeMagic1" value="0" step="1"></div>
 					<div class="sheet-col-1-24"><input type="number" name="attr_MeleeToHit1" value="[[[[@{STR}]] + @{MeleeMagic1} + @{MeleeAtkLuckyRoll1} + @{ATK} + @{MeleeAtkLuckyWeapon1} + @{MeleeAtkBackstabWeapon1}]]" disabled="disabled"></div>
-					<div class="sheet-col-1-12 sheet-center"><button type="roll" class="sheet-roll" name="roll_MeleeAttack1" value="@{character_name} uses @{MeleeWeaponName1} to attack\n\n[[@{MeleeAttackDice1} + @{MeleeToHit1} [To Hit] + (?{Deed/Smite Die roll|0}) [Deed/Smite Die] ]] vs AC (if a crit, roll on the appropriate crit table" >Attack</button></div>
+					<!--<div class="sheet-col-1-12 sheet-center"><button type="roll" class="sheet-roll" name="roll_MeleeAttack1" value="@{character_name} uses @{MeleeWeaponName1} to attack\n\n[[@{MeleeAttackDice1} + @{MeleeToHit1} [To Hit] + (?{Deed/Smite Die roll|0}) [Deed/Smite Die] ]] vs AC (if a crit, roll on the appropriate crit table" >Attack</button></div>-->
 					<div class="sheet-col-1-24 sheet-checkbox-row" title="Check the box if you have the Lucky Roll for Melee Damage."><input type="checkbox" value="@{LCK_Starting}" name="attr_MeleeDmgLuckyRoll1"></div>
 					<div class="sheet-col-1-14" title="Only enter the base damage roll here without any bonuses from stats or other sources"><input class="sheet-center" type="text" name="attr_MeleeDmg1"></div>
 					<div class="sheet-col-1-24"><input type="number" name="attr_MeleeDmgBonus1" value="[[[[@{STR}]] + @{MeleeMagic1} + @{MeleeDmgLuckyRoll1}]]" disabled="disabled"></div>
-					<div class="sheet-col-1-10 sheet-center"><button type="roll" class="sheet-roll" name="roll_MeleeDamage1" value="\nFor [[@{MeleeDmg1} [Base damage] + @{MeleeDmgBonus1} [Damage Bonus] + (?{Deed/Smite Die roll|0}) [Deed/Smite Die] ]] damage." >Damage</button></div>
+					<!--<div class="sheet-col-1-10 sheet-center"><button type="roll" class="sheet-roll" name="roll_MeleeDamage1" value="\nFor [[@{MeleeDmg1} [Base damage] + @{MeleeDmgBonus1} [Damage Bonus] + (?{Deed/Smite Die roll|0}) [Deed/Smite Die] ]] damage." >Damage</button></div>-->
+					<div class="sheet-col-1-15">
+                        <button type='roll' name="Attack_@{MeleeWeaponName1}" value="&{template:DccTabbed} {{combat=1}} {{name=@{Name}}} {{title=@{MeleeWeaponName1}}} {{attack=[[ [[ @{MeleeAttackDice1}cf1cs>@{CritThreat} ]] [To Hit Roll] + @{MeleeToHit1} [To Hit Bonus] + (?{Deed/Smite Die roll|0}) [Deed/Smite] ]] }} {{damage=[[@{MeleeDmg1} [Base damage] + @{MeleeDmgBonus1} [Damage Bonus] + (?{Deed/Smite Die roll|0}) [Deed/Smite Die] ]]}} {{crit=[[ [[@{CritDie} + [[@{LCK}]] + @{CritLuckyRoll}]] on Table @{CritDie_max} ]]}} {{fumble=[[ [[@{ArmorFumbleDie} + [[@{FumbleCheck}]] + @{FumbleLuckyRoll}]] ]]}}"></button>
+                    </div>
 				</div>
 				<!-- END melee weapon row -->
 
@@ -6554,7 +6557,7 @@
 						<div class="sheet-row">
 							<div class="sheet-col-2-7 sheet-right sheet-hd-row">Crit Range :</br></div>
 							<div class="sheet-col-1-7">
-								<select name="attr_WarriorThreatZero">
+								<select name="attr_CritThreatZero">
 									<option value="20" selected="selected">20</option>
 								</select>
 							</div>
@@ -8081,3 +8084,249 @@
 
 	
 </div>
+
+<!--- templates -->
+    <rolltemplate class="sheet-rolltemplate-DccTabbed">
+        <div class="sheet-RollTemp-wrapper">
+            <div class="sheet-RollTemp-header{{#combat}} sheet-combat{{/combat}}{{#spell}}  sheet-spell{{/spell}}{{#stat}} sheet-stat{{/stat}}{{#save}} sheet-save{{/save}}{{#class}} sheet-class{{/class}}">
+                <div class="sheet-RollTemp-title">{{title}}</div>
+                <div class="sheet-RollTemp-name">{{name}}</div>
+                <div class="sheet-RollTemp-line"></div> 
+            </div>
+
+            <div class="sheet-main-content">
+                
+                <!--Weapon based attacks-->
+                    {{#attack}}
+                        <div class="sheet-row">
+                            <div class="sheet-col-7-13 sheet-padl sheet-RollTemp-rollname">Hits AC:</div>
+                            <div class="sheet-col-6-13 sheet-padr sheet-RollTemp-rollresult">{{attack}}</div>
+                        </div>
+                    {{/attack}}
+                    
+                    {{#damage}}
+                        <div class="sheet-row">
+                            <div class="sheet-col-7-13 sheet-padl sheet-padr sheet-RollTemp-rollname">Damage :</div>
+                            <div class="sheet-col-6-13 sheet-padr sheet-RollTemp-rollresult">{{damage}}</div>
+                        </div>
+                    {{/damage}}
+
+                    {{#rollWasCrit() attack}}
+                        <div class="sheet-row">
+                            <div class="sheet-col-1-1">&nbsp;</div>
+                            <div class="sheet-col-7-13 sheet-padl sheet-padr sheet-RollTemp-rollname">Crit :</div>
+                            <div class="sheet-col-19-20 sheet-padl sheet-padr sheet-RollTemp-critsuccess">{{crit}}</div>
+                        </div>
+                    {{/rollWasCrit() attack}}   
+                            
+                    {{#rollWasFumble() attack}}
+                        <div class="sheet-row">
+                            <div class="sheet-col-1-1">&nbsp;</div>
+                            <div class="sheet-col-7-13 sheet-padl sheet-padr sheet-RollTemp-rollname">Fumble :</div>
+                            <div class="sheet-col-19-20 sheet-padl sheet-RollTemp-critfail">{{fumble}}</div>
+                        </div>
+                    {{/rollWasFumble() attack}}
+                        
+                    
+
+                <!-- Initiative -->
+                {{#INIT}}
+                    <div class="sheet-row">
+                        <div class="sheet-col-8-13 sheet-padl sheet-padr sheet-RollTemp-rollname">Initiative : </div>
+                        <div class="sheet-col-5-13 sheet-padr sheet-RollTemp-rollresult">{{INIT}}</div>
+                    </div>
+                {{/INIT}}
+
+                <!-- Hit Die -->
+                {{#HD}}
+                    <div class="sheet-row">
+                        <div class="sheet-col-8-13 sheet-padl sheet-padr sheet-RollTemp-rollname">HP gained : </div>
+                        <div class="sheet-col-5-13 sheet-padr sheet-RollTemp-rollresult">{{HD}}</div>
+                    </div>
+                {{/HD}}
+
+                <!-- STR Open Doors -->
+                {{#strskill}}
+                    <div class="sheet-row">
+                        <div class="sheet-col-5-14 sheet-padl sheet-padr sheet-RollTemp-rollname">Roll : </div>
+                        <div class="sheet-col-9-14 sheet-padr sheet-RollTemp-rollresult">{{strskill}}</div>
+                    </div>
+                    {{#rollWasCrit() strskill}}
+                    <div class="sheet-row">
+                        <div class="sheet-col-1-1">&nbsp;</div>
+                        <div class="sheet-col-19-20 sheet-padl sheet-padr sheet-RollTemp-critsuccess">GREAT SUCCESS !</div>
+                    </div>
+                    {{/rollWasCrit() strskill}}
+                    {{#rollGreater() strskill chance}}
+                        <div class="sheet-row">
+                            <div class="sheet-col-1-1">&nbsp;</div>
+                            <div class="sheet-col-11-12 sheet-padl sheet-padr sheet-RollTemp-fail">FAILURE !</div>
+                        </div>
+                    {{/rollGreater() strskill chance}}
+                    {{#rollBetween() strskill 2 chance}}
+                        <div class="sheet-row">
+                            <div class="sheet-col-1-1">&nbsp;</div>
+                            <div class="sheet-col-11-12 sheet-padl sheet-padr sheet-RollTemp-success">SUCCESS !</div>
+                        </div>
+                    {{/rollBetween() strskill 2 chance}}
+                {{/strskill}}
+
+                <!-- CHA Reactions -->
+                {{#chaskill}}
+                    <div class="sheet-row">
+                        <div class="sheet-col-5-12 sheet-padl sheet-padr sheet-RollTemp-rollname">Check : </div>
+                        <div class="sheet-col-7-12 sheet-padr sheet-RollTemp-rollresult">{{chaskill}}</div>
+                    </div>
+                {{/chaskill}}
+
+                <!-- Ability Checks -->
+                {{#ability}}
+                    <div class="sheet-row">
+                        <div class="sheet-col-5-14 sheet-padl sheet-padr sheet-RollTemp-rollname">Roll : </div>
+                        <div class="sheet-col-9-14 sheet-padr sheet-RollTemp-rollresult">{{ability}}</div>
+                    </div>
+                    {{#rollWasCrit() ability}}
+                    <div class="sheet-row">
+                        <div class="sheet-col-1-1">&nbsp;</div>
+                        <div class="sheet-col-19-20 sheet-padl sheet-padr sheet-RollTemp-critsuccess">GREAT SUCCESS !</div>
+                    </div>
+                    {{/rollWasCrit() ability}}
+                    {{#rollGreater() ability stattype}}
+                        <div class="sheet-row">
+                            <div class="sheet-col-1-1">&nbsp;</div>
+                            <div class="sheet-col-11-12 sheet-padl sheet-padr sheet-RollTemp-fail">FAILURE !</div>
+                        </div>
+                    {{/rollGreater() ability stattype}}
+                    {{#rollBetween() ability 2 stattype}}
+                        <div class="sheet-row">
+                            <div class="sheet-col-1-1">&nbsp;</div>
+                            <div class="sheet-col-11-12 sheet-padl sheet-padr sheet-RollTemp-success">SUCCESS !</div>
+                        </div>
+                    {{/rollBetween() ability 2 stattype}}
+                {{/ability}}
+
+                <!-- Saving Throws -->
+                {{#savingthrow}}
+                    <div class="sheet-row">
+                        <div class="sheet-col-6-15 sheet-padl sheet-padr sheet-RollTemp-rollname">Save : </div>
+                        <div class="sheet-col-9-15 sheet-padr sheet-RollTemp-rollresult">{{savingthrow}}</div>
+                    </div>
+                    {{#rollLess() savingthrow savetype}}
+                        <div class="sheet-row">
+                            <div class="sheet-col-1-1">&nbsp;</div>
+                            <div class="sheet-col-11-12 sheet-padl sheet-padr sheet-RollTemp-fail">FAILURE !</div>
+                        </div>
+                    {{/rollLess() savingthrow savetype}}
+                    {{#rollBetween() savingthrow savetype 100}}
+                        <div class="sheet-row">
+                            <div class="sheet-col-1-1">&nbsp;</div>
+                            <div class="sheet-col-11-12 sheet-padl sheet-padr sheet-RollTemp-success">SUCCESS !</div>
+                        </div>
+                    {{/rollBetween() savingthrow savetype 100}}
+                {{/savingthrow}}
+
+                <!-- Class Abilities: Find Trap, Listen, Detect Secret Doors, Stonecraft, Hear Noise -->
+                {{#classability}}
+                    <div class="sheet-row">
+                        <div class="sheet-col-5-14 sheet-padl sheet-padr sheet-RollTemp-rollname">Roll : </div>
+                        <div class="sheet-col-9-14 sheet-padr sheet-RollTemp-rollresult">{{classability}}</div>
+                    </div>
+                    {{#rollWasCrit() classability}}
+                    <div class="sheet-row">
+                        <div class="sheet-col-1-1">&nbsp;</div>
+                        <div class="sheet-col-19-20 sheet-padl sheet-padr sheet-RollTemp-critsuccess">GREAT SUCCESS !</div>
+                    </div>
+                    {{/rollWasCrit() classability}}
+                    {{#rollGreater() classability chance}}
+                        <div class="sheet-row">
+                            <div class="sheet-col-1-1">&nbsp;</div>
+                            <div class="sheet-col-11-12 sheet-padl sheet-padr sheet-RollTemp-fail">FAILURE !</div>
+                        </div>
+                    {{/rollGreater() classability chance}}
+                    {{#rollBetween() classability 2 chance}}
+                        <div class="sheet-row">
+                            <div class="sheet-col-1-1">&nbsp;</div>
+                            <div class="sheet-col-11-12 sheet-padl sheet-padr sheet-RollTemp-success">SUCCESS !</div>
+                        </div>
+                    {{/rollBetween() classability 2 chance}}
+                {{/classability}}
+
+                <!-- CHA Morale Check -->
+                {{#moralecheck}}
+                    <div class="sheet-row">
+                        <div class="sheet-col-5-14 sheet-padl sheet-padr sheet-RollTemp-rollname">Roll : </div>
+                        <div class="sheet-col-9-14 sheet-padr sheet-RollTemp-rollresult">{{moralecheck}}</div>
+                    </div>
+                    {{#rollGreater() moralecheck chance}}
+                        <div class="sheet-row">
+                            <div class="sheet-col-1-1">&nbsp;</div>
+                            <div class="sheet-col-11-12 sheet-padl sheet-padr sheet-RollTemp-fail">FAILURE !</div>
+                        </div>
+                    {{/rollGreater() moralecheck chance}}
+                    {{#rollBetween() moralecheck 1 chance}}
+                        <div class="sheet-row">
+                            <div class="sheet-col-1-1">&nbsp;</div>
+                            <div class="sheet-col-11-12 sheet-padl sheet-padr sheet-RollTemp-success">SUCCESS !</div>
+                        </div>
+                    {{/rollBetween() moralecheck 1 chance}}
+                {{/moralecheck}}
+
+                <!-- Turn Undead -->
+                {{#turnundead}}
+                    <div class="sheet-row">
+                        <div class="sheet-col-5-14 sheet-padl sheet-padr sheet-RollTemp-rollname">Roll : </div>
+                        <div class="sheet-col-9-14 sheet-padr sheet-RollTemp-rollresult">{{turnundead}}</div>
+                    </div>
+                {{/turnundead}}
+
+                <!-- Surprise -->
+                {{#surprise}}
+                    <div class="sheet-row">
+                        <div class="sheet-col-5-14 sheet-padl sheet-padr sheet-RollTemp-rollname">Roll : </div>
+                        <div class="sheet-col-9-14 sheet-padr sheet-RollTemp-rollresult">{{surprise}}</div>
+                    </div>
+                    {{#rollGreater() surprise chance}}
+                        <div class="sheet-row">
+                            <div class="sheet-col-1-1">&nbsp;</div>
+                            <div class="sheet-col-19-20 sheet-padl sheet-padr sheet-RollTemp-success">NOT SURPRISED !</div>
+                        </div>
+                    {{/rollGreater() surprise chance}}
+                    {{#rollBetween() surprise -100 chance}}
+                        <div class="sheet-row">
+                            <div class="sheet-col-1-1">&nbsp;</div>
+                            <div class="sheet-col-11-12 sheet-padl sheet-padr sheet-RollTemp-fail">SURPRISE !!!</div>
+                        </div>
+                    {{/rollBetween() surprise -100 chance}}
+                {{/surprise}}
+
+                <!-- Thief Percentile Abilities -->
+                {{#thiefpercentability}}
+                    <div class="sheet-row">
+                        <div class="sheet-col-8-23 sheet-padl sheet-padr sheet-RollTemp-rollname">Roll : </div>
+                        <div class="sheet-col-4-23 sheet-RollTemp-rollresult">{{thiefpercentability}}</div>
+                        <div class="sheet-col-11-23 sheet-padr sheet-RollTemp-rollname">%</div>
+                    </div>
+                    {{#rollWasCrit() thiefpercentability}}
+                    <div class="sheet-row">
+                        <div class="sheet-col-1-1">&nbsp;</div>
+                        <div class="sheet-col-19-20 sheet-padl sheet-padr sheet-RollTemp-critsuccess">GREAT SUCCESS !</div>
+                    </div>
+                    {{/rollWasCrit() thiefpercentability}}
+                    {{#rollGreater() thiefpercentability chance}}
+                        <div class="sheet-row">
+                            <div class="sheet-col-1-1">&nbsp;</div>
+                            <div class="sheet-col-11-12 sheet-padl sheet-padr sheet-RollTemp-fail">FAILURE !</div>
+                        </div>
+                    {{/rollGreater() thiefpercentability chance}}
+                    {{#rollBetween() thiefpercentability 2 chance}}
+                        <div class="sheet-row">
+                            <div class="sheet-col-1-1">&nbsp;</div>
+                            <div class="sheet-col-11-12 sheet-padl sheet-padr sheet-RollTemp-success">SUCCESS !</div>
+                        </div>
+                    {{/rollBetween() thiefpercentability 2 chance}}
+                {{/thiefpercentability}}
+
+            </div>
+        </div>
+    </rolltemplate>
+<!--End Roll Templates-->
