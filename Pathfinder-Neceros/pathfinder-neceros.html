@@ -11230,15 +11230,6 @@ on("change:cha-penalty", function() { updateAbility("CHA"); });
 on("change:cha-drain", function() { updateAbility("CHA"); });
 
 
-//Conditions
-on("change:condition-fatigued", function() {
-	updateSTR();
-	updateDEX();
-});
-on("change:condition-grappled", function() { updateAbility("DEX"); });
-on("change:condition-entangled", function() { updateAbility("DEX"); })
-on("change:condition-pinned", function() { updateAbility("DEX"); })
-
 
 //Buffs
 on("change:buff_str-total", function() { updateAbility("STR"); });
@@ -11397,11 +11388,6 @@ on("change:buff10_hp-temp", function() { updateBuffColumn("HP-temp"); });
 on("change:buff10_fort", function() { updateBuffColumn("Fort"); });
 on("change:buff10_ref", function() { updateBuffColumn("Ref"); });
 on("change:buff10_will", function() { updateBuffColumn("Will"); });
-
-
-
-
-
 
 
 
@@ -11564,9 +11550,39 @@ on("change:buff10_wis_macro-text", function() { getAttrs(["buff10_Toggle"], func
 on("change:buff10_cha_macro-text", function() { getAttrs(["buff10_Toggle"], function (values){ if (values["buff10_Toggle"] == "1"){updateBuff("CHA","10");}})});
 
 
+//Conditions
+on("change:condition-fatigued", function() {
+	updateAbility("STR")
+	updateAbility("DEX")
+});
+on("change:condition-entangled", function() { updateAbility("DEX"); })
 
+//grappled and pinned are mutually exclusive
+on("change:condition-grappled", function() { 
+	getAttrs(["change:condition-pinned","change:condition-grappled"],function(values){
+		if (values["change:condition-pinned"] != "0" && values["change:condition-grappled"] != "0") {
+			setAttrs({"change:condition-pinned":"0"});
+		});
+	}
+	updateAbility("DEX"); 
+});
+
+//grappled and pinned are mutually exclusive
+on("change:condition-pinned", function() { 
+	getAttrs(["change:condition-pinned","change:condition-grappled"],function(values){
+		if (values["change:condition-pinned"] != "0" && values["change:condition-grappled"] != "0") {
+			setAttrs({"change:condition-grappled":"0"});
+		});
+	}
+	updateAbility("DEX"); 
+});
+
+
+/* updateSTR
+ * Same as updateAbility, except strength also affected by Fatigued/Exhausted applied as Penalties
+ */
 var updateSTR = function() {
-    	getAttrs(["STR-base","STR-enhance","STR-misc","STR-damage","STR-penalty","STR-drain","buff_STR-total","condition-Fatigued","condition-Unconscious"], function (values){
+   	getAttrs(["STR-base","STR-enhance","STR-misc","STR-damage","STR-penalty","STR-drain","buff_STR-total","condition-Fatigued","condition-Unconscious"], function (values){
 		//console.log (values);
         if (isNaN(values["buff_STR-total"])) {
 			values["buff_STR-total"]="0";
@@ -11592,15 +11608,19 @@ var updateSTR = function() {
 	});
 };
 
-
+ 
+/* updateDEX 
+ * Same as updateAbility, except Dexterity also affected by Fatigued/Exhausted, grappled, entangled applied as Penalties
+ * Pinned condition sets DEX to 10 to eliminate dex bonus (before dex damage and penalties)
+ */
 var updateDEX = function() {
         getAttrs(["DEX-base","DEX-enhance","DEX-misc","DEX-damage","DEX-penalty","DEX-drain","buff_DEX-total","condition-Fatigued","condition-Unconscious","condition-Entangled","condition-grappled","condition-Pinned"], function (values){
         if (isNaN(values["buff_DEX-total"])) {
     		values["buff_DEX-total"]="0";
 		}
-		//console.log (values);
 		var base = parseInt(values["DEX-base"],10) + parseInt(values["DEX-enhance"],10) + parseInt(values["DEX-misc"],10)+ parseInt(values["buff_DEX-total"],10)+ parseInt(values["DEX-drain"],10) ;
-        var condMod = -1 * (parseInt(values["condition-Fatigued"]) + parseInt(values["condition-Entangled"]) + parseInt(values["condition-grappled"]) );
+		var grappled =  parseInt(values["condition-Pinned"]) != 0 ? 0 : parseInt(values["condition-grappled"]);
+        var condMod = -1 * (parseInt(values["condition-Fatigued"]) + parseInt(values["condition-Entangled"]) + grappled );
         var cond = 2 * condMod;
         var dmg =  parseInt(values["DEX-damage"]);
         var dmgMod = -1*Math.floor(Math.abs(dmg)/2);
@@ -11625,28 +11645,30 @@ var updateDEX = function() {
 	});
 };
 
-
+/* updateAbility
+ * Updates the final ability score, ability modifier, condition column based on entries in ability grid plus conditions and buffs.
+ * Also sets unconscious flag if ability damage is >= ability score.
+ * Note: Ability value is not affected by damage and penalties, instead only modifier is affected.
+ * @ability {string} 3 letter abbreviation for one of the 6 ability scores.
+ */
 var updateAbility = function(ability) {
-        //console.log("at update " + ability);
-    	//STR and DEX are special since they are affected by conditions
-		if (ability=="STR") {
-			updateSTR();
-			return;
-		} else if (ability=="DEX") {
-			updateDEX();
-			return;
-		}
-    	getAttrs([ability+"-base",ability+"-enhance",ability+"-misc",ability+"-damage",ability+"-penalty",ability+"-drain","buff_"+ability+"-total","condition-Unconscious"], function (values){
-        if (isNaN(values["buff_"+ability+"-total"])) {
+	//STR and DEX are special since they are affected by conditions
+	if (ability=="STR") {
+		updateSTR();
+		return;
+	} else if (ability=="DEX") {
+		updateDEX();
+		return;
+	}
+	getAttrs([ability+"-base",ability+"-enhance",ability+"-misc",ability+"-damage",ability+"-penalty",ability+"-drain","buff_"+ability+"-total","condition-Unconscious"], function (values){
+		if (isNaN(values["buff_"+ability+"-total"])) {
         	values["buff_"+ability+"-total"]="0";
 		}		
-		//console.log (values);
 		var base = parseInt(values[ability+"-base"],10) + parseInt(values[ability+"-enhance"],10) + parseInt(values[ability+"-misc"],10)+ parseInt(values["buff_"+ability+"-total"],10)+ parseInt(values[ability+"-drain"],10) ;
         var dmg =  parseInt(values[ability+"-damage"]);
         var dmgMod = -1*Math.floor(Math.abs(dmg)/2);
         var dmgAndPenMod = dmgMod  -  Math.floor(Math.abs(values[ability+"-penalty"])/2);
         var mod = Math.floor((base -10)/2) + dmgAndPenMod;
-		//console.log("base:" + base + ",dmg:" + dmg +  ",dmgMod"+dmgMod+ ",dmgAndPenMod:" + dmgAndPenMod + ",mod:"+mod);
 		var condUncon = values["condition-Unconscious"];
 		if ((base + dmg) <= 0 && condUncon == "0") {
 			condUncon = "1";
@@ -11659,14 +11681,20 @@ var updateAbility = function(ability) {
 	});
 };
 
-
-var updateBuff = function (eventname, row) {
-	var fieldtoUpdate = "buff"+row+"_"+eventname;
+/* updateBuff
+ * This updates the buff value when a textbox is updated.
+ * ONLY called if the toggle checkbox is CHECKED for this row.
+ * @buffname {string} The case sensitive distinct portion of name of field that was changed.
+ *      So: Melee, Ranged, DMG, AC, HP-temp, Fort, Ref, Will, STR, DEX, CON, INT, WIS, CHA
+ * @row {number} The row number of the change. 
+ */
+var updateBuff = function (buffname, row) {
+	var fieldtoUpdate = "buff"+row+"_"+buffname;
 	var fieldtoRead = fieldtoUpdate + "_macro-text";
 	var value = 0;
 	getAttrs([fieldtoRead], function (values){ 
 		value = isNaN(values[fieldtoRead]) ? 0 : parseInt(values[fieldtoRead]);
-		if ((eventname=="STR" || eventname=="DEX" || eventname=="CON" || eventname=="INT" || eventname=="WIS" || eventname=="CHA" ) && value < 0) {value =0;}
+		if ((buffname=="STR" || buffname=="DEX" || buffname=="CON" || buffname=="INT" || buffname=="WIS" || buffname=="CHA" ) && value < 0) {value =0;}
 		var o = {};
 		o[fieldtoUpdate]=value;
 		setAttrs(o);
@@ -11674,7 +11702,11 @@ var updateBuff = function (eventname, row) {
 };
 
 
-
+/* updateBuffRow
+ * Updates the buff values for a given row of the buff array when the toggle checkbox is clicked on.
+ * If toggled off, then sets all to zero.  If toggled on, then sets non-zero buffs to proper value.
+ * @row {number} The row number of the checkbox clicked. 
+  */
 var updateBuffRow = function(row) {
     var toggle="buff"+row+"_Toggle";
     getAttrs([toggle], function (values){ 
@@ -11744,7 +11776,11 @@ var updateBuffRow = function(row) {
 
 
 
-
+/* updateBuffColumn
+ * Updates the buff_***-total field for the column in the buff array.
+ * @col {string} the case sensitive distinct portion of name of field.
+ *      So: Melee, Ranged, DMG, AC, HP-temp, Fort, Ref, Will, STR, DEX, CON, INT, WIS, CHA
+ */
 var updateBuffColumn = function (col){
 	getAttrs(["buff1_"+col,"buff2_"+col,"buff3_"+col,"buff4_"+col,"buff5_"+col,
 		"buff6_"+col,"buff7_"+col,"buff8_"+col,"buff9_"+col,"buff10_"+col,], function(v){
@@ -11767,4 +11803,5 @@ var updateBuffColumn = function (col){
 };
 
 </script>
+
 
