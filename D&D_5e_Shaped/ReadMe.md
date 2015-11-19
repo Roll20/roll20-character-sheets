@@ -23,6 +23,10 @@ Long term:
 
 ### Changelog
 
+**November 19th 2015**
+
+* Bind to without chat avatars
+
 **November 16th 2015**
 
 * Add Halfling to NPC Actions
