@@ -14,7 +14,9 @@ This sheet uses a preprocessor for its CSS called SASS. When editing, make sure 
 
 * Rollable Spells
 * All Conditions
+* All Talents/Professions/Paths in dropdown form
 * Settings page (adjust background, layout etc.)
 * Responsive Sheet for mobile play
 * Roll Template
 * Utilize new Character Sheet Worker Scripts
+** Add Madness, Injured conditions 
