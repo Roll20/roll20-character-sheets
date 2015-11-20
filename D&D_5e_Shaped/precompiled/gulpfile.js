@@ -1,15 +1,16 @@
-var gulp = require('gulp'),
-	include = require('gulp-include'),
-	inject = require('gulp-inject'),
-	minifyHTML = require('gulp-minify-html'),
-	minifyCss = require('gulp-minify-css'),
-	concat = require('gulp-concat'),
-	sass = require('gulp-sass'),
-	replace = require('gulp-replace-task'),
-	rename = require('gulp-rename'),
-	wrap = require('gulp-wrap'),
-	md5 = require('md5'),
-	change = require('gulp-change');
+var gulp = require('gulp');
+var include = require('gulp-include');
+var inject = require('gulp-inject');
+var uglify = require('gulp-uglify');
+var minifyHTML = require('gulp-minify-html');
+var minifyCss = require('gulp-minify-css');
+var concat = require('gulp-concat');
+var sass = require('gulp-sass');
+var replace = require('gulp-replace-task');
+var rename = require('gulp-rename');
+var wrap = require('gulp-wrap');
+var md5 = require('md5');
+var change = require('gulp-change');
 
 var customSkillCount = 4,
 	traitsCount = 1,
@@ -334,6 +335,14 @@ gulp.task('addSpellDataHash', ['makeSpellDataJson'], function() {
 
 });
 
+gulp.task('sheetWorkers', function() {
+	return gulp.src(['./components/sheetWorkers/sheetWorkers.js'])
+		.pipe(uglify())
+		.pipe(wrap('<script type="text/worker">\n<%= contents %>\n</script>'))
+		.pipe(rename('sheetWorkers.html'))
+		.pipe(gulp.dest('./'));
+});
+
 gulp.task('preCompile', ['addSpellDataHash'], function() {
 	return gulp.src('./D&D_5e.html')
 		.pipe(replace({
@@ -520,8 +529,8 @@ gulp.task('minify-css', ['sass'], function() {
 });
 
 
-gulp.task('compile', ['preCompile', 'minify-css'], function() {
-	return gulp.src(['../D&D_5e.html', './pages/roll_template.html'])
+gulp.task('compile', ['preCompile', 'minify-css', 'sheetWorkers'], function() {
+	return gulp.src(['../D&D_5e.html', './pages/roll_template.html', './sheetWorkers.html'])
 		.pipe(concat('D&D_5e.html'))
 		.pipe(gulp.dest('../'));
 });
