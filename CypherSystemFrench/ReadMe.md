@@ -5,7 +5,7 @@ Elle est aussi utilisable (et styl&eacute;e) pour _Numen&eacute;ra_ (modulo la g
 La VF s'appuie sur la traduction de Numen&eacute;ra par Black Book Editions.
 
 # Version courante :
-Version 1.3 (25 Octobre 2015) :
+Version 1.4 (21 Novembre 2015) :
 
 * Capture d'&eacute;cran [style Cypher System g&eacute;n&eacute;rique](CypherSystem.png)
 * Capture d'&eacute;cran [style Numen&eacute;ra](CypherSystem_style_Numenera.png)
@@ -52,6 +52,12 @@ Alternative (permettant de modifier les sources &agrave; votre convenance si vou
 Le script API permet que l'&eacute;tat du personnage soit automatiquement mis &agrave; jour en fonction de la perte de points de caract&eacute;ristiques, d'appliquer la perte de caract&eacute;ristique &agrave; partir des jets dans le chat, de remettre &agrave; z&eacute;ro les param&egrave;tres de jet, de reposer compl&egrave;tement le personnage en un clic.
 
 # Notes de version
+
+##Version 1.4 (21 Novembre 2015)
+[Voir le détail sur le forum Roll20](https://app.roll20.net/forum/post/2357046/cypher-system-core-rule-book-sheet/?pageforid=2645489#post-2645489)
+
+* Nouvelle option de la feuille pour choisir le type de paramètrage des jets : via la section Action ou via Questions (type macro)
+* Nouveaux boutons pour montrer dans le chat le détails des Aptitudes Spéciales, Cyphers et Artefacts
 
 ##Version 1.3 (25 Octobre 2015)
 
