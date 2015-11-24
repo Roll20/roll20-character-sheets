@@ -2,7 +2,7 @@
 
 * [View Interactive Sheet Preview](http://neovatar.github.io/roll20-character-sheets/13th_Age-neovatar/testbed/)
 
-* [Character sheets documentation in the Roll20 wiki][https://wiki.roll20.net/13th_Age_Character_Sheet_neovatar]
+* [Character sheets documentation in the Roll20 wiki](https://wiki.roll20.net/13th_Age_Character_Sheet_neovatar)
 
 ### Usage
 
