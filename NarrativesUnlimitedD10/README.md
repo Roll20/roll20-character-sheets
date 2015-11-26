@@ -6,6 +6,11 @@ Narratives Unlimited D10 is a universal story focussed RPG published under a Cre
 * Roll templates
 * Inline roll and hidden math support (no wall of numbers on mouse over)
 * Various visual improvements
+###June 2015 Update
+* Corrected offhand penalty
+* Added Ammo tracking
+* Added Quality and Magical bonuses to indiviual weapons and attacks
+* Magic and Psi Page with foci, components, and matrix storage
 
 ##Useful Attributes
 ###Attribute Scores:

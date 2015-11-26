@@ -29,7 +29,7 @@ You can also use the escalation die macro in you own definitions via the ```@{es
 
 ##### Advanced: Use Escalation Die Token
 
-The basic idea is described in a [youtoube session with Roll20 devs Richard and Riley](https://www.youtube.com/watch?t=434&v=ODh7PN3DVcs).
+The basic idea is described in a [Youtube session with Roll20 devs Richard and Riley](https://www.youtube.com/watch?t=434&v=ODh7PN3DVcs).
 
 ###### Prepare the Escalation Die Token
 
@@ -43,13 +43,13 @@ The basic idea is described in a [youtoube session with Roll20 devs Richard and 
 
 ###### Use the Escalation Die Token
 
-Now update all character sheets to use the "Escalation Die" chracters "die" value as escalation die: Go to "SETUP" Tab on your character sheet and enter the following as "Escalation die macro":
+Now update all character sheets to use the "Escalation Die" character’s "die" value as escalation die: Go to "SETUP" Tab on your character sheet and enter the following as "Escalation die macro":
 
 ```
 @{Escalation Die|die}
 ```
 
-Now the basic attacks and the use of ```@{escdie}``` will pull the escalation die valaue from the escalation die token.
+Now the basic attacks and the use of ```@{escdie}``` will pull the escalation die value from the escalation die token.
 
 Don't forget to update the escalation die value each round.
 
@@ -93,6 +93,9 @@ grunt build
 This will create `13th_Age-neovatar.[css|html]` that you can copy and paste into Roll 20 directly.
 
 ### Changelog
+
+**1.3.1:**
+  * fixed minor spelling typo
 
 **1.3.0:**
 
