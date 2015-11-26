@@ -198,23 +198,6 @@ function checkQuery(file) {
 
 	return template.replace(/\x7B\x7BcheckQuery\x7D\x7D/g, query);
 }
-function skillQuery(file) {
-	var template = file.contents.toString('utf8'),
-		skillsJson = require('./components/skills/skills.json').skills,
-		query = '';
-
-	skillsJson.forEach(function(skill) {
-		var skillName = skill.name.lowercase().replace(/ +/g, '');
-		query += '|' + skill.name + ', {{title=' + skill.name + '&amp;#125;&amp;#125; {{roll=[[d20@{d20_mod} + @{' + skillName + '}]]&amp;#125;&amp;#125; {{rolladv=[[d20@{d20_mod} + @{' + skillName + '}]]&amp;#125;&amp;#125;'
-	});
-	for (var i = 1, len = customSkillCount; i <= len; ++i) {
-		var skillName = '@{custom_skill_' + i + '_name}';
-
-		query += '|' + skillName + ', {{title=' + skillName + '&amp;#125;&amp;#125; {{roll=[[d20@{d20_mod} + @{custom_skill_' + i + '}]]&amp;#125;&amp;#125; {{rolladv=[[d20@{d20_mod} + @{custom_skill_' + i + '}]]&amp;#125;&amp;#125;'
-	}
-
-	return template.replace(/\x7B\x7BcheckQuery\x7D\x7D/g, query);
-}
 
 function meleeQuery(file) {
 	var template = file.contents.toString('utf8'),
@@ -294,7 +277,11 @@ gulp.task('makeSpellDataJson', function() {
 					}
 
 					var value = attributes.match(/value="([^"]*)"/);
-					value = (value !== null) ? value[1] : null;
+					if (value && value[1] === 'undefined') {
+						value = '';
+					} else {
+						value = (value !== null) ? value[1] : null;
+					}
 
 					if (tag === 'select') {
 						return '"' + name + '":"' + value + '",\n';
@@ -339,8 +326,8 @@ gulp.task('addSpellDataHash', ['makeSpellDataJson'], function() {
 	return gulp.src(['spellDefaults.json'])
 		.pipe(change(function(contents) {
 			spellPropsHash = md5(contents);
-			var object = JSON.parse(contents);
-			var objectWithHash = {hash:spellPropsHash, values:object};
+			var object = JSON.parse(contents),
+				objectWithHash = {hash:spellPropsHash, values:object};
 			return 'var ShapedSpellbookDefaults = ' + JSON.stringify(objectWithHash,null, 2) + ';';
 		}))
 		.pipe(rename('spellDefaults.js'))
@@ -507,12 +494,6 @@ gulp.task('preCompile', ['addSpellDataHash'], function() {
 			starttag: '<!-- inject:checkQuery:{{ext}} -->',
 			transform: function (filePath, file) {
 				return checkQuery(file);
-			}
-		}))
-		.pipe( inject(gulp.src(['./components/macros/skills.html']), {
-			starttag: '<!-- inject:skillQuery:{{ext}} -->',
-			transform: function (filePath, file) {
-				return skillQuery(file);
 			}
 		}))
 		.pipe( inject(gulp.src(['./components/macros/weapons/melee.html']), {
