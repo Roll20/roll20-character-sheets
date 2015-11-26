@@ -1,7 +1,17 @@
 <rolltemplate class="sheet-rolltemplate-attack">
   <div class="sheet-swn-template-container">
       <div class="sheet-swn sheet-swn-template-title">
-        Attacks with {{name}}
+        <div class="sheet-swn-template-title-character">
+          {{characterName}}
+        </div>
+        <div class="sheet-swn-template-title-action">
+          {{#name}}
+            Attack using {{name}}
+          {{/name}}
+          {{#attackType}}
+            {{attackType}} Attack
+          {{/attackType}}
+        </div>
       </div>
       <div class="sheet-swn sheet-swn-template-results-row">
           {{#rollGreater() rollValue 20}}
@@ -28,16 +38,9 @@
               </span>
             {{/rollLess() rollValue 20}}
           {{/damage}}
-
-          {{^damage}}
-            {{#rollLess() rollValue 20}}
-              <span class="sheet-swn sheet-results-element sheet-roll-output">
-                No Damage!
-              </span>
-            {{/rollLess() rollValue 20}}
-          {{/damage}}
       </div>
 </rolltemplate>
+
 <rolltemplate class="sheet-rolltemplate-save">
   <div class="sheet-swn-template-container">
       <div class="sheet-swn sheet-swn-template-title">
@@ -371,8 +374,12 @@
         <button type="roll" name="roll_initiative" value="/me rolls initiative: [[1d8+@{dexBonus} &{tracker}]]" ></button>
       </div>
       <div class="sheet-col">
-        <label for="roll_basic_attack">Basic Attack Roll</label>
-        <button type="roll" name="roll_basic_attack" value="/me &{template:attack} {{rollValue=[[1d20 + ?{AC|0} + @{attack_bonus} + ?{Combat Skill Bonus|0} + ?{Attribute Modifier|0}]]}}" ></button>
+        <label for="roll_basic_melee_attack">Basic Melee Attack Roll</label>
+        <button type="roll" name="roll_basic_melee_attack" value="&{template:attack} {{characterName=@{name}}} {{attackType=Melee}} {{rollValue=[[1d20 + ?{AC|0} + ?{Combat Skill Bonus|0} + @{strBonus} + @{attack_bonus}]]}}" ></button>
+      </div>
+      <div class="sheet-col">
+        <label for="roll_basic_ranged_attack">Basic Ranged Attack Roll</label>
+        <button type="roll" name="roll_basic_ranged_attack" value="&{template:attack} {{characterName=@{name}}} {{attackType=Ranged}} {{rollValue=[[1d20 + ?{AC|0} + ?{Combat Skill Bonus|0} + @{dexBonus} + @{attack_bonus}]]}}" ></button>
       </div>
     </div>
     <h3>Saving Throws</h3>
@@ -1055,7 +1062,7 @@
             <input type="text" name="attr_weapon_damage" style="width: 140px">
             <input type="text" name="attr_weapon_range" style="width: 140px">
             <input type="number" name="attr_weapon_ammo"  style="width: 80px">
-            <button type="roll" name="roll_weapon_to_hit" value="/me &{template:attack} {{name=@{weapon_name}}} {{rollValue=[[1d20 + ?{AC|0} + @{attack_bonus} + @{weapon_attack} + ?{Attribute Modifier|0} + ?{Other Modifier|0}]]}} {{damage=[[@{weapon_damage}]]}}" ></button>
+            <button type="roll" name="roll_weapon_to_hit" value="&{template:attack} {{characterName=@{name}}} {{name=@{weapon_name}}} {{rollValue=[[1d20 + ?{AC|0} + @{attack_bonus} + @{weapon_attack} + ?{Attribute Modifier|0} + ?{Other Modifier|0}]]}} {{damage=[[@{weapon_damage}]]}}" ></button>
         </fieldset>
     </div>
 
