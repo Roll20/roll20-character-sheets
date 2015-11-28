@@ -17,7 +17,7 @@
     <input type="radio" name="attr_tab" class="sheet-tab sheet-tab1" value="1" title="Core" checked="checked" style="margin-left:1px;" />
     <span class="sheet-tab sheet-tab1">Core</span>
     <input type="radio" name="attr_tab" class="sheet-tab sheet-tab2" value="2" title="Classes" />
-	<span class="sheet-tab sheet-tab2">Classes</span>
+    <span class="sheet-tab sheet-tab2">Classes</span>
 	<input type="radio" name="attr_tab" class="sheet-tab sheet-tab3" value="3" title="Defenses" />
 	<span class="sheet-tab sheet-tab3">Defenses</span>
 	<input type="radio" name="attr_tab" class="sheet-tab sheet-tab4" value="4" title="Attacks" />
@@ -11240,629 +11240,350 @@
 </rolltemplate>
 </div>
 
+
+
 <script type="text/worker">
 //for jslint
 //var on = function (lookfor,callback){};
 //var setAttrs = function(setthese){};
 //var getAttrs = function(getthese,callback){};
 
+var PFSheet = PFSheet || (function(){
+    'use strict';
 
-//Abilities and total buffs to them
-on("change:str-base change:str-enhance change:str-misc change:str-temp change:str-damage change:str-penalty change:str-drain change:buff_str-total", function() { updateAbility("STR"); });
-on("change:dex-base change:dex-enhance change:dex-misc change:dex-temp change:dex-damage change:dex-penalty change:dex-drain change:buff_dex-total", function() { updateAbility("DEX"); });
-on("change:con-base change:con-enhance change:con-misc change:con-temp change:con-damage change:con-penalty change:con-drain change:buff_con-total", function() { updateAbility("CON"); });
-on("change:int-base change:int-enhance change:int-misc change:int-temp change:int-damage change:int-penalty change:int-drain change:buff_int-total", function() { updateAbility("INT"); });
-on("change:wis-base change:wis-enhance change:wis-misc change:wis-temp change:wis-damage change:wis-penalty change:wis-drain change:buff_wis-total", function() { updateAbility("WIS"); });
-on("change:cha-base change:cha-enhance change:cha-misc change:cha-temp change:cha-damage change:cha-penalty change:cha-drain change:buff_cha-total", function() { updateAbility("CHA"); });
+    var updateGrapple= function() {
+		getAttrs(["condition-Pinned","condition-Grappled"],function(values){
+			if (values["condition-Pinned"] !== "0" && values["condition-Grappled"] !== "0") {
+				setAttrs({"condition-Pinned":"0"});
+			} else {
+				//user hit either pinned and it undid grapple, or hit grapple first time.
+				updateAbility("DEX");
+				//if (values["condition-Pinned"]==1) {
+				//	updateConditionDefensePenalty();
+				//}
+			}
+		});	
+	},
 
-//Buffs - columns
-on("change:buff1_str change:buff2_str change:buff3_str change:buff4_str change:buff5_str change:buff6_str change:buff7_str change:buff8_str change:buff9_str change:buff10_str", function() { updateBuffColumn("STR"); });
-on("change:buff1_dex change:buff2_dex change:buff3_dex change:buff4_dex change:buff5_dex change:buff6_dex change:buff7_dex change:buff8_dex change:buff9_dex change:buff10_dex", function() { updateBuffColumn("DEX"); });
-on("change:buff1_con change:buff2_con change:buff3_con change:buff4_con change:buff5_con change:buff6_con change:buff7_con change:buff8_con change:buff9_con change:buff10_con", function() { updateBuffColumn("CON"); });
-on("change:buff1_int change:buff2_int change:buff3_int change:buff4_int change:buff5_int change:buff6_int change:buff7_int change:buff8_int change:buff9_int change:buff10_int", function() { updateBuffColumn("INT"); });
-on("change:buff1_wis change:buff2_wis change:buff3_wis change:buff4_wis change:buff5_wis change:buff6_wis change:buff7_wis change:buff8_wis change:buff9_wis change:buff10_wis", function() { updateBuffColumn("WIS"); });
-on("change:buff1_cha change:buff2_cha change:buff3_cha change:buff4_cha change:buff5_cha change:buff6_cha change:buff7_cha change:buff8_cha change:buff9_cha change:buff10_cha", function() { updateBuffColumn("CHA"); });
-on("change:buff1_melee change:buff2_melee change:buff3_melee change:buff4_melee change:buff5_melee change:buff6_melee change:buff7_melee change:buff8_melee change:buff9_melee change:buff10_melee", function() { updateBuffColumn("Melee"); });
-on("change:buff1_ranged change:buff2_ranged change:buff3_ranged change:buff4_ranged change:buff5_ranged change:buff6_ranged change:buff7_ranged change:buff8_ranged change:buff9_ranged change:buff10_ranged", function() { updateBuffColumn("Ranged"); });
-on("change:buff1_dmg change:buff2_dmg change:buff3_dmg change:buff4_dmg change:buff5_dmg change:buff6_dmg change:buff7_dmg change:buff8_dmg change:buff9_dmg change:buff10_dmg", function() { updateBuffColumn("DMG"); });
-on("change:buff1_ac change:buff2_ac change:buff3_ac change:buff4_ac change:buff5_ac change:buff6_ac change:buff7_ac change:buff8_ac change:buff9_ac change:buff10_ac", function() { updateBuffColumn("AC"); });
-on("change:buff1_hp-temp change:buff2_hp-temp change:buff3_hp-temp change:buff4_hp-temp change:buff5_hp-temp change:buff6_hp-temp change:buff7_hp-temp change:buff8_hp-temp change:buff9_hp-temp change:buff10_hp-temp", function() { updateBuffColumn("HP-temp"); });
-on("change:buff1_fort change:buff2_fort change:buff3_fort change:buff4_fort change:buff5_fort change:buff6_fort change:buff7_fort change:buff8_fort change:buff9_fort change:buff10_fort", function() { updateBuffColumn("Fort"); });
-on("change:buff1_ref change:buff2_ref change:buff3_ref change:buff4_ref change:buff5_ref change:buff6_ref change:buff7_ref change:buff8_ref change:buff9_ref change:buff10_ref", function() { updateBuffColumn("Ref"); });
-on("change:buff1_will change:buff2_will change:buff3_will change:buff4_will change:buff5_will change:buff6_will change:buff7_will change:buff8_will change:buff9_will change:buff10_will", function() { updateBuffColumn("Will"); });
+	updatePin = function() {
+		getAttrs(["condition-Pinned","condition-Grappled"],function(values){
+			if (values["condition-Pinned"] !== "0" && values["condition-Grappled"] !== "0") {
+				setAttrs({"condition-Grappled":"0"});
+			} else {
+				//user hit grapple and it  undid pinned, or hit pinned first time.
+				updateAbility("DEX"); 
+				//if (values["condition-Grappled"]==0) {
+				//	updateConditionDefensePenalty();
+				//}	
+			}
+		});
+	},
 
+	/* updateAbility
+	 * Updates the final ability score, ability modifier, condition column based on entries in ability grid plus conditions and buffs.
+	 * Also sets unconscious flag if ability damage is >= ability score.
+	 * Note: Ability value is not affected by damage and penalties, instead only modifier is affected.
+	 * @ability {string} 3 letter abbreviation for one of the 6 ability scores.
+	 */
+	updateAbility = function(ability) {
+		//console.log("AAAAAAAAAAAAAAAAAAAAAAA At Update Ability");
+		getAttrs([ability+"-base",ability+"-enhance",ability+"-misc",ability+"-damage",ability+"-penalty",ability+"-drain","buff_"+ability+"-total",
+			"condition-Unconscious","condition-Fatigued","condition-Entangled","condition-Grappled","condition-Pinned",
+			ability, ability+"-mod", ability+"-cond"], function (values){
+			if (isNaN(values["buff_"+ability+"-total"])) {
+				values["buff_"+ability+"-total"]=0;
+			}		
+			//console.log (values);
+			var base = (parseInt(values[ability+"-base"],10)||0) + 
+				(parseInt(values[ability+"-enhance"],10)||0) + 
+				(parseInt(values[ability+"-misc"],10)||0) + 
+				(parseInt(values["buff_"+ability+"-total"],10)||0) + 
+				(parseInt(values[ability+"-drain"],10)||0) ;
+			var newbase = base;
+			var cond=0;
+			var condMod=0;
+			var dmg =  parseInt(values[ability+"-damage"],10)||0;
+			var dmgMod = -1 * Math.floor(Math.abs(dmg)/2);
+			var pen =  parseInt(values[ability+"-penalty"],10)||0;
+			var penMod = -1 * Math.floor(Math.abs(pen)/2);
+			//console.log("AAAAAAAAAAAAAAAAAAAAAAA the ability is "+ ability);
+			switch (ability) {
+				case "DEX":
+					condMod = -1 * ((parseInt(values["condition-Fatigued"],10)||0) + 
+					   (parseInt(values["condition-Entangled"],10)||0) + 
+					   (parseInt(values["condition-Grappled"],10)||0) );			
+					cond = condMod * 2;
+					if (values["condition-Pinned"]=="4" && base > 10) {
+						newbase = 10;
+					}
+					break;
+				case "STR":
+					condMod =  -1 * (parseInt(values["condition-Fatigued"],10)||0);
+					cond = condMod * 2;
+					break;
+			}
 
-//Buffs - rows
-on("change:buff1_toggle", function() { updateBuffRow("1");});
-on("change:buff2_toggle", function() { updateBuffRow("2");});
-on("change:buff3_toggle", function() { updateBuffRow("3");});
-on("change:buff4_toggle", function() { updateBuffRow("4");});
-on("change:buff5_toggle", function() { updateBuffRow("5");});
-on("change:buff6_toggle", function() { updateBuffRow("6");});
-on("change:buff7_toggle", function() { updateBuffRow("7");});
-on("change:buff8_toggle", function() { updateBuffRow("8");});
-on("change:buff9_toggle", function() { updateBuffRow("9");});
-on("change:buff10_toggle", function() { updateBuffRow("10");});
+			var mod = Math.floor((newbase -10)/2) + dmgMod + penMod +condMod;
+			var condUncon = values["condition-Unconscious"];
+			var changedUncon=0;
+			if ((base + dmg) <= 0 && condUncon == "0") {
+				condUncon = "1";
+				changedUncon=1;
+			} 
+			//use 99 (never happen) to make sure we update if there's a problem
+			var currAbility=parseInt(values[ability],10)||99; 
+			var currMod = parseInt(values[ability+"-mod"],10)||99;
+			var currCond = parseInt(values[ability+"-cond"],10)||0;
+			var numset=0;
+			var setter={};
+			//console.log(ability +"update: base:" + base + ",dmg:" + dmg +  ",dmgMod"+dmgMod+ ",condMod:" + condMod + ",mod:"+mod+",currCond:"+currCond+", new cond:"+cond);
+			if (currAbility !== base){setter[ability]=base;numset++;}
+			if (currMod !== mod){setter[ability+"-mod"]=mod;numset++;}
+			if (changedUncon ){setter["condition-Unconscious"]=condUncon;numset++;}
+			if (currCond !== cond){setter[ability+"-cond"]=cond;numset++; }
+			if (numset){setAttrs(setter);}
+		});
+	},
 
-//Buffs - cells
-on("change:buff1_melee_macro-text", function() { getAttrs(["buff1_Toggle"], function (v){ if (v.buff1_Toggle == "1"){updateBuff("Melee","1");}});});
-on("change:buff1_ranged_macro-text", function() { getAttrs(["buff1_Toggle"], function (v){ if (v.buff1_Toggle == "1"){updateBuff("Ranged","1");}});});
-on("change:buff1_dmg_macro-text", function() { getAttrs(["buff1_Toggle"], function (v){ if (v.buff1_Toggle == "1"){updateBuff("DMG","1");}});});
-on("change:buff1_ac_macro-text", function() { getAttrs(["buff1_Toggle"], function (v){ if (v.buff1_Toggle == "1"){updateBuff("AC","1");}});});
-on("change:buff1_hp-temp_macro-text", function() { getAttrs(["buff1_Toggle"], function (v){ if (v.buff1_Toggle == "1"){updateBuff("HP-temp","1");}});});
-on("change:buff1_fort_macro-text", function() { getAttrs(["buff1_Toggle"], function (v){ if (v.buff1_Toggle == "1"){updateBuff("Fort","1");}});});
-on("change:buff1_ref_macro-text", function() { getAttrs(["buff1_Toggle"], function (v){ if (v.buff1_Toggle == "1"){updateBuff("Ref","1");}});});
-on("change:buff1_will_macro-text", function() { getAttrs(["buff1_Toggle"], function (v){ if (v.buff1_Toggle == "1"){updateBuff("Will","1");}});});
-on("change:buff1_str_macro-text", function() { getAttrs(["buff1_Toggle"], function (v){ if (v.buff1_Toggle == "1"){updateBuff("STR","1");}});});
-on("change:buff1_dex_macro-text", function() { getAttrs(["buff1_Toggle"], function (v){ if (v.buff1_Toggle == "1"){updateBuff("DEX","1");}});});
-on("change:buff1_con_macro-text", function() { getAttrs(["buff1_Toggle"], function (v){ if (v.buff1_Toggle == "1"){updateBuff("CON","1");}});});
-on("change:buff1_int_macro-text", function() { getAttrs(["buff1_Toggle"], function (v){ if (v.buff1_Toggle == "1"){updateBuff("INT","1");}});});
-on("change:buff1_wis_macro-text", function() { getAttrs(["buff1_Toggle"], function (v){ if (v.buff1_Toggle == "1"){updateBuff("WIS","1");}});});
-on("change:buff1_cha_macro-text", function() { getAttrs(["buff1_Toggle"], function (v){ if (v.buff1_Toggle == "1"){updateBuff("CHA","1");}});});
+	/* updateBuff
+	 * This updates the buff value when a textbox is updated.
+	 * ONLY called if the toggle checkbox is CHECKED for this row, 
+	 * so set buff even if 0 (since it changed from non zero)
+	 * @buffname {string} The case sensitive distinct portion of name of field that was changed.
+	 *      So: Melee, Ranged, DMG, AC, HP-temp, Fort, Ref, Will, STR, DEX, CON, INT, WIS, CHA
+	 * @row {number} The row number of the change. 
+	 */
+	updateBuff = function (eventname, row) {
+		var fieldtoUpdate = "buff"+row+"_"+eventname;
+		var fieldtoRead = fieldtoUpdate + "_macro-text";
+		var value = 0;
+		getAttrs([fieldtoRead], function (values){ 
+			value = parseInt(values[fieldtoRead])||0;
+			var o = {};
+			o[fieldtoUpdate]=value;
+			setAttrs(o);
+		});
+	},
 
-on("change:buff2_melee_macro-text", function() { getAttrs(["buff2_Toggle"], function (v){ if (v.buff2_Toggle == "1"){updateBuff("Melee","2");}});});
-on("change:buff2_ranged_macro-text", function() { getAttrs(["buff2_Toggle"], function (v){ if (v.buff2_Toggle == "1"){updateBuff("Ranged","2");}});});
-on("change:buff2_dmg_macro-text", function() { getAttrs(["buff2_Toggle"], function (v){ if (v.buff2_Toggle == "1"){updateBuff("DMG","2");}});});
-on("change:buff2_ac_macro-text", function() { getAttrs(["buff2_Toggle"], function (v){ if (v.buff2_Toggle == "1"){updateBuff("AC","2");}});});
-on("change:buff2_hp-temp_macro-text", function() { getAttrs(["buff2_Toggle"], function (v){ if (v.buff2_Toggle == "1"){updateBuff("HP-temp","2");}});});
-on("change:buff2_fort_macro-text", function() { getAttrs(["buff2_Toggle"], function (v){ if (v.buff2_Toggle == "1"){updateBuff("Fort","2");}});});
-on("change:buff2_ref_macro-text", function() { getAttrs(["buff2_Toggle"], function (v){ if (v.buff2_Toggle == "1"){updateBuff("Ref","2");}});});
-on("change:buff2_will_macro-text", function() { getAttrs(["buff2_Toggle"], function (v){ if (v.buff2_Toggle == "1"){updateBuff("Will","2");}});});
-on("change:buff2_str_macro-text", function() { getAttrs(["buff2_Toggle"], function (v){ if (v.buff2_Toggle == "1"){updateBuff("STR","2");}});});
-on("change:buff2_dex_macro-text", function() { getAttrs(["buff2_Toggle"], function (v){ if (v.buff2_Toggle == "1"){updateBuff("DEX","2");}});});
-on("change:buff2_con_macro-text", function() { getAttrs(["buff2_Toggle"], function (v){ if (v.buff2_Toggle == "1"){updateBuff("CON","2");}});});
-on("change:buff2_int_macro-text", function() { getAttrs(["buff2_Toggle"], function (v){ if (v.buff2_Toggle == "1"){updateBuff("INT","2");}});});
-on("change:buff2_wis_macro-text", function() { getAttrs(["buff2_Toggle"], function (v){ if (v.buff2_Toggle == "1"){updateBuff("WIS","2");}});});
-on("change:buff2_cha_macro-text", function() { getAttrs(["buff2_Toggle"], function (v){ if (v.buff2_Toggle == "1"){updateBuff("CHA","2");}});});
-
-on("change:buff3_melee_macro-text", function() { getAttrs(["buff3_Toggle"], function (v){ if (v.buff3_Toggle == "1"){updateBuff("Melee","3");}});});
-on("change:buff3_ranged_macro-text", function() { getAttrs(["buff3_Toggle"], function (v){ if (v.buff3_Toggle == "1"){updateBuff("Ranged","3");}});});
-on("change:buff3_dmg_macro-text", function() { getAttrs(["buff3_Toggle"], function (v){ if (v.buff3_Toggle == "1"){updateBuff("DMG","3");}});});
-on("change:buff3_ac_macro-text", function() { getAttrs(["buff3_Toggle"], function (v){ if (v.buff3_Toggle == "1"){updateBuff("AC","3");}});});
-on("change:buff3_hp-temp_macro-text", function() { getAttrs(["buff3_Toggle"], function (v){ if (v.buff3_Toggle == "1"){updateBuff("HP-temp","3");}});});
-on("change:buff3_fort_macro-text", function() { getAttrs(["buff3_Toggle"], function (v){ if (v.buff3_Toggle == "1"){updateBuff("Fort","3");}});});
-on("change:buff3_ref_macro-text", function() { getAttrs(["buff3_Toggle"], function (v){ if (v.buff3_Toggle == "1"){updateBuff("Ref","3");}});});
-on("change:buff3_will_macro-text", function() { getAttrs(["buff3_Toggle"], function (v){ if (v.buff3_Toggle == "1"){updateBuff("Will","3");}});});
-on("change:buff3_str_macro-text", function() { getAttrs(["buff3_Toggle"], function (v){ if (v.buff3_Toggle == "1"){updateBuff("STR","3");}});});
-on("change:buff3_dex_macro-text", function() { getAttrs(["buff3_Toggle"], function (v){ if (v.buff3_Toggle == "1"){updateBuff("DEX","3");}});});
-on("change:buff3_con_macro-text", function() { getAttrs(["buff3_Toggle"], function (v){ if (v.buff3_Toggle == "1"){updateBuff("CON","3");}});});
-on("change:buff3_int_macro-text", function() { getAttrs(["buff3_Toggle"], function (v){ if (v.buff3_Toggle == "1"){updateBuff("INT","3");}});});
-on("change:buff3_wis_macro-text", function() { getAttrs(["buff3_Toggle"], function (v){ if (v.buff3_Toggle == "1"){updateBuff("WIS","3");}});});
-on("change:buff3_cha_macro-text", function() { getAttrs(["buff3_Toggle"], function (v){ if (v.buff3_Toggle == "1"){updateBuff("CHA","3");}});});
-
-on("change:buff4_melee_macro-text", function() { getAttrs(["buff4_Toggle"], function (v){ if (v.buff4_Toggle == "1"){updateBuff("Melee","4");}});});
-on("change:buff4_ranged_macro-text", function() { getAttrs(["buff4_Toggle"], function (v){ if (v.buff4_Toggle == "1"){updateBuff("Ranged","4");}});});
-on("change:buff4_dmg_macro-text", function() { getAttrs(["buff4_Toggle"], function (v){ if (v.buff4_Toggle == "1"){updateBuff("DMG","4");}});});
-on("change:buff4_ac_macro-text", function() { getAttrs(["buff4_Toggle"], function (v){ if (v.buff4_Toggle == "1"){updateBuff("AC","4");}});});
-on("change:buff4_hp-temp_macro-text", function() { getAttrs(["buff4_Toggle"], function (v){ if (v.buff4_Toggle == "1"){updateBuff("HP-temp","4");}});});
-on("change:buff4_fort_macro-text", function() { getAttrs(["buff4_Toggle"], function (v){ if (v.buff4_Toggle == "1"){updateBuff("Fort","4");}});});
-on("change:buff4_ref_macro-text", function() { getAttrs(["buff4_Toggle"], function (v){ if (v.buff4_Toggle == "1"){updateBuff("Ref","4");}});});
-on("change:buff4_will_macro-text", function() { getAttrs(["buff4_Toggle"], function (v){ if (v.buff4_Toggle == "1"){updateBuff("Will","4");}});});
-on("change:buff4_str_macro-text", function() { getAttrs(["buff4_Toggle"], function (v){ if (v.buff4_Toggle == "1"){updateBuff("STR","4");}});});
-on("change:buff4_dex_macro-text", function() { getAttrs(["buff4_Toggle"], function (v){ if (v.buff4_Toggle == "1"){updateBuff("DEX","4");}});});
-on("change:buff4_con_macro-text", function() { getAttrs(["buff4_Toggle"], function (v){ if (v.buff4_Toggle == "1"){updateBuff("CON","4");}});});
-on("change:buff4_int_macro-text", function() { getAttrs(["buff4_Toggle"], function (v){ if (v.buff4_Toggle == "1"){updateBuff("INT","4");}});});
-on("change:buff4_wis_macro-text", function() { getAttrs(["buff4_Toggle"], function (v){ if (v.buff4_Toggle == "1"){updateBuff("WIS","4");}});});
-on("change:buff4_cha_macro-text", function() { getAttrs(["buff4_Toggle"], function (v){ if (v.buff4_Toggle == "1"){updateBuff("CHA","4");}});});
-
-on("change:buff5_melee_macro-text", function() { getAttrs(["buff5_Toggle"], function (v){ if (v.buff5_Toggle == "1"){updateBuff("Melee","5");}});});
-on("change:buff5_ranged_macro-text", function() { getAttrs(["buff5_Toggle"], function (v){ if (v.buff5_Toggle == "1"){updateBuff("Ranged","5");}});});
-on("change:buff5_dmg_macro-text", function() { getAttrs(["buff5_Toggle"], function (v){ if (v.buff5_Toggle == "1"){updateBuff("DMG","5");}});});
-on("change:buff5_ac_macro-text", function() { getAttrs(["buff5_Toggle"], function (v){ if (v.buff5_Toggle == "1"){updateBuff("AC","5");}});});
-on("change:buff5_hp-temp_macro-text", function() { getAttrs(["buff5_Toggle"], function (v){ if (v.buff5_Toggle == "1"){updateBuff("HP-temp","5");}});});
-on("change:buff5_fort_macro-text", function() { getAttrs(["buff5_Toggle"], function (v){ if (v.buff5_Toggle == "1"){updateBuff("Fort","5");}});});
-on("change:buff5_ref_macro-text", function() { getAttrs(["buff5_Toggle"], function (v){ if (v.buff5_Toggle == "1"){updateBuff("Ref","5");}});});
-on("change:buff5_will_macro-text", function() { getAttrs(["buff5_Toggle"], function (v){ if (v.buff5_Toggle == "1"){updateBuff("Will","5");}});});
-on("change:buff5_str_macro-text", function() { getAttrs(["buff5_Toggle"], function (v){ if (v.buff5_Toggle == "1"){updateBuff("STR","5");}});});
-on("change:buff5_dex_macro-text", function() { getAttrs(["buff5_Toggle"], function (v){ if (v.buff5_Toggle == "1"){updateBuff("DEX","5");}});});
-on("change:buff5_con_macro-text", function() { getAttrs(["buff5_Toggle"], function (v){ if (v.buff5_Toggle == "1"){updateBuff("CON","5");}});});
-on("change:buff5_int_macro-text", function() { getAttrs(["buff5_Toggle"], function (v){ if (v.buff5_Toggle == "1"){updateBuff("INT","5");}});});
-on("change:buff5_wis_macro-text", function() { getAttrs(["buff5_Toggle"], function (v){ if (v.buff5_Toggle == "1"){updateBuff("WIS","5");}});});
-on("change:buff5_cha_macro-text", function() { getAttrs(["buff5_Toggle"], function (v){ if (v.buff5_Toggle == "1"){updateBuff("CHA","5");}});});
-
-on("change:buff6_melee_macro-text", function() { getAttrs(["buff6_Toggle"], function (v){ if (v.buff6_Toggle == "1"){updateBuff("Melee","6");}});});
-on("change:buff6_ranged_macro-text", function() { getAttrs(["buff6_Toggle"], function (v){ if (v.buff6_Toggle == "1"){updateBuff("Ranged","6");}});});
-on("change:buff6_dmg_macro-text", function() { getAttrs(["buff6_Toggle"], function (v){ if (v.buff6_Toggle == "1"){updateBuff("DMG","6");}});});
-on("change:buff6_ac_macro-text", function() { getAttrs(["buff6_Toggle"], function (v){ if (v.buff6_Toggle == "1"){updateBuff("AC","6");}});});
-on("change:buff6_hp-temp_macro-text", function() { getAttrs(["buff6_Toggle"], function (v){ if (v.buff6_Toggle == "1"){updateBuff("HP-temp","6");}});});
-on("change:buff6_fort_macro-text", function() { getAttrs(["buff6_Toggle"], function (v){ if (v.buff6_Toggle == "1"){updateBuff("Fort","6");}});});
-on("change:buff6_ref_macro-text", function() { getAttrs(["buff6_Toggle"], function (v){ if (v.buff6_Toggle == "1"){updateBuff("Ref","6");}});});
-on("change:buff6_will_macro-text", function() { getAttrs(["buff6_Toggle"], function (v){ if (v.buff6_Toggle == "1"){updateBuff("Will","6");}});});
-on("change:buff6_str_macro-text", function() { getAttrs(["buff6_Toggle"], function (v){ if (v.buff6_Toggle == "1"){updateBuff("STR","6");}});});
-on("change:buff6_dex_macro-text", function() { getAttrs(["buff6_Toggle"], function (v){ if (v.buff6_Toggle == "1"){updateBuff("DEX","6");}});});
-on("change:buff6_con_macro-text", function() { getAttrs(["buff6_Toggle"], function (v){ if (v.buff6_Toggle == "1"){updateBuff("CON","6");}});});
-on("change:buff6_int_macro-text", function() { getAttrs(["buff6_Toggle"], function (v){ if (v.buff6_Toggle == "1"){updateBuff("INT","6");}});});
-on("change:buff6_wis_macro-text", function() { getAttrs(["buff6_Toggle"], function (v){ if (v.buff6_Toggle == "1"){updateBuff("WIS","6");}});});
-on("change:buff6_cha_macro-text", function() { getAttrs(["buff6_Toggle"], function (v){ if (v.buff6_Toggle == "1"){updateBuff("CHA","6");}});});
-
-on("change:buff7_melee_macro-text", function() { getAttrs(["buff7_Toggle"], function (v){ if (v.buff7_Toggle == "1"){updateBuff("Melee","7");}});});
-on("change:buff7_ranged_macro-text", function() { getAttrs(["buff7_Toggle"], function (v){ if (v.buff7_Toggle == "1"){updateBuff("Ranged","7");}});});
-on("change:buff7_dmg_macro-text", function() { getAttrs(["buff7_Toggle"], function (v){ if (v.buff7_Toggle == "1"){updateBuff("DMG","7");}});});
-on("change:buff7_ac_macro-text", function() { getAttrs(["buff7_Toggle"], function (v){ if (v.buff7_Toggle == "1"){updateBuff("AC","7");}});});
-on("change:buff7_hp-temp_macro-text", function() { getAttrs(["buff7_Toggle"], function (v){ if (v.buff7_Toggle == "1"){updateBuff("HP-temp","7");}});});
-on("change:buff7_fort_macro-text", function() { getAttrs(["buff7_Toggle"], function (v){ if (v.buff7_Toggle == "1"){updateBuff("Fort","7");}});});
-on("change:buff7_ref_macro-text", function() { getAttrs(["buff7_Toggle"], function (v){ if (v.buff7_Toggle == "1"){updateBuff("Ref","7");}});});
-on("change:buff7_will_macro-text", function() { getAttrs(["buff7_Toggle"], function (v){ if (v.buff7_Toggle == "1"){updateBuff("Will","7");}});});
-on("change:buff7_str_macro-text", function() { getAttrs(["buff7_Toggle"], function (v){ if (v.buff7_Toggle == "1"){updateBuff("STR","7");}});});
-on("change:buff7_dex_macro-text", function() { getAttrs(["buff7_Toggle"], function (v){ if (v.buff7_Toggle == "1"){updateBuff("DEX","7");}});});
-on("change:buff7_con_macro-text", function() { getAttrs(["buff7_Toggle"], function (v){ if (v.buff7_Toggle == "1"){updateBuff("CON","7");}});});
-on("change:buff7_int_macro-text", function() { getAttrs(["buff7_Toggle"], function (v){ if (v.buff7_Toggle == "1"){updateBuff("INT","7");}});});
-on("change:buff7_wis_macro-text", function() { getAttrs(["buff7_Toggle"], function (v){ if (v.buff7_Toggle == "1"){updateBuff("WIS","7");}});});
-on("change:buff7_cha_macro-text", function() { getAttrs(["buff7_Toggle"], function (v){ if (v.buff7_Toggle == "1"){updateBuff("CHA","7");}});});
-
-on("change:buff8_melee_macro-text", function() { getAttrs(["buff8_Toggle"], function (v){ if (v.buff8_Toggle == "1"){updateBuff("Melee","8");}});});
-on("change:buff8_ranged_macro-text", function() { getAttrs(["buff8_Toggle"], function (v){ if (v.buff8_Toggle == "1"){updateBuff("Ranged","8");}});});
-on("change:buff8_dmg_macro-text", function() { getAttrs(["buff8_Toggle"], function (v){ if (v.buff8_Toggle == "1"){updateBuff("DMG","8");}});});
-on("change:buff8_ac_macro-text", function() { getAttrs(["buff8_Toggle"], function (v){ if (v.buff8_Toggle == "1"){updateBuff("AC","8");}});});
-on("change:buff8_hp-temp_macro-text", function() { getAttrs(["buff8_Toggle"], function (v){ if (v.buff8_Toggle == "1"){updateBuff("HP-temp","8");}});});
-on("change:buff8_fort_macro-text", function() { getAttrs(["buff8_Toggle"], function (v){ if (v.buff8_Toggle == "1"){updateBuff("Fort","8");}});});
-on("change:buff8_ref_macro-text", function() { getAttrs(["buff8_Toggle"], function (v){ if (v.buff8_Toggle == "1"){updateBuff("Ref","8");}});});
-on("change:buff8_will_macro-text", function() { getAttrs(["buff8_Toggle"], function (v){ if (v.buff8_Toggle == "1"){updateBuff("Will","8");}});});
-on("change:buff8_str_macro-text", function() { getAttrs(["buff8_Toggle"], function (v){ if (v.buff8_Toggle == "1"){updateBuff("STR","8");}});});
-on("change:buff8_dex_macro-text", function() { getAttrs(["buff8_Toggle"], function (v){ if (v.buff8_Toggle == "1"){updateBuff("DEX","8");}});});
-on("change:buff8_con_macro-text", function() { getAttrs(["buff8_Toggle"], function (v){ if (v.buff8_Toggle == "1"){updateBuff("CON","8");}});});
-on("change:buff8_int_macro-text", function() { getAttrs(["buff8_Toggle"], function (v){ if (v.buff8_Toggle == "1"){updateBuff("INT","8");}});});
-on("change:buff8_wis_macro-text", function() { getAttrs(["buff8_Toggle"], function (v){ if (v.buff8_Toggle == "1"){updateBuff("WIS","8");}});});
-on("change:buff8_cha_macro-text", function() { getAttrs(["buff8_Toggle"], function (v){ if (v.buff8_Toggle == "1"){updateBuff("CHA","8");}});});
-
-on("change:buff9_melee_macro-text", function() { getAttrs(["buff9_Toggle"], function (v){ if (v.buff9_Toggle == "1"){updateBuff("Melee","9");}});});
-on("change:buff9_ranged_macro-text", function() { getAttrs(["buff9_Toggle"], function (v){ if (v.buff9_Toggle == "1"){updateBuff("Ranged","9");}});});
-on("change:buff9_dmg_macro-text", function() { getAttrs(["buff9_Toggle"], function (v){ if (v.buff9_Toggle == "1"){updateBuff("DMG","9");}});});
-on("change:buff9_ac_macro-text", function() { getAttrs(["buff9_Toggle"], function (v){ if (v.buff9_Toggle == "1"){updateBuff("AC","9");}});});
-on("change:buff9_hp-temp_macro-text", function() { getAttrs(["buff9_Toggle"], function (v){ if (v.buff9_Toggle == "1"){updateBuff("HP-temp","9");}});});
-on("change:buff9_fort_macro-text", function() { getAttrs(["buff9_Toggle"], function (v){ if (v.buff9_Toggle == "1"){updateBuff("Fort","9");}});});
-on("change:buff9_ref_macro-text", function() { getAttrs(["buff9_Toggle"], function (v){ if (v.buff9_Toggle == "1"){updateBuff("Ref","9");}});});
-on("change:buff9_will_macro-text", function() { getAttrs(["buff9_Toggle"], function (v){ if (v.buff9_Toggle == "1"){updateBuff("Will","9");}});});
-on("change:buff9_str_macro-text", function() { getAttrs(["buff9_Toggle"], function (v){ if (v.buff9_Toggle == "1"){updateBuff("STR","9");}});});
-on("change:buff9_dex_macro-text", function() { getAttrs(["buff9_Toggle"], function (v){ if (v.buff9_Toggle == "1"){updateBuff("DEX","9");}});});
-on("change:buff9_con_macro-text", function() { getAttrs(["buff9_Toggle"], function (v){ if (v.buff9_Toggle == "1"){updateBuff("CON","9");}});});
-on("change:buff9_int_macro-text", function() { getAttrs(["buff9_Toggle"], function (v){ if (v.buff9_Toggle == "1"){updateBuff("INT","9");}});});
-on("change:buff9_wis_macro-text", function() { getAttrs(["buff9_Toggle"], function (v){ if (v.buff9_Toggle == "1"){updateBuff("WIS","9");}});});
-on("change:buff9_cha_macro-text", function() { getAttrs(["buff9_Toggle"], function (v){ if (v.buff9_Toggle == "1"){updateBuff("CHA","9");}});});
-
-on("change:buff10_melee_macro-text", function() { getAttrs(["buff10_Toggle"], function (v){ if (v.buff10_Toggle == "1"){updateBuff("Melee","10");}});});
-on("change:buff10_ranged_macro-text", function() { getAttrs(["buff10_Toggle"], function (v){ if (v.buff10_Toggle == "1"){updateBuff("Ranged","10");}});});
-on("change:buff10_dmg_macro-text", function() { getAttrs(["buff10_Toggle"], function (v){ if (v.buff10_Toggle == "1"){updateBuff("DMG","10");}});});
-on("change:buff10_ac_macro-text", function() { getAttrs(["buff10_Toggle"], function (v){ if (v.buff10_Toggle == "1"){updateBuff("AC","10");}});});
-on("change:buff10_hp-temp_macro-text", function() { getAttrs(["buff10_Toggle"], function (v){ if (v.buff10_Toggle == "1"){updateBuff("HP-temp","10");}});});
-on("change:buff10_fort_macro-text", function() { getAttrs(["buff10_Toggle"], function (v){ if (v.buff10_Toggle == "1"){updateBuff("Fort","10");}});});
-on("change:buff10_ref_macro-text", function() { getAttrs(["buff10_Toggle"], function (v){ if (v.buff10_Toggle == "1"){updateBuff("Ref","10");}});});
-on("change:buff10_will_macro-text", function() { getAttrs(["buff10_Toggle"], function (v){ if (v.buff10_Toggle == "1"){updateBuff("Will","10");}});});
-on("change:buff10_str_macro-text", function() { getAttrs(["buff10_Toggle"], function (v){ if (v.buff10_Toggle == "1"){updateBuff("STR","10");}});});
-on("change:buff10_dex_macro-text", function() { getAttrs(["buff10_Toggle"], function (v){ if (v.buff10_Toggle == "1"){updateBuff("DEX","10");}});});
-on("change:buff10_con_macro-text", function() { getAttrs(["buff10_Toggle"], function (v){ if (v.buff10_Toggle == "1"){updateBuff("CON","10");}});});
-on("change:buff10_int_macro-text", function() { getAttrs(["buff10_Toggle"], function (v){ if (v.buff10_Toggle == "1"){updateBuff("INT","10");}});});
-on("change:buff10_wis_macro-text", function() { getAttrs(["buff10_Toggle"], function (v){ if (v.buff10_Toggle == "1"){updateBuff("WIS","10");}});});
-on("change:buff10_cha_macro-text", function() { getAttrs(["buff10_Toggle"], function (v){ if (v.buff10_Toggle == "1"){updateBuff("CHA","10");}});});
-
-
-on("change:class-0-hp change:class-1-hp change:class-2-hp change:class-3-hp change:class-4-hp", function() {updateClassInformation("hp");});
-on("change:class-0-fchp change:class-1-fchp change:class-2-fchp change:class-3-fchp change:class-4-fchp", function() {updateClassInformation("fchp");});
-on("change:class-0-bab change:class-1-bab change:class-2-bab change:class-3-bab change:class-4-bab", function() {updateClassInformation("bab");});
-on("change:class-0-skill change:class-1-skill change:class-2-skill change:class-3-skill change:class-4-skill", function() {updateClassInformation("skill");});
-on("change:class-0-fcskill change:class-1-fcskill change:class-2-fcskill change:class-3-fcskill change:class-4-fcskill", function() {updateClassInformation("fcskill");});
-on("change:class-0-fcalt change:class-1-fcalt change:class-2-fcalt change:class-3-fcalt change:class-4-fcalt", function() {updateClassInformation("fcalt");});
-on("change:class-0-fort change:class-1-fort change:class-2-fort change:class-3-fort change:class-4-fort", function() {updateClassInformation("Fort");});
-on("change:class-0-ref change:class-1-ref change:class-2-ref change:class-3-ref change:class-4-ref", function() {updateClassInformation("Ref");});
-on("change:class-0-will change:class-1-will change:class-2-will change:class-3-will change:class-4-will", function() {updateClassInformation("Will");});
-on("change:class-0-level change:class-1-level change:class-2-level change:class-3-level change:class-4-level", function() {updateClassInformation("level");});
-
-//init
-on("change:init-ability", function() {  abilityDropdownHandler("init-ability",["init-ability-mod"],-1,"DEX-mod");});
-on("change:init-ability-mod change:init-trait change:init-misc condition-deafened",function(){ updateInit(); });
-
-on("change:con-mod change:level change:total-hp change:hp-formula", function() { updateHP(); });
-on("change:hp-temp-misc change:buff_hp-temp-total", function() { updateTempHP(); });
-
-
-//Conditions
-on("change:condition-fatigued", function() {
-    updateAbility("STR");
-    updateAbility("DEX");
-});
-on("change:condition-entangled", function() { updateAbility("DEX"); })
-on("change:condition-drained", function() { updateHP(); });
-
-//grappled and pinned are mutually exclusive
-on("change:condition-grappled", function() { 
-    getAttrs(["condition-Pinned","condition-Grappled"],function(values){
-        if (values["condition-Pinned"] !== "0" && values["condition-Grappled"] !== "0") {
-            setAttrs({"condition-Pinned":"0"});
-        } else {
-        	//user hit either pinned and it undid grapple, or hit grapple first time.
-            updateAbility("DEX");
-			//if (values["condition-Pinned"]==1) {
-			//	updateConditionDefensePenalty();
-			//}
-        }
-    });
-});
-//grappled and pinned are mutually exclusive
-on("change:condition-pinned", function() { 
-    getAttrs(["condition-Pinned","condition-Grappled"],function(values){
-        if (values["condition-Pinned"] !== "0" && values["condition-Grappled"] !== "0") {
-        	setAttrs({"condition-Grappled":"0"});
-        } else {
-			//user hit grapple and it  undid pinned, or hit pinned first time.
-            updateAbility("DEX"); 
-			//if (values["condition-Grappled"]==0) {
-			//	updateConditionDefensePenalty();
-			//}	
-        }
-    });
-});
-
-//defense dropdowns
-on("change:ac-ability", function () {abilityDropdownHandler("AC-ability",["AC-ability-mod"],99,"DEX-mod");});
-on("change:ff-ability", function () {abilityDropdownHandler("FF-ability",["FF-DEX"],99,"");});
-on("change:cmd-ability1", function () {abilityDropdownHandler("CMD-ability1",["CMD-STR"],-1,"STR-mod");});
-on("change:cmd-ability2", function () {abilityDropdownHandler("CMD-ability2",["CMD-DEX"],99,"DEX-mod");});
-on("change:cmd-ability", function () {abilityDropdownHandler("CMD-ability",["FF-CMD-DEX"],99,"");});
-
-//attack non repeating dropdowns
-on("change:melee-ability", function () {abilityDropdownHandler("melee-ability",["melee-ability-mod"],-1,"STR-mod");});
-on("change:ranged-ability", function () {abilityDropdownHandler("ranged-ability",["ranged-ability-mod"],-1,"DEX-mod");});
-on("change:cmb-ability", function () {abilityDropdownHandler("CMB-ability",["CMB-ability-mod"],-1,"STR-mod");});
-
-
-/* update attack modes*/ 
-on("change:acp-attack-mod change:condition-dazzled change:condition-entangled change:condition-grappled change:condition-fear change:condition-sickened change:condition-prone change:condition-invisible change:condition-drained change:condition-wounds",function() {
-    updateConditionAttackPenalty();
-});
-
-on ("change:condition-blinded change:condition-cowering change:condition-flat-footed change:condition-stunned change:condition-flat-footed change:condition-stunned change:condition-pinned change:condition-wounds change:ac-ability-mod", function() {
-    updateConditionDefensePenalty();
-});
-
-on("change:bab change:size change:melee-ability-mod change:buff_melee-total change:attk-melee-misc change:attk-penalty",function() { 
-    updateAttack("melee");
-});
-on("change:bab change:size change:ranged-ability-mod change:ranged-total change:attk-ranged-misc change:attk-penalty",function() { 
-    updateAttack("ranged");
-});
-on("change:bab change:size change:cmb-ability-mod change:cmb-total change:attk-cmb-misc change:attk-penalty",function() { 
-    updateAttack("CMB");
-});
-
-on("change:condition-stunned change:condition-flat-footed change:ac-ability-mod change:ff-dex change:ac-penalty change:size change:ac-dodge change:ac-natural change:ac=deflect change:ac-misc change:buff_ac-total change:cmd-dex change:ff-cmd-dex change:cmd-str change:bab change:max-dex",function() {
-    updateDefenses();
-});
-
-on("change:shield-equipped change:shield-acbonus change:shield-max-dex change:shield-acp change:shield-spell-fail change:shield-proficiency change:shield2-equipped change:shield2-acbonus change:shield2-max-dex change:shield2-acp change:shield2-spell-fail change:shield2-proficiency change:armor-equipped change:armor-acbonus change:armor-max-dex change:armor-acp change:armor-spell-fail change:armor-proficiency change:armor2-equipped change:armor2-acbonus change:armor2-max-dex change:armor2-acp change:armor2-spell-fail change:armor2-proficiency",function(){
-    updateArmor();
-});
-on("change:buff_DMG-total change:repeating_weapon:attack-type-mod change:repeating_weapon:enhance change:repeating_weapon:masterwork change:repeating_weapon:attack change:repeating_weapon:proficiency change:repeating_weapon:damage-ability-mod change:repeating_weapon:dmg-effect-total-other change:repeating_weapon:damage change:repeating_weapon:attk-effect-total-other",function() {
-	updateRepeatingWeapon();
-});
-on("change:repeating_weapon:attack-type",function() {
-	//updateRepeatingWeaponAttackType();
-		abilityDropdownHandler("repeating_weapon_attack-type",["repeating_weapon_attack-type-mod"]);
-});
-on("change:repeating_weapon:damage-ability",function() { updateRepeatingWeaponDamageAbility();   });
-
-
-/* updateAbility
- * Updates the final ability score, ability modifier, condition column based on entries in ability grid plus conditions and buffs.
- * Also sets unconscious flag if ability damage is >= ability score.
- * Note: Ability value is not affected by damage and penalties, instead only modifier is affected.
- * @ability {string} 3 letter abbreviation for one of the 6 ability scores.
- */
-var updateAbility = function(ability) {
-    console.log("AAAAAAAAAAAAAAAAAAAAAAA At Update Ability:"+ability);
-    getAttrs([ability+"-base",ability+"-enhance",ability+"-misc",ability+"-damage",ability+"-penalty",ability+"-drain","buff_"+ability+"-total",
-		"condition-Unconscious","condition-Fatigued","condition-Entangled","condition-Grappled","condition-Pinned",
-		ability, ability+"-mod", ability+"-cond"], function (values){
-        if (isNaN(values["buff_"+ability+"-total"])) {
-        	values["buff_"+ability+"-total"]=0;
-		}		
-		console.log (values);
-		var base = (parseInt(values[ability+"-base"],10)||0) + 
-			(parseInt(values[ability+"-enhance"],10)||0) + 
-			(parseInt(values[ability+"-misc"],10)||0) + 
-			(parseInt(values["buff_"+ability+"-total"],10)||0) + 
-			(parseInt(values[ability+"-drain"],10)||0) ;
-		var newbase = base;
-		var cond=0;
-		var condMod=0;
-        var dmg =  parseInt(values[ability+"-damage"],10)||0;
-        var dmgMod = -1 * Math.floor(Math.abs(dmg)/2);
-		var pen =  parseInt(values[ability+"-penalty"],10)||0;
-        var penMod = -1 * Math.floor(Math.abs(pen)/2);
-        console.log("AAAAAAAAAAAAAAAAAAAAAAA the ability is "+ ability);
-		switch (ability) {
-			case 'DEX':
-                console.log("WE ARE AT DEX");
-				condMod = -1 * ((parseInt(values["condition-Fatigued"],10)||0) + 
-				   (parseInt(values["condition-Entangled"],10)||0) + 
-				   (parseInt(values["condition-Grappled"],10)||0) );			
-				cond = condMod * 2;
-				if (values["condition-Pinned"]=="4" && base > 10) {
-					newbase = 10;
+	/* updateBuffRow
+	 * Updates the buff values for a given row of the buff array when the toggle checkbox is clicked on.
+	 * If toggled off, then sets all to zero.  If toggled on, then sets non-zero buffs to proper value.
+	 *
+	 * @row {number} The buff row toggled (X in buffX_Toggle )
+	  */
+	updateBuffRow = function(row) {
+		var valuesToSet ={};
+		var toggle="buff"+row+"_Toggle";
+		var buffFlds = ["buff"+row+"_Melee", "buff"+row+"_Ranged","buff"+row+"_DMG","buff"+row+"_AC","buff"+row+"_HP-temp","buff"+row+"_Fort",
+		"buff"+row+"_Ref","buff"+row+"_Will","buff"+row+"_STR","buff"+row+"_DEX","buff"+row+"_CON","buff"+row+"_INT","buff"+row+"_WIS","buff"+row+"_CHA",
+		toggle];
+		var numFlds = buffFlds.length - 1; // -1 to skip toggle field at end of buffFlds array
+		var n,numSet=0;
+		getAttrs(buffFlds,function(v){
+			if (v[toggle] == 0) {
+				for (i=0;i<numFlds;i++) {
+					if (v[buffFlds[i]] !== 0) {valuesToSet[buffFlds[i]]=0;numSet++;}
 				}
-				break;
-			case 'STR':
-                console.log("WE ARE AT STR");
-				condMod =  -1 * (parseInt(values["condition-Fatigued"],10)||0);
-				cond = condMod * 2;
-				break;
-		}
-                console.log(ability+" udpate, condmod is "+ condMod);
-
-        var mod = Math.floor((newbase -10)/2) + dmgMod + penMod +condMod;
-		var condUncon = values["condition-Unconscious"];
-		var changedUncon=0;
-		if ((base + dmg) <= 0 && condUncon == "0") {
-			condUncon = "1";
-			changedUncon=1;
-		} 
-		//use 99 (never happen) to make sure we update if there's a problem
-		var currAbility=parseInt(values[ability],10)||99; 
-		var currMod = parseInt(values[ability+"-mod"],10)||99;
-        var currCond = parseInt(values[ability+"-cond"],10)||0;
-		var numset=0;
-		var setter={};
-        console.log(ability +"update: base:" + base + ",dmg:" + dmg +  ",dmgMod"+dmgMod+ ",condMod:" + condMod + ",mod:"+mod+",currCond:"+currCond+", new cond:"+cond);
-		if (currAbility !== base){setter[ability]=base;numset++;}
-		if (currMod !== mod){setter[ability+"-mod"]=mod;numset++;}
-		if (changedUncon ){setter["condition-Unconscious"]=condUncon;numset++;}
-        if (currCond !== cond){setter[ability+"-cond"]=cond;numset++; }
-		if (numset){setAttrs(setter);}
-	});
-};
-
-/* updateBuff
- * This updates the buff value when a textbox is updated.
- * ONLY called if the toggle checkbox is CHECKED for this row, 
- * so set buff even if 0 (since it changed from non zero)
- * @buffname {string} The case sensitive distinct portion of name of field that was changed.
- *      So: Melee, Ranged, DMG, AC, HP-temp, Fort, Ref, Will, STR, DEX, CON, INT, WIS, CHA
- * @row {number} The row number of the change. 
- */
-var updateBuff = function (eventname, row) {
-	var fieldtoUpdate = "buff"+row+"_"+eventname;
-	var fieldtoRead = fieldtoUpdate + "_macro-text";
-	var value = 0;
-	getAttrs([fieldtoRead], function (values){ 
-		value = parseInt(values[fieldtoRead])||0;
-		var o = {};
-		o[fieldtoUpdate]=value;
-		setAttrs(o);
-	});
-};
-
-/* updateBuffRow
- * Updates the buff values for a given row of the buff array when the toggle checkbox is clicked on.
- * If toggled off, then sets all to zero.  If toggled on, then sets non-zero buffs to proper value.
- *
- * @row {number} The buff row toggled (X in buffX_Toggle )
-  */
-var updateBuffRow = function(row) {
-    var valuesToSet ={};
-    var toggle="buff"+row+"_Toggle";
-	var buffFlds = ["buff"+row+"_Melee", "buff"+row+"_Ranged","buff"+row+"_DMG","buff"+row+"_AC","buff"+row+"_HP-temp","buff"+row+"_Fort",
-	"buff"+row+"_Ref","buff"+row+"_Will","buff"+row+"_STR","buff"+row+"_DEX","buff"+row+"_CON","buff"+row+"_INT","buff"+row+"_WIS","buff"+row+"_CHA",
-	toggle];
-	var numFlds = buffFlds.length - 1; // -1 to skip toggle field at end of buffFlds array
-	var n,numSet=0;
-	getAttrs(buffFlds,function(v){
-		if (v[toggle] == 0) {
-			for (i=0;i<numFlds;i++) {
-				if (v[buffFlds[i]] !== 0) {valuesToSet[buffFlds[i]]=0;numSet++;}
-			}
-            if (numSet > 0) {  setAttrs(valuesToSet); }
-		} else { 
-			var inputFlds =[numFlds];
-			for (i=0;i<numFlds;i++){
-				inputFlds[i] = buffFlds[i]+"_macro-text";
-			}
-			getAttrs(inputFlds, function (v2){ 
+				if (numSet > 0) {  setAttrs(valuesToSet); }
+			} else { 
+				var inputFlds =[numFlds];
 				for (i=0;i<numFlds;i++){
-                    n=parseInt(v2[inputFlds[i]],10)||0;
-					if (n!==0) { valuesToSet[buffFlds[i]]=n; numSet++;}
+					inputFlds[i] = buffFlds[i]+"_macro-text";
 				}
-				if (numSet > 0) {setAttrs(valuesToSet);}
-			});  
-		}
-	});
-};
+				getAttrs(inputFlds, function (v2){ 
+					for (i=0;i<numFlds;i++){
+						n=parseInt(v2[inputFlds[i]],10)||0;
+						if (n!==0) { valuesToSet[buffFlds[i]]=n; numSet++;}
+					}
+					if (numSet > 0) {setAttrs(valuesToSet);}
+				});  
+			}
+		});
+	},
 
 
-/* updateBuffColumn
- * Updates the buff_***-total field for the column in the buff array.
- * we know buffx_col will not be strings, unlike the _macro-text so just check for null not for isNaN
- * @col {string} the case sensitive distinct portion of name of field.
- *      So: Melee, Ranged, DMG, AC, HP-temp, Fort, Ref, Will, STR, DEX, CON, INT, WIS, CHA
- */
-var updateBuffColumn = function (col){
-	getAttrs(["buff1_"+col,"buff2_"+col,"buff3_"+col,"buff4_"+col,"buff5_"+col,
-		"buff6_"+col,"buff7_"+col,"buff8_"+col,"buff9_"+col,"buff10_"+col], function(v){
-		console.log (v);
-    	var newsum =  (parseInt(v["buff1_"+col],10)||0)+
-    		 (parseInt(v["buff2_"+col],10)||0)+
-			 (parseInt(v["buff3_"+col],10)||0)+
-			 (parseInt(v["buff4_"+col],10)||0)+
-			 (parseInt(v["buff5_"+col],10)||0)+
-			 (parseInt(v["buff6_"+col],10)||0)+
-			 (parseInt(v["buff7_"+col],10)||0)+
-			 (parseInt(v["buff8_"+col],10)||0)+
-			 (parseInt(v["buff9_"+col],10)||0)+
-			 (parseInt(v["buff10_"+col],10)||0);
-        var totalfield="buff_"+col+"-total";
-		var o={};
-		o[totalfield]=newsum;
-		setAttrs(o);
-	});
-};
+	/* updateBuffColumn
+	 * Updates the buff_***-total field for the column in the buff array.
+	 * we know buffx_col will not be strings, unlike the _macro-text so just check for null not for isNaN
+	 * @col {string} the case sensitive distinct portion of name of field.
+	 *      So: Melee, Ranged, DMG, AC, HP-temp, Fort, Ref, Will, STR, DEX, CON, INT, WIS, CHA
+	 */
+	updateBuffColumn = function (col){
+		getAttrs(["buff1_"+col,"buff2_"+col,"buff3_"+col,"buff4_"+col,"buff5_"+col,
+			"buff6_"+col,"buff7_"+col,"buff8_"+col,"buff9_"+col,"buff10_"+col], function(v){
+			//console.log (v);
+			var newsum =  (parseInt(v["buff1_"+col],10)||0)+
+				 (parseInt(v["buff2_"+col],10)||0)+
+				 (parseInt(v["buff3_"+col],10)||0)+
+				 (parseInt(v["buff4_"+col],10)||0)+
+				 (parseInt(v["buff5_"+col],10)||0)+
+				 (parseInt(v["buff6_"+col],10)||0)+
+				 (parseInt(v["buff7_"+col],10)||0)+
+				 (parseInt(v["buff8_"+col],10)||0)+
+				 (parseInt(v["buff9_"+col],10)||0)+
+				 (parseInt(v["buff10_"+col],10)||0);
+			var totalfield="buff_"+col+"-total";
+			var o={};
+			o[totalfield]=newsum;
+			setAttrs(o);
+		});
+	},
 
-/* updateHP
- * sets max HP
- *
-var updateHP = function() {
-    getAttrs(["CON-mod","level","total-hp","condition-Drained","HP-formula"],function(values) {
-        var  totalhp = (( parseInt(values["CON-mod"],10)||0) * (parseInt(values["level"],10)||0)) + 
-		     (parseInt(values["total-hp"],10)||0) + 
-    		 (parseInt(values["HP-formula"],10)||0) +
-			 (5 * (parseInt(values["condition-Drained"],10)||0));
-		setAttrs({"HP_max":totalhp});
-	});
-};*/
-var updateHP = function() {
-    getAttrs(["CON-mod","level","total-hp","condition-Drained","HP-formula","HP_max"],function(values) {
-        var  totalhp = (( parseInt(values["CON-mod"],10)||0) * (parseInt(values["level"],10)||0)) + 
-    	     (parseInt(values["total-hp"],10)||0) + 
-    		 (parseInt(values["HP-formula"],10)||0) +
-			 (5 * (parseInt(values["condition-Drained"],10)||0));
-		var grazedhp = Math.floor(totalhp * .75),
-		    woundedhp = Math.floor(totalhp /2 ),
-			criticalhp = Math.floor(totalhp /4);
-		var currHP= parseInt(values["HP_max"],10)||0;
-		if (currHP !=totalhp) {
-			setAttrs({"HP_max":totalhp,"HP_grazed":grazedhp,"HP_wounded":woundedhp,"HP_critical":criticalhp});
-		}
-	});
-};
-/* updateTempHP
- * sets temp hp
- */
-var updateTempHP = function() {
-	getAttrs(["HP-temp-misc","buff_HP-temp-total"],function(values) {
-		var totaltemp = (parseInt(values["HP-temp-misc"],10)||0) + (parseInt(values["buff_HP-temp-total"],10)||0);
-		setAttrs({"HP-temp":totaltemp});
-	});
-};
+	/* updateHP
+	 * sets max HP
+	 */
+	updateHP = function() {
+		getAttrs(["CON-mod","level","total-hp","condition-Drained","HP-formula","HP_max"],function(values) {
+			var  totalhp = (( parseInt(values["CON-mod"],10)||0) * (parseInt(values["level"],10)||0)) + 
+				 (parseInt(values["total-hp"],10)||0) + 
+				 (parseInt(values["HP-formula"],10)||0) +
+				 (5 * (parseInt(values["condition-Drained"],10)||0));
+			var grazedhp = Math.floor(totalhp * .75),
+				woundedhp = Math.floor(totalhp /2 ),
+				criticalhp = Math.floor(totalhp /4);
+			var currHP= parseInt(values["HP_max"],10)||0;
+			if (currHP !=totalhp) {
+				setAttrs({"HP_max":totalhp,"HP_grazed":grazedhp,"HP_wounded":woundedhp,"HP_critical":criticalhp});
+			}
+		});
+	},
 
-/* updateClassInformation 
- * Updates totals at bottom of Class Information grid
- * 
- * @col the unique part of the string for the cell modified:
- *   hp, fchp, bab, skill, fcskill, alt, Fort, Ref, Will, level
- */
-var updateClassInformation = function (col) {
-    if (col=="fcskill" ) { col="skill";} 
-	else if (col=="fchp") { col="hp";}
-	else if (col=="fcalt") { return; }
-	var col0Name="class-0-"+col;
-	var col1Name="class-1-"+col;
-	var col2Name="class-2-"+col;
-	var col3Name="class-3-"+col;
-	var col4Name="class-4-"+col;
-	var totalColName = "total-"+col;
+	/* updateTempHP
+	 * sets temp hp
+	 */
+	updateTempHP = function() {
+		getAttrs(["HP-temp-misc","buff_HP-temp-total"],function(values) {
+			var totaltemp = (parseInt(values["HP-temp-misc"],10)||0) + (parseInt(values["buff_HP-temp-total"],10)||0);
+			setAttrs({"HP-temp":totaltemp});
+		});
+	},
 
-	if (col == "bab" || col == "level") {
-		totalColName = col; 
-	}
-
-	getAttrs([col0Name,col1Name,col2Name,col3Name,col4Name],function(v){
-		var setVal = {};
-		var tot = ( isNaN(v[col0Name]) ? 0 : parseInt(v[col0Name],10))+
-			( isNaN(v[col1Name]) ? 0 : parseInt(v[col1Name],10))+
-			( isNaN(v[col2Name]) ? 0 : parseInt(v[col2Name],10))+
-			( isNaN(v[col3Name]) ? 0 : parseInt(v[col3Name],10))+
-			( isNaN(v[col4Name]) ? 0 : parseInt(v[col4Name],10));
-		if (!(col == "skill" || col == "hp"  ))	{
-			setVal[totalColName]=tot;
-			setAttrs(setVal);
+	/* updateClassInformation 
+	 * Updates totals at bottom of Class Information grid
+	 * 
+	 * @col the unique part of the string for the cell modified:
+	 *   hp, fchp, bab, skill, fcskill, alt, Fort, Ref, Will, level
+	 */
+	updateClassInformation = function (col) {
+		if (!col || col==="fcalt") { return; }
+		if (col==="fcskill" ) { col="skill";} 
+		else if (col==="fchp") { col="hp";}
+		var getFields=[],col0Name="class-0-"+col, col1Name="class-1-"+col, col2Name="class-2-"+col, col3Name="class-3-"+col,col4Name="class-4-"+col,
+			totalColName, col0Namefc,col1Namefc,col2Namefc,col3Namefc,col4Namefc;
+		totalColName=(col === "bab" || col === "level")?col:"total-"+col;
+		if (col === "skill" || col === "hp"  ){
+			col0Namefc="class-0-fc"+col;
+			col1Namefc="class-1-fc"+col;
+			col2Namefc="class-2-fc"+col;
+			col3Namefc="class-3-fc"+col;
+			col4Namefc="class-4-fc"+col;		
+			getFields=[col0Name,col1Name,col2Name,col3Name,col4Name,totalColName,col0Namefc,col1Namefc,col2Namefc,col3Namefc,col4Namefc];
 		} else {
-			var col0Namefc="class-0-fc"+col;
-			var col1Namefc="class-1-fc"+col;
-			var col2Namefc="class-2-fc"+col;
-			var col3Namefc="class-3-fc"+col;
-			var col4Namefc="class-4-fc"+col;		
-			getAttrs([col0Namefc,col1Namefc,col2Namefc,col3Namefc,col4Namefc],function(v){
-				var totfc = ( isNaN(v[col0Namefc]) ? 0 : parseInt(v[col0Namefc],10))+
-					( isNaN(v[col1Namefc]) ? 0 : parseInt(v[col1Namefc],10))+
-					( isNaN(v[col2Namefc]) ? 0 : parseInt(v[col2Namefc],10))+
-					( isNaN(v[col3Namefc]) ? 0 : parseInt(v[col3Namefc],10))+
-					( isNaN(v[col4Namefc]) ? 0 : parseInt(v[col4Namefc],10));
-				setVal[totalColName] = tot + totfc;
-				setAttrs(setVal);
-			});
-			
+			getFields=[col0Name,col1Name,col2Name,col3Name,col4Name,totalColName];
 		}
+		getAttrs(getFields,function(v){
+			var setVal = {},currTot, tot;
+			tot = ( parseInt(v[col0Name],10)||0)+
+				( parseInt(v[col1Name],10)||0)+
+				( parseInt(v[col2Name],10)||0)+
+				( parseInt(v[col3Name],10)||0)+
+				( parseInt(v[col4Name],10)||0);
+			if (col === "skill" || col === "hp"  ) {
+				tot += (parseInt(v[col0Namefc],10)||0)+
+					( parseInt(v[col1Namefc],10)||0)+
+					( parseInt(v[col2Namefc],10)||0)+
+					( parseInt(v[col3Namefc],10)||0)+
+					( parseInt(v[col4Namefc],10)||0);
+			}
+			tot = Math.floor(tot);
+			currTot = parseInt(v[totalColName],10)||0;
+			if ( tot!== currTot) {
+				setVal[totalColName]=tot;
+				setAttrs(setVal);
+			}
+		});
+	},
+
+	/* findAbilityInString
+	 * Looks at a string for instances of an ability modifier (DEX-mod, etc) and returns
+	 * the modifier it finds. If it finds none, it looks for the base ability 
+	 * Note the order checked is the same as the order they traditionally appear in
+	 * (STR-mod,DEX-mod,CON-mod,INT-mod,WIS-mod,CHA-mod) 
+	 * then it checks for  (STR,DEX,CON,INT,WIS,CHA) 
 		
-	});
-};
+	 */
+	findAbilityInString = function (fieldToFind) {
+		if (fieldToFind.indexOf("STR-mod") >= 0 ) {fieldToFind = "STR-mod";}
+		else if (fieldToFind.indexOf("DEX-mod") >= 0 ) {fieldToFind = "DEX-mod";}
+		else if (fieldToFind.indexOf("CON-mod") >= 0 ) {fieldToFind = "CON-mod";}
+		else if (fieldToFind.indexOf("INT-mod") >= 0 ) {fieldToFind = "INT-mod";}
+		else if (fieldToFind.indexOf("WIS-mod") >= 0 ) {fieldToFind = "WIS-mod";}
+		else if (fieldToFind.indexOf("CHA-mod") >= 0 ) {fieldToFind = "CHA-mod";}
+		else if (fieldToFind.indexOf("STR") >= 0 ) {fieldToFind = "STR";}
+		else if (fieldToFind.indexOf("DEX") >= 0 ) {fieldToFind = "DEX";}
+		else if (fieldToFind.indexOf("CON") >= 0 ) {fieldToFind = "CON";}
+		else if (fieldToFind.indexOf("INT") >= 0 ) {fieldToFind = "INT";}
+		else if (fieldToFind.indexOf("WIS") >= 0 ) {fieldToFind = "WIS";}
+		else if (fieldToFind.indexOf("CHA") >= 0 ) {fieldToFind = "CHA";}
+		else if (fieldToFind.indexOf("melee") >= 0) {fieldToFind="attk-melee";}
+		else if (fieldToFind.indexOf("ranged") >= 0) {fieldToFind="attk-ranged";}
+		else if (fieldToFind.indexOf("CMB") >= 0) {fieldToFind="CMB";}
+		return fieldToFind;
+	},
 
-/* findAbilityInString
- * Looks at a string for instances of an ability modifier (DEX-mod, etc) and returns
- * the modifier it finds. If it finds none, it looks for the base ability 
- * Note the order checked is the same as the order they traditionally appear in
- * (STR-mod,DEX-mod,CON-mod,INT-mod,WIS-mod,CHA-mod) 
- * then it checks for  (STR,DEX,CON,INT,WIS,CHA) 
-	
- */
-var findAbilityInString = function (fieldToFind) {
-    if (fieldToFind.indexOf("STR-mod") >= 0 ) {fieldToFind = "STR-mod";}
-	else if (fieldToFind.indexOf("DEX-mod") >= 0 ) {fieldToFind = "DEX-mod";}
-	else if (fieldToFind.indexOf("CON-mod") >= 0 ) {fieldToFind = "CON-mod";}
-	else if (fieldToFind.indexOf("INT-mod") >= 0 ) {fieldToFind = "INT-mod";}
-	else if (fieldToFind.indexOf("WIS-mod") >= 0 ) {fieldToFind = "WIS-mod";}
-	else if (fieldToFind.indexOf("CHA-mod") >= 0 ) {fieldToFind = "CHA-mod";}
-	else if (fieldToFind.indexOf("STR") >= 0 ) {fieldToFind = "STR";}
-	else if (fieldToFind.indexOf("DEX") >= 0 ) {fieldToFind = "DEX";}
-	else if (fieldToFind.indexOf("CON") >= 0 ) {fieldToFind = "CON";}
-	else if (fieldToFind.indexOf("INT") >= 0 ) {fieldToFind = "INT";}
-	else if (fieldToFind.indexOf("WIS") >= 0 ) {fieldToFind = "WIS";}
-	else if (fieldToFind.indexOf("CHA") >= 0 ) {fieldToFind = "CHA";}
-	else if (fieldToFind.indexOf("melee") >= 0) {fieldToFind="attk-melee";}
-	else if (fieldToFind.indexOf("ranged") >= 0) {fieldToFind="attk-ranged";}
-	else if (fieldToFind.indexOf("CMB") >= 0) {fieldToFind="CMB";}
-	return fieldToFind;
-};
+	/* findMultiplier
+	 * for damage dropdown in attack items, look at string for dropdown
+	 * and return number
+	 * 
+	 * @str = the value of the damage ability
+	 * @returns = a number indicating the multiplier for the ability mod
+	*/
+	findMultiplier = function (str) {
+		if (str.indexOf("1.5") >= 0) {str=1.5;}
+		else if (str.indexOf(".5") >= 0) {str=.5;}
+		else if (str.indexOf("2") >= 0) {str=2;}
+		else if (str.indexOf("1/2") >= 0) {str=.5;}
+		else if (str.indexOf("3/2") >= 0) {str=1.5;}
+		else if (str.indexOf("1 1/2") >= 0) {str=1.5;}
+		else { str=1;}
+		return str;
+	},
 
-/* findMultiplier
- * for damage dropdown in attack items, look at string for dropdown
- * and return number
- * 
- * @str = the value of the damage ability
- * @returns = a number indicating the multiplier for the ability mod
-*/
-var findMultiplier = function (str) {
-	if (str.indexOf(".5") >= 0) {str=.5;}
-	else if (str.indexOf("1/2") >= 0) {str=.5;}
-	else if (str.indexOf("1.5") >= 0) {str=1.5;}
-	else if (str.indexOf("3/2") >= 0) {str=1.5;}
-	else if (str.indexOf("1 1/2") >= 0) {str=1.5;}
-	else if (str.indexOf("2") >= 0) {str=2;}
-	else { str=1;}
-	return str;
-};
-
-/* abilityDropdownGetter
- * by passing the value of a dropdown that has string references to abilties, 
- * this determines what ability / field it references, finds that field in 
- * the sheet, and calls the callback function passing the value in.
- * If new dropdowns are made, ensure the fields referenced are in the
- * findAbilityInString method.
- * 
- * @readField = the dropdown we are looking at
- * @defaultAbility = if the value of the dropdown cannot be determined , use this.
- *        pass in "" if no default is desired
- * @callback = a function that takes one integer parameter, which is the value the dropdown selection represents
- */
-var abilityDropdownGetter = function (readField,defaultAbility,callback) {
-    if (typeof readField == "undefined" || readField == null) {
-    	return;
-	}    
+	/* getDropdownVal
+	 * by passing the value of a dropdown that has string references to abilties, 
+	 * this determines what ability / field it references, finds that field in 
+	 * the sheet, and calls the callback function passing the value in.
+	 * If new dropdowns are made, ensure the fields referenced are in the
+	 * findAbilityInString method.
+	 * 
+	 * @readField = the dropdown we are looking at
+	 * @defaultAbility = if the value of the dropdown cannot be determined , use this.
+	 *        pass in "" if no default is desired
+	 * @callback = a function that takes one integer parameter, which is the value the dropdown selection represents
+	 */
+	getDropdownVal = function (readField,defaultAbility,callback) {
+		if (!readField  || typeof callback !== "function" ) {
+			return;
+		}    
 		getAttrs([readField],function(values) {
 			var fieldToFind =values[readField];
-    		//hardcoded 0 means "none"
+			//hardcoded 0 means "none"
 			if (fieldToFind=="0"){
 				callback(0);
 				return;
 			}
-            
-            fieldToFind = findAbilityInString(fieldToFind);
+			
+			fieldToFind = findAbilityInString(fieldToFind);
 			getAttrs([fieldToFind], function(v) {
 				var valueOf = parseInt(v[fieldToFind],10)||9999;
-                if (valueOf!==9999){
+				if (valueOf!==9999){
 					callback(valueOf);
 				} else if ( defaultAbility ) {
 
 						getAttrs([defaultAbility],function(v){
 							var modToSave=valueOf(v[defaultAbility],10)||9999;
 							if (modToSave !== 9999){
-							    callback(modToSave);
+								callback(modToSave);
 							}
 						});
 				} else {
@@ -11871,527 +11592,922 @@ var abilityDropdownGetter = function (readField,defaultAbility,callback) {
 			});
 		});	
 
-};
+	},
 
-/* abilityDropdownHandler
- * finds the value represented by the selected item in the dropdown and writes that value
- * to each field in the writeFields.
- * Calls the full version of abilityDropdownHandler with no limit and no default
- *
- * @readField = the dropdown field name
- * @writeFields = an array [] of fields to write to
- */
-var abilityDropdownHandler = function (readField,writeFields) {
-	abilityDropdownHandler(readField,writeFields,-1,"");
-};
+	/* handleDropdown
+	 * finds the value represented by the selected item in the dropdown and writes that value
+	 * to each field in the writeFields.
+	 * Calls the full version of handleDropdown with no limit and no default
+	 *
+	 * @readField = the dropdown field name
+	 * @writeFields = an array [] of fields to write to
+	 */
+	handleDropdown = function (readField,writeFields) {
+		handleDropdown(readField,writeFields,-1,"");
+	},
 
-/* abilityDropdownHandler
- * Looks at a dropdown, evaluates the number the selected item refers to, and then 
- * sets the writeFields with that number. 
- *
- * @readField = the dropdpown field
- * @writeFields = An array of strings that are fields to write the value to
- * @limit = the number representing a maximum number that is possible (ex: Max DEX to AC)
- *   pass in -1 if no limit applies
- * @defaultAbility = if the dropdown cannot be evaluated, which ability should be used instead. 
- *        pass in "" if no default desired.
- */
-var abilityDropdownHandler = function (readField,writeFields,limit,defaultAbility) {
-	if (typeof writeFields === "undefined" || writeFields == null) {
-		return;
-	}    
-	abilityDropdownGetter(readField,defaultAbility,function(valueOf){
-        console.log("We received "+valueOf+" back");
-		if (typeof limit === "undefined" || limit == null || isNaN(limit) || limit == -1) {
-			limit=9999;
-		}		
-		valueOf=Math.min(valueOf,limit);
-		var setter = {};
-		var setany=0;
-		getAttrs(writeFields,function(v){
-			for( i=0;i<writeFields.length;i++) {
-				if (v[writeFields[i]] !== valueOf) {
-					setter[writeFields[i]]=valueOf;
-					setany++;
-				}
-			}
-			if (setany) {setAttrs(setter);}
-		});
-	});
-};
-
-
-
-
-
-
-/* updateConditionAttackPenalty
- * 
- * updates the condition penalty for attacks.
- */
-var updateConditionAttackPenalty = function() {
-
-    getAttrs(["condition-Dazzled","condition-Entangled","condition-Grappled","condition-Fear","condition-Sickened","condition-Prone",
-    "condition-Invisible","condition-Drained","condition-Wounds","attk-penalty","attk-CMB-gnote","acp-attack-mod"],function(v) { 
-	    var totpenalty = -1 * (
-    			(isNaN(v["condition-Dazzled"])?0:parseInt(v["condition-Dazzled"],10)) +
-				(isNaN(v["condition-Entangled"])?0:parseInt(v["condition-Entangled"],10)) +
-				(isNaN(v["condition-Grappled"])?0:parseInt(v["condition-Grappled"],10)) +
-				(isNaN(v["condition-Fear"])?0:parseInt(v["condition-Fear"],10)) +
-				(isNaN(v["condition-Sickened"])?0:parseInt(v["condition-Sickened"],10)) +
-				(isNaN(v["condition-Prone"])?0:parseInt(v["condition-Prone"],10)) +
-				(isNaN(v["condition-Wounds"])?0:parseInt(v["condition-Wounds"],10)) ) +
-			(isNaN(v["condition-Invisible"])?0:parseInt(v["condition-Invisible"],10)) +
-			(isNaN(v["condition-Drained"])?0:parseInt(v["condition-Drained"],10)) +
-            (isNaN(v["acp-attack-mod"])?0:parseInt(v["acp-attack-mod"],10)) ;
-
-            var grapplenote=" ";
-    		if (v["condition-Grappled"] != "0") {
-				grapplenote="+"+v["condition-Grappled"]+" grapple";
-			}
-			var curr = parseInt("attk-penalty",10);
+	/* handleDropdown
+	 * Looks at a dropdown, evaluates the number the selected item refers to, and then 
+	 * sets the writeFields with that number. 
+	 *
+	 * @readField = the dropdpown field
+	 * @writeFields = An array of strings that are fields to write the value to
+	 * @limit = the number representing a maximum number that is possible (ex: Max DEX to AC)
+	 *   pass in -1 if no limit applies
+	 * @defaultAbility = if the dropdown cannot be evaluated, which ability should be used instead. 
+	 *        pass in "" if no default desired.
+	 */
+	handleDropdown = function (readField,writeFields,limit,defaultAbility) {
+		if ( !writeFields ) {
+			return;
+		}    
+		getDropdownVal(readField,defaultAbility,function(valueOf){
+			console.log("We received "+valueOf+" back");
+			if (!(typeof limit === "undefined" || limit == null || isNaN(limit) || limit == -1 || limit >= 99)) {
+				valueOf=Math.min(valueOf,limit);
+			}		
 			var setter = {};
-			var set=0;
-    		console.log("AAAAAAAAAAA the values are : "+totpenalty + " vs " + curr+" and note is " + grapplenote);
-            
-			if (curr !== totpenalty) {
-				setter["attk-penalty"]=totpenalty;
-				set=1;
+			var setany=0;
+			getAttrs(writeFields,function(v){
+				for( i=0;i<writeFields.length;i++) {
+					if (v[writeFields[i]] !== valueOf) {
+						setter[writeFields[i]]=valueOf;
+						setany++;
+					}
+				}
+				if (setany) {setAttrs(setter);}
+			});
+		});
+	},
+
+
+
+
+
+
+	/* updateConditionAttackPenalty
+	 * 
+	 * updates the condition penalty for attacks.
+	 */
+	updateConditionAttackPenalty = function() {
+
+		getAttrs(["condition-Dazzled","condition-Entangled","condition-Grappled","condition-Fear","condition-Sickened","condition-Prone",
+		"condition-Invisible","condition-Drained","condition-Wounds","attk-penalty","attk-CMB-gnote","acp-attack-mod"],function(v) { 
+			var totpenalty = -1 * (
+					(isNaN(v["condition-Dazzled"])?0:parseInt(v["condition-Dazzled"],10)) +
+					(isNaN(v["condition-Entangled"])?0:parseInt(v["condition-Entangled"],10)) +
+					(isNaN(v["condition-Grappled"])?0:parseInt(v["condition-Grappled"],10)) +
+					(isNaN(v["condition-Fear"])?0:parseInt(v["condition-Fear"],10)) +
+					(isNaN(v["condition-Sickened"])?0:parseInt(v["condition-Sickened"],10)) +
+					(isNaN(v["condition-Prone"])?0:parseInt(v["condition-Prone"],10)) +
+					(isNaN(v["condition-Wounds"])?0:parseInt(v["condition-Wounds"],10)) ) +
+				(isNaN(v["condition-Invisible"])?0:parseInt(v["condition-Invisible"],10)) +
+				(isNaN(v["condition-Drained"])?0:parseInt(v["condition-Drained"],10)) +
+				(isNaN(v["acp-attack-mod"])?0:parseInt(v["acp-attack-mod"],10)) ;
+
+				var grapplenote=" ";
+				if (v["condition-Grappled"] != "0") {
+					grapplenote="+"+v["condition-Grappled"]+" grapple";
+				}
+				var curr = parseInt("attk-penalty",10);
+				var setter = {};
+				var set=0;
+				//console.log("AAAAAAAAAAA the values are : "+totpenalty + " vs " + curr+" and note is " + grapplenote);
+				
+				if (curr !== totpenalty) {
+					setter["attk-penalty"]=totpenalty;
+					set=1;
+				}
+
+				if (v["attk-CMB-gnote"] != grapplenote){
+					setter["attk-CMB-gnote"]=grapplenote;
+					set=1;
+				}
+				if (set===1) {
+					setAttrs(setter);
+				}
+
+		});	
+	},
+
+	/* updateAttack
+	 * Updates the attack type totals at top of attack page for one row of grid
+	 *
+	 * @attype = the type of attack: melee, ranged, CMB (case sensitive)
+	 */
+	updateAttack=function(attype) {
+		var modfield=attype+"-ability-mod";
+		var  miscfield="attk-"+attype+"-misc";
+		var  atfield="attk-"+attype;
+		var  bufftype,bufffield;
+		var sizeMult=1;
+		if (attype=="melee") {bufftype="Melee";	}
+		else if (attype=="ranged") {bufftype="Ranged";}
+		else if (attype=="CMB") {
+			bufftype="CMB";
+			atfield="CMB";
+			bufffield="buff_"+bufftype+"-total";
+			sizeMult = -1;  	
+		}
+		else {return;}
+		
+		getAttrs([modfield,bufffield,"bab","size",miscfield,"attk-penalty",atfield],function(v) { 
+			//console.log(v);
+			var tohit = (isNaN(v["bab"])?0:parseInt(v["bab"],10)) +
+			(isNaN(v[modfield])?0:parseInt(v[modfield],10)) +
+			( sizeMult * (isNaN(v["size"])?0:parseInt(v["size"],10)) )+
+			(isNaN(v[miscfield])?0:parseInt(v[miscfield],10)) +
+			(isNaN(v[bufffield])?0:parseInt(v[bufffield],10)) +
+			(isNaN(v["attk-penalty"])?0:parseInt(v["attk-penalty"],10)) ;
+			var curr = parseInt(v[atfield],10);
+			if (tohit !== curr) {
+				var setter={};
+				setter[atfield]=tohit;
+				setAttrs(setter);
+			}
+		});
+	},
+
+
+
+
+
+	/* repeating weapon attack type
+	 * For the dropdown that represents what type of attack (Melee/Ranged/CMB) set the 
+	 *  weapon-attack-type-mod field.
+	 */
+
+	updateRepeatingWeaponAttackType = function() {
+
+		 getAttrs(["repeating_weapon_attack-type","repeating_weapon_attack-type-mod"],function(v) {
+			var tolookfor=v["repeating_weapon_attack-type"];
+			tolookfor= tolookfor.replace("@{","").replace("}","");
+			getAttrs([tolookfor],function(v2){
+				var tohitmod = v2[tolookfor]||0;
+				tohitmod = isNaN(tohitmod)?0:parseInt(tohitmod,10);
+				var currentmod = parseInt( v["repeating_weapon_attack-type-mod"],10);
+				if (isNaN(currentmod) || tohitmod !== currentmod) {
+					setAttrs({"repeating_weapon_attack-type-mod":tohitmod});
+				}
+			});
+		 });
+	},
+
+
+	/* Damage ability dropdown.
+	 */
+
+	updateRepeatingWeaponDamageAbility=function() {
+		 getAttrs(["repeating_weapon_damage-ability","repeating_weapon_damage-ability-mod"],function(v) {
+			var abilityType=v["repeating_weapon_damage-ability"];
+			var tolookfor= findAbilityInString (abilityType);
+			getAttrs([tolookfor],function(v2){
+				var mult = findMultiplier(abilityType);
+				var mod = isNaN(v2[tolookfor])?0:parseInt(v2[tolookfor],10);
+				var tohitmod = mod * mult;
+				var currentmod = parseInt( v["repeating_weapon_attack-type-mod"],10);
+				if (isNaN(currentmod) || tohitmod !== currentmod) {
+					setAttrs({"repeating_weapon_damage-ability-mod":tohitmod});
+				}
+			});
+		 });
+	},
+
+
+	/* updateInit
+	 * updates the init
+	 */
+	updateInit = function () {
+		getAttrs(["condition-Deafened","init-ability-mod","init-trait","init-misc","init"],function(values){
+			var newinit = parseInt(values["init-ability-mod"],10) + parseInt(values["init-trait"],10) + parseInt(values["init-misc"],10) - parseInt(values["condition-Deafened"],10);
+			var curr = parseInt(values["init"],10)||0;
+			if (newinit != curr) {
+				setAttrs({"init":newinit});
+			}
+		});
+	},
+
+
+
+	updateConditionDefensePenalty = function() {
+		getAttrs(["condition-Blinded","condition-Cowering","condition-Stunned","condition-Flat-Footed","condition-Pinned","condition-Wounds","AC-ability-mod","AC-penalty"], function(v) {
+			var debuff=  (isNaN(v["condition-Blinded"])?0:parseInt(v["condition-Blinded"],10)) +
+				(isNaN(v["condition-Pinned"])?0:parseInt(v["condition-Pinned"],10)) +
+				(isNaN(v["condition-Stunned"])?0:parseInt(v["condition-Stunned"],10)) +
+				(isNaN(v["condition-Cowering"])?0:parseInt(v["condition-Cowering"],10)) +
+				(isNaN(v["condition-Wounds"])?0:parseInt(v["condition-Wounds"],10)) ;
+			debuff = debuff * -1;
+			var curr = parseInt(v["AC-penalty"],10);
+			if (curr !== debuff) {
+				setAttrs({"AC-penalty":debuff});
+			}
+		});
+	},
+
+
+	/* updateDefenses
+	 * updates the top grid of AC, Touch AC, Flat Footed AC, CMD, Flat Footed CMD 
+	 * http://paizo.com/pathfinderRPG/prd/coreRulebook/combat.html#combat-maneuver-defense
+	 * A creature can also add any circumstance, deflection, dodge, insight, luck, morale, profane, and sacred bonuses to AC to its CMD. 
+	 * Any penalties to a creature's AC also apply to its CMD
+	  */
+	updateDefenses = function() {
+		getAttrs(["condition-Stunned","condition-Flat-Footed","AC-ability-mod","FF-DEX","AC-penalty","size","max-dex",
+			"AC-dodge","AC-natural","AC=deflect","AC-misc","buff_AC-total","CMD-DEX","FF-CMD-DEX","CMD-STR","bab","CMD-misc",
+			"AC","Touch","Flat-Footed","CMD","FF-CMD","AC-ability","AC-armor","AC-shield"], function(v) {
+			//console.log("AAAAAAAAAAAAt update defenses");
+			//console.log(v);
+			var size= parseInt(v["size"],10)||0,
+				dodge =parseInt(v["AC-dodge"],10)||0,
+				deflect=parseInt(v["AC-deflect"],10)||0,
+				miscAC=parseInt(v["AC-misc"],10)||0,
+				condPenalty=parseInt(v["AC-penalty"],10)||0,
+				buffs=parseInt(v["buff_AC-total"],10)||0,
+				armor=parseInt(v["AC-armor"],10)||0,
+				shield=parseInt(v["AC-shield"],10)||0,
+				natural=parseInt(v["AC-natural"],10)||0,
+				bab=parseInt(v["bab"],10)||0,
+				miscCMD=parseInt(v["CMD-misc"],10)||0,
+				stunned = (v["condition-Stunned"]!="0" ? 1 : 0),
+				ffed=(v["condition-Flat-Footed"]!="0" ? 1 : 0);
+			var maxDex=parseInt(v["max-dex"],10);
+				maxDex=isNaN(maxDex)?99:maxDex; //cannot do "or 0" since 0 is valid but falsy
+			var ability=parseInt(v["AC-ability-mod"],10)||0,
+				ffAbility=parseInt(v["FF-DEX"],10)||0,
+				cmdAbility1=parseInt(v["CMD-STR"],10)||0,
+				cmdAbility2=parseInt(v["CMD-DEX"],10)||0,
+				cmdFFAbility2=parseInt(v["FF-CMD-DEX"],10)||0;
+			//console.log("size:"+size+", dodge:"+dodge+", misc:"+miscAC+", def:"+deflect+", cond:"+condPenalty+", buff:"+buffs+", armor:"+armor+", shield:"+shield+
+			//  ", natural:"+natural+", bab:"+bab+", miscCMD:"+miscCMD+", maxDex:"+maxDex+", stunned:"+stunned+", ffed:"+ffed+", ability:"+ability+
+			//  ", ffAbility:"+ffAbility+", cmdAbility1:"+cmdAbility1+",cmdAbility2:"+cmdAbility2+", cmdFFAbility2:"+cmdFFAbility2);
+			if (findAbilityInString(v["AC-ability"]) == "DEX-mod" && maxDex < 99 && maxDex >=0 )
+			{
+				ability = Math.min(ability,maxDex);
+				ffAbility = Math.min(ffAbility,maxDex);
 			}
 
-			if (v["attk-CMB-gnote"] != grapplenote){
-				setter["attk-CMB-gnote"]=grapplenote;
-				set=1;
+			//why bother doing this when flat footed is on sheet? maybe macros use it?
+			if (stunned ===1 || ffed === 1) {
+				ability=ffAbility;
+				cmdAbility2=cmdFFAbility2;
 			}
+
+				
+			var ac = 10+ armor+shield+natural+size+dodge + ability  +deflect+miscAC+condPenalty +buffs;
+			var touch= 10+size+dodge+ability+deflect+miscCMD+condPenalty;
+			var ff=10+armor+shield+natural+size+ffAbility+deflect+miscAC+condPenalty+buffs +   ( ffAbility >0?dodge:0  ) ;
+			var cmd = 10+bab+cmdAbility1+cmdAbility2+ (-1*size) +dodge+deflect+miscCMD+condPenalty+buffs;
+			var cmdFF = 10+bab+cmdAbility1+cmdFFAbility2+ (-1*size) +deflect+miscCMD+condPenalty+buffs+( cmdFFAbility2 >0 ? dodge:0  ) ;
+			
+			var currAC= isNaN(v["AC"])?10:parseInt(v["AC"],10);
+			var currTouch= isNaN(v["Touch"])?10:parseInt(v["Touch"],10);
+			var currFF= isNaN(v["Flat-Footed"])?10:parseInt(v["Flat-Footed"],10);
+			var currCMD = isNaN(v["CMD"])?10:parseInt(v["CMD"],10);
+			var currCMDFF = isNaN(v["FF-CMD"])?10:parseInt(v["FF-CMD"],10);
+			setter={};
+			set=0;
+			if (ac !== currAC) {setter["AC"]=ac;set=1;}
+			if (touch !== currTouch) {setter["Touch"]=touch;set=1;}
+			if (ff !== currFF) {setter["Flat-Footed"]=ff;set=1;}
+			if (cmd !== currCMD) {setter["CMD"]=cmd;set=1;}
+			if (cmdFF !== currCMDFF) {setter["FF-CMD"]=cmd;set=1;}
 			if (set===1) {
 				setAttrs(setter);
 			}
-
- 	});	
-};
-
-/* updateAttack
- * Updates the attack type totals at top of attack page for one row of grid
- *
- * @attype = the type of attack: melee, ranged, CMB (case sensitive)
- */
-var updateAttack=function(attype) {
-	var modfield=attype+"-ability-mod";
-	var  miscfield="attk-"+attype+"-misc";
-	var  atfield="attk-"+attype;
-	var  bufftype,bufffield;
-    var sizeMult=1;
-	if (attype=="melee") {bufftype="Melee";	}
-	else if (attype=="ranged") {bufftype="Ranged";}
-	else if (attype=="CMB") {
-		bufftype="CMB";
-		atfield="CMB";
-		bufffield="buff_"+bufftype+"-total";
-        sizeMult = -1;  	
-	}
-    else {return;}
-	
-	getAttrs([modfield,bufffield,"bab","size",miscfield,"attk-penalty",atfield],function(v) { 
-	console.log(v);
-		var tohit = (isNaN(v["bab"])?0:parseInt(v["bab"],10)) +
-		(isNaN(v[modfield])?0:parseInt(v[modfield],10)) +
-		( sizeMult * (isNaN(v["size"])?0:parseInt(v["size"],10)) )+
-		(isNaN(v[miscfield])?0:parseInt(v[miscfield],10)) +
-		(isNaN(v[bufffield])?0:parseInt(v[bufffield],10)) +
-		(isNaN(v["attk-penalty"])?0:parseInt(v["attk-penalty"],10)) ;
-		var curr = parseInt(v[atfield],10);
-		if (tohit !== curr) {
-			var setter={};
-			setter[atfield]=tohit;
-			setAttrs(setter);
-		}
-    });
-};
-
-
-
-
-
-/* repeating weapon attack type
- * For the dropdown that represents what type of attack (Melee/Ranged/CMB) set the 
- *  weapon-attack-type-mod field.
- */
-
-var updateRepeatingWeaponAttackType = function() {
-
-     getAttrs(["repeating_weapon_attack-type","repeating_weapon_attack-type-mod"],function(v) {
-        var tolookfor=v["repeating_weapon_attack-type"];
-        tolookfor= tolookfor.replace("@{","").replace("}","");
-        getAttrs([tolookfor],function(v2){
-			var tohitmod = v2[tolookfor]||0;
-			tohitmod = isNaN(tohitmod)?0:parseInt(tohitmod,10);
-			var currentmod = parseInt( v["repeating_weapon_attack-type-mod"],10);
-			if (isNaN(currentmod) || tohitmod !== currentmod) {
-				setAttrs({"repeating_weapon_attack-type-mod":tohitmod});
-			}
-        });
-     });
-};
-
-
-/* Damage ability dropdown.
- */
-
-var updateRepeatingWeaponDamageAbility=function() {
-     getAttrs(["repeating_weapon_damage-ability","repeating_weapon_damage-ability-mod"],function(v) {
-        var abilityType=v["repeating_weapon_damage-ability"];
-        var tolookfor= findAbilityInString (abilityType);
-        getAttrs([tolookfor],function(v2){
-			var mult = findMultiplier(abilityType);
-			var mod = isNaN(v2[tolookfor])?0:parseInt(v2[tolookfor],10);
-			var tohitmod = mod * mult;
-			var currentmod = parseInt( v["repeating_weapon_attack-type-mod"],10);
-			if (isNaN(currentmod) || tohitmod !== currentmod) {
-				setAttrs({"repeating_weapon_damage-ability-mod":tohitmod});
-			}
-        });
-     });
-};
-
-
-/* updateInit
- * updates the init
- */
-var updateInit = function () {
-    console.log("IIIIIIIIIIIIII init");
-	getAttrs(["condition-Deafened","init-ability-mod","init-trait","init-misc","init"],function(values){
-		var newinit = parseInt(values["init-ability-mod"],10) + parseInt(values["init-trait"],10) + parseInt(values["init-misc"],10) - parseInt(values["condition-Deafened"],10);
-		var curr = parseInt(values["init"],10);
-		if (isNaN(curr) || newinit != curr) {
-			setAttrs({"init":newinit});
-		}
-	});
-};
-
-
-
-updateConditionDefensePenalty = function() {
-	getAttrs(["condition-Blinded","condition-Cowering","condition-Stunned","condition-Flat-Footed","condition-Pinned","condition-Wounds","AC-ability-mod","AC-penalty"], function(v) {
-		var debuff=  (isNaN(v["condition-Blinded"])?0:parseInt(v["condition-Blinded"],10)) +
-			(isNaN(v["condition-Pinned"])?0:parseInt(v["condition-Pinned"],10)) +
-			(isNaN(v["condition-Stunned"])?0:parseInt(v["condition-Stunned"],10)) +
-			(isNaN(v["condition-Cowering"])?0:parseInt(v["condition-Cowering"],10)) +
-			(isNaN(v["condition-Wounds"])?0:parseInt(v["condition-Wounds"],10)) ;
-		debuff = debuff * -1;
-		var curr = parseInt(v["AC-penalty"],10);
-		if (curr !== debuff) {
-			setAttrs({"AC-penalty":debuff});
-		}
-	});
-};
-
-
-/* updateDefenses
- * updates the top grid of AC, Touch AC, Flat Footed AC, CMD, Flat Footed CMD 
- * http://paizo.com/pathfinderRPG/prd/coreRulebook/combat.html#combat-maneuver-defense
- * A creature can also add any circumstance, deflection, dodge, insight, luck, morale, profane, and sacred bonuses to AC to its CMD. 
- * Any penalties to a creature's AC also apply to its CMD
-  */
-var updateDefenses = function() {
-    getAttrs(["condition-Stunned","condition-Flat-Footed","AC-ability-mod","FF-DEX","AC-penalty","size","max-dex",
-		"AC-dodge","AC-natural","AC=deflect","AC-misc","buff_AC-total","CMD-DEX","FF-CMD-DEX","CMD-STR","bab","CMD-misc",
-		"AC","Touch","Flat-Footed","CMD","FF-CMD","AC-ability","AC-armor","AC-shield"], function(v) {
-		console.log("AAAAAAAAAAAAt update defenses");
-		console.log(v);
-		var size= parseInt(v["size"],10)||0,
-			dodge =parseInt(v["AC-dodge"],10)||0,
-			deflect=parseInt(v["AC-deflect"],10)||0,
-			miscAC=parseInt(v["AC-misc"],10)||0,
-			condPenalty=parseInt(v["AC-penalty"],10)||0,
-			buffs=parseInt(v["buff_AC-total"],10)||0,
-			armor=parseInt(v["AC-armor"],10)||0,
-			shield=parseInt(v["AC-shield"],10)||0,
-			natural=parseInt(v["AC-natural"],10)||0,
-			bab=parseInt(v["bab"],10)||0,
-			miscCMD=parseInt(v["CMD-misc"],10)||0,
-			stunned = (v["condition-Stunned"]!="0" ? 1 : 0),
-			ffed=(v["condition-Flat-Footed"]!="0" ? 1 : 0);
-    	var maxDex=parseInt(v["max-dex"],10);
-			maxDex=isNaN(maxDex)?99:maxDex; //cannot do "or 0" since 0 is valid but falsy
-		var ability=parseInt(v["AC-ability-mod"],10)||0,
-			ffAbility=parseInt(v["FF-DEX"],10)||0,
-			cmdAbility1=parseInt(v["CMD-STR"],10)||0,
-			cmdAbility2=parseInt(v["CMD-DEX"],10)||0,
-			cmdFFAbility2=parseInt(v["FF-CMD-DEX"],10)||0;
-		console.log("size:"+size+", dodge:"+dodge+", misc:"+miscAC+", def:"+deflect+", cond:"+condPenalty+", buff:"+buffs+", armor:"+armor+", shield:"+shield+
-		  ", natural:"+natural+", bab:"+bab+", miscCMD:"+miscCMD+", maxDex:"+maxDex+", stunned:"+stunned+", ffed:"+ffed+", ability:"+ability+
-		  ", ffAbility:"+ffAbility+", cmdAbility1:"+cmdAbility1+",cmdAbility2:"+cmdAbility2+", cmdFFAbility2:"+cmdFFAbility2);
-		if (findAbilityInString(v["AC-ability"]) == "DEX-mod" && maxDex < 99)
-		{
-			ability = Math.min(ability,maxDex);
-			ffAbility = Math.min(ffAbility,maxDex);
-		}
-
-		//why bother doing this when flat footed is on sheet? maybe macros use it?
-		if (stunned ===1 || ffed === 1) {
-			ability=ffAbility;
-			cmdAbility2=cmdFFAbility2;
-		}
-
 			
-		var ac = 10+ armor+shield+natural+size+dodge + ability  +deflect+miscAC+condPenalty +buffs;
-		var touch= 10+size+dodge+ability+deflect+miscCMD+condPenalty;
-		var ff=10+armor+shield+natural+size+ffAbility+deflect+miscAC+condPenalty+buffs +   ( ffAbility >0?dodge:0  ) ;
-		var cmd = 10+bab+cmdAbility1+cmdAbility2+ (-1*size) +dodge+deflect+miscCMD+condPenalty+buffs;
-		var cmdFF = 10+bab+cmdAbility1+cmdFFAbility2+ (-1*size) +deflect+miscCMD+condPenalty+buffs+( cmdFFAbility2 >0 ? dodge:0  ) ;
-		
-		var currAC= isNaN(v["AC"])?10:parseInt(v["AC"],10);
-		var currTouch= isNaN(v["Touch"])?10:parseInt(v["Touch"],10);
-		var currFF= isNaN(v["Flat-Footed"])?10:parseInt(v["Flat-Footed"],10);
-		var currCMD = isNaN(v["CMD"])?10:parseInt(v["CMD"],10);
-		var currCMDFF = isNaN(v["FF-CMD"])?10:parseInt(v["FF-CMD"],10);
-		setter={};
-		set=0;
-		if (ac !== currAC) {setter["AC"]=ac;set=1;}
-		if (touch !== currTouch) {setter["Touch"]=touch;set=1;}
-		if (ff !== currFF) {setter["Flat-Footed"]=ff;set=1;}
-		if (cmd !== currCMD) {setter["CMD"]=cmd;set=1;}
-		if (cmdFF !== currCMDFF) {setter["FF-CMD"]=cmd;set=1;}
-		if (set===1) {
-			setAttrs(setter);
+		});
+	},
+
+
+
+	updateRepeatingWeapon=function() {
+	   getAttrs([
+			"repeating_weapon_enhance","repeating_weapon_masterwork","repeating_weapon_attack-type-mod","repeating_weapon_proficiency","repeating_weapon_attk-effect-total-other",
+			"repeating_weapon_damage-ability-mod","repeating_weapon_dmg-effect-total-other","repeating_weapon_buff_DMG-total_display","buff_DMG-total",
+			"repeating_weapon_attack","repeating_weapon_damage",
+			"repeating_weapon_total-attack","repeating_weapon_total-damage"
+		],function(v) {
+			//console.log("FFFFFFFFFF inside getAttrs");
+			//console.log(v);
+			//basetohit includes buff and ability mod already
+			var basetohit=v["repeating_weapon_attack-type-mod"]||0;basetohit=isNaN(basetohit)?0:parseInt(basetohit,10);
+			var dmgBuff=v["buff_DMG-total"]||0;dmgBuff=isNaN(dmgBuff)?0:parseInt(dmgBuff,10);
+			var attackMod=v.repeating_weapon_attack||0;attackMod=isNaN(attackMod)?0:parseInt(attackMod,10);
+			var enhance=v.repeating_weapon_enhance||0;enhance=isNaN(enhance)?0:parseInt(enhance,10);
+			var masterwork=v.repeating_weapon_masterwork||0;masterwork=isNaN(masterwork)?0:parseInt(masterwork,10);
+			var attackOther=v["repeating_weapon_attk-effect-total-other"]||0;attackOther=isNaN(attackOther)?0:parseInt(attackOther,10);
+			var proficient=v.repeating_weapon_proficiency||0;proficient=isNaN(proficient)?0:parseInt(proficient,10);
+			var abilityMod=v["repeating_weapon_damage-ability-mod"]||0;abilityMod=isNaN(abilityMod)?0:parseInt(abilityMod,10);
+			var damageMod=v.repeating_weapon_damage||0;damageMod=isNaN(damageMod)?0:parseInt(damageMod,10);
+			var damageOther=v["repeating_weapon_dmg-effect-total-other"]||0;damageOther=isNaN(damageOther)?0:parseInt(damageOther,10);
+			var dmgBuffRepeat=v["repeating_weapon_buff_DMG-total"]||0;dmgBuffRepeat=isNaN(dmgBuffRepeat)?0:parseInt(dmgBuffRepeat,10);
+			var currentATTKmod=v["repeating_weapon_total-attack"]||0;currentATTKmod=isNaN(currentATTKmod)?0:parseInt(currentATTKmod,10);
+			var currentDMGmod=v["repeating_weapon_total-damage"]||0;currentDMGmod=isNaN(currentDMGmod)?0:parseInt(currentDMGmod,10);
+
+			var tohit = basetohit + Math.max(enhance,masterwork) + attackMod + proficient + attackOther ;
+			var dmg = abilityMod + damageMod + damageOther + dmgBuff + enhance;
+			//console.log("base:"+basetohit+", mwk:"+masterwork+", prof:"+proficient+", enh:"+enhance+", att o: " + attackOther+", dmg o:"+damageOther +", buff:" + dmgBuff + ",buffrep:"+ dmgBuffRepeat+", atmod:" + attackMod +", dmod:"+damageMod);;
+			//console.log("new hit is "+tohit + "new dmg is " +dmg);
+			//console.log ("oldhit: "+currentATTKmod+", olddmg:"+currentDMGmod);
+			
+			var setter={};
+			var set=0;
+			if ( tohit !== currentATTKmod) {  setter["repeating_weapon_total-attack"] = tohit; set=1;  }
+			if (dmg !== currentDMGmod)  {  setter["repeating_weapon_total-damage"] = dmg;   set=1; }
+			if (dmgBuff !== dmgBuffRepeat) {   setter["repeating_weapon_buff_DMG-total_display"] = dmgBuff;  set=1; }
+			if (set===1) { setAttrs(setter); }
+		});
+	},
+
+
+
+	/*updateArmor
+	 * updates total AC and penalty and max dex
+	 * if not proficient sets attack penalty
+	 * for backward compatiblity, proficiency is string and 0 is proficient, anything else non proficient
+	 */
+	updateArmor=function(){
+		getAttrs(["shield-equipped", "shield-acbonus", "shield-max-dex", "shield-acp", "shield-spell-fail", "shield-proficiency",
+		 "shield2-equipped", "shield2-acbonus", "shield2-max-dex", "shield2-acp", "shield2-spell-fail", "shield2-proficiency",
+		 "armor-equipped", "armor-acbonus", "armor-max-dex", "armor-acp", "armor-spell-fail", "armor-proficiency",
+		 "armor2-equipped", "armor2-acbonus", "armor2-max-dex", "armor2-acp", "armor2-spell-fail", "armor2-proficiency",
+		 "acp","max-dex","AC-armor","AC-shield","spell-fail","acp-attack-mod" ], function(v)    {
+		 //console.log(v);
+		 var acp=0,maxDex=99,acA=0,acS=0,sp=0,atk=0;
+		 var subAC=0,subD=0,subAcp=0,prof=0,subsp=0;
+		 if (v["armor-equipped"]==1 ) {
+			 subAC=parseInt(v["armor-acbonus"],10)||0;
+			 subD=parseInt(v["armor-max-dex"],10);subD=isNaN(subD)?99:subD; //cannot do "or 0" since 0 is valid but falsy
+			 subAcp=parseInt(v["armor-acp"],10)||0;
+			 prof=parseInt(v["armor-proficiency"],10);prof=isNaN(prof)?1:prof;
+			 subsp=parseInt(v["armor-spell-fail"],10)||0;
+			 acA+=subAC;
+			 maxDex = Math.min(subD,maxDex);
+			 acp+=subAcp;
+			 sp+=subsp;
+			 if(prof===1) {atk+=subAcp; }
+			 //console.log("the proficiency is " + prof + " and attack penalty: " + atk);
+		 }
+		 if (v["armor2-equipped"]==1 ) {
+			 subAC=parseInt(v["armor2-acbonus"],10)||0;
+			 subD=parseInt(v["armor2-max-dex"],10);subD=isNaN(subD)?99:subD; //cannot do "or 0" since 0 is valid but falsy
+			 subAcp=parseInt(v["armor2-acp"],10)||0;
+			 prof=parseInt(v["armor2-proficiency"],10);prof=isNaN(prof)?1:prof;
+			 subsp=parseInt(v["armor2-spell-fail"],10)||0;
+			 acA+=subAC;
+			 maxDex = Math.min(subD,maxDex);
+			 acp+=subAcp;
+			 sp+=subsp;
+			 if(prof===1) {atk+=subAcp;}
+		 }
+		 if (v["shield-equipped"]==1 ) {
+			 subAC=parseInt(v["shield-acbonus"],10)||0;
+			 subD=parseInt(v["shield-max-dex"],10);subD=isNaN(subD)?99:subD; //cannot do "or 0" since 0 is valid but falsy
+			 subAcp=parseInt(v["shield-acp"],10)||0;
+			 prof=parseInt(v["shield-proficiency"],10);prof=isNaN(prof)?1:prof;
+			 subsp=parseInt(v["shield-spell-fail"],10)||0;
+			 acS+=subAC;
+			 maxDex = Math.min(subD,maxDex);
+			 acp+=subAcp;
+			 sp+=subsp;
+			 if(prof===1) {atk+=subAcp;}
+		 }
+		 if (v["shield2-equipped"]==1 ) {
+			 subAC=parseInt(v["shield2-acbonus"],10)||0;
+			 subD=parseInt(v["shield2-max-dex"],10);subD=isNaN(subD)?99:subD; //cannot do "or 0" since 0 is valid but falsy
+			 subAcp=parseInt(v["shield2-acp"],10)||0;
+			 prof=parseInt(v["shield2-proficiency"],10);prof=isNaN(prof)?1:prof;
+			 subsp=parseInt(v["shield2-spell-fail"],10)||0;
+			 acS+=subAC;
+			 maxDex = Math.min(subD,maxDex);
+			 acp+=subAcp;
+			 sp+=subsp;
+			 if(prof===1) {atk+=subAcp;}
+		 }
+		 
+		 var currACP=parseInt(v.acp,10)||0;
+		 var currMaxDex=parseInt(v["max-dex"],10);
+		 currMaxDex=isNaN(currMaxDex)?99:currMaxDex;
+		 var currACArmor=parseInt(v["AC-armor"],10)||0;
+		 var currACShield=parseInt(v["AC-shield"],10)||0;
+		 var currSpellFail=parseInt(v["spell-fail"],10)||0;
+		 var currAtkMod=parseInt(v["acp-attack-mod"],10)||0;
+
+		 //console.log(v);
+		 //console.log("curr atk mod:"+currAtkMod+", curr acp:"+currACP+", new acp:"+acp+", currMaxDex:"+currMaxDex+", new maxdex:"+maxDex);
+		 var setit=0;
+		 var setter={};
+		 if (currACP!==acp){setter["acp"]=acp;setit=1;}
+		 if (currMaxDex!==maxDex){setter["max-dex"]=maxDex;setit=1;}
+		 if (currACArmor!==acA){setter["AC-armor"]=acA;setit=1;}
+		 if (currACShield!==acS){setter["AC-shield"]=acS;setit=1;}
+		 if (currSpellFail!==sp){setter["spell-fail"]=sp;setit=1;}
+		 if (currAtkMod!==atk){setter["acp-attack-mod"]=atk;setit=1;}
+		 if (setit===1) {
+			 setAttrs(setter);
+		 }
+	 });
+	},
+
+
+		 
+	recalculateSheet = function() {
+
+		updateBuffRow("1");
+		updateBuffRow("2");
+		updateBuffRow("3");
+		updateBuffRow("4");
+		updateBuffRow("5");
+		updateBuffRow("6");
+		updateBuffRow("7");
+		updateBuffRow("8");
+		updateBuffRow("9");
+		updateBuffRow("10");
+		updateAbility("STR"); 
+		updateAbility("DEX"); 
+		updateAbility("CON"); 
+		updateAbility("INT"); 
+		updateAbility("WIS"); 
+		updateAbility("CHA"); 
+		updateHP();
+		updateTempHP();
+		updateClassInformation("hp");
+		updateClassInformation("skill");
+		updateClassInformation("bab");
+		updateClassInformation("Fort");
+		updateClassInformation("Ref");
+		updateClassInformation("Will");
+		updateClassInformation("level");
+		updateClassInformation("");
+		handleDropdown("AC-ability",["AC-ability-mod"],99,"DEX-mod");
+		handleDropdown("FF-ability",["FF-DEX"],99,"");
+		handleDropdown("CMD-ability1",["CMD-STR"],-1,"STR-mod");
+		handleDropdown("CMD-ability2",["CMD-DEX"],99,"DEX-mod");
+		handleDropdown("CMD-ability",["FF-CMD-DEX"],99,"");
+		handleDropdown("melee-ability",["melee-ability-mod"],-1,"STR-mod");
+		handleDropdown("ranged-ability",["ranged-ability-mod"],-1,"DEX-mod");
+		handleDropdown("CMB-ability",["CMB-ability-mod"],-1,"STR-mod");
+		updateArmor();	
+		updateConditionDefensePenalty();
+		updateDefenses();
+		updateConditionAttackPenalty();
+		updateAttack("melee");
+		updateAttack("ranged");
+		updateAttack("CMB");
+		updateInit();
+		updateSave("Fort");
+		updateSave("Ref");
+		updateSave("Will");
+	},
+
+	updateConditionsSavePenalty =function() {
+		getAttrs(["condition-Fear","condition-Sickened","condition-Drained","condition-Wounds","saves-cond"],function(v){
+			var fear = parseInt(v["condition-Fear"],10)||0,
+				sickened = parseInt(v["condition-Sickened"],10)||0,
+				wounds=parseInt(v["condition-Drained"],10)||0,
+				drained=parseInt(v["condition-Wounds"],10)||0,
+				currCond=parseInt(v["saves-cond"],10)||0;
+			var newCond = drained - fear -sickened - wounds;
+			if (currCond !== newCond) {
+				setAttrs({"saves-cond":newCond});
+			}
+		});
+	},
+
+
+
+	/* cond instead of temp*/
+	updateSave = function(save) {
+		var getFields = ["total-"+save,save+"-ability-mod",save+"-trait",save+"-enhance",save+"-resist",save+"-misc","saves-cond","buff_"+save+"-total",save];
+		getAttrs(getFields,function(v) {
+			var currSave=parseInt(v[save],10)||0;
+			var newSave = (parseInt(v["total-"+save] ,10)||0) +
+					 (parseInt(v[save+"-ability-mod"] ,10)||0) +
+					 (parseInt(v[save+"-trait"] ,10)||0) +
+					 (parseInt(v[save+"-enhance"] ,10)||0) +
+					 (parseInt(v[save+"-resist"] ,10)||0) +
+					 (parseInt(v[save+"-misc"] ,10)||0) +
+					 (parseInt(v["saves-cond"] ,10)||0) +
+					 (parseInt(v["buff_"+save+"-total"] ,10)||0);
+			var setter={};
+			if(currSave !== newSave) {
+				setter[save]=newSave;
+				setAttrs(setter);
+			}
+		});
+	};
+  return {
+		updateGrapple:updateGrapple,
+		updatePin:updatePin,
+		updateAbility:updateAbility,
+		updateBuff:updateBuff,
+		updateBuffRow:updateBuffRow,
+		updateBuffColumn:updateBuffColumn,
+		updateHP:updateHP,
+		updateTempHP:updateTempHP,
+		updateClassInformation:updateClassInformation,
+		findAbilityInString:findAbilityInString,
+		findMultiplier:findMultiplier,
+		getDropdownVal:getDropdownVal,
+		handleDropdown:handleDropdown,
+		handleDropdown:handleDropdown,
+		updateConditionAttackPenalty:updateConditionAttackPenalty,
+		updateAttack:updateAttack,
+		updateRepeatingWeaponAttackType:updateRepeatingWeaponAttackType,
+		updateRepeatingWeaponDamageAbility:updateRepeatingWeaponDamageAbility,
+		updateInit:updateInit,
+		updateDefenses:updateDefenses,
+		updateRepeatingWeapon:updateRepeatingWeapon,
+		updateArmor:updateArmor,
+		recalculateSheet:recalculateSheet,
+		updateConditionsSavePenalty:updateConditionsSavePenalty,
+		updateSave:updateSave
+    };	
+}());
+	
+var SWUtils = SWUtils || (function() {	
+	'use strict';
+	
+	/* evaluateFields
+	 * Examines a string for instances of @{fieldname}, and then searches the sheet for those values 
+	 * then replaces the intances in the string with the values of those fields.
+	 * Because it is a search and replace, if there are no @{fieldname} values, then it will return the same string back.
+	 * If there is an error, it will return an empty string "".
+	 *
+	 * @fromfield = string containing one or more @{fieldname}
+	 * @callback = method accepting 1 parameter , this parameter will be the result of the search and replace in the fromfield.
+	 */
+	var evaluateFields = function(fromfield, callback) {
+		if (typeof callback !== "function") {
+			return;
 		}
-		
-	});
-};
+		if (! fromfield ) {
+			callback("");
+			return;
+		}
+		try {
+			var i,numfields,fieldnames=[],matches = [];
+			matches = fromfield.match(/(@\{([^}]+)\})(?!.*\1)/g);
+			if (typeof matches == "undefined" || matches==null) {
+				callback (fromfield);
+				return;
+			}
+			numfields=matches.length;
+
+			fieldnames=[numfields];
+			for (i=0;i<numfields;i++) {
+				fieldnames[i]=matches[i].replace("@{","").replace("}","");
+			}
+			getAttrs(fieldnames,function(values){
+				var evalstr=fromfield;
+				try {
+					var replacements=[numfields];
+					for (i=0;i<numfields;i++){
+						replacements[i]=values[fieldnames[i]];
+					}
+					for (i=0;i<numfields;i++){
+						evalstr = evalstr.replace(matches[i],replacements[i]);
+					}
+				} catch (err) {
+					console.log("ERROR:" + err);
+					evalstr="";
+				} finally {
+					callback ( evalstr);
+				}
+			});
+		} catch (err){
+			console.log("ERROR: " + err);
+			callback (fromfield);
+		} 
+	},
+
+
+	/* evaluateAndSet
+	 * Searches the readField for any instances of @{field} and replaces them with the value
+	 * calls evaluateFields, if it returns null (error) then don't update writeField
+	 * 
+	 * @readField = the field that contains the string to evaluate, like a field containing a macro
+	 * @writeField = the field to write the evaluated value of readField to
+	*/
+	evaluateAndSet = function (readField,writeField) {
+		if (typeof writeField === "undefined" || writeField == null || 
+			typeof readField === "undefined" || readField == null) {
+			return;
+		}
+		getAttrs([readField],function(values) {
+			evaluateFields(values[readField], function(valueOf) {
+				if (typeof valueOf != "undefined" && valueOf != null && valueOf.length > 0) {
+					var setter = {};
+					setter[writeField]=valueOf;
+					setAttrs(setter);
+				}
+			});
+		});
+	};
+
+
+    return {
+		evaluateFields:evaluateFields,
+		evaluateAndSet:evaluateAndSet
+    };
+}());
+	
+	
+
+
+//Abilities and total buffs to them
+on("change:str-base change:str-enhance change:str-misc change:str-temp change:str-damage change:str-penalty change:str-drain change:buff_str-total", function() { PFSheet.updateAbility("STR"); });
+on("change:dex-base change:dex-enhance change:dex-misc change:dex-temp change:dex-damage change:dex-penalty change:dex-drain change:buff_dex-total", function() { PFSheet.updateAbility("DEX"); });
+on("change:con-base change:con-enhance change:con-misc change:con-temp change:con-damage change:con-penalty change:con-drain change:buff_con-total", function() { PFSheet.updateAbility("CON"); });
+on("change:int-base change:int-enhance change:int-misc change:int-temp change:int-damage change:int-penalty change:int-drain change:buff_int-total", function() { PFSheet.updateAbility("INT"); });
+on("change:wis-base change:wis-enhance change:wis-misc change:wis-temp change:wis-damage change:wis-penalty change:wis-drain change:buff_wis-total", function() { PFSheet.updateAbility("WIS"); });
+on("change:cha-base change:cha-enhance change:cha-misc change:cha-temp change:cha-damage change:cha-penalty change:cha-drain change:buff_cha-total", function() { PFSheet.updateAbility("CHA"); });
+
+//Buffs - columns
+on("change:buff1_str change:buff2_str change:buff3_str change:buff4_str change:buff5_str change:buff6_str change:buff7_str change:buff8_str change:buff9_str change:buff10_str", function() { PFSheet.updateBuffColumn("STR"); });
+on("change:buff1_dex change:buff2_dex change:buff3_dex change:buff4_dex change:buff5_dex change:buff6_dex change:buff7_dex change:buff8_dex change:buff9_dex change:buff10_dex", function() { PFSheet.updateBuffColumn("DEX"); });
+on("change:buff1_con change:buff2_con change:buff3_con change:buff4_con change:buff5_con change:buff6_con change:buff7_con change:buff8_con change:buff9_con change:buff10_con", function() { PFSheet.updateBuffColumn("CON"); });
+on("change:buff1_int change:buff2_int change:buff3_int change:buff4_int change:buff5_int change:buff6_int change:buff7_int change:buff8_int change:buff9_int change:buff10_int", function() { PFSheet.updateBuffColumn("INT"); });
+on("change:buff1_wis change:buff2_wis change:buff3_wis change:buff4_wis change:buff5_wis change:buff6_wis change:buff7_wis change:buff8_wis change:buff9_wis change:buff10_wis", function() { PFSheet.updateBuffColumn("WIS"); });
+on("change:buff1_cha change:buff2_cha change:buff3_cha change:buff4_cha change:buff5_cha change:buff6_cha change:buff7_cha change:buff8_cha change:buff9_cha change:buff10_cha", function() { PFSheet.updateBuffColumn("CHA"); });
+on("change:buff1_melee change:buff2_melee change:buff3_melee change:buff4_melee change:buff5_melee change:buff6_melee change:buff7_melee change:buff8_melee change:buff9_melee change:buff10_melee", function() { PFSheet.updateBuffColumn("Melee"); });
+on("change:buff1_ranged change:buff2_ranged change:buff3_ranged change:buff4_ranged change:buff5_ranged change:buff6_ranged change:buff7_ranged change:buff8_ranged change:buff9_ranged change:buff10_ranged", function() { PFSheet.updateBuffColumn("Ranged"); });
+on("change:buff1_dmg change:buff2_dmg change:buff3_dmg change:buff4_dmg change:buff5_dmg change:buff6_dmg change:buff7_dmg change:buff8_dmg change:buff9_dmg change:buff10_dmg", function() { PFSheet.updateBuffColumn("DMG"); });
+on("change:buff1_ac change:buff2_ac change:buff3_ac change:buff4_ac change:buff5_ac change:buff6_ac change:buff7_ac change:buff8_ac change:buff9_ac change:buff10_ac", function() { PFSheet.updateBuffColumn("AC"); });
+on("change:buff1_hp-temp change:buff2_hp-temp change:buff3_hp-temp change:buff4_hp-temp change:buff5_hp-temp change:buff6_hp-temp change:buff7_hp-temp change:buff8_hp-temp change:buff9_hp-temp change:buff10_hp-temp", function() { PFSheet.updateBuffColumn("HP-temp"); });
+on("change:buff1_fort change:buff2_fort change:buff3_fort change:buff4_fort change:buff5_fort change:buff6_fort change:buff7_fort change:buff8_fort change:buff9_fort change:buff10_fort", function() { PFSheet.updateBuffColumn("Fort"); });
+on("change:buff1_ref change:buff2_ref change:buff3_ref change:buff4_ref change:buff5_ref change:buff6_ref change:buff7_ref change:buff8_ref change:buff9_ref change:buff10_ref", function() { PFSheet.updateBuffColumn("Ref"); });
+on("change:buff1_will change:buff2_will change:buff3_will change:buff4_will change:buff5_will change:buff6_will change:buff7_will change:buff8_will change:buff9_will change:buff10_will", function() { PFSheet.updateBuffColumn("Will"); });
+
+
+//Buffs - rows
+on("change:buff1_toggle", function() { PFSheet.updateBuffRow("1");});
+on("change:buff2_toggle", function() { PFSheet.updateBuffRow("2");});
+on("change:buff3_toggle", function() { PFSheet.updateBuffRow("3");});
+on("change:buff4_toggle", function() { PFSheet.updateBuffRow("4");});
+on("change:buff5_toggle", function() { PFSheet.updateBuffRow("5");});
+on("change:buff6_toggle", function() { PFSheet.updateBuffRow("6");});
+on("change:buff7_toggle", function() { PFSheet.updateBuffRow("7");});
+on("change:buff8_toggle", function() { PFSheet.updateBuffRow("8");});
+on("change:buff9_toggle", function() { PFSheet.updateBuffRow("9");});
+on("change:buff10_toggle", function() { PFSheet.updateBuffRow("10");});
+
+//Buffs - cells
+on("change:buff1_melee_macro-text", function() { getAttrs(["buff1_Toggle"], function (v){ if (v.buff1_Toggle == "1"){PFSheet.updateBuff("Melee","1");}});});
+on("change:buff1_ranged_macro-text", function() { getAttrs(["buff1_Toggle"], function (v){ if (v.buff1_Toggle == "1"){PFSheet.updateBuff("Ranged","1");}});});
+on("change:buff1_dmg_macro-text", function() { getAttrs(["buff1_Toggle"], function (v){ if (v.buff1_Toggle == "1"){PFSheet.updateBuff("DMG","1");}});});
+on("change:buff1_ac_macro-text", function() { getAttrs(["buff1_Toggle"], function (v){ if (v.buff1_Toggle == "1"){PFSheet.updateBuff("AC","1");}});});
+on("change:buff1_hp-temp_macro-text", function() { getAttrs(["buff1_Toggle"], function (v){ if (v.buff1_Toggle == "1"){PFSheet.updateBuff("HP-temp","1");}});});
+on("change:buff1_fort_macro-text", function() { getAttrs(["buff1_Toggle"], function (v){ if (v.buff1_Toggle == "1"){PFSheet.updateBuff("Fort","1");}});});
+on("change:buff1_ref_macro-text", function() { getAttrs(["buff1_Toggle"], function (v){ if (v.buff1_Toggle == "1"){PFSheet.updateBuff("Ref","1");}});});
+on("change:buff1_will_macro-text", function() { getAttrs(["buff1_Toggle"], function (v){ if (v.buff1_Toggle == "1"){PFSheet.updateBuff("Will","1");}});});
+on("change:buff1_str_macro-text", function() { getAttrs(["buff1_Toggle"], function (v){ if (v.buff1_Toggle == "1"){PFSheet.updateBuff("STR","1");}});});
+on("change:buff1_dex_macro-text", function() { getAttrs(["buff1_Toggle"], function (v){ if (v.buff1_Toggle == "1"){PFSheet.updateBuff("DEX","1");}});});
+on("change:buff1_con_macro-text", function() { getAttrs(["buff1_Toggle"], function (v){ if (v.buff1_Toggle == "1"){PFSheet.updateBuff("CON","1");}});});
+on("change:buff1_int_macro-text", function() { getAttrs(["buff1_Toggle"], function (v){ if (v.buff1_Toggle == "1"){PFSheet.updateBuff("INT","1");}});});
+on("change:buff1_wis_macro-text", function() { getAttrs(["buff1_Toggle"], function (v){ if (v.buff1_Toggle == "1"){PFSheet.updateBuff("WIS","1");}});});
+on("change:buff1_cha_macro-text", function() { getAttrs(["buff1_Toggle"], function (v){ if (v.buff1_Toggle == "1"){PFSheet.updateBuff("CHA","1");}});});
+
+on("change:buff2_melee_macro-text", function() { getAttrs(["buff2_Toggle"], function (v){ if (v.buff2_Toggle == "1"){PFSheet.updateBuff("Melee","2");}});});
+on("change:buff2_ranged_macro-text", function() { getAttrs(["buff2_Toggle"], function (v){ if (v.buff2_Toggle == "1"){PFSheet.updateBuff("Ranged","2");}});});
+on("change:buff2_dmg_macro-text", function() { getAttrs(["buff2_Toggle"], function (v){ if (v.buff2_Toggle == "1"){PFSheet.updateBuff("DMG","2");}});});
+on("change:buff2_ac_macro-text", function() { getAttrs(["buff2_Toggle"], function (v){ if (v.buff2_Toggle == "1"){PFSheet.updateBuff("AC","2");}});});
+on("change:buff2_hp-temp_macro-text", function() { getAttrs(["buff2_Toggle"], function (v){ if (v.buff2_Toggle == "1"){PFSheet.updateBuff("HP-temp","2");}});});
+on("change:buff2_fort_macro-text", function() { getAttrs(["buff2_Toggle"], function (v){ if (v.buff2_Toggle == "1"){PFSheet.updateBuff("Fort","2");}});});
+on("change:buff2_ref_macro-text", function() { getAttrs(["buff2_Toggle"], function (v){ if (v.buff2_Toggle == "1"){PFSheet.updateBuff("Ref","2");}});});
+on("change:buff2_will_macro-text", function() { getAttrs(["buff2_Toggle"], function (v){ if (v.buff2_Toggle == "1"){PFSheet.updateBuff("Will","2");}});});
+on("change:buff2_str_macro-text", function() { getAttrs(["buff2_Toggle"], function (v){ if (v.buff2_Toggle == "1"){PFSheet.updateBuff("STR","2");}});});
+on("change:buff2_dex_macro-text", function() { getAttrs(["buff2_Toggle"], function (v){ if (v.buff2_Toggle == "1"){PFSheet.updateBuff("DEX","2");}});});
+on("change:buff2_con_macro-text", function() { getAttrs(["buff2_Toggle"], function (v){ if (v.buff2_Toggle == "1"){PFSheet.updateBuff("CON","2");}});});
+on("change:buff2_int_macro-text", function() { getAttrs(["buff2_Toggle"], function (v){ if (v.buff2_Toggle == "1"){PFSheet.updateBuff("INT","2");}});});
+on("change:buff2_wis_macro-text", function() { getAttrs(["buff2_Toggle"], function (v){ if (v.buff2_Toggle == "1"){PFSheet.updateBuff("WIS","2");}});});
+on("change:buff2_cha_macro-text", function() { getAttrs(["buff2_Toggle"], function (v){ if (v.buff2_Toggle == "1"){PFSheet.updateBuff("CHA","2");}});});
+
+on("change:buff3_melee_macro-text", function() { getAttrs(["buff3_Toggle"], function (v){ if (v.buff3_Toggle == "1"){PFSheet.updateBuff("Melee","3");}});});
+on("change:buff3_ranged_macro-text", function() { getAttrs(["buff3_Toggle"], function (v){ if (v.buff3_Toggle == "1"){PFSheet.updateBuff("Ranged","3");}});});
+on("change:buff3_dmg_macro-text", function() { getAttrs(["buff3_Toggle"], function (v){ if (v.buff3_Toggle == "1"){PFSheet.updateBuff("DMG","3");}});});
+on("change:buff3_ac_macro-text", function() { getAttrs(["buff3_Toggle"], function (v){ if (v.buff3_Toggle == "1"){PFSheet.updateBuff("AC","3");}});});
+on("change:buff3_hp-temp_macro-text", function() { getAttrs(["buff3_Toggle"], function (v){ if (v.buff3_Toggle == "1"){PFSheet.updateBuff("HP-temp","3");}});});
+on("change:buff3_fort_macro-text", function() { getAttrs(["buff3_Toggle"], function (v){ if (v.buff3_Toggle == "1"){PFSheet.updateBuff("Fort","3");}});});
+on("change:buff3_ref_macro-text", function() { getAttrs(["buff3_Toggle"], function (v){ if (v.buff3_Toggle == "1"){PFSheet.updateBuff("Ref","3");}});});
+on("change:buff3_will_macro-text", function() { getAttrs(["buff3_Toggle"], function (v){ if (v.buff3_Toggle == "1"){PFSheet.updateBuff("Will","3");}});});
+on("change:buff3_str_macro-text", function() { getAttrs(["buff3_Toggle"], function (v){ if (v.buff3_Toggle == "1"){PFSheet.updateBuff("STR","3");}});});
+on("change:buff3_dex_macro-text", function() { getAttrs(["buff3_Toggle"], function (v){ if (v.buff3_Toggle == "1"){PFSheet.updateBuff("DEX","3");}});});
+on("change:buff3_con_macro-text", function() { getAttrs(["buff3_Toggle"], function (v){ if (v.buff3_Toggle == "1"){PFSheet.updateBuff("CON","3");}});});
+on("change:buff3_int_macro-text", function() { getAttrs(["buff3_Toggle"], function (v){ if (v.buff3_Toggle == "1"){PFSheet.updateBuff("INT","3");}});});
+on("change:buff3_wis_macro-text", function() { getAttrs(["buff3_Toggle"], function (v){ if (v.buff3_Toggle == "1"){PFSheet.updateBuff("WIS","3");}});});
+on("change:buff3_cha_macro-text", function() { getAttrs(["buff3_Toggle"], function (v){ if (v.buff3_Toggle == "1"){PFSheet.updateBuff("CHA","3");}});});
+
+on("change:buff4_melee_macro-text", function() { getAttrs(["buff4_Toggle"], function (v){ if (v.buff4_Toggle == "1"){PFSheet.updateBuff("Melee","4");}});});
+on("change:buff4_ranged_macro-text", function() { getAttrs(["buff4_Toggle"], function (v){ if (v.buff4_Toggle == "1"){PFSheet.updateBuff("Ranged","4");}});});
+on("change:buff4_dmg_macro-text", function() { getAttrs(["buff4_Toggle"], function (v){ if (v.buff4_Toggle == "1"){PFSheet.updateBuff("DMG","4");}});});
+on("change:buff4_ac_macro-text", function() { getAttrs(["buff4_Toggle"], function (v){ if (v.buff4_Toggle == "1"){PFSheet.updateBuff("AC","4");}});});
+on("change:buff4_hp-temp_macro-text", function() { getAttrs(["buff4_Toggle"], function (v){ if (v.buff4_Toggle == "1"){PFSheet.updateBuff("HP-temp","4");}});});
+on("change:buff4_fort_macro-text", function() { getAttrs(["buff4_Toggle"], function (v){ if (v.buff4_Toggle == "1"){PFSheet.updateBuff("Fort","4");}});});
+on("change:buff4_ref_macro-text", function() { getAttrs(["buff4_Toggle"], function (v){ if (v.buff4_Toggle == "1"){PFSheet.updateBuff("Ref","4");}});});
+on("change:buff4_will_macro-text", function() { getAttrs(["buff4_Toggle"], function (v){ if (v.buff4_Toggle == "1"){PFSheet.updateBuff("Will","4");}});});
+on("change:buff4_str_macro-text", function() { getAttrs(["buff4_Toggle"], function (v){ if (v.buff4_Toggle == "1"){PFSheet.updateBuff("STR","4");}});});
+on("change:buff4_dex_macro-text", function() { getAttrs(["buff4_Toggle"], function (v){ if (v.buff4_Toggle == "1"){PFSheet.updateBuff("DEX","4");}});});
+on("change:buff4_con_macro-text", function() { getAttrs(["buff4_Toggle"], function (v){ if (v.buff4_Toggle == "1"){PFSheet.updateBuff("CON","4");}});});
+on("change:buff4_int_macro-text", function() { getAttrs(["buff4_Toggle"], function (v){ if (v.buff4_Toggle == "1"){PFSheet.updateBuff("INT","4");}});});
+on("change:buff4_wis_macro-text", function() { getAttrs(["buff4_Toggle"], function (v){ if (v.buff4_Toggle == "1"){PFSheet.updateBuff("WIS","4");}});});
+on("change:buff4_cha_macro-text", function() { getAttrs(["buff4_Toggle"], function (v){ if (v.buff4_Toggle == "1"){PFSheet.updateBuff("CHA","4");}});});
+
+on("change:buff5_melee_macro-text", function() { getAttrs(["buff5_Toggle"], function (v){ if (v.buff5_Toggle == "1"){PFSheet.updateBuff("Melee","5");}});});
+on("change:buff5_ranged_macro-text", function() { getAttrs(["buff5_Toggle"], function (v){ if (v.buff5_Toggle == "1"){PFSheet.updateBuff("Ranged","5");}});});
+on("change:buff5_dmg_macro-text", function() { getAttrs(["buff5_Toggle"], function (v){ if (v.buff5_Toggle == "1"){PFSheet.updateBuff("DMG","5");}});});
+on("change:buff5_ac_macro-text", function() { getAttrs(["buff5_Toggle"], function (v){ if (v.buff5_Toggle == "1"){PFSheet.updateBuff("AC","5");}});});
+on("change:buff5_hp-temp_macro-text", function() { getAttrs(["buff5_Toggle"], function (v){ if (v.buff5_Toggle == "1"){PFSheet.updateBuff("HP-temp","5");}});});
+on("change:buff5_fort_macro-text", function() { getAttrs(["buff5_Toggle"], function (v){ if (v.buff5_Toggle == "1"){PFSheet.updateBuff("Fort","5");}});});
+on("change:buff5_ref_macro-text", function() { getAttrs(["buff5_Toggle"], function (v){ if (v.buff5_Toggle == "1"){PFSheet.updateBuff("Ref","5");}});});
+on("change:buff5_will_macro-text", function() { getAttrs(["buff5_Toggle"], function (v){ if (v.buff5_Toggle == "1"){PFSheet.updateBuff("Will","5");}});});
+on("change:buff5_str_macro-text", function() { getAttrs(["buff5_Toggle"], function (v){ if (v.buff5_Toggle == "1"){PFSheet.updateBuff("STR","5");}});});
+on("change:buff5_dex_macro-text", function() { getAttrs(["buff5_Toggle"], function (v){ if (v.buff5_Toggle == "1"){PFSheet.updateBuff("DEX","5");}});});
+on("change:buff5_con_macro-text", function() { getAttrs(["buff5_Toggle"], function (v){ if (v.buff5_Toggle == "1"){PFSheet.updateBuff("CON","5");}});});
+on("change:buff5_int_macro-text", function() { getAttrs(["buff5_Toggle"], function (v){ if (v.buff5_Toggle == "1"){PFSheet.updateBuff("INT","5");}});});
+on("change:buff5_wis_macro-text", function() { getAttrs(["buff5_Toggle"], function (v){ if (v.buff5_Toggle == "1"){PFSheet.updateBuff("WIS","5");}});});
+on("change:buff5_cha_macro-text", function() { getAttrs(["buff5_Toggle"], function (v){ if (v.buff5_Toggle == "1"){PFSheet.updateBuff("CHA","5");}});});
+
+on("change:buff6_melee_macro-text", function() { getAttrs(["buff6_Toggle"], function (v){ if (v.buff6_Toggle == "1"){PFSheet.updateBuff("Melee","6");}});});
+on("change:buff6_ranged_macro-text", function() { getAttrs(["buff6_Toggle"], function (v){ if (v.buff6_Toggle == "1"){PFSheet.updateBuff("Ranged","6");}});});
+on("change:buff6_dmg_macro-text", function() { getAttrs(["buff6_Toggle"], function (v){ if (v.buff6_Toggle == "1"){PFSheet.updateBuff("DMG","6");}});});
+on("change:buff6_ac_macro-text", function() { getAttrs(["buff6_Toggle"], function (v){ if (v.buff6_Toggle == "1"){PFSheet.updateBuff("AC","6");}});});
+on("change:buff6_hp-temp_macro-text", function() { getAttrs(["buff6_Toggle"], function (v){ if (v.buff6_Toggle == "1"){PFSheet.updateBuff("HP-temp","6");}});});
+on("change:buff6_fort_macro-text", function() { getAttrs(["buff6_Toggle"], function (v){ if (v.buff6_Toggle == "1"){PFSheet.updateBuff("Fort","6");}});});
+on("change:buff6_ref_macro-text", function() { getAttrs(["buff6_Toggle"], function (v){ if (v.buff6_Toggle == "1"){PFSheet.updateBuff("Ref","6");}});});
+on("change:buff6_will_macro-text", function() { getAttrs(["buff6_Toggle"], function (v){ if (v.buff6_Toggle == "1"){PFSheet.updateBuff("Will","6");}});});
+on("change:buff6_str_macro-text", function() { getAttrs(["buff6_Toggle"], function (v){ if (v.buff6_Toggle == "1"){PFSheet.updateBuff("STR","6");}});});
+on("change:buff6_dex_macro-text", function() { getAttrs(["buff6_Toggle"], function (v){ if (v.buff6_Toggle == "1"){PFSheet.updateBuff("DEX","6");}});});
+on("change:buff6_con_macro-text", function() { getAttrs(["buff6_Toggle"], function (v){ if (v.buff6_Toggle == "1"){PFSheet.updateBuff("CON","6");}});});
+on("change:buff6_int_macro-text", function() { getAttrs(["buff6_Toggle"], function (v){ if (v.buff6_Toggle == "1"){PFSheet.updateBuff("INT","6");}});});
+on("change:buff6_wis_macro-text", function() { getAttrs(["buff6_Toggle"], function (v){ if (v.buff6_Toggle == "1"){PFSheet.updateBuff("WIS","6");}});});
+on("change:buff6_cha_macro-text", function() { getAttrs(["buff6_Toggle"], function (v){ if (v.buff6_Toggle == "1"){PFSheet.updateBuff("CHA","6");}});});
+
+on("change:buff7_melee_macro-text", function() { getAttrs(["buff7_Toggle"], function (v){ if (v.buff7_Toggle == "1"){PFSheet.updateBuff("Melee","7");}});});
+on("change:buff7_ranged_macro-text", function() { getAttrs(["buff7_Toggle"], function (v){ if (v.buff7_Toggle == "1"){PFSheet.updateBuff("Ranged","7");}});});
+on("change:buff7_dmg_macro-text", function() { getAttrs(["buff7_Toggle"], function (v){ if (v.buff7_Toggle == "1"){PFSheet.updateBuff("DMG","7");}});});
+on("change:buff7_ac_macro-text", function() { getAttrs(["buff7_Toggle"], function (v){ if (v.buff7_Toggle == "1"){PFSheet.updateBuff("AC","7");}});});
+on("change:buff7_hp-temp_macro-text", function() { getAttrs(["buff7_Toggle"], function (v){ if (v.buff7_Toggle == "1"){PFSheet.updateBuff("HP-temp","7");}});});
+on("change:buff7_fort_macro-text", function() { getAttrs(["buff7_Toggle"], function (v){ if (v.buff7_Toggle == "1"){PFSheet.updateBuff("Fort","7");}});});
+on("change:buff7_ref_macro-text", function() { getAttrs(["buff7_Toggle"], function (v){ if (v.buff7_Toggle == "1"){PFSheet.updateBuff("Ref","7");}});});
+on("change:buff7_will_macro-text", function() { getAttrs(["buff7_Toggle"], function (v){ if (v.buff7_Toggle == "1"){PFSheet.updateBuff("Will","7");}});});
+on("change:buff7_str_macro-text", function() { getAttrs(["buff7_Toggle"], function (v){ if (v.buff7_Toggle == "1"){PFSheet.updateBuff("STR","7");}});});
+on("change:buff7_dex_macro-text", function() { getAttrs(["buff7_Toggle"], function (v){ if (v.buff7_Toggle == "1"){PFSheet.updateBuff("DEX","7");}});});
+on("change:buff7_con_macro-text", function() { getAttrs(["buff7_Toggle"], function (v){ if (v.buff7_Toggle == "1"){PFSheet.updateBuff("CON","7");}});});
+on("change:buff7_int_macro-text", function() { getAttrs(["buff7_Toggle"], function (v){ if (v.buff7_Toggle == "1"){PFSheet.updateBuff("INT","7");}});});
+on("change:buff7_wis_macro-text", function() { getAttrs(["buff7_Toggle"], function (v){ if (v.buff7_Toggle == "1"){PFSheet.updateBuff("WIS","7");}});});
+on("change:buff7_cha_macro-text", function() { getAttrs(["buff7_Toggle"], function (v){ if (v.buff7_Toggle == "1"){PFSheet.updateBuff("CHA","7");}});});
+
+on("change:buff8_melee_macro-text", function() { getAttrs(["buff8_Toggle"], function (v){ if (v.buff8_Toggle == "1"){PFSheet.updateBuff("Melee","8");}});});
+on("change:buff8_ranged_macro-text", function() { getAttrs(["buff8_Toggle"], function (v){ if (v.buff8_Toggle == "1"){PFSheet.updateBuff("Ranged","8");}});});
+on("change:buff8_dmg_macro-text", function() { getAttrs(["buff8_Toggle"], function (v){ if (v.buff8_Toggle == "1"){PFSheet.updateBuff("DMG","8");}});});
+on("change:buff8_ac_macro-text", function() { getAttrs(["buff8_Toggle"], function (v){ if (v.buff8_Toggle == "1"){PFSheet.updateBuff("AC","8");}});});
+on("change:buff8_hp-temp_macro-text", function() { getAttrs(["buff8_Toggle"], function (v){ if (v.buff8_Toggle == "1"){PFSheet.updateBuff("HP-temp","8");}});});
+on("change:buff8_fort_macro-text", function() { getAttrs(["buff8_Toggle"], function (v){ if (v.buff8_Toggle == "1"){PFSheet.updateBuff("Fort","8");}});});
+on("change:buff8_ref_macro-text", function() { getAttrs(["buff8_Toggle"], function (v){ if (v.buff8_Toggle == "1"){PFSheet.updateBuff("Ref","8");}});});
+on("change:buff8_will_macro-text", function() { getAttrs(["buff8_Toggle"], function (v){ if (v.buff8_Toggle == "1"){PFSheet.updateBuff("Will","8");}});});
+on("change:buff8_str_macro-text", function() { getAttrs(["buff8_Toggle"], function (v){ if (v.buff8_Toggle == "1"){PFSheet.updateBuff("STR","8");}});});
+on("change:buff8_dex_macro-text", function() { getAttrs(["buff8_Toggle"], function (v){ if (v.buff8_Toggle == "1"){PFSheet.updateBuff("DEX","8");}});});
+on("change:buff8_con_macro-text", function() { getAttrs(["buff8_Toggle"], function (v){ if (v.buff8_Toggle == "1"){PFSheet.updateBuff("CON","8");}});});
+on("change:buff8_int_macro-text", function() { getAttrs(["buff8_Toggle"], function (v){ if (v.buff8_Toggle == "1"){PFSheet.updateBuff("INT","8");}});});
+on("change:buff8_wis_macro-text", function() { getAttrs(["buff8_Toggle"], function (v){ if (v.buff8_Toggle == "1"){PFSheet.updateBuff("WIS","8");}});});
+on("change:buff8_cha_macro-text", function() { getAttrs(["buff8_Toggle"], function (v){ if (v.buff8_Toggle == "1"){PFSheet.updateBuff("CHA","8");}});});
+
+on("change:buff9_melee_macro-text", function() { getAttrs(["buff9_Toggle"], function (v){ if (v.buff9_Toggle == "1"){PFSheet.updateBuff("Melee","9");}});});
+on("change:buff9_ranged_macro-text", function() { getAttrs(["buff9_Toggle"], function (v){ if (v.buff9_Toggle == "1"){PFSheet.updateBuff("Ranged","9");}});});
+on("change:buff9_dmg_macro-text", function() { getAttrs(["buff9_Toggle"], function (v){ if (v.buff9_Toggle == "1"){PFSheet.updateBuff("DMG","9");}});});
+on("change:buff9_ac_macro-text", function() { getAttrs(["buff9_Toggle"], function (v){ if (v.buff9_Toggle == "1"){PFSheet.updateBuff("AC","9");}});});
+on("change:buff9_hp-temp_macro-text", function() { getAttrs(["buff9_Toggle"], function (v){ if (v.buff9_Toggle == "1"){PFSheet.updateBuff("HP-temp","9");}});});
+on("change:buff9_fort_macro-text", function() { getAttrs(["buff9_Toggle"], function (v){ if (v.buff9_Toggle == "1"){PFSheet.updateBuff("Fort","9");}});});
+on("change:buff9_ref_macro-text", function() { getAttrs(["buff9_Toggle"], function (v){ if (v.buff9_Toggle == "1"){PFSheet.updateBuff("Ref","9");}});});
+on("change:buff9_will_macro-text", function() { getAttrs(["buff9_Toggle"], function (v){ if (v.buff9_Toggle == "1"){PFSheet.updateBuff("Will","9");}});});
+on("change:buff9_str_macro-text", function() { getAttrs(["buff9_Toggle"], function (v){ if (v.buff9_Toggle == "1"){PFSheet.updateBuff("STR","9");}});});
+on("change:buff9_dex_macro-text", function() { getAttrs(["buff9_Toggle"], function (v){ if (v.buff9_Toggle == "1"){PFSheet.updateBuff("DEX","9");}});});
+on("change:buff9_con_macro-text", function() { getAttrs(["buff9_Toggle"], function (v){ if (v.buff9_Toggle == "1"){PFSheet.updateBuff("CON","9");}});});
+on("change:buff9_int_macro-text", function() { getAttrs(["buff9_Toggle"], function (v){ if (v.buff9_Toggle == "1"){PFSheet.updateBuff("INT","9");}});});
+on("change:buff9_wis_macro-text", function() { getAttrs(["buff9_Toggle"], function (v){ if (v.buff9_Toggle == "1"){PFSheet.updateBuff("WIS","9");}});});
+on("change:buff9_cha_macro-text", function() { getAttrs(["buff9_Toggle"], function (v){ if (v.buff9_Toggle == "1"){PFSheet.updateBuff("CHA","9");}});});
+
+on("change:buff10_melee_macro-text", function() { getAttrs(["buff10_Toggle"], function (v){ if (v.buff10_Toggle == "1"){PFSheet.updateBuff("Melee","10");}});});
+on("change:buff10_ranged_macro-text", function() { getAttrs(["buff10_Toggle"], function (v){ if (v.buff10_Toggle == "1"){PFSheet.updateBuff("Ranged","10");}});});
+on("change:buff10_dmg_macro-text", function() { getAttrs(["buff10_Toggle"], function (v){ if (v.buff10_Toggle == "1"){PFSheet.updateBuff("DMG","10");}});});
+on("change:buff10_ac_macro-text", function() { getAttrs(["buff10_Toggle"], function (v){ if (v.buff10_Toggle == "1"){PFSheet.updateBuff("AC","10");}});});
+on("change:buff10_hp-temp_macro-text", function() { getAttrs(["buff10_Toggle"], function (v){ if (v.buff10_Toggle == "1"){PFSheet.updateBuff("HP-temp","10");}});});
+on("change:buff10_fort_macro-text", function() { getAttrs(["buff10_Toggle"], function (v){ if (v.buff10_Toggle == "1"){PFSheet.updateBuff("Fort","10");}});});
+on("change:buff10_ref_macro-text", function() { getAttrs(["buff10_Toggle"], function (v){ if (v.buff10_Toggle == "1"){PFSheet.updateBuff("Ref","10");}});});
+on("change:buff10_will_macro-text", function() { getAttrs(["buff10_Toggle"], function (v){ if (v.buff10_Toggle == "1"){PFSheet.updateBuff("Will","10");}});});
+on("change:buff10_str_macro-text", function() { getAttrs(["buff10_Toggle"], function (v){ if (v.buff10_Toggle == "1"){PFSheet.updateBuff("STR","10");}});});
+on("change:buff10_dex_macro-text", function() { getAttrs(["buff10_Toggle"], function (v){ if (v.buff10_Toggle == "1"){PFSheet.updateBuff("DEX","10");}});});
+on("change:buff10_con_macro-text", function() { getAttrs(["buff10_Toggle"], function (v){ if (v.buff10_Toggle == "1"){PFSheet.updateBuff("CON","10");}});});
+on("change:buff10_int_macro-text", function() { getAttrs(["buff10_Toggle"], function (v){ if (v.buff10_Toggle == "1"){PFSheet.updateBuff("INT","10");}});});
+on("change:buff10_wis_macro-text", function() { getAttrs(["buff10_Toggle"], function (v){ if (v.buff10_Toggle == "1"){PFSheet.updateBuff("WIS","10");}});});
+on("change:buff10_cha_macro-text", function() { getAttrs(["buff10_Toggle"], function (v){ if (v.buff10_Toggle == "1"){PFSheet.updateBuff("CHA","10");}});});
+
+
+on("change:class-0-hp change:class-1-hp change:class-2-hp change:class-3-hp change:class-4-hp", function() {PFSheet.updateClassInformation("hp");});
+on("change:class-0-fchp change:class-1-fchp change:class-2-fchp change:class-3-fchp change:class-4-fchp", function() {PFSheet.updateClassInformation("fchp");});
+on("change:class-0-bab change:class-1-bab change:class-2-bab change:class-3-bab change:class-4-bab", function() {PFSheet.updateClassInformation("bab");});
+on("change:class-0-skill change:class-1-skill change:class-2-skill change:class-3-skill change:class-4-skill", function() {PFSheet.updateClassInformation("skill");});
+on("change:class-0-fcskill change:class-1-fcskill change:class-2-fcskill change:class-3-fcskill change:class-4-fcskill", function() {PFSheet.updateClassInformation("fcskill");});
+on("change:class-0-fcalt change:class-1-fcalt change:class-2-fcalt change:class-3-fcalt change:class-4-fcalt", function() {PFSheet.updateClassInformation("fcalt");});
+on("change:class-0-fort change:class-1-fort change:class-2-fort change:class-3-fort change:class-4-fort", function() {PFSheet.updateClassInformation("Fort");});
+on("change:class-0-ref change:class-1-ref change:class-2-ref change:class-3-ref change:class-4-ref", function() {PFSheet.updateClassInformation("Ref");});
+on("change:class-0-will change:class-1-will change:class-2-will change:class-3-will change:class-4-will", function() {PFSheet.updateClassInformation("Will");});
+on("change:class-0-level change:class-1-level change:class-2-level change:class-3-level change:class-4-level", function() {PFSheet.updateClassInformation("level");});
+
+//init
+on("change:init-ability", function() {  PFSheet.handleDropdown("init-ability",["init-ability-mod"],-1,"DEX-mod");});
+on("change:init-ability-mod change:init-trait change:init-misc condition-deafened",function(){ PFSheet.updateInit(); });
+
+on("change:con-mod change:level change:total-hp change:hp-formula", function() { PFSheet.updateHP(); });
+on("change:hp-temp-misc change:buff_hp-temp-total", function() { PFSheet.updateTempHP(); });
+
+
+//Conditions
+on("change:condition-fatigued", function() {
+    PFSheet.updateAbility("STR");
+    PFSheet.updateAbility("DEX");
+});
+on("change:condition-entangled", function() { PFSheet.updateAbility("DEX"); })
+on("change:condition-drained", function() { PFSheet.updateHP(); });
+
+//grappled and pinned are mutually exclusive
+on("change:condition-grappled", function() {  PFSheet.updateGrapple() });
+
+
+//grappled and pinned are mutually exclusive
+on("change:condition-pinned", function() { PFSheet.updatePin();});
+
+//defense dropdowns
+on("change:ac-ability", function () {PFSheet.handleDropdown("AC-ability",["AC-ability-mod"],99,"DEX-mod");});
+on("change:ff-ability", function () {PFSheet.handleDropdown("FF-ability",["FF-DEX"],99,"");});
+on("change:cmd-ability1", function () {PFSheet.handleDropdown("CMD-ability1",["CMD-STR"],-1,"STR-mod");});
+on("change:cmd-ability2", function () {PFSheet.handleDropdown("CMD-ability2",["CMD-DEX"],99,"DEX-mod");});
+on("change:cmd-ability", function () {PFSheet.handleDropdown("CMD-ability",["FF-CMD-DEX"],99,"");});
+
+//attack non repeating dropdowns
+on("change:melee-ability", function () {PFSheet.handleDropdown("melee-ability",["melee-ability-mod"],-1,"STR-mod");});
+on("change:ranged-ability", function () {PFSheet.handleDropdown("ranged-ability",["ranged-ability-mod"],-1,"DEX-mod");});
+on("change:cmb-ability", function () {PFSheet.handleDropdown("CMB-ability",["CMB-ability-mod"],-1,"STR-mod");});
+
+
+/* PFSheet.update attack modes*/ 
+on("change:acp-attack-mod change:condition-dazzled change:condition-entangled change:condition-grappled change:condition-fear change:condition-sickened change:condition-prone change:condition-invisible change:condition-drained change:condition-wounds",function() {
+    PFSheet.updateConditionAttackPenalty();
+});
+
+on ("change:condition-blinded change:condition-cowering change:condition-flat-footed change:condition-stunned change:condition-flat-footed change:condition-stunned change:condition-pinned change:condition-wounds change:ac-ability-mod", function() {
+    PFSheet.updateConditionDefensePenalty();
+});
+
+on("change:bab change:size change:melee-ability-mod change:buff_melee-total change:attk-melee-misc change:attk-penalty",function() { 
+    PFSheet.updateAttack("melee");
+});
+on("change:bab change:size change:ranged-ability-mod change:ranged-total change:attk-ranged-misc change:attk-penalty",function() { 
+    PFSheet.updateAttack("ranged");
+});
+on("change:bab change:size change:cmb-ability-mod change:cmb-total change:attk-cmb-misc change:attk-penalty",function() { 
+    PFSheet.updateAttack("CMB");
+});
+
+on("change:condition-stunned change:condition-flat-footed change:ac-ability-mod change:ff-dex change:ac-penalty change:size change:ac-dodge change:ac-natural change:ac=deflect change:ac-misc change:buff_ac-total change:cmd-dex change:ff-cmd-dex change:cmd-str change:bab change:max-dex",function() {
+    PFSheet.updateDefenses();
+});
+
+on("change:shield-equipped change:shield-acbonus change:shield-max-dex change:shield-acp change:shield-spell-fail change:shield-proficiency change:shield2-equipped change:shield2-acbonus change:shield2-max-dex change:shield2-acp change:shield2-spell-fail change:shield2-proficiency change:armor-equipped change:armor-acbonus change:armor-max-dex change:armor-acp change:armor-spell-fail change:armor-proficiency change:armor2-equipped change:armor2-acbonus change:armor2-max-dex change:armor2-acp change:armor2-spell-fail change:armor2-proficiency",function(){
+    PFSheet.updateArmor();
+});
+on("change:buff_DMG-total change:repeating_weapon:attack-type-mod change:repeating_weapon:enhance change:repeating_weapon:masterwork change:repeating_weapon:attack change:repeating_weapon:proficiency change:repeating_weapon:damage-ability-mod change:repeating_weapon:dmg-effect-total-other change:repeating_weapon:damage change:repeating_weapon:attk-effect-total-other",function() {
+	PFSheet.updateRepeatingWeapon();
+});
+on("change:repeating_weapon:attack-type",function() {
+	//PFSheet.updateRepeatingWeaponAttackType();
+		PFSheet.handleDropdown("repeating_weapon_attack-type",["repeating_weapon_attack-type-mod"]);
+});
+on("change:repeating_weapon:damage-ability",function() { PFSheet.updateRepeatingWeaponDamageAbility();   });
 
 
 
-var updateRepeatingWeapon=function() {
-   getAttrs([
-        "repeating_weapon_enhance","repeating_weapon_masterwork","repeating_weapon_attack-type-mod","repeating_weapon_proficiency","repeating_weapon_attk-effect-total-other",
-    	"repeating_weapon_damage-ability-mod","repeating_weapon_dmg-effect-total-other","repeating_weapon_buff_DMG-total_display","buff_DMG-total",
-		"repeating_weapon_attack","repeating_weapon_damage",
-		"repeating_weapon_total-attack","repeating_weapon_total-damage"
-    ],function(v) {
-        //console.log("FFFFFFFFFF inside getAttrs");
-     	//console.log(v);
-		//basetohit includes buff and ability mod already
-        var basetohit=v["repeating_weapon_attack-type-mod"]||0;basetohit=isNaN(basetohit)?0:parseInt(basetohit,10);
-		var dmgBuff=v["buff_DMG-total"]||0;dmgBuff=isNaN(dmgBuff)?0:parseInt(dmgBuff,10);
-		var attackMod=v.repeating_weapon_attack||0;attackMod=isNaN(attackMod)?0:parseInt(attackMod,10);
-		var enhance=v.repeating_weapon_enhance||0;enhance=isNaN(enhance)?0:parseInt(enhance,10);
-		var masterwork=v.repeating_weapon_masterwork||0;masterwork=isNaN(masterwork)?0:parseInt(masterwork,10);
-		var attackOther=v["repeating_weapon_attk-effect-total-other"]||0;attackOther=isNaN(attackOther)?0:parseInt(attackOther,10);
-		var proficient=v.repeating_weapon_proficiency||0;proficient=isNaN(proficient)?0:parseInt(proficient,10);
-		var abilityMod=v["repeating_weapon_damage-ability-mod"]||0;abilityMod=isNaN(abilityMod)?0:parseInt(abilityMod,10);
-		var damageMod=v.repeating_weapon_damage||0;damageMod=isNaN(damageMod)?0:parseInt(damageMod,10);
-		var damageOther=v["repeating_weapon_dmg-effect-total-other"]||0;damageOther=isNaN(damageOther)?0:parseInt(damageOther,10);
-		var dmgBuffRepeat=v["repeating_weapon_buff_DMG-total"]||0;dmgBuffRepeat=isNaN(dmgBuffRepeat)?0:parseInt(dmgBuffRepeat,10);
-		var currentATTKmod=v["repeating_weapon_total-attack"]||0;currentATTKmod=isNaN(currentATTKmod)?0:parseInt(currentATTKmod,10);
-		var currentDMGmod=v["repeating_weapon_total-damage"]||0;currentDMGmod=isNaN(currentDMGmod)?0:parseInt(currentDMGmod,10);
-
-        var tohit = basetohit + Math.max(enhance,masterwork) + attackMod + proficient + attackOther ;
-		var dmg = abilityMod + damageMod + damageOther + dmgBuff + enhance;
-    	//console.log("base:"+basetohit+", mwk:"+masterwork+", prof:"+proficient+", enh:"+enhance+", att o: " + attackOther+", dmg o:"+damageOther +", buff:" + dmgBuff + ",buffrep:"+ dmgBuffRepeat+", atmod:" + attackMod +", dmod:"+damageMod);;
-        //console.log("new hit is "+tohit + "new dmg is " +dmg);
-        //console.log ("oldhit: "+currentATTKmod+", olddmg:"+currentDMGmod);
-        
-		var setter={};
-		var set=0;
-		if ( tohit !== currentATTKmod) {  setter["repeating_weapon_total-attack"] = tohit; set=1;  }
-		if (dmg !== currentDMGmod)  {  setter["repeating_weapon_total-damage"] = dmg;   set=1; }
-		if (dmgBuff !== dmgBuffRepeat) {   setter["repeating_weapon_buff_DMG-total_display"] = dmgBuff;  set=1; }
-		if (set===1) { setAttrs(setter); }
-	});
-};
+on("change:recalc1",function(){PFSheet.recalculateSheet();});
 
 
+on("change:fort-ability", function(){PFSheet.handleDropdown  ("Fort-ability",["Fort-ability-mod"],-1,"CON-mod");   });
+on("change:ref-ability", function(){PFSheet.handleDropdown  ("Ref-ability",["Ref-ability-mod"],-1,"DEX-mod");   });
+on("change:will-ability", function(){PFSheet.handleDropdown  ("Will-ability",["Will-ability-mod"],-1,"WIS-mod");   });
 
-/*updateArmor
- * updates total AC and penalty and max dex
- * if not proficient sets attack penalty
- * for backward compatiblity, proficiency is string and 0 is proficient, anything else non proficient
- */
-var updateArmor=function(){
-getAttrs(["shield-equipped", "shield-acbonus", "shield-max-dex", "shield-acp", "shield-spell-fail", "shield-proficiency",
- "shield2-equipped", "shield2-acbonus", "shield2-max-dex", "shield2-acp", "shield2-spell-fail", "shield2-proficiency",
- "armor-equipped", "armor-acbonus", "armor-max-dex", "armor-acp", "armor-spell-fail", "armor-proficiency",
- "armor2-equipped", "armor2-acbonus", "armor2-max-dex", "armor2-acp", "armor2-spell-fail", "armor2-proficiency",
- "acp","max-dex","AC-armor","AC-shield","spell-fail","acp-attack-mod" ], function(v)    {
-     console.log(v);
-     var acp=0,maxDex=99,acA=0,acS=0,sp=0,atk=0;
-	 var subAC=0,subD=0,subAcp=0,prof=0,subsp=0;
-     if (v["armor-equipped"]==1 ) {
-		 subAC=parseInt(v["armor-acbonus"],10)||0;
-		 subD=parseInt(v["armor-max-dex"],10);subD=isNaN(subD)?99:subD; //cannot do "or 0" since 0 is valid but falsy
-		 subAcp=parseInt(v["armor-acp"],10)||0;
-		 prof=parseInt(v["armor-proficiency"],10);prof=isNaN(prof)?1:prof;
-		 subsp=parseInt(v["armor-spell-fail"],10)||0;
-		 acA+=subAC;
-		 maxDex = Math.min(subD,maxDex);
-		 acp+=subAcp;
-		 sp+=subsp;
-		 if(prof===1) {atk+=subAcp; }
-         console.log("the proficiency is " + prof + " and attack penalty: " + atk);
-	 }
-	 if (v["armor2-equipped"]==1 ) {
-		 subAC=parseInt(v["armor2-acbonus"],10)||0;
-		 subD=parseInt(v["armor2-max-dex"],10);subD=isNaN(subD)?99:subD; //cannot do "or 0" since 0 is valid but falsy
-		 subAcp=parseInt(v["armor2-acp"],10)||0;
-		 prof=parseInt(v["armor2-proficiency"],10);prof=isNaN(prof)?1:prof;
-		 subsp=parseInt(v["armor2-spell-fail"],10)||0;
-		 acA+=subAC;
-		 maxDex = Math.min(subD,maxDex);
-		 acp+=subAcp;
-		 sp+=subsp;
-		 if(prof===1) {atk+=subAcp;}
-	 }
-	 if (v["shield-equipped"]==1 ) {
-		 subAC=parseInt(v["shield-acbonus"],10)||0;
-		 subD=parseInt(v["shield-max-dex"],10);subD=isNaN(subD)?99:subD; //cannot do "or 0" since 0 is valid but falsy
-		 subAcp=parseInt(v["shield-acp"],10)||0;
-		 prof=parseInt(v["shield-proficiency"],10);prof=isNaN(prof)?1:prof;
-		 subsp=parseInt(v["shield-spell-fail"],10)||0;
-		 acS+=subAC;
-		 maxDex = Math.min(subD,maxDex);
-		 acp+=subAcp;
-		 sp+=subsp;
-		 if(prof===1) {atk+=subAcp;}
-	 }
-	 if (v["shield2-equipped"]==1 ) {
-		 subAC=parseInt(v["shield2-acbonus"],10)||0;
-		 subD=parseInt(v["shield2-max-dex"],10);subD=isNaN(subD)?99:subD; //cannot do "or 0" since 0 is valid but falsy
-		 subAcp=parseInt(v["shield2-acp"],10)||0;
-		 prof=parseInt(v["shield2-proficiency"],10);prof=isNaN(prof)?1:prof;
-		 subsp=parseInt(v["shield2-spell-fail"],10)||0;
-		 acS+=subAC;
-		 maxDex = Math.min(subD,maxDex);
-		 acp+=subAcp;
-		 sp+=subsp;
-		 if(prof===1) {atk+=subAcp;}
-	 }
-	 
-	 var currACP=parseInt(v.acp,10)||0;
-	 var currMaxDex=parseInt(v["max-dex"],10);
-     currMaxDex=isNaN(currMaxDex)?99:currMaxDex;
-     var currACArmor=parseInt(v["AC-armor"],10)||0;
-	 var currACShield=parseInt(v["AC-shield"],10)||0;
-	 var currSpellFail=parseInt(v["spell-fail"],10)||0;
-	 var currAtkMod=parseInt(v["acp-attack-mod"],10)||0;
-
-     //console.log(v);
-     console.log("curr atk mod:"+currAtkMod+", curr acp:"+currACP+", new acp:"+acp+", currMaxDex:"+currMaxDex+", new maxdex:"+maxDex);
-	 var setit=0;
-	 var setter={};
-     if (currACP!==acp){setter["acp"]=acp;setit=1;}
-	 if (currMaxDex!==maxDex){setter["max-dex"]=maxDex;setit=1;}
-	 if (currACArmor!==acA){setter["AC-armor"]=acA;setit=1;}
-	 if (currACShield!==acS){setter["AC-shield"]=acS;setit=1;}
-	 if (currSpellFail!==sp){setter["spell-fail"]=sp;setit=1;}
-	 if (currAtkMod!==atk){setter["acp-attack-mod"]=atk;setit=1;}
-	 if (setit===1) {
-		 setAttrs(setter);
-	 }
- });
-};
-
-
-	 
-var recalculateSheet = function() {
-
-    updateBuffRow("1");
-	updateBuffRow("2");
-	updateBuffRow("3");
-	updateBuffRow("4");
-	updateBuffRow("5");
-	updateBuffRow("6");
-	updateBuffRow("7");
-	updateBuffRow("8");
-	updateBuffRow("9");
-	updateBuffRow("10");
-	updateAbility("STR"); 
-	updateAbility("DEX"); 
-	updateAbility("CON"); 
-	updateAbility("INT"); 
-	updateAbility("WIS"); 
-	updateAbility("CHA"); 
-	updateHP();
-	updateTempHP();
-	updateClassInformation("hp");
-	updateClassInformation("skill");
-	updateClassInformation("bab");
-	updateClassInformation("Fort");
-	updateClassInformation("Ref");
-	updateClassInformation("Will");
-	updateClassInformation("level");
-	updateClassInformation("");
-	abilityDropdownHandler("AC-ability",["AC-ability-mod"],99,"DEX-mod");
-	abilityDropdownHandler("FF-ability",["FF-DEX"],99,"");
-	abilityDropdownHandler("CMD-ability1",["CMD-STR"],-1,"STR-mod");
-	abilityDropdownHandler("CMD-ability2",["CMD-DEX"],99,"DEX-mod");
-	abilityDropdownHandler("CMD-ability",["FF-CMD-DEX"],99,"");
-	abilityDropdownHandler("melee-ability",["melee-ability-mod"],-1,"STR-mod");
-	abilityDropdownHandler("ranged-ability",["ranged-ability-mod"],-1,"DEX-mod");
-	abilityDropdownHandler("CMB-ability",["CMB-ability-mod"],-1,"STR-mod");
-	updateArmor();	
-	updateConditionDefensePenalty();
-	updateDefenses();
-	updateConditionAttackPenalty();
-	updateAttack("melee");
-	updateAttack("ranged");
-	updateAttack("CMB");
-	updateInit();
-};
-
-
-
-on("change:recalc1",function(){recalculateSheet();});
-on("change:fort-ability", function(){abilityDropdownHandler  ("Fort-ability",["Fort-ability-mod"],-1,"CON-mod");   });
-on("change:ref-ability", function(){abilityDropdownHandler  ("Ref-ability",["Ref-ability-mod"],-1,"DEX-mod");   });
-on("change:will-ability", function(){abilityDropdownHandler  ("Will-ability",["Will-ability-mod"],-1,"WIS-mod");   });
 
 on("change:condition-fear change:condition-sickened change:condition-drained change:condition-wounds",function() {
-	updateConditionsSavePenalty();
+	PFSheet.updateConditionsSavePenalty();
 });
 on("change:total-fort change:fort-ability-mod change:fort-trait change:fort-enhance change:fort-resist change:fort-misc change:fort-temp change:buff_fort-total",function(){
-	updateSave("Fort");
+	PFSheet.updateSave("Fort");
 });
 on("change:total-ref change:ref-ability-mod change:ref-trait change:ref-enhance change:ref-resist change:ref-misc change:ref-temp change:buff_ref-total",function(){
-	updateSave("Ref");
+	PFSheet.updateSave("Ref");
 });
 on("change:total-will change:will-ability-mod change:will-trait change:will-enhance change:will-resist change:will-misc change:will-temp change:buff_will-total",function(){
-	updateSave("Will");
+	PFSheet.updateSave("Will");
 });
-
-var updateConditionsSavePenalty =function() {
-	getAttrs(["condition-Fear","condition-Sickened","condition-Drained","condition-Wounds","saves-cond"],function(v){
-		var fear = parseInt(v["condition-Fear"],10)||0,
-		    sickened = parseInt(v["condition-Sickened"],10)||0,
-			wounds=parseInt(v["condition-Drained"],10)||0,
-			drained=parseInt(v["condition-Wounds"],10)||0,
-			currCond=parseInt(v["saves-cond"],10)||0;
-		var newCond = drained - fear -sickened - wounds;
-		if (currCond !== newCond) {
-			setAttrs({"saves-cond":newCond});
-		}
-	});
-};
-
-/* cond instead of temp*/
-var updateSave = function(save) {
-	var getFields = ["total-"+save,save+"-ability-mod",save+"-trait",save+"-enhance",save+"-resist",save+"-misc","saves-cond","buff_"+save+"-total",save];
-	getAttrs(getFields,function(v) {
-		var currSave=parseInt(v[save],10)||0;
-		var newSave = (parseInt(v["total-"+save] ,10)||0) +
-				 (parseInt(v[save+"-ability-mod"] ,10)||0) +
-				 (parseInt(v[save+"-trait"] ,10)||0) +
-				 (parseInt(v[save+"-enhance"] ,10)||0) +
-				 (parseInt(v[save+"-resist"] ,10)||0) +
-				 (parseInt(v[save+"-misc"] ,10)||0) +
-				 (parseInt(v["saves-cond"] ,10)||0) +
-				 (parseInt(v["buff_"+save+"-total"] ,10)||0);
-		var setter={};
-		if(currSave !== newSave) {
-			setter[save]=newSave;
-			setAttrs(setter);
-		}
-	});
-};
-
+	
 </script>
 
