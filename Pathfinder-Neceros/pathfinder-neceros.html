@@ -11241,42 +11241,1293 @@
 </div>
 
 
-<script type="text/worker">
-//for jslint
-//var on = function (lookfor,callback){};
-//var setAttrs = function(setthese){};
-//var getAttrs = function(getthese,callback){};
+    <script type="text/worker">
 
-var PFSheet = PFSheet || (function(){
-    'use strict';
+var ExExp = (function(){
 
-	var updateGrapple= function() {
-		getAttrs(["condition-Pinned","condition-Grappled"],function(values){
-			if (values["condition-Pinned"] !== "0" && values["condition-Grappled"] !== "0") {
-				setAttrs({"condition-Pinned":"0"});
+    parseExpression = function (s, until) {
+        //alert('parsing: ' + s);
+        //alert('until is ' + typeof until);
+        var untilCb = (typeof (until) == typeof (function () {}) ? until : function (tok) {
+            return (tok == until);
+        });
+
+        // constants
+        var ARG_COUNTS = {
+            'abs': 1
+            , 'ceil': 1
+            , 'floor': 1
+            , 'round': 1
+            , 'max': [1]
+            , 'min': [1]
+        };
+        var BINARY_PRECEDENCE = {
+            '?': 1
+            , ':': 2
+            , '||': 3
+            , '&&': 4
+            , '|': 5
+            , '^': 6
+            , '&': 7
+            , '=': 8
+            , '==': 8
+            , '!=': 8
+            , '>=': 9
+            , '>': 9
+            , '<': 9
+            , '<=': 9
+            , '<<': 10
+            , '>>': 10
+            , '+': 11
+            , '-': 11
+            , '*': 12
+            , '/': 12
+            , '%': 12
+            , '**': 14
+            , 't': 98
+            , 'd': 99
+        };
+        var UNARY_PRECEDENCE = {
+            '!': 13
+            , '~': 13
+            , '-': 13
+        };
+        var CLOSERS = {
+            '(': ")"
+            , '{': "}"
+        };
+
+        // local variables
+        var operators = [{
+                'precedence': 0
+            }]
+            , operands = [];
+
+        // helper functions
+        function getToken(s) {
+            if (!s) {
+                return s;
+            }
+
+            var m;
+
+            function retVal(tokType, matchObj) {
+                return {
+                    'type': tokType
+                    , 'text': matchObj[0]
+                    , 'match': matchObj
+                };
+            }
+
+            m = s.match(/^\s+/);
+            if (m) {
+                return retVal("whitespace", m);
+            }
+            m = s.match(/^(abs|ceil|floor|round|max|min)[(]/);
+            if (m) {
+                return retVal("function", m);
+            }
+            m = s.match(/^[({]/);
+            if (m) {
+                return retVal("opengroup", m);
+            }
+            m = s.match(/^[)}]/);
+            if (m) {
+                return retVal("closegroup", m);
+            }
+            m = s.match(/^((\d+(\.\d+)?)|(\.\d+))/);
+            if (m) {
+                return retVal("number", m);
+            }
+            m = s.match(/^['"]/);
+            if (m) {
+                return retVal("quote", m);
+            }
+            m = s.match(/^((\|\|)|(&&)|(==)|(!=)|(>=)|(<=)|(<<)|(>>)|(\*\*)|[?:|^&=><%!~])/);
+            if (m) {
+                return retVal("extoperator", m);
+            }
+            m = s.match(/^[-+*/td]/);
+            if (m) {
+                return retVal("baseoperator", m);
+            }
+            m = s.match(/^\[([^\]]+)\]/);
+            if (m) {
+                return retVal("label", m);
+            }
+            m = s.match(/^\${([^'"($}][^}]*)}/);
+            if (m) {
+                return retVal("variable", m);
+            }
+            m = s.match(/^\${/);
+            if (m) {
+                return retVal("openvariable", m);
+            }
+
+            return {
+                'type': "raw"
+                , 'text': s.charAt(0)
+            };
+        }
+
+        function popToken(state) {
+            state.tok = getToken(state.s);
+            if (state.tok) {
+                state.s = state.s.substring(state.tok.text.length);
+            }
+            return state;
+        }
+
+        function popString(state, delim) {
+            var i = -1
+                , j = i;
+            // find first index of delim not preceeded by an odd number of backslashes
+            while (((i - j) & 1) == 0) {
+                i = state.s.indexOf(delim, i + 1);
+                if (i < 0) {
+                    return;
+                }
+                j = i - 1;
+                while ((j >= 0) && (state.s.charAt(j) == '\\')) {
+                    j--;
+                }
+            }
+            // unescape string to be returned
+            function replaceEscapes(s) {
+                return s.replace(/\\n/g, "\n")
+                    .replace(/\\r/g, "\r")
+                    .replace(/\\t/g, "\t")
+                    .replace(/\\/g, "");
+            }
+            var retval = state.s.substring(0, i)
+                .split("\\\\")
+                .map(replaceEscapes)
+                .join("\\");
+            // point state delim, then pop off the delimiter token
+            state.s = state.s.substring(i);
+            popToken(state);
+            return retval;
+        }
+
+        function popOperator() {
+            var op = operators.pop();
+            var right = operands.pop();
+            if (op.unary) {
+                operands.push({
+                    'type': (op.type == "baseoperator" ? "unop" : "unopex")
+                    , 'datatype': right.datatype
+                    , 'operator': op.text
+                    , 'operand': right
+                });
+                return;
+            }
+            var left = operands.pop();
+            if (op.text != ":") {
+                var datatype;
+                if ((op.text == "d") || (op.text == "t")) {
+                    datatype = "number";
+                } else if (left.datatype == right.datatype) {
+                    datatype = left.datatype;
+                } else if ((left.datatype == "string") || (right.datatype == "string")) {
+                    datatype = "string";
+                }
+                operands.push({
+                    'type': (op.type == "baseoperator" ? "binop" : "binopex")
+                    , 'datatype': datatype
+                    , 'operator': op.text
+                    , 'left': left
+                    , 'right': right
+                    , 'mods': op.mods
+                    , 'label': op.label
+                });
+                return;
+            }
+            op = operators.pop();
+            if (op.text != "?") {
+                return "Error: Expected ? but got " + op.text;
+            }
+            var cond = operands.pop();
+            operands.push({
+                'type': "cond"
+                , 'cond': cond
+                , 'left': left
+                , 'right': right
+                , 'datatype': (left.datatype == right.datatype ? left.datatype : undefined)
+            });
+        }
+
+        function pushOperator(op) {
+            var err;
+            op.precedence = (op.unary ? UNARY_PRECEDENCE[op.text] : BINARY_PRECEDENCE[op.text]) || 0;
+            while (operators[operators.length - 1].precedence >= op.precedence) {
+                err = popOperator();
+                if (err) {
+                    return err;
+                }
+            }
+            operators.push(op);
+        }
+
+        function argListUntil(tok) {
+            return (tok == ',') || (tok == ')');
+        }
+
+        function parseHelper() {
+            var err;
+
+            popToken(s);
+            if (!s.tok) {
+                return "Error: Unrecognized token: " + s.s.split(" ", 1)[0];
+            }
+            while (s.tok.type == "whitespace") {
+                popToken(s);
+                if (!s.tok) {
+                    return "Error: Unrecognized token: " + s.s.split(" ", 1)[0];
+                }
+            }
+            switch (s.tok.type) {
+            case "function":
+                var func = s.tok.match[1];
+                var argCounts = ARG_COUNTS[func]
+                    , minArgs, maxArgs;
+                if (typeof (argCounts) == typeof (0)) {
+                    minArgs = argCounts;
+                    maxArgs = argCounts;
+                } else if (typeof (argCounts) == typeof ([])) {
+                    minArgs = argCounts[0];
+                    maxArgs = argCounts[1];
+                } else {
+                    return "Error: Unrecognized function: " + func;
+                }
+                var args = [];
+                while ((s.tok) && (s.tok.text != ')')) {
+                    var argTree = parseExpression(s, argListUntil);
+                    if (typeof (argTree) == typeof ("")) {
+                        return argTree;
+                    } // error
+                    args.push(argTree);
+                    if (!s.tok) {
+                        return "Error: Unterminated function: " + func;
+                    }
+                    if (!argListUntil(s.tok.text)) {
+                        return "Error: Expected ',' or ')' to continue/close '" + func + "(', but got '" + s.tok.text + "'";
+                    }
+                }
+                if ((typeof (minArgs) != typeof (0)) || (minArgs < 0)) {
+                    minArgs = args.length;
+                }
+                if ((typeof (maxArgs) != typeof (0)) || (maxArgs < 0)) {
+                    maxArgs = args.length;
+                }
+                if (args.length < minArgs) {
+                    return "Error: Function '" + func + "' requires at least " + minArgs + " argument(s)";
+                }
+                if (args.length > maxArgs) {
+                    return "Error: Function '" + func + "' requires at most " + maxArgs + " argument(s)";
+                }
+                operands.push({
+                    'type': "function"
+                    , 'datatype': "number"
+                    , 'function': func
+                    , 'args': args
+                });
+                return;
+            case "number":
+                operands.push({
+                    'type': "number"
+                    , 'datatype': "number"
+                    , 'value': parseFloat(s.tok.text)
+                });
+                return;
+            case "variable":
+                operands.push({
+                    'type': "variable"
+                    , 'value': s.tok.match[1]
+                });
+                return;
+            case "quote":
+                var str = popString(s, s.tok.text);
+                if (typeof (str) != typeof ("")) {
+                    return "Error: Unterminated string";
+                }
+                operands.push({
+                    'type': "string"
+                    , 'datatype': "string"
+                    , 'value': str
+                });
+                return;
+            case "opengroup":
+                var opener = s.tok.text
+                    , closer = CLOSERS[opener];
+                var operand = parseExpression(s, closer);
+                if (typeof (operand) == typeof ("")) {
+                    return operand;
+                } // error
+                operands.push(operand);
+                if (s.tok.text != closer) {
+                    return "Error: Expected '" + closer + "' to close '" + opener + "', but got '" + s.tok.text + "'";
+                }
+                return;
+            case "openvariable":
+                var varExp = parseExpression(s, "}");
+                if (typeof (varExp) == typeof ("")) {
+                    return varExp;
+                } // error
+                if (s.tok.text != "}") {
+                    return "Error: Expected '}' to close '${', but got '" + s.tok.text + "'";
+                }
+                operands.push({
+                    'type': "variable"
+                    , 'value': varExp
+                });
+                return;
+            case "extoperator":
+            case "baseoperator":
+                if (!UNARY_PRECEDENCE[s.tok.text]) {
+                    return "Error: " + s.tok.text + " is not a unary operator";
+                }
+                s.tok.unary = true;
+                err = pushOperator(s.tok);
+                if (err) {
+                    return err;
+                }
+                return parseHelper();
+            }
+            return "Error: Unrecognized token: " + s.tok.text + (s.tok.type == "raw" ? s.s.split(" ", 1)[0] : "");
+        }
+
+        // if we were given a string, construct a state object
+        if (typeof (s) == typeof ("")) {
+            s = {
+                's': s
+            };
+        }
+
+        // push operators and operands to their respective stacks, building sub-ASTs in the operand stack as needed
+        var err = parseHelper();
+        if (err) {
+            return err;
+        }
+        for (popToken(s);
+            (s.tok) && (!untilCb(s.tok.text)) && ((until) || (s.tok.type != "raw")); popToken(s)) {
+            switch (s.tok.type) {
+            case "extoperator":
+            case "baseoperator":
+                rollOperator = (s.tok.text == "d" ? s.tok : null);
+                err = pushOperator(s.tok);
+                if (err) {
+                    return err;
+                }
+                if ((rollOperator) && (s.s.charAt(0) == 'F')) {
+                    operands.push({
+                        'type': "rollspec"
+                        , 'value': "F"
+                    })
+                    s.s = s.s.substring(1);
+                } else if (s.tok.text == "t") {
+                    if (s.s.charAt(0) != '[') {
+                        return "Error: 't' operator requires '[table]' argument";
+                    }
+                    var m = s.s.match(/^\[([^'"$(\]][^\]]*)\]/);
+                    var tableExp;
+                    if (m) {
+                        tableExp = m[1];
+                        s.s = s.s.substring(m[0].length);
+                    } else {
+                        s.s = s.s.substring(1);
+                        tableExp = parseExpression(s, "]");
+                        if (typeof (tableExp) == typeof ("")) {
+                            return tableExp;
+                        } // error
+                        if (s.tok.text != "]") {
+                            return "Error: Expected ']' to close 't[', but got '" + s.tok.text + "'";
+                        }
+                    }
+                    operands.push({
+                        'type': "tablename"
+                        , 'value': tableExp
+                    });
+                } else {
+                    err = parseHelper();
+                    if (err) {
+                        return err;
+                    }
+                }
+                if (rollOperator) {
+                    var m = s.s.match(/^[acdfhkloprs0-9<=>!]+/);
+                    if (m) {
+                        rollOperator.mods = m[0];
+                        s.s = s.s.substring(m[0].length)
+                    }
+                }
+                break;
+            case "label":
+                if ((operators.length > 0) && (operators[operators.length - 1].text == "d")) {
+                    // set label on "d" operator instead of operand (e.g. "1d6[foo]" is "(1d6)[foo]", not "1d(6[foo])")
+                    operators[operators.length - 1].label = s.tok.match[1];
+                    break;
+                }
+                var operand = operands.pop();
+                if (operand) {
+                    operand.label = s.tok.match[1];
+                    operands.push(operand);
+                }
+                break;
+            }
+        }
+        // no more input; collapse remaining operators and operands into a single AST
+        while (operators.length > 1) {
+            err = popOperator();
+            if (err) {
+                return err;
+            }
+        }
+
+        return operands.pop();
+    },
+
+    write= function (s) {
+        console.log("EXEXP:"+s);
+    },
+
+
+    sendCommand= function (chunks, asts, evalResults, labels) {
+        // constants
+        var FUNCTION_FUNCTIONS = {
+            'abs': Math.abs
+            , 'ceil': Math.ceil
+            , 'floor': Math.floor
+            , 'round': Math.round
+            , 'max': Math.max
+            , 'min': Math.min
+        };
+        var BINARY_FUNCTIONS = {
+            '||': function (x, y) {
+                return x || y;
+            }
+            , '&&': function (x, y) {
+                return x && y;
+            }
+            , '|': function (x, y) {
+                return x | y;
+            }
+            , '^': function (x, y) {
+                return x ^ y;
+            }
+            , '&': function (x, y) {
+                return x & y;
+            }
+            , '=': function (x, y) {
+                return x == y;
+            }
+            , '==': function (x, y) {
+                return x == y;
+            }
+            , '!=': function (x, y) {
+                return x != y;
+            }
+            , '>=': function (x, y) {
+                return x >= y;
+            }
+            , '>': function (x, y) {
+                return x > y;
+            }
+            , '<': function (x, y) {
+                return x < y;
+            }
+            , '<=': function (x, y) {
+                return x <= y;
+            }
+            , '<<': function (x, y) {
+                return x << y;
+            }
+            , '>>': function (x, y) {
+                return x >> y;
+            }
+            , '+': function (x, y) {
+                return x + y;
+            }
+            , '-': function (x, y) {
+                return x - y;
+            }
+            , '*': function (x, y) {
+                return x * y;
+            }
+            , '/': function (x, y) {
+                return x / y;
+            }
+            , '%': function (x, y) {
+                return x % y;
+            }
+            , '**': Math.pow
+            , 'd': function (x, y) {
+                var retval = 0;
+                for (var i = 0; i < x; i++) {
+                    retval += randomInteger(y);
+                }
+                return retval;
+            }
+        };
+        var UNARY_FUNCTIONS = {
+            '!': function (x) {
+                return !x;
+            }
+            , '~': function (x) {
+                return ~x;
+            }
+            , '-': function (x) {
+                return -x;
+            }
+        };
+
+
+        // local variables
+        var references = {}
+            , unevalRefs = []
+            , evalReqs = [];
+
+        // helper functions
+        function lazyEval(t, labels, references, unevalRefs, evalReqs, force) {
+            //alert(' at lazyEval, t: ' + t + ', t.type:'+t.type);
+            var x, y;
+
+            if (t.label) {
+                labels[t.label] = t;
+            }
+
+            switch (t.type) {
+            case "number":
+            case "rollspec":
+                t.baseValid = true;
+                // fall through
+            case "string":
+                return t;
+            case "tablename":
+                if (typeof (t.value) != typeof ("")) {
+                    x = lazyEval(t.value, labels, references, unevalRefs, evalReqs, true);
+                    if (typeof (x) == typeof ("")) {
+                        return x;
+                    } // error
+                    if (x.type == "number") {
+                        // number node; coerce to string
+                        x.value = "" + x.value;
+                        x.type = "string"
+                    }
+                    if (x.type != "string") {
+                        // unable to fully evaluate table name
+                        if (t.baseValid) {
+                            t.baseValid = false;
+                        }
+                        unevalRefs.push(t.value);
+                        return t;
+                    }
+                    // successfully evaluated table name
+                    t.value = x.value;
+                }
+                // if we got here, t.value is the name of a rollable table
+                t.baseValid = true;
+                return t;
+            case "function":
+                var args = [];
+                for (var i = 0; i < t.args.length; i++) {
+                    x = lazyEval(t.args[i], labels, references, unevalRefs, evalReqs, true);
+                    if (typeof (x) == typeof ("")) {
+                        return x;
+                    } // error
+                    if (x.type == "string") {
+                        x.value = parseFloat(x.value);
+                        x.type = "number";
+                    }
+                    if (x.type != "number") {
+                        // unable to fully evaluate argument
+                        if (t.baseValid) {
+                            t.baseValid = false;
+                        }
+                        return t;
+                    }
+                    args.push(x.value);
+                }
+                // successfully evaluated all arguments
+                t.type = "number";
+                t.datatype = "number";
+                t.value = FUNCTION_FUNCTIONS[t.function].apply(args, args);
+                for (var i = 0; i < t.args.length; i++) {
+                    if (t.args[i].label) {
+                        labels[t.args[i].label] = t.args[i];
+                    }
+                }
+                delete t.function;
+                delete t.args;
+                t.baseValid = true;
+                return t;
+            case "unop":
+            case "unopex":
+                force = force || (t.type != "unop");
+                x = lazyEval(t.operand, labels, references, unevalRefs, evalReqs, force);
+                if (typeof (x) == typeof ("")) {
+                    return x;
+                } // error
+                if (force) {
+                    if (x.type != "number") {
+                        // unable to fully evaluate operand
+                        if (t.baseValid) {
+                            t.baseValid = false;
+                        }
+                        return t;
+                    }
+                    // successfully evaluated operand
+                    t.type = "number";
+                    t.datatype = "number";
+                    t.value = UNARY_FUNCTIONS[t.operator](x.value);
+                    delete t.operator;
+                    if (t.operand.label) {
+                        labels[t.operand.label] = x;
+                    }
+                    delete t.operand;
+                    t.baseValid = true;
+                } else {
+                    t.baseValid = x.baseValid;
+                }
+                return t;
+            case "binop":
+            case "binopex":
+                force = force || (t.type != "binop") || (t.left.datatype == "string") || (t.right.datatype == "string");
+                var forceSubtrees = force || (t.operator == "d") || (t.operator == "t");
+                 //alert('left is: ' + t.left + ', right is:' + t.right);
+                x = lazyEval(t.left, labels, references, unevalRefs, evalReqs, forceSubtrees);
+                y = lazyEval(t.right, labels, references, unevalRefs, evalReqs, forceSubtrees);
+                    //alert('typeof left:' + typeof x + ', typeof right:' + typeof y);
+                    force = true;
+               // if (typeof (x) == typeof ("")) {
+               //     return x;
+               // } // error
+                //if (typeof (y) == typeof ("")) {
+                //    return y;
+               // } // error
+                if (force) {
+                    if ((x.type != "number") && (x.type != "string")) {
+                        // unable to fully evaluate left operand
+                        if (t.baseValid) {
+                            t.baseValid = false;
+                        }
+                        return t;
+                    }
+                    if ((y.type != "number") && (y.type != "string") && (y.type != "rollspec") && (y.type != "tablename")) {
+                        // unable to fully evaluate right operand
+                        if (t.baseValid) {
+                            t.baseValid = false;
+                        }
+                        return t;
+                    }
+                    if ((y.type == "rollspec") && (t.operator != "d")) {
+                        return "Rollspec operand is only compatible with 'd' operator";
+                    }
+                    if ((t.operator == "t") && (y.type != "tablename")) {
+                        return "'t' operator requires tablename operand";
+                    }
+                    // successfully evaluated both operands
+                    if ((t.operator == "t") || ((t.operator == "d") && (t.mods))) {
+                        // operator is rollable table or is roll with mods; must submit to base system for evaluation
+                        evalReqs.push(t);
+                        return t;
+                    }
+                    //alert('about to call binary');
+                    t.value = BINARY_FUNCTIONS[t.operator](x.value, y.value);
+                    delete t.operator;
+                    if (t.left.label) {
+                        labels[t.left.label] = x;
+                    }
+                    delete t.left;
+                    if (t.right.label) {
+                        labels[t.right.label] = y;
+                    }
+                    delete t.right;
+                    t.type = (typeof (t.value) == typeof ("") ? "string" : "number");
+                    t.datatype = t.type;
+                    t.baseValid = (t.datatype == "number");
+                } else if ((x.datatype == "number") && (y.datatype == "number")) {
+                    t.datatype = "number";
+                    t.baseValid = true;
+                }
+                return t;
+            case "cond":
+                x = lazyEval(t.cond, labels, references, unevalRefs, evalReqs, true);
+                if (typeof (x) == typeof ("")) {
+                    return x;
+                } // error
+                if ((x.type != "number") && (x.type != "string")) {
+                    // unable to fully evaluate condition
+                    t.baseValid = false;
+                    return t;
+                }
+                // successfully evaluated condition; replace t with t.left or t.right as appropriate
+                y = (x.value ? t.left : t.right);
+                if (t.cond.label) {
+                    labels[t.cond.label] = x;
+                }
+                delete t.cond;
+                delete t.left;
+                delete t.right;
+                for (var k in y) {
+                    t[k] = y[k];
+                }
+                return lazyEval(t, labels, references, unevalRefs, evalReqs, force);
+            case "variable":
+                if (typeof (t.value) != typeof ("")) {
+                    x = lazyEval(t.value, labels, references, unevalRefs, evalReqs, true);
+                    if (typeof (x) == typeof ("")) {
+                        return x;
+                    } // error
+                    if (x.type == "number") {
+                        // number node; coerce to string
+                        x.value = "" + x.value;
+                        x.type = "string"
+                    }
+                    if (x.type != "string") {
+                        // unable to fully evaluate variable name
+                        if (t.baseValid) {
+                            t.baseValid = false;
+                        }
+                        unevalRefs.push(t.value);
+                        return t;
+                    }
+                    // successfully evaluated variable name
+                    t.value = x.value;
+                }
+                // if we got here, t.value is the name of a variable
+                if ((labels[t.value]) && ((labels[t.value].type == "string") || (labels[t.value].type == "number"))) {
+                    // variable exists and has been fully evaluated
+                    t.type = labels[t.value].type;
+                    t.datatype = labels[t.value].datatype;
+                    t.baseValid = labels[t.value].baseValid;
+                    t.value = labels[t.value].value;
+                } else {
+                    // variable not yet defined or not yet fully evaluated
+                    if (!references[t.value]) {
+                        references[t.value] = [];
+                    }
+                    references[t.value].push(t);
+                    if (t.baseValid) {
+                        t.baseValid = false;
+                    }
+                }
+                return t;
+            default:
+                return "Unknown node type: " + t.type;
+            }
+        }
+
+        function hasUnevaluatedLabels(t) {
+            // base types: fully evaluated
+            if ((t.type == "number") || (t.type == "string") || (t.type == "rollspec")) {
+                return false;
+            }
+
+            // if we got here, node is unevaluated
+            if (t.label) {
+                return true;
+            }
+
+            // node has no label; check children
+            switch (t.type) {
+            case "function":
+                for (var i = 0; i < t.args.length; i++) {
+                    if (hasUnevaluatedLabels(t.args[i])) {
+                        return true;
+                    }
+                }
+                return false;
+            case "tablename":
+            case "variable":
+                if (typeof (t.value) == typeof ("")) {
+                    return false;
+                }
+                return hasUnevaluatedLabels(t.value);
+            case "unop":
+            case "unopex":
+                return hasUnevaluatedLabels(t.operand);
+            case "cond":
+                if (hasUnevaluatedLabels(t.cond)) {
+                    return true;
+                }
+                // fall through
+            case "binop":
+            case "binopex":
+                if (hasUnevaluatedLabels(t.left)) {
+                    return true;
+                }
+                return hasUnevaluatedLabels(t.right);
+            }
+        }
+
+        function flattenAST(t) {
+            var retval;
+
+            switch (t.type) {
+            case "number":
+            case "rollspec":
+                retval = t.value || 0;
+                break;
+            case "tablename":
+                retval = "[" + t.value + "]";
+                break;
+            case "unop":
+                retval = "(" + t.operator + flattenAST(t.operand) + ")";
+                break;
+            case "binop":
+                retval = "(" + flattenAST(t.left) + t.operator + flattenAST(t.right) + (t.mods || "") + ")";
+                if ((t.label) && (t.operator == "d")) {
+                    retval += "[" + t.label + "]";
+                }
+                break;
+            default:
+                return "Unknown node type: " + t.type;
+            }
+
+            return retval;
+        }
+
+        function astToCmd(t) {
+            if (t.type == "string") {
+                return t.value;
+            }
+            var retval = flattenAST(t);
+            return retval;
+        }
+
+        function reportError(err) {
+            ExExp.write("Error: " + err);
+			return "";
+        }
+
+        //BEGIN
+		// substitute in results of base evaluation
+        for (var i = 0; i < evalResults.length; i++) {
+            var t = evalResults[i][0];
+            delete t.operator;
+            delete t.left;
+            delete t.right;
+            t.type = "number";
+            t.datatype = "number";
+            t.value = evalResults[i][1];
+            t.baseValid = true;
+        }
+
+        // traverse ASTs, collapsing as much as possible
+        for (var i = 0; i < asts.length; i++) {
+            if (asts[i].baseValid) {
+                continue;
+            } // can be handled by base expression evaluator
+            if ((asts[i].type == "string") || (asts[i].type == "number")) {
+                continue;
+            } // tree is fully evaluated
+            var err = lazyEval(asts[i], labels, references, unevalRefs, evalReqs, false);
+            if (typeof (err) == typeof ("")) {
+                return reportError(err);
+            }
+        }
+
+        // do variable substitution; repeat until we don't make any more progress
+        var doSubstitution = true;
+        while (doSubstitution) {
+            doSubstitution = false;
+            // substitute in values for variables for which we already have names
+            for (var label in references) {
+                if (!labels[label]) {
+                    return reportError("Variable '" + label + "' not defined");
+                }
+                if ((labels[label].type != "string") && (labels[label].type != "number")) {
+                    // variable exists but not yet evaluated; try to evaluate
+                    var err = lazyEval(labels[label], labels, references, unevalRefs, evalReqs, true);
+                    if (typeof (err) == typeof ("")) {
+                        return reportError(err);
+                    }
+                }
+                if ((labels[label].type == "string") || (labels[label].type == "number")) {
+                    // variable fully evaluated; substitute it in
+                    for (var i = 0; i < references[label].length; i++) {
+                        references[label][i].type = labels[label].type;
+                        references[label][i].datatype = labels[label].datatype;
+                        references[label][i].value = labels[label].value;
+                        references[label][i].baseValid = labels[label].baseValid;
+                    }
+                    delete references[label];
+                    doSubstitution = true;
+                }
+            }
+            // try to get names for variables and tables with unevaluated names
+            var newUneval = [];
+            while (unevalRefs.length > 0) {
+                var r = lazyEval(unevalRefs.shift(), labels, references, unevalRefs, evalReqs, true);
+                if (typeof (r) == typeof ("")) {
+                    return reportError(err);
+                }
+                if ((r.type == "string") || (r.type == "number")) {
+                    doSubstitution = true;
+                } else {
+                    newUneval.push(r);
+                }
+            }
+            unevalRefs = newUneval;
+        }
+
+        // flatten fully evaluated ASTs into strings and splice into chunks
+        for (var i = asts.length - 1; i >= 0; i--) {
+            if ((!asts[i].baseValid) && (asts[i].type != "number") && (asts[i].type != "string")) {
+                continue;
+            }
+            if ((unevalRefs.length > 0) & (hasUnevaluatedLabels(asts[i]))) {
+                continue;
+            }
+            chunks.splice(i, 2, (chunks[i] || "") + astToCmd(asts.splice(i, 1)[0]) + (chunks[i + 1] || ""));
+        }
+
+        if (evalReqs.length > 0) {
+			Console.log("Cannot evalutate");
+			return ;
+        }
+        if (asts.length > 0) {
+            // need to finish evaluating some ASTs; recurse directly
+            return ExExp.sendCommand(chunks, asts, [], labels)
+        }
+        // if we got here, we're done evaluating everything; submit results via sendChat
+		var retval=chunks.join("");
+      
+        return retval;
+    },
+
+  
+    handleExpression= function ( msg) {
+        var chunks = []
+            , asts = []
+            , cmd = msg.replace(/^\s+/, "");
+        var state = {
+            's': cmd
+        };
+		var ast = ExExp.parseExpression(state, null);
+		if (typeof (ast) == typeof ("")) {
+			ExExp.write("could not parse"+msg);
+			return "";
+		}
+		asts.push(ast);
+		state.s =  (state.tok)?(state.tok.text+state.s):state.s;
+          //  ((state.tok || {'text': ""}).text || "") + state.s;
+        chunks.push(state.s);
+        return ExExp.sendCommand(chunks, asts, [], {});
+    };
+
+	
+    return {
+		parseExpression:parseExpression,
+		write:write,
+		sendCommand:sendCommand,
+		handleExpression:handleExpression
+    };
+}());
+
+
+var SWUtils = SWUtils || (function() {	
+	
+	//no macro calls, dropdowns, or keep  highest/lowest more than 1
+	//currently support floor, abs, kh1, kl1 , also extended: ceil, round, max, min
+	var validNumericStr = function(preeval) {
+		var anyillegal=preeval.match(/\||\?|&|\{|\}|k[h,l][^1]/);
+		if (!(anyillegal==undefined) && anyillegal.length>0) {
+			return false;
+		}
+		
+		var r2=preeval.replace(/floor|ceil|round|abs|max|min|kh1|kl1/g,'');
+		anyillegal = r2.match(/[a-zA-Z]/);
+		if (!(anyillegal==undefined) && anyillegal.length>0) {
+			return false;
+		}
+		return true;
+	},
+	
+	/* searchAndReplaceFields
+	 * Examines a string for instances of @{fieldname}, and then searches the sheet for those values 
+	 * then replaces the intances in the string with the values of those fields.
+	 * Because it is a search and replace, if there are no @{fieldname} values, then it will return the same string back.
+	 * If there is an error, it will return an empty string "".
+	 *
+	 * @fromfield = string containing one or more @{fieldname}
+	 * @callback = method accepting 1 parameter , this parameter will be the result of the search and replace in the fromfield.
+	 * @evalToNumber = true if call validNumericStr 
+	 * the end result should be evaluable to a number (not a macro string that is sent to chat)
+	 *   e.g.: replaces  [[ and ]] with ( and ) , ensures only kl1 or kh1 (not kh2 or more etc),
+	 *         no strings except valid functions like floor, ceil, etc, according to validNumericStr
+	 */
+	searchAndReplaceFields = function(fromfield, evalToNumber, callback ) {
+		if (typeof callback !== "function") {
+			return;
+		}
+		if (! fromfield ) {
+			callback("");
+			return;
+		}
+		try {
+			var i,numfields,fieldnames=[],matches = [];
+			if (evalToNumber) {
+				fromfield = fromfield.replace("selected|","").replace("target|","");
+			}
+			matches = fromfield.match(/(@\{([^}]+)\})(?!.*\1)/g);
+			if (typeof matches == "undefined" || matches==null) {
+				callback (fromfield);
+				return;
+			}
+			numfields=matches.length;
+
+			fieldnames=[numfields];
+			for (i=0;i<numfields;i++) {
+				fieldnames[i]=matches[i].replace("@{","").replace("}","");
+			}
+			getAttrs(fieldnames,function(values){
+				var evalstr=fromfield;
+				try {
+					var replacements=[numfields];
+					for (i=0;i<numfields;i++){
+						replacements[i]=values[fieldnames[i]];
+					}
+					for (i=0;i<numfields;i++){
+                        //easier than escaping special regex and double escaping $
+						evalstr = evalstr.split(matches[i]).join(replacements[i]);
+
+					}
+					if (evalToNumber) {
+						evalstr=evalstr.replace(/\s+/g,'').replace(/\[\[/g,"(").replace(/\]\]/g,")");
+						if (! validNumericStr(evalstr) ) {
+							evalstr="";
+							console.log("ERROR: cannot evaluate this to number: " + fromfield);
+						}
+					}
+				} catch (err) {
+					console.log("ERROR:" + err);
+					evalstr="";
+				} finally {
+					callback ( evalstr);
+				}
+			});
+		} catch (err){
+			console.log("ERROR: " + err);
+			callback (fromfield);
+		} 
+	},
+
+	/* evaluateExpression
+	*  reads in the string, evalutates it until we find a number, then passes that numbe to the callback.
+	*  @exprStr= A string containing a mathematical expression, possibly containing references to fields such as @{myfield}
+	*  @callback = a function taking one parameter, either a number or empty string . 
+	*/
+	evaluateExpression = function(exprStr,callback) {
+		if (typeof callback !== "function" ) {
+			return;
+		}
+		if (! exprStr) {
+			callback("");
+		}
+		searchAndReplaceFields(exprStr, true, function(replacedStr) {
+			//console.log("we received "+replacedStr+" back");
+			var evaluated, setter={};
+			if (typeof replacedStr != "undefined" && replacedStr != null ) {
+				evaluated = ExExp.handleExpression(replacedStr);
+				callback( evaluated);
 			} else {
-				//user hit either pinned and it undid grapple, or hit grapple first time.
-				updateAbility("DEX");
-				//if (values["condition-Pinned"]==1) {
-				//	updateConditionDefensePenalty();
-				//}
+				callback("");
 			}
 		});	
 	},
 
-	updatePin = function() {
-		getAttrs(["condition-Pinned","condition-Grappled"],function(values){
-			if (values["condition-Pinned"] !== "0" && values["condition-Grappled"] !== "0") {
-				setAttrs({"condition-Grappled":"0"});
-			} else {
-				//user hit grapple and it  undid pinned, or hit pinned first time.
-				updateAbility("DEX"); 
-				//if (values["condition-Grappled"]==0) {
-				//	updateConditionDefensePenalty();
-				//}	
-			}
+
+	/* evaluateAndSet
+	 * Searches the readField for any instances of @{field} and replaces them with a value
+	 * then writes the resulting string to the writeField. 
+	 * 
+	 * @readField = the field that contains the string to evaluate, like a field containing a macro
+	 * @writeField = the field to write the evaluated value of readField to
+	*/
+	evaluateAndSetString = function (readField,writeField,evalToNumber) {
+		if (typeof writeField === "undefined" || writeField == null || 
+			typeof readField === "undefined" || readField == null) {
+			return;
+		}
+		getAttrs([readField], evalToNumber,function(values) {
+			searchAndReplaceFields(values[readField], function(valueOf) {
+				if (typeof valueOf != "undefined" && valueOf != null && valueOf.length > 0) {
+					var setter = {};
+					setter[writeField]=valueOf;
+					setAttrs(setter);
+				}
+			});
 		});
 	},
+	
+
+
+	/* evaluateToNumberAndSet
+	* Examines the string in readField, and tests to see if it is a number
+	* if it's a number immediately write it to writeField.
+	* if not, then replace any @{field} references with numbers, and then evaluate it 
+	* as a mathematical expression till we find a number.
+	*
+	* note this is NOT recursive, you can't point one field of 
+    *
+	* @readField = field to read containing string to parse
+	* @writeField = field to write to
+	* @defaultVal= optional, default to set if we cannot evaluate the field. If none set to 0.
+	* 
+	*/
+	evaluateAndSetNumber = function(readField,writeField,defaultVal){
+		getAttrs([readField,writeField], function (values){ 
+			var o = {};
+			var value = 0;
+			var currVal= parseFloat(values[writeField],10)||0;
+			value = parseFloat(values[readField]);//cannot do "||0" since 0 is valid but falsy
+			if (isNaN(value) || typeof(value) === "undefined") {
+				SWUtils.evaluateExpression(values[readField],function(value){
+					//should be same, but sometimes not!? check both
+					if ( isNaN(value) || typeof(value) === "undefined" ) {value=defaultVal||0;}
+					if (currVal!==value) {
+						o[writeField]=value;
+						setAttrs(o);					
+					}
+				});
+			} else {
+				if (currVal!==value) {
+					o[writeField]=value;
+					setAttrs(o);
+				}				
+			}
+		});		
+	};
+
+	
+	
+    return {
+		validNumericStr:validNumericStr,
+		searchAndReplaceFields:searchAndReplaceFields,
+		evaluateExpression:evaluateExpression,
+		evaluateAndSetString:evaluateAndSetString,
+		evaluateAndSetNumber:evaluateAndSetNumber
+    };
+}());
+	
+	
+	
+var PFSheet = PFSheet || (function(){
+  
+	//Utilities
+	
+	/* findAbilityInString
+	 * Looks at a string for instances of an ability modifier (DEX-mod, etc) and returns
+	 * the modifier it finds. If it finds none, it looks for the base ability 
+	 * Note the order checked is the same as the order they traditionally appear in
+	 * (STR-mod,DEX-mod,CON-mod,INT-mod,WIS-mod,CHA-mod) 
+	 * then it checks for  (STR,DEX,CON,INT,WIS,CHA) 
+		
+	 */
+	var findAbilityInString = function (fieldToFind) {
+		if (fieldToFind.indexOf("STR-mod") >= 0 ) {fieldToFind = "STR-mod";}
+		else if (fieldToFind.indexOf("DEX-mod") >= 0 ) {fieldToFind = "DEX-mod";}
+		else if (fieldToFind.indexOf("CON-mod") >= 0 ) {fieldToFind = "CON-mod";}
+		else if (fieldToFind.indexOf("INT-mod") >= 0 ) {fieldToFind = "INT-mod";}
+		else if (fieldToFind.indexOf("WIS-mod") >= 0 ) {fieldToFind = "WIS-mod";}
+		else if (fieldToFind.indexOf("CHA-mod") >= 0 ) {fieldToFind = "CHA-mod";}
+		else if (fieldToFind.indexOf("STR") >= 0 ) {fieldToFind = "STR";}
+		else if (fieldToFind.indexOf("DEX") >= 0 ) {fieldToFind = "DEX";}
+		else if (fieldToFind.indexOf("CON") >= 0 ) {fieldToFind = "CON";}
+		else if (fieldToFind.indexOf("INT") >= 0 ) {fieldToFind = "INT";}
+		else if (fieldToFind.indexOf("WIS") >= 0 ) {fieldToFind = "WIS";}
+		else if (fieldToFind.indexOf("CHA") >= 0 ) {fieldToFind = "CHA";}
+		else if (fieldToFind.indexOf("melee") >= 0) {fieldToFind="attk-melee";}
+		else if (fieldToFind.indexOf("ranged") >= 0) {fieldToFind="attk-ranged";}
+		else if (fieldToFind.indexOf("CMB") >= 0) {fieldToFind="CMB";}
+		return fieldToFind;
+	},
+
+	/* findMultiplier
+	 * for damage dropdown in attack items, look at string for dropdown
+	 * and return number
+	 * 
+	 * @str = the value of the damage ability
+	 * @returns = a number indicating the multiplier for the ability mod
+	*/
+	findMultiplier = function (str) {
+		if (str.indexOf("1.5") >= 0) {str=1.5;}
+		else if (str.indexOf(".5") >= 0) {str=.5;}
+		else if (str.indexOf("2") >= 0) {str=2;}
+		else if (str.indexOf("1/2") >= 0) {str=.5;}
+		else if (str.indexOf("3/2") >= 0) {str=1.5;}
+		else if (str.indexOf("1 1/2") >= 0) {str=1.5;}
+		else { str=1;}
+		return str;
+	},
+
+	/* getDropdownVal
+	 * by passing the value of a dropdown that has string references to abilties, 
+	 * this determines what ability / field it references, finds that field in 
+	 * the sheet, and calls the callback function passing the value in.
+	 * If new dropdowns are made, ensure the fields referenced are in the
+	 * findAbilityInString method.
+	 * 
+	 * @readField = the dropdown we are looking at
+	 * @defaultAbility = if the value of the dropdown cannot be determined , use this.
+	 *        pass in "" if no default is desired
+	 * @callback = a function that takes one integer parameter, which is the value the dropdown selection represents
+	 */
+	getDropdownVal = function (readField,callback) {
+		if (!readField  || typeof callback !== "function" ) {
+			return;
+		}    
+		getAttrs([readField],function(values) {
+			var fieldToFind =values[readField];
+			//hardcoded 0 means "none"
+			if (fieldToFind=="0"){
+				callback(0);
+				return;
+			}
+			
+			fieldToFind = findAbilityInString(fieldToFind);
+			getAttrs([fieldToFind], function(v) {
+				var valueOf = parseInt(v[fieldToFind],10)||0;
+				callback(valueOf);
+			});
+		});	
+
+	},
+
+	/* handleDropdown
+	 * Looks at a dropdown, evaluates the number the selected item refers to, and then 
+	 * sets the writeFields with that number. 
+	 *
+	 * @readField = the dropdpown field
+	 * @writeFields = An array of strings that are fields to write the value to
+	 * @limit = the number representing a maximum number that is possible (ex: Max DEX to AC)
+	 *   pass in -1 if no limit applies
+	 * @defaultAbility = if the dropdown cannot be evaluated, which ability should be used instead. 
+	 *        pass in "" if no default desired.
+	 */
+	handleDropdown = function (readField,writeFields) {
+    	console.log("at handle Dropdown: read:"+readField+", write"+writeFields);
+		if ( !writeFields ) {
+			return;
+		}    
+		getDropdownVal(readField,function(valueOf){
+	
+			getAttrs(writeFields,function(v){
+				var i, setany=0,setter = {};
+				for( i=0;i<writeFields.length;i++) {
+					if (v[writeFields[i]] !== valueOf) {
+						setter[writeFields[i]]=valueOf;
+						setany++;
+					}
+				}
+				if (setany) {setAttrs(setter);}
+			});
+		});
+	},
+	
+
+
 
 	/* updateAbility
 	 * Updates the final ability score, ability modifier, condition column based on entries in ability grid plus conditions and buffs.
@@ -11289,9 +12540,6 @@ var PFSheet = PFSheet || (function(){
 		getAttrs([ability+"-base",ability+"-enhance",ability+"-misc",ability+"-damage",ability+"-penalty",ability+"-drain","buff_"+ability+"-total",
 			"condition-Unconscious","condition-Fatigued","condition-Entangled","condition-Grappled","condition-Pinned",
 			ability, ability+"-mod", ability+"-cond"], function (values){
-			if (isNaN(values["buff_"+ability+"-total"])) {
-				values["buff_"+ability+"-total"]=0;
-			}		
 			//console.log (values);
 			var base = (parseInt(values[ability+"-base"],10)||0) + 
 				(parseInt(values[ability+"-enhance"],10)||0) + 
@@ -11344,6 +12592,8 @@ var PFSheet = PFSheet || (function(){
 		});
 	},
 
+	
+	
 	/* updateBuff
 	 * This updates the buff value when a textbox is updated.
 	 * ONLY called if the toggle checkbox is CHECKED for this row, 
@@ -11355,13 +12605,7 @@ var PFSheet = PFSheet || (function(){
 	updateBuff = function (eventname, row) {
 		var fieldtoUpdate = "buff"+row+"_"+eventname;
 		var fieldtoRead = fieldtoUpdate + "_macro-text";
-		var value = 0;
-		getAttrs([fieldtoRead], function (values){ 
-			value = parseInt(values[fieldtoRead])||0;
-			var o = {};
-			o[fieldtoUpdate]=value;
-			setAttrs(o);
-		});
+		SWUtils.evaluateAndSetNumber(fieldtoRead,fieldtoUpdate);
 	},
 
 	/* updateBuffRow
@@ -11371,14 +12615,14 @@ var PFSheet = PFSheet || (function(){
 	 * @row {number} The buff row toggled (X in buffX_Toggle )
 	  */
 	updateBuffRow = function(row) {
-		var valuesToSet ={};
 		var toggle="buff"+row+"_Toggle";
 		var buffFlds = ["buff"+row+"_Melee", "buff"+row+"_Ranged","buff"+row+"_DMG","buff"+row+"_AC","buff"+row+"_HP-temp","buff"+row+"_Fort",
 		"buff"+row+"_Ref","buff"+row+"_Will","buff"+row+"_STR","buff"+row+"_DEX","buff"+row+"_CON","buff"+row+"_INT","buff"+row+"_WIS","buff"+row+"_CHA",
 		toggle];
-		var numFlds = buffFlds.length - 1; // -1 to skip toggle field at end of buffFlds array
-		var n,numSet=0;
+
 		getAttrs(buffFlds,function(v){
+			var numFlds = buffFlds.length - 1; // -1 to skip toggle field at end of buffFlds array
+			var i,n,numSet=0, valuesToSet ={};
 			if (v[toggle] == 0) {
 				for (i=0;i<numFlds;i++) {
 					if (v[buffFlds[i]] !== 0) {valuesToSet[buffFlds[i]]=0;numSet++;}
@@ -11389,13 +12633,16 @@ var PFSheet = PFSheet || (function(){
 				for (i=0;i<numFlds;i++){
 					inputFlds[i] = buffFlds[i]+"_macro-text";
 				}
-				getAttrs(inputFlds, function (v2){ 
+				for (i=0;i<numFlds;i++){
+					SWUtils.evaluateAndSetNumber(inputFlds[i],buffFlds[i]);
+				}
+				/*getAttrs(inputFlds, function (v2){ 
 					for (i=0;i<numFlds;i++){
 						n=parseInt(v2[inputFlds[i]],10)||0;
 						if (n!==0) { valuesToSet[buffFlds[i]]=n; numSet++;}
 					}
 					if (numSet > 0) {setAttrs(valuesToSet);}
-				});  
+				});  */
 			}
 		});
 	},
@@ -11427,6 +12674,49 @@ var PFSheet = PFSheet || (function(){
 			setAttrs(o);
 		});
 	},
+
+	
+	/* updateGrapple
+	* Ensures Grapple and Pin are mutually exclusive
+	*/
+	updateGrapple= function() {
+		getAttrs(["condition-Pinned","condition-Grappled"],function(values){
+			if (values["condition-Pinned"] !== "0" && values["condition-Grappled"] !== "0") {
+				setAttrs({"condition-Pinned":"0"});
+			} else {
+				//user hit either pinned and it undid grapple, or hit grapple first time.
+				updateAbility("DEX");
+			}
+		});	
+	},
+
+	/* updatePin
+	* Ensures Grapple and Pin are mutually exclusive
+	*/
+	updatePin = function() {
+		getAttrs(["condition-Pinned","condition-Grappled"],function(values){
+			if (values["condition-Pinned"] !== "0" && values["condition-Grappled"] !== "0") {
+				setAttrs({"condition-Grappled":"0"});
+			} else {
+				//user hit grapple and it  undid pinned, or hit pinned first time.
+				updateAbility("DEX"); 
+			}
+		});
+	},
+	
+	/* updateInit
+	 * updates the init
+	 */
+	updateInit = function () {
+		getAttrs(["condition-Deafened","init-ability-mod","init-trait","init-misc","init"],function(values){
+			var newinit = parseInt(values["init-ability-mod"],10) + parseInt(values["init-trait"],10) + parseInt(values["init-misc"],10) - parseInt(values["condition-Deafened"],10);
+			var curr = parseInt(values["init"],10)||0;
+			if (newinit != curr) {
+				setAttrs({"init":newinit});
+			}
+		});
+	},
+
 
 	/* updateHP
 	 * sets max HP
@@ -11503,300 +12793,18 @@ var PFSheet = PFSheet || (function(){
 		});
 	},
 
-	/* findAbilityInString
-	 * Looks at a string for instances of an ability modifier (DEX-mod, etc) and returns
-	 * the modifier it finds. If it finds none, it looks for the base ability 
-	 * Note the order checked is the same as the order they traditionally appear in
-	 * (STR-mod,DEX-mod,CON-mod,INT-mod,WIS-mod,CHA-mod) 
-	 * then it checks for  (STR,DEX,CON,INT,WIS,CHA) 
-		
-	 */
-	findAbilityInString = function (fieldToFind) {
-		if (fieldToFind.indexOf("STR-mod") >= 0 ) {fieldToFind = "STR-mod";}
-		else if (fieldToFind.indexOf("DEX-mod") >= 0 ) {fieldToFind = "DEX-mod";}
-		else if (fieldToFind.indexOf("CON-mod") >= 0 ) {fieldToFind = "CON-mod";}
-		else if (fieldToFind.indexOf("INT-mod") >= 0 ) {fieldToFind = "INT-mod";}
-		else if (fieldToFind.indexOf("WIS-mod") >= 0 ) {fieldToFind = "WIS-mod";}
-		else if (fieldToFind.indexOf("CHA-mod") >= 0 ) {fieldToFind = "CHA-mod";}
-		else if (fieldToFind.indexOf("STR") >= 0 ) {fieldToFind = "STR";}
-		else if (fieldToFind.indexOf("DEX") >= 0 ) {fieldToFind = "DEX";}
-		else if (fieldToFind.indexOf("CON") >= 0 ) {fieldToFind = "CON";}
-		else if (fieldToFind.indexOf("INT") >= 0 ) {fieldToFind = "INT";}
-		else if (fieldToFind.indexOf("WIS") >= 0 ) {fieldToFind = "WIS";}
-		else if (fieldToFind.indexOf("CHA") >= 0 ) {fieldToFind = "CHA";}
-		else if (fieldToFind.indexOf("melee") >= 0) {fieldToFind="attk-melee";}
-		else if (fieldToFind.indexOf("ranged") >= 0) {fieldToFind="attk-ranged";}
-		else if (fieldToFind.indexOf("CMB") >= 0) {fieldToFind="CMB";}
-		return fieldToFind;
-	},
-
-	/* findMultiplier
-	 * for damage dropdown in attack items, look at string for dropdown
-	 * and return number
-	 * 
-	 * @str = the value of the damage ability
-	 * @returns = a number indicating the multiplier for the ability mod
+	/*updateConditionDefensePenalty
+	* Updates the AC-penalty field based on conditions
 	*/
-	findMultiplier = function (str) {
-		if (str.indexOf("1.5") >= 0) {str=1.5;}
-		else if (str.indexOf(".5") >= 0) {str=.5;}
-		else if (str.indexOf("2") >= 0) {str=2;}
-		else if (str.indexOf("1/2") >= 0) {str=.5;}
-		else if (str.indexOf("3/2") >= 0) {str=1.5;}
-		else if (str.indexOf("1 1/2") >= 0) {str=1.5;}
-		else { str=1;}
-		return str;
-	},
-
-	/* getDropdownVal
-	 * by passing the value of a dropdown that has string references to abilties, 
-	 * this determines what ability / field it references, finds that field in 
-	 * the sheet, and calls the callback function passing the value in.
-	 * If new dropdowns are made, ensure the fields referenced are in the
-	 * findAbilityInString method.
-	 * 
-	 * @readField = the dropdown we are looking at
-	 * @defaultAbility = if the value of the dropdown cannot be determined , use this.
-	 *        pass in "" if no default is desired
-	 * @callback = a function that takes one integer parameter, which is the value the dropdown selection represents
-	 */
-	getDropdownVal = function (readField,defaultAbility,callback) {
-		if (!readField  || typeof callback !== "function" ) {
-			return;
-		}    
-		getAttrs([readField],function(values) {
-			var fieldToFind =values[readField];
-			//hardcoded 0 means "none"
-			if (fieldToFind=="0"){
-				callback(0);
-				return;
-			}
-			
-			fieldToFind = findAbilityInString(fieldToFind);
-			getAttrs([fieldToFind], function(v) {
-				var valueOf = parseInt(v[fieldToFind],10)||9999;
-				if (valueOf!==9999){
-					callback(valueOf);
-				} else if ( defaultAbility ) {
-
-						getAttrs([defaultAbility],function(v){
-							var modToSave=valueOf(v[defaultAbility],10)||9999;
-							if (modToSave !== 9999){
-								callback(modToSave);
-							}
-						});
-				} else {
-					console.log("COULD NOT DETERMINE WHAT IS IN "+readField );
-				}
-			});
-		});	
-
-	},
-
-	/* handleDropdown
-	 * finds the value represented by the selected item in the dropdown and writes that value
-	 * to each field in the writeFields.
-	 * Calls the full version of handleDropdown with no limit and no default
-	 *
-	 * @readField = the dropdown field name
-	 * @writeFields = an array [] of fields to write to
-	 */
-	handleDropdown = function (readField,writeFields) {
-		handleDropdown(readField,writeFields,-1,"");
-	},
-
-	/* handleDropdown
-	 * Looks at a dropdown, evaluates the number the selected item refers to, and then 
-	 * sets the writeFields with that number. 
-	 *
-	 * @readField = the dropdpown field
-	 * @writeFields = An array of strings that are fields to write the value to
-	 * @limit = the number representing a maximum number that is possible (ex: Max DEX to AC)
-	 *   pass in -1 if no limit applies
-	 * @defaultAbility = if the dropdown cannot be evaluated, which ability should be used instead. 
-	 *        pass in "" if no default desired.
-	 */
-	handleDropdown = function (readField,writeFields,limit,defaultAbility) {
-		if ( !writeFields ) {
-			return;
-		}    
-		getDropdownVal(readField,defaultAbility,function(valueOf){
-			console.log("We received "+valueOf+" back");
-			if (!(typeof limit === "undefined" || limit == null || isNaN(limit) || limit == -1 || limit >= 99)) {
-				valueOf=Math.min(valueOf,limit);
-			}		
-			var setter = {};
-			var setany=0;
-			getAttrs(writeFields,function(v){
-				for( i=0;i<writeFields.length;i++) {
-					if (v[writeFields[i]] !== valueOf) {
-						setter[writeFields[i]]=valueOf;
-						setany++;
-					}
-				}
-				if (setany) {setAttrs(setter);}
-			});
-		});
-	},
-
-
-
-
-
-
-	/* updateConditionAttackPenalty
-	 * 
-	 * updates the condition penalty for attacks.
-	 */
-	updateConditionAttackPenalty = function() {
-
-		getAttrs(["condition-Dazzled","condition-Entangled","condition-Grappled","condition-Fear","condition-Sickened","condition-Prone",
-		"condition-Invisible","condition-Drained","condition-Wounds","attk-penalty","attk-CMB-gnote","acp-attack-mod"],function(v) { 
-			var totpenalty = -1 * (
-					(isNaN(v["condition-Dazzled"])?0:parseInt(v["condition-Dazzled"],10)) +
-					(isNaN(v["condition-Entangled"])?0:parseInt(v["condition-Entangled"],10)) +
-					(isNaN(v["condition-Grappled"])?0:parseInt(v["condition-Grappled"],10)) +
-					(isNaN(v["condition-Fear"])?0:parseInt(v["condition-Fear"],10)) +
-					(isNaN(v["condition-Sickened"])?0:parseInt(v["condition-Sickened"],10)) +
-					(isNaN(v["condition-Prone"])?0:parseInt(v["condition-Prone"],10)) +
-					(isNaN(v["condition-Wounds"])?0:parseInt(v["condition-Wounds"],10)) ) +
-				(isNaN(v["condition-Invisible"])?0:parseInt(v["condition-Invisible"],10)) +
-				(isNaN(v["condition-Drained"])?0:parseInt(v["condition-Drained"],10)) +
-				(isNaN(v["acp-attack-mod"])?0:parseInt(v["acp-attack-mod"],10)) ;
-
-				var grapplenote=" ";
-				if (v["condition-Grappled"] != "0") {
-					grapplenote="+"+v["condition-Grappled"]+" grapple";
-				}
-				var curr = parseInt("attk-penalty",10);
-				var setter = {};
-				var set=0;
-				//console.log("AAAAAAAAAAA the values are : "+totpenalty + " vs " + curr+" and note is " + grapplenote);
-				
-				if (curr !== totpenalty) {
-					setter["attk-penalty"]=totpenalty;
-					set=1;
-				}
-
-				if (v["attk-CMB-gnote"] != grapplenote){
-					setter["attk-CMB-gnote"]=grapplenote;
-					set=1;
-				}
-				if (set===1) {
-					setAttrs(setter);
-				}
-
-		});	
-	},
-
-	/* updateAttack
-	 * Updates the attack type totals at top of attack page for one row of grid
-	 *
-	 * @attype = the type of attack: melee, ranged, CMB (case sensitive)
-	 */
-	updateAttack=function(attype) {
-		var modfield=attype+"-ability-mod";
-		var  miscfield="attk-"+attype+"-misc";
-		var  atfield="attk-"+attype;
-		var  bufftype,bufffield;
-		var sizeMult=1;
-		if (attype=="melee") {bufftype="Melee";	}
-		else if (attype=="ranged") {bufftype="Ranged";}
-		else if (attype=="CMB") {
-			bufftype="CMB";
-			atfield="CMB";
-			bufffield="buff_"+bufftype+"-total";
-			sizeMult = -1;  	
-		}
-		else {return;}
-		
-		getAttrs([modfield,bufffield,"bab","size",miscfield,"attk-penalty",atfield],function(v) { 
-			//console.log(v);
-			var tohit = (isNaN(v["bab"])?0:parseInt(v["bab"],10)) +
-			(isNaN(v[modfield])?0:parseInt(v[modfield],10)) +
-			( sizeMult * (isNaN(v["size"])?0:parseInt(v["size"],10)) )+
-			(isNaN(v[miscfield])?0:parseInt(v[miscfield],10)) +
-			(isNaN(v[bufffield])?0:parseInt(v[bufffield],10)) +
-			(isNaN(v["attk-penalty"])?0:parseInt(v["attk-penalty"],10)) ;
-			var curr = parseInt(v[atfield],10);
-			if (tohit !== curr) {
-				var setter={};
-				setter[atfield]=tohit;
-				setAttrs(setter);
-			}
-		});
-	},
-
-
-
-
-
-	/* repeating weapon attack type
-	 * For the dropdown that represents what type of attack (Melee/Ranged/CMB) set the 
-	 *  weapon-attack-type-mod field.
-	 */
-
-	updateRepeatingWeaponAttackType = function() {
-
-		 getAttrs(["repeating_weapon_attack-type","repeating_weapon_attack-type-mod"],function(v) {
-			var tolookfor=v["repeating_weapon_attack-type"];
-			tolookfor= tolookfor.replace("@{","").replace("}","");
-			getAttrs([tolookfor],function(v2){
-				var tohitmod = v2[tolookfor]||0;
-				tohitmod = isNaN(tohitmod)?0:parseInt(tohitmod,10);
-				var currentmod = parseInt( v["repeating_weapon_attack-type-mod"],10);
-				if (isNaN(currentmod) || tohitmod !== currentmod) {
-					setAttrs({"repeating_weapon_attack-type-mod":tohitmod});
-				}
-			});
-		 });
-	},
-
-
-	/* Damage ability dropdown.
-	 */
-
-	updateRepeatingWeaponDamageAbility=function() {
-		 getAttrs(["repeating_weapon_damage-ability","repeating_weapon_damage-ability-mod"],function(v) {
-			var abilityType=v["repeating_weapon_damage-ability"];
-			var tolookfor= findAbilityInString (abilityType);
-			getAttrs([tolookfor],function(v2){
-				var mult = findMultiplier(abilityType);
-				var mod = isNaN(v2[tolookfor])?0:parseInt(v2[tolookfor],10);
-				var tohitmod = mod * mult;
-				var currentmod = parseInt( v["repeating_weapon_attack-type-mod"],10);
-				if (isNaN(currentmod) || tohitmod !== currentmod) {
-					setAttrs({"repeating_weapon_damage-ability-mod":tohitmod});
-				}
-			});
-		 });
-	},
-
-
-	/* updateInit
-	 * updates the init
-	 */
-	updateInit = function () {
-		getAttrs(["condition-Deafened","init-ability-mod","init-trait","init-misc","init"],function(values){
-			var newinit = parseInt(values["init-ability-mod"],10) + parseInt(values["init-trait"],10) + parseInt(values["init-misc"],10) - parseInt(values["condition-Deafened"],10);
-			var curr = parseInt(values["init"],10)||0;
-			if (newinit != curr) {
-				setAttrs({"init":newinit});
-			}
-		});
-	},
-
-
-
 	updateConditionDefensePenalty = function() {
 		getAttrs(["condition-Blinded","condition-Cowering","condition-Stunned","condition-Flat-Footed","condition-Pinned","condition-Wounds","AC-ability-mod","AC-penalty"], function(v) {
-			var debuff=  (isNaN(v["condition-Blinded"])?0:parseInt(v["condition-Blinded"],10)) +
-				(isNaN(v["condition-Pinned"])?0:parseInt(v["condition-Pinned"],10)) +
-				(isNaN(v["condition-Stunned"])?0:parseInt(v["condition-Stunned"],10)) +
-				(isNaN(v["condition-Cowering"])?0:parseInt(v["condition-Cowering"],10)) +
-				(isNaN(v["condition-Wounds"])?0:parseInt(v["condition-Wounds"],10)) ;
+			var debuff=  (parseInt(v["condition-Blinded"],10)||0) +
+				(parseInt(v["condition-Pinned"],10)||0) +
+				(parseInt(v["condition-Stunned"],10)||0) +
+				(parseInt(v["condition-Cowering"],10)||0) +
+				(parseInt(v["condition-Wounds"],10)||0) ;
 			debuff = debuff * -1;
-			var curr = parseInt(v["AC-penalty"],10);
+			var curr = parseInt(v["AC-penalty"],10)||0;
 			if (curr !== debuff) {
 				setAttrs({"AC-penalty":debuff});
 			}
@@ -11830,7 +12838,7 @@ var PFSheet = PFSheet || (function(){
 				stunned = (v["condition-Stunned"]!="0" ? 1 : 0),
 				ffed=(v["condition-Flat-Footed"]!="0" ? 1 : 0);
 			var maxDex=parseInt(v["max-dex"],10);
-				maxDex=isNaN(maxDex)?99:maxDex; //cannot do "or 0" since 0 is valid but falsy
+				maxDex=isNaN(maxDex)?99:maxDex; //cannot do "||0" since 0 is valid but falsy
 			var ability=parseInt(v["AC-ability-mod"],10)||0,
 				ffAbility=parseInt(v["FF-DEX"],10)||0,
 				cmdAbility1=parseInt(v["CMD-STR"],10)||0,
@@ -11858,11 +12866,11 @@ var PFSheet = PFSheet || (function(){
 			var cmd = 10+bab+cmdAbility1+cmdAbility2+ (-1*size) +dodge+deflect+miscCMD+condPenalty+buffs;
 			var cmdFF = 10+bab+cmdAbility1+cmdFFAbility2+ (-1*size) +deflect+miscCMD+condPenalty+buffs+( cmdFFAbility2 >0 ? dodge:0  ) ;
 			
-			var currAC= isNaN(v["AC"])?10:parseInt(v["AC"],10);
-			var currTouch= isNaN(v["Touch"])?10:parseInt(v["Touch"],10);
-			var currFF= isNaN(v["Flat-Footed"])?10:parseInt(v["Flat-Footed"],10);
-			var currCMD = isNaN(v["CMD"])?10:parseInt(v["CMD"],10);
-			var currCMDFF = isNaN(v["FF-CMD"])?10:parseInt(v["FF-CMD"],10);
+			var currAC= parseInt(v["AC"],10)||10;
+			var currTouch= parseInt(v["Touch"],10)||10;
+			var currFF= parseInt(v["Flat-Footed"],10)||10;
+			var currCMD = parseInt(v["CMD"],10)||10;
+			var currCMDFF = parseInt(v["FF-CMD"],10)||10;
 			setter={};
 			set=0;
 			if (ac !== currAC) {setter["AC"]=ac;set=1;}
@@ -11876,48 +12884,6 @@ var PFSheet = PFSheet || (function(){
 			
 		});
 	},
-
-
-
-	updateRepeatingWeapon=function() {
-	   getAttrs([
-			"repeating_weapon_enhance","repeating_weapon_masterwork","repeating_weapon_attack-type-mod","repeating_weapon_proficiency","repeating_weapon_attk-effect-total-other",
-			"repeating_weapon_damage-ability-mod","repeating_weapon_dmg-effect-total-other","repeating_weapon_buff_DMG-total_display","buff_DMG-total",
-			"repeating_weapon_attack","repeating_weapon_damage",
-			"repeating_weapon_total-attack","repeating_weapon_total-damage"
-		],function(v) {
-			//console.log("FFFFFFFFFF inside getAttrs");
-			//console.log(v);
-			//basetohit includes buff and ability mod already
-			var basetohit=v["repeating_weapon_attack-type-mod"]||0;basetohit=isNaN(basetohit)?0:parseInt(basetohit,10);
-			var dmgBuff=v["buff_DMG-total"]||0;dmgBuff=isNaN(dmgBuff)?0:parseInt(dmgBuff,10);
-			var attackMod=v.repeating_weapon_attack||0;attackMod=isNaN(attackMod)?0:parseInt(attackMod,10);
-			var enhance=v.repeating_weapon_enhance||0;enhance=isNaN(enhance)?0:parseInt(enhance,10);
-			var masterwork=v.repeating_weapon_masterwork||0;masterwork=isNaN(masterwork)?0:parseInt(masterwork,10);
-			var attackOther=v["repeating_weapon_attk-effect-total-other"]||0;attackOther=isNaN(attackOther)?0:parseInt(attackOther,10);
-			var proficient=v.repeating_weapon_proficiency||0;proficient=isNaN(proficient)?0:parseInt(proficient,10);
-			var abilityMod=v["repeating_weapon_damage-ability-mod"]||0;abilityMod=isNaN(abilityMod)?0:parseInt(abilityMod,10);
-			var damageMod=v.repeating_weapon_damage||0;damageMod=isNaN(damageMod)?0:parseInt(damageMod,10);
-			var damageOther=v["repeating_weapon_dmg-effect-total-other"]||0;damageOther=isNaN(damageOther)?0:parseInt(damageOther,10);
-			var dmgBuffRepeat=v["repeating_weapon_buff_DMG-total"]||0;dmgBuffRepeat=isNaN(dmgBuffRepeat)?0:parseInt(dmgBuffRepeat,10);
-			var currentATTKmod=v["repeating_weapon_total-attack"]||0;currentATTKmod=isNaN(currentATTKmod)?0:parseInt(currentATTKmod,10);
-			var currentDMGmod=v["repeating_weapon_total-damage"]||0;currentDMGmod=isNaN(currentDMGmod)?0:parseInt(currentDMGmod,10);
-
-			var tohit = basetohit + Math.max(enhance,masterwork) + attackMod + proficient + attackOther ;
-			var dmg = abilityMod + damageMod + damageOther + dmgBuff + enhance;
-			//console.log("base:"+basetohit+", mwk:"+masterwork+", prof:"+proficient+", enh:"+enhance+", att o: " + attackOther+", dmg o:"+damageOther +", buff:" + dmgBuff + ",buffrep:"+ dmgBuffRepeat+", atmod:" + attackMod +", dmod:"+damageMod);;
-			//console.log("new hit is "+tohit + "new dmg is " +dmg);
-			//console.log ("oldhit: "+currentATTKmod+", olddmg:"+currentDMGmod);
-			
-			var setter={};
-			var set=0;
-			if ( tohit !== currentATTKmod) {  setter["repeating_weapon_total-attack"] = tohit; set=1;  }
-			if (dmg !== currentDMGmod)  {  setter["repeating_weapon_total-damage"] = dmg;   set=1; }
-			if (dmgBuff !== dmgBuffRepeat) {   setter["repeating_weapon_buff_DMG-total_display"] = dmgBuff;  set=1; }
-			if (set===1) { setAttrs(setter); }
-		});
-	},
-
 
 
 	/*updateArmor
@@ -11938,7 +12904,7 @@ var PFSheet = PFSheet || (function(){
 			 subAC=parseInt(v["armor-acbonus"],10)||0;
 			 subD=parseInt(v["armor-max-dex"],10);subD=isNaN(subD)?99:subD; //cannot do "or 0" since 0 is valid but falsy
 			 subAcp=parseInt(v["armor-acp"],10)||0;
-			 prof=parseInt(v["armor-proficiency"],10);prof=isNaN(prof)?1:prof;
+			 prof=parseInt(v["armor-proficiency"],10);prof=isNaN(prof)?1:prof;//cannot do "||0" since 0 is valid but falsy
 			 subsp=parseInt(v["armor-spell-fail"],10)||0;
 			 acA+=subAC;
 			 maxDex = Math.min(subD,maxDex);
@@ -11986,7 +12952,7 @@ var PFSheet = PFSheet || (function(){
 		 
 		 var currACP=parseInt(v.acp,10)||0;
 		 var currMaxDex=parseInt(v["max-dex"],10);
-		 currMaxDex=isNaN(currMaxDex)?99:currMaxDex;
+			currMaxDex=isNaN(currMaxDex)?99:currMaxDex;//cannot do "||0" since 0 is valid but falsy
 		 var currACArmor=parseInt(v["AC-armor"],10)||0;
 		 var currACShield=parseInt(v["AC-shield"],10)||0;
 		 var currSpellFail=parseInt(v["spell-fail"],10)||0;
@@ -12009,56 +12975,6 @@ var PFSheet = PFSheet || (function(){
 	},
 
 
-		 
-	recalculateSheet = function() {
-
-		updateBuffRow("1");
-		updateBuffRow("2");
-		updateBuffRow("3");
-		updateBuffRow("4");
-		updateBuffRow("5");
-		updateBuffRow("6");
-		updateBuffRow("7");
-		updateBuffRow("8");
-		updateBuffRow("9");
-		updateBuffRow("10");
-		updateAbility("STR"); 
-		updateAbility("DEX"); 
-		updateAbility("CON"); 
-		updateAbility("INT"); 
-		updateAbility("WIS"); 
-		updateAbility("CHA"); 
-		updateHP();
-		updateTempHP();
-		updateClassInformation("hp");
-		updateClassInformation("skill");
-		updateClassInformation("bab");
-		updateClassInformation("Fort");
-		updateClassInformation("Ref");
-		updateClassInformation("Will");
-		updateClassInformation("level");
-		updateClassInformation("");
-		handleDropdown("AC-ability",["AC-ability-mod"],99,"DEX-mod");
-		handleDropdown("FF-ability",["FF-DEX"],99,"");
-		handleDropdown("CMD-ability1",["CMD-STR"],-1,"STR-mod");
-		handleDropdown("CMD-ability2",["CMD-DEX"],99,"DEX-mod");
-		handleDropdown("CMD-ability",["FF-CMD-DEX"],99,"");
-		handleDropdown("melee-ability",["melee-ability-mod"],-1,"STR-mod");
-		handleDropdown("ranged-ability",["ranged-ability-mod"],-1,"DEX-mod");
-		handleDropdown("CMB-ability",["CMB-ability-mod"],-1,"STR-mod");
-		updateArmor();	
-		updateConditionDefensePenalty();
-		updateDefenses();
-		updateConditionAttackPenalty();
-		updateAttack("melee");
-		updateAttack("ranged");
-		updateAttack("CMB");
-		updateInit();
-		updateSave("Fort");
-		updateSave("Ref");
-		updateSave("Will");
-	},
-
 	updateConditionsSavePenalty =function() {
 		getAttrs(["condition-Fear","condition-Sickened","condition-Drained","condition-Wounds","saves-cond"],function(v){
 			var fear = parseInt(v["condition-Fear"],10)||0,
@@ -12073,9 +12989,10 @@ var PFSheet = PFSheet || (function(){
 		});
 	},
 
-
-
-	/* cond instead of temp*/
+	/* updateSave
+	* updates the saves for a character
+    * @save = type of save: Fort, Ref, Will  (first character capitalized)
+	*/
 	updateSave = function(save) {
 		var getFields = ["total-"+save,save+"-ability-mod",save+"-trait",save+"-enhance",save+"-resist",save+"-misc","saves-cond","buff_"+save+"-total",save];
 		getAttrs(getFields,function(v) {
@@ -12094,123 +13011,243 @@ var PFSheet = PFSheet || (function(){
 				setAttrs(setter);
 			}
 		});
+	},
+
+	 
+	/* updateConditionAttackPenalty
+	 * 
+	 * updates the attk-penalty for attacks based on conditions (including wearing armor you are not proficient in)
+	 */
+	updateConditionAttackPenalty = function() {
+
+		getAttrs(["condition-Dazzled","condition-Entangled","condition-Grappled","condition-Fear","condition-Sickened","condition-Prone",
+		"condition-Invisible","condition-Drained","condition-Wounds","attk-penalty","attk-CMB-gnote","acp-attack-mod"],function(v) { 
+			var totpenalty = -1 * (
+					(parseInt(v["condition-Dazzled"],10)||0) +
+					(parseInt(v["condition-Entangled"],10)||0) +
+					(parseInt(v["condition-Grappled"],10)||0) +
+					(parseInt(v["condition-Fear"],10)||0) +
+					(parseInt(v["condition-Sickened"],10)||0) +
+					(parseInt(v["condition-Prone"],10)||0) +
+					(parseInt(v["condition-Wounds"],10)||0) ) +
+				(parseInt(v["condition-Invisible"],10)||0) +
+				(parseInt(v["condition-Drained"],10)||0) +
+				(parseInt(v["acp-attack-mod"],10)||0) ;
+
+				var grapplenote=" ";
+				if (v["condition-Grappled"] != "0") {
+					grapplenote="+"+v["condition-Grappled"]+" grapple";
+				}
+				var curr = parseInt("attk-penalty",10)||0;
+				var setter = {};
+				var set=0;
+				//console.log("AAAAAAAAAAA the values are : "+totpenalty + " vs " + curr+" and note is " + grapplenote);
+				
+				if (curr !== totpenalty) {
+					setter["attk-penalty"]=totpenalty;
+					set=1;
+				}
+
+				if (v["attk-CMB-gnote"] != grapplenote){
+					setter["attk-CMB-gnote"]=grapplenote;
+					set=1;
+				}
+				if (set===1) {
+					setAttrs(setter);
+				}
+		});	
+	},
+
+	/* updateAttack
+	 * Updates the attack type totals at top of attack page for one row of grid
+	 *
+	 * @attype = the type of attack: melee, ranged, CMB (case sensitive)
+	 */
+	updateAttack=function(attype) {
+		var modfield=attype+"-ability-mod";
+		var  miscfield="attk-"+attype+"-misc";
+		var  atfield="attk-"+attype;
+		var  bufftype,bufffield;
+		var sizeMult=1;
+		if (attype=="melee") {bufftype="Melee";	}
+		else if (attype=="ranged") {bufftype="Ranged";}
+		else if (attype=="CMB") {
+			bufftype="CMB";
+			atfield="CMB";
+			bufffield="buff_"+bufftype+"-total";
+			sizeMult = -1;  	
+		}
+		else {return;}
+		
+		getAttrs([modfield,bufffield,"bab","size",miscfield,"attk-penalty",atfield],function(v) { 
+			//console.log(v);
+			var tohit = (parseInt(v["bab"],10)||0) +
+			(parseInt(v[modfield],10)||0) +
+			( sizeMult * (parseInt(v["size"],10)||0) )+
+			(parseInt(v[miscfield],10)||0) +
+			(parseInt(v[bufffield],10)||0) +
+			(parseInt(v["attk-penalty"],10)||0) ;
+			var curr = parseInt(v[atfield],10)||0;
+			if (tohit !== curr) {
+				var setter={};
+				setter[atfield]=tohit;
+				setAttrs(setter);
+			}
+		});
+	},
+
+
+
+
+
+
+	/* updateRepeatingWeaponDamageAbility
+	* this is a special case of dropdown, because it contains a possible multipler Damage ability dropdown.
+	* better to split this into two
+	*/
+	updateRepeatingWeaponDamageAbility=function() {
+		 getAttrs(["repeating_weapon_damage-ability","repeating_weapon_damage-ability-mod"],function(v) {
+			var abilityType=v["repeating_weapon_damage-ability"];
+			var tolookfor= findAbilityInString (abilityType);
+			getAttrs([tolookfor],function(v2){
+				var mult = findMultiplier(abilityType);
+				var mod = parseInt(v2[tolookfor],10)||0;
+				var tohitmod = mod * mult;
+				var currentmod = parseInt( v["repeating_weapon_attack-type-mod"],10)||0;
+				if ( tohitmod !== currentmod) {
+					setAttrs({"repeating_weapon_damage-ability-mod":tohitmod});
+				}
+			});
+		 });
+	},
+
+
+
+
+	updateRepeatingWeapon=function() {
+	   getAttrs([
+			"repeating_weapon_enhance","repeating_weapon_masterwork","repeating_weapon_attack-type-mod","repeating_weapon_proficiency","repeating_weapon_attk-effect-total-other",
+			"repeating_weapon_damage-ability-mod","repeating_weapon_dmg-effect-total-other","repeating_weapon_buff_DMG-total_display","buff_DMG-total",
+			"repeating_weapon_attack","repeating_weapon_damage",
+			"repeating_weapon_total-attack","repeating_weapon_total-damage"
+		],function(v) {
+			//console.log("FFFFFFFFFF inside getAttrs");
+			//console.log(v);
+			//basetohit includes buff and ability mod already
+			var basetohit=parseInt(v["repeating_weapon_attack-type-mod"],10)||0;
+			var dmgBuff=parseInt(v["buff_DMG-total"],10)||0;
+			var enhance=parseInt(v.repeating_weapon_enhance,10)||0;
+			var masterwork=parseInt(v.repeating_weapon_masterwork,10)||0;
+			var proficient=parseInt(v.repeating_weapon_proficiency,10)||0;
+			var abilityMod=parseInt(v["repeating_weapon_damage-ability-mod"],10)||0;
+			var dmgBuffRepeat=parseInt(v["repeating_weapon_buff_DMG-total"],10)||0;
+			var currentATTKmod=parseInt(v["repeating_weapon_total-attack"],10)||0;
+			var currentDMGmod=parseInt(v["repeating_weapon_total-damage"],10)||0;
+
+
+			var damageOther=parseInt(v["repeating_weapon_dmg-effect-total-other"],10)||0;
+			var attackOther=parseInt(v["repeating_weapon_attk-effect-total-other"],10)||0;
+			var damageMod=parseInt(v.repeating_weapon_damage,10)||0;
+			var attackMod=parseInt(v.repeating_weapon_attack,10)||0;
+
+			var tohit = basetohit + Math.max(enhance,masterwork) + attackMod + proficient + attackOther ;
+			var dmg = abilityMod + damageMod + damageOther + dmgBuff + enhance;
+			//console.log("base:"+basetohit+", mwk:"+masterwork+", prof:"+proficient+", enh:"+enhance+", att o: " + attackOther+", dmg o:"+damageOther +", buff:" + dmgBuff + ",buffrep:"+ dmgBuffRepeat+", atmod:" + attackMod +", dmod:"+damageMod);;
+			//console.log("new hit is "+tohit + "new dmg is " +dmg);
+			//console.log ("oldhit: "+currentATTKmod+", olddmg:"+currentDMGmod);
+			
+			var setter={};
+			var set=0;
+			if ( tohit !== currentATTKmod) {  setter["repeating_weapon_total-attack"] = tohit; set=1;  }
+			if (dmg !== currentDMGmod)  {  setter["repeating_weapon_total-damage"] = dmg;   set=1; }
+			if (dmgBuff !== dmgBuffRepeat) {   setter["repeating_weapon_buff_DMG-total_display"] = dmgBuff;  set=1; }
+			if (set===1) { setAttrs(setter); }
+		});
+	},
+
+
+
+	recalculateSheet = function() {
+
+		updateBuffRow("1");
+		updateBuffRow("2");
+		updateBuffRow("3");
+		updateBuffRow("4");
+		updateBuffRow("5");
+		updateBuffRow("6");
+		updateBuffRow("7");
+		updateBuffRow("8");
+		updateBuffRow("9");
+		updateBuffRow("10");
+		updateAbility("STR"); 
+		updateAbility("DEX"); 
+		updateAbility("CON"); 
+		updateAbility("INT"); 
+		updateAbility("WIS"); 
+		updateAbility("CHA"); 
+		updateClassInformation("hp");
+		updateClassInformation("skill");
+		updateClassInformation("bab");
+		updateClassInformation("Fort");
+		updateClassInformation("Ref");
+		updateClassInformation("Will");
+		updateClassInformation("level");
+		handleDropdown("AC-ability",["AC-ability-mod"]);
+		handleDropdown("FF-ability",["FF-DEX"]);
+		handleDropdown("CMD-ability1",["CMD-STR"]);
+		handleDropdown("CMD-ability2",["CMD-DEX"]);
+		handleDropdown("CMD-ability",["FF-CMD-DEX"]);
+		handleDropdown("melee-ability",["melee-ability-mod"]);
+		handleDropdown("ranged-ability",["ranged-ability-mod"]);
+		handleDropdown("CMB-ability",["CMB-ability-mod"]);
+		handleDropdown("init-ability",["init-ability-mod"]);
+		handleDropdown  ("Fort-ability",["Fort-ability-mod"]);
+		handleDropdown  ("Ref-ability",["Ref-ability-mod"]);
+		handleDropdown  ("Will-ability",["Will-ability-mod"]);
+		updateInit();
+		updateHP();
+		updateTempHP();
+		updateSave("Fort");
+		updateSave("Ref");
+		updateSave("Will");
+		updateConditionDefensePenalty();
+		updateDefenses();
+		updateArmor();	
+		updateConditionAttackPenalty();
+		updateAttack("melee");
+		updateAttack("ranged");
+		updateAttack("CMB");
 	};
+
+
+	
   return {
-		updateGrapple:updateGrapple,
-		updatePin:updatePin,
-		updateAbility:updateAbility,
-		updateBuff:updateBuff,
-		updateBuffRow:updateBuffRow,
-		updateBuffColumn:updateBuffColumn,
-		updateHP:updateHP,
-		updateTempHP:updateTempHP,
-		updateClassInformation:updateClassInformation,
 		findAbilityInString:findAbilityInString,
 		findMultiplier:findMultiplier,
 		getDropdownVal:getDropdownVal,
 		handleDropdown:handleDropdown,
-		handleDropdown:handleDropdown,
-		updateConditionAttackPenalty:updateConditionAttackPenalty,
-		updateAttack:updateAttack,
-		updateRepeatingWeaponAttackType:updateRepeatingWeaponAttackType,
-		updateRepeatingWeaponDamageAbility:updateRepeatingWeaponDamageAbility,
+		updateAbility:updateAbility,
+		updateGrapple:updateGrapple,
+		updatePin:updatePin,
+		updateBuff:updateBuff,
+		updateBuffRow:updateBuffRow,
+		updateBuffColumn:updateBuffColumn,
 		updateInit:updateInit,
+		updateHP:updateHP,
+		updateTempHP:updateTempHP,
+		updateClassInformation:updateClassInformation,
 		updateDefenses:updateDefenses,
-		updateRepeatingWeapon:updateRepeatingWeapon,
 		updateArmor:updateArmor,
-		recalculateSheet:recalculateSheet,
 		updateConditionsSavePenalty:updateConditionsSavePenalty,
-		updateSave:updateSave
+		updateSave:updateSave,
+		updateConditionDefensePenalty:updateConditionDefensePenalty,
+		updateAttack:updateAttack,
+		updateConditionAttackPenalty:updateConditionAttackPenalty,
+		updateRepeatingWeaponDamageAbility:updateRepeatingWeaponDamageAbility,
+		updateRepeatingWeapon:updateRepeatingWeapon,
+		recalculateSheet:recalculateSheet
     };	
 }());
-	
-var SWUtils = SWUtils || (function() {	
-	'use strict';
-	
-	/* evaluateFields
-	 * Examines a string for instances of @{fieldname}, and then searches the sheet for those values 
-	 * then replaces the intances in the string with the values of those fields.
-	 * Because it is a search and replace, if there are no @{fieldname} values, then it will return the same string back.
-	 * If there is an error, it will return an empty string "".
-	 *
-	 * @fromfield = string containing one or more @{fieldname}
-	 * @callback = method accepting 1 parameter , this parameter will be the result of the search and replace in the fromfield.
-	 */
-	var evaluateFields = function(fromfield, callback) {
-		if (typeof callback !== "function") {
-			return;
-		}
-		if (! fromfield ) {
-			callback("");
-			return;
-		}
-		try {
-			var i,numfields,fieldnames=[],matches = [];
-			matches = fromfield.match(/(@\{([^}]+)\})(?!.*\1)/g);
-			if (typeof matches == "undefined" || matches==null) {
-				callback (fromfield);
-				return;
-			}
-			numfields=matches.length;
-
-			fieldnames=[numfields];
-			for (i=0;i<numfields;i++) {
-				fieldnames[i]=matches[i].replace("@{","").replace("}","");
-			}
-			getAttrs(fieldnames,function(values){
-				var evalstr=fromfield;
-				try {
-					var replacements=[numfields];
-					for (i=0;i<numfields;i++){
-						replacements[i]=values[fieldnames[i]];
-					}
-					for (i=0;i<numfields;i++){
-						evalstr = evalstr.replace(matches[i],replacements[i]);
-					}
-				} catch (err) {
-					console.log("ERROR:" + err);
-					evalstr="";
-				} finally {
-					callback ( evalstr);
-				}
-			});
-		} catch (err){
-			console.log("ERROR: " + err);
-			callback (fromfield);
-		} 
-	},
-
-
-	/* evaluateAndSet
-	 * Searches the readField for any instances of @{field} and replaces them with the value
-	 * calls evaluateFields, if it returns null (error) then don't update writeField
-	 * 
-	 * @readField = the field that contains the string to evaluate, like a field containing a macro
-	 * @writeField = the field to write the evaluated value of readField to
-	*/
-	evaluateAndSet = function (readField,writeField) {
-		if (typeof writeField === "undefined" || writeField == null || 
-			typeof readField === "undefined" || readField == null) {
-			return;
-		}
-		getAttrs([readField],function(values) {
-			evaluateFields(values[readField], function(valueOf) {
-				if (typeof valueOf != "undefined" && valueOf != null && valueOf.length > 0) {
-					var setter = {};
-					setter[writeField]=valueOf;
-					setAttrs(setter);
-				}
-			});
-		});
-	};
-
-
-    return {
-		evaluateFields:evaluateFields,
-		evaluateAndSet:evaluateAndSet
-    };
-}());
-	
 	
 
 
@@ -12415,7 +13452,7 @@ on("change:class-0-will change:class-1-will change:class-2-will change:class-3-w
 on("change:class-0-level change:class-1-level change:class-2-level change:class-3-level change:class-4-level", function() {PFSheet.updateClassInformation("level");});
 
 //init
-on("change:init-ability", function() {  PFSheet.handleDropdown("init-ability",["init-ability-mod"],-1,"DEX-mod");});
+on("change:init-ability", function() {  PFSheet.handleDropdown("init-ability",["init-ability-mod"]);});
 on("change:init-ability-mod change:init-trait change:init-misc condition-deafened",function(){ PFSheet.updateInit(); });
 
 on("change:con-mod change:level change:total-hp change:hp-formula", function() { PFSheet.updateHP(); });
@@ -12438,16 +13475,16 @@ on("change:condition-grappled", function() {  PFSheet.updateGrapple() });
 on("change:condition-pinned", function() { PFSheet.updatePin();});
 
 //defense dropdowns
-on("change:ac-ability", function () {PFSheet.handleDropdown("AC-ability",["AC-ability-mod"],99,"DEX-mod");});
-on("change:ff-ability", function () {PFSheet.handleDropdown("FF-ability",["FF-DEX"],99,"");});
-on("change:cmd-ability1", function () {PFSheet.handleDropdown("CMD-ability1",["CMD-STR"],-1,"STR-mod");});
-on("change:cmd-ability2", function () {PFSheet.handleDropdown("CMD-ability2",["CMD-DEX"],99,"DEX-mod");});
-on("change:cmd-ability", function () {PFSheet.handleDropdown("CMD-ability",["FF-CMD-DEX"],99,"");});
+on("change:ac-ability", function () {PFSheet.handleDropdown("AC-ability",["AC-ability-mod"]);});
+on("change:ff-ability", function () {PFSheet.handleDropdown("FF-ability",["FF-DEX"]);});
+on("change:cmd-ability1", function () {PFSheet.handleDropdown("CMD-ability1",["CMD-STR"]);});
+on("change:cmd-ability2", function () {PFSheet.handleDropdown("CMD-ability2",["CMD-DEX"]);});
+on("change:cmd-ability", function () {PFSheet.handleDropdown("CMD-ability",["FF-CMD-DEX"]);});
 
 //attack non repeating dropdowns
-on("change:melee-ability", function () {PFSheet.handleDropdown("melee-ability",["melee-ability-mod"],-1,"STR-mod");});
-on("change:ranged-ability", function () {PFSheet.handleDropdown("ranged-ability",["ranged-ability-mod"],-1,"DEX-mod");});
-on("change:cmb-ability", function () {PFSheet.handleDropdown("CMB-ability",["CMB-ability-mod"],-1,"STR-mod");});
+on("change:melee-ability", function () {PFSheet.handleDropdown("melee-ability",["melee-ability-mod"]);});
+on("change:ranged-ability", function () {PFSheet.handleDropdown("ranged-ability",["ranged-ability-mod"]);});
+on("change:cmb-ability", function () {PFSheet.handleDropdown("CMB-ability",["CMB-ability-mod"]);});
 
 
 /* PFSheet.update attack modes*/ 
@@ -12490,14 +13527,17 @@ on("change:repeating_weapon:damage-ability",function() { PFSheet.updateRepeating
 on("change:recalc1",function(){PFSheet.recalculateSheet();});
 
 
-on("change:fort-ability", function(){PFSheet.handleDropdown  ("Fort-ability",["Fort-ability-mod"],-1,"CON-mod");   });
-on("change:ref-ability", function(){PFSheet.handleDropdown  ("Ref-ability",["Ref-ability-mod"],-1,"DEX-mod");   });
-on("change:will-ability", function(){PFSheet.handleDropdown  ("Will-ability",["Will-ability-mod"],-1,"WIS-mod");   });
+on("change:fort-ability", function(){PFSheet.handleDropdown  ("Fort-ability",["Fort-ability-mod"]);   });
+on("change:ref-ability", function(){PFSheet.handleDropdown  ("Ref-ability",["Ref-ability-mod"]);   });
+on("change:will-ability", function(){PFSheet.handleDropdown  ("Will-ability",["Will-ability-mod"]);   });
 
 
 on("change:condition-fear change:condition-sickened change:condition-drained change:condition-wounds",function() {
 	PFSheet.updateConditionsSavePenalty();
 });
+
+
+
 on("change:total-fort change:fort-ability-mod change:fort-trait change:fort-enhance change:fort-resist change:fort-misc change:fort-temp change:buff_fort-total",function(){
 	PFSheet.updateSave("Fort");
 });
@@ -12510,3 +13550,6 @@ on("change:total-will change:will-ability-mod change:will-trait change:will-enha
 	
 </script>
 
+
+
+	
