@@ -3,7 +3,7 @@
 Feuille de personnage (FdP) avec jets intégrés pour **Savage Worlds**, basée sur le Livre de Base (LdB) de la version éditée en français par [Black Book Editions](http://www.black-book-editions.fr/index.php?site_id=278).
 
 # Version courante
-1.0 [Capture d'écran](sawofr.png)
+1.1 [Capture d'écran](sawofr.png)
 
 #Divers notes
 
@@ -32,11 +32,6 @@ Dans le cas des Jets de Lancer, de Tir, ou d'armes/attaques utilisant une de ces
 Pour les jets de Tir, l'utilisation du Dé Joket est optionnelle (pour gérer les Cadences de Tir supérieures à 1) et son utilisation doit être confirmée :
 
 ![Utilisation Dé Joker](sawofr_dejokerutil.png)
-
-
-**NB** : un écueil technique dans Roll20 a forcé à renseigner 2 fois les compétences utilisées pour chaque arme/attaque : 1 fois pour l'otion 1, 1 fois pour l'option 2 :
-
-![Renseigner les compétences des armes 2 fois](sawofr_doublecomparme.png)
 
 ###Option 1 : Succès + Relances
 La feuille demande une difficulté ou une cible (pour les jets d'attaques et dégâts) avant de lancer les dés.
@@ -87,6 +82,16 @@ Les suggestions sont les bienvenues à ce sujet.
 NB : décrémenter les PP automatiquement au lancement d'un pouvoir nécessiterait l'utilisation d'un script API, donc d'un compte "Pro".
 
 # Notes de version
+
+##v1.1 (2015-11-30)
+Merci à The Aaron pour son script [TAS](https://github.com/shdwjk/TheAaronSheet).
+
+* Ajout de sheet workers (nouveauté technique Roll20) pour :
+    * alléger le recalcul des caractéristiques dérivées
+    * automatiser le calcul automatique du poids total de l'équipement et donc de l'encombrement éventuel
+    * éviter de saisir 2 fois la compétence des armes, selon le mode de jet choisi sur la feuille
+* Ajout de l'affichage de la compétence utilisées dans les jets d'Armes.
+* État du personnage plus détaillé dans les jets
 
 ##v1.0 (2015-11-16)
 Création de la fiche.
