@@ -11263,7 +11263,6 @@
     </table>
 </rolltemplate>
 </div>
-
 <script type="text/worker">
 
 var ExExp = (function(){
@@ -13193,35 +13192,42 @@ var PFSheet = PFSheet || (function(){
 	* repeating_sectionName_$X_OtherFieldName-copy  
 	*/
 	updateStaticNumberFieldInRepeating = function (repeatingSection,fieldUpdated) {
-		console.log("RRRRRRRRRRRRRRR AT updateStaticNumberFieldInRepeating, section:" + repeatingSection +", field:"+fieldUpdated);
 		getAttrs([fieldUpdated],function(attrs){
 			var fieldUpdatedVal = parseInt(attrs[fieldUpdated],10)||0;
 			getSectionIDs(repeatingSection,function(ids){
 				var fieldToUpdate,idname,notesname,testset={};
-				console.log("RRRRRRRRRRRRR got section IDS for : " + repeatingSection+", field:"+fieldUpdated);
-				console.log(ids);
 				for (id of ids) {
-					console.log("RRRRRRRRRRRR  at id " + id);
-					idname = " "+id;
-					notesname=repeatingSection + "_"+id+"_notes";
-					testset[notesname]=idname;
-					setAttrs(testset);
-					fieldToUpdate=repeatingSection + "_"+id+"_" + fieldUpdated + "-copy";
-					console.log("RRRRRRRRRRRRRRR at " + id + ", about to get "+ fieldToUpdate);
-					getAttrs([fieldToUpdate],function(values){
-						var setter={}, val = parseInt(values[fieldToUpdate],10)||0;
-						console.log("RRRRRRRRRRRRR comparing: " +  fieldUpdated +" ("+ fieldUpdatedVal+") with " + fieldToUpdate + " (" + val +") ");
-						if (fieldUpdatedVal !== val ) {
-							console.log("RRRRRRRRRRRRR Setting " + fieldToUpdate + " to " + fieldUpdatedVal);
-							setter[fieldToUpdate]=fieldUpdatedVal; 
-							setAttrs(setter);
-						}
-					});
+					//idname = " "+id;
+					//notesname=repeatingSection + "_"+id+"_notes";
+					//testset[notesname]=idname;
+					//setAttrs(testset);
+					updateSectionSingleValue(repeatingSection,id,fieldUpdated,fieldUpdatedVal);
+					// fieldToUpdate=repeatingSection + "_"+id+"_" + fieldUpdated + "-copy";
+					// getAttrs([fieldToUpdate],function(values){
+						// var setter={}, 
+						// fieldToUpdateCopy= repeatingSection + "_"+id+"_" + fieldUpdated + "-copy"; // because the outer one changes in the loop
+						// val = parseInt(values[fieldToUpdateCopy],10)||0;
+						// console.log("RRRRRRRRRRRRR comparing: " +  fieldUpdated +" ("+ fieldUpdatedVal+") with " + fieldToUpdateCopy + " (" + val +") ");
+						// if (fieldUpdatedVal !== val ) {
+							// setter[fieldToUpdateCopy]=fieldUpdatedVal; 
+							// setAttrs(setter);
+						// }
+					// });
 				}
 			});
 		});
 	},	
-	
+	updateSectionSingleValue=function(repeatingSection,id,fieldUpdated,newVal) {
+		var fieldToUpdate=repeatingSection + "_"+id+"_" + fieldUpdated + "-copy";
+		getAttrs([fieldToUpdate],function(values){
+			var setter={}, 
+			val = parseInt(values[fieldToUpdate],10)||0;
+			if (newVal !== val ) {
+				setter[fieldToUpdate]=newVal; 
+				setAttrs(setter);
+			}
+		});
+	},
 	updateRepeatingWeapon=function() {
 	   getAttrs([
 			"repeating_weapon_enhance","repeating_weapon_masterwork","repeating_weapon_proficiency",
