@@ -130,7 +130,7 @@
                 </div>
             </div>
             <div class="dercontainer" style="margin-top:-5px;">
-                <button class="derlabel recovery" type="roll" name="roll_DEX" value="&{template:rec} {{rec_die=@{REC-die}}} {{con_bonus=[[[[@{CON-mod}]][CON]]]}} {{level=@{level}}} {{mod=[[?{Modifiers|0}]]}} {{result=[[@{level}d@{REC-die}+[[@{CON-mod}]]+?{Modifiers|0}]]}}">Recovery</button>
+                <button class="derlabel recovery" type="roll" name="roll_recovery" value="&{template:rec} {{name=@{character_name}}} {{rec_die=@{REC-die}}} {{con_bonus=[[[[@{REC-bonus}]][CON]]]}} {{level=@{level}}} {{mod=[[?{Modifiers|0}]]}} {{result=[[@{level}d@{REC-die}+[[@{REC-bonus}]]+?{Modifiers|0}]]}}">Recovery</button>
                 <select class="recovery" type="text" name="attr_REC-die" title="@{REC-die}">
                     <option value="4">d4</option>
                     <option value="6">d6</option>
@@ -141,18 +141,20 @@
                 <span class="derlabel" style="width: 10px; padding-right:0; margin-left:-5px; border-left:0px; border-right:0px;">+</span>
                 <input class="recovery" type="text" style="width:32px;" name="attr_REC-bonus" title="@{REC-bonus}">
                 <span class="derlabel" style="width: 7px; margin-left: -9px;">Max</span>
-                <input class="recovery" type="text" style="border-left:0px; width:31px;" name="attr_REC_max" title="@{REC_max}">
+                <input class="recovery recmax" type="text" style="border-left:0px; width:31px;" name="attr_REC_max" value="8" title="@{REC_max}">
                 <span class="recoverycontainer">
-                    <input type="radio" class="sheet-normal" name="attr_REC" value="1" /><span></span>
-                    <input type="radio" class="sheet-normal" name="attr_REC" value="2" /><span></span>
-                    <input type="radio" class="sheet-normal" name="attr_REC" value="3" /><span></span>
-                    <input type="radio" class="sheet-normal" name="attr_REC" value="4" /><span></span>
-                    <input type="radio" class="sheet-normal" name="attr_REC" value="5" /><span></span>
-                    <input type="radio" class="sheet-normal" name="attr_REC" value="6" /><span></span>
-                    <input type="radio" class="sheet-normal" name="attr_REC" value="7" /><span></span>
-                    <input type="radio" class="sheet-normal" name="attr_REC" value="8" /><span></span>
-                    <input type="radio" class="sheet-normal" name="attr_REC" value="9" /><span></span>
-                    <input type="radio" class="sheet-normal" name="attr_REC" value="10" /><span></span>
+                    <input class="recflag" name="attr_rec_flag" type="hidden" value="8">
+                    <input type="radio" class="sheet-normal 0" name="attr_REC" value="0" /><span></span>
+                    <input type="radio" class="sheet-normal 1" name="attr_REC" value="1" /><span></span>
+                    <input type="radio" class="sheet-normal 2" name="attr_REC" value="2" /><span></span>
+                    <input type="radio" class="sheet-normal 3" name="attr_REC" value="3" /><span></span>
+                    <input type="radio" class="sheet-normal 4" name="attr_REC" value="4" /><span></span>
+                    <input type="radio" class="sheet-normal 5" name="attr_REC" value="5" /><span></span>
+                    <input type="radio" class="sheet-normal 6" name="attr_REC" value="6" /><span></span>
+                    <input type="radio" class="sheet-normal 7" name="attr_REC" value="7" /><span></span>
+                    <input type="radio" class="sheet-normal 8" name="attr_REC" value="8" checked="checked"/><span></span>
+                    <input type="radio" class="sheet-normal 9" name="attr_REC" value="9" /><span></span>
+                    <input type="radio" class="sheet-normal 10" name="attr_REC" value="10" /><span></span>
                 </span>
             </div>
             
@@ -1330,8 +1332,20 @@
         updateWeapons();
     });
     
-    on("change:tracker|Escalation Die", function() {
-        console.log("HEARD CHANGE!");
+    on("change:con-base", function() {
+        getAttrs(["CON-base"], function(v) {
+            setAttrs({
+               "REC-bonus": Math.floor((parseInt(v["CON-base"],10) - 10) / 2)
+            });
+        });
+    });
+
+    on("change:REC_max", function() {
+        getAttrs(["REC_max"], function(v) {
+            setAttrs({
+               "rec_flag": v.REC_max
+            });
+        });
     });
 
     var updatePower = function() {
@@ -1379,7 +1393,6 @@
             // CUSTOM 1
             if(v["repeating_power_cust1-type"] === "@{cust1-custom}") {cust1type = v["repeating_power_cust1-custom"] + ":"}
             else {cust1type = v["repeating_power_cust1-type"] + ":"}
-            console.log(cust1type);
             // CUSTOM 2
             if(v["repeating_power_cust2-type"] === "@{cust2-custom}") {cust2type = v["repeating_power_cust2-custom"] + ":"}
             else {cust2type = v["repeating_power_cust2-type"] + ":"}
@@ -1448,9 +1461,6 @@
                 rattackvs = "+" + (level + dex + rweap3) + " vs AC";
                 rhit = level + "d" + v["RWEAP3"] + "+" + (dex*lvlmultiplier);
             };
-            console.log(mattackvs);
-            console.log(mhit);
-            console.log(str);
             setAttrs({
                 "MBA-attackvs": mattackvs,
                 "MBA-hit": mhit,
