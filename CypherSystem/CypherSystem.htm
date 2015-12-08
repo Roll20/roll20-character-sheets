@@ -1,10 +1,40 @@
 <!-- ******* PC **************** -->
-<span class="sheet-smallspan">Version 1.2 (2015-10-04)&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;&nbsp;Style: </span>
+<div style="display:inline-block;font-size:11px;color: #888888;text-align:left;font-weight: bold;">Style:</div>
 <input type="radio" name="attr_sheetStyle" value="0" class="sheet-styleCypher" checked="checked" title="Cypher System" /><span>Cypher System</span>
 <input type="radio" name="attr_sheetStyle" value="1" class="sheet-styleNumenera" title="Numen&eacute;ra" /><span>Numen&eacute;ra</span>
 <input type="radio" name="attr_sheetStyle" value="2" class="sheet-styleTheStrange" title="The Strange"/><span>The Strange</span>
 <input type="radio" name="attr_sheetStyle" value="99" class="sheet-styleNpc" title="NPC"/><span>NPC</span>
+<div style="display:inline-block;font-size:11px;color: #888888;text-align:left;font-weight: bold;margin-left:10px;">- Rolls type:</div>
+<input type="radio" name="attr_sheetRolls" value="0" class="sheet-actionRoll" checked="checked" title="Roll using the Action section parameters" /><span>Action Section</span>
+<input type="radio" name="attr_sheetRolls" value="1" class="sheet-macroRoll" title="Roll using roll queries for parameters" /><span>Roll Queries</span>
+<div style="display:inline-block;font-size:11px;color: #888888;text-align:left;margin-left:10px;">- Version 1.4 (2015-11-21)</div>
 <div class="sheet-main">
+    <div style="display: none;"> <!-- HIDDEN Rolls and Calculations -->
+        <!-- Using the Action Section -->
+        <input type="hidden" name="attr_targNum" value="@{rollVarDiff}*3" />
+        <input type="hidden" name="attr_effortCost" value="ceil((@{rollVarRollEff}+@{rollVarRollDmg})/6)+(@{rollVarRollEff}+@{rollVarRollDmg})*2" />
+        <input type="hidden" name="attr_effortSpeedCost" value="ceil((@{rollVarRollEff}+@{rollVarRollDmg})/6)+(@{rollVarRollEff}+@{rollVarRollDmg})*(2+@{armorspeedcost})" />
+        <input type="hidden" name="attr_totalCost" value="@{effortCost}+@{rollVarCost}" />
+        <input type="hidden" name="attr_totalSpeedCost" value="@{effortSpeedCost}+@{rollVarCost}" />
+        <input type="hidden" name="attr_MightCost" value="@{totalCost}-@{mightedge}" />
+        <input type="hidden" name="attr_SpeedCost" value="@{totalSpeedCost}-@{speededge}" />
+        <input type="hidden" name="attr_IntelCost" value="@{totalCost}-@{intellectedge}" />
+        <!-- Using questions -->
+        <input type="hidden" name="attr_rollQstDiff" value="?{Difficulty|0 - None/Unknown,0|1 - Simple,1|2 - Standard,2|3 - Demanding,3|4 - Difficult,4|5 - Challenging,5|6 - Intimidating,6|7 - Formidable,7|8 - Heroic,8|9 - Immortal,9|10 - Impossible,10}" />
+        <input type="hidden" name="attr_rollQstCost" value="?{Cost|0}" />
+        <input type="hidden" name="attr_rollQstBonus" value="?{Bonus|0|1|2|-1|-2}" />
+        <input type="hidden" name="attr_rollQstRollEff" value="?{Effort to Roll|0|1|2|3|4|5|6}" />
+        <input type="hidden" name="attr_rollQstRollDmg" value="?{Effort to Damage|0|1|2|3|4|5|6}" />
+        <input type="hidden" name="attr_rollQstAsset" value="?{Asset|0|1|2}" />
+        <input type="hidden" name="attr_targNumQst" value="@{rollQstDiff}*3" />
+        <input type="hidden" name="attr_effortCostQst" value="ceil((@{rollQstRollEff}+@{rollQstRollDmg})/6)+(@{rollQstRollEff}+@{rollQstRollDmg})*2" />
+        <input type="hidden" name="attr_effortSpeedCostQst" value="ceil((@{rollQstRollEff}+@{rollQstRollDmg})/6)+(@{rollQstRollEff}+@{rollQstRollDmg})*(2+@{armorspeedcost})" />
+        <input type="hidden" name="attr_totalCostQst" value="@{effortCostQst}+@{rollQstCost}" />
+        <input type="hidden" name="attr_totalSpeedCostQst" value="@{effortSpeedCostQst}+@{rollQstCost}" />
+        <input type="hidden" name="attr_MightCostQst" value="@{totalCostQst}-@{mightedge}" />
+        <input type="hidden" name="attr_SpeedCostQst" value="@{totalSpeedCostQst}-@{speededge}" />
+        <input type="hidden" name="attr_IntelCostQst" value="@{totalCostQst}-@{intellectedge}" />
+    </div> <!-- END HIDDEN Rolls and Calculations -->
     <table>
         <!-- ******* COL 1 **************** -->
         <tr>
@@ -79,27 +109,36 @@
                                     <div class="sheet-text1">MIGHT</div>
                                     <div>
                                         <input type="number" style="height: 120%;font-weight:bold; font-size:120%; color:#6D0100;" name="attr_might" title="Current value" min="0" value="11" />
-                                        <button type="roll" class="sheet-basicbt" title="Might Roll"
-                                            value="&{template:cyphBasicRoll} {{charid=@{character_id}}} {{stat=might}} {{diceRoll=[[1d20cs>17cf1]]}} {{attribute=Might}} {{attrEdge=@{mightedge}}} {{bonusToRoll=[[@{rollVarBonus}]]}} {{difficulty=[[@{rollVarDiff}]]}} {{target=[[@{target}]]}} {{finalDiff=[[@{rollVarDiff}-@{rollVarAsset}-@{rollVarRollEff}]]}} {{targetRoll=[[(@{rollVarDiff}-@{rollVarAsset}-@{rollVarRollEff})*3-@{rollVarBonus}]]}} {{totalCost=[[@{MightCost}]]}} {{effortCost=[[@{effortCost}]]}} {{effortRoll=[[@{rollVarRollEff}]]}} {{effortDmg=[[@{rollVarRollDmg}]]}} {{statExpense=[[@{rollVarCost}]]}} {{assets=[[@{rollVarAsset}]]}} {{bonusDmg=[[@{rollVarRollDmg}*3]]}}"
-                                            name="roll_basicMightCheck"></button>
+                                        <button type="roll" class="sheet-actionbt" title="Might Roll, using the Action section parameters"
+                                            value="&{template:cyphBasicRoll} {{charid=@{character_id}}} {{stat=might}} {{diceRoll=[[1d20cs>17cf1]]}} {{attribute=Might}} {{attrEdge=@{mightedge}}} {{bonusToRoll=[[@{rollVarBonus}]]}} {{difficulty=[[@{rollVarDiff}]]}} {{targNum=[[@{targNum}]]}} {{finalDiff=[[@{rollVarDiff}-@{rollVarAsset}-@{rollVarRollEff}]]}} {{targNumRoll=[[(@{rollVarDiff}-@{rollVarAsset}-@{rollVarRollEff})*3-(1*@{rollVarBonus})]]}} {{totalCost=[[@{MightCost}]]}} {{effortCost=[[@{effortCost}]]}} {{effortRoll=[[@{rollVarRollEff}]]}} {{effortDmg=[[@{rollVarRollDmg}]]}} {{statExpense=[[@{rollVarCost}]]}} {{assets=[[@{rollVarAsset}]]}} {{bonusDmg=[[@{rollVarRollDmg}*3]]}}"
+                                            name="roll_actionMightCheck"></button>
+                                        <button type="roll" class="sheet-macrobt" title="Might Roll, roll queries for parameters"
+                                            value="&{template:cyphBasicRoll} {{charid=@{character_id}}} {{stat=might}} {{diceRoll=[[1d20cs>17cf1]]}} {{attribute=Might}} {{attrEdge=@{mightedge}}} {{difficulty=[[@{rollQstDiff}]]}} {{effortRoll=[[@{rollQstRollEff}]]}} {{assets=[[@{rollQstAsset}]]}} {{bonusToRoll=[[@{rollQstBonus}]]}} {{statExpense=[[@{rollQstCost}]]}} {{effortDmg=[[@{rollQstRollDmg}]]}} {{targNum=[[@{targNumQst}]]}} {{finalDiff=[[@{rollQstDiff}-@{rollQstAsset}-@{rollQstRollEff}]]}}  {{targNumRoll=[[(@{rollQstDiff}-@{rollQstAsset}-@{rollQstRollEff})*3-(1*@{rollQstBonus})]]}} {{totalCost=[[@{MightCostQst}]]}} {{effortCost=[[@{effortCostQst}]]}} {{bonusDmg=[[@{rollQstRollDmg}*3]]}}"
+                                            name="roll_macroMightCheck"></button>
                                     </div>
                                 </td>
                                 <td COLSPAN="2" VALIGN="top" style="width: 105px;border-right: 1px solid #22428F;">
                                     <div class="sheet-text1">SPEED</div>
                                     <div>
                                         <input type="number" style="height: 120%;font-weight:bold; font-size:120%; color:#6D0100;" name="attr_speed" title="Current value" min="0" value="10" />
-                                        <button type="roll" class="sheet-basicbt" class="sheet-basicbt" title="Speed Roll"
-                                            value="&{template:cyphBasicRoll} {{charid=@{character_id}}} {{stat=speed}} {{diceRoll=[[1d20cs>17cf1]]}} {{attribute=Speed}} {{attrEdge=@{speededge}}} {{bonusToRoll=[[@{rollVarBonus}]]}} {{difficulty=[[@{rollVarDiff}]]}} {{target=[[@{target}]]}} {{finalDiff=[[@{rollVarDiff}-@{rollVarAsset}-@{rollVarRollEff}]]}} {{targetRoll=[[(@{rollVarDiff}-@{rollVarAsset}-@{rollVarRollEff})*3-@{rollVarBonus}]]}} {{totalCost=[[@{SpeedCost}]]}} {{effortCost=[[@{effortSpeedCost}]]}} {{effortRoll=[[@{rollVarRollEff}]]}} {{effortDmg=[[@{rollVarRollDmg}]]}} {{statExpense=[[@{rollVarCost}]]}} {{assets=[[@{rollVarAsset}]]}} {{bonusDmg=[[@{rollVarRollDmg}*3]]}}"
-                                            name="roll_basicSpeedCheck"></button>
+                                        <button type="roll" class="sheet-actionbt" title="Speed Roll, using the Action section parameters"
+                                            value="&{template:cyphBasicRoll} {{charid=@{character_id}}} {{stat=speed}} {{diceRoll=[[1d20cs>17cf1]]}} {{attribute=Speed}} {{attrEdge=@{speededge}}} {{bonusToRoll=[[@{rollVarBonus}]]}} {{difficulty=[[@{rollVarDiff}]]}} {{targNum=[[@{targNum}]]}} {{finalDiff=[[@{rollVarDiff}-@{rollVarAsset}-@{rollVarRollEff}]]}} {{targNumRoll=[[(@{rollVarDiff}-@{rollVarAsset}-@{rollVarRollEff})*3-(1*@{rollVarBonus})]]}} {{totalCost=[[@{SpeedCost}]]}} {{effortCost=[[@{effortSpeedCost}]]}} {{effortRoll=[[@{rollVarRollEff}]]}} {{effortDmg=[[@{rollVarRollDmg}]]}} {{statExpense=[[@{rollVarCost}]]}} {{assets=[[@{rollVarAsset}]]}} {{bonusDmg=[[@{rollVarRollDmg}*3]]}}"
+                                            name="roll_actionSpeedCheck"></button>
+                                        <button type="roll" class="sheet-macrobt" title="Speed Roll, roll queries for parameters"
+                                            value="&{template:cyphBasicRoll} {{charid=@{character_id}}} {{stat=speed}} {{diceRoll=[[1d20cs>17cf1]]}} {{attribute=Speed}} {{attrEdge=@{speededge}}} {{difficulty=[[@{rollQstDiff}]]}} {{effortRoll=[[@{rollQstRollEff}]]}} {{assets=[[@{rollQstAsset}]]}} {{bonusToRoll=[[@{rollQstBonus}]]}} {{statExpense=[[@{rollQstCost}]]}} {{effortDmg=[[@{rollQstRollDmg}]]}} {{targNum=[[@{targNumQst}]]}} {{finalDiff=[[@{rollQstDiff}-@{rollQstAsset}-@{rollQstRollEff}]]}} {{targNumRoll=[[(@{rollQstDiff}-@{rollQstAsset}-@{rollQstRollEff})*3-(1*@{rollQstBonus})]]}} {{totalCost=[[@{SpeedCostQst}]]}} {{effortCost=[[@{effortCostQst}]]}} {{bonusDmg=[[@{rollQstRollDmg}*3]]}}"
+                                            name="roll_macroSpeedCheck"></button>
                                     </div>
                                 </td>
                                 <td COLSPAN="2" VALIGN="top">
                                     <div class="sheet-text1">INTELLECT</div>
                                     <div>
                                         <input type="number" style="height: 120%;font-weight:bold; font-size:120%; color:#6D0100;" name="attr_intellect" title="Current value" min="0" value="7" />
-                                        <button type="roll" class="sheet-basicbt" title="Intellect Roll"
-                                            value="&{template:cyphBasicRoll} {{charid=@{character_id}}} {{stat=intellect}} {{diceRoll=[[1d20cs>17cf1]]}} {{attribute=Intellect}} {{attrEdge=@{intellectedge}}} {{bonusToRoll=[[@{rollVarBonus}]]}} {{difficulty=[[@{rollVarDiff}]]}} {{target=[[@{target}]]}} {{finalDiff=[[@{rollVarDiff}-@{rollVarAsset}-@{rollVarRollEff}]]}} {{targetRoll=[[(@{rollVarDiff}-@{rollVarAsset}-@{rollVarRollEff})*3-@{rollVarBonus}]]}} {{totalCost=[[@{IntelCost}]]}} {{effortCost=[[@{effortCost}]]}} {{effortRoll=[[@{rollVarRollEff}]]}} {{effortDmg=[[@{rollVarRollDmg}]]}} {{statExpense=[[@{rollVarCost}]]}} {{assets=[[@{rollVarAsset}]]}} {{bonusDmg=[[@{rollVarRollDmg}*3]]}}"
-                                            name="roll_basicIntellectCheck"></button>
+                                        <button type="roll" class="sheet-actionbt" title="Intellect Roll, using the Action section parameters"
+                                            value="&{template:cyphBasicRoll} {{charid=@{character_id}}} {{stat=intellect}} {{diceRoll=[[1d20cs>17cf1]]}} {{attribute=Intellect}} {{attrEdge=@{intellectedge}}} {{bonusToRoll=[[@{rollVarBonus}]]}} {{difficulty=[[@{rollVarDiff}]]}} {{targNum=[[@{targNum}]]}} {{finalDiff=[[@{rollVarDiff}-@{rollVarAsset}-@{rollVarRollEff}]]}} {{targNumRoll=[[(@{rollVarDiff}-@{rollVarAsset}-@{rollVarRollEff})*3-(1*@{rollVarBonus})]]}} {{totalCost=[[@{IntelCost}]]}} {{effortCost=[[@{effortCost}]]}} {{effortRoll=[[@{rollVarRollEff}]]}} {{effortDmg=[[@{rollVarRollDmg}]]}} {{statExpense=[[@{rollVarCost}]]}} {{assets=[[@{rollVarAsset}]]}} {{bonusDmg=[[@{rollVarRollDmg}*3]]}}"
+                                            name="roll_actionIntellectCheck"></button>
+                                        <button type="roll" class="sheet-macrobt" title="Intellect Roll, roll queries for parameters"
+                                            value="&{template:cyphBasicRoll} {{charid=@{character_id}}} {{stat=intellect}} {{diceRoll=[[1d20cs>17cf1]]}} {{attribute=Intellect}} {{attrEdge=@{intellectedge}}} {{difficulty=[[@{rollQstDiff}]]}} {{effortRoll=[[@{rollQstRollEff}]]}} {{assets=[[@{rollQstAsset}]]}} {{bonusToRoll=[[@{rollQstBonus}]]}} {{statExpense=[[@{rollQstCost}]]}} {{effortDmg=[[@{rollQstRollDmg}]]}} {{targNum=[[@{targNumQst}]]}} {{finalDiff=[[@{rollQstDiff}-@{rollQstAsset}-@{rollQstRollEff}]]}} {{targNumRoll=[[(@{rollQstDiff}-@{rollQstAsset}-@{rollQstRollEff})*3-(1*@{rollQstBonus})]]}} {{totalCost=[[@{IntelCostQst}]]}} {{effortCost=[[@{effortCostQst}]]}} {{bonusDmg=[[@{rollQstRollDmg}*3]]}}"
+                                            name="roll_macroIntellectCheck"></button>
                                     </div>
                                 </td>
                             </tr>
@@ -109,7 +148,7 @@
                                     <div class="sheet-text2">POOL</div>
                                 </td>
                                 <td VALIGN="top" style="border-right: 1px solid #22428F;">
-                                    <input type="number" name="attr_mightedge" value="1" min="0" max="6" />
+                                    <input type="number" name="attr_mightedge" value="1" min="-6" max="6" />
                                     <div class="sheet-text2">EDGE</div>
                                 </td>
                                 <td VALIGN="top" style="border-right: 1px solid #EFEFF5;">
@@ -117,7 +156,7 @@
                                     <div class="sheet-text2">POOL</div>
                                 </td>
                                 <td VALIGN="top" style="border-right: 1px solid #22428F;">
-                                    <input type="number" name="attr_speededge" value="1"  min="0" max="6" />
+                                    <input type="number" name="attr_speededge" value="1"  min="-6" max="6" />
                                     <div class="sheet-text2">EDGE</div>
                                 </td>
                                 <td VALIGN="top" style="border-right: 1px solid #EFEFF5;">
@@ -125,7 +164,7 @@
                                     <div class="sheet-text2">POOL</div>
                                 </td>
                                 <td VALIGN="top">
-                                    <input type="number" name="attr_intellectedge" value="0" min="0" max="6" />
+                                    <input type="number" name="attr_intellectedge" value="0" min="-6" max="6" />
                                     <div class="sheet-text2">EDGE</div>
                                 </td>
                             </tr>
@@ -133,7 +172,8 @@
                     </div>
                 </div>
             </div> <!-- END STATS -->
-            <div class="sheet-supblock"> <!-- ACTION -->
+            <div class="sheet-divaction"> <!-- ACTION -->
+            <div class="sheet-supblock">
                 <div class="sheet-blublock">
                     <div class="sheet-inpblock2">
                         <table> <!-- BEGIN stat roll -->
@@ -158,19 +198,51 @@
                                     DIFFICULTY
                                 </td>
                                 <td style="text-align: left;">
-                                    <input style="width:40px;height:18px;padding:0px;" type="number" min="0" max="10" name="attr_rollVarDiff" title="Task difficulty" value="0"/>
+                                    <SELECT class="sheet-selaction" name="attr_rollVarDiff" title="Task difficulty">
+                                        <OPTION value="0" SELECTED>0 - None/Unknown</OPTION>
+                                        <OPTION value="1">1 - Simple</OPTION>
+                                        <OPTION value="2">2 - Standard</OPTION>
+                                        <OPTION value="3">3 - Demanding</OPTION>
+                                        <OPTION value="4">4 - Difficult</OPTION>
+                                        <OPTION value="5">5 - Challenging</OPTION>
+                                        <OPTION value="6">6 - Intimidating</OPTION>
+                                        <OPTION value="7">7 - Formidable</OPTION>
+                                        <OPTION value="8">8 - Heroic</OPTION>
+                                        <OPTION value="9">9 - Immortal</OPTION>
+                                        <OPTION value="10">10 - Impossible</OPTION>
+                                    </SELECT>
                                 </td>
                                 <td class="sheet-text2" style="text-align: right;">
                                     COST
                                 </td>
                                 <td style="text-align: left;">
-                                    <input style="width:40px;height:18px;padding:0px;" type="number" min="0" max="12" name="attr_rollVarCost" title="Extra Stat Pool cost from a Power or Ability" value="0" />
+                                    <SELECT class="sheet-selaction" name="attr_rollVarCost" title="Extra Stat Pool cost from a Power or Ability">
+                                        <OPTION value="0" SELECTED>0</OPTION>
+                                        <OPTION value="1">1</OPTION>
+                                        <OPTION value="2">2</OPTION>
+                                        <OPTION value="3">3</OPTION>
+                                        <OPTION value="4">4</OPTION>
+                                        <OPTION value="5">5</OPTION>
+                                        <OPTION value="6">6</OPTION>
+                                        <OPTION value="7">7</OPTION>
+                                        <OPTION value="8">8</OPTION>
+                                        <OPTION value="9">9</OPTION>
+                                        <OPTION value="10">10</OPTION>
+                                        <OPTION value="11">11</OPTION>
+                                        <OPTION value="12">12</OPTION>
+                                    </SELECT>
                                 </td>
                                 <td class="sheet-text2" style="text-align: right;">
                                     BONUS
                                 </td>
                                 <td style="text-align: left;">
-                                    <input style="width:40px;height:18px;padding:0px;" type="number" min="-2" max="2" name="attr_rollVarBonus" title="Bonus to the ROLL (0, 1 or 2 maximum)" value="0" />
+                                    <SELECT class="sheet-selaction" name="attr_rollVarBonus" title="Bonus to the ROLL (0, 1 or 2 maximum)">
+                                        <OPTION value="-2">-2</OPTION>
+                                        <OPTION value="-1">-1</OPTION>
+                                        <OPTION value="0" SELECTED>0</OPTION>
+                                        <OPTION value="1">1</OPTION>
+                                        <OPTION value="2">2</OPTION>
+                                    </SELECT>
                                 </td>
                             </tr>
                             <tr>
@@ -178,33 +250,46 @@
                                     ROLL EFFORT
                                 </td>
                                 <td style="text-align: left;">
-                                    <input style="width:40px;height:18px;padding:0px;" type="number" min="0" max="6" name="attr_rollVarRollEff" title="Effort to lower DIFFICULTY" value="0" />
+                                    <SELECT class="sheet-selaction" name="attr_rollVarRollEff" title="Effort to lower DIFFICULTY">
+                                        <OPTION value="0" SELECTED>0</OPTION>
+                                        <OPTION value="1">1</OPTION>
+                                        <OPTION value="2">2</OPTION>
+                                        <OPTION value="3">3</OPTION>
+                                        <OPTION value="4">4</OPTION>
+                                        <OPTION value="5">5</OPTION>
+                                        <OPTION value="6">6</OPTION>
+                                    </SELECT>
                                 </td>
                                 <td class="sheet-text2" style="text-align: right;">
                                     DMG EFF.
                                 </td>
                                 <td style="text-align: left;">
-                                    <input style="width:40px;height:18px;padding:0px;" type="number" min="0" max="6" name="attr_rollVarRollDmg" title="Effort to increase DAMAGE" value="0" />
+                                    <SELECT class="sheet-selaction" name="attr_rollVarRollDmg" title="Effort to increase DAMAGE">
+                                        <OPTION value="0" SELECTED>0</OPTION>
+                                        <OPTION value="1">1</OPTION>
+                                        <OPTION value="2">2</OPTION>
+                                        <OPTION value="3">3</OPTION>
+                                        <OPTION value="4">4</OPTION>
+                                        <OPTION value="4">5</OPTION>
+                                        <OPTION value="4">6</OPTION>
+                                    </SELECT>
                                 </td>
                                 <td class="sheet-text2" style="text-align: right;">
                                     ASSET
                                 </td>
                                 <td  class="sheet-text2" style="text-align: left;">
-                                    <input style="width:40px;height:18px;padding:0px;" type="number" min="0" max="2" name="attr_rollVarAsset" title="Asset(s) : position, equipment etc. (0, 1 or 2 maximum)" value="0" />
+                                    <SELECT class="sheet-selaction" name="attr_rollVarAsset"  title="Asset(s) : position, equipment etc. (0, 1 or 2 maximum)">
+                                        <OPTION value="0" SELECTED>0</OPTION>
+                                        <OPTION value="1">1</OPTION>
+                                        <OPTION value="2">2</OPTION>
+                                    </SELECT>
                                 </td>
                             </tr>
                         </table>
-                        <input type="hidden" name="attr_target" value="@{rollVarDiff}*3" />
-                        <input type="hidden" name="attr_effortCost" value="ceil((@{rollVarRollEff}+@{rollVarRollDmg})/6)+(@{rollVarRollEff}+@{rollVarRollDmg})*2" />
-                        <input type="hidden" name="attr_effortSpeedCost" value="ceil((@{rollVarRollEff}+@{rollVarRollDmg})/6)+(@{rollVarRollEff}+@{rollVarRollDmg})*(2+@{armorspeedcost})" />
-                        <input type="hidden" name="attr_totalCost" value="@{effortCost}+@{rollVarCost}" />
-                        <input type="hidden" name="attr_totalSpeedCost" value="@{effortSpeedCost}+@{rollVarCost}" />
-                        <input type="hidden" name="attr_MightCost" value="@{totalCost}-@{mightedge}" />
-                        <input type="hidden" name="attr_SpeedCost" value="@{totalSpeedCost}-@{speededge}" />
-                        <input type="hidden" name="attr_IntelCost" value="@{totalCost}-@{intellectedge}" />
                     </div>
                 </div>
-            </div> <!-- END ACTION -->
+            </div>
+            </div><!-- END ACTION -->
             <div class="sheet-supblock"> <!-- DAMAGE -->
                 <div class="sheet-blublock">
                     <div class="sheet-inpblock2">
@@ -282,7 +367,7 @@
                         <div class="sheet-text1" style="text-align: left;">SPECIAL ABILITIES</div>
                         <fieldset class="repeating_abilities">
                             <div class="sheet-text2">
-                                Name&nbsp;
+                                <button type="roll" class="sheet-btDesc" title="Show in chat" value="&{template:cyphDesc} {{name=@{abilityname}}} {{type=Special Ability}} {{use=@{abilityuse}}} {{description=@{abilitydesc}}}">Name</button>
                                 <input type="text" style="width: 190px;font-weight: bold;" name="attr_abilityname" title="Ability name"s placeholder="Name" />
                                 <select name="attr_abilityuse" style="width: 90px;" title="Eventual conditions of use of this ability: enabler, action, once a day etc.">
                                     <option selected="selected">Action</option>
@@ -319,9 +404,12 @@
                                     <option value="1">T&nbsp;&nbsp;&nbsp;&nbsp;Trained</option>
                                     <option value="2">S&nbsp;&nbsp;&nbsp;&nbsp;Specialized</option>
                                 </select>
-                                <button type="roll" class="sheet-basicbt" title="Might Skill Roll"
-                                    value="&{template:cyphBasicRoll} {{charid=@{character_id}}} {{stat=might}} {{diceRoll=[[1d20cs>17cf1]]}} {{attribute=@{skillmightname}}} {{attrEdge=@{mightedge}}} {{bonusToRoll=[[@{rollVarBonus}]]}} {{difficulty=[[@{rollVarDiff}]]}} {{target=[[@{target}]]}} {{finalDiff=[[@{rollVarDiff}-(@{rollVarAsset}+@{rollVarRollEff}+@{skillmightlvl})]]}} {{targetRoll=[[3*@{rollVarDiff}-3*(@{rollVarAsset}+@{rollVarRollEff}+@{skillmightlvl})-@{rollVarBonus}]]}} {{totalCost=[[@{MightCost}]]}} {{effortCost=[[@{effortCost}]]}} {{effortRoll=[[@{rollVarRollEff}]]}} {{effortDmg=[[@{rollVarRollDmg}]]}} {{statExpense=[[@{rollVarCost}]]}} {{assets=[[@{rollVarAsset}]]}} {{bonusDmg=[[@{rollVarRollDmg}*3]]}} {{skilled=[[@{skillmightlvl}]]}}"
-                                    name="roll_basicMightCheck"></button>
+                                <button type="roll" class="sheet-actionbt" title="Might Skill Roll, using the Action section parameters"
+                                    value="&{template:cyphBasicRoll} {{charid=@{character_id}}} {{stat=might}} {{diceRoll=[[1d20cs>17cf1]]}} {{attribute=@{skillmightname}}} {{attrEdge=@{mightedge}}} {{bonusToRoll=[[@{rollVarBonus}]]}} {{difficulty=[[@{rollVarDiff}]]}} {{targNum=[[@{targNum}]]}} {{finalDiff=[[@{rollVarDiff}-(1*@{rollVarAsset})-(1*@{rollVarRollEff})-(1*@{skillmightlvl})]]}} {{targNumRoll=[[(3*@{rollVarDiff})-(3*@{rollVarAsset})-(3*@{rollVarRollEff})-(3*@{skillmightlvl})-(1*@{rollVarBonus})]]}} {{totalCost=[[@{MightCost}]]}} {{effortCost=[[@{effortCost}]]}} {{effortRoll=[[@{rollVarRollEff}]]}} {{effortDmg=[[@{rollVarRollDmg}]]}} {{statExpense=[[@{rollVarCost}]]}} {{assets=[[@{rollVarAsset}]]}} {{bonusDmg=[[@{rollVarRollDmg}*3]]}} {{skilled=[[@{skillmightlvl}]]}}"
+                                    name="roll_actionMightSkillCheck"></button>
+                                <button type="roll" class="sheet-macrobt" title="Might Skill Roll, roll queries for parameters"
+                                    value="&{template:cyphBasicRoll} {{charid=@{character_id}}} {{stat=might}} {{diceRoll=[[1d20cs>17cf1]]}} {{attribute=@{skillmightname}}} {{attrEdge=@{mightedge}}} {{difficulty=[[@{rollQstDiff}]]}} {{effortRoll=[[@{rollQstRollEff}]]}} {{assets=[[@{rollQstAsset}]]}} {{bonusToRoll=[[@{rollQstBonus}]]}} {{statExpense=[[@{rollQstCost}]]}} {{effortDmg=[[@{rollQstRollDmg}]]}} {{targNum=[[@{targNumQst}]]}} {{finalDiff=[[@{rollQstDiff}-(1*@{rollQstAsset})-(1*@{rollQstRollEff})-(1*@{skillmightlvl})]]}} {{targNumRoll=[[(3*@{rollQstDiff})-(3*@{rollQstAsset})-(3*@{rollQstRollEff})-(3*@{skillmightlvl})-(1*@{rollQstBonus})]]}} {{totalCost=[[@{MightCostQst}]]}} {{effortCost=[[@{effortCostQst}]]}} {{bonusDmg=[[@{rollQstRollDmg}*3]]}} {{skilled=[[@{skillmightlvl}]]}}"
+                                    name="roll_macroMightSkillCheck"></button>
                             </div>
                         </fieldset>
                     </div>
@@ -339,9 +427,12 @@
                                 <option value="1">T&nbsp;&nbsp;&nbsp;&nbsp;Trained</option>
                                 <option value="2">S&nbsp;&nbsp;&nbsp;&nbsp;Specialized</option>
                             </select>
-                            <button type="roll" class="sheet-basicbt" title="Initiative Roll"
-                            value="&{template:cyphInit} {{charid=@{character_id}}} {{stat=speed}} {{skilled=[[@{InitVarSkill}*3]]}} {{finalRoll=[[1d20+(@{rollVarRollEff}*3)+(@{InitVarSkill}*3)+(@{rollVarAsset}*3)+@{rollVarBonus} &{tracker}]]}}  {{bonusToRoll=[[@{rollVarBonus}]]}} {{speedEdge=[[@{speededge}]]}} {{effortsUsed=[[@{rollVarRollEff}]]}}  {{assets=[[@{rollVarAsset}]]}} {{effortCost=[[ceil(@{rollVarRollEff}/6)+@{rollVarRollEff}*(2+@{armorspeedcost})]]}} {{statExpense=[[@{rollVarCost}]]}} {{totalCost=[[ceil(@{rollVarRollEff}/6)+@{rollVarRollEff}*(2+@{armorspeedcost})+@{rollVarCost}-@{speededge}]]}}"
-                            name="roll_basicInitCheck"></button>
+                            <button type="roll" class="sheet-actionbt" title="Initiative Roll, using the Action section parameters"
+                            value="&{template:cyphInit} {{charid=@{character_id}}} {{stat=speed}} {{skilled=[[@{InitVarSkill}*3]]}} {{finalRoll=[[1d20+(@{rollVarRollEff}*3)+(@{InitVarSkill}*3)+(@{rollVarAsset}*3)+(1*@{rollVarBonus}) &{tracker}]]}}  {{bonusToRoll=[[@{rollVarBonus}]]}} {{speedEdge=[[@{speededge}]]}} {{effortsUsed=[[@{rollVarRollEff}]]}}  {{assets=[[@{rollVarAsset}]]}} {{effortCost=[[ceil(@{rollVarRollEff}/6)+@{rollVarRollEff}*(2+@{armorspeedcost})]]}} {{statExpense=[[@{rollVarCost}]]}} {{totalCost=[[ceil(@{rollVarRollEff}/6)+@{rollVarRollEff}*(2+@{armorspeedcost})+@{rollVarCost}-@{speededge}]]}}"
+                            name="roll_actionInitCheck"></button>
+                            <button type="roll" class="sheet-macrobt" title="Initiative Roll, roll queries for parameters"
+                            value="&{template:cyphInit} {{charid=@{character_id}}} {{stat=speed}} {{skilled=[[@{InitVarSkill}*3]]}} {{finalRoll=[[1d20+(@{rollQstRollEff}*3)+(@{InitVarSkill}*3)+(@{rollQstAsset}*3)+(1*@{rollQstBonus}) &{tracker}]]}}  {{bonusToRoll=[[@{rollQstBonus}]]}} {{speedEdge=[[@{speededge}]]}} {{effortsUsed=[[@{rollQstRollEff}]]}}  {{assets=[[@{rollQstAsset}]]}} {{effortCost=[[ceil(@{rollQstRollEff}/6)+@{rollQstRollEff}*(2+@{armorspeedcost})]]}} {{statExpense=[[@{rollQstCost}]]}} {{totalCost=[[ceil(@{rollQstRollEff}/6)+@{rollQstRollEff}*(2+@{armorspeedcost})+@{rollQstCost}-@{speededge}]]}}"
+                            name="roll_macroInitCheck"></button>
                         </div> <!-- END INITIATIVE -->
                         <fieldset class="repeating_skillspeed">
                             <div>
@@ -352,9 +443,12 @@
                                     <option value="1">T&nbsp;&nbsp;&nbsp;&nbsp;Trained</option>
                                     <option value="2">S&nbsp;&nbsp;&nbsp;&nbsp;Specialized</option>
                                 </select>
-                                <button type="roll" class="sheet-basicbt" title="Speed Skill Roll"
-                                    value="&{template:cyphBasicRoll} {{charid=@{character_id}}} {{stat=speed}} {{diceRoll=[[1d20cs>17cf1]]}} {{attribute=@{skillspeedname}}} {{attrEdge=@{speededge}}} {{bonusToRoll=[[@{rollVarBonus}]]}} {{difficulty=[[@{rollVarDiff}]]}} {{target=[[@{target}]]}} {{finalDiff=[[@{rollVarDiff}-(@{rollVarAsset}+@{rollVarRollEff}+@{skillspeedlvl})]]}} {{targetRoll=[[3*@{rollVarDiff}-3*(@{rollVarAsset}+@{rollVarRollEff}+@{skillspeedlvl})-@{rollVarBonus}]]}} {{totalCost=[[@{SpeedCost}]]}} {{effortCost=[[@{effortSpeedCost}]]}} {{effortRoll=[[@{rollVarRollEff}]]}} {{effortDmg=[[@{rollVarRollDmg}]]}} {{statExpense=[[@{rollVarCost}]]}} {{assets=[[@{rollVarAsset}]]}} {{bonusDmg=[[@{rollVarRollDmg}*3]]}} {{skilled=[[@{skillspeedlvl}]]}}"
-                                     name="roll_basicSpeedCheck"></button>
+                                <button type="roll" class="sheet-actionbt" title="Speed Skill Roll, using the Action section parameters"
+                                    value="&{template:cyphBasicRoll} {{charid=@{character_id}}} {{stat=speed}} {{diceRoll=[[1d20cs>17cf1]]}} {{attribute=@{skillspeedname}}} {{attrEdge=@{speededge}}} {{bonusToRoll=[[@{rollVarBonus}]]}} {{difficulty=[[@{rollVarDiff}]]}} {{targNum=[[@{targNum}]]}} {{finalDiff=[[@{rollVarDiff}-(1*@{rollVarAsset})-(1*@{rollVarRollEff})-(1*@{skillspeedlvl})]]}} {{targNumRoll=[[(3*@{rollVarDiff})-(3*@{rollVarAsset})-(3*@{rollVarRollEff})-(3*@{skillspeedlvl})-(1*@{rollVarBonus})]]}} {{totalCost=[[@{SpeedCost}]]}} {{effortCost=[[@{effortSpeedCost}]]}} {{effortRoll=[[@{rollVarRollEff}]]}} {{effortDmg=[[@{rollVarRollDmg}]]}} {{statExpense=[[@{rollVarCost}]]}} {{assets=[[@{rollVarAsset}]]}} {{bonusDmg=[[@{rollVarRollDmg}*3]]}} {{skilled=[[@{skillspeedlvl}]]}}"
+                                     name="roll_actionSpeedSkillCheck"></button>
+                                <button type="roll" class="sheet-macrobt" title="Speed Skill Roll, roll queries for parameters"
+                                    value="&{template:cyphBasicRoll} {{charid=@{character_id}}} {{stat=speed}} {{diceRoll=[[1d20cs>17cf1]]}} {{attribute=@{skillspeedname}}} {{attrEdge=@{speededge}}} {{difficulty=[[@{rollQstDiff}]]}} {{effortRoll=[[@{rollQstRollEff}]]}} {{assets=[[@{rollQstAsset}]]}} {{bonusToRoll=[[@{rollQstBonus}]]}} {{statExpense=[[@{rollQstCost}]]}} {{effortDmg=[[@{rollQstRollDmg}]]}} {{targNum=[[@{targNumQst}]]}} {{finalDiff=[[@{rollQstDiff}-(1*@{rollQstAsset})-(1*@{rollQstRollEff})-(1*@{skillspeedlvl})]]}} {{targNumRoll=[[(3*@{rollQstDiff})-(3*@{rollQstAsset})-(3*@{rollQstRollEff})-(3*@{skillspeedlvl})-(1*@{rollQstBonus})]]}} {{totalCost=[[@{SpeedCostQst}]]}} {{effortCost=[[@{effortSpeedCostQst}]]}} {{bonusDmg=[[@{rollQstRollDmg}*3]]}} {{skilled=[[@{skillspeedlvl}]]}}"
+                                     name="roll_macroSpeedSkillCheck"></button>
                             </div>
                         </fieldset>
                     </div>
@@ -373,9 +467,12 @@
                                     <option value="1">T&nbsp;&nbsp;&nbsp;&nbsp;Trained</option>
                                     <option value="2">S&nbsp;&nbsp;&nbsp;&nbsp;Specialized</option>
                                 </select>
-                                <button type="roll" class="sheet-basicbt" title="Intellect Skill Roll"
-                                    value="&{template:cyphBasicRoll} {{charid=@{character_id}}} {{stat=intellect}} {{diceRoll=[[1d20cs>17cf1]]}} {{attribute=@{skillintelname}}} {{attrEdge=@{intellectedge}}} {{bonusToRoll=[[@{rollVarBonus}]]}} {{difficulty=[[@{rollVarDiff}]]}} {{target=[[@{target}]]}} {{finalDiff=[[@{rollVarDiff}-(@{rollVarAsset}+@{rollVarRollEff}+@{skillintellvl})]]}} {{targetRoll=[[3*@{rollVarDiff}-3*(@{rollVarAsset}+@{rollVarRollEff}+@{skillintellvl})-@{rollVarBonus}]]}} {{totalCost=[[@{IntelCost}]]}} {{effortCost=[[@{effortCost}]]}} {{effortRoll=[[@{rollVarRollEff}]]}} {{effortDmg=[[@{rollVarRollDmg}]]}} {{statExpense=[[@{rollVarCost}]]}} {{assets=[[@{rollVarAsset}]]}} {{bonusDmg=[[@{rollVarRollDmg}*3]]}} {{skilled=[[@{skillintellvl}]]}}"
-                                    name="roll_basicIntellectCheck"></button>
+                                <button type="roll" class="sheet-actionbt" title="Intellect Skill Roll, using the Action section parameters"
+                                    value="&{template:cyphBasicRoll} {{charid=@{character_id}}} {{stat=intellect}} {{diceRoll=[[1d20cs>17cf1]]}} {{attribute=@{skillintelname}}} {{attrEdge=@{intellectedge}}} {{bonusToRoll=[[@{rollVarBonus}]]}} {{difficulty=[[@{rollVarDiff}]]}} {{targNum=[[@{targNum}]]}} {{finalDiff=[[@{rollVarDiff}-(1*@{rollVarAsset})-(1*@{rollVarRollEff})-(1*@{skillintellvl})]]}} {{targNumRoll=[[(3*@{rollVarDiff})-(3*@{rollVarAsset})-(3*@{rollVarRollEff})-(3*@{skillintellvl})-(1*@{rollVarBonus})]]}} {{totalCost=[[@{IntelCost}]]}} {{effortCost=[[@{effortCost}]]}} {{effortRoll=[[@{rollVarRollEff}]]}} {{effortDmg=[[@{rollVarRollDmg}]]}} {{statExpense=[[@{rollVarCost}]]}} {{assets=[[@{rollVarAsset}]]}} {{bonusDmg=[[@{rollVarRollDmg}*3]]}} {{skilled=[[@{skillintellvl}]]}}"
+                                    name="roll_actionIntellectCheck"></button>
+                                <button type="roll" class="sheet-macrobt" title="Intellect Skill Roll, roll queries for parameters"
+                                    value="&{template:cyphBasicRoll} {{charid=@{character_id}}} {{stat=intellect}} {{diceRoll=[[1d20cs>17cf1]]}} {{attribute=@{skillintelname}}} {{attrEdge=@{intellectedge}}} {{difficulty=[[@{rollQstDiff}]]}} {{effortRoll=[[@{rollQstRollEff}]]}} {{assets=[[@{rollQstAsset}]]}} {{bonusToRoll=[[@{rollQstBonus}]]}} {{statExpense=[[@{rollQstCost}]]}} {{effortDmg=[[@{rollQstRollDmg}]]}} {{targNum=[[@{targNumQst}]]}} {{finalDiff=[[@{rollQstDiff}-(1*@{rollQstAsset})-(1*@{rollQstRollEff})-(1*@{skillintellvl})]]}} {{targNumRoll=[[(3*@{rollQstDiff})-(3*@{rollQstAsset})-(3*@{rollQstRollEff})-(3*@{skillintellvl})-(1*@{rollQstBonus})]]}} {{totalCost=[[@{IntelCostQst}]]}} {{effortCost=[[@{effortCostQst}]]}} {{bonusDmg=[[@{rollQstRollDmg}*3]]}} {{skilled=[[@{skillintellvl}]]}}"
+                                    name="roll_macroIntellectSkillCheck"></button>
                             </div>
                         </fieldset>
                     </div>
@@ -502,7 +599,7 @@
                         </table>
                         <fieldset class="repeating_cypher-list">
                             <div class="sheet-text2">
-                                Name&nbsp;
+                                <button type="roll" class="sheet-btDesc" title="Show in chat" value="&{template:cyphDesc} {{name=@{cypher-name}}} {{type=Cypher}} {{level=@{cypher-level}}} {{description=@{cypher-description}}}">Name</button>
                                 <input type="text" style="width: 210px;font-weight: bold;" name="attr_cypher-name" title="Name of the cypher" placeholder="Cypher" />
                                 Lvl&nbsp;
                                 <input type="number" style="width: 40px;" name="attr_cypher-level" title="Level of the Cypher" min="0" value="1" />
@@ -520,9 +617,9 @@
                         <div class="sheet-text1" style="text-align: left;">ARTIFACTS</div>
                         <fieldset class="repeating_artifact-list">
                             <div class="sheet-text2" style="text-align: left;">
-                                Name
+                                <button type="roll" class="sheet-btDesc" title="Show in chat" value="&{template:cyphDesc} {{name=@{artifact-name}}} {{type=Artefact}} {{level=@{artifact-level}}} {{depletion=@{artdepthreshold} in @{artdepdice}}} {{description=@{artifact-description}}}">Name</button>
                                 <input type="text" style="width: 210px;font-weight: bold;" name="attr_artifact-name" title="Name" placeholder="Artifact" />
-                                &nbsp; Level
+                                Lvl&nbsp;
                                 <input type="number" style="width: 40px;" name="attr_artifact-level" title="Level" min="0" max="99" value="1" />
                             </div>
                             <div class="sheet-text2" style="text-align: left;">
@@ -745,6 +842,9 @@
         {{#rollGreater() bonusToRoll 0}}
             <tr><td><span>Bonus</span></td><td>+ {{bonusToRoll}}</td></tr>
         {{/rollGreater() bonusToRoll 0}}
+        {{#rollLess() bonusToRoll 0}}
+            <tr><td><span>Malus</span></td><td>{{bonusToRoll}}</td></tr>
+        {{/rollLess() bonusToRoll 0}}
         {{#rollGreater() effortsUsed 0}}
             <tr><td><span>Effort</span></td><td>{{effortsUsed}} (x3)</td></tr>
         {{/rollGreater() effortsUsed 0}}
@@ -810,6 +910,13 @@
                 </td>
             </tr>
         {{/rollGreater() bonusToRoll 0}}
+        {{#rollLess() bonusToRoll 0}}
+            <tr><td></td>
+                <td>
+                        <i>{{bonusToRoll}} (malus)</i>
+                </td>
+            </tr>
+        {{/rollLess() bonusToRoll 0}}
         {{#rollWasCrit() diceRoll}}
             <tr>
                 <td style="color:green;text-align:center;font-weight:bold;">Special:</td>
@@ -825,21 +932,21 @@
             <tr><td COLSPAN="2" style="color:red;text-align:center;font-weight:bold;">GM Intrusion</td></tr>
         {{/rollWasFumble() diceRoll}}
         {{#rollGreater() difficulty 0}}
-            {{#rollGreater() diceRoll targetRoll}}
+            {{#rollGreater() diceRoll targNumRoll}}
                 <tr><td  COLSPAN="2" style="font-size:105%;font-weight:bold;color:green;text-align:center;">Success!</td></tr>
-            {{/rollGreater() diceRoll targetRoll}}
-            {{#rollTotal() diceRoll targetRoll}}
+            {{/rollGreater() diceRoll targNumRoll}}
+            {{#rollTotal() diceRoll targNumRoll}}
                 <tr><td  COLSPAN="2" style="font-size:105%;font-weight:bold;color:green;text-align:center;">Success!</td></tr>
-            {{/rollTotal() diceRoll targetRoll}}
-            {{#rollLess() diceRoll targetRoll}}
+            {{/rollTotal() diceRoll targNumRoll}}
+            {{#rollLess() diceRoll targNumRoll}}
                 <tr><td  COLSPAN="2" style="font-size:105%;font-weight:bold;color:red;text-align:center;">Failure</td></tr>
-            {{/rollLess() diceRoll targetRoll}}
+            {{/rollLess() diceRoll targNumRoll}}
             {{#rollLess() finalDiff difficulty}}
                 <tr><td COLSPAN="2"><hr/></td></tr>
             {{/rollLess() finalDiff difficulty}}
             <tr>
                 <td><span>Difficulty</span></td>
-                <td>{{difficulty}} (TN {{target}})</td>
+                <td>{{difficulty}} (TN {{targNum}})</td>
             </tr>
         {{/rollGreater() difficulty 0}}
         {{#rollTotal() difficulty 0}}
@@ -863,12 +970,18 @@
             <tr><td>Effort</td><td><i>- {{effortRoll}}</i></td></tr>
         {{/rollGreater() effortRoll 0}}
         {{#rollGreater() difficulty 0}}
-            {{#rollLess() targetRoll target}}
+            {{#rollLess() targNumRoll targNum}}
                 <tr>
                     <td style="text-align: right;">=</td>
-                    <td style="text-align: left;">{{finalDiff}} (TN {{targetRoll}})</td>
+                    <td style="text-align: left;">{{finalDiff}} (TN {{targNumRoll}})</td>
                 </tr>
-            {{/rollLess() targetRoll target}}
+            {{/rollLess() targNumRoll targNum}}
+            {{#rollGreater() targNumRoll targNum}}
+                <tr>
+                    <td style="text-align: right;">=</td>
+                    <td style="text-align: left;">{{finalDiff}} (TN {{targNumRoll}})</td>
+                </tr>
+            {{/rollGreater() targNumRoll targNum}}
         {{/rollGreater() difficulty 0}}
         {{#rollTotal() difficulty 0}}
             {{#rollLess() finalDiff 0}}
@@ -880,7 +993,7 @@
             {{#rollGreater() finalDiff 0}}
                 <tr>
                     <td style="text-align: right;">= Difficulty </td>
-                    <td style="text-align: left;" >+ {{finalDiff}} steps</td>
+                    <td style="text-align: left;" >+{{finalDiff}} steps</td>
                 </tr>
             {{/rollGreater() finalDiff 0}}
         {{/rollTotal() difficulty 0}}
@@ -985,3 +1098,19 @@
         {{/nextAction}}
     </table>
 </rolltemplate> <!-- End template cyphRecovery !-->
+<rolltemplate class="sheet-rolltemplate-cyphDesc">
+    <table>
+        <tr><th COLSPAN="2">{{name}}</th></tr>
+        <tr><td><span>Type</span></td><td>{{type}}</td></tr>
+        {{#level}}
+            <tr><td><span>Level</span></td><td>{{level}}</td></tr>
+        {{/level}}
+        {{#depletion}}
+            <tr><td><span>Depletion</span></td><td>{{depletion}}</td></tr>
+        {{/depletion}}
+        {{#use}}
+            <tr><td><span>Use</span></td><td>{{use}}</td></tr>
+        {{/use}}
+        <tr><td COLSPAN="2">{{description}}</th></tr>
+    </table>
+</rolltemplate><!-- End template cyphDesc -->
