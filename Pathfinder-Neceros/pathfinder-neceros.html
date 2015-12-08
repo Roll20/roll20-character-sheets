@@ -1,8 +1,17 @@
 <div ><!--style="display:none;"-->
     <b style="color:red;font-size:150%;">Attention: </b>
-	<ol><li>hit recalc checbox to right. For PCs this could take 10 seconds</li>
+	<ol>
+	<li>Button bars are gone, the buttons in the repeating sections now work directly and can be dragged to your macro bar.
+	 For instance you used %{selected|repeating_weapon_1_attack} you must change the 1 to "$1", or 
+	  you can hover over the button to get the exact name of the button which will be "-kH9876FHKE" or something similar.</li>
+	<li>hit recalc checbox to right. For PCs this could take 10 seconds</li>
 	<li>If updating buff dmg, or effect attack or damage, they won't automatically update repeating weapons. 
 	  so you must go to the weapon and change a value and then change it back to force an update.</li>
+	  <li>If you changed these fields you must update the new version of the field (same location on sheet) because the new fields only are modifiers 
+	  to the calculations which are done in javascript.:
+	  <ol><li>HP-formula</li><li>max-skill-ranks-formula</li></ol>
+	  </li>
+	  
 	</ol>
 </div>
 <div class="sheet-table sheet-header">
@@ -1948,7 +1957,7 @@
 				<span class="sheet-table-data sheet-center">+</span>
 				<span class="sheet-table-data sheet-center"><input title="@{buff_Ranged-total}" type="number" name="attr_buff_Ranged-total" value="0" style="width:3.5em;" class="sheet-calc" readonly="readonly" /></span>
 				<span class="sheet-table-data sheet-center">+</span>
-				<span class="sheet-table-data sheet-center"><input title="@{attk-penalty}" type="number" name="attr_attk-penalty" value="0" max="0" class="sheet-calc" readonly="readonly" /></span>
+				<span class="sheet-table-data sheet-center"><input title="@{attk-penalty}" type="number" name="attr_attk-penalty" value="0"  class="sheet-calc" readonly="readonly" /></span>
 				<span class="sheet-table-data sheet-center">&nbsp;</span>
 				<span class="sheet-table-data sheet-center" style="width:100px;">&nbsp;</span>
 			</div>
@@ -1977,7 +1986,7 @@
 				<span class="sheet-table-data sheet-center"></span>
 				<span class="sheet-table-data sheet-center"></span>
 				<span class="sheet-table-data sheet-center">+</span>
-				<span class="sheet-table-data sheet-center"><input title="@{attk-penalty}" type="number" name="attr_attk-penalty" value="0" max="0" class="sheet-calc" readonly="readonly" /></span>
+				<span class="sheet-table-data sheet-center"><input title="@{attk-penalty}" type="number" name="attr_attk-penalty" value="0" class="sheet-calc" readonly="readonly" /></span>
 				<span class="sheet-table-data sheet-center"></span>
 				<span class="sheet-table-data sheet-center" style="width:100px;"><input title="@{attk-CMB-gnote}" type="text" name="attr_attk-CMB-gnote" value="0" readonly="readonly" /></span>
 			</div>
@@ -11264,12 +11273,14 @@
 </rolltemplate>
 </div>
 <script type="text/worker">
+// var getSectionIDs=function(){};
+// var getAttrs=function(){};
+// var setAttrs=function(){};
+// var on=function(){};
 
 var ExExp = (function(){
 
     parseExpression = function (s, until) {
-        //alert('parsing: ' + s);
-        //alert('until is ' + typeof until);
         var untilCb = (typeof (until) == typeof (function () {}) ? until : function (tok) {
             return (tok == until);
         });
@@ -12240,9 +12251,6 @@ var ExExp = (function(){
 
 	
     return {
-		parseExpression:parseExpression,
-		write:write,
-		sendCommand:sendCommand,
 		handleExpression:handleExpression
     };
 }());
@@ -12349,7 +12357,7 @@ var SWUtils = SWUtils || (function() {
 		}
 		searchAndReplaceFields(exprStr, true, function(replacedStr) {
 			//console.log("we received "+replacedStr+" back");
-			var evaluated, setter={};
+			var evaluated;
 			// not simply !replacedStr since "0" is valid
 			if (typeof replacedStr !== "undefined" && replacedStr !== null ) {
 				evaluated = ExExp.handleExpression(replacedStr);
@@ -12361,7 +12369,7 @@ var SWUtils = SWUtils || (function() {
 	},
 
 
-	/* evaluateAndSet
+	/* evaluateAndSetString
 	 * Searches the readField for any instances of @{field} and replaces them with a value
 	 * then writes the resulting string to the writeField. 
 	 * 
@@ -12385,7 +12393,7 @@ var SWUtils = SWUtils || (function() {
 		});
 	},
 	
-	/* evaluateToNumberAndSet
+	/* evaluateAndSetNumber
 	* Examines the string in readField, and tests to see if it is a number
 	* if it's a number immediately write it to writeField.
 	* if not, then replace any @{field} references with numbers, and then evaluate it 
@@ -12405,7 +12413,7 @@ var SWUtils = SWUtils || (function() {
 			var currVal= parseFloat(values[writeField],10)||0;
 			value = parseFloat(values[readField]);//cannot do "||0" since 0 is valid but falsy
 			if (isNaN(value) || typeof(value) === "undefined") {
-				SWUtils.evaluateExpression(values[readField],function(value){
+				evaluateExpression(values[readField],function(value){
 					//should be same, but sometimes not!? check both
 					if ( isNaN(value) || typeof value  === "undefined" ) {value=defaultVal||0;}
 					if (currVal!==value) {
@@ -12420,16 +12428,83 @@ var SWUtils = SWUtils || (function() {
 				}				
 			}
 		});		
-	};
+	},
+
+
+   /*updateRepeatingSectionNumberValue
+	* updates a single number field in a row for a single repeating section
+	* generates the field name from the section name, id of row, partial name, and postpended string if one is provided.
+	* the name will be :   repeating_<repeatingSection>_<id>_<fieldToUpdatePartialName><postPend>
+    *
+	* @repeatingSection = sectioname without "repeating_"
+	* @id = the id of the row , can be the id from getSectionIDs, should also work with $X the 
+	* @fieldToUpdatePartialName = the partial name (everything after repeating_<name>_$X_   except a postpended string )
+	*       if this is null, then use the copyFromField
+	* @postPend = a postpend string at the end of the fieldname in the repeating section , such as "-copy"
+	*/
+	updateRepeatingSectionNumberValue=function(repeatingSection,id,fieldToUpdatePartialName,newVal,postPend) {
+		var fieldToUpdate= "repeating_" + repeatingSection + "_"+id+"_" + fieldToUpdatePartialName + postPend;
+		getAttrs([fieldToUpdate],function(values){
+			var setter={}, 
+			val = parseInt(values[fieldToUpdate],10)||0;
+			if (newVal !== val ) {
+				setter[fieldToUpdate]=newVal; 
+				setAttrs(setter);
+			}
+		});
+	},	
 
 	
+   /* setNumberFieldToRepeating
+	* Sets a number to a field for all rows of a repeating section
+	* 
+	* @repeatingSection = sectioname without "repeating_"
+	* @val = number value to set
+	* @fieldToUpdatePartialName = the partial name (everything after repeating_<name>_$X_   except a postpended string )
+	*       if this is null, then use the copyFromField (if you set the name to be the same with a postpended string at the end)
+	* @postPend = a postpend string at the end of the fieldname in the repeating section , such as "-copy"
+	*/	
+	setNumberFieldToRepeating = function (repeatingSection,val,fieldToUpdatePartialName,postPend) {
+		getSectionIDs("repeating_"+repeatingSection,function(ids){
+			for (id of ids) {
+				if (ids.hasOwnProperty(id)) {
+					//separate function per row necessary because 
+					//outer variables change rapidly resulting in incorrect values passed in
+					updateRepeatingSectionNumberValue(repeatingSection,id,fieldToUpdatePartialName,val,postPend);
+				}
+			}
+		});
+	},
+
+   /* copyStaticNumberFieldToRepeating
+	* Copies a number from a field outside a repeating section to the fields inside a repeating section
+	* For instance, if you have a field @{FOO} and when it is updated you want to update all field in
+	* the repeating_bar section, and they are named repeating_bar_$X_foo_copy
+	*   then you would call with parameters ("bar","foo","foo","_copy")
+	*
+	* @repeatingSection = sectioname without "repeating_"
+	* @copyFromField = Field to copy from
+	* @fieldToUpdatePartialName = the partial name (everything after repeating_<name>_$X_   except a postpended string )
+	*       if this is null, then use the copyFromField (if you set the name to be the same with a postpended string at the end)
+	* @postPend = a postpend string at the end of the fieldname in the repeating section , such as "-copy"
+	*/
+	copyStaticNumberFieldToRepeating = function (repeatingSection,copyFromField,fieldToUpdatePartialName,postPend) {
+		if (!fieldToUpdatePartialName ) {fieldToUpdatePartialName = copyFromField;}
+		getAttrs([copyFromField],function(attrs){
+			var copyFromFieldVal = parseInt(attrs[copyFromField],10)||0;
+			setNumberFieldToRepeating(repeatingSection,copyFromFieldVal,fieldToUpdatePartialName,postPend);
+		});
+	};
 	
     return {
-		validNumericStr:validNumericStr,
-		searchAndReplaceFields:searchAndReplaceFields,
-		evaluateExpression:evaluateExpression,
-		evaluateAndSetString:evaluateAndSetString,
-		evaluateAndSetNumber:evaluateAndSetNumber
+		 util:{  validNumericStr:validNumericStr
+				,updateRepeatingSectionNumberValue:updateRepeatingSectionNumberValue} 
+		,searchAndReplaceFields:searchAndReplaceFields
+		,evaluateExpression:evaluateExpression
+		,evaluateAndSetString:evaluateAndSetString
+		,evaluateAndSetNumber:evaluateAndSetNumber
+		,copyStaticNumberFieldToRepeating:copyStaticNumberFieldToRepeating
+		,setNumberFieldToRepeating:setNumberFieldToRepeating
     };
 }());
 	
@@ -12439,14 +12514,18 @@ var PFSheet = PFSheet || (function(){
     var version= 0.1,
 
 	//Utilities
-	
+
+	copyStaticNumberFieldToRepeating = function (repeatingSection,copyFromField) {
+		SWUtils.copyStaticNumberFieldToRepeating(repeatingSection,copyFromField,copyFromField,"-copy")
+	},
+
+
 	/* findAbilityInString
-	 * Looks at a string for instances of an ability modifier (DEX-mod, etc) and returns
+	 * Looks at a string for instances of an ability modifier DEX-mod, etc and returns
 	 * the modifier it finds. If it finds none, it looks for the base ability 
 	 * Note the order checked is the same as the order they traditionally appear in
-	 * (STR-mod,DEX-mod,CON-mod,INT-mod,WIS-mod,CHA-mod) 
-	 * then it checks for  (STR,DEX,CON,INT,WIS,CHA) 
-		
+	 * STR-mod,DEX-mod,CON-mod,INT-mod,WIS-mod,CHA-mod 
+	 * then it checks for  STR,DEX,CON,INT,WIS,CHA 
 	 */
 	findAbilityInString = function (fieldToFind) {
 		if (fieldToFind.indexOf("STR-mod") >= 0 ) {fieldToFind = "STR-mod";}
@@ -12493,8 +12572,6 @@ var PFSheet = PFSheet || (function(){
 	 * findAbilityInString method.
 	 * 
 	 * @readField = the dropdown we are looking at
-	 * @defaultAbility = if the value of the dropdown cannot be determined , use this.
-	 *        pass in "" if no default is desired
 	 * @callback = a function that takes one integer parameter, which is the value the dropdown selection represents
 	 */
 	getDropdownVal = function (readField,callback) {
@@ -12609,13 +12686,13 @@ var PFSheet = PFSheet || (function(){
 	/* updateBuff
 	 * This updates the buff value when a textbox is updated.
 	 * ONLY called if the toggle checkbox is CHECKED for this row, 
-	 * so set buff even if 0 (since it changed from non zero)
+	 * so set buff even if 0 since it changed from non zero
 	 * @buffname {string} The case sensitive distinct portion of name of field that was changed.
 	 *      So: Melee, Ranged, DMG, AC, HP-temp, Fort, Ref, Will, STR, DEX, CON, INT, WIS, CHA
 	 * @row {number} The row number of the change. 
 	 */
-	updateBuff = function (eventname, row) {
-		var fieldtoUpdate = "buff"+row+"_"+eventname;
+	updateBuff = function (buffname, row) {
+		var fieldtoUpdate = "buff"+row+"_"+buffname;
 		var fieldtoRead = fieldtoUpdate + "_macro-text";
 		SWUtils.evaluateAndSetNumber(fieldtoRead,fieldtoUpdate);
 	},
@@ -12634,7 +12711,7 @@ var PFSheet = PFSheet || (function(){
 
 		getAttrs(buffFlds,function(v){
 			var numFlds = buffFlds.length - 1; // -1 to skip toggle field at end of buffFlds array
-			var i,n,numSet=0, valuesToSet ={};
+			var i,numSet=0, valuesToSet ={};
 			if (v[toggle] == 0) {
 				for (i=0;i<numFlds;i++) {
 					if (v[buffFlds[i]] !== 0) {valuesToSet[buffFlds[i]]=0;numSet++;}
@@ -12648,13 +12725,6 @@ var PFSheet = PFSheet || (function(){
 				for (i=0;i<numFlds;i++){
 					SWUtils.evaluateAndSetNumber(inputFlds[i],buffFlds[i]);
 				}
-				/*getAttrs(inputFlds, function (v2){ 
-					for (i=0;i<numFlds;i++){
-						n=parseInt(v2[inputFlds[i]],10)||0;
-						if (n!==0) { valuesToSet[buffFlds[i]]=n; numSet++;}
-					}
-					if (numSet > 0) {setAttrs(valuesToSet);}
-				});  */
 			}
 		});
 	},
@@ -12743,7 +12813,7 @@ var PFSheet = PFSheet || (function(){
 				woundedhp = Math.floor(totalhp /2 ),
 				criticalhp = Math.floor(totalhp /4);
 			var currHP= parseInt(values["HP_max"],10)||0;
-			if (currHP !=totalhp) {
+			if (currHP !== totalhp) {
 				setAttrs({"HP_max":totalhp,"HP_grazed":grazedhp,"HP_wounded":woundedhp,"HP_critical":criticalhp});
 			}
 		});
@@ -12753,9 +12823,10 @@ var PFSheet = PFSheet || (function(){
 	 * sets temp hp
 	 */
 	updateTempHP = function() {
-		getAttrs(["HP-temp-misc","buff_HP-temp-total"],function(values) {
-			var totaltemp = (parseInt(values["HP-temp-misc"],10)||0) + (parseInt(values["buff_HP-temp-total"],10)||0);
-			setAttrs({"HP-temp":totaltemp});
+		getAttrs(["HP-temp-misc","buff_HP-temp-total","HP-temp"],function(values) {
+			var totaltemp = (parseInt(values["HP-temp-misc"],10)||0) + (parseInt(values["buff_HP-temp-total"],10)||0),
+			   currtemp=  parseInt(values["HP-temp"],10)||0 ;
+			if (currtemp !== totaltemp) {setAttrs({"HP-temp":totaltemp});}
 		});
 	},
 
@@ -12792,7 +12863,7 @@ var PFSheet = PFSheet || (function(){
 		}
 		//console.log(getFields);
 		getAttrs(getFields,function(v){
-			var setVal = {},currTot, tot=0;
+			var setter = {},currTot, tot=0;
 			//console.log("before switch, col is "+col);
 			switch(col) {
 				case 'skill':
@@ -12819,8 +12890,8 @@ var PFSheet = PFSheet || (function(){
 			currTot = parseInt(v[totalColName],10)||0;
 			//console.log("tot is "+tot+", currtot = "+currTot);
 			if ( tot!== currTot) {
-				setVal[totalColName]=tot;
-				setAttrs(setVal);
+				setter[totalColName]=tot;
+				setAttrs(setter);
 			}
 		});
 	},
@@ -12856,7 +12927,8 @@ var PFSheet = PFSheet || (function(){
 			"AC","Touch","Flat-Footed","CMD","FF-CMD","AC-ability","AC-armor","AC-shield"], function(v) {
 			//console.log("AAAAAAAAAAAAt update defenses");
 			//console.log(v);
-			var size= parseInt(v["size"],10)||0,
+			var setter={}, setAny =0,
+			    size= parseInt(v["size"],10)||0,
 				dodge =parseInt(v["AC-dodge"],10)||0,
 				deflect=parseInt(v["AC-deflect"],10)||0,
 				miscAC=parseInt(v["AC-misc"],10)||0,
@@ -12903,14 +12975,13 @@ var PFSheet = PFSheet || (function(){
 			var currFF= parseInt(v["Flat-Footed"],10)||10;
 			var currCMD = parseInt(v["CMD"],10)||10;
 			var currCMDFF = parseInt(v["FF-CMD"],10)||10;
-			setter={};
-			set=0;
-			if (ac !== currAC) {setter["AC"]=ac;set=1;}
-			if (touch !== currTouch) {setter["Touch"]=touch;set=1;}
-			if (ff !== currFF) {setter["Flat-Footed"]=ff;set=1;}
-			if (cmd !== currCMD) {setter["CMD"]=cmd;set=1;}
-			if (cmdFF !== currCMDFF) {setter["FF-CMD"]=cmd;set=1;}
-			if (set===1) {
+
+			if (ac !== currAC) {setter["AC"]=ac;setAny+=1;}
+			if (touch !== currTouch) {setter["Touch"]=touch;setAny+=1;}
+			if (ff !== currFF) {setter["Flat-Footed"]=ff;setAny+=1;}
+			if (cmd !== currCMD) {setter["CMD"]=cmd;setAny+=1;}
+			if (cmdFF !== currCMDFF) {setter["FF-CMD"]=cmd;setAny+=1;}
+			if (setAny) {
 				setAttrs(setter);
 			}
 			
@@ -12931,8 +13002,11 @@ var PFSheet = PFSheet || (function(){
 		 "acp","max-dex","AC-armor","AC-shield","spell-fail","acp-attack-mod" ], function(v)    {
 		 //console.log(v);
 		 var acp=0,maxDex=99,acA=0,acS=0,sp=0,atk=0;
-		 var subAC=0,subD=0,subAcp=0,nonProf=0,subsp=0;
-		 if (v["armor-equipped"]==1 ) {
+		 var subAC,subD,subAcp,nonProf,subsp;
+		 var currACP,currMaxDex,currACArmor,currACShield,currSpellFail,currAtkMod;
+		 var setAny=0, setter={};
+
+		 if (v["armor-equipped"]=="1" ) {
 			 subAC=parseInt(v["armor-acbonus"],10)||0;
 			 subD=parseInt(v["armor-max-dex"],10);subD=isNaN(subD)?99:subD; //cannot do "or 0" since 0 is valid but falsy
 			 subAcp=parseInt(v["armor-acp"],10)||0;
@@ -12945,7 +13019,7 @@ var PFSheet = PFSheet || (function(){
 			 if(nonProf) {atk+=subAcp; }
 			 //console.log("the proficiency is " + prof + " and attack penalty: " + atk);
 		 }
-		 if (v["armor2-equipped"]==1 ) {
+		 if (v["armor2-equipped"]=="1" ) {
 			 subAC=parseInt(v["armor2-acbonus"],10)||0;
 			 subD=parseInt(v["armor2-max-dex"],10);subD=isNaN(subD)?99:subD; //cannot do "or 0" since 0 is valid but falsy
 			 subAcp=parseInt(v["armor2-acp"],10)||0;
@@ -12957,7 +13031,7 @@ var PFSheet = PFSheet || (function(){
 			 sp+=subsp;
 			 if(nonProf) {atk+=subAcp;}
 		 }
-		 if (v["shield-equipped"]==1 ) {
+		 if (v["shield-equipped"]=="1" ) {
 			 subAC=parseInt(v["shield-acbonus"],10)||0;
 			 subD=parseInt(v["shield-max-dex"],10);subD=isNaN(subD)?99:subD; //cannot do "or 0" since 0 is valid but falsy
 			 subAcp=parseInt(v["shield-acp"],10)||0;
@@ -12969,7 +13043,7 @@ var PFSheet = PFSheet || (function(){
 			 sp+=subsp;
 			 if(nonProf) {atk+=subAcp;}
 		 }
-		 if (v["shield2-equipped"]==1 ) {
+		 if (v["shield2-equipped"]=="1" ) {
 			 subAC=parseInt(v["shield2-acbonus"],10)||0;
 			 subD=parseInt(v["shield2-max-dex"],10);subD=isNaN(subD)?99:subD; //cannot do "or 0" since 0 is valid but falsy
 			 subAcp=parseInt(v["shield2-acp"],10)||0;
@@ -12982,25 +13056,24 @@ var PFSheet = PFSheet || (function(){
 			 if(nonProf) {atk+=subAcp;}
 		 }
 		 
-		 var currACP=parseInt(v.acp,10)||0;
-		 var currMaxDex=parseInt(v["max-dex"],10);
-			currMaxDex=isNaN(currMaxDex)?99:currMaxDex;//cannot do "||0" since 0 is valid but falsy
-		 var currACArmor=parseInt(v["AC-armor"],10)||0;
-		 var currACShield=parseInt(v["AC-shield"],10)||0;
-		 var currSpellFail=parseInt(v["spell-fail"],10)||0;
-		 var currAtkMod=parseInt(v["acp-attack-mod"],10)||0;
+		 currACP=parseInt(v.acp,10)||0;
+		 currMaxDex=parseInt(v["max-dex"],10);
+		 currMaxDex=isNaN(currMaxDex)?99:currMaxDex;//cannot do "||0" since 0 is valid but falsy
+		 currACArmor=parseInt(v["AC-armor"],10)||0;
+		 currACShield=parseInt(v["AC-shield"],10)||0;
+		 currSpellFail=parseInt(v["spell-fail"],10)||0;
+		 currAtkMod=parseInt(v["acp-attack-mod"],10)||0;
 
 		 //console.log(v);
 		 //console.log("curr atk mod:"+currAtkMod+", curr acp:"+currACP+", new acp:"+acp+", currMaxDex:"+currMaxDex+", new maxdex:"+maxDex);
-		 var setit=0;
-		 var setter={};
-		 if (currACP!==acp){setter["acp"]=acp;setit=1;}
-		 if (currMaxDex!==maxDex){setter["max-dex"]=maxDex;setit=1;}
-		 if (currACArmor!==acA){setter["AC-armor"]=acA;setit=1;}
-		 if (currACShield!==acS){setter["AC-shield"]=acS;setit=1;}
-		 if (currSpellFail!==sp){setter["spell-fail"]=sp;setit=1;}
-		 if (currAtkMod!==atk){setter["acp-attack-mod"]=atk;setit=1;}
-		 if (setit===1) {
+
+		 if (currACP!==acp){setter["acp"]=acp;setAny=1;}
+		 if (currMaxDex!==maxDex){setter["max-dex"]=maxDex;setAny=1;}
+		 if (currACArmor!==acA){setter["AC-armor"]=acA;setAny=1;}
+		 if (currACShield!==acS){setter["AC-shield"]=acS;setAny=1;}
+		 if (currSpellFail!==sp){setter["spell-fail"]=sp;setAny=1;}
+		 if (currAtkMod!==atk){setter["acp-attack-mod"]=atk;setAny=1;}
+		 if (setAny) {
 			 setAttrs(setter);
 		 }
 	 });
@@ -13028,6 +13101,7 @@ var PFSheet = PFSheet || (function(){
 	updateSave = function(save) {
 		var getFields = ["total-"+save,save+"-ability-mod",save+"-trait",save+"-enhance",save+"-resist",save+"-misc","saves-cond","buff_"+save+"-total",save];
 		getAttrs(getFields,function(v) {
+			var setter={};
 			var currSave=parseInt(v[save],10)||0;
 			var newSave = (parseInt(v["total-"+save] ,10)||0) +
 					 (parseInt(v[save+"-ability-mod"] ,10)||0) +
@@ -13037,7 +13111,6 @@ var PFSheet = PFSheet || (function(){
 					 (parseInt(v[save+"-misc"] ,10)||0) +
 					 (parseInt(v["saves-cond"] ,10)||0) +
 					 (parseInt(v["buff_"+save+"-total"] ,10)||0);
-			var setter={};
 			if(currSave !== newSave) {
 				setter[save]=newSave;
 				setAttrs(setter);
@@ -13082,9 +13155,12 @@ var PFSheet = PFSheet || (function(){
 	 * updates the attk-penalty for attacks based on conditions (including wearing armor you are not proficient in)
 	 */
 	updateConditionAttackPenalty = function() {
-
 		getAttrs(["condition-Dazzled","condition-Entangled","condition-Grappled","condition-Fear","condition-Sickened","condition-Prone",
 		"condition-Invisible","condition-Drained","condition-Wounds","attk-penalty","attk-CMB-gnote","acp-attack-mod"],function(v) { 
+			var currPenalty = parseInt(v["attk-penalty"],10)||0;
+			var setter = {};
+			var setAny=0;
+			var grapplenote="";
 			var totpenalty = -1 * (
 					(parseInt(v["condition-Dazzled"],10)||0) +
 					(parseInt(v["condition-Entangled"],10)||0) +
@@ -13092,39 +13168,35 @@ var PFSheet = PFSheet || (function(){
 					(parseInt(v["condition-Fear"],10)||0) +
 					(parseInt(v["condition-Sickened"],10)||0) +
 					(parseInt(v["condition-Prone"],10)||0) +
-					(parseInt(v["condition-Wounds"],10)||0) ) +
-				(parseInt(v["condition-Invisible"],10)||0) +
+					(parseInt(v["condition-Wounds"],10)||0) ); 
+			totpenalty+= (parseInt(v["condition-Invisible"],10)||0) +
 				(parseInt(v["condition-Drained"],10)||0) +
 				(parseInt(v["acp-attack-mod"],10)||0) ;
 
-				var grapplenote=" ";
-				if (v["condition-Grappled"] != "0") {
-					grapplenote="+"+v["condition-Grappled"]+" grapple";
-				}
-				var curr = parseInt("attk-penalty",10)||0;
-				var setter = {};
-				var set=0;
-				//console.log("AAAAAAAAAAA the values are : "+totpenalty + " vs " + curr+" and note is " + grapplenote);
-				
-				if (curr !== totpenalty) {
-					setter["attk-penalty"]=totpenalty;
-					set=1;
-				}
+			if (v["condition-Grappled"] != "0") {
+				grapplenote="+"+v["condition-Grappled"]+" grapple";
+			}
 
-				if (v["attk-CMB-gnote"] !== grapplenote){
-					setter["attk-CMB-gnote"]=grapplenote;
-					set=1;
-				}
-				if (set===1) {
-					setAttrs(setter);
-				}
+			if (currPenalty !== totpenalty) {
+				setter["attk-penalty"]=totpenalty;
+				setAny+=1;
+			}
+			//check for both null/empty/undefined as well as not equals
+			if ( !(!v["attk-CMB-gnote"] && !grapplenote)  && v["attk-CMB-gnote"] !== grapplenote  ) {
+				setter["attk-CMB-gnote"]=grapplenote;
+				setAny+=1;
+			}
+			if (setAny) {
+				setAttrs(setter);
+			}
+
 		});	
 	},
 
 	/* updateAttack
 	 * Updates the attack type totals at top of attack page for one row of grid
 	 *
-	 * @attype = the type of attack: melee, ranged, CMB (case sensitive)
+	 * @attype = the type of attack: melee, ranged, CMB case sensitive
 	 */
 	updateAttack=function(attype) {
 		var modfield=attype+"-ability-mod";
@@ -13186,48 +13258,6 @@ var PFSheet = PFSheet || (function(){
 
 
 
-	
-	/* updateStaticFieldInRepeating
-	* Repeating fields that are just copies of other values must be named 
-	* repeating_sectionName_$X_OtherFieldName-copy  
-	*/
-	updateStaticNumberFieldInRepeating = function (repeatingSection,fieldUpdated) {
-		getAttrs([fieldUpdated],function(attrs){
-			var fieldUpdatedVal = parseInt(attrs[fieldUpdated],10)||0;
-			getSectionIDs(repeatingSection,function(ids){
-				var fieldToUpdate,idname,notesname,testset={};
-				for (id of ids) {
-					//idname = " "+id;
-					//notesname=repeatingSection + "_"+id+"_notes";
-					//testset[notesname]=idname;
-					//setAttrs(testset);
-					updateSectionSingleValue(repeatingSection,id,fieldUpdated,fieldUpdatedVal);
-					// fieldToUpdate=repeatingSection + "_"+id+"_" + fieldUpdated + "-copy";
-					// getAttrs([fieldToUpdate],function(values){
-						// var setter={}, 
-						// fieldToUpdateCopy= repeatingSection + "_"+id+"_" + fieldUpdated + "-copy"; // because the outer one changes in the loop
-						// val = parseInt(values[fieldToUpdateCopy],10)||0;
-						// console.log("RRRRRRRRRRRRR comparing: " +  fieldUpdated +" ("+ fieldUpdatedVal+") with " + fieldToUpdateCopy + " (" + val +") ");
-						// if (fieldUpdatedVal !== val ) {
-							// setter[fieldToUpdateCopy]=fieldUpdatedVal; 
-							// setAttrs(setter);
-						// }
-					// });
-				}
-			});
-		});
-	},	
-	updateSectionSingleValue=function(repeatingSection,id,fieldUpdated,newVal) {
-		var fieldToUpdate=repeatingSection + "_"+id+"_" + fieldUpdated + "-copy";
-		getAttrs([fieldToUpdate],function(values){
-			var setter={}, 
-			val = parseInt(values[fieldToUpdate],10)||0;
-			if (newVal !== val ) {
-				setter[fieldToUpdate]=newVal; 
-				setAttrs(setter);
-			}
-		});
-	},
 	updateRepeatingWeapon=function() {
 	   getAttrs([
 			"repeating_weapon_enhance","repeating_weapon_masterwork","repeating_weapon_proficiency",
@@ -13275,7 +13305,7 @@ var PFSheet = PFSheet || (function(){
 	* updates the NPC hp, and also PC hp, because some people use "HP" attributes for monsters. could put this in config as well,  */
 	updateNPCHP = function () {
 		getAttrs(["npc-hd","npc-hd-num","npc-hd-misc","NPC-HP_max","NPC-HP","sync_npc_pc_hp"],function(v){
-			var hp = floor(((parseInt(v["npc-hd"],10)||0)/2) * (parseInt(v["npc-hd-num"],10)||0) + parseInt(v["npc-hd-misc"],10)||0 ),
+			var hp = Math.floor(((parseInt(v["npc-hd"],10)||0)/2) * (parseInt(v["npc-hd-num"],10)||0) + parseInt(v["npc-hd-misc"],10)||0 ),
 				maxhp=parseInt(v["NPC-HP_max"],10)||0,
 				currhp=parseInt(v["NPC-HP"],10)||0,
 				updatehp=parseInt(v.sync_npc_pc_hp,10)||0,
@@ -13322,7 +13352,6 @@ var PFSheet = PFSheet || (function(){
 		var csNm=skill+"-cs",
 		ranksNm=skill+"-ranks",
 		classNm=skill+"-class",
-		//abilityNm=skill+"-ability",
 		modNm=skill+"-ability-display",
 		racialNm=skill+"-racial",
 		featNm=skill+"-feat",
@@ -13331,11 +13360,11 @@ var PFSheet = PFSheet || (function(){
 		acpNm=skill+"-acp",
 		miscNm=skill+"-misc";
 		
-		getAttrs([skill,csNm,ranksNm,classNm,abilityNm,modNm,racialNm,featNm,itemNm,sizeNm,acpNm,miscNm,"skill_size","skill_size_double","acp"],function(v){
+		getAttrs([skill,csNm,ranksNm,classNm,modNm,racialNm,featNm,itemNm,sizeNm,acpNm,miscNm,"skill_size","skill_size_double","acp"],function(v){
 			var ranks,skillSize,adj,currSkill,skillTot=0,setter={},mods="",setAny=0;
 			currSkill=parseInt(v[skill],10)||0;
 			ranks = parseInt(v[ranksNm],10)||0;
-			if (ranks && parseInt(v[csNm],10)||0) {
+			if (ranks && (parseInt(v[csNm],10)||0)) {
 				skillTot+=3;
 				mods="3/";
 			} else {
@@ -13358,14 +13387,14 @@ var PFSheet = PFSheet || (function(){
 				skillTot += adj;
 				mods+=" "+adj;
 			} 
-			skillTot += ranks + (parseInt(v[abilityNm],10)||0) + (parseInt(v[modNm],10)||0) + (parseInt(v[racialNm],10)||0) + 
+			skillTot += ranks  + (parseInt(v[modNm],10)||0) + (parseInt(v[racialNm],10)||0) + 
 				(parseInt(v[featNm],10)||0) + (parseInt(v[itemNm],10)||0) + (parseInt(v[miscNm],10)||0);
 			if (currSkill !== skillTot) {
 				setter[skill]=skillTot;
 				setAny++;
 			}
 			if (mods===" / /") { mods="";}
-			if ((v[classNm]||"")!== mods) {
+			if ( (v[classNm]||"")!== mods) {
 				setter[classNm]=mods;
 				setAny++;
 			}
@@ -13467,11 +13496,13 @@ var PFSheet = PFSheet || (function(){
 		});
 	};
 	
-  return {
-	  version:version,
-		//findAbilityInString:findAbilityInString,
-		//findMultiplier:findMultiplier,
-		//getDropdownVal:getDropdownVal,
+	return {
+		util:{findAbilityInString:findAbilityInString,
+			findMultiplier:findMultiplier,
+			getDropdownVal:getDropdownVal
+			},
+	    version:version,
+		copyStaticNumberFieldToRepeating:copyStaticNumberFieldToRepeating,
 		handleDropdown:handleDropdown,
 		updateSize:updateSize,
 		updateAbility:updateAbility,
@@ -13498,13 +13529,11 @@ var PFSheet = PFSheet || (function(){
 		updateSkill:updateSkill,
 		updateNPCHP:updateNPCHP,
 		recalculateSheet:recalculateSheet,
-		updateStaticNumberFieldInRepeating:updateStaticNumberFieldInRepeating,
 		checkUpdate:checkUpdate
     };	
 }());
 	
 
-on("change:recalc1",function(){PFSheet.checkUpdate();});
 
 //Abilities and total buffs to them
 on("change:str-base change:str-enhance change:str-misc change:str-temp change:str-damage change:str-penalty change:str-drain change:buff_str-total", function() { PFSheet.updateAbility("STR"); });
@@ -13728,11 +13757,11 @@ on("change:acp-attack-mod change:condition-dazzled change:condition-entangled ch
     PFSheet.updateConditionAttackPenalty(); });
 
 //saves	
-on("change:total-fort change:fort-ability-mod change:fort-trait change:fort-enhance change:fort-resist change:fort-misc change:fort-temp change:buff_fort-total",function(){
+on("change:saves-cond change:total-fort change:fort-ability-mod change:fort-trait change:fort-enhance change:fort-resist change:fort-misc change:buff_fort-total",function(){
 	PFSheet.updateSave("Fort"); });
-on("change:total-ref change:ref-ability-mod change:ref-trait change:ref-enhance change:ref-resist change:ref-misc change:ref-temp change:buff_ref-total",function(){
+on("change:saves-cond change:total-ref change:ref-ability-mod change:ref-trait change:ref-enhance change:ref-resist change:ref-misc change:buff_ref-total",function(){
 	PFSheet.updateSave("Ref"); });
-on("change:total-will change:will-ability-mod change:will-trait change:will-enhance change:will-resist change:will-misc change:will-temp change:buff_will-total",function(){
+on("change:saves-cond change:total-will change:will-ability-mod change:will-trait change:will-enhance change:will-resist change:will-misc change:buff_will-total",function(){
 	PFSheet.updateSave("Will"); });
 
 //defenses
@@ -13778,17 +13807,21 @@ on("change:cmb-ability", function () {PFSheet.handleDropdown("CMB-ability",["CMB
 //repeating section dropdowns
 on("change:repeating_weapon:attack-type",function() {PFSheet.handleDropdown("repeating_weapon_attack-type",["repeating_weapon_attack-type-mod"]);});	
 on("change:repeating_weapon:damage-ability",function() { PFSheet.updateRepeatingWeaponDamageAbility();   });
+
 //macros repeating
 on("change:repeating_weapon:damage",function(){	SWUtils.evaluateAndSetNumber("repeating_weapon_damage","repeating_weapon_damage-mod");});
 on("change:repeating_weapon:attack",function(){	SWUtils.evaluateAndSetNumber("repeating_weapon_attack","repeating_weapon_attack-mod");});
 
-//npc sheet
-on("change:npc-hd change:npc-hd-num change:npc-hd-misc",function() {PFSheet.updateNPCHP();});
 
-on("change:total-skill change:total-fcskill change:int-mod change:level change:max-skill-ranks-mod",function() { PFSheet.updateMaxSkills(); })
+
+on("change:attk-effect-total",function(){PFSheet.copyStaticNumberFieldToRepeating("weapon","attk-effect-total");});
+on("change:dmg-effect-total",function(){PFSheet.copyStaticNumberFieldToRepeating("weapon","dmg-effect-total");});
+on("change:buff_dmg-total",function(){PFSheet.copyStaticNumberFieldToRepeating("weapon","buff_DMG-total");});
+
+
+//skills
+on("change:total-skill change:total-fcskill change:int-mod change:level change:max-skill-ranks-mod change:class-0-level change:class-1-level change:class-2-level change:class-3-level change:class-4-level",function() { PFSheet.updateMaxSkills(); });
 on("change:max-skill-ranks-misc",function(){SWUtils.evaluateAndSetNumber("Max-Skill-Ranks-Misc","Max-Skill-Ranks-mod");});
-
-on("change:size",function(){ PFSheet.updateSize()});
 
 // on("change:acrobatics-ability",function(){PFSheet.handleDropdown("Acrobatics-ability",["Acrobatics-ability-display"]);});
 // on("change:acp change:Acrobatics-cs change:Acrobatics-ranks change:Acrobatics-class change:Acrobatics-ability change:Acrobatics-ability-display change:Acrobatics-racial change:Acrobatics-feat change:Acrobatics-item change:Acrobatics-size change:Acrobatics-acp change:Acrobatics-misc"
@@ -13803,12 +13836,15 @@ on("change:size",function(){ PFSheet.updateSize()});
 // on("change:acp change:size_skill_double change:Stealth-cs change:Stealth-ranks change:Stealth-class change:Stealth-ability change:Stealth-ability-display change:Stealth-racial change:Stealth-feat change:Stealth-item change:Stealth-size change:Stealth-acp change:Stealth-misc"
    // ,function(){PFSheet.updateSkill("Stealth");});
 
+//size
+on("change:size",function(){ PFSheet.updateSize()});
+
+//sheet
 on("special:opened",function(){PFSheet.checkUpdate();});
+on("change:recalc1",function(){PFSheet.checkUpdate();});
 
-on("change:attk-effect-total",function(){PFSheet.updateStaticNumberFieldInRepeating("repeating_weapon","attk-effect-total");});
-on("change:dmg-effect-total",function(){PFSheet.updateStaticNumberFieldInRepeating("repeating_weapon","dmg-effect-total");});
-on("change:buff_dmg-total",function(){PFSheet.updateStaticNumberFieldInRepeating("repeating_weapon","buff_DMG-total");});
-
+//npc sheet
+on("change:npc-hd change:npc-hd-num change:npc-hd-misc",function() {PFSheet.updateNPCHP();});
 
 </script>
 
