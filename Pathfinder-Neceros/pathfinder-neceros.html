@@ -6,7 +6,7 @@
 			<li>Button bars are no longer necessary and have been removed. Buttons within repeating sections now work directly and can be dragged to the macro quick bar. To learn the id/name of the button, drag/drop the button to the macro quick bar.</li>
 			<li>All ability macros that utilize repeating attributes must be edited to include "<b>$</b>". e.g. @{repeating_foo_X_...} should be renamed @{repeating_foo_$X_...} where "<b>X</b>" is the row of the repeating section.</li>
 			<li>For existing characters/npc's, hit the recalc checkbox to the right to refresh auto-calculated attributes. This should only need to be done once and could take up to 10s.</li>
-			<li>Updating Buff DMG, or Effect Attack/Damage will not automatically update repeating weapons, so you must go to the weapon and change a value and then change it back to force an update.</li>
+			<li>Updating Buff DMG, and/or Attack and Damage Effects will not automatically update repeating weapons. You must either toggle them on/off or go to the weapon and change a value and then change it back to force an update.</li>
 			<li>If you changed the attributes/fields listed below, you must update to the new version of the attribute/field (same location on sheet) because the new fields are only modifiers to the calculations which are done within sheet workers(javascript).:
 				<ol>
 					<li>HP-formula</li>
@@ -11406,11 +11406,9 @@ var SWUtils = SWUtils || (function() {
 	setNumberFieldToRepeating = function (repeatingSection,val,fieldToUpdatePartialName,postPend) {
 		getSectionIDs("repeating_"+repeatingSection,function(ids){
 			for (id of ids) {
-				if (ids.hasOwnProperty(id)) {
-					//separate function per row necessary because 
-					//outer variables change rapidly resulting in incorrect values passed in
-					updateRepeatingSectionNumberValue(repeatingSection,id,fieldToUpdatePartialName,val,postPend);
-				}
+				//separate function per row necessary because outer variables change rapidly
+				//either that or clone all parameters again inside getAttrs
+				updateRepeatingSectionNumberValue(repeatingSection,id,fieldToUpdatePartialName,val,postPend);
 			}
 		});
 	},
@@ -11569,7 +11567,8 @@ var PFSheet = PFSheet || (function(){
 	 */
 	updateAbility = function(ability) {
 		getAttrs([ability+"-base",ability+"-enhance",ability+"-misc",ability+"-damage",ability+"-penalty",ability+"-drain","buff_"+ability+"-total",
-			"condition-Unconscious","condition-Fatigued","condition-Entangled","condition-Grappled","condition-Pinned",
+			"condition-Unconscious","condition-Fatigued","condition-Entangled","condition-Grappled","condition-Pinned","condition-Cowering",
+			"condition-Blinded","FF-ability",
 			ability, ability+"-mod", ability+"-cond"], function (values){
 			var base = (parseInt(values[ability+"-base"],10)||0) + 
 					(parseInt(values[ability+"-enhance"],10)||0) + 
@@ -11590,7 +11589,7 @@ var PFSheet = PFSheet || (function(){
 					   (parseInt(values["condition-Entangled"],10)||0) + 
 					   (parseInt(values["condition-Grappled"],10)||0) );			
 					cond = condMod * 2;
-					if (values["condition-Pinned"]=="4" && base > 10) {
+					if (((( values["FF-ability"]=="0" && parseInt(values["condition-Cowering"])||0)) || ( parseInt(values["condition-Pinned"])||0)) && base > 10 ){
 						newbase = 10;
 					}
 					break;
@@ -11859,11 +11858,13 @@ var PFSheet = PFSheet || (function(){
 	 * http://paizo.com/pathfinderRPG/prd/coreRulebook/combat.html#combat-maneuver-defense
 	 * A creature can also add any circumstance, deflection, dodge, insight, luck, morale, profane, and sacred bonuses to AC to its CMD. 
 	 * Any penalties to a creature's AC also apply to its CMD
+	 * 
 	  */
 	updateDefenses = function() {
-		getAttrs(["condition-Stunned","condition-Flat-Footed","AC-ability-mod","FF-DEX","AC-penalty","size","max-dex",
+		getAttrs(["condition-Flat-Footed","AC-ability-mod","FF-DEX","AC-penalty","size","max-dex",
 			"AC-dodge","AC-natural","AC=deflect","AC-misc","buff_AC-total","CMD-DEX","FF-CMD-DEX","CMD-STR","bab","CMD-misc",
-			"AC","Touch","Flat-Footed","CMD","FF-CMD","AC-ability","AC-armor","AC-shield"], function(v) {
+			"AC","Touch","Flat-Footed","CMD","FF-CMD","AC-ability","AC-armor","AC-shield",
+			"condition-Blinded","condition-Pinned","condition-Stunned","condition-Cowering"], function(v) {
 			//console.log("AAAAAAAAAAAAt update defenses");
 			//console.log(v);
 			var setter={}, setAny =0,
@@ -11878,30 +11879,49 @@ var PFSheet = PFSheet || (function(){
 				natural=parseInt(v["AC-natural"],10)||0,
 				bab=parseInt(v["bab"],10)||0,
 				miscCMD=parseInt(v["CMD-misc"],10)||0,
-				stunned = (v["condition-Stunned"]!="0" ? 1 : 0),
-				ffed=(v["condition-Flat-Footed"]!="0" ? 1 : 0),
 				maxDex=parseInt(v["max-dex"],10),
 				ability=parseInt(v["AC-ability-mod"],10)||0,
 				ffAbility=parseInt(v["FF-DEX"],10)||0,
 				cmdAbility1=parseInt(v["CMD-STR"],10)||0,
 				cmdAbility2=parseInt(v["CMD-DEX"],10)||0,
-				cmdFFAbility2=parseInt(v["FF-CMD-DEX"],10)||0;
-			maxDex=isNaN(maxDex)?99:maxDex; //cannot do "||0" since 0 is valid but falsy
+				cmdFFAbility2=parseInt(v["FF-CMD-DEX"],10)||0,
+				blinded = (parseInt(v["condition-Blinded"],10)||0)?1:0,
+				pinned = (parseInt(v["condition-Pinned"],10)||0)?1:0,
+				stunned = (parseInt(v["condition-Stunned"],10)||0)?1:0,
+				ffed=(parseInt(v["condition-Flat-Footed"],10)||0)?1:0,
+				cowering = (parseInt(v["condition-Cowering"],10)||0)?1:0,
+				loseDex=0;
+			
 			//console.log("size:"+size+", dodge:"+dodge+", misc:"+miscAC+", def:"+deflect+", cond:"+condPenalty+", buff:"+buffs+", armor:"+armor+", shield:"+shield+
 			//  ", natural:"+natural+", bab:"+bab+", miscCMD:"+miscCMD+", maxDex:"+maxDex+", stunned:"+stunned+", ffed:"+ffed+", ability:"+ability+
 			//  ", ffAbility:"+ffAbility+", cmdAbility1:"+cmdAbility1+",cmdAbility2:"+cmdAbility2+", cmdFFAbility2:"+cmdFFAbility2);
-			if (findAbilityInString(v["AC-ability"]) == "DEX-mod" && maxDex < 99 && maxDex >=0 )
+
+			maxDex=isNaN(maxDex)?99:maxDex; //cannot do "||0" since 0 is valid but falsy
+
+			if ( findAbilityInString(v["AC-ability"]) == "DEX-mod" && maxDex < 99 && maxDex >=0 )
 			{
 				ability = Math.min(ability,maxDex);
 				ffAbility = Math.min(ffAbility,maxDex);
-			}
+			}	
 
-			//why bother doing this when flat footed is on sheet? maybe macros use it?
-			if (stunned ===1 || ffed === 1) {
-				ability=ffAbility;
+			//lose Dex: you lose your bonus but are not flat footed
+			//Must be applied even if your bonus is something else:
+			//http://paizo.com/paizo/faq/v5748nruor1fm#v5748eaic9qdi
+			if (cowering || blinded || stunned) {
+				loseDex= 1;
+				ability = ffAbility;
 				cmdAbility2=cmdFFAbility2;
 			}
 
+			//Uncanny dodge still loses dex if immobilized	
+			//pinned, paralyzed, helpless. tough paralyzed helpless are 0 so ignore.
+			if (pinned) {
+				loseDex=1;
+				ffAbility=Math.max(0,ffAbility);
+				ability=Math.max(0,ffAbility);
+				cmdFFAbility2=Math.max(0,cmdFFAbility2);
+				cmdAbility2=Math.max(0,cmdFFAbility2);
+			}
 				
 			var ac = 10+ armor+shield+natural+size+dodge + ability  +deflect+miscAC+condPenalty +buffs;
 			var touch= 10+size+dodge+ability+deflect+miscCMD+condPenalty;
@@ -12291,18 +12311,20 @@ var PFSheet = PFSheet || (function(){
 		var csNm=skill+"-cs",
 		ranksNm=skill+"-ranks",
 		classNm=skill+"-class",
-		modNm=skill+"-ability-display",
+		modNm=skill+"-ability-mod",
 		racialNm=skill+"-racial",
 		featNm=skill+"-feat",
 		itemNm=skill+"-item",
 		sizeNm=skill+"-size",
 		acpNm=skill+"-acp",
-		miscNm=skill+"-misc";
+		miscNm=skill+"-misc",
+		sizeMod=skill+"-size-mod";
 		
-		getAttrs([skill,csNm,ranksNm,classNm,modNm,racialNm,featNm,itemNm,sizeNm,acpNm,miscNm,"skill_size","skill_size_double","acp"],function(v){
-			var ranks,skillSize,adj,currSkill,skillTot=0,setter={},mods="",setAny=0;
+		getAttrs([skill,csNm,ranksNm,classNm,modNm,racialNm,featNm,itemNm,sizeNm,acpNm,miscNm,sizeMod,"skill_size","skill_size_double","acp"],function(v){
+			var ranks,skillSize,adj,currSkill,skillTot=0,currSizeMod,setter={},mods="",setAny=0;
 			currSkill=parseInt(v[skill],10)||0;
 			ranks = parseInt(v[ranksNm],10)||0;
+			currSizeMod=parseInt(v[sizeMod],10)||0;
 			if (ranks && (parseInt(v[csNm],10)||0)) {
 				skillTot+=3;
 				mods="3/";
@@ -12321,10 +12343,18 @@ var PFSheet = PFSheet || (function(){
 				adj= parseInt(v["skill_size"],10)||0;
 				skillTot +=adj;
 				mods+=" "+adj;
+				if ( currSizeMod !== adj) {
+					setter[sizeMod]=adj;
+					setAny++;
+				}
 			} else if (skillSize===2) {
 				adj=parseInt(v["skill_size_double"],10)||0;
 				skillTot += adj;
 				mods+=" "+adj;
+				if ( currSizeMod !== adj) {
+					setter[sizeMod]=adj;
+					setAny++;
+				}				
 			} 
 			skillTot += ranks  + (parseInt(v[modNm],10)||0) + (parseInt(v[racialNm],10)||0) + 
 				(parseInt(v[featNm],10)||0) + (parseInt(v[itemNm],10)||0) + (parseInt(v[miscNm],10)||0);
@@ -12683,10 +12713,12 @@ on("change:hp-temp-misc change:buff_hp-temp-total", function() { PFSheet.updateT
 
 //Conditions
 on("change:condition-fatigued", function() { PFSheet.updateAbility("STR");  PFSheet.updateAbility("DEX"); });
-on("change:condition-entangled", function() { PFSheet.updateAbility("DEX"); });
+on("change:condition-entangled condition-cowering condition-blinded ff-ability", function() { PFSheet.updateAbility("DEX"); });
 on("change:condition-drained", function() { PFSheet.updateHP(); });
 on("change:condition-grappled", function() {  PFSheet.updateGrapple() });
 on("change:condition-pinned", function() { PFSheet.updatePin();});
+
+
 
 on ("change:condition-blinded change:condition-cowering change:condition-flat-footed change:condition-stunned change:condition-flat-footed change:condition-stunned change:condition-pinned change:condition-wounds change:ac-ability-mod", function() {
     PFSheet.updateConditionDefensePenalty(); });
@@ -12762,18 +12794,18 @@ on("change:buff_dmg-total",function(){PFSheet.copyStaticNumberFieldToRepeating("
 on("change:total-skill change:total-fcskill change:int-mod change:level change:max-skill-ranks-mod change:class-0-level change:class-1-level change:class-2-level change:class-3-level change:class-4-level",function() { PFSheet.updateMaxSkills(); });
 on("change:max-skill-ranks-misc",function(){SWUtils.evaluateAndSetNumber("Max-Skill-Ranks-Misc","Max-Skill-Ranks-mod");});
 
-// on("change:acrobatics-ability",function(){PFSheet.handleDropdown("Acrobatics-ability",["Acrobatics-ability-display"]);});
-// on("change:acp change:Acrobatics-cs change:Acrobatics-ranks change:Acrobatics-class change:Acrobatics-ability change:Acrobatics-ability-display change:Acrobatics-racial change:Acrobatics-feat change:Acrobatics-item change:Acrobatics-size change:Acrobatics-acp change:Acrobatics-misc"
-   // ,function(){PFSheet.updateSkill("Acrobatics");});
+on("change:acrobatics-ability",function(){PFSheet.handleDropdown("Acrobatics-ability",["Acrobatics-ability-mod"]);});
+on("change:acp change:Acrobatics-cs change:Acrobatics-ranks change:Acrobatics-class change:Acrobatics-ability change:Acrobatics-ability-mod change:Acrobatics-racial change:Acrobatics-feat change:Acrobatics-item change:Acrobatics-size change:Acrobatics-acp change:Acrobatics-misc change:Acrobatics-ReqTrain"
+   ,function(){PFSheet.updateSkill("Acrobatics");});
 
-// on("change:fly-ability",function(){PFSheet.handleDropdown("Fly-ability",["Fly-ability-display"]);});
-// on("change:acp change:size_skill change:Fly-cs change:Fly-ranks change:Fly-class change:Fly-ability change:Fly-ability-display change:Fly-racial change:Fly-feat change:Fly-item change:Fly-size change:Fly-acp change:Fly-misc"
-   // ,function(){PFSheet.updateSkill("Fly");});
+on("change:fly-ability",function(){PFSheet.handleDropdown("Fly-ability",["Fly-ability-mod"]);});
+on("change:acp change:size_skill change:Fly-cs change:Fly-ranks change:Fly-class change:Fly-ability change:Fly-ability-mod change:Fly-racial change:Fly-feat change:Fly-item change:Fly-size change:Fly-acp change:Fly-misc change:Fly-ReqTrain"
+   ,function(){PFSheet.updateSkill("Fly");});
 
    
-// on("change:stealth-ability",function(){PFSheet.handleDropdown("Stealth-ability",["Stealth-ability-display"]);});
-// on("change:acp change:size_skill_double change:Stealth-cs change:Stealth-ranks change:Stealth-class change:Stealth-ability change:Stealth-ability-display change:Stealth-racial change:Stealth-feat change:Stealth-item change:Stealth-size change:Stealth-acp change:Stealth-misc"
-   // ,function(){PFSheet.updateSkill("Stealth");});
+on("change:stealth-ability",function(){PFSheet.handleDropdown("Stealth-ability",["Stealth-ability-mod"]);});
+on("change:acp change:size_skill_double change:Stealth-cs change:Stealth-ranks change:Stealth-class change:Stealth-ability change:Stealth-ability-mod change:Stealth-racial change:Stealth-feat change:Stealth-item change:Stealth-size change:Stealth-acp change:Stealth-misc change:Stealth-ReqTrain"
+   ,function(){PFSheet.updateSkill("Stealth");});
 
 //size
 on("change:size",function(){ PFSheet.updateSize()});
