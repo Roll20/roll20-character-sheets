@@ -1,8 +1,17 @@
 # D&D 5E Character Sheet
 
-This is a **work in progress sheet** for use on Roll20.net and with the latest (5th) edition of Dungeons & Dragons.  This sheet is designed to be compatible with the full release of 5th edition and I will try to keep it as up to date as possible with the system as and when rules become publicly available.  The sheet is also designed to be usable by all Roll20 users regardless of subscription level.  An API enhanced version of the sheet is planned for the future.
+This is a character sheet for use on Roll20.net with the latest (5th) edition of Dungeons & Dragons.  This sheet is designed to be compatible with the full release of 5th edition and I will try to keep it as up to date as possible with the system as and when rules become publicly available.  The sheet is also designed to be usable by all Roll20 users regardless of subscription level.  An API enhanced version of the sheet is planned for the future.
 
 ### Changelog
+
+* Roll templates update - 10th March
+Large update to switch the sheet to use the new roll20 roll template system for all output.  This has enabled some additional features to be added to the sheet but has required some minor changes to a few fields that will require user action to update once the sheet goes live.  [Full details can be found on the Roll20 forum](https://app.roll20.net/forum/post/1690480/#post-1690480)
+
+* Minor update - 15th November 2014
+Tweaked the way the global bonus fields are used so the sheet wont break if people enter "+2" instead of just "2" in them.  Added support in the inventory section to allow players to indicate what pieces or inventory are actually carried so that it is included or excluded for the purposes of encumberance tracking.  Added support for the Draconic Resilience feature available in the Sorcerer Draconic Bloodline subclass.
+
+* Minor update - 10th September 2014
+FIxed bugs with the NPC animal handling and intimidation rolls.  Changed the labelling of Armoured AC value that is displayed above the armour table and in the core stats section following questions on the roll20 forum and the realisation that it was probably poorly labelled before.
 
 * Minor update - 25th August 2014
 Added Damage Vulnerability field and initiative button/fields on npc sheet.  Changed the way finesse mod was calculated behind the scenes to try and improve performance a little.  Updated the damage text accross the sheet to improve readability and added an option to suppress crit damage text on spells that can crit crit (such as magic missile, or spells that require a save throw)...find this in the damage line of a spells entry.  Removed built in help page and replaced it with a much more complete wiki page (linked in the footer of the sheet).  Moved armour table to it's own page
