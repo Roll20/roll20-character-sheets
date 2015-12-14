@@ -1,18 +1,18 @@
-var gulp = require('gulp'),
-	include = require('gulp-include'),
-	inject = require('gulp-inject'),
-	minifyHTML = require('gulp-minify-html'),
-	minifyCss = require('gulp-minify-css'),
-	concat = require('gulp-concat'),
-	sass = require('gulp-sass'),
-	replace = require('gulp-replace-task'),
-	rename = require('gulp-rename'),
-	wrap = require('gulp-wrap'),
-	md5 = require('md5'),
-	change = require('gulp-change');
+var gulp = require('gulp');
+var include = require('gulp-include');
+var inject = require('gulp-inject');
+var uglify = require('gulp-uglify');
+var minifyHTML = require('gulp-minify-html');
+var minifyCss = require('gulp-minify-css');
+var concat = require('gulp-concat');
+var sass = require('gulp-sass');
+var replace = require('gulp-replace-task');
+var rename = require('gulp-rename');
+var wrap = require('gulp-wrap');
+var md5 = require('md5');
+var change = require('gulp-change');
 
 var customSkillCount = 4,
-	outputOptionsCount = 1,
 	traitsCount = 1,
 	actionCount = 12,
 	lairActionCount = 4,
@@ -212,7 +212,6 @@ function meleeQuery(file) {
 	return template.replace(/\x7B\x7BmeleeQuery\x7D\x7D/g, query);
 }
 
-
 function ordinal(d) {
 	if(d>3 && d<21) return 'th';
 	switch (d % 10) {
@@ -232,110 +231,15 @@ function processDate () {
 	return date + ordinal(date) + ' ' + months[month] + ' ' + year;
 }
 
-function getValueFromOptions(optionsString) {
-	var match;
-	var firstValue;
-	var re = /<option value="([^"]*)"[\s]*(selected)?[\s]*>/g;
-	while ((match = re.exec(optionsString)) != null) {
-		if(match[2]) {
-			return match[1];
-		}
-		firstValue = firstValue || match[1];
-	}
-	return firstValue;
-}
-
-gulp.task('makeSpellDataJson', function() {
-  return gulp.src(['components/spells/spell-page.html'])
-	  .pipe(replace({patterns: [
-			  {
-					match: /<(div|span) class="sheet-([\w]{2})">[\s\S]*?<\/\1>/g,
-					replacement: function(match, element, lang) {
-						return lang === 'en' ? match : '';
-					}
-				}
-			]
-		}))
-		.pipe(replace({patterns: [
-			  {
-					match: /<select name="([^"]+)"([\s\S]*?)<\/select>/g,
-					replacement: function(match, name, options)	{
-						var value = getValueFromOptions(options);
-						return '<select name="' + name + '" value="' + value + '"><';
-					}
-				}
-			]
-		}))
-    .pipe(replace({patterns: [
-			{
-				match: /[\s\S]*?<(input|textarea|select)(.*?)>(?=<|$)/mg,
-				replacement:function(match, tag, attributes) {
-					var name = attributes.match(/name="attr_([^"]+)"/);
-					name = (name !== null) ? name[1] : null;
-					if (tag === 'textarea') {
-						return '"' + name + '":"",\n';
-					}
-
-					var value = attributes.match(/value="([^"]*)"/);
-					if (value && value[1] === 'undefined') {
-						value = '';
-					} else {
-						value = (value !== null) ? value[1] : null;
-					}
-
-					if (tag === 'select') {
-						return '"' + name + '":"' + value + '",\n';
-					}
-					var type = attributes.match(/type="([^"]+)"/);
-					type = (type !== null) ? type[1] : null;
-					switch (type) {
-						case 'hidden':
-						case 'number':
-							return '"' + name + '":"' + value + '",\n';
-						case 'checkbox':
-							return '"' + name + '":0,\n';
-						case 'text':
-							return '"' + name + '":"",\n';
-						case 'radio':
-							if(attributes.match(/.*checked.*/)) {
-								return '"' + name + '":"' + value + '",\n';
-							}
-							return '';
-						default:
-							throw new Error('Unrecognised input type: ' + type);
-					}
-				}}
-			]
-		}))
-		.pipe(replace({
-		  patterns: [
-			  {
-				  match: /,[\s]*<[\s\S]*/,
-				  replacement: ''
-			  }
-		  ]
-	  }))
-		.pipe(wrap('{\n<%= contents %>\n}\n' ))
-		.pipe(rename('spellDefaults.json'))
+gulp.task('sheetWorkers', function() {
+	return gulp.src(['./components/sheetWorkers/sheetWorkers.js'])
+		.pipe(uglify())
+		.pipe(wrap('<script type="text/worker">\n<%= contents %>\n</script>'))
+		.pipe(rename('sheetWorkers.html'))
 		.pipe(gulp.dest('./'));
 });
 
-var spellPropsHash;
-
-gulp.task('addSpellDataHash', ['makeSpellDataJson'], function() {
-	return gulp.src(['spellDefaults.json'])
-		.pipe(change(function(contents) {
-			spellPropsHash = md5(contents);
-			var object = JSON.parse(contents),
-				objectWithHash = {hash:spellPropsHash, values:object};
-			return 'var ShapedSpellbookDefaults = ' + JSON.stringify(objectWithHash,null, 2) + ';';
-		}))
-		.pipe(rename('spellDefaults.js'))
-		.pipe(gulp.dest('./'));
-
-});
-
-gulp.task('preCompile', ['addSpellDataHash'], function() {
+gulp.task('preCompile', function() {
 	return gulp.src('./D&D_5e.html')
 		.pipe(replace({
 			patterns: [
@@ -344,10 +248,6 @@ gulp.task('preCompile', ['addSpellDataHash'], function() {
 					replacement: function () {
 						return processDate();
 					}
-				},
-				{
-					match:  /\x7B\x7BspellDataHash\x7D\x7D/g,
-					replacement: function() { return  spellPropsHash ; } 
 				}
 			]
 		}))
@@ -521,8 +421,8 @@ gulp.task('minify-css', ['sass'], function() {
 });
 
 
-gulp.task('compile', ['preCompile', 'minify-css'], function() {
-	return gulp.src(['../D&D_5e.html', './pages/roll_template.html'])
+gulp.task('compile', ['preCompile', 'minify-css', 'sheetWorkers'], function() {
+	return gulp.src(['../D&D_5e.html', './pages/roll_template.html', './sheetWorkers.html'])
 		.pipe(concat('D&D_5e.html'))
 		.pipe(gulp.dest('../'));
 });
