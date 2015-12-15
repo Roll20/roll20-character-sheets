@@ -1,8 +1,8 @@
 
 var updateAttribute = function (attribute) {
   updateMod(attribute);
-  updateSave(attribute, mod);
-  updateCheck(attribute, mod);
+  updateSave(attribute);
+  updateCheck(attribute);
 };
 
 var setData = function (key, value) {
@@ -73,7 +73,7 @@ on('change:wisdom change:wisdom_bonus change:wisdom_save_prof change:wisdom_save
 on('change:charisma change:charisma_bonus change:charisma_save_prof change:charisma_save_bonus change:basic_charisma_bonus', function() {
   updateAttribute('charisma');
 });
-on('change:global_save_bonus change:global_check_bonus change:jack_of_all_trades', function() {
+on('change:global_save_bonus change:global_check_bonus change:jack_of_all_trades sheet:opened', function() {
   updateAttribute('strength');
   updateAttribute('dexterity');
   updateAttribute('constitution');
