@@ -421,8 +421,8 @@ gulp.task('minify-css', ['sass'], function() {
 });
 
 
-gulp.task('compile', ['preCompile', 'minify-css', 'sheetWorkers'], function() {
-	return gulp.src(['../D&D_5e.html', './pages/roll_template.html', './sheetWorkers.html'])
+gulp.task('compile', ['preCompile', 'minify-css'], function() {
+	return gulp.src(['../D&D_5e.html', './pages/roll_template.html'])
 		.pipe(concat('D&D_5e.html'))
 		.pipe(gulp.dest('../'));
 });
