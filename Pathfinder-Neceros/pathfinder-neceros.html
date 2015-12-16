@@ -1247,7 +1247,7 @@
                 <span class="sheet-table-data sheet-center">+</span>
                 <span class="sheet-table-data sheet-center"><input style="width:100%;" title="@{AC-misc}" type="number" name="attr_AC-misc" value="0" /></span>
 				<span class="sheet-table-data sheet-center">+</span>
-				<span class="sheet-table-data sheet-center"><input style="width:100%;" title="@{buff_AC-total}" type="number" name="attr_buff_AC-total-display" value="0" class="sheet-calc" readonly="readonly" /></span>
+				<span class="sheet-table-data sheet-center"><input style="width:100%;" title="@{buff_AC-total}" type="number" name="attr_buff_AC-total"  class="sheet-calc" readonly="readonly" /></span>
                 <span class="sheet-table-data sheet-center">+</span>
                 <span class="sheet-table-data sheet-center"><input style="width:100%;" title="@{AC-penalty}" type="number" name="attr_AC-penalty" value="0" class="sheet-calc" readonly="readonly"  /></span>
             </div>
@@ -1316,7 +1316,7 @@
                 <span class="sheet-table-data sheet-center">+</span>
                 <span class="sheet-table-data sheet-center"><input style="width:100%;" title="@{AC-misc}" type="number" name="attr_AC-misc" value="0" /></span>
                 <span class="sheet-table-data sheet-center">+</span>
-				<span class="sheet-table-data sheet-center"><input style="width:100%;" title="@{buff_AC-total}" type="number" name="attr_buff_AC_total" value="0" class="sheet-calc" readonly="readonly" /></span>
+				<span class="sheet-table-data sheet-center"><input style="width:100%;" title="@{buff_AC-total}" type="number" name="attr_buff_AC-total"  class="sheet-calc" readonly="readonly" /></span>
                 <span class="sheet-table-data sheet-center">+</span>
                 <span class="sheet-table-data sheet-center"><input style="width:100%;" title="@{AC-penalty}" type="number" name="attr_AC-penalty" value="0" class="sheet-calc" readonly="readonly" /></span>
             </div>
@@ -8416,7 +8416,7 @@
 							<span class="sheet-table-data sheet-center sheet-small-label"><input title="@{AC-dodge}" type="number" name="attr_AC-dodge" value="0" /><br>Dodge</span>
 							<span class="sheet-table-data sheet-center sheet-small-label"><input title="@{AC-natural}" type="number" name="attr_AC-natural" value="0" /><br>Natural</span>
 							<span class="sheet-table-data sheet-center sheet-small-label"><input title="@{AC-misc}" type="number" name="attr_AC-misc" value="0" /><br>Misc</span>
-							<span class="sheet-table-data sheet-center sheet-small-label"><input title="@{buff_AC-total}" name="attr_buff_AC-total" type="number" value="0"  class="sheet-calc" readonly="readonly" /><br>Buffs</span>
+							<span class="sheet-table-data sheet-center sheet-small-label"><input title="@{buff_AC-total}" name="attr_buff_AC-total" type="number"  class="sheet-calc" readonly="readonly" /><br>Buffs</span>
 							<span class="sheet-table-data sheet-center sheet-small-label"><input title="@{AC-penalty}" type="number" name="attr_AC-penalty" value="0" max="0" class="sheet-calc" readonly="readonly" ><br>Cond</span>
 							<span class="sheet-table-data sheet-center" style="width:5%;vertical-align:middle;font-size:150%;text-align:left;"><b>)</b><br>&nbsp;</span>							
 						</div>
@@ -10223,7 +10223,6 @@
 </rolltemplate>
 </div>
 
-
 <script type="text/worker">
 // var getSectionIDs=function(){};
 // var getAttrs=function(){};
@@ -11880,7 +11879,7 @@ var PFSheet = PFSheet || (function(){
 			"AC-dodge","AC-natural","AC-deflect","AC-misc","buff_AC-total","CMD-DEX","FF-CMD-DEX","CMD-STR","bab","CMD-misc",
 			"AC","Touch","Flat-Footed","CMD","FF-CMD","AC-ability","AC-armor","AC-shield",
 			"condition-Blinded","condition-Pinned","condition-Stunned","condition-Cowering"], function(v) {
-			console.log("AAAAAAAAAAAAt update defenses");
+			//console.log("AAAAAAAAAAAAt update defenses");
 			console.log(v);
 			var setter={}, setAny =0,
 			    size= parseInt(v["size"],10)||0,
@@ -11939,7 +11938,7 @@ var PFSheet = PFSheet || (function(){
 				cmdAbility2=Math.max(0,cmdFFAbility2);
 			}
 			var ac = 10+ armor+shield+natural+size+dodge + ability  +deflect+miscAC+condPenalty +buffs;
-			var touch= 10+size+dodge+ability+deflect+miscCMD+condPenalty;
+			var touch= 10+size+dodge+ability+deflect+miscAC+condPenalty;
 			var ff=10+armor+shield+natural+size+ffAbility+deflect+miscAC+condPenalty+buffs +   ( ffAbility >0?dodge:0  ) ;
 			var cmd = 10+bab+cmdAbility1+cmdAbility2+ (-1*size) +dodge+deflect+miscCMD+condPenalty+buffs;
 			var cmdFF = 10+bab+cmdAbility1+cmdFFAbility2+ (-1*size) +deflect+miscCMD+condPenalty+buffs+( cmdFFAbility2 >0 ? dodge:0  ) ;
@@ -11954,7 +11953,7 @@ var PFSheet = PFSheet || (function(){
 			if (touch !== currTouch) {setter["Touch"]=touch;setAny+=1;}
 			if (ff !== currFF) {setter["Flat-Footed"]=ff;setAny+=1;}
 			if (cmd !== currCMD) {setter["CMD"]=cmd;setAny+=1;}
-			if (cmdFF !== currCMDFF) {setter["FF-CMD"]=cmd;setAny+=1;}
+			if (cmdFF !== currCMDFF) {setter["FF-CMD"]=cmdFF;setAny+=1;}
 			if (setAny) {
 				setAttrs(setter);
 			}
@@ -12183,11 +12182,10 @@ var PFSheet = PFSheet || (function(){
 		else if (attype==="CMB") {
 			bufftype="CMB";
 			atfield="CMB";
-			bufffield="buff_"+bufftype+"-total";
 			sizeMult = -1;  	
 		}
 		else {return;}
-		
+		bufffield="buff_"+bufftype+"-total";		
 		getAttrs([modfield,bufffield,"bab","size",miscfield,"attk-penalty",atfield],function(v) { 
 			//console.log(v);
 			var tohit = (parseInt(v["bab"],10)||0) +
@@ -12448,6 +12446,11 @@ var PFSheet = PFSheet || (function(){
 		updateAttack("melee");
 		updateAttack("ranged");
 		updateAttack("CMB");
+		getAttrs(["Stealth"],function(v){
+		 if (!isNaN(parseInt(v["Stealth"],10))) {
+		   setAttrs({"Stealth":"(@{Stealth-ranks} + @{Stealth-class} + @{Stealth-ability} + @{Stealth-racial} + @{Stealth-feat} + @{Stealth-item} + @{Stealth-misc} + @{Stealth-acp} - @{condition-Fear} -  @{condition-sickened} + @{condition-Drained} - @{condition-Wounds})"});
+		 }
+		});
 	},
 	
 	
@@ -12751,7 +12754,7 @@ on("change:saves-cond change:total-will change:will-ability-mod change:will-trai
 	PFSheet.updateSave("Will"); });
 
 //defenses
-on("change:condition-stunned change:condition-flat-footed change:ac-ability-mod change:ff-dex change:ac-penalty change:size change:ac-dodge change:ac-natural change:ac-deflect change:ac-misc change:ac-shield change:ac-armor change:buff_ac-total change:cmd-dex change:ff-cmd-dex change:cmd-str change:bab change:max-dex",function() {
+on("change:condition-stunned change:condition-flat-footed change:ac-ability-mod change:ff-dex change:ac-penalty change:size change:ac-dodge change:ac-natural change:ac-deflect change:ac-misc change:ac-shield change:ac-armor change:buff_ac-total change:cmd-dex change:ff-cmd-dex change:cmd-str change:cmd-misc change:bab change:max-dex",function() {
     PFSheet.updateDefenses(); });
 on("change:shield-equipped change:shield-acbonus change:shield-max-dex change:shield-acp change:shield-spell-fail change:shield-proficiency change:shield2-equipped change:shield2-acbonus change:shield2-max-dex change:shield2-acp change:shield2-spell-fail change:shield2-proficiency change:armor-equipped change:armor-acbonus change:armor-max-dex change:armor-acp change:armor-spell-fail change:armor-proficiency change:armor2-equipped change:armor2-acbonus change:armor2-max-dex change:armor2-acp change:armor2-spell-fail change:armor2-proficiency",function(){
     PFSheet.updateArmor(); });
