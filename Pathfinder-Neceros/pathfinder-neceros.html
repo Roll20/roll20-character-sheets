@@ -4,7 +4,7 @@
 	<div class="sheet-footer sheet-sect" ​style="text-align:left; padding:5px; margin:5px;">
 		<ol>
 			<li>Button bars are no longer necessary and have been removed. Buttons within repeating sections now work directly and can be dragged to the macro quick bar. To learn the id/name of the button, drag/drop the button to the macro quick bar.</li>
-			<li>All ability macros that utilize <b>repeating attributes</b> must be edited to include "<b>$</b>". e.g. @{repeating_foo_X_...} should be renamed @{repeating_foo_$X_...} where "<b>X</b>" is the row of the repeating section.</li>
+			<li>All ability macros that utilize <b>repeating attributes</b> must be edited to include "<b>$</b>". e.g. @{repeating_foo_X_...} should be renamed @{repeating_foo_$X_...-roll} where "<b>X</b>" is the row of the repeating section and "-roll" added to end.</li>
 			<li>For <b>existing characters/npc's</b>, if you do not see version "0.1" listed(top-right corner of sheet), use the recalc checkbox to force a refresh of all auto-calculated attributes. This should only need to be done once and could take up to 10s.</li>
 			<li>If the sheet has been recalculated and you still have empty auto-calculated fields or a value of "NaN", you may have to toggle(change the value(s) then change it back) of sub-component attributes to help generate a value for the empty fields.</li>
 			<li>If you changed the attributes/fields listed below, you must update to the new version of the attribute/field (same location on sheet) because the new fields are only modifiers to the calculations which are done within sheet workers(javascript).:
@@ -28,7 +28,7 @@
         <div class="sheet-table-data sheet-center sheet-label"><input name="attr_buffs-apply" title="This is the total bonus to various scores you are currently experiencing due to buffs." type="text" value="(@{buffs})" style="width:3.5em;" disabled /><br>Buffs</div>
         <span style="display:none;"><input name="attr_buffs" title="@{buffs}" type="hidden" value="(0 + abs(@{buff_Melee-total}) + abs(@{buff_Ranged-total}) + abs(@{buff_DMG-total}) + abs(@{buff_AC-total}) + abs(@{buff_HP-temp-total}) + abs(@{buff_Fort-total}) + abs(@{buff_Ref-total}) + abs(@{buff_Will-total}) + abs(@{buff_STR-total}) + abs(@{buff_DEX-total}) + abs(@{buff_CON-total}) + abs(@{buff_INT-total}) + abs(@{buff_WIS-total}) + abs(@{buff_CHA-total}) )" disabled /></span>
         <div class="sheet-table-data sheet-center sheet-label" style="padding:8px 5px 0px 5px;"><input type="checkbox" name="attr_recalc1" value="1" style="margin-top:-10px;" title="Force existing disabled/auto-calculated attributes to use sheet worker javascript."/><br>Recalc</div>
- 	    <div class="sheet-table-data sheet-center sheet-label"><input type="number" name="attr_PFSheet_Version" value="0" class="sheet-calc" readonly="readonly" title="Version 0.1 indicates attributes have been successfully recalculated." /><br>Version</div>
+ 	    <div class="sheet-table-data sheet-center sheet-label"><input type="number" name="attr_PFSheet_Version" value="0" class="sheet-calc" readonly="readonly" title="Version >0 non blank indicates attributes have been successfully recalculated." /><br>Version</div>
     </div>
 </div>
     <input type="radio" name="attr_tab" class="sheet-tab sheet-tab1" value="1" title="Core" checked="checked" style="margin-left:1px;" />
@@ -888,6 +888,12 @@
                 <span class="sheet-table-header">/</span>
                 <span class="sheet-table-header">Max HP</span>
 				<span class="sheet-table-header">&nbsp;</span>
+				<span class="sheet-table-header">Ability</span>
+				<span class="sheet-table-header">Mod</span>
+				<span class="sheet-table-header">&nbsp;</span>
+                <span class="sheet-table-header">Max HP adj</span>
+				<span class="sheet-table-header">Mod</span>
+				<span class="sheet-table-header">&nbsp;</span>
                 <span class="sheet-table-header">Temp HP</span>
 				<span class="sheet-table-header">&nbsp;</span>
 				<span class="sheet-table-header">Temp HP Misc</span>
@@ -895,26 +901,39 @@
 				<span class="sheet-table-header">Buffs</span>
 				<span class="sheet-table-header">&nbsp;</span>
                 <span class="sheet-table-header">Non-lethal Dmg</span>
-				<span class="sheet-table-header">&nbsp;</span>
-                <span class="sheet-table-header">Max HP modifier</span>
             </div>
             <div class="sheet-table-row" style="line-height:.1em;">
-                <span class="sheet-table-data sheet-center"><input style="width:100%;" type="number" title="@{HP}" name="attr_HP" value="0" />&nbsp;</span>
+                <span class="sheet-table-data sheet-center"><input style="width:100%;" type="number" title="@{HP}" name="attr_HP" value="0"  >&nbsp;</span>
                 <span class="sheet-table-data sheet-center">/</span>
                 <span class="sheet-table-data sheet-center"><input style="width:100%;" type="number" title="@{HP|max}" name="attr_HP_max" value="0"  class="sheet-calc" readonly="readonly" />&nbsp;</span>
-				<span class="sheet-table-data sheet-center">&nbsp;</span>
-                <span class="sheet-table-data sheet-center"><input style="width:100%;" type="number" title="@{HP-temp}" name="attr_HP-temp" value="0" class="sheet-calc" readonly="readonly" />&nbsp;</span>
+				<span class="sheet-table-header">&nbsp;</span>
+				<span class="sheet-table-data sheet-center" style="width:65px;">
+					<select title="@{HP-ability}" name="attr_HP-ability" class="sheet-select-small">
+						<option value="0" >None</option>
+						<option value="@{STR-mod}">STR</option>
+						<option value="@{DEX-mod}">DEX</option>
+						<option value="@{CON-mod}" selected>CON</option>
+						<option value="@{INT-mod}">INT</option>
+						<option value="@{WIS-mod}">WIS</option>
+						<option value="@{CHA-mod}">CHA</option>
+					</select>
+				</span>				
+                <span class="sheet-table-data sheet-center"><input style="width:100%;" type="number" title="@{HP-ability-mod}" name="attr_HP-ability-mod" value="" class="sheet-calc" readonly="readonly" />&nbsp;</span>
+				<span class="sheet-table-header">&nbsp;</span>
+				<span class="sheet-table-data sheet-center"><input style="width:100%;" type="text" title="@{HP-formula-macro-text}" name="attr_HP-formula-macro-text" value="0"  >&nbsp;</span>
+                <span class="sheet-table-data sheet-center"><input style="width:100%;" type="number" title="@{HP-formula-mod}" name="attr_HP-formula-mod" value="0" class="sheet-calc" readonly="readonly" />&nbsp;</span>
+				<span class="sheet-table-data sheet-center">|</span>
+                <span class="sheet-table-data sheet-center"><input style="width:100%;" type="number" title="@{HP-temp}" name="attr_HP-temp" value="" class="sheet-calc" readonly="readonly" />&nbsp;</span>
 				<span class="sheet-table-data sheet-center">=</span>
-				<span class="sheet-table-data sheet-center"><input style="width:100%;" type="number" title="@{HP-temp-misc}" name="attr_HP-temp-misc" value="0" />&nbsp;</span>
+				<span class="sheet-table-data sheet-center"><input style="width:100%;" type="number" title="@{HP-temp-misc}" name="attr_HP-temp-misc" value="0" >&nbsp;</span>
 				<span class="sheet-table-data sheet-center">+</span>
-				<span class="sheet-table-data sheet-center"><input type="number" title="@{buff_HP-temp-total}" name="attr_buff_HP-temp-total" value="0" class="sheet-calc" readonly="readonly" />&nbsp;</span>
-				<span class="sheet-table-data sheet-center">&nbsp;</span>
-                <span class="sheet-table-data sheet-center"><input style="width:100%;" type="number" title="@{non-lethal-damage}" name="attr_non-lethal-damage" value="0" min="0" />&nbsp;</span>
-                <span class="sheet-table-data sheet-center">&nbsp;</span>
-				<span class="sheet-table-data sheet-center"><input style="width:100%;" type="text" title="@{HP-formula}" name="attr_HP-formula" value="0" />&nbsp;</span>
+				<span class="sheet-table-data sheet-center"><input style="width:100%;" type="number" title="@{buff_HP-temp-total}" name="attr_buff_HP-temp-total" value="0" class="sheet-calc" readonly="readonly" />&nbsp;</span>
+				<span class="sheet-table-data sheet-center">|</span>
+                <span class="sheet-table-data sheet-center"><input style="width:100%;" type="number" title="@{non-lethal-damage}" name="attr_non-lethal-damage" value="0" min=0>&nbsp;</span>
             </div>
+		</div>
     		<input type="checkbox" class="sheet-sect-show" title="@{wound_threshold-show}" name="attr_wound_threshold-show" value="1" style="opacity:0;width: 35px;height: 16px;position: relative;top: 0;left: 0;margin: -32px;cursor: pointer;z-index: 1;" /><span></span>		
-            <div class="sheet-table-row sheet-sect">
+			<div class="sheet-table-row sheet-sect">
                 <span class="sheet-table-data sheet-center" style="background-color:#000;color:#FFF;font-weight:bold;">Wound Threshold</span>
                 <span class="sheet-table-data">&nbsp;</span>
                 <span class="sheet-table-data" style="text-align:center;"><label class="sheet-center"><input type="radio" title="@{condition-Wounds}" name="attr_condition-Wounds" value="0" checked="checked" /><b class="sheet-offCase" style="vertical-align:middle;"> Healthy</b></label></span>
@@ -11362,6 +11381,7 @@ var SWUtils = SWUtils || (function() {
 	* 
 	*/
 	evaluateAndSetNumber = function(readField,writeField,defaultVal){
+		console.log("EEEE at evaluateAndSetNumber read:"+readField+", write:"+writeField);
 		getAttrs([readField,writeField], function (values){ 
 			var o = {};
 			var value = 0;
@@ -11464,7 +11484,7 @@ var SWUtils = SWUtils || (function() {
 
 var PFSheet = PFSheet || (function(){
   
-    var version= 0.1,
+    var version= 0.12,
 
 	//Utilities
 
@@ -11758,10 +11778,10 @@ var PFSheet = PFSheet || (function(){
 	 * sets max HP
 	 */
 	updateHP = function() {
-		getAttrs(["CON-mod","level","total-hp","condition-Drained","HP-formula","HP_max"],function(values) {
-			var  totalhp = (( parseInt(values["CON-mod"],10)||0) * (parseInt(values["level"],10)||0)) + 
+		getAttrs(["HP-ability-mod","level","total-hp","condition-Drained","HP-formula-mod","HP_max"],function(values) {
+			var  totalhp = (( parseInt(values["HP-ability-mod"],10)||0) * (parseInt(values["level"],10)||0)) + 
 				 (parseInt(values["total-hp"],10)||0) + 
-				 (parseInt(values["HP-formula"],10)||0) +
+				 (parseInt(values["HP-formula-mod"],10)||0) +
 				 (5 * (parseInt(values["condition-Drained"],10)||0));
 			var grazedhp = Math.floor(totalhp * 0.75),
 				woundedhp = Math.floor(totalhp /2 ),
@@ -11944,13 +11964,12 @@ var PFSheet = PFSheet || (function(){
 			var ff=10+armor+shield+natural+size+ffAbility+deflect+miscAC+condPenalty+buffs +   ( ffAbility >0?dodge:0  ) ;
 			var cmd = 10+bab+cmdAbility1+cmdAbility2+ (-1*size) +dodge+deflect+miscCMD+condPenalty+buffs;
 			var cmdFF = 10+bab+cmdAbility1+cmdFFAbility2+ (-1*size) +deflect+miscCMD+condPenalty+buffs+( cmdFFAbility2 >0 ? dodge:0  ) ;
-			
-			var currAC= parseInt(v["AC"],10)||10;
-			var currTouch= parseInt(v["Touch"],10)||10;
-			var currFF= parseInt(v["Flat-Footed"],10)||10;
-			var currCMD = parseInt(v["CMD"],10)||10;
-			var currCMDFF = parseInt(v["FF-CMD"],10)||10;
-
+			//use 0 not 10 to force an update
+			var currAC= parseInt(v["AC"],10)||0;
+			var currTouch= parseInt(v["Touch"],10)||0;
+			var currFF= parseInt(v["Flat-Footed"],10)||0;
+			var currCMD = parseInt(v["CMD"],10)||0;
+			var currCMDFF = parseInt(v["FF-CMD"],10)||0;
 			if (ac !== currAC) {setter["AC"]=ac;setAny+=1;}
 			if (touch !== currTouch) {setter["Touch"]=touch;setAny+=1;}
 			if (ff !== currFF) {setter["Flat-Footed"]=ff;setAny+=1;}
@@ -12034,9 +12053,10 @@ var PFSheet = PFSheet || (function(){
 		 currACP=parseInt(v.acp,10)||0;
 		 currMaxDex=parseInt(v["max-dex"],10);
 		 currMaxDex=isNaN(currMaxDex)?99:currMaxDex;//cannot do "||0" since 0 is valid but falsy
-		 currACArmor=parseInt(v["AC-armor"],10)||0;
-		 currACShield=parseInt(v["AC-shield"],10)||0;
-		 currSpellFail=parseInt(v["spell-fail"],10)||0;
+		 //using -1 forces update
+		 currACArmor=parseInt(v["AC-armor"],10)||-1;
+		 currACShield=parseInt(v["AC-shield"],10)||-1;
+		 currSpellFail=parseInt(v["spell-fail"],10)||-1;
 		 currAtkMod=parseInt(v["acp-attack-mod"],10)||0;
 
 		 //console.log(v);
@@ -12405,9 +12425,23 @@ var PFSheet = PFSheet || (function(){
 			setAttrs({ size_display:size, size_skill:skillSize, "CMD-size":cmbsize, size_skill_double:doubleSkill});
 		});
 	},
-	
-	recalculateSheet = function() {
-
+	recalculateAllBuffs = function() {
+		setAttrs({
+				"buff_Melee-total":0,
+				"buff_Ranged-total":0,
+				"buff_DMG-total":0,
+				"buff_AC-total":0,
+				"buff_HP-temp-total":0,
+				"buff_Fort-total":0,
+				"buff_Ref-total":0,
+				"buff_Will-total":0,
+				"buff_STR-total":0,
+				"buff_DEX-total":0,
+				"buff_CON-total":0,
+				"buff_INT-total":0,
+				"buff_WIS-total":0,
+				"buff_CHA-total":0
+		});
 		updateBuffRow("1");
 		updateBuffRow("2");
 		updateBuffRow("3");
@@ -12418,14 +12452,53 @@ var PFSheet = PFSheet || (function(){
 		updateBuffRow("8");
 		updateBuffRow("9");
 		updateBuffRow("10");
+		updateBuffColumn("STR");		
+		updateBuffColumn("DEX");		
+		updateBuffColumn("CON");		
+		updateBuffColumn("INT");		
+		updateBuffColumn("WIS");		
+		updateBuffColumn("CHA");		
+		updateBuffColumn("Ranged");		
+		updateBuffColumn("Melee");		
+		updateBuffColumn("DMG");	
+		updateBuffColumn("AC");		
+		updateBuffColumn("Fort");		
+		updateBuffColumn("Will");		
+		updateBuffColumn("Ref");		
+		updateBuffColumn("HP-temp");		
+						
+	},
+	recalculateSheet = function(version) {
+		recalculateAllBuffs();
 		updateAbility("STR"); 
 		updateAbility("DEX"); 
 		updateAbility("CON"); 
 		updateAbility("INT"); 
 		updateAbility("WIS"); 
 		updateAbility("CHA"); 
+		
+		handleDropdown("HP-ability",["HP-ability-mod"]);
+		//init dropdown	
+		handleDropdown("init-ability",["init-ability-mod"]);
+		//saves
+		handleDropdown  ("Fort-ability",["Fort-ability-mod"]);   
+		handleDropdown  ("Ref-ability",["Ref-ability-mod"]);   
+		handleDropdown  ("Will-ability",["Will-ability-mod"]);   
+		//defense dropdowns
+		handleDropdown("AC-ability",["AC-ability-mod"]);
+		handleDropdown("FF-ability",["FF-DEX"]);
+		handleDropdown("CMD-ability1",["CMD-STR"]);
+		handleDropdown("CMD-ability2",["CMD-DEX"]);
+		handleDropdown("CMD-ability",["FF-CMD-DEX"]);
+		//attack non repeating dropdowns
+		handleDropdown("melee-ability",["melee-ability-mod"]);
+		handleDropdown("ranged-ability",["ranged-ability-mod"]);
+		handleDropdown("CMB-ability",["CMB-ability-mod"]);
+			
+
 		updateSize();
 		updateInit();
+		SWUtils.evaluateAndSetNumber("HP-formula-macro-text","HP-formula-mod");
 		updateHP();
 		updateTempHP();
 		updateClassInformation("hp");
@@ -12437,7 +12510,6 @@ var PFSheet = PFSheet || (function(){
 		updateClassInformation("Ref");
 		updateClassInformation("Will");
 		updateClassInformation("level");
-		updateEffectTotals();
 		updateSave("Fort");
 		updateSave("Ref");
 		updateSave("Will");
@@ -12445,20 +12517,32 @@ var PFSheet = PFSheet || (function(){
 		updateDefenses();
 		updateArmor();	
 		updateConditionAttackPenalty();
+		updateEffectTotals();
 		updateAttack("melee");
 		updateAttack("ranged");
 		updateAttack("CMB");
-		getAttrs(["Stealth"],function(v){
-		 if (!isNaN(parseInt(v["Stealth"],10))) {
-		   setAttrs({"Stealth":"(@{Stealth-ranks} + @{Stealth-class} + @{Stealth-ability} + @{Stealth-racial} + @{Stealth-feat} + @{Stealth-item} + @{Stealth-misc} + @{Stealth-acp} - @{condition-Fear} -  @{condition-sickened} + @{condition-Drained} - @{condition-Wounds})"});
-		 }
-		});
+		copyStaticNumberFieldToRepeating("weapon","attk-effect-total");
+		copyStaticNumberFieldToRepeating("weapon","dmg-effect-total");
+		copyStaticNumberFieldToRepeating("weapon","buff_DMG-total");
+		SWUtils.evaluateAndSetNumber("Max-Skill-Ranks-Misc","Max-Skill-Ranks-mod");
+		if (version===.1) {
+			getAttrs(["Stealth"],function(v){
+				 if (!isNaN(parseInt(v["Stealth"],10))) {
+				   setAttrs({"Stealth":"(@{Stealth-ranks} + @{Stealth-class} + @{Stealth-ability} + @{Stealth-racial} + @{Stealth-feat} + @{Stealth-item} + @{Stealth-misc} + @{Stealth-acp} - @{condition-Fear} -  @{condition-sickened} + @{condition-Drained} - @{condition-Wounds})"});
+				 }
+				 if (!isNaN(parseInt(v["Fly"],10))) {
+				   setAttrs({"Fly":"(@{Fly-ranks} + @{Fly-class} + @{Fly-ability} + @{Fly-racial} + @{Fly-feat} + @{Fly-item} + @{Fly-misc} + @{Fly-acp} - @{condition-Fear} -  @{condition-sickened} + @{condition-Drained} - @{condition-Wounds})"});
+				 }				 
+				 if (!isNaN(parseInt(v["Acrobatics"],10))) {
+				   setAttrs({"Acrobatics":"(@{Acrobatics-ranks} + @{Acrobatics-class} + @{Acrobatics-ability} + @{Acrobatics-racial} + @{Acrobatics-feat} + @{Acrobatics-item} + @{Acrobatics-misc} + @{Acrobatics-acp} - @{condition-Fear} -  @{condition-sickened} + @{condition-Drained} - @{condition-Wounds})"});
+				 }			 
+				});
+		}
 	},
 	
 	
 	
 	checkUpdate=function(){
-		console.log("UUUUUUUUUUUUUU AT checkupdate");
 		getAttrs(["PFSheet_version","PFSheet_forcesync","recalc1"],function(v){
 			var setter={},setAny=0,currVer=0;
 			currVer=parseInt(v["PFSheet_version"],10)||0;
@@ -12474,6 +12558,10 @@ var PFSheet = PFSheet || (function(){
 					setAny++;
 				}
 			}
+			//just force an update these initial weeks till all bugs are gone
+			recalculateSheet(version);
+			setAny++;
+			
 			//reset checkbox
 			if (v["recalc1"]) {
 				setter["recalc1"]=0;
@@ -12727,7 +12815,7 @@ on("change:class-0-level change:class-1-level change:class-2-level change:class-
 //init
 on("change:init-ability-mod change:init-trait change:init-misc condition-deafened",function(){ PFSheet.updateInit(); });
 
-on("change:con-mod change:level change:total-hp change:hp-formula", function() { PFSheet.updateHP(); });
+on("change:hp-ability-mod change:level change:total-hp change:hp-formula-mod", function() { PFSheet.updateHP(); });
 on("change:hp-temp-misc change:buff_hp-temp-total", function() { PFSheet.updateTempHP(); });
 
 
@@ -12777,6 +12865,8 @@ on("change:repeating_weapon:dmg-effect-total-copy change:repeating_weapon:attk-e
 
 
 //dropdowns
+on("change:hp-ability", function () {PFSheet.handleDropdown("HP-ability",["HP-ability-mod"]);});
+
 //init dropdown	
 on("change:init-ability", function() {  PFSheet.handleDropdown("init-ability",["init-ability-mod"]);});
 //saves
@@ -12803,8 +12893,8 @@ on("change:repeating_weapon:damage-ability",function() { PFSheet.updateRepeating
 on("change:repeating_weapon:damage",function(){	SWUtils.evaluateAndSetNumber("repeating_weapon_damage","repeating_weapon_damage-mod");});
 on("change:repeating_weapon:attack",function(){	SWUtils.evaluateAndSetNumber("repeating_weapon_attack","repeating_weapon_attack-mod");});
 
-
-
+//macros non repeating
+on("change:hp-formula-macro-text",function(){SWUtils.evaluateAndSetNumber("HP-formula-macro-text","HP-formula-mod");});
 on("change:attk-effect-total",function(){PFSheet.copyStaticNumberFieldToRepeating("weapon","attk-effect-total");});
 on("change:dmg-effect-total",function(){PFSheet.copyStaticNumberFieldToRepeating("weapon","dmg-effect-total");});
 on("change:buff_dmg-total",function(){PFSheet.copyStaticNumberFieldToRepeating("weapon","buff_DMG-total");});
