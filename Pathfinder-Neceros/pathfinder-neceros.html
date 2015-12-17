@@ -8454,8 +8454,9 @@
                     <span class="sheet-table-data sheet-center" style="width:5%;vertical-align:middle;font-size:150%;"><b>d</b><br>&nbsp;</span>
                     <span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input title="@{NPC-HD}" type="number" name="attr_npc-hd" value="0" /><br>&nbsp;</span>
                     <span class="sheet-table-data sheet-center" style="width:5%;vertical-align:middle;font-size:150%;"><b>+</b><br>&nbsp;</span>
-                    <span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input title="@{NPC-HD-misc}" type="number" name="attr_npc-hd-misc" value="0" /><br>&nbsp;</span>
-                    <span class="sheet-table-data sheet-center" style="width:5%;vertical-align:middle;font-size:150%;text-align:left;"><b>);</b><br>&nbsp;</span>
+                    <span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input title="@{NPC-HD-misc}" type="text" style="width:70px;" name="attr_npc-hd-misc" value="0" /><br>&nbsp;</span>
+                    <span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input title="@{NPC-HD-misc-mod}" type="number" name="attr_npc-hd-misc-mod" value="0" class="sheet-calc" readonly="readonly" /><br>Mod</span>                    
+					<span class="sheet-table-data sheet-center" style="width:5%;vertical-align:middle;font-size:150%;text-align:left;"><b>);</b><br>&nbsp;</span>
                     <span class="sheet-table-data sheet-center sheet-small-label" style="text-align:left;width:20%;"><input type="text" title="@{npc-heal-conditions}" name="attr_npc-heal-conditions" placeholder="Heal conditions" /><br>Heal Conditions</span>
 					<span class="sheet-table-data sheet-center" style="vertical-align:middle;font-size:150%;">|</span>
 					<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" title="@{HP-temp}" name="attr_HP-temp" value="0" /><br>Temp</span>
@@ -12299,8 +12300,8 @@ var PFSheet = PFSheet || (function(){
 	/* updateNPCHP
 	* updates the NPC hp, and also PC hp, because some people use "HP" attributes for monsters. could put this in config as well,  */
 	updateNPCHP = function () {
-		getAttrs(["npc-hd","npc-hd-num","npc-hd-misc","NPC-HP_max","NPC-HP","sync_npc_pc_hp"],function(v){
-			var hp = Math.floor((((parseInt(v["npc-hd"],10)||0)+1)/2) * (parseInt(v["npc-hd-num"],10)||0) + parseInt(v["npc-hd-misc"],10)||0 ),
+		getAttrs(["npc-hd","npc-hd-num","npc-hd-misc-mod","NPC-HP_max","NPC-HP","sync_npc_pc_hp"],function(v){
+			var hp = Math.floor((((parseInt(v["npc-hd"],10)||0)+1)/2 * (parseInt(v["npc-hd-num"],10)||0)) + parseInt(v["npc-hd-misc-mod"],10)||0 ),
 				maxhp=parseInt(v["NPC-HP_max"],10)||0,
 				currhp=parseInt(v["NPC-HP"],10)||0,
 				updatehp=parseInt(v.sync_npc_pc_hp,10)||0,
@@ -12500,6 +12501,7 @@ var PFSheet = PFSheet || (function(){
 		updateSize();
 		updateInit();
 		SWUtils.evaluateAndSetNumber("HP-formula-macro-text","HP-formula-mod");
+		SWUtils.evaluateAndSetNumber("NPC-HD-misc","NPC-HD-misc-mod");
 		updateHP();
 		updateTempHP();
 		updateClassInformation("hp");
@@ -12926,6 +12928,7 @@ on("sheet:opened",function(){PFSheet.checkUpdate();});
 on("change:recalc1",function(){PFSheet.checkUpdate();});
 
 //npc sheet
-on("change:npc-hd change:npc-hd-num change:npc-hd-misc",function() {PFSheet.updateNPCHP();});
+on("change:npc-hd change:npc-hd-num change:npc-hd-misc change:npc-hd-misc-mod",function() {PFSheet.updateNPCHP();});
+on("change:npc-hd change:npc-hd-num change:npc-hd-misc change:npc-hd-misc-mod",function() {SWUtils.evaluateAndSetNumber("NPC-HD-misc","NPC-HD-misc-mod");});
 
 </script>
