@@ -1,3 +1,215 @@
+<script type="text/worker">
+on("change:base_hp change:hp change:base_atk change:atk change:atk_stage change:base_def change:def change:def_stage change:base_spdef change:spdef change:spdef_stage change:base_spatk change:spatk change:spatk_stage  change:base_speed change:speed change:speed_stage", function() {
+    statUp();
+});
+
+on("change:def_total change:spdef_total change:speed_total change:eva", function() {
+    evaUp();
+});
+
+on("change:level change:chartype change:hp_total change:injuries", function() {
+    hpCalc();
+});
+
+on("change:move1_db", function() {
+    getAttrs(["Move1_DB"], function(values) {
+        x = dbCalc(values.Move1_DB);
+        setAttrs({
+          Move1_Amount: x.amount,
+          Move1_Dice: x.dice,
+          Move1_Bonus: x.bonus
+        });
+    });
+});
+
+on("change:move2_db", function() {
+    getAttrs(["Move2_DB"], function(values) {
+        x = dbCalc(values.Move2_DB);
+        setAttrs({
+          Move2_Amount: x.amount,
+          Move2_Dice: x.dice,
+          Move2_Bonus: x.bonus
+        });
+    });
+});
+
+on("change:move3_db", function() {
+    getAttrs(["Move3_DB"], function(values) {
+        x = dbCalc(values.Move3_DB);
+        setAttrs({
+          Move3_Amount: x.amount,
+          Move3_Dice: x.dice,
+          Move3_Bonus: x.bonus
+        });
+    });
+});
+
+on("change:move4_db", function() {
+    getAttrs(["Move4_DB"], function(values) {
+        x = dbCalc(values.Move4_DB);
+        setAttrs({
+          Move4_Amount: x.amount,
+          Move4_Dice: x.dice,
+          Move4_Bonus: x.bonus
+        });
+    });
+});
+
+on("change:move5_db", function() {
+    getAttrs(["Move5_DB"], function(values) {
+        x = dbCalc(values.Move5_DB);
+        setAttrs({
+          Move5_Amount: x.amount,
+          Move5_Dice: x.dice,
+          Move5_Bonus: x.bonus
+        });
+    });
+});
+
+on("change:move6_db", function() {
+    getAttrs(["Move6_DB"], function(values) {
+        x = dbCalc(values.Move6_DB);
+        setAttrs({
+          Move6_Amount: x.amount,
+          Move6_Dice: x.dice,
+          Move6_Bonus: x.bonus
+        });
+    });
+});
+
+on("change:struggle_db", function() {
+    getAttrs(["Struggle_DB"], function(values) {
+        x = dbCalc(values.Struggle_DB);
+        setAttrs({
+          Struggle_Amount: x.amount,
+          Struggle_Dice: x.dice,
+          Struggle_Bonus: x.bonus
+        });
+    });
+});
+
+on("change:repeating_moves:move_db", function() {
+    getAttrs(["repeating_moves_Move_DB"], function(values) {
+        x = dbCalc(values.repeating_moves_Move_DB);
+        setAttrs({
+          repeating_moves_Move_Amount: x.amount,
+          repeating_moves_Move_Dice: x.dice,
+          repeating_moves_Move_Bonus: x.bonus
+        });
+    });
+});
+    var statUp = function(){
+        getAttrs(["base_HP","HP","base_ATK","ATK","ATK_Stage","base_DEF","DEF","DEF_Stage","base_SPATK","SPATK","SPATK_Stage","base_SPDEF","SPDEF","SPDEF_Stage","base_SPEED","SPEED","SPEED_Stage"], function(v) {
+        setAttrs({
+          HP_total: v.base_HP + v.HP,
+          ATK_total: (v.base_ATK + v.ATK)*v.ATK_Stage,
+          DEF_total: (v.base_DEF*1 + v.DEF*1)*v.DEF_Stage,
+          SPATK_total: (v.base_SPATK + v.SPATK)*v.SPATK_Stage,
+          SPDEF_total: (v.base_SPDEF + v.SPDEF)*v.SPDEF_Stage,
+          SPEED_total: (v.base_SPEED*1 + v.SPEED*1)*v.SPEED_Stage
+        });
+        });
+    };
+    
+    var evaUp = function () {
+        getAttrs(["DEF_total","SPDEF_total","SPEED_total", "Eva"], function(v) {
+        def = Math.min(Math.floor(v["DEF_total"]/5),6);
+        sdef = Math.min(Math.floor(v["SPDEF_total"]/5),6);
+        speed = Math.min(Math.floor(v["SPEED_total"]/5),6);
+        eva = v["Eva"];
+        console.log('This');
+        setAttrs({
+          PE: def,
+          PEB: eva,
+          PhysEvade: Math.min(def*1 + eva*1,9),
+          ScE: sdef,
+          ScEB: eva,
+          SpecEvade: Math.min(sdef*1 + eva*1,9),
+          SpE: speed,
+          SpEB: eva,
+          SpeedEvade: Math.min(speed*1 + eva*1,9)
+        });
+        });
+    }; 
+    
+    var hpCalc = function (){
+        getAttrs(["Level","CharType","HP_Total", "Injuries"], function(v) {
+            x = Math.floor(v.Level*(v.CharType + 1) + v.HP_Total*3 + 10)
+            setAttrs({
+                HitPoints_max:x * (1-v.Injuries/10),
+                HitPoints_permmax:x,
+                75_hp:Math.floor(x*.75),
+                50_hp:Math.floor(x*.5),
+                25_hp:Math.floor(x*.25),
+                13_hp:Math.floor(x*(1/3)),
+                16_hp:Math.floor(x*(1/6)),
+                18_hp:Math.floor(x*(1/8)),
+                110_hp:Math.floor(x*(1/10)),
+                116_hp:Math.floor(x*(1/16)),
+            });
+        });
+    };
+    
+    var dbCalc = function (v){
+        if (v==1) {
+            return {amount:1,dice:"d6",bonus:1};
+        } else if (v==2) {
+            return {amount:1,dice:"d6",bonus:3};
+        } else if (v==3) {
+            return {amount:1,dice:"d6",bonus:5};
+        } else if (v==4) {
+            return {amount:1,dice:"d8",bonus:6};
+        } else if (v==5) {
+            return {amount:1,dice:"d8",bonus:8};
+        } else if (v==6) {
+            return {amount:2,dice:"d6",bonus:8};
+        } else if (v==7) {
+            return {amount:2,dice:"d6",bonus:10};
+        } else if (v==8) {
+            return {amount:2,dice:"d8",bonus:10};
+        } else if (v==9) {
+            return {amount:2,dice:"d10",bonus:10};
+        } else if (v==10) {
+            return {amount:3,dice:"d8",bonus:10};
+        } else if (v==11) {
+            return {amount:3,dice:"d10",bonus:10};
+        } else if (v==12) {
+            return {amount:3,dice:"d12",bonus:10};
+        } else if (v==13) {
+            return {amount:4,dice:"d10",bonus:10};
+        } else if (v==14) {
+            return {amount:4,dice:"d10",bonus:15};
+        } else if (v==15) {
+            return {amount:4,dice:"d10",bonus:20};
+        } else if (v==16) {
+            return {amount:5,dice:"d10",bonus:20};
+        } else if (v==17) {
+            return {amount:5,dice:"d12",bonus:25};
+        } else if (v==18) {
+            return {amount:6,dice:"d12",bonus:25};
+        } else if (v==19) {
+            return {amount:6,dice:"d12",bonus:30};
+        } else if (v==20) {
+            return {amount:6,dice:"d12",bonus:35};
+        } else if (v==21) {
+            return {amount:6,dice:"d12",bonus:40};
+        } else if (v==22) {
+            return {amount:6,dice:"d12",bonus:45};
+        } else if (v==23) {
+            return {amount:6,dice:"d12",bonus:50};
+        } else if (v==24) {
+            return {amount:6,dice:"d12",bonus:55};
+        } else if (v==25) {
+            return {amount:6,dice:"d12",bonus:60};
+        } else if (v==26) {
+            return {amount:7,dice:"d12",bonus:65};
+        } else if (v==27) {
+            return {amount:8,dice:"d12",bonus:70};
+        } else if (v==28) {
+            return {amount:8,dice:"d12",bonus:80};
+        }
+    };
+</script>
 <rolltemplate class="sheet-rolltemplate-PTU">
     <table>
         {{^dis}}
@@ -15,8 +227,8 @@
             {{^damage2}}
 -                <tr>
 -                    <td><span class="tcat">Damage: </span>{{damage}} <span class="tcat">Crit: </span>{{dmgcrit}}</td>
--    			</tr>
--            {{/damage2}}
+-        		</tr>
+-           {{/damage2}}
             {{#damage2}}
                 <tr>
                     <td><span class="tcat">Roll for Hit Number: </span>{{roll}}</td>
@@ -152,7 +364,7 @@
                 <td align="center"><input type='number' name='attr_base_HP' value = 0 ></td>
                 <td align='center'><input type='number' name='attr_HP' value = 0 ></td>
                 <td>&nbsp;</td>
-                <td align='center'><input type='number' name="attr_HP_total" value="floor(@{base_HP} + @{HP})" disabled="true" /></td>
+                <td align='center'><input type='number' name="attr_HP_total"/></td>
             </tr>
             <tr>
                 <td class='sheet-table-header'>ATK</td>
@@ -173,7 +385,7 @@
                     <option value='2'>5</option>
                     <option value='2.2'>6</option>
                 </select></td>
-                <td align='center'><input type='number' name="attr_ATK_total" value="floor((@{base_ATK} + @{ATK}) * @{ATK_Stage})" disabled="true" /></td>
+                <td align='center'><input type='number' name="attr_ATK_total"/></td>
             </tr>
             <tr>
                 <td class='sheet-table-header'>DEF</td>
@@ -194,7 +406,7 @@
                     <option value='2'>5</option>
                     <option value='2.2'>6</option>
                 </select></td>
-                <td align='center'><input type='number' name="attr_DEF_total" value="floor((@{base_DEF} + @{DEF}) * @{DEF_Stage})" disabled="true" /></td>
+                <td align='center'><input type='number' name="attr_DEF_total"/></td>
             </tr>
             <tr>
                 <td class='sheet-table-header'>SPATK</td>
@@ -215,7 +427,7 @@
                     <option value='2'>5</option>
                     <option value='2.2'>6</option>
                 </select></td>
-                <td align='center'><input type='number' name="attr_SPATK_total" value="floor((@{base_SPATK} + @{SPATK}) * @{SPATK_Stage})" disabled="true" /></td>
+                <td align='center'><input type='number' name="attr_SPATK_total"/></td>
             </tr>
             <tr>
                 <td class='sheet-table-header'>SPDEF</td>
@@ -236,7 +448,7 @@
                     <option value='2'>5</option>
                     <option value='2.2'>6</option>
                 </select></td>
-                <td align='center'><input type='number' name="attr_SPDEF_total" value="floor((@{base_SPDEF} + @{SPDEF}) * @{SPDEF_Stage})" disabled="true" /></td>
+                <td align='center'><input type='number' name="attr_SPDEF_total"/></td>
             </tr>
             <tr>
                 <td class='sheet-table-header'>SPEED</td>
@@ -257,7 +469,7 @@
                     <option value='2'>5</option>
                     <option value='2.2'>6</option>
                 </select></td>
-                <td align='center'><input type='number' name="attr_SPEED_total" value="floor((@{base_SPEED} + @{SPEED}) * @{SPEED_Stage})" disabled="true" /></td>
+                <td align='center'><input type='number' name="attr_SPEED_total"/></td>
             </tr>
             <tr>
                 <td class='sheet-table-header'>Accuracy Bonus</td>
@@ -323,11 +535,11 @@
             </tr>
             <tr>
                 <td class='sheet-table-header'>Current Max Hit Points</td>
-                <td><input type='number' name='attr_HitPoints_max' disabled='true' value= 'floor(((@{Level}*(@{CharType}+1))+(@{HP_Total}*3)+10)*(1-@{Injures}/10))'></td>
+                <td><input type='number' name='attr_HitPoints_max'></td>
             </tr>
             <tr>
                 <td class='sheet-table-header'>Max Hit Points</td>
-                <td><input type='number' name='attr_HitPoints_permmax' disabled='true' value= 'floor(((@{Level}*(@{CharType}+1))+(@{HP_Total}*3)+10))'></td>
+                <td><input type='number' name='attr_HitPoints_permmax'></td>
             </tr>
             <tr>
                 <td class='sheet-table-header'>Temporary Hit Points</td>
@@ -343,27 +555,27 @@
         <table class='sheet-table'>
             <tr>
                 <td class='sheet-table-header'>75%</td>
-                <td><input type='number' name='attr_75_hp' disabled='true' value='floor(@{HitPoints_permmax} * 0.75)' /></td>
+                <td><input type='number' name='attr_75_hp'/></td>
                 <td class='sheet-table-header'>50%</td>
-                <td><input type='number' name='attr_50_hp' disabled='true' value='floor(@{HitPoints_permmax} * 0.5)' /></td>
+                <td><input type='number' name='attr_50_hp'/></td>
             </tr>
             <tr>
                 <td class='sheet-table-header'>25%</td>
-                <td><input type='number' name='attr_25_hp' disabled='true' value='floor(@{HitPoints_permmax} * 0.25)' /></td>
+                <td><input type='number' name='attr_25_hp'/></td>
                 <td class='sheet-table-header'>1/3rd</td>
-                <td><input type='number' name='attr_13_hp' disabled='true' value='floor(@{HitPoints_permmax} * (1/3))' /></td>
+                <td><input type='number' name='attr_13_hp'/></td>
             </tr>
             <tr>
                 <td class='sheet-table-header'>1/6th</td>
-                <td><input type='number' name='attr_16_hp' disabled='true' value='floor(@{HitPoints_permmax} * (1/6))' /></td>
+                <td><input type='number' name='attr_16_hp'/></td>
                 <td class='sheet-table-header'>1/8th</td>
-                <td><input type='number' name='attr_18_hp' disabled='true' value='floor(@{HitPoints_permmax} * (1/8))' /></td>
+                <td><input type='number' name='attr_18_hp'/></td>
             </tr>
             <tr>
                 <td class='sheet-table-header'>1/10th (Tick Value)</td>
-                <td><input type='number' name='attr_110_hp' disabled='true' value='floor(@{HitPoints_permmax} * (1/10))' /></td>
+                <td><input type='number' name='attr_110_hp'/></td>
                 <td class='sheet-table-header'>1/16th</td>
-                <td><input type='number' name='attr_116_hp' disabled='true' value='floor(@{HitPoints_permmax} * (1/16))' /></td>
+                <td><input type='number' name='attr_116_hp'/></td>
             </tr>
         </table>
         <br />
@@ -371,21 +583,21 @@
             <table class='sheet-table'>
                 <tr>
                     <td class='sheet-table-header'>Physical Evade:</td>
-                    <td><input type='number' name='attr_PE' disabled='true' value="floor(@{DEF_Total}/5)"/> (MAX 6) + </td>
-                    <td><input type='number' name='attr_PEB' disabled='true' value="@{Eva}"/> = </td>
-                    <td><input type='number' name='attr_PhysEvade' disabled='true' value="@{PE}+@{PEB}"/> (MAX 9)</td>
+                    <td><input type='number' name='attr_PE'/> + </td>
+                    <td><input type='number' name='attr_PEB'/> = </td>
+                    <td><input type='number' name='attr_PhysEvade'/> </td>
                 </tr>
                 <tr>
                     <td class='sheet-table-header'>Special Evade:</td>
-                    <td><input type='number' name='attr_ScE' disabled='true' value="floor(@{SPDEF_Total}/5)"/> (MAX 6) + </td>
-                    <td><input type='number' name='attr_ScEB' disabled='true' value="@{Eva}"/> = </td>
-                    <td><input type='number' name='attr_SpecEvade' disabled='true' value="@{ScE}+@{ScEB}"/> (MAX 9)</td>
+                    <td><input type='number' name='attr_ScE'/> + </td>
+                    <td><input type='number' name='attr_ScEB'/> = </td>
+                    <td><input type='number' name='attr_SpecEvade'/></td>
                 </tr>
                 <tr>
                     <td class='sheet-table-header'>Speed Evade:</td>
-                    <td><input type='number' name='attr_SpE' disabled='true' value="floor(@{SPEED_Total}/5)"/> (MAX 6) + </td>
-                    <td><input type='number' name='attr_SpEB' disabled='true' value="@{Eva}"/> = </td>
-                    <td><input type='number' name='attr_SpeedEvade' disabled='true' value="@{SpE}+@{SpEB}"/> (MAX 9)</td>
+                    <td><input type='number' name='attr_SpE'/> + </td>
+                    <td><input type='number' name='attr_SpEB'/> = </td>
+                    <td><input type='number' name='attr_SpeedEvade'/> </td>
                 </tr>
             </table>
         <br />
@@ -427,7 +639,9 @@
             <br/>
                 <h4 class='sheet-minihead'>Move #1</h4>
                  <table class="sheet-table">
-                    <tr>
+            <tr hidden>
+            </tr>
+            <tr>
                 <td class='sheet-table-header'>Move Name:</td>
                 <td><input class='sheet-shortfield' type='text' name="attr_Move1_Name"/></td>
             </tr>
@@ -445,13 +659,16 @@
             </tr>
             <tr>
                 <td class='sheet-table-header'>Damage Base:</td>
+                <td><input type='number' name='attr_Move1_DB'/></td>
+            </tr>
+            <tr>
+                <td class='sheet-table-header'>Damage Dice:</td>
                 <td><input type='number' name='attr_Move1_Amount'/><select class='sheet-shortfield2' name="attr_Move1_Dice" class="dtype">                
                       <option value="d6">d6</option>
                       <option value="d8">d8</option>
                       <option value="d10">d10</option>
                       <option value="d12">d12</option>
                     </select>+<input class='sheet-shortfield' type='number' name='attr_Move1_Bonus'/>
-                    
                 </td>
             </tr>
             <tr>
@@ -461,8 +678,8 @@
             <tr>
                <td class='sheet-table-header'>Damage Rolls:</td> 
                <td>
-                <button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move1_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move1_AC}}} {{Type=@{Move1_Type}}} {{Frequency=@{Move1_Freq}}} {{damage=[[@{Move1_Amount}@{Move1_Dice}+@{Move1_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit=[[(@{Move1_Amount}*2)@{Move1_Dice}+2*@{Move1_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcat=Physical}} {{range=@{Move1_Range}}} {{effect=@{Move1_Effects}}}' name='roll_Move1AtkPhys' /> <img src="http://www.serebii.net/pokedex-dp/type/physical.png">
-                <button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move1_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move1_AC}}} {{Type=@{Move1_Type}}} {{Frequency=@{Move1_Freq}}} {{damage=[[@{Move1_Amount}@{Move1_Dice}+@{Move1_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit=[[(@{Move1_Amount}*2)@{Move1_Dice}+2*@{Move1_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcat=Special}} {{range=@{Move1_Range}}} {{effect=@{Move1_Effects}}}' name='roll_Move1AtkSpec' /> <img src="http://www.serebii.net/pokedex-dp/type/special.png">
+                <button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move1_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move1_AC}}} {{Type=@{Move1_Type}}} {{Frequency=@{Move1_Freq}}} {{damage=[[@{Move1_Amount}@{Move1_Dice}+@{Move1_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit=[[(@{Move1_Amount}*(2+@{sniper}))@{Move1_Dice}+(2+@{sniper})*@{Move1_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcat=Physical}} {{range=@{Move1_Range}}} {{effect=@{Move1_Effects}}}' name='roll_Move1AtkPhys' /> <img src="http://www.serebii.net/pokedex-dp/type/physical.png">
+                <button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move1_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move1_AC}}} {{Type=@{Move1_Type}}} {{Frequency=@{Move1_Freq}}} {{damage=[[@{Move1_Amount}@{Move1_Dice}+@{Move1_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit=[[(@{Move1_Amount}*(2+@{sniper}))@{Move1_Dice}+(2+@{sniper})*@{Move1_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcat=Special}} {{range=@{Move1_Range}}} {{effect=@{Move1_Effects}}}' name='roll_Move1AtkSpec' /> <img src="http://www.serebii.net/pokedex-dp/type/special.png">
 		<button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move1_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move1_AC}}} {{Type=@{Move1_Type}}} {{Frequency=@{Move1_Freq}}} {{range=@{Move1_Range}}} {{effect=@{Move1_Effects}}}' name='roll_Move1AtkStat' /> <img src="http://www.serebii.net/pokedex-dp/type/other.png">             
                </td>
             </tr>
@@ -480,6 +697,8 @@
         <br/>
         <h4 class='sheet-minihead'>Move #4</h4>
         <table class='sheet-table'>
+            <tr hidden>
+            </tr>
             <tr>
                 <td class='sheet-table-header'>Move Name:</td>
                 <td><input class='sheet-shortfield' type='text' name="attr_Move4_Name"/></td>
@@ -495,6 +714,10 @@
             <tr>
                 <td class='sheet-table-header'>Type:</td>
                 <td><input class='sheet-shortfield' type='text' name="attr_Move4_Type"/></td>
+            </tr>
+            <tr>
+                <td class='sheet-table-header'>Damage Base:</td>
+                <td><input type='number' name='attr_Move4_DB'/></td>
             </tr>
             <tr>
                 <td class='sheet-table-header'>Damage Base:</td>
@@ -514,8 +737,8 @@
             <tr>
                <td class='sheet-table-header'>Damage Rolls:</td> 
                <td>
-                 <button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move4_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move4_AC}}} {{Type=@{Move4_Type}}} {{Frequency=@{Move4_Freq}}} {{damage=[[@{Move4_Amount}@{Move4_Dice}+@{Move4_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit=[[(@{Move4_Amount}*2)@{Move4_Dice}+2*@{Move4_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcat=Physical}} {{range=@{Move4_Range}}} {{effect=@{Move4_Effects}}}' name='roll_Move4AtkPhys' /> <img src="http://www.serebii.net/pokedex-dp/type/physical.png">
-                 <button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move4_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move4_AC}}} {{Type=@{Move4_Type}}} {{Frequency=@{Move4_Freq}}} {{damage=[[@{Move4_Amount}@{Move4_Dice}+@{Move4_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit=[[(@{Move4_Amount}*2)@{Move4_Dice}+2*@{Move4_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcat=Special}} {{range=@{Move4_Range}}} {{effect=@{Move4_Effects}}}' name='roll_Move4AtkSpec' /> <img src="http://www.serebii.net/pokedex-dp/type/special.png">
+                 <button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move4_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move4_AC}}} {{Type=@{Move4_Type}}} {{Frequency=@{Move4_Freq}}} {{damage=[[@{Move4_Amount}@{Move4_Dice}+@{Move4_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit=[[(@{Move4_Amount}*(2+@{sniper}))@{Move4_Dice}+(2+@{sniper})*@{Move4_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcat=Physical}} {{range=@{Move4_Range}}} {{effect=@{Move4_Effects}}}' name='roll_Move4AtkPhys' /> <img src="http://www.serebii.net/pokedex-dp/type/physical.png">
+                 <button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move4_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move4_AC}}} {{Type=@{Move4_Type}}} {{Frequency=@{Move4_Freq}}} {{damage=[[@{Move4_Amount}@{Move4_Dice}+@{Move4_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit=[[(@{Move4_Amount}*(2+@{sniper}))@{Move4_Dice}+(2+@{sniper})*@{Move4_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcat=Special}} {{range=@{Move4_Range}}} {{effect=@{Move4_Effects}}}' name='roll_Move4AtkSpec' /> <img src="http://www.serebii.net/pokedex-dp/type/special.png">
                  <button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move4_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move4_AC}}} {{Type=@{Move4_Type}}} {{Frequency=@{Move4_Freq}}} {{range=@{Move4_Range}}} {{effect=@{Move4_Effects}}}' name='roll_Move4AtkStat' />  <img src="http://www.serebii.net/pokedex-dp/type/other.png">             
                </td>
             </tr>
@@ -535,6 +758,8 @@
         <br>
         <h4 class='sheet-minihead'>Move #2</h4>
         <table class='sheet-table'>
+            <tr hidden>
+            </tr>
             <tr>
                 <td class='sheet-table-header'>Move Name:</td>
                 <td><input class='sheet-shortfield' type='text' name="attr_Move2_Name"/></td>
@@ -550,6 +775,10 @@
             <tr>
                 <td class='sheet-table-header'>Type:</td>
                 <td><input class='sheet-shortfield' type='text' name="attr_Move2_Type"/></td>
+            </tr>
+            <tr>
+                <td class='sheet-table-header'>Damage Base:</td>
+                <td><input type='number' name='attr_Move2_DB'/></td>
             </tr>
             <tr>
                 <td class='sheet-table-header'>Damage Base:</td>
@@ -569,8 +798,8 @@
             <tr>
                <td class='sheet-table-header'>Damage Rolls:</td> 
                <td>
-                <button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move2_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move2_AC}}} {{Type=@{Move2_Type}}} {{Frequency=@{Move2_Freq}}} {{damage=[[@{Move2_Amount}@{Move2_Dice}+@{Move2_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit=[[(@{Move2_Amount}*2)@{Move2_Dice}+2*@{Move2_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcat=Physical}} {{range=@{Move2_Range}}} {{effect=@{Move2_Effects}}}' name='roll_Move2AtkPhys' /> <img src="http://www.serebii.net/pokedex-dp/type/physical.png">
-                <button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move2_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move2_AC}}} {{Type=@{Move2_Type}}} {{Frequency=@{Move2_Freq}}} {{damage=[[@{Move2_Amount}@{Move2_Dice}+@{Move2_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit=[[(@{Move2_Amount}*2)@{Move2_Dice}+2*@{Move2_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcat=Special}} {{range=@{Move2_Range}}} {{effect=@{Move2_Effects}}}' name='roll_Move2AtkSpec' />  <img src="http://www.serebii.net/pokedex-dp/type/special.png">
+                <button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move2_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move2_AC}}} {{Type=@{Move2_Type}}} {{Frequency=@{Move2_Freq}}} {{damage=[[@{Move2_Amount}@{Move2_Dice}+@{Move2_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit=[[(@{Move2_Amount}*(2+@{sniper}))@{Move2_Dice}+(2+@{sniper})*@{Move2_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcat=Physical}} {{range=@{Move2_Range}}} {{effect=@{Move2_Effects}}}' name='roll_Move2AtkPhys' /> <img src="http://www.serebii.net/pokedex-dp/type/physical.png">
+                <button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move2_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move2_AC}}} {{Type=@{Move2_Type}}} {{Frequency=@{Move2_Freq}}} {{damage=[[@{Move2_Amount}@{Move2_Dice}+@{Move2_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit=[[(@{Move2_Amount}*(2+@{sniper}))@{Move2_Dice}+(2+@{sniper})*@{Move2_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcat=Special}} {{range=@{Move2_Range}}} {{effect=@{Move2_Effects}}}' name='roll_Move2AtkSpec' />  <img src="http://www.serebii.net/pokedex-dp/type/special.png">
 		<button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move2_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move2_AC}}} {{Type=@{Move2_Type}}} {{Frequency=@{Move2_Freq}}} {{range=@{Move2_Range}}} {{effect=@{Move2_Effects}}}' name='roll_Move2AtkStat' /> <img src="http://www.serebii.net/pokedex-dp/type/other.png">                              
                 </td>
             </tr>
@@ -588,6 +817,8 @@
         <br/>
         <h4 class='sheet-minihead'>Move #5</h4>
         <table class='sheet-table'>
+            <tr hidden>
+            </tr>
             <tr>
                 <td class='sheet-table-header'>Move Name:</td>
                 <td><input class='sheet-shortfield' type='text' name="attr_Move5_Name"/></td>
@@ -603,6 +834,10 @@
             <tr>
                 <td class='sheet-table-header'>Type:</td>
                 <td><input class='sheet-shortfield' type='text' name="attr_Move5_Type"/></td>
+            </tr>
+            <tr>
+                <td class='sheet-table-header'>Damage Base:</td>
+                <td><input type='number' name='attr_Move5_DB'/></td>
             </tr>
             <tr>
                 <td class='sheet-table-header'>Damage Base:</td>
@@ -622,8 +857,8 @@
             <tr>
                <td class='sheet-table-header'>Damage Rolls:</td> 
                <td>
-                <button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move5_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move5_AC}}} {{Type=@{Move5_Type}}} {{Frequency=@{Move5_Freq}}} {{damage=[[@{Move5_Amount}@{Move5_Dice}+@{Move5_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit=[[(@{Move5_Amount}*2)@{Move5_Dice}+2*@{Move5_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcat=Physical}} {{range=@{Move5_Range}}} {{effect=@{Move5_Effects}}}' name='roll_Move5AtkPhys' />  <img src="http://www.serebii.net/pokedex-dp/type/physical.png">
-                <button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move5_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move5_AC}}} {{Type=@{Move5_Type}}} {{Frequency=@{Move5_Freq}}} {{damage=[[@{Move5_Amount}@{Move5_Dice}+@{Move5_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit=[[(@{Move5_Amount}*2)@{Move5_Dice}+2*@{Move5_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcat=Special}} {{range=@{Move5_Range}}} {{effect=@{Move5_Effects}}}' name='roll_Move5AtkSpec' />  <img src="http://www.serebii.net/pokedex-dp/type/special.png">
+                <button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move5_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move5_AC}}} {{Type=@{Move5_Type}}} {{Frequency=@{Move5_Freq}}} {{damage=[[@{Move5_Amount}@{Move5_Dice}+@{Move5_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit=[[(@{Move5_Amount}*(2+@{sniper}))@{Move5_Dice}+(2+@{sniper})*@{Move5_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcat=Physical}} {{range=@{Move5_Range}}} {{effect=@{Move5_Effects}}}' name='roll_Move5AtkPhys' />  <img src="http://www.serebii.net/pokedex-dp/type/physical.png">
+                <button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move5_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move5_AC}}} {{Type=@{Move5_Type}}} {{Frequency=@{Move5_Freq}}} {{damage=[[@{Move5_Amount}@{Move5_Dice}+@{Move5_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit=[[(@{Move5_Amount}*(2+@{sniper}))@{Move5_Dice}+(2+@{sniper})*@{Move5_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcat=Special}} {{range=@{Move5_Range}}} {{effect=@{Move5_Effects}}}' name='roll_Move5AtkSpec' />  <img src="http://www.serebii.net/pokedex-dp/type/special.png">
                 <button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move5_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move5_AC}}} {{Type=@{Move5_Type}}} {{Frequency=@{Move5_Freq}}} {{range=@{Move5_Range}}} {{effect=@{Move5_Effects}}}' name='roll_Move5AtkStat' />  <img src="http://www.serebii.net/pokedex-dp/type/other.png">              
                </td>
             </tr>
@@ -643,6 +878,8 @@
      <br/>
         <h4 class='sheet-minihead'>Move #3</h4>
         <table class='sheet-table'>
+            <tr hidden>
+            </tr>
             <tr>
                 <td class='sheet-table-header'>Move Name:</td>
                 <td><input class='sheet-shortfield' type='text' name="attr_Move3_Name"/></td>
@@ -658,6 +895,10 @@
             <tr>
                 <td class='sheet-table-header'>Type:</td>
                 <td><input class='sheet-shortfield' type='text' name="attr_Move3_Type"/></td>
+            </tr>
+            <tr>
+                <td class='sheet-table-header'>Damage Base:</td>
+                <td><input type='number' name='attr_Move3_DB'/></td>
             </tr>
             <tr>
                 <td class='sheet-table-header'>Damage Base:</td>
@@ -677,8 +918,8 @@
             <tr>
                <td class='sheet-table-header'>Damage Rolls:</td> 
                <td>
-                <button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move3_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move3_AC}}} {{Type=@{Move3_Type}}} {{Frequency=@{Move3_Freq}}} {{damage=[[@{Move3_Amount}@{Move3_Dice}+@{Move3_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit=[[(@{Move3_Amount}*2)@{Move3_Dice}+2*@{Move3_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcat=Physical}} {{range=@{Move3_Range}}} {{effect=@{Move3_Effects}}}' name='roll_Move3AtkPhys' /> <img src="http://www.serebii.net/pokedex-dp/type/physical.png">
-                <button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move3_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move3_AC}}} {{Type=@{Move3_Type}}} {{Frequency=@{Move3_Freq}}} {{damage=[[@{Move3_Amount}@{Move3_Dice}+@{Move3_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit=[[(@{Move3_Amount}*2)@{Move3_Dice}+2*@{Move3_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcat=Special}} {{range=@{Move3_Range}}} {{effect=@{Move3_Effects}}}' name='roll_Move3AtkSpec' />  <img src="http://www.serebii.net/pokedex-dp/type/special.png">
+                <button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move3_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move3_AC}}} {{Type=@{Move3_Type}}} {{Frequency=@{Move3_Freq}}} {{damage=[[@{Move3_Amount}@{Move3_Dice}+@{Move3_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit=[[(@{Move3_Amount}*(2+@{sniper}))@{Move3_Dice}+(2+@{sniper})*@{Move3_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcat=Physical}} {{range=@{Move3_Range}}} {{effect=@{Move3_Effects}}}' name='roll_Move3AtkPhys' /> <img src="http://www.serebii.net/pokedex-dp/type/physical.png">
+                <button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move3_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move3_AC}}} {{Type=@{Move3_Type}}} {{Frequency=@{Move3_Freq}}} {{damage=[[@{Move3_Amount}@{Move3_Dice}+@{Move3_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit=[[(@{Move3_Amount}*(2+@{sniper}))@{Move3_Dice}+(2+@{sniper})*@{Move3_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcat=Special}} {{range=@{Move3_Range}}} {{effect=@{Move3_Effects}}}' name='roll_Move3AtkSpec' />  <img src="http://www.serebii.net/pokedex-dp/type/special.png">
                 <button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move3_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move3_AC}}} {{Type=@{Move3_Type}}} {{Frequency=@{Move3_Freq}}} {{range=@{Move3_Range}}} {{effect=@{Move3_Effects}}}' name='roll_Move3AtkStat' />  <img src="http://www.serebii.net/pokedex-dp/type/other.png">              
                </td>
             </tr>
@@ -696,6 +937,8 @@
         <br/>
         <h4 class='sheet-minihead'>Move #6</h4>
         <table class='sheet-table'>
+            <tr hidden>
+            </tr>
             <tr>
                 <td class='sheet-table-header'>Move Name:</td>
                 <td><input class='sheet-shortfield' type='text' name="attr_Move6_Name"/></td>
@@ -711,6 +954,10 @@
             <tr>
                 <td class='sheet-table-header'>Type:</td>
                 <td><input class='sheet-shortfield' type='text' name="attr_Move6_Type"/></td>
+            </tr>
+            <tr>
+                <td class='sheet-table-header'>Damage Base:</td>
+                <td><input type='number' name='attr_Move6_DB'/></td>
             </tr>
             <tr>
                 <td class='sheet-table-header'>Damage Base:</td>
@@ -730,8 +977,8 @@
             <tr>
                 <td class='sheet-table-header'>Damage Rolls:</td> 
                <td>
-                <button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move6_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move6_AC}}} {{Type=@{Move6_Type}}} {{Frequency=@{Move6_Freq}}} {{damage=[[@{Move6_Amount}@{Move6_Dice}+@{Move6_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit=[[(@{Move6_Amount}*2)@{Move6_Dice}+2*@{Move6_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcat=Physical}} {{range=@{Move6_Range}}} {{effect=@{Move6_Effects}}}' name='roll_Move6AtkPhys' /> <img src="http://www.serebii.net/pokedex-dp/type/physical.png">
-                <button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move6_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move6_AC}}} {{Type=@{Move6_Type}}} {{Frequency=@{Move6_Freq}}} {{damage=[[@{Move6_Amount}@{Move6_Dice}+@{Move6_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit=[[(@{Move6_Amount}*2)@{Move6_Dice}+2*@{Move6_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcat=Special}} {{range=@{Move6_Range}}} {{effect=@{Move6_Effects}}}' name='roll_Move6AtkSpec' /> <img src="http://www.serebii.net/pokedex-dp/type/special.png">
+                <button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move6_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move6_AC}}} {{Type=@{Move6_Type}}} {{Frequency=@{Move6_Freq}}} {{damage=[[@{Move6_Amount}@{Move6_Dice}+@{Move6_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit=[[(@{Move6_Amount}*(2+@{sniper}))@{Move6_Dice}+(2+@{sniper})*@{Move6_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcat=Physical}} {{range=@{Move6_Range}}} {{effect=@{Move6_Effects}}}' name='roll_Move6AtkPhys' /> <img src="http://www.serebii.net/pokedex-dp/type/physical.png">
+                <button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move6_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move6_AC}}} {{Type=@{Move6_Type}}} {{Frequency=@{Move6_Freq}}} {{damage=[[@{Move6_Amount}@{Move6_Dice}+@{Move6_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit=[[(@{Move6_Amount}*(2+@{sniper}))@{Move6_Dice}+(2+@{sniper})*@{Move6_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcat=Special}} {{range=@{Move6_Range}}} {{effect=@{Move6_Effects}}}' name='roll_Move6AtkSpec' /> <img src="http://www.serebii.net/pokedex-dp/type/special.png">
 		<button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move6_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move6_AC}}} {{Type=@{Move6_Type}}} {{Frequency=@{Move6_Freq}}} {{range=@{Move6_Range}}} {{effect=@{Move6_Effects}}}' name='roll_Move6AtkStat' />  <img src="http://www.serebii.net/pokedex-dp/type/other.png">                             
                </td>
             </tr>
@@ -752,6 +999,8 @@
         <br/>
         <h4 class='sheet-minihead'>Struggle</h4>
         <table class="sheet-table">
+            <tr hidden>
+            </tr>
             <tr>
                 <td class='sheet-table-header'>Move Name:</td>
                 <td>Struggle</td>
@@ -767,6 +1016,10 @@
             <tr>
                 <td class='sheet-table-header'>Type:</td>
                 <td><input class='sheet-shortfield' type='text' name="attr_Struggle_Type" value = "Normal"/></td>
+            </tr>
+            <tr>
+                <td class='sheet-table-header'>Damage Base:</td>
+                <td><input type='number' name='attr_Struggle_DB' value = "4"/></td>
             </tr>
             <tr>
                 <td class='sheet-table-header'>Damage Base:</td>
@@ -786,8 +1039,8 @@
             <tr>
                <td class='sheet-table-header'>Damage Rolls:</td>
                <td>
-                <button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=Struggle}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Struggle_AC}}} {{Type=@{Struggle_Type}}} {{Frequency=At-Will}} {{damage=[[@{Struggle_Amount}@{Struggle_Dice}+@{Struggle_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit=[[(@{Struggle_Amount}*2)@{Struggle_Dice}+2*@{Struggle_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcat=Physical}} {{range=@{Struggle_Range}}} {{effect=@{Struggle_Effects}}}' name='roll_StruggleAtkPhys' />  <img src="http://www.serebii.net/pokedex-dp/type/physical.png">
-                <button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=Struggle}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Struggle_AC}}} {{Type=@{Struggle_Type}}} {{Frequency=At-Will}} {{damage=[[@{Struggle_Amount}@{Struggle_Dice}+@{Struggle_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit=[[(@{Struggle_Amount}*2)@{Struggle_Dice}+2*@{Struggle_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcat=Special}} {{range=@{Struggle_Range}}} {{effect=@{Struggle_Effects}}}' name='roll_StruggleAtkSpec' />  <img src="http://www.serebii.net/pokedex-dp/type/special.png">
+                <button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=Struggle}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Struggle_AC}}} {{Type=@{Struggle_Type}}} {{Frequency=At-Will}} {{damage=[[@{Struggle_Amount}@{Struggle_Dice}+@{Struggle_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit=[[(@{Struggle_Amount}(2+@{sniper}))@{Struggle_Dice}+(2+@{sniper})*@{Struggle_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcat=Physical}} {{range=@{Struggle_Range}}} {{effect=@{Struggle_Effects}}}' name='roll_StruggleAtkPhys' />  <img src="http://www.serebii.net/pokedex-dp/type/physical.png">
+                <button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=Struggle}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Struggle_AC}}} {{Type=@{Struggle_Type}}} {{Frequency=At-Will}} {{damage=[[@{Struggle_Amount}@{Struggle_Dice}+@{Struggle_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit=[[(@{Struggle_Amount}*(2+@{sniper}))@{Struggle_Dice}+(2+@{sniper})*@{Struggle_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcat=Special}} {{range=@{Struggle_Range}}} {{effect=@{Struggle_Effects}}}' name='roll_StruggleAtkSpec' />  <img src="http://www.serebii.net/pokedex-dp/type/special.png">
                </td>
             </tr>
             <tr>
@@ -808,6 +1061,8 @@
             <input class = "allign" type="radio" name="strike" checked><span class="allign-2">Normal Move</span>
             <input class ="allign five-strike" type="radio" name="strike" value="Five"><span class="allign-2">Five-Strike</span>
             <table class="sheet-table">
+                <tr hidden>
+                </tr>
                 <tr>
                     <td class='sheet-table-header-1'>Move Name:</td>
                     <td colspan="3"><input class='sheet-shortfield' type='text' name="attr_Move_Name"/></td>
@@ -823,6 +1078,10 @@
                 <tr>
                     <td class='sheet-table-header-1'>Type:</td>
                     <td colspan="3"><input class='sheet-shortfield' type='text' name="attr_Move_Type"/></td>
+                </tr>
+                <tr>
+                    <td class='sheet-table-header'>Damage Base:</td>
+                    <td><input type='number' name='attr_Move_DB'/></td>
                 </tr>
                 <tr>
                     <td class='sheet-table-header-1'>Damage Base:</td>
@@ -881,8 +1140,8 @@
                 <tr class="sheet-normal">
                    <td class='sheet-table-header-1'>Damage Rolls:</td>
                    <td colspan="3">
-                        <button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move_AC}}} {{Type=@{Move_Type}}} {{Frequency=@{Move_Freq}}} {{damage=[[@{Move_Amount}@{Move_Dice}+@{Move_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit=[[(@{Move_Amount}*2)@{Move_Dice}+2*@{Move_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcat=Physical}} {{range=@{Move_Range}}} {{effect=@{Move_Effects}}}' name='roll_MoveAtkPhys' />  <img src="http://www.serebii.net/pokedex-dp/type/physical.png">
-                        <button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move_AC}}} {{Type=@{Move_Type}}} {{Frequency=@{Move_Freq}}} {{damage=[[@{Move_Amount}@{Move_Dice}+@{Move_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit=[[(@{Move_Amount}*2)@{Move_Dice}+2*@{Move_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcat=Special}} {{range=@{Move_Range}}} {{effect=@{Move_Effects}}}' name='roll_MoveAtkSpec' />  <img src="http://www.serebii.net/pokedex-dp/type/special.png">
+                        <button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move_AC}}} {{Type=@{Move_Type}}} {{Frequency=@{Move_Freq}}} {{damage=[[@{Move_Amount}@{Move_Dice}+@{Move_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit=[[(@{Move_Amount}*(2+@{sniper}))@{Move_Dice}+(2+@{sniper})*@{Move_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcat=Physical}} {{range=@{Move_Range}}} {{effect=@{Move_Effects}}}' name='roll_MoveAtkPhys' />  <img src="http://www.serebii.net/pokedex-dp/type/physical.png">
+                        <button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move_AC}}} {{Type=@{Move_Type}}} {{Frequency=@{Move_Freq}}} {{damage=[[@{Move_Amount}@{Move_Dice}+@{Move_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit=[[(@{Move_Amount}*(2+@{sniper}))@{Move_Dice}+(2+@{sniper})*@{Move_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcat=Special}} {{range=@{Move_Range}}} {{effect=@{Move_Effects}}}' name='roll_MoveAtkSpec' />  <img src="http://www.serebii.net/pokedex-dp/type/special.png">
 			<button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move_AC}}} {{Type=@{Move_Type}}} {{Frequency=@{Move_Freq}}} {{range=@{Move_Range}}} {{effect=@{Move_Effects}}}' name='roll_MoveAtkStat' />  <img src="http://www.serebii.net/pokedex-dp/type/other.png">                                  
                     </td>
                 </tr>
@@ -891,8 +1150,8 @@
                 <tr class="sheet-five-strike">
                    <td class='sheet-table-header-1'>Damage Rolls:</td>
                    <td colspan="3">
-                        <button type='roll' value='&{template:PTU} {{roll=[[1d8]]}} {{nick=@{nickname}}} {{name=@{Move_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move_AC}}} {{Type=@{Move_Type}}} {{Frequency=@{Move_Freq}}} {{damage=[[@{Move_Amount}@{Move_Dice}+@{Move_Bonus}+@{dam_B}+@{ATK_total}]]}} {{damage2=[[@{Move_Amount2}@{Move_Dice2}+@{Move_Bonus2}+@{dam_B}+@{ATK_total}]]}} {{damage3=[[@{Move_Amount3}@{Move_Dice3}+@{Move_Bonus3}+@{dam_B}+@{ATK_total}]]}} {{damage4=[[@{Move_Amount4}@{Move_Dice4}+@{Move_Bonus4}+@{dam_B}+@{ATK_total}]]}} {{damage5=[[@{Move_Amount5}@{Move_Dice5}+@{Move_Bonus5}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit=[[(@{Move_Amount}*2)@{Move_Dice}+2*@{Move_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit2=[[(@{Move_Amount2}*2)@{Move_Dice2}+2*@{Move_Bonus2}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit3=[[(@{Move_Amount3}*2)@{Move_Dice3}+2*@{Move_Bonus3}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit4=[[(@{Move_Amount4}*2)@{Move_Dice4}+2*@{Move_Bonus4}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit5=[[(@{Move_Amount5}*2)@{Move_Dice5}+2*@{Move_Bonus5}+@{dam_B}+@{ATK_total}]]}} {{dmgcat=Physical}} {{range=@{Move_Range}}} {{effect=@{Move_Effects}}}' name='roll_MoveAtkPhys' />  <img src="http://www.serebii.net/pokedex-dp/type/physical.png">
-                        <button type='roll' value='&{template:PTU} {{roll=[[1d8]]}} {{nick=@{nickname}}} {{name=@{Move_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move_AC}}} {{Type=@{Move_Type}}} {{Frequency=@{Move_Freq}}} {{damage=[[@{Move_Amount}@{Move_Dice}+@{Move_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{damage2=[[@{Move_Amount2}@{Move_Dice2}+@{Move_Bonus2}+@{dam_B}+@{SPATK_total}]]}} {{damage3=[[@{Move_Amount3}@{Move_Dice3}+@{Move_Bonus3}+@{dam_B}+@{SPATK_total}]]}} {{damage4=[[@{Move_Amount4}@{Move_Dice4}+@{Move_Bonus4}+@{dam_B}+@{SPATK_total}]]}} {{damage5=[[@{Move_Amount5}@{Move_Dice5}+@{Move_Bonus5}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit=[[(@{Move_Amount}*2)@{Move_Dice}+2*@{Move_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit2=[[(@{Move_Amount2}*2)@{Move_Dice2}+2*@{Move_Bonus2}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit3=[[(@{Move_Amount3}*2)@{Move_Dice3}+2*@{Move_Bonus3}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit4=[[(@{Move_Amount4}*2)@{Move_Dice4}+2*@{Move_Bonus4}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit5=[[(@{Move_Amount5}*2)@{Move_Dice5}+2*@{Move_Bonus5}+@{dam_B}+@{SPATK_total}]]}} {{dmgcat=Special}} {{range=@{Move_Range}}} {{effect=@{Move_Effects}}}' name='roll_MoveAtkSpec' />  <img src="http://www.serebii.net/pokedex-dp/type/special.png">
+                        <button type='roll' value='&{template:PTU} {{roll=[[1d8]]}} {{nick=@{nickname}}} {{name=@{Move_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move_AC}}} {{Type=@{Move_Type}}} {{Frequency=@{Move_Freq}}} {{damage=[[@{Move_Amount}@{Move_Dice}+@{Move_Bonus}+@{dam_B}+@{ATK_total}]]}} {{damage2=[[@{Move_Amount2}@{Move_Dice2}+@{Move_Bonus2}+@{dam_B}+@{ATK_total}]]}} {{damage3=[[@{Move_Amount3}@{Move_Dice3}+@{Move_Bonus3}+@{dam_B}+@{ATK_total}]]}} {{damage4=[[@{Move_Amount4}@{Move_Dice4}+@{Move_Bonus4}+@{dam_B}+@{ATK_total}]]}} {{damage5=[[@{Move_Amount5}@{Move_Dice5}+@{Move_Bonus5}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit=[[(@{Move_Amount}*(2+@{sniper}))@{Move_Dice}+(2+@{sniper})*@{Move_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit2=[[(@{Move_Amount2}*(2+@{sniper}))@{Move_Dice2}+(2+@{sniper})*@{Move_Bonus2}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit3=[[(@{Move_Amount3}*(2+@{sniper}))@{Move_Dice3}+(2+@{sniper})*@{Move_Bonus3}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit4=[[(@{Move_Amount4}*(2+@{sniper}))@{Move_Dice4}+(2+@{sniper})*@{Move_Bonus4}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit5=[[(@{Move_Amount5}*(2+@{sniper}))@{Move_Dice5}+(2+@{sniper})*@{Move_Bonus5}+@{dam_B}+@{ATK_total}]]}} {{dmgcat=Physical}} {{range=@{Move_Range}}} {{effect=@{Move_Effects}}}' name='roll_MoveAtkPhys' />  <img src="http://www.serebii.net/pokedex-dp/type/physical.png">
+                        <button type='roll' value='&{template:PTU} {{roll=[[1d8]]}} {{nick=@{nickname}}} {{name=@{Move_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move_AC}}} {{Type=@{Move_Type}}} {{Frequency=@{Move_Freq}}} {{damage=[[@{Move_Amount}@{Move_Dice}+@{Move_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{damage2=[[@{Move_Amount2}@{Move_Dice2}+@{Move_Bonus2}+@{dam_B}+@{SPATK_total}]]}} {{damage3=[[@{Move_Amount3}@{Move_Dice3}+@{Move_Bonus3}+@{dam_B}+@{SPATK_total}]]}} {{damage4=[[@{Move_Amount4}@{Move_Dice4}+@{Move_Bonus4}+@{dam_B}+@{SPATK_total}]]}} {{damage5=[[@{Move_Amount5}@{Move_Dice5}+@{Move_Bonus5}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit=[[(@{Move_Amount}*(2+@{sniper}))@{Move_Dice}+(2+@{sniper})*@{Move_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit2=[[(@{Move_Amount2}*(2+@{sniper}))@{Move_Dice2}+(2+@{sniper})*@{Move_Bonus2}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit3=[[(@{Move_Amount3}*(2+@{sniper}))@{Move_Dice3}+(2+@{sniper})*@{Move_Bonus3}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit4=[[(@{Move_Amount4}*(2+@{sniper}))@{Move_Dice4}+(2+@{sniper})*@{Move_Bonus4}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit5=[[(@{Move_Amount5}*(2+@{sniper}))@{Move_Dice5}+(2+@{sniper})*@{Move_Bonus5}+@{dam_B}+@{SPATK_total}]]}} {{dmgcat=Special}} {{range=@{Move_Range}}} {{effect=@{Move_Effects}}}' name='roll_MoveAtkSpec' />  <img src="http://www.serebii.net/pokedex-dp/type/special.png">
                     </td>
                 </tr>
                 <tr>
@@ -1242,8 +1501,17 @@
         </table>
     </fieldset>
 </div>
+<div class='sheet-row'>
+    <input type="checkbox" class="sheet-arrow" /><span></span>
+    <h3 class="sheet-header">Ability Support</h3>
+    <div class="sheet-checklist">Sniper:
+    <select name="attr_sniper" class="sheet-shortfield2">
+        <option value=0>Off</option>
+        <option value=1>On</option>
+    </select>
+    </div>
 </div>
-
+</div>
 <div class="sheet-tab2">
 <div class='sheet-row'>
     <h3 class="sheet-header">Roll Page</h3>
@@ -1292,54 +1560,54 @@
         <h4 class='sheet-minihead'>Move #1</h4>
         <input class='sheet-shortfield' name="attr_f1" disabled="true" type='text' value="@{Move1_Name}"/>
         <table style="width:100%;" align="center"><tr>
-                <td><button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move1_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move1_AC}}} {{Type=@{Move1_Type}}} {{Frequency=@{Move1_Freq}}} {{damage=[[@{Move1_Amount}@{Move1_Dice}+@{Move1_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit=[[(@{Move1_Amount}*2)@{Move1_Dice}+2*@{Move1_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcat=Physical}} {{range=@{Move1_Range}}} {{effect=@{Move1_Effects}}}' name='roll_Move1AtkPhys' /> <img src="http://www.serebii.net/pokedex-dp/type/physical.png">
-                </td><td><button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move1_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move1_AC}}} {{Type=@{Move1_Type}}} {{Frequency=@{Move1_Freq}}} {{damage=[[@{Move1_Amount}@{Move1_Dice}+@{Move1_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit=[[(@{Move1_Amount}*2)@{Move1_Dice}+2*@{Move1_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcat=Special}} {{range=@{Move1_Range}}} {{effect=@{Move1_Effects}}}' name='roll_Move1AtkSpec' /> <img src="http://www.serebii.net/pokedex-dp/type/special.png">
+                <td><button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move1_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move1_AC}}} {{Type=@{Move1_Type}}} {{Frequency=@{Move1_Freq}}} {{damage=[[@{Move1_Amount}@{Move1_Dice}+@{Move1_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit=[[(@{Move1_Amount}*(2+@{sniper}))@{Move1_Dice}+(2+@{sniper})*@{Move1_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcat=Physical}} {{range=@{Move1_Range}}} {{effect=@{Move1_Effects}}}' name='roll_Move1AtkPhys' /> <img src="http://www.serebii.net/pokedex-dp/type/physical.png">
+                </td><td><button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move1_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move1_AC}}} {{Type=@{Move1_Type}}} {{Frequency=@{Move1_Freq}}} {{damage=[[@{Move1_Amount}@{Move1_Dice}+@{Move1_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit=[[(@{Move1_Amount}*(2+@{sniper}))@{Move1_Dice}+(2+@{sniper})*@{Move1_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcat=Special}} {{range=@{Move1_Range}}} {{effect=@{Move1_Effects}}}' name='roll_Move1AtkSpec' /> <img src="http://www.serebii.net/pokedex-dp/type/special.png">
 	            </td><td><button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move1_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move1_AC}}} {{Type=@{Move1_Type}}} {{Frequency=@{Move1_Freq}}} {{range=@{Move1_Range}}} {{effect=@{Move1_Effects}}}' name='roll_Move1AtkStat' /> <img src="http://www.serebii.net/pokedex-dp/type/other.png">             
         </td></tr></table>
         <br/>
         <h4 class='sheet-minihead'>Move #4</h4>
         <input class='sheet-shortfield' name="attr_f4" disabled="true" type='text' value="@{Move4_Name}"/>
         <table style="width;100%" align="center"><tr>
-                <td><button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move4_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move4_AC}}} {{Type=@{Move4_Type}}} {{Frequency=@{Move4_Freq}}} {{damage=[[@{Move4_Amount}@{Move4_Dice}+@{Move4_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit=[[(@{Move4_Amount}*2)@{Move4_Dice}+2*@{Move4_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcat=Physical}} {{range=@{Move4_Range}}} {{effect=@{Move4_Effects}}}' name='roll_Move4AtkPhys' /> <img src="http://www.serebii.net/pokedex-dp/type/physical.png">
-                </td><td><button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move4_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move4_AC}}} {{Type=@{Move4_Type}}} {{Frequency=@{Move4_Freq}}} {{damage=[[@{Move4_Amount}@{Move4_Dice}+@{Move4_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit=[[(@{Move4_Amount}*2)@{Move4_Dice}+2*@{Move4_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcat=Special}} {{range=@{Move4_Range}}} {{effect=@{Move4_Effects}}}' name='roll_Move4AtkSpec' /> <img src="http://www.serebii.net/pokedex-dp/type/special.png">
+                <td><button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move4_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move4_AC}}} {{Type=@{Move4_Type}}} {{Frequency=@{Move4_Freq}}} {{damage=[[@{Move4_Amount}@{Move4_Dice}+@{Move4_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit=[[(@{Move4_Amount}*(2+@{sniper}))@{Move4_Dice}+(2+@{sniper})*@{Move4_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcat=Physical}} {{range=@{Move4_Range}}} {{effect=@{Move4_Effects}}}' name='roll_Move4AtkPhys' /> <img src="http://www.serebii.net/pokedex-dp/type/physical.png">
+                </td><td><button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move4_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move4_AC}}} {{Type=@{Move4_Type}}} {{Frequency=@{Move4_Freq}}} {{damage=[[@{Move4_Amount}@{Move4_Dice}+@{Move4_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit=[[(@{Move4_Amount}*(2+@{sniper}))@{Move4_Dice}+(2+@{sniper})*@{Move4_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcat=Special}} {{range=@{Move4_Range}}} {{effect=@{Move4_Effects}}}' name='roll_Move4AtkSpec' /> <img src="http://www.serebii.net/pokedex-dp/type/special.png">
                 </td><td><button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move4_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move4_AC}}} {{Type=@{Move4_Type}}} {{Frequency=@{Move4_Freq}}} {{range=@{Move4_Range}}} {{effect=@{Move4_Effects}}}' name='roll_Move4AtkStat' />  <img src="http://www.serebii.net/pokedex-dp/type/other.png">             
         </td></tr></table>
         </div><div class='sheet-col'><br>
         <h4 class='sheet-minihead'>Move #2</h4>
         <input class='sheet-shortfield' name="attr_f2" disabled="true" type='text' value="@{Move2_Name}"/>
         <table style="width;100%" align="center"><tr>
-                <td><button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move2_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move2_AC}}} {{Type=@{Move2_Type}}} {{Frequency=@{Move2_Freq}}} {{damage=[[@{Move2_Amount}@{Move2_Dice}+@{Move2_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit=[[(@{Move2_Amount}*2)@{Move2_Dice}+2*@{Move2_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcat=Physical}} {{range=@{Move2_Range}}} {{effect=@{Move2_Effects}}}' name='roll_Move2AtkPhys' /> <img src="http://www.serebii.net/pokedex-dp/type/physical.png">
-                </td><td><button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move2_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move2_AC}}} {{Type=@{Move2_Type}}} {{Frequency=@{Move2_Freq}}} {{damage=[[@{Move2_Amount}@{Move2_Dice}+@{Move2_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit=[[(@{Move2_Amount}*2)@{Move2_Dice}+2*@{Move2_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcat=Special}} {{range=@{Move2_Range}}} {{effect=@{Move2_Effects}}}' name='roll_Move2AtkSpec' />  <img src="http://www.serebii.net/pokedex-dp/type/special.png">
+                <td><button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move2_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move2_AC}}} {{Type=@{Move2_Type}}} {{Frequency=@{Move2_Freq}}} {{damage=[[@{Move2_Amount}@{Move2_Dice}+@{Move2_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit=[[(@{Move2_Amount}*(2+@{sniper}))@{Move2_Dice}+(2+@{sniper})*@{Move2_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcat=Physical}} {{range=@{Move2_Range}}} {{effect=@{Move2_Effects}}}' name='roll_Move2AtkPhys' /> <img src="http://www.serebii.net/pokedex-dp/type/physical.png">
+                </td><td><button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move2_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move2_AC}}} {{Type=@{Move2_Type}}} {{Frequency=@{Move2_Freq}}} {{damage=[[@{Move2_Amount}@{Move2_Dice}+@{Move2_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit=[[(@{Move2_Amount}*(2+@{sniper}))@{Move2_Dice}+(2+@{sniper})*@{Move2_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcat=Special}} {{range=@{Move2_Range}}} {{effect=@{Move2_Effects}}}' name='roll_Move2AtkSpec' />  <img src="http://www.serebii.net/pokedex-dp/type/special.png">
 	            </td><td><button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move2_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move2_AC}}} {{Type=@{Move2_Type}}} {{Frequency=@{Move2_Freq}}} {{range=@{Move2_Range}}} {{effect=@{Move2_Effects}}}' name='roll_Move2AtkStat' /> <img src="http://www.serebii.net/pokedex-dp/type/other.png">                              
         </td></tr></table>
         <br>
         <h4 class='sheet-minihead'>Move #5</h4>
         <input class='sheet-shortfield' name="attr_f5" disabled="true" type='text' value="@{Move5_Name}"/>
         <table style="width;100%" align="center"><tr>
-                <td><button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move5_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move5_AC}}} {{Type=@{Move5_Type}}} {{Frequency=@{Move5_Freq}}} {{damage=[[@{Move5_Amount}@{Move5_Dice}+@{Move5_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit=[[(@{Move5_Amount}*2)@{Move5_Dice}+2*@{Move5_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcat=Physical}} {{range=@{Move5_Range}}} {{effect=@{Move5_Effects}}}' name='roll_Move5AtkPhys' />  <img src="http://www.serebii.net/pokedex-dp/type/physical.png">
-                </td><td><button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move5_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move5_AC}}} {{Type=@{Move5_Type}}} {{Frequency=@{Move5_Freq}}} {{damage=[[@{Move5_Amount}@{Move5_Dice}+@{Move5_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit=[[(@{Move5_Amount}*2)@{Move5_Dice}+2*@{Move5_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcat=Special}} {{range=@{Move5_Range}}} {{effect=@{Move5_Effects}}}' name='roll_Move5AtkSpec' />  <img src="http://www.serebii.net/pokedex-dp/type/special.png">
+                <td><button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move5_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move5_AC}}} {{Type=@{Move5_Type}}} {{Frequency=@{Move5_Freq}}} {{damage=[[@{Move5_Amount}@{Move5_Dice}+@{Move5_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit=[[(@{Move5_Amount}*(2+@{sniper}))@{Move5_Dice}+(2+@{sniper})*@{Move5_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcat=Physical}} {{range=@{Move5_Range}}} {{effect=@{Move5_Effects}}}' name='roll_Move5AtkPhys' />  <img src="http://www.serebii.net/pokedex-dp/type/physical.png">
+                </td><td><button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move5_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move5_AC}}} {{Type=@{Move5_Type}}} {{Frequency=@{Move5_Freq}}} {{damage=[[@{Move5_Amount}@{Move5_Dice}+@{Move5_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit=[[(@{Move5_Amount}*(2+@{sniper}))@{Move5_Dice}+(2+@{sniper})*@{Move5_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcat=Special}} {{range=@{Move5_Range}}} {{effect=@{Move5_Effects}}}' name='roll_Move5AtkSpec' />  <img src="http://www.serebii.net/pokedex-dp/type/special.png">
                 </td><td><button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move5_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move5_AC}}} {{Type=@{Move5_Type}}} {{Frequency=@{Move5_Freq}}} {{range=@{Move5_Range}}} {{effect=@{Move5_Effects}}}' name='roll_Move5AtkStat' />  <img src="http://www.serebii.net/pokedex-dp/type/other.png">              
         </td></tr></table>
         <br>
         <h4 class='sheet-minihead' >Struggle</h4>
         <table style="width;100%" align="center"><tr>
-                <td><button type='roll' name="attr_fs" value='&{template:PTU} {{nick=@{nickname}}} {{name=Struggle}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Struggle_AC}}} {{Type=@{Struggle_Type}}} {{Frequency=At-Will}} {{damage=[[@{Struggle_Amount}@{Struggle_Dice}+@{Struggle_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit=[[(@{Struggle_Amount}*2)@{Struggle_Dice}+2*@{Struggle_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcat=Physical}} {{range=@{Struggle_Range}}} {{effect=@{Struggle_Effects}}}' name='roll_StruggleAtkPhys' />  <img src="http://www.serebii.net/pokedex-dp/type/physical.png">
-                </td><td><button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=Struggle}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Struggle_AC}}} {{Type=@{Struggle_Type}}} {{Frequency=At-Will}} {{damage=[[@{Struggle_Amount}@{Struggle_Dice}+@{Struggle_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit=[[(@{Struggle_Amount}*2)@{Struggle_Dice}+2*@{Struggle_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcat=Special}} {{range=@{Struggle_Range}}} {{effect=@{Struggle_Effects}}}' name='roll_StruggleAtkSpec' />  <img src="http://www.serebii.net/pokedex-dp/type/special.png">
+                <td><button type='roll' name="attr_fs" value='&{template:PTU} {{nick=@{nickname}}} {{name=Struggle}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Struggle_AC}}} {{Type=@{Struggle_Type}}} {{Frequency=At-Will}} {{damage=[[@{Struggle_Amount}@{Struggle_Dice}+@{Struggle_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit=[[(@{Struggle_Amount}*(2+@{sniper}))@{Struggle_Dice}+(2+@{sniper})*@{Struggle_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcat=Physical}} {{range=@{Struggle_Range}}} {{effect=@{Struggle_Effects}}}' name='roll_StruggleAtkPhys' />  <img src="http://www.serebii.net/pokedex-dp/type/physical.png">
+                </td><td><button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=Struggle}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Struggle_AC}}} {{Type=@{Struggle_Type}}} {{Frequency=At-Will}} {{damage=[[@{Struggle_Amount}@{Struggle_Dice}+@{Struggle_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit=[[(@{Struggle_Amount}*(2+@{sniper}))@{Struggle_Dice}+(2+@{sniper})*@{Struggle_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcat=Special}} {{range=@{Struggle_Range}}} {{effect=@{Struggle_Effects}}}' name='roll_StruggleAtkSpec' />  <img src="http://www.serebii.net/pokedex-dp/type/special.png">
         </td></tr></table>
         </div><div class='sheet-col'><br>
         <h4 class='sheet-minihead'>Move #3</h4>
         <input class='sheet-shortfield' name="attr_f3" disabled="true" type='text' value="@{Move3_Name}"/>
         <table style="width;100%" align="center"><tr>
-                <td><button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move3_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move3_AC}}} {{Type=@{Move3_Type}}} {{Frequency=@{Move3_Freq}}} {{damage=[[@{Move3_Amount}@{Move3_Dice}+@{Move3_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit=[[(@{Move3_Amount}*2)@{Move3_Dice}+2*@{Move3_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcat=Physical}} {{range=@{Move3_Range}}} {{effect=@{Move3_Effects}}}' name='roll_Move3AtkPhys' /> <img src="http://www.serebii.net/pokedex-dp/type/physical.png">
-                </td><td><button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move3_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move3_AC}}} {{Type=@{Move3_Type}}} {{Frequency=@{Move3_Freq}}} {{damage=[[@{Move3_Amount}@{Move3_Dice}+@{Move3_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit=[[(@{Move3_Amount}*2)@{Move3_Dice}+2*@{Move3_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcat=Special}} {{range=@{Move3_Range}}} {{effect=@{Move3_Effects}}}' name='roll_Move3AtkSpec' />  <img src="http://www.serebii.net/pokedex-dp/type/special.png">
+                <td><button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move3_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move3_AC}}} {{Type=@{Move3_Type}}} {{Frequency=@{Move3_Freq}}} {{damage=[[@{Move3_Amount}@{Move3_Dice}+@{Move3_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit=[[(@{Move3_Amount}*(2+@{sniper}))@{Move3_Dice}+(2+@{sniper})*@{Move3_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcat=Physical}} {{range=@{Move3_Range}}} {{effect=@{Move3_Effects}}}' name='roll_Move3AtkPhys' /> <img src="http://www.serebii.net/pokedex-dp/type/physical.png">
+                </td><td><button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move3_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move3_AC}}} {{Type=@{Move3_Type}}} {{Frequency=@{Move3_Freq}}} {{damage=[[@{Move3_Amount}@{Move3_Dice}+@{Move3_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit=[[(@{Move3_Amount}*(2+@{sniper}))@{Move3_Dice}+(2+@{sniper})*@{Move3_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcat=Special}} {{range=@{Move3_Range}}} {{effect=@{Move3_Effects}}}' name='roll_Move3AtkSpec' />  <img src="http://www.serebii.net/pokedex-dp/type/special.png">
                 </td><td><button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move3_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move3_AC}}} {{Type=@{Move3_Type}}} {{Frequency=@{Move3_Freq}}} {{range=@{Move3_Range}}} {{effect=@{Move3_Effects}}}' name='roll_Move3AtkStat' />  <img src="http://www.serebii.net/pokedex-dp/type/other.png">           
         </td></tr></table>
         <br>
         <h4 class='sheet-minihead'>Move #6</h4>
         <input class='sheet-shortfield' name="attr_f6" type='text' value="@{Move6_Name}" disabled="true"/>
         <table style="width;100%" align="center"><tr>
-                <td><button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move6_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move6_AC}}} {{Type=@{Move6_Type}}} {{Frequency=@{Move6_Freq}}} {{damage=[[@{Move6_Amount}@{Move6_Dice}+@{Move6_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit=[[(@{Move6_Amount}*2)@{Move6_Dice}+2*@{Move6_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcat=Physical}} {{range=@{Move6_Range}}} {{effect=@{Move6_Effects}}}' name='roll_Move6AtkPhys' /> <img src="http://www.serebii.net/pokedex-dp/type/physical.png">
-                </td><td><button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move6_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move6_AC}}} {{Type=@{Move6_Type}}} {{Frequency=@{Move6_Freq}}} {{damage=[[@{Move6_Amount}@{Move6_Dice}+@{Move6_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit=[[(@{Move6_Amount}*2)@{Move6_Dice}+2*@{Move6_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcat=Special}} {{range=@{Move6_Range}}} {{effect=@{Move6_Effects}}}' name='roll_Move6AtkSpec' /> <img src="http://www.serebii.net/pokedex-dp/type/special.png">
+                <td><button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move6_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move6_AC}}} {{Type=@{Move6_Type}}} {{Frequency=@{Move6_Freq}}} {{damage=[[@{Move6_Amount}@{Move6_Dice}+@{Move6_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit=[[(@{Move6_Amount}*(2+@{sniper}))@{Move6_Dice}+(2+@{sniper})*@{Move6_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcat=Physical}} {{range=@{Move6_Range}}} {{effect=@{Move6_Effects}}}' name='roll_Move6AtkPhys' /> <img src="http://www.serebii.net/pokedex-dp/type/physical.png">
+                </td><td><button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move6_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move6_AC}}} {{Type=@{Move6_Type}}} {{Frequency=@{Move6_Freq}}} {{damage=[[@{Move6_Amount}@{Move6_Dice}+@{Move6_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit=[[(@{Move6_Amount}*(2+@{sniper}))@{Move6_Dice}+(2+@{sniper})*@{Move6_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcat=Special}} {{range=@{Move6_Range}}} {{effect=@{Move6_Effects}}}' name='roll_Move6AtkSpec' /> <img src="http://www.serebii.net/pokedex-dp/type/special.png">
 		        </td><td><button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=@{Move6_Name}}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Move6_AC}}} {{Type=@{Move6_Type}}} {{Frequency=@{Move6_Freq}}} {{range=@{Move6_Range}}} {{effect=@{Move6_Effects}}}' name='roll_Move6AtkStat' />  <img src="http://www.serebii.net/pokedex-dp/type/other.png">                             
         </td></tr></table>
         <br>
