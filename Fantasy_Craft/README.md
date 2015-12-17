@@ -5,6 +5,26 @@ This is my fork of Suldae's initial sheet.
 
 ### ChangeLog
 
+#### Major update - May 2015
+* Added sheet config controls to remove background image and control Logos (thanks to Rich Finder)
+* Added Initiative roll button which auto-populates Turn Tracker
+* Added attribute name to spell hide/reveal so it will remember previous state
+* Adjusted width of Combat/Non-combat abilities and made description fields variable height and scrollable text box, so text will always fit.
+* Adjusted width of Gear fields to occupy full 100% of width and added location field
+* Added Holdings section
+* Finally(!) fixed width control of spell section's repitems.  Now they always occupy 100% width
+* Added sheet version/date
+* Adjusted Path text input to be wider and changed to textarea
+
+#### Minor update - Mar 2015
+* Darkened background as temporary 'fix' for larger UI changes
+* Removed/consolidated the last of dead css classes
+
+#### Bug Fix Update and Improvements - Feb 2015
+* Migrated single class definitions to general ones
+* Removed superfluous selector classes
+* Darkened background
+
 #### Bug Fix Update and Improvements - Feb 2015
 * Fixed up this README...
 * Added attribute name to coin-in-hand, stake, and Weapon placeholder names for weapon 2-4
@@ -86,7 +106,6 @@ This is my fork of Suldae's initial sheet.
 
 ### TODO
 
-* Add roll button for Initiative
 * Compute Keen in conjunction with damage rolls
 * Add Global Keen than just to individual weapons
 * What to do if > 4 weapons?  Repeating field?
@@ -99,17 +118,18 @@ This is my fork of Suldae's initial sheet.
 * Armor resistances are still number type.  Should be changed to text/number
 * Add sneak attack damage dice to weapons section
 * Consider adding individual conditions select element in order to create flexible macros
-* Need to add Contacts, Holdings, Magic Items, Mounts, and Vehicles section to Gear & Prizes
+* Need to add Contacts, Magic Items, Mounts, and Vehicles section to Gear & Prizes
 * Add input field for Edge?
 * Need to do comprehensive review of rolls and how they are computed
-* Migrate more individual class definitions in css to general ones
-* Move style definitions on elements in html to css
 * Possibly create dedicated Tricks/Stance section to track which abilities are tricks/stances (or use T/S checkbox)
 * Possibly create Feat Category select to help track how many feats of a tree a character has
 * Character Disposition tracking for both Special and Standard (See pg 373)
 * Standard Character sheet
-* Add Tooltip to Total Lifestyle explaining that the points are distributed to either Panache of Prudence
 * Merge 'Focus' into 'Skills' section?
+* Add Critical Injuries and heal time in addition to conditions tracker?
+* Update json file to provide more detail what is tracked and what is not
+* Update json file to explain tooltip usage to provide table 'hints', special/standard sheet, Spellcasting incorporated into skills, what rolls auto-calculate, and where to find attribute names for creating macros
+
 
 ### NOTE
 
@@ -132,3 +152,4 @@ If you feel you've contributed to the development of this character sheet, don't
 #### Credit to those that have influenced the design of the sheet with input, feedback, or just good style:
 * Delal of crafty-games forums' custom character sheet
 * Actoba's spell section and tabs from DnD 5e sheet
+* Rich Finder's UI controls from SW sheet
