@@ -9746,7 +9746,7 @@
 <div class="sheet-footer">
 	<div class="sheet-table">
 		<div class="sheet-table-row">
-			<span class="sheet-table-data sheet-center">Created by Samuel Marino w/contributions by Vince, Samuel Terrazas, Nibrodooh, Chris Buchholz | Last updated: <i>12.17.15'</i></span>
+			<span class="sheet-table-data sheet-center">Created by Samuel Marino w/contributions by Vince, Samuel Terrazas, Nibrodooh, Chris Buchholz | Last updated: <i>12.18.15'</i></span>
 		</div>
 		<div class="sheet-table-row">
 			<span class="sheet-table-data sheet-center">Have questions or feedback?  This thread can help:<input type="text" style="width:50%; border:0px;" value="https://app.roll20.net/forum/post/1915585/pathfinder-sheet-thread-4-life-after-sam" /></span>
@@ -10920,6 +10920,8 @@ var ExExp = (function(){
                 delete t.cond;
                 delete t.left;
                 delete t.right;
+				
+				
                 for (var k in y) {
                     t[k] = y[k];
                 }
@@ -11084,43 +11086,46 @@ var ExExp = (function(){
         while (doSubstitution) {
             doSubstitution = false;
             // substitute in values for variables for which we already have names
-            for (var label in references) {
-                if (!labels[label]) {
-                    return reportError("Variable '" + label + "' not defined");
-                }
-                if ((labels[label].type != "string") && (labels[label].type != "number")) {
-                    // variable exists but not yet evaluated; try to evaluate
-                    var err = lazyEval(labels[label], labels, references, unevalRefs, evalReqs, true);
-                    if (typeof (err) == typeof ("")) {
-                        return reportError(err);
-                    }
-                }
-                if ((labels[label].type == "string") || (labels[label].type == "number")) {
-                    // variable fully evaluated; substitute it in
-                    for (var i = 0; i < references[label].length; i++) {
-                        references[label][i].type = labels[label].type;
-                        references[label][i].datatype = labels[label].datatype;
-                        references[label][i].value = labels[label].value;
-                        references[label][i].baseValid = labels[label].baseValid;
-                    }
-                    delete references[label];
-                    doSubstitution = true;
-                }
-            }
-            // try to get names for variables and tables with unevaluated names
-            var newUneval = [];
-            while (unevalRefs.length > 0) {
-                var r = lazyEval(unevalRefs.shift(), labels, references, unevalRefs, evalReqs, true);
-                if (typeof (r) == typeof ("")) {
-                    return reportError(err);
-                }
-                if ((r.type == "string") || (r.type == "number")) {
-                    doSubstitution = true;
-                } else {
-                    newUneval.push(r);
-                }
-            }
-            unevalRefs = newUneval;
+
+			for (var label in references) {
+				if (!labels[label]) {
+					return reportError("Variable '" + label + "' not defined");
+				}
+				if ((labels[label].type != "string") && (labels[label].type != "number")) {
+					// variable exists but not yet evaluated; try to evaluate
+					var err = lazyEval(labels[label], labels, references, unevalRefs, evalReqs, true);
+					if (typeof (err) == typeof ("")) {
+						return reportError(err);
+					}
+				}
+				if ((labels[label].type == "string") || (labels[label].type == "number")) {
+					// variable fully evaluated; substitute it in
+					for (var i = 0; i < references[label].length; i++) {
+						references[label][i].type = labels[label].type;
+						references[label][i].datatype = labels[label].datatype;
+						references[label][i].value = labels[label].value;
+						references[label][i].baseValid = labels[label].baseValid;
+					}
+					delete references[label];
+					doSubstitution = true;
+				}
+			}
+		
+			// try to get names for variables and tables with unevaluated names
+			var newUneval = [];
+			while (unevalRefs.length > 0) {
+				var r = lazyEval(unevalRefs.shift(), labels, references, unevalRefs, evalReqs, true);
+				if (typeof (r) == typeof ("")) {
+					return reportError(err);
+				}
+				if ((r.type == "string") || (r.type == "number")) {
+					doSubstitution = true;
+				} else {
+					newUneval.push(r);
+				}
+			}
+			unevalRefs = newUneval;
+			
         }
 
         // flatten fully evaluated ASTs into strings and splice into chunks
@@ -11276,12 +11281,12 @@ var SWUtils = SWUtils || (function() {
 			callback("");
 		}
 		searchAndReplaceFields(exprStr, true, function(replacedStr) {
-			console.log("we received "+replacedStr+" back");
+			//console.log("we received "+replacedStr+" back");
 			var evaluated;
 			// not simply !replacedStr since "0" is valid
 			if (typeof replacedStr !== "undefined" && replacedStr !== null ) {
 				evaluated = ExExp.handleExpression(replacedStr);
-				console.log("sending back "+evaluated);
+				//console.log("sending back "+evaluated);
 				callback( evaluated);
 			} else {
 				callback("");
@@ -11322,29 +11327,33 @@ var SWUtils = SWUtils || (function() {
 	*
 	* note this is NOT recursive, you can't point one field of 
     *
-	* @readField = field to read containing string to parse
-	* @writeField = field to write to
-	* @defaultVal= optional, default to set if we cannot evaluate the field. If none set to 0.
+	* @readField {string}= field to read containing string to parse
+	* @writeField {string}= field to write to
+	* @dontForceZero {boolean}= if the writeField is empty, then leave it empty rather than set it to 0
+	* @defaultVal {number}= optional, default to set if we cannot evaluate the field. If none set to 0.
 	* 
 	*/
-	evaluateAndSetNumber = function(readField,writeField,defaultVal){
-		console.log("EEEE at evaluateAndSetNumber read:"+readField+", write:"+writeField);
+	evaluateAndSetNumber = function(readField,writeField,dontForceZero,defaultVal){
+		//console.log("EEEE at evaluateAndSetNumber read:"+readField+", write:"+writeField);
 		getAttrs([readField,writeField], function (values){ 
+			//console.log(values);
 			var o = {};
-			var currVal= parseFloat(values[writeField],10)||0;
-			var value = parseFloat(values[readField]);//cannot do "||0" since 0 is valid but falsy
+			var currVal= parseFloat(values[writeField],10);
+			var value = parseFloat(values[readField],10);//cannot do "||0" since 0 is valid but falsy
+			var forceUpdate = isNaN(currVal) && !dontForceZero;
+			currVal=currVal||0;
 			if (!values[readField] ) { value=0;}
-			if  (isNaN(value) || typeof(value) === "undefined") {
-				evaluateExpression(values[readField],function(value){
+			if  (isNaN(value) ) {
+				evaluateExpression(values[readField],function(value2){
 					//should be same, but sometimes not!? check both
-					if ( isNaN(value) || typeof value  === "undefined" ) {value=defaultVal||0;}
-					if (currVal!==value) {
-						o[writeField]=value;
+					if ( isNaN(value2) || typeof value2  === "undefined" ) {value2=defaultVal||0;}
+					if (forceUpdate || currVal!==value2) {
+						o[writeField]=value2;
 						setAttrs(o);					
 					}
 				});
 			} else {
-				if (currVal!==value) {
+				if ( forceUpdate ||  currVal!==value) {
 					o[writeField]=value;
 					setAttrs(o);
 				}				
@@ -11389,8 +11398,7 @@ var SWUtils = SWUtils || (function() {
 	setNumberFieldToRepeating = function (repeatingSection,val,fieldToUpdatePartialName,postPend) {
 		getSectionIDs("repeating_"+repeatingSection,function(ids){
 			for (id of ids) {
-				//separate function per row necessary because outer variables change rapidly
-				//either that or clone all parameters again inside getAttrs
+				//separate function per row necessary to clone params because outer variables change rapidly
 				updateRepeatingSectionNumberValue(repeatingSection,id,fieldToUpdatePartialName,val,postPend);
 			}
 		});
@@ -11418,11 +11426,12 @@ var SWUtils = SWUtils || (function() {
 	
     return {
 		 util:{  validNumericStr:validNumericStr
-				,updateRepeatingSectionNumberValue:updateRepeatingSectionNumberValue} 
+				} 
 		,searchAndReplaceFields:searchAndReplaceFields
 		,evaluateExpression:evaluateExpression
 		,evaluateAndSetString:evaluateAndSetString
 		,evaluateAndSetNumber:evaluateAndSetNumber
+		,updateRepeatingSectionNumberValue:updateRepeatingSectionNumberValue
 		,copyStaticNumberFieldToRepeating:copyStaticNumberFieldToRepeating
 		,setNumberFieldToRepeating:setNumberFieldToRepeating
     };
@@ -11448,7 +11457,8 @@ var PFSheet = PFSheet || (function(){
 	 * then it checks for  STR,DEX,CON,INT,WIS,CHA 
 	 */
 	findAbilityInString = function (fieldToFind) {
-		if (fieldToFind.indexOf("STR-mod") >= 0 ) {fieldToFind = "STR-mod";}
+		if (!fieldToFind) {fieldToFind="";}
+		else if (fieldToFind.indexOf("STR-mod") >= 0 ) {fieldToFind = "STR-mod";}
 		else if (fieldToFind.indexOf("DEX-mod") >= 0 ) {fieldToFind = "DEX-mod";}
 		else if (fieldToFind.indexOf("CON-mod") >= 0 ) {fieldToFind = "CON-mod";}
 		else if (fieldToFind.indexOf("INT-mod") >= 0 ) {fieldToFind = "INT-mod";}
@@ -11474,14 +11484,15 @@ var PFSheet = PFSheet || (function(){
 	 * @returns = a number indicating the multiplier for the ability mod
 	*/
 	findMultiplier = function (str) {
-		if (str.indexOf("1.5") >= 0) {str=1.5;}
-		else if (str.indexOf(".5") >= 0) {str=0.5;}
-		else if (str.indexOf("2") >= 0) {str=2;}
-		else if (str.indexOf("1/2") >= 0) {str=0.5;}
-		else if (str.indexOf("3/2") >= 0) {str=1.5;}
-		else if (str.indexOf("1 1/2") >= 0) {str=1.5;}
-		else { str=1;}
-		return str;
+		var retNum;
+		if (str.indexOf("1.5") >= 0) {retNum=1.5;}
+		else if (str.indexOf(".5") >= 0) {retNum=0.5;}
+		else if (str.indexOf("1/2") >= 0) {retNum=0.5;}
+		else if (str.indexOf("3/2") >= 0) {retNum=1.5;}
+		else if (str.indexOf("1 1/2") >= 0) {retNum=1.5;}
+		else if (str.indexOf("2") >= 0) {retNum=2;}
+		else { retNum=1;}
+		return retNum;
 	},
 
 	/* getDropdownVal
@@ -11499,16 +11510,20 @@ var PFSheet = PFSheet || (function(){
 			return;
 		}    
 		getAttrs([readField],function(values) {
-			var fieldToFind =values[readField];
+			//console.log("GGGGGGGGG getDropdownVal read " + readField);
+			//console.log(values);
+			var fieldToFind =values[readField],foundField;
 			//hardcoded 0 means "none"
 			if (fieldToFind==="0" || fieldToFind===0 ){
+				console.log("found 0");
 				callback(0);
 				return;
 			}
 			
-			fieldToFind = findAbilityInString(fieldToFind);
-			getAttrs([fieldToFind], function(v) {
-				var valueOf = parseInt(v[fieldToFind],10)||0;
+			foundField = findAbilityInString(fieldToFind);
+			//console.log("GGGGGGGGG getDropdownVal read " + readField + " field to find is " + foundField);
+			getAttrs([foundField], function(v) {
+				var valueOf = parseInt(v[foundField],10)||0;
 				callback(valueOf);
 			});
 		});	
@@ -11523,20 +11538,21 @@ var PFSheet = PFSheet || (function(){
 	 * @writeFields = An array of strings that are fields to write the value to
 	 */
 	handleDropdown = function (readField,writeFields) {
-    	//console.log("at handle Dropdown: read:"+readField+", write"+writeFields);
 		if ( !writeFields ) {
 			return;
 		}    
 		getDropdownVal(readField,function(valueOf){
-	
+			//console.log(writeFields);
 			getAttrs(writeFields,function(v){
 				var i, setany=0,setter = {};
 				for( i=0;i<writeFields.length;i++) {
+					//console.log("checking item "+i+", named "+writeFields[i] + ", value:" + v[writeFields[i]]);
 					if (v[writeFields[i]] !== valueOf) {
 						setter[writeFields[i]]=valueOf;
 						setany++;
 					}
 				}
+				//console.log("at handledropdown setting "+ writeFields[0] +" to " + valueOf );
 				if (setany) {setAttrs(setter);}
 			});
 		});
@@ -11644,7 +11660,7 @@ var PFSheet = PFSheet || (function(){
 					inputFlds[i] = buffFlds[i]+"_macro-text";
 				}
 				for (i=0;i<numFlds;i++){
-					SWUtils.evaluateAndSetNumber(inputFlds[i],buffFlds[i]);
+					SWUtils.evaluateAndSetNumber(inputFlds[i],buffFlds[i],true);
 				}
 			}
 		});
@@ -11808,9 +11824,9 @@ var PFSheet = PFSheet || (function(){
 					( parseFloat(v[col4Name],10)||0);
 			}
 			tot = parseInt(Math.floor(tot),10);
-			currTot = parseInt(v[totalColName],10)||0;
+			currTot = parseInt(v[totalColName],10);
 			//console.log("tot is "+tot+", currtot = "+currTot);
-			if ( tot!== currTot) {
+			if ( isNaN(currTot) ||  tot!== currTot) {
 				setter[totalColName]=tot;
 				setAttrs(setter);
 			}
@@ -11849,7 +11865,7 @@ var PFSheet = PFSheet || (function(){
 			"AC","Touch","Flat-Footed","CMD","FF-CMD","AC-ability","AC-armor","AC-shield",
 			"condition-Blinded","condition-Pinned","condition-Stunned","condition-Cowering"], function(v) {
 			//console.log("AAAAAAAAAAAAt update defenses");
-			console.log(v);
+			//console.log(v);
 			var setter={}, setAny =0,
 			    size= parseInt(v["size"],10)||0,
 				dodge =parseInt(v["AC-dodge"],10)||0,
@@ -11889,7 +11905,7 @@ var PFSheet = PFSheet || (function(){
 			}	
 
 			//lose Dex: you lose your bonus but are not flat footed
-			//Must be applied even if your bonus is something else:
+			//Must be applied even if your bonus is not dex :
 			//http://paizo.com/paizo/faq/v5748nruor1fm#v5748eaic9qdi
 			if (cowering || blinded || stunned) {
 				loseDex= 1;
@@ -12182,24 +12198,44 @@ var PFSheet = PFSheet || (function(){
 	* better to split this into two
 	*/
 	updateRepeatingWeaponDamageAbility=function() {
-		 getAttrs(["repeating_weapon_damage-ability","repeating_weapon_damage-ability-mod"],function(v) {
-			var abilityType=v["repeating_weapon_damage-ability"];
-			var tolookfor= findAbilityInString (abilityType);
+		updateRepeatingWeaponDamageAbility(null);
+	},
+	updateRepeatingWeaponDamageAbility=function(id) {
+		var readField,writeField,idStr="";
+		if (id) {idStr=id + "_";}
+		readField="repeating_weapon_"+idStr+"damage-ability";
+		writeField= readField+"-mod";
+
+		getAttrs([readField,writeField],function(v) {
+			var abilityType,tolookfor;
+			abilityType=v[readField];
+			tolookfor= findAbilityInString (abilityType);
 			getAttrs([tolookfor],function(v2){
 				var mult = findMultiplier(abilityType);
 				var mod = parseInt(v2[tolookfor],10)||0;
-				var tohitmod = mod * mult;
-				var currentmod = parseInt( v["repeating_weapon_attack-type-mod"],10)||0;
+				var tohitmod = Math.floor(mod * mult);
+				var currentmod = parseInt( v[writeField],10)||0;
+				var setter={};
+				//console.log("DDDDDDDDDDD AT updateRepeatingWeaponDamageAbility updating "+writeField+" to " + tohitmod);
 				if ( tohitmod !== currentmod) {
-					setAttrs({"repeating_weapon_damage-ability-mod":tohitmod});
+					setter[writeField]=tohitmod;
+					setAttrs(setter);
 				}
 			});
 		 });
 	},
 
-
-
 	updateRepeatingWeapon=function() {
+		updateRepeatingWeapon(null);
+	},
+
+	updateRepeatingWeapon=function(id) {
+		var idStr="";
+		if (id) {
+			idStr=id+"_";
+			return; //not ready yet
+		}
+		//console.log("WWWWWWWWWWWWWWWWWWWWWWWWWWWW at updateRepeatingWeapon enhance is repeating_weapon_" + idStr + "enhance"  );
 	   getAttrs([
 			"repeating_weapon_enhance","repeating_weapon_masterwork","repeating_weapon_proficiency",
 			"repeating_weapon_damage-ability-mod","repeating_weapon_attack-type-mod",
@@ -12218,8 +12254,8 @@ var PFSheet = PFSheet || (function(){
 			var masterwork=parseInt(v.repeating_weapon_masterwork,10)||0;
 			var proficient=parseInt(v.repeating_weapon_proficiency,10)||0;
 			var abilityMod=parseInt(v["repeating_weapon_damage-ability-mod"],10)||0;
-			var currentATTKmod=parseInt(v["repeating_weapon_total-attack"],10)||0;
-			var currentDMGmod=parseInt(v["repeating_weapon_total-damage"],10)||0;
+			var currentATTKmod=parseInt(v["repeating_weapon_total-attack"],10);
+			var currentDMGmod=parseInt(v["repeating_weapon_total-damage"],10);
 
 
 			var attackOther=parseInt(v["repeating_weapon_attk-effect-total-copy"],10)||0;
@@ -12228,17 +12264,17 @@ var PFSheet = PFSheet || (function(){
 			var damageMod=parseInt(v["repeating_weapon_damage-mod"],10)||0;
 			var attackMod=parseInt(v["repeating_weapon_attack-mod"],10)||0;
 
-			var tohit = basetohit + Math.max(enhance,masterwork) + attackMod + proficient + attackOther ;
-			var dmg = abilityMod + damageMod + damageOther + dmgBuff + enhance;
+			var tohit = Math.floor(basetohit + Math.max(enhance,masterwork) + attackMod + proficient + attackOther) ;
+			var dmg = Math.floor(abilityMod + damageMod + damageOther + dmgBuff + enhance);
 			//console.log("base:"+basetohit+", mwk:"+masterwork+", prof:"+proficient+", enh:"+enhance+", att o: " + attackOther+", dmg o:"+damageOther +", buff:" + dmgBuff + ",buffrep:"+ dmgBuffRepeat+", atmod:" + attackMod +", dmod:"+damageMod);;
 			//console.log("new hit is "+tohit + "new dmg is " +dmg);
 			//console.log ("oldhit: "+currentATTKmod+", olddmg:"+currentDMGmod);
 			
 			var setter={};
-			var set=0;
-			if ( tohit !== currentATTKmod) {  setter["repeating_weapon_total-attack"] = tohit; set=1;  }
-			if (dmg !== currentDMGmod)  {  setter["repeating_weapon_total-damage"] = dmg;   set=1; }
-			if (set) { setAttrs(setter); }
+			var setAny=0;
+			if (isNaN(currentATTKmod) || tohit !== currentATTKmod) {  setter["repeating_weapon_total-attack"] = tohit; setAny=1;  }
+			if (isNaN(currentDMGmod) || dmg !== currentDMGmod)  {  setter["repeating_weapon_total-damage"] = dmg;   setAny=1; }
+			if (setAny) { setAttrs(setter); }
 		});
 	},
 
@@ -12253,8 +12289,8 @@ var PFSheet = PFSheet || (function(){
 				currhp=parseInt(v["NPC-HP"],10)||0,
 				updatehp=parseInt(v.sync_npc_pc_hp,10)||0,
 				setter={},setAny=0;
-			console.log("HHHHHHHHHHHHHHHHHHHHHHHHH updateNPCHP, hp:"+hp+", maxhp:"+maxhp);
-			console.log(v);
+			//console.log("HHHHHHHHHHHHHHHHHHHHHHHHH updateNPCHP, hp:"+hp+", maxhp:"+maxhp);
+			//console.log(v);
 			if (hp !== maxhp) {
 				setter["NPC-HP_max"]=hp;
 				if (updatehp) {	setter["HP"]=hp; }
@@ -12380,6 +12416,48 @@ var PFSheet = PFSheet || (function(){
 			setAttrs({ size_display:size, size_skill:skillSize, "CMD-size":cmbsize, size_skill_double:doubleSkill});
 		});
 	},
+	
+	/* recalculateRepeatingWeapons
+	* For every on("change:xxxx") that modifies repeating weapons, make sure to 
+	* also call this, which loops through every row and calls the same eventhandlers but
+	* using the row ids.
+	*
+	*	copyStaticNumberFieldToRepeating("weapon","attk-effect-total");
+	*	copyStaticNumberFieldToRepeating("weapon","dmg-effect-total");
+	*	copyStaticNumberFieldToRepeating("weapon","buff_DMG-total");
+	* 	SWUtils.evaluateAndSetNumber("repeating_weapon_damage","repeating_weapon_damage-mod");
+	*	SWUtils.evaluateAndSetNumber("repeating_weapon_attack","repeating_weapon_attack-mod");
+	*	PFSheet.handleDropdown("repeating_weapon_attack-type",["repeating_weapon_attack-type-mod"]);	
+	*	PFSheet.updateRepeatingWeaponDamageAbility();   
+	*	PFSheet.updateRepeatingWeapon();	
+	*/
+	recalculateRepeatingWeapons = function() {
+		getAttrs(["attk-effect-total","dmg-effect-total","buff_DMG-total"],function(v){
+			getSectionIDs("repeating_weapon",function(ids){
+				var id, readField;
+				for (id of ids) {
+					//console.log("WWWWWWWWWWWWWWWwwww at recalculateRepeatingWeapons "+id);
+					readField= "repeating_weapon_" +id+"_" ;
+					SWUtils.updateRepeatingSectionNumberValue("repeating_weapon",id,"attk-effect-total",(parseInt(v["attk-effect-total"],10)||0),"-copy");
+					SWUtils.updateRepeatingSectionNumberValue("repeating_weapon",id,"dmg-effect-total",(parseInt(v["dmg-effect-total"],10)||0),"-copy");
+					SWUtils.updateRepeatingSectionNumberValue("repeating_weapon",id,"buff_DMG-total",(parseInt(v["buff_DMG-total"],10)||0),"-copy");
+					SWUtils.evaluateAndSetNumber(readField+"damage",readField+"damage-mod");
+					SWUtils.evaluateAndSetNumber(readField+"attack",readField+"attack-mod");
+					handleRepeatingDropdown(id,"weapon","attack-type","attack-type-mod");
+					//handleDropdown(readField+"attack-type",readField+"attack-type-mod");
+					updateRepeatingWeaponDamageAbility(id);
+					//updateRepeatingWeapon(id);
+				}
+			});
+		});
+	},
+	handleRepeatingDropdown= function (id,section,readField,writeField){
+		//console.log("HHHHHHHHHHH handleRepeatingDropdown reading " + id + " and field " + readField);
+		getDropdownVal("repeating_"+section +"_" +  id + "_"+ readField,function(valueOf) {
+			//console.log("HHHHHHHHH receieved " + valueOf+"  writing to "+ writeField);
+			SWUtils.updateRepeatingSectionNumberValue("weapon",id,writeField,valueOf,"");
+		});		
+	},
 	recalculateAllBuffs = function() {
 		setAttrs({
 				"buff_Melee-total":0,
@@ -12397,6 +12475,7 @@ var PFSheet = PFSheet || (function(){
 				"buff_WIS-total":0,
 				"buff_CHA-total":0
 		});
+		//not synchronous, but by the time these run the sets above should have run
 		updateBuffRow("1");
 		updateBuffRow("2");
 		updateBuffRow("3");
@@ -12478,10 +12557,11 @@ var PFSheet = PFSheet || (function(){
 		updateAttack("melee");
 		updateAttack("ranged");
 		updateAttack("CMB");
+		//copyStaticNumberFieldToRepeating("weapon","attk-effect-total");
+		//copyStaticNumberFieldToRepeating("weapon","dmg-effect-total");
+		//copyStaticNumberFieldToRepeating("weapon","buff_DMG-total");
+		recalculateRepeatingWeapons();
 		updateMaxSkills();
-		copyStaticNumberFieldToRepeating("weapon","attk-effect-total");
-		copyStaticNumberFieldToRepeating("weapon","dmg-effect-total");
-		copyStaticNumberFieldToRepeating("weapon","buff_DMG-total");
 		SWUtils.evaluateAndSetNumber("Max-Skill-Ranks-Misc","Max-Skill-Ranks-mod");
 		if (version===.1) {
 			getAttrs(["Stealth","Fly","Acrobatics"],function(v){
@@ -12534,7 +12614,8 @@ var PFSheet = PFSheet || (function(){
 	return {
 		util:{findAbilityInString:findAbilityInString,
 			findMultiplier:findMultiplier,
-			getDropdownVal:getDropdownVal
+			getDropdownVal:getDropdownVal,
+			recalculateAllBuffs:recalculateAllBuffs
 			},
 	    version:version,
 		copyStaticNumberFieldToRepeating:copyStaticNumberFieldToRepeating,
