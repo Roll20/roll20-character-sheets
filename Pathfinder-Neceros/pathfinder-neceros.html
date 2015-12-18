@@ -8406,6 +8406,7 @@
 					<span class="sheet-table-data sheet-center" style="vertical-align:middle;font-size:150%;"><b>+</b><br>&nbsp;</span>
 					<span class="sheet-table-data sheet-center sheet-small-label"><input type="number" title="@{buff_HP-temp-total}" name="attr_buff_HP-temp-total" value="0"  class="sheet-calc" /><br>Buffs</span>	
 					<span class="sheet-table-data sheet-center" style="width:5%;vertical-align:middle;font-size:150%;"><br>&nbsp;</span>
+
 					<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" title="@{non-lethal-damage}" name="attr_non-lethal-damage" value="0"  min="0" /><br>NL</span>
                 </div>
             </div>
@@ -9641,7 +9642,10 @@
 		<span class="sheet-table-name">Pathfinder Unchained</span>
             <div class="sheet-table-row">
 				<span class="sheet-table-data sheet-left"><label><span title="Use the Unchained Skills variants."><input type="checkbox" title="@{unchained_skills-show}" name="attr_unchained_skills-show" value="1" /> Display Unchained Skills</span></label></span>
-                <span class="sheet-table-data sheet-left"><label><span title="Background skills ranks are awarded at a rate of two per level and can be spent on any background skill."><input type="checkbox" title="@{BG-Skill-Use}" name="attr_BG-Skill-Use" value="1" /> Enable Background Skills.</span></label></span>
+                <span class="sheet-table-data sheet-left"><label>
+					<span title="Consolidated skills ranks are awarded at 1/2 normal skill points."><input type="radio" title="@{BG-Skill-Use}" name="attr_BG-Skill-Use" value="0" /> Enable Consolidated Skills.</span><br/>
+					<span title="Background skills ranks are awarded at a rate of two per level and can be spent on any background skill."><input type="radio" title="@{BG-Skill-Use}" name="attr_BG-Skill-Use" value="1" /> Enable Background Skills.</span>
+				</label></span>
                 <span class="sheet-table-data sheet-left"><label><span title="Any number of adventure skill ranks can be traded for an equal number of background skill ranks."><input type="number" title="@{adventure-skills-traded}" name="attr_adventure-skills-traded" value="0"  min="0" style="width:2.85em";/> Trade Adventure ranks for Background ranks.</span></label></span>
 				<span class="sheet-table-data sheet-left"><label><span title="In the wound thresholds variant, a character divides her hit point total into four quarters, and takes penalties whenever she's not in her top quarter."><input type="checkbox" title="@{wound_threshold-show}" name="attr_wound_threshold-show" value="1" /> Display Wound Thresholds.</span></label></span>
 			</div>
@@ -12270,7 +12274,7 @@ var PFSheet = PFSheet || (function(){
 	*/
 	updateMaxSkills = function() {
 		getAttrs(["total-skill","total-fcskill","INT-mod","level","Max-Skill-Ranks-mod","Max-Skill-Ranks",
-			"unchained_skills-show","BG-Skills-Use"],function(v){
+			"unchained_skills-show","BG-Skill-Use"],function(v){
 			var intMod = parseInt(v["INT-mod"],10)||0,
 				classSkills=parseInt(v["total-skill"],10)||0,
 				level=parseInt(v.level,10)||0,
@@ -12281,7 +12285,7 @@ var PFSheet = PFSheet || (function(){
 				setter={},setAny=0;
 			totIntMod=intMod * level;
 			classPlusInt = classSkills + totIntMod;
-			if (v["unchained_skills-show"]=="1" && (!v["BG-Skills-Use"] || v["BG-Skills-Use"]=="0")) {
+			if (v["unchained_skills-show"]=="1" && (!v["BG-Skill-Use"] || v["BG-Skill-Use"]=="0")) {
 				classPlusInt = Math.floor(classPlusInt / 2);
 			}
 			if (classPlusInt < level ) {classPlusInt = level;}
@@ -12474,6 +12478,7 @@ var PFSheet = PFSheet || (function(){
 		updateAttack("melee");
 		updateAttack("ranged");
 		updateAttack("CMB");
+		updateMaxSkills();
 		copyStaticNumberFieldToRepeating("weapon","attk-effect-total");
 		copyStaticNumberFieldToRepeating("weapon","dmg-effect-total");
 		copyStaticNumberFieldToRepeating("weapon","buff_DMG-total");
@@ -12854,7 +12859,7 @@ on("change:buff_dmg-total",function(){PFSheet.copyStaticNumberFieldToRepeating("
 
 
 //skills
-on("change:total-skill change:total-fcskill change:int-mod change:level change:max-skill-ranks-mod change:class-0-level change:class-1-level change:class-2-level change:class-3-level change:class-4-level change:unchained_skills-show change:BG-Skills-Use",function() { PFSheet.updateMaxSkills(); });
+on("change:total-skill change:total-fcskill change:int-mod change:level change:max-skill-ranks-mod change:class-0-level change:class-1-level change:class-2-level change:class-3-level change:class-4-level change:unchained_skills-show change:BG-Skill-Use",function() { PFSheet.updateMaxSkills(); });
 on("change:max-skill-ranks-misc",function(){SWUtils.evaluateAndSetNumber("Max-Skill-Ranks-Misc","Max-Skill-Ranks-mod");});
 
 // on("change:acrobatics-ability",function(){PFSheet.handleDropdown("Acrobatics-ability",["Acrobatics-ability-mod"]);});
