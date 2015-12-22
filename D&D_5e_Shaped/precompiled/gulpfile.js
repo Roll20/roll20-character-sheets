@@ -9,23 +9,22 @@ var sass = require('gulp-sass');
 var replace = require('gulp-replace-task');
 var rename = require('gulp-rename');
 var wrap = require('gulp-wrap');
-var md5 = require('md5');
 var change = require('gulp-change');
 
-var customSkillCount = 4,
-	traitsCount = 1,
-	actionCount = 12,
-	lairActionCount = 4,
-	legendaryActionCount = 4,
-	meleeCount = 7,
-	rangedCount = 4,
-	quickClassActions = 5,
-	classActionsPerPage = 10,
-	customClassCount = 6,
-	spellCount = 10,
-	armorCount = 6,
-	inventoryPerPage = 20,
-	abilitiesName = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'];
+var customSkillCount = 4;
+var traitsCount = 1;
+var actionCount = 12;
+var lairActionCount = 4;
+var legendaryActionCount = 4;
+var meleeCount = 7;
+var rangedCount = 4;
+var quickClassActions = 5;
+var classActionsPerPage = 10;
+var customClassCount = 6;
+var spellCount = 10;
+var armorCount = 6;
+var inventoryPerPage = 20;
+var abilitiesName = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'];
 
 String.prototype.capitalize = function () {
 	return this.replace(/\w\S*/g, function (txt) {
@@ -37,8 +36,8 @@ String.prototype.lowercase = function () {
 };
 
 function actionsCompile(file, limit, action_type, action_name) {
-	var template = file.contents.toString('utf8'),
-		s = [];
+	var template = file.contents.toString('utf8');
+	var s = [];
 	for (var i = 0; i < limit; i++) {
 		s.push(template
 				.replace(/\x7B\x7Baction_type\x7D\x7D/g, action_type)
@@ -91,8 +90,8 @@ function spell(file, limit, start) {
 	return s.join('\n\n');
 }
 function duplicate(file, limit, start) {
-	var template = file.contents.toString('utf8'),
-		s = [];
+	var template = file.contents.toString('utf8');
+	var s = [];
 
 	if (!start) {
 		start = 0;
@@ -108,9 +107,9 @@ function duplicate(file, limit, start) {
 	return s.join('\n\n');
 }
 function skills(file) {
-	var template = file.contents.toString('utf8'),
-		skillsJson = require('./components/skills/skills.json').skills,
-		skills = [];
+	var template = file.contents.toString('utf8');
+	var skillsJson = require('./components/skills/skills.json').skills;
+	var skills = [];
 
 	var selectedString = ' selected="selected"';
 
@@ -163,8 +162,8 @@ function skills(file) {
 }
 
 function saveQuery(file) {
-	var template = file.contents.toString('utf8'),
-		query = '';
+	var template = file.contents.toString('utf8');
+	var query = '';
 
 	for (var i = 0; i < abilitiesName.length; ++i) {
 		var ability = abilitiesName[i];
@@ -178,9 +177,9 @@ function saveQuery(file) {
 }
 
 function checkQuery(file) {
-	var template = file.contents.toString('utf8'),
-		skillsJson = require('./components/skills/skills.json').skills,
-		query = '';
+	var template = file.contents.toString('utf8');
+	var skillsJson = require('./components/skills/skills.json').skills;
+	var query = '';
 
 	skillsJson.forEach(function (skill) {
 		var skillName = skill.name.lowercase().replace(/ +/g, '');
@@ -202,8 +201,8 @@ function checkQuery(file) {
 }
 
 function meleeQuery(file) {
-	var template = file.contents.toString('utf8'),
-		query = '';
+	var template = file.contents.toString('utf8');
+	var query = '';
 
 	for (var i = 0; i < meleeCount; ++i) {
 		var weaponName = '@{repeating_weapons_melee_' + i + '_name}';
@@ -228,11 +227,11 @@ function ordinal(d) {
 	}
 }
 function processDate() {
-	var dt = new Date(),
-		months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-		month = dt.getMonth(),
-		date = dt.getDate(),
-		year = dt.getFullYear();
+	var dt = new Date();
+	var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+	var month = dt.getMonth();
+	var date = dt.getDate();
+	var year = dt.getFullYear();
 
 	return date + ordinal(date) + ' ' + months[month] + ' ' + year;
 }
@@ -425,7 +424,6 @@ gulp.task('minify-css', ['sass'], function () {
 		.pipe(minifyCss())
 		.pipe(gulp.dest('../'));
 });
-
 
 gulp.task('compile', ['preCompile', 'minify-css'], function () {
 	return gulp.src(['../D&D_5e.html', './pages/roll_template.html'])
