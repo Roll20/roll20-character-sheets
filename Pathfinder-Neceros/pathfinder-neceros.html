@@ -1517,8 +1517,7 @@
                 <span class="sheet-table-data sheet-center">
                     <select title="@{max-dex-source}" name="attr_max-dex-source">
                         <option value="9999" selected>&#8226;None</option>
-                        <option value="(@{armor-max-dex} + @{armor2-max-dex})">Armor</option>
-                        <option value="(@{shield-max-dex} + @{shield2-max-dex})">Shield</option>
+                        <option value="(@{armor-max-dex} + @{armor2-max-dex})">Armor & Shield</option>
                         <option value="3">Medium Load</option>
                         <option value="1">Heavy Load</option>
                     </select>                   
@@ -11798,11 +11797,14 @@ var PFSheet = PFSheet || (function(){
 		 "shield2-equipped", "shield2-acbonus", "shield2-max-dex", "shield2-acp", "shield2-spell-fail", "shield2-proficiency",
 		 "armor-equipped", "armor-acbonus", "armor-max-dex", "armor-acp", "armor-spell-fail", "armor-proficiency",
 		 "armor2-equipped", "armor2-acbonus", "armor2-max-dex", "armor2-acp", "armor2-spell-fail", "armor2-proficiency",
-		 "acp","max-dex","AC-armor","AC-shield","spell-fail","acp-attack-mod" ], function(v)    {
+		 "acp","max-dex","AC-armor","AC-shield","spell-fail","acp-attack-mod",
+		 "max-dex-source","acp-source"], function(v)    {
 		 //console.log(v);
 		 var acp=0,maxDex=99,acA=0,acS=0,sp=0,atk=0;
 		 var subAC,subD,subAcp,nonProf,subsp;
 		 var currACP,currMaxDex,currACArmor,currACShield,currSpellFail,currAtkMod;
+		 var maxDexDropdown=parseInt(v["max-dex-source"],10);
+		 var acpDropdown  = parseInt(v["acp-source"],10)
 		 var setAny=0, setter={};
 
 		 if (v["armor-equipped"]=="1" ) {
@@ -11854,10 +11856,21 @@ var PFSheet = PFSheet || (function(){
 			 sp+=subsp;
 			 if(nonProf) {atk+=subAcp;}
 		 }
+		 //if not using armor and shield then use value in the dropdown 
+		 //armor and shield are not a number
+		 if (!isNaN(maxDexDropdown)) {
+			 maxDex = maxDexDropdown;
+			 if (maxDex===9999) { maxDex =99;}
+		 }
+		 if (!isNaN(acpDropdown)) {
+			 acp = acpDropdown;
+		 }
 		 
 		 currACP=parseInt(v.acp,10)||0;
-		 currMaxDex=parseInt(v["max-dex"],10);
-		 currMaxDex=isNaN(currMaxDex)?99:currMaxDex;//cannot do "||0" since 0 is valid but falsy
+		 currMaxDex=parseInt(v["max-dex"],10);//cannot do "||0" since 0 is valid but falsy
+
+		 currMaxDex=isNaN(currMaxDex)?99:currMaxDex;
+		 
 		 //using -1 forces update
 		 currACArmor=parseInt(v["AC-armor"],10)||-1;
 		 currACShield=parseInt(v["AC-shield"],10)||-1;
@@ -13197,7 +13210,7 @@ on("change:saves-cond change:total-will change:will-ability-mod change:will-trai
 //defenses
 on("change:condition-stunned change:condition-flat-footed change:ac-ability-mod change:ff-dex change:ac-penalty change:size change:ac-dodge change:ac-natural change:ac-deflect change:ac-misc change:ac-shield change:ac-armor change:buff_ac-total change:cmd-dex change:ff-cmd-dex change:cmd-str change:cmd-misc change:bab change:max-dex",function() {
     PFSheet.updateDefenses(); });
-on("change:shield-equipped change:shield-acbonus change:shield-max-dex change:shield-acp change:shield-spell-fail change:shield-proficiency change:shield2-equipped change:shield2-acbonus change:shield2-max-dex change:shield2-acp change:shield2-spell-fail change:shield2-proficiency change:armor-equipped change:armor-acbonus change:armor-max-dex change:armor-acp change:armor-spell-fail change:armor-proficiency change:armor2-equipped change:armor2-acbonus change:armor2-max-dex change:armor2-acp change:armor2-spell-fail change:armor2-proficiency",function(){
+on("change:shield-equipped change:shield-acbonus change:shield-max-dex change:shield-acp change:shield-spell-fail change:shield-proficiency change:shield2-equipped change:shield2-acbonus change:shield2-max-dex change:shield2-acp change:shield2-spell-fail change:shield2-proficiency change:armor-equipped change:armor-acbonus change:armor-max-dex change:armor-acp change:armor-spell-fail change:armor-proficiency change:armor2-equipped change:armor2-acbonus change:armor2-max-dex change:armor2-acp change:armor2-spell-fail change:armor2-proficiency change:max-dex-source change:acp-source",function(){   
     PFSheet.updateArmor(); });
 
 //attacks
