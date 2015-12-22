@@ -1134,6 +1134,20 @@
                 <span class="sheet-table-data sheet-center"><input title="@{class-4-level}" type="number" name="attr_class-4-level" value="0" /></span>
             </div>
             <div class="sheet-table-row">
+                <span class="sheet-table-data sheet-center"><b>5.</b></span>
+                <span class="sheet-table-data sheet-center"><input title="@{class-5-hp}" type="number" name="attr_class-5-hp" value="0" /></span>
+                <span class="sheet-table-data sheet-center"><input title="@{class-5-fchp}" type="number" name="attr_class-5-fchp" value="0" /></span>
+                <span class="sheet-table-data sheet-center"><input title="@{class-5-name}" type="text" name="attr_class-5-name" placeholder="Class Name"></span>
+                <span class="sheet-table-data sheet-center"><input title="@{class-5-bab}" type="number" name="attr_class-5-bab" value="0" /></span>
+                <span class="sheet-table-data sheet-center"><input title="@{class-5-skill}" type="number" name="attr_class-5-skill" value="0" /></span>
+                <span class="sheet-table-data sheet-center"><input title="@{class-5-fcskill}" type="number" name="attr_class-5-fcskill" value="0" /></span>
+				<span class="sheet-table-data sheet-center"><input title="@{class-5-fcalt}" type="number" name="attr_class-5-fcalt" value="0" /></span>
+                <span class="sheet-table-data sheet-center"><input title="@{class-5-Fort}" type="number" name="attr_class-5-Fort" value="0" /></span>
+                <span class="sheet-table-data sheet-center"><input title="@{class-5-Ref}" type="number" name="attr_class-5-Ref" value="0" /></span>
+                <span class="sheet-table-data sheet-center"><input title="@{class-5-Will}" type="number" name="attr_class-5-Will" value="0" /></span>
+                <span class="sheet-table-data sheet-center"><input title="@{class-5-level}" type="number" name="attr_class-5-level" value="0" /></span>
+            </div>
+            <div class="sheet-table-row">
                 <span class="sheet-table-data sheet-center"><b>Totals</b></span>
                 <span class="sheet-table-data sheet-center"><input title="@{total-hp}" type="number" name="attr_total-hp" value="0" class="sheet-calc" readonly="readonly" /></span>
                 <span class="sheet-table-data sheet-center sheet-label" title="Favored Class(es)">FC:</span>
@@ -10004,6 +10018,7 @@
 </rolltemplate>
 </div>
 
+
 <script type="text/worker">
 // var getSectionIDs=function(){};
 // var getAttrs=function(){};
@@ -11382,19 +11397,21 @@ var PFSheet = PFSheet || (function(){
 	 * @ability {string} 3 letter abbreviation for one of the 6 ability scores.
 	 */
 	updateAbility = function(ability) {
-		getAttrs([ability+"-base",ability+"-enhance",ability+"-misc",ability+"-damage",ability+"-penalty",ability+"-drain","buff_"+ability+"-total",
-			"condition-Unconscious","condition-Fatigued","condition-Entangled","condition-Grappled","condition-Pinned","condition-Cowering",
-			"condition-Blinded","FF-ability",
-			ability, ability+"-mod", ability+"-cond"], function (values){
+		var readFields=[ability+"-base",ability+"-enhance",ability+"-misc",ability+"-damage",ability+"-penalty",ability+"-drain",ability, ability+"-mod", ability+"-cond","buff_"+ability+"-total","FF-ability"];
+		if (ability ==="STR" ){
+			readFields=readFields.concat(["condition-Fatigued"]);
+		} else if (ability == "DEX"){
+			readFields=readFields.concat(["condition-Fatigued","condition-Entangled","condition-Grappled","condition-Pinned","condition-Cowering"]);//,"condition-Cowering"]);
+		}
+		getAttrs(readFields, function (values){
 			var base = (parseInt(values[ability+"-base"],10)||0) + 
 					(parseInt(values[ability+"-enhance"],10)||0) + 
 					(parseInt(values[ability+"-misc"],10)||0) + 
 					(parseInt(values["buff_"+ability+"-total"],10)||0) + 
 					(parseInt(values[ability+"-drain"],10)||0),
-				condUncon=values["condition-Unconscious"],
 				dmg =  parseInt(values[ability+"-damage"],10)||0,
 				pen =  parseInt(values[ability+"-penalty"],10)||0,
-				cond=0, condMod=0, changedUncon=0,
+				cond=0, condMod=0, 
 				newbase,mod,dmgMod,penMod;
 			newbase=base;
 			dmgMod = -1 * Math.floor(Math.abs(dmg)/2);
@@ -11405,7 +11422,9 @@ var PFSheet = PFSheet || (function(){
 					   (parseInt(values["condition-Entangled"],10)||0) + 
 					   (parseInt(values["condition-Grappled"],10)||0) );			
 					cond = condMod * 2;
-					if (((( values["FF-ability"]=="0" && parseInt(values["condition-Cowering"])||0)) || ( parseInt(values["condition-Pinned"])||0)) && base > 10 ){
+					//do cower and pin remove DEX always, or just to AC?
+					if (( values["condition-Cowering"] !== "0" || values["condition-Pinned"]!== "0") && base > 10 ){
+					//if (values["condition-Pinned"]!== "0" && base > 10 ){	
 						newbase = 10;
 					}
 					break;
@@ -11416,10 +11435,7 @@ var PFSheet = PFSheet || (function(){
 			}
 
 			mod = Math.floor((newbase -10)/2) + dmgMod + penMod +condMod;
-			if ((base + dmg) <= 0 && condUncon == "0") {
-				condUncon = "1";
-				changedUncon=1;
-			} 
+
 			//use 99 (never happen) to make sure we update if there's a problem
 			var currAbility=parseInt(values[ability],10)||99; 
 			var currMod = parseInt(values[ability+"-mod"],10)||99;
@@ -11429,8 +11445,7 @@ var PFSheet = PFSheet || (function(){
 			//console.log(ability +"update: base:" + base + ",dmg:" + dmg +  ",dmgMod"+dmgMod+ ",condMod:" + condMod + ",mod:"+mod+",currCond:"+currCond+", new cond:"+cond);
 			if (currAbility !== base){setter[ability]=base;numset++;}
 			if (currMod !== mod){setter[ability+"-mod"]=mod;numset++;}
-			if (changedUncon ){setter["condition-Unconscious"]=condUncon;numset++;}
-			if (currCond !== cond){setter[ability+"-cond"]=cond;numset++; }
+
 			if (numset){setAttrs(setter);}
 		});
 	},
@@ -11595,8 +11610,8 @@ var PFSheet = PFSheet || (function(){
 		if (!col ) { return; }
 		if (col==="fchp") { col="hp";}
 		var getFields=[],totalColName,
-			col0Name="class-0-"+col, col1Name="class-1-"+col, col2Name="class-2-"+col, col3Name="class-3-"+col,col4Name="class-4-"+col,
-			col0NameTwo,col1NameTwo,col2NameTwo,col3NameTwo,col4NameTwo;
+			col0Name="class-0-"+col, col1Name="class-1-"+col, col2Name="class-2-"+col, col3Name="class-3-"+col,col4Name="class-4-"+col,col5Name="class-5-"+col,
+			col0NameTwo,col1NameTwo,col2NameTwo,col3NameTwo,col4NameTwo,col5NameTwo;
 		totalColName=(col === "bab" || col === "level")?col:"total-"+col;
 		getFields=[col0Name,col1Name,col2Name,col3Name,col4Name,totalColName];
 		if (col === "skill" ) {
@@ -11605,7 +11620,8 @@ var PFSheet = PFSheet || (function(){
 			col2NameTwo="class-2-level";
 			col3NameTwo="class-3-level";
 			col4NameTwo="class-4-level";
-			getFields=getFields.concat([col0NameTwo,col1NameTwo,col2NameTwo,col3NameTwo,col4NameTwo]);			
+			col5NameTwo="class-5-level";
+			getFields=getFields.concat([col0NameTwo,col1NameTwo,col2NameTwo,col3NameTwo,col4NameTwo,col5NameTwo]);			
 		}
 		if ( col === "hp"  ){
 			col0NameTwo="class-0-fc"+col;
@@ -11613,7 +11629,8 @@ var PFSheet = PFSheet || (function(){
 			col2NameTwo="class-2-fc"+col;
 			col3NameTwo="class-3-fc"+col;
 			col4NameTwo="class-4-fc"+col;		
-			getFields=getFields.concat([col0NameTwo,col1NameTwo,col2NameTwo,col3NameTwo,col4NameTwo]);
+			col5NameTwo="class-5-fc"+col;		
+			getFields=getFields.concat([col0NameTwo,col1NameTwo,col2NameTwo,col3NameTwo,col4NameTwo,col5NameTwo]);
 		}
 		//console.log(getFields);
 		getAttrs(getFields,function(v){
@@ -11625,20 +11642,23 @@ var PFSheet = PFSheet || (function(){
 							( parseFloat(v[col1Name],10)||0)*( parseFloat(v[col1NameTwo],10)||0) +
 							( parseFloat(v[col2Name],10)||0)*( parseFloat(v[col2NameTwo],10)||0) +
 							( parseFloat(v[col3Name],10)||0)*( parseFloat(v[col3NameTwo],10)||0) +
-							( parseFloat(v[col4Name],10)||0)* ( parseFloat(v[col4NameTwo],10)||0)  ;
+							( parseFloat(v[col4Name],10)||0)* ( parseFloat(v[col4NameTwo],10)||0)+
+							( parseFloat(v[col5Name],10)||0)* ( parseFloat(v[col5NameTwo],10)||0)  ;
 					break;
 				case 'hp':
 					tot = (parseFloat(v[col0NameTwo],10)||0)+
 						( parseFloat(v[col1NameTwo],10)||0)+
 						( parseFloat(v[col2NameTwo],10)||0)+
 						( parseFloat(v[col3NameTwo],10)||0)+
-						( parseFloat(v[col4NameTwo],10)||0);
+						( parseFloat(v[col4NameTwo],10)||0)+
+						( parseFloat(v[col5NameTwo],10)||0);
 				default:
 					tot += ( parseFloat(v[col0Name],10)||0)+
 					( parseFloat(v[col1Name],10)||0)+
 					( parseFloat(v[col2Name],10)||0)+
 					( parseFloat(v[col3Name],10)||0)+
-					( parseFloat(v[col4Name],10)||0);
+					( parseFloat(v[col4Name],10)||0)+
+					( parseFloat(v[col5Name],10)||0);
 			}
 			tot = parseInt(Math.floor(tot),10);
 			currTot = parseInt(v[totalColName],10);
@@ -11715,7 +11735,7 @@ var PFSheet = PFSheet || (function(){
 
 			maxDex=isNaN(maxDex)?99:maxDex; //cannot do "||0" since 0 is valid but falsy
 
-			if ( findAbilityInString(v["AC-ability"]) == "DEX-mod" && maxDex < 99 && maxDex >=0 )
+			if ( findAbilityInString(v["AC-ability"]) === "DEX-mod" && maxDex < 99 && maxDex >=0 )
 			{
 				ability = Math.min(ability,maxDex);
 				ffAbility = Math.min(ffAbility,maxDex);
@@ -11724,21 +11744,23 @@ var PFSheet = PFSheet || (function(){
 			//lose Dex: you lose your bonus but are not flat footed
 			//Must be applied even if your bonus is not dex :
 			//http://paizo.com/paizo/faq/v5748nruor1fm#v5748eaic9qdi
-			if (cowering || blinded || stunned) {
+
+			//blinded: uncanny dodge does not lose dex
+			if ( blinded) {
 				loseDex= 1;
 				ability = ffAbility;
 				cmdAbility2=cmdFFAbility2;
-			}
+			} 
 
-			//Uncanny dodge still loses dex if immobilized	
-			//pinned, paralyzed, helpless. tough paralyzed helpless are 0 so ignore.
-			if (pinned) {
+			//Uncanny dodge still loses dex in these conditions:	
+			if (pinned||cowering|| stunned) {
 				loseDex=1;
 				ffAbility=Math.max(0,ffAbility);
 				ability=Math.max(0,ffAbility);
 				cmdFFAbility2=Math.max(0,cmdFFAbility2);
 				cmdAbility2=Math.max(0,cmdFFAbility2);
 			}
+			
 			var ac = 10+ armor+shield+natural+size+dodge + ability  +deflect+miscAC+condPenalty +buffs;
 			var touch= 10+size+dodge+ability+deflect+miscAC+condPenalty;
 			var ff=10+armor+shield+natural+size+ffAbility+deflect+miscAC+condPenalty+buffs +   ( ffAbility >0?dodge:0  ) ;
@@ -12164,7 +12186,7 @@ var PFSheet = PFSheet || (function(){
 	},
 
 	updateSkill = function(skill) {
-			var csNm=skill+"-cs",
+		var csNm=skill+"-cs",
 		ranksNm=skill+"-ranks",
 		classNm=skill+"-class",
 		abNm=skill+"-ability",
@@ -12172,24 +12194,26 @@ var PFSheet = PFSheet || (function(){
 		racialNm=skill+"-racial",
 		featNm=skill+"-feat",
 		itemNm=skill+"-item",
-
-
 		miscNm=skill+"-misc",
 		rtNm=skill+"-ReqTrain";
 		//sizeMod=skill+"-size-mod";
-
 		//sizeNm=skill+"-size",
 		//acpNm=skill+"-acp",
-		getAttrs([skill,csNm,ranksNm,classNm,abNm,modNm,racialNm,featNm,itemNm,miscNm,rtNm,"size_skill","size_skill_double","acp"],function(v){
+		//,sizeNm,acpNm,sizeMod,
+		getAttrs([skill,csNm,ranksNm,classNm,abNm,modNm,racialNm,featNm,itemNm,miscNm,rtNm,
+		"size_skill","size_skill_double","acp","All-skills-cond","Phys-skills-cond","Perception-cond"],function(v){
+			
+			var skillSize=0,adj,skillTot=0,setter={},mods="",setAny=0,cond=0,
+			cs=parseInt(v[csNm],10)||0,
+			currSkill=parseInt(v[skill],10),//no default
+			ranks = parseInt(v[ranksNm],10)||0,
+			rt = parseInt(v[rtNm],10)||0,
+			allCond = parseInt(v["All-skills-cond"],10)||0,
+			abilityName=findAbilityInString(v[abNm]),
+			physCond = 0,perCond=0;
 			console.log("SSSSSSSSSSSSSSSSSSSSSSSSSSSSS");
 			console.log(v);
-			//,sizeNm,acpNm,sizeMod,
-			var skillSize=0,adj,skillTot=0,setter={},mods="",setAny=0,
-
-			cs=(parseInt(v[csNm],10)||0),
-			currSkill=parseInt(v[skill],10),//no default
-			ranks = (parseInt(v[ranksNm],10)||0),
-			rt = parseInt(v[rtNm],10)||0;
+			console.log("at the new version");
 			//currSizeMod=parseInt(v[sizeMod],10)||0;
 			if (ranks && cs ) {
 				skillTot+=3;
@@ -12217,7 +12241,6 @@ var PFSheet = PFSheet || (function(){
 					//if ( currSizeMod !== adj) {
 					//	setter[sizeMod]=adj;
 					//	setAny++;
-
 					//}
 				} else if (skillSize===2) {
 					adj=parseInt(v["size_skill_double"],10)||0;
@@ -12226,21 +12249,26 @@ var PFSheet = PFSheet || (function(){
 					//if ( currSizeMod !== adj) {
 					//	setter[sizeMod]=adj;
 					//	setAny++;
-
 					//}				
 				} 
 			} else {
 				console.log("not in size");
 				mods+="0/";
 			}
-
+			//conditions
+			if (abilityName==="DEX-mod" || abilityName==="STR-mod"){
+				physCond= parseInt(v["Phys-skills-cond"],10)||0;
+			}
+			if (skill==="Perception"){
+				perCond = parseInt(v["Perception-cond"],10)||0;
+			}
+			cond = allCond+physCond+perCond;
+			mods+= ""+cond;
 			
-			//have to adjust for conditions 
-			mods += "0";
 			if (rt && !ranks) {
 				skillTot=0;
 			} else {
-				skillTot += ranks  + (parseInt(v[modNm],10)||0) + (parseInt(v[racialNm],10)||0) + 
+				skillTot += ranks  + cond + (parseInt(v[modNm],10)||0) + (parseInt(v[racialNm],10)||0) + 
 					(parseInt(v[featNm],10)||0) + (parseInt(v[itemNm],10)||0) + (parseInt(v[miscNm],10)||0);
 			}
 			if ( currSkill !== skillTot) {
@@ -12277,7 +12305,34 @@ var PFSheet = PFSheet || (function(){
 		});
 	},
 	
-
+	updateConditionSkillPenalty=function(){
+		console.log("CCCCCCCCCCCCCCCCCCCCCCCCCCCC at updateConditionSkillPenalty");
+		getAttrs(["condition-Blinded","condition-Fear","condition-Drained","condition-Sickened","All-skills-cond","Phys-skills-cond","Perception-cond"],function(v) {
+			//,"condition-Fascinated" -4 to perception
+			var allSkills= -1 * ((parseInt(v["condition-Fear"],10)||0) + (parseInt(v["condition-Sickened"],10)||0))-(parseInt(v["condition-Drained"],10)||0) ,
+			blindedMod = -2 * (parseInt(v["condition-Blinded"],10)||0),
+			currAllSkills=parseInt(v["All-skills-cond"],10)||0,
+			currPhysSkills=parseInt(v["Phys-skills-cond"],10)||0,
+			currPerSkills=parseInt(v["Perception-cond"],10)||0,
+			setter={},setAny=0;
+			if (allSkills!==currAllSkills){
+				setter["All-skills-cond"]=allSkills;
+				setAny=1;
+			}
+			if (blindedMod!==currPhysSkills){
+				setter["Phys-skills-cond"]=blindedMod;
+				setAny=1;
+			}
+			if (blindedMod!==currPerSkills){
+				setter["Perception-cond"]=blindedMod;
+				setAny=1;
+			}
+			console.log("about to set " + setter);
+			if (setAny){
+				setAttrs(setter);
+			}
+		});
+	},
 
 	/* recalculateRepeatingWeapons
 	* For every on("change:xxxx") that modifies repeating weapons, make sure to 
@@ -12508,70 +12563,8 @@ var PFSheet = PFSheet || (function(){
 		updateBuffColumn("HP-temp");		
 						
 	},
-	recalculateSheet = function(version) {
-		recalculateAllBuffs();
-		updateAbility("STR"); 
-		updateAbility("DEX"); 
-		updateAbility("CON"); 
-		updateAbility("INT"); 
-		updateAbility("WIS"); 
-		updateAbility("CHA"); 
-		
-		handleDropdown("HP-ability",["HP-ability-mod"]);
-		//init dropdown	
-		handleDropdown("init-ability",["init-ability-mod"]);
-		//saves
-		handleDropdown  ("Fort-ability",["Fort-ability-mod"]);   
-		handleDropdown  ("Ref-ability",["Ref-ability-mod"]);   
-		handleDropdown  ("Will-ability",["Will-ability-mod"]);   
-		//defense dropdowns
-		handleDropdown("AC-ability",["AC-ability-mod"]);
-		handleDropdown("FF-ability",["FF-DEX"]);
-		handleDropdown("CMD-ability1",["CMD-STR"]);
-		handleDropdown("CMD-ability2",["CMD-DEX"]);
-		handleDropdown("CMD-ability",["FF-CMD-DEX"]);
-		//attack non repeating dropdowns
-		handleDropdown("melee-ability",["melee-ability-mod"]);
-		handleDropdown("ranged-ability",["ranged-ability-mod"]);
-		handleDropdown("CMB-ability",["CMB-ability-mod"]);
-			
-
-		updateSize();
-		updateInit();
-		SWUtils.evaluateAndSetNumber("HP-formula-macro-text","HP-formula-mod");
-		updateHP();
-		updateTempHP();
-		SWUtils.evaluateAndSetNumber("NPC-HD-misc","NPC-HD-misc-mod");
-		updateNPCHP();
-		updateClassInformation("hp");
-		updateClassInformation("skill");
-		updateClassInformation("fcskill");
-		updateClassInformation("fcalt");
-		updateClassInformation("bab");
-		updateClassInformation("Fort");
-		updateClassInformation("Ref");
-		updateClassInformation("Will");
-		updateClassInformation("level");
-
-		updateSave("Fort");
-		updateSave("Ref");
-		updateSave("Will");
-		updateConditionDefensePenalty();
-		updateDefenses();
-		updateArmor();	
-		updateConditionAttackPenalty();
-		updateEffectTotals();
-		updateAttack("melee");
-		updateAttack("ranged");
-		updateAttack("CMB");
-		//copyStaticNumberFieldToRepeating("weapon","attk-effect-total");
-		//copyStaticNumberFieldToRepeating("weapon","dmg-effect-total");
-		//copyStaticNumberFieldToRepeating("weapon","buff_DMG-total");
-		recalculateRepeatingWeapons();
-		updateMaxSkills();
-		recalculateSkills();
-		SWUtils.evaluateAndSetNumber("Max-Skill-Ranks-Misc","Max-Skill-Ranks-mod");
-		if (version===.1) {
+	recalculateSheet = function(oldversion) {
+		if (oldversion===.1) {
 			getAttrs(["Stealth","Fly","Acrobatics"],function(v){
 				 if (!isNaN(parseInt(v["Stealth"],10))) {
 				   setAttrs({"Stealth":"(@{Stealth-ranks} + @{Stealth-class} + @{Stealth-ability} + @{Stealth-racial} + @{Stealth-feat} + @{Stealth-item} + @{Stealth-misc} + @{Stealth-acp} - @{condition-Fear} -  @{condition-sickened} + @{condition-Drained} - @{condition-Wounds})"});
@@ -12584,6 +12577,71 @@ var PFSheet = PFSheet || (function(){
 				 }
 				});
 		}
+		
+
+			recalculateAllBuffs();
+			updateAbility("STR"); 
+			updateAbility("DEX"); 
+			updateAbility("CON"); 
+			updateAbility("INT"); 
+			updateAbility("WIS"); 
+			updateAbility("CHA"); 
+			
+			handleDropdown("HP-ability",["HP-ability-mod"]);
+			//init dropdown	
+			handleDropdown("init-ability",["init-ability-mod"]);
+			//saves
+			handleDropdown  ("Fort-ability",["Fort-ability-mod"]);   
+			handleDropdown  ("Ref-ability",["Ref-ability-mod"]);   
+			handleDropdown  ("Will-ability",["Will-ability-mod"]);   
+			//defense dropdowns
+			handleDropdown("AC-ability",["AC-ability-mod"]);
+			handleDropdown("FF-ability",["FF-DEX"]);
+			handleDropdown("CMD-ability1",["CMD-STR"]);
+			handleDropdown("CMD-ability2",["CMD-DEX"]);
+			handleDropdown("CMD-ability",["FF-CMD-DEX"]);
+			//attack non repeating dropdowns
+			handleDropdown("melee-ability",["melee-ability-mod"]);
+			handleDropdown("ranged-ability",["ranged-ability-mod"]);
+			handleDropdown("CMB-ability",["CMB-ability-mod"]);
+				
+
+			updateSize();
+			updateInit();
+			SWUtils.evaluateAndSetNumber("HP-formula-macro-text","HP-formula-mod");
+			updateHP();
+			updateTempHP();
+			SWUtils.evaluateAndSetNumber("NPC-HD-misc","NPC-HD-misc-mod");
+			updateNPCHP();
+			updateClassInformation("hp");
+			updateClassInformation("skill");
+			updateClassInformation("fcskill");
+			updateClassInformation("fcalt");
+			updateClassInformation("bab");
+			updateClassInformation("Fort");
+			updateClassInformation("Ref");
+			updateClassInformation("Will");
+			updateClassInformation("level");
+
+			updateSave("Fort");
+			updateSave("Ref");
+			updateSave("Will");
+			updateConditionDefensePenalty();
+			updateDefenses();
+			updateArmor();	
+			updateConditionAttackPenalty();
+			updateEffectTotals();
+			updateAttack("melee");
+			updateAttack("ranged");
+			updateAttack("CMB");
+			recalculateRepeatingWeapons();
+			
+			SWUtils.evaluateAndSetNumber("Max-Skill-Ranks-Misc","Max-Skill-Ranks-mod");
+			updateMaxSkills();
+
+			updateConditionSkillPenalty();
+			recalculateSkills();
+
 	},
 	
 	
@@ -12591,32 +12649,20 @@ var PFSheet = PFSheet || (function(){
 	checkUpdate=function(){
 
 		getAttrs(["PFSheet_version","PFSheet_forcesync","recalc1"],function(v){
-			var setter={},setAny=0,currVer=0;
+			var setter={},currVer=0;
 			currVer=parseInt(v["PFSheet_version"],10)||0;
-			if ( currVer!== version) {
+			//reset checkbox
+			if (v["recalc1"]||v["PFSheet_forcesync"]) {
+				recalculateSheet(-1);
+				if (v["recalc1"]) {setter["recalc1"]=0;}
+				if (v["PFSheet_forcesync"]) {setter["PFSheet_forcesync"]=0;}
+				setAttrs( setter);
+			} else if ( currVer!== version) {
 				recalculateSheet(currVer);
 				setter["PFSheet_version"]= version;
-				setAny++;
-			}
-			if (v["PFSheet_forcesync"]) {
-				setter["PFSheet_forcesync"]=0;
-				if (!setAny){
-					recalculateSheet(version);
-					setAny++;
-				}
-			}
-			//just force an update these initial weeks till all bugs are gone
-			recalculateSheet(version);
-			setAny++;
-			
-			//reset checkbox
-			if (v["recalc1"]) {
-				setter["recalc1"]=0;
-				setAny++;
-			}
-			if (setAny){
 				setAttrs( setter);
-			}
+			} 
+
 		});
 	};
 	
@@ -12650,6 +12696,7 @@ var PFSheet = PFSheet || (function(){
 		updateConditionAttackPenalty:updateConditionAttackPenalty,
 		updateRepeatingWeaponDamageAbility:updateRepeatingWeaponDamageAbility,
 		updateRepeatingWeapon:updateRepeatingWeapon,
+		updateConditionSkillPenalty:updateConditionSkillPenalty,
 		updateMaxSkills:updateMaxSkills,
 		updateSkill:updateSkill,
 		updateNPCHP:updateNPCHP,
@@ -12849,16 +12896,270 @@ on("change:buff10_wis_macro-text", function() { getAttrs(["buff10_Toggle"], func
 on("change:buff10_cha_macro-text", function() { getAttrs(["buff10_Toggle"], function (v){ if (v.buff10_Toggle == "1"){PFSheet.updateBuff("CHA","10");}});});
 
 
-on("change:class-0-hp change:class-1-hp change:class-2-hp change:class-3-hp change:class-4-hp", function() {PFSheet.updateClassInformation("hp");});
-on("change:class-0-fchp change:class-1-fchp change:class-2-fchp change:class-3-fchp change:class-4-fchp", function() {PFSheet.updateClassInformation("fchp");});
-on("change:class-0-bab change:class-1-bab change:class-2-bab change:class-3-bab change:class-4-bab", function() {PFSheet.updateClassInformation("bab");});
-on("change:class-0-skill change:class-1-skill change:class-2-skill change:class-3-skill change:class-4-skill", function() {PFSheet.updateClassInformation("skill");});
-on("change:class-0-fcskill change:class-1-fcskill change:class-2-fcskill change:class-3-fcskill change:class-4-fcskill", function() {PFSheet.updateClassInformation("fcskill");});
-on("change:class-0-fcalt change:class-1-fcalt change:class-2-fcalt change:class-3-fcalt change:class-4-fcalt", function() {PFSheet.updateClassInformation("fcalt");});
-on("change:class-0-fort change:class-1-fort change:class-2-fort change:class-3-fort change:class-4-fort", function() {PFSheet.updateClassInformation("Fort");});
-on("change:class-0-ref change:class-1-ref change:class-2-ref change:class-3-ref change:class-4-ref", function() {PFSheet.updateClassInformation("Ref");});
-on("change:class-0-will change:class-1-will change:class-2-will change:class-3-will change:class-4-will", function() {PFSheet.updateClassInformation("Will");});
-on("change:class-0-level change:class-1-level change:class-2-level change:class-3-level change:class-4-level", function() {PFSheet.updateClassInformation("level");});
+//allskills
+
+
+
+on("change:acrobatics-ability",function(){PFSheet.handleDropdown("Acrobatics-ability",["Acrobatics-ability-mod"]);});
+on("change:acp change:acrobatics-cs change:acrobatics-ranks change:acrobatics-class change:All-skills-cond change:acrobatics-ability-mod change:acrobatics-racial change:acrobatics-feat change:acrobatics-item change:acrobatics-size change:acrobatics-acp change:acrobatics-misc change:acrobatics-ReqTrain"
+   ,function(){PFSheet.updateSkill("Acrobatics");});
+
+on("change:artistry-ability",function(){PFSheet.handleDropdown("Artistry-ability",["Artistry-ability-mod"]);});
+on("change:artistry-cs change:artistry-ranks change:artistry-class change:All-skills-cond change:artistry-ability-mod change:artistry-racial change:artistry-feat change:artistry-item change:artistry-size change:artistry-acp change:artistry-misc change:artistry-ReqTrain"
+   ,function(){PFSheet.updateSkill("Artistry");});
+
+on("change:appraise-ability",function(){PFSheet.handleDropdown("Appraise-ability",["Appraise-ability-mod"]);});
+on("change:appraise-cs change:appraise-ranks change:appraise-class change:All-skills-cond change:appraise-ability-mod change:appraise-racial change:appraise-feat change:appraise-item change:appraise-size change:appraise-acp change:appraise-misc change:appraise-ReqTrain"
+   ,function(){PFSheet.updateSkill("Appraise");});
+
+on("change:bluff-ability",function(){PFSheet.handleDropdown("Bluff-ability",["Bluff-ability-mod"]);});
+on("change:bluff-cs change:bluff-ranks change:bluff-class change:All-skills-cond change:bluff-ability-mod change:bluff-racial change:bluff-feat change:bluff-item change:bluff-size change:bluff-acp change:bluff-misc change:bluff-ReqTrain"
+   ,function(){PFSheet.updateSkill("Bluff");});
+
+on("change:climb-ability",function(){PFSheet.handleDropdown("Climb-ability",["Climb-ability-mod"]);});
+on("change:acp change:climb-cs change:climb-ranks change:climb-class change:All-skills-cond change:climb-ability-mod change:climb-racial change:climb-feat change:climb-item change:climb-size change:climb-acp change:climb-misc change:climb-ReqTrain"
+   ,function(){PFSheet.updateSkill("Climb");});
+
+on("change:craft-ability",function(){PFSheet.handleDropdown("Craft-ability",["Craft-ability-mod"]);});
+on("change:craft-cs change:craft-ranks change:craft-class change:All-skills-cond change:craft-ability-mod change:craft-racial change:craft-feat change:craft-item change:craft-size change:craft-acp change:craft-misc change:craft-ReqTrain"
+   ,function(){PFSheet.updateSkill("Craft");});
+
+on("change:craft2-ability",function(){PFSheet.handleDropdown("Craft2-ability",["Craft2-ability-mod"]);});
+on("change:craft2-cs change:craft2-ranks change:craft2-class change:All-skills-cond change:craft2-ability-mod change:craft2-racial change:craft2-feat change:craft2-item change:craft2-size change:craft2-acp change:craft2-misc change:craft2-ReqTrain"
+   ,function(){PFSheet.updateSkill("Craft2");});
+
+on("change:craft3-ability",function(){PFSheet.handleDropdown("Craft3-ability",["Craft3-ability-mod"]);});
+on("change:craft3-cs change:craft3-ranks change:craft3-class change:All-skills-cond change:craft3-ability-mod change:craft3-racial change:craft3-feat change:craft3-item change:craft3-size change:craft3-acp change:craft3-misc change:craft3-ReqTrain"
+   ,function(){PFSheet.updateSkill("Craft3");});
+
+on("change:diplomacy-ability",function(){PFSheet.handleDropdown("Diplomacy-ability",["Diplomacy-ability-mod"]);});
+on("change:diplomacy-cs change:diplomacy-ranks change:diplomacy-class change:All-skills-cond change:diplomacy-ability-mod change:diplomacy-racial change:diplomacy-feat change:diplomacy-item change:diplomacy-size change:diplomacy-acp change:diplomacy-misc change:diplomacy-ReqTrain"
+   ,function(){PFSheet.updateSkill("Diplomacy");});
+
+on("change:disable-Device-ability",function(){PFSheet.handleDropdown("Disable-Device-ability",["Disable-Device-ability-mod"]);});
+on("change:acp change:disable-Device-cs change:disable-Device-ranks change:disable-Device-class change:All-skills-cond change:disable-Device-ability-mod change:disable-Device-racial change:disable-Device-feat change:disable-Device-item change:disable-Device-size change:disable-Device-acp change:disable-Device-misc change:disable-Device-ReqTrain"
+   ,function(){PFSheet.updateSkill("Disable-Device");});
+
+on("change:disguise-ability",function(){PFSheet.handleDropdown("Disguise-ability",["Disguise-ability-mod"]);});
+on("change:disguise-cs change:disguise-ranks change:disguise-class change:All-skills-cond change:disguise-ability-mod change:disguise-racial change:disguise-feat change:disguise-item change:disguise-size change:disguise-acp change:disguise-misc change:disguise-ReqTrain"
+   ,function(){PFSheet.updateSkill("Disguise");});
+
+on("change:escape-Artist-ability",function(){PFSheet.handleDropdown("Escape-Artist-ability",["Escape-Artist-ability-mod"]);});
+on("change:acp change:escape-Artist-cs change:escape-Artist-ranks change:escape-Artist-class change:All-skills-cond change:escape-Artist-ability-mod change:escape-Artist-racial change:escape-Artist-feat change:escape-Artist-item change:escape-Artist-size change:escape-Artist-acp change:escape-Artist-misc change:escape-Artist-ReqTrain"
+   ,function(){PFSheet.updateSkill("Escape-Artist");});
+  
+on("change:fly-ability",function(){PFSheet.handleDropdown("Fly-ability",["Fly-ability-mod"]);});
+on("change:acp change:size_skill change:fly-cs change:fly-ranks change:fly-class change:All-skills-cond change:fly-ability-mod change:fly-racial change:fly-feat change:fly-item change:fly-size change:fly-acp change:fly-misc change:fly-ReqTrain"
+   ,function(){PFSheet.updateSkill("Fly");});
+
+on("change:handle-Animal-ability",function(){PFSheet.handleDropdown("Handle-Animal-ability",["Handle-Animal-ability-mod"]);});
+on("change:handle-Animal-cs change:handle-Animal-ranks change:handle-Animal-class change:All-skills-cond change:handle-Animal-ability-mod change:handle-Animal-racial change:handle-Animal-feat change:handle-Animal-item change:handle-Animal-size change:handle-Animal-acp change:handle-Animal-misc change:handle-Animal-ReqTrain"
+   ,function(){PFSheet.updateSkill("Handle-Animal");});
+
+on("change:heal-ability",function(){PFSheet.handleDropdown("Heal-ability",["Heal-ability-mod"]);});
+on("change:heal-cs change:heal-ranks change:heal-class change:All-skills-cond change:heal-ability-mod change:heal-racial change:heal-feat change:heal-item change:heal-size change:heal-acp change:heal-misc change:heal-ReqTrain"
+   ,function(){PFSheet.updateSkill("Heal");});
+
+on("change:intimidate-ability",function(){PFSheet.handleDropdown("Intimidate-ability",["Intimidate-ability-mod"]);});
+on("change:intimidate-cs change:intimidate-ranks change:intimidate-class change:All-skills-cond change:intimidate-ability-mod change:intimidate-racial change:intimidate-feat change:intimidate-item change:intimidate-size change:intimidate-acp change:intimidate-misc change:intimidate-ReqTrain"
+   ,function(){PFSheet.updateSkill("Intimidate");});
+
+on("change:linguistics-ability",function(){PFSheet.handleDropdown("Linguistics-ability",["Linguistics-ability-mod"]);});
+on("change:linguistics-cs change:linguistics-ranks change:linguistics-class change:All-skills-cond change:linguistics-ability-mod change:linguistics-racial change:linguistics-feat change:linguistics-item change:linguistics-size change:linguistics-acp change:linguistics-misc change:linguistics-ReqTrain"
+   ,function(){PFSheet.updateSkill("Linguistics");});
+
+on("change:lore-ability",function(){PFSheet.handleDropdown("Lore-ability",["Lore-ability-mod"]);});
+on("change:lore-cs change:lore-ranks change:lore-class change:All-skills-cond change:lore-ability-mod change:lore-racial change:lore-feat change:lore-item change:lore-size change:lore-acp change:lore-misc change:lore-ReqTrain"
+   ,function(){PFSheet.updateSkill("Lore");});
+
+on("change:knowledge-arcana-ability",function(){PFSheet.handleDropdown("Knowledge-Arcana-ability",["Knowledge-Arcana-ability-mod"]);});
+on("change:knowledge-arcana-cs change:knowledge-arcana-ranks change:knowledge-arcana-class change:All-skills-cond change:knowledge-arcana-ability-mod change:knowledge-arcana-racial change:knowledge-arcana-feat change:knowledge-arcana-item change:knowledge-arcana-size change:knowledge-arcana-acp change:knowledge-arcana-misc change:knowledge-arcana-ReqTrain"
+   ,function(){PFSheet.updateSkill("Knowledge-Arcana");});
+
+on("change:knowledge-dungeoneering-ability",function(){PFSheet.handleDropdown("Knowledge-Dungeoneering-ability",["Knowledge-Dungeoneering-ability-mod"]);});
+on("change:knowledge-dungeoneering-cs change:knowledge-dungeoneering-ranks change:knowledge-dungeoneering-class change:All-skills-cond change:knowledge-dungeoneering-ability-mod change:knowledge-dungeoneering-racial change:knowledge-dungeoneering-feat change:knowledge-dungeoneering-item change:knowledge-dungeoneering-size change:knowledge-dungeoneering-acp change:knowledge-dungeoneering-misc change:knowledge-dungeoneering-ReqTrain"
+   ,function(){PFSheet.updateSkill("Knowledge-Dungeoneering");});
+
+on("change:knowledge-engineering-ability",function(){PFSheet.handleDropdown("Knowledge-Engineering-ability",["Knowledge-Engineering-ability-mod"]);});
+on("change:knowledge-engineering-cs change:knowledge-engineering-ranks change:knowledge-engineering-class change:All-skills-cond change:knowledge-engineering-ability-mod change:knowledge-engineering-racial change:knowledge-engineering-feat change:knowledge-engineering-item change:knowledge-engineering-size change:knowledge-engineering-acp change:knowledge-engineering-misc change:knowledge-engineering-ReqTrain"
+   ,function(){PFSheet.updateSkill("Knowledge-Engineering");});
+
+on("change:knowledge-geography-ability",function(){PFSheet.handleDropdown("Knowledge-Geography-ability",["Knowledge-Geography-ability-mod"]);});
+on("change:knowledge-geography-cs change:knowledge-geography-ranks change:knowledge-geography-class change:All-skills-cond change:knowledge-geography-ability-mod change:knowledge-geography-racial change:knowledge-geography-feat change:knowledge-geography-item change:knowledge-geography-size change:knowledge-geography-acp change:knowledge-geography-misc change:knowledge-geography-ReqTrain"
+   ,function(){PFSheet.updateSkill("Knowledge-Geography");});
+   
+on("change:knowledge-history-ability",function(){PFSheet.handleDropdown("Knowledge-History-ability",["Knowledge-History-ability-mod"]);});
+on("change:knowledge-history-cs change:knowledge-history-ranks change:knowledge-history-class change:All-skills-cond change:knowledge-history-ability-mod change:knowledge-history-racial change:knowledge-history-feat change:knowledge-history-item change:knowledge-history-size change:knowledge-history-acp change:knowledge-history-misc change:knowledge-history-ReqTrain"
+   ,function(){PFSheet.updateSkill("Knowledge-History");});
+
+on("change:knowledge-local-ability",function(){PFSheet.handleDropdown("Knowledge-Local-ability",["Knowledge-Local-ability-mod"]);});
+on("change:knowledge-local-cs change:knowledge-local-ranks change:knowledge-local-class change:All-skills-cond change:knowledge-local-ability-mod change:knowledge-local-racial change:knowledge-local-feat change:knowledge-local-item change:knowledge-local-size change:knowledge-local-acp change:knowledge-local-misc change:knowledge-local-ReqTrain"
+   ,function(){PFSheet.updateSkill("Knowledge-Local");});
+
+on("change:knowledge-nature-ability",function(){PFSheet.handleDropdown("Knowledge-Nature-ability",["Knowledge-Nature-ability-mod"]);});
+on("change:knowledge-nature-cs change:knowledge-nature-ranks change:knowledge-nature-class change:All-skills-cond change:knowledge-nature-ability-mod change:knowledge-nature-racial change:knowledge-nature-feat change:knowledge-nature-item change:knowledge-nature-size change:knowledge-nature-acp change:knowledge-nature-misc change:knowledge-nature-ReqTrain"
+   ,function(){PFSheet.updateSkill("Knowledge-Nature");});
+
+on("change:knowledge-nobility-ability",function(){PFSheet.handleDropdown("Knowledge-Nobility-ability",["Knowledge-Nobility-ability-mod"]);});
+on("change:knowledge-nobility-cs change:knowledge-nobility-ranks change:knowledge-nobility-class change:All-skills-cond change:knowledge-nobility-ability-mod change:knowledge-nobility-racial change:knowledge-nobility-feat change:knowledge-nobility-item change:knowledge-nobility-size change:knowledge-nobility-acp change:knowledge-nobility-misc change:knowledge-nobility-ReqTrain"
+   ,function(){PFSheet.updateSkill("Knowledge-Nobility");});
+
+on("change:knowledge-planes-ability",function(){PFSheet.handleDropdown("Knowledge-Planes-ability",["Knowledge-Planes-ability-mod"]);});
+on("change:knowledge-planes-cs change:knowledge-planes-ranks change:knowledge-planes-class change:All-skills-cond change:knowledge-planes-ability-mod change:knowledge-planes-racial change:knowledge-planes-feat change:knowledge-planes-item change:knowledge-planes-size change:knowledge-planes-acp change:knowledge-planes-misc change:knowledge-planes-ReqTrain"
+   ,function(){PFSheet.updateSkill("Knowledge-Planes");});
+
+on("change:knowledge-religion-ability",function(){PFSheet.handleDropdown("Knowledge-Religion-ability",["Knowledge-Religion-ability-mod"]);});
+on("change:knowledge-religion-cs change:knowledge-religion-ranks change:knowledge-religion-class change:All-skills-cond change:knowledge-religion-ability-mod change:knowledge-religion-racial change:knowledge-religion-feat change:knowledge-religion-item change:knowledge-religion-size change:knowledge-religion-acp change:knowledge-religion-misc change:knowledge-religion-ReqTrain"
+   ,function(){PFSheet.updateSkill("Knowledge-Religion");});
+   
+on("change:perception-ability",function(){PFSheet.handleDropdown("Perception-ability",["Perception-ability-mod"]);});
+on("change:perception-cs change:perception-ranks change:perception-class change:All-skills-cond change:perception-ability-mod change:perception-racial change:perception-feat change:perception-item change:perception-size change:perception-acp change:perception-misc change:perception-ReqTrain"
+   ,function(){PFSheet.updateSkill("Perception");});
+
+on("change:perform-ability",function(){PFSheet.handleDropdown("Perform-ability",["Perform-ability-mod"]);});
+on("change:perform-cs change:perform-ranks change:perform-class change:All-skills-cond change:perform-ability-mod change:perform-racial change:perform-feat change:perform-item change:perform-size change:perform-acp change:perform-misc change:perform-ReqTrain"
+   ,function(){PFSheet.updateSkill("Perform");});
+
+on("change:perform2-ability",function(){PFSheet.handleDropdown("Perform2-ability",["Perform2-ability-mod"]);});
+on("change:perform2-cs change:perform2-ranks change:perform2-class change:All-skills-cond change:perform2-ability-mod change:perform2-racial change:perform2-feat change:perform2-item change:perform2-size change:perform2-acp change:perform2-misc change:perform2-ReqTrain"
+   ,function(){PFSheet.updateSkill("Perform2");});
+
+on("change:perform3-ability",function(){PFSheet.handleDropdown("Perform3-ability",["Perform3-ability-mod"]);});
+on("change:perform3-cs change:perform3-ranks change:perform3-class change:All-skills-cond change:perform3-ability-mod change:perform3-racial change:perform3-feat change:perform3-item change:perform3-size change:perform3-acp change:perform3-misc change:perform3-ReqTrain"
+   ,function(){PFSheet.updateSkill("Perform3");});
+
+on("change:profession-ability",function(){PFSheet.handleDropdown("Profession-ability",["Profession-ability-mod"]);});
+on("change:profession-cs change:profession-ranks change:profession-class change:All-skills-cond change:profession-ability-mod change:profession-racial change:profession-feat change:profession-item change:profession-size change:profession-acp change:profession-misc change:profession-ReqTrain"
+   ,function(){PFSheet.updateSkill("Profession");});
+
+on("change:profession2-ability",function(){PFSheet.handleDropdown("Profession2-ability",["Profession2-ability-mod"]);});
+on("change:profession2-cs change:profession2-ranks change:profession2-class change:All-skills-cond change:profession2-ability-mod change:profession2-racial change:profession2-feat change:profession2-item change:profession2-size change:profession2-acp change:profession2-misc change:profession2-ReqTrain"
+   ,function(){PFSheet.updateSkill("Profession2");});
+
+on("change:profession3-ability",function(){PFSheet.handleDropdown("Profession3-ability",["Profession3-ability-mod"]);});
+on("change:profession3-cs change:profession3-ranks change:profession3-class change:All-skills-cond change:profession3-ability-mod change:profession3-racial change:profession3-feat change:profession3-item change:profession3-size change:profession3-acp change:profession3-misc change:profession3-ReqTrain"
+   ,function(){PFSheet.updateSkill("Profession3");});
+
+on("change:ride-ability",function(){PFSheet.handleDropdown("Ride-ability",["Ride-ability-mod"]);});
+on("change:acp change:ride-cs change:ride-ranks change:ride-class change:All-skills-cond change:ride-ability-mod change:ride-racial change:ride-feat change:ride-item change:ride-size change:ride-acp change:ride-misc change:ride-ReqTrain"
+   ,function(){PFSheet.updateSkill("Ride");});
+
+on("change:sense-Motive-ability",function(){PFSheet.handleDropdown("Sense-Motive-ability",["Sense-Motive-ability-mod"]);});
+on("change:sense-Motive-cs change:sense-Motive-ranks change:sense-Motive-class change:All-skills-cond change:sense-Motive-ability-mod change:sense-Motive-racial change:sense-Motive-feat change:sense-Motive-item change:sense-Motive-size change:sense-Motive-acp change:sense-Motive-misc change:sense-Motive-ReqTrain"
+   ,function(){PFSheet.updateSkill("Sense-Motive");});
+   
+on("change:sleight-of-Hand-ability",function(){PFSheet.handleDropdown("Sleight-of-Hand-ability",["Sleight-of-Hand-ability-mod"]);});
+on("change:sleight-of-Hand-cs change:sleight-of-Hand-ranks change:sleight-of-Hand-class change:All-skills-cond change:sleight-of-Hand-ability-mod change:sleight-of-Hand-racial change:sleight-of-Hand-feat change:sleight-of-Hand-item change:sleight-of-Hand-size change:sleight-of-Hand-acp change:sleight-of-Hand-misc change:sleight-of-Hand-ReqTrain"
+   ,function(){PFSheet.updateSkill("Sleight-of-Hand");});
+
+on("change:spellcraft-ability",function(){PFSheet.handleDropdown("Spellcraft-ability",["Spellcraft-ability-mod"]);});
+on("change:spellcraft-cs change:spellcraft-ranks change:spellcraft-class change:All-skills-cond change:spellcraft-ability-mod change:spellcraft-racial change:spellcraft-feat change:spellcraft-item change:spellcraft-size change:spellcraft-acp change:spellcraft-misc change:spellcraft-ReqTrain"
+   ,function(){PFSheet.updateSkill("Spellcraft");});
+
+on("change:stealth-ability",function(){PFSheet.handleDropdown("Stealth-ability",["Stealth-ability-mod"]);});
+on("change:acp change:size_skill_double change:stealth-cs change:stealth-ranks change:stealth-class change:All-skills-cond change:stealth-ability-mod change:stealth-racial change:stealth-feat change:stealth-item change:stealth-size change:stealth-acp change:stealth-misc change:stealth-ReqTrain"
+   ,function(){PFSheet.updateSkill("Stealth");});
+   
+on("change:survival-ability",function(){PFSheet.handleDropdown("Survival-ability",["Survival-ability-mod"]);});
+on("change:survival-cs change:survival-ranks change:survival-class change:All-skills-cond change:survival-ability-mod change:survival-racial change:survival-feat change:survival-item change:survival-size change:survival-acp change:survival-misc change:survival-ReqTrain"
+   ,function(){PFSheet.updateSkill("Survival");});
+
+on("change:swim-ability",function(){PFSheet.handleDropdown("Swim-ability",["Swim-ability-mod"]);});
+on("change:acp change:swim-cs change:swim-ranks change:swim-class change:All-skills-cond change:swim-ability-mod change:swim-racial change:swim-feat change:swim-item change:swim-size change:swim-acp change:swim-misc change:swim-ReqTrain"
+   ,function(){PFSheet.updateSkill("Swim");});
+
+on("change:use-magic-device-ability",function(){PFSheet.handleDropdown("Use-Magic-Device-ability",["Use-Magic-Device-ability-mod"]);});
+on("change:use-magic-device-cs change:use-magic-device-ranks change:use-magic-device-class change:All-skills-cond change:use-magic-device-ability-mod change:use-magic-device-racial change:use-magic-device-feat change:use-magic-device-item change:use-magic-device-size change:use-magic-device-acp change:use-magic-device-misc change:use-magic-device-ReqTrain"
+   ,function(){PFSheet.updateSkill("Use-Magic-Device");});
+
+on("change:misc-skill-1-ability",function(){PFSheet.handleDropdown("Misc-Skill-0-ability",["Misc-Skill-0-ability-mod"]);});
+on("change:misc-skill-1-cs change:misc-skill-1-ranks change:misc-skill-1-class change:All-skills-cond change:misc-skill-1-ability-mod change:misc-skill-1-racial change:misc-skill-1-feat change:misc-skill-1-item change:misc-skill-1-size change:misc-skill-1-acp change:misc-skill-1-misc change:misc-skill-1-ReqTrain"
+   ,function(){PFSheet.updateSkill("Misc-Skill-0");});
+
+on("change:misc-skill-1-ability",function(){PFSheet.handleDropdown("Misc-Skill-1-ability",["Misc-Skill-1-ability-mod"]);});
+on("change:misc-skill-1-cs change:misc-skill-1-ranks change:misc-skill-1-class change:All-skills-cond change:misc-skill-1-ability-mod change:misc-skill-1-racial change:misc-skill-1-feat change:misc-skill-1-item change:misc-skill-1-size change:misc-skill-1-acp change:misc-skill-1-misc change:misc-skill-1-ReqTrain"
+   ,function(){PFSheet.updateSkill("Misc-Skill-1");});
+
+on("change:misc-skill-2-ability",function(){PFSheet.handleDropdown("Misc-Skill-2-ability",["Misc-Skill-2-ability-mod"]);});
+on("change:misc-skill-2-cs change:misc-skill-2-ranks change:misc-skill-2-class change:All-skills-cond change:misc-skill-2-ability-mod change:misc-skill-2-racial change:misc-skill-2-feat change:misc-skill-2-item change:misc-skill-2-size change:misc-skill-2-acp change:misc-skill-2-misc change:misc-skill-2-ReqTrain"
+   ,function(){PFSheet.updateSkill("Misc-Skill-2");});
+
+on("change:misc-skill-3-ability",function(){PFSheet.handleDropdown("Misc-Skill-3-ability",["Misc-Skill-3-ability-mod"]);});
+on("change:misc-skill-3-cs change:misc-skill-3-ranks change:misc-skill-3-class change:All-skills-cond change:misc-skill-3-ability-mod change:misc-skill-3-racial change:misc-skill-3-feat change:misc-skill-3-item change:misc-skill-3-size change:misc-skill-3-acp change:misc-skill-3-misc change:misc-skill-3-ReqTrain"
+   ,function(){PFSheet.updateSkill("Misc-Skill-3");});
+
+on("change:misc-skill-4-ability",function(){PFSheet.handleDropdown("Misc-Skill-4-ability",["Misc-Skill-4-ability-mod"]);});
+on("change:misc-skill-4-cs change:misc-skill-4-ranks change:misc-skill-4-class change:All-skills-cond change:misc-skill-4-ability-mod change:misc-skill-4-racial change:misc-skill-4-feat change:misc-skill-4-item change:misc-skill-4-size change:misc-skill-4-acp change:misc-skill-4-misc change:misc-skill-4-ReqTrain"
+   ,function(){PFSheet.updateSkill("Misc-Skill-4");});
+
+on("change:misc-skill-5-ability",function(){PFSheet.handleDropdown("Misc-Skill-5-ability",["Misc-Skill-5-ability-mod"]);});
+on("change:misc-skill-5-cs change:misc-skill-5-ranks change:misc-skill-5-class change:All-skills-cond change:misc-skill-5-ability-mod change:misc-skill-5-racial change:misc-skill-5-feat change:misc-skill-5-item change:misc-skill-5-size change:misc-skill-5-acp change:misc-skill-5-misc change:misc-skill-5-ReqTrain"
+   ,function(){PFSheet.updateSkill("Misc-Skill-5");});
+
+on("change:cS-Acrobatics-ability",function(){PFSheet.handleDropdown("CS-Acrobatics-ability",["CS-Acrobatics-ability-mod"]);});
+on("change:acp change:cS-Acrobatics-cs change:cS-Acrobatics-ranks change:cS-Acrobatics-class change:All-skills-cond change:cS-Acrobatics-ability-mod change:cS-Acrobatics-racial change:cS-Acrobatics-feat change:cS-Acrobatics-item change:cS-Acrobatics-size change:cS-Acrobatics-acp change:cS-Acrobatics-misc change:cS-Acrobatics-ReqTrain"
+   ,function(){PFSheet.updateSkill("CS-Acrobatics");});
+
+on("change:cS-Athletics-ability",function(){PFSheet.handleDropdown("CS-Athletics-ability",["CS-Athletics-ability-mod"]);});
+on("change:acp change:cS-Athletics-cs change:cS-Athletics-ranks change:cS-Athletics-class change:All-skills-cond change:cS-Athletics-ability-mod change:cS-Athletics-racial change:cS-Athletics-feat change:cS-Athletics-item change:cS-Athletics-size change:cS-Athletics-acp change:cS-Athletics-misc change:cS-Athletics-ReqTrain"
+   ,function(){PFSheet.updateSkill("CS-Athletics");});
+
+
+on("change:cs-finesse-ability",function(){PFSheet.handleDropdown("CS-Finesse-ability",["CS-Finesse-ability-mod"]);});
+on("change:cs-finesse-cs change:cs-finesse-ranks change:cs-finesse-class change:All-skills-cond change:cs-finesse-ability-mod change:cs-finesse-racial change:cs-finesse-feat change:cs-finesse-item change:cs-finesse-size change:cs-finesse-acp change:cs-finesse-misc change:cs-finesse-ReqTrain"
+   ,function(){PFSheet.updateSkill("CS-Finesse");});
+      
+on("change:cs-influence-ability",function(){PFSheet.handleDropdown("CS-Influence-ability",["CS-Influence-ability-mod"]);});
+on("change:cs-influence-cs change:cs-influence-ranks change:cs-influence-class change:All-skills-cond change:cs-influence-ability-mod change:cs-influence-racial change:cs-influence-feat change:cs-influence-item change:cs-influence-size change:cs-influence-acp change:cs-influence-misc change:cs-influence-ReqTrain"
+   ,function(){PFSheet.updateSkill("CS-Influence");});
+
+on("change:cs-nature-ability",function(){PFSheet.handleDropdown("CS-Nature-ability",["CS-Nature-ability-mod"]);});
+on("change:cs-nature-cs change:cs-nature-ranks change:cs-nature-class change:All-skills-cond change:cs-nature-ability-mod change:cs-nature-racial change:cs-nature-feat change:cs-nature-item change:cs-nature-size change:cs-nature-acp change:cs-nature-misc change:cs-nature-ReqTrain"
+   ,function(){PFSheet.updateSkill("CS-Nature");});
+
+on("change:cs-perception-ability",function(){PFSheet.handleDropdown("CS-Perception-ability",["CS-Perception-ability-mod"]);});
+on("change:cs-perception-cs change:cs-perception-ranks change:cs-perception-class change:All-skills-cond change:cs-perception-ability-mod change:cs-perception-racial change:cs-perception-feat change:cs-perception-item change:cs-perception-size change:cs-perception-acp change:cs-perception-misc change:cs-perception-ReqTrain"
+   ,function(){PFSheet.updateSkill("CS-Perception");});
+
+on("change:cs-performance-ability",function(){PFSheet.handleDropdown("CS-Performance-ability",["CS-Performance-ability-mod"]);});
+on("change:cs-performance-cs change:cs-performance-ranks change:cs-performance-class change:All-skills-cond change:cs-performance-ability-mod change:cs-performance-racial change:cs-performance-feat change:cs-performance-item change:cs-performance-size change:cs-performance-acp change:cs-performance-misc change:cs-performance-ReqTrain"
+   ,function(){PFSheet.updateSkill("CS-Performance");});
+
+on("change:cs-religion-ability",function(){PFSheet.handleDropdown("CS-Religion-ability",["CS-Religion-ability-mod"]);});
+on("change:cs-religion-cs change:cs-religion-ranks change:cs-religion-class change:All-skills-cond change:cs-religion-ability-mod change:cs-religion-racial change:cs-religion-feat change:cs-religion-item change:cs-religion-size change:cs-religion-acp change:cs-religion-misc change:cs-religion-ReqTrain"
+   ,function(){PFSheet.updateSkill("CS-Religion");});
+
+on("change:cs-society-ability",function(){PFSheet.handleDropdown("CS-Society-ability",["CS-Society-ability-mod"]);});
+on("change:cs-society-cs change:cs-society-ranks change:cs-society-class change:All-skills-cond change:cs-society-ability-mod change:cs-society-racial change:cs-society-feat change:cs-society-item change:cs-society-size change:cs-society-acp change:cs-society-misc change:cs-society-ReqTrain"
+   ,function(){PFSheet.updateSkill("CS-Society");});
+
+on("change:cs-spellcraft-ability",function(){PFSheet.handleDropdown("CS-Spellcraft-ability",["CS-Spellcraft-ability-mod"]);});
+on("change:cs-spellcraft-cs change:cs-spellcraft-ranks change:cs-spellcraft-class change:All-skills-cond change:cs-spellcraft-ability-mod change:cs-spellcraft-racial change:cs-spellcraft-feat change:cs-spellcraft-item change:cs-spellcraft-size change:cs-spellcraft-acp change:cs-spellcraft-misc change:cs-spellcraft-ReqTrain"
+   ,function(){PFSheet.updateSkill("CS-Spellcraft");});
+
+
+on("change:cs-stealth-ability",function(){PFSheet.handleDropdown("CS-Stealth-ability",["CS-Stealth-ability-mod"]);});
+on("change:All-skills-cond change:acp change:cs-stealth-cs change:cs-stealth-ranks change:cs-stealth-class change:cs-stealth-ability-mod change:cs-stealth-racial change:cs-stealth-feat change:cs-stealth-item change:cs-stealth-size change:cs-stealth-acp change:cs-stealth-misc change:cs-stealth-ReqTrain"
+   ,function(){PFSheet.updateSkill("CS-Stealth");});
+
+on("change:cs-survival-ability",function(){PFSheet.handleDropdown("CS-Survival-ability",["CS-Survival-ability-mod"]);});
+on("change:cs-survival-cs change:cs-survival-ranks change:cs-survival-class change:cs-survival-ability-mod change:cs-survival-racial change:cs-survival-feat change:cs-survival-item change:cs-survival-size change:cs-survival-acp change:cs-survival-misc change:cs-survival-ReqTrain"
+   ,function(){PFSheet.updateSkill("CS-Survival");});
+
+		
+
+   
+
+on("change:class-0-hp change:class-1-hp change:class-2-hp change:class-3-hp change:class-4-hp change:class-5-hp", function() {PFSheet.updateClassInformation("hp");});
+on("change:class-0-fchp change:class-1-fchp change:class-2-fchp change:class-3-fchp change:class-4-fchp change:class-5-fchp", function() {PFSheet.updateClassInformation("fchp");});
+on("change:class-0-bab change:class-1-bab change:class-2-bab change:class-3-bab change:class-4-bab change:class-5-bab", function() {PFSheet.updateClassInformation("bab");});
+on("change:class-0-skill change:class-1-skill change:class-2-skill change:class-3-skill change:class-4-skill change:class-5-skill", function() {PFSheet.updateClassInformation("skill");});
+on("change:class-0-fcskill change:class-1-fcskill change:class-2-fcskill change:class-3-fcskill change:class-4-fcskill change:class-5-fcskill", function() {PFSheet.updateClassInformation("fcskill");});
+on("change:class-0-fcalt change:class-1-fcalt change:class-2-fcalt change:class-3-fcalt change:class-4-fcalt change:class-5-fcalt", function() {PFSheet.updateClassInformation("fcalt");});
+on("change:class-0-fort change:class-1-fort change:class-2-fort change:class-3-fort change:class-4-fort change:class-5-fort", function() {PFSheet.updateClassInformation("Fort");});
+on("change:class-0-ref change:class-1-ref change:class-2-ref change:class-3-ref change:class-4-ref change:class-5-ref", function() {PFSheet.updateClassInformation("Ref");});
+on("change:class-0-will change:class-1-will change:class-2-will change:class-3-will change:class-4-will change:class-5-will", function() {PFSheet.updateClassInformation("Will");});
+on("change:class-0-level change:class-1-level change:class-2-level change:class-3-level change:class-4-level change:class-5-level", function() {PFSheet.updateClassInformation("level");});
 
 //init
 on("change:init-ability-mod change:init-trait change:init-misc condition-deafened",function(){ PFSheet.updateInit(); });
@@ -12873,6 +13174,7 @@ on("change:condition-entangled condition-cowering condition-blinded ff-ability",
 on("change:condition-drained", function() { PFSheet.updateHP(); });
 on("change:condition-grappled", function() {  PFSheet.updateGrapple() });
 on("change:condition-pinned", function() { PFSheet.updatePin();});
+on("change:condition-Fear change:condition-Blinded change:condition-Drained change:condition-Sickened", function() {PFSheet.updateConditionSkillPenalty();}); 
 
 
 
@@ -12961,275 +13263,30 @@ on("change:npc-hd change:npc-hd-num change:npc-hd2 change:npc-hd-num2 change:npc
 on("change:npc-hd-misc",function(){	SWUtils.evaluateAndSetNumber("NPC-HD-misc","NPC-HD-misc-mod");});
 
 //skills
-on("change:total-skill change:total-fcskill change:int-mod change:level change:max-skill-ranks-mod change:class-0-level change:class-1-level change:class-2-level change:class-3-level change:class-4-level change:unchained_skills-show change:BG-Skill-Use",function() { PFSheet.updateMaxSkills(); });
+on("change:total-skill change:total-fcskill change:int-mod change:level change:max-skill-ranks-mod change:unchained_skills-show change:BG-Skill-Use",function() { PFSheet.updateMaxSkills(); });
 on("change:max-skill-ranks-misc",function(){SWUtils.evaluateAndSetNumber("Max-Skill-Ranks-Misc","Max-Skill-Ranks-mod");});
 
 on("change:size_skill",function(){	PFSheet.updateSkill("Fly");});
 
 on("change:size_skill_double",function(){	PFSheet.updateSkill("Stealth");});
 
-//allskills
-
-
-
-on("change:acrobatics-ability",function(){PFSheet.handleDropdown("Acrobatics-ability",["Acrobatics-ability-mod"]);});
-on("change:acp change:acrobatics-cs change:acrobatics-ranks change:acrobatics-class change:acrobatics-ability change:acrobatics-ability-mod change:acrobatics-racial change:acrobatics-feat change:acrobatics-item change:acrobatics-size change:acrobatics-acp change:acrobatics-misc change:acrobatics-ReqTrain"
-   ,function(){PFSheet.updateSkill("Acrobatics");});
-
-on("change:artistry-ability",function(){PFSheet.handleDropdown("Artistry-ability",["Artistry-ability-mod"]);});
-on("change:artistry-cs change:artistry-ranks change:artistry-class change:artistry-ability change:artistry-ability-mod change:artistry-racial change:artistry-feat change:artistry-item change:artistry-size change:artistry-acp change:artistry-misc change:artistry-ReqTrain"
-   ,function(){PFSheet.updateSkill("Artistry");});
-
-on("change:appraise-ability",function(){PFSheet.handleDropdown("Appraise-ability",["Appraise-ability-mod"]);});
-on("change:appraise-cs change:appraise-ranks change:appraise-class change:appraise-ability change:appraise-ability-mod change:appraise-racial change:appraise-feat change:appraise-item change:appraise-size change:appraise-acp change:appraise-misc change:appraise-ReqTrain"
-   ,function(){PFSheet.updateSkill("Appraise");});
-
-on("change:bluff-ability",function(){PFSheet.handleDropdown("Bluff-ability",["Bluff-ability-mod"]);});
-on("change:bluff-cs change:bluff-ranks change:bluff-class change:bluff-ability change:bluff-ability-mod change:bluff-racial change:bluff-feat change:bluff-item change:bluff-size change:bluff-acp change:bluff-misc change:bluff-ReqTrain"
-   ,function(){PFSheet.updateSkill("Bluff");});
-
-on("change:climb-ability",function(){PFSheet.handleDropdown("Climb-ability",["Climb-ability-mod"]);});
-on("change:acp change:climb-cs change:climb-ranks change:climb-class change:climb-ability change:climb-ability-mod change:climb-racial change:climb-feat change:climb-item change:climb-size change:climb-acp change:climb-misc change:climb-ReqTrain"
-   ,function(){PFSheet.updateSkill("Climb");});
-
-on("change:craft-ability",function(){PFSheet.handleDropdown("Craft-ability",["Craft-ability-mod"]);});
-on("change:craft-cs change:craft-ranks change:craft-class change:craft-ability change:craft-ability-mod change:craft-racial change:craft-feat change:craft-item change:craft-size change:craft-acp change:craft-misc change:craft-ReqTrain"
-   ,function(){PFSheet.updateSkill("Craft");});
-
-on("change:craft2-ability",function(){PFSheet.handleDropdown("Craft2-ability",["Craft2-ability-mod"]);});
-on("change:craft2-cs change:craft2-ranks change:craft2-class change:craft2-ability change:craft2-ability-mod change:craft2-racial change:craft2-feat change:craft2-item change:craft2-size change:craft2-acp change:craft2-misc change:craft2-ReqTrain"
-   ,function(){PFSheet.updateSkill("Craft2");});
-
-on("change:craft3-ability",function(){PFSheet.handleDropdown("Craft3-ability",["Craft3-ability-mod"]);});
-on("change:craft3-cs change:craft3-ranks change:craft3-class change:craft3-ability change:craft3-ability-mod change:craft3-racial change:craft3-feat change:craft3-item change:craft3-size change:craft3-acp change:craft3-misc change:craft3-ReqTrain"
-   ,function(){PFSheet.updateSkill("Craft3");});
-
-on("change:diplomacy-ability",function(){PFSheet.handleDropdown("Diplomacy-ability",["Diplomacy-ability-mod"]);});
-on("change:diplomacy-cs change:diplomacy-ranks change:diplomacy-class change:diplomacy-ability change:diplomacy-ability-mod change:diplomacy-racial change:diplomacy-feat change:diplomacy-item change:diplomacy-size change:diplomacy-acp change:diplomacy-misc change:diplomacy-ReqTrain"
-   ,function(){PFSheet.updateSkill("Diplomacy");});
-
-on("change:disable-Device-ability",function(){PFSheet.handleDropdown("Disable-Device-ability",["Disable-Device-ability-mod"]);});
-on("change:acp change:disable-Device-cs change:disable-Device-ranks change:disable-Device-class change:disable-Device-ability change:disable-Device-ability-mod change:disable-Device-racial change:disable-Device-feat change:disable-Device-item change:disable-Device-size change:disable-Device-acp change:disable-Device-misc change:disable-Device-ReqTrain"
-   ,function(){PFSheet.updateSkill("Disable-Device");});
-
-on("change:disguise-ability",function(){PFSheet.handleDropdown("Disguise-ability",["Disguise-ability-mod"]);});
-on("change:disguise-cs change:disguise-ranks change:disguise-class change:disguise-ability change:disguise-ability-mod change:disguise-racial change:disguise-feat change:disguise-item change:disguise-size change:disguise-acp change:disguise-misc change:disguise-ReqTrain"
-   ,function(){PFSheet.updateSkill("Disguise");});
-
-on("change:escape-Artist-ability",function(){PFSheet.handleDropdown("Escape-Artist-ability",["Escape-Artist-ability-mod"]);});
-on("change:acp change:escape-Artist-cs change:escape-Artist-ranks change:escape-Artist-class change:escape-Artist-ability change:escape-Artist-ability-mod change:escape-Artist-racial change:escape-Artist-feat change:escape-Artist-item change:escape-Artist-size change:escape-Artist-acp change:escape-Artist-misc change:escape-Artist-ReqTrain"
-   ,function(){PFSheet.updateSkill("Escape-Artist");});
-  
-on("change:fly-ability",function(){PFSheet.handleDropdown("Fly-ability",["Fly-ability-mod"]);});
-on("change:acp change:size_skill change:fly-cs change:fly-ranks change:fly-class change:fly-ability change:fly-ability-mod change:fly-racial change:fly-feat change:fly-item change:fly-size change:fly-acp change:fly-misc change:fly-ReqTrain"
-   ,function(){PFSheet.updateSkill("Fly");});
-
-on("change:handle-Animal-ability",function(){PFSheet.handleDropdown("Handle-Animal-ability",["Handle-Animal-ability-mod"]);});
-on("change:handle-Animal-cs change:handle-Animal-ranks change:handle-Animal-class change:handle-Animal-ability change:handle-Animal-ability-mod change:handle-Animal-racial change:handle-Animal-feat change:handle-Animal-item change:handle-Animal-size change:handle-Animal-acp change:handle-Animal-misc change:handle-Animal-ReqTrain"
-   ,function(){PFSheet.updateSkill("Handle-Animal");});
-
-on("change:heal-ability",function(){PFSheet.handleDropdown("Heal-ability",["Heal-ability-mod"]);});
-on("change:heal-cs change:heal-ranks change:heal-class change:heal-ability change:heal-ability-mod change:heal-racial change:heal-feat change:heal-item change:heal-size change:heal-acp change:heal-misc change:heal-ReqTrain"
-   ,function(){PFSheet.updateSkill("Heal");});
-
-on("change:intimidate-ability",function(){PFSheet.handleDropdown("Intimidate-ability",["Intimidate-ability-mod"]);});
-on("change:intimidate-cs change:intimidate-ranks change:intimidate-class change:intimidate-ability change:intimidate-ability-mod change:intimidate-racial change:intimidate-feat change:intimidate-item change:intimidate-size change:intimidate-acp change:intimidate-misc change:intimidate-ReqTrain"
-   ,function(){PFSheet.updateSkill("Intimidate");});
-
-on("change:linguistics-ability",function(){PFSheet.handleDropdown("Linguistics-ability",["Linguistics-ability-mod"]);});
-on("change:linguistics-cs change:linguistics-ranks change:linguistics-class change:linguistics-ability change:linguistics-ability-mod change:linguistics-racial change:linguistics-feat change:linguistics-item change:linguistics-size change:linguistics-acp change:linguistics-misc change:linguistics-ReqTrain"
-   ,function(){PFSheet.updateSkill("Linguistics");});
-
-on("change:lore-ability",function(){PFSheet.handleDropdown("Lore-ability",["Lore-ability-mod"]);});
-on("change:lore-cs change:lore-ranks change:lore-class change:lore-ability change:lore-ability-mod change:lore-racial change:lore-feat change:lore-item change:lore-size change:lore-acp change:lore-misc change:lore-ReqTrain"
-   ,function(){PFSheet.updateSkill("Lore");});
-
-on("change:knowledge-arcana-ability",function(){PFSheet.handleDropdown("Knowledge-Arcana-ability",["Knowledge-Arcana-ability-mod"]);});
-on("change:knowledge-arcana-cs change:knowledge-arcana-ranks change:knowledge-arcana-class change:knowledge-arcana-ability change:knowledge-arcana-ability-mod change:knowledge-arcana-racial change:knowledge-arcana-feat change:knowledge-arcana-item change:knowledge-arcana-size change:knowledge-arcana-acp change:knowledge-arcana-misc change:knowledge-arcana-ReqTrain"
-   ,function(){PFSheet.updateSkill("Knowledge-Arcana");});
-
-on("change:knowledge-dungeoneering-ability",function(){PFSheet.handleDropdown("Knowledge-Dungeoneering-ability",["Knowledge-Dungeoneering-ability-mod"]);});
-on("change:knowledge-dungeoneering-cs change:knowledge-dungeoneering-ranks change:knowledge-dungeoneering-class change:knowledge-dungeoneering-ability change:knowledge-dungeoneering-ability-mod change:knowledge-dungeoneering-racial change:knowledge-dungeoneering-feat change:knowledge-dungeoneering-item change:knowledge-dungeoneering-size change:knowledge-dungeoneering-acp change:knowledge-dungeoneering-misc change:knowledge-dungeoneering-ReqTrain"
-   ,function(){PFSheet.updateSkill("Knowledge-Dungeoneering");});
-
-on("change:knowledge-engineering-ability",function(){PFSheet.handleDropdown("Knowledge-Engineering-ability",["Knowledge-Engineering-ability-mod"]);});
-on("change:knowledge-engineering-cs change:knowledge-engineering-ranks change:knowledge-engineering-class change:knowledge-engineering-ability change:knowledge-engineering-ability-mod change:knowledge-engineering-racial change:knowledge-engineering-feat change:knowledge-engineering-item change:knowledge-engineering-size change:knowledge-engineering-acp change:knowledge-engineering-misc change:knowledge-engineering-ReqTrain"
-   ,function(){PFSheet.updateSkill("Knowledge-Engineering");});
-
-on("change:knowledge-geography-ability",function(){PFSheet.handleDropdown("Knowledge-Geography-ability",["Knowledge-Geography-ability-mod"]);});
-on("change:knowledge-geography-cs change:knowledge-geography-ranks change:knowledge-geography-class change:knowledge-geography-ability change:knowledge-geography-ability-mod change:knowledge-geography-racial change:knowledge-geography-feat change:knowledge-geography-item change:knowledge-geography-size change:knowledge-geography-acp change:knowledge-geography-misc change:knowledge-geography-ReqTrain"
-   ,function(){PFSheet.updateSkill("Knowledge-Geography");});
-   
-on("change:knowledge-history-ability",function(){PFSheet.handleDropdown("Knowledge-History-ability",["Knowledge-History-ability-mod"]);});
-on("change:knowledge-history-cs change:knowledge-history-ranks change:knowledge-history-class change:knowledge-history-ability change:knowledge-history-ability-mod change:knowledge-history-racial change:knowledge-history-feat change:knowledge-history-item change:knowledge-history-size change:knowledge-history-acp change:knowledge-history-misc change:knowledge-history-ReqTrain"
-   ,function(){PFSheet.updateSkill("Knowledge-History");});
-
-on("change:knowledge-local-ability",function(){PFSheet.handleDropdown("Knowledge-Local-ability",["Knowledge-Local-ability-mod"]);});
-on("change:knowledge-local-cs change:knowledge-local-ranks change:knowledge-local-class change:knowledge-local-ability change:knowledge-local-ability-mod change:knowledge-local-racial change:knowledge-local-feat change:knowledge-local-item change:knowledge-local-size change:knowledge-local-acp change:knowledge-local-misc change:knowledge-local-ReqTrain"
-   ,function(){PFSheet.updateSkill("Knowledge-Local");});
-
-on("change:knowledge-nature-ability",function(){PFSheet.handleDropdown("Knowledge-Nature-ability",["Knowledge-Nature-ability-mod"]);});
-on("change:knowledge-nature-cs change:knowledge-nature-ranks change:knowledge-nature-class change:knowledge-nature-ability change:knowledge-nature-ability-mod change:knowledge-nature-racial change:knowledge-nature-feat change:knowledge-nature-item change:knowledge-nature-size change:knowledge-nature-acp change:knowledge-nature-misc change:knowledge-nature-ReqTrain"
-   ,function(){PFSheet.updateSkill("Knowledge-Nature");});
-
-on("change:knowledge-nobility-ability",function(){PFSheet.handleDropdown("Knowledge-Nobility-ability",["Knowledge-Nobility-ability-mod"]);});
-on("change:knowledge-nobility-cs change:knowledge-nobility-ranks change:knowledge-nobility-class change:knowledge-nobility-ability change:knowledge-nobility-ability-mod change:knowledge-nobility-racial change:knowledge-nobility-feat change:knowledge-nobility-item change:knowledge-nobility-size change:knowledge-nobility-acp change:knowledge-nobility-misc change:knowledge-nobility-ReqTrain"
-   ,function(){PFSheet.updateSkill("Knowledge-Nobility");});
-
-on("change:knowledge-planes-ability",function(){PFSheet.handleDropdown("Knowledge-Planes-ability",["Knowledge-Planes-ability-mod"]);});
-on("change:knowledge-planes-cs change:knowledge-planes-ranks change:knowledge-planes-class change:knowledge-planes-ability change:knowledge-planes-ability-mod change:knowledge-planes-racial change:knowledge-planes-feat change:knowledge-planes-item change:knowledge-planes-size change:knowledge-planes-acp change:knowledge-planes-misc change:knowledge-planes-ReqTrain"
-   ,function(){PFSheet.updateSkill("Knowledge-Planes");});
-
-on("change:knowledge-religion-ability",function(){PFSheet.handleDropdown("Knowledge-Religion-ability",["Knowledge-Religion-ability-mod"]);});
-on("change:knowledge-religion-cs change:knowledge-religion-ranks change:knowledge-religion-class change:knowledge-religion-ability change:knowledge-religion-ability-mod change:knowledge-religion-racial change:knowledge-religion-feat change:knowledge-religion-item change:knowledge-religion-size change:knowledge-religion-acp change:knowledge-religion-misc change:knowledge-religion-ReqTrain"
-   ,function(){PFSheet.updateSkill("Knowledge-Religion");});
-   
-on("change:perception-ability",function(){PFSheet.handleDropdown("Perception-ability",["Perception-ability-mod"]);});
-on("change:perception-cs change:perception-ranks change:perception-class change:perception-ability change:perception-ability-mod change:perception-racial change:perception-feat change:perception-item change:perception-size change:perception-acp change:perception-misc change:perception-ReqTrain"
-   ,function(){PFSheet.updateSkill("Perception");});
-
-on("change:perform-ability",function(){PFSheet.handleDropdown("Perform-ability",["Perform-ability-mod"]);});
-on("change:perform-cs change:perform-ranks change:perform-class change:perform-ability change:perform-ability-mod change:perform-racial change:perform-feat change:perform-item change:perform-size change:perform-acp change:perform-misc change:perform-ReqTrain"
-   ,function(){PFSheet.updateSkill("Perform");});
-
-on("change:perform2-ability",function(){PFSheet.handleDropdown("Perform2-ability",["Perform2-ability-mod"]);});
-on("change:perform2-cs change:perform2-ranks change:perform2-class change:perform2-ability change:perform2-ability-mod change:perform2-racial change:perform2-feat change:perform2-item change:perform2-size change:perform2-acp change:perform2-misc change:perform2-ReqTrain"
-   ,function(){PFSheet.updateSkill("Perform2");});
-
-on("change:perform3-ability",function(){PFSheet.handleDropdown("Perform3-ability",["Perform3-ability-mod"]);});
-on("change:perform3-cs change:perform3-ranks change:perform3-class change:perform3-ability change:perform3-ability-mod change:perform3-racial change:perform3-feat change:perform3-item change:perform3-size change:perform3-acp change:perform3-misc change:perform3-ReqTrain"
-   ,function(){PFSheet.updateSkill("Perform3");});
-
-on("change:profession-ability",function(){PFSheet.handleDropdown("Profession-ability",["Profession-ability-mod"]);});
-on("change:profession-cs change:profession-ranks change:profession-class change:profession-ability change:profession-ability-mod change:profession-racial change:profession-feat change:profession-item change:profession-size change:profession-acp change:profession-misc change:profession-ReqTrain"
-   ,function(){PFSheet.updateSkill("Profession");});
-
-on("change:profession2-ability",function(){PFSheet.handleDropdown("Profession2-ability",["Profession2-ability-mod"]);});
-on("change:profession2-cs change:profession2-ranks change:profession2-class change:profession2-ability change:profession2-ability-mod change:profession2-racial change:profession2-feat change:profession2-item change:profession2-size change:profession2-acp change:profession2-misc change:profession2-ReqTrain"
-   ,function(){PFSheet.updateSkill("Profession2");});
-
-on("change:profession3-ability",function(){PFSheet.handleDropdown("Profession3-ability",["Profession3-ability-mod"]);});
-on("change:profession3-cs change:profession3-ranks change:profession3-class change:profession3-ability change:profession3-ability-mod change:profession3-racial change:profession3-feat change:profession3-item change:profession3-size change:profession3-acp change:profession3-misc change:profession3-ReqTrain"
-   ,function(){PFSheet.updateSkill("Profession3");});
-
-on("change:ride-ability",function(){PFSheet.handleDropdown("Ride-ability",["Ride-ability-mod"]);});
-on("change:acp change:ride-cs change:ride-ranks change:ride-class change:ride-ability change:ride-ability-mod change:ride-racial change:ride-feat change:ride-item change:ride-size change:ride-acp change:ride-misc change:ride-ReqTrain"
-   ,function(){PFSheet.updateSkill("Ride");});
-
-on("change:sense-Motive-ability",function(){PFSheet.handleDropdown("Sense-Motive-ability",["Sense-Motive-ability-mod"]);});
-on("change:sense-Motive-cs change:sense-Motive-ranks change:sense-Motive-class change:sense-Motive-ability change:sense-Motive-ability-mod change:sense-Motive-racial change:sense-Motive-feat change:sense-Motive-item change:sense-Motive-size change:sense-Motive-acp change:sense-Motive-misc change:sense-Motive-ReqTrain"
-   ,function(){PFSheet.updateSkill("Sense-Motive");});
-   
-on("change:sleight-of-Hand-ability",function(){PFSheet.handleDropdown("Sleight-of-Hand-ability",["Sleight-of-Hand-ability-mod"]);});
-on("change:sleight-of-Hand-cs change:sleight-of-Hand-ranks change:sleight-of-Hand-class change:sleight-of-Hand-ability change:sleight-of-Hand-ability-mod change:sleight-of-Hand-racial change:sleight-of-Hand-feat change:sleight-of-Hand-item change:sleight-of-Hand-size change:sleight-of-Hand-acp change:sleight-of-Hand-misc change:sleight-of-Hand-ReqTrain"
-   ,function(){PFSheet.updateSkill("Sleight-of-Hand");});
-
-on("change:spellcraft-ability",function(){PFSheet.handleDropdown("Spellcraft-ability",["Spellcraft-ability-mod"]);});
-on("change:spellcraft-cs change:spellcraft-ranks change:spellcraft-class change:spellcraft-ability change:spellcraft-ability-mod change:spellcraft-racial change:spellcraft-feat change:spellcraft-item change:spellcraft-size change:spellcraft-acp change:spellcraft-misc change:spellcraft-ReqTrain"
-   ,function(){PFSheet.updateSkill("Spellcraft");});
-
-on("change:stealth-ability",function(){PFSheet.handleDropdown("Stealth-ability",["Stealth-ability-mod"]);});
-on("change:acp change:size_skill_double change:stealth-cs change:stealth-ranks change:stealth-class change:stealth-ability change:stealth-ability-mod change:stealth-racial change:stealth-feat change:stealth-item change:stealth-size change:stealth-acp change:stealth-misc change:stealth-ReqTrain"
-   ,function(){PFSheet.updateSkill("Stealth");});
-   
-on("change:survival-ability",function(){PFSheet.handleDropdown("Survival-ability",["Survival-ability-mod"]);});
-on("change:survival-cs change:survival-ranks change:survival-class change:survival-ability change:survival-ability-mod change:survival-racial change:survival-feat change:survival-item change:survival-size change:survival-acp change:survival-misc change:survival-ReqTrain"
-   ,function(){PFSheet.updateSkill("Survival");});
-
-on("change:swim-ability",function(){PFSheet.handleDropdown("Swim-ability",["Swim-ability-mod"]);});
-on("change:acp change:swim-cs change:swim-ranks change:swim-class change:swim-ability change:swim-ability-mod change:swim-racial change:swim-feat change:swim-item change:swim-size change:swim-acp change:swim-misc change:swim-ReqTrain"
-   ,function(){PFSheet.updateSkill("Swim");});
-
-on("change:use-magic-device-ability",function(){PFSheet.handleDropdown("Use-Magic-Device-ability",["Use-Magic-Device-ability-mod"]);});
-on("change:use-magic-device-cs change:use-magic-device-ranks change:use-magic-device-class change:use-magic-device-ability change:use-magic-device-ability-mod change:use-magic-device-racial change:use-magic-device-feat change:use-magic-device-item change:use-magic-device-size change:use-magic-device-acp change:use-magic-device-misc change:use-magic-device-ReqTrain"
-   ,function(){PFSheet.updateSkill("Use-Magic-Device");});
-
-on("change:misc-skill-1-ability",function(){PFSheet.handleDropdown("Misc-Skill-0-ability",["Misc-Skill-0-ability-mod"]);});
-on("change:misc-skill-1-cs change:misc-skill-1-ranks change:misc-skill-1-class change:misc-skill-1-ability change:misc-skill-1-ability-mod change:misc-skill-1-racial change:misc-skill-1-feat change:misc-skill-1-item change:misc-skill-1-size change:misc-skill-1-acp change:misc-skill-1-misc change:misc-skill-1-ReqTrain"
-   ,function(){PFSheet.updateSkill("Misc-Skill-0");});
-
-on("change:misc-skill-1-ability",function(){PFSheet.handleDropdown("Misc-Skill-1-ability",["Misc-Skill-1-ability-mod"]);});
-on("change:misc-skill-1-cs change:misc-skill-1-ranks change:misc-skill-1-class change:misc-skill-1-ability change:misc-skill-1-ability-mod change:misc-skill-1-racial change:misc-skill-1-feat change:misc-skill-1-item change:misc-skill-1-size change:misc-skill-1-acp change:misc-skill-1-misc change:misc-skill-1-ReqTrain"
-   ,function(){PFSheet.updateSkill("Misc-Skill-1");});
-
-on("change:misc-skill-2-ability",function(){PFSheet.handleDropdown("Misc-Skill-2-ability",["Misc-Skill-2-ability-mod"]);});
-on("change:misc-skill-2-cs change:misc-skill-2-ranks change:misc-skill-2-class change:misc-skill-2-ability change:misc-skill-2-ability-mod change:misc-skill-2-racial change:misc-skill-2-feat change:misc-skill-2-item change:misc-skill-2-size change:misc-skill-2-acp change:misc-skill-2-misc change:misc-skill-2-ReqTrain"
-   ,function(){PFSheet.updateSkill("Misc-Skill-2");});
-
-on("change:misc-skill-3-ability",function(){PFSheet.handleDropdown("Misc-Skill-3-ability",["Misc-Skill-3-ability-mod"]);});
-on("change:misc-skill-3-cs change:misc-skill-3-ranks change:misc-skill-3-class change:misc-skill-3-ability change:misc-skill-3-ability-mod change:misc-skill-3-racial change:misc-skill-3-feat change:misc-skill-3-item change:misc-skill-3-size change:misc-skill-3-acp change:misc-skill-3-misc change:misc-skill-3-ReqTrain"
-   ,function(){PFSheet.updateSkill("Misc-Skill-3");});
-
-on("change:misc-skill-4-ability",function(){PFSheet.handleDropdown("Misc-Skill-4-ability",["Misc-Skill-4-ability-mod"]);});
-on("change:misc-skill-4-cs change:misc-skill-4-ranks change:misc-skill-4-class change:misc-skill-4-ability change:misc-skill-4-ability-mod change:misc-skill-4-racial change:misc-skill-4-feat change:misc-skill-4-item change:misc-skill-4-size change:misc-skill-4-acp change:misc-skill-4-misc change:misc-skill-4-ReqTrain"
-   ,function(){PFSheet.updateSkill("Misc-Skill-4");});
-
-on("change:misc-skill-5-ability",function(){PFSheet.handleDropdown("Misc-Skill-5-ability",["Misc-Skill-5-ability-mod"]);});
-on("change:misc-skill-5-cs change:misc-skill-5-ranks change:misc-skill-5-class change:misc-skill-5-ability change:misc-skill-5-ability-mod change:misc-skill-5-racial change:misc-skill-5-feat change:misc-skill-5-item change:misc-skill-5-size change:misc-skill-5-acp change:misc-skill-5-misc change:misc-skill-5-ReqTrain"
-   ,function(){PFSheet.updateSkill("Misc-Skill-5");});
-
-on("change:cS-Acrobatics-ability",function(){PFSheet.handleDropdown("CS-Acrobatics-ability",["CS-Acrobatics-ability-mod"]);});
-on("change:acp change:cS-Acrobatics-cs change:cS-Acrobatics-ranks change:cS-Acrobatics-class change:cS-Acrobatics-ability change:cS-Acrobatics-ability-mod change:cS-Acrobatics-racial change:cS-Acrobatics-feat change:cS-Acrobatics-item change:cS-Acrobatics-size change:cS-Acrobatics-acp change:cS-Acrobatics-misc change:cS-Acrobatics-ReqTrain"
-   ,function(){PFSheet.updateSkill("CS-Acrobatics");});
-
-on("change:cS-Athletics-ability",function(){PFSheet.handleDropdown("CS-Athletics-ability",["CS-Athletics-ability-mod"]);});
-on("change:acp change:cS-Athletics-cs change:cS-Athletics-ranks change:cS-Athletics-class change:cS-Athletics-ability change:cS-Athletics-ability-mod change:cS-Athletics-racial change:cS-Athletics-feat change:cS-Athletics-item change:cS-Athletics-size change:cS-Athletics-acp change:cS-Athletics-misc change:cS-Athletics-ReqTrain"
-   ,function(){PFSheet.updateSkill("CS-Athletics");});
-
-
-on("change:cs-finesse-ability",function(){PFSheet.handleDropdown("CS-Finesse-ability",["CS-Finesse-ability-mod"]);});
-on("change:cs-finesse-cs change:cs-finesse-ranks change:cs-finesse-class change:cs-finesse-ability change:cs-finesse-ability-mod change:cs-finesse-racial change:cs-finesse-feat change:cs-finesse-item change:cs-finesse-size change:cs-finesse-acp change:cs-finesse-misc change:cs-finesse-ReqTrain"
-   ,function(){PFSheet.updateSkill("CS-Finesse");});
-      
-on("change:cs-influence-ability",function(){PFSheet.handleDropdown("CS-Influence-ability",["CS-Influence-ability-mod"]);});
-on("change:cs-influence-cs change:cs-influence-ranks change:cs-influence-class change:cs-influence-ability change:cs-influence-ability-mod change:cs-influence-racial change:cs-influence-feat change:cs-influence-item change:cs-influence-size change:cs-influence-acp change:cs-influence-misc change:cs-influence-ReqTrain"
-   ,function(){PFSheet.updateSkill("CS-Influence");});
-
-on("change:cs-nature-ability",function(){PFSheet.handleDropdown("CS-Nature-ability",["CS-Nature-ability-mod"]);});
-on("change:cs-nature-cs change:cs-nature-ranks change:cs-nature-class change:cs-nature-ability change:cs-nature-ability-mod change:cs-nature-racial change:cs-nature-feat change:cs-nature-item change:cs-nature-size change:cs-nature-acp change:cs-nature-misc change:cs-nature-ReqTrain"
-   ,function(){PFSheet.updateSkill("CS-Nature");});
-
-on("change:cs-perception-ability",function(){PFSheet.handleDropdown("CS-Perception-ability",["CS-Perception-ability-mod"]);});
-on("change:cs-perception-cs change:cs-perception-ranks change:cs-perception-class change:cs-perception-ability change:cs-perception-ability-mod change:cs-perception-racial change:cs-perception-feat change:cs-perception-item change:cs-perception-size change:cs-perception-acp change:cs-perception-misc change:cs-perception-ReqTrain"
-   ,function(){PFSheet.updateSkill("CS-Perception");});
-
-on("change:cs-performance-ability",function(){PFSheet.handleDropdown("CS-Performance-ability",["CS-Performance-ability-mod"]);});
-on("change:cs-performance-cs change:cs-performance-ranks change:cs-performance-class change:cs-performance-ability change:cs-performance-ability-mod change:cs-performance-racial change:cs-performance-feat change:cs-performance-item change:cs-performance-size change:cs-performance-acp change:cs-performance-misc change:cs-performance-ReqTrain"
-   ,function(){PFSheet.updateSkill("CS-Performance");});
-
-on("change:cs-religion-ability",function(){PFSheet.handleDropdown("CS-Religion-ability",["CS-Religion-ability-mod"]);});
-on("change:cs-religion-cs change:cs-religion-ranks change:cs-religion-class change:cs-religion-ability change:cs-religion-ability-mod change:cs-religion-racial change:cs-religion-feat change:cs-religion-item change:cs-religion-size change:cs-religion-acp change:cs-religion-misc change:cs-religion-ReqTrain"
-   ,function(){PFSheet.updateSkill("CS-Religion");});
-
-on("change:cs-society-ability",function(){PFSheet.handleDropdown("CS-Society-ability",["CS-Society-ability-mod"]);});
-on("change:cs-society-cs change:cs-society-ranks change:cs-society-class change:cs-society-ability change:cs-society-ability-mod change:cs-society-racial change:cs-society-feat change:cs-society-item change:cs-society-size change:cs-society-acp change:cs-society-misc change:cs-society-ReqTrain"
-   ,function(){PFSheet.updateSkill("CS-Society");});
-
-on("change:cs-spellcraft-ability",function(){PFSheet.handleDropdown("CS-Spellcraft-ability",["CS-Spellcraft-ability-mod"]);});
-on("change:cs-spellcraft-cs change:cs-spellcraft-ranks change:cs-spellcraft-class change:cs-spellcraft-ability change:cs-spellcraft-ability-mod change:cs-spellcraft-racial change:cs-spellcraft-feat change:cs-spellcraft-item change:cs-spellcraft-size change:cs-spellcraft-acp change:cs-spellcraft-misc change:cs-spellcraft-ReqTrain"
-   ,function(){PFSheet.updateSkill("CS-Spellcraft");});
-
-
-on("change:cs-stealth-ability",function(){PFSheet.handleDropdown("CS-Stealth-ability",["CS-Stealth-ability-mod"]);});
-on("change:acp change:cs-stealth-cs change:cs-stealth-ranks change:cs-stealth-class change:cs-stealth-ability change:cs-stealth-ability-mod change:cs-stealth-racial change:cs-stealth-feat change:cs-stealth-item change:cs-stealth-size change:cs-stealth-acp change:cs-stealth-misc change:cs-stealth-ReqTrain"
-   ,function(){PFSheet.updateSkill("CS-Stealth");});
-
-on("change:cs-survival-ability",function(){PFSheet.handleDropdown("CS-Survival-ability",["CS-Survival-ability-mod"]);});
-on("change:cs-survival-cs change:cs-survival-ranks change:cs-survival-class change:cs-survival-ability change:cs-survival-ability-mod change:cs-survival-racial change:cs-survival-feat change:cs-survival-item change:cs-survival-size change:cs-survival-acp change:cs-survival-misc change:cs-survival-ReqTrain"
-   ,function(){PFSheet.updateSkill("CS-Survival");});
-
-   
-on("change:acp",function() {
+on("change:Phys-skills-cond",function() {
 	PFSheet.updateSkill("Acrobatics");
 	PFSheet.updateSkill("Climb");
-	PFSheet.updateSkill("Disable-Device");   
+	PFSheet.updateSkill("Disable-Device");
 	PFSheet.updateSkill("Escape-Artist");
 	PFSheet.updateSkill("Fly");
+	PFSheet.updateSkill("Intimidate");
 	PFSheet.updateSkill("Ride");
+	PFSheet.updateSkill("Sleight-of-Hand");
 	PFSheet.updateSkill("Stealth");
 	PFSheet.updateSkill("Swim");
 	PFSheet.updateSkill("CS-Acrobatics");
 	PFSheet.updateSkill("CS-Athletics");
+	PFSheet.updateSkill("CS-Finesse");
 	PFSheet.updateSkill("CS-Stealth");
 });
+on("change:Perception-cond",function() {PFSheet.updateSkill("Perception");});
+   
+   
 </script>
