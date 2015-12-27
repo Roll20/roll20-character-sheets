@@ -147,8 +147,7 @@
     <input type="text" disabled hidden name="attr_jetRollTir" value="&{template:sawo} {{name=Tir}} {{perso=@{character_name}}} {{secoue=[[@{secoue}]]}} {{jet=[[@{jetRollBastTir}]]}} {{blessures=[[@{blessures}]]}} {{fatigue=[[@{fatigue}]]}} {{encombrement=[[@{encombrement}]]}}" />
 </div> <!-- *** HIDDEN ROLLS ** -->
 <!-- PARAMETRAGES -->
-<span class="sheet-smallspan">Version 1.1 (2015-11-30)&nbsp;-&nbsp;Style des jets: </span>
-<input type="radio" name="attr_sheetStyle" value="0" class="sheet-styleRolrel" checked="checked" title="Style de jet par template, montrant succès et relances" /><span>Succès+Relances</span>
+<span class="sheet-smallspan">v1.2 - <b>Style des jets :</b></span><input type="radio" name="attr_sheetStyle" value="0" class="sheet-styleRolrel" checked="checked" title="Style de jet par template, montrant succès et relances" /><span>Succès+Relances</span>
 <input type="radio" name="attr_sheetStyle" value="1" class="sheet-styleRoljet" title="Style de jet 'macro', montrant les jets bruts" /><span>Jets bruts</span>
 <!--- ***  FdP *** -->
 <div class="sheet-main">
@@ -893,15 +892,17 @@
                 <input type="number" name="attr_encombrement" value="0" title="Malus d'encombrement à tous les jets d’Agilité et de Force, ainsi qu’à tous les jets de Compétences liées à ces deux Attributs" readonly />
             </div>
             <div>
-                <div class="sheet-redtitle2" style="display: inline-block;width: 170px;">&Eacute;QUIPEMENT</div>
-                <div class="sheet-blacktext1" style="width: 40px;">Poids</div>
-                <div class="sheet-blacktext1" style="width: 40px;">Qté</div>
+                <div class="sheet-redtitle2" style="display: inline-block;width: 140px;">&Eacute;QUIPEMENT</div>
+                <div class="sheet-blacktext1" style="width: 35px;">Qté</div>
+                <div class="sheet-blacktext1" style="width: 35px;">Poids</div>
+                <div class="sheet-blacktext1" style="width: 35px;">Tot.</div>
             </div>
             <fieldset class="repeating_equipements">
                 <div class="sheet-input">
-                    <input type="text" style="width: 170px;" name="attr_equipnom" placeholder="&Eacute;quipement" title="Nom de l'équipement" />
-                    <input type="number" style="width: 40px;" name="attr_equippoids" value="0" min="0" title="Poids total de l'équipement" />
-                    <input type="number" style="width: 40px;" name="attr_equipqte" value="1" min="0" title="Quantité" />
+                    <input type="text" style="width: 145px;" name="attr_equipnom" placeholder="&Eacute;quipement" title="Nom de l'équipement" />
+                    <input type="number" style="width: 35px;" name="attr_equipqte" value="1" min="0" title="Quantité" />
+                    <input type="number" style="width: 35px;" name="attr_equippdsunit" value="0" min="0" title="Poids unitaire" />
+                    <input type="text" style="width: 35px;text-align:right" name="attr_equippoids" value="0" min="0" title="Poids total de l'équipement" readonly />
                 </div>
             </fieldset>
         </div><!-- FIN EQUIPEMENT -->
@@ -1129,18 +1130,16 @@
                 <input name="attr_armeD_pa" type="number" style="width:30px;margin-right:3px;" value="0" min="0" title="Pénétration d'Armure" />
                 <input name="attr_armeD_notes" style="width: 190px;" type="text" placeholder="Notes" title="Notes sur l'arme" />
             </div> <!-- FIN ARME DYNAMIQUE -->
-            <div style="display: none;">
-                <script type="text/worker">
-                    on("change:repeating_armes:armed_comp", function() {
-                        getAttrs(["repeating_armes_armeD_comp"], function(values) {
-                            setAttrs({
-                                repeating_armes_armeD_comp_rel: "@{relRollBast" + values.repeating_armes_armeD_comp + "}",
-                                repeating_armes_armeD_comp_jet: "@{jetRollBast" + values.repeating_armes_armeD_comp + "}"
-                            });
+            <script type="text/worker">
+                on("change:repeating_armes:armed_comp", function() {
+                    getAttrs(["repeating_armes_armeD_comp"], function(values) {
+                        setAttrs({
+                            repeating_armes_armeD_comp_rel: "@{relRollBast" + values.repeating_armes_armeD_comp + "}",
+                            repeating_armes_armeD_comp_jet: "@{jetRollBast" + values.repeating_armes_armeD_comp + "}"
                         });
                     });
-                </script>
-            </div>
+                });
+            </script>
         </fieldset>
     </div> <!-- ** FIN ARMES ** -->
     <div class="sheet-colblock"> <!-- ** POUVOIRS ** -->
@@ -1170,7 +1169,7 @@
         </fieldset>
    </div> <!-- ** FIN POUVOIRS ** -->
 </div>
-<div style="display: none;"> <!-- SCRIPTS / SHEET WORKERS -->
+<!-- **** SCRIPTS / SHEET WORKERS -->
 <script type="text/worker">
 /* ---- BEGIN: TheAaronSheet.js ---- */
 // Github:   https://github.com/shdwjk/TheAaronSheet/blob/master/TheAaronSheet.js
@@ -1556,7 +1555,22 @@ on("change:vigueur_de change:vigueur_bonus change:resistance_bonus", function() 
     });
 });
 //Inventaire et encombrement
-on('change:repeating_equipements',function(){
+/* on('change:repeating_equipements remove:repeating_equipements',function(){
+
+    TAS.repeatingSimpleSum('equipements','equippoids','encombpoids');
+});
+*/
+on("change:repeating_equipements:equipqte change:repeating_equipements:equippdsunit", function() {
+    getAttrs(["repeating_equipements_equipqte", "repeating_equipements_equippdsunit"], function(values) {
+        var qte = parseFloat(values.repeating_equipements_equipqte) || 1.0;
+        var pds = parseFloat(values.repeating_equipements_equippdsunit) || 0.0;
+        setAttrs({
+         repeating_spells_equippoids: qte*pds
+        });
+   });
+   TAS.repeatingSimpleSum('equipements','equippoids','encombpoids');
+});
+ on('remove:repeating_equipements',function(){
     TAS.repeatingSimpleSum('equipements','equippoids','encombpoids');
 });
 on("change:force_de", function() {
@@ -1576,7 +1590,6 @@ on("change:encombpoids change:encombmax", function() {
     });
 });
 </script>
-</div> <!-- FIN SCRIPTS / SHEET WORKERS -->
 <!-- *** TEMPLATES ** -->
 <rolltemplate class="sheet-rolltemplate-sawo">
     {{#perso}}
