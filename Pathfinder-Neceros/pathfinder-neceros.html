@@ -1950,7 +1950,7 @@
 				<span class="sheet-table-data sheet-divider">+</span>
 				<span class="sheet-table-data sheet-center"><input title="@{attk-penalty}" type="number" name="attr_attk-penalty" value="0" max="0" class="sheet-calc" readonly="readonly"  /></span>
 				<span class="sheet-table-data sheet-center">&nbsp;</span>
-				<span class="sheet-table-data sheet-center" style="width:100px;">&nbsp;</span>
+				<span class="sheet-table-data sheet-center" style="width:100px;"><input title="@{attk-cnote} : condition" type="text" name="attr_attk-cnote" value="" class="sheet-calc" readonly="readonly" /></span>
 			</div>
 			<div class="sheet-table-row">
 				<span class="sheet-table-row-name sheet-roll-check"><button class="sheet-text-button" type="roll" title="%{selected|Ranged-Attack-Roll}" name="roll_Ranged-Attack-Roll" value="@{PC-whisper} &{template:pf_attack} {{header_image=@{header_image-pf_attack-ranged}}} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{subtitle}} {{name=Ranged Attack}} {{Check=[[ 1d20 + [[ @{attk-ranged} ]] ]]}}"> Ranged</button></span>
@@ -1979,7 +1979,7 @@
 				<span class="sheet-table-data sheet-divider">+</span>
 				<span class="sheet-table-data sheet-center"><input title="@{attk-penalty}" type="number" name="attr_attk-penalty" value="0"  class="sheet-calc" readonly="readonly" /></span>
 				<span class="sheet-table-data sheet-center">&nbsp;</span>
-				<span class="sheet-table-data sheet-center" style="width:100px;">&nbsp;</span>
+				<span class="sheet-table-data sheet-center" style="width:100px;"><input title="@{attk-cnote} : condition" type="text" name="attr_attk-cnote" value="" class="sheet-calc" readonly="readonly" /></span>
 			</div>
 			<div class="sheet-table-row">
 				<span class="sheet-table-row-name sheet-roll-check"><button class="sheet-text-button" type="roll" title="%{selected|CMB-Check}" name="roll_CMB-Check" value="@{PC-whisper} &{template:pf_attack} {{header_image=@{header_image-pf_attack-cmb}}} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{subtitle}} {{name=CMB}} {{Check=[[ 1d20 + [[ @{CMB} ]] ]]}}"> CMB</button></span>
@@ -2008,7 +2008,7 @@
 				<span class="sheet-table-data sheet-divider">+</span>
 				<span class="sheet-table-data sheet-center"><input title="@{attk-penalty}" type="number" name="attr_attk-penalty" value="0" class="sheet-calc" readonly="readonly" /></span>
 				<span class="sheet-table-data sheet-center"></span>
-				<span class="sheet-table-data sheet-center" style="width:100px;"><input title="@{attk-CMB-gnote} : grappled condition" type="text" name="attr_attk-CMB-gnote" value="0" class="sheet-calc" readonly="readonly" /></span>
+				<span class="sheet-table-data sheet-center" style="width:100px;"><input title="@{attk-CMB-cnote} : grappled condition" type="text" name="attr_attk-CMB-cnote" value="" class="sheet-calc" readonly="readonly" /></span>
 			</div>
 		</div>
 		<br>
@@ -9685,7 +9685,7 @@
 <div class="sheet-footer">
 	<div class="sheet-table">
 		<div class="sheet-table-row">
-			<span class="sheet-table-data sheet-center">Created by Samuel Marino w/contributions by Vince, Samuel Terrazas, Nibrodooh, Chris Buchholz | Last updated: <i>12.22.15'&nbsp;&nbsp;</i>v.<input type="text" style="width: 2.5em;height:1.4em; vertical-align:top;padding:0px 2px 0px 2px; border:none;" name="attr_PFSheet_Version" value="0" class="sheet-calc" readonly="readonly" title="Version non blank indicates attributes have been successfully recalculated."></span>
+			<span class="sheet-table-data sheet-center">Created by Samuel Marino w/contributions by Vince, Samuel Terrazas, Nibrodooh, Chris Buchholz | Last updated: <i>12.30.15'&nbsp;&nbsp;</i>v.<input type="text" style="width: 2.5em;height:1.4em; vertical-align:top;padding:0px 2px 0px 2px; border:none;" name="attr_PFSheet_Version" value="0" class="sheet-calc" readonly="readonly" title="Version non blank indicates attributes have been successfully recalculated."></span>
 		</div>
 		<div class="sheet-table-row">
 			<span class="sheet-table-data sheet-center">Have questions or feedback?  This thread can help:<input type="text" style="width:50%; border:none;" value="https://app.roll20.net/forum/post/1915585/pathfinder-sheet-thread-4-life-after-sam" /></span>
@@ -11387,7 +11387,7 @@ var SWUtils = SWUtils || (function() {
 
 var PFSheet = PFSheet || (function(){
   
-    var version= 0.16,
+    var version= 0.17,
 
 	//Utilities
 
@@ -11508,6 +11508,31 @@ var PFSheet = PFSheet || (function(){
 		});
 	},
 	
+	/* updateConditionAbilityPenalty
+	* Sets DEX-cond and STR-cond for fatigued, entangled, and grappled
+	*/
+	updateConditionAbilityPenalty = function() {
+		var readFields=["STR-cond","DEX-cond","condition-Fatigued","condition-Entangled","condition-Grappled"];
+		getAttrs(readFields,function(v){
+			var setter={},setAny=0,
+			strMod = (parseInt(v["condition-Fatigued"],10)||0),
+			dexMod = (parseInt(v["condition-Entangled"],10)||0) + 
+					   (parseInt(v["condition-Grappled"],10)||0);
+			dexMod += strMod;
+			dexMod = dexMod * -2;
+			strMod = strMod * -2;
+			if (dexMod !== (parseInt(v["DEX-cond"],10)||0)) {
+				setter["DEX-cond"]=dexMod;
+				setAny=1;
+			}
+			if (strMod !== (parseInt(v["STR-cond"],10)||0)) {
+				setter["STR-cond"]=strMod;
+				setAny=1;
+			}
+			if (setAny) { setAttrs(setter);}
+		});
+	},
+	
 	/* updateAbility
 	 * Updates the final ability score, ability modifier, condition column based on entries in ability grid plus conditions and buffs.
 	 * Also sets unconscious flag if ability damage is >= ability score.
@@ -11516,55 +11541,28 @@ var PFSheet = PFSheet || (function(){
 	 */
 	updateAbility = function(ability) {
 		var readFields=[ability+"-base",ability+"-enhance",ability+"-misc",ability+"-damage",ability+"-penalty",ability+"-drain",ability, ability+"-mod", ability+"-cond","buff_"+ability+"-total","FF-ability"];
-		if (ability ==="STR" ){
-			readFields=readFields.concat(["condition-Fatigued"]);
-		} else if (ability == "DEX"){
-			readFields=readFields.concat(["condition-Fatigued","condition-Entangled","condition-Grappled","condition-Pinned","condition-Cowering"]);//,"condition-Cowering"]);
-		}
+	
 		getAttrs(readFields, function (values){
 			var base = (parseInt(values[ability+"-base"],10)||0) + 
 					(parseInt(values[ability+"-enhance"],10)||0) + 
 					(parseInt(values[ability+"-misc"],10)||0) + 
 					(parseInt(values["buff_"+ability+"-total"],10)||0) + 
 					(parseInt(values[ability+"-drain"],10)||0),
-				dmg =  parseInt(values[ability+"-damage"],10)||0,
-				pen =  parseInt(values[ability+"-penalty"],10)||0,
-				cond=0, condMod=0, 
-				newbase,mod,dmgMod,penMod;
-			newbase=base;
-			dmgMod = -1 * Math.floor(Math.abs(dmg)/2);
-			penMod = -1 * Math.floor(Math.abs(pen)/2);
-			switch (ability) {
-				case "DEX":
-					condMod = -1 * ((parseInt(values["condition-Fatigued"],10)||0) + 
-					   (parseInt(values["condition-Entangled"],10)||0) + 
-					   (parseInt(values["condition-Grappled"],10)||0) );			
-					cond = condMod * 2;
-					//do cower and pin remove DEX always, or just to AC?
-					if (( values["condition-Cowering"] !== "0" || values["condition-Pinned"]!== "0") && base > 10 ){
-					//if (values["condition-Pinned"]!== "0" && base > 10 ){	
-						newbase = 10;
-					}
-					break;
-				case "STR":
-					condMod =  -1 * (parseInt(values["condition-Fatigued"],10)||0);
-					cond = condMod * 2;
-					break;
-			}
+				dmg =  -1 * Math.floor(Math.abs(parseInt(values[ability+"-damage"],10)||0)/2),
+				pen =  -1 * Math.floor(Math.abs(parseInt(values[ability+"-penalty"],10)||0)/2),
+				cond= -1 * Math.floor(Math.abs(parseInt(values[ability+"-cond"],10)||0)/2),
+				//use 99 (never happen) to make sure we update if there's a problem
+				currAbility=parseInt(values[ability],10)||99,
+				currMod = parseInt(values[ability+"-mod"],10)||99,
+				mod,setAny=0,setter={};
+			//no abs for floor of base - 10
+			mod = Math.floor((base -10)/2) + dmg + pen +cond;
 
-			mod = Math.floor((newbase -10)/2) + dmgMod + penMod +condMod;
+			//console.log(ability +"update: base:" + base + ",dmg:" + dmg +  ",dmgMod"+dmgMod+ ",penMod:" + penMod + ",mod:"+mod+",currCond:"+currCond+", new condMod:"+condMod);
+			if (currAbility !== base){setter[ability]=base;setAny++;}
+			if (currMod !== mod){setter[ability+"-mod"]=mod;setAny++;}
 
-			//use 99 (never happen) to make sure we update if there's a problem
-			var currAbility=parseInt(values[ability],10)||99; 
-			var currMod = parseInt(values[ability+"-mod"],10)||99;
-			var currCond = parseInt(values[ability+"-cond"],10)||0;
-			var numset=0;
-			var setter={};
-			//console.log(ability +"update: base:" + base + ",dmg:" + dmg +  ",dmgMod"+dmgMod+ ",condMod:" + condMod + ",mod:"+mod+",currCond:"+currCond+", new cond:"+cond);
-			if (currAbility !== base){setter[ability]=base;numset++;}
-			if (currMod !== mod){setter[ability+"-mod"]=mod;numset++;}
-
-			if (numset){setAttrs(setter);}
+			if (setAny){setAttrs(setter);}
 		});
 	},
 
@@ -11594,6 +11592,7 @@ var PFSheet = PFSheet || (function(){
 		var toggle="buff"+row+"_Toggle";
 		var buffFlds = ["buff"+row+"_Melee", "buff"+row+"_Ranged","buff"+row+"_DMG","buff"+row+"_AC","buff"+row+"_HP-temp","buff"+row+"_Fort",
 		"buff"+row+"_Ref","buff"+row+"_Will","buff"+row+"_STR","buff"+row+"_DEX","buff"+row+"_CON","buff"+row+"_INT","buff"+row+"_WIS","buff"+row+"_CHA",
+		"buff"+row+"_Touch","buff"+row+"_CMD","buff"+row+"_Check","buff"+row+"_CasterLevel",
 		toggle];
 
 		getAttrs(buffFlds,function(v){
@@ -11654,7 +11653,7 @@ var PFSheet = PFSheet || (function(){
 				setAttrs({"condition-Pinned":"0"});
 			} else {
 				//user hit either pinned and it undid grapple, or hit grapple first time.
-				updateAbility("DEX");
+				updateConditionAbilityPenalty();
 			}
 		});	
 	},
@@ -11668,7 +11667,7 @@ var PFSheet = PFSheet || (function(){
 				setAttrs({"condition-Grappled":"0"});
 			} else {
 				//user hit grapple and it  undid pinned, or hit pinned first time.
-				updateAbility("DEX"); 
+				updateConditionAbilityPenalty();
 			}
 		});
 	},
@@ -12089,36 +12088,48 @@ var PFSheet = PFSheet || (function(){
 	 * updates the attk-penalty for attacks based on conditions (including wearing armor you are not proficient in)
 	 */
 	updateConditionAttackPenalty = function() {
-		getAttrs(["condition-Dazzled","condition-Entangled","condition-Grappled","condition-Fear","condition-Sickened","condition-Prone",
-		"condition-Invisible","condition-Drained","condition-Wounds","attk-penalty","attk-CMB-gnote","acp-attack-mod"],function(v) { 
-			var currPenalty = parseInt(v["attk-penalty"],10)||0;
+		getAttrs(["condition-Dazzled","condition-Entangled","condition-Grappled","condition-Invisible","condition-Fear","condition-Sickened","condition-Prone",
+		"condition-Drained","condition-Wounds","attk-penalty","acp-attack-mod",
+		"attk-cnote","attk-CMB-cnote"],function(v) { 
 			var setter = {};
 			var setAny=0;
 			var grapplenote="";
+			var cnote="";
+			var currPenalty = parseInt(v["attk-penalty"],10)||0;
+			var invis = parseInt(v["condition-Invisible"],10)||0;
+			var grappled = parseInt(v["condition-Grappled"],10)||0;
 			var totpenalty = -1 * (
 					(parseInt(v["condition-Dazzled"],10)||0) +
 					(parseInt(v["condition-Entangled"],10)||0) +
-					(parseInt(v["condition-Grappled"],10)||0) +
 					(parseInt(v["condition-Fear"],10)||0) +
 					(parseInt(v["condition-Sickened"],10)||0) +
 					(parseInt(v["condition-Prone"],10)||0) +
-					(parseInt(v["condition-Wounds"],10)||0) ); 
-			totpenalty+= (parseInt(v["condition-Invisible"],10)||0) +
-				(parseInt(v["condition-Drained"],10)||0) +
+					(parseInt(v["condition-Wounds"],10)||0) );
+			
+			totpenalty+= (parseInt(v["condition-Drained"],10)||0) +
 				(parseInt(v["acp-attack-mod"],10)||0) ;
 
-			if (v["condition-Grappled"] != "0") {
+			if (grappled) {
+				totpenalty = totpenalty - grappled;
 				grapplenote="+"+v["condition-Grappled"]+" grapple";
+			}
+			if (invis) {
+				totpenalty+= invis;
+				cnote="vs sighted, +ignore dex";
 			}
 
 			if (currPenalty !== totpenalty) {
 				setter["attk-penalty"]=totpenalty;
-				setAny+=1;
+				setAny=1;
 			}
 			//check for both null/empty/undefined as well as not equals
-			if ( !(!v["attk-CMB-gnote"] && !grapplenote)  && v["attk-CMB-gnote"] !== grapplenote  ) {
-				setter["attk-CMB-gnote"]=grapplenote;
-				setAny+=1;
+			if ( !(!v["attk-CMB-cnote"] && !grapplenote)  && v["attk-CMB-cnote"] !== grapplenote  ) {
+				setter["attk-CMB-cnote"]=grapplenote;
+				setAny=1;
+			}
+			if ( !(!v["attk-cnote"] && !cnote)  && v["attk-cnote"] !== cnote  ) {
+				setter["attk-cnote"]=cnote;
+				setAny=1;
 			}
 			if (setAny) {
 				setAttrs(setter);
@@ -12148,6 +12159,9 @@ var PFSheet = PFSheet || (function(){
 		}
 		else {return;}
 
+		//if already grappled do not get +2 attack 
+		//http://paizo.com/pathfinderRPG/prd/coreRulebook/glossary.html
+		//"condition-Grappled","condition-Invisible",
 		bufffield="buff_"+bufftype+"-total";		
 		getAttrs([modfield,bufffield,"bab","size",miscfield,"attk-penalty",atfield],function(v) { 
 			//console.log(v);
@@ -12346,9 +12360,9 @@ var PFSheet = PFSheet || (function(){
 			allCond = parseInt(v["checks-cond"],10)||0,
 			abilityName=findAbilityInString(v[abNm]),
 			physCond = 0,perCond=0;
-			console.log("SSSSSSSSSSSSSSSSSSSSSSSSSSSSS");
-			console.log(v);
-			console.log("at the new version");
+			//console.log("SSSSSSSSSSSSSSSSSSSSSSSSSSSSS");
+			//console.log(v);
+			//console.log("at the new version");
 			//currSizeMod=parseInt(v[sizeMod],10)||0;
 			if (ranks && cs ) {
 				skillTot+=3;
@@ -12365,9 +12379,9 @@ var PFSheet = PFSheet || (function(){
 				mods+="0/";
 			}
 			skillSize=sizeSkills[skill];
-			console.log("size skills is "+ skillSize);
+			//console.log("size skills is "+ skillSize);
 			if (skillSize) {
-				console.log("we are in size");
+				//console.log("we are in size");
 				//skillSize=(parseInt(v[sizeNm],10)||0);
 				if (skillSize===1) {
 					adj= parseInt(v["size_skill"],10)||0;
@@ -12387,14 +12401,14 @@ var PFSheet = PFSheet || (function(){
 					//}				
 				} 
 			} else {
-				console.log("not in size");
+				//console.log("not in size");
 				mods+="0/";
 			}
 			//conditions
 			if (abilityName==="DEX-mod" || abilityName==="STR-mod"){
 				physCond= parseInt(v["Phys-skills-cond"],10)||0;
 			}
-			if (skill==="Perception"){
+			if (skill==="Perception" || skill==="CS-Perception"){
 				perCond = parseInt(v["Perception-cond"],10)||0;
 			}
 			cond = allCond+physCond+perCond;
@@ -12441,7 +12455,7 @@ var PFSheet = PFSheet || (function(){
 	},
 	
 	updateConditionSkillPenalty=function(){
-		console.log("CCCCCCCCCCCCCCCCCCCCCCCCCCCC at updateConditionSkillPenalty");
+		//console.log("CCCCCCCCCCCCCCCCCCCCCCCCCCCC at updateConditionSkillPenalty");
 		getAttrs(["condition-Blinded","condition-Fear","condition-Drained","condition-Sickened","checks-cond","Phys-skills-cond","Perception-cond","condition-Wounds","buff_Check-total"],function(v) {
 			//,"condition-Fascinated" -4 to perception
 			var allSkills= (parseInt(v["buff_Check-total"],10)||0)+(parseInt(v["condition-Drained"],10)||0)-((parseInt(v["condition-Fear"],10)||0) + (parseInt(v["condition-Sickened"],10)||0)+parseInt(v["condition-Wounds"],10)||0),
@@ -12528,6 +12542,44 @@ var PFSheet = PFSheet || (function(){
 			SWUtils.updateRepeatingSectionNumberValue("weapon",id,writeField,valueOf,"");
 		});		
 	},
+	
+	
+	//handleNewRow = function (section, id, index) {
+	//do nothing
+	//},
+//	handleNewRows = function(section) {
+//		getSectionIDs("repeating_"+section,function(ids){
+//			console.log("RRRRRRRRRRRRRRRRRRRRR got section ids");
+//			console.log(ids);
+			// ids.forEach(function(id,index){
+				// var newflag  = "repeating_"+section +"_" +id+"_new_flag",
+				// rowid = "repeating_"+section +"_" +id+"_row_id",
+				// rowindex = "repeating_"+section +"_" +id+"_row_index";	
+				// console.log("handleNewRows, id is: "+id);
+				// getAttrs([newflag,rowid,rowindex],function(v){
+					// var setter={};
+					// console.log(v);
+					// if (typeof v[newflag]==="undefined" ) {
+						// setter[rowid]= id;
+						// setter[rowindex]=index;
+						// setter[newflag]=1;
+						// console.log("setting the following:");
+						// console.log(setter);
+						//setAttrs(setter);
+						//handleNewRow(section,id,index);
+					// }
+				// });
+			// });
+		// });
+	// },
+	// checkIsNewRow = function(section) {
+		// getAttrs(["new_flag"],function(v) {
+			// console.log("handleNewRows, the new flag is: "+ v["new_flag"]);
+			// if (typeof v["new_flag"]==="undefined"  ){
+				// handleNewRows(section);
+			// }
+		// });	
+	// },
 	recalculateSkills = function() {
 		handleDropdown("Acrobatics-ability",["Acrobatics-ability-mod"]);
 		handleDropdown("Artistry-ability",["Artistry-ability-mod"]);
@@ -12688,29 +12740,12 @@ var PFSheet = PFSheet || (function(){
 		updateBuffRow("8");
 		updateBuffRow("9");
 		updateBuffRow("10");
-		updateBuffColumn("STR");		
-		updateBuffColumn("DEX");		
-		updateBuffColumn("CON");		
-		updateBuffColumn("INT");		
-		updateBuffColumn("WIS");		
-		updateBuffColumn("CHA");		
-		updateBuffColumn("Ranged");		
-		updateBuffColumn("Melee");		
-		updateBuffColumn("DMG");	
-		updateBuffColumn("AC");		
-		updateBuffColumn("Fort");		
-		updateBuffColumn("Will");		
-		updateBuffColumn("Ref");		
-		updateBuffColumn("HP-temp");		
 		
-		updateBuffColumn("Touch");
-		updateBuffColumn("CMD");
-		updateBuffColumn("Check");
-		updateBuffColumn("CasterLevel");
-						
 	},
 	recalculateSheet = function(oldversion) {
-		if (oldversion===.1) {
+
+		/*if (oldversion===0.10) {
+			//no longer necessary will be fixed in updateAllSkills as of 0.15
 			getAttrs(["Stealth","Fly","Acrobatics"],function(v){
 				 if (!isNaN(parseInt(v["Stealth"],10))) {
 				   setAttrs({"Stealth":"(@{Stealth-ranks} + @{Stealth-class} + @{Stealth-ability} + @{Stealth-racial} + @{Stealth-feat} + @{Stealth-item} + @{Stealth-misc} + @{Stealth-acp} - @{condition-Fear} -  @{condition-sickened} + @{condition-Drained} - @{condition-Wounds})"});
@@ -12722,8 +12757,8 @@ var PFSheet = PFSheet || (function(){
 				   setAttrs({"Acrobatics":"(@{Acrobatics-ranks} + @{Acrobatics-class} + @{Acrobatics-ability} + @{Acrobatics-racial} + @{Acrobatics-feat} + @{Acrobatics-item} + @{Acrobatics-misc} + @{Acrobatics-acp} - @{condition-Fear} -  @{condition-sickened} + @{condition-Drained} - @{condition-Wounds})"});
 				 }
 				});
-		}
-		
+		}*/
+		if (oldversion < 0.15) {
 
 			recalculateAllBuffs();
 			updateAbility("STR"); 
@@ -12781,12 +12816,31 @@ var PFSheet = PFSheet || (function(){
 			updateAttack("ranged");
 			updateAttack("CMB");
 			recalculateRepeatingWeapons();
-			
+		}
+		if (oldversion < 0.16) {
+
 			SWUtils.evaluateAndSetNumber("Max-Skill-Ranks-Misc","Max-Skill-Ranks-mod");
 			updateMaxSkills();
 
 			updateConditionSkillPenalty();
 			recalculateSkills();
+		}
+		if (oldversion > 0.14 && oldversion < 0.18) {
+			//buff and skills fixed in 0.17
+			updateBuffRow("1");
+			updateBuffRow("2");
+			updateBuffRow("3");
+			updateBuffRow("4");
+			updateBuffRow("5");
+			updateBuffRow("6");
+			updateBuffRow("7");
+			updateBuffRow("8");
+			updateBuffRow("9");
+			updateBuffRow("10");
+			updateSkill("CS-Perception");
+			updateConditionAbilityPenalty();
+		}
+
 
 	},
 	
@@ -12794,9 +12848,9 @@ var PFSheet = PFSheet || (function(){
 	
 	checkUpdate=function(){
 
-		getAttrs(["PFSheet_version","PFSheet_forcesync","recalc1"],function(v){
+		getAttrs(["PFSheet_Version","PFSheet_forcesync","recalc1"],function(v){
 			var setter={},currVer=0;
-			currVer=parseInt(v["PFSheet_version"],10)||0;
+			currVer=parseFloat(v["PFSheet_Version"],10)||0;
 			//reset checkbox
 			if (v["recalc1"]||v["PFSheet_forcesync"]) {
 				recalculateSheet(-1);
@@ -12804,9 +12858,12 @@ var PFSheet = PFSheet || (function(){
 				if (v["PFSheet_forcesync"]) {setter["PFSheet_forcesync"]=0;}
 				setAttrs( setter);
 			} else if ( currVer!== version) {
-				recalculateSheet(currVer);
-				setter["PFSheet_version"]= version;
+				console.log("currVer !== version");
+				setter["PFSheet_Version"]= version;
 				setAttrs( setter);
+				console.log("UUUUUUUUUUUUUUUUUU setting with value");
+				console.log(setter);
+				recalculateSheet(currVer);
 			} 
 
 		});
@@ -12843,9 +12900,12 @@ var PFSheet = PFSheet || (function(){
 		updateRepeatingWeaponDamageAbility:updateRepeatingWeaponDamageAbility,
 		updateRepeatingWeapon:updateRepeatingWeapon,
 		updateConditionSkillPenalty:updateConditionSkillPenalty,
+		updateConditionAbilityPenalty:updateConditionAbilityPenalty,
 		updateMaxSkills:updateMaxSkills,
 		updateSkill:updateSkill,
 		updateNPCHP:updateNPCHP,
+		//handleNewWeapons:handleNewWeapons,
+		//checkIsNewRow:checkIsNewRow,
 		recalculateSheet:recalculateSheet,
 		checkUpdate:checkUpdate
     };	
@@ -12853,13 +12913,6 @@ var PFSheet = PFSheet || (function(){
 	
 
 
-//Abilities and total buffs to them
-on("change:str-base change:str-enhance change:str-misc change:str-temp change:str-damage change:str-penalty change:str-drain change:buff_str-total", function() { PFSheet.updateAbility("STR"); });
-on("change:dex-base change:dex-enhance change:dex-misc change:dex-temp change:dex-damage change:dex-penalty change:dex-drain change:buff_dex-total", function() { PFSheet.updateAbility("DEX"); });
-on("change:con-base change:con-enhance change:con-misc change:con-temp change:con-damage change:con-penalty change:con-drain change:buff_con-total", function() { PFSheet.updateAbility("CON"); });
-on("change:int-base change:int-enhance change:int-misc change:int-temp change:int-damage change:int-penalty change:int-drain change:buff_int-total", function() { PFSheet.updateAbility("INT"); });
-on("change:wis-base change:wis-enhance change:wis-misc change:wis-temp change:wis-damage change:wis-penalty change:wis-drain change:buff_wis-total", function() { PFSheet.updateAbility("WIS"); });
-on("change:cha-base change:cha-enhance change:cha-misc change:cha-temp change:cha-damage change:cha-penalty change:cha-drain change:buff_cha-total", function() { PFSheet.updateAbility("CHA"); });
 
 //Buffs - columns
 on("change:buff1_str change:buff2_str change:buff3_str change:buff4_str change:buff5_str change:buff6_str change:buff7_str change:buff8_str change:buff9_str change:buff10_str", function() { PFSheet.updateBuffColumn("STR"); });
@@ -13336,10 +13389,75 @@ on("change:cs-survival-ability",function(){PFSheet.handleDropdown("CS-Survival-a
 on("change:cs-survival-cs change:cs-survival-ranks change:cs-survival-class change:cs-survival-ability-mod change:cs-survival-racial change:cs-survival-feat change:cs-survival-item change:cs-survival-size change:cs-survival-acp change:cs-survival-misc change:cs-survival-ReqTrain"
    ,function(){PFSheet.updateSkill("CS-Survival");});
 
+//buffs
+on("change:buff_check-total", function() {
+	PFSheet.updateConditionSkillPenalty();
+}); 
 		
+//Abilities and total buffs to them
+on("change:str-base change:str-enhance change:str-misc change:str-temp change:str-damage change:str-penalty change:str-drain change:buff_str-total change:str-cond", function() { PFSheet.updateAbility("STR"); });
+on("change:dex-base change:dex-enhance change:dex-misc change:dex-temp change:dex-damage change:dex-penalty change:dex-drain change:buff_dex-total change:dex-cond", function() { PFSheet.updateAbility("DEX"); });
+on("change:con-base change:con-enhance change:con-misc change:con-temp change:con-damage change:con-penalty change:con-drain change:buff_con-total change:con-cond", function() { PFSheet.updateAbility("CON"); });
+on("change:int-base change:int-enhance change:int-misc change:int-temp change:int-damage change:int-penalty change:int-drain change:buff_int-total change:int-cond", function() { PFSheet.updateAbility("INT"); });
+on("change:wis-base change:wis-enhance change:wis-misc change:wis-temp change:wis-damage change:wis-penalty change:wis-drain change:buff_wis-total change:wis-cond", function() { PFSheet.updateAbility("WIS"); });
+on("change:cha-base change:cha-enhance change:cha-misc change:cha-temp change:cha-damage change:cha-penalty change:cha-drain change:buff_cha-total change:cha-cond", function() { PFSheet.updateAbility("CHA"); });
+
+
+//Conditions
+on("change:condition-fatigued change:condition-entangled", function() { PFSheet.updateConditionAbilityPenalty(); });
+on("change:condition-grappled", function() {  PFSheet.updateGrapple() });
+on("change:condition-pinned", function() { PFSheet.updatePin();});
+
+on("change:condition-drained", function() { 
+	PFSheet.updateHP(); 
+});
+on("change:condition-wounds change:condition-fear change:condition-sickened change:condition-drained", function() { 
+	PFSheet.updateConditionSkillPenalty(); //includes abilities
+	PFSheet.updateConditionsSavePenalty();
+	PFSheet.updateConditionAttackPenalty();
+});
+
+on("change:condition-Blinded", function() {
+	PFSheet.updateConditionSkillPenalty();
+	PFSheet.updateConditionDefensePenalty(); 
+}); 
+
+on("change:condition-invisible change:condition-prone", function() {
+	PFSheet.updateConditionAttackPenalty();
+	//PFSheet.updateConditionDefensePenalty(); 
+}); 
+
+on ("change:condition-cowering change:condition-flat-footed change:condition-stunned change:condition-pinned change:ac-ability-mod", function() {
+    PFSheet.updateConditionDefensePenalty(); 
+});
+on("change:acp-attack-mod change:condition-dazzled change:condition-entangled change:condition-grappled",function() {
+    PFSheet.updateConditionAttackPenalty(); 
+});
+
+//init
+on("change:init-ability", function() {  PFSheet.handleDropdown("init-ability",["init-ability-mod"]);});
+on("change:init-ability-mod change:init-trait change:init-misc condition-deafened",function(){ PFSheet.updateInit(); });
+
+//hp
+on("change:hp-ability", function () {PFSheet.handleDropdown("HP-ability",["HP-ability-mod"]);});
+on("change:hp-ability-mod change:level change:total-hp change:hp-formula-mod", function() { PFSheet.updateHP(); });
+on("change:hp-temp-misc change:buff_hp-temp-total", function() { PFSheet.updateTempHP(); });
+
+
+//saves	
+on("change:saves-cond change:total-fort change:fort-ability-mod change:fort-trait change:fort-enhance change:fort-resist change:fort-misc change:buff_fort-total",function(){
+	PFSheet.updateSave("Fort"); 
+});
+on("change:saves-cond change:total-ref change:ref-ability-mod change:ref-trait change:ref-enhance change:ref-resist change:ref-misc change:buff_ref-total",function(){
+	PFSheet.updateSave("Ref"); 
+});
+on("change:saves-cond change:total-will change:will-ability-mod change:will-trait change:will-enhance change:will-resist change:will-misc change:buff_will-total",function(){
+	PFSheet.updateSave("Will"); 
+});
+
 
    
-
+//classes
 on("change:class-0-hp change:class-1-hp change:class-2-hp change:class-3-hp change:class-4-hp change:class-5-hp", function() {PFSheet.updateClassInformation("hp");});
 on("change:class-0-fchp change:class-1-fchp change:class-2-fchp change:class-3-fchp change:class-4-fchp change:class-5-fchp", function() {PFSheet.updateClassInformation("fchp");});
 on("change:class-0-bab change:class-1-bab change:class-2-bab change:class-3-bab change:class-4-bab change:class-5-bab", function() {PFSheet.updateClassInformation("bab");});
@@ -13350,41 +13468,9 @@ on("change:class-0-fort change:class-1-fort change:class-2-fort change:class-3-f
 on("change:class-0-ref change:class-1-ref change:class-2-ref change:class-3-ref change:class-4-ref change:class-5-ref", function() {PFSheet.updateClassInformation("Ref");});
 on("change:class-0-will change:class-1-will change:class-2-will change:class-3-will change:class-4-will change:class-5-will", function() {PFSheet.updateClassInformation("Will");});
 on("change:class-0-level change:class-1-level change:class-2-level change:class-3-level change:class-4-level change:class-5-level", function() {PFSheet.updateClassInformation("level");});
-
-//init
-on("change:init-ability-mod change:init-trait change:init-misc condition-deafened",function(){ PFSheet.updateInit(); });
-
-on("change:hp-ability-mod change:level change:total-hp change:hp-formula-mod", function() { PFSheet.updateHP(); });
-on("change:hp-temp-misc change:buff_hp-temp-total", function() { PFSheet.updateTempHP(); });
-
-
-//Conditions
-on("change:condition-fatigued", function() { PFSheet.updateAbility("STR");  PFSheet.updateAbility("DEX"); });
-on("change:condition-entangled condition-cowering condition-blinded ff-ability", function() { PFSheet.updateAbility("DEX"); });
-on("change:condition-drained", function() { PFSheet.updateHP(); });
-on("change:condition-grappled", function() {  PFSheet.updateGrapple() });
-on("change:condition-pinned", function() { PFSheet.updatePin();});
-on("change:condition-Fear change:condition-Blinded change:condition-Drained change:condition-Sickened change:buff_check-total", function() {PFSheet.updateConditionSkillPenalty();}); 
-
-
-
-on ("change:condition-blinded change:condition-cowering change:condition-flat-footed change:condition-stunned change:condition-flat-footed change:condition-stunned change:condition-pinned change:condition-wounds change:ac-ability-mod", function() {
-    PFSheet.updateConditionDefensePenalty(); });
-on("change:condition-fear change:condition-sickened change:condition-drained change:condition-wounds",function() {
-	PFSheet.updateConditionsSavePenalty(); });
-on("change:acp-attack-mod change:condition-dazzled change:condition-entangled change:condition-grappled change:condition-fear change:condition-sickened change:condition-prone change:condition-invisible change:condition-drained change:condition-wounds",function() {
-    PFSheet.updateConditionAttackPenalty(); });
-
-//saves	
-on("change:saves-cond change:total-fort change:fort-ability-mod change:fort-trait change:fort-enhance change:fort-resist change:fort-misc change:buff_fort-total",function(){
-	PFSheet.updateSave("Fort"); });
-on("change:saves-cond change:total-ref change:ref-ability-mod change:ref-trait change:ref-enhance change:ref-resist change:ref-misc change:buff_ref-total",function(){
-	PFSheet.updateSave("Ref"); });
-on("change:saves-cond change:total-will change:will-ability-mod change:will-trait change:will-enhance change:will-resist change:will-misc change:buff_will-total",function(){
-	PFSheet.updateSave("Will"); });
-
+	
 //defenses
-on("change:condition-stunned change:condition-flat-footed change:ac-ability-mod change:ff-dex change:ac-penalty change:size change:ac-dodge change:ac-natural change:ac-deflect change:ac-misc change:ac-shield change:ac-armor change:cmd-dex change:ff-cmd-dex change:cmd-str change:cmd-misc  change:buff_ac-total change:buff_touch-total change:buff_cmd-total change:bab change:max-dex",function() {
+on("change:condition-stunned change:condition-flat-footed change:ac-ability-mod change:ff-dex change:ac-penalty change:size change:ac-dodge change:ac-natural change:ac-deflect change:ac-misc change:ac-shield change:ac-armor change:cmd-dex change:ff-cmd-dex change:cmd-str change:cmd-misc change:buff_ac-total change:buff_touch-total change:buff_cmd-total change:bab change:max-dex",function() {
     PFSheet.updateDefenses(); });
 on("change:shield-equipped change:shield-acbonus change:shield-max-dex change:shield-acp change:shield-spell-fail change:shield-proficiency change:shield2-equipped change:shield2-acbonus change:shield2-max-dex change:shield2-acp change:shield2-spell-fail change:shield2-proficiency change:armor-equipped change:armor-acbonus change:armor-max-dex change:armor-acp change:armor-spell-fail change:armor-proficiency change:armor2-equipped change:armor2-acbonus change:armor2-max-dex change:armor2-acp change:armor2-spell-fail change:armor2-proficiency change:max-dex-source change:acp-source",function(){   
     PFSheet.updateArmor(); });
@@ -13399,16 +13485,11 @@ on("change:bab change:size change:cmb-ability-mod change:cmb-total change:attk-c
 
 on("change:attk-effect_mod_1 change:attk-effect_mod_1_Toggle change:attk-effect_mod_2 change:attk-effect_mod_2_Toggle change:attk-effect_mod_3 change:attk-effect_mod_3_Toggle change:attk-effect_mod_4 change:attk-effect_mod_4_Toggle change:dmg-effect_mod_1 change:dmg-effect_mod_1_Toggle change:dmg-effect_mod_2 change:dmg-effect_mod_2_Toggle change:dmg-effect_mod_3 change:dmg-effect_mod_3_Toggle change:dmg-effect_mod_4 change:dmg-effect_mod_4_Toggle",function(){
 	PFSheet.updateEffectTotals();});
-	//change:attk-effect-total change:dmg-effect-total
+
 on("change:repeating_weapon:dmg-effect-total-copy change:repeating_weapon:attk-effect-total-copy change:repeating_weapon:buff_dmg-total-copy change:repeating_weapon:attack-type-mod change:repeating_weapon:enhance change:repeating_weapon:masterwork change:repeating_weapon:proficiency change:repeating_weapon:damage-ability-mod  change:repeating_weapon:attack-mod change:repeating_weapon:damage-mod",function() {
 	PFSheet.updateRepeatingWeapon(); });
 
 
-//dropdowns
-on("change:hp-ability", function () {PFSheet.handleDropdown("HP-ability",["HP-ability-mod"]);});
-
-//init dropdown	
-on("change:init-ability", function() {  PFSheet.handleDropdown("init-ability",["init-ability-mod"]);});
 //saves
 on("change:fort-ability", function(){PFSheet.handleDropdown  ("Fort-ability",["Fort-ability-mod"]);   });
 on("change:ref-ability", function(){PFSheet.handleDropdown  ("Ref-ability",["Ref-ability-mod"]);   });
@@ -13476,8 +13557,10 @@ on("change:Phys-skills-cond",function() {
 	PFSheet.updateSkill("CS-Finesse");
 	PFSheet.updateSkill("CS-Stealth");
 });
-on("change:Perception-cond",function() {PFSheet.updateSkill("Perception");});
-   
+on("change:Perception-cond",function() {
+	PFSheet.updateSkill("Perception");
+	PFSheet.updateSkill("CS-Perception");
+});
 
-  
+//on("change:repeating_weapon",function() { PFSheet.checkIsNewRow("weapon");});
 </script>
