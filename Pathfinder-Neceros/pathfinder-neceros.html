@@ -12461,21 +12461,20 @@ var PFSheet = PFSheet || (function(){
 			//,"condition-Fascinated" -4 to perception
 			var allSkills= (parseInt(v["buff_Check-total"],10)||0)+(parseInt(v["condition-Drained"],10)||0)-((parseInt(v["condition-Fear"],10)||0) + (parseInt(v["condition-Sickened"],10)||0)+parseInt(v["condition-Wounds"],10)||0),
 			blindedMod = -2 * (parseInt(v["condition-Blinded"],10)||0),
-			currAllSkills=parseInt(v["checks-cond"],10)||0,
-			currPhysSkills=parseInt(v["Phys-skills-cond"],10)||0,
-			currPerSkills=parseInt(v["Perception-cond"],10)||0,
-			buffAllSkills=parseInt(v["buff_Check-total"],10)||0,
+			currAllSkills=parseInt(v["checks-cond"],10),
+			currPhysSkills=parseInt(v["Phys-skills-cond"],10),
+			currPerSkills=parseInt(v["Perception-cond"],10),
 			setter={},setAny=0;
 			
-			if (allSkills!==currAllSkills){
+			if (allSkills!==currAllSkills||isNaN(currAllSkills)){
 				setter["checks-cond"]=allSkills;
 				setAny=1;
 			}
-			if (blindedMod!==currPhysSkills){
+			if (blindedMod!==currPhysSkills||isNaN(currPhysSkills)){
 				setter["Phys-skills-cond"]=blindedMod;
 				setAny=1;
 			}
-			if (blindedMod!==currPerSkills){
+			if (blindedMod!==currPerSkills||isNaN(currPerSkills)){
 				setter["Perception-cond"]=blindedMod;
 				setAny=1;
 			}
@@ -12770,7 +12769,24 @@ var PFSheet = PFSheet || (function(){
 		updateBuffRow("8");
 		updateBuffRow("9");
 		updateBuffRow("10");
-		
+		updateBuffColumn("STR");		
+		updateBuffColumn("DEX");		
+		updateBuffColumn("CON");		
+		updateBuffColumn("INT");		
+		updateBuffColumn("WIS");		
+		updateBuffColumn("CHA");		
+		updateBuffColumn("Ranged");		
+		updateBuffColumn("Melee");		
+		updateBuffColumn("DMG");	
+		updateBuffColumn("AC");		
+		updateBuffColumn("Fort");		
+		updateBuffColumn("Will");		
+		updateBuffColumn("Ref");		
+		updateBuffColumn("HP-temp");		
+		updateBuffColumn("Touch");		
+		updateBuffColumn("CMD");		
+		updateBuffColumn("Check");		
+		updateBuffColumn("CasterLevel");			
 	},
 	recalculateSheet = function(oldversion) {
 
@@ -12859,21 +12875,14 @@ var PFSheet = PFSheet || (function(){
 		}
 		if (oldversion > 0.14 && oldversion < 0.17) {
 			//buff and skills fixed in 0.17
-			updateBuffRow("1");
-			updateBuffRow("2");
-			updateBuffRow("3");
-			updateBuffRow("4");
-			updateBuffRow("5");
-			updateBuffRow("6");
-			updateBuffRow("7");
-			updateBuffRow("8");
-			updateBuffRow("9");
-			updateBuffRow("10");
+			recalculateAllBuffs();
 			updateSkill("CS-Perception");
 			updateConditionAbilityPenalty();
 		}
 		if (oldversion < 0.17) {
 			//recalculateRepeatingWeapons();
+			//recalculateAllBuffs();
+			//updateConditionSkillPenalty();
 			recalculateRepeatingMaxUsed("class-ability");
 			recalculateRepeatingMaxUsed("feat");
 			recalculateRepeatingMaxUsed("racial-trait");
