@@ -7,7 +7,6 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 Short Term:
 * Spell Crit damage should use higher level
 * Spell Crit damage should not roll 3D dice for secondary and other stuff that is toggled off.
-* Actions: Allow for "Effects" to be whispered to the GM.
 * Revamp Traits. Keep fluff traits on the first page and for action like traits write "see Actions". Also include fluff traits on "Actions".
 * Refactor Actions to use damage die and bonus like weapons do
 
@@ -23,6 +22,66 @@ Long term:
 
 
 ### Changelog
+
+**November 19th 2015**
+
+* Bind to without chat avatars
+
+**November 16th 2015**
+
+* Add Halfling to NPC Actions
+
+**November 15th 2015**
+
+* Russian Indentation fixes
+
+**October 30th 2015**
+
+* Added Russian
+
+**October 24th 2015**
+
+* Added a setting for changing the passive skill base (instead of 10)
+* Removed skill macro as it's in the check macro
+* Fixed Lucian's spell thing after I changed spell higher level stuff to a select input
+* Move Jack of All Trades to the class page
+
+**October 16th 2015**
+
+* Spell higher levels are now a select. No data should be lost unless you used something other than d2,d4,d6,d8,d10,d12,d20
+
+**October 2nd 2015**
+
+* More French Translations
+
+**October 1st 2015**
+
+* Setup some variables for Lucian
+
+**September 28th 2015**
+
+* Prevent "freetextname" from showing on roll templates
+
+**September 20th 2015**
+
+* Removed spellcastingtime from rolltemplate stuff
+
+**September 19th 2015**
+
+* Updated Save Macro
+* Updated Check Macro (Depreciate Skill macro)
+
+**September 17th 2015**
+
+* French translations
+
+**September 13th 2015**
+
+* Removed old spell syntax
+
+**September 5th 2015**
+
+* Reduce number of attributes for spells.
 
 **August 30th 2015**
 
