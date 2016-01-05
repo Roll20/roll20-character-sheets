@@ -1602,7 +1602,6 @@
                 </span>
                 <span class="sheet-table-row-name"><button class="sheet-text-button" type="roll" title="%{selected|Spell-Fail-Check}" name="roll_Spell-Fail-Check" style="font-size:13px; line-height:10px; vertical-align:text-bottom;" value="@{PC-whisper} &{template:pf_generic} {{header_image=@{header_image-pf_generic}}} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{subtitle}} {{name=Spell Fail}} {{Spell Fail Chance=[[ @{spell-fail} ]]}} {{Check=[[ 1d100 ]]}}"> Spell Fail Chance</button></span>
                 <span class="sheet-table-data sheet-center"><input title="@{spell-fail}" type="number" name="attr_spell-fail" value="0" style="width:3.5em;" class="sheet-calc" readonly="readonly" />&#37;</span>
-
             </div>
         </div>
         <br>
@@ -2008,8 +2007,6 @@
 				<span class="sheet-table-data sheet-center"><input title="@{CMD-size}" type="text" name="attr_CMD-size" value="0"  style="width:3.5em;" class="sheet-calc" readonly="readonly" /></span>
 				<span class="sheet-table-data sheet-divider">+</span>
 				<span class="sheet-table-data sheet-center"><input title="@{attk-CMB-misc}" type="number" name="attr_attk-CMB-misc" value="0" /></span>
-
-
 				<span class="sheet-table-data sheet-center"></span>
 				<span class="sheet-table-data sheet-center"></span>
 				<span class="sheet-table-data sheet-divider">+</span>
@@ -11395,7 +11392,7 @@ var SWUtils = SWUtils || (function() {
 
 var PFSheet = PFSheet || (function(){
   
-    var version= 0.17,
+    var version= 0.18,
 
 	//Utilities
 
@@ -12361,17 +12358,17 @@ var PFSheet = PFSheet || (function(){
 		"size_skill","size_skill_double","acp","checks-cond","Phys-skills-cond","Perception-cond"],function(v){
 			
 			var skillSize=0,adj,skillTot=0,setter={},mods="",setAny=0,cond=0,
-			cs=parseInt(v[csNm],10)||0,
+			cs=0,
 			currSkill=parseInt(v[skill],10),//no default
 			ranks = parseInt(v[ranksNm],10)||0,
 			rt = parseInt(v[rtNm],10)||0,
 			allCond = parseInt(v["checks-cond"],10)||0,
 			abilityName=findAbilityInString(v[abNm]),
 			physCond = 0,perCond=0;
-			//console.log("SSSSSSSSSSSSSSSSSSSSSSSSSSSSS");
-			//console.log(v);
-			//console.log("at the new version");
-			//currSizeMod=parseInt(v[sizeMod],10)||0;
+			if(v[csNm]) { cs = 3;}  
+			else if (!v[csNm]) { cs = 0;}
+			console.log("the class skill is:"+v[csNm]+" and cs is "+cs);
+			
 			if (ranks && cs ) {
 				skillTot+=3;
 				mods="3/";
@@ -12744,6 +12741,86 @@ var PFSheet = PFSheet || (function(){
 		updateSkill("CS-Survival");
 	},
 	
+	fixClassSkill=function(skill) {
+		var csNm=skill+"-cs";
+		getAttrs([csNm],function(v){
+			var  cs=0,setter={};
+			if (v[csNm]=="0") { cs = 0;}
+			else if(v[csNm]) { cs = 3;}  
+			else if (!v[csNm]) { cs = 0;}
+			console.log("FIXSKILL: "+skill+" : cs is "+cs + " raw is:"+v[csNm]);
+			if (cs===3) {
+				setter[csNm]=cs;
+				setAttrs(setter);
+			}
+		});
+	},
+	
+	fixClassSkills=function() {
+		fixClassSkill("Acrobatics");
+		fixClassSkill("Appraise");
+		fixClassSkill("Bluff");
+		fixClassSkill("Climb");
+		fixClassSkill("Craft");
+		fixClassSkill("Craft2");
+		fixClassSkill("Craft3");
+		fixClassSkill("Diplomacy");
+		fixClassSkill("Disable-Device");
+		fixClassSkill("Disguise");
+		fixClassSkill("Escape-Artist");
+		fixClassSkill("Fly");
+		fixClassSkill("Handle-Animal");
+		fixClassSkill("Heal");
+		fixClassSkill("Intimidate");
+		fixClassSkill("Linguistics");
+		fixClassSkill("Knowledge-Arcana");
+		fixClassSkill("Knowledge-Dungeoneering");
+		fixClassSkill("Knowledge-Engineering");
+		fixClassSkill("Knowledge-Geography");
+		fixClassSkill("Knowledge-History");
+		fixClassSkill("Knowledge-Local");
+		fixClassSkill("Knowledge-Nature");
+		fixClassSkill("Knowledge-Nobility");
+		fixClassSkill("Knowledge-Planes");
+		fixClassSkill("Knowledge-Religion");
+		fixClassSkill("Perception");
+		fixClassSkill("Perform");
+		fixClassSkill("Perform2");
+		fixClassSkill("Perform3");
+		fixClassSkill("Profession");
+		fixClassSkill("Profession2");
+		fixClassSkill("Profession3");
+		fixClassSkill("Ride");
+		fixClassSkill("Sense-Motive");
+		fixClassSkill("Sleight-of-Hand");
+		fixClassSkill("Spellcraft");
+		fixClassSkill("Stealth");
+		fixClassSkill("Survival");
+		fixClassSkill("Swim");
+		fixClassSkill("Use-Magic-Device");
+		fixClassSkill("Misc-Skill-0");
+		fixClassSkill("Misc-Skill-1");
+		fixClassSkill("Misc-Skill-2");
+		fixClassSkill("Misc-Skill-3");
+		fixClassSkill("Misc-Skill-4");
+		fixClassSkill("Misc-Skill-5");
+
+		fixClassSkill("Artistry");
+		fixClassSkill("Lore");
+
+		fixClassSkill("CS-Acrobatics");
+		fixClassSkill("CS-Athletics");
+		fixClassSkill("CS-Finesse");
+		fixClassSkill("CS-Influence");
+		fixClassSkill("CS-Nature");
+		fixClassSkill("CS-Perception");
+		fixClassSkill("CS-Performance");
+		fixClassSkill("CS-Religion");
+		fixClassSkill("CS-Society");
+		fixClassSkill("CS-Spellcraft");
+		fixClassSkill("CS-Stealth");
+		fixClassSkill("CS-Survival");		
+	},
 	recalculateAllBuffs = function() {
 		setAttrs({
 				"buff_Melee-total":0,
@@ -12899,6 +12976,9 @@ var PFSheet = PFSheet || (function(){
 			//setNewRowDefaultFields("feat");
 			//setNewRowDefaultFields("racial-trait");
 			//setNewRowDefaultFields("trait");
+		}
+		if (oldversion < .18) {
+			fixClassSkills();
 		}
 
 	},
@@ -13635,4 +13715,3 @@ on("change:Perception-cond",function() {
 
 
 </script>
-
