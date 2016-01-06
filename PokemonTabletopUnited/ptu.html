@@ -11,6 +11,10 @@ on("change:level change:chartype change:hp_total change:injuries", function() {
     hpCalc();
 });
 
+on("change:level", function() {
+    apCalc();
+});
+
 on("change:move1_db", function() {
     getAttrs(["Move1_DB"], function(values) {
         x = dbCalc(values.Move1_DB);
@@ -149,6 +153,15 @@ on("change:repeating_moves:move_db", function() {
         });
     };
     
+    var apCalc = function (){
+        getAttrs(["Level"], function(v) {
+            x = Math.floor(v.Level/5)+5;
+            setAttrs({
+                AP_max:x
+            });
+        });
+    };
+    
     var dbCalc = function (v){
         if (v==1) {
             return {amount:1,dice:"d6",bonus:1};
@@ -226,7 +239,7 @@ on("change:repeating_moves:move_db", function() {
             {{^damage2}}
 -                <tr>
 -                    <td><span class="tcat">Damage: </span>{{damage}} <span class="tcat">Crit: </span>{{dmgcrit}}</td>
--        		</tr>
+-            	</tr>
 -           {{/damage2}}
             {{#damage2}}
                 <tr>
@@ -326,6 +339,10 @@ on("change:repeating_moves:move_db", function() {
             <tr>
                 <td class='sheet-table-header'>EXP:</td>
                 <td><input type='number' value='0' name='attr_EXP' />/<input type='number' value='10' name='attr_EXP_max' /></td>
+            </tr>
+            <tr>
+                <td class='sheet-table-header'>AP:</td>
+                <td><input type='number' name='attr_AP' />/<input type='number' name='attr_AP_max' /></td>
             </tr>
             <tr>
                 <td class='sheet-table-header'>Held Item:</td>
