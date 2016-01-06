@@ -966,8 +966,9 @@
 				<span class="sheet-table-header">Ability</span>
 				<span class="sheet-table-header">Mod</span>
 				<span class="sheet-table-header">&nbsp;</span>
-                <span class="sheet-table-header">Max HP adj</span>
-				<span class="sheet-table-header">Mod</span>
+                <span class="sheet-table-header">HP adj1</span>
+                <span class="sheet-table-header">HP adj2</span>
+				<span class="sheet-table-header">Mod2</span>
 				<span class="sheet-table-header">&nbsp;</span>
                 <span class="sheet-table-header">Temp HP</span>
 				<span class="sheet-table-header">&nbsp;</span>
@@ -995,7 +996,8 @@
 				</span>				
                 <span class="sheet-table-data sheet-center"><input type="number" style="width:100%;" title="@{HP-ability-mod}" name="attr_HP-ability-mod" value="" class="sheet-calc" readonly="readonly" /></span>
 				<span class="sheet-table-data sheet-divider">+</span>
-				<span class="sheet-table-data sheet-center"><input type="text" style="width:100%;" title="@{HP-formula-macro-text}" name="attr_HP-formula-macro-text" value="0" /></span>
+				<span class="sheet-table-data sheet-center"><input type="number" style="width:100%;" title="@{HP-misc}" name="attr_HP-misc" value="0" /></span>
+				<span class="sheet-table-data sheet-center"><input type="text" style="width:100%;" title="@{HP-formula-macro-text}" name="attr_HP-formula-macro-text" value="" Placeholder="macro" /></span>
                 <span class="sheet-table-data sheet-center"><input type="number" style="width:100%;" title="@{HP-formula-mod}" name="attr_HP-formula-mod" value="0" class="sheet-calc" readonly="readonly" /></span>
 				<span class="sheet-table-data sheet-center">&nbsp;|&nbsp;</span>
                 <span class="sheet-table-data sheet-center"><input type="number" style="width:100%;" title="@{HP-temp}" name="attr_HP-temp" value="0" class="sheet-calc" readonly="readonly" /></span>
@@ -11695,9 +11697,10 @@ var PFSheet = PFSheet || (function(){
 	 * sets max HP
 	 */
 	updateHP = function() {
-		getAttrs(["HP-ability-mod","level","total-hp","condition-Drained","HP-formula-mod","HP_max"],function(values) {
+		getAttrs(["HP-ability-mod","level","total-hp","condition-Drained","HP-formula-mod","HP_max","HP-misc"],function(values) {
 			var  totalhp = (( parseInt(values["HP-ability-mod"],10)||0) * (parseInt(values["level"],10)||0)) + 
 				 (parseInt(values["total-hp"],10)||0) + 
+				 (parseInt(values["HP-misc"],10)||0) +
 				 (parseInt(values["HP-formula-mod"],10)||0) +
 				 (5 * (parseInt(values["condition-Drained"],10)||0));
 			var grazedhp = Math.floor(totalhp * 0.75),
@@ -13579,7 +13582,7 @@ on("change:init-ability-mod change:init-trait change:init-misc condition-deafene
 
 //hp
 on("change:hp-ability", function () {PFSheet.handleDropdown("HP-ability",["HP-ability-mod"]);});
-on("change:hp-ability-mod change:level change:total-hp change:hp-formula-mod", function() { PFSheet.updateHP(); });
+on("change:hp-ability-mod change:level change:total-hp change:hp-formula-mod change:HP-misc", function() { PFSheet.updateHP(); });
 on("change:hp-temp-misc change:buff_hp-temp-total", function() { PFSheet.updateTempHP(); });
 on("change:hp-formula-macro-text",function(){SWUtils.evaluateAndSetNumber("HP-formula-macro-text","HP-formula-mod");});
 
