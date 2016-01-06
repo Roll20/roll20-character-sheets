@@ -2410,6 +2410,8 @@
             <div class="sheet-table-row">
                 <span class="sheet-table-header">Skill Misc</span>
 				<span class="sheet-table-header">Mod</span>
+                <span class="sheet-table-header sheet-divider"></span>
+				<span class="sheet-table-header">Misc2</span>
                 <span class="sheet-table-header sheet-divider">|</span>
                 <span class="sheet-table-header">Max Skill Ranks</span>
                 <span class="sheet-table-header"></span>
@@ -2421,6 +2423,8 @@
             <div class="sheet-table-row">
                 <span class="sheet-table-data sheet-center" style="width:10%"><input type="text" title="@{Max-Skill-Ranks-Misc}" name="attr_Max-Skill-Ranks-Misc" Placeholder="extra ranks" /></span>
                 <span class="sheet-table-data sheet-center"><input type="number" title="@{Max-Skill-Ranks-mod}" name="attr_Max-Skill-Ranks-mod" value="0" class="sheet-calc" readonly="readonly" style="width:4em;"/></span>
+                <span class="sheet-table-data sheet-divider" ></span>
+                <span class="sheet-table-data sheet-center"><input type="number" title="@{Max-Skill-Ranks-Misc2}" name="attr_Max-Skill-Ranks-Misc2" value="0"  style="width:4em;"/></span>
                 <span class="sheet-table-data sheet-divider-lg" >|</span>
                 <span class="sheet-table-data sheet-center"><input type="number" title="@{Max-Skill-Ranks}" name="attr_Max-Skill-Ranks" value="0" style="width:3.5em;" class="sheet-calc" readonly="readonly"  /></span>
                 <span class="sheet-table-data sheet-divider">-</span>
@@ -12314,10 +12318,11 @@ var PFSheet = PFSheet || (function(){
 	* Calculates maximum skill ranks. Minimum 1 per level.
 	*/
 	updateMaxSkills = function() {
-		getAttrs(["total-skill","total-fcskill","INT-mod","level","Max-Skill-Ranks-mod","Max-Skill-Ranks",
+		getAttrs(["total-skill","total-fcskill","INT-mod","level","Max-Skill-Ranks-mod","Max-Skill-Ranks","Max-Skill-Ranks-Misc2",
 			"unchained_skills-show","BG-Skill-Use"],function(v){
 			var intMod = parseInt(v["INT-mod"],10)||0,
 				classSkills=parseInt(v["total-skill"],10)||0,
+				otherMod=parseInt(v["Max-Skill-Ranks-Misc2"],10)||0,
 				level=parseInt(v.level,10)||0,
 				fcSkills=parseInt(v["total-fcskill"],10)||0,
 				extra=parseInt(v["Max-Skill-Ranks-mod"],10)||0,
@@ -12330,7 +12335,7 @@ var PFSheet = PFSheet || (function(){
 				classPlusInt = Math.floor(classPlusInt / 2);
 			}
 			if (classPlusInt < level ) {classPlusInt = level;}
-			totAllSkills = classPlusInt+fcSkills+extra;
+			totAllSkills = classPlusInt+fcSkills+extra+otherMod;
 			if (currSkills !== totAllSkills) { setter["Max-Skill-Ranks"]=totAllSkills;setAny++;}
 			if (setAny) {setAttrs(setter);}
 		});
@@ -13688,7 +13693,7 @@ on("change:npc-hd change:npc-hd-num change:npc-hd2 change:npc-hd-num2 change:npc
 on("change:npc-hd-misc",function(){	SWUtils.evaluateAndSetNumber("NPC-HD-misc","NPC-HD-misc-mod");});
 
 //skills
-on("change:total-skill change:total-fcskill change:int-mod change:level change:max-skill-ranks-mod change:unchained_skills-show change:BG-Skill-Use",function() { PFSheet.updateMaxSkills(); });
+on("change:total-skill change:total-fcskill change:int-mod change:level change:max-skill-ranks-mod change:Max-Skill-Ranks-Misc2 change:unchained_skills-show change:BG-Skill-Use",function() { PFSheet.updateMaxSkills(); });
 on("change:max-skill-ranks-misc",function(){SWUtils.evaluateAndSetNumber("Max-Skill-Ranks-Misc","Max-Skill-Ranks-mod");});
 
 on("change:size_skill",function(){	PFSheet.updateSkill("Fly");});
