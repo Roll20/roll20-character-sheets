@@ -2272,7 +2272,7 @@
 								<span class="sheet-table-data sheet-center"><span class="sheet-table-data sheet-center sheet-small-label" ><input type="number" name="attr_DMG-mod-copy" title="@{DMG-mod} buffs and conditions" value="0" style="width:2.8em;" class="sheet-calc" readonly="readonly" /><br>Adj</span></span>
 								<span class="sheet-table-data sheet-divider">=</span>
 								<span class="sheet-table-data sheet-center sheet-small-label"><input type="number" name="attr_total-damage" title="@{repeating_weapon_$X_total-damage}" value="0" style="width:2.8em;" class="sheet-calc" readonly="readonly" /><br>DMG</span>
-								<span class="sheet-table-data sheet-center sheet-small-label"><input type="number" name="attr_range" title="@{repeating_weapon_$X_range}" value="0"  min="0"style="width:3.8em;"  /><br>Range</span>
+								<span class="sheet-table-data sheet-center sheet-small-label"><input type="number" name="attr_range" title="@{repeating_weapon_$X_range}" value="0"  min="0" style="width:3.8em;"  /><br>Range</span>
 								<span class="sheet-table-data sheet-center sheet-small-label"><input type="text" name="attr_type" title="@{repeating_weapon_$X_type} Damage Type" placeholder="Damage Type" style="width:3em;"/><br>type</span>
 								<span class="sheet-table-data sheet-center sheet-small-label"><input type="number" name="attr_weight" title="@{repeating_weapon_$X_weight}" value="0"  step="any" min="0" style="width:3em;" /><br>WT</span>
 								<span class="sheet-table-data sheet-center sheet-small-label"><input type="number" name="attr_ammo" title="@{repeating_weapon_$X_ammo}" value="0" style="width:2.8em;"  /><br>Ammo</span>
@@ -12228,21 +12228,21 @@ var PFSheet = PFSheet || (function(){
 	 * @attype = the type of attack: melee, ranged, CMB case sensitive
 	 */
     updateAttack=function(attype) {
-        var  bufftype,bufffield,fields
+        var  bufftype,buffField,fields
         ,sizeField="size"
         ,atkField="attk-"+attype;
         //var sizeMult=1;
         if (attype=="melee") {bufftype="Melee"; }
         else if (attype==="ranged") {bufftype="Ranged";}
         else if (attype==="CMB") {
-            sizefield="CMD-size";
+            sizeField="CMD-size";
             bufftype="Melee";
             atkField="CMB";
             //sizeMult = -1;
         }
         else {return;}
-        bufffield="buff_"+bufftype+"-total";
-        fields=[atkField,"bab",attype+"-ability-mod","attk-"+attype+"-misc","attk-penalty",bufffield,sizefield];
+        buffField="buff_"+bufftype+"-total";
+        fields=[atkField,"bab",attype+"-ability-mod","attk-"+attype+"-misc","attk-penalty",buffField,sizeField];
         updateRowTotal(fields);
     },
 
@@ -13606,11 +13606,13 @@ on("change:attk-effect_mod_1 change:attk-effect_mod_1_Toggle change:attk-effect_
 on("change:dmg-effect_mod_1 change:dmg-effect_mod_1_Toggle change:dmg-effect_mod_2 change:dmg-effect_mod_2_Toggle change:dmg-effect_mod_3 change:dmg-effect_mod_3_Toggle change:dmg-effect_mod_4 change:dmg-effect_mod_4_Toggle",function(){
     PFSheet.updateDMGEffectTotals();
 });
+//redo these 3, too slow
+//attack, melee, cmb will cause them all to update due to dropdown
 on("change:attk-effect-total",function(){PFSheet.copyStaticNumberFieldToRepeating("weapon","attk-effect-total");});
 on("change:dmg-effect-total",function(){PFSheet.copyStaticNumberFieldToRepeating("weapon","dmg-effect-total");});
+on("change:dmg-mod",function(){PFSheet.copyStaticNumberFieldToRepeating("weapon","DMG-mod");});
 
 //repeating weapons
-on("change:dmg-mod",function(){PFSheet.copyStaticNumberFieldToRepeating("weapon","DMG-mod");});
 on("change:repeating_weapon:attack-type",function() {PFSheet.handleRepeatingAttackDropdown();});
 on("change:repeating_weapon:damage-ability",function() {PFSheet.handleRepeatingDamageDropdown();});
 on("change:repeating_weapon:damage",function(){SWUtils.evaluateAndSetNumber("repeating_weapon_damage","repeating_weapon_damage-mod");});
