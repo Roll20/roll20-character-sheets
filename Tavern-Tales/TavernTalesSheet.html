@@ -29,7 +29,7 @@
 								<th>Treasure</th>
 								<td><input type="number" name="attr_TreasureEarned" /></td> 
 								<td><input type="number" name="attr_TreasureSpent" /></td> 
-								<td><input type="number" name="attr_TreasureRemaining" /></td>
+								<td><input type="number" name="attr_TreasureRemaining" value="(@{TreasureEarned}-@{TreasureSpent})" disabled="true" /></td>
 							</tr>
 						</table>
 					</div>
@@ -233,6 +233,7 @@
 					<input type="radio" name="traitTabs" value="Combat" class="sheet-tab sheet-tab-combat" id="sheet-traitsTabCombat" title="Combat" />
 					<input type="radio" name="traitTabs" value="Exploration" class="sheet-tab sheet-tab-exploration" id="sheet-traitsTabExploration" title="Exploration" />
 					<input type="radio" name="traitTabs" value="Interaction" class="sheet-tab sheet-tab-interaction" id="sheet-traitsTabInteraction" title="Interaction" />
+					<input type="radio" name="traitTabs" value="General" class="sheet-tab sheet-tab-general" id="sheet-traitsTabGeneral" title="General" />
 					<input type="radio" name="traitTabs" value="All" class="sheet-tab sheet-tab-all" id="sheet-traitsTabAll" checked="checked" title="All" />					
 
 
@@ -272,10 +273,24 @@
 							
 					</div>
 					
+
+					<div class="sheet-traitsTabGeneralContent">
+
+						<div class="sheet-traits">
+							<h3><span class="sheet-traitXP">XP: <input type="number" name="attr_generalTraitsXPSpent" value=0 /></span>General Traits (Name, Description)</h3>
+							<fieldset class="repeating_GeneralTraits">
+							  <textarea class="sheet-TTtraitName" name="attr_GeneralTraitName" rows="2"></textarea>
+							  <textarea class="sheet-TTtraitDesc" name="attr_GeneralTraitDescription" rows="2"></textarea>
+							</fieldset>
+						</div>							
+					</div>
+										
+					
+					
 					<div class="sheet-traitsTabAllContent">
 						
 						<div class="sheet-traits">
-							<h2><span class="sheet-traitXP">XP: <input type="number" name="attr_totalTraitXPSpent" disabled="true" value="(@{combatTraitsXPSpent} + @{explorationTraitsXPSpent} + @{interactionTraitsXPSpent})" /></span>All Traits</h2>
+							<h2><span class="sheet-traitXP">XP: <input type="number" name="attr_totalTraitXPSpent" disabled="true" value="(@{combatTraitsXPSpent} + @{explorationTraitsXPSpent} + @{interactionTraitsXPSpent} + @{generalTraitsXPSpent})" /></span>All Traits</h2>
 							<h3><span class="sheet-traitXP">XP: <input type="number" name="attr_combatTraitsXPSpent" value=0 /></span>Combat Traits (Name, Description)</h3>
 							<fieldset class="repeating_CombatTraits">
 
@@ -295,6 +310,13 @@
 							  <textarea class="sheet-TTtraitName" name="attr_InteractionTraitName" rows="2"></textarea>
 							  <textarea class="sheet-TTtraitDesc" name="attr_InteractionTraitDescription" rows="2"></textarea>
 							</fieldset>
+
+
+							<h3><span class="sheet-traitXP">XP: <input type="number" name="attr_generalTraitsXPSpent" value=0 /></span>Interaction Traits (Name, Description)</h3>
+							<fieldset class="repeating_GeneralTraits">
+							  <textarea class="sheet-TTtraitName" name="attr_GeneralTraitName" rows="2"></textarea>
+							  <textarea class="sheet-TTtraitDesc" name="attr_GeneralTraitDescription" rows="2"></textarea>
+							</fieldset>
 							
 						</div>	
 			
@@ -307,7 +329,20 @@
 		
 		</div>
 		
+<!--
 
+                                  o8o             
+                                  `"'             
+ .ooooo.   .ooooo oo oooo  oooo  oooo  oo.ooooo.  
+d88' `88b d88' `888  `888  `888  `888   888' `88b 
+888ooo888 888   888   888   888   888   888   888 
+888    .o 888   888   888   888   888   888   888 
+`Y8bod8P' `V8bod888   `V88V"V8P' o888o  888bod8P' 
+                888.                    888       
+                8P'                    o888o      
+                "                                 
+
+-->
 	  
 
 
@@ -541,12 +576,17 @@ o.  )88b 888   .o8  888      888   888   888   888 .
 			explorationTraitsXPCost = calcXPCost(numExplorationTraits);
 			setAttrs({explorationTraitsXPSpent: explorationTraitsXPCost});
 		});
+		getSectionIDs("repeating_GeneralTraits", function(idarray) {
+			var numGeneralTraits = idarray.length;
+			generalTraitsXPCost = calcXPCost(numGeneralTraits);
+			setAttrs({generalTraitsXPSpent: generalTraitsXPCost});
+		});
 		
 		var totalTraitXPCost = combatTraitsXPCost + interactionTraitsXPCost + explorationTraitsXPCost;
 		console.log("finished updating trait XP costs: " + totalTraitXPCost);
 		
-		getAttrs(["combatTraitsXPSpent", "interactionTraitsXPSpent", "explorationTraitsXPSpent"], function(values) {
-			var totalTraitXPCost = values.combatTraitsXPSpent + values.interactionTraitsXPSpent + values.explorationTraitsXPSpent;
+		getAttrs(["combatTraitsXPSpent", "interactionTraitsXPSpent", "explorationTraitsXPSpent", "generalTraitsXPSpent"], function(values) {
+			var totalTraitXPCost = values.combatTraitsXPSpent + values.interactionTraitsXPSpent + values.explorationTraitsXPSpent + values.generalTraitsXPSpent;
 			setAttrs({totalTraitXPSpent: totalTraitXPCost});
 		});
 		
@@ -569,9 +609,9 @@ o.  )88b 888   .o8  888      888   888   888   888 .
 	};
 
 	var updateTotalXPCost = function () {
-		getAttrs(["statXPSpent", "combatTraitsXPSpent", "interactionTraitsXPSpent", "explorationTraitsXPSpent"], function(values) {
+		getAttrs(["statXPSpent", "combatTraitsXPSpent", "interactionTraitsXPSpent", "explorationTraitsXPSpent", "generalTraitsXPSpent"], function(values) {
 			console.log("updating total XP Cost...");
-			setAttrs({totalXPSpent: values.statXPSpent + values.combatTraitsXPSpent + values.interactionTraitsXPSpent + values.explorationTraitsXPSpent});
+			setAttrs({totalXPSpent: values.statXPSpent + values.combatTraitsXPSpent + values.interactionTraitsXPSpent + values.explorationTraitsXPSpent + values.generalTraitsXPSpent});
 			console.log("finished updating total XP Cost.");
 		});
 		
@@ -590,7 +630,7 @@ o.  )88b 888   .o8  888      888   888   888   888 .
 		updateAllXP();
 	});
 
-	on("change:repeating_CombatTraits change:repeating_ExplorationTraits change:repeating_InteractionTraits", function() {
+	on("change:repeating_CombatTraits change:repeating_ExplorationTraits change:repeating_InteractionTraits change:repeating_GeneralTraits", function() {
 		// update all the traits
 		updateTraitXPCost();
 	});
@@ -684,4 +724,5 @@ o.  )88b 888   .o8  888      888   888   888   888 .
 		</div>
 	</div>
 </rolltemplate>
+
 
