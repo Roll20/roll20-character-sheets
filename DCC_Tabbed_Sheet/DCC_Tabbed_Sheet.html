@@ -308,8 +308,8 @@
 						<div class="sheet-col-1-8 sheet-center sheet-small-label">Current Score</div>
                         <div class="sheet-col-1-8 sheet-center sheet-small-label">Max Score</div>
 						<div class="sheet-col-1-8 sheet-center sheet-small-label">Mod</div>
-						<div class="sheet-col-1-8 sheet-center sheet-small-label">Trained</div>
-						<div class="sheet-col-1-8 sheet-center sheet-small-label">Untrained</div>
+						<div class="sheet-col-1-8 sheet-center sheet-small-label">Trained (Trn)</div>
+						<div class="sheet-col-1-8 sheet-center sheet-small-label">Untrained (Untrn)</div>
 					</div>
 					
 					<div class="sheet-row">
@@ -317,8 +317,14 @@
 						<div class="sheet-col-1-8"><input type="number" name="attr_Strength" min="1" step="1"/></div>
                			<div class="sheet-col-1-8"><input type="number" name="attr_Strength_max" min="1" step="1"/></div>
 						<div class="sheet-col-1-8"><input type="number" name="attr_STR" value="floor( (0.0009 * @{Strength} * @{Strength} * @{Strength}) + (-0.029 * @{Strength} * @{Strength}) + (0.6 * @{Strength}) +0.41) -4" disabled="disabled"/></div>
-						<div class="sheet-col-1-8 sheet-center"><button type="roll" class="sheet-core-check" name="roll_STR" value="@{character_name} attempts a trained Strength Skill Check\n\nSTR check :[[1d20 + [[@{STR}]] [Stat Mod] ]]"></button></div>
-						<div class="sheet-col-1-8 sheet-center"><button type="roll" class="sheet-core-check" name="roll_STR" value="@{character_name} attempts an untrained Strength Skill Check\n\nSTR check :[[1d10 + [[@{STR}]] [Stat Mod] ]]"></button></div>
+						<div class="sheet-col-1-8 sheet-center">
+							<!--<button type="roll" class="sheet-core-check" name="roll_STR" value="@{character_name} attempts a trained Strength Skill Check\n\nSTR check :[[1d20 + [[@{STR}]] [Stat Mod] ]]"></button>-->
+							<button type='roll' class="sheet-core-check" value="&{template:DccTabbed} {{stat=1}} {{name=@{Name}}} {{title=Trained STR Check}} {{ability=[[1d20 + [[@{STR}]] [Stat Mod] ]]}}" name='STR' title="STR Check">Trn</button>
+						</div>
+						<div class="sheet-col-1-8 sheet-center">
+							<!--<button type="roll" class="sheet-core-check" name="roll_STR" value="@{character_name} attempts an untrained Strength Skill Check\n\nSTR check :[[1d10 + [[@{STR}]] [Stat Mod] ]]"></button>-->
+							<button type='roll' class="sheet-core-check" value="&{template:DccTabbed} {{stat=1}} {{name=@{Name}}} {{title=Untrained STR Check}} {{ability=[[1d10 + [[@{STR}]] [Stat Mod] ]]}}" name='STR' title="STR Check">Untrn</button>
+						</div>
 					</div>
 					
 					<div class="sheet-row">
@@ -7425,13 +7431,20 @@
 			<h4 class="sheet-center">Monster Combat</h4>
 
 						<div class="sheet-row">
-							<div class="sheet-col-2-17 sheet-center">&nbsp;</div>
 							<div class="sheet-col-2-17 sheet-right sheet-heading-row">Initiative : </br></div>
 							<div class="sheet-col-1-17 sheet-small-label sheet-center" title="Enter Monster's initiative here."><input class="sheet-underlined sheet-center" type="number" name="attr_INITMonster" value="0" step="1"><br/></div>
+							<div class="sheet-col-1-7 sheet-center">
+								<button type='roll' class="sheet-initiative sheet-large-button" name="roll_INITMonster" value="&{template:DccTabbed} {{name=@{name}}} {{title=Monster/NPC Initiative}} {{INIT=[[1d20 + @{selected|INITMonster} [Initiative Mod] + (?{Bonus/Minus|0}) &{tracker}]]}}" name='Initiative' title="Initiative">Initiative</button>
+							</div>
 
-							<div class="sheet-col-1-7 sheet-center"><button type='roll' class="sheet-initiative sheet-large-button" name="roll_INITMonster" value="&{template:DccTabbed} {{name=@{name}}} {{title=Monster/NPC Initiative}} {{INIT=[[1d20 + @{selected|INITMonster} [Initiative Mod] + (?{Bonus/Minus|0}) &{tracker}]]}}" name='Initiative' title="Initiative">Initiative</button></div>
+							<div class="sheet-col-1-24 sheet-center">&nbsp;</div>
 
-							<div class="sheet-col-2-17 sheet-center">&nbsp;</div>
+							<div class="sheet-col-2-17 sheet-right sheet-heading-row">Morale Check : </br></div>
+							<div class="sheet-col-1-9 sheet-center">
+								<button type='roll' class="sheet-initiative" name="Monster Morale Check" value="/w gm &{template:DccTabbed} {{stat=1}} {{name=@{Name}}} {{title=Morale Check}} {{moralecheck=[[1d20 + @{WILLMonster} + (?{Any Morale Bonus/Minus|0}) ]]}} {{chance=[[10]]}}" name='Morale' title="Morale Check">Morale</button>
+							</div>
+
+							<div class="sheet-col-1-24 sheet-center">&nbsp;</div>
 
 							<div class="sheet-col-2-17 sheet-right sheet-heading-row">Action Dice : </br></div>
 							<div class="sheet-col-1-17 sheet-small-label sheet-center" title="Enter the amount of Action Die."><input class="sheet-underlined sheet-center" type="number" name="attr_ActionDieMonster" value="1" min="1" step="1"><br/></div>
@@ -8255,39 +8268,33 @@
                     {{/rollBetween() strskill 2 chance}}
                 {{/strskill}}
 
-                <!-- CHA Reactions -->
-                {{#chaskill}}
-                    <div class="sheet-row">
-                        <div class="sheet-col-5-12 sheet-padl sheet-padr sheet-RollTemp-rollname">Check : </div>
-                        <div class="sheet-col-7-12 sheet-padr sheet-RollTemp-rollresult">{{chaskill}}</div>
-                    </div>
-                {{/chaskill}}
+                <!-- Monster/Retainer Morale Check -->
+	                {{#moralecheck}}
+	                    <div class="sheet-row">
+	                        <div class="sheet-col-5-13 sheet-padl sheet-padr sheet-RollTemp-rollname">Morale : </div>
+	                        <div class="sheet-col-8-13 sheet-padr sheet-RollTemp-rollresult">{{moralecheck}}</div>
+	                    </div>
+	                    {{#rollGreater() moralecheck chance}}
+	                        <div class="sheet-row">
+	                            <div class="sheet-col-1-1">&nbsp;</div>
+	                            <div class="sheet-col-11-12 sheet-padl sheet-padr sheet-RollTemp-success">SUCCESS !</div>
+	                        </div>
+	                    {{/rollGreater() moralecheck chance}}
+	                    {{#rollBetween() moralecheck 1 chance}}
+	                        <div class="sheet-row">
+	                            <div class="sheet-col-1-1">&nbsp;</div>
+	                            <div class="sheet-col-11-12 sheet-padl sheet-padr sheet-RollTemp-fail">FAILURE !</div>
+	                        </div>
+	                    {{/rollBetween() moralecheck 1 chance}}
+	                {{/moralecheck}}
 
                 <!-- Ability Checks -->
-                {{#ability}}
-                    <div class="sheet-row">
-                        <div class="sheet-col-5-14 sheet-padl sheet-padr sheet-RollTemp-rollname">Roll : </div>
-                        <div class="sheet-col-9-14 sheet-padr sheet-RollTemp-rollresult">{{ability}}</div>
-                    </div>
-                    {{#rollWasCrit() ability}}
-                    <div class="sheet-row">
-                        <div class="sheet-col-1-1">&nbsp;</div>
-                        <div class="sheet-col-19-20 sheet-padl sheet-padr sheet-RollTemp-critsuccess">GREAT SUCCESS !</div>
-                    </div>
-                    {{/rollWasCrit() ability}}
-                    {{#rollGreater() ability stattype}}
-                        <div class="sheet-row">
-                            <div class="sheet-col-1-1">&nbsp;</div>
-                            <div class="sheet-col-11-12 sheet-padl sheet-padr sheet-RollTemp-fail">FAILURE !</div>
-                        </div>
-                    {{/rollGreater() ability stattype}}
-                    {{#rollBetween() ability 2 stattype}}
-                        <div class="sheet-row">
-                            <div class="sheet-col-1-1">&nbsp;</div>
-                            <div class="sheet-col-11-12 sheet-padl sheet-padr sheet-RollTemp-success">SUCCESS !</div>
-                        </div>
-                    {{/rollBetween() ability 2 stattype}}
-                {{/ability}}
+	                {{#ability}}
+	                    <div class="sheet-row">
+	                        <div class="sheet-col-4-13 sheet-padl sheet-padr sheet-RollTemp-rollname">Roll : </div>
+	                        <div class="sheet-col-9-13 sheet-padr sheet-RollTemp-rollresult">{{ability}}</div>
+	                    </div>
+	                {{/ability}}
 
                 <!-- Saving Throws -->
 	                {{#savingthrow}}
