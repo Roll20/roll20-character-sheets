@@ -17,7 +17,6 @@ var traitsCount = 1;
 var actionCount = 12;
 var lairActionCount = 4;
 var legendaryActionCount = 4;
-var weaponCount = 7;
 var quickClassActions = 5;
 var classActionsPerPage = 10;
 var customClassCount = 6;
@@ -241,19 +240,6 @@ function checkQuery(file) {
 	return template.replace(/\x7B\x7BcheckQuery\x7D\x7D/g, query);
 }
 
-function weaponQuery(file) {
-	var template = file.contents.toString('utf8');
-	var query = '';
-
-	for (var i = 0; i < weaponCount; ++i) {
-		var weaponName = '@{repeating_attacks_' + i + '_name}';
-
-		query += '|' + weaponName + ', {{title=' + weaponName + '&amp;#125;&amp;#125;'
-	}
-
-	return template.replace(/\x7B\x7BweaponQuery\x7D\x7D/g, query);
-}
-
 function ordinal(d) {
 	if (d > 3 && d < 21) return 'th';
 	switch (d % 10) {
@@ -346,12 +332,6 @@ gulp.task('preCompile', function () {
 				return actionsCompile(file, actionCount, '', 'Action');
 			}
 		}))
-		.pipe(inject(gulp.src(['./components/attacks/attacks.html']), {
-			starttag: '<!-- inject:attacks:{{ext}} -->',
-			transform: function (filePath, file) {
-				return duplicate(file, weaponCount);
-			}
-		}))
 		.pipe(inject(gulp.src(['./components/class/class_action.html']), {
 			starttag: '<!-- inject:class_1:{{ext}} -->',
 			transform: function (filePath, file) {
@@ -392,12 +372,6 @@ gulp.task('preCompile', function () {
 			starttag: '<!-- inject:checkQuery:{{ext}} -->',
 			transform: function (filePath, file) {
 				return checkQuery(file);
-			}
-		}))
-		.pipe(inject(gulp.src(['./components/macros/attacks/attacks.html']), {
-			starttag: '<!-- inject:weaponQuery:{{ext}} -->',
-			transform: function (filePath, file) {
-				return weaponQuery(file);
 			}
 		}))
 		.pipe(replace({
