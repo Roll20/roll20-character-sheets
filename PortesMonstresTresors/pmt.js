@@ -1,22 +1,22 @@
 var PmT = PmT || (function () {
     'use strict';
-    var version = 1.0,
-    releasedate= "2016-01-04",
+    var version = 1.1,
+    releasedate= "2016-01-14",
     schemaversion = 1.0,
     author="Natha (roll20userid:75857)",
     warning = "This script is meant to be used with the Portes-Monstres-Trésors sheet",
     sortsDivins=["Détection de la Magie","Détection du Mal","Lumière","Protection contre le Mal","Purification","Regain d’Assurance","Résistance au Froid","Soins Légers"],
     sortsProfanes=["Bouclier","Charme-personne","Détection de la Magie","Disque Flottant","Lecture des Langages","Lecture de la Magie","Lumière","Projectile Magique","Protection contre le Mal","Sommeil","Ventriloquie","Verrouillage"],
     // Clerc 58 PO + Standard = 65
-    packClerc='{"nom":"Armure de cuir rembourré","qte":"1","poids":"10"}|{"nom":"Bouclier","qte":"1","poids":"5"}|{"nom":"Casque","qte":"1","poids":"2.5"}|{"nom":"Fronde","qte":"1","poids":"0"}|{"nom":"Masse","qte":"1","poids":"1.5"}|{"nom":"Pierres de fronde","qte":"10","poids":"0.15"}|{"nom":"Symbole religieux en bois","qte":"1","poids":"0"}',
+    packClerc='{"nom":"Brigandine","qte":"1","poids":"10"}|{"nom":"Bouclier","qte":"1","poids":"5"}|{"nom":"Casque","qte":"1","poids":"2.5"}|{"nom":"Fronde","qte":"1","poids":"0"}|{"nom":"Masse","qte":"1","poids":"1.5"}|{"nom":"Pierres de fronde","qte":"10","poids":"0.15"}|{"nom":"Symbole religieux en bois","qte":"1","poids":"0"}',
     // Guerrier 94 PO + Standard = 103
-    packGuerrier='{"nom":"Arc court","qte":"1","poids":"1"}|{"nom":"Armure de cuir rembourré","qte":"1","poids":"10"}|{"nom":"Bouclier","qte":"1","poids":"5"}|{"nom":"Carquois","qte":"1","poids":"0.5"}|{"nom":"Flèches","qte":"20","poids":"0.07"}|{"nom":"Casque","qte":"1","poids":"2.5"}|{"nom":"Dague","qte":"1","poids":"0.5"}|{"nom":"Epée longue","qte":"1","poids":"2"}',
+    packGuerrier='{"nom":"Arc court","qte":"1","poids":"1"}|{"nom":"Brigandine","qte":"1","poids":"10"}|{"nom":"Bouclier","qte":"1","poids":"5"}|{"nom":"Carquois","qte":"1","poids":"0.5"}|{"nom":"Flèches","qte":"20","poids":"0.07"}|{"nom":"Casque","qte":"1","poids":"2.5"}|{"nom":"Dague","qte":"1","poids":"0.5"}|{"nom":"Epée longue","qte":"1","poids":"2"}',
     // Magicien 54 PO + Standard = 61
     packMagicien='{"nom":"Bâton","qte":"1","poids":"4"}|{"nom":"Dague","qte":"1","poids":"0.5"}|{"nom":"Fléchettes","qte":"10","poids":"0.1"}|{"nom":"Grimoire","qte":"1","poids":"1.5"}|{"nom":"Encre (fiole de 30 ml)","qte":"1","poids":"0"}|{"nom":"Plume","qte":"1","poids":"0"}',
     // Voleur 78 PO + Standard = 85
     packVoleur='{"nom":"Arc court","qte":"1","poids":"1"}|{"nom":"Armure de cuir","qte":"1","poids":"7.5"}|{"nom":"Carquois","qte":"1","poids":"0.5"}|{"nom":"Flèches","qte":"20","poids":"0.07"}|{"nom":"Dague","qte":"1","poids":"0.5"}|{"nom":"Epée courte","qte":"1","poids":"1"}|{"nom":"Pitons","qte":"12","poids":"0.33"}|{"nom":"Outils de crochetage","qte":"1","poids":"0.5"}',
     // Elfe 89 PO + Standard = 96
-    packElfe='{"nom":"Arc long","qte":"1","poids":"1"}|{"nom":"Armure de cuir rembourré","qte":"1","poids":"10"}|{"nom":"Carquois","qte":"1","poids":"0.5"}|{"nom":"Flèches","qte":"20","poids":"0.07"}|{"nom":"Dague","qte":"1","poids":"0.5"}|{"nom":"Epée longue","qte":"1","poids":"2"}',
+    packElfe='{"nom":"Arc long","qte":"1","poids":"1"}|{"nom":"Brigandine","qte":"1","poids":"10"}|{"nom":"Carquois","qte":"1","poids":"0.5"}|{"nom":"Flèches","qte":"20","poids":"0.07"}|{"nom":"Dague","qte":"1","poids":"0.5"}|{"nom":"Epée longue","qte":"1","poids":"2"}',
     // Halfelin 47 PO + Standard = 54
     packHalfelin='{"nom":"Arc court","qte":"1","poids":"1"}|{"nom":"Armure de cuir","qte":"1","poids":"7.5"}|{"nom":"Carquois","qte":"1","poids":"0.5"}|{"nom":"Flèches","qte":"20","poids":"0.07"}|{"nom":"Dague","qte":"1","poids":"0.5"}|{"nom":"Epée courte","qte":"1","poids":"1"}',
     // Standard 7 PO
@@ -217,7 +217,7 @@ var PmT = PmT || (function () {
         var DV = 0;
         var PV = 0;
         var XP = 0;
-        var ATK_Bonus=0;
+        var ATK_Bonus=1;
         var JS_Souffles=0;
         var JS_Poison=0;
         var JS_Petrification=0;
@@ -258,7 +258,8 @@ var PmT = PmT || (function () {
                 JS_Petrification=14;
                 JS_Baton=12;
                 JS_Sorts=15;
-                lesort=sortsDivins[randomInteger(8)-1];
+                //lesort=sortsDivins[randomInteger(8)-1];
+                lesort="Détection de la Magie|Détection du Mal|Lumière|Protection contre le Mal|Purification|Regain d’Assurance|Résistance au Froid|Soins Légers";
                 lepack=""+packClerc+"|"+packStandard;
                 lecout=65;
                 CaAscArmure = 12;
@@ -397,6 +398,7 @@ var PmT = PmT || (function () {
         createObj("attribute", {name: "PV", current: PV, max: PV, characterid: char.id});
         createObj("attribute", {name: "XP", current: 0, max: XP, characterid: char.id});
         createObj("attribute", {name: "BonusXp", current: BonusXp, characterid: char.id});
+        createObj("attribute", {name: "sheetOptionCa", current: 1, characterid: char.id});
         createObj("attribute", {name: "CaAscArmure", current: CaAscArmure, characterid: char.id});
         createObj("attribute", {name: "CaDescArmure", current: CaDescArmure, characterid: char.id});
         createObj("attribute", {name: "CaBouclier", current: CaBouclier, characterid: char.id});
