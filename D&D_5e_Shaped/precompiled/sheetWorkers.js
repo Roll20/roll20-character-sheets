@@ -6,8 +6,8 @@ on('change:cp change:sp change:ep change:gp change:pp', function () {
 		var goldPieces = parseFloat(v.gp) || 0;
 		var platinumPieces = parseFloat(v.pp) || 0;
 		var copperPerGold = parseFloat(v.copper_per_gold) || 100;
-		var silverPerGold = parseFloat(v.copper_per_gold) || 10;
-		var electrumPerGold = parseFloat(v.copper_per_gold) || 2;
+		var silverPerGold = parseFloat(v.silver_per_gold) || 10;
+		var electrumPerGold = parseFloat(v.electrum_per_gold) || 2;
 		var platinumPerGold = parseFloat(v.platinum_per_gold) || 10;
 		var totalGold = (copperPieces / copperPerGold) + (silverPieces / silverPerGold) + (electrumPieces / electrumPerGold) + goldPieces + (platinumPieces * platinumPerGold);
 		var coinWeight = (copperPieces + silverPieces + electrumPieces + goldPieces + platinumPieces) / 50;
@@ -18,38 +18,63 @@ on('change:cp change:sp change:ep change:gp change:pp', function () {
 	});
 });
 
-on('change:repeating_inventory', function () {
-	setAttrs({
-		'weight_inventory': 0
-	});
+var sumRepeating = function (options) {
+	var repeatingItem = 'repeating_' + options.collection;
 
-	getSectionIDs('repeating_inventory', function (ids) {
-		var inventoryArray = [];
+	getSectionIDs(repeatingItem, function (ids) {
+		var collectionArray = [];
 		var finalSetAttrs = {};
 
 		for (var i = 0; i < ids.length; i++) {
-			inventoryArray.push('repeating_inventory_' + ids[i] + '_carried');
-			inventoryArray.push('repeating_inventory_' + ids[i] + '_qty');
-			inventoryArray.push('repeating_inventory_' + ids[i] + '_weight');
+			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + options.toggle);
+			if(options.qty) {
+				collectionArray.push(repeatingItem + '_' + ids[i] + '_' + options.qty);
+			}
+			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + options.weight);
 		}
 
-		getAttrs(inventoryArray, function (v) {
+		getAttrs(collectionArray, function (v) {
 			var sum = 0;
 			for (var j = 0; j < ids.length; j++) {
-				var carried = v['repeating_inventory_' + ids[j] + '_carried'] || true;
-				if(carried) {
-					var qty = parseInt(v['repeating_inventory_' + ids[j] + '_qty'], 10) || 1;
-					var weight = parseFloat(v['repeating_inventory_' + ids[j] + '_weight']) || 0;
-					var totalWeight = qty * weight;
+				var toggle = v[repeatingItem+'_' + ids[j] + '_' + options.toggle];
+				if(toggle === 'undefined' || toggle === 'on') {
+					var qty = 1;
+					if(options.qty) {
+						qty = parseInt(v[repeatingItem+'_' + ids[j] + '_' + options.qty], 10) || 1;
+					}
+					var weight = parseFloat(v[repeatingItem+'_' + ids[j] + '_' + options.weight]) || 0;
+					var itemWeight = qty * weight;
 
-					finalSetAttrs['repeating_inventory_' + ids[j] + '_weight_total'] = totalWeight;
+					if(options.itemWeight) {
+						finalSetAttrs[repeatingItem+'_' + ids[j] + '_' + options.itemWeight] = itemWeight;
+					}
 
-					sum += totalWeight;
+					sum += itemWeight;
 				}
 			}
 
-			finalSetAttrs.weight_inventory = sum;
+			finalSetAttrs[options.totalField] = sum;
 			setAttrs(finalSetAttrs);
 		});
+	});
+};
+
+on('change:repeating_inventory', function () {
+	sumRepeating({
+		collection: 'inventory',
+		toggle: 'carried',
+		qty: 'qty',
+		weight: 'weight',
+		itemWeight: 'weight_total',
+		totalField: 'weight_inventory'
+	});
+});
+
+on('change:repeating_armor', function () {
+	sumRepeating({
+		collection: 'armor',
+		toggle: 'worn',
+		weight: 'weight',
+		totalField: 'weight_armor'
 	});
 });
