@@ -14,54 +14,68 @@
           <div class="col-10 center small-label vert-bottom">{{'SPEED_PENALTY_10' | translate}}</div>
           <div class="col-06 center small-label vert-bottom">{{'WEIGHT' | translate}}</div>
         </div>
-        <div ui-sortable ng-model="inventory.data.armor">
-          <div class="shaped-row" ng-repeat="armor in inventory.data.armor track by $index">
+        <fieldset class="repeating_inventory">
+          <div class="shaped-row">
             <div class="col-05 center vert-middle">
-              <input type="checkbox" ng-model="armor.worn" checked>
+              <input type="checkbox" name="attr_worn" checked>
             </div>
             <div class="col-08 center vert-middle">
-              <input type="checkbox" ng-model="armor.unarmored">
+              <input type="checkbox" name="attr_unarmored">
             </div>
             <div class="col-25 vert-middle pad-r-sm">
-              <input class="form-control" type="text" ng-model="armor.name">
+              <input type="text" name="attr_name">
             </div>
             <div class="col-08 vert-middle pad-r-sm">
-              <input class="form-control" type="number" ng-model="armor.ac" value="0" step="1">
+              <input type="number" name="attr_AC_base" value="0" step="1">
             </div>
             <div class="col-08 vert-middle pad-r-sm">
-              <select ng-model="armor.type" ng-options="armorKey as armorKey | uppercase | translate for (armorKey, armorType) in inventory.data.armorTypes"></select>
+              <span class="en">
+                <select name="attr_repeating_armor_{{num}}_type">
+                  <option value="@{armor_type_other}">Other</option>
+                  <option value="@{armor_type_light}">Light</option>
+                  <option value="@{armor_type_medium}">Medium</option>
+                  <option value="@{armor_type_heavy}">Heavy</option>
+                </select>
+              </span>
+              <span class="de">
+                <select name="attr_repeating_armor_{{num}}_type">
+                  <option value="@{armor_type_other}">Other</option>
+                  <option value="@{armor_type_light}">Leichte Rüstung</option>
+                  <option value="@{armor_type_medium}">Mittleschwere Rüstung</option>
+                  <option value="@{armor_type_heavy}">Schwere Rüstung</option>
+                </select>
+              </span>
             </div>
             <div class="col-08 vert-middle pad-r-sm">
-              <input class="form-control" type="number" ng-model="armor.bonus" value="0" step="1">
+              <input type="number" name="attr_bonus}" value="0" step="1">
             </div>
             <div class="col-08 vert-middle pad-r-sm">
-              <input class="form-control" type="number" ng-model="armor.total" disabled>
+              <input type="number" name="attr_total_AC" disabled>
             </div>
             <div class="col-14 center vert-middle">
-              <input type="checkbox" ng-model="armor.stealthDisadvantage">
+              <input type="checkbox" name="attr_stealth_pen" value="@{armor_stealth_pen}">
             </div>
             <div class="col-10 vert-middle pad-r-sm">
-              <select ng-model="armor.speedPenalty">
-                <option value="No" selected>{{'NO' | translate}}</option>
-                <option value="If Str &lt; 13">{{'IF' | translate}} {{'ABILITIES.strength.SHORT_NAME_CAPITAL' | translate}} &lt; 13</option>
-                <option value="If Str &lt; 15">{{'IF' | translate}} {{'ABILITIES.strength.SHORT_NAME_CAPITAL' | translate}} &lt; 15</option>
+              <select name="attr_speed_pen">
+                <option value="@{armor_speed_pen_no}" selected>No</option>
+                <option value="@{armor_speed_pen_str_13}">If Str &lt; 13</option>
+                <option value="@{armor_speed_pen_str_15}">If Str &lt; 15</option>
               </select>
             </div>
             <div class="col-06 center vert-middle">
-              <input class="form-control" type="number" ng-model="armor.weight">
+              <input type="number" name="attr_weight_armor" disabled>
             </div>
           </div>
-        </div>
-        <div repeating-add collection="inventory.data.armor" default-item="inventory.defaultArmor" define-added-item="inventory.defineArmorItem"></div>
+        </fieldset>
 
         <div class="shaped-row pad-b-md">
           <div class="col-08 center pad-r-md">
-            <input class="form-control" type="number" ng-model="inventory.data.ac.armored" value="" disabled>
+            <input type="number" name="attr_AC_armor_calc" value="(@{repeating_armor_0_worn} + @{repeating_armor_1_worn} + @{repeating_armor_2_worn} + @{repeating_armor_3_worn} + @{repeating_armor_4_worn} + (@{global_ac_bonus}))" disabled="disabled">
 
             <div class="small-label">{{'AC_ARMORED' | translate}}</div>
           </div>
           <div class="col-08 center pad-r-md">
-            <input class="form-control" type="number" ng-model="inventory.data.ac.unarmored" value="" disabled>
+            <input type="number" name="attr_AC_no_armor_calc" value="(10 + @{dexterity_mod} + @{unarmored_class_bonus} + @{repeating_armor_0_unarmored} + @{repeating_armor_1_unarmored} + @{repeating_armor_2_unarmored} + @{repeating_armor_3_unarmored} + @{repeating_armor_4_unarmored} + (@{global_ac_bonus}))" disabled="disabled">
 
             <div class="small-label">{{'AC_UNARMORED' | translate}}</div>
           </div>
@@ -73,11 +87,12 @@
             <div class="small-label">{{'ABILITY_BONUS' | translate}}</div>
           </div>
           <div class="col-08 center">
-            <input class="form-control" type="number" ng-model="inventory.data.ac.bonus" value="0">
+            <input class="sheet-center" type="text" name="attr_global_ac_bonus" value="0">
 
             <div class="small-label">{{'AC_BONUS' | translate}}</div>
           </div>
           <div class="col-08 center bold">
+            <input type="number" name="attr_pc_AC" value="((@{AC_armor_calc} + @{AC_no_armor_calc} + abs(@{AC_armor_calc} - @{AC_no_armor_calc})) / 2)" disabled="disabled">
             <input class="form-control" type="number" class="" ng-model="inventory.data.ac.total" disabled>
 
             <div class="small-label">{{'AC' | translate}}</div>
@@ -90,56 +105,31 @@
     <div class="col-10 center pad-r-md">
       <div class="wrap-box mar-b-sm" ng-repeat="(coinName, coinValue) in inventory.data.coinage">
         <div class="shaped-row center-xs middle-xs">
-          <div class="col-30 small-label">
-            <span class="en">CP</span>
-            <span class="de">KM</span>
-            <span class="fr">PC</span>
-            <span class="ru">ММ</span>
-          </div>
+          <div class="col-30 small-label">{{'COINS_CP' | translate}}</div>
           <div class="col-70">
             <input type="number" name="attr_cp" value="0" min="0" step="1">
           </div>
         </div>
         <div class="shaped-row center-xs middle-xs">
-          <div class="col-30 small-label">
-            <span class="en">SP</span>
-            <span class="de">SM</span>
-            <span class="fr">PA</span>
-            <span class="ru">СМ</span>
-          </div>
+          <div class="col-30 small-label">{{'COINS_SP' | translate}}</div>
           <div class="col-70">
             <input type="number" name="attr_sp" value="0" min="0" step="1">
           </div>
         </div>
         <div class="shaped-row center-xs middle-xs">
-          <div class="col-30 small-label">
-            <span class="en">EP</span>
-            <span class="de">EM</span>
-            <span class="fr">PE</span>
-            <span class="ru">ЭМ</span>
-          </div>
+          <div class="col-30 small-label">{{'COINS_EP' | translate}}</div>
           <div class="col-70">
             <input type="number" name="attr_ep" value="0" min="0" step="1">
           </div>
         </div>
         <div class="shaped-row center-xs middle-xs">
-          <div class="col-30 small-label">
-            <span class="en">GP</span>
-            <span class="de">GM</span>
-            <span class="fr">PO</span>
-            <span class="ru">ЗМ</span>
-          </div>
+          <div class="col-30 small-label">{{'COINS_GP' | translate}}</div>
           <div class="col-70">
             <input type="number" name="attr_gp" value="0" min="0" step="1">
           </div>
         </div>
         <div class="shaped-row center-xs middle-xs">
-          <div class="col-30 small-label">
-            <span class="en">PP</span>
-            <span class="de">PM</span>
-            <span class="fr">PP</span>
-            <span class="ru">ПМ</span>
-          </div>
+          <div class="col-30 small-label">{{'COINS_PP' | translate}}</div>
           <div class="col-70">
             <input type="number" name="attr_pp" value="0" min="0" step="1">
           </div>
@@ -147,14 +137,9 @@
       </div>
       <div class="wrap-box">
         <div class="shaped-row center-xs middle-xs">
-          <div class="col-30 small-label bold">
-            <span class="en">Total GP Value</span>
-            <span class="de">GM Gesamtwert</span>
-            <span class="fr">Valeur Total en PO</span>
-            <span class="ru">Всего в золотых</span>
-          </div>
+          <div class="col-30 small-label bold">{{'COINS_GP' | translate}}</div>
           <div class="col-70">
-            <input type="number" name="attr_money_total_gp" value="(@{cp} / @{copper_per_gold}) + (@{sp} / @{silver_per_gold}) + (@{ep} / @{electrum_per_gold}) + @{gp} + (@{pp} * @{platinum_per_gold})" class="bold" disabled="disabled">
+            <input type="number" name="attr_money_total_gp" value="(@{cp} / @{copper_per_gold}) + (@{sp} / @{silver_per_gold}) + (@{ep} / @{electrum_per_gold}) + @{gp} + (@{pp} * @{platinum_per_gold})" class="bold" disabled>
           </div>
         </div>
       </div>
@@ -164,144 +149,74 @@
         <div class="shaped-row">
           <div class="col-50 center pad-r-sm">
             <div class="center">
-              <input class="form-control" type="number" ng-model="inventory.data.weight.weapons" disabled>
+              <input type="number" name="attr_weight_weapons" disabled>
 
               <div class="small-label">{{'WEAPONS' | translate}}</div>
             </div>
             <div class="center pad-t-sm">
-              <input class="form-control" type="number" ng-model="inventory.data.weight.armor" disabled>
+              <input type="number" name="attr_weight_armor" disabled>
 
               <div class="small-label">{{'ARMOR' | translate}}</div>
             </div>
             <div class="center pad-t-sm">
-              <input class="form-control" type="number" ng-model="inventory.data.weight.inventory" disabled>
+              <input type="number" name="attr_weight_inventory" disabled>
 
               <div class="small-label">{{'INVENTORY' | translate}}</div>
             </div>
             <div class="center pad-t-sm">
-              <input type="number" name="attr_coin_weight" value="((@{CP} + @{SP} + @{EP} + @{GP} + @{PP}) / 50)" disabled="disabled">
+              <input type="number" name="attr_coin_weight" value="((@{CP} + @{SP} + @{EP} + @{GP} + @{PP}) / 50)" disabled>
 
-              <div class="small-label">
-                <span class="en">Coin</span>
-                <span class="de">Münzen</span>
-                <span class="fr">Monnaie</span>
-                <span class="ru">Деньги</span>
-              </div>
+              <div class="small-label">{{'COINAGE' | translate}}</div>
             </div>
             <div class="center pad-t-sm">
               <input type="number" name="attr_other_weight" value="0" min="0" step="0.01">
 
               <div class="small-label">
-                <div class="small-label">
-                  <span class="en">Other</span>
-                  <span class="de">Anderes</span>
-                  <span class="fr">Autre</span>
-                  <span class="ru">Прочее</span>
-                </div>
+                <div class="small-label">{{'OTHER' | translate}}</div>
               </div>
             </div>
             <div class="center pad-t-sm">
-              <input type="number" name="attr_total_weight" value="@{inventory_weight} + @{coin_weight} + @{other_weight}" class="bold" disabled="disabled">
+              <input type="number" name="attr_total_weight" value="@{inventory_weight} + @{coin_weight} + @{other_weight}" class="bold" disabled>
 
-              <div class="small-label bold">
-                <span class="en">Total</span>
-                <span class="de">Gesamt</span>
-                <span class="fr">Total</span>
-                <span class="ru">Всего</span>
-              </div>
+              <div class="small-label bold">{{'TOTAL' | translate}}</div>
             </div>
           </div>
           <div class="col-50 center pad-l-sm">
             <div class="center">
-              <input type="number" name="attr_total_weight_max" title="The maximum total weight your character can carry" value="@{strength}*15" disabled="disabled">
+              <input type="number" name="attr_total_weight_max" title="The maximum total weight your character can carry" value="@{strength}*15" disabled>
 
-              <div class="small-label">
-                <span class="en">Carrying Max</span>
-                <span class="de">Max Tragelast</span>
-                <span class="fr">Capacité Max</span>
-                <span class="ru">Максимум</span>
-              </div>
+              <div class="small-label">{{'CARRYING_CAPACITY' | translate}}</div>
             </div>
             <div class="center pad-t-sm">
-              <input type="number" name="attr_max_push_drag_lift" title="This is the maximum weight you can push/drag/lift. If the weight you are pushing/dragging/carrying exceeds your maximum carrying capacity then your speed drops to 5 feet" value="@{strength}*30" disabled="disabled">
+              <input type="number" name="attr_max_push_drag_lift" title="This is the maximum weight you can push/drag/lift. If the weight you are pushing/dragging/carrying exceeds your maximum carrying capacity then your speed drops to 5 feet" value="@{strength}*30" disabled>
 
-              <div class="small-label">
-                <span class="en">Push/Drag/Lift</span>
-                <span class="de">Schieben/Ziehen/Heben</span>
-                <span class="fr">Pousse/Tire/Lève</span>
-                <span class="ru">Можно поднять\перенести</span>
-              </div>
+              <div class="small-label">{{'CARRYING_PUSH_DRAG_LIFT' | translate}}</div>
             </div>
             <div class="center pad-t-sm-sm">
-              <input type="number" name="attr_encumbered" value="5 * @{strength}" disabled="disabled">
+              <input type="number" name="attr_encumbered" value="5 * @{strength}" disabled>
 
-              <div class="small-label">
-                <span class="en">Encumbered</span>
-                <span class="de">Beladen</span>
-                <span class="fr">Encombré</span>
-                <span class="ru">Перегрузка</span>
-              </div>
+              <div class="small-label">{{'ENCUMBERED' | translate}}</div>
             </div>
             <div class="center pad-t-sm">
-              <input type="number" name="attr_heavily_encumbered" value=" * @{strength}" disabled="disabled">
+              <input type="number" name="attr_heavily_encumbered" value=" * @{strength}" disabled>
 
-              <div class="small-label">
-                <span class="en">H. Encumbered</span>
-                <span class="de">H. Encumbered</span>
-                <span class="fr">Fort Encombré</span>
-                <span class="ru">Сил.Перегрузка</span>
-              </div>
+              <div class="small-label">{{'ENCUMBERED_HEAVILY' | translate}}</div>
             </div>
           </div>
         </div>
-        <div class="wrap-box-title center">
-          <span class="en">Weight</span>
-          <span class="de">Gewicht</span>
-          <span class="fr">Poids</span>
-          <span class="ru">Вес</span>
-        </div>
+        <div class="wrap-box-title center">{{'WEIGHT' | translate}}</div>
       </div>
     </div>
   </div>
 
   <div class="wrap-box mar-t-md">
     <div class="shaped-row sub-header">
-      <div class="col-05 center small-label">
-        <span class="en">Carried</span>
-        <span class="de">Ausgerüstet</span>
-        <span class="fr">Porté</span>
-        <span class="ru">У персонажа</span>
-      </div>
-      <div class="col-20 center small-label pad-r-sm">
-        <span class="en">Name</span>
-        <span class="de">Name</span>
-        <span class="fr">Nom</span>
-        <span class="ru">Наименование</span>
-      </div>
-      <div class="col-50 center small-label pad-r-sm">
-        <span class="en">Description</span>
-        <span class="de">Beschreibung</span>
-        <span class="fr">Description</span>
-        <span class="ru">Описание</span>
-      </div>
-      <div class="col-07 center small-label pad-r-sm">
-        <span class="en">Qty</span>
-        <span class="de">Anz</span>
-        <span class="fr">Qté</span>
-        <span class="ru">Клво</span>
-      </div>
-      <div class="col-07 center small-label pad-r-sm">
-        <span class="en">Weight</span>
-        <span class="de">Gewicht</span>
-        <span class="fr">Poids</span>
-        <span class="ru">Вес</span>
-      </div>
-      <div class="col-11 center small-label pad-r-sm">
-        <span class="en">Weight</span>
-        <span class="de">Gewicht</span>
-        <span class="fr">Poids</span>
-        <span class="ru">Вес</span>
-      </div>
+      <div class="col-05 center small-label">{{'CARRIED' | translate}}</div>
+      <div class="col-20 center small-label pad-r-sm">{{'NAME' | translate}}</div>
+      <div class="col-50 center small-label pad-r-sm">{{'DESCRIPTION' | translate}}</div>
+      <div class="col-07 center small-label pad-r-sm">{{'QTY' | translate}}</div>
+      <div class="col-07 center small-label pad-r-sm">{{'WEIGHT' | translate}}</div>
+      <div class="col-11 center small-label pad-r-sm">{{'WEIGHT' | translate}}</div>
     </div>
     <fieldset class="repeating_inventory">
       <div class="shaped-row">
@@ -326,11 +241,6 @@
       </div>
     </fieldset>
 
-    <div class="wrap-box-title center">
-      <span class="en">Inventory</span>
-      <span class="de">Inventar</span>
-      <span class="fr">Inventaire</span>
-      <span class="ru">Инвентарь</span>
-    </div>
+    <div class="wrap-box-title center">{{'INVENTORY' | translate}}</div>
   </div>
 </div>

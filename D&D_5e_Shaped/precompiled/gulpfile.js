@@ -10,6 +10,7 @@ var replace = require('gulp-replace-task');
 var rename = require('gulp-rename');
 var wrap = require('gulp-wrap');
 var change = require('gulp-change');
+var fs = require('fs');
 
 var customSkillCount = 4;
 var traitsCount = 1;
@@ -23,6 +24,7 @@ var customClassCount = 6;
 var spellCount = 10;
 var armorCount = 6;
 var abilitiesName = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'];
+var translations = {};
 
 String.prototype.capitalize = function () {
 	return this.replace(/\w\S*/g, function (txt) {
@@ -32,6 +34,48 @@ String.prototype.capitalize = function () {
 String.prototype.lowercase = function () {
 	return this.toLowerCase();
 };
+
+function getTranslation () {
+	translations.en = JSON.parse(fs.readFileSync('./translations/en.json'));
+	translations.de = JSON.parse(fs.readFileSync('./translations/de.json'));
+	translations.fr = JSON.parse(fs.readFileSync('./translations/fr.json'));
+	translations.ru = JSON.parse(fs.readFileSync('./translations/ru.json'));
+}
+
+function objByString (o, s) {
+	s = s.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties
+	s = s.replace(/^\./, '');           // strip a leading dot
+	var a = s.split('.');
+	for (var i = 0, n = a.length; i < n; ++i) {
+		var k = a[i];
+		if (k in o) {
+			o = o[k];
+		} else {
+			return;
+		}
+	}
+	return o;
+}
+
+function translationWrapper (lang, key) {
+	var translation = objByString(translations[lang], key);
+
+	if(translation) {
+		return '<span class=' + lang + '>' + translation + '</span>';
+	} else {
+		return '';
+	}
+
+}
+
+function translate (key) {
+	if(Object.keys(translations).length === 0) {
+		getTranslation();
+	}
+	var translation = translationWrapper('en', key) + translationWrapper('de', key) + translationWrapper('fr', key) + translationWrapper('ru', key);
+
+	return translation;
+}
 
 function actionsCompile(file, limit, action_type, action_name) {
 	var template = file.contents.toString('utf8');
@@ -374,6 +418,16 @@ gulp.task('preCompile', function () {
 			transform: function (filePath, file) {
 				return weaponQuery(file);
 			}
+		}))
+		.pipe(replace({
+			patterns: [
+				{
+					match: /\x7B\x7B'([A-Za-z_0-9\.]+)'\s\|\stranslate\x7D\x7D/g,
+					replacement: function ($1, $2) {
+						return translate($2);
+					}
+				}
+			]
 		}))
 		.pipe(minifyHTML({
 			whitespace: true
