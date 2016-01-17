@@ -22,7 +22,6 @@ var quickClassActions = 5;
 var classActionsPerPage = 10;
 var customClassCount = 6;
 var spellCount = 10;
-var armorCount = 6;
 var abilitiesName = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'];
 var translations = {};
 
@@ -247,7 +246,7 @@ function weaponQuery(file) {
 	var query = '';
 
 	for (var i = 0; i < weaponCount; ++i) {
-		var weaponName = '@{repeating_weapons_' + i + '_name}';
+		var weaponName = '@{repeating_attacks_' + i + '_name}';
 
 		query += '|' + weaponName + ', {{title=' + weaponName + '&amp;#125;&amp;#125;'
 	}
@@ -341,7 +340,7 @@ gulp.task('preCompile', function () {
 				return actionsCompile(file, legendaryActionCount, 'legendary_', 'Legendary');
 			}
 		}))
-		.pipe(inject(gulp.src(['./components/quick_weapons/actions_template.html']), {
+		.pipe(inject(gulp.src(['./components/quick_attacks/actions_template.html']), {
 			starttag: '<!-- inject:quickActions:{{ext}} -->',
 			transform: function (filePath, file) {
 				return duplicate(file, actionCount);
@@ -353,14 +352,14 @@ gulp.task('preCompile', function () {
 				return actionsCompile(file, actionCount, '', 'Action');
 			}
 		}))
-		.pipe(inject(gulp.src(['./components/quick_weapons/melee_template.html']), {
+		.pipe(inject(gulp.src(['./components/quick_attacks/melee_template.html']), {
 			starttag: '<!-- inject:quickMelee:{{ext}} -->',
 			transform: function (filePath, file) {
 				return duplicate(file, weaponCount);
 			}
 		}))
-		.pipe(inject(gulp.src(['./components/weapons/weapons.html']), {
-			starttag: '<!-- inject:weapons:{{ext}} -->',
+		.pipe(inject(gulp.src(['./components/attacks/attacks.html']), {
+			starttag: '<!-- inject:attacks:{{ext}} -->',
 			transform: function (filePath, file) {
 				return duplicate(file, weaponCount);
 			}
@@ -395,12 +394,6 @@ gulp.task('preCompile', function () {
 				return spell(file, spellCount);
 			}
 		}))
-		.pipe(inject(gulp.src(['./components/armor/armor.html']), {
-			starttag: '<!-- inject:armor:{{ext}} -->',
-			transform: function (filePath, file) {
-				return duplicate(file, armorCount, 1);
-			}
-		}))
 		.pipe(inject(gulp.src(['./components/macros/saves.html']), {
 			starttag: '<!-- inject:saveQuery:{{ext}} -->',
 			transform: function (filePath, file) {
@@ -413,7 +406,7 @@ gulp.task('preCompile', function () {
 				return checkQuery(file);
 			}
 		}))
-		.pipe(inject(gulp.src(['./components/macros/weapons/weapons.html']), {
+		.pipe(inject(gulp.src(['./components/macros/attacks/attacks.html']), {
 			starttag: '<!-- inject:weaponQuery:{{ext}} -->',
 			transform: function (filePath, file) {
 				return weaponQuery(file);
