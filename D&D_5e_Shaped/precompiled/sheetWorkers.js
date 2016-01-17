@@ -112,4 +112,21 @@ on('change:repeating_armor change:medium_armor_max_dex', function () {
 		itemTotal: 'ac_total',
 		totalField: 'ac_armor_calc'
 	});
+	updateAC();
 });
+
+var updateAC = function () {
+	getAttrs(['dexterity_mod', 'ac_armored_calc', 'ac_unarmored_ability_bonus', 'ac_unarmored_bonus', 'global_ac_bonus'], function (v) {
+		var finalSetAttrs = {};
+		var dexMod = parseInt(v.dexterity_mod, 10);
+		var armoredAC = parseFloat(v.ac_armored_calc) || 0;
+		var unarmoredACAbility = parseFloat(v.ac_unarmored_ability_bonus) || 0;
+		var unarmoredACBonus = parseFloat(v.ac_unarmored_bonus) || 0;
+		var acBonus = parseFloat(v.global_ac_bonus) || 0;
+
+		finalSetAttrs.ac_unarmored_calc = 10 + dexMod + unarmoredACAbility + unarmoredACBonus;
+
+		finalSetAttrs.pc_ac = Math.max(armoredAC, finalSetAttrs.ac_unarmored_calc) + acBonus;
+		setAttrs(finalSetAttrs);
+	});
+}
