@@ -340,22 +340,10 @@ gulp.task('preCompile', function () {
 				return actionsCompile(file, legendaryActionCount, 'legendary_', 'Legendary');
 			}
 		}))
-		.pipe(inject(gulp.src(['./components/quick_attacks/actions_template.html']), {
-			starttag: '<!-- inject:quickActions:{{ext}} -->',
-			transform: function (filePath, file) {
-				return duplicate(file, actionCount);
-			}
-		}))
 		.pipe(inject(gulp.src(['./components/actions/actions.html']), {
 			starttag: '<!-- inject:actions:{{ext}} -->',
 			transform: function (filePath, file) {
 				return actionsCompile(file, actionCount, '', 'Action');
-			}
-		}))
-		.pipe(inject(gulp.src(['./components/quick_attacks/melee_template.html']), {
-			starttag: '<!-- inject:quickMelee:{{ext}} -->',
-			transform: function (filePath, file) {
-				return duplicate(file, weaponCount);
 			}
 		}))
 		.pipe(inject(gulp.src(['./components/attacks/attacks.html']), {
