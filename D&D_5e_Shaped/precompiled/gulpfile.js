@@ -413,6 +413,16 @@ gulp.task('preCompile', function () {
 		.pipe(minifyHTML({
 			whitespace: true
 		}))
+		.pipe(replace({
+			patterns: [
+				{
+					match: /text\/worker/g,
+					replacement: function () {
+						return '"text/worker"';
+					}
+				}
+			]
+		}))
 		.pipe(gulp.dest('../'));
 });
 
