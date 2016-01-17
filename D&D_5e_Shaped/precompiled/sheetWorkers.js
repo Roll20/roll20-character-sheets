@@ -35,6 +35,12 @@ var sumRepeating = function (options) {
 			if(options.bonus) {
 				collectionArray.push(repeatingItem + '_' + ids[i] + '_' + options.bonus);
 			}
+			if(options.armor_type) {
+				collectionArray.push(repeatingItem + '_' + ids[i] + '_' + options.armor_type);
+			}
+		}
+		if(options.getExtraFields) {
+			collectionArray = collectionArray.concat(options.getExtraFields);
 		}
 
 		getAttrs(collectionArray, function (v) {
@@ -48,6 +54,21 @@ var sumRepeating = function (options) {
 					var fieldToAdd = parseFloat(v[repeatingItem+'_' + ids[j] + '_' + options.fieldToAdd]) || 0;
 					if(options.bonus) {
 						fieldToAdd += parseFloat(v[repeatingItem+'_' + ids[j] + '_' + options.bonus]) || 0;
+					}
+					if(options.armor_type) {
+						var armorType = v[repeatingItem+'_' + ids[j] + '_' + options.armor_type];
+						var attributeBonus = 0;
+						var dexMod = parseInt(v.dexterity_mod, 10);
+						if(armorType === 'light') {
+							attributeBonus = dexMod;
+						} else if (armorType === 'medium') {
+							var mediumArmorDexMod = parseInt(v.medium_armor_max_dex, 10);
+							attributeBonus = Math.min(mediumArmorDexMod, dexMod);
+						} else {
+							attributeBonus = 0;
+						}
+						console.log('attributeBonus', attributeBonus);
+						fieldToAdd += attributeBonus;
 					}
 					var itemTotal = qty * fieldToAdd;
 
@@ -74,7 +95,7 @@ on('change:repeating_inventory', function () {
 	});
 });
 
-on('change:repeating_armor', function () {
+on('change:repeating_armor change:medium_armor_max_dex', function () {
 	sumRepeating({
 		collection: 'armor',
 		toggle: 'worn',
@@ -83,9 +104,11 @@ on('change:repeating_armor', function () {
 	});
 	sumRepeating({
 		collection: 'armor',
+		getExtraFields: ['dexterity_mod', 'medium_armor_max_dex'],
 		toggle: 'worn',
 		fieldToAdd: 'ac_base',
 		bonus: 'ac_bonus',
+		armor_type: 'type',
 		itemTotal: 'ac_total',
 		totalField: 'ac_armor_calc'
 	});
