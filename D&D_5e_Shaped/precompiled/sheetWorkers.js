@@ -24,17 +24,20 @@ var sumRepeating = function (options) {
 	getSectionIDs(repeatingItem, function (ids) {
 		var collectionArray = [];
 		var finalSetAttrs = {};
+		finalSetAttrs[options.totalField] = 0;
 
 		for (var i = 0; i < ids.length; i++) {
 			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + options.toggle);
 			if(options.qty) {
 				collectionArray.push(repeatingItem + '_' + ids[i] + '_' + options.qty);
 			}
-			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + options.weight);
+			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + options.fieldToAdd);
+			if(options.bonus) {
+				collectionArray.push(repeatingItem + '_' + ids[i] + '_' + options.bonus);
+			}
 		}
 
 		getAttrs(collectionArray, function (v) {
-			var sum = 0;
 			for (var j = 0; j < ids.length; j++) {
 				var toggle = v[repeatingItem+'_' + ids[j] + '_' + options.toggle];
 				if(toggle === 'undefined' || toggle === 'on') {
@@ -42,18 +45,19 @@ var sumRepeating = function (options) {
 					if(options.qty) {
 						qty = parseInt(v[repeatingItem+'_' + ids[j] + '_' + options.qty], 10) || 1;
 					}
-					var weight = parseFloat(v[repeatingItem+'_' + ids[j] + '_' + options.weight]) || 0;
-					var itemWeight = qty * weight;
+					var fieldToAdd = parseFloat(v[repeatingItem+'_' + ids[j] + '_' + options.fieldToAdd]) || 0;
+					if(options.bonus) {
+						fieldToAdd += parseFloat(v[repeatingItem+'_' + ids[j] + '_' + options.bonus]) || 0;
+					}
+					var itemTotal = qty * fieldToAdd;
 
-					if(options.itemWeight) {
-						finalSetAttrs[repeatingItem+'_' + ids[j] + '_' + options.itemWeight] = itemWeight;
+					if(options.itemTotal) {
+						finalSetAttrs[repeatingItem+'_' + ids[j] + '_' + options.itemTotal] = itemTotal;
 					}
 
-					sum += itemWeight;
+					finalSetAttrs[options.totalField] += itemTotal;
 				}
 			}
-
-			finalSetAttrs[options.totalField] = sum;
 			setAttrs(finalSetAttrs);
 		});
 	});
@@ -64,8 +68,8 @@ on('change:repeating_inventory', function () {
 		collection: 'inventory',
 		toggle: 'carried',
 		qty: 'qty',
-		weight: 'weight',
-		itemWeight: 'weight_total',
+		fieldToAdd: 'weight',
+		itemTotal: 'weight_total',
 		totalField: 'weight_inventory'
 	});
 });
@@ -74,7 +78,15 @@ on('change:repeating_armor', function () {
 	sumRepeating({
 		collection: 'armor',
 		toggle: 'worn',
-		weight: 'weight',
+		fieldToAdd: 'weight',
 		totalField: 'weight_armor'
+	});
+	sumRepeating({
+		collection: 'armor',
+		toggle: 'worn',
+		fieldToAdd: 'ac_base',
+		bonus: 'ac_bonus',
+		itemTotal: 'ac_total',
+		totalField: 'ac_armor_calc'
 	});
 });
