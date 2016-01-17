@@ -20,11 +20,11 @@ on('change:cp change:sp change:ep change:gp change:pp', function () {
 
 var sumRepeating = function (options) {
 	var repeatingItem = 'repeating_' + options.collection;
+	var collectionArray = [];
+	var finalSetAttrs = {};
+	finalSetAttrs[options.totalField] = 0;
 
 	getSectionIDs(repeatingItem, function (ids) {
-		var collectionArray = [];
-		var finalSetAttrs = {};
-		finalSetAttrs[options.totalField] = 0;
 
 		for (var i = 0; i < ids.length; i++) {
 			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + options.toggle);
@@ -110,7 +110,7 @@ on('change:repeating_armor change:medium_armor_max_dex', function () {
 		bonus: 'ac_bonus',
 		armor_type: 'type',
 		itemTotal: 'ac_total',
-		totalField: 'ac_armor_calc'
+		totalField: 'ac_armored_calc'
 	});
 	updateAC();
 });
