@@ -58,12 +58,11 @@ function objByString (o, s) {
 function translationWrapper (lang, key) {
 	var translation = objByString(translations[lang], key);
 
-	if(translation) {
-		return '<span class=' + lang + '>' + translation + '</span>';
-	} else {
-		return '';
+	if(!translation) {
+		translation = objByString(translations.en, key)
 	}
 
+	return '<span class=' + lang + '>' + translation + '</span>';
 }
 
 function translate (key) {
