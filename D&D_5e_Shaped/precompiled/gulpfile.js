@@ -107,7 +107,7 @@ function spell(file, limit, start) {
 				.replace(/\x7B\x7Blevel_num_readable\x7D\x7D/g, 'Cantrip')
 				.replace(/\x7B\x7Blevel_num_readable_de\x7D\x7D/g, 'Zaubertrick')
 				.replace(/\x7B\x7Blevel_num_readable_fr\x7D\x7D/g, 'Cantrip')
-				.replace(/\x7B\x7Bhidden_if_cantrip\x7D\x7D/g, ' sheet-hidden')
+				.replace(/\x7B\x7Bhidden_if_cantrip\x7D\x7D/g, ' hidden')
 				.replace(/\x7B\x7Bchecked_if_cantrip\x7D\x7D/g, ' checked')
 				.replace(/\x7B\x7BhigherLevelQuery\x7D\x7D/g, '');
 		} else {
