@@ -13,7 +13,7 @@ on('change:cp change:sp change:ep change:gp change:pp', function () {
 		var coinWeight = (copperPieces + silverPieces + electrumPieces + goldPieces + platinumPieces) / 50;
 		setAttrs({
 			total_gp: totalGold.toFixed(2),
-			coin_weight: coinWeight
+			weight_coinage: coinWeight
 		});
 	});
 });
@@ -35,24 +35,18 @@ on('change:repeating_inventory', function () {
 
 		getAttrs(inventoryArray, function (v) {
 			var sum = 0;
-			console.log('v', v);
-			console.log('ids', ids);
 			for (var j = 0; j < ids.length; j++) {
 				var carried = v['repeating_inventory_' + ids[j] + '_carried'] || true;
 				if(carried) {
 					var qty = parseInt(v['repeating_inventory_' + ids[j] + '_qty'], 10) || 1;
-					console.log('qty', qty);
 					var weight = parseFloat(v['repeating_inventory_' + ids[j] + '_weight']) || 0;
-					console.log('weight', weight);
 					var totalWeight = qty * weight;
-					console.log('totalWeight', totalWeight);
 
+					finalSetAttrs['repeating_inventory_' + ids[j] + '_weight_total'] = totalWeight;
 
 					sum += totalWeight;
-					console.log('sum', sum);
 				}
 			}
-			console.log('total sum', sum);
 
 			finalSetAttrs.weight_inventory = sum;
 			setAttrs(finalSetAttrs);
