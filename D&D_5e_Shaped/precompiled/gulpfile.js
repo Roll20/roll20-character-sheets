@@ -187,14 +187,8 @@ function skills(file) {
 
 		skills.push(ggTemplate
 				.replace(/\x7B\x7Bname\x7D\x7D/g, skill.name.lowercase().replace(/ +/g, ''))
-				.replace(/\x7B\x7Bname_cap\x7D\x7D/g, skill.name.capitalize().replace(/ +/g, ''))
 				.replace(/\x7B\x7Battribute\x7D\x7D/g, skill.attribute.capitalize())
-				.replace(/\x7B\x7Bfriendly_name\x7D\x7D/g, skill.name)
-				.replace(/\x7B\x7Bfriendly_name_de\x7D\x7D/g, skill.name_de)
-				.replace(/\x7B\x7Bfriendly_name_fr\x7D\x7D/g, skill.name_fr)
-				.replace(/\x7B\x7Bdescription\x7D\x7D/g, skill.description)
-				.replace(/\x7B\x7Bdescription_de\x7D\x7D/g, skill.description_de)
-				.replace(/\x7B\x7Bdescription_fr\x7D\x7D/g, skill.description_fr)
+				.replace(/\x7B\x7BtranslatedName\x7D\x7D/g, translate('SKILLS.' + skill.name + '.NAME'))
 		);
 	});
 	return skills.join('\n\n');
