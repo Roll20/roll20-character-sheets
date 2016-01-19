@@ -18,7 +18,7 @@ var actionCount = 12;
 var lairActionCount = 4;
 var legendaryActionCount = 4;
 var quickClassActions = 5;
-var classActionsPerPage = 10;
+var classActionsPerPage = 20;
 var customClassCount = 6;
 var spellCount = 10;
 var abilitiesName = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'];
@@ -322,7 +322,7 @@ gulp.task('preCompile', function () {
 			}
 		}))
 		.pipe(inject(gulp.src(['./components/class/class_action.html']), {
-			starttag: '<!-- inject:class_1:{{ext}} -->',
+			starttag: '<!-- inject:class:{{ext}} -->',
 			transform: function (filePath, file) {
 				return duplicate(file, classActionsPerPage, 1);
 			}
@@ -331,12 +331,6 @@ gulp.task('preCompile', function () {
 			starttag: '<!-- inject:quickClassActions:{{ext}} -->',
 			transform: function (filePath, file) {
 				return duplicate(file, quickClassActions, 1);
-			}
-		}))
-		.pipe(inject(gulp.src(['./components/class/class_action.html']), {
-			starttag: '<!-- inject:class_2:{{ext}} -->',
-			transform: function (filePath, file) {
-				return duplicate(file, classActionsPerPage, 1 + classActionsPerPage);
 			}
 		}))
 		.pipe(inject(gulp.src(['./components/class/custom_class.html']), {
