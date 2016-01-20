@@ -129,4 +129,39 @@ var updateAC = function () {
 		finalSetAttrs.pc_ac = Math.max(armoredAC, finalSetAttrs.ac_unarmored_calc) + acBonus;
 		setAttrs(finalSetAttrs);
 	});
-}
+};
+
+on('change:repeating_attack', function () {
+	updateAttack();
+});
+
+var updateAttack = function () {
+	var repeatingItem = 'repeating_attack';
+	var collectionArray = [];
+	var finalSetAttrs = {};
+	finalSetAttrs[options.totalField] = 0;
+
+	getSectionIDs(repeatingItem, function (ids) {
+		for (var i = 0; i < ids.length; i++) {
+			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'proficient');
+			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'attack_bonus');
+			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'reach');
+			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'range');
+			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'ammo');
+			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'damage');
+			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'damage_bonus');
+			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'damage_type');
+			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'second_damage');
+			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'second_damage_bonus');
+			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'second_damage_type');
+			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'bonus_crit_damage');
+			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'crit_range');
+		}
+
+		getAttrs(collectionArray, function (v) {
+			for (var j = 0; j < ids.length; j++) {
+			}
+			setAttrs(finalSetAttrs);
+		});
+	});
+};
