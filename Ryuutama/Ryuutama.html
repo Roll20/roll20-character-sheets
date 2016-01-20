@@ -109,7 +109,7 @@
             getAttrs(["showAttackTypeMastery"], function(values) {
                 if (parseInt(values.showAttackTypeMastery) == 0) {
                     setAttrs({
-                        attr_attackTypeMastery: 0 
+                        attackTypeMastery: 0 
                     });
                 }
             });
@@ -118,7 +118,7 @@
             getAttrs(["showSecondAttackTypeMastery"], function(values) {
                 if (parseInt(values.showSecondAttackTypeMastery) == 0) {
                     setAttrs({
-                        attr_attackTypeMastery2: 0 
+                        attackTypeMastery2: 0 
                     });
                 }
             });
@@ -302,6 +302,22 @@
                 });
             });
         });
+        on("change:fumble", function() {
+            getAttrs(["fumble", "concentrationFumble"], function(values) {
+                setAttrs({
+                    showFumbleConcentration: parseInt(values.fumble) > 0 ? 1 : 0,
+                    concentrationFumble: parseInt(values.fumble) > 0 ? parseInt(values.concentrationFumble) : 0
+                });
+            });
+        });
+        on("change:concentrationMP change:concentrationFumble change:type1 change:type2", function() {
+            getAttrs(["concentrationMP", "concentrationFumble", "type1", "type2"], function(values) {
+                var applyConcentration = parseInt(values.concentrationMP) + parseInt(values.concentrationFumble) > 0 ? true : false;
+                setAttrs({
+                    concentrationBonus: applyConcentration ? parseInt(values.concentrationMP) + parseInt(values.concentrationFumble) + (values.type1 == 'Technical' ? 1 : 0) + (values.type2 == 'Technical' ? 1 : 0) : 0
+                });
+            });
+        });
     </script>
     <div class='characterSheet'>
         <!-- Hidden Fields -->
@@ -315,6 +331,7 @@
             <input type='number' name='attr_classNegotiationMod' value='0'/>
             <input type='number' name='attr_classSkillBonus' value='0'/>
             <input type='number' name='attr_armorPenalty' value='0'/>
+            <input type='number' name='attr_concentrationBonus' value='0'/>
         </div>
         <!-- End Hidden Fields -->
         
@@ -907,6 +924,16 @@
                 </div>
             </div>
             
+            <div class='sheet-row'>
+                <div class='sheet-col'>
+                    Apply Concentration to next roll? 
+                    <label class='checkboxLabel concentration'><input type='checkbox' name='attr_concentrationMP' value='1'> Use MP</label>
+                    <input type='checkbox' class='showFumble' name='attr_showFumbleConcentration' value='1'>
+                    <label class='checkboxLabel concentration'><input type='checkbox' name='attr_concentrationFumble' value='1'> Use Fumble Point</label>
+                    *Can't apply concentration to initiative, condition, or damage checks
+                </div>
+            </div>
+            
             <span>
                 <input type='checkbox' class='showDiv' name='attr_showFarmerSkills' value='1'>
                 <div class='sheet-3colrow'>
@@ -949,22 +976,22 @@
                     <label class='headerLabel checkLabel'>Artisan Checks</label>
                     <div class='sheet-col'>
                         <span class='journeyLabel'>Trapping [DEX+INT]</span>
-                        <!--<button type='roll' value='/em rolls a Trapping check with result [[1d@{currentDex}+1d@{currentInt}+@{artisanTrappingMod}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_artisanTrappingRoll'></button>-->
-                        <button type='roll' value='&{template:skillCheck} {{name=Trapping}} {{die1=[[1d@{currentDex}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{artisanTrappingMod}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_artisanTrappingRoll'></button>
+                        <!--<button type='roll' value='/em rolls a Trapping check with result [[1d@{currentDex}+1d@{currentInt}+@{artisanTrappingMod}+@{concentrationBonus}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_artisanTrappingRoll'></button>-->
+                        <button type='roll' value='&{template:skillCheck} {{name=Trapping}} {{die1=[[1d@{currentDex}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{artisanTrappingMod}+@{concentrationBonus}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_artisanTrappingRoll'></button>
                         Special Modifiers: <input type='number' name='attr_artisanTrappingMod' value='0' class='journeyMod'/>
                     </div>
                     <div class='sheet-col'>
                         <span class='journeyLabel'>Crafting [STR+DEX]</span>
-                        <!--<button type='roll' value='/em rolls a Crafting check with result [[1d@{currentStr}+1d@{currentDex}+@{craftingMod}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_craftingRoll'></button>-->
-                        <button type='roll' value='&{template:skillCheck} {{name=Crafting}} {{die1=[[1d@{currentStr}]]}} {{die2=[[1d@{currentDex}]]}} {{bonusesAndPenalties=[[@{craftingMod}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_craftingRoll'></button>
+                        <!--<button type='roll' value='/em rolls a Crafting check with result [[1d@{currentStr}+1d@{currentDex}+@{craftingMod}+@{concentrationBonus}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_craftingRoll'></button>-->
+                        <button type='roll' value='&{template:skillCheck} {{name=Crafting}} {{die1=[[1d@{currentStr}]]}} {{die2=[[1d@{currentDex}]]}} {{bonusesAndPenalties=[[@{craftingMod}+@{concentrationBonus}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_craftingRoll'></button>
                         Special Modifiers: <input type='number' name='attr_craftingMod' value='0' class='journeyMod'/>
                     </div>
                 </div>
                 <div class='sheet-2colrow'>
                     <div class='sheet-col'>
                         <span class='journeyLabel'>Repair [STR+DEX]</span>
-                        <!--<button type='roll' value='/em rolls a Repair check with result [[1d@{currentStr}+1d@{currentDex}+@{repairMod}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_repairRoll'></button>-->
-                        <button type='roll' value='&{template:skillCheck} {{name=Repair}} {{die1=[[1d@{currentStr}]]}} {{die2=[[1d@{currentDex}]]}} {{bonusesAndPenalties=[[@{repairMod}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_repairRoll'></button>
+                        <!--<button type='roll' value='/em rolls a Repair check with result [[1d@{currentStr}+1d@{currentDex}+@{repairMod}+@{concentrationBonus}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_repairRoll'></button>-->
+                        <button type='roll' value='&{template:skillCheck} {{name=Repair}} {{die1=[[1d@{currentStr}]]}} {{die2=[[1d@{currentDex}]]}} {{bonusesAndPenalties=[[@{repairMod}+@{concentrationBonus}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_repairRoll'></button>
                         Special Modifiers: <input type='number' name='attr_repairMod' value='0' class='journeyMod'/>
                     </div>
                 </div>
@@ -976,28 +1003,28 @@
                     <label class='headerLabel checkLabel'>Healer Checks</label>
                     <div class='sheet-col'>
                         <span class='journeyLabel'>Healing [INT+SPI]</span>
-                        <!--<button type='roll' value='/em rolls a Healing check with result [[1d@{currentInt}+1d@{currentSpi}+@{healingMod}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_healingRoll'></button>-->
-                        <button type='roll' value='&{template:skillCheck} {{name=Healing}} {{die1=[[1d@{currentInt}]]}} {{die2=[[1d@{currentSpi}]]}} {{bonusesAndPenalties=[[@{healingMod}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_healingRoll'></button>
+                        <!--<button type='roll' value='/em rolls a Healing check with result [[1d@{currentInt}+1d@{currentSpi}+@{healingMod}+@{concentrationBonus}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_healingRoll'></button>-->
+                        <button type='roll' value='&{template:skillCheck} {{name=Healing}} {{die1=[[1d@{currentInt}]]}} {{die2=[[1d@{currentSpi}]]}} {{bonusesAndPenalties=[[@{healingMod}+@{concentrationBonus}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_healingRoll'></button>
                         Special Modifiers: <input type='number' name='attr_healingMod' value='0' class='journeyMod'/>
                     </div>
                     <div class='sheet-col'>
                         <span class='journeyLabel'>Herb Gathering [STR+INT]</span>
-                        <!--<button type='roll' value='/em rolls an Herb Gathering check with result [[1d@{currentStr}+1d@{currentInt}+@{herbGatheringMod}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_musicRoll'></button>-->
-                        <button type='roll' value='&{template:skillCheck} {{name=Herb Gathering}} {{die1=[[1d@{currentStr}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{herbGatheringMod}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_musicRoll'></button>
+                        <!--<button type='roll' value='/em rolls an Herb Gathering check with result [[1d@{currentStr}+1d@{currentInt}+@{herbGatheringMod}+@{concentrationBonus}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_musicRoll'></button>-->
+                        <button type='roll' value='&{template:skillCheck} {{name=Herb Gathering}} {{die1=[[1d@{currentStr}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{herbGatheringMod}+@{concentrationBonus}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_musicRoll'></button>
                         Special Modifiers: <input type='number' name='attr_herbGatheringMod' value='0' class='journeyMod'/>
                     </div>
                 </div>
                 <div class='sheet-2colrow'>
                     <div class='sheet-col'>
                         <span class='journeyLabel'>First Aid [INT+SPI] (out of combat)</span>
-                        <!--<button type='roll' value='/em rolls a First Aid check with result [[1d@{currentInt}+1d@{currentSpi}+@{firstAidOocMod}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_firstAidOocRoll'></button>-->
-                        <button type='roll' value='&{template:skillCheck} {{name=First Aid}} {{die1=[[1d@{currentInt}]]}} {{die2=[[1d@{currentSpi}]]}} {{bonusesAndPenalties=[[@{firstAidOocMod}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_firstAidOocRoll'></button>
+                        <!--<button type='roll' value='/em rolls a First Aid check with result [[1d@{currentInt}+1d@{currentSpi}+@{firstAidOocMod}+@{concentrationBonus}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_firstAidOocRoll'></button>-->
+                        <button type='roll' value='&{template:skillCheck} {{name=First Aid}} {{die1=[[1d@{currentInt}]]}} {{die2=[[1d@{currentSpi}]]}} {{bonusesAndPenalties=[[@{firstAidOocMod}+@{concentrationBonus}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_firstAidOocRoll'></button>
                         Special Modifiers: <input type='number' name='attr_firstAidOocMod' value='0' class='journeyMod'/>
                     </div>
                     <div class='sheet-col'>
                         <span class='journeyLabel'>First Aid [INT] (in combat)</span>
-                        <!--<button type='roll' value='/em rolls a First Aid check with result [[1d@{currentInt}+@{firstAidIcMod}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_firstAidIcRoll'></button>-->
-                        <button type='roll' value='&{template:oneDieCheck} {{name=First Aid}} {{result=[[1d@{currentInt}+@{firstAidIcMod}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_firstAidIcRoll'></button>
+                        <!--<button type='roll' value='/em rolls a First Aid check with result [[1d@{currentInt}+@{firstAidIcMod}+@{concentrationBonus}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_firstAidIcRoll'></button>-->
+                        <button type='roll' value='&{template:oneDieCheck} {{name=First Aid}} {{result=[[1d@{currentInt}+@{firstAidIcMod}+@{concentrationBonus}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_firstAidIcRoll'></button>
                         Special Modifiers: <input type='number' name='attr_firstAidIcMod' value='0' class='journeyMod'/>
                     </div>
                 </div>
@@ -1009,22 +1036,22 @@
                     <label class='headerLabel checkLabel'>Hunter Checks</label>
                     <div class='sheet-col'>
                         <span class='journeyLabel'>Animal Tracking [STR+INT]</span>
-                        <!--<button type='roll' value='/em rolls an Animal Tracking check with result [[1d@{currentStr}+1d@{currentInt}+@{animalTrackingMod}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_animalTrackingRoll'></button>-->
-                        <button type='roll' value='&{template:skillCheck} {{name=Animal Tracking}} {{die1=[[1d@{currentStr}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{animalTrackingMod}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_animalTrackingRoll'></button>
+                        <!--<button type='roll' value='/em rolls an Animal Tracking check with result [[1d@{currentStr}+1d@{currentInt}+@{animalTrackingMod}+@{concentrationBonus}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_animalTrackingRoll'></button>-->
+                        <button type='roll' value='&{template:skillCheck} {{name=Animal Tracking}} {{die1=[[1d@{currentStr}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{animalTrackingMod}+@{concentrationBonus}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_animalTrackingRoll'></button>
                         Special Modifiers: <input type='number' name='attr_animalTrackingMod' value='0' class='journeyMod'/>
                     </div>
                     <div class='sheet-col'>
                         <span class='journeyLabel'>Trapping [DEX+INT]</span>
-                        <!--<button type='roll' value='/em rolls a Trapping check with result [[1d@{currentDex}+1d@{currentInt}+@{hunterTrappingMod}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_hunterTrappingRoll'></button>-->
-                        <button type='roll' value='&{template:skillCheck} {{name=Trapping}} {{die1=[[1d@{currentDex}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{hunterTrappingMod}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_hunterTrappingRoll'></button>
+                        <!--<button type='roll' value='/em rolls a Trapping check with result [[1d@{currentDex}+1d@{currentInt}+@{hunterTrappingMod}+@{concentrationBonus}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_hunterTrappingRoll'></button>-->
+                        <button type='roll' value='&{template:skillCheck} {{name=Trapping}} {{die1=[[1d@{currentDex}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{hunterTrappingMod}+@{concentrationBonus}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_hunterTrappingRoll'></button>
                         Special Modifiers: <input type='number' name='attr_hunterTrappingMod' value='0' class='journeyMod'/>
                     </div>
                 </div>
                 <div class='sheet-2colrow'>
                     <div class='sheet-col'>
                         <span class='journeyLabel'>Hunting [DEX+INT]</span>
-                        <!--<button type='roll' value='/em rolls a Hunting check with result [[1d@{currentDex}+1d@{currentInt}+@{huntingMod}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_huntingRoll'></button>-->
-                        <button type='roll' value='&{template:skillCheck} {{name=Hunting}} {{die1=[[1d@{currentDex}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{huntingMod}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_huntingRoll'></button>
+                        <!--<button type='roll' value='/em rolls a Hunting check with result [[1d@{currentDex}+1d@{currentInt}+@{huntingMod}+@{concentrationBonus}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_huntingRoll'></button>-->
+                        <button type='roll' value='&{template:skillCheck} {{name=Hunting}} {{die1=[[1d@{currentDex}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{huntingMod}+@{concentrationBonus}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_huntingRoll'></button>
                         Special Modifiers: <input type='number' name='attr_huntingMod' value='0' class='journeyMod'/>
                     </div>
                 </div>
@@ -1036,8 +1063,8 @@
                     <label class='headerLabel checkLabel'>Merchant Checks</label>
                     <div class='sheet-col'>
                         <span class='journeyLabel'>Trader [INT+SPI]</span>
-                        <!--<button type='roll' value='/em rolls a Trader check with result [[1d@{currentInt}+1d@{currentSpi}+@{traderMod}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_traderRoll'></button>-->
-                        <button type='roll' value='&{template:skillCheck} {{name=Trader}} {{die1=[[1d@{currentInt}]]}} {{die2=[[1d@{currentSpi}]]}} {{bonusesAndPenalties=[[@{traderMod}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_traderRoll'></button>
+                        <!--<button type='roll' value='/em rolls a Trader check with result [[1d@{currentInt}+1d@{currentSpi}+@{traderMod}+@{concentrationBonus}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_traderRoll'></button>-->
+                        <button type='roll' value='&{template:skillCheck} {{name=Trader}} {{die1=[[1d@{currentInt}]]}} {{die2=[[1d@{currentSpi}]]}} {{bonusesAndPenalties=[[@{traderMod}+@{concentrationBonus}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_traderRoll'></button>
                         Special Modifiers: <input type='number' name='attr_traderMod' value='0' class='journeyMod'/>
                     </div>
                 </div>
@@ -1049,14 +1076,14 @@
                     <label class='headerLabel checkLabel'>Minstrel Checks</label>
                     <div class='sheet-col'>
                         <span class='journeyLabel'>Knowledge of Tradition [INT+INT]</span>
-                        <!--<button type='roll' value='/em rolls a Knowledge of Tradition check with result [[2d@{currentInt}+@{knowledgeOfTraditionMod}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_knowledgeOfTraditionRoll'></button>-->
-                        <button type='roll' value='&{template:skillCheck} {{name=Knowledge of Tradition}} {{die1=[[1d@{currentInt}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{knowledgeOfTraditionMod}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_knowledgeOfTraditionRoll'></button>
+                        <!--<button type='roll' value='/em rolls a Knowledge of Tradition check with result [[2d@{currentInt}+@{knowledgeOfTraditionMod}+@{concentrationBonus}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_knowledgeOfTraditionRoll'></button>-->
+                        <button type='roll' value='&{template:skillCheck} {{name=Knowledge of Tradition}} {{die1=[[1d@{currentInt}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{knowledgeOfTraditionMod}+@{concentrationBonus}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_knowledgeOfTraditionRoll'></button>
                         Special Modifiers: <input type='number' name='attr_knowledgeOfTraditionMod' value='0' class='journeyMod'/>
                     </div>
                     <div class='sheet-col'>
                         <span class='journeyLabel'>Music [DEX+SPI]</span>
-                        <!--<button type='roll' value='/em rolls a Music check with result [[1d@{currentDex}+1d@{currentSpi}+@{musicMod}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_musicRoll'></button>-->
-                        <button type='roll' value='&{template:skillCheck} {{name=Music}} {{die1=[[1d@{currentDex}]]}} {{die2=[[1d@{currentSpi}]]}} {{bonusesAndPenalties=[[@{musicMod}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_musicRoll'></button>
+                        <!--<button type='roll' value='/em rolls a Music check with result [[1d@{currentDex}+1d@{currentSpi}+@{musicMod}+@{concentrationBonus}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_musicRoll'></button>-->
+                        <button type='roll' value='&{template:skillCheck} {{name=Music}} {{die1=[[1d@{currentDex}]]}} {{die2=[[1d@{currentSpi}]]}} {{bonusesAndPenalties=[[@{musicMod}+@{concentrationBonus}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_musicRoll'></button>
                         Special Modifiers: <input type='number' name='attr_musicMod' value='0' class='journeyMod'/>
                     </div>
                 </div>
@@ -1068,14 +1095,14 @@
                     <label class='headerLabel checkLabel'>Noble Checks</label>
                     <div class='sheet-col'>
                         <span class='journeyLabel'>Etiquette [DEX+INT]</span>
-                        <!--<button type='roll' value='/em rolls an Etiquette check with result [[1d@{currentDex}+1d@{currentInt}+@{etiquetteMod}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_etiquetteRoll'></button>-->
-                        <button type='roll' value='&{template:skillCheck} {{name=Etiquette}} {{die1=[[1d@{currentDex}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{etiquetteMod}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_etiquetteRoll'></button>
+                        <!--<button type='roll' value='/em rolls an Etiquette check with result [[1d@{currentDex}+1d@{currentInt}+@{etiquetteMod}+@{concentrationBonus}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_etiquetteRoll'></button>-->
+                        <button type='roll' value='&{template:skillCheck} {{name=Etiquette}} {{die1=[[1d@{currentDex}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{etiquetteMod}+@{concentrationBonus}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_etiquetteRoll'></button>
                         Special Modifiers: <input type='number' name='attr_etiquetteMod' value='0' class='journeyMod'/>
                     </div>
                     <div class='sheet-col'>
                         <span class='journeyLabel'>Refined Education [INT+INT]</span>
-                        <!--<button type='roll' value='/em rolls a Refined Education check with result [[1d@{currentInt}+1d@{currentInt}+@{refinedEducationMod}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_refinedEducationRoll'></button>-->
-                        <button type='roll' value='&{template:skillCheck} {{name=Refined Education}} {{die1=[[1d@{currentInt}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{refinedEducationMod}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_refinedEducationRoll'></button>
+                        <!--<button type='roll' value='/em rolls a Refined Education check with result [[1d@{currentInt}+1d@{currentInt}+@{refinedEducationMod}+@{concentrationBonus}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_refinedEducationRoll'></button>-->
+                        <button type='roll' value='&{template:skillCheck} {{name=Refined Education}} {{die1=[[1d@{currentInt}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{refinedEducationMod}+@{concentrationBonus}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_refinedEducationRoll'></button>
                         Special Modifiers: <input type='number' name='attr_refinedEducationMod' value='0' class='journeyMod'/>
                     </div>
                 </div>
@@ -1091,8 +1118,8 @@
                 </div>
                 <div class='sheet-col'>
                     <span class='journeyLabel'>Travel Check [STR+DEX]</span>
-                    <!--<button type='roll' value='/em rolls a Travel check with result [[1d@{currentStr}+1d@{currentDex}+@{travelMod}+@{classTravelMod}+@{applyTerrain}+@{applyWeather}-@{armorPenalty}-@{overburdenPenalty}]]' name='roll_travelRoll'></button>-->
-                    <button type='roll' value='&{template:skillCheck} {{name=Travel}} {{die1=[[1d@{currentStr}]]}} {{die2=[[1d@{currentDex}]]}} {{bonusesAndPenalties=[[@{travelMod}+@{classTravelMod}+@{applyTerrain}+@{applyWeather}-@{armorPenalty}-@{overburdenPenalty}]]}}' name='roll_travelRoll'></button>
+                    <!--<button type='roll' value='/em rolls a Travel check with result [[1d@{currentStr}+1d@{currentDex}+@{travelMod}+@{concentrationBonus}+@{classTravelMod}+@{applyTerrain}+@{applyWeather}-@{armorPenalty}-@{overburdenPenalty}]]' name='roll_travelRoll'></button>-->
+                    <button type='roll' value='&{template:skillCheck} {{name=Travel}} {{die1=[[1d@{currentStr}]]}} {{die2=[[1d@{currentDex}]]}} {{bonusesAndPenalties=[[@{travelMod}+@{concentrationBonus}+@{classTravelMod}+@{applyTerrain}+@{applyWeather}-@{armorPenalty}-@{overburdenPenalty}]]}}' name='roll_travelRoll'></button>
                     Special Modifiers: <input type='number' name='attr_travelMod' value='0' class='journeyMod'/>
                 </div>
             </div>
@@ -1100,14 +1127,14 @@
             <div class='sheet-2colrow'>
                 <div class='sheet-col'>
                     <span class='journeyLabel'>Direction Check [INT+INT]</span>
-                    <!--<button type='roll' value='/em rolls a Direction check with result [[2d@{currentInt}+@{directionMod}+@{classDirectionMod}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_directionRoll'></button>-->
-                    <button type='roll' value='&{template:skillCheck} {{name=Direction}} {{die1=[[1d@{currentInt}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{directionMod}+@{classDirectionMod}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_directionRoll'></button>
+                    <!--<button type='roll' value='/em rolls a Direction check with result [[2d@{currentInt}+@{directionMod}+@{concentrationBonus}+@{classDirectionMod}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_directionRoll'></button>-->
+                    <button type='roll' value='&{template:skillCheck} {{name=Direction}} {{die1=[[1d@{currentInt}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{directionMod}+@{concentrationBonus}+@{classDirectionMod}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_directionRoll'></button>
                     Special Modifiers: <input type='number' name='attr_directionMod' value='0' class='journeyMod'/>
                 </div>
                 <div class='sheet-col'>
                     <span class='journeyLabel'>Camp Check [DEX+INT]</span>
-                    <!--<button type='roll' value='/em rolls a Camp check with result [[1d@{currentDex}+1d@{currentInt}+@{campMod}+@{classCampMod}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_campRoll'></button>-->
-                    <button type='roll' value='&{template:skillCheck} {{name=Camp}} {{die1=[[1d@{currentDex}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{campMod}+@{classCampMod}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_campRoll'></button>
+                    <!--<button type='roll' value='/em rolls a Camp check with result [[1d@{currentDex}+1d@{currentInt}+@{campMod}+@{concentrationBonus}+@{classCampMod}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_campRoll'></button>-->
+                    <button type='roll' value='&{template:skillCheck} {{name=Camp}} {{die1=[[1d@{currentDex}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{campMod}+@{concentrationBonus}+@{classCampMod}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_campRoll'></button>
                     Special Modifiers: <input type='number' name='attr_campMod' value='0' class='journeyMod'/>
                 </div>
             </div>
@@ -1120,8 +1147,8 @@
                 </div>
                 <div class='sheet-col'>
                     <span class='journeyLabel'>Monster Knowledge [INT+INT]</span>
-                    <!--<button type='roll' value='/em rolls a Monster Knowledge check with result [[2d@{currentInt}+@{monsterKnowledgeMod}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_monsterKnowledgeRoll'></button>-->
-                    <button type='roll' value='&{template:skillCheck} {{name=Monster Knowledge}} {{die1=[[1d@{currentInt}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{monsterKnowledgeMod}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_monsterKnowledgeRoll'></button>
+                    <!--<button type='roll' value='/em rolls a Monster Knowledge check with result [[2d@{currentInt}+@{monsterKnowledgeMod}+@{concentrationBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_monsterKnowledgeRoll'></button>-->
+                    <button type='roll' value='&{template:skillCheck} {{name=Monster Knowledge}} {{die1=[[1d@{currentInt}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{monsterKnowledgeMod}+@{concentrationBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_monsterKnowledgeRoll'></button>
                     Special Modifiers: <input type='number' name='attr_monsterKnowledgeMod' value='0' class='journeyMod'/>
                 </div>
             </div>
@@ -1129,14 +1156,14 @@
             <div class='sheet-2colrow'>
                 <div class='sheet-col'>
                     <span class='journeyLabel'>Search for Food [STR+INT]</span>
-                    <!--<button type='roll' value='/em rolls a Foraging check with result [[1d@{currentStr}+1d@{currentInt}+@{foragingMod}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_foragingRoll'></button>-->
-                    <button type='roll' value='&{template:skillCheck} {{name=Search for Food}} {{die1=[[1d@{currentStr}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{foragingMod}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_foragingRoll'></button>
+                    <!--<button type='roll' value='/em rolls a Foraging check with result [[1d@{currentStr}+1d@{currentInt}+@{foragingMod}+@{concentrationBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_foragingRoll'></button>-->
+                    <button type='roll' value='&{template:skillCheck} {{name=Search for Food}} {{die1=[[1d@{currentStr}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{foragingMod}+@{concentrationBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_foragingRoll'></button>
                     Special Modifiers: <input type='number' name='attr_foragingMod' value='0' class='journeyMod'/>
                 </div>
                 <div class='sheet-col'>
                     <span class='journeyLabel'>Hard Exercise [STR+DEX]</span>
-                    <!--<button type='roll' value='/em rolls a Hard Exercise check with result [[1d@{currentStr}+1d@{currentDex}+@{hardExerciseMod}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_hardExerciseRoll'></button>-->
-                    <button type='roll' value='&{template:skillCheck} {{name=Hard Exercise}} {{die1=[[1d@{currentStr}]]}} {{die2=[[1d@{currentDex}]]}} {{bonusesAndPenalties=[[@{hardExerciseMod}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_hardExerciseRoll'></button>
+                    <!--<button type='roll' value='/em rolls a Hard Exercise check with result [[1d@{currentStr}+1d@{currentDex}+@{hardExerciseMod}+@{concentrationBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_hardExerciseRoll'></button>-->
+                    <button type='roll' value='&{template:skillCheck} {{name=Hard Exercise}} {{die1=[[1d@{currentStr}]]}} {{die2=[[1d@{currentDex}]]}} {{bonusesAndPenalties=[[@{hardExerciseMod}+@{concentrationBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_hardExerciseRoll'></button>
                     Special Modifiers: <input type='number' name='attr_hardExerciseMod' value='0' class='journeyMod'/>
                 </div>
             </div>
@@ -1144,14 +1171,14 @@
             <div class='sheet-2colrow'>
                 <div class='sheet-col'>
                     <span class='journeyLabel'>Drinking [STR+SPI]</span>
-                    <!--<button type='roll' value='/em rolls a Drinking check with result [[1d@{currentStr}+1d@{currentSpi}+@{drinkingMod}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_drinkingRoll'></button>-->
-                    <button type='roll' value='&{template:skillCheck} {{name=Drinking}} {{die1=[[1d@{currentStr}]]}} {{die2=[[1d@{currentSpi}]]}} {{bonusesAndPenalties=[[@{drinkingMod}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_drinkingRoll'></button>
+                    <!--<button type='roll' value='/em rolls a Drinking check with result [[1d@{currentStr}+1d@{currentSpi}+@{drinkingMod}+@{concentrationBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_drinkingRoll'></button>-->
+                    <button type='roll' value='&{template:skillCheck} {{name=Drinking}} {{die1=[[1d@{currentStr}]]}} {{die2=[[1d@{currentSpi}]]}} {{bonusesAndPenalties=[[@{drinkingMod}+@{concentrationBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_drinkingRoll'></button>
                     Special Modifiers: <input type='number' name='attr_drinkingMod' value='0' class='journeyMod'/>
                 </div>
                 <div class='sheet-col'>
                     <span class='journeyLabel'>Stealth [DEX+DEX]</span>
-                    <!--<button type='roll' value='/em rolls a Stealth check with result [[2d@{currentDex}+@{stealthMod}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_stealthRoll'></button>-->
-                    <button type='roll' value='&{template:skillCheck} {{name=Stealth}} {{die1=[[1d@{currentDex}]]}} {{die2=[[1d@{currentDex}]]}} {{bonusesAndPenalties=[[@{stealthMod}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_stealthRoll'></button>
+                    <!--<button type='roll' value='/em rolls a Stealth check with result [[2d@{currentDex}+@{stealthMod}+@{concentrationBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_stealthRoll'></button>-->
+                    <button type='roll' value='&{template:skillCheck} {{name=Stealth}} {{die1=[[1d@{currentDex}]]}} {{die2=[[1d@{currentDex}]]}} {{bonusesAndPenalties=[[@{stealthMod}+@{concentrationBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_stealthRoll'></button>
                     Special Modifiers: <input type='number' name='attr_stealthMod' value='0' class='journeyMod'/>
                 </div>
             </div>
@@ -1159,14 +1186,14 @@
             <div class='sheet-2colrow'>
                 <div class='sheet-col'>
                     <span class='journeyLabel'>Perception [DEX+INT]</span>
-                    <!--<button type='roll' value='/em rolls a Perception check with result [[1d@{currentDex}+1d@{currentInt}+@{perceptionMod}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_perceptionRoll'></button>-->
-                    <button type='roll' value='&{template:skillCheck} {{name=Perception}} {{die1=[[1d@{currentDex}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{perceptionMod}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_perceptionRoll'></button>
+                    <!--<button type='roll' value='/em rolls a Perception check with result [[1d@{currentDex}+1d@{currentInt}+@{perceptionMod}+@{concentrationBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_perceptionRoll'></button>-->
+                    <button type='roll' value='&{template:skillCheck} {{name=Perception}} {{die1=[[1d@{currentDex}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{perceptionMod}+@{concentrationBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_perceptionRoll'></button>
                     Special Modifiers: <input type='number' name='attr_perceptionMod' value='0' class='journeyMod'/>
                 </div>
                 <div class='sheet-col'>
                     <span class='journeyLabel'>Dodge [DEX+INT]</span>
-                    <!--<button type='roll' value='/em rolls a Dodge check with result [[1d@{currentDex}+1d@{currentInt}+@{dodgeMod}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_dodgeRoll'></button>-->
-                    <button type='roll' value='&{template:skillCheck} {{name=Dodge}} {{die1=[[1d@{currentDex}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{dodgeMod}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_dodgeRoll'></button>
+                    <!--<button type='roll' value='/em rolls a Dodge check with result [[1d@{currentDex}+1d@{currentInt}+@{dodgeMod}+@{concentrationBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_dodgeRoll'></button>-->
+                    <button type='roll' value='&{template:skillCheck} {{name=Dodge}} {{die1=[[1d@{currentDex}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{dodgeMod}+@{concentrationBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_dodgeRoll'></button>
                     Special Modifiers: <input type='number' name='attr_dodgeMod' value='0' class='journeyMod'/>
                 </div>
             </div>
@@ -1174,14 +1201,14 @@
             <div class='sheet-2colrow'>
                 <div class='sheet-col'>
                     <span class='journeyLabel'>Delicate Work [DEX+SPI]</span>
-                    <!--<button type='roll' value='/em rolls a Delicate Work check with result [[1d@{currentDex}+1d@{currentSpi}+@{delicateWorkMod}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_delicateWorkRoll'></button>-->
-                    <button type='roll' value='&{template:skillCheck} {{name=Delicate Work}} {{die1=[[1d@{currentDex}]]}} {{die2=[[1d@{currentSpi}]]}} {{bonusesAndPenalties=[[@{delicateWorkMod}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_delicateWorkRoll'></button>
+                    <!--<button type='roll' value='/em rolls a Delicate Work check with result [[1d@{currentDex}+1d@{currentSpi}+@{delicateWorkMod}+@{concentrationBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_delicateWorkRoll'></button>-->
+                    <button type='roll' value='&{template:skillCheck} {{name=Delicate Work}} {{die1=[[1d@{currentDex}]]}} {{die2=[[1d@{currentSpi}]]}} {{bonusesAndPenalties=[[@{delicateWorkMod}+@{concentrationBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_delicateWorkRoll'></button>
                     Special Modifiers: <input type='number' name='attr_delicateWorkMod' value='0' class='journeyMod'/>
                 </div>
                 <div class='sheet-col'>
                     <span class='journeyLabel'>Negotiation [INT+SPI]</span>
-                    <!--<button type='roll' value='/em rolls a Negotiation check with result [[1d@{currentInt}+1d@{currentSpi}+@{negotiationMod}+@{classNegotiationMod}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_negotiationRoll'></button>-->
-                    <button type='roll' value='&{template:skillCheck} {{name=Negotiation}} {{die1=[[1d@{currentInt}]]}} {{die2=[[1d@{currentSpi}]]}} {{bonusesAndPenalties=[[@{negotiationMod}+@{classNegotiationMod}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_negotiationRoll'></button>
+                    <!--<button type='roll' value='/em rolls a Negotiation check with result [[1d@{currentInt}+1d@{currentSpi}+@{negotiationMod}+@{concentrationBonus}+@{classNegotiationMod}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_negotiationRoll'></button>-->
+                    <button type='roll' value='&{template:skillCheck} {{name=Negotiation}} {{die1=[[1d@{currentInt}]]}} {{die2=[[1d@{currentSpi}]]}} {{bonusesAndPenalties=[[@{negotiationMod}+@{concentrationBonus}+@{classNegotiationMod}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_negotiationRoll'></button>
                     Special Modifiers: <input type='number' name='attr_negotiationMod' value='0' class='journeyMod'/>
                 </div>
             </div>
@@ -1189,14 +1216,14 @@
             <div class='sheet-2colrow'>
                 <div class='sheet-col'>
                     <span class='journeyLabel'>Sense [INT+SPI]</span>
-                    <!--<button type='roll' value='/em rolls a Sense check with result [[1d@{currentInt}+1d@{currentSpi}+@{senseMod}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_senseRoll'></button>-->
-                    <button type='roll' value='&{template:skillCheck} {{name=Sense}} {{die1=[[1d@{currentInt}]]}} {{die2=[[1d@{currentSpi}]]}} {{bonusesAndPenalties=[[@{senseMod}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_senseRoll'></button>
+                    <!--<button type='roll' value='/em rolls a Sense check with result [[1d@{currentInt}+1d@{currentSpi}+@{senseMod}+@{concentrationBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_senseRoll'></button>-->
+                    <button type='roll' value='&{template:skillCheck} {{name=Sense}} {{die1=[[1d@{currentInt}]]}} {{die2=[[1d@{currentSpi}]]}} {{bonusesAndPenalties=[[@{senseMod}+@{concentrationBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_senseRoll'></button>
                     Special Modifiers: <input type='number' name='attr_senseMod' value='0' class='journeyMod'/>
                 </div>
                 <div class='sheet-col'>
                     <span class='journeyLabel'>Job Knowledge [INT+INT]</span>
-                    <!--<button type='roll' value='/em rolls a Job Knowledge check with result [[2d@{currentInt}+@{jobKnowledgeMod}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_jobKnowledgeRoll'></button>-->
-                    <button type='roll' value='&{template:skillCheck} {{name=Job Knowledge}} {{die1=[[1d@{currentInt}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{jobKnowledgeMod}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_jobKnowledgeRoll'></button>
+                    <!--<button type='roll' value='/em rolls a Job Knowledge check with result [[2d@{currentInt}+@{jobKnowledgeMod}+@{concentrationBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_jobKnowledgeRoll'></button>-->
+                    <button type='roll' value='&{template:skillCheck} {{name=Job Knowledge}} {{die1=[[1d@{currentInt}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{jobKnowledgeMod}+@{concentrationBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_jobKnowledgeRoll'></button>
                     Special Modifiers: <input type='number' name='attr_jobKnowledgeMod' value='0' class='journeyMod'/>
                 </div>
             </div>
@@ -1209,8 +1236,8 @@
                         <input type='text' name='attr_skillNameA'/>
                         <div class='skillCheck classSkillRoll'>
                             Roll:
-                            <!--<button type='roll' value='/em rolls a(n) @{skillNameA} check with result [[1d@{skillDie1A}+1d@{skillDie2A}+@{skillModA}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_otherRollA'></button>-->
-                            <button type='roll' value='&{template:skillCheck} {{name=@{skillNameA}}} {{die1=[[1d@{skillDie1A}]]}} {{die2=[[1d@{skillDie2A}]]}} {{bonusesAndPenalties=[[@{skillModA}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_otherRollA'></button>
+                            <!--<button type='roll' value='/em rolls a(n) @{skillNameA} check with result [[1d@{skillDie1A}+1d@{skillDie2A}+@{skillModA}+@{concentrationBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_otherRollA'></button>-->
+                            <button type='roll' value='&{template:skillCheck} {{name=@{skillNameA}}} {{die1=[[1d@{skillDie1A}]]}} {{die2=[[1d@{skillDie2A}]]}} {{bonusesAndPenalties=[[@{skillModA}+@{concentrationBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_otherRollA'></button>
                             <select name="attr_skillDie1A" class="attributeType">
                                 <option value="@{currentStr}">STR</option>
                                 <option value="@{currentDex}">DEX</option>
@@ -1231,8 +1258,8 @@
                         <input type='text' name='attr_skillNameB'/>
                         <div class='skillCheck classSkillRoll'>
                             Roll:
-                            <!--<button type='roll' value='/em rolls a(n) @{skillNameB} check with result [[1d@{skillDie1B}+1d@{skillDie2B}+@{skillModB}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_otherRollA'></button>-->
-                            <button type='roll' value='&{template:skillCheck} {{name=@{skillNameB}}} {{die1=[[1d@{skillDie1B}]]}} {{die2=[[1d@{skillDie2B}]]}} {{bonusesAndPenalties=[[@{skillModB}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_otherRollA'></button>
+                            <!--<button type='roll' value='/em rolls a(n) @{skillNameB} check with result [[1d@{skillDie1B}+1d@{skillDie2B}+@{skillModB}+@{concentrationBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_otherRollA'></button>-->
+                            <button type='roll' value='&{template:skillCheck} {{name=@{skillNameB}}} {{die1=[[1d@{skillDie1B}]]}} {{die2=[[1d@{skillDie2B}]]}} {{bonusesAndPenalties=[[@{skillModB}+@{concentrationBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_otherRollA'></button>
                             <select name="attr_skillDie1B" class="attributeType">
                                 <option value="@{currentStr}">STR</option>
                                 <option value="@{currentDex}">DEX</option>
@@ -1273,8 +1300,8 @@
                 <div class='sheet-2colrow weaponRow2'>
                     <div class='sheet-col skillCheck'>
                         <input type='number' class='hidden' name='attr_weaponGraceMod' value='0'>
-                        <!--<button type='roll' value='/em rolls a(n) @{weaponName} attack with result [[1d@{weaponAccuracyDie1}+1d@{weaponAccuracyDie2}+@{weaponAccuracyMod}+@{weaponGraceMod}-@{overburdenPenalty}]]' name='roll_weaponAccuracyRoll'></button>-->
-                        <button type='roll' value='&{template:accuracyCheck} {{name=@{weaponName}}} {{die1=[[1d@{weaponAccuracyDie1}]]}} {{die2=[[1d@{weaponAccuracyDie2}]]}} {{bonusesAndPenalties=[[@{weaponAccuracyMod}+@{weaponGraceMod}-@{overburdenPenalty}]]}}' name='roll_weaponAccuracyRoll'></button>
+                        <!--<button type='roll' value='/em rolls a(n) @{weaponName} attack with result [[1d@{weaponAccuracyDie1}+1d@{weaponAccuracyDie2}+@{weaponAccuracyMod}+@{concentrationBonus}+@{weaponGraceMod}-@{overburdenPenalty}]]' name='roll_weaponAccuracyRoll'></button>-->
+                        <button type='roll' value='&{template:accuracyCheck} {{name=@{weaponName}}} {{die1=[[1d@{weaponAccuracyDie1}]]}} {{die2=[[1d@{weaponAccuracyDie2}]]}} {{bonusesAndPenalties=[[@{weaponAccuracyMod}+@{concentrationBonus}+@{weaponGraceMod}-@{overburdenPenalty}]]}}' name='roll_weaponAccuracyRoll'></button>
                         Accuracy:
                         <select name="attr_weaponAccuracyDie1" class="attributeType">                
                             <option value="@{currentStr}">STR</option>
