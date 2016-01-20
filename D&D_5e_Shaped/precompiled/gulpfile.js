@@ -74,14 +74,14 @@ function translate (key) {
 	return translation;
 }
 
-function actionsCompile(file, limit, action_type, action_name) {
+function actionsCompile(file, limit, type, name) {
 	var template = file.contents.toString('utf8');
 	var s = [];
 	for (var i = 0; i < limit; i++) {
 		s.push(template
-				.replace(/\x7B\x7Baction_type\x7D\x7D/g, action_type)
+				.replace(/\x7B\x7Btype\x7D\x7D/g, type)
 				.replace(/\x7B\x7Bnum\x7D\x7D/g, i.toString())
-				.replace(/\x7B\x7Baction_name\x7D\x7D/g, action_name)
+				.replace(/\x7B\x7Bname\x7D\x7D/g, name)
 		);
 	}
 	return s.join('\n\n');
