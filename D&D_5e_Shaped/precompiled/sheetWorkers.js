@@ -160,6 +160,11 @@ var updateAttack = function () {
 
 		getAttrs(collectionArray, function (v) {
 			for (var j = 0; j < ids.length; j++) {
+				var damageType = v[repeatingItem+'_' + ids[j] + '_' + 'damage_type'];
+
+
+				finalSetAttrs[repeatingItem+'_' + ids[j] + '_' + 'to_hit'] = 5;
+				finalSetAttrs[repeatingItem+'_' + ids[j] + '_' + 'damage_total'] = 5 + ' ' + damageType;
 			}
 			setAttrs(finalSetAttrs);
 		});
