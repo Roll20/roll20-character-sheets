@@ -197,6 +197,7 @@ var updateAttack = function () {
 			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'range');
 			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'ammo');
 			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'damage');
+			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'damage_stat');
 			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'damage_bonus');
 			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'damage_type');
 			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'second_damage');
@@ -218,6 +219,51 @@ var updateAttack = function () {
 				toHit += parseInt(v[repeatingItem+'_' + ids[j] + '_' + 'attack_bonus'], 10);
 
 				finalSetAttrs[repeatingItem+'_' + ids[j] + '_' + 'to_hit'] = toHit;
+
+				var damageString = '';
+				var damageBonus = 0;
+				if (v[repeatingItem+'_' + ids[j] + '_' + 'damage']) {
+					damageString += v[repeatingItem+'_' + ids[j] + '_' + 'damage'];
+
+					if (v[repeatingItem+'_' + ids[j] + '_' + 'damage_stat']) {
+						var damageStat = v[repeatingItem+'_' + ids[j] + '_' + 'damage_stat'];
+						if(damageStat && damageStat !== 0) {
+							damageBonus += parseInt(v[damageStat], 10);
+						}
+					}
+					if (v[repeatingItem+'_' + ids[j] + '_' + 'damage_bonus']) {
+						damageBonus += parseInt(v[repeatingItem+'_' + ids[j] + '_' + 'damage_bonus'], 10);
+					}
+					if (damageBonus !== 0) {
+						damageString += ' + ' + damageBonus;
+					}
+					if (v[repeatingItem+'_' + ids[j] + '_' + 'damage_type']) {
+						damageString += ' ' + v[repeatingItem+'_' + ids[j] + '_' + 'damage_type'];
+					}
+				}
+
+				var secondDamageBonus = 0;
+				if (v[repeatingItem+'_' + ids[j] + '_' + 'second_damage']) {
+					damageString += ' + ' + v[repeatingItem+'_' + ids[j] + '_' + 'second_damage'];
+
+					if (v[repeatingItem+'_' + ids[j] + '_' + 'second_damage_stat']) {
+						var secondDamageStat = v[repeatingItem+'_' + ids[j] + '_' + 'second_damage_stat'];
+						if(secondDamageStat && secondDamageStat !== 0) {
+							secondDamageBonus += parseInt(v[secondDamageStat], 10);
+						}
+					}
+					if (v[repeatingItem+'_' + ids[j] + '_' + 'second_damage_bonus']) {
+						secondDamageBonus += parseInt(v[repeatingItem+'_' + ids[j] + '_' + 'second_damage_bonus'], 10);
+					}
+					if (secondDamageBonus !== 0) {
+						damageString += ' + ' + secondDamageBonus;
+					}
+					if (v[repeatingItem+'_' + ids[j] + '_' + 'second_damage_type']) {
+						damageString += ' ' + v[repeatingItem+'_' + ids[j] + '_' + 'second_damage_type'];
+					}
+				}
+				finalSetAttrs[repeatingItem+'_' + ids[j] + '_' + 'damage_string'] = damageString;
+
 			}
 
 			console.log('updateAttack', finalSetAttrs);
