@@ -18,6 +18,51 @@ on('change:cp change:sp change:ep change:gp change:pp', function () {
 	});
 });
 
+var updateAbilityModifier = function (ability) {
+	var collectionArray = [ability, ability + '_bonus'];
+	var finalSetAttrs = {};
+
+	if(ability === 'strength') {
+		collectionArray.push('dexterity_mod');
+	} else if(ability === 'dexterity') {
+		collectionArray.push('strength_mod');
+	}
+
+
+	getAttrs(collectionArray, function (v) {
+		var calculatedAbilityMod = Math.floor((parseInt(v[ability], 10) - 10) / 2) + parseInt(v[ability + '_bonus'], 10);
+		finalSetAttrs[ability + '_mod'] = calculatedAbilityMod;
+
+		if(ability === 'strength') {
+			finalSetAttrs.finesse_mod = Math.max(calculatedAbilityMod, parseInt(v.dexterity_mod, 10) || 0);
+		} else if(ability === 'dexterity') {
+			finalSetAttrs.finesse_mod = Math.max(calculatedAbilityMod, parseInt(v.strength_mod, 10) || 0);
+		}
+
+		console.log('updateAbilityModifier', finalSetAttrs);
+		setAttrs(finalSetAttrs);
+	});
+};
+on('change:strength strength_bonus', function () {
+	updateAbilityModifier('strength');
+});
+on('change:dexterity dexterity_bonus', function () {
+	updateAbilityModifier('dexterity');
+});
+on('change:constitution constitution_bonus', function () {
+	updateAbilityModifier('constitution');
+});
+on('change:intelligence intelligence_bonus', function () {
+	updateAbilityModifier('intelligence');
+});
+on('change:wisdom wisdom_bonus', function () {
+	updateAbilityModifier('wisdom');
+});
+on('change:charisma charisma_bonus', function () {
+	updateAbilityModifier('charisma');
+});
+
+/*
 var sumRepeating = function (options) {
 	var repeatingItem = 'repeating_' + options.collection;
 	var collectionArray = [];
@@ -131,24 +176,28 @@ var updateAC = function () {
 	});
 };
 
+*/
+
 on('change:repeating_attack', function () {
 	updateAttack();
 });
 
 var updateAttack = function () {
+
 	var repeatingItem = 'repeating_attack';
-	var collectionArray = [];
+	var collectionArray = ['pb', 'finesse_mod', 'strength_mod', 'dexterity_mod', 'constitution_mod', 'intelligence_mod', 'wisdom_mod', 'charisma_mod'];
 	var finalSetAttrs = {};
-	finalSetAttrs[options.totalField] = 0;
 
 	getSectionIDs(repeatingItem, function (ids) {
 		for (var i = 0; i < ids.length; i++) {
 			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'proficient');
+			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'attack_stat');
 			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'attack_bonus');
 			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'reach');
 			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'range');
 			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'ammo');
 			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'damage');
+			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'damage_stat');
 			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'damage_bonus');
 			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'damage_type');
 			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'second_damage');
@@ -160,12 +209,64 @@ var updateAttack = function () {
 
 		getAttrs(collectionArray, function (v) {
 			for (var j = 0; j < ids.length; j++) {
-				var damageType = v[repeatingItem+'_' + ids[j] + '_' + 'damage_type'];
+				var toHit = 0;
+				if(v[repeatingItem+'_' + ids[j] + '_' + 'proficient'] === 'on') {
+					toHit += 2;
+				}
 
+				var attackStat = v[repeatingItem+'_' + ids[j] + '_' + 'attack_stat'];
+				toHit += parseInt(v[attackStat], 10);
+				toHit += parseInt(v[repeatingItem+'_' + ids[j] + '_' + 'attack_bonus'], 10);
 
-				finalSetAttrs[repeatingItem+'_' + ids[j] + '_' + 'to_hit'] = 5;
-				finalSetAttrs[repeatingItem+'_' + ids[j] + '_' + 'damage_total'] = 5 + ' ' + damageType;
+				finalSetAttrs[repeatingItem+'_' + ids[j] + '_' + 'to_hit'] = toHit;
+
+				var damageString = '';
+				var damageBonus = 0;
+				if (v[repeatingItem+'_' + ids[j] + '_' + 'damage']) {
+					damageString += v[repeatingItem+'_' + ids[j] + '_' + 'damage'];
+
+					if (v[repeatingItem+'_' + ids[j] + '_' + 'damage_stat']) {
+						var damageStat = v[repeatingItem+'_' + ids[j] + '_' + 'damage_stat'];
+						if(damageStat && damageStat !== 0) {
+							damageBonus += parseInt(v[damageStat], 10);
+						}
+					}
+					if (v[repeatingItem+'_' + ids[j] + '_' + 'damage_bonus']) {
+						damageBonus += parseInt(v[repeatingItem+'_' + ids[j] + '_' + 'damage_bonus'], 10);
+					}
+					if (damageBonus !== 0) {
+						damageString += ' + ' + damageBonus;
+					}
+					if (v[repeatingItem+'_' + ids[j] + '_' + 'damage_type']) {
+						damageString += ' ' + v[repeatingItem+'_' + ids[j] + '_' + 'damage_type'];
+					}
+				}
+
+				var secondDamageBonus = 0;
+				if (v[repeatingItem+'_' + ids[j] + '_' + 'second_damage']) {
+					damageString += ' + ' + v[repeatingItem+'_' + ids[j] + '_' + 'second_damage'];
+
+					if (v[repeatingItem+'_' + ids[j] + '_' + 'second_damage_stat']) {
+						var secondDamageStat = v[repeatingItem+'_' + ids[j] + '_' + 'second_damage_stat'];
+						if(secondDamageStat && secondDamageStat !== 0) {
+							secondDamageBonus += parseInt(v[secondDamageStat], 10);
+						}
+					}
+					if (v[repeatingItem+'_' + ids[j] + '_' + 'second_damage_bonus']) {
+						secondDamageBonus += parseInt(v[repeatingItem+'_' + ids[j] + '_' + 'second_damage_bonus'], 10);
+					}
+					if (secondDamageBonus !== 0) {
+						damageString += ' + ' + secondDamageBonus;
+					}
+					if (v[repeatingItem+'_' + ids[j] + '_' + 'second_damage_type']) {
+						damageString += ' ' + v[repeatingItem+'_' + ids[j] + '_' + 'second_damage_type'];
+					}
+				}
+				finalSetAttrs[repeatingItem+'_' + ids[j] + '_' + 'damage_string'] = damageString;
+
 			}
+
+			console.log('updateAttack', finalSetAttrs);
 			setAttrs(finalSetAttrs);
 		});
 	});
