@@ -51,25 +51,25 @@ var updateSave = function (attribute) {
 	sumValues([attribute + '_mod', attribute + '_save_prof', attribute + '_save_bonus', 'global_saving_bonus'], attribute + '_save_mod');
 };
 var updateCheck = function (attribute) {
-	sumValues([attribute + '_mod', 'basic_' + attribute + '_bonus', 'global_check_bonus', 'jack_of_all_trades'], 'basic_' + attribute + '_check_mod');
+	sumValues([attribute + '_mod', attribute + '_bonus', 'global_check_bonus', 'jack_of_all_trades'], attribute + '_check_mod');
 };
 
-on('change:strength change:strength_bonus change:strength_save_prof change:strength_save_bonus change:basic_strength_bonus', function () {
+on('change:strength change:strength_bonus change:strength_save_prof change:strength_save_bonus change:strength_bonus', function () {
 	updateAttribute('strength');
 });
-on('change:dexterity change:dexterity_bonus change:dexterity_save_prof change:dexterity_save_bonus change:basic_dexterity_bonus', function () {
+on('change:dexterity change:dexterity_bonus change:dexterity_save_prof change:dexterity_save_bonus change:dexterity_bonus', function () {
 	updateAttribute('dexterity');
 });
-on('change:constitution change:constitution_bonus change:constitution_save_prof change:constitution_save_bonus change:basic_constitution_bonus', function () {
+on('change:constitution change:constitution_bonus change:constitution_save_prof change:constitution_save_bonus change:constitution_bonus', function () {
 	updateAttribute('constitution');
 });
-on('change:intelligence change:intelligence_bonus change:intelligence_save_prof change:intelligence_save_bonus change:basic_intelligence_bonus', function () {
+on('change:intelligence change:intelligence_bonus change:intelligence_save_prof change:intelligence_save_bonus change:intelligence_bonus', function () {
 	updateAttribute('intelligence');
 });
-on('change:wisdom change:wisdom_bonus change:wisdom_save_prof change:wisdom_save_bonus change:basic_wisdom_bonus', function () {
+on('change:wisdom change:wisdom_bonus change:wisdom_save_prof change:wisdom_save_bonus change:wisdom_bonus', function () {
 	updateAttribute('wisdom');
 });
-on('change:charisma change:charisma_bonus change:charisma_save_prof change:charisma_save_bonus change:basic_charisma_bonus', function () {
+on('change:charisma change:charisma_bonus change:charisma_save_prof change:charisma_save_bonus change:charisma_bonus', function () {
 	updateAttribute('charisma');
 });
 on('change:global_save_bonus change:global_check_bonus change:jack_of_all_trades', function () {
