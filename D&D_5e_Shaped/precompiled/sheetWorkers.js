@@ -193,18 +193,14 @@ var updateAttack = function () {
 			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'proficient');
 			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'attack_stat');
 			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'attack_bonus');
-			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'reach');
-			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'range');
-			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'ammo');
 			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'damage');
 			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'damage_stat');
 			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'damage_bonus');
 			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'damage_type');
 			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'second_damage');
+			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'second_damage_stat');
 			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'second_damage_bonus');
 			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'second_damage_type');
-			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'bonus_crit_damage');
-			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'crit_range');
 		}
 
 		getAttrs(collectionArray, function (v) {
@@ -215,7 +211,9 @@ var updateAttack = function () {
 				}
 
 				var attackStat = v[repeatingItem+'_' + ids[j] + '_' + 'attack_stat'];
-				toHit += parseInt(v[attackStat], 10);
+				if(attackStat && attackStat !== 0 && attackStat !== '0') {
+					toHit += parseInt(v[attackStat], 10);
+				}
 				toHit += parseInt(v[repeatingItem+'_' + ids[j] + '_' + 'attack_bonus'], 10);
 
 				finalSetAttrs[repeatingItem+'_' + ids[j] + '_' + 'to_hit'] = toHit;
@@ -227,7 +225,7 @@ var updateAttack = function () {
 
 					if (v[repeatingItem+'_' + ids[j] + '_' + 'damage_stat']) {
 						var damageStat = v[repeatingItem+'_' + ids[j] + '_' + 'damage_stat'];
-						if(damageStat && damageStat !== 0) {
+						if(damageStat && damageStat !== 0 && damageStat !== '0') {
 							damageBonus += parseInt(v[damageStat], 10);
 						}
 					}
@@ -248,7 +246,7 @@ var updateAttack = function () {
 
 					if (v[repeatingItem+'_' + ids[j] + '_' + 'second_damage_stat']) {
 						var secondDamageStat = v[repeatingItem+'_' + ids[j] + '_' + 'second_damage_stat'];
-						if(secondDamageStat && secondDamageStat !== 0) {
+						if(secondDamageStat && secondDamageStat !== 0 && secondDamageStat !== '0') {
 							secondDamageBonus += parseInt(v[secondDamageStat], 10);
 						}
 					}
