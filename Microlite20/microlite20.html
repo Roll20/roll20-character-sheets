@@ -51,28 +51,28 @@
 					<td><label>Race</label></td>
 					<td>
 						<select name="attr_race" style="width: 100px">
-							<option value="1">
+							<option value="human">
 								Human
 							</option>
-							<option value="0.7">
+							<option value="elf">
 								Elf
 							</option>
-							<option value="0.6">
+							<option value="dwarf">
 								Dwarf
 							</option>
-							<option value="0.5">
+							<option value="halfling">
 								Halfling
 							</option>
-							<option value="0.4">
+							<option value="gnome">
 								Gnome
 							</option>
-							<option value="0.3">
+							<option value="halforc">
 								Half-orc
 							</option>
-							<option value="0.2">
+							<option value="halfelf">
 								Half-elf
 							</option>
-							<option value="0.1">
+							<option value="lizardman">
 								Lizardman
 							</option>
 						</select>
@@ -82,34 +82,31 @@
 					<td><label>Class</label></td>
 					<td>
 						<select name="attr_class" style="width: 100px">
-							<option value="16">
+							<option value="fighter">
 								Fighter
 							</option>
-							<option value="12">
+							<option value="rogue">
 								Rogue
 							</option>
-							<option value="10">
+							<option value="mage">
 								Mage
 							</option>
-							<option value="8">
+							<option value="cleric">
 								Cleric
 							</option>
-							<option value="-14">
+							<option value="paladin">
 								Paladin
 							</option>
-							<option value="-11">
+							<option value="ranger">
 								Ranger
 							</option>
-							
-							<option value="6">
+							<option value="illusionist">
 								Illusionist
 							</option>
-							
-							<option value="4">
+							<option value="druid">
 								Druid
 							</option>
-							
-							<option value="2">
+							<option value="bard">
 								Bard
 							</option>
 						</select>
@@ -249,6 +246,10 @@
 				</tbody>
 			</table>
 		</div>
+		<div class="sheet-col">
+			<p>Enter your stats here after rolling them for the first time.  The sheet will automatically figure out racial bonuses for you so you don't have to check the rulebook.</p>
+			<p>Remember: you get to add 1 to any stat you choose at levels 3, 6, 9, 12, 15, and 18.</p>
+		</div>
 	</div>
 	<hr>
 	<div class="sheet-3colrow">
@@ -257,7 +258,6 @@
 			<table class="sheet-table">
 				<thead>
 					<th><label>Skill</label></th>
-					<th><label>Base</label></th>
 					<th title="Miscellaneous Skill Modifier"><label>Mod</label></th>
 					<th><label>Current</label></th>
 					<th><label>Str</label></th>
@@ -267,9 +267,6 @@
 				<tbody>
 					<tr>
 						<td><label>Physical</label></td>
-						<td>
-							<input class="sheet-short" name="attr_physical" value="1" type="number">
-						</td>
 						<td>
 							<input type="number" name="attr_physical_mod" class="sheet-short" value="0">
 						</td>
@@ -292,9 +289,6 @@
 					<tr>
 						<td><label>Subterfuge</label></td>
 						<td>
-							<input class="sheet-short" name="attr_subterfuge" value="1" type="number">
-						</td>
-						<td>
 							<input type="number" name="attr_subterfuge_mod" class="sheet-short" value="0">
 						</td>
 						<td>
@@ -315,9 +309,6 @@
 					</tr>
 					<tr>
 						<td><label>Knowledge</label></td>
-						<td>
-							<input class="sheet-short" name="attr_knowledge" value="1" type="number">
-						</td>
 						<td>
 							<input type="number" name="attr_knowledge_mod" class="sheet-short" value="0">
 						</td>
@@ -340,9 +331,6 @@
 					<tr>
 						<td><label>Communication</label></td>
 						<td>
-							<input class="sheet-short" name="attr_communication" value="1" type="number">
-						</td>
-						<td>
 							<input type="number" name="attr_communication_mod" class="sheet-short" value="0">
 						</td>
 						<td>
@@ -364,9 +352,6 @@
 					<tr>
 						<td><label>Survival</label></td>
 						<td>
-							<input class="sheet-short" name="attr_survival" value="0" type="number">
-						</td>
-						<td>
 							<input type="number" name="attr_survival_mod" class="sheet-short" value="0">
 						</td>
 						<td>
@@ -387,6 +372,10 @@
 					</tr>
 				</tbody>
 			</table>
+		</div>
+		<div class="sheet-col">
+		<p>Skills are calculated based on your level, class, and in the case of human, race.  There's no need to edit these skills directly anymore, and if there are any discrepancies, you can always edit the Miscellaneous Modifier field.</p>
+		<p>If you chose half-elf as your race, add +1 to 2 skills of your choice.  This +1 goes in the Miscellaneous Modifier fields of the 2 chosen skills.</p>
 		</div>
 	</div>
 	<hr />
@@ -565,13 +554,13 @@
 						<td><label>Weapon Type</label></td>
 						<td>
 							<select name="attr_range_type" style="width: 130px">
-								<option value="2">
+								<option value="melee 1-handed">
 									Melee 1-handed
 								</option>
-								<option value="4">
+								<option value="melee 2-handed">
 									Melee 2-handed
 								</option>
-								<option value="-1">
+								<option value="ranged">
 									Ranged
 								</option>
 							</select> 
@@ -596,18 +585,21 @@
 							<label>Melee</label>
 						</td>
 						<td>
+							<input type="hidden" name="attr_meleeRoll" value="" />
 							<button type="roll" value="&{template:default} {{name=Melee Attack Roll}} {{Roll Result=[[d20+[[(@{melee_attack_bonus})]]+[[((floor(abs(@{class})/16))*(1+floor(@{level}/5)))]]+[[(@{weapon_mod})]]]]}}" title="d20 + melee attack bonus + fighter class bonus + miscellaneous weapon modifier"></button>
 						</td>
 					</tr>
 					<tr>
 						<td><label>Missile/Ranged</label></td>
 						<td>
+							<input type="hidden" name="attr_missileRoll" value="" />
 							<button type="roll" value="&{template:default} {{name=Missile/Ranged Roll}}{{Roll Result=[[d20+[[(@{missile_attack_bonus})]] + [[((floor(abs(@{class})/16))*(1+floor(@{level}/5)))+((abs(@{class}%2)))]]+[[(@{weapon_mod})]]]]}}" title="d20+missile/ranged attack bonus + fighter class bonus + ranger class bonus + miscellaneous weapon modifier"></button>
 						</td>
 					</tr>
 					<tr>
 						<td><label>Light Weapon/Dex</label></td>
 						<td>
+							<input type="hidden" name="attr_lightWeaponRoll" value="" />
 							<button type="roll" value="&{template:default} {{name=Light Weapon Roll}} {{Roll Result=[[d20+[[(@{missile_attack_bonus})]]+[[((floor(abs(@{class})/16))*(1+floor(@{level}/5)))]]+[[(@{weapon_mod})]]]]}}" title="d20 + light weapon attack bonus + fighter class bonus + miscellaneous weapon modifier">
 						</button>
 						</td>
@@ -615,6 +607,7 @@
 					<tr>
 						<td><label title="Roll once for any weapon you wish to dual wield with">Dual Wield</label></td>
 						<td>
+							<input type="hidden" name="attr_dualWieldRoll" value="" />
 							<button type="roll" value="&{template:default} {{name=Dual Wield Roll}} {{Roll Result=[[d20+[[(@{missile_attack_bonus})]]+[[((floor(abs(@{class})/16))*(1+floor(@{level}/5)))+((abs(@{class}%2)))]]-2+[[(@{weapon_mod})]]]]}}" title="d20 + light weapon attack bonus + fighter class bonus + ranger class bonus - attack penalty + miscellaneous weapon modifier">
 						</button>
 						</td>
@@ -634,6 +627,7 @@
 								<input type="number" name="attr_damage_mod" value="0">
 							</td>
 							<td>
+								<input type="hidden" name="damageRoll" value="" />
 								<button class="sheet-button" type="roll" 
 								value="&{template:default} {{name=Damage Roll}} {{@{weapon_name}=[[@{damage_dice}+[[((floor(abs(@{class})/16))*(1+floor(@{level}/5)))]]+[[((floor((@{range_type})/2))*(@{strength_bonus}))]]+[[((abs(@{class}%2))*(@{range_type}%2))]]+[[(@{damage_mod})]]]]}}" title="damage dice + fighter class bonus + melee bonus + ranger class bonus + miscellaneous damage modifier">
 								</button>
@@ -745,3 +739,266 @@
 		</div>
 	
 </div>
+<script type="text/worker">
+	
+	on("change:level", function(){
+		calculatePhysical();
+		calculateSubterfuge();
+		calculateKnowledge();
+		calculateCommunication();
+		calculateSurvival();
+		calculateAttacks();
+	};
+	
+	on("change:race", function(){
+		calculateStrength();
+		calculateDex();
+		calculateMind();
+	});
+	
+	on("change:strength change:strength_modifier", function(){
+		calculateStrength();
+	});
+	
+	on("change:dexterity change:dexterity_modifier", function(){
+		calculateDex();
+	});
+	
+	on("change:mind change:mind_modifier", function(){
+		calculateMind();
+	});
+	
+	var calculateStrength = function(){
+		getAttrs(["strength","strength_modifier","race"], function(attribute){
+			var current = attribute.strength+attribute.strength_modifier;
+			if (attribute.race=="dwarf" || attribute.race=="lizardman"){
+				current+=2;
+			} else if (attribute.race=="halforc"){
+				current+=4;
+			} 
+			var bonus = Math.floor((current - 10) / 2);
+			setAttrs(
+				{
+					"strength_current":current,
+					"strength_bonus":bonus
+				}
+			);
+		});
+	};
+	
+	var calculateDex = function(){
+		getAttrs(["dexterity","dexterity_modifier","race"], function(attribute){
+			var current = attribute.dexterity+attribute.dexterity_modifier;
+			if (attribute.race=="gnome"||attribute.race=="halfelf"){
+				current++;
+			} else if (attribute.race=="lizardman" || attribute.race=="halfling"){
+				current+=2;
+			}
+			var bonus = Math.floor((current-10)/2);
+			setAttrs(
+				{
+					"dexterity_current":current,
+					"dexterity_bonus":bonus
+				}
+			);
+		});
+	};
+	
+	var calculateMind = function(){
+		getAttrs(["mind","mind_modifier","race"], function(attribute){
+			var current = attribute.mind+attribute.mind_modifier;
+			if (attribute.race=="gnome"){
+				current++;
+			} else if (attribute.race=="elf"){
+				current+=2;
+			} else if (attribute.race=="halforc"||attribute.race=="lizardman"){
+				current-=2;
+			}
+			var bonus = Math.floor((current-10)/2);
+			setAttrs(
+				{
+					"mind_current":current,
+					"mind_bonus":bonus
+				}
+			);
+		});
+	};
+
+	var calculatePhysical = function(){
+		getAttrs(["physical_mod", "level", "class", "race"], function(value){
+			var skill = value.level+value.physical_mod;
+			if (value.class=="fighter"){
+				skill+=3;
+			} else if (value.class=="paladin"){
+				skill++;
+			}
+			if (value.race=="human"){
+				skill++;
+			}
+			setAttrs(
+				{
+					"physical_current" : skill
+				}
+			);
+		});
+	};
+	
+	var calculateSubterfuge = function(){
+		getAttrs(["subterfuge_mod", "level", "class", "race"], function(value){
+			var sub = value.level+value.subterfuge_mod;
+			if (value.class=="rogue"){
+				skill+=3;
+			} else if (value.class=="bard"){
+				skill+=2;
+			} else if (value.class=="illusionist"){
+				skill++;
+			}
+			if (value.race=="human"){
+				skill++;
+			}
+			setAttrs(
+				{
+					"subterfuge_current" : skill
+				}
+			);
+		});
+	};
+	
+	var calculateKnowledge = function(){
+		getAttrs(["knowledge_mod", "level", "class", "race"], function(value){
+			var sub = value.level+value.knowledge_mod;
+			if (value.class=="mage"){
+				skill+=3;
+			} else if (value.class=="bard" || value.class=="druid"){
+				skill+=2;
+			} 
+			if (value.race=="human"){
+				skill++;
+			}
+			setAttrs(
+				{
+					"knowledge_current" : skill
+				}
+			);
+		});
+	};
+	
+	
+	
+	var calculateCommunication = function(){
+		getAttrs(["communication_mod", "level", "class", "race"], function(value){
+			var sub = value.level+value.communication_mod;
+			if (value.class=="cleric"){
+				skill+=3;
+			} else if (value.class=="bard" || value.class=="illusionist"){
+				skill+=2;
+			} else if (value.class=="paladin") {
+				skill++;
+			}
+			if (value.race=="human"){
+				skill++;
+			}
+			setAttrs(
+				{
+					"communication_current" : skill
+				}
+			);
+		});
+	};
+	
+	var calculateSurvival = function(){
+		getAttrs(["survival_mod", "level", "class", "race"], function(value){
+			var sub = value.level+value.survival_mod;
+			if (value.class=="ranger"){
+				skill+=3;
+			} else if (value.class=="druid"){
+				skill+=2;
+			} 
+			if (value.race=="human"){
+				skill++;
+			}
+			setAttrs(
+				{
+					"survival_current" : skill
+				}
+			);
+		});
+	};
+	
+	var calculateAttacks = function(){
+		calculateAttackRolls();
+		calculateDamageRolls();
+	};
+	
+	var calculateAttackRolls = function(){
+		calculateMeleeRolls();
+		calculateMissileRolls();
+		calculateLightWeaponRolls();
+		calculateDualWieldRolls();
+	};
+	
+	var calculateDamageRolls = function(){
+		/**
+			damage dice + fighter class bonus + melee bonus + ranger class bonus + miscellaneous damage modifier
+			damageRoll = &{template:default} {{name=Damage Roll}} {{@{weapon_name}=[[@{damage_dice}+[[((floor(abs(@{class})/16))*(1+floor(@{level}/5)))]]+[[((floor((@{range_type})/2))*(@{strength_bonus}))]]+[[((abs(@{class}%2))*(@{range_type}%2))]]+[[(@{damage_mod})]]]]}}
+		*/
+		getAttrs(["class", "level", "strength_bonus"], function(stats){
+			getSectionIDs("repeating_weapons", function(ids){
+				for (var i=0; i<ids.length; i++){
+					var weapon = "repeating_weapons_"+ids[i];
+					var range_type = weaponAttributes[weapon+"_range_type"];
+					getAttrs([weapon+"_weapon_name", weapon+"_damage_dice", weapon+"_range_type", weapon+"_damage_mod"], function(weaponAttributes){
+						var damageRoll = "&{template:default} {{name=Damage Roll}} {{"+weaponAttributes[weapon+"_weapon_name"]+"=[["+weaponAttributes[weapon+"_damage_dice"];
+						if (stats.class=="fighter"){
+							damageRoll+="+[[(1+floor("+stats.level+"/5))]]";
+						} else if (stats.class=="ranger" && range_type == "ranged"){
+							damageRoll+="+1";
+						}
+						if (range_type!="ranged"){
+							if (range_type=="melee 1-handed"){
+								damageRoll+="+"+stats.strength_bonus;
+							} else if (range_type=="melee 2-handed"){
+								damageRoll+="+"+(stats.strength_bonus*2);
+							}
+						}
+						damageRoll+="+"+weaponAttributes[weapon+"_damage_mod"];
+						setAttrs(
+							{
+								weapon+"_damageRoll": damageRoll
+							}
+						);
+					});
+				}
+			});
+		});
+	};
+	
+	var calculateMeleeRolls = function(){
+		/**
+			d20 + melee attack bonus + fighter class bonus + miscellaneous weapon modifier
+			meleeRoll = &{template:default} {{name=Melee Attack Roll}} {{Roll Result=[[d20+[[(@{melee_attack_bonus})]]+[[((floor(abs(@{class})/16))*(1+floor(@{level}/5)))]]+[[(@{weapon_mod})]]]]}}
+		*/
+	};
+	
+	var calculateMissileRolls = function(){
+		/**
+			d20+missile/ranged attack bonus + fighter class bonus + ranger class bonus + miscellaneous weapon modifier
+			missileRoll = &{template:default} {{name=Missile/Ranged Roll}}{{Roll Result=[[d20+[[(@{missile_attack_bonus})]] + [[((floor(abs(@{class})/16))*(1+floor(@{level}/5)))+((abs(@{class}%2)))]]+[[(@{weapon_mod})]]]]}}
+		*/
+	};
+	
+	var calculateLightWeaponRolls = function(){
+		/**
+			d20 + light weapon attack bonus + fighter class bonus + miscellaneous weapon modifier
+			lightWeaponRoll = &{template:default} {{name=Light Weapon Roll}} {{Roll Result=[[d20+[[(@{missile_attack_bonus})]]+[[((floor(abs(@{class})/16))*(1+floor(@{level}/5)))]]+[[(@{weapon_mod})]]]]}}
+		*/
+	};
+	
+	var calculateDualWieldRolls = function(){
+		/**
+			d20 + light weapon attack bonus + fighter class bonus + ranger class bonus - attack penalty + miscellaneous weapon modifier
+			dualWieldRoll = &{template:default} {{name=Dual Wield Roll}} {{Roll Result=[[d20+[[(@{missile_attack_bonus})]]+[[((floor(abs(@{class})/16))*(1+floor(@{level}/5)))+((abs(@{class}%2)))]]-2+[[(@{weapon_mod})]]]]}}
+		*/
+	};
+
+</script>
