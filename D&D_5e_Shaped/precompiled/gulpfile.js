@@ -198,7 +198,7 @@ function saveQuery(file) {
 		var ability = abilitiesName[i];
 		query += '|' + ability + ', {{title=' + ability + '&amp;#125;&amp;#125; {{roll=[[d20@{d20_mod} + @{' + ability.toLowerCase() + '_save_mod}]]&amp;#125;&amp;#125; {{rolladv=[[d20@{d20_mod} + @{' + ability.toLowerCase() + '_save_mod}]]&amp;#125;&amp;#125;';
 	}
-	query += '|Death, {{deathsave=1&amp;#125;&amp;#125; {{emote=dices with death!&amp;#125;&amp;#125; {{title=Death Save&amp;#125;&amp;#125; {{rollname=Death Save&amp;#125;&amp;#125; {{roll=[[d20@{d20_mod} + (@{global_saving_bonus})]]&amp;#125;&amp;#125; {{rolladv=[[d20@{d20_mod} + (@{global_saving_bonus})]]&amp;#125;&amp;#125;';
+	query += '|Death, {{deathsave=1&amp;#125;&amp;#125; {{emote=dices with death!&amp;#125;&amp;#125; {{title=Death Save&amp;#125;&amp;#125; {{roll=[[d20@{d20_mod} + (@{global_saving_bonus})]]&amp;#125;&amp;#125; {{rolladv=[[d20@{d20_mod} + (@{global_saving_bonus})]]&amp;#125;&amp;#125;';
 	query += '|Other, {{title=?{Other&amp;#124;Unspecified&amp;#125;&amp;#125;&amp;#125; {{roll=[[d20@{d20_mod} + (@{global_saving_bonus}) + ?{Modifiers&amp;#124;0&amp;#125;]]&amp;#125;&amp;#125; {{rolladv=[[d20@{d20_mod} + (@{global_saving_bonus}) + ?{Modifiers&amp;#124;0&amp;#125;]]&amp;#125;&amp;#125;';
 
 	template = template.replace(/\x7B\x7BsaveQuery\x7D\x7D/g, query);
@@ -251,14 +251,6 @@ function processDate() {
 
 	return date + ordinal(date) + ' ' + months[month] + ' ' + year;
 }
-
-gulp.task('sheetWorkers', function () {
-	return gulp.src(['./components/sheetWorkers/sheetWorkers.js'])
-		.pipe(uglify())
-		.pipe(wrap('<script type="text/worker">\n<%= contents %>\n</script>'))
-		.pipe(rename('sheetWorkers.html'))
-		.pipe(gulp.dest('./'));
-});
 
 gulp.task('preCompile', function () {
 	return gulp.src('./D&D_5e.html')
@@ -336,7 +328,7 @@ gulp.task('preCompile', function () {
 		.pipe(inject(gulp.src(['./components/class/custom_class.html']), {
 			starttag: '<!-- inject:custom_class:{{ext}} -->',
 			transform: function (filePath, file) {
-				return duplicate(file, customClassCount, 1);
+				return duplicate(file, customClassCount);
 			}
 		}))
 		.pipe(inject(gulp.src(['./components/spells/spell-page.html']), {
