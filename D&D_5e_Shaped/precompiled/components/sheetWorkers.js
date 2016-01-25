@@ -1,3 +1,7 @@
+var capitalizeFirstLetter = function (string) {
+	return string.charAt(0).toUpperCase() + string.slice(1);
+};
+
 on('change:cp change:sp change:ep change:gp change:pp', function () {
 	getAttrs(['cp', 'copper_per_gold', 'sp', 'silver_per_gold', 'ep', 'electrum_per_gold', 'gp', 'pp', 'platinum_per_gold'], function (v) {
 		var copperPieces = parseFloat(v.cp) || 0;
@@ -61,6 +65,101 @@ on('change:wisdom', function () {
 on('change:charisma', function () {
 	updateAbilityModifier('charisma');
 });
+
+var updateLevels = function () {
+	var collectionArray = ['barbarian_level', 'bard_level', 'cleric_level', 'druid_level', 'fighter_level', 'monk_level', 'paladin_level', 'ranger_level', 'rogue_level', 'sorcerer_level', 'warlock_level', 'wizard_level', 'custom_class_level_0', 'custom_class_hd_0', 'custom_class_name_0', 'custom_class_level_1', 'custom_class_hd_1', 'custom_class_name_1', 'custom_class_level_2', 'custom_class_hd_2', 'custom_class_name_2', 'custom_class_level_3', 'custom_class_hd_3', 'custom_class_name_3', 'custom_class_level_4', 'custom_class_hd_4', 'custom_class_name_4', 'custom_class_level_5', 'custom_class_hd_5', 'custom_class_name_5'];
+	var finalSetAttrs = {};
+
+	getAttrs(collectionArray, function (v) {
+		var levels = {
+			barbarian: parseInt(v['barbarian_level'], 10) || 0,
+			bard: parseInt(v['bard_level'], 10) || 0,
+			cleric: parseInt(v['cleric_level'], 10) || 0,
+			druid: parseInt(v['druid_level'], 10) || 0,
+			fighter: parseInt(v['fighter_level'], 10) || 0,
+			monk: parseInt(v['monk_level'], 10) || 0,
+			paladin: parseInt(v['paladin_level'], 10) || 0,
+			ranger: parseInt(v['ranger_level'], 10) || 0,
+			rogue: parseInt(v['rogue_level'], 10) || 0,
+			sorcerer: parseInt(v['sorcerer_level'], 10) || 0,
+			warlock: parseInt(v['warlock_level'], 10) || 0,
+			wizard: parseInt(v['wizard_level'], 10) || 0
+		};
+
+		var hd = {
+			'd12': levels.barbarian,
+			'd10': levels.fighter + levels.paladin + levels.ranger,
+			'd8': levels.bard + levels.cleric + levels.druid + levels.monk + levels.rogue + levels.warlock,
+			'd6': levels.sorcerer + levels.wizard
+		};
+		var totalLevel = 0;
+		var levelString = '';
+
+		for (var key in levels) {
+			if (levels.hasOwnProperty(key)) {
+				if (levels[key]) {
+					totalLevel += levels[key];
+					if (levelString !== '') {
+						levelString += ' ';
+					}
+					levelString += capitalizeFirstLetter(key) + ' ' + levels[key];
+				}
+			}
+		}
+
+		for(var i = 0; i < 6; i++) {
+			var customClass = {
+				hd: parseInt(v['custom_class_hd_'+i], 10) || 6,
+				level: parseInt(v['custom_class_level_'+i], 10) || 0,
+				name: v['custom_class_name_'+i]
+			};
+
+			if (customClass.level) {
+				totalLevel += customClass.level;
+				hd['d'+customClass.hd] += customClass.level;
+				if (levelString !== '') {
+					levelString += ' ';
+				}
+				if (!customClass.name || customClass.name === '') {
+					customClass.name = 'Custom ' + i;
+				}
+				levelString += customClass.name + ' ' + customClass.level;
+			}
+		}
+
+		if (hd.d12) {
+			finalSetAttrs.hd_d12_max = hd.d12;
+			finalSetAttrs.hd_d12_toggle = 'on';
+		}
+		if (hd.d10) {
+			finalSetAttrs.hd_d10_max = hd.d10;
+			finalSetAttrs.hd_d10_toggle = 'on';
+		}
+		if (hd.d8) {
+			finalSetAttrs.hd_d8_max = hd.d8;
+			finalSetAttrs.hd_d8_toggle = 'on';
+		}
+		if (hd.d6) {
+			finalSetAttrs.hd_d6_max = hd.d6;
+			finalSetAttrs.hd_d6_toggle = 'on';
+		}
+
+		var pb = 2 + Math.floor(Math.abs((totalLevel - 1)/4));
+
+		finalSetAttrs.class = levelString;
+		finalSetAttrs.pb = pb;
+		finalSetAttrs.exp = pb * 2;
+		finalSetAttrs.h_PB = pb / 2;
+
+		console.log('updateLevels', finalSetAttrs);
+		setAttrs(finalSetAttrs);
+	});
+};
+
+on('change:barbarian_level change:bard_level change:cleric_level change:druid_level change:fighter_level change:monk_level change:paladin_level change:ranger_level change:rogue_level change:sorcerer_level change:warlock_level change:wizard_level change:custom_class_level_0 change:custom_class_hd_0 change:custom_class_name_0 change:custom_class_level_1 change:custom_class_hd_1 change:custom_class_name_1 change:custom_class_level_2 change:custom_class_hd_2 change:custom_class_name_2 change:custom_class_level_3 change:custom_class_hd_3 change:custom_class_name_3 change:custom_class_level_4 change:custom_class_hd_4 change:custom_class_name_4 change:custom_class_level_5 change:custom_class_hd_5 change:custom_class_name_5', function () {
+	updateLevels();
+});
+
 
 /*
 var sumRepeating = function (options) {

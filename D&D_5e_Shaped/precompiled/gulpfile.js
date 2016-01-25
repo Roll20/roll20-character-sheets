@@ -328,7 +328,7 @@ gulp.task('preCompile', function () {
 		.pipe(inject(gulp.src(['./components/class/custom_class.html']), {
 			starttag: '<!-- inject:custom_class:{{ext}} -->',
 			transform: function (filePath, file) {
-				return duplicate(file, customClassCount, 1);
+				return duplicate(file, customClassCount);
 			}
 		}))
 		.pipe(inject(gulp.src(['./components/spells/spell-page.html']), {
