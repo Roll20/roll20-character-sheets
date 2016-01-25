@@ -55,6 +55,12 @@ function objByString (o, s) {
 	return o;
 }
 
+function getTranslationsIfTheyDontExist () {
+	if(Object.keys(translations).length === 0) {
+		getTranslation();
+	}
+}
+
 function translationWrapper (lang, key) {
 	var translation = objByString(translations[lang], key);
 
@@ -66,12 +72,15 @@ function translationWrapper (lang, key) {
 }
 
 function translate (key) {
-	if(Object.keys(translations).length === 0) {
-		getTranslation();
-	}
+	getTranslationsIfTheyDontExist();
 	var translation = translationWrapper('en', key) + translationWrapper('de', key) + translationWrapper('fr', key) + translationWrapper('ru', key);
 
 	return translation;
+}
+
+function skillEn (key) {
+	getTranslationsIfTheyDontExist();
+	return objByString(translations.en, key);
 }
 
 function actionsCompile(file, limit, type, name) {
@@ -184,6 +193,7 @@ function skills(file) {
 		skills.push(ggTemplate
 				.replace(/\x7B\x7Bname\x7D\x7D/g, skill.name.lowercase().replace(/ +/g, ''))
 				.replace(/\x7B\x7Battribute\x7D\x7D/g, skill.attribute.capitalize())
+				.replace(/\x7B\x7BtranslatedNameEn\x7D\x7D/g, skillEn('SKILLS.' + skill.name + '.NAME'))
 				.replace(/\x7B\x7BtranslatedName\x7D\x7D/g, translate('SKILLS.' + skill.name + '.NAME'))
 		);
 	});
