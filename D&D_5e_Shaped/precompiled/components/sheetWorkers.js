@@ -146,7 +146,8 @@ var updateLevels = function () {
 
 		var pb = 2 + Math.floor(Math.abs((totalLevel - 1)/4));
 
-		finalSetAttrs.class = levelString;
+		finalSetAttrs.level = totalLevel;
+		finalSetAttrs.class_and_level = levelString;
 		finalSetAttrs.pb = pb;
 		finalSetAttrs.exp = pb * 2;
 		finalSetAttrs.h_PB = pb / 2;
