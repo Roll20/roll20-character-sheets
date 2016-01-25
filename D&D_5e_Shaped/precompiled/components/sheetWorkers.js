@@ -43,22 +43,22 @@ var updateAbilityModifier = function (ability) {
 		setAttrs(finalSetAttrs);
 	});
 };
-on('change:strength strength_bonus', function () {
+on('change:strength', function () {
 	updateAbilityModifier('strength');
 });
-on('change:dexterity dexterity_bonus', function () {
+on('change:dexterity', function () {
 	updateAbilityModifier('dexterity');
 });
-on('change:constitution constitution_bonus', function () {
+on('change:constitution', function () {
 	updateAbilityModifier('constitution');
 });
-on('change:intelligence intelligence_bonus', function () {
+on('change:intelligence', function () {
 	updateAbilityModifier('intelligence');
 });
-on('change:wisdom wisdom_bonus', function () {
+on('change:wisdom', function () {
 	updateAbilityModifier('wisdom');
 });
-on('change:charisma charisma_bonus', function () {
+on('change:charisma', function () {
 	updateAbilityModifier('charisma');
 });
 
