@@ -32,13 +32,17 @@ var updateAbilityModifier = function (ability) {
 		collectionArray.push('strength_mod');
 	}
 
-
 	getAttrs(collectionArray, function (v) {
 		var calculatedAbilityMod = Math.floor((parseInt(v[ability], 10) - 10) / 2) + parseInt(v[ability + '_bonus'], 10);
 		finalSetAttrs[ability + '_mod'] = calculatedAbilityMod;
 
 		if(ability === 'strength') {
 			finalSetAttrs.finesse_mod = Math.max(calculatedAbilityMod, parseInt(v.dexterity_mod, 10) || 0);
+			var str = parseInt(v.strength, 10) || 0;
+			finalSetAttrs.carrying_capacity = str * 15;
+			finalSetAttrs.max_push_drag_lift = str * 30;
+			finalSetAttrs.encumbered = str * 5;
+			finalSetAttrs.heavily_encumbered = str * 10;
 		} else if(ability === 'dexterity') {
 			finalSetAttrs.finesse_mod = Math.max(calculatedAbilityMod, parseInt(v.strength_mod, 10) || 0);
 		}
