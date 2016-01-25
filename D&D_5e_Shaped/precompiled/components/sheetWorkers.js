@@ -87,10 +87,12 @@ var updateLevels = function () {
 		};
 
 		var hd = {
+			'd20': 0,
 			'd12': levels.barbarian,
 			'd10': levels.fighter + levels.paladin + levels.ranger,
 			'd8': levels.bard + levels.cleric + levels.druid + levels.monk + levels.rogue + levels.warlock,
-			'd6': levels.sorcerer + levels.wizard
+			'd6': levels.sorcerer + levels.wizard,
+			'd4': 0
 		};
 		var totalLevel = 0;
 		var levelString = '';
@@ -109,7 +111,7 @@ var updateLevels = function () {
 
 		for(var i = 0; i < 6; i++) {
 			var customClass = {
-				hd: parseInt(v['custom_class_hd_'+i], 10) || 6,
+				hd: parseInt(v['custom_class_hd_'+i], 10) || 8,
 				level: parseInt(v['custom_class_level_'+i], 10) || 0,
 				name: v['custom_class_name_'+i]
 			};
@@ -127,6 +129,13 @@ var updateLevels = function () {
 			}
 		}
 
+		if (hd.d20) {
+			finalSetAttrs.hd_d20_max = hd.d20;
+			finalSetAttrs.hd_d20_toggle = 'on';
+		} else {
+			finalSetAttrs.hd_d20_max = 0;
+			finalSetAttrs.hd_d20_toggle = '';
+		}
 		if (hd.d12) {
 			finalSetAttrs.hd_d12_max = hd.d12;
 			finalSetAttrs.hd_d12_toggle = 'on';
@@ -154,6 +163,13 @@ var updateLevels = function () {
 		} else {
 			finalSetAttrs.hd_d6_max = 0;
 			finalSetAttrs.hd_d6_toggle = '';
+		}
+		if (hd.d4) {
+			finalSetAttrs.hd_d4_max = hd.d4;
+			finalSetAttrs.hd_d4_toggle = 'on';
+		} else {
+			finalSetAttrs.hd_d4_max = 0;
+			finalSetAttrs.hd_d4_toggle = '';
 		}
 
 		var pb = 2 + Math.floor(Math.abs((totalLevel - 1)/4));
