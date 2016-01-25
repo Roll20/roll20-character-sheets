@@ -1,4 +1,8 @@
 <script type="text/worker">
+on("change:input", function() {
+    infoImport();
+});
+
 on("change:base_hp change:hp change:base_atk change:atk change:atk_stage change:base_def change:def change:def_stage change:base_spdef change:spdef change:spdef_stage change:base_spatk change:spatk change:spatk_stage  change:base_speed change:speed change:speed_stage", function() {
     statUp();
 });
@@ -146,6 +150,197 @@ on("change:repeating_moves:move_db5", function() {
         });
     });
 });
+
+
+    var infoImport = function() {
+        getAttrs(["input"], function (v) {
+            var char = JSON.parse(v.input);
+            var x; var t; var rmoves; var rcaps; var redges; var rabils; var ritems; var rfeats; var i;
+            getSectionIDs("repeating_moves", function(idarray) {
+                rmoves = idarray;
+            });
+            getSectionIDs("repeating_capabilities", function(idarray) {
+                rcaps = idarray;
+            });
+            getSectionIDs("repeating_edges", function(idarray) {
+                redges = idarray;
+            });
+            getSectionIDs("repeating_features", function(idarray) {
+                rfeats = idarray;
+            });
+            getSectionIDs("repeating_abilities", function(idarray) {
+                rabils = idarray;
+            });
+            if (rmoves==undefined){
+                rmoves=[];
+            }
+            if (rcaps==undefined){
+                rcaps=[];
+            }
+            if (redges==undefined){
+                redges=[];
+            }
+            if (rfeats==undefined){
+                rfeats=[];
+            }
+            if (rabils==undefined){
+                rabils=[];
+            }
+            for (var property in char) {
+                if (char.hasOwnProperty(property)) {
+                    if (property.match(/Move\d/g)!=null) {
+                        i = Number(property.substring(4));
+                        t = {};
+                        if (i<7){
+                            for (var prop in char[property]){
+                                if (char[property].hasOwnProperty(prop)){
+                                    x = property.concat("_").concat(prop);
+                                    t[x] = char[property][prop];
+                                }
+                            }
+                            setAttrs(t);
+                        } else if (i<7+rmoves.length){
+                            for (var prop in char[property]){
+                                if (char[property].hasOwnProperty(prop)){
+                                    x = "repeating_moves_".concat(rmoves[i-7]).concat("_Move_").concat(prop);
+                                    t[x] = char[property][prop];
+                                }
+                            }
+                            setAttrs(t);
+                        } else {
+                            i=generateRowID();
+                            for (var prop in char[property]){
+                                if (char[property].hasOwnProperty(prop)){
+                                    x = "repeating_moves_".concat(i).concat("_Move_").concat(prop);
+                                    t[x] = char[property][prop];
+                                }
+                            }
+                            setAttrs(t);
+                        }
+                    } else if (property.match(/Feature\d/g)!=null) {
+                        i = Number(property.substring(7));
+                        t = {};
+                        if (i<2){
+                            for (var prop in char[property]){
+                                if (char[property].hasOwnProperty(prop)){
+                                    x = "Feature".concat(prop);
+                                    t[x] = char[property][prop];
+                                }
+                            }
+                            setAttrs(t);
+                        } else if (i<2+rmoves.length){
+                            for (var prop in char[property]){
+                                if (char[property].hasOwnProperty(prop)){
+                                    x = "repeating_features_".concat(rfeats[i-2]).concat("_Feature_").concat(prop);
+                                    t[x] = char[property][prop];
+                                }
+                            }
+                            setAttrs(t);
+                        } else {
+                            i=generateRowID();
+                            for (var prop in char[property]){
+                                if (char[property].hasOwnProperty(prop)){
+                                    x = "repeating_features_".concat(i).concat("_Feature_").concat(prop);
+                                    t[x] = char[property][prop];
+                                }
+                            }
+                            setAttrs(t);
+                        }
+                    } else if (property.match(/Ability\d/g)!=null) {
+                        i = Number(property.substring(7));
+                        t = {};
+                        if (i<2){
+                            for (var prop in char[property]){
+                                if (char[property].hasOwnProperty(prop)){
+                                    x = "Ability".concat(prop);
+                                    t[x] = char[property][prop];
+                                }
+                            }
+                            setAttrs(t);
+                        } else if (i<2+rabils.length){
+                            for (var prop in char[property]){
+                                if (char[property].hasOwnProperty(prop)){
+                                    x = "repeating_abilities_".concat(rabils[i-2]).concat("_Ability_").concat(prop);
+                                    t[x] = char[property][prop];
+                                }
+                            }
+                            setAttrs(t);
+                        } else {
+                            i=generateRowID();
+                            for (var prop in char[property]){
+                                if (char[property].hasOwnProperty(prop)){
+                                    x = "repeating_abilities_".concat(i).concat("_Ability_").concat(prop);
+                                    t[x] = char[property][prop];
+                                }
+                            }
+                            setAttrs(t);
+                        }
+                    } else if (property.match(/Edge\d/g)!=null) {
+                        i = Number(property.substring(4));
+                        t = {};
+                        if (i<redges.length){
+                            for (var prop in char[property]){
+                                if (char[property].hasOwnProperty(prop)){
+                                    x = "repeating_edges_".concat(rabils[i]).concat("_Edge").concat(prop);
+                                    t[x] = char[property][prop];
+                                }
+                            }
+                            setAttrs(t);
+                        } else {
+                            i=generateRowID();
+                            for (var prop in char[property]){
+                                if (char[property].hasOwnProperty(prop)){
+                                    x = "repeating_edges_".concat(i).concat("_Edge").concat(prop);
+                                    t[x] = char[property][prop];
+                                }
+                            }
+                            setAttrs(t);
+                        }
+                    } 
+                    else if (property=="Capabilities"){
+                        x = 0;
+                        for (var prop in char[property]) {
+                            if (char[property].hasOwnProperty(prop)) {
+                                if (prop=="Overland"||prop=="Swim"||prop=="HJ"||prop=="LJ"||prop=="Power") {
+                                    t={};
+                                    t[prop]=char[property][prop];
+                                    setAttrs(t);
+                                } else if (char[property][prop]==true){
+                                    if (x<rcaps.length-1) {
+                                        t={};
+                                        t["repeating_capabities_".concat(rcaps[x]).concat("_Capability")]=prop;
+                                        setAttrs(t);
+                                    } else {
+                                        i=generateRowID();
+                                        t={};
+                                        t["repeating_capabities_".concat(i).concat("_Capability")]=prop;
+                                        setAttrs(t);
+                                    }
+                                    x++;
+                                } else if (char[property][prop]!=0){
+                                    if (x<rcaps.length-1) {
+                                        t={};
+                                        t["repeating_capabities_".concat(rcaps[x]).concat("_Capability")]=prop;
+                                        t["repeating_capabities_".concat(rcaps[x]).concat("_Capability_Rank")]=char[property][prop];
+                                        setAttrs(t);
+                                    } else {
+                                        i=generateRowID();
+                                        t["repeating_capabities_".concat(i).concat("_Capability")]=prop;
+                                        t["repeating_capabities_".concat(i).concat("_Capability_Rank")]=char[property][prop];
+                                        setAttrs(t);
+                                    }
+                                    x++;
+                                }
+                            }
+                        }
+                    } else {
+                        t={};
+                        t[property]=char[property];
+                        setAttrs(t);}
+                }
+            }
+        });
+    };
 
     var statUp = function(){
         getAttrs(["base_HP","HP","base_ATK","ATK","ATK_Stage","base_DEF","DEF","DEF_Stage","base_SPATK","SPATK","SPATK_Stage","base_SPDEF","SPDEF","SPDEF_Stage","base_SPEED","SPEED","SPEED_Stage"], function(v) {
@@ -367,8 +562,9 @@ on("change:repeating_moves:move_db5", function() {
     </table>
 </rolltemplate>
 <input type="radio" name="attr_tab" class="sheet-oldtab sheet-oldtab1" value="1" title="Traditional Page" checked="checked" />
-<input type="radio" name="attr_tab" class="sheet-oldtab sheet-oldtab2" value="2" title="Tabbed Page" checked="checked" />
+<input type="radio" name="attr_tab" class="sheet-oldtab sheet-oldtab2" value="2" title="Tabbed Page" />
 <input type="radio" name="attr_tab" class="sheet-oldtab sheet-oldtab3" value="3" title="Roll Page" />
+<input type="radio" name="attr_tab" class="sheet-oldtab sheet-oldtab4" value="4" title="Import Page" />
 
 <div class="sheet-oldtab-br"></div>
 
@@ -1522,7 +1718,7 @@ on("change:repeating_moves:move_db5", function() {
                 <td><button type='roll' value='&{template:PTU} {{dis=Feature}} {{desc=@{FeatureInfo}}} {{nick=@{nickname}}} {{name=@{FeatureName}}} {{freq=@{FeatureFreq}}} {{tar=@{FeatureTarget}}}' name='roll_FeatRoll' /> Show</td>
             </tr>
         </table>
-        <fieldset class='repeating_abilities'>
+        <fieldset class='repeating_features'>
             <br/>
             <h4 class='sheet-minihead'>Feature</h4>
             <table class='sheet-table'>
@@ -2829,7 +3025,7 @@ on("change:repeating_moves:move_db5", function() {
                 <td><button type='roll' value='&{template:PTU} {{dis=Feature}} {{desc=@{FeatureInfo}}} {{nick=@{nickname}}} {{name=@{FeatureName}}} {{freq=@{FeatureFreq}}} {{tar=@{FeatureTarget}}}' name='roll_FeatRoll' /> Show</td>
             </tr>
         </table>
-        <fieldset class='repeating_abilities'>
+        <fieldset class='repeating_features'>
             <br/>
             <h4 class='sheet-minihead'>Feature</h4>
             <table class='sheet-big-table'>
@@ -3119,4 +3315,7 @@ on("change:repeating_moves:move_db5", function() {
     </div>
 </div>
 </div>
+</div>
+<div class="sheet-oldtab4" style="background-color:#f2f2f2;"> 
+    <textarea class='sheet-textarea' name='attr_input'></textarea>
 </div>
