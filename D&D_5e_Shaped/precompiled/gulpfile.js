@@ -252,14 +252,6 @@ function processDate() {
 	return date + ordinal(date) + ' ' + months[month] + ' ' + year;
 }
 
-gulp.task('sheetWorkers', function () {
-	return gulp.src(['./components/sheetWorkers/sheetWorkers.js'])
-		.pipe(uglify())
-		.pipe(wrap('<script type="text/worker">\n<%= contents %>\n</script>'))
-		.pipe(rename('sheetWorkers.html'))
-		.pipe(gulp.dest('./'));
-});
-
 gulp.task('preCompile', function () {
 	return gulp.src('./D&D_5e.html')
 		.pipe(replace({
