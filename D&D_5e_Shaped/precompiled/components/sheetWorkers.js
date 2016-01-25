@@ -130,18 +130,30 @@ var updateLevels = function () {
 		if (hd.d12) {
 			finalSetAttrs.hd_d12_max = hd.d12;
 			finalSetAttrs.hd_d12_toggle = 'on';
+		} else {
+			finalSetAttrs.hd_d12_max = 0;
+			finalSetAttrs.hd_d12_toggle = '';
 		}
 		if (hd.d10) {
 			finalSetAttrs.hd_d10_max = hd.d10;
 			finalSetAttrs.hd_d10_toggle = 'on';
+		} else {
+			finalSetAttrs.hd_d10_max = 0;
+			finalSetAttrs.hd_d10_toggle = '';
 		}
 		if (hd.d8) {
 			finalSetAttrs.hd_d8_max = hd.d8;
 			finalSetAttrs.hd_d8_toggle = 'on';
+		} else {
+			finalSetAttrs.hd_d8_max = 0;
+			finalSetAttrs.hd_d8_toggle = '';
 		}
 		if (hd.d6) {
 			finalSetAttrs.hd_d6_max = hd.d6;
 			finalSetAttrs.hd_d6_toggle = 'on';
+		} else {
+			finalSetAttrs.hd_d6_max = 0;
+			finalSetAttrs.hd_d6_toggle = '';
 		}
 
 		var pb = 2 + Math.floor(Math.abs((totalLevel - 1)/4));
