@@ -229,14 +229,14 @@ var sumRepeating = function (options) {
 	});
 };
 
-on('change:repeating_inventory', function () {
+on('change:repeating_equipment', function () {
 	sumRepeating({
-		collection: 'inventory',
+		collection: 'equipment',
 		toggle: 'carried',
 		qty: 'qty',
 		fieldToAdd: 'weight',
 		itemTotal: 'weight_total',
-		totalField: 'weight_inventory'
+		totalField: 'weight_equipment'
 	});
 });
 
