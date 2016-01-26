@@ -299,25 +299,25 @@ gulp.task('preCompile', function () {
 				return duplicate(file, customSkillCount, 1);
 			}
 		}))
-		.pipe(inject(gulp.src(['./components/traits/traits.html']), {
+		.pipe(inject(gulp.src(['./components/actions/traits.html']), {
 			starttag: '<!-- inject:traits:{{ext}} -->',
 			transform: function (filePath, file) {
 				return duplicate(file, traitsCount);
 			}
 		}))
-		.pipe(inject(gulp.src(['./components/actions/actions.html']), {
+		.pipe(inject(gulp.src(['./components/actions/action.html']), {
 			starttag: '<!-- inject:lairActions:{{ext}} -->',
 			transform: function (filePath, file) {
 				return actionsCompile(file, lairActionCount, 'lair_', 'Lair');
 			}
 		}))
-		.pipe(inject(gulp.src(['./components/actions/actions.html']), {
+		.pipe(inject(gulp.src(['./components/actions/action.html']), {
 			starttag: '<!-- inject:legendaryActions:{{ext}} -->',
 			transform: function (filePath, file) {
 				return actionsCompile(file, legendaryActionCount, 'legendary_', 'Legendary');
 			}
 		}))
-		.pipe(inject(gulp.src(['./components/actions/actions.html']), {
+		.pipe(inject(gulp.src(['./components/actions/action.html']), {
 			starttag: '<!-- inject:actions:{{ext}} -->',
 			transform: function (filePath, file) {
 				return actionsCompile(file, actionCount, '', 'Action');
@@ -398,7 +398,7 @@ gulp.task('minify-css', ['sass'], function () {
 });
 
 gulp.task('compile', ['preCompile', 'minify-css'], function () {
-	return gulp.src(['../D&D_5e.html', './pages/roll_template.html'])
+	return gulp.src(['../D&D_5e.html', './components/rollTemplate.html'])
 		.pipe(concat('D&D_5e.html'))
 		.pipe(gulp.dest('../'));
 });
