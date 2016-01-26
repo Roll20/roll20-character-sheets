@@ -12,7 +12,7 @@ var wrap = require('gulp-wrap');
 var change = require('gulp-change');
 var fs = require('fs');
 
-var customSkillCount = 4;
+var customSkillCount = 6;
 var traitsCount = 1;
 var actionCount = 12;
 var lairActionCount = 4;
