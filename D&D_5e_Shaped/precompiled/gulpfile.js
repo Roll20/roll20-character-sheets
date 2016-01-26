@@ -17,7 +17,6 @@ var traitsCount = 1;
 var actionCount = 12;
 var lairActionCount = 4;
 var legendaryActionCount = 4;
-var quickClassActions = 5;
 var classActionsPerPage = 20;
 var customClassCount = 6;
 var spellCount = 10;
@@ -327,12 +326,6 @@ gulp.task('preCompile', function () {
 			starttag: '<!-- inject:class:{{ext}} -->',
 			transform: function (filePath, file) {
 				return duplicate(file, classActionsPerPage, 1);
-			}
-		}))
-		.pipe(inject(gulp.src(['./components/class/quick_class_action.html']), {
-			starttag: '<!-- inject:quickClassActions:{{ext}} -->',
-			transform: function (filePath, file) {
-				return duplicate(file, quickClassActions, 1);
 			}
 		}))
 		.pipe(inject(gulp.src(['./components/class/custom_class.html']), {
