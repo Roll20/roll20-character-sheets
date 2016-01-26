@@ -193,8 +193,6 @@ on('change:barbarian_level change:bard_level change:cleric_level change:druid_le
 	updateLevels();
 });
 
-
-/*
 var sumRepeating = function (options) {
 	var repeatingItem = 'repeating_' + options.collection;
 	var collectionArray = [];
@@ -221,6 +219,11 @@ var sumRepeating = function (options) {
 		}
 
 		getAttrs(collectionArray, function (v) {
+
+			if (options.armor_type) {
+				var dexMod = parseInt(v.dexterity_mod, 10);
+			}
+
 			for (var j = 0; j < ids.length; j++) {
 				var toggle = v[repeatingItem+'_' + ids[j] + '_' + options.toggle];
 				if(toggle === 'undefined' || toggle === 'on') {
@@ -235,19 +238,15 @@ var sumRepeating = function (options) {
 					if(options.armor_type) {
 						var armorType = v[repeatingItem+'_' + ids[j] + '_' + options.armor_type];
 						var attributeBonus = 0;
-						var dexMod = parseInt(v.dexterity_mod, 10);
 						if(armorType === 'light') {
 							attributeBonus = dexMod;
 						} else if (armorType === 'medium') {
-							var mediumArmorDexMod = parseInt(v.medium_armor_max_dex, 10);
+							var mediumArmorDexMod = parseInt(v.medium_armor_max_dex, 10) || 2;
 							attributeBonus = Math.min(mediumArmorDexMod, dexMod);
-						} else {
-							attributeBonus = 0;
 						}
-						console.log('attributeBonus', attributeBonus);
 						fieldToAdd += attributeBonus;
 					}
-					var itemTotal = qty * fieldToAdd;
+					var itemTotal = Math.round(qty * fieldToAdd * 100) / 100;
 
 					if(options.itemTotal) {
 						finalSetAttrs[repeatingItem+'_' + ids[j] + '_' + options.itemTotal] = itemTotal;
@@ -256,6 +255,19 @@ var sumRepeating = function (options) {
 					finalSetAttrs[options.totalField] += itemTotal;
 				}
 			}
+
+			if(options.armor_type) {
+				var unarmoredACAbility = parseFloat(v.ac_unarmored_ability_bonus) || 0;
+				var unarmoredACBonus = parseFloat(v.ac_unarmored_bonus) || 0;
+
+				finalSetAttrs.ac_unarmored_calc = 10 + dexMod + unarmoredACAbility + unarmoredACBonus;
+
+				var acBonus = parseFloat(v.global_ac_bonus) || 0;
+
+				finalSetAttrs.ac = Math.max(finalSetAttrs[options.totalField], finalSetAttrs.ac_unarmored_calc) + acBonus;
+			}
+
+			console.log('sumRepeating', finalSetAttrs);
 			setAttrs(finalSetAttrs);
 		});
 	});
@@ -281,7 +293,7 @@ on('change:repeating_armor change:medium_armor_max_dex', function () {
 	});
 	sumRepeating({
 		collection: 'armor',
-		getExtraFields: ['dexterity_mod', 'medium_armor_max_dex'],
+		getExtraFields: ['dexterity_mod', 'medium_armor_max_dex', 'ac_unarmored_ability_bonus', 'ac_unarmored_bonus', 'global_ac_bonus'],
 		toggle: 'worn',
 		fieldToAdd: 'ac_base',
 		bonus: 'ac_bonus',
@@ -289,26 +301,7 @@ on('change:repeating_armor change:medium_armor_max_dex', function () {
 		itemTotal: 'ac_total',
 		totalField: 'ac_armored_calc'
 	});
-	updateAC();
 });
-
-var updateAC = function () {
-	getAttrs(['dexterity_mod', 'ac_armored_calc', 'ac_unarmored_ability_bonus', 'ac_unarmored_bonus', 'global_ac_bonus'], function (v) {
-		var finalSetAttrs = {};
-		var dexMod = parseInt(v.dexterity_mod, 10);
-		var armoredAC = parseFloat(v.ac_armored_calc) || 0;
-		var unarmoredACAbility = parseFloat(v.ac_unarmored_ability_bonus) || 0;
-		var unarmoredACBonus = parseFloat(v.ac_unarmored_bonus) || 0;
-		var acBonus = parseFloat(v.global_ac_bonus) || 0;
-
-		finalSetAttrs.ac_unarmored_calc = 10 + dexMod + unarmoredACAbility + unarmoredACBonus;
-
-		finalSetAttrs.pc_ac = Math.max(armoredAC, finalSetAttrs.ac_unarmored_calc) + acBonus;
-		setAttrs(finalSetAttrs);
-	});
-};
-
-*/
 
 on('change:repeating_attack', function () {
 	updateAttack();
