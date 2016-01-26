@@ -225,33 +225,33 @@ var sumRepeating = function (options) {
 			}
 
 			for (var j = 0; j < ids.length; j++) {
+				var qty = 1;
+				if(options.qty) {
+					qty = parseInt(v[repeatingItem+'_' + ids[j] + '_' + options.qty], 10) || 1;
+				}
+				var fieldToAdd = parseFloat(v[repeatingItem+'_' + ids[j] + '_' + options.fieldToAdd]) || 0;
+				if(options.bonus) {
+					fieldToAdd += parseFloat(v[repeatingItem+'_' + ids[j] + '_' + options.bonus]) || 0;
+				}
+				if(options.armor_type) {
+					var armorType = v[repeatingItem+'_' + ids[j] + '_' + options.armor_type];
+					var attributeBonus = 0;
+					if(armorType === 'light') {
+						attributeBonus = dexMod;
+					} else if (armorType === 'medium') {
+						var mediumArmorDexMod = parseInt(v.medium_armor_max_dex, 10) || 2;
+						attributeBonus = Math.min(mediumArmorDexMod, dexMod);
+					}
+					fieldToAdd += attributeBonus;
+				}
+				var itemTotal = Math.round(qty * fieldToAdd * 100) / 100;
+
+				if(options.itemTotal) {
+					finalSetAttrs[repeatingItem+'_' + ids[j] + '_' + options.itemTotal] = itemTotal;
+				}
+
 				var toggle = v[repeatingItem+'_' + ids[j] + '_' + options.toggle];
-				if(toggle === 'undefined' || toggle === 'on') {
-					var qty = 1;
-					if(options.qty) {
-						qty = parseInt(v[repeatingItem+'_' + ids[j] + '_' + options.qty], 10) || 1;
-					}
-					var fieldToAdd = parseFloat(v[repeatingItem+'_' + ids[j] + '_' + options.fieldToAdd]) || 0;
-					if(options.bonus) {
-						fieldToAdd += parseFloat(v[repeatingItem+'_' + ids[j] + '_' + options.bonus]) || 0;
-					}
-					if(options.armor_type) {
-						var armorType = v[repeatingItem+'_' + ids[j] + '_' + options.armor_type];
-						var attributeBonus = 0;
-						if(armorType === 'light') {
-							attributeBonus = dexMod;
-						} else if (armorType === 'medium') {
-							var mediumArmorDexMod = parseInt(v.medium_armor_max_dex, 10) || 2;
-							attributeBonus = Math.min(mediumArmorDexMod, dexMod);
-						}
-						fieldToAdd += attributeBonus;
-					}
-					var itemTotal = Math.round(qty * fieldToAdd * 100) / 100;
-
-					if(options.itemTotal) {
-						finalSetAttrs[repeatingItem+'_' + ids[j] + '_' + options.itemTotal] = itemTotal;
-					}
-
+				if (toggle !== 0) {
 					finalSetAttrs[options.totalField] += itemTotal;
 				}
 			}
@@ -305,10 +305,16 @@ on('change:repeating_armor change:medium_armor_max_dex', function () {
 
 on('change:repeating_attack', function () {
 	updateAttack();
+
+	sumRepeating({
+		collection: 'attack',
+		toggle: 'carried',
+		fieldToAdd: 'weight',
+		totalField: 'weight_weapons'
+	});
 });
 
 var updateAttack = function () {
-
 	var repeatingItem = 'repeating_attack';
 	var collectionArray = ['pb', 'finesse_mod', 'strength_mod', 'dexterity_mod', 'constitution_mod', 'intelligence_mod', 'wisdom_mod', 'charisma_mod'];
 	var finalSetAttrs = {};
