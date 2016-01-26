@@ -219,7 +219,6 @@ var sumRepeating = function (options) {
 		}
 
 		getAttrs(collectionArray, function (v) {
-
 			if (options.armor_type) {
 				var dexMod = parseInt(v.dexterity_mod, 10);
 			}
@@ -251,7 +250,7 @@ var sumRepeating = function (options) {
 				}
 
 				var toggle = v[repeatingItem+'_' + ids[j] + '_' + options.toggle];
-				if (toggle !== 0) {
+				if (toggle !== 0 && toggle !== '0') {
 					finalSetAttrs[options.totalField] += itemTotal;
 				}
 			}
@@ -273,17 +272,6 @@ var sumRepeating = function (options) {
 	});
 };
 
-on('change:repeating_equipment', function () {
-	sumRepeating({
-		collection: 'equipment',
-		toggle: 'carried',
-		qty: 'qty',
-		fieldToAdd: 'weight',
-		itemTotal: 'weight_total',
-		totalField: 'weight_equipment'
-	});
-});
-
 on('change:repeating_armor change:medium_armor_max_dex', function () {
 	sumRepeating({
 		collection: 'armor',
@@ -300,6 +288,17 @@ on('change:repeating_armor change:medium_armor_max_dex', function () {
 		armor_type: 'type',
 		itemTotal: 'ac_total',
 		totalField: 'ac_armored_calc'
+	});
+});
+
+on('change:repeating_equipment', function () {
+	sumRepeating({
+		collection: 'equipment',
+		toggle: 'carried',
+		qty: 'qty',
+		fieldToAdd: 'weight',
+		itemTotal: 'weight_total',
+		totalField: 'weight_equipment'
 	});
 });
 
