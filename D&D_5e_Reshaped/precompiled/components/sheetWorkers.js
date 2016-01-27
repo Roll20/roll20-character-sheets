@@ -323,6 +323,8 @@ var updateAttack = function () {
 			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'proficient');
 			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'attack_stat');
 			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'attack_bonus');
+			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'saving_throw_stat');
+			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'saving_throw_bonus');
 			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'damage');
 			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'damage_stat');
 			collectionArray.push(repeatingItem+'_' + ids[i] + '_' + 'damage_bonus');
@@ -338,11 +340,13 @@ var updateAttack = function () {
 				var toHit = 0;
 				var proficient = v[repeatingItem+'_' + ids[j] + '_' + 'proficient'];
 				if(!proficient || proficient === 'on') {
-					toHit += 2;
+					toHit += v.pb;
 				}
 
 				var attackStat = v[repeatingItem+'_' + ids[j] + '_' + 'attack_stat'];
-				if(attackStat && attackStat !== 0 && attackStat !== '0') {
+				if (!attackStat) {
+					attackStat += parseInt(v.strength_mod, 10);
+				} else if(attackStat !== 0 && attackStat !== '0') {
 					attackStat = attackStat.replace(/\W/g, '');
 					toHit += parseInt(v[attackStat], 10);
 				}
@@ -350,8 +354,21 @@ var updateAttack = function () {
 				if(attackBonus && attackBonus !== 0 && attackBonus !== '0') {
 					toHit += parseInt(attackBonus, 10);
 				}
-
 				finalSetAttrs[repeatingItem+'_' + ids[j] + '_' + 'to_hit'] = toHit;
+
+
+				var savingThrowDC = 8 + v.pb;
+				var savingThrowStat = v[repeatingItem+'_' + ids[j] + '_' + 'saving_throw_stat'];
+				if(savingThrowStat && savingThrowStat !== 0 && savingThrowStat !== '0') {
+					savingThrowStat = savingThrowStat.replace(/\W/g, '');
+					savingThrowDC += parseInt(v[savingThrowStat], 10);
+				}
+				var savingThrowBonus = v[repeatingItem+'_' + ids[j] + '_' + 'saving_throw_bonus'];
+				if(savingThrowBonus && savingThrowBonus !== 0 && savingThrowBonus !== '0') {
+					savingThrowDC += parseInt(savingThrowBonus, 10);
+				}
+				finalSetAttrs[repeatingItem+'_' + ids[j] + '_' + 'saving_throw_total'] = toHit;
+
 
 				var damageString = '';
 				var damageBonus = 0;
