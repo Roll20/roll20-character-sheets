@@ -115,8 +115,6 @@ function skills(file) {
 	var skills = [];
 
 	skillsJson.forEach(function (skill) {
-		console.log('wee', 'ABILITIES.' + skill.attribute.lowercase() + '.SHORT_NAME_CAPITAL');
-
 		skills.push(template
 				.replace(/\x7B\x7Bname\x7D\x7D/g, skill.name.lowercase().replace(/ +/g, ''))
 				.replace(/\x7B\x7Battribute\x7D\x7D/g, skill.attribute.substring(0,3).capitalize())
