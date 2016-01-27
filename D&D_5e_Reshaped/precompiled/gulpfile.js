@@ -117,8 +117,9 @@ function skills(file) {
 	skillsJson.forEach(function (skill) {
 		skills.push(template
 				.replace(/\x7B\x7Bname\x7D\x7D/g, skill.name.lowercase().replace(/ +/g, ''))
-				.replace(/\x7B\x7Battribute\x7D\x7D/g, skill.attribute.substring(0,3).capitalize())
-				.replace(/\x7B\x7BattributeTranslated\x7D\x7D/g, translate('ABILITIES.' + skill.attribute.lowercase() + '.SHORT_NAME_CAPITAL'))
+				.replace(/\x7B\x7Battribute\x7D\x7D/g, skill.attribute)
+				.replace(/\x7B\x7BattributeShort\x7D\x7D/g, skill.attribute.substring(0,3).capitalize())
+				.replace(/\x7B\x7BattributeTranslated\x7D\x7D/g, translate('ABILITIES.' + skill.attribute + '.SHORT_NAME_CAPITAL'))
 				.replace(/\x7B\x7BnameTranslatedEn\x7D\x7D/g, skillEn('SKILLS.' + skill.name + '.NAME'))
 				.replace(/\x7B\x7BnameTranslated\x7D\x7D/g, translate('SKILLS.' + skill.name + '.NAME'))
 		);
