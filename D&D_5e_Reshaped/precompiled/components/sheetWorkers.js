@@ -380,7 +380,7 @@ var updateAttack = function () {
 				var savingThrowAttribute = v[repeatingString + 'saving_throw_attribute'];
 				savingThrowDC += getAttributeValue(v, savingThrowAttribute, 'strength_mod');
 				savingThrowDC += getNumericValue(v[repeatingString + 'saving_throw_bonus']);
-				finalSetAttrs[repeatingString + 'saving_throw_total'] = savingThrowDC;
+				finalSetAttrs[repeatingString + 'saving_throw_dc'] = savingThrowDC;
 
 				var damageString = '';
 				var damageBonus = 0;
