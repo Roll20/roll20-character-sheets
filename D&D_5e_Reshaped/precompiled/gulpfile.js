@@ -6,6 +6,7 @@ var minifyHTML = require('gulp-minify-html');
 var minifyCss = require('gulp-minify-css');
 var concat = require('gulp-concat');
 var sass = require('gulp-sass');
+var sassLint = require('gulp-sass-lint');
 var replace = require('gulp-replace-task');
 var rename = require('gulp-rename');
 var wrap = require('gulp-wrap');
@@ -293,6 +294,16 @@ gulp.task('preCompile', function () {
 		}))
 		.pipe(gulp.dest('../'));
 });
+
+var sassConfig = {
+	rules: {
+		'clean-import-paths': 0,
+		'force-element-nesting': 0,
+		'hex-length': 'long',
+		'empty-line-between-blocks': 0,
+		include: 0
+	}
+};
 
 gulp.task('sass', function () {
 	return gulp.src('./D&D_5e.scss')
