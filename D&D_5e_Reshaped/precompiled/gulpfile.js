@@ -307,6 +307,11 @@ var sassConfig = {
 
 gulp.task('sass', function () {
 	return gulp.src('./D&D_5e.scss')
+		/*
+		.pipe(sassLint(sassConfig))
+		.pipe(sassLint.format())
+		.pipe(sassLint.failOnError())
+		*/
 		.pipe(sass().on('error', sass.logError))
 		.pipe(gulp.dest('../'));
 });
