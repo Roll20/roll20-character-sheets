@@ -329,12 +329,12 @@ var getNumericValue = function (value) {
 	return parseInt(value, 10) || 0;
 };
 
-var concatenateIfExists = function (value, concatenator) {
+var concatenateIfExists = function (value, joiner) {
 	if (value === 0 || value === '0' || value === '' || !value) {
 		return '';
 	}
-	if (concatenator) {
-		value += concatenator;
+	if (joiner) {
+		value = joiner + value;
 	}
 	return value;
 };
@@ -384,25 +384,21 @@ var updateAttack = function () {
 
 				var damageString = '';
 				var damageBonus = 0;
-				if (v[repeatingString + 'damage']) {
+				if (v[repeatingString + 'damage'] || v[repeatingString + 'damage_attribute'] || v[repeatingString + 'damage_bonus'] || v[repeatingString + 'damage_type']) {
 					damageString += concatenateIfExists(v[repeatingString + 'damage']);
 
-					if (v[repeatingString + 'damage_attribute']) {
-						damageBonus += getAttributeValue(v, v[repeatingString + 'damage_attribute'], 'strength_mod');
-					}
-					damageBonus += getNumericValue(v[repeatingString + 'damage_bonus']);
+					damageBonus += getAttributeValue(v, v[repeatingString + 'damage_attribute'], 'strength_mod');
+					damageBonus += getNumericValue(v[repeatingString + 'damage_bonus'], ' + ');
 
 					damageString += concatenateIfExists(damageBonus, ' + ');
 					damageString += concatenateIfExists(v[repeatingString + 'damage_type'], ' ');
 				}
 
 				var secondDamageBonus = 0;
-				if (v[repeatingString + 'second_damage']) {
+				if (v[repeatingString + 'second_damage'] || v[repeatingString + 'second_damage_attribute'] || v[repeatingString + 'second_damage_bonus'] || v[repeatingString + 'second_damage_type']) {
 					damageString += concatenateIfExists(v[repeatingString + 'second_damage'], ' + ');
 
-					if (v[repeatingString + 'second_damage_attribute']) {
-						secondDamageBonus += getAttributeValue(v, v[repeatingString + 'second_damage_attribute']);
-					}
+					secondDamageBonus += getAttributeValue(v, v[repeatingString + 'second_damage_attribute']);
 					secondDamageBonus += getNumericValue(v[repeatingString + 'second_damage_bonus']);
 
 					damageString += concatenateIfExists(secondDamageBonus, ' + ');
