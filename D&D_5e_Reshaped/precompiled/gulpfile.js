@@ -18,7 +18,6 @@ var actionCount = 12;
 var lairActionCount = 4;
 var legendaryActionCount = 4;
 var customClassCount = 6;
-var spellCount = 10;
 var abilitiesName = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'];
 var translations = {};
 
@@ -90,44 +89,6 @@ function actionsCompile(file, limit, type, name) {
 				.replace(/\x7B\x7Bnum\x7D\x7D/g, i.toString())
 				.replace(/\x7B\x7Bname\x7D\x7D/g, name)
 		);
-	}
-	return s.join('\n\n');
-}
-function spell(file, limit, start) {
-	var s = [];
-
-	if (!start) {
-		start = 0;
-	} else if (start > 0) {
-		limit += start;
-	}
-
-	for (var i = start; i < limit; i++) {
-		var template = file.contents.toString('utf8').replace(/\x7B\x7Bnum\x7D\x7D/g, i.toString());
-
-		if (i === 0) {
-			template = template
-				.replace(/\x7B\x7Blevel_num\x7D\x7D/g, 'cantrip')
-				.replace(/\x7B\x7Blevel_num_readable\x7D\x7D/g, 'Cantrip')
-				.replace(/\x7B\x7Bhidden_if_cantrip\x7D\x7D/g, ' hidden')
-				.replace(/\x7B\x7Bchecked_if_cantrip\x7D\x7D/g, ' checked')
-				.replace(/\x7B\x7BhigherLevelQuery\x7D\x7D/g, '');
-		} else {
-			var higherLevelQuery = '?{Spell Level';
-			for (var j = i; j < limit; j++) {
-				higherLevelQuery += '|' + j;
-			}
-			higherLevelQuery += '}';
-
-			template = template
-				.replace(/\x7B\x7Blevel_num\x7D\x7D/g, 'level' + i.toString())
-				.replace(/\x7B\x7Blevel_num_readable\x7D\x7D/g, 'Level ' + i.toString())
-				.replace(/\x7B\x7Bhidden_if_cantrip\x7D\x7D/g, '')
-				.replace(/\x7B\x7Bchecked_if_cantrip\x7D\x7D/g, '')
-				.replace(/\x7B\x7BhigherLevelQuery\x7D\x7D/g, higherLevelQuery);
-		}
-
-		s.push(template);
 	}
 	return s.join('\n\n');
 }
@@ -325,12 +286,6 @@ gulp.task('preCompile', function () {
 			starttag: '<!-- inject:custom_class:{{ext}} -->',
 			transform: function (filePath, file) {
 				return duplicate(file, customClassCount);
-			}
-		}))
-		.pipe(inject(gulp.src(['./components/spells/spell-page.html']), {
-			starttag: '<!-- inject:spells:{{ext}} -->',
-			transform: function (filePath, file) {
-				return spell(file, spellCount);
 			}
 		}))
 		.pipe(inject(gulp.src(['./components/macros/saves.html']), {
