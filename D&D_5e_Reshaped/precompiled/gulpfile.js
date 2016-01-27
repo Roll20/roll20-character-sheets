@@ -114,46 +114,15 @@ function skills(file) {
 	var skillsJson = require('./components/skills/skills.json').skills;
 	var skills = [];
 
-	var selectedString = ' selected="selected"';
-
 	skillsJson.forEach(function (skill) {
-		var ggTemplate = template;
-		if (skill.attribute === 'str') {
-			ggTemplate = ggTemplate.replace(/\x7B\x7Bstr_selected\x7D\x7D/g, selectedString);
-		} else {
-			ggTemplate = ggTemplate.replace(/\x7B\x7Bstr_selected\x7D\x7D/g, '');
-		}
-		if (skill.attribute === 'dex') {
-			ggTemplate = ggTemplate.replace(/\x7B\x7Bdex_selected\x7D\x7D/g, selectedString);
-		} else {
-			ggTemplate = ggTemplate.replace(/\x7B\x7Bdex_selected\x7D\x7D/g, '');
-		}
-		if (skill.attribute === 'con') {
-			ggTemplate = ggTemplate.replace(/\x7B\x7Bcon_selected\x7D\x7D/g, selectedString);
-		} else {
-			ggTemplate = ggTemplate.replace(/\x7B\x7Bcon_selected\x7D\x7D/g, '');
-		}
-		if (skill.attribute === 'int') {
-			ggTemplate = ggTemplate.replace(/\x7B\x7Bint_selected\x7D\x7D/g, selectedString);
-		} else {
-			ggTemplate = ggTemplate.replace(/\x7B\x7Bint_selected\x7D\x7D/g, '');
-		}
-		if (skill.attribute === 'wis') {
-			ggTemplate = ggTemplate.replace(/\x7B\x7Bwis_selected\x7D\x7D/g, selectedString);
-		} else {
-			ggTemplate = ggTemplate.replace(/\x7B\x7Bwis_selected\x7D\x7D/g, '');
-		}
-		if (skill.attribute === 'cha') {
-			ggTemplate = ggTemplate.replace(/\x7B\x7Bcha_selected\x7D\x7D/g, selectedString);
-		} else {
-			ggTemplate = ggTemplate.replace(/\x7B\x7Bcha_selected\x7D\x7D/g, '');
-		}
+		console.log('wee', 'ABILITIES.' + skill.attribute.lowercase() + '.SHORT_NAME_CAPITAL');
 
-		skills.push(ggTemplate
+		skills.push(template
 				.replace(/\x7B\x7Bname\x7D\x7D/g, skill.name.lowercase().replace(/ +/g, ''))
-				.replace(/\x7B\x7Battribute\x7D\x7D/g, skill.attribute.capitalize())
-				.replace(/\x7B\x7BtranslatedNameEn\x7D\x7D/g, skillEn('SKILLS.' + skill.name + '.NAME'))
-				.replace(/\x7B\x7BtranslatedName\x7D\x7D/g, translate('SKILLS.' + skill.name + '.NAME'))
+				.replace(/\x7B\x7Battribute\x7D\x7D/g, skill.attribute.substring(0,3).capitalize())
+				.replace(/\x7B\x7BattributeTranslated\x7D\x7D/g, translate('ABILITIES.' + skill.attribute.lowercase() + '.SHORT_NAME_CAPITAL'))
+				.replace(/\x7B\x7BnameTranslatedEn\x7D\x7D/g, skillEn('SKILLS.' + skill.name + '.NAME'))
+				.replace(/\x7B\x7BnameTranslated\x7D\x7D/g, translate('SKILLS.' + skill.name + '.NAME'))
 		);
 	});
 	return skills.join('\n\n');
