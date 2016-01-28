@@ -134,10 +134,10 @@ function saveQuery(file) {
 
 	for (var i = 0; i < abilitiesName.length; ++i) {
 		var ability = abilitiesName[i];
-		query += '|' + ability + ', {{title=' + ability + '&amp;#125;&amp;#125; {{roll=[[d20@{d20_mod} + @{' + ability.toLowerCase() + '_save_mod}]]&amp;#125;&amp;#125; {{rolladv=[[d20@{d20_mod} + @{' + ability.toLowerCase() + '_save_mod}]]&amp;#125;&amp;#125;';
+		query += '|' + ability + ', {{title=' + ability + '&amp;#125;&amp;#125; {{roll=[[d20@{d20_mod} + @{' + ability.toLowerCase() + '_save_mod}]]&amp;#125;&amp;#125; {{roll_adv=[[d20@{d20_mod} + @{' + ability.toLowerCase() + '_save_mod}]]&amp;#125;&amp;#125;';
 	}
-	query += '|Death, {{deathsave=1&amp;#125;&amp;#125; {{emote=dices with death!&amp;#125;&amp;#125; {{title=Death Save&amp;#125;&amp;#125; {{roll=[[d20@{d20_mod} + (@{global_saving_bonus})]]&amp;#125;&amp;#125; {{rolladv=[[d20@{d20_mod} + (@{global_saving_bonus})]]&amp;#125;&amp;#125;';
-	query += '|Other, {{title=?{Other&amp;#124;Unspecified&amp;#125;&amp;#125;&amp;#125; {{roll=[[d20@{d20_mod} + (@{global_saving_bonus}) + ?{Modifiers&amp;#124;0&amp;#125;]]&amp;#125;&amp;#125; {{rolladv=[[d20@{d20_mod} + (@{global_saving_bonus}) + ?{Modifiers&amp;#124;0&amp;#125;]]&amp;#125;&amp;#125;';
+	query += '|Death, {{deathsave=1&amp;#125;&amp;#125; {{emote=dices with death!&amp;#125;&amp;#125; {{title=Death Save&amp;#125;&amp;#125; {{roll=[[d20@{d20_mod} + (@{global_saving_bonus})]]&amp;#125;&amp;#125; {{roll_adv=[[d20@{d20_mod} + (@{global_saving_bonus})]]&amp;#125;&amp;#125;';
+	query += '|Other, {{title=?{Other&amp;#124;Unspecified&amp;#125;&amp;#125;&amp;#125; {{roll=[[d20@{d20_mod} + (@{global_saving_bonus}) + ?{Modifiers&amp;#124;0&amp;#125;]]&amp;#125;&amp;#125; {{roll_adv=[[d20@{d20_mod} + (@{global_saving_bonus}) + ?{Modifiers&amp;#124;0&amp;#125;]]&amp;#125;&amp;#125;';
 
 	template = template.replace(/\x7B\x7BsaveQuery\x7D\x7D/g, query);
 	return template;
@@ -150,19 +150,19 @@ function checkQuery(file) {
 
 	skillsJson.forEach(function (skill) {
 		var skillName = skill.name.lowercase().replace(/ +/g, '');
-		query += '|' + skill.name + ' (' + skill.attribute.capitalize() + ') , {{title=' + skill.name + '&amp;#125;&amp;#125; {{roll=[[d20@{d20_mod} + @{' + skillName + '}]]&amp;#125;&amp;#125; {{rolladv=[[d20@{d20_mod} + @{' + skillName + '}]]&amp;#125;&amp;#125;'
+		query += '|' + skill.name + ' (' + skill.attribute.capitalize() + ') , {{title=' + skill.name + '&amp;#125;&amp;#125; {{roll=[[d20@{d20_mod} + @{' + skillName + '}]]&amp;#125;&amp;#125; {{roll_adv=[[d20@{d20_mod} + @{' + skillName + '}]]&amp;#125;&amp;#125;'
 	});
 	for (var i = 1, len = customSkillCount; i <= len; ++i) {
 		var skillName = '@{custom_skill_' + i + '_name}';
 
-		query += '|' + skillName + ', {{title=' + skillName + '&amp;#125;&amp;#125; {{roll=[[d20@{d20_mod} + @{custom_skill_' + i + '}]]&amp;#125;&amp;#125; {{rolladv=[[d20@{d20_mod} + @{custom_skill_' + i + '}]]&amp;#125;&amp;#125;'
+		query += '|' + skillName + ', {{title=' + skillName + '&amp;#125;&amp;#125; {{roll=[[d20@{d20_mod} + @{custom_skill_' + i + '}]]&amp;#125;&amp;#125; {{roll_adv=[[d20@{d20_mod} + @{custom_skill_' + i + '}]]&amp;#125;&amp;#125;'
 	}
 	query += '|-';
 	for (var i = 0; i < abilitiesName.length; ++i) {
 		var ability = abilitiesName[i];
-		query += '|' + ability + ', {{title=' + ability + '&amp;#125;&amp;#125; {{roll=[[d20@{d20_mod} + @{' + ability.toLowerCase() + '_check_mod}]]&amp;#125;&amp;#125; {{rolladv=[[d20@{d20_mod} + @{basic_' + ability.toLowerCase() + '_check_mod}]]&amp;#125;&amp;#125;';
+		query += '|' + ability + ', {{title=' + ability + '&amp;#125;&amp;#125; {{roll=[[d20@{d20_mod} + @{' + ability.toLowerCase() + '_check_mod}]]&amp;#125;&amp;#125; {{roll_adv=[[d20@{d20_mod} + @{basic_' + ability.toLowerCase() + '_check_mod}]]&amp;#125;&amp;#125;';
 	}
-	query += '|Other, {{title=?{Other&amp;#124;Unspecified&amp;#125;&amp;#125;&amp;#125; {{roll=[[d20@{d20_mod} + ?{Modifiers&amp;#124;0&amp;#125;]]&amp;#125;&amp;#125; {{rolladv=[[d20@{d20_mod} + ?{Modifiers&amp;#124;0&amp;#125;]]&amp;#125;&amp;#125; ';
+	query += '|Other, {{title=?{Other&amp;#124;Unspecified&amp;#125;&amp;#125;&amp;#125; {{roll=[[d20@{d20_mod} + ?{Modifiers&amp;#124;0&amp;#125;]]&amp;#125;&amp;#125; {{roll_adv=[[d20@{d20_mod} + ?{Modifiers&amp;#124;0&amp;#125;]]&amp;#125;&amp;#125; ';
 
 	return template.replace(/\x7B\x7BcheckQuery\x7D\x7D/g, query);
 }
