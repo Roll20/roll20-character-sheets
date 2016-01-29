@@ -251,7 +251,7 @@ gulp.task('preCompile', function () {
 				return actionsCompile(file, actionCount, '', 'Action');
 			}
 		}))
-		.pipe(inject(gulp.src(['./components/class/custom_class.html']), {
+		.pipe(inject(gulp.src(['./components/character/custom_class.html']), {
 			starttag: '<!-- inject:custom_class:{{ext}} -->',
 			transform: function (filePath, file) {
 				return duplicate(file, customClassCount);
