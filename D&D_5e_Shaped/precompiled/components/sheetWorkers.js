@@ -2,17 +2,44 @@ var capitalizeFirstLetter = function (string) {
 	return string.charAt(0).toUpperCase() + string.slice(1);
 };
 
+var getIntValue = function (value, defaultValue) {
+  if (!defaultValue) {
+    defaultValue = 0;
+  }
+  return parseInt(value, 10) || defaultValue;
+};
+var getFloatValue = function (value, defaultValue) {
+  if (!defaultValue) {
+    defaultValue = 0;
+  }
+  return parseFloat(value) || defaultValue;
+};
+
+var getAttributeValue = function (v, varName, defaultAttribute) {
+  if (!varName) {
+    if(defaultAttribute) {
+      return getIntValue(v[defaultAttribute]);
+    }
+  } else if (varName !== 0 && varName !== '0') {
+    console.log('varName', varName);
+    varName = varName.replace(/\W/g, '');
+    console.log('varName2', varName);
+    return getIntValue(v[varName]);
+  }
+  return 0;
+};
+
 on('change:cp change:sp change:ep change:gp change:pp', function () {
 	getAttrs(['cp', 'copper_per_gold', 'sp', 'silver_per_gold', 'ep', 'electrum_per_gold', 'gp', 'pp', 'platinum_per_gold'], function (v) {
-		var copperPieces = parseFloat(v.cp) || 0;
-		var silverPieces = parseFloat(v.sp) || 0;
-		var electrumPieces = parseFloat(v.ep) || 0;
-		var goldPieces = parseFloat(v.gp) || 0;
-		var platinumPieces = parseFloat(v.pp) || 0;
-		var copperPerGold = parseFloat(v.copper_per_gold) || 100;
-		var silverPerGold = parseFloat(v.silver_per_gold) || 10;
-		var electrumPerGold = parseFloat(v.electrum_per_gold) || 2;
-		var platinumPerGold = parseFloat(v.platinum_per_gold) || 10;
+		var copperPieces = getFloatValue(v.cp);
+		var silverPieces = getFloatValue(v.sp);
+		var electrumPieces = getFloatValue(v.ep);
+		var goldPieces = getFloatValue(v.gp);
+		var platinumPieces = getFloatValue(v.pp);
+		var copperPerGold = getFloatValue(v.copper_per_gold, 100);
+		var silverPerGold = getFloatValue(v.silver_per_gold, 10);
+		var electrumPerGold = getFloatValue(v.electrum_per_gold, 2);
+		var platinumPerGold = getFloatValue(v.platinum_per_gold, 10);
 		var totalGold = (copperPieces / copperPerGold) + (silverPieces / silverPerGold) + (electrumPieces / electrumPerGold) + goldPieces + (platinumPieces * platinumPerGold);
 		var coinWeight = (copperPieces + silverPieces + electrumPieces + goldPieces + platinumPieces) / 50;
 		setAttrs({
@@ -33,23 +60,27 @@ var updateAbilityModifier = function (ability) {
 	}
 
 	getAttrs(collectionArray, function (v) {
-		var calculatedAbilityMod = Math.floor((parseInt(v[ability], 10) - 10) / 2) + parseInt(v[ability + '_bonus'], 10);
+		var calculatedAbilityMod = Math.floor((getIntValue(v[ability]) - 10) / 2) + getIntValue(v[ability + '_bonus']);
 		finalSetAttrs[ability + '_mod'] = calculatedAbilityMod;
 
 		if(ability === 'strength') {
-			finalSetAttrs.finesse_mod = Math.max(calculatedAbilityMod, parseInt(v.dexterity_mod, 10) || 0);
-			var str = parseInt(v.strength, 10) || 0;
+			finalSetAttrs.finesse_mod = Math.max(calculatedAbilityMod, getIntValue(v.dexterity_mod));
+			var str = getIntValue(v.strength);
 			finalSetAttrs.carrying_capacity = str * 15;
 			finalSetAttrs.max_push_drag_lift = str * 30;
 			finalSetAttrs.encumbered = str * 5;
 			finalSetAttrs.heavily_encumbered = str * 10;
 		} else if(ability === 'dexterity') {
-			finalSetAttrs.finesse_mod = Math.max(calculatedAbilityMod, parseInt(v.strength_mod, 10) || 0);
+			finalSetAttrs.finesse_mod = Math.max(calculatedAbilityMod, getIntValue(v.strength_mod));
 		}
 
 		console.log('updateAbilityModifier', finalSetAttrs);
 		setAttrs(finalSetAttrs);
 	});
+	if(ability === 'dexterity') {
+		updateArmor();
+	}
+	updateAC();
 };
 on('change:strength', function () {
 	updateAbilityModifier('strength');
@@ -76,18 +107,18 @@ var updateLevels = function () {
 
 	getAttrs(collectionArray, function (v) {
 		var levels = {
-			barbarian: parseInt(v['barbarian_level'], 10) || 0,
-			bard: parseInt(v['bard_level'], 10) || 0,
-			cleric: parseInt(v['cleric_level'], 10) || 0,
-			druid: parseInt(v['druid_level'], 10) || 0,
-			fighter: parseInt(v['fighter_level'], 10) || 0,
-			monk: parseInt(v['monk_level'], 10) || 0,
-			paladin: parseInt(v['paladin_level'], 10) || 0,
-			ranger: parseInt(v['ranger_level'], 10) || 0,
-			rogue: parseInt(v['rogue_level'], 10) || 0,
-			sorcerer: parseInt(v['sorcerer_level'], 10) || 0,
-			warlock: parseInt(v['warlock_level'], 10) || 0,
-			wizard: parseInt(v['wizard_level'], 10) || 0
+			barbarian: getIntValue(v.barbarian_level),
+			bard: getIntValue(v.bard_level),
+			cleric: getIntValue(v.cleric_level),
+			druid: getIntValue(v.druid_level),
+			fighter: getIntValue(v.fighter_level),
+			monk: getIntValue(v.monk_level),
+			paladin: getIntValue(v.paladin_level),
+			ranger: getIntValue(v.ranger_level),
+			rogue: getIntValue(v.rogue_level),
+			sorcerer: getIntValue(v.sorcerer_level),
+			warlock: getIntValue(v.warlock_level),
+			wizard: getIntValue(v.wizard_level)
 		};
 
 		var hd = {
@@ -115,8 +146,8 @@ var updateLevels = function () {
 
 		for(var i = 0; i < 6; i++) {
 			var customClass = {
-				hd: parseInt(v['custom_class_hd_'+i], 10) || 8,
-				level: parseInt(v['custom_class_level_'+i], 10) || 0,
+				hd: getIntValue(v['custom_class_hd_'+i], 8),
+				level: getIntValue(v['custom_class_level_'+i]),
 				name: v['custom_class_name_'+i]
 			};
 
@@ -204,6 +235,24 @@ on('change:barbarian_level change:bard_level change:cleric_level change:druid_le
 	updateLevels();
 });
 
+var updateAC = function () {
+	var collectionArray = ['ac_unarmored_ability', 'ac_unarmored_bonus', 'global_ac_bonus', 'strength_mod', 'dexterity_mod', 'constitution_mod', 'intelligence_mod', 'wisdom_mod', 'charisma_mod'];
+	var finalSetAttrs = {};
+
+	getAttrs(collectionArray, function (v) {
+		finalSetAttrs.ac_unarmored_calc = 10 + getIntValue(v.dexterity_mod) + getAttributeValue(v, v.ac_unarmored_ability) + getFloatValue(v.ac_unarmored_bonus);
+
+		finalSetAttrs.ac = Math.max(getFloatValue(v.ac_armored_calc), finalSetAttrs.ac_unarmored_calc) + getFloatValue(v.global_ac_bonus);
+
+		console.log('updateAC', finalSetAttrs);
+		setAttrs(finalSetAttrs);
+	});
+};
+
+on('change:ac_armored_calc change:ac_unarmored_ability change:ac_unarmored_bonus change:global_ac_bonus', function () {
+	updateAC();
+});
+
 var sumRepeating = function (options) {
 	var repeatingItem = 'repeating_' + options.collection;
 	var collectionArray = [];
@@ -230,18 +279,19 @@ var sumRepeating = function (options) {
 		}
 
 		getAttrs(collectionArray, function (v) {
+      var dexMod = 0;
 			if (options.armor_type) {
-				var dexMod = parseInt(v.dexterity_mod, 10);
+				dexMod = getIntValue(v.dexterity_mod);
 			}
 
 			for (var j = 0; j < ids.length; j++) {
 				var qty = 1;
 				if(options.qty) {
-					qty = parseInt(v[repeatingItem+'_' + ids[j] + '_' + options.qty], 10) || 1;
+					qty = getIntValue(v[repeatingItem+'_' + ids[j] + '_' + options.qty], 1);
 				}
-				var fieldToAdd = parseFloat(v[repeatingItem+'_' + ids[j] + '_' + options.fieldToAdd]) || 0;
+				var fieldToAdd = getFloatValue(v[repeatingItem+'_' + ids[j] + '_' + options.fieldToAdd]);
 				if(options.bonus) {
-					fieldToAdd += parseFloat(v[repeatingItem+'_' + ids[j] + '_' + options.bonus]) || 0;
+					fieldToAdd += getFloatValue(v[repeatingItem+'_' + ids[j] + '_' + options.bonus]);
 				}
 				if(options.armor_type) {
 					var armorType = v[repeatingItem+'_' + ids[j] + '_' + options.armor_type];
@@ -249,7 +299,7 @@ var sumRepeating = function (options) {
 					if(armorType === 'light') {
 						attributeBonus = dexMod;
 					} else if (armorType === 'medium') {
-						var mediumArmorDexMod = parseInt(v.medium_armor_max_dex, 10) || 2;
+						var mediumArmorDexMod = getIntValue(v.medium_armor_max_dex, 2);
 						attributeBonus = Math.min(mediumArmorDexMod, dexMod);
 					}
 					fieldToAdd += attributeBonus;
@@ -266,24 +316,13 @@ var sumRepeating = function (options) {
 				}
 			}
 
-			if(options.armor_type) {
-				var unarmoredACAbility = parseFloat(v.ac_unarmored_ability_bonus) || 0;
-				var unarmoredACBonus = parseFloat(v.ac_unarmored_bonus) || 0;
-
-				finalSetAttrs.ac_unarmored_calc = 10 + dexMod + unarmoredACAbility + unarmoredACBonus;
-
-				var acBonus = parseFloat(v.global_ac_bonus) || 0;
-
-				finalSetAttrs.ac = Math.max(finalSetAttrs[options.totalField], finalSetAttrs.ac_unarmored_calc) + acBonus;
-			}
-
 			console.log('sumRepeating', finalSetAttrs);
 			setAttrs(finalSetAttrs);
 		});
 	});
 };
 
-on('change:repeating_armor change:medium_armor_max_dex', function () {
+var updateArmor = function () {
 	sumRepeating({
 		collection: 'armor',
 		toggle: 'worn',
@@ -292,7 +331,7 @@ on('change:repeating_armor change:medium_armor_max_dex', function () {
 	});
 	sumRepeating({
 		collection: 'armor',
-		getExtraFields: ['dexterity_mod', 'medium_armor_max_dex', 'ac_unarmored_ability_bonus', 'ac_unarmored_bonus', 'global_ac_bonus'],
+		getExtraFields: ['dexterity_mod', 'medium_armor_max_dex'],
 		toggle: 'worn',
 		fieldToAdd: 'ac_base',
 		bonus: 'ac_bonus',
@@ -300,6 +339,10 @@ on('change:repeating_armor change:medium_armor_max_dex', function () {
 		itemTotal: 'ac_total',
 		totalField: 'ac_armored_calc'
 	});
+};
+
+on('change:repeating_armor change:medium_armor_max_dex', function () {
+	updateArmor();
 });
 
 on('change:repeating_equipment', function () {
@@ -323,22 +366,6 @@ on('change:repeating_attack', function () {
 		totalField: 'weight_weapons'
 	});
 });
-
-var getAttributeValue = function (v, varName, defaultAttribute) {
-	if (!varName) {
-		if(defaultAttribute) {
-			return parseInt(v[defaultAttribute], 10);
-		}
-	} else if (varName !== 0 && varName !== '0') {
-		varName = varName.replace(/\W/g, '');
-		return parseInt(v[varName], 10);
-	}
-	return 0;
-};
-
-var getNumericValue = function (value) {
-	return parseInt(value, 10) || 0;
-};
 
 var concatenateIfExists = function (value, joiner) {
 	if (value === 0 || value === '0' || value === '' || !value) {
@@ -384,13 +411,13 @@ var updateAttack = function () {
 				}
 				var attackAttribute = v[repeatingString + 'attack_attribute'];
 				toHit += getAttributeValue(v, attackAttribute, 'strength_mod');
-				toHit += getNumericValue(v[repeatingString + 'attack_bonus']);
+				toHit += getIntValue(v[repeatingString + 'attack_bonus']);
 				finalSetAttrs[repeatingString + 'to_hit'] = toHit;
 
 				var savingThrowDC = 8 + v.pb;
 				var savingThrowAttribute = v[repeatingString + 'saving_throw_attribute'];
 				savingThrowDC += getAttributeValue(v, savingThrowAttribute, 'strength_mod');
-				savingThrowDC += getNumericValue(v[repeatingString + 'saving_throw_bonus']);
+				savingThrowDC += getIntValue(v[repeatingString + 'saving_throw_bonus']);
 				finalSetAttrs[repeatingString + 'saving_throw_dc'] = savingThrowDC;
 
 				var damageString = '';
@@ -399,7 +426,7 @@ var updateAttack = function () {
 					damageString += concatenateIfExists(v[repeatingString + 'damage']);
 
 					damageBonus += getAttributeValue(v, v[repeatingString + 'damage_attribute'], 'strength_mod');
-					damageBonus += getNumericValue(v[repeatingString + 'damage_bonus'], ' + ');
+					damageBonus += getIntValue(v[repeatingString + 'damage_bonus'], ' + ');
 
 					damageString += concatenateIfExists(damageBonus, ' + ');
 					damageString += concatenateIfExists(v[repeatingString + 'damage_type'], ' ');
@@ -410,7 +437,7 @@ var updateAttack = function () {
 					damageString += concatenateIfExists(v[repeatingString + 'second_damage'], ' + ');
 
 					secondDamageBonus += getAttributeValue(v, v[repeatingString + 'second_damage_attribute']);
-					secondDamageBonus += getNumericValue(v[repeatingString + 'second_damage_bonus']);
+					secondDamageBonus += getIntValue(v[repeatingString + 'second_damage_bonus']);
 
 					damageString += concatenateIfExists(secondDamageBonus, ' + ');
 					damageString += concatenateIfExists(v[repeatingString + 'second_damage_type'], ' ');
