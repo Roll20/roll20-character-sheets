@@ -11427,7 +11427,7 @@ var SWUtils = SWUtils || (function() {
                 trueDefault = defaultVal||0,
                 currVal= parseFloat(values[writeField],10),
                 value = Number(values[readField]);
-            //console.log("trueDefault:"+trueDefault+", currVal:"+currVal+", value:"+value+", isNaN:"+isNaN(currVal));
+            ////console.log("TrueDefault:"+trueDefault+", currVal:"+currVal+", value:"+value+", isNaN:"+isNaN(currVal));
 
             if (typeof values[readField] === "undefined" || values[readField]==="" ){
                 value=trueDefault;
@@ -11515,8 +11515,8 @@ var SWUtils = SWUtils || (function() {
 
 var PFSheet = PFSheet || (function(){
   
-    var version= 0.20,
-	pfDebug = false,
+    var version=0.20,
+	pfDebug=false,
 
 	//Utilities
 
@@ -11696,6 +11696,32 @@ var PFSheet = PFSheet || (function(){
             }
         });
     },
+	
+	/* if id is not empty, then returns the ID with an underscore on the right.
+	*/
+    getRepeatingIDStr=function(id){
+        var idStr="";
+        if (id) {idStr=id + "_";}
+        return idStr;
+    },
+	
+	isBadRowId=function(section,id,nullok) {
+		//console.log("TRACE: isBadRowId section:"+section+", id:"+id+", null ok?:" + nullok);
+		if (!nullok &&  !id ) {
+			return true;
+		}
+		if ( id === section) {
+			return true;
+		}
+		if (section==="weapon") {
+			if ( id && (id.indexOf("attack")>=0 || id.indexOf("damage")>=0)) {
+				return true;
+			}
+		}
+		//console.log("DEBUG: GOOD ID:" + id + " for section " + section);
+		return false;
+	},
+		
 
 	/* setRepeatingRowDefaultFields
 	* sets the _new_flag to 1, _row_id, and _row_index fields of a repeating section row
@@ -11710,6 +11736,7 @@ var PFSheet = PFSheet || (function(){
          rowid = "repeating_"+section +"_" +id+"_row_id",
          rowindex = "repeating_"+section +"_" +id+"_row_index",
          fieldNames=[newflag,rowid,rowindex];
+		 //console.log("TRACE:setRepeatingRowDefaultFields: section:"+section+", id:"+id+", index:"+ index);
          getAttrs(fieldNames,function(v){
             var setter={};
             if ( !(v[newflag]) || forceReset ) {
@@ -11727,41 +11754,25 @@ var PFSheet = PFSheet || (function(){
 	* @forceReset {bool} = if true then set the row fields no matter what _new_flag is set to.	
 	*/
     handleRepeatingRowOrdering = function(section,forceReset) {
+		//console.log("TRACE:handleRepeatingRowOrdering section:" + section);
         getSectionIDs("repeating_"+section,function(ids){
             ids.forEach(function(id,index){
-                 //console.log("handleRepeatingRowOrderings, id is: "+id+ ", index is: "+index);
-                 if (id===section && !forceReset) {
-                     console.log("ERROR repeating_"+section + " row index "+index +", id is "+id);
-                     return;
-                 } else {
-                    setRepeatingRowDefaultFields(section,id,index,forceReset);
-                 }
+				if (isBadRowId(section,id,false)) {
+					console.log("ERROR: handleRepeatingRowOrdering invalid id:"+id);
+					return;
+				}
+				setRepeatingRowDefaultFields(section,id,index,forceReset);
+				if (section==="weapon"){
+					//console.log("DEBUG: this is a NEW REPEATING_WEAPON set attack and damage dropdowns " );
+					handleRepeatingAttackDropdown(id);
+					handleRepeatingDamageDropdown(id);
+				}
             });
         });
     },
 
-	/*checkIsNewRow
-	* Within row context of a repeating section item, 
-	* if _new_flag is blank or 0 then call handleRepeatingRowOrdering
-	* @section {string} = the name of the repeating section that appears after "repeating_"
-	*/
-    checkIsNewRow = function(section) {
-		if (!section) {return;}
-        var fieldname="repeating_"+section+"_new_flag";
-		//console.log("At checkIsNewRow");
-        getAttrs([fieldname],function(v) {
-			var setter={};
-            if (!( v[fieldname]) || v[fieldname]=="0" ) {
-                handleRepeatingRowOrdering(section);
-				console.log("adding " + section);
-				if (section==="weapon"){
-					handleRepeatingAttackDropdown();
-					handleRepeatingDamageDropdown();
-				}
-            }
-        });
-    },
 
+	
 
     /*updateSize
     * When size attribute is changed, update CMD-size, size_display, size_skill, size_skill_double
@@ -11819,6 +11830,7 @@ var PFSheet = PFSheet || (function(){
 	 */
 	updateAbility = function(ability) {
 		var readFields=[ability+"-base",ability+"-enhance",ability+"-misc",ability+"-damage",ability+"-penalty",ability+"-drain",ability, ability+"-mod", ability+"-cond","buff_"+ability+"-total","FF-ability"];
+		//console.log("TRACE:updateAbility ability:"+ability);	
 	
 		getAttrs(readFields, function (values){
 			var base = (parseInt(values[ability+"-base"],10)||0) + 
@@ -12020,7 +12032,7 @@ var PFSheet = PFSheet || (function(){
                         ( parseFloat(v[col4Name],10)||0)* ( parseInt(v[col4NameTwo],10)||0)+
                         ( parseFloat(v[col5Name],10)||0)* ( parseInt(v[col5NameTwo],10)||0));
                 currTot = parseInt(v[totalColName],10);
-                //console.log("tot is "+tot+", currtot = "+currTot);
+                ////console.log("Tot is "+tot+", currtot = "+currTot);
                 if ( isNaN(currTot) ||  tot!== currTot) {
                     setter[totalColName]=tot;
                     setAttrs(setter);
@@ -12080,7 +12092,7 @@ var PFSheet = PFSheet || (function(){
                 cowering = (parseInt(v["condition-Cowering"],10)||0)?1:0,
                 loseDex=0;
 
-            //console.log("DDDDDDDDDD updateDefenses size:"+size+", dodge:"+dodge+", misc:"+miscAC+", def:"+deflect+", cond:"+condPenalty+", buff:"+buffs+", armor:"+armor+", shield:"+shield+
+            ////console.log("DDDDDDDDDD updateDefenses size:"+size+", dodge:"+dodge+", misc:"+miscAC+", def:"+deflect+", cond:"+condPenalty+", buff:"+buffs+", armor:"+armor+", shield:"+shield+
             //  ", natural:"+natural+", bab:"+bab+", miscCMD:"+miscCMD+", maxDex:"+maxDex+", stunned:"+stunned+", ffed:"+ffed+", ability:"+ability+
             //  ", ffAbility:"+ffAbility+", cmdAbility1:"+cmdAbility1+",cmdAbility2:"+cmdAbility2+", cmdFFAbility2:"+cmdFFAbility2
             //  + ", blinded: "+blinded+", pinned:"+pinned +", cowering:"+cowering  );
@@ -12171,7 +12183,7 @@ var PFSheet = PFSheet || (function(){
 			 acp+=subAcp;
 			 sp+=subsp;
 			 if(nonProf) {atk+=subAcp; }
-			 //console.log("the proficiency is " + prof + " and attack penalty: " + atk);
+			 ////console.log("The proficiency is " + prof + " and attack penalty: " + atk);
 		 }
 		 if (v["armor2-equipped"]=="1" ) {
 			 subAC=parseInt(v["armor2-acbonus"],10)||0;
@@ -12270,6 +12282,9 @@ var PFSheet = PFSheet || (function(){
 	},
 
     updateAttackEffectTotals = function() {
+		//console.log("TRACE:updateAttackEffectTotals");	
+
+		
         getAttrs(["attk-effect-total",
             "attk-effect_mod_1","attk-effect_mod_1_Toggle","attk-effect_mod_2","attk-effect_mod_2_Toggle",
             "attk-effect_mod_3","attk-effect_mod_3_Toggle","attk-effect_mod_4","attk-effect_mod_4_Toggle"],function(v){
@@ -12286,7 +12301,9 @@ var PFSheet = PFSheet || (function(){
         });
     },
 
-    updateDMGEffectTotals = function(effectType) {
+    updateDMGEffectTotals = function() {
+		//console.log("TRACE:updateDMGEffectTotals");	
+		
         getAttrs(["dmg-effect-total",
             "dmg-effect_mod_1","dmg-effect_mod_1_Toggle","dmg-effect_mod_2","dmg-effect_mod_2_Toggle",
             "dmg-effect_mod_3","dmg-effect_mod_3_Toggle","dmg-effect_mod_4","dmg-effect_mod_4_Toggle"],function(v){
@@ -12304,6 +12321,8 @@ var PFSheet = PFSheet || (function(){
     },
 
      updateDamageNote = function() {
+		//console.log("TRACE:updateDamageNote");	
+		 
         getAttrs(["size","DMG-cnote"],function(v){
             var size = (parseInt(v["size"],10)||0),
                 note="";
@@ -12319,6 +12338,7 @@ var PFSheet = PFSheet || (function(){
      },
 
      updateDamage = function() {
+		//console.log("TRACE:updateDamage");	
         updateRowTotal(["DMG-mod","buff_DMG-total"],0,["condition-Sickened"]);
      },
 	 
@@ -12334,6 +12354,7 @@ var PFSheet = PFSheet || (function(){
             ,"condition-Wounds"];
         updateRowTotal(adds,0,subtracts);
     },
+	
     updateConditionAttackNote = function () {
         getAttrs(["condition-Grappled","condition-Invisible"],function(v){
             var setter={},setAny=0,gnote,cnote;
@@ -12367,6 +12388,7 @@ var PFSheet = PFSheet || (function(){
         var  bufftype,bufffield,fields
         ,sizeField="size"
         ,atkField="attk-"+attype;
+		//console.log("TRACE:updateAttack attype:"+attype);
         //var sizeMult=1;
         if (attype=="melee") {bufftype="Melee"; }
         else if (attype==="ranged") {bufftype="Ranged";}
@@ -12382,29 +12404,20 @@ var PFSheet = PFSheet || (function(){
         updateRowTotal(fields);
     },
 
-	/* if id is not empty, then returns the ID with an underscore on the right.
-	*/
-    getRepeatingIDStr=function(id){
-        var idStr="";
-        if (id) {idStr=id + "_";}
-        return idStr;
-    },
 
 	/*handleRepeatingAttackDropdown
-	* Special case of handleRepeatingDropdown, also sets repeating damage dropdown
-	* to STR if the attack type is melee and damage dropdown is not already chosen.
-	* just to save user one step.
+	* Special case of handleRepeatingDropdown
 	*/
-    handleRepeatingAttackDropdown = function(){
-        handleDropdown("repeating_weapon_attack-type",["repeating_weapon_attack-type-mod"]);
-        getAttrs(["repeating_weapon_attack-type","repeating_weapon_damage-ability"],function(v){
-            var attack=findAbilityInString(v["repeating_weapon_attack-type"]),
-                damage=findAbilityInString(v["repeating_weapon_damage-ability"]);
-            if (attack==="attk-melee" && !damage ) {
-                setAttrs({"repeating_weapon_damage-ability":"@{STR-mod} - [[ @{condition-sickened} ]]"});
-            }
-        });
+    handleRepeatingAttackDropdown = function(id){
+		var idStr=getRepeatingIDStr(id);
+		//console.log("TRACE:handleRepeatingAttackDropdown id:" + id);
+		if (isBadRowId("weapon",id,true)) {
+			console.log("ERROR: handleRepeatingAttackDropdown, invalid id:"+id);
+			return;			
+		}		
+        handleDropdown("repeating_weapon_"+idStr+"attack-type",["repeating_weapon_"+idStr+"attack-type-mod"]);
     },
+
 
     /* handleRepeatingDamageDropdown
     * this is a special case of dropdown, because it contains a possible multipler Damage ability dropdown.
@@ -12412,6 +12425,11 @@ var PFSheet = PFSheet || (function(){
     */
     handleRepeatingDamageDropdown=function(id) {
         var readField,writeField,idStr=getRepeatingIDStr(id);
+		//console.log("TRACE:handleRepeatingDamageDropdown id:" + id);
+		if (isBadRowId("weapon",id,true)) {
+			console.log("ERROR: handleRepeatingDamageDropdown, invalid id:"+id);
+			return;			
+		}
         readField="repeating_weapon_"+idStr+"damage-ability";
         writeField= readField+"-mod";
         getAttrs([readField,writeField],function(v) {
@@ -12434,6 +12452,11 @@ var PFSheet = PFSheet || (function(){
     updateRepeatingWeaponAttack=function(id) {
         var idStr=getRepeatingIDStr(id),
 		currAttackEffectTotalRepField="repeating_weapon_"+idStr+"attk-effect-total-copy";
+		//console.log("TRACE:updateRepeatingWeaponAttack id:" + id);
+		if (isBadRowId("weapon",id,true)) {
+			console.log("ERROR: updateRepeatingWeaponAttack, invalid id:"+id);
+			return;			
+		}
         getAttrs(["repeating_weapon_"+idStr+"enhance",
 				"repeating_weapon_"+idStr+"masterwork",
 				currAttackEffectTotalRepField,
@@ -12453,11 +12476,16 @@ var PFSheet = PFSheet || (function(){
 				setAttrs(setter);
 			}
         });
-    },	
+    },
+	
     updateRepeatingWeaponAttacks = function() {
+		//console.log("TRACE:updateRepeatingWeaponAttacks LOOP" );
 		getSectionIDs("repeating_weapon",function(ids){
-			console.log(ids);
 			ids.forEach(function(id,index){
+				if (isBadRowId("weapon",id,false)) {
+					console.log("ERROR: updateRepeatingWeaponAttacks, invalid id:"+id+", index:" +index);
+					return;
+				}
 				updateRepeatingWeaponAttack(id);
 			});
 		});
@@ -12470,6 +12498,11 @@ var PFSheet = PFSheet || (function(){
             modname="repeating_weapon_"+idStr+"damage-ability-mod",
 			dmgEffectCopy="repeating_weapon_"+idStr+"dmg-effect-total-copy",
 			dmgModCopy="repeating_weapon_"+idStr+"DMG-mod-copy";
+		//console.log("TRACE:updateRepeatingWeaponDamage id:" + id);
+		if (isBadRowId("weapon",id,true)) {
+			console.log("ERROR: updateRepeatingWeaponDamage, invalid id:"+id);
+			return;			
+		}
         getAttrs([maxname,modname,dmgEffectCopy,dmgModCopy,"dmg-effect-total","DMG-mod"],function(v){
             var dmgFields, setter={}, setAny=0,
 
@@ -12498,8 +12531,13 @@ var PFSheet = PFSheet || (function(){
     },
 
     updateRepeatingWeaponDamages = function() {
+		//console.log("TRACE:updateRepeatingWeaponDamages LOOP" );
 		getSectionIDs("repeating_weapon",function(ids){
 			ids.forEach(function(id,index){
+				if (isBadRowId("weapon",id,false)) {
+					console.log("ERROR: updateRepeatingWeaponDamages, invalid id:"+id+", index:"+ index);
+					return;
+				}
 				updateRepeatingWeaponDamage(id);
 			});
 		});
@@ -12679,6 +12717,22 @@ var PFSheet = PFSheet || (function(){
 	
 
 	
+	/*checkIsNewRow
+	* Within row context of a repeating section item, 
+	* if _new_flag is blank or 0 then call handleRepeatingRowOrdering
+	* @section {string} = the name of the repeating section that appears after "repeating_"
+	*/
+    checkIsNewRow = function(section) {
+		if (!section) {return;}
+        var fieldname="repeating_"+section+"_new_flag";
+		//console.log("TRACE: At checkIsNewRow for section " + section);
+        getAttrs([fieldname],function(v) {
+			var setter={};
+            if (!( v[fieldname]) || v[fieldname]=="0" ) {
+                handleRepeatingRowOrdering(section);
+            }
+        });
+    },
 
 
 	/* recalculateRepeatingWeapons
@@ -12693,21 +12747,21 @@ var PFSheet = PFSheet || (function(){
             getSectionIDs("repeating_weapon",function(ids){
                 var readField;
                 ids.forEach(function(id,index){
-                    if (id === "weapon") {
-                        console.log("ERROR: recalculateRepeatingWeapons, id is same as section name, id="+id);
-                        return;
-                    }
-                    //console.log("TRACE: recalculateRepeatingWeapons id="+id);
-                    readField= "repeating_weapon_" +id+"_" ;
+					if (isBadRowId("weapon",id,false)) {
+						console.log("ERROR: updateRepeatingWeaponDamages, invalid id:"+id+", index:" +index);
+						return;
+					}
+					////console.log("TRACE: recalculateRepeatingWeapons id="+id);
+					readField= "repeating_weapon_" +id+"_" ;
 					SWUtils.setAttributeNumber(readField+"attk-effect-total-copy",(parseInt(v["attk-effect-total"],10)||0));
 					SWUtils.setAttributeNumber(readField+"dmg-effect-total-copy",(parseInt(v["dmg-effect-total"],10)||0));
 					SWUtils.setAttributeNumber(readField+"DMG-mod-copy",(parseInt(v["DMG-mod"],10)||0));
-                    SWUtils.evaluateAndSetNumber(readField+"damage",readField+"damage-mod");
-                    SWUtils.evaluateAndSetNumber(readField+"attack",readField+"attack-mod");
-                    handleRepeatingDropdown(id,"weapon","attack-type","attack-type-mod");
-                    handleRepeatingDamageDropdown(id);
-                    updateRepeatingWeaponAttack(id);
-                    updateRepeatingWeaponDamage(id);
+					SWUtils.evaluateAndSetNumber(readField+"damage",readField+"damage-mod");
+					SWUtils.evaluateAndSetNumber(readField+"attack",readField+"attack-mod");
+					handleRepeatingDropdown(id,"weapon","attack-type","attack-type-mod");
+					handleRepeatingDamageDropdown(id);
+					updateRepeatingWeaponAttack(id);
+					updateRepeatingWeaponDamage(id);
                 });
             });
         });
@@ -12723,7 +12777,10 @@ var PFSheet = PFSheet || (function(){
 	recalculateRepeatingMaxUsed=function(section){
 		getSectionIDs("repeating_"+section,function(ids){
 			ids.forEach(function(id,index){
-				//console.log("recalculatemaxused section:" + section+", id:"+id);
+				if (isBadRowId(section,id,false)) {
+					console.log("ERROR: updateRepeatingWeaponDamages, invalid id:"+id+", index:" +index);
+					return;
+				}
 				handleRepeatingMacro(id,section,"max-calculation","used_max");
 			});
 		});		
@@ -13095,6 +13152,7 @@ var PFSheet = PFSheet || (function(){
 	
 
     checkUpdate=function(){
+		//console.log("TRACE: checkUpdate");
         getAttrs(["PFSheet_Version","PFSheet_forcesync","recalc1"],function(v){
             var setter={},currVer=0,setAny=0,recalc=false;
             currVer=parseFloat(v["PFSheet_Version"],10)||0;
@@ -13134,7 +13192,8 @@ var PFSheet = PFSheet || (function(){
             updateRowTotal:updateRowTotal,
             handleRepeatingDropdown:handleRepeatingDropdown,
             handleRepeatingMacro:handleRepeatingMacro,
-			recalculateAllBuffs:recalculateAllBuffs
+			recalculateAllBuffs:recalculateAllBuffs,
+			isBadRowId:isBadRowId
 			},
 	    version:version,
 		handleDropdown:handleDropdown,
@@ -13178,7 +13237,6 @@ var PFSheet = PFSheet || (function(){
     };	
 }());
 	
-
 
 //set repeating IDS
 
@@ -13779,13 +13837,37 @@ on("change:fort-ability", function(){PFSheet.handleDropdown  ("Fort-ability",["F
 on("change:ref-ability", function(){PFSheet.handleDropdown  ("Ref-ability",["Ref-ability-mod"]);   });
 on("change:will-ability", function(){PFSheet.handleDropdown  ("Will-ability",["Will-ability-mod"]);   });
 
+
 //attacks
-on("change:melee-ability", function () {PFSheet.handleDropdown("melee-ability",["melee-ability-mod"]);});
-on("change:ranged-ability", function () {PFSheet.handleDropdown("ranged-ability",["ranged-ability-mod"]);});
-on("change:cmb-ability", function () {PFSheet.handleDropdown("CMB-ability",["CMB-ability-mod"]);});
-on("change:bab change:size change:melee-ability-mod change:buff_melee-total change:attk-melee-misc change:attk-penalty",function() { PFSheet.updateAttack("melee"); });
-on("change:bab change:size change:ranged-ability-mod change:buff_ranged-total change:attk-ranged-misc change:attk-penalty",function() { PFSheet.updateAttack("ranged"); });
-on("change:bab change:CMD-size change:cmb-ability-mod change:cmb-total change:attk-cmb-misc change:attk-penalty",function() { PFSheet.updateAttack("CMB"); });
+on("change:melee-ability", function () {
+//console.log("TRACE: EVENT change:melee-ability");
+PFSheet.handleDropdown("melee-ability",["melee-ability-mod"]);
+});
+	
+on("change:ranged-ability", function () {	
+//console.log("TRACE: EVENT change:ranged-ability");
+PFSheet.handleDropdown("ranged-ability",["ranged-ability-mod"]);
+});
+
+on("change:cmb-ability", function () {	
+//console.log("TRACE: EVENT change:cmb-ability");
+PFSheet.handleDropdown("CMB-ability",["CMB-ability-mod"]);
+});
+
+on("change:bab change:size change:melee-ability-mod change:buff_melee-total change:attk-melee-misc change:attk-penalty",function() { 
+//console.log("TRACE: EVENT change:melee-ability-mod");
+PFSheet.updateAttack("melee"); 
+});
+
+on("change:bab change:size change:ranged-ability-mod change:buff_ranged-total change:attk-ranged-misc change:attk-penalty",function() { 
+//console.log("TRACE: EVENT change:ranged-ability-mod");
+PFSheet.updateAttack("ranged"); 
+});
+
+on("change:bab change:CMD-size change:cmb-ability-mod change:cmb-total change:attk-cmb-misc change:attk-penalty",function() { 
+//console.log("TRACE: EVENT change:cmb-ability-mod");
+PFSheet.updateAttack("CMB"); 
+});
 
 on("change:condition-Sickened change:buff_dmg-total",function(){PFSheet.updateDamage();});
 
@@ -13801,15 +13883,34 @@ on("change:dmg-effect_mod_1 change:dmg-effect_mod_1_Toggle change:dmg-effect_mod
 on("change:attk-effect-total",function(){PFSheet.updateRepeatingWeaponAttacks();});
 on("change:dmg-effect-total change:dmg-mod", function(){PFSheet.updateRepeatingWeaponDamages();});
 
-
-on("change:repeating_weapon:masterwork change:repeating_weapon:proficiency change:repeating_weapon:attack-type-mod change:repeating_weapon:attack-mod",function() {
+on("change:repeating_weapon:attack-type-mod",function() {
+	//console.log("TRACE: EVENT change:repeating_weapon:attack-type-mod");	
     PFSheet.updateRepeatingWeaponAttack();
 });
-on("change:repeating_weapon:damage-ability-mod change:repeating_weapon:damage-mod change:repeating_weapon:damage-ability-max",function() {
+
+on("change:repeating_weapon:masterwork change:repeating_weapon:proficiency change:repeating_weapon:attack-mod",function() {
+    PFSheet.updateRepeatingWeaponAttack();
+});
+
+on("change:repeating_weapon:damage-ability-mod",function() {
+	//console.log("TRACE: EVENT change:repeating_weapon:damage-ability-mod");		
     PFSheet.updateRepeatingWeaponDamage();
 });
-on("change:repeating_weapon:attack-type",function() {PFSheet.handleRepeatingAttackDropdown();});
-on("change:repeating_weapon:damage-ability",function() {PFSheet.handleRepeatingDamageDropdown();});
+
+on("change:repeating_weapon:damage-mod change:repeating_weapon:damage-ability-max",function() {
+    PFSheet.updateRepeatingWeaponDamage();
+});
+
+on("change:repeating_weapon:attack-type",function() { 
+//console.log("TRACE: EVENT change:repeating_weapon:attack-type"); 
+PFSheet.handleRepeatingAttackDropdown();
+});
+
+on("change:repeating_weapon:damage-ability",function() {
+//console.log("TRACE: EVENT change:repeating_weapon:damage-ability");  
+PFSheet.handleRepeatingDamageDropdown();
+});
+	
 on("change:repeating_weapon:damage",function(){SWUtils.evaluateAndSetNumber("repeating_weapon_damage","repeating_weapon_damage-mod");});
 on("change:repeating_weapon:attack",function(){SWUtils.evaluateAndSetNumber("repeating_weapon_attack","repeating_weapon_attack-mod");});
 
