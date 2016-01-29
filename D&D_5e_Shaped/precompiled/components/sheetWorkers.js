@@ -166,45 +166,45 @@ var updateLevels = function () {
 
 		if (hd.d20) {
 			finalSetAttrs.hd_d20_max = hd.d20;
-			finalSetAttrs.hd_d20_toggle = 'on';
+			finalSetAttrs.hd_d20_toggle = 1;
 		} else {
 			finalSetAttrs.hd_d20_max = 0;
-			finalSetAttrs.hd_d20_toggle = '';
+			finalSetAttrs.hd_d20_toggle = 0;
 		}
 		if (hd.d12) {
 			finalSetAttrs.hd_d12_max = hd.d12;
-			finalSetAttrs.hd_d12_toggle = 'on';
+			finalSetAttrs.hd_d12_toggle = 1;
 		} else {
 			finalSetAttrs.hd_d12_max = 0;
-			finalSetAttrs.hd_d12_toggle = '';
+			finalSetAttrs.hd_d12_toggle = 0;
 		}
 		if (hd.d10) {
 			finalSetAttrs.hd_d10_max = hd.d10;
-			finalSetAttrs.hd_d10_toggle = 'on';
+			finalSetAttrs.hd_d10_toggle = 1;
 		} else {
 			finalSetAttrs.hd_d10_max = 0;
-			finalSetAttrs.hd_d10_toggle = '';
+			finalSetAttrs.hd_d10_toggle = 0;
 		}
 		if (hd.d8) {
 			finalSetAttrs.hd_d8_max = hd.d8;
-			finalSetAttrs.hd_d8_toggle = 'on';
+			finalSetAttrs.hd_d8_toggle = 1;
 		} else {
 			finalSetAttrs.hd_d8_max = 0;
-			finalSetAttrs.hd_d8_toggle = '';
+			finalSetAttrs.hd_d8_toggle = 0;
 		}
 		if (hd.d6) {
 			finalSetAttrs.hd_d6_max = hd.d6;
-			finalSetAttrs.hd_d6_toggle = 'on';
+			finalSetAttrs.hd_d6_toggle = 1;
 		} else {
 			finalSetAttrs.hd_d6_max = 0;
-			finalSetAttrs.hd_d6_toggle = '';
+			finalSetAttrs.hd_d6_toggle = 0;
 		}
 		if (hd.d4) {
 			finalSetAttrs.hd_d4_max = hd.d4;
-			finalSetAttrs.hd_d4_toggle = 'on';
+			finalSetAttrs.hd_d4_toggle = 1;
 		} else {
 			finalSetAttrs.hd_d4_max = 0;
-			finalSetAttrs.hd_d4_toggle = '';
+			finalSetAttrs.hd_d4_toggle = 0;
 		}
 
 		var pb = 2 + Math.floor(Math.abs((totalLevel - 1)/4));
