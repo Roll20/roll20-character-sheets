@@ -236,7 +236,7 @@ on('change:barbarian_level change:bard_level change:cleric_level change:druid_le
 });
 
 var updateAC = function () {
-	var collectionArray = ['ac_unarmored_ability', 'ac_unarmored_bonus', 'global_ac_bonus', 'strength_mod', 'dexterity_mod', 'constitution_mod', 'intelligence_mod', 'wisdom_mod', 'charisma_mod'];
+	var collectionArray = ['ac_armored_calc', 'ac_unarmored_ability', 'ac_unarmored_bonus', 'global_ac_bonus', 'strength_mod', 'dexterity_mod', 'constitution_mod', 'intelligence_mod', 'wisdom_mod', 'charisma_mod'];
 	var finalSetAttrs = {};
 
 	getAttrs(collectionArray, function (v) {
