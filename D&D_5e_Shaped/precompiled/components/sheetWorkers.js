@@ -356,6 +356,10 @@ on('change:repeating_equipment', function () {
 	});
 });
 
+on('change:pb', function () {
+  updateAttack();
+});
+
 on('change:repeating_attack', function () {
 	updateAttack();
 
@@ -407,14 +411,14 @@ var updateAttack = function () {
 				var toHit = 0;
 				var proficient = v[repeatingString + 'proficient'];
 				if(!proficient || proficient === 'on') {
-					toHit += v.pb;
+					toHit += getIntValue(v.pb);
 				}
 				var attackAttribute = v[repeatingString + 'attack_attribute'];
 				toHit += getAttributeValue(v, attackAttribute, 'strength_mod');
 				toHit += getIntValue(v[repeatingString + 'attack_bonus']);
 				finalSetAttrs[repeatingString + 'to_hit'] = toHit;
 
-				var savingThrowDC = 8 + v.pb;
+				var savingThrowDC = 8 + getIntValue(v.pb);
 				var savingThrowAttribute = v[repeatingString + 'saving_throw_attribute'];
 				savingThrowDC += getAttributeValue(v, savingThrowAttribute, 'strength_mod');
 				savingThrowDC += getIntValue(v[repeatingString + 'saving_throw_bonus']);
