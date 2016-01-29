@@ -184,6 +184,17 @@ var updateLevels = function () {
 		finalSetAttrs.exp = pb * 2;
 		finalSetAttrs.h_PB = pb / 2;
 
+		if(levels.sorcerer > 0) {
+			finalSetAttrs.spell_display_sorcery_points = 1;
+		} else {
+			finalSetAttrs.spell_display_sorcery_points = 0;
+		}
+		if(levels.warlock > 0) {
+			finalSetAttrs.spell_display_warlock_slots = 1;
+		} else {
+			finalSetAttrs.spell_display_warlock_slots = 0;
+		}
+
 		console.log('updateLevels', finalSetAttrs);
 		setAttrs(finalSetAttrs);
 	});
