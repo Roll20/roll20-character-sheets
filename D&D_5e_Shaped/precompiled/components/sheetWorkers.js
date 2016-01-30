@@ -21,9 +21,7 @@ var getAbilityValue = function (v, varName, defaultAbility) {
       return getIntValue(v[defaultAbility]);
     }
   } else if (varName !== 0 && varName !== '0') {
-    console.log('varName', varName);
     varName = varName.replace(/\W/g, '');
-    console.log('varName2', varName);
     return getIntValue(v[varName]);
   }
   return 0;
@@ -228,6 +226,7 @@ var updateLevels = function () {
 
 		console.log('updateLevels', finalSetAttrs);
 		setAttrs(finalSetAttrs);
+		updateAttack();
 	});
 };
 
@@ -409,7 +408,6 @@ var updateAttack = function () {
 			for (var j = 0; j < ids.length; j++) {
 				var repeatingString = repeatingItem+'_' + ids[j] + '_';
 
-
 				if(!v[repeatingString + 'type'] || v[repeatingString + 'type'] === 'melee') {
 					finalSetAttrs[repeatingString + 'local_attack_bonus'] = '@{global_melee_attack_bonus}';
 					finalSetAttrs[repeatingString + 'local_damage_bonus'] = '@{global_melee_damage_bonus}';
@@ -424,7 +422,9 @@ var updateAttack = function () {
 				var toHit = 0;
 				var proficiency = v[repeatingString + 'proficiency'];
 				if(!proficiency || proficiency === 'on') {
-					toHit += getIntValue(v.pb);
+					var pb = getIntValue(v.pb);
+					toHit += pb;
+					finalSetAttrs[repeatingString + 'proficiency_toggled'] = pb;
 				}
 				var attackAbility = v[repeatingString + 'attack_ability'];
 				toHit += getAbilityValue(v, attackAbility, 'strength_mod');
