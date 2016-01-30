@@ -121,8 +121,8 @@ function skills(file) {
 				.replace(/\x7B\x7Bability\x7D\x7D/g, skill.ability)
 				.replace(/\x7B\x7BabilityShort\x7D\x7D/g, skill.ability.substring(0,3).capitalize())
 				.replace(/\x7B\x7BabilityTranslated\x7D\x7D/g, translate('ABILITIES.' + skill.ability + '.SHORT_NAME_CAPITAL'))
-				.replace(/\x7B\x7BnameTranslatedEn\x7D\x7D/g, skillEn('SKILLS.' + skill.name + '.NAME'))
-				.replace(/\x7B\x7BnameTranslated\x7D\x7D/g, translate('SKILLS.' + skill.name + '.NAME'))
+				.replace(/\x7B\x7BnameTranslatedEn\x7D\x7D/g, skillEn('SKILLS.' + skill.name))
+				.replace(/\x7B\x7BnameTranslated\x7D\x7D/g, translate('SKILLS.' + skill.name))
 		);
 	});
 	return skills.join('\n\n');
