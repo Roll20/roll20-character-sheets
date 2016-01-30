@@ -15,10 +15,10 @@ var getFloatValue = function (value, defaultValue) {
   return parseFloat(value) || defaultValue;
 };
 
-var getAttributeValue = function (v, varName, defaultAttribute) {
+var getAbilityValue = function (v, varName, defaultAbility) {
   if (!varName) {
-    if(defaultAttribute) {
-      return getIntValue(v[defaultAttribute]);
+    if(defaultAbility) {
+      return getIntValue(v[defaultAbility]);
     }
   } else if (varName !== 0 && varName !== '0') {
     console.log('varName', varName);
@@ -240,7 +240,7 @@ var updateAC = function () {
 	var finalSetAttrs = {};
 
 	getAttrs(collectionArray, function (v) {
-		finalSetAttrs.ac_unarmored_calc = 10 + getIntValue(v.dexterity_mod) + getAttributeValue(v, v.ac_unarmored_ability) + getFloatValue(v.ac_unarmored_bonus);
+		finalSetAttrs.ac_unarmored_calc = 10 + getIntValue(v.dexterity_mod) + getAbilityValue(v, v.ac_unarmored_ability) + getFloatValue(v.ac_unarmored_bonus);
 
 		finalSetAttrs.ac = Math.max(getFloatValue(v.ac_armored_calc), finalSetAttrs.ac_unarmored_calc) + getFloatValue(v.global_ac_bonus);
 
@@ -295,14 +295,14 @@ var sumRepeating = function (options) {
 				}
 				if(options.armor_type) {
 					var armorType = v[repeatingItem+'_' + ids[j] + '_' + options.armor_type];
-					var attributeBonus = 0;
+					var abilityBonus = 0;
 					if(armorType === 'light') {
-						attributeBonus = dexMod;
+						abilityBonus = dexMod;
 					} else if (armorType === 'medium') {
 						var mediumArmorDexMod = getIntValue(v.medium_armor_max_dex, 2);
-						attributeBonus = Math.min(mediumArmorDexMod, dexMod);
+						abilityBonus = Math.min(mediumArmorDexMod, dexMod);
 					}
-					fieldToAdd += attributeBonus;
+					fieldToAdd += abilityBonus;
 				}
 				var itemTotal = Math.round(qty * fieldToAdd * 100) / 100;
 
@@ -390,16 +390,16 @@ var updateAttack = function () {
 		for (var i = 0; i < ids.length; i++) {
 			var repeatingString = repeatingItem + '_' + ids[i] + '_';
 			collectionArray.push(repeatingString + 'proficient');
-			collectionArray.push(repeatingString + 'attack_attribute');
+			collectionArray.push(repeatingString + 'attack_ability');
 			collectionArray.push(repeatingString + 'attack_bonus');
-			collectionArray.push(repeatingString + 'saving_throw_attribute');
+			collectionArray.push(repeatingString + 'saving_throw_ability');
 			collectionArray.push(repeatingString + 'saving_throw_bonus');
 			collectionArray.push(repeatingString + 'damage');
-			collectionArray.push(repeatingString + 'damage_attribute');
+			collectionArray.push(repeatingString + 'damage_ability');
 			collectionArray.push(repeatingString + 'damage_bonus');
 			collectionArray.push(repeatingString + 'damage_type');
 			collectionArray.push(repeatingString + 'second_damage');
-			collectionArray.push(repeatingString + 'second_damage_attribute');
+			collectionArray.push(repeatingString + 'second_damage_ability');
 			collectionArray.push(repeatingString + 'second_damage_bonus');
 			collectionArray.push(repeatingString + 'second_damage_type');
 		}
@@ -413,23 +413,23 @@ var updateAttack = function () {
 				if(!proficient || proficient === 'on') {
 					toHit += getIntValue(v.pb);
 				}
-				var attackAttribute = v[repeatingString + 'attack_attribute'];
-				toHit += getAttributeValue(v, attackAttribute, 'strength_mod');
+				var attackAbility = v[repeatingString + 'attack_ability'];
+				toHit += getAbilityValue(v, attackAbility, 'strength_mod');
 				toHit += getIntValue(v[repeatingString + 'attack_bonus']);
 				finalSetAttrs[repeatingString + 'to_hit'] = toHit;
 
 				var savingThrowDC = 8 + getIntValue(v.pb);
-				var savingThrowAttribute = v[repeatingString + 'saving_throw_attribute'];
-				savingThrowDC += getAttributeValue(v, savingThrowAttribute, 'strength_mod');
+				var savingThrowAbility = v[repeatingString + 'saving_throw_ability'];
+				savingThrowDC += getAbilityValue(v, savingThrowAbility, 'strength_mod');
 				savingThrowDC += getIntValue(v[repeatingString + 'saving_throw_bonus']);
 				finalSetAttrs[repeatingString + 'saving_throw_dc'] = savingThrowDC;
 
 				var damageString = '';
 				var damageBonus = 0;
-				if (v[repeatingString + 'damage'] || v[repeatingString + 'damage_attribute'] || v[repeatingString + 'damage_bonus'] || v[repeatingString + 'damage_type']) {
+				if (v[repeatingString + 'damage'] || v[repeatingString + 'damage_ability'] || v[repeatingString + 'damage_bonus'] || v[repeatingString + 'damage_type']) {
 					damageString += concatenateIfExists(v[repeatingString + 'damage']);
 
-					damageBonus += getAttributeValue(v, v[repeatingString + 'damage_attribute'], 'strength_mod');
+					damageBonus += getAbilityValue(v, v[repeatingString + 'damage_ability'], 'strength_mod');
 					damageBonus += getIntValue(v[repeatingString + 'damage_bonus'], ' + ');
 
 					damageString += concatenateIfExists(damageBonus, ' + ');
@@ -437,10 +437,10 @@ var updateAttack = function () {
 				}
 
 				var secondDamageBonus = 0;
-				if (v[repeatingString + 'second_damage'] || v[repeatingString + 'second_damage_attribute'] || v[repeatingString + 'second_damage_bonus'] || v[repeatingString + 'second_damage_type']) {
+				if (v[repeatingString + 'second_damage'] || v[repeatingString + 'second_damage_ability'] || v[repeatingString + 'second_damage_bonus'] || v[repeatingString + 'second_damage_type']) {
 					damageString += concatenateIfExists(v[repeatingString + 'second_damage'], ' + ');
 
-					secondDamageBonus += getAttributeValue(v, v[repeatingString + 'second_damage_attribute']);
+					secondDamageBonus += getAbilityValue(v, v[repeatingString + 'second_damage_ability']);
 					secondDamageBonus += getIntValue(v[repeatingString + 'second_damage_bonus']);
 
 					damageString += concatenateIfExists(secondDamageBonus, ' + ');

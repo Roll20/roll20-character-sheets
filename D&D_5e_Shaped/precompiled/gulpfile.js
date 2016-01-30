@@ -118,9 +118,9 @@ function skills(file) {
 	skillsJson.forEach(function (skill) {
 		skills.push(template
 				.replace(/\x7B\x7Bname\x7D\x7D/g, skill.name.lowercase().replace(/ +/g, ''))
-				.replace(/\x7B\x7Battribute\x7D\x7D/g, skill.attribute)
-				.replace(/\x7B\x7BattributeShort\x7D\x7D/g, skill.attribute.substring(0,3).capitalize())
-				.replace(/\x7B\x7BattributeTranslated\x7D\x7D/g, translate('ABILITIES.' + skill.attribute + '.SHORT_NAME_CAPITAL'))
+				.replace(/\x7B\x7Bability\x7D\x7D/g, skill.ability)
+				.replace(/\x7B\x7BabilityShort\x7D\x7D/g, skill.ability.substring(0,3).capitalize())
+				.replace(/\x7B\x7BabilityTranslated\x7D\x7D/g, translate('ABILITIES.' + skill.ability + '.SHORT_NAME_CAPITAL'))
 				.replace(/\x7B\x7BnameTranslatedEn\x7D\x7D/g, skillEn('SKILLS.' + skill.name + '.NAME'))
 				.replace(/\x7B\x7BnameTranslated\x7D\x7D/g, translate('SKILLS.' + skill.name + '.NAME'))
 		);
@@ -150,7 +150,7 @@ function checkQuery(file) {
 
 	skillsJson.forEach(function (skill) {
 		var skillName = skill.name.lowercase().replace(/ +/g, '');
-		query += '|' + skill.name + ' (' + skill.attribute.capitalize() + ') , {{title=' + skill.name + '&amp;#125;&amp;#125; {{roll=[[d20@{d20_mod} + @{' + skillName + '}]]&amp;#125;&amp;#125; {{roll_adv=[[d20@{d20_mod} + @{' + skillName + '}]]&amp;#125;&amp;#125;'
+		query += '|' + skill.name + ' (' + skill.ability.capitalize() + ') , {{title=' + skill.name + '&amp;#125;&amp;#125; {{roll=[[d20@{d20_mod} + @{' + skillName + '}]]&amp;#125;&amp;#125; {{roll_adv=[[d20@{d20_mod} + @{' + skillName + '}]]&amp;#125;&amp;#125;'
 	});
 	for (var i = 1, len = customSkillCount; i <= len; ++i) {
 		var skillName = '@{custom_skill_' + i + '_name}';
