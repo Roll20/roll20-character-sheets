@@ -321,7 +321,7 @@ var sumRepeating = function (options, sumItems) {
 			if (options.collection === 'armor') {
 				finalSetAttrs.ac_unarmored_calc += 10 + getIntValue(v.dexterity_mod) + getAbilityValue(v, v.ac_unarmored_ability);
 
-				finalSetAttrs.ac = Math.max(finalSetAttrs.ac_armored_calc, finalSetAttrs.ac_unarmored_calc) + getFloatValue(v.global_ac_bonus);
+				finalSetAttrs.ac = Math.max(finalSetAttrs.ac_armored_calc, finalSetAttrs.ac_unarmored_calc);
 			}
 
 			console.log('sumRepeating', finalSetAttrs);
@@ -333,7 +333,7 @@ var sumRepeating = function (options, sumItems) {
 var updateArmor = function () {
 	var options = {
 		collection: 'armor',
-		getExtraFields: ['dexterity_mod', 'medium_armor_max_dex', 'ac_unarmored_ability', 'ac_unarmored_bonus', 'global_ac_bonus', 'strength_mod', 'dexterity_mod', 'constitution_mod', 'intelligence_mod', 'wisdom_mod', 'charisma_mod'],
+		getExtraFields: ['dexterity_mod', 'medium_armor_max_dex', 'ac_unarmored_ability', 'ac_unarmored_bonus', 'strength_mod', 'dexterity_mod', 'constitution_mod', 'intelligence_mod', 'wisdom_mod', 'charisma_mod'],
 		toggle: 'worn'
 	};
 	var sumItems = [
@@ -353,7 +353,7 @@ var updateArmor = function () {
 	sumRepeating(options, sumItems);
 };
 
-on('change:repeating_armor change:medium_armor_max_dex change:ac_unarmored_ability change:global_ac_bonus', function () {
+on('change:repeating_armor change:medium_armor_max_dex change:ac_unarmored_ability', function () {
 	updateArmor();
 });
 
