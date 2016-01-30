@@ -389,7 +389,8 @@ var updateAttack = function () {
 	getSectionIDs(repeatingItem, function (ids) {
 		for (var i = 0; i < ids.length; i++) {
 			var repeatingString = repeatingItem + '_' + ids[i] + '_';
-			collectionArray.push(repeatingString + 'proficient');
+			collectionArray.push(repeatingString + 'type');
+			collectionArray.push(repeatingString + 'proficiency');
 			collectionArray.push(repeatingString + 'attack_ability');
 			collectionArray.push(repeatingString + 'attack_bonus');
 			collectionArray.push(repeatingString + 'saving_throw_ability');
@@ -408,9 +409,21 @@ var updateAttack = function () {
 			for (var j = 0; j < ids.length; j++) {
 				var repeatingString = repeatingItem+'_' + ids[j] + '_';
 
+
+				if(!v[repeatingString + 'type'] || v[repeatingString + 'type'] === 'melee') {
+					finalSetAttrs[repeatingString + 'local_attack_bonus'] = '@{global_melee_attack_bonus}';
+					finalSetAttrs[repeatingString + 'local_damage_bonus'] = '@{global_melee_damage_bonus}';
+				} else if(v[repeatingString + 'type'] === 'ranged') {
+					finalSetAttrs[repeatingString + 'local_attack_bonus'] = '@{global_ranged_attack_bonus}';
+					finalSetAttrs[repeatingString + 'local_damage_bonus'] = '@{global_ranged_damage_bonus}';
+				} else {
+					finalSetAttrs[repeatingString + 'local_attack_bonus'] = 0;
+					finalSetAttrs[repeatingString + 'local_damage_bonus'] = 0;
+				}
+
 				var toHit = 0;
-				var proficient = v[repeatingString + 'proficient'];
-				if(!proficient || proficient === 'on') {
+				var proficiency = v[repeatingString + 'proficiency'];
+				if(!proficiency || proficiency === 'on') {
 					toHit += getIntValue(v.pb);
 				}
 				var attackAbility = v[repeatingString + 'attack_ability'];
