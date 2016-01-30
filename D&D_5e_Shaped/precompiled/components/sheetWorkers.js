@@ -467,3 +467,24 @@ var updateAttack = function () {
 		});
 	});
 };
+
+var updateD20Mod = function () {
+	var collectionArray = ['halfling_luck'];
+	var finalSetAttrs = {};
+
+	getAttrs(collectionArray, function (v) {
+		if (!v.halfling_luck || v.halfling_luck === 'on') {
+			finalSetAttrs.d20_mod = 'ro<1';
+		} else {
+			finalSetAttrs.d20_mod = '';
+		}
+
+		console.log('updateD20Mod', finalSetAttrs);
+		setAttrs(finalSetAttrs);
+	});
+};
+
+on('change:halfling_luck', function () {
+	updateD20Mod();
+});
+
