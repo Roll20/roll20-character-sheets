@@ -13,7 +13,6 @@ var wrap = require('gulp-wrap');
 var change = require('gulp-change');
 var fs = require('fs');
 
-var customSkillCount = 6;
 var traitsCount = 1;
 var actionCount = 12;
 var lairActionCount = 4;
@@ -175,11 +174,6 @@ function checkQuery(file) {
 		var skillName = skill.name.lowercase().replace(/ +/g, '');
 		query += '|' + skill.name + ' (' + skill.ability.capitalize() + ') , {{title=' + skill.name + '&amp;#125;&amp;#125; {{roll=[[d20@{d20_mod} + @{' + skillName + '}]]&amp;#125;&amp;#125; {{roll_adv=[[d20@{d20_mod} + @{' + skillName + '}]]&amp;#125;&amp;#125;'
 	});
-	for (var i = 1, len = customSkillCount; i <= len; ++i) {
-		var skillName = '@{custom_skill_' + i + '_name}';
-
-		query += '|' + skillName + ', {{title=' + skillName + '&amp;#125;&amp;#125; {{roll=[[d20@{d20_mod} + @{custom_skill_' + i + '}]]&amp;#125;&amp;#125; {{roll_adv=[[d20@{d20_mod} + @{custom_skill_' + i + '}]]&amp;#125;&amp;#125;'
-	}
 	query += '|-';
 	for (var i = 0; i < abilitiesName.length; ++i) {
 		var ability = abilitiesName[i];
@@ -236,18 +230,6 @@ gulp.task('preCompile', function () {
 			starttag: '<!-- inject:skillsBonuses:{{ext}} -->',
 			transform: function (filePath, file) {
 				return skills(file);
-			}
-		}))
-		.pipe(inject(gulp.src(['./components/skills/custom_skill.html']), {
-			starttag: '<!-- inject:customSkills:{{ext}} -->',
-			transform: function (filePath, file) {
-				return duplicate(file, customSkillCount, 1);
-			}
-		}))
-		.pipe(inject(gulp.src(['./components/skills/custom_skill_bonuses.html']), {
-			starttag: '<!-- inject:customSkillsBonuses:{{ext}} -->',
-			transform: function (filePath, file) {
-				return duplicate(file, customSkillCount, 1);
 			}
 		}))
 		.pipe(inject(gulp.src(['./components/actions/traits.html']), {
