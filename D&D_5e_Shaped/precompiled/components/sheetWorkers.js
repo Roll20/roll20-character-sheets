@@ -464,6 +464,7 @@ var updateAttack = function () {
 			collectionArray.push(repeatingString + 'proficiency');
 			collectionArray.push(repeatingString + 'attack_ability');
 			collectionArray.push(repeatingString + 'attack_bonus');
+			collectionArray.push(repeatingString + 'saving_throw_toggle');
 			collectionArray.push(repeatingString + 'saving_throw_ability');
 			collectionArray.push(repeatingString + 'saving_throw_bonus');
 			collectionArray.push(repeatingString + 'attack_toggle');
@@ -537,7 +538,6 @@ var updateAttack = function () {
 					finalSetAttrs[repeatingString + 'to_hit'] = toHit;
 					finalSetAttrs[repeatingString + 'attack_formula'] = attackFormula;
 				}
-
 
 				var savingThrowToggle = v[repeatingString + 'saving_throw_toggle'];
 				if (savingThrowToggle === '{{saving_throw_toggle=1}}') {
