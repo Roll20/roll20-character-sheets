@@ -275,7 +275,9 @@ var sumRepeating = function (options, sumItems) {
 
 			for (var x = 0; x < sumItems.length; x++) {
 				finalSetAttrs[sumItems[x].totalField] = 0;
-				finalSetAttrs[sumItems[x].totalFieldSecondary] = 0;
+				if (sumItems[x].totalFieldSecondary) {
+					finalSetAttrs[sumItems[x].totalFieldSecondary] = 0;
+				}
 				collectionArray.push(repeatingString + sumItems[x].fieldToAdd);
 				if(sumItems[x].bonus) {
 					collectionArray.push(repeatingString + sumItems[x].bonus);
