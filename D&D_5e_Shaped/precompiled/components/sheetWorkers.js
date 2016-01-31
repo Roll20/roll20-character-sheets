@@ -344,6 +344,15 @@ var sumRepeating = function (options, sumItems) {
 					}
 				}
 			}
+			for (var x = 0; x < sumItems.length; x++) {
+				if (sumItems[x].totalField && !exists(finalSetAttrs[sumItems[x].totalField])) {
+					finalSetAttrs[sumItems[x].totalField] = 0;
+				}
+				if (sumItems[x].totalFieldSecondary && !exists(finalSetAttrs[sumItems[x].totalFieldSecondary])) {
+					finalSetAttrs[sumItems[x].totalFieldSecondary] = 0;
+				}
+			}
+
 
 			if (options.collection === 'armor') {
 				finalSetAttrs.ac_unarmored_calc += 10 + getIntValue(v.dexterity_mod) + getAbilityValue(v, v.ac_unarmored_ability);
@@ -380,11 +389,11 @@ var updateArmor = function () {
 	sumRepeating(options, sumItems);
 };
 
-on('change:repeating_armor change:medium_armor_max_dex change:ac_unarmored_ability', function () {
+on('change:repeating_armor change:medium_armor_max_dex change:ac_unarmored_ability remove:repeating_armor', function () {
 	updateArmor();
 });
 
-on('change:repeating_equipment', function () {
+on('change:repeating_equipment remove:repeating_equipment', function () {
 	var options = {
 		collection: 'equipment',
 		toggle: 'carried',
@@ -420,7 +429,7 @@ on('change:jack_of_all_trades_toggle', function () {
 });
 
 
-on('change:repeating_attack', function () {
+on('change:repeating_attack remove:repeating_attack', function () {
 	updateAttack();
 
 
