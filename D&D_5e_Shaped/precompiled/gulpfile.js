@@ -75,11 +75,6 @@ function translate (key) {
 	return translation;
 }
 
-function skillEn (key) {
-	getTranslationsIfTheyDontExist();
-	return objByString(translations.en, key);
-}
-
 function actionsCompile(file, limit, type, name) {
 	var template = file.contents.toString('utf8');
 	var s = [];
@@ -108,46 +103,6 @@ function duplicate(file, limit, start) {
 		);
 	}
 	return s.join('\n\n');
-}
-function skills(file) {
-	var template = file.contents.toString('utf8');
-	var skillsJson = require('./components/skills/skills.json').skills;
-	var skills = [];
-
-	var selectedString = ' selected';
-
-	skillsJson.forEach(function (skill) {
-		var skillTemplate = template;
-		if (skill.ability === 'strength') {
-			skillTemplate = skillTemplate.replace(/\x7B\x7Bstr_selected\x7D\x7D/g, selectedString);
-		} else if (skill.ability === 'dexterity') {
-			skillTemplate = skillTemplate.replace(/\x7B\x7Bdex_selected\x7D\x7D/g, selectedString);
-		} else if (skill.ability === 'constitution') {
-			skillTemplate = skillTemplate.replace(/\x7B\x7Bcon_selected\x7D\x7D/g, selectedString);
-		} else if (skill.ability === 'intelligence') {
-			skillTemplate = skillTemplate.replace(/\x7B\x7Bint_selected\x7D\x7D/g, selectedString);
-		} else if (skill.ability === 'wisdom') {
-			skillTemplate = skillTemplate.replace(/\x7B\x7Bwis_selected\x7D\x7D/g, selectedString);
-		} else if (skill.ability === 'charisma') {
-			skillTemplate = skillTemplate.replace(/\x7B\x7Bcha_selected\x7D\x7D/g, selectedString);
-		}
-		skillTemplate = skillTemplate.replace(/\x7B\x7Bstr_selected\x7D\x7D/g, '');
-		skillTemplate = skillTemplate.replace(/\x7B\x7Bdex_selected\x7D\x7D/g, '');
-		skillTemplate = skillTemplate.replace(/\x7B\x7Bcon_selected\x7D\x7D/g, '');
-		skillTemplate = skillTemplate.replace(/\x7B\x7Bint_selected\x7D\x7D/g, '');
-		skillTemplate = skillTemplate.replace(/\x7B\x7Bwis_selected\x7D\x7D/g, '');
-		skillTemplate = skillTemplate.replace(/\x7B\x7Bcha_selected\x7D\x7D/g, '');
-
-		skills.push(skillTemplate
-				.replace(/\x7B\x7Bname\x7D\x7D/g, skill.name.lowercase().replace(/ +/g, ''))
-				.replace(/\x7B\x7Bability\x7D\x7D/g, skill.ability)
-				.replace(/\x7B\x7BabilityShort\x7D\x7D/g, skill.ability.substring(0,3).capitalize())
-				.replace(/\x7B\x7BabilityTranslated\x7D\x7D/g, translate('ABILITIES.' + skill.ability + '.SHORT_NAME_CAPITAL'))
-				.replace(/\x7B\x7BnameTranslatedEn\x7D\x7D/g, skillEn('SKILLS.' + skill.name))
-				.replace(/\x7B\x7BnameTranslated\x7D\x7D/g, translate('SKILLS.' + skill.name))
-		);
-	});
-	return skills.join('\n\n');
 }
 
 function saveQuery(file) {
@@ -220,18 +175,6 @@ gulp.task('preCompile', function () {
 			]
 		}))
 		.pipe(include())
-		.pipe(inject(gulp.src(['./components/skills/skill.html']), {
-			starttag: '<!-- inject:skills:{{ext}} -->',
-			transform: function (filePath, file) {
-				return skills(file);
-			}
-		}))
-		.pipe(inject(gulp.src(['./components/skills/skill_bonuses.html']), {
-			starttag: '<!-- inject:skillsBonuses:{{ext}} -->',
-			transform: function (filePath, file) {
-				return skills(file);
-			}
-		}))
 		.pipe(inject(gulp.src(['./components/actions/traits.html']), {
 			starttag: '<!-- inject:traits:{{ext}} -->',
 			transform: function (filePath, file) {
