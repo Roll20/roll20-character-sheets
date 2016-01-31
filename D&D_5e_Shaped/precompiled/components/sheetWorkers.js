@@ -307,9 +307,9 @@ var sumRepeating = function (options, sumItems) {
 						fieldToAdd += getFloatValue(v[repeatingString + sumItems[x].bonus]);
 					}
 					if(sumItems[x].armorType) {
-						if(v[repeatingString + sumItems[x].armorType] === 'light') {
+						if(v[repeatingString + sumItems[x].armorType] === 'Light Armor') {
 							fieldToAdd += dexMod;
-						} else if (v[repeatingString + sumItems[x].armorType] === 'medium') {
+						} else if (v[repeatingString + sumItems[x].armorType] === 'Medium Armor') {
 							var mediumArmorDexMod = getIntValue(v.medium_armor_max_dex, 2);
 							fieldToAdd += Math.min(mediumArmorDexMod, dexMod);
 						}
@@ -327,9 +327,9 @@ var sumRepeating = function (options, sumItems) {
 						var addToSecondary = false;
 
 						if(sumItems[x].armorType) {
-							if (v[repeatingString + sumItems[x].armorType] === 'shield') {
+							if (v[repeatingString + sumItems[x].armorType] === 'Shield') {
 								addToSecondary = true;
-							} else if (v[repeatingString + sumItems[x].armorType] === 'unarmored') {
+							} else if (v[repeatingString + sumItems[x].armorType] === 'Unarmored') {
 								addToPrimary = false;
 								addToSecondary = true;
 							}
