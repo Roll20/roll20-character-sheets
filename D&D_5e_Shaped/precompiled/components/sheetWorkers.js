@@ -2,6 +2,10 @@ var capitalizeFirstLetter = function (string) {
 	return string.charAt(0).toUpperCase() + string.slice(1);
 };
 
+var firstThreeChars = function (string) {
+	return string.substring(0, 3);
+};
+
 var getIntValue = function (value, defaultValue) {
   if (!defaultValue) {
     defaultValue = 0;
@@ -512,3 +516,53 @@ on('change:halfling_luck', function () {
 	updateD20Mod();
 });
 
+var updateSkill = function () {
+	var repeatingItem = 'repeating_skill';
+	var collectionArray = ['pb', 'exp', 'strength_mod', 'dexterity_mod', 'constitution_mod', 'intelligence_mod', 'wisdom_mod', 'charisma_mod'];
+	var finalSetAttrs = {};
+
+	getSectionIDs(repeatingItem, function (ids) {
+		for (var i = 0; i < ids.length; i++) {
+			var repeatingString = repeatingItem + '_' + ids[i] + '_';
+			collectionArray.push(repeatingString + 'proficiency');
+			collectionArray.push(repeatingString + 'name');
+			collectionArray.push(repeatingString + 'ability');
+			collectionArray.push(repeatingString + 'bonus');
+		}
+
+		getAttrs(collectionArray, function (v) {
+			for (var j = 0; j < ids.length; j++) {
+				var repeatingString = repeatingItem+'_' + ids[j] + '_';
+
+				var ability = v[repeatingString + 'ability'].replace(/\W/g, '');
+				if (!ability) {
+					ability = 'strength';
+				}
+				finalSetAttrs[repeatingString + 'ability_short_name'] = capitalizeFirstLetter(firstThreeChars(ability));
+
+				var total = 0;
+				var proficiency = v[repeatingString + 'proficiency'];
+				if (proficiency === 'proficient') {
+					var pb = getIntValue(v.pb);
+					total += pb;
+					finalSetAttrs[repeatingString + 'proficiency_toggled'] = pb;
+				} else if (proficiency === 'expertise') {
+					var exp = getIntValue(v.exp);
+					total += exp;
+					finalSetAttrs[repeatingString + 'proficiency_toggled'] = exp;
+				}
+				var skillAbility = v[repeatingString + 'ability'];
+				total += getAbilityValue(v, skillAbility, 'strength_mod');
+				total += getIntValue(v[repeatingString + 'bonus']);
+				finalSetAttrs[repeatingString + 'total'] = total;
+			}
+
+			console.log('updateSkill', finalSetAttrs);
+			setAttrs(finalSetAttrs);
+		});
+	});
+};
+
+on('change:repeating_skill', function () {
+	updateSkill();
+});
