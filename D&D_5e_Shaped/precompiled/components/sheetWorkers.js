@@ -491,9 +491,11 @@ var updateAttack = function () {
 			for (var j = 0; j < ids.length; j++) {
 				var repeatingString = repeatingItem+'_' + ids[j] + '_';
 
-				if (v[repeatingString + 'attack_toggle']) {
+				var attackFormula = '';
+
+				var attackToggle = v[repeatingString + 'attack_toggle'];
+				if (!attackToggle || attackToggle === '{{attack_toggle=1}}') {
 					var toHit = 0;
-					var attackFormula = '';
 
 					var proficiency = v[repeatingString + 'proficiency'];
 					if (!proficiency || proficiency === 'on') {
@@ -536,16 +538,21 @@ var updateAttack = function () {
 					finalSetAttrs[repeatingString + 'attack_formula'] = attackFormula;
 				}
 
-				var savingThrowDC = 8 + getIntValue(v.pb);
-				var savingThrowAbility = v[repeatingString + 'saving_throw_ability'];
-				savingThrowDC += getAbilityValue(v, savingThrowAbility, 'strength_mod');
-				savingThrowDC += getIntValue(v[repeatingString + 'saving_throw_bonus']);
-				finalSetAttrs[repeatingString + 'saving_throw_dc'] = savingThrowDC;
+
+				var savingThrowToggle = v[repeatingString + 'saving_throw_toggle'];
+				if (savingThrowToggle === '{{saving_throw_toggle=1}}') {
+					var savingThrowDC = 8 + getIntValue(v.pb);
+					var savingThrowAbility = v[repeatingString + 'saving_throw_ability'];
+					savingThrowDC += getAbilityValue(v, savingThrowAbility, 'strength_mod');
+					savingThrowDC += getIntValue(v[repeatingString + 'saving_throw_bonus']);
+					finalSetAttrs[repeatingString + 'saving_throw_dc'] = savingThrowDC;
+				}
 
 				var damageString = '';
+				var damageFormula = '';
 
-				if (v[repeatingString + 'damage_toggle']) {
-					var damageFormula = '';
+				var damageToggle = v[repeatingString + 'damage_toggle'];
+				if (!damageToggle || damageToggle === '{{damage_toggle=1}}') {
 					var damageAddition = 0;
 
 					var damage = v[repeatingString + 'damage'];
@@ -557,13 +564,19 @@ var updateAttack = function () {
 					var damageAbility = getAbilityValue(v, v[repeatingString + 'damage_ability'], 'strength_mod');
 					if (exists(damageAbility)) {
 						damageAddition += damageAbility;
-						damageFormula += ADD + damageAbility + '[' + getAbilityShortName(v[repeatingString + 'damage_ability']) + ']';
+						if (damageFormula !== '') {
+							damageFormula += ADD;
+						}
+						damageFormula += damageAbility + '[' + getAbilityShortName(v[repeatingString + 'damage_ability']) + ']';
 					}
 
 					var damageBonus = getIntValue(v[repeatingString + 'damage_bonus']);
 					if (exists(damageBonus)) {
 						damageAddition += damageBonus;
-						damageFormula += ADD + damageBonus + '[bonus]';
+						if (damageFormula !== '') {
+							damageFormula += ADD;
+						}
+						damageFormula += damageBonus + '[bonus]';
 					}
 
 					damageAddition += globalDamageBonus;
@@ -571,10 +584,16 @@ var updateAttack = function () {
 
 					if(!v[repeatingString + 'type'] || v[repeatingString + 'type'] === 'melee') {
 						damageAddition += globalMeleeDamageBonus;
-						damageFormula += ADD + globalMeleeDamageBonus + '[global melee damage bonus]';
+						if (damageFormula !== '') {
+							damageFormula += ADD;
+						}
+						damageFormula += globalMeleeDamageBonus + '[global melee damage bonus]';
 					} else if (v[repeatingString + 'type'] === 'ranged') {
 						damageAddition += globalRangedDamageBonus;
-						damageFormula += ADD + globalRangedDamageBonus + '[global ranged damage bonus]';
+						if (damageFormula !== '') {
+							damageFormula += ADD;
+						}
+						damageFormula += globalRangedDamageBonus + '[global ranged damage bonus]';
 					}
 
 					if (exists(damageAddition)) {
@@ -585,17 +604,17 @@ var updateAttack = function () {
 					if (exists(damageType)) {
 						damageString += SPACE + damageType;
 					}
-
-					if (!exists(damageFormula)) {
-						damageFormula = 0;
-					}
-					finalSetAttrs[repeatingString + 'damage_formula'] = damageFormula;
 				}
+				if (!exists(damageFormula)) {
+					damageFormula = 0;
+				}
+				finalSetAttrs[repeatingString + 'damage_formula'] = damageFormula;
 
-				var secondDamageAddition = 0;
 				var secondDamageFormula = '';
 
-				if (v[repeatingString + 'second_damage_toggle']) {
+				var secondDamageToggle = v[repeatingString + 'second_damage_toggle'];
+				if (secondDamageToggle === '{{second_damage_toggle=1}}') {
+					var secondDamageAddition = 0;
 					var secondDamage = v[repeatingString + 'second_damage'];
 					if (exists(secondDamage)) {
 						damageString += ADD + secondDamage;
@@ -605,13 +624,19 @@ var updateAttack = function () {
 					var secondDamageAbility = getAbilityValue(v, v[repeatingString + 'second_damage_ability']);
 					if (exists(secondDamageAbility)) {
 						secondDamageAddition += secondDamageAbility;
-						secondDamageFormula += ADD + secondDamageAbility + '[' + getAbilityShortName(v[repeatingString + 'second_damage_ability']) + ']';
+						if (secondDamageFormula !== '') {
+							secondDamageFormula += ADD;
+						}
+						secondDamageFormula += secondDamageAbility + '[' + getAbilityShortName(v[repeatingString + 'second_damage_ability']) + ']';
 					}
 
 					var secondDamageBonus = getIntValue(v[repeatingString + 'second_damage_bonus']);
 					if (exists(secondDamageBonus)) {
 						secondDamageAddition += secondDamageBonus;
-						secondDamageFormula += ADD + secondDamageBonus + '[bonus]';
+						if (secondDamageFormula !== '') {
+							secondDamageFormula += ADD;
+						}
+						secondDamageFormula += secondDamageBonus + '[bonus]';
 					}
 
 					if (exists(secondDamageAddition)) {
@@ -623,11 +648,11 @@ var updateAttack = function () {
 						damageString += SPACE + secondDamageType;
 					}
 
-					if (!exists(secondDamageFormula)) {
-						secondDamageFormula = 0;
-					}
-					finalSetAttrs[repeatingString + 'second_damage_formula'] = secondDamageFormula;
 				}
+				if (!exists(secondDamageFormula)) {
+					secondDamageFormula = 0;
+				}
+				finalSetAttrs[repeatingString + 'second_damage_formula'] = secondDamageFormula;
 
 				finalSetAttrs[repeatingString + 'damage_string'] = damageString;
 			}
