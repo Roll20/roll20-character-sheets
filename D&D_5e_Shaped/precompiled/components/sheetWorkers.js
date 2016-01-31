@@ -531,7 +531,7 @@ var updateD20Mod = function () {
 
 	getAttrs(collectionArray, function (v) {
 		if (v.halfling_luck === 'on') {
-			finalSetAttrs.d20_mod = 'ro<1';
+			finalSetAttrs.d20_mod = 'ro<1[halfling luck]';
 		} else {
 			finalSetAttrs.d20_mod = '';
 		}
