@@ -379,7 +379,23 @@ on('change:repeating_equipment', function () {
 
 on('change:pb', function () {
   updateAttack();
+	updateJackOfAllTrades();
 });
+
+var updateJackOfAllTrades = function () {
+	var finalSetAttrs = {};
+
+	getAttrs(['pb'], function (v) {
+		finalSetAttrs.jack_of_all_trades = Math.floor(getIntValue(v.pb) / 2);
+
+		setAttrs(finalSetAttrs);
+		updateSkill();
+	});
+};
+on('change:jack_of_all_trades_toggle', function () {
+	updateJackOfAllTrades();
+});
+
 
 on('change:repeating_attack', function () {
 	updateAttack();
@@ -453,6 +469,8 @@ var updateAttack = function () {
 					var pb = getIntValue(v.pb);
 					toHit += pb;
 					finalSetAttrs[repeatingString + 'proficiency_toggled'] = pb;
+				} else {
+					finalSetAttrs[repeatingString + 'proficiency_toggled'] = '';
 				}
 				var attackAbility = v[repeatingString + 'attack_ability'];
 				toHit += getAbilityValue(v, attackAbility, 'strength_mod');
@@ -501,7 +519,7 @@ var updateD20Mod = function () {
 	var finalSetAttrs = {};
 
 	getAttrs(collectionArray, function (v) {
-		if (!v.halfling_luck || v.halfling_luck === 'on') {
+		if (v.halfling_luck === 'on') {
 			finalSetAttrs.d20_mod = 'ro<1';
 		} else {
 			finalSetAttrs.d20_mod = '';
@@ -518,7 +536,7 @@ on('change:halfling_luck', function () {
 
 var updateSkill = function () {
 	var repeatingItem = 'repeating_skill';
-	var collectionArray = ['pb', 'exp', 'strength_mod', 'dexterity_mod', 'constitution_mod', 'intelligence_mod', 'wisdom_mod', 'charisma_mod'];
+	var collectionArray = ['jack_of_all_trades_toggle', 'jack_of_all_trades', 'pb', 'exp', 'strength_mod', 'dexterity_mod', 'constitution_mod', 'intelligence_mod', 'wisdom_mod', 'charisma_mod'];
 	var finalSetAttrs = {};
 
 	getSectionIDs(repeatingItem, function (ids) {
@@ -542,7 +560,15 @@ var updateSkill = function () {
 
 				var total = 0;
 				var proficiency = v[repeatingString + 'proficiency'];
-				if (proficiency === 'proficient') {
+				if (!proficiency || proficiency === 'unproficient') {
+					if (v.jack_of_all_trades_toggle === 'on') {
+						var jackOfAllTrades = getIntValue(v.jack_of_all_trades);
+						total += jackOfAllTrades;
+						finalSetAttrs[repeatingString + 'proficiency_toggled'] = jackOfAllTrades;
+					} else {
+						finalSetAttrs[repeatingString + 'proficiency_toggled'] = '';
+					}
+				} else if (proficiency === 'proficient') {
 					var pb = getIntValue(v.pb);
 					total += pb;
 					finalSetAttrs[repeatingString + 'proficiency_toggled'] = pb;
@@ -565,4 +591,108 @@ var updateSkill = function () {
 
 on('change:repeating_skill', function () {
 	updateSkill();
+});
+
+
+var sheetOpened = function () {
+	var collectionArray = ['version'];
+	var finalSetAttrs = {};
+
+	getAttrs(['version'], function (v) {
+		var version = getFloatValue(v.version);
+
+		if (!version) {
+			var skills = [
+				{
+					'name': 'Acrobatics',
+					'ability': 'dexterity'
+				},
+				{
+					'name': 'Animal Handling',
+					'ability': 'wisdom'
+				},
+				{
+					'name': 'Arcana',
+					'ability': 'intelligence'
+				},
+				{
+					'name': 'Athletics',
+					'ability': 'strength'
+				},
+				{
+					'name': 'Deception',
+					'ability': 'charisma'
+				},
+				{
+					'name': 'History',
+					'ability': 'intelligence'
+				},
+				{
+					'name': 'Insight',
+					'ability': 'wisdom'
+				},
+				{
+					'name': 'Intimidation',
+					'ability': 'charisma'
+				},
+				{
+					'name': 'Investigation',
+					'ability': 'intelligence'
+				},
+				{
+					'name': 'Medicine',
+					'ability': 'wisdom'
+				},
+				{
+					'name': 'Nature',
+					'ability': 'intelligence'
+				},
+				{
+					'name': 'Perception',
+					'ability': 'wisdom'
+				},
+				{
+					'name': 'Performance',
+					'ability': 'charisma'
+				},
+				{
+					'name': 'Persuasion',
+					'ability': 'charisma'
+				},
+				{
+					'name': 'Religion',
+					'ability': 'intelligence'
+				},
+				{
+					'name': 'Sleight of Hand',
+					'ability': 'dexterity'
+				},
+				{
+					'name': 'Stealth',
+					'ability': 'dexterity'
+				},
+				{
+					'name': 'Survival',
+					'ability': 'wisdom'
+				}
+			];
+
+			for (var i = 0; i < skills.length; i++) {
+				var newRowId = generateRowID();
+				var repeatingString = 'repeating_skill_' + newRowId + '_';
+				finalSetAttrs[repeatingString + 'name'] = skills[i].name;
+				finalSetAttrs[repeatingString + 'ability'] = '@{' + skills[i].ability + '_mod}';
+			}
+
+
+			finalSetAttrs.version = '2.0.0';
+		}
+
+		setAttrs(finalSetAttrs);
+		updateSkill();
+	});
+};
+
+on('sheet:opened', function () {
+	sheetOpened();
 });
