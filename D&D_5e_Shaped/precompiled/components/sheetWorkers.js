@@ -30,6 +30,17 @@ var getAbilityValue = function (v, varName, defaultAbility) {
   }
   return 0;
 };
+var getAbilityShortName = function (varName, capital) {
+	if (!varName) {
+		return 'Str';
+	}
+	varName = varName.replace(/\W/g, '');
+	if (capital) {
+		varName = capitalizeFirstLetter(varName);
+	}
+	return firstThreeChars(varName);
+};
+
 
 on('change:cp change:sp change:ep change:gp change:pp', function () {
 	getAttrs(['cp', 'copper_per_gold', 'sp', 'silver_per_gold', 'ep', 'electrum_per_gold', 'gp', 'pp', 'platinum_per_gold'], function (v) {
@@ -536,7 +547,7 @@ on('change:halfling_luck', function () {
 
 var updateSkill = function () {
 	var repeatingItem = 'repeating_skill';
-	var collectionArray = ['jack_of_all_trades_toggle', 'jack_of_all_trades', 'pb', 'exp', 'strength_mod', 'dexterity_mod', 'constitution_mod', 'intelligence_mod', 'wisdom_mod', 'charisma_mod'];
+	var collectionArray = ['jack_of_all_trades_toggle', 'jack_of_all_trades', 'pb', 'exp', 'strength_mod', 'dexterity_mod', 'constitution_mod', 'intelligence_mod', 'wisdom_mod', 'charisma_mod', 'global_check_bonus'];
 	var finalSetAttrs = {};
 
 	getSectionIDs(repeatingItem, function (ids) {
@@ -559,27 +570,39 @@ var updateSkill = function () {
 				finalSetAttrs[repeatingString + 'ability_short_name'] = capitalizeFirstLetter(firstThreeChars(ability));
 
 				var total = 0;
+				finalSetAttrs[repeatingString + 'formula'] = '';
+
 				var proficiency = v[repeatingString + 'proficiency'];
 				if (!proficiency || proficiency === 'unproficient') {
 					if (v.jack_of_all_trades_toggle === 'on') {
 						var jackOfAllTrades = getIntValue(v.jack_of_all_trades);
 						total += jackOfAllTrades;
-						finalSetAttrs[repeatingString + 'proficiency_toggled'] = jackOfAllTrades;
+						finalSetAttrs[repeatingString + 'formula'] += jackOfAllTrades + '[jack of all trades]';
 					} else {
-						finalSetAttrs[repeatingString + 'proficiency_toggled'] = '';
+						finalSetAttrs[repeatingString + 'formula'] += 0 + '[unproficient]';
 					}
 				} else if (proficiency === 'proficient') {
 					var pb = getIntValue(v.pb);
 					total += pb;
-					finalSetAttrs[repeatingString + 'proficiency_toggled'] = pb;
+					finalSetAttrs[repeatingString + 'formula'] += pb + '[proficient]';
 				} else if (proficiency === 'expertise') {
 					var exp = getIntValue(v.exp);
 					total += exp;
-					finalSetAttrs[repeatingString + 'proficiency_toggled'] = exp;
+					finalSetAttrs[repeatingString + 'formula'] += exp + '[expertise]';
 				}
-				var skillAbility = v[repeatingString + 'ability'];
-				total += getAbilityValue(v, skillAbility, 'strength_mod');
-				total += getIntValue(v[repeatingString + 'bonus']);
+
+				var skillAbility = getAbilityValue(v, v[repeatingString + 'ability'], 'strength_mod');
+				total += skillAbility;
+				finalSetAttrs[repeatingString + 'formula'] += ' + ' + skillAbility + '[' + getAbilityShortName(v[repeatingString + 'ability']) + ']';
+
+				var skillBonus = getIntValue(v[repeatingString + 'bonus']);
+				total += skillBonus;
+				finalSetAttrs[repeatingString + 'formula'] += ' + ' + skillBonus + '[bonus]';
+
+				var globalCheckBonus = getIntValue(v.global_check_bonus);
+				total += globalCheckBonus;
+				finalSetAttrs[repeatingString + 'formula'] += ' + ' + globalCheckBonus + '[global check bonus]';
+
 				finalSetAttrs[repeatingString + 'total'] = total;
 			}
 
