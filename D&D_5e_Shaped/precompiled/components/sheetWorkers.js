@@ -437,6 +437,9 @@ on('change:repeating_attack', function () {
 	sumRepeating(options, sumItems);
 });
 
+on('change:global_attack_bonus change:global_melee_attack_bonus change:global_ranged_attack_bonus change:global_damage_bonus change:global_melee_damage_bonus change:global_ranged_damage_bonus', function () {
+	updateAttack();
+});
 
 var concatenateIfExists = function (value, joiner) {
 	if (value === 0 || value === '0' || value === '' || !value) {
