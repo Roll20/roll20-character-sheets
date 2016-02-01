@@ -75,9 +75,6 @@ on('change:cp change:sp change:ep change:gp change:pp', function () {
 var getAbilityMod = function (score) {
 	return Math.floor((getIntValue(score) - 10) / 2);
 };
-var getHalfRoundedDown = function (value) {
-	return Math.floor(value / 2);
-};
 
 var updateAbilityModifier = function (ability) {
 	var collectionArray = [ability, ability + '_bonus'];
@@ -665,6 +662,7 @@ var updateAttack = function () {
 			collectionArray.push(repeatingString + 'second_damage_ability');
 			collectionArray.push(repeatingString + 'second_damage_bonus');
 			collectionArray.push(repeatingString + 'second_damage_type');
+			collectionArray.push(repeatingString + 'parsed');
 		}
 
 		getAttrs(collectionArray, function (v) {
@@ -687,6 +685,7 @@ var updateAttack = function () {
 					globalRangedDamageBonus: getIntValue(v.global_ranged_damage_bonus)
 				};
 				updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
+				finalSetAttrs[repeatingString + 'parsed'] = true;
 			}
 
 			console.log('updateAttack', finalSetAttrs);
@@ -710,6 +709,7 @@ var updateSpell = function () {
 			collectionArray.push(repeatingString + 'attack_bonus');
 			collectionArray.push(repeatingString + 'saving_throw_toggle');
 			collectionArray.push(repeatingString + 'saving_throw_ability');
+			collectionArray.push(repeatingString + 'saving_throw_vs_ability');
 			collectionArray.push(repeatingString + 'saving_throw_bonus');
 			collectionArray.push(repeatingString + 'damage_toggle');
 			collectionArray.push(repeatingString + 'damage');
@@ -721,6 +721,7 @@ var updateSpell = function () {
 			collectionArray.push(repeatingString + 'second_damage_ability');
 			collectionArray.push(repeatingString + 'second_damage_bonus');
 			collectionArray.push(repeatingString + 'second_damage_type');
+			collectionArray.push(repeatingString + 'parsed');
 		}
 
 		getAttrs(collectionArray, function (v) {
@@ -738,6 +739,23 @@ var updateSpell = function () {
 					globalDamageBonus: getIntValue(v.global_spell_damage_bonus)
 				};
 				updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
+
+				if (!exists(v[repeatingString + 'parsed'])) {
+					if (exists(finalSetAttrs[repeatingString + 'type']) || exists(v[repeatingString + 'type'])) {
+						finalSetAttrs[repeatingString + 'roll_toggle'] = '@{roll_toggle_var}';
+					}
+					if (exists(v[repeatingString + 'saving_throw_vs_ability'])) {
+						finalSetAttrs[repeatingString + 'damage_toggle'] = '@{damage_toggle_var}';
+					}
+					if (exists(finalSetAttrs[repeatingString + 'damage']) || exists(v[repeatingString + 'damage'])) {
+						finalSetAttrs[repeatingString + 'damage_toggle'] = '@{damage_toggle_var}';
+					}
+					if (exists(finalSetAttrs[repeatingString + 'second_damage']) || exists(v[repeatingString + 'second_damage'])) {
+						finalSetAttrs[repeatingString + 'second_damage_toggle'] = '@{second_damage_toggle_var}';
+					}
+				}
+
+				finalSetAttrs[repeatingString + 'parsed'] = true;
 			}
 
 			console.log('updateSpell', finalSetAttrs);
