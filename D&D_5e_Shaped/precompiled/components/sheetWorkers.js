@@ -90,11 +90,11 @@ var updateAbilityModifier = function (ability) {
 	}
 
 	getAttrs(collectionArray, function (v) {
-		var abilityMod = getAbilityMod(v[ability]);
-		abilityMod += getHalfRoundedDown(v[ability + '_bonus']);
+		var abilityScore = getIntValue(v[ability]);
+		var abilityBonus = getIntValue(v[ability + '_bonus']);
+		var abilityMod = getAbilityMod((abilityScore + abilityBonus));
 
-		var abilityCheckFormula = getAbilityMod(v[ability]) + '[' + firstThreeChars(ability) + ' mod]';
-		abilityCheckFormula += ADD + getAbilityMod(v[ability + '_bonus']) + '[' + firstThreeChars(ability) + ' bonus moded]';
+		var abilityCheckFormula = abilityMod + '[' + firstThreeChars(ability) + ' mod with bonus]';
 		abilityCheckFormula += ADD + '@{jack_of_all_trades_toggle}[jack of all trades]';
 		abilityCheckFormula += ADD + '(@{global_check_bonus})[global check bonus]';
 
