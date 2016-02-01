@@ -742,7 +742,7 @@ var updateSkill = function () {
 
 				var proficiency = v[repeatingString + 'proficiency'];
 				if (!proficiency || proficiency === 'unproficient') {
-					if (v.jack_of_all_trades_toggle === 'on') {
+					if (v.jack_of_all_trades_toggle === '@{jack_of_all_trades}') {
 						var jackOfAllTrades = getIntValue(v.jack_of_all_trades);
 						total += jackOfAllTrades;
 						totalFormula += jackOfAllTrades + '[jack of all trades]';
