@@ -465,9 +465,8 @@ var updateAttackToggle = function (v, finalSetAttrs, repeatingString, options) {
 	var attackFormula = '';
 	var attackToggle = v[repeatingString + 'roll_toggle'];
 
+	var toHit = 0;
 	if (!attackToggle || attackToggle === '@{roll_toggle_var}') {
-		var toHit = 0;
-
 		var proficiency = v[repeatingString + 'proficiency'];
 		if (!proficiency || proficiency === 'on') {
 			var pb = getIntValue(v.pb);
