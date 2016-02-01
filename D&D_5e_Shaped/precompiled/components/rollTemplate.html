@@ -46,14 +46,12 @@
             {{casting_time}}
           </div>
         {{/casting_time}}
-
         {{#range}}
           <div>
             <span class="bold">Range:</span>
             {{range}}
           </div>
         {{/range}}
-
         {{#components}}
           <div>
             <span class="bold">Components:</span>
@@ -61,7 +59,6 @@
             {{#materials}}({{materials}}){{/materials}}
           </div>
         {{/components}}
-
         {{#duration}}
           <div>
             <span class="bold">Duration:</span>
@@ -80,20 +77,38 @@
         <div class="mar-t-md">{{description}}</div>
       {{/description}}
 
-      {{#attack_toggle}}
-        <div class="shaped-row center">
-          <div class="col-{{^attack_adv}}100{{/attack_adv}}{{#attack_adv}}50{{/attack_adv}}">
-            <div class="output">{{attack}}</div>
+      {{#roll_toggle}}
+        <div class="shaped-row">
+          <div class="output col-{{#only_roll_1}}100{{/only_roll_1}}{{^only_roll_1}}50{{/only_roll_1}}">
+            {{^only_roll_1}}
+              {{#rollGreater() roll1 roll2}}
+                <div class="greater-than">{{roll1}}</div>
+              {{/rollGreater() roll1 roll2}}
+              {{#rollLess() roll1 roll2}}
+                <div class="less-than">{{roll1}}</div>
+              {{/rollLess() roll1 roll2}}
+            {{/only_roll_1}}
+            {{#only_roll_1}}
+              <div>{{roll1}}</div>
+            {{/only_roll_1}}
           </div>
-          {{#attack_adv}}
-            <div class="col-50 border-left">
-              <div class="output">{{attack_adv}}</div>
+          {{^only_roll_1}}
+            <div class="output col-50 border-left{{#advantage}} advantage-set{{#rollGreater() roll2 roll1}} adv{{/rollGreater() roll2 roll1}}{{/advantage}}{{#disadvantage}} disadvantage-set{{#rollLess() roll2 roll1}} disadv{{/rollLess() roll2 roll1}}{{/disadvantage}}">
+              {{#rollGreater() roll2 roll1}}
+                <div class="greater-than">{{roll2}}</div>
+              {{/rollGreater() roll2 roll1}}
+              {{#rollLess() roll2 roll1}}
+                <div class="less-than">{{roll2}}</div>
+              {{/rollLess() roll2 roll1}}
             </div>
-          {{/attack_adv}}
+          {{/only_roll_1}}
         </div>
-        <div class="output-small-label center">vs AC{{#targetAC}} {{targetAC}}{{/targetAC}}</div>
-        <hr>
-      {{/attack_toggle}}
+        {{#vs_ac}}
+          <div class="output-small-label center">vs AC{{#targetAC}} {{targetAC}}{{/targetAC}}</div>
+          <hr>
+        {{/vs_ac}}
+      {{/roll_toggle}}
+
 
       {{#saving_throw_toggle}}
         <div class="mar-t-sm"></div>
@@ -126,33 +141,20 @@
         <hr>
       {{/saving_throw_toggle}}
 
-      {{#roll}}
-        <div class="shaped-row">
-          <div class="col-{{^roll_adv}}100{{/roll_adv}}{{#roll_adv}}50{{/roll_adv}}">
-            <div class="output">{{roll}}</div>
-          </div>
-          {{#roll_adv}}
-            <div class="col-50 border-left">
-              <div class="output">{{roll_adv}}</div>
-            </div>
-          {{/roll_adv}}
-        </div>
-      {{/roll}}
-
       {{#damage_toggle}}
         <div class="shaped-row zebra center vert-center">
           <div class="col-{{^second_damage}}100{{/second_damage}}{{#second_damage}}47{{/second_damage}}">
             <div class="output">{{damage}}
-              {{#attack}}
-                {{#rollWasCrit() attack}}
+              {{#roll_toggle}}
+                {{#rollWasCrit() roll1}}
                   <span>+ {{crit_damage}}</span>
-                {{/rollWasCrit() attack}}
-                {{#rollWasCrit() attack_adv}}
-                  {{#^rollWasCrit() attack}}
+                {{/rollWasCrit() roll1}}
+                {{#rollWasCrit() roll2}}
+                  {{#^rollWasCrit() roll1}}
                     <span>+ {{crit_damage}}</span>
-                  {{/^rollWasCrit() attack}}
-                {{/rollWasCrit() attack_adv}}
-              {{/attack}}
+                  {{/^rollWasCrit() roll1}}
+                {{/rollWasCrit() roll2}}
+              {{/roll_toggle}}
             </div>
             <div class="output-small-label">{{damage_type}}{{^damage_type}}damage{{/damage_type}}</div>
           </div>
@@ -162,16 +164,16 @@
             </div>
             <div class="col-47">
               <div class="output">{{second_damage}}
-                {{#attack}}
-                  {{#rollWasCrit() attack}}
+                {{#roll_toggle}}
+                  {{#rollWasCrit() roll1}}
                     <span>+ {{second_crit_damage}}</span>
-                  {{/rollWasCrit() attack}}
-                  {{#rollWasCrit() attack_adv}}
-                    {{#^rollWasCrit() attack}}
+                  {{/rollWasCrit() roll1}}
+                  {{#rollWasCrit() roll2}}
+                    {{#^rollWasCrit() roll1}}
                       <span>+ {{second_crit_damage}}</span>
-                    {{/^rollWasCrit() attack}}
-                  {{/rollWasCrit() attack_adv}}
-                {{/attack}}
+                    {{/^rollWasCrit() roll1}}
+                  {{/rollWasCrit() roll2}}
+                {{/roll_toggle}}
               </div>
               <div class="output-small-label">{{second_damage_type}}{{^second_damage_type}}damage{{/second_damage_type}}</div>
             </div>
@@ -212,17 +214,20 @@
       {{#text}}
         <div class="center">{{text}}</div>
       {{/text}}
+      {{#text_big}}
+        <div class="output center">{{text_big}}</div>
+      {{/text_big}}
 
       {{#freetext}}
         <div class="center">{{freetext}}</div>
       {{/freetext}}
 
-      {{#allprops() freetext text character_name save title show_character_name subheader roll roll_adv ability emote death_save death_saving_throw_successes death_saving_throw_failures targetAC targetName attack_toggle attack action type damage_toggle damage damage_type crit_damage crit_damage_adv second_damage_toggle second_damage second_damage_type second_crit_damage second_crit_damage_adv ranged attack_adv damage critdamage target reach range ammo ammo_auto ammo_field spell saving_throw_toggle saving_throw_condition saving_throw_dc save saving_throw_vs_ability saving_throw_success saving_throw_failure friendly_level school concentration ritual description cast_as_level healing casting_time duration components materials effect hide_saving_throw_dc hide_saving_throw_failure hide_saving_throw_success hide_effect recharge hide_recharge}}
+      {{#allprops() freetext text text_big character_name save title show_character_name subheader roll_toggle roll1 roll2 only_roll_1 advantage disadvantage vs_ac ability emote death_save death_saving_throw_successes death_saving_throw_failures targetAC targetName action type damage_toggle damage damage_type crit_damage crit_damage_adv second_damage_toggle second_damage second_damage_type second_crit_damage second_crit_damage_adv ranged damage critdamage target reach range ammo ammo_auto ammo_field spell saving_throw_toggle saving_throw_condition saving_throw_dc save saving_throw_vs_ability saving_throw_success saving_throw_failure friendly_level school concentration ritual description cast_as_level healing casting_time duration components materials effect hide_saving_throw_dc hide_saving_throw_failure hide_saving_throw_success hide_effect recharge hide_recharge}}
         <div class="center">
           {{key}}
           {{value}}
         </div>
-      {{/allprops() freetext text character_name save title show_character_name subheader roll roll_adv ability emote death_save death_saving_throw_successes death_saving_throw_failures targetAC targetName attack_toggle attack action type damage_toggle damage damage_type crit_damage crit_damage_adv second_damage_toggle second_damage second_damage_type second_crit_damage second_crit_damage_adv ranged attack_adv damage critdamage target reach range ammo ammo_auto ammo_field spell saving_throw_toggle saving_throw_condition saving_throw_dc save saving_throw_vs_ability saving_throw_success saving_throw_failure friendly_level school concentration ritual description cast_as_level healing casting_time duration components materials effect hide_saving_throw_dc hide_saving_throw_failure hide_saving_throw_success hide_effect recharge hide_recharge}}
+      {{/allprops() freetext text text_big character_name save title show_character_name subheader roll_toggle roll1 roll2 only_roll_1 advantage disadvantage vs_ac ability emote death_save death_saving_throw_successes death_saving_throw_failures targetAC targetName action type damage_toggle damage damage_type crit_damage crit_damage_adv second_damage_toggle second_damage second_damage_type second_crit_damage second_crit_damage_adv ranged damage critdamage target reach range ammo ammo_auto ammo_field spell saving_throw_toggle saving_throw_condition saving_throw_dc save saving_throw_vs_ability saving_throw_success saving_throw_failure friendly_level school concentration ritual description cast_as_level healing casting_time duration components materials effect hide_saving_throw_dc hide_saving_throw_failure hide_saving_throw_success hide_effect recharge hide_recharge}}
     </div>
   </div>
 </rolltemplate>

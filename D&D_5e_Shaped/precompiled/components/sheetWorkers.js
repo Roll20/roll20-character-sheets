@@ -469,14 +469,13 @@ var updateAttack = function () {
 		for (var i = 0; i < ids.length; i++) {
 			var repeatingString = repeatingItem + '_' + ids[i] + '_';
 			collectionArray.push(repeatingString + 'type');
-			collectionArray.push(repeatingString + 'attack_toggle');
+			collectionArray.push(repeatingString + 'roll_toggle');
 			collectionArray.push(repeatingString + 'proficiency');
 			collectionArray.push(repeatingString + 'attack_ability');
 			collectionArray.push(repeatingString + 'attack_bonus');
 			collectionArray.push(repeatingString + 'saving_throw_toggle');
 			collectionArray.push(repeatingString + 'saving_throw_ability');
 			collectionArray.push(repeatingString + 'saving_throw_bonus');
-			collectionArray.push(repeatingString + 'attack_toggle');
 			collectionArray.push(repeatingString + 'damage_toggle');
 			collectionArray.push(repeatingString + 'damage');
 			collectionArray.push(repeatingString + 'damage_ability');
@@ -503,8 +502,8 @@ var updateAttack = function () {
 
 				var attackFormula = '';
 
-				var attackToggle = v[repeatingString + 'attack_toggle'];
-				if (!attackToggle || attackToggle === '{{attack_toggle=1}}') {
+				var attackToggle = v[repeatingString + 'roll_toggle'];
+				if (!attackToggle || attackToggle === '{{roll_toggle=1}}') {
 					var toHit = 0;
 
 					var proficiency = v[repeatingString + 'proficiency'];
