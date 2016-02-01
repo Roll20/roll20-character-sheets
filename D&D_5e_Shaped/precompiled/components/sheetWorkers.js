@@ -266,7 +266,6 @@ var updateLevels = function () {
 
 		console.log('updateLevels', finalSetAttrs);
 		setAttrs(finalSetAttrs);
-		updateAttack();
 	});
 };
 
@@ -426,6 +425,7 @@ on('change:repeating_equipment remove:repeating_equipment', function () {
 
 on('change:pb', function () {
   updateAttack();
+	updateSpell();
 	updateJackOfAllTrades();
 });
 
@@ -446,7 +446,6 @@ on('change:jack_of_all_trades_toggle', function () {
 
 on('change:repeating_attack remove:repeating_attack', function () {
 	updateAttack();
-
 
 	var options = {
 		collection: 'attack',
@@ -495,7 +494,7 @@ var updateAttackToggle = function (v, finalSetAttrs, repeatingString, options) {
 
 		if (exists(options.globalAttackBonus)) {
 			toHit += options.globalAttackBonus;
-			attackFormula += ADD + options.globalAttackBonus + '[global attack bonus]';
+			attackFormula += ADD + options.globalAttackBonus + '[' + options.globalAttackBonusLabel + ']';
 		}
 
 		if (!v[repeatingString + 'type'] || v[repeatingString + 'type'] === 'melee') {
@@ -674,6 +673,7 @@ var updateAttack = function () {
 
 				var attackOptions = {
 					globalAttackBonus: getIntValue(v.global_attack_bonus),
+					globalAttackBonusLabel: 'global attack bonus',
 					globalMeleeAttackBonus: getIntValue(v.global_melee_attack_bonus),
 					globalRangedAttackBonus: getIntValue(v.global_ranged_attack_bonus)
 				};
@@ -695,18 +695,65 @@ var updateAttack = function () {
 	});
 };
 
-/*
 var updateSpell = function () {
 	var repeatingItem = 'repeating_spell';
-	var collectionArray = ['pb', 'finesse_mod', 'strength_mod', 'dexterity_mod', 'constitution_mod', 'intelligence_mod', 'wisdom_mod', 'charisma_mod', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus'];
+	var collectionArray = ['pb', 'finesse_mod', 'strength_mod', 'dexterity_mod', 'constitution_mod', 'intelligence_mod', 'wisdom_mod', 'charisma_mod', 'global_spell_attack_bonus', 'global_spell_damage_bonus'];
 	var finalSetAttrs = {};
 
+	getSectionIDs(repeatingItem, function (ids) {
+		for (var i = 0; i < ids.length; i++) {
+			var repeatingString = repeatingItem + '_' + ids[i] + '_';
+			collectionArray.push(repeatingString + 'type');
+			collectionArray.push(repeatingString + 'roll_toggle');
+			collectionArray.push(repeatingString + 'proficiency');
+			collectionArray.push(repeatingString + 'attack_ability');
+			collectionArray.push(repeatingString + 'attack_bonus');
+			collectionArray.push(repeatingString + 'saving_throw_toggle');
+			collectionArray.push(repeatingString + 'saving_throw_ability');
+			collectionArray.push(repeatingString + 'saving_throw_bonus');
+			collectionArray.push(repeatingString + 'damage_toggle');
+			collectionArray.push(repeatingString + 'damage');
+			collectionArray.push(repeatingString + 'damage_ability');
+			collectionArray.push(repeatingString + 'damage_bonus');
+			collectionArray.push(repeatingString + 'damage_type');
+			collectionArray.push(repeatingString + 'second_damage_toggle');
+			collectionArray.push(repeatingString + 'second_damage');
+			collectionArray.push(repeatingString + 'second_damage_ability');
+			collectionArray.push(repeatingString + 'second_damage_bonus');
+			collectionArray.push(repeatingString + 'second_damage_type');
+		}
+
+		getAttrs(collectionArray, function (v) {
+			for (var j = 0; j < ids.length; j++) {
+				var repeatingString = repeatingItem+'_' + ids[j] + '_';
+
+				var attackOptions = {
+					globalAttackBonus: getIntValue(v.global_spell_attack_bonus)
+				};
+				updateAttackToggle(v, finalSetAttrs, repeatingString, attackOptions);
+
+				updateSavingThrowToggle(v, finalSetAttrs, repeatingString);
+
+				var damageOptions = {
+					globalDamageBonus: getIntValue(v.global_spell_damage_bonus)
+				};
+				updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
+			}
+
+			console.log('updateSpell', finalSetAttrs);
+			setAttrs(finalSetAttrs);
+		});
+	});
 };
 
-on('change:repeating_spell', function () {
+
+on('change:repeating_spell remove:repeating_spell', function () {
 	updateSpell();
 });
-*/
+on('change:global_spell_attack_bonus change:global_spell_damage_bonus', function () {
+	updateSpell();
+});
+
 
 var updateD20Mod = function () {
 	var collectionArray = ['halfling_luck'];
