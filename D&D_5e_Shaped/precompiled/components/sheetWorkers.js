@@ -72,6 +72,13 @@ on('change:cp change:sp change:ep change:gp change:pp', function () {
 	});
 });
 
+var getAbilityMod = function (score) {
+	return Math.floor((getIntValue(score) - 10) / 2);
+};
+var getHalfRoundedDown = function (value) {
+	return Math.floor(value / 2);
+};
+
 var updateAbilityModifier = function (ability) {
 	var collectionArray = [ability, ability + '_bonus'];
 	var finalSetAttrs = {};
@@ -83,18 +90,26 @@ var updateAbilityModifier = function (ability) {
 	}
 
 	getAttrs(collectionArray, function (v) {
-		var calculatedAbilityMod = Math.floor((getIntValue(v[ability]) - 10) / 2) + getIntValue(v[ability + '_bonus']);
-		finalSetAttrs[ability + '_mod'] = calculatedAbilityMod;
+		var abilityMod = getAbilityMod(v[ability]);
+		abilityMod += getHalfRoundedDown(v[ability + '_bonus']);
+
+		var abilityCheckFormula = getAbilityMod(v[ability]) + '[' + firstThreeChars(ability) + ' mod]';
+		abilityCheckFormula += ADD + getAbilityMod(v[ability + '_bonus']) + '[' + firstThreeChars(ability) + ' bonus moded]';
+		abilityCheckFormula += ADD + '@{jack_of_all_trades_toggle}[jack of all trades]';
+		abilityCheckFormula += ADD + '(@{global_check_bonus})[global check bonus]';
+
+		finalSetAttrs[ability + '_mod'] = abilityMod;
+		finalSetAttrs[ability + '_check_mod'] = abilityCheckFormula;
 
 		if(ability === 'strength') {
-			finalSetAttrs.finesse_mod = Math.max(calculatedAbilityMod, getIntValue(v.dexterity_mod));
+			finalSetAttrs.finesse_mod = Math.max(abilityMod, getIntValue(v.dexterity_mod));
 			var str = getIntValue(v.strength);
 			finalSetAttrs.carrying_capacity = str * 15;
 			finalSetAttrs.max_push_drag_lift = str * 30;
 			finalSetAttrs.encumbered = str * 5;
 			finalSetAttrs.heavily_encumbered = str * 10;
 		} else if(ability === 'dexterity') {
-			finalSetAttrs.finesse_mod = Math.max(calculatedAbilityMod, getIntValue(v.strength_mod));
+			finalSetAttrs.finesse_mod = Math.max(abilityMod, getIntValue(v.strength_mod));
 		}
 
 		console.log('updateAbilityModifier', finalSetAttrs);
@@ -105,22 +120,22 @@ var updateAbilityModifier = function (ability) {
 	}
 	updateAttack();
 };
-on('change:strength', function () {
+on('change:strength change:strength_bonus', function () {
 	updateAbilityModifier('strength');
 });
-on('change:dexterity', function () {
+on('change:dexterity change:dexterity_bonus', function () {
 	updateAbilityModifier('dexterity');
 });
-on('change:constitution', function () {
+on('change:constitution change:constitution_bonus', function () {
 	updateAbilityModifier('constitution');
 });
-on('change:intelligence', function () {
+on('change:intelligence change:intelligence_bonus', function () {
 	updateAbilityModifier('intelligence');
 });
-on('change:wisdom', function () {
+on('change:wisdom change:wisdom_bonus', function () {
 	updateAbilityModifier('wisdom');
 });
-on('change:charisma', function () {
+on('change:charisma change:charisma_bonus', function () {
 	updateAbilityModifier('charisma');
 });
 
