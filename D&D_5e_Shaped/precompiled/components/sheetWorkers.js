@@ -503,7 +503,7 @@ var updateAttack = function () {
 				var attackFormula = '';
 
 				var attackToggle = v[repeatingString + 'roll_toggle'];
-				if (!attackToggle || attackToggle === '{{roll_toggle=1}}') {
+				if (!attackToggle || attackToggle === '@{roll_toggle_var}') {
 					var toHit = 0;
 
 					var proficiency = v[repeatingString + 'proficiency'];
@@ -548,7 +548,7 @@ var updateAttack = function () {
 				}
 
 				var savingThrowToggle = v[repeatingString + 'saving_throw_toggle'];
-				if (savingThrowToggle === '{{saving_throw_toggle=1}}') {
+				if (savingThrowToggle === '@{saving_throw_toggle_var}') {
 					var savingThrowDC = 8 + getIntValue(v.pb);
 					var savingThrowAbility = v[repeatingString + 'saving_throw_ability'];
 					savingThrowDC += getAbilityValue(v, savingThrowAbility, 'strength_mod');
@@ -560,7 +560,7 @@ var updateAttack = function () {
 				var damageFormula = '';
 
 				var damageToggle = v[repeatingString + 'damage_toggle'];
-				if (!damageToggle || damageToggle === '{{damage_toggle=1}}') {
+				if (!damageToggle || damageToggle === '@{damage_toggle_var}') {
 					var damageAddition = 0;
 
 					var damage = v[repeatingString + 'damage'];
@@ -621,7 +621,7 @@ var updateAttack = function () {
 				var secondDamageFormula = '';
 
 				var secondDamageToggle = v[repeatingString + 'second_damage_toggle'];
-				if (secondDamageToggle === '{{second_damage_toggle=1}}') {
+				if (secondDamageToggle === '@{second_damage_toggle_var}') {
 					var secondDamageAddition = 0;
 					var secondDamage = v[repeatingString + 'second_damage'];
 					if (exists(secondDamage)) {
