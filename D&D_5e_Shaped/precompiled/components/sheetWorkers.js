@@ -752,11 +752,38 @@ var updateSpell = function () {
 			collectionArray.push(repeatingString + 'second_damage_bonus');
 			collectionArray.push(repeatingString + 'second_damage_type');
 			collectionArray.push(repeatingString + 'parsed');
+      collectionArray.push(repeatingString + 'casting_time');
+      collectionArray.push(repeatingString + 'components');
 		}
 
 		getAttrs(collectionArray, function (v) {
 			for (var j = 0; j < ids.length; j++) {
 				var repeatingString = repeatingItem+'_' + ids[j] + '_';
+
+        var castingTime = v[repeatingString + 'casting_time'];
+        if (exists(castingTime)) {
+          if (castingTime.indexOf('1 action') !== -1) {
+            finalSetAttrs[repeatingString + 'casting_time_toggle'] = '1 action';
+          } else if (castingTime.indexOf('1 bonus action') !== -1) {
+            finalSetAttrs[repeatingString + 'casting_time_toggle'] = '1 bonus action';
+          } else if (castingTime.indexOf('1 reaction') !== -1) {
+            finalSetAttrs[repeatingString + 'casting_time_toggle'] = '1 reaction';
+          } else {
+            finalSetAttrs[repeatingString + 'casting_time_toggle'] = 'longer';
+          }
+        }
+        var spellComponents = v[repeatingString + 'components'];
+        if (exists(spellComponents)) {
+          if (spellComponents.indexOf('V') !== -1) {
+            finalSetAttrs[repeatingString + 'components_verbal'] = 1;
+          }
+          if (spellComponents.indexOf('S') !== -1) {
+            finalSetAttrs[repeatingString + 'components_somatic'] = 1;
+          }
+          if (spellComponents.indexOf('M') !== -1) {
+            finalSetAttrs[repeatingString + 'components_material'] = 1;
+          }
+        }
 
 				var attackOptions = {
 					globalAttackBonus: getIntValue(v.global_spell_attack_bonus)
