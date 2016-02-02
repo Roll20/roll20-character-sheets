@@ -92,9 +92,10 @@
     	</tr>
         <tr>
             <td>Penalty: </td>
-    		<td><input class="sheet-skill-off" type="number" name="attr_Penalty"/></td>
+    		<td><input class="sheet-skill-off" type="number" name="attr_HealthPenalty"/>+<input class="sheet-skill-on" type="number" name="attr_BonusPenalty"/>
+            =<input class="sheet-skill-off" type="number" name="attr_Penalty" value="(@{HealthPenalty})+(@{BonusPenalty})" disabled="true"/></td>
         </tr>
-    	<tr>
+        <tr>
 			<td>Stamina: </td>
 			<td colspan="3"><input class="sheet-skill-on" type="number" name="attr_Stamina" value="10"/>
 	            <button type='roll' name='roll_Stamina' value='&{template:basic} {{name=@{character_name} }} {{action=Stamina}} {{attack=[[1d10+@{Stamina}[Stamina]+@{Penalty}[Penalty]]]}}'></button></td>
@@ -368,26 +369,31 @@
 
 <div class="sheet-section-skills sheet-section sheet-third sheet-weapon">
 	<div class="sheet-header">Attitudes</div>
-	<div class="sheet-header-sub"><input type="radio" name="attr_Attitude" value="Standard" checked="true"/>Standard</div>
+    
+	<div class="sheet-header-sub"><input type="radio" name="attr_Attitude" value="Standard" checked="true"/>Standard</div>    
         Atk: <input class="sheet-skill-on" type="number" name="attr_StandardAttack"/>
         <button type='roll' name='roll_Standard_Attack' value='&{template:basic} {{name=@{character_name} }} {{action=Standard Attack}} {{attack=[[1d10+@{StandardAttack}[Attack]+@{Penalty}[Condition Penalty]]]}}'></button>
         Def: <input class="sheet-skill-off" type="number" name="attr_StandardDefense" value="@{DefenseSum}" disabled="true"/>
         Spd: <input class="sheet-skill-off" type="number" name="attr_StandardSpeed" value="@{SpeedSum}" disabled="true"/>    
+        
 	<div class="sheet-header-sub"><input type="radio" name="attr_Attitude" value="Offensive"/>Offensive</div>
         Atk: <input class="sheet-skill-off" type="number" name="attr_OffensiveAttack" value="@{StandardAttack}+@{PotentialSum}" disabled="true"/>
         <button type='roll' name='roll_Offensive_Attack' value='&{template:basic} {{name=@{character_name} }} {{action=Offensive Attack}} {{attack=[[1d10+@{OffensiveAttack}[Attack]+@{Penalty}[Condition Penalty]]]}}'></button>
         Def: <input class="sheet-skill-off" type="number" name="attr_OffensiveDefense" value="@{DefenseSum}-(@{PotentialSum})" disabled="true"/>
         Spd: <input class="sheet-skill-off" type="number" name="attr_OffensiveSpeed" value="@{SpeedSum}" disabled="true"/>	
+        
     <div class="sheet-header-sub"><input type="radio" name="attr_Attitude" value="Defensive"/>Defensive</div>
         Atk: <input class="sheet-skill-off" type="number" name="attr_DefensiveAttack" value="@{StandardAttack}-@{PotentialSum}" disabled="true"/>
         <button type='roll' name='roll_Defensive_Attack' value='&{template:basic} {{name=@{character_name} }} {{action=Defensive Attack}} {{attack=[[1d10+@{DefensiveAttack}[Attack]+@{Penalty}[Condition Penalty]]]}}'></button>
         Def: <input class="sheet-skill-off" type="number" name="attr_DefensiveDefense" value="@{DefenseSum}+(@{PotentialSum})" disabled="true"/>
         Spd: <input class="sheet-skill-off" type="number" name="attr_DefensiveSpeed" value="@{SpeedSum}" disabled="true"/>	
+        
 	<div class="sheet-header-sub"><input type="radio" name="attr_Attitude" value="Quick"/>Quick</div>
         Atk: <input class="sheet-skill-off" type="number" name="attr_QuickAttack" value="@{StandardAttack}" disabled="true"/>
         <button type='roll' name='roll_Quick_Attack' value='&{template:basic} {{name=@{character_name} }} {{action=Quick Attack}} {{attack=[[1d10+@{QuickAttack}[Attack]+@{Penalty}[Condition Penalty]]]}}'></button>
         Def: <input class="sheet-skill-off" type="number" name="attr_QuickDefense" value="@{DefenseSum}-(@{PotentialSum})" disabled="true"/>
         Spd: <input class="sheet-skill-off" type="number" name="attr_QuickSpeed" value="@{SpeedSum}+(@{PotentialSum})" disabled="true"/>	
+        
 	<div class="sheet-header-sub"><input type="radio" name="attr_Attitude" value="Movement"/>Movement</div>
         Atk: <input class="sheet-skill-off" type="number" name="attr_MovementAttack" value="0" disabled="true"/>
         Def: <input class="sheet-skill-off" type="number" name="attr_MovementDefense" value="@{DefenseSum}+(@{PotentialSum})" disabled="true"/>
@@ -572,7 +578,7 @@ Experience Total: <input type="number" name="attr_ExperienceTotal" />
 
 <script type="text/worker">
 
-on("change:hc change:hc_max change:hok change:hbad change:hcritical change:penalty", function() {
+on("change:hc change:hc_max change:hok change:hbad change:hcritical change:healthpenalty", function() {
     getAttrs(["HC", "HOk", "HBad", "HCritical"], function(values) {
         var hp =  parseInt(values.HC);
 		var ok = parseInt(values.HOk);
@@ -584,7 +590,7 @@ on("change:hc change:hc_max change:hok change:hbad change:hcritical change:penal
         if ( hp <= bad ) penalty = -2;
         if ( hp <= critical ) penalty = -3;
         setAttrs({
-            Penalty: penalty
+            HealthPenalty: penalty
         });
     });
 });
