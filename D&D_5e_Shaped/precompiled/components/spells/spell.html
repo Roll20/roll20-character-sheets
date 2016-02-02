@@ -1,4 +1,4 @@
-<fieldset class="repeating_spell spell">
+<fieldset class="repeating_spell">
   <input type="radio" name="attr_base_level" value="0" class="hidden">
   <input type="radio" name="attr_base_level" value="1" class="hidden">
   <input type="radio" name="attr_base_level" value="2" class="hidden">
@@ -9,7 +9,11 @@
   <input type="radio" name="attr_base_level" value="7" class="hidden">
   <input type="radio" name="attr_base_level" value="8" class="hidden">
   <input type="radio" name="attr_base_level" value="9" class="hidden">
+  <input type="hidden" name="attr_higher_level_query" value="?{Spell Level|1|2|3|4|5|6|7|8|9}">
+  <input type="hidden" name="attr_level_readable">
+
   <input type="checkbox" name="attr_ritual" class="hidden" value="Yes" accept="Ritual">
+  <input type="hidden" name="attr_type" accept="Spell Attack">
 
   <input type="radio" name="attr_casting_time" value="reaction" class="hidden">
   <input type="radio" name="attr_casting_time" value="bonus" class="hidden">
@@ -21,81 +25,95 @@
   <input type="checkbox" name="attr_components_material" class="hidden">
   <input type="checkbox" name="attr_concentration" class="hidden">
 
+  <div class="wrap-box spell compendium-drop-target relative mar-b-md">
+    <button type="roll" name="roll_spell"
+            value="@{output_option}   &{template:5e-shaped}   {{character_name=@{character_name}}}   @{show_character_name}   {{title=@{name}}}   {{targetName=@{attacks_vs_target_name}}}   {{spell=1}}   @{tie_on_spell}   {{friendly_level=@{base_level}}}   {{school=@{school}}}   {{casting_time=@{casting_time}}}   {{range=@{range}}}   {{components=@{components}}}   {{materials=@{materials}}}   {{duration=@{duration}}}   {{target=@{target}}}   {{description=@{description}}}   @{roll_toggle}   @{saving_throw_toggle}   @{damage_toggle}   @{second_damage_toggle}   @{extras_toggle}">
+        <!--
+        <button type="roll" name="roll_SpellCast"
+                value="{{spellhigherlevel=@{higher_slot_effect}}}   {{damage=[[0d0 + @{spell_attack_dmg}[dmg] + @{spell_attack_dmg_total}[bonus dmg] + (@{global_spell_damage_bonus})[global spell dmg bonus] + ((@{higher_level_query} - @{base_level}) * @{spell_attack_higher_level_dmg_dice})@{spell_attack_higher_level_dmg_die}[higher lvl]]]}} {{second_damage=[[0d0 + @{spell_attack_second_dmg}[dmg] + @{spell_attack_second_dmg_total}[bonus dmg] + (@{global_spell_damage_bonus})[global spell dmg bonus] + ((@{higher_level_query} - @{base_level}) * @{spell_attack_second_higher_level_dmg_dice})@{spell_attack_second_higher_level_dmg_die}[higher lvl]]]}} {{crit_damage=[[0d0 + @{spell_attack_dmg} + ((@{higher_level_query} - @{base_level}) * @{spell_attack_higher_level_dmg_dice})@{spell_attack_higher_level_dmg_die}[higher lvl]]]}} {{second_crit_damage=[[0d0 + @{spell_attack_second_dmg} + ((@{higher_level_query} - @{base_level}) * @{spell_attack_second_higher_level_dmg_dice})@{spell_attack_second_higher_level_dmg_die}[higher lvl]]]}} {{saving_throw_failure=@{saving_throw_failure}}} {{damage=[[0d0 + @{spell_save_dmg}[dmg] + @{spell_save_dmg_total}[bonus dmg] + (@{global_spell_damage_bonus})[global spell dmg bonus] + ((@{higher_level_query} - @{base_level}) * @{spell_save_higher_level_dmg_dice})@{spell_save_higher_level_dmg_die}[higher lvl] ]]}}   {{heal=[[0d0 + @{heal_amount}[amount] + @{heal_ability_bonus}[stat bonus] + @{healbonus}[bonus] + (@{global_spell_heal_bonus})[global spell heal bonus] + ((@{higher_level_query} - @{base_level}) * @{spell_heal_higher_level_amount}) + ((@{higher_level_query} - @{base_level}) * @{spell_heal_higher_level_dmg_dice})@{spell_heal_higher_level_dmg_die}[higher lvl] ]]}}   {{spell_cast_as_level=?{Spell Level}}} ">
+        -->
+      <div class="shaped-row vert-center">
+        <div class="col-35 center pad-r-sm">
+          <input type="text" name="attr_name" class="center" readonly>
+        </div>
+        <div class="col-10 center pad-r-sm">
+          <input type="text" name="attr_to_hit" class="center" readonly>
+        </div>
+        <div class="col-51 center pad-r-sm">
+          <input type="text" name="attr_damage_string" class="center" readonly>
+        </div>
+      </div>
+    </button>
+    <input type="checkbox" name="attr_toggle_details" class="sheet-toggle-icon-settings" checked><span class="sheet-toggle-icon-settings pictos">y</span>
 
-  <div class="wrap-box compendium-drop-target relative mar-b-md">
-    <div class="shaped-row">
-      <div class="col-80">
-        <input type="text" name="attr_name" class="spell-name" placeholder="name" accept="Name">
+    <div class="spells-toggle-spell details">
+      <div class="shaped-row">
+        <div class="col-80">
+          <input type="text" name="attr_name" class="spell-name" placeholder="name" accept="Name">
+        </div>
       </div>
-    </div>
-    <div class="shaped-row">
-      <div class="col-14">
-        <select name="attr_base_level" class="italic no-border" accept="Level">
-          <option value="0">Cantrip</option>
-          <option value="1">1st-level</option>
-          <option value="2">2nd-level</option>
-          <option value="3">3rd-level</option>
-          <option value="4">4th-level</option>
-          <option value="5">5th-level</option>
-          <option value="6">6th-level</option>
-          <option value="7">7th-level</option>
-          <option value="8">8th-level</option>
-          <option value="9">9th-level</option>
-        </select>
-      </div>
-      <div class="col-22 center">
-        <span class="en">
-          <select name="attr_school" class="italic no-border" accept="School">
-            <option value="Abjuration">Abjuration</option>
-            <option value="Conjuration">Conjuration</option>
-            <option value="Divination">Divination</option>
-            <option value="Enchantment">Enchantment</option>
-            <option value="Evocation">Evocation</option>
-            <option value="Illusion">Illusion</option>
-            <option value="Necromancy">Necromancy</option>
-            <option value="Transmutation">Transmutation</option>
+      <div class="shaped-row">
+        <div class="col-14">
+          <select name="attr_base_level" class="italic no-border" accept="Level">
+            <option value="0">Cantrip</option>
+            <option value="1">1st-level</option>
+            <option value="2">2nd-level</option>
+            <option value="3">3rd-level</option>
+            <option value="4">4th-level</option>
+            <option value="5">5th-level</option>
+            <option value="6">6th-level</option>
+            <option value="7">7th-level</option>
+            <option value="8">8th-level</option>
+            <option value="9">9th-level</option>
           </select>
-        </span>
-        <span class="de">
-          <select name="attr_school" class="italic no-border" accept="School">
-            <option value="Abjuration">Bannzauber</option>
-            <option value="Conjuration">Beschwörung</option>
-            <option value="Divination">Erkenntniszauber</option>
-            <option value="Enchantment">Verzauberung</option>
-            <option value="Evocation">Hervorrufung</option>
-            <option value="Illusion">Illusion</option>
-            <option value="Necromancy">Nekromantie</option>
-            <option value="Transmutation">Verwandlung</option>
-          </select>
-        </span>
-        <span class="fr">
-          <select name="attr_school" class="italic no-border" accept="School">
-            <option value="Abjuration">Abjuration</option>
-            <option value="Conjuration">Invocation</option>
-            <option value="Divination">Divination</option>
-            <option value="Enchantment">Enchantement</option>
-            <option value="Evocation">Evocation</option>
-            <option value="Illusion">Illusion</option>
-            <option value="Necromancy">Necromancie</option>
-            <option value="Transmutation">Transmutation</option>
-          </select>
-        </span>
+        </div>
+        <div class="col-22 center">
+          <span class="en">
+            <select name="attr_school" class="italic no-border" accept="School">
+              <option value="Abjuration">Abjuration</option>
+              <option value="Conjuration">Conjuration</option>
+              <option value="Divination">Divination</option>
+              <option value="Enchantment">Enchantment</option>
+              <option value="Evocation">Evocation</option>
+              <option value="Illusion">Illusion</option>
+              <option value="Necromancy">Necromancy</option>
+              <option value="Transmutation">Transmutation</option>
+            </select>
+          </span>
+          <span class="de">
+            <select name="attr_school" class="italic no-border" accept="School">
+              <option value="Abjuration">Bannzauber</option>
+              <option value="Conjuration">Beschwörung</option>
+              <option value="Divination">Erkenntniszauber</option>
+              <option value="Enchantment">Verzauberung</option>
+              <option value="Evocation">Hervorrufung</option>
+              <option value="Illusion">Illusion</option>
+              <option value="Necromancy">Nekromantie</option>
+              <option value="Transmutation">Verwandlung</option>
+            </select>
+          </span>
+          <span class="fr">
+            <select name="attr_school" class="italic no-border" accept="School">
+              <option value="Abjuration">Abjuration</option>
+              <option value="Conjuration">Invocation</option>
+              <option value="Divination">Divination</option>
+              <option value="Enchantment">Enchantement</option>
+              <option value="Evocation">Evocation</option>
+              <option value="Illusion">Illusion</option>
+              <option value="Necromancy">Necromancie</option>
+              <option value="Transmutation">Transmutation</option>
+            </select>
+          </span>
+        </div>
+        <div class="mar-l-lg">
+          <input type="checkbox" name="attr_ritual" class="toggle-spells-ritual" value="Yes" accept="Ritual"><span class="toggle-spells-ritual">{{'RITUAL' | translate}}</span>
+        </div>
+        <div class="mar-l-lg">
+          <input type="checkbox" name="attr_is_prepared" class="toggle-spells-prepared"><span class="toggle-spells-prepared">{{'PREPARED' | translate}}</span>
+        </div>
       </div>
-      <div class="mar-l-lg">
-        <input type="checkbox" name="attr_ritual" class="toggle-spells-ritual" value="Yes" accept="Ritual"><span class="toggle-spells-ritual">{{'RITUAL' | translate}}</span>
-      </div>
-      <div class="mar-l-lg">
-        <input type="checkbox" name="attr_is_prepared" class="toggle-spells-prepared"><span class="toggle-spells-prepared">{{'PREPARED' | translate}}</span>
-      </div>
-    </div>
+      <!--put in hidden checkboxes for casting time, components, concentration, and ritual-->
 
-    <input type="hidden" name="attr_type" accept="Spell Attack">
-    <input type="hidden" name="attr_level_readable">
-    <input type="hidden" name="attr_higher_level_query" value="?{Spell Level|1|2|3|4|5|6|7|8|9}">
-
-    <!--put in hidden checkboxes for casting time, components, concentration, and ritual-->
-
-    <div class="spells-toggle-spell inline">
       <div class="shaped-row">
         <span class="bold mar-r-sm">{{'CASTING_TIME' | translate}}:</span>
         <div class="flex-grow center pad-l-sm">
@@ -129,23 +147,6 @@
           <input type="text" name="attr_target" class="no-border" accept="Target">
         </div>
       </div>
-      <div class="spell-button-group right">
-        <div class="shaped-row">
-          <div class="col center">
-            <button type="roll" name="roll_spell"
-                    value="@{output_option}   &{template:5e-shaped}   {{character_name=@{character_name}}}   @{show_character_name}   {{title=@{name}}}   {{targetName=@{attacks_vs_target_name}}}   {{spell=1}}   @{tie_on_spell}   {{friendly_level=@{base_level}}}   {{school=@{school}}}   {{casting_time=@{casting_time}}}   {{range=@{range}}}   {{components=@{components}}}   {{materials=@{materials}}}   {{duration=@{duration}}}   {{target=@{target}}}   {{description=@{description}}}   @{roll_toggle}   @{saving_throw_toggle}   @{damage_toggle}   @{second_damage_toggle}   @{extras_toggle}">
-              <span>Cast</span>
-            </button>
-
-            <!--
-            <button type="roll" name="roll_SpellCast"
-                    value="{{spellhigherlevel=@{higher_slot_effect}}}   {{damage=[[0d0 + @{spell_attack_dmg}[dmg] + @{spell_attack_dmg_total}[bonus dmg] + (@{global_spell_damage_bonus})[global spell dmg bonus] + ((@{higher_level_query} - @{base_level}) * @{spell_attack_higher_level_dmg_dice})@{spell_attack_higher_level_dmg_die}[higher lvl]]]}} {{second_damage=[[0d0 + @{spell_attack_second_dmg}[dmg] + @{spell_attack_second_dmg_total}[bonus dmg] + (@{global_spell_damage_bonus})[global spell dmg bonus] + ((@{higher_level_query} - @{base_level}) * @{spell_attack_second_higher_level_dmg_dice})@{spell_attack_second_higher_level_dmg_die}[higher lvl]]]}} {{crit_damage=[[0d0 + @{spell_attack_dmg} + ((@{higher_level_query} - @{base_level}) * @{spell_attack_higher_level_dmg_dice})@{spell_attack_higher_level_dmg_die}[higher lvl]]]}} {{second_crit_damage=[[0d0 + @{spell_attack_second_dmg} + ((@{higher_level_query} - @{base_level}) * @{spell_attack_second_higher_level_dmg_dice})@{spell_attack_second_higher_level_dmg_die}[higher lvl]]]}} {{saving_throw_failure=@{saving_throw_failure}}} {{damage=[[0d0 + @{spell_save_dmg}[dmg] + @{spell_save_dmg_total}[bonus dmg] + (@{global_spell_damage_bonus})[global spell dmg bonus] + ((@{higher_level_query} - @{base_level}) * @{spell_save_higher_level_dmg_dice})@{spell_save_higher_level_dmg_die}[higher lvl] ]]}}   {{heal=[[0d0 + @{heal_amount}[amount] + @{heal_ability_bonus}[stat bonus] + @{healbonus}[bonus] + (@{global_spell_heal_bonus})[global spell heal bonus] + ((@{higher_level_query} - @{base_level}) * @{spell_heal_higher_level_amount}) + ((@{higher_level_query} - @{base_level}) * @{spell_heal_higher_level_dmg_dice})@{spell_heal_higher_level_dmg_die}[higher lvl] ]]}}   {{spell_cast_as_level=?{Spell Level}}} ">
-            -->
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="spells-toggle-spell spells-toggle-spell-details">
       <textarea name="attr_description" class="three-line-textarea" placeholder="description" accept="Content"></textarea>
 
       //= include ../attacks/components/attackSpell.html
