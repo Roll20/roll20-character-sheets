@@ -523,7 +523,7 @@ var updateAttackToggle = function (v, finalSetAttrs, repeatingString, options) {
 	finalSetAttrs[repeatingString + 'attack_formula'] = attackFormula;
 };
 
-var updateSavingThrowToggle = function (v, finalSetAttrs, repeatingString) {
+var updateSavingThrowToggle = function (v, finalSetAttrs, repeatingString, options) {
   if (!exists(v[repeatingString + 'parsed'])) {
     if (exists(v[repeatingString + 'saving_throw_vs_ability'])) {
       finalSetAttrs[repeatingString + 'saving_throw_ability'] = v.default_ability;
@@ -539,6 +539,9 @@ var updateSavingThrowToggle = function (v, finalSetAttrs, repeatingString) {
       savingThrowAbility = finalSetAttrs[repeatingString + 'saving_throw_ability'];
     }
 		savingThrowDC += getAbilityValue(v, savingThrowAbility, 'strength_mod');
+		if (options.bonusDC) {
+			savingThrowDC += getIntValue(options.bonusDC);
+		}
 		savingThrowDC += getIntValue(v[repeatingString + 'saving_throw_bonus']);
 		finalSetAttrs[repeatingString + 'saving_throw_dc'] = savingThrowDC;
 	}
@@ -726,7 +729,7 @@ var updateAttack = function () {
 
 var updateSpell = function () {
 	var repeatingItem = 'repeating_spell';
-	var collectionArray = ['pb', 'finesse_mod', 'strength_mod', 'dexterity_mod', 'constitution_mod', 'intelligence_mod', 'wisdom_mod', 'charisma_mod', 'global_spell_attack_bonus', 'global_spell_damage_bonus', 'default_ability'];
+	var collectionArray = ['pb', 'finesse_mod', 'strength_mod', 'dexterity_mod', 'constitution_mod', 'intelligence_mod', 'wisdom_mod', 'charisma_mod', 'global_spell_attack_bonus', 'global_spell_damage_bonus', 'global_spell_dc_bonus', 'global_spell_heal_bonus', 'default_ability'];
 	var finalSetAttrs = {};
 
 	getSectionIDs(repeatingItem, function (ids) {
@@ -790,7 +793,10 @@ var updateSpell = function () {
 				};
 				updateAttackToggle(v, finalSetAttrs, repeatingString, attackOptions);
 
-				updateSavingThrowToggle(v, finalSetAttrs, repeatingString);
+				var savingThrowOptions = {
+					bonusDC: v.global_spell_dc_bonus
+				};
+				updateSavingThrowToggle(v, finalSetAttrs, repeatingString, savingThrowOptions);
 
 				var damageOptions = {
 					globalDamageBonus: getIntValue(v.global_spell_damage_bonus)
@@ -810,7 +816,7 @@ var updateSpell = function () {
 on('change:repeating_spell remove:repeating_spell', function () {
 	updateSpell();
 });
-on('change:global_spell_attack_bonus change:global_spell_damage_bonus', function () {
+on('change:global_spell_attack_bonus change:global_spell_damage_bonus change:global_spell_dc_bonus change:global_spell_heal_bonus', function () {
 	updateSpell();
 });
 
