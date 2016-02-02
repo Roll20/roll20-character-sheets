@@ -763,18 +763,6 @@ var updateSpell = function () {
 			for (var j = 0; j < ids.length; j++) {
 				var repeatingString = repeatingItem+'_' + ids[j] + '_';
 
-        var castingTime = v[repeatingString + 'casting_time'];
-        if (exists(castingTime)) {
-          if (castingTime.indexOf('1 action') !== -1) {
-            finalSetAttrs[repeatingString + 'casting_time_toggle'] = '1 action';
-          } else if (castingTime.indexOf('1 bonus action') !== -1) {
-            finalSetAttrs[repeatingString + 'casting_time_toggle'] = '1 bonus action';
-          } else if (castingTime.indexOf('1 reaction') !== -1) {
-            finalSetAttrs[repeatingString + 'casting_time_toggle'] = '1 reaction';
-          } else {
-            finalSetAttrs[repeatingString + 'casting_time_toggle'] = 'longer';
-          }
-        }
         var spellComponents = v[repeatingString + 'components'];
         if (exists(spellComponents)) {
           if (spellComponents.indexOf('V') !== -1) {
