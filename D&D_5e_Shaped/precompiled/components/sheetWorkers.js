@@ -668,6 +668,18 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 	finalSetAttrs[repeatingString + 'damage_string'] = damageString;
 };
 
+updateHealToggle = function (v, finalSetAttrs, repeatingString) {
+	console.log('updateHealToggle');
+	if (!exists(v[repeatingString + 'parsed'])) {
+		console.log('not parsed');
+		if (exists(v[repeatingString + 'heal'])) {
+			console.log('heal exists');
+			finalSetAttrs[repeatingString + 'heal_ability'] = v.default_ability;
+			finalSetAttrs[repeatingString + 'heal_toggle'] = '@{heal_var}';
+		}
+	}
+};
+
 var updateAttack = function () {
 	var repeatingItem = 'repeating_attack';
 	var collectionArray = ['pb', 'finesse_mod', 'strength_mod', 'dexterity_mod', 'constitution_mod', 'intelligence_mod', 'wisdom_mod', 'charisma_mod', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability'];
@@ -757,6 +769,8 @@ var updateSpell = function () {
 			collectionArray.push(repeatingString + 'parsed');
       collectionArray.push(repeatingString + 'casting_time');
       collectionArray.push(repeatingString + 'components');
+			collectionArray.push(repeatingString + 'heal');
+			collectionArray.push(repeatingString + 'add_casting_modifier');
 		}
 
 		getAttrs(collectionArray, function (v) {
@@ -775,6 +789,15 @@ var updateSpell = function () {
             finalSetAttrs[repeatingString + 'components_material'] = 1;
           }
         }
+				var addCastingModifier = v[repeatingString + 'add_casting_modifier'];
+				if (exists(addCastingModifier)) {
+					if (exists(v[repeatingString + 'damage'])) {
+						finalSetAttrs[repeatingString + 'damage_ability'] = v.default_ability;
+					}
+					if (exists(v[repeatingString + 'heal'])) {
+						finalSetAttrs[repeatingString + 'heal_ability'] = v.default_ability;
+					}
+				}
 
 				var attackOptions = {
 					globalAttackBonus: getIntValue(v.global_spell_attack_bonus)
@@ -791,7 +814,12 @@ var updateSpell = function () {
 				};
 				updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
 
-				finalSetAttrs[repeatingString + 'parsed'] = true;
+				updateHealToggle(v, finalSetAttrs, repeatingString);
+
+				if (!exists(v[repeatingString + 'parsed'])) {
+					finalSetAttrs[repeatingString + 'parsed'] = true;
+				}
+
 			}
 
 			console.log('updateSpell', finalSetAttrs);
