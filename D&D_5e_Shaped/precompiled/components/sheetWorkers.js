@@ -462,6 +462,13 @@ on('change:global_attack_bonus change:global_melee_attack_bonus change:global_ra
 });
 
 var updateAttackToggle = function (v, finalSetAttrs, repeatingString, options) {
+  if (!exists(v[repeatingString + 'parsed'])) {
+    if (exists(v[repeatingString + 'type'])) {
+      finalSetAttrs[repeatingString + 'attack_ability'] = v.default_ability;
+      finalSetAttrs[repeatingString + 'roll_toggle'] = '@{roll_toggle_var}';
+    }
+  }
+
 	var attackFormula = '';
 	var attackToggle = v[repeatingString + 'roll_toggle'];
 
@@ -476,7 +483,11 @@ var updateAttackToggle = function (v, finalSetAttrs, repeatingString, options) {
 			attackFormula += 0 + '[unproficient]';
 		}
 
-		var attackAbility = getAbilityValue(v, v[repeatingString + 'attack_ability'], 'strength_mod');
+    var attackAbility = v[repeatingString + 'attack_ability'];
+    if (finalSetAttrs[repeatingString + 'attack_ability']) {
+      attackAbility = finalSetAttrs[repeatingString + 'attack_ability'];
+    }
+		attackAbility = getAbilityValue(v, attackAbility, options.defaultAbility);
 		if (exists(attackAbility)) {
 			toHit += attackAbility;
 			attackFormula += ADD + attackAbility + '[' + getAbilityShortName(v[repeatingString + 'attack_ability']) + ']';
@@ -513,10 +524,20 @@ var updateAttackToggle = function (v, finalSetAttrs, repeatingString, options) {
 };
 
 var updateSavingThrowToggle = function (v, finalSetAttrs, repeatingString) {
+  if (!exists(v[repeatingString + 'parsed'])) {
+    if (exists(v[repeatingString + 'saving_throw_vs_ability'])) {
+      finalSetAttrs[repeatingString + 'saving_throw_ability'] = v.default_ability;
+      finalSetAttrs[repeatingString + 'saving_throw_toggle'] = '@{saving_throw_toggle_var}';
+    }
+  }
+
 	var savingThrowToggle = v[repeatingString + 'saving_throw_toggle'];
 	if (savingThrowToggle === '@{saving_throw_toggle_var}') {
 		var savingThrowDC = 8 + getIntValue(v.pb);
 		var savingThrowAbility = v[repeatingString + 'saving_throw_ability'];
+    if (finalSetAttrs[repeatingString + 'saving_throw_ability']) {
+      savingThrowAbility = finalSetAttrs[repeatingString + 'saving_throw_ability'];
+    }
 		savingThrowDC += getAbilityValue(v, savingThrowAbility, 'strength_mod');
 		savingThrowDC += getIntValue(v[repeatingString + 'saving_throw_bonus']);
 		finalSetAttrs[repeatingString + 'saving_throw_dc'] = savingThrowDC;
@@ -524,6 +545,15 @@ var updateSavingThrowToggle = function (v, finalSetAttrs, repeatingString) {
 };
 
 var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
+  if (!exists(v[repeatingString + 'parsed'])) {
+    if (exists(v[repeatingString + 'damage'])) {
+      finalSetAttrs[repeatingString + 'damage_toggle'] = '@{damage_toggle_var}';
+    }
+    if (exists(v[repeatingString + 'second_damage'])) {
+      finalSetAttrs[repeatingString + 'second_damage_toggle'] = '@{second_damage_toggle_var}';
+    }
+  }
+
 	var damageString = '';
 	var damageFormula = '';
 	var damageToggle = v[repeatingString + 'damage_toggle'];
@@ -637,7 +667,7 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 
 var updateAttack = function () {
 	var repeatingItem = 'repeating_attack';
-	var collectionArray = ['pb', 'finesse_mod', 'strength_mod', 'dexterity_mod', 'constitution_mod', 'intelligence_mod', 'wisdom_mod', 'charisma_mod', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus'];
+	var collectionArray = ['pb', 'finesse_mod', 'strength_mod', 'dexterity_mod', 'constitution_mod', 'intelligence_mod', 'wisdom_mod', 'charisma_mod', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability'];
 	var finalSetAttrs = {};
 
 	getSectionIDs(repeatingItem, function (ids) {
@@ -669,6 +699,7 @@ var updateAttack = function () {
 				var repeatingString = repeatingItem+'_' + ids[j] + '_';
 
 				var attackOptions = {
+          defaultAbility: 'strength_mod',
 					globalAttackBonus: getIntValue(v.global_attack_bonus),
 					globalAttackBonusLabel: 'global attack bonus',
 					globalMeleeAttackBonus: getIntValue(v.global_melee_attack_bonus),
@@ -695,7 +726,7 @@ var updateAttack = function () {
 
 var updateSpell = function () {
 	var repeatingItem = 'repeating_spell';
-	var collectionArray = ['pb', 'finesse_mod', 'strength_mod', 'dexterity_mod', 'constitution_mod', 'intelligence_mod', 'wisdom_mod', 'charisma_mod', 'global_spell_attack_bonus', 'global_spell_damage_bonus'];
+	var collectionArray = ['pb', 'finesse_mod', 'strength_mod', 'dexterity_mod', 'constitution_mod', 'intelligence_mod', 'wisdom_mod', 'charisma_mod', 'global_spell_attack_bonus', 'global_spell_damage_bonus', 'default_ability'];
 	var finalSetAttrs = {};
 
 	getSectionIDs(repeatingItem, function (ids) {
@@ -738,21 +769,6 @@ var updateSpell = function () {
 					globalDamageBonus: getIntValue(v.global_spell_damage_bonus)
 				};
 				updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
-
-				if (!exists(v[repeatingString + 'parsed'])) {
-					if (exists(finalSetAttrs[repeatingString + 'type']) || exists(v[repeatingString + 'type'])) {
-						finalSetAttrs[repeatingString + 'roll_toggle'] = '@{roll_toggle_var}';
-					}
-					if (exists(v[repeatingString + 'saving_throw_vs_ability'])) {
-						finalSetAttrs[repeatingString + 'damage_toggle'] = '@{damage_toggle_var}';
-					}
-					if (exists(finalSetAttrs[repeatingString + 'damage']) || exists(v[repeatingString + 'damage'])) {
-						finalSetAttrs[repeatingString + 'damage_toggle'] = '@{damage_toggle_var}';
-					}
-					if (exists(finalSetAttrs[repeatingString + 'second_damage']) || exists(v[repeatingString + 'second_damage'])) {
-						finalSetAttrs[repeatingString + 'second_damage_toggle'] = '@{second_damage_toggle_var}';
-					}
-				}
 
 				finalSetAttrs[repeatingString + 'parsed'] = true;
 			}
