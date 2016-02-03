@@ -97,6 +97,10 @@ var parseAttackComponents = function (v, repeatingString, finalSetAttrs, options
   }
 };
 
+function hasUpperCase(string) {
+	return (/[A-Z]/.test(string));
+}
+
 var ADD = ' + ';
 var SPACE = ' ';
 
@@ -746,6 +750,9 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 
 		var damageType = v[repeatingString + 'damage_type'];
 		if (exists(damageType)) {
+			if (hasUpperCase(damageType)) {
+				finalSetAttrs[repeatingString + 'damage_type'] = damageType.toLowerCase();
+			}
 			damageString += SPACE + damageType;
 		}
 	}
@@ -797,6 +804,9 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 
 		var secondDamageType = v[repeatingString + 'second_damage_type'];
 		if (exists(secondDamageType)) {
+			if (hasUpperCase(damageType)) {
+				finalSetAttrs[repeatingString + 'second_damage_type'] = secondDamageType.toLowerCase();
+			}
 			damageString += SPACE + secondDamageType;
 		}
 
