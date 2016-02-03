@@ -71,11 +71,12 @@
                 });
             });
         });
-        on("change:condition", function() {
-            getAttrs(["condition"], function(values) {
+        on("change:condition change:class1 change:class2", function() {
+            getAttrs(["condition", "class1", "class2"], function(values) {
+                var tipTopShape = 10 - (values.class1 == 'Navigator' ? 1 : 0) - (values.class2 == 'Navigator' ? 1 : 0);
                 setAttrs({
                     outOfShape: parseInt(values.condition) <= 2 && parseInt(values.condition) > 0 ? 1 : 0,
-                    tipTopShape: parseInt(values.condition) >= 10 ? 1 : 0,
+                    tipTopShape: parseInt(values.condition) >= tipTopShape ? 1 : 0,
                     conditionDeath: parseInt(values.condition) <= 0 ? 1 : 0
                 });
             });
@@ -127,7 +128,7 @@
             getAttrs(["class1", "class2", "class1Other", "class2Other"], function(values) {
                 setAttrs({
                     classTravelMod: (values.class1 == 'Minstrel' ? 1 : 0) + (values.class2 == 'Minstrel' ? 1 : 0),
-                    classDirectionMod: (values.class1 == 'Minstrel' ? 1 : 0) + (values.class2 == 'Minstrel' ? 1 : 0),
+                    classDirectionMod: (values.class1 == 'Minstrel' ? 1 : 0) + (values.class2 == 'Minstrel' ? 1 : 0) + (values.class1 == 'Navigator' ? 2 : 0) + (values.class2 == 'Navigator' ? 2 : 0) - (values.class1 == 'Navigator' && values.class2 == 'Navigator' ? 1 : 0),
                     classCampMod: (values.class1 == 'Minstrel' ? 1 : 0) + (values.class2 == 'Minstrel' ? 1 : 0),
                     classNegotiationMod: (values.class1 == 'Merchant' ? 1 : 0) + (values.class2 == 'Merchant' ? 1 : 0),
                     classConditionMod: (values.class1 == 'Farmer' ? 1 : 0) + (values.class2 == 'Farmer' ? 1 : 0),
@@ -136,12 +137,13 @@
                     showFarmerSkills: (values.class1 == 'Farmer' || values.class2 == 'Farmer' ? 1 : 0),
                     showHealerSkills: (values.class1 == 'Healer' || values.class2 == 'Healer' ? 1 : 0),
                     showHunterSkills: (values.class1 == 'Hunter' || values.class2 == 'Hunter' ? 1 : 0),
+                    showNavigatorSkills: (values.class1 == 'Navigator' || values.class2 == 'Navigator' ? 1 : 0),
                     showMerchantSkills: (values.class1 == 'Merchant' || values.class2 == 'Merchant' ? 1 : 0),
                     showMinstrelSkills: (values.class1 == 'Minstrel' || values.class2 == 'Minstrel' ? 1 : 0),
                     showNobleSkills: (values.class1 == 'Noble' || values.class2 == 'Noble' ? 1 : 0),
                     showWeaponGrace: (values.class1 == 'Noble' || values.class2 == 'Noble' ? 1 : 0),
                     showSecondWeaponGrace: (values.class1 == 'Noble' && values.class2 == 'Noble' ? 1 : 0),
-                    animalsMax: 1 + (values.class1 == 'Merchant' || values.class1 == 'Farmer' ? 2 : 0) + (values.class2 == 'Merchant' || values.class2 == 'Farmer' ? 2 : 0)
+                    animals_max: 1 + (values.class1 == 'Merchant' || values.class1 == 'Farmer' ? 2 : 0) + (values.class2 == 'Merchant' || values.class2 == 'Farmer' ? 2 : 0)
                 });
             });
         });
@@ -163,10 +165,10 @@
                 }
             });
         });
-        on("change:repeating_containers remove:repeating_containers change:repeating_animals remove:repeating_animals change:currentStr change:level change:type1 change:type2 change:class1 change:class2", function() {
+        on("change:repeating_containers remove:repeating_containers change:repeating_animals remove:repeating_animals change:currentStr change:level change:type1 change:type2 change:class1 change:class2 change:species", function() {
             getSectionIDs("repeating_containers", function(containerIdArray) {
                 getSectionIDs("repeating_animals", function(animalIdArray) {
-                    var fieldNames = ["currentStr", "level", "type1", "type2", "class1", "class2"]
+                    var fieldNames = ["currentStr", "level", "type1", "type2", "class1", "class2", "species"]
                     for(var i=0; i < containerIdArray.length; i++) {
                         fieldNames.push("repeating_containers_" + containerIdArray[i] + "_containerCapacity");
                         fieldNames.push("repeating_containers_" + containerIdArray[i] + "_containerWater");
@@ -187,9 +189,11 @@
                         for (var i=0; i < animalIdArray.length; i++) {
                             containerItemCapacities += parseInt(values["repeating_animals_" + animalIdArray[i] + "_animalCapacity"]);
                         }
+                        var maximumLoad = parseInt(values.currentStr) + parseInt(values.level) + 2 + (values.type1 == 'Technical' ? 3 : 0) + (values.type2 == 'Technical' ? 3 : 0) + (values.class1 == 'Farmer' ? 3 : 0) + (values.class2 == 'Farmer' ? 3 : 0) + (values.species == 'Koneko Goblin' ? 3 : 0);
                         setAttrs({
-                            capacityMax: parseInt(values.currentStr) + parseInt(values.level) + 2 + (values.type1 == 'Technical' ? 3 : 0) + (values.type2 == 'Technical' ? 3 : 0) + (values.class1 == 'Farmer' ? 3 : 0) + (values.class2 == 'Farmer' ? 3 : 0) + containerItemCapacities,
-                            waterMax: containerWaterCapacities
+                            capacity_max: maximumLoad + containerItemCapacities,
+                            weaponCapacity_max: maximumLoad,
+                            water_max: containerWaterCapacities
                         });
                     });
                 });
@@ -221,11 +225,11 @@
                 });
             });
         });
-        on("change:capacity change:capacityMax change:applyOverburdenPenalty", function() {
-            getAttrs(["capacity", "capacityMax", "applyOverburdenPenalty"], function(values) {
+        on("change:capacity change:capacity_max change:applyOverburdenPenalty", function() {
+            getAttrs(["capacity", "capacity_max", "applyOverburdenPenalty"], function(values) {
                 setAttrs({
-                    overburdenPenalty: parseInt(values.applyOverburdenPenalty) * Math.max(0, parseInt(values.capacity) - parseInt(values.capacityMax)),
-                    overCapacity: parseInt(values.capacity) > parseInt(values.capacityMax) ? 1 : 0
+                    overburdenPenalty: parseInt(values.applyOverburdenPenalty) * Math.max(0, parseInt(values.capacity) - parseInt(values.capacity_max)),
+                    overCapacity: parseInt(values.capacity) > parseInt(values.capacity_max) ? 1 : 0
                 });
             });
         });
@@ -236,7 +240,7 @@
                 });
             });
         });
-        on("change:repeating_armor remove:repeating_armor", function() {
+        on("change:repeating_armor:armorPenalty remove:repeating_armor", function() {
             getSectionIDs("repeating_armor", function(armorIdArray) {
                 var fieldNames = [];
                 for (var i=0; i < armorIdArray.length; i++) {
@@ -260,10 +264,10 @@
                 });
             });
         });
-        on("change:animals change:animalsMax", function() {
-            getAttrs(["animals", "animalsMax"], function(values) {
+        on("change:animals change:animals_max", function() {
+            getAttrs(["animals", "animals_max"], function(values) {
                 setAttrs({
-                    tooManyAnimals: parseInt(values.animals) > parseInt(values.animalsMax) ? 1 : 0
+                    tooManyAnimals: parseInt(values.animals) > parseInt(values.animals_max) ? 1 : 0
                 });
             }); 
         });
@@ -318,6 +322,47 @@
                 });
             });
         });
+        on("change:repeating_weapons:weaponSize change:repeating_armor:armorSize remove:repeating_weapons remove:repeating_armor", function() {
+            var fieldNames = [];
+            getSectionIDs("repeating_weapons", function(weaponIdArray) {
+                for (var i=0; i < weaponIdArray.length; i++) {
+                    console.log("pushing " + "repeating_weapons_" + weaponIdArray[i] + "_weaponSize")
+                    fieldNames.push("repeating_weapons_" + weaponIdArray[i] + "_weaponSize");
+                }
+                getSectionIDs("repeating_armor", function(armorIdArray) {
+                    for (var i=0; i < armorIdArray.length; i++) {
+                        console.log("pushing " + "repeating_armor_" + armorIdArray[i] + "_armorSize")
+                        fieldNames.push("repeating_armor_" + armorIdArray[i] + "_armorSize");
+                    }
+                    var totalBurden = 0;
+                    console.log("burden starts at 0")
+                    getAttrs(fieldNames, function(values) {
+                        for (var key in values) {
+                            totalBurden += parseInt(values[key])
+                            console.log("burden is now" + totalBurden + " because " + parseInt(values[key]) + " was added to it")
+                        }
+                        setAttrs({
+                            weaponCapacity: totalBurden
+                        });
+                    });
+                });
+            });
+        });
+        on("change:weaponCapacity change:weaponCapacity_max", function() {
+            getAttrs(["weaponCapacity", "weaponCapacity_max"], function(values) {
+                setAttrs({
+                    overEncumbered: parseInt(values.weaponCapacity) > parseInt(values.weaponCapacity_max) ? 1 : 0
+                });
+            });
+        });
+        on("change:species change:currentSeason", function() {
+            getAttrs(["species", "currentSeason"], function(values) {
+                setAttrs({
+                    speciesConditionMod: (values.species == 'Koneko Goblin' && values.currentSeason == 'Spring' ? 1 : 0),
+                    speciesInitiativeMod: (values.species == 'Koneko Goblin' && values.currentSeason == 'Spring' ? 1 : 0)
+                });
+            });
+        });
     </script>
     <div class='characterSheet'>
         <!-- Hidden Fields -->
@@ -332,6 +377,8 @@
             <input type='number' name='attr_classSkillBonus' value='0'/>
             <input type='number' name='attr_armorPenalty' value='0'/>
             <input type='number' name='attr_concentrationBonus' value='0'/>
+            <input type='number' name='attr_speciesConditionMod' value='0'/>
+            <input type='number' name='attr_speciesInitiativeMod' value='0'/>
         </div>
         <!-- End Hidden Fields -->
         
@@ -352,7 +399,21 @@
                     {{/rollWasCrit() die1}}
                     {{#rollTotal() die1 6}}
                         {{#rollTotal() die2 6}}
-                            <div class='critical'>CRITICAL SUCCESS!!!</div>
+                            {{#^rollWasCrit() die1}}
+                                {{#^rollWasCrit() die2}}
+                                    <div class='critical'>CRITICAL SUCCESS!!!</div>
+                                {{/^rollWasCrit() die2}}
+                            {{/^rollWasCrit() die1}}
+                            {{#rollWasCrit() die1}}
+                                {{#^rollWasCrit() die2}}
+                                    <div class='critical'>CRITICAL SUCCESS!!!</div>
+                                {{/^rollWasCrit() die2}}
+                            {{/rollWasCrit() die1}}
+                            {{#^rollWasCrit() die1}}
+                                {{#rollWasCrit() die2}}
+                                    <div class='critical'>CRITICAL SUCCESS!!!</div>
+                                {{/rollWasCrit() die2}}
+                            {{/^rollWasCrit() die1}}
                         {{/rollTotal() die2 6}}
                     {{/rollTotal() die1 6}}
                 </div>
@@ -375,7 +436,21 @@
                     {{/rollWasCrit() die1}}
                     {{#rollTotal() die1 6}}
                         {{#rollTotal() die2 6}}
-                            <div class='critical'>CRITICAL HIT!!!</div>
+                            {{#^rollWasCrit() die1}}
+                                {{#^rollWasCrit() die2}}
+                                    <div class='critical'>CRITICAL HIT!!!</div>
+                                {{/^rollWasCrit() die2}}
+                            {{/^rollWasCrit() die1}}
+                            {{#rollWasCrit() die1}}
+                                {{#^rollWasCrit() die2}}
+                                    <div class='critical'>CRITICAL HIT!!!</div>
+                                {{/^rollWasCrit() die2}}
+                            {{/rollWasCrit() die1}}
+                            {{#^rollWasCrit() die1}}
+                                {{#rollWasCrit() die2}}
+                                    <div class='critical'>CRITICAL HIT!!!</div>
+                                {{/rollWasCrit() die2}}
+                            {{/^rollWasCrit() die1}}
                         {{/rollTotal() die2 6}}
                     {{/rollTotal() die1 6}}
                 </div>
@@ -403,6 +478,16 @@
         <!-- End High Level Tabs -->
     
         <span class='characterDetails'>
+            <div class='sheet-2colrow'>
+                <div class='sheet-col'>
+                    <label class='headerLabel infoLabel'>Species</label>
+                    <select name='attr_species'>
+                        <option value='Human'>Human</option>
+                        <option value='Koneko Goblin'>Koneko Goblin</option>
+                    </select>
+                </div>
+            </div>
+        
             <div class='sheet-2colrow'>
                 <div class='sheet-col'>
                     <label class='headerLabel infoLabel'>Age</label>
@@ -460,6 +545,7 @@
                         <option value='Hunter'>Hunter</option>
                         <option value='Merchant'>Merchant</option>
                         <option value='Minstrel'>Minstrel</option>
+                        <option value='Navigator'>Navigator</option>
                         <option value='Noble'>Noble</option>
                         <option value='Other'>Other</option>
                     </select>
@@ -475,6 +561,7 @@
                         <option value='Hunter'>Hunter</option>
                         <option value='Merchant'>Merchant</option>
                         <option value='Minstrel'>Minstrel</option>
+                        <option value='Navigator'>Navigator</option>
                         <option value='Noble'>Noble</option>
                         <option value='Other'>Other</option>
                     </select>
@@ -747,7 +834,8 @@
                     <input type='checkbox' class='deathCondition' name='attr_conditionDeath' value='1'/>
                     <input type='checkbox' class='bonusCondition' name='attr_tipTopShape' value='1'/>
                     <input type='number' name='attr_condition' value='5'/> If >= 10, add bonus to
-                    <select name="attr_bonus" class='attributeType'>                
+                    <select name="attr_bonus" class='attributeType'>
+			<option value=''></option>
                         <option value='STR'>STR</option>
                         <option value='DEX'>DEX</option>
                         <option value='INT'>INT</option>
@@ -870,6 +958,19 @@
             
             <span class='characterChecks'>
             <label class='headerLabel loweredHeaderLabel'>Optional Modifiers</label>
+            <div class='sheet-row'>
+                <div class='sheet-col'>
+                    Current Season:
+                    <select name='attr_currentSeason' class='terrain'>
+                        <option value=''></option>
+                        <option value='Spring'>Spring</option>
+                        <option value='Summer'>Summer</option>
+                        <option value='Autumn'>Autumn</option>
+                        <option value='Winter'>Winter</option>
+                    </select>
+                </div>
+            </div>
+            
             <div class='sheet-3colrow'>
                 <div class='sheet-col'>
                     Current Terrain:
@@ -1090,6 +1191,25 @@
             </span>
             
             <span>
+                <input type='checkbox' class='showDiv' name='attr_showNavigatorSkills' value='1'>
+                <div class='sheet-2colrow'>
+                    <label class='headerLabel checkLabel'>Navigator Checks</label>
+                    <div class='sheet-col'>
+                        <span class='journeyLabel'>Navigation [STR+DEX]</span>
+                        <!--<button type='roll' value='/em rolls a Navigation check with result [[1d@{currentStr}+1d@{currentDex}+@{navigationMod}+@{concentrationBonus}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_navigationRoll'></button>-->
+                        <button type='roll' value='&{template:skillCheck} {{name=Navigation}} {{die1=[[1d@{currentStr}]]}} {{die2=[[1d@{currentDex}]]}} {{bonusesAndPenalties=[[@{navigationMod}+@{concentrationBonus}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_navigationRoll'></button>
+                        Special Modifiers: <input type='number' name='attr_navigationMod' value='0' class='journeyMod'/>
+                    </div>
+                    <div class='sheet-col'>
+                        <span class='journeyLabel'>Repair [STR+DEX]</span>
+                        <!--<button type='roll' value='/em rolls a Repair check with result [[1d@{currentStr}+1d@{currentDex}+@{navigatorRepairMod}+@{concentrationBonus}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_navigatorRepairRoll'></button>-->
+                        <button type='roll' value='&{template:skillCheck} {{name=Repair}} {{die1=[[1d@{currentStr}]]}} {{die2=[[1d@{currentDex}]]}} {{bonusesAndPenalties=[[@{navigatorRepairMod}+@{concentrationBonus}+@{classSkillBonus}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_navigatorRepairRoll'></button>
+                        Special Modifiers: <input type='number' name='attr_navigatorRepairMod' value='0' class='journeyMod'/>
+                    </div>
+                </div>
+            </span>
+            
+            <span>
                 <input type='checkbox' class='showDiv' name='attr_showNobleSkills' value='1'>
                 <div class='sheet-2colrow'>
                     <label class='headerLabel checkLabel'>Noble Checks</label>
@@ -1112,8 +1232,8 @@
             <div class='sheet-2colrow'>
                 <div class='sheet-col'>
                     <span class='journeyLabel'>Condition Check [STR+SPI]</span>
-                    <!--<button type='roll' value='/em rolls a Condition check with result [[1d@{currentStr}+1d@{currentSpi}+@{conditionMod}+@{classConditionMod}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]' name='roll_condRoll'></button>-->
-                    <button type='roll' value='&{template:skillCheck} {{name=Condition}} {{die1=[[1d@{currentStr}]]}} {{die2=[[1d@{currentSpi}]]}} {{bonusesAndPenalties=[[@{conditionMod}+@{classConditionMod}+@{applyTerrain}+@{applyWeather}-@{overburdenPenalty}]]}}' name='roll_conditionRoll'></button>
+                    <!--<button type='roll' value='/em rolls a Condition check with result [[1d@{currentStr}+1d@{currentSpi}+@{conditionMod}+@{classConditionMod}+@{applyTerrain}+@{applyWeather}+@{speciesConditionMod}-@{overburdenPenalty}]]' name='roll_condRoll'></button>-->
+                    <button type='roll' value='&{template:skillCheck} {{name=Condition}} {{die1=[[1d@{currentStr}]]}} {{die2=[[1d@{currentSpi}]]}} {{bonusesAndPenalties=[[@{conditionMod}+@{classConditionMod}+@{applyTerrain}+@{applyWeather}+@{speciesConditionMod}-@{overburdenPenalty}]]}}' name='roll_conditionRoll'></button>
                     Special Modifiers: <input type='number' name='attr_conditionMod' value='0' class='journeyMod'/>
                 </div>
                 <div class='sheet-col'>
@@ -1142,7 +1262,7 @@
             <div class='sheet-2colrow'>
                 <div class='sheet-col'>
                     <span class='journeyLabel'>Initiative [DEX+INT]</span>
-                    <button type='roll' value='/em rolls an Initiative check with result [[1d@{currentDex}+1d@{currentInt}+@{initiativeMod}+@{typeInitiativeMod}+@{applyTerrain}+@{applyWeather}-@{armorPenalty}-@{overburdenPenalty} &{tracker}]]' name='roll_initiativeRoll'></button>
+                    <button type='roll' value='/em rolls an Initiative check with result [[1d@{currentDex}+1d@{currentInt}+@{initiativeMod}+@{typeInitiativeMod}+@{applyTerrain}+@{applyWeather}+@{speciesInitiativeMod}-@{armorPenalty}-@{overburdenPenalty} &{tracker}]]' name='roll_initiativeRoll'></button>
                     Special Modifiers: <input type='number' name='attr_initiativeMod' value='0' class='journeyMod'/>
                 </div>
                 <div class='sheet-col'>
@@ -1280,6 +1400,35 @@
             </span>
             
             <span class='characterEquipment'>
+            <label class='headerLabel itemLabel'>Currency:</label>
+            <input type='number' name='attr_currency' value='0' min='0' style='width:70px'/>
+            
+            <div class='sheet-2colrow'>
+                <div class='sheet-col'>
+                    <label class='headerLabel itemLabel'>Equipped Weapon & Armor Capacity</label>
+                    <input type='checkbox' class='penaltyCondition' name='attr_overEncumbered' value='1'/>
+                    <input type='number' name='attr_weaponCapacity' value='0' min='0'/> / <input type='number' name='attr_weaponCapacity_max' value='0' min='0'/>
+                </div>
+                <div class='sheet-col'>
+                    <label class='headerLabel itemLabel'>Item Capacity</label>
+                    <input type='checkbox' class='penaltyCondition' name='attr_overCapacity' value='1'/>
+                    <input type='number' name='attr_capacity' value='0' min='0'/> / <input type='number' name='attr_capacity_max' value='0' min='0'/>
+                </div>
+            </div>
+            
+            <div class='sheet-2colrow'>
+                <div class='sheet-col'>
+                    <label class='headerLabel itemLabel'>Water Capacity</label>
+                    <input type='checkbox' class='penaltyCondition' name='attr_outOfWater' value='1'/>
+                    <input type='number' name='attr_water' value='0' min='0'/> / <input type='number' name='attr_water_max' value='0' min='0'/>
+                </div>
+                <div class='sheet-col'>
+                    <label class='headerLabel itemLabel'>Animal Capacity</label>
+                    <input type='checkbox' class='penaltyCondition' name='attr_tooManyAnimals' value='1'/>
+                    <input type='number' name='attr_animals' value='0' min='0'/> / <input type='number' name='attr_animals_max' value='1' min='0'/>
+                </div>
+            </div>
+            
             <label class='headerLabel itemLabel'>Weapons</label>
             <fieldset class='repeating_weapons'>
                 <div class='sheet-row'>
@@ -1293,9 +1442,10 @@
                         <option value='5'>Bow</option>
                         <option value='6'>Unarmed</option>
                     </select>
-                    Name: <input type='text' name='attr_weaponName' style='width: 120px;margin-right:4px'/>
-                    Effect: <input type='text' name='attr_weaponEffect' style='margin-right: 4px'/>
-                    Durability: <input type='number' name='attr_weaponDurability' value='0' min='0'/> / <input type='number' name='attr_weaponDurabilityMax' value='1' min='1'/>
+                    Name: <input type='text' name='attr_weaponName' style='width: 100px;margin-right:4px'/>
+                    Effect: <input type='text' name='attr_weaponEffect' style='width: 150px; margin-right: 4px'/>
+                    Durability: <input type='number' name='attr_weaponDurability' value='0' min='0'/> / <input type='number' name='attr_weaponDurability_max' value='1' min='1' style='margin-right: 4px'/>
+                    Size: <input type='number' name='attr_weaponSize' value='0' min='0'/>
                 </div>
                 <div class='sheet-2colrow weaponRow2'>
                     <div class='sheet-col skillCheck'>
@@ -1344,8 +1494,9 @@
                     <div class='sheet-col'>
                         Effect: <input type='text' name='attr_armorEffect'/>
                     </div>
-                    <div class='sheet-col'>
-                        Durability: <input type='number' name='attr_armorDurability' value='0' min='0'/> / <input type='number' name='attr_armorDurabilityMax' value='1' min='1'/>
+                    <div class='sheet-col' style='position:relative; right:14px;'>
+                        Durability: <input type='number' name='attr_armorDurability' value='0' min='0'/> / <input type='number' name='attr_armorDurability_max' value='1' min='1'/>
+                        Size: <input type='number' name='attr_armorSize' value='0' min='0'/>
                     </div>
                 </div>
             </fieldset>
@@ -1361,31 +1512,6 @@
                     </div>
                 </div>
             </fieldset>
-        
-            <div class='sheet-2colrow'>
-                <div class='sheet-col'>
-                    <label class='headerLabel itemLabel'>Currency</label>
-                    <input type='number' name='attr_currency' value='0' min='0' style='width:70px'/>
-                </div>
-                <div class='sheet-col'>
-                    <label class='headerLabel itemLabel'>Item Capacity</label>
-                    <input type='checkbox' class='penaltyCondition' name='attr_overCapacity' value='1'/>
-                    <input type='number' name='attr_capacity' value='0' min='0'/> / <input type='number' name='attr_capacityMax' value='0' min='0'/>
-                </div>
-            </div>
-            
-            <div class='sheet-2colrow'>
-                <div class='sheet-col'>
-                    <label class='headerLabel itemLabel'>Water Capacity</label>
-                    <input type='checkbox' class='penaltyCondition' name='attr_outOfWater' value='1'/>
-                    <input type='number' name='attr_water' value='0' min='0'/> / <input type='number' name='attr_waterMax' value='0' min='0'/>
-                </div>
-                <div class='sheet-col'>
-                    <label class='headerLabel itemLabel'>Animal Capacity</label>
-                    <input type='checkbox' class='penaltyCondition' name='attr_tooManyAnimals' value='1'/>
-                    <input type='number' name='attr_animals' value='0' min='0'/> / <input type='number' name='attr_animalsMax' value='1' min='0'/>
-                </div>
-            </div>
             
             <label class='headerLabel itemLabel'>Items</label>
             <fieldset class='repeating_items'>
