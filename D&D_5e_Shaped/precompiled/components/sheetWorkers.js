@@ -1,3 +1,5 @@
+var currentVersion = '2.0.1';
+
 var capitalizeFirstLetter = function (string) {
 	return string.charAt(0).toUpperCase() + string.slice(1);
 };
@@ -270,7 +272,6 @@ on('change:barbarian_level change:bard_level change:cleric_level change:druid_le
 	updateLevels();
 });
 
-
 var sumRepeating = function (options, sumItems) {
 	var repeatingItem = 'repeating_' + options.collection;
 	var collectionArray = [];
@@ -427,19 +428,60 @@ on('change:pb', function () {
 });
 
 var updateJackOfAllTrades = function () {
+	var collectionArray = ['pb'];
 	var finalSetAttrs = {};
 
-	getAttrs(['pb'], function (v) {
+	getAttrs(collectionArray, function (v) {
 		finalSetAttrs.jack_of_all_trades = Math.floor(getIntValue(v.pb) / 2);
 
 		setAttrs(finalSetAttrs);
-		updateSkill();
 	});
 };
 on('change:jack_of_all_trades_toggle', function () {
 	updateJackOfAllTrades();
 });
 
+var updateInitiative = function () {
+	var collectionArray = ['dexterity_mod', 'initiative_bonus', 'jack_of_all_trades_toggle', 'jack_of_all_trades', 'global_check_bonus'];
+	var finalSetAttrs = {};
+
+	finalSetAttrs.initiative = 0;
+	finalSetAttrs.initiative_formula = '';
+	getAttrs(collectionArray, function (v) {
+
+		var dexMod = getIntValue(v.dexterity_mod);
+		if (exists(dexMod)) {
+			finalSetAttrs.initiative += dexMod;
+			finalSetAttrs.initiative_formula += dexMod + '[dex]';
+		}
+
+		var initiativeBonus = getIntValue(v.initiative_bonus);
+		if (exists(initiativeBonus)) {
+			finalSetAttrs.initiative += initiativeBonus;
+			finalSetAttrs.initiative_formula += ADD + initiativeBonus + '[initiative bonus]';
+		}
+
+		if (v.jack_of_all_trades_toggle === '@{jack_of_all_trades}') {
+			var jackOfAllTrades = getIntValue(v.jack_of_all_trades);
+			if (exists(jackOfAllTrades)) {
+				finalSetAttrs.initiative += jackOfAllTrades;
+				finalSetAttrs.initiative_formula += ADD + jackOfAllTrades + '[jack of all trades]';
+			}
+		}
+
+		var globalCheckBonus = getIntValue(v.global_check_bonus);
+		if (exists(globalCheckBonus)) {
+			finalSetAttrs.initiative += globalCheckBonus;
+			finalSetAttrs.initiative_formula += ADD + globalCheckBonus + '[global check bonus]';
+		}
+
+		console.log('updateInitiative', finalSetAttrs);
+		setAttrs(finalSetAttrs);
+	});
+};
+on('change:dexterity_mod change:initiative_bonus change:jack_of_all_trades_toggle change:jack_of_all_trades change:global_check_bonus', function () {
+	updateInitiative();
+});
 
 on('change:repeating_attack remove:repeating_attack', function () {
 	updateAttack();
@@ -930,10 +972,9 @@ var updateSkill = function () {
 	});
 };
 
-on('change:repeating_skill', function () {
+on('change:repeating_skill change:jack_of_all_trades_toggle change:jack_of_all_trades', function () {
 	updateSkill();
 });
-
 
 var sheetOpened = function () {
 	var collectionArray = ['version'];
@@ -1025,8 +1066,7 @@ var sheetOpened = function () {
 				finalSetAttrs[repeatingString + 'ability'] = '@{' + skills[i].ability + '_mod}';
 			}
 
-
-			finalSetAttrs.version = '2.0.0';
+			finalSetAttrs.version = currentVersion;
 		}
 
 		setAttrs(finalSetAttrs);
