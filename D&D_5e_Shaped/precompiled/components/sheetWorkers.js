@@ -254,11 +254,27 @@ var updateLevels = function () {
 
 		if(levels.sorcerer > 0) {
 			finalSetAttrs.spell_display_sorcery_points = 1;
+			if (levels.sorcerer === 1) {
+				finalSetAttrs.sorcery_points_max = 0;
+			} else {
+				finalSetAttrs.sorcery_points_max = levels.sorcerer;
+			}
 		} else {
 			finalSetAttrs.spell_display_sorcery_points = 0;
 		}
 		if(levels.warlock > 0) {
 			finalSetAttrs.spell_display_warlock_slots = 1;
+
+			if (levels.warlock === 1) {
+				finalSetAttrs.warlock_spell_slots_max = 1;
+			} else if (levels.warlock >= 2 && levels.warlock < 11) {
+				finalSetAttrs.warlock_spell_slots_max = 2;
+			} else if (levels.warlock >= 11 && levels.warlock < 17) {
+				finalSetAttrs.warlock_spell_slots_max = 3;
+			} else {
+				finalSetAttrs.warlock_spell_slots_max = 4;
+			}
+
 		} else {
 			finalSetAttrs.spell_display_warlock_slots = 0;
 		}
