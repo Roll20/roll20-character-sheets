@@ -916,12 +916,28 @@ var updateAttack = function (rowId) {
 			collectionArray.push(repeatingString + 'second_damage_ability');
 			collectionArray.push(repeatingString + 'second_damage_bonus');
 			collectionArray.push(repeatingString + 'second_damage_type');
+			collectionArray.push(repeatingString + 'modifiers');
 			collectionArray.push(repeatingString + 'parsed');
 		}
 
 		getAttrs(collectionArray, function (v) {
 			for (var j = 0; j < ids.length; j++) {
 				var repeatingString = repeatingItem+'_' + ids[j] + '_';
+
+				if (!exists(v[repeatingString + 'parsed']) || v[repeatingString + 'parsed'].indexOf('modifiers') === -1) {
+					var attackModifiers = v[repeatingString + 'modifiers'];
+					if (exists(attackModifiers)) {
+						var attackBonus = attackModifiers.replace(/.*(?:Melee|Ranged) Attacks \+(\d+).*/gi, '$1');
+						var damageBonus = attackModifiers.replace(/.*(?:Melee|Ranged) Damage \+(\d+).*/gi, '$1');
+
+						finalSetAttrs[repeatingString + 'attack_bonus'] = attackBonus;
+						finalSetAttrs[repeatingString + 'damage_bonus'] = damageBonus;
+						if (!finalSetAttrs[repeatingString + 'parsed']) {
+							finalSetAttrs[repeatingString + 'parsed'] = '';
+						}
+						finalSetAttrs[repeatingString + 'parsed'] += ' modifiers';
+					}
+				}
 
 				var attackOptions = {
           defaultAbility: 'strength_mod',
@@ -943,18 +959,6 @@ var updateAttack = function (rowId) {
 					type: 'attack'
 				};
 				updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
-
-				if (!exists(finalSetAttrs[repeatingString + 'parsed'])) {
-					var attackModifiers = v[repeatingString + 'modifiers'];
-					if (exists(attackModifiers)) {
-						var attackBonus = attackModifiers.replace(/.*Melee Attacks \+(\d+).*/gi, '$1');
-						var damageBonus = attackModifiers.replace(/.*Melee Damage \+(\d+).*/gi, '$1');
-
-						finalSetAttrs[repeatingString + 'attack_bonus'] = attackBonus;
-						finalSetAttrs[repeatingString + 'damage_bonus'] = damageBonus;
-						finalSetAttrs[repeatingString + 'parsed'] = true;
-					}
-				}
 			}
 
 			console.log('updateAttack', finalSetAttrs);
