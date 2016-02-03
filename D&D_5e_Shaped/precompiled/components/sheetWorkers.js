@@ -75,9 +75,6 @@ var parseAttackComponents = function (v, repeatingString, finalSetAttrs, options
 
   if (!exists(parsed) || parsed.indexOf(options.parseName) === -1) {
     if (exists(v[repeatingString + options.triggerField])) {
-      if (options.abilityField) {
-        finalSetAttrs[repeatingString + options.abilityField] = v.default_ability;
-      }
       finalSetAttrs[repeatingString + options.toggleField] = options.toggleFieldSetTo;
     }
     if (!exists(finalSetAttrs[repeatingString + 'parsed'])) {
@@ -576,7 +573,6 @@ on('change:global_attack_bonus change:global_melee_attack_bonus change:global_ra
 
 var updateAttackToggle = function (v, finalSetAttrs, repeatingString, options) {
   var attackParse = {
-    abilityField: 'attack_ability',
     parseName: 'attack',
     toggleField: 'roll_toggle',
     toggleFieldSetTo: '@{roll_toggle_var}',
@@ -640,7 +636,6 @@ var updateAttackToggle = function (v, finalSetAttrs, repeatingString, options) {
 
 var updateSavingThrowToggle = function (v, finalSetAttrs, repeatingString, options) {
   var savingThrowParse = {
-    abilityField: 'saving_throw_ability',
     parseName: 'savingThrow',
     toggleField: 'saving_throw_toggle',
     toggleFieldSetTo: '@{saving_throw_toggle_var}',
@@ -652,9 +647,11 @@ var updateSavingThrowToggle = function (v, finalSetAttrs, repeatingString, optio
 	if (savingThrowToggle === '@{saving_throw_toggle_var}') {
 		var savingThrowDC = 8 + getIntValue(v.pb);
 		var savingThrowAbility = v[repeatingString + 'saving_throw_ability'];
-    if (finalSetAttrs[repeatingString + 'saving_throw_ability']) {
-      savingThrowAbility = finalSetAttrs[repeatingString + 'saving_throw_ability'];
+    if (!finalSetAttrs[repeatingString + 'saving_throw_ability']) {
+      finalSetAttrs[repeatingString + 'saving_throw_ability'] = v.default_ability;
     }
+    savingThrowAbility = finalSetAttrs[repeatingString + 'saving_throw_ability'];
+
 		savingThrowDC += getAbilityValue(v, savingThrowAbility, 'strength_mod');
 		if (options && options.bonusDC) {
 			savingThrowDC += getIntValue(options.bonusDC);
