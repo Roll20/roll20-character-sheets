@@ -70,7 +70,22 @@ var setFinalAttrs = function (finalSetAttrs) {
     setAttrs(finalSetAttrs);
   }
 };
+var parseAttackComponents = function (v, repeatingString, finalSetAttrs, options) {
+  var parsed = finalSetAttrs[repeatingString + 'parsed'];
 
+  if (!exists(parsed) || parsed.indexOf(options.parseName) === -1) {
+    if (exists(v[repeatingString + options.triggerField])) {
+      if (options.abilityField) {
+        finalSetAttrs[repeatingString + options.abilityField] = v.default_ability;
+      }
+      finalSetAttrs[repeatingString + options.toggleField] = options.toggleFieldSetTo;
+    }
+    if (!exists(finalSetAttrs[repeatingString + 'parsed'])) {
+      finalSetAttrs[repeatingString + 'parsed'] = '';
+    }
+    finalSetAttrs[repeatingString + 'parsed'] += ' ' + options.parseName;
+  }
+};
 
 var ADD = ' + ';
 var SPACE = ' ';
@@ -560,12 +575,14 @@ on('change:global_attack_bonus change:global_melee_attack_bonus change:global_ra
 });
 
 var updateAttackToggle = function (v, finalSetAttrs, repeatingString, options) {
-  if (!exists(v[repeatingString + 'parsed'])) {
-    if (exists(v[repeatingString + 'type'])) {
-      finalSetAttrs[repeatingString + 'attack_ability'] = v.default_ability;
-      finalSetAttrs[repeatingString + 'roll_toggle'] = '@{roll_toggle_var}';
-    }
-  }
+  var attackParse = {
+    abilityField: 'attack_ability',
+    parseName: 'attack',
+    toggleField: 'roll_toggle',
+    toggleFieldSetTo: '@{roll_toggle_var}',
+    triggerField: 'type'
+  };
+  parseAttackComponents(v, repeatingString, finalSetAttrs, attackParse);
 
 	var attackFormula = '';
 	var attackToggle = v[repeatingString + 'roll_toggle'];
@@ -622,12 +639,14 @@ var updateAttackToggle = function (v, finalSetAttrs, repeatingString, options) {
 };
 
 var updateSavingThrowToggle = function (v, finalSetAttrs, repeatingString, options) {
-  if (!exists(v[repeatingString + 'parsed'])) {
-    if (exists(v[repeatingString + 'saving_throw_vs_ability'])) {
-      finalSetAttrs[repeatingString + 'saving_throw_ability'] = v.default_ability;
-      finalSetAttrs[repeatingString + 'saving_throw_toggle'] = '@{saving_throw_toggle_var}';
-    }
-  }
+  var savingThrowParse = {
+    abilityField: 'saving_throw_ability',
+    parseName: 'savingThrow',
+    toggleField: 'saving_throw_toggle',
+    toggleFieldSetTo: '@{saving_throw_toggle_var}',
+    triggerField: 'saving_throw_vs_ability'
+  };
+  parseAttackComponents(v, repeatingString, finalSetAttrs, savingThrowParse);
 
 	var savingThrowToggle = v[repeatingString + 'saving_throw_toggle'];
 	if (savingThrowToggle === '@{saving_throw_toggle_var}') {
@@ -646,14 +665,13 @@ var updateSavingThrowToggle = function (v, finalSetAttrs, repeatingString, optio
 };
 
 var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
-  if (!exists(v[repeatingString + 'parsed'])) {
-    if (exists(v[repeatingString + 'damage'])) {
-      finalSetAttrs[repeatingString + 'damage_toggle'] = '@{damage_toggle_var}';
-    }
-    if (exists(v[repeatingString + 'second_damage'])) {
-      finalSetAttrs[repeatingString + 'second_damage_toggle'] = '@{second_damage_toggle_var}';
-    }
-  }
+  var damageParse = {
+    parseName: 'damage',
+    toggleField: 'damage_toggle',
+    toggleFieldSetTo: '@{damage_toggle_var}',
+    triggerField: 'damage'
+  };
+  parseAttackComponents(v, repeatingString, finalSetAttrs, damageParse);
 
 	var damageString = '';
 	var damageFormula = '';
@@ -721,6 +739,14 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 	}
 	finalSetAttrs[repeatingString + 'damage_formula'] = damageFormula;
 
+  var secondDamageParse = {
+    parseName: 'secondDamage',
+    toggleField: 'second_damage_toggle',
+    toggleFieldSetTo: '@{second_damage_toggle_var}',
+    triggerField: 'second_damage'
+  };
+  parseAttackComponents(v, repeatingString, finalSetAttrs, secondDamageParse);
+
 	var secondDamageFormula = '';
 
 	var secondDamageToggle = v[repeatingString + 'second_damage_toggle'];
@@ -771,15 +797,13 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 };
 
 updateHealToggle = function (v, finalSetAttrs, repeatingString) {
-	console.log('updateHealToggle');
-	if (!exists(v[repeatingString + 'parsed'])) {
-		console.log('not parsed');
-		if (exists(v[repeatingString + 'heal'])) {
-			console.log('heal exists');
-			finalSetAttrs[repeatingString + 'heal_ability'] = v.default_ability;
-			finalSetAttrs[repeatingString + 'heal_toggle'] = '@{heal_var}';
-		}
-	}
+  var healParse = {
+    parseName: 'heal',
+    toggleField: 'heal_toggle',
+    toggleFieldSetTo: '@{heal_var}',
+    triggerField: 'heal'
+  };
+  parseAttackComponents(v, repeatingString, finalSetAttrs, healParse);
 };
 
 var updateAttack = function (rowId) {
@@ -837,7 +861,6 @@ var updateAttack = function (rowId) {
 					globalRangedDamageBonus: getIntValue(v.global_ranged_damage_bonus)
 				};
 				updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
-				finalSetAttrs[repeatingString + 'parsed'] = true;
 			}
 
 			console.log('updateAttack', finalSetAttrs);
@@ -926,11 +949,6 @@ var updateSpell = function (rowId) {
 				updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
 
 				updateHealToggle(v, finalSetAttrs, repeatingString);
-
-				if (!exists(v[repeatingString + 'parsed'])) {
-					finalSetAttrs[repeatingString + 'parsed'] = true;
-				}
-
 			}
 
 			console.log('updateSpell', finalSetAttrs);
