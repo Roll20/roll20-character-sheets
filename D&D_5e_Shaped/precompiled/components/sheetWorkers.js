@@ -1126,6 +1126,7 @@ var sheetOpened = function () {
 				finalSetAttrs[repeatingString + 'name'] = skills[i].name;
 				finalSetAttrs[repeatingString + 'ability'] = '@{' + skills[i].ability + '_mod}';
 			}
+      updateSkill();
 		}
 
 		if (!version || version !== currentVersion) {
@@ -1133,7 +1134,6 @@ var sheetOpened = function () {
 		}
 
 		setAttrs(finalSetAttrs);
-		updateSkill();
 	});
 };
 
