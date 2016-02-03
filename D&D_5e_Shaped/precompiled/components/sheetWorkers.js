@@ -687,12 +687,12 @@ var updateAttackToggle = function (v, finalSetAttrs, repeatingString, options) {
 			attackFormula += ADD + options.globalAttackBonus + '[' + options.globalAttackBonusLabel + ']';
 		}
 
-		if (!v[repeatingString + 'type'] || v[repeatingString + 'type'] === 'melee') {
+		if (!v[repeatingString + 'type'] || v[repeatingString + 'type'] === 'Melee Weapon') {
 			if (exists(options.globalMeleeAttackBonus)) {
 				toHit += options.globalMeleeAttackBonus;
 				attackFormula += ADD + options.globalMeleeAttackBonus + '[global melee attack bonus]';
 			}
-		} else if (v[repeatingString + 'type'] === 'ranged') {
+		} else if (v[repeatingString + 'type'] === 'Ranged Weapon') {
 			if (exists(options.globalRangedAttackBonus)) {
 				toHit += options.globalRangedAttackBonus;
 				attackFormula += ADD + options.globalRangedAttackBonus + '[global ranged attack bonus]';
@@ -782,13 +782,13 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 		damageAddition += options.globalDamageBonus;
 		damageFormula += ADD + options.globalDamageBonus + '[global damage bonus]';
 
-		if(options && options.globalMeleeDamageBonus && !v[repeatingString + 'type'] || v[repeatingString + 'type'] === 'melee') {
+		if(options && options.globalMeleeDamageBonus && !v[repeatingString + 'type'] || v[repeatingString + 'type'] === 'Melee Weapon') {
 			damageAddition += options.globalMeleeDamageBonus;
 			if (damageFormula !== '') {
 				damageFormula += ADD;
 			}
 			damageFormula += options.globalMeleeDamageBonus + '[global melee damage bonus]';
-		} else if (options && options.globalRangedDamageBonus && v[repeatingString + 'type'] === 'ranged') {
+		} else if (options && options.globalRangedDamageBonus && v[repeatingString + 'type'] === 'Ranged Weapon') {
 			damageAddition += options.globalRangedDamageBonus;
 			if (damageFormula !== '') {
 				damageFormula += ADD;
@@ -943,6 +943,18 @@ var updateAttack = function (rowId) {
 					type: 'attack'
 				};
 				updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
+
+				if (!exists(finalSetAttrs[repeatingString + 'parsed'])) {
+					var attackModifiers = v[repeatingString + 'modifiers'];
+					if (exists(attackModifiers)) {
+						var attackBonus = attackModifiers.replace(/.*Melee Attacks \+(\d+).*/gi, '$1');
+						var damageBonus = attackModifiers.replace(/.*Melee Damage \+(\d+).*/gi, '$1');
+
+						finalSetAttrs[repeatingString + 'attack_bonus'] = attackBonus;
+						finalSetAttrs[repeatingString + 'damage_bonus'] = damageBonus;
+						finalSetAttrs[repeatingString + 'parsed'] = true;
+					}
+				}
 			}
 
 			console.log('updateAttack', finalSetAttrs);
