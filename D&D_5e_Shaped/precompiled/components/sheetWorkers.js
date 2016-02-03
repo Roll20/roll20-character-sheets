@@ -486,6 +486,7 @@ on('change:repeating_equipment remove:repeating_equipment', function () {
 });
 
 on('change:pb', function () {
+	console.log('pb changed');
   updateAttack();
 	updateSpell();
 	updateJackOfAllTrades();
@@ -565,7 +566,10 @@ on('change:weight_attacks change:weight_armor change:weight_equipment change:wei
 
 on('change:repeating_attack', function (eventInfo) {
   var rowId = getRowId('repeating_attack', eventInfo);
-  updateAttack(rowId);
+	var changedField = getRepeatingField('repeating_attack', eventInfo);
+	if (changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed') {
+		updateAttack(rowId);
+	}
 });
 on('change:repeating_attack remove:repeating_attack', function () {
   var options = {
@@ -963,12 +967,16 @@ var updateSpell = function (rowId) {
 
 on('change:repeating_spell', function (eventInfo) {
   var rowId = getRowId('repeating_spell', eventInfo);
-  updateSpell(rowId);
+	var changedField = getRepeatingField('repeating_spell', eventInfo);
+
+	if (changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed') {
+		updateSpell(rowId);
+	}
 });
 on('change:global_spell_attack_bonus change:global_spell_damage_bonus change:global_spell_dc_bonus change:global_spell_heal_bonus', function () {
+	console.log('updateSpell trigged by global');
 	updateSpell();
 });
-
 
 var updateD20Mod = function () {
 	var collectionArray = ['halfling_luck'];
