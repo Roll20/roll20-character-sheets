@@ -539,7 +539,7 @@ var updateSavingThrowToggle = function (v, finalSetAttrs, repeatingString, optio
       savingThrowAbility = finalSetAttrs[repeatingString + 'saving_throw_ability'];
     }
 		savingThrowDC += getAbilityValue(v, savingThrowAbility, 'strength_mod');
-		if (options.bonusDC) {
+		if (options && options.bonusDC) {
 			savingThrowDC += getIntValue(options.bonusDC);
 		}
 		savingThrowDC += getIntValue(v[repeatingString + 'saving_throw_bonus']);
@@ -570,7 +570,11 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 			damageFormula += damage + '[damage]';
 		}
 
-		var damageAbility = getAbilityValue(v, v[repeatingString + 'damage_ability'], 'strength_mod');
+		if (!options.defaultDamageAbility) {
+			options.defaultDamageAbility = 0;
+		}
+
+		var damageAbility = getAbilityValue(v, v[repeatingString + 'damage_ability'], options.defaultDamageAbility);
 		if (exists(damageAbility)) {
 			damageAddition += damageAbility;
 			if (damageFormula !== '') {
@@ -591,13 +595,13 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 		damageAddition += options.globalDamageBonus;
 		damageFormula += ADD + options.globalDamageBonus + '[global damage bonus]';
 
-		if(!v[repeatingString + 'type'] || v[repeatingString + 'type'] === 'melee') {
+		if(options && options.globalMeleeDamageBonus && !v[repeatingString + 'type'] || v[repeatingString + 'type'] === 'melee') {
 			damageAddition += options.globalMeleeDamageBonus;
 			if (damageFormula !== '') {
 				damageFormula += ADD;
 			}
 			damageFormula += options.globalMeleeDamageBonus + '[global melee damage bonus]';
-		} else if (v[repeatingString + 'type'] === 'ranged') {
+		} else if (options && options.globalRangedDamageBonus && v[repeatingString + 'type'] === 'ranged') {
 			damageAddition += options.globalRangedDamageBonus;
 			if (damageFormula !== '') {
 				damageFormula += ADD;
@@ -725,6 +729,7 @@ var updateAttack = function () {
 				updateSavingThrowToggle(v, finalSetAttrs, repeatingString);
 
 				var damageOptions = {
+					defaultDamageAbility: 'strength_mod',
 					globalDamageBonus: getIntValue(v.global_damage_bonus),
 					globalMeleeDamageBonus: getIntValue(v.global_melee_damage_bonus),
 					globalRangedDamageBonus: getIntValue(v.global_ranged_damage_bonus)
