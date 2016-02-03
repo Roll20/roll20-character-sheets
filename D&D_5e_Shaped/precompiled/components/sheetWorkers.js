@@ -138,7 +138,9 @@ var updateAbilityModifier = function (ability) {
 	if(ability === 'dexterity') {
 		updateArmor();
 	}
+  updateSkill();
 	updateAttack();
+  updateSpell();
 };
 on('change:strength change:strength_bonus', function () {
 	updateAbilityModifier('strength');
