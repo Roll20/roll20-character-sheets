@@ -662,7 +662,9 @@ var updateAttackToggle = function (v, finalSetAttrs, repeatingString, options) {
 	if (!exists(toHit)) {
 		toHit = 0;
 	}
-	finalSetAttrs[repeatingString + 'to_hit'] = toHit;
+	if (options.type === 'attack') {
+		finalSetAttrs[repeatingString + 'to_hit'] = toHit;
+	}
 	finalSetAttrs[repeatingString + 'attack_formula'] = attackFormula;
 };
 
@@ -828,7 +830,9 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 		damageString = ' ';
 	}
 	finalSetAttrs[repeatingString + 'second_damage_formula'] = secondDamageFormula;
-	finalSetAttrs[repeatingString + 'damage_string'] = damageString;
+	if (options.type === 'attack') {
+		finalSetAttrs[repeatingString + 'damage_string'] = damageString;
+	}
 };
 
 updateHealToggle = function (v, finalSetAttrs, repeatingString) {
@@ -884,7 +888,8 @@ var updateAttack = function (rowId) {
 					globalAttackBonus: getIntValue(v.global_attack_bonus),
 					globalAttackBonusLabel: 'global attack bonus',
 					globalMeleeAttackBonus: getIntValue(v.global_melee_attack_bonus),
-					globalRangedAttackBonus: getIntValue(v.global_ranged_attack_bonus)
+					globalRangedAttackBonus: getIntValue(v.global_ranged_attack_bonus),
+					type: 'attack'
 				};
 				updateAttackToggle(v, finalSetAttrs, repeatingString, attackOptions);
 
@@ -894,7 +899,8 @@ var updateAttack = function (rowId) {
 					defaultDamageAbility: 'strength_mod',
 					globalDamageBonus: getIntValue(v.global_damage_bonus),
 					globalMeleeDamageBonus: getIntValue(v.global_melee_damage_bonus),
-					globalRangedDamageBonus: getIntValue(v.global_ranged_damage_bonus)
+					globalRangedDamageBonus: getIntValue(v.global_ranged_damage_bonus),
+					type: 'attack'
 				};
 				updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
 			}
@@ -962,7 +968,8 @@ var updateSpell = function (rowId) {
 
 				var attackOptions = {
 					attackAbility: true,
-					globalAttackBonus: getIntValue(v.global_spell_attack_bonus)
+					globalAttackBonus: getIntValue(v.global_spell_attack_bonus),
+					type: 'spell'
 				};
 				updateAttackToggle(v, finalSetAttrs, repeatingString, attackOptions);
 
@@ -972,7 +979,8 @@ var updateSpell = function (rowId) {
 				updateSavingThrowToggle(v, finalSetAttrs, repeatingString, savingThrowOptions);
 
 				var damageOptions = {
-					globalDamageBonus: getIntValue(v.global_spell_damage_bonus)
+					globalDamageBonus: getIntValue(v.global_spell_damage_bonus),
+					type: 'spell'
 				};
 				updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
 
