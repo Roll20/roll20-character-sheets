@@ -512,7 +512,7 @@ on('change:jack_of_all_trades_toggle', function () {
 });
 
 var updateInitiative = function () {
-	var collectionArray = ['dexterity_mod', 'initiative_bonus', 'jack_of_all_trades_toggle', 'jack_of_all_trades', 'global_check_bonus'];
+	var collectionArray = ['dexterity_mod', 'dexterity_check_bonus', 'initiative_bonus', 'jack_of_all_trades_toggle', 'jack_of_all_trades', 'global_check_bonus'];
 	var finalSetAttrs = {};
 
 	finalSetAttrs.initiative = 0;
@@ -523,6 +523,12 @@ var updateInitiative = function () {
 		if (exists(dexMod)) {
 			finalSetAttrs.initiative += dexMod;
 			finalSetAttrs.initiative_formula += dexMod + '[dex]';
+		}
+
+		var dexCheckBonus = getIntValue(v.dexterity_check_bonus);
+		if (exists(dexCheckBonus)) {
+			finalSetAttrs.initiative += dexCheckBonus;
+			finalSetAttrs.initiative_formula += dexCheckBonus + '[dex check bonus]';
 		}
 
 		var initiativeBonus = getIntValue(v.initiative_bonus);
