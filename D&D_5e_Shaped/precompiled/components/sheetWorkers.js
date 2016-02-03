@@ -450,6 +450,7 @@ var updateJackOfAllTrades = function () {
 	getAttrs(collectionArray, function (v) {
 		finalSetAttrs.jack_of_all_trades = Math.floor(getIntValue(v.pb) / 2);
 
+		console.log('updateJackOfAllTrades', finalSetAttrs);
 		setAttrs(finalSetAttrs);
 	});
 };
@@ -497,6 +498,21 @@ var updateInitiative = function () {
 };
 on('change:dexterity_mod change:initiative_bonus change:jack_of_all_trades_toggle change:jack_of_all_trades change:global_check_bonus', function () {
 	updateInitiative();
+});
+
+var updateWeight = function () {
+	var collectionArray = ['weight_attacks', 'weight_armor', 'weight_equipment', 'weight_coinage', 'weight_misc'];
+	var finalSetAttrs = {};
+
+	getAttrs(collectionArray, function (v) {
+		finalSetAttrs.weight_total = Math.round((getFloatValue(v.weight_attacks) + getFloatValue(v.weight_armor) + getFloatValue(v.weight_equipment) + getFloatValue(v.weight_coinage) + getFloatValue(v.weight_misc)) * 100) / 100;
+
+		console.log('updateWeight', finalSetAttrs);
+		setAttrs(finalSetAttrs);
+	});
+};
+on('change:weight_attacks change:weight_armor change:weight_equipment change:weight_coinage change:weight_misc', function () {
+	updateWeight();
 });
 
 on('change:repeating_attack remove:repeating_attack', function () {
