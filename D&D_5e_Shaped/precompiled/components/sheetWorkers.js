@@ -49,6 +49,17 @@ var exists = function (value) {
 	return true;
 };
 
+var getRowId = function (leadingString, eventInfo) {
+	var re = new RegExp(leadingString + '_([a-zA-Z0-9\-]*)_.*');
+
+	return eventInfo.sourceAttribute.replace(re, '$1');
+};
+var getRepeatingField = function (leadingString, eventInfo) {
+	var re = new RegExp(leadingString + '_[a-zA-Z0-9\-]*_(.*)');
+
+	return eventInfo.sourceAttribute.replace(re, '$1');
+};
+
 var ADD = ' + ';
 var SPACE = ' ';
 
@@ -513,22 +524,23 @@ on('change:weight_attacks change:weight_armor change:weight_equipment change:wei
 	updateWeight();
 });
 
-on('change:repeating_attack remove:repeating_attack', function () {
-	updateAttack();
-
-	var options = {
-		collection: 'attack',
-		toggle: 'carried'
-	};
-	var sumItems = [
-		{
-			fieldToAdd: 'weight',
-			totalField: 'weight_attacks'
-		}
-	];
-	sumRepeating(options, sumItems);
+on('change:repeating_attack', function (eventInfo) {
+  var rowId = getRowId('repeating_attack', eventInfo);
+  updateAttack(rowId);
 });
-
+on('change:repeating_attack remove:repeating_attack', function () {
+  var options = {
+    collection: 'attack',
+    toggle: 'carried'
+  };
+  var sumItems = [
+    {
+      fieldToAdd: 'weight',
+      totalField: 'weight_attacks'
+    }
+  ];
+  sumRepeating(options, sumItems);
+});
 on('change:global_attack_bonus change:global_melee_attack_bonus change:global_ranged_attack_bonus change:global_damage_bonus change:global_melee_damage_bonus change:global_ranged_damage_bonus', function () {
 	updateAttack();
 });
@@ -756,12 +768,16 @@ updateHealToggle = function (v, finalSetAttrs, repeatingString) {
 	}
 };
 
-var updateAttack = function () {
+var updateAttack = function (rowId) {
 	var repeatingItem = 'repeating_attack';
 	var collectionArray = ['pb', 'finesse_mod', 'strength_mod', 'dexterity_mod', 'constitution_mod', 'intelligence_mod', 'wisdom_mod', 'charisma_mod', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability'];
 	var finalSetAttrs = {};
 
 	getSectionIDs(repeatingItem, function (ids) {
+    if (rowId) {
+      ids = [];
+      ids.push(rowId);
+    }
 		for (var i = 0; i < ids.length; i++) {
 			var repeatingString = repeatingItem + '_' + ids[i] + '_';
 			collectionArray.push(repeatingString + 'type');
@@ -816,12 +832,16 @@ var updateAttack = function () {
 	});
 };
 
-var updateSpell = function () {
+var updateSpell = function (rowId) {
 	var repeatingItem = 'repeating_spell';
 	var collectionArray = ['pb', 'finesse_mod', 'strength_mod', 'dexterity_mod', 'constitution_mod', 'intelligence_mod', 'wisdom_mod', 'charisma_mod', 'global_spell_attack_bonus', 'global_spell_damage_bonus', 'global_spell_dc_bonus', 'global_spell_heal_bonus', 'default_ability'];
 	var finalSetAttrs = {};
 
 	getSectionIDs(repeatingItem, function (ids) {
+    if (rowId) {
+      ids = [];
+      ids.push(rowId);
+    }
 		for (var i = 0; i < ids.length; i++) {
 			var repeatingString = repeatingItem + '_' + ids[i] + '_';
 			collectionArray.push(repeatingString + 'type');
@@ -905,9 +925,9 @@ var updateSpell = function () {
 	});
 };
 
-
-on('change:repeating_spell remove:repeating_spell', function () {
-	updateSpell();
+on('change:repeating_spell', function (eventInfo) {
+  var rowId = getRowId('repeating_spell', eventInfo);
+  updateSpell(rowId);
 });
 on('change:global_spell_attack_bonus change:global_spell_damage_bonus change:global_spell_dc_bonus change:global_spell_heal_bonus', function () {
 	updateSpell();
@@ -934,12 +954,16 @@ on('change:halfling_luck', function () {
 	updateD20Mod();
 });
 
-var updateSkill = function () {
+var updateSkill = function (rowId) {
 	var repeatingItem = 'repeating_skill';
 	var collectionArray = ['jack_of_all_trades_toggle', 'jack_of_all_trades', 'pb', 'exp', 'strength_mod', 'dexterity_mod', 'constitution_mod', 'intelligence_mod', 'wisdom_mod', 'charisma_mod', 'global_check_bonus'];
 	var finalSetAttrs = {};
 
 	getSectionIDs(repeatingItem, function (ids) {
+    if (rowId) {
+      ids = [];
+      ids.push(rowId);
+    }
 		for (var i = 0; i < ids.length; i++) {
 			var repeatingString = repeatingItem + '_' + ids[i] + '_';
 			collectionArray.push(repeatingString + 'proficiency');
@@ -1002,7 +1026,14 @@ var updateSkill = function () {
 	});
 };
 
-on('change:repeating_skill change:jack_of_all_trades_toggle change:jack_of_all_trades', function () {
+on('change:repeating_skill', function (eventInfo) {
+	var rowId = getRowId('repeating_skill', eventInfo);
+	var changedField = getRepeatingField('repeating_skill', eventInfo);
+	if (changedField !== 'total') {
+		updateSkill(rowId);
+	}
+});
+on('change:jack_of_all_trades_toggle change:jack_of_all_trades', function () {
 	updateSkill();
 });
 
