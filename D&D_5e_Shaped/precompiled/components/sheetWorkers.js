@@ -450,7 +450,41 @@ var sumRepeating = function (options, sumItems) {
 	});
 };
 
-var updateArmor = function () {
+var updateArmor = function (rowId) {
+	var repeatingItem = 'repeating_armor';
+	var collectionArray = [];
+	var finalSetAttrs = {};
+
+	getSectionIDs(repeatingItem, function (ids) {
+		if (rowId) {
+			ids = [];
+			ids.push(rowId);
+		}
+		for (var i = 0; i < ids.length; i++) {
+			var repeatingString = repeatingItem + '_' + ids[i] + '_';
+			collectionArray.push(repeatingString + 'modifiers');
+		}
+
+		getAttrs(collectionArray, function (v) {
+			for (var j = 0; j < ids.length; j++) {
+				var repeatingString = repeatingItem+'_' + ids[j] + '_';
+
+				if (!exists(finalSetAttrs[repeatingString + 'parsed'])) {
+					var armorModifiers = v[repeatingString + 'modifiers'];
+					if (exists(armorModifiers)) {
+						var acBonus = armorModifiers.replace(/^\D+/g, '');
+
+						finalSetAttrs[repeatingString + 'ac_bonus'] = acBonus;
+					}
+					finalSetAttrs[repeatingString + 'parsed'] = true;
+				}
+			}
+
+			console.log('updateArmor', finalSetAttrs);
+			setFinalAttrs(finalSetAttrs)
+		});
+	});
+
 	var options = {
 		collection: 'armor',
 		getExtraFields: ['dexterity_mod', 'medium_armor_max_dex', 'ac_unarmored_ability', 'ac_unarmored_bonus', 'strength_mod', 'dexterity_mod', 'constitution_mod', 'intelligence_mod', 'wisdom_mod', 'charisma_mod'],
@@ -472,8 +506,14 @@ var updateArmor = function () {
 	];
 	sumRepeating(options, sumItems);
 };
-
-on('change:repeating_armor change:medium_armor_max_dex change:ac_unarmored_ability remove:repeating_armor', function () {
+on('change:repeating_armor', function (eventInfo) {
+	var rowId = getRowId('repeating_armor', eventInfo);
+	var changedField = getRepeatingField('repeating_armor', eventInfo);
+	if (changedField !== 'ac_total') {
+		updateArmor(rowId);
+	}
+});
+on('change:medium_armor_max_dex change:ac_unarmored_ability remove:repeating_armor', function () {
 	updateArmor();
 });
 
