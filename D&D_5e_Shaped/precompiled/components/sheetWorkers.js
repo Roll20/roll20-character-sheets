@@ -77,6 +77,19 @@ var parseAttackComponents = function (v, repeatingString, finalSetAttrs, options
     if (exists(v[repeatingString + options.triggerField])) {
       finalSetAttrs[repeatingString + options.toggleField] = options.toggleFieldSetTo;
     }
+	  if (options.attackAbility && !exists(v[repeatingString + 'attack_ability']) && v[repeatingString + 'attack_ability'] !== '0') {
+		  finalSetAttrs[repeatingString + 'attack_ability'] = v.default_ability;
+	  }
+
+	  if (options.addCastingModifier) {
+		  if (exists(v[repeatingString + 'damage']) && !exists(v[repeatingString + 'damage_ability']) && v[repeatingString + 'damage_ability'] !== '0') {
+			  finalSetAttrs[repeatingString + 'damage_ability'] = v.default_ability;
+		  }
+		  if (exists(v[repeatingString + 'heal']) && !exists(v[repeatingString + 'heal_ability']) && v[repeatingString + 'heal_ability'] !== '0') {
+			  finalSetAttrs[repeatingString + 'heal_ability'] = v.default_ability;
+		  }
+	  }
+
     if (!exists(finalSetAttrs[repeatingString + 'parsed'])) {
       finalSetAttrs[repeatingString + 'parsed'] = '';
     }
@@ -573,6 +586,7 @@ on('change:global_attack_bonus change:global_melee_attack_bonus change:global_ra
 
 var updateAttackToggle = function (v, finalSetAttrs, repeatingString, options) {
   var attackParse = {
+	  attackAbility: options.attackAbility,
     parseName: 'attack',
     toggleField: 'roll_toggle',
     toggleFieldSetTo: '@{roll_toggle_var}',
@@ -647,10 +661,9 @@ var updateSavingThrowToggle = function (v, finalSetAttrs, repeatingString, optio
 	if (savingThrowToggle === '@{saving_throw_toggle_var}') {
 		var savingThrowDC = 8 + getIntValue(v.pb);
 		var savingThrowAbility = v[repeatingString + 'saving_throw_ability'];
-    if (!finalSetAttrs[repeatingString + 'saving_throw_ability']) {
+    if (!savingThrowAbility && savingThrowAbility !== '0') {
       finalSetAttrs[repeatingString + 'saving_throw_ability'] = v.default_ability;
     }
-    savingThrowAbility = finalSetAttrs[repeatingString + 'saving_throw_ability'];
 
 		savingThrowDC += getAbilityValue(v, savingThrowAbility, 'strength_mod');
 		if (options && options.bonusDC) {
@@ -663,6 +676,7 @@ var updateSavingThrowToggle = function (v, finalSetAttrs, repeatingString, optio
 
 var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
   var damageParse = {
+	  addCastingModifier: exists(v[repeatingString + 'add_casting_modifier']),
     parseName: 'damage',
     toggleField: 'damage_toggle',
     toggleFieldSetTo: '@{damage_toggle_var}',
@@ -795,6 +809,7 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 
 updateHealToggle = function (v, finalSetAttrs, repeatingString) {
   var healParse = {
+	  addCastingModifier: exists(v[repeatingString + 'add_casting_modifier']),
     parseName: 'heal',
     toggleField: 'heal_toggle',
     toggleFieldSetTo: '@{heal_var}',
@@ -920,17 +935,9 @@ var updateSpell = function (rowId) {
             finalSetAttrs[repeatingString + 'components_material'] = 1;
           }
         }
-				var addCastingModifier = v[repeatingString + 'add_casting_modifier'];
-				if (exists(addCastingModifier)) {
-					if (exists(v[repeatingString + 'damage'])) {
-						finalSetAttrs[repeatingString + 'damage_ability'] = v.default_ability;
-					}
-					if (exists(v[repeatingString + 'heal'])) {
-						finalSetAttrs[repeatingString + 'heal_ability'] = v.default_ability;
-					}
-				}
 
 				var attackOptions = {
+					attackAbility: true,
 					globalAttackBonus: getIntValue(v.global_spell_attack_bonus)
 				};
 				updateAttackToggle(v, finalSetAttrs, repeatingString, attackOptions);
