@@ -49,10 +49,8 @@ var exists = function (value) {
 	return true;
 };
 
-
 var ADD = ' + ';
 var SPACE = ' ';
-
 
 on('change:cp change:sp change:ep change:gp change:pp', function () {
 	getAttrs(['cp', 'copper_per_gold', 'sp', 'silver_per_gold', 'ep', 'electrum_per_gold', 'gp', 'pp', 'platinum_per_gold'], function (v) {
@@ -1097,7 +1095,9 @@ var sheetOpened = function () {
 				finalSetAttrs[repeatingString + 'name'] = skills[i].name;
 				finalSetAttrs[repeatingString + 'ability'] = '@{' + skills[i].ability + '_mod}';
 			}
+		}
 
+		if (!version || version !== currentVersion) {
 			finalSetAttrs.version = currentVersion;
 		}
 
