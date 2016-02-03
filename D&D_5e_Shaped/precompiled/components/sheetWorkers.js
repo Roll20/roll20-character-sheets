@@ -71,7 +71,11 @@ var setFinalAttrs = function (finalSetAttrs) {
   }
 };
 var parseAttackComponents = function (v, repeatingString, finalSetAttrs, options) {
-  var parsed = finalSetAttrs[repeatingString + 'parsed'];
+  var parsed = v[repeatingString + 'parsed'];
+
+	if (!exists(parsed)) {
+		parsed = finalSetAttrs[repeatingString + 'parsed'];
+	}
 
   if (!exists(parsed) || parsed.indexOf(options.parseName) === -1) {
     if (exists(v[repeatingString + options.triggerField])) {
