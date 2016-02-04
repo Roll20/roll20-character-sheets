@@ -113,6 +113,13 @@ var parseAttackComponents = function (v, repeatingString, finalSetAttrs, options
 function hasUpperCase(string) {
 	return (/[A-Z]/.test(string));
 }
+function emptyIfUndefined(value) {
+	if (!value) {
+		return '';
+	}
+	return value;
+}
+
 
 var ADD = ' + ';
 var SPACE = ' ';
@@ -681,6 +688,7 @@ on('change:repeating_attack', function (eventInfo) {
 	if (changedField !== 'toggle_details' && changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed') {
 		updateAttack(rowId);
 	}
+	updateAttackQuery();
 });
 on('change:repeating_attack remove:repeating_attack', function () {
   var options = {
@@ -1002,6 +1010,51 @@ updateHigherLevelToggle = function (v, finalSetAttrs, repeatingString) {
 		}
 	}
 	console.log('updateHigherLevelToggle', finalSetAttrs);
+};
+
+var updateAttackQuery = function () {
+	var repeatingItem = 'repeating_attack';
+	var collectionArray = ['character_name'];
+	var finalSetAttrs = {};
+
+	finalSetAttrs.attack_query_var = '?{Attack';
+
+	getSectionIDs(repeatingItem, function (ids) {
+		for (var i = 0; i < ids.length; i++) {
+			var repeatingString = repeatingItem + '_' + ids[i] + '_';
+			collectionArray.push(repeatingString + 'name');
+			collectionArray.push(repeatingString + 'reach');
+			collectionArray.push(repeatingString + 'range');
+			collectionArray.push(repeatingString + 'ammo');
+			collectionArray.push(repeatingString + 'roll_toggle');
+			collectionArray.push(repeatingString + 'saving_throw_toggle');
+			collectionArray.push(repeatingString + 'damage_toggle');
+			collectionArray.push(repeatingString + 'reach');
+			collectionArray.push(repeatingString + 'second_damage_toggle');
+			collectionArray.push(repeatingString + 'extras_toggle');
+		}
+
+		getAttrs(collectionArray, function (v) {
+			for (var j = 0; j < ids.length; j++) {
+				var repeatingString = repeatingItem + '_' + ids[j] + '_';
+
+				finalSetAttrs.attack_query_var += '|' + v[repeatingString + 'name'] + ',';
+				finalSetAttrs.attack_query_var += ' {{title=' + v[repeatingString + 'name'] + '&#125;&#125;';
+				finalSetAttrs.attack_query_var += '{{reach=' + emptyIfUndefined(v[repeatingString + 'reach']) + '&#125;&#125;';
+				finalSetAttrs.attack_query_var += '{{range=' + emptyIfUndefined(v[repeatingString + 'range']) + '&#125;&#125;';
+				finalSetAttrs.attack_query_var += '{{ammo=' + emptyIfUndefined(v[repeatingString + 'ammo']) + '&#125;&#125;';
+				finalSetAttrs.attack_query_var += '' + emptyIfUndefined(v[repeatingString + 'roll_toggle']);
+				finalSetAttrs.attack_query_var += '' + emptyIfUndefined(v[repeatingString + 'saving_throw_toggle']);
+				finalSetAttrs.attack_query_var += '' + emptyIfUndefined(v[repeatingString + 'damage_toggle']);
+				finalSetAttrs.attack_query_var += '' + emptyIfUndefined(v[repeatingString + 'second_damage_toggle']);
+				finalSetAttrs.attack_query_var += '' + emptyIfUndefined(v[repeatingString + 'extras_toggle']);
+			}
+			finalSetAttrs.attack_query_var += '}';
+
+			console.log('updateAttackQuery', finalSetAttrs);
+			setFinalAttrs(finalSetAttrs)
+		});
+	});
 };
 
 var updateAttack = function (rowId) {

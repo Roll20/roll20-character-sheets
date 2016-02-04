@@ -107,7 +107,7 @@ function duplicate(file, limit, start) {
 
 function saveQuery(file) {
 	var template = file.contents.toString('utf8');
-	var query = '';
+	var query = '?{Saving Throw';
 
 	for (var i = 0; i < abilitiesName.length; ++i) {
 		var ability = abilitiesName[i];
@@ -123,7 +123,7 @@ function saveQuery(file) {
 function checkQuery(file) {
 	var template = file.contents.toString('utf8');
 	var skillsJson = require('./components/skills/skills.json').skills;
-	var query = '';
+	var query = '?{Ability Check';
 
 	skillsJson.forEach(function (skill) {
 		var skillName = skill.name.lowercase().replace(/ +/g, '');
