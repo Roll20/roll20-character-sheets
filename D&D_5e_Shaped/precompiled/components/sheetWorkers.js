@@ -478,14 +478,17 @@ var updateArmor = function (rowId) {
 			for (var j = 0; j < ids.length; j++) {
 				var repeatingString = repeatingItem+'_' + ids[j] + '_';
 
-				if (!exists(finalSetAttrs[repeatingString + 'parsed'])) {
+				if (!exists(v[repeatingString + 'parsed']) || v[repeatingString + 'parsed'].indexOf('acBonus') === -1) {
 					var armorModifiers = v[repeatingString + 'modifiers'];
 					if (exists(armorModifiers)) {
 						var acBonus = armorModifiers.replace(/^\D+/g, '');
 
 						finalSetAttrs[repeatingString + 'ac_bonus'] = acBonus;
 					}
-					finalSetAttrs[repeatingString + 'parsed'] = true;
+					if (!exists(finalSetAttrs[repeatingString + 'parsed'])) {
+						finalSetAttrs[repeatingString + 'parsed'] = '';
+					}
+					finalSetAttrs[repeatingString + 'parsed'] += ' acBonus';
 				}
 			}
 
@@ -526,6 +529,51 @@ on('change:medium_armor_max_dex change:ac_unarmored_ability remove:repeating_arm
 	updateArmor();
 });
 
+var updateEquipment = function (rowId) {
+	var repeatingItem = 'repeating_equipment';
+	var collectionArray = [];
+	var finalSetAttrs = {};
+
+	getSectionIDs(repeatingItem, function (ids) {
+		if (rowId) {
+			ids = [];
+			ids.push(rowId);
+		}
+		for (var i = 0; i < ids.length; i++) {
+			var repeatingString = repeatingItem + '_' + ids[i] + '_';
+			collectionArray.push(repeatingString + 'content');
+		}
+
+		getAttrs(collectionArray, function (v) {
+			for (var j = 0; j < ids.length; j++) {
+				var repeatingString = repeatingItem+'_' + ids[j] + '_';
+
+				if (!exists(v[repeatingString + 'parsed']) || v[repeatingString + 'parsed'].indexOf('content') === -1) {
+					var content = v[repeatingString + 'content'];
+					if (exists(content)) {
+						content = content.replace(/\s(\d+d\d+\s(?:\+|\-)\s\d+)\s/g, ' [[$1]] ')
+														.replace(/\s(\d+d\d+)\s/g, ' [[$1]] ')
+														.replace(/\s(\d+)\s/g, ' [[$1]] ');
+
+						finalSetAttrs[repeatingString + 'content'] = content;
+					}
+					if (!exists(finalSetAttrs[repeatingString + 'parsed'])) {
+						finalSetAttrs[repeatingString + 'parsed'] = '';
+					}
+					finalSetAttrs[repeatingString + 'parsed'] += ' content';
+				}
+			}
+
+			console.log('updateEquipment', finalSetAttrs);
+			setFinalAttrs(finalSetAttrs)
+		});
+	});
+};
+
+on('change:repeating_equipment', function (eventInfo) {
+	var rowId = getRowId('repeating_equipment', eventInfo);
+	updateEquipment(rowId);
+});
 on('change:repeating_equipment remove:repeating_equipment', function () {
 	var options = {
 		collection: 'equipment',
