@@ -654,7 +654,7 @@ on('change:global_attack_bonus change:global_melee_attack_bonus change:global_ra
 var updateAttackToggle = function (v, finalSetAttrs, repeatingString, options) {
   var attackParse = {
 	  attackAbility: options.attackAbility,
-    parseName: 'higherLevel',
+    parseName: 'attack',
     toggleField: 'roll_toggle',
     toggleFieldSetTo: '@{roll_toggle_var}',
     triggerFields: ['type']
@@ -918,13 +918,12 @@ updateHealToggle = function (v, finalSetAttrs, repeatingString) {
 };
 
 updateHigherLevelToggle = function (v, finalSetAttrs, repeatingString) {
-  console.log('updateHigherLevelToggle');
 	var higherLevelParse = {
 		addCastingModifier: exists(v[repeatingString + 'add_casting_modifier']),
-		parseName: 'heal',
+		parseName: 'higherLevel',
 		toggleField: 'higher_level_toggle',
 		toggleFieldSetTo: '@{higher_level_toggle_var}',
-    triggerFields: ['higher_level_die', 'higher_level_dice', 'second_higher_level_die', 'second_higher_level_dice', 'higher_level_dice']
+    triggerFields: ['higher_level_dice', 'higher_level_die', 'second_higher_level_dice', 'second_higher_level_die', 'higher_level_heal']
 	};
 	parseAttackComponents(v, repeatingString, finalSetAttrs, higherLevelParse);
 
@@ -1141,7 +1140,7 @@ on('change:repeating_spell', function (eventInfo) {
   var rowId = getRowId('repeating_spell', eventInfo);
 	var changedField = getRepeatingField('repeating_spell', eventInfo);
 
-	if (changedField !== 'toggle_details' && changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed') {
+	if (changedField !== 'toggle_details' && changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'heal_formula' && changedField !== 'higher_level_query' && changedField !== 'parsed') {
 		console.log('changedField', changedField);
 		updateSpell(rowId);
 	}
