@@ -113,7 +113,7 @@ function saveQuery(file) {
 		var ability = abilitiesName[i];
 		query += '|' + ability + ', {{title=' + ability + '&amp;#125;&amp;#125; {{roll_toggle=1&amp;#125;&amp;#125; {{roll1=[[d20@{d20_mod} + @{' + ability.toLowerCase() + '_save_mod}]]&amp;#125;&amp;#125; {{roll2=[[d20@{d20_mod} + @{' + ability.toLowerCase() + '_save_mod}]]&amp;#125;&amp;#125;';
 	}
-	query += '|Death, {{death_save=1&amp;#125;&amp;#125; {{emote=dices with death!&amp;#125;&amp;#125; {{title=Death Save&amp;#125;&amp;#125; {{roll_toggle=1&amp;#125;&amp;#125; {{roll1=[[d20@{d20_mod} + (@{global_saving_bonus})]]&amp;#125;&amp;#125; {{roll2=[[d20@{d20_mod} + (@{global_saving_bonus})]]&amp;#125;&amp;#125;';
+	query += '|Death, {{death_save=1&amp;#125;&amp;#125; {{title=Death Save&amp;#125;&amp;#125; {{roll_toggle=1&amp;#125;&amp;#125; {{roll1=[[d20@{d20_mod} + (@{global_saving_bonus})]]&amp;#125;&amp;#125; {{roll2=[[d20@{d20_mod} + (@{global_saving_bonus})]]&amp;#125;&amp;#125;';
 	query += '|Other, {{title=?{Other&amp;#124;Unspecified&amp;#125;&amp;#125;&amp;#125; {{roll_toggle=1&amp;#125;&amp;#125; {{roll1=[[d20@{d20_mod} + (@{global_saving_bonus}) + ?{Modifiers&amp;#124;0&amp;#125;]]&amp;#125;&amp;#125; {{roll2=[[d20@{d20_mod} + (@{global_saving_bonus}) + ?{Modifiers&amp;#124;0&amp;#125;]]&amp;#125;&amp;#125;';
 
 	template = template.replace(/\x7B\x7BsaveQuery\x7D\x7D/g, query);
