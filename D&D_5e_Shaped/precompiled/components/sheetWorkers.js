@@ -210,153 +210,141 @@ on('change:charisma change:charisma_bonus', function () {
 });
 
 var updateLevels = function () {
-	var collectionArray = ['barbarian_level', 'bard_level', 'cleric_level', 'druid_level', 'fighter_level', 'monk_level', 'paladin_level', 'ranger_level', 'rogue_level', 'sorcerer_level', 'warlock_level', 'wizard_level', 'custom_class_level_0', 'custom_class_hd_0', 'custom_class_name_0', 'custom_class_level_1', 'custom_class_hd_1', 'custom_class_name_1', 'custom_class_level_2', 'custom_class_hd_2', 'custom_class_name_2', 'custom_class_level_3', 'custom_class_hd_3', 'custom_class_name_3', 'custom_class_level_4', 'custom_class_hd_4', 'custom_class_name_4', 'custom_class_level_5', 'custom_class_hd_5', 'custom_class_name_5'];
+	var repeatingItem = 'repeating_class';
+	var collectionArray = [];
+	var finalSetAttrs = {};
+
+	var hd = {
+		d20: 0,
+		d12: 0,
+		d10: 0,
+		d8: 0,
+		d6: 0,
+		d4: 0,
+		d2: 0,
+		d0: 0
+	};
+	var totalLevel = 0;
+	var levelArray = [];
+	var sorcererLevels = 0;
+	var warlockLevels = 0;
+
+	getSectionIDs(repeatingItem, function (ids) {
+		for (var i = 0; i < ids.length; i++) {
+			var repeatingString = repeatingItem + '_' + ids[i] + '_';
+			collectionArray.push(repeatingString + 'level');
+			collectionArray.push(repeatingString + 'name');
+			collectionArray.push(repeatingString + 'custom_name');
+			collectionArray.push(repeatingString + 'hd');
+			collectionArray.push(repeatingString + 'spellcasting');
+		}
+
+		getAttrs(collectionArray, function (v) {
+			for (var j = 0; j < ids.length; j++) {
+				var repeatingString = repeatingItem + '_' + ids[j] + '_';
+
+				var className = v[repeatingString + 'name'];
+				if (!exists(className) || className === 'custom') {
+					finalSetAttrs.custom_class_toggle = 'on';
+					var customName = v[repeatingString + 'custom_name'];
+					if (exists(customName)) {
+						className = customName;
+					} else {
+						className = 'Custom';
+					}
+				}
+				var classLevel = getIntValue(v[repeatingString + 'level']);
+				console.log('classLevel', classLevel);
+				totalLevel += classLevel;
+				levelArray.push(capitalizeFirstLetter(className) + ' ' + classLevel);
+
+				var classHd = v[repeatingString + 'hd'];
+				console.log('classHd', classHd);
+				if (!exists(classHd)) {
+					classHd = 'd0';
+				}
+				hd[classHd] += classLevel;
+
+				if (className === 'sorcerer' || className === 'sorcerer') {
+					sorcererLevels += classLevel;
+				}
+				if (className === 'warlock' || className === 'Warlock') {
+					warlockLevels += classLevel;
+				}
+			}
+
+			for (var key in hd) {
+				if (hd.hasOwnProperty(key)) {
+					if (hd[key] !== 0) {
+						finalSetAttrs['hd_' + key + '_max'] = hd[key];
+						finalSetAttrs['hd_' + key + '_toggle'] = 1;
+					} else {
+						finalSetAttrs['hd_' + key + '_max'] = 0;
+						finalSetAttrs['hd_' + key + '_toggle'] = 0;
+					}
+				}
+			}
+
+			console.log('totalLevel', totalLevel);
+			finalSetAttrs.level = totalLevel;
+			console.log('levelArray', levelArray);
+			finalSetAttrs.class_and_level = levelArray.join(' ');
+
+			if(sorcererLevels > 0) {
+				finalSetAttrs.has_sorcerer_levels = 'on';
+				if (sorcererLevels === 1) {
+					finalSetAttrs.sorcery_points_max = 0;
+				} else {
+					finalSetAttrs.sorcery_points_max = sorcererLevels;
+				}
+			} else {
+				finalSetAttrs.has_sorcerer_levels = 0;
+			}
+			if(warlockLevels > 0) {
+				finalSetAttrs.has_warlock_levels = 'on';
+
+				if (warlockLevels === 1) {
+					finalSetAttrs.warlock_spell_slots_max = 1;
+				} else if (warlockLevels >= 2 && warlockLevels < 11) {
+					finalSetAttrs.warlock_spell_slots_max = 2;
+				} else if (warlockLevels >= 11 && warlockLevels < 17) {
+					finalSetAttrs.warlock_spell_slots_max = 3;
+				} else {
+					finalSetAttrs.warlock_spell_slots_max = 4;
+				}
+			} else {
+				finalSetAttrs.has_warlock_levels = 0;
+			}
+
+			console.log('updateLevels', finalSetAttrs);
+			setFinalAttrs(finalSetAttrs)
+		});
+	});
+};
+
+
+on('change:repeating_class remove:repeating_class', function (eventInfo) {
+	updateLevels();
+});
+
+var updatePb = function () {
+	var collectionArray = ['level'];
 	var finalSetAttrs = {};
 
 	getAttrs(collectionArray, function (v) {
-		var levels = {
-			barbarian: getIntValue(v.barbarian_level),
-			bard: getIntValue(v.bard_level),
-			cleric: getIntValue(v.cleric_level),
-			druid: getIntValue(v.druid_level),
-			fighter: getIntValue(v.fighter_level),
-			monk: getIntValue(v.monk_level),
-			paladin: getIntValue(v.paladin_level),
-			ranger: getIntValue(v.ranger_level),
-			rogue: getIntValue(v.rogue_level),
-			sorcerer: getIntValue(v.sorcerer_level),
-			warlock: getIntValue(v.warlock_level),
-			wizard: getIntValue(v.wizard_level)
-		};
-
-		var hd = {
-			'd20': 0,
-			'd12': levels.barbarian,
-			'd10': levels.fighter + levels.paladin + levels.ranger,
-			'd8': levels.bard + levels.cleric + levels.druid + levels.monk + levels.rogue + levels.warlock,
-			'd6': levels.sorcerer + levels.wizard,
-			'd4': 0
-		};
-		var totalLevel = 0;
-		var levelString = '';
-
-		for (var key in levels) {
-			if (levels.hasOwnProperty(key)) {
-				if (levels[key]) {
-					totalLevel += levels[key];
-					if (levelString !== '') {
-						levelString += SPACE;
-					}
-					levelString += capitalizeFirstLetter(key) + SPACE + levels[key];
-				}
-			}
-		}
-
-		for(var i = 0; i < 6; i++) {
-			var customClass = {
-				hd: getIntValue(v['custom_class_hd_'+i], 8),
-				level: getIntValue(v['custom_class_level_'+i]),
-				name: v['custom_class_name_'+i]
-			};
-
-			if (customClass.level) {
-				totalLevel += customClass.level;
-				hd['d'+customClass.hd] += customClass.level;
-				if (levelString !== '') {
-					levelString += SPACE;
-				}
-				if (!customClass.name || customClass.name === '') {
-					customClass.name = 'Custom ' + i;
-				}
-				levelString += customClass.name + SPACE + customClass.level;
-			}
-		}
-
-		if (hd.d20) {
-			finalSetAttrs.hd_d20_max = hd.d20;
-			finalSetAttrs.hd_d20_toggle = 1;
-		} else {
-			finalSetAttrs.hd_d20_max = 0;
-			finalSetAttrs.hd_d20_toggle = 0;
-		}
-		if (hd.d12) {
-			finalSetAttrs.hd_d12_max = hd.d12;
-			finalSetAttrs.hd_d12_toggle = 1;
-		} else {
-			finalSetAttrs.hd_d12_max = 0;
-			finalSetAttrs.hd_d12_toggle = 0;
-		}
-		if (hd.d10) {
-			finalSetAttrs.hd_d10_max = hd.d10;
-			finalSetAttrs.hd_d10_toggle = 1;
-		} else {
-			finalSetAttrs.hd_d10_max = 0;
-			finalSetAttrs.hd_d10_toggle = 0;
-		}
-		if (hd.d8) {
-			finalSetAttrs.hd_d8_max = hd.d8;
-			finalSetAttrs.hd_d8_toggle = 1;
-		} else {
-			finalSetAttrs.hd_d8_max = 0;
-			finalSetAttrs.hd_d8_toggle = 0;
-		}
-		if (hd.d6) {
-			finalSetAttrs.hd_d6_max = hd.d6;
-			finalSetAttrs.hd_d6_toggle = 1;
-		} else {
-			finalSetAttrs.hd_d6_max = 0;
-			finalSetAttrs.hd_d6_toggle = 0;
-		}
-		if (hd.d4) {
-			finalSetAttrs.hd_d4_max = hd.d4;
-			finalSetAttrs.hd_d4_toggle = 1;
-		} else {
-			finalSetAttrs.hd_d4_max = 0;
-			finalSetAttrs.hd_d4_toggle = 0;
-		}
-
-		var pb = 2 + Math.floor(Math.abs((totalLevel - 1)/4));
-
-		finalSetAttrs.level = totalLevel;
-		finalSetAttrs.class_and_level = levelString;
+		var level = getIntValue(v.level);
+		var pb = 2 + Math.floor(Math.abs((level- 1)/4));
 		finalSetAttrs.pb = pb;
 		finalSetAttrs.exp = pb * 2;
 		finalSetAttrs.h_PB = pb / 2;
 
-		if(levels.sorcerer > 0) {
-			finalSetAttrs.has_sorcerer_levels = 'on';
-			if (levels.sorcerer === 1) {
-				finalSetAttrs.sorcery_points_max = 0;
-			} else {
-				finalSetAttrs.sorcery_points_max = levels.sorcerer;
-			}
-		} else {
-			finalSetAttrs.has_sorcerer_levels = 0;
-		}
-		if(levels.warlock > 0) {
-			finalSetAttrs.has_warlock_levels = 'on';
-
-			if (levels.warlock === 1) {
-				finalSetAttrs.warlock_spell_slots_max = 1;
-			} else if (levels.warlock >= 2 && levels.warlock < 11) {
-				finalSetAttrs.warlock_spell_slots_max = 2;
-			} else if (levels.warlock >= 11 && levels.warlock < 17) {
-				finalSetAttrs.warlock_spell_slots_max = 3;
-			} else {
-				finalSetAttrs.warlock_spell_slots_max = 4;
-			}
-
-		} else {
-			finalSetAttrs.has_warlock_levels = 0;
-		}
-
-		console.log('updateLevels', finalSetAttrs);
-    setFinalAttrs(finalSetAttrs)
+		console.log('updatePb', finalSetAttrs);
+		setFinalAttrs(finalSetAttrs)
 	});
 };
 
-on('change:barbarian_level change:bard_level change:cleric_level change:druid_level change:fighter_level change:monk_level change:paladin_level change:ranger_level change:rogue_level change:sorcerer_level change:warlock_level change:wizard_level change:custom_class_level_0 change:custom_class_hd_0 change:custom_class_name_0 change:custom_class_level_1 change:custom_class_hd_1 change:custom_class_name_1 change:custom_class_level_2 change:custom_class_hd_2 change:custom_class_name_2 change:custom_class_level_3 change:custom_class_hd_3 change:custom_class_name_3 change:custom_class_level_4 change:custom_class_hd_4 change:custom_class_name_4 change:custom_class_level_5 change:custom_class_hd_5 change:custom_class_name_5', function () {
-	updateLevels();
+on('change:level', function () {
+	updatePb();
 });
 
 var sumRepeating = function (options, sumItems) {
@@ -1014,7 +1002,7 @@ updateHigherLevelToggle = function (v, finalSetAttrs, repeatingString) {
 
 var updateAttackQuery = function () {
 	var repeatingItem = 'repeating_attack';
-	var collectionArray = ['character_name'];
+	var collectionArray = [];
 	var finalSetAttrs = {};
 
 	finalSetAttrs.attack_query_var = '?{Attack';
