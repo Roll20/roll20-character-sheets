@@ -999,6 +999,7 @@ var updateSpell = function (rowId) {
 			collectionArray.push(repeatingString + 'second_damage_bonus');
 			collectionArray.push(repeatingString + 'second_damage_type');
 			collectionArray.push(repeatingString + 'parsed');
+			collectionArray.push(repeatingString + 'spell_level');
       collectionArray.push(repeatingString + 'casting_time');
       collectionArray.push(repeatingString + 'components');
 			collectionArray.push(repeatingString + 'heal');
@@ -1008,6 +1009,11 @@ var updateSpell = function (rowId) {
 		getAttrs(collectionArray, function (v) {
 			for (var j = 0; j < ids.length; j++) {
 				var repeatingString = repeatingItem+'_' + ids[j] + '_';
+
+				var spellLevel = v[repeatingString + 'spell_level'];
+				if (!exists(spellLevel)) {
+					finalSetAttrs[repeatingString + 'spell_level'] = 0;
+				}
 
         var spellComponents = v[repeatingString + 'components'];
         if (exists(spellComponents)) {
