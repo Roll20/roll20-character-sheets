@@ -78,7 +78,16 @@ var parseAttackComponents = function (v, repeatingString, finalSetAttrs, options
 	}
 
   if (!exists(parsed) || parsed.indexOf(options.parseName) === -1) {
-    if (exists(v[repeatingString + options.triggerField])) {
+		var aTriggerFieldExists = false;
+
+		for (var i = 0; i < options.triggerFields.length; i++) {
+			if (exists(v[repeatingString + options.triggerFields[i]])) {
+				aTriggerFieldExists = true;
+			}
+		}
+    console.log('aTriggerFieldExists', aTriggerFieldExists, options);
+
+    if (aTriggerFieldExists) {
       finalSetAttrs[repeatingString + options.toggleField] = options.toggleFieldSetTo;
     }
 	  if (options.attackAbility && !exists(v[repeatingString + 'attack_ability']) && v[repeatingString + 'attack_ability'] !== '0') {
@@ -645,10 +654,10 @@ on('change:global_attack_bonus change:global_melee_attack_bonus change:global_ra
 var updateAttackToggle = function (v, finalSetAttrs, repeatingString, options) {
   var attackParse = {
 	  attackAbility: options.attackAbility,
-    parseName: 'attack',
+    parseName: 'higherLevel',
     toggleField: 'roll_toggle',
     toggleFieldSetTo: '@{roll_toggle_var}',
-    triggerField: 'type'
+    triggerFields: ['type']
   };
   parseAttackComponents(v, repeatingString, finalSetAttrs, attackParse);
 
@@ -713,7 +722,7 @@ var updateSavingThrowToggle = function (v, finalSetAttrs, repeatingString, optio
     parseName: 'savingThrow',
     toggleField: 'saving_throw_toggle',
     toggleFieldSetTo: '@{saving_throw_toggle_var}',
-    triggerField: 'saving_throw_vs_ability'
+    triggerFields: ['saving_throw_vs_ability']
   };
   parseAttackComponents(v, repeatingString, finalSetAttrs, savingThrowParse);
 
@@ -740,7 +749,7 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
     parseName: 'damage',
     toggleField: 'damage_toggle',
     toggleFieldSetTo: '@{damage_toggle_var}',
-    triggerField: 'damage'
+    triggerFields: ['damage']
   };
   parseAttackComponents(v, repeatingString, finalSetAttrs, damageParse);
 
@@ -817,7 +826,7 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
     parseName: 'secondDamage',
     toggleField: 'second_damage_toggle',
     toggleFieldSetTo: '@{second_damage_toggle_var}',
-    triggerField: 'second_damage'
+    triggerFields: ['second_damage']
   };
   parseAttackComponents(v, repeatingString, finalSetAttrs, secondDamageParse);
 
@@ -880,10 +889,72 @@ updateHealToggle = function (v, finalSetAttrs, repeatingString) {
 	  addCastingModifier: exists(v[repeatingString + 'add_casting_modifier']),
     parseName: 'heal',
     toggleField: 'heal_toggle',
-    toggleFieldSetTo: '@{heal_var}',
-    triggerField: 'heal'
+    toggleFieldSetTo: '@{heal_toggle_var}',
+    triggerFields: ['heal']
   };
   parseAttackComponents(v, repeatingString, finalSetAttrs, healParse);
+
+	var healFormula = '@{heal}[heal]';
+	var healToggle = v[repeatingString + 'heal_toggle'];
+	if (healToggle === '@{heal_toggle_var}') {
+		var healAbility = v[repeatingString + 'heal_ability'];
+		healAbility = getAbilityValue(v, healAbility);
+		if (exists(healAbility)) {
+			healFormula += ADD + healAbility + '[' + getAbilityShortName(v[repeatingString + 'heal_ability']) + ']';
+		}
+
+		var healBonus = getIntValue(v[repeatingString + 'heal_bonus']);
+		if (exists(healBonus)) {
+			healFormula += ADD + healBonus + '[bonus]';
+		}
+
+		if (exists(v.global_spell_heal_bonus)) {
+			healFormula += ADD + '@{global_spell_heal_bonus}[global spell heal bonus]';
+		}
+	}
+
+	finalSetAttrs[repeatingString + 'heal_formula'] = healFormula;
+	console.log('updateHealToggle', finalSetAttrs);
+};
+
+updateHigherLevelToggle = function (v, finalSetAttrs, repeatingString) {
+  console.log('updateHigherLevelToggle');
+	var higherLevelParse = {
+		addCastingModifier: exists(v[repeatingString + 'add_casting_modifier']),
+		parseName: 'heal',
+		toggleField: 'higher_level_toggle',
+		toggleFieldSetTo: '@{higher_level_toggle_var}',
+    triggerFields: ['higher_level_die', 'higher_level_dice', 'second_higher_level_die', 'second_higher_level_dice', 'higher_level_dice']
+	};
+	parseAttackComponents(v, repeatingString, finalSetAttrs, higherLevelParse);
+
+	var higherLevelToggle = v[repeatingString + 'higher_level_toggle'];
+	if (exists(higherLevelToggle) && higherLevelToggle === '@{higher_level_toggle_var}') {
+    var spellLevelQuery = '?{Spell Level';
+
+    var spellLevel = getIntValue(v[repeatingString + 'spell_level']);
+    for (var i = spellLevel; i <= 9; i++) {
+      spellLevelQuery += '|' + i;
+    }
+    spellLevelQuery += '}';
+    finalSetAttrs[repeatingString + 'higher_level_query'] = spellLevelQuery;
+
+		var damageToggle = v[repeatingString + 'damage_toggle'];
+		if (damageToggle && damageToggle === '@{damage_toggle_var}') {
+			finalSetAttrs[repeatingString + 'damage_formula'] += ADD + '((@{higher_level_query} - @{spell_level}) * @{higher_level_dice})@{higher_level_die}[higher lvl]';
+		}
+
+		var secondDamageToggle = v[repeatingString + 'second_damage_toggle'];
+		if (secondDamageToggle && secondDamageToggle === '@{second_damage_toggle_var}') {
+			finalSetAttrs[repeatingString + 'second_damage_formula'] += ADD + '((@{higher_level_query} - @{spell_level}) * @{second_higher_level_dice})@{second_higher_level_die}[higher lvl]';
+		}
+
+		var healToggle = v[repeatingString + 'heal_toggle'];
+		if (healToggle && healToggle === '@{heal_toggle_var}') {
+			finalSetAttrs[repeatingString + 'heal_formula'] += ADD + '((@{higher_level_query} - @{spell_level}) * @{higher_level_dice})@{higher_level_die}[higher lvl] + (@{higher_level_heal} * (@{higher_level_query} - @{spell_level}))[higher lvl flat amount]';
+		}
+	}
+	console.log('updateHigherLevelToggle', finalSetAttrs);
 };
 
 var updateAttack = function (rowId) {
@@ -1002,8 +1073,17 @@ var updateSpell = function (rowId) {
 			collectionArray.push(repeatingString + 'spell_level');
       collectionArray.push(repeatingString + 'casting_time');
       collectionArray.push(repeatingString + 'components');
+			collectionArray.push(repeatingString + 'heal_toggle');
 			collectionArray.push(repeatingString + 'heal');
+			collectionArray.push(repeatingString + 'heal_ability');
+			collectionArray.push(repeatingString + 'heal_bonus');
 			collectionArray.push(repeatingString + 'add_casting_modifier');
+			collectionArray.push(repeatingString + 'higher_level_toggle');
+			collectionArray.push(repeatingString + 'higher_level_dice');
+			collectionArray.push(repeatingString + 'higher_level_die');
+			collectionArray.push(repeatingString + 'second_higher_level_dice');
+			collectionArray.push(repeatingString + 'second_higher_level_die');
+			collectionArray.push(repeatingString + 'higher_level_heal');
 		}
 
 		getAttrs(collectionArray, function (v) {
@@ -1047,6 +1127,8 @@ var updateSpell = function (rowId) {
 				updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
 
 				updateHealToggle(v, finalSetAttrs, repeatingString);
+
+				updateHigherLevelToggle(v, finalSetAttrs, repeatingString);
 			}
 
 			console.log('updateSpell', finalSetAttrs);
