@@ -324,17 +324,17 @@ var updateLevels = function () {
 		finalSetAttrs.h_PB = pb / 2;
 
 		if(levels.sorcerer > 0) {
-			finalSetAttrs.spell_display_sorcery_points = 1;
+			finalSetAttrs.has_sorcerer_levels = 'on';
 			if (levels.sorcerer === 1) {
 				finalSetAttrs.sorcery_points_max = 0;
 			} else {
 				finalSetAttrs.sorcery_points_max = levels.sorcerer;
 			}
 		} else {
-			finalSetAttrs.spell_display_sorcery_points = 0;
+			finalSetAttrs.has_sorcerer_levels = 0;
 		}
 		if(levels.warlock > 0) {
-			finalSetAttrs.spell_display_warlock_slots = 1;
+			finalSetAttrs.has_warlock_levels = 'on';
 
 			if (levels.warlock === 1) {
 				finalSetAttrs.warlock_spell_slots_max = 1;
@@ -347,7 +347,7 @@ var updateLevels = function () {
 			}
 
 		} else {
-			finalSetAttrs.spell_display_warlock_slots = 0;
+			finalSetAttrs.has_warlock_levels = 0;
 		}
 
 		console.log('updateLevels', finalSetAttrs);
