@@ -621,7 +621,7 @@ on('change:weight_attacks change:weight_armor change:weight_equipment change:wei
 on('change:repeating_attack', function (eventInfo) {
   var rowId = getRowId('repeating_attack', eventInfo);
 	var changedField = getRepeatingField('repeating_attack', eventInfo);
-	if (changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed') {
+	if (changedField !== 'toggle_details' && changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed') {
 		updateAttack(rowId);
 	}
 });
@@ -1053,7 +1053,8 @@ on('change:repeating_spell', function (eventInfo) {
   var rowId = getRowId('repeating_spell', eventInfo);
 	var changedField = getRepeatingField('repeating_spell', eventInfo);
 
-	if (changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed') {
+	if (changedField !== 'toggle_details' && changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed') {
+		console.log('changedField', changedField);
 		updateSpell(rowId);
 	}
 });
