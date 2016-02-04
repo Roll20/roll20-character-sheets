@@ -85,7 +85,6 @@ var parseAttackComponents = function (v, repeatingString, finalSetAttrs, options
 				aTriggerFieldExists = true;
 			}
 		}
-    console.log('aTriggerFieldExists', aTriggerFieldExists, options);
 
     if (aTriggerFieldExists) {
       finalSetAttrs[repeatingString + options.toggleField] = options.toggleFieldSetTo;
@@ -787,6 +786,7 @@ var updateSavingThrowToggle = function (v, finalSetAttrs, repeatingString, optio
 		var savingThrowDC = 8 + getIntValue(v.pb);
 		var savingThrowAbility = v[repeatingString + 'saving_throw_ability'];
     if (!savingThrowAbility && savingThrowAbility !== '0') {
+	    savingThrowAbility = v.default_ability;
       finalSetAttrs[repeatingString + 'saving_throw_ability'] = v.default_ability;
     }
 
