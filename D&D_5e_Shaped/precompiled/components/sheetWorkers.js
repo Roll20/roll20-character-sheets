@@ -283,7 +283,7 @@ var updateLevels = function () {
   var spellcasting = {
     full: 0,
     half: 0,
-    quarter: 0,
+    third: 0,
     warlock: 0
   };
 	var totalLevel = 0;
@@ -346,9 +346,6 @@ var updateLevels = function () {
 				if (className === 'sorcerer' || className === 'sorcerer') {
 					sorcererLevels += classLevel;
 				}
-				if (className === 'warlock' || className === 'Warlock') {
-					warlockLevels += classLevel;
-				}
 			}
 
 			for (var key in hd) {
@@ -362,6 +359,14 @@ var updateLevels = function () {
 					}
 				}
 			}
+
+      var casterLevel = 0;
+      casterLevel += spellcasting.full;
+      casterLevel += Math.floor(spellcasting.half / 2);
+      casterLevel += Math.floor(spellcasting.third / 3);
+      finalSetAttrs.caster_level = casterLevel;
+
+      updateSpellSlots(v, finalSetAttrs, casterLevel);
 
 			console.log('totalLevel', totalLevel);
 			finalSetAttrs.level = totalLevel;
@@ -378,14 +383,14 @@ var updateLevels = function () {
 			} else {
 				finalSetAttrs.has_sorcerer_levels = 0;
 			}
-			if(warlockLevels > 0) {
+			if(spellcasting.warlock > 0) {
 				finalSetAttrs.has_warlock_levels = 'on';
 
-				if (warlockLevels === 1) {
+				if (spellcasting.warlock === 1) {
 					finalSetAttrs.warlock_spell_slots_max = 1;
-				} else if (warlockLevels >= 2 && warlockLevels < 11) {
+				} else if (spellcasting.warlock >= 2 && spellcasting.warlock < 11) {
 					finalSetAttrs.warlock_spell_slots_max = 2;
-				} else if (warlockLevels >= 11 && warlockLevels < 17) {
+				} else if (spellcasting.warlock >= 11 && spellcasting.warlock < 17) {
 					finalSetAttrs.warlock_spell_slots_max = 3;
 				} else {
 					finalSetAttrs.warlock_spell_slots_max = 4;
@@ -400,9 +405,193 @@ var updateLevels = function () {
 	});
 };
 
+on('change:repeating_class remove:repeating_class', function () {
+  updateLevels();
+});
 
-on('change:repeating_class remove:repeating_class', function (eventInfo) {
-	updateLevels();
+var updateSpellSlots = function () {
+  var collectionArray = ['caster_level'];
+  var finalSetAttrs = {};
+
+  var spellSlotTiers = {
+    1: {
+      1: 2
+    },
+    2: {
+      1: 3
+    },
+    3: {
+      1: 4,
+      2: 2
+    },
+    4: {
+      1: 4,
+      2: 3
+    },
+    5: {
+      1: 4,
+      2: 3,
+      3: 2
+    },
+    6: {
+      1: 4,
+      2: 3,
+      3: 3
+    },
+    7: {
+      1: 4,
+      2: 3,
+      3: 3,
+      4: 1
+    },
+    8: {
+      1: 4,
+      2: 3,
+      3: 3,
+      4: 2
+    },
+    9: {
+      1: 4,
+      2: 3,
+      3: 3,
+      4: 3,
+      5: 1
+    },
+    10: {
+      1: 4,
+      2: 3,
+      3: 3,
+      4: 3,
+      5: 2
+    },
+    11: {
+      1: 4,
+      2: 3,
+      3: 3,
+      4: 3,
+      5: 2,
+      6: 1
+    },
+    12: {
+      1: 4,
+      2: 3,
+      3: 3,
+      4: 3,
+      5: 2,
+      6: 1
+    },
+    13: {
+      1: 4,
+      2: 3,
+      3: 3,
+      4: 3,
+      5: 2,
+      6: 1,
+      7: 1
+    },
+    14: {
+      1: 4,
+      2: 3,
+      3: 3,
+      4: 3,
+      5: 2,
+      6: 1,
+      7: 1
+    },
+    15: {
+      1: 4,
+      2: 3,
+      3: 3,
+      4: 3,
+      5: 2,
+      6: 1,
+      7: 1,
+      8: 1
+    },
+    16: {
+      1: 4,
+      2: 3,
+      3: 3,
+      4: 3,
+      5: 2,
+      6: 1,
+      7: 1,
+      8: 1
+    },
+    17: {
+      1: 4,
+      2: 3,
+      3: 3,
+      4: 3,
+      5: 2,
+      6: 1,
+      7: 1,
+      8: 1,
+      9: 1
+    },
+    18: {
+      1: 4,
+      2: 3,
+      3: 3,
+      4: 3,
+      5: 3,
+      6: 1,
+      7: 1,
+      8: 1,
+      9: 1
+    },
+    19: {
+      1: 4,
+      2: 3,
+      3: 3,
+      4: 3,
+      5: 3,
+      6: 2,
+      7: 1,
+      8: 1,
+      9: 1
+    },
+    20: {
+      1: 4,
+      2: 3,
+      3: 3,
+      4: 3,
+      5: 3,
+      6: 2,
+      7: 2,
+      8: 1,
+      9: 1
+    }
+  };
+
+  for (var i = 1; i <= 9; i++) {
+    var repeatingString = 'spell_slots_l' + i + '_';
+    collectionArray.push(repeatingString + 'calc');
+    collectionArray.push(repeatingString + 'bonus');
+    collectionArray.push(repeatingString + 'max');
+  }
+  getAttrs(collectionArray, function (v) {
+    var casterLevel = getIntValue(v.caster_level);
+    console.log('casterLevel', casterLevel);
+
+    var spellSlots = spellSlotTiers[Math.min(casterLevel, 20)];
+    console.log('spellSlotTiers[casterLevel]', spellSlotTiers[casterLevel]);
+    console.log('spellSlots', spellSlots);
+
+    for (var i = 1; i <= 9; i++) {
+      var slotCalc = spellSlots[i] || 0;
+      finalSetAttrs['spell_slots_l' + i + '_calc'] = slotCalc;
+
+      var slotBonus = getIntValue(v['spell_slots_l' + i + '_bonus']);
+      finalSetAttrs['spell_slots_l' + i + '_max'] = slotCalc + slotBonus;
+    }
+
+    setFinalAttrs(v, finalSetAttrs);
+  });
+};
+
+on('change:caster_level change:spell_slots_l1_bonus change:spell_slots_l2_bonus change:spell_slots_l3_bonus change:spell_slots_l4_bonus change:spell_slots_l5_bonus change:spell_slots_l6_bonus change:spell_slots_l7_bonus change:spell_slots_l8_bonus change:spell_slots_l9_bonus', function () {
+  updateSpellSlots();
 });
 
 var updatePb = function () {
