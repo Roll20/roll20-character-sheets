@@ -69,7 +69,6 @@ var setFinalAttrs = function (v, finalSetAttrs) {
   if (!isEmpty(finalSetAttrs)) {
     for (var key in finalSetAttrs) {
       if (finalSetAttrs.hasOwnProperty(key)) {
-        console.log(key, v[key], finalSetAttrs[key]);
         if (v[key] === finalSetAttrs[key]) {
           delete finalSetAttrs[key];
         }
@@ -306,15 +305,17 @@ var updateLevels = function () {
 				var repeatingString = repeatingItem + '_' + ids[j] + '_';
 
 				var className = v[repeatingString + 'name'];
-				if (!exists(className) || className === 'custom') {
-					finalSetAttrs.custom_class_toggle = 'on';
+				if (className === 'custom') {
+					finalSetAttrs[repeatingString + 'custom_class_toggle'] = 'on';
 					var customName = v[repeatingString + 'custom_name'];
 					if (exists(customName)) {
 						className = customName;
 					} else {
-						className = 'Custom';
+						className = 'custom';
 					}
-				}
+				} else {
+          finalSetAttrs[repeatingString + 'custom_class_toggle'] = 0;
+        }
 
 				var classLevel = getIntValue(v[repeatingString + 'level']);
 				console.log('classLevel', classLevel);
@@ -583,7 +584,14 @@ var updateSpellSlots = function () {
       finalSetAttrs['spell_slots_l' + i + '_calc'] = slotCalc;
 
       var slotBonus = getIntValue(v['spell_slots_l' + i + '_bonus']);
-      finalSetAttrs['spell_slots_l' + i + '_max'] = slotCalc + slotBonus;
+      var spellSlotMax = slotCalc + slotBonus;
+      finalSetAttrs['spell_slots_l' + i + '_max'] = spellSlotMax;
+
+      if (spellSlotMax > 0) {
+        finalSetAttrs['spell_slots_l' + i + '_toggle'] = 'on';
+      } else {
+        finalSetAttrs['spell_slots_l' + i + '_toggle'] = 0;
+      }
     }
 
     setFinalAttrs(v, finalSetAttrs);
