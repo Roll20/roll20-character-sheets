@@ -27,9 +27,9 @@ var getAbilityValue = function (v, varName, defaultAbility) {
     }
   } else if (exists(varName)) {
     varName = varName.replace(/\W/g, '');
-    return getIntValue(v[varName]);
+    return getIntValue(v[varName], -5);
   }
-  return 0;
+  return -5;
 };
 var getAbilityShortName = function (varName, capital) {
 	if (!varName) {
@@ -213,9 +213,9 @@ on('change:dexterity_mod', function () {
 });
 
 on('change:strength_mod change:dexterity_mod change:constitution_mod change:intelligence_mod change:wisdom_mod change:charisma_mod', function () {
-  updateSkill();
-  updateAttack();
-  updateSpell();
+	updateSkill();
+	updateAttack();
+	updateSpell();
 });
 
 var updateLevels = function () {
@@ -1626,6 +1626,7 @@ on('change:repeating_skill', function (eventInfo) {
   var changedField = getRepeatingField('repeating_skill', eventInfo);
   if (changedField !== 'ability_short_name' && changedField !== 'total' && changedField !== 'formula') {
     var rowId = getRowId('repeating_skill', eventInfo);
+	  console.log('updateSkill(rowId)', rowId);
     updateSkill(rowId);
   }
 });
@@ -1721,8 +1722,8 @@ var sheetOpened = function () {
 				var repeatingString = 'repeating_skill_' + newRowId + '_';
 				finalSetAttrs[repeatingString + 'name'] = skills[i].name;
 				finalSetAttrs[repeatingString + 'ability'] = '@{' + skills[i].ability + '_mod}';
+				updateSkill(newRowId);
 			}
-      updateSkill();
 		}
 
 		if (!version || version !== currentVersion) {
