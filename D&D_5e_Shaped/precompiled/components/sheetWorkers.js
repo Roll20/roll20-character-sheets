@@ -49,7 +49,6 @@ var exists = function (value) {
 };
 var getRowId = function (leadingString, eventInfo) {
 	var re = new RegExp(leadingString + '_([a-zA-Z0-9\-]*)_.*');
-
 	return eventInfo.sourceAttribute.replace(re, '$1');
 };
 var getRepeatingField = function (leadingString, eventInfo) {
@@ -190,12 +189,6 @@ var updateAbilityModifier = function (ability) {
 		console.log('updateAbilityModifier', finalSetAttrs);
     setFinalAttrs(v, finalSetAttrs);
 	});
-	if(ability === 'dexterity') {
-		updateArmor();
-	}
-  updateSkill();
-	updateAttack();
-  updateSpell();
 };
 on('change:strength change:strength_bonus', function () {
 	updateAbilityModifier('strength');
@@ -215,6 +208,16 @@ on('change:wisdom change:wisdom_bonus', function () {
 on('change:charisma change:charisma_bonus', function () {
 	updateAbilityModifier('charisma');
 });
+on('change:dexterity_mod', function () {
+  updateArmor();
+});
+
+on('change:strength_mod change:dexterity_mod change:constitution_mod change:intelligence_mod change:wisdom_mod change:charisma_mod', function () {
+  updateSkill();
+  updateAttack();
+  updateSpell();
+});
+
 
 var updateLevels = function () {
 	var repeatingItem = 'repeating_class';
@@ -1616,9 +1619,9 @@ var updateSkill = function (rowId) {
 };
 
 on('change:repeating_skill', function (eventInfo) {
-	var rowId = getRowId('repeating_skill', eventInfo);
 	var changedField = getRepeatingField('repeating_skill', eventInfo);
-	if (changedField !== 'total') {
+	if (changedField !== 'ability_short_name' && changedField !== 'total' && changedField !== 'formula' ) {
+    var rowId = getRowId('repeating_skill', eventInfo);
 		updateSkill(rowId);
 	}
 });
@@ -1722,6 +1725,7 @@ var sheetOpened = function () {
 			finalSetAttrs.version = currentVersion;
 		}
 
+    console.log('sheetOpened', finalSetAttrs);
     setFinalAttrs(v, finalSetAttrs);
 	});
 };
