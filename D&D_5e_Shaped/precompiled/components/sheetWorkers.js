@@ -214,6 +214,53 @@ var updateLevels = function () {
 	var collectionArray = [];
 	var finalSetAttrs = {};
 
+  var defaultClassDetails = {
+    barbarian: {
+      hd: 'd12'
+    },
+    bard: {
+      hd: 'd8',
+      spellcasting: 'full'
+    },
+    cleric: {
+      hd: 'd8',
+      spellcasting: 'full'
+    },
+    druid: {
+      hd: 'd8',
+      spellcasting: 'full'
+    },
+    fighter: {
+      hd: 'd10'
+    },
+    monk: {
+      hd: 'd8'
+    },
+    paladin: {
+      hd: 'd10',
+      spellcasting: 'half'
+    },
+    ranger: {
+      hd: 'd10',
+      spellcasting: 'half'
+    },
+    rogue: {
+      hd: 'd8'
+    },
+    sorcerer: {
+      hd: 'd6',
+      spellcasting: 'full'
+    },
+    warlock: {
+      hd: 'd8',
+      spellcasting: 'warlock'
+    },
+    wizard: {
+      hd: 'd6',
+      spellcasting: 'full'
+    }
+  };
+
 	var hd = {
 		d20: 0,
 		d12: 0,
@@ -224,6 +271,13 @@ var updateLevels = function () {
 		d2: 0,
 		d0: 0
 	};
+
+  var spellcasting = {
+    full: 0,
+    half: 0,
+    quarter: 0,
+    warlock: 0
+  };
 	var totalLevel = 0;
 	var levelArray = [];
 	var sorcererLevels = 0;
@@ -253,6 +307,7 @@ var updateLevels = function () {
 						className = 'Custom';
 					}
 				}
+
 				var classLevel = getIntValue(v[repeatingString + 'level']);
 				console.log('classLevel', classLevel);
 				totalLevel += classLevel;
@@ -261,9 +316,24 @@ var updateLevels = function () {
 				var classHd = v[repeatingString + 'hd'];
 				console.log('classHd', classHd);
 				if (!exists(classHd)) {
-					classHd = 'd0';
+          if (defaultClassDetails.hasOwnProperty(className)) {
+            classHd = defaultClassDetails[className].hd;
+          } else {
+            classHd = 'd0';
+          }
 				}
 				hd[classHd] += classLevel;
+
+        var classSpellcasting = v[repeatingString + 'spellcasting'];
+        console.log('classSpellcasting', classSpellcasting);
+        if (!exists(classSpellcasting)) {
+          if (defaultClassDetails.hasOwnProperty(className)) {
+            classSpellcasting = defaultClassDetails[className].spellcasting;
+          }
+        }
+        if (exists(classSpellcasting)) {
+          spellcasting[classSpellcasting] += classLevel;
+        }
 
 				if (className === 'sorcerer' || className === 'sorcerer') {
 					sorcererLevels += classLevel;
