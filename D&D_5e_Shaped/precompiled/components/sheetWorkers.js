@@ -1734,10 +1734,10 @@ on('sheet:opened', function () {
 	sheetOpened();
 });
 
-var updateTieOns = function () {
-  console.log('updateTieOns');
-  var repeatingItem = 'repeating_tie_on';
-  var collectionArray = ['tie_on_strength_check', 'tie_on_dexterity_check', 'tie_on_constitution_check', 'tie_on_intelligence_check', 'tie_on_wisdom_check', 'tie_on_charisma_check', 'tie_on_initiative', 'tie_on_strength_saving_throw', 'tie_on_dexterity_saving_throw', 'tie_on_constitution_saving_throw', 'tie_on_intelligence_saving_throw', 'tie_on_wisdom_saving_throw', 'tie_on_charisma_saving_throw', 'attr_tie_on_death_saving_throw', 'tie_on_hit_dice', 'tie_on_attack', 'tie_on_spell'];
+var updateAttachers = function () {
+  console.log('updateAttachers');
+  var repeatingItem = 'repeating_attacher';
+  var collectionArray = ['attacher_strength_check', 'attacher_dexterity_check', 'attacher_constitution_check', 'attacher_intelligence_check', 'attacher_wisdom_check', 'attacher_charisma_check', 'attacher_initiative', 'attacher_strength_saving_throw', 'attacher_dexterity_saving_throw', 'attacher_constitution_saving_throw', 'attacher_intelligence_saving_throw', 'attacher_wisdom_saving_throw', 'attacher_charisma_saving_throw', 'attr_attacher_death_saving_throw', 'attacher_hit_dice', 'attacher_attack', 'attacher_spell'];
   var finalSetAttrs = {};
   var itemsToPush = ['strength_check', 'dexterity_check', 'constitution_check', 'intelligence_check', 'wisdom_check', 'charisma_check', 'initiative', 'strength_saving_throw', 'dexterity_saving_throw', 'constitution_saving_throw', 'intelligence_saving_throw', 'wisdom_saving_throw', 'charisma_saving_throw', 'death_saving_throw', 'hit_dice', 'attack', 'spell'];
 
@@ -1747,8 +1747,8 @@ var updateTieOns = function () {
       collectionArray.push(repeatingString + 'output');
 
       for (var x = 0; x < itemsToPush.length; x++) {
-        collectionArray.push(repeatingString + itemsToPush + '_tie_on');
-        finalSetAttrs['tie_on_' + itemsToPush[x]] = '';
+        collectionArray.push(repeatingString + itemsToPush + '_attacher');
+        finalSetAttrs['attacher_' + itemsToPush[x]] = ' ';
       }
     }
 
@@ -1759,17 +1759,20 @@ var updateTieOns = function () {
 
         for (var x = 0; x < itemsToPush.length; x++) {
           var output = v[repeatingString + 'output'];
-          finalSetAttrs['tie_on_' + itemsToPush[x]] += output + ' ';
+          var attacher = v[repeatingString + itemsToPush + '_attacher'];
+          if (exists(output) && exists(attacher) && attacher === 'on') {
+            finalSetAttrs['attacher_' + itemsToPush[x]] += output + ' ';
+          }
         }
       }
 
-      console.log('updateTieOns', finalSetAttrs);
+      console.log('updateAttachers', finalSetAttrs);
       setFinalAttrs(v, finalSetAttrs);
     });
   });
 };
 
-on('change:repeating_tie_on remove:repeating_tie_on', function () {
-  console.log('trigger tie on change');
-  updateTieOns();
+on('change:repeating_attacher remove:repeating_attacher', function () {
+  console.log('trigger attacher change');
+  updateAttachers();
 });
