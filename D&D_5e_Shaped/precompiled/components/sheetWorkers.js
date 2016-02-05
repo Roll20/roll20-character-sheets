@@ -154,7 +154,7 @@ var getAbilityMod = function (score) {
 };
 
 var updateAbilityModifier = function (ability) {
-	var collectionArray = [ability, ability + '_bonus'];
+	var collectionArray = [ability, ability + '_bonus', ability + '_mod', ability + '_check_mod'];
 	var finalSetAttrs = {};
 
 	if(ability === 'strength') {
@@ -217,7 +217,6 @@ on('change:strength_mod change:dexterity_mod change:constitution_mod change:inte
   updateAttack();
   updateSpell();
 });
-
 
 var updateLevels = function () {
 	var repeatingItem = 'repeating_class';
@@ -307,6 +306,9 @@ var updateLevels = function () {
 				var repeatingString = repeatingItem + '_' + ids[j] + '_';
 
 				var className = v[repeatingString + 'name'];
+				if (!exists(className)) {
+					className = 'barbarian';
+				}
 				if (className === 'custom') {
 					finalSetAttrs[repeatingString + 'custom_class_toggle'] = 'on';
 					var customName = v[repeatingString + 'custom_name'];
@@ -329,7 +331,7 @@ var updateLevels = function () {
             classHd = defaultClassDetails[className].hd;
             finalSetAttrs[repeatingString + 'hd'] = classHd;
           } else {
-            classHd = 'd0';
+            classHd = 'd12';
           }
         }
 				hd[classHd] += classLevel;
@@ -406,6 +408,7 @@ var updateLevels = function () {
 };
 
 on('change:repeating_class remove:repeating_class', function () {
+	console.log('repeating_class');
   updateLevels();
 });
 
@@ -784,11 +787,11 @@ var updateArmor = function (rowId) {
 	sumRepeating(options, sumItems);
 };
 on('change:repeating_armor', function (eventInfo) {
-	var rowId = getRowId('repeating_armor', eventInfo);
-	var changedField = getRepeatingField('repeating_armor', eventInfo);
-	if (changedField !== 'ac_total') {
-		updateArmor(rowId);
-	}
+  var changedField = getRepeatingField('repeating_armor', eventInfo);
+  if (changedField !== 'ac_total') {
+    var rowId = getRowId('repeating_armor', eventInfo);
+    updateArmor(rowId);
+  }
 });
 on('change:medium_armor_max_dex change:ac_unarmored_ability remove:repeating_armor', function () {
 	updateArmor();
@@ -836,8 +839,8 @@ var updateEquipment = function (rowId) {
 };
 
 on('change:repeating_equipment', function (eventInfo) {
-	var rowId = getRowId('repeating_equipment', eventInfo);
-	updateEquipment(rowId);
+  var rowId = getRowId('repeating_equipment', eventInfo);
+  updateEquipment(rowId);
 });
 on('change:repeating_equipment remove:repeating_equipment', function () {
 	var options = {
@@ -941,12 +944,12 @@ on('change:weight_attacks change:weight_armor change:weight_equipment change:wei
 });
 
 on('change:repeating_attack', function (eventInfo) {
-  var rowId = getRowId('repeating_attack', eventInfo);
-	var changedField = getRepeatingField('repeating_attack', eventInfo);
-	if (changedField !== 'toggle_details' && changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed') {
-		updateAttack(rowId);
-	}
-	updateAttackQuery();
+  var changedField = getRepeatingField('repeating_attack', eventInfo);
+  if (changedField !== 'toggle_details' && changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed') {
+    var rowId = getRowId('repeating_attack', eventInfo);
+    updateAttack(rowId);
+  }
+  updateAttackQuery();
 });
 on('change:repeating_attack remove:repeating_attack', function () {
   var options = {
@@ -1513,13 +1516,12 @@ var updateSpell = function (rowId) {
 };
 
 on('change:repeating_spell', function (eventInfo) {
-  var rowId = getRowId('repeating_spell', eventInfo);
-	var changedField = getRepeatingField('repeating_spell', eventInfo);
-
-	if (changedField !== 'toggle_details' && changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'heal_formula' && changedField !== 'higher_level_query' && changedField !== 'parsed') {
-		console.log('changedField', changedField);
-		updateSpell(rowId);
-	}
+  var changedField = getRepeatingField('repeating_spell', eventInfo);
+  if (changedField !== 'toggle_details' && changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'heal_formula' && changedField !== 'higher_level_query' && changedField !== 'parsed') {
+    console.log('spell changedField', changedField);
+    var rowId = getRowId('repeating_spell', eventInfo);
+    updateSpell(rowId);
+  }
 });
 on('change:global_spell_attack_bonus change:global_spell_damage_bonus change:global_spell_dc_bonus change:global_spell_heal_bonus', function () {
 	console.log('updateSpell trigged by global');
@@ -1621,11 +1623,11 @@ var updateSkill = function (rowId) {
 };
 
 on('change:repeating_skill', function (eventInfo) {
-	var changedField = getRepeatingField('repeating_skill', eventInfo);
-	if (changedField !== 'ability_short_name' && changedField !== 'total' && changedField !== 'formula' ) {
+  var changedField = getRepeatingField('repeating_skill', eventInfo);
+  if (changedField !== 'ability_short_name' && changedField !== 'total' && changedField !== 'formula') {
     var rowId = getRowId('repeating_skill', eventInfo);
-		updateSkill(rowId);
-	}
+    updateSkill(rowId);
+  }
 });
 on('change:jack_of_all_trades_toggle change:jack_of_all_trades', function () {
 	updateSkill();
