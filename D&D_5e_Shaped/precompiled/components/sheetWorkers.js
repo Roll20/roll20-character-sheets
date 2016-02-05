@@ -1563,8 +1563,10 @@ var updateSkill = function (rowId) {
 			for (var j = 0; j < ids.length; j++) {
 				var repeatingString = repeatingItem+'_' + ids[j] + '_';
 
-				var ability = v[repeatingString + 'ability'].replace(/\W/g, '');
-				if (!ability) {
+				var ability = v[repeatingString + 'ability'];
+				if (ability) {
+					ability = ability.replace(/\W/g, '');
+				} else {
 					ability = 'strength';
 				}
 				finalSetAttrs[repeatingString + 'ability_short_name'] = capitalizeFirstLetter(firstThreeChars(ability));
