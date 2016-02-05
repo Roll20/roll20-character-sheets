@@ -324,13 +324,14 @@ var updateLevels = function () {
 
 				var classHd = v[repeatingString + 'hd'];
 				console.log('classHd', classHd);
-				if (!exists(classHd)) {
+        if (!exists(classHd)) {
           if (defaultClassDetails.hasOwnProperty(className)) {
             classHd = defaultClassDetails[className].hd;
+            finalSetAttrs[repeatingString + 'hd'] = classHd;
           } else {
             classHd = 'd0';
           }
-				}
+        }
 				hd[classHd] += classLevel;
 
         var classSpellcasting = v[repeatingString + 'spellcasting'];
@@ -338,6 +339,7 @@ var updateLevels = function () {
         if (!exists(classSpellcasting)) {
           if (defaultClassDetails.hasOwnProperty(className)) {
             classSpellcasting = defaultClassDetails[className].spellcasting;
+            finalSetAttrs[repeatingString + 'spellcasting'] = classSpellcasting;
           }
         }
         if (exists(classSpellcasting)) {
@@ -415,6 +417,7 @@ var updateSpellSlots = function () {
   var finalSetAttrs = {};
 
   var spellSlotTiers = {
+    0: {},
     1: {
       1: 2
     },
