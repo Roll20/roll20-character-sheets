@@ -1088,13 +1088,16 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 			options.defaultDamageAbility = 0;
 		}
 
-		var damageAbility = getAbilityValue(v, v[repeatingString + 'damage_ability'], options.defaultDamageAbility);
-		if (exists(damageAbility)) {
-			damageAddition += damageAbility;
-			if (damageFormula !== '') {
-				damageFormula += ADD;
+		var damageAbility = v[repeatingString + 'damage_ability'];
+		if (exists(damageAbility) || options.defaultDamageAbility) {
+			damageAbility = getAbilityValue(v, damageAbility, options.defaultDamageAbility);
+			if (exists(damageAbility)) {
+				damageAddition += damageAbility;
+				if (damageFormula !== '') {
+					damageFormula += ADD;
+				}
+				damageFormula += damageAbility + '[' + getAbilityShortName(v[repeatingString + 'damage_ability']) + ']';
 			}
-			damageFormula += damageAbility + '[' + getAbilityShortName(v[repeatingString + 'damage_ability']) + ']';
 		}
 
 		var damageBonus = getIntValue(v[repeatingString + 'damage_bonus']);
@@ -1161,13 +1164,16 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 			secondDamageFormula += secondDamage + '[second damage]';
 		}
 
-		var secondDamageAbility = getAbilityValue(v, v[repeatingString + 'second_damage_ability']);
+		var secondDamageAbility = v[repeatingString + 'second_damage_ability'];
 		if (exists(secondDamageAbility)) {
-			secondDamageAddition += secondDamageAbility;
-			if (secondDamageFormula !== '') {
-				secondDamageFormula += ADD;
+			secondDamageAbility = getAbilityValue(v, secondDamageAbility);
+			if (exists(secondDamageAbility)) {
+				secondDamageAddition += secondDamageAbility;
+				if (secondDamageFormula !== '') {
+					secondDamageFormula += ADD;
+				}
+				secondDamageFormula += secondDamageAbility + '[' + getAbilityShortName(v[repeatingString + 'second_damage_ability']) + ']';
 			}
-			secondDamageFormula += secondDamageAbility + '[' + getAbilityShortName(v[repeatingString + 'second_damage_ability']) + ']';
 		}
 
 		var secondDamageBonus = getIntValue(v[repeatingString + 'second_damage_bonus']);
