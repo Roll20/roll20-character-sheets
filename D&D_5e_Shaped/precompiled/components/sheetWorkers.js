@@ -288,7 +288,6 @@ var updateLevels = function () {
 	var totalLevel = 0;
 	var levelArray = [];
 	var sorcererLevels = 0;
-	var warlockLevels = 0;
 
 	getSectionIDs(repeatingItem, function (ids) {
 		for (var i = 0; i < ids.length; i++) {
@@ -318,12 +317,10 @@ var updateLevels = function () {
         }
 
 				var classLevel = getIntValue(v[repeatingString + 'level']);
-				console.log('classLevel', classLevel);
 				totalLevel += classLevel;
 				levelArray.push(capitalizeFirstLetter(className) + ' ' + classLevel);
 
 				var classHd = v[repeatingString + 'hd'];
-				console.log('classHd', classHd);
         if (!exists(classHd)) {
           if (defaultClassDetails.hasOwnProperty(className)) {
             classHd = defaultClassDetails[className].hd;
@@ -335,7 +332,6 @@ var updateLevels = function () {
 				hd[classHd] += classLevel;
 
         var classSpellcasting = v[repeatingString + 'spellcasting'];
-        console.log('classSpellcasting', classSpellcasting);
         if (!exists(classSpellcasting)) {
           if (defaultClassDetails.hasOwnProperty(className)) {
             classSpellcasting = defaultClassDetails[className].spellcasting;
@@ -371,9 +367,7 @@ var updateLevels = function () {
 
       updateSpellSlots(v, finalSetAttrs, casterLevel);
 
-			console.log('totalLevel', totalLevel);
 			finalSetAttrs.level = totalLevel;
-			console.log('levelArray', levelArray);
 			finalSetAttrs.class_and_level = levelArray.join(' ');
 
 			if(sorcererLevels > 0) {
@@ -576,12 +570,8 @@ var updateSpellSlots = function () {
   }
   getAttrs(collectionArray, function (v) {
     var casterLevel = getIntValue(v.caster_level);
-    console.log('casterLevel', casterLevel);
 
     var spellSlots = spellSlotTiers[Math.min(casterLevel, 20)];
-    console.log('spellSlotTiers[casterLevel]', spellSlotTiers[casterLevel]);
-    console.log('spellSlots', spellSlots);
-
     for (var i = 1; i <= 9; i++) {
       var slotCalc = spellSlots[i] || 0;
       finalSetAttrs['spell_slots_l' + i + '_calc'] = slotCalc;
@@ -1187,7 +1177,7 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 
 		var secondDamageType = v[repeatingString + 'second_damage_type'];
 		if (exists(secondDamageType)) {
-			if (hasUpperCase(damageType)) {
+			if (hasUpperCase(secondDamageType)) {
 				finalSetAttrs[repeatingString + 'second_damage_type'] = secondDamageType.toLowerCase();
 			}
 			damageString += SPACE + secondDamageType;
