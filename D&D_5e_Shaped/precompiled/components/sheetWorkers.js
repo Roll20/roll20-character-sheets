@@ -65,8 +65,16 @@ var isEmpty = function (obj) {
   }
   return true;
 };
-var setFinalAttrs = function (finalSetAttrs) {
+var setFinalAttrs = function (v, finalSetAttrs) {
   if (!isEmpty(finalSetAttrs)) {
+    for (var key in finalSetAttrs) {
+      if (finalSetAttrs.hasOwnProperty(key)) {
+        console.log(key, v[key], finalSetAttrs[key]);
+        if (v[key] === finalSetAttrs[key]) {
+          delete finalSetAttrs[key];
+        }
+      }
+    }
     setAttrs(finalSetAttrs);
   }
 };
@@ -181,7 +189,7 @@ var updateAbilityModifier = function (ability) {
 		}
 
 		console.log('updateAbilityModifier', finalSetAttrs);
-    setFinalAttrs(finalSetAttrs)
+    setFinalAttrs(v, finalSetAttrs);
 	});
 	if(ability === 'dexterity') {
 		updateArmor();
@@ -387,7 +395,7 @@ var updateLevels = function () {
 			}
 
 			console.log('updateLevels', finalSetAttrs);
-			setFinalAttrs(finalSetAttrs)
+			setFinalAttrs(v, finalSetAttrs);
 		});
 	});
 };
@@ -409,7 +417,7 @@ var updatePb = function () {
 		finalSetAttrs.h_PB = pb / 2;
 
 		console.log('updatePb', finalSetAttrs);
-		setFinalAttrs(finalSetAttrs)
+		setFinalAttrs(v, finalSetAttrs);
 	});
 };
 
@@ -518,7 +526,7 @@ var sumRepeating = function (options, sumItems) {
 			}
 
 			console.log('sumRepeating', finalSetAttrs);
-      setFinalAttrs(finalSetAttrs)
+      setFinalAttrs(v, finalSetAttrs);
 		});
 	});
 };
@@ -557,7 +565,7 @@ var updateArmor = function (rowId) {
 			}
 
 			console.log('updateArmor', finalSetAttrs);
-			setFinalAttrs(finalSetAttrs)
+			setFinalAttrs(v, finalSetAttrs);
 		});
 	});
 
@@ -629,7 +637,7 @@ var updateEquipment = function (rowId) {
 			}
 
 			console.log('updateEquipment', finalSetAttrs);
-			setFinalAttrs(finalSetAttrs)
+			setFinalAttrs(v, finalSetAttrs);
 		});
 	});
 };
@@ -669,7 +677,7 @@ var updateJackOfAllTrades = function () {
 		finalSetAttrs.jack_of_all_trades = Math.floor(getIntValue(v.pb) / 2);
 
 		console.log('updateJackOfAllTrades', finalSetAttrs);
-    setFinalAttrs(finalSetAttrs)
+    setFinalAttrs(v, finalSetAttrs);
 	});
 };
 on('change:jack_of_all_trades_toggle', function () {
@@ -717,7 +725,7 @@ var updateInitiative = function () {
 		}
 
 		console.log('updateInitiative', finalSetAttrs);
-    setFinalAttrs(finalSetAttrs)
+    setFinalAttrs(v, finalSetAttrs);
 	});
 };
 on('change:dexterity_mod change:initiative_bonus change:jack_of_all_trades_toggle change:jack_of_all_trades change:global_check_bonus', function () {
@@ -732,7 +740,7 @@ var updateWeight = function () {
 		finalSetAttrs.weight_total = Math.round((getFloatValue(v.weight_attacks) + getFloatValue(v.weight_armor) + getFloatValue(v.weight_equipment) + getFloatValue(v.weight_coinage) + getFloatValue(v.weight_misc)) * 100) / 100;
 
 		console.log('updateWeight', finalSetAttrs);
-    setFinalAttrs(finalSetAttrs)
+    setFinalAttrs(v, finalSetAttrs);
 	});
 };
 on('change:weight_attacks change:weight_armor change:weight_equipment change:weight_coinage change:weight_misc', function () {
@@ -1084,6 +1092,8 @@ var updateAttackQuery = function () {
 			collectionArray.push(repeatingString + 'reach');
 			collectionArray.push(repeatingString + 'range');
 			collectionArray.push(repeatingString + 'ammo');
+      collectionArray.push(repeatingString + 'to_hit');
+      collectionArray.push(repeatingString + 'attack_formula');
 			collectionArray.push(repeatingString + 'roll_toggle');
 			collectionArray.push(repeatingString + 'saving_throw_toggle');
 			collectionArray.push(repeatingString + 'damage_toggle');
@@ -1110,7 +1120,7 @@ var updateAttackQuery = function () {
 			finalSetAttrs.attack_query_var += '}';
 
 			console.log('updateAttackQuery', finalSetAttrs);
-			setFinalAttrs(finalSetAttrs)
+			setFinalAttrs(v, finalSetAttrs);
 		});
 	});
 };
@@ -1129,22 +1139,28 @@ var updateAttack = function (rowId) {
 			var repeatingString = repeatingItem + '_' + ids[i] + '_';
 			collectionArray.push(repeatingString + 'type');
 			collectionArray.push(repeatingString + 'roll_toggle');
+      collectionArray.push(repeatingString + 'to_hit');
+      collectionArray.push(repeatingString + 'attack_formula');
 			collectionArray.push(repeatingString + 'proficiency');
 			collectionArray.push(repeatingString + 'attack_ability');
 			collectionArray.push(repeatingString + 'attack_bonus');
 			collectionArray.push(repeatingString + 'saving_throw_toggle');
 			collectionArray.push(repeatingString + 'saving_throw_ability');
 			collectionArray.push(repeatingString + 'saving_throw_bonus');
+      collectionArray.push(repeatingString + 'saving_throw_dc');
 			collectionArray.push(repeatingString + 'damage_toggle');
+      collectionArray.push(repeatingString + 'damage_formula');
 			collectionArray.push(repeatingString + 'damage');
 			collectionArray.push(repeatingString + 'damage_ability');
 			collectionArray.push(repeatingString + 'damage_bonus');
 			collectionArray.push(repeatingString + 'damage_type');
 			collectionArray.push(repeatingString + 'second_damage_toggle');
+      collectionArray.push(repeatingString + 'second_damage_formula');
 			collectionArray.push(repeatingString + 'second_damage');
 			collectionArray.push(repeatingString + 'second_damage_ability');
 			collectionArray.push(repeatingString + 'second_damage_bonus');
 			collectionArray.push(repeatingString + 'second_damage_type');
+      collectionArray.push(repeatingString + 'damage_string');
 			collectionArray.push(repeatingString + 'modifiers');
 			collectionArray.push(repeatingString + 'parsed');
 		}
@@ -1191,7 +1207,7 @@ var updateAttack = function (rowId) {
 			}
 
 			console.log('updateAttack', finalSetAttrs);
-      setFinalAttrs(finalSetAttrs)
+      setFinalAttrs(v, finalSetAttrs);
 		});
 	});
 };
@@ -1210,6 +1226,8 @@ var updateSpell = function (rowId) {
 			var repeatingString = repeatingItem + '_' + ids[i] + '_';
 			collectionArray.push(repeatingString + 'type');
 			collectionArray.push(repeatingString + 'roll_toggle');
+      collectionArray.push(repeatingString + 'to_hit');
+      collectionArray.push(repeatingString + 'attack_formula');
 			collectionArray.push(repeatingString + 'proficiency');
 			collectionArray.push(repeatingString + 'attack_ability');
 			collectionArray.push(repeatingString + 'attack_bonus');
@@ -1217,16 +1235,20 @@ var updateSpell = function (rowId) {
 			collectionArray.push(repeatingString + 'saving_throw_ability');
 			collectionArray.push(repeatingString + 'saving_throw_vs_ability');
 			collectionArray.push(repeatingString + 'saving_throw_bonus');
+      collectionArray.push(repeatingString + 'saving_throw_dc');
 			collectionArray.push(repeatingString + 'damage_toggle');
+      collectionArray.push(repeatingString + 'damage_formula');
 			collectionArray.push(repeatingString + 'damage');
 			collectionArray.push(repeatingString + 'damage_ability');
 			collectionArray.push(repeatingString + 'damage_bonus');
 			collectionArray.push(repeatingString + 'damage_type');
 			collectionArray.push(repeatingString + 'second_damage_toggle');
+      collectionArray.push(repeatingString + 'second_damage_formula');
 			collectionArray.push(repeatingString + 'second_damage');
 			collectionArray.push(repeatingString + 'second_damage_ability');
 			collectionArray.push(repeatingString + 'second_damage_bonus');
 			collectionArray.push(repeatingString + 'second_damage_type');
+      collectionArray.push(repeatingString + 'damage_string');
 			collectionArray.push(repeatingString + 'parsed');
 			collectionArray.push(repeatingString + 'spell_level');
       collectionArray.push(repeatingString + 'casting_time');
@@ -1290,7 +1312,7 @@ var updateSpell = function (rowId) {
 			}
 
 			console.log('updateSpell', finalSetAttrs);
-      setFinalAttrs(finalSetAttrs)
+      setFinalAttrs(v, finalSetAttrs);
 		});
 	});
 };
@@ -1321,7 +1343,7 @@ var updateD20Mod = function () {
 		}
 
 		console.log('updateD20Mod', finalSetAttrs);
-    setFinalAttrs(finalSetAttrs)
+    setFinalAttrs(v, finalSetAttrs);
 	});
 };
 
@@ -1396,7 +1418,7 @@ var updateSkill = function (rowId) {
 			}
 
 			console.log('updateSkill', finalSetAttrs);
-      setFinalAttrs(finalSetAttrs)
+      setFinalAttrs(v, finalSetAttrs);
 		});
 	});
 };
@@ -1508,7 +1530,7 @@ var sheetOpened = function () {
 			finalSetAttrs.version = currentVersion;
 		}
 
-    setFinalAttrs(finalSetAttrs)
+    setFinalAttrs(v, finalSetAttrs);
 	});
 };
 
