@@ -1735,7 +1735,6 @@ on('sheet:opened', function () {
 });
 
 var updateAttachers = function () {
-  console.log('updateAttachers');
   var repeatingItem = 'repeating_attacher';
   var collectionArray = ['attacher_strength_check', 'attacher_dexterity_check', 'attacher_constitution_check', 'attacher_intelligence_check', 'attacher_wisdom_check', 'attacher_charisma_check', 'attacher_initiative', 'attacher_strength_saving_throw', 'attacher_dexterity_saving_throw', 'attacher_constitution_saving_throw', 'attacher_intelligence_saving_throw', 'attacher_wisdom_saving_throw', 'attacher_charisma_saving_throw', 'attr_attacher_death_saving_throw', 'attacher_hit_dice', 'attacher_attack', 'attacher_spell'];
   var finalSetAttrs = {};
@@ -1747,19 +1746,17 @@ var updateAttachers = function () {
       collectionArray.push(repeatingString + 'output');
 
       for (var x = 0; x < itemsToPush.length; x++) {
-        collectionArray.push(repeatingString + itemsToPush + '_attacher');
+        collectionArray.push(repeatingString + itemsToPush[x] + '_attacher');
         finalSetAttrs['attacher_' + itemsToPush[x]] = ' ';
       }
     }
-
-    console.log('collectionArray', itemsToPush);
     getAttrs(collectionArray, function (v) {
       for (var j = 0; j < ids.length; j++) {
         var repeatingString = repeatingItem+'_' + ids[j] + '_';
 
         for (var x = 0; x < itemsToPush.length; x++) {
           var output = v[repeatingString + 'output'];
-          var attacher = v[repeatingString + itemsToPush + '_attacher'];
+          var attacher = v[repeatingString + itemsToPush[x] + '_attacher'];
           if (exists(output) && exists(attacher) && attacher === 'on') {
             finalSetAttrs['attacher_' + itemsToPush[x]] += output + ' ';
           }
@@ -1773,6 +1770,5 @@ var updateAttachers = function () {
 };
 
 on('change:repeating_attacher remove:repeating_attacher', function () {
-  console.log('trigger attacher change');
   updateAttachers();
 });
