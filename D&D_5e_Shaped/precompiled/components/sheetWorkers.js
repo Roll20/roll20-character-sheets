@@ -1103,8 +1103,10 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 			damageFormula += damageBonus + '[bonus]';
 		}
 
-		damageAddition += options.globalDamageBonus;
-		damageFormula += ADD + options.globalDamageBonus + '[global damage bonus]';
+    if (exists(options.globalDamageBonus)) {
+      damageAddition += options.globalDamageBonus;
+      damageFormula += ADD + options.globalDamageBonus + '[global damage bonus]';
+    }
 
 		if(options && options.globalMeleeDamageBonus && !v[repeatingString + 'type'] || v[repeatingString + 'type'] === 'Melee Weapon') {
 			damageAddition += options.globalMeleeDamageBonus;
