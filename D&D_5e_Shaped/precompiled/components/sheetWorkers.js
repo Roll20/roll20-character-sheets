@@ -166,12 +166,6 @@ var updateAbilityModifier = function (ability) {
 	var collectionArray = [ability, ability + '_bonus', ability + '_mod', ability + '_check_mod'];
 	var finalSetAttrs = {};
 
-	if (ability === 'strength') {
-		collectionArray.push('dexterity_mod');
-	} else if (ability === 'dexterity') {
-		collectionArray.push('strength_mod');
-	}
-
 	getAttrs(collectionArray, function (v) {
 		var abilityScore = getIntValue(v[ability]);
 		var abilityBonus = getIntValue(v[ability + '_bonus']);
@@ -186,11 +180,10 @@ var updateAbilityModifier = function (ability) {
 
 		if (ability === 'strength') {
 			finalSetAttrs.finesse_mod = Math.max(abilityMod, getIntValue(v.dexterity_mod));
-			var str = getIntValue(v.strength);
-			finalSetAttrs.carrying_capacity = str * 15;
-			finalSetAttrs.max_push_drag_lift = str * 30;
-			finalSetAttrs.encumbered = str * 5;
-			finalSetAttrs.heavily_encumbered = str * 10;
+			finalSetAttrs.carrying_capacity = abilityScore * 15;
+			finalSetAttrs.max_push_drag_lift = abilityScore * 30;
+			finalSetAttrs.encumbered = abilityScore * 5;
+			finalSetAttrs.heavily_encumbered = abilityScore * 10;
 		} else if (ability === 'dexterity') {
 			finalSetAttrs.finesse_mod = Math.max(abilityMod, getIntValue(v.strength_mod));
 		}
@@ -199,7 +192,6 @@ var updateAbilityModifier = function (ability) {
 		setFinalAttrs(v, finalSetAttrs);
 	});
 };
-
 on('change:strength change:strength_bonus', function () {
 	updateAbilityModifier('strength');
 });
@@ -223,7 +215,6 @@ on('change:dexterity_mod', function () {
 });
 on('change:strength_mod change:dexterity_mod change:constitution_mod change:intelligence_mod change:wisdom_mod change:charisma_mod', function () {
 	console.log('---------------------mod adjusted------------------------');
-	updateSkill();
 	updateAttack();
 	updateSpell();
 });
@@ -1540,7 +1531,7 @@ on('change:repeating_spell', function (eventInfo) {
 	}
 });
 on('change:global_spell_attack_bonus change:global_spell_damage_bonus change:global_spell_dc_bonus change:global_spell_heal_bonus', function () {
-	console.log('updateSpell trigged by global');
+	console.log('updateSpell triggered by global');
 	updateSpell();
 });
 
@@ -1592,17 +1583,12 @@ var updateSkill = function (rowId) {
 			for (var j = 0; j < ids.length; j++) {
 				var repeatingString = repeatingItem + '_' + ids[j] + '_';
 
-				var ability = v[repeatingString + 'ability'];
-				if (ability) {
-					ability = ability.replace(/\W/g, '');
-				} else {
-					ability = 'strength';
-				}
-				finalSetAttrs[repeatingString + 'ability_short_name'] = capitalizeFirstLetter(firstThreeChars(ability));
+				var ability = getAbilityModName(v[repeatingString + 'ability']);
+				console.log('ability', ability);
+				finalSetAttrs[repeatingString + 'ability_short_name'] = getAbilityShortName(ability, true);
 
 				var total = 0;
 				var totalFormula = '';
-
 				var proficiency = v[repeatingString + 'proficiency'];
 				if (!proficiency || proficiency === 'unproficient') {
 					if (v.jack_of_all_trades_toggle === '@{jack_of_all_trades}') {
@@ -1663,9 +1649,9 @@ var updateSkill = function (rowId) {
 on('change:repeating_skill', function (eventInfo) {
 	var changedField = getRepeatingField('repeating_skill', eventInfo);
 	if (changedField !== 'ability_short_name' && changedField !== 'total' && changedField !== 'formula') {
-		console.log('changedField', changedField);
+		console.log('change:repeating_skill changedField', changedField);
 		var rowId = getRowId('repeating_skill', eventInfo);
-		console.log('change:repeating_skill', rowId);
+		console.log('change:repeating_skill rowId', rowId);
 		updateSkill(rowId);
 	}
 });
