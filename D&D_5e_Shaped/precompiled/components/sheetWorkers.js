@@ -429,7 +429,7 @@ var updateSpellSlots = function () {
 				spellSlots['1'] = 4;
 			} else if (casterLevel === 2) {
 				spellSlots['1'] = 3;
-			}  else if (casterLevel === 1) {
+			} else if (casterLevel === 1) {
 				spellSlots['1'] = 2;
 			}
 			if (casterLevel >= 4) {
