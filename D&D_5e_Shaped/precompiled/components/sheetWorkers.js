@@ -188,11 +188,24 @@ var updateAbilityModifier = function (ability) {
 	});
 };
 
-for (var i = 0; i < ABILITIES.length; i++) {
-	on('change:' + ABILITIES[i] + ' change:' + ABILITIES[i] + '_bonus', function () {
-		updateAbilityModifier(ABILITIES[i]);
-	});
-}
+on('change:strength change:strength_bonus', function () {
+	updateAbilityModifier('strength');
+});
+on('change:dexterity change:dexterity_bonus', function () {
+	updateAbilityModifier('dexterity');
+});
+on('change:constitution change:constitution_bonus', function () {
+	updateAbilityModifier('constitution');
+});
+on('change:intelligence change:intelligence_bonus', function () {
+	updateAbilityModifier('intelligence');
+});
+on('change:wisdom change:wisdom_bonus', function () {
+	updateAbilityModifier('wisdom');
+});
+on('change:charisma change:charisma_bonus', function () {
+	updateAbilityModifier('charisma');
+});
 on('change:dexterity_mod', function () {
 	updateArmor();
 });
