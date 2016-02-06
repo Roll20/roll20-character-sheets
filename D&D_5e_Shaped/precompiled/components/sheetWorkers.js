@@ -300,6 +300,7 @@ var updateLevels = function () {
 	var totalLevel = 0;
 	var levelArray = [];
 	var sorcererLevels = 0;
+	var classesWithSpellcasting = 0;
 
 	getSectionIDs(repeatingItem, function (ids) {
 		for (var i = 0; i < ids.length; i++) {
@@ -354,6 +355,7 @@ var updateLevels = function () {
 					}
 				}
 				if (exists(classSpellcasting)) {
+					classesWithSpellcasting += 1;
 					spellcasting[classSpellcasting] += classLevel;
 				}
 
@@ -379,6 +381,23 @@ var updateLevels = function () {
 			casterLevel += Math.floor(spellcasting.half / 2);
 			casterLevel += Math.floor(spellcasting.third / 3);
 			finalSetAttrs.caster_level = casterLevel;
+
+
+			if (classesWithSpellcasting > 1 || spellcasting.full) {
+				console.log('first if');
+				finalSetAttrs.caster_type = 'full';
+			} else if (spellcasting.half) {
+				console.log('half');
+				finalSetAttrs.caster_type = 'half';
+			} else if (spellcasting.third) {
+				console.log('third');
+				finalSetAttrs.caster_type = 'third';
+			} else {
+				console.log('else');
+				finalSetAttrs.caster_type = 'full';
+			}
+
+			console.log('finalSetAttrs.caster_type', finalSetAttrs.caster_type);
 
 			updateSpellSlots(v, finalSetAttrs, casterLevel);
 
@@ -423,7 +442,7 @@ on('change:repeating_class remove:repeating_class', function () {
 });
 
 var updateSpellSlots = function () {
-	var collectionArray = ['caster_level'];
+	var collectionArray = ['caster_level', 'caster_type'];
 	var finalSetAttrs = {};
 
 	var spellSlots = {
@@ -446,8 +465,10 @@ var updateSpellSlots = function () {
 	}
 	getAttrs(collectionArray, function (v) {
 		var casterLevel = getIntValue(v.caster_level);
-
-		var casterType = 'full';
+		var casterType = v.caster_type;
+		if (!exists(casterType)) {
+			casterType = 'full';
+		}
 
 		if (casterType === 'full') {
 			if (casterLevel >= 3) {
@@ -532,6 +553,7 @@ var updateSpellSlots = function () {
 		}
 
 		if (casterType === 'third') {
+			console.log('third casterLevel', casterLevel);
 			if (casterLevel >= 7) {
 				spellSlots['1'] = 4;
 			} else if (casterLevel >= 4) {
