@@ -163,13 +163,14 @@ var getAbilityMod = function (score) {
 };
 
 var updateAbilityModifier = function (ability) {
-	var collectionArray = [ability, ability + '_bonus', ability + '_mod', ability + '_check_mod'];
+	var collectionArray = [ability, ability + '_bonus', ability + '_mod', ability + '_check_mod', 'global_ability_bonus'];
 	var finalSetAttrs = {};
 
 	getAttrs(collectionArray, function (v) {
 		var abilityScore = getIntValue(v[ability]);
 		var abilityBonus = getIntValue(v[ability + '_bonus']);
-		var abilityMod = getAbilityMod((abilityScore + abilityBonus));
+		var globalAbilityBonus = getIntValue(v['global_ability_bonus']);
+		var abilityMod = getAbilityMod((abilityScore + abilityBonus + globalAbilityBonus));
 
 		var abilityCheckFormula = abilityMod + '[' + firstThreeChars(ability) + ' mod with bonus]';
 		abilityCheckFormula += ADD + '@{jack_of_all_trades_toggle}[jack of all trades]';
@@ -192,22 +193,22 @@ var updateAbilityModifier = function (ability) {
 		setFinalAttrs(v, finalSetAttrs);
 	});
 };
-on('change:strength change:strength_bonus', function () {
+on('change:strength change:strength_bonus change:strength_check_mod change:global_ability_bonus', function () {
 	updateAbilityModifier('strength');
 });
-on('change:dexterity change:dexterity_bonus', function () {
+on('change:dexterity change:dexterity_bonus change:dexterity_check_mod change:global_ability_bonus', function () {
 	updateAbilityModifier('dexterity');
 });
-on('change:constitution change:constitution_bonus', function () {
+on('change:constitution change:constitution_bonus change:constitution_check_mod change:global_ability_bonus', function () {
 	updateAbilityModifier('constitution');
 });
-on('change:intelligence change:intelligence_bonus', function () {
+on('change:intelligence change:intelligence_bonus change:intelligence_check_mod change:global_ability_bonus', function () {
 	updateAbilityModifier('intelligence');
 });
-on('change:wisdom change:wisdom_bonus', function () {
+on('change:wisdom change:wisdom_bonus change:wisdom_check_mod change:global_ability_bonus', function () {
 	updateAbilityModifier('wisdom');
 });
-on('change:charisma change:charisma_bonus', function () {
+on('change:charisma change:charisma_bonus change:charisma_check_mod change:global_ability_bonus', function () {
 	updateAbilityModifier('charisma');
 });
 on('change:dexterity_mod', function () {
