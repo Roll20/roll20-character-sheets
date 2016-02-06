@@ -37,9 +37,9 @@ function getAbilityValue(v, varName, defaultAbility) {
 		}
 	} else if (exists(varName)) {
 		varName = getAbilityModName(varName);
-		return getIntValue(v[varName], -5);
+		return getIntValue(v[varName], 0);
 	}
-	return -5;
+	return 0;
 }
 function getAbilityShortName(varName, capital) {
 	if (!varName) {
@@ -704,9 +704,8 @@ var sumRepeating = function (options, sumItems) {
 				}
 			}
 
-
 			if (options.collection === 'armor') {
-				finalSetAttrs.ac_unarmored_calc += 10 + getIntValue(v.dexterity_mod) + getAbilityValue(v, v.ac_unarmored_ability);
+				finalSetAttrs.ac_unarmored_calc += 10 + dexMod + getAbilityValue(v, v.ac_unarmored_ability);
 
 				finalSetAttrs.ac = Math.max(finalSetAttrs.ac_armored_calc, finalSetAttrs.ac_unarmored_calc);
 			}
