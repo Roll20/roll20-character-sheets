@@ -1666,6 +1666,22 @@ var sheetOpened = function () {
 		var version = getFloatValue(v.version);
 
 		if (!version) {
+			var setAbilities = {
+				strength: 10,
+				strength_mod: 0,
+				dexterity: 10,
+				dexterity_mod: 0,
+				constitution: 10,
+				constitution_mod: 0,
+				intelligence: 10,
+				intelligence_mod: 0,
+				wisdom: 10,
+				wisdom_mod: 0,
+				charisma: 10,
+				charisma_mod: 0
+			};
+			setFinalAttrs(v, setAbilities);
+
 			var skills = [
 				{
 					'name': 'Acrobatics',
