@@ -216,6 +216,7 @@ on('change:dexterity_mod', function () {
 });
 on('change:strength_mod change:dexterity_mod change:constitution_mod change:intelligence_mod change:wisdom_mod change:charisma_mod', function () {
 	console.log('---------------------mod adjusted------------------------');
+	updateSkill();
 	updateAttack();
 	updateSpell();
 });
@@ -856,6 +857,7 @@ on('change:repeating_equipment remove:repeating_equipment', function () {
 
 on('change:pb', function () {
 	console.log('pb changed');
+	updateSkill();
 	updateAttack();
 	updateSpell();
 	updateJackOfAllTrades();
@@ -1779,7 +1781,8 @@ var sheetOpened = function () {
 	});
 };
 
-on('sheet:opened', function () {
+on('sheet:opened', function (eventInfo) {
+	console.log('============================================================================sheetopened eventInfo', eventInfo);
 	sheetOpened();
 });
 
