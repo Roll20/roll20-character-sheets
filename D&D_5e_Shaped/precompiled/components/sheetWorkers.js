@@ -1795,7 +1795,9 @@ var updateAttachers = function () {
 	getSectionIDs(repeatingItem, function (ids) {
 		for (var i = 0; i < ids.length; i++) {
 			var repeatingString = repeatingItem + '_' + ids[i] + '_';
-			collectionArray.push(repeatingString + 'output');
+			collectionArray.push(repeatingString + 'name');
+			collectionArray.push(repeatingString + 'freetext');
+			collectionArray.push(repeatingString + 'freeform');
 
 			for (var x = 0; x < itemsToPush.length; x++) {
 				collectionArray.push(repeatingString + itemsToPush[x] + '_attacher');
@@ -1807,10 +1809,19 @@ var updateAttachers = function () {
 				var repeatingString = repeatingItem + '_' + ids[j] + '_';
 
 				for (var x = 0; x < itemsToPush.length; x++) {
-					var output = v[repeatingString + 'output'];
 					var attacher = v[repeatingString + itemsToPush[x] + '_attacher'];
-					if (exists(output) && exists(attacher) && attacher === 'on') {
-						finalSetAttrs['attacher_' + itemsToPush[x]] += output + ' ';
+					if (exists(attacher) && attacher === 'on') {
+
+						var attacherName = v[repeatingString + 'name'] || '';
+
+						var freeText = v[repeatingString + 'freetext'];
+						if(exists(freeText)) {
+							finalSetAttrs['attacher_' + itemsToPush[x]] += '{{' + attacherName + '=' + freeText + '}}' + ' ';
+						}
+						var freeForm = v[repeatingString + 'freeform'];
+						if(exists(freeForm)) {
+							finalSetAttrs['attacher_' + itemsToPush[x]] += freeForm + ' ';
+						}
 					}
 				}
 			}
