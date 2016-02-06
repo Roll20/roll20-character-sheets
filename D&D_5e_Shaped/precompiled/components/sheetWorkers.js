@@ -214,12 +214,6 @@ on('change:charisma change:charisma_bonus change:charisma_check_mod change:globa
 on('change:dexterity_mod', function () {
 	updateArmor();
 });
-on('change:strength_mod change:dexterity_mod change:constitution_mod change:intelligence_mod change:wisdom_mod change:charisma_mod', function () {
-	console.log('---------------------mod adjusted------------------------');
-	updateSkill();
-	updateAttack();
-	updateSpell();
-});
 
 var updateLevels = function () {
 	var repeatingItem = 'repeating_class';
@@ -1672,6 +1666,8 @@ var sheetOpened = function () {
 		var version = getFloatValue(v.version);
 
 		if (!version) {
+			updatePb();
+
 			var setAbilities = {
 				strength: 10,
 				strength_mod: 0,
