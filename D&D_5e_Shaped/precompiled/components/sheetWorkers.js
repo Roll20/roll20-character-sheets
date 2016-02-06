@@ -401,156 +401,16 @@ var updateSpellSlots = function () {
 	var collectionArray = ['caster_level'];
 	var finalSetAttrs = {};
 
-	var spellSlotTiers = {
-		0: {},
-		1: {
-			1: 2
-		},
-		2: {
-			1: 3
-		},
-		3: {
-			1: 4,
-			2: 2
-		},
-		4: {
-			1: 4,
-			2: 3
-		},
-		5: {
-			1: 4,
-			2: 3,
-			3: 2
-		},
-		6: {
-			1: 4,
-			2: 3,
-			3: 3
-		},
-		7: {
-			1: 4,
-			2: 3,
-			3: 3,
-			4: 1
-		},
-		8: {
-			1: 4,
-			2: 3,
-			3: 3,
-			4: 2
-		},
-		9: {
-			1: 4,
-			2: 3,
-			3: 3,
-			4: 3,
-			5: 1
-		},
-		10: {
-			1: 4,
-			2: 3,
-			3: 3,
-			4: 3,
-			5: 2
-		},
-		11: {
-			1: 4,
-			2: 3,
-			3: 3,
-			4: 3,
-			5: 2,
-			6: 1
-		},
-		12: {
-			1: 4,
-			2: 3,
-			3: 3,
-			4: 3,
-			5: 2,
-			6: 1
-		},
-		13: {
-			1: 4,
-			2: 3,
-			3: 3,
-			4: 3,
-			5: 2,
-			6: 1,
-			7: 1
-		},
-		14: {
-			1: 4,
-			2: 3,
-			3: 3,
-			4: 3,
-			5: 2,
-			6: 1,
-			7: 1
-		},
-		15: {
-			1: 4,
-			2: 3,
-			3: 3,
-			4: 3,
-			5: 2,
-			6: 1,
-			7: 1,
-			8: 1
-		},
-		16: {
-			1: 4,
-			2: 3,
-			3: 3,
-			4: 3,
-			5: 2,
-			6: 1,
-			7: 1,
-			8: 1
-		},
-		17: {
-			1: 4,
-			2: 3,
-			3: 3,
-			4: 3,
-			5: 2,
-			6: 1,
-			7: 1,
-			8: 1,
-			9: 1
-		},
-		18: {
-			1: 4,
-			2: 3,
-			3: 3,
-			4: 3,
-			5: 3,
-			6: 1,
-			7: 1,
-			8: 1,
-			9: 1
-		},
-		19: {
-			1: 4,
-			2: 3,
-			3: 3,
-			4: 3,
-			5: 3,
-			6: 2,
-			7: 1,
-			8: 1,
-			9: 1
-		},
-		20: {
-			1: 4,
-			2: 3,
-			3: 3,
-			4: 3,
-			5: 3,
-			6: 2,
-			7: 2,
-			8: 1,
-			9: 1
-		}
+	var spellSlots = {
+		1: 0,
+		2: 0,
+		3: 0,
+		4: 0,
+		5: 0,
+		6: 0,
+		7: 0,
+		8: 0,
+		9: 0
 	};
 
 	for (var i = 1; i <= 9; i++) {
@@ -562,9 +422,115 @@ var updateSpellSlots = function () {
 	getAttrs(collectionArray, function (v) {
 		var casterLevel = getIntValue(v.caster_level);
 
-		var spellSlots = spellSlotTiers[Math.min(casterLevel, 20)];
+		var casterType = 'full';
+
+		if (casterType === 'full') {
+			if (casterLevel >= 3) {
+				spellSlots['1'] = 4;
+			} else if (casterLevel === 2) {
+				spellSlots['1'] = 3;
+			}  else if (casterLevel === 1) {
+				spellSlots['1'] = 2;
+			}
+			if (casterLevel >= 4) {
+				spellSlots['2'] = 3;
+			} else if (casterLevel === 3) {
+				spellSlots['2'] = 2;
+			}
+			if (casterLevel >= 6) {
+				spellSlots['3'] = 3;
+			} else if (casterLevel === 5) {
+				spellSlots['3'] = 2;
+			}
+			if (casterLevel >= 9) {
+				spellSlots['4'] = 3;
+			} else if (casterLevel === 8) {
+				spellSlots['4'] = 2;
+			} else if (casterLevel === 7) {
+				spellSlots['4'] = 1;
+			}
+			if (casterLevel >= 18) {
+				spellSlots['5'] = 3;
+			} else if (casterLevel >= 10) {
+				spellSlots['5'] = 2;
+			} else if (casterLevel === 9) {
+				spellSlots['5'] = 1;
+			}
+			if (casterLevel >= 19) {
+				spellSlots['6'] = 2;
+			} else if (casterLevel >= 11) {
+				spellSlots['6'] = 1;
+			}
+			if (casterLevel >= 20) {
+				spellSlots['7'] = 2;
+			} else if (casterLevel >= 13) {
+				spellSlots['7'] = 1;
+			}
+			if (casterLevel >= 15) {
+				spellSlots['8'] = 1;
+			}
+			if (casterLevel >= 17) {
+				spellSlots['9'] = 1;
+			}
+		}
+
+		if (casterType === 'half') {
+			if (casterLevel >= 5) {
+				spellSlots['1'] = 4;
+			} else if (casterLevel >= 3) {
+				spellSlots['1'] = 3;
+			} else if (casterLevel === 2) {
+				spellSlots['1'] = 2;
+			}
+			if (casterLevel >= 7) {
+				spellSlots['2'] = 3;
+			} else if (casterLevel >= 5) {
+				spellSlots['2'] = 2;
+			}
+			if (casterLevel >= 11) {
+				spellSlots['3'] = 3;
+			} else if (casterLevel >= 9) {
+				spellSlots['3'] = 2;
+			}
+			if (casterLevel >= 17) {
+				spellSlots['4'] = 3;
+			} else if (casterLevel >= 15) {
+				spellSlots['4'] = 2;
+			} else if (casterLevel >= 13) {
+				spellSlots['4'] = 1;
+			}
+			if (casterLevel >= 19) {
+				spellSlots['5'] = 2;
+			} else if (casterLevel >= 17) {
+				spellSlots['5'] = 1;
+			}
+		}
+
+		if (casterType === 'third') {
+			if (casterLevel >= 7) {
+				spellSlots['1'] = 4;
+			} else if (casterLevel >= 4) {
+				spellSlots['1'] = 3;
+			} else if (casterLevel === 3) {
+				spellSlots['1'] = 2;
+			}
+			if (casterLevel >= 10) {
+				spellSlots['2'] = 3;
+			} else if (casterLevel >= 7) {
+				spellSlots['2'] = 2;
+			}
+			if (casterLevel >= 16) {
+				spellSlots['3'] = 3;
+			} else if (casterLevel >= 13) {
+				spellSlots['3'] = 2;
+			}
+			if (casterLevel >= 19) {
+				spellSlots['4'] = 1;
+			}
+		}
+
 		for (var i = 1; i <= 9; i++) {
-			var slotCalc = spellSlots[i] || 0;
+			var slotCalc = spellSlots[i];
 			finalSetAttrs['spell_slots_l' + i + '_calc'] = slotCalc;
 
 			var slotBonus = getIntValue(v['spell_slots_l' + i + '_bonus']);
