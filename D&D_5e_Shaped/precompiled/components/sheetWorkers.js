@@ -757,7 +757,7 @@ var updateArmor = function (rowId) {
 
 	var options = {
 		collection: 'armor',
-		getExtraFields: ['medium_armor_max_dex', 'ac_unarmored_ability', 'ac_unarmored_bonus'],
+		getExtraFields: ['medium_armor_max_dex', 'dexterity_mod', 'ac_unarmored_ability'],
 		toggle: 'worn'
 	};
 	for (var i = 0; i < ABILITIES.length; i++) {
