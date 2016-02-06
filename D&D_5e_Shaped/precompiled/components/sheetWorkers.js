@@ -18,13 +18,25 @@ function getFloatValue(value, defaultValue) {
 	}
 	return parseFloat(value) || defaultValue;
 }
+function getAbilityName(varName) {
+	if (!varName) {
+		return 'strength';
+	}
+	return getAbilityModName(varName).replace('_mod', '');
+}
+function getAbilityModName(varName) {
+	if (!varName) {
+		return 'strength_mod';
+	}
+	return varName.replace(/\W/g, '');
+}
 function getAbilityValue(v, varName, defaultAbility) {
 	if (!varName) {
 		if (defaultAbility) {
 			return getIntValue(v[defaultAbility]);
 		}
 	} else if (exists(varName)) {
-		varName = varName.replace(/\W/g, '');
+		varName = getAbilityModName(varName);
 		return getIntValue(v[varName], -5);
 	}
 	return -5;
@@ -33,7 +45,7 @@ function getAbilityShortName(varName, capital) {
 	if (!varName) {
 		return 'Str';
 	}
-	varName = varName.replace(/\W/g, '');
+	varName = getAbilityModName(varName);
 	if (capital) {
 		varName = capitalizeFirstLetter(varName);
 	}
@@ -209,8 +221,8 @@ on('change:charisma change:charisma_bonus', function () {
 on('change:dexterity_mod', function () {
 	updateArmor();
 });
-
 on('change:strength_mod change:dexterity_mod change:constitution_mod change:intelligence_mod change:wisdom_mod change:charisma_mod', function () {
+	console.log('---------------------mod adjusted------------------------');
 	updateSkill();
 	updateAttack();
 	updateSpell();
@@ -893,7 +905,7 @@ var updateInitiative = function () {
 		setFinalAttrs(v, finalSetAttrs);
 	});
 };
-on('change:dexterity_mod change:initiative_bonus change:jack_of_all_trades_toggle change:jack_of_all_trades change:global_check_bonus', function () {
+on('change:dexterity_mod change:dexterity_check_bonus change:initiative_bonus change:jack_of_all_trades_toggle change:jack_of_all_trades change:global_check_bonus', function () {
 	updateInitiative();
 });
 
@@ -1532,12 +1544,14 @@ on('change:halfling_luck', function () {
 });
 
 var updateSkill = function (rowId) {
+	console.log('updateSkill', rowId);
 	var repeatingItem = 'repeating_skill';
 	var collectionArray = ['jack_of_all_trades_toggle', 'jack_of_all_trades', 'pb', 'exp', 'global_check_bonus'];
 	var finalSetAttrs = {};
 
 	for (var i = 0; i < ABILITIES.length; i++) {
 		collectionArray.push(ABILITIES[i] + '_mod');
+		collectionArray.push(ABILITIES[i] + '_check_bonus');
 	}
 
 	getSectionIDs(repeatingItem, function (ids) {
@@ -1587,17 +1601,33 @@ var updateSkill = function (rowId) {
 					totalFormula += exp + '[expertise]';
 				}
 
-				var skillAbility = getAbilityValue(v, v[repeatingString + 'ability'], 'strength_mod');
-				total += skillAbility;
-				totalFormula += ADD + skillAbility + '[' + getAbilityShortName(v[repeatingString + 'ability']) + ']';
+				var skillAbility = getAbilityValue(v, ability, 'strength_mod');
+				if (exists(skillAbility)) {
+					total += skillAbility;
+					totalFormula += ADD + skillAbility + '[' + getAbilityShortName(ability) + ']';
+				}
 
 				var skillBonus = getIntValue(v[repeatingString + 'bonus']);
-				total += skillBonus;
-				totalFormula += ADD + skillBonus + '[bonus]';
+				if (exists(skillBonus)) {
+					total += skillBonus;
+					totalFormula += ADD + skillBonus + '[bonus]';
+				}
+
+				var skillAbilityName = getAbilityName(ability);
+				if (exists(skillAbilityName)) {
+					var checkBonus = v[skillAbilityName + '_check_bonus'];
+					if (exists(checkBonus)) {
+						checkBonus = getIntValue(checkBonus);
+						total += checkBonus;
+						totalFormula += ADD + checkBonus + '[' + getAbilityShortName(ability) + ' check bonus]';
+					}
+				}
 
 				var globalCheckBonus = getIntValue(v.global_check_bonus);
-				total += globalCheckBonus;
-				totalFormula += ADD + globalCheckBonus + '[global check bonus]';
+				if (exists(globalCheckBonus)) {
+					total += globalCheckBonus;
+					totalFormula += ADD + globalCheckBonus + '[global check bonus]';
+				}
 
 				finalSetAttrs[repeatingString + 'total'] = total;
 				finalSetAttrs[repeatingString + 'formula'] = totalFormula;
@@ -1612,12 +1642,13 @@ var updateSkill = function (rowId) {
 on('change:repeating_skill', function (eventInfo) {
 	var changedField = getRepeatingField('repeating_skill', eventInfo);
 	if (changedField !== 'ability_short_name' && changedField !== 'total' && changedField !== 'formula') {
+		console.log('changedField', changedField);
 		var rowId = getRowId('repeating_skill', eventInfo);
-		console.log('updateSkill(rowId)', rowId);
+		console.log('change:repeating_skill', rowId);
 		updateSkill(rowId);
 	}
 });
-on('change:jack_of_all_trades_toggle change:jack_of_all_trades', function () {
+on('change:jack_of_all_trades_toggle change:jack_of_all_trades change:global_check_bonus change:strength_check_bonus change:dexterity_check_bonus change:constitution_check_bonus change:intelligence_check_bonus change:wisdom_check_bonus change:charisma_check_bonus', function () {
 	updateSkill();
 });
 
