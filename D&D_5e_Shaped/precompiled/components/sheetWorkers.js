@@ -1814,7 +1814,7 @@ var updateAttachers = function () {
 						var attacherName = v[repeatingString + 'name'] || '';
 
 						var freeText = v[repeatingString + 'freetext'];
-						if(exists(freeText)) {
+						if(exists(attacherName) && exists(freeText)) {
 							finalSetAttrs['attacher_' + itemsToPush[x]] += '{{' + attacherName + '=' + freeText + '}}' + ' ';
 						}
 						var freeForm = v[repeatingString + 'freeform'];
