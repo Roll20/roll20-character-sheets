@@ -595,8 +595,11 @@ var updatePb = function () {
 	var finalSetAttrs = {};
 
 	getAttrs(collectionArray, function (v) {
+		var pb = 2;
 		var level = getIntValue(v.level);
-		var pb = 2 + Math.floor(Math.abs((level - 1) / 4));
+		if (exists(level)) {
+			pb += Math.floor(Math.abs((level - 1) / 4));
+		}
 		finalSetAttrs.pb = pb;
 		finalSetAttrs.exp = pb * 2;
 		finalSetAttrs.h_PB = pb / 2;
