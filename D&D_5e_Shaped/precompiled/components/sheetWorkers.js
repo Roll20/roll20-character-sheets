@@ -1,4 +1,4 @@
-var currentVersion = '2.0.1';
+var currentVersion = '2.0.5';
 
 function capitalizeFirstLetter(string) {
 	return string.charAt(0).toUpperCase() + string.slice(1);
@@ -1582,6 +1582,11 @@ var updateSkill = function (rowId) {
 			for (var j = 0; j < ids.length; j++) {
 				var repeatingString = repeatingItem + '_' + ids[j] + '_';
 
+				var skillName = v[repeatingString + 'name'];
+				if (!exists(skillName)) {
+					return;
+				}
+
 				var ability = getAbilityModName(v[repeatingString + 'ability']);
 				console.log('ability', ability);
 				finalSetAttrs[repeatingString + 'ability_short_name'] = getAbilityShortName(ability, true);
@@ -1774,6 +1779,9 @@ var sheetOpened = function () {
 
 		console.log('sheetOpened', finalSetAttrs);
 		setFinalAttrs(v, finalSetAttrs);
+
+		updateInitiative();
+		updateArmor();
 	});
 };
 
