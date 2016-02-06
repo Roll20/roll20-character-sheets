@@ -1,5 +1,7 @@
 var currentVersion = '2.0.1';
 
+var abilities = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
+
 var capitalizeFirstLetter = function (string) {
 	return string.charAt(0).toUpperCase() + string.slice(1);
 };
@@ -190,24 +192,12 @@ var updateAbilityModifier = function (ability) {
     setFinalAttrs(v, finalSetAttrs);
 	});
 };
-on('change:strength change:strength_bonus', function () {
-	updateAbilityModifier('strength');
-});
-on('change:dexterity change:dexterity_bonus', function () {
-	updateAbilityModifier('dexterity');
-});
-on('change:constitution change:constitution_bonus', function () {
-	updateAbilityModifier('constitution');
-});
-on('change:intelligence change:intelligence_bonus', function () {
-	updateAbilityModifier('intelligence');
-});
-on('change:wisdom change:wisdom_bonus', function () {
-	updateAbilityModifier('wisdom');
-});
-on('change:charisma change:charisma_bonus', function () {
-	updateAbilityModifier('charisma');
-});
+
+for (var i = 0; i < abilities.length; i++) {
+	on('change:' + abilities[i] + ' change:' + abilities[i] + '_bonus', function () {
+		updateAbilityModifier(abilities[i]);
+	});
+}
 on('change:dexterity_mod', function () {
   updateArmor();
 });
@@ -663,14 +653,15 @@ var sumRepeating = function (options, sumItems) {
 				var qty = getIntValue(v[repeatingString + options.qty], 1);
 
 				for (var x = 0; x < sumItems.length; x++) {
-					var fieldToAdd = getFloatValue(v[repeatingString + sumItems[x].fieldToAdd]);
-					if(sumItems[x].bonus) {
-						fieldToAdd += getFloatValue(v[repeatingString + sumItems[x].bonus]);
+					var sumItem = sumItems[x];
+					var fieldToAdd = getFloatValue(v[repeatingString + sumItem.fieldToAdd]);
+					if(sumItem.bonus) {
+						fieldToAdd += getFloatValue(v[repeatingString + sumItem.bonus]);
 					}
-					if(sumItems[x].armorType) {
-						if(v[repeatingString + sumItems[x].armorType] === 'Light Armor') {
+					if(sumItem.armorType) {
+						if(v[repeatingString + sumItem.armorType] === 'Light Armor') {
 							fieldToAdd += dexMod;
-						} else if (v[repeatingString + sumItems[x].armorType] === 'Medium Armor') {
+						} else if (v[repeatingString + sumItem.armorType] === 'Medium Armor') {
 							var mediumArmorDexMod = getIntValue(v.medium_armor_max_dex, 2);
 							fieldToAdd += Math.min(mediumArmorDexMod, dexMod);
 						}
@@ -678,8 +669,8 @@ var sumRepeating = function (options, sumItems) {
 
 					var itemTotal = Math.round(qty * fieldToAdd * 100) / 100;
 
-					if(sumItems[x].itemTotal) {
-						finalSetAttrs[repeatingString + sumItems[x].itemTotal] = itemTotal;
+					if(sumItem.itemTotal) {
+						finalSetAttrs[repeatingString + sumItem.itemTotal] = itemTotal;
 					}
 
 					var toggle = v[repeatingString + options.toggle];
@@ -687,30 +678,31 @@ var sumRepeating = function (options, sumItems) {
 						var addToPrimary = true;
 						var addToSecondary = false;
 
-						if(sumItems[x].armorType) {
-							if (v[repeatingString + sumItems[x].armorType] === 'Shield') {
+						if(sumItem.armorType) {
+							if (v[repeatingString + sumItem.armorType] === 'Shield') {
 								addToSecondary = true;
-							} else if (v[repeatingString + sumItems[x].armorType] === 'Unarmored') {
+							} else if (v[repeatingString + sumItem.armorType] === 'Unarmored') {
 								addToPrimary = false;
 								addToSecondary = true;
 							}
 						}
 
 						if (addToPrimary) {
-							finalSetAttrs[sumItems[x].totalField] += itemTotal;
+							finalSetAttrs[sumItem.totalField] += itemTotal;
 						}
 						if (addToSecondary) {
-							finalSetAttrs[sumItems[x].totalFieldSecondary] += itemTotal;
+							finalSetAttrs[sumItem.totalFieldSecondary] += itemTotal;
 						}
 					}
 				}
 			}
-			for (var x = 0; x < sumItems.length; x++) {
-				if (sumItems[x].totalField && !exists(finalSetAttrs[sumItems[x].totalField])) {
-					finalSetAttrs[sumItems[x].totalField] = 0;
+			for (var y = 0; y < sumItems.length; y++) {
+				var item = sumItems[y];
+				if (item.totalField && !exists(finalSetAttrs[item.totalField])) {
+					finalSetAttrs[item.totalField] = 0;
 				}
-				if (sumItems[x].totalFieldSecondary && !exists(finalSetAttrs[sumItems[x].totalFieldSecondary])) {
-					finalSetAttrs[sumItems[x].totalFieldSecondary] = 0;
+				if (item.totalFieldSecondary && !exists(finalSetAttrs[item.totalFieldSecondary])) {
+					finalSetAttrs[item.totalFieldSecondary] = 0;
 				}
 			}
 
@@ -767,9 +759,12 @@ var updateArmor = function (rowId) {
 
 	var options = {
 		collection: 'armor',
-		getExtraFields: ['dexterity_mod', 'medium_armor_max_dex', 'ac_unarmored_ability', 'ac_unarmored_bonus', 'strength_mod', 'dexterity_mod', 'constitution_mod', 'intelligence_mod', 'wisdom_mod', 'charisma_mod'],
+		getExtraFields: ['medium_armor_max_dex', 'ac_unarmored_ability', 'ac_unarmored_bonus'],
 		toggle: 'worn'
 	};
+	for (var i = 0; i < abilities.length; i++) {
+		options.getExtraFields.push(abilities[i] + '_mod');
+	}
 	var sumItems = [
 		{
 			fieldToAdd: 'weight',
@@ -1210,7 +1205,7 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 	}
 };
 
-updateHealToggle = function (v, finalSetAttrs, repeatingString) {
+var updateHealToggle = function (v, finalSetAttrs, repeatingString) {
   var healParse = {
 	  addCastingModifier: exists(v[repeatingString + 'add_casting_modifier']),
     parseName: 'heal',
@@ -1243,7 +1238,7 @@ updateHealToggle = function (v, finalSetAttrs, repeatingString) {
 	console.log('updateHealToggle', finalSetAttrs);
 };
 
-updateHigherLevelToggle = function (v, finalSetAttrs, repeatingString) {
+var updateHigherLevelToggle = function (v, finalSetAttrs, repeatingString) {
 	var higherLevelParse = {
 		addCastingModifier: exists(v[repeatingString + 'add_casting_modifier']),
 		parseName: 'higherLevel',
@@ -1331,8 +1326,12 @@ var updateAttackQuery = function () {
 
 var updateAttack = function (rowId) {
 	var repeatingItem = 'repeating_attack';
-	var collectionArray = ['pb', 'finesse_mod', 'strength_mod', 'dexterity_mod', 'constitution_mod', 'intelligence_mod', 'wisdom_mod', 'charisma_mod', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability'];
+	var collectionArray = ['pb', 'finesse_mod', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability'];
 	var finalSetAttrs = {};
+
+	for (var i = 0; i < abilities.length; i++) {
+		collectionArray.push(abilities[i] + '_mod');
+	}
 
 	getSectionIDs(repeatingItem, function (ids) {
     if (rowId) {
@@ -1418,8 +1417,12 @@ var updateAttack = function (rowId) {
 
 var updateSpell = function (rowId) {
 	var repeatingItem = 'repeating_spell';
-	var collectionArray = ['pb', 'finesse_mod', 'strength_mod', 'dexterity_mod', 'constitution_mod', 'intelligence_mod', 'wisdom_mod', 'charisma_mod', 'global_spell_attack_bonus', 'global_spell_damage_bonus', 'global_spell_dc_bonus', 'global_spell_heal_bonus', 'default_ability'];
+	var collectionArray = ['pb', 'finesse_mod', 'global_spell_attack_bonus', 'global_spell_damage_bonus', 'global_spell_dc_bonus', 'global_spell_heal_bonus', 'default_ability'];
 	var finalSetAttrs = {};
+
+	for (var i = 0; i < abilities.length; i++) {
+		collectionArray.push(abilities[i] + '_mod');
+	}
 
 	getSectionIDs(repeatingItem, function (ids) {
     if (rowId) {
@@ -1556,8 +1559,12 @@ on('change:halfling_luck', function () {
 
 var updateSkill = function (rowId) {
 	var repeatingItem = 'repeating_skill';
-	var collectionArray = ['jack_of_all_trades_toggle', 'jack_of_all_trades', 'pb', 'exp', 'strength_mod', 'dexterity_mod', 'constitution_mod', 'intelligence_mod', 'wisdom_mod', 'charisma_mod', 'global_check_bonus'];
+	var collectionArray = ['jack_of_all_trades_toggle', 'jack_of_all_trades', 'pb', 'exp', 'global_check_bonus'];
 	var finalSetAttrs = {};
+
+	for (var i = 0; i < abilities.length; i++) {
+		collectionArray.push(abilities[i] + '_mod');
+	}
 
 	getSectionIDs(repeatingItem, function (ids) {
     if (rowId) {
@@ -1747,9 +1754,16 @@ on('sheet:opened', function () {
 
 var updateAttachers = function () {
   var repeatingItem = 'repeating_attacher';
-  var collectionArray = ['attacher_strength_check', 'attacher_dexterity_check', 'attacher_constitution_check', 'attacher_intelligence_check', 'attacher_wisdom_check', 'attacher_charisma_check', 'attacher_initiative', 'attacher_strength_saving_throw', 'attacher_dexterity_saving_throw', 'attacher_constitution_saving_throw', 'attacher_intelligence_saving_throw', 'attacher_wisdom_saving_throw', 'attacher_charisma_saving_throw', 'attr_attacher_death_saving_throw', 'attacher_hit_dice', 'attacher_attack', 'attacher_spell'];
+  var collectionArray = ['attacher_initiative', 'attr_attacher_death_saving_throw', 'attacher_hit_dice', 'attacher_attack', 'attacher_spell'];
   var finalSetAttrs = {};
-  var itemsToPush = ['strength_check', 'dexterity_check', 'constitution_check', 'intelligence_check', 'wisdom_check', 'charisma_check', 'initiative', 'strength_saving_throw', 'dexterity_saving_throw', 'constitution_saving_throw', 'intelligence_saving_throw', 'wisdom_saving_throw', 'charisma_saving_throw', 'death_saving_throw', 'hit_dice', 'attack', 'spell'];
+	var itemsToPush = ['initiative', 'death_saving_throw', 'hit_dice', 'attack', 'spell'];
+
+	for (var i = 0; i < abilities.length; i++) {
+		collectionArray.push('attacher_' + abilities[i] + '_check');
+		collectionArray.push('attacher_' + abilities[i] + '_saving_throw');
+		itemsToPush.push(abilities[i] + '_check');
+		itemsToPush.push(abilities[i] + '_saving_throw');
+	}
 
   getSectionIDs(repeatingItem, function (ids) {
     for (var i = 0; i < ids.length; i++) {
