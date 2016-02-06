@@ -382,7 +382,6 @@ var updateLevels = function () {
 			casterLevel += Math.floor(spellcasting.third / 3);
 			finalSetAttrs.caster_level = casterLevel;
 
-
 			if (classesWithSpellcasting > 1 || spellcasting.full) {
 				console.log('first if');
 				finalSetAttrs.caster_type = 'full';
@@ -398,8 +397,6 @@ var updateLevels = function () {
 			}
 
 			console.log('finalSetAttrs.caster_type', finalSetAttrs.caster_type);
-
-			updateSpellSlots(v, finalSetAttrs, casterLevel);
 
 			finalSetAttrs.level = totalLevel;
 			finalSetAttrs.class_and_level = levelArray.join(' ');
@@ -442,7 +439,7 @@ on('change:repeating_class remove:repeating_class', function () {
 });
 
 var updateSpellSlots = function () {
-	var collectionArray = ['caster_level', 'caster_type'];
+	var collectionArray = ['level', 'caster_level', 'caster_type'];
 	var finalSetAttrs = {};
 
 	var spellSlots = {
@@ -464,13 +461,15 @@ var updateSpellSlots = function () {
 		collectionArray.push(repeatingString + 'max');
 	}
 	getAttrs(collectionArray, function (v) {
-		var casterLevel = getIntValue(v.caster_level);
+		var casterLevel = getIntValue(v.level);
 		var casterType = v.caster_type;
 		if (!exists(casterType)) {
 			casterType = 'full';
 		}
 
 		if (casterType === 'full') {
+			casterLevel = getIntValue(v.caster_level);
+
 			if (casterLevel >= 3) {
 				spellSlots['1'] = 4;
 			} else if (casterLevel === 2) {
