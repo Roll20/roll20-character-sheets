@@ -1664,7 +1664,7 @@ on('change:jack_of_all_trades_toggle change:jack_of_all_trades change:global_che
 });
 
 var sheetOpened = function () {
-	var collectionArray = ['version'];
+	var collectionArray = ['version', 'strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
 	var finalSetAttrs = {};
 
 	getAttrs(collectionArray, function (v) {
@@ -1673,20 +1673,31 @@ var sheetOpened = function () {
 		if (!version) {
 			updatePb();
 
-			var setAbilities = {
-				strength: 10,
-				strength_mod: 0,
-				dexterity: 10,
-				dexterity_mod: 0,
-				constitution: 10,
-				constitution_mod: 0,
-				intelligence: 10,
-				intelligence_mod: 0,
-				wisdom: 10,
-				wisdom_mod: 0,
-				charisma: 10,
-				charisma_mod: 0
-			};
+			var setAbilities = {};
+			if (!exists(v.strength)) {
+				setAbilities.strength = 10;
+				setAbilities.strength_mod = 0;
+			}
+			if (!exists(v.dexterity)) {
+				setAbilities.dexterity = 10;
+				setAbilities.dexterity_mod = 0;
+			}
+			if (!exists(v.constitution)) {
+				setAbilities.constitution = 10;
+				setAbilities.constitution_mod = 0;
+			}
+			if (!exists(v.intelligence)) {
+				setAbilities.intelligence = 10;
+				setAbilities.intelligence_mod = 0;
+			}
+			if (!exists(v.wisdom)) {
+				setAbilities.wisdom = 10;
+				setAbilities.wisdom_mod = 0;
+			}
+			if (!exists(v.charisma)) {
+				setAbilities.charisma = 10;
+				setAbilities.charisma_mod = 0;
+			}
 			setFinalAttrs(v, setAbilities);
 
 			var skills = [
