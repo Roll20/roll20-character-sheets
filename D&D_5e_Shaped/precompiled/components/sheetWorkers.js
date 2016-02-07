@@ -1,4 +1,4 @@
-var currentVersion = '2.0.5';
+var currentVersion = '2.0.6';
 
 function capitalizeFirstLetter(string) {
 	return string.charAt(0).toUpperCase() + string.slice(1);
