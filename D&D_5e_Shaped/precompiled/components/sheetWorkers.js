@@ -1486,9 +1486,14 @@ var updateSpell = function (rowId) {
 					return;
 				}
 
-				var spellLevel = v[repeatingString + 'spell_level'];
-				if (!exists(spellLevel)) {
-					finalSetAttrs[repeatingString + 'spell_level'] = 0;
+				var spellLevel = getIntValue(v[repeatingString + 'spell_level']);
+				if (exists(spellLevel)) {
+					var friendlyLevel = spellLevel;
+					if (spellLevel === 0) {
+						friendlyLevel = 'Cantrip';
+					}
+					finalSetAttrs[repeatingString + 'level_readable'] = friendlyLevel;
+					finalSetAttrs[repeatingString + 'spell_level'] = spellLevel;
 				}
 
 				var spellComponents = v[repeatingString + 'components'];
