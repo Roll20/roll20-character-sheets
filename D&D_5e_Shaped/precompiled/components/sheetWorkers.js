@@ -78,10 +78,7 @@ function setFinalAttrs(v, finalSetAttrs) {
 	if (!isEmpty(finalSetAttrs)) {
 		for (var key in finalSetAttrs) {
 			if (finalSetAttrs.hasOwnProperty(key)) {
-				if (
-					v[key] === finalSetAttrs[key] ||
-					(!v[key] && finalSetAttrs[key] === 0)
-				) {
+				if (v[key] === finalSetAttrs[key]) {
 					delete finalSetAttrs[key];
 				}
 			}
@@ -1691,7 +1688,7 @@ var sheetOpened = function () {
 	var finalSetAttrs = {};
 
 	getAttrs(collectionArray, function (v) {
-		var version = getFloatValue(v.version);
+		var version = v.version;
 
 		if (!version) {
 			updatePb();
