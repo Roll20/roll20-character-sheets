@@ -163,7 +163,7 @@ var getAbilityMod = function (score) {
 };
 
 var updateAbilityModifier = function (ability) {
-	var collectionArray = [ability, ability + '_bonus', ability + '_mod', ability + '_check_mod', 'global_ability_bonus'];
+	var collectionArray = [ability, ability + '_bonus', ability + '_mod', ability + '_check_mod', 'global_ability_bonus', 'strength_mod', 'dexterity_mod'];
 	var finalSetAttrs = {};
 
 	getAttrs(collectionArray, function (v) {
