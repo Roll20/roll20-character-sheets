@@ -1337,6 +1337,7 @@ var updateAttack = function (rowId) {
 		}
 		for (var i = 0; i < ids.length; i++) {
 			var repeatingString = repeatingItem + '_' + ids[i] + '_';
+			collectionArray.push(repeatingString + 'name');
 			collectionArray.push(repeatingString + 'type');
 			collectionArray.push(repeatingString + 'roll_toggle');
 			collectionArray.push(repeatingString + 'to_hit');
@@ -1368,6 +1369,11 @@ var updateAttack = function (rowId) {
 		getAttrs(collectionArray, function (v) {
 			for (var j = 0; j < ids.length; j++) {
 				var repeatingString = repeatingItem + '_' + ids[j] + '_';
+
+				var attackName = v[repeatingString + 'name'];
+				if (!exists(attackName)) {
+					return;
+				}
 
 				if (!exists(v[repeatingString + 'parsed']) || v[repeatingString + 'parsed'].indexOf('modifiers') === -1) {
 					var attackModifiers = v[repeatingString + 'modifiers'];
@@ -1428,6 +1434,7 @@ var updateSpell = function (rowId) {
 		}
 		for (var i = 0; i < ids.length; i++) {
 			var repeatingString = repeatingItem + '_' + ids[i] + '_';
+			collectionArray.push(repeatingString + 'name');
 			collectionArray.push(repeatingString + 'type');
 			collectionArray.push(repeatingString + 'roll_toggle');
 			collectionArray.push(repeatingString + 'to_hit');
@@ -1473,6 +1480,11 @@ var updateSpell = function (rowId) {
 		getAttrs(collectionArray, function (v) {
 			for (var j = 0; j < ids.length; j++) {
 				var repeatingString = repeatingItem + '_' + ids[j] + '_';
+
+				var spellName = v[repeatingString + 'name'];
+				if (!exists(spellName)) {
+					return;
+				}
 
 				var spellLevel = v[repeatingString + 'spell_level'];
 				if (!exists(spellLevel)) {
