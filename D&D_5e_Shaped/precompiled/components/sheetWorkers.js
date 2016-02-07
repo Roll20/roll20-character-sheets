@@ -988,7 +988,10 @@ var updateAttackToggle = function (v, finalSetAttrs, repeatingString, options) {
 		}
 
 		var attackAbility = v[repeatingString + 'attack_ability'];
-		if (finalSetAttrs[repeatingString + 'attack_ability']) {
+		if (!exists(attackAbility) && v[repeatingString + 'type'] === 'Ranged Weapon') {
+			attackAbility = '@{dexterity_mod}';
+			finalSetAttrs[repeatingString + 'attack_ability'] = attackAbility;
+		} else if (finalSetAttrs[repeatingString + 'attack_ability']) {
 			attackAbility = finalSetAttrs[repeatingString + 'attack_ability'];
 		}
 		attackAbility = getAbilityValue(v, attackAbility, options.defaultAbility);
@@ -1084,6 +1087,11 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 		}
 
 		var damageAbility = v[repeatingString + 'damage_ability'];
+		if (!exists(damageAbility) && v[repeatingString + 'type'] === 'Ranged Weapon') {
+			damageAbility = '@{dexterity_mod}';
+			finalSetAttrs[repeatingString + 'damage_ability'] = damageAbility;
+		}
+
 		if (exists(damageAbility) || options.defaultDamageAbility) {
 			damageAbility = getAbilityValue(v, damageAbility, options.defaultDamageAbility);
 			if (exists(damageAbility)) {
