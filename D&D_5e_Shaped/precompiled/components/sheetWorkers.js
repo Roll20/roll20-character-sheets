@@ -1487,12 +1487,7 @@ var updateSpell = function (rowId) {
 				}
 
 				var spellLevel = getIntValue(v[repeatingString + 'spell_level']);
-				if (exists(spellLevel)) {
-					var friendlyLevel = spellLevel;
-					if (spellLevel === 0) {
-						friendlyLevel = 'Cantrip';
-					}
-					finalSetAttrs[repeatingString + 'level_readable'] = friendlyLevel;
+				if (!exists(spellLevel)) {
 					finalSetAttrs[repeatingString + 'spell_level'] = spellLevel;
 				}
 
