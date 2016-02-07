@@ -676,7 +676,7 @@ var sumRepeating = function (options, sumItems) {
 						var addToSecondary = false;
 
 						if (sumItem.armorType) {
-							if (v[repeatingString + sumItem.armorType] === 'Shield') {
+							if (v[repeatingString + sumItem.armorType] === 'Shield' || v[repeatingString + sumItem.armorType] === 'AC') {
 								addToSecondary = true;
 							} else if (v[repeatingString + sumItem.armorType] === 'Unarmored') {
 								addToPrimary = false;
