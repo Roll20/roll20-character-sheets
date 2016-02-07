@@ -78,7 +78,10 @@ function setFinalAttrs(v, finalSetAttrs) {
 	if (!isEmpty(finalSetAttrs)) {
 		for (var key in finalSetAttrs) {
 			if (finalSetAttrs.hasOwnProperty(key)) {
-				if (v[key] === finalSetAttrs[key]) {
+				if (
+					v[key] === finalSetAttrs[key] ||
+					(!v[key] && finalSetAttrs[key] === 0)
+				) {
 					delete finalSetAttrs[key];
 				}
 			}
