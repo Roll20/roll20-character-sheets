@@ -30,6 +30,32 @@
                         <div class="charsheet tab-pane" style="display: block;">
                             <!-- Begin custom sheet here -->
                             <div class="sheet-hex">
+                                <script type="text/worker">
+                                    on("change:strength", function() {
+                                        getAttrs(["strength"], function(values) {
+                                            switch (values.strength) {
+                                                case "1":
+                                                    setAttrs({ enclight: 10, encmedium: 25, encheavy: 50});
+                                                    break;
+                                                case "2":
+                                                    setAttrs({ enclight: 25, encmedium: 50, encheavy: 100});
+                                                    break;
+                                                case "3":
+                                                    setAttrs({ enclight: 50, encmedium: 100, encheavy: 250});
+                                                    break;
+                                                case "4":
+                                                    setAttrs({ enclight: 100, encmedium: 250, encheavy: 500});
+                                                    break;
+                                                case "5":
+                                                    setAttrs({ enclight: 250, encmedium: 500, encheavy: 750});
+                                                    break;
+                                                default:
+                                                    setAttrs({ enclight: 0, encmedium: 0, encheavy: 0});
+                                                    break;
+                                            } //end switch
+                                        });
+                                    }); //end on
+                                </script>
                                 <div class="sheet-2colrow">
                                     <!-- Left column -->
                                     <div class="sheet-col sheet-primary">
@@ -38,29 +64,35 @@
                                             <div class="sheet-col sheet-collapse-margin">
                                                 <label class="sheet-attr-input-label">
                                                     Body
-                                                    <input class="sheet-attr-input-text" name="attr_body" type="text" />
+                                                    <input class="sheet-attr-input-text body" name="attr_body" type="text" />
+                                                    <button type="roll" class="sheet-roll-button" name="roll_bodyroll" value="/roll (@{body}*2)d2>2"></button>
                                                 </label>
                                                 <label class="sheet-attr-input-label">
                                                     Dexterity
-                                                    <input class="sheet-attr-input-text" name="attr_dexterity" type="text" />
+                                                    <input class="sheet-attr-input-text dexterity" name="attr_dexterity" type="text" />
+                                                    <button type="roll" class="sheet-roll-button" value="/roll (@{dexterity}*2)d2>2"></button>
                                                 </label>
                                                 <label class="sheet-attr-input-label">
                                                     Strength
-                                                    <input class="sheet-attr-input-text" name="attr_strength" type="text" />
+                                                    <input class="sheet-attr-input-text strength" name="attr_strength" type="text" />
+                                                    <button type="roll" class="sheet-roll-button" value="/roll (@{strength}*2)d2>2"></button>
                                                 </label>
                                             </div>
                                             <div class="sheet-col sheet-collapse-margin">
                                                 <label class="sheet-attr-input-label">
                                                     Charisma
-                                                    <input class="sheet-attr-input-text" name="attr_charisma" type="text" />
+                                                    <input class="sheet-attr-input-text charisma" name="attr_charisma" type="text" />
+                                                    <button type="roll" class="sheet-roll-button" value="/roll (@{charisma}*2)d2>2"></button>
                                                 </label>
                                                 <label class="sheet-attr-input-label">
                                                     Intelligence
-                                                    <input class="sheet-attr-input-text" name="attr_intelligence" type="text" />
+                                                    <input class="sheet-attr-input-text intelligence" name="attr_intelligence" type="text" />
+                                                    <button type="roll" class="sheet-roll-button" value="/roll (@{intelligence}*2)d2>2"></button>
                                                 </label>
                                                 <label class="sheet-attr-input-label">
                                                     Willpower
-                                                    <input class="sheet-attr-input-text" name="attr_willpower" type="text" />
+                                                    <input class="sheet-attr-input-text willpower" name="attr_willpower" type="text" />
+                                                    <button type="roll" class="sheet-roll-button" value="/roll (@{willpower}*2)d2>2"></button>
                                                 </label>
                                             </div>
                                         </div>
@@ -78,18 +110,22 @@
                                                 </label>
                                                 <label class="sheet-attr-input-label">
                                                     Perception
-                                                    <input class="sheet-attr-input-text" name="attr_perception" type="text" />
+                                                    <input class="sheet-attr-input-text perception" name="attr_perception" type="text" />
+                                                    <button type="roll" class="sheet-roll-button" value="/roll @{perception}d2>2"></button>
                                                 </label>
                                             </div>
                                             <div class="sheet-col sheet-collapse-margin">
                                                 <label class="sheet-attr-input-label">
                                                     Initiative
-                                                    <input class="sheet-attr-input-text" type="text" />
+                                                    <input class="sheet-attr-input-text initiative" name="attr_initiative" type="text" />
+                                                    <button type="roll" class="sheet-roll-button" value="/roll @{initiative}d2>2"></button>
                                                 </label>
                                                 <label class="sheet-attr-input-label">
                                                     Defense
-                                                    <input class="sheet-attr-input-text" type="text" />
+                                                    <input class="sheet-attr-input-text defense" name="attr_defense" type="text" />
+                                                    <button type="roll" class="sheet-roll-button" value="/roll @{defense}d2>2"></button>
                                                 </label>
+                                                
                                                 <label class="sheet-attr-input-label">
                                                     Stun
                                                     <input class="sheet-attr-input-text" type="text" />
@@ -110,7 +146,7 @@
                                             <fieldset class="repeating_skills">
                                                 <div class="sheet-skill-row-1">
                                                     <div class="sheet-skill-name">
-                                                        <input type="text" name="attr_skillname" class="sheet-free-input" />
+                                                        <input type="text" name="attr_skillname" class="sheet-free-input skillname" />
                                                     </div>
                                                     <div class="sheet-skill-base">
                                                         <input type="text" name="attr_skillbase" class="sheet-free-input" />
@@ -122,30 +158,14 @@
                                                         <input type="text" name="attr_skillrating" class="sheet-free-input skillrating" />
                                                     </div>
                                                     <div class="sheet-skill-avg">
-                                                        <input type="text" name="attr_skillaverage" class="sheet-free-input" />
+                                                        <input type="text" name="attr_skillaverage" class="sheet-free-input" value="@{skillrating}/2" disabled="disabled"/>
                                                     </div>
                                                     <div class="sheet-skill-roll">
-                                                        <button type="roll" value="/roll @{skillrating}d2>2"></button>
+                                                        <button type="roll" value="/roll @{skillrating}d2>2" name="roll_@{skillname}"></button>
                                                     </div>
                                                 </div>
                                             </fieldset>
                                         </div>
-                                        <!-- Talents -->
-                                        <h1 class="sheet-top-separator">Talents</h1>
-                                        <fieldset class="repeating_talents">
-                                            <input class="sheet-free-input" name="attr_talent" type="text" />
-                                        </fieldset>
-
-                                        <h1 class="sheet-top-separator">Resources</h1>
-                                        <fieldset class="repeating_resources">
-                                            <input class="sheet-free-input" name="attr_resource" type="text" />
-                                        </fieldset>
-
-                                        <h1 class="sheet-top-separator">Flaws</h1>
-                                        <fieldset class="repeating_flaws">
-                                            <input class="sheet-free-input" name="attr_flaw" type="text" />
-                                        </fieldset>
-
                                         <!-- Weapons -->
                                         <div class="sheet-top-separator sheet-bottom-separator sheet-heading-with-columns sheet-weapons">
                                             <h1>Weapons</h1>
@@ -155,24 +175,23 @@
                                                         <input type="text" name="attr_weaponname" class="sheet-free-input" />
                                                     </div>
                                                     <div class="sheet-weapon-dmg">
-                                                        <input type="text" name="attr_weapondmg" class="sheet-free-input" />
+                                                        <input type="text" name="attr_weapondmg" class="sheet-free-input weapondmg" />
                                                         <span>Dmg</span>
                                                     </div>
                                                     <div class="sheet-weapon-mod">
-                                                        <input type="text" name="attr_weaponmod" class="sheet-free-input" />
+                                                        <input type="text" name="attr_weaponmod" class="sheet-free-input weaponmod" value="0" />
                                                         <span>Mod</span>
                                                     </div>
                                                     <div class="sheet-weapon-attack">
-                                                        <input type="text" name="attr_weaponattack" class="sheet-free-input" />
+                                                        <input type="text" name="attr_weaponattack" class="sheet-free-input weaponattack" />
                                                         <span>Attack</span>
                                                     </div>
                                                     <div class="sheet-weapon-avg">
-                                                        <input type="text" name="attr_weaponavg" class="sheet-free-input" />
+                                                        <input type="text" name="attr_weaponavg" class="sheet-free-input" value="@{weaponattack}/2" disabled="disabled" />
                                                         <span>(Avg)</span>
                                                     </div>
-                                                    <div class="sheet-weapon-speed">
-                                                        <input type="text" name="attr_weaponspeed" class="sheet-free-input" />
-                                                        <span>Spd</span>
+                                                    <div class="sheet-weapon-roll">
+                                                        <button type="roll" value="/roll (@{weaponattack}+@{weaponmod})d2>2"></button>
                                                     </div>
                                                 </div>
                                                 <div class="sheet-weapon-row-2">
@@ -182,6 +201,10 @@
                                                         <div class="sheet-weapon-notes">
                                                             <input type="text" name="attr_weaponnotes" class="sheet-free-input" />
                                                             <span>Notes</span>
+                                                        </div>
+                                                        <div class="sheet-weapon-speed">
+                                                            <input type="text" name="attr_weaponspeed" class="sheet-free-input" />
+                                                            <span>Spd</span>
                                                         </div>
                                                         <div class="sheet-weapon-range">
                                                             <input type="text" name="attr_weaponrange" class="sheet-free-input" />
@@ -203,6 +226,21 @@
                                                 </div>
                                             </fieldset>
                                         </div>
+                                        <!-- Talents -->
+                                        <h1 class="sheet-top-separator">Talents</h1>
+                                        <fieldset class="repeating_talents">
+                                            <input class="sheet-free-input" name="attr_talent" type="text" />
+                                        </fieldset>
+
+                                        <h1 class="sheet-top-separator">Resources</h1>
+                                        <fieldset class="repeating_resources">
+                                            <input class="sheet-free-input" name="attr_resource" type="text" />
+                                        </fieldset>
+
+                                        <h1 class="sheet-top-separator">Flaws</h1>
+                                        <fieldset class="repeating_flaws">
+                                            <input class="sheet-free-input" name="attr_flaw" type="text" />
+                                        </fieldset>
 
                                         <div class="sheet-2colrow sheet-top-separator">
                                             <div class="sheet-col sheet-languages">
@@ -215,17 +253,17 @@
                                                 <h1 class="sheet-bottom-separator">Encumbrance</h1>
                                                 <label class="sheet-attr-input-label">
                                                     <span class="sheet-field">Light</span>
-                                                    <input class="sheet-widest-input-text" name="attr_enclight" type="text" />
+                                                    <input class="sheet-widest-input-text" name="attr_enclight" type="text"/>
                                                     <span class="sheet-subtext">lbs</span>
                                                 </label>
                                                 <label class="sheet-attr-input-label">
                                                     <span class="sheet-field">Medium</span>
-                                                    <input class="sheet-widest-input-text" type="text" name="attr_encmedium" />
+                                                    <input class="sheet-widest-input-text" type="text" name="attr_encmedium"/>
                                                     <span class="sheet-subtext">lbs</span>
                                                 </label>
                                                 <label class="sheet-attr-input-label">
                                                     <span class="sheet-field">Heavy</span>
-                                                    <input class="sheet-widest-input-text" type="text" name="attr_encheavy" />
+                                                    <input class="sheet-widest-input-text" type="text" name="attr_encheavy"/>
                                                     <span class="sheet-subtext">lbs</span>
                                                 </label>
                                             </div>
