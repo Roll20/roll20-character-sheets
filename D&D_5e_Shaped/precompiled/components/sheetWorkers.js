@@ -656,11 +656,13 @@ var sumRepeating = function (options, sumItems) {
 						fieldToAdd += getFloatValue(v[repeatingString + sumItem.bonus]);
 					}
 					if (sumItem.armorType) {
-						if (v[repeatingString + sumItem.armorType] === 'Light Armor') {
-							fieldToAdd += dexMod;
+						if (!v[repeatingString + sumItem.armorType] || v[repeatingString + sumItem.armorType] === 'Light Armor') {
+							fieldToAdd += Math.min(5, dexMod);
 						} else if (v[repeatingString + sumItem.armorType] === 'Medium Armor') {
 							var mediumArmorDexMod = getIntValue(v.medium_armor_max_dex, 2);
 							fieldToAdd += Math.min(mediumArmorDexMod, dexMod);
+						} else if (v[repeatingString + sumItem.armorType] === 'Armor + Dex') {
+              fieldToAdd += dexMod;
 						}
 					}
 
