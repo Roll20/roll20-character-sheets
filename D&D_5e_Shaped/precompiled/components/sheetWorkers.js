@@ -1165,7 +1165,8 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 		var damageType = v[repeatingString + 'damage_type'];
 		if (exists(damageType)) {
 			if (hasUpperCase(damageType)) {
-				finalSetAttrs[repeatingString + 'damage_type'] = damageType.toLowerCase();
+				damageType = damageType.toLowerCase();
+				finalSetAttrs[repeatingString + 'damage_type'] = damageType;
 			}
 			damageString += SPACE + damageType;
 		}
@@ -1222,9 +1223,24 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 		var secondDamageType = v[repeatingString + 'second_damage_type'];
 		if (exists(secondDamageType)) {
 			if (hasUpperCase(secondDamageType)) {
-				finalSetAttrs[repeatingString + 'second_damage_type'] = secondDamageType.toLowerCase();
+				secondDamageType = secondDamageType.toLowerCase();
+				finalSetAttrs[repeatingString + 'second_damage_type'] = secondDamageType;
 			}
 			damageString += SPACE + secondDamageType;
+		}
+
+		if (!exists(v[repeatingString + 'parsed']) || v[repeatingString + 'parsed'].indexOf('damageProperties') === -1) {
+			var damageProperties = v[repeatingString + 'properties'];
+			if (exists(damageProperties)) {
+				if (damageProperties.indexOf('Versatile') !== -1) {
+					finalSetAttrs[repeatingString + 'second_damage_ability'] = finalSetAttrs[repeatingString + 'damage_ability'];
+					finalSetAttrs[repeatingString + 'second_damage_type'] = finalSetAttrs[repeatingString + 'damage_type'];
+				}
+				if (!finalSetAttrs[repeatingString + 'parsed']) {
+					finalSetAttrs[repeatingString + 'parsed'] = '';
+				}
+				finalSetAttrs[repeatingString + 'parsed'] += ' damageProperties';
+			}
 		}
 
 	}
@@ -1428,9 +1444,14 @@ var updateAttack = function (rowId) {
 						finalSetAttrs[repeatingString + 'parsed'] += ' modifiers';
 					}
 				}
-        if (!exists(v[repeatingString + 'parsed']) || v[repeatingString + 'parsed'].indexOf('properties') === -1) {
+        if (!exists(v[repeatingString + 'parsed']) || v[repeatingString + 'parsed'].indexOf('attackProperties') === -1) {
           var attackProperties = v[repeatingString + 'properties'];
           if (exists(attackProperties)) {
+	          if (attackProperties.indexOf('Reach') !== -1) {
+		          finalSetAttrs[repeatingString + 'reach'] = '10 ft';
+	          } else if (v[repeatingString + 'type'] === 'Melee Weapon') {
+		          finalSetAttrs[repeatingString + 'reach'] = '5 ft';
+	          }
             if (attackProperties.indexOf('Finesse') !== -1) {
               finalSetAttrs[repeatingString + 'attack_ability'] = '@{finesse_mod}';
               finalSetAttrs[repeatingString + 'damage_ability'] = '@{finesse_mod}';
@@ -1438,7 +1459,7 @@ var updateAttack = function (rowId) {
             if (!finalSetAttrs[repeatingString + 'parsed']) {
               finalSetAttrs[repeatingString + 'parsed'] = '';
             }
-            finalSetAttrs[repeatingString + 'parsed'] += ' properties';
+            finalSetAttrs[repeatingString + 'parsed'] += ' attackProperties';
           }
         }
 
