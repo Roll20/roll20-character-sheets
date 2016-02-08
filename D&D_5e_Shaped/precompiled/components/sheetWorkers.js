@@ -1,4 +1,4 @@
-var currentVersion = '2.0.6';
+var currentVersion = '2.0.7';
 
 function capitalizeFirstLetter(string) {
 	return string.charAt(0).toUpperCase() + string.slice(1);
@@ -132,6 +132,22 @@ function emptyIfUndefined(value) {
 		return '';
 	}
 	return value;
+}
+function ordinalSpellLevel(level) {
+  if (level === 0) {
+    return 'Cantrip'
+  } else {
+    switch (level % 10) {
+      case 1:
+        return level+'st-level';
+      case 2:
+        return level+'nd-level';
+      case 3:
+        return level+'rd-level';
+      default:
+        return level+'th-level';
+    }
+  }
 }
 
 var ABILITIES = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
@@ -1498,8 +1514,13 @@ var updateSpell = function (rowId) {
 
 				var spellLevel = getIntValue(v[repeatingString + 'spell_level']);
 				if (!exists(spellLevel)) {
-					finalSetAttrs[repeatingString + 'spell_level'] = spellLevel;
-				}
+          spellLevel = 0;
+          finalSetAttrs[repeatingString + 'spell_level'] = spellLevel;
+        }
+        if (spellLevel === 0) {
+          finalSetAttrs[repeatingString + 'is_prepared'] = 'on';
+        }
+        finalSetAttrs[repeatingString + 'friendly_level'] = ordinalSpellLevel(spellLevel);
 
 				var spellComponents = v[repeatingString + 'components'];
 				if (exists(spellComponents)) {
