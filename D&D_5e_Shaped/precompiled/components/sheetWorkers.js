@@ -304,6 +304,7 @@ var updateLevels = function () {
 	var levelArray = [];
 	var sorcererLevels = 0;
 	var classesWithSpellcasting = 0;
+  var xpTable = [0, 300, 900, 2700, 6500, 14000, 23000, 34000, 48000, 64000, 85000, 100000, 120000, 140000, 165000, 195000, 225000, 265000, 305000, 355000, 385000, 405000, 435000, 465000, 495000, 525000, 555000, 585000, 605000, 635000, 665000];
 
 	getSectionIDs(repeatingItem, function (ids) {
 		for (var i = 0; i < ids.length; i++) {
@@ -402,7 +403,18 @@ var updateLevels = function () {
 			console.log('finalSetAttrs.caster_type', finalSetAttrs.caster_type);
 
 			finalSetAttrs.level = totalLevel;
-			finalSetAttrs.class_and_level = levelArray.join(' ');
+      finalSetAttrs.class_and_level = levelArray.join(' ');
+
+      var xpForNextLevel = 0;
+      if (!totalLevel) {
+        totalLevel = 0;
+      }
+      if (totalLevel > 30) {
+        xpForNextLevel = xpTable[30];
+      } else {
+        xpForNextLevel = xpTable[totalLevel];
+      }
+      finalSetAttrs.xp_next_level = xpForNextLevel;
 
 			if (sorcererLevels > 0) {
 				finalSetAttrs.has_sorcerer_levels = 'on';
