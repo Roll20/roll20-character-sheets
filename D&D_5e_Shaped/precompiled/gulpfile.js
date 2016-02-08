@@ -18,7 +18,6 @@ var actionCount = 12;
 var lairActionCount = 4;
 var legendaryActionCount = 4;
 var customClassCount = 6;
-var abilitiesName = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'];
 var translations = {};
 
 String.prototype.capitalize = function () {
@@ -105,75 +104,8 @@ function duplicate(file, limit, start) {
 	return s.join('\n\n');
 }
 
-function saveQuery(file) {
-	var template = file.contents.toString('utf8');
-	var query = '?{Saving Throw';
-
-	for (var i = 0; i < abilitiesName.length; ++i) {
-		var ability = abilitiesName[i];
-		query += '|' + ability + ', {{title=' + ability + '&amp;#125;&amp;#125; {{roll_toggle=1&amp;#125;&amp;#125; {{roll1=[[d20@{d20_mod} + @{' + ability.toLowerCase() + '_save_mod}]]&amp;#125;&amp;#125; {{roll2=[[d20@{d20_mod} + @{' + ability.toLowerCase() + '_save_mod}]]&amp;#125;&amp;#125;';
-	}
-	query += '|Death, {{death_save=1&amp;#125;&amp;#125; {{title=Death Save&amp;#125;&amp;#125; {{roll_toggle=1&amp;#125;&amp;#125; {{roll1=[[d20@{d20_mod} + (@{global_saving_bonus})]]&amp;#125;&amp;#125; {{roll2=[[d20@{d20_mod} + (@{global_saving_bonus})]]&amp;#125;&amp;#125;';
-	query += '|Other, {{title=?{Other&amp;#124;Unspecified&amp;#125;&amp;#125;&amp;#125; {{roll_toggle=1&amp;#125;&amp;#125; {{roll1=[[d20@{d20_mod} + (@{global_saving_bonus}) + ?{Modifiers&amp;#124;0&amp;#125;]]&amp;#125;&amp;#125; {{roll2=[[d20@{d20_mod} + (@{global_saving_bonus}) + ?{Modifiers&amp;#124;0&amp;#125;]]&amp;#125;&amp;#125;';
-
-	template = template.replace(/\x7B\x7BsaveQuery\x7D\x7D/g, query);
-	return template;
-}
-
-function checkQuery(file) {
-	var template = file.contents.toString('utf8');
-	var skillsJson = require('./components/skills/skills.json').skills;
-	var query = '?{Ability Check';
-
-	skillsJson.forEach(function (skill) {
-		var skillName = skill.name.lowercase().replace(/ +/g, '');
-		query += '|' + skill.name + ' (' + skill.ability.capitalize() + ') , {{title=' + skill.name + '&amp;#125;&amp;#125; {{roll_toggle=1&amp;#125;&amp;#125; {{roll1=[[d20@{d20_mod} + @{' + skillName + '}]]&amp;#125;&amp;#125; {{roll2=[[d20@{d20_mod} + @{' + skillName + '}]]&amp;#125;&amp;#125;'
-	});
-	query += '|-';
-	for (var i = 0; i < abilitiesName.length; ++i) {
-		var ability = abilitiesName[i];
-		query += '|' + ability + ', {{title=' + ability + '&amp;#125;&amp;#125; {{roll_toggle=1&amp;#125;&amp;#125; {{roll1=[[d20@{d20_mod} + @{' + ability.toLowerCase() + '_check_mod}]]&amp;#125;&amp;#125; {{roll2=[[d20@{d20_mod} + @{basic_' + ability.toLowerCase() + '_check_mod}]]&amp;#125;&amp;#125;';
-	}
-	query += '|Other, {{title=?{Other&amp;#124;Unspecified&amp;#125;&amp;#125;&amp;#125; {{roll_toggle=1&amp;#125;&amp;#125; {{roll1=[[d20@{d20_mod} + ?{Modifiers&amp;#124;0&amp;#125;]]&amp;#125;&amp;#125; {{roll2=[[d20@{d20_mod} + ?{Modifiers&amp;#124;0&amp;#125;]]&amp;#125;&amp;#125; ';
-
-	return template.replace(/\x7B\x7BcheckQuery\x7D\x7D/g, query);
-}
-
-function ordinal(d) {
-	if (d > 3 && d < 21) return 'th';
-	switch (d % 10) {
-		case 1:
-			return 'st';
-		case 2:
-			return 'nd';
-		case 3:
-			return 'rd';
-		default:
-			return 'th';
-	}
-}
-function processDate() {
-	var dt = new Date();
-	var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-	var month = dt.getMonth();
-	var date = dt.getDate();
-	var year = dt.getFullYear();
-
-	return date + ordinal(date) + ' ' + months[month] + ' ' + year;
-}
-
 gulp.task('preCompile', function () {
 	return gulp.src('./D&D_5e.html')
-		.pipe(replace({
-			patterns: [
-				{
-					match: /\x7B\x7Bdate\x7D\x7D/g,
-					replacement: function () {
-						return processDate();
-					}
-				}
-			]
-		}))
 		.pipe(include())
 		.pipe(inject(gulp.src(['./components/actions/traits.html']), {
 			starttag: '<!-- inject:traits:{{ext}} -->',
@@ -197,24 +129,6 @@ gulp.task('preCompile', function () {
 			starttag: '<!-- inject:actions:{{ext}} -->',
 			transform: function (filePath, file) {
 				return actionsCompile(file, actionCount, '', 'Action');
-			}
-		}))
-		.pipe(inject(gulp.src(['./components/character/custom_class.html']), {
-			starttag: '<!-- inject:custom_class:{{ext}} -->',
-			transform: function (filePath, file) {
-				return duplicate(file, customClassCount);
-			}
-		}))
-		.pipe(inject(gulp.src(['./components/macros/saves.html']), {
-			starttag: '<!-- inject:saveQuery:{{ext}} -->',
-			transform: function (filePath, file) {
-				return saveQuery(file);
-			}
-		}))
-		.pipe(inject(gulp.src(['./components/macros/checks.html']), {
-			starttag: '<!-- inject:checkQuery:{{ext}} -->',
-			transform: function (filePath, file) {
-				return checkQuery(file);
 			}
 		}))
 		.pipe(replace({
