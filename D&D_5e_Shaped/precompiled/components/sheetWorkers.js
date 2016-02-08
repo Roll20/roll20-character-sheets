@@ -1389,6 +1389,7 @@ var updateAttack = function (rowId) {
 			collectionArray.push(repeatingString + 'second_damage_type');
 			collectionArray.push(repeatingString + 'damage_string');
 			collectionArray.push(repeatingString + 'modifiers');
+      collectionArray.push(repeatingString + 'properties');
 			collectionArray.push(repeatingString + 'parsed');
 		}
 
@@ -1415,6 +1416,19 @@ var updateAttack = function (rowId) {
 						finalSetAttrs[repeatingString + 'parsed'] += ' modifiers';
 					}
 				}
+        if (!exists(v[repeatingString + 'parsed']) || v[repeatingString + 'parsed'].indexOf('properties') === -1) {
+          var attackProperties = v[repeatingString + 'properties'];
+          if (exists(attackProperties)) {
+            if (attackProperties.indexOf('Finesse') !== -1) {
+              finalSetAttrs[repeatingString + 'attack_ability'] = '@{finesse_mod}';
+              finalSetAttrs[repeatingString + 'damage_ability'] = '@{finesse_mod}';
+            }
+            if (!finalSetAttrs[repeatingString + 'parsed']) {
+              finalSetAttrs[repeatingString + 'parsed'] = '';
+            }
+            finalSetAttrs[repeatingString + 'parsed'] += ' properties';
+          }
+        }
 
 				var attackOptions = {
 					defaultAbility: 'strength_mod',
