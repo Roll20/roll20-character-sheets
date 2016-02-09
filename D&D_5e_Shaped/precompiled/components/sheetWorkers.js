@@ -913,8 +913,8 @@ var updateInitiative = function () {
 		var dexMod = getIntValue(v.dexterity_mod);
 		if (exists(dexMod)) {
 			finalSetAttrs.initiative += dexMod;
-			finalSetAttrs.initiative_formula += dexMod + '[dex]';
 		}
+		finalSetAttrs.initiative_formula += dexMod + '[dex]';
 
 		var dexCheckBonus = getIntValue(v.dexterity_check_bonus);
 		if (exists(dexCheckBonus)) {
