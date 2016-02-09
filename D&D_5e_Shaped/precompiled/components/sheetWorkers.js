@@ -913,8 +913,8 @@ var updateInitiative = function () {
 		var dexMod = getIntValue(v.dexterity_mod);
 		if (exists(dexMod)) {
 			finalSetAttrs.initiative += dexMod;
-			finalSetAttrs.initiative_formula += dexMod + '[dex]';
 		}
+		finalSetAttrs.initiative_formula += dexMod + '[dex]';
 
 		var dexCheckBonus = getIntValue(v.dexterity_check_bonus);
 		if (exists(dexCheckBonus)) {
@@ -1893,9 +1893,9 @@ on('sheet:opened', function (eventInfo) {
 
 var updateAttachers = function () {
 	var repeatingItem = 'repeating_attacher';
-	var collectionArray = ['attacher_initiative', 'attr_attacher_death_saving_throw', 'attacher_hit_dice', 'attacher_attack', 'attacher_spell'];
+	var collectionArray = ['attacher_initiative', 'attr_attacher_death_saving_throw', 'attacher_hit_dice', 'attacher_attack', 'attacher_spell', 'attacher_skill'];
 	var finalSetAttrs = {};
-	var itemsToPush = ['initiative', 'death_saving_throw', 'hit_dice', 'attack', 'spell'];
+	var itemsToPush = ['initiative', 'death_saving_throw', 'hit_dice', 'attack', 'spell', skill];
 
 	for (var i = 0; i < ABILITIES.length; i++) {
 		collectionArray.push('attacher_' + ABILITIES[i] + '_check');
