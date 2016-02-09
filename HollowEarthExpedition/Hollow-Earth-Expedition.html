@@ -31,30 +31,44 @@
                             <!-- Begin custom sheet here -->
                             <div class="sheet-hex">
                                 <script type="text/worker">
-                                    on("change:strength", function() {
-                                        getAttrs(["strength"], function(values) {
+                                    on("change:strength", function () {
+                                        getAttrs(["strength"], function (values) {
                                             switch (values.strength) {
                                                 case "1":
-                                                    setAttrs({ enclight: 10, encmedium: 25, encheavy: 50});
+                                                    setAttrs({ enclight: 10, encmedium: 25, encheavy: 50 });
                                                     break;
                                                 case "2":
-                                                    setAttrs({ enclight: 25, encmedium: 50, encheavy: 100});
+                                                    setAttrs({ enclight: 25, encmedium: 50, encheavy: 100 });
                                                     break;
                                                 case "3":
-                                                    setAttrs({ enclight: 50, encmedium: 100, encheavy: 250});
+                                                    setAttrs({ enclight: 50, encmedium: 100, encheavy: 250 });
                                                     break;
                                                 case "4":
-                                                    setAttrs({ enclight: 100, encmedium: 250, encheavy: 500});
+                                                    setAttrs({ enclight: 100, encmedium: 250, encheavy: 500 });
                                                     break;
                                                 case "5":
-                                                    setAttrs({ enclight: 250, encmedium: 500, encheavy: 750});
+                                                    setAttrs({ enclight: 250, encmedium: 500, encheavy: 750 });
                                                     break;
                                                 default:
-                                                    setAttrs({ enclight: 0, encmedium: 0, encheavy: 0});
+                                                    setAttrs({ enclight: 0, encmedium: 0, encheavy: 0 });
                                                     break;
                                             } //end switch
+                                        }); //end getAttrs
+                                    }); //end on("change:strength")
+                                    on("change:repeating_skills:skillrating", function (e) {
+                                        getAttrs(["repeating_skills_skillrating"], function (values) {
+                                            var n = Math.floor(values.repeating_skills_skillrating / 2).toString();
+                                            n += (values.repeating_skills_skillrating % 2 > 0) ? "+" : "";
+                                            setAttrs({repeating_skills_skillaverage: n});
                                         });
-                                    }); //end on
+                                    });
+                                    on("change:repeating_weapons:weaponattack", function (e) {
+                                        getAttrs(["repeating_weapons_weaponattack"], function (values) {
+                                            var n = Math.floor(values.repeating_weapons_weaponattack / 2).toString();
+                                            n += (values.repeating_weapons_weaponattack % 2 > 0) ? "+" : "";
+                                            setAttrs({ repeating_weapons_weaponaverage: n });
+                                        });
+                                    });
                                 </script>
                                 <div class="sheet-2colrow">
                                     <!-- Left column -->
@@ -125,7 +139,7 @@
                                                     <input class="sheet-attr-input-text defense" name="attr_defense" type="text" />
                                                     <button type="roll" class="sheet-roll-button" value="/roll @{defense}d2>2"></button>
                                                 </label>
-                                                
+
                                                 <label class="sheet-attr-input-label">
                                                     Stun
                                                     <input class="sheet-attr-input-text" type="text" />
@@ -158,7 +172,8 @@
                                                         <input type="text" name="attr_skillrating" class="sheet-free-input skillrating" />
                                                     </div>
                                                     <div class="sheet-skill-avg">
-                                                        <input type="text" name="attr_skillaverage" class="sheet-free-input" value="@{skillrating}/2" disabled="disabled"/>
+                                                        <!--<input type="text" name="attr_skillaverage" class="sheet-free-input" value="@{skillrating}/2" disabled="disabled" />-->
+                                                        <input type="text" name="attr_skillaverage" class="sheet-free-input skillsaverage" readonly="readonly" />
                                                     </div>
                                                     <div class="sheet-skill-roll">
                                                         <button type="roll" value="/roll @{skillrating}d2>2" name="roll_@{skillname}"></button>
@@ -187,7 +202,7 @@
                                                         <span>Attack</span>
                                                     </div>
                                                     <div class="sheet-weapon-avg">
-                                                        <input type="text" name="attr_weaponavg" class="sheet-free-input" value="@{weaponattack}/2" disabled="disabled" />
+                                                        <input type="text" name="attr_weaponaverage" class="sheet-free-input weaponaverage" readonly="readonly" />
                                                         <span>(Avg)</span>
                                                     </div>
                                                     <div class="sheet-weapon-roll">
@@ -253,17 +268,17 @@
                                                 <h1 class="sheet-bottom-separator">Encumbrance</h1>
                                                 <label class="sheet-attr-input-label">
                                                     <span class="sheet-field">Light</span>
-                                                    <input class="sheet-widest-input-text" name="attr_enclight" type="text"/>
+                                                    <input class="sheet-widest-input-text" name="attr_enclight" type="text" readonly="readonly" />
                                                     <span class="sheet-subtext">lbs</span>
                                                 </label>
                                                 <label class="sheet-attr-input-label">
                                                     <span class="sheet-field">Medium</span>
-                                                    <input class="sheet-widest-input-text" type="text" name="attr_encmedium"/>
+                                                    <input class="sheet-widest-input-text" type="text" name="attr_encmedium" readonly="readonly" />
                                                     <span class="sheet-subtext">lbs</span>
                                                 </label>
                                                 <label class="sheet-attr-input-label">
                                                     <span class="sheet-field">Heavy</span>
-                                                    <input class="sheet-widest-input-text" type="text" name="attr_encheavy"/>
+                                                    <input class="sheet-widest-input-text" type="text" name="attr_encheavy" readonly="readonly" />
                                                     <span class="sheet-subtext">lbs</span>
                                                 </label>
                                             </div>
@@ -333,105 +348,105 @@
                                                     </tr>
                                                     <tr>
                                                         <td>11</td>
-                                                        <td><input type="radio" name="attr_h11" value="11L"/></td>
-                                                        <td><input type="radio" name="attr_h11" value="11NL"/></td>
-                                                        <td><input type="radio" name="attr_h11" value="11H"/></td>
+                                                        <td><input type="radio" name="attr_h11" value="11L" /></td>
+                                                        <td><input type="radio" name="attr_h11" value="11NL" /></td>
+                                                        <td><input type="radio" name="attr_h11" value="11H" /></td>
                                                     </tr>
                                                     <tr>
                                                         <td>10</td>
-                                                        <td><input type="radio" name="attr_h10" value="10L"/></td>
-                                                        <td><input type="radio" name="attr_h10" value="10NL"/></td>
-                                                        <td><input type="radio" name="attr_h10" value="10H"/></td>
+                                                        <td><input type="radio" name="attr_h10" value="10L" /></td>
+                                                        <td><input type="radio" name="attr_h10" value="10NL" /></td>
+                                                        <td><input type="radio" name="attr_h10" value="10H" /></td>
                                                     </tr>
                                                     <tr>
                                                         <td>9</td>
-                                                        <td><input type="radio" name="attr_h9" value="9L"/></td>
-                                                        <td><input type="radio" name="attr_h9" value="9NL"/></td>
-                                                        <td><input type="radio" name="attr_h9" value="9H"/></td>
+                                                        <td><input type="radio" name="attr_h9" value="9L" /></td>
+                                                        <td><input type="radio" name="attr_h9" value="9NL" /></td>
+                                                        <td><input type="radio" name="attr_h9" value="9H" /></td>
                                                     </tr>
                                                     <tr>
                                                         <td>8</td>
-                                                        <td><input type="radio" name="attr_h8" value="8L"/></td>
-                                                        <td><input type="radio" name="attr_h8" value="8NL"/></td>
-                                                        <td><input type="radio" name="attr_h8" value="8H"/></td>
+                                                        <td><input type="radio" name="attr_h8" value="8L" /></td>
+                                                        <td><input type="radio" name="attr_h8" value="8NL" /></td>
+                                                        <td><input type="radio" name="attr_h8" value="8H" /></td>
                                                     </tr>
                                                     <tr>
                                                         <td>7</td>
-                                                        <td><input type="radio" name="attr_h7" value="7L"/></td>
-                                                        <td><input type="radio" name="attr_h7" value="7NL"/></td>
-                                                        <td><input type="radio" name="attr_h7" value="7H"/></td>
+                                                        <td><input type="radio" name="attr_h7" value="7L" /></td>
+                                                        <td><input type="radio" name="attr_h7" value="7NL" /></td>
+                                                        <td><input type="radio" name="attr_h7" value="7H" /></td>
                                                     </tr>
                                                     <tr>
                                                         <td>6</td>
-                                                        <td><input type="radio" name="attr_h6" value="6L"/></td>
-                                                        <td><input type="radio" name="attr_h6" value="6NL"/></td>
-                                                        <td><input type="radio" name="attr_h6" value="6H"/></td>
+                                                        <td><input type="radio" name="attr_h6" value="6L" /></td>
+                                                        <td><input type="radio" name="attr_h6" value="6NL" /></td>
+                                                        <td><input type="radio" name="attr_h6" value="6H" /></td>
                                                     </tr>
                                                     <tr>
                                                         <td>5</td>
-                                                        <td><input type="radio" name="attr_h5" value="5L"/></td>
-                                                        <td><input type="radio" name="attr_h5" value="5NL"/></td>
-                                                        <td><input type="radio" name="attr_h5" value="5H"/></td>
+                                                        <td><input type="radio" name="attr_h5" value="5L" /></td>
+                                                        <td><input type="radio" name="attr_h5" value="5NL" /></td>
+                                                        <td><input type="radio" name="attr_h5" value="5H" /></td>
                                                     </tr>
                                                     <tr>
                                                         <td>4</td>
-                                                        <td><input type="radio" name="attr_h4" value="4L"/></td>
-                                                        <td><input type="radio" name="attr_h4" value="4NL"/></td>
-                                                        <td><input type="radio" name="attr_h4" value="4H"/></td>
+                                                        <td><input type="radio" name="attr_h4" value="4L" /></td>
+                                                        <td><input type="radio" name="attr_h4" value="4NL" /></td>
+                                                        <td><input type="radio" name="attr_h4" value="4H" /></td>
                                                     </tr>
                                                     <tr>
                                                         <td>3</td>
-                                                        <td><input type="radio" name="attr_h3" value="3L"/></td>
-                                                        <td><input type="radio" name="attr_h3" value="3NL"/></td>
-                                                        <td><input type="radio" name="attr_h3" value="3H"/></td>
+                                                        <td><input type="radio" name="attr_h3" value="3L" /></td>
+                                                        <td><input type="radio" name="attr_h3" value="3NL" /></td>
+                                                        <td><input type="radio" name="attr_h3" value="3H" /></td>
                                                     </tr>
                                                     <tr>
                                                         <td>2</td>
-                                                        <td><input type="radio" name="attr_h2" value="2L"/></td>
-                                                        <td><input type="radio" name="attr_h2" value="2NL"/></td>
-                                                        <td><input type="radio" name="attr_h2" value="2H"/></td>
+                                                        <td><input type="radio" name="attr_h2" value="2L" /></td>
+                                                        <td><input type="radio" name="attr_h2" value="2NL" /></td>
+                                                        <td><input type="radio" name="attr_h2" value="2H" /></td>
                                                     </tr>
                                                     <tr>
                                                         <td>1</td>
-                                                        <td><input type="radio" name="attr_h1" value="1L"/></td>
-                                                        <td><input type="radio" name="attr_h1" value="1NL"/></td>
-                                                        <td><input type="radio" name="attr_h1" value="1H"/></td>
+                                                        <td><input type="radio" name="attr_h1" value="1L" /></td>
+                                                        <td><input type="radio" name="attr_h1" value="1NL" /></td>
+                                                        <td><input type="radio" name="attr_h1" value="1H" /></td>
                                                     </tr>
                                                     <tr>
                                                         <td>0</td>
-                                                        <td><input type="radio" name="attr_h0" value="0L"/></td>
-                                                        <td><input type="radio" name="attr_h0" value="0NL"/></td>
-                                                        <td><input type="radio" name="attr_h0" value="0H"/></td>
+                                                        <td><input type="radio" name="attr_h0" value="0L" /></td>
+                                                        <td><input type="radio" name="attr_h0" value="0NL" /></td>
+                                                        <td><input type="radio" name="attr_h0" value="0H" /></td>
                                                     </tr>
                                                     <tr>
                                                         <td>-1</td>
-                                                        <td><input type="radio" name="attr_hn1" value="-1L"/></td>
-                                                        <td><input type="radio" name="attr_hn1" value="-1NL"/></td>
-                                                        <td><input type="radio" name="attr_hn1" value="-1H"/></td>
+                                                        <td><input type="radio" name="attr_hn1" value="-1L" /></td>
+                                                        <td><input type="radio" name="attr_hn1" value="-1NL" /></td>
+                                                        <td><input type="radio" name="attr_hn1" value="-1H" /></td>
                                                     </tr>
                                                     <tr>
                                                         <td>-2</td>
-                                                        <td><input type="radio" name="attr_hn2" value="-2L"/></td>
-                                                        <td><input type="radio" name="attr_hn2" value="-2NL"/></td>
-                                                        <td><input type="radio" name="attr_hn2" value="-2H"/></td>
+                                                        <td><input type="radio" name="attr_hn2" value="-2L" /></td>
+                                                        <td><input type="radio" name="attr_hn2" value="-2NL" /></td>
+                                                        <td><input type="radio" name="attr_hn2" value="-2H" /></td>
                                                     </tr>
                                                     <tr>
                                                         <td>-3</td>
-                                                        <td><input type="radio" name="attr_hn3" value="-3L"/></td>
-                                                        <td><input type="radio" name="attr_hn3" value="-3NL"/></td>
-                                                        <td><input type="radio" name="attr_hn3" value="-3H"/></td>
+                                                        <td><input type="radio" name="attr_hn3" value="-3L" /></td>
+                                                        <td><input type="radio" name="attr_hn3" value="-3NL" /></td>
+                                                        <td><input type="radio" name="attr_hn3" value="-3H" /></td>
                                                     </tr>
                                                     <tr>
                                                         <td>-4</td>
-                                                        <td><input type="radio" name="attr_hn4" value="-4L"/></td>
-                                                        <td><input type="radio" name="attr_hn4" value="-4NL"/></td>
-                                                        <td><input type="radio" name="attr_hn4" value="-4H"/></td>
+                                                        <td><input type="radio" name="attr_hn4" value="-4L" /></td>
+                                                        <td><input type="radio" name="attr_hn4" value="-4NL" /></td>
+                                                        <td><input type="radio" name="attr_hn4" value="-4H" /></td>
                                                     </tr>
                                                     <tr>
                                                         <td>-5</td>
-                                                        <td><input type="radio" name="attr_hn5" value="-5L"/></td>
-                                                        <td><input type="radio" name="attr_hn5" value="-5NL"/></td>
-                                                        <td><input type="radio" name="attr_hn5" value="-5H"/></td>
+                                                        <td><input type="radio" name="attr_hn5" value="-5L" /></td>
+                                                        <td><input type="radio" name="attr_hn5" value="-5NL" /></td>
+                                                        <td><input type="radio" name="attr_hn5" value="-5H" /></td>
                                                     </tr>
                                                 </tbody>
                                             </table>
