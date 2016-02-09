@@ -15,6 +15,10 @@ Vous pouvez trouver un script API qui correspond à cette feuille : [extended_au
 
 # Notes de version
 
+##v1.1 (2015-02-07)
+
+Ajout de l'aplomb et des jets cachés.
+
 ##v1.0 (2015-12-28)
 
 Création.
