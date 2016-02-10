@@ -2,7 +2,7 @@ var currentVersion = '2.0.10';
 
 String.prototype.capitalize = function () {
 	return this.replace(/\w\S*/g, function (txt) {
-		return txt.charAt(0).toUpperCase() + txt.substr(1)
+		return txt.charAt(0).toUpperCase() + txt.substr(1);
 	});
 };
 String.prototype.firstThree = function () {
@@ -88,6 +88,12 @@ function setFinalAttrs(v, finalSetAttrs) {
 		setAttrs(finalSetAttrs);
 	}
 }
+function fromVOrFinalSetAttrs (v, finalSetAttrs, value) {
+  if (exists(finalSetAttrs[value])) {
+    return finalSetAttrs[value];
+  }
+  return v[value];
+}
 function parseAttackComponents(v, repeatingString, finalSetAttrs, options) {
 	var parsed = v[repeatingString + 'parsed'];
 
@@ -137,7 +143,7 @@ function emptyIfUndefined(value) {
 }
 function ordinalSpellLevel(level) {
   if (level === 0) {
-    return 'Cantrip'
+    return 'Cantrip';
   } else {
     switch (level % 10) {
       case 1:
@@ -187,7 +193,7 @@ var updateAbilityModifier = function (ability) {
 	getAttrs(collectionArray, function (v) {
 		var abilityScore = getIntValue(v[ability]);
 		var abilityBonus = getIntValue(v[ability + '_bonus']);
-		var globalAbilityBonus = getIntValue(v['global_ability_bonus']);
+		var globalAbilityBonus = getIntValue(v.global_ability_bonus);
 		var abilityMod = getAbilityMod((abilityScore + abilityBonus + globalAbilityBonus));
 
 		var abilityCheckFormula = abilityMod + '[' + ability.firstThree() + ' mod with bonus]';
@@ -979,7 +985,7 @@ on('change:repeating_attack', function (eventInfo) {
 		var rowId = getRowId('repeating_attack', eventInfo);
 		updateAttack(rowId);
 	}
-	updateAttackQuery();
+	/*updateAttackQuery();*/
 });
 on('change:repeating_attack remove:repeating_attack', function () {
 	var options = {
@@ -1196,7 +1202,7 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 
 	var secondDamageFormula = '';
 
-	var secondDamageToggle = v[repeatingString + 'second_damage_toggle'];
+	var secondDamageToggle = fromVOrFinalSetAttrs(v, finalSetAttrs, repeatingString + 'second_damage_toggle');
 	if (secondDamageToggle === '@{second_damage_toggle_var}') {
 		var secondDamageAddition = 0;
 		var secondDamage = v[repeatingString + 'second_damage'];
@@ -1243,6 +1249,9 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 			var damageProperties = v[repeatingString + 'properties'];
 			if (exists(damageProperties)) {
 				if (damageProperties.indexOf('Versatile') !== -1) {
+          if (!exists(damageAbility)) {
+            damageAbility = '@{strength_mod}'
+          }
 					finalSetAttrs[repeatingString + 'second_damage_ability'] = damageAbility;
 					finalSetAttrs[repeatingString + 'second_damage_type'] = damageType;
 				}
