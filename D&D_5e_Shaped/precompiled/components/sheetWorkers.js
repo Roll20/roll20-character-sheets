@@ -194,7 +194,13 @@ var updateAbilityModifier = function (ability) {
 		abilityCheckFormula += ADD + '@{jack_of_all_trades_toggle}[jack of all trades]';
 		abilityCheckFormula += ADD + '(@{global_check_bonus})[global check bonus]';
 
+    var abilityModWithSign = abilityMod;
+    if (abilityMod >= 0) {
+      abilityModWithSign = '+' + abilityMod;
+    }
+
 		finalSetAttrs[ability + '_mod'] = abilityMod;
+    finalSetAttrs[ability + '_mod_with_sign'] = abilityModWithSign;
 		finalSetAttrs[ability + '_check_mod'] = abilityCheckFormula;
 
 		if (ability === 'strength') {
@@ -1769,26 +1775,32 @@ var sheetOpened = function () {
 			if (!exists(v.strength)) {
 				setAbilities.strength = 10;
 				setAbilities.strength_mod = 0;
+        setAbilities.strength_mod_with_sign = '+0';
 			}
 			if (!exists(v.dexterity)) {
 				setAbilities.dexterity = 10;
 				setAbilities.dexterity_mod = 0;
+        setAbilities.dexterity_mod_with_sign = '+0';
 			}
 			if (!exists(v.constitution)) {
 				setAbilities.constitution = 10;
 				setAbilities.constitution_mod = 0;
+        setAbilities.constitution_mod_with_sign = '+0';
 			}
 			if (!exists(v.intelligence)) {
 				setAbilities.intelligence = 10;
 				setAbilities.intelligence_mod = 0;
+        setAbilities.intelligence_mod_with_sign = '+0';
 			}
 			if (!exists(v.wisdom)) {
 				setAbilities.wisdom = 10;
 				setAbilities.wisdom_mod = 0;
+        setAbilities.wisdom_mod_with_sign = '+0';
 			}
 			if (!exists(v.charisma)) {
 				setAbilities.charisma = 10;
 				setAbilities.charisma_mod = 0;
+        setAbilities.charisma_mod_with_sign = '+0';
 			}
 			setFinalAttrs(v, setAbilities);
 
