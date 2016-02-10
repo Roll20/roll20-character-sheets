@@ -13,11 +13,6 @@ var wrap = require('gulp-wrap');
 var change = require('gulp-change');
 var fs = require('fs');
 
-var traitsCount = 1;
-var actionCount = 12;
-var lairActionCount = 4;
-var legendaryActionCount = 4;
-var customClassCount = 6;
 var translations = {};
 
 String.prototype.capitalize = function () {
@@ -56,7 +51,6 @@ function getTranslationsIfTheyDontExist () {
 		getTranslation();
 	}
 }
-
 function translationWrapper (lang, key) {
 	var translation = objByString(translations[lang], key);
 
@@ -66,25 +60,11 @@ function translationWrapper (lang, key) {
 
 	return '<span class=' + lang + '>' + translation + '</span>';
 }
-
 function translate (key) {
 	getTranslationsIfTheyDontExist();
 	var translation = translationWrapper('en', key) + translationWrapper('de', key) + translationWrapper('fr', key) + translationWrapper('ru', key);
 
 	return translation;
-}
-
-function actionsCompile(file, limit, type, name) {
-	var template = file.contents.toString('utf8');
-	var s = [];
-	for (var i = 0; i < limit; i++) {
-		s.push(template
-				.replace(/\x7B\x7Btype\x7D\x7D/g, type)
-				.replace(/\x7B\x7Bnum\x7D\x7D/g, i.toString())
-				.replace(/\x7B\x7Bname\x7D\x7D/g, name)
-		);
-	}
-	return s.join('\n\n');
 }
 function duplicate(file, limit, start) {
 	var template = file.contents.toString('utf8');
@@ -107,30 +87,6 @@ function duplicate(file, limit, start) {
 gulp.task('preCompile', function () {
 	return gulp.src('./D&D_5e.html')
 		.pipe(include())
-		.pipe(inject(gulp.src(['./components/actions/traits.html']), {
-			starttag: '<!-- inject:traits:{{ext}} -->',
-			transform: function (filePath, file) {
-				return duplicate(file, traitsCount);
-			}
-		}))
-		.pipe(inject(gulp.src(['./components/actions/action.html']), {
-			starttag: '<!-- inject:lairActions:{{ext}} -->',
-			transform: function (filePath, file) {
-				return actionsCompile(file, lairActionCount, 'lair_', 'Lair');
-			}
-		}))
-		.pipe(inject(gulp.src(['./components/actions/action.html']), {
-			starttag: '<!-- inject:legendaryActions:{{ext}} -->',
-			transform: function (filePath, file) {
-				return actionsCompile(file, legendaryActionCount, 'legendary_', 'Legendary');
-			}
-		}))
-		.pipe(inject(gulp.src(['./components/actions/action.html']), {
-			starttag: '<!-- inject:actions:{{ext}} -->',
-			transform: function (filePath, file) {
-				return actionsCompile(file, actionCount, '', 'Action');
-			}
-		}))
 		.pipe(replace({
 			patterns: [
 				{
