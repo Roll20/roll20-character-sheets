@@ -1,11 +1,13 @@
-var currentVersion = '2.0.9';
+var currentVersion = '2.0.10';
 
-function capitalizeFirstLetter(string) {
-	return string.charAt(0).toUpperCase() + string.slice(1);
-}
-function firstThreeChars(string) {
-	return string.substring(0, 3);
-}
+String.prototype.capitalize = function () {
+	return this.replace(/\w\S*/g, function (txt) {
+		return txt.charAt(0).toUpperCase() + txt.substr(1);
+	});
+};
+String.prototype.firstThree = function () {
+	return this.substring(0, 3);
+};
 function getIntValue(value, defaultValue) {
 	if (!defaultValue) {
 		defaultValue = 0;
@@ -47,9 +49,9 @@ function getAbilityShortName(varName, capital) {
 	}
 	varName = getAbilityModName(varName);
 	if (capital) {
-		varName = capitalizeFirstLetter(varName);
+		varName = varName.capitalize();
 	}
-	return firstThreeChars(varName);
+	return varName.firstThree();
 }
 function exists(value) {
 	if (!value || value === '' || value === '0' || value === 0) {
@@ -86,6 +88,12 @@ function setFinalAttrs(v, finalSetAttrs) {
 		setAttrs(finalSetAttrs);
 	}
 }
+function fromVOrFinalSetAttrs (v, finalSetAttrs, value) {
+  if (exists(finalSetAttrs[value])) {
+    return finalSetAttrs[value];
+  }
+  return v[value];
+}
 function parseAttackComponents(v, repeatingString, finalSetAttrs, options) {
 	var parsed = v[repeatingString + 'parsed'];
 
@@ -102,7 +110,7 @@ function parseAttackComponents(v, repeatingString, finalSetAttrs, options) {
 			}
 		}
 
-		if (aTriggerFieldExists) {
+		if (aTriggerFieldExists && !exists(v[repeatingString + options.toggleField])) {
 			finalSetAttrs[repeatingString + options.toggleField] = options.toggleFieldSetTo;
 		}
 		if (options.attackAbility && !exists(v[repeatingString + 'attack_ability']) && v[repeatingString + 'attack_ability'] !== '0') {
@@ -135,7 +143,7 @@ function emptyIfUndefined(value) {
 }
 function ordinalSpellLevel(level) {
   if (level === 0) {
-    return 'Cantrip'
+    return 'Cantrip';
   } else {
     switch (level % 10) {
       case 1:
@@ -185,14 +193,20 @@ var updateAbilityModifier = function (ability) {
 	getAttrs(collectionArray, function (v) {
 		var abilityScore = getIntValue(v[ability]);
 		var abilityBonus = getIntValue(v[ability + '_bonus']);
-		var globalAbilityBonus = getIntValue(v['global_ability_bonus']);
+		var globalAbilityBonus = getIntValue(v.global_ability_bonus);
 		var abilityMod = getAbilityMod((abilityScore + abilityBonus + globalAbilityBonus));
 
-		var abilityCheckFormula = abilityMod + '[' + firstThreeChars(ability) + ' mod with bonus]';
+		var abilityCheckFormula = abilityMod + '[' + ability.firstThree() + ' mod with bonus]';
 		abilityCheckFormula += ADD + '@{jack_of_all_trades_toggle}[jack of all trades]';
 		abilityCheckFormula += ADD + '(@{global_check_bonus})[global check bonus]';
 
+    var abilityModWithSign = abilityMod;
+    if (abilityMod >= 0) {
+      abilityModWithSign = '+' + abilityMod;
+    }
+
 		finalSetAttrs[ability + '_mod'] = abilityMod;
+    finalSetAttrs[ability + '_mod_with_sign'] = abilityModWithSign;
 		finalSetAttrs[ability + '_check_mod'] = abilityCheckFormula;
 
 		if (ability === 'strength') {
@@ -338,7 +352,7 @@ var updateLevels = function () {
 
 				var classLevel = getIntValue(v[repeatingString + 'level']);
 				totalLevel += classLevel;
-				levelArray.push(capitalizeFirstLetter(className) + ' ' + classLevel);
+				levelArray.push(className.capitalize() + ' ' + classLevel);
 
 				var classHd = v[repeatingString + 'hd'];
 				if (!exists(classHd)) {
@@ -863,7 +877,7 @@ on('change:repeating_equipment', function (eventInfo) {
 	var rowId = getRowId('repeating_equipment', eventInfo);
 	updateEquipment(rowId);
 });
-on('change:repeating_equipment remove:repeating_equipment', function () {
+on('change:repeating_equipment:carried change:repeating_equipment:weight_total remove:repeating_equipment', function () {
 	var options = {
 		collection: 'equipment',
 		toggle: 'carried',
@@ -971,9 +985,9 @@ on('change:repeating_attack', function (eventInfo) {
 		var rowId = getRowId('repeating_attack', eventInfo);
 		updateAttack(rowId);
 	}
-	updateAttackQuery();
+	/*updateAttackQuery();*/
 });
-on('change:repeating_attack remove:repeating_attack', function () {
+on('change:repeating_attack:carried change:repeating_attack:weight remove:repeating_attack', function () {
 	var options = {
 		collection: 'attack',
 		toggle: 'carried'
@@ -1099,6 +1113,8 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 	var damageString = '';
 	var damageFormula = '';
 	var damageToggle = v[repeatingString + 'damage_toggle'];
+  var damageAbility;
+  var damageType;
 
 	if (!damageToggle || damageToggle === '@{damage_toggle_var}') {
 		var damageAddition = 0;
@@ -1113,7 +1129,7 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 			options.defaultDamageAbility = 0;
 		}
 
-		var damageAbility = v[repeatingString + 'damage_ability'];
+		damageAbility = v[repeatingString + 'damage_ability'];
 		if (!exists(damageAbility) && v[repeatingString + 'type'] === 'Ranged Weapon') {
 			damageAbility = '@{dexterity_mod}';
 			finalSetAttrs[repeatingString + 'damage_ability'] = damageAbility;
@@ -1162,7 +1178,7 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 			damageString += ADD + damageAddition;
 		}
 
-		var damageType = v[repeatingString + 'damage_type'];
+		damageType = v[repeatingString + 'damage_type'];
 		if (exists(damageType)) {
 			if (hasUpperCase(damageType)) {
 				damageType = damageType.toLowerCase();
@@ -1186,7 +1202,7 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 
 	var secondDamageFormula = '';
 
-	var secondDamageToggle = v[repeatingString + 'second_damage_toggle'];
+	var secondDamageToggle = fromVOrFinalSetAttrs(v, finalSetAttrs, repeatingString + 'second_damage_toggle');
 	if (secondDamageToggle === '@{second_damage_toggle_var}') {
 		var secondDamageAddition = 0;
 		var secondDamage = v[repeatingString + 'second_damage'];
@@ -1233,8 +1249,11 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 			var damageProperties = v[repeatingString + 'properties'];
 			if (exists(damageProperties)) {
 				if (damageProperties.indexOf('Versatile') !== -1) {
-					finalSetAttrs[repeatingString + 'second_damage_ability'] = finalSetAttrs[repeatingString + 'damage_ability'];
-					finalSetAttrs[repeatingString + 'second_damage_type'] = finalSetAttrs[repeatingString + 'damage_type'];
+          if (!exists(damageAbility)) {
+            damageAbility = '@{strength_mod}'
+          }
+					finalSetAttrs[repeatingString + 'second_damage_ability'] = damageAbility;
+					finalSetAttrs[repeatingString + 'second_damage_type'] = damageType;
 				}
 				if (!finalSetAttrs[repeatingString + 'parsed']) {
 					finalSetAttrs[repeatingString + 'parsed'] = '';
@@ -1767,26 +1786,32 @@ var sheetOpened = function () {
 			if (!exists(v.strength)) {
 				setAbilities.strength = 10;
 				setAbilities.strength_mod = 0;
+        setAbilities.strength_mod_with_sign = '+0';
 			}
 			if (!exists(v.dexterity)) {
 				setAbilities.dexterity = 10;
 				setAbilities.dexterity_mod = 0;
+        setAbilities.dexterity_mod_with_sign = '+0';
 			}
 			if (!exists(v.constitution)) {
 				setAbilities.constitution = 10;
 				setAbilities.constitution_mod = 0;
+        setAbilities.constitution_mod_with_sign = '+0';
 			}
 			if (!exists(v.intelligence)) {
 				setAbilities.intelligence = 10;
 				setAbilities.intelligence_mod = 0;
+        setAbilities.intelligence_mod_with_sign = '+0';
 			}
 			if (!exists(v.wisdom)) {
 				setAbilities.wisdom = 10;
 				setAbilities.wisdom_mod = 0;
+        setAbilities.wisdom_mod_with_sign = '+0';
 			}
 			if (!exists(v.charisma)) {
 				setAbilities.charisma = 10;
 				setAbilities.charisma_mod = 0;
+        setAbilities.charisma_mod_with_sign = '+0';
 			}
 			setFinalAttrs(v, setAbilities);
 
@@ -1886,8 +1911,7 @@ var sheetOpened = function () {
 	});
 };
 
-on('sheet:opened', function (eventInfo) {
-	console.log('============================================================================sheetopened eventInfo', eventInfo);
+on('sheet:opened', function () {
 	sheetOpened();
 });
 
