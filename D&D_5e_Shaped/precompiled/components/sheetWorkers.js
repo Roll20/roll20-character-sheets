@@ -104,7 +104,7 @@ function parseAttackComponents(v, repeatingString, finalSetAttrs, options) {
 			}
 		}
 
-		if (aTriggerFieldExists) {
+		if (aTriggerFieldExists && !exists(v[repeatingString + options.toggleField])) {
 			finalSetAttrs[repeatingString + options.toggleField] = options.toggleFieldSetTo;
 		}
 		if (options.attackAbility && !exists(v[repeatingString + 'attack_ability']) && v[repeatingString + 'attack_ability'] !== '0') {
@@ -1107,6 +1107,8 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 	var damageString = '';
 	var damageFormula = '';
 	var damageToggle = v[repeatingString + 'damage_toggle'];
+  var damageAbility;
+  var damageType;
 
 	if (!damageToggle || damageToggle === '@{damage_toggle_var}') {
 		var damageAddition = 0;
@@ -1121,7 +1123,7 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 			options.defaultDamageAbility = 0;
 		}
 
-		var damageAbility = v[repeatingString + 'damage_ability'];
+		damageAbility = v[repeatingString + 'damage_ability'];
 		if (!exists(damageAbility) && v[repeatingString + 'type'] === 'Ranged Weapon') {
 			damageAbility = '@{dexterity_mod}';
 			finalSetAttrs[repeatingString + 'damage_ability'] = damageAbility;
@@ -1170,7 +1172,7 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 			damageString += ADD + damageAddition;
 		}
 
-		var damageType = v[repeatingString + 'damage_type'];
+		damageType = v[repeatingString + 'damage_type'];
 		if (exists(damageType)) {
 			if (hasUpperCase(damageType)) {
 				damageType = damageType.toLowerCase();
@@ -1241,8 +1243,8 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 			var damageProperties = v[repeatingString + 'properties'];
 			if (exists(damageProperties)) {
 				if (damageProperties.indexOf('Versatile') !== -1) {
-					finalSetAttrs[repeatingString + 'second_damage_ability'] = finalSetAttrs[repeatingString + 'damage_ability'];
-					finalSetAttrs[repeatingString + 'second_damage_type'] = finalSetAttrs[repeatingString + 'damage_type'];
+					finalSetAttrs[repeatingString + 'second_damage_ability'] = damageAbility;
+					finalSetAttrs[repeatingString + 'second_damage_type'] = damageType;
 				}
 				if (!finalSetAttrs[repeatingString + 'parsed']) {
 					finalSetAttrs[repeatingString + 'parsed'] = '';
@@ -1900,8 +1902,7 @@ var sheetOpened = function () {
 	});
 };
 
-on('sheet:opened', function (eventInfo) {
-	console.log('============================================================================sheetopened eventInfo', eventInfo);
+on('sheet:opened', function () {
 	sheetOpened();
 });
 
