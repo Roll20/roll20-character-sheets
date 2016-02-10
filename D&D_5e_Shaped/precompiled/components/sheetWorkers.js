@@ -877,7 +877,7 @@ on('change:repeating_equipment', function (eventInfo) {
 	var rowId = getRowId('repeating_equipment', eventInfo);
 	updateEquipment(rowId);
 });
-on('change:repeating_equipment remove:repeating_equipment', function () {
+on('change:repeating_equipment:carried change:repeating_equipment:weight_total remove:repeating_equipment', function () {
 	var options = {
 		collection: 'equipment',
 		toggle: 'carried',
@@ -987,7 +987,7 @@ on('change:repeating_attack', function (eventInfo) {
 	}
 	/*updateAttackQuery();*/
 });
-on('change:repeating_attack remove:repeating_attack', function () {
+on('change:repeating_attack:carried change:repeating_attack:weight remove:repeating_attack', function () {
 	var options = {
 		collection: 'attack',
 		toggle: 'carried'
