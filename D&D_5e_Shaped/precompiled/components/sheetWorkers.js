@@ -1,11 +1,13 @@
 var currentVersion = '2.0.10';
 
-function capitalizeFirstLetter(string) {
-	return string.charAt(0).toUpperCase() + string.slice(1);
-}
-function firstThreeChars(string) {
-	return string.substring(0, 3);
-}
+String.prototype.capitalize = function () {
+	return this.replace(/\w\S*/g, function (txt) {
+		return txt.charAt(0).toUpperCase() + txt.substr(1)
+	});
+};
+String.prototype.firstThree = function () {
+	return this.substring(0, 3);
+};
 function getIntValue(value, defaultValue) {
 	if (!defaultValue) {
 		defaultValue = 0;
@@ -47,9 +49,9 @@ function getAbilityShortName(varName, capital) {
 	}
 	varName = getAbilityModName(varName);
 	if (capital) {
-		varName = capitalizeFirstLetter(varName);
+		varName = varName.capitalize();
 	}
-	return firstThreeChars(varName);
+	return varName.firstThree();
 }
 function exists(value) {
 	if (!value || value === '' || value === '0' || value === 0) {
@@ -188,7 +190,7 @@ var updateAbilityModifier = function (ability) {
 		var globalAbilityBonus = getIntValue(v['global_ability_bonus']);
 		var abilityMod = getAbilityMod((abilityScore + abilityBonus + globalAbilityBonus));
 
-		var abilityCheckFormula = abilityMod + '[' + firstThreeChars(ability) + ' mod with bonus]';
+		var abilityCheckFormula = abilityMod + '[' + ability.firstThree() + ' mod with bonus]';
 		abilityCheckFormula += ADD + '@{jack_of_all_trades_toggle}[jack of all trades]';
 		abilityCheckFormula += ADD + '(@{global_check_bonus})[global check bonus]';
 
@@ -338,7 +340,7 @@ var updateLevels = function () {
 
 				var classLevel = getIntValue(v[repeatingString + 'level']);
 				totalLevel += classLevel;
-				levelArray.push(capitalizeFirstLetter(className) + ' ' + classLevel);
+				levelArray.push(className.capitalize() + ' ' + classLevel);
 
 				var classHd = v[repeatingString + 'hd'];
 				if (!exists(classHd)) {
