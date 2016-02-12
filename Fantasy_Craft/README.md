@@ -5,7 +5,7 @@ This is my fork of Suldae's initial sheet.
 
 ### ChangeLog
 
-#### Bug Fix Update - Feb 2016
+#### Bug Fix Update - February 2016
 * Added attribute names (or used unique names) to various attributes so they would work properly, such as drag-n-drop of initiative onto desktop
 
 #### Major update - May 2015
