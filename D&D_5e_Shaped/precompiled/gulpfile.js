@@ -1,15 +1,14 @@
 var gulp = require('gulp');
 var include = require('gulp-include');
 var inject = require('gulp-inject');
-var uglify = require('gulp-uglify');
 var minifyHTML = require('gulp-minify-html');
 var minifyCss = require('gulp-minify-css');
 var concat = require('gulp-concat');
 var sass = require('gulp-sass');
+var jshint = require('gulp-jshint');
 var sassLint = require('gulp-sass-lint');
 var replace = require('gulp-replace-task');
 var rename = require('gulp-rename');
-var wrap = require('gulp-wrap');
 var change = require('gulp-change');
 var fs = require('fs');
 
@@ -140,7 +139,13 @@ gulp.task('minify-css', ['sass'], function () {
 		.pipe(gulp.dest('../'));
 });
 
-gulp.task('compile', ['preCompile', 'minify-css'], function () {
+gulp.task('jshint', function() {
+	return gulp.src('components/sheetWorkers.js')
+		.pipe(jshint())
+		.pipe(jshint.reporter('jshint-stylish'));
+});
+
+gulp.task('compile', ['preCompile', 'minify-css', 'jshint'], function () {
 	return gulp.src(['../D&D_5e.html', './components/rollTemplate.html'])
 		.pipe(concat('D&D_5e.html'))
 		.pipe(gulp.dest('../'));
