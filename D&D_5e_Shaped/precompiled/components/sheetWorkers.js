@@ -1296,7 +1296,7 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 			if (exists(damageProperties)) {
 				if (damageProperties.indexOf('Versatile') !== -1) {
           if (!exists(damageAbility)) {
-            damageAbility = '@{strength_mod}'
+            damageAbility = '@{strength_mod}';
           }
 					finalSetAttrs[repeatingString + 'second_damage_ability'] = damageAbility;
 					finalSetAttrs[repeatingString + 'second_damage_type'] = damageType;
