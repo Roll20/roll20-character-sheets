@@ -721,6 +721,9 @@ var sumRepeating = function (options, sumItems) {
 				if (sumItems[x].armorType) {
 					collectionArray.push(repeatingString + sumItems[x].armorType);
 				}
+				if (sumItems[x].addOnAfterQty) {
+					collectionArray.push(repeatingString + sumItems[x].addOnAfterQty);
+				}
 			}
 		}
 		if (options.getExtraFields) {
@@ -755,6 +758,10 @@ var sumRepeating = function (options, sumItems) {
 					}
 
 					var itemTotal = Math.round(qty * fieldToAdd * 100) / 100;
+
+					if (sumItem.addOnAfterQty) {
+						itemTotal += getFloatValue(v[repeatingString + sumItem.addOnAfterQty]);
+					}
 
 					if (sumItem.itemTotal) {
 						finalSetAttrs[repeatingString + sumItem.itemTotal] = itemTotal;
@@ -1033,14 +1040,17 @@ on('change:repeating_attack', function (eventInfo) {
 	}
 	/*updateAttackQuery();*/
 });
-on('change:repeating_attack:carried change:repeating_attack:weight remove:repeating_attack', function () {
+on('change:repeating_attack:carried change:repeating_attack:weight change:repeating_attack:ammo change:repeating_attack:ammo_weight remove:repeating_attack', function () {
 	var options = {
 		collection: 'attack',
-		toggle: 'carried'
+		toggle: 'carried',
+		qty: 'ammo'
 	};
 	var sumItems = [
 		{
-			fieldToAdd: 'weight',
+			addOnAfterQty: 'weight',
+			fieldToAdd: 'ammo_weight',
+			itemTotal: 'weight_total',
 			totalField: 'weight_attacks'
 		}
 	];
