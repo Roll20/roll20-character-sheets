@@ -2073,7 +2073,7 @@ on('change:size change:type change:alignment', function () {
 });
 
 var updateNPCChallenge = function () {
-	var collectionArray = ['challenge'];
+	var collectionArray = ['challenge', 'xp'];
 	var finalSetAttrs = {};
 
 	getAttrs(collectionArray, function (v) {
@@ -2131,7 +2131,7 @@ var updateNPCHP = function () {
 	var finalSetAttrs = {};
 
 	getAttrs(collectionArray, function (v) {
-		if (exists(v.hp_srd) && !exists(v.hp)) {
+		if (exists(v.hp_srd)) {
 			var match = v.hp_srd.match(/(\d+)\s?\(([\dd\s\+\-]*)\)/i);
 			if (!match || !match[1] || !match[2]) {
 				console.log('Character doesn\'t have valid HP/HD format');
@@ -2143,12 +2143,12 @@ var updateNPCHP = function () {
 			}
 		}
 
-		console.log('updateNPC', finalSetAttrs);
+		console.log('updateNPCHP', finalSetAttrs);
 		setFinalAttrs(v, finalSetAttrs);
 	});
 };
 
-on('change:hp_srd change:hp', function () {
+on('change:hp_srd', function () {
 	updateNPCHP();
 });
 
@@ -2157,7 +2157,7 @@ var updateNPCAC = function () {
 	var finalSetAttrs = {};
 
 	getAttrs(collectionArray, function (v) {
-		if (exists(v.ac_srd) && !exists(v.ac)) {
+		if (exists(v.ac_srd)) {
 			var match = v.ac_srd.match(/(\d+)\s?(.*)/);
 			if (!match || !match[1] || !match[2]) {
 				console.log('Character doesn\'t have valid AC format');
@@ -2172,6 +2172,22 @@ var updateNPCAC = function () {
 	});
 };
 
-on('change:hp_srd change:hp', function () {
+on('change:ac_srd', function () {
 	updateNPCAC();
+});
+
+var updateNPCName = function () {
+	var collectionArray = ['character_name_srd', 'character_name_srd'];
+	var finalSetAttrs = {};
+
+	getAttrs(collectionArray, function (v) {
+		finalSetAttrs.character_name = v.character_name_srd;
+
+		console.log('updateNPCName', finalSetAttrs);
+		setFinalAttrs(v, finalSetAttrs);
+	});
+};
+
+on('change:character_name_srd', function () {
+	console.log('character_name_srd changed');
 });
