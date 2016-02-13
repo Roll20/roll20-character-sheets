@@ -1974,7 +1974,7 @@ var updateAttachers = function () {
 	var repeatingItem = 'repeating_attacher';
 	var collectionArray = ['attacher_initiative', 'attr_attacher_death_saving_throw', 'attacher_hit_dice', 'attacher_attack', 'attacher_spell', 'attacher_skill'];
 	var finalSetAttrs = {};
-	var itemsToPush = ['initiative', 'death_saving_throw', 'hit_dice', 'attack', 'spell', skill];
+	var itemsToPush = ['initiative', 'death_saving_throw', 'hit_dice', 'attack', 'spell', 'skill'];
 
 	for (var i = 0; i < ABILITIES.length; i++) {
 		collectionArray.push('attacher_' + ABILITIES[i] + '_check');
