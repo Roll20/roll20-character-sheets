@@ -94,10 +94,12 @@ This will create `13th_Age-neovatar.[css|html]` that you can copy and paste into
 
 ### Changelog
 
+**1.5.0:**
+* Sheet workers are used to calculate HP per level and removed HP lvlmod field
+
 **1.4.2:**
 
 * Pop-up asks for situational attack modifier on a basic attack roll
-* Sheet workers are used to calculate HP per level and removed  HP lvlmod field
 
 **1.4.1:**
 
