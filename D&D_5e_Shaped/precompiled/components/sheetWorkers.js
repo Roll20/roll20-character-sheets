@@ -1995,7 +1995,7 @@ on('sheet:opened', function () {
 
 var updateAttachers = function () {
 	var repeatingItem = 'repeating_attacher';
-	var collectionArray = ['attacher_initiative', 'attr_attacher_death_saving_throw', 'attacher_hit_dice', 'attacher_attack', 'attacher_spell', 'attacher_skill'];
+	var collectionArray = ['attacher_initiative', 'attacher_death_saving_throw', 'attacher_hit_dice', 'attacher_attack', 'attacher_spell', 'attacher_skill'];
 	var finalSetAttrs = {};
 	var itemsToPush = ['initiative', 'death_saving_throw', 'hit_dice', 'attack', 'spell', 'skill'];
 
@@ -2048,4 +2048,26 @@ var updateAttachers = function () {
 
 on('change:repeating_attacher remove:repeating_attacher', function () {
 	updateAttachers();
+});
+
+var updateNPCSizeTypeAlignment = function () {
+	var collectionArray = ['size', 'type', 'alignment'];
+	var finalSetAttrs = {};
+
+	getAttrs(collectionArray, function (v) {
+		finalSetAttrs.size_type_alignment = v.size || 'Large';
+		if (v.type) {
+			finalSetAttrs.size_type_alignment += SPACE + v.type;
+		}
+		if (v.alignment) {
+			finalSetAttrs.size_type_alignment += ',' + SPACE + v.alignment;
+		}
+
+		console.log('updateNPC', finalSetAttrs);
+		setFinalAttrs(v, finalSetAttrs);
+	});
+};
+
+on('change:size change:type change:alignment', function () {
+	updateNPCSizeTypeAlignment();
 });
