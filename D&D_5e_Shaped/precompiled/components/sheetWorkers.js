@@ -2071,3 +2071,107 @@ var updateNPCSizeTypeAlignment = function () {
 on('change:size change:type change:alignment', function () {
 	updateNPCSizeTypeAlignment();
 });
+
+var updateNPCChallenge = function () {
+	var collectionArray = ['challenge'];
+	var finalSetAttrs = {};
+
+	getAttrs(collectionArray, function (v) {
+		var challenge = v.challenge;
+		var xpPerChallenge = {
+			0: 0,
+			'1/8': 25,
+			'1/4': 50,
+			'1/2': 100,
+			1: 200,
+			2: 450,
+			3: 700,
+			4: 1100,
+			5: 1800,
+			6: 2300,
+			7: 2900,
+			8: 3900,
+			9: 5000,
+			10: 5900,
+			11: 7200,
+			12: 8400,
+			13: 10000,
+			14: 11500,
+			15: 13000,
+			16: 15000,
+			17: 18000,
+			18: 20000,
+			19: 22000,
+			20: 25000,
+			21: 33000,
+			22: 41000,
+			23: 50000,
+			24: 62000,
+			25: 75000,
+			26: 90000,
+			27: 105000,
+			28: 120000,
+			29: 135000,
+			30: 155000
+		};
+
+		finalSetAttrs.xp = xpPerChallenge[challenge];
+
+		console.log('updateNPCChallenge', finalSetAttrs);
+		setFinalAttrs(v, finalSetAttrs);
+	});
+};
+
+on('change:challenge', function () {
+	updateNPCChallenge();
+});
+
+var updateNPCHP = function () {
+	var collectionArray = ['hp_srd', 'hp', 'hp_max', 'hp_formula'];
+	var finalSetAttrs = {};
+
+	getAttrs(collectionArray, function (v) {
+		if (exists(v.hp_srd) && !exists(v.hp)) {
+			var match = v.hp_srd.match(/(\d+)\s?\(([\dd\s\+\-]*)\)/i);
+			if (!match || !match[1] || !match[2]) {
+				console.log('Character doesn\'t have valid HP/HD format');
+			} else {
+				var hp = match[1];
+				finalSetAttrs.hp = hp;
+				finalSetAttrs.hp_max = hp;
+				finalSetAttrs.hp_formula = match[2];
+			}
+		}
+
+		console.log('updateNPC', finalSetAttrs);
+		setFinalAttrs(v, finalSetAttrs);
+	});
+};
+
+on('change:hp_srd change:hp', function () {
+	updateNPCHP();
+});
+
+var updateNPCAC = function () {
+	var collectionArray = ['ac_srd', 'ac', 'ac_note'];
+	var finalSetAttrs = {};
+
+	getAttrs(collectionArray, function (v) {
+		if (exists(v.ac_srd) && !exists(v.ac)) {
+			var match = v.ac_srd.match(/(\d+)\s?(.*)/);
+			if (!match || !match[1] || !match[2]) {
+				console.log('Character doesn\'t have valid AC format');
+			} else {
+				finalSetAttrs.ac = match[1];
+				finalSetAttrs.ac_note = match[2].replace(/\(|\)/g, '');
+			}
+		}
+
+		console.log('updateNPC', finalSetAttrs);
+		setFinalAttrs(v, finalSetAttrs);
+	});
+};
+
+on('change:hp_srd change:hp', function () {
+	updateNPCAC();
+});
