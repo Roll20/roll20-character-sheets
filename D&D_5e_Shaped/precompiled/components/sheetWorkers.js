@@ -1084,6 +1084,11 @@ var updateAttackToggle = function (v, finalSetAttrs, repeatingString, options) {
 			attackFormula += 0 + '[unproficient]';
 		}
 
+		if (!exists(v[repeatingString + 'ammo_weight']) && !exists(finalSetAttrs[repeatingString + 'ammo_weight'])&& v[repeatingString + 'type'] === 'Ranged Weapon') {
+			finalSetAttrs[repeatingString + 'ammo'] = '.02';
+			finalSetAttrs[repeatingString + 'ammo_weight'] = '.02';
+		}
+
 		var attackAbility = v[repeatingString + 'attack_ability'];
 		if (!exists(attackAbility) && v[repeatingString + 'type'] === 'Ranged Weapon') {
 			attackAbility = '@{dexterity_mod}';
@@ -1306,7 +1311,7 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 			if (exists(damageProperties)) {
 				if (damageProperties.indexOf('Versatile') !== -1) {
           if (!exists(damageAbility)) {
-            damageAbility = '@{strength_mod}'
+            damageAbility = '@{strength_mod}';
           }
 					finalSetAttrs[repeatingString + 'second_damage_ability'] = damageAbility;
 					finalSetAttrs[repeatingString + 'second_damage_type'] = damageType;
@@ -1493,6 +1498,8 @@ var updateAttack = function (rowId) {
 			collectionArray.push(repeatingString + 'damage_string');
 			collectionArray.push(repeatingString + 'modifiers');
       collectionArray.push(repeatingString + 'properties');
+			collectionArray.push(repeatingString + 'weight');
+			collectionArray.push(repeatingString + 'ammo_weight');
 			collectionArray.push(repeatingString + 'parsed');
 		}
 
@@ -1531,6 +1538,12 @@ var updateAttack = function (rowId) {
               finalSetAttrs[repeatingString + 'attack_ability'] = '@{finesse_mod}';
               finalSetAttrs[repeatingString + 'damage_ability'] = '@{finesse_mod}';
             }
+	          if (attackProperties.indexOf('Thrown') !== -1) {
+		          var ammoWeight = parseFloat(v[repeatingString + 'weight']);
+		          finalSetAttrs[repeatingString + 'ammo'] = 1;
+		          finalSetAttrs[repeatingString + 'ammo_weight'] = ammoWeight;
+		          finalSetAttrs[repeatingString + 'weight'] = 0;
+	          }
             if (!finalSetAttrs[repeatingString + 'parsed']) {
               finalSetAttrs[repeatingString + 'parsed'] = '';
             }
