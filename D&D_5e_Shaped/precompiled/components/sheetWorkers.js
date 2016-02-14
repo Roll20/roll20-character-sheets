@@ -2194,7 +2194,7 @@ on('change:character_name_srd', function () {
 
 var updateNPCContent = function () {
 	console.log('updateNPCContent');
-	var collectionArray = ['content_srd'];
+	var collectionArray = ['content_srd', 'character_name_srd'];
 	var finalSetAttrs = {};
 
 	getAttrs(collectionArray, function (v) {
@@ -2204,8 +2204,8 @@ var updateNPCContent = function () {
 		var traits;
 		var re = /\*\*(.*)\*\*:\s(.*)/gi;
 		var match;
-
-		console.log('re', re);
+		var newRowId;
+		var repeatingString;
 
 		if (exists(content)) {
 			if (content.indexOf('Legendary Actions') !== -1) {
@@ -2213,24 +2213,61 @@ var updateNPCContent = function () {
 				legendaryActions = legendaryActionsSplit[1];
 				content = legendaryActionsSplit[0];
 			}
+			if (exists(legendaryActions)) {
+				console.log('legendaryActions', legendaryActions);
+				console.log('v.character_name_srd', v.character_name_srd);
+				var creatureName = v.character_name_srd;
+				var legendaryActionAmount = 3;
+				var legendaryActionsMatch = legendaryActions.match(/Can take (\d+) Legendary Actions/gi);
+
+				if (legendaryActionsMatch && legendaryActionsMatch[1]) {
+					console.log('legendaryActionsMatch[1]', legendaryActionsMatch[1]);
+					legendaryActionAmount = legendaryActionAmount[1];
+				}
+				console.log('legendaryActionAmount', legendaryActionAmount);
+
+				finalSetAttrs.legendary_actions_blurb = 'The ' + creatureName + ' can take ' + legendaryActionAmount + ' legendary actions, choosing from the options below. Only one legendary option can be used at a time and only at the end of another creature\'s turn. The ' + creatureName + ' regains spent legendary actions at the start of its turn.';
+				while (match = re.exec(legendaryActions)) {
+					console.log('match', match);
+					if (match && match[1] && match[2]) {
+						newRowId = generateRowID();
+						repeatingString = 'repeating_legendary_action_' + newRowId + '_';
+						finalSetAttrs[repeatingString + 'name'] = match[1];
+						finalSetAttrs[repeatingString + 'content'] = match[2];
+					} else {
+						console.log('Character doesn\'t have a valid legendary action format');
+					}
+				}
+			}
+
 			if (content.indexOf('Actions') !== -1) {
 				var actionsSplit = content.split(/Actions\n/);
 				actions = actionsSplit[1];
 				content = actionsSplit[0];
 			}
+			if (exists(actions)) {
+				while (match = re.exec(actions)) {
+					if (match && match[1] && match[2]) {
+						newRowId = generateRowID();
+						repeatingString = 'repeating_action_' + newRowId + '_';
+						finalSetAttrs[repeatingString + 'name'] = match[1];
+						finalSetAttrs[repeatingString + 'content'] = match[2];
+					} else {
+						console.log('Character doesn\'t have a valid action format');
+					}
+				}
+			}
+
 			if (content.indexOf('Traits') !== -1) {
 				var traitsSplit = content.split(/Traits\n/);
 				traits = traitsSplit[1];
 				content = traitsSplit[0];
 			}
-
-			console.log('traits', traits);
-
 			if (exists(traits)) {
 				while (match = re.exec(traits)) {
 					if (match && match[1] && match[2]) {
-						var newRowId = generateRowID();
-						var repeatingString = 'repeating_trait_' + newRowId + '_';
+						newRowId = generateRowID();
+						repeatingString = 'repeating_trait_' + newRowId + '_';
 						finalSetAttrs[repeatingString + 'name'] = match[1];
 						finalSetAttrs[repeatingString + 'content'] = match[2];
 					} else {
