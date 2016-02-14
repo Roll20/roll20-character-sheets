@@ -2191,3 +2191,61 @@ var updateNPCName = function () {
 on('change:character_name_srd', function () {
 	console.log('character_name_srd changed');
 });
+
+var updateNPCContent = function () {
+	console.log('updateNPCContent');
+	var collectionArray = ['content_srd'];
+	var finalSetAttrs = {};
+
+	getAttrs(collectionArray, function (v) {
+		var content = v.content_srd;
+		var legendaryActions;
+		var actions;
+		var traits;
+		var re = /\*\*(.*)\*\*:\s(.*)/gi;
+		var match;
+
+		console.log('re', re);
+
+		if (exists(content)) {
+			if (content.indexOf('Legendary Actions') !== -1) {
+				var legendaryActionsSplit = content.split(/Legendary Actions\n/);
+				legendaryActions = legendaryActionsSplit[1];
+				content = legendaryActionsSplit[0];
+			}
+			if (content.indexOf('Actions') !== -1) {
+				var actionsSplit = content.split(/Actions\n/);
+				actions = actionsSplit[1];
+				content = actionsSplit[0];
+			}
+			if (content.indexOf('Traits') !== -1) {
+				var traitsSplit = content.split(/Traits\n/);
+				traits = traitsSplit[1];
+				content = traitsSplit[0];
+			}
+
+			console.log('traits', traits);
+
+			if (exists(traits)) {
+				while (match = re.exec(traits)) {
+					if (match && match[1] && match[2]) {
+						var newRowId = generateRowID();
+						var repeatingString = 'repeating_trait_' + newRowId + '_';
+						finalSetAttrs[repeatingString + 'name'] = match[1];
+						finalSetAttrs[repeatingString + 'content'] = match[2];
+					} else {
+						console.log('Character doesn\'t have a valid trait format');
+					}
+				}
+			}
+		}
+
+		console.log('updateNPCContent', finalSetAttrs);
+		setFinalAttrs(v, finalSetAttrs);
+	});
+};
+
+on('change:content_srd', function () {
+	console.log('content_srd changed');
+	updateNPCContent();
+});
