@@ -2126,7 +2126,7 @@ on('change:challenge', function () {
 	updateNPCChallenge();
 });
 
-var updateNPCHP = function () {
+var updateNPCHPFromSRD = function () {
 	var collectionArray = ['hp_srd', 'hp', 'hp_max', 'hp_formula'];
 	var finalSetAttrs = {};
 
@@ -2143,12 +2143,59 @@ var updateNPCHP = function () {
 			}
 		}
 
+		console.log('updateNPCHPFromSRD', finalSetAttrs);
+		setFinalAttrs(v, finalSetAttrs);
+	});
+};
+on('change:hp_srd', function () {
+	updateNPCHPFromSRD();
+});
+
+var updateNPCHP = function () {
+	var collectionArray = ['hp', 'hp_max', 'hp_formula'];
+	var finalSetAttrs = {};
+
+	getAttrs(collectionArray, function (v) {
+		if (exists(v.hp_formula)) {
+			var regex = (/(?:(\+|\-)\s)?(\d+)(?:d(\d+))?/gi);
+			var totalHP = 0;
+			var splitFormula;
+
+			while (splitFormula = regex.exec(v.hp_formula)) {
+				if (!splitFormula || !splitFormula[2]) {
+					console.log('Character doesn\'t have valid hp formula');
+				} else {
+					var amount = 0;
+
+					if (!splitFormula[3]) {
+						amount = getIntValue(splitFormula[2]);
+					} else {
+						var hdNum = getIntValue(splitFormula[2]);
+						var hdSize = getIntValue(splitFormula[3]);
+						var hdAverage = (hdSize / 2) + .5;
+						amount = Math.floor(hdNum * hdAverage);
+					}
+
+					if (!splitFormula[1] || splitFormula[1] === '+') {
+						totalHP += amount;
+					} else if (splitFormula[1] === '-') {
+						totalHP -= amount;
+					}
+				}
+				v.hp_formula.replace(splitFormula[0], '');
+			}
+
+			if (totalHP) {
+				finalSetAttrs.hp = totalHP;
+				finalSetAttrs.hp_max = totalHP;
+			}
+		}
+
 		console.log('updateNPCHP', finalSetAttrs);
 		setFinalAttrs(v, finalSetAttrs);
 	});
 };
-
-on('change:hp_srd', function () {
+on('change:hp_formula', function () {
 	updateNPCHP();
 });
 
