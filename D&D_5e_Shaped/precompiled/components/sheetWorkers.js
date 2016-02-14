@@ -88,11 +88,11 @@ function setFinalAttrs(v, finalSetAttrs) {
 		setAttrs(finalSetAttrs);
 	}
 }
-function fromVOrFinalSetAttrs (v, finalSetAttrs, value) {
-  if (exists(finalSetAttrs[value])) {
-    return finalSetAttrs[value];
-  }
-  return v[value];
+function fromVOrFinalSetAttrs(v, finalSetAttrs, value) {
+	if (exists(finalSetAttrs[value])) {
+		return finalSetAttrs[value];
+	}
+	return v[value];
 }
 function parseAttackComponents(v, repeatingString, finalSetAttrs, options) {
 	var parsed = v[repeatingString + 'parsed'];
@@ -142,20 +142,20 @@ function emptyIfUndefined(value) {
 	return value;
 }
 function ordinalSpellLevel(level) {
-  if (level === 0) {
-    return 'Cantrip';
-  } else {
-    switch (level % 10) {
-      case 1:
-        return level+'st-level';
-      case 2:
-        return level+'nd-level';
-      case 3:
-        return level+'rd-level';
-      default:
-        return level+'th-level';
-    }
-  }
+	if (level === 0) {
+		return 'Cantrip';
+	} else {
+		switch (level % 10) {
+			case 1:
+				return level + 'st-level';
+			case 2:
+				return level + 'nd-level';
+			case 3:
+				return level + 'rd-level';
+			default:
+				return level + 'th-level';
+		}
+	}
 }
 function versionCompare(v1, v2, options) {
 	var lexicographical = options && options.lexicographical,
@@ -246,13 +246,13 @@ var updateAbilityModifier = function (ability) {
 		abilityCheckFormula += ADD + '@{jack_of_all_trades_toggle}[jack of all trades]';
 		abilityCheckFormula += ADD + '(@{global_check_bonus})[global check bonus]';
 
-    var abilityModWithSign = abilityMod;
-    if (abilityMod >= 0) {
-      abilityModWithSign = '+' + abilityMod;
-    }
+		var abilityModWithSign = abilityMod;
+		if (abilityMod >= 0) {
+			abilityModWithSign = '+' + abilityMod;
+		}
 
 		finalSetAttrs[ability + '_mod'] = abilityMod;
-    finalSetAttrs[ability + '_mod_with_sign'] = abilityModWithSign;
+		finalSetAttrs[ability + '_mod_with_sign'] = abilityModWithSign;
 		finalSetAttrs[ability + '_check_mod'] = abilityCheckFormula;
 
 		if (ability === 'strength') {
@@ -364,7 +364,7 @@ var updateLevels = function () {
 	var levelArray = [];
 	var sorcererLevels = 0;
 	var classesWithSpellcasting = 0;
-  var xpTable = [0, 300, 900, 2700, 6500, 14000, 23000, 34000, 48000, 64000, 85000, 100000, 120000, 140000, 165000, 195000, 225000, 265000, 305000, 355000, 385000, 405000, 435000, 465000, 495000, 525000, 555000, 585000, 605000, 635000, 665000];
+	var xpTable = [0, 300, 900, 2700, 6500, 14000, 23000, 34000, 48000, 64000, 85000, 100000, 120000, 140000, 165000, 195000, 225000, 265000, 305000, 355000, 385000, 405000, 435000, 465000, 495000, 525000, 555000, 585000, 605000, 635000, 665000];
 
 	getSectionIDs(repeatingItem, function (ids) {
 		for (var i = 0; i < ids.length; i++) {
@@ -463,18 +463,18 @@ var updateLevels = function () {
 			console.log('finalSetAttrs.caster_type', finalSetAttrs.caster_type);
 
 			finalSetAttrs.level = totalLevel;
-      finalSetAttrs.class_and_level = levelArray.join(' ');
+			finalSetAttrs.class_and_level = levelArray.join(' ');
 
-      var xpForNextLevel = 0;
-      if (!totalLevel) {
-        totalLevel = 0;
-      }
-      if (totalLevel > 30) {
-        xpForNextLevel = xpTable[30];
-      } else {
-        xpForNextLevel = xpTable[totalLevel];
-      }
-      finalSetAttrs.xp_next_level = xpForNextLevel;
+			var xpForNextLevel = 0;
+			if (!totalLevel) {
+				totalLevel = 0;
+			}
+			if (totalLevel > 30) {
+				xpForNextLevel = xpTable[30];
+			} else {
+				xpForNextLevel = xpTable[totalLevel];
+			}
+			finalSetAttrs.xp_next_level = xpForNextLevel;
 
 			if (sorcererLevels > 0) {
 				finalSetAttrs.has_sorcerer_levels = 'on';
@@ -753,7 +753,7 @@ var sumRepeating = function (options, sumItems) {
 							var mediumArmorDexMod = getIntValue(v.medium_armor_max_dex, 2);
 							fieldToAdd += Math.min(mediumArmorDexMod, dexMod);
 						} else if (v[repeatingString + sumItem.armorType] === 'Armor + Dex') {
-              fieldToAdd += dexMod;
+							fieldToAdd += dexMod;
 						}
 					}
 
@@ -1084,7 +1084,7 @@ var updateAttackToggle = function (v, finalSetAttrs, repeatingString, options) {
 			attackFormula += 0 + '[unproficient]';
 		}
 
-		if (!exists(v[repeatingString + 'ammo_weight']) && !exists(finalSetAttrs[repeatingString + 'ammo_weight'])&& v[repeatingString + 'type'] === 'Ranged Weapon') {
+		if (!exists(v[repeatingString + 'ammo_weight']) && !exists(finalSetAttrs[repeatingString + 'ammo_weight']) && v[repeatingString + 'type'] === 'Ranged Weapon') {
 			finalSetAttrs[repeatingString + 'ammo'] = '.02';
 			finalSetAttrs[repeatingString + 'ammo_weight'] = '.02';
 		}
@@ -1174,8 +1174,8 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 	var damageString = '';
 	var damageFormula = '';
 	var damageToggle = v[repeatingString + 'damage_toggle'];
-  var damageAbility;
-  var damageType;
+	var damageAbility;
+	var damageType;
 
 	if (!damageToggle || damageToggle === '@{damage_toggle_var}') {
 		var damageAddition = 0;
@@ -1310,9 +1310,9 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 			var damageProperties = v[repeatingString + 'properties'];
 			if (exists(damageProperties)) {
 				if (damageProperties.indexOf('Versatile') !== -1) {
-          if (!exists(damageAbility)) {
-            damageAbility = '@{strength_mod}';
-          }
+					if (!exists(damageAbility)) {
+						damageAbility = '@{strength_mod}';
+					}
 					finalSetAttrs[repeatingString + 'second_damage_ability'] = damageAbility;
 					finalSetAttrs[repeatingString + 'second_damage_type'] = damageType;
 				}
@@ -1497,7 +1497,7 @@ var updateAttack = function (rowId) {
 			collectionArray.push(repeatingString + 'second_damage_type');
 			collectionArray.push(repeatingString + 'damage_string');
 			collectionArray.push(repeatingString + 'modifiers');
-      collectionArray.push(repeatingString + 'properties');
+			collectionArray.push(repeatingString + 'properties');
 			collectionArray.push(repeatingString + 'weight');
 			collectionArray.push(repeatingString + 'ammo_weight');
 			collectionArray.push(repeatingString + 'parsed');
@@ -1526,30 +1526,30 @@ var updateAttack = function (rowId) {
 						finalSetAttrs[repeatingString + 'parsed'] += ' modifiers';
 					}
 				}
-        if (!exists(v[repeatingString + 'parsed']) || v[repeatingString + 'parsed'].indexOf('attackProperties') === -1) {
-          var attackProperties = v[repeatingString + 'properties'];
-          if (exists(attackProperties)) {
-	          if (attackProperties.indexOf('Reach') !== -1) {
-		          finalSetAttrs[repeatingString + 'reach'] = '10 ft';
-	          } else if (v[repeatingString + 'type'] === 'Melee Weapon') {
-		          finalSetAttrs[repeatingString + 'reach'] = '5 ft';
-	          }
-            if (attackProperties.indexOf('Finesse') !== -1) {
-              finalSetAttrs[repeatingString + 'attack_ability'] = '@{finesse_mod}';
-              finalSetAttrs[repeatingString + 'damage_ability'] = '@{finesse_mod}';
-            }
-	          if (attackProperties.indexOf('Thrown') !== -1) {
-		          var ammoWeight = parseFloat(v[repeatingString + 'weight']);
-		          finalSetAttrs[repeatingString + 'ammo'] = 1;
-		          finalSetAttrs[repeatingString + 'ammo_weight'] = ammoWeight;
-		          finalSetAttrs[repeatingString + 'weight'] = 0;
-	          }
-            if (!finalSetAttrs[repeatingString + 'parsed']) {
-              finalSetAttrs[repeatingString + 'parsed'] = '';
-            }
-            finalSetAttrs[repeatingString + 'parsed'] += ' attackProperties';
-          }
-        }
+				if (!exists(v[repeatingString + 'parsed']) || v[repeatingString + 'parsed'].indexOf('attackProperties') === -1) {
+					var attackProperties = v[repeatingString + 'properties'];
+					if (exists(attackProperties)) {
+						if (attackProperties.indexOf('Reach') !== -1) {
+							finalSetAttrs[repeatingString + 'reach'] = '10 ft';
+						} else if (v[repeatingString + 'type'] === 'Melee Weapon') {
+							finalSetAttrs[repeatingString + 'reach'] = '5 ft';
+						}
+						if (attackProperties.indexOf('Finesse') !== -1) {
+							finalSetAttrs[repeatingString + 'attack_ability'] = '@{finesse_mod}';
+							finalSetAttrs[repeatingString + 'damage_ability'] = '@{finesse_mod}';
+						}
+						if (attackProperties.indexOf('Thrown') !== -1) {
+							var ammoWeight = parseFloat(v[repeatingString + 'weight']);
+							finalSetAttrs[repeatingString + 'ammo'] = 1;
+							finalSetAttrs[repeatingString + 'ammo_weight'] = ammoWeight;
+							finalSetAttrs[repeatingString + 'weight'] = 0;
+						}
+						if (!finalSetAttrs[repeatingString + 'parsed']) {
+							finalSetAttrs[repeatingString + 'parsed'] = '';
+						}
+						finalSetAttrs[repeatingString + 'parsed'] += ' attackProperties';
+					}
+				}
 
 				var attackOptions = {
 					defaultAbility: 'strength_mod',
@@ -1649,13 +1649,13 @@ var updateSpell = function (rowId) {
 
 				var spellLevel = getIntValue(v[repeatingString + 'spell_level']);
 				if (!exists(spellLevel)) {
-          spellLevel = 0;
-          finalSetAttrs[repeatingString + 'spell_level'] = spellLevel;
-        }
-        if (spellLevel === 0) {
-          finalSetAttrs[repeatingString + 'is_prepared'] = 'on';
-        }
-        finalSetAttrs[repeatingString + 'friendly_level'] = ordinalSpellLevel(spellLevel);
+					spellLevel = 0;
+					finalSetAttrs[repeatingString + 'spell_level'] = spellLevel;
+				}
+				if (spellLevel === 0) {
+					finalSetAttrs[repeatingString + 'is_prepared'] = 'on';
+				}
+				finalSetAttrs[repeatingString + 'friendly_level'] = ordinalSpellLevel(spellLevel);
 
 				var spellComponents = v[repeatingString + 'components'];
 				if (exists(spellComponents)) {
@@ -1855,32 +1855,32 @@ var sheetOpened = function () {
 			if (!exists(v.strength)) {
 				setAbilities.strength = 10;
 				setAbilities.strength_mod = 0;
-        setAbilities.strength_mod_with_sign = '+0';
+				setAbilities.strength_mod_with_sign = '+0';
 			}
 			if (!exists(v.dexterity)) {
 				setAbilities.dexterity = 10;
 				setAbilities.dexterity_mod = 0;
-        setAbilities.dexterity_mod_with_sign = '+0';
+				setAbilities.dexterity_mod_with_sign = '+0';
 			}
 			if (!exists(v.constitution)) {
 				setAbilities.constitution = 10;
 				setAbilities.constitution_mod = 0;
-        setAbilities.constitution_mod_with_sign = '+0';
+				setAbilities.constitution_mod_with_sign = '+0';
 			}
 			if (!exists(v.intelligence)) {
 				setAbilities.intelligence = 10;
 				setAbilities.intelligence_mod = 0;
-        setAbilities.intelligence_mod_with_sign = '+0';
+				setAbilities.intelligence_mod_with_sign = '+0';
 			}
 			if (!exists(v.wisdom)) {
 				setAbilities.wisdom = 10;
 				setAbilities.wisdom_mod = 0;
-        setAbilities.wisdom_mod_with_sign = '+0';
+				setAbilities.wisdom_mod_with_sign = '+0';
 			}
 			if (!exists(v.charisma)) {
 				setAbilities.charisma = 10;
 				setAbilities.charisma_mod = 0;
-        setAbilities.charisma_mod_with_sign = '+0';
+				setAbilities.charisma_mod_with_sign = '+0';
 			}
 			setFinalAttrs(v, setAbilities);
 
@@ -2029,11 +2029,11 @@ var updateAttachers = function () {
 						var attacherName = v[repeatingString + 'name'] || '';
 
 						var freeText = v[repeatingString + 'freetext'];
-						if(exists(attacherName) && exists(freeText)) {
+						if (exists(attacherName) && exists(freeText)) {
 							finalSetAttrs['attacher_' + itemsToPush[x]] += '{{' + attacherName + '=' + freeText + '}}' + ' ';
 						}
 						var freeForm = v[repeatingString + 'freeform'];
-						if(exists(freeForm)) {
+						if (exists(freeForm)) {
 							finalSetAttrs['attacher_' + itemsToPush[x]] += freeForm + ' ';
 						}
 					}
