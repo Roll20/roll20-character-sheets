@@ -2280,7 +2280,7 @@ var updateNPCContent = function () {
 						newRowId = generateRowID();
 						repeatingString = 'repeating_legendary_action_' + newRowId + '_';
 						finalSetAttrs[repeatingString + 'name'] = match[1];
-						finalSetAttrs[repeatingString + 'content'] = match[2];
+						finalSetAttrs[repeatingString + 'freetext'] = match[2];
 					} else {
 						console.log('Character doesn\'t have a valid legendary action format');
 					}
@@ -2298,7 +2298,7 @@ var updateNPCContent = function () {
 						newRowId = generateRowID();
 						repeatingString = 'repeating_action_' + newRowId + '_';
 						finalSetAttrs[repeatingString + 'name'] = match[1];
-						finalSetAttrs[repeatingString + 'content'] = match[2];
+						finalSetAttrs[repeatingString + 'freetext'] = match[2];
 					} else {
 						console.log('Character doesn\'t have a valid action format');
 					}
@@ -2316,7 +2316,7 @@ var updateNPCContent = function () {
 						newRowId = generateRowID();
 						repeatingString = 'repeating_trait_' + newRowId + '_';
 						finalSetAttrs[repeatingString + 'name'] = match[1];
-						finalSetAttrs[repeatingString + 'content'] = match[2];
+						finalSetAttrs[repeatingString + 'freetext'] = match[2];
 					} else {
 						console.log('Character doesn\'t have a valid trait format');
 					}
