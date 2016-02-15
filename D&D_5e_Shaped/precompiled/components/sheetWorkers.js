@@ -674,14 +674,17 @@ on('change:caster_level change:spell_slots_l1_bonus change:spell_slots_l2_bonus 
 });
 
 var updatePb = function () {
-	var collectionArray = ['level'];
+	var collectionArray = ['level', 'challenge'];
 	var finalSetAttrs = {};
 
 	getAttrs(collectionArray, function (v) {
 		var pb = 2;
 		var level = getIntValue(v.level);
-		if (exists(level)) {
-			pb += Math.floor(Math.abs((level - 1) / 4));
+		var challenge = getIntValue(v.challenge);
+		var levelOrChallenge = Math.max(level, challenge);
+
+		if (exists(levelOrChallenge)) {
+			pb += Math.floor(Math.abs((levelOrChallenge - 1) / 4));
 		}
 		finalSetAttrs.pb = pb;
 		finalSetAttrs.exp = pb * 2;
@@ -2136,6 +2139,7 @@ var updateNPCChallenge = function () {
 
 on('change:challenge', function () {
 	updateNPCChallenge();
+	updatePb();
 });
 
 var updateNPCHPFromSRD = function () {
