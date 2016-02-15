@@ -203,9 +203,13 @@ function versionCompare(v1, v2, options) {
 
 	return 0;
 }
+function getAbilityMod (score) {
+  return Math.floor((getIntValue(score) - 10) / 2);
+}
 
 var ABILITIES = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
 var ADD = ' + ';
+var SUBTRACT = ' - ';
 var SPACE = ' ';
 
 on('change:cp change:sp change:ep change:gp change:pp', function () {
@@ -228,11 +232,7 @@ on('change:cp change:sp change:ep change:gp change:pp', function () {
 	});
 });
 
-var getAbilityMod = function (score) {
-	return Math.floor((getIntValue(score) - 10) / 2);
-};
-
-var updateAbilityModifier = function (ability) {
+function updateAbilityModifier (ability) {
 	var collectionArray = [ability, ability + '_bonus', ability + '_mod', ability + '_check_mod', 'global_ability_bonus', 'strength_mod', 'dexterity_mod'];
 	var finalSetAttrs = {};
 
@@ -268,7 +268,7 @@ var updateAbilityModifier = function (ability) {
 		console.log('updateAbilityModifier', finalSetAttrs);
 		setFinalAttrs(v, finalSetAttrs);
 	});
-};
+}
 on('change:strength change:strength_bonus change:strength_check_mod change:global_ability_bonus', function () {
 	updateAbilityModifier('strength');
 });
@@ -291,7 +291,7 @@ on('change:dexterity_mod', function () {
 	updateArmor();
 });
 
-var updateLevels = function () {
+function updateLevels () {
 	var repeatingItem = 'repeating_class';
 	var collectionArray = [];
 	var finalSetAttrs = {};
@@ -506,7 +506,7 @@ var updateLevels = function () {
 			setFinalAttrs(v, finalSetAttrs);
 		});
 	});
-};
+}
 
 on('change:repeating_class remove:repeating_class', function () {
 	console.log('repeating_class');
@@ -2063,7 +2063,7 @@ var updateNPCSizeTypeAlignment = function () {
 			finalSetAttrs.size_type_alignment += ',' + SPACE + v.alignment;
 		}
 
-		console.log('updateNPC', finalSetAttrs);
+		console.log('updateNPCSizeTypeAlignment', finalSetAttrs);
 		setFinalAttrs(v, finalSetAttrs);
 	});
 };
@@ -2127,75 +2127,119 @@ on('change:challenge', function () {
 });
 
 var updateNPCHPFromSRD = function () {
-	var collectionArray = ['hp_srd', 'hp', 'hp_max', 'hp_formula'];
+  var collectionArray = ['hp_srd', 'constitution', 'constitution_mod', 'constitution_bonus', 'global_ability_bonus'];
+  var finalSetAttrs = {};
+
+  getAttrs(collectionArray, function (v) {
+    if (exists(v.hp_srd)) {
+      var match = v.hp_srd.match(/\((\d+)d(\d+)(?:\s?(?:\+|\-)\s?(\d+))?\)/i);
+      if (!match || !match[1] || !match[2]) {
+        console.log('Character doesn\'t have valid HP/HD format');
+      } else {
+        var hdNum = getIntValue(match[1]);
+
+        var conMod = getIntValue(v.constitution_mod);
+        if (!conMod) {
+          var conScore = getIntValue(v.constitution);
+          var conBonus = getIntValue(v.constitution_bonus);
+          var globalAbilityBonus = getIntValue(v.global_ability_bonus);
+          console.log('conScore', conScore);
+          console.log('conBonus', conBonus);
+          console.log('globalAbilityBonus', globalAbilityBonus);
+
+          conMod = getAbilityMod((conScore + conBonus + globalAbilityBonus));
+          console.log('conMod 1', conMod);
+        }
+        console.log('conMod', conMod);
+
+        console.log('hdNum', hdNum);
+        finalSetAttrs.hit_dice = hdNum;
+        finalSetAttrs.hit_die = 'd' + getIntValue(match[2]);
+
+        var hpExpectedBonus = hdNum * conMod;
+        var hpBonus = getIntValue(match[3]);
+        if (hpBonus !== hpExpectedBonus) {
+          finalSetAttrs.hp_extra = hpBonus - hpExpectedBonus;
+        }
+      }
+    }
+
+    console.log('updateNPCHPFromSRD', finalSetAttrs);
+    setFinalAttrs(v, finalSetAttrs);
+  });
+};
+on('change:hp_srd', function () {
+  updateNPCHPFromSRD();
+});
+
+
+var updateNPCHP = function () {
+	var collectionArray = ['hit_dice', 'hit_die', 'hp_extra', 'constitution_mod'];
 	var finalSetAttrs = {};
 
 	getAttrs(collectionArray, function (v) {
-		if (exists(v.hp_srd)) {
-			var match = v.hp_srd.match(/(\d+)\s?\(([\dd\s\+\-]*)\)/i);
-			if (!match || !match[1] || !match[2]) {
-				console.log('Character doesn\'t have valid HP/HD format');
-			} else {
-				var hp = match[1];
-				finalSetAttrs.hp = hp;
-				finalSetAttrs.hp_max = hp;
-				finalSetAttrs.hp_formula = match[2];
+		var hdNum = getIntValue(v.hit_dice);
+		var hdSize = getIntValue(v.hit_die.replace('d', ''));
+		var hdAverage = (hdSize / 2) + 0.5;
+		var hpFormula = hdNum + 'd' + hdSize;
+		var conMod = getIntValue(v.constitution_mod);
+		var totalHP = Math.floor(hdNum * hdAverage);
+		var amount;
+
+		if (conMod !== 0) {
+			var bonusHP = hdNum * conMod;
+			if (conMod > 0) {
+				hpFormula += ADD + bonusHP;
+				totalHP += bonusHP;
+			} else if (conMod < 0) {
+				hpFormula += SUBTRACT + bonusHP;
+				totalHP -= bonusHP;
 			}
 		}
 
-		console.log('updateNPCHPFromSRD', finalSetAttrs);
-		setFinalAttrs(v, finalSetAttrs);
-	});
-};
-on('change:hp_srd', function () {
-	updateNPCHPFromSRD();
-});
-
-var updateNPCHP = function () {
-	var collectionArray = ['hp', 'hp_max', 'hp_formula'];
-	var finalSetAttrs = {};
-
-	getAttrs(collectionArray, function (v) {
-		if (exists(v.hp_formula)) {
+		if (exists(v.hp_extra)) {
 			var regex = (/(?:(\+|\-)\s)?(\d+)(?:d(\d+))?/gi);
-			var totalHP = 0;
 			var splitFormula;
 
-			while (splitFormula = regex.exec(v.hp_formula)) {
+			while (splitFormula = regex.exec(v.hp_extra)) {
 				if (!splitFormula || !splitFormula[2]) {
 					console.log('Character doesn\'t have valid hp formula');
 				} else {
-					var amount = 0;
+					amount = 0;
 
 					if (!splitFormula[3]) {
 						amount = getIntValue(splitFormula[2]);
 					} else {
-						var hdNum = getIntValue(splitFormula[2]);
-						var hdSize = getIntValue(splitFormula[3]);
-						var hdAverage = (hdSize / 2) + 0.5;
-						amount = Math.floor(hdNum * hdAverage);
+						var extraHdNum = getIntValue(splitFormula[2]);
+						var extraHdSize = getIntValue(splitFormula[3]);
+						var extraHdAverage = (extraHdSize / 2) + 0.5;
+						amount = Math.floor(extraHdNum * extraHdAverage);
 					}
 
 					if (!splitFormula[1] || splitFormula[1] === '+') {
 						totalHP += amount;
+            hpFormula += ADD + amount;
 					} else if (splitFormula[1] === '-') {
 						totalHP -= amount;
+            hpFormula += SUBTRACT + amount;
 					}
 				}
-				v.hp_formula.replace(splitFormula[0], '');
+				v.hp_extra.replace(splitFormula[0], '');
 			}
+		}
 
-			if (totalHP) {
-				finalSetAttrs.hp = totalHP;
-				finalSetAttrs.hp_max = totalHP;
-			}
+		if (totalHP) {
+			finalSetAttrs.hp = totalHP;
+			finalSetAttrs.hp_max = totalHP;
+			finalSetAttrs.hp_formula = hpFormula;
 		}
 
 		console.log('updateNPCHP', finalSetAttrs);
 		setFinalAttrs(v, finalSetAttrs);
 	});
 };
-on('change:hp_formula', function () {
+on('change:hit_dice change:hit_die change:hp_extra change:constitution_mod', function () {
+	console.log('hd stuff changed');
 	updateNPCHP();
 });
 
