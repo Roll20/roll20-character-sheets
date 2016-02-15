@@ -1853,22 +1853,22 @@ function updateSavingThrowsFromSRD () {
 		var pbVar = '@{PB}';
 
 		if (savingThrowsFromSRD.indexOf('Str') !== -1) {
-			finalSetAttrs['strength_save_prof'] = pbVar;
+			finalSetAttrs.strength_save_prof = pbVar;
 		}
 		if (savingThrowsFromSRD.indexOf('Dex') !== -1) {
-			finalSetAttrs['dexterity_save_prof'] = pbVar;
+			finalSetAttrs.dexterity_save_prof = pbVar;
 		}
 		if (savingThrowsFromSRD.indexOf('Con') !== -1) {
-			finalSetAttrs['constitution_save_prof'] = pbVar;
+			finalSetAttrs.constitution_save_prof = pbVar;
 		}
 		if (savingThrowsFromSRD.indexOf('Int') !== -1) {
-			finalSetAttrs['intelligence_save_prof'] = pbVar;
+			finalSetAttrs.intelligence_save_prof = pbVar;
 		}
 		if (savingThrowsFromSRD.indexOf('Wis') !== -1) {
-			finalSetAttrs['wisdom_save_prof'] = pbVar;
+			finalSetAttrs.wisdom_save_prof = pbVar;
 		}
 		if (savingThrowsFromSRD.indexOf('Cha') !== -1) {
-			finalSetAttrs['charisma_save_prof'] = pbVar;
+			finalSetAttrs.charisma_save_prof = pbVar;
 		}
 
 		console.log('updateSavingThrowsFromSRD', finalSetAttrs);
