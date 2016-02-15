@@ -680,7 +680,14 @@ var updatePb = function () {
 	getAttrs(collectionArray, function (v) {
 		var pb = 2;
 		var level = getIntValue(v.level);
-		var challenge = getIntValue(v.challenge);
+		var challenge = v.challenge;
+
+		if (challenge < 1) {
+			challenge = 1;
+		} else {
+			getIntValue(v.challenge);
+		}
+
 		var levelOrChallenge = Math.max(level, challenge);
 
 		if (exists(levelOrChallenge)) {
