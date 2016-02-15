@@ -2172,7 +2172,7 @@ var updateNPCHP = function () {
 					} else {
 						var hdNum = getIntValue(splitFormula[2]);
 						var hdSize = getIntValue(splitFormula[3]);
-						var hdAverage = (hdSize / 2) + .5;
+						var hdAverage = (hdSize / 2) + 0.5;
 						amount = Math.floor(hdNum * hdAverage);
 					}
 
