@@ -2055,7 +2055,19 @@ var updateNPCSizeTypeAlignment = function () {
 	var finalSetAttrs = {};
 
 	getAttrs(collectionArray, function (v) {
-		finalSetAttrs.size_type_alignment = v.size || 'Large';
+    var creatureSize = v.size || 'Large';
+		finalSetAttrs.size_type_alignment = creatureSize;
+
+    var sizeToHdSize = {
+      Tiny: 4,
+      Small: 6,
+      Medium: 8,
+      Large: 10,
+      Huge: 12,
+      Gargantuan: 20
+    };
+    finalSetAttrs.hit_die = 'd' + sizeToHdSize[creatureSize];
+
 		if (v.type) {
 			finalSetAttrs.size_type_alignment += SPACE + v.type;
 		}
