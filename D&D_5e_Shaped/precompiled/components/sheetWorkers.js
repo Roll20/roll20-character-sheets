@@ -1874,7 +1874,7 @@ function updateSavingThrowsFromSRD () {
 		console.log('updateSavingThrowsFromSRD', finalSetAttrs);
 		setFinalAttrs(v, finalSetAttrs);
 	});
-};
+}
 on('change:saving_throws_srd', function () {
 	updateSavingThrowsFromSRD();
 });
