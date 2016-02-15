@@ -1844,6 +1844,41 @@ on('change:jack_of_all_trades_toggle change:jack_of_all_trades change:global_che
 	updateSkill();
 });
 
+function updateSavingThrowsFromSRD () {
+	var collectionArray = ['saving_throws_srd'];
+	var finalSetAttrs = {};
+
+	getAttrs(collectionArray, function (v) {
+		var savingThrowsFromSRD = v.saving_throws_srd;
+		var pbVar = '@{PB}';
+
+		if (savingThrowsFromSRD.indexOf('Str') !== -1) {
+			finalSetAttrs['strength_save_prof'] = pbVar;
+		}
+		if (savingThrowsFromSRD.indexOf('Dex') !== -1) {
+			finalSetAttrs['dexterity_save_prof'] = pbVar;
+		}
+		if (savingThrowsFromSRD.indexOf('Con') !== -1) {
+			finalSetAttrs['constitution_save_prof'] = pbVar;
+		}
+		if (savingThrowsFromSRD.indexOf('Int') !== -1) {
+			finalSetAttrs['intelligence_save_prof'] = pbVar;
+		}
+		if (savingThrowsFromSRD.indexOf('Wis') !== -1) {
+			finalSetAttrs['wisdom_save_prof'] = pbVar;
+		}
+		if (savingThrowsFromSRD.indexOf('Cha') !== -1) {
+			finalSetAttrs['charisma_save_prof'] = pbVar;
+		}
+
+		console.log('updateSavingThrowsFromSRD', finalSetAttrs);
+		setFinalAttrs(v, finalSetAttrs);
+	});
+};
+on('change:saving_throws_srd', function () {
+	updateSavingThrowsFromSRD();
+});
+
 var sheetOpened = function () {
 	var collectionArray = ['version', 'strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
 	var finalSetAttrs = {};
