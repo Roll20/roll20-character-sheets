@@ -2269,7 +2269,6 @@ var updateNPCChallenge = function () {
 			finalSetAttrs.level = 1;
 		}
 
-
 		console.log('updateNPCChallenge', finalSetAttrs);
 		setFinalAttrs(v, finalSetAttrs);
 	});
@@ -2277,7 +2276,6 @@ var updateNPCChallenge = function () {
 
 on('change:challenge', function () {
 	updateNPCChallenge();
-	updatePb();
 });
 
 var updateNPCHPFromSRD = function () {
