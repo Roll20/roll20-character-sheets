@@ -1954,6 +1954,28 @@ on('change:saving_throws_srd', function () {
 	updateSavingThrowsFromSRD();
 });
 
+function updateSpellsFromSRD () {
+  var collectionArray = ['spells_srd'];
+  var finalSetAttrs = {};
+
+  getAttrs(collectionArray, function (v) {
+    var spells = v.spells_srd.split(', ');
+
+    for (var i = 0; i < spells.length; i++) {
+      var newRowId = generateRowID();
+      var repeatingString = 'repeating_spell_' + newRowId + '_';
+      finalSetAttrs[repeatingString + 'name'] = spells[i];
+    }
+
+    console.log('updateSpellsFromSRD', finalSetAttrs);
+    setFinalAttrs(v, finalSetAttrs);
+  });
+}
+on('change:spells_srd', function () {
+  updateSpellsFromSRD();
+});
+
+
 var sheetOpened = function () {
 	var collectionArray = ['version', 'strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
 	var finalSetAttrs = {};
