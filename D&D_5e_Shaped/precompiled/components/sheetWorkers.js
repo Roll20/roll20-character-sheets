@@ -673,26 +673,29 @@ on('change:caster_level change:spell_slots_l1_bonus change:spell_slots_l2_bonus 
 	updateSpellSlots();
 });
 
+function getPB (level, challenge) {
+  var pb = 2;
+
+  level = getIntValue(level);
+  if (challenge < 1) {
+    challenge = 1;
+  } else {
+    getIntValue(challenge);
+  }
+  var levelOrChallenge = Math.max(level, challenge);
+
+  if (exists(levelOrChallenge)) {
+    pb += Math.floor(Math.abs((levelOrChallenge - 1) / 4));
+  }
+  return pb;
+}
 var updatePb = function () {
 	var collectionArray = ['level', 'challenge'];
 	var finalSetAttrs = {};
 
 	getAttrs(collectionArray, function (v) {
-		var pb = 2;
-		var level = getIntValue(v.level);
-		var challenge = v.challenge;
+		var pb = getPB(v.level, v.challenge);
 
-		if (challenge < 1) {
-			challenge = 1;
-		} else {
-			getIntValue(v.challenge);
-		}
-
-		var levelOrChallenge = Math.max(level, challenge);
-
-		if (exists(levelOrChallenge)) {
-			pb += Math.floor(Math.abs((levelOrChallenge - 1) / 4));
-		}
 		finalSetAttrs.pb = pb;
 		finalSetAttrs.exp = pb * 2;
 		finalSetAttrs.h_PB = pb / 2;
@@ -1849,6 +1852,71 @@ on('change:repeating_skill', function (eventInfo) {
 });
 on('change:jack_of_all_trades_toggle change:jack_of_all_trades change:global_check_bonus change:strength_check_bonus change:dexterity_check_bonus change:constitution_check_bonus change:intelligence_check_bonus change:wisdom_check_bonus change:charisma_check_bonus', function () {
 	updateSkill();
+});
+
+function updateSkillsFromSRD () {
+	var repeatingItem = 'repeating_skill';
+	var collectionArray = ['skills_srd', 'level', 'challenge', 'strength_mod', 'dexterity_mod', 'constitution_mod', 'intelligence_mod', 'wisdom_mod', 'charisma_mod'];
+	var finalSetAttrs = {};
+
+	getSectionIDs(repeatingItem, function (ids) {
+		for (var i = 0; i < ids.length; i++) {
+			var repeatingString = repeatingItem + '_' + ids[i] + '_';
+			collectionArray.push(repeatingString + 'name');
+			collectionArray.push(repeatingString + 'ability');
+		}
+		getAttrs(collectionArray, function (v) {
+			var skillsFromSRD = v.skills_srd;
+			var skillsObj = {};
+      var pb = getPB(v.level, v.challenge);
+			var expertise = pb * 2;
+      var skillName;
+      var repeatingString;
+
+			if (exists(skillsFromSRD)) {
+				for (var j = 0; j < ids.length; j++) {
+					repeatingString = repeatingItem + '_' + ids[j] + '_';
+					skillName = v[repeatingString + 'name'];
+					skillsObj[skillName] = ids[j];
+				}
+
+				var re = /(\w+)\s?((?:\+|\-)\d+)/gi;
+				while (match = re.exec(skillsFromSRD)) {
+					if (match && match[1] && match[2]) {
+						skillName = match[1];
+						if (skillsObj[skillName]) {
+							var skillId = skillsObj[skillName];
+              repeatingString = repeatingItem + '_' + skillId + '_';
+
+              var skillAbility = v[repeatingString + 'ability'];
+              var abilityValue = getAbilityValue(v, skillAbility);
+              var skillBonus = getIntValue(match[2]) - abilityValue;
+
+							if (skillBonus >= expertise) {
+								finalSetAttrs[repeatingString + 'proficiency'] = 'expertise';
+								if (skillBonus > expertise) {
+									finalSetAttrs[repeatingString + 'bonus'] = skillBonus - expertise;
+								}
+							} else if (skillBonus >= pb) {
+								finalSetAttrs[repeatingString + 'proficiency'] = 'proficient';
+								if (skillBonus > pb) {
+									finalSetAttrs[repeatingString + 'bonus'] = skillBonus - pb;
+								}
+							}
+						} else {
+							console.log(skillName + ' does not exist in the list of skills');
+						}
+					}
+				}
+			}
+
+			console.log('updateSkillsFromSRD', finalSetAttrs);
+			setFinalAttrs(v, finalSetAttrs);
+		});
+	});
+}
+on('change:skills_srd', function () {
+	updateSkillsFromSRD();
 });
 
 function updateSavingThrowsFromSRD () {
