@@ -1,4 +1,4 @@
-var currentVersion = '2.0.11';
+var currentVersion = '2.0.12';
 
 String.prototype.capitalize = function () {
 	return this.replace(/\w\S*/g, function (txt) {
