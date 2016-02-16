@@ -2264,6 +2264,12 @@ var updateNPCChallenge = function () {
 
 		finalSetAttrs.xp = xpPerChallenge[challenge];
 
+		finalSetAttrs.level = challenge;
+		if (finalSetAttrs.level < 1) {
+			finalSetAttrs.level = 1;
+		}
+
+
 		console.log('updateNPCChallenge', finalSetAttrs);
 		setFinalAttrs(v, finalSetAttrs);
 	});
