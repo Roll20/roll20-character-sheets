@@ -1208,13 +1208,16 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 			damageAbility = '@{dexterity_mod}';
 			finalSetAttrs[repeatingString + 'damage_ability'] = damageAbility;
 		}
-
 		if (exists(damageAbility) || options.defaultDamageAbility) {
 			damageAbility = getAbilityValue(v, damageAbility, options.defaultDamageAbility);
 			if (exists(damageAbility)) {
 				damageAddition += damageAbility;
 				if (damageFormula !== '') {
-					damageFormula += ADD;
+					if (damageAbility < 0) {
+						damageFormula += SUBTRACT;
+					} else {
+						damageFormula += ADD;
+					}
 				}
 				damageFormula += damageAbility + '[' + getAbilityShortName(v[repeatingString + 'damage_ability']) + ']';
 			}
@@ -1249,7 +1252,14 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 		}
 
 		if (exists(damageAddition)) {
-			damageString += ADD + damageAddition;
+			if (exists(damageString)) {
+				if (damageAddition < 0) {
+					damageString += SUBTRACT;
+				} else {
+					damageString += ADD;
+				}
+			}
+			damageString += damageAddition;
 		}
 
 		damageType = v[repeatingString + 'damage_type'];
@@ -1291,7 +1301,11 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 			if (exists(secondDamageAbility)) {
 				secondDamageAddition += secondDamageAbility;
 				if (secondDamageFormula !== '') {
-					secondDamageFormula += ADD;
+					if (secondDamageAbility < 0) {
+						secondDamageFormula += SUBTRACT;
+					} else {
+						secondDamageFormula += ADD;
+					}
 				}
 				secondDamageFormula += secondDamageAbility + '[' + getAbilityShortName(v[repeatingString + 'second_damage_ability']) + ']';
 			}
@@ -1307,7 +1321,14 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 		}
 
 		if (exists(secondDamageAddition)) {
-			damageString += ADD + secondDamageAddition;
+			if (exists(damageString)) {
+				if (secondDamageAddition < 0) {
+					damageString += SUBTRACT;
+				} else {
+					damageString += ADD;
+				}
+			}
+			damageString += secondDamageAddition;
 		}
 
 		var secondDamageType = v[repeatingString + 'second_damage_type'];
@@ -1470,7 +1491,7 @@ var updateAttackQuery = function () {
 
 var updateAttack = function (rowId) {
 	var repeatingItem = 'repeating_attack';
-	var collectionArray = ['pb', 'finesse_mod', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability'];
+	var collectionArray = ['pb', 'strength_mod', 'finesse_mod', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability'];
 	var finalSetAttrs = {};
 
 	for (var i = 0; i < ABILITIES.length; i++) {
