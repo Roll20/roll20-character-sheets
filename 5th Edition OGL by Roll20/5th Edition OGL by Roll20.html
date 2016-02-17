@@ -181,6 +181,32 @@
             <input type="text" name="attr_npc_xp" placeholder="250">
         </div>
         <div class="row">
+            <input class="npcspellcastingflag" type="checkbox" name="attr_npcspellcastingflag" value="1">
+            <span>SPELLCASTING NPC</span>
+            <div class="npcspelloptions">
+                <span>SPELLCASTING ABILITY</span>
+                <select name="attr_spellcasting_ability" style="margin: 0px; width: auto; padding: 0px; height: 15px;">
+                    <option value="0*">NONE</option>
+                    <option value="@{strength_mod}+">STRENGTH</option>
+                    <option value="@{dexterity_mod}+">DEXTERITY</option>
+                    <option value="@{constitution_mod}+">CONSTITUTION</option>
+                    <option value="@{intelligence_mod}+">INTELLIGENCE</option>
+                    <option value="@{wisdom_mod}+">WISDOM</option>
+                    <option value="@{charisma_mod}+">CHARISMA</option>
+                </select>
+            </div> 
+            <div class="npcspelloptions">
+                <span>SPELL DC</span>
+                <input class="num" type="text" name="attr_npc_spelldc" placeholder="10">
+                <span>SPELL ATTACK BONUS</span>
+                <input class="num" type="text" name="attr_npc_spellattackmod" placeholder="3">
+            </div>
+        </div>
+        <div class="row">
+            <input type="checkbox" name="attr_npcreactionsflag" value="1">
+            <span>HAS REACTIONS</span>
+        </div>
+        <div class="row">
             <span>LEGENDARY ACTIONS:</span>
             <input class="num" type="text" name="attr_npc_legendary_actions" placeholder="0">
         </div>
@@ -452,30 +478,30 @@
         <input class="flag" type="hidden" name="attr_npc_vulnerabilities_flag" value="0">
         <div class="row vulnerabilities red">
             <span>Damage Vulnerabilities</span>
-            <input type="text" name="attr_npcd_vulnerabilities" style="width: 200px;">
+            <span class="info" name="attr_npcd_vulnerabilities"></span>
         </div>
         <input class="flag" type="hidden" name="attr_npc_resistances_flag" value="0">
         <div class="row resistances red">
             <span>Damage Resistances</span>
-            <input type="text" name="attr_npcd_resistances">
+            <span class="info" name="attr_npcd_resistances"></span>
         </div>
         <input class="flag" type="hidden" name="attr_npc_immunities_flag" value="0">
         <div class="row immunities red">
             <span>Damage Immunities</span>
-            <input type="text" name="attr_npcd_immunities">
+            <span class="info" name="attr_npcd_immunities"></span>
         </div>
         <input class="flag" type="hidden" name="attr_npc_condition_immunities_flag" value="0">
         <div class="row condition_immunities red">
             <span>Condition Immunities</span>
-            <input type="text" name="attr_npcd_condition_immunities">
+            <span class="info" name="attr_npcd_condition_immunities"></span>
         </div>
-        <div class="row red">
+        <div class="row senses red">
             <span>Senses</span>
-            <input type="text" name="attr_npcd_senses" style="width: 300px;">
+            <span class="info" name="attr_npcd_senses"></span>
         </div>
-        <div class="row red">
+        <div class="row languages red">
             <span>Languages</span>
-            <input type="text" name="attr_npcd_languages" style="width: 270px;">
+            <span class="info" name="attr_npcd_languages"></span>
         </div>
         <div class="row red">
             <span>Challenge</span>
@@ -495,8 +521,14 @@
     <div class="actions_container"></div>
         <input class="dflag" type="hidden" name="attr_dflag" value="pick">
         <div class="row actions">
-            <div class="row actiontitle">
+            <div class="row actiontitle" style="position: relative;">
                 <span class="title red">Actions</span>
+                <input type="hidden" class="toggleflag" name="attr_toggleflag">
+                <div class="advantagetoggle" style="top: 0px; right: 0px;">
+                    <input type="radio" class="toggle-left" name="attr_advantagetoggle" value="{{query=1}}  {{advantage=1}} {{r2=[[1d20" style="right: 181px; width: 90px;"><span style="right: 181px; width: 90px;">Advantage</span>
+                    <input type="radio" class="toggle-center" name="attr_advantagetoggle" value="{{query=1}}  {{normal=1}} {{r2=[[0d20" checked="checked" style="right: 113px; width: 65px;"><span style="right: 113px; width: 65px;">Normal</span>
+                    <input type="radio" class="toggle-right" name="attr_advantagetoggle" value="{{query=1}}  {{disadvantage=1}} {{r2=[[1d20" style="right: 0px; width: 110px;"><span style="right: 0px; width: 110px;">Disadvantage</span>
+                </div>
             </div>
             <fieldset class="repeating_npcaction">
                 <div class="action compendium-drop-target">
@@ -565,6 +597,178 @@
                     <button type="roll" style="display: none;" name="roll_npc_crit" value="@{wtype}&{template:npcdmg} @{damage_flag} {{crit=1}} {{dmg1=[[@{attack_damage}+0]]}} {{dmg1type=@{attack_damagetype}}} {{dmg2=[[@{attack_damage2}+0]]}} {{dmg2type=@{attack_damagetype2}}} {{crit1=[[@{attack_crit}+0]]}} {{crit2=[[@{attack_crit2}+0]]}}"></button>
                 </div>
             </fieldset>
+        </div>
+        <input class="reaction_flag" type="hidden" name="attr_reaction_flag">
+        <div class="row actions reaction">
+            <div class="row actiontitle">
+                <span class="title red">Reactions</span>
+            </div>
+            <fieldset class="repeating_npcreaction">
+                <div class="trait">
+                    <input type="text" name="attr_name" placeholder="Parry.">
+                    <textarea name="attr_desc" placeholder="The creature adds 2 to its AC against..."></textarea>
+                </div>  
+            </fieldset>
+        </div>
+        <input class="npcspell_flag" type="hidden" name="attr_npcspell_flag">
+        <div class="row actions npcspell spells">
+            <div class="row actiontitle">
+                <span class="title red" style="font-weight: normal; text-align: left;">Spells</span>
+            </div>
+            <div class="spell-container">
+                <fieldset class="repeating_spell-npc">
+                    <div class="spell compendium-drop-target">
+                        <input class="options-flag" type="checkbox" name="attr_options-flag" checked="checked"><span>y</span>
+                        <div class="options">
+                            <div class="row">
+                                <span>NAME:</span>
+                                <input type="text" name="attr_spellname_base" accept="Name">
+                                <input type="checkbox" name="attr_spellprepared" value="1" checked="checked">
+                                <span>PREP</span>
+                            </div>
+                            <div class="row">
+                                <span>SCHOOL:</span>
+                                <select name="attr_spellschool" accept="School">
+                                    <option value="abjuration">Abjuration</option>
+                                    <option value="conjuration">Conjuration</option>
+                                    <option value="divination">Divination</option>
+                                    <option value="enchantment">Enchantment</option>
+                                    <option value="evocation">Evocation</option>
+                                    <option value="illusion">Illusion</option>
+                                    <option value="necromancy">Necromancy</option>
+                                    <option value="transmutation">Transmutation</option>
+                                </select>
+                                <input type="hidden" name="attr_spellritualflag" accept="Ritual">
+                                <input type="checkbox" name="attr_spellritual" value="{{ritual=1}}">
+                                <span>RITUAL</span>
+                            </div>
+                            <div class="row">
+                                <span>CASTING TIME:</span>
+                                <input type="text" name="attr_spellcastingtime" accept="Casting Time" style="width: 161px">
+                            </div>
+                            <div class="row">
+                                <span>RANGE:</span>
+                                <input type="text" name="attr_spellrange" accept="Range" style="width: 194px">
+                            </div>
+                            <div class="row">
+                                <span>TARGET:</span>
+                                <input type="text" name="attr_spelltarget" accept="Target" style="width: 189px">
+                            </div>
+                            <input type="hidden" name="attr_spellcomp" accept="Components">
+                            <div class="row">
+                                <span>COMPONENTS:</span>
+                                <input type="checkbox" name="attr_spellcomp_v" value="{{v=1}}" checked="checked">
+                                <span>V</span>
+                                <input type="checkbox" name="attr_spellcomp_s" value="{{s=1}}" checked="checked">
+                                <span>S</span>
+                                <input type="checkbox" name="attr_spellcomp_m" value="{{m=1}}" checked="checked">
+                                <span>M</span>
+                                <input type="text" name="attr_spellcomp_materials" accept="Material" style="margin-left: 17px; width: 215px;" placeholder="ruby dust worth 50gp">
+                            </div>
+                            <div class="row">
+                                <input type="hidden" name="attr_spellconcentrationflag" accept="Concentration">
+                                <input type="checkbox" name="attr_spellconcentration" value="{{concentration=1}}">
+                                <span>CONCENTRATION</span>
+                            </div>
+                            <div class="row">
+                                <span>DURATION:</span>
+                                <input type="text" name="attr_spellduration" accept="Duration" style="width: 178px;">
+                            </div>
+                            <div class="row">
+                                <span>OUTPUT:</span>
+                                <select name="attr_spelloutput">
+                                    <option value="SPELLCARD">SPELLCARD</option>
+                                    <option value="ATTACK">ATTACK</option>
+                                </select>
+                            </div>
+                            <input type="hidden" class="spellattackinfoflag" name="attr_spellattackinfoflag">
+                            <div class="spellattackinfo">
+                                <div class="row">
+                                    <span>SPELL ATTACK:</span>
+                                    <select name="attr_spellattack" accept="Spell Attack">
+                                        <option value="None">None</option>
+                                        <option value="Melee">Melee</option>
+                                        <option value="Melee">Ranged</option>
+                                    </select>
+                                </div>
+                                <div class="row">
+                                    <span>DAMAGE:</span>
+                                    <input type="text" name="attr_spelldamage" accept="Damage" style="width: 50px;">
+                                    <span>TYPE:</span>
+                                    <input type="text" name="attr_spelldamagetype" accept="Damage Type" style="width: 103px;">
+                                </div>
+                                <div class="row">
+                                    <span>DAMAGE2:</span>
+                                    <input type="text" name="attr_spelldamage2" accept="Secondary Damage" style="width: 45px;">
+                                    <span>TYPE:</span>
+                                    <input type="text" name="attr_spelldamagetype2" accept="Secondary Damage Type" style="width: 103px;">
+                                </div>
+                                <div class="row">
+                                    <span>HEALING:</span>
+                                    <input type="text" name="attr_spellhealing" accept="Healing" style="width: 45px;">
+                                </div>
+                                <div class="row">
+                                    <input type="checkbox" name="attr_spelldmgmod" value="Yes" accept="Add Casting Modifier">
+                                    <span>ADD ABILITY MOD TO DAMAGE OR HEALING</span>
+                                </div>
+                                <div class="row">
+                                    <span>SAVING THROW:</span>
+                                    <select name="attr_spellsave" accept="Save">
+                                        <option value="" selected="selected">NONE</option>
+                                        <option value="Strength">STR</option>
+                                        <option value="Dexterity">DEX</option>
+                                        <option value="Constitution">CON</option>
+                                        <option value="Intelligence">INT</option>
+                                        <option value="Wisdom">WIS</option>
+                                        <option value="Charisma">CHA</option>
+                                    </select>
+                                    <span>EFFECT:</span>
+                                    <input type="text" name="attr_spellsavesuccess" accept="Save Success" style="width: 78px;" placeholder="Half damage">
+                                </div>
+                                <div class="row">
+                                    <span>HIGHER LVL CAST DMG:</span>
+                                    <input type="text" name="attr_spellhldie" placeholder="1" accept="Higher Spell Slot Dice" style="width: 15px; text-align: right;">
+                                    <select name="attr_spellhldietype" accept="Higher Spell Slot Die">
+                                        <option value="" selected="selected">NONE</option>
+                                        <option value="d4">d4</option>
+                                        <option value="d6">d6</option>
+                                        <option value="d8">d8</option>
+                                        <option value="d10">d10</option>
+                                        <option value="d12">d12</option>
+                                        <option value="d20">d20</option>
+                                    </select>
+                                    <span>+</span>
+                                    <input type="text" name="attr_spellhlbonus" placeholder="0" accept="Higher Spell Slot Bonus" style="width: 15px; text-align: center;">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <span>DESCRIPTION:</span>
+                            </div>
+                            <input type="hidden" name="attr_spellcontent" accept="Content">
+                            <div class="row">
+                                <textarea name="attr_spelldescription"></textarea>
+                            </div>
+                            <div class="row">
+                                <span>AT HIGHER LEVELS:</span>
+                            </div>
+                            <div class="row">
+                                <textarea name="attr_spellathigherlevels" style="height: 36px; min-height: 36px;"></textarea>
+                            </div>
+                            <input type="hidden" name="attr_spellattackid">
+                            <input type="hidden" name="attr_spelllevel" accept="Level">
+                            <input type="hidden" name="attr_spell_updateflag">
+                            <input type="hidden" name="attr_rollbase">
+                        </div>
+                        <div class="display">
+                            <input type="hidden" name="attr_rollcontent" value="@{wtype}&{template:spell} {{level=@{spellschool} @{spelllevel}}}  {{name=@{spellname_base}}} {{castingtime=@{spellcastingtime}}} {{range=@{spellrange}}} {{target=@{spelltarget}}} @{spellcomp_v} @{spellcomp_s} @{spellcomp_m} {{material=@{spellcomp_materials}}} {{duration=@{spellduration}}} {{description=@{spelldescription}}} {{athigherlevels=@{spellathigherlevels}}} @{spellritual} @{spellconcentration}">
+                            <button class="spellcard" type="roll" name="roll_spell" value="@{rollcontent}">
+                                <input type="hidden" name="attr_prep" value=""><span class="prep"></span>
+                                <input type="text" name="attr_spellname" style="width: 225px; margin-left: 13px;" value="">
+                            </button>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
         </div>
         <input class="legendary_flag" type="hidden" name="attr_legendary_flag">
         <div class="row actions legendary">
@@ -831,92 +1035,92 @@
                 <div class="skills-container">
                     <div class="skill">
                         <input type="checkbox" name="attr_acrobatics_prof" title="@{acrobatics_prof}" value="(@{pb}*@{acrobatics_type})">
-                        <input type="text" name="attr_acrobatics_bonus" title="@{acrobatics_bonus}" value="(@{dexterity_mod}+@{acrobatics_proficiency})" disabled="true">
+                        <input type="text" name="attr_acrobatics_bonus" title="@{acrobatics_bonus}" value="(@{dexterity_mod}+@{acrobatics_proficiency}+@{acrobatics_flat})" disabled="true">
                         <button type="roll" name="roll_acrobatics" value="@{wtype}&{template:simple} {{rname=ACROBATICS}} {{mod=[[[[@{acrobatics_bonus}]][ACR]]]}} {{r1=[[1d20@{halflingluck}+[[@{acrobatics_bonus}]][ACR]]]}} @{rtype}@{halflingluck}+[[@{acrobatics_bonus}]][ACR]]]}} @{charname_output}">Acrobatics <span>(Dex)</span></button>
                     </div>
                     <div class="skill">
                         <input type="checkbox" name="attr_animal_handling_prof" title="@{animal_handling_prof}" value="(@{pb}*@{animal_handling_type})">
-                        <input type="text" name="attr_animal_handling_bonus" title="@{animal_handling_bonus}" value="(@{wisdom_mod}+@{animal_handling_proficiency})" disabled="true">
+                        <input type="text" name="attr_animal_handling_bonus" title="@{animal_handling_bonus}" value="(@{wisdom_mod}+@{animal_handling_proficiency}+@{animal_handling_flat})" disabled="true">
                         <button type="roll" name="roll_animal_handling" value="@{wtype}&{template:simple} {{rname=ANIMAL HANDLING}} {{mod=[[[[@{animal_handling_bonus}]][ANI]]]}} {{r1=[[1d20@{halflingluck}+[[@{animal_handling_bonus}]][ANI]]]}} @{rtype}@{halflingluck}+[[@{animal_handling_bonus}]][ANI]]]}} @{charname_output}">Animal Handling <span>(Wis)</span></button>
                     </div>
                     <div class="skill">
                         <input type="checkbox" name="attr_arcana_prof" title="@{arcana_prof}" value="(@{pb}*@{arcana_type})">
-                        <input type="text" name="attr_arcana_bonus" title="@{arcana_bonus}" value="(@{intelligence_mod}+@{arcana_proficiency})" disabled="true">
+                        <input type="text" name="attr_arcana_bonus" title="@{arcana_bonus}" value="(@{intelligence_mod}+@{arcana_proficiency}+@{arcana_flat})" disabled="true">
                         <button type="roll" name="roll_arcana" value="@{wtype}&{template:simple} {{rname=ARCANA}} {{mod=[[[[@{arcana_bonus}]][ARC]]]}} {{r1=[[1d20@{halflingluck}+[[@{arcana_bonus}]][ARC]]]}} @{rtype}@{halflingluck}+[[@{arcana_bonus}]][ARC]]]}} @{charname_output}">Arcana <span>(Int)</span></button>
                     </div>
                     <div class="skill">
                         <input type="checkbox" name="attr_athletics_prof" title="@{athletics_prof}" value="(@{pb}*@{athletics_type})">
-                        <input type="text" name="attr_athletics_bonus" title="@{athletics_bonus}" value="(@{strength_mod}+@{athletics_proficiency})" disabled="true">
+                        <input type="text" name="attr_athletics_bonus" title="@{athletics_bonus}" value="(@{strength_mod}+@{athletics_proficiency}+@{athletics_flat})" disabled="true">
                         <button type="roll" name="roll_athletics" value="@{wtype}&{template:simple} {{rname=ATHLETICS}} {{mod=[[[[@{athletics_bonus}]][ATH]]]}} {{r1=[[1d20@{halflingluck}+[[@{athletics_bonus}]][ATH]]]}} @{rtype}@{halflingluck}+[[@{athletics_bonus}]][ATH]]]}} @{charname_output}">Athletics <span>(Str)</span></button>
                     </div>
                     <div class="skill">
                         <input type="checkbox" name="attr_deception_prof" title="@{deception_prof}" value="(@{pb}*@{deception_type})">
-                        <input type="text" name="attr_deception_bonus" title="@{deception_bonus}" value="(@{charisma_mod}+@{deception_proficiency})" disabled="true">
+                        <input type="text" name="attr_deception_bonus" title="@{deception_bonus}" value="(@{charisma_mod}+@{deception_proficiency}+@{deception_flat})" disabled="true">
                         <button type="roll" name="roll_deception" value="@{wtype}&{template:simple} {{rname=DECEPTION}} {{mod=[[[[@{deception_bonus}]][DEC]]]}} {{r1=[[1d20@{halflingluck}+[[@{deception_bonus}]][DEC]]]}} @{rtype}@{halflingluck}+[[@{deception_bonus}]][DEC]]]}} @{charname_output}">Deception <span>(Cha)</span></button>
                     </div>
                     <div class="skill">
                         <input type="checkbox" name="attr_history_prof" title="@{history_prof}" value="(@{pb}*@{history_type})">
-                        <input type="text" name="attr_history_bonus" title="@{history_bonus}" value="(@{intelligence_mod}+@{history_proficiency})" disabled="true">
+                        <input type="text" name="attr_history_bonus" title="@{history_bonus}" value="(@{intelligence_mod}+@{history_proficiency}+@{history_flat})" disabled="true">
                         <button type="roll" name="roll_history" value="@{wtype}&{template:simple} {{rname=HISTORY}} {{mod=[[[[@{history_bonus}]][HIS]]]}} {{r1=[[1d20@{halflingluck}+[[@{history_bonus}]][HIS]]]}} @{rtype}@{halflingluck}+[[@{history_bonus}]][HIS]]]}} @{charname_output}">History <span>(Int)</span></button>
                     </div>
                     <div class="skill">
                         <input type="checkbox" name="attr_insight_prof" title="@{insight_prof}" value="(@{pb}*@{insight_type})">
-                        <input type="text" name="attr_insight_bonus" title="@{insight_bonus}" value="(@{wisdom_mod}+@{insight_proficiency})" disabled="true">
+                        <input type="text" name="attr_insight_bonus" title="@{insight_bonus}" value="(@{wisdom_mod}+@{insight_proficiency}+@{insight_flat})" disabled="true">
                         <button type="roll" name="roll_insight" value="@{wtype}&{template:simple} {{rname=INSIGHT}} {{mod=[[[[@{insight_bonus}]][INS]]]}} {{r1=[[1d20@{halflingluck}+[[@{insight_bonus}]][INS]]]}} @{rtype}@{halflingluck}+[[@{insight_bonus}]][INS]]]}} @{charname_output}">Insight <span>(Wis)</span></button>
                     </div>
                     <div class="skill">
                         <input type="checkbox" name="attr_intimidation_prof" title="@{intimidation_prof}" value="(@{pb}*@{intimidation_type})">
-                        <input type="text" name="attr_intimidation_bonus" title="@{intimidation_bonus}" value="(@{charisma_mod}+@{intimidation_proficiency})" disabled="true">
+                        <input type="text" name="attr_intimidation_bonus" title="@{intimidation_bonus}" value="(@{charisma_mod}+@{intimidation_proficiency}+@{intimidation_flat})" disabled="true">
                         <button type="roll" name="roll_intimidation" value="@{wtype}&{template:simple} {{rname=INTIMIDATION}} {{mod=[[[[@{intimidation_bonus}]][INT]]]}} {{r1=[[1d20@{halflingluck}+[[@{intimidation_bonus}]][INT]]]}} @{rtype}@{halflingluck}+[[@{intimidation_bonus}]][INT]]]}} @{charname_output}">Intimidation <span>(Cha)</span></button>
                     </div>
                     <div class="skill">
                         <input type="checkbox" name="attr_investigation_prof" title="@{investigation_prof}" value="(@{pb}*@{investigation_type})">
-                        <input type="text" name="attr_investigation_bonus" title="@{investigation_bonus}" value="(@{intelligence_mod}+@{investigation_proficiency})" disabled="true">
+                        <input type="text" name="attr_investigation_bonus" title="@{investigation_bonus}" value="(@{intelligence_mod}+@{investigation_proficiency}+@{investigation_flat})" disabled="true">
                         <button type="roll" name="roll_investigation" value="@{wtype}&{template:simple} {{rname=INVESTIGATION}} {{mod=[[[[@{investigation_bonus}]][INV]]]}} {{r1=[[1d20@{halflingluck}+[[@{investigation_bonus}]][INV]]]}} @{rtype}@{halflingluck}+[[@{investigation_bonus}]][INV]]]}} @{charname_output}">Investigation <span>(Int)</span></button>
                     </div>
                     <div class="skill">
                         <input type="checkbox" name="attr_medicine_prof" title="@{medicine_prof}" value="(@{pb}*@{medicine_type})">
-                        <input type="text" name="attr_medicine_bonus" title="@{medicine_bonus}" value="(@{wisdom_mod}+@{medicine_proficiency})" disabled="true">
+                        <input type="text" name="attr_medicine_bonus" title="@{medicine_bonus}" value="(@{wisdom_mod}+@{medicine_proficiency}+@{medicine_flat})" disabled="true">
                         <button type="roll" name="roll_medicine" value="@{wtype}&{template:simple} {{rname=MEDICINE}} {{mod=[[[[@{medicine_bonus}]][MED]]]}} {{r1=[[1d20@{halflingluck}+[[@{medicine_bonus}]][MED]]]}} @{rtype}@{halflingluck}+[[@{medicine_bonus}]][MED]]]}} @{charname_output}">Medicine <span>(Wis)</span></button>
                     </div>
                     <div class="skill">
                         <input type="checkbox" name="attr_nature_prof" title="@{nature_prof}" value="(@{pb}*@{nature_type})">
-                        <input type="text" name="attr_nature_bonus" title="@{nature_bonus}" value="(@{intelligence_mod}+@{nature_proficiency})" disabled="true">
+                        <input type="text" name="attr_nature_bonus" title="@{nature_bonus}" value="(@{intelligence_mod}+@{nature_proficiency}+@{nature_flat})" disabled="true">
                         <button type="roll" name="roll_nature" value="@{wtype}&{template:simple} {{rname=NATURE}} {{mod=[[[[@{nature_bonus}]][NAT]]]}} {{r1=[[1d20@{halflingluck}+[[@{nature_bonus}]][NAT]]]}} @{rtype}@{halflingluck}+[[@{nature_bonus}]][NAT]]]}} @{charname_output}">Nature <span>(Int)</span></button>
                     </div>
                     <div class="skill">
                         <input type="checkbox" name="attr_perception_prof" title="@{perception_prof}" value="(@{pb}*@{perception_type})">
-                        <input type="text" name="attr_perception_bonus" title="@{perception_bonus}" value="(@{wisdom_mod}+@{perception_proficiency})" disabled="true">
+                        <input type="text" name="attr_perception_bonus" title="@{perception_bonus}" value="(@{wisdom_mod}+@{perception_proficiency}+@{perception_flat})" disabled="true">
                         <button type="roll" name="roll_perception" value="@{wtype}&{template:simple} {{rname=PERCEPTION}} {{mod=[[[[@{perception_bonus}]][PER]]]}} {{r1=[[1d20@{halflingluck}+[[@{perception_bonus}]][PER]]]}} @{rtype}@{halflingluck}+[[@{perception_bonus}]][PER]]]}} @{charname_output}">Perception <span>(Wis)</span></button>
                     </div>
                     <div class="skill">
                         <input type="checkbox" name="attr_performance_prof" title="@{performance_prof}" value="(@{pb}*@{performance_type})">
-                        <input type="text" name="attr_performance_bonus" title="@{performance_bonus}" value="(@{charisma_mod}+@{performance_proficiency})" disabled="true">
+                        <input type="text" name="attr_performance_bonus" title="@{performance_bonus}" value="(@{charisma_mod}+@{performance_proficiency}+@{performance_flat})" disabled="true">
                         <button type="roll" name="roll_performance" value="@{wtype}&{template:simple} {{rname=PERFORMANCE}} {{mod=[[[[@{performance_bonus}]][PER]]]}} {{r1=[[1d20@{halflingluck}+[[@{performance_bonus}]][PER]]]}} @{rtype}@{halflingluck}+[[@{performance_bonus}]][PER]]]}} @{charname_output}">Performance <span>(Cha)</span></button>
                     </div>
                     <div class="skill">
                         <input type="checkbox" name="attr_persuasion_prof" title="@{persuasion_prof}" value="(@{pb}*@{persuasion_type})">
-                        <input type="text" name="attr_persuasion_bonus" title="@{persuasion_bonus}" value="(@{charisma_mod}+@{persuasion_proficiency})" disabled="true">
+                        <input type="text" name="attr_persuasion_bonus" title="@{persuasion_bonus}" value="(@{charisma_mod}+@{persuasion_proficiency}+@{persuasion_flat})" disabled="true">
                         <button type="roll" name="roll_persuasion" value="@{wtype}&{template:simple} {{rname=PERSUASION}} {{mod=[[[[@{persuasion_bonus}]][PER]]]}} {{r1=[[1d20@{halflingluck}+[[@{persuasion_bonus}]][PER]]]}} @{rtype}@{halflingluck}+[[@{persuasion_bonus}]][PER]]]}} @{charname_output}">Persuasion <span>(Cha)</span></button>
                     </div>
                     <div class="skill">
                         <input type="checkbox" name="attr_religion_prof" title="@{religion_prof}" value="(@{pb}*@{religion_type})">
-                        <input type="text" name="attr_religion_bonus" title="@{religion_bonus}" value="(@{intelligence_mod}+@{religion_proficiency})" disabled="true">
+                        <input type="text" name="attr_religion_bonus" title="@{religion_bonus}" value="(@{intelligence_mod}+@{religion_proficiency}+@{religion_flat})" disabled="true">
                         <button type="roll" name="roll_religion" value="@{wtype}&{template:simple} {{rname=RELIGION}} {{mod=[[[[@{religion_bonus}]][REL]]]}} {{r1=[[1d20@{halflingluck}+[[@{religion_bonus}]][REL]]]}} @{rtype}@{halflingluck}+[[@{religion_bonus}]][REL]]]}} @{charname_output}">Religion <span>(Int)</span></button>
                     </div>
                     <div class="skill">
                         <input type="checkbox" name="attr_sleight_of_hand_prof" title="@{sleight_of_hand_prof}" value="(@{pb}*@{sleight_of_hand_type})">
-                        <input type="text" name="attr_sleight_of_hand_bonus" title="@{sleight_of_hand_bonus}" value="(@{dexterity_mod}+@{sleight_of_hand_proficiency})" disabled="true">
+                        <input type="text" name="attr_sleight_of_hand_bonus" title="@{sleight_of_hand_bonus}" value="(@{dexterity_mod}+@{sleight_of_hand_proficiency}+@{sleight_of_hand_flat})" disabled="true">
                         <button type="roll" name="roll_sleight_of_hand" value="@{wtype}&{template:simple} {{rname=SLEIGHT OF HAND}} {{mod=[[[[@{sleight_of_hand_bonus}]][SLE]]]}} {{r1=[[1d20@{halflingluck}+[[@{sleight_of_hand_bonus}]][SLE]]]}} @{rtype}@{halflingluck}+[[@{sleight_of_hand_bonus}]][SLE]]]}} @{charname_output}">Sleight of Hand <span>(Dex)</span></button>
                     </div>
                     <div class="skill">
                         <input type="checkbox" name="attr_stealth_prof" title="@{stealth_prof}" value="(@{pb}*@{stealth_type})">
-                        <input type="text" name="attr_stealth_bonus" title="@{stealth_bonus}" value="(@{dexterity_mod}+@{stealth_proficiency})" disabled="true">
+                        <input type="text" name="attr_stealth_bonus" title="@{stealth_bonus}" value="(@{dexterity_mod}+@{stealth_proficiency}+@{stealth_flat})" disabled="true">
                         <button type="roll" name="roll_stealth" value="@{wtype}&{template:simple} {{rname=STEALTH}} {{mod=[[[[@{stealth_bonus}]][STE]]]}} {{r1=[[1d20@{halflingluck}+[[@{stealth_bonus}]][STE]]]}} @{rtype}@{halflingluck}+[[@{stealth_bonus}]][STE]]]}} @{charname_output}">Stealth <span>(Dex)</span></button>
                     </div>
                     <div class="skill">
                         <input type="checkbox" name="attr_survival_prof" title="@{survival_prof}" value="(@{pb}*@{survival_type})">
-                        <input type="text" name="attr_survival_bonus" title="@{survival_bonus}" value="(@{wisdom_mod}+@{survival_proficiency})" disabled="true">
+                        <input type="text" name="attr_survival_bonus" title="@{survival_bonus}" value="(@{wisdom_mod}+@{survival_proficiency}+@{survival_flat})" disabled="true">
                         <button type="roll" name="roll_survival" value="@{wtype}&{template:simple} {{rname=SURVIVAL}} {{mod=[[[[@{survival_bonus}]][SUR]]]}} {{r1=[[1d20@{halflingluck}+[[@{survival_bonus}]][SUR]]]}} @{rtype}@{halflingluck}+[[@{survival_bonus}]][SUR]]]}} @{charname_output}">Survival <span>(Wis)</span></button>
                     </div>
                     <div class="label">
@@ -3356,74 +3560,92 @@
                 <div class="row skill">
                     <select name="attr_acrobatics_type"><option value="1" selected="selected">Normal</option><option value="2">Expertise</option></select>
                     <span>Acrobatics <span>(Dex)</span></span>
+                    <span>+</span><input type="text" class="num" name="attr_acrobatics_flat" value="0" placeholder="0" title="@{acrobatics_flat}">
                 </div>
                 <div class="row skill">
                     <select name="attr_animal_handling_type"><option value="1" selected="selected">Normal</option><option value="2">Expertise</option></select>
                     <span>Animal Handling <span>(Wis)</span></span>
+                    <span>+</span><input type="text" class="num" name="attr_animal_handling_flat" value="0" placeholder="0" title="@{animal_handling_flat}">
                 </div>
                 <div class="row skill">
                     <select name="attr_arcana_type"><option value="1" selected="selected">Normal</option><option value="2">Expertise</option></select>
                     <span>Arcana <span>(Int)</span></span>
+                    <span>+</span><input type="text" class="num" name="attr_arcana_flat" value="0" placeholder="0" title="@{arcana_flat}">
                 </div>
                 <div class="row skill">
                     <select name="attr_athletics_type"><option value="1" selected="selected">Normal</option><option value="2">Expertise</option></select>
                     <span>Athletics <span>(Str)</span></span>
+                    <span>+</span><input type="text" class="num" name="attr_athletics_flat" value="0" placeholder="0" title="@{athletics_flat}">
                 </div>
                 <div class="row skill">
                     <select name="attr_deception_type"><option value="1" selected="selected">Normal</option><option value="2">Expertise</option></select>
                     <span>Deception <span>(Cha)</span></span>
+                    <span>+</span><input type="text" class="num" name="attr_deception_flat" value="0" placeholder="0" title="@{deception_flat}">
                 </div>
                 <div class="row skill">
                     <select name="attr_history_type"><option value="1" selected="selected">Normal</option><option value="2">Expertise</option></select>
                     <span>History <span>(Int)</span></span>
+                    <span>+</span><input type="text" class="num" name="attr_history_flat" value="0" placeholder="0" title="@{history_flat}">
                 </div>
                 <div class="row skill">
                     <select name="attr_insight_type"><option value="1" selected="selected">Normal</option><option value="2">Expertise</option></select>
                     <span>Insight <span>(Wis)</span></span>
+                    <span>+</span><input type="text" class="num" name="attr_insight_flat" value="0" placeholder="0" title="@{insight_flat}">
                 </div>
                 <div class="row skill">
                     <select name="attr_intimidation_type"><option value="1" selected="selected">Normal</option><option value="2">Expertise</option></select>
                     <span>Intimidation <span>(Cha)</span></span>
+                    <span>+</span><input type="text" class="num" name="attr_intimidation_flat" value="0" placeholder="0" title="@{intimidation_flat}">
                 </div>
                 <div class="row skill">
                     <select name="attr_investigation_type"><option value="1" selected="selected">Normal</option><option value="2">Expertise</option></select>
                     <span>Investigation <span>(Int)</span></span>
+                    <span>+</span><input type="text" class="num" name="attr_investigation_flat" value="0" placeholder="0" title="@{investigation_flat}">
                 </div>
                 <div class="row skill">
                     <select name="attr_medicine_type"><option value="1" selected="selected">Normal</option><option value="2">Expertise</option></select>
                     <span>Medicine <span>(Wis)</span></span>
+                    <span>+</span><input type="text" class="num" name="attr_medicine_flat" value="0" placeholder="0" title="@{medicine_flat}">
                 </div>
                 <div class="row skill">
                     <select name="attr_nature_type"><option value="1" selected="selected">Normal</option><option value="2">Expertise</option></select>
                     <span>Nature <span>(Int)</span></span>
+                    <span>+</span><input type="text" class="num" name="attr_nature_flat" value="0" placeholder="0" title="@{nature_flat}">
                 </div>
                 <div class="row skill">
                     <select name="attr_perception_type"><option value="1" selected="selected">Normal</option><option value="2">Expertise</option></select>
                     <span>Perception <span>(Wis)</span></span>
+                    <span>+</span><input type="text" class="num" name="attr_perception_flat" value="0" placeholder="0" title="@{perception_flat}">
                 </div>
                 <div class="row skill">
                     <select name="attr_performance_type"><option value="1" selected="selected">Normal</option><option value="2">Expertise</option></select>
                     <span>Performance <span>(Cha)</span></span>
+                    <span>+</span><input type="text" class="num" name="attr_performance_flat" value="0" placeholder="0" title="@{performance_flat}">
                 </div>
                 <div class="row skill">
                     <select name="attr_persuasion_type"><option value="1" selected="selected">Normal</option><option value="2">Expertise</option></select>
                     <span>Persuasion <span>(Cha)</span></span>
+                    <span>+</span><input type="text" class="num" name="attr_persuasion_flat" value="0" placeholder="0" title="@{persuasion_flat}">
                 </div>
                 <div class="row skill">
                     <select name="attr_religion_type"><option value="1" selected="selected">Normal</option><option value="2">Expertise</option></select>
                     <span>Religion <span>(Int)</span></span>
+                    <span>+</span><input type="text" class="num" name="attr_religion_flat" value="0" placeholder="0" title="@{religion_flat}">
                 </div>
                 <div class="row skill">
                     <select name="attr_sleight_of_hand_type"><option value="1" selected="selected">Normal</option><option value="2">Expertise</option></select>
                     <span>Sleight of Hand <span>(Dex)</span></span>
+                    <span>+</span><input type="text" class="num" name="attr_sleight_of_hand_flat" value="0" placeholder="0" title="@{sleight_of_hand_flat}">
                 </div>
                 <div class="row skill">
                     <select name="attr_stealth_type"><option value="1" selected="selected">Normal</option><option value="2">Expertise</option></select>
                     <span>Stealth <span>(Dex)</span></span>
+                    <span>+</span><input type="text" class="num" name="attr_stealth_flat" value="0" placeholder="0" title="@{stealth_flat}">
                 </div>
                 <div class="row skill">
                     <select name="attr_survival_type"><option value="1" selected="selected">Normal</option><option value="2">Expertise</option></select>
                     <span>Survival <span>(Wis)</span></span>
+                    <span>+</span><input type="text" class="num" name="attr_survival_flat" value="0" placeholder="0" title="@{survival_flat}">
                 </div>
                 <div class="row" style="margin-top:10px;">
                     <input type="checkbox" name="attr_jack_of_all_trades" value="(floor(@{pb}/2))">
@@ -3438,7 +3660,7 @@
             <div class="general_options">
                 <div class="version">
                     <span>v</span>
-                    <input type="text" name="attr_version" value="1.3">
+                    <input type="text" name="attr_version" value="1.4">
                 </div>
                 <div class="row">
                     <input type="checkbox" name="attr_npc" value="1">
@@ -4409,6 +4631,22 @@
 
     on("sheet:opened", function() {
         versioning();
+
+        getAttrs(['meleedmg1','rangeddmg1','pro_weapons','pro_armor','inventoryname1','barbarian_level','bard_level','cleric_level','druid_level','figher_level','monk_level','paladin_level','ranger_level','rogue_level','sorcerer_level','warlock_level','wizard_level','npc_type','npc_size','npc_alignment','npc_hp','npc_HP_hit_dice','npc_AC_note','npc_strength','npc_dexterity','npc_constitution','npc_intelligence','npc_wisdom','npc_charisma','speed','speed_fly','speed_burrow','speed_swim','speed_climb','prolanguages','blindsight','darkvision','tremorsense','truesight','challenge','xp','multiattack','npc_traits','lair_actions','legendary_action_notes','damage_vulnerability','damage_resistance','damage_immunity','condition_immunity'], function(attrs) {
+            var hasOldData = false;
+            var updates = {};
+            _.each(attrs, function(value, key) {
+                if(value) {
+                    hasOldData = true;
+                    updates.tab = 'options';
+                }
+            });
+            if(!hasOldData) {
+                updates.already_transitioned = '1';
+            }
+
+            setAttrs(updates);
+        });
     });
 
     on("change:npc", function() {
@@ -4539,15 +4777,15 @@
         // });
     });
     
-    on("change:repeating_spell-cantrip:spellname_base change:repeating_spell-1:spellname_base change:repeating_spell-1:spellprepared change:repeating_spell-2:spellname_base change:repeating_spell-2:spellprepared change:repeating_spell-3:spellname_base change:repeating_spell-3:spellprepared change:repeating_spell-4:spellname_base change:repeating_spell-4:spellprepared change:repeating_spell-5:spellname_base change:repeating_spell-5:spellprepared change:repeating_spell-6:spellname_base change:repeating_spell-6:spellprepared change:repeating_spell-7:spellname_base change:repeating_spell-7:spellprepared change:repeating_spell-8:spellname_base change:repeating_spell-8:spellprepared change:repeating_spell-9:spellname_base change:repeating_spell-9:spellprepared change:repeating_spell-cantrip:spellrange change:repeating_spell-1:spellrange change:repeating_spell-2:spellrange change:repeating_spell-3:spellrange change:repeating_spell-4:spellrange change:repeating_spell-5:spellrange change:repeating_spell-6:spellrange change:repeating_spell-7:spellrange change:repeating_spell-8:spellrange change:repeating_spell-9:spellrange change:repeating_spell-cantrip:spelltarget change:repeating_spell-1:spelltarget change:repeating_spell-2:spelltarget change:repeating_spell-3:spelltarget change:repeating_spell-4:spelltarget change:repeating_spell-5:spelltarget change:repeating_spell-6:spelltarget change:repeating_spell-7:spelltarget change:repeating_spell-8:spelltarget change:repeating_spell-9:spelltarget change:repeating_spell-cantrip:spelldamage change:repeating_spell-1:spelldamage change:repeating_spell-2:spelldamage change:repeating_spell-3:spelldamage change:repeating_spell-4:spelldamage change:repeating_spell-5:spelldamage change:repeating_spell-6:spelldamage change:repeating_spell-7:spelldamage change:repeating_spell-8:spelldamage change:repeating_spell-9:spelldamage change:repeating_spell-cantrip:spelldamagetype change:repeating_spell-1:spelldamagetype change:repeating_spell-2:spelldamagetype change:repeating_spell-3:spelldamagetype change:repeating_spell-4:spelldamagetype change:repeating_spell-5:spelldamagetype change:repeating_spell-6:spelldamagetype change:repeating_spell-7:spelldamagetype change:repeating_spell-8:spelldamagetype change:repeating_spell-9:spelldamagetype change:repeating_spell-cantrip:spelldamage2 change:repeating_spell-1:spelldamage2 change:repeating_spell-2:spelldamage2 change:repeating_spell-3:spelldamage2 change:repeating_spell-4:spelldamage2 change:repeating_spell-5:spelldamage2 change:repeating_spell-6:spelldamage2 change:repeating_spell-7:spelldamage2 change:repeating_spell-8:spelldamage2 change:repeating_spell-9:spelldamage2 change:repeating_spell-cantrip:spelldamagetype2 change:repeating_spell-1:spelldamagetype2 change:repeating_spell-2:spelldamagetype2 change:repeating_spell-3:spelldamagetype2 change:repeating_spell-4:spelldamagetype2 change:repeating_spell-5:spelldamagetype2 change:repeating_spell-6:spelldamagetype2 change:repeating_spell-7:spelldamagetype2 change:repeating_spell-8:spelldamagetype2 change:repeating_spell-9:spelldamagetype2 change:repeating_spell-cantrip:spellhealing change:repeating_spell-1:spellhealing change:repeating_spell-2:spellhealing change:repeating_spell-3:spellhealing change:repeating_spell-4:spellhealing change:repeating_spell-5:spellhealing change:repeating_spell-6:spellhealing change:repeating_spell-7:spellhealing change:repeating_spell-8:spellhealing change:repeating_spell-9:spellhealing change:repeating_spell-cantrip:spelldmgmod change:repeating_spell-1:spelldmgmod change:repeating_spell-2:spelldmgmod change:repeating_spell-3:spelldmgmod change:repeating_spell-4:spelldmgmod change:repeating_spell-5:spelldmgmod change:repeating_spell-6:spelldmgmod change:repeating_spell-7:spelldmgmod change:repeating_spell-8:spelldmgmod change:repeating_spell-9:spelldmgmod change:repeating_spell-cantrip:spellsave change:repeating_spell-1:spellsave change:repeating_spell-2:spellsave change:repeating_spell-3:spellsave change:repeating_spell-4:spellsave change:repeating_spell-5:spellsave change:repeating_spell-6:spellsave change:repeating_spell-7:spellsave change:repeating_spell-8:spellsave change:repeating_spell-9:spellsave change:repeating_spell-cantrip:spellsavesuccess change:repeating_spell-1:spellsavesuccess change:repeating_spell-2:spellsavesuccess change:repeating_spell-3:spellsavesuccess change:repeating_spell-4:spellsavesuccess change:repeating_spell-5:spellsavesuccess change:repeating_spell-6:spellsavesuccess change:repeating_spell-7:spellsavesuccess change:repeating_spell-8:spellsavesuccess change:repeating_spell-9:spellsavesuccess change:repeating_spell-cantrip:spellhldie change:repeating_spell-1:spellhldie change:repeating_spell-2:spellhldie change:repeating_spell-3:spellhldie change:repeating_spell-4:spellhldie change:repeating_spell-5:spellhldie change:repeating_spell-6:spellhldie change:repeating_spell-7:spellhldie change:repeating_spell-8:spellhldie change:repeating_spell-9:spellhldie change:repeating_spell-cantrip:spellhldietype change:repeating_spell-1:spellhldietype change:repeating_spell-2:spellhldietype change:repeating_spell-3:spellhldietype change:repeating_spell-4:spellhldietype change:repeating_spell-5:spellhldietype change:repeating_spell-6:spellhldietype change:repeating_spell-7:spellhldietype change:repeating_spell-8:spellhldietype change:repeating_spell-9:spellhldietype change:repeating_spell-cantrip:spell_updateflag change:repeating_spell-1:spell_updateflag change:repeating_spell-2:spell_updateflag change:repeating_spell-3:spell_updateflag change:repeating_spell-4:spell_updateflag change:repeating_spell-5:spell_updateflag change:repeating_spell-6:spell_updateflag change:repeating_spell-7:spell_updateflag change:repeating_spell-8:spell_updateflag change:repeating_spell-9:spell_updateflag change:repeating_spell-cantrip:spellattack change:repeating_spell-1:spellattack change:repeating_spell-2:spellattack change:repeating_spell-3:spellattack change:repeating_spell-4:spellattack change:repeating_spell-5:spellattack change:repeating_spell-6:spellattack change:repeating_spell-7:spellattack change:repeating_spell-8:spellattack change:repeating_spell-9:spellattack change:repeating_spell-cantrip:spellhlbonus change:repeating_spell-1:spellhlbonus change:repeating_spell-2:spellhlbonus change:repeating_spell-3:spellhlbonus change:repeating_spell-4:spellhlbonus change:repeating_spell-5:spellhlbonus change:repeating_spell-6:spellhlbonus change:repeating_spell-7:spellhlbonus change:repeating_spell-8:spellhlbonus change:repeating_spell-9:spellhlbonus", function(eventinfo) {
+    on("change:repeating_spell-cantrip:spellname_base change:repeating_spell-1:spellname_base change:repeating_spell-1:spellprepared change:repeating_spell-2:spellname_base change:repeating_spell-2:spellprepared change:repeating_spell-3:spellname_base change:repeating_spell-3:spellprepared change:repeating_spell-4:spellname_base change:repeating_spell-4:spellprepared change:repeating_spell-5:spellname_base change:repeating_spell-5:spellprepared change:repeating_spell-6:spellname_base change:repeating_spell-6:spellprepared change:repeating_spell-7:spellname_base change:repeating_spell-7:spellprepared change:repeating_spell-8:spellname_base change:repeating_spell-8:spellprepared change:repeating_spell-9:spellname_base change:repeating_spell-9:spellprepared change:repeating_spell-cantrip:spellrange change:repeating_spell-1:spellrange change:repeating_spell-2:spellrange change:repeating_spell-3:spellrange change:repeating_spell-4:spellrange change:repeating_spell-5:spellrange change:repeating_spell-6:spellrange change:repeating_spell-7:spellrange change:repeating_spell-8:spellrange change:repeating_spell-9:spellrange change:repeating_spell-cantrip:spelltarget change:repeating_spell-1:spelltarget change:repeating_spell-2:spelltarget change:repeating_spell-3:spelltarget change:repeating_spell-4:spelltarget change:repeating_spell-5:spelltarget change:repeating_spell-6:spelltarget change:repeating_spell-7:spelltarget change:repeating_spell-8:spelltarget change:repeating_spell-9:spelltarget change:repeating_spell-cantrip:spelldamage change:repeating_spell-1:spelldamage change:repeating_spell-2:spelldamage change:repeating_spell-3:spelldamage change:repeating_spell-4:spelldamage change:repeating_spell-5:spelldamage change:repeating_spell-6:spelldamage change:repeating_spell-7:spelldamage change:repeating_spell-8:spelldamage change:repeating_spell-9:spelldamage change:repeating_spell-cantrip:spelldamagetype change:repeating_spell-1:spelldamagetype change:repeating_spell-2:spelldamagetype change:repeating_spell-3:spelldamagetype change:repeating_spell-4:spelldamagetype change:repeating_spell-5:spelldamagetype change:repeating_spell-6:spelldamagetype change:repeating_spell-7:spelldamagetype change:repeating_spell-8:spelldamagetype change:repeating_spell-9:spelldamagetype change:repeating_spell-cantrip:spelldamage2 change:repeating_spell-1:spelldamage2 change:repeating_spell-2:spelldamage2 change:repeating_spell-3:spelldamage2 change:repeating_spell-4:spelldamage2 change:repeating_spell-5:spelldamage2 change:repeating_spell-6:spelldamage2 change:repeating_spell-7:spelldamage2 change:repeating_spell-8:spelldamage2 change:repeating_spell-9:spelldamage2 change:repeating_spell-cantrip:spelldamagetype2 change:repeating_spell-1:spelldamagetype2 change:repeating_spell-2:spelldamagetype2 change:repeating_spell-3:spelldamagetype2 change:repeating_spell-4:spelldamagetype2 change:repeating_spell-5:spelldamagetype2 change:repeating_spell-6:spelldamagetype2 change:repeating_spell-7:spelldamagetype2 change:repeating_spell-8:spelldamagetype2 change:repeating_spell-9:spelldamagetype2 change:repeating_spell-cantrip:spellhealing change:repeating_spell-1:spellhealing change:repeating_spell-2:spellhealing change:repeating_spell-3:spellhealing change:repeating_spell-4:spellhealing change:repeating_spell-5:spellhealing change:repeating_spell-6:spellhealing change:repeating_spell-7:spellhealing change:repeating_spell-8:spellhealing change:repeating_spell-9:spellhealing change:repeating_spell-cantrip:spelldmgmod change:repeating_spell-1:spelldmgmod change:repeating_spell-2:spelldmgmod change:repeating_spell-3:spelldmgmod change:repeating_spell-4:spelldmgmod change:repeating_spell-5:spelldmgmod change:repeating_spell-6:spelldmgmod change:repeating_spell-7:spelldmgmod change:repeating_spell-8:spelldmgmod change:repeating_spell-9:spelldmgmod change:repeating_spell-cantrip:spellsave change:repeating_spell-1:spellsave change:repeating_spell-2:spellsave change:repeating_spell-3:spellsave change:repeating_spell-4:spellsave change:repeating_spell-5:spellsave change:repeating_spell-6:spellsave change:repeating_spell-7:spellsave change:repeating_spell-8:spellsave change:repeating_spell-9:spellsave change:repeating_spell-cantrip:spellsavesuccess change:repeating_spell-1:spellsavesuccess change:repeating_spell-2:spellsavesuccess change:repeating_spell-3:spellsavesuccess change:repeating_spell-4:spellsavesuccess change:repeating_spell-5:spellsavesuccess change:repeating_spell-6:spellsavesuccess change:repeating_spell-7:spellsavesuccess change:repeating_spell-8:spellsavesuccess change:repeating_spell-9:spellsavesuccess change:repeating_spell-cantrip:spellhldie change:repeating_spell-1:spellhldie change:repeating_spell-2:spellhldie change:repeating_spell-3:spellhldie change:repeating_spell-4:spellhldie change:repeating_spell-5:spellhldie change:repeating_spell-6:spellhldie change:repeating_spell-7:spellhldie change:repeating_spell-8:spellhldie change:repeating_spell-9:spellhldie change:repeating_spell-cantrip:spellhldietype change:repeating_spell-1:spellhldietype change:repeating_spell-2:spellhldietype change:repeating_spell-3:spellhldietype change:repeating_spell-4:spellhldietype change:repeating_spell-5:spellhldietype change:repeating_spell-6:spellhldietype change:repeating_spell-7:spellhldietype change:repeating_spell-8:spellhldietype change:repeating_spell-9:spellhldietype change:repeating_spell-cantrip:spell_updateflag change:repeating_spell-1:spell_updateflag change:repeating_spell-2:spell_updateflag change:repeating_spell-3:spell_updateflag change:repeating_spell-4:spell_updateflag change:repeating_spell-5:spell_updateflag change:repeating_spell-6:spell_updateflag change:repeating_spell-7:spell_updateflag change:repeating_spell-8:spell_updateflag change:repeating_spell-9:spell_updateflag change:repeating_spell-cantrip:spellattack change:repeating_spell-1:spellattack change:repeating_spell-2:spellattack change:repeating_spell-3:spellattack change:repeating_spell-4:spellattack change:repeating_spell-5:spellattack change:repeating_spell-6:spellattack change:repeating_spell-7:spellattack change:repeating_spell-8:spellattack change:repeating_spell-9:spellattack change:repeating_spell-cantrip:spellhlbonus change:repeating_spell-1:spellhlbonus change:repeating_spell-2:spellhlbonus change:repeating_spell-3:spellhlbonus change:repeating_spell-4:spellhlbonus change:repeating_spell-5:spellhlbonus change:repeating_spell-6:spellhlbonus change:repeating_spell-7:spellhlbonus change:repeating_spell-8:spellhlbonus change:repeating_spell-9:spellhlbonus change:repeating_spell-npc:spellname_base change:repeating_spell-npc:spellrange change:repeating_spell-npc:spelltarget change:repeating_spell-npc:spelldamage change:repeating_spell-npc:spelldamagetype change:repeating_spell-npc:spelldamage2 change:repeating_spell-npc:spelldamagetype2 change:repeating_spell-npc:spellhealing change:repeating_spell-npc:spelldmgmod change:repeating_spell-npc:spellsave change:repeating_spell-npc:spellsavesuccess change:repeating_spell-npc:spellhldie change:repeating_spell-npc:spellhldietype change:repeating_spell-npc:spell_updateflag change:repeating_spell-npc:spellattack change:repeating_spell-npc:spellhlbonus", function(eventinfo) {
         updateSpell("","",eventinfo);
     });
     
-    on("change:npc_name change:npc_type change:npc_ac change:npc_actype change:hp_max change:npc_hpformula change:npc_speed change:strength change:dexterity change:constitution change:intelligence change:wisdom change:charisma change:npc_str_save change:npc_dex_save change:npc_con_save change:npc_int_save change:npc_wis_save change:npc_cha_save change:npc_acrobatics change:npc_animal_handling change:npc_arcana change:npc_athletics change:npc_deception change:npc_history change:npc_insight change:npc_intimidation change:npc_investigation change:npc_medicine change:npc_nature change:npc_perception change:npc_performance change:npc_persuasion change:npc_religion change:npc_sleight_of_hand change:npc_stealth change:npc_survival change:npc_vulnerabilities change:npc_resistances change:npc_immunities change:npc_condition_immunities change:npc_senses change:npc_languages change:npc_challenge change:npc_xp change:npc_legendary_actions", function() {
+    on("change:npc_name change:npc_type change:npc_ac change:npc_actype change:hp_max change:npc_hpformula change:npc_speed change:strength change:dexterity change:constitution change:intelligence change:wisdom change:charisma change:npc_str_save change:npc_dex_save change:npc_con_save change:npc_int_save change:npc_wis_save change:npc_cha_save change:npc_acrobatics change:npc_animal_handling change:npc_arcana change:npc_athletics change:npc_deception change:npc_history change:npc_insight change:npc_intimidation change:npc_investigation change:npc_medicine change:npc_nature change:npc_perception change:npc_performance change:npc_persuasion change:npc_religion change:npc_sleight_of_hand change:npc_stealth change:npc_survival change:npc_vulnerabilities change:npc_resistances change:npc_immunities change:npc_condition_immunities change:npc_senses change:npc_languages change:npc_challenge change:npc_xp change:npc_legendary_actions change:npcreactionsflag change:npcspellcastingflag", function() {
         updateNPC();
     });
 
-    on("change:repeating_spell-cantrip:spellritualflag change:repeating_spell-1:spellritualflag change:repeating_spell-2:spellritualflag change:repeating_spell-3:spellritualflag change:repeating_spell-4:spellritualflag change:repeating_spell-5:spellritualflag change:repeating_spell-6:spellritualflag change:repeating_spell-7:spellritualflag change:repeating_spell-8:spellritualflag change:repeating_spell-9:spellritualflag", function() {
+    on("change:repeating_spell-cantrip:spellritualflag change:repeating_spell-1:spellritualflag change:repeating_spell-2:spellritualflag change:repeating_spell-3:spellritualflag change:repeating_spell-4:spellritualflag change:repeating_spell-5:spellritualflag change:repeating_spell-6:spellritualflag change:repeating_spell-7:spellritualflag change:repeating_spell-8:spellritualflag change:repeating_spell-9:spellritualflag change:repeating_spell-npc:spellritualflag", function() {
         getAttrs(["repeating_spell_spellritualflag"], function(v) {
             flag = v.repeating_spell_spellritualflag === "Yes" ? "{{ritual=1}}" : "0";
             setAttrs({
@@ -4556,7 +4794,7 @@
         });
     });
 
-    on("change:repeating_spell-cantrip:spellconcentrationflag change:repeating_spell-1:spellconcentrationflag change:repeating_spell-2:spellconcentrationflag change:repeating_spell-3:spellconcentrationflag change:repeating_spell-4:spellconcentrationflag change:repeating_spell-5:spellconcentrationflag change:repeating_spell-6:spellconcentrationflag change:repeating_spell-7:spellconcentrationflag change:repeating_spell-8:spellconcentrationflag change:repeating_spell-9:spellconcentrationflag", function() {
+    on("change:repeating_spell-cantrip:spellconcentrationflag change:repeating_spell-1:spellconcentrationflag change:repeating_spell-2:spellconcentrationflag change:repeating_spell-3:spellconcentrationflag change:repeating_spell-4:spellconcentrationflag change:repeating_spell-5:spellconcentrationflag change:repeating_spell-6:spellconcentrationflag change:repeating_spell-7:spellconcentrationflag change:repeating_spell-8:spellconcentrationflag change:repeating_spell-9:spellconcentrationflag change:repeating_spell-npc:spellconcentrationflag", function() {
         getAttrs(["repeating_spell_spellconcentrationflag"], function(v) {
             flag = v.repeating_spell_spellconcentrationflag === "Yes" ? "{{concentration=1}}" : "0";
             setAttrs({
@@ -4565,7 +4803,7 @@
         });
     });
     
-    on("change:repeating_spell-cantrip:spellcomp change:repeating_spell-1:spellcomp change:repeating_spell-2:spellcomp change:repeating_spell-3:spellcomp change:repeating_spell-4:spellcomp change:repeating_spell-5:spellcomp change:repeating_spell-6:spellcomp change:repeating_spell-7:spellcomp change:repeating_spell-8:spellcomp change:repeating_spell-9:spellcomp", function() {
+    on("change:repeating_spell-cantrip:spellcomp change:repeating_spell-1:spellcomp change:repeating_spell-2:spellcomp change:repeating_spell-3:spellcomp change:repeating_spell-4:spellcomp change:repeating_spell-5:spellcomp change:repeating_spell-6:spellcomp change:repeating_spell-7:spellcomp change:repeating_spell-8:spellcomp change:repeating_spell-9:spellcomp change:repeating_spell-npc:spellcomp", function() {
         getAttrs(["repeating_spell_spellcomp"], function(v) {
             spellv = v.repeating_spell_spellcomp.indexOf("V") > -1 ? "{{v=1}}" : "0"
             spells = v.repeating_spell_spellcomp.indexOf("S") > -1 ? "{{s=1}}" : "0"
@@ -4578,7 +4816,7 @@
         });
     });
 
-    on("change:repeating_spell-cantrip:spellcontent change:repeating_spell-1:spellcontent change:repeating_spell-2:spellcontent change:repeating_spell-3:spellcontent change:repeating_spell-4:spellcontent change:repeating_spell-5:spellcontent change:repeating_spell-6:spellcontent change:repeating_spell-7:spellcontent change:repeating_spell-8:spellcontent change:repeating_spell-9:spellcontent", function() {
+    on("change:repeating_spell-cantrip:spellcontent change:repeating_spell-1:spellcontent change:repeating_spell-2:spellcontent change:repeating_spell-3:spellcontent change:repeating_spell-4:spellcontent change:repeating_spell-5:spellcontent change:repeating_spell-6:spellcontent change:repeating_spell-7:spellcontent change:repeating_spell-8:spellcontent change:repeating_spell-9:spellcontent change:repeating_spell-npc:spellcontent", function() {
         getAttrs(["repeating_spell_spellcontent"], function(v) {
             content = v.repeating_spell_spellcontent.split("At Higher Levels:");
             if(content.length > 1) {
@@ -4613,12 +4851,13 @@
     //     });
     // });
 
-    on("change:repeating_spell-cantrip:spelloutput change:repeating_spell-1:spelloutput change:repeating_spell-2:spelloutput change:repeating_spell-3:spelloutput change:repeating_spell-4:spelloutput change:repeating_spell-5:spelloutput change:repeating_spell-6:spelloutput change:repeating_spell-7:spelloutput change:repeating_spell-8:spelloutput change:repeating_spell-9:spelloutput", function(eventinfo) {
+    on("change:repeating_spell-cantrip:spelloutput change:repeating_spell-1:spelloutput change:repeating_spell-2:spelloutput change:repeating_spell-3:spelloutput change:repeating_spell-4:spelloutput change:repeating_spell-5:spelloutput change:repeating_spell-6:spelloutput change:repeating_spell-7:spelloutput change:repeating_spell-8:spelloutput change:repeating_spell-9:spelloutput change:repeating_spell-npc:spelloutput", function(eventinfo) {
         var idlvl = "-" + eventinfo.sourceAttribute.match(/repeating_spell-(.*?)-/)[1];
         var spid = eventinfo.sourceAttribute.split("_")[2];
         var ourid = idlvl + spid;
-        getAttrs(["repeating_spell_spellattackid","repeating_spell_spelloutput","character_name","repeating_spell_pickbase"], function(v) {
+        getAttrs(["repeating_spell_spellattackid","repeating_spell_spelloutput","character_id","repeating_spell_pickbase"], function(v) {
             if(v.repeating_spell_spelloutput === "ATTACK") {
+                // if(idlvl != "-npc_") {
                 setAttrs({repeating_spell_spellattackinfoflag:"show"});
                 if(!v.repeating_spell_spellattackid) {
                     addspellattack(ourid);
@@ -4635,13 +4874,19 @@
                             getAttrs(["repeating_attack_" + v.repeating_spell_spellattackid + "_hidden_pickbase"], function(x) {
                                 // pbase = x["repeating_attack_" + v.repeating_spell_spellattackid + "_hidden_pickbase"];
                                 setAttrs({
-                                    repeating_spell_rollcontent: "%{" + v.character_name + "|repeating_attack_" + v.repeating_spell_spellattackid + "_attack}"
+                                    repeating_spell_rollcontent: "%{" + v.character_id + "|repeating_attack_" + v.repeating_spell_spellattackid + "_attack}"
                                 });
                             });
                         }
                     });
                 };
-                
+                // }
+                // else {
+                //     setAttrs({
+                //         repeating_spell_rollcontent: "@{rollbase}"
+                //     });
+                //     updateNPCspell(eventinfo);
+                // }
             }
             else {
                 setAttrs({
@@ -4652,7 +4897,7 @@
         });
     });
 
-    on("change:repeating_spell-cantrip:spelldamage change:repeating_spell-1:spelldamage change:repeating_spell-2:spelldamage change:repeating_spell-3:spelldamage change:repeating_spell-4:spelldamage change:repeating_spell-5:spelldamage change:repeating_spell-6:spelldamage change:repeating_spell-7:spelldamage change:repeating_spell-8:spelldamage change:repeating_spell-9:spelldamage change:repeating_spell-cantrip:spellhealing change:repeating_spell-1:spellhealing change:repeating_spell-2:spellhealing change:repeating_spell-3:spellhealing change:repeating_spell-4:spellhealing change:repeating_spell-5:spellhealing change:repeating_spell-6:spellhealing change:repeating_spell-7:spellhealing change:repeating_spell-8:spellhealing change:repeating_spell-9:spellhealing", function() {
+    on("change:repeating_spell-cantrip:spelldamage change:repeating_spell-1:spelldamage change:repeating_spell-2:spelldamage change:repeating_spell-3:spelldamage change:repeating_spell-4:spelldamage change:repeating_spell-5:spelldamage change:repeating_spell-6:spelldamage change:repeating_spell-7:spelldamage change:repeating_spell-8:spelldamage change:repeating_spell-9:spelldamage change:repeating_spell-npc:spelldamage change:repeating_spell-cantrip:spellhealing change:repeating_spell-1:spellhealing change:repeating_spell-2:spellhealing change:repeating_spell-3:spellhealing change:repeating_spell-4:spellhealing change:repeating_spell-5:spellhealing change:repeating_spell-6:spellhealing change:repeating_spell-7:spellhealing change:repeating_spell-8:spellhealing change:repeating_spell-9:spellhealing change:repeating_spell-npc:spellhealing", function() {
         getAttrs(["repeating_spell_spelldamage","repeating_spell_spellhealing"], function(v) {
             if((v.repeating_spell_spelldamage && v.repeating_spell_spelldamage != "") || (v.repeating_spell_spellhealing && v.repeating_spell_spellhealing != "")) {
                 setAttrs({
@@ -4848,8 +5093,8 @@
         });
     });
 
-    on("remove:repeating_spell-cantrip remove:repeating_spell-1 remove:repeating_spell-2 remove:repeating_spell-3 remove:repeating_spell-4 remove:repeating_spell-5 remove:repeating_spell-6 remove:repeating_spell-7 remove:repeating_spell-8 remove:repeating_spell-9", function(eventinfo) {
-        id = eventinfo.sourceAttribute.substring(18, 38);
+    on("remove:repeating_spell-cantrip remove:repeating_spell-1 remove:repeating_spell-2 remove:repeating_spell-3 remove:repeating_spell-4 remove:repeating_spell-5 remove:repeating_spell-6 remove:repeating_spell-7 remove:repeating_spell-8 remove:repeating_spell-9 remove:repeating_spell-npc", function(eventinfo) {
+        id = eventinfo.sourceAttribute.split("_")[2];
         getSectionIDs("repeating_attack", function(idarray) {
             _.each(idarray, function(currentID, i) {
                 getAttrs(["repeating_attack_" + currentID + "_spellid"], function(v) {
@@ -4908,7 +5153,7 @@
         updateglobalsave();
     });
 
-    on("change:dexterity change:repeating_inventory:equipped change:globalacmod", function() {
+    on("change:dexterity change:repeating_inventory:equipped change:globalacmod change:repeating_inventory:itemmodifiers", function() {
         updateac();
     });
 
@@ -4963,6 +5208,11 @@
                 if(contentarray && contentarray.indexOf("Legendary Actions") > -1) {
                     temp = contentarray.split(/Legendary Actions\n/)
                     var legendaryactionsarray = temp[1];
+                    contentarray = temp[0];
+                }
+                if(contentarray && contentarray.indexOf("Reactions") > -1) {
+                    temp = contentarray.split(/Reactions\n/)
+                    var reactionsarray = temp[1];
                     contentarray = temp[0];
                 }
                 if(contentarray && contentarray.indexOf("Actions") > -1) {
@@ -5045,6 +5295,24 @@
                             update["repeating_npcaction_" + newrowid + "_description"] = desc;
                         }
 
+                    });
+                }
+                if(reactionsarray) {
+                    update["npcreactionsflag"] = 1;
+                    reactionsarray = reactionsarray.split("**");
+                    reactionsarray.shift();
+                    var reactionsobj = {};
+                    reactionsarray.forEach(function(val, i) {
+                        if (i % 2 === 1) return;
+                        reactionsobj[val] = reactionsarray[i + 1];
+                    });
+                    _.each(reactionsobj, function(desc, name) {
+                        newrowid = generateRowID();
+                        update["repeating_npcreaction_" + newrowid + "_name"] = name + ".";
+                        if(desc.substring(0,2) === ": ") {
+                            desc = desc.substring(2);
+                        }
+                        update["repeating_npcreaction_" + newrowid + "_desc"] = desc.trim();
                     });
                 }
                 if(legendaryactionsarray) {
@@ -5307,6 +5575,10 @@
         });
     });
 
+    on("change:npc_spelldc change:npc_spellattackmod change:spellcasting_ability ", function() {
+        force_refresh_spells();
+    });
+
     var updateitemweight = function() {
         var wtotal = 0;
         getAttrs(["cp","sp","ep","gp","pp"], function(v) {
@@ -5472,12 +5744,12 @@
     }
 
     var addspellattack = function(sid) {
-        getAttrs(["repeating_spell_spelloutput","repeating_spell_spellname_base","repeating_spell_spellrange","repeating_spell_spellattack","spellcasting_ability","repeating_spell_spelldamage","repeating_spell_spelldamagetype","repeating_spell_spelldamage2","repeating_spell_spelldamagetype2","repeating_spell_spellsave","repeating_spell_spellsavesuccess","repeating_spell_spellattackid","character_name","repeating_spell_spellhldie","repeating_spell_spellhldietype","repeating_spell_spellhlbonus","repeating_spell_spelldmgmod","repeating_spell_spellhealing","repeating_spell_spelllevel"], function(v) {
+        getAttrs(["repeating_spell_spelloutput","repeating_spell_spellname_base","repeating_spell_spellrange","repeating_spell_spellattack","spellcasting_ability","repeating_spell_spelldamage","repeating_spell_spelldamagetype","repeating_spell_spelldamage2","repeating_spell_spelldamagetype2","repeating_spell_spellsave","repeating_spell_spellsavesuccess","repeating_spell_spellattackid","character_id","repeating_spell_spellhldie","repeating_spell_spellhldietype","repeating_spell_spellhlbonus","repeating_spell_spelldmgmod","repeating_spell_spellhealing","repeating_spell_spelllevel","npc_spellattackmod","level","npc_spelldc"], function(v) {
             var newrowid = generateRowID();
             var newrowattrs = {};
-            var cname = v.character_name
+            var npcspell = sid.substring(0,4) === "-npc" ? true : false;
             newrowattrs["repeating_spell_spellattackid"] = newrowid;
-            newrowattrs["repeating_spell_rollcontent"] = "%{" + v.character_name + "|repeating_attack_" + newrowid + "_attack}";
+            newrowattrs["repeating_spell_rollcontent"] = "%{" + v.character_id + "|repeating_attack_" + newrowid + "_attack}";
             newrowattrs["repeating_attack_" + newrowid + "_options-flag"] = "0";
             newrowattrs["repeating_attack_" + newrowid + "_atkname_base"] = v.repeating_spell_spellname_base;
             newrowattrs["repeating_attack_" + newrowid + "_spellid"] = sid;
@@ -5510,7 +5782,7 @@
                 newrowattrs["repeating_attack_" + newrowid + "_dmg2type"] = v.repeating_spell_spelldamagetype2;
             }
             if(v.repeating_spell_spellsave && v.repeating_spell_spellsave != "") {
-                newrowattrs["repeating_attack_" + newrowid + "_saveflag"] = "{{save=1}} {{saveattr=@{saveattr}}} {{savedesc=@{saveeffect}}}  {{savedc=[[@{savedc}]]}}";
+                newrowattrs["repeating_attack_" + newrowid + "_saveflag"] = "{{save=1}} {{saveattr=@{saveattr}}} {{savedesc=@{saveeffect}}} {{savedc=[[[[@{savedc}]][SAVE]]]}}";
                 newrowattrs["repeating_attack_" + newrowid + "_saveattr"] = v.repeating_spell_spellsave;
                 newrowattrs["repeating_attack_" + newrowid + "_saveeffect"] = v.repeating_spell_spellsavesuccess;
             }
@@ -5549,6 +5821,14 @@
                         newrowattrs["repeating_attack_" + newrowid + "_dmg2attr"] = "0";
                     }
                 }
+            }
+            if(npcspell === true) {
+                var pb = Math.ceil((v.level)/1e10) + Math.ceil((v.level)/4);
+                pb = isNaN(pb) === false ? pb : 0;
+                newrowattrs["repeating_attack_" + newrowid + "_atkattr_base"] = "0";
+                newrowattrs["repeating_attack_" + newrowid + "_atkmod"] = v.npc_spellattackmod && isNaN(parseInt(v.npc_spellattackmod, 10)) === false ? parseInt(v.npc_spellattackmod, 10) - pb : 0 - pb;
+                newrowattrs["repeating_attack_" + newrowid + "_savedc"] = "(@{saveflat})";
+                newrowattrs["repeating_attack_" + newrowid + "_saveflat"] = v.npc_spelldc && isNaN(parseInt(v.npc_spelldc, 10)) === false ? parseInt(v.npc_spelldc, 10) : 0;
             }
             setAttrs(newrowattrs);
         });
@@ -6025,22 +6305,24 @@
         });
     };
     
-    var updateSpell = function(spellid, category, eventinfo) {
-        console.log(spellid);
-        console.log(category);
+    var updateSpell = function(spellid, category, eventinfo, forceupdate) {
         var sourcetype = eventinfo ? eventinfo.sourceType : "";
         var cat = category ? "-" + category : "";
         var repid = spellid ? spellid + "_" : "";
         var update = {};
         var quietupdate = {};
-        getAttrs(["repeating_spell" + cat + "_" + repid + "spellname_base","repeating_spell" + cat + "_" + repid + "spellprepared","repeating_spell" + cat + "_" + repid + "spellrange","repeating_spell" + cat + "_" + repid + "spelltarget","repeating_spell" + cat + "_" + repid + "spellattack","repeating_spell" + cat + "_" + repid + "spelldamage","repeating_spell" + cat + "_" + repid + "spelldamagetype","repeating_spell" + cat + "_" + repid + "spelldamage2","repeating_spell" + cat + "_" + repid + "spelldamagetype2","repeating_spell" + cat + "_" + repid + "spellhealing","repeating_spell" + cat + "_" + repid + "spelldmgmod","repeating_spell" + cat + "_" + repid + "spellsave","repeating_spell" + cat + "_" + repid + "spellsavesuccess","repeating_spell" + cat + "_" + repid + "spellhldie","repeating_spell" + cat + "_" + repid + "spellhldietype","repeating_spell" + cat + "_" + repid + "spellhlbonus","repeating_spell" + cat + "_" + repid + "spellattackid","character_name","repeating_spell" + cat + "_" + repid + "spelloutput","repeating_spell" + cat + "_" + repid + "spelllevel","spellcasting_ability"], function(v) {
+        var npcspell = false;
+        if((eventinfo && eventinfo.sourceAttribute && eventinfo.sourceAttribute.split("_")[1] === "spell-npc") || (category && category === "npc")) {
+            npcspell = true;
+        }
+        getAttrs(["npc_spellattackmod","level","npc_spelldc","repeating_spell" + cat + "_" + repid + "spellname_base","repeating_spell" + cat + "_" + repid + "spellprepared","repeating_spell" + cat + "_" + repid + "spellrange","repeating_spell" + cat + "_" + repid + "spelltarget","repeating_spell" + cat + "_" + repid + "spellattack","repeating_spell" + cat + "_" + repid + "spelldamage","repeating_spell" + cat + "_" + repid + "spelldamagetype","repeating_spell" + cat + "_" + repid + "spelldamage2","repeating_spell" + cat + "_" + repid + "spelldamagetype2","repeating_spell" + cat + "_" + repid + "spellhealing","repeating_spell" + cat + "_" + repid + "spelldmgmod","repeating_spell" + cat + "_" + repid + "spellsave","repeating_spell" + cat + "_" + repid + "spellsavesuccess","repeating_spell" + cat + "_" + repid + "spellhldie","repeating_spell" + cat + "_" + repid + "spellhldietype","repeating_spell" + cat + "_" + repid + "spellhlbonus","repeating_spell" + cat + "_" + repid + "spellattackid","character_id","repeating_spell" + cat + "_" + repid + "spelloutput","repeating_spell" + cat + "_" + repid + "spelllevel","spellcasting_ability"], function(v) {
             update["repeating_spell" + cat + "_" + repid + "spellname"] = v["repeating_spell" + cat + "_" + repid + "spellname_base"] ? v["repeating_spell" + cat + "_" + repid + "spellname_base"] : "";
             update["repeating_spell" + cat + "_" + repid + "prep"] = v["repeating_spell" + cat + "_" + repid + "spellprepared"] ? v["repeating_spell" + cat + "_" + repid + "spellprepared"] : 1;
             update["repeating_spell" + cat + "_" + repid + "spellattackinfoflag"] = v["repeating_spell" + cat + "_" + repid + "spelloutput"] && v["repeating_spell" + cat + "_" + repid + "spelloutput"] === "ATTACK" ? "show" : "hide";
             if(v["repeating_spell" + cat + "_" + repid + "spellattackid"] && v["repeating_spell" + cat + "_" + repid + "spellattackid"] != "") {
                 atkid = v["repeating_spell" + cat + "_" + repid + "spellattackid"];
-                quietupdate["repeating_spell" + cat + "_" + repid + "rollcontent"] = "%{" + v.character_name + "|repeating_attack_" + atkid + "_attack}";
-                if(sourcetype && sourcetype === "player") {
+                quietupdate["repeating_spell" + cat + "_" + repid + "rollcontent"] = "%{" + v.character_id + "|repeating_attack_" + atkid + "_attack}";
+                if((sourcetype && sourcetype === "player") || (forceupdate && forceupdate === true)) {
                     quietupdate["repeating_attack_" + atkid + "_options-flag"] = "0";
                     quietupdate["repeating_attack_" + atkid + "_atkname_base"] = v["repeating_spell" + cat + "_" + repid + "spellname_base"];
                     if(v["repeating_spell" + cat + "_" + repid + "spellrange"] && v["repeating_spell" + cat + "_" + repid + "spellrange"] != "") {
@@ -6072,7 +6354,7 @@
                         quietupdate["repeating_attack_" + atkid + "_dmg2type"] = v["repeating_spell" + cat + "_" + repid + "spelldamagetype2"];
                     }
                     if(v["repeating_spell" + cat + "_" + repid + "spellsave"] && v["repeating_spell" + cat + "_" + repid + "spellsave"] != "") {
-                        quietupdate["repeating_attack_" + atkid + "_saveflag"] = "{{save=1}} {{saveattr=@{saveattr}}} {{savedesc=@{saveeffect}}}  {{savedc=[[@{savedc}]]}}";
+                        quietupdate["repeating_attack_" + atkid + "_saveflag"] = "{{save=1}} {{saveattr=@{saveattr}}} {{savedesc=@{saveeffect}}} {{savedc=[[[[@{savedc}]][SAVE]]]}}";
                         quietupdate["repeating_attack_" + atkid + "_saveattr"] = v["repeating_spell" + cat + "_" + repid + "spellsave"];
                         quietupdate["repeating_attack_" + atkid + "_saveeffect"] = v["repeating_spell" + cat + "_" + repid + "spellsavesuccess"];
                     }
@@ -6115,11 +6397,18 @@
                             }
                         }
                     }
+                    if(npcspell === true) {
+                        var pb = Math.ceil((v.level)/1e10) + Math.ceil((v.level)/4);
+                        pb = isNaN(pb) === false ? pb : 0;
+                        quietupdate["repeating_attack_" + atkid + "_atkattr_base"] = "0";
+                        quietupdate["repeating_attack_" + atkid + "_atkmod"] = v.npc_spellattackmod && isNaN(parseInt(v.npc_spellattackmod, 10)) === false ? parseInt(v.npc_spellattackmod, 10) - pb : 0 - pb;
+                        quietupdate["repeating_attack_" + atkid + "_savedc"] = "(@{saveflat})";
+                        quietupdate["repeating_attack_" + atkid + "_saveflat"] = v.npc_spelldc && isNaN(parseInt(v.npc_spelldc, 10)) === false ? parseInt(v.npc_spelldc, 10) : 0;
+                    }
                 }
             }
             setAttrs(quietupdate, {silent: true});
             setAttrs(update);
-            console.log("FINISHED UPDATE!");
         });
     };
     
@@ -6153,7 +6442,7 @@
     };
     
     var updateNPC = function() {
-        getAttrs(["npc_name","npc_type","npc_ac","npc_actype","hp_max","npc_hpformula","npc_speed","strength","dexterity","constitution","intelligence","wisdom","charisma","npc_str_save","npc_dex_save","npc_con_save","npc_int_save","npc_wis_save","npc_cha_save","npc_acrobatics","npc_animal_handling","npc_arcana","npc_athletics","npc_deception","npc_history","npc_insight","npc_intimidation","npc_investigation","npc_medicine","npc_nature","npc_perception","npc_performance","npc_persuasion","npc_religion","npc_sleight_of_hand","npc_stealth","npc_survival","npc_vulnerabilities","npc_resistances","npc_immunities","npc_condition_immunities","npc_senses","npc_languages","npc_challenge","npc_xp","npc_legendary_actions"], function(v) {
+        getAttrs(["npc_name","npc_type","npc_ac","npc_actype","hp_max","npc_hpformula","npc_speed","strength","dexterity","constitution","intelligence","wisdom","charisma","npc_str_save","npc_dex_save","npc_con_save","npc_int_save","npc_wis_save","npc_cha_save","npc_acrobatics","npc_animal_handling","npc_arcana","npc_athletics","npc_deception","npc_history","npc_insight","npc_intimidation","npc_investigation","npc_medicine","npc_nature","npc_perception","npc_performance","npc_persuasion","npc_religion","npc_sleight_of_hand","npc_stealth","npc_survival","npc_vulnerabilities","npc_resistances","npc_immunities","npc_condition_immunities","npc_senses","npc_languages","npc_challenge","npc_xp","npc_legendary_actions","npcreactionsflag","npcspellcastingflag"], function(v) {
             var rollbase = "";
             var first_save = 0;
             var first_skill = 0;
@@ -6206,6 +6495,8 @@
             if(v.npc_stealth && v.npc_stealth != "") {stealth = parseInt(v.npc_stealth, 10); if(first_skill === 0 && stealth < 10) {stealth_flag = 1} else if(first_skill === 0 && stealth > 9) {stealth_flag = 2}  else if(first_skill === 1 && stealth < 10) {stealth_flag = 3} else if(first_skill === 1 && stealth > 9) {stealth_flag = 4}; first_skill = 1;} else {stealth_flag = 0; stealth = "";}
             if(v.npc_survival && v.npc_survival != "") {survival = parseInt(v.npc_survival, 10); if(first_skill === 0 && survival < 10) {survival_flag = 1} else if(first_skill === 0 && survival > 9) {survival_flag = 2}  else if(first_skill === 1 && survival < 10) {survival_flag = 3} else if(first_skill === 1 && survival > 9) {survival_flag = 4}; first_skill = 1;} else {survival_flag = 0; survival = "";}
             leg_act = v.npc_legendary_actions && v.npc_legendary_actions != "" ? v.npc_legendary_actions : 0;
+            react = v.npcreactionsflag && v.npcreactionsflag != "0" ? v.npcreactionsflag : 0;
+            npcspells = v.npcspellcastingflag && v.npcspellcastingflag != "0" ? v.npcspellcastingflag : 0;
             legendary_actions_display = "The " + v.npc_name + " can take " + leg_act + " legendary actions, choosing from the options below. Only one legendary option can be used at a time and only at the end of another creature's turn. The " + v.npc_name + " regains spent legendary actions at the start of its turn."
 
             setAttrs({
@@ -6291,7 +6582,9 @@
                 npcd_challenge: challenge,
                 npcd_xp: xp,
                 legendary_flag: leg_act,
-                legendary_actions_display: legendary_actions_display
+                legendary_actions_display: legendary_actions_display,
+                reaction_flag: react,
+                npcspell_flag: npcspells
             });
         });
     };
@@ -6384,12 +6677,44 @@
         });
     };
 
+    // var updateNPCspell = function(eventinfo) {
+    //     var id = eventinfo.sourceAttribute.split("_")[2];
+    //     console.log(id);
+    //     var update = {};
+    //     var rollbase = "";
+    //     getAttrs(["dtype","spellcasting_ability","npc_spelldc","character_id","npc_spellattackmod","repeating_spell-npc_"+id+"_spelloutput","repeating_spell-npc_"+id+"_spellattack","repeating_spell-npc_"+id+"_spellattack","repeating_spell-npc_"+id+"_spellname_base"], function(v) {
+    //         var atk_flag = v["repeating_spell-npc_"+id+"_spellattack"] != "None" ? "{{attack=1}} " : "";
+    //         var dmg_flag = v["repeating_spell-npc_"+id+"_spelldamage"] != "" ? "{{damage=1}} " : "";
+    //         if(v["repeating_spell-npc_"+id+"_spelloutput"] === "ATTACK") {
+    //             if(v.dtype === "full") {
+    //                 rollbase = "@{wtype}&{template:npcaction} " + atk_flag + dmg_flag + "{{name=@{npc_name}}} {{rname=" + v["repeating_spell-npc_"+id+"_spellname_base"] + "}} {{r1=[[1d20+(@{npc_spellattackmod}+0)]]}} @{rtype}+(@{npc_spellattackmod}+0)]]}} {{dmg1=[[@{spelldamage}+0]]}} {{dmg1type=@{spelldamagetype}}} {{dmg2=[[@{spelldamage2}+0]]}} {{dmg2type=@{spelldamagetype2}}} {{crit1=[[@{attack_crit}+0]]}} {{crit2=[[@{attack_crit2}+0]]}} {{description=@{spelldescription}}}";
+    //             }
+    //             // else if(v.repeating_npcaction_attack_flag && v.repeating_npcaction_attack_flag != "0") {
+    //             //     if(eventinfo.sourceAttribute.indexOf("npcaction-l") === -1) {
+    //             //         rollbase = "@{wtype}&{template:npcatk} @{attack_display_flag} @{damage_flag} {{name=@{npc_name}}} {{rname=[@{name}](~repeating_npcaction_npc_dmg)}} {{rnamec=[@{name}](~repeating_npcaction_npc_crit)}} {{r1=[[1d20+(@{attack_tohit}+0)]]}} @{rtype}+(@{attack_tohit}+0)]]}} {{description=@{description}}} @{charname_output}";
+    //             //     }
+    //             //     else {
+    //             //         rollbase = "@{wtype}&{template:npcatk} @{attack_display_flag} @{damage_flag} {{name=@{npc_name}}} {{rname=[@{name}](~repeating_npcaction-l_npc_dmg)}} {{rnamec=[@{name}](~repeating_npcaction-l_npc_crit)}} {{r1=[[1d20+(@{attack_tohit}+0)]]}} @{rtype}+(@{attack_tohit}+0)]]}} {{description=@{description}}} @{charname_output}"
+    //             //     }
+    //             // }
+    //             // else if(v.repeating_npcaction_attack_damage && v.repeating_npcaction_attack_damage != "") {
+    //             //     rollbase = "@{wtype}&{template:npcdmg} @{damage_flag} {{dmg1=[[@{attack_damage}+0]]}} {{dmg1type=@{attack_damagetype}}} {{dmg2=[[@{attack_damage2}+0]]}} {{dmg2type=@{attack_damagetype2}}} {{crit1=[[@{attack_crit}+0]]}} {{crit2=[[@{attack_crit2}+0]]}} @{charname_output}"
+    //             // }
+    //             // else {
+    //             //     rollbase = "@{wtype}&{template:npcaction} {{name=@{npc_name}}} {{rname=@{name}}} {{description=@{description}}} @{charname_output}"
+    //             }
+    //             update["repeating_spell-npc_"+id+"_rollbase"] = rollbase;
+    //             setAttrs(update);
+    //         }
+    //     });
+    // }
+
     var force_refresh_spells = function() {
-        spellcats = ["cantrip","1","2","3","4","5","6","7","8","9"];
+        spellcats = ["cantrip","1","2","3","4","5","6","7","8","9","npc"];
         _.each(spellcats, function(cat) {
             getSectionIDs("repeating_spell-" + cat, function(idarray) {
                 _.each(idarray, function(currentID, i) {
-                    updateSpell(currentID,cat);
+                    updateSpell(currentID,cat,"",true);
                 });
             });
         })
@@ -6884,7 +7209,7 @@
         // set proficiencies
         getAttrs(['pro_tools'],function(toolAttrs) {
             var updates = {},
-                tools = toolAttrs.pro_tools.split(/, and|,and|and|;|:|\||,/);
+                tools = (toolAttrs.pro_tools || '').split(/, and|,and|and|;|:|\||,/);
             if(toolAttrs.pro_tools && toolAttrs.pro_tools.trim() !== '') {
                 _.each(tools, function(tool) {
                     var newRowId = generateRowID();
@@ -7040,14 +7365,14 @@
     };
     // /TRANSITION SCRIPT
 
-    var upgrade_1_1_to_1_2 = function() {
+    var upgrade_1_1_to_1_2 = function(doneupdating) {
         force_refresh_spells();
         force_refresh_attacks();
+        doneupdating();
     }
 
-    var upgrade_1_2_to_1_3 = function() {
+    var upgrade_1_2_to_1_3 = function(doneupdating) {
         // UPGRADING SAVING THROW TOGGLE
-        console.log("UPGRADING SAVING THROW TOGGLE!!!!!!!");
         getSectionIDs("repeating_attack", function(idarray) {
             var update = {};
             _.each(idarray, function(currentID, i) {
@@ -7056,15 +7381,25 @@
                         update["repeating_attack_" + currentID + "_saveflag"] = "{{save=1}} {{saveattr=@{saveattr}}} {{savedesc=@{saveeffect}}} {{savedc=[[[[@{savedc}]][SAVE]]]}}";
                     }
                     if(i === idarray.length - 1) {
-                        setAttrs(update);
+                        console.log(update);
+                        setAttrs(update, {}, function() {
+                            console.log("MOVING ON DOWN!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                            force_refresh_npcactions();
+                            updateac();
+                            force_refresh_spells();
+                            force_refresh_attacks();
+                            doneupdating();
+                        });
                     }
                 });
             });
         });
-        force_refresh_npcactions();
-        updateac();
+    }
+
+    var upgrade_1_3_to_1_4 = function(doneupdating) {
         force_refresh_spells();
         force_refresh_attacks();
+        doneupdating();
     }
     
     var versioning = function() {
@@ -7081,18 +7416,29 @@
             }
             else if(v["version"] === "1.1") {
                 console.log("UPGRADING TO v1.2");
-                upgrade_1_1_to_1_2();
-                setAttrs({version: "1.2"});
-                versioning();
+                upgrade_1_1_to_1_2(function() {
+                    setAttrs({version: "1.2"});
+                    versioning();
+                });
+                
             }
             else if(v["version"] === "1.2") {
                 console.log("UPGRADING TO v1.3");
-                upgrade_1_2_to_1_3();
-                setAttrs({version: "1.3"});
-                versioning();
+                upgrade_1_2_to_1_3(function() {
+                    setAttrs({version: "1.3"});
+                    versioning();
+                });
+                
+            }
+            else if(v["version"] === "1.3") {
+                console.log("UPGRADING TO v1.4");
+                upgrade_1_3_to_1_4(function() {
+                    setAttrs({version: "1.4"});
+                    versioning();
+                });
             }
             else {
-                setAttrs({version: "1.3"});
+                setAttrs({version: "1.4"});
                 console.log("5th Edition OGL by Roll20 version " + v["version"]);
             }
         });
