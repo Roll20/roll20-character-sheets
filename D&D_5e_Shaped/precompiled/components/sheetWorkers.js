@@ -1361,9 +1361,6 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 	if (!exists(secondDamageFormula)) {
 		secondDamageFormula = 0;
 	}
-	if (!exists(damageString)) {
-		damageString = ' ';
-	}
 	finalSetAttrs[repeatingString + 'second_damage_formula'] = secondDamageFormula;
 	if (options.type === 'attack') {
 		finalSetAttrs[repeatingString + 'damage_string'] = damageString;
