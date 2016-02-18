@@ -94,7 +94,7 @@ function fromVOrFinalSetAttrs(v, finalSetAttrs, value) {
 	}
 	return v[value];
 }
-function parseAttackComponents(v, repeatingString, finalSetAttrs, options) {
+function parseAttackComponent(v, repeatingString, finalSetAttrs, options) {
 	var parsed = v[repeatingString + 'parsed'];
 
 	if (!exists(parsed)) {
@@ -112,6 +112,11 @@ function parseAttackComponents(v, repeatingString, finalSetAttrs, options) {
 
 		if (aTriggerFieldExists && !exists(v[repeatingString + options.toggleField])) {
 			finalSetAttrs[repeatingString + options.toggleField] = options.toggleFieldSetTo;
+
+			if (!exists(finalSetAttrs[repeatingString + 'parsed'])) {
+				finalSetAttrs[repeatingString + 'parsed'] = '';
+			}
+			finalSetAttrs[repeatingString + 'parsed'] += ' ' + options.parseName;
 		}
 		if (options.attackAbility && !exists(v[repeatingString + 'attack_ability']) && v[repeatingString + 'attack_ability'] !== '0') {
 			finalSetAttrs[repeatingString + 'attack_ability'] = v.default_ability;
@@ -125,11 +130,6 @@ function parseAttackComponents(v, repeatingString, finalSetAttrs, options) {
 				finalSetAttrs[repeatingString + 'heal_ability'] = v.default_ability;
 			}
 		}
-
-		if (!exists(finalSetAttrs[repeatingString + 'parsed'])) {
-			finalSetAttrs[repeatingString + 'parsed'] = '';
-		}
-		finalSetAttrs[repeatingString + 'parsed'] += ' ' + options.parseName;
 	}
 }
 function hasUpperCase(string) {
@@ -1081,7 +1081,7 @@ var updateAttackToggle = function (v, finalSetAttrs, repeatingString, options) {
 		toggleFieldSetTo: '@{roll_toggle_var}',
 		triggerFields: ['type']
 	};
-	parseAttackComponents(v, repeatingString, finalSetAttrs, attackParse);
+	parseAttackComponent(v, repeatingString, finalSetAttrs, attackParse);
 
 	var attackFormula = '';
 	var attackToggle = v[repeatingString + 'roll_toggle'];
@@ -1154,7 +1154,7 @@ var updateSavingThrowToggle = function (v, finalSetAttrs, repeatingString, optio
 		toggleFieldSetTo: '@{saving_throw_toggle_var}',
 		triggerFields: ['saving_throw_vs_ability']
 	};
-	parseAttackComponents(v, repeatingString, finalSetAttrs, savingThrowParse);
+	parseAttackComponent(v, repeatingString, finalSetAttrs, savingThrowParse);
 
 	var savingThrowToggle = v[repeatingString + 'saving_throw_toggle'];
 	if (savingThrowToggle === '@{saving_throw_toggle_var}') {
@@ -1182,7 +1182,7 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 		toggleFieldSetTo: '@{damage_toggle_var}',
 		triggerFields: ['damage']
 	};
-	parseAttackComponents(v, repeatingString, finalSetAttrs, damageParse);
+	parseAttackComponent(v, repeatingString, finalSetAttrs, damageParse);
 
 	var damageString = '';
 	var damageFormula = '';
@@ -1282,7 +1282,7 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 		toggleFieldSetTo: '@{second_damage_toggle_var}',
 		triggerFields: ['second_damage']
 	};
-	parseAttackComponents(v, repeatingString, finalSetAttrs, secondDamageParse);
+	parseAttackComponent(v, repeatingString, finalSetAttrs, secondDamageParse);
 
 	var secondDamageFormula = '';
 
@@ -1375,7 +1375,7 @@ var updateHealToggle = function (v, finalSetAttrs, repeatingString) {
 		toggleFieldSetTo: '@{heal_toggle_var}',
 		triggerFields: ['heal']
 	};
-	parseAttackComponents(v, repeatingString, finalSetAttrs, healParse);
+	parseAttackComponent(v, repeatingString, finalSetAttrs, healParse);
 
 	var healFormula = '@{heal}[heal]';
 	var healToggle = v[repeatingString + 'heal_toggle'];
@@ -1407,7 +1407,7 @@ var updateHigherLevelToggle = function (v, finalSetAttrs, repeatingString) {
 		toggleFieldSetTo: '@{higher_level_toggle_var}',
 		triggerFields: ['higher_level_dice', 'higher_level_die', 'second_higher_level_dice', 'second_higher_level_die', 'higher_level_heal']
 	};
-	parseAttackComponents(v, repeatingString, finalSetAttrs, higherLevelParse);
+	parseAttackComponent(v, repeatingString, finalSetAttrs, higherLevelParse);
 
 	var higherLevelToggle = v[repeatingString + 'higher_level_toggle'];
 	if (exists(higherLevelToggle) && higherLevelToggle === '@{higher_level_toggle_var}') {
