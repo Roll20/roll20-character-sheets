@@ -76,7 +76,7 @@ function isEmpty(obj) {
 	}
 	return true;
 }
-function setFinalAttrs(v, finalSetAttrs) {
+function setFinalAttrs(v, finalSetAttrs, quiet) {
 	if (!isEmpty(finalSetAttrs)) {
 		for (var key in finalSetAttrs) {
 			if (finalSetAttrs.hasOwnProperty(key)) {
@@ -85,7 +85,12 @@ function setFinalAttrs(v, finalSetAttrs) {
 				}
 			}
 		}
-		setAttrs(finalSetAttrs);
+		console.log('quiet', quiet);
+		if (quiet) {
+			setAttrs(finalSetAttrs, {quiet: true});
+		} else {
+			setAttrs(finalSetAttrs);
+		}
 	}
 }
 function fromVOrFinalSetAttrs(v, finalSetAttrs, value) {
@@ -1397,10 +1402,9 @@ var updateHealToggle = function (v, finalSetAttrs, repeatingString) {
 		if (exists(v.global_spell_heal_bonus)) {
 			healFormula += ADD + '@{global_spell_heal_bonus}[global spell heal bonus]';
 		}
-	}
 
-	finalSetAttrs[repeatingString + 'heal_formula'] = healFormula;
-	console.log('updateHealToggle', finalSetAttrs);
+		finalSetAttrs[repeatingString + 'heal_formula'] = healFormula;
+	}
 };
 
 var updateHigherLevelToggle = function (v, finalSetAttrs, repeatingString) {
@@ -1439,7 +1443,6 @@ var updateHigherLevelToggle = function (v, finalSetAttrs, repeatingString) {
 			finalSetAttrs[repeatingString + 'heal_formula'] += ADD + '((@{higher_level_query} - @{spell_level}) * @{higher_level_dice})@{higher_level_die}[higher lvl] + (@{higher_level_heal} * (@{higher_level_query} - @{spell_level}))[higher lvl flat amount]';
 		}
 	}
-	console.log('updateHigherLevelToggle', finalSetAttrs);
 };
 
 var updateAttackQuery = function () {
@@ -1670,16 +1673,15 @@ var updateSpell = function (rowId) {
 			collectionArray.push(repeatingString + 'second_higher_level_dice');
 			collectionArray.push(repeatingString + 'second_higher_level_die');
 			collectionArray.push(repeatingString + 'higher_level_heal');
+			collectionArray.push(repeatingString + 'components_verbal');
+			collectionArray.push(repeatingString + 'components_somatic');
+			collectionArray.push(repeatingString + 'components_material');
+
 		}
 
 		getAttrs(collectionArray, function (v) {
 			for (var j = 0; j < ids.length; j++) {
 				var repeatingString = repeatingItem + '_' + ids[j] + '_';
-
-				var spellName = v[repeatingString + 'name'];
-				if (!exists(spellName)) {
-					return;
-				}
 
 				var spellLevel = getIntValue(v[repeatingString + 'spell_level']);
 				if (!exists(spellLevel)) {
@@ -1693,13 +1695,13 @@ var updateSpell = function (rowId) {
 
 				var spellComponents = v[repeatingString + 'components'];
 				if (exists(spellComponents)) {
-					if (spellComponents.indexOf('V') !== -1) {
+					if (spellComponents.indexOf('V') !== -1 && !exists(v[repeatingString + 'components_verbal'])) {
 						finalSetAttrs[repeatingString + 'components_verbal'] = 1;
 					}
-					if (spellComponents.indexOf('S') !== -1) {
+					if (spellComponents.indexOf('S') !== -1 && !exists(v[repeatingString + 'components_somatic'])) {
 						finalSetAttrs[repeatingString + 'components_somatic'] = 1;
 					}
-					if (spellComponents.indexOf('M') !== -1) {
+					if (spellComponents.indexOf('M') !== -1 && !exists(v[repeatingString + 'components_material'])) {
 						finalSetAttrs[repeatingString + 'components_material'] = 1;
 					}
 				}
@@ -1767,7 +1769,6 @@ on('change:halfling_luck', function () {
 });
 
 var updateSkill = function (rowId) {
-	console.log('updateSkill', rowId);
 	var repeatingItem = 'repeating_skill';
 	var collectionArray = ['jack_of_all_trades_toggle', 'jack_of_all_trades', 'pb', 'exp', 'global_check_bonus'];
 	var finalSetAttrs = {};
@@ -1865,9 +1866,7 @@ var updateSkill = function (rowId) {
 on('change:repeating_skill', function (eventInfo) {
 	var changedField = getRepeatingField('repeating_skill', eventInfo);
 	if (changedField !== 'ability_short_name' && changedField !== 'total' && changedField !== 'formula') {
-		console.log('change:repeating_skill changedField', changedField);
 		var rowId = getRowId('repeating_skill', eventInfo);
-		console.log('change:repeating_skill rowId', rowId);
 		updateSkill(rowId);
 	}
 });
@@ -1989,7 +1988,7 @@ function updateSpellsFromSRD () {
     }
 
     console.log('updateSpellsFromSRD', finalSetAttrs);
-    setFinalAttrs(v, finalSetAttrs);
+    setFinalAttrs(v, finalSetAttrs, 'quiet');
   });
 }
 on('change:spells_srd', function () {
@@ -2316,16 +2315,10 @@ var updateNPCHPFromSRD = function () {
           var conScore = getIntValue(v.constitution);
           var conBonus = getIntValue(v.constitution_bonus);
           var globalAbilityBonus = getIntValue(v.global_ability_bonus);
-          console.log('conScore', conScore);
-          console.log('conBonus', conBonus);
-          console.log('globalAbilityBonus', globalAbilityBonus);
 
           conMod = getAbilityMod((conScore + conBonus + globalAbilityBonus));
-          console.log('conMod 1', conMod);
         }
-        console.log('conMod', conMod);
 
-        console.log('hdNum', hdNum);
         finalSetAttrs.hit_dice = hdNum;
         finalSetAttrs.hit_die = 'd' + getIntValue(match[2]);
 
@@ -2440,25 +2433,9 @@ on('change:ac_srd', function () {
 	updateNPCAC();
 });
 
-var updateNPCName = function () {
-	var collectionArray = ['character_name_srd', 'character_name_srd'];
-	var finalSetAttrs = {};
-
-	getAttrs(collectionArray, function (v) {
-		finalSetAttrs.character_name = v.character_name_srd;
-
-		console.log('updateNPCName', finalSetAttrs);
-		setFinalAttrs(v, finalSetAttrs);
-	});
-};
-
-on('change:character_name_srd', function () {
-	console.log('character_name_srd changed');
-});
-
 var updateNPCContent = function () {
 	console.log('updateNPCContent');
-	var collectionArray = ['content_srd', 'character_name_srd'];
+	var collectionArray = ['content_srd', 'character_name'];
 	var finalSetAttrs = {};
 
 	getAttrs(collectionArray, function (v) {
@@ -2479,8 +2456,7 @@ var updateNPCContent = function () {
 			}
 			if (exists(legendaryActions)) {
 				console.log('legendaryActions', legendaryActions);
-				console.log('v.character_name_srd', v.character_name_srd);
-				var creatureName = v.character_name_srd;
+				var creatureName = v.character_name;
 				var legendaryActionAmount = 3;
 				var legendaryActionsMatch = legendaryActions.match(/Can take (\d+) Legendary Actions/gi);
 
