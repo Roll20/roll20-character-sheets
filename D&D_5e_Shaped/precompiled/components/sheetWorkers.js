@@ -76,7 +76,7 @@ function isEmpty(obj) {
 	}
 	return true;
 }
-function setFinalAttrs(v, finalSetAttrs, quiet) {
+function setFinalAttrs(v, finalSetAttrs) {
 	if (!isEmpty(finalSetAttrs)) {
 		for (var key in finalSetAttrs) {
 			if (finalSetAttrs.hasOwnProperty(key)) {
@@ -85,12 +85,7 @@ function setFinalAttrs(v, finalSetAttrs, quiet) {
 				}
 			}
 		}
-		console.log('quiet', quiet);
-		if (quiet) {
-			setAttrs(finalSetAttrs, {quiet: true});
-		} else {
-			setAttrs(finalSetAttrs);
-		}
+		setAttrs(finalSetAttrs);
 	}
 }
 function fromVOrFinalSetAttrs(v, finalSetAttrs, value) {
@@ -1988,7 +1983,7 @@ function updateSpellsFromSRD () {
     }
 
     console.log('updateSpellsFromSRD', finalSetAttrs);
-    setFinalAttrs(v, finalSetAttrs, 'quiet');
+    setFinalAttrs(v, finalSetAttrs);
   });
 }
 on('change:spells_srd', function () {
