@@ -5,6 +5,9 @@ This is my fork of Suldae's initial sheet.
 
 ### ChangeLog
 
+#### Bug Fix Update - February 2016
+* Added attribute names (or used unique names) to various attributes so they would work properly, such as drag-n-drop of initiative onto desktop
+
 #### Major update - May 2015
 * Added sheet config controls to remove background image and control Logos (thanks to Rich Finder)
 * Added Initiative roll button which auto-populates Turn Tracker
