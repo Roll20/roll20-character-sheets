@@ -29,8 +29,10 @@ function getAbilityName(varName) {
 function getAbilityModName(varName) {
 	if (!varName) {
 		return 'strength_mod';
+	} else if (typeof varName === 'string') {
+		varName = varName.replace(/\W/g, '');
 	}
-	return varName.replace(/\W/g, '');
+	return varName;
 }
 function getAbilityValue(v, varName, defaultAbility) {
 	if (!varName) {
@@ -206,6 +208,18 @@ function versionCompare(v1, v2, options) {
 function getAbilityMod (score) {
   return Math.floor((getIntValue(score) - 10) / 2);
 }
+function addOrSubtract (string, number) {
+	var value = number;
+	if (string && value) {
+		if (value >= 0) {
+			value = ADD + value;
+		} else {
+			value = SUBTRACT + Math.abs(value);
+		}
+	}
+	return value;
+}
+
 
 var ABILITIES = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
 var ADD = ' + ';
@@ -1209,17 +1223,10 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 			finalSetAttrs[repeatingString + 'damage_ability'] = damageAbility;
 		}
 		if (exists(damageAbility) || options.defaultDamageAbility) {
-			damageAbility = getAbilityValue(v, damageAbility, options.defaultDamageAbility);
-			if (exists(damageAbility)) {
-				damageAddition += damageAbility;
-				if (damageFormula !== '') {
-					if (damageAbility < 0) {
-						damageFormula += SUBTRACT;
-					} else {
-						damageFormula += ADD;
-					}
-				}
-				damageFormula += damageAbility + '[' + getAbilityShortName(v[repeatingString + 'damage_ability']) + ']';
+			var damageAbilityValue = getAbilityValue(v, damageAbility, options.defaultDamageAbility);
+			if (exists(damageAbilityValue)) {
+				damageAddition += damageAbilityValue;
+				damageFormula += addOrSubtract(damageFormula, damageAbilityValue) + '[' + getAbilityShortName(v[repeatingString + 'damage_ability']) + ']';
 			}
 		}
 
@@ -1252,14 +1259,7 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 		}
 
 		if (exists(damageAddition)) {
-			if (exists(damageString)) {
-				if (damageAddition < 0) {
-					damageString += SUBTRACT;
-				} else {
-					damageString += ADD;
-				}
-			}
-			damageString += damageAddition;
+			damageString += addOrSubtract(damageString, damageAddition);
 		}
 
 		damageType = v[repeatingString + 'damage_type'];
@@ -1300,14 +1300,7 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 			secondDamageAbility = getAbilityValue(v, secondDamageAbility);
 			if (exists(secondDamageAbility)) {
 				secondDamageAddition += secondDamageAbility;
-				if (secondDamageFormula !== '') {
-					if (secondDamageAbility < 0) {
-						secondDamageFormula += SUBTRACT;
-					} else {
-						secondDamageFormula += ADD;
-					}
-				}
-				secondDamageFormula += secondDamageAbility + '[' + getAbilityShortName(v[repeatingString + 'second_damage_ability']) + ']';
+				secondDamageFormula += addOrSubtract(secondDamageFormula, secondDamageAbility) + '[' + getAbilityShortName(v[repeatingString + 'second_damage_ability']) + ']';
 			}
 		}
 
@@ -1321,14 +1314,7 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 		}
 
 		if (exists(secondDamageAddition)) {
-			if (exists(damageString)) {
-				if (secondDamageAddition < 0) {
-					damageString += SUBTRACT;
-				} else {
-					damageString += ADD;
-				}
-			}
-			damageString += secondDamageAddition;
+			damageString += addOrSubtract(damageString, secondDamageAddition);
 		}
 
 		var secondDamageType = v[repeatingString + 'second_damage_type'];
@@ -2346,13 +2332,8 @@ var updateNPCHP = function () {
 
 		if (conMod !== 0) {
 			var bonusHP = hdNum * conMod;
-			if (conMod > 0) {
-				hpFormula += ADD + bonusHP;
-				totalHP += bonusHP;
-			} else if (conMod < 0) {
-				hpFormula += SUBTRACT + bonusHP;
-				totalHP -= bonusHP;
-			}
+			totalHP += bonusHP;
+			hpFormula += addOrSubtract(hpFormula, bonusHP);
 		}
 
 		if (exists(v.hp_extra)) {
