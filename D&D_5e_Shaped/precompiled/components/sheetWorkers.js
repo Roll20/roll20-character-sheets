@@ -1,4 +1,4 @@
-var currentVersion = '2.0.13';
+var currentVersion = '2.0.14';
 
 String.prototype.capitalize = function () {
 	return this.replace(/\w\S*/g, function (txt) {
@@ -1831,7 +1831,13 @@ var updateSkill = function (rowId) {
 					totalFormula += ADD + globalCheckBonus + '[global check bonus]';
 				}
 
+				var totalWithSign = total;
+				if (total >= 0) {
+					totalWithSign = '+' + total;
+				}
+
 				finalSetAttrs[repeatingString + 'total'] = total;
+				finalSetAttrs[repeatingString + 'total_with_sign'] = totalWithSign;
 				finalSetAttrs[repeatingString + 'formula'] = totalFormula;
 			}
 
@@ -1843,7 +1849,7 @@ var updateSkill = function (rowId) {
 
 on('change:repeating_skill', function (eventInfo) {
 	var changedField = getRepeatingField('repeating_skill', eventInfo);
-	if (changedField !== 'ability_short_name' && changedField !== 'total' && changedField !== 'formula') {
+	if (changedField !== 'ability_short_name' && changedField !== 'total' && changedField !== 'total_with_sign' && changedField !== 'formula') {
 		var rowId = getRowId('repeating_skill', eventInfo);
 		updateSkill(rowId);
 	}
@@ -2108,6 +2114,9 @@ var sheetOpened = function () {
 			updateAbilityModifier('intelligence');
 			updateAbilityModifier('wisdom');
 			updateAbilityModifier('charisma');
+		}
+		if (versionCompare(version, '2.0.14') < 0) {
+			updateSkill();
 		}
 
 		if (!version || version !== currentVersion) {
