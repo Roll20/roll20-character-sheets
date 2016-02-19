@@ -527,7 +527,7 @@ on('change:repeating_class remove:repeating_class', function () {
 	updateLevels();
 });
 
-var updateSpellSlots = function () {
+function updateSpellSlots () {
 	var collectionArray = ['level', 'caster_level', 'caster_type'];
 	var finalSetAttrs = {};
 
@@ -681,7 +681,7 @@ var updateSpellSlots = function () {
 
 		setFinalAttrs(v, finalSetAttrs);
 	});
-};
+}
 
 on('change:caster_level change:spell_slots_l1_bonus change:spell_slots_l2_bonus change:spell_slots_l3_bonus change:spell_slots_l4_bonus change:spell_slots_l5_bonus change:spell_slots_l6_bonus change:spell_slots_l7_bonus change:spell_slots_l8_bonus change:spell_slots_l9_bonus', function () {
 	updateSpellSlots();
@@ -703,7 +703,7 @@ function getPB (level, challenge) {
   }
   return pb;
 }
-var updatePb = function () {
+function updatePb () {
 	var collectionArray = ['level', 'challenge'];
 	var finalSetAttrs = {};
 
@@ -717,13 +717,13 @@ var updatePb = function () {
 		console.log('updatePb', finalSetAttrs);
 		setFinalAttrs(v, finalSetAttrs);
 	});
-};
+}
 
 on('change:level', function () {
 	updatePb();
 });
 
-var sumRepeating = function (options, sumItems) {
+function sumRepeating (options, sumItems) {
 	var repeatingItem = 'repeating_' + options.collection;
 	var collectionArray = [];
 	var finalSetAttrs = {};
@@ -837,9 +837,9 @@ var sumRepeating = function (options, sumItems) {
 			setFinalAttrs(v, finalSetAttrs);
 		});
 	});
-};
+}
 
-var updateArmor = function (rowId) {
+function updateArmor (rowId) {
 	var repeatingItem = 'repeating_armor';
 	var collectionArray = [];
 	var finalSetAttrs = {};
@@ -900,7 +900,7 @@ var updateArmor = function (rowId) {
 		}
 	];
 	sumRepeating(options, sumItems);
-};
+}
 on('change:repeating_armor', function (eventInfo) {
 	var changedField = getRepeatingField('repeating_armor', eventInfo);
 	if (changedField !== 'ac_total') {
@@ -912,7 +912,7 @@ on('change:medium_armor_max_dex change:ac_unarmored_ability remove:repeating_arm
 	updateArmor();
 });
 
-var updateEquipment = function (rowId) {
+function updateEquipment (rowId) {
 	var repeatingItem = 'repeating_equipment';
 	var collectionArray = [];
 	var finalSetAttrs = {};
@@ -951,7 +951,7 @@ var updateEquipment = function (rowId) {
 			setFinalAttrs(v, finalSetAttrs);
 		});
 	});
-};
+}
 
 on('change:repeating_equipment', function (eventInfo) {
 	var rowId = getRowId('repeating_equipment', eventInfo);
@@ -981,7 +981,7 @@ on('change:pb', function () {
 	updateJackOfAllTrades();
 });
 
-var updateJackOfAllTrades = function () {
+function updateJackOfAllTrades () {
 	var collectionArray = ['pb'];
 	var finalSetAttrs = {};
 
@@ -991,12 +991,12 @@ var updateJackOfAllTrades = function () {
 		console.log('updateJackOfAllTrades', finalSetAttrs);
 		setFinalAttrs(v, finalSetAttrs);
 	});
-};
+}
 on('change:jack_of_all_trades_toggle', function () {
 	updateJackOfAllTrades();
 });
 
-var updateInitiative = function () {
+function updateInitiative () {
 	var collectionArray = ['dexterity_mod', 'dexterity_check_bonus', 'initiative_bonus', 'jack_of_all_trades_toggle', 'jack_of_all_trades', 'global_check_bonus'];
 	var finalSetAttrs = {};
 
@@ -1039,12 +1039,12 @@ var updateInitiative = function () {
 		console.log('updateInitiative', finalSetAttrs);
 		setFinalAttrs(v, finalSetAttrs);
 	});
-};
+}
 on('change:dexterity_mod change:dexterity_check_bonus change:initiative_bonus change:jack_of_all_trades_toggle change:jack_of_all_trades change:global_check_bonus', function () {
 	updateInitiative();
 });
 
-var updateWeight = function () {
+function updateWeight () {
 	var collectionArray = ['weight_attacks', 'weight_armor', 'weight_equipment', 'weight_coinage', 'weight_misc'];
 	var finalSetAttrs = {};
 
@@ -1054,7 +1054,7 @@ var updateWeight = function () {
 		console.log('updateWeight', finalSetAttrs);
 		setFinalAttrs(v, finalSetAttrs);
 	});
-};
+}
 on('change:weight_attacks change:weight_armor change:weight_equipment change:weight_coinage change:weight_misc', function () {
 	updateWeight();
 });
@@ -1087,7 +1087,7 @@ on('change:global_attack_bonus change:global_melee_attack_bonus change:global_ra
 	updateAttack();
 });
 
-var updateAttackToggle = function (v, finalSetAttrs, repeatingString, options) {
+function updateAttackToggle (v, finalSetAttrs, repeatingString, options) {
 	var attackParse = {
 		attackAbility: options.attackAbility,
 		parseName: 'attack',
@@ -1159,9 +1159,9 @@ var updateAttackToggle = function (v, finalSetAttrs, repeatingString, options) {
 		finalSetAttrs[repeatingString + 'to_hit'] = toHit;
 	}
 	finalSetAttrs[repeatingString + 'attack_formula'] = attackFormula;
-};
+}
 
-var updateSavingThrowToggle = function (v, finalSetAttrs, repeatingString, options) {
+function updateSavingThrowToggle (v, finalSetAttrs, repeatingString, options) {
 	var savingThrowParse = {
 		parseName: 'savingThrow',
 		toggleField: 'saving_throw_toggle',
@@ -1186,9 +1186,9 @@ var updateSavingThrowToggle = function (v, finalSetAttrs, repeatingString, optio
 		savingThrowDC += getIntValue(v[repeatingString + 'saving_throw_bonus']);
 		finalSetAttrs[repeatingString + 'saving_throw_dc'] = savingThrowDC;
 	}
-};
+}
 
-var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
+function updateDamageToggle (v, finalSetAttrs, repeatingString, options) {
 	var damageParse = {
 		addCastingModifier: exists(v[repeatingString + 'add_casting_modifier']),
 		parseName: 'damage',
@@ -1351,9 +1351,9 @@ var updateDamageToggle = function (v, finalSetAttrs, repeatingString, options) {
 	if (options.type === 'attack') {
 		finalSetAttrs[repeatingString + 'damage_string'] = damageString;
 	}
-};
+}
 
-var updateHealToggle = function (v, finalSetAttrs, repeatingString) {
+function updateHealToggle (v, finalSetAttrs, repeatingString) {
 	var healParse = {
 		addCastingModifier: exists(v[repeatingString + 'add_casting_modifier']),
 		parseName: 'heal',
@@ -1383,9 +1383,9 @@ var updateHealToggle = function (v, finalSetAttrs, repeatingString) {
 
 		finalSetAttrs[repeatingString + 'heal_formula'] = healFormula;
 	}
-};
+}
 
-var updateHigherLevelToggle = function (v, finalSetAttrs, repeatingString) {
+function updateHigherLevelToggle (v, finalSetAttrs, repeatingString) {
 	var higherLevelParse = {
 		addCastingModifier: exists(v[repeatingString + 'add_casting_modifier']),
 		parseName: 'higherLevel',
@@ -1421,9 +1421,9 @@ var updateHigherLevelToggle = function (v, finalSetAttrs, repeatingString) {
 			finalSetAttrs[repeatingString + 'heal_formula'] += ADD + '((@{higher_level_query} - @{spell_level}) * @{higher_level_dice})@{higher_level_die}[higher lvl] + (@{higher_level_heal} * (@{higher_level_query} - @{spell_level}))[higher lvl flat amount]';
 		}
 	}
-};
+}
 
-var updateAttackQuery = function () {
+function updateAttackQuery () {
 	var repeatingItem = 'repeating_attack';
 	var collectionArray = [];
 	var finalSetAttrs = {};
@@ -1468,9 +1468,9 @@ var updateAttackQuery = function () {
 			setFinalAttrs(v, finalSetAttrs);
 		});
 	});
-};
+}
 
-var updateAttack = function (rowId) {
+function updateAttack (rowId) {
 	var repeatingItem = 'repeating_attack';
 	var collectionArray = ['pb', 'strength_mod', 'finesse_mod', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability'];
 	var finalSetAttrs = {};
@@ -1592,9 +1592,9 @@ var updateAttack = function (rowId) {
 			setFinalAttrs(v, finalSetAttrs);
 		});
 	});
-};
+}
 
-var updateSpell = function (rowId) {
+function updateSpell (rowId) {
 	var repeatingItem = 'repeating_spell';
 	var collectionArray = ['pb', 'finesse_mod', 'global_spell_attack_bonus', 'global_spell_damage_bonus', 'global_spell_dc_bonus', 'global_spell_heal_bonus', 'default_ability'];
 	var finalSetAttrs = {};
@@ -1711,7 +1711,7 @@ var updateSpell = function (rowId) {
 			setFinalAttrs(v, finalSetAttrs);
 		});
 	});
-};
+}
 
 on('change:repeating_spell', function (eventInfo) {
 	var changedField = getRepeatingField('repeating_spell', eventInfo);
@@ -1726,7 +1726,7 @@ on('change:global_spell_attack_bonus change:global_spell_damage_bonus change:glo
 	updateSpell();
 });
 
-var updateD20Mod = function () {
+function updateD20Mod () {
 	var collectionArray = ['halfling_luck'];
 	var finalSetAttrs = {};
 
@@ -1740,13 +1740,13 @@ var updateD20Mod = function () {
 		console.log('updateD20Mod', finalSetAttrs);
 		setFinalAttrs(v, finalSetAttrs);
 	});
-};
+}
 
 on('change:halfling_luck', function () {
 	updateD20Mod();
 });
 
-var updateSkill = function (rowId) {
+function updateSkill (rowId) {
 	var repeatingItem = 'repeating_skill';
 	var collectionArray = ['jack_of_all_trades_toggle', 'jack_of_all_trades', 'pb', 'exp', 'global_check_bonus'];
 	var finalSetAttrs = {};
@@ -1845,7 +1845,7 @@ var updateSkill = function (rowId) {
 			setFinalAttrs(v, finalSetAttrs);
 		});
 	});
-};
+}
 
 on('change:repeating_skill', function (eventInfo) {
 	var changedField = getRepeatingField('repeating_skill', eventInfo);
@@ -1979,8 +1979,7 @@ on('change:spells_srd', function () {
   updateSpellsFromSRD();
 });
 
-
-var sheetOpened = function () {
+function sheetOpened () {
 	var collectionArray = ['version', 'strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
 	var finalSetAttrs = {};
 
@@ -2129,13 +2128,13 @@ var sheetOpened = function () {
 		updateInitiative();
 		updateArmor();
 	});
-};
+}
 
 on('sheet:opened', function () {
 	sheetOpened();
 });
 
-var updateAttachers = function () {
+function updateAttachers () {
 	var repeatingItem = 'repeating_attacher';
 	var collectionArray = ['attacher_initiative', 'attacher_death_saving_throw', 'attacher_hit_dice', 'attacher_attack', 'attacher_spell', 'attacher_skill'];
 	var finalSetAttrs = {};
@@ -2186,13 +2185,13 @@ var updateAttachers = function () {
 			setFinalAttrs(v, finalSetAttrs);
 		});
 	});
-};
+}
 
 on('change:repeating_attacher remove:repeating_attacher', function () {
 	updateAttachers();
 });
 
-var updateNPCSizeTypeAlignment = function () {
+function updateNPCSizeTypeAlignment () {
 	var collectionArray = ['size', 'type', 'alignment'];
 	var finalSetAttrs = {};
 
@@ -2220,13 +2219,13 @@ var updateNPCSizeTypeAlignment = function () {
 		console.log('updateNPCSizeTypeAlignment', finalSetAttrs);
 		setFinalAttrs(v, finalSetAttrs);
 	});
-};
+}
 
 on('change:size change:type change:alignment', function () {
 	updateNPCSizeTypeAlignment();
 });
 
-var updateNPCChallenge = function () {
+function updateNPCChallenge () {
 	var collectionArray = ['challenge', 'xp'];
 	var finalSetAttrs = {};
 
@@ -2279,13 +2278,13 @@ var updateNPCChallenge = function () {
 		console.log('updateNPCChallenge', finalSetAttrs);
 		setFinalAttrs(v, finalSetAttrs);
 	});
-};
+}
 
 on('change:challenge', function () {
 	updateNPCChallenge();
 });
 
-var updateNPCHPFromSRD = function () {
+function updateNPCHPFromSRD () {
   var collectionArray = ['hp_srd', 'constitution', 'constitution_mod', 'constitution_bonus', 'global_ability_bonus'];
   var finalSetAttrs = {};
 
@@ -2320,13 +2319,12 @@ var updateNPCHPFromSRD = function () {
     console.log('updateNPCHPFromSRD', finalSetAttrs);
     setFinalAttrs(v, finalSetAttrs);
   });
-};
+}
 on('change:hp_srd', function () {
   updateNPCHPFromSRD();
 });
 
-
-var updateNPCHP = function () {
+function updateNPCHP () {
 	var collectionArray = ['hit_dice', 'hit_die', 'hp_extra', 'constitution_mod'];
 	var finalSetAttrs = {};
 
@@ -2385,13 +2383,13 @@ var updateNPCHP = function () {
 		console.log('updateNPCHP', finalSetAttrs);
 		setFinalAttrs(v, finalSetAttrs);
 	});
-};
+}
 on('change:hit_dice change:hit_die change:hp_extra change:constitution_mod', function () {
 	console.log('hd stuff changed');
 	updateNPCHP();
 });
 
-var updateNPCAC = function () {
+function updateNPCAC () {
 	var collectionArray = ['ac_srd', 'ac', 'ac_note'];
 	var finalSetAttrs = {};
 
@@ -2409,13 +2407,13 @@ var updateNPCAC = function () {
 		console.log('updateNPC', finalSetAttrs);
 		setFinalAttrs(v, finalSetAttrs);
 	});
-};
+}
 
 on('change:ac_srd', function () {
 	updateNPCAC();
 });
 
-var updateNPCContent = function () {
+function updateNPCContent () {
 	console.log('updateNPCContent');
 	var collectionArray = ['content_srd', 'character_name'];
 	var finalSetAttrs = {};
@@ -2502,7 +2500,7 @@ var updateNPCContent = function () {
 		console.log('updateNPCContent', finalSetAttrs);
 		setFinalAttrs(v, finalSetAttrs);
 	});
-};
+}
 
 on('change:content_srd', function () {
 	console.log('content_srd changed');
