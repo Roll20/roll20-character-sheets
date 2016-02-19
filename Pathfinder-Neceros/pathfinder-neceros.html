@@ -8,6 +8,8 @@
 			<li>For macro calls to <b>button rolls</b> in repeating rows, you must do the above ($) and you must add "_roll" to the end. For attacks, add "-roll".</li>
 			<li>For <b>existing characters/npc's</b>, if you do not see Version > 0 listed (top-right corner of sheet), use the recalc checkbox to force a refresh of all auto-calculated attributes. This should only need to be done once and could take up to 10s.</li>
 			<li>If the sheet has been recalculated and you still have empty auto-calculated fields, you may have to toggle(change attribute value(s)) of sub-component attributes to help generate a value for the empty fields.</li>
+
+
 			<li>If you changed the attributes/fields listed below, you must update to the new version of the attribute/field (same location on sheet) because the new fields are only modifiers to the calculations which are done within sheet workers(javascript).:
 				<ol>
 					<li>HP-formula</li>
@@ -938,6 +940,7 @@
 				<span class="sheet-table-data sheet-left" style="width:20%;"><label><input type="checkbox" title="@{condition-Sickened}" name="attr_condition-Sickened" value="2" /><b title="-2 penalty on all attack rolls, weapon damage rolls, saving throws, skill checks, and ability checks"> Sickened</b></label></span>
 				<span class="sheet-table-data sheet-left" style="width:20%;"><label><input type="checkbox" title="@{condition-Stunned}" name="attr_condition-Stunned" value="2" /><b title="-2 penalty to Armor Class"> Stunned</b></label></span>
 				<span class="sheet-table-data sheet-left" style="width:20%;">&nbsp;
+
 				<input type="hidden" name="attr_checks-cond" value="0" />
 				<input type="hidden" name="attr_Phys-skills-cond" value="0" />
 				<input type="hidden" name="attr_Perception-cond" value="0" />
@@ -1279,8 +1282,8 @@
                                 <div class="sheet-table-row">
                                     <span class="sheet-table-data sheet-center"><b>0.</b></span>
                                     <span class="sheet-table-data sheet-center"><input style="width:100%;" title="@{mythic-0-path}" type="text" name="attr_mythic-0-path" placeholder="Path Name" /></span>
-                                    <span class="sheet-table-data sheet-center"><input style="width:100%;" title="@{mythic-0-tier}" type="number" name="attr_mythic-0-tier" value="0"></span>
-                                    <span class="sheet-table-data sheet-center"><input style="width:100%;" title="@{mythic-0-hp}" type="number" name="attr_mythic-0-hp" value="0" /></span>
+                                    <span class="sheet-table-data sheet-center"><input style="width:100%;" title="@{mythic-tier}" type="number" name="attr_mythic-tier" value="0"></span>
+                                    <span class="sheet-table-data sheet-center"><input style="width:100%;" title="@{mythic-hp}" type="number" name="attr_mythic-hp" value="0" /></span>
                                 </div>
                                 <div class="sheet-table-row">
                                     <span class="sheet-table-data sheet-center"><b>1.</b></span>
@@ -1441,7 +1444,7 @@
 
                                 <textarea class="sheet-desc" title="@{repeating_mythic-ability_$X_description}" name="attr_description"></textarea>
 
-                                <textarea class="sheet-macro-text" title="@{repeating_mythic-ability_$X_macro-text}" name="attr_macro-text">@{PC-whisper} &{template:pf_block} {{header_image=@{header_image-pf_block}}} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{subtitle}} {{Class=**Class**: @{mythic-number}}} {{name=@{name}}} {{description=@{short-description}}}</textarea>
+                                <textarea class="sheet-macro-text" title="@{repeating_mythic-ability_$X_macro-text}" name="attr_macro-text">@{PC-whisper} &{template:pf_block} {{header_image=@{header_image-pf_block}}} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{subtitle}} {{Class=**Path**: @{mythic-number}}} {{name=@{name}}} {{description=@{short-description}}}</textarea>
 
 						<div class="sheet-repeating_ids sheet-table-row">
 							<input type="hidden" name="attr_new_flag" value="0" />
@@ -13184,13 +13187,17 @@ var PFSheet = PFSheet || (function(){
     var version= 0.33,
 	pfDebug = false,
 	
+
 	/****************************** UTILITIES ************************************/
 
     /* findAbilityInString
 	 * For dropdowns, this looks at the <option value="xxxx"> pass the value to here.
 	 *
      * Looks at a string for instances of an ability modifier DEX-mod, STR-mod,  etc and returnsthe modifier it finds. 
+
      * Note the order checked is the same as the order they traditionally appear in: STR-mod,DEX-mod,CON-mod,INT-mod,WIS-mod,CHA-mod
+
+
      * Also checks for regular abilityies without mod , and other items that appear in dropdowns.
      * if none is found, then if the first character is "0" return ""
      */
@@ -13312,11 +13319,92 @@ var PFSheet = PFSheet || (function(){
 						}
 					}
 				});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 			}
         });
     },
 	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	/****************************************** REPEATING SECTION SUPPORT *****************/
 	/* if id is not empty, then returns the ID with an underscore on the right.
@@ -13518,6 +13606,7 @@ var PFSheet = PFSheet || (function(){
     },
 
 	
+
     /* updateConditionAbilityPenalty - for ability penalties, not "ability check" penalites
     * Sets DEX-cond and STR-cond for fatigued, entangled, and grappled
     */
@@ -13809,8 +13898,8 @@ var PFSheet = PFSheet || (function(){
     * Updates total at bottom of Mythic Path Information grid
     */
     updateMythicPathInformation = function () {
-        getAttrs(["mythic-0-tier", "mythic-0-hp", "total-mythic-hp"], function (values) {
-            var tot = (parseInt(values["mythic-0-tier"], 10) || 0) * (parseInt(values["mythic-0-hp"], 10) || 0),
+        getAttrs(["mythic-tier", "mythic-hp", "total-mythic-hp"], function (values) {
+            var tot = (parseInt(values["mythic-tier"], 10) || 0) * (parseInt(values["mythic-hp"], 10) || 0),
             currTot = parseInt(values["total-mythic-hp"], 10) || 0;
             //console.log("tot=" + tot + ", currTot=" + currTot);
             if (currTot !== tot) { setAttrs({ "total-mythic-hp": tot }); }
@@ -13835,8 +13924,8 @@ var PFSheet = PFSheet || (function(){
     */
     updateTierMythicPower = function () {
         //console.log("entered updateTierMythicPower");
-        getAttrs(["tier-mythic-power", "mythic-0-tier"], function (values) {
-            var totalTier = 3 + 2 * (parseInt(values["mythic-0-tier"], 10) || 0),
+        getAttrs(["tier-mythic-power", "mythic-tier"], function (values) {
+            var totalTier = 3 + 2 * (parseInt(values["mythic-tier"], 10) || 0),
             curr = parseInt(values["tier-mythic-power"], 10) || 0;
             //console.log("totalTier=" + totalTier + ", curr=" + curr);
             if (curr !== totalTier) { setAttrs({ "tier-mythic-power": totalTier }); }
@@ -14127,6 +14216,7 @@ var PFSheet = PFSheet || (function(){
      });
     },
 
+
 	/*updateConditionsSavePenalty
 	*  applies conditions to saves.
 	*/
@@ -14152,6 +14242,41 @@ var PFSheet = PFSheet || (function(){
         var getFields = [save,"total-"+save,save+"-ability-mod",save+"-trait",save+"-enhance",save+"-resist",save+"-misc","saves-cond","buff_"+save+"-total"];
         updateRowTotal(getFields);
     },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 	/************************************* ATTACKS PAGE ***********************************/
@@ -14228,6 +14353,12 @@ var PFSheet = PFSheet || (function(){
     },
 
 	
+
+
+
+
+
+
     /* updateAttack - updates one row of attack grid,
      * Updates the attack type totals at top of attack page for one row of grid
      *
@@ -14396,6 +14527,7 @@ var PFSheet = PFSheet || (function(){
 		});
 	},
 
+
 	/* updateRepeatingWeaponDamage - updates total-damage
 	* also updates  dmg-effect-total-copy and DMG-mod-copy
 	*/
@@ -14449,6 +14581,34 @@ var PFSheet = PFSheet || (function(){
 		});
 	},
 	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	/******************************************* SKILLS PAGE ********************************/
 	
@@ -14566,7 +14726,55 @@ var PFSheet = PFSheet || (function(){
         });
     },
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	/*******************************************  SPELL PAGE ***********************/
 	
 	/********  Spell Classes top section ****/
@@ -14592,6 +14800,8 @@ var PFSheet = PFSheet || (function(){
 		});
 	},
 		
+
+
 	/* updateSpellClassLevel - when the class level is updated on the CLASS page, sync the level on the SPELL page
 	* but not vice versa
 	* @classidx {number} = the row on the CLASS GRID starting with 0
@@ -14755,7 +14965,16 @@ var PFSheet = PFSheet || (function(){
         });
     },
 
+
+
+
+
 	
+
+
+
+
+
 	/* updateBonusSpells
 	* updates Bonus Spells for the class
 	* It looks at the attribute, not the attribute mod. So it does not change with ability damage or penalties.
@@ -14794,6 +15013,20 @@ var PFSheet = PFSheet || (function(){
             ,"spellclass-"+classidx+"-level-"+spelllvl+"-misc"];
         updateRowTotal(fields);
     },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /******** SPELLS REPEATING SECTION ******/
 	
@@ -14923,11 +15156,38 @@ var PFSheet = PFSheet || (function(){
         });
 	},
 	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	
+
+
+
 	
 	/************************************************ RECALCULATE  PAGES  to account for updates  *****************/
 
 	/*recalculateSpell sets spell level because it is now modifiable 
+
 	* ensures that spell_level is set on each spell repeating row, since it was changed to an editable field
 	* @section the spell level "lvl-0-spells", "lvl-1-spells", .... , "lvl-9-spells"
 	*/
@@ -14951,6 +15211,7 @@ var PFSheet = PFSheet || (function(){
 	},
 	
 	/*recalculateSpellLevels - for all spell repeating sections of a level 0,..,9 calls recalculateSpell and updateSpell
+
 	* @spellLevel {int} = the DEFAULT spell level of the repeating section, from 0 to 9
 	*/
     recalculateSpellLevels = function (spellLevel){
@@ -14968,6 +15229,8 @@ var PFSheet = PFSheet || (function(){
 	},
 		
 	/*recalculateSpellLevelsAll calls recalculateSpellLevels for each spell levels 0-9 */
+
+
 	recalculateSpellLevelsAll = function() {
 		var i=0;
 		for (i=0;i<10;i++) {
@@ -14976,6 +15239,9 @@ var PFSheet = PFSheet || (function(){
 	},
 	
     /* recalculateRepeatingWeapons-  recalculates all repeating weapons rows.   */
+
+
+
     recalculateRepeatingWeapons = function() {
         getAttrs(["attk-effect-total","dmg-effect-total","DMG-mod"],function(v){
             getSectionIDs("repeating_weapon",function(ids){
@@ -15001,6 +15267,7 @@ var PFSheet = PFSheet || (function(){
     },
 
     /* recalculateRepeatingMaxUsed - Parses the macro text "...max-calculation" in the repeating items 
+
 	* (such as class-abilities, feats, traits, racial-traits)
     * and sets the used|max value.
     * Loops through all rows in the given repeating section.
@@ -15022,6 +15289,7 @@ var PFSheet = PFSheet || (function(){
 	
 
 	
+
 	/* recalculateSkills - updates ALL skills  - calls handleDropdown for ability then updateSkill 
 	* CB: REFACTOR: put updateSkill in the callback so it happens in order */
     recalculateSkills = function() {	
@@ -15433,13 +15701,24 @@ var PFSheet = PFSheet || (function(){
 		}
 		if (oldversion < 0.32) {
 			recalculateSpellLevelsAll();
+
+
+
+
+
 		}
 		if (oldversion < 0.33) {
             handleRepeatingRowOrdering("mythic-ability",true);
+            handleRepeatingRowOrdering("mythic-feat", true);
 			recalculateRepeatingMaxUsed("mythic-ability");
-		}
+            recalculateRepeatingMaxUsed("mythic-feat");
+
+			}
 	},  
 	
+
+
+
 
 	/* checkForUpdate looks at current version of page in PFSheet_Version and compares to code PFSheet.version 
 	*  calls recalulateSheet if versions don't match or if recalculate button was pressed.
@@ -15477,6 +15756,7 @@ var PFSheet = PFSheet || (function(){
     };
 
     return {
+
         util:{findAbilityInString:findAbilityInString,
             findMultiplier:findMultiplier,
             updateRowTotal:updateRowTotal,
@@ -16079,7 +16359,7 @@ on("change:init-ability-mod change:init-trait change:init-misc change:condition-
 
 //hp
 on("change:hp-ability", function () {PFSheet.handleDropdown("HP-ability",["HP-ability-mod"]);});
-on("change:hp-ability-mod change:level change:total-hp change:total-mythic-hp change:hp-formula-mod change:HP-misc", function () { PFSheet.updateHP(); });
+on("change:hp-ability-mod change:level change:total-hp change:total-mythic-hp change:hp-formula-mod change:HP-misc change:mythic-adventures-show", function () { PFSheet.updateHP(); });
 on("change:hp-temp-misc change:buff_hp-temp-total", function() { PFSheet.updateTempHP(); });
 on("change:hp-formula-macro-text",function(){SWUtils.evaluateAndSetNumber("HP-formula-macro-text","HP-formula-mod");});
 
@@ -16101,11 +16381,20 @@ on("change:class-0-level change:class-1-level change:class-2-level change:class-
 	PFSheet.updateClassInformation("skill");
 });
 
-//mythic paths, mythic power
-on("change:mythic-0-tier change:mythic-0-hp", function () { PFSheet.updateMythicPathInformation(); });
-on("change:mythic-0-tier", function () { PFSheet.updateTierMythicPower(); });
+//mythic paths
+on("change:mythic-tier change:mythic-hp", function () { PFSheet.updateMythicPathInformation(); });
+
+//mythic power
+on("change:mythic-tier", function () { PFSheet.updateTierMythicPower(); });
 on("change:misc-mythic-power change:tier-mythic-power", function () { PFSheet.updateMythicPower(); });
+
+//mythic features/abilities
 on("change:repeating_mythic-ability:max-calculation",function(){ SWUtils.evaluateAndSetNumber("repeating_mythic-ability_max-calculation","repeating_mythic-ability_used_max");});
+
+//mythic feats
+on("change:repeating_mythic-feat:max-calculation", function () { SWUtils.evaluateAndSetNumber("repeating_mythic-feat_max-calculation", "repeating_mythic-feat_used_max"); });
+
+
 
 //class abilities
 on("change:repeating_class-ability:max-calculation",function(){ SWUtils.evaluateAndSetNumber("repeating_class-ability_max-calculation","repeating_class-ability_used_max");});
@@ -16161,9 +16450,11 @@ on("change:condition-Sickened change:buff_dmg-total",function(){PFSheet.updateDa
 //attack effects
 on("change:attk-effect_mod_1 change:attk-effect_mod_1_Toggle change:attk-effect_mod_2 change:attk-effect_mod_2_Toggle change:attk-effect_mod_3 change:attk-effect_mod_3_Toggle change:attk-effect_mod_4 change:attk-effect_mod_4_Toggle"
 ,function(){ PFSheet.updateAttackEffectTotals();
+
 });
 on("change:dmg-effect_mod_1 change:dmg-effect_mod_1_Toggle change:dmg-effect_mod_2 change:dmg-effect_mod_2_Toggle change:dmg-effect_mod_3 change:dmg-effect_mod_3_Toggle change:dmg-effect_mod_4 change:dmg-effect_mod_4_Toggle"
 ,function(){ PFSheet.updateDMGEffectTotals();
+
 });
 //repeating weapons
 on("change:attk-effect-total",function(eventInfo){PFSheet.updateRepeatingWeaponAttacks(eventInfo);});
@@ -16171,9 +16462,13 @@ on("change:dmg-effect-total change:dmg-mod", function(){PFSheet.updateRepeatingW
 
 
 on("change:repeating_weapon:attack-type-mod change:repeating_weapon:masterwork change:repeating_weapon:proficiency change:repeating_weapon:attack-mod"
+
+
 	, function(eventInfo) { PFSheet.updateRepeatingWeaponAttack(null,eventInfo);
 });
 on("change:repeating_weapon:damage-ability-mod change:repeating_weapon:damage-mod change:repeating_weapon:damage-ability-max"
+
+
 	,function() { PFSheet.updateRepeatingWeaponDamage();
 });
 
@@ -16392,6 +16687,8 @@ on("change:repeating_npc-spell-like-abilities:ids-show",function(eventInfo) {PFS
 on("change:repeating_npc-spells1:ids-show",function(eventInfo) {PFSheet.checkIsNewRow("npc-spells1",eventInfo);});
 on("change:repeating_npc-spells2:ids-show",function(eventInfo) {PFSheet.checkIsNewRow("npc-spells2",eventInfo);});
 on("change:repeating_mythic-ability:ids-show",function(eventInfo) {PFSheet.checkIsNewRow("mythic-ability",eventInfo);});
+on("change:repeating_mythic-feat:ids-show", function (eventInfo) { PFSheet.checkIsNewRow("mythic-feat", eventInfo); });
+
 
 
 </script>
