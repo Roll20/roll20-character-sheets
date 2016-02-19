@@ -1923,6 +1923,65 @@ on('change:skills_srd', function () {
 	updateSkillsFromSRD();
 });
 
+function updateSavingThrow (ability) {
+	var collectionArray = ['pb', ability + '_mod', ability + '_save_prof', ability + '_save_bonus', 'global_saving_throw_bonus'];
+	var finalSetAttrs = {};
+
+	getAttrs(collectionArray, function (v) {
+		var proficiency = getIntValue(v[ability + '_save_prof']);
+		var abilityMod = getIntValue(v[ability + '_mod']);
+		var total = abilityMod;
+		var totalFormula = abilityMod + '[' + getAbilityShortName(ability) + ']';
+
+		if (proficiency === '@{PB}') {
+			var pb = getIntValue(v.pb);
+			total += pb;
+			totalFormula += pb + '[proficient]';
+		}
+
+		var abilitySavingThrowBonus = getIntValue(v[ability + '_save_bonus']);
+		if (exists(abilitySavingThrowBonus)) {
+			total += abilitySavingThrowBonus;
+			totalFormula += ADD + abilitySavingThrowBonus + '[' + getAbilityShortName(ability) + 'saving throw bonus]';
+		}
+
+		var globalSavingThrowBonus = getIntValue(v.global_saving_throw_bonus);
+		if (exists(globalSavingThrowBonus)) {
+			total += globalSavingThrowBonus;
+			totalFormula += ADD + globalSavingThrowBonus + '[global saving throw bonus]';
+		}
+
+		var savingThrowWithSign = total;
+		if (total >= 0) {
+			savingThrowWithSign = '+' + total;
+		}
+
+		finalSetAttrs[ability + '_saving_throw_mod'] = totalFormula;
+		finalSetAttrs[ability + '_saving_throw_mod_with_sign'] = savingThrowWithSign;
+
+		console.log('updateSavingThrows', finalSetAttrs);
+		setFinalAttrs(v, finalSetAttrs);
+	});
+}
+on('change:pb change:strength_mod change:strength_save_prof change:strength_save_bonus change:global_saving_throw_bonus', function () {
+	updateSavingThrow('strength');
+});
+on('change:pb change:dexterity_mod change:dexterity_save_prof change:dexterity_save_bonus change:global_saving_throw_bonus', function () {
+	updateSavingThrow('dexterity');
+});
+on('change:pb change:constitution_mod change:constitution_save_prof change:constitution_save_bonus change:global_saving_throw_bonus', function () {
+	updateSavingThrow('constitution');
+});
+on('change:pb change:intelligence_mod change:intelligence_save_prof change:intelligence_save_bonus change:global_saving_throw_bonus', function () {
+	updateSavingThrow('intelligence');
+});
+on('change:pb change:wisdom_mod change:wisdom_save_prof change:wisdom_save_bonus change:global_saving_throw_bonus', function () {
+	updateSavingThrow('wisdom');
+});
+on('change:pb change:charisma_mod change:charisma_save_prof change:charisma_save_bonus change:global_saving_throw_bonus', function () {
+	updateSavingThrow('charisma');
+});
+
 function updateSavingThrowsFromSRD () {
 	var collectionArray = ['saving_throws_srd'];
 	var finalSetAttrs = {};
@@ -2116,6 +2175,12 @@ function sheetOpened () {
 		}
 		if (versionCompare(version, '2.0.14') < 0) {
 			updateSkill();
+			updateSavingThrow('strength');
+			updateSavingThrow('dexterity');
+			updateSavingThrow('constitution');
+			updateSavingThrow('intelligence');
+			updateSavingThrow('wisdom');
+			updateSavingThrow('charisma');
 		}
 
 		if (!version || version !== currentVersion) {
