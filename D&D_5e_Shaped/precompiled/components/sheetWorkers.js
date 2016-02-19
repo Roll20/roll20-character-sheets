@@ -1928,7 +1928,7 @@ function updateSavingThrow (ability) {
 	var finalSetAttrs = {};
 
 	getAttrs(collectionArray, function (v) {
-		var proficiency = getIntValue(v[ability + '_save_prof']);
+		var proficiency = v[ability + '_save_prof'];
 		var abilityMod = getIntValue(v[ability + '_mod']);
 		var total = abilityMod;
 		var totalFormula = abilityMod + '[' + getAbilityShortName(ability) + ']';
@@ -1959,11 +1959,12 @@ function updateSavingThrow (ability) {
 		finalSetAttrs[ability + '_saving_throw_mod'] = totalFormula;
 		finalSetAttrs[ability + '_saving_throw_mod_with_sign'] = savingThrowWithSign;
 
-		console.log('updateSavingThrows', finalSetAttrs);
+		console.log('updateSavingThrow', finalSetAttrs);
 		setFinalAttrs(v, finalSetAttrs);
 	});
 }
 on('change:pb change:strength_mod change:strength_save_prof change:strength_save_bonus change:global_saving_throw_bonus', function () {
+	console.log('strength saving throw proficiency');
 	updateSavingThrow('strength');
 });
 on('change:pb change:dexterity_mod change:dexterity_save_prof change:dexterity_save_bonus change:global_saving_throw_bonus', function () {
