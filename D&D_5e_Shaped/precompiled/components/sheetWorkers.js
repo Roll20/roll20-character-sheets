@@ -2507,7 +2507,7 @@ function updateAction (rowId, type) {
 
 				var recharge = v[repeatingString + 'recharge'];
 				if (exists(recharge)) {
-					finalSetAttrs[repeatingString + 'recharge_display'] = '(Recharge' + recharge + ')';
+					finalSetAttrs[repeatingString + 'recharge_display'] = '(Recharge ' + recharge + ')';
 				} else {
 					finalSetAttrs[repeatingString + 'recharge_display'] = '';
 				}
