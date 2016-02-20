@@ -35,7 +35,7 @@ function getAbilityModName(varName) {
 	return varName;
 }
 function getAbilityValue(v, varName, defaultAbility) {
-	if (!varName) {
+	if (typeof varName === 'undefined') {
 		if (defaultAbility) {
 			return getIntValue(v[defaultAbility]);
 		}
@@ -238,7 +238,38 @@ function findClosest (array, goal) {
 		return (Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev);
 	});
 }
-
+function getCorrectAbilityBasedOnBonus (finalSetAttrs, repeatingString, fieldName, bonus, spellMods, meleeMods, spellAttack, rangedAttack, dexMod) {
+	var closest;
+	if (bonus) {
+		if (spellAttack) {
+			closest = findClosest(spellMods, bonus);
+			bonus -= closest;
+			if (closest === spellMods[0]) {
+				finalSetAttrs[repeatingString + fieldName] = '@{intelligence_mod}';
+			} else if (closest === spellMods[1]) {
+				finalSetAttrs[repeatingString + fieldName] = '@{wisdom_mod}';
+			} else if (closest === spellMods[2]) {
+				finalSetAttrs[repeatingString + fieldName] = '@{charisma_mod}';
+			}
+		} else {
+			if (rangedAttack) {
+				finalSetAttrs[repeatingString + 'attack_ability'] = '@{dexterity_mod}';
+				bonus -= dexMod;
+			} else {
+				closest = findClosest(meleeMods, bonus);
+				bonus -= closest;
+				if (closest === meleeMods[0]) {
+					finalSetAttrs[repeatingString + fieldName] = '@{strength_mod}';
+				} else if (closest === meleeMods[1]) {
+					finalSetAttrs[repeatingString + fieldName] = '@{dexterity_mod}';
+				}
+			}
+		}
+	} else {
+		finalSetAttrs[repeatingString + fieldName] = 0;
+	}
+	return bonus;
+}
 
 function lowercaseDamageTypes (string) {
 	if (!string) {
@@ -2633,33 +2664,8 @@ function parseAction (rowId, type) {
 					var hitBonus = toHit[1];
 					hitBonus -= pb;
 
-					if (spellAttack) {
-						closest = findClosest(spellMods, hitBonus);
-						hitBonus -= closest;
-						if (closest === spellMods[0]) {
-							finalSetAttrs[repeatingString + 'attack_ability'] = '@{intelligence_mod}';
-						}
-						if (closest === spellMods[1]) {
-							finalSetAttrs[repeatingString + 'attack_ability'] = '@{wisdom_mod}';
-						}
-						if (closest === spellMods[2]) {
-							finalSetAttrs[repeatingString + 'attack_ability'] = '@{charisma_mod}';
-						}
-					} else {
-						if (rangedAttack) {
-							finalSetAttrs[repeatingString + 'attack_ability'] = '@{dexterity_mod}';
-							hitBonus -= dexMod;
-						} else {
-							closest = findClosest(meleeMods, hitBonus);
-							hitBonus -= closest;
-							if (closest === meleeMods[0]) {
-								finalSetAttrs[repeatingString + 'attack_ability'] = '@{strength_mod}';
-							}
-							if (closest === meleeMods[1]) {
-								finalSetAttrs[repeatingString + 'attack_ability'] = '@{dexterity_mod}';
-							}
-						}
-					}
+					hitBonus = getCorrectAbilityBasedOnBonus(finalSetAttrs, repeatingString, 'attack_ability', hitBonus, spellMods, meleeMods, spellAttack, rangedAttack, dexMod);
+
 					if (hitBonus) {
 						finalSetAttrs[repeatingString + 'attack_bonus'] = hitBonus;
 					}
@@ -2692,35 +2698,7 @@ function parseAction (rowId, type) {
 							}
 						}
 					}
-					if (damageBonus) {
-						if (spellAttack) {
-							closest = findClosest(spellMods, damageBonus);
-							damageBonus -= closest;
-							if (closest === spellMods[0]) {
-								finalSetAttrs[repeatingString + 'damage_ability'] = '@{intelligence_mod}';
-							}
-							if (closest === spellMods[1]) {
-								finalSetAttrs[repeatingString + 'damage_ability'] = '@{wisdom_mod}';
-							}
-							if (closest === spellMods[2]) {
-								finalSetAttrs[repeatingString + 'damage_ability'] = '@{charisma_mod}';
-							}
-						} else {
-							if (rangedAttack) {
-								finalSetAttrs[repeatingString + 'damage_ability'] = '@{dexterity_mod}';
-								damageBonus -= dexMod;
-							} else {
-								closest = findClosest(meleeMods, damageBonus);
-								damageBonus -= closest;
-								if (closest === meleeMods[0]) {
-									finalSetAttrs[repeatingString + 'damage_ability'] = '@{strength_mod}';
-								}
-								if (closest === meleeMods[1]) {
-									finalSetAttrs[repeatingString + 'damage_ability'] = '@{dexterity_mod}';
-								}
-							}
-						}
-					}
+					damageBonus = getCorrectAbilityBasedOnBonus(finalSetAttrs, repeatingString, 'damage_ability', damageBonus, spellMods, meleeMods, spellAttack, rangedAttack, dexMod);
 					if (damage[3]) {
 						finalSetAttrs[repeatingString + 'damage_type'] = damage[3];
 					}
