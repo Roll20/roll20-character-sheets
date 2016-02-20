@@ -2309,12 +2309,13 @@ on('change:ac_srd', function () {
 
 function updateNPCContent () {
 	console.log('updateNPCContent');
-	var collectionArray = ['content_srd', 'character_name'];
+	var collectionArray = ['content_srd'];
 	var finalSetAttrs = {};
 
 	getAttrs(collectionArray, function (v) {
 		var content = v.content_srd;
 		var legendaryActions;
+		var reactions;
 		var actions;
 		var traits;
 		var re = /\*\*(.*)\*\*:\s(.*)/gi;
@@ -2330,7 +2331,6 @@ function updateNPCContent () {
 			}
 			if (exists(legendaryActions)) {
 				console.log('legendaryActions', legendaryActions);
-				var creatureName = v.character_name;
 				var legendaryActionAmount = 3;
 				var legendaryActionsMatch = legendaryActions.match(/Can take (\d+) Legendary Actions/gi);
 
@@ -2353,7 +2353,23 @@ function updateNPCContent () {
 					}
 				}
 			}
-
+			if (content.indexOf('Reactions') !== -1) {
+				var reactionsSplit = content.split(/Reactions\n/);
+				reactions = reactionsSplit[1];
+				content = reactionsSplit[0];
+			}
+			if (exists(reactions)) {
+				while (match = re.exec(reactions)) {
+					if (match && match[1] && match[2]) {
+						newRowId = generateRowID();
+						repeatingString = 'repeating_reaction_' + newRowId + '_';
+						finalSetAttrs[repeatingString + 'name'] = match[1];
+						finalSetAttrs[repeatingString + 'freetext'] = match[2];
+					} else {
+						console.log('Character doesn\'t have a valid reaction format');
+					}
+				}
+			}
 			if (content.indexOf('Actions') !== -1) {
 				var actionsSplit = content.split(/Actions\n/);
 				actions = actionsSplit[1];
