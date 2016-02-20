@@ -10,7 +10,12 @@ Report any problems, suggestions or features by sending a private message on Rol
 
 ## Changelog
 
-###0.0.1
+### 0.0.2
+* Added in Stats section for Escalate roll macro.
+* Added in NPC tab.
+* Changed roll macros in NPC tab to allow user to put in the stats of whichever NPC is applicable.
+
+### 0.0.1
 
 * First release, supporting simple and escalation rolls.
 * Stats are set at a minimum of 2 as stated in character creation.
