@@ -2679,6 +2679,12 @@ function sheetOpened () {
 		}
 		if (versionCompare(version, '2.1.0') < 0) {
 			updateNPCChallenge();
+			updateDamageVulnerabilities();
+			updateDamageResistances();
+			updateDamageImmunities();
+			updateConditionImmunities();
+			updateLanguages();
+			updateSenses();
 		}
 
 		if (!version || version !== currentVersion) {
