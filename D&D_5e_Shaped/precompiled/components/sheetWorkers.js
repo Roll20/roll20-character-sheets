@@ -2507,7 +2507,11 @@ function updateAction (rowId, type) {
 
 				var recharge = v[repeatingString + 'recharge'];
 				if (exists(recharge)) {
-					finalSetAttrs[repeatingString + 'recharge_display'] = '(Recharge ' + recharge + ')';
+					if (recharge.indexOf('/Day') !== -1 || recharge.indexOf('/day') !== -1) {
+						finalSetAttrs[repeatingString + 'recharge_display'] = '(' + recharge + ')';
+					} else {
+						finalSetAttrs[repeatingString + 'recharge_display'] = '(Recharge ' + recharge + ')';
+					}
 				} else {
 					finalSetAttrs[repeatingString + 'recharge_display'] = '';
 				}
