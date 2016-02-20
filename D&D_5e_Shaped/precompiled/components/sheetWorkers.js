@@ -1670,7 +1670,6 @@ function updateSpell (rowId) {
 			collectionArray.push(repeatingString + 'components_verbal');
 			collectionArray.push(repeatingString + 'components_somatic');
 			collectionArray.push(repeatingString + 'components_material');
-
 		}
 
 		getAttrs(collectionArray, function (v) {
@@ -2346,7 +2345,7 @@ function updateNPCContent () {
 					console.log('match', match);
 					if (match && match[1] && match[2]) {
 						newRowId = generateRowID();
-						repeatingString = 'repeating_legendary_action_' + newRowId + '_';
+						repeatingString = 'repeating_legendaryaction_' + newRowId + '_';
 						finalSetAttrs[repeatingString + 'name'] = match[1];
 						finalSetAttrs[repeatingString + 'freetext'] = match[2];
 					} else {
