@@ -233,6 +233,12 @@ function lowercaseWords (string) {
 	}
 	return string.toLowerCase();
 }
+function findClosest (array, goal) {
+	return array.reduce(function (prev, curr) {
+		return (Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev);
+	});
+}
+
 
 function lowercaseDamageTypes (string) {
 	if (!string) {
@@ -2409,10 +2415,333 @@ function updateNPCContent () {
 		setFinalAttrs(v, finalSetAttrs);
 	});
 }
-
 on('change:content_srd', function () {
 	console.log('content_srd changed');
 	updateNPCContent();
+});
+
+function updateAction (rowId, type) {
+	var repeatingItem = 'repeating_' + type;
+	var collectionArray = ['pb', 'strength_mod', 'finesse_mod', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability'];
+	var finalSetAttrs = {};
+
+	for (var i = 0; i < ABILITIES.length; i++) {
+		collectionArray.push(ABILITIES[i] + '_mod');
+	}
+
+	getSectionIDs(repeatingItem, function (ids) {
+		if (rowId) {
+			ids = [];
+			ids.push(rowId);
+		}
+		for (var i = 0; i < ids.length; i++) {
+			var repeatingString = repeatingItem + '_' + ids[i] + '_';
+			collectionArray.push(repeatingString + 'name');
+			collectionArray.push(repeatingString + 'type');
+			collectionArray.push(repeatingString + 'roll_toggle');
+			collectionArray.push(repeatingString + 'to_hit');
+			collectionArray.push(repeatingString + 'attack_formula');
+			collectionArray.push(repeatingString + 'proficiency');
+			collectionArray.push(repeatingString + 'attack_ability');
+			collectionArray.push(repeatingString + 'attack_bonus');
+			collectionArray.push(repeatingString + 'saving_throw_toggle');
+			collectionArray.push(repeatingString + 'saving_throw_ability');
+			collectionArray.push(repeatingString + 'saving_throw_bonus');
+			collectionArray.push(repeatingString + 'saving_throw_dc');
+			collectionArray.push(repeatingString + 'damage_toggle');
+			collectionArray.push(repeatingString + 'damage_formula');
+			collectionArray.push(repeatingString + 'damage');
+			collectionArray.push(repeatingString + 'damage_ability');
+			collectionArray.push(repeatingString + 'damage_bonus');
+			collectionArray.push(repeatingString + 'damage_type');
+			collectionArray.push(repeatingString + 'second_damage_toggle');
+			collectionArray.push(repeatingString + 'second_damage_formula');
+			collectionArray.push(repeatingString + 'second_damage');
+			collectionArray.push(repeatingString + 'second_damage_ability');
+			collectionArray.push(repeatingString + 'second_damage_bonus');
+			collectionArray.push(repeatingString + 'second_damage_type');
+			collectionArray.push(repeatingString + 'damage_string');
+			collectionArray.push(repeatingString + 'parsed');
+		}
+
+		getAttrs(collectionArray, function (v) {
+			for (var j = 0; j < ids.length; j++) {
+				var repeatingString = repeatingItem + '_' + ids[j] + '_';
+
+				var actionName = v[repeatingString + 'name'];
+				if (!exists(actionName)) {
+					return;
+				}
+
+				var attackOptions = {
+					defaultAbility: 'strength_mod',
+					globalAttackBonus: getIntValue(v.global_attack_bonus),
+					globalAttackBonusLabel: 'global attack bonus',
+					globalMeleeAttackBonus: getIntValue(v.global_melee_attack_bonus),
+					globalRangedAttackBonus: getIntValue(v.global_ranged_attack_bonus),
+					type: 'attack'
+				};
+				updateAttackToggle(v, finalSetAttrs, repeatingString, attackOptions);
+
+				updateSavingThrowToggle(v, finalSetAttrs, repeatingString);
+
+				var damageOptions = {
+					defaultDamageAbility: 'strength_mod',
+					globalDamageBonus: getIntValue(v.global_damage_bonus),
+					globalMeleeDamageBonus: getIntValue(v.global_melee_damage_bonus),
+					globalRangedDamageBonus: getIntValue(v.global_ranged_damage_bonus),
+					type: 'attack'
+				};
+				updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
+			}
+			setFinalAttrs(v, finalSetAttrs);
+		});
+	});
+}
+on('change:repeating_action', function (eventInfo) {
+	var changedField = getRepeatingField('repeating_action', eventInfo);
+	if (changedField !== '') {
+		console.log('action changedField', changedField);
+		var rowId = getRowId('repeating_action', eventInfo);
+		updateAction(rowId, 'action');
+	}
+});
+
+function parseAction (rowId, type) {
+	var repeatingItem = 'repeating_' + type;
+	var collectionArray = ['level', 'challenge', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability'];
+	var finalSetAttrs = {};
+
+	var commaPeriodSpace = /\,?\.?\s*?/;
+	var commaPeriodDefinitiveSpace = /\,?\.?\s*/;
+	var commaPeriodOneSpace = /\,?\.?\s?/;
+	var hit = /Hit:.*?/;
+	var damageType = /((?:[\w]+|[\w]+\s(?:or|and)\s[\w]+)(?:\s*?\([\w\s]+\))?)\s*?damage\s?(\([\w\'\s]+\))?/;
+	var damageSyntax = /(?:(\d+)|.*?\(([\dd\s\+\-]*)\).*?)\s*?/;
+	var altDamageSyntax = /(?:\,\s*?or\s*?)/;
+	var plus = /\s*?plus\s*?/;
+	var savingThrow = /(?:DC)\s*?(\d+)\s*?([a-zA-Z]*)\s*?(?:saving throw)/;
+	var takeOrTaking = /\,?\s*?(?:taking|or take)/;
+	var againstDisease = /(?: against disease)?/;
+	var saveSuccess = /(?:.*or\s(.*)?\son a successful one.)?/;
+	var saveSuccessTwo = /(?:On a successful save,)?(.*)?/;
+	var saveFailure = /(?:On a (?:failure|failed save))\,\s(?:(.*). On a success,\s(.*)?)?(.*)?/;
+	var andAnythingElse = /(\s?and.*)?/;
+	var orAnythingElseNoTake = /(or\s(?!take).*)/;
+	var anythingElse = /(.*)?/;
+	var damageRegex = new RegExp(damageSyntax.source + damageType.source, 'i');
+	var damagePlusRegex = new RegExp(plus.source + damageSyntax.source + damageType.source + commaPeriodSpace.source + anythingElse.source, 'i');
+	var altDamageRegex = new RegExp(altDamageSyntax.source + damageSyntax.source + damageType.source, 'i');
+	var hitEffectRegex = new RegExp(hit.source + anythingElse.source, 'i');
+	var saveDamageRegex = new RegExp(savingThrow.source + takeOrTaking.source + damageSyntax.source + damageType.source + saveSuccess.source + commaPeriodSpace.source + anythingElse.source + saveSuccessTwo.source, 'i');
+	var saveOrRegex = new RegExp(savingThrow.source + againstDisease.source + commaPeriodDefinitiveSpace.source + orAnythingElseNoTake.source, 'i');
+	var	saveFailedSaveRegex = new RegExp(savingThrow.source + commaPeriodSpace.source + saveFailure.source, 'i');
+
+	var rechargeRegex = /\s*?\((?:Recharge\s*?(\d+\-\d+|\d+)|Recharges\safter\sa\s(.*))\)/gi;
+	var rechargeDayRegex = /\s*?\((\d+\/Day)\)/gi;
+	var typeRegex = /(melee|ranged|melee or ranged)\s*(spell|weapon)\s*/gi;
+	var toHitRegex = /\+\s?(\d+)\s*(?:to hit)/gi;
+	var reachRegex = /(?:reach)\s?(\d+)\s?(?:ft)/gi;
+	var rangeRegex = /(?:range)\s?(\d+)\/(\d+)\s?(ft)/gi;
+	var damageParseRegex = /(\d+d?\d+)(?:\s?(?:\+|\-)\s?(\d+))?/gi;
+
+	for (var i = 0; i < ABILITIES.length; i++) {
+		collectionArray.push(ABILITIES[i] + '_mod');
+	}
+
+	getSectionIDs(repeatingItem, function (ids) {
+		if (rowId) {
+			ids = [];
+			ids.push(rowId);
+		}
+		for (var i = 0; i < ids.length; i++) {
+			var repeatingString = repeatingItem + '_' + ids[i] + '_';
+			collectionArray.push(repeatingString + 'name');
+			collectionArray.push(repeatingString + 'freetext');
+		}
+
+		getAttrs(collectionArray, function (v) {
+			var pb = getPB(v.level, v.challenge);
+			var strMod = getIntValue(v.strength_mod);
+			var dexMod = getIntValue(v.dexterity_mod);
+			var intMod = getIntValue(v.intelligence_mod);
+			var wisMod = getIntValue(v.wisdom_mod);
+			var chaMod = getIntValue(v.charisma_mod);
+			var meleeMods = [strMod, dexMod];
+			var spellMods = [intMod, wisMod, chaMod];
+
+			for (var j = 0; j < ids.length; j++) {
+				var repeatingString = repeatingItem + '_' + ids[j] + '_';
+
+				var rangedAttack = false;
+				var spellAttack = false;
+				var closest;
+
+				var name = v[repeatingString + 'name'];
+				var freetext = v[repeatingString + 'freetext'];
+
+				if (name) {
+					var rechargeResult = rechargeRegex.exec(name);
+					if (rechargeResult) {
+						finalSetAttrs[repeatingString + 'recharge'] = rechargeResult[1] || rechargeResult[2];
+						finalSetAttrs[repeatingString + 'name'] = name.replace(rechargeRegex, '');
+					}
+					var rechargeDayResult = rechargeDayRegex.exec(name);
+					if (rechargeDayResult) {
+						finalSetAttrs[repeatingString + 'recharge'] = rechargeDayResult[1] || rechargeDayResult[2];
+						finalSetAttrs[repeatingString + 'name'] = name.replace(rechargeDayRegex, '');
+					}
+				}
+
+				var type = typeRegex.exec(freetext);
+				if (type) {
+					if (type[1]) {
+						type[1] = type[1].toLowerCase();
+						if (type[1] === 'melee') {
+							finalSetAttrs[repeatingString + 'type'] = 'Melee Weapon';
+						}
+						if (type[1] === 'ranged') {
+							finalSetAttrs[repeatingString + 'type'] = 'Ranged Weapon';
+							rangedAttack = true;
+						}
+						if (type[1] === 'melee or ranged') {
+							finalSetAttrs[repeatingString + 'type'] = 'Other';
+						}
+					}
+					if (type[2]) {
+						type[2] = type[2].toLowerCase();
+						if (type[2] === 'spell') {
+							spellAttack = true;
+						}
+					}
+					freetext = freetext.replace(typeRegex, '');
+				}
+
+				var reach = reachRegex.exec(freetext);
+				if (reach && reach[1]) {
+					finalSetAttrs[repeatingString + 'reach'] = reach[1];
+					freetext = freetext.replace(reachRegex, '');
+				}
+				var range = rangeRegex.exec(freetext);
+				if (range && range[1] && range[2]) {
+					finalSetAttrs[repeatingString + 'range'] = range[1];
+					freetext = freetext.replace(rangeRegex, '');
+				}
+
+				var toHit = toHitRegex.exec(freetext);
+				if (toHit && toHit[1]) {
+					var hitBonus = toHit[1];
+					hitBonus -= pb;
+
+					if (spellAttack) {
+						closest = findClosest(spellMods, hitBonus);
+						hitBonus -= closest;
+						if (closest === spellMods[0]) {
+							finalSetAttrs[repeatingString + 'attack_ability'] = '@{intelligence_mod}';
+						}
+						if (closest === spellMods[1]) {
+							finalSetAttrs[repeatingString + 'attack_ability'] = '@{wisdom_mod}';
+						}
+						if (closest === spellMods[2]) {
+							finalSetAttrs[repeatingString + 'attack_ability'] = '@{charisma_mod}';
+						}
+					} else {
+						if (rangedAttack) {
+							finalSetAttrs[repeatingString + 'attack_ability'] = '@{dexterity_mod}';
+							hitBonus -= dexMod;
+						} else {
+							closest = findClosest(meleeMods, hitBonus);
+							hitBonus -= closest;
+							if (closest === meleeMods[0]) {
+								finalSetAttrs[repeatingString + 'attack_ability'] = '@{strength_mod}';
+							}
+							if (closest === meleeMods[1]) {
+								finalSetAttrs[repeatingString + 'attack_ability'] = '@{dexterity_mod}';
+							}
+						}
+					}
+					if (hitBonus) {
+						finalSetAttrs[repeatingString + 'attack_bonus'] = hitBonus;
+					}
+					freetext = freetext.replace(toHitRegex, '');
+					finalSetAttrs[repeatingString + 'roll_toggle'] = '@{roll_toggle_var}';
+				} else {
+					finalSetAttrs[repeatingString + 'roll_toggle'] = '0';
+				}
+
+				var damage = damageRegex.exec(freetext);
+				console.log('damage', damage);
+				var damageBonus;
+				if (damage) {
+					/*
+					1 is damage without dice. Example "1"
+					2 is damage with dice. Example "2d6+4"
+					3 is damage type. Example "slashing" or "lightning or thunder"
+					*/
+					if (damage[1]) {
+						damageBonus = damage[1];
+					}
+					if (damage[2]) {
+						var damageParsed = damageParseRegex.exec(damage[2]);
+						if (damageParsed) {
+							if (damageParsed[1]) {
+								finalSetAttrs[repeatingString + 'damage'] = damageParsed[1];
+							}
+							if (damageParsed[2]) {
+								damageBonus = damageParsed[2];
+							}
+						}
+					}
+					if (damageBonus) {
+						if (spellAttack) {
+							closest = findClosest(spellMods, damageBonus);
+							damageBonus -= closest;
+							if (closest === spellMods[0]) {
+								finalSetAttrs[repeatingString + 'damage_ability'] = '@{intelligence_mod}';
+							}
+							if (closest === spellMods[1]) {
+								finalSetAttrs[repeatingString + 'damage_ability'] = '@{wisdom_mod}';
+							}
+							if (closest === spellMods[2]) {
+								finalSetAttrs[repeatingString + 'damage_ability'] = '@{charisma_mod}';
+							}
+						} else {
+							if (rangedAttack) {
+								finalSetAttrs[repeatingString + 'damage_ability'] = '@{dexterity_mod}';
+								damageBonus -= dexMod;
+							} else {
+								closest = findClosest(meleeMods, damageBonus);
+								damageBonus -= closest;
+								if (closest === meleeMods[0]) {
+									finalSetAttrs[repeatingString + 'damage_ability'] = '@{strength_mod}';
+								}
+								if (closest === meleeMods[1]) {
+									finalSetAttrs[repeatingString + 'damage_ability'] = '@{dexterity_mod}';
+								}
+							}
+						}
+					}
+					if (damage[3]) {
+						finalSetAttrs[repeatingString + 'damage_type'] = damage[3];
+					}
+					freetext = freetext.replace(damageRegex, '');
+					finalSetAttrs[repeatingString + 'damage_toggle'] = '@{damage_toggle_var}';
+				} else {
+					finalSetAttrs[repeatingString + 'damage_toggle'] = 0;
+				}
+				finalSetAttrs[repeatingString + 'extras_toggle'] = '@{extas_var}';
+			}
+			setFinalAttrs(v, finalSetAttrs);
+		});
+	});
+}
+on('change:repeating_action:freetext', function (eventInfo) {
+	var changedField = getRepeatingField('repeating_action', eventInfo);
+	if (changedField !== '') {
+		console.log('action changedField', changedField);
+		var rowId = getRowId('repeating_action', eventInfo);
+		parseAction(rowId, 'action');
+	}
 });
 
 function updateSenses () {
@@ -2516,7 +2845,6 @@ function updateDamageImmunities () {
 	var finalSetAttrs = {};
 
 	getAttrs(collectionArray, function (v) {
-		console.log('v.damage_immunities', v.damage_immunities);
 		if (v.damage_immunities) {
 			finalSetAttrs.damage_immunities_exist = 1;
 			finalSetAttrs.damage_immunities = lowercaseDamageTypes(v.damage_immunities);
