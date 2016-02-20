@@ -2338,9 +2338,9 @@ function updateNPCContent () {
 					console.log('legendaryActionsMatch[1]', legendaryActionsMatch[1]);
 					legendaryActionAmount = legendaryActionAmount[1];
 				}
-				console.log('legendaryActionAmount', legendaryActionAmount);
 
-				finalSetAttrs.legendary_actions_blurb = 'The ' + creatureName + ' can take ' + legendaryActionAmount + ' legendary actions, choosing from the options below. Only one legendary option can be used at a time and only at the end of another creature\'s turn. The ' + creatureName + ' regains spent legendary actions at the start of its turn.';
+				finalSetAttrs.legendary_action_amount = legendaryActionAmount;
+
 				while (match = re.exec(legendaryActions)) {
 					console.log('match', match);
 					if (match && match[1] && match[2]) {
