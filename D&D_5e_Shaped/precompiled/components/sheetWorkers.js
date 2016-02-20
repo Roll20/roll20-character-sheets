@@ -2493,6 +2493,7 @@ function updateAction (rowId, type) {
 			collectionArray.push(repeatingString + 'second_damage_type');
 			collectionArray.push(repeatingString + 'damage_string');
 			collectionArray.push(repeatingString + 'parsed');
+			collectionArray.push(repeatingString + 'recharge');
 		}
 
 		getAttrs(collectionArray, function (v) {
@@ -2502,6 +2503,13 @@ function updateAction (rowId, type) {
 				var actionName = v[repeatingString + 'name'];
 				if (!exists(actionName)) {
 					return;
+				}
+
+				var recharge = v[repeatingString + 'recharge'];
+				if (exists(recharge)) {
+					finalSetAttrs[repeatingString + 'recharge_display'] = '(Recharge' + recharge + ')';
+				} else {
+					finalSetAttrs[repeatingString + 'recharge_display'] = '';
 				}
 
 				var attackOptions = {
