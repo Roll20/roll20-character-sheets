@@ -219,6 +219,11 @@ function addOrSubtract (string, number) {
 	}
 	return value;
 }
+function numberWithCommas(x) {
+	var parts = x.toString().split(".");
+	parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+	return parts.join(".");
+}
 
 
 var ABILITIES = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
@@ -2039,167 +2044,6 @@ on('change:spells_srd', function () {
   updateSpellsFromSRD();
 });
 
-function sheetOpened () {
-	var collectionArray = ['version', 'strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
-	var finalSetAttrs = {};
-
-	getAttrs(collectionArray, function (v) {
-		var version = v.version;
-
-		if (!version) {
-			updatePb();
-
-			var setAbilities = {};
-			if (!exists(v.strength)) {
-				setAbilities.strength = 10;
-				setAbilities.strength_mod = 0;
-				setAbilities.strength_mod_with_sign = '+0';
-			}
-			if (!exists(v.dexterity)) {
-				setAbilities.dexterity = 10;
-				setAbilities.dexterity_mod = 0;
-				setAbilities.dexterity_mod_with_sign = '+0';
-			}
-			if (!exists(v.constitution)) {
-				setAbilities.constitution = 10;
-				setAbilities.constitution_mod = 0;
-				setAbilities.constitution_mod_with_sign = '+0';
-			}
-			if (!exists(v.intelligence)) {
-				setAbilities.intelligence = 10;
-				setAbilities.intelligence_mod = 0;
-				setAbilities.intelligence_mod_with_sign = '+0';
-			}
-			if (!exists(v.wisdom)) {
-				setAbilities.wisdom = 10;
-				setAbilities.wisdom_mod = 0;
-				setAbilities.wisdom_mod_with_sign = '+0';
-			}
-			if (!exists(v.charisma)) {
-				setAbilities.charisma = 10;
-				setAbilities.charisma_mod = 0;
-				setAbilities.charisma_mod_with_sign = '+0';
-			}
-			setFinalAttrs(v, setAbilities);
-
-			var skills = [
-				{
-					'name': 'Acrobatics',
-					'ability': 'dexterity'
-				},
-				{
-					'name': 'Animal Handling',
-					'ability': 'wisdom'
-				},
-				{
-					'name': 'Arcana',
-					'ability': 'intelligence'
-				},
-				{
-					'name': 'Athletics',
-					'ability': 'strength'
-				},
-				{
-					'name': 'Deception',
-					'ability': 'charisma'
-				},
-				{
-					'name': 'History',
-					'ability': 'intelligence'
-				},
-				{
-					'name': 'Insight',
-					'ability': 'wisdom'
-				},
-				{
-					'name': 'Intimidation',
-					'ability': 'charisma'
-				},
-				{
-					'name': 'Investigation',
-					'ability': 'intelligence'
-				},
-				{
-					'name': 'Medicine',
-					'ability': 'wisdom'
-				},
-				{
-					'name': 'Nature',
-					'ability': 'intelligence'
-				},
-				{
-					'name': 'Perception',
-					'ability': 'wisdom'
-				},
-				{
-					'name': 'Performance',
-					'ability': 'charisma'
-				},
-				{
-					'name': 'Persuasion',
-					'ability': 'charisma'
-				},
-				{
-					'name': 'Religion',
-					'ability': 'intelligence'
-				},
-				{
-					'name': 'Sleight of Hand',
-					'ability': 'dexterity'
-				},
-				{
-					'name': 'Stealth',
-					'ability': 'dexterity'
-				},
-				{
-					'name': 'Survival',
-					'ability': 'wisdom'
-				}
-			];
-
-			for (var i = 0; i < skills.length; i++) {
-				var newRowId = generateRowID();
-				var repeatingString = 'repeating_skill_' + newRowId + '_';
-				finalSetAttrs[repeatingString + 'name'] = skills[i].name;
-				finalSetAttrs[repeatingString + 'ability'] = '@{' + skills[i].ability + '_mod}';
-				updateSkill(newRowId);
-			}
-		}
-
-		if (versionCompare(version, '2.0.10') < 0) {
-			updateAbilityModifier('strength');
-			updateAbilityModifier('dexterity');
-			updateAbilityModifier('constitution');
-			updateAbilityModifier('intelligence');
-			updateAbilityModifier('wisdom');
-			updateAbilityModifier('charisma');
-		}
-		if (versionCompare(version, '2.0.14') < 0) {
-			updateSkill();
-			updateSavingThrow('strength');
-			updateSavingThrow('dexterity');
-			updateSavingThrow('constitution');
-			updateSavingThrow('intelligence');
-			updateSavingThrow('wisdom');
-			updateSavingThrow('charisma');
-		}
-
-		if (!version || version !== currentVersion) {
-			finalSetAttrs.version = currentVersion;
-		}
-
-		console.log('sheetOpened', finalSetAttrs);
-		setFinalAttrs(v, finalSetAttrs);
-
-		updateInitiative();
-		updateArmor();
-	});
-}
-
-on('sheet:opened', function () {
-	sheetOpened();
-});
-
 function updateAttachers () {
 	var repeatingItem = 'repeating_attacher';
 	var collectionArray = ['attacher_initiative', 'attacher_death_saving_throw', 'attacher_hit_dice', 'attacher_attack', 'attacher_spell', 'attacher_skill'];
@@ -2335,6 +2179,7 @@ function updateNPCChallenge () {
 		};
 
 		finalSetAttrs.xp = xpPerChallenge[challenge];
+		finalSetAttrs.xp_readable = numberWithCommas(finalSetAttrs.xp);
 
 		finalSetAttrs.level = challenge;
 		if (finalSetAttrs.level < 1) {
@@ -2571,4 +2416,168 @@ function updateNPCContent () {
 on('change:content_srd', function () {
 	console.log('content_srd changed');
 	updateNPCContent();
+});
+
+function sheetOpened () {
+	var collectionArray = ['version', 'strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
+	var finalSetAttrs = {};
+
+	getAttrs(collectionArray, function (v) {
+		var version = v.version;
+
+		if (!version) {
+			updatePb();
+
+			var setAbilities = {};
+			if (!exists(v.strength)) {
+				setAbilities.strength = 10;
+				setAbilities.strength_mod = 0;
+				setAbilities.strength_mod_with_sign = '+0';
+			}
+			if (!exists(v.dexterity)) {
+				setAbilities.dexterity = 10;
+				setAbilities.dexterity_mod = 0;
+				setAbilities.dexterity_mod_with_sign = '+0';
+			}
+			if (!exists(v.constitution)) {
+				setAbilities.constitution = 10;
+				setAbilities.constitution_mod = 0;
+				setAbilities.constitution_mod_with_sign = '+0';
+			}
+			if (!exists(v.intelligence)) {
+				setAbilities.intelligence = 10;
+				setAbilities.intelligence_mod = 0;
+				setAbilities.intelligence_mod_with_sign = '+0';
+			}
+			if (!exists(v.wisdom)) {
+				setAbilities.wisdom = 10;
+				setAbilities.wisdom_mod = 0;
+				setAbilities.wisdom_mod_with_sign = '+0';
+			}
+			if (!exists(v.charisma)) {
+				setAbilities.charisma = 10;
+				setAbilities.charisma_mod = 0;
+				setAbilities.charisma_mod_with_sign = '+0';
+			}
+			setFinalAttrs(v, setAbilities);
+
+			var skills = [
+				{
+					'name': 'Acrobatics',
+					'ability': 'dexterity'
+				},
+				{
+					'name': 'Animal Handling',
+					'ability': 'wisdom'
+				},
+				{
+					'name': 'Arcana',
+					'ability': 'intelligence'
+				},
+				{
+					'name': 'Athletics',
+					'ability': 'strength'
+				},
+				{
+					'name': 'Deception',
+					'ability': 'charisma'
+				},
+				{
+					'name': 'History',
+					'ability': 'intelligence'
+				},
+				{
+					'name': 'Insight',
+					'ability': 'wisdom'
+				},
+				{
+					'name': 'Intimidation',
+					'ability': 'charisma'
+				},
+				{
+					'name': 'Investigation',
+					'ability': 'intelligence'
+				},
+				{
+					'name': 'Medicine',
+					'ability': 'wisdom'
+				},
+				{
+					'name': 'Nature',
+					'ability': 'intelligence'
+				},
+				{
+					'name': 'Perception',
+					'ability': 'wisdom'
+				},
+				{
+					'name': 'Performance',
+					'ability': 'charisma'
+				},
+				{
+					'name': 'Persuasion',
+					'ability': 'charisma'
+				},
+				{
+					'name': 'Religion',
+					'ability': 'intelligence'
+				},
+				{
+					'name': 'Sleight of Hand',
+					'ability': 'dexterity'
+				},
+				{
+					'name': 'Stealth',
+					'ability': 'dexterity'
+				},
+				{
+					'name': 'Survival',
+					'ability': 'wisdom'
+				}
+			];
+
+			for (var i = 0; i < skills.length; i++) {
+				var newRowId = generateRowID();
+				var repeatingString = 'repeating_skill_' + newRowId + '_';
+				finalSetAttrs[repeatingString + 'name'] = skills[i].name;
+				finalSetAttrs[repeatingString + 'ability'] = '@{' + skills[i].ability + '_mod}';
+				updateSkill(newRowId);
+			}
+		}
+
+		if (versionCompare(version, '2.0.10') < 0) {
+			updateAbilityModifier('strength');
+			updateAbilityModifier('dexterity');
+			updateAbilityModifier('constitution');
+			updateAbilityModifier('intelligence');
+			updateAbilityModifier('wisdom');
+			updateAbilityModifier('charisma');
+		}
+		if (versionCompare(version, '2.0.14') < 0) {
+			updateSkill();
+			updateSavingThrow('strength');
+			updateSavingThrow('dexterity');
+			updateSavingThrow('constitution');
+			updateSavingThrow('intelligence');
+			updateSavingThrow('wisdom');
+			updateSavingThrow('charisma');
+		}
+		if (versionCompare(version, '2.1.0') < 0) {
+			updateNPCChallenge();
+		}
+
+		if (!version || version !== currentVersion) {
+			finalSetAttrs.version = currentVersion;
+		}
+
+		console.log('sheetOpened', finalSetAttrs);
+		setFinalAttrs(v, finalSetAttrs);
+
+		updateInitiative();
+		updateArmor();
+	});
+}
+
+on('sheet:opened', function () {
+	sheetOpened();
 });
