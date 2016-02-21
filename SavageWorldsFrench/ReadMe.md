@@ -1,9 +1,10 @@
 # Savage Worlds (french)
 
-Feuille de personnage (FdP) avec jets intégrés pour **Savage Worlds** et **Deadland Reloaded**, basée sur le Livre de Base (LdB) de la version éditée en français par [Black Book Editions](http://www.black-book-editions.fr/catalogue.php?id=58).
+Feuille de personnage (FdP) avec jets intégrés pour **Savage Worlds** et **Deadlands Reloaded**, basée sur le Livre de Base (LdB) de la version éditée en français par [Black Book Editions](http://www.black-book-editions.fr/catalogue.php?id=58).
 
 # Version courante
-1.4 [Capture d'écran](sawofr.jpg)
+1.4 [Capture d'écran](sawofr.jpg)  
+[Style Deadlands](sawofr_style_deadlands.png)
 
 #Notes sur les Jets
 
@@ -73,34 +74,38 @@ Il n'y a (pour l'instant) aucun automatisme lié à ces propriétés.
 
 ##Raccourcis/barre de macro
 Les boutons contenus dans les sections dynamiques/répétables peuvent être glissés/déposés dans la barre de macro pour créer un bouton "raccourcis".  
-Cela concerne, sur la FdP : compétences supplémentaire (au-delà de la liste complète du LdB, intégrée dans la FdP), et les armes/attaques au-delà des 3 premières.  
+Cela concerne, sur la FdP : compétences supplémentaire (au-delà de la liste complète du LdB, intégrée dans la FdP), et les armes/attaques au-delà des 3 premières.
 
 ##Pouvoirs
-Aucun jet/automatisme n'est pour l'instant intégré dans la FdP concernant les Pouvoirs, si ce n'est de pouvoir les saisir et les montrer dans le chat.  
+Aucun jet/automatisme n'est pour l'instant intégré dans la FdP concernant les Pouvoirs, si ce n'est de pouvoir les saisir et les montrer dans le chat.
 Les suggestions sont les bienvenues à ce sujet.  
 NB : décrémenter les PP automatiquement au lancement d'un pouvoir nécessiterait l'utilisation d'un script API, donc d'un compte "Pro".
 
 # Notes de version
 
-##v1.4 (2016-02-19)
+##v1.4 (2016-02-21)
 Merci à Xo de Vorcen pour les tests !
 
-* Option d'affichage aux couleurs de Deadlands Reloaded
-* Possibilité de saisir un modificateur au jet de dégâts
-* Jet de dégâts avec +1d6!! dégâts en mode succès+relances si relance, affichage d'un jet supplémentaire de +1d6!! dans les autres modes
-* Amélioration de l'affichage des résultats de jets en mode succès+relances (indicateur d'échec, succès sans relance et succès+relances)
-* Option de configuration pour afficher/masquer les Possessions (masquée par défaut pour les PNJ et Extras)
-* Correction : les bonus de dégâts peuvent être négatifs
-* Correction des malus de jets en état critique (-3 pour les Blessures et -2 pour la Fatigue)
-* Affichage adapté entre PJ/PNJ/Extra
-* Déplacement de la configuration dans un onglet dédié
-* Options de configuration pour afficher/masquer les compétences,  toutes ou une à une.
-* Stylisation de l'état Secoué, des Blessures et de la Fatigue
-* Option de configuration pour les jets : template de succès+relances (défaut), template de total de jets, ou "jets bruts" (pas de template)
-* Option de configuration pour les attaques avec succès+relances : choix entre cible/pion (défaut) ou saisie de difficulté
-* Option d'affichage ou non des états du personnage (Secoué, Blessures, Fatigue) dans le template de jet
-* Ajout un bouton d'affichage dans le chat de la description des pouvoirs
-* Ajout d'un bouton d'agrandissement/réduction des Atouts, Handicaps, Signes particuliers, Richesse, des notes d'Armes et Pouvoirs
+* Configuration
+  * Déplacement de la configuration dans un onglet dédié
+  * Option d'affichage aux couleurs de Deadlands Reloaded
+  * Option de configuration pour afficher/masquer les Possessions (masquée par défaut pour les PNJ et Extras)
+  * Options de configuration pour afficher/masquer les compétences,  toutes ou une à une (sauf Tripes, dépendante du style Deadlands)
+  * Option de configuration pour les jets : template de succès+relances (défaut), template de total de jets, ou "jets bruts" (pas de template)
+  * Option de configuration pour les attaques avec succès+relances : choix entre cible/pion (défaut) ou saisie de difficulté
+  * Option d'affichage ou non des états du personnage (Secoué, Blessures, Fatigue) dans le template de jet
+* Feuille
+  * Ajout de la caractéristique Trempe et la compétence Tripes, visibles uniquement en mode "Deadlands"
+  * Correction : les bonus de dégâts peuvent être négatifs
+  * Affichage adapté entre PJ/PNJ/Extra
+  * Stylisation de l'état Secoué, des Blessures et de la Fatigue
+  * Ajout un bouton d'affichage dans le chat de la description des pouvoirs
+  * Ajout d'un bouton d'agrandissement/réduction des Atouts, Handicaps, Signes particuliers, Richesse, des notes d'Armes et Pouvoirs
+* Jets
+  * Possibilité de saisir un modificateur au jet de dégâts
+  * Jet de dégâts avec +1d6!! dégâts en mode succès+relances si relance, affichage d'un jet supplémentaire de +1d6!! dans les autres modes
+  * Amélioration de l'affichage des résultats de jets en mode succès+relances (indicateur d'échec, succès sans relance et succès+relances)
+  * Correction des malus de jets en état critique (-3 pour les Blessures et -2 pour la Fatigue)
 
 ##v1.2 (2015-12-22)
 Equipement / Inventaire / Encombrement : ajout du poids individuel, gestion des poids décimaux, correction d'un bug lors de la suppression d'une ligne.
