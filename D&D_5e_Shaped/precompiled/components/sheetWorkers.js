@@ -270,6 +270,29 @@ function getCorrectAbilityBasedOnBonus (finalSetAttrs, repeatingString, fieldNam
 	}
 	return bonus;
 }
+function getAnyCorrectAbilityBasedOnBonus (finalSetAttrs, repeatingString, fieldName, bonus, abilityMods) {
+	var closest = findClosest(abilityMods, bonus);
+	if (bonus) {
+		bonus -= closest;
+
+		if (closest === abilityMods[0]) {
+			finalSetAttrs[repeatingString + fieldName] = '@{strength_mod}';
+		} else if (closest === abilityMods[1]) {
+			finalSetAttrs[repeatingString + fieldName] = '@{dexterity_mod}';
+		} else if (closest === abilityMods[2]) {
+			finalSetAttrs[repeatingString + fieldName] = '@{constitution_mod}';
+		} else if (closest === abilityMods[3]) {
+			finalSetAttrs[repeatingString + fieldName] = '@{intelligence_mod}';
+		} else if (closest === abilityMods[4]) {
+			finalSetAttrs[repeatingString + fieldName] = '@{wisdom_mod}';
+		} else if (closest === abilityMods[5]) {
+			finalSetAttrs[repeatingString + fieldName] = '@{charisma_mod}';
+		}
+	} else {
+		finalSetAttrs[repeatingString + fieldName] = 0;
+	}
+	return bonus;
+}
 
 function lowercaseDamageTypes (string) {
 	if (!string) {
@@ -2659,6 +2682,7 @@ function parseAction (rowId, type) {
 	var damagePlusRegex = new RegExp(plus.source + damageSyntax.source + damageType.source, 'i');
 	var altDamageRegex = new RegExp(altDamageSyntax.source + damageSyntax.source + damageType.source, 'i');
 	var hitEffectRegex = new RegExp(hit.source + anythingElse.source, 'i');
+	var savingThrowRegex = new RegExp(savingThrow.source, 'i');
 	var saveDamageRegex = new RegExp(savingThrow.source + takeOrTaking.source + damageSyntax.source + damageType.source + saveSuccess.source + commaPeriodSpace.source + anythingElse.source + saveSuccessTwo.source, 'i');
 	var saveOrRegex = new RegExp(savingThrow.source + againstDisease.source + commaPeriodDefinitiveSpace.source + orAnythingElseNoTake.source, 'i');
 	var	saveFailedSaveRegex = new RegExp(savingThrow.source + commaPeriodSpace.source + saveFailure.source, 'i');
@@ -2687,11 +2711,13 @@ function parseAction (rowId, type) {
 			var pb = getPB(v.level, v.challenge);
 			var strMod = getIntValue(v.strength_mod);
 			var dexMod = getIntValue(v.dexterity_mod);
+			var conMod = getIntValue(v.constitution_mod);
 			var intMod = getIntValue(v.intelligence_mod);
 			var wisMod = getIntValue(v.wisdom_mod);
 			var chaMod = getIntValue(v.charisma_mod);
 			var meleeMods = [strMod, dexMod];
 			var spellMods = [intMod, wisMod, chaMod];
+			var abilityMods = [strMod, dexMod, conMod, intMod, wisMod, chaMod];
 
 			for (var j = 0; j < ids.length; j++) {
 				var repeatingString = repeatingItem + '_' + ids[j] + '_';
@@ -2753,8 +2779,30 @@ function parseAction (rowId, type) {
 					finalSetAttrs[repeatingString + 'roll_toggle'] = '0';
 				}
 
+				var savingThrow = savingThrowRegex.exec(freetext);
+				if (savingThrow) {
+					if (savingThrow[1]) {
+						var savingThrowTotal = savingThrow[1];
+						savingThrowTotal -= 8;
+						savingThrowTotal -= pb;
+
+						savingThrowTotal = getAnyCorrectAbilityBasedOnBonus(finalSetAttrs, repeatingString, 'saving_throw_ability', savingThrowTotal, abilityMods);
+
+						if (savingThrowTotal) {
+							finalSetAttrs[repeatingString + 'saving_throw_bonus'] = savingThrowTotal;
+						}
+						freetext = freetext.replace(savingThrowRegex, '');
+						finalSetAttrs[repeatingString + 'saving_throw_toggle'] = '@{saving_throw_toggle_var}';
+					}
+					if (savingThrow[2]) {
+						finalSetAttrs[repeatingString + 'saving_throw_vs_ability'] = savingThrow[2];
+					}
+				} else {
+					finalSetAttrs[repeatingString + 'saving_throw_toggle'] = '0';
+				}
+
 				parseDamage(finalSetAttrs, repeatingString, freetext, damageRegex, 'damage', spellMods, meleeMods, spellAttack, rangedAttack, dexMod);
-				parseDamage(finalSetAttrs, repeatingString, freetext, altDamageSyntax, 'second_damage', spellMods, meleeMods, spellAttack, rangedAttack, dexMod);
+				parseDamage(finalSetAttrs, repeatingString, freetext, altDamageRegex, 'second_damage', spellMods, meleeMods, spellAttack, rangedAttack, dexMod);
 				parseDamage(finalSetAttrs, repeatingString, freetext, damagePlusRegex, 'second_damage', spellMods, meleeMods, spellAttack, rangedAttack, dexMod);
 
 				finalSetAttrs[repeatingString + 'extras_toggle'] = '@{extas_var}';
