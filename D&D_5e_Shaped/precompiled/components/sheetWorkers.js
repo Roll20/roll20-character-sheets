@@ -2596,6 +2596,44 @@ on('change:repeating_lairaction', function (eventInfo) {
 	}
 });
 
+function parseDamage (finalSetAttrs, repeatingString, freetext, regex, name, spellMods, meleeMods, spellAttack, rangedAttack, dexMod) {
+	var damageParseRegex = /(\d+d?\d+)(?:\s?(?:\+|\-)\s?(\d+))?/gi;
+	var damage = regex.exec(freetext);
+	var damageBonus;
+	if (damage) {
+		/*
+		 1 is damage without dice. Example "1"
+		 2 is damage with dice. Example "2d6+4"
+		 3 is damage type. Example "slashing" or "lightning or thunder"
+		 */
+		if (damage[1]) {
+			damageBonus = damage[1];
+		}
+		if (damage[2]) {
+			var damageParsed = damageParseRegex.exec(damage[2]);
+			if (damageParsed) {
+				if (damageParsed[1]) {
+					finalSetAttrs[repeatingString + name] = damageParsed[1];
+				}
+				if (damageParsed[2]) {
+					damageBonus = damageParsed[2];
+				}
+			}
+		}
+		damageBonus = getCorrectAbilityBasedOnBonus(finalSetAttrs, repeatingString, name + '_ability', damageBonus, spellMods, meleeMods, spellAttack, rangedAttack, dexMod);
+		if (damage[3]) {
+			finalSetAttrs[repeatingString + name + '_type'] = damage[3];
+		}
+		if (damageBonus) {
+			finalSetAttrs[repeatingString + name + '_bonus'] = damageBonus;
+		}
+		freetext = freetext.replace(regex, '');
+		finalSetAttrs[repeatingString + name + '_toggle'] = '@{' + name + '_toggle_var}';
+	} else {
+		finalSetAttrs[repeatingString + name + '_toggle'] = 0;
+	}
+}
+
 function parseAction (rowId, type) {
 	var repeatingItem = 'repeating_' + type;
 	var collectionArray = ['level', 'challenge', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability'];
@@ -2603,7 +2641,6 @@ function parseAction (rowId, type) {
 
 	var commaPeriodSpace = /\,?\.?\s*?/;
 	var commaPeriodDefinitiveSpace = /\,?\.?\s*/;
-	var commaPeriodOneSpace = /\,?\.?\s?/;
 	var hit = /Hit:.*?/;
 	var damageType = /((?:[\w]+|[\w]+\s(?:or|and)\s[\w]+)(?:\s*?\([\w\s]+\))?)\s*?damage\s?(\([\w\'\s]+\))?/;
 	var damageSyntax = /(?:(\d+)|.*?\(([\dd\s\+\-]*)\).*?)\s*?/;
@@ -2619,7 +2656,7 @@ function parseAction (rowId, type) {
 	var orAnythingElseNoTake = /(or\s(?!take).*)/;
 	var anythingElse = /(.*)?/;
 	var damageRegex = new RegExp(damageSyntax.source + damageType.source, 'i');
-	var damagePlusRegex = new RegExp(plus.source + damageSyntax.source + damageType.source + commaPeriodSpace.source + anythingElse.source, 'i');
+	var damagePlusRegex = new RegExp(plus.source + damageSyntax.source + damageType.source, 'i');
 	var altDamageRegex = new RegExp(altDamageSyntax.source + damageSyntax.source + damageType.source, 'i');
 	var hitEffectRegex = new RegExp(hit.source + anythingElse.source, 'i');
 	var saveDamageRegex = new RegExp(savingThrow.source + takeOrTaking.source + damageSyntax.source + damageType.source + saveSuccess.source + commaPeriodSpace.source + anythingElse.source + saveSuccessTwo.source, 'i');
@@ -2630,7 +2667,6 @@ function parseAction (rowId, type) {
 	var toHitRegex = /\+\s?(\d+)\s*(?:to hit)/gi;
 	var reachRegex = /(?:reach)\s?(\d+)\s?(?:ft)/gi;
 	var rangeRegex = /(?:range)\s?(\d+)\/(\d+)\s?(ft)/gi;
-	var damageParseRegex = /(\d+d?\d+)(?:\s?(?:\+|\-)\s?(\d+))?/gi;
 
 	for (var i = 0; i < ABILITIES.length; i++) {
 		collectionArray.push(ABILITIES[i] + '_mod');
@@ -2666,24 +2702,24 @@ function parseAction (rowId, type) {
 				var name = v[repeatingString + 'name'];
 				var freetext = v[repeatingString + 'freetext'];
 
-				var type = typeRegex.exec(freetext);
-				if (type) {
-					if (type[1]) {
-						type[1] = type[1].toLowerCase();
-						if (type[1] === 'melee') {
+				var actionType = typeRegex.exec(freetext);
+				if (actionType) {
+					if (actionType[1]) {
+						actionType[1] = type[1].toLowerCase();
+						if (actionType[1] === 'melee') {
 							finalSetAttrs[repeatingString + 'type'] = 'Melee Weapon';
 						}
-						if (type[1] === 'ranged') {
+						if (actionType[1] === 'ranged') {
 							finalSetAttrs[repeatingString + 'type'] = 'Ranged Weapon';
 							rangedAttack = true;
 						}
-						if (type[1] === 'melee or ranged') {
+						if (actionType[1] === 'melee or ranged') {
 							finalSetAttrs[repeatingString + 'type'] = 'Other';
 						}
 					}
-					if (type[2]) {
-						type[2] = type[2].toLowerCase();
-						if (type[2] === 'spell') {
+					if (actionType[2]) {
+						actionType[2] = type[2].toLowerCase();
+						if (actionType[2] === 'spell') {
 							spellAttack = true;
 						}
 					}
@@ -2692,12 +2728,12 @@ function parseAction (rowId, type) {
 
 				var reach = reachRegex.exec(freetext);
 				if (reach && reach[1]) {
-					finalSetAttrs[repeatingString + 'reach'] = reach[1];
+					finalSetAttrs[repeatingString + 'reach'] = reach[1] + 'ft.';
 					freetext = freetext.replace(reachRegex, '');
 				}
 				var range = rangeRegex.exec(freetext);
 				if (range && range[1] && range[2]) {
-					finalSetAttrs[repeatingString + 'range'] = range[1];
+					finalSetAttrs[repeatingString + 'range'] = range[1] + 'ft.';
 					freetext = freetext.replace(rangeRegex, '');
 				}
 
@@ -2717,41 +2753,16 @@ function parseAction (rowId, type) {
 					finalSetAttrs[repeatingString + 'roll_toggle'] = '0';
 				}
 
-				var damage = damageRegex.exec(freetext);
-				console.log('damage', damage);
-				var damageBonus;
-				if (damage) {
-					/*
-					1 is damage without dice. Example "1"
-					2 is damage with dice. Example "2d6+4"
-					3 is damage type. Example "slashing" or "lightning or thunder"
-					*/
-					if (damage[1]) {
-						damageBonus = damage[1];
-					}
-					if (damage[2]) {
-						var damageParsed = damageParseRegex.exec(damage[2]);
-						if (damageParsed) {
-							if (damageParsed[1]) {
-								finalSetAttrs[repeatingString + 'damage'] = damageParsed[1];
-							}
-							if (damageParsed[2]) {
-								damageBonus = damageParsed[2];
-							}
-						}
-					}
-					damageBonus = getCorrectAbilityBasedOnBonus(finalSetAttrs, repeatingString, 'damage_ability', damageBonus, spellMods, meleeMods, spellAttack, rangedAttack, dexMod);
-					if (damage[3]) {
-						finalSetAttrs[repeatingString + 'damage_type'] = damage[3];
-					}
-					freetext = freetext.replace(damageRegex, '');
-					finalSetAttrs[repeatingString + 'damage_toggle'] = '@{damage_toggle_var}';
-				} else {
-					finalSetAttrs[repeatingString + 'damage_toggle'] = 0;
-				}
+				parseDamage(finalSetAttrs, repeatingString, freetext, damageRegex, 'damage', spellMods, meleeMods, spellAttack, rangedAttack, dexMod);
+				parseDamage(finalSetAttrs, repeatingString, freetext, altDamageSyntax, 'second_damage', spellMods, meleeMods, spellAttack, rangedAttack, dexMod);
+				parseDamage(finalSetAttrs, repeatingString, freetext, damagePlusRegex, 'second_damage', spellMods, meleeMods, spellAttack, rangedAttack, dexMod);
+
 				finalSetAttrs[repeatingString + 'extras_toggle'] = '@{extas_var}';
 			}
 			setFinalAttrs(v, finalSetAttrs);
+			for (var x = 0; x < ids.length; x++) {
+				updateAction(ids[x], type);
+			}
 		});
 	});
 }
