@@ -129,48 +129,378 @@
 					</div>
 					
 					<div class="sheet-row">
-						<div class="sheet-col-1-6"><input type="number" name="attr_dexterity"  min="1" step="1"/></div>
-						<div class="sheet-col-1-6 sheet-core-stat-label">Dex</div>
-						<div class="sheet-col-1-6"><input type="number" name="attr_dexterity_mod" value="(floor((@{dexterity}-10)/2))" disabled="disabled"/></div>
-						<div class="sheet-col-1-6 sheet-vert-middle sheet-checkbox-row"><input type="checkbox" name="attr_dexterity_save_prof" value="@{PB}" /></div>
-						<div class="sheet-col-1-6"><input type="number" name="attr_dexterity_save_mod" value="@{dexterity_mod} + @{dexterity_save_prof}" disabled="disabled"></div>
-						<div class="sheet-col-1-6 sheet-center"><button type="roll" class="sheet-core-save" name="roll_Dexterity_Save" value="&{template:5eDefault} {{character_name=@{character_name}}} {{save=1}} {{title=DEX saving throw}} {{subheader=@{character_name}}} {{rollname=DEX save}} {{roll=[[ 1d20 + [[@{dexterity_save_mod}]] + [[@{global_saving_bonus}]] ]]}} {{rolladv=[[ 1d20 + [[@{dexterity_save_mod}]] + [[@{global_saving_bonus}]] ]]}} @{classactiondexteritysave}">Save</button></div>
+						<div class="sheet-col-1-7"><input type="number" name="attr_dexterity"  min="1" step="1"/></div>
+						<div class="sheet-col-1-7 sheet-core-stat-label">Dex</div>
+						<div class="sheet-col-1-7"><input type="number" name="attr_dexterity_mod" value="(floor((@{dexterity}-10)/2))" disabled="disabled"/></div>
+						<div class="sheet-col-1-7 sheet-vert-middle sheet-checkbox-row"><input type="checkbox" name="attr_dexterity_save_prof" value="@{PB}" /></div>
+						<div class="sheet-col-1-7"><input type="number" name="attr_dexterity_save_mod" value="@{dexterity_mod} + @{dexterity_save_prof}" disabled="disabled"></div>
+						<div class="sheet-col-1-7 sheet-center"><button type="roll" class="sheet-core-save" name="roll_Dexterity_Save" value="&{template:5eDefault} {{character_name=@{character_name}}} {{title=DEX saving throw}} {{subheader=@{character_name}}} {{save=1}} {{savethrow=1}} {{rollname=DEX save}} {{roll1=[[ 1d20 + [[@{dexterity_save_mod}]] + [[@{global_saving_bonus}]] ]]}} @{ro_dexsave} @{classactiondexteritysave}">Save</button></div>
+						<div class="sheet-col-1-7 sheet-align-center">
+							<input type="checkbox" name="attr_dex_save_ro" class="sheet-ro-checkbox" value="1" /><span class="sheet-ro-label">y</span>
+							
+							<!-- Modal template Should be placed as the first element immediately after the input checkbox to open it -->
+							<div class="sheet-ro-modal sheet-save-modal">
+								
+								<div>							
+									<!-- Modal Title and close button row -->
+									<div class="sheet-row sheet-ro-header sheet-border-bottom sheet-padb">
+										<div class="sheet-col-3-4 sheet-ro-title">DEX save throw roll options</div>
+										<div class="sheet-col-1-4 sheet-ro-close-wrapper">
+											<input type="checkbox" name="attr_dex_save_ro" class="sheet-ro-close-checkbox" value="1" />
+											<span class="sheet-ro-close-label"></span>
+										</div>
+									</div>
+									
+									<!-- define hidden attribute to store summary of all options selected -->
+									<input type="hidden" name="attr_ro_dexsave" value="@{ro_dexsave_rolltype}@{ro_dexsave_roll2_closing} @{ro_dexsave_emoteprompt} @{ro_dexsave_showmath}" />
+									
+									<!--Help text and copy of roll button-->
+									<div class="sheet-row sheet-padb">
+										<div class="sheet-col-2-3 sheet-small-note">The settings here apply <b>only</b> to the roll specified in the title above.  </div>
+										<div class="sheet-col-1-3 sheet-padl"><button type="roll" class="sheet-roll" name="roll_Dexterity_Save_ro" value="&{template:5eDefault} {{character_name=@{character_name}}} {{title=DEX saving throw}} {{subheader=@{character_name}}} {{save=1}} {{savethrow=1}} {{rollname=DEX save}} {{roll1=[[ 1d20 + [[@{dexterity_save_mod}]] + [[@{global_saving_bonus}]] ]]}} @{ro_dexsave} @{classactiondexteritysave}">Roll</button></div>
+									</div>
+									
+									<hr/>
+									
+									<!-- Define options here -->
+									
+
+									<div class="sheet-row sheet-checkbox-row">
+										<div class="sheet-col-1-3 sheet-ro-optionlabel">Roll type</div>
+										<div class="sheet-col-2-3 sheet-padl sheet-ro-option">
+											<input type="hidden" name="attr_ro_dexsave_roll2_closing" value="+ [[@{dexterity_save_mod}]] + [[@{global_saving_bonus}]] ]] }}" />
+											 <select name="attr_ro_dexsave_rolltype">
+												<option value="{{showadvroll=1}} {{roll2=[[ 1d20 + [[@{dexterity_save_mod}]] + [[@{global_saving_bonus}]] ]]}}">Roll 2d20</option>
+												<option value="{{noadvroll=1}}">Roll 1d20</option>
+												<option value="?{Roll type?|Normal,&#123&#123noadvroll=1&#125&#125 |Advantage,&#123&#123rollhasadv=1&#125&#125 &#123&#123roll2=[[1d20  |Disadvantage,&#123&#123rollhasdisadv=1&#125&#125 &#123&#123roll2=[[1d20}">Prompt for adv/disadv</option>
+											</select>
+										</div>
+									</div>
+									
+									<hr/>
+									
+									<div class="sheet-row sheet-checkbox-row">
+										<div class="sheet-col-1-3 sheet-ro-optionlabel">Prompt for emote?</div>
+										<div class="sheet-col-2-3 sheet-padl sheet-ro-option"><input type="checkbox" name="attr_ro_dexsave_emoteprompt" value="{{emote=?{Emote text} }}"></div>
+									</div>
+									
+									<hr/>
+									
+									<div class="sheet-row sheet-checkbox-row">
+										<div class="sheet-col-1-3 sheet-ro-optionlabel">Show math?</div>
+										<div class="sheet-col-2-3 sheet-padl sheet-ro-option"><input type="checkbox" name="attr_ro_dexsave_showmath" value="{{math=1d20
+										+ [[@{dexterity_save_mod}]] [Save mod]
+										+ (@{global_saving_bonus}) [Global save bonus]}}"></div>
+									</div>
+									
+
+									
+									
+								</div> <!-- close inner modal div -->
+							</div> <!-- close outer modal div -->
+							
+							
+						</div>
 					</div>
 					
 					<div class="sheet-row">
-						<div class="sheet-col-1-6"><input type="number" name="attr_constitution" min="1" step="1"/></div>
-						<div class="sheet-col-1-6 sheet-core-stat-label">Con</div>
-						<div class="sheet-col-1-6"><input type="number" name="attr_constitution_mod" value="(floor((@{constitution}-10)/2))" disabled="disabled"/></div>
-						<div class="sheet-col-1-6 sheet-vert-middle sheet-checkbox-row"><input type="checkbox" name="attr_constitution_save_prof" value="@{PB}" /></div>
-						<div class="sheet-col-1-6"><input type="number" name="attr_constitution_save_mod" value="@{constitution_mod} + @{constitution_save_prof}" disabled="disabled"></div>
-						<div class="sheet-col-1-6 sheet-center"><button type="roll" class="sheet-core-save" name="roll_Constitution_Save" value="&{template:5eDefault} {{character_name=@{character_name}}} {{save=1}} {{title=CON saving throw}} {{subheader=@{character_name}}} {{rollname=CON save}} {{roll=[[ 1d20 + [[@{constitution_save_mod}]] + [[@{global_saving_bonus}]] ]]}} {{rolladv=[[ 1d20 + [[@{constitution_save_mod}]] + [[@{global_saving_bonus}]] ]]}} @{classactionconstitutionsave}">Save</button></div>
+						<div class="sheet-col-1-7"><input type="number" name="attr_constitution" min="1" step="1"/></div>
+						<div class="sheet-col-1-7 sheet-core-stat-label">Con</div>
+						<div class="sheet-col-1-7"><input type="number" name="attr_constitution_mod" value="(floor((@{constitution}-10)/2))" disabled="disabled"/></div>
+						<div class="sheet-col-1-7 sheet-vert-middle sheet-checkbox-row"><input type="checkbox" name="attr_constitution_save_prof" value="@{PB}" /></div>
+						<div class="sheet-col-1-7"><input type="number" name="attr_constitution_save_mod" value="@{constitution_mod} + @{constitution_save_prof}" disabled="disabled"></div>
+						<div class="sheet-col-1-7 sheet-center"><button type="roll" class="sheet-core-save" name="roll_Constitution_Save" value="&{template:5eDefault} {{character_name=@{character_name}}} {{title=CON saving throw}} {{subheader=@{character_name}}} {{save=1}} {{savethrow=1}} {{rollname=CON save}} {{roll1=[[ 1d20 + [[@{constitution_save_mod}]] + [[@{global_saving_bonus}]] ]]}} @{ro_consave} @{classactionconstitutionsave}">Save</button></div>
+						<div class="sheet-col-1-7 sheet-align-center">
+							<input type="checkbox" name="attr_con_save_ro" class="sheet-ro-checkbox" value="1" /><span class="sheet-ro-label">y</span>
+							
+							<!-- Modal template Should be placed as the first element immediately after the input checkbox to open it -->
+							<div class="sheet-ro-modal sheet-save-modal">
+								
+								<div>							
+									<!-- Modal Title and close button row -->
+									<div class="sheet-row sheet-ro-header sheet-border-bottom sheet-padb">
+										<div class="sheet-col-3-4 sheet-ro-title">CON save throw roll options</div>
+										<div class="sheet-col-1-4 sheet-ro-close-wrapper">
+											<input type="checkbox" name="attr_con_save_ro" class="sheet-ro-close-checkbox" value="1" />
+											<span class="sheet-ro-close-label"></span>
+										</div>
+									</div>
+									
+									<!-- define hidden attribute to store summary of all options selected -->
+									<input type="hidden" name="attr_ro_consave" value="@{ro_consave_rolltype}@{ro_consave_roll2_closing} @{ro_consave_emoteprompt} @{ro_consave_showmath}" />
+									
+									<!--Help text and copy of roll button-->
+									<div class="sheet-row sheet-padb">
+										<div class="sheet-col-2-3 sheet-small-note">The settings here apply <b>only</b> to the roll specified in the title above.  </div>
+										<div class="sheet-col-1-3 sheet-padl"><button type="roll" class="sheet-roll" name="roll_Constitution_Save_ro" value="&{template:5eDefault} {{character_name=@{character_name}}} {{title=CON saving throw}} {{subheader=@{character_name}}} {{save=1}} {{savethrow=1}} {{rollname=CON save}} {{roll1=[[ 1d20 + [[@{constitution_save_mod}]] + [[@{global_saving_bonus}]] ]]}} @{ro_consave} @{classactionconstitutionsave}">Roll</button></div>
+									</div>
+									
+									<hr/>
+									
+									<!-- Define options here -->
+									
+
+									<div class="sheet-row sheet-checkbox-row">
+										<div class="sheet-col-1-3 sheet-ro-optionlabel">Roll type</div>
+										<div class="sheet-col-2-3 sheet-padl sheet-ro-option">
+											<input type="hidden" name="attr_ro_consave_roll2_closing" value="+ [[@{constitution_save_mod}]] + [[@{global_saving_bonus}]] ]] }}" />
+											 <select name="attr_ro_consave_rolltype">
+												<option value="{{showadvroll=1}} {{roll2=[[ 1d20 + [[@{constitution_save_mod}]] + [[@{global_saving_bonus}]] ]]}}">Roll 2d20</option>
+												<option value="{{noadvroll=1}}">Roll 1d20</option>
+												<option value="?{Roll type?|Normal,&#123&#123noadvroll=1&#125&#125 |Advantage,&#123&#123rollhasadv=1&#125&#125 &#123&#123roll2=[[1d20  |Disadvantage,&#123&#123rollhasdisadv=1&#125&#125 &#123&#123roll2=[[1d20}">Prompt for adv/disadv</option>
+											</select>
+										</div>
+									</div>
+									
+									<hr/>
+									
+									<div class="sheet-row sheet-checkbox-row">
+										<div class="sheet-col-1-3 sheet-ro-optionlabel">Prompt for emote?</div>
+										<div class="sheet-col-2-3 sheet-padl sheet-ro-option"><input type="checkbox" name="attr_ro_consave_emoteprompt" value="{{emote=?{Emote text} }}"></div>
+									</div>
+									
+									<hr/>
+									
+									<div class="sheet-row sheet-checkbox-row">
+										<div class="sheet-col-1-3 sheet-ro-optionlabel">Show math?</div>
+										<div class="sheet-col-2-3 sheet-padl sheet-ro-option"><input type="checkbox" name="attr_ro_consave_showmath" value="{{math=1d20
+										+ [[@{constitution_save_mod}]] [Save mod]
+										+ (@{global_saving_bonus}) [Global save bonus]}}"></div>
+									</div>
+									
+
+									
+									
+								</div> <!-- close inner modal div -->
+							</div> <!-- close outer modal div -->
+							
+							
+						</div>
 					</div>
 					
 					<div class="sheet-row">
-						<div class="sheet-col-1-6"><input type="number" name="attr_intelligence" min="1" step="1"/></div>
-						<div class="sheet-col-1-6 sheet-core-stat-label">Int</div>
-						<div class="sheet-col-1-6"><input type="number" name="attr_intelligence_mod" value="(floor((@{intelligence}-10)/2))" disabled="disabled"/></div>
-						<div class="sheet-col-1-6 sheet-vert-middle sheet-checkbox-row"><input type="checkbox" name="attr_intelligence_save_prof" value="@{PB}" /></div>
-						<div class="sheet-col-1-6"><input type="number" name="attr_intelligence_save_mod" value="@{intelligence_mod} + @{intelligence_save_prof}" disabled="disabled"></div>
-						<div class="sheet-col-1-6 sheet-center"><button type="roll" class="sheet-core-save" name="roll_Intelligence_Save" value="&{template:5eDefault} {{character_name=@{character_name}}} {{save=1}} {{title=INT saving throw}} {{subheader=@{character_name}}} {{rollname=INT save}} {{roll=[[ 1d20 + [[@{intelligence_save_mod}]] + [[@{global_saving_bonus}]] ]]}} {{rolladv=[[ 1d20 + [[@{intelligence_save_mod}]] + [[@{global_saving_bonus}]] ]]}} @{classactionintelligencesave}">Save</button></div>
+						<div class="sheet-col-1-7"><input type="number" name="attr_intelligence" min="1" step="1"/></div>
+						<div class="sheet-col-1-7 sheet-core-stat-label">Int</div>
+						<div class="sheet-col-1-7"><input type="number" name="attr_intelligence_mod" value="(floor((@{intelligence}-10)/2))" disabled="disabled"/></div>
+						<div class="sheet-col-1-7 sheet-vert-middle sheet-checkbox-row"><input type="checkbox" name="attr_intelligence_save_prof" value="@{PB}" /></div>
+						<div class="sheet-col-1-7"><input type="number" name="attr_intelligence_save_mod" value="@{intelligence_mod} + @{intelligence_save_prof}" disabled="disabled"></div>
+						<div class="sheet-col-1-7 sheet-center"><button type="roll" class="sheet-core-save" name="roll_Intelligence_Save" value="&{template:5eDefault} {{character_name=@{character_name}}} {{title=INT saving throw}} {{subheader=@{character_name}}} {{save=1}} {{savethrow=1}} {{rollname=INT save}} {{roll1=[[ 1d20 + [[@{intelligence_save_mod}]] + [[@{global_saving_bonus}]] ]]}} @{ro_intsave} @{classactionintelligencesave}">Save</button></div>
+						<div class="sheet-col-1-7 sheet-align-center">
+							<input type="checkbox" name="attr_int_save_ro" class="sheet-ro-checkbox" value="1" /><span class="sheet-ro-label">y</span>
+							
+							<!-- Modal template Should be placed as the first element immediately after the input checkbox to open it -->
+							<div class="sheet-ro-modal sheet-save-modal">
+								
+								<div>							
+									<!-- Modal Title and close button row -->
+									<div class="sheet-row sheet-ro-header sheet-border-bottom sheet-padb">
+										<div class="sheet-col-3-4 sheet-ro-title">INT save throw roll options</div>
+										<div class="sheet-col-1-4 sheet-ro-close-wrapper">
+											<input type="checkbox" name="attr_int_save_ro" class="sheet-ro-close-checkbox" value="1" />
+											<span class="sheet-ro-close-label"></span>
+										</div>
+									</div>
+									
+									<!-- define hidden attribute to store summary of all options selected -->
+									<input type="hidden" name="attr_ro_intsave" value="@{ro_intsave_rolltype}@{ro_intsave_roll2_closing} @{ro_intsave_emoteprompt} @{ro_intsave_showmath}" />
+									
+									<!--Help text and copy of roll button-->
+									<div class="sheet-row sheet-padb">
+										<div class="sheet-col-2-3 sheet-small-note">The settings here apply <b>only</b> to the roll specified in the title above.  </div>
+										<div class="sheet-col-1-3 sheet-padl"><button type="roll" class="sheet-roll" name="roll_Intelligence_Save_ro" value="&{template:5eDefault} {{character_name=@{character_name}}} {{title=INT saving throw}} {{subheader=@{character_name}}} {{save=1}} {{savethrow=1}} {{rollname=INT save}} {{roll1=[[ 1d20 + [[@{intelligence_save_mod}]] + [[@{global_saving_bonus}]] ]]}} @{ro_intsave} @{classactionintelligencesave}">Roll</button></div>
+									</div>
+									
+									<hr/>
+									
+									<!-- Define options here -->
+									
+
+									<div class="sheet-row sheet-checkbox-row">
+										<div class="sheet-col-1-3 sheet-ro-optionlabel">Roll type</div>
+										<div class="sheet-col-2-3 sheet-padl sheet-ro-option">
+											<input type="hidden" name="attr_ro_intsave_roll2_closing" value="+ [[@{intelligence_save_mod}]] + [[@{global_saving_bonus}]] ]] }}" />
+											 <select name="attr_ro_intsave_rolltype">
+												<option value="{{showadvroll=1}} {{roll2=[[ 1d20 + [[@{intelligence_save_mod}]] + [[@{global_saving_bonus}]] ]]}}">Roll 2d20</option>
+												<option value="{{noadvroll=1}}">Roll 1d20</option>
+												<option value="?{Roll type?|Normal,&#123&#123noadvroll=1&#125&#125 |Advantage,&#123&#123rollhasadv=1&#125&#125 &#123&#123roll2=[[1d20  |Disadvantage,&#123&#123rollhasdisadv=1&#125&#125 &#123&#123roll2=[[1d20}">Prompt for adv/disadv</option>
+											</select>
+										</div>
+									</div>
+									
+									<hr/>
+									
+									<div class="sheet-row sheet-checkbox-row">
+										<div class="sheet-col-1-3 sheet-ro-optionlabel">Prompt for emote?</div>
+										<div class="sheet-col-2-3 sheet-padl sheet-ro-option"><input type="checkbox" name="attr_ro_intsave_emoteprompt" value="{{emote=?{Emote text} }}"></div>
+									</div>
+									
+									<hr/>
+									
+									<div class="sheet-row sheet-checkbox-row">
+										<div class="sheet-col-1-3 sheet-ro-optionlabel">Show math?</div>
+										<div class="sheet-col-2-3 sheet-padl sheet-ro-option"><input type="checkbox" name="attr_ro_intsave_showmath" value="{{math=1d20
+										+ [[@{intelligence_save_mod}]] [Save mod]
+										+ (@{global_saving_bonus}) [Global save bonus]}}"></div>
+									</div>
+									
+
+									
+									
+								</div> <!-- close inner modal div -->
+							</div> <!-- close outer modal div -->
+							
+							
+						</div>
 					</div>
 					
 					<div class="sheet-row">
-						<div class="sheet-col-1-6"><input type="number" name="attr_wisdom" min="1" step="1"/></div>
-						<div class="sheet-col-1-6 sheet-core-stat-label">Wis</div>
-						<div class="sheet-col-1-6"><input type="number" name="attr_wisdom_mod" value="(floor((@{wisdom}-10)/2))" disabled="disabled"/></div>
-						<div class="sheet-col-1-6 sheet-vert-middle sheet-checkbox-row"><input type="checkbox" name="attr_wisdom_save_prof" value="@{PB}" /></div>
-						<div class="sheet-col-1-6"><input type="number" name="attr_wisdom_save_mod" value="@{wisdom_mod} + @{wisdom_save_prof}" disabled="disabled"></div>
-						<div class="sheet-col-1-6 sheet-center"><button type="roll" class="sheet-core-save" name="roll_Wisdom_Save" value="&{template:5eDefault} {{character_name=@{character_name}}} {{save=1}} {{title=WIS saving throw}} {{subheader=@{character_name}}} {{rollname=WIS save}} {{roll=[[ 1d20 + [[@{wisdom_save_mod}]] + [[@{global_saving_bonus}]] ]]}} {{rolladv=[[ 1d20 + [[@{wisdom_save_mod}]] + [[@{global_saving_bonus}]] ]]}} @{classactionwisdomsave}">Save</button></div>
+						<div class="sheet-col-1-7"><input type="number" name="attr_wisdom" min="1" step="1"/></div>
+						<div class="sheet-col-1-7 sheet-core-stat-label">Wis</div>
+						<div class="sheet-col-1-7"><input type="number" name="attr_wisdom_mod" value="(floor((@{wisdom}-10)/2))" disabled="disabled"/></div>
+						<div class="sheet-col-1-7 sheet-vert-middle sheet-checkbox-row"><input type="checkbox" name="attr_wisdom_save_prof" value="@{PB}" /></div>
+						<div class="sheet-col-1-7"><input type="number" name="attr_wisdom_save_mod" value="@{wisdom_mod} + @{wisdom_save_prof}" disabled="disabled"></div>
+						<div class="sheet-col-1-7 sheet-center"><button type="roll" class="sheet-core-save" name="roll_Wisdom_Save" value="&{template:5eDefault} {{character_name=@{character_name}}} {{title=WIS saving throw}} {{subheader=@{character_name}}} {{save=1}} {{savethrow=1}} {{rollname=WIS save}} {{roll1=[[ 1d20 + [[@{wisdom_save_mod}]] + [[@{global_saving_bonus}]] ]]}} @{ro_wissave} @{classactionwisdomsave}">Save</button></div>
+						<div class="sheet-col-1-7 sheet-align-center">
+							<input type="checkbox" name="attr_wis_save_ro" class="sheet-ro-checkbox" value="1" /><span class="sheet-ro-label">y</span>
+							
+							<!-- Modal template Should be placed as the first element immediately after the input checkbox to open it -->
+							<div class="sheet-ro-modal sheet-save-modal">
+								
+								<div>							
+									<!-- Modal Title and close button row -->
+									<div class="sheet-row sheet-ro-header sheet-border-bottom sheet-padb">
+										<div class="sheet-col-3-4 sheet-ro-title">WIS save throw roll options</div>
+										<div class="sheet-col-1-4 sheet-ro-close-wrapper">
+											<input type="checkbox" name="attr_wis_save_ro" class="sheet-ro-close-checkbox" value="1" />
+											<span class="sheet-ro-close-label"></span>
+										</div>
+									</div>
+									
+									<!-- define hidden attribute to store summary of all options selected -->
+									<input type="hidden" name="attr_ro_wissave" value="@{ro_wissave_rolltype}@{ro_wissave_roll2_closing} @{ro_wissave_emoteprompt} @{ro_wissave_showmath}" />
+									
+									<!--Help text and copy of roll button-->
+									<div class="sheet-row sheet-padb">
+										<div class="sheet-col-2-3 sheet-small-note">The settings here apply <b>only</b> to the roll specified in the title above.  </div>
+										<div class="sheet-col-1-3 sheet-padl"><button type="roll" class="sheet-roll" name="roll_Wisdom_Save_ro" value="&{template:5eDefault} {{character_name=@{character_name}}} {{title=WIS saving throw}} {{subheader=@{character_name}}} {{save=1}} {{savethrow=1}} {{rollname=WIS save}} {{roll1=[[ 1d20 + [[@{wisdom_save_mod}]] + [[@{global_saving_bonus}]] ]]}} @{ro_wissave} @{classactionwisdomsave}">Roll</button></div>
+									</div>
+									
+									<hr/>
+									
+									<!-- Define options here -->
+									
+
+									<div class="sheet-row sheet-checkbox-row">
+										<div class="sheet-col-1-3 sheet-ro-optionlabel">Roll type</div>
+										<div class="sheet-col-2-3 sheet-padl sheet-ro-option">
+											<input type="hidden" name="attr_ro_wissave_roll2_closing" value="+ [[@{wisdom_save_mod}]] + [[@{global_saving_bonus}]] ]] }}" />
+											 <select name="attr_ro_wissave_rolltype">
+												<option value="{{showadvroll=1}} {{roll2=[[ 1d20 + [[@{wisdom_save_mod}]] + [[@{global_saving_bonus}]] ]]}}">Roll 2d20</option>
+												<option value="{{noadvroll=1}}">Roll 1d20</option>
+												<option value="?{Roll type?|Normal,&#123&#123noadvroll=1&#125&#125 |Advantage,&#123&#123rollhasadv=1&#125&#125 &#123&#123roll2=[[1d20  |Disadvantage,&#123&#123rollhasdisadv=1&#125&#125 &#123&#123roll2=[[1d20}">Prompt for adv/disadv</option>
+											</select>
+										</div>
+									</div>
+									
+									<hr/>
+									
+									<div class="sheet-row sheet-checkbox-row">
+										<div class="sheet-col-1-3 sheet-ro-optionlabel">Prompt for emote?</div>
+										<div class="sheet-col-2-3 sheet-padl sheet-ro-option"><input type="checkbox" name="attr_ro_wissave_emoteprompt" value="{{emote=?{Emote text} }}"></div>
+									</div>
+									
+									<hr/>
+									
+									<div class="sheet-row sheet-checkbox-row">
+										<div class="sheet-col-1-3 sheet-ro-optionlabel">Show math?</div>
+										<div class="sheet-col-2-3 sheet-padl sheet-ro-option"><input type="checkbox" name="attr_ro_wissave_showmath" value="{{math=1d20
+										+ [[@{wisdom_save_mod}]] [Save mod]
+										+ (@{global_saving_bonus}) [Global save bonus]}}"></div>
+									</div>
+									
+
+									
+									
+								</div> <!-- close inner modal div -->
+							</div> <!-- close outer modal div -->
+							
+							
+						</div>
 					</div>
 					
 					<div class="sheet-row">
-						<div class="sheet-col-1-6"><input type="number" name="attr_charisma" min="1" step="1"/></div>
-						<div class="sheet-col-1-6 sheet-core-stat-label">Cha</div>
-						<div class="sheet-col-1-6"><input type="number" name="attr_charisma_mod" value="(floor((@{charisma}-10)/2))" disabled="disabled"/></div>
-						<div class="sheet-col-1-6 sheet-vert-middle sheet-checkbox-row"><input type="checkbox" name="attr_charisma_save_prof" value="@{PB}" /></div>
-						<div class="sheet-col-1-6"><input type="number" name="attr_charisma_save_mod" value="@{charisma_mod} + @{charisma_save_prof}" disabled="disabled"></div>
-						<div class="sheet-col-1-6 sheet-center"><button type="roll" class="sheet-core-save" name="roll_Charisma_Save" value="&{template:5eDefault} {{character_name=@{character_name}}} {{save=1}} {{title=CHA saving throw}} {{subheader=@{character_name}}} {{rollname=CHA save}} {{roll=[[ 1d20 + [[@{charisma_save_mod}]] + [[@{global_saving_bonus}]] ]]}} {{rolladv=[[ 1d20 + [[@{charisma_save_mod}]] + [[@{global_saving_bonus}]] ]]}} @{classactioncharismasave}">Save</button></div>
+						<div class="sheet-col-1-7"><input type="number" name="attr_charisma" min="1" step="1"/></div>
+						<div class="sheet-col-1-7 sheet-core-stat-label">Cha</div>
+						<div class="sheet-col-1-7"><input type="number" name="attr_charisma_mod" value="(floor((@{charisma}-10)/2))" disabled="disabled"/></div>
+						<div class="sheet-col-1-7 sheet-vert-middle sheet-checkbox-row"><input type="checkbox" name="attr_charisma_save_prof" value="@{PB}" /></div>
+						<div class="sheet-col-1-7"><input type="number" name="attr_charisma_save_mod" value="@{charisma_mod} + @{charisma_save_prof}" disabled="disabled"></div>
+						<div class="sheet-col-1-7 sheet-center"><button type="roll" class="sheet-core-save" name="roll_Charismaa_Save" value="&{template:5eDefault} {{character_name=@{character_name}}} {{title=CHA saving throw}} {{subheader=@{character_name}}} {{save=1}} {{savethrow=1}} {{rollname=CHA save}} {{roll1=[[ 1d20 + [[@{charisma_save_mod}]] + [[@{global_saving_bonus}]] ]]}} @{ro_chasave} @{classactioncharismasave}">Save</button></div>
+						<div class="sheet-col-1-7 sheet-align-center">
+							<input type="checkbox" name="attr_cha_save_ro" class="sheet-ro-checkbox" value="1" /><span class="sheet-ro-label">y</span>
+							
+							<!-- Modal template Should be placed as the first element immediately after the input checkbox to open it -->
+							<div class="sheet-ro-modal sheet-save-modal">
+								
+								<div>							
+									<!-- Modal Title and close button row -->
+									<div class="sheet-row sheet-ro-header sheet-border-bottom sheet-padb">
+										<div class="sheet-col-3-4 sheet-ro-title">CHA save throw roll options</div>
+										<div class="sheet-col-1-4 sheet-ro-close-wrapper">
+											<input type="checkbox" name="attr_cha_save_ro" class="sheet-ro-close-checkbox" value="1" />
+											<span class="sheet-ro-close-label"></span>
+										</div>
+									</div>
+									
+									<!-- define hidden attribute to store summary of all options selected -->
+									<input type="hidden" name="attr_ro_chasave" value="@{ro_chasave_rolltype}@{ro_chasave_roll2_closing} @{ro_chasave_emoteprompt} @{ro_chasave_showmath}" />
+									
+									<!--Help text and copy of roll button-->
+									<div class="sheet-row sheet-padb">
+										<div class="sheet-col-2-3 sheet-small-note">The settings here apply <b>only</b> to the roll specified in the title above.  </div>
+										<div class="sheet-col-1-3 sheet-padl"><button type="roll" class="sheet-roll" name="roll_Charisma_Save_ro" value="&{template:5eDefault} {{character_name=@{character_name}}} {{title=CHA saving throw}} {{subheader=@{character_name}}} {{save=1}} {{savethrow=1}} {{rollname=CHA save}} {{roll1=[[ 1d20 + [[@{charisma_save_mod}]] + [[@{global_saving_bonus}]] ]]}} @{ro_chasave} @{classactioncharismasave}">Roll</button></div>
+									</div>
+									
+									<hr/>
+									
+									<!-- Define options here -->
+									
+
+									<div class="sheet-row sheet-checkbox-row">
+										<div class="sheet-col-1-3 sheet-ro-optionlabel">Roll type</div>
+										<div class="sheet-col-2-3 sheet-padl sheet-ro-option">
+											<input type="hidden" name="attr_ro_chasave_roll2_closing" value="+ [[@{charisma_save_mod}]] + [[@{global_saving_bonus}]] ]] }}" />
+											 <select name="attr_ro_chasave_rolltype">
+												<option value="{{showadvroll=1}} {{roll2=[[ 1d20 + [[@{charisma_save_mod}]] + [[@{global_saving_bonus}]] ]]}}">Roll 2d20</option>
+												<option value="{{noadvroll=1}}">Roll 1d20</option>
+												<option value="?{Roll type?|Normal,&#123&#123noadvroll=1&#125&#125 |Advantage,&#123&#123rollhasadv=1&#125&#125 &#123&#123roll2=[[1d20  |Disadvantage,&#123&#123rollhasdisadv=1&#125&#125 &#123&#123roll2=[[1d20}">Prompt for adv/disadv</option>
+											</select>
+										</div>
+									</div>
+									
+									<hr/>
+									
+									<div class="sheet-row sheet-checkbox-row">
+										<div class="sheet-col-1-3 sheet-ro-optionlabel">Prompt for emote?</div>
+										<div class="sheet-col-2-3 sheet-padl sheet-ro-option"><input type="checkbox" name="attr_ro_chasave_emoteprompt" value="{{emote=?{Emote text} }}"></div>
+									</div>
+									
+									<hr/>
+									
+									<div class="sheet-row sheet-checkbox-row">
+										<div class="sheet-col-1-3 sheet-ro-optionlabel">Show math?</div>
+										<div class="sheet-col-2-3 sheet-padl sheet-ro-option"><input type="checkbox" name="attr_ro_chasave_showmath" value="{{math=1d20
+										+ [[@{charisma_save_mod}]] [Save mod]
+										+ (@{global_saving_bonus}) [Global save bonus]}}"></div>
+									</div>
+									
+
+									
+									
+								</div> <!-- close inner modal div -->
+							</div> <!-- close outer modal div -->
+							
+							
+						</div>
 					</div>
 				
 				</div>
@@ -13808,7 +14138,7 @@
 					{{#rollhasadv}}
 						<div class="sheet-row">
 							<div class="sheet-col-5-12 sheet-padl sheet-padr sheet-rt-key">Roll type</div>
-							<div class="sheet-col-7-12 sheet-padl sheet-padr sheet-rt-value">With advantage</div>
+							<div class="sheet-col-7-12 sheet-padr sheet-rt-value">With advantage</div>
 						</div>			
 					{{/rollhasadv}}
 					
@@ -13847,7 +14177,7 @@
 					{{#math}}
 						<div class="sheet-row">
 							<div class="sheet-col-5-12 sheet-padl sheet-padr sheet-rt-key">Math</div>
-							<div class="sheet-col-7-12 sheet-padl sheet-padr sheet-rt-value sheet-no-roll-highlight">{{math}}</div>
+							<div class="sheet-col-7-12 sheet-padr sheet-rt-value sheet-no-roll-highlight">{{math}}</div>
 						</div>			
 					{{/math}}
 				
