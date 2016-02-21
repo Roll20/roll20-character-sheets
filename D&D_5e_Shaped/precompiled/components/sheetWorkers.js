@@ -2456,6 +2456,9 @@ function updateAction (rowId, type) {
 	var collectionArray = ['pb', 'strength_mod', 'finesse_mod', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability'];
 	var finalSetAttrs = {};
 
+	var rechargeRegex = /\s*?\((?:Recharge\s*?(\d+\-\d+|\d+)|Recharges\safter\sa\s(.*))\)/gi;
+	var rechargeDayRegex = /\s*?\((\d+\/Day)\)/gi;
+
 	for (var i = 0; i < ABILITIES.length; i++) {
 		collectionArray.push(ABILITIES[i] + '_mod');
 	}
@@ -2494,6 +2497,7 @@ function updateAction (rowId, type) {
 			collectionArray.push(repeatingString + 'damage_string');
 			collectionArray.push(repeatingString + 'parsed');
 			collectionArray.push(repeatingString + 'recharge');
+			collectionArray.push(repeatingString + 'recharge_display');
 		}
 
 		getAttrs(collectionArray, function (v) {
@@ -2503,16 +2507,26 @@ function updateAction (rowId, type) {
 				var actionName = v[repeatingString + 'name'];
 				if (!exists(actionName)) {
 					return;
+				} else {
+					var rechargeResult = rechargeRegex.exec(actionName);
+					if (rechargeResult) {
+						finalSetAttrs[repeatingString + 'recharge'] = rechargeResult[1] || rechargeResult[2];
+						finalSetAttrs[repeatingString + 'name'] = name.replace(rechargeRegex, '');
+					}
+					var rechargeDayResult = rechargeDayRegex.exec(actionName);
+					if (rechargeDayResult) {
+						finalSetAttrs[repeatingString + 'recharge'] = rechargeDayResult[1] || rechargeDayResult[2];
+						finalSetAttrs[repeatingString + 'name'] = name.replace(rechargeDayRegex, '');
+					}
 				}
-
-				var recharge = v[repeatingString + 'recharge'];
+				var recharge = fromVOrFinalSetAttrs(v, finalSetAttrs, repeatingString + 'recharge');
 				if (exists(recharge)) {
 					if (recharge.indexOf('/Day') !== -1 || recharge.indexOf('/day') !== -1) {
-						finalSetAttrs[repeatingString + 'recharge_display'] = '(' + recharge + ')';
+						finalSetAttrs[repeatingString + 'recharge_display'] = ' (' + recharge + ')';
 					} else {
-						finalSetAttrs[repeatingString + 'recharge_display'] = '(Recharge ' + recharge + ')';
+						finalSetAttrs[repeatingString + 'recharge_display'] = ' (Recharge ' + recharge + ')';
 					}
-				} else {
+				} else if (exists(v[repeatingString + 'recharge_display'])) {
 					finalSetAttrs[repeatingString + 'recharge_display'] = '';
 				}
 
@@ -2541,12 +2555,44 @@ function updateAction (rowId, type) {
 		});
 	});
 }
+on('change:repeating_trait', function (eventInfo) {
+	var changedField = getRepeatingField('repeating_trait', eventInfo);
+	if (changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed' && changedField !== 'recharge_display') {
+		console.log('trait changedField', changedField);
+		var rowId = getRowId('repeating_trait', eventInfo);
+		updateAction(rowId, 'trait');
+	}
+});
 on('change:repeating_action', function (eventInfo) {
 	var changedField = getRepeatingField('repeating_action', eventInfo);
-	if (changedField !== '') {
+	if (changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed' && changedField !== 'recharge_display') {
 		console.log('action changedField', changedField);
 		var rowId = getRowId('repeating_action', eventInfo);
 		updateAction(rowId, 'action');
+	}
+});
+on('change:repeating_reaction', function (eventInfo) {
+	var changedField = getRepeatingField('repeating_reaction', eventInfo);
+	if (changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed' && changedField !== 'recharge_display') {
+		console.log('action changedField', changedField);
+		var rowId = getRowId('repeating_reaction', eventInfo);
+		updateAction(rowId, 'reaction');
+	}
+});
+on('change:repeating_legendaryaction', function (eventInfo) {
+	var changedField = getRepeatingField('repeating_legendaryaction', eventInfo);
+	if (changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed' && changedField !== 'recharge_display') {
+		console.log('action changedField', changedField);
+		var rowId = getRowId('repeating_legendaryaction', eventInfo);
+		updateAction(rowId, 'legendaryaction');
+	}
+});
+on('change:repeating_lairaction', function (eventInfo) {
+	var changedField = getRepeatingField('repeating_lairaction', eventInfo);
+	if (changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed' && changedField !== 'recharge_display') {
+		console.log('action changedField', changedField);
+		var rowId = getRowId('repeating_lairaction', eventInfo);
+		updateAction(rowId, 'lairaction');
 	}
 });
 
@@ -2580,8 +2626,6 @@ function parseAction (rowId, type) {
 	var saveOrRegex = new RegExp(savingThrow.source + againstDisease.source + commaPeriodDefinitiveSpace.source + orAnythingElseNoTake.source, 'i');
 	var	saveFailedSaveRegex = new RegExp(savingThrow.source + commaPeriodSpace.source + saveFailure.source, 'i');
 
-	var rechargeRegex = /\s*?\((?:Recharge\s*?(\d+\-\d+|\d+)|Recharges\safter\sa\s(.*))\)/gi;
-	var rechargeDayRegex = /\s*?\((\d+\/Day)\)/gi;
 	var typeRegex = /(melee|ranged|melee or ranged)\s*(spell|weapon)\s*/gi;
 	var toHitRegex = /\+\s?(\d+)\s*(?:to hit)/gi;
 	var reachRegex = /(?:reach)\s?(\d+)\s?(?:ft)/gi;
@@ -2618,23 +2662,9 @@ function parseAction (rowId, type) {
 
 				var rangedAttack = false;
 				var spellAttack = false;
-				var closest;
 
 				var name = v[repeatingString + 'name'];
 				var freetext = v[repeatingString + 'freetext'];
-
-				if (name) {
-					var rechargeResult = rechargeRegex.exec(name);
-					if (rechargeResult) {
-						finalSetAttrs[repeatingString + 'recharge'] = rechargeResult[1] || rechargeResult[2];
-						finalSetAttrs[repeatingString + 'name'] = name.replace(rechargeRegex, '');
-					}
-					var rechargeDayResult = rechargeDayRegex.exec(name);
-					if (rechargeDayResult) {
-						finalSetAttrs[repeatingString + 'recharge'] = rechargeDayResult[1] || rechargeDayResult[2];
-						finalSetAttrs[repeatingString + 'name'] = name.replace(rechargeDayRegex, '');
-					}
-				}
 
 				var type = typeRegex.exec(freetext);
 				if (type) {
@@ -2725,13 +2755,54 @@ function parseAction (rowId, type) {
 		});
 	});
 }
+on('change:repeating_trait:freetext', function (eventInfo) {
+	var rowId = getRowId('repeating_trait', eventInfo);
+	parseAction(rowId, 'trait');
+});
 on('change:repeating_action:freetext', function (eventInfo) {
-	var changedField = getRepeatingField('repeating_action', eventInfo);
-	if (changedField !== '') {
-		console.log('action changedField', changedField);
-		var rowId = getRowId('repeating_action', eventInfo);
-		parseAction(rowId, 'action');
-	}
+	var rowId = getRowId('repeating_action', eventInfo);
+	parseAction(rowId, 'action');
+});
+on('change:repeating_reaction:freetext', function (eventInfo) {
+	var rowId = getRowId('repeating_reaction', eventInfo);
+	parseAction(rowId, 'reaction');
+});
+on('change:repeating_legendaryaction:freetext', function (eventInfo) {
+	var rowId = getRowId('repeating_legendaryaction', eventInfo);
+	parseAction(rowId, 'legendaryaction');
+});
+on('change:repeating_lairaction:freetext', function (eventInfo) {
+	var rowId = getRowId('repeating_lairaction', eventInfo);
+	parseAction(rowId, 'lairaction');
+});
+
+function countAction (type) {
+	var repeatingItem = 'repeating_' + type;
+	var finalSetAttrs = {};
+
+	finalSetAttrs[type + 's_exist'] = 0;
+
+	getSectionIDs(repeatingItem, function (ids) {
+		if (ids.length > 0) {
+			finalSetAttrs[type + 's_exist'] = 1;
+		}
+		setFinalAttrs({}, finalSetAttrs);
+	});
+}
+on('change:repeating_trait remove:repeating_trait', function () {
+	countAction('trait');
+});
+on('change:repeating_action remove:repeating_action', function () {
+	countAction('action');
+});
+on('change:repeating_reaction remove:repeating_reaction', function () {
+	countAction('reaction');
+});
+on('change:repeating_legendaryaction remove:repeating_legendaryaction', function () {
+	countAction('legendaryaction');
+});
+on('change:repeating_lairaction remove:repeating_lairaction', function () {
+	countAction('lairaction');
 });
 
 function updateSenses () {
