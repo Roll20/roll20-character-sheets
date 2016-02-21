@@ -2511,12 +2511,12 @@ function updateAction (rowId, type) {
 					var rechargeResult = rechargeRegex.exec(actionName);
 					if (rechargeResult) {
 						finalSetAttrs[repeatingString + 'recharge'] = rechargeResult[1] || rechargeResult[2];
-						finalSetAttrs[repeatingString + 'name'] = name.replace(rechargeRegex, '');
+						finalSetAttrs[repeatingString + 'name'] = actionName.replace(rechargeRegex, '');
 					}
 					var rechargeDayResult = rechargeDayRegex.exec(actionName);
 					if (rechargeDayResult) {
 						finalSetAttrs[repeatingString + 'recharge'] = rechargeDayResult[1] || rechargeDayResult[2];
-						finalSetAttrs[repeatingString + 'name'] = name.replace(rechargeDayRegex, '');
+						finalSetAttrs[repeatingString + 'name'] = actionName.replace(rechargeDayRegex, '');
 					}
 				}
 				var recharge = fromVOrFinalSetAttrs(v, finalSetAttrs, repeatingString + 'recharge');
