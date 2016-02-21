@@ -2662,30 +2662,17 @@ function parseAction (rowId, type) {
 	var collectionArray = ['level', 'challenge', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability'];
 	var finalSetAttrs = {};
 
-	var commaPeriodSpace = /\,?\.?\s*?/;
-	var commaPeriodDefinitiveSpace = /\,?\.?\s*/;
-	var hit = /Hit:.*?/;
 	var damageType = /((?:[\w]+|[\w]+\s(?:or|and)\s[\w]+)(?:\s*?\([\w\s]+\))?)\s*?damage\s?(\([\w\'\s]+\))?/;
 	var damageSyntax = /(?:(\d+)|.*?\(([\dd\s\+\-]*)\).*?)\s*?/;
 	var altDamageSyntax = /(?:\,\s*?or\s*?)/;
 	var plus = /\s*?plus\s*?/;
 	var savingThrow = /(?:DC)\s*?(\d+)\s*?([a-zA-Z]*)\s*?(?:saving throw)/;
-	var takeOrTaking = /\,?\s*?(?:taking|or take)/;
-	var againstDisease = /(?: against disease)?/;
 	var saveSuccess = /(?:.*or\s(.*)?\son a successful one.)?/;
-	var saveSuccessTwo = /(?:On a successful save,)?(.*)?/;
-	var saveFailure = /(?:On a (?:failure|failed save))\,\s(?:(.*). On a success,\s(.*)?)?(.*)?/;
-	var andAnythingElse = /(\s?and.*)?/;
-	var orAnythingElseNoTake = /(or\s(?!take).*)/;
-	var anythingElse = /(.*)?/;
 	var damageRegex = new RegExp(damageSyntax.source + damageType.source, 'i');
 	var damagePlusRegex = new RegExp(plus.source + damageSyntax.source + damageType.source, 'i');
 	var altDamageRegex = new RegExp(altDamageSyntax.source + damageSyntax.source + damageType.source, 'i');
-	var hitEffectRegex = new RegExp(hit.source + anythingElse.source, 'i');
 	var savingThrowRegex = new RegExp(savingThrow.source, 'i');
-	var saveDamageRegex = new RegExp(savingThrow.source + takeOrTaking.source + damageSyntax.source + damageType.source + saveSuccess.source + commaPeriodSpace.source + anythingElse.source + saveSuccessTwo.source, 'i');
-	var saveOrRegex = new RegExp(savingThrow.source + againstDisease.source + commaPeriodDefinitiveSpace.source + orAnythingElseNoTake.source, 'i');
-	var	saveFailedSaveRegex = new RegExp(savingThrow.source + commaPeriodSpace.source + saveFailure.source, 'i');
+	var saveSuccessRegex = new RegExp(saveSuccess.source, 'i');
 
 	var typeRegex = /(melee|ranged|melee or ranged)\s*(spell|weapon)\s*/gi;
 	var toHitRegex = /\+\s?(\d+)\s*(?:to hit)/gi;
@@ -2796,6 +2783,11 @@ function parseAction (rowId, type) {
 					}
 					if (savingThrow[2]) {
 						finalSetAttrs[repeatingString + 'saving_throw_vs_ability'] = savingThrow[2];
+					}
+					var halfDamage = saveSuccessRegex.exec(freetext);
+					if (halfDamage && halfDamage[1]) {
+						finalSetAttrs[repeatingString + 'saving_throw_success'] = halfDamage[1];
+						freetext = freetext.replace(saveSuccessRegex, '');
 					}
 				} else {
 					finalSetAttrs[repeatingString + 'saving_throw_toggle'] = '0';
