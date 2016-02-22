@@ -2696,7 +2696,7 @@ function parseAction (rowId, type) {
 	var saveSuccessRegex = new RegExp(saveSuccess.source, 'i');
 
 	var typeRegex = /(melee|ranged|melee or ranged)\s*(spell|weapon)\s*/gi;
-	var toHitRegex = /\+\s?(\d+)\s*(?:to hit)/gi;
+	var toHitRegex = /:\s?\+\s?(\d+)\s*(?:to hit)/gi;
 	var reachRegex = /(?:reach)\s?(\d+)\s?(?:ft)/gi;
 	var rangeRegex = /(?:range)\s?(\d+)\/(\d+)\s?(ft)/gi;
 
