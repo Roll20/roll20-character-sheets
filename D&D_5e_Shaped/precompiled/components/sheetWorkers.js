@@ -2378,7 +2378,7 @@ function updateNPCContent () {
 		var reactions;
 		var actions;
 		var traits;
-		var re = /\*\*(.*)\*\*:\s(.*)/gi;
+		var re = /\@(.*)\@:\s([^@]+)/gi;
 		var match;
 		var newRowId;
 		var repeatingString;
@@ -2401,13 +2401,13 @@ function updateNPCContent () {
 
 				finalSetAttrs.legendary_action_amount = legendaryActionAmount;
 
-				while (match = re.exec(legendaryActions)) {
+				while (match = re.exec(legendaryActions.replace(/\*\*/g, '@'))) {
 					console.log('match', match);
 					if (match && match[1] && match[2]) {
 						newRowId = generateRowID();
 						repeatingString = 'repeating_legendaryaction_' + newRowId + '_';
 						finalSetAttrs[repeatingString + 'name'] = match[1];
-						finalSetAttrs[repeatingString + 'freetext'] = match[2];
+						finalSetAttrs[repeatingString + 'freetext'] = match[2].trim();
 					} else {
 						console.log('Character doesn\'t have a valid legendary action format');
 					}
@@ -2419,12 +2419,12 @@ function updateNPCContent () {
 				content = reactionsSplit[0];
 			}
 			if (exists(reactions)) {
-				while (match = re.exec(reactions)) {
+				while (match = re.exec(reactions.replace(/\*\*/g, '@'))) {
 					if (match && match[1] && match[2]) {
 						newRowId = generateRowID();
 						repeatingString = 'repeating_reaction_' + newRowId + '_';
 						finalSetAttrs[repeatingString + 'name'] = match[1];
-						finalSetAttrs[repeatingString + 'freetext'] = match[2];
+						finalSetAttrs[repeatingString + 'freetext'] = match[2].trim();
 					} else {
 						console.log('Character doesn\'t have a valid reaction format');
 					}
@@ -2436,12 +2436,12 @@ function updateNPCContent () {
 				content = actionsSplit[0];
 			}
 			if (exists(actions)) {
-				while (match = re.exec(actions)) {
+				while (match = re.exec(actions.replace(/\*\*/g, '@'))) {
 					if (match && match[1] && match[2]) {
 						newRowId = generateRowID();
 						repeatingString = 'repeating_action_' + newRowId + '_';
 						finalSetAttrs[repeatingString + 'name'] = match[1];
-						finalSetAttrs[repeatingString + 'freetext'] = match[2];
+						finalSetAttrs[repeatingString + 'freetext'] = match[2].trim();
 					} else {
 						console.log('Character doesn\'t have a valid action format');
 					}
@@ -2454,12 +2454,13 @@ function updateNPCContent () {
 				content = traitsSplit[0];
 			}
 			if (exists(traits)) {
-				while (match = re.exec(traits)) {
+				while (match = re.exec(traits.replace(/\*\*/g, '@'))) {
+					console.log('match', match);
 					if (match && match[1] && match[2]) {
 						newRowId = generateRowID();
 						repeatingString = 'repeating_trait_' + newRowId + '_';
 						finalSetAttrs[repeatingString + 'name'] = match[1];
-						finalSetAttrs[repeatingString + 'freetext'] = match[2];
+						finalSetAttrs[repeatingString + 'freetext'] = match[2].trim();
 					} else {
 						console.log('Character doesn\'t have a valid trait format');
 					}
