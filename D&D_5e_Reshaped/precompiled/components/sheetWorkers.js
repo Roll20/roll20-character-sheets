@@ -348,7 +348,7 @@ on('change:cp change:sp change:ep change:gp change:pp', function () {
 });
 
 function updateAbilityModifier (ability) {
-	var collectionArray = [ability, ability + '_bonus', ability + '_mod', ability + '_check_mod', 'global_ability_bonus', 'strength_mod', 'dexterity_mod'];
+	var collectionArray = [ability, ability + '_bonus', ability + '_mod', ability + '_check_mod', 'global_ability_bonus', 'strength_mod', 'dexterity_mod', 'jack_of_all_trades_toggle', 'jack_of_all_trades', 'remarkable_athlete_toggle', 'remarkable_athlete'];
 	var finalSetAttrs = {};
 
 	getAttrs(collectionArray, function (v) {
@@ -358,7 +358,13 @@ function updateAbilityModifier (ability) {
 		var abilityMod = getAbilityMod((abilityScore + abilityBonus + globalAbilityBonus));
 
 		var abilityCheckFormula = abilityMod + '[' + ability.firstThree() + ' mod with bonus]';
-		abilityCheckFormula += ADD + '@{jack_of_all_trades_toggle}[jack of all trades]';
+		if ((ability === 'strength' || ability === 'dexterity' || ability === 'constitution') && v.remarkable_athlete_toggle === '@{remarkable_athlete}') {
+			var remarkableAthlete = getIntValue(v.remarkable_athlete);
+			abilityCheckFormula += ADD + remarkableAthlete + '[remarkable athlete]';
+		} else if (v.jack_of_all_trades_toggle === '@{jack_of_all_trades}') {
+			var jackOfAllTrades = getIntValue(v.jack_of_all_trades);
+			abilityCheckFormula += ADD + jackOfAllTrades + '[jack of all trades]';
+		}
 		abilityCheckFormula += ADD + '(@{global_check_bonus})[global check bonus]';
 
 		var abilityModWithSign = abilityMod;
@@ -382,22 +388,22 @@ function updateAbilityModifier (ability) {
 		setFinalAttrs(v, finalSetAttrs);
 	});
 }
-on('change:strength change:strength_bonus change:strength_check_mod change:global_ability_bonus', function () {
+on('change:strength change:strength_bonus change:strength_check_mod change:jack_of_all_trades_toggle change:jack_of_all_trades change:remarkable_athlete_toggle change:remarkable_athlete change:global_ability_bonus', function () {
 	updateAbilityModifier('strength');
 });
-on('change:dexterity change:dexterity_bonus change:dexterity_check_mod change:global_ability_bonus', function () {
+on('change:dexterity change:dexterity_bonus change:dexterity_check_mod change:jack_of_all_trades_toggle change:jack_of_all_trades change:remarkable_athlete_toggle change:remarkable_athlete change:global_ability_bonus', function () {
 	updateAbilityModifier('dexterity');
 });
-on('change:constitution change:constitution_bonus change:constitution_check_mod change:global_ability_bonus', function () {
+on('change:constitution change:constitution_bonus change:constitution_check_mod change:jack_of_all_trades_toggle change:jack_of_all_trades change:remarkable_athlete_toggle change:remarkable_athlete change:global_ability_bonus', function () {
 	updateAbilityModifier('constitution');
 });
-on('change:intelligence change:intelligence_bonus change:intelligence_check_mod change:global_ability_bonus', function () {
+on('change:intelligence change:intelligence_bonus change:intelligence_check_mod change:jack_of_all_trades_toggle change:jack_of_all_trades  change:global_ability_bonus', function () {
 	updateAbilityModifier('intelligence');
 });
-on('change:wisdom change:wisdom_bonus change:wisdom_check_mod change:global_ability_bonus', function () {
+on('change:wisdom change:wisdom_bonus change:wisdom_check_mod change:jack_of_all_trades_toggle change:jack_of_all_trades  change:global_ability_bonus', function () {
 	updateAbilityModifier('wisdom');
 });
-on('change:charisma change:charisma_bonus change:charisma_check_mod change:global_ability_bonus', function () {
+on('change:charisma change:charisma_bonus change:charisma_check_mod change:jack_of_all_trades_toggle change:jack_of_all_trades  change:global_ability_bonus', function () {
 	updateAbilityModifier('charisma');
 });
 on('change:dexterity_mod', function () {
@@ -1065,6 +1071,12 @@ on('change:pb', function () {
 	updateAttack();
 	updateSpell();
 	updateJackOfAllTrades();
+	updateRemarkableAthlete();
+	updateAction('trait');
+	updateAction('action');
+	updateAction('reaction');
+	updateAction('legendaryaction');
+	updateAction('lairaction');
 });
 
 function updateJackOfAllTrades () {
@@ -1080,8 +1092,21 @@ on('change:jack_of_all_trades_toggle', function () {
 	updateJackOfAllTrades();
 });
 
+function updateRemarkableAthlete () {
+	var collectionArray = ['pb'];
+	var finalSetAttrs = {};
+
+	getAttrs(collectionArray, function (v) {
+		finalSetAttrs.remarkable_athlete = Math.ceil(getIntValue(v.pb) / 2);
+		setFinalAttrs(v, finalSetAttrs);
+	});
+}
+on('change:remarkable_athlete_toggle', function () {
+	updateRemarkableAthlete();
+});
+
 function updateInitiative () {
-	var collectionArray = ['dexterity_mod', 'dexterity_check_bonus', 'initiative_bonus', 'jack_of_all_trades_toggle', 'jack_of_all_trades', 'global_check_bonus'];
+	var collectionArray = ['dexterity_mod', 'dexterity_check_bonus', 'initiative_bonus', 'jack_of_all_trades_toggle', 'jack_of_all_trades', 'remarkable_athlete_toggle', 'remarkable_athlete', 'global_check_bonus'];
 	var finalSetAttrs = {};
 
 	finalSetAttrs.initiative = 0;
@@ -1106,7 +1131,13 @@ function updateInitiative () {
 			finalSetAttrs.initiative_formula += ADD + initiativeBonus + '[initiative bonus]';
 		}
 
-		if (v.jack_of_all_trades_toggle === '@{jack_of_all_trades}') {
+		if (v.remarkable_athlete_toggle === '@{remarkable_athlete}') {
+			var remarkableAthlete = getIntValue(v.remarkable_athlete);
+			if (exists(remarkableAthlete)) {
+				finalSetAttrs.initiative += remarkableAthlete;
+				finalSetAttrs.initiative_formula += ADD + remarkableAthlete + '[remarkable athlete]';
+			}
+		} else if (v.jack_of_all_trades_toggle === '@{jack_of_all_trades}') {
 			var jackOfAllTrades = getIntValue(v.jack_of_all_trades);
 			if (exists(jackOfAllTrades)) {
 				finalSetAttrs.initiative += jackOfAllTrades;
@@ -1122,7 +1153,7 @@ function updateInitiative () {
 		setFinalAttrs(v, finalSetAttrs);
 	});
 }
-on('change:dexterity_mod change:dexterity_check_bonus change:initiative_bonus change:jack_of_all_trades_toggle change:jack_of_all_trades change:global_check_bonus', function () {
+on('change:dexterity_mod change:dexterity_check_bonus change:initiative_bonus change:jack_of_all_trades_toggle change:jack_of_all_trades change:remarkable_athlete_toggle change:remarkable_athlete change:global_check_bonus', function () {
 	updateInitiative();
 });
 
@@ -1819,7 +1850,7 @@ on('change:halfling_luck', function () {
 
 function updateSkill (rowId) {
 	var repeatingItem = 'repeating_skill';
-	var collectionArray = ['jack_of_all_trades_toggle', 'jack_of_all_trades', 'pb', 'exp', 'global_check_bonus'];
+	var collectionArray = ['jack_of_all_trades_toggle', 'jack_of_all_trades', 'remarkable_athlete_toggle', 'remarkable_athlete', 'pb', 'exp', 'global_check_bonus'];
 	var finalSetAttrs = {};
 
 	for (var i = 0; i < ABILITIES.length; i++) {
@@ -1850,13 +1881,18 @@ function updateSkill (rowId) {
 				}
 
 				var ability = getAbilityModName(v[repeatingString + 'ability']);
+				var abilityName = getAbilityName(v[repeatingString + 'ability']);
 				finalSetAttrs[repeatingString + 'ability_short_name'] = getAbilityShortName(ability, true);
 
 				var total = 0;
 				var totalFormula = '';
 				var proficiency = v[repeatingString + 'proficiency'];
 				if (!proficiency || proficiency === 'unproficient') {
-					if (v.jack_of_all_trades_toggle === '@{jack_of_all_trades}') {
+					if ((abilityName === 'strength' || abilityName === 'dexterity' || abilityName === 'constitution') && v.remarkable_athlete_toggle === '@{remarkable_athlete}') {
+						var remarkableAthlete = getIntValue(v.remarkable_athlete);
+						total += remarkableAthlete;
+						totalFormula += remarkableAthlete + '[remarkable athlete]';
+					} else if (v.jack_of_all_trades_toggle === '@{jack_of_all_trades}') {
 						var jackOfAllTrades = getIntValue(v.jack_of_all_trades);
 						total += jackOfAllTrades;
 						totalFormula += jackOfAllTrades + '[jack of all trades]';
@@ -1922,7 +1958,7 @@ on('change:repeating_skill', function (eventInfo) {
 		updateSkill(rowId);
 	}
 });
-on('change:jack_of_all_trades_toggle change:jack_of_all_trades change:global_check_bonus change:strength_check_bonus change:dexterity_check_bonus change:constitution_check_bonus change:intelligence_check_bonus change:wisdom_check_bonus change:charisma_check_bonus', function () {
+on('change:jack_of_all_trades_toggle change:jack_of_all_trades change:remarkable_athlete_toggle change:remarkable_athlete change:global_check_bonus change:strength_check_bonus change:dexterity_check_bonus change:constitution_check_bonus change:intelligence_check_bonus change:wisdom_check_bonus change:charisma_check_bonus', function () {
 	updateSkill();
 });
 
@@ -2495,7 +2531,7 @@ on('change:content_srd', function () {
 	updateNPCContent();
 });
 
-function updateAction (rowId, type) {
+function updateAction (type, rowId) {
 	var repeatingItem = 'repeating_' + type;
 	var collectionArray = ['pb', 'strength_mod', 'finesse_mod', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability'];
 	var finalSetAttrs = {};
@@ -2604,7 +2640,7 @@ on('change:repeating_trait', function (eventInfo) {
 	if (changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed' && changedField !== 'recharge_display') {
 		console.log('trait changedField', changedField);
 		var rowId = getRowId('repeating_trait', eventInfo);
-		updateAction(rowId, 'trait');
+		updateAction('trait', rowId);
 	}
 });
 on('change:repeating_action', function (eventInfo) {
@@ -2612,7 +2648,7 @@ on('change:repeating_action', function (eventInfo) {
 	if (changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed' && changedField !== 'recharge_display') {
 		console.log('action changedField', changedField);
 		var rowId = getRowId('repeating_action', eventInfo);
-		updateAction(rowId, 'action');
+		updateAction('action', rowId);
 	}
 });
 on('change:repeating_reaction', function (eventInfo) {
@@ -2620,7 +2656,7 @@ on('change:repeating_reaction', function (eventInfo) {
 	if (changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed' && changedField !== 'recharge_display') {
 		console.log('action changedField', changedField);
 		var rowId = getRowId('repeating_reaction', eventInfo);
-		updateAction(rowId, 'reaction');
+		updateAction('reaction', rowId);
 	}
 });
 on('change:repeating_legendaryaction', function (eventInfo) {
@@ -2628,7 +2664,7 @@ on('change:repeating_legendaryaction', function (eventInfo) {
 	if (changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed' && changedField !== 'recharge_display') {
 		console.log('action changedField', changedField);
 		var rowId = getRowId('repeating_legendaryaction', eventInfo);
-		updateAction(rowId, 'legendaryaction');
+		updateAction('legendaryaction', rowId);
 	}
 });
 on('change:repeating_lairaction', function (eventInfo) {
@@ -2636,7 +2672,7 @@ on('change:repeating_lairaction', function (eventInfo) {
 	if (changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed' && changedField !== 'recharge_display') {
 		console.log('action changedField', changedField);
 		var rowId = getRowId('repeating_lairaction', eventInfo);
-		updateAction(rowId, 'lairaction');
+		updateAction('lairaction', rowId);
 	}
 });
 
@@ -2832,7 +2868,7 @@ function parseAction (rowId, type) {
 			}
 			setFinalAttrs(v, finalSetAttrs);
 			for (var x = 0; x < ids.length; x++) {
-				updateAction(ids[x], type);
+				updateAction(type, ids[x]);
 			}
 		});
 	});
