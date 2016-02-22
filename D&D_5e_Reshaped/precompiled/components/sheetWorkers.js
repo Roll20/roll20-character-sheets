@@ -2367,10 +2367,28 @@ on('change:ac_srd', function () {
 	updateNPCAC();
 });
 
+function setDefaultAbility (v, finalSetAttrs) {
+	var abilityScores = [getIntValue(v.intelligence), getIntValue(v.wisdom), getIntValue(v.charisma)];
+	var highestAbilityScore = Math.max.apply(Math, abilityScores);
+	var highestAbilityName = 'intelligence';
+
+	if (highestAbilityScore === abilityScores[1]) {
+		highestAbilityName = 'wisdom';
+	} else if (highestAbilityScore === abilityScores[2]) {
+		highestAbilityName = 'charisma';
+	}
+
+	finalSetAttrs.default_ability = '@{' + highestAbilityName + '_mod}';
+}
+
 function updateNPCContent () {
 	console.log('updateNPCContent');
 	var collectionArray = ['content_srd'];
 	var finalSetAttrs = {};
+
+	for (var i = 0; i < ABILITIES.length; i++) {
+		collectionArray.push(ABILITIES[i]);
+	}
 
 	getAttrs(collectionArray, function (v) {
 		var content = v.content_srd;
@@ -2382,6 +2400,8 @@ function updateNPCContent () {
 		var match;
 		var newRowId;
 		var repeatingString;
+
+		setDefaultAbility(v, finalSetAttrs);
 
 		if (exists(content)) {
 			if (content.indexOf('Legendary Actions') !== -1) {
