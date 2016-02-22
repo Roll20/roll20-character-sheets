@@ -2720,7 +2720,7 @@ function parseAction (rowId, type) {
 	var reachRegex = /(?:reach)\s?(\d+)\s?(?:ft)/gi;
 	var rangeRegex = /(?:range)\s?(\d+)\/(\d+)\s?(ft)/gi;
 	var spellcastingRegex = /(\d+)\w+\slevel\s\((\d+)\s?slot(?:s)?\)/gi;
-
+	var spellcastingAbilityRegex = /spellcasting ability is (\w+)/i;
 
 	for (var i = 0; i < ABILITIES.length; i++) {
 		collectionArray.push(ABILITIES[i] + '_mod');
@@ -2759,6 +2759,11 @@ function parseAction (rowId, type) {
 				var freetext = v[repeatingString + 'freetext'];
 
 				if (name === 'Spellcasting') {
+					var spellcastingSearch = spellcastingAbilityRegex.exec(freetext);
+					if (spellcastingSearch && spellcastingSearch[1]) {
+						var spellcastingAbility = spellcastingSearch[1].toLowerCase();
+						finalSetAttrs.default_ability = '@{' + spellcastingAbility + '_mod}';
+					}
 					while (match = spellcastingRegex.exec(freetext)) {
 						if (match && match[1] && match[2]) {
 							finalSetAttrs['spell_slots_l' + match[1] + '_bonus'] = match[2];
