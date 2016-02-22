@@ -566,16 +566,12 @@ function updateLevels () {
 			finalSetAttrs.caster_level = casterLevel;
 
 			if (classesWithSpellcasting > 1 || spellcasting.full) {
-				console.log('first if');
 				finalSetAttrs.caster_type = 'full';
 			} else if (spellcasting.half) {
-				console.log('half');
 				finalSetAttrs.caster_type = 'half';
 			} else if (spellcasting.third) {
-				console.log('third');
 				finalSetAttrs.caster_type = 'third';
 			} else {
-				console.log('else');
 				finalSetAttrs.caster_type = 'full';
 			}
 
@@ -624,7 +620,6 @@ function updateLevels () {
 }
 
 on('change:repeating_class remove:repeating_class', function () {
-	console.log('repeating_class');
 	updateLevels();
 });
 
@@ -742,7 +737,6 @@ function updateSpellSlots () {
 		}
 
 		if (casterType === 'third') {
-			console.log('third casterLevel', casterLevel);
 			if (casterLevel >= 7) {
 				spellSlots['1'] = 4;
 			} else if (casterLevel >= 4) {
@@ -1066,7 +1060,6 @@ on('change:repeating_equipment:carried change:repeating_equipment:weight_total r
 });
 
 on('change:pb', function () {
-	console.log('pb changed');
 	updateSkill();
 	updateAttack();
 	updateSpell();
@@ -1826,7 +1819,6 @@ on('change:repeating_spell', function (eventInfo) {
 	}
 });
 on('change:global_spell_attack_bonus change:global_spell_damage_bonus change:global_spell_dc_bonus change:global_spell_heal_bonus', function () {
-	console.log('updateSpell triggered by global');
 	updateSpell();
 });
 
@@ -2064,7 +2056,6 @@ function updateSavingThrow (ability) {
 	});
 }
 on('change:pb change:strength_mod change:strength_save_prof change:strength_save_bonus change:global_saving_throw_bonus', function () {
-	console.log('strength saving throw proficiency');
 	updateSavingThrow('strength');
 });
 on('change:pb change:dexterity_mod change:dexterity_save_prof change:dexterity_save_bonus change:global_saving_throw_bonus', function () {
@@ -2377,7 +2368,6 @@ function updateNPCHP () {
 	});
 }
 on('change:hit_dice change:hit_die change:hp_extra change:constitution_mod', function () {
-	console.log('hd stuff changed');
 	updateNPCHP();
 });
 
@@ -2418,7 +2408,6 @@ function setDefaultAbility (v, finalSetAttrs) {
 }
 
 function updateNPCContent () {
-	console.log('updateNPCContent');
 	var collectionArray = ['content_srd'];
 	var finalSetAttrs = {};
 
@@ -2446,19 +2435,16 @@ function updateNPCContent () {
 				content = legendaryActionsSplit[0];
 			}
 			if (exists(legendaryActions)) {
-				console.log('legendaryActions', legendaryActions);
 				var legendaryActionAmount = 3;
 				var legendaryActionsMatch = legendaryActions.match(/Can take (\d+) Legendary Actions/gi);
 
 				if (legendaryActionsMatch && legendaryActionsMatch[1]) {
-					console.log('legendaryActionsMatch[1]', legendaryActionsMatch[1]);
 					legendaryActionAmount = legendaryActionAmount[1];
 				}
 
 				finalSetAttrs.legendary_action_amount = legendaryActionAmount;
 
 				while (match = re.exec(legendaryActions.replace(/\*\*/g, '@'))) {
-					console.log('match', match);
 					if (match && match[1] && match[2]) {
 						newRowId = generateRowID();
 						repeatingString = 'repeating_legendaryaction_' + newRowId + '_';
@@ -2511,7 +2497,6 @@ function updateNPCContent () {
 			}
 			if (exists(traits)) {
 				while (match = re.exec(traits.replace(/\*\*/g, '@'))) {
-					console.log('match', match);
 					if (match && match[1] && match[2]) {
 						newRowId = generateRowID();
 						repeatingString = 'repeating_trait_' + newRowId + '_';
@@ -2527,7 +2512,6 @@ function updateNPCContent () {
 	});
 }
 on('change:content_srd', function () {
-	console.log('content_srd changed');
 	updateNPCContent();
 });
 
@@ -2654,7 +2638,7 @@ on('change:repeating_action', function (eventInfo) {
 on('change:repeating_reaction', function (eventInfo) {
 	var changedField = getRepeatingField('repeating_reaction', eventInfo);
 	if (changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed' && changedField !== 'recharge_display') {
-		console.log('action changedField', changedField);
+		console.log('reaction changedField', changedField);
 		var rowId = getRowId('repeating_reaction', eventInfo);
 		updateAction('reaction', rowId);
 	}
@@ -2662,7 +2646,7 @@ on('change:repeating_reaction', function (eventInfo) {
 on('change:repeating_legendaryaction', function (eventInfo) {
 	var changedField = getRepeatingField('repeating_legendaryaction', eventInfo);
 	if (changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed' && changedField !== 'recharge_display') {
-		console.log('action changedField', changedField);
+		console.log('legendaryaction changedField', changedField);
 		var rowId = getRowId('repeating_legendaryaction', eventInfo);
 		updateAction('legendaryaction', rowId);
 	}
@@ -2670,7 +2654,7 @@ on('change:repeating_legendaryaction', function (eventInfo) {
 on('change:repeating_lairaction', function (eventInfo) {
 	var changedField = getRepeatingField('repeating_lairaction', eventInfo);
 	if (changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed' && changedField !== 'recharge_display') {
-		console.log('action changedField', changedField);
+		console.log('lairaction changedField', changedField);
 		var rowId = getRowId('repeating_lairaction', eventInfo);
 		updateAction('lairaction', rowId);
 	}
@@ -3017,7 +3001,6 @@ function updateDamageResistances () {
 }
 on('change:damage_resistances', function () {
 	updateDamageResistances();
-
 });
 function updateDamageImmunities () {
 	var collectionArray = ['damage_immunities'];
@@ -3034,7 +3017,6 @@ function updateDamageImmunities () {
 	});
 }
 on('change:damage_immunities', function () {
-	console.log('damage_immunities changed');
 	updateDamageImmunities();
 });
 function updateConditionImmunities () {
