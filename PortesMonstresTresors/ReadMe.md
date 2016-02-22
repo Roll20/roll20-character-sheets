@@ -8,7 +8,7 @@ PMT est une adaptation de **Labyrinth Lord**, r&eacute;alis&eacute;e par [Arasmo
 Le jeu complet est disponible gratuitement en PDF sur le site du [Scriptorium.D100.fr](http://www.scriptorium.d100.fr/index.php/lesparchemins/portes-monstres-tresors/), et en version papier sur [Lulu](http://www.lulu.com/shop/daniel-proctor-and-james-manez/portes-monstres-tr%C3%A9sors/hardcover/product-22096059.html).
 
 # Version courante
-3.1 [Screenshot](pmt_v3.jpg)
+4.0 [Screenshot](pmt_v4.jpg)
 
 # Script API de création de personnage
 Un [script API](pmt.js) est disponible pour créer des personnages rapidement (le taux de mortalité est élevé en OSR ;) ).
@@ -43,6 +43,17 @@ Si ces informations n'apparaissent pas, fermer la feuille et réouvrez la après
 Par défaut, le personnage créé est attribué au joueur qui a cliqué dans le chat (même s'il est visible par tous, seul ce joueur et le MJ pourront modifier le personnage).
 
 # Notes de version
+##v4.0 (29 Janvier 2016).
+* Changement de la police des zones de saisie de 'Times' à 'Patrick Hand' (aspect plus 'manuscrit')
+* Quelques ajustements de mise en page
+* Élargissement du template de jet dans le chat
+* Agrandissement et complétion de la section "Sorts" avec l'ajout du caractère réversible du sort, durée, portée et description du sort.
+* Ajout d'un bouton d'information sur les sorts, permettant de montrer le sort dans le chat
+* Mise à jour du [script API](pmt.js) de création de personnage :
+  * Correction des sorts d'elfe et magicien : conformément aux règles, 2 sorts de niveau 1 et un sort de niveau 2 sont tirés au hasard
+  * Les sorts de niveau 1 et 2 d'elfe et magicien ont toutes les informations pré-renseignées
+  * Tous les sorts de Clerc de niveau 1 ont toutes les informations pré-renseignées
+
 ##v3.1 (17 Janvier 2016).
 * Ajout du nom du personnage sur tous les templates de jet dans le chat (utile lorsqu'un joueur contrôle plusieurs personnages)
 * Ajout de champs de saisie pour le titre et les langues supplémentaires du personnage
