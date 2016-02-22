@@ -2699,6 +2699,8 @@ function parseAction (rowId, type) {
 	var toHitRegex = /:\s?\+\s?(\d+)\s*(?:to hit)/gi;
 	var reachRegex = /(?:reach)\s?(\d+)\s?(?:ft)/gi;
 	var rangeRegex = /(?:range)\s?(\d+)\/(\d+)\s?(ft)/gi;
+	var spellcastingRegex = /(\d+)\w+\slevel\s\((\d+)\s?slot(?:s)?\)/gi;
+
 
 	for (var i = 0; i < ABILITIES.length; i++) {
 		collectionArray.push(ABILITIES[i] + '_mod');
@@ -2735,6 +2737,14 @@ function parseAction (rowId, type) {
 
 				var name = v[repeatingString + 'name'];
 				var freetext = v[repeatingString + 'freetext'];
+
+				if (name === 'Spellcasting') {
+					while (match = spellcastingRegex.exec(freetext)) {
+						if (match && match[1] && match[2]) {
+							finalSetAttrs['spell_slots_l' + match[1] + '_bonus'] = match[2];
+						}
+					}
+				}
 
 				var actionType = typeRegex.exec(freetext);
 				if (actionType) {
