@@ -2688,7 +2688,7 @@ function parseAction (rowId, type) {
 	var altDamageSyntax = /(?:\,\s*?or\s*?)/;
 	var plus = /\s*?plus\s*?/;
 	var savingThrow = /(?:DC)\s*?(\d+)\s*?([a-zA-Z]*)\s*?(?:saving throw)/;
-	var saveSuccess = /(?:.*or\s(.*)?\son a successful one.)?/;
+	var saveSuccess = /or\s(.*)?\son a successful one./;
 	var damageRegex = new RegExp(damageSyntax.source + damageType.source, 'i');
 	var damagePlusRegex = new RegExp(plus.source + damageSyntax.source + damageType.source, 'i');
 	var altDamageRegex = new RegExp(altDamageSyntax.source + damageSyntax.source + damageType.source, 'i');
