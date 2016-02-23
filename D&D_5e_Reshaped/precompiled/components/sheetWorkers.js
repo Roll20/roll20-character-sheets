@@ -1,4 +1,4 @@
-var currentVersion = '2.1.2';
+var currentVersion = '2.1.3';
 
 String.prototype.capitalize = function () {
 	return this.replace(/\w\S*/g, function (txt) {
@@ -2198,38 +2198,6 @@ on('change:repeating_attacher remove:repeating_attacher', function () {
 	updateAttachers();
 });
 
-function updateNPCSizeTypeAlignment () {
-	var collectionArray = ['size', 'type', 'alignment'];
-	var finalSetAttrs = {};
-
-	getAttrs(collectionArray, function (v) {
-    var creatureSize = v.size || 'Large';
-		finalSetAttrs.size_type_alignment = creatureSize;
-
-    var sizeToHdSize = {
-      Tiny: 4,
-      Small: 6,
-      Medium: 8,
-      Large: 10,
-      Huge: 12,
-      Gargantuan: 20
-    };
-    finalSetAttrs.hit_die = 'd' + sizeToHdSize[creatureSize];
-
-		if (v.type) {
-			finalSetAttrs.size_type_alignment += SPACE + v.type;
-		}
-		if (v.alignment) {
-			finalSetAttrs.size_type_alignment += ',' + SPACE + v.alignment;
-		}
-		setFinalAttrs(v, finalSetAttrs);
-	});
-}
-
-on('change:size change:type change:alignment', function () {
-	updateNPCSizeTypeAlignment();
-});
-
 function updateNPCChallenge () {
 	var collectionArray = ['challenge', 'xp'];
 	var finalSetAttrs = {};
@@ -2933,6 +2901,58 @@ on('change:repeating_lairaction remove:repeating_lairaction', function () {
 	countAction('lairaction');
 });
 
+function updateSize () {
+	var collectionArray = ['size'];
+	var finalSetAttrs = {};
+
+	getAttrs(collectionArray, function (v) {
+		var creatureSize = v.size || 'Large';
+		var sizeToHdSize = {
+			Tiny: 4,
+			Small: 6,
+			Medium: 8,
+			Large: 10,
+			Huge: 12,
+			Gargantuan: 20
+		};
+		finalSetAttrs.hit_die = 'd' + sizeToHdSize[creatureSize];
+		setFinalAttrs(v, finalSetAttrs);
+	});
+}
+on('change:size', function () {
+	updateSize();
+});
+
+function updateType () {
+	var collectionArray = ['type'];
+	var finalSetAttrs = {};
+
+	getAttrs(collectionArray, function (v) {
+		if (v.type) {
+			finalSetAttrs.type = lowercaseWords(v.type);
+		}
+		setFinalAttrs(v, finalSetAttrs);
+	});
+}
+on('change:type', function () {
+	updateType();
+});
+
+function updateAlignment () {
+	var collectionArray = ['alignment'];
+	var finalSetAttrs = {};
+
+	getAttrs(collectionArray, function (v) {
+		if (v.alignment) {
+			finalSetAttrs.alignment = lowercaseWords(v.alignment);
+		}
+		setFinalAttrs(v, finalSetAttrs);
+	});
+}
+on('change:alignment', function () {
+	updateAlignment();
+});
+
 function updateSenses () {
 	var collectionArray = ['senses'];
 	var finalSetAttrs = {};
@@ -3208,6 +3228,10 @@ function sheetOpened () {
 			updateConditionImmunities();
 			updateLanguages();
 			updateSenses();
+		}
+		if (versionCompare(version, '2.1.3') < 0) {
+			updateType();
+			updateAlignment();
 		}
 
 		if (!version || version !== currentVersion) {
