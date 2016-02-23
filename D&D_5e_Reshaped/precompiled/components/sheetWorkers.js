@@ -2047,7 +2047,7 @@ function updateSavingThrow (ability) {
 		if (proficiency === '@{PB}') {
 			var pb = getIntValue(v.pb);
 			total += pb;
-			totalFormula += pb + '[proficient]';
+			totalFormula += ADD + pb + '[proficient]';
 		}
 
 		var abilitySavingThrowBonus = getIntValue(v[ability + '_save_bonus']);
