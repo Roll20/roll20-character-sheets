@@ -629,6 +629,7 @@ function updateLevels () {
 
 on('change:repeating_class remove:repeating_class', function () {
 	updateLevels();
+	updateSpellSlots();
 });
 
 function updateSpellSlots () {
@@ -1223,8 +1224,8 @@ function updateAttackToggle (v, finalSetAttrs, repeatingString, options) {
 			attackFormula += 0 + '[unproficient]';
 		}
 
-		if (!exists(v[repeatingString + 'ammo_weight']) && !exists(finalSetAttrs[repeatingString + 'ammo_weight']) && v[repeatingString + 'type'] === 'Ranged Weapon') {
-			finalSetAttrs[repeatingString + 'ammo'] = '.02';
+		if (!exists(v[repeatingString + 'ammo']) && !exists(finalSetAttrs[repeatingString + 'ammo_weight']) && v[repeatingString + 'type'] === 'Ranged Weapon') {
+			finalSetAttrs[repeatingString + 'ammo'] = '1';
 			finalSetAttrs[repeatingString + 'ammo_weight'] = '.02';
 		}
 
