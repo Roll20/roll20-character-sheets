@@ -2696,6 +2696,7 @@ function parseDamage (finalSetAttrs, repeatingString, freetext, regex, name, spe
 	} else {
 		finalSetAttrs[repeatingString + name + '_toggle'] = 0;
 	}
+	return freetext;
 }
 
 function parseAction (rowId, type) {
@@ -2849,9 +2850,12 @@ function parseAction (rowId, type) {
 					finalSetAttrs[repeatingString + 'saving_throw_toggle'] = '0';
 				}
 
-				parseDamage(finalSetAttrs, repeatingString, freetext, damageRegex, 'damage', spellMods, meleeMods, spellAttack, rangedAttack, dexMod);
-				parseDamage(finalSetAttrs, repeatingString, freetext, altDamageRegex, 'second_damage', spellMods, meleeMods, spellAttack, rangedAttack, dexMod);
-				parseDamage(finalSetAttrs, repeatingString, freetext, damagePlusRegex, 'second_damage', spellMods, meleeMods, spellAttack, rangedAttack, dexMod);
+				freetext = parseDamage(finalSetAttrs, repeatingString, freetext, damageRegex, 'damage', spellMods, meleeMods, spellAttack, rangedAttack, dexMod);
+				freetext = parseDamage(finalSetAttrs, repeatingString, freetext, altDamageRegex, 'second_damage', spellMods, meleeMods, spellAttack, rangedAttack, dexMod);
+				freetext = parseDamage(finalSetAttrs, repeatingString, freetext, damagePlusRegex, 'second_damage', spellMods, meleeMods, spellAttack, rangedAttack, dexMod);
+				if (!exists(finalSetAttrs[repeatingString + 'second_damage'])) {
+					freetext = parseDamage(finalSetAttrs, repeatingString, freetext, damageRegex, 'second_damage', spellMods, meleeMods, spellAttack, rangedAttack, dexMod);
+				}
 
 				finalSetAttrs[repeatingString + 'extras_toggle'] = '@{extas_var}';
 			}
