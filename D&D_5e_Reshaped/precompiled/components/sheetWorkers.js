@@ -347,6 +347,14 @@ on('change:cp change:sp change:ep change:gp change:pp', function () {
 	});
 });
 
+function updateAbilityModifiers () {
+	updateAbilityModifier('strength');
+	updateAbilityModifier('dexterity');
+	updateAbilityModifier('constitution');
+	updateAbilityModifier('intelligence');
+	updateAbilityModifier('wisdom');
+	updateAbilityModifier('charisma');
+}
 function updateAbilityModifier (ability) {
 	var collectionArray = [ability, ability + '_bonus', ability + '_mod', ability + '_check_mod', 'global_ability_bonus', 'strength_mod', 'dexterity_mod', 'jack_of_all_trades_toggle', 'jack_of_all_trades', 'remarkable_athlete_toggle', 'remarkable_athlete'];
 	var finalSetAttrs = {};
@@ -2017,6 +2025,15 @@ on('change:skills_srd', function () {
 	updateSkillsFromSRD();
 });
 
+function updateSavingThrows () {
+	updateSavingThrow('strength');
+	updateSavingThrow('dexterity');
+	updateSavingThrow('constitution');
+	updateSavingThrow('intelligence');
+	updateSavingThrow('wisdom');
+	updateSavingThrow('charisma');
+}
+
 function updateSavingThrow (ability) {
 	var collectionArray = ['pb', ability + '_mod', ability + '_save_prof', ability + '_save_bonus', 'global_saving_throw_bonus'];
 	var finalSetAttrs = {};
@@ -3171,24 +3188,17 @@ function sheetOpened () {
 				finalSetAttrs[repeatingString + 'ability'] = '@{' + skills[i].ability + '_mod}';
 				updateSkill(newRowId);
 			}
+			updateSavingThrows();
 		}
 
 		if (versionCompare(version, '2.0.10') < 0) {
-			updateAbilityModifier('strength');
-			updateAbilityModifier('dexterity');
-			updateAbilityModifier('constitution');
-			updateAbilityModifier('intelligence');
-			updateAbilityModifier('wisdom');
-			updateAbilityModifier('charisma');
+			updateAbilityModifiers();
 		}
+
 		if (versionCompare(version, '2.0.14') < 0) {
+			console.log('in if');
 			updateSkill();
-			updateSavingThrow('strength');
-			updateSavingThrow('dexterity');
-			updateSavingThrow('constitution');
-			updateSavingThrow('intelligence');
-			updateSavingThrow('wisdom');
-			updateSavingThrow('charisma');
+			updateSavingThrows();
 		}
 		if (versionCompare(version, '2.1.0') < 0) {
 			updateNPCChallenge();
