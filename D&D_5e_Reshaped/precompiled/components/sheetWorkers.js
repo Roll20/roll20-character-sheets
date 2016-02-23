@@ -629,6 +629,7 @@ function updateLevels () {
 
 on('change:repeating_class remove:repeating_class', function () {
 	updateLevels();
+	updateSpellSlots();
 });
 
 function updateSpellSlots () {
