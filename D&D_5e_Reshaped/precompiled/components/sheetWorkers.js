@@ -2903,6 +2903,24 @@ on('change:repeating_lairaction remove:repeating_lairaction', function () {
 	countAction('lairaction');
 });
 
+
+function switchToNPC () {
+	var collectionArray = ['is_npc', 'size'];
+	var finalSetAttrs = {};
+
+	getAttrs(collectionArray, function (v) {
+		var isNPC = getIntValue(v.is_npc) === 1;
+
+		if (isNPC && !v.size) {
+			finalSetAttrs.size = 'Large';
+		}
+		setFinalAttrs(v, finalSetAttrs);
+	});
+}
+on('change:is_npc', function () {
+	switchToNPC();
+});
+
 function updateSize () {
 	var collectionArray = ['size'];
 	var finalSetAttrs = {};
