@@ -1781,14 +1781,17 @@ function updateSpell (rowId) {
 				finalSetAttrs[repeatingString + 'friendly_level'] = ordinalSpellLevel(spellLevel);
 
 				var spellComponents = v[repeatingString + 'components'];
+				finalSetAttrs[repeatingString + 'components_verbal'] = 0;
+				finalSetAttrs[repeatingString + 'components_somatic'] = 0;
+				finalSetAttrs[repeatingString + 'components_material'] = 0;
 				if (exists(spellComponents)) {
-					if (spellComponents.indexOf('V') !== -1 && !exists(v[repeatingString + 'components_verbal'])) {
+					if (spellComponents.indexOf('V') !== -1) {
 						finalSetAttrs[repeatingString + 'components_verbal'] = 1;
 					}
-					if (spellComponents.indexOf('S') !== -1 && !exists(v[repeatingString + 'components_somatic'])) {
+					if (spellComponents.indexOf('S') !== -1) {
 						finalSetAttrs[repeatingString + 'components_somatic'] = 1;
 					}
-					if (spellComponents.indexOf('M') !== -1 && !exists(v[repeatingString + 'components_material'])) {
+					if (spellComponents.indexOf('M') !== -1) {
 						finalSetAttrs[repeatingString + 'components_material'] = 1;
 					}
 				}
