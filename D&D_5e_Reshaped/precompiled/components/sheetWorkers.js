@@ -1,4 +1,4 @@
-var currentVersion = '2.1.3';
+var currentVersion = '2.1.4';
 
 String.prototype.capitalize = function () {
 	return this.replace(/\w\S*/g, function (txt) {
@@ -1625,6 +1625,7 @@ function updateAttack (rowId) {
 			collectionArray.push(repeatingString + 'modifiers');
 			collectionArray.push(repeatingString + 'properties');
 			collectionArray.push(repeatingString + 'weight');
+			collectionArray.push(repeatingString + 'ammo');
 			collectionArray.push(repeatingString + 'ammo_weight');
 			collectionArray.push(repeatingString + 'parsed');
 		}
@@ -2900,6 +2901,24 @@ on('change:repeating_legendaryaction remove:repeating_legendaryaction', function
 });
 on('change:repeating_lairaction remove:repeating_lairaction', function () {
 	countAction('lairaction');
+});
+
+
+function switchToNPC () {
+	var collectionArray = ['is_npc', 'size'];
+	var finalSetAttrs = {};
+
+	getAttrs(collectionArray, function (v) {
+		var isNPC = getIntValue(v.is_npc) === 1;
+
+		if (isNPC && !v.size) {
+			finalSetAttrs.size = 'Large';
+		}
+		setFinalAttrs(v, finalSetAttrs);
+	});
+}
+on('change:is_npc', function () {
+	switchToNPC();
 });
 
 function updateSize () {
