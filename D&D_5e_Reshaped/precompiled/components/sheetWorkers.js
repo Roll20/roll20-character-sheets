@@ -8,6 +8,9 @@ String.prototype.capitalize = function () {
 String.prototype.firstThree = function () {
 	return this.substring(0, 3);
 };
+Number.prototype.round = function(places) {
+	return +(Math.round(this + "e+" + places)  + "e-" + places);
+};
 function getIntValue(value, defaultValue) {
 	if (!defaultValue) {
 		defaultValue = 0;
@@ -885,11 +888,14 @@ function sumRepeating (options, sumItems) {
 						}
 					}
 
-					var itemTotal = Math.round(qty * fieldToAdd * 100) / 100;
+					var itemTotal = (qty * fieldToAdd).round(2);
+					console.log('itemTotal', itemTotal);
 
 					if (sumItem.addOnAfterQty) {
 						itemTotal += getFloatValue(v[repeatingString + sumItem.addOnAfterQty]);
 					}
+
+					itemTotal = itemTotal.round(2);
 
 					if (sumItem.itemTotal) {
 						finalSetAttrs[repeatingString + sumItem.itemTotal] = itemTotal;
@@ -1164,7 +1170,7 @@ function updateWeight () {
 	var finalSetAttrs = {};
 
 	getAttrs(collectionArray, function (v) {
-		finalSetAttrs.weight_total = Math.round((getFloatValue(v.weight_attacks) + getFloatValue(v.weight_armor) + getFloatValue(v.weight_equipment) + getFloatValue(v.weight_coinage) + getFloatValue(v.weight_misc)) * 100) / 100;
+		finalSetAttrs.weight_total = (getFloatValue(v.weight_attacks) + getFloatValue(v.weight_armor) + getFloatValue(v.weight_equipment) + getFloatValue(v.weight_coinage) + getFloatValue(v.weight_misc)).round(2);
 		setFinalAttrs(v, finalSetAttrs);
 	});
 }
