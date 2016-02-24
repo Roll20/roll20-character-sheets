@@ -1625,6 +1625,7 @@ function updateAttack (rowId) {
 			collectionArray.push(repeatingString + 'modifiers');
 			collectionArray.push(repeatingString + 'properties');
 			collectionArray.push(repeatingString + 'weight');
+			collectionArray.push(repeatingString + 'ammo');
 			collectionArray.push(repeatingString + 'ammo_weight');
 			collectionArray.push(repeatingString + 'parsed');
 		}
