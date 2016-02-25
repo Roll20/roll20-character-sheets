@@ -862,6 +862,7 @@ function sumRepeating (options, sumItems) {
 		}
 
 		getAttrs(collectionArray, function (v) {
+			var acUnarmoredBonus = getIntValue(v.ac_unarmored_bonus);
 			var dexMod = 0;
 			if (options.collection === 'armor') {
 				dexMod = getIntValue(v.dexterity_mod);
@@ -935,7 +936,7 @@ function sumRepeating (options, sumItems) {
 			}
 
 			if (options.collection === 'armor') {
-				finalSetAttrs.ac_unarmored_calc += 10 + dexMod + getAbilityValue(v, v.ac_unarmored_ability);
+				finalSetAttrs.ac_unarmored_calc += 10 + dexMod + getAbilityValue(v, v.ac_unarmored_ability) + acUnarmoredBonus;
 
 				finalSetAttrs.ac = Math.max(finalSetAttrs.ac_armored_calc, finalSetAttrs.ac_unarmored_calc);
 			}
@@ -982,7 +983,7 @@ function updateArmor (rowId) {
 
 	var options = {
 		collection: 'armor',
-		getExtraFields: ['medium_armor_max_dex', 'dexterity_mod', 'ac_unarmored_ability'],
+		getExtraFields: ['medium_armor_max_dex', 'dexterity_mod', 'ac_unarmored_ability', 'ac_unarmored_bonus'],
 		toggle: 'worn'
 	};
 	for (var i = 0; i < ABILITIES.length; i++) {
@@ -1011,7 +1012,7 @@ on('change:repeating_armor', function (eventInfo) {
 		updateArmor(rowId);
 	}
 });
-on('change:medium_armor_max_dex change:ac_unarmored_ability remove:repeating_armor', function () {
+on('change:medium_armor_max_dex change:ac_unarmored_ability change:ac_unarmored_bonus remove:repeating_armor', function () {
 	updateArmor();
 });
 
@@ -2359,16 +2360,18 @@ on('change:hit_dice change:hit_die change:hp_extra change:constitution_mod', fun
 });
 
 function updateNPCAC () {
-	var collectionArray = ['ac_srd', 'ac', 'ac_note'];
+	var collectionArray = ['ac_srd', 'ac', 'ac_note', 'dexterity_mod'];
 	var finalSetAttrs = {};
 
 	getAttrs(collectionArray, function (v) {
 		if (exists(v.ac_srd)) {
 			var match = v.ac_srd.match(/(\d+)\s?(.*)/);
-			if (!match || !match[1] || !match[2]) {
-				console.log('Character doesn\'t have valid AC format');
-			} else {
-				finalSetAttrs.ac = match[1];
+			if (match && match[1]) {
+				var dexMod = v.dexterity_mod;
+				finalSetAttrs.ac_unarmored_bonus = match[1] - 10 - dexMod;
+				console.log('finalSetAttrs.ac_unarmored_bonus', finalSetAttrs.ac_unarmored_bonus);
+			}
+			if (match && match[2]) {
 				finalSetAttrs.ac_note = match[2].replace(/\(|\)/g, '');
 			}
 		}
