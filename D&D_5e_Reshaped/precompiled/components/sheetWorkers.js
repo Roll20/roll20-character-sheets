@@ -3357,6 +3357,7 @@ function sheetOpened () {
 		}
     if (versionCompare(version, '2.1.5') < 0) {
       updateLevels();
+      updateNPCAC();
       updateLanguageSelection();
     }
 
