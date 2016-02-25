@@ -3270,6 +3270,7 @@ function generateSkills () {
         }
         repeatingString = repeatingItem + '_' + skillId + '_';
         finalSetAttrs[repeatingString + 'name'] = name;
+	      finalSetAttrs[repeatingString + 'storage_name'] = key;
         finalSetAttrs[repeatingString + 'ability'] = '@{' + ability + '_mod}';
         updateSkill(skillId);
 
