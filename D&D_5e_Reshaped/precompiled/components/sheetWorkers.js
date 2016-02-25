@@ -423,7 +423,7 @@ on('change:dexterity_mod', function () {
 
 function updateLevels () {
 	var repeatingItem = 'repeating_class';
-	var collectionArray = [];
+	var collectionArray = ['barbarian_level', 'bard_level', 'cleric_level', 'druid_level', 'fighter_level', 'monk_level', 'paladin_level', 'ranger_level', 'rogue_level', 'sorcerer_level', 'warlock_level', 'wizard_level'];
 	var finalSetAttrs = {};
 
 	var defaultClassDetails = {
@@ -507,6 +507,44 @@ function updateLevels () {
 		}
 
 		getAttrs(collectionArray, function (v) {
+
+      if (v.barbarian_level) {
+        finalSetAttrs.barbarian_level = 0;
+      }
+      if (v.bard_level) {
+        finalSetAttrs.bard_level = 0;
+      }
+      if (v.cleric_level) {
+        finalSetAttrs.cleric_level = 0;
+      }
+      if (v.druid_level) {
+        finalSetAttrs.druid_level = 0;
+      }
+      if (v.fighter_level) {
+        finalSetAttrs.fighter_level = 0;
+      }
+      if (v.monk_level) {
+        finalSetAttrs.monk_level = 0;
+      }
+      if (v.paladin_level) {
+        finalSetAttrs.paladin_level = 0;
+      }
+      if (v.ranger_level) {
+        finalSetAttrs.ranger_level = 0;
+      }
+      if (v.rogue_level) {
+        finalSetAttrs.rogue_level = 0;
+      }
+      if (v.sorcerer_level) {
+        finalSetAttrs.sorcerer_level = 0;
+      }
+      if (v.warlock_level) {
+        finalSetAttrs.warlock_level = 0;
+      }
+      if (v.wizard_level) {
+        finalSetAttrs.wizard_level = 0;
+      }
+
 			for (var j = 0; j < ids.length; j++) {
 				var repeatingString = repeatingItem + '_' + ids[j] + '_';
 
@@ -530,7 +568,13 @@ function updateLevels () {
 				totalLevel += classLevel;
 				levelArray.push(className.capitalize() + ' ' + classLevel);
 
-				var classHd = v[repeatingString + 'hd'];
+        if (v[className + '_level']) {
+          finalSetAttrs[className + '_level'] += classLevel;
+        } else {
+          finalSetAttrs[className + '_level'] = classLevel;
+        }
+
+        var classHd = v[repeatingString + 'hd'];
 				if (!exists(classHd)) {
 					if (defaultClassDetails.hasOwnProperty(className)) {
 						classHd = defaultClassDetails[className].hd;
@@ -3256,6 +3300,9 @@ function sheetOpened () {
 			updateType();
 			updateAlignment();
 		}
+    if (versionCompare(version, '2.1.5') < 0) {
+      updateLevels();
+    }
 
 		if (!version || version !== currentVersion) {
 			finalSetAttrs.version = currentVersion;
