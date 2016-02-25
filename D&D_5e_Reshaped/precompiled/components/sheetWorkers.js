@@ -9,7 +9,7 @@ String.prototype.firstThree = function () {
 	return this.substring(0, 3);
 };
 Number.prototype.round = function(places) {
-	return +(Math.round(this + "e+" + places)  + "e-" + places);
+	return +(Math.round(this + 'e+' + places)  + 'e-' + places);
 };
 function getIntValue(value, defaultValue) {
 	if (!defaultValue) {
@@ -2700,9 +2700,9 @@ function parseDamage (finalSetAttrs, repeatingString, freetext, regex, name, spe
 	var damageBonus;
 	if (damage) {
 		/*
-		 1 is damage without dice. Example "1"
-		 2 is damage with dice. Example "2d6+4"
-		 3 is damage type. Example "slashing" or "lightning or thunder"
+		 1 is damage without dice. Example '1'
+		 2 is damage with dice. Example '2d6+4'
+		 3 is damage type. Example 'slashing' or 'lightning or thunder'
 		 */
 		if (damage[1]) {
 			damageBonus = damage[1];
@@ -3150,6 +3150,142 @@ on('change:condition_immunities', function () {
 	updateConditionImmunities();
 });
 
+function updateLanguageSelection() {
+  var collectionArray = ['lang'];
+  var finalSetAttrs = {};
+
+  getAttrs(collectionArray, function (v) {
+    var language = v.lang;
+
+    if (language) {
+      if (language === 'English') {
+        finalSetAttrs.lang = 'en';
+      } else if (language === 'French') {
+        finalSetAttrs.lang = 'fr';
+      } else if (language === 'German') {
+        finalSetAttrs.lang = 'de';
+      } else if (language === 'Russian') {
+        finalSetAttrs.lang = 'ru';
+      }
+    }
+    setFinalAttrs(v, finalSetAttrs);
+  });
+}
+
+function generateSkills () {
+  var repeatingItem = 'repeating_skill';
+  var collectionArray = ['lang'];
+  var finalSetAttrs = {};
+
+  var skills = {
+    abilities: {
+      'acrobatics': 'dexterity',
+      'animalHandling': 'wisdom',
+      'arcana': 'intelligence',
+      'athletics': 'strength',
+      'deception': 'charisma',
+      'history': 'intelligence',
+      'insight': 'wisdom',
+      'intimidation': 'charisma',
+      'investigation': 'intelligence',
+      'medicine': 'wisdom',
+      'nature': 'intelligence',
+      'perception': 'wisdom',
+      'performance': 'charisma',
+      'persuasion': 'charisma',
+      'religion': 'intelligence',
+      'sleightOfHand': 'dexterity',
+      'stealth': 'dexterity',
+      'survival': 'wisdom'
+    },
+    names: {
+      en: {
+        'acrobatics': 'Acrobatics',
+        'animalHandling': 'Animal Handling',
+        'arcana': 'Arcana',
+        'athletics': 'Athletics',
+        'deception': 'Deception',
+        'history': 'History',
+        'insight': 'Insight',
+        'intimidation': 'Intimidation',
+        'investigation': 'Investigation',
+        'medicine': 'Medicine',
+        'nature': 'Nature',
+        'perception': 'Perception',
+        'performance': 'Performance',
+        'persuasion': 'Persuasion',
+        'religion': 'Religion',
+        'sleightOfHand': 'Sleight of Hand',
+        'stealth': 'Stealth',
+        'survival': 'Survival'
+      },
+      fr: {
+        'acrobatics': 'Acrobaties',
+        'animalHandling': 'Dressage',
+        'arcana': 'Arcanes',
+        'athletics': 'Athlétisme',
+        'deception': 'Tromperie',
+        'history': 'Histoire',
+        'insight': 'Intuition',
+        'intimidation': 'Intimidation',
+        'investigation': 'Investigation',
+        'medicine': 'Médecine',
+        'nature': 'Nature',
+        'perception': 'Perception',
+        'performance': 'Représentation',
+        'persuasion': 'Persuasion',
+        'religion': 'Religion',
+        'sleightOfHand': 'Escamotage',
+        'stealth': 'Discrétion',
+        'survival': 'Survie'
+      }
+    }
+  };
+
+  var repeatingString;
+
+  getSectionIDs(repeatingItem, function (ids) {
+    for (var i = 0; i < ids.length; i++) {
+      repeatingString = repeatingItem + '_' + ids[i] + '_';
+      collectionArray.push(repeatingString + 'name');
+      collectionArray.push(repeatingString + 'ability');
+    }
+
+    getAttrs(collectionArray, function (v) {
+      var language = v.lang;
+      if (!language || !skills.names[language]) {
+        language = 'en';
+      }
+
+      var x = 0;
+      Object.keys(skills.abilities).forEach(function(key) {
+        var name = skills.names[language][key];
+        var ability = skills.abilities[key];
+        var skillId;
+
+        if (ids[x]) {
+          skillId = ids[x];
+        } else {
+          skillId = generateRowID();
+        }
+        repeatingString = repeatingItem + '_' + skillId + '_';
+        finalSetAttrs[repeatingString + 'name'] = name;
+        finalSetAttrs[repeatingString + 'ability'] = '@{' + ability + '_mod}';
+        updateSkill(skillId);
+
+        x++;
+      });
+      setFinalAttrs(v, finalSetAttrs);
+    });
+  });
+}
+on('change:lang', function () {
+  generateSkills();
+});
+on('change:generate_skills', function () {
+  generateSkills();
+});
+
 function sheetOpened () {
 	var collectionArray = ['version', 'strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
 	var finalSetAttrs = {};
@@ -3193,88 +3329,7 @@ function sheetOpened () {
 			}
 			setFinalAttrs(v, setAbilities);
 
-			var skills = [
-				{
-					'name': 'Acrobatics',
-					'ability': 'dexterity'
-				},
-				{
-					'name': 'Animal Handling',
-					'ability': 'wisdom'
-				},
-				{
-					'name': 'Arcana',
-					'ability': 'intelligence'
-				},
-				{
-					'name': 'Athletics',
-					'ability': 'strength'
-				},
-				{
-					'name': 'Deception',
-					'ability': 'charisma'
-				},
-				{
-					'name': 'History',
-					'ability': 'intelligence'
-				},
-				{
-					'name': 'Insight',
-					'ability': 'wisdom'
-				},
-				{
-					'name': 'Intimidation',
-					'ability': 'charisma'
-				},
-				{
-					'name': 'Investigation',
-					'ability': 'intelligence'
-				},
-				{
-					'name': 'Medicine',
-					'ability': 'wisdom'
-				},
-				{
-					'name': 'Nature',
-					'ability': 'intelligence'
-				},
-				{
-					'name': 'Perception',
-					'ability': 'wisdom'
-				},
-				{
-					'name': 'Performance',
-					'ability': 'charisma'
-				},
-				{
-					'name': 'Persuasion',
-					'ability': 'charisma'
-				},
-				{
-					'name': 'Religion',
-					'ability': 'intelligence'
-				},
-				{
-					'name': 'Sleight of Hand',
-					'ability': 'dexterity'
-				},
-				{
-					'name': 'Stealth',
-					'ability': 'dexterity'
-				},
-				{
-					'name': 'Survival',
-					'ability': 'wisdom'
-				}
-			];
-
-			for (var i = 0; i < skills.length; i++) {
-				var newRowId = generateRowID();
-				var repeatingString = 'repeating_skill_' + newRowId + '_';
-				finalSetAttrs[repeatingString + 'name'] = skills[i].name;
-				finalSetAttrs[repeatingString + 'ability'] = '@{' + skills[i].ability + '_mod}';
-				updateSkill(newRowId);
-			}
+      generateSkills();
 			updateSavingThrows();
 		}
 
@@ -3302,6 +3357,7 @@ function sheetOpened () {
 		}
     if (versionCompare(version, '2.1.5') < 0) {
       updateLevels();
+      updateLanguageSelection();
     }
 
 		if (!version || version !== currentVersion) {
