@@ -408,13 +408,13 @@ on('change:dexterity change:dexterity_bonus change:dexterity_check_mod change:ja
 on('change:constitution change:constitution_bonus change:constitution_check_mod change:jack_of_all_trades_toggle change:jack_of_all_trades change:remarkable_athlete_toggle change:remarkable_athlete change:global_ability_bonus', function () {
 	updateAbilityModifier('constitution');
 });
-on('change:intelligence change:intelligence_bonus change:intelligence_check_mod change:jack_of_all_trades_toggle change:jack_of_all_trades  change:global_ability_bonus', function () {
+on('change:intelligence change:intelligence_bonus change:intelligence_check_mod change:jack_of_all_trades_toggle change:jack_of_all_trades change:global_ability_bonus', function () {
 	updateAbilityModifier('intelligence');
 });
-on('change:wisdom change:wisdom_bonus change:wisdom_check_mod change:jack_of_all_trades_toggle change:jack_of_all_trades  change:global_ability_bonus', function () {
+on('change:wisdom change:wisdom_bonus change:wisdom_check_mod change:jack_of_all_trades_toggle change:jack_of_all_trades change:global_ability_bonus', function () {
 	updateAbilityModifier('wisdom');
 });
-on('change:charisma change:charisma_bonus change:charisma_check_mod change:jack_of_all_trades_toggle change:jack_of_all_trades  change:global_ability_bonus', function () {
+on('change:charisma change:charisma_bonus change:charisma_check_mod change:jack_of_all_trades_toggle change:jack_of_all_trades change:global_ability_bonus', function () {
 	updateAbilityModifier('charisma');
 });
 on('change:dexterity_mod', function () {
@@ -1153,9 +1153,8 @@ function updateInitiative () {
 			}
 		}
 
-		var globalCheckBonus = getIntValue(v.global_check_bonus);
+		var globalCheckBonus = v.global_check_bonus;
 		if (exists(globalCheckBonus)) {
-			finalSetAttrs.initiative += globalCheckBonus;
 			finalSetAttrs.initiative_formula += ADD + globalCheckBonus + '[global check bonus]';
 		}
 		setFinalAttrs(v, finalSetAttrs);
@@ -1255,18 +1254,15 @@ function updateAttackToggle (v, finalSetAttrs, repeatingString, options) {
 		}
 
 		if (exists(options.globalAttackBonus)) {
-			toHit += options.globalAttackBonus;
 			attackFormula += ADD + options.globalAttackBonus + '[' + options.globalAttackBonusLabel + ']';
 		}
 
 		if (!v[repeatingString + 'type'] || v[repeatingString + 'type'] === 'Melee Weapon') {
 			if (exists(options.globalMeleeAttackBonus)) {
-				toHit += options.globalMeleeAttackBonus;
 				attackFormula += ADD + options.globalMeleeAttackBonus + '[global melee attack bonus]';
 			}
 		} else if (v[repeatingString + 'type'] === 'Ranged Weapon') {
 			if (exists(options.globalRangedAttackBonus)) {
-				toHit += options.globalRangedAttackBonus;
 				attackFormula += ADD + options.globalRangedAttackBonus + '[global ranged attack bonus]';
 			}
 		}
@@ -1359,18 +1355,15 @@ function updateDamageToggle (v, finalSetAttrs, repeatingString, options) {
 		}
 
 		if (exists(options.globalDamageBonus)) {
-			damageAddition += options.globalDamageBonus;
 			damageFormula += ADD + options.globalDamageBonus + '[global damage bonus]';
 		}
 
 		if (options && options.globalMeleeDamageBonus && !v[repeatingString + 'type'] || v[repeatingString + 'type'] === 'Melee Weapon') {
-			damageAddition += options.globalMeleeDamageBonus;
 			if (damageFormula !== '') {
 				damageFormula += ADD;
 			}
 			damageFormula += options.globalMeleeDamageBonus + '[global melee damage bonus]';
 		} else if (options && options.globalRangedDamageBonus && v[repeatingString + 'type'] === 'Ranged Weapon') {
-			damageAddition += options.globalRangedDamageBonus;
 			if (damageFormula !== '') {
 				damageFormula += ADD;
 			}
@@ -1686,10 +1679,10 @@ function updateAttack (rowId) {
 
 				var attackOptions = {
 					defaultAbility: 'strength_mod',
-					globalAttackBonus: getIntValue(v.global_attack_bonus),
+					globalAttackBonus: v.global_attack_bonus,
 					globalAttackBonusLabel: 'global attack bonus',
-					globalMeleeAttackBonus: getIntValue(v.global_melee_attack_bonus),
-					globalRangedAttackBonus: getIntValue(v.global_ranged_attack_bonus),
+					globalMeleeAttackBonus: v.global_melee_attack_bonus,
+					globalRangedAttackBonus: v.global_ranged_attack_bonus,
 					type: 'attack'
 				};
 				updateAttackToggle(v, finalSetAttrs, repeatingString, attackOptions);
@@ -1698,9 +1691,9 @@ function updateAttack (rowId) {
 
 				var damageOptions = {
 					defaultDamageAbility: 'strength_mod',
-					globalDamageBonus: getIntValue(v.global_damage_bonus),
-					globalMeleeDamageBonus: getIntValue(v.global_melee_damage_bonus),
-					globalRangedDamageBonus: getIntValue(v.global_ranged_damage_bonus),
+					globalDamageBonus: v.global_damage_bonus,
+					globalMeleeDamageBonus: v.global_melee_damage_bonus,
+					globalRangedDamageBonus: v.global_ranged_damage_bonus,
 					type: 'attack'
 				};
 				updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
@@ -1804,7 +1797,7 @@ function updateSpell (rowId) {
 
 				var attackOptions = {
 					attackAbility: true,
-					globalAttackBonus: getIntValue(v.global_spell_attack_bonus),
+					globalAttackBonus: v.global_spell_attack_bonus,
 					type: 'spell'
 				};
 				updateAttackToggle(v, finalSetAttrs, repeatingString, attackOptions);
@@ -1815,7 +1808,7 @@ function updateSpell (rowId) {
 				updateSavingThrowToggle(v, finalSetAttrs, repeatingString, savingThrowOptions);
 
 				var damageOptions = {
-					globalDamageBonus: getIntValue(v.global_spell_damage_bonus),
+					globalDamageBonus: v.global_spell_damage_bonus,
 					type: 'spell'
 				};
 				updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
@@ -1942,9 +1935,8 @@ function updateSkill (rowId) {
 					}
 				}
 
-				var globalCheckBonus = getIntValue(v.global_check_bonus);
+				var globalCheckBonus = v.global_check_bonus;
 				if (exists(globalCheckBonus)) {
-					total += globalCheckBonus;
 					totalFormula += ADD + globalCheckBonus + '[global check bonus]';
 				}
 
@@ -2067,9 +2059,8 @@ function updateSavingThrow (ability) {
 			totalFormula += ADD + abilitySavingThrowBonus + '[' + getAbilityShortName(ability) + 'saving throw bonus]';
 		}
 
-		var globalSavingThrowBonus = getIntValue(v.global_saving_throw_bonus);
+		var globalSavingThrowBonus = v.global_saving_throw_bonus;
 		if (exists(globalSavingThrowBonus)) {
-			total += globalSavingThrowBonus;
 			totalFormula += ADD + globalSavingThrowBonus + '[global saving throw bonus]';
 		}
 
@@ -2592,10 +2583,10 @@ function updateAction (type, rowId) {
 
 				var attackOptions = {
 					defaultAbility: 'strength_mod',
-					globalAttackBonus: getIntValue(v.global_attack_bonus),
+					globalAttackBonus: v.global_attack_bonus,
 					globalAttackBonusLabel: 'global attack bonus',
-					globalMeleeAttackBonus: getIntValue(v.global_melee_attack_bonus),
-					globalRangedAttackBonus: getIntValue(v.global_ranged_attack_bonus),
+					globalMeleeAttackBonus: v.global_melee_attack_bonus,
+					globalRangedAttackBonus: v.global_ranged_attack_bonus,
 					type: 'attack'
 				};
 				updateAttackToggle(v, finalSetAttrs, repeatingString, attackOptions);
@@ -2604,9 +2595,9 @@ function updateAction (type, rowId) {
 
 				var damageOptions = {
 					defaultDamageAbility: 'strength_mod',
-					globalDamageBonus: getIntValue(v.global_damage_bonus),
-					globalMeleeDamageBonus: getIntValue(v.global_melee_damage_bonus),
-					globalRangedDamageBonus: getIntValue(v.global_ranged_damage_bonus),
+					globalDamageBonus: v.global_damage_bonus,
+					globalMeleeDamageBonus: v.global_melee_damage_bonus,
+					globalRangedDamageBonus: v.global_ranged_damage_bonus,
 					type: 'attack'
 				};
 				updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
