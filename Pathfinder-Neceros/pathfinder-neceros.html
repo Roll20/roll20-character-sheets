@@ -13590,7 +13590,7 @@ var SWUtils = SWUtils || (function() {
 
 var PFSheet = PFSheet || (function(){
 
-    var version= 0.34,
+    var version= 0.35,
 	pfDebug = false,
 	
 	/****************************** UTILITIES ************************************/
@@ -14288,7 +14288,7 @@ var PFSheet = PFSheet || (function(){
 	* @dropdownField {string} = fieldname of dropdown, FROM eventInfo.sourceAttribute
 	*/
 	handleDefenseDropdown= function(dropdownField) {
-		console.log("at handleDefenseDropdown:"+ability);
+		//console.log("at handleDefenseDropdown:"+dropdownField);
 		switch(dropdownField){
 			case "CMD-ability1":
 			case "cmd-ability1":
@@ -15265,29 +15265,39 @@ var PFSheet = PFSheet || (function(){
 	* updates Bonus Spells for the class
 	* It looks at the attribute, not the attribute mod. So it does not change with ability damage or penalties.
 	*/
-    updateBonusSpells=function(classidx) {
-            getAttrs(["Concentration-"+classidx+"-ability"],function(va){
-                var ability=findAbilityInString(va["Concentration-"+classidx+"-ability"]).replace("-mod","");
-				//eliminate the modifier, we just want @{INT} not @{INT-mod}
-                getAttrs([ability],function(v){
-                    var spellAbility=parseInt(v[ability],10)||0
-					,fields={},bonusSpells,bonusName,i,newRaw;
-                    if (spellAbility >= 12) {
-                        for(i=1;i<10;i++) {
-                            newRaw=Math.max(0,spellAbility-10-(2*(i-1)));
-                            bonusSpells=Math.ceil(newRaw/8);
-                            bonusName="spellclass-"+classidx+"-level-"+i+"-bonus";
-                            fields[bonusName]=bonusSpells;
-                        }
-                    } else {
-                        for(i=1;i<10;i++) {
-                            bonusName="spellclass-"+classidx+"-level-"+i+"-bonus";
-                            fields[bonusName]=0;
-                        }
-                    }
-                    setAttrs(fields);
-                });
-            });
+    updateBonusSpells=function(classidx,eventInfo) {
+		console.log("at updateBonusSpells: idx:"+classidx );
+		TAS.log(eventInfo);
+		
+		var conAbility="Concentration-"+classidx+"-ability";
+		getAttrs([conAbility,"INT","WIS","CHA","STR","DEX","CON"],function(v){
+			//eliminate the modifier, we just want @{INT} not @{INT-mod}
+			var abilityName=findAbilityInString(v[conAbility]).replace("-mod","")
+				,abilityVal=parseInt(v[abilityName],10)
+				,fields={},bonusSpells,bonusName,i,newRaw
+				,prefix="spellclass-"+classidx+"-level-";
+			TAS.log(v);
+			console.log("abilityName:"+abilityName+", abilityVal:"+abilityVal);
+			if (isNaN(abilityVal)) {
+				//error
+				return;
+			}
+			if (abilityVal >= 12) {
+				abilityVal-=1;
+				for(i=1;i<10;i++) {
+					newRaw=Math.max(0,abilityVal-10-(2*(i-1)));
+					bonusSpells=Math.ceil(newRaw/8);
+					bonusName=prefix+i+"-bonus";
+					fields[bonusName]=bonusSpells;
+				}
+			} else {
+				for(i=1;i<10;i++) {
+					bonusName=prefix+i+"-bonus";
+					fields[bonusName]=0;
+				}
+			}
+			setAttrs(fields,{quiet:true});
+		});
     },
 
 	/* updateMaxSpellsPerDay
@@ -15984,7 +15994,12 @@ var PFSheet = PFSheet || (function(){
 	        TAS.repeatingSimpleSum('belonging', 'hp', 'belonging-total-hp');
 	        TAS.repeatingSimpleSum('belonging', 'hp_max', 'belonging-total-hp_max');
 	        TAS.repeatingSimpleSum('belonging', 'value', 'belonging-total-value');
-			}
+		}
+		if (oldversion < .35) {
+			if (ifSpellClassExists(0),function(){updateBonusSpells(0);});
+			if (ifSpellClassExists(1),function(){updateBonusSpells(1);});
+			if (ifSpellClassExists(2),function(){updateBonusSpells(2);});
+		}
 	},  
 	
 
@@ -16891,9 +16906,20 @@ on("change:concentration-1-ability", function () {PFSheet.handleConcentrationAbi
 on("change:concentration-2-ability", function () {PFSheet.handleConcentrationAbilityDropdown(2);});
 
 
-on("change:concentration-0-mod",function(){PFSheet.ifSpellClassExists(0,function(){PFSheet.updateBonusSpells(0);PFSheet.updateSaveDCs(0);});});
-on("change:concentration-1-mod",function(){PFSheet.ifSpellClassExists(1,function(){PFSheet.updateBonusSpells(1);PFSheet.updateSaveDCs(1);});});
-on("change:concentration-2-mod",function(){PFSheet.ifSpellClassExists(2,function(){PFSheet.updateBonusSpells(2);PFSheet.updateSaveDCs(2);});});
+on("change:concentration-0-mod",function(){PFSheet.ifSpellClassExists(0,function(){PFSheet.updateSaveDCs(0);});});
+on("change:concentration-1-mod",function(){PFSheet.ifSpellClassExists(1,function(){PFSheet.updateSaveDCs(1);});});
+on("change:concentration-2-mod",function(){PFSheet.ifSpellClassExists(2,function(){PFSheet.updateSaveDCs(2);});});
+
+
+on("change:concentration-0-ability",function(eventInfo){PFSheet.ifSpellClassExists(0,function(){PFSheet.updateBonusSpells(0,eventInfo);});});
+on("change:concentration-1-ability",function(eventInfo){PFSheet.ifSpellClassExists(1,function(){PFSheet.updateBonusSpells(1,eventInfo);});});
+on("change:concentration-2-ability",function(eventInfo){PFSheet.ifSpellClassExists(2,function(){PFSheet.updateBonusSpells(2,eventInfo);});});
+//this will make it fire twice
+//on("change:int change:wis change:cha change:str change:dex change:con",function(eventInfo){
+//		PFSheet.ifSpellClassExists(0,function(){PFSheet.updateBonusSpells(0,eventInfo);});
+//		PFSheet.ifSpellClassExists(1,function(){PFSheet.updateBonusSpells(1,eventInfo);});
+//		PFSheet.ifSpellClassExists(2,function(){PFSheet.updateBonusSpells(2,eventInfo);});
+//});
 
 on("change:concentration-0-mod change:buff_check-total change:concentration-0-misc", function () {PFSheet.ifSpellClassExists(0,function(){PFSheet.updateConcentration(0);});});
 on("change:concentration-1-mod change:buff_check-total change:concentration-1-misc", function () {PFSheet.ifSpellClassExists(1,function(){PFSheet.updateConcentration(1);});});
