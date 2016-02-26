@@ -2592,6 +2592,10 @@ function updateAction (type, rowId) {
 			collectionArray.push(repeatingString + 'second_damage_bonus');
 			collectionArray.push(repeatingString + 'second_damage_type');
 			collectionArray.push(repeatingString + 'damage_string');
+			collectionArray.push(repeatingString + 'heal_toggle');
+			collectionArray.push(repeatingString + 'heal');
+			collectionArray.push(repeatingString + 'heal_ability');
+			collectionArray.push(repeatingString + 'heal_bonus');
 			collectionArray.push(repeatingString + 'parsed');
 			collectionArray.push(repeatingString + 'recharge');
 			collectionArray.push(repeatingString + 'recharge_display');
@@ -2647,6 +2651,8 @@ function updateAction (type, rowId) {
 					type: 'attack'
 				};
 				updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
+
+				updateHealToggle(v, finalSetAttrs, repeatingString);
 			}
 			setFinalAttrs(v, finalSetAttrs);
 		});
