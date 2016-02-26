@@ -103,11 +103,11 @@ function fromVOrFinalSetAttrs(v, finalSetAttrs, value) {
 function parseAttackComponent(v, repeatingString, finalSetAttrs, options) {
 	var parsed = v[repeatingString + 'parsed'];
 
-	if (!exists(parsed)) {
+	if (isUndefined(parsed)) {
 		parsed = finalSetAttrs[repeatingString + 'parsed'];
 	}
 
-	if (!exists(parsed) || parsed.indexOf(options.parseName) === -1) {
+	if (isUndefined(parsed) || parsed.indexOf(options.parseName) === -1) {
 		var aTriggerFieldExists = false;
 
 		for (var i = 0; i < options.triggerFields.length; i++) {
@@ -119,7 +119,7 @@ function parseAttackComponent(v, repeatingString, finalSetAttrs, options) {
 		if (aTriggerFieldExists && !exists(v[repeatingString + options.toggleField])) {
 			finalSetAttrs[repeatingString + options.toggleField] = options.toggleFieldSetTo;
 
-			if (!exists(finalSetAttrs[repeatingString + 'parsed'])) {
+			if (isUndefined(finalSetAttrs[repeatingString + 'parsed'])) {
 				finalSetAttrs[repeatingString + 'parsed'] = '';
 			}
 			finalSetAttrs[repeatingString + 'parsed'] += ' ' + options.parseName;
@@ -140,6 +140,12 @@ function parseAttackComponent(v, repeatingString, finalSetAttrs, options) {
 }
 function hasUpperCase(string) {
 	return (/[A-Z]/.test(string));
+}
+function isUndefined(value) {
+	if (typeof value === 'undefined'){
+		return true;
+	}
+	 return false;
 }
 function emptyIfUndefined(value) {
 	if (!value) {
@@ -549,7 +555,7 @@ function updateLevels () {
 				var repeatingString = repeatingItem + '_' + ids[j] + '_';
 
 				var className = v[repeatingString + 'name'];
-				if (!exists(className)) {
+				if (isUndefined(className)) {
 					className = 'barbarian';
 				}
 				if (className === 'custom') {
@@ -575,7 +581,7 @@ function updateLevels () {
         }
 
         var classHd = v[repeatingString + 'hd'];
-				if (!exists(classHd)) {
+				if (isUndefined(classHd)) {
 					if (defaultClassDetails.hasOwnProperty(className)) {
 						classHd = defaultClassDetails[className].hd;
 						finalSetAttrs[repeatingString + 'hd'] = classHd;
@@ -586,7 +592,7 @@ function updateLevels () {
 				hd[classHd] += classLevel;
 
 				var classSpellcasting = v[repeatingString + 'spellcasting'];
-				if (!exists(classSpellcasting)) {
+				if (isUndefined(classSpellcasting)) {
 					if (defaultClassDetails.hasOwnProperty(className)) {
 						classSpellcasting = defaultClassDetails[className].spellcasting;
 						finalSetAttrs[repeatingString + 'spellcasting'] = classSpellcasting;
@@ -704,7 +710,7 @@ function updateSpellSlots () {
 	getAttrs(collectionArray, function (v) {
 		var casterLevel = getIntValue(v.level);
 		var casterType = v.caster_type;
-		if (!exists(casterType)) {
+		if (isUndefined(casterType)) {
 			casterType = 'full';
 		}
 
@@ -1007,14 +1013,14 @@ function updateArmor (rowId) {
 			for (var j = 0; j < ids.length; j++) {
 				var repeatingString = repeatingItem + '_' + ids[j] + '_';
 
-				if (!exists(v[repeatingString + 'parsed']) || v[repeatingString + 'parsed'].indexOf('acBonus') === -1) {
+				if (isUndefined(v[repeatingString + 'parsed']) || v[repeatingString + 'parsed'].indexOf('acBonus') === -1) {
 					var armorModifiers = v[repeatingString + 'modifiers'];
 					if (exists(armorModifiers)) {
 						var acBonus = armorModifiers.replace(/^\D+/g, '');
 
 						finalSetAttrs[repeatingString + 'ac_bonus'] = acBonus;
 					}
-					if (!exists(finalSetAttrs[repeatingString + 'parsed'])) {
+					if (isUndefined(finalSetAttrs[repeatingString + 'parsed'])) {
 						finalSetAttrs[repeatingString + 'parsed'] = '';
 					}
 					finalSetAttrs[repeatingString + 'parsed'] += ' acBonus';
@@ -1078,7 +1084,7 @@ function updateEquipment (rowId) {
 			for (var j = 0; j < ids.length; j++) {
 				var repeatingString = repeatingItem + '_' + ids[j] + '_';
 
-				if (!exists(v[repeatingString + 'parsed']) || v[repeatingString + 'parsed'].indexOf('content') === -1) {
+				if (isUndefined(v[repeatingString + 'parsed']) || v[repeatingString + 'parsed'].indexOf('content') === -1) {
 					var content = v[repeatingString + 'content'];
 					if (exists(content)) {
 						content = content.replace(/\s(\d+d\d+\s(?:\+|\-)\s\d+)\s/g, ' [[$1]] ')
@@ -1087,7 +1093,7 @@ function updateEquipment (rowId) {
 
 						finalSetAttrs[repeatingString + 'content'] = content;
 					}
-					if (!exists(finalSetAttrs[repeatingString + 'parsed'])) {
+					if (isUndefined(finalSetAttrs[repeatingString + 'parsed'])) {
 						finalSetAttrs[repeatingString + 'parsed'] = '';
 					}
 					finalSetAttrs[repeatingString + 'parsed'] += ' content';
@@ -1273,13 +1279,13 @@ function updateAttackToggle (v, finalSetAttrs, repeatingString, options) {
 			attackFormula += 0 + '[unproficient]';
 		}
 
-		if (!exists(v[repeatingString + 'ammo']) && !exists(finalSetAttrs[repeatingString + 'ammo_weight']) && v[repeatingString + 'type'] === 'Ranged Weapon') {
+		if (isUndefined(v[repeatingString + 'ammo']) && isUndefined(finalSetAttrs[repeatingString + 'ammo_weight']) && v[repeatingString + 'type'] === 'Ranged Weapon') {
 			finalSetAttrs[repeatingString + 'ammo'] = '1';
 			finalSetAttrs[repeatingString + 'ammo_weight'] = '.02';
 		}
 
 		var attackAbility = v[repeatingString + 'attack_ability'];
-		if (!exists(attackAbility) && v[repeatingString + 'type'] === 'Ranged Weapon') {
+		if (isUndefined(attackAbility) && v[repeatingString + 'type'] === 'Ranged Weapon') {
 			attackAbility = '@{dexterity_mod}';
 			finalSetAttrs[repeatingString + 'attack_ability'] = attackAbility;
 		} else if (finalSetAttrs[repeatingString + 'attack_ability']) {
@@ -1310,9 +1316,6 @@ function updateAttackToggle (v, finalSetAttrs, repeatingString, options) {
 				attackFormula += ADD + options.globalRangedAttackBonus + '[global ranged attack bonus]';
 			}
 		}
-	}
-	if (!exists(toHit)) {
-		toHit = 0;
 	}
 	if (options.type === 'attack') {
 		finalSetAttrs[repeatingString + 'to_hit'] = toHit;
@@ -1377,7 +1380,7 @@ function updateDamageToggle (v, finalSetAttrs, repeatingString, options) {
 		}
 
 		damageAbility = v[repeatingString + 'damage_ability'];
-		if (!exists(damageAbility) && v[repeatingString + 'type'] === 'Ranged Weapon') {
+		if (isUndefined(damageAbility) && v[repeatingString + 'type'] === 'Ranged Weapon') {
 			damageAbility = '@{dexterity_mod}';
 			finalSetAttrs[repeatingString + 'damage_ability'] = damageAbility;
 		}
@@ -1482,7 +1485,7 @@ function updateDamageToggle (v, finalSetAttrs, repeatingString, options) {
 			damageString += SPACE + secondDamageType;
 		}
 
-		if (!exists(v[repeatingString + 'parsed']) || v[repeatingString + 'parsed'].indexOf('damageProperties') === -1) {
+		if (isUndefined(v[repeatingString + 'parsed']) || v[repeatingString + 'parsed'].indexOf('damageProperties') === -1) {
 			var damageProperties = v[repeatingString + 'properties'];
 			if (exists(damageProperties)) {
 				if (damageProperties.indexOf('Versatile') !== -1) {
@@ -1678,11 +1681,11 @@ function updateAttack (rowId) {
 				var repeatingString = repeatingItem + '_' + ids[j] + '_';
 
 				var attackName = v[repeatingString + 'name'];
-				if (!exists(attackName)) {
+				if (isUndefined(attackName)) {
 					return;
 				}
 
-				if (!exists(v[repeatingString + 'parsed']) || v[repeatingString + 'parsed'].indexOf('modifiers') === -1) {
+				if (isUndefined(v[repeatingString + 'parsed']) || v[repeatingString + 'parsed'].indexOf('modifiers') === -1) {
 					var attackModifiers = v[repeatingString + 'modifiers'];
 					if (exists(attackModifiers)) {
 						var attackBonus = attackModifiers.replace(/.*(?:Melee|Ranged) Attacks \+(\d+).*/gi, '$1');
@@ -1696,7 +1699,7 @@ function updateAttack (rowId) {
 						finalSetAttrs[repeatingString + 'parsed'] += ' modifiers';
 					}
 				}
-				if (!exists(v[repeatingString + 'parsed']) || v[repeatingString + 'parsed'].indexOf('attackProperties') === -1) {
+				if (isUndefined(v[repeatingString + 'parsed']) || v[repeatingString + 'parsed'].indexOf('attackProperties') === -1) {
 					var attackProperties = v[repeatingString + 'properties'];
 					if (exists(attackProperties)) {
 						if (attackProperties.indexOf('Reach') !== -1) {
@@ -1814,8 +1817,7 @@ function updateSpell (rowId) {
 				var repeatingString = repeatingItem + '_' + ids[j] + '_';
 
 				var spellLevel = getIntValue(v[repeatingString + 'spell_level']);
-				if (!exists(spellLevel)) {
-					spellLevel = 0;
+				if (spellLevel === 0) {
 					finalSetAttrs[repeatingString + 'spell_level'] = spellLevel;
 				}
 				if (spellLevel === 0) {
@@ -1924,7 +1926,7 @@ function updateSkill (rowId) {
 				var repeatingString = repeatingItem + '_' + ids[j] + '_';
 
 				var skillName = v[repeatingString + 'name'];
-				if (!exists(skillName)) {
+				if (isUndefined(skillName)) {
 					return;
 				}
 
@@ -2028,7 +2030,7 @@ function updateSkillsFromSRD () {
       var skillName;
       var repeatingString;
 
-			if (exists(skillsFromSRD)) {
+			if (!isUndefined(skillsFromSRD)) {
 				for (var j = 0; j < ids.length; j++) {
 					repeatingString = repeatingItem + '_' + ids[j] + '_';
 					skillName = v[repeatingString + 'name'];
@@ -2104,7 +2106,7 @@ function updateSavingThrow (ability) {
 		}
 
 		var globalSavingThrowBonus = v.global_saving_throw_bonus;
-		if (exists(globalSavingThrowBonus)) {
+		if (!isUndefined(globalSavingThrowBonus)) {
 			totalFormula += ADD + globalSavingThrowBonus + '[global saving throw bonus]';
 		}
 
@@ -2600,7 +2602,7 @@ function updateAction (type, rowId) {
 				var repeatingString = repeatingItem + '_' + ids[j] + '_';
 
 				var actionName = v[repeatingString + 'name'];
-				if (!exists(actionName)) {
+				if (isUndefined(actionName)) {
 					return;
 				} else {
 					var rechargeResult = rechargeRegex.exec(actionName);
@@ -3295,32 +3297,32 @@ function sheetOpened () {
 			updatePb();
 
 			var setAbilities = {};
-			if (!exists(v.strength)) {
+			if (isUndefined(v.strength)) {
 				setAbilities.strength = 10;
 				setAbilities.strength_mod = 0;
 				setAbilities.strength_mod_with_sign = '+0';
 			}
-			if (!exists(v.dexterity)) {
+			if (isUndefined(v.dexterity)) {
 				setAbilities.dexterity = 10;
 				setAbilities.dexterity_mod = 0;
 				setAbilities.dexterity_mod_with_sign = '+0';
 			}
-			if (!exists(v.constitution)) {
+			if (isUndefined(v.constitution)) {
 				setAbilities.constitution = 10;
 				setAbilities.constitution_mod = 0;
 				setAbilities.constitution_mod_with_sign = '+0';
 			}
-			if (!exists(v.intelligence)) {
+			if (isUndefined(v.intelligence)) {
 				setAbilities.intelligence = 10;
 				setAbilities.intelligence_mod = 0;
 				setAbilities.intelligence_mod_with_sign = '+0';
 			}
-			if (!exists(v.wisdom)) {
+			if (isUndefined(v.wisdom)) {
 				setAbilities.wisdom = 10;
 				setAbilities.wisdom_mod = 0;
 				setAbilities.wisdom_mod_with_sign = '+0';
 			}
-			if (!exists(v.charisma)) {
+			if (isUndefined(v.charisma)) {
 				setAbilities.charisma = 10;
 				setAbilities.charisma_mod = 0;
 				setAbilities.charisma_mod_with_sign = '+0';
