@@ -3329,10 +3329,6 @@ function sheetOpened () {
 			}
 			setFinalAttrs(v, setAbilities);
 
-			finalSetAttrs.xp = 0;
-			finalSetAttrs.xp_next_level = 0;
-			finalSetAttrs.level = 0;
-			finalSetAttrs.class_and_level = 'set on "Character"';
       generateSkills();
 			updateSavingThrows();
 		}
