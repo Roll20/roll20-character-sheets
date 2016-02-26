@@ -3329,6 +3329,8 @@ function sheetOpened () {
 			}
 			setFinalAttrs(v, setAbilities);
 
+			finalSetAttrs.edit_mode = 1;
+
       generateSkills();
 			updateSavingThrows();
 		}
