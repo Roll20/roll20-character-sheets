@@ -12,8 +12,5 @@ Report any problems, suggestions or features by sending a private message on Rol
 
 ### 0.0.1
 
-* First release, supporting simple and escalation rolls.
-* Stats are set at a minimum of 2 as stated in character creation.
-* Each set of rolls is sorted for easier overall sorting.
-* Each individual dice roll can be clicked and dragged onto page for easier use.
-  *Standard Roll20 feature.
+* First release, has the complete blank character sheet.
+* Roll macros display the single highest roll.
