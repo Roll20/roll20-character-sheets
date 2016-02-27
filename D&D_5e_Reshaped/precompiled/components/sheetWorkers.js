@@ -1,4 +1,4 @@
-var currentVersion = '2.1.8';
+var currentVersion = '2.1.9';
 var skills = {
 	abilities: {
 		'acrobatics': 'dexterity',
@@ -3030,14 +3030,41 @@ on('change:repeating_lairaction remove:repeating_lairaction', function () {
 
 
 function switchToNPC () {
-	var collectionArray = ['is_npc', 'size'];
+	var collectionArray = ['is_npc', 'size', 'hide_saving_throw_dc', 'hide_spell_content', 'hide_action_freetext', 'hide_saving_throw_failure', 'hide_saving_throw_success', 'hide_recharge'];
 	var finalSetAttrs = {};
 
 	getAttrs(collectionArray, function (v) {
 		var isNPC = getIntValue(v.is_npc) === 1;
 
-		if (isNPC && !v.size) {
+		if (isNPC && isUndefined(v.size)) {
 			finalSetAttrs.size = 'Large';
+		}
+		if (isNPC) {
+			finalSetAttrs.hide_saving_throw_dc = '@{hide_saving_throw_dc_var}';
+			finalSetAttrs.hide_spell_content = '@{hide_spell_content_var}';
+			finalSetAttrs.hide_action_freetext = '@{hide_action_freetext_var}';
+			finalSetAttrs.hide_saving_throw_failure = '@{hide_saving_throw_failure_var}';
+			finalSetAttrs.hide_saving_throw_success = '@{hide_saving_throw_success_var}';
+			finalSetAttrs.hide_recharge = '@{hide_recharge_var}';
+		} else {
+			if (!isUndefined(v.hide_saving_throw_dc)) {
+				finalSetAttrs.hide_saving_throw_dc = '';
+			}
+			if (!isUndefined(v.hide_spell_content)) {
+				finalSetAttrs.hide_spell_content = '';
+			}
+			if (!isUndefined(v.hide_action_freetext)) {
+				finalSetAttrs.hide_action_freetext = '';
+			}
+			if (!isUndefined(v.hide_saving_throw_failure)) {
+				finalSetAttrs.hide_saving_throw_failure = '';
+			}
+			if (!isUndefined(v.hide_saving_throw_success)) {
+				finalSetAttrs.hide_saving_throw_success = '';
+			}
+			if (!isUndefined(v.hide_recharge)) {
+				finalSetAttrs.hide_recharge = '';
+			}
 		}
 		setFinalAttrs(v, finalSetAttrs);
 	});
@@ -3413,6 +3440,11 @@ function sheetOpened () {
 		if (versionCompare(version, '2.1.7') < 0) {
 			setSkillStorageNames();
 		}
+		if (versionCompare(version, '2.1.9') < 0) {
+			switchToNPC();
+		}
+
+
 
 		if (!version || version !== currentVersion) {
 			finalSetAttrs.version = currentVersion;
