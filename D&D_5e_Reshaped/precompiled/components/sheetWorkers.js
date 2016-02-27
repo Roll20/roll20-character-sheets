@@ -41,6 +41,26 @@ var skills = {
 			'stealth': 'Stealth',
 			'survival': 'Survival'
 		},
+		de: {
+			'acrobatics': 'Akrobatik',
+			'animalHandling': 'Umgang mit Tieren',
+			'arcana': 'Arkanes',
+			'athletics': 'Athletik',
+			'deception': 'Täuschung',
+			'history': 'Geschichte',
+			'insight': 'Einsicht',
+			'intimidation': 'Einschüchterung',
+			'investigation': 'Investigation',
+			'medicine': 'Medizin',
+			'nature': 'Natur',
+			'perception': 'Entdecken',
+			'performance': 'Auftreten',
+			'persuasion': 'Überreden',
+			'religion': 'Religion',
+			'sleightOfHand': 'Taschendiebstahl',
+			'stealth': 'Tarnung',
+			'survival': 'Überleben'
+		},
 		fr: {
 			'acrobatics': 'Acrobaties',
 			'animalHandling': 'Dressage',
