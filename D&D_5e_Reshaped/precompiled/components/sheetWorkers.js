@@ -1,4 +1,68 @@
-var currentVersion = '2.1.6';
+var currentVersion = '2.1.7';
+var skills = {
+	abilities: {
+		'acrobatics': 'dexterity',
+		'animalHandling': 'wisdom',
+		'arcana': 'intelligence',
+		'athletics': 'strength',
+		'deception': 'charisma',
+		'history': 'intelligence',
+		'insight': 'wisdom',
+		'intimidation': 'charisma',
+		'investigation': 'intelligence',
+		'medicine': 'wisdom',
+		'nature': 'intelligence',
+		'perception': 'wisdom',
+		'performance': 'charisma',
+		'persuasion': 'charisma',
+		'religion': 'intelligence',
+		'sleightOfHand': 'dexterity',
+		'stealth': 'dexterity',
+		'survival': 'wisdom'
+	},
+	names: {
+		en: {
+			'acrobatics': 'Acrobatics',
+			'animalHandling': 'Animal Handling',
+			'arcana': 'Arcana',
+			'athletics': 'Athletics',
+			'deception': 'Deception',
+			'history': 'History',
+			'insight': 'Insight',
+			'intimidation': 'Intimidation',
+			'investigation': 'Investigation',
+			'medicine': 'Medicine',
+			'nature': 'Nature',
+			'perception': 'Perception',
+			'performance': 'Performance',
+			'persuasion': 'Persuasion',
+			'religion': 'Religion',
+			'sleightOfHand': 'Sleight of Hand',
+			'stealth': 'Stealth',
+			'survival': 'Survival'
+		},
+		fr: {
+			'acrobatics': 'Acrobaties',
+			'animalHandling': 'Dressage',
+			'arcana': 'Arcanes',
+			'athletics': 'Athlétisme',
+			'deception': 'Tromperie',
+			'history': 'Histoire',
+			'insight': 'Intuition',
+			'intimidation': 'Intimidation',
+			'investigation': 'Investigation',
+			'medicine': 'Médecine',
+			'nature': 'Nature',
+			'perception': 'Perception',
+			'performance': 'Représentation',
+			'persuasion': 'Persuasion',
+			'religion': 'Religion',
+			'sleightOfHand': 'Escamotage',
+			'stealth': 'Discrétion',
+			'survival': 'Survie'
+		}
+	}
+};
 
 String.prototype.capitalize = function () {
 	return this.replace(/\w\S*/g, function (txt) {
@@ -10,6 +74,15 @@ String.prototype.firstThree = function () {
 };
 Number.prototype.round = function(places) {
 	return +(Math.round(this + 'e+' + places)  + 'e-' + places);
+};
+Object.prototype.getKeyByValue = function( value ) {
+	for (var prop in this) {
+		if (this.hasOwnProperty( prop )) {
+			if (this[ prop ] === value) {
+				return prop;
+			}
+		}
+	}
 };
 function getIntValue(value, defaultValue) {
 	if (!defaultValue) {
@@ -3177,75 +3250,45 @@ function updateLanguageSelection() {
   });
 }
 
+function setSkillStorageNames () {
+	var repeatingItem = 'repeating_skill';
+	var collectionArray = ['lang'];
+	var finalSetAttrs = {};
+
+	var repeatingString;
+
+	getSectionIDs(repeatingItem, function (ids) {
+		for (var i = 0; i < ids.length; i++) {
+			repeatingString = repeatingItem + '_' + ids[i] + '_';
+			collectionArray.push(repeatingString + 'name');
+			collectionArray.push(repeatingString + 'storage_name');
+		}
+
+		getAttrs(collectionArray, function (v) {
+			var language = v.lang;
+			if (!language || language === 'en') {
+				for (var i = 0; i < ids.length; i++) {
+					repeatingString = repeatingItem + '_' + ids[i] + '_';
+
+					var name = v[repeatingString + 'name'];
+					if (!isUndefined(name)) {
+						var storageName = skills.names.en.getKeyByValue(name);
+						console.log('storageName', storageName);
+
+						if (storageName && isUndefined(v[repeatingString + 'storage_name'])) {
+							finalSetAttrs[repeatingString + 'storage_name'] = storageName;
+						}
+					}
+				}
+				setFinalAttrs(v, finalSetAttrs);
+			}
+		});
+	});
+}
 function generateSkills () {
   var repeatingItem = 'repeating_skill';
   var collectionArray = ['lang'];
   var finalSetAttrs = {};
-
-  var skills = {
-    abilities: {
-      'acrobatics': 'dexterity',
-      'animalHandling': 'wisdom',
-      'arcana': 'intelligence',
-      'athletics': 'strength',
-      'deception': 'charisma',
-      'history': 'intelligence',
-      'insight': 'wisdom',
-      'intimidation': 'charisma',
-      'investigation': 'intelligence',
-      'medicine': 'wisdom',
-      'nature': 'intelligence',
-      'perception': 'wisdom',
-      'performance': 'charisma',
-      'persuasion': 'charisma',
-      'religion': 'intelligence',
-      'sleightOfHand': 'dexterity',
-      'stealth': 'dexterity',
-      'survival': 'wisdom'
-    },
-    names: {
-      en: {
-        'acrobatics': 'Acrobatics',
-        'animalHandling': 'Animal Handling',
-        'arcana': 'Arcana',
-        'athletics': 'Athletics',
-        'deception': 'Deception',
-        'history': 'History',
-        'insight': 'Insight',
-        'intimidation': 'Intimidation',
-        'investigation': 'Investigation',
-        'medicine': 'Medicine',
-        'nature': 'Nature',
-        'perception': 'Perception',
-        'performance': 'Performance',
-        'persuasion': 'Persuasion',
-        'religion': 'Religion',
-        'sleightOfHand': 'Sleight of Hand',
-        'stealth': 'Stealth',
-        'survival': 'Survival'
-      },
-      fr: {
-        'acrobatics': 'Acrobaties',
-        'animalHandling': 'Dressage',
-        'arcana': 'Arcanes',
-        'athletics': 'Athlétisme',
-        'deception': 'Tromperie',
-        'history': 'Histoire',
-        'insight': 'Intuition',
-        'intimidation': 'Intimidation',
-        'investigation': 'Investigation',
-        'medicine': 'Médecine',
-        'nature': 'Nature',
-        'perception': 'Perception',
-        'performance': 'Représentation',
-        'persuasion': 'Persuasion',
-        'religion': 'Religion',
-        'sleightOfHand': 'Escamotage',
-        'stealth': 'Discrétion',
-        'survival': 'Survie'
-      }
-    }
-  };
 
   var repeatingString;
 
@@ -3368,6 +3411,9 @@ function sheetOpened () {
       updateNPCAC();
       updateLanguageSelection();
     }
+		if (versionCompare(version, '2.1.7') < 0) {
+			setSkillStorageNames();
+		}
 
 		if (!version || version !== currentVersion) {
 			finalSetAttrs.version = currentVersion;
