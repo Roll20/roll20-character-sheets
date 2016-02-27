@@ -3273,7 +3273,6 @@ function setSkillStorageNames () {
 					var name = v[repeatingString + 'name'];
 					if (!isUndefined(name)) {
 						var storageName = skills.names.en.getKeyByValue(name);
-						console.log('storageName', storageName);
 
 						if (storageName && isUndefined(v[repeatingString + 'storage_name'])) {
 							finalSetAttrs[repeatingString + 'storage_name'] = storageName;
