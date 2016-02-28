@@ -1990,6 +1990,44 @@ on('change:halfling_luck', function () {
 	updateD20Mod();
 });
 
+function updateAbilityChecksMacro () {
+	var repeatingItem = 'repeating_skill';
+	var collectionArray = ['ability_checks_macro_var'];
+	var finalSetAttrs = {};
+
+	finalSetAttrs.ability_checks_macro_var = '[Strength](~strength_check)';
+	finalSetAttrs.ability_checks_macro_var += ', ';
+	finalSetAttrs.ability_checks_macro_var += '[Dexterity](~dexterity_check)';
+	finalSetAttrs.ability_checks_macro_var += ', ';
+	finalSetAttrs.ability_checks_macro_var += '[Constitution](~constitution_check)';
+	finalSetAttrs.ability_checks_macro_var += ', ';
+	finalSetAttrs.ability_checks_macro_var += '[Intelligence](~intelligence_check)';
+	finalSetAttrs.ability_checks_macro_var += ', ';
+	finalSetAttrs.ability_checks_macro_var += '[Wisdom](~wisdom_check)';
+	finalSetAttrs.ability_checks_macro_var += ', ';
+	finalSetAttrs.ability_checks_macro_var += '[Charisma](~charisma_check)';
+	finalSetAttrs.ability_checks_macro_var += ', ';
+	finalSetAttrs.ability_checks_macro_var += '[Initiative](~initiative)';
+
+	getSectionIDs(repeatingItem, function (ids) {
+		for (var i = 0; i < ids.length; i++) {
+			var repeatingString = repeatingItem + '_' + ids[i] + '_';
+			collectionArray.push(repeatingString + 'name');
+		}
+
+		console.log('collectionArray', collectionArray);
+		getAttrs(collectionArray, function (v) {
+			for (var j = 0; j < ids.length; j++) {
+				var repeatingString = repeatingItem + '_' + ids[j] + '_';
+				finalSetAttrs.ability_checks_macro_var += ', ';
+				finalSetAttrs.ability_checks_macro_var += '[' + v[repeatingString + 'name'] + '](~repeating_skill_' + ids[j] + '_skill)';
+			}
+			console.log('updateAbilityChecksMacro', finalSetAttrs);
+			setFinalAttrs(v, finalSetAttrs);
+		});
+	});
+}
+
 function updateSkill (rowId) {
 	var repeatingItem = 'repeating_skill';
 	var collectionArray = ['jack_of_all_trades_toggle', 'jack_of_all_trades', 'remarkable_athlete_toggle', 'remarkable_athlete', 'pb', 'exp', 'global_check_bonus'];
@@ -2088,6 +2126,7 @@ function updateSkill (rowId) {
 				finalSetAttrs[repeatingString + 'formula'] = totalFormula;
 			}
 			setFinalAttrs(v, finalSetAttrs);
+			updateAbilityChecksMacro();
 		});
 	});
 }
@@ -3407,6 +3446,7 @@ function sheetOpened () {
       generateSkills();
 			updateSavingThrows();
 			updateLevels();
+			updateAbilityChecksMacro();
 		}
 
 		if (versionCompare(version, '2.0.10') < 0) {
@@ -3445,6 +3485,7 @@ function sheetOpened () {
 		}
 		if (versionCompare(version, '2.1.11') < 0) {
 			updateLevels();
+			updateAbilityChecksMacro();
 		}
 
 
