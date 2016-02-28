@@ -2136,6 +2136,9 @@ on('change:repeating_skill', function (eventInfo) {
 		updateSkill(rowId);
 	}
 });
+on('remove:repeating_skill', function () {
+	updateAbilityChecksMacro();
+});
 on('change:jack_of_all_trades_toggle change:jack_of_all_trades change:remarkable_athlete_toggle change:remarkable_athlete change:global_check_bonus change:strength_check_bonus change:dexterity_check_bonus change:constitution_check_bonus change:intelligence_check_bonus change:wisdom_check_bonus change:charisma_check_bonus', function () {
 	updateSkill();
 });
