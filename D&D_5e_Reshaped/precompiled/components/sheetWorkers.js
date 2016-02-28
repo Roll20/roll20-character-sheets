@@ -3465,6 +3465,7 @@ function sheetOpened () {
 		}
 		if (versionCompare(version, '2.1.10') < 0) {
 			updateSavingThrows();
+			updateAttack();
 		}
 
 
