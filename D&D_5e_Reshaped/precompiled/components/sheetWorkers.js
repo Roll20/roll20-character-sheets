@@ -1992,37 +1992,35 @@ on('change:halfling_luck', function () {
 
 function updateAbilityChecksMacro () {
 	var repeatingItem = 'repeating_skill';
-	var collectionArray = ['ability_checks_macro_var'];
+	var collectionArray = ['ability_checks_query_var', 'ability_checks_macro_var'];
 	var finalSetAttrs = {};
 
-	finalSetAttrs.ability_checks_macro_var = '[Strength](~strength_check)';
-	finalSetAttrs.ability_checks_macro_var += ', ';
-	finalSetAttrs.ability_checks_macro_var += '[Dexterity](~dexterity_check)';
-	finalSetAttrs.ability_checks_macro_var += ', ';
-	finalSetAttrs.ability_checks_macro_var += '[Constitution](~constitution_check)';
-	finalSetAttrs.ability_checks_macro_var += ', ';
-	finalSetAttrs.ability_checks_macro_var += '[Intelligence](~intelligence_check)';
-	finalSetAttrs.ability_checks_macro_var += ', ';
-	finalSetAttrs.ability_checks_macro_var += '[Wisdom](~wisdom_check)';
-	finalSetAttrs.ability_checks_macro_var += ', ';
-	finalSetAttrs.ability_checks_macro_var += '[Charisma](~charisma_check)';
-	finalSetAttrs.ability_checks_macro_var += ', ';
-	finalSetAttrs.ability_checks_macro_var += '[Initiative](~initiative)';
+	finalSetAttrs.ability_checks_query_var = '?{Ability Check';
+	finalSetAttrs.ability_checks_macro_var = '';
+
+	for (var i = 0; i < ABILITIES.length; i++) {
+		finalSetAttrs.ability_checks_query_var += '|' + ABILITIES[i].capitalize() + ', {{title=' + ABILITIES[i].capitalize() + '&#125;&#125; {{roll1=[[d20@{d20_mod} + @{' + ABILITIES[i] + '_check_mod}]]&#125;&#125; {{roll2=[[d20@{d20_mod} + @{' + ABILITIES[i] + '_check_mod}]]&#125;&#125;';
+		finalSetAttrs.ability_checks_macro_var += '[' + ABILITIES[i].capitalize() + '](~' + ABILITIES[i] + '_check)';
+		if (i < ABILITIES.length - 1) {
+			finalSetAttrs.ability_checks_macro_var += ', ';
+		}
+	}
 
 	getSectionIDs(repeatingItem, function (ids) {
 		for (var i = 0; i < ids.length; i++) {
 			var repeatingString = repeatingItem + '_' + ids[i] + '_';
 			collectionArray.push(repeatingString + 'name');
+			collectionArray.push(repeatingString + 'ability');
 		}
 
-		console.log('collectionArray', collectionArray);
 		getAttrs(collectionArray, function (v) {
 			for (var j = 0; j < ids.length; j++) {
 				var repeatingString = repeatingItem + '_' + ids[j] + '_';
+				finalSetAttrs.ability_checks_query_var += '|' + v[repeatingString + 'name'] + ', {{title=' + v[repeatingString + 'name'] + ' (' + getAbilityShortName(v[repeatingString + 'ability']).capitalize() + ')&#125;&#125; {{roll1=[[d20@{d20_mod} + @{' + repeatingString + 'formula' + '}]]&#125;&#125; {{roll2=[[d20@{d20_mod} + @{' + repeatingString + 'formula' + '}]]&#125;&#125;';
 				finalSetAttrs.ability_checks_macro_var += ', ';
 				finalSetAttrs.ability_checks_macro_var += '[' + v[repeatingString + 'name'] + '](~repeating_skill_' + ids[j] + '_skill)';
 			}
-			console.log('updateAbilityChecksMacro', finalSetAttrs);
+			finalSetAttrs.ability_checks_query_var += '}';
 			setFinalAttrs(v, finalSetAttrs);
 		});
 	});
