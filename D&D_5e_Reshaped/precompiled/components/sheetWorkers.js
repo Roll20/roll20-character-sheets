@@ -1377,15 +1377,24 @@ function updateAttackToggle (v, finalSetAttrs, repeatingString, options) {
 		}
 
 		if (exists(options.globalAttackBonus)) {
+			if (!isNaN(options.globalAttackBonus)) {
+				toHit += getIntValue(options.globalAttackBonus);
+			}
 			attackFormula += ADD + options.globalAttackBonus + '[' + options.globalAttackBonusLabel + ']';
 		}
 
 		if (!v[repeatingString + 'type'] || v[repeatingString + 'type'] === 'Melee Weapon') {
 			if (exists(options.globalMeleeAttackBonus)) {
+				if (!isNaN(options.globalMeleeAttackBonus)) {
+					toHit += getIntValue(options.globalMeleeAttackBonus);
+				}
 				attackFormula += ADD + options.globalMeleeAttackBonus + '[global melee attack bonus]';
 			}
 		} else if (v[repeatingString + 'type'] === 'Ranged Weapon') {
 			if (exists(options.globalRangedAttackBonus)) {
+				if (!isNaN(options.globalRangedAttackBonus)) {
+					toHit += getIntValue(options.globalRangedAttackBonus);
+				}
 				attackFormula += ADD + options.globalRangedAttackBonus + '[global ranged attack bonus]';
 			}
 		}
@@ -1475,15 +1484,30 @@ function updateDamageToggle (v, finalSetAttrs, repeatingString, options) {
 		}
 
 		if (exists(options.globalDamageBonus)) {
+			if (!isNaN(options.globalDamageBonus)) {
+				damageAddition += getIntValue(options.globalDamageBonus);
+			} else {
+				damageString += ADD + options.globalDamageBonus;
+			}
 			damageFormula += ADD + options.globalDamageBonus + '[global damage bonus]';
 		}
 
 		if (options && options.globalMeleeDamageBonus && !v[repeatingString + 'type'] || v[repeatingString + 'type'] === 'Melee Weapon') {
+			if (!isNaN(options.globalMeleeDamageBonus)) {
+				damageAddition += getIntValue(options.globalMeleeDamageBonus);
+			} else {
+				damageString += ADD + options.globalMeleeDamageBonus;
+			}
 			if (damageFormula !== '') {
 				damageFormula += ADD;
 			}
 			damageFormula += options.globalMeleeDamageBonus + '[global melee damage bonus]';
 		} else if (options && options.globalRangedDamageBonus && v[repeatingString + 'type'] === 'Ranged Weapon') {
+			if (!isNaN(options.globalRangedDamageBonus)) {
+				damageAddition += getIntValue(options.globalRangedDamageBonus);
+			} else {
+				damageString += ADD + options.globalRangedDamageBonus;
+			}
 			if (damageFormula !== '') {
 				damageFormula += ADD;
 			}
@@ -2713,7 +2737,7 @@ function updateAction (type, rowId) {
 						globalMeleeAttackBonus: v.global_melee_attack_bonus,
 						globalRangedAttackBonus: v.global_ranged_attack_bonus,
 						type: 'attack'
-					}
+					};
 				}
 				updateAttackToggle(v, finalSetAttrs, repeatingString, attackOptions);
 
