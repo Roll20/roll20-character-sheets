@@ -2704,25 +2704,31 @@ function updateAction (type, rowId) {
 					finalSetAttrs[repeatingString + 'recharge_display'] = '';
 				}
 
-				var attackOptions = {
-					defaultAbility: 'strength_mod',
-					globalAttackBonus: v.global_attack_bonus,
-					globalAttackBonusLabel: 'global attack bonus',
-					globalMeleeAttackBonus: v.global_melee_attack_bonus,
-					globalRangedAttackBonus: v.global_ranged_attack_bonus,
-					type: 'attack'
-				};
+				var attackOptions = {};
+				if (type !== 'trait') {
+					attackOptions = {
+						defaultAbility: 'strength_mod',
+						globalAttackBonus: v.global_attack_bonus,
+						globalAttackBonusLabel: 'global attack bonus',
+						globalMeleeAttackBonus: v.global_melee_attack_bonus,
+						globalRangedAttackBonus: v.global_ranged_attack_bonus,
+						type: 'attack'
+					}
+				}
 				updateAttackToggle(v, finalSetAttrs, repeatingString, attackOptions);
 
 				updateSavingThrowToggle(v, finalSetAttrs, repeatingString);
 
-				var damageOptions = {
-					defaultDamageAbility: 'strength_mod',
-					globalDamageBonus: v.global_damage_bonus,
-					globalMeleeDamageBonus: v.global_melee_damage_bonus,
-					globalRangedDamageBonus: v.global_ranged_damage_bonus,
-					type: 'attack'
-				};
+				var damageOptions = {};
+				if (type !== 'trait') {
+					damageOptions = {
+						defaultDamageAbility: 'strength_mod',
+						globalDamageBonus: v.global_damage_bonus,
+						globalMeleeDamageBonus: v.global_melee_damage_bonus,
+						globalRangedDamageBonus: v.global_ranged_damage_bonus,
+						type: 'attack'
+					};
+				}
 				updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
 
 				updateHealToggle(v, finalSetAttrs, repeatingString);
