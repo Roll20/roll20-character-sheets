@@ -3443,7 +3443,7 @@ function sheetOpened () {
 			updateSavingThrows();
 			updateAttack();
 		}
-		if (versionCompare(version, '2.1.1') < 0) {
+		if (versionCompare(version, '2.1.11') < 0) {
 			updateLevels();
 		}
 
