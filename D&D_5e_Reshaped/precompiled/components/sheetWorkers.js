@@ -606,43 +606,18 @@ function updateLevels () {
 		}
 
 		getAttrs(collectionArray, function (v) {
-
-      if (v.barbarian_level) {
-        finalSetAttrs.barbarian_level = 0;
-      }
-      if (v.bard_level) {
-        finalSetAttrs.bard_level = 0;
-      }
-      if (v.cleric_level) {
-        finalSetAttrs.cleric_level = 0;
-      }
-      if (v.druid_level) {
-        finalSetAttrs.druid_level = 0;
-      }
-      if (v.fighter_level) {
-        finalSetAttrs.fighter_level = 0;
-      }
-      if (v.monk_level) {
-        finalSetAttrs.monk_level = 0;
-      }
-      if (v.paladin_level) {
-        finalSetAttrs.paladin_level = 0;
-      }
-      if (v.ranger_level) {
-        finalSetAttrs.ranger_level = 0;
-      }
-      if (v.rogue_level) {
-        finalSetAttrs.rogue_level = 0;
-      }
-      if (v.sorcerer_level) {
-        finalSetAttrs.sorcerer_level = 0;
-      }
-      if (v.warlock_level) {
-        finalSetAttrs.warlock_level = 0;
-      }
-      if (v.wizard_level) {
-        finalSetAttrs.wizard_level = 0;
-      }
+      finalSetAttrs.barbarian_level = 0;
+      finalSetAttrs.bard_level = 0;
+      finalSetAttrs.cleric_level = 0;
+      finalSetAttrs.druid_level = 0;
+      finalSetAttrs.fighter_level = 0;
+      finalSetAttrs.monk_level = 0;
+      finalSetAttrs.paladin_level = 0;
+      finalSetAttrs.ranger_level = 0;
+      finalSetAttrs.rogue_level = 0;
+      finalSetAttrs.sorcerer_level = 0;
+      finalSetAttrs.warlock_level = 0;
+      finalSetAttrs.wizard_level = 0;
 
 			for (var j = 0; j < ids.length; j++) {
 				var repeatingString = repeatingItem + '_' + ids[j] + '_';
@@ -3431,6 +3406,7 @@ function sheetOpened () {
 
       generateSkills();
 			updateSavingThrows();
+			updateLevels();
 		}
 
 		if (versionCompare(version, '2.0.10') < 0) {
@@ -3466,6 +3442,9 @@ function sheetOpened () {
 		if (versionCompare(version, '2.1.10') < 0) {
 			updateSavingThrows();
 			updateAttack();
+		}
+		if (versionCompare(version, '2.1.1') < 0) {
+			updateLevels();
 		}
 
 
