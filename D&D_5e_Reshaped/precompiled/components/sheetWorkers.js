@@ -3443,6 +3443,9 @@ function sheetOpened () {
 		if (versionCompare(version, '2.1.7') < 0) {
 			setSkillStorageNames();
 		}
+		if (versionCompare(version, '2.1.10') < 0) {
+			updateSavingThrows();
+		}
 
 
 
