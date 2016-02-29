@@ -1905,6 +1905,9 @@ function updateSpell (rowId) {
 			collectionArray.push(repeatingString + 'components_verbal');
 			collectionArray.push(repeatingString + 'components_somatic');
 			collectionArray.push(repeatingString + 'components_material');
+			collectionArray.push(repeatingString + 'duration');
+			collectionArray.push(repeatingString + 'concentration');
+			collectionArray.push(repeatingString + 'concentration_text');
 		}
 
 		getAttrs(collectionArray, function (v) {
@@ -1919,6 +1922,16 @@ function updateSpell (rowId) {
 					finalSetAttrs[repeatingString + 'is_prepared'] = 'on';
 				}
 				finalSetAttrs[repeatingString + 'friendly_level'] = ordinalSpellLevel(spellLevel);
+
+				var concentration = v[repeatingString + 'concentration'];
+				if (concentration === 'Yes') {
+					finalSetAttrs[repeatingString + 'concentration_text'] = 'Concentration, ';
+				} else {
+					finalSetAttrs[repeatingString + 'concentration_text'] = '';
+				}
+				if (v.duration) {
+					finalSetAttrs.duration = lowercaseWords(v.duration);
+				}
 
 				var spellComponents = v[repeatingString + 'components'];
 				finalSetAttrs[repeatingString + 'components_verbal'] = 0;
@@ -3493,10 +3506,8 @@ function sheetOpened () {
 		}
 		if (versionCompare(version, '2.1.13') < 0) {
 			weighEquipment();
+			updateSpell();
 		}
-
-
-
 
 		if (!version || version !== currentVersion) {
 			finalSetAttrs.version = currentVersion;
