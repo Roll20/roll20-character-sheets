@@ -1,4 +1,4 @@
-var currentVersion = '2.1.12';
+var currentVersion = '2.1.13';
 var skills = {
 	abilities: {
 		'acrobatics': 'dexterity',
