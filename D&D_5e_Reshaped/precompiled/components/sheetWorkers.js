@@ -1176,7 +1176,7 @@ on('change:repeating_equipment', function (eventInfo) {
 	var rowId = getRowId('repeating_equipment', eventInfo);
 	updateEquipment(rowId);
 });
-on('change:repeating_equipment:carried change:repeating_equipment:weight_total remove:repeating_equipment', function () {
+function weighEquipment () {
 	var options = {
 		collection: 'equipment',
 		toggle: 'carried',
@@ -1190,6 +1190,9 @@ on('change:repeating_equipment:carried change:repeating_equipment:weight_total r
 		}
 	];
 	sumRepeating(options, sumItems);
+}
+on('change:repeating_equipment:carried change:repeating_equipment:qty change:repeating_equipment:weight remove:repeating_equipment', function () {
+	weighEquipment();
 });
 
 on('change:pb', function () {
@@ -3488,6 +3491,10 @@ function sheetOpened () {
 			updateLevels();
 			updateAbilityChecksMacro();
 		}
+		if (versionCompare(version, '2.1.13') < 0) {
+			weighEquipment();
+		}
+
 
 
 
