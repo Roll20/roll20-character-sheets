@@ -13432,10 +13432,10 @@ var SWUtils = SWUtils || (function() {
 			if (typeof writeFields === "string") {
 				getAttrs([writeFields],function(v){
 					var currValue=parseInt(v[writeFields],10),setter={};
-					console.log("handledropdown, readField:"+readField+ ", currValue:"+currValue+", newValue:"+valueOf);
+					//console.log("handledropdown, readField:"+readField+ ", currValue:"+currValue+", newValue:"+valueOf);
 					if (currValue!==valueOf || isNaN(currValue)) {
 						TAS.log("handledropdown",readField,lookupField,currValue,valueOf);
-						console.log("handledropdown, readField:"+readField+ ", currValue:"+currValue+", newValue:"+valueOf);
+						//console.log("handledropdown, readField:"+readField+ ", currValue:"+currValue+", newValue:"+valueOf);
 						setter[writeFields]=valueOf;
 						setAttrs(setter);
 						if (typeof callback === "function" ) {
@@ -13857,7 +13857,11 @@ var PFSheet = PFSheet || (function(){
             var i,numSet=0, valuesToSet ={};
             if (v[toggle] == "0") {
                 for (i=0;i<numFlds;i++) {
-                    if (v[buffFlds[i]] !== 0) {valuesToSet[buffFlds[i]]=0;numSet++;}
+                    if (parseInt(v[buffFlds[i]],10) !== 0 ){
+						TAS.log("updateBuffRow",v[buffFlds[i]]);
+						valuesToSet[buffFlds[i]]=0;
+						numSet++;
+					}
                 }
                 if (numSet > 0) {  setAttrs(valuesToSet); }
             } else {
@@ -13884,6 +13888,8 @@ var PFSheet = PFSheet || (function(){
             "buff6_"+col,"buff7_"+col,"buff8_"+col,"buff9_"+col,"buff10_"+col];
         //updateRowTotal(fields);
 		getAttrs(fields,function(v){
+			//TAS.log("updateBuffColumn",col);
+			//TAS.log(v);
 			var currValue= parseInt(v[fields[0]],10)
 				,newValue=0,setter={},i=1;
             for(i=1;i<11;i++){
@@ -13891,9 +13897,10 @@ var PFSheet = PFSheet || (function(){
                 newValue+= (parseFloat(v[fields[i]])||0);
 				//console.log("i:"+i+", val="+newValue);
             }
+			//final total is int.
 			newValue=Math.floor(newValue);
             if (isNaN(currValue) || currValue !== newValue) {
-				TAS.log({"function":"updateBuffColumn","column":col,"currValue":currValue,"newValue":newValue});
+				TAS.log({"function":"updateBuffColumn","column":col,"field":fields[0],"currValue":currValue,"newValue":newValue});
                 setter[fields[0]]=newValue;
                 setAttrs(setter);
 				switch(col) {
