@@ -2127,6 +2127,9 @@ function updateSkill (rowId) {
 
 				var globalCheckBonus = v.global_check_bonus;
 				if (exists(globalCheckBonus)) {
+					if (!isNaN(globalCheckBonus)) {
+						total += getIntValue(globalCheckBonus);
+					}
 					totalFormula += ADD + globalCheckBonus + '[global check bonus]';
 				}
 
@@ -2255,6 +2258,9 @@ function updateSavingThrow (ability) {
 
 		var globalSavingThrowBonus = v.global_saving_throw_bonus;
 		if (!isUndefined(globalSavingThrowBonus)) {
+			if (!isNaN(globalSavingThrowBonus)) {
+				total += getIntValue(globalSavingThrowBonus);
+			}
 			totalFormula += ADD + globalSavingThrowBonus + '[global saving throw bonus]';
 		}
 
