@@ -13407,7 +13407,7 @@ var SWUtils = SWUtils || (function() {
 				foundField = synchrousFindAttributeFunc(fieldToFind);
 				getAttrs([foundField], function(v) {
 					var valueOf = parseInt(v[foundField],10)||0;
-					callback(valueOf);
+					callback(valueOf,foundField);
 				});
 			}
 		});
@@ -13425,12 +13425,17 @@ var SWUtils = SWUtils || (function() {
      *         with the value we set as the only parameter.
      */
     handleDropdown = function (readField,writeFields,synchrousFindAttributeFunc,callback) {
-		SWUtils.getReferencedAttributeValue(readField,synchrousFindAttributeFunc,function(valueOf){
+		SWUtils.getReferencedAttributeValue(readField,synchrousFindAttributeFunc,function(valueOf,lookupField){
+			if (Array.isArray(writeFields) && writeFields.length ==1) {
+				writeFields=writeFields[0];
+			};
 			if (typeof writeFields === "string") {
 				getAttrs([writeFields],function(v){
 					var currValue=parseInt(v[writeFields],10),setter={};
-					if (currValue!==valueOf || isNaN(writeFields)) {
-						TAS.log({"function":"handleDropdown","readField":readField,"writeField":writeFields,"currValue":currValue,"newValue":valueOf});
+					console.log("handledropdown, readField:"+readField+ ", currValue:"+currValue+", newValue:"+valueOf);
+					if (currValue!==valueOf || isNaN(currValue)) {
+						TAS.log("handledropdown",readField,lookupField,currValue,valueOf);
+						console.log("handledropdown, readField:"+readField+ ", currValue:"+currValue+", newValue:"+valueOf);
 						setter[writeFields]=valueOf;
 						setAttrs(setter);
 						if (typeof callback === "function" ) {
@@ -14225,7 +14230,7 @@ var PFSheet = PFSheet || (function(){
 		//console.log("at handleDefenseDropdown:"+dropdownField);
 		switch(dropdownField.toLowerCase()){
 			case "cmd-ability1":
-				handleDropdown("CMD-ability1",["CMD-STR"]);
+				handleDropdown("CMD-ability1","CMD-STR");
 				break;
 			case "ac-ability":
 				handleNonFFDefenseDropdown("AC-ability","AC-ability-mod","FF-ability","FF-DEX");
@@ -14234,10 +14239,10 @@ var PFSheet = PFSheet || (function(){
 				handleNonFFDefenseDropdown("CMD-ability2","CMD-DEX","CMD-ability","FF-CMD-DEX");
 				break;
 			case "ff-ability":
-				handleDropdown("FF-ability",["FF-DEX"]);
+				handleDropdown("FF-ability","FF-DEX");
 				break;
 			case "cmd-ability":
-				handleDropdown("CMD-ability",["FF-CMD-DEX"]);
+				handleDropdown("CMD-ability","FF-CMD-DEX");
 				break;
 		}
 	},
@@ -14939,7 +14944,13 @@ var PFSheet = PFSheet || (function(){
                 setter[classNm]=mods;
                 setAny++;
             }
-            if (setAny) {setAttrs(setter);}
+            if (setAny) {
+				TAS.log({
+					"function":"updateSkill","currSkill":currSkill,"newSkill":skillTot,"oldmods":v[classNm],"mods":mods
+					
+				});
+				setAttrs(setter);
+			}
         });
     },
 
@@ -15252,7 +15263,7 @@ var PFSheet = PFSheet || (function(){
 	* @classidx {number} = 0,1,2 the spellclass
 	*/
     handleConcentrationAbilityDropdown= function(classidx) {
-		handleDropdown("Concentration-"+classidx+"-ability",["Concentration-"+classidx+"-mod"]);
+		handleDropdown("Concentration-"+classidx+"-ability","Concentration-"+classidx+"-mod");
     },
 	
 	
@@ -15710,67 +15721,67 @@ var PFSheet = PFSheet || (function(){
 	/* recalculateSkills - updates ALL skills  - calls handleDropdown for ability then updateSkill 
 	* CB: REFACTOR: put updateSkill in the callback so it happens in order */
     recalculateSkills = function() {	
-        handleDropdown("Acrobatics-ability",["Acrobatics-ability-mod"]);
-        handleDropdown("Artistry-ability",["Artistry-ability-mod"]);
-        handleDropdown("Appraise-ability",["Appraise-ability-mod"]);
-        handleDropdown("Bluff-ability",["Bluff-ability-mod"]);
-        handleDropdown("Climb-ability",["Climb-ability-mod"]);
-        handleDropdown("Craft-ability",["Craft-ability-mod"]);
-        handleDropdown("Craft2-ability",["Craft2-ability-mod"]);
-        handleDropdown("Craft3-ability",["Craft3-ability-mod"]);
-        handleDropdown("Diplomacy-ability",["Diplomacy-ability-mod"]);
-        handleDropdown("Disable-Device-ability",["Disable-Device-ability-mod"]);
-        handleDropdown("Disguise-ability",["Disguise-ability-mod"]);
-        handleDropdown("Escape-Artist-ability",["Escape-Artist-ability-mod"]);
-        handleDropdown("Fly-ability",["Fly-ability-mod"]);
-        handleDropdown("Handle-Animal-ability",["Handle-Animal-ability-mod"]);
-        handleDropdown("Heal-ability",["Heal-ability-mod"]);
-        handleDropdown("Intimidate-ability",["Intimidate-ability-mod"]);
-        handleDropdown("Linguistics-ability",["Linguistics-ability-mod"]);
-        handleDropdown("Lore-ability",["Lore-ability-mod"]);
-        handleDropdown("Knowledge-Arcana-ability",["Knowledge-Arcana-ability-mod"]);
-        handleDropdown("Knowledge-Dungeoneering-ability",["Knowledge-Dungeoneering-ability-mod"]);
-        handleDropdown("Knowledge-Engineering-ability",["Knowledge-Engineering-ability-mod"]);
-        handleDropdown("Knowledge-Geography-ability",["Knowledge-Geography-ability-mod"]);
-        handleDropdown("Knowledge-History-ability",["Knowledge-History-ability-mod"]);
-        handleDropdown("Knowledge-Local-ability",["Knowledge-Local-ability-mod"]);
-        handleDropdown("Knowledge-Nature-ability",["Knowledge-Nature-ability-mod"]);
-        handleDropdown("Knowledge-Nobility-ability",["Knowledge-Nobility-ability-mod"]);
-        handleDropdown("Knowledge-Planes-ability",["Knowledge-Planes-ability-mod"]);
-        handleDropdown("Knowledge-Religion-ability",["Knowledge-Religion-ability-mod"]);
-        handleDropdown("Perception-ability",["Perception-ability-mod"]);
-        handleDropdown("Perform-ability",["Perform-ability-mod"]);
-        handleDropdown("Perform2-ability",["Perform2-ability-mod"]);
-        handleDropdown("Perform3-ability",["Perform3-ability-mod"]);
-        handleDropdown("Profession-ability",["Profession-ability-mod"]);
-        handleDropdown("Profession2-ability",["Profession2-ability-mod"]);
-        handleDropdown("Profession3-ability",["Profession3-ability-mod"]);
-        handleDropdown("Ride-ability",["Ride-ability-mod"]);
-        handleDropdown("Sense-Motive-ability",["Sense-Motive-ability-mod"]);
-        handleDropdown("Sleight-of-Hand-ability",["Sleight-of-Hand-ability-mod"]);
-        handleDropdown("Spellcraft-ability",["Spellcraft-ability-mod"]);
-        handleDropdown("Stealth-ability",["Stealth-ability-mod"]);
-        handleDropdown("Survival-ability",["Survival-ability-mod"]);
-        handleDropdown("Swim-ability",["Swim-ability-mod"]);
-        handleDropdown("Use-Magic-Device-ability",["Use-Magic-Device-ability-mod"]);
-        handleDropdown("Misc-Skill-0-ability",["Misc-Skill-0-ability-mod"]);
-        handleDropdown("Misc-Skill-1-ability",["Misc-Skill-1-ability-mod"]);
-        handleDropdown("Misc-Skill-2-ability",["Misc-Skill-2-ability-mod"]);
-        handleDropdown("Misc-Skill-3-ability",["Misc-Skill-3-ability-mod"]);
-        handleDropdown("Misc-Skill-4-ability",["Misc-Skill-4-ability-mod"]);
-        handleDropdown("Misc-Skill-5-ability",["Misc-Skill-5-ability-mod"]);
-        handleDropdown("CS-Acrobatics-ability",["CS-Acrobatics-ability-mod"]);
-        handleDropdown("CS-Athletics-ability",["CS-Athletics-ability-mod"]);
-        handleDropdown("CS-Finesse-ability",["CS-Finesse-ability-mod"]);
-        handleDropdown("CS-Influence-ability",["CS-Influence-ability-mod"]);
-        handleDropdown("CS-Nature-ability",["CS-Nature-ability-mod"]);
-        handleDropdown("CS-Perception-ability",["CS-Perception-ability-mod"]);
-        handleDropdown("CS-Performance-ability",["CS-Performance-ability-mod"]);
-        handleDropdown("CS-Religion-ability",["CS-Religion-ability-mod"]);
-        handleDropdown("CS-Society-ability",["CS-Society-ability-mod"]);
-        handleDropdown("CS-Spellcraft-ability",["CS-Spellcraft-ability-mod"]);
-        handleDropdown("CS-Stealth-ability",["CS-Stealth-ability-mod"]);
-        handleDropdown("CS-Survival-ability",["CS-Survival-ability-mod"]);
+        handleDropdown("Acrobatics-ability","Acrobatics-ability-mod");
+        handleDropdown("Artistry-ability","Artistry-ability-mod");
+        handleDropdown("Appraise-ability","Appraise-ability-mod");
+        handleDropdown("Bluff-ability","Bluff-ability-mod");
+        handleDropdown("Climb-ability","Climb-ability-mod");
+        handleDropdown("Craft-ability","Craft-ability-mod");
+        handleDropdown("Craft2-ability","Craft2-ability-mod");
+        handleDropdown("Craft3-ability","Craft3-ability-mod");
+        handleDropdown("Diplomacy-ability","Diplomacy-ability-mod");
+        handleDropdown("Disable-Device-ability","Disable-Device-ability-mod");
+        handleDropdown("Disguise-ability","Disguise-ability-mod");
+        handleDropdown("Escape-Artist-ability","Escape-Artist-ability-mod");
+        handleDropdown("Fly-ability","Fly-ability-mod");
+        handleDropdown("Handle-Animal-ability","Handle-Animal-ability-mod");
+        handleDropdown("Heal-ability","Heal-ability-mod");
+        handleDropdown("Intimidate-ability","Intimidate-ability-mod");
+        handleDropdown("Linguistics-ability","Linguistics-ability-mod");
+        handleDropdown("Lore-ability","Lore-ability-mod");
+        handleDropdown("Knowledge-Arcana-ability","Knowledge-Arcana-ability-mod");
+        handleDropdown("Knowledge-Dungeoneering-ability","Knowledge-Dungeoneering-ability-mod");
+        handleDropdown("Knowledge-Engineering-ability","Knowledge-Engineering-ability-mod");
+        handleDropdown("Knowledge-Geography-ability","Knowledge-Geography-ability-mod");
+        handleDropdown("Knowledge-History-ability","Knowledge-History-ability-mod");
+        handleDropdown("Knowledge-Local-ability","Knowledge-Local-ability-mod");
+        handleDropdown("Knowledge-Nature-ability","Knowledge-Nature-ability-mod");
+        handleDropdown("Knowledge-Nobility-ability","Knowledge-Nobility-ability-mod");
+        handleDropdown("Knowledge-Planes-ability","Knowledge-Planes-ability-mod");
+        handleDropdown("Knowledge-Religion-ability","Knowledge-Religion-ability-mod");
+        handleDropdown("Perception-ability","Perception-ability-mod");
+        handleDropdown("Perform-ability","Perform-ability-mod");
+        handleDropdown("Perform2-ability","Perform2-ability-mod");
+        handleDropdown("Perform3-ability","Perform3-ability-mod");
+        handleDropdown("Profession-ability","Profession-ability-mod");
+        handleDropdown("Profession2-ability","Profession2-ability-mod");
+        handleDropdown("Profession3-ability","Profession3-ability-mod");
+        handleDropdown("Ride-ability","Ride-ability-mod");
+        handleDropdown("Sense-Motive-ability","Sense-Motive-ability-mod");
+        handleDropdown("Sleight-of-Hand-ability","Sleight-of-Hand-ability-mod");
+        handleDropdown("Spellcraft-ability","Spellcraft-ability-mod");
+        handleDropdown("Stealth-ability","Stealth-ability-mod");
+        handleDropdown("Survival-ability","Survival-ability-mod");
+        handleDropdown("Swim-ability","Swim-ability-mod");
+        handleDropdown("Use-Magic-Device-ability","Use-Magic-Device-ability-mod");
+        handleDropdown("Misc-Skill-0-ability","Misc-Skill-0-ability-mod");
+        handleDropdown("Misc-Skill-1-ability","Misc-Skill-1-ability-mod");
+        handleDropdown("Misc-Skill-2-ability","Misc-Skill-2-ability-mod");
+        handleDropdown("Misc-Skill-3-ability","Misc-Skill-3-ability-mod");
+        handleDropdown("Misc-Skill-4-ability","Misc-Skill-4-ability-mod");
+        handleDropdown("Misc-Skill-5-ability","Misc-Skill-5-ability-mod");
+        handleDropdown("CS-Acrobatics-ability","CS-Acrobatics-ability-mod");
+        handleDropdown("CS-Athletics-ability","CS-Athletics-ability-mod");
+        handleDropdown("CS-Finesse-ability","CS-Finesse-ability-mod");
+        handleDropdown("CS-Influence-ability","CS-Influence-ability-mod");
+        handleDropdown("CS-Nature-ability","CS-Nature-ability-mod");
+        handleDropdown("CS-Perception-ability","CS-Perception-ability-mod");
+        handleDropdown("CS-Performance-ability","CS-Performance-ability-mod");
+        handleDropdown("CS-Religion-ability","CS-Religion-ability-mod");
+        handleDropdown("CS-Society-ability","CS-Society-ability-mod");
+        handleDropdown("CS-Spellcraft-ability","CS-Spellcraft-ability-mod");
+        handleDropdown("CS-Stealth-ability","CS-Stealth-ability-mod");
+        handleDropdown("CS-Survival-ability","CS-Survival-ability-mod");
 
         updateSkill("Acrobatics");
         updateSkill("Appraise");
@@ -15837,19 +15848,23 @@ var PFSheet = PFSheet || (function(){
         updateSkill("CS-Survival");
     },
 	
-	/* fixClassSkill - updates the class skill checkbox from that long string to a number 0 or 3 */
+	/* fixClassSkill - updates the class skill checkbox from that long string to a number 0 or 3
+		from the original sheet	*/
 	fixClassSkill=function(skill) {
 		var csNm=skill+"-cs";
 		getAttrs([csNm],function(v){
 			var  cs=0,setter={};
-			if (v[csNm]=="0") { cs = 0;}
-			else if(v[csNm]) { cs = 3;}  
-			else if (!v[csNm]) { cs = 0;}
-			//console.log("FIXSKILL: "+skill+" : cs is "+cs + " raw is:"+v[csNm]);
-			if (cs===3) {
-				setter[csNm]=cs;
-				setAttrs(setter);
-			}
+			cs = parseInt(v[csNm],10);
+			if (isNaN(cs)) {
+				if (v[csNm]=="0") { cs = 0;}
+				else if(v[csNm]) { cs = 3;}  
+				else if (!v[csNm]) { cs = 0;}
+				if (cs===3) {
+					TAS.log({"function":"fixClassSkill","raw":v[csNm],"cs":cs});
+					setter[csNm]=cs;
+					setAttrs(setter);
+				}
+			} 
 		});
 	},
 	
@@ -15965,23 +15980,23 @@ var PFSheet = PFSheet || (function(){
             updateAbility("WIS");
             updateAbility("CHA");
 
-            handleDropdown("HP-ability",["HP-ability-mod"]);
+            handleDropdown("HP-ability","HP-ability-mod");
             //init dropdown
-            handleDropdown("init-ability",["init-ability-mod"]);
+            handleDropdown("init-ability","init-ability-mod");
             //saves
-            handleDropdown  ("Fort-ability",["Fort-ability-mod"]);
-            handleDropdown  ("Ref-ability",["Ref-ability-mod"]);
-            handleDropdown  ("Will-ability",["Will-ability-mod"]);
+            handleDropdown  ("Fort-ability","Fort-ability-mod");
+            handleDropdown  ("Ref-ability","Ref-ability-mod");
+            handleDropdown  ("Will-ability","Will-ability-mod");
             //defense dropdowns
-            handleDropdown("AC-ability",["AC-ability-mod"]);
-            handleDropdown("FF-ability",["FF-DEX"]);
-            handleDropdown("CMD-ability1",["CMD-STR"]);
-            handleDropdown("CMD-ability2",["CMD-DEX"]);
-            handleDropdown("CMD-ability",["FF-CMD-DEX"]);
+            handleDropdown("AC-ability","AC-ability-mod");
+            handleDropdown("FF-ability","FF-DEX");
+            handleDropdown("CMD-ability1","CMD-STR");
+            handleDropdown("CMD-ability2","CMD-DEX");
+            handleDropdown("CMD-ability","FF-CMD-DEX");
             //attack non repeating dropdowns
-            handleDropdown("melee-ability",["melee-ability-mod"]);
-            handleDropdown("ranged-ability",["ranged-ability-mod"]);
-            handleDropdown("CMB-ability",["CMB-ability-mod"]);
+            handleDropdown("melee-ability","melee-ability-mod");
+            handleDropdown("ranged-ability","ranged-ability-mod");
+            handleDropdown("CMB-ability","CMB-ability-mod");
 
 
             updateSize();
@@ -16452,249 +16467,249 @@ on("change:buff10_casterlevel_macro-text", function() { getAttrs(["buff10_Toggle
 
 
 
-on("change:acrobatics-ability",function(){PFSheet.handleDropdown("Acrobatics-ability",["Acrobatics-ability-mod"]);});
+on("change:acrobatics-ability",function(){PFSheet.handleDropdown("Acrobatics-ability","Acrobatics-ability-mod");});
 on("change:acp change:acrobatics-cs change:acrobatics-ranks change:acrobatics-class change:checks-cond change:acrobatics-ability-mod change:acrobatics-racial change:acrobatics-feat change:acrobatics-item change:acrobatics-size change:acrobatics-acp change:acrobatics-misc change:acrobatics-ReqTrain"
    ,function(){PFSheet.updateSkill("Acrobatics");});
 
-on("change:artistry-ability",function(){PFSheet.handleDropdown("Artistry-ability",["Artistry-ability-mod"]);});
+on("change:artistry-ability",function(){PFSheet.handleDropdown("Artistry-ability","Artistry-ability-mod");});
 on("change:artistry-cs change:artistry-ranks change:artistry-class change:checks-cond change:artistry-ability-mod change:artistry-racial change:artistry-feat change:artistry-item change:artistry-size change:artistry-acp change:artistry-misc change:artistry-ReqTrain"
    ,function(){PFSheet.updateSkill("Artistry");});
 
-on("change:appraise-ability",function(){PFSheet.handleDropdown("Appraise-ability",["Appraise-ability-mod"]);});
+on("change:appraise-ability",function(){PFSheet.handleDropdown("Appraise-ability","Appraise-ability-mod");});
 on("change:appraise-cs change:appraise-ranks change:appraise-class change:checks-cond change:appraise-ability-mod change:appraise-racial change:appraise-feat change:appraise-item change:appraise-size change:appraise-acp change:appraise-misc change:appraise-ReqTrain"
    ,function(){PFSheet.updateSkill("Appraise");});
 
-on("change:bluff-ability",function(){PFSheet.handleDropdown("Bluff-ability",["Bluff-ability-mod"]);});
+on("change:bluff-ability",function(){PFSheet.handleDropdown("Bluff-ability","Bluff-ability-mod");});
 on("change:bluff-cs change:bluff-ranks change:bluff-class change:checks-cond change:bluff-ability-mod change:bluff-racial change:bluff-feat change:bluff-item change:bluff-size change:bluff-acp change:bluff-misc change:bluff-ReqTrain"
    ,function(){PFSheet.updateSkill("Bluff");});
 
-on("change:climb-ability",function(){PFSheet.handleDropdown("Climb-ability",["Climb-ability-mod"]);});
+on("change:climb-ability",function(){PFSheet.handleDropdown("Climb-ability","Climb-ability-mod");});
 on("change:acp change:climb-cs change:climb-ranks change:climb-class change:checks-cond change:climb-ability-mod change:climb-racial change:climb-feat change:climb-item change:climb-size change:climb-acp change:climb-misc change:climb-ReqTrain"
    ,function(){PFSheet.updateSkill("Climb");});
 
-on("change:craft-ability",function(){PFSheet.handleDropdown("Craft-ability",["Craft-ability-mod"]);});
+on("change:craft-ability",function(){PFSheet.handleDropdown("Craft-ability","Craft-ability-mod");});
 on("change:craft-cs change:craft-ranks change:craft-class change:checks-cond change:craft-ability-mod change:craft-racial change:craft-feat change:craft-item change:craft-size change:craft-acp change:craft-misc change:craft-ReqTrain"
    ,function(){PFSheet.updateSkill("Craft");});
 
-on("change:craft2-ability",function(){PFSheet.handleDropdown("Craft2-ability",["Craft2-ability-mod"]);});
+on("change:craft2-ability",function(){PFSheet.handleDropdown("Craft2-ability","Craft2-ability-mod");});
 on("change:craft2-cs change:craft2-ranks change:craft2-class change:checks-cond change:craft2-ability-mod change:craft2-racial change:craft2-feat change:craft2-item change:craft2-size change:craft2-acp change:craft2-misc change:craft2-ReqTrain"
    ,function(){PFSheet.updateSkill("Craft2");});
 
-on("change:craft3-ability",function(){PFSheet.handleDropdown("Craft3-ability",["Craft3-ability-mod"]);});
+on("change:craft3-ability",function(){PFSheet.handleDropdown("Craft3-ability","Craft3-ability-mod");});
 on("change:craft3-cs change:craft3-ranks change:craft3-class change:checks-cond change:craft3-ability-mod change:craft3-racial change:craft3-feat change:craft3-item change:craft3-size change:craft3-acp change:craft3-misc change:craft3-ReqTrain"
    ,function(){PFSheet.updateSkill("Craft3");});
 
-on("change:diplomacy-ability",function(){PFSheet.handleDropdown("Diplomacy-ability",["Diplomacy-ability-mod"]);});
+on("change:diplomacy-ability",function(){PFSheet.handleDropdown("Diplomacy-ability","Diplomacy-ability-mod");});
 on("change:diplomacy-cs change:diplomacy-ranks change:diplomacy-class change:checks-cond change:diplomacy-ability-mod change:diplomacy-racial change:diplomacy-feat change:diplomacy-item change:diplomacy-size change:diplomacy-acp change:diplomacy-misc change:diplomacy-ReqTrain"
    ,function(){PFSheet.updateSkill("Diplomacy");});
 
-on("change:disable-Device-ability",function(){PFSheet.handleDropdown("Disable-Device-ability",["Disable-Device-ability-mod"]);});
+on("change:disable-Device-ability",function(){PFSheet.handleDropdown("Disable-Device-ability","Disable-Device-ability-mod");});
 on("change:acp change:disable-Device-cs change:disable-Device-ranks change:disable-Device-class change:checks-cond change:disable-Device-ability-mod change:disable-Device-racial change:disable-Device-feat change:disable-Device-item change:disable-Device-size change:disable-Device-acp change:disable-Device-misc change:disable-Device-ReqTrain"
    ,function(){PFSheet.updateSkill("Disable-Device");});
 
-on("change:disguise-ability",function(){PFSheet.handleDropdown("Disguise-ability",["Disguise-ability-mod"]);});
+on("change:disguise-ability",function(){PFSheet.handleDropdown("Disguise-ability","Disguise-ability-mod");});
 on("change:disguise-cs change:disguise-ranks change:disguise-class change:checks-cond change:disguise-ability-mod change:disguise-racial change:disguise-feat change:disguise-item change:disguise-size change:disguise-acp change:disguise-misc change:disguise-ReqTrain"
    ,function(){PFSheet.updateSkill("Disguise");});
 
-on("change:escape-Artist-ability",function(){PFSheet.handleDropdown("Escape-Artist-ability",["Escape-Artist-ability-mod"]);});
+on("change:escape-Artist-ability",function(){PFSheet.handleDropdown("Escape-Artist-ability","Escape-Artist-ability-mod");});
 on("change:acp change:escape-Artist-cs change:escape-Artist-ranks change:escape-Artist-class change:checks-cond change:escape-Artist-ability-mod change:escape-Artist-racial change:escape-Artist-feat change:escape-Artist-item change:escape-Artist-size change:escape-Artist-acp change:escape-Artist-misc change:escape-Artist-ReqTrain"
    ,function(){PFSheet.updateSkill("Escape-Artist");});
 
-on("change:fly-ability",function(){PFSheet.handleDropdown("Fly-ability",["Fly-ability-mod"]);});
+on("change:fly-ability",function(){PFSheet.handleDropdown("Fly-ability","Fly-ability-mod");});
 on("change:acp change:size_skill change:fly-cs change:fly-ranks change:fly-class change:checks-cond change:fly-ability-mod change:fly-racial change:fly-feat change:fly-item change:fly-size change:fly-acp change:fly-misc change:fly-ReqTrain"
    ,function(){PFSheet.updateSkill("Fly");});
 
-on("change:handle-Animal-ability",function(){PFSheet.handleDropdown("Handle-Animal-ability",["Handle-Animal-ability-mod"]);});
+on("change:handle-Animal-ability",function(){PFSheet.handleDropdown("Handle-Animal-ability","Handle-Animal-ability-mod");});
 on("change:handle-Animal-cs change:handle-Animal-ranks change:handle-Animal-class change:checks-cond change:handle-Animal-ability-mod change:handle-Animal-racial change:handle-Animal-feat change:handle-Animal-item change:handle-Animal-size change:handle-Animal-acp change:handle-Animal-misc change:handle-Animal-ReqTrain"
    ,function(){PFSheet.updateSkill("Handle-Animal");});
 
-on("change:heal-ability",function(){PFSheet.handleDropdown("Heal-ability",["Heal-ability-mod"]);});
+on("change:heal-ability",function(){PFSheet.handleDropdown("Heal-ability","Heal-ability-mod");});
 on("change:heal-cs change:heal-ranks change:heal-class change:checks-cond change:heal-ability-mod change:heal-racial change:heal-feat change:heal-item change:heal-size change:heal-acp change:heal-misc change:heal-ReqTrain"
    ,function(){PFSheet.updateSkill("Heal");});
 
-on("change:intimidate-ability",function(){PFSheet.handleDropdown("Intimidate-ability",["Intimidate-ability-mod"]);});
+on("change:intimidate-ability",function(){PFSheet.handleDropdown("Intimidate-ability","Intimidate-ability-mod");});
 on("change:intimidate-cs change:intimidate-ranks change:intimidate-class change:checks-cond change:intimidate-ability-mod change:intimidate-racial change:intimidate-feat change:intimidate-item change:intimidate-size change:intimidate-acp change:intimidate-misc change:intimidate-ReqTrain"
    ,function(){PFSheet.updateSkill("Intimidate");});
 
-on("change:linguistics-ability",function(){PFSheet.handleDropdown("Linguistics-ability",["Linguistics-ability-mod"]);});
+on("change:linguistics-ability",function(){PFSheet.handleDropdown("Linguistics-ability","Linguistics-ability-mod");});
 on("change:linguistics-cs change:linguistics-ranks change:linguistics-class change:checks-cond change:linguistics-ability-mod change:linguistics-racial change:linguistics-feat change:linguistics-item change:linguistics-size change:linguistics-acp change:linguistics-misc change:linguistics-ReqTrain"
    ,function(){PFSheet.updateSkill("Linguistics");});
 
-on("change:lore-ability",function(){PFSheet.handleDropdown("Lore-ability",["Lore-ability-mod"]);});
+on("change:lore-ability",function(){PFSheet.handleDropdown("Lore-ability","Lore-ability-mod");});
 on("change:lore-cs change:lore-ranks change:lore-class change:checks-cond change:lore-ability-mod change:lore-racial change:lore-feat change:lore-item change:lore-size change:lore-acp change:lore-misc change:lore-ReqTrain"
    ,function(){PFSheet.updateSkill("Lore");});
 
-on("change:knowledge-arcana-ability",function(){PFSheet.handleDropdown("Knowledge-Arcana-ability",["Knowledge-Arcana-ability-mod"]);});
+on("change:knowledge-arcana-ability",function(){PFSheet.handleDropdown("Knowledge-Arcana-ability","Knowledge-Arcana-ability-mod");});
 on("change:knowledge-arcana-cs change:knowledge-arcana-ranks change:knowledge-arcana-class change:checks-cond change:knowledge-arcana-ability-mod change:knowledge-arcana-racial change:knowledge-arcana-feat change:knowledge-arcana-item change:knowledge-arcana-size change:knowledge-arcana-acp change:knowledge-arcana-misc change:knowledge-arcana-ReqTrain"
    ,function(){PFSheet.updateSkill("Knowledge-Arcana");});
 
-on("change:knowledge-dungeoneering-ability",function(){PFSheet.handleDropdown("Knowledge-Dungeoneering-ability",["Knowledge-Dungeoneering-ability-mod"]);});
+on("change:knowledge-dungeoneering-ability",function(){PFSheet.handleDropdown("Knowledge-Dungeoneering-ability","Knowledge-Dungeoneering-ability-mod");});
 on("change:knowledge-dungeoneering-cs change:knowledge-dungeoneering-ranks change:knowledge-dungeoneering-class change:checks-cond change:knowledge-dungeoneering-ability-mod change:knowledge-dungeoneering-racial change:knowledge-dungeoneering-feat change:knowledge-dungeoneering-item change:knowledge-dungeoneering-size change:knowledge-dungeoneering-acp change:knowledge-dungeoneering-misc change:knowledge-dungeoneering-ReqTrain"
    ,function(){PFSheet.updateSkill("Knowledge-Dungeoneering");});
 
-on("change:knowledge-engineering-ability",function(){PFSheet.handleDropdown("Knowledge-Engineering-ability",["Knowledge-Engineering-ability-mod"]);});
+on("change:knowledge-engineering-ability",function(){PFSheet.handleDropdown("Knowledge-Engineering-ability","Knowledge-Engineering-ability-mod");});
 on("change:knowledge-engineering-cs change:knowledge-engineering-ranks change:knowledge-engineering-class change:checks-cond change:knowledge-engineering-ability-mod change:knowledge-engineering-racial change:knowledge-engineering-feat change:knowledge-engineering-item change:knowledge-engineering-size change:knowledge-engineering-acp change:knowledge-engineering-misc change:knowledge-engineering-ReqTrain"
    ,function(){PFSheet.updateSkill("Knowledge-Engineering");});
 
-on("change:knowledge-geography-ability",function(){PFSheet.handleDropdown("Knowledge-Geography-ability",["Knowledge-Geography-ability-mod"]);});
+on("change:knowledge-geography-ability",function(){PFSheet.handleDropdown("Knowledge-Geography-ability","Knowledge-Geography-ability-mod");});
 on("change:knowledge-geography-cs change:knowledge-geography-ranks change:knowledge-geography-class change:checks-cond change:knowledge-geography-ability-mod change:knowledge-geography-racial change:knowledge-geography-feat change:knowledge-geography-item change:knowledge-geography-size change:knowledge-geography-acp change:knowledge-geography-misc change:knowledge-geography-ReqTrain"
    ,function(){PFSheet.updateSkill("Knowledge-Geography");});
 
-on("change:knowledge-history-ability",function(){PFSheet.handleDropdown("Knowledge-History-ability",["Knowledge-History-ability-mod"]);});
+on("change:knowledge-history-ability",function(){PFSheet.handleDropdown("Knowledge-History-ability","Knowledge-History-ability-mod");});
 on("change:knowledge-history-cs change:knowledge-history-ranks change:knowledge-history-class change:checks-cond change:knowledge-history-ability-mod change:knowledge-history-racial change:knowledge-history-feat change:knowledge-history-item change:knowledge-history-size change:knowledge-history-acp change:knowledge-history-misc change:knowledge-history-ReqTrain"
    ,function(){PFSheet.updateSkill("Knowledge-History");});
 
-on("change:knowledge-local-ability",function(){PFSheet.handleDropdown("Knowledge-Local-ability",["Knowledge-Local-ability-mod"]);});
+on("change:knowledge-local-ability",function(){PFSheet.handleDropdown("Knowledge-Local-ability","Knowledge-Local-ability-mod");});
 on("change:knowledge-local-cs change:knowledge-local-ranks change:knowledge-local-class change:checks-cond change:knowledge-local-ability-mod change:knowledge-local-racial change:knowledge-local-feat change:knowledge-local-item change:knowledge-local-size change:knowledge-local-acp change:knowledge-local-misc change:knowledge-local-ReqTrain"
    ,function(){PFSheet.updateSkill("Knowledge-Local");});
 
-on("change:knowledge-nature-ability",function(){PFSheet.handleDropdown("Knowledge-Nature-ability",["Knowledge-Nature-ability-mod"]);});
+on("change:knowledge-nature-ability",function(){PFSheet.handleDropdown("Knowledge-Nature-ability","Knowledge-Nature-ability-mod");});
 on("change:knowledge-nature-cs change:knowledge-nature-ranks change:knowledge-nature-class change:checks-cond change:knowledge-nature-ability-mod change:knowledge-nature-racial change:knowledge-nature-feat change:knowledge-nature-item change:knowledge-nature-size change:knowledge-nature-acp change:knowledge-nature-misc change:knowledge-nature-ReqTrain"
    ,function(){PFSheet.updateSkill("Knowledge-Nature");});
 
-on("change:knowledge-nobility-ability",function(){PFSheet.handleDropdown("Knowledge-Nobility-ability",["Knowledge-Nobility-ability-mod"]);});
+on("change:knowledge-nobility-ability",function(){PFSheet.handleDropdown("Knowledge-Nobility-ability","Knowledge-Nobility-ability-mod");});
 on("change:knowledge-nobility-cs change:knowledge-nobility-ranks change:knowledge-nobility-class change:checks-cond change:knowledge-nobility-ability-mod change:knowledge-nobility-racial change:knowledge-nobility-feat change:knowledge-nobility-item change:knowledge-nobility-size change:knowledge-nobility-acp change:knowledge-nobility-misc change:knowledge-nobility-ReqTrain"
    ,function(){PFSheet.updateSkill("Knowledge-Nobility");});
 
-on("change:knowledge-planes-ability",function(){PFSheet.handleDropdown("Knowledge-Planes-ability",["Knowledge-Planes-ability-mod"]);});
+on("change:knowledge-planes-ability",function(){PFSheet.handleDropdown("Knowledge-Planes-ability","Knowledge-Planes-ability-mod");});
 on("change:knowledge-planes-cs change:knowledge-planes-ranks change:knowledge-planes-class change:checks-cond change:knowledge-planes-ability-mod change:knowledge-planes-racial change:knowledge-planes-feat change:knowledge-planes-item change:knowledge-planes-size change:knowledge-planes-acp change:knowledge-planes-misc change:knowledge-planes-ReqTrain"
    ,function(){PFSheet.updateSkill("Knowledge-Planes");});
 
-on("change:knowledge-religion-ability",function(){PFSheet.handleDropdown("Knowledge-Religion-ability",["Knowledge-Religion-ability-mod"]);});
+on("change:knowledge-religion-ability",function(){PFSheet.handleDropdown("Knowledge-Religion-ability","Knowledge-Religion-ability-mod");});
 on("change:knowledge-religion-cs change:knowledge-religion-ranks change:knowledge-religion-class change:checks-cond change:knowledge-religion-ability-mod change:knowledge-religion-racial change:knowledge-religion-feat change:knowledge-religion-item change:knowledge-religion-size change:knowledge-religion-acp change:knowledge-religion-misc change:knowledge-religion-ReqTrain"
    ,function(){PFSheet.updateSkill("Knowledge-Religion");});
 
-on("change:perception-ability",function(){PFSheet.handleDropdown("Perception-ability",["Perception-ability-mod"]);});
+on("change:perception-ability",function(){PFSheet.handleDropdown("Perception-ability","Perception-ability-mod");});
 on("change:perception-cs change:perception-ranks change:perception-class change:checks-cond change:perception-ability-mod change:perception-racial change:perception-feat change:perception-item change:perception-size change:perception-acp change:perception-misc change:perception-ReqTrain"
    ,function(){PFSheet.updateSkill("Perception");});
 
-on("change:perform-ability",function(){PFSheet.handleDropdown("Perform-ability",["Perform-ability-mod"]);});
+on("change:perform-ability",function(){PFSheet.handleDropdown("Perform-ability","Perform-ability-mod");});
 on("change:perform-cs change:perform-ranks change:perform-class change:checks-cond change:perform-ability-mod change:perform-racial change:perform-feat change:perform-item change:perform-size change:perform-acp change:perform-misc change:perform-ReqTrain"
    ,function(){PFSheet.updateSkill("Perform");});
 
-on("change:perform2-ability",function(){PFSheet.handleDropdown("Perform2-ability",["Perform2-ability-mod"]);});
+on("change:perform2-ability",function(){PFSheet.handleDropdown("Perform2-ability","Perform2-ability-mod");});
 on("change:perform2-cs change:perform2-ranks change:perform2-class change:checks-cond change:perform2-ability-mod change:perform2-racial change:perform2-feat change:perform2-item change:perform2-size change:perform2-acp change:perform2-misc change:perform2-ReqTrain"
    ,function(){PFSheet.updateSkill("Perform2");});
 
-on("change:perform3-ability",function(){PFSheet.handleDropdown("Perform3-ability",["Perform3-ability-mod"]);});
+on("change:perform3-ability",function(){PFSheet.handleDropdown("Perform3-ability","Perform3-ability-mod");});
 on("change:perform3-cs change:perform3-ranks change:perform3-class change:checks-cond change:perform3-ability-mod change:perform3-racial change:perform3-feat change:perform3-item change:perform3-size change:perform3-acp change:perform3-misc change:perform3-ReqTrain"
    ,function(){PFSheet.updateSkill("Perform3");});
 
-on("change:profession-ability",function(){PFSheet.handleDropdown("Profession-ability",["Profession-ability-mod"]);});
+on("change:profession-ability",function(){PFSheet.handleDropdown("Profession-ability","Profession-ability-mod");});
 on("change:profession-cs change:profession-ranks change:profession-class change:checks-cond change:profession-ability-mod change:profession-racial change:profession-feat change:profession-item change:profession-size change:profession-acp change:profession-misc change:profession-ReqTrain"
    ,function(){PFSheet.updateSkill("Profession");});
 
-on("change:profession2-ability",function(){PFSheet.handleDropdown("Profession2-ability",["Profession2-ability-mod"]);});
+on("change:profession2-ability",function(){PFSheet.handleDropdown("Profession2-ability","Profession2-ability-mod");});
 on("change:profession2-cs change:profession2-ranks change:profession2-class change:checks-cond change:profession2-ability-mod change:profession2-racial change:profession2-feat change:profession2-item change:profession2-size change:profession2-acp change:profession2-misc change:profession2-ReqTrain"
    ,function(){PFSheet.updateSkill("Profession2");});
 
-on("change:profession3-ability",function(){PFSheet.handleDropdown("Profession3-ability",["Profession3-ability-mod"]);});
+on("change:profession3-ability",function(){PFSheet.handleDropdown("Profession3-ability","Profession3-ability-mod");});
 on("change:profession3-cs change:profession3-ranks change:profession3-class change:checks-cond change:profession3-ability-mod change:profession3-racial change:profession3-feat change:profession3-item change:profession3-size change:profession3-acp change:profession3-misc change:profession3-ReqTrain"
    ,function(){PFSheet.updateSkill("Profession3");});
 
-on("change:ride-ability",function(){PFSheet.handleDropdown("Ride-ability",["Ride-ability-mod"]);});
+on("change:ride-ability",function(){PFSheet.handleDropdown("Ride-ability","Ride-ability-mod");});
 on("change:acp change:ride-cs change:ride-ranks change:ride-class change:checks-cond change:ride-ability-mod change:ride-racial change:ride-feat change:ride-item change:ride-size change:ride-acp change:ride-misc change:ride-ReqTrain"
    ,function(){PFSheet.updateSkill("Ride");});
 
-on("change:sense-Motive-ability",function(){PFSheet.handleDropdown("Sense-Motive-ability",["Sense-Motive-ability-mod"]);});
+on("change:sense-Motive-ability",function(){PFSheet.handleDropdown("Sense-Motive-ability","Sense-Motive-ability-mod");});
 on("change:sense-Motive-cs change:sense-Motive-ranks change:sense-Motive-class change:checks-cond change:sense-Motive-ability-mod change:sense-Motive-racial change:sense-Motive-feat change:sense-Motive-item change:sense-Motive-size change:sense-Motive-acp change:sense-Motive-misc change:sense-Motive-ReqTrain"
    ,function(){PFSheet.updateSkill("Sense-Motive");});
 
-on("change:sleight-of-Hand-ability",function(){PFSheet.handleDropdown("Sleight-of-Hand-ability",["Sleight-of-Hand-ability-mod"]);});
+on("change:sleight-of-Hand-ability",function(){PFSheet.handleDropdown("Sleight-of-Hand-ability","Sleight-of-Hand-ability-mod");});
 on("change:sleight-of-Hand-cs change:sleight-of-Hand-ranks change:sleight-of-Hand-class change:checks-cond change:sleight-of-Hand-ability-mod change:sleight-of-Hand-racial change:sleight-of-Hand-feat change:sleight-of-Hand-item change:sleight-of-Hand-size change:sleight-of-Hand-acp change:sleight-of-Hand-misc change:sleight-of-Hand-ReqTrain"
    ,function(){PFSheet.updateSkill("Sleight-of-Hand");});
 
-on("change:spellcraft-ability",function(){PFSheet.handleDropdown("Spellcraft-ability",["Spellcraft-ability-mod"]);});
+on("change:spellcraft-ability",function(){PFSheet.handleDropdown("Spellcraft-ability","Spellcraft-ability-mod");});
 on("change:spellcraft-cs change:spellcraft-ranks change:spellcraft-class change:checks-cond change:spellcraft-ability-mod change:spellcraft-racial change:spellcraft-feat change:spellcraft-item change:spellcraft-size change:spellcraft-acp change:spellcraft-misc change:spellcraft-ReqTrain"
    ,function(){PFSheet.updateSkill("Spellcraft");});
 
-on("change:stealth-ability",function(){PFSheet.handleDropdown("Stealth-ability",["Stealth-ability-mod"]);});
+on("change:stealth-ability",function(){PFSheet.handleDropdown("Stealth-ability","Stealth-ability-mod");});
 on("change:acp change:size_skill_double change:stealth-cs change:stealth-ranks change:stealth-class change:checks-cond change:stealth-ability-mod change:stealth-racial change:stealth-feat change:stealth-item change:stealth-size change:stealth-acp change:stealth-misc change:stealth-ReqTrain"
    ,function(){PFSheet.updateSkill("Stealth");});
 
-on("change:survival-ability",function(){PFSheet.handleDropdown("Survival-ability",["Survival-ability-mod"]);});
+on("change:survival-ability",function(){PFSheet.handleDropdown("Survival-ability","Survival-ability-mod");});
 on("change:survival-cs change:survival-ranks change:survival-class change:checks-cond change:survival-ability-mod change:survival-racial change:survival-feat change:survival-item change:survival-size change:survival-acp change:survival-misc change:survival-ReqTrain"
    ,function(){PFSheet.updateSkill("Survival");});
 
-on("change:swim-ability",function(){PFSheet.handleDropdown("Swim-ability",["Swim-ability-mod"]);});
+on("change:swim-ability",function(){PFSheet.handleDropdown("Swim-ability","Swim-ability-mod");});
 on("change:acp change:swim-cs change:swim-ranks change:swim-class change:checks-cond change:swim-ability-mod change:swim-racial change:swim-feat change:swim-item change:swim-size change:swim-acp change:swim-misc change:swim-ReqTrain"
    ,function(){PFSheet.updateSkill("Swim");});
 
-on("change:use-magic-device-ability",function(){PFSheet.handleDropdown("Use-Magic-Device-ability",["Use-Magic-Device-ability-mod"]);});
+on("change:use-magic-device-ability",function(){PFSheet.handleDropdown("Use-Magic-Device-ability","Use-Magic-Device-ability-mod");});
 on("change:use-magic-device-cs change:use-magic-device-ranks change:use-magic-device-class change:checks-cond change:use-magic-device-ability-mod change:use-magic-device-racial change:use-magic-device-feat change:use-magic-device-item change:use-magic-device-size change:use-magic-device-acp change:use-magic-device-misc change:use-magic-device-ReqTrain"
    ,function(){PFSheet.updateSkill("Use-Magic-Device");});
 
-on("change:misc-skill-0-ability",function(){PFSheet.handleDropdown("Misc-Skill-0-ability",["Misc-Skill-0-ability-mod"]);});
+on("change:misc-skill-0-ability",function(){PFSheet.handleDropdown("Misc-Skill-0-ability","Misc-Skill-0-ability-mod");});
 on("change:misc-skill-0-cs change:misc-skill-0-ranks change:misc-skill-0-class change:checks-cond change:misc-skill-0-ability-mod change:misc-skill-0-racial change:misc-skill-0-feat change:misc-skill-0-item change:misc-skill-0-size change:misc-skill-0-acp change:misc-skill-0-misc change:misc-skill-0-ReqTrain"
    ,function(){PFSheet.updateSkill("Misc-Skill-0");});
 
-on("change:misc-skill-1-ability",function(){PFSheet.handleDropdown("Misc-Skill-1-ability",["Misc-Skill-1-ability-mod"]);});
+on("change:misc-skill-1-ability",function(){PFSheet.handleDropdown("Misc-Skill-1-ability","Misc-Skill-1-ability-mod");});
 on("change:misc-skill-1-cs change:misc-skill-1-ranks change:misc-skill-1-class change:checks-cond change:misc-skill-1-ability-mod change:misc-skill-1-racial change:misc-skill-1-feat change:misc-skill-1-item change:misc-skill-1-size change:misc-skill-1-acp change:misc-skill-1-misc change:misc-skill-1-ReqTrain"
    ,function(){PFSheet.updateSkill("Misc-Skill-1");});
 
-on("change:misc-skill-2-ability",function(){PFSheet.handleDropdown("Misc-Skill-2-ability",["Misc-Skill-2-ability-mod"]);});
+on("change:misc-skill-2-ability",function(){PFSheet.handleDropdown("Misc-Skill-2-ability","Misc-Skill-2-ability-mod");});
 on("change:misc-skill-2-cs change:misc-skill-2-ranks change:misc-skill-2-class change:checks-cond change:misc-skill-2-ability-mod change:misc-skill-2-racial change:misc-skill-2-feat change:misc-skill-2-item change:misc-skill-2-size change:misc-skill-2-acp change:misc-skill-2-misc change:misc-skill-2-ReqTrain"
    ,function(){PFSheet.updateSkill("Misc-Skill-2");});
 
-on("change:misc-skill-3-ability",function(){PFSheet.handleDropdown("Misc-Skill-3-ability",["Misc-Skill-3-ability-mod"]);});
+on("change:misc-skill-3-ability",function(){PFSheet.handleDropdown("Misc-Skill-3-ability","Misc-Skill-3-ability-mod");});
 on("change:misc-skill-3-cs change:misc-skill-3-ranks change:misc-skill-3-class change:checks-cond change:misc-skill-3-ability-mod change:misc-skill-3-racial change:misc-skill-3-feat change:misc-skill-3-item change:misc-skill-3-size change:misc-skill-3-acp change:misc-skill-3-misc change:misc-skill-3-ReqTrain"
    ,function(){PFSheet.updateSkill("Misc-Skill-3");});
 
-on("change:misc-skill-4-ability",function(){PFSheet.handleDropdown("Misc-Skill-4-ability",["Misc-Skill-4-ability-mod"]);});
+on("change:misc-skill-4-ability",function(){PFSheet.handleDropdown("Misc-Skill-4-ability","Misc-Skill-4-ability-mod");});
 on("change:misc-skill-4-cs change:misc-skill-4-ranks change:misc-skill-4-class change:checks-cond change:misc-skill-4-ability-mod change:misc-skill-4-racial change:misc-skill-4-feat change:misc-skill-4-item change:misc-skill-4-size change:misc-skill-4-acp change:misc-skill-4-misc change:misc-skill-4-ReqTrain"
    ,function(){PFSheet.updateSkill("Misc-Skill-4");});
 
-on("change:misc-skill-5-ability",function(){PFSheet.handleDropdown("Misc-Skill-5-ability",["Misc-Skill-5-ability-mod"]);});
+on("change:misc-skill-5-ability",function(){PFSheet.handleDropdown("Misc-Skill-5-ability","Misc-Skill-5-ability-mod");});
 on("change:misc-skill-5-cs change:misc-skill-5-ranks change:misc-skill-5-class change:checks-cond change:misc-skill-5-ability-mod change:misc-skill-5-racial change:misc-skill-5-feat change:misc-skill-5-item change:misc-skill-5-size change:misc-skill-5-acp change:misc-skill-5-misc change:misc-skill-5-ReqTrain"
    ,function(){PFSheet.updateSkill("Misc-Skill-5");});
 
-on("change:cS-Acrobatics-ability",function(){PFSheet.handleDropdown("CS-Acrobatics-ability",["CS-Acrobatics-ability-mod"]);});
+on("change:cS-Acrobatics-ability",function(){PFSheet.handleDropdown("CS-Acrobatics-ability","CS-Acrobatics-ability-mod");});
 on("change:acp change:cS-Acrobatics-cs change:cS-Acrobatics-ranks change:cS-Acrobatics-class change:checks-cond change:cS-Acrobatics-ability-mod change:cS-Acrobatics-racial change:cS-Acrobatics-feat change:cS-Acrobatics-item change:cS-Acrobatics-size change:cS-Acrobatics-acp change:cS-Acrobatics-misc change:cS-Acrobatics-ReqTrain"
    ,function(){PFSheet.updateSkill("CS-Acrobatics");});
 
-on("change:cS-Athletics-ability",function(){PFSheet.handleDropdown("CS-Athletics-ability",["CS-Athletics-ability-mod"]);});
+on("change:cS-Athletics-ability",function(){PFSheet.handleDropdown("CS-Athletics-ability","CS-Athletics-ability-mod");});
 on("change:acp change:cS-Athletics-cs change:cS-Athletics-ranks change:cS-Athletics-class change:checks-cond change:cS-Athletics-ability-mod change:cS-Athletics-racial change:cS-Athletics-feat change:cS-Athletics-item change:cS-Athletics-size change:cS-Athletics-acp change:cS-Athletics-misc change:cS-Athletics-ReqTrain"
    ,function(){PFSheet.updateSkill("CS-Athletics");});
 
 
-on("change:cs-finesse-ability",function(){PFSheet.handleDropdown("CS-Finesse-ability",["CS-Finesse-ability-mod"]);});
+on("change:cs-finesse-ability",function(){PFSheet.handleDropdown("CS-Finesse-ability","CS-Finesse-ability-mod");});
 on("change:cs-finesse-cs change:cs-finesse-ranks change:cs-finesse-class change:checks-cond change:cs-finesse-ability-mod change:cs-finesse-racial change:cs-finesse-feat change:cs-finesse-item change:cs-finesse-size change:cs-finesse-acp change:cs-finesse-misc change:cs-finesse-ReqTrain"
    ,function(){PFSheet.updateSkill("CS-Finesse");});
 
-on("change:cs-influence-ability",function(){PFSheet.handleDropdown("CS-Influence-ability",["CS-Influence-ability-mod"]);});
+on("change:cs-influence-ability",function(){PFSheet.handleDropdown("CS-Influence-ability","CS-Influence-ability-mod");});
 on("change:cs-influence-cs change:cs-influence-ranks change:cs-influence-class change:checks-cond change:cs-influence-ability-mod change:cs-influence-racial change:cs-influence-feat change:cs-influence-item change:cs-influence-size change:cs-influence-acp change:cs-influence-misc change:cs-influence-ReqTrain"
    ,function(){PFSheet.updateSkill("CS-Influence");});
 
-on("change:cs-nature-ability",function(){PFSheet.handleDropdown("CS-Nature-ability",["CS-Nature-ability-mod"]);});
+on("change:cs-nature-ability",function(){PFSheet.handleDropdown("CS-Nature-ability","CS-Nature-ability-mod");});
 on("change:cs-nature-cs change:cs-nature-ranks change:cs-nature-class change:checks-cond change:cs-nature-ability-mod change:cs-nature-racial change:cs-nature-feat change:cs-nature-item change:cs-nature-size change:cs-nature-acp change:cs-nature-misc change:cs-nature-ReqTrain"
    ,function(){PFSheet.updateSkill("CS-Nature");});
 
-on("change:cs-perception-ability",function(){PFSheet.handleDropdown("CS-Perception-ability",["CS-Perception-ability-mod"]);});
+on("change:cs-perception-ability",function(){PFSheet.handleDropdown("CS-Perception-ability","CS-Perception-ability-mod");});
 on("change:cs-perception-cs change:cs-perception-ranks change:cs-perception-class change:checks-cond change:cs-perception-ability-mod change:cs-perception-racial change:cs-perception-feat change:cs-perception-item change:cs-perception-size change:cs-perception-acp change:cs-perception-misc change:cs-perception-ReqTrain"
    ,function(){PFSheet.updateSkill("CS-Perception");});
 
-on("change:cs-performance-ability",function(){PFSheet.handleDropdown("CS-Performance-ability",["CS-Performance-ability-mod"]);});
+on("change:cs-performance-ability",function(){PFSheet.handleDropdown("CS-Performance-ability","CS-Performance-ability-mod");});
 on("change:cs-performance-cs change:cs-performance-ranks change:cs-performance-class change:checks-cond change:cs-performance-ability-mod change:cs-performance-racial change:cs-performance-feat change:cs-performance-item change:cs-performance-size change:cs-performance-acp change:cs-performance-misc change:cs-performance-ReqTrain"
    ,function(){PFSheet.updateSkill("CS-Performance");});
 
-on("change:cs-religion-ability",function(){PFSheet.handleDropdown("CS-Religion-ability",["CS-Religion-ability-mod"]);});
+on("change:cs-religion-ability",function(){PFSheet.handleDropdown("CS-Religion-ability","CS-Religion-ability-mod");});
 on("change:cs-religion-cs change:cs-religion-ranks change:cs-religion-class change:checks-cond change:cs-religion-ability-mod change:cs-religion-racial change:cs-religion-feat change:cs-religion-item change:cs-religion-size change:cs-religion-acp change:cs-religion-misc change:cs-religion-ReqTrain"
    ,function(){PFSheet.updateSkill("CS-Religion");});
 
-on("change:cs-society-ability",function(){PFSheet.handleDropdown("CS-Society-ability",["CS-Society-ability-mod"]);});
+on("change:cs-society-ability",function(){PFSheet.handleDropdown("CS-Society-ability","CS-Society-ability-mod");});
 on("change:cs-society-cs change:cs-society-ranks change:cs-society-class change:checks-cond change:cs-society-ability-mod change:cs-society-racial change:cs-society-feat change:cs-society-item change:cs-society-size change:cs-society-acp change:cs-society-misc change:cs-society-ReqTrain"
    ,function(){PFSheet.updateSkill("CS-Society");});
 
-on("change:cs-spellcraft-ability",function(){PFSheet.handleDropdown("CS-Spellcraft-ability",["CS-Spellcraft-ability-mod"]);});
+on("change:cs-spellcraft-ability",function(){PFSheet.handleDropdown("CS-Spellcraft-ability","CS-Spellcraft-ability-mod");});
 on("change:cs-spellcraft-cs change:cs-spellcraft-ranks change:cs-spellcraft-class change:checks-cond change:cs-spellcraft-ability-mod change:cs-spellcraft-racial change:cs-spellcraft-feat change:cs-spellcraft-item change:cs-spellcraft-size change:cs-spellcraft-acp change:cs-spellcraft-misc change:cs-spellcraft-ReqTrain"
    ,function(){PFSheet.updateSkill("CS-Spellcraft");});
 
 
-on("change:cs-stealth-ability",function(){PFSheet.handleDropdown("CS-Stealth-ability",["CS-Stealth-ability-mod"]);});
+on("change:cs-stealth-ability",function(){PFSheet.handleDropdown("CS-Stealth-ability","CS-Stealth-ability-mod");});
 on("change:checks-cond change:acp change:cs-stealth-cs change:cs-stealth-ranks change:cs-stealth-class change:cs-stealth-ability-mod change:cs-stealth-racial change:cs-stealth-feat change:cs-stealth-item change:cs-stealth-size change:cs-stealth-acp change:cs-stealth-misc change:cs-stealth-ReqTrain"
    ,function(){PFSheet.updateSkill("CS-Stealth");});
 
-on("change:cs-survival-ability",function(){PFSheet.handleDropdown("CS-Survival-ability",["CS-Survival-ability-mod"]);});
+on("change:cs-survival-ability",function(){PFSheet.handleDropdown("CS-Survival-ability","CS-Survival-ability-mod");});
 on("change:cs-survival-cs change:cs-survival-ranks change:cs-survival-class change:cs-survival-ability-mod change:cs-survival-racial change:cs-survival-feat change:cs-survival-item change:cs-survival-size change:cs-survival-acp change:cs-survival-misc change:cs-survival-ReqTrain"
    ,function(){PFSheet.updateSkill("CS-Survival");});
 
@@ -16755,11 +16770,11 @@ on("change:condition-grappled change:condition-invisible", function() {
 });
 
 //init 
-on("change:init-ability", function() {  PFSheet.handleDropdown("init-ability",["init-ability-mod"]);});
+on("change:init-ability", function() {  PFSheet.handleDropdown("init-ability","init-ability-mod");});
 on("change:init-ability-mod change:init-trait change:init-misc change:condition-deafened",function(){ PFSheet.updateInit(); });
 
 //hp
-on("change:hp-ability", function () {PFSheet.handleDropdown("HP-ability",["HP-ability-mod"]);});
+on("change:hp-ability", function () {PFSheet.handleDropdown("HP-ability","HP-ability-mod");});
 on("change:hp-ability-mod change:level change:total-hp change:total-mythic-hp change:hp-formula-mod change:HP-misc change:mythic-adventures-show", function () { PFSheet.updateHP(); });
 on("change:hp-temp-misc change:buff_hp-temp-total", function() { PFSheet.updateTempHP(); });
 on("change:hp-formula-macro-text",function(){SWUtils.evaluateAndSetNumber("HP-formula-macro-text","HP-formula-mod");});
