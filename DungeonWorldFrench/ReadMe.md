@@ -3,9 +3,16 @@
 Feuille de Personnage en français pour [Dungeon World](http://dungeonworld-fr.blogspot.fr/), adaptée de la feuille VO de Willem den Besten (Morenim) et Devindra Payment (@Ardnived).
 
 # Version courante
-1.0 [Capture d'écran](dwfr.png)
+1.1 [Capture d'écran](dwfr.png)
 
 # Notes de version
+
+##v1.1 (2016-02-28)
+* Ajout du logo
+* Affichage légèrement plus compact
+* Ajout du nombre d'utilisations (courante et maximum) dans le matériel
+* Affichage direct de la base de PV et de la base de Charge 
+* Reformatage des sorts sur la colonne de droite, sous les actions
 
 ##v1.0 (2016-02-21)
 Création de la fiche.
