@@ -2464,7 +2464,7 @@ function updateNPCHPFromSRD () {
 
   getAttrs(collectionArray, function (v) {
     if (exists(v.hp_srd)) {
-      var match = v.hp_srd.match(/\((\d+)d(\d+)(?:\s?(?:\+|\-)\s?(\d+))?\)/i);
+      var match = v.hp_srd.match(/\((\d+)d(\d+)(?:\s?(\+|\-)\s?(\d+))?\)/i);
       if (!match || !match[1] || !match[2]) {
         console.log('Character doesn\'t have valid HP/HD format');
       } else {
@@ -2483,9 +2483,14 @@ function updateNPCHPFromSRD () {
         finalSetAttrs.hit_die = 'd' + getIntValue(match[2]);
 
         var hpExpectedBonus = hdNum * conMod;
-        var hpBonus = getIntValue(match[3]);
+	      var hpBonusSign = match[3];
+        var hpBonus = getIntValue(match[4]);
         if (hpBonus !== hpExpectedBonus) {
-          finalSetAttrs.hp_extra = hpBonus - hpExpectedBonus;
+	        if (hpBonusSign === '-') {
+		        finalSetAttrs.hp_extra = hpBonus + hpExpectedBonus;
+	        } else {
+		        finalSetAttrs.hp_extra = hpBonus - hpExpectedBonus;
+	        }
         }
       }
     }
