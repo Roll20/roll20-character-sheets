@@ -523,7 +523,7 @@ on('change:dexterity_mod', function () {
 
 function updateLevels () {
 	var repeatingItem = 'repeating_class';
-	var collectionArray = [];
+	var collectionArray = ['ki_max', 'lay_on_hands_max', 'sorcery_points_max', 'warlock_spell_slots_max'];
 	var finalSetAttrs = {};
 
 	for (var i = 0; i < CLASSES.length; i++) {
@@ -723,14 +723,19 @@ function updateLevels () {
 				}
 			}
 
+			if (finalSetAttrs.monk_level > 1) {
+				finalSetAttrs.ki_max = finalSetAttrs.monk_level;
+			} else if (!isUndefined(v.ki_max)) {
+				finalSetAttrs.ki_max = 0;
+			}
 			if (finalSetAttrs.paladin_level > 0) {
 				finalSetAttrs.lay_on_hands_max = finalSetAttrs.paladin_level * 5;
-			} else {
+			} else if (!isUndefined(v.lay_on_hands_max)) {
 				finalSetAttrs.lay_on_hands_max = 0;
 			}
 			if (finalSetAttrs.sorcerer_level > 1) {
 				finalSetAttrs.sorcery_points_max = finalSetAttrs.sorcerer_level;
-			} else {
+			} else if (!isUndefined(v.sorcery_points_max)) {
 				finalSetAttrs.sorcery_points_max = 0;
 			}
 			if (spellcasting.warlock > 0) {
@@ -743,7 +748,7 @@ function updateLevels () {
 				} else {
 					finalSetAttrs.warlock_spell_slots_max = 4;
 				}
-			} else {
+			} else if (!isUndefined(v.warlock_spell_slots_max)) {
 				finalSetAttrs.warlock_spell_slots_max = 0;
 			}
 			setFinalAttrs(v, finalSetAttrs);
