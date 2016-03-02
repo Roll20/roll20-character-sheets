@@ -1634,6 +1634,9 @@ function updateHealToggle (v, finalSetAttrs, repeatingString) {
 		if (exists(v.global_spell_heal_bonus)) {
 			healFormula += ADD + '@{global_spell_heal_bonus}[global spell heal bonus]';
 		}
+		if (v[repeatingString + 'heal_query_toggle'] === '@{heal_query}') {
+			healFormula += ADD + '@{heal_query_toggle}[query amount]';
+		}
 
 		finalSetAttrs[repeatingString + 'heal_formula'] = healFormula;
 	}
@@ -1895,6 +1898,7 @@ function updateSpell (rowId) {
 			collectionArray.push(repeatingString + 'heal');
 			collectionArray.push(repeatingString + 'heal_ability');
 			collectionArray.push(repeatingString + 'heal_bonus');
+			collectionArray.push(repeatingString + 'heal_query_toggle');
 			collectionArray.push(repeatingString + 'add_casting_modifier');
 			collectionArray.push(repeatingString + 'higher_level_toggle');
 			collectionArray.push(repeatingString + 'higher_level_dice');
@@ -2755,6 +2759,7 @@ function updateAction (type, rowId) {
 			collectionArray.push(repeatingString + 'heal');
 			collectionArray.push(repeatingString + 'heal_ability');
 			collectionArray.push(repeatingString + 'heal_bonus');
+			collectionArray.push(repeatingString + 'heal_query_toggle');
 			collectionArray.push(repeatingString + 'parsed');
 			collectionArray.push(repeatingString + 'recharge');
 			collectionArray.push(repeatingString + 'recharge_display');
