@@ -680,9 +680,15 @@ function updateLevels () {
 				if (hd.hasOwnProperty(key)) {
 					if (hd[key] !== 0) {
 						finalSetAttrs['hd_' + key + '_max'] = hd[key];
+						finalSetAttrs['hd_' + key + '_query'] = '?{HD';
+						for (var i = 1; i <= hd[key]; i++) {
+							finalSetAttrs['hd_' + key + '_query'] += '|' + i;
+						}
+						finalSetAttrs['hd_' + key + '_query'] += '}';
 						finalSetAttrs['hd_' + key + '_toggle'] = 1;
 					} else {
 						finalSetAttrs['hd_' + key + '_max'] = 0;
+						finalSetAttrs['hd_' + key + '_query'] += '';
 						finalSetAttrs['hd_' + key + '_toggle'] = 0;
 					}
 				}
@@ -3523,6 +3529,9 @@ function sheetOpened () {
 		if (versionCompare(version, '2.1.13') < 0) {
 			weighEquipment();
 			updateSpell();
+		}
+		if (versionCompare(version, '2.1.14') < 0) {
+			updateLevels();
 		}
 
 		if (!version || version !== currentVersion) {
