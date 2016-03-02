@@ -424,6 +424,7 @@ function lowercaseDamageTypes (string) {
 		.replace('Adamantine', 'adamantine');
 }
 
+var CLASSES = ['barbarian', 'bard', 'cleric', 'druid', 'fighter', 'monk', 'paladin', 'ranger', 'rogue', 'sorcerer', 'warlock', 'wizard'];
 var ABILITIES = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
 var ADD = ' + ';
 var SUBTRACT = ' - ';
@@ -522,8 +523,12 @@ on('change:dexterity_mod', function () {
 
 function updateLevels () {
 	var repeatingItem = 'repeating_class';
-	var collectionArray = ['barbarian_level', 'bard_level', 'cleric_level', 'druid_level', 'fighter_level', 'monk_level', 'paladin_level', 'ranger_level', 'rogue_level', 'sorcerer_level', 'warlock_level', 'wizard_level'];
+	var collectionArray = [];
 	var finalSetAttrs = {};
+
+	for (var i = 0; i < CLASSES.length; i++) {
+		collectionArray.push(CLASSES[i] + '_level');
+	}
 
 	var defaultClassDetails = {
 		barbarian: {
@@ -591,7 +596,6 @@ function updateLevels () {
 	};
 	var totalLevel = 0;
 	var levelArray = [];
-	var sorcererLevels = 0;
 	var classesWithSpellcasting = 0;
 	var xpTable = [0, 300, 900, 2700, 6500, 14000, 23000, 34000, 48000, 64000, 85000, 100000, 120000, 140000, 165000, 195000, 225000, 265000, 305000, 355000, 385000, 405000, 435000, 465000, 495000, 525000, 555000, 585000, 605000, 635000, 665000];
 
@@ -606,18 +610,9 @@ function updateLevels () {
 		}
 
 		getAttrs(collectionArray, function (v) {
-      finalSetAttrs.barbarian_level = 0;
-      finalSetAttrs.bard_level = 0;
-      finalSetAttrs.cleric_level = 0;
-      finalSetAttrs.druid_level = 0;
-      finalSetAttrs.fighter_level = 0;
-      finalSetAttrs.monk_level = 0;
-      finalSetAttrs.paladin_level = 0;
-      finalSetAttrs.ranger_level = 0;
-      finalSetAttrs.rogue_level = 0;
-      finalSetAttrs.sorcerer_level = 0;
-      finalSetAttrs.warlock_level = 0;
-      finalSetAttrs.wizard_level = 0;
+			for (var i = 0; i < CLASSES.length; i++) {
+				finalSetAttrs[CLASSES[i] + '_level'] = 0;
+			}
 
 			for (var j = 0; j < ids.length; j++) {
 				var repeatingString = repeatingItem + '_' + ids[j] + '_';
@@ -670,10 +665,6 @@ function updateLevels () {
 					classesWithSpellcasting += 1;
 					spellcasting[classSpellcasting] += classLevel;
 				}
-
-				if (className === 'sorcerer' || className === 'sorcerer') {
-					sorcererLevels += classLevel;
-				}
 			}
 
 			for (var key in hd) {
@@ -681,8 +672,8 @@ function updateLevels () {
 					if (hd[key] !== 0) {
 						finalSetAttrs['hd_' + key + '_max'] = hd[key];
 						finalSetAttrs['hd_' + key + '_query'] = '?{HD';
-						for (var i = 1; i <= hd[key]; i++) {
-							finalSetAttrs['hd_' + key + '_query'] += '|' + i;
+						for (var x = 1; x <= hd[key]; x++) {
+							finalSetAttrs['hd_' + key + '_query'] += '|' + x;
 						}
 						finalSetAttrs['hd_' + key + '_query'] += '}';
 						finalSetAttrs['hd_' + key + '_toggle'] = 1;
@@ -724,19 +715,25 @@ function updateLevels () {
 			}
 			finalSetAttrs.xp_next_level = xpForNextLevel;
 
-			if (sorcererLevels > 0) {
-				finalSetAttrs.has_sorcerer_levels = 'on';
-				if (sorcererLevels === 1) {
-					finalSetAttrs.sorcery_points_max = 0;
+			for (var y = 0; y < CLASSES.length; y++) {
+				if (finalSetAttrs[CLASSES[y] + '_level'] > 0) {
+					finalSetAttrs['has_' + CLASSES[y] + '_levels'] = 1;
 				} else {
-					finalSetAttrs.sorcery_points_max = sorcererLevels;
+					finalSetAttrs['has_' + CLASSES[y] + '_levels'] = 0;
 				}
+			}
+
+			if (finalSetAttrs.paladin_level > 0) {
+				finalSetAttrs.lay_on_hands_max = finalSetAttrs.paladin_level * 5;
 			} else {
-				finalSetAttrs.has_sorcerer_levels = 0;
+				finalSetAttrs.lay_on_hands_max = 0;
+			}
+			if (finalSetAttrs.sorcerer_level > 1) {
+				finalSetAttrs.sorcery_points_max = finalSetAttrs.sorcerer_level;
+			} else {
+				finalSetAttrs.sorcery_points_max = 0;
 			}
 			if (spellcasting.warlock > 0) {
-				finalSetAttrs.has_warlock_levels = 'on';
-
 				if (spellcasting.warlock === 1) {
 					finalSetAttrs.warlock_spell_slots_max = 1;
 				} else if (spellcasting.warlock >= 2 && spellcasting.warlock < 11) {
@@ -747,7 +744,7 @@ function updateLevels () {
 					finalSetAttrs.warlock_spell_slots_max = 4;
 				}
 			} else {
-				finalSetAttrs.has_warlock_levels = 0;
+				finalSetAttrs.warlock_spell_slots_max = 0;
 			}
 			setFinalAttrs(v, finalSetAttrs);
 		});
