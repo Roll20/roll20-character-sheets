@@ -2728,6 +2728,31 @@ on('change:content_srd', function () {
 	updateNPCContent();
 });
 
+function displayTextForTraits () {
+	var repeatingItem = 'repeating_trait';
+	var collectionArray = [];
+	var finalSetAttrs = {};
+
+	getSectionIDs(repeatingItem, function (ids) {
+		for (var i = 0; i < ids.length; i++) {
+			var repeatingString = repeatingItem + '_' + ids[i] + '_';
+			collectionArray.push(repeatingString + 'display_text');
+			collectionArray.push(repeatingString + 'freetext');
+		}
+
+		getAttrs(collectionArray, function (v) {
+			for (var j = 0; j < ids.length; j++) {
+				var repeatingString = repeatingItem + '_' + ids[j] + '_';
+
+				if (isUndefined(v.display_text)) {
+					finalSetAttrs[repeatingString + 'display_text'] = v[repeatingString + 'freetext'];
+				}
+			}
+			setFinalAttrs(v, finalSetAttrs);
+		});
+	});
+}
+
 function updateAction (type, rowId) {
 	var repeatingItem = 'repeating_' + type;
 	var collectionArray = ['pb', 'strength_mod', 'finesse_mod', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability'];
@@ -3546,6 +3571,7 @@ function sheetOpened () {
 		}
 		if (versionCompare(version, '2.1.15') < 0) {
 			updateLevels();
+			displayTextForTraits();
 		}
 
 		if (!version || version !== currentVersion) {
