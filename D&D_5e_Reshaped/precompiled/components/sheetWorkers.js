@@ -2712,7 +2712,9 @@ function updateNPCContent () {
 						newRowId = generateRowID();
 						repeatingString = 'repeating_trait_' + newRowId + '_';
 						finalSetAttrs[repeatingString + 'name'] = match[1];
-						finalSetAttrs[repeatingString + 'freetext'] = match[2].trim();
+						var text = match[2].trim();
+						finalSetAttrs[repeatingString + 'display_text'] = text;
+						finalSetAttrs[repeatingString + 'freetext'] = text;
 					} else {
 						console.log('Character doesn\'t have a valid trait format');
 					}
