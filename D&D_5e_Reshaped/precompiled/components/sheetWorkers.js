@@ -523,7 +523,7 @@ on('change:dexterity_mod', function () {
 
 function updateLevels () {
 	var repeatingItem = 'repeating_class';
-	var collectionArray = ['ki_max', 'lay_on_hands_max', 'sorcery_points_max', 'warlock_spell_slots_max'];
+	var collectionArray = ['action_surge_uses_max', 'ki_max', 'lay_on_hands_uses_max', 'sorcery_points_max', 'warlock_spell_slots_max'];
 	var finalSetAttrs = {};
 
 	for (var i = 0; i < CLASSES.length; i++) {
@@ -723,15 +723,22 @@ function updateLevels () {
 				}
 			}
 
+			if (v.fighter_level >= 17) {
+				finalSetAttrs.action_surge_uses_max = 2;
+			} else if (v.fighter_level >= 1) {
+				finalSetAttrs.action_surge_uses_max = 1;
+			} else if (!isUndefined(v.action_surge_uses_max)) {
+				finalSetAttrs.action_surge_uses_max = 0;
+			}
 			if (finalSetAttrs.monk_level > 1) {
 				finalSetAttrs.ki_max = finalSetAttrs.monk_level;
 			} else if (!isUndefined(v.ki_max)) {
 				finalSetAttrs.ki_max = 0;
 			}
 			if (finalSetAttrs.paladin_level > 0) {
-				finalSetAttrs.lay_on_hands_max = finalSetAttrs.paladin_level * 5;
-			} else if (!isUndefined(v.lay_on_hands_max)) {
-				finalSetAttrs.lay_on_hands_max = 0;
+				finalSetAttrs.lay_on_hands_uses_max = finalSetAttrs.paladin_level * 5;
+			} else if (!isUndefined(v.lay_on_hands_uses_max)) {
+				finalSetAttrs.lay_on_hands_uses_max = 0;
 			}
 			if (finalSetAttrs.sorcerer_level > 1) {
 				finalSetAttrs.sorcery_points_max = finalSetAttrs.sorcerer_level;
@@ -3533,6 +3540,9 @@ function sheetOpened () {
 			updateSpell();
 		}
 		if (versionCompare(version, '2.1.14') < 0) {
+			updateLevels();
+		}
+		if (versionCompare(version, '2.1.15') < 0) {
 			updateLevels();
 		}
 
