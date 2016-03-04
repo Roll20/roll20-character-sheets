@@ -1,4 +1,4 @@
-var currentVersion = '2.1.14';
+var currentVersion = '2.1.15';
 var skills = {
 	abilities: {
 		'acrobatics': 'dexterity',
@@ -523,7 +523,7 @@ on('change:dexterity_mod', function () {
 
 function updateLevels () {
 	var repeatingItem = 'repeating_class';
-	var collectionArray = ['ki_max', 'lay_on_hands_max', 'sorcery_points_max', 'warlock_spell_slots_max'];
+	var collectionArray = ['action_surge_uses_max', 'ki_max', 'lay_on_hands_uses_max', 'sorcery_points_max', 'warlock_spell_slots_max'];
 	var finalSetAttrs = {};
 
 	for (var i = 0; i < CLASSES.length; i++) {
@@ -723,15 +723,22 @@ function updateLevels () {
 				}
 			}
 
+			if (v.fighter_level >= 17) {
+				finalSetAttrs.action_surge_uses_max = 2;
+			} else if (v.fighter_level >= 1) {
+				finalSetAttrs.action_surge_uses_max = 1;
+			} else if (!isUndefined(v.action_surge_uses_max)) {
+				finalSetAttrs.action_surge_uses_max = 0;
+			}
 			if (finalSetAttrs.monk_level > 1) {
 				finalSetAttrs.ki_max = finalSetAttrs.monk_level;
 			} else if (!isUndefined(v.ki_max)) {
 				finalSetAttrs.ki_max = 0;
 			}
 			if (finalSetAttrs.paladin_level > 0) {
-				finalSetAttrs.lay_on_hands_max = finalSetAttrs.paladin_level * 5;
-			} else if (!isUndefined(v.lay_on_hands_max)) {
-				finalSetAttrs.lay_on_hands_max = 0;
+				finalSetAttrs.lay_on_hands_uses_max = finalSetAttrs.paladin_level * 5;
+			} else if (!isUndefined(v.lay_on_hands_uses_max)) {
+				finalSetAttrs.lay_on_hands_uses_max = 0;
 			}
 			if (finalSetAttrs.sorcerer_level > 1) {
 				finalSetAttrs.sorcery_points_max = finalSetAttrs.sorcerer_level;
@@ -2705,7 +2712,9 @@ function updateNPCContent () {
 						newRowId = generateRowID();
 						repeatingString = 'repeating_trait_' + newRowId + '_';
 						finalSetAttrs[repeatingString + 'name'] = match[1];
-						finalSetAttrs[repeatingString + 'freetext'] = match[2].trim();
+						var text = match[2].trim();
+						finalSetAttrs[repeatingString + 'display_text'] = text;
+						finalSetAttrs[repeatingString + 'freetext'] = text;
 					} else {
 						console.log('Character doesn\'t have a valid trait format');
 					}
@@ -2718,6 +2727,31 @@ function updateNPCContent () {
 on('change:content_srd', function () {
 	updateNPCContent();
 });
+
+function displayTextForTraits () {
+	var repeatingItem = 'repeating_trait';
+	var collectionArray = [];
+	var finalSetAttrs = {};
+
+	getSectionIDs(repeatingItem, function (ids) {
+		for (var i = 0; i < ids.length; i++) {
+			var repeatingString = repeatingItem + '_' + ids[i] + '_';
+			collectionArray.push(repeatingString + 'display_text');
+			collectionArray.push(repeatingString + 'freetext');
+		}
+
+		getAttrs(collectionArray, function (v) {
+			for (var j = 0; j < ids.length; j++) {
+				var repeatingString = repeatingItem + '_' + ids[j] + '_';
+
+				if (isUndefined(v.display_text)) {
+					finalSetAttrs[repeatingString + 'display_text'] = v[repeatingString + 'freetext'];
+				}
+			}
+			setFinalAttrs(v, finalSetAttrs);
+		});
+	});
+}
 
 function updateAction (type, rowId) {
 	var repeatingItem = 'repeating_' + type;
@@ -3534,6 +3568,10 @@ function sheetOpened () {
 		}
 		if (versionCompare(version, '2.1.14') < 0) {
 			updateLevels();
+		}
+		if (versionCompare(version, '2.1.15') < 0) {
+			updateLevels();
+			displayTextForTraits();
 		}
 
 		if (!version || version !== currentVersion) {
