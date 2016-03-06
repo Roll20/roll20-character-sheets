@@ -159,11 +159,11 @@ gulp.task('compileJS', ['lint'], function() {
 			header: '<script type="text/worker">',
 			footer: '</script>'
 		}))
-		.pipe(gulp.dest('../'));
+		.pipe(gulp.dest('./'));
 });
 
 gulp.task('compile', ['preCompile', 'lint', 'compileJS'], function () {
-	return gulp.src(['../D&D_5e.html', '../sheetWorkers.js', './components/rollTemplate.html'])
+	return gulp.src(['../D&D_5e.html', './sheetWorkers.js', './components/rollTemplate.html'])
 		.pipe(concat('D&D_5e.html'))
 		.pipe(gulp.dest('../'));
 });
