@@ -103,16 +103,6 @@ gulp.task('preCompile', function () {
 		.pipe(minifyHTML({
 			whitespace: true
 		}))
-		.pipe(replace({
-			patterns: [
-				{
-					match: /text\/worker/g,
-					replacement: function () {
-						return '"text/worker"';
-					}
-				}
-			]
-		}))
 		.pipe(gulp.dest('../'));
 });
 
@@ -134,11 +124,6 @@ gulp.task('sass', function () {
 		.pipe(sassLint.failOnError())
 		*/
 		.pipe(sass().on('error', sass.logError))
-		.pipe(gulp.dest('../'));
-});
-
-gulp.task('minify-css', ['sass'], function () {
-	return gulp.src('../D&D_5e.css')
 		.pipe(minifyCss())
 		.pipe(gulp.dest('../'));
 });
@@ -177,7 +162,7 @@ gulp.task('compileJS', ['lint'], function() {
 		.pipe(gulp.dest('../'));
 });
 
-gulp.task('compile', ['preCompile', 'minify-css', 'lint', 'compileJS'], function () {
+gulp.task('compile', ['preCompile', 'lint', 'compileJS'], function () {
 	return gulp.src(['../D&D_5e.html', '../sheetWorkers.js', './components/rollTemplate.html'])
 		.pipe(concat('D&D_5e.html'))
 		.pipe(gulp.dest('../'));
