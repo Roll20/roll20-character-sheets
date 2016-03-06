@@ -1022,7 +1022,6 @@ function sumRepeating (options, sumItems) {
 					}
 
 					var itemTotal = (qty * fieldToAdd).round(2);
-					console.log('itemTotal', itemTotal);
 
 					if (sumItem.addOnAfterQty) {
 						itemTotal += getFloatValue(v[repeatingString + sumItem.addOnAfterQty]);
