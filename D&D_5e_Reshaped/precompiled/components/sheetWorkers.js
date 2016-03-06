@@ -164,7 +164,7 @@ function getRowId(leadingString, eventInfo) {
 function getRepeatingField(leadingString, eventInfo) {
 	var re = new RegExp(leadingString + '_[a-zA-Z0-9\-]*_(.*)');
 	var match = eventInfo.sourceAttribute.match(re);
-	if (!match) {
+	if (!match || (match && match[1].indexOf(leadingString) !== -1)) {
 		return 'error';
 	}
 
