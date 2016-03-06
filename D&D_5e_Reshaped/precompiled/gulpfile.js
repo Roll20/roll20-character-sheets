@@ -149,7 +149,7 @@ gulp.task('lint', function() {
 		.pipe(eslint.failAfterError());
 });
 
-gulp.task('compileJS', ['lint'], function() {
+gulp.task('compileJS', function() {
 	return gulp.src(['components/sheetWorkers.js'])
 		.pipe(babel({
 			presets: ['es2015'],
@@ -162,7 +162,7 @@ gulp.task('compileJS', ['lint'], function() {
 		.pipe(gulp.dest('./'));
 });
 
-gulp.task('compile', ['preCompile', 'lint', 'compileJS'], function () {
+gulp.task('compile', ['preCompile', 'sass', 'compileJS'], function () {
 	return gulp.src(['../D&D_5e.html', './sheetWorkers.js', './components/rollTemplate.html'])
 		.pipe(concat('D&D_5e.html'))
 		.pipe(gulp.dest('../'));
