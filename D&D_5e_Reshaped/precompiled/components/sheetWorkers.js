@@ -163,6 +163,10 @@ function getRowId(leadingString, eventInfo) {
 }
 function getRepeatingField(leadingString, eventInfo) {
 	var re = new RegExp(leadingString + '_[a-zA-Z0-9\-]*_(.*)');
+	var match = eventInfo.sourceAttribute.match(re);
+	if (!match) {
+		return 'error';
+	}
 
 	return eventInfo.sourceAttribute.replace(re, '$1');
 }
@@ -1088,6 +1092,7 @@ function updateArmor (rowId) {
 		}
 		for (var i = 0; i < ids.length; i++) {
 			var repeatingString = repeatingItem + '_' + ids[i] + '_';
+			collectionArray.push(repeatingString + 'parsed');
 			collectionArray.push(repeatingString + 'modifiers');
 		}
 
@@ -1138,7 +1143,7 @@ function updateArmor (rowId) {
 }
 on('change:repeating_armor', function (eventInfo) {
 	var changedField = getRepeatingField('repeating_armor', eventInfo);
-	if (changedField !== 'ac_total') {
+	if (changedField !== 'error' && changedField !== 'ac_total') {
 		var rowId = getRowId('repeating_armor', eventInfo);
 		updateArmor(rowId);
 	}
@@ -1314,7 +1319,7 @@ on('change:weight_attacks change:weight_armor change:weight_equipment change:wei
 
 on('change:repeating_attack', function (eventInfo) {
 	var changedField = getRepeatingField('repeating_attack', eventInfo);
-	if (changedField !== 'toggle_details' && changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed') {
+	if (changedField !== 'error' && changedField !== 'toggle_details' && changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed') {
 		var rowId = getRowId('repeating_attack', eventInfo);
 		updateAttack(rowId);
 	}
@@ -1996,7 +2001,7 @@ function updateSpell (rowId) {
 
 on('change:repeating_spell', function (eventInfo) {
 	var changedField = getRepeatingField('repeating_spell', eventInfo);
-	if (changedField !== 'toggle_details' && changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'heal_formula' && changedField !== 'higher_level_query' && changedField !== 'parsed') {
+	if (changedField !== 'error' && changedField !== 'toggle_details' && changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'heal_formula' && changedField !== 'higher_level_query' && changedField !== 'parsed') {
 		console.log('spell changedField', changedField);
 		var rowId = getRowId('repeating_spell', eventInfo);
 		updateSpell(rowId);
@@ -2168,7 +2173,7 @@ function updateSkill (rowId) {
 
 on('change:repeating_skill', function (eventInfo) {
 	var changedField = getRepeatingField('repeating_skill', eventInfo);
-	if (changedField !== 'ability_short_name' && changedField !== 'total' && changedField !== 'total_with_sign' && changedField !== 'formula') {
+	if (changedField !== 'error' && changedField !== 'ability_short_name' && changedField !== 'total' && changedField !== 'total_with_sign' && changedField !== 'formula') {
 		var rowId = getRowId('repeating_skill', eventInfo);
 		updateSkill(rowId);
 	}
@@ -2871,7 +2876,7 @@ function updateAction (type, rowId) {
 }
 on('change:repeating_trait', function (eventInfo) {
 	var changedField = getRepeatingField('repeating_trait', eventInfo);
-	if (changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed' && changedField !== 'recharge_display') {
+	if (changedField !== 'error' && changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed' && changedField !== 'recharge_display') {
 		console.log('trait changedField', changedField);
 		var rowId = getRowId('repeating_trait', eventInfo);
 		updateAction('trait', rowId);
@@ -2879,7 +2884,7 @@ on('change:repeating_trait', function (eventInfo) {
 });
 on('change:repeating_action', function (eventInfo) {
 	var changedField = getRepeatingField('repeating_action', eventInfo);
-	if (changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed' && changedField !== 'recharge_display') {
+	if (changedField !== 'error' && changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed' && changedField !== 'recharge_display') {
 		console.log('action changedField', changedField);
 		var rowId = getRowId('repeating_action', eventInfo);
 		updateAction('action', rowId);
@@ -2887,7 +2892,7 @@ on('change:repeating_action', function (eventInfo) {
 });
 on('change:repeating_reaction', function (eventInfo) {
 	var changedField = getRepeatingField('repeating_reaction', eventInfo);
-	if (changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed' && changedField !== 'recharge_display') {
+	if (changedField !== 'error' && changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed' && changedField !== 'recharge_display') {
 		console.log('reaction changedField', changedField);
 		var rowId = getRowId('repeating_reaction', eventInfo);
 		updateAction('reaction', rowId);
@@ -2895,7 +2900,7 @@ on('change:repeating_reaction', function (eventInfo) {
 });
 on('change:repeating_legendaryaction', function (eventInfo) {
 	var changedField = getRepeatingField('repeating_legendaryaction', eventInfo);
-	if (changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed' && changedField !== 'recharge_display') {
+	if (changedField !== 'error' && changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed' && changedField !== 'recharge_display') {
 		console.log('legendaryaction changedField', changedField);
 		var rowId = getRowId('repeating_legendaryaction', eventInfo);
 		updateAction('legendaryaction', rowId);
@@ -2903,7 +2908,7 @@ on('change:repeating_legendaryaction', function (eventInfo) {
 });
 on('change:repeating_lairaction', function (eventInfo) {
 	var changedField = getRepeatingField('repeating_lairaction', eventInfo);
-	if (changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed' && changedField !== 'recharge_display') {
+	if (changedField !== 'error' && changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed' && changedField !== 'recharge_display') {
 		console.log('lairaction changedField', changedField);
 		var rowId = getRowId('repeating_lairaction', eventInfo);
 		updateAction('lairaction', rowId);
@@ -3521,6 +3526,8 @@ function sheetOpened () {
 			updateSavingThrows();
 			updateLevels();
 			updateAbilityChecksMacro();
+			updateInitiative();
+			updateArmor();
 		}
 
 		if (versionCompare(version, '2.0.10') < 0) {
@@ -3577,9 +3584,6 @@ function sheetOpened () {
 			finalSetAttrs.version = currentVersion;
 		}
 		setFinalAttrs(v, finalSetAttrs);
-
-		updateInitiative();
-		updateArmor();
 	});
 }
 
