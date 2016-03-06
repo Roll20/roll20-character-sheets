@@ -453,7 +453,7 @@ on('change:cp change:sp change:ep change:gp change:pp', () => {
 });
 
 const updateAbilityModifier = (ability) => {
-	const collectionArray = [ability, `${ability}_bonus`, `${ability}_mod`, `${ability}_check_mod`, 'global_ability_bonus', 'strength_mod', 'dexterity_mod', 'jack_of_all_trades_toggle', 'jack_of_all_trades', 'remarkable_athlete_toggle', 'remarkable_athlete'];
+	const collectionArray = [ability, `${ability}_bonus`, `${ability}_mod`, `${ability}_check_mod`, 'global_ability_bonus', 'strength_mod', 'dexterity_mod', 'jack_of_all_trades_toggle', 'jack_of_all_trades', 'remarkable_athlete_toggle', 'remarkable_athlete', 'global_check_bonus'];
 	const finalSetAttrs = {};
 
 	getAttrs(collectionArray, (v) => {
@@ -462,13 +462,19 @@ const updateAbilityModifier = (ability) => {
 		const globalAbilityBonus = getIntValue(v.global_ability_bonus);
 		const abilityMod = getAbilityMod((abilityScore + abilityBonus + globalAbilityBonus));
 
+		let abilityCheck = abilityMod;
 		let abilityCheckFormula = `${abilityMod}[${firstThree(ability)} mod with bonus]`;
 		if ((ability === 'strength' || ability === 'dexterity' || ability === 'constitution') && v.remarkable_athlete_toggle === '@{remarkable_athlete}') {
 			const remarkableAthlete = getIntValue(v.remarkable_athlete);
+			abilityCheck += remarkableAthlete;
 			abilityCheckFormula += ` + ${remarkableAthlete}[remarkable athlete]`;
 		} else if (v.jack_of_all_trades_toggle === '@{jack_of_all_trades}') {
 			const jackOfAllTrades = getIntValue(v.jack_of_all_trades);
+			abilityCheck += jackOfAllTrades;
 			abilityCheckFormula += ` + ${jackOfAllTrades}[jack of all trades]`;
+		}
+		if (!isNaN(v.global_check_bonus)) {
+			abilityCheck += getIntValue(v.global_check_bonus);
 		}
 		abilityCheckFormula += ' + (@{global_check_bonus})[global check bonus]';
 
@@ -479,7 +485,8 @@ const updateAbilityModifier = (ability) => {
 
 		finalSetAttrs[`${ability}_mod`] = abilityMod;
 		finalSetAttrs[`${ability}_mod_with_sign`] = abilityModWithSign;
-		finalSetAttrs[`${ability}_check_mod`] = abilityCheckFormula;
+		finalSetAttrs[`${ability}_check_mod`] = abilityCheck;
+		finalSetAttrs[`${ability}_check_mod_formula`] = abilityCheckFormula;
 
 		if (ability === 'strength') {
 			finalSetAttrs.finesse_mod = Math.max(abilityMod, getIntValue(v.dexterity_mod));
@@ -3557,6 +3564,9 @@ const sheetOpened = () => {
 		if (versionCompare(version, '2.1.15') < 0) {
 			updateLevels();
 			displayTextForTraits();
+		}
+		if (versionCompare(version, '2.1.1') < 0) {
+			updateAbilityModifiers();
 		}
 
 		if (!version || version !== currentVersion) {
