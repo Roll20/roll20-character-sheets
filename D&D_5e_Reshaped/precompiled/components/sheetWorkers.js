@@ -1,6 +1,6 @@
 'use strict';
 
-const currentVersion = '2.2.0';
+const currentVersion = '2.2.1';
 const skills = {
   abilities: {
 		acrobatics: 'dexterity',
@@ -3565,7 +3565,7 @@ const sheetOpened = () => {
 			updateLevels();
 			displayTextForTraits();
 		}
-		if (versionCompare(version, '2.1.1') < 0) {
+		if (versionCompare(version, '2.2.1') < 0) {
 			updateAbilityModifiers();
 		}
 
