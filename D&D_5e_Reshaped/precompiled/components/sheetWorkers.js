@@ -121,33 +121,33 @@ const getIntValue = (value, defaultValue) => {
 	}
 	return parseInt(value, 10) || defaultValue;
 };
-function getFloatValue(value, defaultValue) {
+const getFloatValue = (value, defaultValue) => {
 	if (!defaultValue) {
 		defaultValue = 0;
 	}
 	return parseFloat(value) || defaultValue;
-}
-function exists(value) {
+};
+const exists = (value) => {
 	if (!value || value === '' || value === '0' || value === 0) {
 		return false;
 	}
 	return true;
-}
-function getAbilityModName(varName) {
+};
+const getAbilityModName = (varName) => {
 	if (!varName) {
 		return 'strength_mod';
 	} else if (typeof varName === 'string') {
 		varName = varName.replace(/\W/g, '');
 	}
 	return varName;
-}
-function getAbilityName(varName) {
+};
+const getAbilityName = (varName) => {
 	if (!varName) {
 		return 'strength';
 	}
 	return getAbilityModName(varName).replace('_mod', '');
-}
-function getAbilityValue(v, varName, defaultAbility) {
+};
+const getAbilityValue = (v, varName, defaultAbility) => {
 	if (typeof varName === 'undefined') {
 		if (defaultAbility) {
 			return getIntValue(v[defaultAbility]);
@@ -157,8 +157,8 @@ function getAbilityValue(v, varName, defaultAbility) {
 		return getIntValue(v[varName], 0);
 	}
 	return 0;
-}
-function getAbilityShortName(varName, capital) {
+};
+const getAbilityShortName = (varName, capital) => {
 	if (!varName) {
 		return 'Str';
 	}
@@ -167,12 +167,12 @@ function getAbilityShortName(varName, capital) {
 		varName = capitalize(varName);
 	}
 	return firstThree(varName);
-}
-function getRowId(leadingString, eventInfo) {
+};
+const getRowId = (leadingString, eventInfo) => {
 	const re = new RegExp(`${leadingString}_([a-zA-Z0-9\-]*)_.*`);
 	return eventInfo.sourceAttribute.replace(re, '$1');
-}
-function getRepeatingField(leadingString, eventInfo) {
+};
+const getRepeatingField = (leadingString, eventInfo) => {
 	const re = new RegExp(`${leadingString}_[a-zA-Z0-9\-]*_(.*)`);
 	const match = eventInfo.sourceAttribute.match(re);
 	if (!match || (match && match[1].indexOf(leadingString) !== -1)) {
@@ -180,16 +180,16 @@ function getRepeatingField(leadingString, eventInfo) {
 	}
 
 	return eventInfo.sourceAttribute.replace(re, '$1');
-}
-function isEmpty(obj) {
+};
+const isEmpty = (obj) => {
 	for (const prop in obj) {
 		if (obj.hasOwnProperty(prop)) {
 			return false;
 		}
 	}
 	return true;
-}
-function setFinalAttrs(v, finalSetAttrs) {
+};
+const setFinalAttrs = (v, finalSetAttrs) => {
 	if (!isEmpty(finalSetAttrs)) {
 		for (const key in finalSetAttrs) {
 			if (finalSetAttrs.hasOwnProperty(key)) {
@@ -201,14 +201,14 @@ function setFinalAttrs(v, finalSetAttrs) {
 		console.log('finalSetAttrs', finalSetAttrs);
 		setAttrs(finalSetAttrs);
 	}
-}
-function fromVOrFinalSetAttrs(v, finalSetAttrs, value) {
+};
+const fromVOrFinalSetAttrs = (v, finalSetAttrs, value) => {
 	if (exists(finalSetAttrs[value])) {
 		return finalSetAttrs[value];
 	}
 	return v[value];
-}
-function parseAttackComponent(v, repeatingString, finalSetAttrs, options) {
+};
+const parseAttackComponent = (v, repeatingString, finalSetAttrs, options) => {
 	let parsed = v[`${repeatingString}parsed`];
 
 	if (isUndefined(parsed)) {
@@ -245,17 +245,17 @@ function parseAttackComponent(v, repeatingString, finalSetAttrs, options) {
 			}
 		}
 	}
-}
-function hasUpperCase(string) {
+};
+const hasUpperCase = (string) => {
 	return (/[A-Z]/.test(string));
-}
-function emptyIfUndefined(value) {
+};
+const emptyIfUndefined = (value) => {
 	if (!value) {
 		return '';
 	}
 	return value;
-}
-function ordinalSpellLevel(level) {
+};
+const ordinalSpellLevel = (level) => {
 	let spellLevel = '';
 	if (level === 0) {
 		spellLevel = 'Cantrip';
@@ -276,16 +276,16 @@ function ordinalSpellLevel(level) {
 		}
 	}
 	return spellLevel;
-}
-function versionCompare(v1, v2, options) {
+};
+const versionCompare = (v1, v2, options) => {
 	const lexicographical = options && options.lexicographical;
 	const zeroExtend = options && options.zeroExtend;
 	let v1parts = v1.split('.');
 	let	v2parts = v2.split('.');
 
-	function isValidPart(x) {
+	const isValidPart = (x) => {
 		return (lexicographical ? /^\d+[A-Za-z]*$/ : /^\d+$/).test(x);
-	}
+	};
 
 	if (!v1parts.every(isValidPart) || !v2parts.every(isValidPart)) {
 		return NaN;
@@ -320,11 +320,11 @@ function versionCompare(v1, v2, options) {
 	}
 
 	return 0;
-}
-function getAbilityMod(score) {
+};
+const getAbilityMod = (score) => {
 	return Math.floor((getIntValue(score) - 10) / 2);
-}
-function addOrSubtract(string, number) {
+};
+const addOrSubtract = (string, number) => {
 	let value = number;
 	if (string && value) {
 		if (value >= 0) {
@@ -334,21 +334,21 @@ function addOrSubtract(string, number) {
 		}
 	}
 	return value;
-}
-function numberWithCommas(x) {
+};
+const numberWithCommas = (x) => {
 	const parts = x.toString().split('.');
 	parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 	return parts.join('.');
-}
-function lowercaseWords(string) {
+};
+const lowercaseWords = (string) => {
 	return string.toLowerCase();
-}
-function findClosest(array, goal) {
+};
+const findClosest = (array, goal) => {
 	return array.reduce((prev, curr) => {
 		return (Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev);
 	});
-}
-function getCorrectAbilityBasedOnBonus(finalSetAttrs, repeatingString, fieldName, bonus, spellMods, meleeMods, spellAttack, rangedAttack, dexMod) {
+};
+const getCorrectAbilityBasedOnBonus = (finalSetAttrs, repeatingString, fieldName, bonus, spellMods, meleeMods, spellAttack, rangedAttack, dexMod) => {
 	let closest;
 	if (bonus) {
 		if (spellAttack) {
@@ -379,8 +379,8 @@ function getCorrectAbilityBasedOnBonus(finalSetAttrs, repeatingString, fieldName
 		finalSetAttrs[repeatingString + fieldName] = 0;
 	}
 	return bonus;
-}
-function getAnyCorrectAbilityBasedOnBonus(finalSetAttrs, repeatingString, fieldName, bonus, abilityMods) {
+};
+const getAnyCorrectAbilityBasedOnBonus = (finalSetAttrs, repeatingString, fieldName, bonus, abilityMods) => {
 	const closest = findClosest(abilityMods, bonus);
 	if (bonus) {
 		bonus -= closest;
@@ -402,9 +402,9 @@ function getAnyCorrectAbilityBasedOnBonus(finalSetAttrs, repeatingString, fieldN
 		finalSetAttrs[repeatingString + fieldName] = 0;
 	}
 	return bonus;
-}
+};
 
-function lowercaseDamageTypes(string) {
+const lowercaseDamageTypes = (string) => {
 	if (!string) {
 		string = '';
 	}
@@ -430,7 +430,7 @@ function lowercaseDamageTypes(string) {
 		.replace('Aren\'t', 'aren\'t')
 		.replace('Silvered', 'silvered')
 		.replace('Adamantine', 'adamantine');
-}
+};
 
 on('change:cp change:sp change:ep change:gp change:pp', () => {
 	getAttrs(['cp', 'copper_per_gold', 'sp', 'silver_per_gold', 'ep', 'electrum_per_gold', 'gp', 'pp', 'platinum_per_gold'], (v) => {
@@ -452,7 +452,7 @@ on('change:cp change:sp change:ep change:gp change:pp', () => {
 	});
 });
 
-function updateAbilityModifier(ability) {
+const updateAbilityModifier = (ability) => {
 	const collectionArray = [ability, `${ability}_bonus`, `${ability}_mod`, `${ability}_check_mod`, 'global_ability_bonus', 'strength_mod', 'dexterity_mod', 'jack_of_all_trades_toggle', 'jack_of_all_trades', 'remarkable_athlete_toggle', 'remarkable_athlete'];
 	const finalSetAttrs = {};
 
@@ -492,15 +492,15 @@ function updateAbilityModifier(ability) {
 		}
 		setFinalAttrs(v, finalSetAttrs);
 	});
-}
-function updateAbilityModifiers() {
+};
+const updateAbilityModifiers = () => {
 	updateAbilityModifier('strength');
 	updateAbilityModifier('dexterity');
 	updateAbilityModifier('constitution');
 	updateAbilityModifier('intelligence');
 	updateAbilityModifier('wisdom');
 	updateAbilityModifier('charisma');
-}
+};
 on('change:strength change:strength_bonus change:strength_check_mod change:jack_of_all_trades_toggle change:jack_of_all_trades change:remarkable_athlete_toggle change:remarkable_athlete change:global_ability_bonus', () => {
 	updateAbilityModifier('strength');
 });
@@ -520,7 +520,7 @@ on('change:charisma change:charisma_bonus change:charisma_check_mod change:jack_
 	updateAbilityModifier('charisma');
 });
 
-function updateLevels() {
+const updateLevels = () => {
 	const repeatingItem = 'repeating_class';
 	const collectionArray = ['action_surge_uses_max', 'ki_max', 'lay_on_hands_uses_max', 'sorcery_points_max', 'warlock_spell_slots_max'];
 	const finalSetAttrs = {};
@@ -760,9 +760,9 @@ function updateLevels() {
 			setFinalAttrs(v, finalSetAttrs);
 		});
 	});
-}
+};
 
-function updateSpellSlots() {
+const updateSpellSlots = () => {
 	const collectionArray = ['level', 'caster_level', 'caster_type'];
 	const finalSetAttrs = {};
 
@@ -914,7 +914,7 @@ function updateSpellSlots() {
 		}
 		setFinalAttrs(v, finalSetAttrs);
 	});
-}
+};
 on('change:repeating_class remove:repeating_class', () => {
 	updateLevels();
 	updateSpellSlots();
@@ -923,7 +923,7 @@ on('change:caster_level change:spell_slots_l1_bonus change:spell_slots_l2_bonus 
 	updateSpellSlots();
 });
 
-function getPB(level, challenge) {
+const getPB = (level, challenge) => {
 	let pb = 2;
 
 	level = getIntValue(level);
@@ -938,8 +938,8 @@ function getPB(level, challenge) {
 		pb += Math.floor(Math.abs((levelOrChallenge - 1) / 4));
 	}
 	return pb;
-}
-function updatePb() {
+};
+const updatePb = () => {
 	const collectionArray = ['level', 'challenge'];
 	const finalSetAttrs = {};
 
@@ -951,13 +951,13 @@ function updatePb() {
 		finalSetAttrs.h_PB = pb / 2;
 		setFinalAttrs(v, finalSetAttrs);
 	});
-}
+};
 
 on('change:level', () => {
 	updatePb();
 });
 
-function sumRepeating(options, sumItems) {
+const sumRepeating = (options, sumItems) => {
 	const repeatingItem = `repeating_${options.collection}`;
 	let collectionArray = [];
 	const finalSetAttrs = {};
@@ -1071,9 +1071,9 @@ function sumRepeating(options, sumItems) {
 			setFinalAttrs(v, finalSetAttrs);
 		});
 	});
-}
+};
 
-function updateArmor(rowId) {
+const updateArmor = (rowId) => {
 	const repeatingItem = 'repeating_armor';
 	const collectionArray = [];
 	const finalSetAttrs = {};
@@ -1133,7 +1133,7 @@ function updateArmor(rowId) {
 		}
 	];
 	sumRepeating(options, sumItems);
-}
+};
 on('change:repeating_armor', (eventInfo) => {
 	const changedField = getRepeatingField('repeating_armor', eventInfo);
 	if (changedField !== 'error' && changedField !== 'ac_total') {
@@ -1145,7 +1145,7 @@ on('change:dexterity_mod change:medium_armor_max_dex change:ac_unarmored_ability
 	updateArmor();
 });
 
-function updateEquipment(rowId) {
+const updateEquipment = (rowId) => {
 	const repeatingItem = 'repeating_equipment';
 	const collectionArray = [];
 	const finalSetAttrs = {};
@@ -1182,13 +1182,13 @@ function updateEquipment(rowId) {
 			setFinalAttrs(v, finalSetAttrs);
 		});
 	});
-}
+};
 
 on('change:repeating_equipment', (eventInfo) => {
 	const rowId = getRowId('repeating_equipment', eventInfo);
 	updateEquipment(rowId);
 });
-function weighEquipment() {
+const weighEquipment = () => {
 	const options = {
 		collection: 'equipment',
 		toggle: 'carried',
@@ -1202,12 +1202,12 @@ function weighEquipment() {
 		}
 	];
 	sumRepeating(options, sumItems);
-}
+};
 on('change:repeating_equipment:carried change:repeating_equipment:qty change:repeating_equipment:weight remove:repeating_equipment', () => {
 	weighEquipment();
 });
 
-function updateJackOfAllTrades() {
+const updateJackOfAllTrades = () => {
 	const collectionArray = ['pb'];
 	const finalSetAttrs = {};
 
@@ -1215,12 +1215,12 @@ function updateJackOfAllTrades() {
 		finalSetAttrs.jack_of_all_trades = Math.floor(getIntValue(v.pb) / 2);
 		setFinalAttrs(v, finalSetAttrs);
 	});
-}
+};
 on('change:jack_of_all_trades_toggle', () => {
 	updateJackOfAllTrades();
 });
 
-function updateRemarkableAthlete() {
+const updateRemarkableAthlete = () => {
 	const collectionArray = ['pb'];
 	const finalSetAttrs = {};
 
@@ -1228,12 +1228,12 @@ function updateRemarkableAthlete() {
 		finalSetAttrs.remarkable_athlete = Math.ceil(getIntValue(v.pb) / 2);
 		setFinalAttrs(v, finalSetAttrs);
 	});
-}
+};
 on('change:remarkable_athlete_toggle', () => {
 	updateRemarkableAthlete();
 });
 
-function updateInitiative() {
+const updateInitiative = () => {
 	const collectionArray = ['dexterity_mod', 'dexterity_check_bonus', 'initiative_bonus', 'jack_of_all_trades_toggle', 'jack_of_all_trades', 'remarkable_athlete_toggle', 'remarkable_athlete', 'global_check_bonus'];
 	const finalSetAttrs = {};
 
@@ -1278,12 +1278,12 @@ function updateInitiative() {
 		}
 		setFinalAttrs(v, finalSetAttrs);
 	});
-}
+};
 on('change:dexterity_mod change:dexterity_check_bonus change:initiative_bonus change:jack_of_all_trades_toggle change:jack_of_all_trades change:remarkable_athlete_toggle change:remarkable_athlete change:global_check_bonus', () => {
 	updateInitiative();
 });
 
-function updateWeight() {
+const updateWeight = () => {
 	const collectionArray = ['weight_attacks', 'weight_armor', 'weight_equipment', 'weight_coinage', 'weight_misc'];
 	const finalSetAttrs = {};
 
@@ -1291,11 +1291,11 @@ function updateWeight() {
 		finalSetAttrs.weight_total = round((getFloatValue(v.weight_attacks) + getFloatValue(v.weight_armor) + getFloatValue(v.weight_equipment) + getFloatValue(v.weight_coinage) + getFloatValue(v.weight_misc)), 2);
 		setFinalAttrs(v, finalSetAttrs);
 	});
-}
+};
 on('change:weight_attacks change:weight_armor change:weight_equipment change:weight_coinage change:weight_misc', () => {
 	updateWeight();
 });
-function updateAttackToggle(v, finalSetAttrs, repeatingString, options) {
+const updateAttackToggle = (v, finalSetAttrs, repeatingString, options) => {
 	const attackParse = {
 		attackAbility: options.attackAbility,
 		parseName: 'attack',
@@ -1370,9 +1370,9 @@ function updateAttackToggle(v, finalSetAttrs, repeatingString, options) {
 		finalSetAttrs[`${repeatingString}to_hit`] = toHit;
 	}
 	finalSetAttrs[`${repeatingString}attack_formula`] = attackFormula;
-}
+};
 
-function updateSavingThrowToggle(v, finalSetAttrs, repeatingString, options) {
+const updateSavingThrowToggle = (v, finalSetAttrs, repeatingString, options) => {
 	const savingThrowParse = {
 		parseName: 'savingThrow',
 		toggleField: 'saving_throw_toggle',
@@ -1397,9 +1397,9 @@ function updateSavingThrowToggle(v, finalSetAttrs, repeatingString, options) {
 		savingThrowDC += getIntValue(v[`${repeatingString}saving_throw_bonus`]);
 		finalSetAttrs[`${repeatingString}saving_throw_dc`] = savingThrowDC;
 	}
-}
+};
 
-function updateDamageToggle(v, finalSetAttrs, repeatingString, options) {
+const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
 	const damageParse = {
 		addCastingModifier: exists(v[`${repeatingString}add_casting_modifier`]),
 		parseName: 'damage',
@@ -1573,9 +1573,9 @@ function updateDamageToggle(v, finalSetAttrs, repeatingString, options) {
 	if (options.type === 'attack') {
 		finalSetAttrs[`${repeatingString}damage_string`] = damageString;
 	}
-}
+};
 
-function updateHealToggle(v, finalSetAttrs, repeatingString) {
+const updateHealToggle = (v, finalSetAttrs, repeatingString) => {
 	const healParse = {
 		addCastingModifier: exists(v[`${repeatingString}add_casting_modifier`]),
 		parseName: 'heal',
@@ -1608,9 +1608,9 @@ function updateHealToggle(v, finalSetAttrs, repeatingString) {
 
 		finalSetAttrs[`${repeatingString}heal_formula`] = healFormula;
 	}
-}
+};
 
-function updateHigherLevelToggle(v, finalSetAttrs, repeatingString) {
+const updateHigherLevelToggle = (v, finalSetAttrs, repeatingString) => {
 	const higherLevelParse = {
 		addCastingModifier: exists(v[`${repeatingString}add_casting_modifier`]),
 		parseName: 'higherLevel',
@@ -1646,9 +1646,9 @@ function updateHigherLevelToggle(v, finalSetAttrs, repeatingString) {
 			finalSetAttrs[`${repeatingString}heal_formula`] += ' + ((@{higher_level_query} - @{spell_level}) * @{higher_level_dice})@{higher_level_die}[higher lvl] + (@{higher_level_heal} * (@{higher_level_query} - @{spell_level}))[higher lvl flat amount]';
 		}
 	}
-}
+};
 
-function updateAttackQuery() {
+const updateAttackQuery = () => {
 	const repeatingItem = 'repeating_attack';
 	const collectionArray = [];
 	const finalSetAttrs = {};
@@ -1691,9 +1691,9 @@ function updateAttackQuery() {
 			setFinalAttrs(v, finalSetAttrs);
 		});
 	});
-}
+};
 
-function updateAttack(rowId) {
+const updateAttack = (rowId) => {
 	const repeatingItem = 'repeating_attack';
 	const collectionArray = ['pb', 'strength_mod', 'finesse_mod', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability'];
 	const finalSetAttrs = {};
@@ -1814,7 +1814,7 @@ function updateAttack(rowId) {
 			setFinalAttrs(v, finalSetAttrs);
 		});
 	});
-}
+};
 on('change:repeating_attack', (eventInfo) => {
 	const changedField = getRepeatingField('repeating_attack', eventInfo);
 	if (changedField !== 'error' && changedField !== 'toggle_details' && changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed') {
@@ -1843,7 +1843,7 @@ on('change:global_attack_bonus change:global_melee_attack_bonus change:global_ra
 	updateAttack();
 });
 
-function updateSpell(rowId) {
+const updateSpell = (rowId) => {
 	const repeatingItem = 'repeating_spell';
 	const collectionArray = ['pb', 'finesse_mod', 'global_spell_attack_bonus', 'global_spell_damage_bonus', 'global_spell_dc_bonus', 'global_spell_heal_bonus', 'default_ability'];
 	const finalSetAttrs = {};
@@ -1973,7 +1973,7 @@ function updateSpell(rowId) {
 			setFinalAttrs(v, finalSetAttrs);
 		});
 	});
-}
+};
 
 on('change:repeating_spell', (eventInfo) => {
 	const changedField = getRepeatingField('repeating_spell', eventInfo);
@@ -2005,7 +2005,7 @@ on('change:halfling_luck', () => {
 	updateD20Mod();
 });
 
-function updateAbilityChecksMacro() {
+const updateAbilityChecksMacro = () => {
 	const repeatingItem = 'repeating_skill';
 	const collectionArray = ['ability_checks_query_var', 'ability_checks_macro_var'];
 	const finalSetAttrs = {};
@@ -2039,9 +2039,9 @@ function updateAbilityChecksMacro() {
 			setFinalAttrs(v, finalSetAttrs);
 		});
 	});
-}
+};
 
-function updateSkill(rowId) {
+const updateSkill = (rowId) => {
 	const repeatingItem = 'repeating_skill';
 	const collectionArray = ['jack_of_all_trades_toggle', 'jack_of_all_trades', 'remarkable_athlete_toggle', 'remarkable_athlete', 'pb', 'exp', 'global_check_bonus'];
 	const finalSetAttrs = {};
@@ -2145,7 +2145,7 @@ function updateSkill(rowId) {
 			updateAbilityChecksMacro();
 		});
 	});
-}
+};
 
 on('change:repeating_skill', (eventInfo) => {
 	const changedField = getRepeatingField('repeating_skill', eventInfo);
@@ -2161,7 +2161,7 @@ on('change:jack_of_all_trades_toggle change:jack_of_all_trades change:remarkable
 	updateSkill();
 });
 
-function updateSkillsFromSRD() {
+const updateSkillsFromSRD = () => {
 	const repeatingItem = 'repeating_skill';
 	const collectionArray = ['skills_srd', 'level', 'challenge', 'strength_mod', 'dexterity_mod', 'constitution_mod', 'intelligence_mod', 'wisdom_mod', 'charisma_mod'];
 	const finalSetAttrs = {};
@@ -2220,13 +2220,12 @@ function updateSkillsFromSRD() {
 			setFinalAttrs(v, finalSetAttrs);
 		});
 	});
-}
+};
 on('change:skills_srd', () => {
 	updateSkillsFromSRD();
 });
 
-
-function updateSavingThrow(ability) {
+const updateSavingThrow = (ability) => {
 	const collectionArray = ['pb', `${ability}_mod`, `${ability}_save_prof`, `${ability}_save_bonus`, 'global_saving_throw_bonus'];
 	const finalSetAttrs = {};
 
@@ -2265,15 +2264,15 @@ function updateSavingThrow(ability) {
 		finalSetAttrs[`${ability}_saving_throw_mod_with_sign`] = savingThrowWithSign;
 		setFinalAttrs(v, finalSetAttrs);
 	});
-}
-function updateSavingThrows() {
+};
+const updateSavingThrows = () => {
 	updateSavingThrow('strength');
 	updateSavingThrow('dexterity');
 	updateSavingThrow('constitution');
 	updateSavingThrow('intelligence');
 	updateSavingThrow('wisdom');
 	updateSavingThrow('charisma');
-}
+};
 on('change:pb change:strength_mod change:strength_save_prof change:strength_save_bonus change:global_saving_throw_bonus', () => {
 	updateSavingThrow('strength');
 });
@@ -2293,7 +2292,7 @@ on('change:pb change:charisma_mod change:charisma_save_prof change:charisma_save
 	updateSavingThrow('charisma');
 });
 
-function updateSavingThrowsFromSRD() {
+const updateSavingThrowsFromSRD = () => {
 	const collectionArray = ['saving_throws_srd'];
 	const finalSetAttrs = {};
 
@@ -2321,12 +2320,12 @@ function updateSavingThrowsFromSRD() {
 		}
 		setFinalAttrs(v, finalSetAttrs);
 	});
-}
+};
 on('change:saving_throws_srd', () => {
 	updateSavingThrowsFromSRD();
 });
 
-function updateSpellsFromSRD() {
+const updateSpellsFromSRD = () => {
 	const collectionArray = ['spells_srd'];
 	const finalSetAttrs = {};
 
@@ -2340,12 +2339,12 @@ function updateSpellsFromSRD() {
 		}
 		setFinalAttrs(v, finalSetAttrs);
 	});
-}
+};
 on('change:spells_srd', () => {
 	updateSpellsFromSRD();
 });
 
-function updateAttachers() {
+const updateAttachers = () => {
 	const repeatingItem = 'repeating_attacher';
 	const collectionArray = ['attacher_initiative', 'attacher_death_saving_throw', 'attacher_hit_dice', 'attacher_attack', 'attacher_spell', 'attacher_skill'];
 	const finalSetAttrs = {};
@@ -2393,13 +2392,13 @@ function updateAttachers() {
 			setFinalAttrs(v, finalSetAttrs);
 		});
 	});
-}
+};
 
 on('change:repeating_attacher remove:repeating_attacher', () => {
 	updateAttachers();
 });
 
-function updateNPCChallenge() {
+const updateNPCChallenge = () => {
 	const collectionArray = ['challenge', 'xp'];
 	const finalSetAttrs = {};
 
@@ -2451,13 +2450,13 @@ function updateNPCChallenge() {
 		}
 		setFinalAttrs(v, finalSetAttrs);
 	});
-}
+};
 
 on('change:challenge', () => {
 	updateNPCChallenge();
 });
 
-function updateNPCHPFromSRD() {
+const updateNPCHPFromSRD = () => {
 	const collectionArray = ['hp_srd', 'constitution', 'constitution_mod', 'constitution_bonus', 'global_ability_bonus'];
 	const finalSetAttrs = {};
 
@@ -2495,12 +2494,12 @@ function updateNPCHPFromSRD() {
 		}
 		setFinalAttrs(v, finalSetAttrs);
 	});
-}
+};
 on('change:hp_srd', () => {
 	updateNPCHPFromSRD();
 });
 
-function updateNPCHP() {
+const updateNPCHP = () => {
 	const collectionArray = ['hit_dice', 'hit_die', 'hp_extra', 'constitution_mod'];
 	const finalSetAttrs = {};
 
@@ -2557,12 +2556,12 @@ function updateNPCHP() {
 		}
 		setFinalAttrs(v, finalSetAttrs);
 	});
-}
+};
 on('change:hit_dice change:hit_die change:hp_extra change:constitution_mod', () => {
 	updateNPCHP();
 });
 
-function updateNPCAC() {
+const updateNPCAC = () => {
 	const collectionArray = ['ac_srd', 'ac', 'ac_note', 'dexterity_mod'];
 	const finalSetAttrs = {};
 
@@ -2578,13 +2577,13 @@ function updateNPCAC() {
 		}
 		setFinalAttrs(v, finalSetAttrs);
 	});
-}
+};
 
 on('change:ac_srd', () => {
 	updateNPCAC();
 });
 
-function setDefaultAbility(v, finalSetAttrs) {
+const setDefaultAbility = (v, finalSetAttrs) => {
 	const abilityScores = [getIntValue(v.intelligence), getIntValue(v.wisdom), getIntValue(v.charisma)];
 	const highestAbilityScore = Math.max.apply(Math, abilityScores);
 	let highestAbilityName = 'intelligence';
@@ -2596,9 +2595,9 @@ function setDefaultAbility(v, finalSetAttrs) {
 	}
 
 	finalSetAttrs.default_ability = `@{${highestAbilityName}_mod}`;
-}
+};
 
-function updateNPCContent() {
+const updateNPCContent = () => {
 	const collectionArray = ['content_srd'];
 	const finalSetAttrs = {};
 
@@ -2703,12 +2702,12 @@ function updateNPCContent() {
 		}
 		setFinalAttrs(v, finalSetAttrs);
 	});
-}
+};
 on('change:content_srd', () => {
 	updateNPCContent();
 });
 
-function displayTextForTraits() {
+const displayTextForTraits = () => {
 	const repeatingItem = 'repeating_trait';
 	const collectionArray = [];
 	const finalSetAttrs = {};
@@ -2731,9 +2730,9 @@ function displayTextForTraits() {
 			setFinalAttrs(v, finalSetAttrs);
 		});
 	});
-}
+};
 
-function updateAction(type, rowId) {
+const updateAction = (type, rowId) => {
 	const repeatingItem = `repeating_${type}`;
 	const collectionArray = ['pb', 'strength_mod', 'finesse_mod', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability'];
 	const finalSetAttrs = {};
@@ -2847,7 +2846,7 @@ function updateAction(type, rowId) {
 			setFinalAttrs(v, finalSetAttrs);
 		});
 	});
-}
+};
 on('change:repeating_trait', (eventInfo) => {
 	const changedField = getRepeatingField('repeating_trait', eventInfo);
 	if (changedField !== 'error' && changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed' && changedField !== 'recharge_display') {
@@ -2884,7 +2883,7 @@ on('change:repeating_lairaction', (eventInfo) => {
 	}
 });
 
-function parseDamage(finalSetAttrs, repeatingString, freetext, regex, name, spellMods, meleeMods, spellAttack, rangedAttack, dexMod) {
+const parseDamage = (finalSetAttrs, repeatingString, freetext, regex, name, spellMods, meleeMods, spellAttack, rangedAttack, dexMod) => {
 	const damageParseRegex = /(\d+d?\d+)(?:\s?(?:\+|\-)\s?(\d+))?/gi;
 	const damage = regex.exec(freetext);
 	let damageBonus;
@@ -2921,9 +2920,9 @@ function parseDamage(finalSetAttrs, repeatingString, freetext, regex, name, spel
 		finalSetAttrs[`${repeatingString}${name}_toggle`] = 0;
 	}
 	return freetext;
-}
+};
 
-function parseAction(rowId, type) {
+const parseAction = (rowId, type) => {
 	const repeatingItem = `repeating_${type}`;
 	const collectionArray = ['level', 'challenge', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability'];
 	const finalSetAttrs = {};
@@ -3090,7 +3089,7 @@ function parseAction(rowId, type) {
 			}
 		});
 	});
-}
+};
 on('change:repeating_trait:freetext', (eventInfo) => {
 	const rowId = getRowId('repeating_trait', eventInfo);
 	parseAction(rowId, 'trait');
@@ -3112,7 +3111,7 @@ on('change:repeating_lairaction:freetext', (eventInfo) => {
 	parseAction(rowId, 'lairaction');
 });
 
-function countAction(type) {
+const countAction = (type) => {
 	const repeatingItem = `repeating_${type}`;
 	const finalSetAttrs = {};
 
@@ -3124,7 +3123,7 @@ function countAction(type) {
 		}
 		setFinalAttrs({}, finalSetAttrs);
 	});
-}
+};
 on('change:repeating_trait remove:repeating_trait', () => {
 	countAction('trait');
 });
@@ -3141,8 +3140,7 @@ on('change:repeating_lairaction remove:repeating_lairaction', () => {
 	countAction('lairaction');
 });
 
-
-function switchToNPC() {
+const switchToNPC = () => {
 	const collectionArray = ['is_npc', 'size'];
 	const finalSetAttrs = {};
 
@@ -3154,12 +3152,12 @@ function switchToNPC() {
 		}
 		setFinalAttrs(v, finalSetAttrs);
 	});
-}
+};
 on('change:is_npc', () => {
 	switchToNPC();
 });
 
-function updateSize() {
+const updateSize = () => {
 	const collectionArray = ['size'];
 	const finalSetAttrs = {};
 
@@ -3176,12 +3174,12 @@ function updateSize() {
 		finalSetAttrs.hit_die = `d${sizeToHdSize[creatureSize]}`;
 		setFinalAttrs(v, finalSetAttrs);
 	});
-}
+};
 on('change:size', () => {
 	updateSize();
 });
 
-function updateType() {
+const updateType = () => {
 	const collectionArray = ['type'];
 	const finalSetAttrs = {};
 
@@ -3191,12 +3189,12 @@ function updateType() {
 		}
 		setFinalAttrs(v, finalSetAttrs);
 	});
-}
+};
 on('change:type', () => {
 	updateType();
 });
 
-function updateAlignment() {
+const updateAlignment = () => {
 	const collectionArray = ['alignment'];
 	const finalSetAttrs = {};
 
@@ -3206,12 +3204,12 @@ function updateAlignment() {
 		}
 		setFinalAttrs(v, finalSetAttrs);
 	});
-}
+};
 on('change:alignment', () => {
 	updateAlignment();
 });
 
-function updateSenses() {
+const updateSenses = () => {
 	const collectionArray = ['senses'];
 	const finalSetAttrs = {};
 
@@ -3224,12 +3222,12 @@ function updateSenses() {
 		}
 		setFinalAttrs(v, finalSetAttrs);
 	});
-}
+};
 on('change:senses', () => {
 	updateSenses();
 });
 
-function updateLanguages() {
+const updateLanguages = () => {
 	const collectionArray = ['languages'];
 	const finalSetAttrs = {};
 
@@ -3241,12 +3239,12 @@ function updateLanguages() {
 		}
 		setFinalAttrs(v, finalSetAttrs);
 	});
-}
+};
 on('change:languages', () => {
 	updateLanguages();
 });
 
-function updateSpeed() {
+const updateSpeed = () => {
 	const collectionArray = ['npc_speed'];
 	const finalSetAttrs = {};
 
@@ -3254,12 +3252,12 @@ function updateSpeed() {
 		finalSetAttrs.npc_speed = lowercaseWords(v.npc_speed);
 		setFinalAttrs(v, finalSetAttrs);
 	});
-}
+};
 on('change:npc_speed', () => {
 	updateSpeed();
 });
 
-function updateACNote() {
+const updateACNote = () => {
 	const collectionArray = ['ac_note'];
 	const finalSetAttrs = {};
 
@@ -3267,12 +3265,12 @@ function updateACNote() {
 		finalSetAttrs.ac_note = lowercaseWords(v.ac_note);
 		setFinalAttrs(v, finalSetAttrs);
 	});
-}
+};
 on('change:ac_note', () => {
 	updateACNote();
 });
 
-function updateDamageVulnerabilities() {
+const updateDamageVulnerabilities = () => {
 	const collectionArray = ['damage_vulnerabilities'];
 	const finalSetAttrs = {};
 
@@ -3285,11 +3283,11 @@ function updateDamageVulnerabilities() {
 		}
 		setFinalAttrs(v, finalSetAttrs);
 	});
-}
+};
 on('change:damage_vulnerabilities', () => {
 	updateDamageVulnerabilities();
 });
-function updateDamageResistances() {
+const updateDamageResistances = () => {
 	const collectionArray = ['damage_resistances'];
 	const finalSetAttrs = {};
 
@@ -3302,11 +3300,11 @@ function updateDamageResistances() {
 		}
 		setFinalAttrs(v, finalSetAttrs);
 	});
-}
+};
 on('change:damage_resistances', () => {
 	updateDamageResistances();
 });
-function updateDamageImmunities() {
+const updateDamageImmunities = () => {
 	const collectionArray = ['damage_immunities'];
 	const finalSetAttrs = {};
 
@@ -3319,11 +3317,11 @@ function updateDamageImmunities() {
 		}
 		setFinalAttrs(v, finalSetAttrs);
 	});
-}
+};
 on('change:damage_immunities', () => {
 	updateDamageImmunities();
 });
-function updateConditionImmunities() {
+const updateConditionImmunities = () => {
 	const collectionArray = ['condition_immunities'];
 	const finalSetAttrs = {};
 
@@ -3336,12 +3334,12 @@ function updateConditionImmunities() {
 		}
 		setFinalAttrs(v, finalSetAttrs);
 	});
-}
+};
 on('change:condition_immunities', () => {
 	updateConditionImmunities();
 });
 
-function updateLanguageSelection() {
+const updateLanguageSelection = () => {
 	const collectionArray = ['lang'];
 	const finalSetAttrs = {};
 
@@ -3361,9 +3359,9 @@ function updateLanguageSelection() {
 		}
 		setFinalAttrs(v, finalSetAttrs);
 	});
-}
+};
 
-function setSkillStorageNames() {
+const setSkillStorageNames = () => {
 	const repeatingItem = 'repeating_skill';
 	const collectionArray = ['lang'];
 	const finalSetAttrs = {};
@@ -3395,8 +3393,8 @@ function setSkillStorageNames() {
 			}
 		});
 	});
-}
-function generateSkills() {
+};
+const generateSkills = () => {
 	const repeatingItem = 'repeating_skill';
 	const collectionArray = ['lang'];
 	const finalSetAttrs = {};
@@ -3438,7 +3436,7 @@ function generateSkills() {
 			setFinalAttrs(v, finalSetAttrs);
 		});
 	});
-}
+};
 on('change:lang', () => {
 	generateSkills();
 });
