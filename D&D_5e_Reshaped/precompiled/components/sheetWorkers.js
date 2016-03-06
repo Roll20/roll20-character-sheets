@@ -2212,7 +2212,7 @@ function updateSkillsFromSRD () {
 				}
 
 				var re = /(\w+)\s?((?:\+|\-)\d+)/gi;
-				while (match = re.exec(skillsFromSRD)) {
+				while ((match = re.exec(skillsFromSRD)) !== null) {
 					if (match && match[1] && match[2]) {
 						skillName = match[1];
 						if (skillsObj[skillName]) {
@@ -2547,7 +2547,7 @@ function updateNPCHP () {
 			var regex = (/(?:(\+|\-)\s)?(\d+)(?:d(\d+))?/gi);
 			var splitFormula;
 
-			while (splitFormula = regex.exec(v.hp_extra)) {
+			while ((splitFormula = regex.exec(v.hp_extra)) !== null) {
 				if (!splitFormula || !splitFormula[2]) {
 					console.log('Character doesn\'t have valid hp formula');
 				} else {
@@ -2659,7 +2659,7 @@ function updateNPCContent () {
 
 				finalSetAttrs.legendary_action_amount = legendaryActionAmount;
 
-				while (match = re.exec(legendaryActions.replace(/\*\*/g, '@'))) {
+				while ((match = re.exec(legendaryActions.replace(/\*\*/g, '@'))) !== null) {
 					if (match && match[1] && match[2]) {
 						newRowId = generateRowID();
 						repeatingString = 'repeating_legendaryaction_' + newRowId + '_';
@@ -2676,7 +2676,7 @@ function updateNPCContent () {
 				content = reactionsSplit[0];
 			}
 			if (exists(reactions)) {
-				while (match = re.exec(reactions.replace(/\*\*/g, '@'))) {
+				while ((match = re.exec(reactions.replace(/\*\*/g, '@'))) !== null) {
 					if (match && match[1] && match[2]) {
 						newRowId = generateRowID();
 						repeatingString = 'repeating_reaction_' + newRowId + '_';
@@ -2693,7 +2693,7 @@ function updateNPCContent () {
 				content = actionsSplit[0];
 			}
 			if (exists(actions)) {
-				while (match = re.exec(actions.replace(/\*\*/g, '@'))) {
+				while ((match = re.exec(actions.replace(/\*\*/g, '@'))) !== null) {
 					if (match && match[1] && match[2]) {
 						newRowId = generateRowID();
 						repeatingString = 'repeating_action_' + newRowId + '_';
@@ -2711,7 +2711,7 @@ function updateNPCContent () {
 				content = traitsSplit[0];
 			}
 			if (exists(traits)) {
-				while (match = re.exec(traits.replace(/\*\*/g, '@'))) {
+				while ((match = re.exec(traits.replace(/\*\*/g, '@'))) !== null) {
 					if (match && match[1] && match[2]) {
 						newRowId = generateRowID();
 						repeatingString = 'repeating_trait_' + newRowId + '_';
@@ -3020,7 +3020,7 @@ function parseAction (rowId, type) {
 						var spellcastingAbility = spellcastingSearch[1].toLowerCase();
 						finalSetAttrs.default_ability = '@{' + spellcastingAbility + '_mod}';
 					}
-					while (match = spellcastingRegex.exec(freetext)) {
+					while ((match = spellcastingRegex.exec(freetext)) !== null) {
 						if (match && match[1] && match[2]) {
 							finalSetAttrs['spell_slots_l' + match[1] + '_bonus'] = match[2];
 						}
