@@ -1073,7 +1073,7 @@ const sumRepeating = (options, sumItems) => {
 			if (options.collection === 'armor' && !getIntValue(v.is_npc)) {
 				finalSetAttrs.ac_unarmored_calc += 10 + dexMod + getAbilityValue(v, v.ac_unarmored_ability);
 
-				finalSetAttrs.ac = Math.max(finalSetAttrs.ac_armored_calc, finalSetAttrs.ac_unarmored_calc);
+				finalSetAttrs.AC = Math.max(finalSetAttrs.ac_armored_calc, finalSetAttrs.ac_unarmored_calc);
 			}
 			setFinalAttrs(v, finalSetAttrs);
 		});
@@ -2557,8 +2557,8 @@ const updateNPCHP = () => {
 		}
 
 		if (totalHP) {
-			finalSetAttrs.hp = totalHP;
-			finalSetAttrs.hp_max = totalHP;
+			finalSetAttrs.HP = totalHP;
+			finalSetAttrs.HP_max = totalHP;
 			finalSetAttrs.hp_formula = hpFormula;
 		}
 		setFinalAttrs(v, finalSetAttrs);
@@ -2576,7 +2576,7 @@ const updateNPCAC = () => {
 		if (exists(v.ac_srd)) {
 			const match = v.ac_srd.match(/(\d+)\s?(.*)/);
 			if (match && match[1]) {
-				finalSetAttrs.ac = match[1];
+				finalSetAttrs.AC = match[1];
 			}
 			if (match && match[2]) {
 				finalSetAttrs.ac_note = match[2].replace(/\(|\)/g, '');
@@ -3568,6 +3568,11 @@ const sheetOpened = () => {
 		if (versionCompare(version, '2.2.1') < 0) {
 			updateAbilityModifiers();
 		}
+		if (versionCompare(version, '2.2.2') < 0) {
+			updateNPCHP();
+			updateNPCAC();
+		}
+
 
 		if (!version || version !== currentVersion) {
 			finalSetAttrs.version = currentVersion;
