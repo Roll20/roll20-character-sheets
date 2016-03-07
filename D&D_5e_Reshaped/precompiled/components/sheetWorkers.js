@@ -1,7 +1,7 @@
 'use strict';
 
 const currentVersion = '2.2.1';
-const skills = {
+const SKILLS = {
   abilities: {
 		acrobatics: 'dexterity',
 		animalHandling: 'wisdom',
@@ -3390,7 +3390,7 @@ const setSkillStorageNames = () => {
 
 					const name = v[`${repeatingString}name`];
 					if (!isUndefined(name)) {
-						const storageName = getKeyByValue(skills.names.en, name);
+						const storageName = getKeyByValue(SKILLS.names.en, name);
 						if (storageName && isUndefined(v[`${repeatingString}storage_name`])) {
 							finalSetAttrs[`${repeatingString}storage_name`] = storageName;
 						}
@@ -3417,25 +3417,24 @@ const generateSkills = () => {
 
 		getAttrs(collectionArray, (v) => {
 			let language = v.lang;
-			if (!language || !skills.names[language]) {
+			if (!language || !SKILLS.names[language]) {
 				language = 'en';
 			}
 
 			let x = 0;
-			Object.keys(skills.abilities).forEach((key) => {
-				const name = skills.names[language][key];
-				const ability = skills.abilities[key];
+			Object.keys(SKILLS.abilities).forEach((key) => {
 				let skillId;
-
 				if (ids[x]) {
 					skillId = ids[x];
 				} else {
 					skillId = generateRowID();
 				}
-				repeatingString = `${repeatingItem}_${skillId}`;
-				finalSetAttrs[`${repeatingString}name`] = name;
+				repeatingString = `${repeatingItem}_${skillId}_`;
+
 				finalSetAttrs[`${repeatingString}storage_name`] = key;
-				finalSetAttrs[`${repeatingString}ability`] = `@{${ability}_mod}`;
+				finalSetAttrs[`${repeatingString}name`] = SKILLS.names[language][key];
+
+				finalSetAttrs[`${repeatingString}ability`] = `@{${SKILLS.abilities[key]}_mod}`;
 				updateSkill(skillId);
 
 				x++;
