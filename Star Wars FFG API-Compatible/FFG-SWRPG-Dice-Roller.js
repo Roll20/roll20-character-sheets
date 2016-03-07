@@ -1,6 +1,103 @@
 ﻿/*
-Version Info:
-Version 4.0.2.17
+    Current Version: 4.0.3.12
+    Last updated: 03.03.2016
+    Character Sheet and Script Maintained by: GM Knowledge Rhino
+    Older Verions: https://github.com/dayst/StarWarsEdgeOfTheEmpire_Dice    
+    
+    Credits:
+      Original creator: Konrad J.
+      Helped with Dice specs: Alicia G. and Blake the Lake
+      Dice graphics hosted by Alicia G. at galacticcampaigns.com
+      Dice graphics borrowed from the awesome google+ hangouts EotE Dice App
+      Basic Character Sheet and Advanced Dice Roller: Steve Day
+      GM Sheet Campaign Details design inspiration: www.reddit.com/user/JohnSquiggleton
+      Sheet Autocreator: www.reddit.com/user/lowdownfool
+      New Tab Labels: Steve D., GM Knowledge Rhino, and Loki
+      Skill Description by: Gribble - https://dl.dropboxusercontent.com/u/9077657/SW-EotE-Reference-Sheets.pdf
+      Critical Descriptions by: Gribble - https://dl.dropboxusercontent.com/u/9077657/SW-EotE-Reference-Sheets.pdf
+      Debugger: Arron
+      Basic Roll Templates for basic rolls: Josh A.
+      Initiative Roller: Andrew H.
+      Opposed Roller: Tom F.
+      Work done by GM Knowledge Rhino:
+          Group Tab
+          Companion Tab
+          GM Resources
+          ReDesign of Vehicle Tab
+          Riding Beast Display
+          Roll Template Code Fixes
+          Roll Templates integrated with all Rolls
+    
+    API Chat Commands
+    Settings:
+		Log
+			* default: 'on' and 'single'
+			* Description: Sets the visual output in the chat window for the dice rolls
+			* Command: !eed log on|off|multi|single
+		
+		Graphics
+			* default: 'on' and 'm'
+			* Description: Sets chat window dice output as graphic, small, medium, or large if "on" or as text if "off"
+			* Command: !eed graphics on|off|s|m|l
+		
+		Test
+			* Description: Output every side of every die to the chat window
+			* !eed test
+			
+		Debug
+			* default: 'off'
+			* DescriptionL Sets the logging level of the script in the API console.  If you are having issues with the 
+			* script rolling incorect dice, turn on debug logging and post the result in the forums. No need to restart the
+			* script with this command.
+			* Command: !eed debug on|off
+	
+	Roll:
+		Label
+			* default: null
+			* Description: set the skill name of the roll
+			* Command: !eed label(Name of Skill)
+		
+		Initiative
+			* default: false
+			* Description: Set NPC/PC initiative true
+			* Command: !eed npcinit or pcinit and #b #g #y #blk #p #r #w
+		
+		Skill
+			* default: 
+			* Description: create the ability and proficiency dice for a skill check
+			* Command: !eed skill(char_value|skill_value)
+		
+		Opposed
+			* default: 
+			* Description: create the difficulty and challenge dice for an opposed skill check
+			* Command: !eed opposed(char_value|skill_value)
+		
+		Dice
+			* default: 
+			* Description: Loop thru the dice and adds or subtracts them from the dice object
+			* Command: !eed #g #y #b #blk #r #p #w #s #a
+		
+		Upgrade
+			* default: 
+			* Description: upgrades ability and difficulty dice
+			* Command: !eed upgrade(ability|#) or upgrade(difficulty|#)
+		
+		Downgrade
+			* default: 
+			* Description: downgrades proficiency and challenge dice
+			* Command: !eed downgrade(proficiency|#) or downgrade(challenge|#)
+
+        Destiny
+          * default:
+          * Description: Rolls 1w die and adds the result to the destiny pool
+          * Command: !eed #w destiny doRoll
+
+   Other:
+      Charsheet
+          * default:
+          * Description: Generates a blank character sheet and automatically makes it viewable and editable by the person calling the script.
+          * Command: !charsheet
+	
 */
 
 /* Begin Sheet Character Sheet Auto Creator */
@@ -50,106 +147,6 @@ if (!Date.now) {
     };
 }
 /* End Sheet Character Sheet Auto Creator */
-
-/*
-    Current Version: 4.0.2.4
-    Last updated: 11.17.2015
-    Character Sheet and Script Maintained by: GM Knowledge Rhino
-    Current and Developement Verions: https://github.com/KnowledgeRhino/FFG-SWRPG-CharacterSheet-For-Roll20.git
-    Older Verions: https://github.com/dayst/StarWarsEdgeOfTheEmpire_Dice
-    
-    Credits:
-      Original creator: Konrad J.
-      Helped with Dice specs: Alicia G. and Blake the Lake
-      Dice graphics hosted by Alicia G. at galacticcampaigns.com
-      Dice graphics borrowed from the awesome google+ hangouts EotE Dice App
-      Character Sheet and Advanced Dice Roller: Steve Day
-      GM Sheet Campaign Details design idea: www.reddit.com/user/JohnSquiggleton
-      Sheet Autocreator: www.reddit.com/user/lowdownfool
-      New Tab Design: Steve D., GM Knowledge Rhino, and Loki
-      Skill Description by: Gribble - https://dl.dropboxusercontent.com/u/9077657/SW-EotE-Reference-Sheets.pdf
-      Critical Descriptions by: Gribble - https://dl.dropboxusercontent.com/u/9077657/SW-EotE-Reference-Sheets.pdf
-      Debugger: Arron
-      Initiative Roller: Andrew H.
-      Opposed Roller: Tom F.
-      Work done by GM Knowledge Rhino:
-          Group Tab
-          Companion Tab
-          GM Resources
-          ReDesign of Vehicle Tabs
-  
-  API Chat Commands
-
-  Settings:
-      Log
-          * default: 'on' and 'single'
-          * Description: Sets the visual output in the chat window for the dice rolls
-          * Command: !eed log on|off|multi|single
-      
-      Graphics
-          * default: 'on' and 'm'
-          * Description: Sets chat window dice output as graphic, small, medium, or large if "on" or as text if "off"
-          * Command: !eed graphics on|off|s|m|l
-      
-      Test
-          * Description: Output every side of every die to the chat window
-          * !eed test
-          
-      Debug
-          * default: 'off'
-          * DescriptionL Sets the logging level of the script in the API console.  If you are having issues with the 
-          * script rolling incorect dice, turn on debug logging and post the result in the forums. No need to restart the
-          * script with this command.
-          * Command: !eed debug on|off
-  
-  Roll:
-      Label
-          * default: null
-          * Description: set the skill name of the roll
-          * Command: !eed label(Name of Skill)
-      
-      Initiative
-          * default: false
-          * Description: Set NPC/PC initiative true
-          * Command: !eed npcinit or pcinit and #b #g #y #blk #p #r #w
-      
-      Skill
-          * default: 
-          * Description: create the ability and proficiency dice for a skill check
-          * Command: !eed skill(char_value|skill_value)
-      
-      Opposed
-          * default: 
-          * Description: create the difficulty and challenge dice for an opposed skill check
-          * Command: !eed opposed(char_value|skill_value)
-      
-      Dice
-          * default: 
-          * Description: Loop thru the dice and adds or subtracts them from the dice object
-          * Command: !eed #g #y #b #blk #r #p #w #s #f #a #t
-      
-      Upgrade
-          * default: 
-          * Description: upgrades ability and difficulty dice
-          * Command: !eed upgrade(ability|#) or upgrade(difficulty|#)
-      
-      Downgrade
-          * default: 
-          * Description: downgrades proficiency and challenge dice
-          * Command: !eed downgrade(proficiency|#) or downgrade(challenge|#)
-          
-      destiny
-          * default:
-          * Description: Rolls 1w die and adds the result to the destiny pool
-          * Command: !eed #w destiny doRoll
-
-   Other:
-      charsheet
-          * default:
-          * Description: Generates a blank character sheet and automatically makes it viewable and editable by the person calling the script.
-          * Command: !charsheet
-*/
-
 var eote = {}
 
 eote.init = function () {
@@ -406,7 +403,6 @@ eote.updateAddAttribute = function (charactersObj, updateAddAttributesObj) { // 
 
             log('UPDATE/ADD ATTRIBUTES FOR:----------------------->' + characterName);
 
-
             _.each(updateAddAttributesObj, function (updateAddAttrObj) { //loop attributes to update / add
 
                 attr = _.find(characterAttributesObj, function (a) {
@@ -420,7 +416,7 @@ eote.updateAddAttribute = function (charactersObj, updateAddAttributesObj) { // 
                         attr.set({ max: updateAddAttrObj.max ? updateAddAttrObj.max : '' });
                     }
                 } else {
-                    log('Add Attr: ' + updateAddAttrObj.name);
+                    // log('Add Attr: '+ updateAddAttrObj.name);
                     eote.createObj('attribute', {
                         characterid: characterObj.id,
                         name: updateAddAttrObj.name,
@@ -569,6 +565,7 @@ eote.process.setup = function (cmd, playerName, playerID) {
         }
     }
 
+
     var characterIDMatch = cmd.match(eote.defaults.regex.characterID);
 
     if (characterIDMatch) {
@@ -584,7 +581,8 @@ eote.process.setup = function (cmd, playerName, playerID) {
 
     if (unusableMatch) {
         eote.process.logger("eote.process.setup.unusableMatch", "Roll ended because of unusable weapon");
-        sendChat(diceObj.vars.characterName, 'Weapon is too damaged to be used. Try repairing it.');
+        /*sendChat(diceObj.vars.characterName, 'Weapon is too damaged to be used. Try repairing it.');*/
+        sendChat(diceObj.vars.characterName, "&{template:base} {{title=" + diceObj.vars.characterName + "}} {{wide=Weapon is too damaged to be used. Try repairing it.}}");
         return false;
     }
 
@@ -881,7 +879,8 @@ eote.process.destiny = function (cmd, diceObj) {
     });
 
     if (!currentDarkSidePoints[0] || !currentLightSidePoints[0]) {
-        sendChat("Dice System", "No Destiny Points Defined.  GM needs to add points then update players.");
+        sendChat("Dice System", "No Destiny Points Defined. The GM has been whispered with instructions to reset the Destiny Pool.");
+        sendChat("GM", "/w " + "gm The Destiny Pool system needs to be (or has been) reset. To fix this functionality, go to the -DicePool Character Sheet and add 1 dark side and 1 light side destint point, then click the Force Player Update button. This should clear up the issue.")
         return doRoll;
     }
 
@@ -891,23 +890,33 @@ eote.process.destiny = function (cmd, diceObj) {
     switch (cmd[1]) {
         case "useDark":
             if (darkSide > 0) {
-                sendChat("The GM", "Uses a dark side point!");
                 darkSide = darkSide - 1;
                 lightSide = lightSide + 1;
+
+                var displayPool = '/direct &{template:base} {{title=' + 'The GM flips a Dark Side Destiny Point' + '}}'
+                displayPool = displayPool + '{{Dark Side points remaining=' + darkSide + '}}';
+                displayPool = displayPool + '{{New Light Side total=' + lightSide + '}}';
+
+                sendChat('Dice System', displayPool);
             }
             else {
-                sendChat("Dice System", "No dark side points to use!");
+                sendChat("GM", "/w " + "gm There are no Dark Side points left in the Destiny Pool. Encourage your Players to use a Light Side Point." )
                 return doRoll;
             }
             break;
         case "useLight":
             if (lightSide > 0) {
-                sendChat(diceObj.vars.characterName, "Uses a light side point!");
                 lightSide = lightSide - 1;
                 darkSide = darkSide + 1;
+
+                var displayPool = '/direct &{template:base} {{title=' + diceObj.vars.characterName + ' flips a Light Side Destiny Point' + '}}'
+                displayPool = displayPool + '{{New Dark Side total=' + darkSide + '}}';
+                displayPool = displayPool + '{{Light Side points remaining=' + lightSide + '}}';
+
+                sendChat('Dice System', displayPool);
             }
             else {
-                sendChat("Dice System", "No light side points to use!");
+                sendChat("Dice System", "/w " + diceObj.vars.characterName + " There are no Light Side points left in the Destiny Pool. Suggest to your GM to use a Dark Side point to make one available.")
                 return doRoll;
             }
             break;
@@ -1001,9 +1010,19 @@ eote.process.label = function (cmd, diceObj) {
             var label = labelArray[0];
             var message = labelArray[1];
 
-            labelStr = labelStr + '<b>' + label + ':</b> ' + message + '<br>';
+            if (label == "Weapon") {
+                labelStr = labelStr + message + '}}';
+            }
+            else if (label == "skill") {
+                labelStr = labelStr + message + '}}';
+            }
+            else if (label == "Dice") {
+                labelStr = labelStr + message + '}}';
+            }
+            else {
+                labelStr = labelStr + '{{' + label + '=' + message + '}}';
+            }
         });
-
         diceObj.vars.label = labelStr;
     }
 
@@ -1228,10 +1247,10 @@ eote.process.initiative = function (cmd, diceObj) {
 eote.process.crit = function (cmd, diceObj) {
 
     /* Crit
-       * default: 
-       * Description: Rolls critical injury table
-       * Command: !eed crit(roll) crit(roll|#) crit(heal|#)
-       * ---------------------------------------------------------------- */
+     * default: 
+     * Description: Rolls critical injury table
+     * Command: !eed crit(roll) crit(roll|#) crit(heal|#)
+     * ---------------------------------------------------------------- */
 
     eote.process.logger("eote.process.crit", "");
 
@@ -1244,205 +1263,205 @@ eote.process.crit = function (cmd, diceObj) {
             Result: 'Suffer 1 strain.',
             effect: '',
         },
-      {
-          percent: '6 to 10',
-          severity: 1,
-          name: 'Slowed Down',
-          Result: 'May only act during last allied Initiative slot on next turn.',
-          effect: '',
-      },
-      {
-          percent: '11 to 15',
-          severity: 1,
-          name: 'Sudden Jolt',
-          Result: 'May only act during last hero Initiative slot on next turn.',
-          effect: '',
-      },
-      {
-          percent: '16 to 20',
-          severity: 1,
-          name: 'Distracted',
-          Result: 'Cannot perform free maneuver on next turn.',
-          effect: '',
-      },
-      {
-          percent: '21 to 25',
-          severity: 1,
-          name: 'Off-Balance',
-          Result: 'Add 1 Setback die to next skill check.',
-          effect: '',
-      },
-      {
-          percent: '26 to 30',
-          severity: 1,
-          name: 'Discouraging Wound',
-          Result: 'Flip one light destiny to dark.',
-          effect: '',
-      },
-      {
-          percent: '31 to 35',
-          severity: 1,
-          name: 'Stunned',
-          Result: 'Staggered, cannot perform action on next turn.',
-          effect: '',
-      },
-      {
-          percent: '36 to 40',
-          severity: 1,
-          name: 'Stinger',
-          Result: 'Increase difficulty of next check by 1 Difficulty die.',
-          effect: '',
-      },
-      //----------------------------- Severity 2
-      {
-          percent: '41 to 45',
-          severity: 2,
-          name: 'Bowled Over',
-          Result: 'Knocked prone and suffer 1 strain.',
-          effect: '',
-      },
-      {
-          percent: '46 to 50',
-          severity: 2,
-          name: 'Head Ringer',
-          Result: 'Increase difficulty of all Intellect and Cunning checks by 1 Difficulty die until end of encounter.',
-          effect: '',
-      },
-      {
-          percent: '51 to 55',
-          severity: 2,
-          name: 'Fearsome Wound',
-          Result: 'Increase difficulty of all Presence and Willpower checks by 1 Difficulty die until end of encounter.',
-          effect: '',
-      },
-      {
-          percent: '56 to 60',
-          severity: 2,
-          name: 'Agonizing Wound',
-          Result: 'Increase difficulty of all Brawn and Agility checks by 1 Difficulty die until end of encounter.',
-          effect: '',
-      },
-      {
-          percent: '61 to 65',
-          severity: 2,
-          name: 'Slightly Dazed',
-          Result: 'Add 1 Setback die to all skill checks until end of encounter.',
-          effect: '',
-      },
-      {
-          percent: '66 to 70',
-          severity: 2,
-          name: 'Scattered Senses',
-          Result: 'Remove all Boost dice from all skill checks until end of encounter.',
-          effect: '',
-      },
-      {
-          percent: '71 to 75',
-          severity: 2,
-          name: 'Hamstrung',
-          Result: 'Lose free maneuver until end of encounter.',
-          effect: '',
-      },
-      {
-          percent: '76 to 80',
-          severity: 2,
-          name: 'Staggered',
-          Result: 'Attacker may immediately attempt another free attack against you using same dice pool as original attack.',
-          effect: '',
-      },
-      {
-          percent: '81 to 85',
-          severity: 2,
-          name: 'Winded',
-          Result: 'Cannot voluntarily suffer strain to activate abilities or gain additional maneuvers until end of encounter.',
-          effect: '',
-      },
-      {
-          percent: '86 to 90',
-          severity: 2,
-          name: 'Compromised',
-          Result: 'Increase difficulty of all skill checks by 1 Difficulty die until end of encounter.',
-          effect: '',
-      },
-      //---------------------------------------- Severity 3
-      {
-          percent: '91 to 95',
-          severity: 3,
-          name: 'At the Brink',
-          Result: 'Suffer 1 strain each time you perform an action.',
-          effect: '',
-      },
-      {
-          percent: '96 to 100',
-          severity: 3,
-          name: 'Crippled',
-          Result: 'Limb crippled until healed or replaced. Increase difficulty of all checks that use that limb by 1 Difficulty die.',
-          effect: '',
-      },
-      {
-          percent: '101 to 105',
-          severity: 3,
-          name: 'Maimed',
-          Result: 'Limb permanently lost. Unless you have a cybernetic replacement, cannot perform actions that use that limb. Add 1 Setback to all other actions.',
-          effect: '',
-      },
-      {
-          percent: '106 to 110',
-          severity: 3,
-          name: 'Horrific Injury',
-          Result: 'Roll 1d10 to determine one wounded characteristic -- roll results(1-3 = Brawn, 4-6 = Agility, 7 = Intellect, 8 = Cunning, 9 = Presence, 10 = Willpower. Until Healed, treat characteristic as one point lower.',
-          effect: '',
-      },
-      {
-          percent: '111 to 115',
-          severity: 3,
-          name: 'Temporarily Lame',
-          Result: 'Until healed, may not perform more than one maneuver each turn.',
-          effect: '',
-      },
-      {
-          percent: '116 to 120',
-          severity: 3,
-          name: 'Blinded',
-          Result: 'Can no longer see. Upgrade the difficulty of Perception and Vigilance checks three times, and all other checks twice.',
-          effect: '',
-      },
-      {
-          percent: '121 to 125',
-          severity: 3,
-          name: 'Knocked Senseless',
-          Result: 'You can no longer upgrade dice for checks.',
-          effect: '',
-      },
-      //---------------------------------------- Severity 4
-      {
-          percent: '126 to 130',
-          severity: 4,
-          name: 'Gruesome Injury',
-          Result: 'Roll 1d10 to determine one wounded characteristic -- roll results(1-3 = Brawn, 4-6 = Agility, 7 = Intellect, 8 = Cunning, 9 = Presence, 10 = Willpower. Characteristic is permanently one point lower.',
-          effect: '',
-      },
-      {
-          percent: '131 to 140',
-          severity: 4,
-          name: 'Bleeding Out',
-          Result: 'Suffer 1 wound and 1 strain every round at the beginning of turn. For every 5 wounds suffered beyond wound threshold, suffer one additional Critical Injury (ignore the details for any result below this result).',
-          effect: '',
-      },
-      {
-          percent: '141 to 150',
-          severity: 4,
-          name: 'The End is Nigh',
-          Result: 'Die after the last Initiative slot during the next round.',
-          effect: '',
-      },
-      {
-          percent: '151',
-          severity: 4,
-          name: 'Dead',
-          Result: 'Complete, absolute death.',
-          effect: '',
-      }
+        {
+            percent: '6 to 10',
+            severity: 1,
+            name: 'Slowed Down',
+            Result: 'May only act during last allied Initiative slot on next turn.',
+            effect: '',
+        },
+        {
+            percent: '11 to 15',
+            severity: 1,
+            name: 'Sudden Jolt',
+            Result: 'May only act during last hero Initiative slot on next turn.',
+            effect: '',
+        },
+        {
+            percent: '16 to 20',
+            severity: 1,
+            name: 'Distracted',
+            Result: 'Cannot perform free maneuver on next turn.',
+            effect: '',
+        },
+        {
+            percent: '21 to 25',
+            severity: 1,
+            name: 'Off-Balance',
+            Result: 'Add 1 Setback die to next skill check.',
+            effect: '',
+        },
+        {
+            percent: '26 to 30',
+            severity: 1,
+            name: 'Discouraging Wound',
+            Result: 'Flip one light destiny to dark.',
+            effect: '',
+        },
+        {
+            percent: '31 to 35',
+            severity: 1,
+            name: 'Stunned',
+            Result: 'Staggered, cannot perform action on next turn.',
+            effect: '',
+        },
+        {
+            percent: '36 to 40',
+            severity: 1,
+            name: 'Stinger',
+            Result: 'Increase difficulty of next check by 1 Difficulty die.',
+            effect: '',
+        },
+        //----------------------------- Severity 2
+        {
+            percent: '41 to 45',
+            severity: 2,
+            name: 'Bowled Over',
+            Result: 'Knocked prone and suffer 1 strain.',
+            effect: '',
+        },
+        {
+            percent: '46 to 50',
+            severity: 2,
+            name: 'Head Ringer',
+            Result: 'Increase difficulty of all Intellect and Cunning checks by 1 Difficulty die until end of encounter.',
+            effect: '',
+        },
+        {
+            percent: '51 to 55',
+            severity: 2,
+            name: 'Fearsome Wound',
+            Result: 'Increase difficulty of all Presence and Willpower checks by 1 Difficulty die until end of encounter.',
+            effect: '',
+        },
+        {
+            percent: '56 to 60',
+            severity: 2,
+            name: 'Agonizing Wound',
+            Result: 'Increase difficulty of all Brawn and Agility checks by 1 Difficulty die until end of encounter.',
+            effect: '',
+        },
+        {
+            percent: '61 to 65',
+            severity: 2,
+            name: 'Slightly Dazed',
+            Result: 'Add 1 Setback die to all skill checks until end of encounter.',
+            effect: '',
+        },
+        {
+            percent: '66 to 70',
+            severity: 2,
+            name: 'Scattered Senses',
+            Result: 'Remove all Boost dice from all skill checks until end of encounter.',
+            effect: '',
+        },
+        {
+            percent: '71 to 75',
+            severity: 2,
+            name: 'Hamstrung',
+            Result: 'Lose free maneuver until end of encounter.',
+            effect: '',
+        },
+        {
+            percent: '76 to 80',
+            severity: 2,
+            name: 'Staggered',
+            Result: 'Attacker may immediately attempt another free attack against you using same dice pool as original attack.',
+            effect: '',
+        },
+        {
+            percent: '81 to 85',
+            severity: 2,
+            name: 'Winded',
+            Result: 'Cannot voluntarily suffer strain to activate abilities or gain additional maneuvers until end of encounter.',
+            effect: '',
+        },
+        {
+            percent: '86 to 90',
+            severity: 2,
+            name: 'Compromised',
+            Result: 'Increase difficulty of all skill checks by 1 Difficulty die until end of encounter.',
+            effect: '',
+        },
+        //---------------------------------------- Severity 3
+        {
+            percent: '91 to 95',
+            severity: 3,
+            name: 'At the Brink',
+            Result: 'Suffer 1 strain each time you perform an action.',
+            effect: '',
+        },
+        {
+            percent: '96 to 100',
+            severity: 3,
+            name: 'Crippled',
+            Result: 'Limb crippled until healed or replaced. Increase difficulty of all checks that use that limb by 1 Difficulty die.',
+            effect: '',
+        },
+        {
+            percent: '101 to 105',
+            severity: 3,
+            name: 'Maimed',
+            Result: 'Limb permanently lost. Unless you have a cybernetic replacement, cannot perform actions that use that limb. Add 1 Setback to all other actions.',
+            effect: '',
+        },
+        {
+            percent: '106 to 110',
+            severity: 3,
+            name: 'Horrific Injury',
+            Result: 'Roll 1d10 to determine one wounded characteristic -- roll results(1-3 = Brawn, 4-6 = Agility, 7 = Intellect, 8 = Cunning, 9 = Presence, 10 = Willpower. Until Healed, treat characteristic as one point lower.',
+            effect: '',
+        },
+        {
+            percent: '111 to 115',
+            severity: 3,
+            name: 'Temporarily Lame',
+            Result: 'Until healed, may not perform more than one maneuver each turn.',
+            effect: '',
+        },
+        {
+            percent: '116 to 120',
+            severity: 3,
+            name: 'Blinded',
+            Result: 'Can no longer see. Upgrade the difficulty of Perception and Vigilance checks three times, and all other checks twice.',
+            effect: '',
+        },
+        {
+            percent: '121 to 125',
+            severity: 3,
+            name: 'Knocked Senseless',
+            Result: 'You can no longer upgrade dice for checks.',
+            effect: '',
+        },
+        //---------------------------------------- Severity 4
+        {
+            percent: '126 to 130',
+            severity: 4,
+            name: 'Gruesome Injury',
+            Result: 'Roll 1d10 to determine one wounded characteristic -- roll results(1-3 = Brawn, 4-6 = Agility, 7 = Intellect, 8 = Cunning, 9 = Presence, 10 = Willpower. Characteristic is permanently one point lower.',
+            effect: '',
+        },
+        {
+            percent: '131 to 140',
+            severity: 4,
+            name: 'Bleeding Out',
+            Result: 'Suffer 1 wound and 1 strain every round at the beginning of turn. For every 5 wounds suffered beyond wound threshold, suffer one additional Critical Injury (ignore the details for any result below this result).',
+            effect: '',
+        },
+        {
+            percent: '141 to 150',
+            severity: 4,
+            name: 'The End is Nigh',
+            Result: 'Die after the last Initiative slot during the next round.',
+            effect: '',
+        },
+        {
+            percent: '151',
+            severity: 4,
+            name: 'Dead',
+            Result: 'Complete, absolute death.',
+            effect: '',
+        }
     ];
 
     var critRoll = function (addCritNum) {
@@ -1469,7 +1488,7 @@ eote.process.crit = function (cmd, diceObj) {
         }
 
         if (!openSlot) {
-            sendChat("Alert", "Why are you not dead!");
+            sendChat("Alert", "&{template:base} {{title=Alert}} {{wide=Why are you not dead!?}}");
             return false;
         }
 
@@ -1529,17 +1548,17 @@ eote.process.crit = function (cmd, diceObj) {
 
                 eote.updateAddAttribute(characterObj, critAttrs);
 
-                var chat = '/direct <br><b>Rolls Critical Injury</b><br>';
-                chat = chat + '<img src="http://i.imgur.com/z51hRwd.png" /><br/>'
-                chat = chat + 'Current Criticals: (' + totalcrits + ' x 10)<br>';
+                var chat = '/direct &{template:base} {{title=' + diceObj.vars.characterName + '}}'
+                chat = chat + '{{subtitle=Critical Injury}}';
+                chat = chat + '{{flavor=<img style="margin-left:auto; margin-right:auto;" src="http://i.imgur.com/z51hRwd.png" />}}'
+                chat = chat + '{{Current Criticals=' + totalcrits + ' x 10}}';
                 if (rollOffset) {
-                    chat = chat + 'Dice Roll Offset: ' + rollOffset + '<br>';
+                    chat = chat + '{{Dice Roll Offset=' + rollOffset + '}}';
                 }
-                chat = chat + 'Dice Roll: ' + diceRoll + '<br>';
-                chat = chat + 'Total: ' + rollTotal + '<br>';
-                chat = chat + '<br>';
-                chat = chat + '<b>' + critTable[key].name + '</b><br>';
-                chat = chat + critTable[key].Result + '<br>';
+                chat = chat + '{{Dice Roll=' + diceRoll + '}}';
+                chat = chat + '{{Total=' + rollTotal + '}}';
+                chat = chat + '{{wide=<b>' + critTable[key].name + '</b><br>';
+                chat = chat + critTable[key].Result + '<br>}}';
 
                 sendChat(diceObj.vars.characterName, chat);
 
@@ -1550,36 +1569,36 @@ eote.process.crit = function (cmd, diceObj) {
     var critHeal = function (critID) {
 
         critAttrs = [
-              {
-                  name: 'critName' + critID,
-                  current: '',
-                  max: '',
-                  update: true
-              },
-              {
-                  name: 'critSeverity' + critID,
-                  current: '',
-                  max: '',
-                  update: true
-              },
-              {
-                  name: 'critRange' + critID,
-                  current: '',
-                  max: '',
-                  update: true
-              },
-              {
-                  name: 'critSummary' + critID,
-                  current: '',
-                  max: '',
-                  update: true
-              },
-              {
-                  name: 'critOn' + critID,
-                  current: 0,
-                  max: '',
-                  update: true
-              }
+            {
+                name: 'critName' + critID,
+                current: '',
+                max: '',
+                update: true
+            },
+            {
+                name: 'critSeverity' + critID,
+                current: '',
+                max: '',
+                update: true
+            },
+            {
+                name: 'critRange' + critID,
+                current: '',
+                max: '',
+                update: true
+            },
+            {
+                name: 'critSummary' + critID,
+                current: '',
+                max: '',
+                update: true
+            },
+            {
+                name: 'critOn' + critID,
+                current: 0,
+                max: '',
+                update: true
+            }
         ];
 
         eote.updateAddAttribute(characterObj, critAttrs);
@@ -1604,10 +1623,10 @@ eote.process.crit = function (cmd, diceObj) {
 eote.process.critShip = function (cmd, diceObj) {
 
     /* CritShip
-       * default: 
-       * Description: Rolls vehicle critical table, Both crit() and critShip() function the same
-       * Command: !eed critShip(roll) critShip(roll|#) critShip(heal|#)
-       * ---------------------------------------------------------------- */
+     * default: 
+     * Description: Rolls vehicle critical table, Both crit() and critShip() function the same
+     * Command: !eed critShip(roll) critShip(roll|#) critShip(heal|#)
+     * ---------------------------------------------------------------- */
 
     var characterObj = [{ name: diceObj.vars.characterName, id: diceObj.vars.characterID }];
 
@@ -1619,135 +1638,135 @@ eote.process.critShip = function (cmd, diceObj) {
             Result: 'Ship or vehicle suffers 1 system strain.',
             effect: '',
         },
-      {
-          percent: '10 to 18',
-          severity: 1,
-          name: 'Jostled',
-          Result: 'All crew members suffer 1 strain.',
-          effect: '',
-      },
-      {
-          percent: '19 to 27',
-          severity: 1,
-          name: 'Losing Power to Shields',
-          Result: 'Decrease defense in affected defense zone by 1 until repaired. If ship or vehicle has no defense, suffer 1 system strain.',
-          effect: '',
-      },
-      {
-          percent: '28 to 36',
-          severity: 1,
-          name: 'Knocked Off Course',
-          Result: 'On next turn, pilot cannot execute any maneuvers. Instead, must make a Piloting check to regain bearings and resume course. Difficulty depends on current speed.',
-          effect: '',
-      },
-      {
-          percent: '37 to 45',
-          severity: 1,
-          name: 'Tailspin',
-          Result: 'All firing from ship or vehicle suffers 2 setback dice until end of pilot\'s next turn.',
-          effect: '',
-      },
-      {
-          percent: '46 to 54',
-          severity: 1,
-          name: 'Component Hit',
-          Result: 'One component of the attacker\'s choice is knocked offline, and is rendered inoperable until the end of the following round. See page 245 CRB for Small/Large Vehicle and Ship Component tables. ',
-          effect: '',
-      },
-      // --------------- severity : 2
-      {
-          percent: '55 to 63',
-          severity: 2,
-          name: 'Shields Failing',
-          Result: 'Decrease defense in all defense zones by 1 until repaired. If ship or vehicle has no defense, suffer 2 system strain.',
-          effect: '',
-      },
-      {
-          percent: '64 to 72',
-          severity: 2,
-          name: 'Hyperdrive or Navicomputer Failure',
-          Result: 'Cannot make any jump to hyperspace until repaired. If ship or vehicle has no hyperdrive, navigation systems fail leaving it unable to tell where it is or is going.',
-          effect: '',
-      },
-      {
-          percent: '73 to 81',
-          severity: 2,
-          name: 'Power Fluctuations',
-          Result: 'Pilot cannot voluntarily inflict system strain on the ship until repaired.',
-          effect: '',
-      },
-      // --------------- severity : 3
-      {
-          percent: '82 to 90',
-          severity: 3,
-          name: 'Shields Down',
-          Result: 'Decrease defense in affected defense zone to 0 and all other defense zones by 1 point until repaired. If ship or vehicle has no defense, suffer 4 system strain.',
-          effect: '',
-      },
-      {
-          percent: '91 to 99',
-          severity: 3,
-          name: 'Engine Damaged',
-          Result: 'Ship or vehicle\'s maximum speed reduced by 1, to a minimum of 1, until repaired.',
-          effect: '',
-      },
-      {
-          percent: '100 to 108',
-          severity: 3,
-          name: 'Shield Overload',
-          Result: 'Decrease defense in all defense zones to 0 until repaired. In addition, suffer 2 system strain. Cannot be repaired until end of encounter. If ship or vehicle has no defense, reduce armor by 1 until repaired.',
-          effect: '',
-      },
-      {
-          percent: '109 to 117',
-          severity: 3,
-          name: 'Engines Down',
-          Result: 'Ship or vehicle\'s maximum speed reduced to 0. In addition, ship or vehicle cannot execute maneuvers until repaired. Ship continues on course at current speed and cannot be stopped or course changed until repaired.',
-          effect: '',
-      },
-      {
-          percent: '118 to 126',
-          severity: 3,
-          name: 'Major System Failure',
-          Result: 'One component of the attacker\'s choice is heavily damages, and is inoperable until the critical hit is repaired. See page 245 CRB for Small/Large Vehicle and Ship Component tables. ',
-          effect: '',
-      },
-      // --------------- severity : 4
-      {
-          percent: '127 to 133',
-          severity: 4,
-          name: 'Major Hull Breach',
-          Result: 'Ships and vehicles of silhouette 4 and smaller depressurize in a number of rounds equal to silhouette. Ships of silhouette 5 and larger don\'t completely depressurize, but parts do (specifics at GM discretion). Ships and vehicles operating in atmosphere instead suffer a Destabilized Critical.',
-          effect: '',
-      },
-      {
-          percent: '134 to 138',
-          severity: 4,
-          name: 'Destabilised',
-          Result: 'Reduce ship or vehicle\'s hull integrity threshold and system strain threshold to half original values until repaired.',
-          effect: '',
-      },
-      {
-          percent: '139 to 144',
-          severity: 4,
-          name: 'Fire!',
-          Result: 'Fire rages through ship or vehicle and it immediately takes 2 system strain. Fire can be extinguished with appropriate skill, Vigilance or Cool checks at GM\'s discretion. Takes one round per two silhouette to put out.',
-          effect: '',
-      },
-      {
-          percent: '145 to 153',
-          severity: 4,
-          name: 'Breaking Up',
-          Result: 'At the end of next round, ship is completely destroyed. Anyone aboard has one round to reach escape pod or bail out before they are lost.',
-          effect: '',
-      },
-      {
-          percent: '154+',
-          severity: 4,
-          name: 'Vaporized',
-          Result: 'The ship or Vehicle is completely destroyed.',
-          effect: '',
-      }
+        {
+            percent: '10 to 18',
+            severity: 1,
+            name: 'Jostled',
+            Result: 'All crew members suffer 1 strain.',
+            effect: '',
+        },
+        {
+            percent: '19 to 27',
+            severity: 1,
+            name: 'Losing Power to Shields',
+            Result: 'Decrease defense in affected defense zone by 1 until repaired. If ship or vehicle has no defense, suffer 1 system strain.',
+            effect: '',
+        },
+        {
+            percent: '28 to 36',
+            severity: 1,
+            name: 'Knocked Off Course',
+            Result: 'On next turn, pilot cannot execute any maneuvers. Instead, must make a Piloting check to regain bearings and resume course. Difficulty depends on current speed.',
+            effect: '',
+        },
+        {
+            percent: '37 to 45',
+            severity: 1,
+            name: 'Tailspin',
+            Result: 'All firing from ship or vehicle suffers 2 setback dice until end of pilot\'s next turn.',
+            effect: '',
+        },
+        {
+            percent: '46 to 54',
+            severity: 1,
+            name: 'Component Hit',
+            Result: 'One component of the attacker\'s choice is knocked offline, and is rendered inoperable until the end of the following round. See page 245 CRB for Small/Large Vehicle and Ship Component tables. ',
+            effect: '',
+        },
+        // --------------- severity : 2
+        {
+            percent: '55 to 63',
+            severity: 2,
+            name: 'Shields Failing',
+            Result: 'Decrease defense in all defense zones by 1 until repaired. If ship or vehicle has no defense, suffer 2 system strain.',
+            effect: '',
+        },
+        {
+            percent: '64 to 72',
+            severity: 2,
+            name: 'Hyperdrive or Navicomputer Failure',
+            Result: 'Cannot make any jump to hyperspace until repaired. If ship or vehicle has no hyperdrive, navigation systems fail leaving it unable to tell where it is or is going.',
+            effect: '',
+        },
+        {
+            percent: '73 to 81',
+            severity: 2,
+            name: 'Power Fluctuations',
+            Result: 'Pilot cannot voluntarily inflict system strain on the ship until repaired.',
+            effect: '',
+        },
+        // --------------- severity : 3
+        {
+            percent: '82 to 90',
+            severity: 3,
+            name: 'Shields Down',
+            Result: 'Decrease defense in affected defense zone to 0 and all other defense zones by 1 point until repaired. If ship or vehicle has no defense, suffer 4 system strain.',
+            effect: '',
+        },
+        {
+            percent: '91 to 99',
+            severity: 3,
+            name: 'Engine Damaged',
+            Result: 'Ship or vehicle\'s maximum speed reduced by 1, to a minimum of 1, until repaired.',
+            effect: '',
+        },
+        {
+            percent: '100 to 108',
+            severity: 3,
+            name: 'Shield Overload',
+            Result: 'Decrease defense in all defense zones to 0 until repaired. In addition, suffer 2 system strain. Cannot be repaired until end of encounter. If ship or vehicle has no defense, reduce armor by 1 until repaired.',
+            effect: '',
+        },
+        {
+            percent: '109 to 117',
+            severity: 3,
+            name: 'Engines Down',
+            Result: 'Ship or vehicle\'s maximum speed reduced to 0. In addition, ship or vehicle cannot execute maneuvers until repaired. Ship continues on course at current speed and cannot be stopped or course changed until repaired.',
+            effect: '',
+        },
+        {
+            percent: '118 to 126',
+            severity: 3,
+            name: 'Major System Failure',
+            Result: 'One component of the attacker\'s choice is heavily damages, and is inoperable until the critical hit is repaired. See page 245 CRB for Small/Large Vehicle and Ship Component tables. ',
+            effect: '',
+        },
+        // --------------- severity : 4
+        {
+            percent: '127 to 133',
+            severity: 4,
+            name: 'Major Hull Breach',
+            Result: 'Ships and vehicles of silhouette 4 and smaller depressurize in a number of rounds equal to silhouette. Ships of silhouette 5 and larger don\'t completely depressurize, but parts do (specifics at GM discretion). Ships and vehicles operating in atmosphere instead suffer a Destabilized Critical.',
+            effect: '',
+        },
+        {
+            percent: '134 to 138',
+            severity: 4,
+            name: 'Destabilised',
+            Result: 'Reduce ship or vehicle\'s hull integrity threshold and system strain threshold to half original values until repaired.',
+            effect: '',
+        },
+        {
+            percent: '139 to 144',
+            severity: 4,
+            name: 'Fire!',
+            Result: 'Fire rages through ship or vehicle and it immediately takes 2 system strain. Fire can be extinguished with appropriate skill, Vigilance or Cool checks at GM\'s discretion. Takes one round per two silhouette to put out.',
+            effect: '',
+        },
+        {
+            percent: '145 to 153',
+            severity: 4,
+            name: 'Breaking Up',
+            Result: 'At the end of next round, ship is completely destroyed. Anyone aboard has one round to reach escape pod or bail out before they are lost.',
+            effect: '',
+        },
+        {
+            percent: '154+',
+            severity: 4,
+            name: 'Vaporized',
+            Result: 'The ship or Vehicle is completely destroyed.',
+            effect: '',
+        }
     ];
 
     var critRoll = function (addCritNum) {
@@ -1773,7 +1792,7 @@ eote.process.critShip = function (cmd, diceObj) {
         }
 
         if (!openSlot) {
-            sendChat("Alert", "Why are you not dead!");
+            sendChat("Alert", "&{template:base} {{title=Alert}} {{wide=Why are you not dead!?}}");
             return false;
         }
 
@@ -1830,17 +1849,17 @@ eote.process.critShip = function (cmd, diceObj) {
 
                 eote.updateAddAttribute(characterObj, critAttrs);
 
-                var chat = '/direct <br><b>Rolls Vehicle Critical</b><br>';
-                chat = chat + '<img src="http://i.imgur.com/JO3pOr8.png" /><br>';//need new graphic
-                chat = chat + 'Current Criticals: (' + totalcrits + ' x 10)<br>';
+                var chat = '/direct &{template:base} {{title=' + diceObj.vars.characterName + '}} '
+                chat = chat + '{{subtitle=Vehicle Critical}}';
+                chat = chat + '{{flavor=<img style="margin-left:auto;" src="http://i.imgur.com/JO3pOr8.png" />}}';//need new graphic
+                chat = chat + '{{Current Criticals=' + totalcrits + ' x 10}}';
                 if (rollOffset) {
-                    chat = chat + 'Dice Roll Offset: ' + rollOffset + '<br>';
+                    chat = chat + '{{Dice Roll Offset=' + rollOffset + '}}';
                 }
-                chat = chat + 'Dice Roll: ' + diceRoll + '<br>';
-                chat = chat + 'Total: ' + rollTotal + '<br>';
-                chat = chat + '<br>';
-                chat = chat + '<b>' + critTable[key].name + '</b><br>';
-                chat = chat + critTable[key].Result + '<br>';
+                chat = chat + '{{Dice Roll=' + diceRoll + '}}';
+                chat = chat + '{{Total=' + rollTotal + '}}';
+                chat = chat + '{{wide=<b>' + critTable[key].name + '</b><br>';
+                chat = chat + critTable[key].Result + '}}';
 
                 sendChat(diceObj.vars.characterName, chat);
 
@@ -1852,36 +1871,36 @@ eote.process.critShip = function (cmd, diceObj) {
     var critHeal = function (critID) {
 
         critAttrs = [
-              {
-                  name: 'critShipName' + critID,
-                  current: '',
-                  max: '',
-                  update: true
-              },
-              {
-                  name: 'critShipSeverity' + critID,
-                  current: '',
-                  max: '',
-                  update: true
-              },
-              {
-                  name: 'critShipRange' + critID,
-                  current: '',
-                  max: '',
-                  update: true
-              },
-              {
-                  name: 'critShipSummary' + critID,
-                  current: '',
-                  max: '',
-                  update: true
-              },
-              {
-                  name: 'critShipOn' + critID,
-                  current: 0,
-                  max: '',
-                  update: true
-              }
+            {
+                name: 'critShipName' + critID,
+                current: '',
+                max: '',
+                update: true
+            },
+            {
+                name: 'critShipSeverity' + critID,
+                current: '',
+                max: '',
+                update: true
+            },
+            {
+                name: 'critShipRange' + critID,
+                current: '',
+                max: '',
+                update: true
+            },
+            {
+                name: 'critShipSummary' + critID,
+                current: '',
+                max: '',
+                update: true
+            },
+            {
+                name: 'critShipOn' + critID,
+                current: 0,
+                max: '',
+                update: true
+            }
         ];
 
         eote.updateAddAttribute(characterObj, critAttrs);
@@ -2230,7 +2249,6 @@ eote.process.upgrade = function (cmd, diceObj) {
             }
         }
 
-
     });
 
     return diceObj;
@@ -2510,7 +2528,6 @@ eote.process.rollDice = function (diceObj) {
     //finds the sum of each dice attribute
     diceObj.totals = eote.process.totalDiceValues(diceObj.totals);
 
-
     return diceObj;
 }
 
@@ -2585,20 +2602,22 @@ eote.process.diceOutput = function (diceObj, playerName, playerID) {
     //------------------------------------>
 
     if (eote.defaults.globalVars.diceTestEnabled === true) {
-        chatGlobal = "/direct <br>6b 8g 12y 6blk 8p 12r 12w <br>";
-    } else if (diceObj.vars.label) {
-        chatGlobal = "/direct <br>" + diceObj.vars.label + '<br>';
-    } else {
-        chatGlobal = "/direct <br>";
-    }
-
-    if (eote.defaults.globalVars.diceTestEnabled === true) {
         characterPlayer = 'TEST';
     } else if (diceObj.vars.characterName) {
         characterPlayer = diceObj.vars.characterName;
     } else {
         characterPlayer = playerName;
     }
+
+    if (eote.defaults.globalVars.diceTestEnabled === true) {
+        chatGlobal = "/direct <br>6b 8g 12y 6blk 8p 12r 12w <br>";
+    } else if (diceObj.vars.label) {
+        chatGlobal = "/direct &{template:base} {{title=" + diceObj.vars.label + "}} {{subtitle=" + characterPlayer + "}}";
+    } else {
+        chatGlobal = "/direct &{template:base} {{title=" + characterPlayer + "}}";
+    }
+
+
 
     //------------------------------------>
 
@@ -2620,7 +2639,7 @@ eote.process.diceOutput = function (diceObj, playerName, playerID) {
             if (diceObj.textLog.Threat != "") diceTextRolled = diceGraphicsRolled + "Threat:" + diceObj.textLog.Threat;
 
             if (eote.defaults.globalVars.diceGraphicsChat === true) {
-                chatGlobal = chatGlobal + '<br>' + diceGraphicsRolled;
+                chatGlobal = chatGlobal + '{{roll=' + diceGraphicsRolled + '}}';
             } else {
                 sendChat("", diceTextRolled);
             }
@@ -2630,7 +2649,7 @@ eote.process.diceOutput = function (diceObj, playerName, playerID) {
             if (eote.defaults.globalVars.diceGraphicsChat === true) {
 
                 if (diceObj.vars.label) {
-                    sendChat(characterPlayer, "/direct <br><b>Skill:</b> " + diceObj.vars.label + '<br>');
+                    sendChat(characterPlayer, "/direct " + diceObj.vars.label + '<br>');
                 }
 
                 if (diceObj.graphicsLog.Boost != "") sendChat("", "/direct " + diceObj.graphicsLog.Boost);
@@ -2647,7 +2666,7 @@ eote.process.diceOutput = function (diceObj, playerName, playerID) {
             } else {
 
                 if (diceObj.vars.label) {
-                    sendChat(characterPlayer, "/direct <br><b>Skill:</b> " + diceObj.vars.label + '<br>');
+                    sendChat(characterPlayer, "/direct " + diceObj.vars.label + '<br>');
                 }
 
                 if (diceObj.textLog.Boost != "") sendChat("", "Boost:" + diceObj.textLog.Boost);
@@ -2668,7 +2687,7 @@ eote.process.diceOutput = function (diceObj, playerName, playerID) {
 
     if (eote.defaults.globalVars.diceGraphicsChat === true) {
 
-        chatGlobal = chatGlobal + '<br>Roll:' + diceGraphicsResults;
+        chatGlobal = chatGlobal + '{{results=' + diceGraphicsResults + '}}';
 
         sendChat(characterPlayer, chatGlobal);
 
@@ -3468,7 +3487,7 @@ eote.roll = {
     },
 
     failure: function (diceQty) {
-        //Free Faliure
+        //Free Failure
         var i = 0;
         var s1 = '<img src="';
         var s2 = '" title="';
@@ -3505,7 +3524,7 @@ eote.roll = {
 
 eote.events = function () {
 
-    //event listner Add character defaults to new characters
+    //event listener Add character defaults to new characters
     on("add:character", function (characterObj) {
         eote.setCharacterDefaults(characterObj);
     });
@@ -3518,6 +3537,7 @@ eote.events = function () {
 
         eote.process.setup(msg.content, msg.who, msg.playerid);
     });
+
 }
 
 on('ready', function () {
