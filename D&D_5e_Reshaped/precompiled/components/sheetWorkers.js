@@ -3567,10 +3567,6 @@ const sheetOpened = () => {
 		if (versionCompare(version, '2.2.1') < 0) {
 			updateAbilityModifiers();
 		}
-		if (versionCompare(version, '2.2.2') < 0) {
-			updateNPCHP();
-			updateNPCAC();
-		}
 
 
 		if (!version || version !== currentVersion) {
