@@ -3368,6 +3368,48 @@ const updateLanguageSelection = () => {
 	});
 };
 
+const resourcesToClassFeatures = () => {
+  const repeatingItem = 'repeating_resource';
+  const newRepeatingItem = 'repeating_classfeature';
+  const collectionArray = [];
+  const finalSetAttrs = {};
+
+  let repeatingString;
+  getSectionIDs(repeatingItem, (ids) => {
+    for (let i = 0; i < ids.length; i++) {
+      repeatingString = `${repeatingItem}_${ids[i]}_`;
+      collectionArray.push(`${repeatingString}name`);
+      collectionArray.push(`${repeatingString}uses`);
+      collectionArray.push(`${repeatingString}uses_max`);
+      collectionArray.push(`${repeatingString}toggle_details`);
+      collectionArray.push(`${repeatingString}recharge`);
+      collectionArray.push(`${repeatingString}extras_toggle`);
+      collectionArray.push(`${repeatingString}freetext`);
+      collectionArray.push(`${repeatingString}freeform`);
+    }
+
+    getAttrs(collectionArray, (v) => {
+      console.log('v', v);
+      for (let i = 0; i < ids.length; i++) {
+        repeatingString = `${repeatingItem}_${ids[i]}_`;
+        const newRowId = generateRowID();
+        let newRepeatingString = `${newRepeatingItem}_${newRowId}_`;
+
+        finalSetAttrs[`${newRepeatingString}name`] = v[`${repeatingString}name`];
+        finalSetAttrs[`${newRepeatingString}uses`] = v[`${repeatingString}uses`];
+        finalSetAttrs[`${newRepeatingString}uses_max`] = v[`${repeatingString}uses_max`];
+        finalSetAttrs[`${newRepeatingString}toggle_details`] = v[`${repeatingString}toggle_details`];
+        finalSetAttrs[`${newRepeatingString}recharge`] = v[`${repeatingString}recharge`];
+        finalSetAttrs[`${newRepeatingString}extras_toggle`] = v[`${repeatingString}extras_toggle`];
+        finalSetAttrs[`${newRepeatingString}freetext`] = v[`${repeatingString}freetext`];
+        finalSetAttrs[`${newRepeatingString}freeform`] = v[`${repeatingString}freeform`];
+      }
+      console.log('resourcesToClassFeatures', finalSetAttrs);
+      setFinalAttrs(v, finalSetAttrs);
+    });
+  });
+};
+
 const setSkillStorageNames = () => {
 	const repeatingItem = 'repeating_skill';
 	const collectionArray = ['lang'];
@@ -3567,7 +3609,9 @@ const sheetOpened = () => {
 		if (versionCompare(version, '2.2.1') < 0) {
 			updateAbilityModifiers();
 		}
-
+    if (versionCompare(version, '2.2.3') < 0) {
+      resourcesToClassFeatures();
+    }
 
 		if (!version || version !== currentVersion) {
 			finalSetAttrs.version = currentVersion;
