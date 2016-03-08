@@ -2994,7 +2994,7 @@ const parseAction = (rowId, type) => {
 				const name = v[`${repeatingString}name`];
 				let freetext = v[`${repeatingString}freetext`];
 
-				if (name === 'Spellcasting') {
+				if (name && name.indexOf('Spellcasting') !== -1) {
 					const spellcastingSearch = spellcastingAbilityRegex.exec(freetext);
 					if (spellcastingSearch && spellcastingSearch[1]) {
 						const spellcastingAbility = spellcastingSearch[1].toLowerCase();
