@@ -5,7 +5,7 @@ Elle est aussi utilisable (et styl&eacute;e) pour _Numen&eacute;ra_ (modulo la g
 La VF s'appuie sur la traduction de Numen&eacute;ra par Black Book Editions.
 
 # Version courante :
-Version 1.4 (21 Novembre 2015) :
+Version 1.6 (21 Février 2016) :
 
 * Capture d'&eacute;cran [style Cypher System g&eacute;n&eacute;rique](CypherSystem.png)
 * Capture d'&eacute;cran [style Numen&eacute;ra](CypherSystem_style_Numenera.png)
@@ -53,10 +53,23 @@ Le script API permet que l'&eacute;tat du personnage soit automatiquement mis &a
 
 # Notes de version
 
+##Version 1.6 (21 Février 2016)
+Changements esthétiques, pour faciliter l'accès au bouton de suppression de ligne répétable, et diminuer la hauteur des lignes répétables.
+
+##Version 1.5 (21 Décembre 2015)
+
+* Nouvelles sections "Attaques" (1 par caractéristique) avec jets intégrés, prenant en compte le niveau de compétence, le coûts, les dégats etc.
+* Les jets de Caractéristiques et Compétences ne demandent plus/n'utilisent plus les efforts aux dégâts (utilisez les nouvelles sections Attaques en lieu et place)
+* Nouvelles options pour simplifier les jets : choisissez si le jet demande/utilise les Atouts, Bonus et Coûts. Le paramétrage par défaut est désormais de ne pas les utiliser.
+* Les boutons "Noms" (affichage des détails d'éléments dans le chat) ont été remplacés par des boutons image "Info"
+* Les boutons d'info peuvent être glisser/déposer dans la barre de macro
+* Nouveaux boutons d'info pour l'équipement (divers et consommables)
+* Correction d'un bug : le calcul du coût des efforts prend désormais en compte correctement le Curseur de Dégâts du personnage
+
 ##Version 1.4 (21 Novembre 2015)
 [Voir le détail sur le forum Roll20](https://app.roll20.net/forum/post/2357046/cypher-system-core-rule-book-sheet/?pageforid=2645489#post-2645489)
 
-* Nouvelle option de la feuille pour choisir le type de paramètrage des jets : via la section Action ou via Questions (type macro)
+* Nouvelle option de la feuille pour choisir le type de paramétrage des jets : via la section Action ou via Questions (type macro)
 * Nouveaux boutons pour montrer dans le chat le détails des Aptitudes Spéciales, Cyphers et Artefacts
 
 ##Version 1.3 (25 Octobre 2015)
