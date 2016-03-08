@@ -529,7 +529,7 @@ on('change:charisma change:charisma_bonus change:charisma_check_mod change:jack_
 
 const updateLevels = () => {
 	const repeatingItem = 'repeating_class';
-	const collectionArray = ['action_surge_uses_max', 'ki_max', 'lay_on_hands_uses_max', 'sorcery_points_max', 'warlock_spell_slots_max'];
+	const collectionArray = ['action_surge_uses_max', 'ki_max', 'lay_on_hands_uses_max', 'sorcery_points_max', 'warlock_spell_slots_max', 'is_npc'];
 	const finalSetAttrs = {};
 
 	for (let i = 0; i < CLASSES.length; i++) {
@@ -582,7 +582,6 @@ const updateLevels = () => {
 			spellcasting: 'full'
 		}
 	};
-
 	const hd = {
 		d20: 0,
 		d12: 0,
@@ -593,7 +592,6 @@ const updateLevels = () => {
 		d2: 0,
 		d0: 0
 	};
-
 	const spellcasting = {
 		full: 0,
 		half: 0,
@@ -692,10 +690,12 @@ const updateLevels = () => {
 			}
 
 			let casterLevel = 0;
-			casterLevel += spellcasting.full;
-			casterLevel += Math.floor(spellcasting.half / 2);
-			casterLevel += Math.floor(spellcasting.third / 3);
-			finalSetAttrs.caster_level = casterLevel;
+			if (!v.is_npc) {
+				casterLevel += spellcasting.full;
+				casterLevel += Math.floor(spellcasting.half / 2);
+				casterLevel += Math.floor(spellcasting.third / 3);
+				finalSetAttrs.caster_level = casterLevel;
+			}
 
 			if (classesWithSpellcasting > 1 || spellcasting.full) {
 				finalSetAttrs.caster_type = 'full';
@@ -1852,7 +1852,7 @@ on('change:global_attack_bonus change:global_melee_attack_bonus change:global_ra
 
 const updateSpell = (rowId) => {
 	const repeatingItem = 'repeating_spell';
-	const collectionArray = ['pb', 'finesse_mod', 'global_spell_attack_bonus', 'global_spell_damage_bonus', 'global_spell_dc_bonus', 'global_spell_heal_bonus', 'default_ability'];
+	const collectionArray = ['pb', 'finesse_mod', 'global_spell_attack_bonus', 'global_spell_damage_bonus', 'global_spell_dc_bonus', 'global_spell_heal_bonus', 'default_ability', 'caster_level'];
 	const finalSetAttrs = {};
 
 	for (let i = 0; i < ABILITIES.length; i++) {
@@ -1972,6 +1972,10 @@ const updateSpell = (rowId) => {
 					type: 'spell'
 				};
 				updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
+
+				if (v.caster_level && v[`${repeatingString}damage`] && v[`${repeatingString}damage`].indexOf('@{level}') !== -1) {
+					finalSetAttrs[`${repeatingString}damage`] = v[`${repeatingString}damage`].replace('@{level}', '@{caster_level}');
+				}
 
 				updateHealToggle(v, finalSetAttrs, repeatingString);
 
@@ -2951,6 +2955,7 @@ const parseAction = (rowId, type) => {
 	const reachRegex = /(?:reach)\s?(\d+)\s?(?:ft)/gi;
 	const rangeRegex = /(?:range)\s?(\d+)\/(\d+)\s?(ft)/gi;
 	const spellcastingRegex = /(\d+)\w+\slevel\s\((\d+)\s?slot(?:s)?\)/gi;
+	const spellcastingLevelRegex = /(\d+)(?:st|dn|rd|th)-level spellcaster/i;
 	const spellcastingAbilityRegex = /spellcasting ability is (\w+)/i;
 
 	for (let i = 0; i < ABILITIES.length; i++) {
@@ -2995,6 +3000,11 @@ const parseAction = (rowId, type) => {
 						const spellcastingAbility = spellcastingSearch[1].toLowerCase();
 						finalSetAttrs.default_ability = `@{${spellcastingAbility}_mod}`;
 					}
+					const spellcastingLevelSearch = spellcastingLevelRegex.exec(freetext);
+					if (spellcastingLevelSearch && spellcastingLevelSearch[1]) {
+						finalSetAttrs.caster_level = spellcastingLevelSearch[1];
+					}
+
 					let match;
 					while ((match = spellcastingRegex.exec(freetext)) !== null) {
 						if (match && match[1] && match[2]) {
