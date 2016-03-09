@@ -1330,11 +1330,6 @@ const updateAttackToggle = (v, finalSetAttrs, repeatingString, options) => {
       attackFormula += '0[unproficient]';
     }
 
-    if (isUndefined(v[`${repeatingString}ammo`]) && isUndefined(finalSetAttrs[`${repeatingString}ammo_weight`]) && v[`${repeatingString}type`] === 'Ranged Weapon') {
-      finalSetAttrs[`${repeatingString}ammo`] = '1';
-      finalSetAttrs[`${repeatingString}ammo_weight`] = '.02';
-    }
-
     let attackAbility = v[`${repeatingString}attack_ability`];
     if (isUndefined(attackAbility) && v[`${repeatingString}type`] === 'Ranged Weapon') {
       attackAbility = '@{dexterity_mod}';
@@ -1672,7 +1667,6 @@ const updateAttackQuery = () => {
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}reach`);
       collectionArray.push(`${repeatingString}range`);
-      collectionArray.push(`${repeatingString}ammo`);
       collectionArray.push(`${repeatingString}to_hit`);
       collectionArray.push(`${repeatingString}attack_formula`);
       collectionArray.push(`${repeatingString}roll_toggle`);
@@ -1691,7 +1685,6 @@ const updateAttackQuery = () => {
         finalSetAttrs.attack_query_const += ` {{title=' + ${v[`${repeatingString}name`]}&#125;&#125;`;
         finalSetAttrs.attack_query_const += `{{reach=' + ${emptyIfUndefined(v[`${repeatingString}reach`])}&#125;&#125;`;
         finalSetAttrs.attack_query_const += `{{range=' + ${emptyIfUndefined(v[`${repeatingString}range`])}&#125;&#125;`;
-        finalSetAttrs.attack_query_const += `{{ammo=' + ${emptyIfUndefined(v[`${repeatingString}ammo`])}&#125;&#125;`;
         finalSetAttrs.attack_query_const += emptyIfUndefined(v[`${repeatingString}roll_toggle`]);
         finalSetAttrs.attack_query_const += emptyIfUndefined(v[`${repeatingString}saving_throw_toggle`]);
         finalSetAttrs.attack_query_const += emptyIfUndefined(v[`${repeatingString}damage_toggle`]);
@@ -1748,8 +1741,6 @@ const updateAttack = (rowId) => {
       collectionArray.push(`${repeatingString}modifiers`);
       collectionArray.push(`${repeatingString}properties`);
       collectionArray.push(`${repeatingString}weight`);
-      collectionArray.push(`${repeatingString}ammo`);
-      collectionArray.push(`${repeatingString}ammo_weight`);
       collectionArray.push(`${repeatingString}parsed`);
     }
 
@@ -1787,12 +1778,6 @@ const updateAttack = (rowId) => {
             if (attackProperties.indexOf('Finesse') !== -1) {
               finalSetAttrs[`${repeatingString}attack_ability`] = '@{finesse_mod}';
               finalSetAttrs[`${repeatingString}damage_ability`] = '@{finesse_mod}';
-            }
-            if (attackProperties.indexOf('Thrown') !== -1) {
-              const ammoWeight = parseFloat(v[`${repeatingString}weight`]);
-              finalSetAttrs[`${repeatingString}ammo`] = 1;
-              finalSetAttrs[`${repeatingString}ammo_weight`] = ammoWeight;
-              finalSetAttrs[`${repeatingString}weight`] = 0;
             }
             if (!finalSetAttrs[`${repeatingString}parsed`]) {
               finalSetAttrs[`${repeatingString}parsed`] = '';
@@ -1834,16 +1819,14 @@ on('change:repeating_attack', (eventInfo) => {
     updateAttackQuery();
   }
 });
-on('change:repeating_attack:carried change:repeating_attack:weight change:repeating_attack:ammo change:repeating_attack:ammo_weight remove:repeating_attack', () => {
+on('change:repeating_attack:carried change:repeating_attack:weight remove:repeating_attack', () => {
   const options = {
     collection: 'attack',
     toggle: 'carried',
-    qty: 'ammo'
   };
   const sumItems = [
     {
-      addOnAfterQty: 'weight',
-      fieldToAdd: 'ammo_weight',
+      fieldToAdd: 'weight',
       itemTotal: 'weight_total',
       totalField: 'weight_attacks'
     }
