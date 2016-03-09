@@ -20,7 +20,7 @@ const SKILLS = {
     religion: 'intelligence',
     sleightOfHand: 'dexterity',
     stealth: 'dexterity',
-    survival: 'wisdom'
+    survival: 'wisdom',
   },
   names: {
     en: {
@@ -41,7 +41,7 @@ const SKILLS = {
       religion: 'Religion',
       sleightOfHand: 'Sleight of Hand',
       stealth: 'Stealth',
-      survival: 'Survival'
+      survival: 'Survival',
     },
     de: {
       acrobatics: 'Akrobatik',
@@ -61,7 +61,7 @@ const SKILLS = {
       religion: 'Religion',
       sleightOfHand: 'Taschendiebstahl',
       stealth: 'Tarnung',
-      survival: 'Überleben'
+      survival: 'Überleben',
     },
     fr: {
       acrobatics: 'Acrobaties',
@@ -81,9 +81,9 @@ const SKILLS = {
       religion: 'Religion',
       sleightOfHand: 'Escamotage',
       stealth: 'Discrétion',
-      survival: 'Survie'
-    }
-  }
+      survival: 'Survie',
+    },
+  },
 };
 const CLASSES = ['barbarian', 'bard', 'cleric', 'druid', 'fighter', 'monk', 'paladin', 'ranger', 'rogue', 'sorcerer', 'warlock', 'wizard'];
 const ABILITIES = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
@@ -451,7 +451,7 @@ on('change:cp change:sp change:ep change:gp change:pp', () => {
     const coinWeight = (copperPieces + silverPieces + electrumPieces + goldPieces + platinumPieces) / 50;
     setAttrs({
       total_gp: totalGold.toFixed(2),
-      weight_coinage: coinWeight
+      weight_coinage: coinWeight,
     });
   });
 });
@@ -542,49 +542,49 @@ const updateLevels = () => {
 
   const defaultClassDetails = {
     barbarian: {
-      hd: 'd12'
+      hd: 'd12',
     },
     bard: {
       hd: 'd8',
-      spellcasting: 'full'
+      spellcasting: 'full',
     },
     cleric: {
       hd: 'd8',
-      spellcasting: 'full'
+      spellcasting: 'full',
     },
     druid: {
       hd: 'd8',
-      spellcasting: 'full'
+      spellcasting: 'full',
     },
     fighter: {
-      hd: 'd10'
+      hd: 'd10',
     },
     monk: {
-      hd: 'd8'
+      hd: 'd8',
     },
     paladin: {
       hd: 'd10',
-      spellcasting: 'half'
+      spellcasting: 'half',
     },
     ranger: {
       hd: 'd10',
-      spellcasting: 'half'
+      spellcasting: 'half',
     },
     rogue: {
-      hd: 'd8'
+      hd: 'd8',
     },
     sorcerer: {
       hd: 'd6',
-      spellcasting: 'full'
+      spellcasting: 'full',
     },
     warlock: {
       hd: 'd8',
-      spellcasting: 'warlock'
+      spellcasting: 'warlock',
     },
     wizard: {
       hd: 'd6',
-      spellcasting: 'full'
-    }
+      spellcasting: 'full',
+    },
   };
   const hd = {
     d20: 0,
@@ -594,13 +594,13 @@ const updateLevels = () => {
     d6: 0,
     d4: 0,
     d2: 0,
-    d0: 0
+    d0: 0,
   };
   const spellcasting = {
     full: 0,
     half: 0,
     third: 0,
-    warlock: 0
+    warlock: 0,
   };
   let totalLevel = 0;
   const levelArray = [];
@@ -786,7 +786,7 @@ const updateSpellSlots = () => {
     6: 0,
     7: 0,
     8: 0,
-    9: 0
+    9: 0,
   };
 
   for (let i = 1; i <= 9; i++) {
@@ -1124,7 +1124,7 @@ const updateArmor = (rowId) => {
   const options = {
     collection: 'armor',
     getExtraFields: ['medium_armor_max_dex', 'dexterity_mod', 'ac_unarmored_ability', 'is_npc'],
-    toggle: 'worn'
+    toggle: 'worn',
   };
   for (let i = 0; i < ABILITIES.length; i++) {
     options.getExtraFields.push(`${ABILITIES[i]}_mod`);
@@ -1132,7 +1132,7 @@ const updateArmor = (rowId) => {
   const sumItems = [
     {
       fieldToAdd: 'weight',
-      totalField: 'weight_armor'
+      totalField: 'weight_armor',
     },
     {
       fieldToAdd: 'ac_base',
@@ -1140,8 +1140,8 @@ const updateArmor = (rowId) => {
       armorType: 'type',
       itemTotal: 'ac_total',
       totalField: 'ac_armored_calc',
-      totalFieldSecondary: 'ac_unarmored_calc'
-    }
+      totalFieldSecondary: 'ac_unarmored_calc',
+    },
   ];
   sumRepeating(options, sumItems);
 };
@@ -1203,14 +1203,14 @@ const weighEquipment = () => {
   const options = {
     collection: 'equipment',
     toggle: 'carried',
-    qty: 'qty'
+    qty: 'qty',
   };
   const sumItems = [
     {
       fieldToAdd: 'weight',
       itemTotal: 'weight_total',
-      totalField: 'weight_equipment'
-    }
+      totalField: 'weight_equipment',
+    },
   ];
   sumRepeating(options, sumItems);
 };
@@ -1312,7 +1312,7 @@ const updateAttackToggle = (v, finalSetAttrs, repeatingString, options) => {
     parseName: 'attack',
     toggleField: 'roll_toggle',
     toggleFieldSetTo: '@{roll_toggle_var}',
-    triggerFields: ['type']
+    triggerFields: ['type'],
   };
   parseAttackComponent(v, repeatingString, finalSetAttrs, attackParse);
 
@@ -1383,7 +1383,7 @@ const updateSavingThrowToggle = (v, finalSetAttrs, repeatingString, options) => 
     parseName: 'savingThrow',
     toggleField: 'saving_throw_toggle',
     toggleFieldSetTo: '@{saving_throw_toggle_var}',
-    triggerFields: ['saving_throw_vs_ability']
+    triggerFields: ['saving_throw_vs_ability'],
   };
   parseAttackComponent(v, repeatingString, finalSetAttrs, savingThrowParse);
 
@@ -1411,7 +1411,7 @@ const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
     parseName: 'damage',
     toggleField: 'damage_toggle',
     toggleFieldSetTo: '@{damage_toggle_var}',
-    triggerFields: ['damage']
+    triggerFields: ['damage'],
   };
   parseAttackComponent(v, repeatingString, finalSetAttrs, damageParse);
 
@@ -1509,7 +1509,7 @@ const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
     parseName: 'secondDamage',
     toggleField: 'second_damage_toggle',
     toggleFieldSetTo: '@{second_damage_toggle_var}',
-    triggerFields: ['second_damage']
+    triggerFields: ['second_damage'],
   };
   parseAttackComponent(v, repeatingString, finalSetAttrs, secondDamageParse);
 
@@ -1587,7 +1587,7 @@ const updateHealToggle = (v, finalSetAttrs, repeatingString) => {
     parseName: 'heal',
     toggleField: 'heal_toggle',
     toggleFieldSetTo: '@{heal_toggle_var}',
-    triggerFields: ['heal']
+    triggerFields: ['heal'],
   };
   parseAttackComponent(v, repeatingString, finalSetAttrs, healParse);
 
@@ -1622,7 +1622,7 @@ const updateHigherLevelToggle = (v, finalSetAttrs, repeatingString) => {
     parseName: 'higherLevel',
     toggleField: 'higher_level_toggle',
     toggleFieldSetTo: '@{higher_level_toggle_var}',
-    triggerFields: ['higher_level_dice', 'higher_level_die', 'second_higher_level_dice', 'second_higher_level_die', 'higher_level_heal']
+    triggerFields: ['higher_level_dice', 'higher_level_die', 'second_higher_level_dice', 'second_higher_level_die', 'higher_level_heal'],
   };
   parseAttackComponent(v, repeatingString, finalSetAttrs, higherLevelParse);
 
@@ -1792,7 +1792,7 @@ const updateAttack = (rowId) => {
           globalAttackBonusLabel: 'global attack bonus',
           globalMeleeAttackBonus: v.global_melee_attack_bonus,
           globalRangedAttackBonus: v.global_ranged_attack_bonus,
-          type: 'attack'
+          type: 'attack',
         };
         updateAttackToggle(v, finalSetAttrs, repeatingString, attackOptions);
 
@@ -1803,7 +1803,7 @@ const updateAttack = (rowId) => {
           globalDamageBonus: v.global_damage_bonus,
           globalMeleeDamageBonus: v.global_melee_damage_bonus,
           globalRangedDamageBonus: v.global_ranged_damage_bonus,
-          type: 'attack'
+          type: 'attack',
         };
         updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
       }
@@ -1828,8 +1828,8 @@ on('change:repeating_attack:carried change:repeating_attack:weight remove:repeat
     {
       fieldToAdd: 'weight',
       itemTotal: 'weight_total',
-      totalField: 'weight_attacks'
-    }
+      totalField: 'weight_attacks',
+    },
   ];
   sumRepeating(options, sumItems);
 });
@@ -1945,18 +1945,18 @@ const updateSpell = (rowId) => {
         const attackOptions = {
           attackAbility: true,
           globalAttackBonus: v.global_spell_attack_bonus,
-          type: 'spell'
+          type: 'spell',
         };
         updateAttackToggle(v, finalSetAttrs, repeatingString, attackOptions);
 
         const savingThrowOptions = {
-          bonusDC: v.global_spell_dc_bonus
+          bonusDC: v.global_spell_dc_bonus,
         };
         updateSavingThrowToggle(v, finalSetAttrs, repeatingString, savingThrowOptions);
 
         const damageOptions = {
           globalDamageBonus: v.global_spell_damage_bonus,
-          type: 'spell'
+          type: 'spell',
         };
         updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
 
@@ -2436,7 +2436,7 @@ const updateNPCChallenge = () => {
       27: 105000,
       28: 120000,
       29: 135000,
-      30: 155000
+      30: 155000,
     };
 
     finalSetAttrs.xp = xpPerChallenge[challenge];
@@ -2820,7 +2820,7 @@ const updateAction = (type, rowId) => {
             globalAttackBonusLabel: 'global attack bonus',
             globalMeleeAttackBonus: v.global_melee_attack_bonus,
             globalRangedAttackBonus: v.global_ranged_attack_bonus,
-            type: 'attack'
+            type: 'attack',
           };
         }
         updateAttackToggle(v, finalSetAttrs, repeatingString, attackOptions);
@@ -2834,7 +2834,7 @@ const updateAction = (type, rowId) => {
             globalDamageBonus: v.global_damage_bonus,
             globalMeleeDamageBonus: v.global_melee_damage_bonus,
             globalRangedDamageBonus: v.global_ranged_damage_bonus,
-            type: 'attack'
+            type: 'attack',
           };
         }
         updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
@@ -3173,7 +3173,7 @@ const updateSize = () => {
       Medium: 8,
       Large: 10,
       Huge: 12,
-      Gargantuan: 20
+      Gargantuan: 20,
     };
     finalSetAttrs.hit_die = `d${sizeToHdSize[creatureSize]}`;
     setFinalAttrs(v, finalSetAttrs);
@@ -3390,7 +3390,7 @@ const resourcesToClassFeatures = () => {
       for (let i = 0; i < ids.length; i++) {
         repeatingString = `${repeatingItem}_${ids[i]}_`;
         const newRowId = generateRowID();
-        let newRepeatingString = `${newRepeatingItem}_${newRowId}_`;
+        const newRepeatingString = `${newRepeatingItem}_${newRowId}_`;
 
         finalSetAttrs[`${newRepeatingString}name`] = v[`${repeatingString}name`];
         finalSetAttrs[`${newRepeatingString}uses`] = v[`${repeatingString}uses`];

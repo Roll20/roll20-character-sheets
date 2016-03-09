@@ -134,7 +134,6 @@ var esLintConfig = {
 	rules: {
 		'arrow-body-style': 0,
 		'indent': 0,
-		'comma-dangle': 0,
 		'max-len': 0,
 		'no-cond-assign': 0,
 		'no-console': 0,
