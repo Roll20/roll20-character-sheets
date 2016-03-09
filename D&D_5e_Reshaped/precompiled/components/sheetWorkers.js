@@ -3216,11 +3216,11 @@ on('change:type', () => {
 });
 
 const updateAlignment = () => {
-  const collectionArray = ['alignment'];
+  const collectionArray = ['alignment', 'is_npc'];
   const finalSetAttrs = {};
 
   getAttrs(collectionArray, (v) => {
-    if (v.alignment) {
+    if (v.alignment && v.is_npc) {
       finalSetAttrs.alignment = lowercaseWords(v.alignment);
     }
     setFinalAttrs(v, finalSetAttrs);
