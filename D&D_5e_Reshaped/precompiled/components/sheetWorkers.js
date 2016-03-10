@@ -1,6 +1,6 @@
 'use strict';
 
-const currentVersion = '2.2.3';
+const currentVersion = '2.2.4';
 const SKILLS = {
   abilities: {
     acrobatics: 'dexterity',
@@ -1259,24 +1259,25 @@ const updateInitiative = () => {
   const finalSetAttrs = {};
 
   finalSetAttrs.initiative = 0;
-  finalSetAttrs.initiative_formula = '';
   getAttrs(collectionArray, (v) => {
     const dexMod = getIntValue(v.dexterity_mod);
     if (exists(dexMod)) {
       finalSetAttrs.initiative += dexMod;
     }
-    finalSetAttrs.initiative_formula += `${dexMod}[dex]`;
+    finalSetAttrs.initiative_formula = `${dexMod}[dex]`;
 
     const dexCheckBonus = getIntValue(v.dexterity_check_bonus);
     if (exists(dexCheckBonus)) {
       finalSetAttrs.initiative += dexCheckBonus;
-      finalSetAttrs.initiative_formula += `${dexCheckBonus}[dex check bonus]`;
+      finalSetAttrs.initiative_formula += ` + ${dexCheckBonus}[dex check bonus]`;
     }
 
-    const initiativeBonus = getIntValue(v.initiative_bonus);
+    const initiativeBonus = v.initiative_bonus;
     if (exists(initiativeBonus)) {
-      finalSetAttrs.initiative += initiativeBonus;
-      finalSetAttrs.initiative_formula += ` + ${initiativeBonus}[initiative bonus]`;
+      if (!isNaN(initiativeBonus)) {
+        finalSetAttrs.initiative += getIntValue(initiativeBonus);
+      }
+      finalSetAttrs.initiative_formula += ` + @{initiative_bonus}[initiative bonus]`;
     }
 
     if (v.remarkable_athlete_toggle === '@{remarkable_athlete}') {
@@ -3618,6 +3619,9 @@ const sheetOpened = () => {
     }
     if (versionCompare(version, '2.2.2') < 0) {
       resourcesToClassFeatures();
+    }
+    if (versionCompare(version, '2.2.4') < 0) {
+      updateInitiative();
     }
 
     if (!version || version !== currentVersion) {
