@@ -538,11 +538,12 @@ on('change:charisma change:charisma_bonus change:charisma_check_mod change:chari
 
 const updateLevels = () => {
   const repeatingItem = 'repeating_class';
-  const collectionArray = ['action_surge_uses_max', 'ki_max', 'lay_on_hands_uses_max', 'sorcery_points_max', 'warlock_spell_slots_max', 'is_npc'];
+  const collectionArray = ['is_npc'];
   const finalSetAttrs = {};
 
   for (let i = 0; i < CLASSES.length; i++) {
     collectionArray.push(`${CLASSES[i]}_level`);
+    collectionArray.push(`has_${CLASSES[i]}_levels`);
   }
 
   const defaultClassDetails = {
@@ -612,6 +613,14 @@ const updateLevels = () => {
   let classesWithSpellcasting = 0;
   const xpTable = [0, 300, 900, 2700, 6500, 14000, 23000, 34000, 48000, 64000, 85000, 100000, 120000, 140000, 165000, 195000, 225000, 265000, 305000, 355000, 385000, 405000, 435000, 465000, 495000, 525000, 555000, 585000, 605000, 635000, 665000];
 
+  for (const key in hd) {
+    if (hd.hasOwnProperty(key)) {
+      collectionArray.push(`hd_${key}_max`);
+      collectionArray.push(`hd_${key}_query`);
+      collectionArray.push(`hd_${key}_query`);
+    }
+  }
+
   getSectionIDs(repeatingItem, (ids) => {
     for (let i = 0; i < ids.length; i++) {
       const repeatingString = `${repeatingItem}_${ids[i]}_`;
@@ -620,6 +629,7 @@ const updateLevels = () => {
       collectionArray.push(`${repeatingString}custom_name`);
       collectionArray.push(`${repeatingString}hd`);
       collectionArray.push(`${repeatingString}spellcasting`);
+      collectionArray.push(`${repeatingString}custom_class_toggle`);
     }
 
     getAttrs(collectionArray, (v) => {
@@ -642,7 +652,7 @@ const updateLevels = () => {
           } else {
             className = 'custom';
           }
-        } else {
+        } else if (v[`${repeatingString}custom_class_toggle`]) {
           finalSetAttrs[`${repeatingString}custom_class_toggle`] = 0;
         }
 
@@ -691,9 +701,15 @@ const updateLevels = () => {
             finalSetAttrs[`hd_${key}_query`] += '}';
             finalSetAttrs[`hd_${key}_toggle`] = 1;
           } else {
-            finalSetAttrs[`hd_${key}_max`] = 0;
-            finalSetAttrs[`hd_${key}_query`] = '';
-            finalSetAttrs[`hd_${key}_toggle`] = 0;
+            if (v[`hd_${key}_max`]) {
+              finalSetAttrs[`hd_${key}_max`] = 0;
+            }
+            if (v[`hd_${key}_query`]) {
+              finalSetAttrs[`hd_${key}_query`] = '';
+            }
+            if (v[`hd_${key}_toggle`]) {
+              finalSetAttrs[`hd_${key}_toggle`] = 0;
+            }
           }
         }
       }
@@ -733,28 +749,11 @@ const updateLevels = () => {
       for (let y = 0; y < CLASSES.length; y++) {
         if (finalSetAttrs[`${CLASSES[y]}_level`] > 0) {
           finalSetAttrs[`has_${CLASSES[y]}_levels`] = 1;
-        } else {
+        } else if (v[`has_${CLASSES[y]}_levels`]) {
           finalSetAttrs[`has_${CLASSES[y]}_levels`] = 0;
         }
       }
 
-      if (v.fighter_level >= 17) {
-        finalSetAttrs.action_surge_uses_max = 2;
-      } else if (v.fighter_level >= 1) {
-        finalSetAttrs.action_surge_uses_max = 1;
-      } else if (!isUndefined(v.action_surge_uses_max)) {
-        finalSetAttrs.action_surge_uses_max = 0;
-      }
-      if (finalSetAttrs.monk_level > 1) {
-        finalSetAttrs.ki_max = finalSetAttrs.monk_level;
-      } else if (!isUndefined(v.ki_max)) {
-        finalSetAttrs.ki_max = 0;
-      }
-      if (finalSetAttrs.paladin_level > 0) {
-        finalSetAttrs.lay_on_hands_uses_max = finalSetAttrs.paladin_level * 5;
-      } else if (!isUndefined(v.lay_on_hands_uses_max)) {
-        finalSetAttrs.lay_on_hands_uses_max = 0;
-      }
       if (finalSetAttrs.sorcerer_level > 1) {
         finalSetAttrs.sorcery_points_max = finalSetAttrs.sorcerer_level;
       } else if (!isUndefined(v.sorcery_points_max)) {
