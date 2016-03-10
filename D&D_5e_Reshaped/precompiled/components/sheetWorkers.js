@@ -457,12 +457,13 @@ on('change:cp change:sp change:ep change:gp change:pp', () => {
 });
 
 const updateAbilityModifier = (ability) => {
-  const collectionArray = [ability, `${ability}_bonus`, `${ability}_mod`, `${ability}_check_mod`, 'global_ability_bonus', 'strength_mod', 'dexterity_mod', 'jack_of_all_trades_toggle', 'jack_of_all_trades', 'remarkable_athlete_toggle', 'remarkable_athlete', 'global_check_bonus'];
+  const collectionArray = [ability, `${ability}_bonus`, `${ability}_mod`, `${ability}_check_mod`, `${ability}_check_bonus`, 'global_ability_bonus', 'strength_mod', 'dexterity_mod', 'jack_of_all_trades_toggle', 'jack_of_all_trades', 'remarkable_athlete_toggle', 'remarkable_athlete', 'global_check_bonus'];
   const finalSetAttrs = {};
 
   getAttrs(collectionArray, (v) => {
     const abilityScore = getIntValue(v[ability]);
     const abilityBonus = getIntValue(v[`${ability}_bonus`]);
+    const abilityCheckBonus = getIntValue(v[`${ability}_check_bonus`]);
     const globalAbilityBonus = getIntValue(v.global_ability_bonus);
     const abilityMod = getAbilityMod((abilityScore + abilityBonus + globalAbilityBonus));
 
@@ -476,6 +477,10 @@ const updateAbilityModifier = (ability) => {
       const jackOfAllTrades = getIntValue(v.jack_of_all_trades);
       abilityCheck += jackOfAllTrades;
       abilityCheckFormula += ` + ${jackOfAllTrades}[jack of all trades]`;
+    }
+    if (abilityCheckBonus) {
+      abilityCheck += abilityCheckBonus;
+      abilityCheckFormula += ` + ${abilityCheckBonus}[${ability} check bonus]`;
     }
     if (!isNaN(v.global_check_bonus)) {
       abilityCheck += getIntValue(v.global_check_bonus);
@@ -512,22 +517,22 @@ const updateAbilityModifiers = () => {
   updateAbilityModifier('wisdom');
   updateAbilityModifier('charisma');
 };
-on('change:strength change:strength_bonus change:strength_check_mod change:jack_of_all_trades_toggle change:jack_of_all_trades change:remarkable_athlete_toggle change:remarkable_athlete change:global_ability_bonus', () => {
+on('change:strength change:strength_bonus change:strength_check_mod change:strength_check_bonus change:jack_of_all_trades_toggle change:jack_of_all_trades change:remarkable_athlete_toggle change:remarkable_athlete change:global_ability_bonus', () => {
   updateAbilityModifier('strength');
 });
-on('change:dexterity change:dexterity_bonus change:dexterity_check_mod change:jack_of_all_trades_toggle change:jack_of_all_trades change:remarkable_athlete_toggle change:remarkable_athlete change:global_ability_bonus', () => {
+on('change:dexterity change:dexterity_bonus change:dexterity_check_mod change:dexterity_check_bonus change:jack_of_all_trades_toggle change:jack_of_all_trades change:remarkable_athlete_toggle change:remarkable_athlete change:global_ability_bonus', () => {
   updateAbilityModifier('dexterity');
 });
-on('change:constitution change:constitution_bonus change:constitution_check_mod change:jack_of_all_trades_toggle change:jack_of_all_trades change:remarkable_athlete_toggle change:remarkable_athlete change:global_ability_bonus', () => {
+on('change:constitution change:constitution_bonus change:constitution_check_mod change:constitution_check_bonus change:jack_of_all_trades_toggle change:jack_of_all_trades change:remarkable_athlete_toggle change:remarkable_athlete change:global_ability_bonus', () => {
   updateAbilityModifier('constitution');
 });
-on('change:intelligence change:intelligence_bonus change:intelligence_check_mod change:jack_of_all_trades_toggle change:jack_of_all_trades change:global_ability_bonus', () => {
+on('change:intelligence change:intelligence_bonus change:intelligence_check_mod change:intelligence_check_bonus change:jack_of_all_trades_toggle change:jack_of_all_trades change:global_ability_bonus', () => {
   updateAbilityModifier('intelligence');
 });
-on('change:wisdom change:wisdom_bonus change:wisdom_check_mod change:jack_of_all_trades_toggle change:jack_of_all_trades change:global_ability_bonus', () => {
+on('change:wisdom change:wisdom_bonus change:wisdom_check_mod change:wisdom_check_bonus change:jack_of_all_trades_toggle change:jack_of_all_trades change:global_ability_bonus', () => {
   updateAbilityModifier('wisdom');
 });
-on('change:charisma change:charisma_bonus change:charisma_check_mod change:jack_of_all_trades_toggle change:jack_of_all_trades change:global_ability_bonus', () => {
+on('change:charisma change:charisma_bonus change:charisma_check_mod change:charisma_check_bonus change:jack_of_all_trades_toggle change:jack_of_all_trades change:global_ability_bonus', () => {
   updateAbilityModifier('charisma');
 });
 
