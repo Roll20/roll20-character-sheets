@@ -692,7 +692,7 @@ const updateLevels = () => {
             finalSetAttrs[`hd_${key}_toggle`] = 1;
           } else {
             finalSetAttrs[`hd_${key}_max`] = 0;
-            finalSetAttrs[`hd_${key}_query`] += '';
+            finalSetAttrs[`hd_${key}_query`] = '';
             finalSetAttrs[`hd_${key}_toggle`] = 0;
           }
         }
