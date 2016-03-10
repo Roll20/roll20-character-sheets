@@ -536,7 +536,7 @@ on('change:charisma change:charisma_bonus change:charisma_check_mod change:chari
   updateAbilityModifier('charisma');
 });
 
-const updateLevels = () => {
+const updateLevels = (removeClass) => {
   const repeatingItem = 'repeating_class';
   const collectionArray = ['is_npc'];
   const finalSetAttrs = {};
@@ -667,7 +667,7 @@ const updateLevels = () => {
         }
 
         let classHd = v[`${repeatingString}hd`];
-        if (isUndefined(classHd)) {
+        if (isUndefined(classHd) && removeClass !== 'remove') {
           if (defaultClassDetails.hasOwnProperty(className)) {
             classHd = defaultClassDetails[className].hd;
             finalSetAttrs[`${repeatingString}hd`] = classHd;
@@ -692,7 +692,7 @@ const updateLevels = () => {
 
       for (const key in hd) {
         if (hd.hasOwnProperty(key)) {
-          if (hd[key] !== 0) {
+          if (hd[key] && hd[key] !== 0) {
             finalSetAttrs[`hd_${key}_max`] = hd[key];
             finalSetAttrs[`hd_${key}_query`] = '?{HD';
             for (let x = 1; x <= hd[key]; x++) {
@@ -930,8 +930,14 @@ const updateSpellSlots = () => {
     setFinalAttrs(v, finalSetAttrs);
   });
 };
-on('change:repeating_class remove:repeating_class', () => {
+on('change:repeating_class', () => {
+  console.log('change:repeating_class');
   updateLevels();
+  updateSpellSlots();
+});
+on('remove:repeating_class', () => {
+  console.log('remove:repeating_class');
+  updateLevels('remove');
   updateSpellSlots();
 });
 on('change:caster_level change:spell_slots_l1_bonus change:spell_slots_l2_bonus change:spell_slots_l3_bonus change:spell_slots_l4_bonus change:spell_slots_l5_bonus change:spell_slots_l6_bonus change:spell_slots_l7_bonus change:spell_slots_l8_bonus change:spell_slots_l9_bonus', () => {
