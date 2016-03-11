@@ -1228,6 +1228,23 @@ on('change:repeating_equipment:carried change:repeating_equipment:qty change:rep
   weighEquipment();
 });
 
+const weighAmmo = () => {
+  const options = {
+    collection: 'ammo',
+    qty: 'qty',
+  };
+  const sumItems = [
+    {
+      fieldToAdd: 'weight',
+      totalField: 'weight_ammo',
+    },
+  ];
+  sumRepeating(options, sumItems);
+};
+on('change:repeating_ammo:weight change:repeating_ammo:qty', () => {
+  weighAmmo();
+});
+
 const updateJackOfAllTrades = () => {
   const collectionArray = ['pb'];
   const finalSetAttrs = {};
@@ -1306,15 +1323,15 @@ on('change:dexterity_mod change:dexterity_check_bonus change:initiative_bonus ch
 });
 
 const updateWeight = () => {
-  const collectionArray = ['weight_attacks', 'weight_armor', 'weight_equipment', 'weight_coinage', 'weight_misc'];
+  const collectionArray = ['weight_attacks', 'weight_ammo', 'weight_armor', 'weight_equipment', 'weight_coinage', 'weight_misc'];
   const finalSetAttrs = {};
 
   getAttrs(collectionArray, (v) => {
-    finalSetAttrs.weight_total = round((getFloatValue(v.weight_attacks) + getFloatValue(v.weight_armor) + getFloatValue(v.weight_equipment) + getFloatValue(v.weight_coinage) + getFloatValue(v.weight_misc)), 2);
+    finalSetAttrs.weight_total = round((getFloatValue(v.weight_attacks) + getFloatValue(v.weight_ammo) + getFloatValue(v.weight_armor) + getFloatValue(v.weight_equipment) + getFloatValue(v.weight_coinage) + getFloatValue(v.weight_misc)), 2);
     setFinalAttrs(v, finalSetAttrs);
   });
 };
-on('change:weight_attacks change:weight_armor change:weight_equipment change:weight_coinage change:weight_misc', () => {
+on('change:weight_attacks change:weight_ammo change:weight_armor change:weight_equipment change:weight_coinage change:weight_misc', () => {
   updateWeight();
 });
 const updateAttackToggle = (v, finalSetAttrs, repeatingString, options) => {
@@ -3622,6 +3639,9 @@ const sheetOpened = () => {
     }
     if (versionCompare(version, '2.2.4') < 0) {
       updateInitiative();
+    }
+    if (versionCompare(version, '2.2.5') < 0) {
+      weighAmmo();
     }
 
     if (!version || version !== currentVersion) {
