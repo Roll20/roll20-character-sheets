@@ -5,7 +5,7 @@ Elle est aussi utilisable (et styl&eacute;e) pour _Numen&eacute;ra_ (modulo la g
 La VF s'appuie sur la traduction de Numen&eacute;ra par Black Book Editions.
 
 # Version courante :
-Version 1.2 (4 Octobre 2015) :
+Version 1.6 (21 Février 2016) :
 
 * Capture d'&eacute;cran [style Cypher System g&eacute;n&eacute;rique](CypherSystem.png)
 * Capture d'&eacute;cran [style Numen&eacute;ra](CypherSystem_style_Numenera.png)
@@ -52,6 +52,32 @@ Alternative (permettant de modifier les sources &agrave; votre convenance si vou
 Le script API permet que l'&eacute;tat du personnage soit automatiquement mis &agrave; jour en fonction de la perte de points de caract&eacute;ristiques, d'appliquer la perte de caract&eacute;ristique &agrave; partir des jets dans le chat, de remettre &agrave; z&eacute;ro les param&egrave;tres de jet, de reposer compl&egrave;tement le personnage en un clic.
 
 # Notes de version
+
+##Version 1.6 (21 Février 2016)
+Changements esthétiques, pour faciliter l'accès au bouton de suppression de ligne répétable, et diminuer la hauteur des lignes répétables.
+
+##Version 1.5 (21 Décembre 2015)
+
+* Nouvelles sections "Attaques" (1 par caractéristique) avec jets intégrés, prenant en compte le niveau de compétence, le coûts, les dégats etc.
+* Les jets de Caractéristiques et Compétences ne demandent plus/n'utilisent plus les efforts aux dégâts (utilisez les nouvelles sections Attaques en lieu et place)
+* Nouvelles options pour simplifier les jets : choisissez si le jet demande/utilise les Atouts, Bonus et Coûts. Le paramétrage par défaut est désormais de ne pas les utiliser.
+* Les boutons "Noms" (affichage des détails d'éléments dans le chat) ont été remplacés par des boutons image "Info"
+* Les boutons d'info peuvent être glisser/déposer dans la barre de macro
+* Nouveaux boutons d'info pour l'équipement (divers et consommables)
+* Correction d'un bug : le calcul du coût des efforts prend désormais en compte correctement le Curseur de Dégâts du personnage
+
+##Version 1.4 (21 Novembre 2015)
+[Voir le détail sur le forum Roll20](https://app.roll20.net/forum/post/2357046/cypher-system-core-rule-book-sheet/?pageforid=2645489#post-2645489)
+
+* Nouvelle option de la feuille pour choisir le type de paramétrage des jets : via la section Action ou via Questions (type macro)
+* Nouveaux boutons pour montrer dans le chat le détails des Aptitudes Spéciales, Cyphers et Artefacts
+
+##Version 1.3 (25 Octobre 2015)
+
+* Correction des jets avec Difficult&eacute; et Incapacit&eacute; : la difficult&eacute; finale est correctement affich&eacute;e,
+* Action : champs de saisie remplac&eacute;s par des listes d&eacute;roulantes pour une meilleure prise en compte des mises &agrave; jour par Roll20,
+* Possibilit&eacute; de saisir des Avantages n&eacute;gatifs (handicaps),
+* Remplacement du mot-cl&eacute; "Target" dans le code HTML et template permettant l'utilisation de macros custom.
 
 ##Version 1.2 (4 Octobre 2015)
 Le script API doit &ecirc;tre mis &agrave; jour en version 1.2.
