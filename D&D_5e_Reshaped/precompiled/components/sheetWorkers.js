@@ -3963,6 +3963,9 @@ const sheetOpened = () => {
       extasToExtrasFix('repeating_action');
       extasToExtrasFix('repeating_spell');
     }
+    if (versionCompare(version, '2.2.8') < 0) {
+      updateAttack();
+    }
 
     if (!version || version !== currentVersion) {
       finalSetAttrs.version = currentVersion;
