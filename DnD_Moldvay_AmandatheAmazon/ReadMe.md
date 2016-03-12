@@ -3,9 +3,14 @@
 This is a re-creation of the "green-sheet" for the D&D Basic Moldvay Red box game.  It was created for the Roll20 Moldvay Basic Contest.
 
 ## Current Version
-1.13
+1.14
 
 ### Changelog
+
+#### 1.14
+* Separated out the two sheets (Character Record and Monster) so that they are more noticeable to the GM/Players
+* Added To Hit AC for Monsters which fixes a bug with the new Attack Roll Template on the Monster Side
+* Beginnings of Monster Update 2.0 - Random Encounter and Distance rolls sent to GM
 
 #### 1.13
 * Added To Hit Armor Class in the attack rolls instead of showing the die roll - this will use the values listed in the To Hit Roll table
