@@ -3818,6 +3818,7 @@ const generateSkills = () => {
 };
 on('change:lang', () => {
   generateSkills();
+  updateLevels();
 });
 on('change:generate_skills', () => {
   generateSkills();
