@@ -1867,7 +1867,7 @@ on('change:global_attack_bonus change:global_melee_attack_bonus change:global_ra
 
 const updateSpell = (rowId) => {
   const repeatingItem = 'repeating_spell';
-  const collectionArray = ['pb', 'finesse_mod', 'global_spell_attack_bonus', 'global_spell_damage_bonus', 'global_spell_dc_bonus', 'global_spell_heal_bonus', 'default_ability', 'caster_level'];
+  const collectionArray = ['is_npc', 'pb', 'finesse_mod', 'global_spell_attack_bonus', 'global_spell_damage_bonus', 'global_spell_dc_bonus', 'global_spell_heal_bonus', 'default_ability', 'caster_level'];
   const finalSetAttrs = {};
 
   for (let i = 0; i < ABILITIES.length; i++) {
@@ -1988,7 +1988,7 @@ const updateSpell = (rowId) => {
         };
         updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
 
-        if (v.caster_level && v[`${repeatingString}damage`] && v[`${repeatingString}damage`].indexOf('@{level}') !== -1) {
+        if (v.is_npc && v.caster_level && v[`${repeatingString}damage`] && v[`${repeatingString}damage`].indexOf('@{level}') !== -1) {
           finalSetAttrs[`${repeatingString}damage`] = v[`${repeatingString}damage`].replace('@{level}', '@{caster_level}');
         }
 
