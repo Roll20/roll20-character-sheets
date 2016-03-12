@@ -26,11 +26,19 @@ const CLASSES = ['barbarian', 'bard', 'cleric', 'druid', 'fighter', 'monk', 'pal
 const ABILITIES = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
 
 const translate = (language, key) => {
-  if (TRANSLATIONS[language] && TRANSLATIONS[language][key]) {
-    return TRANSLATIONS[language][key];
-  } else {
-    return TRANSLATIONS.en[key];
+  let translatedValue;
+  if (key.indexOf('.') !== -1) {
+    translatedValue = key.split('.').reduce((a, b) => a[b], TRANSLATIONS[language]);
   }
+
+  if (TRANSLATIONS[language] && TRANSLATIONS[language][key]) {
+    translatedValue = TRANSLATIONS[language][key];
+  }
+
+  if (!translatedValue && language !== 'en') {
+    translate('en', key);
+  }
+  return translatedValue;
 };
 const capitalize = (string) => {
   return string.replace(/\w\S*/g, (txt) => {
@@ -731,9 +739,11 @@ const updateLevels = (removeClass) => {
 
 const setClassFeatures = (levelsData) => {
   const finalSetAttrs = {};
-  const collectionArray = ['ac_unarmored_ability'];
+  const collectionArray = ['ac_unarmored_ability', 'lang'];
 
   getAttrs(collectionArray, (v) => {
+    const language = v.lang || 'en';
+
     if (levelsData['barbarian_level'] >= 1) {
       let rageUses = 2;
       if (levelsData['barbarian_level'] >= 20) {
@@ -748,12 +758,8 @@ const setClassFeatures = (levelsData) => {
         rageUses = 3;
       }
       setClassFeature({
-        freetext: 'On your turn, you can enter a rage as a bonus action. While raging, you gain the following benefits if you aren’t wearing heavy armor:' +
-        '\n•You have advantage on Strength checks and Strength saving throws.' +
-        '\n•When you make a melee weapon attack using Strength, you gain a bonus to the damage roll that increases as you gain levels as a barbarian, as shown in the Rage Damage column of the Barbarian table.' +
-        '\n•You have resistance to bludgeoning, piercing, and slashing damage' +
-        '\nIf you are able to cast spells, you can’t cast them or concentrate on them while raging.' +
-        '\nYour rage lasts for 1 minute. It ends early if you are knocked unconscious or if your turn ends and you haven’t attacked a hostile creature since your last turn or taken damage since then. You can also end your rage on your turn as a bonus action.',
+        freetext: translate(language, 'CLASS_FEATURES.RAGE_TEXT'),
+        name: translate(language, 'CLASS_FEATURES.RAGE'),
         recharge: 'Long Rest',
         storageName: 'Rage',
         uses_max: rageUses,
@@ -774,7 +780,7 @@ const setClassFeatures = (levelsData) => {
         });
         setTrait({
           storageName: 'Danger Sense',
-          freetext: 'You have advantage on Dexterity saving throws against effects that you can see, such as traps and spells. To gain this benefit, you can’t be blinded, deafened, or incapacitated.',
+          freetext: 'You have advantage on Dexterity saving throws against effects that you can see, such as traps and spells. To gain this benefit, you can\'t be blinded, deafened, or incapacitated.',
         });
       }
 
@@ -792,7 +798,7 @@ const setClassFeatures = (levelsData) => {
         setTrait({
           storageName: 'Feral Instinct',
           freetext: 'By 7th level, your instincts are so honed that you have advantage on initiative rolls.' +
-          '\nAdditionally, if you are surprised at the beginning of combat and aren’t incapacitated, you can act normally on your first turn, but only if you enter your rage before doing anything else on that turn.',
+          '\nAdditionally, if you are surprised at the beginning of combat and aren\'t incapacitated, you can act normally on your first turn, but only if you enter your rage before doing anything else on that turn.',
         });
       }
       if (levelsData['barbarian_level'] >= 9) {
@@ -805,7 +811,7 @@ const setClassFeatures = (levelsData) => {
       if (levelsData['barbarian_level'] >= 11) {
         setTrait({
           storageName: 'Relentless Rage',
-          freetext: 'Starting at 11th level, your rage can keep you fighting despite grievous wounds. If you drop to 0 hit points while you’re raging and don’t die outright, you can make a DC 10 Constitution saving throw. If you succeed, you drop to 1 hit point instead.' +
+          freetext: 'Starting at 11th level, your rage can keep you fighting despite grievous wounds. If you drop to 0 hit points while you\'re raging and don\'t die outright, you can make a DC 10 Constitution saving throw. If you succeed, you drop to 1 hit point instead.' +
           '\nEach time you use this feature after the first, the DC increases by 5. When you finish a short or long rest, the DC resets to 10',
         });
       }
@@ -3774,7 +3780,7 @@ const generateSkills = () => {
     }
 
     getAttrs(collectionArray, (v) => {
-      let language = v.lang || 'en';
+      const language = v.lang || 'en';
 
       let x = 0;
       Object.keys(SKILLS).forEach((key) => {
