@@ -2137,7 +2137,6 @@ const updateClassFeatureToggleToNewVer = () => {
   });
 };
 
-
 function updateD20Mod() {
   const collectionArray = ['halfling_luck'];
   const finalSetAttrs = {};
