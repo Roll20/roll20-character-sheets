@@ -1,6 +1,6 @@
 'use strict';
 
-const currentVersion = '2.2.4';
+const currentVersion = '2.2.5';
 const SKILLS = {
   abilities: {
     acrobatics: 'dexterity',
