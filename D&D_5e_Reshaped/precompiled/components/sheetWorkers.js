@@ -1947,7 +1947,7 @@ const updateAttack = (rowId) => {
         if (!isUndefined(ammoName)) {
           findAmmo(ammoName, (ammoQtyName) => {
             const setAmmo = {};
-            setAmmo[`${repeatingString}ammo_toggle_var`] = `{{ammo=[[${ammoQtyName}-@{ammo_auto_use}]]}} {{ammo_name=${ammoName}}`;
+            setAmmo[`${repeatingString}ammo_toggle_var`] = `{{ammo=[[${ammoQtyName}-@{ammo_auto_use}]]}} {{ammo_name=${ammoName}}}`;
             setFinalAttrs(v, setAmmo);
           });
         }
