@@ -1294,7 +1294,7 @@ const updateInitiative = () => {
       if (!isNaN(initiativeBonus)) {
         finalSetAttrs.initiative += getIntValue(initiativeBonus);
       }
-      finalSetAttrs.initiative_formula += ` + @{initiative_bonus}[initiative bonus]`;
+      finalSetAttrs.initiative_formula += ' + @{initiative_bonus}[initiative bonus]';
     }
 
     if (v.remarkable_athlete_toggle === '@{remarkable_athlete}') {
@@ -1739,7 +1739,7 @@ const findAmmo = (name, callback) => {
     getAttrs(collectionArray, (v) => {
       for (let j = 0; j < ids.length; j++) {
         const repeatingString = `${repeatingItem}_${ids[j]}_`;
-        if(v[`${repeatingString}name`] === name) {
+        if (v[`${repeatingString}name`] === name) {
           callback(`@{${repeatingString}qty}`);
         }
       }
@@ -1850,7 +1850,7 @@ const updateAttack = (rowId) => {
         updateAttackToggle(v, finalSetAttrs, repeatingString, attackOptions);
 
         const ammoName = v[`${repeatingString}ammo_field_name`];
-        if(!isUndefined(ammoName)) {
+        if (!isUndefined(ammoName)) {
           findAmmo(ammoName, (ammoQtyName) => {
             const setAmmo = {};
             setAmmo[`${repeatingString}ammo_toggle_var`] = `{{ammo=[[${ammoQtyName}-@{ammo_auto_use}]]}} {{ammo_name=${ammoName}}`;
@@ -2034,7 +2034,6 @@ const updateSpell = (rowId) => {
     });
   });
 };
-
 on('change:repeating_spell', (eventInfo) => {
   const changedField = getRepeatingField('repeating_spell', eventInfo);
   if (changedField !== 'error' && changedField !== 'toggle_details' && changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'heal_formula' && changedField !== 'higher_level_query' && changedField !== 'parsed') {
@@ -2046,6 +2045,98 @@ on('change:repeating_spell', (eventInfo) => {
 on('change:global_spell_attack_bonus change:global_spell_damage_bonus change:global_spell_dc_bonus change:global_spell_heal_bonus', () => {
   updateSpell();
 });
+
+const updateClassFeatures = (rowId) => {
+  const repeatingItem = 'repeating_classfeature';
+  const collectionArray = ['pb', 'finesse_mod', 'default_ability'];
+  const finalSetAttrs = {};
+
+  for (let i = 0; i < ABILITIES.length; i++) {
+    collectionArray.push(`${ABILITIES[i]}_mod`);
+  }
+
+  getSectionIDs(repeatingItem, (ids) => {
+    if (rowId) {
+      ids = [];
+      ids.push(rowId);
+    }
+    for (let i = 0; i < ids.length; i++) {
+      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+      collectionArray.push(`${repeatingString}name`);
+      collectionArray.push(`${repeatingString}damage_toggle`);
+      collectionArray.push(`${repeatingString}damage_formula`);
+      collectionArray.push(`${repeatingString}damage`);
+      collectionArray.push(`${repeatingString}damage_ability`);
+      collectionArray.push(`${repeatingString}damage_bonus`);
+      collectionArray.push(`${repeatingString}damage_type`);
+      collectionArray.push(`${repeatingString}second_damage_toggle`);
+      collectionArray.push(`${repeatingString}second_damage_formula`);
+      collectionArray.push(`${repeatingString}second_damage`);
+      collectionArray.push(`${repeatingString}second_damage_ability`);
+      collectionArray.push(`${repeatingString}second_damage_bonus`);
+      collectionArray.push(`${repeatingString}second_damage_type`);
+      collectionArray.push(`${repeatingString}damage_string`);
+      collectionArray.push(`${repeatingString}heal_toggle`);
+      collectionArray.push(`${repeatingString}heal`);
+      collectionArray.push(`${repeatingString}heal_ability`);
+      collectionArray.push(`${repeatingString}heal_bonus`);
+      collectionArray.push(`${repeatingString}heal_query_toggle`);
+      collectionArray.push(`${repeatingString}add_casting_modifier`);
+    }
+
+    getAttrs(collectionArray, (v) => {
+      for (let j = 0; j < ids.length; j++) {
+        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+
+        const damageOptions = {
+          type: 'attack',
+        };
+        updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
+        updateHealToggle(v, finalSetAttrs, repeatingString);
+      }
+      setFinalAttrs(v, finalSetAttrs);
+    });
+  });
+};
+on('change:repeating_classfeature', (eventInfo) => {
+  const changedField = getRepeatingField('repeating_classfeature', eventInfo);
+  if (changedField !== 'error' && changedField !== 'toggle_extras' && changedField !== 'heal_formula' && changedField !== 'freetext' && changedField !== 'freeform') {
+    console.log('class feature changedField', changedField);
+    const rowId = getRowId('repeating_classfeature', eventInfo);
+    updateClassFeatures(rowId);
+  }
+});
+
+const updateClassFeatureToggleToNewVer = () => {
+  const repeatingItem = 'repeating_classfeature';
+  const collectionArray = [];
+  const finalSetAttrs = {};
+
+  getSectionIDs(repeatingItem, (ids) => {
+    if (rowId) {
+      ids = [];
+      ids.push(rowId);
+    }
+    for (let i = 0; i < ids.length; i++) {
+      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+      collectionArray.push(`${repeatingString}heal_toggle`);
+    }
+
+    getAttrs(collectionArray, (v) => {
+      for (let j = 0; j < ids.length; j++) {
+        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+
+        const healToggled = v[`${repeatingString}heal_toggle`];
+        if (!isUndefined(healToggled)) {
+          updateClassFeatures();
+          return;
+        }
+      }
+      setFinalAttrs(v, finalSetAttrs);
+    });
+  });
+};
+
 
 function updateD20Mod() {
   const collectionArray = ['halfling_luck'];
@@ -3676,6 +3767,9 @@ const sheetOpened = () => {
     }
     if (versionCompare(version, '2.2.5') < 0) {
       weighAmmo();
+    }
+    if (versionCompare(version, '2.2.6') < 0) {
+      updateClassFeatureToggleToNewVer();
     }
 
     if (!version || version !== currentVersion) {
