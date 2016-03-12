@@ -3730,6 +3730,31 @@ on('change:pb', () => {
   updateAction('lairaction');
 });
 
+const extasToExtrasFix = (repeatingItem) => {
+  const collectionArray = [];
+  const finalSetAttrs = {};
+
+  getSectionIDs(repeatingItem, (ids) => {
+    for (let i = 0; i < ids.length; i++) {
+      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+      collectionArray.push(`${repeatingString}extas_toggle`);
+    }
+
+    getAttrs(collectionArray, (v) => {
+      for (let j = 0; j < ids.length; j++) {
+        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+
+        const extasToggle = v[`${repeatingString}extas_toggle`];
+        if (!isUndefined(extrasToggle)) {
+          finalSetAttrs[`${repeatingString}extras_toggle`] = extasToggle;
+        }
+
+      }
+      setFinalAttrs(v, finalSetAttrs);
+    });
+  });
+};
+
 const sheetOpened = () => {
   const collectionArray = ['version', 'strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
   const finalSetAttrs = {};
@@ -3846,6 +3871,9 @@ const sheetOpened = () => {
     if (versionCompare(version, '2.2.6') < 0) {
       updateClassFeatureToggleToNewVer();
       updateLevels();
+      extasToExtrasFix('repeating_attack');
+      extasToExtrasFix('repeating_action');
+      extasToExtrasFix('repeating_spell');
     }
 
     if (!version || version !== currentVersion) {
