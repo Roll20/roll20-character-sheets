@@ -1988,7 +1988,7 @@ const updateSpell = (rowId) => {
         };
         updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
 
-        if (v.is_npc && v.caster_level && v[`${repeatingString}damage`] && v[`${repeatingString}damage`].indexOf('@{level}') !== -1) {
+        if (getIntValue(v.is_npc) === 1 && v.caster_level && v[`${repeatingString}damage`] && v[`${repeatingString}damage`].indexOf('@{level}') !== -1) {
           finalSetAttrs[`${repeatingString}damage`] = v[`${repeatingString}damage`].replace('@{level}', '@{caster_level}');
         }
 
