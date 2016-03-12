@@ -657,36 +657,38 @@ const updateLevels = (removeClass) => {
         }
 
         const classLevel = getIntValue(v[`${repeatingString}level`]);
-        totalLevel += classLevel;
-        levelArray.push(`${capitalize(className)} ${classLevel}`);
+        if (classLevel) { //TODO: Remove when roll20 fixes deleting a row calling a change event
+          totalLevel += classLevel;
+          levelArray.push(`${capitalize(className)} ${classLevel}`);
 
-        if (v[`${className}_level`]) {
-          finalSetAttrs[`${className}_level`] += classLevel;
-        } else {
-          finalSetAttrs[`${className}_level`] = classLevel;
-        }
-
-        let classHd = v[`${repeatingString}hd`];
-        if (isUndefined(classHd) && removeClass !== 'remove') {
-          if (defaultClassDetails.hasOwnProperty(className)) {
-            classHd = defaultClassDetails[className].hd;
-            finalSetAttrs[`${repeatingString}hd`] = classHd;
+          if (v[`${className}_level`]) {
+            finalSetAttrs[`${className}_level`] += classLevel;
           } else {
-            classHd = 'd12';
+            finalSetAttrs[`${className}_level`] = classLevel;
           }
-        }
-        hd[classHd] += classLevel;
 
-        let classSpellcasting = v[`${repeatingString}spellcasting`];
-        if (isUndefined(classSpellcasting)) {
-          if (defaultClassDetails.hasOwnProperty(className)) {
-            classSpellcasting = defaultClassDetails[className].spellcasting;
-            finalSetAttrs[`${repeatingString}spellcasting`] = classSpellcasting;
+          let classHd = v[`${repeatingString}hd`];
+          if (isUndefined(classHd) && removeClass !== 'remove') {
+            if (defaultClassDetails.hasOwnProperty(className)) {
+              classHd = defaultClassDetails[className].hd;
+              finalSetAttrs[`${repeatingString}hd`] = classHd;
+            } else {
+              classHd = 'd12';
+            }
           }
-        }
-        if (exists(classSpellcasting)) {
-          classesWithSpellcasting += 1;
-          spellcasting[classSpellcasting] += classLevel;
+          hd[classHd] += classLevel;
+
+          let classSpellcasting = v[`${repeatingString}spellcasting`];
+          if (isUndefined(classSpellcasting)) {
+            if (defaultClassDetails.hasOwnProperty(className)) {
+              classSpellcasting = defaultClassDetails[className].spellcasting;
+              finalSetAttrs[`${repeatingString}spellcasting`] = classSpellcasting;
+            }
+          }
+          if (exists(classSpellcasting)) {
+            classesWithSpellcasting += 1;
+            spellcasting[classSpellcasting] += classLevel;
+          }
         }
       }
 
@@ -754,40 +756,21 @@ const updateLevels = (removeClass) => {
         }
       }
 
-      if (finalSetAttrs.sorcerer_level > 1) {
-        setClassFeature({
-          storageName: 'Sorcery Points',
-          uses_max: finalSetAttrs.sorcerer_level,
-        });
-      } else {
-        setClassFeature({
-          clear: true,
-          storageName: 'Sorcery Points',
-          uses_max: 0,
-        });
-      }
       if (spellcasting.warlock > 0) {
-        if (spellcasting.warlock === 1) {
-          setClassFeature({
-            storageName: 'Warlock Spell Slots',
-            uses_max: 1,
-          });
-        } else if (spellcasting.warlock >= 2 && spellcasting.warlock < 11) {
-          setClassFeature({
-            storageName: 'Warlock Spell Slots',
-            uses_max: 2,
-          });
+        let warlockSpellSlots = 1;
+        if (spellcasting.warlock >= 17) {
+          warlockSpellSlots = 4;
         } else if (spellcasting.warlock >= 11 && spellcasting.warlock < 17) {
-          setClassFeature({
-            storageName: 'Warlock Spell Slots',
-            uses_max: 3,
-          });
-        } else {
-          setClassFeature({
-            storageName: 'Warlock Spell Slots',
-            uses_max: 4,
-          });
+          warlockSpellSlots = 3;
+        } else if (spellcasting.warlock >= 2 && spellcasting.warlock < 11) {
+          warlockSpellSlots = 2;
         }
+        setClassFeature({
+          freetext: 'Spells cast at maximum level.',
+          recharge: 'Short Rest',
+          storageName: 'Warlock Spell Slots',
+          uses_max: warlockSpellSlots,
+        });
       } else {
         setClassFeature({
           clear: true,
@@ -795,8 +778,152 @@ const updateLevels = (removeClass) => {
           uses_max: 0,
         });
       }
+
       setFinalAttrs(v, finalSetAttrs);
+      setClassFeatures(finalSetAttrs);
     });
+  });
+};
+
+const setClassFeatures = (levelsData) => {
+  const finalSetAttrs = {};
+  const collectionArray = ['ac_unarmored_ability'];
+
+  getAttrs(collectionArray, (v) => {
+    if (levelsData['barbarian_level'] >= 1) {
+      let rageUses = 2;
+      if (levelsData['barbarian_level'] >= 20) {
+        rageUses = 999999;
+      } else if (levelsData['barbarian_level'] >= 17) {
+        rageUses = 6;
+      } else if (levelsData['barbarian_level'] >= 12) {
+        rageUses = 5;
+      } else if (levelsData['barbarian_level'] >= 6) {
+        rageUses = 4;
+      } else if (levelsData['barbarian_level'] >= 3) {
+        rageUses = 3;
+      }
+      setClassFeature({
+        freetext: 'On your turn, you can enter a rage as a bonus action. While raging, you gain the following benefits if you aren’t wearing heavy armor:' +
+        '\n•You have advantage on Strength checks and Strength saving throws.' +
+        '\n•When you make a melee weapon attack using Strength, you gain a bonus to the damage roll that increases as you gain levels as a barbarian, as shown in the Rage Damage column of the Barbarian table.' +
+        '\n•You have resistance to bludgeoning, piercing, and slashing damage' +
+        '\nIf you are able to cast spells, you can’t cast them or concentrate on them while raging.' +
+        '\nYour rage lasts for 1 minute. It ends early if you are knocked unconscious or if your turn ends and you haven’t attacked a hostile creature since your last turn or taken damage since then. You can also end your rage on your turn as a bonus action.',
+        recharge: 'Long Rest',
+        storageName: 'Rage',
+        uses_max: rageUses,
+      });
+
+      if (isUndefined(v['ac_unarmored_ability'])) {
+        finalSetAttrs['ac_unarmored_ability'] = '@{constitution_mod}';
+      }
+      setTrait({
+        storageName: 'Unarmored Defense',
+        freetext: 'While you are not wearing any armor, your Armor Class equals 10 + your Dexterity modifier + your Constitution modifier. You can use a shield and still gain this benefit.',
+      });
+
+      if (levelsData['barbarian_level'] >= 2) {
+        setClassFeature({
+          freetext: 'When you make your first attack on your turn, you can decide to attack recklessly. Doing so gives you advantage on melee weapon attack rolls using Strength during this turn, but attack rolls against you have advantage until your next turn.',
+          storageName: 'Reckless Attack'
+        });
+        setTrait({
+          storageName: 'Danger Sense',
+          freetext: 'You have advantage on Dexterity saving throws against effects that you can see, such as traps and spells. To gain this benefit, you can’t be blinded, deafened, or incapacitated.',
+        });
+      }
+
+      if (levelsData['barbarian_level'] >= 5) {
+        setTrait({
+          storageName: 'Extra Attack',
+          freetext: 'Beginning at 5th level, you can attack twice, instead of once, whenever you take the Attack action on your turn.',
+        });
+        setTrait({
+          storageName: 'Fast Movement',
+          freetext: 'Starting at 5th level, your speed increases by 10 feet while you aren\'t wearing heavy armor.',
+        });
+      }
+      if (levelsData['barbarian_level'] >= 7) {
+        setTrait({
+          storageName: 'Feral Instinct',
+          freetext: 'By 7th level, your instincts are so honed that you have advantage on initiative rolls.' +
+          '\nAdditionally, if you are surprised at the beginning of combat and aren’t incapacitated, you can act normally on your first turn, but only if you enter your rage before doing anything else on that turn.',
+        });
+      }
+      if (levelsData['barbarian_level'] >= 9) {
+        setTrait({
+          storageName: 'Brutal Critical',
+          freetext: 'Beginning at 9th level, you can roll one additional weapon damage die when determining the extra damage for a critical hit with a melee attack.' +
+          '\nThis increases to two additional dice at 13th level and three additional dice at 17th level.',
+        });
+      }
+      if (levelsData['barbarian_level'] >= 11) {
+        setTrait({
+          storageName: 'Relentless Rage',
+          freetext: 'Starting at 11th level, your rage can keep you fighting despite grievous wounds. If you drop to 0 hit points while you’re raging and don’t die outright, you can make a DC 10 Constitution saving throw. If you succeed, you drop to 1 hit point instead.' +
+          '\nEach time you use this feature after the first, the DC increases by 5. When you finish a short or long rest, the DC resets to 10',
+        });
+      }
+      if (levelsData['barbarian_level'] >= 15) {
+        setTrait({
+          storageName: 'Persistent Rage',
+          freetext: 'Beginning at 15th level, your rage is so fierce that it ends early only if you fall unconscious or if you choose to end it.',
+        });
+      }
+      if (levelsData['barbarian_level'] >= 18) {
+        setTrait({
+          storageName: 'Indomitable Might',
+          freetext: 'Beginning at 18th level, if your total for a Strength check is less than your Strength score, you can use that score in place of the total.',
+        });
+      }
+      if (levelsData['barbarian_level'] >= 20) {
+        setTrait({
+          storageName: 'Primal Champion',
+          freetext: 'At 20th level, you embody the power of the wilds. Your Strength and Constitution scores increase by 4. Your maximum for those scores is now 24.',
+        });
+      }
+    }
+
+    if (levelsData['fighter_level'] >= 2) {
+      setClassFeature({
+        freetext: 'On your turn, you can take one additional action on top of your regular action and a possible bonus action.',
+        recharge: 'Short Rest',
+        storageName: 'Action Surge',
+        uses_max: 1,
+      });
+      if (levelsData['fighter_level'] >= 17) {
+        setClassFeature({
+          storageName: 'Action Surge',
+          uses_max: 2,
+        });
+      }
+    }
+    if (levelsData['fighter_level'] >= 1) {
+      setClassFeature({
+        freetext: 'On your turn, you can use a bonus action to regain hit points.',
+        heal: 'd10 + @{fighter_level}',
+        recharge: 'Short Rest',
+        storageName: 'Second Wind',
+        uses_max: 1,
+      });
+    }
+
+    if (levelsData['sorcerer_level'] > 1) {
+      setClassFeature({
+        freetext: 'You can use your sorcery points to gain additional spell slots, or sacrifice spell slots to gain additional sorcery points.',
+        recharge: 'Long Rest',
+        storageName: 'Sorcery Points',
+        uses_max: levelsData.sorcerer_level,
+      });
+    } else {
+      setClassFeature({
+        clear: true,
+        storageName: 'Sorcery Points',
+        uses_max: 0,
+      });
+    }
+    setFinalAttrs(v, finalSetAttrs);
   });
 };
 
@@ -2130,14 +2257,13 @@ on('change:repeating_classfeature', (eventInfo) => {
   }
 });
 
-const setClassFeature = (classFeature) => {
-  const repeatingItem = 'repeating_classfeature';
+const setClassFeatureOrTrait = (repeatingItem, obj) => {
   const collectionArray = [];
   const finalSetAttrs = {};
-  let classFeatureId;
+  let itemId;
 
-  if (!classFeature.name) {
-    classFeature.name = classFeature.storageName;
+  if (!obj.name) {
+    obj.name = obj.storageName;
   }
 
   getSectionIDs(repeatingItem, (ids) => {
@@ -2152,39 +2278,60 @@ const setClassFeature = (classFeature) => {
       for (let j = 0; j < ids.length; j++) {
         repeatingString = `${repeatingItem}_${ids[j]}_`;
 
-        if (v[`${repeatingString}storage_name`] === classFeature.storageName) {
-          classFeatureId = ids[j];
+        if (v[`${repeatingString}storage_name`] === obj.storageName) {
+          itemId = ids[j];
         }
       }
-      if (!classFeatureId) {
-        classFeatureId = generateRowID();
+      if (!itemId) {
+        itemId = generateRowID();
       }
 
-      repeatingString = `repeating_classfeature_${classFeatureId}_`;
-      finalSetAttrs[`${repeatingString}storage_name`] = classFeature.storageName;
-      if (v[`${repeatingString}name`] !== classFeature.name) {
-        finalSetAttrs[`${repeatingString}name`] = classFeature.name;
+      repeatingString = `${repeatingItem}_${itemId}_`;
+      if (!obj.clear && isUndefined(v[`${repeatingString}storage_name`])) {
+        finalSetAttrs[`${repeatingString}storage_name`] = obj.storageName;
       }
-      delete classFeature.storageName;
+      if (!obj.clear && v[`${repeatingString}name`] !== obj.name) {
+        finalSetAttrs[`${repeatingString}name`] = obj.name;
+      }
+      delete obj.storageName;
 
-      if (classFeature.clear) {
-        delete classFeature.clear;
-        for (const prop in classFeature) {
+      if (obj.clear) {
+        delete obj.clear;
+        for (const prop in obj) {
           if (!isUndefined(v[`${repeatingString}${prop}`])) {
-            finalSetAttrs[`${repeatingString}${prop}`] = classFeature[prop];
+            finalSetAttrs[`${repeatingString}${prop}`] = obj[prop];
           }
         }
       } else {
-        for (const prop in classFeature) {
-          if (classFeature[prop] && v[`${repeatingString}${prop}`] !== classFeature[prop]) {
-            finalSetAttrs[`${repeatingString}${prop}`] = classFeature[prop];
+        for (const prop in obj) {
+          if (obj[prop] && v[`${repeatingString}${prop}`] !== obj[prop]) {
+            finalSetAttrs[`${repeatingString}${prop}`] = obj[prop];
           }
+        }
+        if (obj.damage || obj.damage_ability || obj.damage_bonus) {
+          finalSetAttrs[`${repeatingString}damage_toggle`] = '@{damage_toggle_var}';
+        }
+        if (obj.heal || obj.heal_ability || obj.heal_bonus || obj.heal_query_toggle) {
+          finalSetAttrs[`${repeatingString}heal_toggle`] = '@{heal_toggle_var}';
+        }
+        if (obj.freetext) {
+          finalSetAttrs[`${repeatingString}extras_toggle`] = '@{extras_var}';
+          console.log('set extras toggle');
+        }
+        if (obj.freetext && repeatingItem === 'repeating_trait') {
+          finalSetAttrs[`${repeatingString}display_text`] = obj.freetext;
         }
       }
 
       setFinalAttrs(v, finalSetAttrs);
     });
   });
+};
+const setClassFeature = (obj) => {
+  setClassFeatureOrTrait('repeating_classfeature', obj);
+};
+const setTrait = (obj) => {
+  setClassFeatureOrTrait('repeating_trait', obj);
 };
 
 const updateClassFeatureToggleToNewVer = () => {
@@ -3313,7 +3460,7 @@ const parseAction = (rowId, type) => {
           freetext = parseDamage(finalSetAttrs, repeatingString, freetext, damageRegex, 'second_damage', spellMods, meleeMods, spellAttack, rangedAttack, dexMod);
         }
 
-        finalSetAttrs[`${repeatingString}extras_toggle`] = '@{extas_var}';
+        finalSetAttrs[`${repeatingString}extras_toggle`] = '@{extras_var}';
       }
       setFinalAttrs(v, finalSetAttrs);
       for (let x = 0; x < ids.length; x++) {
@@ -3744,9 +3891,9 @@ const extasToExtrasFix = (repeatingItem) => {
       for (let j = 0; j < ids.length; j++) {
         const repeatingString = `${repeatingItem}_${ids[j]}_`;
 
-        const extasToggle = v[`${repeatingString}extas_toggle`];
+        const extrasToggle = v[`${repeatingString}extas_toggle`];
         if (!isUndefined(extrasToggle)) {
-          finalSetAttrs[`${repeatingString}extras_toggle`] = extasToggle;
+          finalSetAttrs[`${repeatingString}extras_toggle`] = extrasToggle;
         }
 
       }
