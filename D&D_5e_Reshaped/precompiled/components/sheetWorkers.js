@@ -755,22 +755,45 @@ const updateLevels = (removeClass) => {
       }
 
       if (finalSetAttrs.sorcerer_level > 1) {
-        finalSetAttrs.sorcery_points_max = finalSetAttrs.sorcerer_level;
-      } else if (!isUndefined(v.sorcery_points_max)) {
-        finalSetAttrs.sorcery_points_max = 0;
+        setClassFeature({
+          storageName: 'Sorcery Points',
+          uses_max: finalSetAttrs.sorcerer_level,
+        });
+      } else {
+        setClassFeature({
+          clear: true,
+          storageName: 'Sorcery Points',
+          uses_max: 0,
+        });
       }
       if (spellcasting.warlock > 0) {
         if (spellcasting.warlock === 1) {
-          finalSetAttrs.warlock_spell_slots_max = 1;
+          setClassFeature({
+            storageName: 'Warlock Spell Slots',
+            uses_max: 1,
+          });
         } else if (spellcasting.warlock >= 2 && spellcasting.warlock < 11) {
-          finalSetAttrs.warlock_spell_slots_max = 2;
+          setClassFeature({
+            storageName: 'Warlock Spell Slots',
+            uses_max: 2,
+          });
         } else if (spellcasting.warlock >= 11 && spellcasting.warlock < 17) {
-          finalSetAttrs.warlock_spell_slots_max = 3;
+          setClassFeature({
+            storageName: 'Warlock Spell Slots',
+            uses_max: 3,
+          });
         } else {
-          finalSetAttrs.warlock_spell_slots_max = 4;
+          setClassFeature({
+            storageName: 'Warlock Spell Slots',
+            uses_max: 4,
+          });
         }
-      } else if (!isUndefined(v.warlock_spell_slots_max)) {
-        finalSetAttrs.warlock_spell_slots_max = 0;
+      } else {
+        setClassFeature({
+          clear: true,
+          storageName: 'Warlock Spell Slots',
+          uses_max: 0,
+        });
       }
       setFinalAttrs(v, finalSetAttrs);
     });
@@ -2046,7 +2069,7 @@ on('change:global_spell_attack_bonus change:global_spell_damage_bonus change:glo
   updateSpell();
 });
 
-const updateClassFeatures = (rowId) => {
+const updateClassFeature = (rowId) => {
   const repeatingItem = 'repeating_classfeature';
   const collectionArray = ['pb', 'finesse_mod', 'default_ability'];
   const finalSetAttrs = {};
@@ -2103,9 +2126,66 @@ on('change:repeating_classfeature', (eventInfo) => {
   if (changedField !== 'error' && changedField !== 'toggle_extras' && changedField !== 'heal_formula' && changedField !== 'freetext' && changedField !== 'freeform') {
     console.log('class feature changedField', changedField);
     const rowId = getRowId('repeating_classfeature', eventInfo);
-    updateClassFeatures(rowId);
+    updateClassFeature(rowId);
   }
 });
+
+const setClassFeature = (classFeature) => {
+  const repeatingItem = 'repeating_classfeature';
+  const collectionArray = [];
+  const finalSetAttrs = {};
+  let classFeatureId;
+
+  if (!classFeature.name) {
+    classFeature.name = classFeature.storageName;
+  }
+
+  getSectionIDs(repeatingItem, (ids) => {
+    for (let i = 0; i < ids.length; i++) {
+      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+      collectionArray.push(`${repeatingString}storage_name`);
+      collectionArray.push(`${repeatingString}name`);
+    }
+
+    getAttrs(collectionArray, (v) => {
+      let repeatingString;
+      for (let j = 0; j < ids.length; j++) {
+        repeatingString = `${repeatingItem}_${ids[j]}_`;
+
+        if (v[`${repeatingString}storage_name`] === classFeature.storageName) {
+          classFeatureId = ids[j];
+        }
+      }
+      if (!classFeatureId) {
+        classFeatureId = generateRowID();
+      }
+
+      repeatingString = `repeating_classfeature_${classFeatureId}_`;
+      finalSetAttrs[`${repeatingString}storage_name`] = classFeature.storageName;
+      if (v[`${repeatingString}name`] !== classFeature.name) {
+        finalSetAttrs[`${repeatingString}name`] = classFeature.name;
+      }
+      delete classFeature.storageName;
+
+      if (classFeature.clear) {
+        delete classFeature.clear;
+        for (const prop in classFeature) {
+          if (!isUndefined(v[`${repeatingString}${prop}`])) {
+            finalSetAttrs[`${repeatingString}${prop}`] = classFeature[prop];
+          }
+        }
+      } else {
+        for (const prop in classFeature) {
+          if (classFeature[prop] && v[`${repeatingString}${prop}`] !== classFeature[prop]) {
+            finalSetAttrs[`${repeatingString}${prop}`] = classFeature[prop];
+          }
+        }
+      }
+
+      setFinalAttrs(v, finalSetAttrs);
+    });
+  });
+};
 
 const updateClassFeatureToggleToNewVer = () => {
   const repeatingItem = 'repeating_classfeature';
@@ -2113,10 +2193,6 @@ const updateClassFeatureToggleToNewVer = () => {
   const finalSetAttrs = {};
 
   getSectionIDs(repeatingItem, (ids) => {
-    if (rowId) {
-      ids = [];
-      ids.push(rowId);
-    }
     for (let i = 0; i < ids.length; i++) {
       const repeatingString = `${repeatingItem}_${ids[i]}_`;
       collectionArray.push(`${repeatingString}heal_toggle`);
@@ -2128,7 +2204,7 @@ const updateClassFeatureToggleToNewVer = () => {
 
         const healToggled = v[`${repeatingString}heal_toggle`];
         if (!isUndefined(healToggled)) {
-          updateClassFeatures();
+          updateClassFeature();
           return;
         }
       }
@@ -3569,8 +3645,8 @@ const setSkillStorageNames = () => {
   getSectionIDs(repeatingItem, (ids) => {
     for (let i = 0; i < ids.length; i++) {
       repeatingString = `${repeatingItem}_${ids[i]}_`;
-      collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}storage_name`);
+      collectionArray.push(`${repeatingString}name`);
     }
 
     getAttrs(collectionArray, (v) => {
@@ -3769,6 +3845,7 @@ const sheetOpened = () => {
     }
     if (versionCompare(version, '2.2.6') < 0) {
       updateClassFeatureToggleToNewVer();
+      updateLevels();
     }
 
     if (!version || version !== currentVersion) {
