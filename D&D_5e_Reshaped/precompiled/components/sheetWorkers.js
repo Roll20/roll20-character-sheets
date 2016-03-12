@@ -1,93 +1,37 @@
 'use strict';
 
 const currentVersion = '2.2.7';
+let TRANSLATIONS;
 const SKILLS = {
-  abilities: {
-    acrobatics: 'dexterity',
-    animalHandling: 'wisdom',
-    arcana: 'intelligence',
-    athletics: 'strength',
-    deception: 'charisma',
-    history: 'intelligence',
-    insight: 'wisdom',
-    intimidation: 'charisma',
-    investigation: 'intelligence',
-    medicine: 'wisdom',
-    nature: 'intelligence',
-    perception: 'wisdom',
-    performance: 'charisma',
-    persuasion: 'charisma',
-    religion: 'intelligence',
-    sleightOfHand: 'dexterity',
-    stealth: 'dexterity',
-    survival: 'wisdom',
-  },
-  names: {
-    en: {
-      acrobatics: 'Acrobatics',
-      animalHandling: 'Animal Handling',
-      arcana: 'Arcana',
-      athletics: 'Athletics',
-      deception: 'Deception',
-      history: 'History',
-      insight: 'Insight',
-      intimidation: 'Intimidation',
-      investigation: 'Investigation',
-      medicine: 'Medicine',
-      nature: 'Nature',
-      perception: 'Perception',
-      performance: 'Performance',
-      persuasion: 'Persuasion',
-      religion: 'Religion',
-      sleightOfHand: 'Sleight of Hand',
-      stealth: 'Stealth',
-      survival: 'Survival',
-    },
-    de: {
-      acrobatics: 'Akrobatik',
-      animalHandling: 'Umgang mit Tieren',
-      arcana: 'Arkanes',
-      athletics: 'Athletik',
-      deception: 'Täuschung',
-      history: 'Geschichte',
-      insight: 'Einsicht',
-      intimidation: 'Einschüchterung',
-      investigation: 'Investigation',
-      medicine: 'Medizin',
-      nature: 'Natur',
-      perception: 'Entdecken',
-      performance: 'Auftreten',
-      persuasion: 'Überreden',
-      religion: 'Religion',
-      sleightOfHand: 'Taschendiebstahl',
-      stealth: 'Tarnung',
-      survival: 'Überleben',
-    },
-    fr: {
-      acrobatics: 'Acrobaties',
-      animalHandling: 'Dressage',
-      arcana: 'Arcanes',
-      athletics: 'Athlétisme',
-      deception: 'Tromperie',
-      history: 'Histoire',
-      insight: 'Intuition',
-      intimidation: 'Intimidation',
-      investigation: 'Investigation',
-      medicine: 'Médecine',
-      nature: 'Nature',
-      perception: 'Perception',
-      performance: 'Représentation',
-      persuasion: 'Persuasion',
-      religion: 'Religion',
-      sleightOfHand: 'Escamotage',
-      stealth: 'Discrétion',
-      survival: 'Survie',
-    },
-  },
+  acrobatics: 'dexterity',
+  animalHandling: 'wisdom',
+  arcana: 'intelligence',
+  athletics: 'strength',
+  deception: 'charisma',
+  history: 'intelligence',
+  insight: 'wisdom',
+  intimidation: 'charisma',
+  investigation: 'intelligence',
+  medicine: 'wisdom',
+  nature: 'intelligence',
+  perception: 'wisdom',
+  performance: 'charisma',
+  persuasion: 'charisma',
+  religion: 'intelligence',
+  sleightOfHand: 'dexterity',
+  stealth: 'dexterity',
+  survival: 'wisdom',
 };
 const CLASSES = ['barbarian', 'bard', 'cleric', 'druid', 'fighter', 'monk', 'paladin', 'ranger', 'rogue', 'sorcerer', 'warlock', 'wizard'];
 const ABILITIES = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
 
+const translate = (language, key) => {
+  if (TRANSLATIONS[language] && TRANSLATIONS[language][key]) {
+    return TRANSLATIONS[language][key];
+  } else {
+    return TRANSLATIONS.en[key];
+  }
+};
 const capitalize = (string) => {
   return string.replace(/\w\S*/g, (txt) => {
     return txt.charAt(0).toUpperCase() + txt.substr(1);
@@ -3804,7 +3748,7 @@ const setSkillStorageNames = () => {
 
           const name = v[`${repeatingString}name`];
           if (!isUndefined(name)) {
-            const storageName = getKeyByValue(SKILLS.names.en, name);
+            const storageName = getKeyByValue(TRANSLATIONS.en.SKILLS, name);
             if (storageName && isUndefined(v[`${repeatingString}storage_name`])) {
               finalSetAttrs[`${repeatingString}storage_name`] = storageName;
             }
@@ -3830,13 +3774,10 @@ const generateSkills = () => {
     }
 
     getAttrs(collectionArray, (v) => {
-      let language = v.lang;
-      if (!language || !SKILLS.names[language]) {
-        language = 'en';
-      }
+      let language = v.lang || 'en';
 
       let x = 0;
-      Object.keys(SKILLS.abilities).forEach((key) => {
+      Object.keys(SKILLS).forEach((key) => {
         let skillId;
         if (ids[x]) {
           skillId = ids[x];
@@ -3846,9 +3787,9 @@ const generateSkills = () => {
         repeatingString = `${repeatingItem}_${skillId}_`;
 
         finalSetAttrs[`${repeatingString}storage_name`] = key;
-        finalSetAttrs[`${repeatingString}name`] = SKILLS.names[language][key];
+        finalSetAttrs[`${repeatingString}name`] = translate(language, `SKILLS.${key}`);
 
-        finalSetAttrs[`${repeatingString}ability`] = `@{${SKILLS.abilities[key]}_mod}`;
+        finalSetAttrs[`${repeatingString}ability`] = `@{${SKILLS[key]}_mod}`;
         updateSkill(skillId);
 
         x++;
@@ -4026,6 +3967,7 @@ const sheetOpened = () => {
     if (!version || version !== currentVersion) {
       finalSetAttrs.version = currentVersion;
     }
+
     setFinalAttrs(v, finalSetAttrs);
   });
 };

@@ -8,7 +8,7 @@ const minifyCss = require('gulp-minify-css');
 const concat = require('gulp-concat');
 const sass = require('gulp-sass');
 const sassLint = require('gulp-sass-lint');
-const replace = require('gulp-replace-task');
+const replaceTask = require('gulp-replace-task');
 const rename = require('gulp-rename');
 const change = require('gulp-change');
 const fs = require('fs');
@@ -90,7 +90,7 @@ function duplicate(file, limit, start) {
 gulp.task('preCompile', function () {
 	return gulp.src('./D&D_5e.html')
 		.pipe(include())
-		.pipe(replace({
+		.pipe(replaceTask({
 			patterns: [
 				{
 					match: /\x7B\x7B'([A-Za-z_0-9\.]+)'\s\|\stranslate\x7D\x7D/g,
@@ -150,6 +150,21 @@ gulp.task('lint', function() {
 
 gulp.task('compileJS', function() {
 	return gulp.src(['components/sheetWorkers.js'])
+		.pipe(replaceTask({
+			patterns: [
+				{
+					match: /(let TRANSLATIONS;)/i,
+					replacement: function () {
+						let translations = {};
+						translations.de = JSON.parse(fs.readFileSync('./translations/de.json'));
+						translations.en = JSON.parse(fs.readFileSync('./translations/en.json'));
+						translations.fr = JSON.parse(fs.readFileSync('./translations/fr.json'));
+						translations.ru = JSON.parse(fs.readFileSync('./translations/ru.json'));
+						return `const TRANSLATIONS = ${JSON.stringify(translations)};`;
+					}
+				}
+			]
+		}))
 		.pipe(babel({
 			presets: ['es2015'],
 			comments: false
