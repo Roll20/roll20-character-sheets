@@ -1005,7 +1005,7 @@ const setClassFeatures = () => {
     const language = v.lang || 'en';
 
     if (v.barbarian_level >= 1) {
-      let rageUses = 2;
+      let rageUses;
       if (v.barbarian_level >= 20) {
         rageUses = 999999;
       } else if (v.barbarian_level >= 17) {
@@ -1016,6 +1016,8 @@ const setClassFeatures = () => {
         rageUses = 4;
       } else if (v.barbarian_level >= 3) {
         rageUses = 3;
+      } else {
+        rageUses = 2;
       }
       setClassFeature({
         freetext: translate(language, 'CLASS_FEATURES.RAGE_TEXT'),
@@ -1098,13 +1100,15 @@ const setClassFeatures = () => {
     }
 
     if (v.bard_level >= 1) {
-      let die = 'd6';
+      let die;
       if (v.bard_level >= 15) {
         die = 'd12';
       } else if (v.bard_level >= 10) {
         die = 'd10';
       } else if (v.bard_level >= 5) {
         die = 'd8';
+      } else {
+        die = 'd6';
       }
       let recharge = 'Long Rest';
       if (v.bard_level >= 5) {
@@ -1126,13 +1130,15 @@ const setClassFeatures = () => {
         });
         finalSetAttrs.jack_of_all_trades_toggle = '@{jack_of_all_trades}';
 
-        let heal = 'd6';
+        let heal;
         if (v.bard_level >= 17) {
           heal = 'd12';
         } else if (v.bard_level >= 13) {
           heal = 'd10';
         } else if (v.bard_level >= 9) {
           heal = 'd8';
+        } else {
+          heal = 'd6';
         }
         setClassFeature({
           freetext: translate(language, 'CLASS_FEATURES.SONG_OF_REST_TEXT'),
@@ -1173,13 +1179,15 @@ const setClassFeatures = () => {
 
     if (v.cleric_level >= 1) {
       if (v.cleric_level >= 2) {
-        let channelDivinityUses = 1;
+        let channelDivinityUses;
         if (v.cleric_level >= 18) {
           channelDivinityUses = 3;
         } else if (v.cleric_level >= 6) {
           channelDivinityUses = 2;
+        } else {
+          channelDivinityUses = 1;
         }
-        const channelDivinityId = setClassFeature({
+        setClassFeature({
           freetext: translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY_TEXT'),
           name: translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY'),
           recharge: 'Short Rest',
@@ -1187,14 +1195,38 @@ const setClassFeatures = () => {
           uses_max: channelDivinityUses,
         });
 
-        console.log('channelDivinityId', channelDivinityId);
+        let turnUndeadText = translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY_TURN_UNDEAD_TEXT');
+        if (v.cleric_level >= 5) {
+          let turnUndeadDestroyCR;
+          if (v.cleric_level >= 17) {
+            turnUndeadDestroyCR = '4';
+          } else if (v.cleric_level >= 14) {
+            turnUndeadDestroyCR = '3';
+          } else if (v.cleric_level >= 11) {
+            turnUndeadDestroyCR = '2';
+          } else if (v.cleric_level >= 8) {
+            turnUndeadDestroyCR = '1';
+          } else {
+            turnUndeadDestroyCR = '1/2';
+          }
+          turnUndeadText += `\n${translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY_TURN_UNDEAD_TEXT_PART_2').replace('CHALLENGE_RATING', turnUndeadDestroyCR)}`;
+        }
         setClassFeature({
-          freetext: translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY_TURN_UNDEAD_TEXT'),
+          freetext: turnUndeadText,
           name: translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY_TURN_UNDEAD'),
           saving_throw_ability: '@{wisdom_mod}',
           saving_throw_vs_ability: 'Wisdom',
           storageName: 'Turn Undead',
         });
+        if (v.cleric_level >= 10) {
+          setClassFeature({
+            freeform: '{{text_top=[[d100]] > [[@{cleric_level}]]}}',
+            freetext: translate(language, 'CLASS_FEATURES.DIVINE_INTERVENTION_TEXT'),
+            name: translate(language, 'CLASS_FEATURES.DIVINE_INTERVENTION'),
+            storageName: 'Divine Intervention',
+            uses_max: 1,
+          });
+        }
       }
     }
 
