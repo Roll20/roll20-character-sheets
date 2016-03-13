@@ -1443,6 +1443,11 @@ const setClassFeatures = () => {
       });
 
       if (v.paladin_level >= 2) {
+        setTrait({
+          freetext: `${translate(language, 'CLASS_FEATURES.FIGHTING_STYLE_TEXT')} ${translate(language, 'CLASS_FEATURES.FIGHTING_STYLE_PALADIN_OPTIONS')}`,
+          name: translate(language, 'CLASS_FEATURES.FIGHTING_STYLE'),
+          storageName: 'Fighting Style',
+        });
         setClassFeature({
           damage: '[[(?{Spell Level|1|2|3|4+, 4} + 1)d8]]',
           damage_type: 'radiant',
@@ -1512,23 +1517,94 @@ const setClassFeatures = () => {
       }
     }
 
-    if (v.sorcerer_level > 1) {
-      setClassFeature({
-        freetext: translate(language, 'CLASS_FEATURES.SORCERY_POINTS_TEXT'),
-        name: translate(language, 'CLASS_FEATURES.SORCERY_POINTS'),
-        recharge: 'Long Rest',
-        storageName: 'Sorcery Points',
-        uses_max: v.sorcerer_level,
+
+    if (v.ranger_level) {
+      setTrait({
+        freetext: translate(language, 'CLASS_FEATURES.FAVORED_ENEMY_TEXT'),
+        name: translate(language, 'CLASS_FEATURES.FAVORED_ENEMY'),
+        storageName: 'Favored Enemy',
       });
-    } else {
-      setClassFeature({
-        clear: true,
-        storageName: 'Sorcery Points',
-        uses_max: 0,
+      setTrait({
+        freetext: translate(language, 'CLASS_FEATURES.NATURAL_EXPLORER_TEXT'),
+        name: translate(language, 'CLASS_FEATURES.NATURAL_EXPLORER'),
+        storageName: 'Natural Explorer',
       });
+      if (v.ranger_level >= 2) {
+        setTrait({
+          freetext: `${translate(language, 'CLASS_FEATURES.FIGHTING_STYLE_TEXT')} ${translate(language, 'CLASS_FEATURES.FIGHTING_STYLE_RANGER_OPTIONS')}`,
+          name: translate(language, 'CLASS_FEATURES.FIGHTING_STYLE'),
+          storageName: 'Fighting Style',
+        });
+      }
+      if (v.ranger_level >= 3) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.PRIMEVAL_AWARENESS_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.PRIMEVAL_AWARENESS'),
+          storageName: 'Primeval Awareness',
+        });
+      }
+      if (v.ranger_level >= 5) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_TEXT').replace('NUMBER_OF_TIMES', translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_TWICE')),
+          name: translate(language, 'CLASS_FEATURES.EXTRA_ATTACK'),
+          storageName: 'Extra Attack',
+        });
+      }
+      if (v.ranger_level >= 8) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.LANDS_STRIDE_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.LANDS_STRIDE'),
+          storageName: 'Land\'s Stride',
+        });
+      }
+      if (v.ranger_level >= 10) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.HIDE_IN_PLAIN_SIGHT_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.HIDE_IN_PLAIN_SIGHT'),
+          storageName: 'Hide in Plain Sight',
+        });
+      }
+      if (v.ranger_level >= 14) {
+        setClassFeature({
+          freetext: translate(language, 'CLASS_FEATURES.VANISH_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.VANISH'),
+          storageName: 'Vanish',
+        });
+      }
+      if (v.ranger_level >= 18) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.FERAL_SENSES_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.FERAL_SENSES'),
+          storageName: 'Feral Senses',
+        });
+      }
+      if (v.ranger_level >= 20) {
+        setClassFeature({
+          freetext: translate(language, 'CLASS_FEATURES.FOE_SLAYER_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.FOE_SLAYER'),
+          storageName: 'Foe Slayer',
+        });
+      }
+    }
+
+    if (v.sorcerer_level) {
+      if (v.sorcerer_level >= 2) {
+        setClassFeature({
+          freetext: translate(language, 'CLASS_FEATURES.SORCERY_POINTS_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.SORCERY_POINTS'),
+          recharge: 'Long Rest',
+          storageName: 'Sorcery Points',
+          uses_max: v.sorcerer_level,
+        });
+      }
     }
 
     if (v.fighter_level) {
+      setTrait({
+        freetext: `${translate(language, 'CLASS_FEATURES.FIGHTING_STYLE_TEXT')} ${translate(language, 'CLASS_FEATURES.FIGHTING_STYLE_FIGHTER_OPTIONS')}`,
+        name: translate(language, 'CLASS_FEATURES.FIGHTING_STYLE'),
+        storageName: 'Fighting Style',
+      });
       setClassFeature({
         freetext: translate(language, 'CLASS_FEATURES.SECOND_WIND_TEXT'),
         name: translate(language, 'CLASS_FEATURES.SECOND_WIND'),
