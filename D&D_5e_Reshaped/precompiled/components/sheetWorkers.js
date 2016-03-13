@@ -568,7 +568,7 @@ const setClassFeatureOrTrait = (repeatingItem, obj) => {
         if (obj.uses_max && !obj.uses && isUndefined(v[`${repeatingString}uses`])) {
           finalSetAttrs[`${repeatingString}uses`] = obj.uses_max;
         }
-        if (obj.freetext && repeatingItem === 'repeating_trait' && v[`${repeatingString}display_text`]) {
+        if (obj.freetext && repeatingItem === 'repeating_trait' && isUndefined(v[`${repeatingString}display_text`])) {
           finalSetAttrs[`${repeatingString}display_text`] = obj.freetext;
         }
       }
