@@ -502,6 +502,9 @@ const setClassFeatureOrTrait = (repeatingItem, obj) => {
       const repeatingString = `${repeatingItem}_${ids[i]}_`;
       collectionArray.push(`${repeatingString}storage_name`);
       collectionArray.push(`${repeatingString}name`);
+      if (repeatingItem === 'repeating_trait') {
+        collectionArray.push(`${repeatingString}display_text`);
+      }
     }
 
     getAttrs(collectionArray, (v) => {
@@ -552,7 +555,7 @@ const setClassFeatureOrTrait = (repeatingItem, obj) => {
           finalSetAttrs[`${repeatingString}extras_toggle`] = '@{extras_var}';
           console.log('set extras toggle');
         }
-        if (obj.freetext && repeatingItem === 'repeating_trait') {
+        if (obj.freetext && repeatingItem === 'repeating_trait' && v[`${repeatingString}display_text`]) {
           finalSetAttrs[`${repeatingString}display_text`] = obj.freetext;
         }
       }
@@ -675,11 +678,11 @@ const setClassFeatures = (levelsData) => {
 
     if (levelsData.bard_level >= 1) {
       let die = 'd6';
-      if (levelsData.barbarian_level >= 15) {
+      if (levelsData.bard_level >= 15) {
         die = 'd12';
-      } else if (levelsData.barbarian_level >= 10) {
+      } else if (levelsData.bard_level >= 10) {
         die = 'd10';
-      } else if (levelsData.barbarian_level >= 5) {
+      } else if (levelsData.bard_level >= 5) {
         die = 'd8';
       }
       let recharge = 'Long Rest';
