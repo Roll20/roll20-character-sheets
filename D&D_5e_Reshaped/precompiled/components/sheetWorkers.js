@@ -61,6 +61,9 @@ const getKeyByValue = (obj, value) => {
   }
   return null;
 };
+const calculatePercentDifference = (oldValue, newValue) => {
+  return Math.abs(((oldValue - newValue) / oldValue) * 100);
+};
 const isUndefined = (value) => {
   if (typeof value === 'undefined' || value === '') {
     return true;
@@ -568,7 +571,8 @@ const setClassFeatureOrTrait = (repeatingItem, obj) => {
         if (obj.uses_max && !obj.uses && isUndefined(v[`${repeatingString}uses`])) {
           finalSetAttrs[`${repeatingString}uses`] = obj.uses_max;
         }
-        if (obj.freetext && repeatingItem === 'repeating_trait' && isUndefined(v[`${repeatingString}display_text`])) {
+        if (obj.freetext && repeatingItem === 'repeating_trait' && (isUndefined(v[`${repeatingString}display_text`]) ||
+          calculatePercentDifference(v[`${repeatingString}display_text`].length, obj.freetext.length) < 10)) {
           finalSetAttrs[`${repeatingString}display_text`] = obj.freetext;
         }
       }
