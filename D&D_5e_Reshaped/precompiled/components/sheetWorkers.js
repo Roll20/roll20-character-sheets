@@ -502,8 +502,14 @@ const setClassFeatureOrTrait = (repeatingItem, obj) => {
       const repeatingString = `${repeatingItem}_${ids[i]}_`;
       collectionArray.push(`${repeatingString}storage_name`);
       collectionArray.push(`${repeatingString}name`);
+      collectionArray.push(`${repeatingString}uses`);
       if (repeatingItem === 'repeating_trait') {
         collectionArray.push(`${repeatingString}display_text`);
+      }
+      for (const prop in obj) {
+        if (obj.hasOwnProperty(prop)) {
+          collectionArray.push(`${repeatingString}${prop}`);
+        }
       }
     }
 
@@ -532,14 +538,18 @@ const setClassFeatureOrTrait = (repeatingItem, obj) => {
       if (obj.clear) {
         delete obj.clear;
         for (const prop in obj) {
-          if (!isUndefined(v[`${repeatingString}${prop}`])) {
-            finalSetAttrs[`${repeatingString}${prop}`] = obj[prop];
+          if (obj.hasOwnProperty(prop)) {
+            if (!isUndefined(v[`${repeatingString}${prop}`])) {
+              finalSetAttrs[`${repeatingString}${prop}`] = obj[prop];
+            }
           }
         }
       } else {
         for (const prop in obj) {
-          if (obj[prop] && v[`${repeatingString}${prop}`] !== obj[prop]) {
-            finalSetAttrs[`${repeatingString}${prop}`] = obj[prop];
+          if (obj.hasOwnProperty(prop)) {
+            if (obj[prop] && v[`${repeatingString}${prop}`] !== obj[prop]) {
+              finalSetAttrs[`${repeatingString}${prop}`] = obj[prop];
+            }
           }
         }
         if (obj.saving_throw_ability || obj.saving_throw_bonus || obj.saving_throw_vs_ability) {
@@ -554,6 +564,9 @@ const setClassFeatureOrTrait = (repeatingItem, obj) => {
         if (obj.freetext) {
           finalSetAttrs[`${repeatingString}extras_toggle`] = '@{extras_var}';
           console.log('set extras toggle');
+        }
+        if (obj.uses_max && !obj.uses && isUndefined(v[`${repeatingString}uses`])) {
+          finalSetAttrs[`${repeatingString}uses`] = obj.uses_max;
         }
         if (obj.freetext && repeatingItem === 'repeating_trait' && v[`${repeatingString}display_text`]) {
           finalSetAttrs[`${repeatingString}display_text`] = obj.freetext;
