@@ -1153,9 +1153,9 @@ const setClassFeatures = () => {
       }
       if (v.bard_level >= 3) {
         setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.EXPERTISE_TEXT'),
+          freetext: translate(language, 'CLASS_FEATURES.EXPERTISE_BARD_TEXT'),
           name: translate(language, 'CLASS_FEATURES.EXPERTISE'),
-          storageName: 'Expertise',
+          storageName: 'Expertise Bard',
         });
       }
       if (v.bard_level >= 6) {
@@ -1449,11 +1449,11 @@ const setClassFeatures = () => {
           storageName: 'Fighting Style',
         });
         setClassFeature({
-          damage: '[[(?{Spell Level|1|2|3|4+, 4} + 1)d8]]',
+          damage: '(?{Spell Level|1|2|3|4+, 4} + 1)d8',
           damage_type: 'radiant',
           freetext: translate(language, 'CLASS_FEATURES.DIVINE_SMITE_TEXT'),
           name: translate(language, 'CLASS_FEATURES.DIVINE_SMITE'),
-          second_damage: '[[d8]]',
+          second_damage: 'd8',
           second_damage_type: 'vs undead or fiend',
           storageName: 'Divine Smite',
         });
@@ -1583,6 +1583,83 @@ const setClassFeatures = () => {
           freetext: translate(language, 'CLASS_FEATURES.FOE_SLAYER_TEXT'),
           name: translate(language, 'CLASS_FEATURES.FOE_SLAYER'),
           storageName: 'Foe Slayer',
+        });
+      }
+    }
+
+    if (v.rogue_level) {
+      setTrait({
+        freetext: translate(language, 'CLASS_FEATURES.EXPERTISE_ROGUE_TEXT'),
+        name: translate(language, 'CLASS_FEATURES.EXPERTISE'),
+        storageName: 'Expertise Rogue',
+      });
+      setClassFeature({
+        damage: `${Math.ceil(getIntValue(v.rogue_level)/2)}d6`,
+        freetext: translate(language, 'CLASS_FEATURES.SNEAK_ATTACK_TEXT'),
+        name: translate(language, 'CLASS_FEATURES.SNEAK_ATTACK'),
+        storageName: 'Sneak Attack',
+      });
+      setTrait({
+        freetext: translate(language, 'CLASS_FEATURES.THIEVES_CANT_TEXT'),
+        name: translate(language, 'CLASS_FEATURES.THIEVES_CANT'),
+        storageName: 'Thieves\' Cant',
+      });
+      if (v.rogue_level >= 2) {
+        setClassFeature({
+          freetext: translate(language, 'CLASS_FEATURES.CUNNING_ACTION_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.CUNNING_ACTION'),
+          storageName: 'Cunning Action',
+        });
+      }
+      if (v.rogue_level >= 5) {
+        setClassFeature({
+          freetext: translate(language, 'CLASS_FEATURES.UNCANNY_DODGE_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.UNCANNY_DODGE'),
+          storageName: 'Uncanny Dodge',
+        });
+      }
+      if (v.rogue_level >= 7) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.EVASION_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.EVASION'),
+          storageName: 'Evasion',
+        });
+      }
+      if (v.rogue_level >= 11) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.RELIABLE_TALENT_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.RELIABLE_TALENT'),
+          storageName: 'Reliable Talent',
+        });
+      }
+      if (v.rogue_level >= 14) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.BLINDSENSE_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.BLINDSENSE'),
+          storageName: 'Blindsense',
+        });
+      }
+      if (v.rogue_level >= 15) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.SLIPPERY_MIND_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.SLIPPERY_MIND'),
+          storageName: 'Slippery Mind',
+        });
+      }
+      if (v.rogue_level >= 18) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.ELUSIVE_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.ELUSIVE'),
+          storageName: 'Elusive',
+        });
+      }
+      if (v.rogue_level >= 20) {
+        setClassFeature({
+          freetext: translate(language, 'CLASS_FEATURES.STROKE_OF_LUCK_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.STROKE_OF_LUCK'),
+          recharge: 'Short Rest',
+          storageName: 'Stroke of Luck',
+          uses_max: 1,
         });
       }
     }
