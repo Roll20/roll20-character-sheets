@@ -1050,7 +1050,7 @@ const setClassFeatures = () => {
       }
       if (v.barbarian_level >= 5) {
         setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_TEXT'),
+          freetext: translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_TEXT').replace('NUMBER_OF_TIMES', translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_TWICE')),
           name: translate(language, 'CLASS_FEATURES.EXTRA_ATTACK'),
           storageName: 'Extra Attack',
         });
@@ -1230,6 +1230,56 @@ const setClassFeatures = () => {
       }
     }
 
+    if (v.druid_level >= 1) {
+      if (v.druid_level >= 2) {
+        let wildShapeUses;
+        let wildShapeCR;
+        let wildShapeLimitations;
+
+        if (v.druid_level >= 4) {
+          wildShapeCR = '1/2';
+          wildShapeLimitations = translate(language, 'CLASS_FEATURES.WILD_SHAPE_NO_FLYING');
+        } else if (v.druid_level >= 8) {
+          wildShapeCR = 1;
+          wildShapeLimitations = '';
+        } else {
+          wildShapeCR = '1/4';
+          wildShapeLimitations = translate(language, 'CLASS_FEATURES.WILD_SHAPE_NO_FLYING_OR_SWIMMING');
+        }
+        if (v.druid_level >= 20) {
+          wildShapeUses = 999999;
+        } else {
+          wildShapeUses = 2;
+        }
+        setClassFeature({
+          freetext: translate(language, 'CLASS_FEATURES.WILD_SHAPE_TEXT').replace('CHALLENGE_RATING', wildShapeCR).replace('LIMITATIONS', ` ${wildShapeLimitations}`),
+          name: translate(language, 'CLASS_FEATURES.WILD_SHAPE'),
+          recharge: 'Short Rest',
+          storageName: 'Wild Shape',
+          uses_max: wildShapeUses,
+        });
+      }
+      if (v.druid_level >= 18) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.TIMELESS_BODY_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.TIMELESS_BODY'),
+          storageName: 'Timeless Body',
+        });
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.BEAST_SPELLS_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.BEAST_SPELLS'),
+          storageName: 'Beast Spells',
+        });
+      }
+      if (v.druid_level >= 20) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.ARCHDRUID_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.ARCHDRUID'),
+          storageName: 'Archdruid',
+        });
+      }
+    }
+
     if (v.fighter_level >= 1) {
       setClassFeature({
         freetext: translate(language, 'CLASS_FEATURES.SECOND_WIND_TEXT'),
@@ -1240,11 +1290,12 @@ const setClassFeatures = () => {
         uses_max: 1,
       });
 
-
       if (v.fighter_level >= 2) {
-        let actionSurgeUses = 1;
+        let actionSurgeUses;
         if (v.fighter_level >= 17) {
           actionSurgeUses = 2;
+        } else {
+          actionSurgeUses = 1;
         }
         setClassFeature({
           freetext: translate(language, 'CLASS_FEATURES.ACTION_SURGE_TEXT'),
@@ -1252,6 +1303,39 @@ const setClassFeatures = () => {
           recharge: 'Short Rest',
           storageName: 'Action Surge',
           uses_max: actionSurgeUses,
+        });
+      }
+
+      if (v.fighter_level >= 5) {
+        let extraAttackTimes;
+        if (v.fighter_level >= 20) {
+          extraAttackTimes = translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_FOUR');
+        } else if (v.fighter_level >= 11) {
+          extraAttackTimes = translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_THREE');
+        } else {
+          extraAttackTimes = translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_TWICE');
+        }
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_TEXT').replace('NUMBER_OF_TIMES', extraAttackTimes),
+          name: translate(language, 'CLASS_FEATURES.EXTRA_ATTACK'),
+          storageName: 'Extra Attack',
+        });
+      }
+      if (v.fighter_level >= 9) {
+        let indomitableUses;
+        if (v.fighter_level >= 17) {
+          indomitableUses = 3;
+        } else if (v.fighter_level >= 13) {
+          indomitableUses = 2;
+        } else {
+          indomitableUses = 1
+        }
+        setClassFeature({
+          freetext: translate(language, 'CLASS_FEATURES.INDOMITABLE_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.INDOMITABLE'),
+          recharge: 'Long Rest',
+          storageName: 'Indomitable',
+          uses_max: indomitableUses,
         });
       }
     }
