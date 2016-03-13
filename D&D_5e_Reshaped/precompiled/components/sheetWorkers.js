@@ -743,21 +743,6 @@ const setClassFeatures = (levelsData) => {
       }
     }
 
-    if (levelsData.fighter_level >= 2) {
-      setClassFeature({
-        freetext: translate(language, 'CLASS_FEATURES.ACTION_SURGE_TEXT'),
-        name: translate(language, 'CLASS_FEATURES.ACTION_SURGE'),
-        recharge: 'Short Rest',
-        storageName: 'Action Surge',
-        uses_max: 1,
-      });
-      if (levelsData.fighter_level >= 17) {
-        setClassFeature({
-          storageName: 'Action Surge',
-          uses_max: 2,
-        });
-      }
-    }
     if (levelsData.fighter_level >= 1) {
       setClassFeature({
         freetext: translate(language, 'CLASS_FEATURES.SECOND_WIND_TEXT'),
@@ -767,6 +752,21 @@ const setClassFeatures = (levelsData) => {
         storageName: 'Second Wind',
         uses_max: 1,
       });
+
+
+      if (levelsData.fighter_level >= 2) {
+        let actionSurgeUses = 1;
+        if (levelsData.fighter_level >= 17) {
+          actionSurgeUses = 2;
+        }
+        setClassFeature({
+          freetext: translate(language, 'CLASS_FEATURES.ACTION_SURGE_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.ACTION_SURGE'),
+          recharge: 'Short Rest',
+          storageName: 'Action Surge',
+          uses_max: actionSurgeUses,
+        });
+      }
     }
 
     if (levelsData.sorcerer_level > 1) {
