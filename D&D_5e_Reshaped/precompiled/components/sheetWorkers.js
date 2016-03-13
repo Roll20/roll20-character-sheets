@@ -1004,7 +1004,7 @@ const setClassFeatures = () => {
   getAttrs(collectionArray, (v) => {
     const language = v.lang || 'en';
 
-    if (v.barbarian_level >= 1) {
+    if (v.barbarian_level) {
       let rageUses;
       if (v.barbarian_level >= 20) {
         rageUses = 999999;
@@ -1099,7 +1099,7 @@ const setClassFeatures = () => {
       }
     }
 
-    if (v.bard_level >= 1) {
+    if (v.bard_level) {
       let die;
       if (v.bard_level >= 15) {
         die = 'd12';
@@ -1177,7 +1177,7 @@ const setClassFeatures = () => {
       }
     }
 
-    if (v.cleric_level >= 1) {
+    if (v.cleric_level) {
       if (v.cleric_level >= 2) {
         let channelDivinityUses;
         if (v.cleric_level >= 18) {
@@ -1230,7 +1230,7 @@ const setClassFeatures = () => {
       }
     }
 
-    if (v.druid_level >= 1) {
+    if (v.druid_level) {
       if (v.druid_level >= 2) {
         let wildShapeUses;
         let wildShapeCR;
@@ -1261,7 +1261,7 @@ const setClassFeatures = () => {
       }
       if (v.druid_level >= 18) {
         setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.TIMELESS_BODY_TEXT'),
+          freetext: translate(language, 'CLASS_FEATURES.TIMELESS_BODY_DRUID_TEXT'),
           name: translate(language, 'CLASS_FEATURES.TIMELESS_BODY'),
           storageName: 'Timeless Body',
         });
@@ -1280,7 +1280,7 @@ const setClassFeatures = () => {
       }
     }
 
-    if (v.fighter_level >= 1) {
+    if (v.fighter_level) {
       setClassFeature({
         freetext: translate(language, 'CLASS_FEATURES.SECOND_WIND_TEXT'),
         name: translate(language, 'CLASS_FEATURES.SECOND_WIND'),
@@ -1336,6 +1336,147 @@ const setClassFeatures = () => {
           recharge: 'Long Rest',
           storageName: 'Indomitable',
           uses_max: indomitableUses,
+        });
+      }
+    }
+
+    if (v.monk_level) {
+      setTrait({
+        freetext: translate(language, 'CLASS_FEATURES.MARTIAL_ARTS_TEXT'),
+        name: translate(language, 'CLASS_FEATURES.MARTIAL_ARTS'),
+        storageName: 'Martial Arts',
+      });
+      if (v.monk_level >= 2) {
+        setClassFeature({
+          freetext: translate(language, 'CLASS_FEATURES.KI_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.KI'),
+          recharge: 'Short Rest',
+          storageName: 'Ki',
+          uses_max: v.monk_level,
+        });
+        setClassFeature({
+          freetext: translate(language, 'CLASS_FEATURES.FLURRY_OF_BLOWS_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.FLURRY_OF_BLOWS'),
+          storageName: 'Flurry of Blows'
+        });
+        setClassFeature({
+          freetext: translate(language, 'CLASS_FEATURES.PATIENT_DEFENSE_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.PATIENT_DEFENSE'),
+          storageName: 'Patient Defense'
+        });
+        setClassFeature({
+          freetext: translate(language, 'CLASS_FEATURES.STEP_OF_THE_WIND_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.STEP_OF_THE_WIND'),
+          storageName: 'Step of the Wind'
+        });
+
+        let unarmoredMovementFeet;
+
+        if (v.monk_level >= 6) {
+          unarmoredMovementFeet = 15;
+        } else if (v.monk_level >= 10) {
+          unarmoredMovementFeet = 20;
+        } else if (v.monk_level >= 14) {
+          unarmoredMovementFeet = 25;
+        } else if (v.monk_level >= 18) {
+          unarmoredMovementFeet = 30;
+        } else {
+          unarmoredMovementFeet = 10;
+        }
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.UNARMORED_MOVEMENT_TEXT').replace('UNARMORED_MOVEMENT_FEET', unarmoredMovementFeet),
+          name: translate(language, 'CLASS_FEATURES.UNARMORED_MOVEMENT'),
+          storageName: 'Unarmored Movement',
+        });
+      }
+      if (v.monk_level >= 3) {
+        setClassFeature({
+          freetext: translate(language, 'CLASS_FEATURES.DEFLECT_MISSILES_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.DEFLECT_MISSILES'),
+          storageName: 'Deflect Missiles'
+        });
+      }
+      if (v.monk_level >= 4) {
+        setClassFeature({
+          freetext: translate(language, 'CLASS_FEATURES.SLOW_FALL_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.SLOW_FALL'),
+          storageName: 'Slow Fall'
+        });
+      }
+      if (v.monk_level >= 5) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_TEXT').replace('NUMBER_OF_TIMES', translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_TWICE')),
+          name: translate(language, 'CLASS_FEATURES.EXTRA_ATTACK'),
+          storageName: 'Extra Attack',
+        });
+        setClassFeature({
+          freetext: translate(language, 'CLASS_FEATURES.STUNNING_STRIKE_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.STUNNING_STRIKE'),
+          saving_throw_ability: '@{wisdom_mod}',
+          saving_throw_failure: 'or be stunned until the end of your next turn',
+          saving_throw_vs_ability: 'Constitution',
+          storageName: 'Stunning Strike'
+        });
+      }
+      if (v.monk_level >= 6) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.KI_EMPOWERED_STRIKES_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.KI_EMPOWERED_STRIKES'),
+          storageName: 'Ki-Empowered Strikes',
+        });
+      }
+      if (v.monk_level >= 7) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.EVASION_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.EVASION'),
+          storageName: 'Evasion',
+        });
+        setClassFeature({
+          freetext: translate(language, 'CLASS_FEATURES.STILLNESS_OF_MIND_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.STILLNESS_OF_MIND'),
+          storageName: 'Stillness of Mind'
+        });
+      }
+      if (v.monk_level >= 10) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.PURITY_OF_BODY_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.PURITY_OF_BODY'),
+          storageName: 'Purity of Body',
+        });
+      }
+      if (v.monk_level >= 13) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.TONGUE_OF_THE_SUN_AND_MOON_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.TONGUE_OF_THE_SUN_AND_MOON'),
+          storageName: 'Tongue of the Sun and Moon',
+        });
+      }
+      if (v.monk_level >= 14) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.DIAMOND_SOUL_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.DIAMOND_SOUL'),
+          storageName: 'Diamond Soul'
+        });
+      }
+      if (v.monk_level >= 15) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.TIMELESS_BODY_MONK_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.TIMELESS_BODY'),
+          storageName: 'Timeless Body',
+        });
+      }
+      if (v.monk_level >= 15) {
+        setClassFeature({
+          freetext: translate(language, 'CLASS_FEATURES.EMPTY_BODY_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.EMPTY_BODY'),
+          storageName: 'Empty Body'
+        });
+      }
+      if (v.monk_level >= 20) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.PERFECT_SELF_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.PERFECT_SELF'),
+          storageName: 'Perfect Self',
         });
       }
     }
