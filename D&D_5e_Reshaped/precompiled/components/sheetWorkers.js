@@ -539,6 +539,9 @@ const setClassFeatureOrTrait = (repeatingItem, obj) => {
             finalSetAttrs[`${repeatingString}${prop}`] = obj[prop];
           }
         }
+        if (obj.saving_throw_ability || obj.saving_throw_bonus || obj.saving_throw_vs_ability) {
+          finalSetAttrs[`${repeatingString}saving_throw_toggle`] = '@{saving_throw_toggle_var}';
+        }
         if (obj.damage || obj.damage_ability || obj.damage_bonus) {
           finalSetAttrs[`${repeatingString}damage_toggle`] = '@{damage_toggle_var}';
         }
@@ -555,14 +558,15 @@ const setClassFeatureOrTrait = (repeatingItem, obj) => {
       }
 
       setFinalAttrs(v, finalSetAttrs);
+      return itemId;
     });
   });
 };
 const setClassFeature = (obj) => {
-  setClassFeatureOrTrait('repeating_classfeature', obj);
+  return setClassFeatureOrTrait('repeating_classfeature', obj);
 };
 const setTrait = (obj) => {
-  setClassFeatureOrTrait('repeating_trait', obj);
+  return setClassFeatureOrTrait('repeating_trait', obj);
 };
 
 const setClassFeatures = (levelsData) => {
@@ -739,6 +743,33 @@ const setClassFeatures = (levelsData) => {
           freetext: translate(language, 'CLASS_FEATURES.SUPERIOR_INSPIRATION_TEXT'),
           name: translate(language, 'CLASS_FEATURES.SUPERIOR_INSPIRATION'),
           storageName: 'Superior Inspiration',
+        });
+      }
+    }
+
+    if (levelsData.cleric_level >= 1) {
+      if (levelsData.cleric_level >= 2) {
+        let channelDivinityUses = 1;
+        if (levelsData.cleric_level >= 18) {
+          channelDivinityUses = 3;
+        } else if (levelsData.cleric_level >= 6) {
+          channelDivinityUses = 2;
+        }
+        const channelDivinityId = setClassFeature({
+          freetext: translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY'),
+          recharge: 'Short Rest',
+          storageName: 'Channel Divinity',
+          uses_max: channelDivinityUses,
+        });
+
+        console.log('channelDivinityId', channelDivinityId);
+        setClassFeature({
+          freetext: translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY_TURN_UNDEAD_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY_TURN_UNDEAD'),
+          saving_throw_ability: '@{wisdom_mod}',
+          saving_throw_vs_ability: 'Wisdom',
+          storageName: 'Turn Undead',
         });
       }
     }
@@ -2326,6 +2357,11 @@ const updateClassFeature = (rowId) => {
     for (let i = 0; i < ids.length; i++) {
       const repeatingString = `${repeatingItem}_${ids[i]}_`;
       collectionArray.push(`${repeatingString}name`);
+      collectionArray.push(`${repeatingString}saving_throw_toggle`);
+      collectionArray.push(`${repeatingString}saving_throw_ability`);
+      collectionArray.push(`${repeatingString}saving_throw_vs_ability`);
+      collectionArray.push(`${repeatingString}saving_throw_bonus`);
+      collectionArray.push(`${repeatingString}saving_throw_dc`);
       collectionArray.push(`${repeatingString}damage_toggle`);
       collectionArray.push(`${repeatingString}damage_formula`);
       collectionArray.push(`${repeatingString}damage`);
@@ -2355,6 +2391,8 @@ const updateClassFeature = (rowId) => {
           type: 'attack',
         };
         updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
+        const savingThrowOptions = {};
+        updateSavingThrowToggle(v, finalSetAttrs, repeatingString, savingThrowOptions);
         updateHealToggle(v, finalSetAttrs, repeatingString);
       }
       setFinalAttrs(v, finalSetAttrs);
