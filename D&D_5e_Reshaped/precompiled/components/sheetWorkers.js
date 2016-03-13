@@ -572,256 +572,6 @@ const setTrait = (obj) => {
   return setClassFeatureOrTrait('repeating_trait', obj);
 };
 
-const setClassFeatures = (levelsData) => {
-  const finalSetAttrs = {};
-  const collectionArray = ['ac_unarmored_ability', 'lang'];
-
-  for (let i = 0; i < ABILITIES.length; i++) {
-    collectionArray.push(`${ABILITIES[i]}_mod`);
-  }
-
-  getAttrs(collectionArray, (v) => {
-    const language = v.lang || 'en';
-
-    if (levelsData.barbarian_level >= 1) {
-      let rageUses = 2;
-      if (levelsData.barbarian_level >= 20) {
-        rageUses = 999999;
-      } else if (levelsData.barbarian_level >= 17) {
-        rageUses = 6;
-      } else if (levelsData.barbarian_level >= 12) {
-        rageUses = 5;
-      } else if (levelsData.barbarian_level >= 6) {
-        rageUses = 4;
-      } else if (levelsData.barbarian_level >= 3) {
-        rageUses = 3;
-      }
-      setClassFeature({
-        freetext: translate(language, 'CLASS_FEATURES.RAGE_TEXT'),
-        name: translate(language, 'CLASS_FEATURES.RAGE'),
-        recharge: 'Long Rest',
-        storageName: 'Rage',
-        uses_max: rageUses,
-      });
-
-      if (isUndefined(v.ac_unarmored_ability)) {
-        finalSetAttrs.ac_unarmored_ability = '@{constitution_mod}';
-      }
-      setTrait({
-        freetext: translate(language, 'CLASS_FEATURES.UNARMORED_DEFENSE_TEXT'),
-        name: translate(language, 'CLASS_FEATURES.UNARMORED_DEFENSE'),
-        storageName: 'Unarmored Defense',
-      });
-
-      if (levelsData.barbarian_level >= 2) {
-        setClassFeature({
-          freetext: translate(language, 'CLASS_FEATURES.RECKLESS_ATTACK'),
-          name: translate(language, 'CLASS_FEATURES.RECKLESS_ATTACK'),
-          storageName: 'Reckless Attack',
-        });
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.DANGER_SENSE_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.DANGER_SENSE'),
-          storageName: 'Danger Sense',
-        });
-      }
-      if (levelsData.barbarian_level >= 5) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.EXTRA_ATTACK'),
-          storageName: 'Extra Attack',
-        });
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.FAST_MOVEMENT_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.FAST_MOVEMENT'),
-          storageName: 'Fast Movement',
-        });
-      }
-      if (levelsData.barbarian_level >= 7) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.FERAL_INSTINCT_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.FERAL_INSTINCT'),
-          storageName: 'Feral Instinct',
-        });
-      }
-      if (levelsData.barbarian_level >= 9) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.BRUTAL_CRITICAL_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.BRUTAL_CRITICAL'),
-          storageName: 'Brutal Critical',
-        });
-      }
-      if (levelsData.barbarian_level >= 11) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.RELENTLESS_RAGE_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.RELENTLESS_RAGE'),
-          storageName: 'Relentless Rage',
-        });
-      }
-      if (levelsData.barbarian_level >= 15) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.PERSISTENT_RAGE_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.PERSISTENT_RAGE'),
-          storageName: 'Persistent Rage',
-        });
-      }
-      if (levelsData.barbarian_level >= 18) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.INDOMITABLE_MIGHT_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.INDOMITABLE_MIGHT'),
-          storageName: 'Indomitable Might',
-        });
-      }
-      if (levelsData.barbarian_level >= 20) {
-      }
-    }
-
-    if (levelsData.bard_level >= 1) {
-      let die = 'd6';
-      if (levelsData.bard_level >= 15) {
-        die = 'd12';
-      } else if (levelsData.bard_level >= 10) {
-        die = 'd10';
-      } else if (levelsData.bard_level >= 5) {
-        die = 'd8';
-      }
-      let recharge = 'Long Rest';
-      if (levelsData.bard_level >= 5) {
-        recharge = 'Short Rest';
-      }
-      setClassFeature({
-        freetext: translate(language, 'CLASS_FEATURES.BARDIC_INSPIRATION_TEXT').replace('d6', die),
-        name: translate(language, 'CLASS_FEATURES.BARDIC_INSPIRATION'),
-        recharge: recharge,
-        storageName: 'Bardic Inspiration',
-        uses_max: Math.max(getIntValue(v.charisma_mod), 1),
-      });
-
-      if (levelsData.bard_level >= 2) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.JACK_OF_ALL_TRADES_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.JACK_OF_ALL_TRADES'),
-          storageName: 'Jack of All Trades',
-        });
-        finalSetAttrs.jack_of_all_trades_toggle = '@{jack_of_all_trades}';
-
-        let heal = 'd6';
-        if (levelsData.barbarian_level >= 17) {
-          heal = 'd12';
-        } else if (levelsData.barbarian_level >= 13) {
-          heal = 'd10';
-        } else if (levelsData.barbarian_level >= 9) {
-          heal = 'd8';
-        }
-        setClassFeature({
-          freetext: translate(language, 'CLASS_FEATURES.SONG_OF_REST_TEXT'),
-          heal: heal,
-          name: translate(language, 'CLASS_FEATURES.SONG_OF_REST'),
-          storageName: 'Song of Rest',
-        });
-      }
-      if (levelsData.bard_level >= 3) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.EXPERTISE_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.EXPERTISE'),
-          storageName: 'Expertise',
-        });
-      }
-      if (levelsData.bard_level >= 6) {
-        setClassFeature({
-          freetext: translate(language, 'CLASS_FEATURES.COUNTERCHARM_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.COUNTERCHARM'),
-          storageName: 'Countercharm',
-        });
-      }
-      if (levelsData.bard_level >= 10) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.MAGICAL_SECRETS_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.MAGICAL_SECRETS'),
-          storageName: 'Magical Secrets',
-        });
-      }
-      if (levelsData.bard_level >= 20) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.SUPERIOR_INSPIRATION_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.SUPERIOR_INSPIRATION'),
-          storageName: 'Superior Inspiration',
-        });
-      }
-    }
-
-    if (levelsData.cleric_level >= 1) {
-      if (levelsData.cleric_level >= 2) {
-        let channelDivinityUses = 1;
-        if (levelsData.cleric_level >= 18) {
-          channelDivinityUses = 3;
-        } else if (levelsData.cleric_level >= 6) {
-          channelDivinityUses = 2;
-        }
-        const channelDivinityId = setClassFeature({
-          freetext: translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY'),
-          recharge: 'Short Rest',
-          storageName: 'Channel Divinity',
-          uses_max: channelDivinityUses,
-        });
-
-        console.log('channelDivinityId', channelDivinityId);
-        setClassFeature({
-          freetext: translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY_TURN_UNDEAD_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY_TURN_UNDEAD'),
-          saving_throw_ability: '@{wisdom_mod}',
-          saving_throw_vs_ability: 'Wisdom',
-          storageName: 'Turn Undead',
-        });
-      }
-    }
-
-    if (levelsData.fighter_level >= 1) {
-      setClassFeature({
-        freetext: translate(language, 'CLASS_FEATURES.SECOND_WIND_TEXT'),
-        name: translate(language, 'CLASS_FEATURES.SECOND_WIND'),
-        heal: 'd10 + @{fighter_level}',
-        recharge: 'Short Rest',
-        storageName: 'Second Wind',
-        uses_max: 1,
-      });
-
-
-      if (levelsData.fighter_level >= 2) {
-        let actionSurgeUses = 1;
-        if (levelsData.fighter_level >= 17) {
-          actionSurgeUses = 2;
-        }
-        setClassFeature({
-          freetext: translate(language, 'CLASS_FEATURES.ACTION_SURGE_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.ACTION_SURGE'),
-          recharge: 'Short Rest',
-          storageName: 'Action Surge',
-          uses_max: actionSurgeUses,
-        });
-      }
-    }
-
-    if (levelsData.sorcerer_level > 1) {
-      setClassFeature({
-        freetext: translate(language, 'CLASS_FEATURES.SORCERY_POINTS_TEXT'),
-        name: translate(language, 'CLASS_FEATURES.SORCERY_POINTS'),
-        recharge: 'Long Rest',
-        storageName: 'Sorcery Points',
-        uses_max: levelsData.sorcerer_level,
-      });
-    } else {
-      setClassFeature({
-        clear: true,
-        storageName: 'Sorcery Points',
-        uses_max: 0,
-      });
-    }
-    setFinalAttrs(v, finalSetAttrs);
-  });
-};
-
 const updateLevels = (removeClass) => {
   const repeatingItem = 'repeating_class';
   const collectionArray = ['is_npc', 'lang'];
@@ -1069,7 +819,6 @@ const updateLevels = (removeClass) => {
       }
 
       setFinalAttrs(v, finalSetAttrs);
-      setClassFeatures(finalSetAttrs);
     });
   });
 };
@@ -1227,6 +976,260 @@ const updateSpellSlots = () => {
     setFinalAttrs(v, finalSetAttrs);
   });
 };
+
+const setClassFeatures = () => {
+  const finalSetAttrs = {};
+  const collectionArray = ['ac_unarmored_ability', 'lang'];
+
+  for (let i = 0; i < ABILITIES.length; i++) {
+    collectionArray.push(`${ABILITIES[i]}_mod`);
+  }
+  for (let j = 0; j < CLASSES.length; j++) {
+    collectionArray.push(`${CLASSES[j]}_level`);
+  }
+
+  getAttrs(collectionArray, (v) => {
+    const language = v.lang || 'en';
+
+    if (v.barbarian_level >= 1) {
+      let rageUses = 2;
+      if (v.barbarian_level >= 20) {
+        rageUses = 999999;
+      } else if (v.barbarian_level >= 17) {
+        rageUses = 6;
+      } else if (v.barbarian_level >= 12) {
+        rageUses = 5;
+      } else if (v.barbarian_level >= 6) {
+        rageUses = 4;
+      } else if (v.barbarian_level >= 3) {
+        rageUses = 3;
+      }
+      setClassFeature({
+        freetext: translate(language, 'CLASS_FEATURES.RAGE_TEXT'),
+        name: translate(language, 'CLASS_FEATURES.RAGE'),
+        recharge: 'Long Rest',
+        storageName: 'Rage',
+        uses_max: rageUses,
+      });
+
+      if (isUndefined(v.ac_unarmored_ability)) {
+        finalSetAttrs.ac_unarmored_ability = '@{constitution_mod}';
+      }
+      setTrait({
+        freetext: translate(language, 'CLASS_FEATURES.UNARMORED_DEFENSE_TEXT'),
+        name: translate(language, 'CLASS_FEATURES.UNARMORED_DEFENSE'),
+        storageName: 'Unarmored Defense',
+      });
+
+      if (v.barbarian_level >= 2) {
+        setClassFeature({
+          freetext: translate(language, 'CLASS_FEATURES.RECKLESS_ATTACK'),
+          name: translate(language, 'CLASS_FEATURES.RECKLESS_ATTACK'),
+          storageName: 'Reckless Attack',
+        });
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.DANGER_SENSE_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.DANGER_SENSE'),
+          storageName: 'Danger Sense',
+        });
+      }
+      if (v.barbarian_level >= 5) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.EXTRA_ATTACK'),
+          storageName: 'Extra Attack',
+        });
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.FAST_MOVEMENT_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.FAST_MOVEMENT'),
+          storageName: 'Fast Movement',
+        });
+      }
+      if (v.barbarian_level >= 7) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.FERAL_INSTINCT_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.FERAL_INSTINCT'),
+          storageName: 'Feral Instinct',
+        });
+      }
+      if (v.barbarian_level >= 9) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.BRUTAL_CRITICAL_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.BRUTAL_CRITICAL'),
+          storageName: 'Brutal Critical',
+        });
+      }
+      if (v.barbarian_level >= 11) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.RELENTLESS_RAGE_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.RELENTLESS_RAGE'),
+          storageName: 'Relentless Rage',
+        });
+      }
+      if (v.barbarian_level >= 15) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.PERSISTENT_RAGE_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.PERSISTENT_RAGE'),
+          storageName: 'Persistent Rage',
+        });
+      }
+      if (v.barbarian_level >= 18) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.INDOMITABLE_MIGHT_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.INDOMITABLE_MIGHT'),
+          storageName: 'Indomitable Might',
+        });
+      }
+      if (v.barbarian_level >= 20) {
+      }
+    }
+
+    if (v.bard_level >= 1) {
+      let die = 'd6';
+      if (v.bard_level >= 15) {
+        die = 'd12';
+      } else if (v.bard_level >= 10) {
+        die = 'd10';
+      } else if (v.bard_level >= 5) {
+        die = 'd8';
+      }
+      let recharge = 'Long Rest';
+      if (v.bard_level >= 5) {
+        recharge = 'Short Rest';
+      }
+      setClassFeature({
+        freetext: translate(language, 'CLASS_FEATURES.BARDIC_INSPIRATION_TEXT').replace('d6', die),
+        name: translate(language, 'CLASS_FEATURES.BARDIC_INSPIRATION'),
+        recharge: recharge,
+        storageName: 'Bardic Inspiration',
+        uses_max: Math.max(getIntValue(v.charisma_mod), 1),
+      });
+
+      if (v.bard_level >= 2) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.JACK_OF_ALL_TRADES_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.JACK_OF_ALL_TRADES'),
+          storageName: 'Jack of All Trades',
+        });
+        finalSetAttrs.jack_of_all_trades_toggle = '@{jack_of_all_trades}';
+
+        let heal = 'd6';
+        if (v.bard_level >= 17) {
+          heal = 'd12';
+        } else if (v.bard_level >= 13) {
+          heal = 'd10';
+        } else if (v.bard_level >= 9) {
+          heal = 'd8';
+        }
+        setClassFeature({
+          freetext: translate(language, 'CLASS_FEATURES.SONG_OF_REST_TEXT'),
+          heal: heal,
+          name: translate(language, 'CLASS_FEATURES.SONG_OF_REST'),
+          storageName: 'Song of Rest',
+        });
+      }
+      if (v.bard_level >= 3) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.EXPERTISE_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.EXPERTISE'),
+          storageName: 'Expertise',
+        });
+      }
+      if (v.bard_level >= 6) {
+        setClassFeature({
+          freetext: translate(language, 'CLASS_FEATURES.COUNTERCHARM_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.COUNTERCHARM'),
+          storageName: 'Countercharm',
+        });
+      }
+      if (v.bard_level >= 10) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.MAGICAL_SECRETS_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.MAGICAL_SECRETS'),
+          storageName: 'Magical Secrets',
+        });
+      }
+      if (v.bard_level >= 20) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.SUPERIOR_INSPIRATION_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.SUPERIOR_INSPIRATION'),
+          storageName: 'Superior Inspiration',
+        });
+      }
+    }
+
+    if (v.cleric_level >= 1) {
+      if (v.cleric_level >= 2) {
+        let channelDivinityUses = 1;
+        if (v.cleric_level >= 18) {
+          channelDivinityUses = 3;
+        } else if (v.cleric_level >= 6) {
+          channelDivinityUses = 2;
+        }
+        const channelDivinityId = setClassFeature({
+          freetext: translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY'),
+          recharge: 'Short Rest',
+          storageName: 'Channel Divinity',
+          uses_max: channelDivinityUses,
+        });
+
+        console.log('channelDivinityId', channelDivinityId);
+        setClassFeature({
+          freetext: translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY_TURN_UNDEAD_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY_TURN_UNDEAD'),
+          saving_throw_ability: '@{wisdom_mod}',
+          saving_throw_vs_ability: 'Wisdom',
+          storageName: 'Turn Undead',
+        });
+      }
+    }
+
+    if (v.fighter_level >= 1) {
+      setClassFeature({
+        freetext: translate(language, 'CLASS_FEATURES.SECOND_WIND_TEXT'),
+        name: translate(language, 'CLASS_FEATURES.SECOND_WIND'),
+        heal: 'd10 + @{fighter_level}',
+        recharge: 'Short Rest',
+        storageName: 'Second Wind',
+        uses_max: 1,
+      });
+
+
+      if (v.fighter_level >= 2) {
+        let actionSurgeUses = 1;
+        if (v.fighter_level >= 17) {
+          actionSurgeUses = 2;
+        }
+        setClassFeature({
+          freetext: translate(language, 'CLASS_FEATURES.ACTION_SURGE_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.ACTION_SURGE'),
+          recharge: 'Short Rest',
+          storageName: 'Action Surge',
+          uses_max: actionSurgeUses,
+        });
+      }
+    }
+
+    if (v.sorcerer_level > 1) {
+      setClassFeature({
+        freetext: translate(language, 'CLASS_FEATURES.SORCERY_POINTS_TEXT'),
+        name: translate(language, 'CLASS_FEATURES.SORCERY_POINTS'),
+        recharge: 'Long Rest',
+        storageName: 'Sorcery Points',
+        uses_max: v.sorcerer_level,
+      });
+    } else {
+      setClassFeature({
+        clear: true,
+        storageName: 'Sorcery Points',
+        uses_max: 0,
+      });
+    }
+    setFinalAttrs(v, finalSetAttrs);
+  });
+};
+
 on('change:repeating_class', () => {
   console.log('change:repeating_class');
   updateLevels();
@@ -1236,7 +1239,22 @@ on('remove:repeating_class', () => {
   console.log('remove:repeating_class');
   updateLevels('remove');
   updateSpellSlots();
+  setClassFeatures();
 });
+
+const watchForClassLevelChanges = () => {
+  let classFeatureWatch = [];
+  for (let z = 0; z < CLASSES.length; z++) {
+    classFeatureWatch.push(`change:${CLASSES[z]}_level`);
+  }
+  for (let i = 0; i < ABILITIES.length; i++) {
+    classFeatureWatch.push(`change:${ABILITIES[i]}_mod`);
+  }
+  on(classFeatureWatch.join(' '), () => {
+    setClassFeatures();
+  });
+};
+watchForClassLevelChanges();
 on('change:caster_level change:spell_slots_l1_bonus change:spell_slots_l2_bonus change:spell_slots_l3_bonus change:spell_slots_l4_bonus change:spell_slots_l5_bonus change:spell_slots_l6_bonus change:spell_slots_l7_bonus change:spell_slots_l8_bonus change:spell_slots_l9_bonus', () => {
   updateSpellSlots();
 });
