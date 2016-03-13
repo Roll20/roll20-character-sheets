@@ -569,6 +569,10 @@ const setClassFeatures = (levelsData) => {
   const finalSetAttrs = {};
   const collectionArray = ['ac_unarmored_ability', 'lang'];
 
+  for (let i = 0; i < ABILITIES.length; i++) {
+    options.getExtraFields.push(`${ABILITIES[i]}_mod`);
+  }
+
   getAttrs(collectionArray, (v) => {
     const language = v.lang || 'en';
 
@@ -662,10 +666,79 @@ const setClassFeatures = (levelsData) => {
         });
       }
       if (levelsData.barbarian_level >= 20) {
+      }
+    }
+
+    if (levelsData.bard_level >= 1) {
+      let die = 'd6';
+      if (levelsData.barbarian_level >= 15) {
+        die = 'd12';
+      } else if (levelsData.barbarian_level >= 10) {
+        die = 'd10';
+      } else if (levelsData.barbarian_level >= 5) {
+        die = 'd8';
+      }
+      let recharge = 'Long Rest';
+      if (levelsData.bard_level >= 5) {
+        recharge = 'Short Rest';
+      }
+      setClassFeature({
+        freetext: translate(language, 'CLASS_FEATURES.BARDIC_INSPIRATION_TEXT').replace('d6', die),
+        name: translate(language, 'CLASS_FEATURES.BARDIC_INSPIRATION'),
+        recharge: recharge,
+        storageName: 'Bardic Inspiration',
+        uses_max: Math.Max(getIntValue(v.charisma_mod), 1),
+      });
+
+      if (levelsData.bard_level >= 2) {
         setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.PRIMAL_CHAMPION_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.PRIMAL_CHAMPION'),
-          storageName: 'Primal Champion',
+          freetext: translate(language, 'CLASS_FEATURES.JACK_OF_ALL_TRADES_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.JACK_OF_ALL_TRADES'),
+          storageName: 'Jack of All Trades',
+        });
+        finalSetAttrs.jack_of_all_trades_toggle = '@{jack_of_all_trades}';
+
+        let heal = 'd6';
+        if (levelsData.barbarian_level >= 17) {
+          heal = 'd12';
+        } else if (levelsData.barbarian_level >= 13) {
+          heal = 'd10';
+        } else if (levelsData.barbarian_level >= 9) {
+          heal = 'd8';
+        }
+        setClassFeature({
+          freetext: translate(language, 'CLASS_FEATURES.SONG_OF_REST_TEXT'),
+          heal: heal,
+          name: translate(language, 'CLASS_FEATURES.SONG_OF_REST'),
+          storageName: 'Song of Rest',
+        });
+      }
+      if (levelsData.bard_level >= 3) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.EXPERTISE_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.EXPERTISE'),
+          storageName: 'Expertise',
+        });
+      }
+      if (levelsData.bard_level >= 6) {
+        setClassFeature({
+          freetext: translate(language, 'CLASS_FEATURES.COUNTERCHARM_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.COUNTERCHARM'),
+          storageName: 'Countercharm',
+        });
+      }
+      if (levelsData.bard_level >= 10) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.MAGICAL_SECRETS_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.MAGICAL_SECRETS'),
+          storageName: 'Magical Secrets',
+        });
+      }
+      if (levelsData.bard_level >= 20) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.SUPERIOR_INSPIRATION_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.SUPERIOR_INSPIRATION'),
+          storageName: 'Superior Inspiration',
         });
       }
     }
