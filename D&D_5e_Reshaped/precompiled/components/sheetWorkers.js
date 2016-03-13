@@ -570,7 +570,7 @@ const setClassFeatures = (levelsData) => {
   const collectionArray = ['ac_unarmored_ability', 'lang'];
 
   for (let i = 0; i < ABILITIES.length; i++) {
-    options.getExtraFields.push(`${ABILITIES[i]}_mod`);
+    collectionArray.push(`${ABILITIES[i]}_mod`);
   }
 
   getAttrs(collectionArray, (v) => {
@@ -687,7 +687,7 @@ const setClassFeatures = (levelsData) => {
         name: translate(language, 'CLASS_FEATURES.BARDIC_INSPIRATION'),
         recharge: recharge,
         storageName: 'Bardic Inspiration',
-        uses_max: Math.Max(getIntValue(v.charisma_mod), 1),
+        uses_max: Math.max(getIntValue(v.charisma_mod), 1),
       });
 
       if (levelsData.bard_level >= 2) {
@@ -790,7 +790,7 @@ const setClassFeatures = (levelsData) => {
 
 const updateLevels = (removeClass) => {
   const repeatingItem = 'repeating_class';
-  const collectionArray = ['is_npc'];
+  const collectionArray = ['is_npc', 'lang'];
   const finalSetAttrs = {};
 
   for (let i = 0; i < CLASSES.length; i++) {
@@ -1010,6 +1010,7 @@ const updateLevels = (removeClass) => {
       }
 
       if (spellcasting.warlock > 0) {
+        const language = v.lang || 'en';
         let warlockSpellSlots = 1;
         if (spellcasting.warlock >= 17) {
           warlockSpellSlots = 4;
