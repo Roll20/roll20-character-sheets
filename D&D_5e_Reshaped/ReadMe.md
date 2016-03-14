@@ -2,8 +2,8 @@
 
 This is the redesigned Shaped character sheet for use on Roll20.net with the latest (5th) edition of Dungeons & Dragons. The sheet is designed to be usable by all Roll20 users regardless of subscription level.
 
-[PC]: http://i.imgur.com/li1ETpJ.jpg "PC sheet"
-[NPC]: http://i.imgur.com/T2hbvnA.jpg "NPC sheet"
+![alt text](http://i.imgur.com/li1ETpJ.jpg "PC sheet")
+![alt text](http://i.imgur.com/T2hbvnA.jpg "NPC sheet")
 
 ---
 
