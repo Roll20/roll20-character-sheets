@@ -1,0 +1,894 @@
+<script type='text/worker'>
+    
+    function calcFateCost(eventInfo){
+        getSectionIDs("repeating_fates", function(idarray){
+            var vars = new Array();
+            for (i = 0; i < idarray.length; i++){
+                vars.push("repeating_fates_" + idarray[i] + "_fateCost");
+            }
+            
+            getAttrs(vars, function (values){
+                var total = 0;
+                
+                for (j = 0; j < vars.length; j++){
+                    
+                    switch (values[vars[j]]){
+                        case "3":
+                            total = total + 10;
+                            break;
+                        case "4":
+                            total = total + 30;
+                            break;
+                        case "5":
+                            total = total + 70;
+                            break;
+                    }
+                }
+                
+                setAttrs({
+                    totalFateCost: total
+                });
+            });
+        });
+    }
+    
+    on("change:repeating_fates:fateCost", calcFateCost);
+    on("remove:repeating_fates", calcFateCost);
+    
+    on("change:meikyoKarma", function(eventInfo) {
+        getAttrs(["meikyoKarma"], function(values){
+            var bonus = 0;
+            var karma = parseInt(values.meikyoKarma);
+            
+            if (karma <= 20){
+                bonus = 0;
+            }else if (karma <= 40){
+                bonus = 1;
+            }else if (karma <= 60){
+                bonus = 2;
+            }else if (karma <= 80){
+                bonus = 3;
+            }else if (karma <= 100){
+                bonus = 4;
+            }else if (karma <= 108){
+                bonus = 5;
+            }else {
+                bonus = 6;
+            }
+            
+            setAttrs({
+                meikyoBonus: bonus
+            });
+        });
+    });
+    
+    function calcWoundBonus(eventInfo){
+        getAttrs(["heavyWounds", "criticalWounds", "deadBox"], function(values){
+            var bonus = 0;
+            if (values.deadBox == "1"){
+                bonus = 3;
+            }else if (values.criticalWounds != "0"){
+                bonus = 2;
+            }else if (values.heavyWounds != "0"){
+                bonus = 1;
+            }
+            
+            setAttrs({
+                woundBonus: bonus
+            })
+        });
+    }
+    
+    on("change:heavyWounds change:criticalWounds", calcWoundBonus)
+    on("change:deadBox", calcWoundBonus);
+    
+    function calcWounds(eventInfo){
+        getAttrs(["Body"], function(values){
+            var body = parseInt(values.Body);
+            var light = body;
+            var heavy = Math.ceil(body / 2);
+            var critical = Math.ceil(body / 4);
+            
+            setAttrs({
+                lightWounds_max: light,
+                heavyWounds_max: heavy,
+                criticalWounds_max: critical
+            })
+        });
+    }
+    
+    on("change:Body", calcWounds);
+    
+     function calcArmourWounds(eventInfo){
+        getAttrs(["ArmourBody"], function(values){
+            var body = parseInt(values.ArmourBody);
+            var light = body;
+            var heavy = Math.ceil(body / 2);
+            var critical = Math.ceil(body / 4);
+            
+            setAttrs({
+                armourlightWounds_max: light,
+                armourheavyWounds_max: heavy,
+                armourcriticalWounds_max: critical
+            })
+        });
+    }
+    
+    on("change:ArmourBody", calcArmourWounds);
+    
+</script>
+
+<div class='sheet-3colrow'>
+    <div class='sheet-col'>
+        <div class='sheet-row'>
+            Name <input type="text" name="attr_name"/>
+        </div>
+        <div class='sheet-row'>
+            Age <input type="text" name="attr_age" class='sheet-short'/>
+            Sex <input type="text" name="attr_sex" class='sheet-short'/>
+        </div>
+        <div class='sheet-row'>
+            Concept <textarea name="attr_concept"></textarea>
+        </div>
+        <div class='sheet-row'>
+            Archetypes <textarea name="attr_archetypes"></textarea>
+        </div>
+        <div class='sheet-row'>
+            <span>Karma Cost</span> <input type="number" name="attr_karmaCost"/>
+            <span>Attribute Cost</span> <input type="number" name="attr_attrCost"/>
+        </div>
+        <div class='sheet-row'>
+            <b>Fates</b> <br/>
+            <fieldset class='repeating_fates'>
+                <table>
+                    <tr>
+                        <td>
+                            <input type='checkbox' value='1' name='attr_fateSublimate' /><span></span>
+                            <textarea class='fate' name='attr_fate' rows='2'></textarea>
+                        </td>
+                        <td>
+                            Cost
+                            <input type="radio" name="attr_fateCost" value="1" checked /><span></span>
+                            <input type="radio" name="attr_fateCost" value="2" /><span></span>
+                            <input type="radio" name="attr_fateCost" value="3" /><span></span>
+                            <input type="radio" name="attr_fateCost" value="4" /><span></span>
+                            <input type="radio" name="attr_fateCost" value="5" /><span></span>
+                        </td>
+                    </tr>
+                </table>
+            </fieldset>
+            Total Fate Cost: <input type='number' name='attr_totalFateCost' readonly />
+        </div>
+    </div>
+    
+    <div class='sheet-col'>
+        <div class='sheet-row'>
+            Vitality <input type='number' name='attr_vit'/> / 
+            <input type='number' name='attr_vit_Max' disabled='true' value='@{Body}+@{Spirit}' />
+        </div>
+        <div class='sheet-row'>
+            Armour Vitality <input type='number' name='attr_armourVit'/> / 
+            <input type='number' name='attr_armourVit_Max' disabled='true' value='@{ArmourBody}*2' />
+        </div>
+        <div class='sheet-row'>
+            Soul <input type='number' name='attr_soul'/> / 
+            <input type='number' name='attr_soul_Max' disabled='true' value='(@{Spirit}+@{Knowledge})*2' />
+        </div>
+        <div class='sheet-row'>
+            <b>Kiai</b> <br/>
+            <span class='nowrap'>Current <input type='number' name='attr_CurrentKiai' /></span>
+            <span class='nowrap'>Spent <input type='number' name='attr_SpentKiai' /></span>
+        </div>
+        <div class='sheet-row'>
+            <b>Karma</b> <br/>
+            <span class='nowrap'>Character <input type='number' name='attr_charKarma' /></span>
+            <span class='nowrap'>Meikyo <input type='number' name='attr_meikyoKarma' /> </span>
+            <span class='nowrap'>Total <input type='number' name='attr_totalKarma' value='@{charKarma}+@{meikyoKarma}' disabled /></span>
+            <span class='nowrap'>Meikyo Bonus <input type='number' name='attr_meikyoBonus' readonly /></span>
+        </div>
+        <div class='sheet-row'>
+            <table class='sheet-wounds'>
+            <tr><th colspan="2">Wounds</th></tr>
+                <tr>
+                    <td>
+                        <input type='radio' value='0' name='attr_lightWounds' class='zero' checked /> <span></span>
+                        <input type='radio' value='1' name='attr_lightWounds' class='wound' /><span></span>
+                        <input type='radio' value='1' name='attr_lightWounds_max' class='woundMax'/>
+                        <input type='radio' value='2' name='attr_lightWounds' class='wound' /><span></span>
+                        <input type='radio' value='2' name='attr_lightWounds_max' class='woundMax' />
+                        <input type='radio' value='3' name='attr_lightWounds' class='wound' /><span></span>
+                        <input type='radio' value='3' name='attr_lightWounds_max' class='woundMax' />
+                        <input type='radio' value='4' name='attr_lightWounds' class='wound' /><span></span>
+                        <input type='radio' value='4' name='attr_lightWounds_max' class='woundMax' />
+                        <input type='radio' value='5' name='attr_lightWounds' class='wound' /><span></span>
+                        <input type='radio' value='5' name='attr_lightWounds_max' class='woundMax' />
+                        <input type='radio' value='6' name='attr_lightWounds' class='wound' /><span></span>
+                        <input type='radio' value='6' name='attr_lightWounds_max' class='woundMax' />
+                        <input type='radio' value='7' name='attr_lightWounds' class='wound' /><span></span>
+                        <input type='radio' value='7' name='attr_lightWounds_max' class='woundMax' />
+                        <input type='radio' value='8' name='attr_lightWounds' class='wound' /><span></span>
+                        <input type='radio' value='8' name='attr_lightWounds_max' class='woundMax' />
+                        <input type='radio' value='9' name='attr_lightWounds' class='wound' /><span></span>
+                        <input type='radio' value='9' name='attr_lightWounds_max' class='woundMax' />
+                        <input type='radio' value='10' name='attr_lightWounds' class='wound' /><span></span>
+                        <br/>
+                        <input type='radio' class='false' /> <span></span>
+                        <input type='radio' value='10' name='attr_lightWounds_max' class='woundMax' />
+                        <input type='radio' value='11' name='attr_lightWounds' class='wound' /><span></span>
+                        <input type='radio' value='11' name='attr_lightWounds_max' class='woundMax' />
+                        <input type='radio' value='12' name='attr_lightWounds' class='wound' /><span></span>
+                        <input type='radio' value='12' name='attr_lightWounds_max' class='woundMax' />
+                        <input type='radio' value='13' name='attr_lightWounds' class='wound' /><span></span>
+                        <input type='radio' value='13' name='attr_lightWounds_max' class='woundMax' />
+                        <input type='radio' value='14' name='attr_lightWounds' class='wound' /><span></span>
+                        <input type='radio' value='14' name='attr_lightWounds_max' class='woundMax' />
+                        <input type='radio' value='15' name='attr_lightWounds' class='wound' /><span></span>
+                        <input type='radio' value='15' name='attr_lightWounds_max' class='woundMax' />
+                        <input type='radio' value='16' name='attr_lightWounds' class='wound' /><span></span>
+                        <input type='radio' value='16' name='attr_lightWounds_max' class='woundMax' />
+                        <input type='radio' value='17' name='attr_lightWounds' class='wound' /><span></span>
+                        <input type='radio' value='17' name='attr_lightWounds_max' class='woundMax' />
+                        <input type='radio' value='18' name='attr_lightWounds' class='wound' /><span></span>
+                        <input type='radio' value='18' name='attr_lightWounds_max' class='woundMax' />
+                        <input type='radio' value='19' name='attr_lightWounds' class='wound' /><span></span>
+                        <input type='radio' value='19' name='attr_lightWounds_max' class='woundMax' />
+                        <input type='radio' value='20' name='attr_lightWounds' class='wound' /><span></span>
+                        <br/>Light (Body)
+                    </td>
+                    <td>
+                        <input type='radio' value='0' name='attr_heavyWounds' class='zero' checked /> <span></span>
+                        <input type='radio' value='1' name='attr_heavyWounds' class='wound' /><span></span>
+                        <input type='radio' value='1' name='attr_heavyWounds_max' class='woundMax' />
+                        <input type='radio' value='2' name='attr_heavyWounds' class='wound' /><span></span>
+                        <input type='radio' value='2' name='attr_heavyWounds_max' class='woundMax' />
+                        <input type='radio' value='3' name='attr_heavyWounds' class='wound' /><span></span>
+                        <input type='radio' value='3' name='attr_heavyWounds_max' class='woundMax' />
+                        <input type='radio' value='4' name='attr_heavyWounds' class='wound' /><span></span>
+                        <input type='radio' value='4' name='attr_heavyWounds_max' class='woundMax' />
+                        <input type='radio' value='5' name='attr_heavyWounds' class='wound' /><span></span>
+                        <br/>
+                        <input type='radio' class='false' /> <span></span>
+                        <input type='radio' value='5' name='attr_heavyWounds_max' class='woundMax' />
+                        <input type='radio' value='6' name='attr_heavyWounds' class='wound' /><span></span>
+                        <input type='radio' value='6' name='attr_heavyWounds_max' class='woundMax' />
+                        <input type='radio' value='7' name='attr_heavyWounds' class='wound' /><span></span>
+                        <input type='radio' value='7' name='attr_heavyWounds_max' class='woundMax' />
+                        <input type='radio' value='8' name='attr_heavyWounds' class='wound' /><span></span>
+                        <input type='radio' value='8' name='attr_heavyWounds_max' class='woundMax' />
+                        <input type='radio' value='9' name='attr_heavyWounds' class='wound' /><span></span>
+                        <input type='radio' value='9' name='attr_heavyWounds_max' class='woundMax' />
+                        <input type='radio' value='10' name='attr_heavyWounds' class='wound' /><span></span>
+                        <br/>Heavy (Body/2) +1 
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type='radio' value='0' name='attr_criticalWounds' class='zero' checked /> <span></span>
+                        <input type='radio' value='1' name='attr_criticalWounds' class='wound' /><span></span>
+                        <input type='radio' value='1' name='attr_criticalWounds_max' class='woundMax' />
+                        <input type='radio' value='2' name='attr_criticalWounds' class='wound' /><span></span>
+                        <input type='radio' value='2' name='attr_criticalWounds_max' class='woundMax' />
+                        <input type='radio' value='3' name='attr_criticalWounds' class='wound' /><span></span>
+                        <input type='radio' value='3' name='attr_criticalWounds_max' class='woundMax' />
+                        <input type='radio' value='4' name='attr_criticalWounds' class='wound' /><span></span>
+                        <input type='radio' value='4' name='attr_criticalWounds_max' class='woundMax' />
+                        <input type='radio' value='5' name='attr_criticalWounds' class='wound' /><span></span>
+                        <br/>Critical (Body/4) +2
+                    </td>
+                    <td>
+                        <input type='radio' class='false' /> <span></span>
+                        <input type='checkbox' value='1' name='attr_deadBox' /><span></span>
+                        <br/>Dead +3
+                    </td>
+                </tr>
+            </table>
+            Bonus <input type='number' name='attr_woundBonus' value='0' readonly />
+        </div>
+        <div class='sheet-row'>
+            <table class='sheet-wounds'>
+            <tr><th colspan="2">Armour Wounds</th></tr>
+                <tr>
+                    <td>
+                        <input type='radio' value='0' name='attr_armourlightWounds' class='zero' checked /> <span></span>
+                        <input type='radio' value='1' name='attr_armourlightWounds' class='wound' /><span></span>
+                        <input type='radio' value='1' name='attr_armourlightWounds_max' class='woundMax'/>
+                        <input type='radio' value='2' name='attr_armourlightWounds' class='wound' /><span></span>
+                        <input type='radio' value='2' name='attr_armourlightWounds_max' class='woundMax' />
+                        <input type='radio' value='3' name='attr_armourlightWounds' class='wound' /><span></span>
+                        <input type='radio' value='3' name='attr_armourlightWounds_max' class='woundMax' />
+                        <input type='radio' value='4' name='attr_armourlightWounds' class='wound' /><span></span>
+                        <input type='radio' value='4' name='attr_armourlightWounds_max' class='woundMax' />
+                        <input type='radio' value='5' name='attr_armourlightWounds' class='wound' /><span></span>
+                        <input type='radio' value='5' name='attr_armourlightWounds_max' class='woundMax' />
+                        <input type='radio' value='6' name='attr_armourlightWounds' class='wound' /><span></span>
+                        <input type='radio' value='6' name='attr_armourlightWounds_max' class='woundMax' />
+                        <input type='radio' value='7' name='attr_armourlightWounds' class='wound' /><span></span>
+                        <input type='radio' value='7' name='attr_armourlightWounds_max' class='woundMax' />
+                        <input type='radio' value='8' name='attr_armourlightWounds' class='wound' /><span></span>
+                        <input type='radio' value='8' name='attr_armourlightWounds_max' class='woundMax' />
+                        <input type='radio' value='9' name='attr_armourlightWounds' class='wound' /><span></span>
+                        <input type='radio' value='9' name='attr_armourlightWounds_max' class='woundMax' />
+                        <input type='radio' value='10' name='attr_armourlightWounds' class='wound' /><span></span>
+                        <br/>
+                        <input type='radio' class='false' /> <span></span>
+                        <input type='radio' value='10' name='attr_armourlightWounds_max' class='woundMax' />
+                        <input type='radio' value='11' name='attr_armourlightWounds' class='wound' /><span></span>
+                        <input type='radio' value='11' name='attr_armourlightWounds_max' class='woundMax' />
+                        <input type='radio' value='12' name='attr_armourlightWounds' class='wound' /><span></span>
+                        <input type='radio' value='12' name='attr_armourlightWounds_max' class='woundMax' />
+                        <input type='radio' value='13' name='attr_armourlightWounds' class='wound' /><span></span>
+                        <input type='radio' value='13' name='attr_armourlightWounds_max' class='woundMax' />
+                        <input type='radio' value='14' name='attr_armourlightWounds' class='wound' /><span></span>
+                        <input type='radio' value='14' name='attr_armourlightWounds_max' class='woundMax' />
+                        <input type='radio' value='15' name='attr_armourlightWounds' class='wound' /><span></span>
+                        <input type='radio' value='15' name='attr_armourlightWounds_max' class='woundMax' />
+                        <input type='radio' value='16' name='attr_armourlightWounds' class='wound' /><span></span>
+                        <input type='radio' value='16' name='attr_armourlightWounds_max' class='woundMax' />
+                        <input type='radio' value='17' name='attr_armourlightWounds' class='wound' /><span></span>
+                        <input type='radio' value='17' name='attr_armourlightWounds_max' class='woundMax' />
+                        <input type='radio' value='18' name='attr_armourlightWounds' class='wound' /><span></span>
+                        <input type='radio' value='18' name='attr_armourlightWounds_max' class='woundMax' />
+                        <input type='radio' value='19' name='attr_armourlightWounds' class='wound' /><span></span>
+                        <input type='radio' value='19' name='attr_armourlightWounds_max' class='woundMax' />
+                        <input type='radio' value='20' name='attr_armourlightWounds' class='wound' /><span></span>
+                        <br/>Light (Body)
+                    </td>
+                    <td>
+                        <input type='radio' value='0' name='attr_armourheavyWounds' class='zero' checked /> <span></span>
+                        <input type='radio' value='1' name='attr_armourheavyWounds' class='wound' /><span></span>
+                        <input type='radio' value='1' name='attr_armourheavyWounds_max' class='woundMax' />
+                        <input type='radio' value='2' name='attr_armourheavyWounds' class='wound' /><span></span>
+                        <input type='radio' value='2' name='attr_armourheavyWounds_max' class='woundMax' />
+                        <input type='radio' value='3' name='attr_armourheavyWounds' class='wound' /><span></span>
+                        <input type='radio' value='3' name='attr_armourheavyWounds_max' class='woundMax' />
+                        <input type='radio' value='4' name='attr_armourheavyWounds' class='wound' /><span></span>
+                        <input type='radio' value='4' name='attr_armourheavyWounds_max' class='woundMax' />
+                        <input type='radio' value='5' name='attr_armourheavyWounds' class='wound' /><span></span>
+                        <br/>
+                        <input type='radio' class='false' /> <span></span>
+                        <input type='radio' value='5' name='attr_armourheavyWounds_max' class='woundMax' />
+                        <input type='radio' value='6' name='attr_armourheavyWounds' class='wound' /><span></span>
+                        <input type='radio' value='6' name='attr_armourheavyWounds_max' class='woundMax' />
+                        <input type='radio' value='7' name='attr_armourheavyWounds' class='wound' /><span></span>
+                        <input type='radio' value='7' name='attr_armourheavyWounds_max' class='woundMax' />
+                        <input type='radio' value='8' name='attr_armourheavyWounds' class='wound' /><span></span>
+                        <input type='radio' value='8' name='attr_armourheavyWounds_max' class='woundMax' />
+                        <input type='radio' value='9' name='attr_armourheavyWounds' class='wound' /><span></span>
+                        <input type='radio' value='9' name='attr_armourheavyWounds_max' class='woundMax' />
+                        <input type='radio' value='10' name='attr_armourheavyWounds' class='wound' /><span></span>
+                        <br/>Heavy (Body/2) 
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type='radio' value='0' name='attr_armourcriticalWounds' class='zero' checked /> <span></span>
+                        <input type='radio' value='1' name='attr_armourcriticalWounds' class='wound' /><span></span>
+                        <input type='radio' value='1' name='attr_armourcriticalWounds_max' class='woundMax' />
+                        <input type='radio' value='2' name='attr_armourcriticalWounds' class='wound' /><span></span>
+                        <input type='radio' value='2' name='attr_armourcriticalWounds_max' class='woundMax' />
+                        <input type='radio' value='3' name='attr_armourcriticalWounds' class='wound' /><span></span>
+                        <input type='radio' value='3' name='attr_armourcriticalWounds_max' class='woundMax' />
+                        <input type='radio' value='4' name='attr_armourcriticalWounds' class='wound' /><span></span>
+                        <input type='radio' value='4' name='attr_armourcriticalWounds_max' class='woundMax' />
+                        <input type='radio' value='5' name='attr_armourcriticalWounds' class='wound' /><span></span>
+                        <br/>Critical (Body/4)
+                    </td>
+                    <td>
+                        <input type='radio' class='false' /> <span></span>
+                        <input type='checkbox' value='1' name='attr_deadBox' /><span></span>
+                        <br/>Dead
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class='sheet-row'>
+            <b>Weapons</b>
+            <fieldset class='repeating_weapons'>
+                <input type='text' name='attr_weaponName'>
+                <span class='nowrap'>Damage <input type='number' name='attr_weaponDamage'></span>
+                <span class='nowrap'>ROF <input type='number' name='attr_weaponROF'></span>
+                <span class='nowrap'>Range <input type='text' name='attr_weaponRange' class='xShort'></span>
+                <span class='nowrap'>Ammo <input type='number' name='attr_weaponAmmo'>
+                / <input type='number' name='attr_weaponAmmo_max'></span>
+            </fieldset>
+        </div>
+        <div class='sheet-row'>
+            <b>Possessions</b>
+            <textarea name='attr_possessions'></textarea>
+        </div>
+    </div>
+    
+    <div class='sheet-col'>
+        <div class='sheet-row'>
+            <table class='sheet-attrTable'>
+                <tr>
+                    <th>Body</th>
+                    <th colspan="2">
+                        <input type='number' name='attr_Body'/> / 
+                        <input type='number' name='attr_ArmourBody' /> 
+                        <button type='roll' name='roll_InterfaceBody' value='@{name} Interface Body: [[(@{ArmourBody}+@{woundBonus}+@{meikyoBonus}+?{Bonus|0})d6<@{Interface}]]'></button>
+                    </th>
+                </tr>
+                <tr>
+                    <td>Unarmed Combat</td>
+                    <td class='sheet-skillDots'>
+                        <input type='radio' name="attr_UnarmedCombat" value='0' class="false" disabled/><span></span>
+                        <input type="radio" name="attr_UnarmedCombat" value="1" checked /><span></span>
+                        <input type="radio" name="attr_UnarmedCombat" value="2" /><span></span>
+                        <input type="radio" name="attr_UnarmedCombat" value="3" /><span></span>
+                        <input type="radio" name="attr_UnarmedCombat" value="4" /><span></span>
+                        <input type="radio" name="attr_UnarmedCombat" value="5" /><span></span>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_UnarmedCombat' value='@{name} Unarmed Combat: [[(@{Body}+@{woundBonus}+?{Bonus|0})d6<@{UnarmedCombat}]]'></button>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_ArmourUnarmedCombat' value='@{name} Armour Unarmed Combat: [[(@{ArmourBody}+@{woundBonus}+@{meikyoBonus}+?{Bonus|0})d6<@{UnarmedCombat}]]'></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Wormcharm</td>
+                    <td>
+                        <input type="radio" name="attr_Wormcharm" value="0" class=" zero" checked/><span></span>
+                        <input type="radio" name="attr_Wormcharm" value="1" /><span></span>
+                        <input type="radio" name="attr_Wormcharm" value="2" /><span></span>
+                        <input type="radio" name="attr_Wormcharm" value="3" /><span></span>
+                        <input type="radio" name="attr_Wormcharm" value="4" /><span></span>
+                        <input type="radio" name="attr_Wormcharm" value="5" /><span></span>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_Wormcharm' value='@{name} Wormcharm: [[(@{Body}+@{woundBonus}+?{Bonus|0})d6<@{Wormcharm}]]'></button>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_ArmourWormcharm' value='@{name} Armour Wormcharm: [[(@{ArmourBody}+@{woundBonus}+@{meikyoBonus}+?{Bonus|0})d6<@{Wormcharm}]]'></button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class='sheet-row'>
+            <table class='sheet-attrTable'>
+                <tr>
+                    <th>Agility</th>
+                    <th colspan="2">
+                        <input type='number' name='attr_Agility'/> / 
+                        <input type='number' name='attr_ArmourAgility' /> 
+                        <button type='roll' name='roll_InterfaceAgility' value='@{name} Interface Agility: [[(@{ArmourAgility}+@{woundBonus}+@{meikyoBonus}+?{Bonus|0})d6<@{Interface}]]'></button>
+                    </th>
+                </tr>
+                <tr>
+                    <td>Movement</td>
+                    <td>
+                        <input type="radio" name="attr_Movement" value="0" class=" false" disabled/><span></span>
+                        <input type="radio" name="attr_Movement" value="1" checked/><span></span>
+                        <input type="radio" name="attr_Movement" value="2" /><span></span>
+                        <input type="radio" name="attr_Movement" value="3" /><span></span>
+                        <input type="radio" name="attr_Movement" value="4" /><span></span>
+                        <input type="radio" name="attr_Movement" value="5" /><span></span>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_Movement' value='@{name} Movement: [[(@{Agility}+@{woundBonus}+?{Bonus|0})d6<@{Movement}]]'></button>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_ArmourMovement' value='@{name} Armour Movement: [[(@{ArmourAgility}+@{woundBonus}+@{meikyoBonus}+?{Bonus|0})d6<@{Movement}]]'></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Melee Weapons</td>
+                    <td>
+                        <input type="radio" name="attr_MeleeWeapons" value="0" class=" false" disabled/><span></span>
+                        <input type="radio" name="attr_MeleeWeapons" value="1" checked/><span></span>
+                        <input type="radio" name="attr_MeleeWeapons" value="2" /><span></span>
+                        <input type="radio" name="attr_MeleeWeapons" value="3" /><span></span>
+                        <input type="radio" name="attr_MeleeWeapons" value="4" /><span></span>
+                        <input type="radio" name="attr_MeleeWeapons" value="5" /><span></span>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_MeleeWeapons' value='@{name} Melee Weapons: [[(@{Agility}+@{woundBonus}+?{Bonus|0})d6<@{MeleeWeapons}]]'></button>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_ArmourMeleeWeapons' value='@{name} Armour Melee Weapons: [[(@{ArmourAgility}+@{woundBonus}+@{meikyoBonus}+?{Bonus|0})d6<@{MeleeWeapons}]]'></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Evasion</td>
+                    <td>
+                        <input type="radio" name="attr_Evasion" value="0" class=" false" disabled/><span></span>
+                        <input type="radio" name="attr_Evasion" value="1" checked/><span></span>
+                        <input type="radio" name="attr_Evasion" value="2" /><span></span>
+                        <input type="radio" name="attr_Evasion" value="3" /><span></span>
+                        <input type="radio" name="attr_Evasion" value="4" /><span></span>
+                        <input type="radio" name="attr_Evasion" value="5" /><span></span>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_Evasion' value='@{name} Evasion: [[(@{Agility}+@{woundBonus}+?{Bonus|0})d6<@{Evasion}]]'></button>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_ArmourEvasion' value='@{name} Armour Evasion: [[(@{ArmourAgility}+@{woundBonus}+@{meikyoBonus}+?{Bonus|0})d6<@{Evasion}]]'></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Stealth</td>
+                    <td>
+                        <input type="radio" name="attr_Stealth" value="0" class=" false" disabled/><span></span>
+                        <input type="radio" name="attr_Stealth" value="1" checked/><span></span>
+                        <input type="radio" name="attr_Stealth" value="2" /><span></span>
+                        <input type="radio" name="attr_Stealth" value="3" /><span></span>
+                        <input type="radio" name="attr_Stealth" value="4" /><span></span>
+                        <input type="radio" name="attr_Stealth" value="5" /><span></span>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_Stealth' value='@{name} Stealth: [[(@{Agility}+@{woundBonus}+?{Bonus|0})d6<@{Stealth}]]'></button>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_ArmourStealth' value='@{name} Armour Stealth: [[(@{ArmourAgility}+@{woundBonus}+@{meikyoBonus}+?{Bonus|0})d6<@{Stealth}]]'></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Ninjutsu</td>
+                    <td>
+                        <input type="radio" name="attr_Ninjutsu" value="0" class=" zero" checked/><span></span>
+                        <input type="radio" name="attr_Ninjutsu" value="1" /><span></span>
+                        <input type="radio" name="attr_Ninjutsu" value="2" /><span></span>
+                        <input type="radio" name="attr_Ninjutsu" value="3" /><span></span>
+                        <input type="radio" name="attr_Ninjutsu" value="4" /><span></span>
+                        <input type="radio" name="attr_Ninjutsu" value="5" /><span></span>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_Ninjutsu' value='@{name} Ninjutsu: [[(@{Agility}+@{woundBonus}+?{Bonus|0})d6<@{Ninjutsu}]]'></button>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_ArmourNinjutsu' value='@{name} Armour Ninjutsu: [[(@{ArmourAgility}+@{woundBonus}+@{meikyoBonus}+?{Bonus|0})d6<@{Ninjutsu}]]'></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Criminal Arts</td>
+                    <td>
+                        <input type="radio" name="attr_CriminalArts" value="0" class=" zero" checked/><span></span>
+                        <input type="radio" name="attr_CriminalArts" value="1" /><span></span>
+                        <input type="radio" name="attr_CriminalArts" value="2" /><span></span>
+                        <input type="radio" name="attr_CriminalArts" value="3" /><span></span>
+                        <input type="radio" name="attr_CriminalArts" value="4" /><span></span>
+                        <input type="radio" name="attr_CriminalArts" value="5" /><span></span>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_CriminalArts' value='@{name} Criminal Arts: [[(@{Agility}+@{woundBonus}+?{Bonus|0})d6<@{CriminalArts}]]'></button>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_ArmourCriminalArts' value='@{name} Armour Criminal Arts: [[(@{ArmourAgility}+@{woundBonus}+@{meikyoBonus}+?{Bonus|0})d6<@{CriminalArts}]]'></button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class='sheet-row'>
+            <table class='sheet-attrTable'>
+                <tr>
+                    <th>Senses</th>
+                    <th colspan="2">
+                        <input type='number' name='attr_Senses'/> / 
+                        <input type='number' name='attr_ArmourSenses' /> 
+                        <button type='roll' name='roll_InterfaceSenses' value='@{name} Interface Senses: [[(@{ArmourSenses}+@{woundBonus}+@{meikyoBonus}+?{Bonus|0})d6<@{Interface}]]'></button>
+                    </th>
+                </tr>
+                <tr>
+                    <td>First Aid</td>
+                    <td>
+                        <input type="radio" name="attr_FirstAid" value="0" class=" false" disabled/><span></span>
+                        <input type="radio" name="attr_FirstAid" value="1" checked/><span></span>
+                        <input type="radio" name="attr_FirstAid" value="2" /><span></span>
+                        <input type="radio" name="attr_FirstAid" value="3" /><span></span>
+                        <input type="radio" name="attr_FirstAid" value="4" /><span></span>
+                        <input type="radio" name="attr_FirstAid" value="5" /><span></span>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_FirstAid' value='@{name} First Aid: [[(@{Senses}+@{woundBonus}+?{Bonus|0})d6<@{FirstAid}]]'></button>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_ArmourFirstAid' value='@{name} Armour First Aid: [[(@{ArmourSenses}+@{woundBonus}+@{meikyoBonus}+?{Bonus|0})d6<@{FirstAid}]]'></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Notice</td>
+                    <td>
+                        <input type="radio" name="attr_Notice" value="0" class=" false" disabled/><span></span>
+                        <input type="radio" name="attr_Notice" value="1" checked/><span></span>
+                        <input type="radio" name="attr_Notice" value="2" /><span></span>
+                        <input type="radio" name="attr_Notice" value="3" /><span></span>
+                        <input type="radio" name="attr_Notice" value="4" /><span></span>
+                        <input type="radio" name="attr_Notice" value="5" /><span></span>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_Notice' value='@{name} Notice: [[(@{Senses}+@{woundBonus}+?{Bonus|0})d6<@{Notice}]]'></button>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_ArmourNotice' value='@{name} Armour Notice: [[(@{ArmourSenses}+@{woundBonus}+@{meikyoBonus}+?{Bonus|0})d6<@{Notice}]]'></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Marksman</td>
+                    <td>
+                        <input type="radio" name="attr_Marksman" value="0" class=" false" disabled/><span></span>
+                        <input type="radio" name="attr_Marksman" value="1" checked/><span></span>
+                        <input type="radio" name="attr_Marksman" value="2" /><span></span>
+                        <input type="radio" name="attr_Marksman" value="3" /><span></span>
+                        <input type="radio" name="attr_Marksman" value="4" /><span></span>
+                        <input type="radio" name="attr_Marksman" value="5" /><span></span>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_Marksman' value='@{name} Marksman: [[(@{Senses}+@{woundBonus}+?{Bonus|0})d6<@{Marksman}]]'></button>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_ArmourMarksman' value='@{name} Armour Marksman: [[(@{ArmourSenses}+@{woundBonus}+@{meikyoBonus}+?{Bonus|0})d6<@{Marksman}]]'></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Pursuit / Hunt</td>
+                    <td>
+                        <input type="radio" name="attr_PursuitHunt" value="0" class=" false" disabled/><span></span>
+                        <input type="radio" name="attr_PursuitHunt" value="1" checked/><span></span>
+                        <input type="radio" name="attr_PursuitHunt" value="2" /><span></span>
+                        <input type="radio" name="attr_PursuitHunt" value="3" /><span></span>
+                        <input type="radio" name="attr_PursuitHunt" value="4" /><span></span>
+                        <input type="radio" name="attr_PursuitHunt" value="5" /><span></span>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_PursuitHunt' value='@{name} Pursuit / Hunt: [[(@{Senses}+@{woundBonus}+?{Bonus|0})d6<@{PursuitHunt}]]'></button>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_ArmourPursuitHunt' value='@{name} Armour Pursuit / Hunt: [[(@{ArmourSenses}+@{woundBonus}+@{meikyoBonus}+?{Bonus|0})d6<@{PursuitHunt}]]'></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Forgery</td>
+                    <td>
+                        <input type="radio" name="attr_Forgery" value="0" class=" zero" checked/><span></span>
+                        <input type="radio" name="attr_Forgery" value="1" /><span></span>
+                        <input type="radio" name="attr_Forgery" value="2" /><span></span>
+                        <input type="radio" name="attr_Forgery" value="3" /><span></span>
+                        <input type="radio" name="attr_Forgery" value="4" /><span></span>
+                        <input type="radio" name="attr_Forgery" value="5" /><span></span>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_Forgery' value='@{name} Forgery: [[(@{Senses}+@{woundBonus}+?{Bonus|0})d6<@{Forgery}]]'></button>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_ArmourForgery' value='@{name} Armour Forgery: [[(@{ArmourSenses}+@{woundBonus}+@{meikyoBonus}+?{Bonus|0})d6<@{Forgery}]]'></button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class='sheet-row'>
+            <table class='sheet-attrTable'>
+                <tr>
+                    <th>Knowledge</th>
+                    <th class='sheet-attrBox'>
+                        <input type='number' name='attr_Knowledge'/>
+                    </th>
+                </tr>
+                <tr>
+                    <td>Information</td>
+                    <td>
+                        <input type="radio" name="attr_Information" value="0" class=" false" disabled/><span></span>
+                        <input type="radio" name="attr_Information" value="1" checked/><span></span>
+                        <input type="radio" name="attr_Information" value="2" /><span></span>
+                        <input type="radio" name="attr_Information" value="3" /><span></span>
+                        <input type="radio" name="attr_Information" value="4" /><span></span>
+                        <input type="radio" name="attr_Information" value="5" /><span></span>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_Information' value='@{name} Information: [[(@{Knowledge}+@{woundBonus}+?{Bonus|0})d6<@{Information}]]'></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Onmyojutsu</td>
+                    <td>
+                        <input type="radio" name="attr_Onmyojutsu" value="0" class=" zero" checked/><span></span>
+                        <input type="radio" name="attr_Onmyojutsu" value="1" /><span></span>
+                        <input type="radio" name="attr_Onmyojutsu" value="2" /><span></span>
+                        <input type="radio" name="attr_Onmyojutsu" value="3" /><span></span>
+                        <input type="radio" name="attr_Onmyojutsu" value="4" /><span></span>
+                        <input type="radio" name="attr_Onmyojutsu" value="5" /><span></span>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_Onmyojutsu' value='@{name} Onmyojutsu: [[(@{Knowledge}+@{woundBonus}+?{Bonus|0})d6<@{Onmyojutsu}]]'></button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class='sheet-row'>
+            <table class='sheet-attrTable'>
+                <tr>
+                    <th>Spirit</th>
+                    <th class='sheet-attrBox'>
+                        <input type='number' name='attr_Spirit'/>
+                    </th>
+                </tr>
+                <tr>
+                    <td>Willpower</td>
+                    <td>
+                        <input type="radio" name="attr_Willpower" value="0" class=" false" disabled/><span></span>
+                        <input type="radio" name="attr_Willpower" value="1" checked/><span></span>
+                        <input type="radio" name="attr_Willpower" value="2" /><span></span>
+                        <input type="radio" name="attr_Willpower" value="3" /><span></span>
+                        <input type="radio" name="attr_Willpower" value="4" /><span></span>
+                        <input type="radio" name="attr_Willpower" value="5" /><span></span>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_Willpower' value='@{name} Information: [[(@{Spirit}+@{woundBonus}+?{Bonus|0})d6<@{Willpower}]]'></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Resonance</td>
+                    <td>
+                        <input type="radio" name="attr_Resonance" value="0" class=" zero" checked/><span></span>
+                        <input type="radio" name="attr_Resonance" value="1" /><span></span>
+                        <input type="radio" name="attr_Resonance" value="2" /><span></span>
+                        <input type="radio" name="attr_Resonance" value="3" /><span></span>
+                        <input type="radio" name="attr_Resonance" value="4" /><span></span>
+                        <input type="radio" name="attr_Resonance" value="5" /><span></span>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_Resonance' value='@{name} Resonance: [[(@{Spirit}+@{woundBonus}+?{Bonus|0})d6<@{Resonance}]]'></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Interface</td>
+                    <td>
+                        <input type="radio" name="attr_Interface" value="0" class=" zero" checked/><span></span>
+                        <input type="radio" name="attr_Interface" value="1" /><span></span>
+                        <input type="radio" name="attr_Interface" value="2" /><span></span>
+                        <input type="radio" name="attr_Interface" value="3" /><span></span>
+                        <input type="radio" name="attr_Interface" value="4" /><span></span>
+                        <input type="radio" name="attr_Interface" value="5" /><span></span>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_Interface' value='@{name} Interface: [[(@{Spirit}+@{woundBonus}+?{Bonus|0})d6<@{Interface}]]'></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Buddhist Magic</td>
+                    <td>
+                        <input type="radio" name="attr_BuddhistMagic" value="0" class=" zero" checked/><span></span>
+                        <input type="radio" name="attr_BuddhistMagic" value="1" /><span></span>
+                        <input type="radio" name="attr_BuddhistMagic" value="2" /><span></span>
+                        <input type="radio" name="attr_BuddhistMagic" value="3" /><span></span>
+                        <input type="radio" name="attr_BuddhistMagic" value="4" /><span></span>
+                        <input type="radio" name="attr_BuddhistMagic" value="5" /><span></span>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_BuddhistMagic' value='@{name} Buddhist Magic: [[(@{Spirit}+@{woundBonus}+?{Bonus|0})d6<@{BuddhistMagic}]]'></button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class='sheet-row'>
+            <table class='sheet-attrTable'>
+                <tr>
+                    <th>Empathy</th>
+                    <th class='sheet-attrBox'>
+                        <input type='number' name='attr_Empathy'/>
+                    </th>
+                </tr>
+                <tr>
+                    <td>Persuasion</td>
+                    <td>
+                        <input type="radio" name="attr_Persuasion" value="0" class=" false" disabled/><span></span>
+                        <input type="radio" name="attr_Persuasion" value="1" checked/><span></span>
+                        <input type="radio" name="attr_Persuasion" value="2" /><span></span>
+                        <input type="radio" name="attr_Persuasion" value="3" /><span></span>
+                        <input type="radio" name="attr_Persuasion" value="4" /><span></span>
+                        <input type="radio" name="attr_Persuasion" value="5" /><span></span>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_Persuasion' value='@{name} Persuasion: [[(@{Empathy}+@{woundBonus}+?{Bonus|0})d6<@{Persuasion}]]'></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Pillow Arts</td>
+                    <td>
+                        <input type="radio" name="attr_PillowArts" value="0" class=" false" disabled/><span></span>
+                        <input type="radio" name="attr_PillowArts" value="1" checked/><span></span>
+                        <input type="radio" name="attr_PillowArts" value="2" /><span></span>
+                        <input type="radio" name="attr_PillowArts" value="3" /><span></span>
+                        <input type="radio" name="attr_PillowArts" value="4" /><span></span>
+                        <input type="radio" name="attr_PillowArts" value="5" /><span></span>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_PillowArts' value='@{name} Pillow Arts: [[(@{Empathy}+@{woundBonus}+?{Bonus|0})d6<@{PillowArts}]]'></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Perform</td>
+                    <td>
+                        <input type="radio" name="attr_Perform" value="0" class=" zero" checked/><span></span>
+                        <input type="radio" name="attr_Perform" value="1" /><span></span>
+                        <input type="radio" name="attr_Perform" value="2" /><span></span>
+                        <input type="radio" name="attr_Perform" value="3" /><span></span>
+                        <input type="radio" name="attr_Perform" value="4" /><span></span>
+                        <input type="radio" name="attr_Perform" value="5" /><span></span>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_Perform' value='@{name} Perform: [[(@{Empathy}+@{woundBonus}+?{Bonus|0})d6<@{Perform}]]'></button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class='sheet-row'>
+            <table class='sheet-attrTable'>
+                <tr>
+                    <th>Station</th>
+                    <th class='sheet-attrBox'>
+                        <input type='number' name='attr_Station'/>
+                    </th>
+                </tr>
+                <tr>
+                    <td>Strategy</td>
+                    <td>
+                        <input type="radio" name="attr_Strategy" value="0" class=" zero" checked/><span></span>
+                        <input type="radio" name="attr_Strategy" value="1" /><span></span>
+                        <input type="radio" name="attr_Strategy" value="2" /><span></span>
+                        <input type="radio" name="attr_Strategy" value="3" /><span></span>
+                        <input type="radio" name="attr_Strategy" value="4" /><span></span>
+                        <input type="radio" name="attr_Strategy" value="5" /><span></span>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_Strategy' value='@{name} Strategy: [[(@{Station}+@{woundBonus}+?{Bonus|0})d6<@{Strategy}]]'></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Etiquette</td>
+                    <td>
+                        <input type="radio" name="attr_Etiquette" value="0" class=" zero" checked/><span></span>
+                        <input type="radio" name="attr_Etiquette" value="1" /><span></span>
+                        <input type="radio" name="attr_Etiquette" value="2" /><span></span>
+                        <input type="radio" name="attr_Etiquette" value="3" /><span></span>
+                        <input type="radio" name="attr_Etiquette" value="4" /><span></span>
+                        <input type="radio" name="attr_Etiquette" value="5" /><span></span>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_Etiquette' value='@{name} Etiquette: [[(@{Station}+@{woundBonus}+?{Bonus|0})d6<@{Etiquette}]]'></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Shinto</td>
+                    <td>
+                        <input type="radio" name="attr_Shinto" value="0" class=" zero" checked/><span></span>
+                        <input type="radio" name="attr_Shinto" value="1" /><span></span>
+                        <input type="radio" name="attr_Shinto" value="2" /><span></span>
+                        <input type="radio" name="attr_Shinto" value="3" /><span></span>
+                        <input type="radio" name="attr_Shinto" value="4" /><span></span>
+                        <input type="radio" name="attr_Shinto" value="5" /><span></span>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_Shinto' value='@{name} Shinto: [[(@{Station}+@{woundBonus}+?{Bonus|0})d6<@{Shinto}]]'></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Art of Rule</td>
+                    <td>
+                        <input type="radio" name="attr_ArtofRule" value="0" class=" zero" checked/><span></span>
+                        <input type="radio" name="attr_ArtofRule" value="1" /><span></span>
+                        <input type="radio" name="attr_ArtofRule" value="2" /><span></span>
+                        <input type="radio" name="attr_ArtofRule" value="3" /><span></span>
+                        <input type="radio" name="attr_ArtofRule" value="4" /><span></span>
+                        <input type="radio" name="attr_ArtofRule" value="5" /><span></span>
+                    </td>
+                    <td>
+                        <button type='roll' name='roll_ArtofRule' value='@{name} Art of Rule: [[(@{Station}+@{woundBonus}+?{Bonus|0})d6<@{ArtofRule}]]'></button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class='sheet-row'>
+            <b>Art of War</b> <br/>
+            <fieldset class='repeating_artofwar'>
+                <input type='text' name='attr_artofwarName' class='short' />
+                <input type="radio" name="attr_artofwar" value="0" class=" zero" checked/><span></span>
+                <input type="radio" name="attr_artofwar" value="1" /><span></span>
+                <input type="radio" name="attr_artofwar" value="2" /><span></span>
+                <input type="radio" name="attr_artofwar" value="3" /><span></span>
+                <input type="radio" name="attr_artofwar" value="4" /><span></span>
+                <input type="radio" name="attr_artofwar" value="5" /><span></span>
+            </fieldset>
+        </div>
+    </div>
+</div>
