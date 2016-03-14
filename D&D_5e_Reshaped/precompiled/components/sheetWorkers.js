@@ -1,6 +1,6 @@
 'use strict';
 
-const currentVersion = '2.2.10';
+const currentVersion = '2.2.11';
 let TRANSLATIONS;
 const SKILLS = {
   acrobatics: 'dexterity',
@@ -4737,6 +4737,9 @@ const sheetOpened = () => {
     }
     if (versionCompare(version, '2.2.8') < 0) {
       updateAttack();
+    }
+    if (versionCompare(version, '2.2.11') < 0) {
+      setClassFeatures();
     }
 
     if (!version || version !== currentVersion) {
