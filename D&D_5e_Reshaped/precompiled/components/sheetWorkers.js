@@ -506,6 +506,7 @@ const setClassFeatureOrTrait = (repeatingItem, obj) => {
       collectionArray.push(`${repeatingString}storage_name`);
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}uses`);
+      collectionArray.push(`${repeatingString}extras_toggle`);
       if (repeatingItem === 'repeating_trait') {
         collectionArray.push(`${repeatingString}display_text`);
       }
@@ -564,9 +565,8 @@ const setClassFeatureOrTrait = (repeatingItem, obj) => {
         if (obj.heal || obj.heal_ability || obj.heal_bonus || obj.heal_query_toggle) {
           finalSetAttrs[`${repeatingString}heal_toggle`] = '@{heal_toggle_var}';
         }
-        if (obj.freetext) {
+        if (obj.freetext && isUndefined(v[`${repeatingString}extras_toggle`])) {
           finalSetAttrs[`${repeatingString}extras_toggle`] = '@{extras_var}';
-          console.log('set extras toggle');
         }
         if (obj.uses_max && !obj.uses && isUndefined(v[`${repeatingString}uses`])) {
           finalSetAttrs[`${repeatingString}uses`] = obj.uses_max;
