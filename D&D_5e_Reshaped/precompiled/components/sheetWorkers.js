@@ -810,31 +810,6 @@ const updateLevels = (removeClass) => {
         }
       }
 
-      if (spellcasting.warlock > 0) {
-        const language = v.lang || 'en';
-        let warlockSpellSlots = 1;
-        if (spellcasting.warlock >= 17) {
-          warlockSpellSlots = 4;
-        } else if (spellcasting.warlock >= 11 && spellcasting.warlock < 17) {
-          warlockSpellSlots = 3;
-        } else if (spellcasting.warlock >= 2 && spellcasting.warlock < 11) {
-          warlockSpellSlots = 2;
-        }
-        setClassFeature({
-          freetext: translate(language, 'CLASS_FEATURES.WARLOCK_SPELL_SLOTS_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.WARLOCK_SPELL_SLOTS'),
-          recharge: 'Short Rest',
-          storageName: 'Warlock Spell Slots',
-          uses_max: warlockSpellSlots,
-        });
-      } else {
-        setClassFeature({
-          clear: true,
-          storageName: 'Warlock Spell Slots',
-          uses_max: 0,
-        });
-      }
-
       setFinalAttrs(v, finalSetAttrs);
     });
   });
@@ -1745,6 +1720,75 @@ const setClassFeatures = () => {
             storageName: 'Sorcerous Restoration',
           });
         }
+      }
+    }
+
+    if (v.warlock_level) {
+      const language = v.lang || 'en';
+      let warlockSpellSlots;
+      if (v.warlock_level >= 17) {
+        warlockSpellSlots = 4;
+      } else if (v.warlock_level >= 11) {
+        warlockSpellSlots = 3;
+      } else if (v.warlock_level >= 2) {
+        warlockSpellSlots = 2;
+      } else {
+        warlockSpellSlots = 1;
+      }
+      setClassFeature({
+        freetext: translate(language, 'CLASS_FEATURES.WARLOCK_SPELL_SLOTS_TEXT'),
+        name: translate(language, 'CLASS_FEATURES.WARLOCK_SPELL_SLOTS'),
+        recharge: 'Short Rest',
+        storageName: 'Warlock Spell Slots',
+        uses_max: warlockSpellSlots,
+      });
+
+      if (v.warlock_level >= 2) {
+        let eldritchInvocations;
+        if (v.warlock_level >= 17) {
+          eldritchInvocations = 8;
+        } else if (v.warlock_level >= 15) {
+          eldritchInvocations = 7;
+        } else if (v.warlock_level >= 12) {
+          eldritchInvocations = 6;
+        } else if (v.warlock_level >= 9) {
+          eldritchInvocations = 5;
+        } else if (v.warlock_level >= 7) {
+          eldritchInvocations = 4;
+        } else if (v.warlock_level >= 5) {
+          eldritchInvocations = 3;
+        } else {
+          eldritchInvocations = 2;
+        }
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.ELDRITCH_INVOCATIONS_TEXT').replace('NUMBER_OF_INVOCATIONS_KNOWN', eldritchInvocations),
+          name: translate(language, 'CLASS_FEATURES.ELDRITCH_INVOCATIONS'),
+          storageName: 'Eldritch Invocations',
+        });
+      }
+    }
+
+    if (v.wizard_level) {
+      setClassFeature({
+        freetext: translate(language, 'CLASS_FEATURES.ARCANE_RECOVERY_TEXT'),
+        name: translate(language, 'CLASS_FEATURES.ARCANE_RECOVERY'),
+        recharge: 'Long Rest',
+        storageName: 'Arcane Recovery',
+        uses_max: 1,
+      });
+      if (v.wizard_level >= 18) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.SPELL_MASTERY_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.SPELL_MASTERY'),
+          storageName: 'Spell Mastery',
+        });
+      }
+      if (v.wizard_level >= 20) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.SIGNATURE_SPELLS_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.SIGNATURE_SPELLS'),
+          storageName: 'Signature Spells',
+        });
       }
     }
 
