@@ -178,8 +178,7 @@ const parseAttackComponent = (v, repeatingString, finalSetAttrs, options) => {
         aTriggerFieldExists = true;
       }
     }
-
-    if (aTriggerFieldExists && !exists(v[repeatingString + options.toggleField])) {
+    if (aTriggerFieldExists && isUndefined(v[repeatingString + options.toggleField])) {
       finalSetAttrs[repeatingString + options.toggleField] = options.toggleFieldSetTo;
 
       if (isUndefined(finalSetAttrs[`${repeatingString}parsed`])) {
@@ -187,15 +186,15 @@ const parseAttackComponent = (v, repeatingString, finalSetAttrs, options) => {
       }
       finalSetAttrs[`${repeatingString}parsed`] += ` ${options.parseName}`;
     }
-    if (options.attackAbility && !exists(v[`${repeatingString}attack_ability`]) && v[`${repeatingString}attack_ability`] !== '0') {
+    if (options.attackAbility && isUndefined(v[`${repeatingString}attack_ability`])) {
       finalSetAttrs[`${repeatingString}attack_ability`] = v.default_ability;
     }
 
     if (options.addCastingModifier) {
-      if (exists(v[`${repeatingString}damage`]) && !exists(v[`${repeatingString}damage_ability`]) && v[`${repeatingString}damage_ability`] !== '0') {
+      if (exists(v[`${repeatingString}damage`]) && isUndefined(v[`${repeatingString}damage_ability`])) {
         finalSetAttrs[`${repeatingString}damage_ability`] = v.default_ability;
       }
-      if (exists(v[`${repeatingString}heal`]) && !exists(v[`${repeatingString}heal_ability`]) && v[`${repeatingString}heal_ability`] !== '0') {
+      if (exists(v[`${repeatingString}heal`]) && isUndefined(v[`${repeatingString}heal_ability`])) {
         finalSetAttrs[`${repeatingString}heal_ability`] = v.default_ability;
       }
     }
