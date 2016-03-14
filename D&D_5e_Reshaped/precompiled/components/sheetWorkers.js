@@ -1099,8 +1099,6 @@ const setClassFeatures = () => {
           storageName: 'Indomitable Might',
         });
       }
-      if (v.barbarian_level >= 20) {
-      }
     }
 
     if (v.bard_level) {
@@ -1121,7 +1119,7 @@ const setClassFeatures = () => {
       setClassFeature({
         freetext: translate(language, 'CLASS_FEATURES.BARDIC_INSPIRATION_TEXT').replace('d6', die),
         name: translate(language, 'CLASS_FEATURES.BARDIC_INSPIRATION'),
-        recharge: recharge,
+        recharge,
         storageName: 'Bardic Inspiration',
         uses_max: Math.max(getIntValue(v.charisma_mod), 1),
       });
@@ -1146,7 +1144,7 @@ const setClassFeatures = () => {
         }
         setClassFeature({
           freetext: translate(language, 'CLASS_FEATURES.SONG_OF_REST_TEXT'),
-          heal: heal,
+          heal,
           name: translate(language, 'CLASS_FEATURES.SONG_OF_REST'),
           storageName: 'Song of Rest',
         });
@@ -1301,17 +1299,17 @@ const setClassFeatures = () => {
         setClassFeature({
           freetext: translate(language, 'CLASS_FEATURES.FLURRY_OF_BLOWS_TEXT'),
           name: translate(language, 'CLASS_FEATURES.FLURRY_OF_BLOWS'),
-          storageName: 'Flurry of Blows'
+          storageName: 'Flurry of Blows',
         });
         setClassFeature({
           freetext: translate(language, 'CLASS_FEATURES.PATIENT_DEFENSE_TEXT'),
           name: translate(language, 'CLASS_FEATURES.PATIENT_DEFENSE'),
-          storageName: 'Patient Defense'
+          storageName: 'Patient Defense',
         });
         setClassFeature({
           freetext: translate(language, 'CLASS_FEATURES.STEP_OF_THE_WIND_TEXT'),
           name: translate(language, 'CLASS_FEATURES.STEP_OF_THE_WIND'),
-          storageName: 'Step of the Wind'
+          storageName: 'Step of the Wind',
         });
 
         let unarmoredMovementFeet;
@@ -1337,14 +1335,14 @@ const setClassFeatures = () => {
         setClassFeature({
           freetext: translate(language, 'CLASS_FEATURES.DEFLECT_MISSILES_TEXT'),
           name: translate(language, 'CLASS_FEATURES.DEFLECT_MISSILES'),
-          storageName: 'Deflect Missiles'
+          storageName: 'Deflect Missiles',
         });
       }
       if (v.monk_level >= 4) {
         setClassFeature({
           freetext: translate(language, 'CLASS_FEATURES.SLOW_FALL_TEXT'),
           name: translate(language, 'CLASS_FEATURES.SLOW_FALL'),
-          storageName: 'Slow Fall'
+          storageName: 'Slow Fall',
         });
       }
       if (v.monk_level >= 5) {
@@ -1359,7 +1357,7 @@ const setClassFeatures = () => {
           saving_throw_ability: '@{wisdom_mod}',
           saving_throw_failure: 'or be stunned until the end of your next turn',
           saving_throw_vs_ability: 'Constitution',
-          storageName: 'Stunning Strike'
+          storageName: 'Stunning Strike',
         });
       }
       if (v.monk_level >= 6) {
@@ -1378,7 +1376,7 @@ const setClassFeatures = () => {
         setClassFeature({
           freetext: translate(language, 'CLASS_FEATURES.STILLNESS_OF_MIND_TEXT'),
           name: translate(language, 'CLASS_FEATURES.STILLNESS_OF_MIND'),
-          storageName: 'Stillness of Mind'
+          storageName: 'Stillness of Mind',
         });
       }
       if (v.monk_level >= 10) {
@@ -1399,7 +1397,7 @@ const setClassFeatures = () => {
         setTrait({
           freetext: translate(language, 'CLASS_FEATURES.DIAMOND_SOUL_TEXT'),
           name: translate(language, 'CLASS_FEATURES.DIAMOND_SOUL'),
-          storageName: 'Diamond Soul'
+          storageName: 'Diamond Soul',
         });
       }
       if (v.monk_level >= 15) {
@@ -1413,7 +1411,7 @@ const setClassFeatures = () => {
         setClassFeature({
           freetext: translate(language, 'CLASS_FEATURES.EMPTY_BODY_TEXT'),
           name: translate(language, 'CLASS_FEATURES.EMPTY_BODY'),
-          storageName: 'Empty Body'
+          storageName: 'Empty Body',
         });
       }
       if (v.monk_level >= 20) {
@@ -1593,7 +1591,7 @@ const setClassFeatures = () => {
         storageName: 'Expertise Rogue',
       });
       setClassFeature({
-        damage: `${Math.ceil(getIntValue(v.rogue_level)/2)}d6`,
+        damage: `${Math.ceil(getIntValue(v.rogue_level) / 2)}d6`,
         freetext: translate(language, 'CLASS_FEATURES.SNEAK_ATTACK_TEXT'),
         name: translate(language, 'CLASS_FEATURES.SNEAK_ATTACK'),
         storageName: 'Sneak Attack',
@@ -1803,7 +1801,7 @@ const setClassFeatures = () => {
         } else if (v.fighter_level >= 13) {
           indomitableUses = 2;
         } else {
-          indomitableUses = 1
+          indomitableUses = 1;
         }
         setClassFeature({
           freetext: translate(language, 'CLASS_FEATURES.INDOMITABLE_TEXT'),
@@ -1832,7 +1830,7 @@ on('remove:repeating_class', () => {
 });
 
 const watchForClassLevelChanges = () => {
-  let classFeatureWatch = [];
+  const classFeatureWatch = [];
   for (let z = 0; z < CLASSES.length; z++) {
     classFeatureWatch.push(`change:${CLASSES[z]}_level`);
   }
