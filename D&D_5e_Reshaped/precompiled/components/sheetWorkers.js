@@ -983,6 +983,28 @@ const setClassFeatures = () => {
   getAttrs(collectionArray, (v) => {
     const language = v.lang || 'en';
 
+    if (v.fighter_level >= 5) {
+      let extraAttackTimes;
+      if (v.fighter_level >= 20) {
+        extraAttackTimes = translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_FOUR');
+      } else if (v.fighter_level >= 11) {
+        extraAttackTimes = translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_THREE');
+      } else {
+        extraAttackTimes = translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_TWICE');
+      }
+      setTrait({
+        freetext: translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_TEXT').replace('NUMBER_OF_TIMES', extraAttackTimes),
+        name: translate(language, 'CLASS_FEATURES.EXTRA_ATTACK'),
+        storageName: 'Extra Attack',
+      });
+    } else if (v.barbarian_level >= 5 || v.monk_level >= 5 || v.paladin_level >= 5 || v.ranger_level >= 5) {
+      setTrait({
+        freetext: translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_TEXT').replace('NUMBER_OF_TIMES', translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_TWICE')),
+        name: translate(language, 'CLASS_FEATURES.EXTRA_ATTACK'),
+        storageName: 'Extra Attack',
+      });
+    }
+
     if (v.barbarian_level) {
       let rageUses;
       if (v.barbarian_level >= 20) {
@@ -1028,11 +1050,6 @@ const setClassFeatures = () => {
         });
       }
       if (v.barbarian_level >= 5) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_TEXT').replace('NUMBER_OF_TIMES', translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_TWICE')),
-          name: translate(language, 'CLASS_FEATURES.EXTRA_ATTACK'),
-          storageName: 'Extra Attack',
-        });
         setTrait({
           freetext: translate(language, 'CLASS_FEATURES.FAST_MOVEMENT_TEXT'),
           name: translate(language, 'CLASS_FEATURES.FAST_MOVEMENT'),
@@ -1257,6 +1274,55 @@ const setClassFeatures = () => {
       }
     }
 
+    if (v.fighter_level) {
+      setTrait({
+        freetext: `${translate(language, 'CLASS_FEATURES.FIGHTING_STYLE_TEXT')} ${translate(language, 'CLASS_FEATURES.FIGHTING_STYLE_FIGHTER_OPTIONS')}`,
+        name: translate(language, 'CLASS_FEATURES.FIGHTING_STYLE'),
+        storageName: 'Fighting Style',
+      });
+      setClassFeature({
+        freetext: translate(language, 'CLASS_FEATURES.SECOND_WIND_TEXT'),
+        name: translate(language, 'CLASS_FEATURES.SECOND_WIND'),
+        heal: 'd10 + @{fighter_level}',
+        recharge: 'Short Rest',
+        storageName: 'Second Wind',
+        uses_max: 1,
+      });
+
+      if (v.fighter_level >= 2) {
+        let actionSurgeUses;
+        if (v.fighter_level >= 17) {
+          actionSurgeUses = 2;
+        } else {
+          actionSurgeUses = 1;
+        }
+        setClassFeature({
+          freetext: translate(language, 'CLASS_FEATURES.ACTION_SURGE_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.ACTION_SURGE'),
+          recharge: 'Short Rest',
+          storageName: 'Action Surge',
+          uses_max: actionSurgeUses,
+        });
+      }
+      if (v.fighter_level >= 9) {
+        let indomitableUses;
+        if (v.fighter_level >= 17) {
+          indomitableUses = 3;
+        } else if (v.fighter_level >= 13) {
+          indomitableUses = 2;
+        } else {
+          indomitableUses = 1;
+        }
+        setClassFeature({
+          freetext: translate(language, 'CLASS_FEATURES.INDOMITABLE_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.INDOMITABLE'),
+          recharge: 'Long Rest',
+          storageName: 'Indomitable',
+          uses_max: indomitableUses,
+        });
+      }
+    }
+
     if (v.monk_level) {
       setTrait({
         freetext: translate(language, 'CLASS_FEATURES.MARTIAL_ARTS_TEXT'),
@@ -1321,11 +1387,6 @@ const setClassFeatures = () => {
         });
       }
       if (v.monk_level >= 5) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_TEXT').replace('NUMBER_OF_TIMES', translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_TWICE')),
-          name: translate(language, 'CLASS_FEATURES.EXTRA_ATTACK'),
-          storageName: 'Extra Attack',
-        });
         setClassFeature({
           freetext: translate(language, 'CLASS_FEATURES.STUNNING_STRIKE_TEXT'),
           name: translate(language, 'CLASS_FEATURES.STUNNING_STRIKE'),
@@ -1444,13 +1505,6 @@ const setClassFeatures = () => {
           storageName: 'Channel Divinity Paladin',
         });
       }
-      if (v.paladin_level >= 5) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_TEXT').replace('NUMBER_OF_TIMES', translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_TWICE')),
-          name: translate(language, 'CLASS_FEATURES.EXTRA_ATTACK'),
-          storageName: 'Extra Attack',
-        });
-      }
       if (v.paladin_level >= 6) {
         let auraRange;
         if (v.paladin_level >= 18) {
@@ -1513,13 +1567,6 @@ const setClassFeatures = () => {
           freetext: translate(language, 'CLASS_FEATURES.PRIMEVAL_AWARENESS_TEXT'),
           name: translate(language, 'CLASS_FEATURES.PRIMEVAL_AWARENESS'),
           storageName: 'Primeval Awareness',
-        });
-      }
-      if (v.ranger_level >= 5) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_TEXT').replace('NUMBER_OF_TIMES', translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_TWICE')),
-          name: translate(language, 'CLASS_FEATURES.EXTRA_ATTACK'),
-          storageName: 'Extra Attack',
         });
       }
       if (v.ranger_level >= 8) {
@@ -1788,71 +1835,6 @@ const setClassFeatures = () => {
           freetext: translate(language, 'CLASS_FEATURES.SIGNATURE_SPELLS_TEXT'),
           name: translate(language, 'CLASS_FEATURES.SIGNATURE_SPELLS'),
           storageName: 'Signature Spells',
-        });
-      }
-    }
-
-    if (v.fighter_level) {
-      setTrait({
-        freetext: `${translate(language, 'CLASS_FEATURES.FIGHTING_STYLE_TEXT')} ${translate(language, 'CLASS_FEATURES.FIGHTING_STYLE_FIGHTER_OPTIONS')}`,
-        name: translate(language, 'CLASS_FEATURES.FIGHTING_STYLE'),
-        storageName: 'Fighting Style',
-      });
-      setClassFeature({
-        freetext: translate(language, 'CLASS_FEATURES.SECOND_WIND_TEXT'),
-        name: translate(language, 'CLASS_FEATURES.SECOND_WIND'),
-        heal: 'd10 + @{fighter_level}',
-        recharge: 'Short Rest',
-        storageName: 'Second Wind',
-        uses_max: 1,
-      });
-
-      if (v.fighter_level >= 2) {
-        let actionSurgeUses;
-        if (v.fighter_level >= 17) {
-          actionSurgeUses = 2;
-        } else {
-          actionSurgeUses = 1;
-        }
-        setClassFeature({
-          freetext: translate(language, 'CLASS_FEATURES.ACTION_SURGE_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.ACTION_SURGE'),
-          recharge: 'Short Rest',
-          storageName: 'Action Surge',
-          uses_max: actionSurgeUses,
-        });
-      }
-
-      if (v.fighter_level >= 5) {
-        let extraAttackTimes;
-        if (v.fighter_level >= 20) {
-          extraAttackTimes = translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_FOUR');
-        } else if (v.fighter_level >= 11) {
-          extraAttackTimes = translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_THREE');
-        } else {
-          extraAttackTimes = translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_TWICE');
-        }
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_TEXT').replace('NUMBER_OF_TIMES', extraAttackTimes),
-          name: translate(language, 'CLASS_FEATURES.EXTRA_ATTACK'),
-          storageName: 'Extra Attack',
-        });
-      }
-      if (v.fighter_level >= 9) {
-        let indomitableUses;
-        if (v.fighter_level >= 17) {
-          indomitableUses = 3;
-        } else if (v.fighter_level >= 13) {
-          indomitableUses = 2;
-        } else {
-          indomitableUses = 1;
-        }
-        setClassFeature({
-          freetext: translate(language, 'CLASS_FEATURES.INDOMITABLE_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.INDOMITABLE'),
-          recharge: 'Long Rest',
-          storageName: 'Indomitable',
-          uses_max: indomitableUses,
         });
       }
     }
