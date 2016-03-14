@@ -153,7 +153,12 @@ const setFinalAttrs = (v, finalSetAttrs) => {
         }
       }
     }
-    console.log('finalSetAttrs', finalSetAttrs);
+    /* debug
+    if (!isEmpty(finalSetAttrs)) {
+      console.log('v', v);
+      console.log('finalSetAttrs', finalSetAttrs);
+    }
+    */
     setAttrs(finalSetAttrs);
   }
 };
@@ -505,6 +510,10 @@ const setClassFeatureOrTrait = (repeatingItem, obj) => {
       collectionArray.push(`${repeatingString}storage_name`);
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}uses`);
+      collectionArray.push(`${repeatingString}freetext`);
+      collectionArray.push(`${repeatingString}saving_throw_toggle`);
+      collectionArray.push(`${repeatingString}damage_toggle`);
+      collectionArray.push(`${repeatingString}heal_toggle`);
       collectionArray.push(`${repeatingString}extras_toggle`);
       if (repeatingItem === 'repeating_trait') {
         collectionArray.push(`${repeatingString}display_text`);
@@ -590,7 +599,7 @@ const setTrait = (obj) => {
 
 const updateLevels = (removeClass) => {
   const repeatingItem = 'repeating_class';
-  const collectionArray = ['is_npc', 'lang'];
+  const collectionArray = ['is_npc', 'lang', 'caster_level', 'caster_type', 'class_and_level', 'level', 'xp_next_level'];
   const finalSetAttrs = {};
 
   for (let i = 0; i < CLASSES.length; i++) {
@@ -669,7 +678,7 @@ const updateLevels = (removeClass) => {
     if (hd.hasOwnProperty(key)) {
       collectionArray.push(`hd_${key}_max`);
       collectionArray.push(`hd_${key}_query`);
-      collectionArray.push(`hd_${key}_query`);
+      collectionArray.push(`hd_${key}_toggle`);
     }
   }
 
@@ -693,6 +702,12 @@ const updateLevels = (removeClass) => {
         const repeatingString = `${repeatingItem}_${ids[j]}_`;
 
         let className = v[`${repeatingString}name`];
+        const classLevel = getIntValue(v[`${repeatingString}level`]);
+
+        if (isUndefined(v[`${repeatingString}name`] && isUndefined(v[`${repeatingString}level`]))) {
+          continue;
+        }
+
         if (isUndefined(className)) {
           className = 'barbarian';
         }
@@ -708,40 +723,39 @@ const updateLevels = (removeClass) => {
           finalSetAttrs[`${repeatingString}custom_class_toggle`] = 0;
         }
 
-        const classLevel = getIntValue(v[`${repeatingString}level`]);
         if (classLevel) {
-          /* TODO: Remove when roll20 fixes deleting a row calling a change event */
           totalLevel += classLevel;
           levelArray.push(`${capitalize(className)} ${classLevel}`);
-
-          if (v[`${className}_level`]) {
-            finalSetAttrs[`${className}_level`] += classLevel;
-          } else {
-            finalSetAttrs[`${className}_level`] = classLevel;
-          }
-
-          let classHd = v[`${repeatingString}hd`];
-          if (isUndefined(classHd) && removeClass !== 'remove') {
-            if (defaultClassDetails.hasOwnProperty(className)) {
-              classHd = defaultClassDetails[className].hd;
+          finalSetAttrs[`${className}_level`] += classLevel;
+        } else if (isUndefined(finalSetAttrs[`${className}_level`])) {
+          finalSetAttrs[`${className}_level`] = classLevel;
+        }
+        let classHd = v[`${repeatingString}hd`];
+        if (isUndefined(classHd)) {
+          if (defaultClassDetails.hasOwnProperty(className)) {
+            classHd = defaultClassDetails[className].hd;
+            if (removeClass !== 'remove') {
               finalSetAttrs[`${repeatingString}hd`] = classHd;
-            } else {
-              classHd = 'd12';
             }
+          } else {
+            classHd = 'd12';
           }
+        }
+        if (classHd && classLevel) {
           hd[classHd] += classLevel;
+        }
 
-          let classSpellcasting = v[`${repeatingString}spellcasting`];
-          if (isUndefined(classSpellcasting)) {
-            if (defaultClassDetails.hasOwnProperty(className)) {
-              classSpellcasting = defaultClassDetails[className].spellcasting;
+        let classSpellcasting = v[`${repeatingString}spellcasting`];
+        if (isUndefined(classSpellcasting)) {
+          if (defaultClassDetails.hasOwnProperty(className)) {
+            classSpellcasting = defaultClassDetails[className].spellcasting;
+            if (removeClass !== 'remove') {
               finalSetAttrs[`${repeatingString}spellcasting`] = classSpellcasting;
             }
           }
-          if (exists(classSpellcasting)) {
-            classesWithSpellcasting += 1;
-            spellcasting[classSpellcasting] += classLevel;
-          }
+        } else {
+          classesWithSpellcasting += 1;
+          spellcasting[classSpellcasting] += classLevel;
         }
       }
 
@@ -756,13 +770,13 @@ const updateLevels = (removeClass) => {
             finalSetAttrs[`hd_${key}_query`] += '}';
             finalSetAttrs[`hd_${key}_toggle`] = 1;
           } else {
-            if (v[`hd_${key}_max`]) {
+            if (!isUndefined(v[`hd_${key}_max`])) {
               finalSetAttrs[`hd_${key}_max`] = 0;
             }
-            if (v[`hd_${key}_query`]) {
+            if (!isUndefined(v[`hd_${key}_query`])) {
               finalSetAttrs[`hd_${key}_query`] = '';
             }
-            if (v[`hd_${key}_toggle`]) {
+            if (!isUndefined(v[`hd_${key}_toggle`])) {
               finalSetAttrs[`hd_${key}_toggle`] = 0;
             }
           }
@@ -804,7 +818,7 @@ const updateLevels = (removeClass) => {
       for (let y = 0; y < CLASSES.length; y++) {
         if (finalSetAttrs[`${CLASSES[y]}_level`] > 0) {
           finalSetAttrs[`has_${CLASSES[y]}_levels`] = 1;
-        } else if (v[`has_${CLASSES[y]}_levels`]) {
+        } else if (!isUndefined(v[`has_${CLASSES[y]}_levels`])) {
           finalSetAttrs[`has_${CLASSES[y]}_levels`] = 0;
         }
       }
@@ -835,6 +849,7 @@ const updateSpellSlots = () => {
     collectionArray.push(`${repeatingString}calc`);
     collectionArray.push(`${repeatingString}bonus`);
     collectionArray.push(`${repeatingString}max`);
+    collectionArray.push(`${repeatingString}toggle`);
   }
   getAttrs(collectionArray, (v) => {
     let casterLevel = getIntValue(v.level);
@@ -956,12 +971,18 @@ const updateSpellSlots = () => {
 
       const slotBonus = getIntValue(v[`spell_slots_l${i}_bonus`]);
       const spellSlotMax = slotCalc + slotBonus;
-      finalSetAttrs[`spell_slots_l${i}_max`] = spellSlotMax;
+      if (v[`spell_slots_l${i}_max`] !== spellSlotMax) {
+        finalSetAttrs[`spell_slots_l${i}_max`] = spellSlotMax;
+      }
 
+      let spellSlotToggle;
       if (spellSlotMax > 0) {
-        finalSetAttrs[`spell_slots_l${i}_toggle`] = 'on';
+        spellSlotToggle = 'on';
       } else {
-        finalSetAttrs[`spell_slots_l${i}_toggle`] = 0;
+        spellSlotToggle = 0;
+      }
+      if (v[`spell_slots_l${i}_toggle`] !== spellSlotToggle) {
+        finalSetAttrs[`spell_slots_l${i}_toggle`] = spellSlotToggle;
       }
     }
     setFinalAttrs(v, finalSetAttrs);
@@ -970,7 +991,7 @@ const updateSpellSlots = () => {
 
 const setClassFeatures = () => {
   const finalSetAttrs = {};
-  const collectionArray = ['ac_unarmored_ability', 'lang', 'careful_spell_toggle', 'distant_spell_toggle', 'empowered_spell_toggle', 'extended_spell_toggle', 'heightened_spell_toggle', 'quickened_spell_toggle', 'subtle_spell_toggle', 'twinned_spell_toggle'];
+  const collectionArray = ['ac_unarmored_ability', 'lang', 'jack_of_all_trades_toggle', 'careful_spell_toggle', 'distant_spell_toggle', 'empowered_spell_toggle', 'extended_spell_toggle', 'heightened_spell_toggle', 'quickened_spell_toggle', 'subtle_spell_toggle', 'twinned_spell_toggle'];
 
   for (let i = 0; i < ABILITIES.length; i++) {
     collectionArray.push(`${ABILITIES[i]}_mod`);
@@ -1842,10 +1863,12 @@ const setClassFeatures = () => {
   });
 };
 
-on('change:repeating_class', () => {
-  console.log('change:repeating_class');
-  updateLevels();
-  updateSpellSlots();
+on('change:repeating_class', (eventInfo) => {
+  const changedField = getRepeatingField('repeating_class', eventInfo);
+  if (changedField !== 'error') {
+    updateLevels();
+    updateSpellSlots();
+  }
 });
 on('remove:repeating_class', () => {
   console.log('remove:repeating_class');
@@ -1897,7 +1920,7 @@ const getPB = (level, challenge) => {
   return pb;
 };
 const updatePb = () => {
-  const collectionArray = ['level', 'challenge'];
+  const collectionArray = ['level', 'challenge', 'pb', 'exp', 'h_PB'];
   const finalSetAttrs = {};
 
   getAttrs(collectionArray, (v) => {
@@ -3873,6 +3896,8 @@ const updateAction = (type, rowId) => {
       collectionArray.push(`${repeatingString}parsed`);
       collectionArray.push(`${repeatingString}recharge`);
       collectionArray.push(`${repeatingString}recharge_display`);
+      collectionArray.push(`${repeatingString}extras_toggle`);
+      collectionArray.push(`${repeatingString}freetext`);
     }
 
     getAttrs(collectionArray, (v) => {
