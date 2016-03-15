@@ -154,11 +154,11 @@ const setFinalAttrs = (v, finalSetAttrs) => {
       }
     }
     /* debug
-    if (!isEmpty(finalSetAttrs)) {
-      console.log('v', v);
-      console.log('finalSetAttrs', finalSetAttrs);
-    }
-    */
+     if (!isEmpty(finalSetAttrs)) {
+       console.log('v', v);
+       console.log('finalSetAttrs', finalSetAttrs);
+     }
+     */
     setAttrs(finalSetAttrs);
   }
 };
