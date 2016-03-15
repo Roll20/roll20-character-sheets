@@ -1791,7 +1791,6 @@ const setClassFeatures = () => {
     }
 
     if (v.warlock_level) {
-      const language = v.lang || 'en';
       let warlockSpellSlots;
       if (v.warlock_level >= 17) {
         warlockSpellSlots = 4;
