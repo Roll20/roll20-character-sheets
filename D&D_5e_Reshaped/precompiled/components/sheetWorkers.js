@@ -1044,8 +1044,17 @@ const setClassFeatures = () => {
       } else {
         rageUses = 2;
       }
+
+      let rageDamage;
+      if (v.barbarian_level >= 16) {
+        rageDamage = 4;
+      } else if (v.barbarian_level >= 9) {
+        rageDamage = 3;
+      } else {
+        rageDamage = 2;
+      }
       setClassFeature({
-        freetext: translate(language, 'CLASS_FEATURES.RAGE_TEXT'),
+        freetext: translate(language, 'CLASS_FEATURES.RAGE_TEXT').replace('RAGE_DAMAGE', rageDamage),
         name: translate(language, 'CLASS_FEATURES.RAGE'),
         recharge: 'Long Rest',
         storageName: 'Rage',
