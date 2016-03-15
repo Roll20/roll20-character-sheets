@@ -1719,8 +1719,8 @@ const setClassFeatures = () => {
         });
         if (v.sorcerer_level >= 3) {
           setTrait({
-            freetext: translate(language, 'CLASS_FEATURES.FLEXIBLE_CASTING_TEXT'),
-            name: translate(language, 'CLASS_FEATURES.FLEXIBLE_CASTING'),
+            freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_TEXT'),
+            name: translate(language, 'CLASS_FEATURES.METAMAGIC'),
             storageName: 'Metamagic',
           });
           if (v.careful_spell_toggle === '@{careful_spell_toggle_var}') {
