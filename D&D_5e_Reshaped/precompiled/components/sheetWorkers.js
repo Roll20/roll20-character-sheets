@@ -153,12 +153,9 @@ const setFinalAttrs = (v, finalSetAttrs) => {
         }
       }
     }
-    /* debug
     if (!isEmpty(finalSetAttrs)) {
-      console.log('v', v);
       console.log('finalSetAttrs', finalSetAttrs);
     }
-    */
     setAttrs(finalSetAttrs);
   }
 };
@@ -724,7 +721,7 @@ const updateLevels = (changedField) => {
         }
 
         if (classLevel) {
-          console.log('classLevels[capitalize(className)]', classLevels[capitalize(className)]);
+          totalLevel += classLevel;
           if (classLevels[capitalize(className)]) {
             classLevels[capitalize(className)] += classLevel;
           } else {
@@ -764,6 +761,27 @@ const updateLevels = (changedField) => {
         } else {
           classesWithSpellcasting += 1;
           spellcasting[classSpellcasting] += classLevel;
+        }
+      }
+
+      finalSetAttrs.level = totalLevel;
+
+      let xpForNextLevel = 0;
+      if (!totalLevel) {
+        totalLevel = 0;
+      }
+      if (totalLevel > 30) {
+        xpForNextLevel = xpTable[30];
+      } else {
+        xpForNextLevel = xpTable[totalLevel];
+      }
+      finalSetAttrs.xp_next_level = xpForNextLevel;
+
+      for (let y = 0; y < CLASSES.length; y++) {
+        if (finalSetAttrs[`${CLASSES[y]}_level`] > 0) {
+          finalSetAttrs[`has_${CLASSES[y]}_levels`] = 1;
+        } else if (!isUndefined(v[`has_${CLASSES[y]}_levels`])) {
+          finalSetAttrs[`has_${CLASSES[y]}_levels`] = 0;
         }
       }
 
@@ -807,27 +825,6 @@ const updateLevels = (changedField) => {
         finalSetAttrs.caster_type = 'third';
       } else {
         finalSetAttrs.caster_type = 'full';
-      }
-
-      finalSetAttrs.level = totalLevel;
-
-      let xpForNextLevel = 0;
-      if (!totalLevel) {
-        totalLevel = 0;
-      }
-      if (totalLevel > 30) {
-        xpForNextLevel = xpTable[30];
-      } else {
-        xpForNextLevel = xpTable[totalLevel];
-      }
-      finalSetAttrs.xp_next_level = xpForNextLevel;
-
-      for (let y = 0; y < CLASSES.length; y++) {
-        if (finalSetAttrs[`${CLASSES[y]}_level`] > 0) {
-          finalSetAttrs[`has_${CLASSES[y]}_levels`] = 1;
-        } else if (!isUndefined(v[`has_${CLASSES[y]}_levels`])) {
-          finalSetAttrs[`has_${CLASSES[y]}_levels`] = 0;
-        }
       }
 
       setFinalAttrs(v, finalSetAttrs);
