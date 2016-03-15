@@ -1847,6 +1847,21 @@ const setClassFeatures = () => {
           storageName: 'Eldritch Invocations',
         });
       }
+      if (v.warlock_level >= 11) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.MYSTIC_ARCANUM_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.MYSTIC_ARCANUM'),
+          storageName: 'Mystic Arcanum',
+        });
+      }
+      if (v.warlock_level >= 20) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.ELDRITCH_MASTER_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.ELDRITCH_MASTER'),
+          recharge: 'Long Rest',
+          storageName: 'Eldritch Master',
+        });
+      }
     }
 
     if (v.wizard_level) {
