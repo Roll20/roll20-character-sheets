@@ -547,18 +547,14 @@ const setClassFeatureOrTrait = (repeatingItem, obj) => {
       if (obj.clear) {
         delete obj.clear;
         for (const prop in obj) {
-          if (obj.hasOwnProperty(prop)) {
-            if (!isUndefined(v[`${repeatingString}${prop}`])) {
-              finalSetAttrs[`${repeatingString}${prop}`] = obj[prop];
-            }
+          if (obj.hasOwnProperty(prop) && !isUndefined(v[`${repeatingString}${prop}`])) {
+            finalSetAttrs[`${repeatingString}${prop}`] = obj[prop];
           }
         }
       } else {
         for (const prop in obj) {
-          if (obj.hasOwnProperty(prop)) {
-            if (obj[prop] && v[`${repeatingString}${prop}`] !== obj[prop]) {
-              finalSetAttrs[`${repeatingString}${prop}`] = obj[prop];
-            }
+          if (obj.hasOwnProperty(prop) && v[`${repeatingString}${prop}`] !== obj[prop]) {
+            finalSetAttrs[`${repeatingString}${prop}`] = obj[prop];
           }
         }
         if (obj.saving_throw_ability || obj.saving_throw_bonus || obj.saving_throw_vs_ability) {
@@ -1107,7 +1103,6 @@ const setClassFeatures = () => {
         setTrait({
           freetext: translate(language, 'CLASS_FEATURES.RELENTLESS_RAGE_TEXT'),
           name: translate(language, 'CLASS_FEATURES.RELENTLESS_RAGE'),
-          saving_throw_ability: 0,
           storageName: 'Relentless Rage',
         });
       }
