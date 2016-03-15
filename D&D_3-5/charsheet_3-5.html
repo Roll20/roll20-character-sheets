@@ -2,9 +2,9 @@
 <!-- by Diana P. -->
 <!-- based on Pathfinder sheets from Barry R., Sam, Brian, and Justin N. -->
 <!-- with lots of help from Toby-->
-<!-- Version 2.7.1 3/15/16 (Sheetworkers for Attributes, encumbrance calcs, and inventory cost/weight calculation)-->
+<!-- Version 2.7.2 3/15/16 (Sheetworkers for Attributes, encumbrance calcs, and inventory cost/weight calculation)-->
 
-<input type="hidden" name="attr_currentsheetversion" title="currentsheetversion" value="7.1"/>
+<input type="hidden" name="attr_currentsheetversion" title="currentsheetversion" value="7.2"/>
 <input type="radio" class="sheet-switch-pc-show sheet-switch" title="npc-show" name="attr_npc-show" value="1" checked /><span style="text-align: left;">PC &nbsp; &nbsp; &nbsp; &nbsp;</span>
 <input type="radio" class="sheet-switch-npc-show sheet-switch" title="npc-show" name="attr_npc-show" value="2" /><span style="text-align: left;">NPC</span>
 
@@ -3297,6 +3297,13 @@
 	<div class="sheet-tab-content sheet-tab8 sheet-tab99">
 		<!-- Misc Stuff -->
 			<input type="hidden" name="attr_sheetversion" title="sheetversion" value="1.0"/>
+			<table>
+				<tr>
+					<td style="width: 30px;"><input type="checkbox" name="attr_recalc" title="recalc" value="1" /> </td>
+					<td style="text-align:left">Ability score recalc.  Click this box to force a recalc of the ability scores.</td>
+				</tr>
+			</table>
+			<hr/>
 			<input type="checkbox" class="sheet-pc-pronouns-show sheet-arrow" title="pronouns-show" name="attr_pronouns-show" value="1" checked /><span style="text-align: left;">Pronouns</span>
 			<div class="sheet-pc-pronouns">
 				For use in macros if desired.  Enter your preferred pronoun for the following categories.
@@ -4730,15 +4737,13 @@ on('change:repeating_equipment', function(){
         .execute(); 
 });
 
-/* need to figure out the best way to ensure dex/etcmod gets updated when first started.. need a version field?
-on opened for dexmod/etc does not feel like the best solution here; it might fire before the dex/etc summation.
-also can remove some of the nested calcs if I get this working reliably.  How to update total weight???  Guess check other sheets  ----------still not working.. see Caiden.... it set all mods to -5???? */
-function StartingSetup(version, cversion) {
+/* Setup for when a character sheet gets opened for the first time.  -Calc ability and ability mods as well as encumbrance. */
+function StartingSetup(version, cversion, calc) {
    mod = version;
-   console.log('/* ----------entering StartingSetup; sheetversion:' + version + '  cversion:' + cversion + '------------ */');
-   if ((version < cversion) || (isNaN(version))) {
+   console.log('/* ----------entering StartingSetup; sheetversion:' + version + '  cversion:' + cversion + '  calc:' + calc + '------------ */');
+   if ((version < cversion) || (isNaN(version)) || (calc == 1)) {
 	  mod = cversion;
-      getAttrs(["str", "str-mod", "str-base", "str-misc", "str-temp", "encumbrstr", "dex", "dex-mod", "dex-base", "dex-misc", "dex-temp", "con", "con-mod", "con-base", "con-misc", "con-temp", "int", "int-mod", "int-base", "int-misc", "int-temp", "wis", "wis-mod", "wis-base", "wis-misc", "wis-temp", "cha", "cha-mod", "cha-base", "cha-misc", "cha-temp"], function(values){
+      getAttrs(["str", "str-mod", "str-base", "str-misc", "str-temp", "encumbrstr", "dex", "dex-mod", "dex-base", "dex-misc", "dex-temp", "con", "con-mod", "con-base", "con-misc", "con-temp", "int", "int-mod", "int-base", "int-misc", "int-temp", "wis", "wis-mod", "wis-base", "wis-misc", "wis-temp", "cha", "cha-mod", "cha-base", "cha-misc", "cha-temp", "recalc"], function(values){
 	     strtempvar = (parseInt(values["str-base"],10) + parseInt(values["str-misc"],10) + parseInt(values["str-temp"],10));
 		 dextempvar = (parseInt(values["dex-base"],10) + parseInt(values["dex-misc"],10) + parseInt(values["dex-temp"],10));
 		 contempvar = (parseInt(values["con-base"],10) + parseInt(values["con-misc"],10) + parseInt(values["con-temp"],10));
@@ -4758,18 +4763,20 @@ function StartingSetup(version, cversion) {
 	        wis: wistempvar,
 		    "wis-mod": Math.floor((wistempvar / 2) - 5),
 	        cha: chatempvar,
-		    "cha-mod": Math.floor((chatempvar / 2) - 5)
+		    "cha-mod": Math.floor((chatempvar / 2) - 5),
+			recalc: 0
 		 });
 	  });
    }
    console.log('/* ----------leaving StartingSetup; mod:' + mod + '------------ */');
    return mod;
 }
- 
-on("sheet:opened", function() {
-  getAttrs(["sheetversion", "currentsheetversion"], function(values) {
+
+//  <!---- Run the setup if the sheet is opened or the recalc box is clicked ---->
+on("sheet:opened change:recalc", function() {
+  getAttrs(["sheetversion", "currentsheetversion", "recalc"], function(values) {
 	setAttrs({
-	  sheetversion: StartingSetup(parseFloat(values.sheetversion), parseFloat(values.currentsheetversion))
+	  sheetversion: StartingSetup(parseFloat(values.sheetversion), parseFloat(values.currentsheetversion), parseInt(values.recalc,10))
 	});
   });
 });
