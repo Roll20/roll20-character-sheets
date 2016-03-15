@@ -3130,14 +3130,14 @@ const updateAbilityChecksMacro = () => {
   const collectionArray = ['ability_checks_query_var', 'ability_checks_macro_var'];
   const finalSetAttrs = {};
 
-  finalSetAttrs.ability_checks_query_const = '?{Ability Check';
-  finalSetAttrs.ability_checks_macro_const = '';
+  finalSetAttrs.ability_checks_query_var = '?{Ability Check';
+  finalSetAttrs.ability_checks_macro_var = '';
 
   for (let i = 0; i < ABILITIES.length; i++) {
-    finalSetAttrs.ability_checks_query_const += `|${capitalize(ABILITIES[i])},{{title=${capitalize(ABILITIES[i])}&#125;&#125; {{roll1=[[d20@{d20_mod} + @{${ABILITIES[i]}_check_mod}]]&#125;&#125; {{roll2=[[d20@{d20_mod} + @{${ABILITIES[i]}_check_mod}]]&#125;&#125;`;
-    finalSetAttrs.ability_checks_macro_const += `[${capitalize(ABILITIES[i])}](~${ABILITIES[i]}_check)`;
+    finalSetAttrs.ability_checks_query_var += `|${capitalize(ABILITIES[i])},{{title=${capitalize(ABILITIES[i])}&#125;&#125; {{roll1=[[d20@{d20_mod} + @{${ABILITIES[i]}_check_mod}]]&#125;&#125; {{roll2=[[d20@{d20_mod} + @{${ABILITIES[i]}_check_mod}]]&#125;&#125;`;
+    finalSetAttrs.ability_checks_macro_var += `[${capitalize(ABILITIES[i])}](~${ABILITIES[i]}_check)`;
     if (i < ABILITIES.length - 1) {
-      finalSetAttrs.ability_checks_macro_const += ', ';
+      finalSetAttrs.ability_checks_macro_var += ', ';
     }
   }
 
@@ -3151,11 +3151,11 @@ const updateAbilityChecksMacro = () => {
     getAttrs(collectionArray, (v) => {
       for (let j = 0; j < ids.length; j++) {
         const repeatingString = `${repeatingItem}_${ids[j]}_`;
-        finalSetAttrs.ability_checks_query_const += `|${v[`${repeatingString}name`]}, {{title=${v[`${repeatingString}name`]} (${capitalize(getAbilityShortName(v[`${repeatingString}ability`]))})&#125;&#125; {{roll1=[[d20@{d20_mod} + @{${repeatingString}formula}]]&#125;&#125; {{roll2=[[d20@{d20_mod} + @{${repeatingString}formula}]]&#125;&#125;`;
-        finalSetAttrs.ability_checks_macro_const += ', ';
-        finalSetAttrs.ability_checks_macro_const += `[${v[`${repeatingString}name`]}](~repeating_skill_'${ids[j]}_skill)`;
+        finalSetAttrs.ability_checks_query_var += `|${v[`${repeatingString}name`]}, {{title=${v[`${repeatingString}name`]} (${capitalize(getAbilityShortName(v[`${repeatingString}ability`]))})&#125;&#125; {{roll1=[[d20@{d20_mod} + @{${repeatingString}formula}]]&#125;&#125; {{roll2=[[d20@{d20_mod} + @{${repeatingString}formula}]]&#125;&#125;`;
+        finalSetAttrs.ability_checks_macro_var += ', ';
+        finalSetAttrs.ability_checks_macro_var += `[${v[`${repeatingString}name`]}](~repeating_skill_${ids[j]}_skill)`;
       }
-      finalSetAttrs.ability_checks_query_const += '}';
+      finalSetAttrs.ability_checks_query_var += '}';
       setFinalAttrs(v, finalSetAttrs);
     });
   });
@@ -4773,6 +4773,9 @@ const sheetOpened = () => {
     }
     if (versionCompare(version, '2.2.11') < 0) {
       setClassFeatures();
+    }
+    if (versionCompare(version, '2.2.12') < 0) {
+      updateAbilityChecksMacro();
     }
 
     if (!version || version !== currentVersion) {
