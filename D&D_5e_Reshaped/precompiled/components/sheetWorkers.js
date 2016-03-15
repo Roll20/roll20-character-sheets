@@ -1378,14 +1378,14 @@ const setClassFeatures = () => {
         });
 
         let unarmoredMovementFeet;
-        if (v.monk_level >= 6) {
-          unarmoredMovementFeet = 15;
-        } else if (v.monk_level >= 10) {
-          unarmoredMovementFeet = 20;
+        if (v.monk_level >= 18) {
+          unarmoredMovementFeet = 30;
         } else if (v.monk_level >= 14) {
           unarmoredMovementFeet = 25;
-        } else if (v.monk_level >= 18) {
-          unarmoredMovementFeet = 30;
+        } else if (v.monk_level >= 10) {
+          unarmoredMovementFeet = 20;
+        } else if (v.monk_level >= 6) {
+          unarmoredMovementFeet = 15;
         } else {
           unarmoredMovementFeet = 10;
         }
