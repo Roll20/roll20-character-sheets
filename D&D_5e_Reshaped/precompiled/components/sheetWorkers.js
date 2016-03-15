@@ -1107,6 +1107,7 @@ const setClassFeatures = () => {
         setTrait({
           freetext: translate(language, 'CLASS_FEATURES.RELENTLESS_RAGE_TEXT'),
           name: translate(language, 'CLASS_FEATURES.RELENTLESS_RAGE'),
+          saving_throw_ability: 0,
           storageName: 'Relentless Rage',
         });
       }
