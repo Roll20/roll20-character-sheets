@@ -704,7 +704,7 @@ const updateLevels = (changedField) => {
         let className = v[`${repeatingString}name`];
         const classLevel = getIntValue(v[`${repeatingString}level`]);
 
-        if (isUndefined(v[`${repeatingString}name`] && isUndefined(v[`${repeatingString}level`]))) {
+        if (isUndefined(v[`${repeatingString}name`]) && isUndefined(v[`${repeatingString}level`])) {
           continue;
         }
 
