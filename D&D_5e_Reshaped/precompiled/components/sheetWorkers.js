@@ -597,7 +597,7 @@ const setTrait = (obj) => {
   return setClassFeatureOrTrait('repeating_trait', obj);
 };
 
-const updateLevels = (removeClass) => {
+const updateLevels = (changedField) => {
   const repeatingItem = 'repeating_class';
   const collectionArray = ['is_npc', 'lang', 'caster_level', 'caster_type', 'class_and_level', 'level', 'xp_next_level'];
   const finalSetAttrs = {};
@@ -670,7 +670,7 @@ const updateLevels = (removeClass) => {
     warlock: 0,
   };
   let totalLevel = 0;
-  const levelArray = [];
+  const classLevels = {};
   let classesWithSpellcasting = 0;
   const xpTable = [0, 300, 900, 2700, 6500, 14000, 23000, 34000, 48000, 64000, 85000, 100000, 120000, 140000, 165000, 195000, 225000, 265000, 305000, 355000, 385000, 405000, 435000, 465000, 495000, 525000, 555000, 585000, 605000, 635000, 665000];
 
@@ -724,34 +724,42 @@ const updateLevels = (removeClass) => {
         }
 
         if (classLevel) {
-          totalLevel += classLevel;
-          levelArray.push(`${capitalize(className)} ${classLevel}`);
-          finalSetAttrs[`${className}_level`] += classLevel;
+          console.log('classLevels[capitalize(className)]', classLevels[capitalize(className)]);
+          if (classLevels[capitalize(className)]) {
+            classLevels[capitalize(className)] += classLevel;
+          } else {
+            classLevels[capitalize(className)] = classLevel;
+          }
         } else if (isUndefined(finalSetAttrs[`${className}_level`])) {
           finalSetAttrs[`${className}_level`] = classLevel;
         }
+
+        finalSetAttrs.class_and_level = '';
+        for (const prop in classLevels) {
+          if (classLevels.hasOwnProperty(prop)) {
+            finalSetAttrs[`${className}_level`] = classLevels[prop];
+            finalSetAttrs.class_and_level += `${prop} ${classLevels[prop]}`;
+          }
+        }
+
         let classHd = v[`${repeatingString}hd`];
-        if (isUndefined(classHd)) {
+        if (isUndefined(classHd) || changedField === 'name') {
           if (defaultClassDetails.hasOwnProperty(className)) {
             classHd = defaultClassDetails[className].hd;
-            if (removeClass !== 'remove') {
-              finalSetAttrs[`${repeatingString}hd`] = classHd;
-            }
           } else {
             classHd = 'd12';
           }
+          finalSetAttrs[`${repeatingString}hd`] = classHd;
         }
         if (classHd && classLevel) {
           hd[classHd] += classLevel;
         }
 
         let classSpellcasting = v[`${repeatingString}spellcasting`];
-        if (isUndefined(classSpellcasting)) {
+        if (isUndefined(classSpellcasting) || changedField === 'name') {
           if (defaultClassDetails.hasOwnProperty(className)) {
             classSpellcasting = defaultClassDetails[className].spellcasting;
-            if (removeClass !== 'remove') {
-              finalSetAttrs[`${repeatingString}spellcasting`] = classSpellcasting;
-            }
+            finalSetAttrs[`${repeatingString}spellcasting`] = classSpellcasting;
           }
         } else {
           classesWithSpellcasting += 1;
@@ -802,7 +810,6 @@ const updateLevels = (removeClass) => {
       }
 
       finalSetAttrs.level = totalLevel;
-      finalSetAttrs.class_and_level = levelArray.join(' ');
 
       let xpForNextLevel = 0;
       if (!totalLevel) {
@@ -1374,7 +1381,6 @@ const setClassFeatures = () => {
         });
 
         let unarmoredMovementFeet;
-
         if (v.monk_level >= 6) {
           unarmoredMovementFeet = 15;
         } else if (v.monk_level >= 10) {
@@ -1548,6 +1554,8 @@ const setClassFeatures = () => {
       }
       if (v.paladin_level >= 11) {
         setTrait({
+          damage: 'd8',
+          damage_type: 'radiant',
           freetext: translate(language, 'CLASS_FEATURES.IMPROVED_DIVINE_SMITE_TEXT'),
           name: translate(language, 'CLASS_FEATURES.IMPROVED_DIVINE_SMITE'),
           storageName: 'Improved Divine Smite',
@@ -1866,13 +1874,16 @@ const setClassFeatures = () => {
 on('change:repeating_class', (eventInfo) => {
   const changedField = getRepeatingField('repeating_class', eventInfo);
   if (changedField !== 'error') {
-    updateLevels();
-    updateSpellSlots();
+    console.log('change:repeating_class', changedField);
+    updateLevels(changedField);
+    if (changedField === 'spellcasting') {
+      updateSpellSlots();
+    }
   }
 });
 on('remove:repeating_class', () => {
   console.log('remove:repeating_class');
-  updateLevels('remove');
+  updateLevels();
   updateSpellSlots();
   setClassFeatures();
 });
