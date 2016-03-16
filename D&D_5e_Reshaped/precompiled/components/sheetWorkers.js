@@ -415,7 +415,7 @@ on('change:cp change:sp change:ep change:gp change:pp', () => {
 });
 
 const updateAbilityModifier = (ability) => {
-  const collectionArray = [ability, `${ability}_bonus`, `${ability}_mod`, `${ability}_check_mod`, `${ability}_check_bonus`, 'global_ability_bonus', 'strength_mod', 'dexterity_mod', 'jack_of_all_trades_toggle', 'jack_of_all_trades', 'remarkable_athlete_toggle', 'remarkable_athlete', 'global_check_bonus'];
+  const collectionArray = [ability, `${ability}_bonus`, `${ability}_mod`, `${ability}_mod_with_sign`, `${ability}_check_mod`, `${ability}check_mod_formula`, `${ability}_check_bonus`, 'global_ability_bonus', 'strength_mod', 'dexterity_mod', 'jack_of_all_trades_toggle', 'jack_of_all_trades', 'remarkable_athlete_toggle', 'remarkable_athlete', 'global_check_bonus'];
   const finalSetAttrs = {};
 
   getAttrs(collectionArray, (v) => {
@@ -2680,7 +2680,7 @@ const updateAttackQuery = () => {
   const collectionArray = [];
   const finalSetAttrs = {};
 
-  finalSetAttrs.attack_query_const = '?{Attack';
+  finalSetAttrs.attack_query_var = '?{Attack';
 
   getSectionIDs(repeatingItem, (ids) => {
     for (let i = 0; i < ids.length; i++) {
@@ -2702,17 +2702,17 @@ const updateAttackQuery = () => {
       for (let j = 0; j < ids.length; j++) {
         const repeatingString = `${repeatingItem}_${ids[j]}_`;
 
-        finalSetAttrs.attack_query_const += `|${v[`${repeatingString}name`]},`;
-        finalSetAttrs.attack_query_const += ` {{title=' + ${v[`${repeatingString}name`]}&#125;&#125;`;
-        finalSetAttrs.attack_query_const += `{{reach=' + ${emptyIfUndefined(v[`${repeatingString}reach`])}&#125;&#125;`;
-        finalSetAttrs.attack_query_const += `{{range=' + ${emptyIfUndefined(v[`${repeatingString}range`])}&#125;&#125;`;
-        finalSetAttrs.attack_query_const += emptyIfUndefined(v[`${repeatingString}roll_toggle`]);
-        finalSetAttrs.attack_query_const += emptyIfUndefined(v[`${repeatingString}saving_throw_toggle`]);
-        finalSetAttrs.attack_query_const += emptyIfUndefined(v[`${repeatingString}damage_toggle`]);
-        finalSetAttrs.attack_query_const += emptyIfUndefined(v[`${repeatingString}second_damage_toggle`]);
-        finalSetAttrs.attack_query_const += emptyIfUndefined(v[`${repeatingString}extras_toggle`]);
+        finalSetAttrs.attack_query_var += `|${v[`${repeatingString}name`]},`;
+        finalSetAttrs.attack_query_var += ` {{title=' + ${v[`${repeatingString}name`]}&#125;&#125;`;
+        finalSetAttrs.attack_query_var += `{{reach=' + ${emptyIfUndefined(v[`${repeatingString}reach`])}&#125;&#125;`;
+        finalSetAttrs.attack_query_var += `{{range=' + ${emptyIfUndefined(v[`${repeatingString}range`])}&#125;&#125;`;
+        finalSetAttrs.attack_query_var += emptyIfUndefined(v[`${repeatingString}roll_toggle`]);
+        finalSetAttrs.attack_query_var += emptyIfUndefined(v[`${repeatingString}saving_throw_toggle`]);
+        finalSetAttrs.attack_query_var += emptyIfUndefined(v[`${repeatingString}damage_toggle`]);
+        finalSetAttrs.attack_query_var += emptyIfUndefined(v[`${repeatingString}second_damage_toggle`]);
+        finalSetAttrs.attack_query_var += emptyIfUndefined(v[`${repeatingString}extras_toggle`]);
       }
-      finalSetAttrs.attack_query_const += '}';
+      finalSetAttrs.attack_query_var += '}';
       setFinalAttrs(v, finalSetAttrs);
     });
   });
@@ -2871,7 +2871,7 @@ on('change:repeating_attack', (eventInfo) => {
   if (changedField !== 'error' && changedField !== 'toggle_details' && changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed') {
     const rowId = getRowId('repeating_attack', eventInfo);
     updateAttack(rowId);
-    updateAttackQuery();
+    //updateAttackQuery();
   }
 });
 on('change:repeating_attack:carried change:repeating_attack:weight remove:repeating_attack', () => {
@@ -4267,6 +4267,7 @@ on('change:repeating_lairaction:freetext', (eventInfo) => {
 
 const countAction = (type) => {
   const repeatingItem = `repeating_${type}`;
+  const collectionArray = [`${type}s_exist`];
   const finalSetAttrs = {};
 
   finalSetAttrs[`${type}s_exist`] = 0;
@@ -4275,7 +4276,9 @@ const countAction = (type) => {
     if (ids.length > 0) {
       finalSetAttrs[`${type}s_exist`] = 1;
     }
-    setFinalAttrs({}, finalSetAttrs);
+    getAttrs(collectionArray, (v) => {
+      setFinalAttrs(v, finalSetAttrs);
+    });
   });
 };
 on('change:repeating_trait remove:repeating_trait', () => {
