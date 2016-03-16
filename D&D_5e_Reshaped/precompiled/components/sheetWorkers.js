@@ -156,7 +156,9 @@ const setFinalAttrs = (v, finalSetAttrs) => {
     if (!isEmpty(finalSetAttrs)) {
       console.log('finalSetAttrs', finalSetAttrs);
     }
-    setAttrs(finalSetAttrs);
+    if (!isEmpty(finalSetAttrs)) {
+      setAttrs(finalSetAttrs);
+    }
   }
 };
 const fromVOrFinalSetAttrs = (v, finalSetAttrs, value) => {
