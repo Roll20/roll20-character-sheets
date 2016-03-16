@@ -2314,15 +2314,15 @@ on('change:dexterity_mod change:dexterity_check_bonus change:initiative_bonus ch
 });
 
 const updateWeight = () => {
-  const collectionArray = ['weight_attacks', 'weight_ammo', 'weight_armor', 'weight_equipment', 'weight_coinage', 'weight_misc'];
+  const collectionArray = ['weight_attacks', 'weight_ammo', 'weight_armor', 'weight_equipment', 'weight_coinage'];
   const finalSetAttrs = {};
 
   getAttrs(collectionArray, (v) => {
-    finalSetAttrs.weight_total = round((getFloatValue(v.weight_attacks) + getFloatValue(v.weight_ammo) + getFloatValue(v.weight_armor) + getFloatValue(v.weight_equipment) + getFloatValue(v.weight_coinage) + getFloatValue(v.weight_misc)), 2);
+    finalSetAttrs.weight_total = round((getFloatValue(v.weight_attacks) + getFloatValue(v.weight_ammo) + getFloatValue(v.weight_armor) + getFloatValue(v.weight_equipment) + getFloatValue(v.weight_coinage)), 2);
     setFinalAttrs(v, finalSetAttrs);
   });
 };
-on('change:weight_attacks change:weight_ammo change:weight_armor change:weight_equipment change:weight_coinage change:weight_misc', () => {
+on('change:weight_attacks change:weight_ammo change:weight_armor change:weight_equipment change:weight_coinage', () => {
   updateWeight();
 });
 const updateAttackToggle = (v, finalSetAttrs, repeatingString, options) => {
