@@ -2392,11 +2392,11 @@ const updateAttackToggle = (v, finalSetAttrs, repeatingString, options) => {
         attackFormula += ` + ${options.globalRangedAttackBonus}[global ranged attack bonus]`;
       }
     }
+    finalSetAttrs[`${repeatingString}attack_formula`] = attackFormula;
   }
   if (options.type === 'attack') {
     finalSetAttrs[`${repeatingString}to_hit`] = toHit;
   }
-  finalSetAttrs[`${repeatingString}attack_formula`] = attackFormula;
 };
 
 const updateSavingThrowToggle = (v, finalSetAttrs, repeatingString, options) => {
