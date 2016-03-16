@@ -752,14 +752,14 @@ const updateLevels = (changedField) => {
         }
       }
 
+      finalSetAttrs.class_and_level = '';
       for (const className in classLevels) {
         if (classLevels.hasOwnProperty(className)) {
           finalSetAttrs[`${className}_level`] = classLevels[className];
-          if (isUndefined(finalSetAttrs.class_and_level)) {
-            finalSetAttrs.class_and_level = `${className} ${classLevels[className]}`;
-          } else {
-            finalSetAttrs.class_and_level += ` ${className} ${classLevels[className]}`;
+          if (finalSetAttrs.class_and_level !== '') {
+            finalSetAttrs.class_and_level += ', ';
           }
+          finalSetAttrs.class_and_level += `${className} ${classLevels[className]}`;
         }
       }
 
