@@ -3646,7 +3646,7 @@ on('change:hp_srd', () => {
 });
 
 const updateNPCHP = () => {
-  const collectionArray = ['hit_dice', 'hit_die', 'hp_extra', 'constitution_mod'];
+  const collectionArray = ['HP', 'HP_max', 'hp_formula', 'hit_dice', 'hit_die', 'hp_extra', 'constitution_mod'];
   const finalSetAttrs = {};
 
   getAttrs(collectionArray, (v) => {
