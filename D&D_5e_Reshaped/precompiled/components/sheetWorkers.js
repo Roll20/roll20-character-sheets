@@ -727,14 +727,6 @@ const updateLevels = (changedField) => {
           finalSetAttrs[`${className}_level`] = classLevel;
         }
 
-        finalSetAttrs.class_and_level = '';
-        for (const prop in classLevels) {
-          if (classLevels.hasOwnProperty(prop)) {
-            finalSetAttrs[`${className}_level`] = classLevels[prop];
-            finalSetAttrs.class_and_level += `${prop} ${classLevels[prop]}`;
-          }
-        }
-
         let classHd = v[`${repeatingString}hd`];
         if (isUndefined(classHd) || changedField === 'name') {
           if (defaultClassDetails.hasOwnProperty(className)) {
@@ -757,6 +749,17 @@ const updateLevels = (changedField) => {
         } else {
           classesWithSpellcasting += 1;
           spellcasting[classSpellcasting] += classLevel;
+        }
+      }
+
+      for (const className in classLevels) {
+        if (classLevels.hasOwnProperty(className)) {
+          finalSetAttrs[`${className}_level`] = classLevels[className];
+          if (isUndefined(finalSetAttrs.class_and_level)) {
+            finalSetAttrs.class_and_level = `${className} ${classLevels[className]}`;
+          } else {
+            finalSetAttrs.class_and_level += ` ${className} ${classLevels[className]}`;
+          }
         }
       }
 
