@@ -1531,6 +1531,7 @@ const setClassFeatures = () => {
           name: translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY'),
           recharge: 'Short Rest',
           storageName: 'Channel Divinity Paladin',
+          uses_max: 1,
         });
       }
       if (v.paladin_level >= 6) {
