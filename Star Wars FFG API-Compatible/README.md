@@ -7,3 +7,8 @@ Design Change of section headers.
 
 Added Roll Templates
 Fixed display of Species/Career/Specialization to look more crisp.
+
+4.0.4.3 Updates;
+Fixed spelling mistakes
+Code cleanup
+Changed display of Old Vehicle Tabs
