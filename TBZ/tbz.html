@@ -3,25 +3,36 @@
     function calcFateCost(eventInfo){
         getSectionIDs("repeating_fates", function(idarray){
             var vars = new Array();
+            var costs = new Array();
+            var sublimates = new Array();
             for (i = 0; i < idarray.length; i++){
-                vars.push("repeating_fates_" + idarray[i] + "_fateCost");
+                var cost = "repeating_fates_" + idarray[i] + "_fateCost";
+                var sublimate = "repeating_fates_" + idarray[i] + "_fateSublimate";
+                
+                vars.push(cost);
+                vars.push(sublimate);
+                
+                costs.push(cost);
+                sublimates.push(sublimate);
             }
             
             getAttrs(vars, function (values){
                 var total = 0;
                 
-                for (j = 0; j < vars.length; j++){
+                for (j = 0; j < costs.length; j++){
                     
-                    switch (values[vars[j]]){
-                        case "3":
-                            total = total + 10;
-                            break;
-                        case "4":
-                            total = total + 30;
-                            break;
-                        case "5":
-                            total = total + 70;
-                            break;
+                    if (values[sublimates[j]] == "0"){
+                        switch (values[costs[j]]){
+                            case "3":
+                                total = total + 10;
+                                break;
+                            case "4":
+                                total = total + 30;
+                                break;
+                            case "5":
+                                total = total + 70;
+                                break;
+                        }
                     }
                 }
                 
@@ -32,7 +43,7 @@
         });
     }
     
-    on("change:repeating_fates:fateCost", calcFateCost);
+    on("change:repeating_fates:fateCost change:repeating_fates:fateSublimate", calcFateCost);
     on("remove:repeating_fates", calcFateCost);
     
     on("change:meikyoKarma", function(eventInfo) {
@@ -153,6 +164,9 @@
                             <input type="radio" name="attr_fateCost" value="3" /><span></span>
                             <input type="radio" name="attr_fateCost" value="4" /><span></span>
                             <input type="radio" name="attr_fateCost" value="5" /><span></span>
+                        </td>
+                        <td>
+                            <button type='roll' name="roll_fate" value="@{name} Fate Roll [[@{Empathy}d6<@{fateCost}]]"></button>
                         </td>
                     </tr>
                 </table>
