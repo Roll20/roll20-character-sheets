@@ -207,12 +207,6 @@ const parseAttackComponent = (v, repeatingString, finalSetAttrs, options) => {
 const hasUpperCase = (string) => {
   return (/[A-Z]/.test(string));
 };
-const emptyIfUndefined = (value) => {
-  if (!value) {
-    return '';
-  }
-  return value;
-};
 const ordinalSpellLevel = (level) => {
   let spellLevel = '';
   if (level === 0) {
@@ -1807,7 +1801,6 @@ const setClassFeatures = () => {
     }
 
     if (v.warlock_level) {
-      const language = v.lang || 'en';
       let warlockSpellSlots;
       if (v.warlock_level >= 17) {
         warlockSpellSlots = 4;
@@ -2675,49 +2668,6 @@ const updateHigherLevelToggle = (v, finalSetAttrs, repeatingString) => {
   }
 };
 
-const updateAttackQuery = () => {
-  const repeatingItem = 'repeating_attack';
-  const collectionArray = [];
-  const finalSetAttrs = {};
-
-  finalSetAttrs.attack_query_var = '?{Attack';
-
-  getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
-      collectionArray.push(`${repeatingString}name`);
-      collectionArray.push(`${repeatingString}reach`);
-      collectionArray.push(`${repeatingString}range`);
-      collectionArray.push(`${repeatingString}to_hit`);
-      collectionArray.push(`${repeatingString}attack_formula`);
-      collectionArray.push(`${repeatingString}roll_toggle`);
-      collectionArray.push(`${repeatingString}saving_throw_toggle`);
-      collectionArray.push(`${repeatingString}damage_toggle`);
-      collectionArray.push(`${repeatingString}reach`);
-      collectionArray.push(`${repeatingString}second_damage_toggle`);
-      collectionArray.push(`${repeatingString}extras_toggle`);
-    }
-
-    getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
-
-        finalSetAttrs.attack_query_var += `|${v[`${repeatingString}name`]},`;
-        finalSetAttrs.attack_query_var += ` {{title=' + ${v[`${repeatingString}name`]}&#125;&#125;`;
-        finalSetAttrs.attack_query_var += `{{reach=' + ${emptyIfUndefined(v[`${repeatingString}reach`])}&#125;&#125;`;
-        finalSetAttrs.attack_query_var += `{{range=' + ${emptyIfUndefined(v[`${repeatingString}range`])}&#125;&#125;`;
-        finalSetAttrs.attack_query_var += emptyIfUndefined(v[`${repeatingString}roll_toggle`]);
-        finalSetAttrs.attack_query_var += emptyIfUndefined(v[`${repeatingString}saving_throw_toggle`]);
-        finalSetAttrs.attack_query_var += emptyIfUndefined(v[`${repeatingString}damage_toggle`]);
-        finalSetAttrs.attack_query_var += emptyIfUndefined(v[`${repeatingString}second_damage_toggle`]);
-        finalSetAttrs.attack_query_var += emptyIfUndefined(v[`${repeatingString}extras_toggle`]);
-      }
-      finalSetAttrs.attack_query_var += '}';
-      setFinalAttrs(v, finalSetAttrs);
-    });
-  });
-};
-
 const findAmmo = (name, callback) => {
   const repeatingItem = 'repeating_ammo';
   const collectionArray = [];
@@ -2871,7 +2821,6 @@ on('change:repeating_attack', (eventInfo) => {
   if (changedField !== 'error' && changedField !== 'toggle_details' && changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed') {
     const rowId = getRowId('repeating_attack', eventInfo);
     updateAttack(rowId);
-    //updateAttackQuery();
   }
 });
 on('change:repeating_attack:carried change:repeating_attack:weight remove:repeating_attack', () => {
