@@ -4107,7 +4107,7 @@ const parseAction = (rowId, type) => {
         const actionType = typeRegex.exec(freetext);
         if (actionType) {
           if (actionType[1]) {
-            actionType[1] = type[1].toLowerCase();
+            actionType[1] = actionType[1].toLowerCase();
             if (actionType[1] === 'melee') {
               finalSetAttrs[`${repeatingString}type`] = 'Melee Weapon';
             }
@@ -4120,7 +4120,7 @@ const parseAction = (rowId, type) => {
             }
           }
           if (actionType[2]) {
-            actionType[2] = type[2].toLowerCase();
+            actionType[2] = actionType[2].toLowerCase();
             if (actionType[2] === 'spell') {
               spellAttack = true;
             }
