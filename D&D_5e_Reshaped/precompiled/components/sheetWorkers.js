@@ -4675,7 +4675,7 @@ const extasToExtrasFix = (repeatingItem) => {
 };
 
 const sheetOpened = () => {
-  const collectionArray = ['version', 'strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
+  const collectionArray = ['version', 'strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma', 'import_data'];
   const finalSetAttrs = {};
 
   getAttrs(collectionArray, (v) => {
@@ -4717,7 +4717,9 @@ const sheetOpened = () => {
       }
       setFinalAttrs(v, setAbilities);
 
-      finalSetAttrs.edit_mode = 'on';
+      if(!v.import_data) {
+        finalSetAttrs.edit_mode = 'on';
+      }
 
       generateSkills();
       updateSavingThrows();
@@ -4806,6 +4808,14 @@ const sheetOpened = () => {
 
     if (!version || version !== currentVersion) {
       finalSetAttrs.version = currentVersion;
+    }
+
+    if(v.import_data) {
+      let importObject = JSON.parse(v.import_data);
+      Object.keys(importObject).forEach( key => {
+        finalSetAttrs[key] = importObject[key];
+      });
+      finalSetAttrs.import_data = '';
     }
 
     setFinalAttrs(v, finalSetAttrs);
