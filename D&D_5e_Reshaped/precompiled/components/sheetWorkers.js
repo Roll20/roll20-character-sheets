@@ -4188,9 +4188,6 @@ const parseAction = (rowId, type) => {
         finalSetAttrs[`${repeatingString}extras_toggle`] = '@{extras_var}';
       }
       setFinalAttrs(v, finalSetAttrs);
-      for (let x = 0; x < ids.length; x++) {
-        updateAction(type, ids[x]);
-      }
     });
   });
 };
