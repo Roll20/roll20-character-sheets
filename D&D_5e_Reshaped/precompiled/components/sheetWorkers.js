@@ -1,6 +1,6 @@
 'use strict';
 
-const currentVersion = '2.2.13';
+const currentVersion = '2.2.14';
 let TRANSLATIONS;
 const SKILLS = {
   acrobatics: 'dexterity',
