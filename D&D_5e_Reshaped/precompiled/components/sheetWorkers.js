@@ -412,6 +412,16 @@ const updateAbilityModifier = (ability) => {
   const collectionArray = [ability, `${ability}_bonus`, `${ability}_mod`, `${ability}_mod_with_sign`, `${ability}_check_mod`, `${ability}_check_mod_formula`, `${ability}_check_bonus`, 'global_ability_bonus', 'strength_mod', 'dexterity_mod', 'jack_of_all_trades_toggle', 'jack_of_all_trades', 'remarkable_athlete_toggle', 'remarkable_athlete', 'global_check_bonus'];
   const finalSetAttrs = {};
 
+  if (ability === 'strength' || ability === 'dexterity') {
+    collectionArray.push('finesse_mod');
+  }
+  if (ability === 'strength') {
+    collectionArray.push('carrying_capacity');
+    collectionArray.push('max_push_drag_lift');
+    collectionArray.push('encumbered');
+    collectionArray.push('heavily_encumbered');
+  }
+
   getAttrs(collectionArray, (v) => {
     const abilityScore = getIntValue(v[ability]);
     const abilityBonus = getIntValue(v[`${ability}_bonus`]);
@@ -2232,7 +2242,7 @@ on('change:repeating_ammo:weight change:repeating_ammo:qty', () => {
 });
 
 const updateJackOfAllTrades = () => {
-  const collectionArray = ['pb'];
+  const collectionArray = ['pb', 'jack_of_all_trades'];
   const finalSetAttrs = {};
 
   getAttrs(collectionArray, (v) => {
@@ -2245,7 +2255,7 @@ on('change:jack_of_all_trades_toggle', () => {
 });
 
 const updateRemarkableAthlete = () => {
-  const collectionArray = ['pb'];
+  const collectionArray = ['pb', 'remarkable_athlete'];
   const finalSetAttrs = {};
 
   getAttrs(collectionArray, (v) => {
@@ -2258,7 +2268,7 @@ on('change:remarkable_athlete_toggle', () => {
 });
 
 const updateInitiative = () => {
-  const collectionArray = ['dexterity_mod', 'dexterity_check_bonus', 'initiative_bonus', 'jack_of_all_trades_toggle', 'jack_of_all_trades', 'remarkable_athlete_toggle', 'remarkable_athlete', 'global_check_bonus'];
+  const collectionArray = ['initiative', 'initiative_formula', 'dexterity_mod', 'dexterity_check_bonus', 'initiative_bonus', 'jack_of_all_trades_toggle', 'jack_of_all_trades', 'remarkable_athlete_toggle', 'remarkable_athlete', 'global_check_bonus'];
   const finalSetAttrs = {};
 
   finalSetAttrs.initiative = 0;
@@ -3154,6 +3164,10 @@ const updateSkill = (rowId) => {
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}ability`);
       collectionArray.push(`${repeatingString}bonus`);
+      collectionArray.push(`${repeatingString}ability_short_name`);
+      collectionArray.push(`${repeatingString}formula`);
+      collectionArray.push(`${repeatingString}total`);
+      collectionArray.push(`${repeatingString}total_with_sign`);
     }
 
     getAttrs(collectionArray, (v) => {
