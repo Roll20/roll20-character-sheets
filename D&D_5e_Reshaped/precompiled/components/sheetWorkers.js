@@ -2179,11 +2179,12 @@ const updateEquipment = (rowId) => {
               .replace(/\s(\d+)\s/g, ' [[$1]] ');
 
             finalSetAttrs[`${repeatingString}content`] = content;
+
+            if (isUndefined(finalSetAttrs[`${repeatingString}parsed`])) {
+              finalSetAttrs[`${repeatingString}parsed`] = '';
+            }
+            finalSetAttrs[`${repeatingString}parsed`] += ' content';
           }
-          if (isUndefined(finalSetAttrs[`${repeatingString}parsed`])) {
-            finalSetAttrs[`${repeatingString}parsed`] = '';
-          }
-          finalSetAttrs[`${repeatingString}parsed`] += ' content';
         }
       }
       setFinalAttrs(v, finalSetAttrs);
