@@ -123,18 +123,18 @@ const getAbilityShortName = (varName, capital) => {
   }
   return firstThree(varName);
 };
-const getRowId = (leadingString, eventInfo) => {
-  const re = new RegExp(`${leadingString}_([a-zA-Z0-9\-]*)_.*`);
-  return eventInfo.sourceAttribute.replace(re, '$1');
-};
-const getRepeatingField = (leadingString, eventInfo) => {
-  const re = new RegExp(`${leadingString}_[a-zA-Z0-9\-]*_(.*)`);
+const getRepeatingInfo = (leadingString, eventInfo) => {
+  const re = new RegExp(`${leadingString}_(-[a-zA-Z0-9\-]*)_(.*)`);
   const match = eventInfo.sourceAttribute.match(re);
-  if (!match || (match && match[1].indexOf(leadingString) !== -1)) {
-    return 'error';
-  }
 
-  return eventInfo.sourceAttribute.replace(re, '$1');
+  let result;
+  if (match && match[1] && match[2]) {
+    result = {
+      rowId: match[1],
+      field: match[2],
+    };
+  }
+  return result
 };
 const isEmpty = (obj) => {
   for (const prop in obj) {
@@ -1888,11 +1888,11 @@ const setClassFeatures = () => {
 };
 
 on('change:repeating_class', (eventInfo) => {
-  const changedField = getRepeatingField('repeating_class', eventInfo);
-  if (changedField !== 'error') {
-    console.log('change:repeating_class', changedField);
-    updateLevels(changedField);
-    if (changedField === 'spellcasting') {
+  const repeatingInfo = getRepeatingInfo('repeating_class', eventInfo);
+  if (repeatingInfo) {
+    console.log('change:repeating_class', repeatingInfo.field);
+    updateLevels(repeatingInfo.field);
+    if (repeatingInfo.field === 'spellcasting') {
       updateSpellSlots();
     }
   }
@@ -2142,10 +2142,9 @@ const updateArmor = (rowId) => {
   sumRepeating(options, sumItems);
 };
 on('change:repeating_armor', (eventInfo) => {
-  const changedField = getRepeatingField('repeating_armor', eventInfo);
-  if (changedField !== 'error' && changedField !== 'ac_total') {
-    const rowId = getRowId('repeating_armor', eventInfo);
-    updateArmor(rowId);
+  const repeatingInfo = getRepeatingInfo('repeating_armor', eventInfo);
+  if (repeatingInfo && repeatingInfo.field !== 'ac_total') {
+    updateArmor(repeatingInfo.rowId);
   }
 });
 on('change:dexterity_mod change:medium_armor_max_dex change:ac_unarmored_ability remove:repeating_armor', () => {
@@ -2193,8 +2192,8 @@ const updateEquipment = (rowId) => {
 };
 
 on('change:repeating_equipment', (eventInfo) => {
-  const rowId = getRowId('repeating_equipment', eventInfo);
-  updateEquipment(rowId);
+  const repeatingInfo = getRepeatingInfo('repeating_equipment', eventInfo);
+  updateEquipment(repeatingInfo.rowId);
 });
 const weighEquipment = () => {
   const options = {
@@ -2818,10 +2817,9 @@ const updateAttack = (rowId) => {
   });
 };
 on('change:repeating_attack', (eventInfo) => {
-  const changedField = getRepeatingField('repeating_attack', eventInfo);
-  if (changedField !== 'error' && changedField !== 'toggle_details' && changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed') {
-    const rowId = getRowId('repeating_attack', eventInfo);
-    updateAttack(rowId);
+  const repeatingInfo = getRepeatingInfo('repeating_attack', eventInfo);
+  if (repeatingInfo && repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed') {
+    updateAttack(repeatingInfo.row);
   }
 });
 on('change:repeating_attack:carried change:repeating_attack:weight remove:repeating_attack', () => {
@@ -2978,11 +2976,10 @@ const updateSpell = (rowId) => {
   });
 };
 on('change:repeating_spell', (eventInfo) => {
-  const changedField = getRepeatingField('repeating_spell', eventInfo);
-  if (changedField !== 'error' && changedField !== 'toggle_details' && changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'heal_formula' && changedField !== 'higher_level_query' && changedField !== 'parsed') {
-    console.log('spell changedField', changedField);
-    const rowId = getRowId('repeating_spell', eventInfo);
-    updateSpell(rowId);
+  const repeatingInfo = getRepeatingInfo('repeating_spell', eventInfo);
+  if (repeatingInfo && repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'heal_formula' && repeatingInfo.field !== 'higher_level_query' && repeatingInfo.field !== 'parsed') {
+    console.log('spell repeatingInfo.field', repeatingInfo.field);
+    updateSpell(repeatingInfo.rowId);
   }
 });
 on('change:global_spell_attack_bonus change:global_spell_damage_bonus change:global_spell_dc_bonus change:global_spell_heal_bonus', () => {
@@ -3049,11 +3046,10 @@ const updateClassFeature = (rowId) => {
   });
 };
 on('change:repeating_classfeature', (eventInfo) => {
-  const changedField = getRepeatingField('repeating_classfeature', eventInfo);
-  if (changedField !== 'error' && changedField !== 'toggle_extras' && changedField !== 'heal_formula' && changedField !== 'freetext' && changedField !== 'freeform') {
-    console.log('class feature changedField', changedField);
-    const rowId = getRowId('repeating_classfeature', eventInfo);
-    updateClassFeature(rowId);
+  const repeatingInfo = getRepeatingInfo('repeating_classfeature', eventInfo);
+  if (repeatingInfo && repeatingInfo.field !== 'toggle_extras' && repeatingInfo.field !== 'heal_formula' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'freeform') {
+    console.log('class feature repeatingInfo.field', repeatingInfo.field);
+    updateClassFeature(repeatingInfo.rowId);
   }
 });
 
@@ -3244,10 +3240,9 @@ const updateSkill = (rowId) => {
 };
 
 on('change:repeating_skill', (eventInfo) => {
-  const changedField = getRepeatingField('repeating_skill', eventInfo);
-  if (changedField !== 'error' && changedField !== 'ability_short_name' && changedField !== 'total' && changedField !== 'total_with_sign' && changedField !== 'formula') {
-    const rowId = getRowId('repeating_skill', eventInfo);
-    updateSkill(rowId);
+  const repeatingInfo = getRepeatingInfo('repeating_skill', eventInfo);
+  if (repeatingInfo && repeatingInfo.field !== 'ability_short_name' && repeatingInfo.field !== 'total' && repeatingInfo.field !== 'total_with_sign' && repeatingInfo.field !== 'formula') {
+    updateSkill(repeatingInfo.rowId);
   }
 });
 on('remove:repeating_skill', () => {
@@ -3946,38 +3941,33 @@ const updateAction = (type, rowId) => {
   });
 };
 on('change:repeating_trait', (eventInfo) => {
-  const changedField = getRepeatingField('repeating_trait', eventInfo);
-  if (changedField !== 'error' && changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'freetext' && changedField !== 'parsed' && changedField !== 'recharge_display') {
-    const rowId = getRowId('repeating_trait', eventInfo);
-    updateAction('trait', rowId);
+  const repeatingInfo = getRepeatingInfo('repeating_trait', eventInfo);
+  if (repeatingInfo && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
+    updateAction('trait', repeatingInfo.rowId);
   }
 });
 on('change:repeating_action', (eventInfo) => {
-  const changedField = getRepeatingField('repeating_action', eventInfo);
-  if (changedField !== 'error' && changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'freetext' && changedField !== 'parsed' && changedField !== 'recharge_display') {
-    const rowId = getRowId('repeating_action', eventInfo);
-    updateAction('action', rowId);
+  const repeatingInfo = getRepeatingInfo('repeating_action', eventInfo);
+  if (repeatingInfo && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
+    updateAction('action', repeatingInfo.rowId);
   }
 });
 on('change:repeating_reaction', (eventInfo) => {
-  const changedField = getRepeatingField('repeating_reaction', eventInfo);
-  if (changedField !== 'error' && changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'freetext' && changedField !== 'parsed' && changedField !== 'recharge_display') {
-    const rowId = getRowId('repeating_reaction', eventInfo);
-    updateAction('reaction', rowId);
+  const repeatingInfo = getRepeatingInfo('repeating_reaction', eventInfo);
+  if (repeatingInfo && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
+    updateAction('reaction',  repeatingInfo.rowId);
   }
 });
 on('change:repeating_legendaryaction', (eventInfo) => {
-  const changedField = getRepeatingField('repeating_legendaryaction', eventInfo);
-  if (changedField !== 'error' && changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'freetext' && changedField !== 'parsed' && changedField !== 'recharge_display') {
-    const rowId = getRowId('repeating_legendaryaction', eventInfo);
-    updateAction('legendaryaction', rowId);
+  const repeatingInfo = getRepeatingInfo('repeating_legendaryaction', eventInfo);
+  if (repeatingInfo && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
+    updateAction('legendaryaction',  repeatingInfo.rowId);
   }
 });
 on('change:repeating_lairaction', (eventInfo) => {
-  const changedField = getRepeatingField('repeating_lairaction', eventInfo);
-  if (changedField !== 'error' && changedField !== 'to_hit' && changedField !== 'attack_formula' && changedField !== 'damage_formula' && changedField !== 'second_damage_formula' && changedField !== 'damage_string' && changedField !== 'saving_throw_dc' && changedField !== 'parsed' && changedField !== 'recharge_display') {
-    const rowId = getRowId('repeating_lairaction', eventInfo);
-    updateAction('lairaction', rowId);
+  const repeatingInfo = getRepeatingInfo('repeating_lairaction', eventInfo);
+  if (repeatingInfo && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
+    updateAction('lairaction',  repeatingInfo.rowId);
   }
 });
 
@@ -4192,24 +4182,24 @@ const parseAction = (rowId, type) => {
   });
 };
 on('change:repeating_trait:freetext', (eventInfo) => {
-  const rowId = getRowId('repeating_trait', eventInfo);
-  parseAction(rowId, 'trait');
+  const repeatingInfo = getRepeatingInfo('repeating_trait', eventInfo);
+  parseAction(repeatingInfo.rowId, 'trait');
 });
 on('change:repeating_action:freetext', (eventInfo) => {
-  const rowId = getRowId('repeating_action', eventInfo);
-  parseAction(rowId, 'action');
+  const repeatingInfo = getRepeatingInfo('repeating_action', eventInfo);
+  parseAction(repeatingInfo.rowId, 'action');
 });
 on('change:repeating_reaction:freetext', (eventInfo) => {
-  const rowId = getRowId('repeating_reaction', eventInfo);
-  parseAction(rowId, 'reaction');
+  const repeatingInfo = getRepeatingInfo('repeating_reaction', eventInfo);
+  parseAction(repeatingInfo.rowId, 'reaction');
 });
 on('change:repeating_legendaryaction:freetext', (eventInfo) => {
-  const rowId = getRowId('repeating_legendaryaction', eventInfo);
-  parseAction(rowId, 'legendaryaction');
+  const repeatingInfo = getRepeatingInfo('repeating_legendaryaction', eventInfo);
+  parseAction(repeatingInfo.rowId, 'legendaryaction');
 });
 on('change:repeating_lairaction:freetext', (eventInfo) => {
-  const rowId = getRowId('repeating_lairaction', eventInfo);
-  parseAction(rowId, 'lairaction');
+  const repeatingInfo = getRepeatingInfo('repeating_lairaction', eventInfo);
+  parseAction(repeatingInfo.rowId, 'lairaction');
 });
 
 const countAction = (type) => {
