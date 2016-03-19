@@ -134,7 +134,7 @@ const getRepeatingInfo = (leadingString, eventInfo) => {
       field: match[2],
     };
   }
-  return result
+  return result;
 };
 const isEmpty = (obj) => {
   for (const prop in obj) {
@@ -3969,19 +3969,19 @@ on('change:repeating_action', (eventInfo) => {
 on('change:repeating_reaction', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_reaction', eventInfo);
   if (repeatingInfo && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
-    updateAction('reaction',  repeatingInfo.rowId);
+    updateAction('reaction', repeatingInfo.rowId);
   }
 });
 on('change:repeating_legendaryaction', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_legendaryaction', eventInfo);
   if (repeatingInfo && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
-    updateAction('legendaryaction',  repeatingInfo.rowId);
+    updateAction('legendaryaction', repeatingInfo.rowId);
   }
 });
 on('change:repeating_lairaction', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_lairaction', eventInfo);
   if (repeatingInfo && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
-    updateAction('lairaction',  repeatingInfo.rowId);
+    updateAction('lairaction', repeatingInfo.rowId);
   }
 });
 
