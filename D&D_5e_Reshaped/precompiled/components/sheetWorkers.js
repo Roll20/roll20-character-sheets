@@ -4819,14 +4819,15 @@ const importData = () => {
         }
       }
       if (importObject.spells) {
-        for (const prop in importObject.spells) {
-          if (importObject.spells.hasOwnProperty(prop)) {
-            const newRowId = generateRowID();
-            const repeatingString = `repeating_spell_${newRowId}_`;
-
-            finalSetAttrs[`${repeatingString}${prop}`] = importObject.spells[prop];
+        importObject.spells.forEach(spell => {
+          const newRowId = generateRowID();
+          const repeatingString = `repeating_spell_${newRowId}_`;
+          for (const prop in spell) {
+            if (spell.hasOwnProperty(prop)) {
+              finalSetAttrs[`${repeatingString}${prop}`] = spell[prop];
+            }
           }
-        }
+        });
       }
       finalSetAttrs.import_data = '';
       finalSetAttrs.import_data_present = 'off';
