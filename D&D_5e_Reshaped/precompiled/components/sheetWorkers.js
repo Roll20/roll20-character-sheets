@@ -4592,23 +4592,26 @@ const generateSkills = () => {
       const language = v.lang || 'en';
 
       let x = 0;
-      Object.keys(SKILLS).forEach((key) => {
-        let skillId;
-        if (ids[x]) {
-          skillId = ids[x];
-        } else {
-          skillId = generateRowID();
+
+      for (const prop in SKILLS) {
+        if (SKILLS.hasOwnProperty(prop)) {
+          let skillId;
+          if (ids[x]) {
+            skillId = ids[x];
+          } else {
+            skillId = generateRowID();
+          }
+          repeatingString = `${repeatingItem}_${skillId}_`;
+
+          finalSetAttrs[`${repeatingString}storage_name`] = prop;
+          finalSetAttrs[`${repeatingString}name`] = translate(language, `SKILLS.${prop}`);
+
+          finalSetAttrs[`${repeatingString}ability`] = `@{${SKILLS[prop]}_mod}`;
+          updateSkill(skillId);
+
+          x++;
         }
-        repeatingString = `${repeatingItem}_${skillId}_`;
-
-        finalSetAttrs[`${repeatingString}storage_name`] = key;
-        finalSetAttrs[`${repeatingString}name`] = translate(language, `SKILLS.${key}`);
-
-        finalSetAttrs[`${repeatingString}ability`] = `@{${SKILLS[key]}_mod}`;
-        updateSkill(skillId);
-
-        x++;
-      });
+      }
       setFinalAttrs(v, finalSetAttrs);
     });
   });
@@ -4809,18 +4812,21 @@ const importData = () => {
       let importObject = JSON.parse(v.import_data);
 
       if (importObject.npc) {
-        Object.keys(importObject.npc).forEach(key => {
-          finalSetAttrs[key] = importObject[key];
-        });
+        for (const prop in importObject.npc) {
+          if (importObject.npc.hasOwnProperty(prop)) {
+            finalSetAttrs[prop] = importObject.npc[prop];
+          }
+        }
       }
       if(importObject.spells) {
-        importObject.spells.forEach(spell => {
-          const newRowId = generateRowID();
-          const repeatingString = `repeating_spell_${newRowId}_`;
-          Object.keys(spell).forEach(key => {
-            finalSetAttrs[`${repeatingString}${key}`] = spell[key];
-          });
-        });
+        for (const prop in importObject.spells) {
+          if (importObject.spells.hasOwnProperty(prop)) {
+            const newRowId = generateRowID();
+            const repeatingString = `repeating_spell_${newRowId}_`;
+
+            finalSetAttrs[`${repeatingString}${prop}`] = importObject.spells[prop];
+          }
+        }
       }
       finalSetAttrs.import_data = '';
       finalSetAttrs.import_data_present = 'off';
