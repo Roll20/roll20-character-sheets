@@ -2848,6 +2848,10 @@ on('change:repeating_attack:carried change:repeating_attack:weight remove:repeat
 });
 on('change:global_attack_bonus change:global_melee_attack_bonus change:global_ranged_attack_bonus change:global_damage_bonus change:global_melee_damage_bonus change:global_ranged_damage_bonus', () => {
   updateAttack();
+  updateAction('action');
+  updateAction('reaction');
+  updateAction('legendaryaction');
+  updateAction('lairaction');
 });
 
 const updateSpell = (rowId) => {
