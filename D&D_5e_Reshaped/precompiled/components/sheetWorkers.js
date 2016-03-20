@@ -3307,11 +3307,11 @@ const updatePreAndPostRoll = () => {
     if (v.roll_setting === '@{roll_advantage}') {
       finalSetAttrs.roll_info = '{{advantage=1}}';
       finalSetAttrs.preroll = 2;
-      finalSetAttrs.postroll += 'kh1';
+      finalSetAttrs.postroll = 'kh1';
     } else if (v.roll_setting === '@{roll_disadvantage}') {
       finalSetAttrs.roll_info = '{{disadvantage=1}}';
       finalSetAttrs.preroll = 2;
-      finalSetAttrs.postroll += 'kl1';
+      finalSetAttrs.postroll = 'kl1';
     }
 
     setFinalAttrs(v, finalSetAttrs);
