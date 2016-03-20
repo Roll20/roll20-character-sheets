@@ -4798,17 +4798,44 @@ const sheetOpened = () => {
       finalSetAttrs.version = currentVersion;
     }
 
-    if(v.import_data) {
-      let importObject = JSON.parse(v.import_data);
-      Object.keys(importObject).forEach( key => {
-        finalSetAttrs[key] = importObject[key];
-      });
-      finalSetAttrs.import_data = '';
-    }
-
     setFinalAttrs(v, finalSetAttrs);
   });
 };
+
+const importData = () => {
+  getAttrs(['import_data'], v => {
+    if(v.import_data) {
+      const finalSetAttrs = {};
+      let importObject = JSON.parse(v.import_data);
+
+      if (importObject.npc) {
+        Object.keys(importObject.npc).forEach(key => {
+          finalSetAttrs[key] = importObject[key];
+        });
+      }
+      if(importObject.spells) {
+        importObject.spells.forEach(spell => {
+          const newRowId = generateRowID();
+          const repeatingString = `repeating_spell_${newRowId}_`;
+          Object.keys(spell).forEach(key => {
+            finalSetAttrs[`${repeatingString}${key}`] = spell[key];
+          });
+        });
+      }
+      finalSetAttrs.import_data = '';
+      finalSetAttrs.import_data_present = 'off';
+      setFinalAttrs(v, finalSetAttrs);
+    }
+  });
+};
+
+const deleteImportData = () => {
+  setFinalAttrs([], {import_data:'', import_data_present:'off'});
+};
+
+on('change:accept_import', importData);
+on('change:reject_import', deleteImportData);
+
 
 on('sheet:opened', () => {
   sheetOpened();
