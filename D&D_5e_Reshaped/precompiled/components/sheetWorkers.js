@@ -2701,6 +2701,154 @@ const findAmmo = (name, callback) => {
   });
 };
 
+const updateAction = (type, rowId) => {
+  const repeatingItem = `repeating_${type}`;
+  const collectionArray = ['pb', 'strength_mod', 'finesse_mod', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability'];
+  const finalSetAttrs = {};
+
+  const rechargeRegex = /\s*?\((?:Recharge\s*?(\d+\-\d+|\d+)|Recharges\safter\sa\s(.*))\)/gi;
+  const rechargeDayRegex = /\s*?\((\d+\/Day)\)/gi;
+
+  for (let i = 0; i < ABILITIES.length; i++) {
+    collectionArray.push(`${ABILITIES[i]}_mod`);
+  }
+
+  getSectionIDs(repeatingItem, (ids) => {
+    if (rowId) {
+      ids = [];
+      ids.push(rowId);
+    }
+    for (let i = 0; i < ids.length; i++) {
+      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+      collectionArray.push(`${repeatingString}name`);
+      collectionArray.push(`${repeatingString}type`);
+      collectionArray.push(`${repeatingString}roll_toggle`);
+      collectionArray.push(`${repeatingString}to_hit`);
+      collectionArray.push(`${repeatingString}attack_formula`);
+      collectionArray.push(`${repeatingString}proficiency`);
+      collectionArray.push(`${repeatingString}attack_ability`);
+      collectionArray.push(`${repeatingString}attack_bonus`);
+      collectionArray.push(`${repeatingString}saving_throw_toggle`);
+      collectionArray.push(`${repeatingString}saving_throw_ability`);
+      collectionArray.push(`${repeatingString}saving_throw_bonus`);
+      collectionArray.push(`${repeatingString}saving_throw_dc`);
+      collectionArray.push(`${repeatingString}damage_toggle`);
+      collectionArray.push(`${repeatingString}damage_formula`);
+      collectionArray.push(`${repeatingString}damage`);
+      collectionArray.push(`${repeatingString}damage_ability`);
+      collectionArray.push(`${repeatingString}damage_bonus`);
+      collectionArray.push(`${repeatingString}damage_type`);
+      collectionArray.push(`${repeatingString}second_damage_toggle`);
+      collectionArray.push(`${repeatingString}second_damage_formula`);
+      collectionArray.push(`${repeatingString}second_damage`);
+      collectionArray.push(`${repeatingString}second_damage_ability`);
+      collectionArray.push(`${repeatingString}second_damage_bonus`);
+      collectionArray.push(`${repeatingString}second_damage_type`);
+      collectionArray.push(`${repeatingString}damage_string`);
+      collectionArray.push(`${repeatingString}heal_toggle`);
+      collectionArray.push(`${repeatingString}heal`);
+      collectionArray.push(`${repeatingString}heal_ability`);
+      collectionArray.push(`${repeatingString}heal_bonus`);
+      collectionArray.push(`${repeatingString}heal_query_toggle`);
+      collectionArray.push(`${repeatingString}parsed`);
+      collectionArray.push(`${repeatingString}recharge`);
+      collectionArray.push(`${repeatingString}recharge_display`);
+      collectionArray.push(`${repeatingString}extras_toggle`);
+      collectionArray.push(`${repeatingString}freetext`);
+    }
+
+    getAttrs(collectionArray, (v) => {
+      for (let j = 0; j < ids.length; j++) {
+        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+
+        const actionName = v[`${repeatingString}name`];
+        if (!isUndefined(actionName)) {
+          const rechargeResult = rechargeRegex.exec(actionName);
+          if (rechargeResult) {
+            finalSetAttrs[`${repeatingString}recharge`] = rechargeResult[1] || rechargeResult[2];
+            finalSetAttrs[`${repeatingString}name`] = actionName.replace(rechargeRegex, '');
+          }
+          const rechargeDayResult = rechargeDayRegex.exec(actionName);
+          if (rechargeDayResult) {
+            finalSetAttrs[`${repeatingString}recharge`] = rechargeDayResult[1] || rechargeDayResult[2];
+            finalSetAttrs[`${repeatingString}name`] = actionName.replace(rechargeDayRegex, '');
+          }
+        }
+        const recharge = fromVOrFinalSetAttrs(v, finalSetAttrs, `${repeatingString}recharge`);
+        if (exists(recharge)) {
+          if (recharge.indexOf('/Day') !== -1 || recharge.indexOf('/day') !== -1) {
+            finalSetAttrs[`${repeatingString}recharge_display`] = ` (${recharge})`;
+          } else {
+            finalSetAttrs[`${repeatingString}recharge_display`] = ` (Recharge ${recharge})`;
+          }
+        } else if (exists(v[`${repeatingString}recharge_display`])) {
+          finalSetAttrs[`${repeatingString}recharge_display`] = '';
+        }
+
+        let attackOptions = {};
+        if (type !== 'trait') {
+          attackOptions = {
+            defaultAbility: 'strength_mod',
+            globalAttackBonus: v.global_attack_bonus,
+            globalAttackBonusLabel: 'global attack bonus',
+            globalMeleeAttackBonus: v.global_melee_attack_bonus,
+            globalRangedAttackBonus: v.global_ranged_attack_bonus,
+            type: 'attack',
+          };
+        }
+        updateAttackToggle(v, finalSetAttrs, repeatingString, attackOptions);
+
+        updateSavingThrowToggle(v, finalSetAttrs, repeatingString);
+
+        let damageOptions = {};
+        if (type !== 'trait') {
+          damageOptions = {
+            defaultDamageAbility: 'strength_mod',
+            globalDamageBonus: v.global_damage_bonus,
+            globalMeleeDamageBonus: v.global_melee_damage_bonus,
+            globalRangedDamageBonus: v.global_ranged_damage_bonus,
+            type: 'attack',
+          };
+        }
+        updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
+
+        updateHealToggle(v, finalSetAttrs, repeatingString);
+      }
+      setFinalAttrs(v, finalSetAttrs);
+    });
+  });
+};
+on('change:repeating_trait', (eventInfo) => {
+  const repeatingInfo = getRepeatingInfo('repeating_trait', eventInfo);
+  if (repeatingInfo && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
+    updateAction('trait', repeatingInfo.rowId);
+  }
+});
+on('change:repeating_action', (eventInfo) => {
+  const repeatingInfo = getRepeatingInfo('repeating_action', eventInfo);
+  if (repeatingInfo && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
+    updateAction('action', repeatingInfo.rowId);
+  }
+});
+on('change:repeating_reaction', (eventInfo) => {
+  const repeatingInfo = getRepeatingInfo('repeating_reaction', eventInfo);
+  if (repeatingInfo && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
+    updateAction('reaction', repeatingInfo.rowId);
+  }
+});
+on('change:repeating_legendaryaction', (eventInfo) => {
+  const repeatingInfo = getRepeatingInfo('repeating_legendaryaction', eventInfo);
+  if (repeatingInfo && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
+    updateAction('legendaryaction', repeatingInfo.rowId);
+  }
+});
+on('change:repeating_lairaction', (eventInfo) => {
+  const repeatingInfo = getRepeatingInfo('repeating_lairaction', eventInfo);
+  if (repeatingInfo && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
+    updateAction('lairaction', repeatingInfo.rowId);
+  }
+});
+
 const updateAttack = (rowId) => {
   const repeatingItem = 'repeating_attack';
   const collectionArray = ['pb', 'strength_mod', 'finesse_mod', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability'];
@@ -3867,154 +4015,6 @@ const displayTextForTraits = () => {
   });
 };
 
-const updateAction = (type, rowId) => {
-  const repeatingItem = `repeating_${type}`;
-  const collectionArray = ['pb', 'strength_mod', 'finesse_mod', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability'];
-  const finalSetAttrs = {};
-
-  const rechargeRegex = /\s*?\((?:Recharge\s*?(\d+\-\d+|\d+)|Recharges\safter\sa\s(.*))\)/gi;
-  const rechargeDayRegex = /\s*?\((\d+\/Day)\)/gi;
-
-  for (let i = 0; i < ABILITIES.length; i++) {
-    collectionArray.push(`${ABILITIES[i]}_mod`);
-  }
-
-  getSectionIDs(repeatingItem, (ids) => {
-    if (rowId) {
-      ids = [];
-      ids.push(rowId);
-    }
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
-      collectionArray.push(`${repeatingString}name`);
-      collectionArray.push(`${repeatingString}type`);
-      collectionArray.push(`${repeatingString}roll_toggle`);
-      collectionArray.push(`${repeatingString}to_hit`);
-      collectionArray.push(`${repeatingString}attack_formula`);
-      collectionArray.push(`${repeatingString}proficiency`);
-      collectionArray.push(`${repeatingString}attack_ability`);
-      collectionArray.push(`${repeatingString}attack_bonus`);
-      collectionArray.push(`${repeatingString}saving_throw_toggle`);
-      collectionArray.push(`${repeatingString}saving_throw_ability`);
-      collectionArray.push(`${repeatingString}saving_throw_bonus`);
-      collectionArray.push(`${repeatingString}saving_throw_dc`);
-      collectionArray.push(`${repeatingString}damage_toggle`);
-      collectionArray.push(`${repeatingString}damage_formula`);
-      collectionArray.push(`${repeatingString}damage`);
-      collectionArray.push(`${repeatingString}damage_ability`);
-      collectionArray.push(`${repeatingString}damage_bonus`);
-      collectionArray.push(`${repeatingString}damage_type`);
-      collectionArray.push(`${repeatingString}second_damage_toggle`);
-      collectionArray.push(`${repeatingString}second_damage_formula`);
-      collectionArray.push(`${repeatingString}second_damage`);
-      collectionArray.push(`${repeatingString}second_damage_ability`);
-      collectionArray.push(`${repeatingString}second_damage_bonus`);
-      collectionArray.push(`${repeatingString}second_damage_type`);
-      collectionArray.push(`${repeatingString}damage_string`);
-      collectionArray.push(`${repeatingString}heal_toggle`);
-      collectionArray.push(`${repeatingString}heal`);
-      collectionArray.push(`${repeatingString}heal_ability`);
-      collectionArray.push(`${repeatingString}heal_bonus`);
-      collectionArray.push(`${repeatingString}heal_query_toggle`);
-      collectionArray.push(`${repeatingString}parsed`);
-      collectionArray.push(`${repeatingString}recharge`);
-      collectionArray.push(`${repeatingString}recharge_display`);
-      collectionArray.push(`${repeatingString}extras_toggle`);
-      collectionArray.push(`${repeatingString}freetext`);
-    }
-
-    getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
-
-        const actionName = v[`${repeatingString}name`];
-        if (!isUndefined(actionName)) {
-          const rechargeResult = rechargeRegex.exec(actionName);
-          if (rechargeResult) {
-            finalSetAttrs[`${repeatingString}recharge`] = rechargeResult[1] || rechargeResult[2];
-            finalSetAttrs[`${repeatingString}name`] = actionName.replace(rechargeRegex, '');
-          }
-          const rechargeDayResult = rechargeDayRegex.exec(actionName);
-          if (rechargeDayResult) {
-            finalSetAttrs[`${repeatingString}recharge`] = rechargeDayResult[1] || rechargeDayResult[2];
-            finalSetAttrs[`${repeatingString}name`] = actionName.replace(rechargeDayRegex, '');
-          }
-        }
-        const recharge = fromVOrFinalSetAttrs(v, finalSetAttrs, `${repeatingString}recharge`);
-        if (exists(recharge)) {
-          if (recharge.indexOf('/Day') !== -1 || recharge.indexOf('/day') !== -1) {
-            finalSetAttrs[`${repeatingString}recharge_display`] = ` (${recharge})`;
-          } else {
-            finalSetAttrs[`${repeatingString}recharge_display`] = ` (Recharge ${recharge})`;
-          }
-        } else if (exists(v[`${repeatingString}recharge_display`])) {
-          finalSetAttrs[`${repeatingString}recharge_display`] = '';
-        }
-
-        let attackOptions = {};
-        if (type !== 'trait') {
-          attackOptions = {
-            defaultAbility: 'strength_mod',
-            globalAttackBonus: v.global_attack_bonus,
-            globalAttackBonusLabel: 'global attack bonus',
-            globalMeleeAttackBonus: v.global_melee_attack_bonus,
-            globalRangedAttackBonus: v.global_ranged_attack_bonus,
-            type: 'attack',
-          };
-        }
-        updateAttackToggle(v, finalSetAttrs, repeatingString, attackOptions);
-
-        updateSavingThrowToggle(v, finalSetAttrs, repeatingString);
-
-        let damageOptions = {};
-        if (type !== 'trait') {
-          damageOptions = {
-            defaultDamageAbility: 'strength_mod',
-            globalDamageBonus: v.global_damage_bonus,
-            globalMeleeDamageBonus: v.global_melee_damage_bonus,
-            globalRangedDamageBonus: v.global_ranged_damage_bonus,
-            type: 'attack',
-          };
-        }
-        updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
-
-        updateHealToggle(v, finalSetAttrs, repeatingString);
-      }
-      setFinalAttrs(v, finalSetAttrs);
-    });
-  });
-};
-on('change:repeating_trait', (eventInfo) => {
-  const repeatingInfo = getRepeatingInfo('repeating_trait', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
-    updateAction('trait', repeatingInfo.rowId);
-  }
-});
-on('change:repeating_action', (eventInfo) => {
-  const repeatingInfo = getRepeatingInfo('repeating_action', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
-    updateAction('action', repeatingInfo.rowId);
-  }
-});
-on('change:repeating_reaction', (eventInfo) => {
-  const repeatingInfo = getRepeatingInfo('repeating_reaction', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
-    updateAction('reaction', repeatingInfo.rowId);
-  }
-});
-on('change:repeating_legendaryaction', (eventInfo) => {
-  const repeatingInfo = getRepeatingInfo('repeating_legendaryaction', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
-    updateAction('legendaryaction', repeatingInfo.rowId);
-  }
-});
-on('change:repeating_lairaction', (eventInfo) => {
-  const repeatingInfo = getRepeatingInfo('repeating_lairaction', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
-    updateAction('lairaction', repeatingInfo.rowId);
-  }
-});
-
 const parseDamage = (finalSetAttrs, repeatingString, freetext, regex, name, spellMods, meleeMods, spellAttack, rangedAttack, dexMod) => {
   const damageParseRegex = /(\d+d?\d+)(?:\s?(?:\+|\-)\s?(\d+))?/gi;
   const damage = regex.exec(freetext);
@@ -4704,7 +4704,7 @@ const sheetOpened = () => {
       }
       setFinalAttrs(v, setAbilities);
 
-      if(!v.import_data) {
+      if (!v.import_data) {
         finalSetAttrs.edit_mode = 'on';
       }
 
@@ -4807,9 +4807,9 @@ const sheetOpened = () => {
 
 const importData = () => {
   getAttrs(['import_data'], v => {
-    if(v.import_data) {
+    if (v.import_data) {
       const finalSetAttrs = {};
-      let importObject = JSON.parse(v.import_data);
+      const importObject = JSON.parse(v.import_data);
 
       if (importObject.npc) {
         for (const prop in importObject.npc) {
@@ -4818,7 +4818,7 @@ const importData = () => {
           }
         }
       }
-      if(importObject.spells) {
+      if (importObject.spells) {
         for (const prop in importObject.spells) {
           if (importObject.spells.hasOwnProperty(prop)) {
             const newRowId = generateRowID();
@@ -4836,7 +4836,10 @@ const importData = () => {
 };
 
 const deleteImportData = () => {
-  setFinalAttrs([], {import_data:'', import_data_present:'off'});
+  setFinalAttrs({}, {
+    import_data: '',
+    import_data_present: 'off',
+  });
 };
 
 on('change:accept_import', importData);
