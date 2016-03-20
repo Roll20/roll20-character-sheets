@@ -3120,7 +3120,7 @@ const updateAbilityChecksMacro = () => {
   finalSetAttrs.ability_checks_macro_var = '';
 
   for (let i = 0; i < ABILITIES.length; i++) {
-    finalSetAttrs.ability_checks_query_var += `|${capitalize(ABILITIES[i])},{{title=${capitalize(ABILITIES[i])}&#125;&#125; {{roll1=[[d20@{d20_mod} + @{${ABILITIES[i]}_check_mod}]]&#125;&#125; {{roll2=[[d20@{d20_mod} + @{${ABILITIES[i]}_check_mod}]]&#125;&#125;`;
+    finalSetAttrs.ability_checks_query_var += `|${capitalize(ABILITIES[i])},{{title=${capitalize(ABILITIES[i])}&#125;&#125; {{roll1=[[@{preroll}d20@{postroll}@{d20_mod} + @{${ABILITIES[i]}_check_mod}]]&#125;&#125; @{roll_setting}@{d20_mod} + @{${ABILITIES[i]}_check_mod}]]&#125;&#125;`;
     finalSetAttrs.ability_checks_macro_var += `[${capitalize(ABILITIES[i])}](~${ABILITIES[i]}_check)`;
     if (i < ABILITIES.length - 1) {
       finalSetAttrs.ability_checks_macro_var += ', ';
@@ -3137,7 +3137,7 @@ const updateAbilityChecksMacro = () => {
     getAttrs(collectionArray, (v) => {
       for (let j = 0; j < ids.length; j++) {
         const repeatingString = `${repeatingItem}_${ids[j]}_`;
-        finalSetAttrs.ability_checks_query_var += `|${v[`${repeatingString}name`]}, {{title=${v[`${repeatingString}name`]} (${capitalize(getAbilityShortName(v[`${repeatingString}ability`]))})&#125;&#125; {{roll1=[[d20@{d20_mod} + @{${repeatingString}formula}]]&#125;&#125; {{roll2=[[d20@{d20_mod} + @{${repeatingString}formula}]]&#125;&#125;`;
+        finalSetAttrs.ability_checks_query_var += `|${v[`${repeatingString}name`]}, {{title=${v[`${repeatingString}name`]} (${capitalize(getAbilityShortName(v[`${repeatingString}ability`]))})&#125;&#125; {{roll1=[[@{preroll}d20@{postroll}@{d20_mod} + @{${repeatingString}formula}]]&#125;&#125; @{roll_setting}@{d20_mod} + @{${repeatingString}formula}]]&#125;&#125;`;
         finalSetAttrs.ability_checks_macro_var += ', ';
         finalSetAttrs.ability_checks_macro_var += `[${v[`${repeatingString}name`]}](~repeating_skill_${ids[j]}_skill)`;
       }
@@ -3146,6 +3146,32 @@ const updateAbilityChecksMacro = () => {
     });
   });
 };
+
+const updatePreAndPostRoll = () => {
+  const collectionArray = ['roll_setting', 'roll_info', 'preroll', 'postroll'];
+  const finalSetAttrs = {};
+
+  getAttrs(collectionArray, (v) => {
+    finalSetAttrs.roll_info = '';
+    finalSetAttrs.preroll = '';
+    finalSetAttrs.postroll = '';
+
+    if (v.roll_setting === '@{roll_advantage}') {
+      finalSetAttrs.roll_info = '{{advantage=1}}';
+      finalSetAttrs.preroll = 2;
+      finalSetAttrs.postroll += 'kh1';
+    } else if (v.roll_setting === '@{roll_disadvantage}') {
+      finalSetAttrs.roll_info = '{{disadvantage=1}}';
+      finalSetAttrs.preroll = 2;
+      finalSetAttrs.postroll += 'kl1';
+    }
+
+    setFinalAttrs(v, finalSetAttrs);
+  });
+};
+on('change:roll_setting', () => {
+  updatePreAndPostRoll();
+});
 
 const updateSkill = (rowId) => {
   const repeatingItem = 'repeating_skill';
@@ -4762,6 +4788,10 @@ const sheetOpened = () => {
     }
     if (versionCompare(version, '2.2.12') < 0) {
       updateAbilityChecksMacro();
+    }
+    if (versionCompare(version, '2.2.15') < 0) {
+      updateAbilityChecksMacro();
+      updatePreAndPostRoll();
     }
 
     if (!version || version !== currentVersion) {
