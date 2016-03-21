@@ -3759,10 +3759,6 @@
                         <label for="isShaped"><img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/5th%20Edition%20OGL%20by%20Roll20/D%26D5eShapedPreview.png" width="220" height="177"></label>
                     </div>
                 </div>
-                <div class="row">
-                    <input type="checkbox" class="already_transitioned" name="attr_already_transitioned" value="1">
-                    Hide TRANSITION OPTIONS
-                </div>
                 <div class="row title">
                     <span>TRANSITION OPTIONS</span>
                 </div>
@@ -4658,18 +4654,22 @@
     on("sheet:opened", function() {
         versioning();
 
-        getAttrs(['meleedmg1','rangeddmg1','pro_weapons','pro_armor','inventoryname1','barbarian_level','bard_level','cleric_level','druid_level','figher_level','monk_level','paladin_level','ranger_level','rogue_level','sorcerer_level','warlock_level','wizard_level','npc_type','npc_size','npc_alignment','npc_hp','npc_HP_hit_dice','npc_AC_note','npc_strength','npc_dexterity','npc_constitution','npc_intelligence','npc_wisdom','npc_charisma','speed','speed_fly','speed_burrow','speed_swim','speed_climb','prolanguages','blindsight','darkvision','tremorsense','truesight','challenge','xp','multiattack','npc_traits','lair_actions','legendary_action_notes','damage_vulnerability','damage_resistance','damage_immunity','condition_immunity'], function(attrs) {
+        getAttrs(['meleedmg1','rangeddmg1','pro_weapons','pro_armor','inventoryname1','barbarian_level','bard_level','cleric_level','druid_level','figher_level','monk_level','paladin_level','ranger_level','rogue_level','sorcerer_level','warlock_level','wizard_level','npc_type','npc_size','npc_alignment','npc_hp','npc_HP_hit_dice','npc_AC_note','npc_strength','npc_dexterity','npc_constitution','npc_intelligence','npc_wisdom','npc_charisma','speed','speed_fly','speed_burrow','speed_swim','speed_climb','prolanguages','blindsight','darkvision','tremorsense','truesight','challenge','xp','multiattack','npc_traits','lair_actions','legendary_action_notes','damage_vulnerability','damage_resistance','damage_immunity','condition_immunity', 'already_transitioned'], function(attrs) {
             var hasOldData = false;
             var updates = {};
-            _.each(attrs, function(value, key) {
-                if(value) {
-                    hasOldData = true;
+            if(attrs.already_transitioned != '1')
+            {
+                _.each(attrs, function(value, key) {
+                    if(value) {
+                        hasOldData = true;
+                        updates.tab = 'options';
+                    }
+                });
+                if(!hasOldData) {
+                    updates.already_transitioned = '1';
                 }
-            });
-            if(!hasOldData) {
-                updates.already_transitioned = '1';
+                setAttrs(updates);
             }
-            setAttrs(updates);
         });
     });
 
@@ -6403,7 +6403,7 @@
                     }
                     if(v["repeating_spell" + cat + "_" + repid + "spelldamage"] && v["repeating_spell" + cat + "_" + repid + "spelldamage"] != "") {
                         quietupdate["repeating_attack_" + atkid + "_dmgbase"] = v["repeating_spell" + cat + "_" + repid + "spelldamage"];
-                        quietupdate["repeating_attack_" + atkid + "_dmgtype"] = v["repeating_spell" + cat + "_" + repid + "spelldamagetype"];
+                        quietupdate["repeating_attack_" + atkid + "_dmgtype"] = v["repeating_spell" + cat + "_" + repid + "spelldamagetype"] ? v["repeating_spell" + cat + "_" + repid + "spelldamagetype"] : "";
                         quietupdate["repeating_attack_" + atkid + "_dmgflag"] = "{{damage=1}} {{dmg1flag=1}}";
                         if(v["repeating_spell" + cat + "_" + repid + "spelldmgmod"] && v["repeating_spell" + cat + "_" + repid + "spelldmgmod"] === "Yes") {
                             quietupdate["repeating_attack_" + atkid + "_dmgattr"] = v.spellcasting_ability.slice(0, -1);
@@ -6435,9 +6435,13 @@
                     }
                     if(v["repeating_spell" + cat + "_" + repid + "spellhldie"] && v["repeating_spell" + cat + "_" + repid + "spellhldie"] != "" && v["repeating_spell" + cat + "_" + repid + "spellhldietype"] && v["repeating_spell" + cat + "_" + repid + "spellhldietype"] != "") {
                         var bonus = "";
+                        var spelllevel = v["repeating_spell" + cat + "_" + repid + "spelllevel"];
+                        if(!spelllevel) {
+                            spelllevel = eventinfo.sourceAttribute.split("_")[1].replace("spell-", "");
+                        }
                         var query = "?{Cast at what level?";
-                        for(i = 0; i < 10-v["repeating_spell" + cat + "_" + repid + "spelllevel"]; i++) {
-                            query = query + "|Level " + (parseInt(i, 10) + parseInt(v["repeating_spell" + cat + "_" + repid + "spelllevel"], 10)) + "," + i;
+                        for(i = 0; i < 10-spelllevel; i++) {
+                            query = query + "|Level " + (parseInt(i, 10) + parseInt(spelllevel, 10)) + "," + i;
                         }
                         query = query + "}";
                         if(v["repeating_spell" + cat + "_" + repid + "spellhlbonus"] && v["repeating_spell" + cat + "_" + repid + "spellhlbonus"] != "") {
@@ -6482,6 +6486,7 @@
                     }
                 }
             }
+            console.log(quietupdate);
             setAttrs(quietupdate, {silent: true});
             setAttrs(update);
         });
