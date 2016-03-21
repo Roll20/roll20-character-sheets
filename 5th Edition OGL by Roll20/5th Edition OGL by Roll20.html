@@ -6403,7 +6403,7 @@
                     }
                     if(v["repeating_spell" + cat + "_" + repid + "spelldamage"] && v["repeating_spell" + cat + "_" + repid + "spelldamage"] != "") {
                         quietupdate["repeating_attack_" + atkid + "_dmgbase"] = v["repeating_spell" + cat + "_" + repid + "spelldamage"];
-                        quietupdate["repeating_attack_" + atkid + "_dmgtype"] = v["repeating_spell" + cat + "_" + repid + "spelldamagetype"];
+                        quietupdate["repeating_attack_" + atkid + "_dmgtype"] = v["repeating_spell" + cat + "_" + repid + "spelldamagetype"] ? v["repeating_spell" + cat + "_" + repid + "spelldamagetype"] : "";
                         quietupdate["repeating_attack_" + atkid + "_dmgflag"] = "{{damage=1}} {{dmg1flag=1}}";
                         if(v["repeating_spell" + cat + "_" + repid + "spelldmgmod"] && v["repeating_spell" + cat + "_" + repid + "spelldmgmod"] === "Yes") {
                             quietupdate["repeating_attack_" + atkid + "_dmgattr"] = v.spellcasting_ability.slice(0, -1);
@@ -6435,9 +6435,13 @@
                     }
                     if(v["repeating_spell" + cat + "_" + repid + "spellhldie"] && v["repeating_spell" + cat + "_" + repid + "spellhldie"] != "" && v["repeating_spell" + cat + "_" + repid + "spellhldietype"] && v["repeating_spell" + cat + "_" + repid + "spellhldietype"] != "") {
                         var bonus = "";
+                        var spelllevel = v["repeating_spell" + cat + "_" + repid + "spelllevel"];
+                        if(!spelllevel) {
+                            spelllevel = eventinfo.sourceAttribute.split("_")[1].replace("spell-", "");
+                        }
                         var query = "?{Cast at what level?";
-                        for(i = 0; i < 10-v["repeating_spell" + cat + "_" + repid + "spelllevel"]; i++) {
-                            query = query + "|Level " + (parseInt(i, 10) + parseInt(v["repeating_spell" + cat + "_" + repid + "spelllevel"], 10)) + "," + i;
+                        for(i = 0; i < 10-spelllevel; i++) {
+                            query = query + "|Level " + (parseInt(i, 10) + parseInt(spelllevel, 10)) + "," + i;
                         }
                         query = query + "}";
                         if(v["repeating_spell" + cat + "_" + repid + "spellhlbonus"] && v["repeating_spell" + cat + "_" + repid + "spellhlbonus"] != "") {
@@ -6482,6 +6486,7 @@
                     }
                 }
             }
+            console.log(quietupdate);
             setAttrs(quietupdate, {silent: true});
             setAttrs(update);
         });
