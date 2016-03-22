@@ -4708,6 +4708,8 @@ const sheetOpened = () => {
         finalSetAttrs.edit_mode = 'on';
       }
 
+      finalSetAttrs.roll_info = '';
+
       generateSkills();
       updateSavingThrows();
       updateLevels();
