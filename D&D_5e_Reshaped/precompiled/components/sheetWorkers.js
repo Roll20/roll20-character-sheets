@@ -144,7 +144,7 @@ const isEmpty = (obj) => {
   }
   return true;
 };
-const setFinalAttrs = (v, finalSetAttrs) => {
+const setFinalAttrs = (v, finalSetAttrs, callback) => {
   if (!isEmpty(finalSetAttrs)) {
     for (const key in finalSetAttrs) {
       if (finalSetAttrs.hasOwnProperty(key)) {
@@ -157,7 +157,11 @@ const setFinalAttrs = (v, finalSetAttrs) => {
       console.log('finalSetAttrs', finalSetAttrs);
     }
     if (!isEmpty(finalSetAttrs)) {
-      setAttrs(finalSetAttrs);
+      if (callback) {
+        setAttrs(finalSetAttrs, {}, callback());
+      } else {
+        setAttrs(finalSetAttrs);
+      }
     }
   }
 };
@@ -705,7 +709,7 @@ const updateLevels = (changedField) => {
         const repeatingString = `${repeatingItem}_${ids[j]}_`;
 
         let className = v[`${repeatingString}name`];
-        const classLevel = getIntValue(v[`${repeatingString}level`]);
+        let classLevel = getIntValue(v[`${repeatingString}level`]);
 
         if (isUndefined(v[`${repeatingString}name`]) && isUndefined(v[`${repeatingString}level`])) {
           continue;
@@ -755,6 +759,8 @@ const updateLevels = (changedField) => {
           if (defaultClassDetails.hasOwnProperty(className)) {
             classSpellcasting = defaultClassDetails[className].spellcasting;
             finalSetAttrs[`${repeatingString}spellcasting`] = classSpellcasting;
+          } else {
+            finalSetAttrs[`${repeatingString}spellcasting`] = 'none';
           }
         } else {
           classesWithSpellcasting += 1;
@@ -836,7 +842,10 @@ const updateLevels = (changedField) => {
         finalSetAttrs.caster_type = 'full';
       }
 
-      setFinalAttrs(v, finalSetAttrs);
+      setFinalAttrs(v, finalSetAttrs, () => {
+        console.log('CALLBACK IS DONE');
+        setClassFeatures();
+      });
     });
   });
 };
@@ -1003,6 +1012,7 @@ const updateSpellSlots = () => {
 };
 
 const setClassFeatures = () => {
+  console.log('setClassFeatures called');
   const finalSetAttrs = {};
   const collectionArray = ['ac_unarmored_ability', 'lang', 'jack_of_all_trades_toggle', 'careful_spell_toggle', 'distant_spell_toggle', 'empowered_spell_toggle', 'extended_spell_toggle', 'heightened_spell_toggle', 'quickened_spell_toggle', 'subtle_spell_toggle', 'twinned_spell_toggle'];
 
@@ -1014,6 +1024,8 @@ const setClassFeatures = () => {
   }
 
   getAttrs(collectionArray, (v) => {
+    console.log('setClassFeatures v', v);
+
     const language = v.lang || 'en';
 
     if (v.fighter_level >= 5) {
@@ -1920,9 +1932,6 @@ on('remove:repeating_class', () => {
 
 const watchForClassLevelChanges = () => {
   const classFeatureWatch = [];
-  for (let z = 0; z < CLASSES.length; z++) {
-    classFeatureWatch.push(`change:${CLASSES[z]}_level`);
-  }
   for (let i = 0; i < ABILITIES.length; i++) {
     classFeatureWatch.push(`change:${ABILITIES[i]}_mod`);
   }
