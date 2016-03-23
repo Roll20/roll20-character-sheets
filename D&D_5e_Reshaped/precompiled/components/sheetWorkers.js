@@ -709,9 +709,9 @@ const updateLevels = (changedField) => {
         const repeatingString = `${repeatingItem}_${ids[j]}_`;
 
         let className = v[`${repeatingString}name`];
-        let classLevel = getIntValue(v[`${repeatingString}level`]);
+        let classLevel = v[`${repeatingString}level`];
 
-        if (isUndefined(v[`${repeatingString}name`]) && isUndefined(v[`${repeatingString}level`])) {
+        if (isUndefined(className) && isUndefined(classLevel)) {
           continue;
         }
 
@@ -730,15 +730,18 @@ const updateLevels = (changedField) => {
           finalSetAttrs[`${repeatingString}custom_class_toggle`] = 0;
         }
 
-        if (classLevel) {
+        if (isUndefined(classLevel)) {
+          classLevel = 1;
+          finalSetAttrs[`${repeatingString}level`] = classLevel;
+          finalSetAttrs[`${className}_level`] = classLevel;
+        } else {
+          classLevel = getIntValue(classLevel);
           totalLevel += classLevel;
           if (classLevels[className]) {
             classLevels[className] += classLevel;
           } else {
             classLevels[className] = classLevel;
           }
-        } else if (isUndefined(finalSetAttrs[`${className}_level`])) {
-          finalSetAttrs[`${className}_level`] = classLevel;
         }
 
         let classHd = v[`${repeatingString}hd`];
