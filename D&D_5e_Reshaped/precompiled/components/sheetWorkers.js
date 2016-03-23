@@ -728,10 +728,10 @@ const updateLevels = (changedField) => {
 
         if (classLevel) {
           totalLevel += classLevel;
-          if (classLevels[capitalize(className)]) {
-            classLevels[capitalize(className)] += classLevel;
+          if (classLevels[className]) {
+            classLevels[className] += classLevel;
           } else {
-            classLevels[capitalize(className)] = classLevel;
+            classLevels[className] = classLevel;
           }
         } else if (isUndefined(finalSetAttrs[`${className}_level`])) {
           finalSetAttrs[`${className}_level`] = classLevel;
@@ -769,7 +769,7 @@ const updateLevels = (changedField) => {
           if (finalSetAttrs.class_and_level !== '') {
             finalSetAttrs.class_and_level += ', ';
           }
-          finalSetAttrs.class_and_level += `${className} ${classLevels[className]}`;
+          finalSetAttrs.class_and_level += `${capitalize(className)} ${classLevels[className]}`;
         }
       }
 
