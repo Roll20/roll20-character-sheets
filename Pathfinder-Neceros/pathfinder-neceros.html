@@ -13766,7 +13766,7 @@ var PFSheet = PFSheet || (function () {
     * @bonus {number} = a number that is added
     * @penalties {Array} = array of fieldnames to be subtracted from the total.
     */
-    updateRowTotal = function (fields, bonus, penalties) {
+    updateRowTotal = function (fields, bonus, penalties, totalIsFloat) {
     	var readFields = fields;
     	if (!fields || fields.length === 0) { return; }
     	if (penalties && penalties.length > 0) {
@@ -13785,7 +13785,9 @@ var PFSheet = PFSheet || (function () {
     			}
     			newValue -= penalty;
     		}
-    		newValue = Math.floor(newValue);
+			if (!totalIsFloat) {
+				newValue = Math.floor(newValue);
+			}
     		if (isNaN(currValue) || currValue !== newValue) {
     			setter[fields[0]] = newValue;
     			setAttrs(setter);
@@ -14686,7 +14688,7 @@ var PFSheet = PFSheet || (function () {
 				    subAcp = parseInt(v[row + "-acp"], 10) || 0;
 				    nonProf = parseInt(v[row + "-proficiency"], 10) || 0;//assume proficient 0 is messing with it //prof=isNaN(prof)?0:prof;//cannot do "||0" since 0 is valid but falsy
 				    subsp = parseInt(v[row + "-spell-fail"], 10) || 0;
-					if (row === "armor"){
+					if (row.indexOf("armor") >= 0){
 						acA += subAC;
 					} else {
 						acS += subAC;
@@ -15236,7 +15238,7 @@ var PFSheet = PFSheet || (function () {
         wornEquipmentRows.forEach(function (slot) {
 			attribList.push("worn-" + slot + "-" + col);
 		});
-		updateRowTotal(attribList);
+		updateRowTotal(attribList,null,null,true);
 	},
 
     /* updateCarriedCurrency
@@ -16457,9 +16459,9 @@ var PFSheet = PFSheet || (function () {
                 .reduce(function (m, r) {
                 	if (r.I.qty > 0 && r.I.location == 0) {
                 		if (r.I.qty_max == 0) {
-                			m.weight += r.I.weight * r.I.qty;
+                			m.weight += r.F.weight * r.I.qty;
                 		} else {
-                			m.weight += r.I.weight;
+                			m.weight += r.F.weight;
                 		}
                 	}
                 	m.hp += r.I.hp;
@@ -17167,9 +17169,9 @@ on('change:repeating_item:weight change:repeating_item:qty change:repeating_item
 			.reduce(function (m, r) {
 				if (r.I.qty > 0 && r.I.location == 0) {
 					if (r.I.qty_max == 0) {
-						m.weight += r.I.weight * r.I.qty;
+						m.weight += r.F.weight * r.I.qty;
 					} else {
-						m.weight += r.I.weight;
+						m.weight += r.F.weight;
 					}
 				}
 				return m;
@@ -17229,9 +17231,9 @@ on('remove:repeating_item',
 			.reduce(function (m, r) {
 				if (r.I.qty > 0 && r.I.location == 0) {
 					if (r.I.qty_max == 0) {
-						m.weight += r.I.weight * r.I.qty;
+						m.weight += r.F.weight * r.I.qty;
 					} else {
-						m.weight += r.I.weight;
+						m.weight += r.F.weight;
 					}
 				}
 				m.hp += r.I.hp;
