@@ -13702,7 +13702,7 @@ var SWUtils = SWUtils || (function () {
 var PFSheet = PFSheet || (function () {
 	'use strict';
 
-	var version = 0.41,
+	var version = 0.42,
 	pfDebug = false,
 
 	/****************************** UTILITIES ************************************/
@@ -15241,6 +15241,36 @@ var PFSheet = PFSheet || (function () {
 		updateRowTotal(attribList,null,null,true);
 	},
 
+	updateRepeatingItems = function () {
+   		TAS.repeating('item')
+			.attrs('item_total_weight', 'item-total-hp', 'item-total-hp_max', 'item-total-value')
+			.fields('weight', 'qty', 'qty_max', 'location', 'hp', 'hp_max', 'value')
+			.reduce(function (m, r) {
+				if (r.I.qty > 0 && r.I.location == 0) {
+					if (r.I.qty_max == 0) {
+						m.weight += r.F.weight * r.I.qty;
+					} else {
+						m.weight += r.F.weight;
+					}
+				}
+				m.hp += r.I.hp;
+				m.hp_max += r.I.hp_max;
+				m.value += r.I.value;
+				return m;
+			}, {
+				weight: 0,
+				hp: 0,
+				hp_max: 0,
+				value: 0
+			}, function (m, r, a) {
+				a.S['item_total_weight'] = m.weight;
+				a.S['item-total-hp'] = m.hp;
+				a.S['item-total-hp_max'] = m.hp_max;
+				a.S['item-total-value'] = m.value;
+			})
+			.execute();		
+	},
+	
     /* updateCarriedCurrency
      * updates the total for carried currency
      *
@@ -15262,6 +15292,7 @@ var PFSheet = PFSheet || (function () {
 			var curr = parseFloat(v["carried-total"], 10) || 0,
 			carried = ((parseFloat(v["carried-currency"], 10) || 0) * 100 + (parseFloat(v["item_total_weight"], 10) || 0) * 100 + (parseFloat(v["worn-total-weight"], 10) || 0) * 100 + (parseFloat(v["carried-misc"], 10) || 0) * 100) / 100; // Fix bad javascript math
 			//TAS.debug("curr=" + curr + ", carried=" + carried);
+			carried = Math.round(carried);
 			if (curr !== carried) { setAttrs({ "carried-total": carried }); }
 		});
 	},
@@ -16453,33 +16484,8 @@ var PFSheet = PFSheet || (function () {
             wornEquipmentColumns.forEach(function (column) {
 			    updateWornEquipment(column);
             });
-    		TAS.repeating('item')
-                .attrs('item_total_weight', 'item-total-hp', 'item-total-hp_max', 'item-total-value')
-                .fields('weight', 'qty', 'qty_max', 'location', 'hp', 'hp_max', 'value')
-                .reduce(function (m, r) {
-                	if (r.I.qty > 0 && r.I.location == 0) {
-                		if (r.I.qty_max == 0) {
-                			m.weight += r.F.weight * r.I.qty;
-                		} else {
-                			m.weight += r.F.weight;
-                		}
-                	}
-                	m.hp += r.I.hp;
-                	m.hp_max += r.I.hp_max;
-                	m.value += r.I.value;
-                	return m;
-                }, {
-                	weight: 0,
-                	hp: 0,
-                	hp_max: 0,
-                	value: 0
-                }, function (m, r, a) {
-                	a.S['item_total_weight'] = m.weight;
-                	a.S['item-total-hp'] = m.hp;
-                	a.S['item-total-hp_max'] = m.hp_max;
-                	a.S['item-total-value'] = m.value;
-                })
-                .execute();
+			updateRepeatingItems();
+    
     		updateCarriedCurrency();
     		updateCarriedTotal();
     		updateLoadsAndLift();
@@ -16496,6 +16502,19 @@ var PFSheet = PFSheet || (function () {
 				PFSheet.updateBuffTotals(col);
 			});
 			updateArmor();
+		}
+		if (oldversion < 0.42 ) {
+
+			updateArmor();
+			//update for float
+			wornEquipmentColumns.forEach(function (column) {
+			    updateWornEquipment(column);
+            });
+			updateRepeatingItems();
+    
+    		updateCarriedTotal();
+    		updateLoadsAndLift();
+    		updateCurrentLoad();			
 		}
     },
 
@@ -16621,6 +16640,7 @@ var PFSheet = PFSheet || (function () {
 		verifyHasSkill: verifyHasSkill,
 		updateNPCHP: updateNPCHP,
 		updateWornEquipment: updateWornEquipment,
+		updateRepeatingItems:updateRepeatingItems,
 		updateCarriedCurrency: updateCarriedCurrency,
 		updateCarriedTotal: updateCarriedTotal,
 		updateCurrentLoad: updateCurrentLoad,
@@ -17163,6 +17183,8 @@ _.each(PFSheet.lists.wornEquipmentRows, function (row) {
 on('change:repeating_item:weight change:repeating_item:qty change:repeating_item:qty_max change:repeating_item:location',
     TAS.callback(function eventUpdateItemTotalWeight(eventInfo) {
     	TAS.debug("caught " + eventInfo.sourceAttribute + " event");
+		//this does a few more fields than weight
+		//	PFSheet.updateRepeatingItems();
     	TAS.repeating('item')
 			.attrs('item_total_weight')
 			.fields('weight', 'qty', 'qty_max', 'location')
@@ -17224,34 +17246,7 @@ on('change:repeating_item:value',
 on('remove:repeating_item',
 	TAS.callback(function eventRemoveItem(eventInfo) {
 		TAS.debug("caught " + eventInfo.sourceAttribute + " event");
-
-		TAS.repeating('item')
-			.attrs('item_total_weight', 'item-total-hp', 'item-total-hp_max', 'item-total-value')
-			.fields('weight', 'qty', 'qty_max', 'location', 'hp', 'hp_max', 'value')
-			.reduce(function (m, r) {
-				if (r.I.qty > 0 && r.I.location == 0) {
-					if (r.I.qty_max == 0) {
-						m.weight += r.F.weight * r.I.qty;
-					} else {
-						m.weight += r.F.weight;
-					}
-				}
-				m.hp += r.I.hp;
-				m.hp_max += r.I.hp_max;
-				m.value += r.I.value;
-				return m;
-			}, {
-				weight: 0,
-				hp: 0,
-				hp_max: 0,
-				value: 0
-			}, function (m, r, a) {
-				a.S['item_total_weight'] = m.weight;
-				a.S['item-total-hp'] = m.hp;
-				a.S['item-total-hp_max'] = m.hp_max;
-				a.S['item-total-value'] = m.value;
-			})
-			.execute();
+		PFSheet.updateRepeatingItems();
 	})
 );
 on('change:CP change:SP change:GP change:PP',
