@@ -158,7 +158,7 @@ const setFinalAttrs = (v, finalSetAttrs, callback) => {
     }
     if (!isEmpty(finalSetAttrs)) {
       if (callback) {
-        setAttrs(finalSetAttrs, {}, callback());
+        setAttrs(finalSetAttrs, {}, callback);
       } else {
         setAttrs(finalSetAttrs);
       }
@@ -845,6 +845,7 @@ const updateLevels = (changedField) => {
       setFinalAttrs(v, finalSetAttrs, () => {
         console.log('CALLBACK IS DONE');
         setClassFeatures();
+        updateSpellSlots();
       });
     });
   });
@@ -1012,7 +1013,6 @@ const updateSpellSlots = () => {
 };
 
 const setClassFeatures = () => {
-  console.log('setClassFeatures called');
   const finalSetAttrs = {};
   const collectionArray = ['ac_unarmored_ability', 'lang', 'jack_of_all_trades_toggle', 'careful_spell_toggle', 'distant_spell_toggle', 'empowered_spell_toggle', 'extended_spell_toggle', 'heightened_spell_toggle', 'quickened_spell_toggle', 'subtle_spell_toggle', 'twinned_spell_toggle'];
 
@@ -1916,18 +1916,11 @@ const setClassFeatures = () => {
 on('change:repeating_class', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_class', eventInfo);
   if (repeatingInfo) {
-    console.log('change:repeating_class', repeatingInfo.field);
     updateLevels(repeatingInfo.field);
-    if (repeatingInfo.field === 'spellcasting') {
-      updateSpellSlots();
-    }
   }
 });
 on('remove:repeating_class', () => {
-  console.log('remove:repeating_class');
   updateLevels();
-  updateSpellSlots();
-  setClassFeatures();
 });
 
 const watchForClassLevelChanges = () => {
@@ -1949,7 +1942,7 @@ const watchForClassLevelChanges = () => {
   });
 };
 watchForClassLevelChanges();
-on('change:caster_level change:spell_slots_l1_bonus change:spell_slots_l2_bonus change:spell_slots_l3_bonus change:spell_slots_l4_bonus change:spell_slots_l5_bonus change:spell_slots_l6_bonus change:spell_slots_l7_bonus change:spell_slots_l8_bonus change:spell_slots_l9_bonus', () => {
+on('change:spell_slots_l1_bonus change:spell_slots_l2_bonus change:spell_slots_l3_bonus change:spell_slots_l4_bonus change:spell_slots_l5_bonus change:spell_slots_l6_bonus change:spell_slots_l7_bonus change:spell_slots_l8_bonus change:spell_slots_l9_bonus', () => {
   updateSpellSlots();
 });
 
@@ -4533,7 +4526,6 @@ const resourcesToClassFeatures = () => {
     }
 
     getAttrs(collectionArray, (v) => {
-      console.log('v', v);
       for (let i = 0; i < ids.length; i++) {
         repeatingString = `${repeatingItem}_${ids[i]}_`;
         const newRowId = generateRowID();
@@ -4548,7 +4540,6 @@ const resourcesToClassFeatures = () => {
         finalSetAttrs[`${newRepeatingString}freetext`] = v[`${repeatingString}freetext`];
         finalSetAttrs[`${newRepeatingString}freeform`] = v[`${repeatingString}freeform`];
       }
-      console.log('resourcesToClassFeatures', finalSetAttrs);
       setFinalAttrs(v, finalSetAttrs);
     });
   });
