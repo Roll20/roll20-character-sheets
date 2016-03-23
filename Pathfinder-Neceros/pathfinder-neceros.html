@@ -7784,6 +7784,7 @@
 			</div>
 		</div>
 	</div>
+
 <!-- Spells Levels 0-9 -->
     <div class="sheet-repeating-sect">
 		<b>Spells</b>
@@ -13701,7 +13702,7 @@ var SWUtils = SWUtils || (function () {
 var PFSheet = PFSheet || (function () {
 	'use strict';
 
-	var version = 0.40,
+	var version = 0.41,
 	pfDebug = false,
 
 	/****************************** UTILITIES ************************************/
@@ -14685,13 +14686,17 @@ var PFSheet = PFSheet || (function () {
 				    subAcp = parseInt(v[row + "-acp"], 10) || 0;
 				    nonProf = parseInt(v[row + "-proficiency"], 10) || 0;//assume proficient 0 is messing with it //prof=isNaN(prof)?0:prof;//cannot do "||0" since 0 is valid but falsy
 				    subsp = parseInt(v[row + "-spell-fail"], 10) || 0;
-        		acA += subAC;
-        		maxDex = Math.min(subD, maxDex);
-        		acp += subAcp;
-        		sp += subsp;
-        		if (nonProf) { atk += subAcp; }
-				    //TAS.debug("row=" + row + ", subAC=" + subAC + ", subD=" + subD + ", subAcp=" + subAcp + ", nonProf=" + nonProf + ", subsp=" + subsp + ", acA=" + acA + ", maxDex=" + maxDex + ", acp=" + acp + ", sp=" + sp + ", atk=" + atk);
-			    }
+					if (row === "armor"){
+						acA += subAC;
+					} else {
+						acS += subAC;
+					}
+					maxDex = Math.min(subD, maxDex);
+					acp += subAcp;
+					sp += subsp;
+					if (nonProf) { atk += subAcp; }
+					//TAS.debug("row=" + row + ", subAC=" + subAC + ", subD=" + subD + ", subAcp=" + subAcp + ", nonProf=" + nonProf + ", subsp=" + subsp + ", acA=" + acA + ", maxDex=" + maxDex + ", acp=" + acp + ", sp=" + sp + ", atk=" + atk);
+				}
 			});
 
         	// #0: Armor, Shield & Load
@@ -15982,7 +15987,7 @@ var PFSheet = PFSheet || (function () {
 		"class-ability", "feat", "racial-trait", "trait", "npc-spell-like-abilities", "mythic-ability", "mythic-feat"
 	],
 	abilities = ["STR", "DEX", "CON", "INT", "WIS", "CHA"],
-	abilityEvents = "change:REPLACE-base change:REPLACE-enhance change:REPLACE-misc change:REPLACE-temp change:REPLACE-damage change:REPLACE-penalty change:REPLACE-drain change:REPLACE-cond change:buff_REPLACE-total",
+	abilityEvents = "change:REPLACE-base change:REPLACE-enhance change:REPLACE-misc change:REPLACE-temp change:REPLACE-damage change:REPLACE-penalty change:REPLACE-drain change:REPLACE-cond",
 	abilityMods = ["STR-mod", "DEX-mod", "CON-mod", "INT-mod", "WIS-mod", "CHA-mod"],
 	conditionEvents = {
 		"change:condition-Sickened": [updateDamage, updateConditionCheckPenalty, updateConditionsSavePenalty, updateConditionAttackPenalty]
@@ -16007,6 +16012,15 @@ var PFSheet = PFSheet || (function () {
 		"STR", "DEX", "CON", "INT", "WIS", "CHA", "Ranged", "Melee", "DMG", "AC", "Touch", "CMD", "HP-temp"
 		, "Fort", "Will", "Ref", "Check", "CasterLevel"
 	],
+	buffEvents={
+		 "Ranged":[updateAttack],"Melee":[updateAttack],"DMG":[updateDamage]
+		,"Fort":[updateSave],"Will":[updateSave],"Ref":[updateSave]
+		,"STR":[updateAbility], "DEX":[updateAbility], "CON":[updateAbility], "INT":[updateAbility], "WIS":[updateAbility], "CHA":[updateAbility]
+	},
+	buffEventsNoParam={
+		 "AC":[updateDefenses],"Touch":[updateDefenses],"CMD":[updateDefenses]
+		,"HP-temp":[updateTempHP],"Check":[updateConditionCheckPenalty]
+	},	
 	//all columns in Classes grid
 	classColumns = ["hp", "skill", "fcskill", "fcalt", "bab", "Fort", "Ref", "Will", "level"],
 	//the classes available
@@ -16475,6 +16489,12 @@ var PFSheet = PFSheet || (function () {
     		recalculateAllBuffs();
 			updateSize();
 		}
+		if (oldversion < 0.41 ) {
+			buffColumns.forEach(function (col) {
+				PFSheet.updateBuffTotals(col);
+			});
+			updateArmor();
+		}
     },
 
 
@@ -16527,6 +16547,8 @@ var PFSheet = PFSheet || (function () {
 			buffColumns: buffColumns,
 			dropdowns: dropdowns,
 			defenseDropdowns: defenseDropdowns,
+			buffEvents:buffEvents,
+			buffEventsNoParam:buffEventsNoParam,			
 			saveTypes: saveTypes,
 			saveEvents: saveEvents,
 			classColumns: classColumns,
@@ -16687,7 +16709,32 @@ on("change:repeating_buff:buff-enable_toggle remove:repeating_buff",
 			PFSheet.updateBuffTotals(col);
 		});
 	})
+);
+
+//generic easy buff total updates
+_.each(PFSheet.lists.buffEvents,function(functions,col){
+	var eventToWatch="change:buff_"+col+"-total";
+	_.each(functions,function(methodToCall){
+		on(eventToWatch,
+			TAS.callback(function eventBuffTotal(eventInfo){
+				TAS.debug("caught " + eventInfo.sourceAttribute + " event");
+				methodToCall(col,eventInfo);
+			})
 		);
+	});
+});
+_.each(PFSheet.lists.buffEventsNoParam,function(functions,col){
+	var eventToWatch="change:buff_"+col+"-total";
+	_.each(functions,function(methodToCall){
+		on(eventToWatch,
+			TAS.callback(function eventBuffTotal(eventInfo){
+				TAS.debug("caught " + eventInfo.sourceAttribute + " event");
+				methodToCall(eventInfo);
+			})
+		);
+	});
+});
+
 
 //SKILLS
 on("change:total-skill change:total-fcskill change:int-mod change:level change:max-skill-ranks-mod change:Max-Skill-Ranks-Misc2 change:unchained_skills-show change:BG-Skill-Use",
