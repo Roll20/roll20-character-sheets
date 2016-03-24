@@ -1155,6 +1155,13 @@ const setClassFeatures = () => {
           storageName: 'Indomitable Might',
         });
       }
+      if (v.barbarian_level >= 20) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.PRIMAL_CHAMPION_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.PRIMAL_CHAMPION'),
+          storageName: 'Primal Champion',
+        });
+      }
     }
 
     if (v.bard_level) {
