@@ -1454,7 +1454,7 @@ const setClassFeatures = () => {
           freetext: translate(language, 'CLASS_FEATURES.STUNNING_STRIKE_TEXT'),
           name: translate(language, 'CLASS_FEATURES.STUNNING_STRIKE'),
           saving_throw_ability: '@{wisdom_mod}',
-          saving_throw_failure: 'or be stunned until the end of your next turn',
+          saving_throw_failure: translate(language, 'CLASS_FEATURES.STUNNING_STRIKE_SAVING_THROW_FAILURE'),
           saving_throw_vs_ability: 'Constitution',
           storageName: 'Stunning Strike',
         });
