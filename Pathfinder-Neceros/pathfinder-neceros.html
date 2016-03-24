@@ -568,6 +568,7 @@
 							<span class="sheet-table-header">Swim</span>
 							<span class="sheet-table-header">Climb</span>
 							<span class="sheet-table-header">Misc</span>
+							<span class="sheet-table-header" title="run multiplier" >Mult</span>
                             <span class="sheet-table-header" title="The maximum distance that the character can run in a straight line during your turn">Run</span>
 						</div>
 						<div class="sheet-table-row">
@@ -577,6 +578,7 @@
 							<span class="sheet-table-data sheet-center"><input style="width:100%;" title="@{speed-swim}" type="number" name="attr_speed-swim" value="0" step="5" /></span>
 							<span class="sheet-table-data sheet-center"><input style="width:100%;" title="@{speed-climb}" type="number" name="attr_speed-climb" value="0" step="5" /></span>
 							<span class="sheet-table-data sheet-center"><input style="width:100%;" title="@{speed-misc}" type="number" name="attr_speed-misc" value="0" step="5" /></span>
+							<span class="sheet-table-data sheet-center"><input style="width:100%;" title="@{speed-run-mult}" type="number" name="attr_run-mult" value="4" step="1" /></span>
                             <span class="sheet-table-data sheet-center"><input style="width:100%;" title="@{speed-run}" type="number" name="attr_speed-run" value="0" class="sheet-calc" readonly="readonly" /></span>
                         </div>
 						</div>
@@ -590,8 +592,14 @@
                 </span>
                 <span class="sheet-table-data sheet-center">&nbsp;</span>
                 <span class="sheet-table-data sheet-center">
-                    <textarea class="sheet-speed-notes" name="attr_speed-notes" title="@{speed-notes}" placeholder="Speed Notes"></textarea>
-                    <label class="sheet-center sheet-small-label"><b>Speed Notes</b></label>
+					<label class="sheet-center sheet-small-label" style="display:inline;"><b>Encumbrance:</b></label>
+					<select title="@{speed-source}" name="attr_speed-source" style="width:auto;display:inline;" >
+                        <option value="0" selected>&#8226;Armor, Shield &amp; Load</option>
+                        <option value="1">Armor &amp; Shield only</option>
+                        <option value="2">Load only</option>
+                        <option value="3">None</option>
+					</select>
+					
                 </span>
 			</div>
 
@@ -603,7 +611,10 @@
 					<label class="sheet-center sheet-small-label"><input type="checkbox" title="@{toggle_init_notes}" name="attr_toggle_init_notes" value="@{var_init_notes}" /><b title="Include initiative notes with roll."> Initiative Notes</b></label>
 				</span>
                 <span class="sheet-table-data sheet-center">&nbsp;</span>
-                <span class="sheet-table-data sheet-center">&nbsp;</span>
+                <span class="sheet-table-data sheet-center">
+                    <textarea class="sheet-speed-notes" name="attr_speed-notes" title="@{speed-notes}" placeholder="Speed Notes"></textarea>
+                    <label class="sheet-center sheet-small-label"><b>Speed Notes</b></label>
+				</span>
 			</div>
 		</div>
 		<br>
@@ -13702,7 +13713,7 @@ var SWUtils = SWUtils || (function () {
 var PFSheet = PFSheet || (function () {
 	'use strict';
 
-	var version = 0.42,
+	var version = 0.43,
 	pfDebug = false,
 
 	/****************************** UTILITIES ************************************/
@@ -14190,72 +14201,86 @@ var PFSheet = PFSheet || (function () {
      *
      */
     updateModifiedSpeed = function () {
-        var attribList = ["current-load", "speed-base", "speed-modified", "speed-run", "load-heavy", "carried-total", "race"];
+        var attribList = ["current-load", "speed-base", "speed-modified", "speed-run", "load-heavy", "carried-total", "race", "speed-source", "run-mult"];
         defenseArmorShieldRows.forEach(function (row) {
             attribList.push(row + "-equipped");
             attribList.push(row + "-type");
 		});
 		getAttrs(attribList, function (v) {
-            	var currMod = parseInt(v["speed-modified"], 10) || 0,
-				currRun = parseInt(v["speed-run"], 10) || 0,
-				load = parseInt(v["current-load"], 10) || 0,
-				base = parseInt(v["speed-base"], 10) || 0,
-				heavy = parseInt(v["load-heavy"], 10) || 0,
-				carried = parseInt(v["carried-total"], 10) || 0;
-            	//TAS.debug("speed-modified=" + currMod + ", speed-run=" + currRun + ", current-load=" + load + ", speed-base=" + base + ", load-heavy=" + heavy + ", carried-total=" + carried);
+			var currMod = parseInt(v["speed-modified"], 10) || 0,
+			currRun = parseInt(v["speed-run"], 10) || 0,
+			load = parseInt(v["current-load"], 10) || 0,
+			base = parseInt(v["speed-base"], 10) || 0,
+			heavy = parseInt(v["load-heavy"], 10) || 0,
+			carried = parseInt(v["carried-total"], 10) || 0,
+			speedDropdown = parseInt(v["speed-source"],10) || 0,
+			origRunMult = parseInt(v["run-mult"],10),
+			newSpeed, newLoadSpeed, newArmorSpeed, newRun, runMult,
+			isDwarf, inHeavy, inMedium;
+			//TAS.debug("speed-modified=" + currMod + ", speed-run=" + currRun + ", current-load=" + load + ", speed-base=" + base + ", load-heavy=" + heavy + ", carried-total=" + carried);
+			if (isNaN(origRunMult)) { origRunMult=4; }
+			runMult = origRunMult;
+        	// #0: Armor, Shield & Load
+        	// #1: Armor & Shield only
+        	// #2: Load only
+        	// #3: None		
+			if (speedDropdown === 3) {
+				newSpeed = base;
+			} else {
+				if (speedDropdown === 0 || speedDropdown === 2) {
+					if (load > 0) { //Medium Or Heavy load
+						if (carried > heavy) {
+							newLoadSpeed = 5;
+							newRun = 5;
+							runMult = 0;
+						} else {
+							if (base <= 5) { newLoadSpeed = 5; }
+							else if (base % 15 == 0) { newLoadSpeed = base * 2 / 3; }
+							else if ((base + 5) % 15 == 0) { newLoadSpeed = (base + 5) * 2 / 3; }
+							else { newLoadSpeed = ((base + 10) * 2 / 3) - 5; }
 
-            	var newLoadSpeed, newArmorSpeed, newRun, runMult = 4;
-            	if (load > 0) { //Medium Or Heavy load
-            		if (carried > heavy) {
-            			newLoadSpeed = 5;
-            			newRun = 5;
-            			runMult = 0;
-            		} else {
-            			if (base <= 5) { newLoadSpeed = 5; }
-            			else if (base % 15 == 0) { newLoadSpeed = base * 2 / 3; }
-            			else if ((base + 5) % 15 == 0) { newLoadSpeed = (base + 5) * 2 / 3; }
-            			else { newLoadSpeed = ((base + 10) * 2 / 3) - 5; }
+							if (load > 1) { runMult -=1; } //Heavy load
+						}
+					} else { //Light load
+						newLoadSpeed = base;
+					}
+				}
+				//TAS.debug("newLoadSpeed=" + newLoadSpeed + ", newRun=" + newRun + ", runMult=" + runMult);
 
-            			if (load > 1) { runMult = 3; } //Heavy load
-            		}
-            	} else { //Light load
-            		newLoadSpeed = base;
-            		runMult = 4;
-            	}
-            	//TAS.debug("newLoadSpeed=" + newLoadSpeed + ", newRun=" + newRun + ", runMult=" + runMult);
+				//TAS.debug("race=" + v.race + ", armor-type=" + v["armor-type"] + ", armor-equipped=" + v["armor-equipped"] +
+				//            ", armor2-type=" + v["armor2-type"] + ", armor2-equipped=" + v["armor2-equipped"] + 
+				//            ", armor3-type=" + v["armor3-type"] + ", armor3-equipped=" + v["armor3-equipped"]);
+				if (speedDropdown === 0 || speedDropdown === 1) {
+					isDwarf = typeof v.race === "undefined" ? false : v.race.toLowerCase().indexOf("dwarf") >= 0;
+					inHeavy = (v["armor-type"] == "Heavy" && (v["armor-equipped"] == "1" || typeof v["armor-equipped"] === "undefined")) ||
+						(v["armor2-type"] == "Heavy" && (v["armor2-equipped"] == "1" || typeof v["armor2-equipped"] === "undefined")) ||
+						(v["armor3-type"] == "Heavy" && (v["armor3-equipped"] == "1" || typeof v["armor3-equipped"] === "undefined"));
+					inMedium = (v["armor-type"] == "Medium" && (v["armor-equipped"] == "1" || v["armor-equipped"] === "undefined")) ||
+						(v["armor2-type"] == "Medium" && (v["armor2-equipped"] == "1" || typeof v["armor2-equipped"] === "undefined")) ||
+						(v["armor3-type"] == "Medium" && (v["armor3-equipped"] == "1" || typeof v["armor3-equipped"] === "undefined"));
+					//TAS.debug("inHeavy=" + inHeavy + ", inMedium=" + inMedium + ", isDwarf=" + isDwarf);
+					if (inHeavy && runMult === origRunMult ) { runMult -= 1; } // Max x3 run in heavy armor
+					if (!isDwarf && (inHeavy || inMedium)) {
+						if (base <= 5) { newArmorSpeed = 5; }
+						else if (base % 15 == 0) { newArmorSpeed = base * 2 / 3; }
+						else if ((base + 5) % 15 == 0) { newArmorSpeed = (base + 5) * 2 / 3; }
+						else { newArmorSpeed = ((base + 10) * 2 / 3) - 5; }
+					} else {
+						newArmorSpeed = base;
+					}
+				}
+				//TAS.debug("newArmorSpeed=" + newArmorSpeed + ", runMult=" + runMult);
+				newSpeed = Math.min(newLoadSpeed, newArmorSpeed);
+				//TAS.debug("newSpeed=" + newSpeed + ", runMult=" + runMult);
+			}
+			
+			if (runMult > 0) { newRun = newSpeed * runMult; }
+			//TAS.debug("newRun=" + newRun);
 
-            	//TAS.debug("race=" + v.race + ", armor-type=" + v["armor-type"] + ", armor-equipped=" + v["armor-equipped"] +
-            	//            ", armor2-type=" + v["armor2-type"] + ", armor2-equipped=" + v["armor2-equipped"] + 
-            	//            ", armor3-type=" + v["armor3-type"] + ", armor3-equipped=" + v["armor3-equipped"]);
-            	var isDwarf = typeof v.race === "undefined" ? false : v.race.toLowerCase().indexOf("dwarf") >= 0;
-            	var inHeavy = (v["armor-type"] == "Heavy" && (v["armor-equipped"] == "1" || typeof v["armor-equipped"] === "undefined")) ||
-					(v["armor2-type"] == "Heavy" && (v["armor2-equipped"] == "1" || typeof v["armor2-equipped"] === "undefined")) ||
-					(v["armor3-type"] == "Heavy" && (v["armor3-equipped"] == "1" || typeof v["armor3-equipped"] === "undefined"));
-            	var inMedium = (v["armor-type"] == "Medium" && (v["armor-equipped"] == "1" || v["armor-equipped"] === "undefined")) ||
-					(v["armor2-type"] == "Medium" && (v["armor2-equipped"] == "1" || typeof v["armor2-equipped"] === "undefined")) ||
-					(v["armor3-type"] == "Medium" && (v["armor3-equipped"] == "1" || typeof v["armor3-equipped"] === "undefined"));
-            	//TAS.debug("inHeavy=" + inHeavy + ", inMedium=" + inMedium + ", isDwarf=" + isDwarf);
-			if (inHeavy && runMult > 3) { runMult = 3; } // Max x3 run in heavy armor
-            	if (!isDwarf && (inHeavy || inMedium)) {
-            		if (base <= 5) { newArmorSpeed = 5; }
-            		else if (base % 15 == 0) { newArmorSpeed = base * 2 / 3; }
-            		else if ((base + 5) % 15 == 0) { newArmorSpeed = (base + 5) * 2 / 3; }
-            		else { newArmorSpeed = ((base + 10) * 2 / 3) - 5; }
-            	} else {
-            		newArmorSpeed = base;
-            	}
-            	//TAS.debug("newArmorSpeed=" + newArmorSpeed + ", runMult=" + runMult);
-
-            	var newSpeed = Math.min(newLoadSpeed, newArmorSpeed);
-            	//TAS.debug("newSpeed=" + newSpeed + ", runMult=" + runMult);
-
-            	if (runMult > 0) { newRun = newSpeed * runMult; }
-            	//TAS.debug("newRun=" + newRun);
-
-            	if (currMod !== newSpeed) { setAttrs({ "speed-modified": newSpeed }); }
-            	if (currRun !== newRun) { setAttrs({ "speed-run": newRun }); }
-            });
-    },
+			if (currMod !== newSpeed) { setAttrs({ "speed-modified": newSpeed }); }
+			if (currRun !== newRun) { setAttrs({ "speed-run": newRun }); }
+		});
+	},
 
     /* updateGrapple
     * Ensures Grapple and Pin are mutually exclusive
@@ -16858,7 +16883,7 @@ on("change:init-ability-mod change:init-trait change:init-misc",
 );
 
 //speed
-on("change:current-load change:speed-base change:load-heavy change:carried-total change:race change:armor-equipped change:armor2-equipped change:armor3-equipped change:armor-type change:armor2-type change:armor3-type",
+on("change:current-load change:speed-base change:load-heavy change:carried-total change:race change:armor-equipped change:armor2-equipped change:armor3-equipped change:armor-type change:armor2-type change:armor3-type change:speed-source change:run-mult",
 	TAS.callback(function eventUpdateModifiedSpeed(eventInfo) {
 		TAS.debug("caught " + eventInfo.sourceAttribute + " event");
 		PFSheet.updateModifiedSpeed();
