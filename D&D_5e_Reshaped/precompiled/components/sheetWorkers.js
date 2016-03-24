@@ -3082,6 +3082,10 @@ const updateSpell = (rowId) => {
       collectionArray.push(`${repeatingString}duration`);
       collectionArray.push(`${repeatingString}concentration`);
       collectionArray.push(`${repeatingString}concentration_text`);
+      collectionArray.push(`${repeatingString}ritual`);
+      collectionArray.push(`${repeatingString}ritual_show`);
+      collectionArray.push(`${repeatingString}materials`);
+      collectionArray.push(`${repeatingString}materials_show`);
     }
 
     getAttrs(collectionArray, (v) => {
@@ -3099,12 +3103,26 @@ const updateSpell = (rowId) => {
 
         const concentration = v[`${repeatingString}concentration`];
         if (concentration === 'Yes') {
+          finalSetAttrs[`${repeatingString}concentration_show`] = 1;
           finalSetAttrs[`${repeatingString}concentration_text`] = 'Concentration, ';
-        } else {
+        } else if (!isUndefined(v[`${repeatingString}concentration_text`])) {
           finalSetAttrs[`${repeatingString}concentration_text`] = '';
+          finalSetAttrs[`${repeatingString}concentration_show`] = 0;
         }
         if (v.duration) {
           finalSetAttrs.duration = lowercaseWords(v.duration);
+        }
+        const ritual = v[`${repeatingString}ritual`];
+        if (ritual === 'Yes') {
+          finalSetAttrs[`${repeatingString}ritual_show`] = 1;
+        } else if (!isUndefined(v[`${repeatingString}ritual_show`])) {
+          finalSetAttrs[`${repeatingString}ritual_show`] = 0;
+        }
+        const materials = v[`${repeatingString}materials`];
+        if (!isUndefined(materials) && materials !== '') {
+          finalSetAttrs[`${repeatingString}materials_show`] = 1;
+        } else if (!isUndefined(v[`${repeatingString}materials_show`])) {
+          finalSetAttrs[`${repeatingString}materials_show`] = 0;
         }
 
         const spellComponents = v[`${repeatingString}components`];
@@ -4675,6 +4693,49 @@ const extasToExtrasFix = (repeatingItem) => {
   });
 };
 
+
+
+const importData = () => {
+  getAttrs(['import_data'], v => {
+    if (v.import_data) {
+      const finalSetAttrs = {};
+      const importObject = JSON.parse(v.import_data);
+
+      if (importObject.npc) {
+        for (const prop in importObject.npc) {
+          if (importObject.npc.hasOwnProperty(prop)) {
+            finalSetAttrs[prop] = importObject.npc[prop];
+          }
+        }
+      }
+      if (importObject.spells) {
+        importObject.spells.forEach(spell => {
+          const newRowId = generateRowID();
+          const repeatingString = `repeating_spell_${newRowId}_`;
+          for (const prop in spell) {
+            if (spell.hasOwnProperty(prop)) {
+              finalSetAttrs[`${repeatingString}${prop}`] = spell[prop];
+            }
+          }
+        });
+      }
+      finalSetAttrs.import_data = '';
+      finalSetAttrs.import_data_present = 'off';
+      setFinalAttrs(v, finalSetAttrs);
+    }
+  });
+};
+
+const deleteImportData = () => {
+  setFinalAttrs({}, {
+    import_data: '',
+    import_data_present: 'off',
+  });
+};
+
+on('change:accept_import', importData);
+on('change:reject_import', deleteImportData);
+
 const sheetOpened = () => {
   const collectionArray = ['version', 'strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma', 'import_data'];
   const finalSetAttrs = {};
@@ -4814,6 +4875,7 @@ const sheetOpened = () => {
     }
     if (versionCompare(version, '2.2.19') < 0) {
       updateAbilityModifiers();
+      updateSpell();
     }
 
     if (!version || version !== currentVersion) {
@@ -4823,48 +4885,6 @@ const sheetOpened = () => {
     setFinalAttrs(v, finalSetAttrs);
   });
 };
-
-const importData = () => {
-  getAttrs(['import_data'], v => {
-    if (v.import_data) {
-      const finalSetAttrs = {};
-      const importObject = JSON.parse(v.import_data);
-
-      if (importObject.npc) {
-        for (const prop in importObject.npc) {
-          if (importObject.npc.hasOwnProperty(prop)) {
-            finalSetAttrs[prop] = importObject.npc[prop];
-          }
-        }
-      }
-      if (importObject.spells) {
-        importObject.spells.forEach(spell => {
-          const newRowId = generateRowID();
-          const repeatingString = `repeating_spell_${newRowId}_`;
-          for (const prop in spell) {
-            if (spell.hasOwnProperty(prop)) {
-              finalSetAttrs[`${repeatingString}${prop}`] = spell[prop];
-            }
-          }
-        });
-      }
-      finalSetAttrs.import_data = '';
-      finalSetAttrs.import_data_present = 'off';
-      setFinalAttrs(v, finalSetAttrs);
-    }
-  });
-};
-
-const deleteImportData = () => {
-  setFinalAttrs({}, {
-    import_data: '',
-    import_data_present: 'off',
-  });
-};
-
-on('change:accept_import', importData);
-on('change:reject_import', deleteImportData);
-
 
 on('sheet:opened', () => {
   sheetOpened();
