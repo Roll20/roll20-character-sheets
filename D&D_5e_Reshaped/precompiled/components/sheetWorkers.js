@@ -1,6 +1,6 @@
 'use strict';
 
-const currentVersion = '2.2.18';
+const currentVersion = '2.2.19';
 let TRANSLATIONS;
 const SKILLS = {
   acrobatics: 'dexterity',
@@ -1103,7 +1103,7 @@ const setClassFeatures = () => {
 
       if (v.barbarian_level >= 2) {
         setClassFeature({
-          freetext: translate(language, 'CLASS_FEATURES.RECKLESS_ATTACK'),
+          freetext: translate(language, 'CLASS_FEATURES.RECKLESS_ATTACK_TEXT'),
           name: translate(language, 'CLASS_FEATURES.RECKLESS_ATTACK'),
           storageName: 'Reckless Attack',
         });
