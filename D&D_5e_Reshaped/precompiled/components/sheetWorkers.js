@@ -1894,7 +1894,7 @@ const setClassFeatures = () => {
         });
       }
       if (v.warlock_level >= 20) {
-        setTrait({
+        setClassFeature({
           freetext: translate(language, 'CLASS_FEATURES.ELDRITCH_MASTER_TEXT'),
           name: translate(language, 'CLASS_FEATURES.ELDRITCH_MASTER'),
           recharge: 'Long Rest',
