@@ -429,9 +429,15 @@ const updateAbilityModifier = (ability) => {
   getAttrs(collectionArray, (v) => {
     const abilityScore = getIntValue(v[ability]);
     const abilityBonus = getIntValue(v[`${ability}_bonus`]);
+    const globalAbilityBonus = v.global_ability_bonus;
+    let abilityScoreCalc = abilityScore + abilityBonus;
+
+    if (!isNaN(globalAbilityBonus)) {
+      abilityScoreCalc += getIntValue(globalAbilityBonus);
+    }
+
     const abilityCheckBonus = getIntValue(v[`${ability}_check_bonus`]);
-    const globalAbilityBonus = getIntValue(v.global_ability_bonus);
-    const abilityMod = getAbilityMod((abilityScore + abilityBonus + globalAbilityBonus));
+    const abilityMod = getAbilityMod(abilityScoreCalc);
 
     let abilityCheck = abilityMod;
     let abilityCheckFormula = `${abilityMod}[${firstThree(ability)} mod with bonus]`;
@@ -458,6 +464,7 @@ const updateAbilityModifier = (ability) => {
       abilityModWithSign = `+${abilityMod}`;
     }
 
+    finalSetAttrs[`${ability}_calculated`] = abilityScoreCalc;
     finalSetAttrs[`${ability}_mod`] = abilityMod;
     finalSetAttrs[`${ability}_mod_with_sign`] = abilityModWithSign;
     finalSetAttrs[`${ability}_check_mod`] = abilityCheck;
@@ -4804,6 +4811,9 @@ const sheetOpened = () => {
     if (versionCompare(version, '2.2.15') < 0) {
       updateAbilityChecksMacro();
       updatePreAndPostRoll();
+    }
+    if (versionCompare(version, '2.2.19') < 0) {
+      updateAbilityModifiers();
     }
 
     if (!version || version !== currentVersion) {
