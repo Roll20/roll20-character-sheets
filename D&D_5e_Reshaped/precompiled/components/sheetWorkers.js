@@ -1096,9 +1096,9 @@ const setClassFeatures = () => {
         finalSetAttrs.ac_unarmored_ability = '@{constitution_mod}';
       }
       setTrait({
-        freetext: translate(language, 'CLASS_FEATURES.UNARMORED_DEFENSE_TEXT'),
+        freetext: translate(language, 'CLASS_FEATURES.UNARMORED_DEFENSE_BARBARIAN_TEXT'),
         name: translate(language, 'CLASS_FEATURES.UNARMORED_DEFENSE'),
-        storageName: 'Unarmored Defense',
+        storageName: 'Unarmored Defense Barbarian',
       });
 
       if (v.barbarian_level >= 2) {
@@ -1388,6 +1388,14 @@ const setClassFeatures = () => {
     }
 
     if (v.monk_level) {
+      if (isUndefined(v.ac_unarmored_ability)) {
+        finalSetAttrs.ac_unarmored_ability = '@{wisdom_mod}';
+      }
+      setTrait({
+        freetext: translate(language, 'CLASS_FEATURES.UNARMORED_DEFENSE_MONK_TEXT'),
+        name: translate(language, 'CLASS_FEATURES.UNARMORED_DEFENSE'),
+        storageName: 'Unarmored Defense Monk',
+      });
       setTrait({
         freetext: translate(language, 'CLASS_FEATURES.MARTIAL_ARTS_TEXT'),
         name: translate(language, 'CLASS_FEATURES.MARTIAL_ARTS'),
@@ -1547,11 +1555,11 @@ const setClassFeatures = () => {
         });
         setClassFeature({
           damage: '(?{Spell Level|1|2|3|4+, 4} + 1)d8',
-          damage_type: 'radiant',
+          damage_type: translate(language, 'DAMAGE_TYPES.RADIANT'),
           freetext: translate(language, 'CLASS_FEATURES.DIVINE_SMITE_TEXT'),
           name: translate(language, 'CLASS_FEATURES.DIVINE_SMITE'),
           second_damage: 'd8',
-          second_damage_type: 'vs undead or fiend',
+          second_damage_type: translate(language, 'VS_FIEND_OR_UNDEAD.RADIANT'),
           storageName: 'Divine Smite',
         });
       }
