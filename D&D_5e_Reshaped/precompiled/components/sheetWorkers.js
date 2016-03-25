@@ -4792,7 +4792,9 @@ const sheetOpened = () => {
         setAbilities.charisma_mod = 0;
         setAbilities.charisma_mod_with_sign = '+0';
       }
-      setFinalAttrs(v, setAbilities);
+      setFinalAttrs(v, setAbilities, () => {
+        updateAbilityModifiers();
+      });
 
       if (!v.import_data) {
         finalSetAttrs.edit_mode = 'on';
