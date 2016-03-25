@@ -574,8 +574,12 @@ const setClassFeatureOrTrait = (repeatingItem, obj) => {
         }
       } else {
         for (const prop in obj) {
-          if (obj.hasOwnProperty(prop) && (isUndefined(v[`${repeatingString}${prop}`]) || calculatePercentDifference(v[`${repeatingString}${prop}`].length, obj[prop].length) < 10)) {
-            finalSetAttrs[`${repeatingString}${prop}`] = obj[prop];
+          if (obj.hasOwnProperty(prop)) {
+            if ((prop === 'name' || prop === 'freetext') && (isUndefined(v[`${repeatingString}${prop}`]) || calculatePercentDifference(v[`${repeatingString}${prop}`].length, obj[prop].length) < 10)) {
+              finalSetAttrs[`${repeatingString}${prop}`] = obj[prop];
+            } else if (v[`${repeatingString}${prop}`] !== obj[prop]) {
+              finalSetAttrs[`${repeatingString}${prop}`] = obj[prop];
+            }
           }
         }
         if (obj.saving_throw_ability || obj.saving_throw_bonus || obj.saving_throw_vs_ability) {
