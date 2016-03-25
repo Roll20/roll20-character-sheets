@@ -1512,6 +1512,7 @@ const setClassFeatures = () => {
         });
       }
       if (v.monk_level >= 14) {
+        finalSetAttrs.death_saving_throw_prof = '@{pb}';
         setTrait({
           freetext: translate(language, 'CLASS_FEATURES.DIAMOND_SOUL_TEXT'),
           name: translate(language, 'CLASS_FEATURES.DIAMOND_SOUL'),
