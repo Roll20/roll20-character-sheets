@@ -4386,7 +4386,7 @@ const updateAlignment = () => {
   const finalSetAttrs = {};
 
   getAttrs(collectionArray, (v) => {
-    if (v.alignment && v.is_npc) {
+    if (v.alignment && v.is_npc === '1') {
       finalSetAttrs.alignment = lowercaseWords(v.alignment);
     }
     setFinalAttrs(v, finalSetAttrs);
