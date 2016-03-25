@@ -574,7 +574,7 @@ const setClassFeatureOrTrait = (repeatingItem, obj) => {
         }
       } else {
         for (const prop in obj) {
-          if (obj.hasOwnProperty(prop) && v[`${repeatingString}${prop}`] !== obj[prop]) {
+          if (obj.hasOwnProperty(prop) && (isUndefined(v[`${repeatingString}${prop}`]) || calculatePercentDifference(v[`${repeatingString}${prop}`].length, obj[prop].length) < 10)) {
             finalSetAttrs[`${repeatingString}${prop}`] = obj[prop];
           }
         }
