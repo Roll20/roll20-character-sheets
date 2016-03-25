@@ -2887,7 +2887,7 @@ on('change:repeating_lairaction', (eventInfo) => {
 
 const updateAttack = (rowId) => {
   const repeatingItem = 'repeating_attack';
-  const collectionArray = ['pb', 'strength_mod', 'finesse_mod', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability'];
+  const collectionArray = ['pb', 'strength_mod', 'finesse_mod', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability', 'ammo_auto_use'];
   const finalSetAttrs = {};
 
   for (let i = 0; i < ABILITIES.length; i++) {
@@ -2911,6 +2911,7 @@ const updateAttack = (rowId) => {
       collectionArray.push(`${repeatingString}attack_bonus`);
       collectionArray.push(`${repeatingString}ammo_toggle_var`);
       collectionArray.push(`${repeatingString}ammo_field_name`);
+      collectionArray.push(`${repeatingString}ammo_used`);
       collectionArray.push(`${repeatingString}saving_throw_toggle`);
       collectionArray.push(`${repeatingString}saving_throw_ability`);
       collectionArray.push(`${repeatingString}saving_throw_bonus`);
@@ -2987,10 +2988,18 @@ const updateAttack = (rowId) => {
         updateAttackToggle(v, finalSetAttrs, repeatingString, attackOptions);
 
         const ammoName = v[`${repeatingString}ammo_field_name`];
+        const ammoUsed = getIntValue(v[`${repeatingString}ammo_used`], 1);
         if (!isUndefined(ammoName)) {
+          let ammoAutoUse;
+          if (v.ammo_auto_use === '@{ammo_auto_use_var}') {
+            ammoAutoUse = 1;
+          } else {
+            ammoAutoUse = 0 ;
+          }
+
           findAmmo(ammoName, (ammoQtyName) => {
             const setAmmo = {};
-            setAmmo[`${repeatingString}ammo_toggle_var`] = `{{ammo=[[${ammoQtyName}-@{ammo_auto_use}]]}} {{ammo_name=${ammoName}}}`;
+            setAmmo[`${repeatingString}ammo_toggle_var`] = `{{ammo=[[${ammoQtyName}-${ammoAutoUse * ammoUsed}]]}} {{ammo_name=${ammoName}}}`;
             setFinalAttrs(v, setAmmo);
           });
         }
@@ -3030,7 +3039,7 @@ on('change:repeating_attack:carried change:repeating_attack:weight remove:repeat
   ];
   sumRepeating(options, sumItems);
 });
-on('change:global_attack_bonus change:global_melee_attack_bonus change:global_ranged_attack_bonus change:global_damage_bonus change:global_melee_damage_bonus change:global_ranged_damage_bonus', () => {
+on('change:global_attack_bonus change:global_melee_attack_bonus change:global_ranged_attack_bonus change:global_damage_bonus change:global_melee_damage_bonus change:global_ranged_damage_bonus change:ammo_auto_use', () => {
   updateAttack();
   updateAction('action');
   updateAction('reaction');
