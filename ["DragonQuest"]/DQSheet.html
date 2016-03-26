@@ -784,6 +784,16 @@ on("change:repeating_spell:sprank", function() {
     });
 });
 
+/* Remove and place update into calculation if/when SC is calculated */
+
+on("change:repeating_spell:spmain", function() {
+    getAttrs(["repeating_spell_spmain"], function(obj) {
+        setAttrs({
+            "repeating_spell_sum-main": obj.repeating_spell_spmain
+        });
+    });
+});
+
 on("change:repeating_spell:sprg", function() {
     getAttrs(["repeating_spell_sprg"], function(obj) {
         setAttrs({
@@ -801,10 +811,10 @@ on("change:repeating_spell:spdur", function() {
 });
 
 on("change:repeating_spell:spresp change:repeating_spell:spresa", function() {
-    getAttrs(["repeating_spell_spresp","repeating_spell_spresa"], function() {
+    getAttrs(["repeating_spell_spresp","repeating_spell_spresa"], function(obj) {
         var res = "";
-        if (obj.repeating_spell_spresp == "on") { res += "P"; }
-        if (obj.repeating_spell_spresa == "on") { res += "A"; }
+        if (obj.repeating_spell_spresp == "P") { res += "P"; }
+        if (obj.repeating_spell_spresa == "A") { res += "A"; }
         if (res == "") { res = "N"; }
         setAttrs({
             "repeating_spells_sum-res": res
@@ -814,8 +824,11 @@ on("change:repeating_spell:spresp change:repeating_spell:spresa", function() {
 
 on("change:repeating_spell:sprit", function() {
     getAttrs(["repeating_spell_sprit"], function(obj) {
+        var rit = obj.repeating_spell_sprit;
+        if (rit == "on") { rit = "Y"; }
+        else {rit = "N"; }
         setAttrs({
-            "repeating_spell_sum-rit": obj.repeating_spell_sprit
+            "repeating_spell_sum-rit": rit
         });
     });
 });
@@ -834,7 +847,7 @@ on("change:repeating_spell:sprit", function() {
             <div class="sheet-stat"><span class="sheet-pictos">U</span><span name="attr_stat-height"></span></div>
             <div class="sheet-stat"><span class="sheet-pictos">a</span><span name="attr_stat-weight"></span></div>
             <div class="sheet-stat"><span class="sheet-pictos">\</span><span name="attr_stat-age"></span></div>
-            <div class="sheet-stat"><span class="sheet-pictos">k</span><span name="attr_stat-pb"></span></div>
+            <div class="sheet-stat"><span class="sheet-pictos">k</span><button class="sheet-btn" type="roll" value="&{template:default} {{name=Beauty Roll}} {{D100=[[1d100]]}} {{Physical Beauty=[[@{pb}]]}}}"><span name="attr_stat-pb"></span></button></div>
         </div>
         <div class="sheet-header">History</div>
         <div class="sheet-hsummary">
@@ -934,22 +947,22 @@ on("change:repeating_spell:sprit", function() {
                 <div class="sheet-prichars">
                     <ul>
                         <li>
-                            <span>Physical Strength (PS):</span>
+                            <button class="sheet-btn" type="roll" value="&{template:default} {{name=Strength Roll}} {{D100=[[1d100]]}} {{Physical Strength=[[@{ps}]]}} {{Mults = [[@{ps}*3]] | [[@{ps}/5]] }}">Physical Strength (PS):</button>
                             <input type="number" name="attr_ps" value="0" min="0"></li>
                         <li>
-                            <span>Manual Dexterity (MD):</span>
+                            <button class="sheet-btn" type="roll" value="&{template:default} {{name=Dexterity Roll}} {{D100=[[1d100]]}} {{Manual Dexterity=[[@{mdcurr}]]}}">Manual Dexterity (MD):</button>
                             <input type="number" name="attr_mdcurr" value="0" readonly> / <input type="number" name="attr_md" value="0" min="0"></li>
                         <li>
-                            <span>Agility (AG):</span>
+                            <button class="sheet-btn" type="roll" value="&{template:default} {{name=Agility Roll}} {{D100=[[1d100]]}} {{Agility=[[@{agcurr}]]}}">Agility (AG):</button>
                             <input type="number" name="attr_agcurr" readonly value="0"> / <input type="number" name="attr_ag" value="0" min="0"></li>
                         <li>
-                            <span>Magical Aptitude (MA):</span>
+                            <button class="sheet-btn" type="roll" value="&{template:default} {{name=Magic Aptitude Roll}} {{D100=[[1d100]]}} {{Magical Aptitude=[[@{ma}]]}}">Magical Aptitude (MA):</button>
                             <input type="number" name="attr_ma" value="0" min="0"></li>
                         <li>
-                            <span>Will Power (WP):</span>
+                            <button class="sheet-btn" type="roll" value="&{template:default} {{name=Will Power Roll}} {{D100=[[1d100]]}} {{Will Power=[[@{wp}]]}}">Will Power (WP):</button>
                             <input type="number" name="attr_wp" value="0" min="0"></li>
                         <li>
-                            <span>Perception (PC):</span>
+                            <button class="sheet-btn" type="roll" value="&{template:default} {{name=Perception Roll}} {{D100=[[1d100]]}} {{Perception=[[@{pc}]]}}">Perception (PC):</button>
                             <input type="number" name="attr_pc" value="0" min="0"></li>
                         <li>
                             <span>Initiative base:</span>
@@ -1011,7 +1024,8 @@ on("change:repeating_spell:sprit", function() {
                 <input class="sheet-options-flag" type="checkbox" name="attr_wuc-options-flag" checked>
                 <span class="sheet-flag-unchecked">W</span><span class="sheet-flag-checked">3</span>
                 <div class="sheet-wsummary">
-                    <span>Unarmed combat</span>
+                    <button class="sheet-btn" type="roll" value="&{template:default} {{name=Unarmed Combat}} {{D100=[[1d100]]}} {{SC=[[@{wuc-wsc}]]}} {{Damage D10 +  @{wuc-wdm}=[[1d10+@{wuc-wdm}]]}}">
+                    <span>Unarmed combat</span></button>
                     <span>MC</span>
                     <span>0</span>
                     <span name="attr_wuc-wsum-iv">0</span>
@@ -1096,7 +1110,8 @@ on("change:repeating_spell:sprit", function() {
                     <input class="sheet-options-flag" type="checkbox" name="attr_options-flag" checked>
                     <span class="sheet-flag-unchecked">W</span><span class="sheet-flag-checked">3</span>
                     <div class="sheet-wsummary">
-                        <span name="attr_wsum-name"></span>
+                        <button class="sheet-btn" type="roll" value="&{template:default} {{name=@{wname}}} {{D100=[[1d100]]}} {{SC=[[@{wsc}]]}} {{Damage D10 + @{wdm}=[[1d10+@{wdm}]]}}">
+                        <span name="attr_wsum-name"></span></button>
                         <span name="attr_wsum-use"></span>
                         <span name="attr_wsum-range"></span>
                         <span name="attr_wsum-iv"></span>
@@ -1424,11 +1439,12 @@ on("change:repeating_spell:sprit", function() {
                         <input class="sheet-options-flag" type="checkbox" name="attr_options-flag" checked>
                         <span class="sheet-flag-unchecked">W</span><span class="sheet-flag-checked">3</span>
                         <div class="sheet-summary">
-                            <span name="attr_sum-name"></span>
+                            <button class="sheet-btn" type="roll" value="&{template:default} {{name=@{spname}}} {{D100=[[1d100]]}} {{SC=[[@{spmain}]]}}">
+                            <span name="attr_sum-name"></span></button>
                             <span name="attr_sum-type"></span>
                             <span name="attr_sum-rank"></span>
                             <span name="attr_sum-main"></span>
-                            <span name="attr_sum-range"></span>
+                            <span name="attr_sum-rg"></span>
                             <span name="attr_sum-dur"></span>
                             <span name="attr_sum-res"></span>
                             <span name="attr_sum-rit"></span>
@@ -1444,7 +1460,7 @@ on("change:repeating_spell:sprit", function() {
                                         <span>Rank (RK):</span>
                                         <input type="number" name="attr_sprank" value="0" min="0">
                                     </li>
-                                    <li><span>Main % (SC):</span><input type="number" name="attr_spmain" value="0" readonly></li>
+                                    <li><span>Main % (SC):</span><input type="number" name="attr_spmain" value="0"></li>
                                     <li>
                                         <span>Effects:</span>
                                         <textarea name="attr_spdesc" placeholder="Sees the caster as true friend"></textarea>
@@ -1501,13 +1517,14 @@ on("change:repeating_spell:sprit", function() {
         </div>
         <div class="sheet-skills">
             <div class="sheet-header">Skills</div>
-            <div class="sheet-sklabels">
+            <div class="sheet-skheaders">
                 <span>Skill</span>
                 <span>Notes</span>
                 <span>Rank</span>
             </div>
             <fieldset class="repeating_skill">
                 <div class="sheet-skdata">
+                    <button class="sheet-btn" type="roll" value="&{template:default} {{name=@{sktype}}} {{D100=[[1d100]]}}"></button>
                     <select name="attr_sktype">
                         <option value="adventuring">Adventuring</option>
                         <option value="language">Language</option>
