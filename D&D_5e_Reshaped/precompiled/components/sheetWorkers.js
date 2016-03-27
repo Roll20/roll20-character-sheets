@@ -1977,7 +1977,7 @@ const getPB = (level, challenge) => {
   let pb = 2;
 
   level = getIntValue(level);
-  if (challenge < 1) {
+  if (challenge === '1/8' || challenge === '1/4' || challenge === '1/2') {
     challenge = 1;
   } else {
     getIntValue(challenge);
