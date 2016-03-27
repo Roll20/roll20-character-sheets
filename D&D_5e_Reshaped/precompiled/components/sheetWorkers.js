@@ -523,8 +523,8 @@ const setClassFeatureOrTrait = (repeatingItem, obj) => {
   }
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}storage_name`);
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}uses`);
@@ -545,11 +545,11 @@ const setClassFeatureOrTrait = (repeatingItem, obj) => {
 
     getAttrs(collectionArray, (v) => {
       let repeatingString;
-      for (let j = 0; j < ids.length; j++) {
-        repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (id of ids) {
+        repeatingString = `${repeatingItem}_${id}_`;
 
         if (v[`${repeatingString}storage_name`] === obj.storageName) {
-          itemId = ids[j];
+          itemId = id;
         }
       }
       if (!itemId) {
@@ -1777,8 +1777,8 @@ const updateLevels = (changedField) => {
   }
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}level`);
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}custom_name`);
@@ -1792,8 +1792,8 @@ const updateLevels = (changedField) => {
         finalSetAttrs[`${CLASSES[i]}_level`] = 0;
       }
 
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
 
         let className = v[`${repeatingString}name`];
         let classLevel = v[`${repeatingString}level`];
@@ -2013,8 +2013,8 @@ const sumRepeating = (options, sumItems) => {
   const finalSetAttrs = {};
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(repeatingString + options.toggle);
       if (options.qty) {
         collectionArray.push(repeatingString + options.qty);
@@ -2047,8 +2047,8 @@ const sumRepeating = (options, sumItems) => {
         dexMod = getIntValue(v.dexterity_mod);
       }
 
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
         const qty = getIntValue(v[repeatingString + options.qty], 1);
 
         for (let x = 0; x < sumItems.length; x++) {
@@ -2133,15 +2133,15 @@ const updateArmor = (rowId) => {
       ids = [];
       ids.push(rowId);
     }
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}parsed`);
       collectionArray.push(`${repeatingString}modifiers`);
     }
 
     getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
 
         if (isUndefined(v[`${repeatingString}parsed`]) || v[`${repeatingString}parsed`].indexOf('acBonus') === -1) {
           const armorModifiers = v[`${repeatingString}modifiers`];
@@ -2204,14 +2204,14 @@ const updateEquipment = (rowId) => {
       ids = [];
       ids.push(rowId);
     }
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}content`);
     }
 
     getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
 
         if (isUndefined(v[`${repeatingString}parsed`]) || v[`${repeatingString}parsed`].indexOf('content') === -1) {
           let content = v[`${repeatingString}content`];
@@ -2716,15 +2716,15 @@ const findAmmo = (name, callback) => {
   const collectionArray = [];
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}qty`);
     }
 
     getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
         if (v[`${repeatingString}name`] === name) {
           callback(`@{${repeatingString}qty}`);
         }
@@ -2751,8 +2751,8 @@ const updateAction = (type, rowId) => {
       ids = [];
       ids.push(rowId);
     }
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}type`);
       collectionArray.push(`${repeatingString}roll_toggle`);
@@ -2791,8 +2791,8 @@ const updateAction = (type, rowId) => {
     }
 
     getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
 
         const actionName = v[`${repeatingString}name`];
         if (!isUndefined(actionName)) {
@@ -2896,8 +2896,8 @@ const updateAttack = (rowId) => {
       ids = [];
       ids.push(rowId);
     }
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}type`);
       collectionArray.push(`${repeatingString}roll_toggle`);
@@ -2933,8 +2933,8 @@ const updateAttack = (rowId) => {
     }
 
     getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (id of ids) {
+        const repeatingString = `${repeatingItem}_${ids}_`;
 
         const attackName = v[`${repeatingString}name`];
         if (isUndefined(attackName)) {
@@ -3058,8 +3058,8 @@ const updateSpell = (rowId) => {
       ids = [];
       ids.push(rowId);
     }
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}type`);
       collectionArray.push(`${repeatingString}roll_toggle`);
@@ -3115,8 +3115,8 @@ const updateSpell = (rowId) => {
     }
 
     getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
 
         const spellLevel = getIntValue(v[`${repeatingString}spell_level`]);
         if (spellLevel === 0) {
@@ -3222,8 +3222,8 @@ const updateClassFeature = (rowId) => {
       ids = [];
       ids.push(rowId);
     }
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}saving_throw_toggle`);
       collectionArray.push(`${repeatingString}saving_throw_ability`);
@@ -3252,8 +3252,8 @@ const updateClassFeature = (rowId) => {
     }
 
     getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
 
         const damageOptions = {
           type: 'attack',
@@ -3281,14 +3281,14 @@ const updateClassFeatureToggleToNewVer = () => {
   const finalSetAttrs = {};
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}heal_toggle`);
     }
 
     getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
 
         const healToggled = v[`${repeatingString}heal_toggle`];
         if (!isUndefined(healToggled)) {
@@ -3336,18 +3336,18 @@ const updateAbilityChecksMacro = () => {
   }
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}ability`);
     }
 
     getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
         finalSetAttrs.ability_checks_query_var += `|${v[`${repeatingString}name`]}, {{title=${v[`${repeatingString}name`]} (${capitalize(getAbilityShortName(v[`${repeatingString}ability`]))})&#125;&#125; {{roll1=[[@{preroll}d20@{postroll}@{d20_mod} + @{${repeatingString}formula}]]&#125;&#125; @{roll_setting}@{d20_mod} + @{${repeatingString}formula}]]&#125;&#125;`;
         finalSetAttrs.ability_checks_macro_var += ', ';
-        finalSetAttrs.ability_checks_macro_var += `[${v[`${repeatingString}name`]}](~repeating_skill_${ids[j]}_skill)`;
+        finalSetAttrs.ability_checks_macro_var += `[${v[`${repeatingString}name`]}](~repeating_skill_${id}_skill)`;
       }
       finalSetAttrs.ability_checks_query_var += '}';
       setFinalAttrs(v, finalSetAttrs);
@@ -3396,8 +3396,8 @@ const updateSkill = (rowId) => {
       ids = [];
       ids.push(rowId);
     }
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}proficiency`);
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}ability`);
@@ -3409,8 +3409,8 @@ const updateSkill = (rowId) => {
     }
 
     getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
 
         const skillName = v[`${repeatingString}name`];
         if (isUndefined(skillName)) {
@@ -3505,8 +3505,8 @@ const updateSkillsFromSRD = () => {
   const finalSetAttrs = {};
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}ability`);
     }
@@ -3519,10 +3519,10 @@ const updateSkillsFromSRD = () => {
       let repeatingString;
 
       if (!isUndefined(skillsFromSRD)) {
-        for (let j = 0; j < ids.length; j++) {
-          repeatingString = `${repeatingItem}_${ids[j]}_`;
+        for (id of ids) {
+          repeatingString = `${repeatingItem}_${id}_`;
           skillName = v[`${repeatingString}name`];
-          skillsObj[skillName] = ids[j];
+          skillsObj[skillName] = id;
         }
 
         const re = /(\w+)\s?((?:\+|\-)\d+)/gi;
@@ -3691,8 +3691,8 @@ const updateAttachers = () => {
   }
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}freetext`);
       collectionArray.push(`${repeatingString}freeform`);
@@ -3703,8 +3703,8 @@ const updateAttachers = () => {
       }
     }
     getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
 
         for (let x = 0; x < itemsToPush.length; x++) {
           const attacher = v[`${repeatingString}${itemsToPush[x]}_attacher`];
@@ -4046,15 +4046,15 @@ const displayTextForTraits = () => {
   const finalSetAttrs = {};
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}display_text`);
       collectionArray.push(`${repeatingString}freetext`);
     }
 
     getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
 
         if (isUndefined(v.display_text)) {
           finalSetAttrs[`${repeatingString}display_text`] = v[`${repeatingString}freetext`];
@@ -4138,8 +4138,8 @@ const parseAction = (rowId, type) => {
       ids = [];
       ids.push(rowId);
     }
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}freetext`);
     }
@@ -4156,8 +4156,8 @@ const parseAction = (rowId, type) => {
       const spellMods = [intMod, wisMod, chaMod];
       const abilityMods = [strMod, dexMod, conMod, intMod, wisMod, chaMod];
 
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
 
         let rangedAttack = false;
         let spellAttack = false;
@@ -4557,8 +4557,8 @@ const resourcesToClassFeatures = () => {
 
   let repeatingString;
   getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (id of ids) {
+      repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}uses`);
       collectionArray.push(`${repeatingString}uses_max`);
@@ -4570,8 +4570,8 @@ const resourcesToClassFeatures = () => {
     }
 
     getAttrs(collectionArray, (v) => {
-      for (let i = 0; i < ids.length; i++) {
-        repeatingString = `${repeatingItem}_${ids[i]}_`;
+      for (id of ids) {
+        repeatingString = `${repeatingItem}_${id}_`;
         const newRowId = generateRowID();
         const newRepeatingString = `${newRepeatingItem}_${newRowId}_`;
 
@@ -4597,8 +4597,8 @@ const setSkillStorageNames = () => {
   let repeatingString;
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (id of ids) {
+      repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}storage_name`);
       collectionArray.push(`${repeatingString}name`);
     }
@@ -4606,8 +4606,8 @@ const setSkillStorageNames = () => {
     getAttrs(collectionArray, (v) => {
       const language = v.lang;
       if (!language || language === 'en') {
-        for (let i = 0; i < ids.length; i++) {
-          repeatingString = `${repeatingItem}_${ids[i]}_`;
+        for (id of ids) {
+          repeatingString = `${repeatingItem}_${id}_`;
 
           const name = v[`${repeatingString}name`];
           if (!isUndefined(name)) {
@@ -4630,8 +4630,8 @@ const generateSkills = () => {
   let repeatingString;
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (id of ids) {
+      repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}storage_name`);
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}ability`);
@@ -4645,8 +4645,8 @@ const generateSkills = () => {
       for (const prop in SKILLS) {
         if (SKILLS.hasOwnProperty(prop)) {
           let skillId;
-          if (ids[x]) {
-            skillId = ids[x];
+          if (id) {
+            skillId = id;
           } else {
             skillId = generateRowID();
           }
@@ -4690,14 +4690,14 @@ const extasToExtrasFix = (repeatingItem) => {
   const finalSetAttrs = {};
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}extas_toggle`);
     }
 
     getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
 
         const extrasToggle = v[`${repeatingString}extas_toggle`];
         if (!isUndefined(extrasToggle)) {
