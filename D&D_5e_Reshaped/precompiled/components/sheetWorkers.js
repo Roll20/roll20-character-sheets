@@ -199,10 +199,10 @@ const parseAttackComponent = (v, repeatingString, finalSetAttrs, options) => {
     }
 
     if (options.addCastingModifier) {
-      if (exists(v[`${repeatingString}damage`]) && isUndefined(v[`${repeatingString}damage_ability`])) {
+      if (!isUndefined(v[`${repeatingString}damage`]) && isUndefined(v[`${repeatingString}damage_ability`])) {
         finalSetAttrs[`${repeatingString}damage_ability`] = v.default_ability;
       }
-      if (exists(v[`${repeatingString}heal`]) && isUndefined(v[`${repeatingString}heal_ability`])) {
+      if (!isUndefined(v[`${repeatingString}heal`]) && isUndefined(v[`${repeatingString}heal_ability`])) {
         finalSetAttrs[`${repeatingString}heal_ability`] = v.default_ability;
       }
     }
