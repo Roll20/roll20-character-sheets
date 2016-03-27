@@ -300,9 +300,6 @@ const numberWithCommas = (x) => {
   parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   return parts.join('.');
 };
-const lowercaseWords = (string) => {
-  return string.toLowerCase();
-};
 const findClosest = (array, goal) => {
   return array.reduce((prev, curr) => {
     return (Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev);
@@ -391,9 +388,18 @@ const lowercaseDamageTypes = (string) => {
     .replace('Silvered', 'silvered')
     .replace('Adamantine', 'adamantine');
 };
+const showSign = (value) => {
+  if (value >= 0) {
+    value = `+${value}`;
+  }
+  return value;
+};
 
 on('change:cp change:sp change:ep change:gp change:pp', () => {
-  getAttrs(['cp', 'copper_per_gold', 'sp', 'silver_per_gold', 'ep', 'electrum_per_gold', 'gp', 'pp', 'platinum_per_gold'], (v) => {
+  const collectionArray = ['cp', 'copper_per_gold', 'sp', 'silver_per_gold', 'ep', 'electrum_per_gold', 'gp', 'pp', 'platinum_per_gold'];
+  const finalSetAttrs = {};
+
+  getAttrs(collectionArray, (v) => {
     const copperPieces = getFloatValue(v.cp);
     const silverPieces = getFloatValue(v.sp);
     const electrumPieces = getFloatValue(v.ep);
@@ -403,12 +409,11 @@ on('change:cp change:sp change:ep change:gp change:pp', () => {
     const silverPerGold = getFloatValue(v.silver_per_gold, 10);
     const electrumPerGold = getFloatValue(v.electrum_per_gold, 2);
     const platinumPerGold = getFloatValue(v.platinum_per_gold, 10);
-    const totalGold = (copperPieces / copperPerGold) + (silverPieces / silverPerGold) + (electrumPieces / electrumPerGold) + goldPieces + (platinumPieces * platinumPerGold);
-    const coinWeight = (copperPieces + silverPieces + electrumPieces + goldPieces + platinumPieces) / 50;
-    setAttrs({
-      total_gp: totalGold.toFixed(2),
-      weight_coinage: coinWeight,
-    });
+
+    finalSetAttrs.total_gp = ((copperPieces / copperPerGold) + (silverPieces / silverPerGold) + (electrumPieces / electrumPerGold) + goldPieces + (platinumPieces * platinumPerGold)).toFixed(2);
+    finalSetAttrs.weight_coinage = (copperPieces + silverPieces + electrumPieces + goldPieces + platinumPieces) / 50;
+
+    setFinalAttrs(v, finalSetAttrs);
   });
 });
 
@@ -459,14 +464,9 @@ const updateAbilityModifier = (ability) => {
     }
     abilityCheckFormula += ' + (@{global_check_bonus})[global check bonus]';
 
-    let abilityModWithSign = abilityMod;
-    if (abilityMod >= 0) {
-      abilityModWithSign = `+${abilityMod}`;
-    }
-
     finalSetAttrs[`${ability}_calculated`] = abilityScoreCalc;
     finalSetAttrs[`${ability}_mod`] = abilityMod;
-    finalSetAttrs[`${ability}_mod_with_sign`] = abilityModWithSign;
+    finalSetAttrs[`${ability}_mod_with_sign`] = showSign(abilityMod);
     finalSetAttrs[`${ability}_check_mod`] = abilityCheck;
     finalSetAttrs[`${ability}_check_mod_formula`] = abilityCheckFormula;
 
@@ -2877,7 +2877,7 @@ on('change:repeating_legendaryaction', (eventInfo) => {
 });
 on('change:repeating_lairaction', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_lairaction', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
+  if (repeatingInfo && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
     updateAction('lairaction', repeatingInfo.rowId);
   }
 });
@@ -3136,7 +3136,7 @@ const updateSpell = (rowId) => {
           finalSetAttrs[`${repeatingString}concentration_show`] = 0;
         }
         if (v.duration) {
-          finalSetAttrs.duration = lowercaseWords(v.duration);
+          finalSetAttrs.duration = v.duration.toLowerCase();
         }
         const ritual = v[`${repeatingString}ritual`];
         if (ritual === 'Yes') {
@@ -3476,13 +3476,8 @@ const updateSkill = (rowId) => {
           totalFormula += ` + ${globalCheckBonus}[global check bonus]`;
         }
 
-        let totalWithSign = total;
-        if (total >= 0) {
-          totalWithSign = `+${total}`;
-        }
-
         finalSetAttrs[`${repeatingString}total`] = total;
-        finalSetAttrs[`${repeatingString}total_with_sign`] = totalWithSign;
+        finalSetAttrs[`${repeatingString}total_with_sign`] = showSign(total);
         finalSetAttrs[`${repeatingString}formula`] = totalFormula;
       }
       setFinalAttrs(v, finalSetAttrs);
@@ -3585,7 +3580,7 @@ const updateSavingThrow = (ability) => {
     }
 
     const abilitySavingThrowBonus = getIntValue(v[`${ability}_save_bonus`]);
-    if (exists(abilitySavingThrowBonus)) {
+    if (abilitySavingThrowBonus) {
       total += abilitySavingThrowBonus;
       totalFormula += ` + ${abilitySavingThrowBonus}[${getAbilityShortName(ability)}saving throw bonus]`;
     }
@@ -3598,13 +3593,8 @@ const updateSavingThrow = (ability) => {
       totalFormula += ` + ${globalSavingThrowBonus}[global saving throw bonus]`;
     }
 
-    let savingThrowWithSign = total;
-    if (total >= 0) {
-      savingThrowWithSign = `+${total}`;
-    }
-
     finalSetAttrs[`${ability}_saving_throw_mod`] = totalFormula;
-    finalSetAttrs[`${ability}_saving_throw_mod_with_sign`] = savingThrowWithSign;
+    finalSetAttrs[`${ability}_saving_throw_mod_with_sign`] = showSign(total);
     setFinalAttrs(v, finalSetAttrs);
   });
 };
@@ -4383,7 +4373,7 @@ const updateType = () => {
 
   getAttrs(collectionArray, (v) => {
     if (v.type) {
-      finalSetAttrs.type = lowercaseWords(v.type);
+      finalSetAttrs.type = v.type.toLowerCase();
     }
     setFinalAttrs(v, finalSetAttrs);
   });
@@ -4398,7 +4388,7 @@ const updateAlignment = () => {
 
   getAttrs(collectionArray, (v) => {
     if (v.alignment && v.is_npc === '1') {
-      finalSetAttrs.alignment = lowercaseWords(v.alignment);
+      finalSetAttrs.alignment = v.alignment.toLowerCase();
     }
     setFinalAttrs(v, finalSetAttrs);
   });
@@ -4414,7 +4404,7 @@ const updateSenses = () => {
   getAttrs(collectionArray, (v) => {
     if (v.senses) {
       finalSetAttrs.senses_exist = 1;
-      finalSetAttrs.senses = lowercaseWords(v.senses);
+      finalSetAttrs.senses = v.senses.toLowerCase();
     } else {
       finalSetAttrs.senses_exist = 0;
     }
@@ -4447,7 +4437,7 @@ const updateSpeed = () => {
   const finalSetAttrs = {};
 
   getAttrs(collectionArray, (v) => {
-    finalSetAttrs.npc_speed = lowercaseWords(v.npc_speed);
+    finalSetAttrs.npc_speed = v.npc_speed.toLowerCase();
     setFinalAttrs(v, finalSetAttrs);
   });
 };
@@ -4460,7 +4450,7 @@ const updateACNote = () => {
   const finalSetAttrs = {};
 
   getAttrs(collectionArray, (v) => {
-    finalSetAttrs.ac_note = lowercaseWords(v.ac_note);
+    finalSetAttrs.ac_note = v.ac_note.toLowerCase();
     setFinalAttrs(v, finalSetAttrs);
   });
 };
@@ -4642,6 +4632,7 @@ const generateSkills = () => {
   getSectionIDs(repeatingItem, (ids) => {
     for (let i = 0; i < ids.length; i++) {
       repeatingString = `${repeatingItem}_${ids[i]}_`;
+      collectionArray.push(`${repeatingString}storage_name`);
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}ability`);
     }
@@ -4663,7 +4654,6 @@ const generateSkills = () => {
 
           finalSetAttrs[`${repeatingString}storage_name`] = prop;
           finalSetAttrs[`${repeatingString}name`] = translate(language, `SKILLS.${prop}`);
-
           finalSetAttrs[`${repeatingString}ability`] = `@{${SKILLS[prop]}_mod}`;
           updateSkill(skillId);
 
