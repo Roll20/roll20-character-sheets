@@ -52,7 +52,7 @@ const round = (value, places) => {
   return +(`${Math.round(`${value}e+${places}`)}e-${places}`);
 };
 const getKeyByValue = (obj, value) => {
-  for (const prop in obj) {
+  for (prop in obj) {
     if (obj.hasOwnProperty(prop)) {
       if (obj[prop] === value) {
         return prop;
@@ -137,7 +137,7 @@ const getRepeatingInfo = (leadingString, eventInfo) => {
   return result;
 };
 const isEmpty = (obj) => {
-  for (const prop in obj) {
+  for (prop in obj) {
     if (obj.hasOwnProperty(prop)) {
       return false;
     }
@@ -146,7 +146,7 @@ const isEmpty = (obj) => {
 };
 const setFinalAttrs = (v, finalSetAttrs, callback) => {
   if (!isEmpty(finalSetAttrs)) {
-    for (const key in finalSetAttrs) {
+    for (key in finalSetAttrs) {
       if (finalSetAttrs.hasOwnProperty(key)) {
         if (v[key] === finalSetAttrs[key]) {
           delete finalSetAttrs[key];
@@ -536,7 +536,7 @@ const setClassFeatureOrTrait = (repeatingItem, obj) => {
       if (repeatingItem === 'repeating_trait') {
         collectionArray.push(`${repeatingString}display_text`);
       }
-      for (const prop in obj) {
+      for (prop in obj) {
         if (obj.hasOwnProperty(prop)) {
           collectionArray.push(`${repeatingString}${prop}`);
         }
@@ -567,13 +567,13 @@ const setClassFeatureOrTrait = (repeatingItem, obj) => {
 
       if (obj.clear) {
         delete obj.clear;
-        for (const prop in obj) {
+        for (prop in obj) {
           if (obj.hasOwnProperty(prop) && !isUndefined(v[`${repeatingString}${prop}`])) {
             finalSetAttrs[`${repeatingString}${prop}`] = obj[prop];
           }
         }
       } else {
-        for (const prop in obj) {
+        for (prop in obj) {
           if (obj.hasOwnProperty(prop)) {
             if ((prop === 'name' || prop === 'freetext') && (isUndefined(v[`${repeatingString}${prop}`]) || calculatePercentDifference(v[`${repeatingString}${prop}`].length, obj[prop].length) < 10)) {
               finalSetAttrs[`${repeatingString}${prop}`] = obj[prop];
@@ -1768,7 +1768,7 @@ const updateLevels = (changedField) => {
   let classesWithSpellcasting = 0;
   const xpTable = [0, 300, 900, 2700, 6500, 14000, 23000, 34000, 48000, 64000, 85000, 100000, 120000, 140000, 165000, 195000, 225000, 265000, 305000, 355000, 385000, 405000, 435000, 465000, 495000, 525000, 555000, 585000, 605000, 635000, 665000];
 
-  for (const key in hd) {
+  for (key in hd) {
     if (hd.hasOwnProperty(key)) {
       collectionArray.push(`hd_${key}_max`);
       collectionArray.push(`hd_${key}_query`);
@@ -1859,13 +1859,13 @@ const updateLevels = (changedField) => {
       }
 
       finalSetAttrs.class_and_level = '';
-      for (const className in classLevels) {
-        if (classLevels.hasOwnProperty(className)) {
-          finalSetAttrs[`${className}_level`] = classLevels[className];
+      for (prop in classLevels) {
+        if (classLevels.hasOwnProperty(prop)) {
+          finalSetAttrs[`${prop}_level`] = classLevels[prop];
           if (finalSetAttrs.class_and_level !== '') {
             finalSetAttrs.class_and_level += ', ';
           }
-          finalSetAttrs.class_and_level += `${capitalize(className)} ${classLevels[className]}`;
+          finalSetAttrs.class_and_level += `${capitalize(prop)} ${classLevels[prop]}`;
         }
       }
 
@@ -1890,7 +1890,7 @@ const updateLevels = (changedField) => {
         }
       }
 
-      for (const key in hd) {
+      for (key in hd) {
         if (hd.hasOwnProperty(key)) {
           if (hd[key] && hd[key] !== 0) {
             finalSetAttrs[`hd_${key}_max`] = hd[key];
@@ -2146,9 +2146,7 @@ const updateArmor = (rowId) => {
         if (isUndefined(v[`${repeatingString}parsed`]) || v[`${repeatingString}parsed`].indexOf('acBonus') === -1) {
           const armorModifiers = v[`${repeatingString}modifiers`];
           if (exists(armorModifiers)) {
-            const acBonus = armorModifiers.replace(/^\D+/g, '');
-
-            finalSetAttrs[`${repeatingString}ac_bonus`] = acBonus;
+            finalSetAttrs[`${repeatingString}ac_bonus`] = armorModifiers.replace(/^\D+/g, '');
           }
           if (isUndefined(finalSetAttrs[`${repeatingString}parsed`])) {
             finalSetAttrs[`${repeatingString}parsed`] = '';
@@ -3944,7 +3942,7 @@ const updateNPCContent = () => {
     let reactions;
     let actions;
     let traits;
-    const re = /\@(.*)\@:\s([^@]+)/gi;
+    const re = /@(.*)@:\s([^@]+)/gi;
     let match;
     let newRowId;
     let repeatingString;
@@ -4016,7 +4014,6 @@ const updateNPCContent = () => {
       if (content.indexOf('Traits') !== -1) {
         const traitsSplit = content.split(/Traits\n/);
         traits = traitsSplit[1];
-        content = traitsSplit[0];
       }
       if (exists(traits)) {
         while ((match = re.exec(traits.replace(/\*\*/g, '@'))) !== null) {
@@ -4109,9 +4106,9 @@ const parseAction = (rowId, type) => {
   const collectionArray = ['level', 'challenge', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability'];
   const finalSetAttrs = {};
 
-  const damageType = /((?:[\w]+|[\w]+\s(?:or|and)\s[\w]+)(?:\s*?\([\w\s]+\))?)\s*?damage\s?(\([\w\'\s]+\))?/;
+  const damageType = /((?:[\w]+|[\w]+\s(?:or|and)\s[\w]+)(?:\s*?\([\w\s]+\))?)\s*?damage\s?(\([\w'\s]+\))?/;
   const damageSyntax = /(?:(\d+)|.*?\(([\dd\s\+\-]*)\).*?)\s*?/;
-  const altDamageSyntax = /(?:\,\s*?or\s*?)/;
+  const altDamageSyntax = /(?:,\s*?or\s*?)/;
   const plus = /\s*?plus\s*?/;
   const savingThrowRe = /(?:DC)\s*?(\d+)\s*?([a-zA-Z]*)\s*?(?:saving throw)/;
   const saveSuccess = /or\s(.*)?\son a successful one./;
@@ -4642,7 +4639,7 @@ const generateSkills = () => {
 
       let x = 0;
 
-      for (const prop in SKILLS) {
+      for (prop in SKILLS) {
         if (SKILLS.hasOwnProperty(prop)) {
           let skillId;
           if (id) {
@@ -4716,7 +4713,7 @@ const importData = () => {
       const importObject = JSON.parse(v.import_data);
 
       if (importObject.npc) {
-        for (const prop in importObject.npc) {
+        for (prop in importObject.npc) {
           if (importObject.npc.hasOwnProperty(prop)) {
             finalSetAttrs[prop] = importObject.npc[prop];
           }
@@ -4726,7 +4723,7 @@ const importData = () => {
         importObject.spells.forEach(spell => {
           const newRowId = generateRowID();
           const repeatingString = `repeating_spell_${newRowId}_`;
-          for (const prop in spell) {
+          for (prop in spell) {
             if (spell.hasOwnProperty(prop)) {
               finalSetAttrs[`${repeatingString}${prop}`] = spell[prop];
             }
