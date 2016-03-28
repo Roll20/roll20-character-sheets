@@ -11035,7 +11035,7 @@
 				<span class="sheet-table-data sheet-left sheet-sect">	
                     <label>
                         <span title="Consolidated skills ranks are awarded at 1/2 normal skill points.">
-                            <input type="radio" title="@{BG-Skill-Use}" name="attr_BG-Skill-Use" value="0" checked="checked" /> Enable Consolidated Skills.
+                            <input type="radio" title="@{BG-Skill-Use}" name="attr_BG-Skill-Use" value="0"  /> Enable Consolidated Skills.
                         </span>
                     </label>
                     <label>
@@ -15144,22 +15144,27 @@ var PFSheet = PFSheet || (function () {
             }
 
             getAttrs(["BG-Skill-Use", "unchained_skills-show"], function (v) {
-                var retval = true;
-                //TAS.debug("verifyHasSkill",skill,"first4",first4,"cs",cs,"bg",bg,"core",core,"getAttrs",v);
-                if (core && (v["unchained_skills-show"] == "1" && v["BG-Skill-Use"] == "0")) {
-                    retval = false;
-                }
-                if (bg && !(v["unchained_skills-show"] == "1" && v["BG-Skill-Use"] == "1")) {
-                    retval = false;
-                }
-                if (cs && !(v["unchained_skills-show"] == "1" && v["BG-Skill-Use"] == "0")) {
-                    retval = false;
+                var retval = false;
+                if (core) {
+                    if  (v["unchained_skills-show"] == "0" || v["BG-Skill-Use"] == "1") {
+                        retval = true;
+                    }
+                } else if (bg) {
+                    if (v["unchained_skills-show"] == "1" && v["BG-Skill-Use"] == "1") {
+                        retval = true;
+                    }
+                } else {
+                    if (v["unchained_skills-show"] == "1" && v["BG-Skill-Use"] == "0") {
+                        retval = true;
+                    }
                 }
                 //TAS.debug("verifyHasSkill: returning "+retval);
                 callback(retval);
             });
         }
     },
+
+
 
     /* updates one  skill row 
     * @skill {string} skill to update, must have same capitalization as on HTML
@@ -15177,74 +15182,74 @@ var PFSheet = PFSheet || (function () {
         itemNm = skill + "-item",
         miscNm = skill + "-misc",
         rtNm = skill + "-ReqTrain";
-        //verifyHasSkill(skill, function (hasSkill) {
-        //  if (hasSkill) {
-        getAttrs([skill, csNm, ranksNm, classNm, abNm, modNm, racialNm, featNm, itemNm, miscNm, rtNm,
-        "size_skill", "size_skill_double", "acp", "checks-cond", "Phys-skills-cond", "Perception-cond"], function (v) {
+        verifyHasSkill(skill, function (hasSkill) {
+            if (hasSkill) {
+			getAttrs([skill, csNm, ranksNm, classNm, abNm, modNm, racialNm, featNm, itemNm, miscNm, rtNm,
+			"size_skill", "size_skill_double", "acp", "checks-cond", "Phys-skills-cond", "Perception-cond"], function (v) {
 
-            var skillSize = 0, adj, skillTot = 0, setter = {}, mods = "", setAny = 0, cond = 0,
-            cs = parseInt(v[csNm], 10) || 0,
-            currSkill = parseInt(v[skill], 10),//no default
-            ranks = parseInt(v[ranksNm], 10) || 0,
-            rt = parseInt(v[rtNm], 10) || 0,
-            allCond = parseInt(v["checks-cond"], 10) || 0,
-            abilityName = findAbilityInString(v[abNm]),
-            physCond = 0, perCond = 0;
+				var skillSize = 0, adj, skillTot = 0, setter = {}, mods = "", setAny = 0, cond = 0,
+				cs = parseInt(v[csNm], 10) || 0,
+				currSkill = parseInt(v[skill], 10),//no default
+				ranks = parseInt(v[ranksNm], 10) || 0,
+				rt = parseInt(v[rtNm], 10) || 0,
+				allCond = parseInt(v["checks-cond"], 10) || 0,
+				abilityName = findAbilityInString(v[abNm]),
+				physCond = 0, perCond = 0;
 
-            if (ranks && cs) {
-                skillTot += 3;
-                mods = "3/";
-            } else {
-                mods = "0/";
-            }
-            if (abilityName === "DEX-mod" || abilityName === "STR-mod") {
-                adj = parseInt(v["acp"], 10) || 0;
-                skillTot += adj;
-                mods += adj + "/";
-            } else {
-                mods += "0/";
-            }
-            skillSize = sizeSkills[skill];
-            if (skillSize) {
-                if (skillSize === 1) {
-                    adj = parseInt(v["size_skill"], 10) || 0;
-                    skillTot += adj;
-                    mods += adj + "/";
-                } else if (skillSize === 2) {
-                    adj = parseInt(v["size_skill_double"], 10) || 0;
-                    skillTot += adj;
-                    mods += adj + "/";
-                }
-            } else {
-                mods += "0/";
-            }
-            if (abilityName === "DEX-mod" || abilityName === "STR-mod") {
-                physCond = parseInt(v["Phys-skills-cond"], 10) || 0;
-            }
-            if (skill === "Perception" || skill === "CS-Perception") {
-                perCond = parseInt(v["Perception-cond"], 10) || 0;
-            }
-            cond = allCond + physCond + perCond;
-            mods += cond;
+				if (ranks && cs) {
+					skillTot += 3;
+					mods = "3/";
+				} else {
+					mods = "0/";
+				}
+				if (abilityName === "DEX-mod" || abilityName === "STR-mod") {
+					adj = parseInt(v["acp"], 10) || 0;
+					skillTot += adj;
+					mods += adj + "/";
+				} else {
+					mods += "0/";
+				}
+				skillSize = sizeSkills[skill];
+				if (skillSize) {
+					if (skillSize === 1) {
+						adj = parseInt(v["size_skill"], 10) || 0;
+						skillTot += adj;
+						mods += adj + "/";
+					} else if (skillSize === 2) {
+						adj = parseInt(v["size_skill_double"], 10) || 0;
+						skillTot += adj;
+						mods += adj + "/";
+					}
+				} else {
+					mods += "0/";
+				}
+				if (abilityName === "DEX-mod" || abilityName === "STR-mod") {
+					physCond = parseInt(v["Phys-skills-cond"], 10) || 0;
+				}
+				if (skill === "Perception" || skill === "CS-Perception") {
+					perCond = parseInt(v["Perception-cond"], 10) || 0;
+				}
+				cond = allCond + physCond + perCond;
+				mods += cond;
 
-            skillTot += ranks + cond + (parseInt(v[modNm], 10) || 0) + (parseInt(v[racialNm], 10) || 0) +
-                (parseInt(v[featNm], 10) || 0) + (parseInt(v[itemNm], 10) || 0) + (parseInt(v[miscNm], 10) || 0);
+				skillTot += ranks + cond + (parseInt(v[modNm], 10) || 0) + (parseInt(v[racialNm], 10) || 0) +
+					(parseInt(v[featNm], 10) || 0) + (parseInt(v[itemNm], 10) || 0) + (parseInt(v[miscNm], 10) || 0);
 
-            if (currSkill !== skillTot) {
-                setter[skill] = skillTot;
-                setAny++;
-            }
+				if (currSkill !== skillTot) {
+					setter[skill] = skillTot;
+					setAny++;
+				}
 
 
-            if ((v[classNm] || "0/0/0/0") !== mods) {
-                setter[classNm] = mods;
-                setAny++;
-            }
-            if (setAny) {
-                //TAS.debug({"function":"updateSkill","currSkill":currSkill,"newSkill":skillTot,"oldmods":v[classNm],"mods":mods                });
-                setAttrs(setter);
-            //}
-        //});
+				if ((v[classNm] || "0/0/0/0") !== mods) {
+					setter[classNm] = mods;
+					setAny++;
+				}
+				if (setAny) {
+					//TAS.debug({"function":"updateSkill","currSkill":currSkill,"newSkill":skillTot,"oldmods":v[classNm],"mods":mods                });
+					setAttrs(setter);
+				}
+			});
             }
         });
     },
@@ -16793,60 +16798,60 @@ on("change:max-skill-ranks-misc",
 //each skill has a dropdown handler and a skill update handler
 //normal skills
 _.each(PFSheet.lists.allCoreSkills, function (skill) {
-    on((PFSheet.lists.skillEvents.replace(/REPLACE/g, skill)),
-        TAS.callback(function eventUpdateAllCoreSkills(eventInfo) {
-            TAS.debug("caught " + eventInfo.sourceAttribute + " event for " + skill);
-            PFSheet.updateSkill(skill, eventInfo);
-        })
-    );
-    on("change:" + skill + "-ability",
-        TAS.callback(function eventNormalSkillAbility(eventInfo) {
-            TAS.debug("caught " + eventInfo.sourceAttribute + " event");
-            PFSheet.util.handleDropdown(skill + "-ability", skill + "-ability-mod");
-            //PFSheet.verifyHasSkill(skill, function (hasSkill) {
-            //  if (hasSkill) {
-            //  }
-            //});
-        })
-    );
+	on((PFSheet.lists.skillEvents.replace(/REPLACE/g, skill)),
+		TAS.callback(function eventUpdateAllCoreSkills(eventInfo) {
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event for " + skill);
+			PFSheet.updateSkill(skill, eventInfo);
+		})
+	);
+	on("change:" + skill + "-ability",
+		TAS.callback(function eventNormalSkillAbility(eventInfo) {
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event");
+			PFSheet.verifyHasSkill(skill, function (hasSkill) {
+			 if (hasSkill) {
+				PFSheet.util.handleDropdown(skill + "-ability", skill + "-ability-mod");
+			 }
+			});
+		})
+	);
 });
 //consolidated skills
 _.each(PFSheet.lists.consolidatedSkills, function (skill) {
-    on((PFSheet.lists.skillEvents.replace(/REPLACE/g, skill)),
-        TAS.callback(function eventUpdateConsolidatedSkills(eventInfo) {
-            TAS.debug("caught " + eventInfo.sourceAttribute + " event for " + skill);
-            PFSheet.updateSkill(skill, eventInfo);
-        })
-    );
-    on("change:" + skill + "-ability",
-        TAS.callback(function eventConsolidatedSkillAbility(eventInfo) {
-            TAS.debug("caught " + eventInfo.sourceAttribute + " event");
-            PFSheet.util.handleDropdown(skill + "-ability", skill + "-ability-mod");
-            //PFSheet.verifyHasSkill(skill, function (hasSkill) {
-            //  if (hasSkill) {
-            //  }
-            //});
-        })
-    );
+	on((PFSheet.lists.skillEvents.replace(/REPLACE/g, skill)),
+		TAS.callback(function eventUpdateConsolidatedSkills(eventInfo) {
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event for " + skill);
+			PFSheet.updateSkill(skill, eventInfo);
+		})
+	);
+	on("change:" + skill + "-ability",
+		TAS.callback(function eventConsolidatedSkillAbility(eventInfo) {
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event");
+			PFSheet.verifyHasSkill(skill, function (hasSkill) {
+			 if (hasSkill) {
+				 PFSheet.util.handleDropdown(skill + "-ability", skill + "-ability-mod");
+			 }
+			});
+		})
+	);
 });
 //background only skills
 _.each(PFSheet.lists.backgroundSkills, function (skill) {
-    on((PFSheet.lists.skillEvents.replace(/REPLACE/g, skill)),
-        TAS.callback(function eventUpdateBackgroundSkills(eventInfo) {
-            TAS.debug("caught " + eventInfo.sourceAttribute + " event for " + skill);
-            PFSheet.updateSkill(skill, eventInfo);
-        })
-    );
-    on("change:" + skill + "-ability",
-        TAS.callback(function eventBackgroundSkillAbility(eventInfo) {
-            TAS.debug("caught " + eventInfo.sourceAttribute + " event");
-            PFSheet.util.handleDropdown(skill + "-ability", skill + "-ability-mod");
-            //PFSheet.verifyHasSkill(skill, function (hasSkill) {
-            //  if (hasSkill) {
-            //  }
-            //});
-        })
-    );
+	on((PFSheet.lists.skillEvents.replace(/REPLACE/g, skill)),
+		TAS.callback(function eventUpdateBackgroundSkills(eventInfo) {
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event for " + skill);
+			PFSheet.updateSkill(skill, eventInfo);
+		})
+	);
+	on("change:" + skill + "-ability",
+		TAS.callback(function eventBackgroundSkillAbility(eventInfo) {
+			TAS.debug("caught " + eventInfo.sourceAttribute + " event");
+			PFSheet.verifyHasSkill(skill, function (hasSkill) {
+			 if (hasSkill) {
+				 PFSheet.util.handleDropdown(skill + "-ability", skill + "-ability-mod");
+			 }
+			});
+		})
+	);
 });
 //skills affected by size
 _.each(PFSheet.lists.sizeSkills, function (mult, skill) {
