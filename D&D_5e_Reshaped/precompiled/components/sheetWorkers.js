@@ -52,7 +52,7 @@ const round = (value, places) => {
   return +(`${Math.round(`${value}e+${places}`)}e-${places}`);
 };
 const getKeyByValue = (obj, value) => {
-  for (prop in obj) {
+  for (const prop in obj) {
     if (obj.hasOwnProperty(prop)) {
       if (obj[prop] === value) {
         return prop;
@@ -137,7 +137,7 @@ const getRepeatingInfo = (leadingString, eventInfo) => {
   return result;
 };
 const isEmpty = (obj) => {
-  for (prop in obj) {
+  for (const prop in obj) {
     if (obj.hasOwnProperty(prop)) {
       return false;
     }
@@ -146,7 +146,7 @@ const isEmpty = (obj) => {
 };
 const setFinalAttrs = (v, finalSetAttrs, callback) => {
   if (!isEmpty(finalSetAttrs)) {
-    for (key in finalSetAttrs) {
+    for (const key in finalSetAttrs) {
       if (finalSetAttrs.hasOwnProperty(key)) {
         if (v[key] === finalSetAttrs[key]) {
           delete finalSetAttrs[key];
@@ -523,7 +523,7 @@ const setClassFeatureOrTrait = (repeatingItem, obj) => {
   }
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (id of ids) {
+    for (const id of ids) {
       const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}storage_name`);
       collectionArray.push(`${repeatingString}name`);
@@ -536,7 +536,7 @@ const setClassFeatureOrTrait = (repeatingItem, obj) => {
       if (repeatingItem === 'repeating_trait') {
         collectionArray.push(`${repeatingString}display_text`);
       }
-      for (prop in obj) {
+      for (const prop in obj) {
         if (obj.hasOwnProperty(prop)) {
           collectionArray.push(`${repeatingString}${prop}`);
         }
@@ -545,7 +545,7 @@ const setClassFeatureOrTrait = (repeatingItem, obj) => {
 
     getAttrs(collectionArray, (v) => {
       let repeatingString;
-      for (id of ids) {
+      for (const id of ids) {
         repeatingString = `${repeatingItem}_${id}_`;
 
         if (v[`${repeatingString}storage_name`] === obj.storageName) {
@@ -567,13 +567,13 @@ const setClassFeatureOrTrait = (repeatingItem, obj) => {
 
       if (obj.clear) {
         delete obj.clear;
-        for (prop in obj) {
+        for (const prop in obj) {
           if (obj.hasOwnProperty(prop) && !isUndefined(v[`${repeatingString}${prop}`])) {
             finalSetAttrs[`${repeatingString}${prop}`] = obj[prop];
           }
         }
       } else {
-        for (prop in obj) {
+        for (const prop in obj) {
           if (obj.hasOwnProperty(prop)) {
             if ((prop === 'name' || prop === 'freetext') && (isUndefined(v[`${repeatingString}${prop}`]) || calculatePercentDifference(v[`${repeatingString}${prop}`].length, obj[prop].length) < 10)) {
               finalSetAttrs[`${repeatingString}${prop}`] = obj[prop];
@@ -1768,7 +1768,7 @@ const updateLevels = (changedField) => {
   let classesWithSpellcasting = 0;
   const xpTable = [0, 300, 900, 2700, 6500, 14000, 23000, 34000, 48000, 64000, 85000, 100000, 120000, 140000, 165000, 195000, 225000, 265000, 305000, 355000, 385000, 405000, 435000, 465000, 495000, 525000, 555000, 585000, 605000, 635000, 665000];
 
-  for (key in hd) {
+  for (const key in hd) {
     if (hd.hasOwnProperty(key)) {
       collectionArray.push(`hd_${key}_max`);
       collectionArray.push(`hd_${key}_query`);
@@ -1777,7 +1777,7 @@ const updateLevels = (changedField) => {
   }
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (id of ids) {
+    for (const id of ids) {
       const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}level`);
       collectionArray.push(`${repeatingString}name`);
@@ -1792,7 +1792,7 @@ const updateLevels = (changedField) => {
         finalSetAttrs[`${CLASSES[i]}_level`] = 0;
       }
 
-      for (id of ids) {
+      for (const id of ids) {
         const repeatingString = `${repeatingItem}_${id}_`;
 
         let className = v[`${repeatingString}name`];
@@ -1859,7 +1859,7 @@ const updateLevels = (changedField) => {
       }
 
       finalSetAttrs.class_and_level = '';
-      for (prop in classLevels) {
+      for (const prop in classLevels) {
         if (classLevels.hasOwnProperty(prop)) {
           finalSetAttrs[`${prop}_level`] = classLevels[prop];
           if (finalSetAttrs.class_and_level !== '') {
@@ -1890,7 +1890,7 @@ const updateLevels = (changedField) => {
         }
       }
 
-      for (key in hd) {
+      for (const key in hd) {
         if (hd.hasOwnProperty(key)) {
           if (hd[key] && hd[key] !== 0) {
             finalSetAttrs[`hd_${key}_max`] = hd[key];
@@ -2013,7 +2013,7 @@ const sumRepeating = (options, sumItems) => {
   const finalSetAttrs = {};
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (id of ids) {
+    for (const id of ids) {
       const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(repeatingString + options.toggle);
       if (options.qty) {
@@ -2047,7 +2047,7 @@ const sumRepeating = (options, sumItems) => {
         dexMod = getIntValue(v.dexterity_mod);
       }
 
-      for (id of ids) {
+      for (const id of ids) {
         const repeatingString = `${repeatingItem}_${id}_`;
         const qty = getIntValue(v[repeatingString + options.qty], 1);
 
@@ -2133,14 +2133,14 @@ const updateArmor = (rowId) => {
       ids = [];
       ids.push(rowId);
     }
-    for (id of ids) {
+    for (const id of ids) {
       const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}parsed`);
       collectionArray.push(`${repeatingString}modifiers`);
     }
 
     getAttrs(collectionArray, (v) => {
-      for (id of ids) {
+      for (const id of ids) {
         const repeatingString = `${repeatingItem}_${id}_`;
 
         if (isUndefined(v[`${repeatingString}parsed`]) || v[`${repeatingString}parsed`].indexOf('acBonus') === -1) {
@@ -2202,13 +2202,13 @@ const updateEquipment = (rowId) => {
       ids = [];
       ids.push(rowId);
     }
-    for (id of ids) {
+    for (const id of ids) {
       const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}content`);
     }
 
     getAttrs(collectionArray, (v) => {
-      for (id of ids) {
+      for (const id of ids) {
         const repeatingString = `${repeatingItem}_${id}_`;
 
         if (isUndefined(v[`${repeatingString}parsed`]) || v[`${repeatingString}parsed`].indexOf('content') === -1) {
@@ -2714,14 +2714,14 @@ const findAmmo = (name, callback) => {
   const collectionArray = [];
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (id of ids) {
+    for (const id of ids) {
       const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}qty`);
     }
 
     getAttrs(collectionArray, (v) => {
-      for (id of ids) {
+      for (const id of ids) {
         const repeatingString = `${repeatingItem}_${id}_`;
         if (v[`${repeatingString}name`] === name) {
           callback(`@{${repeatingString}qty}`);
@@ -2749,7 +2749,7 @@ const updateAction = (type, rowId) => {
       ids = [];
       ids.push(rowId);
     }
-    for (id of ids) {
+    for (const id of ids) {
       const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}type`);
@@ -2789,7 +2789,7 @@ const updateAction = (type, rowId) => {
     }
 
     getAttrs(collectionArray, (v) => {
-      for (id of ids) {
+      for (const id of ids) {
         const repeatingString = `${repeatingItem}_${id}_`;
 
         const actionName = v[`${repeatingString}name`];
@@ -2894,7 +2894,7 @@ const updateAttack = (rowId) => {
       ids = [];
       ids.push(rowId);
     }
-    for (id of ids) {
+    for (const id of ids) {
       const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}type`);
@@ -2931,7 +2931,7 @@ const updateAttack = (rowId) => {
     }
 
     getAttrs(collectionArray, (v) => {
-      for (id of ids) {
+      for (const id of ids) {
         const repeatingString = `${repeatingItem}_${ids}_`;
 
         const attackName = v[`${repeatingString}name`];
@@ -3056,7 +3056,7 @@ const updateSpell = (rowId) => {
       ids = [];
       ids.push(rowId);
     }
-    for (id of ids) {
+    for (const id of ids) {
       const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}type`);
@@ -3113,7 +3113,7 @@ const updateSpell = (rowId) => {
     }
 
     getAttrs(collectionArray, (v) => {
-      for (id of ids) {
+      for (const id of ids) {
         const repeatingString = `${repeatingItem}_${id}_`;
 
         const spellLevel = getIntValue(v[`${repeatingString}spell_level`]);
@@ -3220,7 +3220,7 @@ const updateClassFeature = (rowId) => {
       ids = [];
       ids.push(rowId);
     }
-    for (id of ids) {
+    for (const id of ids) {
       const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}saving_throw_toggle`);
@@ -3250,7 +3250,7 @@ const updateClassFeature = (rowId) => {
     }
 
     getAttrs(collectionArray, (v) => {
-      for (id of ids) {
+      for (const id of ids) {
         const repeatingString = `${repeatingItem}_${id}_`;
 
         const damageOptions = {
@@ -3279,13 +3279,13 @@ const updateClassFeatureToggleToNewVer = () => {
   const finalSetAttrs = {};
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (id of ids) {
+    for (const id of ids) {
       const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}heal_toggle`);
     }
 
     getAttrs(collectionArray, (v) => {
-      for (id of ids) {
+      for (const id of ids) {
         const repeatingString = `${repeatingItem}_${id}_`;
 
         const healToggled = v[`${repeatingString}heal_toggle`];
@@ -3334,14 +3334,14 @@ const updateAbilityChecksMacro = () => {
   }
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (id of ids) {
+    for (const id of ids) {
       const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}ability`);
     }
 
     getAttrs(collectionArray, (v) => {
-      for (id of ids) {
+      for (const id of ids) {
         const repeatingString = `${repeatingItem}_${id}_`;
         finalSetAttrs.ability_checks_query_var += `|${v[`${repeatingString}name`]}, {{title=${v[`${repeatingString}name`]} (${capitalize(getAbilityShortName(v[`${repeatingString}ability`]))})&#125;&#125; {{roll1=[[@{preroll}d20@{postroll}@{d20_mod} + @{${repeatingString}formula}]]&#125;&#125; @{roll_setting}@{d20_mod} + @{${repeatingString}formula}]]&#125;&#125;`;
         finalSetAttrs.ability_checks_macro_var += ', ';
@@ -3394,7 +3394,7 @@ const updateSkill = (rowId) => {
       ids = [];
       ids.push(rowId);
     }
-    for (id of ids) {
+    for (const id of ids) {
       const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}proficiency`);
       collectionArray.push(`${repeatingString}name`);
@@ -3407,7 +3407,7 @@ const updateSkill = (rowId) => {
     }
 
     getAttrs(collectionArray, (v) => {
-      for (id of ids) {
+      for (const id of ids) {
         const repeatingString = `${repeatingItem}_${id}_`;
 
         const skillName = v[`${repeatingString}name`];
@@ -3503,7 +3503,7 @@ const updateSkillsFromSRD = () => {
   const finalSetAttrs = {};
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (id of ids) {
+    for (const id of ids) {
       const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}ability`);
@@ -3517,7 +3517,7 @@ const updateSkillsFromSRD = () => {
       let repeatingString;
 
       if (!isUndefined(skillsFromSRD)) {
-        for (id of ids) {
+        for (const id of ids) {
           repeatingString = `${repeatingItem}_${id}_`;
           skillName = v[`${repeatingString}name`];
           skillsObj[skillName] = id;
@@ -3677,7 +3677,7 @@ on('change:spells_srd', () => {
 
 const updateAttachers = () => {
   const repeatingItem = 'repeating_attacher';
-  const collectionArray = ['attacher_initiative', 'attacher_death_saving_throw', 'attacher_hit_dice', 'attacher_attack', 'attacher_spell', 'attacher_skill'];
+  const collectionArray = ['attacher_initiative', 'attacher_death_saving_throw', 'attacher_hit_dice', 'attacher_attack', 'attacher_spell', 'attacher_skill', 'attacher_crit'];
   const finalSetAttrs = {};
   const itemsToPush = ['initiative', 'death_saving_throw', 'hit_dice', 'attack', 'spell', 'skill'];
 
@@ -3689,11 +3689,12 @@ const updateAttachers = () => {
   }
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (id of ids) {
+    for (const id of ids) {
       const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}freetext`);
       collectionArray.push(`${repeatingString}freeform`);
+      collectionArray.push(`${repeatingString}crit_attacher`);
 
       for (let x = 0; x < itemsToPush.length; x++) {
         collectionArray.push(`${repeatingString}${itemsToPush[x]}_attacher`);
@@ -3701,7 +3702,7 @@ const updateAttachers = () => {
       }
     }
     getAttrs(collectionArray, (v) => {
-      for (id of ids) {
+      for (const id of ids) {
         const repeatingString = `${repeatingItem}_${id}_`;
 
         for (let x = 0; x < itemsToPush.length; x++) {
@@ -3711,7 +3712,13 @@ const updateAttachers = () => {
 
             const freeText = v[`${repeatingString}freetext`];
             if (exists(attacherName) && exists(freeText)) {
-              finalSetAttrs[`attacher_${itemsToPush[x]}`] += `{{${attacherName}=${freeText}}} `;
+              const critAttacher = v[`${repeatingString}crit_attacher`];
+              if (critAttacher) {
+                finalSetAttrs[`attacher_${itemsToPush[x]}`] += `{{crit_name=${attacherName}}} `;
+                finalSetAttrs[`attacher_${itemsToPush[x]}`] += `{{crit_text=${freeText}}} `;
+              } else {
+                finalSetAttrs[`attacher_${itemsToPush[x]}`] += `{{${attacherName}=${freeText}}} `;
+              }
             }
             const freeForm = v[`${repeatingString}freeform`];
             if (exists(freeForm)) {
@@ -4043,14 +4050,14 @@ const displayTextForTraits = () => {
   const finalSetAttrs = {};
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (id of ids) {
+    for (const id of ids) {
       const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}display_text`);
       collectionArray.push(`${repeatingString}freetext`);
     }
 
     getAttrs(collectionArray, (v) => {
-      for (id of ids) {
+      for (const id of ids) {
         const repeatingString = `${repeatingItem}_${id}_`;
 
         if (isUndefined(v.display_text)) {
@@ -4135,7 +4142,7 @@ const parseAction = (rowId, type) => {
       ids = [];
       ids.push(rowId);
     }
-    for (id of ids) {
+    for (const id of ids) {
       const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}freetext`);
@@ -4153,7 +4160,7 @@ const parseAction = (rowId, type) => {
       const spellMods = [intMod, wisMod, chaMod];
       const abilityMods = [strMod, dexMod, conMod, intMod, wisMod, chaMod];
 
-      for (id of ids) {
+      for (const id of ids) {
         const repeatingString = `${repeatingItem}_${id}_`;
 
         let rangedAttack = false;
@@ -4554,7 +4561,7 @@ const resourcesToClassFeatures = () => {
 
   let repeatingString;
   getSectionIDs(repeatingItem, (ids) => {
-    for (id of ids) {
+    for (const id of ids) {
       repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}uses`);
@@ -4567,7 +4574,7 @@ const resourcesToClassFeatures = () => {
     }
 
     getAttrs(collectionArray, (v) => {
-      for (id of ids) {
+      for (const id of ids) {
         repeatingString = `${repeatingItem}_${id}_`;
         const newRowId = generateRowID();
         const newRepeatingString = `${newRepeatingItem}_${newRowId}_`;
@@ -4594,7 +4601,7 @@ const setSkillStorageNames = () => {
   let repeatingString;
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (id of ids) {
+    for (const id of ids) {
       repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}storage_name`);
       collectionArray.push(`${repeatingString}name`);
@@ -4603,7 +4610,7 @@ const setSkillStorageNames = () => {
     getAttrs(collectionArray, (v) => {
       const language = v.lang;
       if (!language || language === 'en') {
-        for (id of ids) {
+        for (const id of ids) {
           repeatingString = `${repeatingItem}_${id}_`;
 
           const name = v[`${repeatingString}name`];
@@ -4627,7 +4634,7 @@ const generateSkills = () => {
   let repeatingString;
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (id of ids) {
+    for (const id of ids) {
       repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}storage_name`);
       collectionArray.push(`${repeatingString}name`);
@@ -4639,7 +4646,7 @@ const generateSkills = () => {
 
       let x = 0;
 
-      for (prop in SKILLS) {
+      for (const prop in SKILLS) {
         if (SKILLS.hasOwnProperty(prop)) {
           let skillId;
           if (id) {
@@ -4687,13 +4694,13 @@ const extasToExtrasFix = (repeatingItem) => {
   const finalSetAttrs = {};
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (id of ids) {
+    for (const id of ids) {
       const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}extas_toggle`);
     }
 
     getAttrs(collectionArray, (v) => {
-      for (id of ids) {
+      for (const id of ids) {
         const repeatingString = `${repeatingItem}_${id}_`;
 
         const extrasToggle = v[`${repeatingString}extas_toggle`];
@@ -4713,7 +4720,7 @@ const importData = () => {
       const importObject = JSON.parse(v.import_data);
 
       if (importObject.npc) {
-        for (prop in importObject.npc) {
+        for (const prop in importObject.npc) {
           if (importObject.npc.hasOwnProperty(prop)) {
             finalSetAttrs[prop] = importObject.npc[prop];
           }
@@ -4723,7 +4730,7 @@ const importData = () => {
         importObject.spells.forEach(spell => {
           const newRowId = generateRowID();
           const repeatingString = `repeating_spell_${newRowId}_`;
-          for (prop in spell) {
+          for (const prop in spell) {
             if (spell.hasOwnProperty(prop)) {
               finalSetAttrs[`${repeatingString}${prop}`] = spell[prop];
             }
