@@ -181,8 +181,9 @@ const parseAttackComponent = (v, repeatingString, finalSetAttrs, options) => {
   if (isUndefined(parsed) || parsed.indexOf(options.parseName) === -1) {
     let aTriggerFieldExists = false;
 
-    for (let i = 0; i < options.triggerFields.length; i++) {
-      if (exists(v[repeatingString + options.triggerFields[i]])) {
+
+    for (const triggerField of options.triggerFields) {
+      if (exists(v[repeatingString + triggerField])) {
         aTriggerFieldExists = true;
       }
     }
@@ -619,11 +620,11 @@ const setClassFeatures = () => {
   const finalSetAttrs = {};
   const collectionArray = ['ac_unarmored_ability', 'lang', 'jack_of_all_trades_toggle', 'careful_spell_toggle', 'distant_spell_toggle', 'empowered_spell_toggle', 'extended_spell_toggle', 'heightened_spell_toggle', 'quickened_spell_toggle', 'subtle_spell_toggle', 'twinned_spell_toggle'];
 
-  for (let i = 0; i < ABILITIES.length; i++) {
-    collectionArray.push(`${ABILITIES[i]}_mod`);
+  for (const ability of ABILITIES) {
+    collectionArray.push(`${ability}_mod`);
   }
-  for (let j = 0; j < CLASSES.length; j++) {
-    collectionArray.push(`${CLASSES[j]}_level`);
+  for (const className of CLASSES) {
+    collectionArray.push(`${className}_level`);
   }
 
   getAttrs(collectionArray, (v) => {
@@ -1696,9 +1697,9 @@ const updateLevels = (changedField) => {
   const collectionArray = ['is_npc', 'lang', 'caster_level', 'caster_type', 'class_and_level', 'level', 'xp_next_level'];
   const finalSetAttrs = {};
 
-  for (let i = 0; i < CLASSES.length; i++) {
-    collectionArray.push(`${CLASSES[i]}_level`);
-    collectionArray.push(`has_${CLASSES[i]}_levels`);
+  for (const className of CLASSES) {
+    collectionArray.push(`${className}_level`);
+    collectionArray.push(`has_${className}_levels`);
   }
 
   const defaultClassDetails = {
@@ -1788,8 +1789,8 @@ const updateLevels = (changedField) => {
     }
 
     getAttrs(collectionArray, (v) => {
-      for (let i = 0; i < CLASSES.length; i++) {
-        finalSetAttrs[`${CLASSES[i]}_level`] = 0;
+      for (const className of CLASSES) {
+        finalSetAttrs[`${className}_level`] = 0;
       }
 
       for (const id of ids) {
@@ -1882,11 +1883,11 @@ const updateLevels = (changedField) => {
       }
       finalSetAttrs.xp_next_level = xpForNextLevel;
 
-      for (let y = 0; y < CLASSES.length; y++) {
-        if (finalSetAttrs[`${CLASSES[y]}_level`] > 0) {
-          finalSetAttrs[`has_${CLASSES[y]}_levels`] = 1;
-        } else if (!isUndefined(v[`has_${CLASSES[y]}_levels`])) {
-          finalSetAttrs[`has_${CLASSES[y]}_levels`] = 0;
+      for (const className of CLASSES) {
+        if (finalSetAttrs[`${className}_level`] > 0) {
+          finalSetAttrs[`has_${className}_levels`] = 1;
+        } else if (!isUndefined(v[`has_${className}_levels`])) {
+          finalSetAttrs[`has_${className}_levels`] = 0;
         }
       }
 
@@ -1952,8 +1953,8 @@ on('remove:repeating_class', () => {
 
 const watchForClassLevelChanges = () => {
   const classFeatureWatch = [];
-  for (let i = 0; i < ABILITIES.length; i++) {
-    classFeatureWatch.push(`change:${ABILITIES[i]}_mod`);
+  for (const ability of ABILITIES) {
+    classFeatureWatch.push(`change:${ability}_mod`);
   }
   classFeatureWatch.push('change:careful_spell_toggle');
   classFeatureWatch.push('change:distant_spell_toggle');
@@ -2020,20 +2021,20 @@ const sumRepeating = (options, sumItems) => {
         collectionArray.push(repeatingString + options.qty);
       }
 
-      for (let x = 0; x < sumItems.length; x++) {
-        finalSetAttrs[sumItems[x].totalField] = 0;
-        if (sumItems[x].totalFieldSecondary) {
-          finalSetAttrs[sumItems[x].totalFieldSecondary] = 0;
+      for (const sumItem of sumItems) {
+        finalSetAttrs[sumItem.totalField] = 0;
+        if (sumItem.totalFieldSecondary) {
+          finalSetAttrs[sumItem.totalFieldSecondary] = 0;
         }
-        collectionArray.push(repeatingString + sumItems[x].fieldToAdd);
-        if (sumItems[x].bonus) {
-          collectionArray.push(repeatingString + sumItems[x].bonus);
+        collectionArray.push(repeatingString + sumItem.fieldToAdd);
+        if (sumItem.bonus) {
+          collectionArray.push(repeatingString + sumItem.bonus);
         }
-        if (sumItems[x].armorType) {
-          collectionArray.push(repeatingString + sumItems[x].armorType);
+        if (sumItem.armorType) {
+          collectionArray.push(repeatingString + sumItem.armorType);
         }
-        if (sumItems[x].addOnAfterQty) {
-          collectionArray.push(repeatingString + sumItems[x].addOnAfterQty);
+        if (sumItem.addOnAfterQty) {
+          collectionArray.push(repeatingString + sumItem.addOnAfterQty);
         }
       }
     }
@@ -2051,8 +2052,7 @@ const sumRepeating = (options, sumItems) => {
         const repeatingString = `${repeatingItem}_${id}_`;
         const qty = getIntValue(v[repeatingString + options.qty], 1);
 
-        for (let x = 0; x < sumItems.length; x++) {
-          const sumItem = sumItems[x];
+        for (const sumItem of sumItems) {
           let fieldToAdd = getFloatValue(v[repeatingString + sumItem.fieldToAdd]);
           if (sumItem.bonus) {
             fieldToAdd += getFloatValue(v[repeatingString + sumItem.bonus]);
@@ -2103,13 +2103,12 @@ const sumRepeating = (options, sumItems) => {
           }
         }
       }
-      for (let y = 0; y < sumItems.length; y++) {
-        const item = sumItems[y];
-        if (item.totalField && !exists(finalSetAttrs[item.totalField])) {
-          finalSetAttrs[item.totalField] = 0;
+      for (const sumItem of sumItems) {
+        if (sumItem.totalField && !exists(finalSetAttrs[sumItem.totalField])) {
+          finalSetAttrs[sumItem.totalField] = 0;
         }
-        if (item.totalFieldSecondary && !exists(finalSetAttrs[item.totalFieldSecondary])) {
-          finalSetAttrs[item.totalFieldSecondary] = 0;
+        if (sumItem.totalFieldSecondary && !exists(finalSetAttrs[sumItem.totalFieldSecondary])) {
+          finalSetAttrs[sumItem.totalFieldSecondary] = 0;
         }
       }
 
@@ -2163,8 +2162,8 @@ const updateArmor = (rowId) => {
     getExtraFields: ['medium_armor_max_dex', 'dexterity_mod', 'ac_unarmored_ability', 'is_npc'],
     toggle: 'worn',
   };
-  for (let i = 0; i < ABILITIES.length; i++) {
-    options.getExtraFields.push(`${ABILITIES[i]}_mod`);
+  for (const ability of ABILITIES) {
+    options.getExtraFields.push(`${ability}_mod`);
   }
   const sumItems = [
     {
@@ -2740,8 +2739,8 @@ const updateAction = (type, rowId) => {
   const rechargeRegex = /\s*?\((?:Recharge\s*?(\d+\-\d+|\d+)|Recharges\safter\sa\s(.*))\)/gi;
   const rechargeDayRegex = /\s*?\((\d+\/Day)\)/gi;
 
-  for (let i = 0; i < ABILITIES.length; i++) {
-    collectionArray.push(`${ABILITIES[i]}_mod`);
+  for (const ability of ABILITIES) {
+    collectionArray.push(`${ability}_mod`);
   }
 
   getSectionIDs(repeatingItem, (ids) => {
@@ -2885,8 +2884,8 @@ const updateAttack = (rowId) => {
   const collectionArray = ['pb', 'strength_mod', 'finesse_mod', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability', 'ammo_auto_use'];
   const finalSetAttrs = {};
 
-  for (let i = 0; i < ABILITIES.length; i++) {
-    collectionArray.push(`${ABILITIES[i]}_mod`);
+  for (const ability of ABILITIES) {
+    collectionArray.push(`${ability}_mod`);
   }
 
   getSectionIDs(repeatingItem, (ids) => {
@@ -3047,8 +3046,8 @@ const updateSpell = (rowId) => {
   const collectionArray = ['is_npc', 'pb', 'finesse_mod', 'global_spell_attack_bonus', 'global_spell_damage_bonus', 'global_spell_dc_bonus', 'global_spell_heal_bonus', 'default_ability', 'caster_level'];
   const finalSetAttrs = {};
 
-  for (let i = 0; i < ABILITIES.length; i++) {
-    collectionArray.push(`${ABILITIES[i]}_mod`);
+  for (const ability of ABILITIES) {
+    collectionArray.push(`${ability}_mod`);
   }
 
   getSectionIDs(repeatingItem, (ids) => {
@@ -3211,8 +3210,8 @@ const updateClassFeature = (rowId) => {
   const collectionArray = ['pb', 'finesse_mod', 'default_ability'];
   const finalSetAttrs = {};
 
-  for (let i = 0; i < ABILITIES.length; i++) {
-    collectionArray.push(`${ABILITIES[i]}_mod`);
+  for (const ability of ABILITIES) {
+    collectionArray.push(`${ability}_mod`);
   }
 
   getSectionIDs(repeatingItem, (ids) => {
@@ -3325,12 +3324,14 @@ const updateAbilityChecksMacro = () => {
   finalSetAttrs.ability_checks_query_var = '?{Ability Check';
   finalSetAttrs.ability_checks_macro_var = '';
 
-  for (let i = 0; i < ABILITIES.length; i++) {
-    finalSetAttrs.ability_checks_query_var += `|${capitalize(ABILITIES[i])},{{title=${capitalize(ABILITIES[i])}&#125;&#125; {{roll1=[[@{preroll}d20@{postroll}@{d20_mod} + @{${ABILITIES[i]}_check_mod}]]&#125;&#125; @{roll_setting}@{d20_mod} + @{${ABILITIES[i]}_check_mod}]]&#125;&#125;`;
-    finalSetAttrs.ability_checks_macro_var += `[${capitalize(ABILITIES[i])}](~${ABILITIES[i]}_check)`;
+  let i = 0;
+  for (const ability of ABILITIES) {
+    finalSetAttrs.ability_checks_query_var += `|${capitalize(ability)},{{title=${capitalize(ability)}&#125;&#125; {{roll1=[[@{preroll}d20@{postroll}@{d20_mod} + @{${ability}_check_mod}]]&#125;&#125; @{roll_setting}@{d20_mod} + @{${ability}_check_mod}]]&#125;&#125;`;
+    finalSetAttrs.ability_checks_macro_var += `[${capitalize(ability)}](~${ability}_check)`;
     if (i < ABILITIES.length - 1) {
       finalSetAttrs.ability_checks_macro_var += ', ';
     }
+    i++;
   }
 
   getSectionIDs(repeatingItem, (ids) => {
@@ -3384,9 +3385,9 @@ const updateSkill = (rowId) => {
   const collectionArray = ['jack_of_all_trades_toggle', 'jack_of_all_trades', 'remarkable_athlete_toggle', 'remarkable_athlete', 'pb', 'exp', 'global_check_bonus'];
   const finalSetAttrs = {};
 
-  for (let i = 0; i < ABILITIES.length; i++) {
-    collectionArray.push(`${ABILITIES[i]}_mod`);
-    collectionArray.push(`${ABILITIES[i]}_check_bonus`);
+  for (const ability of ABILITIES) {
+    collectionArray.push(`${ability}_mod`);
+    collectionArray.push(`${ability}_check_bonus`);
   }
 
   getSectionIDs(repeatingItem, (ids) => {
@@ -3663,10 +3664,10 @@ const updateSpellsFromSRD = () => {
   getAttrs(collectionArray, (v) => {
     const spells = v.spells_srd.split(', ');
 
-    for (let i = 0; i < spells.length; i++) {
+    for (const spell of spells) {
       const newRowId = generateRowID();
       const repeatingString = `repeating_spell_${newRowId}_`;
-      finalSetAttrs[`${repeatingString}name`] = spells[i];
+      finalSetAttrs[`${repeatingString}name`] = spell;
     }
     setFinalAttrs(v, finalSetAttrs);
   });
@@ -3681,11 +3682,11 @@ const updateAttachers = () => {
   const finalSetAttrs = {};
   const itemsToPush = ['initiative', 'death_saving_throw', 'hit_dice', 'attack', 'spell', 'skill'];
 
-  for (let i = 0; i < ABILITIES.length; i++) {
-    collectionArray.push(`attacher_${ABILITIES[i]}_check`);
-    collectionArray.push(`attacher_${ABILITIES[i]}_saving_throw`);
-    itemsToPush.push(`${ABILITIES[i]}_check`);
-    itemsToPush.push(`${ABILITIES[i]}_saving_throw`);
+  for (const ability of ABILITIES) {
+    collectionArray.push(`attacher_${ability}_check`);
+    collectionArray.push(`attacher_${ability}_saving_throw`);
+    itemsToPush.push(`${ability}_check`);
+    itemsToPush.push(`${ability}_saving_throw`);
   }
 
   getSectionIDs(repeatingItem, (ids) => {
@@ -3696,17 +3697,17 @@ const updateAttachers = () => {
       collectionArray.push(`${repeatingString}freeform`);
       collectionArray.push(`${repeatingString}crit_attacher`);
 
-      for (let x = 0; x < itemsToPush.length; x++) {
-        collectionArray.push(`${repeatingString}${itemsToPush[x]}_attacher`);
-        finalSetAttrs[`attacher_${itemsToPush[x]}`] = ' ';
+      for (const itemToPush of itemsToPush) {
+        collectionArray.push(`${repeatingString}${itemToPush}_attacher`);
+        finalSetAttrs[`attacher_${itemToPush}`] = ' ';
       }
     }
     getAttrs(collectionArray, (v) => {
       for (const id of ids) {
         const repeatingString = `${repeatingItem}_${id}_`;
 
-        for (let x = 0; x < itemsToPush.length; x++) {
-          const attacher = v[`${repeatingString}${itemsToPush[x]}_attacher`];
+        for (const itemToPush of itemsToPush) {
+          const attacher = v[`${repeatingString}${itemToPush}_attacher`];
           if (exists(attacher) && attacher === 'on') {
             const attacherName = v[`${repeatingString}name`] || '';
 
@@ -3714,15 +3715,15 @@ const updateAttachers = () => {
             if (exists(attacherName) && exists(freeText)) {
               const critAttacher = v[`${repeatingString}crit_attacher`];
               if (critAttacher) {
-                finalSetAttrs[`attacher_${itemsToPush[x]}`] += `{{crit_name=${attacherName}}} `;
-                finalSetAttrs[`attacher_${itemsToPush[x]}`] += `{{crit_text=${freeText}}} `;
+                finalSetAttrs[`attacher_${itemToPush}`] += `{{crit_name=${attacherName}}} `;
+                finalSetAttrs[`attacher_${itemToPush}`] += `{{crit_text=${freeText}}} `;
               } else {
-                finalSetAttrs[`attacher_${itemsToPush[x]}`] += `{{${attacherName}=${freeText}}} `;
+                finalSetAttrs[`attacher_${itemToPush}`] += `{{${attacherName}=${freeText}}} `;
               }
             }
             const freeForm = v[`${repeatingString}freeform`];
             if (exists(freeForm)) {
-              finalSetAttrs[`attacher_${itemsToPush[x]}`] += `${freeForm} `;
+              finalSetAttrs[`attacher_${itemToPush}`] += `${freeForm} `;
             }
           }
         }
@@ -3939,8 +3940,8 @@ const updateNPCContent = () => {
   const collectionArray = ['content_srd'];
   const finalSetAttrs = {};
 
-  for (let i = 0; i < ABILITIES.length; i++) {
-    collectionArray.push(ABILITIES[i]);
+  for (const ability of ABILITIES) {
+    collectionArray.push(ability);
   }
 
   getAttrs(collectionArray, (v) => {
@@ -4133,8 +4134,8 @@ const parseAction = (rowId, type) => {
   const spellcastingLevelRegex = /(\d+)(?:st|dn|rd|th)-level spellcaster/i;
   const spellcastingAbilityRegex = /spellcasting ability is (\w+)/i;
 
-  for (let i = 0; i < ABILITIES.length; i++) {
-    collectionArray.push(`${ABILITIES[i]}_mod`);
+  for (const ability of ABILITIES) {
+    collectionArray.push(`${ability}_mod`);
   }
 
   getSectionIDs(repeatingItem, (ids) => {
