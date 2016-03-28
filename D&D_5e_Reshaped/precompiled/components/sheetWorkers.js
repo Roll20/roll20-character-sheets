@@ -1489,6 +1489,13 @@ const setClassFeatures = () => {
           storageName: 'Eldritch Invocations',
         });
       }
+      if (v.warlock_level >= 3) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.PACT_BOON_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.PACT_BOON'),
+          storageName: 'Pact Boon',
+        });
+      }
       if (v.warlock_level >= 11) {
         setTrait({
           freetext: translate(language, 'CLASS_FEATURES.MYSTIC_ARCANUM_TEXT'),
