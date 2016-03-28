@@ -396,7 +396,7 @@ const showSign = (value) => {
   return value;
 };
 
-on('change:cp change:sp change:ep change:gp change:pp', () => {
+const calculateGold = () => {
   const collectionArray = ['cp', 'copper_per_gold', 'sp', 'silver_per_gold', 'ep', 'electrum_per_gold', 'gp', 'pp', 'platinum_per_gold'];
   const finalSetAttrs = {};
 
@@ -416,6 +416,9 @@ on('change:cp change:sp change:ep change:gp change:pp', () => {
 
     setFinalAttrs(v, finalSetAttrs);
   });
+};
+on('change:cp change:copper_per_gold change:sp change:silver_per_gold change:ep change:electrum_per_gold change:gp change:pp change:platinum_per_gold', () => {
+  calculateGold();
 });
 
 const updateAbilityModifier = (ability) => {
