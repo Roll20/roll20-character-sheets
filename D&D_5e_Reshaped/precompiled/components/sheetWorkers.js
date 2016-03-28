@@ -4647,14 +4647,13 @@ const generateSkills = () => {
 
     getAttrs(collectionArray, (v) => {
       const language = v.lang || 'en';
-
       let x = 0;
 
       for (const prop in SKILLS) {
         if (SKILLS.hasOwnProperty(prop)) {
           let skillId;
-          if (id) {
-            skillId = id;
+          if (ids[x]) {
+            skillId = ids[x];
           } else {
             skillId = generateRowID();
           }
