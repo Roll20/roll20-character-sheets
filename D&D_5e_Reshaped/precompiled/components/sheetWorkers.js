@@ -2931,7 +2931,7 @@ const updateAttack = (rowId) => {
 
     getAttrs(collectionArray, (v) => {
       for (const id of ids) {
-        const repeatingString = `${repeatingItem}_${ids}_`;
+        const repeatingString = `${repeatingItem}_${id}_`;
 
         const attackName = v[`${repeatingString}name`];
         if (isUndefined(attackName)) {
