@@ -1,0 +1,1578 @@
+<script type="text/worker">
+
+// Populating description
+
+on("change:gender change:hand change:race", function() {
+    getAttrs(["gender","hand","race"], function(obj) {
+        var hand = obj.hand;
+        hand = hand.charAt(0).toUpperCase() + hand.slice(1).toLowerCase();
+        var gender = obj.gender;
+        gender = gender.toLowerCase();
+        var race = obj.race;
+        race  = race.toLowerCase();
+        setAttrs({
+            "descrip": hand + " " + gender + " " + race
+        });
+    });
+});
+
+on("change:height change:weight change:age change:pb", function() {
+    getAttrs(["height","weight","age","pb"], function(obj) {
+        var height = obj.height;
+        var weight = obj.weight;
+        var age = obj.age;
+        var pb = obj.pb;
+        attrs = {};
+        attrs["stat-height"] = "";
+        attrs["stat-weight"] = "";
+        attrs["stat-age"] = "";
+        attrs["stat-pb"] = "";
+        if (height != undefined || weight != undefined || age != undefined || pb != undefined){
+            if (height != undefined) {
+                attrs["stat-height"] = height;
+            }
+            if (weight != undefined) {
+                attrs["stat-weight"] = weight;
+            }
+            if (age != undefined) {
+                attrs["stat-age"] = age + " y.o.";
+            }
+            if (pb != undefined) {
+                attrs["stat-pb"] = "PB: " + pb;
+            }
+        }
+        setAttrs(attrs);
+    });
+});
+
+// Populate history
+
+on("change:aspect change:status change:legit change:order", function() {
+    getAttrs(["aspect","status","legit","order"], function(obj) {
+        var order = obj["order"];
+        if (order != undefined) { order = "You are your parents' " + order + " child."; }
+        else { order = ""; }
+        setAttrs({
+            "hsum-aspect": obj["aspect"],
+            "hsum-status": obj["status"],
+            "hsum-legit": obj["legit"],
+            "hsum-order": order
+        });
+    });
+});
+
+// Calculating IB
+
+on("change:agcurr change:pc", function() {
+    getAttrs(["agcurr", "pc"], function(obj) {
+        setAttrs({
+            "ib": (obj.agcurr*1 + obj.pc*1)
+        });
+    });
+});
+
+// Calculating TMR
+
+on("change:agcurr change:tmrracemod", function() {
+    getAttrs(["agcurr", "tmrracemod"], function(v) {
+        var tmr = 0;
+        var agnum = v.agcurr;
+        var racemod = v.tmrracemod;
+        if (agnum >= 27) { tmr = 99; }
+        else if (agnum >= 26) { tmr = 8; }
+        else if (agnum >= 22) { tmr = 7; }
+        else if (agnum >= 18) { tmr = 6; }
+        else if (agnum >= 13) { tmr = 5; }
+        else if (agnum >= 9) { tmr = 4; }
+        else if (agnum >= 5) { tmr = 3; }
+        else if (agnum >= 3) { tmr = 2; }
+        else { tmr = 0; }
+        tmr += racemod*1;
+        setAttrs({"tmr":tmr});
+    });
+});
+
+// Calculating MR
+ 
+var updateIsmage = function() {
+    getSectionIDs("repeating_college", function(idArray) {
+        if(idArray.length == 0) {
+            setAttrs({"ismage":0});
+        }
+        else {
+            var mage = 0;
+            var collegeIDs = [];
+            for (var i=0; i < idArray.length; i++) {
+                var idname = idArray[i];
+                collegeIDs.push("repeating_college_" + idname + "_college");
+            }
+            getAttrs(collegeIDs, function(objCollege) {
+                _.each(objCollege, function(value, key) { 
+                    if (value!="") { mage = 1; }
+                });
+                setAttrs({"ismage":mage});
+            });
+        }
+    });
+};
+ 
+on("change:repeating_college:college", function() {
+    getAttrs(["repeating_college_college", "ismage"], function(obj) {
+        console.log(obj);
+        if((obj.ismage=="1") && (obj.repeating_college_college==undefined)) {
+            updateIsmage();
+        }
+        else if((obj.ismage=="0") && (obj.repeating_college_college!=undefined)) {
+            updateIsmage();
+        }
+    })
+});
+
+on("remove:repeating_college", function() {
+    updateIsmage();
+}); 
+
+on("change:wp change:ismage", function() {
+    getAttrs(["wp", "ismage"], function(values) {
+        var wp = values.wp*1;
+        if (values.ismage*1 == 0) {
+            wp += 20;
+        }
+        setAttrs({"mr":wp});
+    });
+});
+
+// Calculating shield MD total
+
+on("change:repeating_shield:smd change:repeating_shield:sequip", function() {
+    getAttrs(["repeating_shield_smd", "repeating_shield_sequip"], function(obj) {
+        var smdact = 0;
+        var smd = obj.repeating_shield_smd;
+        var sequip = obj.repeating_shield_sequip;
+        if (sequip == "on") {
+            sequip = 1;
+        }
+        smdact = smd * sequip;
+        setAttrs({"repeating_shield_smdact":smdact});
+    });
+});
+
+on("change:repeating_shield:smdact remove:repeating_shield", function() {
+    var tot = 0;
+    getSectionIDs("repeating_shield", function(idArray) {
+        var IDs = [];
+        for (var i = 0; i < idArray.length; i++) {
+            IDs.push("repeating_shield_" + idArray[i] + "_smdact");
+        }
+        getAttrs(IDs, function(obj) {
+            _.each(obj, function(value, key) {
+                tot += value*1;
+            });
+            setAttrs({"smdtot":tot})
+        });
+    });
+});
+
+// Calculating mdcurr
+
+on("change:md change:smdtot", function() {
+    getAttrs(["md", "smdtot"], function(values) {
+        setAttrs( {
+            "mdcurr": (values.md*1 + values.smdtot*1)
+        });
+    });
+});
+
+// Calculating df
+
+on("change:sdftot change:agcurr", function() {
+    getAttrs(["sdftot", "agcurr"], function(values) {
+        setAttrs( {
+            "df": (values.sdftot*1 + values.agcurr*1)
+        });
+    });
+});
+
+// Calculating stunned value
+
+on("change:en", function() {
+    getAttrs(["en"], function(values) {
+        setAttrs( {
+            "stun": Math.ceil(values.en/3)
+        });
+    });
+});
+
+// Calculating aagtot, pagcalc & agcurr
+
+on("change:repeating_armour:aag change:repeating_armour:aequip", function() {
+    getAttrs(["repeating_armour_aag", "repeating_armour_aequip"], function(obj) {
+        var aagact = 0;
+        var aag = obj.repeating_armour_aag;
+        var aequip = obj.repeating_armour_aequip;
+        if (aequip == "on") {
+            aequip = 1;
+        }
+        aagact = aag * aequip;
+        setAttrs({"repeating_armour_aagact":aagact});
+    });
+});
+
+on("change:repeating_armour:aagact remove:repeating_armour", function() {
+    var tot = 0;
+    getSectionIDs("repeating_armour", function(idArray) {
+        var IDs = [];
+        for (var i = 0; i < idArray.length; i++) {
+            IDs.push("repeating_armour_" + idArray[i] + "_aagact");
+        }
+        getAttrs(IDs, function(obj) {
+            _.each(obj, function(value, key) {
+                tot += value*1;
+            });
+            setAttrs({"aagtot":tot})
+        });
+    });
+});
+
+on("change:ps change:wgttot", function(info) {
+    getAttrs(["ps", "wgttot"], function(values) {
+        var pagcalc = 0;
+        var wgttot = values.wgttot*1;
+        var ps = values.ps*1;
+        // Set limits
+        var limits = [];
+        if (ps >= 37 && ps < 40) { limits = [65,95,135,170,207.5,247.5,280,307.5,325]; }
+        else if (ps >= 33) { limits = [55,80,110,140,180,220,245,262.5,275]; }
+        else if (ps >= 28) { limits = [45,65,85,105,140,180,205,260,250]; }
+        else if (ps >= 24) { limits = [35,50,65,85,120,160,185,207.5,225]; }
+        else if (ps >= 21) { limits = [25,40,55,70,100,140,165,185,200]; }
+        else if (ps >= 18) { limits = [17.5,25,35,50,75,105,125,140,150]; }
+        else if (ps >= 13) { limits = [12.5,17.5,25,40,60,80,95,112.5,125]; }
+        else if (ps >= 9) { limits = [5,12.5,17.5,25,46,60,75,90,100]; }
+        else if (ps >= 6) { limits = [0,5,12.5,17.5,25,40,55,67.5,75]; }
+        else if (ps >= 3) { limits = [0,0,5,14,21.5,30,37.5,45,50]; }
+        else if (ps < 3) { limits = [0,0,0,0,0,0,0,0,0]; }
+        // Use limits to get pagcalc
+        if (wgttot > limits[8]) { pagcalc = -99; }
+        else if (wgttot > limits[7]) { pagcalc=-12; }
+        else if (wgttot > limits[6]) { pagcalc=-10; }
+        else if (wgttot > limits[5]) { pagcalc=-9; }
+        else if (wgttot > limits[4]) { pagcalc=-7; }
+        else if (wgttot > limits[3]) { pagcalc=-5; }
+        else if (wgttot > limits[2]) { pagcalc=-3; }
+        else if (wgttot > limits[1]) { pagcalc=-2; }
+        else if (wgttot > limits[0]) { pagcalc=-1; }
+        // Calculate agcurr
+        setAttrs({"pagcalc":pagcalc});
+    });
+});
+
+on("change:aagtot change:ag change:pagcalc", function() {
+    getAttrs(["ag","aagtot","pagcalc"], function(obj) {
+        console.log("%cAgility or Agility Modifier changed","color:red");
+        console.log(obj);
+        console.log((obj.ag*1) + (obj.aagtot*1) + (obj.pagcalc*1));
+        console.log(obj.ag*1);
+        console.log(obj.aagtot*1);
+        console.log(obj.pagcalc*1);
+        if ((obj.pagcalc*1) == -99) {
+            obj.pagcalc = (obj.ag*-1) + (obj.aagtot*-1)
+        }
+        console.log(obj.pagcalc);
+        setAttrs({
+            "agcurr": (obj.ag*1) + (obj.aagtot*1) + (obj.pagcalc*1)
+        });
+    });
+});
+
+// Calculating total sp value & weight of money
+
+on("change:cf change:sp change:gs change:tg", function() {
+    getAttrs(["cf", "sp", "gs", "tg"], function(values) {
+        setAttrs( {
+            "monwgt": (((values.cf*4)+(values.sp*1)+(values.gs*1)+(values.tg*2))/16),
+            "totsp": ((values.cf/4)+(values.sp*1)+(values.gs*12)+(values.tg*252))
+        });
+    });
+});
+
+// Calculating weights for multiples of weapons
+
+on("change:repeating_weapon:wnum change:repeating_weapon:wwgt", function() {
+    getAttrs(["repeating_weapon_wnum", "repeating_weapon_wwgt"], function(obj) {
+        setAttrs({
+            "repeating_weapon_wwgtact": ((obj.repeating_weapon_wnum*(obj.repeating_weapon_wwgt*10000))/10000)
+        });
+    });
+});
+
+// Calculating weapon IV
+
+on("change:repeating_weapon:wrank", function() {
+    getAttrs(["repeating_weapon_wrank", "ib"], function(obj) {
+        var wrank = obj.repeating_weapon_wrank;
+        if (wrank==undefined) { wrank = 0; }
+        var wiv = (wrank*1)+(obj.ib*1);
+        setAttrs({
+            "repeating_weapon_wiv": wiv,
+            "repeating_weapon_wsum-iv": wiv
+        });
+    });
+});
+
+on("change:ib", function() {
+    // Trigger recalc of IV for all weapons
+    getSectionIDs("repeating_weapon", function(idArray) {
+        var IDs = [];
+        for (var i = 0; i < idArray.length; i++) {
+            IDs.push("repeating_weapon_" + idArray[i] + "_wrank");
+        }
+        IDs.push("ib");
+        getAttrs(IDs, function(objAttrs) {
+            var ib = objAttrs.ib*1;
+            delete objAttrs.ib;
+            var attrs = {};
+            _.each(objAttrs, function(value, key) {
+                var wivID = key.slice(0, -5);
+                if (value == undefined || value == "") { value=0; }
+                var wiv = ib + (value*1);
+                attrs[wivID + "wiv"] = wiv;
+                attrs[wivID + "wsum-iv"] = wiv;
+            });
+            setAttrs(attrs);
+        });
+    });
+});
+
+// Calculating Unarmed Combat IV
+
+on("change:wuc-wrank change:ib", function() {
+    getAttrs(["wuc-wrank","ib"], function(obj) {
+        var wrank = obj["wuc-wrank"];
+        if (wrank == undefined || wrank == "") { wrank = 0; }
+        var iv = (obj.ib*1) + (wrank*1);
+        setAttrs({
+            "wuc-wiv": iv,
+            "wuc-wsum-iv": iv
+        });
+    });
+});
+
+// Calculating weapon SC
+
+on("change:repeating_weapon:wbase change:repeating_weapon:wrank", function() {
+    getAttrs(["repeating_weapon_wbase","repeating_weapon_wrank","mdcurr"], function(obj) {
+        var wrank = obj.repeating_weapon_wrank;
+        var rank = undefined;
+        if (wrank != undefined && wrank != "") { rank = obj.repeating_weapon_wrank*1; }
+        var wsc =  ((obj.repeating_weapon_wbase*1)+((rank != undefined) ? rank*4 + (obj.mdcurr*1) : 0));
+        setAttrs({
+            "repeating_weapon_wsc": wsc,
+            "repeating_weapon_wsum-sc": wsc
+        });
+    });
+});
+
+on("change:mdcurr", function() {
+    // Trigger recalc of SC for all weapons
+    getSectionIDs("repeating_weapon", function(idArray) {
+        var IDs = [];
+        for (var i = 0; i < idArray.length; i++) {
+            IDs.push("repeating_weapon_" + idArray[i] + "_wbase");
+            IDs.push("repeating_weapon_" + idArray[i] + "_wrank");
+        }
+        IDs.push("mdcurr");
+        getAttrs(IDs, function(objAttrs) {
+            var mdcurr = objAttrs.mdcurr;
+            delete objAttrs.mdcurr;
+            var objWbase = {};
+            var objWrank = {};
+            var keys = [];
+            var attrs = {};
+            _.each(objAttrs, function(value, key) {
+                if (key.slice(-4) == "base") {
+                    key = key.slice(0, -6);
+                    objWbase[key] = value;
+                    keys.push(key);
+                }
+                else if (key.slice(-4) == "rank") {
+                    key = key.slice(0, -6);
+                    objWrank[key] = value;
+                }
+            });
+            for (var i = 0; i < keys.length; i++) {
+                var wrank = objWrank[keys[i]];
+                var rank = undefined;
+                if (wrank != undefined && wrank != "") { rank = objWrank[keys[i]]*1; }
+                var sc = (objWbase[keys[i]]*1) + ((rank != undefined) ? (rank*4) + mdcurr : 0);
+                attrs[keys[i] + "_wsc"] = sc;
+                attrs[keys[i] + "_wsum-sc"] = sc;
+            }
+            setAttrs(attrs);
+        });
+    });    
+});
+
+// Calculating Unarmed Combat SC
+
+on("change:wuc-wrank change:wuc-wbase change:mdcurr", function() {
+    getAttrs(["wuc-wrank","wuc-wbase","mdcurr"], function(obj) {
+        var wrank = obj["wuc-wrank"];
+        var rank = undefined;
+        if (wrank != undefined && wrank != "") { rank = obj["wuc-wrank"]*1; }
+        var sc = ((obj["wuc-wbase"]*1) + ((rank != undefined) ? (rank*4) + (obj.mdcurr*1) : 0));
+        setAttrs({
+            "wuc-wsc": sc,
+            "wuc-wsum-sc": sc
+        });
+    });
+});
+
+// Calculating Unarmed combat base & damage
+
+on("change:agcurr change:ps", function() {
+    getAttrs(["agcurr","ps"], function(obj) {
+        var ps = obj.ps * 1;
+        var psbonus = (ps > 15) ? ps - 15 : 0;
+        var dmbonus = Math.floor(psbonus/3) - 4;
+        setAttrs({
+            "wuc-wbase": (obj.agcurr * 2) + psbonus,
+            "wuc-wdm": dmbonus,
+            "wuc-wsum-dm": dmbonus
+        });
+    });
+});
+
+// Calculating all the weight totals
+
+on("change:repeating_weapon:wwgtact remove:repeating_weapon", function() {
+    var wgttot = 0;
+    getSectionIDs("repeating_weapon", function(idArray) {
+        var wgtIDs = [];
+        for (var i = 0; i < idArray.length; i++) {
+            wgtIDs.push("repeating_weapon_" + idArray[i] + "_wwgtact");
+        }
+        getAttrs(wgtIDs, function(objWgts) {
+            _.each(objWgts, function(value) {
+                wgttot += value*10000;
+            });
+            wgttot = wgttot/10000;
+            setAttrs({"wwgttot":wgttot});
+        });
+    });
+});
+
+on("change:repeating_armour:awgt remove:repeating_armour", function() {
+    var wgttot = 0;
+    getSectionIDs("repeating_armour", function(idArray) {
+        var wgtIDs = [];
+        for (var i = 0; i < idArray.length; i++) {
+            wgtIDs.push("repeating_armour_" + idArray[i] + "_awgt");
+        }
+        getAttrs(wgtIDs, function(objWgts) {
+            _.each(objWgts, function(value) {
+                wgttot += value*10000;
+            });
+            wgttot = wgttot/10000;
+            setAttrs({"awgttot":wgttot});
+        });
+    });
+});
+
+on("change:repeating_shield:swgt remove:repeating_shield", function() {
+    var wgttot = 0;
+    getSectionIDs("repeating_shield", function(idArray) {
+        var wgtIDs = [];
+        for (var i = 0; i < idArray.length; i++) {
+            wgtIDs.push("repeating_shield_" + idArray[i] + "_swgt");
+        }
+        getAttrs(wgtIDs, function(objWgts) {
+            _.each(objWgts, function(value) {
+                wgttot += value*10000;
+            });
+            wgttot = wgttot/10000;
+            setAttrs({"swgttot":wgttot});
+        });
+    });
+});
+
+on("change:repeating_possession:pwgt remove:repeating_possession", function() {
+    var wgttot = 0;
+    getSectionIDs("repeating_possession", function(idArray) {
+        var wgtIDs = [];
+        for (var i = 0; i < idArray.length; i++) {
+            wgtIDs.push("repeating_possession_" + idArray[i] + "_pwgt");
+        }
+        getAttrs(wgtIDs, function(objWgts) {
+            _.each(objWgts, function(value) {
+                wgttot += value*10000;
+            });
+            wgttot = wgttot/10000;
+            setAttrs({"pwgttot":wgttot});
+        });
+    });
+});
+
+// Calculating wgttot
+
+on("change:wwgttot change:awgttot change:swgttot change:monwgt change:pwgttot", function() {
+    getAttrs(["wwgttot", "awgttot", "swgttot", "monwgt", "pwgttot"], function(values) {
+        setAttrs( {
+            "wgttot": ((values.wwgttot*1)+(values.awgttot*1)+(values.swgttot*1)+(values.monwgt*1)+(values.pwgttot*1))
+        });
+    });
+});
+
+// Getting total protection from armour
+
+on("change:repeating_armour:apro change:repeating_armour:aequip", function(log) {
+    getAttrs(["repeating_armour_apro", "repeating_armour_aequip"], function(obj) {
+        var aproact = 0;
+        var apro = obj.repeating_armour_apro;
+        var aequip = obj.repeating_armour_aequip;
+        if (aequip == "on") {
+            aequip = 1;
+        }
+        aproact = apro * aequip;
+        setAttrs({"repeating_armour_aproact":aproact});
+    });
+});
+
+on("change:repeating_armour:aproact remove:repeating_armour", function() {
+    var tot = 0;
+    getSectionIDs("repeating_armour", function(idArray) {
+        var IDs = [];
+        for (var i = 0; i < idArray.length; i++) {
+            IDs.push("repeating_armour_" + idArray[i] + "_aproact");
+        }
+        getAttrs(IDs, function(obj) {
+            _.each(obj, function(value, key) {
+                tot += value*1;
+            });
+            setAttrs({"pro":tot})
+        });
+    });
+});
+
+// Getting total defence from shields
+
+on("change:repeating_shield:srank change:repeating_shield:sdfpr change:repeating_shield:sequip", function() {
+    getAttrs(["repeating_shield_srank", "repeating_shield_sdfpr", "repeating_shield_sequip"], function(obj) {
+        var sdf = 0;
+        var sdef = 0;
+        var srank = obj.repeating_shield_srank;
+        var sdfpr = obj.repeating_shield_sdfpr;
+        var sequip = obj.repeating_shield_sequip;
+        if (sequip == "on") {
+            sequip = 1;
+        }
+        sdf = srank * sdfpr * sequip;
+        sdef = srank * sdfpr;
+        setAttrs({"repeating_shield_sdf":sdf, "repeating_shield_sdef":sdef});
+    });
+});
+
+on("change:repeating_shield:sdf remove:repeating_shield", function() {
+    var tot = 0;
+    getSectionIDs("repeating_shield", function(idArray) {
+        var IDs = [];
+        for (var i = 0; i < idArray.length; i++) {
+            IDs.push("repeating_shield_" + idArray[i] + "_sdf");
+        }
+        getAttrs(IDs, function(obj) {
+            _.each(obj, function(value, key) {
+                tot += value*1;
+            });
+            setAttrs({"sdftot":tot})
+        });
+    });
+});
+
+// Calculating Main SC% for spells
+
+
+
+// Updating weapon summary
+
+on("change:repeating_weapon:wname change:repeating_weapon:wnum", function() {
+    getAttrs(["repeating_weapon_wname", "repeating_weapon_wnum"], function(obj) {
+        var num = "";
+        var wnum = obj.repeating_weapon_wnum*1;
+        if (wnum > 1) {
+            num = " (" + wnum + ")";
+        }
+        else if(wnum == 0) {
+            num = " - unavailable"
+        }
+        setAttrs({
+            "repeating_weapon_wsum-name": obj.repeating_weapon_wname + num
+        });
+    });
+});
+
+on("change:repeating_weapon:wuser change:repeating_weapon:wusem change:repeating_weapon:wusec", function() {
+    getAttrs(["repeating_weapon_wuser","repeating_weapon_wusem","repeating_weapon_wusec"], function(obj) {
+        setAttrs({
+            "repeating_weapon_wsum-use": (obj.repeating_weapon_wuser=="0" ? "" : "R") + (obj.repeating_weapon_wusem=="0" ? "" : "M") + (obj.repeating_weapon_wusec=="0" ? "" : "C")
+        });
+    });
+});
+
+on("change:repeating_weapon:wrg", function() {
+    getAttrs(["repeating_weapon_wrg"], function(obj) {
+        setAttrs({
+            "repeating_weapon_wsum-range": obj.repeating_weapon_wrg
+        });
+    });
+});
+
+on("change:repeating_weapon:wdm", function() {
+    getAttrs(["repeating_weapon_wdm"], function(obj) {
+        setAttrs({
+            "repeating_weapon_wsum-dm": obj.repeating_weapon_wdm
+        });
+    });
+});
+
+on("change:repeating_weapon:wcl", function() {
+    getAttrs(["repeating_weapon_wcl"], function(obj) {
+        setAttrs({
+            "repeating_weapon_wsum-cl": obj.repeating_weapon_wcl
+        });
+    });
+});
+
+on("change:repeating_weapon:wrank change:repeating_weapon:wrankmax", function() {
+    getAttrs(["repeating_weapon_wrank","repeating_weapon_wrankmax"], function(obj) {
+        var wrank = obj.repeating_weapon_wrank;
+        var wrankmax = obj.repeating_weapon_wrankmax;
+        if (wrank == undefined || wrank == "") { wrank = "-"; }
+        if (wrankmax == undefined || wrankmax == "") { wrankmax = "-"; }
+        setAttrs({
+            "repeating_weapon_wsum-rank": wrank + "/" + wrankmax
+        });
+    });
+});
+
+// Updating Unarmed combat weapon summary
+
+on("change:wuc-wrank", function() {
+    getAttrs(["wuc-wrank"], function(obj) {
+        var wrank = obj["wuc-wrank"];
+        if (wrank == undefined || wrank == "") { wrank = "-"; }
+        setAttrs({
+            "wuc-wsum-rank": wrank
+        });
+    });
+});
+
+// Updating armour summary
+
+on("change:repeating_armour:atype", function() {
+    getAttrs(["repeating_armour_atype"], function(obj) {
+        setAttrs({
+            "repeating_armour_asum-type": obj.repeating_armour_atype
+        });
+    });
+});
+
+on("change:repeating_armour:apro", function() {
+    getAttrs(["repeating_armour_apro"], function(obj) {
+        setAttrs({
+            "repeating_armour_asum-pro": obj.repeating_armour_apro
+        });
+    });
+});
+
+on("change:repeating_armour:aag", function() {
+    getAttrs(["repeating_armour_aag"], function(obj) {
+        setAttrs({
+            "repeating_armour_asum-ag": obj.repeating_armour_aag
+        });
+    });
+});
+
+on("change:repeating_armour:asth", function() {
+    getAttrs(["repeating_armour_asth"], function(obj) {
+        setAttrs({
+            "repeating_armour_asum-sth": obj.repeating_armour_asth
+        });
+    });
+});
+
+on("change:repeating_armour:aequip", function() {
+    getAttrs(["repeating_armour_aequip"], function(obj) {
+        var equip = "N";
+        if(obj.repeating_armour_aequip=="on") {
+            equip = "Y";
+        }
+        setAttrs({
+            "repeating_armour_asum-equip": equip
+        });
+    });
+});
+
+// Updating shield summary
+
+on("change:repeating_shield:stype", function() {
+    getAttrs(["repeating_shield_stype"], function(obj) {
+        setAttrs({
+            "repeating_shield_ssum-type": obj.repeating_shield_stype
+        });
+    });
+});
+
+on("change:repeating_shield:srank", function() {
+    getAttrs(["repeating_shield_srank"], function(obj) {
+        setAttrs({
+            "repeating_shield_ssum-rank": obj.repeating_shield_srank
+        });
+    });
+});
+
+on("change:repeating_shield:sdef", function() {
+    getAttrs(["repeating_shield_sdef"], function(obj) {
+        setAttrs({
+            "repeating_shield_ssum-df": obj.repeating_shield_sdef
+        });
+    });
+});
+
+on("change:repeating_shield:smd", function() {
+    getAttrs(["repeating_shield_smd"], function(obj) {
+        setAttrs({
+            "repeating_shield_ssum-md": obj.repeating_shield_smd
+        });
+    });
+});
+
+on("change:repeating_shield:sequip", function() {
+    getAttrs(["repeating_shield_sequip"], function(obj) {
+        var equip = "N";
+        if(obj.repeating_shield_sequip=="on") {
+            equip = "Y";
+        }
+        setAttrs({
+            "repeating_shield_ssum-equip": equip
+        });
+    });
+});
+
+// Updating spell summary
+
+on("change:repeating_spell:spname", function() {
+    getAttrs(["repeating_spell_spname"], function(obj) {
+        setAttrs({
+            "repeating_spell_sum-name": obj.repeating_spell_spname
+        });
+    });
+});
+
+on("change:repeating_spell:sptype", function() {
+    getAttrs(["repeating_spell_sptype"], function(obj) {
+        setAttrs({
+            "repeating_spell_sum-type": obj.repeating_spell_sptype
+        });
+    });
+});
+
+on("change:repeating_spell:sprank", function() {
+    getAttrs(["repeating_spell_sprank"], function(obj) {
+        setAttrs({
+            "repeating_spell_sum-rank": obj.repeating_spell_sprank
+        });
+    });
+});
+
+/* Remove and place update into calculation if/when SC is calculated */
+
+on("change:repeating_spell:spmain", function() {
+    getAttrs(["repeating_spell_spmain"], function(obj) {
+        setAttrs({
+            "repeating_spell_sum-main": obj.repeating_spell_spmain
+        });
+    });
+});
+
+on("change:repeating_spell:sprg", function() {
+    getAttrs(["repeating_spell_sprg"], function(obj) {
+        setAttrs({
+            "repeating_spell_sum-rg": obj.repeating_spell_sprg
+        });
+    });
+});
+
+on("change:repeating_spell:spdur", function() {
+    getAttrs(["repeating_spell_spdur"], function(obj) {
+        setAttrs({
+            "repeating_spell_sum-dur": obj.repeating_spell_spdur
+        });
+    });
+});
+
+on("change:repeating_spell:spresp change:repeating_spell:spresa", function() {
+    getAttrs(["repeating_spell_spresp","repeating_spell_spresa"], function(obj) {
+        var res = "";
+        if (obj.repeating_spell_spresp == "P") { res += "P"; }
+        if (obj.repeating_spell_spresa == "A") { res += "A"; }
+        if (res == "") { res = "N"; }
+        setAttrs({
+            "repeating_spells_sum-res": res
+        });
+    });
+});
+
+on("change:repeating_spell:sprit", function() {
+    getAttrs(["repeating_spell_sprit"], function(obj) {
+        var rit = obj.repeating_spell_sprit;
+        if (rit == "on") { rit = "Y"; }
+        else {rit = "N"; }
+        setAttrs({
+            "repeating_spell_sum-rit": rit
+        });
+    });
+});
+
+</script>
+
+
+<div class="sheet-charsheet">
+<div class="sheet-2colsec">
+    <div class="sheet-colm sheet-chardets">
+        <input class="sheet-options-flag" type="checkbox" name="attr_hist-options-flag" checked>
+        <span class="sheet-flag-unchecked">W</span><span class="sheet-flag-checked">3</span>
+        <div class="sheet-header">Description</div>
+        <div class="sheet-descrip">     
+            <span name="attr_descrip"></span>
+            <div class="sheet-stat"><span class="sheet-pictos">U</span><span name="attr_stat-height"></span></div>
+            <div class="sheet-stat"><span class="sheet-pictos">a</span><span name="attr_stat-weight"></span></div>
+            <div class="sheet-stat"><span class="sheet-pictos">\</span><span name="attr_stat-age"></span></div>
+            <div class="sheet-stat"><span class="sheet-pictos">k</span><button class="sheet-btn" type="roll" value="&{template:default} {{name=Beauty Roll}} {{D100=[[1d100]]}} {{Physical Beauty=[[@{pb}]]}}}"><span name="attr_stat-pb"></span></button></div>
+        </div>
+        <div class="sheet-header">History</div>
+        <div class="sheet-hsummary">
+            <span>The </span>
+            <span name="attr_hsum-legit"></span><span> child of </span>
+            <span name="attr_hsum-status"></span><span>, you were born under the aspect of </span>
+            <span name="attr_hsum-aspect"></span><span>.</span>
+            <span name="attr_hsum-order"></span>
+        </div>
+        <div class="sheet-initchars">
+            <ul>
+                <li>
+                    <span>Gender:</span>
+                    <input type="text" name="attr_gender" placeholder="ungendered">
+                </li>
+                <li>
+                    <span>Handedness:</span>
+                    <input type="text" name="attr_hand" placeholder="Right-handed">
+                </li>
+                <li>
+                    <span>Race:</span>
+                    <input type="text" name="attr_race" placeholder="Human">
+                </li>
+                <li>
+                    <span>Racial TMR modifier:</span>
+                    <select name="attr_tmrracemod">
+                        <option value="-1">-1</option>
+                        <option value="0" selected>0</option>
+                        <option value="1">+1</option>
+                    </select>
+                </li>
+                <li>
+                    <span>Aspect:</span>
+                    <select name="attr_aspect">
+                        <option value="the winter stars">the winter stars</option>
+                        <option value="the spring stars">the spring stars</option>
+                        <option value="the summers stars">the summer stars</option>
+                        <option value="the autumn stars">the autumn stars</option>
+                        <option value="the sun">the sun</option>
+                        <option value="the moon">the moon</option>
+                        <option value="life">life</option>
+                        <option value="death">death</option>
+                    </select>
+                </li>
+                <li>
+                    <span>Social status:</span>
+                    <select name="attr_status">
+                        <option value="poor trash">poor trash</option>
+                        <option value="impoverished gentlefolk">impoverished gentlefolk</option>
+                        <option value="a farmer">a farmer</option>
+                        <option value="a burgher">a burgher</option>
+                        <option value="a merchant">a merchant</option>
+                        <option value="a merchant prince">a merchant prince</option>
+                        <option value="a craftsman">a craftsman</option>
+                        <option value="an adventurer">an adventurer</option>
+                        <option value="a bandit">a bandit</option>
+                        <option value="a pirate">a pirate</option>
+                        <option value="lesser nobility">lesser nobility</option>
+                        <option value="greater nobility">greater nobility</option>
+                    </select>
+                </li>
+                <li>
+                    <span>Standing:</span>
+                    <select name="attr_legit">
+                        <option value="legitimate">legitimate</option>
+                        <option value="illegitimate">illegitimate</option>
+                        <option value="first born">first born</option>
+                    </select>
+                </li>
+                <li>
+                    <span>Birth order:</span>
+                    <input type="text" name="attr_order" placeholder="third">
+                </li>
+                <li>
+                    <span>Height:</span>
+                    <input type="text" name="attr_height" placeholder="Height"></li>
+                <li>
+                    <span>Weight:</span>
+                    <input type="text" name="attr_weight" placeholder="Weight"></li>
+                <li>
+                    <span>Age:</span>
+                    <input type="number" name="attr_age" value="0" min="0"></li>
+                <li>
+                    <span>Beauty (PB):</span>
+                    <input type="number" name="attr_pb" min="0"></li>
+            </ul>
+        </div>
+        <div class="sheet-rpnotes">
+            <div class="sheet-header">RP notes:</div>
+            <textarea name="attr_rpnotes" placeholder="RP Notes"></textarea>
+        </div>
+    </div>
+    <div class="sheet-colm sheet-chars">
+        <div class="sheet-header">Characteristics</div>
+        <div class="sheet-2colsec">
+            <div class="sheet-colm">
+                <div class="sheet-prichars">
+                    <ul>
+                        <li>
+                            <button class="sheet-btn" type="roll" value="&{template:default} {{name=Strength Roll}} {{D100=[[1d100]]}} {{Physical Strength=[[@{ps}]]}} {{Mults = [[@{ps}*3]] | [[@{ps}/5]] }}">Physical Strength (PS):</button>
+                            <input type="number" name="attr_ps" value="0" min="0"></li>
+                        <li>
+                            <button class="sheet-btn" type="roll" value="&{template:default} {{name=Dexterity Roll}} {{D100=[[1d100]]}} {{Manual Dexterity=[[@{mdcurr}]]}}">Manual Dexterity (MD):</button>
+                            <input type="number" name="attr_mdcurr" value="0" readonly> / <input type="number" name="attr_md" value="0" min="0"></li>
+                        <li>
+                            <button class="sheet-btn" type="roll" value="&{template:default} {{name=Agility Roll}} {{D100=[[1d100]]}} {{Agility=[[@{agcurr}]]}}">Agility (AG):</button>
+                            <input type="number" name="attr_agcurr" readonly value="0"> / <input type="number" name="attr_ag" value="0" min="0"></li>
+                        <li>
+                            <button class="sheet-btn" type="roll" value="&{template:default} {{name=Magic Aptitude Roll}} {{D100=[[1d100]]}} {{Magical Aptitude=[[@{ma}]]}}">Magical Aptitude (MA):</button>
+                            <input type="number" name="attr_ma" value="0" min="0"></li>
+                        <li>
+                            <button class="sheet-btn" type="roll" value="&{template:default} {{name=Will Power Roll}} {{D100=[[1d100]]}} {{Will Power=[[@{wp}]]}}">Will Power (WP):</button>
+                            <input type="number" name="attr_wp" value="0" min="0"></li>
+                        <li>
+                            <button class="sheet-btn" type="roll" value="&{template:default} {{name=Perception Roll}} {{D100=[[1d100]]}} {{Perception=[[@{pc}]]}}">Perception (PC):</button>
+                            <input type="number" name="attr_pc" value="0" min="0"></li>
+                        <li>
+                            <span>Initiative base:</span>
+                            <input type="number" name="attr_ib" value="0" readonly></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="sheet-colm">
+                <div class="sheet-secchars">
+                    <ul>
+                        <li>
+                            <span>Endurance (EN):</span>
+                            <input type="number" name="attr_encurr" value="0" min="0"> / 
+                            <input type="number" name="attr_en" value="0" min="0"></li>
+                        <li>
+                            <span>Fatigue (FT):</span>
+                            <input type="number" name="attr_ftcurr" value="0" min="0"> / 
+                            <input type="number" name="attr_ft" value="0" min="0"></li>
+                        <li>
+                            <span>Tactical Movement Rate (TMR):</span>
+                            <input type="number" name="attr_tmr" readonly value="0"></li>
+                        <li>
+                            <span>Protection:</span>
+                            <input type="number" name="attr_pro" readonly value="0"></li>
+                        <li>
+                            <span>Defence (DF):</span>
+                            <input type="number" name="attr_df" value="0" readonly></li>
+                        <li>
+                            <span>Magical Resistance (MR):</span>
+                            <input type="number" name="attr_mr" readonly value="0"></li>
+                        <li>
+                            <span>Stunned on:</span>
+                            <input type="number" name="attr_stun" value="0" readonly>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Left column -->
+<div class="sheet-2colsec">
+    <div class="sheet-colm sheet-leftcol">
+        <!-- Weapons -->
+        <div class="sheet-weapons">
+            <div class="sheet-header">Weapons</div>
+            <div class="sheet-wheaders">
+                <span>Name</span>
+                <span>Use</span>
+                <span>RG</span>
+                <span>IV</span>
+                <span>SC</span>
+                <span>DM</span>
+                <span>CL</span>
+                <span>RNK</span>
+                <span> </span>
+            </div>
+            <div class="sheet-repeating-weapon sheet-unarmed-combat">
+                <input class="sheet-options-flag" type="checkbox" name="attr_wuc-options-flag" checked>
+                <span class="sheet-flag-unchecked">W</span><span class="sheet-flag-checked">3</span>
+                <div class="sheet-wsummary">
+                    <button class="sheet-btn" type="roll" value="&{template:default} {{name=Unarmed Combat}} {{D100=[[1d100]]}} {{SC=[[@{wuc-wsc}]]}} {{Damage D10 +  @{wuc-wdm}=[[1d10+@{wuc-wdm}]]}}">
+                    <span>Unarmed combat</span></button>
+                    <span>MC</span>
+                    <span>0</span>
+                    <span name="attr_wuc-wsum-iv">0</span>
+                    <span name="attr_wuc-wsum-sc">0</span>
+                    <span name="attr_wuc-wsum-dm">0</span>
+                    <span>C</span>
+                    <span name="attr_wuc-wsum-rank">0</span>
+                    <span> </span>
+                </div>
+                <div class="sheet-weapon">
+                    <input class="sheet-expand-flag" type="checkbox" name="attr_wuc-expand-flag" checked>
+                    <span class="sheet-shrink">J</span>
+                    <span class="sheet-expand">.</span>
+                    <div class="sheet-weapondets">
+                        <ul>
+                            <li>
+                                <span>Weapon:</span>
+                                <input type="text" value="Unarmed combat" readonly></li>
+                            <li>
+                                <span>Rank:</span>
+                                <input type="number" name="attr_wuc-wrank"></li>
+                        </ul>
+                        <span>Notes:</span>
+                        <textarea name="attr_wuc-wnotes" placeholder="Weapon notes"></textarea>
+                    </div>
+                    <div class="sheet-weaponstats">
+                        <div class="sheet-2colsec">
+                            <div class="sheet-colm">
+                                <ul>
+                                    <li>
+                                        <span>Initiative (IV):</span>
+                                        <input type="number" name="attr_wuc-wiv" value="0" readonly>
+                                    </li>
+                                    <li>
+                                        <span>Success chance (SC):</span>
+                                        <input type="number" name="attr_wuc-wsc" value="0" readonly>
+                                    </li>
+                                    <li>
+                                        <span>Base %:</span>
+                                        <input type="number" name="attr_wuc-wbase" value="0"readonly></li>
+                                    <li>
+                                        <span>Damage (DM):</span>
+                                        <input type="number" name="attr_wuc-wdm" value="0" readonly></li>
+                                    <li>
+                                        <span>Range (RG):</span>
+                                        <input type="number" value="0" readonly></li>
+                                </ul>
+                            </div>
+                            <div class="sheet-colm">
+                                <ul>
+                                    <li>
+                                        <span>Class (CL):</span>
+                                        <select disabled>
+                                            <option>C - Crushing</option>
+                                        </select></li>
+                                    <li>
+                                        <div class="sheet-wuse">
+                                            <span>Combat Use:</span>
+                                            <ul>
+                                                <li>
+                                                    <input type="checkbox" readonly><span>R - Ranged</span></li>
+                                                <li>
+                                                    <input type="checkbox" readonly checked><span>M - Melee</span></li>
+                                                <li>
+                                                    <input type="checkbox" readonly checked><span>C - Close</span></li>
+                                            </ul>
+                                        </div></li>
+                                    <li>
+                                        <div class="sheet-whand">
+                                            <span>Handed:</span>
+                                                <input type="checkbox" value="1" checked readonly><span>1</span>
+                                                <input type="checkbox" value="2" readonly><span>2</span>
+                                        </div></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <fieldset class="repeating_weapon">
+                <div class="sheet-repeating-weapon">
+                    <input class="sheet-options-flag" type="checkbox" name="attr_options-flag" checked>
+                    <span class="sheet-flag-unchecked">W</span><span class="sheet-flag-checked">3</span>
+                    <div class="sheet-wsummary">
+                        <button class="sheet-btn" type="roll" value="&{template:default} {{name=@{wname}}} {{D100=[[1d100]]}} {{SC=[[@{wsc}]]}} {{Damage D10 + @{wdm}=[[1d10+@{wdm}]]}}">
+                        <span name="attr_wsum-name"></span></button>
+                        <span name="attr_wsum-use"></span>
+                        <span name="attr_wsum-range"></span>
+                        <span name="attr_wsum-iv"></span>
+                        <span name="attr_wsum-sc"></span>
+                        <span name="attr_wsum-dm"></span>
+                        <span name="attr_wsum-cl"></span>
+                        <span name="attr_wsum-rank"></span>
+                        <span> </span>
+                    </div>
+                    <div class="sheet-weapon">
+                    <input class="sheet-expand-flag" type="checkbox" name="attr_expand-flag" checked>
+                    <span class="sheet-shrink">J</span>
+                    <span class="sheet-expand">.</span>
+                        <div class="sheet-weapondets">
+                            <div class="sheet-2colsec">
+                                <div class="sheet-colm">
+                                            <span>Weapon:</span>
+                                            <input type="text" name="attr_wname" placeholder="Shortsword">
+                                </div>
+                                <div class="sheet-colm">
+                                    <ul>
+                                        <li>
+                                            <span>Rank:</span>
+                                            <input type="number" name="attr_wrank" min="0"> /
+                                            <input type="number" name="attr_wrankmax" min="0"></li>
+                                        <li>
+                                            <span>Number carried:</span>
+                                            <input type="number" name="attr_wnum" value="0" min="0"></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <span>Notes:</span>
+                            <textarea name="attr_wnotes" placeholder="Weapon notes"></textarea>
+                        </div>
+                        <div class="sheet-weaponstats">
+                            <div class="sheet-2colsec">
+                                <div class="sheet-colm">
+                                    <ul>
+                                        <li>
+                                            <span>Initiative (IV):</span>
+                                            <input type="number" name="attr_wiv" value="0" readonly>
+                                        </li>
+                                        <li>
+                                            <span>Success chance (SC):</span>
+                                            <input type="number" name="attr_wsc" value="0" readonly>
+                                        </li>
+                                        <li>
+                                            <span>Weight (lbs):</span>
+                                            <input type="number" name="attr_wwgt" value="0" min="0" step="any"></li>
+                                            <input type="hidden" name="attr_wwgtact" value="0">
+                                        <li>
+                                            <span>Base %:</span>
+                                            <input type="number" name="attr_wbase" value="0" min="0"></li>
+                                        <li>
+                                            <span>Damage (DM):</span>
+                                            <input type="number" name="attr_wdm" value="0" min="0"></li>
+                                        <li>
+                                            <span>Range (RG):</span>
+                                            <input type="number" name="attr_wrg" value="0" min="0"></li>
+                                    </ul>
+                                </div>
+                                <div class="sheet-colm">
+                                    <ul>
+                                        <li>
+                                            <span>PS required:</span>
+                                            <input type="number" name="attr_wps" value="0" min="0"></li>
+                                        <li>
+                                            <span>MD required:</span>
+                                            <input type="number" name="attr_wmd" value="0" min="0"></li>
+                                        <li>
+                                            <span>Class (CL):</span>
+                                            <select name="attr_wcl">
+                                                <option value="-">-</option>
+                                                <option value="A">A - Thrusting</option>
+                                                <option value="B">B - Slashing</option>
+                                                <option value="C">C - Crushing</option>
+                                            </select></li>
+                                        <li>
+                                            <div class="sheet-wuse">
+                                                <span>Combat Use:</span>
+                                                <ul>
+                                                    <li>
+                                                        <input type="checkbox" name="attr_wuser" value="R"><span>R - Ranged</span></li>
+                                                    <li>
+                                                        <input type="checkbox" name="attr_wusem" value="M"><span>M - Melee</span></li>
+                                                    <li>
+                                                        <input type="checkbox" name="attr_wusec" value="C"><span>C - Close</span></li>
+                                                </ul>
+                                            </div></li>
+                                        <li>
+                                            <div class="sheet-whand">
+                                                <span>Handed:</span>
+                                                <input type="checkbox" value="1" checked name="attr_whand1"><span>1</span>
+                                                <input type="checkbox" value="2" name="attr_whand2"><span>2</span>
+                                            </div></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+        <!-- Armour -->
+        <div class="sheet-armours">
+            <div class="sheet-header">Armours</div>
+            <div class="sheet-aheaders">
+                <span>Type</span>
+                <span>Pro</span>
+                <span>AG</span>
+                <span>Sth</span>
+                <span>Equip</span>
+                <span> </span>
+            </div>
+            <fieldset class="repeating_armour">
+                <div class="sheet-repeating-armour">
+                    <input class="sheet-options-flag" type="checkbox" name="attr_options-flag" checked>
+                    <span class="sheet-flag-unchecked">W</span><span class="sheet-flag-checked">3</span>
+                    <div class="sheet-asummary">
+                        <span name="attr_asum-type"></span>
+                        <span name="attr_asum-pro"></span>
+                        <span name="attr_asum-ag"></span>
+                        <span name="attr_asum-sth"></span>
+                        <span name="attr_asum-equip"></span>
+                        <span> </span>
+                    </div>
+                    <div class="sheet-armour">
+                        <ul>
+                            <li>
+                                <span>Type:</span>
+                                <input type="text" name="attr_atype" placeholder="Cloth">
+                            </li>
+                            <li>
+                                <span>Equipped?</span>
+                                <input type="checkbox" name="attr_aequip">
+                                <input type="hidden" name="attr_aproact" value="0">
+                            </li>
+                            <li>
+                                <textarea name="attr_anotes" placeholder="Armour notes"></textarea>
+                            </li>
+                            <li>
+                                <span>Weight:</span>
+                                <input type="number" name="attr_awgt" value="0" min="0">
+                            </li>
+                            <li>
+                                <span>Protection:</span>
+                                <input type="number" name="attr_apro" value="0" min="0">  
+                            </li>
+                            <li>
+                                <span>Agility Loss:</span>
+                                <input type="number" name="attr_aag" value="0" max="0">
+                                <input type="hidden" name="attr_aagact" value="0">
+                            </li>
+                            <li>
+                                <span>Stealth Adjustment:</span>
+                                <input type="number" name="attr_asth" value="0">
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </fieldset>
+            <div class="sheet-atotal">
+                <span>PROTECTION</span>
+                <input type="number" name="attr_pro" readonly value="0">
+                <input type="hidden" name="attr_aagtot" value="0">
+            </div>
+        </div>
+        <!-- Shields -->
+        <div class="sheet-shields">
+            <div class="sheet-header">Shields</div>
+            <div class="sheet-sheaders">
+                <span>Type</span>
+                <span>Rank</span>
+                <span>DF</span>
+                <span>MD</span>
+                <span>Equip</span>
+                <span> </span>
+            </div>
+            <fieldset class="repeating_shield">
+                <div class="sheet-repeating-shield">
+                    <input class="sheet-options-flag" type="checkbox" name="attr_options-flag" checked>
+                    <span class="sheet-flag-unchecked">W</span><span class="sheet-flag-checked">3</span>
+                    <div class="sheet-ssummary">
+                        <span name="attr_ssum-type"></span>
+                        <span name="attr_ssum-rank"></span>
+                        <span name="attr_ssum-df"></span>
+                        <span name="attr_ssum-md"></span>
+                        <span name="attr_ssum-equip"></span>
+                        <span> </span>
+                    </div>
+                    <div class="sheet-shield">
+                        <ul>
+                            <li>
+                                <span>Type:</span>
+                                <input type="text" name="attr_stype">
+                            </li>
+                            <li>
+                                <span>Equipped?</span>
+                                <input type="checkbox" name="attr_sequip">
+                            </li>
+                            <li>
+                                <span>Rank:</span>
+                                <input type="number" name="attr_srank" value="0" min="0">
+                            </li>
+                            <li>
+                                <span>Shield defence (DF):</span>
+                                <input type="hidden" name="attr_sdf" value="0">
+                                <input type="number" name="attr_sdef" value="0" readonly>
+                            </li>
+                            <li>
+                                <textarea name="attr_snotes" placeholder="Shield notes"></textarea>
+                            </li>
+                            <li>
+                                <span>Weight:</span>
+                                <input type="number" name="attr_swgt" value="0" min="0">
+                            </li>
+                            <li>
+                                <span>Defence per rank:</span>
+                                <input type="number" name="attr_sdfpr" value="0" min="0">
+                            </li>
+                            <li>
+                                <span>Manual Dexterity loss:</span>
+                                <input type="number" name="attr_smd" value="0" max="0">
+                                <input type="hidden" name="attr_smdact" value="0">
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </fieldset>
+            <div class="sheet-stotal">
+                <span>SHIELD DEFENCE</span>
+                <input type="number" name="attr_sdftot" readonly value="0">
+                <input type="hidden" name="attr_smdtot" value="0">
+            </div>
+        </div>
+        <div class="sheet-possessions">
+            <div class="sheet-header">Possessions</div>
+            <div class="sheet-pheaders">
+                <span>Name</span>
+                <span>Weight (lbs)</span>
+            </div>
+            <div class="sheet-psummary">
+                <span>Weapons</span>
+                <span name="attr_wwgttot"></span>
+            </div>
+            <div class="sheet-psummary">
+                <span>Armours</span>
+                <span name="attr_awgttot"></span>
+            </div>
+            <div class="sheet-psummary">
+                <span>Shields</span>
+                <span name="attr_swgttot"></span>
+            </div>
+            <div class="sheet-psummary">
+                <span>Money</span>
+                <span name="attr_monwgt"></span>
+            </div>
+            <fieldset class="repeating_possession">
+                <div class="sheet-possession">
+                    <input type="text" name="attr_pname">
+                    <input type="number" name="attr_pwgt" value="0" step="any" min="0">
+                </div>
+            </fieldset>
+            <div class="sheet-psummary">
+                <span>TOTAL</span>
+                <input type="hidden" name="attr_pwgttot" value="0">
+                <span name="attr_wgttot"></span>
+            </div>
+            <div class="sheet-pagmod">
+                <span>AGILITY MODIFIER</span>
+                <input type="number" name="attr_pagcalc" readonly value="0">
+            </div>
+        </div>
+        <div class="sheet-money">
+            <div class="sheet-header">Money</div>
+            <div class="sheet-mrow">
+                <span>Copper Farthings (cf) 1/4sp</span>
+                <input type="number" name="attr_cf" value="0" min="0">
+            </div>
+            <div class="sheet-mrow">
+                <span>Silver Pennies (sp)</span>
+                <input type="number" name="attr_sp" value="0" min="0">
+            </div>
+            <div class="sheet-mrow">
+                <span>Gold Shillings (gs) 12sp</span>
+                <input type="number" name="attr_gs" value="0" min="0">
+            </div>
+            <div class="sheet-mrow">
+                <span>Truesilver Guineas (tg) 21gs</span>
+                <input type="number" name="attr_tg" value="0" min="0">
+            </div>
+            <div class="sheet-mrow">
+                <span>TOTAL (in sp)</span>
+                <input type="number" name="attr_totsp" value="0" readonly>
+            </div>
+        </div>
+    </div><!-- Right column -->
+    <div class="sheet-colm">
+        <!-- Magic & Spells -->
+        <div class="sheet-magic">
+            <!-- Colleges -->
+            <div class="sheet-colleges">
+                <div class="sheet-header">Magical Colleges</div>
+                <fieldset class="repeating_college">
+                    <input type="text" name="attr_college" placeholder="Ensorcelments & Enchantments">
+                </fieldset>
+                <input type="hidden" name="attr_ismage" value="0">
+            </div>
+            <!-- Spells -->
+            <div class="sheet-spells">
+                <div class="sheet-header">Spells</div>
+                <div class="sheet-headers">
+                    <span>Name</span>
+                    <span>KT</span>
+                    <span>RK</span>
+                    <span>SC</span>
+                    <span>RG</span>
+                    <span>DR</span>
+                    <span>RS</span>
+                    <span>RT</span>
+                    <span> </span> <!-- for the icon -->
+                </div>
+                <fieldset class="repeating_spell">
+                    <div class="sheet-repeating-spell">
+                        <input class="sheet-options-flag" type="checkbox" name="attr_options-flag" checked>
+                        <span class="sheet-flag-unchecked">W</span><span class="sheet-flag-checked">3</span>
+                        <div class="sheet-summary">
+                            <button class="sheet-btn" type="roll" value="&{template:default} {{name=@{spname}}} {{D100=[[1d100]]}} {{SC=[[@{spmain}]]}}">
+                            <span name="attr_sum-name"></span></button>
+                            <span name="attr_sum-type"></span>
+                            <span name="attr_sum-rank"></span>
+                            <span name="attr_sum-main"></span>
+                            <span name="attr_sum-rg"></span>
+                            <span name="attr_sum-dur"></span>
+                            <span name="attr_sum-res"></span>
+                            <span name="attr_sum-rit"></span>
+                            <span> </span> <!-- for the icon -->
+                        </div>
+                        <div class="sheet-spell">
+                            <input class="sheet-expand-flag" type="checkbox" name="attr_wuc-expand-flag" checked>
+                            <span class="sheet-shrink">J</span>
+                            <span class="sheet-expand">.</span>
+                            <div class="sheet-spelldets">
+                                <ul>
+                                    <li>
+                                        <span>Rank (RK):</span>
+                                        <input type="number" name="attr_sprank" value="0" min="0">
+                                    </li>
+                                    <li><span>Main % (SC):</span><input type="number" name="attr_spmain" value="0"></li>
+                                    <li>
+                                        <span>Effects:</span>
+                                        <textarea name="attr_spdesc" placeholder="Sees the caster as true friend"></textarea>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="sheet-spellstats">
+                                <div class="sheet-2colsec">
+                                    <div class="sheet-colm">
+                                        <ul>
+                                            <li>
+                                                <span>Name:</span>
+                                                <input type="text" name="attr_spname" placeholder="Spell of Charming">
+                                            </li>
+                                            <li>
+                                                <span>Range (RG):</Span>
+                                                <input type="text" name="attr_sprg" placeholder="15ft">
+                                            </li>
+                                            <li>
+                                                <span>Duration (DR):</span>
+                                                <input type="text" name="attr_spdur" placeholder="1 hr">
+                                            </li>
+                                            <li><span>Experience Multiple (EXM):</span><input type="number" name="attr_spexm" value="0" min="0"></li>
+                                        </ul>
+                                    </div>
+                                    <div class="sheet-colm">
+                                        <ul>
+                                            <li>
+                                                <span>Knowledge type (KT):</span>
+                                                <select name="attr_sptype">
+                                                    <option value="G">General Knowledge</option>
+                                                    <option value="S">Special Knowledge</option>
+                                                </select>
+                                            </li>
+                                            <li><span>Base %:</span><input type="number" name="attr_spbase" value="0" min="0"></li>
+                                            <li>
+                                                <div class="sheet-spres">
+                                                    <span>Resistance (RS):</span>
+                                                    <ul>
+                                                        <li><input type="checkbox" value="P" name="attr_spresp">Passive</li>
+                                                        <li><input type="checkbox" value="A" name="attr_spresa">Active</li>
+                                                    </ul>
+                                                </div>
+                                            </li>
+                                            <li><span>Ritual (RT):</span><input type="checkbox" name="attr_sprit"></li>
+                                            </ul>    
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+        <div class="sheet-skills">
+            <div class="sheet-header">Skills</div>
+            <div class="sheet-skheaders">
+                <span>Skill</span>
+                <span>Notes</span>
+                <span>Rank</span>
+            </div>
+            <fieldset class="repeating_skill">
+                <div class="sheet-skdata">
+                    <div class="sheet-sktype">
+                        <button class="sheet-btn" type="roll" value="&{template:default} {{name=@{sktype}}} {{D100=[[1d100]]}}"></button>
+                        <select name="attr_sktype">
+                            <option value="adventuring">Adventuring</option>
+                            <option value="language">Language</option>
+                            <optgroup label="Skill groups">
+                                <option value="alchemist">Alchemist</option>
+                                <option value="assassin">Assassin</option>
+                                <option value="astrologer">Astrologer</option>
+                                <option value="beast-master">Beast Master</option>
+                                <option value="courtesan">Courtesan</option>
+                                <option value="healer">Healer</option>
+                                <option value="mechanician">Mechanician</option>
+                                <option value="merchant">Merchant</option>
+                                <option value="military-scientist">Military Scientist</option>
+                                <option value="navigator">Navigator</option>
+                                <option value="ranger">Ranger</option>
+                                <option value="spy">Spy</option>
+                                <option value="thief">Thief</option>
+                                <option value="troubador">Troubador</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <input type="text" name="attr_sknotes">
+                    <input type="number" value="0" name="attr_skrank" min="0">
+                </div>
+            </fieldset>
+        </div>
+        <div class="sheet-special">
+            <div class="sheet-header">Special abilities/considerations</div>
+            <textarea name="attr_special" placeholder="e.g. Racial abilities"></textarea>
+        </div>
+        <div class="sheet-exp">
+            <div class="sheet-header">Experience</div>
+            <ul>
+                <li>
+                    <span>Current experience</span>
+                    <input type="number" name="attr_exp" value="0" min="0">
+                </li>
+                <li>
+                    <span>Lifetime total</span>
+                    <input type="number" name="attr_exptot" value="0" min="0">
+                </li>
+                <li>
+                    <span>Experience Modifier</span>
+                    <input type="number" name="attr_exm" value="1.0" step="any" min="0">
+                </li>
+            </ul>
+        </div>
+    </div>    
+</div>
+</div>
