@@ -1139,7 +1139,7 @@ const setClassFeatures = () => {
         name: translate(language, 'CLASS_FEATURES.DIVINE_SENSE'),
         recharge: 'Long Rest',
         storageName: 'Divine Sense',
-        uses_max: 1 + v.charisma_mod,
+        uses_max: Math.max(1 + v.charisma_mod, 1),
       });
       setClassFeature({
         freetext: translate(language, 'CLASS_FEATURES.LAY_ON_HANDS_TEXT'),
