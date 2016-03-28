@@ -4647,14 +4647,19 @@ const generateSkills = () => {
 
     getAttrs(collectionArray, (v) => {
       const language = v.lang || 'en';
-      let x = 0;
 
       for (const prop in SKILLS) {
         if (SKILLS.hasOwnProperty(prop)) {
           let skillId;
-          if (ids[x]) {
-            skillId = ids[x];
-          } else {
+
+          for (const id of ids) {
+            repeatingString = `${repeatingItem}_${id}_`;
+            if (v[`${repeatingString}storage_name`] === prop) {
+              skillId = id;
+              break;
+            }
+          }
+          if (!skillId) {
             skillId = generateRowID();
           }
           repeatingString = `${repeatingItem}_${skillId}_`;
@@ -4663,8 +4668,6 @@ const generateSkills = () => {
           finalSetAttrs[`${repeatingString}name`] = translate(language, `SKILLS.${prop}`);
           finalSetAttrs[`${repeatingString}ability`] = `@{${SKILLS[prop]}_mod}`;
           updateSkill(skillId);
-
-          x++;
         }
       }
       setFinalAttrs(v, finalSetAttrs);
