@@ -3025,14 +3025,15 @@ const updateAttack = (rowId) => {
 };
 on('change:repeating_attack', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_attack', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed') {
+  if (repeatingInfo && repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'qty' && repeatingInfo.field !== 'weight' && repeatingInfo.field !== 'parsed') {
     updateAttack(repeatingInfo.row);
   }
 });
-on('change:repeating_attack:carried change:repeating_attack:weight remove:repeating_attack', () => {
+const weighAttacks = () => {
   const options = {
     collection: 'attack',
     toggle: 'carried',
+    qty: 'qty',
   };
   const sumItems = [
     {
@@ -3042,6 +3043,9 @@ on('change:repeating_attack:carried change:repeating_attack:weight remove:repeat
     },
   ];
   sumRepeating(options, sumItems);
+};
+on('change:repeating_attack:carried change:repeating_attack:qty change:repeating_attack:weight remove:repeating_attack', () => {
+  weighAttacks();
 });
 on('change:global_attack_bonus change:global_melee_attack_bonus change:global_ranged_attack_bonus change:global_damage_bonus change:global_melee_damage_bonus change:global_ranged_damage_bonus change:ammo_auto_use', () => {
   updateAttack();
