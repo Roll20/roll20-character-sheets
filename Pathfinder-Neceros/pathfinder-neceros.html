@@ -7784,6 +7784,7 @@
 			</div>
 		</div>
 	</div>
+
 <!-- Spells Levels 0-9 -->
     <div class="sheet-repeating-sect">
 		<b>Spells</b>
@@ -13701,7 +13702,7 @@ var SWUtils = SWUtils || (function () {
 var PFSheet = PFSheet || (function () {
 	'use strict';
 
-	var version = 0.40,
+	var version = 0.42,
 	pfDebug = false,
 
 	/****************************** UTILITIES ************************************/
@@ -13765,7 +13766,7 @@ var PFSheet = PFSheet || (function () {
     * @bonus {number} = a number that is added
     * @penalties {Array} = array of fieldnames to be subtracted from the total.
     */
-    updateRowTotal = function (fields, bonus, penalties) {
+    updateRowTotal = function (fields, bonus, penalties, totalIsFloat) {
     	var readFields = fields;
     	if (!fields || fields.length === 0) { return; }
     	if (penalties && penalties.length > 0) {
@@ -13784,7 +13785,9 @@ var PFSheet = PFSheet || (function () {
     			}
     			newValue -= penalty;
     		}
-    		newValue = Math.floor(newValue);
+			if (!totalIsFloat) {
+				newValue = Math.floor(newValue);
+			}
     		if (isNaN(currValue) || currValue !== newValue) {
     			setter[fields[0]] = newValue;
     			setAttrs(setter);
@@ -14685,13 +14688,17 @@ var PFSheet = PFSheet || (function () {
 				    subAcp = parseInt(v[row + "-acp"], 10) || 0;
 				    nonProf = parseInt(v[row + "-proficiency"], 10) || 0;//assume proficient 0 is messing with it //prof=isNaN(prof)?0:prof;//cannot do "||0" since 0 is valid but falsy
 				    subsp = parseInt(v[row + "-spell-fail"], 10) || 0;
-        		acA += subAC;
-        		maxDex = Math.min(subD, maxDex);
-        		acp += subAcp;
-        		sp += subsp;
-        		if (nonProf) { atk += subAcp; }
-				    //TAS.debug("row=" + row + ", subAC=" + subAC + ", subD=" + subD + ", subAcp=" + subAcp + ", nonProf=" + nonProf + ", subsp=" + subsp + ", acA=" + acA + ", maxDex=" + maxDex + ", acp=" + acp + ", sp=" + sp + ", atk=" + atk);
-			    }
+					if (row.indexOf("armor") >= 0){
+						acA += subAC;
+					} else {
+						acS += subAC;
+					}
+					maxDex = Math.min(subD, maxDex);
+					acp += subAcp;
+					sp += subsp;
+					if (nonProf) { atk += subAcp; }
+					//TAS.debug("row=" + row + ", subAC=" + subAC + ", subD=" + subD + ", subAcp=" + subAcp + ", nonProf=" + nonProf + ", subsp=" + subsp + ", acA=" + acA + ", maxDex=" + maxDex + ", acp=" + acp + ", sp=" + sp + ", atk=" + atk);
+				}
 			});
 
         	// #0: Armor, Shield & Load
@@ -15231,9 +15238,39 @@ var PFSheet = PFSheet || (function () {
         wornEquipmentRows.forEach(function (slot) {
 			attribList.push("worn-" + slot + "-" + col);
 		});
-		updateRowTotal(attribList);
+		updateRowTotal(attribList,null,null,true);
 	},
 
+	updateRepeatingItems = function () {
+   		TAS.repeating('item')
+			.attrs('item_total_weight', 'item-total-hp', 'item-total-hp_max', 'item-total-value')
+			.fields('weight', 'qty', 'qty_max', 'location', 'hp', 'hp_max', 'value')
+			.reduce(function (m, r) {
+				if (r.I.qty > 0 && r.I.location == 0) {
+					if (r.I.qty_max == 0) {
+						m.weight += r.F.weight * r.I.qty;
+					} else {
+						m.weight += r.F.weight;
+					}
+				}
+				m.hp += r.I.hp;
+				m.hp_max += r.I.hp_max;
+				m.value += r.I.value;
+				return m;
+			}, {
+				weight: 0,
+				hp: 0,
+				hp_max: 0,
+				value: 0
+			}, function (m, r, a) {
+				a.S['item_total_weight'] = m.weight;
+				a.S['item-total-hp'] = m.hp;
+				a.S['item-total-hp_max'] = m.hp_max;
+				a.S['item-total-value'] = m.value;
+			})
+			.execute();		
+	},
+	
     /* updateCarriedCurrency
      * updates the total for carried currency
      *
@@ -15255,6 +15292,7 @@ var PFSheet = PFSheet || (function () {
 			var curr = parseFloat(v["carried-total"], 10) || 0,
 			carried = ((parseFloat(v["carried-currency"], 10) || 0) * 100 + (parseFloat(v["item_total_weight"], 10) || 0) * 100 + (parseFloat(v["worn-total-weight"], 10) || 0) * 100 + (parseFloat(v["carried-misc"], 10) || 0) * 100) / 100; // Fix bad javascript math
 			//TAS.debug("curr=" + curr + ", carried=" + carried);
+			carried = Math.round(carried);
 			if (curr !== carried) { setAttrs({ "carried-total": carried }); }
 		});
 	},
@@ -15982,7 +16020,7 @@ var PFSheet = PFSheet || (function () {
 		"class-ability", "feat", "racial-trait", "trait", "npc-spell-like-abilities", "mythic-ability", "mythic-feat"
 	],
 	abilities = ["STR", "DEX", "CON", "INT", "WIS", "CHA"],
-	abilityEvents = "change:REPLACE-base change:REPLACE-enhance change:REPLACE-misc change:REPLACE-temp change:REPLACE-damage change:REPLACE-penalty change:REPLACE-drain change:REPLACE-cond change:buff_REPLACE-total",
+	abilityEvents = "change:REPLACE-base change:REPLACE-enhance change:REPLACE-misc change:REPLACE-temp change:REPLACE-damage change:REPLACE-penalty change:REPLACE-drain change:REPLACE-cond",
 	abilityMods = ["STR-mod", "DEX-mod", "CON-mod", "INT-mod", "WIS-mod", "CHA-mod"],
 	conditionEvents = {
 		"change:condition-Sickened": [updateDamage, updateConditionCheckPenalty, updateConditionsSavePenalty, updateConditionAttackPenalty]
@@ -16007,6 +16045,15 @@ var PFSheet = PFSheet || (function () {
 		"STR", "DEX", "CON", "INT", "WIS", "CHA", "Ranged", "Melee", "DMG", "AC", "Touch", "CMD", "HP-temp"
 		, "Fort", "Will", "Ref", "Check", "CasterLevel"
 	],
+	buffEvents={
+		 "Ranged":[updateAttack],"Melee":[updateAttack],"DMG":[updateDamage]
+		,"Fort":[updateSave],"Will":[updateSave],"Ref":[updateSave]
+		,"STR":[updateAbility], "DEX":[updateAbility], "CON":[updateAbility], "INT":[updateAbility], "WIS":[updateAbility], "CHA":[updateAbility]
+	},
+	buffEventsNoParam={
+		 "AC":[updateDefenses],"Touch":[updateDefenses],"CMD":[updateDefenses]
+		,"HP-temp":[updateTempHP],"Check":[updateConditionCheckPenalty]
+	},	
 	//all columns in Classes grid
 	classColumns = ["hp", "skill", "fcskill", "fcalt", "bab", "Fort", "Ref", "Will", "level"],
 	//the classes available
@@ -16437,33 +16484,8 @@ var PFSheet = PFSheet || (function () {
             wornEquipmentColumns.forEach(function (column) {
 			    updateWornEquipment(column);
             });
-    		TAS.repeating('item')
-                .attrs('item_total_weight', 'item-total-hp', 'item-total-hp_max', 'item-total-value')
-                .fields('weight', 'qty', 'qty_max', 'location', 'hp', 'hp_max', 'value')
-                .reduce(function (m, r) {
-                	if (r.I.qty > 0 && r.I.location == 0) {
-                		if (r.I.qty_max == 0) {
-                			m.weight += r.I.weight * r.I.qty;
-                		} else {
-                			m.weight += r.I.weight;
-                		}
-                	}
-                	m.hp += r.I.hp;
-                	m.hp_max += r.I.hp_max;
-                	m.value += r.I.value;
-                	return m;
-                }, {
-                	weight: 0,
-                	hp: 0,
-                	hp_max: 0,
-                	value: 0
-                }, function (m, r, a) {
-                	a.S['item_total_weight'] = m.weight;
-                	a.S['item-total-hp'] = m.hp;
-                	a.S['item-total-hp_max'] = m.hp_max;
-                	a.S['item-total-value'] = m.value;
-                })
-                .execute();
+			updateRepeatingItems();
+    
     		updateCarriedCurrency();
     		updateCarriedTotal();
     		updateLoadsAndLift();
@@ -16474,6 +16496,25 @@ var PFSheet = PFSheet || (function () {
     		migrateBuffs();
     		recalculateAllBuffs();
 			updateSize();
+		}
+		if (oldversion < 0.41 ) {
+			buffColumns.forEach(function (col) {
+				PFSheet.updateBuffTotals(col);
+			});
+			updateArmor();
+		}
+		if (oldversion < 0.42 ) {
+
+			updateArmor();
+			//update for float
+			wornEquipmentColumns.forEach(function (column) {
+			    updateWornEquipment(column);
+            });
+			updateRepeatingItems();
+    
+    		updateCarriedTotal();
+    		updateLoadsAndLift();
+    		updateCurrentLoad();			
 		}
     },
 
@@ -16527,6 +16568,8 @@ var PFSheet = PFSheet || (function () {
 			buffColumns: buffColumns,
 			dropdowns: dropdowns,
 			defenseDropdowns: defenseDropdowns,
+			buffEvents:buffEvents,
+			buffEventsNoParam:buffEventsNoParam,			
 			saveTypes: saveTypes,
 			saveEvents: saveEvents,
 			classColumns: classColumns,
@@ -16597,6 +16640,7 @@ var PFSheet = PFSheet || (function () {
 		verifyHasSkill: verifyHasSkill,
 		updateNPCHP: updateNPCHP,
 		updateWornEquipment: updateWornEquipment,
+		updateRepeatingItems:updateRepeatingItems,
 		updateCarriedCurrency: updateCarriedCurrency,
 		updateCarriedTotal: updateCarriedTotal,
 		updateCurrentLoad: updateCurrentLoad,
@@ -16687,7 +16731,32 @@ on("change:repeating_buff:buff-enable_toggle remove:repeating_buff",
 			PFSheet.updateBuffTotals(col);
 		});
 	})
+);
+
+//generic easy buff total updates
+_.each(PFSheet.lists.buffEvents,function(functions,col){
+	var eventToWatch="change:buff_"+col+"-total";
+	_.each(functions,function(methodToCall){
+		on(eventToWatch,
+			TAS.callback(function eventBuffTotal(eventInfo){
+				TAS.debug("caught " + eventInfo.sourceAttribute + " event");
+				methodToCall(col,eventInfo);
+			})
 		);
+	});
+});
+_.each(PFSheet.lists.buffEventsNoParam,function(functions,col){
+	var eventToWatch="change:buff_"+col+"-total";
+	_.each(functions,function(methodToCall){
+		on(eventToWatch,
+			TAS.callback(function eventBuffTotal(eventInfo){
+				TAS.debug("caught " + eventInfo.sourceAttribute + " event");
+				methodToCall(eventInfo);
+			})
+		);
+	});
+});
+
 
 //SKILLS
 on("change:total-skill change:total-fcskill change:int-mod change:level change:max-skill-ranks-mod change:Max-Skill-Ranks-Misc2 change:unchained_skills-show change:BG-Skill-Use",
@@ -17114,15 +17183,17 @@ _.each(PFSheet.lists.wornEquipmentRows, function (row) {
 on('change:repeating_item:weight change:repeating_item:qty change:repeating_item:qty_max change:repeating_item:location',
     TAS.callback(function eventUpdateItemTotalWeight(eventInfo) {
     	TAS.debug("caught " + eventInfo.sourceAttribute + " event");
+		//this does a few more fields than weight
+		//	PFSheet.updateRepeatingItems();
     	TAS.repeating('item')
 			.attrs('item_total_weight')
 			.fields('weight', 'qty', 'qty_max', 'location')
 			.reduce(function (m, r) {
 				if (r.I.qty > 0 && r.I.location == 0) {
 					if (r.I.qty_max == 0) {
-						m.weight += r.I.weight * r.I.qty;
+						m.weight += r.F.weight * r.I.qty;
 					} else {
-						m.weight += r.I.weight;
+						m.weight += r.F.weight;
 					}
 				}
 				return m;
@@ -17175,34 +17246,7 @@ on('change:repeating_item:value',
 on('remove:repeating_item',
 	TAS.callback(function eventRemoveItem(eventInfo) {
 		TAS.debug("caught " + eventInfo.sourceAttribute + " event");
-
-		TAS.repeating('item')
-			.attrs('item_total_weight', 'item-total-hp', 'item-total-hp_max', 'item-total-value')
-			.fields('weight', 'qty', 'qty_max', 'location', 'hp', 'hp_max', 'value')
-			.reduce(function (m, r) {
-				if (r.I.qty > 0 && r.I.location == 0) {
-					if (r.I.qty_max == 0) {
-						m.weight += r.I.weight * r.I.qty;
-					} else {
-						m.weight += r.I.weight;
-					}
-				}
-				m.hp += r.I.hp;
-				m.hp_max += r.I.hp_max;
-				m.value += r.I.value;
-				return m;
-			}, {
-				weight: 0,
-				hp: 0,
-				hp_max: 0,
-				value: 0
-			}, function (m, r, a) {
-				a.S['item_total_weight'] = m.weight;
-				a.S['item-total-hp'] = m.hp;
-				a.S['item-total-hp_max'] = m.hp_max;
-				a.S['item-total-value'] = m.value;
-			})
-			.execute();
+		PFSheet.updateRepeatingItems();
 	})
 );
 on('change:CP change:SP change:GP change:PP',

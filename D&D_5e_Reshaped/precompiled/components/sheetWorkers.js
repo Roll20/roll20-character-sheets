@@ -1,6 +1,6 @@
 'use strict';
 
-const currentVersion = '2.2.16';
+const currentVersion = '2.2.17';
 let TRANSLATIONS;
 const SKILLS = {
   acrobatics: 'dexterity',
@@ -4707,6 +4707,8 @@ const sheetOpened = () => {
       if (!v.import_data) {
         finalSetAttrs.edit_mode = 'on';
       }
+
+      finalSetAttrs.roll_info = '';
 
       generateSkills();
       updateSavingThrows();
