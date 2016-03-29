@@ -7849,17 +7849,12 @@
 		<div class="sheet-sect">		
 			<div class="sheet-table">
 				<div class="sheet-row">
-				put map of old to new ids here
+				<textarea value="attr_spellmap" title="@{spellmap}" style="width:100%;" ></textarea>
 				</div>
 			</div>
 
 		<div class="sheet-sect">
-			<input type="radio" name="attr_spellclass_tab" value="0"  class="sheet-spellclass-tab0" checked="checked" style="display:none;" />
-		
-			<input type="radio" name="attr_spellclass_tab" value="1"  class="sheet-spellclass-tab1" style="display:none;" >
-		
-			<input type="radio" name="attr_spellclass_tab" value="2" class="sheet-spellclass-tab2" style="display:none;" >
-			
+
 
 			
 			<input type="radio" name="attr_spells_tab" value="0"  title="Level 0 Spells" class="sheet-tab sheet-spell_level sheet-spells_level-tab0" checked="checked" />
@@ -14959,13 +14954,9 @@ var PFSheet = PFSheet || (function () {
     },
 	
     spellUserFields=[],
-
 	
-
-	
-	migrateSpell = function(section,id) {
+	migrateSpell = function(section,id,newId) {
         var idStr=getRepeatingIDStr(id)
-			,newId=  generateRowID()
 			,newIdStr=getRepeatingIDStr(newId)
             ,prefix="repeating_"+section+"_"+idStr
 			,prefixLen=prefix.length
@@ -15012,13 +15003,14 @@ var PFSheet = PFSheet || (function () {
 			TAS.debug(v);
 			TAS.debug(setter);
 			setAttrs(setter,{silent:true},function(){
-				updateSpells(newSection);
+				updateSpell(newSection,newId);
 			});
         });
 		
     },
     
     migrateSpells = function () {
+		var  idmap={},mapstr;
 		_.each(spellUserFieldDefaults,function(defMap,field){
 			spellUserFields.push(field);
 		});
@@ -15027,14 +15019,21 @@ var PFSheet = PFSheet || (function () {
 			,repeatingsection="repeating_"+section ;
 			//TAS.debug(section);
             getSectionIDs(repeatingsection,function(ids){
+				var newId;
 				//if (ids && ids.length > 0) {TAS.notice(section,ids);}
 				_.each(ids,function(id){
-					migrateSpell(section,id);
+					newId=  generateRowID();
+					idmap[id]=newId;
+					migrateSpell(section, id, newId);
 				});
+				setAttrs({"spellmap":mapstr});
             });
         });
-        
-    },  
+		TAS.notice(idmap);
+		mapstr=JSON.stringify(idmap);
+		TAS.notice(mapstr);
+
+	},  
     
     
     /*********************************** ROW ********************************************/
