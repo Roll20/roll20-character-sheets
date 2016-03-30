@@ -2529,7 +2529,7 @@ const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
       damageFormula += ` + ${options.globalDamageBonus}[global damage bonus]`;
     }
 
-    if (options && options.globalMeleeDamageBonus && !v[`${repeatingString}type`] || v[`${repeatingString}type`] === 'Melee Weapon') {
+    if (options && exists(options.globalMeleeDamageBonus) && (!v[`${repeatingString}type`] || v[`${repeatingString}type`] === 'Melee Weapon')) {
       if (!isNaN(options.globalMeleeDamageBonus)) {
         damageAddition += getIntValue(options.globalMeleeDamageBonus);
       } else {
@@ -2539,7 +2539,7 @@ const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
         damageFormula += ' + ';
       }
       damageFormula += `${options.globalMeleeDamageBonus}[global melee damage bonus]`;
-    } else if (options && options.globalRangedDamageBonus && v[`${repeatingString}type`] === 'Ranged Weapon') {
+    } else if (options && exists(options.globalRangedDamageBonus) && v[`${repeatingString}type`] === 'Ranged Weapon') {
       if (!isNaN(options.globalRangedDamageBonus)) {
         damageAddition += getIntValue(options.globalRangedDamageBonus);
       } else {
@@ -2621,6 +2621,7 @@ const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
 
     if (isUndefined(v[`${repeatingString}parsed`]) || v[`${repeatingString}parsed`].indexOf('damageProperties') === -1) {
       const damageProperties = v[`${repeatingString}properties`];
+      console.log('damageProperties', damageProperties);
       if (exists(damageProperties)) {
         if (damageProperties.indexOf('Versatile') !== -1) {
           if (!exists(damageAbility)) {
@@ -2860,31 +2861,31 @@ const updateAction = (type, rowId) => {
 };
 on('change:repeating_trait', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_trait', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
+  if (repeatingInfo && repeatingInfo.field !== 'name' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
     updateAction('trait', repeatingInfo.rowId);
   }
 });
 on('change:repeating_action', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_action', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
+  if (repeatingInfo && repeatingInfo.field !== 'name' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
     updateAction('action', repeatingInfo.rowId);
   }
 });
 on('change:repeating_reaction', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_reaction', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
+  if (repeatingInfo && repeatingInfo.field !== 'name' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
     updateAction('reaction', repeatingInfo.rowId);
   }
 });
 on('change:repeating_legendaryaction', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_legendaryaction', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
+  if (repeatingInfo && repeatingInfo.field !== 'name' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
     updateAction('legendaryaction', repeatingInfo.rowId);
   }
 });
 on('change:repeating_lairaction', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_lairaction', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
+  if (repeatingInfo && repeatingInfo.field !== 'name' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
     updateAction('lairaction', repeatingInfo.rowId);
   }
 });
@@ -4123,7 +4124,7 @@ const parseDamage = (finalSetAttrs, repeatingString, freetext, regex, name, spel
   return freetext;
 };
 
-const parseAction = (rowId, type) => {
+const parseAction = (type, rowId) => {
   const repeatingItem = `repeating_${type}`;
   const collectionArray = ['level', 'challenge', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability'];
   const finalSetAttrs = {};
@@ -4290,29 +4291,31 @@ const parseAction = (rowId, type) => {
 
         finalSetAttrs[`${repeatingString}extras_toggle`] = '@{extras_var}';
       }
-      setFinalAttrs(v, finalSetAttrs);
+      setFinalAttrs(v, finalSetAttrs, () => {
+        updateAction(type, rowId);
+      });
     });
   });
 };
 on('change:repeating_trait:freetext', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_trait', eventInfo);
-  parseAction(repeatingInfo.rowId, 'trait');
+  parseAction('trait', repeatingInfo.rowId);
 });
 on('change:repeating_action:freetext', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_action', eventInfo);
-  parseAction(repeatingInfo.rowId, 'action');
+  parseAction('action', repeatingInfo.rowId);
 });
 on('change:repeating_reaction:freetext', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_reaction', eventInfo);
-  parseAction(repeatingInfo.rowId, 'reaction');
+  parseAction('reaction', repeatingInfo.rowId);
 });
 on('change:repeating_legendaryaction:freetext', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_legendaryaction', eventInfo);
-  parseAction(repeatingInfo.rowId, 'legendaryaction');
+  parseAction('legendaryaction', repeatingInfo.rowId);
 });
 on('change:repeating_lairaction:freetext', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_lairaction', eventInfo);
-  parseAction(repeatingInfo.rowId, 'lairaction');
+  parseAction('lairaction', repeatingInfo.rowId);
 });
 
 const countAction = (type) => {
