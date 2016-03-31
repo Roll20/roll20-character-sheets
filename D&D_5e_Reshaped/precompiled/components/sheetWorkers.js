@@ -3952,6 +3952,41 @@ const setDefaultAbility = (v, finalSetAttrs) => {
   finalSetAttrs.default_ability = `@{${highestAbilityName}_mod}`;
 };
 
+const parseAction = (content, finalSetAttrs, title, name) => {
+  const re = /@(.*)@:\s([^@]+)/gi;
+  let match;
+  let section;
+
+  if (content.indexOf('Traits') !== -1) {
+    const contentSplit = content.split(`/${title}\n/`);
+    section = contentSplit[1];
+    content = contentSplit[0];
+  }
+  if (exists(section)) {
+    if (name === 'legendaryaction') {
+      const legendaryActionsMatch = content.match(/Can take (\d+) Legendary Actions/gi);
+      if (legendaryActionsMatch && legendaryActionsMatch[1]) {
+        finalSetAttrs.legendary_action_amount = legendaryActionAmount[1];
+      }
+    }
+
+    while ((match = re.exec(section.replace(/\*\*/g, '@'))) !== null) {
+      if (match && match[1] && match[2]) {
+        let repeatingString = `repeating_${name}_${generateRowID()}_`;
+        finalSetAttrs[`${repeatingString}name`] = match[1];
+        const text = match[2].trim();
+        if (name === 'trait') {
+          finalSetAttrs[`${repeatingString}display_text`] = text;
+        }
+        finalSetAttrs[`${repeatingString}freetext`] = text;
+      } else {
+        console.warn(`Character doesn\'t have a valid ${name} format`);
+      }
+    }
+  }
+  return content;
+};
+
 const updateNPCContent = () => {
   const collectionArray = ['content_srd'];
   const finalSetAttrs = {};
@@ -3964,13 +3999,6 @@ const updateNPCContent = () => {
     let content = v.content_srd;
     let regionalEffects;
     let lairActions;
-    let legendaryActions;
-    let reactions;
-    let actions;
-    let traits;
-    const re = /@(.*)@:\s([^@]+)/gi;
-    let match;
-    let newRowId;
     let repeatingString;
 
     setDefaultAbility(v, finalSetAttrs);
@@ -3984,8 +4012,7 @@ const updateNPCContent = () => {
       if (exists(regionalEffects)) {
         const regionalEffectsList = regionalEffects.split(/\*\*/);
         regionalEffectsList.slice(1, -1).forEach((regionalEffect) => {
-          newRowId = generateRowID();
-          repeatingString = `repeating_regionaleffect_${newRowId}_`;
+          repeatingString = `repeating_regionaleffect_${generateRowID()}_`;
           finalSetAttrs[`${repeatingString}freetext`] = regionalEffect.trim();
         });
         finalSetAttrs.regional_effects_fade = regionalEffectsList.slice(-1)[0];
@@ -3997,91 +4024,17 @@ const updateNPCContent = () => {
       }
       if (exists(lairActions)) {
         lairActions.split(/\*\*/).slice(1).forEach((lairAction) => {
-          newRowId = generateRowID();
-          repeatingString = `repeating_lairaction_${newRowId}_`;
+          repeatingString = `repeating_lairaction_${generateRowID()}_`;
           finalSetAttrs[`${repeatingString}freetext`] = lairAction.trim();
         });
       }
-      if (content.indexOf('Legendary Actions') !== -1) {
-        const legendaryActionsSplit = content.split(/Legendary Actions\n/);
-        legendaryActions = legendaryActionsSplit[1];
-        content = legendaryActionsSplit[0];
-      }
-      if (exists(legendaryActions)) {
-        let legendaryActionAmount = 3;
-        const legendaryActionsMatch = legendaryActions.match(/Can take (\d+) Legendary Actions/gi);
 
-        if (legendaryActionsMatch && legendaryActionsMatch[1]) {
-          legendaryActionAmount = legendaryActionAmount[1];
-        }
-
-        finalSetAttrs.legendary_action_amount = legendaryActionAmount;
-
-        while ((match = re.exec(legendaryActions.replace(/\*\*/g, '@'))) !== null) {
-          if (match && match[1] && match[2]) {
-            newRowId = generateRowID();
-            repeatingString = `repeating_legendaryaction_${newRowId}_`;
-            finalSetAttrs[`${repeatingString}name`] = match[1];
-            finalSetAttrs[`${repeatingString}freetext`] = match[2].trim();
-          } else {
-            console.warn('Character doesn\'t have a valid legendary action format');
-          }
-        }
-      }
-      if (content.indexOf('Reactions') !== -1) {
-        const reactionsSplit = content.split(/Reactions\n/);
-        reactions = reactionsSplit[1];
-        content = reactionsSplit[0];
-      }
-      if (exists(reactions)) {
-        while ((match = re.exec(reactions.replace(/\*\*/g, '@'))) !== null) {
-          if (match && match[1] && match[2]) {
-            newRowId = generateRowID();
-            repeatingString = `repeating_reaction_${newRowId}_`;
-            finalSetAttrs[`${repeatingString}name`] = match[1];
-            finalSetAttrs[`${repeatingString}freetext`] = match[2].trim();
-          } else {
-            console.warn('Character doesn\'t have a valid reaction format');
-          }
-        }
-      }
-      if (content.indexOf('Actions') !== -1) {
-        const actionsSplit = content.split(/Actions\n/);
-        actions = actionsSplit[1];
-        content = actionsSplit[0];
-      }
-      if (exists(actions)) {
-        while ((match = re.exec(actions.replace(/\*\*/g, '@'))) !== null) {
-          if (match && match[1] && match[2]) {
-            newRowId = generateRowID();
-            repeatingString = `repeating_action_${newRowId}_`;
-            finalSetAttrs[`${repeatingString}name`] = match[1];
-            finalSetAttrs[`${repeatingString}freetext`] = match[2].trim();
-          } else {
-            console.warn('Character doesn\'t have a valid action format');
-          }
-        }
-      }
-
-      if (content.indexOf('Traits') !== -1) {
-        const traitsSplit = content.split(/Traits\n/);
-        traits = traitsSplit[1];
-      }
-      if (exists(traits)) {
-        while ((match = re.exec(traits.replace(/\*\*/g, '@'))) !== null) {
-          if (match && match[1] && match[2]) {
-            newRowId = generateRowID();
-            repeatingString = `repeating_trait_${newRowId}_`;
-            finalSetAttrs[`${repeatingString}name`] = match[1];
-            const text = match[2].trim();
-            finalSetAttrs[`${repeatingString}display_text`] = text;
-            finalSetAttrs[`${repeatingString}freetext`] = text;
-          } else {
-            console.warn('Character doesn\'t have a valid trait format');
-          }
-        }
-      }
+      content = parseAction(content, finalSetAttrs, 'Legendary Actions', 'legendaryaction');
+      content = parseAction(content, finalSetAttrs, 'Reactions', 'reaction');
+      content = parseAction(content, finalSetAttrs, 'Actions', 'action');
+      parseAction(content, finalSetAttrs, 'Traits', 'trait');
     }
+
     setFinalAttrs(v, finalSetAttrs);
   });
 };
