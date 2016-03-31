@@ -4442,6 +4442,10 @@ const updateSpeed = () => {
 
   getAttrs(collectionArray, (v) => {
     finalSetAttrs.npc_speed = v.npc_speed.toLowerCase();
+    const match = finalSetAttrs.npc_speed.match(/^\s*(\d+)\s*ft/);
+    if (match) {
+      finalSetAttrs.speed = match[1];
+    }
     setFinalAttrs(v, finalSetAttrs);
   });
 };
