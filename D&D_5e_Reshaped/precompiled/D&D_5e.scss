@@ -148,6 +148,12 @@ $classes: 'barbarian', 'bard', 'cleric', 'druid', 'fighter', 'monk', 'paladin', 
 	}
 }
 
+@mixin fadedBorderBottom() {
+	border-left: 0;
+	border-right: 0;
+	border-image: linear-gradient(to right, transparent, rgba(0, 0, 0, .75), transparent) 1;
+}
+
 *, .sheet-rolltemplate-5e-shaped * {
 	box-sizing: border-box;
 	line-height: 100%;
@@ -180,7 +186,8 @@ button {
 
 				&:hover {
 					color: $bright-blue !important;
-					input {
+					input,
+					span {
 						color: $bright-blue !important;
 					}
 				}
@@ -1170,11 +1177,9 @@ $pad-mar: (
 		& > div {
 			padding: 2px 3px;
       &:not(:last-of-type) {
-        border-top: 0;
-        border-left: 0;
-        border-right: 0;
-        border-bottom: 1px;
-        border-image: linear-gradient(to right, transparent, rgba(0, 0, 0, .75), transparent) 1;
+				border-bottom: 1px;
+				border-top: 0;
+				@include fadedBorderBottom();
       }
 		}
 	}
@@ -1223,7 +1228,7 @@ input[class^='sheet-toggle-'] {
 	cursor: pointer;
 	opacity: 0;
 	position: relative;
-	z-index: 999;
+	z-index: 200;
 
 	&:active + span[class^='sheet-toggle-'].sheet-button {
 		box-shadow: 0 4px 8px 0 rgba(0,0,0,.4);
@@ -1255,6 +1260,7 @@ span[class^='sheet-toggle-'] {
 
 @include tab-toggle('pseudo-button', 100px, 'padding');
 
+@include tab-toggle('spells-filter-condense', 50px, 'padding');
 @include tab-toggle('spells-filter-prepared', 43px, 'padding');
 @include tab-toggle('spells-prepared', 43px, 'padding');
 @include tab-toggle('spells-filter-ritual', 26px, 'padding');
@@ -1292,6 +1298,7 @@ span[class^='sheet-toggle-'] {
 @include tab-toggle('recharge', 47px, 'padding');
 @include tab-toggle('spell-slots', 49px, 'padding');
 @include tab-toggle('spell-points', 56px, 'padding');
+@include tab-toggle('spell-slots-all', 13px, 'padding');
 
 span.sheet-toggle-spells-filter-level-cantrips,
 span.sheet-toggle-spells-filter-casting-time-reaction {
@@ -1381,8 +1388,7 @@ span.sheet-toggle-language {
 	display: none;
 }
 input.sheet-slide-input-pc:checked ~ div.sheet-section-core,
-input.sheet-slide-input-pc:not(:checked) ~ div.sheet-section-npc,
-input.sheet-slide-input-pc:checked ~ .sheet-toggle-edit-mode {
+input.sheet-slide-input-pc:not(:checked) ~ div.sheet-section-npc {
 	display: none !important;
 }
 input.sheet-slide-input-pc:not(:checked) ~ input.sheet-toggle-page-core:checked ~ div.sheet-section-core,
@@ -1512,6 +1518,7 @@ input.sheet-toggle-spells-filter-level-7:checked ~ .repcontainer input.sheet-tog
 input.sheet-toggle-spells-filter-level-8:checked ~ .repcontainer input.sheet-toggle-spell-level-8:not(:checked) ~ .sheet-spell,
 input.sheet-toggle-spells-filter-level-9:checked ~ .repcontainer input.sheet-toggle-spell-level-9:not(:checked) ~ .sheet-spell,
 
+input.sheet-toggle-spells-filter-condense:checked ~ .repcontainer .sheet-condense,
 input.sheet-toggle-spells-filter-prepared:checked ~ .repcontainer input.sheet-toggle-spells-prepared:not(:checked) ~ .sheet-spell,
 input.sheet-toggle-spells-filter-ritual:checked ~ .repcontainer input.sheet-toggle-spells-ritual:not(:checked) ~ .sheet-spell,
 input.sheet-toggle-spells-filter-concentration:not(:checked) ~ .repcontainer input.sheet-toggle-spells-concentration:checked ~ .sheet-spell,
@@ -1536,15 +1543,28 @@ input.sheet-toggle-spell-slots:not(:checked) ~ div div.sheet-spell-slots-points,
 input.sheet-toggle-spell-filters:not(:checked) ~ [class^=sheet-toggle-spells-filter],
 input.sheet-toggle-spell-filters:not(:checked) ~ span.sheet-spells-filter,
 
-input.sheet-toggle-spell-level-1:not(:checked) ~ div .sheet-spell-level-1,
-input.sheet-toggle-spell-level-2:not(:checked) ~ div .sheet-spell-level-2,
-input.sheet-toggle-spell-level-3:not(:checked) ~ div .sheet-spell-level-3,
-input.sheet-toggle-spell-level-4:not(:checked) ~ div .sheet-spell-level-4,
-input.sheet-toggle-spell-level-5:not(:checked) ~ div .sheet-spell-level-5,
-input.sheet-toggle-spell-level-6:not(:checked) ~ div .sheet-spell-level-6,
-input.sheet-toggle-spell-level-7:not(:checked) ~ div .sheet-spell-level-7,
-input.sheet-toggle-spell-level-8:not(:checked) ~ div .sheet-spell-level-8,
-input.sheet-toggle-spell-level-9:not(:checked) ~ div .sheet-spell-level-9,
+input.sheet-toggle-spell-level-1:not(:checked) ~ div .sheet-toggle-spells-filter-level-1,
+input.sheet-toggle-spell-level-2:not(:checked) ~ div .sheet-toggle-spells-filter-level-2,
+input.sheet-toggle-spell-level-3:not(:checked) ~ div .sheet-toggle-spells-filter-level-3,
+input.sheet-toggle-spell-level-4:not(:checked) ~ div .sheet-toggle-spells-filter-level-4,
+input.sheet-toggle-spell-level-5:not(:checked) ~ div .sheet-toggle-spells-filter-level-5,
+input.sheet-toggle-spell-level-6:not(:checked) ~ div .sheet-toggle-spells-filter-level-6,
+input.sheet-toggle-spell-level-7:not(:checked) ~ div .sheet-toggle-spells-filter-level-7,
+input.sheet-toggle-spell-level-8:not(:checked) ~ div .sheet-toggle-spells-filter-level-8,
+input.sheet-toggle-spell-level-9:not(:checked) ~ div .sheet-toggle-spells-filter-level-9,
+input.sheet-toggle-spell-level-1:not(:checked) ~ div input.sheet-toggle-spell-slots-all:not(:checked) ~ div .sheet-spell-level-1,
+input.sheet-toggle-spell-level-2:not(:checked) ~ div input.sheet-toggle-spell-slots-all:not(:checked) ~ div .sheet-spell-level-2,
+input.sheet-toggle-spell-level-3:not(:checked) ~ div input.sheet-toggle-spell-slots-all:not(:checked) ~ div .sheet-spell-level-3,
+input.sheet-toggle-spell-level-4:not(:checked) ~ div input.sheet-toggle-spell-slots-all:not(:checked) ~ div .sheet-spell-level-4,
+input.sheet-toggle-spell-level-5:not(:checked) ~ div input.sheet-toggle-spell-slots-all:not(:checked) ~ div .sheet-spell-level-5,
+input.sheet-toggle-spell-level-6:not(:checked) ~ div input.sheet-toggle-spell-slots-all:not(:checked) ~ div .sheet-spell-level-6,
+input.sheet-toggle-spell-level-7:not(:checked) ~ div input.sheet-toggle-spell-slots-all:not(:checked) ~ div .sheet-spell-level-7,
+input.sheet-toggle-spell-level-8:not(:checked) ~ div input.sheet-toggle-spell-slots-all:not(:checked) ~ div .sheet-spell-level-8,
+input.sheet-toggle-spell-level-9:not(:checked) ~ div input.sheet-toggle-spell-slots-all:not(:checked) ~ div .sheet-spell-level-9,
+
+input.sheet-show-concentration:not(:checked) ~ .sheet-show-concentration,
+input.sheet-show-ritual:not(:checked) ~ .sheet-show-ritual,
+input.sheet-show-materials:not(:checked) ~ .sheet-show-materials,
 
 input.sheet-toggle-custom-class:not(:checked) ~ .sheet-custom-class,
 
@@ -1575,6 +1595,12 @@ span[class^='sheet-toggle-spells-filter'] {
   textarea {
     background-color: transparent;
   }
+}
+
+.sheet-no-overflow {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 .sheet-action-name,
@@ -1629,15 +1655,21 @@ span[class^='sheet-toggle-spells-filter'] {
 	}
 }
 
+$toggle-icon-width: 15px;
 .sheet-toggle-icon-settings {
 	height: 16px;
 	position: absolute !important;
 	right: 0;
 	top: 0;
-	width: 15px;
+	width: $toggle-icon-width;
 }
 input.sheet-toggle-icon-settings {
 	height: 16px;
+}
+.sheet-toggle-spells-prepared {
+	position: absolute !important;
+	right: $toggle-icon-width + 2;
+	top: 2px;
 }
 
 span.sheet-toggle-icon-settings,
@@ -1668,17 +1700,14 @@ input.sheet-toggle-edit-mode:checked ~ div {
 	select,
 	textarea {
 		&:not([readonly]) {
-			background-color: rgba(255, 255, 1, 0.41);
+			background-color: rgba(255, 255, 1, .25);
 		}
 	}
 }
 input.sheet-toggle-edit-mode:not(:checked) ~ div {
-	&.sheet-shaped-row,
-	&.sheet-section-core {
-		.repcontrol,
-		.sheet-item-to-toggle {
-			display: none;
-		}
+	.repcontrol,
+	.sheet-item-to-toggle {
+		display: none;
 	}
 }
 .sheet-item-toggle[value="1"] {
@@ -1692,7 +1721,8 @@ input.sheet-toggle-edit-mode:not(:checked) ~ div {
 }
 
 .sheet-small-label,
-.sheet-rolltemplate-5e-shaped .sheet-small-label {
+.sheet-rolltemplate-5e-shaped .sheet-small-label,
+.sheet-slide-input-pc:not(:checked) ~ div .sheet-traits-presentation-wrapper {
 	font-size: 11px;
 }
 .sheet-small-label {
@@ -1823,7 +1853,23 @@ textarea {
 		&:nth-child(odd) {
 			padding-right: 3px;
 		}
+		border-bottom: 0;
+		border-top: 1px;
+		padding-bottom: 5px;
+		padding-top: 5px;
 		width: 50%;
+		@include fadedBorderBottom();
+
+		&:first-child,
+		&:nth-child(2) {
+			border-image: none;
+			padding-top: 0;
+		}
+
+		&:last-child,
+		&:nth-last-child(2) {
+			padding-bottom: 0;
+		}
 	}
 }
 
