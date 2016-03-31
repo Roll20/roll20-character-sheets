@@ -3952,13 +3952,13 @@ const setDefaultAbility = (v, finalSetAttrs) => {
   finalSetAttrs.default_ability = `@{${highestAbilityName}_mod}`;
 };
 
-const parseAction = (content, finalSetAttrs, title, name) => {
+const parseSRDContentSection = (content, finalSetAttrs, title, name) => {
   const re = /@(.*)@:\s([^@]+)/gi;
   let match;
   let section;
 
-  if (content.indexOf('Traits') !== -1) {
-    const contentSplit = content.split(`/${title}\n/`);
+  if (content.indexOf(title) !== -1) {
+    const contentSplit = content.split(`${title}\n`);
     section = contentSplit[1];
     content = contentSplit[0];
   }
@@ -3972,7 +3972,7 @@ const parseAction = (content, finalSetAttrs, title, name) => {
 
     while ((match = re.exec(section.replace(/\*\*/g, '@'))) !== null) {
       if (match && match[1] && match[2]) {
-        let repeatingString = `repeating_${name}_${generateRowID()}_`;
+        const repeatingString = `repeating_${name}_${generateRowID()}_`;
         finalSetAttrs[`${repeatingString}name`] = match[1];
         const text = match[2].trim();
         if (name === 'trait') {
@@ -4029,10 +4029,10 @@ const updateNPCContent = () => {
         });
       }
 
-      content = parseAction(content, finalSetAttrs, 'Legendary Actions', 'legendaryaction');
-      content = parseAction(content, finalSetAttrs, 'Reactions', 'reaction');
-      content = parseAction(content, finalSetAttrs, 'Actions', 'action');
-      parseAction(content, finalSetAttrs, 'Traits', 'trait');
+      content = parseSRDContentSection(content, finalSetAttrs, 'Legendary Actions', 'legendaryaction');
+      content = parseSRDContentSection(content, finalSetAttrs, 'Reactions', 'reaction');
+      content = parseSRDContentSection(content, finalSetAttrs, 'Actions', 'action');
+      parseSRDContentSection(content, finalSetAttrs, 'Traits', 'trait');
     }
 
     setFinalAttrs(v, finalSetAttrs);
