@@ -1,3 +1,4 @@
+/* global setAttrs:false, getAttrs:false, on:false, getSectionIDs:false, generateRowID:false */
 'use strict';
 
 const currentVersion = '2.2.24';
@@ -3961,6 +3962,8 @@ const updateNPCContent = () => {
 
   getAttrs(collectionArray, (v) => {
     let content = v.content_srd;
+    let regionalEffects;
+    let lairActions;
     let legendaryActions;
     let reactions;
     let actions;
@@ -3973,6 +3976,32 @@ const updateNPCContent = () => {
     setDefaultAbility(v, finalSetAttrs);
 
     if (exists(content)) {
+      if (content.indexOf('Regional Effects') !== -1) {
+        const regionalEffectsSplit = content.split(/Regional Effects\n/);
+        regionalEffects = regionalEffectsSplit[1];
+        content = regionalEffectsSplit[0];
+      }
+      if (exists(regionalEffects)) {
+        const regionalEffectsList = regionalEffects.split(/\*\*/);
+        regionalEffectsList.slice(1, -1).forEach((regionalEffect) => {
+          newRowId = generateRowID();
+          repeatingString = `repeating_regionaleffect_${newRowId}_`;
+          finalSetAttrs[`${repeatingString}freetext`] = regionalEffect.trim();
+        });
+        finalSetAttrs.regional_effects_fade = regionalEffectsList.slice(-1)[0];
+      }
+      if (content.indexOf('Lair Actions') !== -1) {
+        const lairActionsSplit = content.split(/Lair Actions\n/);
+        lairActions = lairActionsSplit[1];
+        content = lairActionsSplit[0];
+      }
+      if (exists(lairActions)) {
+        lairActions.split(/\*\*/).slice(1).forEach((lairAction) => {
+          newRowId = generateRowID();
+          repeatingString = `repeating_lairaction_${newRowId}_`;
+          finalSetAttrs[`${repeatingString}freetext`] = lairAction.trim();
+        });
+      }
       if (content.indexOf('Legendary Actions') !== -1) {
         const legendaryActionsSplit = content.split(/Legendary Actions\n/);
         legendaryActions = legendaryActionsSplit[1];
