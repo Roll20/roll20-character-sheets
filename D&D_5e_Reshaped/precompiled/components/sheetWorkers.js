@@ -1,6 +1,7 @@
+/* global setAttrs:false, getAttrs:false, on:false, getSectionIDs:false, generateRowID:false */
 'use strict';
 
-const currentVersion = '2.2.20';
+const currentVersion = '2.3.0';
 let TRANSLATIONS;
 const SKILLS = {
   acrobatics: 'dexterity',
@@ -181,8 +182,9 @@ const parseAttackComponent = (v, repeatingString, finalSetAttrs, options) => {
   if (isUndefined(parsed) || parsed.indexOf(options.parseName) === -1) {
     let aTriggerFieldExists = false;
 
-    for (let i = 0; i < options.triggerFields.length; i++) {
-      if (exists(v[repeatingString + options.triggerFields[i]])) {
+
+    for (const triggerField of options.triggerFields) {
+      if (exists(v[repeatingString + triggerField])) {
         aTriggerFieldExists = true;
       }
     }
@@ -199,10 +201,10 @@ const parseAttackComponent = (v, repeatingString, finalSetAttrs, options) => {
     }
 
     if (options.addCastingModifier) {
-      if (exists(v[`${repeatingString}damage`]) && isUndefined(v[`${repeatingString}damage_ability`])) {
+      if (!isUndefined(v[`${repeatingString}damage`]) && isUndefined(v[`${repeatingString}damage_ability`])) {
         finalSetAttrs[`${repeatingString}damage_ability`] = v.default_ability;
       }
-      if (exists(v[`${repeatingString}heal`]) && isUndefined(v[`${repeatingString}heal_ability`])) {
+      if (!isUndefined(v[`${repeatingString}heal`]) && isUndefined(v[`${repeatingString}heal_ability`])) {
         finalSetAttrs[`${repeatingString}heal_ability`] = v.default_ability;
       }
     }
@@ -300,9 +302,6 @@ const numberWithCommas = (x) => {
   parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   return parts.join('.');
 };
-const lowercaseWords = (string) => {
-  return string.toLowerCase();
-};
 const findClosest = (array, goal) => {
   return array.reduce((prev, curr) => {
     return (Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev);
@@ -391,9 +390,18 @@ const lowercaseDamageTypes = (string) => {
     .replace('Silvered', 'silvered')
     .replace('Adamantine', 'adamantine');
 };
+const showSign = (value) => {
+  if (value >= 0) {
+    value = `+${value}`;
+  }
+  return value;
+};
 
-on('change:cp change:sp change:ep change:gp change:pp', () => {
-  getAttrs(['cp', 'copper_per_gold', 'sp', 'silver_per_gold', 'ep', 'electrum_per_gold', 'gp', 'pp', 'platinum_per_gold'], (v) => {
+const calculateGold = () => {
+  const collectionArray = ['cp', 'copper_per_gold', 'sp', 'silver_per_gold', 'ep', 'electrum_per_gold', 'gp', 'pp', 'platinum_per_gold'];
+  const finalSetAttrs = {};
+
+  getAttrs(collectionArray, (v) => {
     const copperPieces = getFloatValue(v.cp);
     const silverPieces = getFloatValue(v.sp);
     const electrumPieces = getFloatValue(v.ep);
@@ -403,13 +411,15 @@ on('change:cp change:sp change:ep change:gp change:pp', () => {
     const silverPerGold = getFloatValue(v.silver_per_gold, 10);
     const electrumPerGold = getFloatValue(v.electrum_per_gold, 2);
     const platinumPerGold = getFloatValue(v.platinum_per_gold, 10);
-    const totalGold = (copperPieces / copperPerGold) + (silverPieces / silverPerGold) + (electrumPieces / electrumPerGold) + goldPieces + (platinumPieces * platinumPerGold);
-    const coinWeight = (copperPieces + silverPieces + electrumPieces + goldPieces + platinumPieces) / 50;
-    setAttrs({
-      total_gp: totalGold.toFixed(2),
-      weight_coinage: coinWeight,
-    });
+
+    finalSetAttrs.total_gp = ((copperPieces / copperPerGold) + (silverPieces / silverPerGold) + (electrumPieces / electrumPerGold) + goldPieces + (platinumPieces * platinumPerGold)).toFixed(2);
+    finalSetAttrs.weight_coinage = (copperPieces + silverPieces + electrumPieces + goldPieces + platinumPieces) / 50;
+
+    setFinalAttrs(v, finalSetAttrs);
   });
+};
+on('change:cp change:copper_per_gold change:sp change:silver_per_gold change:ep change:electrum_per_gold change:gp change:pp change:platinum_per_gold', () => {
+  calculateGold();
 });
 
 const updateAbilityModifier = (ability) => {
@@ -459,14 +469,9 @@ const updateAbilityModifier = (ability) => {
     }
     abilityCheckFormula += ' + (@{global_check_bonus})[global check bonus]';
 
-    let abilityModWithSign = abilityMod;
-    if (abilityMod >= 0) {
-      abilityModWithSign = `+${abilityMod}`;
-    }
-
     finalSetAttrs[`${ability}_calculated`] = abilityScoreCalc;
     finalSetAttrs[`${ability}_mod`] = abilityMod;
-    finalSetAttrs[`${ability}_mod_with_sign`] = abilityModWithSign;
+    finalSetAttrs[`${ability}_mod_with_sign`] = showSign(abilityMod);
     finalSetAttrs[`${ability}_check_mod`] = abilityCheck;
     finalSetAttrs[`${ability}_check_mod_formula`] = abilityCheckFormula;
 
@@ -523,8 +528,8 @@ const setClassFeatureOrTrait = (repeatingItem, obj) => {
   }
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}storage_name`);
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}uses`);
@@ -545,11 +550,11 @@ const setClassFeatureOrTrait = (repeatingItem, obj) => {
 
     getAttrs(collectionArray, (v) => {
       let repeatingString;
-      for (let j = 0; j < ids.length; j++) {
-        repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (const id of ids) {
+        repeatingString = `${repeatingItem}_${id}_`;
 
         if (v[`${repeatingString}storage_name`] === obj.storageName) {
-          itemId = ids[j];
+          itemId = id;
         }
       }
       if (!itemId) {
@@ -619,11 +624,11 @@ const setClassFeatures = () => {
   const finalSetAttrs = {};
   const collectionArray = ['ac_unarmored_ability', 'lang', 'jack_of_all_trades_toggle', 'careful_spell_toggle', 'distant_spell_toggle', 'empowered_spell_toggle', 'extended_spell_toggle', 'heightened_spell_toggle', 'quickened_spell_toggle', 'subtle_spell_toggle', 'twinned_spell_toggle'];
 
-  for (let i = 0; i < ABILITIES.length; i++) {
-    collectionArray.push(`${ABILITIES[i]}_mod`);
+  for (const ability of ABILITIES) {
+    collectionArray.push(`${ability}_mod`);
   }
-  for (let j = 0; j < CLASSES.length; j++) {
-    collectionArray.push(`${CLASSES[j]}_level`);
+  for (const className of CLASSES) {
+    collectionArray.push(`${className}_level`);
   }
 
   getAttrs(collectionArray, (v) => {
@@ -1135,7 +1140,7 @@ const setClassFeatures = () => {
         name: translate(language, 'CLASS_FEATURES.DIVINE_SENSE'),
         recharge: 'Long Rest',
         storageName: 'Divine Sense',
-        uses_max: 1 + v.charisma_mod,
+        uses_max: Math.max(1 + v.charisma_mod, 1),
       });
       setClassFeature({
         freetext: translate(language, 'CLASS_FEATURES.LAY_ON_HANDS_TEXT'),
@@ -1485,6 +1490,13 @@ const setClassFeatures = () => {
           storageName: 'Eldritch Invocations',
         });
       }
+      if (v.warlock_level >= 3) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.PACT_BOON_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.PACT_BOON'),
+          storageName: 'Pact Boon',
+        });
+      }
       if (v.warlock_level >= 11) {
         setTrait({
           freetext: translate(language, 'CLASS_FEATURES.MYSTIC_ARCANUM_TEXT'),
@@ -1696,9 +1708,9 @@ const updateLevels = (changedField) => {
   const collectionArray = ['is_npc', 'lang', 'caster_level', 'caster_type', 'class_and_level', 'level', 'xp_next_level'];
   const finalSetAttrs = {};
 
-  for (let i = 0; i < CLASSES.length; i++) {
-    collectionArray.push(`${CLASSES[i]}_level`);
-    collectionArray.push(`has_${CLASSES[i]}_levels`);
+  for (const className of CLASSES) {
+    collectionArray.push(`${className}_level`);
+    collectionArray.push(`has_${className}_levels`);
   }
 
   const defaultClassDetails = {
@@ -1777,8 +1789,8 @@ const updateLevels = (changedField) => {
   }
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}level`);
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}custom_name`);
@@ -1788,12 +1800,12 @@ const updateLevels = (changedField) => {
     }
 
     getAttrs(collectionArray, (v) => {
-      for (let i = 0; i < CLASSES.length; i++) {
-        finalSetAttrs[`${CLASSES[i]}_level`] = 0;
+      for (const className of CLASSES) {
+        finalSetAttrs[`${className}_level`] = 0;
       }
 
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
 
         let className = v[`${repeatingString}name`];
         let classLevel = v[`${repeatingString}level`];
@@ -1859,13 +1871,13 @@ const updateLevels = (changedField) => {
       }
 
       finalSetAttrs.class_and_level = '';
-      for (const className in classLevels) {
-        if (classLevels.hasOwnProperty(className)) {
-          finalSetAttrs[`${className}_level`] = classLevels[className];
+      for (const prop in classLevels) {
+        if (classLevels.hasOwnProperty(prop)) {
+          finalSetAttrs[`${prop}_level`] = classLevels[prop];
           if (finalSetAttrs.class_and_level !== '') {
             finalSetAttrs.class_and_level += ', ';
           }
-          finalSetAttrs.class_and_level += `${capitalize(className)} ${classLevels[className]}`;
+          finalSetAttrs.class_and_level += `${capitalize(prop)} ${classLevels[prop]}`;
         }
       }
 
@@ -1882,11 +1894,11 @@ const updateLevels = (changedField) => {
       }
       finalSetAttrs.xp_next_level = xpForNextLevel;
 
-      for (let y = 0; y < CLASSES.length; y++) {
-        if (finalSetAttrs[`${CLASSES[y]}_level`] > 0) {
-          finalSetAttrs[`has_${CLASSES[y]}_levels`] = 1;
-        } else if (!isUndefined(v[`has_${CLASSES[y]}_levels`])) {
-          finalSetAttrs[`has_${CLASSES[y]}_levels`] = 0;
+      for (const className of CLASSES) {
+        if (finalSetAttrs[`${className}_level`] > 0) {
+          finalSetAttrs[`has_${className}_levels`] = 1;
+        } else if (!isUndefined(v[`has_${className}_levels`])) {
+          finalSetAttrs[`has_${className}_levels`] = 0;
         }
       }
 
@@ -1952,8 +1964,8 @@ on('remove:repeating_class', () => {
 
 const watchForClassLevelChanges = () => {
   const classFeatureWatch = [];
-  for (let i = 0; i < ABILITIES.length; i++) {
-    classFeatureWatch.push(`change:${ABILITIES[i]}_mod`);
+  for (const ability of ABILITIES) {
+    classFeatureWatch.push(`change:${ability}_mod`);
   }
   classFeatureWatch.push('change:careful_spell_toggle');
   classFeatureWatch.push('change:distant_spell_toggle');
@@ -1977,7 +1989,7 @@ const getPB = (level, challenge) => {
   let pb = 2;
 
   level = getIntValue(level);
-  if (challenge < 1) {
+  if (challenge === '1/8' || challenge === '1/4' || challenge === '1/2') {
     challenge = 1;
   } else {
     getIntValue(challenge);
@@ -2013,27 +2025,27 @@ const sumRepeating = (options, sumItems) => {
   const finalSetAttrs = {};
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(repeatingString + options.toggle);
       if (options.qty) {
         collectionArray.push(repeatingString + options.qty);
       }
 
-      for (let x = 0; x < sumItems.length; x++) {
-        finalSetAttrs[sumItems[x].totalField] = 0;
-        if (sumItems[x].totalFieldSecondary) {
-          finalSetAttrs[sumItems[x].totalFieldSecondary] = 0;
+      for (const sumItem of sumItems) {
+        finalSetAttrs[sumItem.totalField] = 0;
+        if (sumItem.totalFieldSecondary) {
+          finalSetAttrs[sumItem.totalFieldSecondary] = 0;
         }
-        collectionArray.push(repeatingString + sumItems[x].fieldToAdd);
-        if (sumItems[x].bonus) {
-          collectionArray.push(repeatingString + sumItems[x].bonus);
+        collectionArray.push(repeatingString + sumItem.fieldToAdd);
+        if (sumItem.bonus) {
+          collectionArray.push(repeatingString + sumItem.bonus);
         }
-        if (sumItems[x].armorType) {
-          collectionArray.push(repeatingString + sumItems[x].armorType);
+        if (sumItem.armorType) {
+          collectionArray.push(repeatingString + sumItem.armorType);
         }
-        if (sumItems[x].addOnAfterQty) {
-          collectionArray.push(repeatingString + sumItems[x].addOnAfterQty);
+        if (sumItem.addOnAfterQty) {
+          collectionArray.push(repeatingString + sumItem.addOnAfterQty);
         }
       }
     }
@@ -2047,12 +2059,11 @@ const sumRepeating = (options, sumItems) => {
         dexMod = getIntValue(v.dexterity_mod);
       }
 
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
         const qty = getIntValue(v[repeatingString + options.qty], 1);
 
-        for (let x = 0; x < sumItems.length; x++) {
-          const sumItem = sumItems[x];
+        for (const sumItem of sumItems) {
           let fieldToAdd = getFloatValue(v[repeatingString + sumItem.fieldToAdd]);
           if (sumItem.bonus) {
             fieldToAdd += getFloatValue(v[repeatingString + sumItem.bonus]);
@@ -2103,13 +2114,12 @@ const sumRepeating = (options, sumItems) => {
           }
         }
       }
-      for (let y = 0; y < sumItems.length; y++) {
-        const item = sumItems[y];
-        if (item.totalField && !exists(finalSetAttrs[item.totalField])) {
-          finalSetAttrs[item.totalField] = 0;
+      for (const sumItem of sumItems) {
+        if (sumItem.totalField && !exists(finalSetAttrs[sumItem.totalField])) {
+          finalSetAttrs[sumItem.totalField] = 0;
         }
-        if (item.totalFieldSecondary && !exists(finalSetAttrs[item.totalFieldSecondary])) {
-          finalSetAttrs[item.totalFieldSecondary] = 0;
+        if (sumItem.totalFieldSecondary && !exists(finalSetAttrs[sumItem.totalFieldSecondary])) {
+          finalSetAttrs[sumItem.totalFieldSecondary] = 0;
         }
       }
 
@@ -2133,22 +2143,20 @@ const updateArmor = (rowId) => {
       ids = [];
       ids.push(rowId);
     }
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}parsed`);
       collectionArray.push(`${repeatingString}modifiers`);
     }
 
     getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
 
         if (isUndefined(v[`${repeatingString}parsed`]) || v[`${repeatingString}parsed`].indexOf('acBonus') === -1) {
           const armorModifiers = v[`${repeatingString}modifiers`];
           if (exists(armorModifiers)) {
-            const acBonus = armorModifiers.replace(/^\D+/g, '');
-
-            finalSetAttrs[`${repeatingString}ac_bonus`] = acBonus;
+            finalSetAttrs[`${repeatingString}ac_bonus`] = armorModifiers.replace(/^\D+/g, '');
           }
           if (isUndefined(finalSetAttrs[`${repeatingString}parsed`])) {
             finalSetAttrs[`${repeatingString}parsed`] = '';
@@ -2165,8 +2173,8 @@ const updateArmor = (rowId) => {
     getExtraFields: ['medium_armor_max_dex', 'dexterity_mod', 'ac_unarmored_ability', 'is_npc'],
     toggle: 'worn',
   };
-  for (let i = 0; i < ABILITIES.length; i++) {
-    options.getExtraFields.push(`${ABILITIES[i]}_mod`);
+  for (const ability of ABILITIES) {
+    options.getExtraFields.push(`${ability}_mod`);
   }
   const sumItems = [
     {
@@ -2204,14 +2212,14 @@ const updateEquipment = (rowId) => {
       ids = [];
       ids.push(rowId);
     }
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}content`);
     }
 
     getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
 
         if (isUndefined(v[`${repeatingString}parsed`]) || v[`${repeatingString}parsed`].indexOf('content') === -1) {
           let content = v[`${repeatingString}content`];
@@ -2522,7 +2530,7 @@ const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
       damageFormula += ` + ${options.globalDamageBonus}[global damage bonus]`;
     }
 
-    if (options && options.globalMeleeDamageBonus && !v[`${repeatingString}type`] || v[`${repeatingString}type`] === 'Melee Weapon') {
+    if (options && exists(options.globalMeleeDamageBonus) && (!v[`${repeatingString}type`] || v[`${repeatingString}type`] === 'Melee Weapon')) {
       if (!isNaN(options.globalMeleeDamageBonus)) {
         damageAddition += getIntValue(options.globalMeleeDamageBonus);
       } else {
@@ -2532,7 +2540,7 @@ const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
         damageFormula += ' + ';
       }
       damageFormula += `${options.globalMeleeDamageBonus}[global melee damage bonus]`;
-    } else if (options && options.globalRangedDamageBonus && v[`${repeatingString}type`] === 'Ranged Weapon') {
+    } else if (options && exists(options.globalRangedDamageBonus) && v[`${repeatingString}type`] === 'Ranged Weapon') {
       if (!isNaN(options.globalRangedDamageBonus)) {
         damageAddition += getIntValue(options.globalRangedDamageBonus);
       } else {
@@ -2614,6 +2622,7 @@ const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
 
     if (isUndefined(v[`${repeatingString}parsed`]) || v[`${repeatingString}parsed`].indexOf('damageProperties') === -1) {
       const damageProperties = v[`${repeatingString}properties`];
+      console.log('damageProperties', damageProperties);
       if (exists(damageProperties)) {
         if (damageProperties.indexOf('Versatile') !== -1) {
           if (!exists(damageAbility)) {
@@ -2716,15 +2725,15 @@ const findAmmo = (name, callback) => {
   const collectionArray = [];
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}qty`);
     }
 
     getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
         if (v[`${repeatingString}name`] === name) {
           callback(`@{${repeatingString}qty}`);
         }
@@ -2742,8 +2751,8 @@ const updateAction = (type, rowId) => {
   const rechargeRegex = /\s*?\((?:Recharge\s*?(\d+\-\d+|\d+)|Recharges\safter\sa\s(.*))\)/gi;
   const rechargeDayRegex = /\s*?\((\d+\/Day)\)/gi;
 
-  for (let i = 0; i < ABILITIES.length; i++) {
-    collectionArray.push(`${ABILITIES[i]}_mod`);
+  for (const ability of ABILITIES) {
+    collectionArray.push(`${ability}_mod`);
   }
 
   getSectionIDs(repeatingItem, (ids) => {
@@ -2751,8 +2760,8 @@ const updateAction = (type, rowId) => {
       ids = [];
       ids.push(rowId);
     }
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}type`);
       collectionArray.push(`${repeatingString}roll_toggle`);
@@ -2791,8 +2800,8 @@ const updateAction = (type, rowId) => {
     }
 
     getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
 
         const actionName = v[`${repeatingString}name`];
         if (!isUndefined(actionName)) {
@@ -2853,31 +2862,31 @@ const updateAction = (type, rowId) => {
 };
 on('change:repeating_trait', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_trait', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
+  if (repeatingInfo && repeatingInfo.field !== 'name' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
     updateAction('trait', repeatingInfo.rowId);
   }
 });
 on('change:repeating_action', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_action', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
+  if (repeatingInfo && repeatingInfo.field !== 'name' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
     updateAction('action', repeatingInfo.rowId);
   }
 });
 on('change:repeating_reaction', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_reaction', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
+  if (repeatingInfo && repeatingInfo.field !== 'name' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
     updateAction('reaction', repeatingInfo.rowId);
   }
 });
 on('change:repeating_legendaryaction', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_legendaryaction', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
+  if (repeatingInfo && repeatingInfo.field !== 'name' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
     updateAction('legendaryaction', repeatingInfo.rowId);
   }
 });
 on('change:repeating_lairaction', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_lairaction', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
+  if (repeatingInfo && repeatingInfo.field !== 'name' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
     updateAction('lairaction', repeatingInfo.rowId);
   }
 });
@@ -2887,8 +2896,8 @@ const updateAttack = (rowId) => {
   const collectionArray = ['pb', 'strength_mod', 'finesse_mod', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability', 'ammo_auto_use'];
   const finalSetAttrs = {};
 
-  for (let i = 0; i < ABILITIES.length; i++) {
-    collectionArray.push(`${ABILITIES[i]}_mod`);
+  for (const ability of ABILITIES) {
+    collectionArray.push(`${ability}_mod`);
   }
 
   getSectionIDs(repeatingItem, (ids) => {
@@ -2896,8 +2905,8 @@ const updateAttack = (rowId) => {
       ids = [];
       ids.push(rowId);
     }
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}type`);
       collectionArray.push(`${repeatingString}roll_toggle`);
@@ -2933,8 +2942,8 @@ const updateAttack = (rowId) => {
     }
 
     getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
 
         const attackName = v[`${repeatingString}name`];
         if (isUndefined(attackName)) {
@@ -3018,14 +3027,15 @@ const updateAttack = (rowId) => {
 };
 on('change:repeating_attack', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_attack', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed') {
+  if (repeatingInfo && repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'qty' && repeatingInfo.field !== 'weight' && repeatingInfo.field !== 'parsed') {
     updateAttack(repeatingInfo.row);
   }
 });
-on('change:repeating_attack:carried change:repeating_attack:weight remove:repeating_attack', () => {
+const weighAttacks = () => {
   const options = {
     collection: 'attack',
     toggle: 'carried',
+    qty: 'qty',
   };
   const sumItems = [
     {
@@ -3035,6 +3045,9 @@ on('change:repeating_attack:carried change:repeating_attack:weight remove:repeat
     },
   ];
   sumRepeating(options, sumItems);
+};
+on('change:repeating_attack:carried change:repeating_attack:qty change:repeating_attack:weight remove:repeating_attack', () => {
+  weighAttacks();
 });
 on('change:global_attack_bonus change:global_melee_attack_bonus change:global_ranged_attack_bonus change:global_damage_bonus change:global_melee_damage_bonus change:global_ranged_damage_bonus change:ammo_auto_use', () => {
   updateAttack();
@@ -3049,8 +3062,8 @@ const updateSpell = (rowId) => {
   const collectionArray = ['is_npc', 'pb', 'finesse_mod', 'global_spell_attack_bonus', 'global_spell_damage_bonus', 'global_spell_dc_bonus', 'global_spell_heal_bonus', 'default_ability', 'caster_level'];
   const finalSetAttrs = {};
 
-  for (let i = 0; i < ABILITIES.length; i++) {
-    collectionArray.push(`${ABILITIES[i]}_mod`);
+  for (const ability of ABILITIES) {
+    collectionArray.push(`${ability}_mod`);
   }
 
   getSectionIDs(repeatingItem, (ids) => {
@@ -3058,8 +3071,8 @@ const updateSpell = (rowId) => {
       ids = [];
       ids.push(rowId);
     }
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}type`);
       collectionArray.push(`${repeatingString}roll_toggle`);
@@ -3115,8 +3128,8 @@ const updateSpell = (rowId) => {
     }
 
     getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
 
         const spellLevel = getIntValue(v[`${repeatingString}spell_level`]);
         if (spellLevel === 0) {
@@ -3136,7 +3149,7 @@ const updateSpell = (rowId) => {
           finalSetAttrs[`${repeatingString}concentration_show`] = 0;
         }
         if (v.duration) {
-          finalSetAttrs.duration = lowercaseWords(v.duration);
+          finalSetAttrs.duration = v.duration.toLowerCase();
         }
         const ritual = v[`${repeatingString}ritual`];
         if (ritual === 'Yes') {
@@ -3213,8 +3226,8 @@ const updateClassFeature = (rowId) => {
   const collectionArray = ['pb', 'finesse_mod', 'default_ability'];
   const finalSetAttrs = {};
 
-  for (let i = 0; i < ABILITIES.length; i++) {
-    collectionArray.push(`${ABILITIES[i]}_mod`);
+  for (const ability of ABILITIES) {
+    collectionArray.push(`${ability}_mod`);
   }
 
   getSectionIDs(repeatingItem, (ids) => {
@@ -3222,8 +3235,8 @@ const updateClassFeature = (rowId) => {
       ids = [];
       ids.push(rowId);
     }
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}saving_throw_toggle`);
       collectionArray.push(`${repeatingString}saving_throw_ability`);
@@ -3252,8 +3265,8 @@ const updateClassFeature = (rowId) => {
     }
 
     getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
 
         const damageOptions = {
           type: 'attack',
@@ -3281,14 +3294,14 @@ const updateClassFeatureToggleToNewVer = () => {
   const finalSetAttrs = {};
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}heal_toggle`);
     }
 
     getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
 
         const healToggled = v[`${repeatingString}heal_toggle`];
         if (!isUndefined(healToggled)) {
@@ -3327,27 +3340,29 @@ const updateAbilityChecksMacro = () => {
   finalSetAttrs.ability_checks_query_var = '?{Ability Check';
   finalSetAttrs.ability_checks_macro_var = '';
 
-  for (let i = 0; i < ABILITIES.length; i++) {
-    finalSetAttrs.ability_checks_query_var += `|${capitalize(ABILITIES[i])},{{title=${capitalize(ABILITIES[i])}&#125;&#125; {{roll1=[[@{preroll}d20@{postroll}@{d20_mod} + @{${ABILITIES[i]}_check_mod}]]&#125;&#125; @{roll_setting}@{d20_mod} + @{${ABILITIES[i]}_check_mod}]]&#125;&#125;`;
-    finalSetAttrs.ability_checks_macro_var += `[${capitalize(ABILITIES[i])}](~${ABILITIES[i]}_check)`;
+  let i = 0;
+  for (const ability of ABILITIES) {
+    finalSetAttrs.ability_checks_query_var += `|${capitalize(ability)},{{title=${capitalize(ability)}&#125;&#125; {{roll1=[[@{preroll}d20@{postroll}@{d20_mod} + @{${ability}_check_mod}]]&#125;&#125; @{roll_setting}@{d20_mod} + @{${ability}_check_mod}]]&#125;&#125;`;
+    finalSetAttrs.ability_checks_macro_var += `[${capitalize(ability)}](~${ability}_check)`;
     if (i < ABILITIES.length - 1) {
       finalSetAttrs.ability_checks_macro_var += ', ';
     }
+    i++;
   }
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}ability`);
     }
 
     getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
         finalSetAttrs.ability_checks_query_var += `|${v[`${repeatingString}name`]}, {{title=${v[`${repeatingString}name`]} (${capitalize(getAbilityShortName(v[`${repeatingString}ability`]))})&#125;&#125; {{roll1=[[@{preroll}d20@{postroll}@{d20_mod} + @{${repeatingString}formula}]]&#125;&#125; @{roll_setting}@{d20_mod} + @{${repeatingString}formula}]]&#125;&#125;`;
         finalSetAttrs.ability_checks_macro_var += ', ';
-        finalSetAttrs.ability_checks_macro_var += `[${v[`${repeatingString}name`]}](~repeating_skill_${ids[j]}_skill)`;
+        finalSetAttrs.ability_checks_macro_var += `[${v[`${repeatingString}name`]}](~repeating_skill_${id}_skill)`;
       }
       finalSetAttrs.ability_checks_query_var += '}';
       setFinalAttrs(v, finalSetAttrs);
@@ -3386,9 +3401,9 @@ const updateSkill = (rowId) => {
   const collectionArray = ['jack_of_all_trades_toggle', 'jack_of_all_trades', 'remarkable_athlete_toggle', 'remarkable_athlete', 'pb', 'exp', 'global_check_bonus'];
   const finalSetAttrs = {};
 
-  for (let i = 0; i < ABILITIES.length; i++) {
-    collectionArray.push(`${ABILITIES[i]}_mod`);
-    collectionArray.push(`${ABILITIES[i]}_check_bonus`);
+  for (const ability of ABILITIES) {
+    collectionArray.push(`${ability}_mod`);
+    collectionArray.push(`${ability}_check_bonus`);
   }
 
   getSectionIDs(repeatingItem, (ids) => {
@@ -3396,8 +3411,8 @@ const updateSkill = (rowId) => {
       ids = [];
       ids.push(rowId);
     }
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}proficiency`);
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}ability`);
@@ -3409,8 +3424,8 @@ const updateSkill = (rowId) => {
     }
 
     getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
 
         const skillName = v[`${repeatingString}name`];
         if (isUndefined(skillName)) {
@@ -3476,13 +3491,8 @@ const updateSkill = (rowId) => {
           totalFormula += ` + ${globalCheckBonus}[global check bonus]`;
         }
 
-        let totalWithSign = total;
-        if (total >= 0) {
-          totalWithSign = `+${total}`;
-        }
-
         finalSetAttrs[`${repeatingString}total`] = total;
-        finalSetAttrs[`${repeatingString}total_with_sign`] = totalWithSign;
+        finalSetAttrs[`${repeatingString}total_with_sign`] = showSign(total);
         finalSetAttrs[`${repeatingString}formula`] = totalFormula;
       }
       setFinalAttrs(v, finalSetAttrs);
@@ -3510,8 +3520,8 @@ const updateSkillsFromSRD = () => {
   const finalSetAttrs = {};
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}ability`);
     }
@@ -3524,10 +3534,10 @@ const updateSkillsFromSRD = () => {
       let repeatingString;
 
       if (!isUndefined(skillsFromSRD)) {
-        for (let j = 0; j < ids.length; j++) {
-          repeatingString = `${repeatingItem}_${ids[j]}_`;
+        for (const id of ids) {
+          repeatingString = `${repeatingItem}_${id}_`;
           skillName = v[`${repeatingString}name`];
-          skillsObj[skillName] = ids[j];
+          skillsObj[skillName] = id;
         }
 
         const re = /(\w+)\s?((?:\+|\-)\d+)/gi;
@@ -3585,7 +3595,7 @@ const updateSavingThrow = (ability) => {
     }
 
     const abilitySavingThrowBonus = getIntValue(v[`${ability}_save_bonus`]);
-    if (exists(abilitySavingThrowBonus)) {
+    if (abilitySavingThrowBonus) {
       total += abilitySavingThrowBonus;
       totalFormula += ` + ${abilitySavingThrowBonus}[${getAbilityShortName(ability)}saving throw bonus]`;
     }
@@ -3598,13 +3608,8 @@ const updateSavingThrow = (ability) => {
       totalFormula += ` + ${globalSavingThrowBonus}[global saving throw bonus]`;
     }
 
-    let savingThrowWithSign = total;
-    if (total >= 0) {
-      savingThrowWithSign = `+${total}`;
-    }
-
     finalSetAttrs[`${ability}_saving_throw_mod`] = totalFormula;
-    finalSetAttrs[`${ability}_saving_throw_mod_with_sign`] = savingThrowWithSign;
+    finalSetAttrs[`${ability}_saving_throw_mod_with_sign`] = showSign(total);
     setFinalAttrs(v, finalSetAttrs);
   });
 };
@@ -3675,10 +3680,10 @@ const updateSpellsFromSRD = () => {
   getAttrs(collectionArray, (v) => {
     const spells = v.spells_srd.split(', ');
 
-    for (let i = 0; i < spells.length; i++) {
+    for (const spell of spells) {
       const newRowId = generateRowID();
       const repeatingString = `repeating_spell_${newRowId}_`;
-      finalSetAttrs[`${repeatingString}name`] = spells[i];
+      finalSetAttrs[`${repeatingString}name`] = spell;
     }
     setFinalAttrs(v, finalSetAttrs);
   });
@@ -3689,45 +3694,52 @@ on('change:spells_srd', () => {
 
 const updateAttachers = () => {
   const repeatingItem = 'repeating_attacher';
-  const collectionArray = ['attacher_initiative', 'attacher_death_saving_throw', 'attacher_hit_dice', 'attacher_attack', 'attacher_spell', 'attacher_skill'];
+  const collectionArray = ['attacher_initiative', 'attacher_death_saving_throw', 'attacher_hit_dice', 'attacher_attack', 'attacher_spell', 'attacher_skill', 'attacher_crit'];
   const finalSetAttrs = {};
   const itemsToPush = ['initiative', 'death_saving_throw', 'hit_dice', 'attack', 'spell', 'skill'];
 
-  for (let i = 0; i < ABILITIES.length; i++) {
-    collectionArray.push(`attacher_${ABILITIES[i]}_check`);
-    collectionArray.push(`attacher_${ABILITIES[i]}_saving_throw`);
-    itemsToPush.push(`${ABILITIES[i]}_check`);
-    itemsToPush.push(`${ABILITIES[i]}_saving_throw`);
+  for (const ability of ABILITIES) {
+    collectionArray.push(`attacher_${ability}_check`);
+    collectionArray.push(`attacher_${ability}_saving_throw`);
+    itemsToPush.push(`${ability}_check`);
+    itemsToPush.push(`${ability}_saving_throw`);
   }
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}freetext`);
       collectionArray.push(`${repeatingString}freeform`);
+      collectionArray.push(`${repeatingString}crit_attacher`);
 
-      for (let x = 0; x < itemsToPush.length; x++) {
-        collectionArray.push(`${repeatingString}${itemsToPush[x]}_attacher`);
-        finalSetAttrs[`attacher_${itemsToPush[x]}`] = ' ';
+      for (const itemToPush of itemsToPush) {
+        collectionArray.push(`${repeatingString}${itemToPush}_attacher`);
+        finalSetAttrs[`attacher_${itemToPush}`] = ' ';
       }
     }
     getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
 
-        for (let x = 0; x < itemsToPush.length; x++) {
-          const attacher = v[`${repeatingString}${itemsToPush[x]}_attacher`];
+        for (const itemToPush of itemsToPush) {
+          const attacher = v[`${repeatingString}${itemToPush}_attacher`];
           if (exists(attacher) && attacher === 'on') {
             const attacherName = v[`${repeatingString}name`] || '';
 
             const freeText = v[`${repeatingString}freetext`];
             if (exists(attacherName) && exists(freeText)) {
-              finalSetAttrs[`attacher_${itemsToPush[x]}`] += `{{${attacherName}=${freeText}}} `;
+              const critAttacher = v[`${repeatingString}crit_attacher`];
+              if (critAttacher) {
+                finalSetAttrs[`attacher_${itemToPush}`] += `{{crit_name=${attacherName}}} `;
+                finalSetAttrs[`attacher_${itemToPush}`] += `{{crit_text=${freeText}}} `;
+              } else {
+                finalSetAttrs[`attacher_${itemToPush}`] += `{{${attacherName}=${freeText}}} `;
+              }
             }
             const freeForm = v[`${repeatingString}freeform`];
             if (exists(freeForm)) {
-              finalSetAttrs[`attacher_${itemsToPush[x]}`] += `${freeForm} `;
+              finalSetAttrs[`attacher_${itemToPush}`] += `${freeForm} `;
             }
           }
         }
@@ -3940,109 +3952,89 @@ const setDefaultAbility = (v, finalSetAttrs) => {
   finalSetAttrs.default_ability = `@{${highestAbilityName}_mod}`;
 };
 
+const parseSRDContentSection = (content, finalSetAttrs, title, name) => {
+  const re = /@(.*)@:\s([^@]+)/gi;
+  let match;
+  let section;
+
+  if (content.indexOf(title) !== -1) {
+    const contentSplit = content.split(`${title}\n`);
+    section = contentSplit[1];
+    content = contentSplit[0];
+  }
+  if (exists(section)) {
+    if (name === 'legendaryaction') {
+      const legendaryActionsMatch = content.match(/Can take (\d+) Legendary Actions/gi);
+      if (legendaryActionsMatch && legendaryActionsMatch[1]) {
+        finalSetAttrs.legendary_action_amount = legendaryActionAmount[1];
+      }
+    }
+
+    while ((match = re.exec(section.replace(/\*\*/g, '@'))) !== null) {
+      if (match && match[1] && match[2]) {
+        const repeatingString = `repeating_${name}_${generateRowID()}_`;
+        finalSetAttrs[`${repeatingString}name`] = match[1];
+        const text = match[2].trim();
+        if (name === 'trait') {
+          finalSetAttrs[`${repeatingString}display_text`] = text;
+        }
+        finalSetAttrs[`${repeatingString}freetext`] = text;
+      } else {
+        console.warn(`Character doesn\'t have a valid ${name} format`);
+      }
+    }
+  }
+  return content;
+};
+
 const updateNPCContent = () => {
   const collectionArray = ['content_srd'];
   const finalSetAttrs = {};
 
-  for (let i = 0; i < ABILITIES.length; i++) {
-    collectionArray.push(ABILITIES[i]);
+  for (const ability of ABILITIES) {
+    collectionArray.push(ability);
   }
 
   getAttrs(collectionArray, (v) => {
     let content = v.content_srd;
-    let legendaryActions;
-    let reactions;
-    let actions;
-    let traits;
-    const re = /\@(.*)\@:\s([^@]+)/gi;
-    let match;
-    let newRowId;
+    let regionalEffects;
+    let lairActions;
     let repeatingString;
 
     setDefaultAbility(v, finalSetAttrs);
 
     if (exists(content)) {
-      if (content.indexOf('Legendary Actions') !== -1) {
-        const legendaryActionsSplit = content.split(/Legendary Actions\n/);
-        legendaryActions = legendaryActionsSplit[1];
-        content = legendaryActionsSplit[0];
+      if (content.indexOf('Regional Effects') !== -1) {
+        const regionalEffectsSplit = content.split(/Regional Effects\n/);
+        regionalEffects = regionalEffectsSplit[1];
+        content = regionalEffectsSplit[0];
       }
-      if (exists(legendaryActions)) {
-        let legendaryActionAmount = 3;
-        const legendaryActionsMatch = legendaryActions.match(/Can take (\d+) Legendary Actions/gi);
-
-        if (legendaryActionsMatch && legendaryActionsMatch[1]) {
-          legendaryActionAmount = legendaryActionAmount[1];
-        }
-
-        finalSetAttrs.legendary_action_amount = legendaryActionAmount;
-
-        while ((match = re.exec(legendaryActions.replace(/\*\*/g, '@'))) !== null) {
-          if (match && match[1] && match[2]) {
-            newRowId = generateRowID();
-            repeatingString = `repeating_legendaryaction_${newRowId}_`;
-            finalSetAttrs[`${repeatingString}name`] = match[1];
-            finalSetAttrs[`${repeatingString}freetext`] = match[2].trim();
-          } else {
-            console.warn('Character doesn\'t have a valid legendary action format');
-          }
-        }
+      if (exists(regionalEffects)) {
+        const regionalEffectsList = regionalEffects.split(/\*\*/);
+        regionalEffectsList.slice(1, -1).forEach((regionalEffect) => {
+          repeatingString = `repeating_regionaleffect_${generateRowID()}_`;
+          finalSetAttrs[`${repeatingString}freetext`] = regionalEffect.trim();
+        });
+        finalSetAttrs.regional_effects_fade = regionalEffectsList.slice(-1)[0];
       }
-      if (content.indexOf('Reactions') !== -1) {
-        const reactionsSplit = content.split(/Reactions\n/);
-        reactions = reactionsSplit[1];
-        content = reactionsSplit[0];
+      if (content.indexOf('Lair Actions') !== -1) {
+        const lairActionsSplit = content.split(/Lair Actions\n/);
+        lairActions = lairActionsSplit[1];
+        content = lairActionsSplit[0];
       }
-      if (exists(reactions)) {
-        while ((match = re.exec(reactions.replace(/\*\*/g, '@'))) !== null) {
-          if (match && match[1] && match[2]) {
-            newRowId = generateRowID();
-            repeatingString = `repeating_reaction_${newRowId}_`;
-            finalSetAttrs[`${repeatingString}name`] = match[1];
-            finalSetAttrs[`${repeatingString}freetext`] = match[2].trim();
-          } else {
-            console.warn('Character doesn\'t have a valid reaction format');
-          }
-        }
-      }
-      if (content.indexOf('Actions') !== -1) {
-        const actionsSplit = content.split(/Actions\n/);
-        actions = actionsSplit[1];
-        content = actionsSplit[0];
-      }
-      if (exists(actions)) {
-        while ((match = re.exec(actions.replace(/\*\*/g, '@'))) !== null) {
-          if (match && match[1] && match[2]) {
-            newRowId = generateRowID();
-            repeatingString = `repeating_action_${newRowId}_`;
-            finalSetAttrs[`${repeatingString}name`] = match[1];
-            finalSetAttrs[`${repeatingString}freetext`] = match[2].trim();
-          } else {
-            console.warn('Character doesn\'t have a valid action format');
-          }
-        }
+      if (exists(lairActions)) {
+        lairActions.split(/\*\*/).slice(1).forEach((lairAction) => {
+          repeatingString = `repeating_lairaction_${generateRowID()}_`;
+          finalSetAttrs[`${repeatingString}freetext`] = lairAction.trim();
+        });
       }
 
-      if (content.indexOf('Traits') !== -1) {
-        const traitsSplit = content.split(/Traits\n/);
-        traits = traitsSplit[1];
-        content = traitsSplit[0];
-      }
-      if (exists(traits)) {
-        while ((match = re.exec(traits.replace(/\*\*/g, '@'))) !== null) {
-          if (match && match[1] && match[2]) {
-            newRowId = generateRowID();
-            repeatingString = `repeating_trait_${newRowId}_`;
-            finalSetAttrs[`${repeatingString}name`] = match[1];
-            const text = match[2].trim();
-            finalSetAttrs[`${repeatingString}display_text`] = text;
-            finalSetAttrs[`${repeatingString}freetext`] = text;
-          } else {
-            console.warn('Character doesn\'t have a valid trait format');
-          }
-        }
-      }
+      content = parseSRDContentSection(content, finalSetAttrs, 'Legendary Actions', 'legendaryaction');
+      content = parseSRDContentSection(content, finalSetAttrs, 'Reactions', 'reaction');
+      content = parseSRDContentSection(content, finalSetAttrs, 'Actions', 'action');
+      parseSRDContentSection(content, finalSetAttrs, 'Traits', 'trait');
     }
+
     setFinalAttrs(v, finalSetAttrs);
   });
 };
@@ -4056,15 +4048,15 @@ const displayTextForTraits = () => {
   const finalSetAttrs = {};
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}display_text`);
       collectionArray.push(`${repeatingString}freetext`);
     }
 
     getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
 
         if (isUndefined(v.display_text)) {
           finalSetAttrs[`${repeatingString}display_text`] = v[`${repeatingString}freetext`];
@@ -4114,14 +4106,14 @@ const parseDamage = (finalSetAttrs, repeatingString, freetext, regex, name, spel
   return freetext;
 };
 
-const parseAction = (rowId, type) => {
+const parseAction = (type, rowId) => {
   const repeatingItem = `repeating_${type}`;
   const collectionArray = ['level', 'challenge', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability'];
   const finalSetAttrs = {};
 
-  const damageType = /((?:[\w]+|[\w]+\s(?:or|and)\s[\w]+)(?:\s*?\([\w\s]+\))?)\s*?damage\s?(\([\w\'\s]+\))?/;
+  const damageType = /((?:[\w]+|[\w]+\s(?:or|and)\s[\w]+)(?:\s*?\([\w\s]+\))?)\s*?damage\s?(\([\w'\s]+\))?/;
   const damageSyntax = /(?:(\d+)|.*?\(([\dd\s\+\-]*)\).*?)\s*?/;
-  const altDamageSyntax = /(?:\,\s*?or\s*?)/;
+  const altDamageSyntax = /(?:,\s*?or\s*?)/;
   const plus = /\s*?plus\s*?/;
   const savingThrowRe = /(?:DC)\s*?(\d+)\s*?([a-zA-Z]*)\s*?(?:saving throw)/;
   const saveSuccess = /or\s(.*)?\son a successful one./;
@@ -4139,8 +4131,8 @@ const parseAction = (rowId, type) => {
   const spellcastingLevelRegex = /(\d+)(?:st|dn|rd|th)-level spellcaster/i;
   const spellcastingAbilityRegex = /spellcasting ability is (\w+)/i;
 
-  for (let i = 0; i < ABILITIES.length; i++) {
-    collectionArray.push(`${ABILITIES[i]}_mod`);
+  for (const ability of ABILITIES) {
+    collectionArray.push(`${ability}_mod`);
   }
 
   getSectionIDs(repeatingItem, (ids) => {
@@ -4148,8 +4140,8 @@ const parseAction = (rowId, type) => {
       ids = [];
       ids.push(rowId);
     }
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}freetext`);
     }
@@ -4166,8 +4158,8 @@ const parseAction = (rowId, type) => {
       const spellMods = [intMod, wisMod, chaMod];
       const abilityMods = [strMod, dexMod, conMod, intMod, wisMod, chaMod];
 
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
 
         let rangedAttack = false;
         let spellAttack = false;
@@ -4281,29 +4273,31 @@ const parseAction = (rowId, type) => {
 
         finalSetAttrs[`${repeatingString}extras_toggle`] = '@{extras_var}';
       }
-      setFinalAttrs(v, finalSetAttrs);
+      setFinalAttrs(v, finalSetAttrs, () => {
+        updateAction(type, rowId);
+      });
     });
   });
 };
 on('change:repeating_trait:freetext', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_trait', eventInfo);
-  parseAction(repeatingInfo.rowId, 'trait');
+  parseAction('trait', repeatingInfo.rowId);
 });
 on('change:repeating_action:freetext', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_action', eventInfo);
-  parseAction(repeatingInfo.rowId, 'action');
+  parseAction('action', repeatingInfo.rowId);
 });
 on('change:repeating_reaction:freetext', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_reaction', eventInfo);
-  parseAction(repeatingInfo.rowId, 'reaction');
+  parseAction('reaction', repeatingInfo.rowId);
 });
 on('change:repeating_legendaryaction:freetext', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_legendaryaction', eventInfo);
-  parseAction(repeatingInfo.rowId, 'legendaryaction');
+  parseAction('legendaryaction', repeatingInfo.rowId);
 });
 on('change:repeating_lairaction:freetext', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_lairaction', eventInfo);
-  parseAction(repeatingInfo.rowId, 'lairaction');
+  parseAction('lairaction', repeatingInfo.rowId);
 });
 
 const countAction = (type) => {
@@ -4383,7 +4377,7 @@ const updateType = () => {
 
   getAttrs(collectionArray, (v) => {
     if (v.type) {
-      finalSetAttrs.type = lowercaseWords(v.type);
+      finalSetAttrs.type = v.type.toLowerCase();
     }
     setFinalAttrs(v, finalSetAttrs);
   });
@@ -4398,7 +4392,7 @@ const updateAlignment = () => {
 
   getAttrs(collectionArray, (v) => {
     if (v.alignment && v.is_npc === '1') {
-      finalSetAttrs.alignment = lowercaseWords(v.alignment);
+      finalSetAttrs.alignment = v.alignment.toLowerCase();
     }
     setFinalAttrs(v, finalSetAttrs);
   });
@@ -4414,7 +4408,7 @@ const updateSenses = () => {
   getAttrs(collectionArray, (v) => {
     if (v.senses) {
       finalSetAttrs.senses_exist = 1;
-      finalSetAttrs.senses = lowercaseWords(v.senses);
+      finalSetAttrs.senses = v.senses.toLowerCase();
     } else {
       finalSetAttrs.senses_exist = 0;
     }
@@ -4447,7 +4441,11 @@ const updateSpeed = () => {
   const finalSetAttrs = {};
 
   getAttrs(collectionArray, (v) => {
-    finalSetAttrs.npc_speed = lowercaseWords(v.npc_speed);
+    finalSetAttrs.npc_speed = v.npc_speed.toLowerCase();
+    const match = finalSetAttrs.npc_speed.match(/^\s*(\d+)\s*ft/);
+    if (match && match[1]) {
+      finalSetAttrs.speed = match[1];
+    }
     setFinalAttrs(v, finalSetAttrs);
   });
 };
@@ -4460,7 +4458,7 @@ const updateACNote = () => {
   const finalSetAttrs = {};
 
   getAttrs(collectionArray, (v) => {
-    finalSetAttrs.ac_note = lowercaseWords(v.ac_note);
+    finalSetAttrs.ac_note = v.ac_note.toLowerCase();
     setFinalAttrs(v, finalSetAttrs);
   });
 };
@@ -4567,8 +4565,8 @@ const resourcesToClassFeatures = () => {
 
   let repeatingString;
   getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}uses`);
       collectionArray.push(`${repeatingString}uses_max`);
@@ -4580,8 +4578,8 @@ const resourcesToClassFeatures = () => {
     }
 
     getAttrs(collectionArray, (v) => {
-      for (let i = 0; i < ids.length; i++) {
-        repeatingString = `${repeatingItem}_${ids[i]}_`;
+      for (const id of ids) {
+        repeatingString = `${repeatingItem}_${id}_`;
         const newRowId = generateRowID();
         const newRepeatingString = `${newRepeatingItem}_${newRowId}_`;
 
@@ -4607,8 +4605,8 @@ const setSkillStorageNames = () => {
   let repeatingString;
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}storage_name`);
       collectionArray.push(`${repeatingString}name`);
     }
@@ -4616,8 +4614,8 @@ const setSkillStorageNames = () => {
     getAttrs(collectionArray, (v) => {
       const language = v.lang;
       if (!language || language === 'en') {
-        for (let i = 0; i < ids.length; i++) {
-          repeatingString = `${repeatingItem}_${ids[i]}_`;
+        for (const id of ids) {
+          repeatingString = `${repeatingItem}_${id}_`;
 
           const name = v[`${repeatingString}name`];
           if (!isUndefined(name)) {
@@ -4640,8 +4638,9 @@ const generateSkills = () => {
   let repeatingString;
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      repeatingString = `${repeatingItem}_${id}_`;
+      collectionArray.push(`${repeatingString}storage_name`);
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}ability`);
     }
@@ -4649,25 +4648,26 @@ const generateSkills = () => {
     getAttrs(collectionArray, (v) => {
       const language = v.lang || 'en';
 
-      let x = 0;
-
       for (const prop in SKILLS) {
         if (SKILLS.hasOwnProperty(prop)) {
           let skillId;
-          if (ids[x]) {
-            skillId = ids[x];
-          } else {
+
+          for (const id of ids) {
+            repeatingString = `${repeatingItem}_${id}_`;
+            if (v[`${repeatingString}storage_name`] === prop) {
+              skillId = id;
+              break;
+            }
+          }
+          if (!skillId) {
             skillId = generateRowID();
           }
           repeatingString = `${repeatingItem}_${skillId}_`;
 
           finalSetAttrs[`${repeatingString}storage_name`] = prop;
           finalSetAttrs[`${repeatingString}name`] = translate(language, `SKILLS.${prop}`);
-
           finalSetAttrs[`${repeatingString}ability`] = `@{${SKILLS[prop]}_mod}`;
           updateSkill(skillId);
-
-          x++;
         }
       }
       setFinalAttrs(v, finalSetAttrs);
@@ -4700,14 +4700,14 @@ const extasToExtrasFix = (repeatingItem) => {
   const finalSetAttrs = {};
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}extas_toggle`);
     }
 
     getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
 
         const extrasToggle = v[`${repeatingString}extas_toggle`];
         if (!isUndefined(extrasToggle)) {
