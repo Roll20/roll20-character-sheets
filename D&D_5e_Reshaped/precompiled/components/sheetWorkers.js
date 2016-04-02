@@ -1558,8 +1558,8 @@ const updateSpellSlots = () => {
     9: 0,
   };
 
-  for (let i = 1; i <= 9; i++) {
-    const repeatingString = `spell_slots_l${i}_`;
+  for (const level in spellSlots) {
+    const repeatingString = `spell_slots_l${level}_`;
     collectionArray.push(`${repeatingString}calc`);
     collectionArray.push(`${repeatingString}bonus`);
     collectionArray.push(`${repeatingString}max`);
@@ -1679,14 +1679,13 @@ const updateSpellSlots = () => {
       }
     }
 
-    for (let i = 1; i <= 9; i++) {
-      const slotCalc = spellSlots[i];
-      finalSetAttrs[`spell_slots_l${i}_calc`] = slotCalc;
+    for (const level in spellSlots) {
+      finalSetAttrs[`spell_slots_l${level}_calc`] = spellSlots[level];
 
-      const slotBonus = getIntValue(v[`spell_slots_l${i}_bonus`]);
-      const spellSlotMax = slotCalc + slotBonus;
-      if (v[`spell_slots_l${i}_max`] !== spellSlotMax) {
-        finalSetAttrs[`spell_slots_l${i}_max`] = spellSlotMax;
+      const slotBonus = getIntValue(v[`spell_slots_l${level}_bonus`]);
+      const spellSlotMax = spellSlots[level] + slotBonus;
+      if (v[`spell_slots_l${level}_max`] !== spellSlotMax) {
+        finalSetAttrs[`spell_slots_l${level}_max`] = spellSlotMax;
       }
 
       let spellSlotToggle;
@@ -1695,8 +1694,8 @@ const updateSpellSlots = () => {
       } else {
         spellSlotToggle = 0;
       }
-      if (v[`spell_slots_l${i}_toggle`] !== spellSlotToggle) {
-        finalSetAttrs[`spell_slots_l${i}_toggle`] = spellSlotToggle;
+      if (v[`spell_slots_l${level}_toggle`] !== spellSlotToggle) {
+        finalSetAttrs[`spell_slots_l${level}_toggle`] = spellSlotToggle;
       }
     }
     setFinalAttrs(v, finalSetAttrs);
