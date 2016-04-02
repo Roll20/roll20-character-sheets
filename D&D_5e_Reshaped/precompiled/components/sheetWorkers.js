@@ -1543,7 +1543,7 @@ const setClassFeatures = () => {
 };
 
 const updateSpellSlots = () => {
-  const collectionArray = ['level', 'caster_level', 'caster_type'];
+  const collectionArray = ['caster_level', 'caster_type'];
   const finalSetAttrs = {};
 
   const spellSlots = {
@@ -1566,7 +1566,7 @@ const updateSpellSlots = () => {
     collectionArray.push(`${repeatingString}toggle`);
   }
   getAttrs(collectionArray, (v) => {
-    let casterLevel = getIntValue(v.level);
+    let casterLevel = getIntValue(v.caster_level);
     let casterType = v.caster_type;
     if (isUndefined(casterType)) {
       casterType = 'full';
@@ -1863,6 +1863,8 @@ const updateLevels = (changedField) => {
           } else {
             finalSetAttrs[`${repeatingString}spellcasting`] = 'none';
           }
+        } else if (classSpellcasting === 'warlock') {
+          spellcasting[classSpellcasting] += classLevel;
         } else {
           classesWithSpellcasting += 1;
           spellcasting[classSpellcasting] += classLevel;
@@ -1927,9 +1929,13 @@ const updateLevels = (changedField) => {
 
       let casterLevel = 0;
       if (!v.is_npc || v.is_npc === '0' || v.is_npc === 0) {
-        casterLevel += spellcasting.full;
-        casterLevel += Math.floor(spellcasting.half / 2);
-        casterLevel += Math.floor(spellcasting.third / 3);
+        if (classesWithSpellcasting > 1) {
+          casterLevel += spellcasting.full;
+          casterLevel += Math.floor(spellcasting.half / 2);
+          casterLevel += Math.floor(spellcasting.third / 3);
+        } else {
+          casterLevel = spellcasting.full + spellcasting.half + spellcasting.third;
+        }
         finalSetAttrs.caster_level = casterLevel;
       }
 
