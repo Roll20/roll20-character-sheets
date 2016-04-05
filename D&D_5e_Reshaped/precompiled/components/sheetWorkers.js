@@ -3720,7 +3720,7 @@ const updateAttachers = () => {
 
       for (const itemToPush of itemsToPush) {
         collectionArray.push(`${repeatingString}${itemToPush}_attacher`);
-        finalSetAttrs[`attacher_${itemToPush}`] = ' ';
+        finalSetAttrs[`attacher_${itemToPush}`] = '';
       }
     }
     getAttrs(collectionArray, (v) => {
@@ -3735,7 +3735,7 @@ const updateAttachers = () => {
             const freeText = v[`${repeatingString}freetext`];
             if (exists(attacherName) && exists(freeText)) {
               const critAttacher = v[`${repeatingString}crit_attacher`];
-              if (critAttacher) {
+              if (critAttacher === 'on') {
                 finalSetAttrs[`attacher_${itemToPush}`] += `{{crit_name=${attacherName}}} `;
                 finalSetAttrs[`attacher_${itemToPush}`] += `{{crit_text=${freeText}}} `;
               } else {
