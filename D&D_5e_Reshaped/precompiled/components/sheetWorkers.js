@@ -4908,6 +4908,9 @@ const sheetOpened = () => {
       updateAbilityModifiers();
       updateSpell();
     }
+    if (versionCompare(version, '2.3.3') < 0) {
+      updateAttachers();
+    }
 
     if (!version || version !== currentVersion) {
       finalSetAttrs.version = currentVersion;
