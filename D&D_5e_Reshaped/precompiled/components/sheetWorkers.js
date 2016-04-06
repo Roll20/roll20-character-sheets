@@ -430,6 +430,7 @@ const updateAbilityModifier = (ability) => {
     collectionArray.push('finesse_mod');
   }
   if (ability === 'strength') {
+    collectionArray.push('weight_multiplier');
     collectionArray.push('carrying_capacity');
     collectionArray.push('max_push_drag_lift');
     collectionArray.push('encumbered');
@@ -477,10 +478,11 @@ const updateAbilityModifier = (ability) => {
 
     if (ability === 'strength') {
       finalSetAttrs.finesse_mod = Math.max(abilityMod, getIntValue(v.dexterity_mod));
-      finalSetAttrs.carrying_capacity = abilityScore * 15;
-      finalSetAttrs.max_push_drag_lift = abilityScore * 30;
-      finalSetAttrs.encumbered = abilityScore * 5;
-      finalSetAttrs.heavily_encumbered = abilityScore * 10;
+      const weightMultiplier = getFloatValue(v.weight_multiplier, 1);
+      finalSetAttrs.carrying_capacity = abilityScore * 15 * weightMultiplier;
+      finalSetAttrs.max_push_drag_lift = abilityScore * 30 * weightMultiplier;
+      finalSetAttrs.encumbered = abilityScore * 5 * weightMultiplier;
+      finalSetAttrs.heavily_encumbered = abilityScore * 10 * weightMultiplier;
     } else if (ability === 'dexterity') {
       finalSetAttrs.finesse_mod = Math.max(abilityMod, getIntValue(v.strength_mod));
     }
@@ -499,7 +501,7 @@ const updateAbilityModifiers = () => {
 on('change:jack_of_all_trades_toggle change:jack_of_all_trades change:global_ability_bonus change:global_check_bonus', () => {
   updateAbilityModifiers();
 });
-on('change:strength change:strength_bonus change:strength_check_mod change:strength_check_bonus change:remarkable_athlete_toggle change:remarkable_athlete', () => {
+on('change:strength change:strength_bonus change:strength_check_mod change:strength_check_bonus change:remarkable_athlete_toggle change:remarkable_athlete change:weight_multiplier', () => {
   updateAbilityModifier('strength');
 });
 on('change:dexterity change:dexterity_bonus change:dexterity_check_mod change:dexterity_check_bonus change:remarkable_athlete_toggle change:remarkable_athlete', () => {
@@ -1559,11 +1561,13 @@ const updateSpellSlots = () => {
   };
 
   for (const level in spellSlots) {
-    const repeatingString = `spell_slots_l${level}_`;
-    collectionArray.push(`${repeatingString}calc`);
-    collectionArray.push(`${repeatingString}bonus`);
-    collectionArray.push(`${repeatingString}max`);
-    collectionArray.push(`${repeatingString}toggle`);
+    if (spellSlots.hasOwnProperty(level)) {
+      const repeatingString = `spell_slots_l${level}_`;
+      collectionArray.push(`${repeatingString}calc`);
+      collectionArray.push(`${repeatingString}bonus`);
+      collectionArray.push(`${repeatingString}max`);
+      collectionArray.push(`${repeatingString}toggle`);
+    }
   }
   getAttrs(collectionArray, (v) => {
     let casterLevel = getIntValue(v.caster_level);
@@ -1680,22 +1684,24 @@ const updateSpellSlots = () => {
     }
 
     for (const level in spellSlots) {
-      finalSetAttrs[`spell_slots_l${level}_calc`] = spellSlots[level];
+      if (spellSlots.hasOwnProperty(level)) {
+        finalSetAttrs[`spell_slots_l${level}_calc`] = spellSlots[level];
 
-      const slotBonus = getIntValue(v[`spell_slots_l${level}_bonus`]);
-      const spellSlotMax = spellSlots[level] + slotBonus;
-      if (v[`spell_slots_l${level}_max`] !== spellSlotMax) {
-        finalSetAttrs[`spell_slots_l${level}_max`] = spellSlotMax;
-      }
+        const slotBonus = getIntValue(v[`spell_slots_l${level}_bonus`]);
+        const spellSlotMax = spellSlots[level] + slotBonus;
+        if (v[`spell_slots_l${level}_max`] !== spellSlotMax) {
+          finalSetAttrs[`spell_slots_l${level}_max`] = spellSlotMax;
+        }
 
-      let spellSlotToggle;
-      if (spellSlotMax > 0) {
-        spellSlotToggle = 'on';
-      } else {
-        spellSlotToggle = 0;
-      }
-      if (v[`spell_slots_l${level}_toggle`] !== spellSlotToggle) {
-        finalSetAttrs[`spell_slots_l${level}_toggle`] = spellSlotToggle;
+        let spellSlotToggle;
+        if (spellSlotMax > 0) {
+          spellSlotToggle = 'on';
+        } else {
+          spellSlotToggle = 0;
+        }
+        if (v[`spell_slots_l${level}_toggle`] !== spellSlotToggle) {
+          finalSetAttrs[`spell_slots_l${level}_toggle`] = spellSlotToggle;
+        }
       }
     }
     setFinalAttrs(v, finalSetAttrs);
