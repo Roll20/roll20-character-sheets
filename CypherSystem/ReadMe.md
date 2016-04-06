@@ -3,7 +3,7 @@ Character sheet, with integrated rolls and optional API script, for the Cypher S
 It can look like and be used as a sheet for _Numen&eacute;ra_ (except the armor stat cost, as per the CSR rule) or _The Strange_ (except the armor stat cost thing also, and the recursion management which requires several characters/sheets, one per recursion).
 
 # Current version:
-Version 1.4 (November 21st, 2015).
+Version 1.6 (February 21st, 2016).
 
 * Screenshot [Generic Cypher System style](CypherSystem.png)
 * Screenshot [Numenera style](CypherSystem_style_Numenera.png)
@@ -41,6 +41,19 @@ Set up the API script:
 
 
 # Release Notes
+
+##Release 1.6 (February 21st, 2016)
+Cosmetic changes, to ease access to the delete button on repeatable sections, and diminish repeatable sections line height.
+
+##Release 1.5 (December 21st, 2015)
+
+* New "Attacks" section (one per stat), with integrated rolls, taking in account skill level, costs, damage etc.
+* Stat and skill rolls don't ask/use damage effort anymore (use the new attack sections/rolls instead)
+* New options to simplify rolls: choose if rolls ask for/use assets, bonus and cost. Default is now not askink/using them.
+* "Name" button to logo/info button
+* Info button can be dragged to the macro bar
+* Added info button to equipment and consummables
+* Damage track taken in account for effort cost calculation
 
 ##Release 1.4 (November 21st, 2015)
 [See detailed post on the Roll20 forum](https://app.roll20.net/forum/post/2357046/cypher-system-core-rule-book-sheet/?pageforid=2645489#post-2645489)
