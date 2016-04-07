@@ -3911,7 +3911,7 @@ const updateNPCHP = () => {
             hpFormula += ` - ${amount}`;
           }
         }
-        v.hp_extra.replace(splitFormula[0], '');
+        v.hp_extra.toString().replace(splitFormula[0], '');
       }
     }
 
