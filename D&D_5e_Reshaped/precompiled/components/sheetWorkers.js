@@ -3885,7 +3885,7 @@ const updateNPCHP = () => {
     }
 
     if (exists(v.hp_extra)) {
-      const regex = (/(?:(\+|\-)\s)?(\d+)(?:d(\d+))?/gi);
+      const regex = (/(?:(\+|\-)\s?)?(\d+)(?:d(\d+))?/gi);
       let splitFormula;
 
       while ((splitFormula = regex.exec(v.hp_extra)) !== null) {
