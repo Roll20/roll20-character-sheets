@@ -476,6 +476,7 @@ const updateAbilityModifier = (ability) => {
     finalSetAttrs[`${ability}_mod`] = abilityMod;
     finalSetAttrs[`${ability}_mod_with_sign`] = showSign(abilityMod);
     finalSetAttrs[`${ability}_check_mod`] = abilityCheck;
+    finalSetAttrs[`${ability}_check_mod_with_sign`] = showSign(abilityCheck);
     finalSetAttrs[`${ability}_check_mod_formula`] = abilityCheckFormula;
 
     if (ability === 'strength') {
@@ -3381,11 +3382,9 @@ const updateAbilityChecksMacro = () => {
   finalSetAttrs.skills_macro_var = '';
 
   for (const ability of ABILITIES) {
-    finalSetAttrs.ability_checks_query_var += `|${capitalize(ability)},{{title=${capitalize(ability)}&#125;&#125; {{roll1=[[@{preroll}d20@{postroll}@{d20_mod} + @{${ability}_check_mod}]]&#125;&#125; @{roll_setting}@{d20_mod} + @{${ability}_check_mod}]]&#125;&#125;`;
-    finalSetAttrs.ability_checks_macro_var += `[${capitalize(ability)}](~${ability}_check)`;
-    finalSetAttrs.ability_checks_macro_var += ', ';
+    collectionArray.push(`${ability}_check_mod`);
+    collectionArray.push(`${ability}_check_mod_with_sign`);
   }
-
   getSectionIDs(repeatingItem, (ids) => {
     for (const id of ids) {
       const repeatingString = `${repeatingItem}_${id}_`;
@@ -3395,6 +3394,11 @@ const updateAbilityChecksMacro = () => {
     }
 
     getAttrs(collectionArray, (v) => {
+      for (const ability of ABILITIES) {
+        finalSetAttrs.ability_checks_query_var += `|${capitalize(ability)},{{title=${capitalize(ability)}&#125;&#125; {{roll1=[[@{preroll}d20@{postroll}@{d20_mod} + ${v[`${ability}_check_mod`]}]]&#125;&#125; @{roll_setting}@{d20_mod} + ${v[`${ability}_check_mod`]}]]&#125;&#125;`;
+        finalSetAttrs.ability_checks_macro_var += `[${capitalize(ability)} ${v[`${ability}_check_mod_with_sign`]}](~${ability}_check)`;
+        finalSetAttrs.ability_checks_macro_var += ', ';
+      }
       for (const id of ids) {
         const repeatingString = `${repeatingItem}_${id}_`;
         finalSetAttrs.ability_checks_query_var += `|${v[`${repeatingString}name`]}, {{title=${v[`${repeatingString}name`]} (${capitalize(getAbilityShortName(v[`${repeatingString}ability`]))})&#125;&#125; {{roll1=[[@{preroll}d20@{postroll}@{d20_mod} + @{${repeatingString}formula}]]&#125;&#125; @{roll_setting}@{d20_mod} + @{${repeatingString}formula}]]&#125;&#125;`;
