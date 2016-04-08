@@ -2909,7 +2909,7 @@ const updateAction = (type, rowId) => {
         updateHealToggle(v, finalSetAttrs, repeatingString);
 
         if (v[`${repeatingString}emote`] || v[`${repeatingString}freetext`] || v[`${repeatingString}freeform`]) {
-          finalSetAttrs.extras_toggle = '@{extras_var}';
+          finalSetAttrs[`${repeatingString}extras_toggle`] = '@{extras_var}';
         }
       }
       setFinalAttrs(v, finalSetAttrs, () => {
@@ -3273,7 +3273,7 @@ const updateSpell = (rowId) => {
         updateHigherLevelToggle(v, finalSetAttrs, repeatingString);
 
         if (v[`${repeatingString}emote`] || v[`${repeatingString}freetext`] || v[`${repeatingString}freeform`]) {
-          finalSetAttrs.extras_toggle = '@{extras_var}';
+          finalSetAttrs[`${repeatingString}extras_toggle`] = '@{extras_var}';
         }
       }
       setFinalAttrs(v, finalSetAttrs);
