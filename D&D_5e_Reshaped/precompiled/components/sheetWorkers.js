@@ -286,7 +286,7 @@ const versionCompare = (v1, v2, options) => {
 const getAbilityMod = (score) => {
   return Math.floor((getIntValue(score) - 10) / 2);
 };
-const addOrSubtract = (string, number) => {
+const addArithmeticOperator = (string, number) => {
   let value = number;
   if (string && value) {
     if (value >= 0) {
@@ -455,15 +455,15 @@ const updateAbilityModifier = (ability) => {
     if ((ability === 'strength' || ability === 'dexterity' || ability === 'constitution') && v.remarkable_athlete_toggle === '@{remarkable_athlete}') {
       const remarkableAthlete = getIntValue(v.remarkable_athlete);
       abilityCheck += remarkableAthlete;
-      abilityCheckFormula += ` + ${remarkableAthlete}[remarkable athlete]`;
+      abilityCheckFormula += `${addArithmeticOperator(abilityCheckFormula, remarkableAthlete)}[remarkable athlete]`;
     } else if (v.jack_of_all_trades_toggle === '@{jack_of_all_trades}') {
       const jackOfAllTrades = getIntValue(v.jack_of_all_trades);
       abilityCheck += jackOfAllTrades;
-      abilityCheckFormula += ` + ${jackOfAllTrades}[jack of all trades]`;
+      abilityCheckFormula += `${addArithmeticOperator(abilityCheckFormula, jackOfAllTrades)}[jack of all trades]`;
     }
     if (abilityCheckBonus) {
       abilityCheck += abilityCheckBonus;
-      abilityCheckFormula += ` + ${abilityCheckBonus}[${ability} check bonus]`;
+      abilityCheckFormula += `${addArithmeticOperator(abilityCheckFormula, abilityCheckBonus)}[${ability} check bonus]`;
     }
     if (!isNaN(v.global_check_bonus)) {
       abilityCheck += getIntValue(v.global_check_bonus);
@@ -2334,7 +2334,7 @@ const updateInitiative = () => {
     const dexCheckBonus = getIntValue(v.dexterity_check_bonus);
     if (exists(dexCheckBonus)) {
       finalSetAttrs.initiative += dexCheckBonus;
-      finalSetAttrs.initiative_formula += ` + ${dexCheckBonus}[dex check bonus]`;
+      finalSetAttrs.initiative_formula += `${addArithmeticOperator(finalSetAttrs.initiative_formula, dexCheckBonus)}[dex check bonus]`;
     }
 
     const initiativeBonus = v.initiative_bonus;
@@ -2342,26 +2342,26 @@ const updateInitiative = () => {
       if (!isNaN(initiativeBonus)) {
         finalSetAttrs.initiative += getIntValue(initiativeBonus);
       }
-      finalSetAttrs.initiative_formula += ' + @{initiative_bonus}[initiative bonus]';
+      finalSetAttrs.initiative_formula += `${addArithmeticOperator(finalSetAttrs.initiative_formula, initiativeBonus)}[initiative bonus]`;
     }
 
     if (v.remarkable_athlete_toggle === '@{remarkable_athlete}') {
       const remarkableAthlete = getIntValue(v.remarkable_athlete);
       if (exists(remarkableAthlete)) {
         finalSetAttrs.initiative += remarkableAthlete;
-        finalSetAttrs.initiative_formula += ` + ${remarkableAthlete}[remarkable athlete]`;
+        finalSetAttrs.initiative_formula += `${addArithmeticOperator(finalSetAttrs.initiative_formula, remarkableAthlete)}[remarkable athlete]`;
       }
     } else if (v.jack_of_all_trades_toggle === '@{jack_of_all_trades}') {
       const jackOfAllTrades = getIntValue(v.jack_of_all_trades);
       if (exists(jackOfAllTrades)) {
         finalSetAttrs.initiative += jackOfAllTrades;
-        finalSetAttrs.initiative_formula += ` + ${jackOfAllTrades}[jack of all trades]`;
+        finalSetAttrs.initiative_formula += `${addArithmeticOperator(finalSetAttrs.initiative_formula, jackOfAllTrades)}[jack of all trades]`;
       }
     }
 
     const globalCheckBonus = v.global_check_bonus;
     if (exists(globalCheckBonus)) {
-      finalSetAttrs.initiative_formula += ` + ${globalCheckBonus}[global check bonus]`;
+      finalSetAttrs.initiative_formula += `${addArithmeticOperator(finalSetAttrs.initiative_formula, globalCheckBonus)}[global check bonus]`;
     }
     setFinalAttrs(v, finalSetAttrs);
   });
@@ -2414,20 +2414,20 @@ const updateAttackToggle = (v, finalSetAttrs, repeatingString, options) => {
     attackAbility = getAbilityValue(v, attackAbility, options.defaultAbility);
     if (exists(attackAbility)) {
       toHit += attackAbility;
-      attackFormula += ` + ${attackAbility}[${getAbilityShortName(v[`${repeatingString}attack_ability`])}]`;
+      attackFormula += `${addArithmeticOperator(attackFormula, attackAbility)}[${getAbilityShortName(v[`${repeatingString}attack_ability`])}]`;
     }
 
     const attackBonus = getIntValue(v[`${repeatingString}attack_bonus`]);
     if (exists(attackBonus)) {
       toHit += attackBonus;
-      attackFormula += ` + ${attackBonus}[bonus]`;
+      attackFormula += `${addArithmeticOperator(attackFormula, attackBonus)}[bonus]`;
     }
 
     if (exists(options.globalAttackBonus)) {
       if (!isNaN(options.globalAttackBonus)) {
         toHit += getIntValue(options.globalAttackBonus);
       }
-      attackFormula += ` + ${options.globalAttackBonus}[${options.globalAttackBonusLabel}]`;
+      attackFormula += `${addArithmeticOperator(attackFormula, options.globalAttackBonus)}[${options.globalAttackBonusLabel}]`;
     }
 
     if (!v[`${repeatingString}type`] || v[`${repeatingString}type`] === 'Melee Weapon') {
@@ -2435,14 +2435,14 @@ const updateAttackToggle = (v, finalSetAttrs, repeatingString, options) => {
         if (!isNaN(options.globalMeleeAttackBonus)) {
           toHit += getIntValue(options.globalMeleeAttackBonus);
         }
-        attackFormula += ` + ${options.globalMeleeAttackBonus}[global melee attack bonus]`;
+        attackFormula += `${addArithmeticOperator(attackFormula, options.globalMeleeAttackBonus)}[global melee attack bonus]`;
       }
     } else if (v[`${repeatingString}type`] === 'Ranged Weapon') {
       if (exists(options.globalRangedAttackBonus)) {
         if (!isNaN(options.globalRangedAttackBonus)) {
           toHit += getIntValue(options.globalRangedAttackBonus);
         }
-        attackFormula += ` + ${options.globalRangedAttackBonus}[global ranged attack bonus]`;
+        attackFormula += `${addArithmeticOperator(attackFormula, options.globalRangedAttackBonus)}[global ranged attack bonus]`;
       }
     }
     finalSetAttrs[`${repeatingString}attack_formula`] = attackFormula;
@@ -2517,7 +2517,7 @@ const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
       const damageAbilityValue = getAbilityValue(v, damageAbility, options.defaultDamageAbility);
       if (exists(damageAbilityValue)) {
         damageAddition += damageAbilityValue;
-        damageFormula += `${addOrSubtract(damageFormula, damageAbilityValue)}[${getAbilityShortName(v[`${repeatingString}damage_ability`])}]`;
+        damageFormula += `${addArithmeticOperator(damageFormula, damageAbilityValue)}[${getAbilityShortName(v[`${repeatingString}damage_ability`])}]`;
       }
     }
 
@@ -2534,35 +2534,29 @@ const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
       if (!isNaN(options.globalDamageBonus)) {
         damageAddition += getIntValue(options.globalDamageBonus);
       } else {
-        damageString += ` + ${options.globalDamageBonus}`;
+        damageString += `${addArithmeticOperator(damageString, options.globalDamageBonus)}`;
       }
-      damageFormula += ` + ${options.globalDamageBonus}[global damage bonus]`;
+      damageFormula += `${addArithmeticOperator(damageFormula, options.globalDamageBonus)}[global damage bonus]`;
     }
 
     if (options && exists(options.globalMeleeDamageBonus) && (!v[`${repeatingString}type`] || v[`${repeatingString}type`] === 'Melee Weapon')) {
       if (!isNaN(options.globalMeleeDamageBonus)) {
         damageAddition += getIntValue(options.globalMeleeDamageBonus);
       } else {
-        damageString += ` + ${options.globalMeleeDamageBonus}`;
+        damageString += `${addArithmeticOperator(damageString, options.globalMeleeDamageBonus)}`;
       }
-      if (damageFormula !== '') {
-        damageFormula += ' + ';
-      }
-      damageFormula += `${options.globalMeleeDamageBonus}[global melee damage bonus]`;
+      damageFormula += `${addArithmeticOperator(damageFormula, options.globalMeleeDamageBonus)}[global melee damage bonus]`;
     } else if (options && exists(options.globalRangedDamageBonus) && v[`${repeatingString}type`] === 'Ranged Weapon') {
       if (!isNaN(options.globalRangedDamageBonus)) {
         damageAddition += getIntValue(options.globalRangedDamageBonus);
       } else {
-        damageString += ` + ${options.globalRangedDamageBonus}`;
+        damageString += `${addArithmeticOperator(damageString, options.globalRangedDamageBonus)}`;
       }
-      if (damageFormula !== '') {
-        damageFormula += ' + ';
-      }
-      damageFormula += `${options.globalRangedDamageBonus}[global ranged damage bonus]`;
+      damageFormula += `${addArithmeticOperator(damageFormula, options.globalRangedDamageBonus)}[global ranged damage bonus]`;
     }
 
     if (exists(damageAddition)) {
-      damageString += addOrSubtract(damageString, damageAddition);
+      damageString += addArithmeticOperator(damageString, damageAddition);
     }
 
     damageType = v[`${repeatingString}damage_type`];
@@ -2594,7 +2588,7 @@ const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
     let secondDamageAddition = 0;
     const secondDamage = v[`${repeatingString}second_damage`];
     if (exists(secondDamage)) {
-      damageString += ` + ${secondDamage}`;
+      damageString += `${addArithmeticOperator(damageString, secondDamage)}`;
       secondDamageFormula += `${secondDamage}[second damage]`;
     }
 
@@ -2603,21 +2597,18 @@ const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
       secondDamageAbility = getAbilityValue(v, secondDamageAbility);
       if (exists(secondDamageAbility)) {
         secondDamageAddition += secondDamageAbility;
-        secondDamageFormula += `${addOrSubtract(secondDamageFormula, secondDamageAbility)}[${getAbilityShortName(v[`${repeatingString}second_damage_ability`])}]`;
+        secondDamageFormula += `${addArithmeticOperator(secondDamageFormula, secondDamageAbility)}[${getAbilityShortName(v[`${repeatingString}second_damage_ability`])}]`;
       }
     }
 
     const secondDamageBonus = getIntValue(v[`${repeatingString}second_damage_bonus`]);
     if (exists(secondDamageBonus)) {
       secondDamageAddition += secondDamageBonus;
-      if (secondDamageFormula !== '') {
-        secondDamageFormula += ' + ';
-      }
-      secondDamageFormula += `${secondDamageBonus}[bonus]`;
+      secondDamageFormula += `${addArithmeticOperator(secondDamageFormula, secondDamageBonus)}[bonus]`;
     }
 
     if (exists(secondDamageAddition)) {
-      damageString += addOrSubtract(damageString, secondDamageAddition);
+      damageString += addArithmeticOperator(damageString, secondDamageAddition);
     }
 
     let secondDamageType = v[`${repeatingString}second_damage_type`];
@@ -2672,12 +2663,12 @@ const updateHealToggle = (v, finalSetAttrs, repeatingString) => {
     let healAbility = v[`${repeatingString}heal_ability`];
     healAbility = getAbilityValue(v, healAbility);
     if (exists(healAbility)) {
-      healFormula += ` + ${healAbility}[${getAbilityShortName(v[`${repeatingString}heal_ability`])}]`;
+      healFormula += `${addArithmeticOperator(healFormula, healAbility)}[${getAbilityShortName(v[`${repeatingString}heal_ability`])}]`;
     }
 
     const healBonus = getIntValue(v[`${repeatingString}heal_bonus`]);
     if (exists(healBonus)) {
-      healFormula += ` + ${healBonus}[bonus]`;
+      healFormula += `${addArithmeticOperator(healFormula, healBonus)}[bonus]`;
     }
 
     if (exists(v.global_spell_heal_bonus)) {
@@ -3514,13 +3505,13 @@ const updateSkill = (rowId) => {
         const skillAbility = getAbilityValue(v, ability, 'strength_mod');
         if (exists(skillAbility)) {
           total += skillAbility;
-          totalFormula += ` + ${skillAbility}[${getAbilityShortName(ability)}]`;
+          totalFormula += `${addArithmeticOperator(totalFormula, skillAbility)}[${getAbilityShortName(ability)}]`;
         }
 
         const skillBonus = getIntValue(v[`${repeatingString}bonus`]);
         if (exists(skillBonus)) {
           total += skillBonus;
-          totalFormula += ` + ${skillBonus}[bonus]`;
+          totalFormula += `${addArithmeticOperator(totalFormula, skillBonus)}[bonus]`;
         }
 
         const skillAbilityName = getAbilityName(ability);
@@ -3529,7 +3520,7 @@ const updateSkill = (rowId) => {
           if (exists(checkBonus)) {
             checkBonus = getIntValue(checkBonus);
             total += checkBonus;
-            totalFormula += ` + ${checkBonus}[${getAbilityShortName(ability)} check bonus]`;
+            totalFormula += `${addArithmeticOperator(totalFormula, checkBonus)}[${getAbilityShortName(ability)} check bonus]`;
           }
         }
 
@@ -3538,7 +3529,7 @@ const updateSkill = (rowId) => {
           if (!isNaN(globalCheckBonus)) {
             total += getIntValue(globalCheckBonus);
           }
-          totalFormula += ` + ${globalCheckBonus}[global check bonus]`;
+          totalFormula += `${addArithmeticOperator(totalFormula, globalCheckBonus)}[global check bonus]`;
         }
 
         finalSetAttrs[`${repeatingString}total`] = total;
@@ -3642,13 +3633,13 @@ const updateSavingThrow = (ability) => {
     if (proficiency === '@{PB}') {
       const pb = getIntValue(v.pb);
       total += pb;
-      totalFormula += ` + ${pb}[proficient]`;
+      totalFormula += `${addArithmeticOperator(totalFormula, pb)}[proficient]`;
     }
 
     const abilitySavingThrowBonus = getIntValue(v[`${ability}_save_bonus`]);
     if (abilitySavingThrowBonus) {
       total += abilitySavingThrowBonus;
-      totalFormula += ` + ${abilitySavingThrowBonus}[${getAbilityShortName(ability)}saving throw bonus]`;
+      totalFormula += `${addArithmeticOperator(totalFormula, abilitySavingThrowBonus)}[${getAbilityShortName(ability)}saving throw bonus]`;
     }
 
     const globalSavingThrowBonus = v.global_saving_throw_bonus;
@@ -3656,7 +3647,7 @@ const updateSavingThrow = (ability) => {
       if (!isNaN(globalSavingThrowBonus)) {
         total += getIntValue(globalSavingThrowBonus);
       }
-      totalFormula += ` + ${globalSavingThrowBonus}[global saving throw bonus]`;
+      totalFormula += `${addArithmeticOperator(totalFormula, globalSavingThrowBonus)}[global saving throw bonus]`;
     }
 
     finalSetAttrs[`${ability}_saving_throw_mod`] = totalFormula;
@@ -3921,7 +3912,7 @@ const updateNPCHP = () => {
     if (conMod !== 0) {
       const bonusHP = hdNum * conMod;
       totalHP += bonusHP;
-      hpFormula += addOrSubtract(hpFormula, bonusHP);
+      hpFormula += addArithmeticOperator(hpFormula, bonusHP);
     }
 
     if (exists(v.hp_extra)) {
@@ -3945,10 +3936,10 @@ const updateNPCHP = () => {
 
           if (!splitFormula[1] || splitFormula[1] === '+') {
             totalHP += amount;
-            hpFormula += ` + ${amount}`;
+            hpFormula += `${addArithmeticOperator(hpFormula, amount)}`;
           } else if (splitFormula[1] === '-') {
             totalHP -= amount;
-            hpFormula += ` - ${amount}`;
+            hpFormula += `${addArithmeticOperator(hpFormula, amount)}`;
           }
         }
         v.hp_extra.toString().replace(splitFormula[0], '');
