@@ -2845,7 +2845,9 @@ const updateAction = (type, rowId) => {
       collectionArray.push(`${repeatingString}recharge`);
       collectionArray.push(`${repeatingString}recharge_display`);
       collectionArray.push(`${repeatingString}extras_toggle`);
+      collectionArray.push(`${repeatingString}emote`);
       collectionArray.push(`${repeatingString}freetext`);
+      collectionArray.push(`${repeatingString}freeform`);
     }
 
     getAttrs(collectionArray, (v) => {
@@ -2904,6 +2906,10 @@ const updateAction = (type, rowId) => {
         updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
 
         updateHealToggle(v, finalSetAttrs, repeatingString);
+
+        if (v[`${repeatingString}emote`] || v[`${repeatingString}freetext`] || v[`${repeatingString}freeform`]) {
+          finalSetAttrs.extras_toggle = '@{extras_var}';
+        }
       }
       setFinalAttrs(v, finalSetAttrs, () => {
         updateActionChatMacro(type);
@@ -3182,6 +3188,10 @@ const updateSpell = (rowId) => {
       collectionArray.push(`${repeatingString}ritual_show`);
       collectionArray.push(`${repeatingString}materials`);
       collectionArray.push(`${repeatingString}materials_show`);
+      collectionArray.push(`${repeatingString}extras_toggle`);
+      collectionArray.push(`${repeatingString}emote`);
+      collectionArray.push(`${repeatingString}freetext`);
+      collectionArray.push(`${repeatingString}freeform`);
     }
 
     getAttrs(collectionArray, (v) => {
@@ -3191,8 +3201,6 @@ const updateSpell = (rowId) => {
         const spellLevel = getIntValue(v[`${repeatingString}spell_level`]);
         if (spellLevel === 0) {
           finalSetAttrs[`${repeatingString}spell_level`] = spellLevel;
-        }
-        if (spellLevel === 0) {
           finalSetAttrs[`${repeatingString}is_prepared`] = 'on';
         }
         finalSetAttrs[`${repeatingString}friendly_level`] = ordinalSpellLevel(spellLevel);
@@ -3262,6 +3270,10 @@ const updateSpell = (rowId) => {
         updateHealToggle(v, finalSetAttrs, repeatingString);
 
         updateHigherLevelToggle(v, finalSetAttrs, repeatingString);
+
+        if (v[`${repeatingString}emote`] || v[`${repeatingString}freetext`] || v[`${repeatingString}freeform`]) {
+          finalSetAttrs.extras_toggle = '@{extras_var}';
+        }
       }
       setFinalAttrs(v, finalSetAttrs);
     });
