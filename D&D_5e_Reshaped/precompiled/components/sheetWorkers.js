@@ -2365,7 +2365,7 @@ const updateInitiative = () => {
 
     const globalCheckBonus = v.global_check_bonus;
     if (exists(globalCheckBonus)) {
-      finalSetAttrs.initiative_formula += `${addArithmeticOperator(finalSetAttrs.initiative_formula, globalCheckBonus)}[global check bonus]`;
+      finalSetAttrs.initiative_formula += ' + (@{global_check_bonus})[global check bonus]';
     }
     setFinalAttrs(v, finalSetAttrs);
   });
@@ -2623,7 +2623,6 @@ const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
 
     if (isUndefined(v[`${repeatingString}parsed`]) || v[`${repeatingString}parsed`].indexOf('damageProperties') === -1) {
       const damageProperties = v[`${repeatingString}properties`];
-      console.log('damageProperties', damageProperties);
       if (exists(damageProperties)) {
         if (damageProperties.indexOf('Versatile') !== -1) {
           if (!exists(damageAbility)) {
@@ -3426,7 +3425,7 @@ const updateAbilityChecksMacro = () => {
     getAttrs(collectionArray, (v) => {
       for (const ability of ABILITIES) {
         if (!v[`${ability}_check_mod_with_sign`]) {
-          console.log('rerun until the fields are set');
+          console.warn('rerun until the fields are set');
           updateAbilityModifiers();
           updateAbilityChecksMacro();
         }
@@ -3568,7 +3567,7 @@ const updateSkill = (rowId) => {
           if (!isNaN(globalCheckBonus)) {
             total += getIntValue(globalCheckBonus);
           }
-          totalFormula += `${addArithmeticOperator(totalFormula, globalCheckBonus)}[global check bonus]`;
+          totalFormula += ' + (@{global_check_bonus})[global check bonus]';
         }
 
         finalSetAttrs[`${repeatingString}total`] = total;
