@@ -287,12 +287,12 @@ const getAbilityMod = (score) => {
   return Math.floor((getIntValue(score) - 10) / 2);
 };
 const addArithmeticOperator = (string, number) => {
-  let value = number;
-  if (string && value) {
-    if (value >= 0) {
-      value = ` + ${value}`;
+  let value = '';
+  if (string && number) {
+    if (number >= 0) {
+      value = ` + ${number}`;
     } else {
-      value = ` - ${Math.abs(value)}`;
+      value = ` - ${Math.abs(number)}`;
     }
   }
   return value;
@@ -465,10 +465,12 @@ const updateAbilityModifier = (ability) => {
       abilityCheck += abilityCheckBonus;
       abilityCheckFormula += `${addArithmeticOperator(abilityCheckFormula, abilityCheckBonus)}[${ability} check bonus]`;
     }
-    if (!isNaN(v.global_check_bonus)) {
-      abilityCheck += getIntValue(v.global_check_bonus);
+    if (v.global_check_bonus) {
+      if (!isNaN(v.global_check_bonus)) {
+        abilityCheck += getIntValue(v.global_check_bonus);
+      }
+      abilityCheckFormula += ' + (@{global_check_bonus})[global check bonus]';
     }
-    abilityCheckFormula += ' + (@{global_check_bonus})[global check bonus]';
 
     finalSetAttrs[`${ability}_calculated`] = abilityScoreCalc;
     finalSetAttrs[`${ability}_mod`] = abilityMod;
@@ -2524,10 +2526,7 @@ const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
     const damageBonus = getIntValue(v[`${repeatingString}damage_bonus`]);
     if (exists(damageBonus)) {
       damageAddition += damageBonus;
-      if (damageFormula !== '') {
-        damageFormula += ' + ';
-      }
-      damageFormula += `${damageBonus}[bonus]`;
+      damageFormula += `${addArithmeticOperator(damageFormula, damageBonus)}[bonus]`;
     }
 
     if (exists(options.globalDamageBonus)) {
