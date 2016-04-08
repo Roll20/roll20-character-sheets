@@ -2755,25 +2755,23 @@ const updateActionChatMacro = (type) => {
     for (const id of ids) {
       const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
+      collectionArray.push(`${repeatingString}display_text`);
     }
 
     getAttrs(collectionArray, (v) => {
       for (const id of ids) {
         const repeatingString = `${repeatingItem}_${id}_`;
-        const actionName = v[`${repeatingString}name`];
+        let actionName = v[`${repeatingString}name`];
+        const displayText = v[`${repeatingString}display_text`];
 
         if (id !== ids[0]) {
           finalSetAttrs[`${type}s_macro_var`] += ', ';
         }
         let actionType = 'action';
-        if (type === 'trait') {
-          actionType = 'trait';
-        }
-        finalSetAttrs[`${type}s_macro_var`] += `[${actionName}](~repeating_${type}_${id}_${actionType})`;
-
         let title;
         if (type === 'trait') {
           title = 'Traits';
+          actionType = 'trait';
         } else if (type === 'action') {
           title = 'Actions';
         } else if (type === 'reaction') {
@@ -2782,9 +2780,17 @@ const updateActionChatMacro = (type) => {
           title = 'Legendary Actions';
         } else if (type === 'lairaction') {
           title = 'Lair Actions';
+          actionName = displayText;
         } else if (type === 'regionaleffect') {
           title = 'Regional Effects';
+          actionName = displayText;
         }
+
+        if (actionName && actionName.length > 50) {
+          actionName = `${string.substring(0, 50)}...`;
+        }
+
+        finalSetAttrs[`${type}s_macro_var`] += `[${actionName}](~repeating_${type}_${id}_${actionType})`;
         finalSetAttrs[`${type}s_chat_var`] += `{{${title}=${finalSetAttrs[`${type}s_macro_var`]}}}`;
       }
       setFinalAttrs(v, finalSetAttrs);
