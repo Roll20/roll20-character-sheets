@@ -2402,8 +2402,6 @@ const updateAttackToggle = (v, finalSetAttrs, repeatingString, options) => {
       const pb = getIntValue(v.pb);
       toHit += pb;
       attackFormula += `${pb}[proficient]`;
-    } else {
-      attackFormula += '0[unproficient]';
     }
 
     let attackAbility = v[`${repeatingString}attack_ability`];
@@ -3502,8 +3500,6 @@ const updateSkill = (rowId) => {
             const jackOfAllTrades = getIntValue(v.jack_of_all_trades);
             total += jackOfAllTrades;
             totalFormula += `${jackOfAllTrades}[jack of all trades]`;
-          } else {
-            totalFormula += '0[unproficient]';
           }
         } else if (proficiency === 'proficient') {
           const pb = getIntValue(v.pb);
@@ -4966,7 +4962,7 @@ const sheetOpened = () => {
       updateAttachers();
     }
     if (versionCompare(version, '2.4.3') < 0) {
-      updateAbilityChecksMacro();
+      updateSkill();
       updateActionChatMacro('trait');
       updateActionChatMacro('action');
       updateActionChatMacro('reaction');
