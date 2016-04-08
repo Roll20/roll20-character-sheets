@@ -1165,6 +1165,7 @@ const setClassFeatures = () => {
         setClassFeature({
           damage: '(?{Spell Level|1|2|3|4+, 4} + 1)d8',
           damage_type: translate(language, 'DAMAGE_TYPES.RADIANT'),
+          freeform: '{{subheader=(as ?{Spell Level|1|2|3|4+})}}',
           freetext: translate(language, 'CLASS_FEATURES.DIVINE_SMITE_TEXT'),
           name: translate(language, 'CLASS_FEATURES.DIVINE_SMITE'),
           second_damage: 'd8',
