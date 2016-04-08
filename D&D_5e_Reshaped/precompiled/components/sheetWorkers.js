@@ -2754,6 +2754,38 @@ const findAmmo = (name, callback) => {
   });
 };
 
+const updateActionChatMacro = (type) => {
+  const repeatingItem = `repeating_${type}`;
+  const collectionArray = [`${type}s_macro_var`];
+  const finalSetAttrs = {};
+
+  finalSetAttrs[`${type}s_macro_var`] = '';
+
+  getSectionIDs(repeatingItem, (ids) => {
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
+      collectionArray.push(`${repeatingString}name`);
+    }
+
+    getAttrs(collectionArray, (v) => {
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
+        const actionName = v[`${repeatingString}name`];
+
+        if (id !== ids[0]) {
+          finalSetAttrs[`${type}s_macro_var`] += ', ';
+        }
+        let actionType = 'action';
+        if (type === 'trait') {
+          actionType = 'trait';
+        }
+        finalSetAttrs[`${type}s_macro_var`] += `[${actionName}](~repeating_${type}_${id}_${actionType})`;
+      }
+      setFinalAttrs(v, finalSetAttrs);
+    });
+  });
+};
+
 const updateAction = (type, rowId) => {
   const repeatingItem = `repeating_${type}`;
   const collectionArray = ['pb', 'strength_mod', 'finesse_mod', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability'];
@@ -2867,7 +2899,9 @@ const updateAction = (type, rowId) => {
 
         updateHealToggle(v, finalSetAttrs, repeatingString);
       }
-      setFinalAttrs(v, finalSetAttrs);
+      setFinalAttrs(v, finalSetAttrs, () => {
+        updateActionChatMacro(type);
+      });
     });
   });
 };
@@ -2899,6 +2933,12 @@ on('change:repeating_lairaction', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_lairaction', eventInfo);
   if (repeatingInfo && repeatingInfo.field !== 'name' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
     updateAction('lairaction', repeatingInfo.rowId);
+  }
+});
+on('change:repeating_regionaleffect', (eventInfo) => {
+  const repeatingInfo = getRepeatingInfo('repeating_regionaleffect', eventInfo);
+  if (repeatingInfo && repeatingInfo.field !== 'name' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
+    updateAction('regionaleffect', repeatingInfo.rowId);
   }
 });
 
@@ -3350,15 +3390,12 @@ const updateAbilityChecksMacro = () => {
 
   finalSetAttrs.ability_checks_query_var = '?{Ability Check';
   finalSetAttrs.ability_checks_macro_var = '';
+  finalSetAttrs.skills_macro_var = '';
 
-  let i = 0;
   for (const ability of ABILITIES) {
     finalSetAttrs.ability_checks_query_var += `|${capitalize(ability)},{{title=${capitalize(ability)}&#125;&#125; {{roll1=[[@{preroll}d20@{postroll}@{d20_mod} + @{${ability}_check_mod}]]&#125;&#125; @{roll_setting}@{d20_mod} + @{${ability}_check_mod}]]&#125;&#125;`;
     finalSetAttrs.ability_checks_macro_var += `[${capitalize(ability)}](~${ability}_check)`;
-    if (i < ABILITIES.length - 1) {
-      finalSetAttrs.ability_checks_macro_var += ', ';
-    }
-    i++;
+    finalSetAttrs.ability_checks_macro_var += ', ';
   }
 
   getSectionIDs(repeatingItem, (ids) => {
@@ -3366,14 +3403,20 @@ const updateAbilityChecksMacro = () => {
       const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}ability`);
+      collectionArray.push(`${repeatingString}total_with_sign`);
     }
 
     getAttrs(collectionArray, (v) => {
       for (const id of ids) {
         const repeatingString = `${repeatingItem}_${id}_`;
         finalSetAttrs.ability_checks_query_var += `|${v[`${repeatingString}name`]}, {{title=${v[`${repeatingString}name`]} (${capitalize(getAbilityShortName(v[`${repeatingString}ability`]))})&#125;&#125; {{roll1=[[@{preroll}d20@{postroll}@{d20_mod} + @{${repeatingString}formula}]]&#125;&#125; @{roll_setting}@{d20_mod} + @{${repeatingString}formula}]]&#125;&#125;`;
-        finalSetAttrs.ability_checks_macro_var += ', ';
-        finalSetAttrs.ability_checks_macro_var += `[${v[`${repeatingString}name`]}](~repeating_skill_${id}_skill)`;
+        if (id !== ids[0]) {
+          finalSetAttrs.ability_checks_macro_var += ', ';
+          finalSetAttrs.skills_macro_var += ', ';
+        }
+        const skillButton = `[${v[`${repeatingString}name`]} ${v[`${repeatingString}total_with_sign`]}](~repeating_skill_${id}_skill)`;
+        finalSetAttrs.ability_checks_macro_var += skillButton;
+        finalSetAttrs.skills_macro_var += skillButton;
       }
       finalSetAttrs.ability_checks_query_var += '}';
       setFinalAttrs(v, finalSetAttrs);
@@ -3506,8 +3549,9 @@ const updateSkill = (rowId) => {
         finalSetAttrs[`${repeatingString}total_with_sign`] = showSign(total);
         finalSetAttrs[`${repeatingString}formula`] = totalFormula;
       }
-      setFinalAttrs(v, finalSetAttrs);
-      updateAbilityChecksMacro();
+      setFinalAttrs(v, finalSetAttrs, () => {
+        updateAbilityChecksMacro();
+      });
     });
   });
 };
@@ -4342,6 +4386,9 @@ on('change:repeating_legendaryaction remove:repeating_legendaryaction', () => {
 on('change:repeating_lairaction remove:repeating_lairaction', () => {
   countAction('lairaction');
 });
+on('change:repeating_regionaleffect remove:repeating_regionaleffect', () => {
+  countAction('regionaleffect');
+});
 
 const switchToNPC = () => {
   const collectionArray = ['is_npc', 'size'];
@@ -4704,6 +4751,7 @@ on('change:pb', () => {
   updateAction('reaction');
   updateAction('legendaryaction');
   updateAction('lairaction');
+  updateAction('regionaleffect');
 });
 
 const extasToExtrasFix = (repeatingItem) => {
@@ -4917,6 +4965,16 @@ const sheetOpened = () => {
     if (versionCompare(version, '2.3.3') < 0) {
       updateAttachers();
     }
+    if (versionCompare(version, '2.4.3') < 0) {
+      updateAbilityChecksMacro();
+      updateActionChatMacro('trait');
+      updateActionChatMacro('action');
+      updateActionChatMacro('reaction');
+      updateActionChatMacro('legendaryaction');
+      updateActionChatMacro('lairaction');
+      updateActionChatMacro('regionaleffect');
+    }
+
 
     if (!version || version !== currentVersion) {
       finalSetAttrs.version = currentVersion;
