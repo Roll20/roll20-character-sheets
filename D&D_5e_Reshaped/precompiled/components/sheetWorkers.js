@@ -2745,10 +2745,11 @@ const findAmmo = (name, callback) => {
 
 const updateActionChatMacro = (type) => {
   const repeatingItem = `repeating_${type}`;
-  const collectionArray = [`${type}s_macro_var`];
+  const collectionArray = [`${type}s_macro_var`, `${type}s_chat_var`, `${type}s_exist`];
   const finalSetAttrs = {};
 
   finalSetAttrs[`${type}s_macro_var`] = '';
+  finalSetAttrs[`${type}s_chat_var`] = '';
 
   getSectionIDs(repeatingItem, (ids) => {
     for (const id of ids) {
@@ -2769,6 +2770,22 @@ const updateActionChatMacro = (type) => {
           actionType = 'trait';
         }
         finalSetAttrs[`${type}s_macro_var`] += `[${actionName}](~repeating_${type}_${id}_${actionType})`;
+
+        let title;
+        if (type === 'trait') {
+          title = 'Traits';
+        } else if (type === 'action') {
+          title = 'Actions';
+        } else if (type === 'reaction') {
+          title = 'Reactions';
+        } else if (type === 'legendaryaction') {
+          title = 'Legendary Actions';
+        } else if (type === 'lairaction') {
+          title = 'Lair Actions';
+        } else if (type === 'regionaleffect') {
+          title = 'Regional Effects';
+        }
+        finalSetAttrs[`${type}s_chat_var`] += `{{${title}=${finalSetAttrs[`${type}s_macro_var`]}}}`;
       }
       setFinalAttrs(v, finalSetAttrs);
     });
@@ -3395,6 +3412,12 @@ const updateAbilityChecksMacro = () => {
 
     getAttrs(collectionArray, (v) => {
       for (const ability of ABILITIES) {
+        if (!v[`${ability}_check_mod_with_sign`]) {
+          console.log('rerun until the fields are set');
+          updateAbilityModifiers();
+          updateAbilityChecksMacro();
+        }
+
         finalSetAttrs.ability_checks_query_var += `|${capitalize(ability)},{{title=${capitalize(ability)}&#125;&#125; {{roll1=[[@{preroll}d20@{postroll}@{d20_mod} + ${v[`${ability}_check_mod`]}]]&#125;&#125; @{roll_setting}@{d20_mod} + ${v[`${ability}_check_mod`]}]]&#125;&#125;`;
         finalSetAttrs.ability_checks_macro_var += `[${capitalize(ability)} ${v[`${ability}_check_mod_with_sign`]}](~${ability}_check)`;
         finalSetAttrs.ability_checks_macro_var += ', ';
@@ -4468,14 +4491,16 @@ on('change:senses', () => {
 });
 
 const updateLanguages = () => {
-  const collectionArray = ['languages'];
+  const collectionArray = ['languages', 'languages_exist', 'languages_chat_var'];
   const finalSetAttrs = {};
+
+  finalSetAttrs.languages_exist = 0;
+  finalSetAttrs.languages_chat_var = '';
 
   getAttrs(collectionArray, (v) => {
     if (v.languages) {
       finalSetAttrs.languages_exist = 1;
-    } else {
-      finalSetAttrs.languages_exist = 0;
+      finalSetAttrs.languages_chat_var = '{{Languages=@{languages}}}';
     }
     setFinalAttrs(v, finalSetAttrs);
   });
@@ -4514,6 +4539,38 @@ on('change:ac_note', () => {
   updateACNote();
 });
 
+const updateDamageResistancesVar = () => {
+  const collectionArray = ['damage_resistances_var', 'damage_vulnerabilities_exist', 'damage_resistances_exist', 'damage_immunities_exist', 'condition_immunities_exist'];
+  const finalSetAttrs = {};
+
+  finalSetAttrs.damage_resistances_var = '';
+
+  getAttrs(collectionArray, (v) => {
+    if (v.damage_vulnerabilities_exist) {
+      finalSetAttrs.damage_resistances_var = '{{Damage Vulnerabilities=@{damage_vulnerabilities}}}';
+    }
+    if (v.damage_resistances_exist) {
+      if (finalSetAttrs.damage_resistances_var !== '') {
+        finalSetAttrs.damage_resistances_var += ' ';
+      }
+      finalSetAttrs.damage_resistances_var = '{{Damage Resistances=@{damage_resistances}}}';
+    }
+    if (v.damage_immunities_exist) {
+      if (finalSetAttrs.damage_resistances_var !== '') {
+        finalSetAttrs.damage_resistances_var += ' ';
+      }
+      finalSetAttrs.damage_resistances_var = '{{Damage Immunities=@{damage_immunities}}}';
+    }
+    if (v.condition_immunities_exist) {
+      if (finalSetAttrs.damage_resistances_var !== '') {
+        finalSetAttrs.damage_resistances_var += ' ';
+      }
+      finalSetAttrs.damage_resistances_var = '{{Condition Immunities=@{condition_immunities}}}';
+    }
+    setFinalAttrs(v, finalSetAttrs);
+  });
+};
+
 const updateDamageVulnerabilities = () => {
   const collectionArray = ['damage_vulnerabilities'];
   const finalSetAttrs = {};
@@ -4525,7 +4582,9 @@ const updateDamageVulnerabilities = () => {
     } else {
       finalSetAttrs.damage_vulnerabilities_exist = 0;
     }
-    setFinalAttrs(v, finalSetAttrs);
+    setFinalAttrs(v, finalSetAttrs, () => {
+      updateDamageResistancesVar();
+    });
   });
 };
 on('change:damage_vulnerabilities', () => {
@@ -4542,7 +4601,9 @@ const updateDamageResistances = () => {
     } else {
       finalSetAttrs.damage_resistances_exist = 0;
     }
-    setFinalAttrs(v, finalSetAttrs);
+    setFinalAttrs(v, finalSetAttrs, () => {
+      updateDamageResistancesVar();
+    });
   });
 };
 on('change:damage_resistances', () => {
@@ -4559,7 +4620,9 @@ const updateDamageImmunities = () => {
     } else {
       finalSetAttrs.damage_immunities_exist = 0;
     }
-    setFinalAttrs(v, finalSetAttrs);
+    setFinalAttrs(v, finalSetAttrs, () => {
+      updateDamageResistancesVar();
+    });
   });
 };
 on('change:damage_immunities', () => {
@@ -4576,7 +4639,9 @@ const updateConditionImmunities = () => {
     } else {
       finalSetAttrs.condition_immunities_exist = 0;
     }
-    setFinalAttrs(v, finalSetAttrs);
+    setFinalAttrs(v, finalSetAttrs, () => {
+      updateDamageResistancesVar();
+    });
   });
 };
 on('change:condition_immunities', () => {
@@ -4956,6 +5021,7 @@ const sheetOpened = () => {
       updateAttachers();
     }
     if (versionCompare(version, '2.4.3') < 0) {
+      updateAbilityModifiers();
       updateSkill();
       updateActionChatMacro('trait');
       updateActionChatMacro('action');
@@ -4963,8 +5029,8 @@ const sheetOpened = () => {
       updateActionChatMacro('legendaryaction');
       updateActionChatMacro('lairaction');
       updateActionChatMacro('regionaleffect');
+      updateDamageResistancesVar();
     }
-
 
     if (!version || version !== currentVersion) {
       finalSetAttrs.version = currentVersion;
