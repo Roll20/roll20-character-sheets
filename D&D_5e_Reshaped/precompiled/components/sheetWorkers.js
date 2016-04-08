@@ -1,7 +1,7 @@
 /* global setAttrs:false, getAttrs:false, on:false, getSectionIDs:false, generateRowID:false */
 'use strict';
 
-const currentVersion = '2.4.1';
+const currentVersion = '2.4.2';
 let TRANSLATIONS;
 const SKILLS = {
   acrobatics: 'dexterity',
@@ -5020,7 +5020,7 @@ const sheetOpened = () => {
     if (versionCompare(version, '2.3.3') < 0) {
       updateAttachers();
     }
-    if (versionCompare(version, '2.4.3') < 0) {
+    if (versionCompare(version, '2.4.2') < 0) {
       updateAbilityModifiers();
       updateSkill();
       updateActionChatMacro('trait');
