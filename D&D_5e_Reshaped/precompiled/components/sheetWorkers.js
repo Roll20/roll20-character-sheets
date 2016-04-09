@@ -2590,7 +2590,7 @@ const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
     const secondDamage = v[`${repeatingString}second_damage`];
     if (exists(secondDamage)) {
       damageString += `+ ${secondDamage}`;
-      secondDamageFormula += `${addArithmeticOperator(secondDamageFormula, secondDamage)}[second damage]`;
+      secondDamageFormula += `${secondDamage}[second damage]`;
     }
 
     let secondDamageAbility = v[`${repeatingString}second_damage_ability`];
