@@ -134,12 +134,7 @@
 
 									<div class="sheet-col-1-4 sheet-center">&nbsp;</div>
 
-									<div class="sheet-col-1-4 sheet-right sheet-vert-middle">Lucky Roll?</div>
-									<div class="sheet-col-1-22 sheet-checkbox-row sheet-vert-middle" title="Check the box if you have the Lucky Roll for HP"><input type="checkbox" value="@{LCK_Starting}" name="attr_HPLuckyRoll"></div>
-
-									<div class="sheet-col-1-24 sheet-center">&nbsp;</div>
-
-									<div class="sheet-col-1-7 sheet-center" title="Use this button to roll for your Hit Points when your character levels."><button type='roll' class="sheet-initiative" value="&{template:DccTabbed} {{name=@{character_name}}} {{title=Hit Die}}} {{flavortext=@{ClassName} gains @{HPDie} hit points at each level.}} {{rolltype=HP Gained : }} {{HD=[[ @{HPDie} + [[@{STA}]] + [[@{HPLuckyRoll}]] ]]}}" name='HP' title="Roll for new Hit Dice">Level</button></div>
+									<div class="sheet-col-1-7 sheet-center" title="Use this button to roll for your Hit Points when your character levels."><button type='roll' class="sheet-initiative" value="&{template:DccTabbed} {{name=@{character_name}}} {{title=Hit Die}}} {{flavortext=@{ClassName} gains @{HPDie} hit points at each level.}} {{rolltype=HP Gained : }} {{HD=[[ @{HPDie} [Die Roll] + [[@{STA}]] [STA Mod] + [[@{HPLuckyRoll}]] [Lucky Roll] ]]}}" name='HP' title="Roll for new Hit Dice">Level</button></div>
 
 	                                <div class="sheet-col-1-24 sheet-center">&nbsp;</div>
 
@@ -162,10 +157,10 @@
 
 							<div class="sheet-row">
 								<div class="sheet-col-2-7 sheet-right sheet-padr sheet-hd-row">Initiative</br></div>
-								<div class="sheet-col-1-7 sheet-small-label sheet-center" title="Only enter additional bonuses to initiative here. Your Dex and Class mods are already included in the macro button"><input class="sheet-underlined sheet-center" type="number" name="attr_INIT" value="0" step="1"><br/>Bonus</div>
-								<div class="sheet-col-1-7 sheet-small-label sheet-center"><input class="sheet-underlined" type="number" name="attr_INIT_overall" value="([[[[@{AGI}]] + @{WarriorClassInit} + @{INIT}]])" disabled="disabled"><br/>Total</div>
-								<div class="sheet-col-1-7 sheet-center"><button type='roll' class="sheet-initiative sheet-large-button" name="roll_INIT" value="&{template:DccTabbed} {{name=@{character_name}}} {{title=Initiative}} {{INIT=[[1d20 + @{selected|INIT_overall} [Initiative Mod] &{tracker}]]}}" name='Initiative' title="Initiative">Initiative</button></div>
-								<div class="sheet-col-2-7 sheet-center"><button type='roll' class="sheet-initiative sheet-large-button" name="roll_INIT2Hand" value="&{template:DccTabbed} {{name=@{character_name}}} {{title=Initiative (Two-Handed Weapons)}} {{INIT=[[1d16 + @{selected|INIT_overall} [Initiative Mod] &{tracker}]]}}" name='Initiative' title="Initiative">Initiative (2H)</button></div>
+								<div class="sheet-col-1-7 sheet-small-label sheet-center" title="Only enter additional bonuses to initiative here. Your Dex, Lucky Roll and Class mods are already included in the macro button"><input class="sheet-underlined sheet-center" type="number" name="attr_INIT" value="0" step="1"><br/>Bonus</div>
+								<div class="sheet-col-1-7 sheet-small-label sheet-center"><input class="sheet-underlined" type="number" name="attr_INIT_overall" value="([[[[@{AGI}]] + @{WarriorClassInit} + @{INIT} + @{InitLuckyRoll}]])" disabled="disabled"><br/>Total</div>
+								<div class="sheet-col-1-7 sheet-center"><button type='roll' class="sheet-initiative sheet-large-button" name="roll_INIT" value="&{template:DccTabbed} {{name=@{character_name}}} {{title=Initiative}} {{INIT=[[1d20 [Die Roll] + @{selected|INIT_overall} [Initiative Mod] &{tracker}]]}}" name='Initiative' title="Initiative">Initiative</button></div>
+								<div class="sheet-col-2-7 sheet-center"><button type='roll' class="sheet-initiative sheet-large-button" name="roll_INIT2Hand" value="&{template:DccTabbed} {{name=@{character_name}}} {{title=Initiative (Two-Handed Weapons)}} {{INIT=[[1d16 [Die Roll] + @{selected|INIT_overall} [Initiative Mod] &{tracker}]]}}" name='Initiative' title="Initiative">Initiative (2H)</button></div>
 							</div>
 
 							<div class="sheet-col-1-1 sheet-center">&nbsp;</div>
@@ -256,9 +251,6 @@
 									</select>
 								</div>
 
-								<div class="sheet-col-1-5 sheet-right sheet-vert-middle">Lucky Roll?</div>
-								<div class="sheet-col-1-22 sheet-checkbox-row sheet-vert-middle" title="Check the box if you have the Lucky Roll for Critical Hits"><input type="checkbox" value="@{LCK_Starting}" name="attr_CritLuckyRoll"></div>
-
 							</div>
 
 						<div class="sheet-row">
@@ -288,9 +280,6 @@
 							</div>
 							
 							<input type="hidden" name="attr_FumbleCheck" value="@{LCK} * (-1)" disabled="true"/>
-
-							<div class="sheet-col-1-5 sheet-right sheet-vert-middle">Lucky Roll?</div>
-							<div class="sheet-col-1-22 sheet-checkbox-row sheet-vert-middle" title="Check the box if you have the Lucky Roll for Fumbles"><input type="checkbox" value="@{LCK_Starting} * (-1)" name="attr_FumbleLuckyRoll"></div>
 						</div>
 
 					</div>				
@@ -496,6 +485,15 @@
 								<div class="sheet-col-1-1 sheet-center">&nbsp;</div>
 
 								<div class="sheet-row">
+									<div class="sheet-col-1-5 sheet-hd-row sheet-right sheet-padr">Starting Luck<br/> </div>
+									<div class="sheet-col-1-7 sheet-center" title="Enter your Starting Luck value here"><input class="sheet-underline sheet-center" type="number" name="attr_Luck_Starting" min="0" step="1"></div>
+	                                <div class="sheet-col-1-15 sheet-center">&nbsp;</div>
+									<div class="sheet-col-2-7 sheet-center"><input type="number" name="attr_LCK_Starting" value="(floor( (0.0009 * @{Luck_Starting} * @{Luck_Starting} * @{Luck_Starting}) + (-0.029 * @{Luck_Starting} * @{Luck_Starting}) + (0.6 * @{Luck_Starting}) +0.41) -4)" disabled="disabled"/>Lucky Roll Bonus</div>
+								</div>
+
+								<div class="sheet-col-1-1 sheet-center">&nbsp;</div>
+
+								<div class="sheet-row">
 									<div class="sheet-col-1-5 sheet-hd-row sheet-right sheet-padr">Birth Augur<br/></div>
 									<div class="sheet-col-3-5 sheet-center"><input class="sheet-center sheet-underline" type="text" name="attr_BirthAugur"></div>
 								</div>
@@ -508,13 +506,61 @@
 								</div>
 
 								<div class="sheet-col-1-1 sheet-center">&nbsp;</div>
-								
-								<div class="sheet-row">
-									<div class="sheet-col-1-5 sheet-hd-row sheet-right sheet-padr">Starting Luck<br/> </div>
-									<div class="sheet-col-1-7 sheet-center" title="Enter your Starting Luck value here"><input class="sheet-underline sheet-center" type="number" name="attr_Luck_Starting" min="0" step="1"></div>
-	                                <div class="sheet-col-1-15 sheet-center">&nbsp;</div>
-									<div class="sheet-col-2-7 sheet-center"><input type="number" name="attr_LCK_Starting" value="(floor( (0.0009 * @{Luck_Starting} * @{Luck_Starting} * @{Luck_Starting}) + (-0.029 * @{Luck_Starting} * @{Luck_Starting}) + (0.6 * @{Luck_Starting}) +0.41) -4)" disabled="disabled"/>Lucky Roll Bonus</div>
-								</div>
+
+								<div class="sheet-col-9-22 sheet-left sheet-vert-middle">Lucky Roll for <b>Harsh Winter (All attack rolls)</b>?</div>
+								<div class="sheet-col-1-20 sheet-left sheet-padr sheet-checkbox-row sheet-vert-middle" title="Check the box if you have the Lucky Roll for All attack rolls"><input type="checkbox" value="[[@{LCK_Starting}]]" name="attr_AllAtkLuckyRoll"></div>
+
+								<div class="sheet-col-9-22 sheet-left sheet-vert-middle">Lucky Roll for <b>The bull (Melee attack rolls)</b>?</div>
+								<div class="sheet-col-1-20 sheet-left sheet-padr sheet-checkbox-row sheet-vert-middle" title="Check the box if you have the Lucky Roll for Melee attackrolls"><input type="checkbox" value="[[@{LCK_Starting}]]" name="attr_MeleeAtkLuckyRoll"></div>
+
+								<div class="sheet-col-9-22 sheet-left sheet-vert-middle">Lucky Roll for <b>Born on the battlefield (Damage rolls)</b>?</div>
+								<div class="sheet-col-1-20 sheet-left sheet-padr sheet-checkbox-row sheet-vert-middle" title="Check the box if you have the Lucky Roll for Damage rolls"><input type="checkbox" value="[[@{LCK_Starting}]]" name="attr_DmgLuckyRoll"></div>
+
+								<div class="sheet-col-9-22 sheet-left sheet-vert-middle">Lucky Roll for <b>Path of the bear (Melee damage rolls)</b>?</div>
+								<div class="sheet-col-1-20 sheet-left sheet-padr sheet-checkbox-row sheet-vert-middle" title="Check the box if you have the Lucky Roll for Melee damage rolls"><input type="checkbox" value="[[@{LCK_Starting}]]" name="attr_MeleeDmgLuckyRoll"></div>
+
+								<div class="sheet-col-9-22 sheet-left sheet-vert-middle">Lucky Roll for <b>Righteous Heart (Turn Unholy Checks)</b>?</div>
+								<div class="sheet-col-1-20 sheet-left sheet-padr sheet-checkbox-row sheet-vert-middle" title="Check the box if you have the Lucky Roll for Turn Unholy"><input type="checkbox" value="[[@{LCK_Starting}]]" name="attr_TurnUnholyLuckyRoll"></div>
+
+								<div class="sheet-col-9-22 sheet-left sheet-vert-middle">Lucky Roll for <b>Survived the Plague (Magical Healing)</b>?</div>
+								<div class="sheet-col-1-20 sheet-left sheet-padr sheet-checkbox-row sheet-vert-middle" title="Check the box if you have the Lucky Roll for Magical Healing"><input type="checkbox" value="[[@{LCK_Starting}]]" name="attr_LayOnHandsLuckyRoll"></div>
+
+								<div class="sheet-col-9-22 sheet-left sheet-vert-middle">Lucky Roll for <b>Born Under the Loom (Skill Checks)</b>?</div>
+								<div class="sheet-col-1-20 sheet-left sheet-padr sheet-checkbox-row sheet-vert-middle" title="Check the box if you have the Lucky Roll for Skill Checks"><input type="checkbox" value="[[@{LCK_Starting}]]" name="attr_SkillChecksLuckyRoll"></div>
+
+								<div class="sheet-col-9-22 sheet-left sheet-vert-middle">Lucky Roll for <b>Fox's Cunning (Find/Disable Traps)</b>?</div>
+								<div class="sheet-col-1-20 sheet-left sheet-padr sheet-checkbox-row sheet-vert-middle" title="Check the box if you have the Lucky Roll for Find/Disable Traps"><input type="checkbox" value="[[@{LCK_Starting}]]" name="attr_FindDisableTrapsLuckyRoll"></div>
+
+								<div class="sheet-col-9-22 sheet-left sheet-vert-middle">Lucky Roll for <b>Fortunate date (Missile fire attack rolls)</b>?</div>
+								<div class="sheet-col-1-20 sheet-left sheet-padr sheet-checkbox-row sheet-vert-middle" title="Check the box if you have the Lucky Roll for Ranged to Hit"><input type="checkbox" value="[[@{LCK_Starting}]]" name="attr_RangedAtkLuckyRoll"></div>
+
+								<div class="sheet-col-9-22 sheet-left sheet-vert-middle">Lucky Roll for <b>Hawkeye (Missile fire damage rolls)</b>?</div>
+								<div class="sheet-col-1-20 sheet-left sheet-padr sheet-checkbox-row sheet-vert-middle" title="Check the box if you have the Lucky Roll for Ranged Damage"><input type="checkbox" value="[[@{LCK_Starting}]]" name="attr_RangedDmgLuckyRoll"></div>
+
+								<div class="sheet-col-5-14 sheet-left sheet-vert-middle">Lucky Roll for <b>The Broken Star (Fumbles)</b>?</div>
+								<div class="sheet-col-1-19 sheet-left sheet-padr sheet-checkbox-row sheet-vert-middle" title="Combat Fumbles (Check both boxes)"><input type="checkbox" value="[[@{LCK_Starting} * (-2)]]" name="attr_FumbleLuckyRoll"></div>
+								<div class="sheet-col-1-20 sheet-left sheet-padr sheet-checkbox-row sheet-vert-middle" title="Spell Fumbles (Check both boxes)"><input type="checkbox" value="[[@{LCK_Starting} * (2)]]" name="attr_SpellFumbleLuckyRoll"></div>
+
+								<div class="sheet-col-9-22 sheet-left sheet-vert-middle">Lucky Roll for <b>Warrior’s arm (Critical hit tables)</b>?</div>
+								<div class="sheet-col-1-20 sheet-left sheet-padr sheet-checkbox-row sheet-vert-middle" title="Check the box if you have the Lucky Roll for Critical Hits"><input type="checkbox" value="[[@{LCK_Starting} * (2)]]" name="attr_CritLuckyRoll"></div>
+
+								<div class="sheet-col-9-22 sheet-left sheet-vert-middle">Lucky Roll for <b>Bountiful harvest (Hit points)</b>?</div>
+								<div class="sheet-col-1-20 sheet-left sheet-padr sheet-checkbox-row sheet-vert-middle" title="Check the box if you have the Lucky Roll for HP"><input type="checkbox" value="[[@{LCK_Starting}]]" name="attr_HPLuckyRoll"></div>
+
+								<div class="sheet-col-9-22 sheet-left sheet-vert-middle">Lucky Roll for <b>Speed of the cobra (Initiative)</b>?</div>
+								<div class="sheet-col-1-20 sheet-left sheet-padr sheet-checkbox-row sheet-vert-middle" title="Check the box if you have the Lucky Roll for Initiative"><input type="checkbox" value="[[@{LCK_Starting}]]" name="attr_InitLuckyRoll"></div>
+
+								<div class="sheet-col-9-22 sheet-left sheet-vert-middle">Lucky Roll for <b>Seventh son (Spell checks)</b>?</div>
+								<div class="sheet-col-1-20 sheet-left sheet-padr sheet-checkbox-row sheet-vert-middle" title="Check the box if you have the Lucky Roll for Spell Checks"><input type="checkbox" value="@{LCK_Starting}" name="attr_SpellCastLuckyRoll"></div>
+
+								<div class="sheet-col-9-22 sheet-left sheet-vert-middle">Lucky Roll for <b>The raging storm (Spell damage)</b>?</div>
+								<div class="sheet-col-1-20 sheet-left sheet-padr sheet-checkbox-row sheet-vert-middle" title="Check the box if you have the Lucky Roll for Spell Damage"><input type="checkbox" value="@{LCK_Starting}" name="attr_SpellDmgLuckyRoll"></div>
+
+								<div class="sheet-col-9-22 sheet-left sheet-vert-middle">Lucky Roll for <b>Unholy house (Corruption rolls)</b>?</div>
+								<div class="sheet-col-1-20 sheet-left sheet-padr sheet-checkbox-row sheet-vert-middle" title="Check the box if you have the Lucky Roll for Corruption Rolls"><input type="checkbox" value="@{LCK_Starting}" name="attr_CorruptionLuckyRoll"></div>
+
+								<div class="sheet-col-9-22 sheet-left sheet-vert-middle">Lucky Roll for <b>Charmed house (Armor Class)</b>?</div>
+								<div class="sheet-col-1-20 sheet-left sheet-padr sheet-checkbox-row sheet-vert-middle" title="Check the box if you have the Lucky Roll for Armor Class"><input type="checkbox" value="@{LCK_Starting}" name="attr_ArmorClassLuckyRoll"></div>
 		
 							</div>
 						
@@ -602,11 +648,6 @@
 						<!-- Bard -->
 						<div class="sheet-bard">
 							<h3>Bard Abilities</h3>
-
-								<input type="hidden" name="attr_ThiefSkill_Die" value="d20" />
-
-								<div class="sheet-col-3-8 sheet-left sheet-vert-middle">Lucky Roll for <b>Born Under the Loom (Skill Checks)</b>?</div>
-								<div class="sheet-col-1-22 sheet-checkbox-row sheet-vert-middle" title="Check the box if you have the Lucky Roll for Skill Checks"><input type="checkbox" value="[[@{LCK_Starting}]]" name="attr_SkillChecksLuckyRoll"></div>
 
 								<div class="sheet-col-1-1 sheet-center">&nbsp;</div>
 
@@ -752,13 +793,6 @@
 
 								<div class="sheet-col-1-1 sheet-center">&nbsp;</div>
 
-								<div class="sheet-col-3-8 sheet-left sheet-vert-middle">Lucky Roll for <b>Born Under the Loom (Skill Checks)</b>?</div>
-								<div class="sheet-col-1-22 sheet-checkbox-row sheet-vert-middle" title="Check the box if you have the Lucky Roll for Skill Checks"><input type="checkbox" value="[[@{LCK_Starting}]]" name="attr_SkillChecksLuckyRoll"></div>
-
-								<div class="sheet-col-1-1 sheet-center">&nbsp;</div>
-
-								<div class="sheet-col-1-1 sheet-center">&nbsp;</div>
-
 								<div class="sheet-row">
 									<div class="sheet-col-1-6 sheet-right sheet-padr sheet-hd-row">Jury Rig Die</br></div>
 									<div class="sheet-col-1-10 sheet-right">
@@ -847,18 +881,6 @@
 						<!-- Cleric -->
 						<div class="sheet-cleric">
 							<h3>Cleric Abilities</h3>
-
-								<div class="sheet-col-3-8 sheet-left sheet-vert-middle">Lucky Roll for <b>Righteous Heart (Turn Unholy Checks)</b>?</div>
-								<div class="sheet-col-1-22 sheet-checkbox-row sheet-vert-middle" title="Check the box if you have the Lucky Roll for Turn Unholy"><input type="checkbox" value="[[@{LCK_Starting}]]" name="attr_TurnUnholyLuckyRoll"></div>
-
-								<div class="sheet-col-1-1 sheet-center">&nbsp;</div>
-
-								<div class="sheet-col-3-8 sheet-left sheet-vert-middle">Lucky Roll for <b>Survived the Plague (Magical Healing)</b>?</div>
-								<div class="sheet-col-1-22 sheet-checkbox-row sheet-vert-middle" title="Check the box if you have the Lucky Roll for Magical Healing"><input type="checkbox" value="[[@{LCK_Starting}]]" name="attr_LayOnHandsLuckyRoll"></div>
-
-								<div class="sheet-col-1-1 sheet-center">&nbsp;</div>
-
-								<div class="sheet-col-1-1 sheet-center">&nbsp;</div>
 
 								<div class="sheet-row">
 									<div class="sheet-col-1-7 sheet-right sheet-padr sheet-hd-row">Deity<br/></div>
@@ -1068,21 +1090,6 @@
 
 							<h3>Dwarven Abilities</h3>
 
-								<div class="sheet-col-1-2 sheet-left sheet-vert-middle">Lucky Roll for <b>Harsh Winter (All attack rolls)</b>?</div>
-								<div class="sheet-col-1-22 sheet-checkbox-row sheet-vert-middle" title="Check the box if you have the Lucky Roll for All attack rolls"><input type="checkbox" value="[[@{LCK_Starting}]]" name="attr_AllAtkLuckyRoll"></div>
-
-								<div class="sheet-col-1-2 sheet-left sheet-vert-middle">Lucky Roll for <b>The bull (Melee attack rolls)</b>?</div>
-								<div class="sheet-col-1-22 sheet-checkbox-row sheet-vert-middle" title="Check the box if you have the Lucky Roll for Melee attackrolls"><input type="checkbox" value="[[@{LCK_Starting}]]" name="attr_MeleeAtkLuckyRoll"></div>
-
-								<div class="sheet-col-1-2 sheet-left sheet-vert-middle">Lucky Roll for <b>Born on the battlefield (Damage rolls)</b>?</div>
-								<div class="sheet-col-1-22 sheet-checkbox-row sheet-vert-middle" title="Check the box if you have the Lucky Roll for Damage rolls"><input type="checkbox" value="[[@{LCK_Starting}]]" name="attr_DmgLuckyRoll"></div>
-
-
-								<div class="sheet-col-1-2 sheet-left sheet-vert-middle">Lucky Roll for <b>Path of the bear (Melee damage rolls)</b>?</div>
-								<div class="sheet-col-1-22 sheet-checkbox-row sheet-vert-middle" title="Check the box if you have the Lucky Roll for Melee damage rolls"><input type="checkbox" value="[[@{LCK_Starting}]]" name="attr_MeleeDmgLuckyRoll"></div>
-
-								<div class="sheet-col-1-1 sheet-center">&nbsp;</div>
-
 								<div class="sheet-row">
 									<div class="sheet-col-1-5 sheet-hd-row">Mighty Deeds of Arms : </br></div>
 									<div class="sheet-col-1-10 sheet-right">
@@ -1102,7 +1109,7 @@
 									</div>
 									<div class="sheet-col-1-10 sheet-center">
 										<button type="roll" class="sheet-roll" name="roll_DeedDie"
-										value="&{template:DccTabbed} {{combat=1}} {{name=@{character_name}}} {{title=Mighty Deed of Arms}} {{deeddie=[[ @{DeedDie}cs>3 [Die Roll] ]]  }}" >Deed Die</button>
+										value="&{template:DccTabbed} {{combat=1}} {{name=@{character_name}}} {{title=Mighty Deed of Arms}} {{deeddie=[[ (@{DeedDie})cs>3 [Die Roll] ]]  }}" >Deed Die</button>
 									</div>
 								</div>
 
@@ -1578,8 +1585,7 @@
 
 								<div class="sheet-col-1-1 sheet-center">&nbsp;</div>
 
-								<div class="sheet-col-1-2 sheet-left sheet-vert-middle">Lucky Roll for <b>Fox's Cunning (Find/Disable Traps)</b>?</div>
-								<div class="sheet-col-1-22 sheet-checkbox-row sheet-vert-middle" title="Check the box if you have the Lucky Roll for Find/Disable Traps"><input type="checkbox" value="[[@{LCK_Starting}]]" name="attr_FindDisableTrapsLuckyRoll"></div>
+								
 
 								<div class="sheet-col-1-1 sheet-center">&nbsp;</div>
 
