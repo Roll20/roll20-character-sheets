@@ -182,7 +182,6 @@ const parseAttackComponent = (v, repeatingString, finalSetAttrs, options) => {
   if (isUndefined(parsed) || parsed.indexOf(options.parseName) === -1) {
     let aTriggerFieldExists = false;
 
-
     for (const triggerField of options.triggerFields) {
       if (exists(v[repeatingString + triggerField])) {
         aTriggerFieldExists = true;
@@ -523,7 +522,8 @@ on('change:charisma change:charisma_bonus change:charisma_check_mod change:chari
   updateAbilityModifier('charisma');
 });
 
-const setClassFeatureOrTrait = (repeatingItem, obj) => {
+const setTrait = (obj) => {
+  const repeatingItem = 'repeating_trait';
   const collectionArray = [];
   const finalSetAttrs = {};
   let itemId;
@@ -618,12 +618,6 @@ const setClassFeatureOrTrait = (repeatingItem, obj) => {
     });
   });
 };
-const setClassFeature = (obj) => {
-  return setClassFeatureOrTrait('repeating_classfeature', obj);
-};
-const setTrait = (obj) => {
-  return setClassFeatureOrTrait('repeating_trait', obj);
-};
 
 const setClassFeatures = () => {
   const finalSetAttrs = {};
@@ -685,7 +679,7 @@ const setClassFeatures = () => {
       } else {
         rageDamage = 2;
       }
-      setClassFeature({
+      setTrait({
         freetext: translate(language, 'CLASS_FEATURES.RAGE_TEXT').replace('RAGE_DAMAGE', rageDamage),
         name: translate(language, 'CLASS_FEATURES.RAGE'),
         recharge: 'Long Rest',
@@ -703,7 +697,7 @@ const setClassFeatures = () => {
       });
 
       if (v.barbarian_level >= 2) {
-        setClassFeature({
+        setTrait({
           freetext: translate(language, 'CLASS_FEATURES.RECKLESS_ATTACK_TEXT'),
           name: translate(language, 'CLASS_FEATURES.RECKLESS_ATTACK'),
           storageName: 'Reckless Attack',
@@ -780,7 +774,7 @@ const setClassFeatures = () => {
       if (v.bard_level >= 5) {
         recharge = 'Short Rest';
       }
-      setClassFeature({
+      setTrait({
         freetext: translate(language, 'CLASS_FEATURES.BARDIC_INSPIRATION_TEXT').replace('d6', die),
         name: translate(language, 'CLASS_FEATURES.BARDIC_INSPIRATION'),
         recharge,
@@ -806,7 +800,7 @@ const setClassFeatures = () => {
         } else {
           heal = 'd6';
         }
-        setClassFeature({
+        setTrait({
           freetext: translate(language, 'CLASS_FEATURES.SONG_OF_REST_TEXT'),
           heal,
           name: translate(language, 'CLASS_FEATURES.SONG_OF_REST'),
@@ -821,7 +815,7 @@ const setClassFeatures = () => {
         });
       }
       if (v.bard_level >= 6) {
-        setClassFeature({
+        setTrait({
           freetext: translate(language, 'CLASS_FEATURES.COUNTERCHARM_TEXT'),
           name: translate(language, 'CLASS_FEATURES.COUNTERCHARM'),
           storageName: 'Countercharm',
@@ -853,7 +847,7 @@ const setClassFeatures = () => {
         } else {
           channelDivinityUses = 1;
         }
-        setClassFeature({
+        setTrait({
           freetext: translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY_CLERIC_TEXT'),
           name: translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY'),
           recharge: 'Short Rest',
@@ -877,7 +871,7 @@ const setClassFeatures = () => {
           }
           turnUndeadText += `\n${translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY_TURN_UNDEAD_TEXT_PART_2').replace('CHALLENGE_RATING', turnUndeadDestroyCR)}`;
         }
-        setClassFeature({
+        setTrait({
           freetext: turnUndeadText,
           name: translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY_TURN_UNDEAD'),
           saving_throw_ability: '@{wisdom_mod}',
@@ -885,7 +879,7 @@ const setClassFeatures = () => {
           storageName: 'Turn Undead',
         });
         if (v.cleric_level >= 10) {
-          setClassFeature({
+          setTrait({
             freeform: '{{text_top=[[d100]] > [[@{cleric_level}]]}}',
             freetext: translate(language, 'CLASS_FEATURES.DIVINE_INTERVENTION_TEXT'),
             name: translate(language, 'CLASS_FEATURES.DIVINE_INTERVENTION'),
@@ -917,7 +911,7 @@ const setClassFeatures = () => {
         } else {
           wildShapeUses = 2;
         }
-        setClassFeature({
+        setTrait({
           freetext: translate(language, 'CLASS_FEATURES.WILD_SHAPE_TEXT').replace('CHALLENGE_RATING', wildShapeCR).replace('LIMITATIONS', ` ${wildShapeLimitations}`),
           name: translate(language, 'CLASS_FEATURES.WILD_SHAPE'),
           recharge: 'Short Rest',
@@ -952,7 +946,7 @@ const setClassFeatures = () => {
         name: translate(language, 'CLASS_FEATURES.FIGHTING_STYLE'),
         storageName: 'Fighting Style',
       });
-      setClassFeature({
+      setTrait({
         freetext: translate(language, 'CLASS_FEATURES.SECOND_WIND_TEXT'),
         name: translate(language, 'CLASS_FEATURES.SECOND_WIND'),
         heal: 'd10 + @{fighter_level}',
@@ -968,7 +962,7 @@ const setClassFeatures = () => {
         } else {
           actionSurgeUses = 1;
         }
-        setClassFeature({
+        setTrait({
           freetext: translate(language, 'CLASS_FEATURES.ACTION_SURGE_TEXT'),
           name: translate(language, 'CLASS_FEATURES.ACTION_SURGE'),
           recharge: 'Short Rest',
@@ -985,7 +979,7 @@ const setClassFeatures = () => {
         } else {
           indomitableUses = 1;
         }
-        setClassFeature({
+        setTrait({
           freetext: translate(language, 'CLASS_FEATURES.INDOMITABLE_TEXT'),
           name: translate(language, 'CLASS_FEATURES.INDOMITABLE'),
           recharge: 'Long Rest',
@@ -1010,24 +1004,24 @@ const setClassFeatures = () => {
         storageName: 'Martial Arts',
       });
       if (v.monk_level >= 2) {
-        setClassFeature({
+        setTrait({
           freetext: translate(language, 'CLASS_FEATURES.KI_TEXT'),
           name: translate(language, 'CLASS_FEATURES.KI'),
           recharge: 'Short Rest',
           storageName: 'Ki',
           uses_max: v.monk_level,
         });
-        setClassFeature({
+        setTrait({
           freetext: translate(language, 'CLASS_FEATURES.FLURRY_OF_BLOWS_TEXT'),
           name: translate(language, 'CLASS_FEATURES.FLURRY_OF_BLOWS'),
           storageName: 'Flurry of Blows',
         });
-        setClassFeature({
+        setTrait({
           freetext: translate(language, 'CLASS_FEATURES.PATIENT_DEFENSE_TEXT'),
           name: translate(language, 'CLASS_FEATURES.PATIENT_DEFENSE'),
           storageName: 'Patient Defense',
         });
-        setClassFeature({
+        setTrait({
           freetext: translate(language, 'CLASS_FEATURES.STEP_OF_THE_WIND_TEXT'),
           name: translate(language, 'CLASS_FEATURES.STEP_OF_THE_WIND'),
           storageName: 'Step of the Wind',
@@ -1052,21 +1046,21 @@ const setClassFeatures = () => {
         });
       }
       if (v.monk_level >= 3) {
-        setClassFeature({
+        setTrait({
           freetext: translate(language, 'CLASS_FEATURES.DEFLECT_MISSILES_TEXT'),
           name: translate(language, 'CLASS_FEATURES.DEFLECT_MISSILES'),
           storageName: 'Deflect Missiles',
         });
       }
       if (v.monk_level >= 4) {
-        setClassFeature({
+        setTrait({
           freetext: translate(language, 'CLASS_FEATURES.SLOW_FALL_TEXT'),
           name: translate(language, 'CLASS_FEATURES.SLOW_FALL'),
           storageName: 'Slow Fall',
         });
       }
       if (v.monk_level >= 5) {
-        setClassFeature({
+        setTrait({
           freetext: translate(language, 'CLASS_FEATURES.STUNNING_STRIKE_TEXT'),
           name: translate(language, 'CLASS_FEATURES.STUNNING_STRIKE'),
           saving_throw_ability: '@{wisdom_mod}',
@@ -1088,7 +1082,7 @@ const setClassFeatures = () => {
           name: translate(language, 'CLASS_FEATURES.EVASION'),
           storageName: 'Evasion',
         });
-        setClassFeature({
+        setTrait({
           freetext: translate(language, 'CLASS_FEATURES.STILLNESS_OF_MIND_TEXT'),
           name: translate(language, 'CLASS_FEATURES.STILLNESS_OF_MIND'),
           storageName: 'Stillness of Mind',
@@ -1124,7 +1118,7 @@ const setClassFeatures = () => {
         });
       }
       if (v.monk_level >= 15) {
-        setClassFeature({
+        setTrait({
           freetext: translate(language, 'CLASS_FEATURES.EMPTY_BODY_TEXT'),
           name: translate(language, 'CLASS_FEATURES.EMPTY_BODY'),
           storageName: 'Empty Body',
@@ -1140,14 +1134,14 @@ const setClassFeatures = () => {
     }
 
     if (v.paladin_level) {
-      setClassFeature({
+      setTrait({
         freetext: translate(language, 'CLASS_FEATURES.DIVINE_SENSE_TEXT'),
         name: translate(language, 'CLASS_FEATURES.DIVINE_SENSE'),
         recharge: 'Long Rest',
         storageName: 'Divine Sense',
         uses_max: Math.max(1 + v.charisma_mod, 1),
       });
-      setClassFeature({
+      setTrait({
         freetext: translate(language, 'CLASS_FEATURES.LAY_ON_HANDS_TEXT'),
         heal_query_toggle: '@{heal_query}',
         name: translate(language, 'CLASS_FEATURES.LAY_ON_HANDS'),
@@ -1162,14 +1156,14 @@ const setClassFeatures = () => {
           name: translate(language, 'CLASS_FEATURES.FIGHTING_STYLE'),
           storageName: 'Fighting Style',
         });
-        setClassFeature({
+        setTrait({
           damage: '(?{Spell Level|1|2|3|4+, 4} + 1)d8',
           damage_type: translate(language, 'DAMAGE_TYPES.RADIANT'),
           freeform: '{{subheader=(as ?{Spell Level|1|2|3|4+})}}',
           freetext: translate(language, 'CLASS_FEATURES.DIVINE_SMITE_TEXT'),
           name: translate(language, 'CLASS_FEATURES.DIVINE_SMITE'),
           second_damage: 'd8',
-          second_damage_type: translate(language, 'VS_FIEND_OR_UNDEAD.RADIANT'),
+          second_damage_type: translate(language, 'VS_FIEND_OR_UNDEAD'),
           storageName: 'Divine Smite',
         });
       }
@@ -1179,7 +1173,7 @@ const setClassFeatures = () => {
           name: translate(language, 'CLASS_FEATURES.DIVINE_HEALTH'),
           storageName: 'Divine Health',
         });
-        setClassFeature({
+        setTrait({
           freetext: translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY_PALADIN_TEXT'),
           name: translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY'),
           recharge: 'Short Rest',
@@ -1218,7 +1212,7 @@ const setClassFeatures = () => {
         });
       }
       if (v.paladin_level >= 14) {
-        setClassFeature({
+        setTrait({
           freetext: translate(language, 'CLASS_FEATURES.CLEANSING_TOUCH_TEXT'),
           name: translate(language, 'CLASS_FEATURES.CLEANSING_TOUCH'),
           recharge: 'Long Rest',
@@ -1268,7 +1262,7 @@ const setClassFeatures = () => {
         });
       }
       if (v.ranger_level >= 14) {
-        setClassFeature({
+        setTrait({
           freetext: translate(language, 'CLASS_FEATURES.VANISH_TEXT'),
           name: translate(language, 'CLASS_FEATURES.VANISH'),
           storageName: 'Vanish',
@@ -1282,7 +1276,7 @@ const setClassFeatures = () => {
         });
       }
       if (v.ranger_level >= 20) {
-        setClassFeature({
+        setTrait({
           freetext: translate(language, 'CLASS_FEATURES.FOE_SLAYER_TEXT'),
           name: translate(language, 'CLASS_FEATURES.FOE_SLAYER'),
           storageName: 'Foe Slayer',
@@ -1296,7 +1290,7 @@ const setClassFeatures = () => {
         name: translate(language, 'CLASS_FEATURES.EXPERTISE'),
         storageName: 'Expertise Rogue',
       });
-      setClassFeature({
+      setTrait({
         damage: `${Math.ceil(getIntValue(v.rogue_level) / 2)}d6`,
         freetext: translate(language, 'CLASS_FEATURES.SNEAK_ATTACK_TEXT'),
         name: translate(language, 'CLASS_FEATURES.SNEAK_ATTACK'),
@@ -1308,14 +1302,14 @@ const setClassFeatures = () => {
         storageName: 'Thieves\' Cant',
       });
       if (v.rogue_level >= 2) {
-        setClassFeature({
+        setTrait({
           freetext: translate(language, 'CLASS_FEATURES.CUNNING_ACTION_TEXT'),
           name: translate(language, 'CLASS_FEATURES.CUNNING_ACTION'),
           storageName: 'Cunning Action',
         });
       }
       if (v.rogue_level >= 5) {
-        setClassFeature({
+        setTrait({
           freetext: translate(language, 'CLASS_FEATURES.UNCANNY_DODGE_TEXT'),
           name: translate(language, 'CLASS_FEATURES.UNCANNY_DODGE'),
           storageName: 'Uncanny Dodge',
@@ -1357,7 +1351,7 @@ const setClassFeatures = () => {
         });
       }
       if (v.rogue_level >= 20) {
-        setClassFeature({
+        setTrait({
           freetext: translate(language, 'CLASS_FEATURES.STROKE_OF_LUCK_TEXT'),
           name: translate(language, 'CLASS_FEATURES.STROKE_OF_LUCK'),
           recharge: 'Short Rest',
@@ -1369,7 +1363,7 @@ const setClassFeatures = () => {
 
     if (v.sorcerer_level) {
       if (v.sorcerer_level >= 2) {
-        setClassFeature({
+        setTrait({
           freetext: translate(language, 'CLASS_FEATURES.SORCERY_POINTS_TEXT'),
           name: translate(language, 'CLASS_FEATURES.SORCERY_POINTS'),
           recharge: 'Long Rest',
@@ -1388,56 +1382,56 @@ const setClassFeatures = () => {
             storageName: 'Metamagic',
           });
           if (v.careful_spell_toggle === '@{careful_spell_toggle_var}') {
-            setClassFeature({
+            setTrait({
               freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_CAREFUL_SPELL_TEXT'),
               name: translate(language, 'CLASS_FEATURES.METAMAGIC_CAREFUL_SPELL'),
               storageName: 'Careful Spell',
             });
           }
           if (v.distant_spell_toggle === '@{distant_spell_toggle_var}') {
-            setClassFeature({
+            setTrait({
               freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_DISTANT_SPELL_TEXT'),
               name: translate(language, 'CLASS_FEATURES.METAMAGIC_DISTANT_SPELL'),
               storageName: 'Distant Spell',
             });
           }
           if (v.empowered_spell_toggle === '@{empowered_spell_toggle_var}') {
-            setClassFeature({
+            setTrait({
               freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_EMPOWERED_SPELL_TEXT'),
               name: translate(language, 'CLASS_FEATURES.METAMAGIC_EMPOWERED_SPELL'),
               storageName: 'Empowered Spell',
             });
           }
           if (v.extended_spell_toggle === '@{extended_spell_toggle_var}') {
-            setClassFeature({
+            setTrait({
               freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_EXTENDED_SPELL_TEXT'),
               name: translate(language, 'CLASS_FEATURES.METAMAGIC_EXTENDED_SPELL'),
               storageName: 'Extended Spell',
             });
           }
           if (v.heightened_spell_toggle === '@{heightened_spell_toggle_var}') {
-            setClassFeature({
+            setTrait({
               freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_HEIGHTENED_SPELL_TEXT'),
               name: translate(language, 'CLASS_FEATURES.METAMAGIC_HEIGHTENED_SPELL'),
               storageName: 'Heightened Spell',
             });
           }
           if (v.quickened_spell_toggle === '@{quickened_spell_toggle_var}') {
-            setClassFeature({
+            setTrait({
               freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_QUICKENED_SPELL_TEXT'),
               name: translate(language, 'CLASS_FEATURES.METAMAGIC_QUICKENED_SPELL'),
               storageName: 'Quickened Spell',
             });
           }
           if (v.subtle_spell_toggle === '@{subtle_spell_toggle_var}') {
-            setClassFeature({
+            setTrait({
               freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_SUBTLE_SPELL_TEXT'),
               name: translate(language, 'CLASS_FEATURES.METAMAGIC_SUBTLE_SPELL'),
               storageName: 'Subtle Spell',
             });
           }
           if (v.twinned_spell_toggle === '@{twinned_spell_toggle_var}') {
-            setClassFeature({
+            setTrait({
               freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_TWINNED_SPELL_TEXT'),
               name: translate(language, 'CLASS_FEATURES.METAMAGIC_TWINNED_SPELL'),
               storageName: 'Twinned Spell',
@@ -1465,7 +1459,7 @@ const setClassFeatures = () => {
       } else {
         warlockSpellSlots = 1;
       }
-      setClassFeature({
+      setTrait({
         freetext: translate(language, 'CLASS_FEATURES.WARLOCK_SPELL_SLOTS_TEXT'),
         name: translate(language, 'CLASS_FEATURES.WARLOCK_SPELL_SLOTS'),
         recharge: 'Short Rest',
@@ -1511,7 +1505,7 @@ const setClassFeatures = () => {
         });
       }
       if (v.warlock_level >= 20) {
-        setClassFeature({
+        setTrait({
           freetext: translate(language, 'CLASS_FEATURES.ELDRITCH_MASTER_TEXT'),
           name: translate(language, 'CLASS_FEATURES.ELDRITCH_MASTER'),
           recharge: 'Long Rest',
@@ -1521,7 +1515,7 @@ const setClassFeatures = () => {
     }
 
     if (v.wizard_level) {
-      setClassFeature({
+      setTrait({
         freetext: translate(language, 'CLASS_FEATURES.ARCANE_RECOVERY_TEXT'),
         name: translate(language, 'CLASS_FEATURES.ARCANE_RECOVERY'),
         recharge: 'Long Rest',
@@ -2392,7 +2386,7 @@ const updateAttackToggle = (v, finalSetAttrs, repeatingString, options) => {
     parseName: 'attack',
     toggleField: 'roll_toggle',
     toggleFieldSetTo: '@{roll_toggle_var}',
-    triggerFields: ['type'],
+    triggerFields: ['type', 'attack_ability', 'attack_bonus'],
   };
   parseAttackComponent(v, repeatingString, finalSetAttrs, attackParse);
 
@@ -2461,7 +2455,7 @@ const updateSavingThrowToggle = (v, finalSetAttrs, repeatingString, options) => 
     parseName: 'savingThrow',
     toggleField: 'saving_throw_toggle',
     toggleFieldSetTo: '@{saving_throw_toggle_var}',
-    triggerFields: ['saving_throw_vs_ability'],
+    triggerFields: ['saving_throw_ability', 'saving_throw_bonus', 'saving_throw_vs_ability'],
   };
   parseAttackComponent(v, repeatingString, finalSetAttrs, savingThrowParse);
 
@@ -2489,7 +2483,7 @@ const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
     parseName: 'damage',
     toggleField: 'damage_toggle',
     toggleFieldSetTo: '@{damage_toggle_var}',
-    triggerFields: ['damage'],
+    triggerFields: ['damage', 'damage_ability', 'damage_bonus', 'damage_type'],
   };
   parseAttackComponent(v, repeatingString, finalSetAttrs, damageParse);
 
@@ -2578,7 +2572,7 @@ const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
     parseName: 'secondDamage',
     toggleField: 'second_damage_toggle',
     toggleFieldSetTo: '@{second_damage_toggle_var}',
-    triggerFields: ['second_damage'],
+    triggerFields: ['second_damage', 'second_damage_ability', 'second_damage_bonus', 'second_damage_type'],
   };
   parseAttackComponent(v, repeatingString, finalSetAttrs, secondDamageParse);
 
@@ -2653,7 +2647,7 @@ const updateHealToggle = (v, finalSetAttrs, repeatingString) => {
     parseName: 'heal',
     toggleField: 'heal_toggle',
     toggleFieldSetTo: '@{heal_toggle_var}',
-    triggerFields: ['heal'],
+    triggerFields: ['heal', 'heal_query_toggle'],
   };
   parseAttackComponent(v, repeatingString, finalSetAttrs, healParse);
 
@@ -2787,7 +2781,7 @@ const updateActionChatMacro = (type) => {
         }
 
         if (actionName && actionName.length > 50) {
-          actionName = `${string.substring(0, 50)}...`;
+          actionName = `${actionName.substring(0, 50)}...`;
         }
 
         finalSetAttrs[`${type}s_macro_var`] += `[${actionName}](~repeating_${type}_${id}_${actionType})`;
@@ -3296,99 +3290,6 @@ on('change:global_spell_attack_bonus change:global_spell_damage_bonus change:glo
   updateSpell();
 });
 
-const updateClassFeature = (rowId) => {
-  const repeatingItem = 'repeating_classfeature';
-  const collectionArray = ['pb', 'finesse_mod', 'default_ability'];
-  const finalSetAttrs = {};
-
-  for (const ability of ABILITIES) {
-    collectionArray.push(`${ability}_mod`);
-  }
-
-  getSectionIDs(repeatingItem, (ids) => {
-    if (rowId) {
-      ids = [];
-      ids.push(rowId);
-    }
-    for (const id of ids) {
-      const repeatingString = `${repeatingItem}_${id}_`;
-      collectionArray.push(`${repeatingString}name`);
-      collectionArray.push(`${repeatingString}saving_throw_toggle`);
-      collectionArray.push(`${repeatingString}saving_throw_ability`);
-      collectionArray.push(`${repeatingString}saving_throw_vs_ability`);
-      collectionArray.push(`${repeatingString}saving_throw_bonus`);
-      collectionArray.push(`${repeatingString}saving_throw_dc`);
-      collectionArray.push(`${repeatingString}damage_toggle`);
-      collectionArray.push(`${repeatingString}damage_formula`);
-      collectionArray.push(`${repeatingString}damage`);
-      collectionArray.push(`${repeatingString}damage_ability`);
-      collectionArray.push(`${repeatingString}damage_bonus`);
-      collectionArray.push(`${repeatingString}damage_type`);
-      collectionArray.push(`${repeatingString}second_damage_toggle`);
-      collectionArray.push(`${repeatingString}second_damage_formula`);
-      collectionArray.push(`${repeatingString}second_damage`);
-      collectionArray.push(`${repeatingString}second_damage_ability`);
-      collectionArray.push(`${repeatingString}second_damage_bonus`);
-      collectionArray.push(`${repeatingString}second_damage_type`);
-      collectionArray.push(`${repeatingString}damage_string`);
-      collectionArray.push(`${repeatingString}heal_toggle`);
-      collectionArray.push(`${repeatingString}heal`);
-      collectionArray.push(`${repeatingString}heal_ability`);
-      collectionArray.push(`${repeatingString}heal_bonus`);
-      collectionArray.push(`${repeatingString}heal_query_toggle`);
-      collectionArray.push(`${repeatingString}add_casting_modifier`);
-    }
-
-    getAttrs(collectionArray, (v) => {
-      for (const id of ids) {
-        const repeatingString = `${repeatingItem}_${id}_`;
-
-        const damageOptions = {
-          type: 'attack',
-        };
-        updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
-        const savingThrowOptions = {};
-        updateSavingThrowToggle(v, finalSetAttrs, repeatingString, savingThrowOptions);
-        updateHealToggle(v, finalSetAttrs, repeatingString);
-      }
-      setFinalAttrs(v, finalSetAttrs);
-    });
-  });
-};
-on('change:repeating_classfeature', (eventInfo) => {
-  const repeatingInfo = getRepeatingInfo('repeating_classfeature', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'toggle_extras' && repeatingInfo.field !== 'heal_formula' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'freeform') {
-    console.info('class feature repeatingInfo.field', repeatingInfo.field);
-    updateClassFeature(repeatingInfo.rowId);
-  }
-});
-
-const updateClassFeatureToggleToNewVer = () => {
-  const repeatingItem = 'repeating_classfeature';
-  const collectionArray = [];
-  const finalSetAttrs = {};
-
-  getSectionIDs(repeatingItem, (ids) => {
-    for (const id of ids) {
-      const repeatingString = `${repeatingItem}_${id}_`;
-      collectionArray.push(`${repeatingString}heal_toggle`);
-    }
-
-    getAttrs(collectionArray, (v) => {
-      for (const id of ids) {
-        const repeatingString = `${repeatingItem}_${id}_`;
-
-        const healToggled = v[`${repeatingString}heal_toggle`];
-        if (!isUndefined(healToggled)) {
-          updateClassFeature();
-          return;
-        }
-      }
-      setFinalAttrs(v, finalSetAttrs);
-    });
-  });
-};
-
 function updateD20Mod() {
   const collectionArray = ['halfling_luck'];
   const finalSetAttrs = {};
@@ -3767,8 +3668,7 @@ const updateSpellsFromSRD = () => {
     const spells = v.spells_srd.split(', ');
 
     for (const spell of spells) {
-      const newRowId = generateRowID();
-      const repeatingString = `repeating_spell_${newRowId}_`;
+      const repeatingString = `repeating_spell_${generateRowID()}_`;
       finalSetAttrs[`${repeatingString}name`] = spell;
     }
     setFinalAttrs(v, finalSetAttrs);
@@ -4186,8 +4086,6 @@ const parseDamage = (finalSetAttrs, repeatingString, freetext, regex, name, spel
     }
     freetext = freetext.replace(regex, '');
     finalSetAttrs[`${repeatingString}${name}_toggle`] = `@{${name}_toggle_var}`;
-  } else {
-    finalSetAttrs[`${repeatingString}${name}_toggle`] = 0;
   }
   return freetext;
 };
@@ -4688,9 +4586,9 @@ const updateLanguageSelection = () => {
   });
 };
 
-const resourcesToClassFeatures = () => {
+const resourcesToTraits = () => {
   const repeatingItem = 'repeating_resource';
-  const newRepeatingItem = 'repeating_classfeature';
+  const newRepeatingItem = 'repeating_trait';
   const collectionArray = [];
   const finalSetAttrs = {};
 
@@ -4711,8 +4609,7 @@ const resourcesToClassFeatures = () => {
     getAttrs(collectionArray, (v) => {
       for (const id of ids) {
         repeatingString = `${repeatingItem}_${id}_`;
-        const newRowId = generateRowID();
-        const newRepeatingString = `${newRepeatingItem}_${newRowId}_`;
+        const newRepeatingString = `${newRepeatingItem}_${generateRowID()}_`;
 
         finalSetAttrs[`${newRepeatingString}name`] = v[`${repeatingString}name`];
         finalSetAttrs[`${newRepeatingString}uses`] = v[`${repeatingString}uses`];
@@ -4866,8 +4763,7 @@ const importData = () => {
       }
       if (importObject.spells) {
         importObject.spells.forEach(spell => {
-          const newRowId = generateRowID();
-          const repeatingString = `repeating_spell_${newRowId}_`;
+          const repeatingString = `repeating_spell_${generateRowID()}_`;
           for (const prop in spell) {
             if (spell.hasOwnProperty(prop)) {
               finalSetAttrs[`${repeatingString}${prop}`] = spell[prop];
@@ -5003,7 +4899,7 @@ const sheetOpened = () => {
       updateAbilityModifiers();
     }
     if (versionCompare(version, '2.2.2') < 0) {
-      resourcesToClassFeatures();
+      resourcesToTraits();
     }
     if (versionCompare(version, '2.2.4') < 0) {
       updateInitiative();
@@ -5012,7 +4908,6 @@ const sheetOpened = () => {
       weighAmmo();
     }
     if (versionCompare(version, '2.2.6') < 0) {
-      updateClassFeatureToggleToNewVer();
       updateLevels();
       extasToExtrasFix('repeating_attack');
       extasToExtrasFix('repeating_action');
@@ -5048,6 +4943,9 @@ const sheetOpened = () => {
       updateActionChatMacro('lairaction');
       updateActionChatMacro('regionaleffect');
       updateDamageResistancesVar();
+    }
+    if (versionCompare(version, '2.4.3') < 0) {
+      setClassFeatures();
     }
 
     if (!version || version !== currentVersion) {
