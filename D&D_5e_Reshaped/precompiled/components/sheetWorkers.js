@@ -2814,6 +2814,9 @@ const updateAction = (type, rowId) => {
       const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}type`);
+      collectionArray.push(`${repeatingString}uses`);
+      collectionArray.push(`${repeatingString}uses_max`);
+      collectionArray.push(`${repeatingString}has_uses`);
       collectionArray.push(`${repeatingString}roll_toggle`);
       collectionArray.push(`${repeatingString}to_hit`);
       collectionArray.push(`${repeatingString}attack_formula`);
@@ -2868,6 +2871,13 @@ const updateAction = (type, rowId) => {
             finalSetAttrs[`${repeatingString}name`] = actionName.replace(rechargeDayRegex, '');
           }
         }
+
+        if (v[`${repeatingString}uses`] || v[`${repeatingString}uses_max`]) {
+          finalSetAttrs[`${repeatingString}has_uses`] = 1;
+        } else if (!isUndefined(v[`${repeatingString}has_uses`])) {
+          finalSetAttrs[`${repeatingString}has_uses`] = 0;
+        }
+
         const recharge = fromVOrFinalSetAttrs(v, finalSetAttrs, `${repeatingString}recharge`);
         if (exists(recharge)) {
           if (recharge.indexOf('/Day') !== -1 || recharge.indexOf('/day') !== -1) {
