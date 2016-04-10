@@ -84,7 +84,7 @@ const getFloatValue = (value, defaultValue) => {
   return parseFloat(value) || defaultValue;
 };
 const exists = (value) => {
-  if (!value || value === '' || value === '0' || value === 0) {
+  if (isUndefined(value) || value === '' || value === '0' || value === 0) {
     return false;
   }
   return true;
@@ -286,12 +286,12 @@ const getAbilityMod = (score) => {
   return Math.floor((getIntValue(score) - 10) / 2);
 };
 const addArithmeticOperator = (string, number) => {
-  let value = '';
-  if (string && number) {
-    if (number >= 0) {
-      value = ` + ${number}`;
-    } else {
+  let value = number;
+  if (string) {
+    if (number < 0) {
       value = ` - ${Math.abs(number)}`;
+    } else {
+      value = ` + ${number}`;
     }
   }
   return value;
@@ -4957,6 +4957,11 @@ const sheetOpened = () => {
     }
     if (versionCompare(version, '2.4.3') < 0) {
       setClassFeatures();
+    }
+    if (versionCompare(version, '2.4.4') < 0) {
+      updateSkill();
+      updateAttack();
+      updateSpell();
     }
 
     if (!version || version !== currentVersion) {
