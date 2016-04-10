@@ -4636,6 +4636,102 @@ const resourcesToTraits = () => {
   });
 };
 
+const classFeaturesToTraits = () => {
+  const repeatingItem = 'repeating_classfeature';
+  const newRepeatingItem = 'repeating_trait';
+  const collectionArray = ['lang'];
+  const finalSetAttrs = {};
+
+  let repeatingString;
+  getSectionIDs(repeatingItem, (ids) => {
+    for (const id of ids) {
+      repeatingString = `${repeatingItem}_${id}_`;
+      collectionArray.push(`${repeatingString}name`);
+      collectionArray.push(`${repeatingString}uses`);
+      collectionArray.push(`${repeatingString}uses_max`);
+      collectionArray.push(`${repeatingString}recharge`);
+      collectionArray.push(`${repeatingString}saving_throw_toggle`);
+      collectionArray.push(`${repeatingString}saving_throw_condition`);
+      collectionArray.push(`${repeatingString}saving_throw_ability`);
+      collectionArray.push(`${repeatingString}saving_throw_bonus`);
+      collectionArray.push(`${repeatingString}saving_throw_vs_ability`);
+      collectionArray.push(`${repeatingString}saving_throw_failure`);
+      collectionArray.push(`${repeatingString}saving_throw_success`);
+      collectionArray.push(`${repeatingString}damage_toggle`);
+      collectionArray.push(`${repeatingString}damage`);
+      collectionArray.push(`${repeatingString}damage_ability`);
+      collectionArray.push(`${repeatingString}damage_bonus`);
+      collectionArray.push(`${repeatingString}damage_type`);
+      collectionArray.push(`${repeatingString}second_damage_toggle`);
+      collectionArray.push(`${repeatingString}second_damage`);
+      collectionArray.push(`${repeatingString}second_damage_ability`);
+      collectionArray.push(`${repeatingString}second_damage_bonus`);
+      collectionArray.push(`${repeatingString}second_damage_type`);
+      collectionArray.push(`${repeatingString}heal`);
+      collectionArray.push(`${repeatingString}heal_ability`);
+      collectionArray.push(`${repeatingString}heal_bonus`);
+      collectionArray.push(`${repeatingString}heal_query_toggle`);
+      collectionArray.push(`${repeatingString}extras_toggle`);
+      collectionArray.push(`${repeatingString}emote`);
+      collectionArray.push(`${repeatingString}freetext`);
+      collectionArray.push(`${repeatingString}freeform`);
+    }
+
+    getAttrs(collectionArray, (v) => {
+      const language = v.lang;
+      for (const id of ids) {
+        repeatingString = `${repeatingItem}_${id}_`;
+        const newRepeatingString = `${newRepeatingItem}_${generateRowID()}_`;
+        const name = v[`${repeatingString}name`];
+        const classFeatures = TRANSLATIONS[language].CLASS_FEATURES;
+        let featureExistsInDefinedList = false;
+
+        for (const classFeature in classFeatures) {
+          if (classFeatures.hasOwnProperty(classFeature)) {
+            if (classFeatures[classFeature] === name) {
+              featureExistsInDefinedList = true;
+            }
+          }
+        }
+        if (!featureExistsInDefinedList) {
+          finalSetAttrs[`${newRepeatingString}name`] = name;
+          finalSetAttrs[`${newRepeatingString}uses`] = v[`${repeatingString}uses`];
+          finalSetAttrs[`${newRepeatingString}uses_max`] = v[`${repeatingString}uses_max`];
+          finalSetAttrs[`${newRepeatingString}recharge`] = v[`${repeatingString}recharge`];
+          finalSetAttrs[`${newRepeatingString}saving_throw_toggle`] = v[`${repeatingString}saving_throw_toggle`];
+          finalSetAttrs[`${newRepeatingString}saving_throw_condition`] = v[`${repeatingString}saving_throw_condition`];
+          finalSetAttrs[`${newRepeatingString}saving_throw_ability`] = v[`${repeatingString}saving_throw_ability`];
+          finalSetAttrs[`${newRepeatingString}saving_throw_bonus`] = v[`${repeatingString}saving_throw_bonus`];
+          finalSetAttrs[`${newRepeatingString}saving_throw_vs_ability`] = v[`${repeatingString}saving_throw_vs_ability`];
+          finalSetAttrs[`${newRepeatingString}saving_throw_failure`] = v[`${repeatingString}saving_throw_failure`];
+          finalSetAttrs[`${newRepeatingString}saving_throw_success`] = v[`${repeatingString}saving_throw_success`];
+          finalSetAttrs[`${newRepeatingString}damage_toggle`] = v[`${repeatingString}damage_toggle`];
+          finalSetAttrs[`${newRepeatingString}damage`] = v[`${repeatingString}damage`];
+          finalSetAttrs[`${newRepeatingString}damage_ability`] = v[`${repeatingString}damage_ability`];
+          finalSetAttrs[`${newRepeatingString}damage_bonus`] = v[`${repeatingString}damage_bonus`];
+          finalSetAttrs[`${newRepeatingString}damage_type`] = v[`${repeatingString}damage_type`];
+          finalSetAttrs[`${newRepeatingString}second_damage_toggle`] = v[`${repeatingString}second_damage_toggle`];
+          finalSetAttrs[`${newRepeatingString}second_damage`] = v[`${repeatingString}second_damage`];
+          finalSetAttrs[`${newRepeatingString}second_damage_ability`] = v[`${repeatingString}second_damage_ability`];
+          finalSetAttrs[`${newRepeatingString}second_damage_bonus`] = v[`${repeatingString}second_damage_bonus`];
+          finalSetAttrs[`${newRepeatingString}second_damage_type`] = v[`${repeatingString}second_damage_type`];
+          finalSetAttrs[`${newRepeatingString}heal`] = v[`${repeatingString}heal`];
+          finalSetAttrs[`${newRepeatingString}heal_ability`] = v[`${repeatingString}heal_ability`];
+          finalSetAttrs[`${newRepeatingString}heal_bonus`] = v[`${repeatingString}heal_bonus`];
+          finalSetAttrs[`${newRepeatingString}heal_query_toggle`] = v[`${repeatingString}heal_query_toggle`];
+          finalSetAttrs[`${newRepeatingString}extras_toggle`] = v[`${repeatingString}extras_toggle`];
+          finalSetAttrs[`${newRepeatingString}emote`] = v[`${repeatingString}emote`];
+          finalSetAttrs[`${newRepeatingString}freetext`] = v[`${repeatingString}freetext`];
+          finalSetAttrs[`${newRepeatingString}display_text`] = v[`${repeatingString}freetext`];
+          finalSetAttrs[`${newRepeatingString}freeform`] = v[`${repeatingString}freeform`];
+        }
+      }
+
+      setFinalAttrs(v, finalSetAttrs);
+    });
+  });
+};
+
 const setSkillStorageNames = () => {
   const repeatingItem = 'repeating_skill';
   const collectionArray = ['lang'];
@@ -4963,6 +5059,10 @@ const sheetOpened = () => {
       updateAttack();
       updateSpell();
     }
+    if (versionCompare(version, '2.4.6') < 0) {
+      classFeaturesToTraits();
+    }
+
 
     if (!version || version !== currentVersion) {
       finalSetAttrs.version = currentVersion;
