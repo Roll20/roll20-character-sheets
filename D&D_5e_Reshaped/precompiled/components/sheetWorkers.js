@@ -1684,22 +1684,23 @@ const updateSpellSlots = () => {
 
     for (const level in spellSlots) {
       if (spellSlots.hasOwnProperty(level)) {
-        finalSetAttrs[`spell_slots_l${level}_calc`] = spellSlots[level];
+        if (spellSlots[level] !== 0 || exists(v[`spell_slots_l${level}_calc`])) {
+          finalSetAttrs[`spell_slots_l${level}_calc`] = spellSlots[level];
+        }
 
         const slotBonus = getIntValue(v[`spell_slots_l${level}_bonus`]);
         const spellSlotMax = spellSlots[level] + slotBonus;
-        if (v[`spell_slots_l${level}_max`] !== spellSlotMax) {
-          finalSetAttrs[`spell_slots_l${level}_max`] = spellSlotMax;
-        }
 
-        let spellSlotToggle;
         if (spellSlotMax > 0) {
-          spellSlotToggle = 'on';
+          finalSetAttrs[`spell_slots_l${level}_max`] = spellSlotMax;
+          finalSetAttrs[`spell_slots_l${level}_toggle`] = 'on';
         } else {
-          spellSlotToggle = 0;
-        }
-        if (v[`spell_slots_l${level}_toggle`] !== spellSlotToggle) {
-          finalSetAttrs[`spell_slots_l${level}_toggle`] = spellSlotToggle;
+          if (exists(v[`spell_slots_l${level}_max`])) {
+            finalSetAttrs[`spell_slots_l${level}_max`] = 0;
+          }
+          if (exists(v[`spell_slots_l${level}_toggle`])) {
+            finalSetAttrs[`spell_slots_l${level}_toggle`] = 0;
+          }
         }
       }
     }
@@ -1925,7 +1926,7 @@ const updateLevels = (changedField) => {
             if (!isUndefined(v[`hd_${key}_query`])) {
               finalSetAttrs[`hd_${key}_query`] = '';
             }
-            if (!isUndefined(v[`hd_${key}_toggle`])) {
+            if (exists(v[`hd_${key}_toggle`])) {
               finalSetAttrs[`hd_${key}_toggle`] = 0;
             }
           }
@@ -4300,13 +4301,15 @@ const countAction = (type) => {
   const collectionArray = [`${type}s_exist`];
   const finalSetAttrs = {};
 
-  finalSetAttrs[`${type}s_exist`] = 0;
 
   getSectionIDs(repeatingItem, (ids) => {
-    if (ids.length > 0) {
-      finalSetAttrs[`${type}s_exist`] = 1;
-    }
     getAttrs(collectionArray, (v) => {
+      if (ids.length > 0) {
+        finalSetAttrs[`${type}s_exist`] = 1;
+      } else if (exists(v[`${type}s_exist`])) {
+        finalSetAttrs[`${type}s_exist`] = 0;
+      }
+
       setFinalAttrs(v, finalSetAttrs);
     });
   });
@@ -5062,7 +5065,6 @@ const sheetOpened = () => {
     if (versionCompare(version, '2.4.6') < 0) {
       classFeaturesToTraits();
     }
-
 
     if (!version || version !== currentVersion) {
       finalSetAttrs.version = currentVersion;
