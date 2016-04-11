@@ -1,7 +1,7 @@
 /* global setAttrs:false, getAttrs:false, on:false, getSectionIDs:false, generateRowID:false */
 'use strict';
 
-const currentVersion = '2.4.6';
+const currentVersion = '2.4.7';
 let TRANSLATIONS;
 const SKILLS = {
   acrobatics: 'dexterity',
@@ -2881,7 +2881,7 @@ const updateAction = (type, rowId) => {
 
         const recharge = fromVOrFinalSetAttrs(v, finalSetAttrs, `${repeatingString}recharge`);
         if (exists(recharge)) {
-          if (recharge.indexOf('/Day') !== -1 || recharge.indexOf('/day') !== -1) {
+          if (isNaN(recharge)) {
             finalSetAttrs[`${repeatingString}recharge_display`] = ` (${recharge})`;
           } else {
             finalSetAttrs[`${repeatingString}recharge_display`] = ` (Recharge ${recharge})`;
@@ -3578,19 +3578,22 @@ on('change:skills_srd', () => {
 });
 
 const updateSavingThrow = (ability) => {
-  const collectionArray = ['pb', `${ability}_mod`, `${ability}_save_prof`, `${ability}_save_bonus`, 'global_saving_throw_bonus'];
+  const collectionArray = ['pb', `${ability}_mod`, `${ability}_save_prof`, `${ability}_save_bonus`, 'global_saving_throw_bonus', 'saving_throws_half_proficiency'];
   const finalSetAttrs = {};
 
   getAttrs(collectionArray, (v) => {
-    const proficiency = v[`${ability}_save_prof`];
     const abilityMod = getIntValue(v[`${ability}_mod`]);
     let total = abilityMod;
     let totalFormula = `${abilityMod}[${getAbilityShortName(ability)}]`;
 
-    if (proficiency === '@{PB}') {
-      const pb = getIntValue(v.pb);
+    const pb = getIntValue(v.pb);
+    if (v[`${ability}_save_prof`] === '@{PB}') {
       total += pb;
       totalFormula += `${addArithmeticOperator(totalFormula, pb)}[proficient]`;
+    } else if (v.saving_throws_half_proficiency === 'on') {
+      const halfPB = Math.floor(pb / 2);
+      total += halfPB;
+      totalFormula += `${addArithmeticOperator(totalFormula, halfPB)}[half proficiency]`;
     }
 
     const abilitySavingThrowBonus = getIntValue(v[`${ability}_save_bonus`]);
@@ -3620,22 +3623,25 @@ const updateSavingThrows = () => {
   updateSavingThrow('wisdom');
   updateSavingThrow('charisma');
 };
-on('change:pb change:strength_mod change:strength_save_prof change:strength_save_bonus change:global_saving_throw_bonus', () => {
+on('change:pb change:global_saving_throw_bonus change:saving_throws_half_proficiency', () => {
+  updateSavingThrows();
+});
+on('change:strength_mod change:strength_save_prof change:strength_save_bonus', () => {
   updateSavingThrow('strength');
 });
-on('change:pb change:dexterity_mod change:dexterity_save_prof change:dexterity_save_bonus change:global_saving_throw_bonus', () => {
+on('change:dexterity_mod change:dexterity_save_prof change:dexterity_save_bonus', () => {
   updateSavingThrow('dexterity');
 });
-on('change:pb change:constitution_mod change:constitution_save_prof change:constitution_save_bonus change:global_saving_throw_bonus', () => {
+on('change:constitution_mod change:constitution_save_prof change:constitution_save_bonus', () => {
   updateSavingThrow('constitution');
 });
-on('change:pb change:intelligence_mod change:intelligence_save_prof change:intelligence_save_bonus change:global_saving_throw_bonus', () => {
+on('change:intelligence_mod change:intelligence_save_prof change:intelligence_save_bonus', () => {
   updateSavingThrow('intelligence');
 });
-on('change:pb change:wisdom_mod change:wisdom_save_prof change:wisdom_save_bonus change:global_saving_throw_bonus', () => {
+on('change:wisdom_mod change:wisdom_save_prof change:wisdom_save_bonus', () => {
   updateSavingThrow('wisdom');
 });
-on('change:pb change:charisma_mod change:charisma_save_prof change:charisma_save_bonus change:global_saving_throw_bonus', () => {
+on('change:charisma_mod change:charisma_save_prof change:charisma_save_bonus', () => {
   updateSavingThrow('charisma');
 });
 
@@ -4698,36 +4704,38 @@ const classFeaturesToTraits = () => {
         }
         if (!featureExistsInDefinedList) {
           finalSetAttrs[`${newRepeatingString}name`] = name;
-          finalSetAttrs[`${newRepeatingString}uses`] = v[`${repeatingString}uses`];
-          finalSetAttrs[`${newRepeatingString}uses_max`] = v[`${repeatingString}uses_max`];
-          finalSetAttrs[`${newRepeatingString}recharge`] = v[`${repeatingString}recharge`];
-          finalSetAttrs[`${newRepeatingString}saving_throw_toggle`] = v[`${repeatingString}saving_throw_toggle`];
-          finalSetAttrs[`${newRepeatingString}saving_throw_condition`] = v[`${repeatingString}saving_throw_condition`];
-          finalSetAttrs[`${newRepeatingString}saving_throw_ability`] = v[`${repeatingString}saving_throw_ability`];
-          finalSetAttrs[`${newRepeatingString}saving_throw_bonus`] = v[`${repeatingString}saving_throw_bonus`];
-          finalSetAttrs[`${newRepeatingString}saving_throw_vs_ability`] = v[`${repeatingString}saving_throw_vs_ability`];
-          finalSetAttrs[`${newRepeatingString}saving_throw_failure`] = v[`${repeatingString}saving_throw_failure`];
-          finalSetAttrs[`${newRepeatingString}saving_throw_success`] = v[`${repeatingString}saving_throw_success`];
-          finalSetAttrs[`${newRepeatingString}damage_toggle`] = v[`${repeatingString}damage_toggle`];
-          finalSetAttrs[`${newRepeatingString}damage`] = v[`${repeatingString}damage`];
-          finalSetAttrs[`${newRepeatingString}damage_ability`] = v[`${repeatingString}damage_ability`];
-          finalSetAttrs[`${newRepeatingString}damage_bonus`] = v[`${repeatingString}damage_bonus`];
-          finalSetAttrs[`${newRepeatingString}damage_type`] = v[`${repeatingString}damage_type`];
-          finalSetAttrs[`${newRepeatingString}second_damage_toggle`] = v[`${repeatingString}second_damage_toggle`];
-          finalSetAttrs[`${newRepeatingString}second_damage`] = v[`${repeatingString}second_damage`];
-          finalSetAttrs[`${newRepeatingString}second_damage_ability`] = v[`${repeatingString}second_damage_ability`];
-          finalSetAttrs[`${newRepeatingString}second_damage_bonus`] = v[`${repeatingString}second_damage_bonus`];
-          finalSetAttrs[`${newRepeatingString}second_damage_type`] = v[`${repeatingString}second_damage_type`];
-          finalSetAttrs[`${newRepeatingString}heal`] = v[`${repeatingString}heal`];
-          finalSetAttrs[`${newRepeatingString}heal_ability`] = v[`${repeatingString}heal_ability`];
-          finalSetAttrs[`${newRepeatingString}heal_bonus`] = v[`${repeatingString}heal_bonus`];
-          finalSetAttrs[`${newRepeatingString}heal_query_toggle`] = v[`${repeatingString}heal_query_toggle`];
-          finalSetAttrs[`${newRepeatingString}extras_toggle`] = v[`${repeatingString}extras_toggle`];
-          finalSetAttrs[`${newRepeatingString}emote`] = v[`${repeatingString}emote`];
-          finalSetAttrs[`${newRepeatingString}freetext`] = v[`${repeatingString}freetext`];
-          finalSetAttrs[`${newRepeatingString}display_text`] = v[`${repeatingString}freetext`];
-          finalSetAttrs[`${newRepeatingString}freeform`] = v[`${repeatingString}freeform`];
+        } else {
+          finalSetAttrs[`${newRepeatingString}name`] = `DELETE - ${name}`;
         }
+        finalSetAttrs[`${newRepeatingString}uses`] = v[`${repeatingString}uses`];
+        finalSetAttrs[`${newRepeatingString}uses_max`] = v[`${repeatingString}uses_max`];
+        finalSetAttrs[`${newRepeatingString}recharge`] = v[`${repeatingString}recharge`];
+        finalSetAttrs[`${newRepeatingString}saving_throw_toggle`] = v[`${repeatingString}saving_throw_toggle`];
+        finalSetAttrs[`${newRepeatingString}saving_throw_condition`] = v[`${repeatingString}saving_throw_condition`];
+        finalSetAttrs[`${newRepeatingString}saving_throw_ability`] = v[`${repeatingString}saving_throw_ability`];
+        finalSetAttrs[`${newRepeatingString}saving_throw_bonus`] = v[`${repeatingString}saving_throw_bonus`];
+        finalSetAttrs[`${newRepeatingString}saving_throw_vs_ability`] = v[`${repeatingString}saving_throw_vs_ability`];
+        finalSetAttrs[`${newRepeatingString}saving_throw_failure`] = v[`${repeatingString}saving_throw_failure`];
+        finalSetAttrs[`${newRepeatingString}saving_throw_success`] = v[`${repeatingString}saving_throw_success`];
+        finalSetAttrs[`${newRepeatingString}damage_toggle`] = v[`${repeatingString}damage_toggle`];
+        finalSetAttrs[`${newRepeatingString}damage`] = v[`${repeatingString}damage`];
+        finalSetAttrs[`${newRepeatingString}damage_ability`] = v[`${repeatingString}damage_ability`];
+        finalSetAttrs[`${newRepeatingString}damage_bonus`] = v[`${repeatingString}damage_bonus`];
+        finalSetAttrs[`${newRepeatingString}damage_type`] = v[`${repeatingString}damage_type`];
+        finalSetAttrs[`${newRepeatingString}second_damage_toggle`] = v[`${repeatingString}second_damage_toggle`];
+        finalSetAttrs[`${newRepeatingString}second_damage`] = v[`${repeatingString}second_damage`];
+        finalSetAttrs[`${newRepeatingString}second_damage_ability`] = v[`${repeatingString}second_damage_ability`];
+        finalSetAttrs[`${newRepeatingString}second_damage_bonus`] = v[`${repeatingString}second_damage_bonus`];
+        finalSetAttrs[`${newRepeatingString}second_damage_type`] = v[`${repeatingString}second_damage_type`];
+        finalSetAttrs[`${newRepeatingString}heal`] = v[`${repeatingString}heal`];
+        finalSetAttrs[`${newRepeatingString}heal_ability`] = v[`${repeatingString}heal_ability`];
+        finalSetAttrs[`${newRepeatingString}heal_bonus`] = v[`${repeatingString}heal_bonus`];
+        finalSetAttrs[`${newRepeatingString}heal_query_toggle`] = v[`${repeatingString}heal_query_toggle`];
+        finalSetAttrs[`${newRepeatingString}extras_toggle`] = v[`${repeatingString}extras_toggle`];
+        finalSetAttrs[`${newRepeatingString}emote`] = v[`${repeatingString}emote`];
+        finalSetAttrs[`${newRepeatingString}freetext`] = v[`${repeatingString}freetext`];
+        finalSetAttrs[`${newRepeatingString}display_text`] = v[`${repeatingString}freetext`];
+        finalSetAttrs[`${newRepeatingString}freeform`] = v[`${repeatingString}freeform`];
       }
 
       setFinalAttrs(v, finalSetAttrs);
@@ -5062,8 +5070,9 @@ const sheetOpened = () => {
       updateAttack();
       updateSpell();
     }
-    if (versionCompare(version, '2.4.6') < 0) {
+    if (versionCompare(version, '2.4.7') < 0) {
       classFeaturesToTraits();
+      updateAction('trait');
     }
 
     if (!version || version !== currentVersion) {
