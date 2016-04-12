@@ -4903,6 +4903,16 @@ const deleteImportData = () => {
   });
 };
 
+const checkVersionFormat = (version, finalSetAttrs) => {
+  const versionRegex = /\d+\.\d+\.\d+/gi;
+  const versionIsProperFormat = versionRegex.exec(version);
+
+  if (version && !versionIsProperFormat) {
+    finalSetAttrs.version = version = currentVersion;
+  }
+  return version;
+};
+
 on('change:accept_import', importData);
 on('change:reject_import', deleteImportData);
 
@@ -4911,168 +4921,151 @@ const sheetOpened = () => {
   const finalSetAttrs = {};
 
   getAttrs(collectionArray, (v) => {
-    const version = v.version;
+    const version = checkVersionFormat(v.version, finalSetAttrs);
 
     if (!version) {
-      updatePb();
-
-      const setAbilities = {};
-      if (isUndefined(v.strength)) {
-        setAbilities.strength = 10;
-        setAbilities.strength_mod = 0;
-        setAbilities.strength_mod_with_sign = '+0';
-      }
-      if (isUndefined(v.dexterity)) {
-        setAbilities.dexterity = 10;
-        setAbilities.dexterity_mod = 0;
-        setAbilities.dexterity_mod_with_sign = '+0';
-      }
-      if (isUndefined(v.constitution)) {
-        setAbilities.constitution = 10;
-        setAbilities.constitution_mod = 0;
-        setAbilities.constitution_mod_with_sign = '+0';
-      }
-      if (isUndefined(v.intelligence)) {
-        setAbilities.intelligence = 10;
-        setAbilities.intelligence_mod = 0;
-        setAbilities.intelligence_mod_with_sign = '+0';
-      }
-      if (isUndefined(v.wisdom)) {
-        setAbilities.wisdom = 10;
-        setAbilities.wisdom_mod = 0;
-        setAbilities.wisdom_mod_with_sign = '+0';
-      }
-      if (isUndefined(v.charisma)) {
-        setAbilities.charisma = 10;
-        setAbilities.charisma_mod = 0;
-        setAbilities.charisma_mod_with_sign = '+0';
-      }
-      setFinalAttrs(v, setAbilities, () => {
-        updateAbilityModifiers();
-      });
-
       if (!v.import_data) {
         finalSetAttrs.edit_mode = 'on';
       }
-
       finalSetAttrs.roll_info = '';
+      const setAbilities = {};
+      if (isUndefined(v.strength)) {
+        setAbilities.strength = 10;
+      }
+      if (isUndefined(v.dexterity)) {
+        setAbilities.dexterity = 10;
+      }
+      if (isUndefined(v.constitution)) {
+        setAbilities.constitution = 10;
+      }
+      if (isUndefined(v.intelligence)) {
+        setAbilities.intelligence = 10;
+      }
+      if (isUndefined(v.wisdom)) {
+        setAbilities.wisdom = 10;
+      }
+      if (isUndefined(v.charisma)) {
+        setAbilities.charisma = 10;
+      }
+      setFinalAttrs(v, setAbilities, () => {
+        updatePb();
+        generateSkills();
+        updateSavingThrows();
+        updateLevels();
+        updateAbilityChecksMacro();
+        updateInitiative();
+        updateArmor();
+      });
+    } else {
+      if (versionCompare(version, '2.0.10') < 0) {
+        updateAbilityModifiers();
+      }
 
-      generateSkills();
-      updateSavingThrows();
-      updateLevels();
-      updateAbilityChecksMacro();
-      updateInitiative();
-      updateArmor();
-    }
-
-    if (versionCompare(version, '2.0.10') < 0) {
-      updateAbilityModifiers();
-    }
-
-    if (versionCompare(version, '2.0.14') < 0) {
-      updateSkill();
-      updateSavingThrows();
-    }
-    if (versionCompare(version, '2.1.0') < 0) {
-      updateNPCChallenge();
-      updateDamageVulnerabilities();
-      updateDamageResistances();
-      updateDamageImmunities();
-      updateConditionImmunities();
-      updateLanguages();
-      updateSenses();
-    }
-    if (versionCompare(version, '2.1.3') < 0) {
-      updateType();
-      updateAlignment();
-    }
-    if (versionCompare(version, '2.1.5') < 0) {
-      updateLevels();
-      updateNPCAC();
-      updateLanguageSelection();
-    }
-    if (versionCompare(version, '2.1.7') < 0) {
-      setSkillStorageNames();
-    }
-    if (versionCompare(version, '2.1.10') < 0) {
-      updateSavingThrows();
-      updateAttack();
-    }
-    if (versionCompare(version, '2.1.11') < 0) {
-      updateLevels();
-      updateAbilityChecksMacro();
-    }
-    if (versionCompare(version, '2.1.13') < 0) {
-      weighEquipment();
-      updateSpell();
-    }
-    if (versionCompare(version, '2.1.14') < 0) {
-      updateLevels();
-    }
-    if (versionCompare(version, '2.1.15') < 0) {
-      updateLevels();
-      displayTextForTraits();
-    }
-    if (versionCompare(version, '2.2.1') < 0) {
-      updateAbilityModifiers();
-    }
-    if (versionCompare(version, '2.2.2') < 0) {
-      resourcesToTraits();
-    }
-    if (versionCompare(version, '2.2.4') < 0) {
-      updateInitiative();
-    }
-    if (versionCompare(version, '2.2.5') < 0) {
-      weighAmmo();
-    }
-    if (versionCompare(version, '2.2.6') < 0) {
-      updateLevels();
-      extasToExtrasFix('repeating_attack');
-      extasToExtrasFix('repeating_action');
-      extasToExtrasFix('repeating_spell');
-    }
-    if (versionCompare(version, '2.2.8') < 0) {
-      updateAttack();
-    }
-    if (versionCompare(version, '2.2.11') < 0) {
-      setClassFeatures();
-    }
-    if (versionCompare(version, '2.2.12') < 0) {
-      updateAbilityChecksMacro();
-    }
-    if (versionCompare(version, '2.2.15') < 0) {
-      updateAbilityChecksMacro();
-      updatePreAndPostRoll();
-    }
-    if (versionCompare(version, '2.2.19') < 0) {
-      updateAbilityModifiers();
-      updateSpell();
-    }
-    if (versionCompare(version, '2.3.3') < 0) {
-      updateAttachers();
-    }
-    if (versionCompare(version, '2.4.2') < 0) {
-      updateAbilityModifiers();
-      updateSkill();
-      updateActionChatMacro('trait');
-      updateActionChatMacro('action');
-      updateActionChatMacro('reaction');
-      updateActionChatMacro('legendaryaction');
-      updateActionChatMacro('lairaction');
-      updateActionChatMacro('regionaleffect');
-      updateDamageResistancesVar();
-    }
-    if (versionCompare(version, '2.4.3') < 0) {
-      setClassFeatures();
-    }
-    if (versionCompare(version, '2.4.4') < 0) {
-      updateSkill();
-      updateAttack();
-      updateSpell();
-    }
-    if (versionCompare(version, '2.4.7') < 0) {
-      classFeaturesToTraits();
-      updateAction('trait');
+      if (versionCompare(version, '2.0.14') < 0) {
+        updateSkill();
+        updateSavingThrows();
+      }
+      if (versionCompare(version, '2.1.0') < 0) {
+        updateNPCChallenge();
+        updateDamageVulnerabilities();
+        updateDamageResistances();
+        updateDamageImmunities();
+        updateConditionImmunities();
+        updateLanguages();
+        updateSenses();
+      }
+      if (versionCompare(version, '2.1.3') < 0) {
+        updateType();
+        updateAlignment();
+      }
+      if (versionCompare(version, '2.1.5') < 0) {
+        updateLevels();
+        updateNPCAC();
+        updateLanguageSelection();
+      }
+      if (versionCompare(version, '2.1.7') < 0) {
+        setSkillStorageNames();
+      }
+      if (versionCompare(version, '2.1.10') < 0) {
+        updateSavingThrows();
+        updateAttack();
+      }
+      if (versionCompare(version, '2.1.11') < 0) {
+        updateLevels();
+        updateAbilityChecksMacro();
+      }
+      if (versionCompare(version, '2.1.13') < 0) {
+        weighEquipment();
+        updateSpell();
+      }
+      if (versionCompare(version, '2.1.14') < 0) {
+        updateLevels();
+      }
+      if (versionCompare(version, '2.1.15') < 0) {
+        updateLevels();
+        displayTextForTraits();
+      }
+      if (versionCompare(version, '2.2.1') < 0) {
+        updateAbilityModifiers();
+      }
+      if (versionCompare(version, '2.2.2') < 0) {
+        resourcesToTraits();
+      }
+      if (versionCompare(version, '2.2.4') < 0) {
+        updateInitiative();
+      }
+      if (versionCompare(version, '2.2.5') < 0) {
+        weighAmmo();
+      }
+      if (versionCompare(version, '2.2.6') < 0) {
+        updateLevels();
+        extasToExtrasFix('repeating_attack');
+        extasToExtrasFix('repeating_action');
+        extasToExtrasFix('repeating_spell');
+      }
+      if (versionCompare(version, '2.2.8') < 0) {
+        updateAttack();
+      }
+      if (versionCompare(version, '2.2.11') < 0) {
+        setClassFeatures();
+      }
+      if (versionCompare(version, '2.2.12') < 0) {
+        updateAbilityChecksMacro();
+      }
+      if (versionCompare(version, '2.2.15') < 0) {
+        updateAbilityChecksMacro();
+        updatePreAndPostRoll();
+      }
+      if (versionCompare(version, '2.2.19') < 0) {
+        updateAbilityModifiers();
+        updateSpell();
+      }
+      if (versionCompare(version, '2.3.3') < 0) {
+        updateAttachers();
+      }
+      if (versionCompare(version, '2.4.2') < 0) {
+        updateAbilityModifiers();
+        updateSkill();
+        updateActionChatMacro('trait');
+        updateActionChatMacro('action');
+        updateActionChatMacro('reaction');
+        updateActionChatMacro('legendaryaction');
+        updateActionChatMacro('lairaction');
+        updateActionChatMacro('regionaleffect');
+        updateDamageResistancesVar();
+      }
+      if (versionCompare(version, '2.4.3') < 0) {
+        setClassFeatures();
+      }
+      if (versionCompare(version, '2.4.4') < 0) {
+        updateSkill();
+        updateAttack();
+        updateSpell();
+      }
+      if (versionCompare(version, '2.4.7') < 0) {
+        classFeaturesToTraits();
+        updateAction('trait');
+      }
     }
 
     if (!version || version !== currentVersion) {
