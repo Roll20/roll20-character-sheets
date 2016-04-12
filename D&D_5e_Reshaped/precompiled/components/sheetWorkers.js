@@ -1,7 +1,7 @@
 /* global setAttrs:false, getAttrs:false, on:false, getSectionIDs:false, generateRowID:false */
 'use strict';
 
-const currentVersion = '2.4.7';
+const currentVersion = '2.4.8';
 let TRANSLATIONS;
 const SKILLS = {
   acrobatics: 'dexterity',
@@ -4866,6 +4866,19 @@ const extasToExtrasFix = (repeatingItem) => {
   });
 };
 
+const fixRollTwo = () => {
+  const collectionArray = ['roll_setting'];
+  const finalSetAttrs = {};
+
+  getAttrs(collectionArray, (v) => {
+    if (v.roll_setting === '@{attr_roll_2}') {
+      finalSetAttrs.roll_setting = '@{roll_2}';
+    }
+    setFinalAttrs(v, finalSetAttrs);
+  });
+};
+
+
 const importData = () => {
   getAttrs(['import_data'], v => {
     if (v.import_data) {
@@ -5066,6 +5079,9 @@ const sheetOpened = () => {
         classFeaturesToTraits();
         updateAction('trait');
       }
+    }
+    if (versionCompare(version, '2.4.8') < 0) {
+      fixRollTwo();
     }
 
     if (!version || version !== currentVersion) {
