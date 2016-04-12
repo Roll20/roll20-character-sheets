@@ -1,7 +1,7 @@
 /* global setAttrs:false, getAttrs:false, on:false, getSectionIDs:false, generateRowID:false */
 'use strict';
 
-const currentVersion = '2.4.9';
+const currentVersion = '2.4.10';
 let TRANSLATIONS;
 const SKILLS = {
   acrobatics: 'dexterity',
@@ -5079,12 +5079,12 @@ const sheetOpened = () => {
         classFeaturesToTraits();
         updateAction('trait');
       }
-    }
-    if (versionCompare(version, '2.4.8') < 0) {
-      fixRollTwo();
+      if (versionCompare(version, '2.4.8') < 0) {
+        fixRollTwo();
+      }
     }
 
-    if (!version || version !== currentVersion) {
+    if (isUndefined(version) || !version || version !== currentVersion) {
       finalSetAttrs.version = currentVersion;
     }
 
