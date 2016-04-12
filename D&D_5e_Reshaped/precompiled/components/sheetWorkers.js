@@ -4866,6 +4866,19 @@ const extasToExtrasFix = (repeatingItem) => {
   });
 };
 
+const fixRollTwo = () => {
+  const collectionArray = ['roll_setting'];
+  const finalSetAttrs = {};
+
+  getAttrs(collectionArray, (v) => {
+    if (v.roll_setting === '@{attr_roll_2}') {
+      finalSetAttrs.roll_setting = '@{roll_2}';
+    }
+    setFinalAttrs(v, finalSetAttrs);
+  });
+};
+
+
 const importData = () => {
   getAttrs(['import_data'], v => {
     if (v.import_data) {
@@ -5073,6 +5086,9 @@ const sheetOpened = () => {
     if (versionCompare(version, '2.4.7') < 0) {
       classFeaturesToTraits();
       updateAction('trait');
+    }
+    if (versionCompare(version, '2.4.8') < 0) {
+      fixRollTwo();
     }
 
     if (!version || version !== currentVersion) {
