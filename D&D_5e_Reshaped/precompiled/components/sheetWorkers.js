@@ -1,7 +1,7 @@
 /* global setAttrs:false, getAttrs:false, on:false, getSectionIDs:false, generateRowID:false */
 'use strict';
 
-const currentVersion = '2.4.11';
+const currentVersion = '2.4.12';
 let TRANSLATIONS;
 const SKILLS = {
   acrobatics: 'dexterity',
@@ -4945,6 +4945,7 @@ const sheetOpened = () => {
         finalSetAttrs.edit_mode = 'on';
       }
       finalSetAttrs.roll_info = '';
+      finalSetAttrs.roll_setting = '@{roll_1}';
       const setAbilities = {};
       if (isUndefined(v.strength)) {
         setAbilities.strength = 10;
