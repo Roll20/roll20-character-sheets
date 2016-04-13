@@ -2701,12 +2701,16 @@ const updateHigherLevelToggle = (v, finalSetAttrs, repeatingString) => {
 
     const damageToggle = v[`${repeatingString}damage_toggle`];
     if (damageToggle && damageToggle === '@{damage_toggle_var}') {
-      finalSetAttrs[`${repeatingString}damage_formula`] += ' + ((@{higher_level_query} - @{spell_level}) * @{higher_level_dice})@{higher_level_die}[higher lvl]';
+      const higherLevelDamage = '((@{higher_level_query} - @{spell_level}) * @{higher_level_dice})@{higher_level_die}[higher lvl]';
+      finalSetAttrs[`${repeatingString}damage_formula`] += addArithmeticOperator(finalSetAttrs[`${repeatingString}damage_formula`], higherLevelDamage);;
+      finalSetAttrs[`${repeatingString}damage_crit_formula`] = higherLevelDamage;
     }
 
     const secondDamageToggle = v[`${repeatingString}second_damage_toggle`];
     if (secondDamageToggle && secondDamageToggle === '@{second_damage_toggle_var}') {
-      finalSetAttrs[`${repeatingString}second_damage_formula`] += ' + ((@{higher_level_query} - @{spell_level}) * @{second_higher_level_dice})@{second_higher_level_die}[higher lvl]';
+      const higherLevelSecondDamage = '((@{higher_level_query} - @{spell_level}) * @{second_higher_level_dice})@{second_higher_level_die}[higher lvl]';
+      finalSetAttrs[`${repeatingString}second_damage_formula`] += addArithmeticOperator(finalSetAttrs[`${repeatingString}second_damage_formula`], higherLevelSecondDamage);
+      finalSetAttrs[`${repeatingString}second_damage_crit_formula`] = higherLevelSecondDamage;
     }
 
     const healToggle = v[`${repeatingString}heal_toggle`];
@@ -5081,6 +5085,9 @@ const sheetOpened = () => {
       }
       if (versionCompare(version, '2.4.8') < 0) {
         fixRollTwo();
+      }
+      if (versionCompare(version, '2.4.11') < 0) {
+        updateSpell();
       }
     }
 
