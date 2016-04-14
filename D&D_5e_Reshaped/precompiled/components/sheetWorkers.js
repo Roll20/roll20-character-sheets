@@ -2081,12 +2081,10 @@ const sumRepeating = (options, sumItems) => {
           }
           if (sumItem.armorType) {
             if (!v[repeatingString + sumItem.armorType] || v[repeatingString + sumItem.armorType] === 'Light Armor') {
-              fieldToAdd += Math.min(5, dexMod);
+              fieldToAdd += dexMod;
             } else if (v[repeatingString + sumItem.armorType] === 'Medium Armor') {
               const mediumArmorDexMod = getIntValue(v.medium_armor_max_dex, 2);
               fieldToAdd += Math.min(mediumArmorDexMod, dexMod);
-            } else if (v[repeatingString + sumItem.armorType] === 'Armor + Dex') {
-              fieldToAdd += dexMod;
             }
           }
 
@@ -4870,6 +4868,31 @@ const extasToExtrasFix = (repeatingItem) => {
   });
 };
 
+const armorPlusDexRemoval = () => {
+  const repeatingItem = 'repeating_armor';
+  const collectionArray = [];
+  const finalSetAttrs = {};
+
+  getSectionIDs(repeatingItem, (ids) => {
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
+      collectionArray.push(`${repeatingString}type`);
+    }
+
+    getAttrs(collectionArray, (v) => {
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
+
+        const armorType = v[`${repeatingString}type`];
+        if (armorType === 'Armor + Dex') {
+          finalSetAttrs[`${repeatingString}type`] = 'Light Armor';
+        }
+      }
+      setFinalAttrs(v, finalSetAttrs);
+    });
+  });
+};
+
 const fixRollTwo = () => {
   const collectionArray = ['roll_setting'];
   const finalSetAttrs = {};
@@ -4881,7 +4904,6 @@ const fixRollTwo = () => {
     setFinalAttrs(v, finalSetAttrs);
   });
 };
-
 
 const importData = () => {
   getAttrs(['import_data'], v => {
@@ -4978,7 +5000,6 @@ const sheetOpened = () => {
       if (versionCompare(version, '2.0.10') < 0) {
         updateAbilityModifiers();
       }
-
       if (versionCompare(version, '2.0.14') < 0) {
         updateSkill();
         updateSavingThrows();
@@ -5089,6 +5110,10 @@ const sheetOpened = () => {
       }
       if (versionCompare(version, '2.4.11') < 0) {
         updateSpell();
+      }
+      if (versionCompare(version, '2.4.12') < 0) {
+        armorPlusDexRemoval();
+        updateArmor();
       }
     }
 
