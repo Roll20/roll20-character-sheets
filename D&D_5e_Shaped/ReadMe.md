@@ -1,4 +1,4 @@
-# D&D 5e Character Sheet
+# D&D 5e Shaped Character Sheet
 
 This is the redesigned Shaped character sheet for use on Roll20.net with the 5th edition of Dungeons & Dragons (5e). The sheet is designed to be usable by all Roll20 users regardless of subscription level.
 
