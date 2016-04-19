@@ -34,11 +34,11 @@ Please report any bugs in the [issues tab](https://github.com/mlenser/roll20-cha
 
 ## How to Update the sheet yourself (as Pro):
 
-1. Copy the [html](https://raw.githubusercontent.com/mlenser/roll20-character-sheets/master/D%26D_5e_Shaped/D%26D_5e.html) from github
+1. Copy the [html](https://raw.githubusercontent.com/mlenser/roll20-character-sheets/master/5eShaped/D%26D_5e.html) from github
 2. In Roll20 go to campaign settings and choose a custom character sheet.
 3. Choose D&D 5e as the SRD
 4. In the HTML tab paste the HTML code
-5. Copy the [css](https://raw.githubusercontent.com/mlenser/roll20-character-sheets/master/D%26D_5e_Shaped/D%26D_5e.css) from github
+5. Copy the [css](https://raw.githubusercontent.com/mlenser/roll20-character-sheets/master/5eShaped/D%26D_5e.css) from github
 6. On Roll20 in the CSS tab paste the CSS code.
 7. Hit save.
 
