@@ -26,8 +26,8 @@ Please report any bugs in the [issues tab](https://github.com/mlenser/roll20-cha
 * Attachers can be used to remind yourself to add to saving throws while within 10 feet of your paladin
 * Extra features: Jack of all trades, halfling luck, vision, movement, appearance.
 * **Settings** for how to output all rolls, death saves, initiative, etc
-..* Roll settings to choose to always roll with advantage, disadvantage, or query for both
-..* Optional bonuses to all skills, abilities, saving throws, etc.
+  * Roll settings to choose to always roll with advantage, disadvantage, or query for both
+  * Optional bonuses to all skills, abilities, saving throws, etc.
 
 ![PC sheet](http://i.imgur.com/T2hbvnA.jpg "PC sheet")
 ![NPC sheet](http://i.imgur.com/li1ETpJ.jpg "NPC sheet")
@@ -45,7 +45,6 @@ Please report any bugs in the [issues tab](https://github.com/mlenser/roll20-cha
 ## Contribute
 Since many have asked for it: If you appreciate what I do and want to compensate me for the countless hours that I have spent building this character sheet feel free to support me on Patreon or Paypal (mlenser@gmail.com).
 Thanks so much for your support.
-
 
 ---
 
