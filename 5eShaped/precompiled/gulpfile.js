@@ -88,7 +88,7 @@ function duplicate(file, limit, start) {
 }
 
 gulp.task('preCompile', function () {
-	return gulp.src('./D&D_5e.html')
+	return gulp.src('./5eShaped.html')
 		.pipe(include())
 		.pipe(replaceTask({
 			patterns: [
@@ -117,7 +117,7 @@ const sassConfig = {
 };
 
 gulp.task('sass', function () {
-	return gulp.src('./D&D_5e.scss')
+	return gulp.src('./5eShaped.scss')
 		/*
 		.pipe(sassLint(sassConfig))
 		.pipe(sassLint.format())
@@ -177,7 +177,7 @@ gulp.task('compileJS', function() {
 });
 
 gulp.task('compile', ['preCompile', 'sass', 'compileJS'], function () {
-	return gulp.src(['../D&D_5e.html', './sheetWorkers.js', './components/rollTemplate.html'])
-		.pipe(concat('D&D_5e.html'))
+	return gulp.src(['../5eShaped.html', './sheetWorkers.js', './components/rollTemplate.html'])
+		.pipe(concat('5eShaped.html'))
 		.pipe(gulp.dest('../'));
 });
