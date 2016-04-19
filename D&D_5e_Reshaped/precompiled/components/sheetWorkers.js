@@ -1571,9 +1571,6 @@ const updateSpellSlots = () => {
   getAttrs(collectionArray, (v) => {
     let casterLevel = getIntValue(v.caster_level);
     let casterType = v.caster_type;
-    if (isUndefined(casterType)) {
-      casterType = 'full';
-    }
 
     if (casterType === 'full') {
       casterLevel = getIntValue(v.caster_level);
@@ -1951,8 +1948,6 @@ const updateLevels = (changedField) => {
         finalSetAttrs.caster_type = 'half';
       } else if (spellcasting.third) {
         finalSetAttrs.caster_type = 'third';
-      } else {
-        finalSetAttrs.caster_type = 'full';
       }
 
       setFinalAttrs(v, finalSetAttrs, () => {
