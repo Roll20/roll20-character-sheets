@@ -1862,7 +1862,9 @@ const updateLevels = (changedField) => {
         if (isUndefined(classSpellcasting) || changedField === 'name') {
           if (defaultClassDetails.hasOwnProperty(className)) {
             classSpellcasting = defaultClassDetails[className].spellcasting;
-            finalSetAttrs[`${repeatingString}spellcasting`] = classSpellcasting;
+            if (classSpellcasting) {
+              finalSetAttrs[`${repeatingString}spellcasting`] = classSpellcasting;
+            }
           } else {
             finalSetAttrs[`${repeatingString}spellcasting`] = 'none';
           }
