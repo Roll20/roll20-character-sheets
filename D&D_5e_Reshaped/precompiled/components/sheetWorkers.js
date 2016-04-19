@@ -1,7 +1,7 @@
 /* global setAttrs:false, getAttrs:false, on:false, getSectionIDs:false, generateRowID:false */
 'use strict';
 
-const currentVersion = '2.4.13';
+const currentVersion = '2.4.14';
 let TRANSLATIONS;
 const SKILLS = {
   acrobatics: 'dexterity',
@@ -1571,9 +1571,6 @@ const updateSpellSlots = () => {
   getAttrs(collectionArray, (v) => {
     let casterLevel = getIntValue(v.caster_level);
     let casterType = v.caster_type;
-    if (isUndefined(casterType)) {
-      casterType = 'full';
-    }
 
     if (casterType === 'full') {
       casterLevel = getIntValue(v.caster_level);
@@ -1708,7 +1705,7 @@ const updateSpellSlots = () => {
   });
 };
 
-const updateLevels = (changedField) => {
+const updateLevels = (repeatingInfo) => {
   const repeatingItem = 'repeating_class';
   const collectionArray = ['is_npc', 'lang', 'caster_level', 'caster_type', 'class_and_level', 'level', 'xp_next_level'];
   const finalSetAttrs = {};
@@ -1849,7 +1846,7 @@ const updateLevels = (changedField) => {
         }
 
         let classHd = v[`${repeatingString}hd`];
-        if (isUndefined(classHd) || changedField === 'name') {
+        if (isUndefined(classHd) || repeatingInfo.field === 'name') {
           if (defaultClassDetails.hasOwnProperty(className)) {
             classHd = defaultClassDetails[className].hd;
           } else {
@@ -1862,10 +1859,12 @@ const updateLevels = (changedField) => {
         }
 
         let classSpellcasting = v[`${repeatingString}spellcasting`];
-        if (isUndefined(classSpellcasting) || changedField === 'name') {
+        if ((isUndefined(classSpellcasting) || repeatingInfo.field === 'name') && id === repeatingInfo.rowId) {
           if (defaultClassDetails.hasOwnProperty(className)) {
             classSpellcasting = defaultClassDetails[className].spellcasting;
-            finalSetAttrs[`${repeatingString}spellcasting`] = classSpellcasting;
+            if (classSpellcasting) {
+              finalSetAttrs[`${repeatingString}spellcasting`] = classSpellcasting;
+            }
           } else {
             finalSetAttrs[`${repeatingString}spellcasting`] = 'none';
           }
@@ -1951,8 +1950,6 @@ const updateLevels = (changedField) => {
         finalSetAttrs.caster_type = 'half';
       } else if (spellcasting.third) {
         finalSetAttrs.caster_type = 'third';
-      } else {
-        finalSetAttrs.caster_type = 'full';
       }
 
       setFinalAttrs(v, finalSetAttrs, () => {
@@ -1966,7 +1963,7 @@ const updateLevels = (changedField) => {
 on('change:repeating_class', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_class', eventInfo);
   if (repeatingInfo) {
-    updateLevels(repeatingInfo.field);
+    updateLevels(repeatingInfo);
   }
 });
 on('remove:repeating_class', () => {
