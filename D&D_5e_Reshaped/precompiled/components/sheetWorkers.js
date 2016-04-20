@@ -1,6 +1,7 @@
+/* global setAttrs:false, getAttrs:false, on:false, getSectionIDs:false, generateRowID:false */
 'use strict';
 
-const currentVersion = '2.2.16';
+const currentVersion = '2.4.13';
 let TRANSLATIONS;
 const SKILLS = {
   acrobatics: 'dexterity',
@@ -83,7 +84,7 @@ const getFloatValue = (value, defaultValue) => {
   return parseFloat(value) || defaultValue;
 };
 const exists = (value) => {
-  if (!value || value === '' || value === '0' || value === 0) {
+  if (isUndefined(value) || value === '' || value === '0' || value === 0) {
     return false;
   }
   return true;
@@ -144,7 +145,7 @@ const isEmpty = (obj) => {
   }
   return true;
 };
-const setFinalAttrs = (v, finalSetAttrs) => {
+const setFinalAttrs = (v, finalSetAttrs, callback) => {
   if (!isEmpty(finalSetAttrs)) {
     for (const key in finalSetAttrs) {
       if (finalSetAttrs.hasOwnProperty(key)) {
@@ -154,10 +155,14 @@ const setFinalAttrs = (v, finalSetAttrs) => {
       }
     }
     if (!isEmpty(finalSetAttrs)) {
-      console.log('finalSetAttrs', finalSetAttrs);
+      console.info('finalSetAttrs', finalSetAttrs);
     }
     if (!isEmpty(finalSetAttrs)) {
-      setAttrs(finalSetAttrs);
+      if (callback) {
+        setAttrs(finalSetAttrs, {}, callback);
+      } else {
+        setAttrs(finalSetAttrs);
+      }
     }
   }
 };
@@ -177,8 +182,8 @@ const parseAttackComponent = (v, repeatingString, finalSetAttrs, options) => {
   if (isUndefined(parsed) || parsed.indexOf(options.parseName) === -1) {
     let aTriggerFieldExists = false;
 
-    for (let i = 0; i < options.triggerFields.length; i++) {
-      if (exists(v[repeatingString + options.triggerFields[i]])) {
+    for (const triggerField of options.triggerFields) {
+      if (exists(v[repeatingString + triggerField])) {
         aTriggerFieldExists = true;
       }
     }
@@ -195,10 +200,10 @@ const parseAttackComponent = (v, repeatingString, finalSetAttrs, options) => {
     }
 
     if (options.addCastingModifier) {
-      if (exists(v[`${repeatingString}damage`]) && isUndefined(v[`${repeatingString}damage_ability`])) {
+      if (!isUndefined(v[`${repeatingString}damage`]) && isUndefined(v[`${repeatingString}damage_ability`])) {
         finalSetAttrs[`${repeatingString}damage_ability`] = v.default_ability;
       }
-      if (exists(v[`${repeatingString}heal`]) && isUndefined(v[`${repeatingString}heal_ability`])) {
+      if (!isUndefined(v[`${repeatingString}heal`]) && isUndefined(v[`${repeatingString}heal_ability`])) {
         finalSetAttrs[`${repeatingString}heal_ability`] = v.default_ability;
       }
     }
@@ -280,13 +285,13 @@ const versionCompare = (v1, v2, options) => {
 const getAbilityMod = (score) => {
   return Math.floor((getIntValue(score) - 10) / 2);
 };
-const addOrSubtract = (string, number) => {
+const addArithmeticOperator = (string, number) => {
   let value = number;
-  if (string && value) {
-    if (value >= 0) {
-      value = ` + ${value}`;
+  if (string) {
+    if (number < 0) {
+      value = ` - ${Math.abs(number)}`;
     } else {
-      value = ` - ${Math.abs(value)}`;
+      value = ` + ${number}`;
     }
   }
   return value;
@@ -295,9 +300,6 @@ const numberWithCommas = (x) => {
   const parts = x.toString().split('.');
   parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   return parts.join('.');
-};
-const lowercaseWords = (string) => {
-  return string.toLowerCase();
 };
 const findClosest = (array, goal) => {
   return array.reduce((prev, curr) => {
@@ -387,9 +389,18 @@ const lowercaseDamageTypes = (string) => {
     .replace('Silvered', 'silvered')
     .replace('Adamantine', 'adamantine');
 };
+const showSign = (value) => {
+  if (value >= 0) {
+    value = `+${value}`;
+  }
+  return value;
+};
 
-on('change:cp change:sp change:ep change:gp change:pp', () => {
-  getAttrs(['cp', 'copper_per_gold', 'sp', 'silver_per_gold', 'ep', 'electrum_per_gold', 'gp', 'pp', 'platinum_per_gold'], (v) => {
+const calculateGold = () => {
+  const collectionArray = ['cp', 'copper_per_gold', 'sp', 'silver_per_gold', 'ep', 'electrum_per_gold', 'gp', 'pp', 'platinum_per_gold'];
+  const finalSetAttrs = {};
+
+  getAttrs(collectionArray, (v) => {
     const copperPieces = getFloatValue(v.cp);
     const silverPieces = getFloatValue(v.sp);
     const electrumPieces = getFloatValue(v.ep);
@@ -399,13 +410,15 @@ on('change:cp change:sp change:ep change:gp change:pp', () => {
     const silverPerGold = getFloatValue(v.silver_per_gold, 10);
     const electrumPerGold = getFloatValue(v.electrum_per_gold, 2);
     const platinumPerGold = getFloatValue(v.platinum_per_gold, 10);
-    const totalGold = (copperPieces / copperPerGold) + (silverPieces / silverPerGold) + (electrumPieces / electrumPerGold) + goldPieces + (platinumPieces * platinumPerGold);
-    const coinWeight = (copperPieces + silverPieces + electrumPieces + goldPieces + platinumPieces) / 50;
-    setAttrs({
-      total_gp: totalGold.toFixed(2),
-      weight_coinage: coinWeight,
-    });
+
+    finalSetAttrs.total_gp = ((copperPieces / copperPerGold) + (silverPieces / silverPerGold) + (electrumPieces / electrumPerGold) + goldPieces + (platinumPieces * platinumPerGold)).toFixed(2);
+    finalSetAttrs.weight_coinage = (copperPieces + silverPieces + electrumPieces + goldPieces + platinumPieces) / 50;
+
+    setFinalAttrs(v, finalSetAttrs);
   });
+};
+on('change:cp change:copper_per_gold change:sp change:silver_per_gold change:ep change:electrum_per_gold change:gp change:pp change:platinum_per_gold', () => {
+  calculateGold();
 });
 
 const updateAbilityModifier = (ability) => {
@@ -416,6 +429,7 @@ const updateAbilityModifier = (ability) => {
     collectionArray.push('finesse_mod');
   }
   if (ability === 'strength') {
+    collectionArray.push('weight_multiplier');
     collectionArray.push('carrying_capacity');
     collectionArray.push('max_push_drag_lift');
     collectionArray.push('encumbered');
@@ -425,46 +439,52 @@ const updateAbilityModifier = (ability) => {
   getAttrs(collectionArray, (v) => {
     const abilityScore = getIntValue(v[ability]);
     const abilityBonus = getIntValue(v[`${ability}_bonus`]);
+    const globalAbilityBonus = v.global_ability_bonus;
+    let abilityScoreCalc = abilityScore + abilityBonus;
+
+    if (!isNaN(globalAbilityBonus)) {
+      abilityScoreCalc += getIntValue(globalAbilityBonus);
+    }
+
     const abilityCheckBonus = getIntValue(v[`${ability}_check_bonus`]);
-    const globalAbilityBonus = getIntValue(v.global_ability_bonus);
-    const abilityMod = getAbilityMod((abilityScore + abilityBonus + globalAbilityBonus));
+    const abilityMod = getAbilityMod(abilityScoreCalc);
 
     let abilityCheck = abilityMod;
     let abilityCheckFormula = `${abilityMod}[${firstThree(ability)} mod with bonus]`;
     if ((ability === 'strength' || ability === 'dexterity' || ability === 'constitution') && v.remarkable_athlete_toggle === '@{remarkable_athlete}') {
       const remarkableAthlete = getIntValue(v.remarkable_athlete);
       abilityCheck += remarkableAthlete;
-      abilityCheckFormula += ` + ${remarkableAthlete}[remarkable athlete]`;
+      abilityCheckFormula += `${addArithmeticOperator(abilityCheckFormula, remarkableAthlete)}[remarkable athlete]`;
     } else if (v.jack_of_all_trades_toggle === '@{jack_of_all_trades}') {
       const jackOfAllTrades = getIntValue(v.jack_of_all_trades);
       abilityCheck += jackOfAllTrades;
-      abilityCheckFormula += ` + ${jackOfAllTrades}[jack of all trades]`;
+      abilityCheckFormula += `${addArithmeticOperator(abilityCheckFormula, jackOfAllTrades)}[jack of all trades]`;
     }
     if (abilityCheckBonus) {
       abilityCheck += abilityCheckBonus;
-      abilityCheckFormula += ` + ${abilityCheckBonus}[${ability} check bonus]`;
+      abilityCheckFormula += `${addArithmeticOperator(abilityCheckFormula, abilityCheckBonus)}[${ability} check bonus]`;
     }
-    if (!isNaN(v.global_check_bonus)) {
-      abilityCheck += getIntValue(v.global_check_bonus);
-    }
-    abilityCheckFormula += ' + (@{global_check_bonus})[global check bonus]';
-
-    let abilityModWithSign = abilityMod;
-    if (abilityMod >= 0) {
-      abilityModWithSign = `+${abilityMod}`;
+    if (v.global_check_bonus) {
+      if (!isNaN(v.global_check_bonus)) {
+        abilityCheck += getIntValue(v.global_check_bonus);
+      }
+      abilityCheckFormula += ' + (@{global_check_bonus})[global check bonus]';
     }
 
+    finalSetAttrs[`${ability}_calculated`] = abilityScoreCalc;
     finalSetAttrs[`${ability}_mod`] = abilityMod;
-    finalSetAttrs[`${ability}_mod_with_sign`] = abilityModWithSign;
+    finalSetAttrs[`${ability}_mod_with_sign`] = showSign(abilityMod);
     finalSetAttrs[`${ability}_check_mod`] = abilityCheck;
+    finalSetAttrs[`${ability}_check_mod_with_sign`] = showSign(abilityCheck);
     finalSetAttrs[`${ability}_check_mod_formula`] = abilityCheckFormula;
 
     if (ability === 'strength') {
       finalSetAttrs.finesse_mod = Math.max(abilityMod, getIntValue(v.dexterity_mod));
-      finalSetAttrs.carrying_capacity = abilityScore * 15;
-      finalSetAttrs.max_push_drag_lift = abilityScore * 30;
-      finalSetAttrs.encumbered = abilityScore * 5;
-      finalSetAttrs.heavily_encumbered = abilityScore * 10;
+      const weightMultiplier = getFloatValue(v.weight_multiplier, 1);
+      finalSetAttrs.carrying_capacity = abilityScore * 15 * weightMultiplier;
+      finalSetAttrs.max_push_drag_lift = abilityScore * 30 * weightMultiplier;
+      finalSetAttrs.encumbered = abilityScore * 5 * weightMultiplier;
+      finalSetAttrs.heavily_encumbered = abilityScore * 10 * weightMultiplier;
     } else if (ability === 'dexterity') {
       finalSetAttrs.finesse_mod = Math.max(abilityMod, getIntValue(v.strength_mod));
     }
@@ -479,26 +499,31 @@ const updateAbilityModifiers = () => {
   updateAbilityModifier('wisdom');
   updateAbilityModifier('charisma');
 };
-on('change:strength change:strength_bonus change:strength_check_mod change:strength_check_bonus change:jack_of_all_trades_toggle change:jack_of_all_trades change:remarkable_athlete_toggle change:remarkable_athlete change:global_ability_bonus', () => {
+
+on('change:jack_of_all_trades_toggle change:jack_of_all_trades change:global_ability_bonus change:global_check_bonus', () => {
+  updateAbilityModifiers();
+});
+on('change:strength change:strength_bonus change:strength_check_mod change:strength_check_bonus change:remarkable_athlete_toggle change:remarkable_athlete change:weight_multiplier', () => {
   updateAbilityModifier('strength');
 });
-on('change:dexterity change:dexterity_bonus change:dexterity_check_mod change:dexterity_check_bonus change:jack_of_all_trades_toggle change:jack_of_all_trades change:remarkable_athlete_toggle change:remarkable_athlete change:global_ability_bonus', () => {
+on('change:dexterity change:dexterity_bonus change:dexterity_check_mod change:dexterity_check_bonus change:remarkable_athlete_toggle change:remarkable_athlete', () => {
   updateAbilityModifier('dexterity');
 });
-on('change:constitution change:constitution_bonus change:constitution_check_mod change:constitution_check_bonus change:jack_of_all_trades_toggle change:jack_of_all_trades change:remarkable_athlete_toggle change:remarkable_athlete change:global_ability_bonus', () => {
+on('change:constitution change:constitution_bonus change:constitution_check_mod change:constitution_check_bonus change:remarkable_athlete_toggle change:remarkable_athlete', () => {
   updateAbilityModifier('constitution');
 });
-on('change:intelligence change:intelligence_bonus change:intelligence_check_mod change:intelligence_check_bonus change:jack_of_all_trades_toggle change:jack_of_all_trades change:global_ability_bonus', () => {
+on('change:intelligence change:intelligence_bonus change:intelligence_check_mod change:intelligence_check_bonus', () => {
   updateAbilityModifier('intelligence');
 });
-on('change:wisdom change:wisdom_bonus change:wisdom_check_mod change:wisdom_check_bonus change:jack_of_all_trades_toggle change:jack_of_all_trades change:global_ability_bonus', () => {
+on('change:wisdom change:wisdom_bonus change:wisdom_check_mod change:wisdom_check_bonus', () => {
   updateAbilityModifier('wisdom');
 });
-on('change:charisma change:charisma_bonus change:charisma_check_mod change:charisma_check_bonus change:jack_of_all_trades_toggle change:jack_of_all_trades change:global_ability_bonus', () => {
+on('change:charisma change:charisma_bonus change:charisma_check_mod change:charisma_check_bonus', () => {
   updateAbilityModifier('charisma');
 });
 
-const setClassFeatureOrTrait = (repeatingItem, obj) => {
+const setTrait = (obj) => {
+  const repeatingItem = 'repeating_trait';
   const collectionArray = [];
   const finalSetAttrs = {};
   let itemId;
@@ -508,8 +533,8 @@ const setClassFeatureOrTrait = (repeatingItem, obj) => {
   }
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}storage_name`);
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}uses`);
@@ -530,11 +555,11 @@ const setClassFeatureOrTrait = (repeatingItem, obj) => {
 
     getAttrs(collectionArray, (v) => {
       let repeatingString;
-      for (let j = 0; j < ids.length; j++) {
-        repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (const id of ids) {
+        repeatingString = `${repeatingItem}_${id}_`;
 
         if (v[`${repeatingString}storage_name`] === obj.storageName) {
-          itemId = ids[j];
+          itemId = id;
         }
       }
       if (!itemId) {
@@ -559,8 +584,12 @@ const setClassFeatureOrTrait = (repeatingItem, obj) => {
         }
       } else {
         for (const prop in obj) {
-          if (obj.hasOwnProperty(prop) && v[`${repeatingString}${prop}`] !== obj[prop]) {
-            finalSetAttrs[`${repeatingString}${prop}`] = obj[prop];
+          if (obj.hasOwnProperty(prop)) {
+            if ((prop === 'name' || prop === 'freetext') && (isUndefined(v[`${repeatingString}${prop}`]) || calculatePercentDifference(v[`${repeatingString}${prop}`].length, obj[prop].length) < 10)) {
+              finalSetAttrs[`${repeatingString}${prop}`] = obj[prop];
+            } else if (v[`${repeatingString}${prop}`] !== obj[prop]) {
+              finalSetAttrs[`${repeatingString}${prop}`] = obj[prop];
+            }
           }
         }
         if (obj.saving_throw_ability || obj.saving_throw_bonus || obj.saving_throw_vs_ability) {
@@ -589,256 +618,933 @@ const setClassFeatureOrTrait = (repeatingItem, obj) => {
     });
   });
 };
-const setClassFeature = (obj) => {
-  return setClassFeatureOrTrait('repeating_classfeature', obj);
-};
-const setTrait = (obj) => {
-  return setClassFeatureOrTrait('repeating_trait', obj);
-};
 
-const updateLevels = (changedField) => {
-  const repeatingItem = 'repeating_class';
-  const collectionArray = ['is_npc', 'lang', 'caster_level', 'caster_type', 'class_and_level', 'level', 'xp_next_level'];
+const setClassFeatures = () => {
   const finalSetAttrs = {};
+  const collectionArray = ['ac_unarmored_ability', 'lang', 'jack_of_all_trades_toggle', 'careful_spell_toggle', 'distant_spell_toggle', 'empowered_spell_toggle', 'extended_spell_toggle', 'heightened_spell_toggle', 'quickened_spell_toggle', 'subtle_spell_toggle', 'twinned_spell_toggle'];
 
-  for (let i = 0; i < CLASSES.length; i++) {
-    collectionArray.push(`${CLASSES[i]}_level`);
-    collectionArray.push(`has_${CLASSES[i]}_levels`);
+  for (const ability of ABILITIES) {
+    collectionArray.push(`${ability}_mod`);
+  }
+  for (const className of CLASSES) {
+    collectionArray.push(`${className}_level`);
   }
 
-  const defaultClassDetails = {
-    barbarian: {
-      hd: 'd12',
-    },
-    bard: {
-      hd: 'd8',
-      spellcasting: 'full',
-    },
-    cleric: {
-      hd: 'd8',
-      spellcasting: 'full',
-    },
-    druid: {
-      hd: 'd8',
-      spellcasting: 'full',
-    },
-    fighter: {
-      hd: 'd10',
-    },
-    monk: {
-      hd: 'd8',
-    },
-    paladin: {
-      hd: 'd10',
-      spellcasting: 'half',
-    },
-    ranger: {
-      hd: 'd10',
-      spellcasting: 'half',
-    },
-    rogue: {
-      hd: 'd8',
-    },
-    sorcerer: {
-      hd: 'd6',
-      spellcasting: 'full',
-    },
-    warlock: {
-      hd: 'd8',
-      spellcasting: 'warlock',
-    },
-    wizard: {
-      hd: 'd6',
-      spellcasting: 'full',
-    },
-  };
-  const hd = {
-    d20: 0,
-    d12: 0,
-    d10: 0,
-    d8: 0,
-    d6: 0,
-    d4: 0,
-    d2: 0,
-    d0: 0,
-  };
-  const spellcasting = {
-    full: 0,
-    half: 0,
-    third: 0,
-    warlock: 0,
-  };
-  let totalLevel = 0;
-  const classLevels = {};
-  let classesWithSpellcasting = 0;
-  const xpTable = [0, 300, 900, 2700, 6500, 14000, 23000, 34000, 48000, 64000, 85000, 100000, 120000, 140000, 165000, 195000, 225000, 265000, 305000, 355000, 385000, 405000, 435000, 465000, 495000, 525000, 555000, 585000, 605000, 635000, 665000];
+  getAttrs(collectionArray, (v) => {
+    const language = v.lang || 'en';
 
-  for (const key in hd) {
-    if (hd.hasOwnProperty(key)) {
-      collectionArray.push(`hd_${key}_max`);
-      collectionArray.push(`hd_${key}_query`);
-      collectionArray.push(`hd_${key}_toggle`);
-    }
-  }
-
-  getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
-      collectionArray.push(`${repeatingString}level`);
-      collectionArray.push(`${repeatingString}name`);
-      collectionArray.push(`${repeatingString}custom_name`);
-      collectionArray.push(`${repeatingString}hd`);
-      collectionArray.push(`${repeatingString}spellcasting`);
-      collectionArray.push(`${repeatingString}custom_class_toggle`);
+    if (v.fighter_level >= 5) {
+      let extraAttackTimes;
+      if (v.fighter_level >= 20) {
+        extraAttackTimes = translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_FOUR');
+      } else if (v.fighter_level >= 11) {
+        extraAttackTimes = translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_THREE');
+      } else {
+        extraAttackTimes = translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_TWICE');
+      }
+      setTrait({
+        freetext: translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_TEXT').replace('NUMBER_OF_TIMES', extraAttackTimes),
+        name: translate(language, 'CLASS_FEATURES.EXTRA_ATTACK'),
+        storageName: 'Extra Attack',
+      });
+    } else if (v.barbarian_level >= 5 || v.monk_level >= 5 || v.paladin_level >= 5 || v.ranger_level >= 5) {
+      setTrait({
+        freetext: translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_TEXT').replace('NUMBER_OF_TIMES', translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_TWICE')),
+        name: translate(language, 'CLASS_FEATURES.EXTRA_ATTACK'),
+        storageName: 'Extra Attack',
+      });
     }
 
-    getAttrs(collectionArray, (v) => {
-      for (let i = 0; i < CLASSES.length; i++) {
-        finalSetAttrs[`${CLASSES[i]}_level`] = 0;
+    if (v.barbarian_level) {
+      let rageUses;
+      if (v.barbarian_level >= 20) {
+        rageUses = 999999;
+      } else if (v.barbarian_level >= 17) {
+        rageUses = 6;
+      } else if (v.barbarian_level >= 12) {
+        rageUses = 5;
+      } else if (v.barbarian_level >= 6) {
+        rageUses = 4;
+      } else if (v.barbarian_level >= 3) {
+        rageUses = 3;
+      } else {
+        rageUses = 2;
       }
 
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      let rageDamage;
+      if (v.barbarian_level >= 16) {
+        rageDamage = 4;
+      } else if (v.barbarian_level >= 9) {
+        rageDamage = 3;
+      } else {
+        rageDamage = 2;
+      }
+      setTrait({
+        freetext: translate(language, 'CLASS_FEATURES.RAGE_TEXT').replace('RAGE_DAMAGE', rageDamage),
+        name: translate(language, 'CLASS_FEATURES.RAGE'),
+        recharge: 'Long Rest',
+        storageName: 'Rage',
+        uses_max: rageUses,
+      });
 
-        let className = v[`${repeatingString}name`];
-        const classLevel = getIntValue(v[`${repeatingString}level`]);
+      if (isUndefined(v.ac_unarmored_ability)) {
+        finalSetAttrs.ac_unarmored_ability = '@{constitution_mod}';
+      }
+      setTrait({
+        freetext: translate(language, 'CLASS_FEATURES.UNARMORED_DEFENSE_BARBARIAN_TEXT'),
+        name: translate(language, 'CLASS_FEATURES.UNARMORED_DEFENSE'),
+        storageName: 'Unarmored Defense Barbarian',
+      });
 
-        if (isUndefined(v[`${repeatingString}name`]) && isUndefined(v[`${repeatingString}level`])) {
-          continue;
-        }
+      if (v.barbarian_level >= 2) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.RECKLESS_ATTACK_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.RECKLESS_ATTACK'),
+          storageName: 'Reckless Attack',
+        });
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.DANGER_SENSE_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.DANGER_SENSE'),
+          storageName: 'Danger Sense',
+        });
+      }
+      if (v.barbarian_level >= 5) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.FAST_MOVEMENT_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.FAST_MOVEMENT'),
+          storageName: 'Fast Movement',
+        });
+      }
+      if (v.barbarian_level >= 7) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.FERAL_INSTINCT_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.FERAL_INSTINCT'),
+          storageName: 'Feral Instinct',
+        });
+      }
+      if (v.barbarian_level >= 9) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.BRUTAL_CRITICAL_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.BRUTAL_CRITICAL'),
+          storageName: 'Brutal Critical',
+        });
+      }
+      if (v.barbarian_level >= 11) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.RELENTLESS_RAGE_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.RELENTLESS_RAGE'),
+          storageName: 'Relentless Rage',
+        });
+      }
+      if (v.barbarian_level >= 15) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.PERSISTENT_RAGE_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.PERSISTENT_RAGE'),
+          storageName: 'Persistent Rage',
+        });
+      }
+      if (v.barbarian_level >= 18) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.INDOMITABLE_MIGHT_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.INDOMITABLE_MIGHT'),
+          storageName: 'Indomitable Might',
+        });
+      }
+      if (v.barbarian_level >= 20) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.PRIMAL_CHAMPION_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.PRIMAL_CHAMPION'),
+          storageName: 'Primal Champion',
+        });
+      }
+    }
 
-        if (isUndefined(className)) {
-          className = 'barbarian';
-        }
-        if (className === 'custom') {
-          finalSetAttrs[`${repeatingString}custom_class_toggle`] = 'on';
-          const customName = v[`${repeatingString}custom_name`];
-          if (exists(customName)) {
-            className = customName;
-          } else {
-            className = 'custom';
-          }
-        } else if (v[`${repeatingString}custom_class_toggle`]) {
-          finalSetAttrs[`${repeatingString}custom_class_toggle`] = 0;
-        }
+    if (v.bard_level) {
+      let die;
+      if (v.bard_level >= 15) {
+        die = 'd12';
+      } else if (v.bard_level >= 10) {
+        die = 'd10';
+      } else if (v.bard_level >= 5) {
+        die = 'd8';
+      } else {
+        die = 'd6';
+      }
+      let recharge = 'Long Rest';
+      if (v.bard_level >= 5) {
+        recharge = 'Short Rest';
+      }
+      setTrait({
+        freetext: translate(language, 'CLASS_FEATURES.BARDIC_INSPIRATION_TEXT').replace('d6', die),
+        name: translate(language, 'CLASS_FEATURES.BARDIC_INSPIRATION'),
+        recharge,
+        storageName: 'Bardic Inspiration',
+        uses_max: Math.max(getIntValue(v.charisma_mod), 1),
+      });
 
-        if (classLevel) {
-          totalLevel += classLevel;
-          if (classLevels[capitalize(className)]) {
-            classLevels[capitalize(className)] += classLevel;
-          } else {
-            classLevels[capitalize(className)] = classLevel;
-          }
-        } else if (isUndefined(finalSetAttrs[`${className}_level`])) {
-          finalSetAttrs[`${className}_level`] = classLevel;
-        }
+      if (v.bard_level >= 2) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.JACK_OF_ALL_TRADES_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.JACK_OF_ALL_TRADES'),
+          storageName: 'Jack of All Trades',
+        });
+        finalSetAttrs.jack_of_all_trades_toggle = '@{jack_of_all_trades}';
 
-        let classHd = v[`${repeatingString}hd`];
-        if (isUndefined(classHd) || changedField === 'name') {
-          if (defaultClassDetails.hasOwnProperty(className)) {
-            classHd = defaultClassDetails[className].hd;
-          } else {
-            classHd = 'd12';
-          }
-          finalSetAttrs[`${repeatingString}hd`] = classHd;
-        }
-        if (classHd && classLevel) {
-          hd[classHd] += classLevel;
-        }
-
-        let classSpellcasting = v[`${repeatingString}spellcasting`];
-        if (isUndefined(classSpellcasting) || changedField === 'name') {
-          if (defaultClassDetails.hasOwnProperty(className)) {
-            classSpellcasting = defaultClassDetails[className].spellcasting;
-            finalSetAttrs[`${repeatingString}spellcasting`] = classSpellcasting;
-          }
+        let heal;
+        if (v.bard_level >= 17) {
+          heal = 'd12';
+        } else if (v.bard_level >= 13) {
+          heal = 'd10';
+        } else if (v.bard_level >= 9) {
+          heal = 'd8';
         } else {
-          classesWithSpellcasting += 1;
-          spellcasting[classSpellcasting] += classLevel;
+          heal = 'd6';
         }
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.SONG_OF_REST_TEXT'),
+          heal,
+          name: translate(language, 'CLASS_FEATURES.SONG_OF_REST'),
+          storageName: 'Song of Rest',
+        });
       }
+      if (v.bard_level >= 3) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.EXPERTISE_BARD_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.EXPERTISE'),
+          storageName: 'Expertise Bard',
+        });
+      }
+      if (v.bard_level >= 6) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.COUNTERCHARM_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.COUNTERCHARM'),
+          storageName: 'Countercharm',
+        });
+      }
+      if (v.bard_level >= 10) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.MAGICAL_SECRETS_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.MAGICAL_SECRETS'),
+          storageName: 'Magical Secrets',
+        });
+      }
+      if (v.bard_level >= 20) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.SUPERIOR_INSPIRATION_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.SUPERIOR_INSPIRATION'),
+          storageName: 'Superior Inspiration',
+        });
+      }
+    }
 
-      finalSetAttrs.class_and_level = '';
-      for (const className in classLevels) {
-        if (classLevels.hasOwnProperty(className)) {
-          finalSetAttrs[`${className}_level`] = classLevels[className];
-          if (finalSetAttrs.class_and_level !== '') {
-            finalSetAttrs.class_and_level += ', ';
-          }
-          finalSetAttrs.class_and_level += `${className} ${classLevels[className]}`;
+    if (v.cleric_level) {
+      if (v.cleric_level >= 2) {
+        let channelDivinityUses;
+        if (v.cleric_level >= 18) {
+          channelDivinityUses = 3;
+        } else if (v.cleric_level >= 6) {
+          channelDivinityUses = 2;
+        } else {
+          channelDivinityUses = 1;
         }
-      }
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY_CLERIC_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY'),
+          recharge: 'Short Rest',
+          storageName: 'Channel Divinity Cleric',
+          uses_max: channelDivinityUses,
+        });
 
-      finalSetAttrs.level = totalLevel;
-
-      let xpForNextLevel = 0;
-      if (!totalLevel) {
-        totalLevel = 0;
-      }
-      if (totalLevel > 30) {
-        xpForNextLevel = xpTable[30];
-      } else {
-        xpForNextLevel = xpTable[totalLevel];
-      }
-      finalSetAttrs.xp_next_level = xpForNextLevel;
-
-      for (let y = 0; y < CLASSES.length; y++) {
-        if (finalSetAttrs[`${CLASSES[y]}_level`] > 0) {
-          finalSetAttrs[`has_${CLASSES[y]}_levels`] = 1;
-        } else if (!isUndefined(v[`has_${CLASSES[y]}_levels`])) {
-          finalSetAttrs[`has_${CLASSES[y]}_levels`] = 0;
-        }
-      }
-
-      for (const key in hd) {
-        if (hd.hasOwnProperty(key)) {
-          if (hd[key] && hd[key] !== 0) {
-            finalSetAttrs[`hd_${key}_max`] = hd[key];
-            finalSetAttrs[`hd_${key}_query`] = '?{HD';
-            for (let x = 1; x <= hd[key]; x++) {
-              finalSetAttrs[`hd_${key}_query`] += `|${x}`;
-            }
-            finalSetAttrs[`hd_${key}_query`] += '}';
-            finalSetAttrs[`hd_${key}_toggle`] = 1;
+        let turnUndeadText = translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY_TURN_UNDEAD_TEXT');
+        if (v.cleric_level >= 5) {
+          let turnUndeadDestroyCR;
+          if (v.cleric_level >= 17) {
+            turnUndeadDestroyCR = '4';
+          } else if (v.cleric_level >= 14) {
+            turnUndeadDestroyCR = '3';
+          } else if (v.cleric_level >= 11) {
+            turnUndeadDestroyCR = '2';
+          } else if (v.cleric_level >= 8) {
+            turnUndeadDestroyCR = '1';
           } else {
-            if (!isUndefined(v[`hd_${key}_max`])) {
-              finalSetAttrs[`hd_${key}_max`] = 0;
-            }
-            if (!isUndefined(v[`hd_${key}_query`])) {
-              finalSetAttrs[`hd_${key}_query`] = '';
-            }
-            if (!isUndefined(v[`hd_${key}_toggle`])) {
-              finalSetAttrs[`hd_${key}_toggle`] = 0;
-            }
+            turnUndeadDestroyCR = '1/2';
           }
+          turnUndeadText += `\n${translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY_TURN_UNDEAD_TEXT_PART_2').replace('CHALLENGE_RATING', turnUndeadDestroyCR)}`;
+        }
+        setTrait({
+          freetext: turnUndeadText,
+          name: translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY_TURN_UNDEAD'),
+          saving_throw_ability: '@{wisdom_mod}',
+          saving_throw_vs_ability: 'Wisdom',
+          storageName: 'Turn Undead',
+        });
+        if (v.cleric_level >= 10) {
+          setTrait({
+            freeform: '{{text_top=[[d100]] > [[@{cleric_level}]]}}',
+            freetext: translate(language, 'CLASS_FEATURES.DIVINE_INTERVENTION_TEXT'),
+            name: translate(language, 'CLASS_FEATURES.DIVINE_INTERVENTION'),
+            storageName: 'Divine Intervention',
+            uses_max: 1,
+          });
         }
       }
+    }
 
-      let casterLevel = 0;
-      if (!v.is_npc || v.is_npc === '0' || v.is_npc === 0) {
-        casterLevel += spellcasting.full;
-        casterLevel += Math.floor(spellcasting.half / 2);
-        casterLevel += Math.floor(spellcasting.third / 3);
-        finalSetAttrs.caster_level = casterLevel;
+    if (v.druid_level) {
+      if (v.druid_level >= 2) {
+        const wildShapeHours = Math.floor(v.druid_level / 2);
+        let wildShapeUses;
+        let wildShapeCR;
+        let wildShapeLimitations;
+
+        if (v.druid_level >= 4) {
+          wildShapeCR = '1/2';
+          wildShapeLimitations = translate(language, 'CLASS_FEATURES.WILD_SHAPE_NO_FLYING');
+        } else if (v.druid_level >= 8) {
+          wildShapeCR = 1;
+          wildShapeLimitations = '';
+        } else {
+          wildShapeCR = '1/4';
+          wildShapeLimitations = translate(language, 'CLASS_FEATURES.WILD_SHAPE_NO_FLYING_OR_SWIMMING');
+        }
+        if (v.druid_level >= 20) {
+          wildShapeUses = 999999;
+        } else {
+          wildShapeUses = 2;
+        }
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.WILD_SHAPE_TEXT').replace('WILD_SHAPE_HOURS', wildShapeHours).replace('CHALLENGE_RATING', wildShapeCR).replace('LIMITATIONS', ` ${wildShapeLimitations}`),
+          name: translate(language, 'CLASS_FEATURES.WILD_SHAPE'),
+          recharge: 'Short Rest',
+          storageName: 'Wild Shape',
+          uses_max: wildShapeUses,
+        });
       }
+      if (v.druid_level >= 18) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.TIMELESS_BODY_DRUID_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.TIMELESS_BODY'),
+          storageName: 'Timeless Body',
+        });
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.BEAST_SPELLS_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.BEAST_SPELLS'),
+          storageName: 'Beast Spells',
+        });
+      }
+      if (v.druid_level >= 20) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.ARCHDRUID_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.ARCHDRUID'),
+          storageName: 'Archdruid',
+        });
+      }
+    }
 
-      if (classesWithSpellcasting > 1 || spellcasting.full) {
-        finalSetAttrs.caster_type = 'full';
-      } else if (spellcasting.half) {
-        finalSetAttrs.caster_type = 'half';
-      } else if (spellcasting.third) {
-        finalSetAttrs.caster_type = 'third';
+    if (v.fighter_level) {
+      setTrait({
+        freetext: `${translate(language, 'CLASS_FEATURES.FIGHTING_STYLE_TEXT')} ${translate(language, 'CLASS_FEATURES.FIGHTING_STYLE_FIGHTER_OPTIONS')}`,
+        name: translate(language, 'CLASS_FEATURES.FIGHTING_STYLE'),
+        storageName: 'Fighting Style',
+      });
+      setTrait({
+        freetext: translate(language, 'CLASS_FEATURES.SECOND_WIND_TEXT'),
+        name: translate(language, 'CLASS_FEATURES.SECOND_WIND'),
+        heal: 'd10 + @{fighter_level}',
+        recharge: 'Short Rest',
+        storageName: 'Second Wind',
+        uses_max: 1,
+      });
+
+      if (v.fighter_level >= 2) {
+        let actionSurgeUses;
+        if (v.fighter_level >= 17) {
+          actionSurgeUses = 2;
+        } else {
+          actionSurgeUses = 1;
+        }
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.ACTION_SURGE_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.ACTION_SURGE'),
+          recharge: 'Short Rest',
+          storageName: 'Action Surge',
+          uses_max: actionSurgeUses,
+        });
+      }
+      if (v.fighter_level >= 9) {
+        let indomitableUses;
+        if (v.fighter_level >= 17) {
+          indomitableUses = 3;
+        } else if (v.fighter_level >= 13) {
+          indomitableUses = 2;
+        } else {
+          indomitableUses = 1;
+        }
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.INDOMITABLE_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.INDOMITABLE'),
+          recharge: 'Long Rest',
+          storageName: 'Indomitable',
+          uses_max: indomitableUses,
+        });
+      }
+    }
+
+    if (v.monk_level) {
+      if (isUndefined(v.ac_unarmored_ability)) {
+        finalSetAttrs.ac_unarmored_ability = '@{wisdom_mod}';
+      }
+      setTrait({
+        freetext: translate(language, 'CLASS_FEATURES.UNARMORED_DEFENSE_MONK_TEXT'),
+        name: translate(language, 'CLASS_FEATURES.UNARMORED_DEFENSE'),
+        storageName: 'Unarmored Defense Monk',
+      });
+      setTrait({
+        freetext: translate(language, 'CLASS_FEATURES.MARTIAL_ARTS_TEXT'),
+        name: translate(language, 'CLASS_FEATURES.MARTIAL_ARTS'),
+        storageName: 'Martial Arts',
+      });
+      if (v.monk_level >= 2) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.KI_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.KI'),
+          recharge: 'Short Rest',
+          storageName: 'Ki',
+          uses_max: v.monk_level,
+        });
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.FLURRY_OF_BLOWS_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.FLURRY_OF_BLOWS'),
+          storageName: 'Flurry of Blows',
+        });
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.PATIENT_DEFENSE_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.PATIENT_DEFENSE'),
+          storageName: 'Patient Defense',
+        });
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.STEP_OF_THE_WIND_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.STEP_OF_THE_WIND'),
+          storageName: 'Step of the Wind',
+        });
+
+        let unarmoredMovementFeet;
+        if (v.monk_level >= 18) {
+          unarmoredMovementFeet = 30;
+        } else if (v.monk_level >= 14) {
+          unarmoredMovementFeet = 25;
+        } else if (v.monk_level >= 10) {
+          unarmoredMovementFeet = 20;
+        } else if (v.monk_level >= 6) {
+          unarmoredMovementFeet = 15;
+        } else {
+          unarmoredMovementFeet = 10;
+        }
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.UNARMORED_MOVEMENT_TEXT').replace('UNARMORED_MOVEMENT_FEET', unarmoredMovementFeet),
+          name: translate(language, 'CLASS_FEATURES.UNARMORED_MOVEMENT'),
+          storageName: 'Unarmored Movement',
+        });
+      }
+      if (v.monk_level >= 3) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.DEFLECT_MISSILES_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.DEFLECT_MISSILES'),
+          storageName: 'Deflect Missiles',
+        });
+      }
+      if (v.monk_level >= 4) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.SLOW_FALL_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.SLOW_FALL'),
+          storageName: 'Slow Fall',
+        });
+      }
+      if (v.monk_level >= 5) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.STUNNING_STRIKE_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.STUNNING_STRIKE'),
+          saving_throw_ability: '@{wisdom_mod}',
+          saving_throw_failure: translate(language, 'CLASS_FEATURES.STUNNING_STRIKE_SAVING_THROW_FAILURE'),
+          saving_throw_vs_ability: 'Constitution',
+          storageName: 'Stunning Strike',
+        });
+      }
+      if (v.monk_level >= 6) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.KI_EMPOWERED_STRIKES_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.KI_EMPOWERED_STRIKES'),
+          storageName: 'Ki-Empowered Strikes',
+        });
+      }
+      if (v.monk_level >= 7) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.EVASION_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.EVASION'),
+          storageName: 'Evasion',
+        });
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.STILLNESS_OF_MIND_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.STILLNESS_OF_MIND'),
+          storageName: 'Stillness of Mind',
+        });
+      }
+      if (v.monk_level >= 10) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.PURITY_OF_BODY_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.PURITY_OF_BODY'),
+          storageName: 'Purity of Body',
+        });
+      }
+      if (v.monk_level >= 13) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.TONGUE_OF_THE_SUN_AND_MOON_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.TONGUE_OF_THE_SUN_AND_MOON'),
+          storageName: 'Tongue of the Sun and Moon',
+        });
+      }
+      if (v.monk_level >= 14) {
+        finalSetAttrs.death_saving_throw_prof = '@{pb}';
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.DIAMOND_SOUL_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.DIAMOND_SOUL'),
+          storageName: 'Diamond Soul',
+        });
+      }
+      if (v.monk_level >= 15) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.TIMELESS_BODY_MONK_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.TIMELESS_BODY'),
+          storageName: 'Timeless Body',
+        });
+      }
+      if (v.monk_level >= 15) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.EMPTY_BODY_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.EMPTY_BODY'),
+          storageName: 'Empty Body',
+        });
+      }
+      if (v.monk_level >= 20) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.PERFECT_SELF_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.PERFECT_SELF'),
+          storageName: 'Perfect Self',
+        });
+      }
+    }
+
+    if (v.paladin_level) {
+      setTrait({
+        freetext: translate(language, 'CLASS_FEATURES.DIVINE_SENSE_TEXT'),
+        name: translate(language, 'CLASS_FEATURES.DIVINE_SENSE'),
+        recharge: 'Long Rest',
+        storageName: 'Divine Sense',
+        uses_max: Math.max(1 + v.charisma_mod, 1),
+      });
+      setTrait({
+        freetext: translate(language, 'CLASS_FEATURES.LAY_ON_HANDS_TEXT'),
+        heal_query_toggle: '@{heal_query}',
+        name: translate(language, 'CLASS_FEATURES.LAY_ON_HANDS'),
+        recharge: 'Long Rest',
+        storageName: 'Lay on Hands',
+        uses_max: 5 * v.paladin_level,
+      });
+
+      if (v.paladin_level >= 2) {
+        setTrait({
+          freetext: `${translate(language, 'CLASS_FEATURES.FIGHTING_STYLE_TEXT')} ${translate(language, 'CLASS_FEATURES.FIGHTING_STYLE_PALADIN_OPTIONS')}`,
+          name: translate(language, 'CLASS_FEATURES.FIGHTING_STYLE'),
+          storageName: 'Fighting Style',
+        });
+        setTrait({
+          damage: '(?{Spell Level|1|2|3|4+, 4} + 1)d8',
+          damage_type: translate(language, 'DAMAGE_TYPES.RADIANT'),
+          freeform: '{{subheader=(as ?{Spell Level|1|2|3|4+})}}',
+          freetext: translate(language, 'CLASS_FEATURES.DIVINE_SMITE_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.DIVINE_SMITE'),
+          second_damage: 'd8',
+          second_damage_type: translate(language, 'VS_FIEND_OR_UNDEAD'),
+          storageName: 'Divine Smite',
+        });
+      }
+      if (v.paladin_level >= 3) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.DIVINE_HEALTH_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.DIVINE_HEALTH'),
+          storageName: 'Divine Health',
+        });
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY_PALADIN_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY'),
+          recharge: 'Short Rest',
+          storageName: 'Channel Divinity Paladin',
+          uses_max: 1,
+        });
+      }
+      if (v.paladin_level >= 6) {
+        let auraRange;
+        if (v.paladin_level >= 18) {
+          auraRange = 30;
+        } else {
+          auraRange = 10;
+        }
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.AURA_OF_PROTECTION_TEXT').replace('AURA_RANGE', auraRange),
+          name: translate(language, 'CLASS_FEATURES.AURA_OF_PROTECTION'),
+          storageName: 'Aura of Protection',
+        });
+
+        if (v.paladin_level >= 10) {
+          setTrait({
+            freetext: translate(language, 'CLASS_FEATURES.AURA_OF_COURAGE_TEXT').replace('AURA_RANGE', auraRange),
+            name: translate(language, 'CLASS_FEATURES.AURA_OF_COURAGE'),
+            storageName: 'Aura of Courage',
+          });
+        }
+      }
+      if (v.paladin_level >= 11) {
+        setTrait({
+          damage: 'd8',
+          damage_type: 'radiant',
+          freetext: translate(language, 'CLASS_FEATURES.IMPROVED_DIVINE_SMITE_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.IMPROVED_DIVINE_SMITE'),
+          storageName: 'Improved Divine Smite',
+        });
+      }
+      if (v.paladin_level >= 14) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.CLEANSING_TOUCH_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.CLEANSING_TOUCH'),
+          recharge: 'Long Rest',
+          storageName: 'Cleaning Touch',
+          uses_max: Math.max(getIntValue(v.charisma_mod), 1),
+        });
+      }
+    }
+
+    if (v.ranger_level) {
+      setTrait({
+        freetext: translate(language, 'CLASS_FEATURES.FAVORED_ENEMY_TEXT'),
+        name: translate(language, 'CLASS_FEATURES.FAVORED_ENEMY'),
+        storageName: 'Favored Enemy',
+      });
+      setTrait({
+        freetext: translate(language, 'CLASS_FEATURES.NATURAL_EXPLORER_TEXT'),
+        name: translate(language, 'CLASS_FEATURES.NATURAL_EXPLORER'),
+        storageName: 'Natural Explorer',
+      });
+      if (v.ranger_level >= 2) {
+        setTrait({
+          freetext: `${translate(language, 'CLASS_FEATURES.FIGHTING_STYLE_TEXT')} ${translate(language, 'CLASS_FEATURES.FIGHTING_STYLE_RANGER_OPTIONS')}`,
+          name: translate(language, 'CLASS_FEATURES.FIGHTING_STYLE'),
+          storageName: 'Fighting Style',
+        });
+      }
+      if (v.ranger_level >= 3) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.PRIMEVAL_AWARENESS_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.PRIMEVAL_AWARENESS'),
+          storageName: 'Primeval Awareness',
+        });
+      }
+      if (v.ranger_level >= 8) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.LANDS_STRIDE_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.LANDS_STRIDE'),
+          storageName: 'Land\'s Stride',
+        });
+      }
+      if (v.ranger_level >= 10) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.HIDE_IN_PLAIN_SIGHT_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.HIDE_IN_PLAIN_SIGHT'),
+          storageName: 'Hide in Plain Sight',
+        });
+      }
+      if (v.ranger_level >= 14) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.VANISH_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.VANISH'),
+          storageName: 'Vanish',
+        });
+      }
+      if (v.ranger_level >= 18) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.FERAL_SENSES_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.FERAL_SENSES'),
+          storageName: 'Feral Senses',
+        });
+      }
+      if (v.ranger_level >= 20) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.FOE_SLAYER_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.FOE_SLAYER'),
+          storageName: 'Foe Slayer',
+        });
+      }
+    }
+
+    if (v.rogue_level) {
+      setTrait({
+        freetext: translate(language, 'CLASS_FEATURES.EXPERTISE_ROGUE_TEXT'),
+        name: translate(language, 'CLASS_FEATURES.EXPERTISE'),
+        storageName: 'Expertise Rogue',
+      });
+      setTrait({
+        damage: `${Math.ceil(getIntValue(v.rogue_level) / 2)}d6`,
+        freetext: translate(language, 'CLASS_FEATURES.SNEAK_ATTACK_TEXT'),
+        name: translate(language, 'CLASS_FEATURES.SNEAK_ATTACK'),
+        storageName: 'Sneak Attack',
+      });
+      setTrait({
+        freetext: translate(language, 'CLASS_FEATURES.THIEVES_CANT_TEXT'),
+        name: translate(language, 'CLASS_FEATURES.THIEVES_CANT'),
+        storageName: 'Thieves\' Cant',
+      });
+      if (v.rogue_level >= 2) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.CUNNING_ACTION_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.CUNNING_ACTION'),
+          storageName: 'Cunning Action',
+        });
+      }
+      if (v.rogue_level >= 5) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.UNCANNY_DODGE_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.UNCANNY_DODGE'),
+          storageName: 'Uncanny Dodge',
+        });
+      }
+      if (v.rogue_level >= 7) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.EVASION_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.EVASION'),
+          storageName: 'Evasion',
+        });
+      }
+      if (v.rogue_level >= 11) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.RELIABLE_TALENT_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.RELIABLE_TALENT'),
+          storageName: 'Reliable Talent',
+        });
+      }
+      if (v.rogue_level >= 14) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.BLINDSENSE_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.BLINDSENSE'),
+          storageName: 'Blindsense',
+        });
+      }
+      if (v.rogue_level >= 15) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.SLIPPERY_MIND_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.SLIPPERY_MIND'),
+          storageName: 'Slippery Mind',
+        });
+      }
+      if (v.rogue_level >= 18) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.ELUSIVE_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.ELUSIVE'),
+          storageName: 'Elusive',
+        });
+      }
+      if (v.rogue_level >= 20) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.STROKE_OF_LUCK_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.STROKE_OF_LUCK'),
+          recharge: 'Short Rest',
+          storageName: 'Stroke of Luck',
+          uses_max: 1,
+        });
+      }
+    }
+
+    if (v.sorcerer_level) {
+      if (v.sorcerer_level >= 2) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.SORCERY_POINTS_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.SORCERY_POINTS'),
+          recharge: 'Long Rest',
+          storageName: 'Sorcery Points',
+          uses_max: v.sorcerer_level,
+        });
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.FLEXIBLE_CASTING_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.FLEXIBLE_CASTING'),
+          storageName: 'Flexible Casting',
+        });
+        if (v.sorcerer_level >= 3) {
+          setTrait({
+            freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_TEXT'),
+            name: translate(language, 'CLASS_FEATURES.METAMAGIC'),
+            storageName: 'Metamagic',
+          });
+          if (v.careful_spell_toggle === '@{careful_spell_toggle_var}') {
+            setTrait({
+              freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_CAREFUL_SPELL_TEXT'),
+              name: translate(language, 'CLASS_FEATURES.METAMAGIC_CAREFUL_SPELL'),
+              storageName: 'Careful Spell',
+            });
+          }
+          if (v.distant_spell_toggle === '@{distant_spell_toggle_var}') {
+            setTrait({
+              freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_DISTANT_SPELL_TEXT'),
+              name: translate(language, 'CLASS_FEATURES.METAMAGIC_DISTANT_SPELL'),
+              storageName: 'Distant Spell',
+            });
+          }
+          if (v.empowered_spell_toggle === '@{empowered_spell_toggle_var}') {
+            setTrait({
+              freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_EMPOWERED_SPELL_TEXT'),
+              name: translate(language, 'CLASS_FEATURES.METAMAGIC_EMPOWERED_SPELL'),
+              storageName: 'Empowered Spell',
+            });
+          }
+          if (v.extended_spell_toggle === '@{extended_spell_toggle_var}') {
+            setTrait({
+              freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_EXTENDED_SPELL_TEXT'),
+              name: translate(language, 'CLASS_FEATURES.METAMAGIC_EXTENDED_SPELL'),
+              storageName: 'Extended Spell',
+            });
+          }
+          if (v.heightened_spell_toggle === '@{heightened_spell_toggle_var}') {
+            setTrait({
+              freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_HEIGHTENED_SPELL_TEXT'),
+              name: translate(language, 'CLASS_FEATURES.METAMAGIC_HEIGHTENED_SPELL'),
+              storageName: 'Heightened Spell',
+            });
+          }
+          if (v.quickened_spell_toggle === '@{quickened_spell_toggle_var}') {
+            setTrait({
+              freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_QUICKENED_SPELL_TEXT'),
+              name: translate(language, 'CLASS_FEATURES.METAMAGIC_QUICKENED_SPELL'),
+              storageName: 'Quickened Spell',
+            });
+          }
+          if (v.subtle_spell_toggle === '@{subtle_spell_toggle_var}') {
+            setTrait({
+              freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_SUBTLE_SPELL_TEXT'),
+              name: translate(language, 'CLASS_FEATURES.METAMAGIC_SUBTLE_SPELL'),
+              storageName: 'Subtle Spell',
+            });
+          }
+          if (v.twinned_spell_toggle === '@{twinned_spell_toggle_var}') {
+            setTrait({
+              freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_TWINNED_SPELL_TEXT'),
+              name: translate(language, 'CLASS_FEATURES.METAMAGIC_TWINNED_SPELL'),
+              storageName: 'Twinned Spell',
+            });
+          }
+        }
+        if (v.sorcerer_level >= 20) {
+          setTrait({
+            freetext: translate(language, 'CLASS_FEATURES.SORCEROUS_RESTORATION_TEXT'),
+            name: translate(language, 'CLASS_FEATURES.SORCEROUS_RESTORATION'),
+            storageName: 'Sorcerous Restoration',
+          });
+        }
+      }
+    }
+
+    if (v.warlock_level) {
+      let warlockSpellSlots;
+      if (v.warlock_level >= 17) {
+        warlockSpellSlots = 4;
+      } else if (v.warlock_level >= 11) {
+        warlockSpellSlots = 3;
+      } else if (v.warlock_level >= 2) {
+        warlockSpellSlots = 2;
       } else {
-        finalSetAttrs.caster_type = 'full';
+        warlockSpellSlots = 1;
       }
+      setTrait({
+        freetext: translate(language, 'CLASS_FEATURES.WARLOCK_SPELL_SLOTS_TEXT'),
+        name: translate(language, 'CLASS_FEATURES.WARLOCK_SPELL_SLOTS'),
+        recharge: 'Short Rest',
+        storageName: 'Warlock Spell Slots',
+        uses_max: warlockSpellSlots,
+      });
 
-      setFinalAttrs(v, finalSetAttrs);
-    });
+      if (v.warlock_level >= 2) {
+        let eldritchInvocations;
+        if (v.warlock_level >= 17) {
+          eldritchInvocations = 8;
+        } else if (v.warlock_level >= 15) {
+          eldritchInvocations = 7;
+        } else if (v.warlock_level >= 12) {
+          eldritchInvocations = 6;
+        } else if (v.warlock_level >= 9) {
+          eldritchInvocations = 5;
+        } else if (v.warlock_level >= 7) {
+          eldritchInvocations = 4;
+        } else if (v.warlock_level >= 5) {
+          eldritchInvocations = 3;
+        } else {
+          eldritchInvocations = 2;
+        }
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.ELDRITCH_INVOCATIONS_TEXT').replace('NUMBER_OF_INVOCATIONS_KNOWN', eldritchInvocations),
+          name: translate(language, 'CLASS_FEATURES.ELDRITCH_INVOCATIONS'),
+          storageName: 'Eldritch Invocations',
+        });
+      }
+      if (v.warlock_level >= 3) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.PACT_BOON_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.PACT_BOON'),
+          storageName: 'Pact Boon',
+        });
+      }
+      if (v.warlock_level >= 11) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.MYSTIC_ARCANUM_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.MYSTIC_ARCANUM'),
+          storageName: 'Mystic Arcanum',
+        });
+      }
+      if (v.warlock_level >= 20) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.ELDRITCH_MASTER_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.ELDRITCH_MASTER'),
+          recharge: 'Long Rest',
+          storageName: 'Eldritch Master',
+        });
+      }
+    }
+
+    if (v.wizard_level) {
+      setTrait({
+        freetext: translate(language, 'CLASS_FEATURES.ARCANE_RECOVERY_TEXT'),
+        name: translate(language, 'CLASS_FEATURES.ARCANE_RECOVERY'),
+        recharge: 'Long Rest',
+        storageName: 'Arcane Recovery',
+        uses_max: 1,
+      });
+      if (v.wizard_level >= 18) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.SPELL_MASTERY_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.SPELL_MASTERY'),
+          storageName: 'Spell Mastery',
+        });
+      }
+      if (v.wizard_level >= 20) {
+        setTrait({
+          freetext: translate(language, 'CLASS_FEATURES.SIGNATURE_SPELLS_TEXT'),
+          name: translate(language, 'CLASS_FEATURES.SIGNATURE_SPELLS'),
+          storageName: 'Signature Spells',
+        });
+      }
+    }
+
+    setFinalAttrs(v, finalSetAttrs);
   });
 };
 
 const updateSpellSlots = () => {
-  const collectionArray = ['level', 'caster_level', 'caster_type'];
+  const collectionArray = ['caster_level', 'caster_type'];
   const finalSetAttrs = {};
 
   const spellSlots = {
@@ -853,15 +1559,17 @@ const updateSpellSlots = () => {
     9: 0,
   };
 
-  for (let i = 1; i <= 9; i++) {
-    const repeatingString = `spell_slots_l${i}_`;
-    collectionArray.push(`${repeatingString}calc`);
-    collectionArray.push(`${repeatingString}bonus`);
-    collectionArray.push(`${repeatingString}max`);
-    collectionArray.push(`${repeatingString}toggle`);
+  for (const level in spellSlots) {
+    if (spellSlots.hasOwnProperty(level)) {
+      const repeatingString = `spell_slots_l${level}_`;
+      collectionArray.push(`${repeatingString}calc`);
+      collectionArray.push(`${repeatingString}bonus`);
+      collectionArray.push(`${repeatingString}max`);
+      collectionArray.push(`${repeatingString}toggle`);
+    }
   }
   getAttrs(collectionArray, (v) => {
-    let casterLevel = getIntValue(v.level);
+    let casterLevel = getIntValue(v.caster_level);
     let casterType = v.caster_type;
     if (isUndefined(casterType)) {
       casterType = 'full';
@@ -974,953 +1682,301 @@ const updateSpellSlots = () => {
       }
     }
 
-    for (let i = 1; i <= 9; i++) {
-      const slotCalc = spellSlots[i];
-      finalSetAttrs[`spell_slots_l${i}_calc`] = slotCalc;
+    for (const level in spellSlots) {
+      if (spellSlots.hasOwnProperty(level)) {
+        if (spellSlots[level] !== 0 || exists(v[`spell_slots_l${level}_calc`])) {
+          finalSetAttrs[`spell_slots_l${level}_calc`] = spellSlots[level];
+        }
 
-      const slotBonus = getIntValue(v[`spell_slots_l${i}_bonus`]);
-      const spellSlotMax = slotCalc + slotBonus;
-      if (v[`spell_slots_l${i}_max`] !== spellSlotMax) {
-        finalSetAttrs[`spell_slots_l${i}_max`] = spellSlotMax;
-      }
+        const slotBonus = getIntValue(v[`spell_slots_l${level}_bonus`]);
+        const spellSlotMax = spellSlots[level] + slotBonus;
 
-      let spellSlotToggle;
-      if (spellSlotMax > 0) {
-        spellSlotToggle = 'on';
-      } else {
-        spellSlotToggle = 0;
-      }
-      if (v[`spell_slots_l${i}_toggle`] !== spellSlotToggle) {
-        finalSetAttrs[`spell_slots_l${i}_toggle`] = spellSlotToggle;
+        if (spellSlotMax > 0) {
+          finalSetAttrs[`spell_slots_l${level}_max`] = spellSlotMax;
+          finalSetAttrs[`spell_slots_l${level}_toggle`] = 'on';
+        } else {
+          if (exists(v[`spell_slots_l${level}_max`])) {
+            finalSetAttrs[`spell_slots_l${level}_max`] = 0;
+          }
+          if (exists(v[`spell_slots_l${level}_toggle`])) {
+            finalSetAttrs[`spell_slots_l${level}_toggle`] = 0;
+          }
+        }
       }
     }
     setFinalAttrs(v, finalSetAttrs);
   });
 };
 
-const setClassFeatures = () => {
+const updateLevels = (changedField) => {
+  const repeatingItem = 'repeating_class';
+  const collectionArray = ['is_npc', 'lang', 'caster_level', 'caster_type', 'class_and_level', 'level', 'xp_next_level'];
   const finalSetAttrs = {};
-  const collectionArray = ['ac_unarmored_ability', 'lang', 'jack_of_all_trades_toggle', 'careful_spell_toggle', 'distant_spell_toggle', 'empowered_spell_toggle', 'extended_spell_toggle', 'heightened_spell_toggle', 'quickened_spell_toggle', 'subtle_spell_toggle', 'twinned_spell_toggle'];
 
-  for (let i = 0; i < ABILITIES.length; i++) {
-    collectionArray.push(`${ABILITIES[i]}_mod`);
-  }
-  for (let j = 0; j < CLASSES.length; j++) {
-    collectionArray.push(`${CLASSES[j]}_level`);
+  for (const className of CLASSES) {
+    collectionArray.push(`${className}_level`);
+    collectionArray.push(`has_${className}_levels`);
   }
 
-  getAttrs(collectionArray, (v) => {
-    const language = v.lang || 'en';
+  const defaultClassDetails = {
+    barbarian: {
+      hd: 'd12',
+    },
+    bard: {
+      hd: 'd8',
+      spellcasting: 'full',
+    },
+    cleric: {
+      hd: 'd8',
+      spellcasting: 'full',
+    },
+    druid: {
+      hd: 'd8',
+      spellcasting: 'full',
+    },
+    fighter: {
+      hd: 'd10',
+    },
+    monk: {
+      hd: 'd8',
+    },
+    paladin: {
+      hd: 'd10',
+      spellcasting: 'half',
+    },
+    ranger: {
+      hd: 'd10',
+      spellcasting: 'half',
+    },
+    rogue: {
+      hd: 'd8',
+    },
+    sorcerer: {
+      hd: 'd6',
+      spellcasting: 'full',
+    },
+    warlock: {
+      hd: 'd8',
+      spellcasting: 'warlock',
+    },
+    wizard: {
+      hd: 'd6',
+      spellcasting: 'full',
+    },
+  };
+  const hd = {
+    d20: 0,
+    d12: 0,
+    d10: 0,
+    d8: 0,
+    d6: 0,
+    d4: 0,
+    d2: 0,
+    d0: 0,
+  };
+  const spellcasting = {
+    full: 0,
+    half: 0,
+    third: 0,
+    warlock: 0,
+  };
+  let totalLevel = 0;
+  const classLevels = {};
+  let classesWithSpellcasting = 0;
+  const xpTable = [0, 300, 900, 2700, 6500, 14000, 23000, 34000, 48000, 64000, 85000, 100000, 120000, 140000, 165000, 195000, 225000, 265000, 305000, 355000, 385000, 405000, 435000, 465000, 495000, 525000, 555000, 585000, 605000, 635000, 665000];
 
-    if (v.fighter_level >= 5) {
-      let extraAttackTimes;
-      if (v.fighter_level >= 20) {
-        extraAttackTimes = translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_FOUR');
-      } else if (v.fighter_level >= 11) {
-        extraAttackTimes = translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_THREE');
-      } else {
-        extraAttackTimes = translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_TWICE');
-      }
-      setTrait({
-        freetext: translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_TEXT').replace('NUMBER_OF_TIMES', extraAttackTimes),
-        name: translate(language, 'CLASS_FEATURES.EXTRA_ATTACK'),
-        storageName: 'Extra Attack',
-      });
-    } else if (v.barbarian_level >= 5 || v.monk_level >= 5 || v.paladin_level >= 5 || v.ranger_level >= 5) {
-      setTrait({
-        freetext: translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_TEXT').replace('NUMBER_OF_TIMES', translate(language, 'CLASS_FEATURES.EXTRA_ATTACK_TWICE')),
-        name: translate(language, 'CLASS_FEATURES.EXTRA_ATTACK'),
-        storageName: 'Extra Attack',
-      });
+  for (const key in hd) {
+    if (hd.hasOwnProperty(key)) {
+      collectionArray.push(`hd_${key}_max`);
+      collectionArray.push(`hd_${key}_query`);
+      collectionArray.push(`hd_${key}_toggle`);
+    }
+  }
+
+  getSectionIDs(repeatingItem, (ids) => {
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
+      collectionArray.push(`${repeatingString}level`);
+      collectionArray.push(`${repeatingString}name`);
+      collectionArray.push(`${repeatingString}custom_name`);
+      collectionArray.push(`${repeatingString}hd`);
+      collectionArray.push(`${repeatingString}spellcasting`);
+      collectionArray.push(`${repeatingString}custom_class_toggle`);
     }
 
-    if (v.barbarian_level) {
-      let rageUses;
-      if (v.barbarian_level >= 20) {
-        rageUses = 999999;
-      } else if (v.barbarian_level >= 17) {
-        rageUses = 6;
-      } else if (v.barbarian_level >= 12) {
-        rageUses = 5;
-      } else if (v.barbarian_level >= 6) {
-        rageUses = 4;
-      } else if (v.barbarian_level >= 3) {
-        rageUses = 3;
-      } else {
-        rageUses = 2;
+    getAttrs(collectionArray, (v) => {
+      for (const className of CLASSES) {
+        finalSetAttrs[`${className}_level`] = 0;
       }
 
-      let rageDamage;
-      if (v.barbarian_level >= 16) {
-        rageDamage = 4;
-      } else if (v.barbarian_level >= 9) {
-        rageDamage = 3;
-      } else {
-        rageDamage = 2;
-      }
-      setClassFeature({
-        freetext: translate(language, 'CLASS_FEATURES.RAGE_TEXT').replace('RAGE_DAMAGE', rageDamage),
-        name: translate(language, 'CLASS_FEATURES.RAGE'),
-        recharge: 'Long Rest',
-        storageName: 'Rage',
-        uses_max: rageUses,
-      });
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
 
-      if (isUndefined(v.ac_unarmored_ability)) {
-        finalSetAttrs.ac_unarmored_ability = '@{constitution_mod}';
-      }
-      setTrait({
-        freetext: translate(language, 'CLASS_FEATURES.UNARMORED_DEFENSE_TEXT'),
-        name: translate(language, 'CLASS_FEATURES.UNARMORED_DEFENSE'),
-        storageName: 'Unarmored Defense',
-      });
+        let className = v[`${repeatingString}name`];
+        let classLevel = v[`${repeatingString}level`];
 
-      if (v.barbarian_level >= 2) {
-        setClassFeature({
-          freetext: translate(language, 'CLASS_FEATURES.RECKLESS_ATTACK'),
-          name: translate(language, 'CLASS_FEATURES.RECKLESS_ATTACK'),
-          storageName: 'Reckless Attack',
-        });
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.DANGER_SENSE_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.DANGER_SENSE'),
-          storageName: 'Danger Sense',
-        });
-      }
-      if (v.barbarian_level >= 5) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.FAST_MOVEMENT_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.FAST_MOVEMENT'),
-          storageName: 'Fast Movement',
-        });
-      }
-      if (v.barbarian_level >= 7) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.FERAL_INSTINCT_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.FERAL_INSTINCT'),
-          storageName: 'Feral Instinct',
-        });
-      }
-      if (v.barbarian_level >= 9) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.BRUTAL_CRITICAL_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.BRUTAL_CRITICAL'),
-          storageName: 'Brutal Critical',
-        });
-      }
-      if (v.barbarian_level >= 11) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.RELENTLESS_RAGE_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.RELENTLESS_RAGE'),
-          storageName: 'Relentless Rage',
-        });
-      }
-      if (v.barbarian_level >= 15) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.PERSISTENT_RAGE_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.PERSISTENT_RAGE'),
-          storageName: 'Persistent Rage',
-        });
-      }
-      if (v.barbarian_level >= 18) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.INDOMITABLE_MIGHT_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.INDOMITABLE_MIGHT'),
-          storageName: 'Indomitable Might',
-        });
-      }
-    }
-
-    if (v.bard_level) {
-      let die;
-      if (v.bard_level >= 15) {
-        die = 'd12';
-      } else if (v.bard_level >= 10) {
-        die = 'd10';
-      } else if (v.bard_level >= 5) {
-        die = 'd8';
-      } else {
-        die = 'd6';
-      }
-      let recharge = 'Long Rest';
-      if (v.bard_level >= 5) {
-        recharge = 'Short Rest';
-      }
-      setClassFeature({
-        freetext: translate(language, 'CLASS_FEATURES.BARDIC_INSPIRATION_TEXT').replace('d6', die),
-        name: translate(language, 'CLASS_FEATURES.BARDIC_INSPIRATION'),
-        recharge,
-        storageName: 'Bardic Inspiration',
-        uses_max: Math.max(getIntValue(v.charisma_mod), 1),
-      });
-
-      if (v.bard_level >= 2) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.JACK_OF_ALL_TRADES_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.JACK_OF_ALL_TRADES'),
-          storageName: 'Jack of All Trades',
-        });
-        finalSetAttrs.jack_of_all_trades_toggle = '@{jack_of_all_trades}';
-
-        let heal;
-        if (v.bard_level >= 17) {
-          heal = 'd12';
-        } else if (v.bard_level >= 13) {
-          heal = 'd10';
-        } else if (v.bard_level >= 9) {
-          heal = 'd8';
-        } else {
-          heal = 'd6';
+        if (isUndefined(className) && isUndefined(classLevel)) {
+          continue;
         }
-        setClassFeature({
-          freetext: translate(language, 'CLASS_FEATURES.SONG_OF_REST_TEXT'),
-          heal,
-          name: translate(language, 'CLASS_FEATURES.SONG_OF_REST'),
-          storageName: 'Song of Rest',
-        });
-      }
-      if (v.bard_level >= 3) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.EXPERTISE_BARD_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.EXPERTISE'),
-          storageName: 'Expertise Bard',
-        });
-      }
-      if (v.bard_level >= 6) {
-        setClassFeature({
-          freetext: translate(language, 'CLASS_FEATURES.COUNTERCHARM_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.COUNTERCHARM'),
-          storageName: 'Countercharm',
-        });
-      }
-      if (v.bard_level >= 10) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.MAGICAL_SECRETS_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.MAGICAL_SECRETS'),
-          storageName: 'Magical Secrets',
-        });
-      }
-      if (v.bard_level >= 20) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.SUPERIOR_INSPIRATION_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.SUPERIOR_INSPIRATION'),
-          storageName: 'Superior Inspiration',
-        });
-      }
-    }
 
-    if (v.cleric_level) {
-      if (v.cleric_level >= 2) {
-        let channelDivinityUses;
-        if (v.cleric_level >= 18) {
-          channelDivinityUses = 3;
-        } else if (v.cleric_level >= 6) {
-          channelDivinityUses = 2;
-        } else {
-          channelDivinityUses = 1;
+        if (isUndefined(className)) {
+          className = 'barbarian';
         }
-        setClassFeature({
-          freetext: translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY_CLERIC_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY'),
-          recharge: 'Short Rest',
-          storageName: 'Channel Divinity Cleric',
-          uses_max: channelDivinityUses,
-        });
-
-        let turnUndeadText = translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY_TURN_UNDEAD_TEXT');
-        if (v.cleric_level >= 5) {
-          let turnUndeadDestroyCR;
-          if (v.cleric_level >= 17) {
-            turnUndeadDestroyCR = '4';
-          } else if (v.cleric_level >= 14) {
-            turnUndeadDestroyCR = '3';
-          } else if (v.cleric_level >= 11) {
-            turnUndeadDestroyCR = '2';
-          } else if (v.cleric_level >= 8) {
-            turnUndeadDestroyCR = '1';
+        if (className === 'custom') {
+          finalSetAttrs[`${repeatingString}custom_class_toggle`] = 'on';
+          const customName = v[`${repeatingString}custom_name`];
+          if (exists(customName)) {
+            className = customName;
           } else {
-            turnUndeadDestroyCR = '1/2';
+            className = 'custom';
           }
-          turnUndeadText += `\n${translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY_TURN_UNDEAD_TEXT_PART_2').replace('CHALLENGE_RATING', turnUndeadDestroyCR)}`;
+        } else if (v[`${repeatingString}custom_class_toggle`]) {
+          finalSetAttrs[`${repeatingString}custom_class_toggle`] = 0;
         }
-        setClassFeature({
-          freetext: turnUndeadText,
-          name: translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY_TURN_UNDEAD'),
-          saving_throw_ability: '@{wisdom_mod}',
-          saving_throw_vs_ability: 'Wisdom',
-          storageName: 'Turn Undead',
-        });
-        if (v.cleric_level >= 10) {
-          setClassFeature({
-            freeform: '{{text_top=[[d100]] > [[@{cleric_level}]]}}',
-            freetext: translate(language, 'CLASS_FEATURES.DIVINE_INTERVENTION_TEXT'),
-            name: translate(language, 'CLASS_FEATURES.DIVINE_INTERVENTION'),
-            storageName: 'Divine Intervention',
-            uses_max: 1,
-          });
-        }
-      }
-    }
 
-    if (v.druid_level) {
-      if (v.druid_level >= 2) {
-        let wildShapeUses;
-        let wildShapeCR;
-        let wildShapeLimitations;
-
-        if (v.druid_level >= 4) {
-          wildShapeCR = '1/2';
-          wildShapeLimitations = translate(language, 'CLASS_FEATURES.WILD_SHAPE_NO_FLYING');
-        } else if (v.druid_level >= 8) {
-          wildShapeCR = 1;
-          wildShapeLimitations = '';
+        if (isUndefined(classLevel)) {
+          classLevel = 1;
+          finalSetAttrs[`${repeatingString}level`] = classLevel;
+          finalSetAttrs[`${className}_level`] = classLevel;
         } else {
-          wildShapeCR = '1/4';
-          wildShapeLimitations = translate(language, 'CLASS_FEATURES.WILD_SHAPE_NO_FLYING_OR_SWIMMING');
+          classLevel = getIntValue(classLevel);
+          totalLevel += classLevel;
+          if (classLevels[className]) {
+            classLevels[className] += classLevel;
+          } else {
+            classLevels[className] = classLevel;
+          }
         }
-        if (v.druid_level >= 20) {
-          wildShapeUses = 999999;
+
+        let classHd = v[`${repeatingString}hd`];
+        if (isUndefined(classHd) || changedField === 'name') {
+          if (defaultClassDetails.hasOwnProperty(className)) {
+            classHd = defaultClassDetails[className].hd;
+          } else {
+            classHd = 'd12';
+          }
+          finalSetAttrs[`${repeatingString}hd`] = classHd;
+        }
+        if (classHd && classLevel) {
+          hd[classHd] += classLevel;
+        }
+
+        let classSpellcasting = v[`${repeatingString}spellcasting`];
+        if (isUndefined(classSpellcasting) || changedField === 'name') {
+          if (defaultClassDetails.hasOwnProperty(className)) {
+            classSpellcasting = defaultClassDetails[className].spellcasting;
+            finalSetAttrs[`${repeatingString}spellcasting`] = classSpellcasting;
+          } else {
+            finalSetAttrs[`${repeatingString}spellcasting`] = 'none';
+          }
+        } else if (classSpellcasting === 'warlock') {
+          spellcasting[classSpellcasting] += classLevel;
         } else {
-          wildShapeUses = 2;
-        }
-        setClassFeature({
-          freetext: translate(language, 'CLASS_FEATURES.WILD_SHAPE_TEXT').replace('CHALLENGE_RATING', wildShapeCR).replace('LIMITATIONS', ` ${wildShapeLimitations}`),
-          name: translate(language, 'CLASS_FEATURES.WILD_SHAPE'),
-          recharge: 'Short Rest',
-          storageName: 'Wild Shape',
-          uses_max: wildShapeUses,
-        });
-      }
-      if (v.druid_level >= 18) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.TIMELESS_BODY_DRUID_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.TIMELESS_BODY'),
-          storageName: 'Timeless Body',
-        });
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.BEAST_SPELLS_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.BEAST_SPELLS'),
-          storageName: 'Beast Spells',
-        });
-      }
-      if (v.druid_level >= 20) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.ARCHDRUID_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.ARCHDRUID'),
-          storageName: 'Archdruid',
-        });
-      }
-    }
-
-    if (v.fighter_level) {
-      setTrait({
-        freetext: `${translate(language, 'CLASS_FEATURES.FIGHTING_STYLE_TEXT')} ${translate(language, 'CLASS_FEATURES.FIGHTING_STYLE_FIGHTER_OPTIONS')}`,
-        name: translate(language, 'CLASS_FEATURES.FIGHTING_STYLE'),
-        storageName: 'Fighting Style',
-      });
-      setClassFeature({
-        freetext: translate(language, 'CLASS_FEATURES.SECOND_WIND_TEXT'),
-        name: translate(language, 'CLASS_FEATURES.SECOND_WIND'),
-        heal: 'd10 + @{fighter_level}',
-        recharge: 'Short Rest',
-        storageName: 'Second Wind',
-        uses_max: 1,
-      });
-
-      if (v.fighter_level >= 2) {
-        let actionSurgeUses;
-        if (v.fighter_level >= 17) {
-          actionSurgeUses = 2;
-        } else {
-          actionSurgeUses = 1;
-        }
-        setClassFeature({
-          freetext: translate(language, 'CLASS_FEATURES.ACTION_SURGE_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.ACTION_SURGE'),
-          recharge: 'Short Rest',
-          storageName: 'Action Surge',
-          uses_max: actionSurgeUses,
-        });
-      }
-      if (v.fighter_level >= 9) {
-        let indomitableUses;
-        if (v.fighter_level >= 17) {
-          indomitableUses = 3;
-        } else if (v.fighter_level >= 13) {
-          indomitableUses = 2;
-        } else {
-          indomitableUses = 1;
-        }
-        setClassFeature({
-          freetext: translate(language, 'CLASS_FEATURES.INDOMITABLE_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.INDOMITABLE'),
-          recharge: 'Long Rest',
-          storageName: 'Indomitable',
-          uses_max: indomitableUses,
-        });
-      }
-    }
-
-    if (v.monk_level) {
-      setTrait({
-        freetext: translate(language, 'CLASS_FEATURES.MARTIAL_ARTS_TEXT'),
-        name: translate(language, 'CLASS_FEATURES.MARTIAL_ARTS'),
-        storageName: 'Martial Arts',
-      });
-      if (v.monk_level >= 2) {
-        setClassFeature({
-          freetext: translate(language, 'CLASS_FEATURES.KI_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.KI'),
-          recharge: 'Short Rest',
-          storageName: 'Ki',
-          uses_max: v.monk_level,
-        });
-        setClassFeature({
-          freetext: translate(language, 'CLASS_FEATURES.FLURRY_OF_BLOWS_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.FLURRY_OF_BLOWS'),
-          storageName: 'Flurry of Blows',
-        });
-        setClassFeature({
-          freetext: translate(language, 'CLASS_FEATURES.PATIENT_DEFENSE_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.PATIENT_DEFENSE'),
-          storageName: 'Patient Defense',
-        });
-        setClassFeature({
-          freetext: translate(language, 'CLASS_FEATURES.STEP_OF_THE_WIND_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.STEP_OF_THE_WIND'),
-          storageName: 'Step of the Wind',
-        });
-
-        let unarmoredMovementFeet;
-        if (v.monk_level >= 18) {
-          unarmoredMovementFeet = 30;
-        } else if (v.monk_level >= 14) {
-          unarmoredMovementFeet = 25;
-        } else if (v.monk_level >= 10) {
-          unarmoredMovementFeet = 20;
-        } else if (v.monk_level >= 6) {
-          unarmoredMovementFeet = 15;
-        } else {
-          unarmoredMovementFeet = 10;
-        }
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.UNARMORED_MOVEMENT_TEXT').replace('UNARMORED_MOVEMENT_FEET', unarmoredMovementFeet),
-          name: translate(language, 'CLASS_FEATURES.UNARMORED_MOVEMENT'),
-          storageName: 'Unarmored Movement',
-        });
-      }
-      if (v.monk_level >= 3) {
-        setClassFeature({
-          freetext: translate(language, 'CLASS_FEATURES.DEFLECT_MISSILES_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.DEFLECT_MISSILES'),
-          storageName: 'Deflect Missiles',
-        });
-      }
-      if (v.monk_level >= 4) {
-        setClassFeature({
-          freetext: translate(language, 'CLASS_FEATURES.SLOW_FALL_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.SLOW_FALL'),
-          storageName: 'Slow Fall',
-        });
-      }
-      if (v.monk_level >= 5) {
-        setClassFeature({
-          freetext: translate(language, 'CLASS_FEATURES.STUNNING_STRIKE_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.STUNNING_STRIKE'),
-          saving_throw_ability: '@{wisdom_mod}',
-          saving_throw_failure: 'or be stunned until the end of your next turn',
-          saving_throw_vs_ability: 'Constitution',
-          storageName: 'Stunning Strike',
-        });
-      }
-      if (v.monk_level >= 6) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.KI_EMPOWERED_STRIKES_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.KI_EMPOWERED_STRIKES'),
-          storageName: 'Ki-Empowered Strikes',
-        });
-      }
-      if (v.monk_level >= 7) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.EVASION_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.EVASION'),
-          storageName: 'Evasion',
-        });
-        setClassFeature({
-          freetext: translate(language, 'CLASS_FEATURES.STILLNESS_OF_MIND_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.STILLNESS_OF_MIND'),
-          storageName: 'Stillness of Mind',
-        });
-      }
-      if (v.monk_level >= 10) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.PURITY_OF_BODY_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.PURITY_OF_BODY'),
-          storageName: 'Purity of Body',
-        });
-      }
-      if (v.monk_level >= 13) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.TONGUE_OF_THE_SUN_AND_MOON_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.TONGUE_OF_THE_SUN_AND_MOON'),
-          storageName: 'Tongue of the Sun and Moon',
-        });
-      }
-      if (v.monk_level >= 14) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.DIAMOND_SOUL_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.DIAMOND_SOUL'),
-          storageName: 'Diamond Soul',
-        });
-      }
-      if (v.monk_level >= 15) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.TIMELESS_BODY_MONK_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.TIMELESS_BODY'),
-          storageName: 'Timeless Body',
-        });
-      }
-      if (v.monk_level >= 15) {
-        setClassFeature({
-          freetext: translate(language, 'CLASS_FEATURES.EMPTY_BODY_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.EMPTY_BODY'),
-          storageName: 'Empty Body',
-        });
-      }
-      if (v.monk_level >= 20) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.PERFECT_SELF_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.PERFECT_SELF'),
-          storageName: 'Perfect Self',
-        });
-      }
-    }
-
-    if (v.paladin_level) {
-      setClassFeature({
-        freetext: translate(language, 'CLASS_FEATURES.DIVINE_SENSE_TEXT'),
-        name: translate(language, 'CLASS_FEATURES.DIVINE_SENSE'),
-        recharge: 'Long Rest',
-        storageName: 'Divine Sense',
-        uses_max: 1 + v.charisma_mod,
-      });
-      setClassFeature({
-        freetext: translate(language, 'CLASS_FEATURES.LAY_ON_HANDS_TEXT'),
-        heal_query_toggle: '@{heal_query}',
-        name: translate(language, 'CLASS_FEATURES.LAY_ON_HANDS'),
-        recharge: 'Long Rest',
-        storageName: 'Lay on Hands',
-        uses_max: 5 * v.paladin_level,
-      });
-
-      if (v.paladin_level >= 2) {
-        setTrait({
-          freetext: `${translate(language, 'CLASS_FEATURES.FIGHTING_STYLE_TEXT')} ${translate(language, 'CLASS_FEATURES.FIGHTING_STYLE_PALADIN_OPTIONS')}`,
-          name: translate(language, 'CLASS_FEATURES.FIGHTING_STYLE'),
-          storageName: 'Fighting Style',
-        });
-        setClassFeature({
-          damage: '(?{Spell Level|1|2|3|4+, 4} + 1)d8',
-          damage_type: 'radiant',
-          freetext: translate(language, 'CLASS_FEATURES.DIVINE_SMITE_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.DIVINE_SMITE'),
-          second_damage: 'd8',
-          second_damage_type: 'vs undead or fiend',
-          storageName: 'Divine Smite',
-        });
-      }
-      if (v.paladin_level >= 3) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.DIVINE_HEALTH_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.DIVINE_HEALTH'),
-          storageName: 'Divine Health',
-        });
-        setClassFeature({
-          freetext: translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY_PALADIN_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.CHANNEL_DIVINITY'),
-          recharge: 'Short Rest',
-          storageName: 'Channel Divinity Paladin',
-          uses_max: 1,
-        });
-      }
-      if (v.paladin_level >= 6) {
-        let auraRange;
-        if (v.paladin_level >= 18) {
-          auraRange = 30;
-        } else {
-          auraRange = 10;
-        }
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.AURA_OF_PROTECTION_TEXT').replace('AURA_RANGE', auraRange),
-          name: translate(language, 'CLASS_FEATURES.AURA_OF_PROTECTION'),
-          storageName: 'Aura of Protection',
-        });
-
-        if (v.paladin_level >= 10) {
-          setTrait({
-            freetext: translate(language, 'CLASS_FEATURES.AURA_OF_COURAGE_TEXT').replace('AURA_RANGE', auraRange),
-            name: translate(language, 'CLASS_FEATURES.AURA_OF_COURAGE'),
-            storageName: 'Aura of Courage',
-          });
+          classesWithSpellcasting += 1;
+          spellcasting[classSpellcasting] += classLevel;
         }
       }
-      if (v.paladin_level >= 11) {
-        setTrait({
-          damage: 'd8',
-          damage_type: 'radiant',
-          freetext: translate(language, 'CLASS_FEATURES.IMPROVED_DIVINE_SMITE_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.IMPROVED_DIVINE_SMITE'),
-          storageName: 'Improved Divine Smite',
-        });
-      }
-      if (v.paladin_level >= 14) {
-        setClassFeature({
-          freetext: translate(language, 'CLASS_FEATURES.CLEANSING_TOUCH_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.CLEANSING_TOUCH'),
-          recharge: 'Long Rest',
-          storageName: 'Cleaning Touch',
-          uses_max: Math.max(getIntValue(v.charisma_mod), 1),
-        });
-      }
-    }
 
-    if (v.ranger_level) {
-      setTrait({
-        freetext: translate(language, 'CLASS_FEATURES.FAVORED_ENEMY_TEXT'),
-        name: translate(language, 'CLASS_FEATURES.FAVORED_ENEMY'),
-        storageName: 'Favored Enemy',
-      });
-      setTrait({
-        freetext: translate(language, 'CLASS_FEATURES.NATURAL_EXPLORER_TEXT'),
-        name: translate(language, 'CLASS_FEATURES.NATURAL_EXPLORER'),
-        storageName: 'Natural Explorer',
-      });
-      if (v.ranger_level >= 2) {
-        setTrait({
-          freetext: `${translate(language, 'CLASS_FEATURES.FIGHTING_STYLE_TEXT')} ${translate(language, 'CLASS_FEATURES.FIGHTING_STYLE_RANGER_OPTIONS')}`,
-          name: translate(language, 'CLASS_FEATURES.FIGHTING_STYLE'),
-          storageName: 'Fighting Style',
-        });
-      }
-      if (v.ranger_level >= 3) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.PRIMEVAL_AWARENESS_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.PRIMEVAL_AWARENESS'),
-          storageName: 'Primeval Awareness',
-        });
-      }
-      if (v.ranger_level >= 8) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.LANDS_STRIDE_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.LANDS_STRIDE'),
-          storageName: 'Land\'s Stride',
-        });
-      }
-      if (v.ranger_level >= 10) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.HIDE_IN_PLAIN_SIGHT_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.HIDE_IN_PLAIN_SIGHT'),
-          storageName: 'Hide in Plain Sight',
-        });
-      }
-      if (v.ranger_level >= 14) {
-        setClassFeature({
-          freetext: translate(language, 'CLASS_FEATURES.VANISH_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.VANISH'),
-          storageName: 'Vanish',
-        });
-      }
-      if (v.ranger_level >= 18) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.FERAL_SENSES_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.FERAL_SENSES'),
-          storageName: 'Feral Senses',
-        });
-      }
-      if (v.ranger_level >= 20) {
-        setClassFeature({
-          freetext: translate(language, 'CLASS_FEATURES.FOE_SLAYER_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.FOE_SLAYER'),
-          storageName: 'Foe Slayer',
-        });
-      }
-    }
-
-    if (v.rogue_level) {
-      setTrait({
-        freetext: translate(language, 'CLASS_FEATURES.EXPERTISE_ROGUE_TEXT'),
-        name: translate(language, 'CLASS_FEATURES.EXPERTISE'),
-        storageName: 'Expertise Rogue',
-      });
-      setClassFeature({
-        damage: `${Math.ceil(getIntValue(v.rogue_level) / 2)}d6`,
-        freetext: translate(language, 'CLASS_FEATURES.SNEAK_ATTACK_TEXT'),
-        name: translate(language, 'CLASS_FEATURES.SNEAK_ATTACK'),
-        storageName: 'Sneak Attack',
-      });
-      setTrait({
-        freetext: translate(language, 'CLASS_FEATURES.THIEVES_CANT_TEXT'),
-        name: translate(language, 'CLASS_FEATURES.THIEVES_CANT'),
-        storageName: 'Thieves\' Cant',
-      });
-      if (v.rogue_level >= 2) {
-        setClassFeature({
-          freetext: translate(language, 'CLASS_FEATURES.CUNNING_ACTION_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.CUNNING_ACTION'),
-          storageName: 'Cunning Action',
-        });
-      }
-      if (v.rogue_level >= 5) {
-        setClassFeature({
-          freetext: translate(language, 'CLASS_FEATURES.UNCANNY_DODGE_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.UNCANNY_DODGE'),
-          storageName: 'Uncanny Dodge',
-        });
-      }
-      if (v.rogue_level >= 7) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.EVASION_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.EVASION'),
-          storageName: 'Evasion',
-        });
-      }
-      if (v.rogue_level >= 11) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.RELIABLE_TALENT_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.RELIABLE_TALENT'),
-          storageName: 'Reliable Talent',
-        });
-      }
-      if (v.rogue_level >= 14) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.BLINDSENSE_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.BLINDSENSE'),
-          storageName: 'Blindsense',
-        });
-      }
-      if (v.rogue_level >= 15) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.SLIPPERY_MIND_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.SLIPPERY_MIND'),
-          storageName: 'Slippery Mind',
-        });
-      }
-      if (v.rogue_level >= 18) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.ELUSIVE_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.ELUSIVE'),
-          storageName: 'Elusive',
-        });
-      }
-      if (v.rogue_level >= 20) {
-        setClassFeature({
-          freetext: translate(language, 'CLASS_FEATURES.STROKE_OF_LUCK_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.STROKE_OF_LUCK'),
-          recharge: 'Short Rest',
-          storageName: 'Stroke of Luck',
-          uses_max: 1,
-        });
-      }
-    }
-
-    if (v.sorcerer_level) {
-      if (v.sorcerer_level >= 2) {
-        setClassFeature({
-          freetext: translate(language, 'CLASS_FEATURES.SORCERY_POINTS_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.SORCERY_POINTS'),
-          recharge: 'Long Rest',
-          storageName: 'Sorcery Points',
-          uses_max: v.sorcerer_level,
-        });
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.FLEXIBLE_CASTING_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.FLEXIBLE_CASTING'),
-          storageName: 'Flexible Casting',
-        });
-        if (v.sorcerer_level >= 3) {
-          setTrait({
-            freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_TEXT'),
-            name: translate(language, 'CLASS_FEATURES.METAMAGIC'),
-            storageName: 'Metamagic',
-          });
-          if (v.careful_spell_toggle === '@{careful_spell_toggle_var}') {
-            setClassFeature({
-              freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_CAREFUL_SPELL_TEXT'),
-              name: translate(language, 'CLASS_FEATURES.METAMAGIC_CAREFUL_SPELL'),
-              storageName: 'Careful Spell',
-            });
+      finalSetAttrs.class_and_level = '';
+      for (const prop in classLevels) {
+        if (classLevels.hasOwnProperty(prop)) {
+          finalSetAttrs[`${prop}_level`] = classLevels[prop];
+          if (finalSetAttrs.class_and_level !== '') {
+            finalSetAttrs.class_and_level += ', ';
           }
-          if (v.distant_spell_toggle === '@{distant_spell_toggle_var}') {
-            setClassFeature({
-              freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_DISTANT_SPELL_TEXT'),
-              name: translate(language, 'CLASS_FEATURES.METAMAGIC_DISTANT_SPELL'),
-              storageName: 'Distant Spell',
-            });
-          }
-          if (v.empowered_spell_toggle === '@{empowered_spell_toggle_var}') {
-            setClassFeature({
-              freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_EMPOWERED_SPELL_TEXT'),
-              name: translate(language, 'CLASS_FEATURES.METAMAGIC_EMPOWERED_SPELL'),
-              storageName: 'Empowered Spell',
-            });
-          }
-          if (v.extended_spell_toggle === '@{extended_spell_toggle_var}') {
-            setClassFeature({
-              freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_EXTENDED_SPELL_TEXT'),
-              name: translate(language, 'CLASS_FEATURES.METAMAGIC_EXTENDED_SPELL'),
-              storageName: 'Extended Spell',
-            });
-          }
-          if (v.heightened_spell_toggle === '@{heightened_spell_toggle_var}') {
-            setClassFeature({
-              freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_HEIGHTENED_SPELL_TEXT'),
-              name: translate(language, 'CLASS_FEATURES.METAMAGIC_HEIGHTENED_SPELL'),
-              storageName: 'Heightened Spell',
-            });
-          }
-          if (v.quickened_spell_toggle === '@{quickened_spell_toggle_var}') {
-            setClassFeature({
-              freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_QUICKENED_SPELL_TEXT'),
-              name: translate(language, 'CLASS_FEATURES.METAMAGIC_QUICKENED_SPELL'),
-              storageName: 'Quickened Spell',
-            });
-          }
-          if (v.subtle_spell_toggle === '@{subtle_spell_toggle_var}') {
-            setClassFeature({
-              freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_SUBTLE_SPELL_TEXT'),
-              name: translate(language, 'CLASS_FEATURES.METAMAGIC_SUBTLE_SPELL'),
-              storageName: 'Subtle Spell',
-            });
-          }
-          if (v.twinned_spell_toggle === '@{twinned_spell_toggle_var}') {
-            setClassFeature({
-              freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_TWINNED_SPELL_TEXT'),
-              name: translate(language, 'CLASS_FEATURES.METAMAGIC_TWINNED_SPELL'),
-              storageName: 'Twinned Spell',
-            });
-          }
-        }
-        if (v.sorcerer_level >= 20) {
-          setTrait({
-            freetext: translate(language, 'CLASS_FEATURES.SORCEROUS_RESTORATION_TEXT'),
-            name: translate(language, 'CLASS_FEATURES.SORCEROUS_RESTORATION'),
-            storageName: 'Sorcerous Restoration',
-          });
+          finalSetAttrs.class_and_level += `${capitalize(prop)} ${classLevels[prop]}`;
         }
       }
-    }
 
-    if (v.warlock_level) {
-      let warlockSpellSlots;
-      if (v.warlock_level >= 17) {
-        warlockSpellSlots = 4;
-      } else if (v.warlock_level >= 11) {
-        warlockSpellSlots = 3;
-      } else if (v.warlock_level >= 2) {
-        warlockSpellSlots = 2;
+      finalSetAttrs.level = totalLevel;
+
+      let xpForNextLevel = 0;
+      if (!totalLevel) {
+        totalLevel = 0;
+      }
+      if (totalLevel > 30) {
+        xpForNextLevel = xpTable[30];
       } else {
-        warlockSpellSlots = 1;
+        xpForNextLevel = xpTable[totalLevel];
       }
-      setClassFeature({
-        freetext: translate(language, 'CLASS_FEATURES.WARLOCK_SPELL_SLOTS_TEXT'),
-        name: translate(language, 'CLASS_FEATURES.WARLOCK_SPELL_SLOTS'),
-        recharge: 'Short Rest',
-        storageName: 'Warlock Spell Slots',
-        uses_max: warlockSpellSlots,
-      });
+      finalSetAttrs.xp_next_level = xpForNextLevel;
 
-      if (v.warlock_level >= 2) {
-        let eldritchInvocations;
-        if (v.warlock_level >= 17) {
-          eldritchInvocations = 8;
-        } else if (v.warlock_level >= 15) {
-          eldritchInvocations = 7;
-        } else if (v.warlock_level >= 12) {
-          eldritchInvocations = 6;
-        } else if (v.warlock_level >= 9) {
-          eldritchInvocations = 5;
-        } else if (v.warlock_level >= 7) {
-          eldritchInvocations = 4;
-        } else if (v.warlock_level >= 5) {
-          eldritchInvocations = 3;
-        } else {
-          eldritchInvocations = 2;
+      for (const className of CLASSES) {
+        if (finalSetAttrs[`${className}_level`] > 0) {
+          finalSetAttrs[`has_${className}_levels`] = 1;
+        } else if (!isUndefined(v[`has_${className}_levels`])) {
+          finalSetAttrs[`has_${className}_levels`] = 0;
         }
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.ELDRITCH_INVOCATIONS_TEXT').replace('NUMBER_OF_INVOCATIONS_KNOWN', eldritchInvocations),
-          name: translate(language, 'CLASS_FEATURES.ELDRITCH_INVOCATIONS'),
-          storageName: 'Eldritch Invocations',
-        });
       }
-      if (v.warlock_level >= 11) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.MYSTIC_ARCANUM_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.MYSTIC_ARCANUM'),
-          storageName: 'Mystic Arcanum',
-        });
-      }
-      if (v.warlock_level >= 20) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.ELDRITCH_MASTER_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.ELDRITCH_MASTER'),
-          recharge: 'Long Rest',
-          storageName: 'Eldritch Master',
-        });
-      }
-    }
 
-    if (v.wizard_level) {
-      setClassFeature({
-        freetext: translate(language, 'CLASS_FEATURES.ARCANE_RECOVERY_TEXT'),
-        name: translate(language, 'CLASS_FEATURES.ARCANE_RECOVERY'),
-        recharge: 'Long Rest',
-        storageName: 'Arcane Recovery',
-        uses_max: 1,
+      for (const key in hd) {
+        if (hd.hasOwnProperty(key)) {
+          if (hd[key] && hd[key] !== 0) {
+            finalSetAttrs[`hd_${key}_max`] = hd[key];
+            finalSetAttrs[`hd_${key}_query`] = '?{HD';
+            for (let x = 1; x <= hd[key]; x++) {
+              finalSetAttrs[`hd_${key}_query`] += `|${x}`;
+            }
+            finalSetAttrs[`hd_${key}_query`] += '}';
+            finalSetAttrs[`hd_${key}_toggle`] = 1;
+          } else {
+            if (!isUndefined(v[`hd_${key}_max`])) {
+              finalSetAttrs[`hd_${key}_max`] = 0;
+            }
+            if (!isUndefined(v[`hd_${key}_query`])) {
+              finalSetAttrs[`hd_${key}_query`] = '';
+            }
+            if (exists(v[`hd_${key}_toggle`])) {
+              finalSetAttrs[`hd_${key}_toggle`] = 0;
+            }
+          }
+        }
+      }
+
+      let casterLevel = 0;
+      if (!v.is_npc || v.is_npc === '0' || v.is_npc === 0) {
+        if (classesWithSpellcasting > 1) {
+          casterLevel += spellcasting.full;
+          casterLevel += Math.floor(spellcasting.half / 2);
+          casterLevel += Math.floor(spellcasting.third / 3);
+        } else {
+          casterLevel = spellcasting.full + spellcasting.half + spellcasting.third;
+        }
+        finalSetAttrs.caster_level = casterLevel;
+      }
+
+      if (classesWithSpellcasting > 1 || spellcasting.full) {
+        finalSetAttrs.caster_type = 'full';
+      } else if (spellcasting.half) {
+        finalSetAttrs.caster_type = 'half';
+      } else if (spellcasting.third) {
+        finalSetAttrs.caster_type = 'third';
+      } else {
+        finalSetAttrs.caster_type = 'full';
+      }
+
+      setFinalAttrs(v, finalSetAttrs, () => {
+        setClassFeatures();
+        updateSpellSlots();
       });
-      if (v.wizard_level >= 18) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.SPELL_MASTERY_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.SPELL_MASTERY'),
-          storageName: 'Spell Mastery',
-        });
-      }
-      if (v.wizard_level >= 20) {
-        setTrait({
-          freetext: translate(language, 'CLASS_FEATURES.SIGNATURE_SPELLS_TEXT'),
-          name: translate(language, 'CLASS_FEATURES.SIGNATURE_SPELLS'),
-          storageName: 'Signature Spells',
-        });
-      }
-    }
-
-    setFinalAttrs(v, finalSetAttrs);
+    });
   });
 };
 
 on('change:repeating_class', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_class', eventInfo);
   if (repeatingInfo) {
-    console.log('change:repeating_class', repeatingInfo.field);
     updateLevels(repeatingInfo.field);
-    if (repeatingInfo.field === 'spellcasting') {
-      updateSpellSlots();
-    }
   }
 });
 on('remove:repeating_class', () => {
-  console.log('remove:repeating_class');
   updateLevels();
-  updateSpellSlots();
-  setClassFeatures();
 });
 
 const watchForClassLevelChanges = () => {
   const classFeatureWatch = [];
-  for (let z = 0; z < CLASSES.length; z++) {
-    classFeatureWatch.push(`change:${CLASSES[z]}_level`);
-  }
-  for (let i = 0; i < ABILITIES.length; i++) {
-    classFeatureWatch.push(`change:${ABILITIES[i]}_mod`);
+  for (const ability of ABILITIES) {
+    classFeatureWatch.push(`change:${ability}_mod`);
   }
   classFeatureWatch.push('change:careful_spell_toggle');
   classFeatureWatch.push('change:distant_spell_toggle');
@@ -1936,7 +1992,7 @@ const watchForClassLevelChanges = () => {
   });
 };
 watchForClassLevelChanges();
-on('change:caster_level change:spell_slots_l1_bonus change:spell_slots_l2_bonus change:spell_slots_l3_bonus change:spell_slots_l4_bonus change:spell_slots_l5_bonus change:spell_slots_l6_bonus change:spell_slots_l7_bonus change:spell_slots_l8_bonus change:spell_slots_l9_bonus', () => {
+on('change:spell_slots_l1_bonus change:spell_slots_l2_bonus change:spell_slots_l3_bonus change:spell_slots_l4_bonus change:spell_slots_l5_bonus change:spell_slots_l6_bonus change:spell_slots_l7_bonus change:spell_slots_l8_bonus change:spell_slots_l9_bonus', () => {
   updateSpellSlots();
 });
 
@@ -1944,7 +2000,7 @@ const getPB = (level, challenge) => {
   let pb = 2;
 
   level = getIntValue(level);
-  if (challenge < 1) {
+  if (challenge === '1/8' || challenge === '1/4' || challenge === '1/2') {
     challenge = 1;
   } else {
     getIntValue(challenge);
@@ -1980,27 +2036,27 @@ const sumRepeating = (options, sumItems) => {
   const finalSetAttrs = {};
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(repeatingString + options.toggle);
       if (options.qty) {
         collectionArray.push(repeatingString + options.qty);
       }
 
-      for (let x = 0; x < sumItems.length; x++) {
-        finalSetAttrs[sumItems[x].totalField] = 0;
-        if (sumItems[x].totalFieldSecondary) {
-          finalSetAttrs[sumItems[x].totalFieldSecondary] = 0;
+      for (const sumItem of sumItems) {
+        finalSetAttrs[sumItem.totalField] = 0;
+        if (sumItem.totalFieldSecondary) {
+          finalSetAttrs[sumItem.totalFieldSecondary] = 0;
         }
-        collectionArray.push(repeatingString + sumItems[x].fieldToAdd);
-        if (sumItems[x].bonus) {
-          collectionArray.push(repeatingString + sumItems[x].bonus);
+        collectionArray.push(repeatingString + sumItem.fieldToAdd);
+        if (sumItem.bonus) {
+          collectionArray.push(repeatingString + sumItem.bonus);
         }
-        if (sumItems[x].armorType) {
-          collectionArray.push(repeatingString + sumItems[x].armorType);
+        if (sumItem.armorType) {
+          collectionArray.push(repeatingString + sumItem.armorType);
         }
-        if (sumItems[x].addOnAfterQty) {
-          collectionArray.push(repeatingString + sumItems[x].addOnAfterQty);
+        if (sumItem.addOnAfterQty) {
+          collectionArray.push(repeatingString + sumItem.addOnAfterQty);
         }
       }
     }
@@ -2014,24 +2070,21 @@ const sumRepeating = (options, sumItems) => {
         dexMod = getIntValue(v.dexterity_mod);
       }
 
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
         const qty = getIntValue(v[repeatingString + options.qty], 1);
 
-        for (let x = 0; x < sumItems.length; x++) {
-          const sumItem = sumItems[x];
+        for (const sumItem of sumItems) {
           let fieldToAdd = getFloatValue(v[repeatingString + sumItem.fieldToAdd]);
           if (sumItem.bonus) {
             fieldToAdd += getFloatValue(v[repeatingString + sumItem.bonus]);
           }
           if (sumItem.armorType) {
             if (!v[repeatingString + sumItem.armorType] || v[repeatingString + sumItem.armorType] === 'Light Armor') {
-              fieldToAdd += Math.min(5, dexMod);
+              fieldToAdd += dexMod;
             } else if (v[repeatingString + sumItem.armorType] === 'Medium Armor') {
               const mediumArmorDexMod = getIntValue(v.medium_armor_max_dex, 2);
               fieldToAdd += Math.min(mediumArmorDexMod, dexMod);
-            } else if (v[repeatingString + sumItem.armorType] === 'Armor + Dex') {
-              fieldToAdd += dexMod;
             }
           }
 
@@ -2070,13 +2123,12 @@ const sumRepeating = (options, sumItems) => {
           }
         }
       }
-      for (let y = 0; y < sumItems.length; y++) {
-        const item = sumItems[y];
-        if (item.totalField && !exists(finalSetAttrs[item.totalField])) {
-          finalSetAttrs[item.totalField] = 0;
+      for (const sumItem of sumItems) {
+        if (sumItem.totalField && !exists(finalSetAttrs[sumItem.totalField])) {
+          finalSetAttrs[sumItem.totalField] = 0;
         }
-        if (item.totalFieldSecondary && !exists(finalSetAttrs[item.totalFieldSecondary])) {
-          finalSetAttrs[item.totalFieldSecondary] = 0;
+        if (sumItem.totalFieldSecondary && !exists(finalSetAttrs[sumItem.totalFieldSecondary])) {
+          finalSetAttrs[sumItem.totalFieldSecondary] = 0;
         }
       }
 
@@ -2100,22 +2152,20 @@ const updateArmor = (rowId) => {
       ids = [];
       ids.push(rowId);
     }
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}parsed`);
       collectionArray.push(`${repeatingString}modifiers`);
     }
 
     getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
 
         if (isUndefined(v[`${repeatingString}parsed`]) || v[`${repeatingString}parsed`].indexOf('acBonus') === -1) {
           const armorModifiers = v[`${repeatingString}modifiers`];
           if (exists(armorModifiers)) {
-            const acBonus = armorModifiers.replace(/^\D+/g, '');
-
-            finalSetAttrs[`${repeatingString}ac_bonus`] = acBonus;
+            finalSetAttrs[`${repeatingString}ac_bonus`] = armorModifiers.replace(/^\D+/g, '');
           }
           if (isUndefined(finalSetAttrs[`${repeatingString}parsed`])) {
             finalSetAttrs[`${repeatingString}parsed`] = '';
@@ -2132,8 +2182,8 @@ const updateArmor = (rowId) => {
     getExtraFields: ['medium_armor_max_dex', 'dexterity_mod', 'ac_unarmored_ability', 'is_npc'],
     toggle: 'worn',
   };
-  for (let i = 0; i < ABILITIES.length; i++) {
-    options.getExtraFields.push(`${ABILITIES[i]}_mod`);
+  for (const ability of ABILITIES) {
+    options.getExtraFields.push(`${ability}_mod`);
   }
   const sumItems = [
     {
@@ -2171,14 +2221,14 @@ const updateEquipment = (rowId) => {
       ids = [];
       ids.push(rowId);
     }
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}content`);
     }
 
     getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
 
         if (isUndefined(v[`${repeatingString}parsed`]) || v[`${repeatingString}parsed`].indexOf('content') === -1) {
           let content = v[`${repeatingString}content`];
@@ -2282,7 +2332,7 @@ const updateInitiative = () => {
     const dexCheckBonus = getIntValue(v.dexterity_check_bonus);
     if (exists(dexCheckBonus)) {
       finalSetAttrs.initiative += dexCheckBonus;
-      finalSetAttrs.initiative_formula += ` + ${dexCheckBonus}[dex check bonus]`;
+      finalSetAttrs.initiative_formula += `${addArithmeticOperator(finalSetAttrs.initiative_formula, dexCheckBonus)}[dex check bonus]`;
     }
 
     const initiativeBonus = v.initiative_bonus;
@@ -2290,26 +2340,26 @@ const updateInitiative = () => {
       if (!isNaN(initiativeBonus)) {
         finalSetAttrs.initiative += getIntValue(initiativeBonus);
       }
-      finalSetAttrs.initiative_formula += ' + @{initiative_bonus}[initiative bonus]';
+      finalSetAttrs.initiative_formula += `${addArithmeticOperator(finalSetAttrs.initiative_formula, initiativeBonus)}[initiative bonus]`;
     }
 
     if (v.remarkable_athlete_toggle === '@{remarkable_athlete}') {
       const remarkableAthlete = getIntValue(v.remarkable_athlete);
       if (exists(remarkableAthlete)) {
         finalSetAttrs.initiative += remarkableAthlete;
-        finalSetAttrs.initiative_formula += ` + ${remarkableAthlete}[remarkable athlete]`;
+        finalSetAttrs.initiative_formula += `${addArithmeticOperator(finalSetAttrs.initiative_formula, remarkableAthlete)}[remarkable athlete]`;
       }
     } else if (v.jack_of_all_trades_toggle === '@{jack_of_all_trades}') {
       const jackOfAllTrades = getIntValue(v.jack_of_all_trades);
       if (exists(jackOfAllTrades)) {
         finalSetAttrs.initiative += jackOfAllTrades;
-        finalSetAttrs.initiative_formula += ` + ${jackOfAllTrades}[jack of all trades]`;
+        finalSetAttrs.initiative_formula += `${addArithmeticOperator(finalSetAttrs.initiative_formula, jackOfAllTrades)}[jack of all trades]`;
       }
     }
 
     const globalCheckBonus = v.global_check_bonus;
     if (exists(globalCheckBonus)) {
-      finalSetAttrs.initiative_formula += ` + ${globalCheckBonus}[global check bonus]`;
+      finalSetAttrs.initiative_formula += ' + (@{global_check_bonus})[global check bonus]';
     }
     setFinalAttrs(v, finalSetAttrs);
   });
@@ -2336,7 +2386,7 @@ const updateAttackToggle = (v, finalSetAttrs, repeatingString, options) => {
     parseName: 'attack',
     toggleField: 'roll_toggle',
     toggleFieldSetTo: '@{roll_toggle_var}',
-    triggerFields: ['type'],
+    triggerFields: ['type', 'attack_bonus'],
   };
   parseAttackComponent(v, repeatingString, finalSetAttrs, attackParse);
 
@@ -2350,8 +2400,6 @@ const updateAttackToggle = (v, finalSetAttrs, repeatingString, options) => {
       const pb = getIntValue(v.pb);
       toHit += pb;
       attackFormula += `${pb}[proficient]`;
-    } else {
-      attackFormula += '0[unproficient]';
     }
 
     let attackAbility = v[`${repeatingString}attack_ability`];
@@ -2364,20 +2412,20 @@ const updateAttackToggle = (v, finalSetAttrs, repeatingString, options) => {
     attackAbility = getAbilityValue(v, attackAbility, options.defaultAbility);
     if (exists(attackAbility)) {
       toHit += attackAbility;
-      attackFormula += ` + ${attackAbility}[${getAbilityShortName(v[`${repeatingString}attack_ability`])}]`;
+      attackFormula += `${addArithmeticOperator(attackFormula, attackAbility)}[${getAbilityShortName(v[`${repeatingString}attack_ability`])}]`;
     }
 
     const attackBonus = getIntValue(v[`${repeatingString}attack_bonus`]);
     if (exists(attackBonus)) {
       toHit += attackBonus;
-      attackFormula += ` + ${attackBonus}[bonus]`;
+      attackFormula += `${addArithmeticOperator(attackFormula, attackBonus)}[bonus]`;
     }
 
     if (exists(options.globalAttackBonus)) {
       if (!isNaN(options.globalAttackBonus)) {
         toHit += getIntValue(options.globalAttackBonus);
       }
-      attackFormula += ` + ${options.globalAttackBonus}[${options.globalAttackBonusLabel}]`;
+      attackFormula += `${addArithmeticOperator(attackFormula, options.globalAttackBonus)}[${options.globalAttackBonusLabel}]`;
     }
 
     if (!v[`${repeatingString}type`] || v[`${repeatingString}type`] === 'Melee Weapon') {
@@ -2385,14 +2433,14 @@ const updateAttackToggle = (v, finalSetAttrs, repeatingString, options) => {
         if (!isNaN(options.globalMeleeAttackBonus)) {
           toHit += getIntValue(options.globalMeleeAttackBonus);
         }
-        attackFormula += ` + ${options.globalMeleeAttackBonus}[global melee attack bonus]`;
+        attackFormula += `${addArithmeticOperator(attackFormula, options.globalMeleeAttackBonus)}[global melee attack bonus]`;
       }
     } else if (v[`${repeatingString}type`] === 'Ranged Weapon') {
       if (exists(options.globalRangedAttackBonus)) {
         if (!isNaN(options.globalRangedAttackBonus)) {
           toHit += getIntValue(options.globalRangedAttackBonus);
         }
-        attackFormula += ` + ${options.globalRangedAttackBonus}[global ranged attack bonus]`;
+        attackFormula += `${addArithmeticOperator(attackFormula, options.globalRangedAttackBonus)}[global ranged attack bonus]`;
       }
     }
     finalSetAttrs[`${repeatingString}attack_formula`] = attackFormula;
@@ -2407,7 +2455,7 @@ const updateSavingThrowToggle = (v, finalSetAttrs, repeatingString, options) => 
     parseName: 'savingThrow',
     toggleField: 'saving_throw_toggle',
     toggleFieldSetTo: '@{saving_throw_toggle_var}',
-    triggerFields: ['saving_throw_vs_ability'],
+    triggerFields: ['saving_throw_ability', 'saving_throw_bonus', 'saving_throw_vs_ability'],
   };
   parseAttackComponent(v, repeatingString, finalSetAttrs, savingThrowParse);
 
@@ -2435,7 +2483,7 @@ const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
     parseName: 'damage',
     toggleField: 'damage_toggle',
     toggleFieldSetTo: '@{damage_toggle_var}',
-    triggerFields: ['damage'],
+    triggerFields: ['damage', 'damage_ability', 'damage_bonus', 'damage_type'],
   };
   parseAttackComponent(v, repeatingString, finalSetAttrs, damageParse);
 
@@ -2467,52 +2515,43 @@ const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
       const damageAbilityValue = getAbilityValue(v, damageAbility, options.defaultDamageAbility);
       if (exists(damageAbilityValue)) {
         damageAddition += damageAbilityValue;
-        damageFormula += `${addOrSubtract(damageFormula, damageAbilityValue)}[${getAbilityShortName(v[`${repeatingString}damage_ability`])}]`;
+        damageFormula += `${addArithmeticOperator(damageFormula, damageAbilityValue)}[${getAbilityShortName(v[`${repeatingString}damage_ability`])}]`;
       }
     }
 
     const damageBonus = getIntValue(v[`${repeatingString}damage_bonus`]);
     if (exists(damageBonus)) {
       damageAddition += damageBonus;
-      if (damageFormula !== '') {
-        damageFormula += ' + ';
-      }
-      damageFormula += `${damageBonus}[bonus]`;
+      damageFormula += `${addArithmeticOperator(damageFormula, damageBonus)}[bonus]`;
     }
 
     if (exists(options.globalDamageBonus)) {
       if (!isNaN(options.globalDamageBonus)) {
         damageAddition += getIntValue(options.globalDamageBonus);
       } else {
-        damageString += ` + ${options.globalDamageBonus}`;
+        damageString += `${addArithmeticOperator(damageString, options.globalDamageBonus)}`;
       }
-      damageFormula += ` + ${options.globalDamageBonus}[global damage bonus]`;
+      damageFormula += `${addArithmeticOperator(damageFormula, options.globalDamageBonus)}[global damage bonus]`;
     }
 
-    if (options && options.globalMeleeDamageBonus && !v[`${repeatingString}type`] || v[`${repeatingString}type`] === 'Melee Weapon') {
+    if (options && exists(options.globalMeleeDamageBonus) && (!v[`${repeatingString}type`] || v[`${repeatingString}type`] === 'Melee Weapon')) {
       if (!isNaN(options.globalMeleeDamageBonus)) {
         damageAddition += getIntValue(options.globalMeleeDamageBonus);
       } else {
-        damageString += ` + ${options.globalMeleeDamageBonus}`;
+        damageString += `${addArithmeticOperator(damageString, options.globalMeleeDamageBonus)}`;
       }
-      if (damageFormula !== '') {
-        damageFormula += ' + ';
-      }
-      damageFormula += `${options.globalMeleeDamageBonus}[global melee damage bonus]`;
-    } else if (options && options.globalRangedDamageBonus && v[`${repeatingString}type`] === 'Ranged Weapon') {
+      damageFormula += `${addArithmeticOperator(damageFormula, options.globalMeleeDamageBonus)}[global melee damage bonus]`;
+    } else if (options && exists(options.globalRangedDamageBonus) && v[`${repeatingString}type`] === 'Ranged Weapon') {
       if (!isNaN(options.globalRangedDamageBonus)) {
         damageAddition += getIntValue(options.globalRangedDamageBonus);
       } else {
-        damageString += ` + ${options.globalRangedDamageBonus}`;
+        damageString += `${addArithmeticOperator(damageString, options.globalRangedDamageBonus)}`;
       }
-      if (damageFormula !== '') {
-        damageFormula += ' + ';
-      }
-      damageFormula += `${options.globalRangedDamageBonus}[global ranged damage bonus]`;
+      damageFormula += `${addArithmeticOperator(damageFormula, options.globalRangedDamageBonus)}[global ranged damage bonus]`;
     }
 
     if (exists(damageAddition)) {
-      damageString += addOrSubtract(damageString, damageAddition);
+      damageString += addArithmeticOperator(damageString, damageAddition);
     }
 
     damageType = v[`${repeatingString}damage_type`];
@@ -2533,7 +2572,7 @@ const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
     parseName: 'secondDamage',
     toggleField: 'second_damage_toggle',
     toggleFieldSetTo: '@{second_damage_toggle_var}',
-    triggerFields: ['second_damage'],
+    triggerFields: ['second_damage', 'second_damage_ability', 'second_damage_bonus', 'second_damage_type'],
   };
   parseAttackComponent(v, repeatingString, finalSetAttrs, secondDamageParse);
 
@@ -2553,21 +2592,18 @@ const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
       secondDamageAbility = getAbilityValue(v, secondDamageAbility);
       if (exists(secondDamageAbility)) {
         secondDamageAddition += secondDamageAbility;
-        secondDamageFormula += `${addOrSubtract(secondDamageFormula, secondDamageAbility)}[${getAbilityShortName(v[`${repeatingString}second_damage_ability`])}]`;
+        secondDamageFormula += `${addArithmeticOperator(secondDamageFormula, secondDamageAbility)}[${getAbilityShortName(v[`${repeatingString}second_damage_ability`])}]`;
       }
     }
 
     const secondDamageBonus = getIntValue(v[`${repeatingString}second_damage_bonus`]);
     if (exists(secondDamageBonus)) {
       secondDamageAddition += secondDamageBonus;
-      if (secondDamageFormula !== '') {
-        secondDamageFormula += ' + ';
-      }
-      secondDamageFormula += `${secondDamageBonus}[bonus]`;
+      secondDamageFormula += `${addArithmeticOperator(secondDamageFormula, secondDamageBonus)}[bonus]`;
     }
 
     if (exists(secondDamageAddition)) {
-      damageString += addOrSubtract(damageString, secondDamageAddition);
+      damageString += addArithmeticOperator(damageString, secondDamageAddition);
     }
 
     let secondDamageType = v[`${repeatingString}second_damage_type`];
@@ -2611,7 +2647,7 @@ const updateHealToggle = (v, finalSetAttrs, repeatingString) => {
     parseName: 'heal',
     toggleField: 'heal_toggle',
     toggleFieldSetTo: '@{heal_toggle_var}',
-    triggerFields: ['heal'],
+    triggerFields: ['heal', 'heal_query_toggle'],
   };
   parseAttackComponent(v, repeatingString, finalSetAttrs, healParse);
 
@@ -2621,12 +2657,12 @@ const updateHealToggle = (v, finalSetAttrs, repeatingString) => {
     let healAbility = v[`${repeatingString}heal_ability`];
     healAbility = getAbilityValue(v, healAbility);
     if (exists(healAbility)) {
-      healFormula += ` + ${healAbility}[${getAbilityShortName(v[`${repeatingString}heal_ability`])}]`;
+      healFormula += `${addArithmeticOperator(healFormula, healAbility)}[${getAbilityShortName(v[`${repeatingString}heal_ability`])}]`;
     }
 
     const healBonus = getIntValue(v[`${repeatingString}heal_bonus`]);
     if (exists(healBonus)) {
-      healFormula += ` + ${healBonus}[bonus]`;
+      healFormula += `${addArithmeticOperator(healFormula, healBonus)}[bonus]`;
     }
 
     if (exists(v.global_spell_heal_bonus)) {
@@ -2663,12 +2699,16 @@ const updateHigherLevelToggle = (v, finalSetAttrs, repeatingString) => {
 
     const damageToggle = v[`${repeatingString}damage_toggle`];
     if (damageToggle && damageToggle === '@{damage_toggle_var}') {
-      finalSetAttrs[`${repeatingString}damage_formula`] += ' + ((@{higher_level_query} - @{spell_level}) * @{higher_level_dice})@{higher_level_die}[higher lvl]';
+      const higherLevelDamage = '((@{higher_level_query} - @{spell_level}) * @{higher_level_dice})@{higher_level_die}[higher lvl]';
+      finalSetAttrs[`${repeatingString}damage_formula`] += addArithmeticOperator(finalSetAttrs[`${repeatingString}damage_formula`], higherLevelDamage);;
+      finalSetAttrs[`${repeatingString}damage_crit_formula`] = higherLevelDamage;
     }
 
     const secondDamageToggle = v[`${repeatingString}second_damage_toggle`];
     if (secondDamageToggle && secondDamageToggle === '@{second_damage_toggle_var}') {
-      finalSetAttrs[`${repeatingString}second_damage_formula`] += ' + ((@{higher_level_query} - @{spell_level}) * @{second_higher_level_dice})@{second_higher_level_die}[higher lvl]';
+      const higherLevelSecondDamage = '((@{higher_level_query} - @{spell_level}) * @{second_higher_level_dice})@{second_higher_level_die}[higher lvl]';
+      finalSetAttrs[`${repeatingString}second_damage_formula`] += addArithmeticOperator(finalSetAttrs[`${repeatingString}second_damage_formula`], higherLevelSecondDamage);
+      finalSetAttrs[`${repeatingString}second_damage_crit_formula`] = higherLevelSecondDamage;
     }
 
     const healToggle = v[`${repeatingString}heal_toggle`];
@@ -2683,20 +2723,75 @@ const findAmmo = (name, callback) => {
   const collectionArray = [];
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}qty`);
     }
 
     getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
         if (v[`${repeatingString}name`] === name) {
           callback(`@{${repeatingString}qty}`);
         }
       }
-      console.log(`cannot find ammo field by the name ${name}`);
+      console.warn(`cannot find ammo field by the name ${name}`);
+    });
+  });
+};
+
+const updateActionChatMacro = (type) => {
+  const repeatingItem = `repeating_${type}`;
+  const collectionArray = [`${type}s_macro_var`, `${type}s_chat_var`, `${type}s_exist`];
+  const finalSetAttrs = {};
+
+  finalSetAttrs[`${type}s_macro_var`] = '';
+  finalSetAttrs[`${type}s_chat_var`] = '';
+
+  getSectionIDs(repeatingItem, (ids) => {
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
+      collectionArray.push(`${repeatingString}name`);
+      collectionArray.push(`${repeatingString}display_text`);
+    }
+
+    getAttrs(collectionArray, (v) => {
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
+        let actionName = v[`${repeatingString}name`];
+        const displayText = v[`${repeatingString}display_text`];
+
+        if (id !== ids[0]) {
+          finalSetAttrs[`${type}s_macro_var`] += ', ';
+        }
+        let actionType = 'action';
+        let title;
+        if (type === 'trait') {
+          title = 'Traits';
+          actionType = 'trait';
+        } else if (type === 'action') {
+          title = 'Actions';
+        } else if (type === 'reaction') {
+          title = 'Reactions';
+        } else if (type === 'legendaryaction') {
+          title = 'Legendary Actions';
+        } else if (type === 'lairaction') {
+          title = 'Lair Actions';
+          actionName = displayText;
+        } else if (type === 'regionaleffect') {
+          title = 'Regional Effects';
+          actionName = displayText;
+        }
+
+        if (actionName && actionName.length > 50) {
+          actionName = `${actionName.substring(0, 50)}...`;
+        }
+
+        finalSetAttrs[`${type}s_macro_var`] += `[${actionName}](~repeating_${type}_${id}_${actionType})`;
+        finalSetAttrs[`${type}s_chat_var`] += `{{${title}=${finalSetAttrs[`${type}s_macro_var`]}}}`;
+      }
+      setFinalAttrs(v, finalSetAttrs);
     });
   });
 };
@@ -2709,8 +2804,8 @@ const updateAction = (type, rowId) => {
   const rechargeRegex = /\s*?\((?:Recharge\s*?(\d+\-\d+|\d+)|Recharges\safter\sa\s(.*))\)/gi;
   const rechargeDayRegex = /\s*?\((\d+\/Day)\)/gi;
 
-  for (let i = 0; i < ABILITIES.length; i++) {
-    collectionArray.push(`${ABILITIES[i]}_mod`);
+  for (const ability of ABILITIES) {
+    collectionArray.push(`${ability}_mod`);
   }
 
   getSectionIDs(repeatingItem, (ids) => {
@@ -2718,10 +2813,13 @@ const updateAction = (type, rowId) => {
       ids = [];
       ids.push(rowId);
     }
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}type`);
+      collectionArray.push(`${repeatingString}uses`);
+      collectionArray.push(`${repeatingString}uses_max`);
+      collectionArray.push(`${repeatingString}has_uses`);
       collectionArray.push(`${repeatingString}roll_toggle`);
       collectionArray.push(`${repeatingString}to_hit`);
       collectionArray.push(`${repeatingString}attack_formula`);
@@ -2754,12 +2852,14 @@ const updateAction = (type, rowId) => {
       collectionArray.push(`${repeatingString}recharge`);
       collectionArray.push(`${repeatingString}recharge_display`);
       collectionArray.push(`${repeatingString}extras_toggle`);
+      collectionArray.push(`${repeatingString}emote`);
       collectionArray.push(`${repeatingString}freetext`);
+      collectionArray.push(`${repeatingString}freeform`);
     }
 
     getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
 
         const actionName = v[`${repeatingString}name`];
         if (!isUndefined(actionName)) {
@@ -2774,9 +2874,16 @@ const updateAction = (type, rowId) => {
             finalSetAttrs[`${repeatingString}name`] = actionName.replace(rechargeDayRegex, '');
           }
         }
+
+        if (v[`${repeatingString}uses`] || v[`${repeatingString}uses_max`]) {
+          finalSetAttrs[`${repeatingString}has_uses`] = 1;
+        } else if (!isUndefined(v[`${repeatingString}has_uses`])) {
+          finalSetAttrs[`${repeatingString}has_uses`] = 0;
+        }
+
         const recharge = fromVOrFinalSetAttrs(v, finalSetAttrs, `${repeatingString}recharge`);
         if (exists(recharge)) {
-          if (recharge.indexOf('/Day') !== -1 || recharge.indexOf('/day') !== -1) {
+          if (isNaN(recharge)) {
             finalSetAttrs[`${repeatingString}recharge_display`] = ` (${recharge})`;
           } else {
             finalSetAttrs[`${repeatingString}recharge_display`] = ` (Recharge ${recharge})`;
@@ -2813,49 +2920,61 @@ const updateAction = (type, rowId) => {
         updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
 
         updateHealToggle(v, finalSetAttrs, repeatingString);
+
+        if (v[`${repeatingString}emote`] || v[`${repeatingString}freetext`] || v[`${repeatingString}freeform`]) {
+          finalSetAttrs[`${repeatingString}extras_toggle`] = '@{extras_var}';
+        }
       }
-      setFinalAttrs(v, finalSetAttrs);
+      setFinalAttrs(v, finalSetAttrs, () => {
+        updateActionChatMacro(type);
+      });
     });
   });
 };
 on('change:repeating_trait', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_trait', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
+  if (repeatingInfo && repeatingInfo.field !== 'name' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
     updateAction('trait', repeatingInfo.rowId);
   }
 });
 on('change:repeating_action', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_action', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
+  if (repeatingInfo && repeatingInfo.field !== 'name' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
     updateAction('action', repeatingInfo.rowId);
   }
 });
 on('change:repeating_reaction', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_reaction', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
+  if (repeatingInfo && repeatingInfo.field !== 'name' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
     updateAction('reaction', repeatingInfo.rowId);
   }
 });
 on('change:repeating_legendaryaction', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_legendaryaction', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
+  if (repeatingInfo && repeatingInfo.field !== 'name' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
     updateAction('legendaryaction', repeatingInfo.rowId);
   }
 });
 on('change:repeating_lairaction', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_lairaction', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
+  if (repeatingInfo && repeatingInfo.field !== 'name' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
     updateAction('lairaction', repeatingInfo.rowId);
+  }
+});
+on('change:repeating_regionaleffect', (eventInfo) => {
+  const repeatingInfo = getRepeatingInfo('repeating_regionaleffect', eventInfo);
+  if (repeatingInfo && repeatingInfo.field !== 'name' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
+    updateAction('regionaleffect', repeatingInfo.rowId);
   }
 });
 
 const updateAttack = (rowId) => {
   const repeatingItem = 'repeating_attack';
-  const collectionArray = ['pb', 'strength_mod', 'finesse_mod', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability'];
+  const collectionArray = ['pb', 'strength_mod', 'finesse_mod', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability', 'ammo_auto_use'];
   const finalSetAttrs = {};
 
-  for (let i = 0; i < ABILITIES.length; i++) {
-    collectionArray.push(`${ABILITIES[i]}_mod`);
+  for (const ability of ABILITIES) {
+    collectionArray.push(`${ability}_mod`);
   }
 
   getSectionIDs(repeatingItem, (ids) => {
@@ -2863,8 +2982,8 @@ const updateAttack = (rowId) => {
       ids = [];
       ids.push(rowId);
     }
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}type`);
       collectionArray.push(`${repeatingString}roll_toggle`);
@@ -2875,6 +2994,7 @@ const updateAttack = (rowId) => {
       collectionArray.push(`${repeatingString}attack_bonus`);
       collectionArray.push(`${repeatingString}ammo_toggle_var`);
       collectionArray.push(`${repeatingString}ammo_field_name`);
+      collectionArray.push(`${repeatingString}ammo_used`);
       collectionArray.push(`${repeatingString}saving_throw_toggle`);
       collectionArray.push(`${repeatingString}saving_throw_ability`);
       collectionArray.push(`${repeatingString}saving_throw_bonus`);
@@ -2899,8 +3019,8 @@ const updateAttack = (rowId) => {
     }
 
     getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
 
         const attackName = v[`${repeatingString}name`];
         if (isUndefined(attackName)) {
@@ -2951,10 +3071,18 @@ const updateAttack = (rowId) => {
         updateAttackToggle(v, finalSetAttrs, repeatingString, attackOptions);
 
         const ammoName = v[`${repeatingString}ammo_field_name`];
+        const ammoUsed = getIntValue(v[`${repeatingString}ammo_used`], 1);
         if (!isUndefined(ammoName)) {
+          let ammoAutoUse;
+          if (v.ammo_auto_use === '@{ammo_auto_use_var}') {
+            ammoAutoUse = 1;
+          } else {
+            ammoAutoUse = 0;
+          }
+
           findAmmo(ammoName, (ammoQtyName) => {
             const setAmmo = {};
-            setAmmo[`${repeatingString}ammo_toggle_var`] = `{{ammo=[[${ammoQtyName}-@{ammo_auto_use}]]}} {{ammo_name=${ammoName}}}`;
+            setAmmo[`${repeatingString}ammo_toggle_var`] = `{{ammo=[[${ammoQtyName}-${ammoAutoUse * ammoUsed}]]}} {{ammo_name=${ammoName}}}`;
             setFinalAttrs(v, setAmmo);
           });
         }
@@ -2976,14 +3104,15 @@ const updateAttack = (rowId) => {
 };
 on('change:repeating_attack', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_attack', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed') {
+  if (repeatingInfo && repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'qty' && repeatingInfo.field !== 'weight' && repeatingInfo.field !== 'parsed') {
     updateAttack(repeatingInfo.row);
   }
 });
-on('change:repeating_attack:carried change:repeating_attack:weight remove:repeating_attack', () => {
+const weighAttacks = () => {
   const options = {
     collection: 'attack',
     toggle: 'carried',
+    qty: 'qty',
   };
   const sumItems = [
     {
@@ -2993,8 +3122,11 @@ on('change:repeating_attack:carried change:repeating_attack:weight remove:repeat
     },
   ];
   sumRepeating(options, sumItems);
+};
+on('change:repeating_attack:carried change:repeating_attack:qty change:repeating_attack:weight remove:repeating_attack', () => {
+  weighAttacks();
 });
-on('change:global_attack_bonus change:global_melee_attack_bonus change:global_ranged_attack_bonus change:global_damage_bonus change:global_melee_damage_bonus change:global_ranged_damage_bonus', () => {
+on('change:global_attack_bonus change:global_melee_attack_bonus change:global_ranged_attack_bonus change:global_damage_bonus change:global_melee_damage_bonus change:global_ranged_damage_bonus change:ammo_auto_use', () => {
   updateAttack();
   updateAction('action');
   updateAction('reaction');
@@ -3007,8 +3139,8 @@ const updateSpell = (rowId) => {
   const collectionArray = ['is_npc', 'pb', 'finesse_mod', 'global_spell_attack_bonus', 'global_spell_damage_bonus', 'global_spell_dc_bonus', 'global_spell_heal_bonus', 'default_ability', 'caster_level'];
   const finalSetAttrs = {};
 
-  for (let i = 0; i < ABILITIES.length; i++) {
-    collectionArray.push(`${ABILITIES[i]}_mod`);
+  for (const ability of ABILITIES) {
+    collectionArray.push(`${ability}_mod`);
   }
 
   getSectionIDs(repeatingItem, (ids) => {
@@ -3016,8 +3148,8 @@ const updateSpell = (rowId) => {
       ids = [];
       ids.push(rowId);
     }
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}type`);
       collectionArray.push(`${repeatingString}roll_toggle`);
@@ -3066,29 +3198,49 @@ const updateSpell = (rowId) => {
       collectionArray.push(`${repeatingString}duration`);
       collectionArray.push(`${repeatingString}concentration`);
       collectionArray.push(`${repeatingString}concentration_text`);
+      collectionArray.push(`${repeatingString}ritual`);
+      collectionArray.push(`${repeatingString}ritual_show`);
+      collectionArray.push(`${repeatingString}materials`);
+      collectionArray.push(`${repeatingString}materials_show`);
+      collectionArray.push(`${repeatingString}extras_toggle`);
+      collectionArray.push(`${repeatingString}emote`);
+      collectionArray.push(`${repeatingString}freetext`);
+      collectionArray.push(`${repeatingString}freeform`);
     }
 
     getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
 
         const spellLevel = getIntValue(v[`${repeatingString}spell_level`]);
         if (spellLevel === 0) {
           finalSetAttrs[`${repeatingString}spell_level`] = spellLevel;
-        }
-        if (spellLevel === 0) {
           finalSetAttrs[`${repeatingString}is_prepared`] = 'on';
         }
         finalSetAttrs[`${repeatingString}friendly_level`] = ordinalSpellLevel(spellLevel);
 
         const concentration = v[`${repeatingString}concentration`];
         if (concentration === 'Yes') {
+          finalSetAttrs[`${repeatingString}concentration_show`] = 1;
           finalSetAttrs[`${repeatingString}concentration_text`] = 'Concentration, ';
-        } else {
+        } else if (!isUndefined(v[`${repeatingString}concentration_text`])) {
           finalSetAttrs[`${repeatingString}concentration_text`] = '';
+          finalSetAttrs[`${repeatingString}concentration_show`] = 0;
         }
         if (v.duration) {
-          finalSetAttrs.duration = lowercaseWords(v.duration);
+          finalSetAttrs.duration = v.duration.toLowerCase();
+        }
+        const ritual = v[`${repeatingString}ritual`];
+        if (ritual === 'Yes') {
+          finalSetAttrs[`${repeatingString}ritual_show`] = 1;
+        } else if (!isUndefined(v[`${repeatingString}ritual_show`])) {
+          finalSetAttrs[`${repeatingString}ritual_show`] = 0;
+        }
+        const materials = v[`${repeatingString}materials`];
+        if (!isUndefined(materials) && materials !== '') {
+          finalSetAttrs[`${repeatingString}materials_show`] = 1;
+        } else if (!isUndefined(v[`${repeatingString}materials_show`])) {
+          finalSetAttrs[`${repeatingString}materials_show`] = 0;
         }
 
         const spellComponents = v[`${repeatingString}components`];
@@ -3132,6 +3284,10 @@ const updateSpell = (rowId) => {
         updateHealToggle(v, finalSetAttrs, repeatingString);
 
         updateHigherLevelToggle(v, finalSetAttrs, repeatingString);
+
+        if (v[`${repeatingString}emote`] || v[`${repeatingString}freetext`] || v[`${repeatingString}freeform`]) {
+          finalSetAttrs[`${repeatingString}extras_toggle`] = '@{extras_var}';
+        }
       }
       setFinalAttrs(v, finalSetAttrs);
     });
@@ -3140,106 +3296,13 @@ const updateSpell = (rowId) => {
 on('change:repeating_spell', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_spell', eventInfo);
   if (repeatingInfo && repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'heal_formula' && repeatingInfo.field !== 'higher_level_query' && repeatingInfo.field !== 'parsed') {
-    console.log('spell repeatingInfo.field', repeatingInfo.field);
+    console.info('spell repeatingInfo.field', repeatingInfo.field);
     updateSpell(repeatingInfo.rowId);
   }
 });
 on('change:global_spell_attack_bonus change:global_spell_damage_bonus change:global_spell_dc_bonus change:global_spell_heal_bonus', () => {
   updateSpell();
 });
-
-const updateClassFeature = (rowId) => {
-  const repeatingItem = 'repeating_classfeature';
-  const collectionArray = ['pb', 'finesse_mod', 'default_ability'];
-  const finalSetAttrs = {};
-
-  for (let i = 0; i < ABILITIES.length; i++) {
-    collectionArray.push(`${ABILITIES[i]}_mod`);
-  }
-
-  getSectionIDs(repeatingItem, (ids) => {
-    if (rowId) {
-      ids = [];
-      ids.push(rowId);
-    }
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
-      collectionArray.push(`${repeatingString}name`);
-      collectionArray.push(`${repeatingString}saving_throw_toggle`);
-      collectionArray.push(`${repeatingString}saving_throw_ability`);
-      collectionArray.push(`${repeatingString}saving_throw_vs_ability`);
-      collectionArray.push(`${repeatingString}saving_throw_bonus`);
-      collectionArray.push(`${repeatingString}saving_throw_dc`);
-      collectionArray.push(`${repeatingString}damage_toggle`);
-      collectionArray.push(`${repeatingString}damage_formula`);
-      collectionArray.push(`${repeatingString}damage`);
-      collectionArray.push(`${repeatingString}damage_ability`);
-      collectionArray.push(`${repeatingString}damage_bonus`);
-      collectionArray.push(`${repeatingString}damage_type`);
-      collectionArray.push(`${repeatingString}second_damage_toggle`);
-      collectionArray.push(`${repeatingString}second_damage_formula`);
-      collectionArray.push(`${repeatingString}second_damage`);
-      collectionArray.push(`${repeatingString}second_damage_ability`);
-      collectionArray.push(`${repeatingString}second_damage_bonus`);
-      collectionArray.push(`${repeatingString}second_damage_type`);
-      collectionArray.push(`${repeatingString}damage_string`);
-      collectionArray.push(`${repeatingString}heal_toggle`);
-      collectionArray.push(`${repeatingString}heal`);
-      collectionArray.push(`${repeatingString}heal_ability`);
-      collectionArray.push(`${repeatingString}heal_bonus`);
-      collectionArray.push(`${repeatingString}heal_query_toggle`);
-      collectionArray.push(`${repeatingString}add_casting_modifier`);
-    }
-
-    getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
-
-        const damageOptions = {
-          type: 'attack',
-        };
-        updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
-        const savingThrowOptions = {};
-        updateSavingThrowToggle(v, finalSetAttrs, repeatingString, savingThrowOptions);
-        updateHealToggle(v, finalSetAttrs, repeatingString);
-      }
-      setFinalAttrs(v, finalSetAttrs);
-    });
-  });
-};
-on('change:repeating_classfeature', (eventInfo) => {
-  const repeatingInfo = getRepeatingInfo('repeating_classfeature', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'toggle_extras' && repeatingInfo.field !== 'heal_formula' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'freeform') {
-    console.log('class feature repeatingInfo.field', repeatingInfo.field);
-    updateClassFeature(repeatingInfo.rowId);
-  }
-});
-
-const updateClassFeatureToggleToNewVer = () => {
-  const repeatingItem = 'repeating_classfeature';
-  const collectionArray = [];
-  const finalSetAttrs = {};
-
-  getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
-      collectionArray.push(`${repeatingString}heal_toggle`);
-    }
-
-    getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
-
-        const healToggled = v[`${repeatingString}heal_toggle`];
-        if (!isUndefined(healToggled)) {
-          updateClassFeature();
-          return;
-        }
-      }
-      setFinalAttrs(v, finalSetAttrs);
-    });
-  });
-};
 
 function updateD20Mod() {
   const collectionArray = ['halfling_luck'];
@@ -3266,28 +3329,42 @@ const updateAbilityChecksMacro = () => {
 
   finalSetAttrs.ability_checks_query_var = '?{Ability Check';
   finalSetAttrs.ability_checks_macro_var = '';
+  finalSetAttrs.skills_macro_var = '';
 
-  for (let i = 0; i < ABILITIES.length; i++) {
-    finalSetAttrs.ability_checks_query_var += `|${capitalize(ABILITIES[i])},{{title=${capitalize(ABILITIES[i])}&#125;&#125; {{roll1=[[@{preroll}d20@{postroll}@{d20_mod} + @{${ABILITIES[i]}_check_mod}]]&#125;&#125; @{roll_setting}@{d20_mod} + @{${ABILITIES[i]}_check_mod}]]&#125;&#125;`;
-    finalSetAttrs.ability_checks_macro_var += `[${capitalize(ABILITIES[i])}](~${ABILITIES[i]}_check)`;
-    if (i < ABILITIES.length - 1) {
-      finalSetAttrs.ability_checks_macro_var += ', ';
-    }
+  for (const ability of ABILITIES) {
+    collectionArray.push(`${ability}_check_mod`);
+    collectionArray.push(`${ability}_check_mod_with_sign`);
   }
-
   getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}ability`);
+      collectionArray.push(`${repeatingString}total_with_sign`);
     }
 
     getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
-        finalSetAttrs.ability_checks_query_var += `|${v[`${repeatingString}name`]}, {{title=${v[`${repeatingString}name`]} (${capitalize(getAbilityShortName(v[`${repeatingString}ability`]))})&#125;&#125; {{roll1=[[@{preroll}d20@{postroll}@{d20_mod} + @{${repeatingString}formula}]]&#125;&#125; @{roll_setting}@{d20_mod} + @{${repeatingString}formula}]]&#125;&#125;`;
+      for (const ability of ABILITIES) {
+        if (!v[`${ability}_check_mod_with_sign`]) {
+          console.warn('rerun until the fields are set');
+          updateAbilityModifiers();
+          updateAbilityChecksMacro();
+        }
+
+        finalSetAttrs.ability_checks_query_var += `|${capitalize(ability)},{{title=${capitalize(ability)}&#125;&#125; {{roll1=[[@{preroll}d20@{postroll}@{d20_mod} + ${v[`${ability}_check_mod`]}]]&#125;&#125; @{roll_setting}@{d20_mod} + ${v[`${ability}_check_mod`]}]]&#125;&#125;`;
+        finalSetAttrs.ability_checks_macro_var += `[${capitalize(ability)} ${v[`${ability}_check_mod_with_sign`]}](~${ability}_check)`;
         finalSetAttrs.ability_checks_macro_var += ', ';
-        finalSetAttrs.ability_checks_macro_var += `[${v[`${repeatingString}name`]}](~repeating_skill_${ids[j]}_skill)`;
+      }
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
+        finalSetAttrs.ability_checks_query_var += `|${v[`${repeatingString}name`]}, {{title=${v[`${repeatingString}name`]} (${capitalize(getAbilityShortName(v[`${repeatingString}ability`]))})&#125;&#125; {{roll1=[[@{preroll}d20@{postroll}@{d20_mod} + @{${repeatingString}formula}]]&#125;&#125; @{roll_setting}@{d20_mod} + @{${repeatingString}formula}]]&#125;&#125;`;
+        if (id !== ids[0]) {
+          finalSetAttrs.ability_checks_macro_var += ', ';
+          finalSetAttrs.skills_macro_var += ', ';
+        }
+        const skillButton = `[${v[`${repeatingString}name`]} ${v[`${repeatingString}total_with_sign`]}](~repeating_skill_${id}_skill)`;
+        finalSetAttrs.ability_checks_macro_var += skillButton;
+        finalSetAttrs.skills_macro_var += skillButton;
       }
       finalSetAttrs.ability_checks_query_var += '}';
       setFinalAttrs(v, finalSetAttrs);
@@ -3326,9 +3403,9 @@ const updateSkill = (rowId) => {
   const collectionArray = ['jack_of_all_trades_toggle', 'jack_of_all_trades', 'remarkable_athlete_toggle', 'remarkable_athlete', 'pb', 'exp', 'global_check_bonus'];
   const finalSetAttrs = {};
 
-  for (let i = 0; i < ABILITIES.length; i++) {
-    collectionArray.push(`${ABILITIES[i]}_mod`);
-    collectionArray.push(`${ABILITIES[i]}_check_bonus`);
+  for (const ability of ABILITIES) {
+    collectionArray.push(`${ability}_mod`);
+    collectionArray.push(`${ability}_check_bonus`);
   }
 
   getSectionIDs(repeatingItem, (ids) => {
@@ -3336,8 +3413,8 @@ const updateSkill = (rowId) => {
       ids = [];
       ids.push(rowId);
     }
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}proficiency`);
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}ability`);
@@ -3349,8 +3426,8 @@ const updateSkill = (rowId) => {
     }
 
     getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
 
         const skillName = v[`${repeatingString}name`];
         if (isUndefined(skillName)) {
@@ -3373,8 +3450,6 @@ const updateSkill = (rowId) => {
             const jackOfAllTrades = getIntValue(v.jack_of_all_trades);
             total += jackOfAllTrades;
             totalFormula += `${jackOfAllTrades}[jack of all trades]`;
-          } else {
-            totalFormula += '0[unproficient]';
           }
         } else if (proficiency === 'proficient') {
           const pb = getIntValue(v.pb);
@@ -3389,13 +3464,13 @@ const updateSkill = (rowId) => {
         const skillAbility = getAbilityValue(v, ability, 'strength_mod');
         if (exists(skillAbility)) {
           total += skillAbility;
-          totalFormula += ` + ${skillAbility}[${getAbilityShortName(ability)}]`;
+          totalFormula += `${addArithmeticOperator(totalFormula, skillAbility)}[${getAbilityShortName(ability)}]`;
         }
 
         const skillBonus = getIntValue(v[`${repeatingString}bonus`]);
         if (exists(skillBonus)) {
           total += skillBonus;
-          totalFormula += ` + ${skillBonus}[bonus]`;
+          totalFormula += `${addArithmeticOperator(totalFormula, skillBonus)}[bonus]`;
         }
 
         const skillAbilityName = getAbilityName(ability);
@@ -3404,7 +3479,7 @@ const updateSkill = (rowId) => {
           if (exists(checkBonus)) {
             checkBonus = getIntValue(checkBonus);
             total += checkBonus;
-            totalFormula += ` + ${checkBonus}[${getAbilityShortName(ability)} check bonus]`;
+            totalFormula += `${addArithmeticOperator(totalFormula, checkBonus)}[${getAbilityShortName(ability)} check bonus]`;
           }
         }
 
@@ -3413,20 +3488,16 @@ const updateSkill = (rowId) => {
           if (!isNaN(globalCheckBonus)) {
             total += getIntValue(globalCheckBonus);
           }
-          totalFormula += ` + ${globalCheckBonus}[global check bonus]`;
-        }
-
-        let totalWithSign = total;
-        if (total >= 0) {
-          totalWithSign = `+${total}`;
+          totalFormula += ' + (@{global_check_bonus})[global check bonus]';
         }
 
         finalSetAttrs[`${repeatingString}total`] = total;
-        finalSetAttrs[`${repeatingString}total_with_sign`] = totalWithSign;
+        finalSetAttrs[`${repeatingString}total_with_sign`] = showSign(total);
         finalSetAttrs[`${repeatingString}formula`] = totalFormula;
       }
-      setFinalAttrs(v, finalSetAttrs);
-      updateAbilityChecksMacro();
+      setFinalAttrs(v, finalSetAttrs, () => {
+        updateAbilityChecksMacro();
+      });
     });
   });
 };
@@ -3450,8 +3521,8 @@ const updateSkillsFromSRD = () => {
   const finalSetAttrs = {};
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}ability`);
     }
@@ -3464,10 +3535,10 @@ const updateSkillsFromSRD = () => {
       let repeatingString;
 
       if (!isUndefined(skillsFromSRD)) {
-        for (let j = 0; j < ids.length; j++) {
-          repeatingString = `${repeatingItem}_${ids[j]}_`;
+        for (const id of ids) {
+          repeatingString = `${repeatingItem}_${id}_`;
           skillName = v[`${repeatingString}name`];
-          skillsObj[skillName] = ids[j];
+          skillsObj[skillName] = id;
         }
 
         const re = /(\w+)\s?((?:\+|\-)\d+)/gi;
@@ -3495,7 +3566,7 @@ const updateSkillsFromSRD = () => {
                 }
               }
             } else {
-              console.log(`${skillName} does not exist in the list of skills`);
+              console.warn(`${skillName} does not exist in the list of skills`);
             }
           }
         }
@@ -3509,25 +3580,28 @@ on('change:skills_srd', () => {
 });
 
 const updateSavingThrow = (ability) => {
-  const collectionArray = ['pb', `${ability}_mod`, `${ability}_save_prof`, `${ability}_save_bonus`, 'global_saving_throw_bonus'];
+  const collectionArray = ['pb', `${ability}_mod`, `${ability}_save_prof`, `${ability}_save_bonus`, 'global_saving_throw_bonus', 'saving_throws_half_proficiency'];
   const finalSetAttrs = {};
 
   getAttrs(collectionArray, (v) => {
-    const proficiency = v[`${ability}_save_prof`];
     const abilityMod = getIntValue(v[`${ability}_mod`]);
     let total = abilityMod;
     let totalFormula = `${abilityMod}[${getAbilityShortName(ability)}]`;
 
-    if (proficiency === '@{PB}') {
-      const pb = getIntValue(v.pb);
+    const pb = getIntValue(v.pb);
+    if (v[`${ability}_save_prof`] === '@{PB}') {
       total += pb;
-      totalFormula += ` + ${pb}[proficient]`;
+      totalFormula += `${addArithmeticOperator(totalFormula, pb)}[proficient]`;
+    } else if (v.saving_throws_half_proficiency === 'on') {
+      const halfPB = Math.floor(pb / 2);
+      total += halfPB;
+      totalFormula += `${addArithmeticOperator(totalFormula, halfPB)}[half proficiency]`;
     }
 
     const abilitySavingThrowBonus = getIntValue(v[`${ability}_save_bonus`]);
-    if (exists(abilitySavingThrowBonus)) {
+    if (abilitySavingThrowBonus) {
       total += abilitySavingThrowBonus;
-      totalFormula += ` + ${abilitySavingThrowBonus}[${getAbilityShortName(ability)}saving throw bonus]`;
+      totalFormula += `${addArithmeticOperator(totalFormula, abilitySavingThrowBonus)}[${getAbilityShortName(ability)}saving throw bonus]`;
     }
 
     const globalSavingThrowBonus = v.global_saving_throw_bonus;
@@ -3535,16 +3609,11 @@ const updateSavingThrow = (ability) => {
       if (!isNaN(globalSavingThrowBonus)) {
         total += getIntValue(globalSavingThrowBonus);
       }
-      totalFormula += ` + ${globalSavingThrowBonus}[global saving throw bonus]`;
-    }
-
-    let savingThrowWithSign = total;
-    if (total >= 0) {
-      savingThrowWithSign = `+${total}`;
+      totalFormula += `${addArithmeticOperator(totalFormula, globalSavingThrowBonus)}[global saving throw bonus]`;
     }
 
     finalSetAttrs[`${ability}_saving_throw_mod`] = totalFormula;
-    finalSetAttrs[`${ability}_saving_throw_mod_with_sign`] = savingThrowWithSign;
+    finalSetAttrs[`${ability}_saving_throw_mod_with_sign`] = showSign(total);
     setFinalAttrs(v, finalSetAttrs);
   });
 };
@@ -3556,22 +3625,25 @@ const updateSavingThrows = () => {
   updateSavingThrow('wisdom');
   updateSavingThrow('charisma');
 };
-on('change:pb change:strength_mod change:strength_save_prof change:strength_save_bonus change:global_saving_throw_bonus', () => {
+on('change:pb change:global_saving_throw_bonus change:saving_throws_half_proficiency', () => {
+  updateSavingThrows();
+});
+on('change:strength_mod change:strength_save_prof change:strength_save_bonus', () => {
   updateSavingThrow('strength');
 });
-on('change:pb change:dexterity_mod change:dexterity_save_prof change:dexterity_save_bonus change:global_saving_throw_bonus', () => {
+on('change:dexterity_mod change:dexterity_save_prof change:dexterity_save_bonus', () => {
   updateSavingThrow('dexterity');
 });
-on('change:pb change:constitution_mod change:constitution_save_prof change:constitution_save_bonus change:global_saving_throw_bonus', () => {
+on('change:constitution_mod change:constitution_save_prof change:constitution_save_bonus', () => {
   updateSavingThrow('constitution');
 });
-on('change:pb change:intelligence_mod change:intelligence_save_prof change:intelligence_save_bonus change:global_saving_throw_bonus', () => {
+on('change:intelligence_mod change:intelligence_save_prof change:intelligence_save_bonus', () => {
   updateSavingThrow('intelligence');
 });
-on('change:pb change:wisdom_mod change:wisdom_save_prof change:wisdom_save_bonus change:global_saving_throw_bonus', () => {
+on('change:wisdom_mod change:wisdom_save_prof change:wisdom_save_bonus', () => {
   updateSavingThrow('wisdom');
 });
-on('change:pb change:charisma_mod change:charisma_save_prof change:charisma_save_bonus change:global_saving_throw_bonus', () => {
+on('change:charisma_mod change:charisma_save_prof change:charisma_save_bonus', () => {
   updateSavingThrow('charisma');
 });
 
@@ -3615,10 +3687,9 @@ const updateSpellsFromSRD = () => {
   getAttrs(collectionArray, (v) => {
     const spells = v.spells_srd.split(', ');
 
-    for (let i = 0; i < spells.length; i++) {
-      const newRowId = generateRowID();
-      const repeatingString = `repeating_spell_${newRowId}_`;
-      finalSetAttrs[`${repeatingString}name`] = spells[i];
+    for (const spell of spells) {
+      const repeatingString = `repeating_spell_${generateRowID()}_`;
+      finalSetAttrs[`${repeatingString}name`] = spell;
     }
     setFinalAttrs(v, finalSetAttrs);
   });
@@ -3629,45 +3700,52 @@ on('change:spells_srd', () => {
 
 const updateAttachers = () => {
   const repeatingItem = 'repeating_attacher';
-  const collectionArray = ['attacher_initiative', 'attacher_death_saving_throw', 'attacher_hit_dice', 'attacher_attack', 'attacher_spell', 'attacher_skill'];
+  const collectionArray = ['attacher_initiative', 'attacher_death_saving_throw', 'attacher_hit_dice', 'attacher_attack', 'attacher_spell', 'attacher_skill', 'attacher_crit'];
   const finalSetAttrs = {};
   const itemsToPush = ['initiative', 'death_saving_throw', 'hit_dice', 'attack', 'spell', 'skill'];
 
-  for (let i = 0; i < ABILITIES.length; i++) {
-    collectionArray.push(`attacher_${ABILITIES[i]}_check`);
-    collectionArray.push(`attacher_${ABILITIES[i]}_saving_throw`);
-    itemsToPush.push(`${ABILITIES[i]}_check`);
-    itemsToPush.push(`${ABILITIES[i]}_saving_throw`);
+  for (const ability of ABILITIES) {
+    collectionArray.push(`attacher_${ability}_check`);
+    collectionArray.push(`attacher_${ability}_saving_throw`);
+    itemsToPush.push(`${ability}_check`);
+    itemsToPush.push(`${ability}_saving_throw`);
   }
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}freetext`);
       collectionArray.push(`${repeatingString}freeform`);
+      collectionArray.push(`${repeatingString}crit_attacher`);
 
-      for (let x = 0; x < itemsToPush.length; x++) {
-        collectionArray.push(`${repeatingString}${itemsToPush[x]}_attacher`);
-        finalSetAttrs[`attacher_${itemsToPush[x]}`] = ' ';
+      for (const itemToPush of itemsToPush) {
+        collectionArray.push(`${repeatingString}${itemToPush}_attacher`);
+        finalSetAttrs[`attacher_${itemToPush}`] = '';
       }
     }
     getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
 
-        for (let x = 0; x < itemsToPush.length; x++) {
-          const attacher = v[`${repeatingString}${itemsToPush[x]}_attacher`];
+        for (const itemToPush of itemsToPush) {
+          const attacher = v[`${repeatingString}${itemToPush}_attacher`];
           if (exists(attacher) && attacher === 'on') {
             const attacherName = v[`${repeatingString}name`] || '';
 
             const freeText = v[`${repeatingString}freetext`];
             if (exists(attacherName) && exists(freeText)) {
-              finalSetAttrs[`attacher_${itemsToPush[x]}`] += `{{${attacherName}=${freeText}}} `;
+              const critAttacher = v[`${repeatingString}crit_attacher`];
+              if (critAttacher === 'on') {
+                finalSetAttrs[`attacher_${itemToPush}`] += `{{crit_name=${attacherName}}} `;
+                finalSetAttrs[`attacher_${itemToPush}`] += `{{crit_text=${freeText}}} `;
+              } else {
+                finalSetAttrs[`attacher_${itemToPush}`] += `{{${attacherName}=${freeText}}} `;
+              }
             }
             const freeForm = v[`${repeatingString}freeform`];
             if (exists(freeForm)) {
-              finalSetAttrs[`attacher_${itemsToPush[x]}`] += `${freeForm} `;
+              finalSetAttrs[`attacher_${itemToPush}`] += `${freeForm} `;
             }
           }
         }
@@ -3747,7 +3825,7 @@ const updateNPCHPFromSRD = () => {
     if (exists(v.hp_srd)) {
       const match = v.hp_srd.match(/\((\d+)d(\d+)(?:\s?(\+|\-)\s?(\d+))?\)/i);
       if (!match || !match[1] || !match[2]) {
-        console.log('Character doesn\'t have valid HP/HD format');
+        console.warn('Character doesn\'t have valid HP/HD format');
       } else {
         const hdNum = getIntValue(match[1]);
 
@@ -3798,16 +3876,16 @@ const updateNPCHP = () => {
     if (conMod !== 0) {
       const bonusHP = hdNum * conMod;
       totalHP += bonusHP;
-      hpFormula += addOrSubtract(hpFormula, bonusHP);
+      hpFormula += addArithmeticOperator(hpFormula, bonusHP);
     }
 
     if (exists(v.hp_extra)) {
-      const regex = (/(?:(\+|\-)\s)?(\d+)(?:d(\d+))?/gi);
+      const regex = (/(?:(\+|\-)\s?)?(\d+)(?:d(\d+))?/gi);
       let splitFormula;
 
       while ((splitFormula = regex.exec(v.hp_extra)) !== null) {
         if (!splitFormula || !splitFormula[2]) {
-          console.log('Character doesn\'t have valid hp formula');
+          console.warn('Character doesn\'t have valid hp formula');
         } else {
           amount = 0;
 
@@ -3822,13 +3900,13 @@ const updateNPCHP = () => {
 
           if (!splitFormula[1] || splitFormula[1] === '+') {
             totalHP += amount;
-            hpFormula += ` + ${amount}`;
+            hpFormula += `${addArithmeticOperator(hpFormula, amount)}`;
           } else if (splitFormula[1] === '-') {
             totalHP -= amount;
-            hpFormula += ` - ${amount}`;
+            hpFormula += `${addArithmeticOperator(hpFormula, amount)}`;
           }
         }
-        v.hp_extra.replace(splitFormula[0], '');
+        v.hp_extra.toString().replace(splitFormula[0], '');
       }
     }
 
@@ -3880,109 +3958,89 @@ const setDefaultAbility = (v, finalSetAttrs) => {
   finalSetAttrs.default_ability = `@{${highestAbilityName}_mod}`;
 };
 
+const parseSRDContentSection = (content, finalSetAttrs, title, name) => {
+  const re = /@(.*)@:\s([^@]+)/gi;
+  let match;
+  let section;
+
+  if (content.indexOf(title) !== -1) {
+    const contentSplit = content.split(`${title}\n`);
+    section = contentSplit[1];
+    content = contentSplit[0];
+  }
+  if (exists(section)) {
+    if (name === 'legendaryaction') {
+      const legendaryActionsMatch = content.match(/Can take (\d+) Legendary Actions/gi);
+      if (legendaryActionsMatch && legendaryActionsMatch[1]) {
+        finalSetAttrs.legendary_action_amount = legendaryActionAmount[1];
+      }
+    }
+
+    while ((match = re.exec(section.replace(/\*\*/g, '@'))) !== null) {
+      if (match && match[1] && match[2]) {
+        const repeatingString = `repeating_${name}_${generateRowID()}_`;
+        finalSetAttrs[`${repeatingString}name`] = match[1];
+        const text = match[2].trim();
+        if (name === 'trait') {
+          finalSetAttrs[`${repeatingString}display_text`] = text;
+        }
+        finalSetAttrs[`${repeatingString}freetext`] = text;
+      } else {
+        console.warn(`Character doesn\'t have a valid ${name} format`);
+      }
+    }
+  }
+  return content;
+};
+
 const updateNPCContent = () => {
   const collectionArray = ['content_srd'];
   const finalSetAttrs = {};
 
-  for (let i = 0; i < ABILITIES.length; i++) {
-    collectionArray.push(ABILITIES[i]);
+  for (const ability of ABILITIES) {
+    collectionArray.push(ability);
   }
 
   getAttrs(collectionArray, (v) => {
     let content = v.content_srd;
-    let legendaryActions;
-    let reactions;
-    let actions;
-    let traits;
-    const re = /\@(.*)\@:\s([^@]+)/gi;
-    let match;
-    let newRowId;
+    let regionalEffects;
+    let lairActions;
     let repeatingString;
 
     setDefaultAbility(v, finalSetAttrs);
 
     if (exists(content)) {
-      if (content.indexOf('Legendary Actions') !== -1) {
-        const legendaryActionsSplit = content.split(/Legendary Actions\n/);
-        legendaryActions = legendaryActionsSplit[1];
-        content = legendaryActionsSplit[0];
+      if (content.indexOf('Regional Effects') !== -1) {
+        const regionalEffectsSplit = content.split(/Regional Effects\n/);
+        regionalEffects = regionalEffectsSplit[1];
+        content = regionalEffectsSplit[0];
       }
-      if (exists(legendaryActions)) {
-        let legendaryActionAmount = 3;
-        const legendaryActionsMatch = legendaryActions.match(/Can take (\d+) Legendary Actions/gi);
-
-        if (legendaryActionsMatch && legendaryActionsMatch[1]) {
-          legendaryActionAmount = legendaryActionAmount[1];
-        }
-
-        finalSetAttrs.legendary_action_amount = legendaryActionAmount;
-
-        while ((match = re.exec(legendaryActions.replace(/\*\*/g, '@'))) !== null) {
-          if (match && match[1] && match[2]) {
-            newRowId = generateRowID();
-            repeatingString = `repeating_legendaryaction_${newRowId}_`;
-            finalSetAttrs[`${repeatingString}name`] = match[1];
-            finalSetAttrs[`${repeatingString}freetext`] = match[2].trim();
-          } else {
-            console.log('Character doesn\'t have a valid legendary action format');
-          }
-        }
+      if (exists(regionalEffects)) {
+        const regionalEffectsList = regionalEffects.split(/\*\*/);
+        regionalEffectsList.slice(1, -1).forEach((regionalEffect) => {
+          repeatingString = `repeating_regionaleffect_${generateRowID()}_`;
+          finalSetAttrs[`${repeatingString}freetext`] = regionalEffect.trim();
+        });
+        finalSetAttrs.regional_effects_fade = regionalEffectsList.slice(-1)[0];
       }
-      if (content.indexOf('Reactions') !== -1) {
-        const reactionsSplit = content.split(/Reactions\n/);
-        reactions = reactionsSplit[1];
-        content = reactionsSplit[0];
+      if (content.indexOf('Lair Actions') !== -1) {
+        const lairActionsSplit = content.split(/Lair Actions\n/);
+        lairActions = lairActionsSplit[1];
+        content = lairActionsSplit[0];
       }
-      if (exists(reactions)) {
-        while ((match = re.exec(reactions.replace(/\*\*/g, '@'))) !== null) {
-          if (match && match[1] && match[2]) {
-            newRowId = generateRowID();
-            repeatingString = `repeating_reaction_${newRowId}_`;
-            finalSetAttrs[`${repeatingString}name`] = match[1];
-            finalSetAttrs[`${repeatingString}freetext`] = match[2].trim();
-          } else {
-            console.log('Character doesn\'t have a valid reaction format');
-          }
-        }
-      }
-      if (content.indexOf('Actions') !== -1) {
-        const actionsSplit = content.split(/Actions\n/);
-        actions = actionsSplit[1];
-        content = actionsSplit[0];
-      }
-      if (exists(actions)) {
-        while ((match = re.exec(actions.replace(/\*\*/g, '@'))) !== null) {
-          if (match && match[1] && match[2]) {
-            newRowId = generateRowID();
-            repeatingString = `repeating_action_${newRowId}_`;
-            finalSetAttrs[`${repeatingString}name`] = match[1];
-            finalSetAttrs[`${repeatingString}freetext`] = match[2].trim();
-          } else {
-            console.log('Character doesn\'t have a valid action format');
-          }
-        }
+      if (exists(lairActions)) {
+        lairActions.split(/\*\*/).slice(1).forEach((lairAction) => {
+          repeatingString = `repeating_lairaction_${generateRowID()}_`;
+          finalSetAttrs[`${repeatingString}freetext`] = lairAction.trim();
+        });
       }
 
-      if (content.indexOf('Traits') !== -1) {
-        const traitsSplit = content.split(/Traits\n/);
-        traits = traitsSplit[1];
-        content = traitsSplit[0];
-      }
-      if (exists(traits)) {
-        while ((match = re.exec(traits.replace(/\*\*/g, '@'))) !== null) {
-          if (match && match[1] && match[2]) {
-            newRowId = generateRowID();
-            repeatingString = `repeating_trait_${newRowId}_`;
-            finalSetAttrs[`${repeatingString}name`] = match[1];
-            const text = match[2].trim();
-            finalSetAttrs[`${repeatingString}display_text`] = text;
-            finalSetAttrs[`${repeatingString}freetext`] = text;
-          } else {
-            console.log('Character doesn\'t have a valid trait format');
-          }
-        }
-      }
+      content = parseSRDContentSection(content, finalSetAttrs, 'Legendary Actions', 'legendaryaction');
+      content = parseSRDContentSection(content, finalSetAttrs, 'Reactions', 'reaction');
+      content = parseSRDContentSection(content, finalSetAttrs, 'Actions', 'action');
+      parseSRDContentSection(content, finalSetAttrs, 'Traits', 'trait');
     }
+
     setFinalAttrs(v, finalSetAttrs);
   });
 };
@@ -3996,15 +4054,15 @@ const displayTextForTraits = () => {
   const finalSetAttrs = {};
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}display_text`);
       collectionArray.push(`${repeatingString}freetext`);
     }
 
     getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
 
         if (isUndefined(v.display_text)) {
           finalSetAttrs[`${repeatingString}display_text`] = v[`${repeatingString}freetext`];
@@ -4048,20 +4106,18 @@ const parseDamage = (finalSetAttrs, repeatingString, freetext, regex, name, spel
     }
     freetext = freetext.replace(regex, '');
     finalSetAttrs[`${repeatingString}${name}_toggle`] = `@{${name}_toggle_var}`;
-  } else {
-    finalSetAttrs[`${repeatingString}${name}_toggle`] = 0;
   }
   return freetext;
 };
 
-const parseAction = (rowId, type) => {
+const parseAction = (type, rowId) => {
   const repeatingItem = `repeating_${type}`;
   const collectionArray = ['level', 'challenge', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability'];
   const finalSetAttrs = {};
 
-  const damageType = /((?:[\w]+|[\w]+\s(?:or|and)\s[\w]+)(?:\s*?\([\w\s]+\))?)\s*?damage\s?(\([\w\'\s]+\))?/;
   const damageSyntax = /(?:(\d+)|.*?\(([\dd\s\+\-]*)\).*?)\s*?/;
-  const altDamageSyntax = /(?:\,\s*?or\s*?)/;
+  const damageType = /((?:[a-zA-Z]+|[a-zA-Z]+\s(?:or|and)\s[a-zA-Z]+)(?:\s*?\([a-zA-Z\s]+\))?)\s*?damage\s?(\([a-zA-Z'\s]+\))?/;
+  const altDamageSyntax = /(?:,\s*?or\s*?)/;
   const plus = /\s*?plus\s*?/;
   const savingThrowRe = /(?:DC)\s*?(\d+)\s*?([a-zA-Z]*)\s*?(?:saving throw)/;
   const saveSuccess = /or\s(.*)?\son a successful one./;
@@ -4079,8 +4135,8 @@ const parseAction = (rowId, type) => {
   const spellcastingLevelRegex = /(\d+)(?:st|dn|rd|th)-level spellcaster/i;
   const spellcastingAbilityRegex = /spellcasting ability is (\w+)/i;
 
-  for (let i = 0; i < ABILITIES.length; i++) {
-    collectionArray.push(`${ABILITIES[i]}_mod`);
+  for (const ability of ABILITIES) {
+    collectionArray.push(`${ability}_mod`);
   }
 
   getSectionIDs(repeatingItem, (ids) => {
@@ -4088,8 +4144,8 @@ const parseAction = (rowId, type) => {
       ids = [];
       ids.push(rowId);
     }
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}freetext`);
     }
@@ -4106,8 +4162,8 @@ const parseAction = (rowId, type) => {
       const spellMods = [intMod, wisMod, chaMod];
       const abilityMods = [strMod, dexMod, conMod, intMod, wisMod, chaMod];
 
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
 
         let rangedAttack = false;
         let spellAttack = false;
@@ -4221,29 +4277,31 @@ const parseAction = (rowId, type) => {
 
         finalSetAttrs[`${repeatingString}extras_toggle`] = '@{extras_var}';
       }
-      setFinalAttrs(v, finalSetAttrs);
+      setFinalAttrs(v, finalSetAttrs, () => {
+        updateAction(type, rowId);
+      });
     });
   });
 };
 on('change:repeating_trait:freetext', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_trait', eventInfo);
-  parseAction(repeatingInfo.rowId, 'trait');
+  parseAction('trait', repeatingInfo.rowId);
 });
 on('change:repeating_action:freetext', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_action', eventInfo);
-  parseAction(repeatingInfo.rowId, 'action');
+  parseAction('action', repeatingInfo.rowId);
 });
 on('change:repeating_reaction:freetext', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_reaction', eventInfo);
-  parseAction(repeatingInfo.rowId, 'reaction');
+  parseAction('reaction', repeatingInfo.rowId);
 });
 on('change:repeating_legendaryaction:freetext', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_legendaryaction', eventInfo);
-  parseAction(repeatingInfo.rowId, 'legendaryaction');
+  parseAction('legendaryaction', repeatingInfo.rowId);
 });
 on('change:repeating_lairaction:freetext', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_lairaction', eventInfo);
-  parseAction(repeatingInfo.rowId, 'lairaction');
+  parseAction('lairaction', repeatingInfo.rowId);
 });
 
 const countAction = (type) => {
@@ -4251,13 +4309,15 @@ const countAction = (type) => {
   const collectionArray = [`${type}s_exist`];
   const finalSetAttrs = {};
 
-  finalSetAttrs[`${type}s_exist`] = 0;
 
   getSectionIDs(repeatingItem, (ids) => {
-    if (ids.length > 0) {
-      finalSetAttrs[`${type}s_exist`] = 1;
-    }
     getAttrs(collectionArray, (v) => {
+      if (ids.length > 0) {
+        finalSetAttrs[`${type}s_exist`] = 1;
+      } else if (exists(v[`${type}s_exist`])) {
+        finalSetAttrs[`${type}s_exist`] = 0;
+      }
+
       setFinalAttrs(v, finalSetAttrs);
     });
   });
@@ -4276,6 +4336,9 @@ on('change:repeating_legendaryaction remove:repeating_legendaryaction', () => {
 });
 on('change:repeating_lairaction remove:repeating_lairaction', () => {
   countAction('lairaction');
+});
+on('change:repeating_regionaleffect remove:repeating_regionaleffect', () => {
+  countAction('regionaleffect');
 });
 
 const switchToNPC = () => {
@@ -4323,7 +4386,7 @@ const updateType = () => {
 
   getAttrs(collectionArray, (v) => {
     if (v.type) {
-      finalSetAttrs.type = lowercaseWords(v.type);
+      finalSetAttrs.type = v.type.toLowerCase();
     }
     setFinalAttrs(v, finalSetAttrs);
   });
@@ -4337,8 +4400,8 @@ const updateAlignment = () => {
   const finalSetAttrs = {};
 
   getAttrs(collectionArray, (v) => {
-    if (v.alignment && v.is_npc) {
-      finalSetAttrs.alignment = lowercaseWords(v.alignment);
+    if (v.alignment && v.is_npc === '1') {
+      finalSetAttrs.alignment = v.alignment.toLowerCase();
     }
     setFinalAttrs(v, finalSetAttrs);
   });
@@ -4354,7 +4417,7 @@ const updateSenses = () => {
   getAttrs(collectionArray, (v) => {
     if (v.senses) {
       finalSetAttrs.senses_exist = 1;
-      finalSetAttrs.senses = lowercaseWords(v.senses);
+      finalSetAttrs.senses = v.senses.toLowerCase();
     } else {
       finalSetAttrs.senses_exist = 0;
     }
@@ -4366,14 +4429,16 @@ on('change:senses', () => {
 });
 
 const updateLanguages = () => {
-  const collectionArray = ['languages'];
+  const collectionArray = ['languages', 'languages_exist', 'languages_chat_var'];
   const finalSetAttrs = {};
+
+  finalSetAttrs.languages_exist = 0;
+  finalSetAttrs.languages_chat_var = '';
 
   getAttrs(collectionArray, (v) => {
     if (v.languages) {
       finalSetAttrs.languages_exist = 1;
-    } else {
-      finalSetAttrs.languages_exist = 0;
+      finalSetAttrs.languages_chat_var = '{{Languages=@{languages}}}';
     }
     setFinalAttrs(v, finalSetAttrs);
   });
@@ -4387,7 +4452,11 @@ const updateSpeed = () => {
   const finalSetAttrs = {};
 
   getAttrs(collectionArray, (v) => {
-    finalSetAttrs.npc_speed = lowercaseWords(v.npc_speed);
+    finalSetAttrs.npc_speed = v.npc_speed.toLowerCase();
+    const match = finalSetAttrs.npc_speed.match(/^\s*(\d+)\s*ft/);
+    if (match && match[1]) {
+      finalSetAttrs.speed = match[1];
+    }
     setFinalAttrs(v, finalSetAttrs);
   });
 };
@@ -4400,13 +4469,45 @@ const updateACNote = () => {
   const finalSetAttrs = {};
 
   getAttrs(collectionArray, (v) => {
-    finalSetAttrs.ac_note = lowercaseWords(v.ac_note);
+    finalSetAttrs.ac_note = v.ac_note.toLowerCase();
     setFinalAttrs(v, finalSetAttrs);
   });
 };
 on('change:ac_note', () => {
   updateACNote();
 });
+
+const updateDamageResistancesVar = () => {
+  const collectionArray = ['damage_resistances_var', 'damage_vulnerabilities_exist', 'damage_resistances_exist', 'damage_immunities_exist', 'condition_immunities_exist'];
+  const finalSetAttrs = {};
+
+  finalSetAttrs.damage_resistances_var = '';
+
+  getAttrs(collectionArray, (v) => {
+    if (v.damage_vulnerabilities_exist) {
+      finalSetAttrs.damage_resistances_var = '{{Damage Vulnerabilities=@{damage_vulnerabilities}}}';
+    }
+    if (v.damage_resistances_exist) {
+      if (finalSetAttrs.damage_resistances_var !== '') {
+        finalSetAttrs.damage_resistances_var += ' ';
+      }
+      finalSetAttrs.damage_resistances_var = '{{Damage Resistances=@{damage_resistances}}}';
+    }
+    if (v.damage_immunities_exist) {
+      if (finalSetAttrs.damage_resistances_var !== '') {
+        finalSetAttrs.damage_resistances_var += ' ';
+      }
+      finalSetAttrs.damage_resistances_var = '{{Damage Immunities=@{damage_immunities}}}';
+    }
+    if (v.condition_immunities_exist) {
+      if (finalSetAttrs.damage_resistances_var !== '') {
+        finalSetAttrs.damage_resistances_var += ' ';
+      }
+      finalSetAttrs.damage_resistances_var = '{{Condition Immunities=@{condition_immunities}}}';
+    }
+    setFinalAttrs(v, finalSetAttrs);
+  });
+};
 
 const updateDamageVulnerabilities = () => {
   const collectionArray = ['damage_vulnerabilities'];
@@ -4419,7 +4520,9 @@ const updateDamageVulnerabilities = () => {
     } else {
       finalSetAttrs.damage_vulnerabilities_exist = 0;
     }
-    setFinalAttrs(v, finalSetAttrs);
+    setFinalAttrs(v, finalSetAttrs, () => {
+      updateDamageResistancesVar();
+    });
   });
 };
 on('change:damage_vulnerabilities', () => {
@@ -4436,7 +4539,9 @@ const updateDamageResistances = () => {
     } else {
       finalSetAttrs.damage_resistances_exist = 0;
     }
-    setFinalAttrs(v, finalSetAttrs);
+    setFinalAttrs(v, finalSetAttrs, () => {
+      updateDamageResistancesVar();
+    });
   });
 };
 on('change:damage_resistances', () => {
@@ -4453,7 +4558,9 @@ const updateDamageImmunities = () => {
     } else {
       finalSetAttrs.damage_immunities_exist = 0;
     }
-    setFinalAttrs(v, finalSetAttrs);
+    setFinalAttrs(v, finalSetAttrs, () => {
+      updateDamageResistancesVar();
+    });
   });
 };
 on('change:damage_immunities', () => {
@@ -4470,7 +4577,9 @@ const updateConditionImmunities = () => {
     } else {
       finalSetAttrs.condition_immunities_exist = 0;
     }
-    setFinalAttrs(v, finalSetAttrs);
+    setFinalAttrs(v, finalSetAttrs, () => {
+      updateDamageResistancesVar();
+    });
   });
 };
 on('change:condition_immunities', () => {
@@ -4499,16 +4608,16 @@ const updateLanguageSelection = () => {
   });
 };
 
-const resourcesToClassFeatures = () => {
+const resourcesToTraits = () => {
   const repeatingItem = 'repeating_resource';
-  const newRepeatingItem = 'repeating_classfeature';
+  const newRepeatingItem = 'repeating_trait';
   const collectionArray = [];
   const finalSetAttrs = {};
 
   let repeatingString;
   getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}uses`);
       collectionArray.push(`${repeatingString}uses_max`);
@@ -4520,11 +4629,9 @@ const resourcesToClassFeatures = () => {
     }
 
     getAttrs(collectionArray, (v) => {
-      console.log('v', v);
-      for (let i = 0; i < ids.length; i++) {
-        repeatingString = `${repeatingItem}_${ids[i]}_`;
-        const newRowId = generateRowID();
-        const newRepeatingString = `${newRepeatingItem}_${newRowId}_`;
+      for (const id of ids) {
+        repeatingString = `${repeatingItem}_${id}_`;
+        const newRepeatingString = `${newRepeatingItem}_${generateRowID()}_`;
 
         finalSetAttrs[`${newRepeatingString}name`] = v[`${repeatingString}name`];
         finalSetAttrs[`${newRepeatingString}uses`] = v[`${repeatingString}uses`];
@@ -4535,7 +4642,104 @@ const resourcesToClassFeatures = () => {
         finalSetAttrs[`${newRepeatingString}freetext`] = v[`${repeatingString}freetext`];
         finalSetAttrs[`${newRepeatingString}freeform`] = v[`${repeatingString}freeform`];
       }
-      console.log('resourcesToClassFeatures', finalSetAttrs);
+      setFinalAttrs(v, finalSetAttrs);
+    });
+  });
+};
+
+const classFeaturesToTraits = () => {
+  const repeatingItem = 'repeating_classfeature';
+  const newRepeatingItem = 'repeating_trait';
+  const collectionArray = ['lang'];
+  const finalSetAttrs = {};
+
+  let repeatingString;
+  getSectionIDs(repeatingItem, (ids) => {
+    for (const id of ids) {
+      repeatingString = `${repeatingItem}_${id}_`;
+      collectionArray.push(`${repeatingString}name`);
+      collectionArray.push(`${repeatingString}uses`);
+      collectionArray.push(`${repeatingString}uses_max`);
+      collectionArray.push(`${repeatingString}recharge`);
+      collectionArray.push(`${repeatingString}saving_throw_toggle`);
+      collectionArray.push(`${repeatingString}saving_throw_condition`);
+      collectionArray.push(`${repeatingString}saving_throw_ability`);
+      collectionArray.push(`${repeatingString}saving_throw_bonus`);
+      collectionArray.push(`${repeatingString}saving_throw_vs_ability`);
+      collectionArray.push(`${repeatingString}saving_throw_failure`);
+      collectionArray.push(`${repeatingString}saving_throw_success`);
+      collectionArray.push(`${repeatingString}damage_toggle`);
+      collectionArray.push(`${repeatingString}damage`);
+      collectionArray.push(`${repeatingString}damage_ability`);
+      collectionArray.push(`${repeatingString}damage_bonus`);
+      collectionArray.push(`${repeatingString}damage_type`);
+      collectionArray.push(`${repeatingString}second_damage_toggle`);
+      collectionArray.push(`${repeatingString}second_damage`);
+      collectionArray.push(`${repeatingString}second_damage_ability`);
+      collectionArray.push(`${repeatingString}second_damage_bonus`);
+      collectionArray.push(`${repeatingString}second_damage_type`);
+      collectionArray.push(`${repeatingString}heal`);
+      collectionArray.push(`${repeatingString}heal_ability`);
+      collectionArray.push(`${repeatingString}heal_bonus`);
+      collectionArray.push(`${repeatingString}heal_query_toggle`);
+      collectionArray.push(`${repeatingString}extras_toggle`);
+      collectionArray.push(`${repeatingString}emote`);
+      collectionArray.push(`${repeatingString}freetext`);
+      collectionArray.push(`${repeatingString}freeform`);
+    }
+
+    getAttrs(collectionArray, (v) => {
+      const language = v.lang;
+      for (const id of ids) {
+        repeatingString = `${repeatingItem}_${id}_`;
+        const newRepeatingString = `${newRepeatingItem}_${generateRowID()}_`;
+        const name = v[`${repeatingString}name`];
+        const classFeatures = TRANSLATIONS[language].CLASS_FEATURES;
+        let featureExistsInDefinedList = false;
+
+        for (const classFeature in classFeatures) {
+          if (classFeatures.hasOwnProperty(classFeature)) {
+            if (classFeatures[classFeature] === name) {
+              featureExistsInDefinedList = true;
+            }
+          }
+        }
+        if (!featureExistsInDefinedList) {
+          finalSetAttrs[`${newRepeatingString}name`] = name;
+        } else {
+          finalSetAttrs[`${newRepeatingString}name`] = `DELETE - ${name}`;
+        }
+        finalSetAttrs[`${newRepeatingString}uses`] = v[`${repeatingString}uses`];
+        finalSetAttrs[`${newRepeatingString}uses_max`] = v[`${repeatingString}uses_max`];
+        finalSetAttrs[`${newRepeatingString}recharge`] = v[`${repeatingString}recharge`];
+        finalSetAttrs[`${newRepeatingString}saving_throw_toggle`] = v[`${repeatingString}saving_throw_toggle`];
+        finalSetAttrs[`${newRepeatingString}saving_throw_condition`] = v[`${repeatingString}saving_throw_condition`];
+        finalSetAttrs[`${newRepeatingString}saving_throw_ability`] = v[`${repeatingString}saving_throw_ability`];
+        finalSetAttrs[`${newRepeatingString}saving_throw_bonus`] = v[`${repeatingString}saving_throw_bonus`];
+        finalSetAttrs[`${newRepeatingString}saving_throw_vs_ability`] = v[`${repeatingString}saving_throw_vs_ability`];
+        finalSetAttrs[`${newRepeatingString}saving_throw_failure`] = v[`${repeatingString}saving_throw_failure`];
+        finalSetAttrs[`${newRepeatingString}saving_throw_success`] = v[`${repeatingString}saving_throw_success`];
+        finalSetAttrs[`${newRepeatingString}damage_toggle`] = v[`${repeatingString}damage_toggle`];
+        finalSetAttrs[`${newRepeatingString}damage`] = v[`${repeatingString}damage`];
+        finalSetAttrs[`${newRepeatingString}damage_ability`] = v[`${repeatingString}damage_ability`];
+        finalSetAttrs[`${newRepeatingString}damage_bonus`] = v[`${repeatingString}damage_bonus`];
+        finalSetAttrs[`${newRepeatingString}damage_type`] = v[`${repeatingString}damage_type`];
+        finalSetAttrs[`${newRepeatingString}second_damage_toggle`] = v[`${repeatingString}second_damage_toggle`];
+        finalSetAttrs[`${newRepeatingString}second_damage`] = v[`${repeatingString}second_damage`];
+        finalSetAttrs[`${newRepeatingString}second_damage_ability`] = v[`${repeatingString}second_damage_ability`];
+        finalSetAttrs[`${newRepeatingString}second_damage_bonus`] = v[`${repeatingString}second_damage_bonus`];
+        finalSetAttrs[`${newRepeatingString}second_damage_type`] = v[`${repeatingString}second_damage_type`];
+        finalSetAttrs[`${newRepeatingString}heal`] = v[`${repeatingString}heal`];
+        finalSetAttrs[`${newRepeatingString}heal_ability`] = v[`${repeatingString}heal_ability`];
+        finalSetAttrs[`${newRepeatingString}heal_bonus`] = v[`${repeatingString}heal_bonus`];
+        finalSetAttrs[`${newRepeatingString}heal_query_toggle`] = v[`${repeatingString}heal_query_toggle`];
+        finalSetAttrs[`${newRepeatingString}extras_toggle`] = v[`${repeatingString}extras_toggle`];
+        finalSetAttrs[`${newRepeatingString}emote`] = v[`${repeatingString}emote`];
+        finalSetAttrs[`${newRepeatingString}freetext`] = v[`${repeatingString}freetext`];
+        finalSetAttrs[`${newRepeatingString}display_text`] = v[`${repeatingString}freetext`];
+        finalSetAttrs[`${newRepeatingString}freeform`] = v[`${repeatingString}freeform`];
+      }
+
       setFinalAttrs(v, finalSetAttrs);
     });
   });
@@ -4549,8 +4753,8 @@ const setSkillStorageNames = () => {
   let repeatingString;
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}storage_name`);
       collectionArray.push(`${repeatingString}name`);
     }
@@ -4558,8 +4762,8 @@ const setSkillStorageNames = () => {
     getAttrs(collectionArray, (v) => {
       const language = v.lang;
       if (!language || language === 'en') {
-        for (let i = 0; i < ids.length; i++) {
-          repeatingString = `${repeatingItem}_${ids[i]}_`;
+        for (const id of ids) {
+          repeatingString = `${repeatingItem}_${id}_`;
 
           const name = v[`${repeatingString}name`];
           if (!isUndefined(name)) {
@@ -4582,8 +4786,9 @@ const generateSkills = () => {
   let repeatingString;
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      repeatingString = `${repeatingItem}_${id}_`;
+      collectionArray.push(`${repeatingString}storage_name`);
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}ability`);
     }
@@ -4591,25 +4796,26 @@ const generateSkills = () => {
     getAttrs(collectionArray, (v) => {
       const language = v.lang || 'en';
 
-      let x = 0;
-
       for (const prop in SKILLS) {
         if (SKILLS.hasOwnProperty(prop)) {
           let skillId;
-          if (ids[x]) {
-            skillId = ids[x];
-          } else {
+
+          for (const id of ids) {
+            repeatingString = `${repeatingItem}_${id}_`;
+            if (v[`${repeatingString}storage_name`] === prop) {
+              skillId = id;
+              break;
+            }
+          }
+          if (!skillId) {
             skillId = generateRowID();
           }
           repeatingString = `${repeatingItem}_${skillId}_`;
 
           finalSetAttrs[`${repeatingString}storage_name`] = prop;
           finalSetAttrs[`${repeatingString}name`] = translate(language, `SKILLS.${prop}`);
-
           finalSetAttrs[`${repeatingString}ability`] = `@{${SKILLS[prop]}_mod}`;
           updateSkill(skillId);
-
-          x++;
         }
       }
       setFinalAttrs(v, finalSetAttrs);
@@ -4635,6 +4841,7 @@ on('change:pb', () => {
   updateAction('reaction');
   updateAction('legendaryaction');
   updateAction('lairaction');
+  updateAction('regionaleffect');
 });
 
 const extasToExtrasFix = (repeatingItem) => {
@@ -4642,14 +4849,14 @@ const extasToExtrasFix = (repeatingItem) => {
   const finalSetAttrs = {};
 
   getSectionIDs(repeatingItem, (ids) => {
-    for (let i = 0; i < ids.length; i++) {
-      const repeatingString = `${repeatingItem}_${ids[i]}_`;
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}extas_toggle`);
     }
 
     getAttrs(collectionArray, (v) => {
-      for (let j = 0; j < ids.length; j++) {
-        const repeatingString = `${repeatingItem}_${ids[j]}_`;
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
 
         const extrasToggle = v[`${repeatingString}extas_toggle`];
         if (!isUndefined(extrasToggle)) {
@@ -4661,146 +4868,39 @@ const extasToExtrasFix = (repeatingItem) => {
   });
 };
 
-const sheetOpened = () => {
-  const collectionArray = ['version', 'strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma', 'import_data'];
+const armorPlusDexRemoval = () => {
+  const repeatingItem = 'repeating_armor';
+  const collectionArray = [];
+  const finalSetAttrs = {};
+
+  getSectionIDs(repeatingItem, (ids) => {
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
+      collectionArray.push(`${repeatingString}type`);
+    }
+
+    getAttrs(collectionArray, (v) => {
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
+
+        const armorType = v[`${repeatingString}type`];
+        if (armorType === 'Armor + Dex') {
+          finalSetAttrs[`${repeatingString}type`] = 'Light Armor';
+        }
+      }
+      setFinalAttrs(v, finalSetAttrs);
+    });
+  });
+};
+
+const fixRollTwo = () => {
+  const collectionArray = ['roll_setting'];
   const finalSetAttrs = {};
 
   getAttrs(collectionArray, (v) => {
-    const version = v.version;
-
-    if (!version) {
-      updatePb();
-
-      const setAbilities = {};
-      if (isUndefined(v.strength)) {
-        setAbilities.strength = 10;
-        setAbilities.strength_mod = 0;
-        setAbilities.strength_mod_with_sign = '+0';
-      }
-      if (isUndefined(v.dexterity)) {
-        setAbilities.dexterity = 10;
-        setAbilities.dexterity_mod = 0;
-        setAbilities.dexterity_mod_with_sign = '+0';
-      }
-      if (isUndefined(v.constitution)) {
-        setAbilities.constitution = 10;
-        setAbilities.constitution_mod = 0;
-        setAbilities.constitution_mod_with_sign = '+0';
-      }
-      if (isUndefined(v.intelligence)) {
-        setAbilities.intelligence = 10;
-        setAbilities.intelligence_mod = 0;
-        setAbilities.intelligence_mod_with_sign = '+0';
-      }
-      if (isUndefined(v.wisdom)) {
-        setAbilities.wisdom = 10;
-        setAbilities.wisdom_mod = 0;
-        setAbilities.wisdom_mod_with_sign = '+0';
-      }
-      if (isUndefined(v.charisma)) {
-        setAbilities.charisma = 10;
-        setAbilities.charisma_mod = 0;
-        setAbilities.charisma_mod_with_sign = '+0';
-      }
-      setFinalAttrs(v, setAbilities);
-
-      if (!v.import_data) {
-        finalSetAttrs.edit_mode = 'on';
-      }
-
-      generateSkills();
-      updateSavingThrows();
-      updateLevels();
-      updateAbilityChecksMacro();
-      updateInitiative();
-      updateArmor();
+    if (v.roll_setting === '@{attr_roll_2}') {
+      finalSetAttrs.roll_setting = '@{roll_2}';
     }
-
-    if (versionCompare(version, '2.0.10') < 0) {
-      updateAbilityModifiers();
-    }
-
-    if (versionCompare(version, '2.0.14') < 0) {
-      updateSkill();
-      updateSavingThrows();
-    }
-    if (versionCompare(version, '2.1.0') < 0) {
-      updateNPCChallenge();
-      updateDamageVulnerabilities();
-      updateDamageResistances();
-      updateDamageImmunities();
-      updateConditionImmunities();
-      updateLanguages();
-      updateSenses();
-    }
-    if (versionCompare(version, '2.1.3') < 0) {
-      updateType();
-      updateAlignment();
-    }
-    if (versionCompare(version, '2.1.5') < 0) {
-      updateLevels();
-      updateNPCAC();
-      updateLanguageSelection();
-    }
-    if (versionCompare(version, '2.1.7') < 0) {
-      setSkillStorageNames();
-    }
-    if (versionCompare(version, '2.1.10') < 0) {
-      updateSavingThrows();
-      updateAttack();
-    }
-    if (versionCompare(version, '2.1.11') < 0) {
-      updateLevels();
-      updateAbilityChecksMacro();
-    }
-    if (versionCompare(version, '2.1.13') < 0) {
-      weighEquipment();
-      updateSpell();
-    }
-    if (versionCompare(version, '2.1.14') < 0) {
-      updateLevels();
-    }
-    if (versionCompare(version, '2.1.15') < 0) {
-      updateLevels();
-      displayTextForTraits();
-    }
-    if (versionCompare(version, '2.2.1') < 0) {
-      updateAbilityModifiers();
-    }
-    if (versionCompare(version, '2.2.2') < 0) {
-      resourcesToClassFeatures();
-    }
-    if (versionCompare(version, '2.2.4') < 0) {
-      updateInitiative();
-    }
-    if (versionCompare(version, '2.2.5') < 0) {
-      weighAmmo();
-    }
-    if (versionCompare(version, '2.2.6') < 0) {
-      updateClassFeatureToggleToNewVer();
-      updateLevels();
-      extasToExtrasFix('repeating_attack');
-      extasToExtrasFix('repeating_action');
-      extasToExtrasFix('repeating_spell');
-    }
-    if (versionCompare(version, '2.2.8') < 0) {
-      updateAttack();
-    }
-    if (versionCompare(version, '2.2.11') < 0) {
-      setClassFeatures();
-    }
-    if (versionCompare(version, '2.2.12') < 0) {
-      updateAbilityChecksMacro();
-    }
-    if (versionCompare(version, '2.2.15') < 0) {
-      updateAbilityChecksMacro();
-      updatePreAndPostRoll();
-    }
-
-    if (!version || version !== currentVersion) {
-      finalSetAttrs.version = currentVersion;
-    }
-
     setFinalAttrs(v, finalSetAttrs);
   });
 };
@@ -4820,8 +4920,7 @@ const importData = () => {
       }
       if (importObject.spells) {
         importObject.spells.forEach(spell => {
-          const newRowId = generateRowID();
-          const repeatingString = `repeating_spell_${newRowId}_`;
+          const repeatingString = `repeating_spell_${generateRowID()}_`;
           for (const prop in spell) {
             if (spell.hasOwnProperty(prop)) {
               finalSetAttrs[`${repeatingString}${prop}`] = spell[prop];
@@ -4843,9 +4942,188 @@ const deleteImportData = () => {
   });
 };
 
+const checkVersionFormat = (version, finalSetAttrs) => {
+  const versionRegex = /\d+\.\d+\.\d+/gi;
+  const versionIsProperFormat = versionRegex.exec(version);
+
+  if (version && !versionIsProperFormat) {
+    finalSetAttrs.version = version = currentVersion;
+  }
+  return version;
+};
+
 on('change:accept_import', importData);
 on('change:reject_import', deleteImportData);
 
+const sheetOpened = () => {
+  const collectionArray = ['version', 'strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma', 'import_data'];
+  const finalSetAttrs = {};
+
+  getAttrs(collectionArray, (v) => {
+    const version = checkVersionFormat(v.version, finalSetAttrs);
+
+    if (!version) {
+      if (!v.import_data) {
+        finalSetAttrs.edit_mode = 'on';
+      }
+      finalSetAttrs.roll_info = '';
+      finalSetAttrs.roll_setting = '@{roll_1}';
+      const setAbilities = {};
+      if (isUndefined(v.strength)) {
+        setAbilities.strength = 10;
+      }
+      if (isUndefined(v.dexterity)) {
+        setAbilities.dexterity = 10;
+      }
+      if (isUndefined(v.constitution)) {
+        setAbilities.constitution = 10;
+      }
+      if (isUndefined(v.intelligence)) {
+        setAbilities.intelligence = 10;
+      }
+      if (isUndefined(v.wisdom)) {
+        setAbilities.wisdom = 10;
+      }
+      if (isUndefined(v.charisma)) {
+        setAbilities.charisma = 10;
+      }
+      setFinalAttrs(v, setAbilities, () => {
+        updatePb();
+        generateSkills();
+        updateSavingThrows();
+        updateLevels();
+        updateAbilityChecksMacro();
+        updateInitiative();
+        updateArmor();
+      });
+    } else {
+      if (versionCompare(version, '2.0.10') < 0) {
+        updateAbilityModifiers();
+      }
+      if (versionCompare(version, '2.0.14') < 0) {
+        updateSkill();
+        updateSavingThrows();
+      }
+      if (versionCompare(version, '2.1.0') < 0) {
+        updateNPCChallenge();
+        updateDamageVulnerabilities();
+        updateDamageResistances();
+        updateDamageImmunities();
+        updateConditionImmunities();
+        updateLanguages();
+        updateSenses();
+      }
+      if (versionCompare(version, '2.1.3') < 0) {
+        updateType();
+        updateAlignment();
+      }
+      if (versionCompare(version, '2.1.5') < 0) {
+        updateLevels();
+        updateNPCAC();
+        updateLanguageSelection();
+      }
+      if (versionCompare(version, '2.1.7') < 0) {
+        setSkillStorageNames();
+      }
+      if (versionCompare(version, '2.1.10') < 0) {
+        updateSavingThrows();
+        updateAttack();
+      }
+      if (versionCompare(version, '2.1.11') < 0) {
+        updateLevels();
+        updateAbilityChecksMacro();
+      }
+      if (versionCompare(version, '2.1.13') < 0) {
+        weighEquipment();
+        updateSpell();
+      }
+      if (versionCompare(version, '2.1.14') < 0) {
+        updateLevels();
+      }
+      if (versionCompare(version, '2.1.15') < 0) {
+        updateLevels();
+        displayTextForTraits();
+      }
+      if (versionCompare(version, '2.2.1') < 0) {
+        updateAbilityModifiers();
+      }
+      if (versionCompare(version, '2.2.2') < 0) {
+        resourcesToTraits();
+      }
+      if (versionCompare(version, '2.2.4') < 0) {
+        updateInitiative();
+      }
+      if (versionCompare(version, '2.2.5') < 0) {
+        weighAmmo();
+      }
+      if (versionCompare(version, '2.2.6') < 0) {
+        updateLevels();
+        extasToExtrasFix('repeating_attack');
+        extasToExtrasFix('repeating_action');
+        extasToExtrasFix('repeating_spell');
+      }
+      if (versionCompare(version, '2.2.8') < 0) {
+        updateAttack();
+      }
+      if (versionCompare(version, '2.2.11') < 0) {
+        setClassFeatures();
+      }
+      if (versionCompare(version, '2.2.12') < 0) {
+        updateAbilityChecksMacro();
+      }
+      if (versionCompare(version, '2.2.15') < 0) {
+        updateAbilityChecksMacro();
+        updatePreAndPostRoll();
+      }
+      if (versionCompare(version, '2.2.19') < 0) {
+        updateAbilityModifiers();
+        updateSpell();
+      }
+      if (versionCompare(version, '2.3.3') < 0) {
+        updateAttachers();
+      }
+      if (versionCompare(version, '2.4.2') < 0) {
+        updateAbilityModifiers();
+        updateSkill();
+        updateActionChatMacro('trait');
+        updateActionChatMacro('action');
+        updateActionChatMacro('reaction');
+        updateActionChatMacro('legendaryaction');
+        updateActionChatMacro('lairaction');
+        updateActionChatMacro('regionaleffect');
+        updateDamageResistancesVar();
+      }
+      if (versionCompare(version, '2.4.3') < 0) {
+        setClassFeatures();
+      }
+      if (versionCompare(version, '2.4.4') < 0) {
+        updateSkill();
+        updateAttack();
+        updateSpell();
+      }
+      if (versionCompare(version, '2.4.7') < 0) {
+        classFeaturesToTraits();
+        updateAction('trait');
+      }
+      if (versionCompare(version, '2.4.8') < 0) {
+        fixRollTwo();
+      }
+      if (versionCompare(version, '2.4.11') < 0) {
+        updateSpell();
+      }
+      if (versionCompare(version, '2.4.12') < 0) {
+        armorPlusDexRemoval();
+        updateArmor();
+      }
+    }
+
+    if (isUndefined(version) || !version || version !== currentVersion) {
+      finalSetAttrs.version = currentVersion;
+    }
+
+    setFinalAttrs(v, finalSetAttrs);
+  });
+};
 
 on('sheet:opened', () => {
   sheetOpened();
