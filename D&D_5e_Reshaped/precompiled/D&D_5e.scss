@@ -9,6 +9,7 @@ $pinkish-red: #8c6075;
 $deep-green: #51624b;
 $light-green: #879a6a;
 $deep-blue: #416696;
+$bright-blue: #3f88e6;
 $light-gray: #cecece;
 $gray: #a19a91;
 $grayer-gray: #8c8c8c;
@@ -18,12 +19,18 @@ $light-yellow: #f2f5d3;
 $teal: #E6F5F9;
 $scrollbar-size: .5em;
 
+$classes: 'barbarian', 'bard', 'cleric', 'druid', 'fighter', 'monk', 'paladin', 'ranger', 'rogue', 'sorcerer', 'warlock', 'wizard';
+
 @mixin no-highlight {
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
+}
+
+@mixin text-shadow {
+	text-shadow: -1px 0 $black, 0 1px $black, 1px 0 $black, 0 -1px $black;
 }
 
 @mixin tab-toggle($tab, $width, $padding) {
@@ -141,6 +148,12 @@ $scrollbar-size: .5em;
 	}
 }
 
+@mixin fadedBorderBottom() {
+	border-left: 0;
+	border-right: 0;
+	border-image: linear-gradient(to right, transparent, rgba(0, 0, 0, .75), transparent) 1;
+}
+
 *, .sheet-rolltemplate-5e-shaped * {
 	box-sizing: border-box;
 	line-height: 100%;
@@ -172,18 +185,20 @@ button {
 				padding: 0;
 
 				&:hover {
-					color: #3f88e6 !important;
-					input {
-						color: #3f88e6 !important;
+					color: $bright-blue !important;
+					input,
+					span {
+						color: $bright-blue !important;
 					}
 				}
 			}
 
 			&.sheet-visible-button {
-				background-color: #3f88e6;
+				background-color: $bright-blue;
 				border-radius: $border-radius;
 				box-shadow: 0 2px 5px 0 rgba(0,0,0,.26);
 				color: rgba(255,255,255, .87);
+				font-size: 11px;
 				padding: 3px;
 				&:hover {
 					color: rgba(255,255,255, .87);
@@ -193,7 +208,6 @@ button {
 				}
 			}
 		}
-
 
 		&:hover {
 			background-position: initial;
@@ -217,7 +231,7 @@ button {
 		font-size: 13px;
 		padding: 0 3px 2px;
 		position: relative;
-		z-index: 99999;
+		z-index: 999;
 	}
 	&.repcontrol_add,
 	&.repcontrol_edit,
@@ -234,10 +248,20 @@ button {
 		font-size: 16px;
 		font-weight: bold;
 		position: relative;
-		z-index: 99999;
+		z-index: 999;
 	}
 }
 
+input.sheet-toggle-pseudo-button {
+	height: 17px;
+}
+span.sheet-toggle-pseudo-button {
+	background-color: $bright-blue !important;
+	box-shadow: 0 2px 5px 0 rgba(0,0,0,.26);
+	font-size: 11px !important;
+	height: 17px;
+	padding: 3px !important;
+}
 
 .sheet-wrapper-button {
 	width: 100%;
@@ -266,6 +290,9 @@ button {
 
 	&.sheet-no-border {
 		border-bottom: 0;
+	}
+	&.sheet-no-pad {
+		padding: 0;
 	}
 
 	&:focus{
@@ -359,6 +386,18 @@ $pad-mar: (
     }
   }
 }
+.sheet-pad-t-twelve {
+	padding-top: 12px;
+}
+.sheet-pad-t-eight {
+	padding-top: 8px;
+}
+.sheet-pad-l-hundred {
+	padding-left: 100px;
+}
+.sheet-pad-t-hundred {
+	padding-top: 100px;
+}
 
 .sheet-hidden {
 	display: none !important;
@@ -370,6 +409,19 @@ $pad-mar: (
 
 .sheet-wrapper {
 	min-width: 834px;
+}
+
+.sheet-import-data-present {
+	&:not(:checked) ~ .sheet-overlay {
+		display: none;
+	}
+}
+
+.sheet-overlay {
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0,0,0,0.75);
+	z-index: 9999;
 }
 
 .charsheet {
@@ -411,7 +463,7 @@ $pad-mar: (
 .sheet-tooltip-toggle-text, {
 	background-color: black;
 	border-radius: 50%;
-	color: white;
+	color: rgba(255,255,255, .87);
 	font-size: 77%;
 	font-weight: bold;
 	height: 10px;
@@ -422,7 +474,7 @@ $pad-mar: (
 	background-color: $black;
 	border-bottom-right-radius: 4px;
 	border-bottom-left-radius: 4px;
-	color: $white;
+	color: rgba(255,255,255, .87);
 	margin-top: -15px;
 	opacity: .9;
 	padding: 4px;
@@ -464,7 +516,7 @@ $pad-mar: (
 .sheet-tooltip:hover [class*='sheet-tooltip-content'],
 .sheet-tooltip:focus [class*='sheet-tooltip-content'] {
 	visibility: visible;
-	z-index: 999;
+	z-index: 450;
 }
 
 .sheet-dnd-image-wrapper {
@@ -481,7 +533,7 @@ $pad-mar: (
 		border-bottom-left-radius: 5px !important;
 		border-right-width: 0;
 		border-top-left-radius: 5px !important;
-		font-size: 22px;
+		font-size: 20px;
 		font-weight: bold;
 		padding: 0 2px;
 	}
@@ -491,7 +543,7 @@ $pad-mar: (
 }
 
 .sheet-ability-wrapper {
-	height: 68px;
+	height: 69px;
 	margin-bottom: 12px;
 	position: relative;
 
@@ -507,6 +559,11 @@ $pad-mar: (
 		position: absolute;
 		right: 0;
 		width: 40px !important;
+
+		input.sheet-toggle-edit-mode:checked ~ div & {
+			width: 60px !important;
+		}
+
 		input {
 			font-size: 11px;
 			background: transparent;
@@ -524,8 +581,13 @@ $pad-mar: (
 .sheet-ability-modifier {
 	font-size: 24px;
 	font-weight: bold;
-	padding-bottom: 5px !important;
-	padding-top: 6px !important;
+	padding-bottom: 8px !important;
+	padding-top: 8px !important;
+
+	input.sheet-toggle-edit-mode:checked ~ div & {
+		padding-bottom: 0 !important;
+		padding-top: 0 !important;
+	}
 }
 
 .sheet-spell-slots-points {
@@ -536,7 +598,6 @@ $pad-mar: (
 	}
 }
 
-.sheet-resource,
 .sheet-attacks,
 .sheet-spell {
 	input[readonly] {
@@ -575,6 +636,9 @@ $pad-mar: (
 	position: absolute;
 	top: 0;
 }
+.sheet-fixed {
+	position: fixed;
+}
 
 .sheet-section-core {
 	.sheet-ability-saving-throw-name,
@@ -587,11 +651,18 @@ $pad-mar: (
 		margin-left: 8px;
 	}
 }
+.sheet-heading {
+	text-transform: capitalize !important;
+}
 
+.sheet-input-like {
+	padding: 1px;
+}
 .sheet-skill-ability {
 	color: $light-gray;
 	font-size: 10px;
 }
+
 .sheet-skills {
 	select {
 		padding: 0;
@@ -601,10 +672,8 @@ $pad-mar: (
 	background: transparent;
 	border-bottom: 0;
 	color: #909090;
-	height: 11px;
-	position: relative;
-	width: 25px !important;
-	z-index: 2;
+	font-size: 9px;
+	height: 11px !important;
 }
 .sheet-skill-select-wrapper {
 	select {
@@ -613,28 +682,10 @@ $pad-mar: (
 	}
 }
 
-select.sheet-skills-ability-selector {
-	font-size: 9px;
-}
-
 .sheet-skills-ability-selector-wrapper,
 .sheet-parenthesis-wrapper {
-	display: inline-block;
-	position: relative;
-
-	&::before,
-	&::after {
-		color: #909090;
-		position: absolute;
-		top: 0;
-	}
-	&::before {
-		content: '(';
-	}
-	&::after {
-		content: ')';
-		right: 1px;
-	}
+	color: #909090;
+	font-size: 9px;
   input {
     padding-left: 3px;
     padding-right: 3px;
@@ -649,7 +700,7 @@ select.sheet-skills-ability-selector {
 	padding-top: 7px;
 	padding-right: 2px;
 	position: relative;
-	z-index: 10;
+	z-index: 5;
 
 	&::before {
 		color: white;
@@ -659,7 +710,7 @@ select.sheet-skills-ability-selector {
 		left: -1px;
 		line-height: 51px;
 		position: absolute;
-		text-shadow: -1px 0 $black, 0 1px $black, 1px 0 $black, 0 -1px $black;
+		@include text-shadow();
 		top: 3px;
 		z-index: -1;
 	}
@@ -688,7 +739,6 @@ select.sheet-skills-ability-selector {
 .sheet-uppercase {
 	text-transform: uppercase !important
 }
-
 
 .sheet-big-text {
 	font-size: 16px;
@@ -731,7 +781,7 @@ select.sheet-skills-ability-selector {
 	margin-right: auto;
 	margin-top: 4px;
 	position: relative;
-	z-index: 4;
+	z-index: 5;
 
 	&::after {
 		position: absolute;
@@ -742,7 +792,7 @@ select.sheet-skills-ability-selector {
 		font-family: 'Pictos';
 		font-size: 90px;
 		color: white;
-		text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+		@include text-shadow();
 	}
 
 	> .sheet-shaped-row {
@@ -773,16 +823,23 @@ select.sheet-skills-ability-selector {
 	}
 }
 
+.sheet-checkbox-wrap,
 [class^='sheet-checkbox-label'] {
 	cursor: pointer;
-	white-space: nowrap;
 	margin-bottom: 0;
 	padding-right: 0;
+	font-size: 100%;
 	font-weight: normal;
+	white-space: nowrap;
 }
 
 .sheet-white-space-no-wrap {
 	white-space: nowrap;
+}
+
+.sheet-small-checkbox {
+	-webkit-transform: scale(.8);
+	transform: scale(.8);
 }
 
 .sheet-checkbox-label-sm {
@@ -808,8 +865,6 @@ select.sheet-skills-ability-selector {
 
 .sheet-checkbox-label {
 	display: inline-block;
-	font-size: 100%;
-
 	[type='checkbox'] {
 		display: none;
 		+ span {
@@ -864,9 +919,8 @@ select.sheet-skills-ability-selector {
 	}
 }
 
-
 .sheet-coin {
-	margin-left: -8px;
+	margin-left: -6px;
 }
 .sheet-coin-value-wrap {
 	position: relative;
@@ -897,7 +951,8 @@ select.sheet-skills-ability-selector {
 	}
 }
 
-.sheet-death-saving-throw {
+.sheet-death-success,
+.sheet-death-fail {
 	$death-saving-throw-circle-size: 14px;
 	.sheet-checkbox-label {
 		height: $death-saving-throw-circle-size;
@@ -920,7 +975,7 @@ select.sheet-skills-ability-selector {
 		margin: 1px;
 		opacity: 0;
 		position: relative;
-		z-index: 9999;
+		z-index: 99;
 
 		&,
 		& + span {
@@ -965,15 +1020,13 @@ select.sheet-skills-ability-selector {
 		}
 	}
 }
-
-.sheet-death-succeed {
+.sheet-death-success {
 	[type='radio'] {
 		+ span {
 			background-color: $light-green;
 		}
 	}
 }
-
 .sheet-death-fail {
 	[type='radio'] {
 		+ span {
@@ -1129,11 +1182,9 @@ select.sheet-skills-ability-selector {
 		& > div {
 			padding: 2px 3px;
       &:not(:last-of-type) {
-        border-top: 0;
-        border-left: 0;
-        border-right: 0;
-        border-bottom: 1px;
-        border-image: linear-gradient(to right, transparent, rgba(0, 0, 0, .75), transparent) 1;
+				border-bottom: 1px;
+				border-top: 0;
+				@include fadedBorderBottom();
       }
 		}
 	}
@@ -1162,10 +1213,6 @@ select.sheet-skills-ability-selector {
 		font-style: italic;
 		text-align: center;
 	}
-
-	.sheet-less-important {
-		color: #A2A2A2;
-	}
 }
 
 div[class='repcontainer editmode'] ~ div[class^='repcontrol'] button[class='btn repcontrol_add'] {
@@ -1186,13 +1233,18 @@ input[class^='sheet-toggle-'] {
 	cursor: pointer;
 	opacity: 0;
 	position: relative;
-	z-index: 9999;
+	z-index: 200;
+
+	&:active + span[class^='sheet-toggle-'].sheet-button {
+		box-shadow: 0 4px 8px 0 rgba(0,0,0,.4);
+	}
 }
+
 
 span[class^='sheet-toggle-'] {
 	background-color: $gray;
 	border-radius: $border-radius;
-	color: white;
+	color: rgba(255,255,255, .87);
 	cursor: pointer;
 	display: inline-block;
 	font-size: 10px;
@@ -1211,32 +1263,14 @@ span[class^='sheet-toggle-'] {
 @include tab-toggle('icon-attack-settings', 13px, 'padding');
 @include tab-toggle('edit-mode', 19px, 'padding');
 
-$tab-hd-single-digit-width: 14px;
-$tab-hd-double-digit-width: 20px;
-@include tab-toggle('hd-d2', $tab-hd-single-digit-width, 'halfPadding');
-@include tab-toggle('hd-d4', $tab-hd-single-digit-width, 'halfPadding');
-@include tab-toggle('hd-d6', $tab-hd-single-digit-width, 'halfPadding');
-@include tab-toggle('hd-d8', $tab-hd-single-digit-width, 'halfPadding');
-@include tab-toggle('hd-d10', $tab-hd-double-digit-width, 'halfPadding');
-@include tab-toggle('hd-d12', $tab-hd-double-digit-width, 'halfPadding');
-@include tab-toggle('hd-d20', $tab-hd-double-digit-width, 'halfPadding');
+@include tab-toggle('pseudo-button', 100px, 'padding');
 
-@include tab-toggle('emote', 32px, 'padding');
-@include tab-toggle('attack', 31px, 'padding');
-@include tab-toggle('reach', 32px, 'padding');
-@include tab-toggle('range', 33px, 'padding');
-@include tab-toggle('target', 32px, 'padding');
-@include tab-toggle('ammo', 31px, 'padding');
-@include tab-toggle('ammo-auto', 24px, 'padding');
-@include tab-toggle('damage', 23px, 'padding');
-@include tab-toggle('sv-damage', 23px, 'padding');
-@include tab-toggle('alt-damage', 14px, 'padding');
-@include tab-toggle('second-damage', 52px, 'padding');
-@include tab-toggle('sv-second-damage', 52px, 'padding');
-@include tab-toggle('crit', 17px, 'padding');
-@include tab-toggle('crit-bonus', 32px, 'padding');
-@include tab-toggle('bonus', 32px, 'padding');
-@include tab-toggle('bonuses', 43px, 'padding');
+@include tab-toggle('roll-normal', 34px, 'padding');
+@include tab-toggle('roll-advantage', 53px, 'padding');
+@include tab-toggle('roll-disadvantage', 66px, 'padding');
+@include tab-toggle('roll-two', 28px, 'padding');
+
+@include tab-toggle('spells-filter-condense', 50px, 'padding');
 @include tab-toggle('spells-filter-prepared', 43px, 'padding');
 @include tab-toggle('spells-prepared', 43px, 'padding');
 @include tab-toggle('spells-filter-ritual', 26px, 'padding');
@@ -1274,10 +1308,7 @@ $tab-hd-double-digit-width: 20px;
 @include tab-toggle('recharge', 47px, 'padding');
 @include tab-toggle('spell-slots', 49px, 'padding');
 @include tab-toggle('spell-points', 56px, 'padding');
-@include tab-toggle('spell-sorcery-points', 41px, 'padding');
-@include tab-toggle('spell-warlock-slots', 38px, 'padding');
-
-@include tab-toggle('generate-skills', 70px, 'padding');
+@include tab-toggle('spell-slots-all', 13px, 'padding');
 
 span.sheet-toggle-spells-filter-level-cantrips,
 span.sheet-toggle-spells-filter-casting-time-reaction {
@@ -1367,8 +1398,7 @@ span.sheet-toggle-language {
 	display: none;
 }
 input.sheet-slide-input-pc:checked ~ div.sheet-section-core,
-input.sheet-slide-input-pc:not(:checked) ~ div.sheet-section-npc,
-input.sheet-slide-input-pc:checked ~ .sheet-toggle-edit-mode {
+input.sheet-slide-input-pc:not(:checked) ~ div.sheet-section-npc {
 	display: none !important;
 }
 input.sheet-slide-input-pc:not(:checked) ~ input.sheet-toggle-page-core:checked ~ div.sheet-section-core,
@@ -1393,8 +1423,6 @@ input.sheet-toggle-page-all:checked ~ div[class^='sheet-section-'] {
 input[class^='sheet-toggle-page-'],
 span[class^='sheet-toggle-page-'] {
 	height: 16px;
-	margin-bottom: 2px;
-	margin-top: 2px;
 }
 
 span[class^='sheet-toggle-page-'] {
@@ -1427,7 +1455,7 @@ input[class^='sheet-slide-input-'] {
 	opacity: 0;
 	position: relative;
 	vertical-align: top;
-	z-index: 99;
+	z-index: 5;
 }
 
 label[class^='sheet-slide-toggle-'] {
@@ -1480,38 +1508,9 @@ input.sheet-toggle-hidden-info:checked ~ div.sheet-toggle-hidden-info {
 }
 
 input.sheet-toggle-icon-settings:not(:checked) ~ div.sheet-details,
+input.sheet-toggle-icon-settings:not(:checked) ~ div .sheet-details,
 input.sheet-toggle-edit-mode:not(:checked) ~ div .sheet-edit,
 input.sheet-toggle-edit-mode:checked ~ div .sheet-presentation,
-
-input.sheet-toggle-reach:not(:checked) ~ div div.sheet-toggle-reach,
-input.sheet-toggle-range:not(:checked) ~ div div.sheet-toggle-range,
-input.sheet-toggle-range:not(:checked) ~ .sheet-toggle-ammo,
-input.sheet-toggle-range:not(:checked) ~ .sheet-toggle-ammo-auto,
-input.sheet-toggle-ammo:not(:checked) ~ div div.sheet-toggle-ammo,
-input.sheet-toggle-ammo:not(:checked) ~ .sheet-toggle-ammo-auto,
-input.sheet-toggle-target:not(:checked) ~ div div.sheet-toggle-target,
-input.sheet-toggle-alt-damage:not(:checked) ~ div div.sheet-toggle-alt-damage,
-
-input.sheet-toggle-spells-filter-level-cantrips:checked ~ .repcontainer input.sheet-toggle-spell-level-cantrip:not(:checked) ~ .sheet-spell,
-input.sheet-toggle-spells-filter-level-1:checked ~ .repcontainer input.sheet-toggle-spell-level-1:not(:checked) ~ .sheet-spell,
-input.sheet-toggle-spells-filter-level-2:checked ~ .repcontainer input.sheet-toggle-spell-level-2:not(:checked) ~ .sheet-spell,
-input.sheet-toggle-spells-filter-level-3:checked ~ .repcontainer input.sheet-toggle-spell-level-3:not(:checked) ~ .sheet-spell,
-input.sheet-toggle-spells-filter-level-4:checked ~ .repcontainer input.sheet-toggle-spell-level-4:not(:checked) ~ .sheet-spell,
-input.sheet-toggle-spells-filter-level-5:checked ~ .repcontainer input.sheet-toggle-spell-level-5:not(:checked) ~ .sheet-spell,
-input.sheet-toggle-spells-filter-level-6:checked ~ .repcontainer input.sheet-toggle-spell-level-6:not(:checked) ~ .sheet-spell,
-input.sheet-toggle-spells-filter-level-7:checked ~ .repcontainer input.sheet-toggle-spell-level-7:not(:checked) ~ .sheet-spell,
-input.sheet-toggle-spells-filter-level-8:checked ~ .repcontainer input.sheet-toggle-spell-level-8:not(:checked) ~ .sheet-spell,
-input.sheet-toggle-spells-filter-level-9:checked ~ .repcontainer input.sheet-toggle-spell-level-9:not(:checked) ~ .sheet-spell,
-
-input.sheet-toggle-spells-filter-prepared:checked ~ .repcontainer input.sheet-toggle-spells-prepared:not(:checked) ~ .sheet-spell,
-input.sheet-toggle-spells-filter-ritual:checked ~ .repcontainer input.sheet-toggle-spells-ritual:not(:checked) ~ .sheet-spell,
-input.sheet-toggle-spells-filter-concentration:not(:checked) ~ .repcontainer input.sheet-toggle-spells-concentration:checked ~ .sheet-spell,
-input.sheet-toggle-spells-filter-verbal:not(:checked) ~ .repcontainer input.sheet-toggle-spell-vsm-v:checked ~ .sheet-spell,
-input.sheet-toggle-spells-filter-somatic:not(:checked) ~ .repcontainer input.sheet-toggle-spell-vsm-s:checked ~ .sheet-spell,
-input.sheet-toggle-spells-filter-material:not(:checked) ~ .repcontainer input.sheet-toggle-spell-vsm-m:checked ~ .sheet-spell,
-input.sheet-toggle-spells-filter-casting-time-reaction:checked ~ .repcontainer input.sheet-toggle-casting-time-reaction:not(:checked) ~ .sheet-spell,
-input.sheet-toggle-spells-filter-casting-time-bonus:checked ~ .repcontainer input.sheet-toggle-casting-time-bonus:not(:checked) ~ .sheet-spell,
-input.sheet-toggle-spells-filter-casting-time-action:checked ~ .repcontainer input.sheet-toggle-casting-time-action:not(:checked) ~ .sheet-spell,
 
 input.sheet-toggle-hd-d2:not(:checked) ~ div.sheet-toggle-hd-d2,
 input.sheet-toggle-hd-d4:not(:checked) ~ div.sheet-toggle-hd-d4,
@@ -1523,26 +1522,72 @@ input.sheet-toggle-hd-d20:not(:checked) ~ div.sheet-toggle-hd-d20,
 
 input.sheet-toggle-spell-slots:not(:checked) ~ .sheet-spell-slots,
 input.sheet-toggle-spell-points:not(:checked) ~ .sheet-spell-points,
-input.sheet-toggle-spell-slots:not(:checked) ~ div div.sheet-spell-slots-points,
-input.sheet-toggle-sorcerer-levels:not(:checked) ~ div .sheet-spell-sorcery-points,
-input.sheet-toggle-warlock-levels:not(:checked) ~ div .sheet-spell-warlock-slots,
-input.sheet-toggle-spell-filters:not(:checked) ~ [class^=sheet-toggle-spells-filter],
-input.sheet-toggle-spell-filters:not(:checked) ~ span.sheet-spells-filter,
 
-input.sheet-toggle-spell-level-1:not(:checked) ~ div .sheet-spell-level-1,
-input.sheet-toggle-spell-level-2:not(:checked) ~ div .sheet-spell-level-2,
-input.sheet-toggle-spell-level-3:not(:checked) ~ div .sheet-spell-level-3,
-input.sheet-toggle-spell-level-4:not(:checked) ~ div .sheet-spell-level-4,
-input.sheet-toggle-spell-level-5:not(:checked) ~ div .sheet-spell-level-5,
-input.sheet-toggle-spell-level-6:not(:checked) ~ div .sheet-spell-level-6,
-input.sheet-toggle-spell-level-7:not(:checked) ~ div .sheet-spell-level-7,
-input.sheet-toggle-spell-level-8:not(:checked) ~ div .sheet-spell-level-8,
-input.sheet-toggle-spell-level-9:not(:checked) ~ div .sheet-spell-level-9,
+input.sheet-toggle-spell-filters:not(:checked) ~ [class^=sheet-toggle-spells-filter],
+
+input.sheet-toggle-spell-level-1:not(:checked) ~ div .sheet-toggle-spells-filter-level-1,
+input.sheet-toggle-spell-level-2:not(:checked) ~ div .sheet-toggle-spells-filter-level-2,
+input.sheet-toggle-spell-level-3:not(:checked) ~ div .sheet-toggle-spells-filter-level-3,
+input.sheet-toggle-spell-level-4:not(:checked) ~ div .sheet-toggle-spells-filter-level-4,
+input.sheet-toggle-spell-level-5:not(:checked) ~ div .sheet-toggle-spells-filter-level-5,
+input.sheet-toggle-spell-level-6:not(:checked) ~ div .sheet-toggle-spells-filter-level-6,
+input.sheet-toggle-spell-level-7:not(:checked) ~ div .sheet-toggle-spells-filter-level-7,
+input.sheet-toggle-spell-level-8:not(:checked) ~ div .sheet-toggle-spells-filter-level-8,
+input.sheet-toggle-spell-level-9:not(:checked) ~ div .sheet-toggle-spells-filter-level-9,
+input.sheet-toggle-spell-level-1:not(:checked) ~ div input.sheet-toggle-spell-slots-all:not(:checked) ~ div .sheet-spell-level-1,
+input.sheet-toggle-spell-level-2:not(:checked) ~ div input.sheet-toggle-spell-slots-all:not(:checked) ~ div .sheet-spell-level-2,
+input.sheet-toggle-spell-level-3:not(:checked) ~ div input.sheet-toggle-spell-slots-all:not(:checked) ~ div .sheet-spell-level-3,
+input.sheet-toggle-spell-level-4:not(:checked) ~ div input.sheet-toggle-spell-slots-all:not(:checked) ~ div .sheet-spell-level-4,
+input.sheet-toggle-spell-level-5:not(:checked) ~ div input.sheet-toggle-spell-slots-all:not(:checked) ~ div .sheet-spell-level-5,
+input.sheet-toggle-spell-level-6:not(:checked) ~ div input.sheet-toggle-spell-slots-all:not(:checked) ~ div .sheet-spell-level-6,
+input.sheet-toggle-spell-level-7:not(:checked) ~ div input.sheet-toggle-spell-slots-all:not(:checked) ~ div .sheet-spell-level-7,
+input.sheet-toggle-spell-level-8:not(:checked) ~ div input.sheet-toggle-spell-slots-all:not(:checked) ~ div .sheet-spell-level-8,
+input.sheet-toggle-spell-level-9:not(:checked) ~ div input.sheet-toggle-spell-slots-all:not(:checked) ~ div .sheet-spell-level-9,
+
+input.sheet-show-concentration:not(:checked) ~ .sheet-show-concentration,
+input.sheet-show-ritual:not(:checked) ~ .sheet-show-ritual,
+input.sheet-show-materials:not(:checked) ~ .sheet-show-materials,
 
 input.sheet-toggle-custom-class:not(:checked) ~ .sheet-custom-class,
 
-input.sheet-attack-toggle:not(:checked) ~ div.sheet-attack-toggle {
+input.sheet-attack-toggle:not(:checked) ~ div.sheet-attack-toggle,
+
+input.sheet-show-uses:not(:checked) ~ .sheet-show-uses {
 	display: none;
+}
+
+input.sheet-toggle-spell-filters:checked {
+	& ~ input.sheet-toggle-spells-filter-condense:checked ~ .repcontainer .sheet-condense,
+	& ~ input.sheet-toggle-spells-filter-prepared:checked ~ .repcontainer input.sheet-toggle-spells-prepared:not(:checked) ~ .sheet-spell,
+	& ~ input.sheet-toggle-spells-filter-ritual:checked ~ .repcontainer input.sheet-toggle-spells-ritual:not(:checked) ~ .sheet-spell,
+
+	& ~ input.sheet-toggle-spells-filter-level-cantrips:checked ~ .repcontainer input.sheet-toggle-spell-level-cantrip:not(:checked) ~ .sheet-spell,
+	& ~ input.sheet-toggle-spells-filter-level-1:checked ~ .repcontainer input.sheet-toggle-spell-level-1:not(:checked) ~ .sheet-spell,
+	& ~ input.sheet-toggle-spells-filter-level-2:checked ~ .repcontainer input.sheet-toggle-spell-level-2:not(:checked) ~ .sheet-spell,
+	& ~ input.sheet-toggle-spells-filter-level-3:checked ~ .repcontainer input.sheet-toggle-spell-level-3:not(:checked) ~ .sheet-spell,
+	& ~ input.sheet-toggle-spells-filter-level-4:checked ~ .repcontainer input.sheet-toggle-spell-level-4:not(:checked) ~ .sheet-spell,
+	& ~ input.sheet-toggle-spells-filter-level-5:checked ~ .repcontainer input.sheet-toggle-spell-level-5:not(:checked) ~ .sheet-spell,
+	& ~ input.sheet-toggle-spells-filter-level-6:checked ~ .repcontainer input.sheet-toggle-spell-level-6:not(:checked) ~ .sheet-spell,
+	& ~ input.sheet-toggle-spells-filter-level-7:checked ~ .repcontainer input.sheet-toggle-spell-level-7:not(:checked) ~ .sheet-spell,
+	& ~ input.sheet-toggle-spells-filter-level-8:checked ~ .repcontainer input.sheet-toggle-spell-level-8:not(:checked) ~ .sheet-spell,
+	& ~ input.sheet-toggle-spells-filter-level-9:checked ~ .repcontainer input.sheet-toggle-spell-level-9:not(:checked) ~ .sheet-spell,
+
+	& ~ input.sheet-toggle-spells-filter-casting-time-reaction:checked ~ .repcontainer input.sheet-toggle-casting-time-reaction:not(:checked) ~ .sheet-spell,
+	& ~ input.sheet-toggle-spells-filter-casting-time-bonus:checked ~ .repcontainer input.sheet-toggle-casting-time-bonus:not(:checked) ~ .sheet-spell,
+	& ~ input.sheet-toggle-spells-filter-casting-time-action:checked ~ .repcontainer input.sheet-toggle-casting-time-action:not(:checked) ~ .sheet-spell,
+
+	& ~ input.sheet-toggle-spells-filter-concentration:not(:checked) ~ .repcontainer input.sheet-toggle-spells-concentration:checked ~ .sheet-spell,
+	& ~ input.sheet-toggle-spells-filter-verbal:not(:checked) ~ .repcontainer input.sheet-toggle-spell-vsm-v:checked ~ .sheet-spell,
+	& ~ input.sheet-toggle-spells-filter-somatic:not(:checked) ~ .repcontainer input.sheet-toggle-spell-vsm-s:checked ~ .sheet-spell,
+	& ~ input.sheet-toggle-spells-filter-material:not(:checked) ~ .repcontainer input.sheet-toggle-spell-vsm-m:checked ~ .sheet-spell {
+		display: none;
+	}
+}
+
+@each $class in $classes {
+	input.sheet-has-#{$class}-levels:not([value="1"]) ~ div .sheet-has-#{$class}-levels {
+		display: none;
+	}
 }
 
 .sheet-spells-filter {
@@ -1563,6 +1608,12 @@ span[class^='sheet-toggle-spells-filter'] {
   }
 }
 
+.sheet-no-overflow {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
 .sheet-action-name,
 .sheet-spell-name,
 .sheet-creature-name {
@@ -1570,6 +1621,7 @@ span[class^='sheet-toggle-spells-filter'] {
 	font-family: 'Times New Roman';
 	font-size: 17px;
 	font-weight: bold;
+	line-height: 1.1em;
 	padding: 0 !important;
 }
 .sheet-spell-name,
@@ -1585,7 +1637,7 @@ input[class^='sheet-toggle-icon']:checked + span[class^='sheet-toggle-icon'],
 input[class^='sheet-toggle-edit-mode']:checked + span[class^='sheet-toggle-edit-mode'] {
 	background-color: transparent;
 	color: rgba(255,255,1,.95);
-	text-shadow: -1px 0 $black, 0 1px $black, 1px 0 $black, 0 -1px $black;
+	@include text-shadow();
 }
 
 input[class^='sheet-toggle-spells']:checked + span[class^='sheet-toggle-spells'] {
@@ -1615,50 +1667,69 @@ span[class^='sheet-toggle-spells-filter'] {
 	}
 }
 
+$toggle-icon-width: 15px;
 .sheet-toggle-icon-settings {
+	height: 16px;
 	position: absolute !important;
 	right: 0;
 	top: 0;
+	width: $toggle-icon-width;
+}
+input.sheet-toggle-icon-settings {
+	height: 16px;
+}
+.sheet-toggle-spells-prepared {
+	position: absolute !important;
+	right: $toggle-icon-width + 2;
+	top: 2px;
+}
+
+span.sheet-toggle-icon-settings,
+span.sheet-toggle-edit-mode {
+	background-color: transparent;
+	color: $grayer-gray;
+	margin-top: 0;
+	@include text-shadow();
 }
 
 span.sheet-toggle-icon-settings {
-	background-color: transparent;
-	color: $grayer-gray;
 	font-size: 14px;
 	height: 16px;
-	margin-top: 0;
 }
 span.sheet-toggle-edit-mode {
-	background-color: transparent;
-	color: $grayer-gray;
-	font-size: 18px;
-	margin-top: 0;
+	font-size: 22px;
 }
 input.sheet-toggle-edit-mode,
 span.sheet-toggle-edit-mode {
-	height: 20px;
+	height: 24px;
+	&.sheet-negative-mar-t-eight {
+		margin-top: -8px;
+	}
 }
+
 input.sheet-toggle-edit-mode:checked ~ div {
 	input,
 	select,
 	textarea {
 		&:not([readonly]) {
-			background-color: rgba(255, 255, 1, 0.41);
+			background-color: rgba(255, 255, 1, .25);
 		}
 	}
 }
 input.sheet-toggle-edit-mode:not(:checked) ~ div {
-	&.sheet-shaped-row,
-	&.sheet-section-core {
-		.repcontrol,
-		.sheet-item-to-toggle {
-			display: none;
-		}
+	.repcontrol,
+	.sheet-item-to-toggle {
+		display: none;
 	}
 }
 .sheet-item-toggle[value="1"] {
 	& + .sheet-item-to-toggle {
 		display: block !important;
+	}
+	& ~ .sheet-trait {
+		.sheet-heading:first-child {
+			margin-left: 17%;
+		}
 	}
 }
 
@@ -1667,8 +1738,12 @@ input.sheet-toggle-edit-mode:not(:checked) ~ div {
 }
 
 .sheet-small-label,
-.sheet-rolltemplate-5e-shaped .sheet-small-label {
+.sheet-rolltemplate-5e-shaped .sheet-small-label,
+.sheet-slide-input-pc:not(:checked) ~ div .sheet-traits-presentation-wrapper {
 	font-size: 11px;
+	input {
+		font-size: 11px;
+	}
 }
 .sheet-small-label {
 	select {
@@ -1708,8 +1783,8 @@ span.sheet-spacer {
 	margin-top: 5px;
 }
 
-.sheet-spacer-sm {
-	margin-top: 2px;
+.sheet-spacer-smd {
+	margin-top: 4px;
 }
 
 .sheet-left {
@@ -1726,16 +1801,6 @@ span.sheet-spacer {
 textarea {
 	height: 150px;
 	resize: both;
-}
-
-.sheet-background-textarea,
-.sheet-features-and-traits {
-	font-size: .95em;
-}
-.sheet-equipment-wrapper,
-.sheet-traits-wrapper {
-	max-height: 20em;
-	overflow-y: auto;
 }
 
 .sheet-personality-traits {
@@ -1782,12 +1847,16 @@ textarea {
 .sheet-shaped-row,
 .sheet-rolltemplate-5e-shaped .sheet-shaped-row,
 .sheet-section-spells .repcontainer,
-.sheet-section-npc .sheet-skills .repcontainer {
+.sheet-section-npc .sheet-skills .repcontainer,
+.sheet-ammo .repcontainer {
 	display: flex;
 	flex-direction: row;
 	flex-wrap: wrap;
 	&.sheet-center {
 		justify-content: center;
+	}
+	&.sheet-vert-top {
+		align-items: flex-start;
 	}
 	&.sheet-vert-center {
 		align-items: center;
@@ -1807,14 +1876,40 @@ textarea {
 		&:nth-child(odd) {
 			padding-right: 3px;
 		}
+		border-bottom: 0;
+		border-top: 1px;
+		padding-bottom: 5px;
+		padding-top: 5px;
 		width: 50%;
+		@include fadedBorderBottom();
+
+		&:first-child,
+		&:nth-child(2) {
+			border-image: none;
+			padding-top: 0;
+		}
+
+		&:last-child,
+		&:nth-last-child(2) {
+			padding-bottom: 0;
+		}
 	}
+}
+
+.sheet-ammo .repitem {
+	.sheet-section-core & {
+		width: 25%;
+	}
+	.sheet-section-equipment & {
+		width: 20%;
+	}
+	padding-left: 2px;
+	padding-right: 2px;
 }
 
 .sheet-section-spells .sheet-wrap-box textarea {
 	font-size: 11px;
 }
-
 
 .sheet-col-1-3 {
 	width: 33.33333%;
@@ -1858,9 +1953,11 @@ textarea {
 	margin-left: 20%;
 }
 
+.sheet-gm-info-flex,
+.sheet-rolltemplate-5e-shaped .sheet-gm-info-flex,
 .sheet-gm-info-block,
-.sheet-gm-info-inline-block,
 .sheet-rolltemplate-5e-shaped .sheet-gm-info-block,
+.sheet-gm-info-inline-block,
 .sheet-rolltemplate-5e-shaped .sheet-gm-info-inline-block {
 	background-color: $light-yellow !important;
 	display: none;

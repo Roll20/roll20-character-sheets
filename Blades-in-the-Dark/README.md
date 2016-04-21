@@ -10,6 +10,9 @@ Report any problems, suggestions or features by sending a private message on Rol
 
 ## Changelog
 
+### 0.0.2
+* Fixed bug with Friend/Rival and Harm boxes that would cause the starting boxes to have the same value.
+
 ### 0.0.1
 
 * First release, has the complete blank character sheet.
