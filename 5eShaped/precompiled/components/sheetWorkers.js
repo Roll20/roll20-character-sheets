@@ -1,7 +1,7 @@
 /* global setAttrs:false, getAttrs:false, on:false, getSectionIDs:false, generateRowID:false */
 'use strict';
 
-const currentVersion = '2.4.14';
+const currentVersion = '2.4.15';
 let TRANSLATIONS;
 const SKILLS = {
   acrobatics: 'dexterity',
@@ -2922,47 +2922,33 @@ const updateAction = (type, rowId) => {
           finalSetAttrs[`${repeatingString}extras_toggle`] = '@{extras_var}';
         }
       }
-      setFinalAttrs(v, finalSetAttrs, () => {
-        updateActionChatMacro(type);
-      });
+      setFinalAttrs(v, finalSetAttrs);
     });
   });
 };
-on('change:repeating_trait', (eventInfo) => {
-  const repeatingInfo = getRepeatingInfo('repeating_trait', eventInfo);
+const updateActionIfTriggered = (type, eventInfo) => {
+  const repeatingInfo = getRepeatingInfo(`repeating_${type}`, eventInfo);
   if (repeatingInfo && repeatingInfo.field !== 'name' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
-    updateAction('trait', repeatingInfo.rowId);
+    updateAction(type, repeatingInfo.rowId);
   }
+};
+on('change:repeating_trait', (eventInfo) => {
+  updateActionIfTriggered('trait', eventInfo);
 });
 on('change:repeating_action', (eventInfo) => {
-  const repeatingInfo = getRepeatingInfo('repeating_action', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'name' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
-    updateAction('action', repeatingInfo.rowId);
-  }
+  updateActionIfTriggered('action', eventInfo);
 });
 on('change:repeating_reaction', (eventInfo) => {
-  const repeatingInfo = getRepeatingInfo('repeating_reaction', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'name' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
-    updateAction('reaction', repeatingInfo.rowId);
-  }
+  updateActionIfTriggered('reaction', eventInfo);
 });
 on('change:repeating_legendaryaction', (eventInfo) => {
-  const repeatingInfo = getRepeatingInfo('repeating_legendaryaction', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'name' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
-    updateAction('legendaryaction', repeatingInfo.rowId);
-  }
+  updateActionIfTriggered('legendaryaction', eventInfo);
 });
 on('change:repeating_lairaction', (eventInfo) => {
-  const repeatingInfo = getRepeatingInfo('repeating_lairaction', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'name' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
-    updateAction('lairaction', repeatingInfo.rowId);
-  }
+  updateActionIfTriggered('lairaction', eventInfo);
 });
 on('change:repeating_regionaleffect', (eventInfo) => {
-  const repeatingInfo = getRepeatingInfo('repeating_regionaleffect', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'name' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
-    updateAction('regionaleffect', repeatingInfo.rowId);
-  }
+  updateActionIfTriggered('regionaleffect', eventInfo);
 });
 
 const updateAttack = (rowId) => {
@@ -4321,21 +4307,27 @@ const countAction = (type) => {
 };
 on('change:repeating_trait remove:repeating_trait', () => {
   countAction('trait');
+  updateActionChatMacro('trait');
 });
 on('change:repeating_action remove:repeating_action', () => {
   countAction('action');
+  updateActionChatMacro('action');
 });
 on('change:repeating_reaction remove:repeating_reaction', () => {
   countAction('reaction');
+  updateActionChatMacro('reaction');
 });
 on('change:repeating_legendaryaction remove:repeating_legendaryaction', () => {
   countAction('legendaryaction');
+  updateActionChatMacro('legendaryaction');
 });
 on('change:repeating_lairaction remove:repeating_lairaction', () => {
   countAction('lairaction');
+  updateActionChatMacro('lairaction');
 });
 on('change:repeating_regionaleffect remove:repeating_regionaleffect', () => {
   countAction('regionaleffect');
+  updateActionChatMacro('regionaleffect');
 });
 
 const switchToNPC = () => {
