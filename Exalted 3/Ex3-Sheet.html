@@ -38,7 +38,7 @@
                 });
                 TAS.debug('Max Weapon Defense', wep);
                 TAS.debug('Parry calc:', 'Math.ceil((' + attrs.I.dexterity + ' + Math.max(' + attrs.I.brawl + ', ' + ma + ', ' + attrs.I.melee + ')) / 2) + ' + wep + ' - ' + Math.abs(attrs.I['wound-penalty']));
-                attrs.I.parry = Math.max(0, )Math.ceil((attrs.I.dexterity + Math.max(attrs.I.brawl, ma, attrs.I.melee)) / 2) + wep - Math.abs(attrs.I['wound-penalty']));
+                attrs.I.parry = Math.max(0, Math.ceil((attrs.I.dexterity + Math.max(attrs.I.brawl, ma, attrs.I.melee)) / 2) + wep - Math.abs(attrs.I['wound-penalty']));
             })).execute();
         })).execute();
     }));
@@ -60,6 +60,25 @@
             pen = parseInt(pen);
             TAS.debug('Calculated penalty', pen);
             setAttrs({ 'wound-penalty': pen });
+        }));
+    }));
+    
+    on('sheet:opened', TAS._fn(function initIntimacies(e) {
+        TAS.debug('Initializing intimacies', e);
+        getAttrs(['init-intimacies'], TAS._fn(function checkInitialized(values) {
+            var attrs = {}, indexes = _.times(4, generateRowID);
+            if (parseInt(values['init-intimacies']) !== 0) return;
+            
+            TAS.debug('Creating new intimacies', indexes);
+            _.each(indexes, function(k, i) {
+                var v;
+                if (i === 0) v = 'Defining';
+                else if (i === 1) v = 'Major';
+                else v = 'Minor';
+                attrs['repeating_intimacies_' + k + '_intimacyrepeatingtype'] = v;
+            });
+            attrs['init-intimacies'] = 1;
+            setAttrs(attrs);
         }));
     }));
 /* ---- BEGIN: TheAaronSheet.js ---- */
@@ -2075,6 +2094,28 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
             </select>
         </div>
     </div><!-- /sheet-health-track -->
+    
+    <h1><span>Intimacies</span></h1>
+    <input type="hidden" value="0" name="attr_init-intimacies">
+    <div class="sheet-table">
+        <div class="sheet-table-header">
+            <div class="sheet-table-row">
+                <div class="sheet-table-cell">Intimacy</div>
+                <div class="sheet-table-cell">Intensity</div>
+            </div>
+        </div>
+        <fieldset class="repeating_intimacies sheet-table-body">
+            <div class="sheet-table-cell"><input type="text" name="attr_intimacyrepeatingname" placeholder="Winter Plum (Grief)"></div>
+            <div class="sheet-table-cell">
+                <select name="attr_intimacyrepeatingtype">
+                    <option value=""></option>
+                    <option value="Minor">Minor</option>
+                    <option value="Major">Major</option>
+                    <option value="Defining">Defining</option>
+                </select>
+            </div>
+        </fieldset>
+    </div>
 </div><!-- /sheet-body -->
 <div class="sheet-footer">
     <button type="roll" value="/w &quot;@{character_name}&quot; &{template:default} {{name=Ex3 Character Sheet}} {{Version:=2.0}} {{Wiki Article:=[Click for info](https://wiki.roll20.net/Ex3 Character Sheet)}}">Version 2.0 &ndash; More Information</button>
@@ -2096,64 +2137,6 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
 			<input type="text" style="width: 99%" name="attr_gear10"><br>
 			<fieldset><input type="text" style="width: 99%" name="attr_repgear"><br></fieldset>
 		</div>
-	</div>
-	<div style="float: left; width: 44%; border: solid 1px;" align="center">
-		<h3 align="center">Intimacies</h3>
-		<table>
-			<tbody>
-				<tr>
-                <td>
-    					<input type="text" name="attr_intimacy1name" style="width: 320px;"></input>
-					</td>
-					<td>
-						<select name="attr_intimacy1type">
-							<option>Minor</option>
-							<option>Major</option>
-							<option>Defining</option>
-						</select>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<input type="text" name="attr_intimacy2name" style="width: 320px;"></input>
-					</td>
-					<td>
-						<select name="attr_intimacy2type">
-							<option>Minor</option>
-							<option>Major</option>
-							<option>Defining</option>
-						</select>
-					</td>
-				</tr>
-                <tr>
-    				<td>
-						<input type="text" name="attr_intimacy3name" style="width: 320px;"></input>
-					</td>
-					<td>
-						<select name="attr_intimacy3type">
-							<option>Minor</option>
-							<option>Major</option>
-							<option>Defining</option>
-						</select>
-					</td>
-				</tr>
-                </tr>
-					<tr>
-    				<td>
-                    <fieldset class="repeating_intimacies">
-						<input type="text" name="attr_intimacyrepeatingname" style="width: 320px;"></input>
-					</td>
-					<td>
-						<select name="attr_intimacyrepeatingtype">
-							<option>Minor</option>
-							<option>Major</option>
-							<option>Defining</option>
-						</select>
-                        </fieldset>
-					</td>
-                    </tr>
-			</select>
-		</fieldset>
 	</div>
 </div>
 	<div style="border-top: solid 1px;" align="center">
