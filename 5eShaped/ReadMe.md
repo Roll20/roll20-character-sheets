@@ -43,7 +43,7 @@ Please report any bugs in the [issues tab](https://github.com/mlenser/roll20-cha
 7. Hit save.
 
 ## Contribute
-Since many have asked for it: If you appreciate what I do and want to compensate me for the countless hours that I have spent building this character sheet feel free to support me on Patreon or Paypal (mlenser@gmail.com).
+Since many have asked for it: If you appreciate what I do and want to compensate me for the countless hours that I have spent building this character sheet feel free to support me on [Patreon](https://www.patreon.com/mlenser) or Paypal (mlenser@gmail.com).
 Thanks so much for your support.
 
 ---
