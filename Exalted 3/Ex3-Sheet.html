@@ -1,18 +1,19 @@
 <script type="text/worker">
-    var TAS;
+    var TAS, damageWatch = [], damageAttrs = [], i;
     
-    function log(msg) {
-        try { msg = JSON.stringify(msg); } catch (e) {}
-        console.log('###### Sheet Worker Log ######', msg);
+    for (i = 1; i <= 32; i++) {
+        damageWatch.push('change:hl' + i + '-damage');
+        damageWatch.push('change:hl' + i + '-penalty');
+        damageAttrs.push('hl' + i + '-damage');
+        damageAttrs.push('hl' + i + '-penalty');
     }
-    
-    function max(arr) { return Math.max.apply(null, arr); }
+    damageWatch = damageWatch.join(' ');
     
     initTAS();
     TAS.debugMode();
     on('sheet:opened change:dexterity change:brawl change:ma-snake change:ma-tiger change:ma-void change:ma-reaper change:ma-ebon change:ma-crane '
         + 'change:ma-nightingale change:ma-devil change:ma-claw change:ma-pearl change:ma-steel change:repeating_ma remove:repeating_ma change:melee '
-        + 'change:repeating_weapon remove:repeating_weapon', TAS._fn(function updateParry(e) {
+        + 'change:repeating_weapon remove:repeating_weapon ' + damageWatch, TAS._fn(function updateParry(e) {
         TAS.debug('Updating Parry value', e);
         TAS.repeating('ma').fields('repma').attrs('ma-snake', 'ma-tiger', 'ma-void', 'ma-reaper', 'ma-ebon', 'ma-crane',
         'ma-nightingale', 'ma-devil', 'ma-claw', 'ma-pearl', 'ma-steel').tap(TAS._fn(function getMaxMa(rows, attrs) {
@@ -27,7 +28,8 @@
             
             TAS.debug('Max MA', ma);
             
-            TAS.repeating('weapon').fields('repweapondef').attrs('dexterity', 'brawl', 'melee', 'parry').tap(TAS._fn(function getMaxWeaponDef(rows, attrs) {
+            TAS.repeating('weapon').fields('repweapondef').attrs('dexterity', 'brawl', 'melee', 'parry', 'wound-penalty')
+                .tap(TAS._fn(function getMaxWeaponDef(rows, attrs) {
                 var wep = 0;
                 
                 TAS.debug('attrs', attrs, 'rows', rows);
@@ -35,12 +37,31 @@
                     wep = Math.max(wep, v.I.repweapondef);
                 });
                 TAS.debug('Max Weapon Defense', wep);
-                TAS.debug('Parry calc:', 'Math.ceil((' + attrs.I.dexterity + ' + Math.max(' + attrs.I.brawl + ', ' + ma + ', ' + attrs.I.melee + ')) / 2) + ' + wep);
-                attrs.I.parry = Math.ceil((attrs.I.dexterity + Math.max(attrs.I.brawl, ma, attrs.I.melee)) / 2) + wep;
+                TAS.debug('Parry calc:', 'Math.ceil((' + attrs.I.dexterity + ' + Math.max(' + attrs.I.brawl + ', ' + ma + ', ' + attrs.I.melee + ')) / 2) + ' + wep + ' - ' + Math.abs(attrs.I['wound-penalty']));
+                attrs.I.parry = Math.max(0, )Math.ceil((attrs.I.dexterity + Math.max(attrs.I.brawl, ma, attrs.I.melee)) / 2) + wep - Math.abs(attrs.I['wound-penalty']));
             })).execute();
         })).execute();
     }));
 
+    on('sheet:opened ' + damageWatch, TAS._fn(function updateWoundPenalty(e) {
+        TAS.debug('Updating wound penalty', e);
+        getAttrs(damageAttrs, TAS._fn(function calcPenalty(values) {
+            var pen;
+            
+            for (i = 32; i >= 1; i--) {
+                if (values['hl' + i + '-damage'] && values['hl' + i + '-damage'] !== 'healthy') break;
+            }
+            TAS.debug('Wound penalty at index ' + i, values['hl' + i + '-penalty']);
+            if (values['hl' + i + '-penalty']) pen = values['hl' + i + '-penalty'];
+            else pen = 0;
+            
+            if (pen === 'I') pen = -4;
+            if (pen === '') pen = 0;
+            pen = parseInt(pen);
+            TAS.debug('Calculated penalty', pen);
+            setAttrs({ 'wound-penalty': pen });
+        }));
+    }));
 /* ---- BEGIN: TheAaronSheet.js ---- */
 // Github:   https://github.com/shdwjk/TheAaronSheet/blob/master/TheAaronSheet.js
 // By:       The Aaron, Arcane Scriptomancer
@@ -1516,19 +1537,544 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                 </div>
                 <div class="sheet-table-cell sheet-text-right">Evasion:</div>
                 <div class="sheet-table-cell">
-                    <input type="number" value="ceil((@{dexterity} + @{dodge}) / 2 - abs(@{armor-mobility}))" disabled="disabled" name="attr_evasion">
+                    <input type="hidden" value="(ceil((@{dexterity} + @{dodge}) / 2) - abs(@{armor-mobility}) - abs(@{wound-penalty}))" disabled="disabled" name="attr_evasion-base">
+                    <input type="number" value="(@{evasion-base} + abs(@{evasion-base})) / 2" disabled="disabled" name="attr_evasion">
                 </div>
                 <div class="sheet-table-cell sheet-text-right">Resolve:</div>
                 <div class="sheet-table-cell">
-                    <input type="number" value="ceil((@{wits} + @{integrity}) / 2)" disabled="disabled" style="width:27px;margin-right:2px" title="Resolve without specialty" name="attr_resolve"><input type="number" value="ceil((@{wits} + @{integrity} + 1) / 2)" disabled="disabled" style="width:27px" title="Resolve with specialty" name="attr_resolve-specialty">
+                    <input type="hidden" value="(@{wits} + @{integrity})" disabled="disabled" name="attr_resolve-root">
+                    <input type="hidden" value="(@{resolve-base0} + 1)" disabled="disabled" name="attr_resolve-root-s">
+                    <input type="hidden" value="(ceil(@{resolve-root} / 2) - abs(@{wound-penalty}))" disabled="disabled" name="attr_resolve-base">
+                    <input type="hidden" value="(ceil(@{resolve-root-s} / 2) - abs(@{wound-penalty}))" disabled="disabled" name="attr_resolve-base-s">
+                    <input type="number" value="(@{resolve-base} + abs(@{resolve-base})) / 2" disabled="disabled" style="width:27px;margin-right:2px" title="Resolve without specialty" name="attr_resolve"><input type="number" value="(@{resolve-base-s} + abs(@{resolve-base-s})) / 2" disabled="disabled" style="width:27px" title="Resolve with specialty" name="attr_resolve-specialty">
                 </div>
                 <div class="sheet-table-cell sheet-text-right">Guile:</div>
                 <div class="sheet-table-cell">
-                    <input type="number" value="ceil((@{manipulation} + @{socialize}) / 2)" disabled="disabled" style="width:27px;margin-right:2px" title="Guile without specialty" name="attr_guile"><input type="number" value="ceil((@{manipulation} + @{socialize} + 1) / 2)" disabled="disabled" style="width:27px" title="Guile with specialty" name="attr_guile-specialty">
+                    <input type="hidden" value="(@{manipulation} + @{socialize})" disabled="disabled" name="attr_guile-root">
+                    <input type="hidden" value="(@{guile-root} + 1)" disabled="disabled" name="attr_guile-root-s">
+                    <input type="hidden" value="(ceil(@{guile-root} / 2) - abs(@{wound-penalty}))" disabled="disabled" name="guile-base">
+                    <input type="hidden" value="(ceil(@{guile-root-s} / 2) - abs(@{wound-penalty}))" disabled="disabled" name="guile-base-s">
+                    <input type="number" value="(@{guile-base} + abs(@{guile-base})) / 2" disabled="disabled" style="width:27px;margin-right:2px" title="Guile without specialty" name="attr_guile"><input type="number" value="(@{guile-base-s} + abs(@{guile-base-s})) / 2" disabled="disabled" style="width:27px" title="Guile with specialty" name="attr_guile-specialty">
                 </div>
             </div>
         </div>
-    </div>
+    </div><!-- /sheet-table defenses -->
+    <div class="sheet-text-center sheet-txt-lg" style="margin-top:8px"><strong>Health Levels</strong></div>
+    <div class="sheet-health-track">
+        <input type="hidden" name="attr_wound-penalty" value="0">
+        <div class="sheet-health-level">
+            <div class="sheet-damage-box">
+                <input type="radio" name="attr_hl1-damage" value="healthy" class="sheet-dots0" checked="checked"><span></span>
+                <input type="radio" name="attr_hl1-damage" value="bashing" class="sheet-dots1"><span></span>
+                <input type="radio" name="attr_hl1-damage" value="lethal" class="sheet-dots2"><span></span>
+                <input type="radio" name="attr_hl1-damage" value="aggravated" class="sheet-dots3"><span></span>
+            </div>
+            <select class="sheet-wound-penalty" name="attr_hl1-penalty">
+                <option value=""></option>
+                <option value="0" selected="selected">-0</option>
+                <option value="-1">-1</option>
+                <option value="-2">-2</option>
+                <option value="-4">-4</option>
+                <option value="I">Incapacitated</option>
+            </select>
+        </div>
+        <div class="sheet-health-level">
+            <div class="sheet-damage-box">
+                <input type="radio" name="attr_hl2-damage" value="healthy" class="sheet-dots0" checked="checked"><span></span>
+                <input type="radio" name="attr_hl2-damage" value="bashing" class="sheet-dots1"><span></span>
+                <input type="radio" name="attr_hl2-damage" value="lethal" class="sheet-dots2"><span></span>
+                <input type="radio" name="attr_hl2-damage" value="aggravated" class="sheet-dots3"><span></span>
+            </div>
+            <select class="sheet-wound-penalty" name="attr_hl2-penalty">
+                <option value=""></option>
+                <option value="0">-0</option>
+                <option value="-1" selected="selected">-1</option>
+                <option value="-2">-2</option>
+                <option value="-4">-4</option>
+                <option value="I">Incapacitated</option>
+            </select>
+        </div>
+        <div class="sheet-health-level">
+            <div class="sheet-damage-box">
+                <input type="radio" name="attr_hl3-damage" value="healthy" class="sheet-dots0" checked="checked"><span></span>
+                <input type="radio" name="attr_hl3-damage" value="bashing" class="sheet-dots1"><span></span>
+                <input type="radio" name="attr_hl3-damage" value="lethal" class="sheet-dots2"><span></span>
+                <input type="radio" name="attr_hl3-damage" value="aggravated" class="sheet-dots3"><span></span>
+            </div>
+            <select class="sheet-wound-penalty" name="attr_hl3-penalty">
+                <option value=""></option>
+                <option value="0">-0</option>
+                <option value="-1" selected="selected">-1</option>
+                <option value="-2">-2</option>
+                <option value="-4">-4</option>
+                <option value="I">Incapacitated</option>
+            </select>
+        </div>
+        <div class="sheet-health-level">
+            <div class="sheet-damage-box">
+                <input type="radio" name="attr_hl4-damage" value="healthy" class="sheet-dots0" checked="checked"><span></span>
+                <input type="radio" name="attr_hl4-damage" value="bashing" class="sheet-dots1"><span></span>
+                <input type="radio" name="attr_hl4-damage" value="lethal" class="sheet-dots2"><span></span>
+                <input type="radio" name="attr_hl4-damage" value="aggravated" class="sheet-dots3"><span></span>
+            </div>
+            <select class="sheet-wound-penalty" name="attr_hl4-penalty">
+                <option value=""></option>
+                <option value="0">-0</option>
+                <option value="-1">-1</option>
+                <option value="-2" selected="selected">-2</option>
+                <option value="-4">-4</option>
+                <option value="I">Incapacitated</option>
+            </select>
+        </div>
+        <div class="sheet-health-level">
+            <div class="sheet-damage-box">
+                <input type="radio" name="attr_hl5-damage" value="healthy" class="sheet-dots0" checked="checked"><span></span>
+                <input type="radio" name="attr_hl5-damage" value="bashing" class="sheet-dots1"><span></span>
+                <input type="radio" name="attr_hl5-damage" value="lethal" class="sheet-dots2"><span></span>
+                <input type="radio" name="attr_hl5-damage" value="aggravated" class="sheet-dots3"><span></span>
+            </div>
+            <select class="sheet-wound-penalty" name="attr_hl5-penalty">
+                <option value=""></option>
+                <option value="0">-0</option>
+                <option value="-1">-1</option>
+                <option value="-2" selected="selected">-2</option>
+                <option value="-4">-4</option>
+                <option value="I">Incapacitated</option>
+            </select>
+        </div>
+        <div class="sheet-health-level">
+            <div class="sheet-damage-box">
+                <input type="radio" name="attr_hl6-damage" value="healthy" class="sheet-dots0" checked="checked"><span></span>
+                <input type="radio" name="attr_hl6-damage" value="bashing" class="sheet-dots1"><span></span>
+                <input type="radio" name="attr_hl6-damage" value="lethal" class="sheet-dots2"><span></span>
+                <input type="radio" name="attr_hl6-damage" value="aggravated" class="sheet-dots3"><span></span>
+            </div>
+            <select class="sheet-wound-penalty" name="attr_hl6-penalty">
+                <option value=""></option>
+                <option value="0">-0</option>
+                <option value="-1">-1</option>
+                <option value="-2">-2</option>
+                <option value="-4" selected="selected">-4</option>
+                <option value="I">Incapacitated</option>
+            </select>
+        </div>
+        <div class="sheet-health-level">
+            <div class="sheet-damage-box">
+                <input type="radio" name="attr_hl7-damage" value="healthy" class="sheet-dots0" checked="checked"><span></span>
+                <input type="radio" name="attr_hl7-damage" value="bashing" class="sheet-dots1"><span></span>
+                <input type="radio" name="attr_hl7-damage" value="lethal" class="sheet-dots2"><span></span>
+                <input type="radio" name="attr_hl7-damage" value="aggravated" class="sheet-dots3"><span></span>
+            </div>
+            <select class="sheet-wound-penalty" name="attr_hl7-penalty">
+                <option value=""></option>
+                <option value="0">-0</option>
+                <option value="-1">-1</option>
+                <option value="-2">-2</option>
+                <option value="-4">-4</option>
+                <option value="I" selected="selected">Incapacitated</option>
+            </select>
+        </div>
+        <div class="sheet-health-level">
+            <div class="sheet-damage-box">
+                <input type="radio" name="attr_hl8-damage" value="healthy" class="sheet-dots0" checked="checked"><span></span>
+                <input type="radio" name="attr_hl8-damage" value="bashing" class="sheet-dots1"><span></span>
+                <input type="radio" name="attr_hl8-damage" value="lethal" class="sheet-dots2"><span></span>
+                <input type="radio" name="attr_hl8-damage" value="aggravated" class="sheet-dots3"><span></span>
+            </div>
+            <select class="sheet-wound-penalty" name="attr_hl8-penalty">
+                <option value=""></option>
+                <option value="0">-0</option>
+                <option value="-1">-1</option>
+                <option value="-2">-2</option>
+                <option value="-4">-4</option>
+                <option value="I">Incapacitated</option>
+            </select>
+        </div>
+        <div class="sheet-health-level">
+            <div class="sheet-damage-box">
+                <input type="radio" name="attr_hl9-damage" value="healthy" class="sheet-dots0" checked="checked"><span></span>
+                <input type="radio" name="attr_hl9-damage" value="bashing" class="sheet-dots1"><span></span>
+                <input type="radio" name="attr_hl9-damage" value="lethal" class="sheet-dots2"><span></span>
+                <input type="radio" name="attr_hl9-damage" value="aggravated" class="sheet-dots3"><span></span>
+            </div>
+            <select class="sheet-wound-penalty" name="attr_hl9-penalty">
+                <option value=""></option>
+                <option value="0">-0</option>
+                <option value="-1">-1</option>
+                <option value="-2">-2</option>
+                <option value="-4">-4</option>
+                <option value="I">Incapacitated</option>
+            </select>
+        </div>
+        <div class="sheet-health-level">
+            <div class="sheet-damage-box">
+                <input type="radio" name="attr_hl10-damage" value="healthy" class="sheet-dots0" checked="checked"><span></span>
+                <input type="radio" name="attr_hl10-damage" value="bashing" class="sheet-dots1"><span></span>
+                <input type="radio" name="attr_hl10-damage" value="lethal" class="sheet-dots2"><span></span>
+                <input type="radio" name="attr_hl10-damage" value="aggravated" class="sheet-dots3"><span></span>
+            </div>
+            <select class="sheet-wound-penalty" name="attr_hl10-penalty">
+                <option value=""></option>
+                <option value="0">-0</option>
+                <option value="-1">-1</option>
+                <option value="-2">-2</option>
+                <option value="-4">-4</option>
+                <option value="I">Incapacitated</option>
+            </select>
+        </div>
+        <div class="sheet-health-level">
+            <div class="sheet-damage-box">
+                <input type="radio" name="attr_hl11-damage" value="healthy" class="sheet-dots0" checked="checked"><span></span>
+                <input type="radio" name="attr_hl11-damage" value="bashing" class="sheet-dots1"><span></span>
+                <input type="radio" name="attr_hl11-damage" value="lethal" class="sheet-dots2"><span></span>
+                <input type="radio" name="attr_hl11-damage" value="aggravated" class="sheet-dots3"><span></span>
+            </div>
+            <select class="sheet-wound-penalty" name="attr_hl11-penalty">
+                <option value=""></option>
+                <option value="0">-0</option>
+                <option value="-1">-1</option>
+                <option value="-2">-2</option>
+                <option value="-4">-4</option>
+                <option value="I">Incapacitated</option>
+            </select>
+        </div>
+        <div class="sheet-health-level">
+            <div class="sheet-damage-box">
+                <input type="radio" name="attr_hl12-damage" value="healthy" class="sheet-dots0" checked="checked"><span></span>
+                <input type="radio" name="attr_hl12-damage" value="bashing" class="sheet-dots1"><span></span>
+                <input type="radio" name="attr_hl12-damage" value="lethal" class="sheet-dots2"><span></span>
+                <input type="radio" name="attr_hl12-damage" value="aggravated" class="sheet-dots3"><span></span>
+            </div>
+            <select class="sheet-wound-penalty" name="attr_hl12-penalty">
+                <option value=""></option>
+                <option value="0">-0</option>
+                <option value="-1">-1</option>
+                <option value="-2">-2</option>
+                <option value="-4">-4</option>
+                <option value="I">Incapacitated</option>
+            </select>
+        </div>
+        <div class="sheet-health-level">
+            <div class="sheet-damage-box">
+                <input type="radio" name="attr_hl13-damage" value="healthy" class="sheet-dots0" checked="checked"><span></span>
+                <input type="radio" name="attr_hl13-damage" value="bashing" class="sheet-dots1"><span></span>
+                <input type="radio" name="attr_hl13-damage" value="lethal" class="sheet-dots2"><span></span>
+                <input type="radio" name="attr_hl13-damage" value="aggravated" class="sheet-dots3"><span></span>
+            </div>
+            <select class="sheet-wound-penalty" name="attr_hl13-penalty">
+                <option value=""></option>
+                <option value="0">-0</option>
+                <option value="-1">-1</option>
+                <option value="-2">-2</option>
+                <option value="-4">-4</option>
+                <option value="I">Incapacitated</option>
+            </select>
+        </div>
+        <div class="sheet-health-level">
+            <div class="sheet-damage-box">
+                <input type="radio" name="attr_hl14-damage" value="healthy" class="sheet-dots0" checked="checked"><span></span>
+                <input type="radio" name="attr_hl14-damage" value="bashing" class="sheet-dots1"><span></span>
+                <input type="radio" name="attr_hl14-damage" value="lethal" class="sheet-dots2"><span></span>
+                <input type="radio" name="attr_hl14-damage" value="aggravated" class="sheet-dots3"><span></span>
+            </div>
+            <select class="sheet-wound-penalty" name="attr_hl14-penalty">
+                <option value=""></option>
+                <option value="0">-0</option>
+                <option value="-1">-1</option>
+                <option value="-2">-2</option>
+                <option value="-4">-4</option>
+                <option value="I">Incapacitated</option>
+            </select>
+        </div>
+        <div class="sheet-health-level">
+            <div class="sheet-damage-box">
+                <input type="radio" name="attr_hl15-damage" value="healthy" class="sheet-dots0" checked="checked"><span></span>
+                <input type="radio" name="attr_hl15-damage" value="bashing" class="sheet-dots1"><span></span>
+                <input type="radio" name="attr_hl15-damage" value="lethal" class="sheet-dots2"><span></span>
+                <input type="radio" name="attr_hl15-damage" value="aggravated" class="sheet-dots3"><span></span>
+            </div>
+            <select class="sheet-wound-penalty" name="attr_hl15-penalty">
+                <option value=""></option>
+                <option value="0">-0</option>
+                <option value="-1">-1</option>
+                <option value="-2">-2</option>
+                <option value="-4">-4</option>
+                <option value="I">Incapacitated</option>
+            </select>
+        </div>
+        <div class="sheet-health-level">
+            <div class="sheet-damage-box">
+                <input type="radio" name="attr_hl16-damage" value="healthy" class="sheet-dots0" checked="checked"><span></span>
+                <input type="radio" name="attr_hl16-damage" value="bashing" class="sheet-dots1"><span></span>
+                <input type="radio" name="attr_hl16-damage" value="lethal" class="sheet-dots2"><span></span>
+                <input type="radio" name="attr_hl16-damage" value="aggravated" class="sheet-dots3"><span></span>
+            </div>
+            <select class="sheet-wound-penalty" name="attr_hl16-penalty">
+                <option value=""></option>
+                <option value="0">-0</option>
+                <option value="-1">-1</option>
+                <option value="-2">-2</option>
+                <option value="-4">-4</option>
+                <option value="I">Incapacitated</option>
+            </select>
+        </div>
+        <div class="sheet-health-level">
+            <div class="sheet-damage-box">
+                <input type="radio" name="attr_hl17-damage" value="healthy" class="sheet-dots0" checked="checked"><span></span>
+                <input type="radio" name="attr_hl17-damage" value="bashing" class="sheet-dots1"><span></span>
+                <input type="radio" name="attr_hl17-damage" value="lethal" class="sheet-dots2"><span></span>
+                <input type="radio" name="attr_hl17-damage" value="aggravated" class="sheet-dots3"><span></span>
+            </div>
+            <select class="sheet-wound-penalty" name="attr_hl17-penalty">
+                <option value=""></option>
+                <option value="0">-0</option>
+                <option value="-1">-1</option>
+                <option value="-2">-2</option>
+                <option value="-4">-4</option>
+                <option value="I">Incapacitated</option>
+            </select>
+        </div>
+        <div class="sheet-health-level">
+            <div class="sheet-damage-box">
+                <input type="radio" name="attr_hl18-damage" value="healthy" class="sheet-dots0" checked="checked"><span></span>
+                <input type="radio" name="attr_hl18-damage" value="bashing" class="sheet-dots1"><span></span>
+                <input type="radio" name="attr_hl18-damage" value="lethal" class="sheet-dots2"><span></span>
+                <input type="radio" name="attr_hl18-damage" value="aggravated" class="sheet-dots3"><span></span>
+            </div>
+            <select class="sheet-wound-penalty" name="attr_hl18-penalty">
+                <option value=""></option>
+                <option value="0">-0</option>
+                <option value="-1">-1</option>
+                <option value="-2">-2</option>
+                <option value="-4">-4</option>
+                <option value="I">Incapacitated</option>
+            </select>
+        </div>
+        <div class="sheet-health-level">
+            <div class="sheet-damage-box">
+                <input type="radio" name="attr_hl19-damage" value="healthy" class="sheet-dots0" checked="checked"><span></span>
+                <input type="radio" name="attr_hl19-damage" value="bashing" class="sheet-dots1"><span></span>
+                <input type="radio" name="attr_hl19-damage" value="lethal" class="sheet-dots2"><span></span>
+                <input type="radio" name="attr_hl19-damage" value="aggravated" class="sheet-dots3"><span></span>
+            </div>
+            <select class="sheet-wound-penalty" name="attr_hl19-penalty">
+                <option value=""></option>
+                <option value="0">-0</option>
+                <option value="-1">-1</option>
+                <option value="-2">-2</option>
+                <option value="-4">-4</option>
+                <option value="I">Incapacitated</option>
+            </select>
+        </div>
+        <div class="sheet-health-level">
+            <div class="sheet-damage-box">
+                <input type="radio" name="attr_hl20-damage" value="healthy" class="sheet-dots0" checked="checked"><span></span>
+                <input type="radio" name="attr_hl20-damage" value="bashing" class="sheet-dots1"><span></span>
+                <input type="radio" name="attr_hl20-damage" value="lethal" class="sheet-dots2"><span></span>
+                <input type="radio" name="attr_hl20-damage" value="aggravated" class="sheet-dots3"><span></span>
+            </div>
+            <select class="sheet-wound-penalty" name="attr_hl20-penalty">
+                <option value=""></option>
+                <option value="0">-0</option>
+                <option value="-1">-1</option>
+                <option value="-2">-2</option>
+                <option value="-4">-4</option>
+                <option value="I">Incapacitated</option>
+            </select>
+        </div>
+        <div class="sheet-health-level">
+            <div class="sheet-damage-box">
+                <input type="radio" name="attr_hl21-damage" value="healthy" class="sheet-dots0" checked="checked"><span></span>
+                <input type="radio" name="attr_hl21-damage" value="bashing" class="sheet-dots1"><span></span>
+                <input type="radio" name="attr_hl21-damage" value="lethal" class="sheet-dots2"><span></span>
+                <input type="radio" name="attr_hl21-damage" value="aggravated" class="sheet-dots3"><span></span>
+            </div>
+            <select class="sheet-wound-penalty" name="attr_hl21-penalty">
+                <option value=""></option>
+                <option value="0">-0</option>
+                <option value="-1">-1</option>
+                <option value="-2">-2</option>
+                <option value="-4">-4</option>
+                <option value="I">Incapacitated</option>
+            </select>
+        </div>
+        <div class="sheet-health-level">
+            <div class="sheet-damage-box">
+                <input type="radio" name="attr_hl22-damage" value="healthy" class="sheet-dots0" checked="checked"><span></span>
+                <input type="radio" name="attr_hl22-damage" value="bashing" class="sheet-dots1"><span></span>
+                <input type="radio" name="attr_hl22-damage" value="lethal" class="sheet-dots2"><span></span>
+                <input type="radio" name="attr_hl22-damage" value="aggravated" class="sheet-dots3"><span></span>
+            </div>
+            <select class="sheet-wound-penalty" name="attr_hl22-penalty">
+                <option value=""></option>
+                <option value="0">-0</option>
+                <option value="-1">-1</option>
+                <option value="-2">-2</option>
+                <option value="-4">-4</option>
+                <option value="I">Incapacitated</option>
+            </select>
+        </div>
+        <div class="sheet-health-level">
+            <div class="sheet-damage-box">
+                <input type="radio" name="attr_hl23-damage" value="healthy" class="sheet-dots0" checked="checked"><span></span>
+                <input type="radio" name="attr_hl23-damage" value="bashing" class="sheet-dots1"><span></span>
+                <input type="radio" name="attr_hl23-damage" value="lethal" class="sheet-dots2"><span></span>
+                <input type="radio" name="attr_hl23-damage" value="aggravated" class="sheet-dots3"><span></span>
+            </div>
+            <select class="sheet-wound-penalty" name="attr_hl23-penalty">
+                <option value=""></option>
+                <option value="0">-0</option>
+                <option value="-1">-1</option>
+                <option value="-2">-2</option>
+                <option value="-4">-4</option>
+                <option value="I">Incapacitated</option>
+            </select>
+        </div>
+        <div class="sheet-health-level">
+            <div class="sheet-damage-box">
+                <input type="radio" name="attr_hl24-damage" value="healthy" class="sheet-dots0" checked="checked"><span></span>
+                <input type="radio" name="attr_hl24-damage" value="bashing" class="sheet-dots1"><span></span>
+                <input type="radio" name="attr_hl24-damage" value="lethal" class="sheet-dots2"><span></span>
+                <input type="radio" name="attr_hl24-damage" value="aggravated" class="sheet-dots3"><span></span>
+            </div>
+            <select class="sheet-wound-penalty" name="attr_hl24-penalty">
+                <option value=""></option>
+                <option value="0">-0</option>
+                <option value="-1">-1</option>
+                <option value="-2">-2</option>
+                <option value="-4">-4</option>
+                <option value="I">Incapacitated</option>
+            </select>
+        </div>
+        <div class="sheet-health-level">
+            <div class="sheet-damage-box">
+                <input type="radio" name="attr_hl25-damage" value="healthy" class="sheet-dots0" checked="checked"><span></span>
+                <input type="radio" name="attr_hl25-damage" value="bashing" class="sheet-dots1"><span></span>
+                <input type="radio" name="attr_hl25-damage" value="lethal" class="sheet-dots2"><span></span>
+                <input type="radio" name="attr_hl25-damage" value="aggravated" class="sheet-dots3"><span></span>
+            </div>
+            <select class="sheet-wound-penalty" name="attr_hl25-penalty">
+                <option value=""></option>
+                <option value="0">-0</option>
+                <option value="-1">-1</option>
+                <option value="-2">-2</option>
+                <option value="-4">-4</option>
+                <option value="I">Incapacitated</option>
+            </select>
+        </div>
+        <div class="sheet-health-level">
+            <div class="sheet-damage-box">
+                <input type="radio" name="attr_hl26-damage" value="healthy" class="sheet-dots0" checked="checked"><span></span>
+                <input type="radio" name="attr_hl26-damage" value="bashing" class="sheet-dots1"><span></span>
+                <input type="radio" name="attr_hl26-damage" value="lethal" class="sheet-dots2"><span></span>
+                <input type="radio" name="attr_hl26-damage" value="aggravated" class="sheet-dots3"><span></span>
+            </div>
+            <select class="sheet-wound-penalty" name="attr_hl26-penalty">
+                <option value=""></option>
+                <option value="0">-0</option>
+                <option value="-1">-1</option>
+                <option value="-2">-2</option>
+                <option value="-4">-4</option>
+                <option value="I">Incapacitated</option>
+            </select>
+        </div>
+        <div class="sheet-health-level">
+            <div class="sheet-damage-box">
+                <input type="radio" name="attr_hl27-damage" value="healthy" class="sheet-dots0" checked="checked"><span></span>
+                <input type="radio" name="attr_hl27-damage" value="bashing" class="sheet-dots1"><span></span>
+                <input type="radio" name="attr_hl27-damage" value="lethal" class="sheet-dots2"><span></span>
+                <input type="radio" name="attr_hl27-damage" value="aggravated" class="sheet-dots3"><span></span>
+            </div>
+            <select class="sheet-wound-penalty" name="attr_hl27-penalty">
+                <option value=""></option>
+                <option value="0">-0</option>
+                <option value="-1">-1</option>
+                <option value="-2">-2</option>
+                <option value="-4">-4</option>
+                <option value="I">Incapacitated</option>
+            </select>
+        </div>
+        <div class="sheet-health-level">
+            <div class="sheet-damage-box">
+                <input type="radio" name="attr_hl28-damage" value="healthy" class="sheet-dots0" checked="checked"><span></span>
+                <input type="radio" name="attr_hl28-damage" value="bashing" class="sheet-dots1"><span></span>
+                <input type="radio" name="attr_hl28-damage" value="lethal" class="sheet-dots2"><span></span>
+                <input type="radio" name="attr_hl28-damage" value="aggravated" class="sheet-dots3"><span></span>
+            </div>
+            <select class="sheet-wound-penalty" name="attr_hl28-penalty">
+                <option value=""></option>
+                <option value="0">-0</option>
+                <option value="-1">-1</option>
+                <option value="-2">-2</option>
+                <option value="-4">-4</option>
+                <option value="I">Incapacitated</option>
+            </select>
+        </div>
+        <div class="sheet-health-level">
+            <div class="sheet-damage-box">
+                <input type="radio" name="attr_hl29-damage" value="healthy" class="sheet-dots0" checked="checked"><span></span>
+                <input type="radio" name="attr_hl29-damage" value="bashing" class="sheet-dots1"><span></span>
+                <input type="radio" name="attr_hl29-damage" value="lethal" class="sheet-dots2"><span></span>
+                <input type="radio" name="attr_hl29-damage" value="aggravated" class="sheet-dots3"><span></span>
+            </div>
+            <select class="sheet-wound-penalty" name="attr_hl29-penalty">
+                <option value=""></option>
+                <option value="0">-0</option>
+                <option value="-1">-1</option>
+                <option value="-2">-2</option>
+                <option value="-4">-4</option>
+                <option value="I">Incapacitated</option>
+            </select>
+        </div>
+        <div class="sheet-health-level">
+            <div class="sheet-damage-box">
+                <input type="radio" name="attr_hl30-damage" value="healthy" class="sheet-dots0" checked="checked"><span></span>
+                <input type="radio" name="attr_hl30-damage" value="bashing" class="sheet-dots1"><span></span>
+                <input type="radio" name="attr_hl30-damage" value="lethal" class="sheet-dots2"><span></span>
+                <input type="radio" name="attr_hl30-damage" value="aggravated" class="sheet-dots3"><span></span>
+            </div>
+            <select class="sheet-wound-penalty" name="attr_hl30-penalty">
+                <option value=""></option>
+                <option value="0">-0</option>
+                <option value="-1">-1</option>
+                <option value="-2">-2</option>
+                <option value="-4">-4</option>
+                <option value="I">Incapacitated</option>
+            </select>
+        </div>
+        <div class="sheet-health-level">
+            <div class="sheet-damage-box">
+                <input type="radio" name="attr_hl31-damage" value="healthy" class="sheet-dots0" checked="checked"><span></span>
+                <input type="radio" name="attr_hl31-damage" value="bashing" class="sheet-dots1"><span></span>
+                <input type="radio" name="attr_hl31-damage" value="lethal" class="sheet-dots2"><span></span>
+                <input type="radio" name="attr_hl31-damage" value="aggravated" class="sheet-dots3"><span></span>
+            </div>
+            <select class="sheet-wound-penalty" name="attr_hl31-penalty">
+                <option value=""></option>
+                <option value="0">-0</option>
+                <option value="-1">-1</option>
+                <option value="-2">-2</option>
+                <option value="-4">-4</option>
+                <option value="I">Incapacitated</option>
+            </select>
+        </div>
+        <div class="sheet-health-level">
+            <div class="sheet-damage-box">
+                <input type="radio" name="attr_hl32-damage" value="healthy" class="sheet-dots0" checked="checked"><span></span>
+                <input type="radio" name="attr_hl32-damage" value="bashing" class="sheet-dots1"><span></span>
+                <input type="radio" name="attr_hl32-damage" value="lethal" class="sheet-dots2"><span></span>
+                <input type="radio" name="attr_hl32-damage" value="aggravated" class="sheet-dots3"><span></span>
+            </div>
+            <select class="sheet-wound-penalty" name="attr_hl32-penalty">
+                <option value=""></option>
+                <option value="0">-0</option>
+                <option value="-1">-1</option>
+                <option value="-2">-2</option>
+                <option value="-4">-4</option>
+                <option value="I">Incapacitated</option>
+            </select>
+        </div>
+    </div><!-- /sheet-health-track -->
 </div><!-- /sheet-body -->
 <div class="sheet-footer">
     <button type="roll" value="/w &quot;@{character_name}&quot; &{template:default} {{name=Ex3 Character Sheet}} {{Version:=2.0}} {{Wiki Article:=[Click for info](https://wiki.roll20.net/Ex3 Character Sheet)}}">Version 2.0 &ndash; More Information</button>
@@ -1549,65 +2095,6 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
 			<input type="text" style="width: 99%" name="attr_gear9"><br>
 			<input type="text" style="width: 99%" name="attr_gear10"><br>
 			<fieldset><input type="text" style="width: 99%" name="attr_repgear"><br></fieldset>
-		</div>
-	</div>
-	<div style="width: 49%; float: left;">
-		<h3 align="center">Defense</h3>
-		<div style="border-top: solid 1px; width: 50%; float: left;">
-			<h4 align="center">Health Levels</h4>
-			<table>
-				<tbody>
-					<tr>
-						<td>Levels</td>
-						<td>Total</td>
-						<td>Bash.</td>
-						<td>Leth.</td>
-						<td>Aggr.</td>
-					</tr>
-					<tr>
-						<td>-0</td>
-						<td><input type="number" value="1" style="width: 35px;" name="attr_0hls"></td>
-						<td><input type="number" value="0" style="width: 35px;" name="attr_0bash"></td>
-						<td><input type="number" value="0" style="width: 35px;" name="attr_0leth"></td>
-						<td><input type="number" value="0" style="width: 35px;" name="attr_0agg"></td>
-					</tr>
-					<tr>
-						<td>-1</td>
-						<td><input type="number" value="2" style="width: 35px;" name="attr_1hls"></td>
-						<td><input type="number" value="0" style="width: 35px;" name="attr_1bash"></td>
-						<td><input type="number" value="0" style="width: 35px;" name="attr_1leth"></td>
-						<td><input type="number" value="0" style="width: 35px;" name="attr_1agg"></td>
-					</tr>
-					<tr>
-						<td>-2</td>
-						<td><input type="number" value="2" style="width: 35px;" name="attr_2hls"></td>
-						<td><input type="number" value="0" style="width: 35px;" name="attr_2bash"></td>
-						<td><input type="number" value="0" style="width: 35px;" name="attr_2leth"></td>
-						<td><input type="number" value="0" style="width: 35px;" name="attr_2agg"></td>
-					</tr>
-					<tr>
-						<td>-4</td>
-						<td><input type="number" value="1" style="width: 35px;" disabled="true" name="attr_4hls"></td>
-						<td><input type="number" value="0" style="width: 35px;" name="attr_4bash"></td>
-						<td><input type="number" value="0" style="width: 35px;" name="attr_4leth"></td>
-						<td><input type="number" value="0" style="width: 35px;" name="attr_4agg"></td>
-					</tr>
-					<tr>
-						<td>Incap.</td>
-						<td><input type="number" value="1" style="width: 35px;" disabled="true" name="attr_ihls"></td>
-						<td><input type="number" value="0" style="width: 35px;" name="attr_ibash"></td>
-						<td><input type="number" value="0" style="width: 35px;" name="attr_ileth"></td>
-						<td><input type="number" value="0" style="width: 35px;" name="attr_iagg"></td>
-					</tr>
-					<tr>
-						<td>Dying</td>
-						<td><input type="number" value="@{Stamina}" style="width: 35px;" disabled="true" name="attr_stamina"></td>
-						<td><input type="number" value="0" style="width: 35px;" name="attr_dbash"></td>
-						<td><input type="number" value="0" style="width: 35px;" name="attr_dleth"></td>
-						<td><input type="number" value="0" style="width: 35px;"  name="attr_dagg"></td>
-					</tr>
-				</tbody>
-			</table>
 		</div>
 	</div>
 	<div style="float: left; width: 44%; border: solid 1px;" align="center">
