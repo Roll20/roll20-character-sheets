@@ -1,5 +1,8 @@
 <script type="text/worker">
-    var TAS, damageWatch = [], damageAttrs = [], i;
+    var version = 2.0,
+        TAS, damageWatch = [], damageAttrs = [], i;
+    
+    function cleanAttrs(attrs) { return _.map(attrs, function(e) { return e === undefined ? '' : e; }); }
     
     for (i = 1; i <= 32; i++) {
         damageWatch.push('change:hl' + i + '-damage');
@@ -70,17 +73,376 @@
             if (parseInt(values['init-intimacies']) !== 0) return;
             
             TAS.debug('Creating new intimacies', indexes);
-            _.each(indexes, function(k, i) {
+            _.each(indexes, function(id, k) {
                 var v;
-                if (i === 0) v = 'Defining';
-                else if (i === 1) v = 'Major';
+                if (k === 0) v = 'Defining';
+                else if (k === 1) v = 'Major';
                 else v = 'Minor';
-                attrs['repeating_intimacies_' + k + '_intimacyrepeatingtype'] = v;
+                attrs['repeating_intimacies_' + id + '_intimacyrepeatingtype'] = v;
             });
             attrs['init-intimacies'] = 1;
             setAttrs(attrs);
         }));
     }));
+    
+    on('sheet:opened', TAS._fn(function upgradeVersion(e) {
+        TAS.debug('Checking version', e);
+        getAttrs(['version'], TAS._fn(function versionCheck(values) {
+            var v = parseFloat(values.version);
+            
+            if (v !== version) {
+                switch (v) {
+                    default: // version 1
+                        upgradeV1toV2();
+                }
+            }
+        }));
+    }));
+    
+    function upgradeV1toV2() {
+        TAS.debug('Upgrading from version 1');
+        
+        getAttrs(['specialty1', 'specialty2', 'specialty3', 'repflaws',
+            'personalessencecurr', 'peripheralessencecurr', 'gear1', 'gear2',
+            'gear3', 'gear4', 'gear5', 'gear6', 'gear7', 'gear8', 'gear9',
+            'gear10', '0hls', '0bash', '0leth', '0agg', '1hls', '1bash',
+            '1leth', '1agg', '2hls', '2bash', '2leth', '2agg', '4bash', '4leth',
+            '4agg', 'ibash', 'ileth', 'iagg', 'earnedxp', 'spentxp',
+            'totalsplatxp', 'spentsplatxp', 'currentsilxp', 'currentgolxp',
+            'currentwhixp', 'currentmajpro', 'currentsuppro', 'currentlegpro',
+            'strengthfav', 'dexterityfav', 'staminafav', 'charismafav',
+            'manipulationfav', 'apperancefav', 'perceptionfav',
+            'intelligencefav', 'witsfav', 'archeryfav', 'athleticsfav',
+            'awarenessfav', 'brawlfav', 'bureaucracyfav', 'dodgefav',
+            'integrityfav', 'investigationfav', 'larcenyfav', 'linguisticsfav',
+            'lorefav', 'medicinefav', 'meleefav', 'occultfav', 'performancefav',
+            'presencefav', 'resistancefav', 'ridefav', 'sailfav',
+            'socializefav', 'stealthfav', 'survivalfav', 'thrownfav', 'warfav',
+            'craftfav', 'martialartsfav', 'willpower-spent1',
+            'willpower-spent2', 'willpower-spent3', 'willpower-spent4',
+            'willpower-spent5', 'willpower-spent6', 'willpower-spent7',
+            'willpower-spent8', 'willpower-spent9', 'willpower-spent10',
+            'caste', 'intimacy1name', 'intimacy1type', 'intimacy2name',
+            'intimacy2type', 'intimacy3name', 'intimacy3type'], TAS._fn(function upgrade(values) {
+            var attrs = {}, indexes = _.times(3, generateRowID),
+                penaltyIdx = 0, damageIdx = 0, i, tmp, major, superior, legendary;
+            
+            TAS.debug('Copying specialties');
+            _.each(indexes, function(id, k) {
+                var old = values['specialty' + (k + 1)];
+                if (old && old.length > 0) {
+                    attrs['repeating_specialty_' + id + '_repspecialty'] = old;
+                    attrs['specialty' + (k + 1)] = '';
+                }
+            });
+            TAS.repeating('speciality').fields('repspecialty').each(TAS._fn(function copyRepeatingSpecialties(row) {
+                var id = generateRowID(), attrs = {};
+                TAS.debug(row);
+                attrs['repeating_specialty_' + id + '_repspecialty'] = row.repspecialty;
+                row.repspecialty = '';
+                setAttrs(cleanAttrs(attrs));
+            })).execute();
+            
+            // Due to a bug in the old sheet, there is only one flaw, not a repeating section
+            TAS.debug('Copying flaw');
+            if (values.repflaws && values.repflaws.length > 0) {
+                attrs['repeating_merits_' + generateRowID() + '_repmerits-name'] = values.repflaws;
+                attrs.repflaws = '';
+            }
+            
+            TAS.debug('Copying current essence motes');
+            if (isFinite(parseInt(values.personalessencecurr))) {
+                attrs['personal-essence'] = values.personalessencecurr;
+                attrs.personalessencecurr = '';
+            }
+            if (isFinite(parseInt(values.peripheralessencecurr))) {
+                attrs['peripheral-essence'] = values.peripheralessencecurr;
+                attrs.peripheralessencecurr = '';
+            }
+            
+            TAS.debug('Copying static gear');
+            indexes = _.times(10, generateRowID);
+            _.each(indexes, function(id, k) {
+                var old = values['gear' + (k + 1)];
+                if (old && old.length > 0) {
+                    attrs['repeating_gear_' + id + '_repgear'] = old;
+                    attrs['gear' + (k + 1)] = '';
+                }
+            });
+            
+            TAS.debug('Copying health data');
+            indexes = _.times(32, function(n) { return 'hl' + (n + 1) + '-penalty'; });
+            if (isFinite(parseInt(values['0hls']))) {
+                for (i = 0; i < parseInt(values['0hls']); i++) {
+                    attrs[indexes.shift()] = 0;
+                }
+                attrs['0hls'] = '';
+            }
+            if (isFinite(parseInt(values['1hls']))) {
+                for (i = 0; i < parseInt(values['1hls']); i++) {
+                    attrs[indexes.shift()] = -1;
+                }
+                attrs['1hls'] = '';
+            }
+            if (isFinite(parseInt(values['2hls']))) {
+                for (i = 0; i < parseInt(values['2hls']); i++) {
+                    attrs[indexes.shift()] = -2;
+                }
+                attrs['2hls'] = '';
+            }
+            attrs[indexes.shift()] = -4;
+            attrs['4hls'] = '';
+            attrs[indexes.shift()] = 'I';
+            attrs['ihls'] = '';
+            indexes = _.times(32, function(n) { return 'hl' + (n + 1) + '-damage'; });
+            tmp = 0;
+            if (isFinite(parseInt(values['0agg']))) {
+                tmp += parseInt(values['0agg']);
+                attrs['0agg'] = '';
+            }
+            if (isFinite(parseInt(values['1agg']))) {
+                tmp += parseInt(values['1agg']);
+                attrs['1agg'] = '';
+            }
+            if (isFinite(parseInt(values['2agg']))) {
+                tmp += parseInt(values['2agg']);
+                attrs['2agg'] = '';
+            }
+            if (isFinite(parseInt(values['4agg']))) {
+                tmp += parseInt(values['4agg']);
+                attrs['4agg'] = '';
+            }
+            if (isFinite(parseInt(values['iagg']))) {
+                tmp += parseInt(values['iagg']);
+                attrs['iagg'] = '';
+            }
+            for (i = 0; i < tmp; i++) {
+                attrs[indexes.shift()] = 'aggravated';
+            }
+            tmp = 0;
+            if (isFinite(parseInt(values['0leth']))) {
+                tmp += parseInt(values['0leth']);
+                attrs['0leth'] = '';
+            }
+            if (isFinite(parseInt(values['1leth']))) {
+                tmp += parseInt(values['1leth']);
+                attrs['1leth'] = '';
+            }
+            if (isFinite(parseInt(values['2leth']))) {
+                tmp += parseInt(values['2leth']);
+                attrs['2leth'] = '';
+            }
+            if (isFinite(parseInt(values['4leth']))) {
+                tmp += parseInt(values['4leth']);
+                attrs['4leth'] = '';
+            }
+            if (isFinite(parseInt(values['ileth']))) {
+                tmp += parseInt(values['ileth']);
+                attrs['ileth'] = '';
+            }
+            for (i = 0; i < tmp; i++) {
+                attrs[indexes.shift()] = 'lethal';
+            }
+            tmp = 0;
+            if (isFinite(parseInt(values['0bash']))) {
+                tmp += parseInt(values['0bash']);
+                attrs['0bash'] = '';
+            }
+            if (isFinite(parseInt(values['1bash']))) {
+                tmp += parseInt(values['1bash']);
+                attrs['1bash'] = '';
+            }
+            if (isFinite(parseInt(values['2bash']))) {
+                tmp += parseInt(values['2bash']);
+                attrs['2bash'] = '';
+            }
+            if (isFinite(parseInt(values['4bash']))) {
+                tmp += parseInt(values['4bash']);
+                attrs['4bash'] = '';
+            }
+            if (isFinite(parseInt(values['ibash']))) {
+                tmp += parseInt(values['ibash']);
+                attrs['ibash'] = '';
+            }
+            for (i = 0; i < tmp; i++) {
+                attrs[indexes.shift()] = 'bashing';
+            }
+            
+            TAS.debug('Copying static intimacies');
+            indexes = [values.intimacy1type || 'Minor', values.intimacy2type || 'Minor', values.intimacy3type || 'Minor'];
+            _.each(indexes, function(oldType, i) {
+                var id = generateRowID(), name = values['intimacy' + (i + 1) + 'name'],
+                    newType = oldType ? oldType.substr(0, 1).toUpperCase() + oldType.substr(1).toLowerCase() : '';
+                if (name && name.length > 0) {
+                    attrs['repeating_intimacies_' + id + '_intimacyrepeatingname'] = name;
+                    attrs['repeating_intimacies_' + id + '_intimacyrepeatingtype'] = newType;
+                    
+                    attrs['intimacy' + (i + 1) + 'name'] = '';
+                    attrs['intimacy' + (i + 1) + 'type'] = '';
+                }
+            });
+            TAS.repeating('intimacies').fields('intimacyrepeatingtype').each(TAS._fn(function fixIntimacyTypes(row) {
+                TAS.debug('Fixing repeating intimacy type values');
+                if (!row.intimacyrepeatingtype) {
+                    row.intimacyrepeatingtype = 'Minor';
+                }
+            })).execute();
+            
+            TAS.repeating('charms').fields('charm-name', 'charm-cost', 'charm-type', 'charm-duration', 'charm-effect', // new fields
+                'charm1name', 'charm1cost', 'charm1type', 'charm1dur', 'charm1effect', // old fields
+                'charm2name', 'charm2cost', 'charm2type', 'charm2dur', 'charm2effect',
+                'charm3name', 'charm3cost', 'charm3type', 'charm3dur', 'charm3effect').tap(TAS._fn(function copyingCharms(rows) {
+                var attrs = {};
+                TAS.debug('Copying charms');
+                _.each(rows, function(r) {
+                    var newType = r.charm1type ? r.charm1type.substr(0, 1).toUpperCase() + r.charm1type.substr(1).toLowerCase() : '';
+                    // charm1X goes straight to new fields
+                    r['charm-name'] = r.charm1name;
+                    r['charm-cost'] = r.charm1cost;
+                    r['charm-type'] = newType;
+                    r['charm-duration'] = r.charm1dur;
+                    r['charm-effect'] = r.charm1effect;
+                    
+                    // charm2X and charm3X get new rows
+                    indexes = _.times(2, generateRowID);
+                    _.each(indexes, function(id, k) {
+                        newType = r['charm' + (k + 2) + 'type'];
+                        newType = newType ? newType.substr(0, 1).toUpperCase() + newType.substr(1).toLowerCase() : '';
+                        if (r['charm' + (k + 2) + 'name'] && r['charm' + (k + 2) + 'name'].length > 0) {
+                            attrs['repeating_charms_' + id + '_charm-name'] = r['charm' + (k + 2) + 'name'];
+                            attrs['repeating_charms_' + id + '_charm-cost'] = r['charm' + (k + 2) + 'cost'];
+                            attrs['repeating_charms_' + id + '_charm-type'] = newType;
+                            attrs['repeating_charms_' + id + '_charm-duration'] = r['charm' + (k + 2) + 'dur'];
+                            attrs['repeating_charms_' + id + '_charm-effect'] = r['charm' + (k + 2) + 'effect'];
+                        }
+                    });
+                    
+                    for (i = 1; i <= 3; i++) {
+                        r['charm' + i + 'name'] = '';
+                        r['charm' + i + 'cost'] = '';
+                        r['charm' + i + 'type'] = '';
+                        r['charm' + i + 'dur'] = '';
+                        r['charm' + i + 'effect'] = '';
+                    } 
+                });
+                setAttrs(cleanAttrs(attrs));
+            })).execute();
+            
+            TAS.repeating('spells').fields('repspell2-name', 'repspell2-circle', 'repspell2-control', 'repspell2-cost', 'repspell2-dur', 'repspell2-effect',
+                'repspell3-name', 'repspell3-circle', 'repspell3-control', 'repspell3-cost', 'repspell3-dur', 'repspell3-effect',
+                'repspell-control', 'repspell-name', 'repspell-circle').tap(TAS._fn(function copyingSpells(rows) {
+                var attrs = {};
+                TAS.debug('Copying spells');
+                TAS.debug('rows', rows);
+                _.each(rows, function(r) {
+                    indexes = _.times(2, generateRowID);
+                    _.each(indexes, function(id, k) {
+                        var newCircle = r['repspell' + (k + 2) + '-circle'];
+                        newCircle = newCircle ? newCircle.substr(0, 1).toUpperCase() + newCircle.substr(1).toLowerCase() : '';
+                        if (r['repspell' + (k + 2) + '-name'] && r['repspell' + (k + 2) + '-name'].length > 0) {
+                            attrs['repeating_spells_' + id + '_repspell-name'] = r['repspell' + (k + 2) + '-name'];
+                            attrs['repeating_spells_' + id + '_repspell-circle'] = newCircle;
+                            attrs['repeating_spells_' + id + '_repspell-control'] = r['repspell' + (k + 2) + '-control'] === 'on' ? 1 : 0;
+                            attrs['repeating_spells_' + id + '_repspell-cost'] = r['repspell' + (k + 2) + '-cost'];
+                            attrs['repeating_spells_' + id + '_repspell-dur'] = r['repspell' + (k + 2) + '-dur'];
+                            attrs['repeating_spells_' + id + '_repspell-effect'] = r['repspell' + (k + 2) + '-effect'];
+                            
+                            r['repspell' + (k + 2) + '-name'] = '';
+                            r['repspell' + (k + 2) + '-circle'] = '';
+                            r['repspell' + (k + 2) + '-control'] = '';
+                            r['repspell' + (k + 2) + '-cost'] = '';
+                            r['repspell' + (k + 2) + '-dur'] = '';
+                            r['repspell' + (k + 2) + '-effect'] = '';
+                        }
+                    });
+                    if (r['repspell-name'] && r['repspell-name'].length > 0) {
+                        r['repspell-control'] = r['repspell-control'] === 'on' ? 1 : 0;
+                        r['repspell-circle'] = r['repspell-circle'] ? r['repspell-circle'].substr(0, 1).toUpperCase()
+                            + r['repspell-circle'].substr(1).toLowerCase() : '';
+                    }
+                });
+                TAS.debug('spell attrs', attrs);
+                setAttrs(cleanAttrs(attrs));
+            })).execute();
+            
+            TAS.debug('Copying xp values');
+            if (isFinite(parseInt(values.earnedxp))) {
+                attrs.xp = parseInt(values.earnedxp);
+                attrs.earnedxp = '';
+            }
+            if (isFinite(parseInt(values.spentxp))) {
+                attrs.xp_max = parseInt(values.spentxp);
+                attrs.spentxp = '';
+            }
+            if (isFinite(parseInt(values.totalsplatxp))) {
+                attrs.sxp = parseInt(values.totalsplatxp);
+                attrs.totalsplatxp = '';
+            }
+            if (isFinite(parseInt(values.spentsplatxp))) {
+                attrs.sxp_max = parseInt(values.spentsplatxp);
+                attrs.spentsplatxp = '';
+            }
+            if (isFinite(parseInt(values.currentsilxp))) {
+                attrs['silver-xp'] = parseInt(values.currentsilxp);
+                attrs.currentsilxp = '';
+            }
+            if (isFinite(parseInt(values.currentgolxp))) {
+                attrs['gold-xp'] = parseInt(values.currentgolxp);
+                attrs.currentgolxp = '';
+            }
+            if (isFinite(parseInt(values.currentwhixp))) {
+                attrs['white-xp'] = parseInt(values.currentwhixp);
+                attrs.currentwhixp = '';
+            }
+            
+            TAS.debug('Copying crafting projects');
+            major = parseInt(values.currentmajpro);
+            superior = parseInt(values.currentsuppro);
+            legendary = parseInt(values.currentlegpro);
+            if (isFinite(major) && major > 3) {
+                _.times(major - 3, function() {
+                    attrs['repeating_crafting-projects_' + generateRowID() + '_project-type'] = 'Major';
+                });
+                attrs.currentmajpro = '';
+            }
+            if (isFinite(superior)) {
+                _.times(superior, function() {
+                    attrs['repeating_crafting-projects_' + generateRowID() + '_project-type'] = 'Superior';
+                });
+                attrs.currentsuppro = '';
+            }
+            if (isFinite(legendary)) {
+                _.times(legendary, function() {
+                    attrs['repeating_crafting-projects_' + generateRowID() + '_project-type'] = 'Legendary';
+                });
+                attrs.currentlegpro = '';
+            }
+            
+            TAS.debug('Adjusting values');
+            indexes = ['strengthfav', 'dexterityfav', 'staminafav', 'charismafav',
+                'manipulationfav', 'apperancefav', 'perceptionfav',
+                'intelligencefav', 'witsfav', 'archeryfav', 'athleticsfav',
+                'awarenessfav', 'brawlfav', 'bureaucracyfav', 'dodgefav',
+                'integrityfav', 'investigationfav', 'larcenyfav', 'linguisticsfav',
+                'lorefav', 'medicinefav', 'meleefav', 'occultfav', 'performancefav',
+                'presencefav', 'resistancefav', 'ridefav', 'sailfav',
+                'socializefav', 'stealthfav', 'survivalfav', 'thrownfav', 'warfav',
+                'craftfav', 'martialartsfav', 'willpower-spent1',
+                'willpower-spent2', 'willpower-spent3', 'willpower-spent4',
+                'willpower-spent5', 'willpower-spent6', 'willpower-spent7',
+                'willpower-spent8', 'willpower-spent9', 'willpower-spent10'];
+            _.each(indexes, function(fav) {
+                if (values[fav] === 'on') {
+                    attrs[fav] = 1;
+                }
+            });
+            attrs.caste = values.caste.substr(0, 1).toUpperCase() + values.caste.substr(1).toLowerCase();
+            
+            attrs.version = version;
+            TAS.debug('Saving attributes!', attrs);
+            setAttrs(cleanAttrs(attrs));
+        }));
+    }
     
 /* ---- BEGIN: TheAaronSheet.js ---- */
 // Github:   https://github.com/shdwjk/TheAaronSheet/blob/master/TheAaronSheet.js
@@ -1267,7 +1629,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
             </fieldset>
             
             <h1><span>Specialties</span></h1>
-            <fieldset class="repeating_speciality">
+            <fieldset class="repeating_specialty">
                 <div class="sheet-flexbox-h sheet-flexbox0">
                     <input type="text" name="attr_repspecialty" placeholder="Pirate Tactics">
                     <select name="attr_repspecialtyability">
@@ -1352,16 +1714,16 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                         </div>
                     </div>
                     <div class="sheet-temp-will">
-                        <input type="checkbox" name="attr_willpower-spent1"><span></span>
-                        <input type="checkbox" name="attr_willpower-spent2"><span></span>
-                        <input type="checkbox" name="attr_willpower-spent3"><span></span>
-                        <input type="checkbox" name="attr_willpower-spent4"><span></span>
-                        <input type="checkbox" name="attr_willpower-spent5"><span></span>
-                        <input type="checkbox" name="attr_willpower-spent6"><span></span>
-                        <input type="checkbox" name="attr_willpower-spent7"><span></span>
-                        <input type="checkbox" name="attr_willpower-spent8"><span></span>
-                        <input type="checkbox" name="attr_willpower-spent9"><span></span>
-                        <input type="checkbox" name="attr_willpower-spent10"><span></span>
+                        <input type="checkbox" name="attr_willpower-spent1" value="1"><span></span>
+                        <input type="checkbox" name="attr_willpower-spent2" value="1"><span></span>
+                        <input type="checkbox" name="attr_willpower-spent3" value="1"><span></span>
+                        <input type="checkbox" name="attr_willpower-spent4" value="1"><span></span>
+                        <input type="checkbox" name="attr_willpower-spent5" value="1"><span></span>
+                        <input type="checkbox" name="attr_willpower-spent6" value="1"><span></span>
+                        <input type="checkbox" name="attr_willpower-spent7" value="1"><span></span>
+                        <input type="checkbox" name="attr_willpower-spent8" value="1"><span></span>
+                        <input type="checkbox" name="attr_willpower-spent9" value="1"><span></span>
+                        <input type="checkbox" name="attr_willpower-spent10" value="1"><span></span>
                     </div>
                     <h1><span>Essence</span></h1>
                     <div style="padding-left:6px">
@@ -2152,7 +2514,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
             <div class="sheet-table-cell"><input type="text" name="attr_charm-cost" placeholder="1m/die"></div>
             <div class="sheet-table-cell"><input type="text" name="attr_charm-book" placeholder="Core"></div>
             <div class="sheet-table-cell"><input type="number" name="attr_charm-page" placeholder="255"></div>
-            <div class="sheet-table-cell"><input type="text" style="width:100%" name="attr_charm-effect" placeholder="Add dice to a Larceny roll"></div>
+            <div class="sheet-table-cell"><input type="text" name="attr_charm-effect" style="width:100%" placeholder="Add dice to a Larceny roll"></div>
         </fieldset>
     </div><!-- /sheet-table charms -->
     
