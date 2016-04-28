@@ -3400,12 +3400,15 @@ const updateSkill = (rowId) => {
       const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}proficiency`);
       collectionArray.push(`${repeatingString}name`);
+      collectionArray.push(`${repeatingString}storage_name`);
       collectionArray.push(`${repeatingString}ability`);
       collectionArray.push(`${repeatingString}bonus`);
       collectionArray.push(`${repeatingString}ability_short_name`);
       collectionArray.push(`${repeatingString}formula`);
       collectionArray.push(`${repeatingString}total`);
       collectionArray.push(`${repeatingString}total_with_sign`);
+      collectionArray.push(`${repeatingString}passive_total`);
+      collectionArray.push(`${repeatingString}passive_total_with_sign`);
     }
 
     getAttrs(collectionArray, (v) => {
@@ -3474,8 +3477,13 @@ const updateSkill = (rowId) => {
           totalFormula += ' + (@{global_check_bonus})[global check bonus]';
         }
 
+        const passiveBonus = getIntValue(v[`${repeatingString}passive_bonus`]);
+        const passiveTotal = total + passiveBonus;
+
         finalSetAttrs[`${repeatingString}total`] = total;
+        finalSetAttrs[`${repeatingString}passive_total`] = passiveTotal;
         finalSetAttrs[`${repeatingString}total_with_sign`] = showSign(total);
+        finalSetAttrs[`${repeatingString}passive_total_with_sign`] = showSign(passiveTotal);
         finalSetAttrs[`${repeatingString}formula`] = totalFormula;
       }
       setFinalAttrs(v, finalSetAttrs, () => {
@@ -3487,7 +3495,7 @@ const updateSkill = (rowId) => {
 
 on('change:repeating_skill', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_skill', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'ability_short_name' && repeatingInfo.field !== 'total' && repeatingInfo.field !== 'total_with_sign' && repeatingInfo.field !== 'formula') {
+  if (repeatingInfo && repeatingInfo.field !== 'ability_short_name' && repeatingInfo.field !== 'total' && repeatingInfo.field !== 'total_with_sign' && repeatingInfo.field !== 'passive_total' && repeatingInfo.field !== 'passive_total_with_sign' && repeatingInfo.field !== 'formula') {
     updateSkill(repeatingInfo.rowId);
   }
 });
@@ -5103,6 +5111,9 @@ const sheetOpened = () => {
       if (versionCompare(version, '2.4.12') < 0) {
         armorPlusDexRemoval();
         updateArmor();
+      }
+      if (versionCompare(version, '2.6.0') < 0) {
+        updateSkill();
       }
     }
 
