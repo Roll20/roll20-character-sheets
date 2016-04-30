@@ -3211,7 +3211,7 @@ const updateSpell = (rowId) => {
         const ritual = v[`${repeatingString}ritual`];
         if (ritual === 'Yes') {
           finalSetAttrs[`${repeatingString}ritual_show`] = 1;
-          finalSetAttrs[`${repeatingString}ritual_output`] = '?{Cast as a ritual?|Yes,{{ritual=1&#125;&#125;|No,}';
+          finalSetAttrs[`${repeatingString}ritual_output`] = '?{Cast as|Ritual,{{ritual=1&#125;&#125;|Spell,}';
         } else {
           if (!isUndefined(v[`${repeatingString}ritual_show`])) {
             finalSetAttrs[`${repeatingString}ritual_show`] = 0;
