@@ -164,7 +164,8 @@ const compileSheetWorkers = () => {
 		}))
 		.pipe(babel({
 			presets: ['es2015'],
-			comments: false
+			comments: false,
+			compact: true
 		}))
 		.pipe(wrapper({
 			header: '<script type="text/worker">',
