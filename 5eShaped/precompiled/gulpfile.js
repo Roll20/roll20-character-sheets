@@ -15,6 +15,7 @@ const fs = require('fs');
 const babel = require('gulp-babel');
 const eslint = require('gulp-eslint');
 const wrapper = require('gulp-wrapper');
+const streamqueue = require('streamqueue');
 
 const translations = {};
 
@@ -86,26 +87,6 @@ function duplicate(file, limit, start) {
 	}
 	return s.join('\n\n');
 }
-
-gulp.task('preCompile', function () {
-	return gulp.src('./5eShaped.html')
-		.pipe(include())
-		.pipe(replaceTask({
-			patterns: [
-				{
-					match: /\x7B\x7B'([A-Za-z_0-9\.]+)'\s\|\stranslate\x7D\x7D/g,
-					replacement: function ($1, $2) {
-						return translate($2);
-					}
-				}
-			]
-		}))
-		.pipe(minifyHTML({
-			whitespace: true
-		}))
-		.pipe(gulp.dest('../'));
-});
-
 const sassConfig = {
 	rules: {
 		'clean-import-paths': 0,
@@ -115,7 +96,6 @@ const sassConfig = {
 		include: 0
 	}
 };
-
 gulp.task('sass', function () {
 	return gulp.src('./5eShaped.scss')
 		/*
@@ -128,7 +108,7 @@ gulp.task('sass', function () {
 		.pipe(gulp.dest('../'));
 });
 
-var esLintConfig = {
+const esLintConfig = {
 	parser: 'babel-eslint',
 	extends: 'airbnb/base',
 	rules: {
@@ -148,7 +128,24 @@ gulp.task('lint', function() {
 		.pipe(eslint.failAfterError());
 });
 
-gulp.task('compileJS', function() {
+const compileSheetHTML = () => {
+	return gulp.src('./5eShaped.html')
+		.pipe(include())
+		.pipe(replaceTask({
+			patterns: [
+				{
+					match: /\x7B\x7B'([A-Za-z_0-9\.]+)'\s\|\stranslate\x7D\x7D/g,
+					replacement: function ($1, $2) {
+						return translate($2);
+					}
+				}
+			]
+		}))
+		.pipe(minifyHTML({
+			whitespace: true
+		}));
+};
+const compileSheetWorkers = () => {
 	return gulp.src(['components/sheetWorkers.js'])
 		.pipe(replaceTask({
 			patterns: [
@@ -172,12 +169,14 @@ gulp.task('compileJS', function() {
 		.pipe(wrapper({
 			header: '<script type="text/worker">',
 			footer: '</script>'
-		}))
-		.pipe(gulp.dest('./'));
-});
+		}));
+};
 
-gulp.task('compile', ['preCompile', 'sass', 'compileJS'], function () {
-	return gulp.src(['../5eShaped.html', './sheetWorkers.js', './components/rollTemplate.html'])
+gulp.task('compile', ['sass'], function () {
+	return streamqueue({ objectMode: true },
+		compileSheetHTML(),
+		compileSheetWorkers(),
+		gulp.src(['./components/rollTemplate.html']))
 		.pipe(concat('5eShaped.html'))
-		.pipe(gulp.dest('../'));
+		.pipe(gulp.dest('../'))
 });
