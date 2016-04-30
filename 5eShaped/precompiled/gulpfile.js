@@ -16,6 +16,8 @@ const babel = require('gulp-babel');
 const eslint = require('gulp-eslint');
 const wrapper = require('gulp-wrapper');
 const streamqueue = require('streamqueue');
+const request = require('request');
+const gutil = require('gulp-util');
 
 const translations = {};
 
@@ -82,7 +84,7 @@ function duplicate(file, limit, start) {
 
   for (let i = start; i < limit; i++) {
     s.push(template
-        .replace(/\x7B\x7Bnum\x7D\x7D/g, i.toString())
+      .replace(/\x7B\x7Bnum\x7D\x7D/g, i.toString())
     );
   }
   return s.join('\n\n');
@@ -185,4 +187,40 @@ gulp.task('compile', ['sass'], function () {
   )
     .pipe(concat('5eShaped.html'))
     .pipe(gulp.dest('../'))
+});
+
+gulp.task('submit', ['compile'], (done) => {
+  const html = fs.readFileSync('../5eShaped.html', 'utf-8');
+  const css = fs.readFileSync('../5eShaped.css', 'utf-8');
+  const props = require('./submitProps.json');
+
+  const url = `https://app.roll20.net/campaigns/savesettings/${props.campaignId}`;
+
+  var j = request.jar();
+  var cookie = request.cookie(`rack.session=${props.rackSessionId}`);
+  j.setCookie(cookie, 'https://app.roll20.net');
+
+  request.post({
+      url,
+      form: {
+        customcharsheet_layout: html,
+        customcharsheet_style: css,
+        allowcharacterimport: false,
+        bgimage: 'none',
+        publicaccess: false,
+        charsheettype: 'custom',
+      },
+      jar: j,
+    },
+    (err, httpResponse, body) => {
+      if (httpResponse.statusCode !== 303 ||
+        httpResponse.headers.location !== `https://app.roll20.net/campaigns/campaignsettings/${props.campaignId}`) {
+        gutil.log('Problem submitting sheet, response headers:');
+        gutil.log(httpResponse.headers);
+        return done(httpResponse.statusMessage);
+      }
+      return done(err);
+    }
+  );
+
 });
