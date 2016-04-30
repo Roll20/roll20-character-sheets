@@ -4115,7 +4115,7 @@ const parseAction = (type, rowId) => {
   const savingThrowRegex = new RegExp(savingThrowRe.source, 'i');
   const saveSuccessRegex = new RegExp(saveSuccess.source, 'i');
 
-  const typeRegex = /(melee|ranged|melee or ranged)\s*(spell|weapon)\s*/gi;
+  const typeRegex = /(melee|ranged|melee or ranged)\s*(spell|weapon)\s*attack/gi;
   const toHitRegex = /:\s?\+\s?(\d+)\s*(?:to hit)/gi;
   const reachRegex = /(?:reach)\s?(\d+)\s?(?:ft)/gi;
   const rangeRegex = /(?:range)\s?(\d+)\/(\d+)\s?(ft)/gi;
