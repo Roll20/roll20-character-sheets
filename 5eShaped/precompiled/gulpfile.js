@@ -89,47 +89,6 @@ function duplicate(file, limit, start) {
   }
   return s.join('\n\n');
 }
-const sassConfig = {
-  rules: {
-    'clean-import-paths': 0,
-    'force-element-nesting': 0,
-    'hex-length': 'long',
-    'empty-line-between-blocks': 0,
-    include: 0
-  }
-};
-gulp.task('sass', function () {
-  return gulp.src('./5eShaped.scss')
-    /*
-     .pipe(sassLint(sassConfig))
-     .pipe(sassLint.format())
-     .pipe(sassLint.failOnError())
-     */
-    .pipe(sass().on('error', sass.logError))
-    .pipe(minifyCss())
-    .pipe(gulp.dest('../'));
-});
-
-const esLintConfig = {
-  parser: 'babel-eslint',
-  extends: 'airbnb/base',
-  rules: {
-    'arrow-body-style': 0,
-    'indent': 0,
-    'max-len': 0,
-    'no-cond-assign': 0,
-    'no-console': 0,
-    'no-param-reassign': 0,
-    'no-undef': 0
-  }
-};
-gulp.task('lint', function () {
-  return gulp.src(['components/sheetWorkers.js'])
-    .pipe(eslint(esLintConfig))
-    .pipe(eslint.format())
-    .pipe(eslint.failAfterError());
-});
-
 const compileSheetHTML = () => {
   return gulp.src('./5eShaped.html')
     .pipe(include())
@@ -187,6 +146,47 @@ gulp.task('compile', ['sass'], function () {
   )
     .pipe(concat('5eShaped.html'))
     .pipe(gulp.dest('../'))
+});
+
+const esLintConfig = {
+  parser: 'babel-eslint',
+  extends: 'airbnb/base',
+  rules: {
+    'arrow-body-style': 0,
+    'indent': 0,
+    'max-len': 0,
+    'no-cond-assign': 0,
+    'no-console': 0,
+    'no-param-reassign': 0,
+    'no-undef': 0
+  }
+};
+gulp.task('lint', function () {
+  return gulp.src(['components/sheetWorkers.js'])
+    .pipe(eslint(esLintConfig))
+    .pipe(eslint.format())
+    .pipe(eslint.failAfterError());
+});
+
+const sassConfig = {
+  rules: {
+    'clean-import-paths': 0,
+    'force-element-nesting': 0,
+    'hex-length': 'long',
+    'empty-line-between-blocks': 0,
+    include: 0
+  }
+};
+gulp.task('sass', function () {
+  return gulp.src('./5eShaped.scss')
+    /*
+     .pipe(sassLint(sassConfig))
+     .pipe(sassLint.format())
+     .pipe(sassLint.failOnError())
+     */
+    .pipe(sass().on('error', sass.logError))
+    .pipe(minifyCss())
+    .pipe(gulp.dest('../'));
 });
 
 gulp.task('submit', ['compile'], (done) => {
