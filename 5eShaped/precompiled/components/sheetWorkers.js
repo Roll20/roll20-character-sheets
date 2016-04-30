@@ -3181,6 +3181,7 @@ const updateSpell = (rowId) => {
       collectionArray.push(`${repeatingString}concentration`);
       collectionArray.push(`${repeatingString}concentration_text`);
       collectionArray.push(`${repeatingString}ritual`);
+      collectionArray.push(`${repeatingString}ritual_output`);
       collectionArray.push(`${repeatingString}ritual_show`);
       collectionArray.push(`${repeatingString}materials`);
       collectionArray.push(`${repeatingString}materials_show`);
@@ -3215,8 +3216,14 @@ const updateSpell = (rowId) => {
         const ritual = v[`${repeatingString}ritual`];
         if (ritual === 'Yes') {
           finalSetAttrs[`${repeatingString}ritual_show`] = 1;
-        } else if (!isUndefined(v[`${repeatingString}ritual_show`])) {
-          finalSetAttrs[`${repeatingString}ritual_show`] = 0;
+          finalSetAttrs[`${repeatingString}ritual_output`] = '?{Cast as a ritual?|Yes,{{ritual=1&#125;&#125;|No,}';
+        } else {
+          if (!isUndefined(v[`${repeatingString}ritual_show`])) {
+            finalSetAttrs[`${repeatingString}ritual_show`] = 0;
+          }
+          if (!isUndefined(v[`${repeatingString}ritual_output`])) {
+            finalSetAttrs[`${repeatingString}ritual_output`] = '';
+          }
         }
         const materials = v[`${repeatingString}materials`];
         if (!isUndefined(materials) && materials !== '') {
@@ -5068,15 +5075,15 @@ const sheetOpened = () => {
       if (versionCompare(version, '2.4.8') < 0) {
         fixRollTwo();
       }
-      if (versionCompare(version, '2.4.11') < 0) {
-        updateSpell();
-      }
       if (versionCompare(version, '2.4.12') < 0) {
         armorPlusDexRemoval();
         updateArmor();
       }
       if (versionCompare(version, '2.6.1') < 0) {
         updateSkill();
+      }
+      if (versionCompare(version, '2.6.3') < 0) {
+        updateSpell();
       }
     }
 
