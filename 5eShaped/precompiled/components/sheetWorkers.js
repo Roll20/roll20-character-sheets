@@ -1,7 +1,7 @@
 /* global setAttrs:false, getAttrs:false, on:false, getSectionIDs:false, generateRowID:false */
 'use strict';
 
-const currentVersion = '2.7.0';
+const currentVersion = '2.7.1';
 let TRANSLATIONS;
 const SKILLS = {
   acrobatics: 'dexterity',
