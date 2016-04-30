@@ -3407,8 +3407,8 @@ const updateSkill = (rowId) => {
       collectionArray.push(`${repeatingString}formula`);
       collectionArray.push(`${repeatingString}total`);
       collectionArray.push(`${repeatingString}total_with_sign`);
+      collectionArray.push(`${repeatingString}passive_bonus`);
       collectionArray.push(`${repeatingString}passive_total`);
-      collectionArray.push(`${repeatingString}passive_total_with_sign`);
     }
 
     getAttrs(collectionArray, (v) => {
@@ -3476,14 +3476,12 @@ const updateSkill = (rowId) => {
           }
           totalFormula += ' + (@{global_check_bonus})[global check bonus]';
         }
-
         const passiveBonus = getIntValue(v[`${repeatingString}passive_bonus`]);
-        const passiveTotal = total + passiveBonus;
+        const passiveTotal = 10 + total + passiveBonus;
 
         finalSetAttrs[`${repeatingString}total`] = total;
-        finalSetAttrs[`${repeatingString}passive_total`] = passiveTotal;
+        finalSetAttrs[`${repeatingString}passive`] = passiveTotal;
         finalSetAttrs[`${repeatingString}total_with_sign`] = showSign(total);
-        finalSetAttrs[`${repeatingString}passive_total_with_sign`] = showSign(passiveTotal);
         finalSetAttrs[`${repeatingString}formula`] = totalFormula;
       }
       setFinalAttrs(v, finalSetAttrs, () => {
@@ -4994,13 +4992,6 @@ const sheetOpened = () => {
         updateArmor();
       });
     } else {
-      if (versionCompare(version, '2.0.10') < 0) {
-        updateAbilityModifiers();
-      }
-      if (versionCompare(version, '2.0.14') < 0) {
-        updateSkill();
-        updateSavingThrows();
-      }
       if (versionCompare(version, '2.1.0') < 0) {
         updateNPCChallenge();
         updateDamageVulnerabilities();
@@ -5015,7 +5006,6 @@ const sheetOpened = () => {
         updateAlignment();
       }
       if (versionCompare(version, '2.1.5') < 0) {
-        updateLevels();
         updateNPCAC();
         updateLanguageSelection();
       }
@@ -5024,21 +5014,11 @@ const sheetOpened = () => {
       }
       if (versionCompare(version, '2.1.10') < 0) {
         updateSavingThrows();
-        updateAttack();
-      }
-      if (versionCompare(version, '2.1.11') < 0) {
-        updateLevels();
-        updateAbilityChecksMacro();
       }
       if (versionCompare(version, '2.1.13') < 0) {
         weighEquipment();
-        updateSpell();
-      }
-      if (versionCompare(version, '2.1.14') < 0) {
-        updateLevels();
       }
       if (versionCompare(version, '2.1.15') < 0) {
-        updateLevels();
         displayTextForTraits();
       }
       if (versionCompare(version, '2.2.1') < 0) {
@@ -5059,29 +5039,15 @@ const sheetOpened = () => {
         extasToExtrasFix('repeating_action');
         extasToExtrasFix('repeating_spell');
       }
-      if (versionCompare(version, '2.2.8') < 0) {
-        updateAttack();
-      }
-      if (versionCompare(version, '2.2.11') < 0) {
-        setClassFeatures();
-      }
-      if (versionCompare(version, '2.2.12') < 0) {
-        updateAbilityChecksMacro();
-      }
       if (versionCompare(version, '2.2.15') < 0) {
         updateAbilityChecksMacro();
         updatePreAndPostRoll();
-      }
-      if (versionCompare(version, '2.2.19') < 0) {
-        updateAbilityModifiers();
-        updateSpell();
       }
       if (versionCompare(version, '2.3.3') < 0) {
         updateAttachers();
       }
       if (versionCompare(version, '2.4.2') < 0) {
         updateAbilityModifiers();
-        updateSkill();
         updateActionChatMacro('trait');
         updateActionChatMacro('action');
         updateActionChatMacro('reaction');
@@ -5094,9 +5060,7 @@ const sheetOpened = () => {
         setClassFeatures();
       }
       if (versionCompare(version, '2.4.4') < 0) {
-        updateSkill();
         updateAttack();
-        updateSpell();
       }
       if (versionCompare(version, '2.4.7') < 0) {
         classFeaturesToTraits();
@@ -5112,7 +5076,7 @@ const sheetOpened = () => {
         armorPlusDexRemoval();
         updateArmor();
       }
-      if (versionCompare(version, '2.6.0') < 0) {
+      if (versionCompare(version, '2.6.1') < 0) {
         updateSkill();
       }
     }
