@@ -2945,6 +2945,38 @@ on('change:repeating_regionaleffect', (eventInfo) => {
   updateActionIfTriggered('regionaleffect', eventInfo);
 });
 
+const updateAttackChatMacro = () => {
+  const repeatingItem = `repeating_attack`;
+  const collectionArray = [`attacks_macro_var`];
+  const finalSetAttrs = {};
+
+  finalSetAttrs[`attacks_macro_var`] = '';
+
+  getSectionIDs(repeatingItem, (ids) => {
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
+      collectionArray.push(`${repeatingString}name`);
+    }
+
+    getAttrs(collectionArray, (v) => {
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
+        let actionName = v[`${repeatingString}name`];
+        if (actionName && actionName.length > 50) {
+          actionName = `${actionName.substring(0, 50)}...`;
+        }
+
+        if (id !== ids[0]) {
+          finalSetAttrs[`attacks_macro_var`] += ', ';
+        }
+
+        finalSetAttrs[`attacks_macro_var`] += `[${actionName}](~repeating_attack_${id}_attack)`;
+      }
+      setFinalAttrs(v, finalSetAttrs);
+    });
+  });
+};
+
 const updateAttack = (rowId) => {
   const repeatingItem = 'repeating_attack';
   const collectionArray = ['pb', 'strength_mod', 'finesse_mod', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability', 'ammo_auto_use'];
@@ -3100,6 +3132,16 @@ const weighAttacks = () => {
   ];
   sumRepeating(options, sumItems);
 };
+
+on('change:repeating_attack', () => {
+  const repeatingInfo = getRepeatingInfo('repeating_attack', eventInfo);
+  if (repeatingInfo && repeatingInfo.field === 'name') {
+    updateAttackChatMacro();
+  }
+});
+on('remove:repeating_attack', () => {
+  updateAttackChatMacro();
+});
 on('change:repeating_attack:carried change:repeating_attack:qty change:repeating_attack:weight remove:repeating_attack', () => {
   weighAttacks();
 });
@@ -5113,6 +5155,9 @@ const sheetOpened = () => {
       if (versionCompare(version, '2.6.3') < 0) {
         updateSpell();
         generateHigherLevelQueries();
+      }
+      if (versionCompare(version, '3.1.0') < 0) {
+        updateAttackChatMacro();
       }
     }
 
