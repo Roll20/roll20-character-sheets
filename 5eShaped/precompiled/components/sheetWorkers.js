@@ -1572,9 +1572,8 @@ const updateSpellSlots = () => {
     let casterLevel = getIntValue(v.caster_level);
     let casterType = v.caster_type;
 
-    if (casterType === 'full') {
-      casterLevel = getIntValue(v.caster_level);
 
+    if (casterType === 'full') {
       if (casterLevel >= 3) {
         spellSlots[1] = 4;
       } else if (casterLevel === 2) {
@@ -1859,7 +1858,7 @@ const updateLevels = (repeatingInfo) => {
         }
 
         let classSpellcasting = v[`${repeatingString}spellcasting`];
-        if ((isUndefined(classSpellcasting) || repeatingInfo.field === 'name') && id === repeatingInfo.rowId) {
+        if (isUndefined(classSpellcasting)) {
           if (defaultClassDetails.hasOwnProperty(className)) {
             classSpellcasting = defaultClassDetails[className].spellcasting;
             if (classSpellcasting) {
