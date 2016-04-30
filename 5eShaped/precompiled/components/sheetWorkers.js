@@ -2684,19 +2684,14 @@ const updateHigherLevelToggle = (v, finalSetAttrs, repeatingString) => {
 
   const higherLevelToggle = v[`${repeatingString}higher_level_toggle`];
   if (exists(higherLevelToggle) && higherLevelToggle === '@{higher_level_toggle_var}') {
-    let spellLevelQuery = '?{Spell Level';
 
     const spellLevel = getIntValue(v[`${repeatingString}spell_level`]);
-    for (let i = spellLevel; i <= 9; i++) {
-      spellLevelQuery += `|${i}`;
-    }
-    spellLevelQuery += '}';
-    finalSetAttrs[`${repeatingString}higher_level_query`] = spellLevelQuery;
+    finalSetAttrs[`${repeatingString}higher_level_query`] = `@{higher_level_query_${spellLevel}}`;
 
     const damageToggle = v[`${repeatingString}damage_toggle`];
     if (damageToggle && damageToggle === '@{damage_toggle_var}') {
       const higherLevelDamage = '((@{higher_level_query} - @{spell_level}) * @{higher_level_dice})@{higher_level_die}[higher lvl]';
-      finalSetAttrs[`${repeatingString}damage_formula`] += addArithmeticOperator(finalSetAttrs[`${repeatingString}damage_formula`], higherLevelDamage);;
+      finalSetAttrs[`${repeatingString}damage_formula`] += addArithmeticOperator(finalSetAttrs[`${repeatingString}damage_formula`], higherLevelDamage);
       finalSetAttrs[`${repeatingString}damage_crit_formula`] = higherLevelDamage;
     }
 
@@ -3291,6 +3286,39 @@ on('change:repeating_spell', (eventInfo) => {
 });
 on('change:global_spell_attack_bonus change:global_spell_damage_bonus change:global_spell_dc_bonus change:global_spell_heal_bonus', () => {
   updateSpell();
+});
+
+const generateHigherLevelQueries = () => {
+  const collectionArray = [];
+  const finalSetAttrs = {};
+
+  for (let i = 1; i <= 8; i++) {
+    collectionArray.push(`higher_level_query_${i}`);
+  }
+  for (let i = 1; i <= 9; i++) {
+    collectionArray.push(`spell_slots_l${i}`);
+  }
+
+  getAttrs(collectionArray, (v) => {
+    for (let i = 1; i <= 8; i++) {
+      let levelQuery = '';
+      for (let j = i; j <= 9; j++) {
+        if (getIntValue(v[`spell_slots_l${j}`])) {
+          levelQuery += `|${j}`;
+        }
+      }
+      if (levelQuery) {
+        finalSetAttrs[`higher_level_query_${i}`] = `?{Spell Level${levelQuery}}`;
+      } else {
+        finalSetAttrs[`higher_level_query_${i}`] = i;
+      }
+    }
+    setFinalAttrs(v, finalSetAttrs);
+  });
+};
+
+on('change:spell_slots_l1 change:spell_slots_l2 change:spell_slots_l3 change:spell_slots_l4 change:spell_slots_l5 change:spell_slots_l6 change:spell_slots_l7 change:spell_slots_l8 change:spell_slots_l9', () => {
+  generateHigherLevelQueries();
 });
 
 function updateD20Mod() {
@@ -5084,6 +5112,7 @@ const sheetOpened = () => {
       }
       if (versionCompare(version, '2.6.3') < 0) {
         updateSpell();
+        generateHigherLevelQueries();
       }
     }
 
