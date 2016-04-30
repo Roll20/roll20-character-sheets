@@ -2749,14 +2749,14 @@ const updateActionChatMacro = (type) => {
     for (const id of ids) {
       const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
-      collectionArray.push(`${repeatingString}display_text`);
+      collectionArray.push(`${repeatingString}freetext`);
     }
 
     getAttrs(collectionArray, (v) => {
       for (const id of ids) {
         const repeatingString = `${repeatingItem}_${id}_`;
         let actionName = v[`${repeatingString}name`];
-        const displayText = v[`${repeatingString}display_text`];
+        const freeText = v[`${repeatingString}freetext`];
 
         if (id !== ids[0]) {
           finalSetAttrs[`${type}s_macro_var`] += ', ';
@@ -2774,10 +2774,10 @@ const updateActionChatMacro = (type) => {
           title = 'Legendary Actions';
         } else if (type === 'lairaction') {
           title = 'Lair Actions';
-          actionName = displayText;
+          actionName = freeText;
         } else if (type === 'regionaleffect') {
           title = 'Regional Effects';
-          actionName = displayText;
+          actionName = freeText;
         }
 
         if (actionName && actionName.length > 50) {
