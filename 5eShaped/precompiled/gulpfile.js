@@ -152,11 +152,12 @@ const compileSheetWorkers = () => {
 				{
 					match: /(let TRANSLATIONS;)/i,
 					replacement: function () {
-						let translations = {};
-						translations.de = JSON.parse(fs.readFileSync('./translations/de.json'));
-						translations.en = JSON.parse(fs.readFileSync('./translations/en.json'));
-						translations.fr = JSON.parse(fs.readFileSync('./translations/fr.json'));
-						translations.ru = JSON.parse(fs.readFileSync('./translations/ru.json'));
+						let translations = {
+							de: JSON.parse(fs.readFileSync('./translations/de.json')),
+							en: JSON.parse(fs.readFileSync('./translations/en.json')),
+							fr: JSON.parse(fs.readFileSync('./translations/fr.json')),
+							ru: JSON.parse(fs.readFileSync('./translations/ru.json'))
+						};
 						return `const TRANSLATIONS = ${JSON.stringify(translations)};`;
 					}
 				}
@@ -172,12 +173,16 @@ const compileSheetWorkers = () => {
 			footer: '</script>'
 		}));
 };
+const compileRollTemplate = () => {
+	return gulp.src(['./components/rollTemplate.html']);
+};
 
 gulp.task('compile', ['sass'], function () {
 	return streamqueue({ objectMode: true },
 		compileSheetHTML(),
 		compileSheetWorkers(),
-		gulp.src(['./components/rollTemplate.html']))
+		compileRollTemplate()
+	)
 		.pipe(concat('5eShaped.html'))
 		.pipe(gulp.dest('../'))
 });
