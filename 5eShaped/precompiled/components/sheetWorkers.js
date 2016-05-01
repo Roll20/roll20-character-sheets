@@ -3411,7 +3411,7 @@ const updateAbilityChecksMacro = () => {
         }
 
         finalSetAttrs.ability_checks_query_var += `|${capitalize(ability)},{{title=${capitalize(ability)}&#125;&#125; {{roll1=[[@{preroll}d20@{postroll}@{d20_mod} + ${v[`${ability}_check_mod`]}]]&#125;&#125; @{roll_setting}@{d20_mod} + ${v[`${ability}_check_mod`]}]]&#125;&#125;`;
-        finalSetAttrs.ability_checks_macro_var += `[${capitalize(ability)} ${v[`${ability}_check_mod_with_sign`]}](~${ability}_check)`;
+        finalSetAttrs.ability_checks_macro_var += `[${capitalize(ability)} ${v[`${ability}_check_mod_with_sign`]}](~shaped_${ability}_check)`;
         finalSetAttrs.ability_checks_macro_var += ', ';
       }
       for (const id of ids) {
@@ -5116,7 +5116,6 @@ const sheetOpened = () => {
         extasToExtrasFix('repeating_spell');
       }
       if (versionCompare(version, '2.2.15') < 0) {
-        updateAbilityChecksMacro();
         updatePreAndPostRoll();
       }
       if (versionCompare(version, '2.3.3') < 0) {
@@ -5160,6 +5159,7 @@ const sheetOpened = () => {
       if (versionCompare(version, '3.1.1') < 0) {
         updateActionChatMacro('lairaction');
         updateActionChatMacro('regionaleffect');
+        updateAbilityChecksMacro();
       }
     }
 
