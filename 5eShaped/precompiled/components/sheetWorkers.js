@@ -4035,9 +4035,9 @@ const parseSRDContentSection = (content, finalSetAttrs, title, name) => {
   }
   if (exists(section)) {
     if (name === 'legendaryaction') {
-      const legendaryActionsMatch = content.match(/Can take (\d+) Legendary Actions/gi);
+      const legendaryActionsMatch = section.match(/Can take (\d+) Legendary Actions/i);
       if (legendaryActionsMatch && legendaryActionsMatch[1]) {
-        finalSetAttrs.legendary_action_amount = legendaryActionAmount[1];
+        finalSetAttrs.legendary_action_amount = legendaryActionsMatch[1];
       }
     }
 
