@@ -5128,8 +5128,6 @@ const sheetOpened = () => {
         updateActionChatMacro('action');
         updateActionChatMacro('reaction');
         updateActionChatMacro('legendaryaction');
-        updateActionChatMacro('lairaction');
-        updateActionChatMacro('regionaleffect');
         updateDamageResistancesVar();
       }
       if (versionCompare(version, '2.4.3') < 0) {
@@ -5158,6 +5156,10 @@ const sheetOpened = () => {
       }
       if (versionCompare(version, '3.1.0') < 0) {
         updateAttackChatMacro();
+      }
+      if (versionCompare(version, '3.1.1') < 0) {
+        updateActionChatMacro('lairaction');
+        updateActionChatMacro('regionaleffect');
       }
     }
 
