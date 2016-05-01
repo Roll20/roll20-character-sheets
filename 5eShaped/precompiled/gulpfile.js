@@ -209,6 +209,7 @@ gulp.task('submit', ['compile'], (done) => {
         bgimage: 'none',
         publicaccess: false,
         charsheettype: 'custom',
+        compendium_override: 'dnd5e',
       },
       jar: j,
     },
