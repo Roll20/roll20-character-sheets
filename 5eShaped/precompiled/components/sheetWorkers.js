@@ -4977,12 +4977,15 @@ const fixRollTwo = () => {
 };
 
 const importData = () => {
-  getAttrs(['import_data'], v => {
+  getAttrs(['import_data', 'version'], v => {
     if (v.import_data) {
       const finalSetAttrs = {};
       const importObject = JSON.parse(v.import_data);
 
       if (importObject.npc) {
+        if (!v.version) {
+          sheetOpened();
+        }
         for (const prop in importObject.npc) {
           if (importObject.npc.hasOwnProperty(prop)) {
             finalSetAttrs[prop] = importObject.npc[prop];
@@ -5007,9 +5010,15 @@ const importData = () => {
 };
 
 const deleteImportData = () => {
-  setFinalAttrs({}, {
-    import_data: '',
-    import_data_present: 'off',
+  getAttrs(['import_data', 'version'], v => {
+    const importObject = JSON.parse(v.import_data);
+    if (importObject.npc && !v.version) {
+      sheetOpened(); //NPC import will have wiped all the existing attributes
+    }
+    setFinalAttrs({}, {
+      import_data: '',
+      import_data_present: 'off',
+    });
   });
 };
 
@@ -5027,7 +5036,7 @@ on('change:accept_import', importData);
 on('change:reject_import', deleteImportData);
 
 const sheetOpened = () => {
-  const collectionArray = ['version', 'strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma', 'import_data'];
+  const collectionArray = ['version', 'strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma', 'import_data', 'roll_setting'];
   const finalSetAttrs = {};
 
   getAttrs(collectionArray, (v) => {
@@ -5038,7 +5047,10 @@ const sheetOpened = () => {
         finalSetAttrs.edit_mode = 'on';
       }
       finalSetAttrs.roll_info = '';
-      finalSetAttrs.roll_setting = '@{roll_1}';
+
+      if (!v.roll_setting) { // API Script import sets this when making characters
+        finalSetAttrs.roll_setting = '@{roll_1}';
+      }
       const setAbilities = {};
       if (isUndefined(v.strength)) {
         setAbilities.strength = 10;
