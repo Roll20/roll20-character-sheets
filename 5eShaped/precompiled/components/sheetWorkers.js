@@ -1,7 +1,7 @@
 /* global setAttrs:false, getAttrs:false, on:false, getSectionIDs:false, generateRowID:false */
 'use strict';
 
-const currentVersion = '3.1.2';
+const currentVersion = '3.1.3';
 let TRANSLATIONS;
 const SKILLS = {
   acrobatics: 'dexterity',
@@ -5190,6 +5190,9 @@ const sheetOpened = () => {
         updateActionChatMacro('lairaction');
         updateActionChatMacro('regionaleffect');
         updateAbilityChecksMacro();
+      }
+      if (versionCompare(version, '3.1.3') < 0) {
+        updateSkill();
       }
     }
 
