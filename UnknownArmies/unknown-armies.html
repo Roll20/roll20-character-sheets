@@ -48,6 +48,32 @@
             setAttrs({ 'sociopathy-description': sociopathy });
         }));
     }));
+    
+    on('sheet:opened', TAS._fn(function upgradeVersion(e) {
+        TAS.debug('Checking version', e);
+        getAttrs(['version'], TAS._fn(function versionCheck(values) {
+            var v = parseFloat(values.version);
+            
+            if (v !== version) {
+                switch (v) {
+                    default: // version 1
+                        upgradeV1toV2();
+                }
+            }
+        }));
+    }));
+    
+    function upgradeV1toV2() {
+        TAS.debug('Upgrading from version 1');
+        
+        getAttrs(['drive_max'], TAS._fn(function fixDrive(values) {
+            setAttrs({
+                driving_max: values.drive_max,
+                drive_max: '',
+                version: version
+            });
+        }));
+    }
 
 /* ---- BEGIN: TheAaronSheet.js ---- */
 // Github:   https://github.com/shdwjk/TheAaronSheet/blob/master/TheAaronSheet.js
@@ -184,7 +210,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                         <input type="radio" name="attr_obsession-skill" class="sheet-obsession" value="9" />
                     </div>
                     <div class="sheet-skill">
-                        <input type="number" name="attr_drive_max" min="0" max="99" value="15" class="sheet-full" />
+                        <input type="number" name="attr_driving_max" min="0" max="99" value="15" class="sheet-full" />
                         <input type="radio" name="attr_obsession-skill" class="sheet-obsession" value="10" />
                     </div>
                     <div class="sheet-skill">
