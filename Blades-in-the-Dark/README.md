@@ -10,6 +10,10 @@ Report any problems, suggestions or features by sending a private message on Rol
 
 ## Changelog
 
+### 0.0.3
+* Updated macros to check for number of avalible dice. If less than one (1) reverts to 2d6skl.
+* Added macro for resistance rolls.
+
 ### 0.0.2
 * Fixed bug with Friend/Rival and Harm boxes that would cause the starting boxes to have the same value.
 
