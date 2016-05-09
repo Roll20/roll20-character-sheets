@@ -1,7 +1,7 @@
 /* global setAttrs:false, getAttrs:false, on:false, getSectionIDs:false, generateRowID:false */
 'use strict';
 
-const currentVersion = '3.1.2';
+const currentVersion = '3.1.4';
 let TRANSLATIONS;
 const SKILLS = {
   acrobatics: 'dexterity',
@@ -468,7 +468,10 @@ const updateAbilityModifier = (ability) => {
       if (!isNaN(v.global_check_bonus)) {
         abilityCheck += getIntValue(v.global_check_bonus);
       }
-      abilityCheckFormula += ' + (@{global_check_bonus})[global check bonus]';
+      if (abilityCheckFormula) {
+        abilityCheckFormula += ' + ';
+      }
+      abilityCheckFormula += '(@{global_check_bonus})[global check bonus]';
     }
 
     finalSetAttrs[`${ability}_calculated`] = abilityScoreCalc;
@@ -2355,7 +2358,10 @@ const updateInitiative = () => {
 
     const globalCheckBonus = v.global_check_bonus;
     if (exists(globalCheckBonus)) {
-      finalSetAttrs.initiative_formula += ' + (@{global_check_bonus})[global check bonus]';
+      if (finalSetAttrs.initiative_formula) {
+        finalSetAttrs.initiative_formula += ' + ';
+      }
+      finalSetAttrs.initiative_formula += '(@{global_check_bonus})[global check bonus]';
     }
     setFinalAttrs(v, finalSetAttrs);
   });
@@ -2662,10 +2668,16 @@ const updateHealToggle = (v, finalSetAttrs, repeatingString) => {
     }
 
     if (exists(v.global_spell_heal_bonus)) {
-      healFormula += ' + @{global_spell_heal_bonus}[global spell heal bonus]';
+      if (healFormula) {
+        healFormula += ' + ';
+      }
+      healFormula += '@{global_spell_heal_bonus}[global spell heal bonus]';
     }
     if (v[`${repeatingString}heal_query_toggle`] === '@{heal_query}') {
-      healFormula += ' + @{heal_query_toggle}[query amount]';
+      if (healFormula) {
+        healFormula += ' + ';
+      }
+      healFormula += '@{heal_query_toggle}[query amount]';
     }
 
     finalSetAttrs[`${repeatingString}heal_formula`] = healFormula;
@@ -2704,7 +2716,10 @@ const updateHigherLevelToggle = (v, finalSetAttrs, repeatingString) => {
 
     const healToggle = v[`${repeatingString}heal_toggle`];
     if (healToggle && healToggle === '@{heal_toggle_var}') {
-      finalSetAttrs[`${repeatingString}heal_formula`] += ' + ((@{higher_level_query} - @{spell_level}) * @{higher_level_dice})@{higher_level_die}[higher lvl] + (@{higher_level_heal} * (@{higher_level_query} - @{spell_level}))[higher lvl flat amount]';
+      if (finalSetAttrs[`${repeatingString}heal_formula`]) {
+        finalSetAttrs[`${repeatingString}heal_formula`] += ' + ';
+      }
+      finalSetAttrs[`${repeatingString}heal_formula`] += '((@{higher_level_query} - @{spell_level}) * @{higher_level_dice})@{higher_level_die}[higher lvl] + (@{higher_level_heal} * (@{higher_level_query} - @{spell_level}))[higher lvl flat amount]';
     }
   }
 };
@@ -3550,7 +3565,10 @@ const updateSkill = (rowId) => {
           if (!isNaN(globalCheckBonus)) {
             total += getIntValue(globalCheckBonus);
           }
-          totalFormula += ' + (@{global_check_bonus})[global check bonus]';
+          if (totalFormula) {
+            totalFormula += ' + ';
+          }
+          totalFormula += '(@{global_check_bonus})[global check bonus]';
         }
         const passiveBonus = getIntValue(v[`${repeatingString}passive_bonus`]);
         const passiveTotal = 10 + total + passiveBonus;
@@ -5172,6 +5190,9 @@ const sheetOpened = () => {
         updateActionChatMacro('lairaction');
         updateActionChatMacro('regionaleffect');
         updateAbilityChecksMacro();
+      }
+      if (versionCompare(version, '3.1.3') < 0) {
+        updateSkill();
       }
     }
 
