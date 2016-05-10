@@ -2724,6 +2724,20 @@ const updateHigherLevelToggle = (v, finalSetAttrs, repeatingString) => {
   }
 };
 
+const updateCritDamage = (v, finalSetAttrs, repeatingString) => {
+  if (!v[`${repeatingString}damage_crit`] && v[`${repeatingString}damage`]) {
+    finalSetAttrs[`${repeatingString}damage_crit`] = v[`${repeatingString}damage`];
+  } else if (v[`${repeatingString}damage_crit`].indexOf(`${v[`${repeatingString}damage`]}`) === -1) {
+    finalSetAttrs[`${repeatingString}damage_crit`] = `${v[`${repeatingString}damage`]} + ${v[`${repeatingString}damage_crit`]}`;
+  }
+  if (!v[`${repeatingString}second_damage_crit`] && v[`${repeatingString}second_damage`]) {
+    finalSetAttrs[`${repeatingString}second_damage_crit`] = v[`${repeatingString}second_damage`];
+  } else if (v[`${repeatingString}second_damage_crit`].indexOf(`${v[`${repeatingString}second_damage`]}`) === -1) {
+    finalSetAttrs[`${repeatingString}second_damage_crit`] = `${v[`${repeatingString}second_damage`]} + ${v[`${repeatingString}second_damage_crit`]}`;
+  }
+  console.log('updateCritDamage 2', finalSetAttrs);
+};
+
 const findAmmo = (name, callback) => {
   const repeatingItem = 'repeating_ammo';
   const collectionArray = [];
@@ -2842,12 +2856,14 @@ const updateAction = (type, rowId) => {
       collectionArray.push(`${repeatingString}damage_ability`);
       collectionArray.push(`${repeatingString}damage_bonus`);
       collectionArray.push(`${repeatingString}damage_type`);
+      collectionArray.push(`${repeatingString}damage_crit`);
       collectionArray.push(`${repeatingString}second_damage_toggle`);
       collectionArray.push(`${repeatingString}second_damage_formula`);
       collectionArray.push(`${repeatingString}second_damage`);
       collectionArray.push(`${repeatingString}second_damage_ability`);
       collectionArray.push(`${repeatingString}second_damage_bonus`);
       collectionArray.push(`${repeatingString}second_damage_type`);
+      collectionArray.push(`${repeatingString}second_damage_crit`);
       collectionArray.push(`${repeatingString}damage_string`);
       collectionArray.push(`${repeatingString}heal_toggle`);
       collectionArray.push(`${repeatingString}heal`);
@@ -2924,6 +2940,7 @@ const updateAction = (type, rowId) => {
           };
         }
         updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
+        updateCritDamage(v, finalSetAttrs, repeatingString);
 
         updateHealToggle(v, finalSetAttrs, repeatingString);
 
@@ -2935,9 +2952,18 @@ const updateAction = (type, rowId) => {
     });
   });
 };
+const updateActions = () => {
+  updateAction('trait');
+  updateAction('action');
+  updateAction('reaction');
+  updateAction('legendaryaction');
+  updateAction('lairaction');
+  updateAction('regionaleffect');
+};
+
 const updateActionIfTriggered = (type, eventInfo) => {
   const repeatingInfo = getRepeatingInfo(`repeating_${type}`, eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'name' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
+  if (repeatingInfo && repeatingInfo.field !== 'name' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'damage_crit' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'second_damage_crit' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
     updateAction(type, repeatingInfo.rowId);
   }
 };
@@ -3029,12 +3055,14 @@ const updateAttack = (rowId) => {
       collectionArray.push(`${repeatingString}damage_ability`);
       collectionArray.push(`${repeatingString}damage_bonus`);
       collectionArray.push(`${repeatingString}damage_type`);
+      collectionArray.push(`${repeatingString}damage_crit`);
       collectionArray.push(`${repeatingString}second_damage_toggle`);
       collectionArray.push(`${repeatingString}second_damage_formula`);
       collectionArray.push(`${repeatingString}second_damage`);
       collectionArray.push(`${repeatingString}second_damage_ability`);
       collectionArray.push(`${repeatingString}second_damage_bonus`);
       collectionArray.push(`${repeatingString}second_damage_type`);
+      collectionArray.push(`${repeatingString}second_damage_crit`);
       collectionArray.push(`${repeatingString}damage_string`);
       collectionArray.push(`${repeatingString}modifiers`);
       collectionArray.push(`${repeatingString}properties`);
@@ -3121,6 +3149,7 @@ const updateAttack = (rowId) => {
           type: 'attack',
         };
         updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
+        updateCritDamage(v, finalSetAttrs, repeatingString);
       }
       setFinalAttrs(v, finalSetAttrs);
     });
@@ -3128,7 +3157,7 @@ const updateAttack = (rowId) => {
 };
 on('change:repeating_attack', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_attack', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'qty' && repeatingInfo.field !== 'weight' && repeatingInfo.field !== 'parsed') {
+  if (repeatingInfo && repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'damage_crit' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'second_damage_crit' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'qty' && repeatingInfo.field !== 'weight' && repeatingInfo.field !== 'parsed') {
     updateAttack(repeatingInfo.row);
   }
 });
@@ -3203,12 +3232,14 @@ const updateSpell = (rowId) => {
       collectionArray.push(`${repeatingString}damage_ability`);
       collectionArray.push(`${repeatingString}damage_bonus`);
       collectionArray.push(`${repeatingString}damage_type`);
+      collectionArray.push(`${repeatingString}damage_crit`);
       collectionArray.push(`${repeatingString}second_damage_toggle`);
       collectionArray.push(`${repeatingString}second_damage_formula`);
       collectionArray.push(`${repeatingString}second_damage`);
       collectionArray.push(`${repeatingString}second_damage_ability`);
       collectionArray.push(`${repeatingString}second_damage_bonus`);
       collectionArray.push(`${repeatingString}second_damage_type`);
+      collectionArray.push(`${repeatingString}second_damage_crit`);
       collectionArray.push(`${repeatingString}damage_string`);
       collectionArray.push(`${repeatingString}parsed`);
       collectionArray.push(`${repeatingString}spell_level`);
@@ -3317,6 +3348,7 @@ const updateSpell = (rowId) => {
           type: 'spell',
         };
         updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
+        updateCritDamage(v, finalSetAttrs, repeatingString);
 
         if (getIntValue(v.is_npc) === 1 && v.caster_level && v[`${repeatingString}damage`] && v[`${repeatingString}damage`].indexOf('@{level}') !== -1) {
           finalSetAttrs[`${repeatingString}damage`] = v[`${repeatingString}damage`].replace('@{level}', '@{caster_level}');
@@ -3336,7 +3368,7 @@ const updateSpell = (rowId) => {
 };
 on('change:repeating_spell', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_spell', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'heal_formula' && repeatingInfo.field !== 'higher_level_query' && repeatingInfo.field !== 'parsed') {
+  if (repeatingInfo && repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'damage_crit' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'second_damage_crit' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'heal_formula' && repeatingInfo.field !== 'higher_level_query' && repeatingInfo.field !== 'parsed') {
     console.info('spell repeatingInfo.field', repeatingInfo.field);
     updateSpell(repeatingInfo.rowId);
   }
@@ -4925,12 +4957,7 @@ on('change:pb', () => {
   updateSpell();
   updateJackOfAllTrades();
   updateRemarkableAthlete();
-  updateAction('trait');
-  updateAction('action');
-  updateAction('reaction');
-  updateAction('legendaryaction');
-  updateAction('lairaction');
-  updateAction('regionaleffect');
+  updateActions();
 });
 
 const extasToExtrasFix = (repeatingItem) => {
@@ -5162,12 +5189,8 @@ const sheetOpened = () => {
       if (versionCompare(version, '2.4.3') < 0) {
         setClassFeatures();
       }
-      if (versionCompare(version, '2.4.4') < 0) {
-        updateAttack();
-      }
       if (versionCompare(version, '2.4.7') < 0) {
         classFeaturesToTraits();
-        updateAction('trait');
       }
       if (versionCompare(version, '2.4.8') < 0) {
         fixRollTwo();
@@ -5180,7 +5203,6 @@ const sheetOpened = () => {
         updateSkill();
       }
       if (versionCompare(version, '2.6.3') < 0) {
-        updateSpell();
         generateHigherLevelQueries();
       }
       if (versionCompare(version, '3.1.0') < 0) {
@@ -5193,6 +5215,11 @@ const sheetOpened = () => {
       }
       if (versionCompare(version, '3.1.3') < 0) {
         updateSkill();
+      }
+      if (versionCompare(version, '3.2.0') < 0) {
+        updateAttack();
+        updateSpell();
+        updateActions();
       }
     }
 
