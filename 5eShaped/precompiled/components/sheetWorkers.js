@@ -2735,7 +2735,6 @@ const updateCritDamage = (v, finalSetAttrs, repeatingString) => {
   } else if (v[`${repeatingString}second_damage_crit`].indexOf(`${v[`${repeatingString}second_damage`]}`) === -1) {
     finalSetAttrs[`${repeatingString}second_damage_crit`] = `${v[`${repeatingString}second_damage`]} + ${v[`${repeatingString}second_damage_crit`]}`;
   }
-  console.log('updateCritDamage 2', finalSetAttrs);
 };
 
 const findAmmo = (name, callback) => {
