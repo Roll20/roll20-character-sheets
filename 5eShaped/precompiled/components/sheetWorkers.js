@@ -5164,7 +5164,6 @@ const sheetOpened = () => {
         updateActionChatMacro('action');
         updateActionChatMacro('reaction');
         updateActionChatMacro('legendaryaction');
-        updateDamageResistancesVar();
       }
       if (versionCompare(version, '2.4.3') < 0) {
         setClassFeatures();
@@ -5203,6 +5202,9 @@ const sheetOpened = () => {
       }
       if (versionCompare(version, '3.2.1') < 0) {
         updateCritDamage();
+      }
+      if (versionCompare(version, '3.2.3') < 0) {
+        updateDamageResistancesVar();
       }
     }
 
