@@ -4635,25 +4635,25 @@ const updateDamageResistancesVar = () => {
 
   getAttrs(collectionArray, (v) => {
     if (v.damage_vulnerabilities_exist) {
-      finalSetAttrs.damage_resistances_var = '{{Damage Vulnerabilities=@{damage_vulnerabilities}}}';
+      finalSetAttrs.damage_resistances_var += '{{Damage Vulnerabilities=@{damage_vulnerabilities}}}';
     }
     if (v.damage_resistances_exist) {
       if (finalSetAttrs.damage_resistances_var !== '') {
         finalSetAttrs.damage_resistances_var += ' ';
       }
-      finalSetAttrs.damage_resistances_var = '{{Damage Resistances=@{damage_resistances}}}';
+      finalSetAttrs.damage_resistances_var += '{{Damage Resistances=@{damage_resistances}}}';
     }
     if (v.damage_immunities_exist) {
       if (finalSetAttrs.damage_resistances_var !== '') {
         finalSetAttrs.damage_resistances_var += ' ';
       }
-      finalSetAttrs.damage_resistances_var = '{{Damage Immunities=@{damage_immunities}}}';
+      finalSetAttrs.damage_resistances_var += '{{Damage Immunities=@{damage_immunities}}}';
     }
     if (v.condition_immunities_exist) {
       if (finalSetAttrs.damage_resistances_var !== '') {
         finalSetAttrs.damage_resistances_var += ' ';
       }
-      finalSetAttrs.damage_resistances_var = '{{Condition Immunities=@{condition_immunities}}}';
+      finalSetAttrs.damage_resistances_var += '{{Condition Immunities=@{condition_immunities}}}';
     }
     setFinalAttrs(v, finalSetAttrs);
   });
