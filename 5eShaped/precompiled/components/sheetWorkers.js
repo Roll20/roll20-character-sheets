@@ -2758,6 +2758,15 @@ const updateCritDamage = () => {
   }
 };
 
+const setCritDamage = (v, finalSetAttrs, repeatingString) => {
+  if (!v[`${repeatingString}damage_crit`] && v[`${repeatingString}damage`]) {
+    finalSetAttrs[`${repeatingString}damage_crit`] = v[`${repeatingString}damage`];
+  }
+  if (!v[`${repeatingString}second_damage_crit`] && v[`${repeatingString}second_damage`]) {
+    finalSetAttrs[`${repeatingString}second_damage_crit`] = v[`${repeatingString}second_damage`];
+  }
+};
+
 const findAmmo = (name, callback) => {
   const repeatingItem = 'repeating_ammo';
   const collectionArray = [];
@@ -2960,6 +2969,7 @@ const updateAction = (type, rowId) => {
           };
         }
         updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
+        setCritDamage(v, finalSetAttrs, repeatingString);
 
         updateHealToggle(v, finalSetAttrs, repeatingString);
 
@@ -3168,6 +3178,7 @@ const updateAttack = (rowId) => {
           type: 'attack',
         };
         updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
+        setCritDamage(v, finalSetAttrs, repeatingString);
       }
       setFinalAttrs(v, finalSetAttrs);
     });
@@ -3366,6 +3377,7 @@ const updateSpell = (rowId) => {
           type: 'spell',
         };
         updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
+        setCritDamage(v, finalSetAttrs, repeatingString);
 
         if (getIntValue(v.is_npc) === 1 && v.caster_level && v[`${repeatingString}damage`] && v[`${repeatingString}damage`].indexOf('@{level}') !== -1) {
           finalSetAttrs[`${repeatingString}damage`] = v[`${repeatingString}damage`].replace('@{level}', '@{caster_level}');
