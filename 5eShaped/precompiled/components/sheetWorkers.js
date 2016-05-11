@@ -1,7 +1,7 @@
 /* global setAttrs:false, getAttrs:false, on:false, getSectionIDs:false, generateRowID:false */
 'use strict';
 
-const currentVersion = '3.2.1';
+const currentVersion = '3.2.2';
 let TRANSLATIONS;
 const SKILLS = {
   acrobatics: 'dexterity',
@@ -2722,16 +2722,39 @@ const updateHigherLevelToggle = (v, finalSetAttrs, repeatingString) => {
   }
 };
 
-const updateCritDamage = (v, finalSetAttrs, repeatingString) => {
-  if (!v[`${repeatingString}damage_crit`] && v[`${repeatingString}damage`]) {
-    finalSetAttrs[`${repeatingString}damage_crit`] = v[`${repeatingString}damage`];
-  } else if (v[`${repeatingString}damage_crit`] && v[`${repeatingString}damage_crit`].indexOf(`${v[`${repeatingString}damage`]}`) === -1) {
-    finalSetAttrs[`${repeatingString}damage_crit`] = `${v[`${repeatingString}damage`]} + ${v[`${repeatingString}damage_crit`]}`;
-  }
-  if (!v[`${repeatingString}second_damage_crit`] && v[`${repeatingString}second_damage`]) {
-    finalSetAttrs[`${repeatingString}second_damage_crit`] = v[`${repeatingString}second_damage`];
-  } else if (v[`${repeatingString}second_damage_crit`] && v[`${repeatingString}second_damage_crit`].indexOf(`${v[`${repeatingString}second_damage`]}`) === -1) {
-    finalSetAttrs[`${repeatingString}second_damage_crit`] = `${v[`${repeatingString}second_damage`]} + ${v[`${repeatingString}second_damage_crit`]}`;
+const updateCritDamage = () => {
+  const repeatingItems = ['repeating_attack', 'repeating_spell', 'repeating_trait', 'repeating_action', 'repeating_reaction', 'repeating_legendaryaction', 'repeating_lairaction', 'repeating_regionaleffect'];
+  const collectionArray = [];
+  const finalSetAttrs = {};
+
+  for (const repeatingItem of repeatingItems) {
+    getSectionIDs(repeatingItem, (ids) => {
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
+        collectionArray.push(`${repeatingString}damage`);
+        collectionArray.push(`${repeatingString}damage_crit`);
+        collectionArray.push(`${repeatingString}second_damage`);
+        collectionArray.push(`${repeatingString}second_damage_crit`);
+      }
+
+      getAttrs(collectionArray, (v) => {
+        for (const id of ids) {
+          const repeatingString = `${repeatingItem}_${id}_`;
+
+          if (!v[`${repeatingString}damage_crit`] && v[`${repeatingString}damage`]) {
+            finalSetAttrs[`${repeatingString}damage_crit`] = v[`${repeatingString}damage`];
+          } else if (v[`${repeatingString}damage`] && v[`${repeatingString}damage_crit`]) {
+            finalSetAttrs[`${repeatingString}damage_crit`] = `${v[`${repeatingString}damage`]} + ${v[`${repeatingString}damage_crit`]}`;
+          }
+          if (!v[`${repeatingString}second_damage_crit`] && v[`${repeatingString}second_damage`]) {
+            finalSetAttrs[`${repeatingString}second_damage_crit`] = v[`${repeatingString}second_damage`];
+          } else if (v[`${repeatingString}second_damage`] && v[`${repeatingString}second_damage_crit`]) {
+            finalSetAttrs[`${repeatingString}second_damage_crit`] = `${v[`${repeatingString}second_damage`]} + ${v[`${repeatingString}second_damage_crit`]}`;
+          }
+        }
+        setFinalAttrs(v, finalSetAttrs);
+      });
+    });
   }
 };
 
@@ -2937,7 +2960,6 @@ const updateAction = (type, rowId) => {
           };
         }
         updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
-        updateCritDamage(v, finalSetAttrs, repeatingString);
 
         updateHealToggle(v, finalSetAttrs, repeatingString);
 
@@ -2984,11 +3006,11 @@ on('change:repeating_regionaleffect', (eventInfo) => {
 });
 
 const updateAttackChatMacro = () => {
-  const repeatingItem = `repeating_attack`;
-  const collectionArray = [`attacks_macro_var`];
+  const repeatingItem = 'repeating_attack';
+  const collectionArray = ['attacks_macro_var'];
   const finalSetAttrs = {};
 
-  finalSetAttrs[`attacks_macro_var`] = '';
+  finalSetAttrs.attacks_macro_var = '';
 
   getSectionIDs(repeatingItem, (ids) => {
     for (const id of ids) {
@@ -3005,10 +3027,10 @@ const updateAttackChatMacro = () => {
         }
 
         if (id !== ids[0]) {
-          finalSetAttrs[`attacks_macro_var`] += ', ';
+          finalSetAttrs.attacks_macro_var += ', ';
         }
 
-        finalSetAttrs[`attacks_macro_var`] += `[${actionName}](~repeating_attack_${id}_attack)`;
+        finalSetAttrs.attacks_macro_var += `[${actionName}](~repeating_attack_${id}_attack)`;
       }
       setFinalAttrs(v, finalSetAttrs);
     });
@@ -3146,7 +3168,6 @@ const updateAttack = (rowId) => {
           type: 'attack',
         };
         updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
-        updateCritDamage(v, finalSetAttrs, repeatingString);
       }
       setFinalAttrs(v, finalSetAttrs);
     });
@@ -3345,7 +3366,6 @@ const updateSpell = (rowId) => {
           type: 'spell',
         };
         updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
-        updateCritDamage(v, finalSetAttrs, repeatingString);
 
         if (getIntValue(v.is_npc) === 1 && v.caster_level && v[`${repeatingString}damage`] && v[`${repeatingString}damage`].indexOf('@{level}') !== -1) {
           finalSetAttrs[`${repeatingString}damage`] = v[`${repeatingString}damage`].replace('@{level}', '@{caster_level}');
@@ -5137,8 +5157,12 @@ const sheetOpened = () => {
       if (versionCompare(version, '2.4.3') < 0) {
         setClassFeatures();
       }
+      if (versionCompare(version, '2.4.4') < 0) {
+        updateAttack();
+      }
       if (versionCompare(version, '2.4.7') < 0) {
         classFeaturesToTraits();
+        updateAction('trait');
       }
       if (versionCompare(version, '2.4.8') < 0) {
         fixRollTwo();
@@ -5151,6 +5175,7 @@ const sheetOpened = () => {
         updateSkill();
       }
       if (versionCompare(version, '2.6.3') < 0) {
+        updateSpell();
         generateHigherLevelQueries();
       }
       if (versionCompare(version, '3.1.0') < 0) {
@@ -5165,9 +5190,7 @@ const sheetOpened = () => {
         updateSkill();
       }
       if (versionCompare(version, '3.2.1') < 0) {
-        updateAttack();
-        updateSpell();
-        updateActions();
+        updateCritDamage();
       }
     }
 
