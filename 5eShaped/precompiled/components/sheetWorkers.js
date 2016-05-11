@@ -1,7 +1,7 @@
 /* global setAttrs:false, getAttrs:false, on:false, getSectionIDs:false, generateRowID:false */
 'use strict';
 
-const currentVersion = '3.2.0';
+const currentVersion = '3.2.1';
 let TRANSLATIONS;
 const SKILLS = {
   acrobatics: 'dexterity',
@@ -1572,9 +1572,8 @@ const updateSpellSlots = () => {
     }
   }
   getAttrs(collectionArray, (v) => {
-    let casterLevel = getIntValue(v.caster_level);
-    let casterType = v.caster_type;
-
+    const casterLevel = getIntValue(v.caster_level);
+    const casterType = v.caster_type;
 
     if (casterType === 'full') {
       if (casterLevel >= 3) {
@@ -2696,7 +2695,6 @@ const updateHigherLevelToggle = (v, finalSetAttrs, repeatingString) => {
 
   const higherLevelToggle = v[`${repeatingString}higher_level_toggle`];
   if (exists(higherLevelToggle) && higherLevelToggle === '@{higher_level_toggle_var}') {
-
     const spellLevel = getIntValue(v[`${repeatingString}spell_level`]);
     finalSetAttrs[`${repeatingString}higher_level_query`] = `@{higher_level_query_${spellLevel}}`;
 
@@ -2727,12 +2725,12 @@ const updateHigherLevelToggle = (v, finalSetAttrs, repeatingString) => {
 const updateCritDamage = (v, finalSetAttrs, repeatingString) => {
   if (!v[`${repeatingString}damage_crit`] && v[`${repeatingString}damage`]) {
     finalSetAttrs[`${repeatingString}damage_crit`] = v[`${repeatingString}damage`];
-  } else if (v[`${repeatingString}damage_crit`].indexOf(`${v[`${repeatingString}damage`]}`) === -1) {
+  } else if (v[`${repeatingString}damage_crit`] && v[`${repeatingString}damage_crit`].indexOf(`${v[`${repeatingString}damage`]}`) === -1) {
     finalSetAttrs[`${repeatingString}damage_crit`] = `${v[`${repeatingString}damage`]} + ${v[`${repeatingString}damage_crit`]}`;
   }
   if (!v[`${repeatingString}second_damage_crit`] && v[`${repeatingString}second_damage`]) {
     finalSetAttrs[`${repeatingString}second_damage_crit`] = v[`${repeatingString}second_damage`];
-  } else if (v[`${repeatingString}second_damage_crit`].indexOf(`${v[`${repeatingString}second_damage`]}`) === -1) {
+  } else if (v[`${repeatingString}second_damage_crit`] && v[`${repeatingString}second_damage_crit`].indexOf(`${v[`${repeatingString}second_damage`]}`) === -1) {
     finalSetAttrs[`${repeatingString}second_damage_crit`] = `${v[`${repeatingString}second_damage`]} + ${v[`${repeatingString}second_damage_crit`]}`;
   }
 };
@@ -3176,7 +3174,7 @@ const weighAttacks = () => {
   sumRepeating(options, sumItems);
 };
 
-on('change:repeating_attack', () => {
+on('change:repeating_attack', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_attack', eventInfo);
   if (repeatingInfo && repeatingInfo.field === 'name') {
     updateAttackChatMacro();
@@ -5020,52 +5018,6 @@ const fixRollTwo = () => {
   });
 };
 
-const importData = () => {
-  getAttrs(['import_data', 'version'], v => {
-    if (v.import_data) {
-      const finalSetAttrs = {};
-      const importObject = JSON.parse(v.import_data);
-
-      if (importObject.npc) {
-        if (!v.version) {
-          sheetOpened();
-        }
-        for (const prop in importObject.npc) {
-          if (importObject.npc.hasOwnProperty(prop)) {
-            finalSetAttrs[prop] = importObject.npc[prop];
-          }
-        }
-      }
-      if (importObject.spells) {
-        importObject.spells.forEach(spell => {
-          const repeatingString = `repeating_spell_${generateRowID()}_`;
-          for (const prop in spell) {
-            if (spell.hasOwnProperty(prop)) {
-              finalSetAttrs[`${repeatingString}${prop}`] = spell[prop];
-            }
-          }
-        });
-      }
-      finalSetAttrs.import_data = '';
-      finalSetAttrs.import_data_present = 'off';
-      setFinalAttrs(v, finalSetAttrs);
-    }
-  });
-};
-
-const deleteImportData = () => {
-  getAttrs(['import_data', 'version'], v => {
-    const importObject = JSON.parse(v.import_data);
-    if (importObject.npc && !v.version) {
-      sheetOpened(); //NPC import will have wiped all the existing attributes
-    }
-    setFinalAttrs({}, {
-      import_data: '',
-      import_data_present: 'off',
-    });
-  });
-};
-
 const checkVersionFormat = (version, finalSetAttrs) => {
   const versionRegex = /\d+\.\d+\.\d+/gi;
   const versionIsProperFormat = versionRegex.exec(version);
@@ -5075,9 +5027,6 @@ const checkVersionFormat = (version, finalSetAttrs) => {
   }
   return version;
 };
-
-on('change:accept_import', importData);
-on('change:reject_import', deleteImportData);
 
 const sheetOpened = () => {
   const collectionArray = ['version', 'strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma', 'import_data', 'roll_setting'];
@@ -5215,7 +5164,7 @@ const sheetOpened = () => {
       if (versionCompare(version, '3.1.3') < 0) {
         updateSkill();
       }
-      if (versionCompare(version, '3.2.0') < 0) {
+      if (versionCompare(version, '3.2.1') < 0) {
         updateAttack();
         updateSpell();
         updateActions();
@@ -5233,3 +5182,52 @@ const sheetOpened = () => {
 on('sheet:opened', () => {
   sheetOpened();
 });
+
+
+const importData = () => {
+  getAttrs(['import_data', 'version'], v => {
+    if (v.import_data) {
+      const finalSetAttrs = {};
+      const importObject = JSON.parse(v.import_data);
+
+      if (importObject.npc) {
+        if (!v.version) {
+          sheetOpened();
+        }
+        for (const prop in importObject.npc) {
+          if (importObject.npc.hasOwnProperty(prop)) {
+            finalSetAttrs[prop] = importObject.npc[prop];
+          }
+        }
+      }
+      if (importObject.spells) {
+        importObject.spells.forEach(spell => {
+          const repeatingString = `repeating_spell_${generateRowID()}_`;
+          for (const prop in spell) {
+            if (spell.hasOwnProperty(prop)) {
+              finalSetAttrs[`${repeatingString}${prop}`] = spell[prop];
+            }
+          }
+        });
+      }
+      finalSetAttrs.import_data = '';
+      finalSetAttrs.import_data_present = 'off';
+      setFinalAttrs(v, finalSetAttrs);
+    }
+  });
+};
+
+const deleteImportData = () => {
+  getAttrs(['import_data', 'version'], v => {
+    const importObject = JSON.parse(v.import_data);
+    if (importObject.npc && !v.version) {
+      sheetOpened(); // NPC import will have wiped all the existing attributes
+    }
+    setFinalAttrs({}, {
+      import_data: '',
+      import_data_present: 'off',
+    });
+  });
+};
+on('change:accept_import', importData);
+on('change:reject_import', deleteImportData);
