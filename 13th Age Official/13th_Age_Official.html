@@ -543,8 +543,12 @@
                         <span class="poption spacer"></span>
                     <input class="poption Attack" type="checkbox" name="attr_attack" value="{{attack=1}} {{attbonus=[[1d20+@{attack-type}+?{Modifiers|0}[MOD]+@{E-DIE}]]}} {{vstype=@{attack-vstype}}}"><span class="poption">Attack:</span>
                         <select class="suboption attackoptions" name="attr_attack-type">
-                            <option value="[[@{STR-mod}]][STR]+@{level}[LVL]">Melee</option>
-                            <option value="[[@{DEX-mod}]][DEX]+@{level}[LVL]">Ranged</option>
+                            <option value="[[@{STR-mod}]][STR]+@{level}[LVL]">Melee(STR)</option>
+                            <option value="[[@{DEX-mod}]][DEX]+@{level}[LVL]">Ranged(DEX)</option>
+                            <option value="[[@{INT-mod}]][INT]+@{level}[LVL]">Intelligence based</option>
+                            <option value="[[@{CHA-mod}]][CHA]+@{level}[LVL]">Charisma based</option>
+                            <option value="[[@{WIS-mod}]][WIS]+@{level}[LVL]">Wisdom based</option>
+                            <option value="[[@{CON-mod}]][CON]+@{level}[LVL]">Constitution based</option>
                             <option value="[[@{STR-mod}]][STR]+@{level}[LVL]+@{MWEAP-mod1}[WEAP]">Melee Weapon 1</option>
                             <option value="[[@{STR-mod}]][STR]+@{level}[LVL]+@{MWEAP-mod2}[WEAP]">Melee Weapon 2</option>
                             <option value="[[@{STR-mod}]][STR]+@{level}[LVL]+@{MWEAP-mod3}[WEAP]">Melee Weapon 3</option>
@@ -1180,9 +1184,13 @@
     });
 
     var updatePower = function() {
-        getAttrs(["STR-base","DEX-base","level","MWEAP-mod1","MWEAP-mod2","MWEAP-mod3","RWEAP-mod1","RWEAP-mod2","RWEAP-mod3","repeating_power_name","repeating_power_type","repeating_power_type-custom","repeating_power_uses","repeating_power_action","repeating_power_action-type","repeating_power_action-custom","repeating_power_range","repeating_power_range-type","repeating_power_range-custom","repeating_power_target","repeating_power_target-type","repeating_power_attack","repeating_power_attack-type","repeating_power_attack-custom","repeating_power_attack-vstype","repeating_power_attack-vscustom","repeating_power_cust1","repeating_power_cust1-type","repeating_power_cust1-custom","repeating_power_cust1-subcust1","repeating_power_cust1-subcust2","repeating_power_cust1-subcust3","repeating_power_cust1-subcust4","repeating_power_cust1-subcust1-desc","repeating_power_cust1-subcust2-desc","repeating_power_cust1-subcust3-desc","repeating_power_cust1-subcust4-desc","repeating_power_cust2","repeating_power_cust2-type","repeating_power_cust2-custom","repeating_power_cust2-subcust1","repeating_power_cust2-subcust2","repeating_power_cust2-subcust3","repeating_power_cust2-subcust4","repeating_power_cust2-subcust1-desc","repeating_power_cust2-subcust2-desc","repeating_power_cust2-subcust3-desc","repeating_power_cust2-subcust4-desc","repeating_power_cust3","repeating_power_cust3-type","repeating_power_cust3-custom","repeating_power_cust3-subcust1","repeating_power_cust3-subcust2","repeating_power_cust3-subcust3","repeating_power_cust3-subcust4","repeating_power_cust3-subcust1-desc","repeating_power_cust3-subcust2-desc","repeating_power_cust3-subcust3-desc","repeating_power_cust3-subcust4-desc","repeating_power_classtype","race","repeating_power_rechargerate"], function(v) {
+        getAttrs(["STR-base","DEX-base","CON-base","INT-base","CHA-base","WIS-base","level","MWEAP-mod1","MWEAP-mod2","MWEAP-mod3","RWEAP-mod1","RWEAP-mod2","RWEAP-mod3","repeating_power_name","repeating_power_type","repeating_power_type-custom","repeating_power_uses","repeating_power_action","repeating_power_action-type","repeating_power_action-custom","repeating_power_range","repeating_power_range-type","repeating_power_range-custom","repeating_power_target","repeating_power_target-type","repeating_power_attack","repeating_power_attack-type","repeating_power_attack-custom","repeating_power_attack-vstype","repeating_power_attack-vscustom","repeating_power_cust1","repeating_power_cust1-type","repeating_power_cust1-custom","repeating_power_cust1-subcust1","repeating_power_cust1-subcust2","repeating_power_cust1-subcust3","repeating_power_cust1-subcust4","repeating_power_cust1-subcust1-desc","repeating_power_cust1-subcust2-desc","repeating_power_cust1-subcust3-desc","repeating_power_cust1-subcust4-desc","repeating_power_cust2","repeating_power_cust2-type","repeating_power_cust2-custom","repeating_power_cust2-subcust1","repeating_power_cust2-subcust2","repeating_power_cust2-subcust3","repeating_power_cust2-subcust4","repeating_power_cust2-subcust1-desc","repeating_power_cust2-subcust2-desc","repeating_power_cust2-subcust3-desc","repeating_power_cust2-subcust4-desc","repeating_power_cust3","repeating_power_cust3-type","repeating_power_cust3-custom","repeating_power_cust3-subcust1","repeating_power_cust3-subcust2","repeating_power_cust3-subcust3","repeating_power_cust3-subcust4","repeating_power_cust3-subcust1-desc","repeating_power_cust3-subcust2-desc","repeating_power_cust3-subcust3-desc","repeating_power_cust3-subcust4-desc","repeating_power_classtype","race","repeating_power_rechargerate"], function(v) {
             str = Math.floor((parseInt(v["STR-base"],10) - 10) / 2);
             dex = Math.floor((parseInt(v["DEX-base"],10) - 10) / 2);
+            con = Math.floor((parseInt(v["CON-base"],10) - 10) / 2);
+            int = Math.floor((parseInt(v["INT-base"],10) - 10) / 2);
+            cha = Math.floor((parseInt(v["CHA-base"],10) - 10) / 2);
+            wis = Math.floor((parseInt(v["WIS-base"],10) - 10) / 2);
             mweap1 = v["MWEAP-mod1"] && isNaN(v["MWEAP-mod1"]) === false ? parseInt(v["MWEAP-mod1"], 10) : 0;
             mweap2 = v["MWEAP-mod2"] && isNaN(v["MWEAP-mod2"]) === false ? parseInt(v["MWEAP-mod2"], 10) : 0;
             mweap3 = v["MWEAP-mod3"] && isNaN(v["MWEAP-mod3"]) === false ? parseInt(v["MWEAP-mod3"], 10) : 0;
@@ -1210,6 +1218,10 @@
             // ATTACK
             if(v["repeating_power_attack-type"] === "[[@{STR-mod}]][STR]+@{level}[LVL]") {attack = str + level}
             else if(v["repeating_power_attack-type"] === "[[@{DEX-mod}]][DEX]+@{level}[LVL]") {attack = dex + level}
+            else if(v["repeating_power_attack-type"] === "[[@{CON-mod}]][CON]+@{level}[LVL]") {attack = con + level}
+            else if(v["repeating_power_attack-type"] === "[[@{INT-mod}]][INT]+@{level}[LVL]") {attack = int + level}
+            else if(v["repeating_power_attack-type"] === "[[@{CHA-mod}]][CHA]+@{level}[LVL]") {attack = cha + level}
+            else if(v["repeating_power_attack-type"] === "[[@{WIS-mod}]][WIS]+@{level}[LVL]") {attack = wis + level}
             else if(v["repeating_power_attack-type"] === "[[@{STR-mod}]][STR]+@{level}[LVL]+@{MWEAP-mod1}[WEAP]") {attack = str + level + mweap1}
             else if(v["repeating_power_attack-type"] === "[[@{STR-mod}]][STR]+@{level}[LVL]+@{MWEAP-mod2}[WEAP]") {attack = str + level + mweap2}
             else if(v["repeating_power_attack-type"] === "[[@{STR-mod}]][STR]+@{level}[LVL]+@{MWEAP-mod3}[WEAP]") {attack = str + level + mweap3}
