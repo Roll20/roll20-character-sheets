@@ -1,7 +1,7 @@
 character sheet for the Generic Universal Roleplaying System.
 More information at : https://app.roll20.net/forum/post/902845/gurp-sheet-gurps-style-number-2
 
-There is no CP calculation, this sheet is purely for actual play and focuses on:
+There is no CP calculation and most values need to put put by hand, this sheet is purely for actual play and focuses on:
 - Proper formatting for macros to keep chat clean.
 - Made with lots of options to allow for a good experience via Text Only roll20.
 - Clean and to the point design. Things are organized in Tabs to avoid scrolling up and down, etc
@@ -10,6 +10,13 @@ There is no CP calculation, this sheet is purely for actual play and focuses on:
 Otherwise, sheet is pretty much done and as far as I could tell, works perfectly fine.
 
 CHANGELOG
+05/16/2015:
+- Fixed Load calculation to x2, x3, x6 and x10 as per rule.
+- Fixed Dodge under Full Load display. I now use a new field calledd FullLoad as well as the old CurrLoad (combat one), which hopefully will allow the calculation.
+- Fixed Combat MOVE calculation. I was using a penalty based on encumberance level rather than proper values from rules. The formula now goes like this for now: floor(@{Move}+(@{Move}*(@{CurrLoad} * 0.2)))
+- Note:
+	- Remember that this sheet only calculates some values but otherwise is just meant to ease the use of the system during play and NOT be a character auto generator. It will not calculate CPs used, MOVE, and other derived values. Usually, when you can manually input values, that means no calculation is made.
+
 06/07/2014: MAJOR UPDATE
 - Added a GM only NPC STAT BLOCK layout. This tab will not work properly for players since it uses many /emas and /as
 The GMs can use it to quickly make monsters/npcs, and it contains only the most relevant information as well as tighly packed commands and whatnot. 
