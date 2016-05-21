@@ -1,9 +1,10 @@
 <!--
 *********TODO*********
 Add custom ability names
- Roll Template styles
+New Roll Template styles
 "Permanent bonus" to attack and defense section
 Advantage button - auto calculate +2atk and 1d4dmg
+Concentration check
     
 **********************
 -->
@@ -16,7 +17,7 @@ Advantage button - auto calculate +2atk and 1d4dmg
 <input type="radio" name="attr_page-number" class="sheet-tab sheet-tab3" value="3" title="Rituals and Powers"/>
 <span class="sheet-tab sheet-tab3">Rituals | Powers</span>
 <input type="radio" name="attr_page-number" class="sheet-tab sheet-tab4" value="4" title="Equipment, Group, and Friends"/>
-<span class="sheet-tab sheet-tab4">Equipment</span>
+<span class="sheet-tab sheet-tab4">Equipment | Bio</span>
 <div class="sheet-row" style="padding-top:.5em;margin-right:0;">
     <div><input type="text" name="attr_character-name"/><label>Name</label></div>
     <div style="width:8em;"><input type="text" style="width:100%"name="attr_character-race"/><label>Race</label></div>
@@ -142,20 +143,19 @@ Advantage button - auto calculate +2atk and 1d4dmg
         </div> <!-- END Attributes -->
     </div>
     <div class="sheet-row"> <!-- being Weapons -->
-        <label class="sheet-label-large" style="margin: .5em 0 -.5em 0;">Attacks</label>
-
+        <label class="sheet-label-large" style="margin: .5em 0 -.5em 0;">Attacks</label>    
         <div class="sheet-row-with-labels">
             <div>
-                <button type='roll' name="roll_attack" title="Use attack!" style="background-image:url(http://i.imgur.com/EPH4536.png);background-position:center;background-repeat:no-repeat;height:100%;width:100%" value='&{template:attack}{{name=@{weapon1-name}}}{{attribute=[[@{attack-ability1}+?{Enemy Disdvantage|0}+@{extra-attack}]]}}{{attribute1=[[1+@{attack-ability1}+?{Enemy Disdvantage|0}+@{extra-attack}]]}} {{attack=[[1d20]]}} {{damage=[[@{weapon1-dtype}+@{weapon1-extra-dtype}+@{weapon1-extra-damage}]]}} {{damage-crit=[[1d6]]}} {{character-name=@{character-name}}}'></button>
+                <button type='roll' name="roll_attack" title="Use attack!" value='&{template:attack}{{name=@{weapon1-name}}}{{attribute=[[@{attack-ability1}+?{Enemy Disdvantage|0}+@{weapon1-extra-attack}]]}}{{attribute1=[[@{attack-ability1}+?{Enemy Disdvantage|0}+@{weapon1-extra-attack}+1]]}} {{attack=[[1d20]]}} {{damage=[[@{weapon1-dtype}+@{weapon1-extra-dtype}+@{weapon1-extra-damage}]]}} {{damage-crit=[[1d6]]}} {{character-name=@{character-name}}} {{attack-type=[[@{attack-ability1}]]}}'style="background-image:url(http://i.imgur.com/EPH4536.png);background-position:center;background-repeat:no-repeat;height:100%;width:100%"></button>
             </div>
             <div>
-                <label>Weapon name</label>
-                <input type="text" style="font-weight:bold;width:12em;height:2em;margin:0" name="attr_weapon1-name" title="Weapon used in attack" placeholder="Weapon"/>
+                <label>Weapon or Power</label>
+                <input type="text" style="font-weight:bold;width:16em;height:2em;margin:0" name="attr_weapon1-name" title="Weapon or power used in attack"/>
             </div>
             <div>
                 <label>Attribute</label>
                 <select name="attr_attack-ability1" style="width:auto;" size="1" title="Ability that determines a hit, usually Accurate">
-                    <option value="[[20]]">Bonus dmg</option>
+                    <option value="[[-1]]">Bonus dmg</option>
                     <option value="[[@{accurate}]]" selected>Accurate</option>
                     <option value="[[@{cunning}]]">Cunning</option>
                     <option value="[[@{discreet}]]">Discreet</option>
@@ -215,173 +215,129 @@ Advantage button - auto calculate +2atk and 1d4dmg
                 </div>
             </div>
         </div>
-        <fieldset class="repeating_weapons">
-        <div class="sheet-row-with-labels">
-            <div>
-                <button type='roll' name="roll_attack" title="Use attack!" style="background-image:url(http://i.imgur.com/EPH4536.png);background-position:center;background-repeat:no-repeat;height:100%;width:100%" value='&{template:attack}{{name=@{weapon1-name}}}{{attribute=[[@{attack-ability1}+?{Enemy Disdvantage|0}+@{extra-attack}]]}}{{attribute1=[[1+@{attack-ability1}+?{Enemy Disdvantage|0}+@{extra-attack}]]}} {{attack=[[1d20]]}} {{damage=[[@{weapon1-dtype}+@{weapon1-extra-dtype}+@{weapon1-extra-damage}]]}} {{damage-crit=[[1d6]]}} {{character-name=@{character-name}}}'></button>
-            </div>
-            <div>
-                <input type="text" style="font-weight:bold;width:12em;height:2em;margin:0" name="attr_weapon1-name" title="Weapon used in attack" placeholder="Weapon"/>
-            </div>
-            <div>
-                <select name="attr_attack-ability1" style="width:auto;" size="1" title="Ability that determines a hit, usually Accurate">
-                    <option value="[[20]]">Bonus dmg</option>
-                    <option value="[[@{accurate}]]" selected>Accurate</option>
-                    <option value="[[@{cunning}]]">Cunning</option>
-                    <option value="[[@{discreet}]]">Discreet</option>
-                    <option value="[[@{persuasive}]]">Persuasive</option>
-                    <option value="[[@{quick}]]">Quick</option>
-                    <option value="[[@{resolute}]]">Resolute</option>
-                    <option value="[[@{strong}]]">Strong</option>
-                    <option value="[[@{vigilant}]]">Vigilant</option>
-                </select>
-            </div>
-            <div>
-                <select name="attr_weapon1-dtype" title="Attack roll for the weapon" style="width:55px;">                         
-                    <option value="0"></option>             
-                    <option value="d4">d4</option>
-                    <option value="d6">d6</option>
-                    <option value="d8" selected>d8</option>
-                    <option value="d10">d10</option>
-                    <option value="d12">d12</option>
-                </select>
-            </div>
-            <div>
-                <select name="attr_weapon1-quality">
-                    <option value="0" selected> </option>
-                    <option value="1">Balanced</option>
-                    <option value="2">Blunt</option>
-                    <option value="3">Deep Impact</option>
-                    <option value="4">Jointed</option>
-                    <option value="5">Long</option>
-                    <option value="6">Precise</option>
-                    <option value="7">Short</option>
-                </select>
-            </div>
-            <div class="sheet-faded" style="margin-left:1em;">
+        <fieldset class="repeating_weapons">  
+            <div class="sheet-row-with-labels" style="display:block">
                 <div>
-                    <div>
-                        <input type="number" name="attr_weapon1-extra-damage" title="Bonus to damage" class="sheet-number-box-small" style="vertical-align:top;width:48px;text-align:center;" value="0"/>
-                    </div>
-                    <div>
-                        <select name="attr_weapon1-extra-dtype" style="width:48px;text-align:center;" title="Extra damage roll due to an ability">
-                            <option value="0" selected></option>
-                            <option value="d4">d4</option>
-                            <option value="d6">d6</option>
-                            <option value="d8">d8</option>
-                            <option value="d10">d10</option>
-                            <option value="d12">d12</option>
-                        </select>
-                    </div>
-                    <div>
-                        <input type="number" name="attr_weapon1-extra-attack" title="Bonus to attack roll" class="sheet-number-box-small" style="vertical-align:top;width:48px;text-align:center;" value="0" />
-                    </div>
-                </div>
-            </div>
-        </div> <!-- END Weapons-->
-            
-        </fieldset>
-    </div> <!-- END Weapons-->
-    <div class="sheet-row"><!-- Begin Armor -->
-        <label class="sheet-label-large" style="margin: .5em 0 -.5em 0;">Defenses</label>
-        <div> <!-- begin armor -->
-            <div class="sheet-row-with-labels">
-                <div style="width:28px;height:28px;vertical-align:middle;">
-                    <button type='roll' name="roll_defense" style="background-image:url(http://i.imgur.com/QFy0qCe.png?1);background-position:center;background-repeat:no-repeat;background-position: center;" value='&{template:defense} {{name=@{armor1-name}}} {{attribute=[[@{defense-ability}+?{Enemy Disdvantage|0}+@{armor-impeding}+@{extra-armor}]]}} {{attribute1=[[1+@{defense-ability}+?{Enemy Disdvantage|0}+@{armor-impeding}+@{extra-armor}]]}} {{defense-roll=[[1d20]]}} {{damage-taken=[[@{armor1-dtype}+@{armor1-extra-dtype}+@{negated-damage}]]}} {{defense-crit=[[1d20]]}} {{damage-crit=[[1d6]]}} {{character-name=@{character-name}}}'></button>
+                    <button type='roll' name="roll_attack" title="Use attack!" value='&{template:attack}{{name=@{weapon1-name}}}{{attribute=[[@{attack-ability1}+?{Enemy Disdvantage|0}+@{weapon1-extra-attack}]]}}{{attribute1=[[@{attack-ability1}+?{Enemy Disdvantage|0}+@{weapon1-extra-attack}+1]]}} {{attack=[[1d20]]}} {{damage=[[@{weapon1-dtype}+@{weapon1-extra-dtype}+@{weapon1-extra-damage}]]}} {{damage-crit=[[1d6]]}} {{character-name=@{character-name}}} {{attack-type=[[@{attack-ability1}]]}}'style="background-image:url(http://i.imgur.com/EPH4536.png);background-position:center;background-repeat:no-repeat;height:100%;width:100%"></button>
                 </div>
                 <div>
-                    <label>Armor name</label>
-                    <input type="text" style="font-weight:bold;width:12em;height:2em;margin:0" name="attr_armor1-name" title="Armor the character is wearing" placeholder="Armor"/>
-                </div>
-                <div> 
-					<label>Impede</label>
-                    <input class="sheet-number-box-small" title="Armor's impeding penalty" type="number" min="-4" max="0" value="0" name="attr_armor-impeding" style="width:55px;"/>
+                    <input type="text" style="font-weight:bold;width:16em;height:2em;margin:0" name="attr_weapon1-name" title="Weapon or power used in attack"/>
                 </div>
                 <div>
-                    <label>Attribute</label>
-                    <select name="attr_defense-ability" style="width:auto;" size="1" title="Ability that determines defense, usually Quick">
-                        <option value="[[0]]">Bonus def</option>
-                        <option value="[[@{accurate}]]" >Accurate</option>
+                    <select name="attr_attack-ability1" style="width:auto;" size="1" title="Ability that determines a hit, usually Accurate">
+                        <option value="[[-1]]">Bonus dmg</option>
+                        <option value="[[@{accurate}]]" selected>Accurate</option>
                         <option value="[[@{cunning}]]">Cunning</option>
                         <option value="[[@{discreet}]]">Discreet</option>
                         <option value="[[@{persuasive}]]">Persuasive</option>
-                        <option value="[[@{quick}]]"selected>Quick</option>
+                        <option value="[[@{quick}]]">Quick</option>
                         <option value="[[@{resolute}]]">Resolute</option>
                         <option value="[[@{strong}]]">Strong</option>
                         <option value="[[@{vigilant}]]">Vigilant</option>
                     </select>
                 </div>
                 <div>
-                    <label>Negation</label>
-                    <select name="attr_armor1-dtype" title="Defense roll for the armor" style="width:55px;">                  
-                            <option value="0"></option>                    
-                            <option value="d4" selected>d4</option>
-                            <option value="d6">d6</option>
-                            <option value="d8">d8</option>
-                            <option value="d10">d10</option>
-                            <option value="d12">d12</option>
-                        </select>
+                    <select name="attr_weapon1-dtype" title="Attack roll for the weapon" style="width:55px;">                
+                        <option value="0"></option>               
+                        <option value="d4">d4</option>
+                        <option value="d6">d6</option>
+                        <option value="d8" selected>d8</option>
+                        <option value="d10">d10</option>
+                        <option value="d12">d12</option>
+                    </select>
                 </div>
                 <div>
-                    <label>Quality</label>
-                    <select class="attr_armor1-quality">
-                        <option value="0"></option>
-                        <option value="1">Flexible</option>
-                        <option value="2">Cumbersome</option>
+                    <select name="attr_weapon1-quality">
+                        <option value="0" selected> </option>
+                        <option value="1">Balanced</option>
+                        <option value="2">Blunt</option>
+                        <option value="3">Deep Impact</option>
+                        <option value="4">Jointed</option>
+                        <option value="5">Long</option>
+                        <option value="6">Precise</option>
+                        <option value="7">Short</option>
                     </select>
                 </div>
                 <div class="sheet-faded" style="margin-left:1em;">
-                    <label style="text-align:center;">Bonuses/Disadvantages</label>
                     <div>
-                        <label style="width:48px;text-align:center;">Damage</label>
-                        <input type="number" name="attr_negated-damage" title="Any damage reduction from skills or items" class="sheet-number-box-small" style="vertical-align:top;width:48px;text-align:center;" value="0"/>
-                    </div>
-                    <div>
-                        <label style="width:48px;text-align:center;">Roll</label>
-                            <select name="attr_armor1-extra-dtype" style="width:48px;text-align:center;" title="Damage negated due to an ability">
-                                <option value="0"></option>
+                        <div>
+                            <input type="number" name="attr_weapon1-extra-damage" title="Bonus to damage" class="sheet-number-box-small" style="vertical-align:top;width:48px;text-align:center;" value="0"/>
+                        </div>
+                        <div>
+                            <select name="attr_weapon1-extra-dtype" style="width:48px;text-align:center;" title="Extra damage roll due to an ability">
+                                <option value="0" selected></option>
                                 <option value="d4">d4</option>
                                 <option value="d6">d6</option>
                                 <option value="d8">d8</option>
                                 <option value="d10">d10</option>
                                 <option value="d12">d12</option>
                             </select>
+                        </div>
+                        <div>
+                            <input type="number" name="attr_weapon1-extra-attack" title="Bonus to attack roll" class="sheet-number-box-small" style="vertical-align:top;width:48px;text-align:center;" value="0" />
+                        </div>
                     </div>
-                    <div>
-                        <label style="width:48px;text-align:center;">Defense</label>
-                        <input type="number" name="attr_extra-armor" title="Any bonus to defense, including shields" class="sheet-number-box-small" style="vertical-align:top;width:48px;text-align:center;" value="0" />  
-                    </div>
-                
                 </div>
-            </div><!--Button and weapon info-->
-        </div>
-        <fieldset class="repeating_armor" >
-            <div class="sheet-row-with-labels">
-                <div style="width:28px;height:28px;vertical-align:middle;">
-                    <button type='roll' name="roll_defense" style="background-image:url(http://i.imgur.com/QFy0qCe.png?1);background-position:center;background-repeat:no-repeat;background-position: center;background-size:10px 10px;height:100%;width:100%;" value='&{template:defense} {{name=@{armor1-name}}} {{attribute=[[@{defense-ability}+?{Enemy Disdvantage|0}+@{armor-impeding}+@{extra-armor}]]}} {{attribute1=[[1+@{defense-ability}+?{Enemy Disdvantage|0}+@{armor-impeding}+@{extra-armor}]]}} {{defense-roll=[[1d20]]}} {{damage-taken=[[@{armor1-dtype}+@{armor1-extra-dtype}+@{negated-damage}]]}} {{defense-crit=[[1d20]]}} {{damage-crit=[[1d6]]}} {{character-name=@{character-name}}}'></button>
+            </div>    
+        </fieldset>
+    </div> <!-- END Weapons-->
+    <div class="sheet-row"><!-- Begin Armor -->
+        <label class="sheet-label-large" style="margin: .5em 0 -.5em 0;">Defenses</label>
+		<div class="sheet-row-with-labels">
+            <div>
+                <button type='roll' name="roll_defense" value="&{template:defense}{{name=@{armor1-name}}}{{attribute=[[@{defense-ability}+?{Enemy Disdvantage|0}+@{armor-impeding}+@{extra-armor}]]}}{{attribute1=[[1+@{defense-ability}+?{Enemy Disdvantage|0}+@{armor-impeding}+@{extra-armor}]]}}{{defense-roll=[[1d20]]}}{{damage-taken=[[@{armor1-dtype}+@{armor1-extra-dtype}+@{negated-damage}]]}}{{defense-crit=[[1d20]]}}{{damage-crit=[[1d6]]}}{{character-name=@{character-name}}} {{defense-type=[[@{defense-ability}]]}}" style="background-image:url(http://i.imgur.com/QFy0qCe.png?1);background-position:center;background-repeat:no-repeat;background-position:center;background-size:28px 28px;width:100%;height:100%"></button>
+            </div>
+            <div>
+                <label>Armor or Power</label>
+                <input type="text" style="font-weight:bold;width:14em;height:2em;margin:0" name="attr_armor1-name" title="Armor the character is wearing, or Power used to defend"/>
+            </div>
+            <div> 
+				<label>Impede</label>
+                <input class="sheet-number-box-small" title="Armor's impeding penalty" type="number" min="-4" max="0" value="0" name="attr_armor-impeding" style="width:55px;"/>
+            </div>
+            <div>
+                <label>Attribute</label>
+                <select name="attr_defense-ability" style="width:auto;" size="1" title="Ability that determines defense, usually Quick">
+                    <option value="[[-1]]">Bonus def</option>
+                    <option value="[[@{accurate}]]" >Accurate</option>
+                    <option value="[[@{cunning}]]">Cunning</option>
+                    <option value="[[@{discreet}]]">Discreet</option>
+                    <option value="[[@{persuasive}]]">Persuasive</option>
+                    <option value="[[@{quick}]]"selected>Quick</option>
+                    <option value="[[@{resolute}]]">Resolute</option>
+                    <option value="[[@{strong}]]">Strong</option>
+                    <option value="[[@{vigilant}]]">Vigilant</option>
+                </select>
+            </div>
+            <div>
+                <label>Negation</label>
+                <select name="attr_armor1-dtype" title="Defense roll for the armor" style="width:55px;">                  
+                        <option value="0"></option>                    
+                        <option value="d4" selected>d4</option>
+                        <option value="d6">d6</option>
+                        <option value="d8">d8</option>
+                        <option value="d10">d10</option>
+                        <option value="d12">d12</option>
+                    </select>
+            </div>
+            <div>
+                <label>Quality</label>
+                <select class="attr_armor1-quality">
+                    <option value="0"></option>
+                    <option value="1">Flexible</option>
+                    <option value="2">Cumbersome</option>
+                </select>
+            </div>
+            <div class="sheet-faded" style="margin-left:1em;">
+                <label style="text-align:center;">Bonuses/Disadvantages</label>
+                <div>
+                    <label style="width:48px;text-align:center;">Damage</label>
+                    <input type="number" name="attr_negated-damage" title="Any damage reduction from skills or items" class="sheet-number-box-small" style="vertical-align:top;width:48px;text-align:center;" value="0"/>
                 </div>
                 <div>
-                    <input type="text" style="font-weight:bold;width:12em;height:2em;margin:0" name="attr_armor1-name" title="Armor the character is wearing" placeholder="Armor"/>
-                </div>
-                <div>
-                    <input class="sheet-number-box-small" title="Armor's impeding penalty" type="number" min="-4" max="0" value="0" name="attr_armor-impeding" style="width:55px;"/>
-                </div>
-                <div>
-                        <select name="attr_defense-ability" style="width:auto;" size="1" title="Ability that determines defense, usually Quick">
-                            <option value="[[0]]">Bonus def</option>
-                            <option value="[[@{accurate}]]" >Accurate</option>
-                            <option value="[[@{cunning}]]">Cunning</option>
-                            <option value="[[@{discreet}]]">Discreet</option>
-                            <option value="[[@{persuasive}]]">Persuasive</option>
-                            <option value="[[@{quick}]]"selected>Quick</option>
-                            <option value="[[@{resolute}]]">Resolute</option>
-                            <option value="[[@{strong}]]">Strong</option>
-                            <option value="[[@{vigilant}]]">Vigilant</option>
-                        </select>
-                </div>
-                <div>
-                        <select name="attr_armor1-dtype" title="Defense roll for the armor" style="width:55px;">                    
-                            <option value="0"></option>                  
+                    <label style="width:48px;text-align:center;">Roll</label>
+                        <select name="attr_armor1-extra-dtype" style="width:48px;text-align:center;" title="Damage negated due to an ability">
+                            <option value="0"></option>
                             <option value="d4">d4</option>
                             <option value="d6">d6</option>
                             <option value="d8">d8</option>
@@ -390,32 +346,71 @@ Advantage button - auto calculate +2atk and 1d4dmg
                         </select>
                 </div>
                 <div>
-                    <select class="attr_armor1-quality">
-                        <option value="0"></option>
-                        <option value="1">Flexible</option>
-                        <option value="2">Cumbersome</option>
+                    <label style="width:48px;text-align:center;">Defense</label>
+                    <input type="number" name="attr_extra-armor" title="Any bonus to defense, including shields" class="sheet-number-box-small" style="vertical-align:top;width:48px;text-align:center;" value="0" />  
+                </div>
+            
+            </div>
+        </div>
+        <fieldset class="repeating_armor" ><div class="sheet-row-with-labels">
+            <div>
+                <button type='roll' name="roll_defense" value="&{template:defense}{{name=@{armor1-name}}}{{attribute=[[@{defense-ability}+?{Enemy Disdvantage|0}+@{armor-impeding}+@{extra-armor}]]}}{{attribute1=[[1+@{defense-ability}+?{Enemy Disdvantage|0}+@{armor-impeding}+@{extra-armor}]]}}{{defense-roll=[[1d20]]}}{{damage-taken=[[@{armor1-dtype}+@{armor1-extra-dtype}+@{negated-damage}]]}}{{defense-crit=[[1d20]]}}{{damage-crit=[[1d6]]}}{{character-name=@{character-name}}} {{defense-type=[[@{defense-ability}]]}}" style="background-image:url(http://i.imgur.com/QFy0qCe.png?1);background-position:center;background-repeat:no-repeat;background-position:center;background-size:28px 28px;width:100%;height:100%"></button>
+            </div>
+            <div>
+                <input type="text" style="font-weight:bold;width:14em;height:2em;margin:0" name="attr_armor1-name" title="Armor the character is wearing, or Power used to defend"/>
+            </div>
+            <div> 
+                <input class="sheet-number-box-small" title="Armor's impeding penalty" type="number" min="-4" max="0" value="0" name="attr_armor-impeding" style="width:55px;"/>
+            </div>
+            <div>
+                <select name="attr_defense-ability" style="width:auto;" size="1" title="Ability that determines defense, usually Quick">
+                    <option value="[[-1]]">Bonus def</option>
+                    <option value="[[@{accurate}]]" >Accurate</option>
+                    <option value="[[@{cunning}]]">Cunning</option>
+                    <option value="[[@{discreet}]]">Discreet</option>
+                    <option value="[[@{persuasive}]]">Persuasive</option>
+                    <option value="[[@{quick}]]"selected>Quick</option>
+                    <option value="[[@{resolute}]]">Resolute</option>
+                    <option value="[[@{strong}]]">Strong</option>
+                    <option value="[[@{vigilant}]]">Vigilant</option>
+                </select>
+            </div>
+            <div>
+                <select name="attr_armor1-dtype" title="Defense roll for the armor" style="width:55px;">                  
+                        <option value="0"></option>                    
+                        <option value="d4" selected>d4</option>
+                        <option value="d6">d6</option>
+                        <option value="d8">d8</option>
+                        <option value="d10">d10</option>
+                        <option value="d12">d12</option>
                     </select>
+            </div>
+            <div>
+                <select class="attr_armor1-quality">
+                    <option value="0"></option>
+                    <option value="1">Flexible</option>
+                    <option value="2">Cumbersome</option>
+                </select>
+            </div>
+            <div class="sheet-faded" style="margin-left:1em;">
+                <div>
+                    <input type="number" name="attr_negated-damage" title="Any damage reduction from skills or items" class="sheet-number-box-small" style="vertical-align:top;width:48px;text-align:center;" value="0"/>
                 </div>
-                <div class="sheet-faded" style="margin-left:1em;">
-                    <div>
-                            <input type="number" name="attr_negated-damage" title="Any damage reduction from skills or items" class="sheet-number-box-small" style="vertical-align:top;width:48px;text-align:center;" value="0"/>
-                    </div>
-                    <div>
-                            <select name="attr_armor1-extra-dtype" style="width:48px;text-align:center;" title="Damage negated due to an ability">
-                                <option value="0"></option>
-                                <option value="d4">d4</option>
-                                <option value="d6">d6</option>
-                                <option value="d8">d8</option>
-                                <option value="d10">d10</option>
-                                <option value="d12">d12</option>
-                            </select>
-                    </div>
-                    <div>
-                        <input type="number" name="attr_extra-armor" title="Any bonus to defense, including shields" class="sheet-number-box-small" style="vertical-align:top;width:48px;text-align:center;" value="0" />  
-                    </div>
-                
+                <div>
+                        <select name="attr_armor1-extra-dtype" style="width:48px;text-align:center;" title="Damage negated due to an ability">
+                            <option value="0"></option>
+                            <option value="d4">d4</option>
+                            <option value="d6">d6</option>
+                            <option value="d8">d8</option>
+                            <option value="d10">d10</option>
+                            <option value="d12">d12</option>
+                        </select>
                 </div>
-            </div><!--Button and weapon info-->
+                <div>
+                    <input type="number" name="attr_extra-armor" title="Any bonus to defense, including shields" class="sheet-number-box-small" style="vertical-align:top;width:48px;text-align:center;" value="0" />  
+                </div>
+            
+            </div>
         </div>
         </fieldset>
     </div> <!-- END Armor-->
@@ -651,19 +646,44 @@ Advantage button - auto calculate +2atk and 1d4dmg
                 <div style="margin-bottom:1em;">
                     <label class="sheet-label-large">Items</label>
                     <div>
-                        <input type="text" style="width:290px" name="attr_item-name" title="Item Name" placeholder="Item Name"/>
-                        <input type="number" class="sheet-number-box-small" name="attr_item-quantity" placeholder="#"  title="Item Quantity" style="width:5em;text-align:left;padding-left:.5em;"/>
+                        <input type="text" style="width:290px" name="attr_item-sleeping-roll" title="Standard equipment" value="Sleeping roll"/>
+                        <input type="number" class="sheet-number-box-small" name="attr_item-sleeping-roll-quantity" value="1" title="Item Quantity" style="width:5em;text-align:left;padding-left:.5em;"/>
+                    </div>
+                    <div>
+                        <input type="text" style="width:290px" name="attr_item-cooking-pan" title="Standard equipment" value="Cooking equipment"/>
+                        <input type="number" class="sheet-number-box-small" name="attr_item-cooking-pan-quantity" value="1" title="Item Quantity" style="width:5em;text-align:left;padding-left:.5em;"/>
+                    </div>
+                    <div>
+                        <input type="text" style="width:290px" name="attr_item-firewood" title="Standard equipment" value="Firewood"/>
+                        <input type="number" class="sheet-number-box-small" name="attr_item-firewood-quantity" value="1" title="Item Quantity" style="width:5em;text-align:left;padding-left:.5em;"/>
+                    </div>
+                    <div>
+                        <input type="text" style="width:290px" name="attr_item-flint-and-steel" title="Standard equipment" value="Flint and Steel"/>
+                        <input type="number" class="sheet-number-box-small" name="attr_item-flint-and-steel-quantity" value="1" title="Item Quantity" style="width:5em;text-align:left;padding-left:.5em;"/>
+                    </div>
+                    <div>
+                        <input type="text" style="width:290px" name="attr_item-rope" title="Standard equipment" value="Rope"/>
+                        <input type="number" class="sheet-number-box-small" name="attr_item-rope-quantity" value="1" title="Item Quantity" style="width:5em;text-align:left;padding-left:.5em;"/>
+                    </div>
+                    <div>
+                        <input type="text" style="width:290px" name="attr_item-waterskin" title="Standard equipment" value="Waterskin"/>
+                        <input type="number" class="sheet-number-box-small" name="attr_item-waterskin-quantity" value="1" title="Item Quantity" style="width:5em;text-align:left;padding-left:.5em;"/>
                     </div>
                     <fieldset class="repeating_item">
                         <input type="text" style="width:290px" name="attr_item-name" title="Item Name" placeholder="Item Name"/>
-                        <input type="number" class="sheet-number-box-small" name="attr_item-quantity" placeholder="#"  title="Item Quantity" style="width:5em;text-align:left;padding-left:.5em;"/>
+                        <input type="number" class="sheet-number-box-small" name="attr_item-quantity" value="1" title="Item Quantity" style="width:5em;text-align:left;padding-left:.5em;"/>
                     </fieldset>
                 </div>
             </div> <!-- END column 1 -->
             <div class="sheet-col">
                 <div class="sheet-ability-section">
+                    <label style="font-size:3em;margin-bottom:-.75em;margin-left:-16px;">&ldquo;</label>
+                    <textarea name="attr_character-quote"style="height:2em;width:100%;background:rgba(1,1,1,0.5);border:none;color:#fafafa;font-size:1.5em;padding:.5em;font-style:italic;" placeholder="Quote"></textarea> 
+                    <span style="font-size:3em;float:right;margin-right:-18px;margin-top:-.25em;width:auto;">&rdquo;</span>
+                </div>
+                <div class="sheet-ability-section">
                     <label class="sheet-label-large">Character Background</label>
-                    <textarea name="attr_background"placeholder="Explain where your character comes from and where he or she wants to go and accomplish." ></textarea>
+                    <textarea name="attr_background" placeholder="Explain where your character comes from and where he or she wants to go and accomplish." ></textarea>
                 </div>
                 <div class="sheet-ability-section">
                     <label class="sheet-label-large">Group</label>
@@ -692,39 +712,53 @@ Advantage button - auto calculate +2atk and 1d4dmg
     </div>
 </div> 
 
+
 <rolltemplate class="sheet-rolltemplate-defense">
     <table>
-        <tr><th colspan="2">{{character-name}}<span> defends using </span>{{name}}</th></tr>
-        <tr><td style="text-align:right;width:66%"><span>Attribute:</span></td><td> {{attribute}}</td></tr>
-        <tr><td style="text-align:right;"><span>Roll:</span></td><td>{{defense-roll}}</td></tr>
-        {{#rollLess() defense-roll attribute1}} <!-- miss -->
-        {{#^rollWasFumble() defense-roll}}<tr><th colspan="2"><span>Enemy missed!</span></th></tr>{{/^rollWasFumble() defense-roll}}
-        {{#rollWasFumble() defense-roll}} <tr><th colspan="2" style="text-shadow:1px 1px 1px DarkGreen"><span>Enemy critically missed!</span></th></tr>{{/rollWasFumble() defense-roll}}
-        {{/rollLess() defense-roll attribute1}}
-        
-        {{#rollGreater() defense-roll attribute}} <!-- hit -->
-             {{#^rollWasCrit() defense-roll}}<tr><th colspan="2"><span>Enemy  hit!</span></th></tr>{{/^rollWasCrit() defense-roll}}
-             {{#rollWasCrit() defense-roll}}<tr><th colspan="2"><span style="text-shadow:1px 1px 1px DarkRed">Enemy critically hit!</span></th></tr>{{/rollWasCrit() defense-roll}}
+        {{#rollLess() defense-type 0}}
+    		<tr><th colspan="2">{{character-name}}<span> negates extra damage</span>{{#name}}<span> with </span>{{name}}{{/name}}</th></tr>
             <tr><td style="text-align:right;"><span>Damage negated:</span></td><td>{{damage-taken}}</td></tr>
-        {{/rollGreater() defense-roll attribute}}
+        {{/rollLess() defense-type 0}}
+        
+        {{#rollGreater() defense-type 0}}                
+			<tr><th colspan="2">{{character-name}}<span> defends</span>{{#name}}<span> using </span>{{name}}{{/name}}</th></tr>
+			<tr><td style="text-align:right;width:66%"><span>Attribute:</span></td><td> {{attribute}}</td></tr>
+			<tr><td style="text-align:right;"><span>Roll:</span></td><td>{{defense-roll}}</td></tr>
+			{{#rollLess() defense-roll attribute1}} <!-- miss -->
+			    {{#^rollWasFumble() defense-roll}}<tr><th colspan="2"><span>Enemy missed!</span></th></tr>{{/^rollWasFumble() defense-roll}}
+			    {{#rollWasFumble() defense-roll}} <tr><th colspan="2" style="text-shadow:1px 1px 1px DarkGreen"><span>Enemy critically missed!</span></th></tr>{{/rollWasFumble() defense-roll}}
+			{{/rollLess() defense-roll attribute1}}
+			
+			{{#rollGreater() defense-roll attribute}} <!-- hit -->
+				 {{#^rollWasCrit() defense-roll}}<tr><th colspan="2"><span>Enemy  hit!</span></th></tr>{{/^rollWasCrit() defense-roll}}
+				 {{#rollWasCrit() defense-roll}}<tr><th colspan="2"><span style="text-shadow:1px 1px 1px DarkRed">Enemy critically hit!</span></th></tr>{{/rollWasCrit() defense-roll}}
+                {{#rollGreater() damage-taken 0 }}<tr><td style="text-align:right;"><span>Damage negated:</span></td><td>{{damage-taken}}</td></tr>{{/rollGreater() damage-taken 0 }}
+                {{#rollLess() damage-taken 1}}<tr><td style="text-align:right;"><span>Damage negated:</span></td><td>0</td></tr>{{/rollLess() damage-taken 1}}
+			{{/rollGreater() defense-roll attribute}}
+        {{/rollGreater() defense-type 0}}
     </table>
 </rolltemplate>
- 
 <rolltemplate class="sheet-rolltemplate-attack">
     <table>
-        <tr><th colspan="2">{{character-name}}<span> attacks using </span>{{name}}</th></tr>
-        <tr><td style="text-align:right;width:60%"><span>Attribute:</span></td><td> {{attribute}}</td></tr>
-        <tr><td style="text-align:right;"><span>Roll:</span></td><td>{{attack}}</td></tr>
-        {{#rollLess() attack attribute1}}
-            {{#^rollWasFumble() attack}}<tr><th colspan="2">Attack hit!</th></tr>{{/^rollWasFumble() attack}}
-            {{#rollWasFumble() attack}} <tr><th colspan="2" style="text-shadow:1px 1px 1px DarkGreen">Attack critically hit!</th></tr>{{/rollWasFumble() attack}}
-            {{#rollGreater() damage 0}}<tr><td style="text-align:right;"><span>Damage:</span></td><td>{{damage}} {{#rollWasFumble() attack}} + {{damage-crit}} {{/rollWasFumble() attack}}</td></tr>{{/rollGreater() damage 0}}
-        {{/rollLess() attack attribute1}}
-        
-        {{#rollGreater() attack attribute}}
-            {{#^rollWasCrit() attack}}<tr style="text-align:center;"><th colspan="2">Attack missed!</th></tr>{{/^rollWasCrit() attack}}
-            {{#rollWasCrit() attack}}<tr><th colspan="2" style="text-shadow:1px 1px 1px DarkRed"><span>Attack critically missed!</span></th></tr>{{/rollWasCrit() attack}}
-        {{/rollGreater() attack attribute}}
-        
+        {{#rollLess() attack-type 0}}
+        	<tr><th colspan="2">{{character-name}}<span> does extra damage</span> {{#name}}<span> with </span>{{name}}{{/name}}</th></tr>
+			<tr><td style="text-align:right;"><span>Damage:</span></td><td>{{damage}}</td></tr>		
+        {{/rollLess() attack-type 0}}
+        {{#rollGreater() attack-type 0}}
+            
+			<tr><th colspan="2">{{character-name}}<span> attacks</span>{{#name}}<span> using </span>{{name}}{{/name}}</th></tr>
+            <tr><td style="text-align:right;width:60%">	<span>Attribute: </span></td><td>{{attribute}}	</td></tr>
+            <tr><td style="text-align:right;">			<span>Roll:</span>		</td><td>{{attack}}		</td></tr> 
+			{{#rollLess() attack attribute1}}
+				{{#^rollWasFumble() attack}}<tr><th colspan="2">Attack hit!</th></tr>{{/^rollWasFumble() attack}}
+				{{#rollWasFumble() attack}} <tr><th colspan="2" style="text-shadow:1px 1px 1px DarkGreen">Attack critically hit!</th></tr>{{/rollWasFumble() attack}}
+				{{#rollGreater() damage 0}}<tr><td style="text-align:right;"><span>Damage:</span></td><td>{{damage}} {{#rollWasFumble() attack}}<span> + </span> {{damage-crit}} {{/rollWasFumble() attack}}</td></tr>{{/rollGreater() damage 0}}
+			{{/rollLess() attack attribute1}}
+			        
+			{{#rollGreater() attack attribute}}
+				{{#^rollWasCrit() attack}}<tr style="text-align:center;"><th colspan="2">Attack missed!</th></tr>{{/^rollWasCrit() attack}}
+				{{#rollWasCrit() attack}}<tr><th colspan="2" style="text-shadow:1px 1px 1px DarkRed"><span>Attack critically missed!</span></th></tr>{{/rollWasCrit() attack}}
+			{{/rollGreater() attack attribute}}  
+        {{/rollGreater() attack-type 0}} 
     </table>
 </rolltemplate>
