@@ -75,7 +75,10 @@ const getIntValue = (value, defaultValue) => {
   if (!defaultValue) {
     defaultValue = 0;
   }
-  return parseInt(value, 10) || defaultValue;
+  if (typeof value === 'undefined') {
+    return defaultValue;
+  }
+  return parseInt(value, 10);
 };
 const getFloatValue = (value, defaultValue) => {
   if (!defaultValue) {
