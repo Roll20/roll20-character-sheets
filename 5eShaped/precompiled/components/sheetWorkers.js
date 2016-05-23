@@ -1,7 +1,7 @@
 /* global setAttrs:false, getAttrs:false, on:false, getSectionIDs:false, generateRowID:false */
 'use strict';
 
-const currentVersion = '3.1.4';
+const currentVersion = '3.3.1';
 let TRANSLATIONS;
 const SKILLS = {
   acrobatics: 'dexterity',
@@ -75,7 +75,10 @@ const getIntValue = (value, defaultValue) => {
   if (!defaultValue) {
     defaultValue = 0;
   }
-  return parseInt(value, 10) || defaultValue;
+  if (typeof value === 'undefined') {
+    return defaultValue;
+  }
+  return parseInt(value, 10);
 };
 const getFloatValue = (value, defaultValue) => {
   if (!defaultValue) {
@@ -1572,9 +1575,8 @@ const updateSpellSlots = () => {
     }
   }
   getAttrs(collectionArray, (v) => {
-    let casterLevel = getIntValue(v.caster_level);
-    let casterType = v.caster_type;
-
+    const casterLevel = getIntValue(v.caster_level);
+    const casterType = v.caster_type;
 
     if (casterType === 'full') {
       if (casterLevel >= 3) {
@@ -2696,7 +2698,6 @@ const updateHigherLevelToggle = (v, finalSetAttrs, repeatingString) => {
 
   const higherLevelToggle = v[`${repeatingString}higher_level_toggle`];
   if (exists(higherLevelToggle) && higherLevelToggle === '@{higher_level_toggle_var}') {
-
     const spellLevel = getIntValue(v[`${repeatingString}spell_level`]);
     finalSetAttrs[`${repeatingString}higher_level_query`] = `@{higher_level_query_${spellLevel}}`;
 
@@ -2721,6 +2722,51 @@ const updateHigherLevelToggle = (v, finalSetAttrs, repeatingString) => {
       }
       finalSetAttrs[`${repeatingString}heal_formula`] += '((@{higher_level_query} - @{spell_level}) * @{higher_level_dice})@{higher_level_die}[higher lvl] + (@{higher_level_heal} * (@{higher_level_query} - @{spell_level}))[higher lvl flat amount]';
     }
+  }
+};
+
+const updateCritDamage = () => {
+  const repeatingItems = ['repeating_attack', 'repeating_spell', 'repeating_trait', 'repeating_action', 'repeating_reaction', 'repeating_legendaryaction', 'repeating_lairaction', 'repeating_regionaleffect'];
+  const collectionArray = [];
+  const finalSetAttrs = {};
+
+  for (const repeatingItem of repeatingItems) {
+    getSectionIDs(repeatingItem, (ids) => {
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
+        collectionArray.push(`${repeatingString}damage`);
+        collectionArray.push(`${repeatingString}damage_crit`);
+        collectionArray.push(`${repeatingString}second_damage`);
+        collectionArray.push(`${repeatingString}second_damage_crit`);
+      }
+
+      getAttrs(collectionArray, (v) => {
+        for (const id of ids) {
+          const repeatingString = `${repeatingItem}_${id}_`;
+
+          if (!v[`${repeatingString}damage_crit`] && v[`${repeatingString}damage`]) {
+            finalSetAttrs[`${repeatingString}damage_crit`] = v[`${repeatingString}damage`];
+          } else if (v[`${repeatingString}damage`] && v[`${repeatingString}damage_crit`]) {
+            finalSetAttrs[`${repeatingString}damage_crit`] = `${v[`${repeatingString}damage`]} + ${v[`${repeatingString}damage_crit`]}`;
+          }
+          if (!v[`${repeatingString}second_damage_crit`] && v[`${repeatingString}second_damage`]) {
+            finalSetAttrs[`${repeatingString}second_damage_crit`] = v[`${repeatingString}second_damage`];
+          } else if (v[`${repeatingString}second_damage`] && v[`${repeatingString}second_damage_crit`]) {
+            finalSetAttrs[`${repeatingString}second_damage_crit`] = `${v[`${repeatingString}second_damage`]} + ${v[`${repeatingString}second_damage_crit`]}`;
+          }
+        }
+        setFinalAttrs(v, finalSetAttrs);
+      });
+    });
+  }
+};
+
+const setCritDamage = (v, finalSetAttrs, repeatingString) => {
+  if (!v[`${repeatingString}damage_crit`] && v[`${repeatingString}damage`]) {
+    finalSetAttrs[`${repeatingString}damage_crit`] = v[`${repeatingString}damage`];
+  }
+  if (!v[`${repeatingString}second_damage_crit`] && v[`${repeatingString}second_damage`]) {
+    finalSetAttrs[`${repeatingString}second_damage_crit`] = v[`${repeatingString}second_damage`];
   }
 };
 
@@ -2842,12 +2888,14 @@ const updateAction = (type, rowId) => {
       collectionArray.push(`${repeatingString}damage_ability`);
       collectionArray.push(`${repeatingString}damage_bonus`);
       collectionArray.push(`${repeatingString}damage_type`);
+      collectionArray.push(`${repeatingString}damage_crit`);
       collectionArray.push(`${repeatingString}second_damage_toggle`);
       collectionArray.push(`${repeatingString}second_damage_formula`);
       collectionArray.push(`${repeatingString}second_damage`);
       collectionArray.push(`${repeatingString}second_damage_ability`);
       collectionArray.push(`${repeatingString}second_damage_bonus`);
       collectionArray.push(`${repeatingString}second_damage_type`);
+      collectionArray.push(`${repeatingString}second_damage_crit`);
       collectionArray.push(`${repeatingString}damage_string`);
       collectionArray.push(`${repeatingString}heal_toggle`);
       collectionArray.push(`${repeatingString}heal`);
@@ -2924,6 +2972,7 @@ const updateAction = (type, rowId) => {
           };
         }
         updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
+        setCritDamage(v, finalSetAttrs, repeatingString);
 
         updateHealToggle(v, finalSetAttrs, repeatingString);
 
@@ -2935,9 +2984,18 @@ const updateAction = (type, rowId) => {
     });
   });
 };
+const updateActions = () => {
+  updateAction('trait');
+  updateAction('action');
+  updateAction('reaction');
+  updateAction('legendaryaction');
+  updateAction('lairaction');
+  updateAction('regionaleffect');
+};
+
 const updateActionIfTriggered = (type, eventInfo) => {
   const repeatingInfo = getRepeatingInfo(`repeating_${type}`, eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'name' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
+  if (repeatingInfo && repeatingInfo.field !== 'name' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'damage_crit' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'second_damage_crit' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
     updateAction(type, repeatingInfo.rowId);
   }
 };
@@ -2961,11 +3019,11 @@ on('change:repeating_regionaleffect', (eventInfo) => {
 });
 
 const updateAttackChatMacro = () => {
-  const repeatingItem = `repeating_attack`;
-  const collectionArray = [`attacks_macro_var`];
+  const repeatingItem = 'repeating_attack';
+  const collectionArray = ['attacks_macro_var'];
   const finalSetAttrs = {};
 
-  finalSetAttrs[`attacks_macro_var`] = '';
+  finalSetAttrs.attacks_macro_var = '';
 
   getSectionIDs(repeatingItem, (ids) => {
     for (const id of ids) {
@@ -2982,10 +3040,10 @@ const updateAttackChatMacro = () => {
         }
 
         if (id !== ids[0]) {
-          finalSetAttrs[`attacks_macro_var`] += ', ';
+          finalSetAttrs.attacks_macro_var += ', ';
         }
 
-        finalSetAttrs[`attacks_macro_var`] += `[${actionName}](~repeating_attack_${id}_attack)`;
+        finalSetAttrs.attacks_macro_var += `[${actionName}](~repeating_attack_${id}_attack)`;
       }
       setFinalAttrs(v, finalSetAttrs);
     });
@@ -3029,12 +3087,14 @@ const updateAttack = (rowId) => {
       collectionArray.push(`${repeatingString}damage_ability`);
       collectionArray.push(`${repeatingString}damage_bonus`);
       collectionArray.push(`${repeatingString}damage_type`);
+      collectionArray.push(`${repeatingString}damage_crit`);
       collectionArray.push(`${repeatingString}second_damage_toggle`);
       collectionArray.push(`${repeatingString}second_damage_formula`);
       collectionArray.push(`${repeatingString}second_damage`);
       collectionArray.push(`${repeatingString}second_damage_ability`);
       collectionArray.push(`${repeatingString}second_damage_bonus`);
       collectionArray.push(`${repeatingString}second_damage_type`);
+      collectionArray.push(`${repeatingString}second_damage_crit`);
       collectionArray.push(`${repeatingString}damage_string`);
       collectionArray.push(`${repeatingString}modifiers`);
       collectionArray.push(`${repeatingString}properties`);
@@ -3121,6 +3181,7 @@ const updateAttack = (rowId) => {
           type: 'attack',
         };
         updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
+        setCritDamage(v, finalSetAttrs, repeatingString);
       }
       setFinalAttrs(v, finalSetAttrs);
     });
@@ -3128,7 +3189,7 @@ const updateAttack = (rowId) => {
 };
 on('change:repeating_attack', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_attack', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'qty' && repeatingInfo.field !== 'weight' && repeatingInfo.field !== 'parsed') {
+  if (repeatingInfo && repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'damage_crit' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'second_damage_crit' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'qty' && repeatingInfo.field !== 'weight' && repeatingInfo.field !== 'parsed') {
     updateAttack(repeatingInfo.row);
   }
 });
@@ -3148,7 +3209,7 @@ const weighAttacks = () => {
   sumRepeating(options, sumItems);
 };
 
-on('change:repeating_attack', () => {
+on('change:repeating_attack', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_attack', eventInfo);
   if (repeatingInfo && repeatingInfo.field === 'name') {
     updateAttackChatMacro();
@@ -3203,12 +3264,14 @@ const updateSpell = (rowId) => {
       collectionArray.push(`${repeatingString}damage_ability`);
       collectionArray.push(`${repeatingString}damage_bonus`);
       collectionArray.push(`${repeatingString}damage_type`);
+      collectionArray.push(`${repeatingString}damage_crit`);
       collectionArray.push(`${repeatingString}second_damage_toggle`);
       collectionArray.push(`${repeatingString}second_damage_formula`);
       collectionArray.push(`${repeatingString}second_damage`);
       collectionArray.push(`${repeatingString}second_damage_ability`);
       collectionArray.push(`${repeatingString}second_damage_bonus`);
       collectionArray.push(`${repeatingString}second_damage_type`);
+      collectionArray.push(`${repeatingString}second_damage_crit`);
       collectionArray.push(`${repeatingString}damage_string`);
       collectionArray.push(`${repeatingString}parsed`);
       collectionArray.push(`${repeatingString}spell_level`);
@@ -3317,6 +3380,7 @@ const updateSpell = (rowId) => {
           type: 'spell',
         };
         updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
+        setCritDamage(v, finalSetAttrs, repeatingString);
 
         if (getIntValue(v.is_npc) === 1 && v.caster_level && v[`${repeatingString}damage`] && v[`${repeatingString}damage`].indexOf('@{level}') !== -1) {
           finalSetAttrs[`${repeatingString}damage`] = v[`${repeatingString}damage`].replace('@{level}', '@{caster_level}');
@@ -3336,7 +3400,7 @@ const updateSpell = (rowId) => {
 };
 on('change:repeating_spell', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_spell', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'heal_formula' && repeatingInfo.field !== 'higher_level_query' && repeatingInfo.field !== 'parsed') {
+  if (repeatingInfo && repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'damage_crit' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'second_damage_crit' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'heal_formula' && repeatingInfo.field !== 'higher_level_query' && repeatingInfo.field !== 'parsed') {
     console.info('spell repeatingInfo.field', repeatingInfo.field);
     updateSpell(repeatingInfo.rowId);
   }
@@ -4574,25 +4638,25 @@ const updateDamageResistancesVar = () => {
 
   getAttrs(collectionArray, (v) => {
     if (v.damage_vulnerabilities_exist) {
-      finalSetAttrs.damage_resistances_var = '{{Damage Vulnerabilities=@{damage_vulnerabilities}}}';
+      finalSetAttrs.damage_resistances_var += '{{Damage Vulnerabilities=@{damage_vulnerabilities}}}';
     }
     if (v.damage_resistances_exist) {
       if (finalSetAttrs.damage_resistances_var !== '') {
         finalSetAttrs.damage_resistances_var += ' ';
       }
-      finalSetAttrs.damage_resistances_var = '{{Damage Resistances=@{damage_resistances}}}';
+      finalSetAttrs.damage_resistances_var += '{{Damage Resistances=@{damage_resistances}}}';
     }
     if (v.damage_immunities_exist) {
       if (finalSetAttrs.damage_resistances_var !== '') {
         finalSetAttrs.damage_resistances_var += ' ';
       }
-      finalSetAttrs.damage_resistances_var = '{{Damage Immunities=@{damage_immunities}}}';
+      finalSetAttrs.damage_resistances_var += '{{Damage Immunities=@{damage_immunities}}}';
     }
     if (v.condition_immunities_exist) {
       if (finalSetAttrs.damage_resistances_var !== '') {
         finalSetAttrs.damage_resistances_var += ' ';
       }
-      finalSetAttrs.damage_resistances_var = '{{Condition Immunities=@{condition_immunities}}}';
+      finalSetAttrs.damage_resistances_var += '{{Condition Immunities=@{condition_immunities}}}';
     }
     setFinalAttrs(v, finalSetAttrs);
   });
@@ -4925,12 +4989,7 @@ on('change:pb', () => {
   updateSpell();
   updateJackOfAllTrades();
   updateRemarkableAthlete();
-  updateAction('trait');
-  updateAction('action');
-  updateAction('reaction');
-  updateAction('legendaryaction');
-  updateAction('lairaction');
-  updateAction('regionaleffect');
+  updateActions();
 });
 
 const extasToExtrasFix = (repeatingItem) => {
@@ -4994,52 +5053,6 @@ const fixRollTwo = () => {
   });
 };
 
-const importData = () => {
-  getAttrs(['import_data', 'version'], v => {
-    if (v.import_data) {
-      const finalSetAttrs = {};
-      const importObject = JSON.parse(v.import_data);
-
-      if (importObject.npc) {
-        if (!v.version) {
-          sheetOpened();
-        }
-        for (const prop in importObject.npc) {
-          if (importObject.npc.hasOwnProperty(prop)) {
-            finalSetAttrs[prop] = importObject.npc[prop];
-          }
-        }
-      }
-      if (importObject.spells) {
-        importObject.spells.forEach(spell => {
-          const repeatingString = `repeating_spell_${generateRowID()}_`;
-          for (const prop in spell) {
-            if (spell.hasOwnProperty(prop)) {
-              finalSetAttrs[`${repeatingString}${prop}`] = spell[prop];
-            }
-          }
-        });
-      }
-      finalSetAttrs.import_data = '';
-      finalSetAttrs.import_data_present = 'off';
-      setFinalAttrs(v, finalSetAttrs);
-    }
-  });
-};
-
-const deleteImportData = () => {
-  getAttrs(['import_data', 'version'], v => {
-    const importObject = JSON.parse(v.import_data);
-    if (importObject.npc && !v.version) {
-      sheetOpened(); //NPC import will have wiped all the existing attributes
-    }
-    setFinalAttrs({}, {
-      import_data: '',
-      import_data_present: 'off',
-    });
-  });
-};
-
 const checkVersionFormat = (version, finalSetAttrs) => {
   const versionRegex = /\d+\.\d+\.\d+/gi;
   const versionIsProperFormat = versionRegex.exec(version);
@@ -5049,9 +5062,6 @@ const checkVersionFormat = (version, finalSetAttrs) => {
   }
   return version;
 };
-
-on('change:accept_import', importData);
-on('change:reject_import', deleteImportData);
 
 const sheetOpened = () => {
   const collectionArray = ['version', 'strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma', 'import_data', 'roll_setting'];
@@ -5157,7 +5167,6 @@ const sheetOpened = () => {
         updateActionChatMacro('action');
         updateActionChatMacro('reaction');
         updateActionChatMacro('legendaryaction');
-        updateDamageResistancesVar();
       }
       if (versionCompare(version, '2.4.3') < 0) {
         setClassFeatures();
@@ -5194,6 +5203,12 @@ const sheetOpened = () => {
       if (versionCompare(version, '3.1.3') < 0) {
         updateSkill();
       }
+      if (versionCompare(version, '3.2.1') < 0) {
+        updateCritDamage();
+      }
+      if (versionCompare(version, '3.2.3') < 0) {
+        updateDamageResistancesVar();
+      }
     }
 
     if (isUndefined(version) || !version || version !== currentVersion) {
@@ -5207,3 +5222,52 @@ const sheetOpened = () => {
 on('sheet:opened', () => {
   sheetOpened();
 });
+
+
+const importData = () => {
+  getAttrs(['import_data', 'version'], v => {
+    if (v.import_data) {
+      const finalSetAttrs = {};
+      const importObject = JSON.parse(v.import_data);
+
+      if (importObject.npc) {
+        if (!v.version) {
+          sheetOpened();
+        }
+        for (const prop in importObject.npc) {
+          if (importObject.npc.hasOwnProperty(prop)) {
+            finalSetAttrs[prop] = importObject.npc[prop];
+          }
+        }
+      }
+      if (importObject.spells) {
+        importObject.spells.forEach(spell => {
+          const repeatingString = `repeating_spell_${generateRowID()}_`;
+          for (const prop in spell) {
+            if (spell.hasOwnProperty(prop)) {
+              finalSetAttrs[`${repeatingString}${prop}`] = spell[prop];
+            }
+          }
+        });
+      }
+      finalSetAttrs.import_data = '';
+      finalSetAttrs.import_data_present = 'off';
+      setFinalAttrs(v, finalSetAttrs);
+    }
+  });
+};
+
+const deleteImportData = () => {
+  getAttrs(['import_data', 'version'], v => {
+    const importObject = JSON.parse(v.import_data);
+    if (importObject.npc && !v.version) {
+      sheetOpened(); // NPC import will have wiped all the existing attributes
+    }
+    setFinalAttrs({}, {
+      import_data: '',
+      import_data_present: 'off',
+    });
+  });
+};
+on('change:accept_import', importData);
+on('change:reject_import', deleteImportData);
