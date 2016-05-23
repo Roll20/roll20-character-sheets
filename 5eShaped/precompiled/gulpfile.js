@@ -34,6 +34,7 @@ function getTranslation() {
   translations.en = JSON.parse(fs.readFileSync('./translations/en.json'));
   translations.de = JSON.parse(fs.readFileSync('./translations/de.json'));
   translations.fr = JSON.parse(fs.readFileSync('./translations/fr.json'));
+  translations.it = JSON.parse(fs.readFileSync('./translations/it.json'));
   translations.ru = JSON.parse(fs.readFileSync('./translations/ru.json'));
 }
 
@@ -68,7 +69,7 @@ function translationWrapper(lang, key) {
 }
 function translate(key) {
   getTranslationsIfTheyDontExist();
-  const translation = translationWrapper('en', key) + translationWrapper('de', key) + translationWrapper('fr', key) + translationWrapper('ru', key);
+  const translation = translationWrapper('en', key) + translationWrapper('de', key) + translationWrapper('fr', key) + translationWrapper('it', key) + translationWrapper('ru', key);
 
   return translation;
 }
@@ -117,6 +118,7 @@ const compileSheetWorkers = () => {
               de: JSON.parse(fs.readFileSync('./translations/de.json')),
               en: JSON.parse(fs.readFileSync('./translations/en.json')),
               fr: JSON.parse(fs.readFileSync('./translations/fr.json')),
+              it: JSON.parse(fs.readFileSync('./translations/it.json')),
               ru: JSON.parse(fs.readFileSync('./translations/ru.json'))
             };
             return `const TRANSLATIONS = ${JSON.stringify(translations)};`;
