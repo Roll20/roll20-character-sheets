@@ -186,7 +186,7 @@ const parseAttackComponent = (v, repeatingString, finalSetAttrs, options) => {
     let aTriggerFieldExists = false;
 
     for (const triggerField of options.triggerFields) {
-      if (exists(v[repeatingString + triggerField])) {
+      if (!isUndefined(v[repeatingString + triggerField])) {
         aTriggerFieldExists = true;
       }
     }
@@ -2432,7 +2432,7 @@ const updateAttackToggle = (v, finalSetAttrs, repeatingString, options) => {
       attackFormula += `${addArithmeticOperator(attackFormula, options.globalAttackBonus)}[${options.globalAttackBonusLabel}]`;
     }
 
-    if (!v[`${repeatingString}type`] || v[`${repeatingString}type`] === 'Melee Weapon') {
+    if (v[`${repeatingString}type`] === 'Melee Weapon') {
       if (exists(options.globalMeleeAttackBonus)) {
         if (!isNaN(options.globalMeleeAttackBonus)) {
           toHit += getIntValue(options.globalMeleeAttackBonus);
@@ -2538,7 +2538,7 @@ const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
       damageFormula += `${addArithmeticOperator(damageFormula, options.globalDamageBonus)}[global damage bonus]`;
     }
 
-    if (options && exists(options.globalMeleeDamageBonus) && (!v[`${repeatingString}type`] || v[`${repeatingString}type`] === 'Melee Weapon')) {
+    if (options && exists(options.globalMeleeDamageBonus) && (v[`${repeatingString}type`] === 'Melee Weapon')) {
       if (!isNaN(options.globalMeleeDamageBonus)) {
         damageAddition += getIntValue(options.globalMeleeDamageBonus);
       } else {
@@ -4343,12 +4343,10 @@ const parseAction = (type, rowId) => {
             actionType[1] = actionType[1].toLowerCase();
             if (actionType[1] === 'melee') {
               finalSetAttrs[`${repeatingString}type`] = 'Melee Weapon';
-            }
-            if (actionType[1] === 'ranged') {
+            } else if (actionType[1] === 'ranged') {
               finalSetAttrs[`${repeatingString}type`] = 'Ranged Weapon';
               rangedAttack = true;
-            }
-            if (actionType[1] === 'melee or ranged') {
+            } else {
               finalSetAttrs[`${repeatingString}type`] = 'Other';
             }
           }
