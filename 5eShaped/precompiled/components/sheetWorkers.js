@@ -1880,8 +1880,10 @@ const updateLevels = (repeatingInfo) => {
         }
       }
 
+      finalSetAttrs.number_of_classes = 0;
       finalSetAttrs.class_and_level = '';
       for (const prop in classLevels) {
+        finalSetAttrs.number_of_classes = finalSetAttrs.number_of_classes + 1;
         if (classLevels.hasOwnProperty(prop)) {
           finalSetAttrs[`${prop}_level`] = classLevels[prop];
           if (finalSetAttrs.class_and_level !== '') {
@@ -3410,7 +3412,7 @@ on('change:global_spell_attack_bonus change:global_spell_damage_bonus change:glo
 });
 
 const generateHigherLevelQueries = () => {
-  const collectionArray = [];
+  const collectionArray = ['warlock_level', 'number_of_classes'];
   const finalSetAttrs = {};
 
   for (let i = 1; i <= 8; i++) {
@@ -3423,12 +3425,27 @@ const generateHigherLevelQueries = () => {
   getAttrs(collectionArray, (v) => {
     for (let i = 1; i <= 8; i++) {
       let levelQuery = '';
-      for (let j = i; j <= 9; j++) {
-        if (getIntValue(v[`spell_slots_l${j}`])) {
-          levelQuery += `|${j}`;
+
+      if (i < 6 && v.number_of_classes === 1 && v.warlock_level > 0 && Math.ceil(getIntValue(v.warlock_level)/2) >= i) {
+        let spellLevel = 1;
+        if (v.warlock_level >= 9) {
+          spellLevel = 5;
+        } else if (v.warlock_level >= 7) {
+          spellLevel = 4;
+        } else if (v.warlock_level >= 5) {
+          spellLevel = 3;
+        } else if (v.warlock_level >= 3) {
+          spellLevel = 2;
+        }
+        levelQuery += `|${spellLevel}`;
+      } else {
+        for (let j = i; j <= 9; j++) {
+          if (getIntValue(v[`spell_slots_l${j}`])) {
+            levelQuery += `|${j}`;
+          }
         }
       }
-      if (levelQuery) {
+      if (levelQuery !== '') {
         finalSetAttrs[`higher_level_query_${i}`] = `?{Spell Level${levelQuery}}`;
       } else {
         finalSetAttrs[`higher_level_query_${i}`] = i;
@@ -3438,7 +3455,7 @@ const generateHigherLevelQueries = () => {
   });
 };
 
-on('change:spell_slots_l1 change:spell_slots_l2 change:spell_slots_l3 change:spell_slots_l4 change:spell_slots_l5 change:spell_slots_l6 change:spell_slots_l7 change:spell_slots_l8 change:spell_slots_l9', () => {
+on('change:warlock_level change:spell_slots_l1 change:spell_slots_l2 change:spell_slots_l3 change:spell_slots_l4 change:spell_slots_l5 change:spell_slots_l6 change:spell_slots_l7 change:spell_slots_l8 change:spell_slots_l9', () => {
   generateHigherLevelQueries();
 });
 
