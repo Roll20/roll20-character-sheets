@@ -3416,9 +3416,8 @@ on('change:global_spell_attack_bonus change:global_spell_damage_bonus change:glo
 
 const updateSpellChatMacro = () => {
   const repeatingItem = 'repeating_spell';
-  const collectionArray = ['spells_include_unprepared'];
+  const collectionArray = ['spells_show_unprepared'];
   const finalSetAttrs = {};
-
   const spells = {
     0: [],
     1: [],
@@ -3432,12 +3431,8 @@ const updateSpellChatMacro = () => {
     9: [],
   };
 
-
-  //1 list, set classes via html. Use a toggle to show unprepared spells in the list or not. <span class="unprepared"></span>
-
   for (let i = 0; i <= 9; i++) {
     collectionArray.push(`spells_level_${0}_macro_var`);
-    finalSetAttrs[`spells_level_${0}_macro_var`] = '';
   }
 
   getSectionIDs(repeatingItem, (ids) => {
@@ -3451,14 +3446,14 @@ const updateSpellChatMacro = () => {
     getAttrs(collectionArray, (v) => {
       for (const id of ids) {
         const repeatingString = `${repeatingItem}_${id}_`;
-        const includeUnprepared = v.spells_include_unprepared === 'on' || isUndefined(v.spells_include_unprepared);
+        const showUnprepared = v.spells_show_unprepared === 'on' || isUndefined(v.spells_show_unprepared);
         const spellName = v[`${repeatingString}name`];
         const spellLevel = getIntValue(v[`${repeatingString}spell_level`], 0);
         const spellPrepared = v[`${repeatingString}is_prepared`] === 'on';
 
         if (spellName && spellPrepared) {
           spells[spellLevel].push(`[${spellName}](~repeating_spell_${id}_spell)`);
-        } else if (spellName && includeUnprepared ) {
+        } else if (spellName && showUnprepared ) {
           spells[spellLevel].push(`<span class="sheet-unprepared">[${spellName}](~repeating_spell_${id}_spell)</span>`);
         }
       }
@@ -3474,18 +3469,42 @@ const updateSpellChatMacro = () => {
     });
   });
 };
-
 on('change:repeating_spell', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_spell', eventInfo);
   if (repeatingInfo && (repeatingInfo.field === 'name' || repeatingInfo.field === 'spell_level' || repeatingInfo.field === 'is_prepared')) {
     updateSpellChatMacro();
   }
 });
-on('change:spells_include_unprepared', () => {
+on('change:spells_show_unprepared', () => {
   updateSpellChatMacro();
 });
 on('remove:repeating_spell', () => {
   updateSpellChatMacro();
+});
+
+const updateSpellChatMacroShow = () => {
+  const collectionArray = ['spells_show_spell_level_if_all_slots_are_used'];
+  const finalSetAttrs = {};
+
+  for (let i = 1; i <= 9; i++) {
+    collectionArray.push(`spell_slots_l${i}`);
+  }
+
+  getAttrs(collectionArray, (v) => {
+    const showLevelIfAllSlotsAreUsed = v.spells_show_spell_level_if_all_slots_are_used === 'on' || isUndefined(v.spells_show_spell_level_if_all_slots_are_used);
+
+    for (let i = 1; i <= 9; i++) {
+      if (!showLevelIfAllSlotsAreUsed && !getIntValue(v[`spell_slots_l${i}`])) {
+        finalSetAttrs[`spells_level_${i}_show`] = '';
+      } else {
+        finalSetAttrs[`spells_level_${i}_show`] = true;
+      }
+    }
+    setFinalAttrs(v, finalSetAttrs);
+  });
+};
+on('change:spells_show_spell_level_if_all_slots_are_used change:spell_slots_l1 change:spell_slots_l2 change:spell_slots_l3 change:spell_slots_l4 change:spell_slots_l5 change:spell_slots_l6 change:spell_slots_l7 change:spell_slots_l8 change:spell_slots_l9', () => {
+  updateSpellChatMacroShow();
 });
 
 const generateHigherLevelQueries = () => {
@@ -5303,6 +5322,7 @@ const sheetOpened = () => {
       }
       if (versionCompare(version, '3.5.0') < 0) {
         updateSpellChatMacro();
+        updateSpellChatMacroShow();
       }
     }
 
