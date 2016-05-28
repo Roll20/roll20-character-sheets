@@ -1884,13 +1884,15 @@ const updateLevels = (repeatingInfo) => {
       finalSetAttrs.number_of_classes = 0;
       finalSetAttrs.class_and_level = '';
       for (const prop in classLevels) {
-        finalSetAttrs.number_of_classes = finalSetAttrs.number_of_classes + 1;
         if (classLevels.hasOwnProperty(prop)) {
-          finalSetAttrs[`${prop}_level`] = classLevels[prop];
-          if (finalSetAttrs.class_and_level !== '') {
-            finalSetAttrs.class_and_level += ', ';
+          finalSetAttrs.number_of_classes = finalSetAttrs.number_of_classes + 1;
+          if (classLevels.hasOwnProperty(prop)) {
+            finalSetAttrs[`${prop}_level`] = classLevels[prop];
+            if (finalSetAttrs.class_and_level !== '') {
+              finalSetAttrs.class_and_level += ', ';
+            }
+            finalSetAttrs.class_and_level += `${capitalize(prop)} ${classLevels[prop]}`;
           }
-          finalSetAttrs.class_and_level += `${capitalize(prop)} ${classLevels[prop]}`;
         }
       }
 
@@ -3427,7 +3429,7 @@ const generateHigherLevelQueries = () => {
     for (let i = 1; i <= 8; i++) {
       let levelQuery = '';
 
-      if (i < 6 && v.number_of_classes === 1 && v.warlock_level > 0 && Math.ceil(getIntValue(v.warlock_level)/2) >= i) {
+      if (i < 6 && v.number_of_classes === 1 && v.warlock_level > 0 && Math.ceil(getIntValue(v.warlock_level) / 2) >= i) {
         let spellLevel = 1;
         if (v.warlock_level >= 9) {
           spellLevel = 5;
