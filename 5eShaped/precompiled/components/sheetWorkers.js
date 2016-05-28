@@ -3023,38 +3023,6 @@ on('change:repeating_regionaleffect', (eventInfo) => {
   updateActionIfTriggered('regionaleffect', eventInfo);
 });
 
-const updateAttackChatMacro = () => {
-  const repeatingItem = 'repeating_attack';
-  const collectionArray = ['attacks_macro_var'];
-  const finalSetAttrs = {};
-
-  finalSetAttrs.attacks_macro_var = '';
-
-  getSectionIDs(repeatingItem, (ids) => {
-    for (const id of ids) {
-      const repeatingString = `${repeatingItem}_${id}_`;
-      collectionArray.push(`${repeatingString}name`);
-    }
-
-    getAttrs(collectionArray, (v) => {
-      for (const id of ids) {
-        const repeatingString = `${repeatingItem}_${id}_`;
-        let actionName = v[`${repeatingString}name`];
-        if (actionName && actionName.length > 50) {
-          actionName = `${actionName.substring(0, 50)}...`;
-        }
-
-        if (id !== ids[0]) {
-          finalSetAttrs.attacks_macro_var += ', ';
-        }
-
-        finalSetAttrs.attacks_macro_var += `[${actionName}](~repeating_attack_${id}_attack)`;
-      }
-      setFinalAttrs(v, finalSetAttrs);
-    });
-  });
-};
-
 const updateAttack = (rowId) => {
   const repeatingItem = 'repeating_attack';
   const collectionArray = ['pb', 'strength_mod', 'finesse_mod', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability', 'ammo_auto_use'];
@@ -3212,6 +3180,38 @@ const weighAttacks = () => {
     },
   ];
   sumRepeating(options, sumItems);
+};
+
+const updateAttackChatMacro = () => {
+  const repeatingItem = 'repeating_attack';
+  const collectionArray = ['attacks_macro_var'];
+  const finalSetAttrs = {};
+
+  finalSetAttrs.attacks_macro_var = '';
+
+  getSectionIDs(repeatingItem, (ids) => {
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
+      collectionArray.push(`${repeatingString}name`);
+    }
+
+    getAttrs(collectionArray, (v) => {
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
+        let actionName = v[`${repeatingString}name`];
+        if (actionName && actionName.length > 50) {
+          actionName = `${actionName.substring(0, 50)}...`;
+        }
+
+        if (id !== ids[0]) {
+          finalSetAttrs.attacks_macro_var += ', ';
+        }
+
+        finalSetAttrs.attacks_macro_var += `[${actionName}](~repeating_attack_${id}_attack)`;
+      }
+      setFinalAttrs(v, finalSetAttrs);
+    });
+  });
 };
 
 on('change:repeating_attack', (eventInfo) => {
@@ -3412,6 +3412,80 @@ on('change:repeating_spell', (eventInfo) => {
 });
 on('change:global_spell_attack_bonus change:global_spell_damage_bonus change:global_spell_dc_bonus change:global_spell_heal_bonus', () => {
   updateSpell();
+});
+
+const updateSpellChatMacro = () => {
+  const repeatingItem = 'repeating_spell';
+  const collectionArray = ['spells_include_unprepared'];
+  const finalSetAttrs = {};
+
+  const spells = {
+    0: [],
+    1: [],
+    2: [],
+    3: [],
+    4: [],
+    5: [],
+    6: [],
+    7: [],
+    8: [],
+    9: [],
+  };
+
+
+  //1 list, set classes via html. Use a toggle to show unprepared spells in the list or not. <span class="unprepared"></span>
+
+  for (let i = 0; i <= 9; i++) {
+    collectionArray.push(`spells_level_${0}_macro_var`);
+    finalSetAttrs[`spells_level_${0}_macro_var`] = '';
+  }
+
+  getSectionIDs(repeatingItem, (ids) => {
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
+      collectionArray.push(`${repeatingString}name`);
+      collectionArray.push(`${repeatingString}spell_level`);
+      collectionArray.push(`${repeatingString}is_prepared`);
+    }
+
+    getAttrs(collectionArray, (v) => {
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
+        const includeUnprepared = v.spells_include_unprepared === 'on' || isUndefined(v.spells_include_unprepared);
+        const spellName = v[`${repeatingString}name`];
+        const spellLevel = getIntValue(v[`${repeatingString}spell_level`], 0);
+        const spellPrepared = v[`${repeatingString}is_prepared`] === 'on';
+
+        if (spellName && spellPrepared) {
+          spells[spellLevel].push(`[${spellName}](~repeating_spell_${id}_spell)`);
+        } else if (spellName && includeUnprepared ) {
+          spells[spellLevel].push(`<span class="sheet-unprepared">[${spellName}](~repeating_spell_${id}_spell)</span>`);
+        }
+      }
+
+      for (let i = 0; i <= 9; i++) {
+        if (spells[i].length > 0) {
+          finalSetAttrs[`spells_level_${i}_macro_var`] = spells[i].join(', ');
+        } else {
+          finalSetAttrs[`spells_level_${i}_macro_var`] = '';
+        }
+      }
+      setFinalAttrs(v, finalSetAttrs);
+    });
+  });
+};
+
+on('change:repeating_spell', (eventInfo) => {
+  const repeatingInfo = getRepeatingInfo('repeating_spell', eventInfo);
+  if (repeatingInfo && (repeatingInfo.field === 'name' || repeatingInfo.field === 'spell_level' || repeatingInfo.field === 'is_prepared')) {
+    updateSpellChatMacro();
+  }
+});
+on('change:spells_include_unprepared', () => {
+  updateSpellChatMacro();
+});
+on('remove:repeating_spell', () => {
+  updateSpellChatMacro();
 });
 
 const generateHigherLevelQueries = () => {
@@ -5226,6 +5300,9 @@ const sheetOpened = () => {
       }
       if (versionCompare(version, '3.2.3') < 0) {
         updateDamageResistancesVar();
+      }
+      if (versionCompare(version, '3.5.0') < 0) {
+        updateSpellChatMacro();
       }
     }
 
