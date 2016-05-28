@@ -1211,7 +1211,8 @@ const setClassFeatures = () => {
       }
       if (v.paladin_level >= 11) {
         setTrait({
-          damage: 'd8',
+          damage: '1d8',
+          damage_ability: '',
           damage_type: 'radiant',
           freetext: translate(language, 'CLASS_FEATURES.IMPROVED_DIVINE_SMITE_TEXT'),
           name: translate(language, 'CLASS_FEATURES.IMPROVED_DIVINE_SMITE'),
@@ -4279,7 +4280,7 @@ const parseAction = (type, rowId) => {
   const collectionArray = ['level', 'challenge', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability'];
   const finalSetAttrs = {};
 
-  const damageSyntax = /(?:(\d+)|.*?\(([\dd\s\+\-]*)\).*?)\s*?/;
+  const damageSyntax = /((?:\d+d\d+|\d+)(?:\s(?:\+|\-)\s\d+)?)\)?\s*?/;
   const damageType = /((?:[a-zA-Z]+|[a-zA-Z]+\s(?:or|and)\s[a-zA-Z]+)(?:\s*?\([a-zA-Z\s]+\))?)\s*?damage\s?(\([a-zA-Z'\s]+\))?/;
   const altDamageSyntax = /(?:,\s*?or\s*?)/;
   const plus = /\s*?plus\s*?/;
