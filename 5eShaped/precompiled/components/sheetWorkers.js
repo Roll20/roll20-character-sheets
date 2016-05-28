@@ -3459,7 +3459,7 @@ const updateSpellChatMacro = () => {
 
         if (spellName && spellPrepared) {
           spells[spellLevel].push(`[${spellName}](~repeating_spell_${id}_spell)`);
-        } else if (spellName && showUnprepared ) {
+        } else if (spellName && showUnprepared) {
           spells[spellLevel].push(`<span class="sheet-unprepared">[${spellName}](~repeating_spell_${id}_spell)</span>`);
         }
       }
@@ -3627,7 +3627,7 @@ const updateAbilityChecksMacro = () => {
         if (v.ability_checks_show_totals === 'on') {
           skillButton = `[${v[`${repeatingString}name`]} ${v[`${repeatingString}total_with_sign`]}](~repeating_skill_${id}_skill)`;
         } else {
-          skillButton= `[${v[`${repeatingString}name`]}](~repeating_skill_${id}_skill)`;
+          skillButton = `[${v[`${repeatingString}name`]}](~repeating_skill_${id}_skill)`;
         }
         finalSetAttrs.ability_checks_macro_var += skillButton;
         finalSetAttrs.skills_macro_var += skillButton;
