@@ -5321,6 +5321,7 @@ const sheetOpened = () => {
         updateDamageResistancesVar();
       }
       if (versionCompare(version, '3.5.0') < 0) {
+        generateHigherLevelQueries();
         updateSpellChatMacro();
         updateSpellChatMacroShow();
       }
