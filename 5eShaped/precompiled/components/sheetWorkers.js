@@ -5308,7 +5308,6 @@ const sheetOpened = () => {
       }
       if (versionCompare(version, '2.6.3') < 0) {
         updateSpell();
-        generateHigherLevelQueries();
       }
       if (versionCompare(version, '3.1.0') < 0) {
         updateAttackChatMacro();
