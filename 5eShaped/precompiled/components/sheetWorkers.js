@@ -3581,7 +3581,7 @@ on('change:halfling_luck', () => {
 
 const updateAbilityChecksMacro = () => {
   const repeatingItem = 'repeating_skill';
-  const collectionArray = ['ability_checks_query_var', 'ability_checks_macro_var'];
+  const collectionArray = ['ability_checks_query_var', 'ability_checks_macro_var', 'ability_checks_show_totals'];
   const finalSetAttrs = {};
 
   finalSetAttrs.ability_checks_query_var = '?{Ability Check';
@@ -3609,7 +3609,11 @@ const updateAbilityChecksMacro = () => {
         }
 
         finalSetAttrs.ability_checks_query_var += `|${capitalize(ability)},{{title=${capitalize(ability)}&#125;&#125; {{roll1=[[@{preroll}d20@{postroll}@{d20_mod} + ${v[`${ability}_check_mod`]}]]&#125;&#125; @{roll_setting}@{d20_mod} + ${v[`${ability}_check_mod`]}]]&#125;&#125;`;
-        finalSetAttrs.ability_checks_macro_var += `[${capitalize(ability)} ${v[`${ability}_check_mod_with_sign`]}](~shaped_${ability}_check)`;
+        if (v.ability_checks_show_totals === 'on') {
+          finalSetAttrs.ability_checks_macro_var += `[${capitalize(ability)} ${v[`${ability}_check_mod_with_sign`]}](~shaped_${ability}_check)`;
+        } else {
+          finalSetAttrs.ability_checks_macro_var += `[${capitalize(ability)}](~shaped_${ability}_check)`;
+        }
         finalSetAttrs.ability_checks_macro_var += ', ';
       }
       for (const id of ids) {
@@ -3619,7 +3623,12 @@ const updateAbilityChecksMacro = () => {
           finalSetAttrs.ability_checks_macro_var += ', ';
           finalSetAttrs.skills_macro_var += ', ';
         }
-        const skillButton = `[${v[`${repeatingString}name`]} ${v[`${repeatingString}total_with_sign`]}](~repeating_skill_${id}_skill)`;
+        let skillButton;
+        if (v.ability_checks_show_totals === 'on') {
+          skillButton = `[${v[`${repeatingString}name`]} ${v[`${repeatingString}total_with_sign`]}](~repeating_skill_${id}_skill)`;
+        } else {
+          skillButton= `[${v[`${repeatingString}name`]}](~repeating_skill_${id}_skill)`;
+        }
         finalSetAttrs.ability_checks_macro_var += skillButton;
         finalSetAttrs.skills_macro_var += skillButton;
       }
@@ -3774,7 +3783,7 @@ on('change:repeating_skill', (eventInfo) => {
     updateSkill(repeatingInfo.rowId);
   }
 });
-on('remove:repeating_skill', () => {
+on('remove:repeating_skill change:ability_checks_show_totals', () => {
   updateAbilityChecksMacro();
 });
 on('change:jack_of_all_trades_toggle change:jack_of_all_trades change:remarkable_athlete_toggle change:remarkable_athlete change:global_check_bonus change:strength_check_bonus change:dexterity_check_bonus change:constitution_check_bonus change:intelligence_check_bonus change:wisdom_check_bonus change:charisma_check_bonus', () => {
