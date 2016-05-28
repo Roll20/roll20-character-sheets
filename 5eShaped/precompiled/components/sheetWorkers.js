@@ -1568,11 +1568,11 @@ const updateSpellSlots = () => {
 
   for (const level in spellSlots) {
     if (spellSlots.hasOwnProperty(level)) {
-      const repeatingString = `spell_slots_l${level}_`;
-      collectionArray.push(`${repeatingString}calc`);
-      collectionArray.push(`${repeatingString}bonus`);
-      collectionArray.push(`${repeatingString}max`);
-      collectionArray.push(`${repeatingString}toggle`);
+      const repeatingString = `spell_slots_l${level}`;
+      collectionArray.push(`${repeatingString}_calc`);
+      collectionArray.push(`${repeatingString}_bonus`);
+      collectionArray.push(`${repeatingString}_max`);
+      collectionArray.push(`${repeatingString}_toggle`);
     }
   }
   getAttrs(collectionArray, (v) => {
@@ -1686,22 +1686,28 @@ const updateSpellSlots = () => {
 
     for (const level in spellSlots) {
       if (spellSlots.hasOwnProperty(level)) {
-        if (spellSlots[level] !== 0 || exists(v[`spell_slots_l${level}_calc`])) {
+        const repeatingString = `spell_slots_l${level}`;
+        finalSetAttrs[repeatingString] = 0;
+        if (spellSlots[level] !== 0 || exists(v[`${repeatingString}_calc`])) {
           finalSetAttrs[`spell_slots_l${level}_calc`] = spellSlots[level];
         }
 
-        const slotBonus = getIntValue(v[`spell_slots_l${level}_bonus`]);
+        const slots = v[`${repeatingString}`];
+        const slotBonus = getIntValue(v[`${repeatingString}_bonus`]);
         const spellSlotMax = spellSlots[level] + slotBonus;
 
         if (spellSlotMax > 0) {
-          finalSetAttrs[`spell_slots_l${level}_max`] = spellSlotMax;
-          finalSetAttrs[`spell_slots_l${level}_toggle`] = 'on';
-        } else {
-          if (exists(v[`spell_slots_l${level}_max`])) {
-            finalSetAttrs[`spell_slots_l${level}_max`] = 0;
+          finalSetAttrs[`${repeatingString}_max`] = spellSlotMax;
+          if (isUndefined(slots)) {
+            finalSetAttrs[repeatingString] = spellSlotMax;
           }
-          if (exists(v[`spell_slots_l${level}_toggle`])) {
-            finalSetAttrs[`spell_slots_l${level}_toggle`] = 0;
+          finalSetAttrs[`${repeatingString}_toggle`] = 'on';
+        } else {
+          if (exists(v[`${repeatingString}_max`])) {
+            finalSetAttrs[`${repeatingString}_max`] = 0;
+          }
+          if (exists(v[`${repeatingString}_toggle`])) {
+            finalSetAttrs[`${repeatingString}_toggle`] = 0;
           }
         }
       }
@@ -5217,6 +5223,7 @@ const sheetOpened = () => {
         updateAbilityChecksMacro();
         updateInitiative();
         updateArmor();
+        updateSpellChatMacroShow();
       });
     } else {
       if (versionCompare(version, '2.1.0') < 0) {
@@ -5324,6 +5331,9 @@ const sheetOpened = () => {
         generateHigherLevelQueries();
         updateSpellChatMacro();
         updateSpellChatMacroShow();
+      }
+      if (versionCompare(version, '3.5.1') < 0) {
+        updateSpellSlots();
       }
     }
 
