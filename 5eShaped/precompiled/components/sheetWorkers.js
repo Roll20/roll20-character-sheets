@@ -1716,6 +1716,32 @@ const updateSpellSlots = () => {
   });
 };
 
+const updateHD = (v, finalSetAttrs, hd) => {
+  for (const key in hd) {
+    if (hd.hasOwnProperty(key)) {
+      if (hd[key] && hd[key] !== 0) {
+        finalSetAttrs[`hd_${key}_max`] = hd[key];
+        finalSetAttrs[`hd_${key}_query`] = '?{HD';
+        for (let x = 1; x <= hd[key]; x++) {
+          finalSetAttrs[`hd_${key}_query`] += `|${x}`;
+        }
+        finalSetAttrs[`hd_${key}_query`] += '}';
+        finalSetAttrs[`hd_${key}_toggle`] = 1;
+      } else {
+        if (!isUndefined(v[`hd_${key}_max`])) {
+          finalSetAttrs[`hd_${key}_max`] = 0;
+        }
+        if (!isUndefined(v[`hd_${key}_query`])) {
+          finalSetAttrs[`hd_${key}_query`] = '';
+        }
+        if (exists(v[`hd_${key}_toggle`])) {
+          finalSetAttrs[`hd_${key}_toggle`] = 0;
+        }
+      }
+    }
+  }
+};
+
 const updateLevels = (repeatingInfo) => {
   const repeatingItem = 'repeating_class';
   const collectionArray = ['is_npc', 'lang', 'caster_level', 'caster_type', 'class_and_level', 'level', 'xp_next_level'];
@@ -1923,29 +1949,7 @@ const updateLevels = (repeatingInfo) => {
         }
       }
 
-      for (const key in hd) {
-        if (hd.hasOwnProperty(key)) {
-          if (hd[key] && hd[key] !== 0) {
-            finalSetAttrs[`hd_${key}_max`] = hd[key];
-            finalSetAttrs[`hd_${key}_query`] = '?{HD';
-            for (let x = 1; x <= hd[key]; x++) {
-              finalSetAttrs[`hd_${key}_query`] += `|${x}`;
-            }
-            finalSetAttrs[`hd_${key}_query`] += '}';
-            finalSetAttrs[`hd_${key}_toggle`] = 1;
-          } else {
-            if (!isUndefined(v[`hd_${key}_max`])) {
-              finalSetAttrs[`hd_${key}_max`] = 0;
-            }
-            if (!isUndefined(v[`hd_${key}_query`])) {
-              finalSetAttrs[`hd_${key}_query`] = '';
-            }
-            if (exists(v[`hd_${key}_toggle`])) {
-              finalSetAttrs[`hd_${key}_toggle`] = 0;
-            }
-          }
-        }
-      }
+      updateHD(v, finalSetAttrs, hd);
 
       let casterLevel = 0;
       if (!v.is_npc || v.is_npc === '0' || v.is_npc === 0) {
@@ -4195,6 +4199,43 @@ const updateNPCHP = () => {
 };
 on('change:hit_dice change:hit_die change:hp_extra change:constitution_mod', () => {
   updateNPCHP();
+});
+const updateNPCHD = () => {
+  const collectionArray = ['hit_dice', 'hit_die'];
+  const finalSetAttrs = {};
+  const hd = {
+    d20: 0,
+    d12: 0,
+    d10: 0,
+    d8: 0,
+    d6: 0,
+    d4: 0,
+    d2: 0,
+    d0: 0,
+  };
+  for (const key in hd) {
+    if (hd.hasOwnProperty(key)) {
+      collectionArray.push(`hd_${key}_max`);
+      collectionArray.push(`hd_${key}_query`);
+      collectionArray.push(`hd_${key}_toggle`);
+    }
+  }
+
+  getAttrs(collectionArray, (v) => {
+    const hdNum = getIntValue(v.hit_dice);
+    const hdSize = v.hit_die;
+
+    if (hdNum && hdSize) {
+      hd[hdSize] = hdNum;
+
+      updateHD(v, finalSetAttrs, hd);
+    }
+
+    setFinalAttrs(v, finalSetAttrs);
+  });
+};
+on('change:hit_dice change:hit_die', () => {
+  updateNPCHD();
 });
 
 const updateNPCAC = () => {
