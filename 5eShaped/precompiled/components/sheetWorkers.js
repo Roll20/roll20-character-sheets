@@ -4673,9 +4673,9 @@ const switchToNPC = () => {
     }
 
     if (isNPC) {
-      finalSetAttrs.npc_whisper = '/w GM';
+      finalSetAttrs.hit_dice_output_option = '@{output_to_gm}';
     } else {
-      finalSetAttrs.npc_whisper = '';
+      finalSetAttrs.hit_dice_output_option = '@{output_to_all}';
     }
 
     setFinalAttrs(v, finalSetAttrs);
