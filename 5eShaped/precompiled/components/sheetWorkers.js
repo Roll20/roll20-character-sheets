@@ -5392,6 +5392,7 @@ const sheetOpened = () => {
         updateSpellSlots();
       }
       if (versionCompare(version, '3.6.1') < 0) {
+        updateNPCHD();
         switchToNPC();
       }
     }
