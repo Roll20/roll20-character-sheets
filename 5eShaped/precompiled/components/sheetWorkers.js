@@ -4662,7 +4662,7 @@ on('change:repeating_regionaleffect remove:repeating_regionaleffect', () => {
 });
 
 const switchToNPC = () => {
-  const collectionArray = ['is_npc', 'size'];
+  const collectionArray = ['is_npc', 'size', 'npc_whisper'];
   const finalSetAttrs = {};
 
   getAttrs(collectionArray, (v) => {
@@ -4671,6 +4671,13 @@ const switchToNPC = () => {
     if (isNPC && isUndefined(v.size)) {
       finalSetAttrs.size = 'Large';
     }
+
+    if (isNPC) {
+      finalSetAttrs.npc_whisper = '/w GM';
+    } else {
+      finalSetAttrs.npc_whisper = '';
+    }
+
     setFinalAttrs(v, finalSetAttrs);
   });
 };
@@ -5383,6 +5390,9 @@ const sheetOpened = () => {
       }
       if (versionCompare(version, '3.5.1') < 0) {
         updateSpellSlots();
+      }
+      if (versionCompare(version, '3.6.1') < 0) {
+        switchToNPC();
       }
     }
 
