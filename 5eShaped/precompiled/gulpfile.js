@@ -196,11 +196,11 @@ gulp.task('submit', ['compile'], (done) => {
   const css = fs.readFileSync('../5eShaped.css', 'utf-8');
   const props = require('./submitProps.json');
 
-  const url = `https://app.roll20.net/campaigns/savesettings/${props.campaignId}`;
+  const url = `https://app.${props[props.which].roll20}.net/campaigns/savesettings/${props[props.which].campaignId}`;
 
   var j = request.jar();
-  var cookie = request.cookie(`rack.session=${props.rackSessionId}`);
-  j.setCookie(cookie, 'https://app.roll20.net');
+  var cookie = request.cookie(`rack.session=${props[props.which].rackSessionId}`);
+  j.setCookie(cookie, `https://app.${props[props.which].roll20}.net`);
 
   request.post({
       url,
@@ -217,7 +217,7 @@ gulp.task('submit', ['compile'], (done) => {
     },
     (err, httpResponse, body) => {
       if (httpResponse.statusCode !== 303 ||
-        httpResponse.headers.location !== `https://app.roll20.net/campaigns/campaignsettings/${props.campaignId}`) {
+        httpResponse.headers.location !== `https://app.${props[props.which].roll20}.net/campaigns/campaignsettings/${props[props.which].campaignId}`) {
         gutil.log('Problem submitting sheet, response headers:');
         gutil.log(httpResponse.headers);
         return done(httpResponse.statusMessage);
