@@ -1,7 +1,7 @@
 /* global setAttrs:false, getAttrs:false, on:false, getSectionIDs:false, generateRowID:false */
 'use strict';
 
-const currentVersion = '3.3.1';
+const currentVersion = '3.6.1';
 let TRANSLATIONS;
 const SKILLS = {
   acrobatics: 'dexterity',
@@ -75,10 +75,10 @@ const getIntValue = (value, defaultValue) => {
   if (!defaultValue) {
     defaultValue = 0;
   }
-  if (typeof value === 'undefined') {
-    return defaultValue;
+  if (value === 0 || value === '0') {
+    return 0;
   }
-  return parseInt(value, 10);
+  return parseInt(value, 10) || defaultValue;
 };
 const getFloatValue = (value, defaultValue) => {
   if (!defaultValue) {
@@ -186,7 +186,7 @@ const parseAttackComponent = (v, repeatingString, finalSetAttrs, options) => {
     let aTriggerFieldExists = false;
 
     for (const triggerField of options.triggerFields) {
-      if (exists(v[repeatingString + triggerField])) {
+      if (!isUndefined(v[repeatingString + triggerField])) {
         aTriggerFieldExists = true;
       }
     }
@@ -1211,7 +1211,8 @@ const setClassFeatures = () => {
       }
       if (v.paladin_level >= 11) {
         setTrait({
-          damage: 'd8',
+          damage: '1d8',
+          damage_ability: '',
           damage_type: 'radiant',
           freetext: translate(language, 'CLASS_FEATURES.IMPROVED_DIVINE_SMITE_TEXT'),
           name: translate(language, 'CLASS_FEATURES.IMPROVED_DIVINE_SMITE'),
@@ -1567,11 +1568,11 @@ const updateSpellSlots = () => {
 
   for (const level in spellSlots) {
     if (spellSlots.hasOwnProperty(level)) {
-      const repeatingString = `spell_slots_l${level}_`;
-      collectionArray.push(`${repeatingString}calc`);
-      collectionArray.push(`${repeatingString}bonus`);
-      collectionArray.push(`${repeatingString}max`);
-      collectionArray.push(`${repeatingString}toggle`);
+      const repeatingString = `spell_slots_l${level}`;
+      collectionArray.push(`${repeatingString}_calc`);
+      collectionArray.push(`${repeatingString}_bonus`);
+      collectionArray.push(`${repeatingString}_max`);
+      collectionArray.push(`${repeatingString}_toggle`);
     }
   }
   getAttrs(collectionArray, (v) => {
@@ -1685,28 +1686,60 @@ const updateSpellSlots = () => {
 
     for (const level in spellSlots) {
       if (spellSlots.hasOwnProperty(level)) {
-        if (spellSlots[level] !== 0 || exists(v[`spell_slots_l${level}_calc`])) {
+        const repeatingString = `spell_slots_l${level}`;
+        finalSetAttrs[repeatingString] = 0;
+        if (spellSlots[level] !== 0 || exists(v[`${repeatingString}_calc`])) {
           finalSetAttrs[`spell_slots_l${level}_calc`] = spellSlots[level];
         }
 
-        const slotBonus = getIntValue(v[`spell_slots_l${level}_bonus`]);
+        const slots = v[`${repeatingString}`];
+        const slotBonus = getIntValue(v[`${repeatingString}_bonus`]);
         const spellSlotMax = spellSlots[level] + slotBonus;
 
         if (spellSlotMax > 0) {
-          finalSetAttrs[`spell_slots_l${level}_max`] = spellSlotMax;
-          finalSetAttrs[`spell_slots_l${level}_toggle`] = 'on';
-        } else {
-          if (exists(v[`spell_slots_l${level}_max`])) {
-            finalSetAttrs[`spell_slots_l${level}_max`] = 0;
+          finalSetAttrs[`${repeatingString}_max`] = spellSlotMax;
+          if (isUndefined(slots)) {
+            finalSetAttrs[repeatingString] = spellSlotMax;
           }
-          if (exists(v[`spell_slots_l${level}_toggle`])) {
-            finalSetAttrs[`spell_slots_l${level}_toggle`] = 0;
+          finalSetAttrs[`${repeatingString}_toggle`] = 'on';
+        } else {
+          if (exists(v[`${repeatingString}_max`])) {
+            finalSetAttrs[`${repeatingString}_max`] = 0;
+          }
+          if (exists(v[`${repeatingString}_toggle`])) {
+            finalSetAttrs[`${repeatingString}_toggle`] = 0;
           }
         }
       }
     }
     setFinalAttrs(v, finalSetAttrs);
   });
+};
+
+const updateHD = (v, finalSetAttrs, hd) => {
+  for (const key in hd) {
+    if (hd.hasOwnProperty(key)) {
+      if (hd[key] && hd[key] !== 0) {
+        finalSetAttrs[`hd_${key}_max`] = hd[key];
+        finalSetAttrs[`hd_${key}_query`] = '?{HD';
+        for (let x = 1; x <= hd[key]; x++) {
+          finalSetAttrs[`hd_${key}_query`] += `|${x}`;
+        }
+        finalSetAttrs[`hd_${key}_query`] += '}';
+        finalSetAttrs[`hd_${key}_toggle`] = 1;
+      } else {
+        if (!isUndefined(v[`hd_${key}_max`])) {
+          finalSetAttrs[`hd_${key}_max`] = 0;
+        }
+        if (!isUndefined(v[`hd_${key}_query`])) {
+          finalSetAttrs[`hd_${key}_query`] = '';
+        }
+        if (exists(v[`hd_${key}_toggle`])) {
+          finalSetAttrs[`hd_${key}_toggle`] = 0;
+        }
+      }
+    }
+  }
 };
 
 const updateLevels = (repeatingInfo) => {
@@ -1880,14 +1913,18 @@ const updateLevels = (repeatingInfo) => {
         }
       }
 
+      finalSetAttrs.number_of_classes = 0;
       finalSetAttrs.class_and_level = '';
       for (const prop in classLevels) {
         if (classLevels.hasOwnProperty(prop)) {
-          finalSetAttrs[`${prop}_level`] = classLevels[prop];
-          if (finalSetAttrs.class_and_level !== '') {
-            finalSetAttrs.class_and_level += ', ';
+          finalSetAttrs.number_of_classes = finalSetAttrs.number_of_classes + 1;
+          if (classLevels.hasOwnProperty(prop)) {
+            finalSetAttrs[`${prop}_level`] = classLevels[prop];
+            if (finalSetAttrs.class_and_level !== '') {
+              finalSetAttrs.class_and_level += ', ';
+            }
+            finalSetAttrs.class_and_level += `${capitalize(prop)} ${classLevels[prop]}`;
           }
-          finalSetAttrs.class_and_level += `${capitalize(prop)} ${classLevels[prop]}`;
         }
       }
 
@@ -1912,29 +1949,7 @@ const updateLevels = (repeatingInfo) => {
         }
       }
 
-      for (const key in hd) {
-        if (hd.hasOwnProperty(key)) {
-          if (hd[key] && hd[key] !== 0) {
-            finalSetAttrs[`hd_${key}_max`] = hd[key];
-            finalSetAttrs[`hd_${key}_query`] = '?{HD';
-            for (let x = 1; x <= hd[key]; x++) {
-              finalSetAttrs[`hd_${key}_query`] += `|${x}`;
-            }
-            finalSetAttrs[`hd_${key}_query`] += '}';
-            finalSetAttrs[`hd_${key}_toggle`] = 1;
-          } else {
-            if (!isUndefined(v[`hd_${key}_max`])) {
-              finalSetAttrs[`hd_${key}_max`] = 0;
-            }
-            if (!isUndefined(v[`hd_${key}_query`])) {
-              finalSetAttrs[`hd_${key}_query`] = '';
-            }
-            if (exists(v[`hd_${key}_toggle`])) {
-              finalSetAttrs[`hd_${key}_toggle`] = 0;
-            }
-          }
-        }
-      }
+      updateHD(v, finalSetAttrs, hd);
 
       let casterLevel = 0;
       if (!v.is_npc || v.is_npc === '0' || v.is_npc === 0) {
@@ -2432,7 +2447,7 @@ const updateAttackToggle = (v, finalSetAttrs, repeatingString, options) => {
       attackFormula += `${addArithmeticOperator(attackFormula, options.globalAttackBonus)}[${options.globalAttackBonusLabel}]`;
     }
 
-    if (!v[`${repeatingString}type`] || v[`${repeatingString}type`] === 'Melee Weapon') {
+    if (v[`${repeatingString}type`] === 'Melee Weapon') {
       if (exists(options.globalMeleeAttackBonus)) {
         if (!isNaN(options.globalMeleeAttackBonus)) {
           toHit += getIntValue(options.globalMeleeAttackBonus);
@@ -2538,7 +2553,7 @@ const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
       damageFormula += `${addArithmeticOperator(damageFormula, options.globalDamageBonus)}[global damage bonus]`;
     }
 
-    if (options && exists(options.globalMeleeDamageBonus) && (!v[`${repeatingString}type`] || v[`${repeatingString}type`] === 'Melee Weapon')) {
+    if (options && exists(options.globalMeleeDamageBonus) && (v[`${repeatingString}type`] === 'Melee Weapon')) {
       if (!isNaN(options.globalMeleeDamageBonus)) {
         damageAddition += getIntValue(options.globalMeleeDamageBonus);
       } else {
@@ -3018,38 +3033,6 @@ on('change:repeating_regionaleffect', (eventInfo) => {
   updateActionIfTriggered('regionaleffect', eventInfo);
 });
 
-const updateAttackChatMacro = () => {
-  const repeatingItem = 'repeating_attack';
-  const collectionArray = ['attacks_macro_var'];
-  const finalSetAttrs = {};
-
-  finalSetAttrs.attacks_macro_var = '';
-
-  getSectionIDs(repeatingItem, (ids) => {
-    for (const id of ids) {
-      const repeatingString = `${repeatingItem}_${id}_`;
-      collectionArray.push(`${repeatingString}name`);
-    }
-
-    getAttrs(collectionArray, (v) => {
-      for (const id of ids) {
-        const repeatingString = `${repeatingItem}_${id}_`;
-        let actionName = v[`${repeatingString}name`];
-        if (actionName && actionName.length > 50) {
-          actionName = `${actionName.substring(0, 50)}...`;
-        }
-
-        if (id !== ids[0]) {
-          finalSetAttrs.attacks_macro_var += ', ';
-        }
-
-        finalSetAttrs.attacks_macro_var += `[${actionName}](~repeating_attack_${id}_attack)`;
-      }
-      setFinalAttrs(v, finalSetAttrs);
-    });
-  });
-};
-
 const updateAttack = (rowId) => {
   const repeatingItem = 'repeating_attack';
   const collectionArray = ['pb', 'strength_mod', 'finesse_mod', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability', 'ammo_auto_use'];
@@ -3207,6 +3190,38 @@ const weighAttacks = () => {
     },
   ];
   sumRepeating(options, sumItems);
+};
+
+const updateAttackChatMacro = () => {
+  const repeatingItem = 'repeating_attack';
+  const collectionArray = ['attacks_macro_var'];
+  const finalSetAttrs = {};
+
+  finalSetAttrs.attacks_macro_var = '';
+
+  getSectionIDs(repeatingItem, (ids) => {
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
+      collectionArray.push(`${repeatingString}name`);
+    }
+
+    getAttrs(collectionArray, (v) => {
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
+        let actionName = v[`${repeatingString}name`];
+        if (actionName && actionName.length > 50) {
+          actionName = `${actionName.substring(0, 50)}...`;
+        }
+
+        if (id !== ids[0]) {
+          finalSetAttrs.attacks_macro_var += ', ';
+        }
+
+        finalSetAttrs.attacks_macro_var += `[${actionName}](~repeating_attack_${id}_attack)`;
+      }
+      setFinalAttrs(v, finalSetAttrs);
+    });
+  });
 };
 
 on('change:repeating_attack', (eventInfo) => {
@@ -3409,8 +3424,101 @@ on('change:global_spell_attack_bonus change:global_spell_damage_bonus change:glo
   updateSpell();
 });
 
+const updateSpellChatMacro = () => {
+  const repeatingItem = 'repeating_spell';
+  const collectionArray = ['spells_show_unprepared'];
+  const finalSetAttrs = {};
+  const spells = {
+    0: [],
+    1: [],
+    2: [],
+    3: [],
+    4: [],
+    5: [],
+    6: [],
+    7: [],
+    8: [],
+    9: [],
+  };
+
+  for (let i = 0; i <= 9; i++) {
+    collectionArray.push(`spells_level_${0}_macro_var`);
+  }
+
+  getSectionIDs(repeatingItem, (ids) => {
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
+      collectionArray.push(`${repeatingString}name`);
+      collectionArray.push(`${repeatingString}spell_level`);
+      collectionArray.push(`${repeatingString}is_prepared`);
+    }
+
+    getAttrs(collectionArray, (v) => {
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
+        const showUnprepared = v.spells_show_unprepared === 'on' || isUndefined(v.spells_show_unprepared);
+        const spellName = v[`${repeatingString}name`];
+        const spellLevel = getIntValue(v[`${repeatingString}spell_level`], 0);
+        const spellPrepared = v[`${repeatingString}is_prepared`] === 'on';
+
+        if (spellName && spellPrepared) {
+          spells[spellLevel].push(`[${spellName}](~repeating_spell_${id}_spell)`);
+        } else if (spellName && showUnprepared) {
+          spells[spellLevel].push(`<span class="sheet-unprepared">[${spellName}](~repeating_spell_${id}_spell)</span>`);
+        }
+      }
+
+      for (let i = 0; i <= 9; i++) {
+        if (spells[i].length > 0) {
+          finalSetAttrs[`spells_level_${i}_macro_var`] = spells[i].join(', ');
+        } else {
+          finalSetAttrs[`spells_level_${i}_macro_var`] = '';
+        }
+      }
+      setFinalAttrs(v, finalSetAttrs);
+    });
+  });
+};
+on('change:repeating_spell', (eventInfo) => {
+  const repeatingInfo = getRepeatingInfo('repeating_spell', eventInfo);
+  if (repeatingInfo && (repeatingInfo.field === 'name' || repeatingInfo.field === 'spell_level' || repeatingInfo.field === 'is_prepared')) {
+    updateSpellChatMacro();
+  }
+});
+on('change:spells_show_unprepared', () => {
+  updateSpellChatMacro();
+});
+on('remove:repeating_spell', () => {
+  updateSpellChatMacro();
+});
+
+const updateSpellChatMacroShow = () => {
+  const collectionArray = ['spells_show_spell_level_if_all_slots_are_used'];
+  const finalSetAttrs = {};
+
+  for (let i = 1; i <= 9; i++) {
+    collectionArray.push(`spell_slots_l${i}`);
+  }
+
+  getAttrs(collectionArray, (v) => {
+    const showLevelIfAllSlotsAreUsed = v.spells_show_spell_level_if_all_slots_are_used === 'on' || isUndefined(v.spells_show_spell_level_if_all_slots_are_used);
+
+    for (let i = 1; i <= 9; i++) {
+      if (!showLevelIfAllSlotsAreUsed && !getIntValue(v[`spell_slots_l${i}`])) {
+        finalSetAttrs[`spells_level_${i}_show`] = '';
+      } else {
+        finalSetAttrs[`spells_level_${i}_show`] = true;
+      }
+    }
+    setFinalAttrs(v, finalSetAttrs);
+  });
+};
+on('change:spells_show_spell_level_if_all_slots_are_used change:spell_slots_l1 change:spell_slots_l2 change:spell_slots_l3 change:spell_slots_l4 change:spell_slots_l5 change:spell_slots_l6 change:spell_slots_l7 change:spell_slots_l8 change:spell_slots_l9', () => {
+  updateSpellChatMacroShow();
+});
+
 const generateHigherLevelQueries = () => {
-  const collectionArray = [];
+  const collectionArray = ['warlock_level', 'number_of_classes'];
   const finalSetAttrs = {};
 
   for (let i = 1; i <= 8; i++) {
@@ -3423,12 +3531,27 @@ const generateHigherLevelQueries = () => {
   getAttrs(collectionArray, (v) => {
     for (let i = 1; i <= 8; i++) {
       let levelQuery = '';
-      for (let j = i; j <= 9; j++) {
-        if (getIntValue(v[`spell_slots_l${j}`])) {
-          levelQuery += `|${j}`;
+
+      if (i < 6 && v.number_of_classes === 1 && v.warlock_level > 0 && Math.ceil(getIntValue(v.warlock_level) / 2) >= i) {
+        let spellLevel = 1;
+        if (v.warlock_level >= 9) {
+          spellLevel = 5;
+        } else if (v.warlock_level >= 7) {
+          spellLevel = 4;
+        } else if (v.warlock_level >= 5) {
+          spellLevel = 3;
+        } else if (v.warlock_level >= 3) {
+          spellLevel = 2;
+        }
+        levelQuery += `|${spellLevel}`;
+      } else {
+        for (let j = i; j <= 9; j++) {
+          if (getIntValue(v[`spell_slots_l${j}`])) {
+            levelQuery += `|${j}`;
+          }
         }
       }
-      if (levelQuery) {
+      if (levelQuery !== '') {
         finalSetAttrs[`higher_level_query_${i}`] = `?{Spell Level${levelQuery}}`;
       } else {
         finalSetAttrs[`higher_level_query_${i}`] = i;
@@ -3438,7 +3561,7 @@ const generateHigherLevelQueries = () => {
   });
 };
 
-on('change:spell_slots_l1 change:spell_slots_l2 change:spell_slots_l3 change:spell_slots_l4 change:spell_slots_l5 change:spell_slots_l6 change:spell_slots_l7 change:spell_slots_l8 change:spell_slots_l9', () => {
+on('change:warlock_level change:spell_slots_l1 change:spell_slots_l2 change:spell_slots_l3 change:spell_slots_l4 change:spell_slots_l5 change:spell_slots_l6 change:spell_slots_l7 change:spell_slots_l8 change:spell_slots_l9', () => {
   generateHigherLevelQueries();
 });
 
@@ -3462,7 +3585,7 @@ on('change:halfling_luck', () => {
 
 const updateAbilityChecksMacro = () => {
   const repeatingItem = 'repeating_skill';
-  const collectionArray = ['ability_checks_query_var', 'ability_checks_macro_var'];
+  const collectionArray = ['ability_checks_query_var', 'ability_checks_macro_var', 'ability_checks_show_totals'];
   const finalSetAttrs = {};
 
   finalSetAttrs.ability_checks_query_var = '?{Ability Check';
@@ -3490,7 +3613,11 @@ const updateAbilityChecksMacro = () => {
         }
 
         finalSetAttrs.ability_checks_query_var += `|${capitalize(ability)},{{title=${capitalize(ability)}&#125;&#125; {{roll1=[[@{preroll}d20@{postroll}@{d20_mod} + ${v[`${ability}_check_mod`]}]]&#125;&#125; @{roll_setting}@{d20_mod} + ${v[`${ability}_check_mod`]}]]&#125;&#125;`;
-        finalSetAttrs.ability_checks_macro_var += `[${capitalize(ability)} ${v[`${ability}_check_mod_with_sign`]}](~shaped_${ability}_check)`;
+        if (v.ability_checks_show_totals === 'on') {
+          finalSetAttrs.ability_checks_macro_var += `[${capitalize(ability)} ${v[`${ability}_check_mod_with_sign`]}](~shaped_${ability}_check)`;
+        } else {
+          finalSetAttrs.ability_checks_macro_var += `[${capitalize(ability)}](~shaped_${ability}_check)`;
+        }
         finalSetAttrs.ability_checks_macro_var += ', ';
       }
       for (const id of ids) {
@@ -3500,7 +3627,12 @@ const updateAbilityChecksMacro = () => {
           finalSetAttrs.ability_checks_macro_var += ', ';
           finalSetAttrs.skills_macro_var += ', ';
         }
-        const skillButton = `[${v[`${repeatingString}name`]} ${v[`${repeatingString}total_with_sign`]}](~repeating_skill_${id}_skill)`;
+        let skillButton;
+        if (v.ability_checks_show_totals === 'on') {
+          skillButton = `[${v[`${repeatingString}name`]} ${v[`${repeatingString}total_with_sign`]}](~repeating_skill_${id}_skill)`;
+        } else {
+          skillButton = `[${v[`${repeatingString}name`]}](~repeating_skill_${id}_skill)`;
+        }
         finalSetAttrs.ability_checks_macro_var += skillButton;
         finalSetAttrs.skills_macro_var += skillButton;
       }
@@ -3655,7 +3787,7 @@ on('change:repeating_skill', (eventInfo) => {
     updateSkill(repeatingInfo.rowId);
   }
 });
-on('remove:repeating_skill', () => {
+on('remove:repeating_skill change:ability_checks_show_totals', () => {
   updateAbilityChecksMacro();
 });
 on('change:jack_of_all_trades_toggle change:jack_of_all_trades change:remarkable_athlete_toggle change:remarkable_athlete change:global_check_bonus change:strength_check_bonus change:dexterity_check_bonus change:constitution_check_bonus change:intelligence_check_bonus change:wisdom_check_bonus change:charisma_check_bonus', () => {
@@ -4068,6 +4200,43 @@ const updateNPCHP = () => {
 on('change:hit_dice change:hit_die change:hp_extra change:constitution_mod', () => {
   updateNPCHP();
 });
+const updateNPCHD = () => {
+  const collectionArray = ['hit_dice', 'hit_die'];
+  const finalSetAttrs = {};
+  const hd = {
+    d20: 0,
+    d12: 0,
+    d10: 0,
+    d8: 0,
+    d6: 0,
+    d4: 0,
+    d2: 0,
+    d0: 0,
+  };
+  for (const key in hd) {
+    if (hd.hasOwnProperty(key)) {
+      collectionArray.push(`hd_${key}_max`);
+      collectionArray.push(`hd_${key}_query`);
+      collectionArray.push(`hd_${key}_toggle`);
+    }
+  }
+
+  getAttrs(collectionArray, (v) => {
+    const hdNum = getIntValue(v.hit_dice);
+    const hdSize = v.hit_die;
+
+    if (hdNum && hdSize) {
+      hd[hdSize] = hdNum;
+
+      updateHD(v, finalSetAttrs, hd);
+    }
+
+    setFinalAttrs(v, finalSetAttrs);
+  });
+};
+on('change:hit_dice change:hit_die', () => {
+  updateNPCHD();
+});
 
 const updateNPCAC = () => {
   const collectionArray = ['ac_srd', 'ac', 'ac_note', 'dexterity_mod'];
@@ -4262,7 +4431,7 @@ const parseAction = (type, rowId) => {
   const collectionArray = ['level', 'challenge', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability'];
   const finalSetAttrs = {};
 
-  const damageSyntax = /(?:(\d+)|.*?\(([\dd\s\+\-]*)\).*?)\s*?/;
+  const damageSyntax = /((?:\d+d\d+|\d+)(?:\s(?:\+|\-)\s\d+)?)\)?\s*?/;
   const damageType = /((?:[a-zA-Z]+|[a-zA-Z]+\s(?:or|and)\s[a-zA-Z]+)(?:\s*?\([a-zA-Z\s]+\))?)\s*?damage\s?(\([a-zA-Z'\s]+\))?/;
   const altDamageSyntax = /(?:,\s*?or\s*?)/;
   const plus = /\s*?plus\s*?/;
@@ -4343,12 +4512,10 @@ const parseAction = (type, rowId) => {
             actionType[1] = actionType[1].toLowerCase();
             if (actionType[1] === 'melee') {
               finalSetAttrs[`${repeatingString}type`] = 'Melee Weapon';
-            }
-            if (actionType[1] === 'ranged') {
+            } else if (actionType[1] === 'ranged') {
               finalSetAttrs[`${repeatingString}type`] = 'Ranged Weapon';
               rangedAttack = true;
-            }
-            if (actionType[1] === 'melee or ranged') {
+            } else {
               finalSetAttrs[`${repeatingString}type`] = 'Other';
             }
           }
@@ -4495,7 +4662,7 @@ on('change:repeating_regionaleffect remove:repeating_regionaleffect', () => {
 });
 
 const switchToNPC = () => {
-  const collectionArray = ['is_npc', 'size'];
+  const collectionArray = ['is_npc', 'size', 'npc_whisper'];
   const finalSetAttrs = {};
 
   getAttrs(collectionArray, (v) => {
@@ -4504,6 +4671,13 @@ const switchToNPC = () => {
     if (isNPC && isUndefined(v.size)) {
       finalSetAttrs.size = 'Large';
     }
+
+    if (isNPC) {
+      finalSetAttrs.hit_dice_output_option = '@{output_to_gm}';
+    } else {
+      finalSetAttrs.hit_dice_output_option = '@{output_to_all}';
+    }
+
     setFinalAttrs(v, finalSetAttrs);
   });
 };
@@ -5106,6 +5280,7 @@ const sheetOpened = () => {
         updateAbilityChecksMacro();
         updateInitiative();
         updateArmor();
+        updateSpellChatMacroShow();
       });
     } else {
       if (versionCompare(version, '2.1.0') < 0) {
@@ -5190,7 +5365,6 @@ const sheetOpened = () => {
       }
       if (versionCompare(version, '2.6.3') < 0) {
         updateSpell();
-        generateHigherLevelQueries();
       }
       if (versionCompare(version, '3.1.0') < 0) {
         updateAttackChatMacro();
@@ -5208,6 +5382,18 @@ const sheetOpened = () => {
       }
       if (versionCompare(version, '3.2.3') < 0) {
         updateDamageResistancesVar();
+      }
+      if (versionCompare(version, '3.5.0') < 0) {
+        generateHigherLevelQueries();
+        updateSpellChatMacro();
+        updateSpellChatMacroShow();
+      }
+      if (versionCompare(version, '3.5.1') < 0) {
+        updateSpellSlots();
+      }
+      if (versionCompare(version, '3.6.1') < 0) {
+        updateNPCHD();
+        switchToNPC();
       }
     }
 
