@@ -5129,7 +5129,7 @@ const generateSkills = () => {
 
           for (const id of ids) {
             repeatingString = `${repeatingItem}_${id}_`;
-            if (v[`${repeatingString}storage_name`] === prop) {
+            if (v[`${repeatingString}storage_name`] === prop || v[`${repeatingString}storage_name`] === prop.toLowerCase()) {
               skillId = id;
               break;
             }
