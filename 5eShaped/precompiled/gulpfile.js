@@ -200,7 +200,7 @@ gulp.task('translationDist', function () {
 gulp.task('sort-translations', function() {
   return gulp.src('./translations/*.json')
     .pipe(sortJSON({ space: 2 }))
-    .pipe(gulp.dest('./'));
+    .pipe(gulp.dest('./translations/'));
 });
 
 gulp.task('submit', ['compile'], (done) => {
