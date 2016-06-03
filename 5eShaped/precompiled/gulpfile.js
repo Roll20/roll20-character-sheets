@@ -18,6 +18,7 @@ const wrapper = require('gulp-wrapper');
 const streamqueue = require('streamqueue');
 const request = require('request');
 const gutil = require('gulp-util');
+const sortJSON = require('gulp-json-sort').default;
 
 const translations = {};
 
@@ -114,7 +115,7 @@ const compileSheetWorkers = () => {
         {
           match: /(let TRANSLATIONS;)/i,
           replacement: function () {
-            let translations = {
+            const translations = {
               de: JSON.parse(fs.readFileSync('./translations/de.json')),
               en: JSON.parse(fs.readFileSync('./translations/en.json')),
               fr: JSON.parse(fs.readFileSync('./translations/fr.json')),
@@ -140,7 +141,7 @@ const compileRollTemplate = () => {
   return gulp.src(['./components/rollTemplate.html']);
 };
 
-gulp.task('compile', ['sass'], function () {
+gulp.task('compile', ['sass', 'translationDist'], function () {
   return streamqueue({objectMode: true},
     compileSheetHTML(),
     compileSheetWorkers(),
@@ -190,10 +191,22 @@ gulp.task('sass', function () {
     .pipe(minifyCss())
     .pipe(gulp.dest('../'));
 });
+gulp.task('translationDist', function () {
+  return gulp.src('./translations/en.json')
+    .pipe(rename('translations.json'))
+    .pipe(gulp.dest('../'));
+});
+
+gulp.task('sort-translations', function() {
+  return gulp.src('./translations/*.json')
+    .pipe(sortJSON({ space: 2 }))
+    .pipe(gulp.dest('./'));
+});
 
 gulp.task('submit', ['compile'], (done) => {
   const html = fs.readFileSync('../5eShaped.html', 'utf-8');
   const css = fs.readFileSync('../5eShaped.css', 'utf-8');
+  const translation = fs.readFileSync('./translations/en.json', 'utf-8');
   const props = require('./submitProps.json');
 
   const url = `https://app.${props[props.which].roll20}.net/campaigns/savesettings/${props[props.which].campaignId}`;
@@ -207,6 +220,7 @@ gulp.task('submit', ['compile'], (done) => {
       form: {
         customcharsheet_layout: html,
         customcharsheet_style: css,
+        customcharsheet_translation: translation,
         allowcharacterimport: false,
         bgimage: 'none',
         publicaccess: false,

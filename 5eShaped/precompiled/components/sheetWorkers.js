@@ -4,24 +4,24 @@
 const currentVersion = '3.6.1';
 let TRANSLATIONS;
 const SKILLS = {
-  acrobatics: 'dexterity',
-  animalHandling: 'wisdom',
-  arcana: 'intelligence',
-  athletics: 'strength',
-  deception: 'charisma',
-  history: 'intelligence',
-  insight: 'wisdom',
-  intimidation: 'charisma',
-  investigation: 'intelligence',
-  medicine: 'wisdom',
-  nature: 'intelligence',
-  perception: 'wisdom',
-  performance: 'charisma',
-  persuasion: 'charisma',
-  religion: 'intelligence',
-  sleightOfHand: 'dexterity',
-  stealth: 'dexterity',
-  survival: 'wisdom',
+  ACROBATICS: 'dexterity',
+  ANIMALHANDLING: 'wisdom',
+  ARCANA: 'intelligence',
+  ATHLETICS: 'strength',
+  DECEPTION: 'charisma',
+  HISTORY: 'intelligence',
+  INSIGHT: 'wisdom',
+  INTIMIDATION: 'charisma',
+  INVESTIGATION: 'intelligence',
+  MEDICINE: 'wisdom',
+  NATURE: 'intelligence',
+  PERCEPTION: 'wisdom',
+  PERFORMANCE: 'charisma',
+  PERSUASION: 'charisma',
+  RELIGION: 'intelligence',
+  SLEIGHTOFHAND: 'dexterity',
+  STEALTH: 'dexterity',
+  SURVIVAL: 'wisdom',
 };
 const CLASSES = ['barbarian', 'bard', 'cleric', 'druid', 'fighter', 'monk', 'paladin', 'ranger', 'rogue', 'sorcerer', 'warlock', 'wizard'];
 const ABILITIES = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
@@ -5094,7 +5094,7 @@ const setSkillStorageNames = () => {
 
           const name = v[`${repeatingString}name`];
           if (!isUndefined(name)) {
-            const storageName = getKeyByValue(TRANSLATIONS.en.SKILLS, name);
+            const storageName = getKeyByValue(TRANSLATIONS.en, name);
             if (storageName && isUndefined(v[`${repeatingString}storage_name`])) {
               finalSetAttrs[`${repeatingString}storage_name`] = storageName;
             }
@@ -5140,7 +5140,7 @@ const generateSkills = () => {
           repeatingString = `${repeatingItem}_${skillId}_`;
 
           finalSetAttrs[`${repeatingString}storage_name`] = prop;
-          finalSetAttrs[`${repeatingString}name`] = translate(language, `SKILLS.${prop}`);
+          finalSetAttrs[`${repeatingString}name`] = translate(language, `${prop}`);
           finalSetAttrs[`${repeatingString}ability`] = `@{${SKILLS[prop]}_mod}`;
           updateSkill(skillId);
         }
