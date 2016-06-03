@@ -1389,62 +1389,6 @@ const setClassFeatures = () => {
             name: translate(language, 'CLASS_FEATURES.METAMAGIC'),
             storageName: 'Metamagic',
           });
-          if (v.careful_spell_toggle === '@{careful_spell_toggle_var}') {
-            setTrait({
-              freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_CAREFUL_SPELL_TEXT'),
-              name: translate(language, 'CLASS_FEATURES.METAMAGIC_CAREFUL_SPELL'),
-              storageName: 'Careful Spell',
-            });
-          }
-          if (v.distant_spell_toggle === '@{distant_spell_toggle_var}') {
-            setTrait({
-              freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_DISTANT_SPELL_TEXT'),
-              name: translate(language, 'CLASS_FEATURES.METAMAGIC_DISTANT_SPELL'),
-              storageName: 'Distant Spell',
-            });
-          }
-          if (v.empowered_spell_toggle === '@{empowered_spell_toggle_var}') {
-            setTrait({
-              freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_EMPOWERED_SPELL_TEXT'),
-              name: translate(language, 'CLASS_FEATURES.METAMAGIC_EMPOWERED_SPELL'),
-              storageName: 'Empowered Spell',
-            });
-          }
-          if (v.extended_spell_toggle === '@{extended_spell_toggle_var}') {
-            setTrait({
-              freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_EXTENDED_SPELL_TEXT'),
-              name: translate(language, 'CLASS_FEATURES.METAMAGIC_EXTENDED_SPELL'),
-              storageName: 'Extended Spell',
-            });
-          }
-          if (v.heightened_spell_toggle === '@{heightened_spell_toggle_var}') {
-            setTrait({
-              freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_HEIGHTENED_SPELL_TEXT'),
-              name: translate(language, 'CLASS_FEATURES.METAMAGIC_HEIGHTENED_SPELL'),
-              storageName: 'Heightened Spell',
-            });
-          }
-          if (v.quickened_spell_toggle === '@{quickened_spell_toggle_var}') {
-            setTrait({
-              freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_QUICKENED_SPELL_TEXT'),
-              name: translate(language, 'CLASS_FEATURES.METAMAGIC_QUICKENED_SPELL'),
-              storageName: 'Quickened Spell',
-            });
-          }
-          if (v.subtle_spell_toggle === '@{subtle_spell_toggle_var}') {
-            setTrait({
-              freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_SUBTLE_SPELL_TEXT'),
-              name: translate(language, 'CLASS_FEATURES.METAMAGIC_SUBTLE_SPELL'),
-              storageName: 'Subtle Spell',
-            });
-          }
-          if (v.twinned_spell_toggle === '@{twinned_spell_toggle_var}') {
-            setTrait({
-              freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_TWINNED_SPELL_TEXT'),
-              name: translate(language, 'CLASS_FEATURES.METAMAGIC_TWINNED_SPELL'),
-              storageName: 'Twinned Spell',
-            });
-          }
         }
         if (v.sorcerer_level >= 20) {
           setTrait({
@@ -1454,6 +1398,63 @@ const setClassFeatures = () => {
           });
         }
       }
+    }
+
+    if (v.careful_spell_toggle === '@{careful_spell_toggle_var}') {
+      setTrait({
+        freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_CAREFUL_SPELL_TEXT'),
+        name: translate(language, 'CLASS_FEATURES.METAMAGIC_CAREFUL_SPELL'),
+        storageName: 'Careful Spell',
+      });
+    }
+    if (v.distant_spell_toggle === '@{distant_spell_toggle_var}') {
+      setTrait({
+        freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_DISTANT_SPELL_TEXT'),
+        name: translate(language, 'CLASS_FEATURES.METAMAGIC_DISTANT_SPELL'),
+        storageName: 'Distant Spell',
+      });
+    }
+    if (v.empowered_spell_toggle === '@{empowered_spell_toggle_var}') {
+      setTrait({
+        freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_EMPOWERED_SPELL_TEXT'),
+        name: translate(language, 'CLASS_FEATURES.METAMAGIC_EMPOWERED_SPELL'),
+        storageName: 'Empowered Spell',
+      });
+    }
+    if (v.extended_spell_toggle === '@{extended_spell_toggle_var}') {
+      setTrait({
+        freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_EXTENDED_SPELL_TEXT'),
+        name: translate(language, 'CLASS_FEATURES.METAMAGIC_EXTENDED_SPELL'),
+        storageName: 'Extended Spell',
+      });
+    }
+    if (v.heightened_spell_toggle === '@{heightened_spell_toggle_var}') {
+      setTrait({
+        freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_HEIGHTENED_SPELL_TEXT'),
+        name: translate(language, 'CLASS_FEATURES.METAMAGIC_HEIGHTENED_SPELL'),
+        storageName: 'Heightened Spell',
+      });
+    }
+    if (v.quickened_spell_toggle === '@{quickened_spell_toggle_var}') {
+      setTrait({
+        freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_QUICKENED_SPELL_TEXT'),
+        name: translate(language, 'CLASS_FEATURES.METAMAGIC_QUICKENED_SPELL'),
+        storageName: 'Quickened Spell',
+      });
+    }
+    if (v.subtle_spell_toggle === '@{subtle_spell_toggle_var}') {
+      setTrait({
+        freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_SUBTLE_SPELL_TEXT'),
+        name: translate(language, 'CLASS_FEATURES.METAMAGIC_SUBTLE_SPELL'),
+        storageName: 'Subtle Spell',
+      });
+    }
+    if (v.twinned_spell_toggle === '@{twinned_spell_toggle_var}') {
+      setTrait({
+        freetext: translate(language, 'CLASS_FEATURES.METAMAGIC_TWINNED_SPELL_TEXT'),
+        name: translate(language, 'CLASS_FEATURES.METAMAGIC_TWINNED_SPELL'),
+        storageName: 'Twinned Spell',
+      });
     }
 
     if (v.warlock_level) {
