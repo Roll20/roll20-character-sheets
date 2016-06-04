@@ -134,21 +134,21 @@ gulp.task('sass', function () {
     .pipe(gulp.dest('../'));
 });
 gulp.task('translationDist', function () {
-  return gulp.src('./translations/en.json')
+  return gulp.src('./i18n/en.json')
     .pipe(rename('translations.json'))
     .pipe(gulp.dest('../'));
 });
 
 gulp.task('sort-translations', function() {
-  return gulp.src('./translations/*.json')
+  return gulp.src('./i18n/*.json')
     .pipe(sortJSON({ space: 2 }))
-    .pipe(gulp.dest('./translations/'));
+    .pipe(gulp.dest('./i18n/'));
 });
 
 gulp.task('submit', ['compile'], (done) => {
   const html = fs.readFileSync('../5eShaped.html', 'utf-8');
   const css = fs.readFileSync('../5eShaped.css', 'utf-8');
-  const translation = fs.readFileSync('./translations/en.json', 'utf-8');
+  const translation = fs.readFileSync('./i18n/en.json', 'utf-8');
   const props = require('./submitProps.json');
 
   const url = `https://app.${props[props.which].roll20}.net/campaigns/savesettings/${props[props.which].campaignId}`;
