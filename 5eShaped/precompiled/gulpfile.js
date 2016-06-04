@@ -20,8 +20,6 @@ const request = require('request');
 const gutil = require('gulp-util');
 const sortJSON = require('gulp-json-sort').default;
 
-const translations = {};
-
 String.prototype.capitalize = function () {
   return this.replace(/\w\S*/g, function (txt) {
     return txt.charAt(0).toUpperCase() + txt.substr(1)
@@ -30,14 +28,6 @@ String.prototype.capitalize = function () {
 String.prototype.lowercase = function () {
   return this.toLowerCase();
 };
-
-function getTranslation() {
-  translations.en = JSON.parse(fs.readFileSync('./translations/en.json'));
-  translations.de = JSON.parse(fs.readFileSync('./translations/de.json'));
-  translations.fr = JSON.parse(fs.readFileSync('./translations/fr.json'));
-  translations.it = JSON.parse(fs.readFileSync('./translations/it.json'));
-  translations.ru = JSON.parse(fs.readFileSync('./translations/ru.json'));
-}
 
 function objByString(o, s) {
   s = s.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties
@@ -52,27 +42,6 @@ function objByString(o, s) {
     }
   }
   return o;
-}
-
-function getTranslationsIfTheyDontExist() {
-  if (Object.keys(translations).length === 0) {
-    getTranslation();
-  }
-}
-function translationWrapper(lang, key) {
-  let translation = objByString(translations[lang], key);
-
-  if (!translation) {
-    translation = objByString(translations.en, key)
-  }
-
-  return '<span class=' + lang + '>' + translation + '</span>';
-}
-function translate(key) {
-  getTranslationsIfTheyDontExist();
-  const translation = translationWrapper('en', key) + translationWrapper('de', key) + translationWrapper('fr', key) + translationWrapper('it', key) + translationWrapper('ru', key);
-
-  return translation;
 }
 function duplicate(file, limit, start) {
   const template = file.contents.toString('utf8');
@@ -94,39 +63,12 @@ function duplicate(file, limit, start) {
 const compileSheetHTML = () => {
   return gulp.src('./5eShaped.html')
     .pipe(include())
-    .pipe(replaceTask({
-      patterns: [
-        {
-          match: /\x7B\x7B'([A-Za-z_0-9\.]+)'\s\|\stranslate\x7D\x7D/g,
-          replacement: function ($1, $2) {
-            return translate($2);
-          }
-        }
-      ]
-    }))
     .pipe(minifyHTML({
       whitespace: true
     }));
 };
 const compileSheetWorkers = () => {
   return gulp.src(['components/sheetWorkers.js'])
-    .pipe(replaceTask({
-      patterns: [
-        {
-          match: /(let TRANSLATIONS;)/i,
-          replacement: function () {
-            const translations = {
-              de: JSON.parse(fs.readFileSync('./translations/de.json')),
-              en: JSON.parse(fs.readFileSync('./translations/en.json')),
-              fr: JSON.parse(fs.readFileSync('./translations/fr.json')),
-              it: JSON.parse(fs.readFileSync('./translations/it.json')),
-              ru: JSON.parse(fs.readFileSync('./translations/ru.json'))
-            };
-            return `const TRANSLATIONS = ${JSON.stringify(translations)};`;
-          }
-        }
-      ]
-    }))
     .pipe(babel({
       presets: ['es2015'],
       comments: false,

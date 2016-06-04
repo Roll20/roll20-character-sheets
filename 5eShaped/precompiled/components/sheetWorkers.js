@@ -1,8 +1,7 @@
 /* global setAttrs:false, getAttrs:false, on:false, getSectionIDs:false, generateRowID:false */
 'use strict';
 
-const currentVersion = '4.0.0';
-let TRANSLATIONS;
+const currentVersion = '4.0.1';
 const SKILLS = {
   ACROBATICS: 'dexterity',
   ANIMALHANDLING: 'wisdom',
@@ -26,21 +25,6 @@ const SKILLS = {
 const CLASSES = ['barbarian', 'bard', 'cleric', 'druid', 'fighter', 'monk', 'paladin', 'ranger', 'rogue', 'sorcerer', 'warlock', 'wizard'];
 const ABILITIES = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
 
-const translate = (language, key) => {
-  let translatedValue;
-  if (key.indexOf('.') !== -1) {
-    translatedValue = key.split('.').reduce((a, b) => a[b], TRANSLATIONS[language]);
-  }
-
-  if (TRANSLATIONS[language] && TRANSLATIONS[language][key]) {
-    translatedValue = TRANSLATIONS[language][key];
-  }
-
-  if (!translatedValue && language !== 'en') {
-    translate('en', key);
-  }
-  return translatedValue;
-};
 const capitalize = (string) => {
   return string.replace(/\w\S*/g, (txt) => {
     return txt.charAt(0).toUpperCase() + txt.substr(1);
