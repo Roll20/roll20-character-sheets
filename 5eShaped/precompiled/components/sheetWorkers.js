@@ -5141,7 +5141,7 @@ const generateSkills = () => {
           repeatingString = `${repeatingItem}_${skillId}_`;
 
           finalSetAttrs[`${repeatingString}storage_name`] = prop;
-          finalSetAttrs[`${repeatingString}name`] = translate(language, `${prop}`);
+          finalSetAttrs[`${repeatingString}name`] = getTranslationByKey(prop);
           finalSetAttrs[`${repeatingString}ability`] = `@{${SKILLS[prop]}_mod}`;
           updateSkill(skillId);
         }
