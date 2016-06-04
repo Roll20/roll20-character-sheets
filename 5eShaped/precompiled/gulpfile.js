@@ -128,7 +128,7 @@ gulp.task('sass', function () {
     .pipe(minifyCss())
     .pipe(gulp.dest('../'));
 });
-gulp.task('scss-lint', function() {
+gulp.task('sass-lint', function() {
   return gulp.src('./5eShaped.scss')
     .pipe(sassLint(sassConfig))
     .pipe(sassLint.format())
