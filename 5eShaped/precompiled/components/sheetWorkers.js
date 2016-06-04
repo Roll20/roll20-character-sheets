@@ -5130,6 +5130,34 @@ const fixRollTwo = () => {
   });
 };
 
+const updateSavingThrowVs = () => {
+  const repeatingItems = ['repeating_attack', 'repeating_spell', 'repeating_trait', 'repeating_action', 'repeating_reaction', 'repeating_legendaryaction', 'repeating_lairaction', 'repeating_regionaleffect'];
+  const collectionArray = [];
+  const finalSetAttrs = {};
+
+  for (const repeatingItem of repeatingItems) {
+    getSectionIDs(repeatingItem, (ids) => {
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
+        collectionArray.push(`${repeatingString}saving_throw_vs_ability`);
+      }
+
+      getAttrs(collectionArray, (v) => {
+        for (const id of ids) {
+          const repeatingString = `${repeatingItem}_${id}_`;
+          const oldSavingThrowVsAbility = v[`${repeatingString}saving_throw_vs_ability`];
+
+
+          if (oldSavingThrowVsAbility) {
+            finalSetAttrs[`${repeatingString}saving_throw_vs_ability`] = oldSavingThrowVsAbility.toUpperCase();
+          }
+        }
+        setFinalAttrs(v, finalSetAttrs);
+      });
+    });
+  }
+};
+
 const checkVersionFormat = (version, finalSetAttrs) => {
   const versionRegex = /\d+\.\d+\.\d+/gi;
   const versionIsProperFormat = versionRegex.exec(version);
@@ -5293,6 +5321,9 @@ const sheetOpened = () => {
       if (versionCompare(version, '3.6.1') < 0) {
         updateNPCHD();
         switchToNPC();
+      }
+      if (versionCompare(version, '4.0.2') < 0) {
+        updateSavingThrowVs();
       }
     }
 
