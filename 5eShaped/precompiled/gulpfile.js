@@ -124,19 +124,15 @@ const sassConfig = {
 };
 gulp.task('sass', function () {
   return gulp.src('./5eShaped.scss')
-    /*
-     .pipe(sassLint(sassConfig))
-     .pipe(sassLint.format())
-     .pipe(sassLint.failOnError())
-     */
     .pipe(sass().on('error', sass.logError))
     .pipe(minifyCss())
     .pipe(gulp.dest('../'));
 });
-gulp.task('translationDist', function () {
-  return gulp.src('./i18n/en.json')
-    .pipe(rename('translations.json'))
-    .pipe(gulp.dest('../'));
+gulp.task('scss-lint', function() {
+  return gulp.src('./5eShaped.scss')
+    .pipe(sassLint(sassConfig))
+    .pipe(sassLint.format())
+    .pipe(sassLint.failOnError())
 });
 
 gulp.task('sort-translations', function() {
@@ -181,5 +177,10 @@ gulp.task('submit', ['compile'], (done) => {
       return done(err);
     }
   );
+});
 
+gulp.task('translationDist', function () {
+  return gulp.src('./i18n/en.json')
+    .pipe(rename('translations.json'))
+    .pipe(gulp.dest('../'));
 });
