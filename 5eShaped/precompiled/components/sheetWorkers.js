@@ -3476,26 +3476,40 @@ const updateSpellChatMacroShow = () => {
   const collectionArray = ['spells_show_spell_level_if_all_slots_are_used'];
   const finalSetAttrs = {};
 
-  for (let i = 1; i <= 9; i++) {
+  for (let i = 0; i <= 9; i++) {
     collectionArray.push(`spell_slots_l${i}`);
+    collectionArray.push(`spells_level_${i}_macro_var`);
+    collectionArray.push(`spells_level_${i}_show`);
   }
 
   getAttrs(collectionArray, (v) => {
     const showLevelIfAllSlotsAreUsed = v.spells_show_spell_level_if_all_slots_are_used === 'on' || isUndefined(v.spells_show_spell_level_if_all_slots_are_used);
 
-    for (let i = 1; i <= 9; i++) {
-      if (!showLevelIfAllSlotsAreUsed && !getIntValue(v[`spell_slots_l${i}`])) {
+    for (let i = 0; i <= 9; i++) {
+      if ((!showLevelIfAllSlotsAreUsed && !getIntValue(v[`spell_slots_l${i}`])) || !v[`spells_level_${i}_macro_var`]) {
+        console.log('in if');
         finalSetAttrs[`spells_level_${i}_show`] = '';
       } else {
+        console.log('in else');
         finalSetAttrs[`spells_level_${i}_show`] = true;
       }
     }
     setFinalAttrs(v, finalSetAttrs);
   });
 };
-on('change:spells_show_spell_level_if_all_slots_are_used change:spell_slots_l1 change:spell_slots_l2 change:spell_slots_l3 change:spell_slots_l4 change:spell_slots_l5 change:spell_slots_l6 change:spell_slots_l7 change:spell_slots_l8 change:spell_slots_l9', () => {
-  updateSpellChatMacroShow();
-});
+const watchForSpellChanges = () => {
+  const spellsWatch = ['change:spells_show_spell_level_if_all_slots_are_used'];
+
+  for (let i = 0; i <= 9; i++) {
+    spellsWatch.push(`change:spells_level_${i}_macro_var`);
+    spellsWatch.push(`change:spell_slots_l${i}`);
+  }
+
+  on(spellsWatch.join(' '), () => {
+    updateSpellChatMacroShow();
+  });
+};
+watchForSpellChanges();
 
 const generateHigherLevelQueries = () => {
   const collectionArray = ['warlock_level', 'number_of_classes'];
@@ -5313,7 +5327,6 @@ const sheetOpened = () => {
       if (versionCompare(version, '3.5.0') < 0) {
         generateHigherLevelQueries();
         updateSpellChatMacro();
-        updateSpellChatMacroShow();
       }
       if (versionCompare(version, '3.5.1') < 0) {
         updateSpellSlots();
@@ -5324,6 +5337,9 @@ const sheetOpened = () => {
       }
       if (versionCompare(version, '4.0.2') < 0) {
         updateSavingThrowVs();
+      }
+      if (versionCompare(version, '4.0.4') < 0) {
+        updateSpellChatMacroShow();
       }
     }
 
