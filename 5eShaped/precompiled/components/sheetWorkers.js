@@ -1,7 +1,7 @@
 /* global setAttrs:false, getAttrs:false, on:false, getSectionIDs:false, generateRowID:false */
 'use strict';
 
-const currentVersion = '4.0.2';
+const currentVersion = '4.0.3';
 const SKILLS = {
   ACROBATICS: 'dexterity',
   ANIMALHANDLING: 'wisdom',
@@ -5338,7 +5338,7 @@ const sheetOpened = () => {
       if (versionCompare(version, '4.0.2') < 0) {
         updateSavingThrowVs();
       }
-      if (versionCompare(version, '4.0.4') < 0) {
+      if (versionCompare(version, '4.0.3') < 0) {
         updateSpellChatMacroShow();
       }
     }
