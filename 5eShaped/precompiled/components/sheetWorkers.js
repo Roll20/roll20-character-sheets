@@ -3684,7 +3684,7 @@ const updateSkill = (rowId) => {
       collectionArray.push(`${repeatingString}storage_name`);
       collectionArray.push(`${repeatingString}ability`);
       collectionArray.push(`${repeatingString}bonus`);
-      collectionArray.push(`${repeatingString}ability_short_name`);
+      collectionArray.push(`${repeatingString}ability_key`);
       collectionArray.push(`${repeatingString}formula`);
       collectionArray.push(`${repeatingString}total`);
       collectionArray.push(`${repeatingString}total_with_sign`);
@@ -3703,7 +3703,7 @@ const updateSkill = (rowId) => {
 
         const ability = getAbilityModName(v[`${repeatingString}ability`]);
         const abilityName = getAbilityName(v[`${repeatingString}ability`]);
-        finalSetAttrs[`${repeatingString}ability_short_name`] = getAbilityShortName(ability, true);
+        finalSetAttrs[`${repeatingString}ability_key`] = abilityName.toUpperCase();
 
         let total = 0;
         let totalFormula = '';
@@ -3777,7 +3777,7 @@ const updateSkill = (rowId) => {
 
 on('change:repeating_skill', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_skill', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'ability_short_name' && repeatingInfo.field !== 'total' && repeatingInfo.field !== 'total_with_sign' && repeatingInfo.field !== 'passive_total' && repeatingInfo.field !== 'passive_total_with_sign' && repeatingInfo.field !== 'formula') {
+  if (repeatingInfo && repeatingInfo.field !== 'ability_key' && repeatingInfo.field !== 'total' && repeatingInfo.field !== 'total_with_sign' && repeatingInfo.field !== 'passive_total' && repeatingInfo.field !== 'passive_total_with_sign' && repeatingInfo.field !== 'formula') {
     updateSkill(repeatingInfo.rowId);
   }
 });
@@ -5301,9 +5301,6 @@ const sheetOpened = () => {
         armorPlusDexRemoval();
         updateArmor();
       }
-      if (versionCompare(version, '2.6.1') < 0) {
-        updateSkill();
-      }
       if (versionCompare(version, '2.6.3') < 0) {
         updateSpell();
       }
@@ -5314,9 +5311,6 @@ const sheetOpened = () => {
         updateActionChatMacro('lairaction');
         updateActionChatMacro('regionaleffect');
         updateAbilityChecksMacro();
-      }
-      if (versionCompare(version, '3.1.3') < 0) {
-        updateSkill();
       }
       if (versionCompare(version, '3.2.1') < 0) {
         updateCritDamage();
@@ -5340,6 +5334,9 @@ const sheetOpened = () => {
       }
       if (versionCompare(version, '4.0.3') < 0) {
         updateSpellChatMacroShow();
+      }
+      if (versionCompare(version, '4.1.0') < 0) {
+        updateSkill();
       }
     }
 
