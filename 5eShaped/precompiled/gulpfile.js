@@ -8,6 +8,7 @@ const minifyCss = require('gulp-minify-css');
 const concat = require('gulp-concat');
 const sass = require('gulp-sass');
 const sassLint = require('gulp-sass-lint');
+const autoprefixer = require('gulp-autoprefixer');
 const replaceTask = require('gulp-replace-task');
 const rename = require('gulp-rename');
 const change = require('gulp-change');
@@ -119,12 +120,16 @@ const sassConfig = {
     'force-element-nesting': 0,
     'hex-length': 'long',
     'empty-line-between-blocks': 0,
+    'nesting-depth': 0,
+    'no-url-protocols': 0,
+    'no-important': 0,
     include: 0
   }
 };
 gulp.task('sass', function () {
   return gulp.src('./5eShaped.scss')
     .pipe(sass().on('error', sass.logError))
+    .pipe(autoprefixer())
     .pipe(minifyCss())
     .pipe(gulp.dest('../'));
 });
