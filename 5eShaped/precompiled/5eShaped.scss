@@ -23,6 +23,7 @@ $death-save-header-side: #1f1414;
 $orange: #ca8929;
 $orange-alt: #e69a28;
 $light-green: #879a6a;
+$advantage-green: #2fc910;
 $deep-green: #51624b;
 $attack-header: #2c5d28;
 $attack-header-side: #375035;
@@ -31,6 +32,7 @@ $ability-header-side: #354e50;
 $deep-blue: #416696;
 $bright-blue: #3f88e6;
 $light-gray: #a7a7a7;
+$whitish-gray: #dedede;
 $gray: #a19a91;
 $tan: #867453;
 $small-label-gray: #676767;
@@ -43,6 +45,7 @@ $spell-header: #45285d;
 $spell-header-side: #443550;
 $border-radius: 3px;
 $scrollbar-size: .5em;
+$death-saving-throw-circle-size: 14px;
 
 $classes: 'barbarian', 'bard', 'cleric', 'druid', 'fighter', 'monk', 'paladin', 'ranger', 'rogue', 'sorcerer', 'warlock', 'wizard';
 
@@ -483,18 +486,21 @@ $pad-mar: (
   padding: 2px;
 }
 
-.sheet-tooltip-position-wrapper {
+.sheet-tooltip-position-wrapper,
+.sheet-rolltemplate-5e-shaped .sheet-tooltip-position-wrapper {
   position: absolute;
   right: 1px;
   top: 1px;
   z-index: 99;
 }
 
-.sheet-tooltip {
+.sheet-tooltip,
+.sheet-rolltemplate-5e-shaped .sheet-tooltip {
   position: relative;
 }
 
-.sheet-tooltip-toggle-text {
+.sheet-tooltip-toggle-text,
+.sheet-rolltemplate-5e-shaped .sheet-tooltip-toggle-text {
   background-color: $black;
   border-radius: 50%;
   color: $mostly-transparent-white;
@@ -505,12 +511,12 @@ $pad-mar: (
   width: 10px;
 }
 
-[class*='sheet-tooltip-content'] {
+[class*='sheet-tooltip-content'],
+.sheet-rolltemplate-5e-shaped [class*='sheet-tooltip-content'] {
   background-color: $black;
   border-bottom-left-radius: 4px;
   border-bottom-right-radius: 4px;
   color: $mostly-transparent-white;
-  margin-top: -15px;
   opacity: .9;
   padding: 4px;
   position: absolute;
@@ -527,35 +533,55 @@ $pad-mar: (
     top: 9px;
   }
 }
+[class*='sheet-tooltip-content'] {
+  margin-top: -15px;
+}
 
-.sheet-tooltip-small {
+.sheet-tooltip-small,
+.sheet-rolltemplate-5e-shaped .sheet-tooltip-small {
   width: 80px;
 }
 
-.sheet-tooltip-content-left {
+.sheet-tooltip-content-left,
+.sheet-rolltemplate-5e-shaped .sheet-tooltip-content-left {
   border-top-left-radius: 4px;
-  margin-right: 12px;
   right: 100%;
 }
-
-.sheet-tooltip-content-right {
-  border-top-right-radius: 4px;
-  left: 100%;
-  margin-left: 12px;
+.sheet-tooltip-content-left {
+  margin-right: 12px;
+}
+.sheet-rolltemplate-5e-shaped .sheet-tooltip-content-left {
+  margin-right: 20px;
 }
 
-.sheet-tooltip-content-left::after {
+.sheet-tooltip-content-right,
+.sheet-rolltemplate-5e-shaped .sheet-tooltip-content-right {
+  border-top-right-radius: 4px;
+  left: 100%;
+}
+.sheet-tooltip-content-right {
+  margin-left: 12px;
+}
+.sheet-rolltemplate-5e-shaped .sheet-tooltip-content-right {
+  margin-left: 20px;
+}
+
+.sheet-tooltip-content-left::after,
+.sheet-rolltemplate-5e-shaped .sheet-tooltip-content-left::after {
   border-left: 8px solid $black;
   right: -8px;
 }
 
-.sheet-tooltip-content-right::after {
+.sheet-tooltip-content-right::after,
+.sheet-rolltemplate-5e-shaped .sheet-tooltip-content-right::after {
   border-right: 8px solid $black;
   left: -8px;
 }
 
 .sheet-tooltip:hover [class*='sheet-tooltip-content'],
-.sheet-tooltip:focus [class*='sheet-tooltip-content'] {
+.sheet-tooltip:focus [class*='sheet-tooltip-content'],
+.sheet-rolltemplate-5e-shaped .sheet-tooltip:hover [class*='sheet-tooltip-content'],
+.sheet-rolltemplate-5e-shaped .sheet-tooltip:focus [class*='sheet-tooltip-content'] {
   visibility: visible;
   z-index: 450;
 }
@@ -637,7 +663,7 @@ $pad-mar: (
 .sheet-attacks,
 .sheet-spell {
   input[readonly] {
-    background: $light-gray;
+    background: $whitish-gray;
   }
 }
 
@@ -1015,7 +1041,6 @@ $pad-mar: (
 
 .sheet-death-success,
 .sheet-death-fail {
-  $death-saving-throw-circle-size: 14px;
   .sheet-checkbox-label {
     height: $death-saving-throw-circle-size;
     margin: 0 2px;
@@ -1136,7 +1161,24 @@ $pad-mar: (
     box-sizing: border-box;
     font-size: 12px;
     margin-right: 10px;
-    padding: 4px 0 2px;
+    position: relative;
+  }
+
+  .sheet-advantage-circle {
+    border: 1px solid $black;
+    border-radius: 50%;
+    height: $death-saving-throw-circle-size;
+    position: absolute;
+    right: 2px;
+    top: 2px;
+    width: $death-saving-throw-circle-size;
+    z-index: 5;
+    &.sheet-advantage {
+      background-color: $advantage-green;
+    }
+    &.sheet-disadvantage {
+      background-color: $important-red;
+    }
   }
 
   .inlinerollresult {
@@ -1235,9 +1277,19 @@ $pad-mar: (
       }
     }
   }
-
+  .sheet-rt-title-wrap {
+    padding: 0 3px;
+  }
   .sheet-rt-title {
-    font-size: 1.7em;
+    color: $deep-red;
+    font-family: 'Times New Roman';
+    font-size: 2em;
+    font-variant: small-caps;
+    font-weight: bold;
+  }
+  .sheet-rt-character-name {
+    font-variant: small-caps;
+    padding: 2px 3px;
   }
 
   .sheet-rt-subheader {
@@ -1256,7 +1308,7 @@ $pad-mar: (
   }
 
   .sheet-shaped-row {
-    padding: 2px;
+    padding: 2px 3px;
   }
 
   .sheet-rt-emote {
@@ -1272,6 +1324,10 @@ $pad-mar: (
 
   .sheet-output {
     font-size: 1.7em;
+    text-align: center;
+  }
+  .sheet-output-small {
+    font-size: 1.5em;
     text-align: center;
   }
   .sheet-output-small-label {
@@ -1625,7 +1681,8 @@ span[class^='sheet-toggle-spells-filter'] {
 .sheet-creature-name {
   border: 0;
   font-family: 'Times New Roman';
-  font-size: 17px;
+  font-size: 1.7em;
+  font-variant: small-caps;
   font-weight: bold;
   line-height: 1.1em;
   padding: 0 !important;
