@@ -2967,6 +2967,12 @@ const updateAction = (type, rowId) => {
           };
         }
         updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
+        if (v.damage_type) {
+          finalSetAttrs.damage_type = lowercaseDamageTypes(v.damage_type);
+        }
+        if (v.second_damage_type) {
+          finalSetAttrs.second_damage_type = lowercaseDamageTypes(v.second_damage_type);
+        }
         setCritDamage(v, finalSetAttrs, repeatingString);
 
         updateHealToggle(v, finalSetAttrs, repeatingString);
@@ -3144,6 +3150,12 @@ const updateAttack = (rowId) => {
           type: 'attack',
         };
         updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
+        if (v.damage_type) {
+          finalSetAttrs.damage_type = lowercaseDamageTypes(v.damage_type);
+        }
+        if (v.second_damage_type) {
+          finalSetAttrs.second_damage_type = lowercaseDamageTypes(v.second_damage_type);
+        }
         setCritDamage(v, finalSetAttrs, repeatingString);
       }
       setFinalAttrs(v, finalSetAttrs);
@@ -3375,6 +3387,12 @@ const updateSpell = (rowId) => {
           type: 'spell',
         };
         updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
+        if (v.damage_type) {
+          finalSetAttrs.damage_type = lowercaseDamageTypes(v.damage_type);
+        }
+        if (v.second_damage_type) {
+          finalSetAttrs.second_damage_type = lowercaseDamageTypes(v.second_damage_type);
+        }
         setCritDamage(v, finalSetAttrs, repeatingString);
 
         if (getIntValue(v.is_npc) === 1 && v.caster_level && v[`${repeatingString}damage`] && v[`${repeatingString}damage`].indexOf('@{level}') !== -1) {
