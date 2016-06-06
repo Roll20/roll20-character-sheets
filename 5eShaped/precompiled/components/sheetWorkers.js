@@ -5211,7 +5211,6 @@ const sheetOpened = () => {
       if (!v.import_data) {
         finalSetAttrs.edit_mode = 'on';
       }
-      finalSetAttrs.roll_info = '';
 
       if (!v.roll_setting) { // API Script import sets this when making characters
         finalSetAttrs.roll_setting = '@{roll_1}';
