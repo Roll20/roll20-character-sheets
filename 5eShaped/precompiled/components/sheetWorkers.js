@@ -5211,8 +5211,7 @@ const sheetOpened = () => {
       if (!v.import_data) {
         finalSetAttrs.edit_mode = 'on';
       }
-
-      if (!v.roll_setting) { // API Script import sets this when making characters
+      if (isUndefined(v.roll_setting)) { // API Script import sets this when making characters
         finalSetAttrs.roll_setting = '@{roll_1}';
       }
       const setAbilities = {};
