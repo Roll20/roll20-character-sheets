@@ -545,8 +545,8 @@
         'Lily Chen': {
             'use-portrait': 25,
             title: 'the Martial Artist',
-            sanity: 4, // [4, 5, 6, 7]
-            stamina: 7, // [7, 6, 5, 4]
+            sanity: [4, 5, 6, 7],
+            stamina: [7, 6, 5, 4],
             home: 'Ye Olde Magick Shoppe',
             'fixed-posessions': '$4, 2 Clue tokens, 1 Skill (Martial Arts)',
             'random-posessions': '1 Spell, 1 Common item',
@@ -1193,6 +1193,7 @@
     on('change:edit-investigator', function() {
         getAttrs(['edit-investigator'], function(v) {
             if (parseInt(v['edit-investigator']) !== 1) {
+                updateStats();
                 updateAttributes();
             }
         });
@@ -1204,10 +1205,10 @@
             }
         });
     });
-    on('sheet:opened change:speed-sneak change:fight-will change:lore-luck', updateStats);
+    on('sheet:opened change:speed-sneak change:fight-will change:lore-luck change:sanity-stamina', updateStats);
     
     function updateAttributes() {
-        getAttrs(['sanity_max', 'stamina_max'], function(v) {
+        getAttrs(['sanity_max', 'stamina_max'], function(v) {console.log(v);
             setAttrs({
                 sanity: v.sanity_max,
                 stamina: v.stamina_max
@@ -1246,7 +1247,9 @@
                     character_name: name,
                     'speed-sneak': 3,
                     'fight-will': 3,
-                    'lore-luck': 3
+                    'lore-luck': 3,
+                    'sanity-stamina': 3,
+                    'variable-san-sta': 0
                 },
                 ids;
             
@@ -1269,28 +1272,56 @@
                     attrs[`repeating_abilities_${i}_ability-text`] = attrs.abilities[k].text;
                 });
                 delete attrs.abilities;
-                console.log(attrs);
+                
+                if (_.isArray(attrs.sanity)) {
+                    attrs['variable-san-sta'] = 1;
+                    _.each(attrs.sanity, (n, i) => attrs[`sanity-score${i}`] = n);
+                    attrs.sanity_max = attrs.sanity[2];
+                    delete attrs.sanity;
+                }
+                if (_.isArray(attrs.stamina)) {
+                    attrs['variable-san-sta'] = 1;
+                    _.each(attrs.stamina, (n, i) => attrs[`stamina-score${i}`] = n);
+                    attrs.stamina_max = attrs.stamina[2];
+                    delete attrs.stamina;
+                }
+                if (attrs['variable-san-sta'] === 1) {
+                    if (attrs.sanity !== undefined) {
+                        attrs['sanity-score0'] = attrs.sanity;
+                        delete attrs.sanity;
+                    }
+                    if (attrs.stamina !== undefined) {
+                        attrs['stamina-score0'] = attrs.stamina;
+                        delete attrs.stamina;
+                    }
+                }
                 setAttrs(attrs);
             }
         });
     }
     
     function updateStats() {
-        getAttrs(['speed-sneak', 'fight-will', 'lore-luck',
+        getAttrs(['speed-sneak', 'fight-will', 'lore-luck', 'sanity-stamina',
                   'speed-score0', 'speed-score1', 'speed-score2', 'speed-score3',
                   'sneak-score0', 'sneak-score1', 'sneak-score2', 'sneak-score3',
                   'fight-score0', 'fight-score1', 'fight-score2', 'fight-score3',
                   'will-score0',  'will-score1',  'will-score2',  'will-score3',
                   'lore-score0',  'lore-score1',  'lore-score2',  'lore-score3',
-                  'luck-score0',  'luck-score1',  'luck-score2',  'luck-score3'], function(v) {
+                  'luck-score0',  'luck-score1',  'luck-score2',  'luck-score3',
+                  'sanity-score0', 'sanity-score1', 'sanity-score2', 'sanity-score3',
+                  'stamina-score0', 'stamina-score1', 'stamina-score2', 'stamina-score3',
+                  'variable-san-sta'], function(v) {
             var speed = ['speed-score0', 'speed-score1', 'speed-score2', 'speed-score3'],
                 sneak = ['sneak-score0', 'sneak-score1', 'sneak-score2', 'sneak-score3'],
                 fight = ['fight-score0', 'fight-score1', 'fight-score2', 'fight-score3'],
                 will  = ['will-score0',  'will-score1',  'will-score2',  'will-score3'],
                 lore  = ['lore-score0',  'lore-score1',  'lore-score2',  'lore-score3'],
                 luck  = ['luck-score0',  'luck-score1',  'luck-score2',  'luck-score3'],
-                stats = [speed, sneak, fight, will, lore, luck],
-                slide = _.map(['speed-sneak', 'fight-will', 'lore-luck'], (n) => parseInt(v[n]) - 1);
+                sanity = ['sanity-score0', 'sanity-score1', 'sanity-score2', 'sanity-score3'],
+                stamina = ['stamina-score0', 'stamina-score1', 'stamina-score2', 'stamina-score3'],
+                stats = [speed, sneak, fight, will, lore, luck, sanity, stamina],
+                slide = _.map(['speed-sneak', 'fight-will', 'lore-luck', 'sanity-stamina'], (n) => parseInt(v[n]) - 1),
+                attrs;
             
             _.each(stats, function(st, i, list) {
                 var stVal = _.map(st, (n) => parseInt(v[n])),
@@ -1298,25 +1329,31 @@
                 list[i] = stVal[slideIdx];
             });
             
-            setAttrs({
+            attrs = {
                 speed: stats[0],
                 sneak: stats[1],
                 fight: stats[2],
                 will:  stats[3],
                 lore:  stats[4],
                 luck:  stats[5]
-            });
+            };
+            
+            if (parseInt(v['variable-san-sta'])) {
+                attrs.sanity_max = stats[6];
+                attrs.stamina_max = stats[7];
+            }
+            setAttrs(attrs);
         });
     }
 </script>
 <input type="checkbox" name="attr_edit-investigator" class="sheet-toggle-button" value="1">
 <div class="sheet-onoffswitch">
     <div class="sheet-onoffswitch-label">
-        <span class="sheet-inner"></span>
-        <span class="sheet-switch"></span>
+        <span class="sheet-inner sheet-inner-edit-display"></span>
+        <span class="sheet-switch" style="top:2px"></span>
     </div>
 </div>
-<div style="height:35px"></div>
+<div style="height:27px"></div>
 <div class="sheet-tab sheet-investigator-edit">
     <div class="sheet-table">
         <div class="sheet-table-body">
@@ -1410,10 +1447,31 @@
             </div>
             <div class="sheet-table-row">
                 <div class="sheet-table-cell">
+                    <label>Use Variable San/Stam</label>
+                </div>
+                <div class="sheet-table-cell">
+                    <div class="sheet-onoffswitch">
+                        <input type="checkbox" name="attr_variable-san-sta" class="sheet-toggle-button" value="1">
+                        <div class="sheet-onoffswitch-label">
+                            <span class="sheet-inner sheet-inner-variable-static"></span>
+                            <span class="sheet-switch"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="sheet-table-row">
+                <div class="sheet-table-cell">
                     <label>Maximum Sanity</label>
                 </div>
                 <div class="sheet-table-cell">
+                    <input type="checkbox" name="attr_variable-san-sta" class="sheet-switcher" value="1">
                     <input type="number" name="attr_sanity_max" placeholder="5">
+                    <div>
+                        <input type="number" name="attr_sanity-score0" placeholder="4">
+                        <input type="number" name="attr_sanity-score1" placeholder="5">
+                        <input type="number" name="attr_sanity-score2" placeholder="6">
+                        <input type="number" name="attr_sanity-score3" placeholder="7">
+                    </div>
                 </div>
             </div>
             <div class="sheet-table-row">
@@ -1421,7 +1479,14 @@
                     <label>Maximum Stamina</label>
                 </div>
                 <div class="sheet-table-cell">
+                    <input type="checkbox" name="attr_variable-san-sta" class="sheet-switcher" value="1">
                     <input type="number" name="attr_stamina_max" placeholder="5">
+                    <div>
+                        <input type="number" name="attr_stamina-score0" placeholder="7">
+                        <input type="number" name="attr_stamina-score1" placeholder="6">
+                        <input type="number" name="attr_stamina-score2" placeholder="5">
+                        <input type="number" name="attr_stamina-score3" placeholder="4">
+                    </div>
                 </div>
             </div>
             <div class="sheet-table-row">
@@ -1473,7 +1538,7 @@
                                 <input type="text" name="attr_ability-name" placeholder="Studious">
                             </div>
                             <div class="sheet-table-cell">
-                                <textarea name="attr_ability-text" style="margin-top:-5px" placeholder="**Any Phase:** Whenever Amanda draws one or more cards from the **Skill** deck, she draws one extra card and then discards one of those cards."></textarea>
+                                <textarea name="attr_ability-text" style="margin-top:-5px" placeholder="Any Phase: Whenever Amanda draws one or more cards from the Skill deck, she draws one extra card and then discards one of those cards."></textarea>
                             </div>
                         </fieldset>
                     </div>
@@ -1549,6 +1614,7 @@
         </div>
     </div>
 </div>
+<input type="checkbox" value="1" name="attr_variable-san-sta" class="sheet-toggle-bg sheet-3sliders-4sliders">
 <div class="sheet-tab sheet-investigator-display">
     <input class="sheet-portrait-toggle" type="radio" name="attr_use-portrait" value="1" checked="checked"><div class="sheet-portrait sheet-custom-investigator"></div>
     <input class="sheet-portrait-toggle" type="radio" name="attr_use-portrait" value="2"><div class="sheet-portrait sheet-agnes-baker"></div>
@@ -1631,11 +1697,11 @@
     <div class="sheet-abilities">
         <h3><span name="attr_ability-name1">????</span></h3>
         <p><span name="attr_ability-text1">Any phase: Lorem ipsum dolor sit amet</span></p>
-        <input type="checkbox" value="1" style="display:none" name="attr_two-abilities">
+        <input type="checkbox" value="1" name="attr_two-abilities" class="sheet-hider">
         <div>
             <h3><span name="attr_ability-name2">????</span></h3>
             <p><span name="attr_ability-text2">Any phase: Lorem ipsum dolor sit amet</span></p>
-            <input type="checkbox" value="1" style="display:none" name="attr_three-abilities">
+            <input type="checkbox" value="1" name="attr_three-abilities" class="sheet-hider">
             <div>
                 <h3><span name="attr_ability-name3">????</span></h3>
                 <p><span name="attr_ability-text3">Any phase: Lorem ipsum dolor sit amet</span></p>
@@ -1645,6 +1711,34 @@
     
     <div class="sheet-focus">
         <h3>Focus:<span class="sheet-right" name="attr_focus">0</span></h3>
+    </div>
+    
+    <div class="sheet-sanity-stamina">
+        <div class="sheet-labels">
+            <h3><input class="sheet-inline-input" type="number" name="attr_sanity" value="0">/SANITY</h3>
+            <h3><input class="sheet-inline-input" type="number" name="attr_stamina" value="0">/STAMINA</h3>
+        </div>
+        <div class="sheet-scores">
+            <div class="sheet-scores-row">
+                <h3 class="sheet-inline"><span name="attr_sanity-score0">0</span></h3>
+                <h3 class="sheet-inline"><span name="attr_sanity-score1">0</span></h3>
+                <h3 class="sheet-inline"><span name="attr_sanity-score2">0</span></h3>
+                <h3 class="sheet-inline"><span name="attr_sanity-score3">0</span></h3>
+            </div>
+            <div class="sheet-scores-row">
+                <h3 class="sheet-inline"><span name="attr_stamina-score0">0</span></h3>
+                <h3 class="sheet-inline"><span name="attr_stamina-score1">0</span></h3>
+                <h3 class="sheet-inline"><span name="attr_stamina-score2">0</span></h3>
+                <h3 class="sheet-inline"><span name="attr_stamina-score3">0</span></h3>
+            </div>
+            
+            <div>
+                <input type="radio" class="sheet-score-selector" name="attr_sanity-stamina" value="1"><span class="sheet-score-selector"></span>
+                <input type="radio" class="sheet-score-selector" name="attr_sanity-stamina" value="2"><span class="sheet-score-selector"></span>
+                <input type="radio" class="sheet-score-selector" name="attr_sanity-stamina" value="3" checked="checked"><span class="sheet-score-selector"></span>
+                <input type="radio" class="sheet-score-selector" name="attr_sanity-stamina" value="4"><span class="sheet-score-selector"></span>
+            </div>
+        </div>
     </div>
     
     <div class="sheet-speed-sneak">
