@@ -1200,7 +1200,7 @@
     });
     on('change:predefined-investigator', function() {
         getAttrs(['predefined-investigator'], function(v) {
-            if (v['predefined-investigator'] !== '') {
+            if (v['predefined-investigator'] !== '' && v['predefined-investigator'] !== undefined) {
                 populateInvestigator();
             }
         });
@@ -1208,11 +1208,16 @@
     on('sheet:opened change:speed-sneak change:fight-will change:lore-luck change:sanity-stamina', updateStats);
     
     function updateAttributes() {
-        getAttrs(['sanity_max', 'stamina_max'], function(v) {console.log(v);
-            setAttrs({
+        getAttrs(['predefined-investigator', 'sanity_max', 'stamina_max'], function(v) {
+            var attrs = {
                 sanity: v.sanity_max,
                 stamina: v.stamina_max
-            });
+            };
+            if (v['predefined-investigator'] === '' || v['predefined-investigator'] === undefined) {
+                attrs['use-portrait'] = 1;
+            }
+            
+            setAttrs(attrs);
         });
         
         getSectionIDs('repeating_abilities', function(ids) {
@@ -1238,6 +1243,8 @@
                 setAttrs(result);
             });
         });
+        
+        
     }
     
     function populateInvestigator() {
