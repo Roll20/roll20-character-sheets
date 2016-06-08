@@ -1144,7 +1144,7 @@ const setClassFeatures = () => {
         });
         setTrait({
           damage: '(?{Spell Level|1|2|3|4+, 4} + 1)d8',
-          damage_type: getTranslationByKey('DAMAGE_TYPES.RADIANT'),
+          damage_type: getTranslationByKey('RADIANT'),
           freeform: '{{subheader=(as ?{Spell Level|1|2|3|4+})}}',
           freetext: getTranslationByKey('CLASS_FEATURE_DIVINE_SMITE_TEXT'),
           name: getTranslationByKey('CLASS_FEATURE_DIVINE_SMITE'),
@@ -2649,22 +2649,22 @@ const updateHealToggle = (v, finalSetAttrs, repeatingString) => {
     triggerFields: ['heal', 'heal_query_toggle'],
   };
   parseAttackComponent(v, repeatingString, finalSetAttrs, healParse);
-
-  let healFormula = '@{heal}[heal]';
+  let healFormula = '';
   const healToggle = v[`${repeatingString}heal_toggle`];
   if (healToggle === '@{heal_toggle_var}') {
-    let healAbility = v[`${repeatingString}heal_ability`];
-    healAbility = getAbilityValue(v, healAbility);
-    if (exists(healAbility)) {
+    if (!isUndefined(v[`${repeatingString}heal`])) {
+      healFormula = '@{heal}[heal]';
+    }
+    if (!isUndefined(v[`${repeatingString}heal_ability`])) {
+      const healAbility = getAbilityValue(v, v[`${repeatingString}heal_ability`]);
       healFormula += `${addArithmeticOperator(healFormula, healAbility)}[${getAbilityShortName(v[`${repeatingString}heal_ability`])}]`;
     }
-
-    const healBonus = getIntValue(v[`${repeatingString}heal_bonus`]);
-    if (exists(healBonus)) {
+    if (!isUndefined(v[`${repeatingString}heal_bonus`])) {
+      const healBonus = getIntValue(v[`${repeatingString}heal_bonus`]);
       healFormula += `${addArithmeticOperator(healFormula, healBonus)}[bonus]`;
     }
 
-    if (exists(v.global_spell_heal_bonus)) {
+    if (!isUndefined(v.global_spell_heal_bonus)) {
       if (healFormula) {
         healFormula += ' + ';
       }
