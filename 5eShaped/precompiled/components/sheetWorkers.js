@@ -3713,8 +3713,8 @@ const updateSkill = (rowId) => {
         }
 
         const ability = getAbilityModName(v[`${repeatingString}ability`]);
-        const abilityName = getAbilityName(v[`${repeatingString}ability`]);
-        finalSetAttrs[`${repeatingString}ability_key`] = abilityName.toUpperCase();
+        const abilityName = getAbilityName(ability);
+        finalSetAttrs[`${repeatingString}ability_key`] = getAbilityShortName(v[`${repeatingString}ability`]).toUpperCase();
 
         let total = 0;
         let totalFormula = '';
@@ -3739,10 +3739,10 @@ const updateSkill = (rowId) => {
           totalFormula += `${exp}[expertise]`;
         }
 
-        const skillAbility = getAbilityValue(v, ability, 'strength_mod');
-        if (exists(skillAbility)) {
-          total += skillAbility;
-          totalFormula += `${addArithmeticOperator(totalFormula, skillAbility)}[${getAbilityShortName(ability)}]`;
+        const abilityValue = getAbilityValue(v, ability, 'strength_mod');
+        if (exists(abilityValue)) {
+          total += abilityValue;
+          totalFormula += `${addArithmeticOperator(totalFormula, abilityValue)}[${getAbilityShortName(ability)}]`;
         }
 
         const skillBonus = getIntValue(v[`${repeatingString}bonus`]);
@@ -3751,9 +3751,8 @@ const updateSkill = (rowId) => {
           totalFormula += `${addArithmeticOperator(totalFormula, skillBonus)}[bonus]`;
         }
 
-        const skillAbilityName = getAbilityName(ability);
-        if (exists(skillAbilityName)) {
-          let checkBonus = v[`${skillAbilityName}_check_bonus`];
+        if (exists(abilityName)) {
+          let checkBonus = v[`${abilityName}_check_bonus`];
           if (exists(checkBonus)) {
             checkBonus = getIntValue(checkBonus);
             total += checkBonus;
@@ -5344,7 +5343,7 @@ const sheetOpened = () => {
       if (versionCompare(version, '4.0.3') < 0) {
         updateSpellChatMacroShow();
       }
-      if (versionCompare(version, '4.1.0') < 0) {
+      if (versionCompare(version, '4.1.3') < 0) {
         updateSkill();
       }
     }
