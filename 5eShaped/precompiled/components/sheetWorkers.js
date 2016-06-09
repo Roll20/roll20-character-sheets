@@ -4575,7 +4575,7 @@ const parseAction = (type, rowId) => {
             finalSetAttrs[`${repeatingString}saving_throw_toggle`] = '@{saving_throw_toggle_var}';
           }
           if (savingThrow[2]) {
-            finalSetAttrs[`${repeatingString}saving_throw_vs_ability`] = savingThrow[2];
+            finalSetAttrs[`${repeatingString}saving_throw_vs_ability`] = savingThrow[2].toUpperCase();
           }
           const halfDamage = saveSuccessRegex.exec(freetext);
           if (halfDamage && halfDamage[1]) {
