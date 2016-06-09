@@ -3215,14 +3215,7 @@ const updateAttackChatMacro = () => {
     });
   });
 };
-
-on('change:repeating_attack', (eventInfo) => {
-  const repeatingInfo = getRepeatingInfo('repeating_attack', eventInfo);
-  if (repeatingInfo && repeatingInfo.field === 'name') {
-    updateAttackChatMacro();
-  }
-});
-on('remove:repeating_attack', () => {
+on('change:repeating_attack remove:repeating_attack', () => {
   updateAttackChatMacro();
 });
 on('change:repeating_attack:carried change:repeating_attack:qty change:repeating_attack:weight remove:repeating_attack', () => {
