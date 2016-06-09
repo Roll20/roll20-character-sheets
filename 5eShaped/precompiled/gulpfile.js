@@ -3,7 +3,7 @@
 const gulp = require('gulp');
 const include = require('gulp-include');
 const inject = require('gulp-inject');
-const minifyHTML = require('gulp-minify-html');
+const htmlmin = require('gulp-htmlmin');
 const minifyCss = require('gulp-minify-css');
 const concat = require('gulp-concat');
 const sass = require('gulp-sass');
@@ -64,8 +64,8 @@ function duplicate(file, limit, start) {
 const compileSheetHTML = () => {
   return gulp.src('./5eShaped.html')
     .pipe(include())
-    .pipe(minifyHTML({
-      whitespace: true
+    .pipe(htmlmin({
+      collapseWhitespace: true
     }));
 };
 const compileSheetWorkers = () => {
