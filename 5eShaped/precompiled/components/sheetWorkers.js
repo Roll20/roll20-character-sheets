@@ -676,7 +676,7 @@ const setClassFeatures = () => {
       });
 
       if (isUndefined(v.ac_unarmored_ability)) {
-        finalSetAttrs.ac_unarmored_ability = '@{constitution_mod}';
+        finalSetAttrs.ac_unarmored_ability = 'constitution';
       }
       setTrait({
         freetext: getTranslationByKey('CLASS_FEATURE_UNARMORED_DEFENSE_BARBARIAN_TEXT'),
@@ -862,8 +862,8 @@ const setClassFeatures = () => {
         setTrait({
           freetext: turnUndeadText,
           name: getTranslationByKey('CLASS_FEATURE_CHANNEL_DIVINITY_TURN_UNDEAD'),
-          saving_throw_ability: '@{wisdom_mod}',
-          saving_throw_vs_ability: 'Wisdom',
+          saving_throw_ability: 'wisdom',
+          saving_throw_vs_ability: 'WISDOM',
           storageName: 'Turn Undead',
         });
         if (v.cleric_level >= 10) {
@@ -980,7 +980,7 @@ const setClassFeatures = () => {
 
     if (v.monk_level) {
       if (isUndefined(v.ac_unarmored_ability)) {
-        finalSetAttrs.ac_unarmored_ability = '@{wisdom_mod}';
+        finalSetAttrs.ac_unarmored_ability = 'wisdom';
       }
       setTrait({
         freetext: getTranslationByKey('CLASS_FEATURE_UNARMORED_DEFENSE_MONK_TEXT'),
@@ -1052,9 +1052,9 @@ const setClassFeatures = () => {
         setTrait({
           freetext: getTranslationByKey('CLASS_FEATURE_STUNNING_STRIKE_TEXT'),
           name: getTranslationByKey('CLASS_FEATURE_STUNNING_STRIKE'),
-          saving_throw_ability: '@{wisdom_mod}',
+          saving_throw_ability: 'wisdom',
           saving_throw_failure: getTranslationByKey('CLASS_FEATURE_STUNNING_STRIKE_SAVING_THROW_FAILURE'),
-          saving_throw_vs_ability: 'Constitution',
+          saving_throw_vs_ability: 'CONSTITUTION',
           storageName: 'Stunning Strike',
         });
       }
@@ -5077,7 +5077,7 @@ const generateSkills = () => {
 
           finalSetAttrs[`${repeatingString}storage_name`] = prop;
           finalSetAttrs[`${repeatingString}name`] = getTranslationByKey(prop);
-          finalSetAttrs[`${repeatingString}ability`] = `@{${SKILLS[prop]}_mod}`;
+          finalSetAttrs[`${repeatingString}ability`] = SKILLS[prop];
           updateSkill(skillId);
         }
       }
