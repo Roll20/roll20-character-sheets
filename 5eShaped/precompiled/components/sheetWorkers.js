@@ -1,7 +1,7 @@
 /* global setAttrs:false, getAttrs:false, on:false, getSectionIDs:false, generateRowID:false, getTranslationByKey:false */
 'use strict';
 
-const currentVersion = '4.1.5';
+const currentVersion = '4.2.0';
 const SKILLS = {
   ACROBATICS: 'dexterity',
   ANIMALHANDLING: 'wisdom',
@@ -3653,7 +3653,7 @@ const updateAbilityChecksMacro = () => {
   });
 };
 
-const updatePreAndPostRoll = () => {
+const updateShapedD20 = () => {
   const collectionArray = ['roll_setting', 'roll_info', 'shaped_d20'];
   const finalSetAttrs = {};
 
@@ -3673,7 +3673,7 @@ const updatePreAndPostRoll = () => {
   });
 };
 on('change:roll_setting', () => {
-  updatePreAndPostRoll();
+  updateShapedD20();
 });
 
 const updateSkill = (rowId) => {
@@ -5461,9 +5461,6 @@ const sheetOpened = () => {
         extasToExtrasFix('repeating_action');
         extasToExtrasFix('repeating_spell');
       }
-      if (versionCompare(version, '2.2.15') < 0) {
-        updatePreAndPostRoll();
-      }
       if (versionCompare(version, '2.3.3') < 0) {
         updateAttachers();
       }
@@ -5531,9 +5528,10 @@ const sheetOpened = () => {
       if (versionCompare(version, '4.1.5') < 0) {
         updateSkill();
       }
-      if (versionCompare(version, '4.1.6') < 0) {
+      if (versionCompare(version, '4.2.0') < 0) {
         updateActionComponentsToRemoveExtraFields();
         updateD20Mod();
+        updateShapedD20();
       }
     }
 
