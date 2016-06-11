@@ -2984,7 +2984,7 @@ const updateAction = (type, rowId) => {
 
         updateHealToggle(v, finalSetAttrs, repeatingString);
 
-        if (v[`${repeatingString}emote`] || v[`${repeatingString}freetext`] || v[`${repeatingString}freeform`]) {
+        if (isUndefined(v[`${repeatingString}extras_toggle`]) && (v[`${repeatingString}emote`] || v[`${repeatingString}freetext`] || v[`${repeatingString}freeform`])) {
           finalSetAttrs[`${repeatingString}extras_toggle`] = '@{extras_var}';
         }
       }
@@ -3403,7 +3403,7 @@ const updateSpell = (rowId) => {
 
         updateHigherLevelToggle(v, finalSetAttrs, repeatingString);
 
-        if (v[`${repeatingString}emote`] || v[`${repeatingString}freetext`] || v[`${repeatingString}freeform`]) {
+        if (isUndefined(v[`${repeatingString}extras_toggle`]) && (v[`${repeatingString}emote`] || v[`${repeatingString}freetext`] || v[`${repeatingString}freeform`])) {
           finalSetAttrs[`${repeatingString}extras_toggle`] = '@{extras_var}';
         }
       }
@@ -5118,9 +5118,8 @@ const extasToExtrasFix = (repeatingItem) => {
       for (const id of ids) {
         const repeatingString = `${repeatingItem}_${id}_`;
 
-        const extrasToggle = v[`${repeatingString}extas_toggle`];
-        if (!isUndefined(extrasToggle)) {
-          finalSetAttrs[`${repeatingString}extras_toggle`] = extrasToggle;
+        if (!isUndefined(v[`${repeatingString}extas_toggle`])) {
+          finalSetAttrs[`${repeatingString}extras_toggle`] = v[`${repeatingString}extas_toggle`];
         }
       }
       setFinalAttrs(v, finalSetAttrs);
