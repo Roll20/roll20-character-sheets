@@ -5068,6 +5068,15 @@ const classFeaturesToTraits = () => {
   });
 };
 
+const getSkillIdByStorageName = (v, repeatingItem, ids, prop) => {
+  for (const id of ids) {
+    let repeatingString = `${repeatingItem}_${id}_`;
+    if (v[`${repeatingString}storage_name`] === prop || v[`${repeatingString}storage_name`] === camelize(prop)) {
+      return id;
+    }
+  }
+};
+
 const generateSkills = () => {
   const repeatingItem = 'repeating_skill';
   const collectionArray = ['lang'];
@@ -5088,13 +5097,8 @@ const generateSkills = () => {
         if (SKILLS.hasOwnProperty(prop)) {
           let skillId;
 
-          for (const id of ids) {
-            repeatingString = `${repeatingItem}_${id}_`;
-            if (v[`${repeatingString}storage_name`] === prop || v[`${repeatingString}storage_name`] === camelize(prop)) {
-              skillId = id;
-              break;
-            }
-          }
+          skillId = getSkillIdByStorageName(v, repeatingItem, ids, prop);
+
           if (!skillId) {
             skillId = generateRowID();
           }
