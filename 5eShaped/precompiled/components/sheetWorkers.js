@@ -2192,7 +2192,9 @@ const updateArmor = (rowId) => {
         }
       }
       if (stealthPenalty) {
-        setDisadvantageOnStealth();
+        setAdvantageOnStealth('dis');
+      } else {
+        setAdvantageOnStealth('normal');
       }
 
       setFinalAttrs(v, finalSetAttrs);
@@ -5088,7 +5090,7 @@ const getSkillIdByStorageName = (v, repeatingItem, ids, prop) => {
   }
 };
 
-const setDisadvantageOnStealth = () => {
+const setAdvantageOnStealth = (mode) => {
   const repeatingItem = 'repeating_skill';
   const collectionArray = [];
   const finalSetAttrs = {};
@@ -5108,7 +5110,11 @@ const setDisadvantageOnStealth = () => {
           repeatingString = `${repeatingItem}_${skillId}_`;
 
           if (v[`${repeatingString}storage_name`] === 'STEALTH') {
-            finalSetAttrs[`${repeatingString}skill_d20`] = '2d20@{d20_mod}kl1';
+            if (mode === 'dis') {
+              finalSetAttrs[`${repeatingString}skill_d20`] = '2d20@{d20_mod}kl1';
+            } else if (mode === 'normal') {
+              finalSetAttrs[`${repeatingString}skill_d20`] = '@{shaped_d20}';
+            }
           }
         }
       }
