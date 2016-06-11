@@ -5257,8 +5257,8 @@ const removeToggleVar = () => {
     changeOldRepeatingToggleToNew(v, finalSetAttrs, 'attacks_vs_target_name', 'attacks_vs_target_name_yes', '@{target|token_name}');
 
     changeOldRepeatingToggleToNew(v, finalSetAttrs, 'initiative_roll', 'normal_initiative', '{{roll1=[[d20');
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'initiative_roll', 'advantage_on_initiative', '{{roll1=[[2d20kh1');
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'initiative_roll', 'disadvantage_on_initiative', '{{roll1=[[2d20kl1');
+    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'initiative_roll', 'advantage_on_initiative', '{{roll1=[[2d20@{d20_mod}kh1');
+    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'initiative_roll', 'disadvantage_on_initiative', '{{roll1=[[2d20@{d20_mod}kl1');
 
     changeOldRepeatingToggleToNew(v, finalSetAttrs, 'initiative_to_tracker', 'initiative_to_tracker_yes', '@{selected|initiative_formula} &{tracker}');
     changeOldRepeatingToggleToNew(v, finalSetAttrs, 'initiative_to_tracker', 'initiative_to_tracker_no', '@{initiative_formula}');
