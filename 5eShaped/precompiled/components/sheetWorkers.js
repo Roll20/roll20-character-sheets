@@ -3582,7 +3582,7 @@ function updateD20Mod() {
 
   getAttrs(collectionArray, (v) => {
     if (v.halfling_luck === 'on') {
-      finalSetAttrs.d20_mod = 'ro<1[halfling luck]';
+      finalSetAttrs.d20_mod = 'ro<1';
     } else {
       finalSetAttrs.d20_mod = '';
     }
@@ -3623,7 +3623,7 @@ const updateAbilityChecksMacro = () => {
           updateAbilityChecksMacro();
         }
 
-        finalSetAttrs.ability_checks_query_var += `|${capitalize(ability)},{{title=${capitalize(ability)}&#125;&#125; {{roll1=[[@{preroll}d20@{postroll}@{d20_mod} + ${v[`${ability}_check_mod`]}]]&#125;&#125; @{roll_setting}@{d20_mod} + ${v[`${ability}_check_mod`]}]]&#125;&#125;`;
+        finalSetAttrs.ability_checks_query_var += `|${capitalize(ability)},{{title=${capitalize(ability)}&#125;&#125; {{roll1=[[@{shaped_d20} + ${v[`${ability}_check_mod`]}]]&#125;&#125; @{roll_setting}@{d20_mod} + ${v[`${ability}_check_mod`]}]]&#125;&#125;`;
         if (v.ability_checks_show_totals === 'on') {
           finalSetAttrs.ability_checks_macro_var += `[${capitalize(ability)} ${v[`${ability}_check_mod_with_sign`]}](~shaped_${ability}_check)`;
         } else {
@@ -3633,7 +3633,7 @@ const updateAbilityChecksMacro = () => {
       }
       for (const id of ids) {
         const repeatingString = `${repeatingItem}_${id}_`;
-        finalSetAttrs.ability_checks_query_var += `|${v[`${repeatingString}name`]}, {{title=${v[`${repeatingString}name`]} (${capitalize(getAbilityShortName(v[`${repeatingString}ability`]))})&#125;&#125; {{roll1=[[@{preroll}d20@{postroll}@{d20_mod} + @{${repeatingString}formula}]]&#125;&#125; @{roll_setting}@{d20_mod} + @{${repeatingString}formula}]]&#125;&#125;`;
+        finalSetAttrs.ability_checks_query_var += `|${v[`${repeatingString}name`]}, {{title=${v[`${repeatingString}name`]} (${capitalize(getAbilityShortName(v[`${repeatingString}ability`]))})&#125;&#125; {{roll1=[[@{shaped_d20} + @{${repeatingString}formula}]]&#125;&#125; @{roll_setting}@{d20_mod} + @{${repeatingString}formula}]]&#125;&#125;`;
         if (id !== ids[0]) {
           finalSetAttrs.ability_checks_macro_var += ', ';
           finalSetAttrs.skills_macro_var += ', ';
@@ -3654,22 +3654,19 @@ const updateAbilityChecksMacro = () => {
 };
 
 const updatePreAndPostRoll = () => {
-  const collectionArray = ['roll_setting', 'roll_info', 'preroll', 'postroll'];
+  const collectionArray = ['roll_setting', 'roll_info', 'shaped_d20'];
   const finalSetAttrs = {};
 
   getAttrs(collectionArray, (v) => {
     finalSetAttrs.roll_info = '';
-    finalSetAttrs.preroll = '';
-    finalSetAttrs.postroll = '';
+    finalSetAttrs.shaped_d20 = 'd20';
 
     if (v.roll_setting === 'adv {{ignore=[[0') {
       finalSetAttrs.roll_info = '{{advantage=1}}';
-      finalSetAttrs.preroll = 2;
-      finalSetAttrs.postroll = 'kh1';
+      finalSetAttrs.shaped_d20 = '2d20@{d20_mod}kh1';
     } else if (v.roll_setting === 'dis {{ignore=[[0') {
       finalSetAttrs.roll_info = '{{disadvantage=1}}';
-      finalSetAttrs.preroll = 2;
-      finalSetAttrs.postroll = 'kl1';
+      finalSetAttrs.shaped_d20 = '2d20@{d20_mod}kl1';
     }
 
     setFinalAttrs(v, finalSetAttrs);
@@ -5302,7 +5299,7 @@ const updateActionComponentsToRemoveExtraFields = () => {
           const repeatingString = `${repeatingItem}_${id}_`;
 
           changeOldRepeatingToggleToNew(v, finalSetAttrs, repeatingString, 'ammo_toggle', 'ammo_toggle_var', '1');
-          changeOldRepeatingToggleToNew(v, finalSetAttrs, repeatingString, 'roll_toggle', 'roll_toggle_var', '{{vs_ac=1}} @{roll_info} {{roll1=[[@{preroll}d20cs>@{crit_range}@{postroll}@{d20_mod} + @{attack_formula}]]}} @{roll_setting}cs>@{crit_range}@{d20_mod} + @{attack_formula}]]}} {{targetAC=@{attacks_vs_target_ac}}} {{targetName=@{attacks_vs_target_name}}}');
+          changeOldRepeatingToggleToNew(v, finalSetAttrs, repeatingString, 'roll_toggle', 'roll_toggle_var', '{{vs_ac=1}} @{roll_info} {{roll1=[[@{shaped_d20}cs>@{crit_range} + @{attack_formula}]]}} @{roll_setting}cs>@{crit_range}@{d20_mod} + @{attack_formula}]]}} {{targetAC=@{attacks_vs_target_ac}}} {{targetName=@{attacks_vs_target_name}}}');
           changeOldRepeatingToggleToNew(v, finalSetAttrs, repeatingString, 'content_toggle', 'content_toggle_var', '{{content=@{content}}}');
           changeOldRepeatingToggleToNew(v, finalSetAttrs, repeatingString, 'saving_throw_toggle', 'saving_throw_toggle_var', '{{saving_throw_condition=@{saving_throw_condition}}} {{saving_throw_dc=@{saving_throw_dc}}} {{saving_throw_vs_ability=@{saving_throw_vs_ability}}} {{saving_throw_failure=@{saving_throw_failure}}} {{saving_throw_success=@{saving_throw_success}}} {{targetName=@{attacks_vs_target_name}}}');
           changeOldRepeatingToggleToNew(v, finalSetAttrs, repeatingString, 'damage_toggle', 'damage_toggle_var', '{{damage=[[@{damage_formula}]]}} {{damage_type=@{damage_type}}} {{crit_damage=[[0d0 + @{damage_crit}[crit damage] @{damage_crit_formula}]]}}');
@@ -5536,6 +5533,7 @@ const sheetOpened = () => {
       }
       if (versionCompare(version, '4.1.6') < 0) {
         updateActionComponentsToRemoveExtraFields();
+        updateD20Mod();
       }
     }
 
