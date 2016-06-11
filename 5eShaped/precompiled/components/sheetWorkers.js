@@ -3075,7 +3075,7 @@ const updateAttack = (rowId) => {
       collectionArray.push(`${repeatingString}proficiency`);
       collectionArray.push(`${repeatingString}attack_ability`);
       collectionArray.push(`${repeatingString}attack_bonus`);
-      collectionArray.push(`${repeatingString}ammo_toggle`);
+      collectionArray.push(`${repeatingString}ammo_toggle_var`);
       collectionArray.push(`${repeatingString}ammo_field_name`);
       collectionArray.push(`${repeatingString}ammo_used`);
       collectionArray.push(`${repeatingString}saving_throw_toggle`);
@@ -3167,7 +3167,7 @@ const updateAttack = (rowId) => {
 
           findAmmo(ammoName, (ammoQtyName) => {
             const setAmmo = {};
-            setAmmo[`${repeatingString}ammo_toggle`] = `{{ammo=[[${ammoQtyName}-${ammoAutoUse * ammoUsed}]]}} {{ammo_name=${ammoName}}}`;
+            setAmmo[`${repeatingString}ammo_toggle_var`] = `{{ammo=[[${ammoQtyName}-${ammoAutoUse * ammoUsed}]]}} {{ammo_name=${ammoName}}}`;
             setFinalAttrs(v, setAmmo);
           });
         }
@@ -5355,7 +5355,6 @@ const updateActionComponentsToRemoveExtraFields = () => {
     getSectionIDs(repeatingItem, (ids) => {
       for (const id of ids) {
         const repeatingString = `${repeatingItem}_${id}_`;
-        collectionArray.push(`${repeatingString}ammo_toggle`);
         collectionArray.push(`${repeatingString}roll_toggle`);
         collectionArray.push(`${repeatingString}content_toggle`);
         collectionArray.push(`${repeatingString}saving_throw_toggle`);
@@ -5372,7 +5371,6 @@ const updateActionComponentsToRemoveExtraFields = () => {
         for (const id of ids) {
           const repeatingString = `${repeatingItem}_${id}_`;
 
-          changeOldRepeatingToggleToNew(v, finalSetAttrs, repeatingString, 'ammo_toggle', 'ammo_toggle_var', '1');
           changeOldRepeatingToggleToNew(v, finalSetAttrs, repeatingString, 'roll_toggle', 'roll_toggle_var', '{{vs_ac=1}} @{roll_info} {{roll1=[[@{shaped_d20}cs>@{crit_range} + @{attack_formula}]]}} @{roll_setting}cs>@{crit_range} + @{attack_formula}]]}} {{targetAC=@{attacks_vs_target_ac}}} {{targetName=@{attacks_vs_target_name}}}');
           changeOldRepeatingToggleToNew(v, finalSetAttrs, repeatingString, 'content_toggle', 'content_toggle_var', '{{content=@{content}}}');
           changeOldRepeatingToggleToNew(v, finalSetAttrs, repeatingString, 'saving_throw_toggle', 'saving_throw_toggle_var', '{{saving_throw_condition=@{saving_throw_condition}}} {{saving_throw_dc=@{saving_throw_dc}}} {{saving_throw_vs_ability=@{saving_throw_vs_ability}}} {{saving_throw_failure=@{saving_throw_failure}}} {{saving_throw_success=@{saving_throw_success}}} {{targetName=@{attacks_vs_target_name}}}');
@@ -5609,11 +5607,13 @@ const sheetOpened = () => {
         removeToggleVar();
       }
       if (versionCompare(version, '4.2.2') < 0) {
-        updateAttack();
         updateActions();
       }
       if (versionCompare(version, '4.2.3') < 0) {
         updateArmor();
+      }
+      if (versionCompare(version, '4.2.4') < 0) {
+        updateAttack();
       }
     }
 
