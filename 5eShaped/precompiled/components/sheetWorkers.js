@@ -95,6 +95,7 @@ const getAbilityShortName = (varName, capital) => {
   if (!varName) {
     return 'Str';
   }
+  varName = varName.replace(/\W/g, '');
   if (capital) {
     varName = capitalize(varName);
   }
@@ -5421,6 +5422,9 @@ const sheetOpened = () => {
         updateArmorAbility();
         updateActionComponents();
         updateSkillAbility();
+      }
+      if (versionCompare(version, '4.1.5') < 0) {
+        updateSkill();
       }
     }
 
