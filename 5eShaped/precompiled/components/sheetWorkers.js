@@ -3623,7 +3623,7 @@ const updateAbilityChecksMacro = () => {
           updateAbilityChecksMacro();
         }
 
-        finalSetAttrs.ability_checks_query_var += `|${capitalize(ability)},{{title=${capitalize(ability)}&#125;&#125; {{roll1=[[@{shaped_d20} + ${v[`${ability}_check_mod`]}]]&#125;&#125; @{roll_setting}@{d20_mod} + ${v[`${ability}_check_mod`]}]]&#125;&#125;`;
+        finalSetAttrs.ability_checks_query_var += `|${capitalize(ability)},{{title=${capitalize(ability)}&#125;&#125; {{roll1=[[@{shaped_d20} + ${v[`${ability}_check_mod`]}]]&#125;&#125; @{roll_setting} + ${v[`${ability}_check_mod`]}]]&#125;&#125;`;
         if (v.ability_checks_show_totals === 'on') {
           finalSetAttrs.ability_checks_macro_var += `[${capitalize(ability)} ${v[`${ability}_check_mod_with_sign`]}](~shaped_${ability}_check)`;
         } else {
@@ -3633,7 +3633,7 @@ const updateAbilityChecksMacro = () => {
       }
       for (const id of ids) {
         const repeatingString = `${repeatingItem}_${id}_`;
-        finalSetAttrs.ability_checks_query_var += `|${v[`${repeatingString}name`]}, {{title=${v[`${repeatingString}name`]} (${capitalize(getAbilityShortName(v[`${repeatingString}ability`]))})&#125;&#125; {{roll1=[[@{shaped_d20} + @{${repeatingString}formula}]]&#125;&#125; @{roll_setting}@{d20_mod} + @{${repeatingString}formula}]]&#125;&#125;`;
+        finalSetAttrs.ability_checks_query_var += `|${v[`${repeatingString}name`]}, {{title=${v[`${repeatingString}name`]} (${capitalize(getAbilityShortName(v[`${repeatingString}ability`]))})&#125;&#125; {{roll1=[[@{shaped_d20} + @{${repeatingString}formula}]]&#125;&#125; @{roll_setting} + @{${repeatingString}formula}]]&#125;&#125;`;
         if (id !== ids[0]) {
           finalSetAttrs.ability_checks_macro_var += ', ';
           finalSetAttrs.skills_macro_var += ', ';
@@ -3693,6 +3693,8 @@ const updateSkill = (rowId) => {
     }
     for (const id of ids) {
       const repeatingString = `${repeatingItem}_${id}_`;
+      collectionArray.push(`${repeatingString}skill_d20`);
+      collectionArray.push(`${repeatingString}skill_info`);
       collectionArray.push(`${repeatingString}proficiency`);
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}storage_name`);
@@ -3774,7 +3776,21 @@ const updateSkill = (rowId) => {
           totalFormula += '(@{global_check_bonus})[global check bonus]';
         }
         const passiveBonus = getIntValue(v[`${repeatingString}passive_bonus`]);
-        const passiveTotal = 10 + total + passiveBonus;
+        let advantageOrDisadvantage = 0;
+
+        finalSetAttrs[`${repeatingString}skill_info`] = '';
+
+        if (!isUndefined(v[`${repeatingString}skill_d20`])) {
+          if (v[`${repeatingString}skill_d20`].indexOf('kh1') !== -1) {
+            finalSetAttrs[`${repeatingString}skill_info`] = '{{advantage=1}}';
+            advantageOrDisadvantage = 5;
+          } else if (v[`${repeatingString}skill_d20`].indexOf('kl1') !== -1) {
+            finalSetAttrs[`${repeatingString}skill_info`] = '{{disadvantage=1}}';
+            advantageOrDisadvantage = -5;
+          }
+        }
+
+        const passiveTotal = 10 + total + passiveBonus + advantageOrDisadvantage;
 
         finalSetAttrs[`${repeatingString}total`] = total;
         finalSetAttrs[`${repeatingString}passive`] = passiveTotal;
@@ -5156,7 +5172,7 @@ const fixRollTwo = () => {
 
   getAttrs(collectionArray, (v) => {
     if (v.roll_setting === '@{attr_roll_2}') {
-      finalSetAttrs.roll_setting = '{{roll2=[[d20';
+      finalSetAttrs.roll_setting = '{{roll2=[[d20@{d20_mod}';
     }
     setFinalAttrs(v, finalSetAttrs);
   });
@@ -5215,53 +5231,53 @@ const removeToggleVar = () => {
   const finalSetAttrs = {};
 
   getAttrs(collectionArray, (v) => {
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'careful_spell_toggle', 'careful_spell_toggle_var', '1');
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'distant_spell_toggle', 'distant_spell_toggle_var', '1');
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'empowered_spell_toggle', 'empowered_spell_toggle_var', '1');
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'extended_spell_toggle', 'extended_spell_toggle_var', '1');
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'heightened_spell_toggle', 'heightened_spell_toggle_var', '1');
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'quickened_spell_toggle', 'quickened_spell_toggle_var', '1');
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'subtle_spell_toggle', 'subtle_spell_toggle_var', '1');
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'twinned_spell_toggle', 'twinned_spell_toggle_var', '1');
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'initiative_tie_breaker', 'initiative_tie_breaker_var', '[[@{initiative} / 100]][tie breaker]');
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'ammo_auto_use', 'ammo_auto_use_var', '1');
+    changeOldToggleToNew(v, finalSetAttrs, 'careful_spell_toggle', 'careful_spell_toggle_var', '1');
+    changeOldToggleToNew(v, finalSetAttrs, 'distant_spell_toggle', 'distant_spell_toggle_var', '1');
+    changeOldToggleToNew(v, finalSetAttrs, 'empowered_spell_toggle', 'empowered_spell_toggle_var', '1');
+    changeOldToggleToNew(v, finalSetAttrs, 'extended_spell_toggle', 'extended_spell_toggle_var', '1');
+    changeOldToggleToNew(v, finalSetAttrs, 'heightened_spell_toggle', 'heightened_spell_toggle_var', '1');
+    changeOldToggleToNew(v, finalSetAttrs, 'quickened_spell_toggle', 'quickened_spell_toggle_var', '1');
+    changeOldToggleToNew(v, finalSetAttrs, 'subtle_spell_toggle', 'subtle_spell_toggle_var', '1');
+    changeOldToggleToNew(v, finalSetAttrs, 'twinned_spell_toggle', 'twinned_spell_toggle_var', '1');
+    changeOldToggleToNew(v, finalSetAttrs, 'initiative_tie_breaker', 'initiative_tie_breaker_var', '[[@{initiative} / 100]][tie breaker]');
+    changeOldToggleToNew(v, finalSetAttrs, 'ammo_auto_use', 'ammo_auto_use_var', '1');
 
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'hide_attack', 'hide_attack_var', '{{hide_attack=1}}');
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'hide_damage', 'hide_damage_var', '{{hide_damage=1}}');
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'hide_saving_throw_dc', 'hide_saving_throw_dc_var', '{{hide_saving_throw_dc=1}}');
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'hide_spell_content', 'hide_spell_content_var', '{{hide_spell_content=1}}');
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'hide_action_freetext', 'hide_action_freetext_var', '{{hide_freetext=1}}');
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'hide_saving_throw_failure', 'hide_saving_throw_failure_var', '{{hide_saving_throw_failure=1}}');
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'hide_saving_throw_success', 'hide_saving_throw_success_var', '{{hide_saving_throw_success=1}}');
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'hide_recharge', 'hide_recharge_var', '{{hide_recharge=1}}');
+    changeOldToggleToNew(v, finalSetAttrs, 'hide_attack', 'hide_attack_var', '{{hide_attack=1}}');
+    changeOldToggleToNew(v, finalSetAttrs, 'hide_damage', 'hide_damage_var', '{{hide_damage=1}}');
+    changeOldToggleToNew(v, finalSetAttrs, 'hide_saving_throw_dc', 'hide_saving_throw_dc_var', '{{hide_saving_throw_dc=1}}');
+    changeOldToggleToNew(v, finalSetAttrs, 'hide_spell_content', 'hide_spell_content_var', '{{hide_spell_content=1}}');
+    changeOldToggleToNew(v, finalSetAttrs, 'hide_action_freetext', 'hide_action_freetext_var', '{{hide_freetext=1}}');
+    changeOldToggleToNew(v, finalSetAttrs, 'hide_saving_throw_failure', 'hide_saving_throw_failure_var', '{{hide_saving_throw_failure=1}}');
+    changeOldToggleToNew(v, finalSetAttrs, 'hide_saving_throw_success', 'hide_saving_throw_success_var', '{{hide_saving_throw_success=1}}');
+    changeOldToggleToNew(v, finalSetAttrs, 'hide_recharge', 'hide_recharge_var', '{{hide_recharge=1}}');
 
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'initiative_output_option', 'output_to_all', '');
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'initiative_output_option', 'output_to_gm', '/w GM');
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'output_option', 'output_to_all', '');
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'output_option', 'output_to_gm', '/w GM');
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'death_save_output_option', 'output_to_all', '');
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'death_save_output_option', 'output_to_gm', '/w GM');
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'hit_dice_output_option', 'output_to_all', '');
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'hit_dice_output_option', 'output_to_gm', '/w GM');
+    changeOldToggleToNew(v, finalSetAttrs, 'initiative_output_option', 'output_to_all', '');
+    changeOldToggleToNew(v, finalSetAttrs, 'initiative_output_option', 'output_to_gm', '/w GM');
+    changeOldToggleToNew(v, finalSetAttrs, 'output_option', 'output_to_all', '');
+    changeOldToggleToNew(v, finalSetAttrs, 'output_option', 'output_to_gm', '/w GM');
+    changeOldToggleToNew(v, finalSetAttrs, 'death_save_output_option', 'output_to_all', '');
+    changeOldToggleToNew(v, finalSetAttrs, 'death_save_output_option', 'output_to_gm', '/w GM');
+    changeOldToggleToNew(v, finalSetAttrs, 'hit_dice_output_option', 'output_to_all', '');
+    changeOldToggleToNew(v, finalSetAttrs, 'hit_dice_output_option', 'output_to_gm', '/w GM');
 
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'roll_setting', 'roll_advantage', '{{ignore=[[0');
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'roll_setting', 'roll_disadvantage', '{{ignore=[[0');
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'roll_setting', 'roll_1', '{{ignore=[[0');
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'roll_setting', 'roll_2', '{{roll2=[[d20');
+    changeOldToggleToNew(v, finalSetAttrs, 'roll_setting', 'roll_advantage', 'adv {{ignore=[[0');
+    changeOldToggleToNew(v, finalSetAttrs, 'roll_setting', 'roll_disadvantage', 'dis {{ignore=[[0');
+    changeOldToggleToNew(v, finalSetAttrs, 'roll_setting', 'roll_1', '{{ignore=[[0');
+    changeOldToggleToNew(v, finalSetAttrs, 'roll_setting', 'roll_2', '{{roll2=[[d20@{d20_mod}');
 
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'show_character_name', 'show_character_name_no', '');
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'show_character_name', 'show_character_name_yes', '{{show_character_name=1}}');
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'attacks_vs_target_ac', 'attacks_vs_target_ac_no', '');
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'attacks_vs_target_ac', 'attacks_vs_target_ac_yes', '[[@{target|AC}]]');
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'attacks_vs_target_name', 'attacks_vs_target_name_no', '');
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'attacks_vs_target_name', 'attacks_vs_target_name_yes', '@{target|token_name}');
+    changeOldToggleToNew(v, finalSetAttrs, 'show_character_name', 'show_character_name_no', '');
+    changeOldToggleToNew(v, finalSetAttrs, 'show_character_name', 'show_character_name_yes', '{{show_character_name=1}}');
+    changeOldToggleToNew(v, finalSetAttrs, 'attacks_vs_target_ac', 'attacks_vs_target_ac_no', '');
+    changeOldToggleToNew(v, finalSetAttrs, 'attacks_vs_target_ac', 'attacks_vs_target_ac_yes', '[[@{target|AC}]]');
+    changeOldToggleToNew(v, finalSetAttrs, 'attacks_vs_target_name', 'attacks_vs_target_name_no', '');
+    changeOldToggleToNew(v, finalSetAttrs, 'attacks_vs_target_name', 'attacks_vs_target_name_yes', '@{target|token_name}');
 
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'initiative_roll', 'normal_initiative', '@{shaped_d20}');
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'initiative_roll', 'advantage_on_initiative', '2d20@{d20_mod}kh1');
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'initiative_roll', 'disadvantage_on_initiative', '2d20@{d20_mod}kl1');
+    changeOldToggleToNew(v, finalSetAttrs, 'initiative_roll', 'normal_initiative', '@{shaped_d20}');
+    changeOldToggleToNew(v, finalSetAttrs, 'initiative_roll', 'advantage_on_initiative', '2d20@{d20_mod}kh1');
+    changeOldToggleToNew(v, finalSetAttrs, 'initiative_roll', 'disadvantage_on_initiative', '2d20@{d20_mod}kl1');
 
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'initiative_to_tracker', 'initiative_to_tracker_yes', '@{selected|initiative_formula} &{tracker}');
-    changeOldRepeatingToggleToNew(v, finalSetAttrs, 'initiative_to_tracker', 'initiative_to_tracker_no', '@{initiative_formula}');
+    changeOldToggleToNew(v, finalSetAttrs, 'initiative_to_tracker', 'initiative_to_tracker_yes', '@{selected|initiative_formula} &{tracker}');
+    changeOldToggleToNew(v, finalSetAttrs, 'initiative_to_tracker', 'initiative_to_tracker_no', '@{initiative_formula}');
 
     setFinalAttrs(v, finalSetAttrs);
   });
@@ -5299,7 +5315,7 @@ const updateActionComponentsToRemoveExtraFields = () => {
           const repeatingString = `${repeatingItem}_${id}_`;
 
           changeOldRepeatingToggleToNew(v, finalSetAttrs, repeatingString, 'ammo_toggle', 'ammo_toggle_var', '1');
-          changeOldRepeatingToggleToNew(v, finalSetAttrs, repeatingString, 'roll_toggle', 'roll_toggle_var', '{{vs_ac=1}} @{roll_info} {{roll1=[[@{shaped_d20}cs>@{crit_range} + @{attack_formula}]]}} @{roll_setting}@{d20_mod}cs>@{crit_range} + @{attack_formula}]]}} {{targetAC=@{attacks_vs_target_ac}}} {{targetName=@{attacks_vs_target_name}}}');
+          changeOldRepeatingToggleToNew(v, finalSetAttrs, repeatingString, 'roll_toggle', 'roll_toggle_var', '{{vs_ac=1}} @{roll_info} {{roll1=[[@{shaped_d20}cs>@{crit_range} + @{attack_formula}]]}} @{roll_setting}cs>@{crit_range} + @{attack_formula}]]}} {{targetAC=@{attacks_vs_target_ac}}} {{targetName=@{attacks_vs_target_name}}}');
           changeOldRepeatingToggleToNew(v, finalSetAttrs, repeatingString, 'content_toggle', 'content_toggle_var', '{{content=@{content}}}');
           changeOldRepeatingToggleToNew(v, finalSetAttrs, repeatingString, 'saving_throw_toggle', 'saving_throw_toggle_var', '{{saving_throw_condition=@{saving_throw_condition}}} {{saving_throw_dc=@{saving_throw_dc}}} {{saving_throw_vs_ability=@{saving_throw_vs_ability}}} {{saving_throw_failure=@{saving_throw_failure}}} {{saving_throw_success=@{saving_throw_success}}} {{targetName=@{attacks_vs_target_name}}}');
           changeOldRepeatingToggleToNew(v, finalSetAttrs, repeatingString, 'damage_toggle', 'damage_toggle_var', '{{damage=[[@{damage_formula}]]}} {{damage_type=@{damage_type}}} {{crit_damage=[[0d0 + @{damage_crit}[crit damage] @{damage_crit_formula}]]}}');
@@ -5529,9 +5545,13 @@ const sheetOpened = () => {
         updateSkill();
       }
       if (versionCompare(version, '4.2.0') < 0) {
-        updateActionComponentsToRemoveExtraFields();
         updateD20Mod();
         updateShapedD20();
+      }
+      if (versionCompare(version, '4.2.1') < 0) {
+        updateActionComponentsToRemoveExtraFields();
+        updateAbilityChecksMacro();
+        removeToggleVar();
       }
     }
 
