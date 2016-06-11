@@ -1,7 +1,7 @@
 /* global setAttrs:false, getAttrs:false, on:false, getSectionIDs:false, generateRowID:false, getTranslationByKey:false */
 'use strict';
 
-const currentVersion = '4.2.1';
+const currentVersion = '4.2.2';
 const SKILLS = {
   ACROBATICS: 'dexterity',
   ANIMALHANDLING: 'wisdom',
@@ -5501,9 +5501,6 @@ const sheetOpened = () => {
       if (versionCompare(version, '2.4.3') < 0) {
         setClassFeatures();
       }
-      if (versionCompare(version, '2.4.4') < 0) {
-        updateAttack();
-      }
       if (versionCompare(version, '2.4.7') < 0) {
         classFeaturesToTraits();
         updateAction('trait');
@@ -5563,6 +5560,10 @@ const sheetOpened = () => {
         updateActionComponentsToRemoveExtraFields();
         updateAbilityChecksMacro();
         removeToggleVar();
+      }
+      if (versionCompare(version, '4.2.2') < 0) {
+        updateAttack();
+        updateActions();
       }
     }
 
