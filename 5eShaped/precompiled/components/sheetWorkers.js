@@ -5414,9 +5414,6 @@ const sheetOpened = () => {
       if (versionCompare(version, '4.0.3') < 0) {
         updateSpellChatMacroShow();
       }
-      if (versionCompare(version, '4.1.3') < 0) {
-        updateSkill();
-      }
       if (versionCompare(version, '4.1.4') < 0) {
         updateDefaultAbility();
         updateArmorAbility();
