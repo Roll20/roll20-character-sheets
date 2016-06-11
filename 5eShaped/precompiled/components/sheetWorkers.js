@@ -1,7 +1,7 @@
 /* global setAttrs:false, getAttrs:false, on:false, getSectionIDs:false, generateRowID:false, getTranslationByKey:false */
 'use strict';
 
-const currentVersion = '4.2.2';
+const currentVersion = '4.2.3';
 const SKILLS = {
   ACROBATICS: 'dexterity',
   ANIMALHANDLING: 'wisdom',
@@ -623,7 +623,7 @@ const setTrait = (obj) => {
 
 const setClassFeatures = () => {
   const finalSetAttrs = {};
-  const collectionArray = ['ac_unarmored_ability', 'lang', 'jack_of_all_trades_toggle', 'careful_spell_toggle', 'distant_spell_toggle', 'empowered_spell_toggle', 'extended_spell_toggle', 'heightened_spell_toggle', 'quickened_spell_toggle', 'subtle_spell_toggle', 'twinned_spell_toggle'];
+  const collectionArray = ['ac_unarmored_ability', 'jack_of_all_trades_toggle', 'careful_spell_toggle', 'distant_spell_toggle', 'empowered_spell_toggle', 'extended_spell_toggle', 'heightened_spell_toggle', 'quickened_spell_toggle', 'subtle_spell_toggle', 'twinned_spell_toggle'];
 
   for (const ability of ABILITIES) {
     collectionArray.push(`${ability}_mod`);
@@ -1739,7 +1739,7 @@ const updateHD = (v, finalSetAttrs, hd) => {
 
 const updateLevels = (repeatingInfo) => {
   const repeatingItem = 'repeating_class';
-  const collectionArray = ['is_npc', 'lang', 'caster_level', 'caster_type', 'class_and_level', 'level', 'xp_next_level'];
+  const collectionArray = ['is_npc', 'caster_level', 'caster_type', 'class_and_level', 'level', 'xp_next_level'];
   const finalSetAttrs = {};
 
   for (const className of CLASSES) {
@@ -2158,6 +2158,8 @@ const updateArmor = (rowId) => {
   const collectionArray = [];
   const finalSetAttrs = {};
 
+  let stealthPenalty;
+
   getSectionIDs(repeatingItem, (ids) => {
     if (rowId) {
       ids = [];
@@ -2167,6 +2169,7 @@ const updateArmor = (rowId) => {
       const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}parsed`);
       collectionArray.push(`${repeatingString}modifiers`);
+      collectionArray.push(`${repeatingString}stealth`);
     }
 
     getAttrs(collectionArray, (v) => {
@@ -2183,7 +2186,15 @@ const updateArmor = (rowId) => {
           }
           finalSetAttrs[`${repeatingString}parsed`] += ' acBonus';
         }
+
+        if (v[`${repeatingString}stealth`] === 'Disadvantage') {
+          stealthPenalty = true;
+        }
       }
+      if (stealthPenalty) {
+        setDisadvantageOnStealth();
+      }
+
       setFinalAttrs(v, finalSetAttrs);
     });
   });
@@ -4989,7 +5000,7 @@ const resourcesToTraits = () => {
 const classFeaturesToTraits = () => {
   const repeatingItem = 'repeating_classfeature';
   const newRepeatingItem = 'repeating_trait';
-  const collectionArray = ['lang'];
+  const collectionArray = [];
   const finalSetAttrs = {};
 
   let repeatingString;
@@ -5077,11 +5088,39 @@ const getSkillIdByStorageName = (v, repeatingItem, ids, prop) => {
   }
 };
 
+const setDisadvantageOnStealth = () => {
+  const repeatingItem = 'repeating_skill';
+  const collectionArray = [];
+  const finalSetAttrs = {};
+  let repeatingString;
+
+  getSectionIDs(repeatingItem, (ids) => {
+    for (const id of ids) {
+      repeatingString = `${repeatingItem}_${id}_`;
+      collectionArray.push(`${repeatingString}storage_name`);
+      collectionArray.push(`${repeatingString}skill_d20`);
+    }
+
+    getAttrs(collectionArray, (v) => {
+      for (const prop in SKILLS) {
+        if (SKILLS.hasOwnProperty(prop)) {
+          let skillId = getSkillIdByStorageName(v, repeatingItem, ids, prop);
+          repeatingString = `${repeatingItem}_${skillId}_`;
+
+          if (v[`${repeatingString}storage_name`] === 'STEALTH') {
+            finalSetAttrs[`${repeatingString}skill_d20`] = '2d20@{d20_mod}kl1';
+          }
+        }
+      }
+      setFinalAttrs(v, finalSetAttrs);
+    });
+  });
+};
+
 const generateSkills = () => {
   const repeatingItem = 'repeating_skill';
-  const collectionArray = ['lang'];
+  const collectionArray = [];
   const finalSetAttrs = {};
-
   let repeatingString;
 
   getSectionIDs(repeatingItem, (ids) => {
@@ -5095,9 +5134,7 @@ const generateSkills = () => {
     getAttrs(collectionArray, (v) => {
       for (const prop in SKILLS) {
         if (SKILLS.hasOwnProperty(prop)) {
-          let skillId;
-
-          skillId = getSkillIdByStorageName(v, repeatingItem, ids, prop);
+          let skillId = getSkillIdByStorageName(v, repeatingItem, ids, prop);
 
           if (!skillId) {
             skillId = generateRowID();
@@ -5568,6 +5605,9 @@ const sheetOpened = () => {
       if (versionCompare(version, '4.2.2') < 0) {
         updateAttack();
         updateActions();
+      }
+      if (versionCompare(version, '4.2.3') < 0) {
+        updateArmor();
       }
     }
 
