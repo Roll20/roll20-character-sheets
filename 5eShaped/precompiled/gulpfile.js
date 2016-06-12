@@ -141,15 +141,15 @@ gulp.task('sass-lint', function() {
 });
 
 gulp.task('sort-translations', function() {
-  return gulp.src('./translations/*.json')
+  return gulp.src('../translations/*.json')
     .pipe(sortJSON({ space: 2 }))
-    .pipe(gulp.dest('./translations/'));
+    .pipe(gulp.dest('../translations/'));
 });
 
 gulp.task('submit', ['compile'], (done) => {
   const html = fs.readFileSync('../5eShaped.html', 'utf-8');
   const css = fs.readFileSync('../5eShaped.css', 'utf-8');
-  const translation = fs.readFileSync('./translations/en.json', 'utf-8');
+  const translation = fs.readFileSync('../translations/en.json', 'utf-8');
   const props = require('./submitProps.json');
 
   const url = `https://app.${props[props.which].roll20}.net/campaigns/savesettings/${props[props.which].campaignId}`;
