@@ -4468,7 +4468,7 @@ const parseDamage = (finalSetAttrs, repeatingString, freetext, regex, name, spel
       finalSetAttrs[`${repeatingString}${name}_bonus`] = damageBonus;
     }
     freetext = freetext.replace(regex, '');
-    finalSetAttrs[`${repeatingString}${name}_toggle`] = toggleVars[name];;
+    finalSetAttrs[`${repeatingString}${name}_toggle`] = toggleVars[name];
   }
   return freetext;
 };
@@ -5083,7 +5083,7 @@ const classFeaturesToTraits = () => {
 
 const getSkillIdByStorageName = (v, repeatingItem, ids, prop) => {
   for (const id of ids) {
-    let repeatingString = `${repeatingItem}_${id}_`;
+    const repeatingString = `${repeatingItem}_${id}_`;
     if (v[`${repeatingString}storage_name`] === prop || v[`${repeatingString}storage_name`] === camelize(prop)) {
       return id;
     }
@@ -5106,7 +5106,7 @@ const setAdvantageOnStealth = (mode) => {
     getAttrs(collectionArray, (v) => {
       for (const prop in SKILLS) {
         if (SKILLS.hasOwnProperty(prop)) {
-          let skillId = getSkillIdByStorageName(v, repeatingItem, ids, prop);
+          const skillId = getSkillIdByStorageName(v, repeatingItem, ids, prop);
           repeatingString = `${repeatingItem}_${skillId}_`;
 
           if (v[`${repeatingString}storage_name`] === 'STEALTH') {
