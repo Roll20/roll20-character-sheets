@@ -185,7 +185,7 @@ gulp.task('submit', ['compile'], (done) => {
 });
 
 gulp.task('translationDist', function () {
-  return gulp.src('./translations/en.json')
+  return gulp.src('../translations/en.json')
     .pipe(rename('translation.json'))
     .pipe(gulp.dest('../'));
 });
