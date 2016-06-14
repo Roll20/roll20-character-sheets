@@ -1,7 +1,6 @@
 on('chat:message', function (msg) {
 
     if(((msg.type == 'general' || msg.type == 'whisper') && (msg.rolltemplate.indexOf('sr1') >= 0)) || msg.type == 'rollresult') { //todo JSON.parse(msg.content) to get the rollresult obj
-        log("first");
         if(msg.type == 'rollresult') {
             var rollResult = JSON.parse(msg.content);
             log(rollResult);
