@@ -1696,13 +1696,9 @@ const updateSpellSlots = () => {
           if (isUndefined(slots)) {
             finalSetAttrs[repeatingString] = spellSlotMax;
           }
-          finalSetAttrs[`${repeatingString}_toggle`] = 'on';
         } else {
           if (exists(v[`${repeatingString}_max`])) {
             finalSetAttrs[`${repeatingString}_max`] = 0;
-          }
-          if (exists(v[`${repeatingString}_toggle`])) {
-            finalSetAttrs[`${repeatingString}_toggle`] = 0;
           }
         }
       }
@@ -3515,12 +3511,14 @@ on('remove:repeating_spell', () => {
   updateSpellChatMacro();
 });
 
-const updateSpellChatMacroShow = () => {
+const updateSpellShowHide = () => {
   const collectionArray = ['spells_show_spell_level_if_all_slots_are_used'];
   const finalSetAttrs = {};
 
   for (let i = 0; i <= 9; i++) {
     collectionArray.push(`spell_slots_l${i}`);
+    collectionArray.push(`spell_slots_l${i}_max`);
+    collectionArray.push(`spell_slots_l${i}_toggle`);
     collectionArray.push(`spells_level_${i}_macro_var`);
     collectionArray.push(`spells_level_${i}_show`);
   }
@@ -3528,13 +3526,21 @@ const updateSpellChatMacroShow = () => {
   getAttrs(collectionArray, (v) => {
     const showLevelIfAllSlotsAreUsed = v.spells_show_spell_level_if_all_slots_are_used === 'on' || isUndefined(v.spells_show_spell_level_if_all_slots_are_used);
 
-    for (let i = 0; i <= 9; i++) {
-      if ((!showLevelIfAllSlotsAreUsed && !getIntValue(v[`spell_slots_l${i}`])) || !v[`spells_level_${i}_macro_var`]) {
-        finalSetAttrs[`spells_level_${i}_show`] = '';
+    for (let level = 0; level <= 9; level++) {
+      if (v[`spells_level_${level}_macro_var`] || getIntValue(v[`spell_slots_l${level}`]) || getIntValue(v[`spell_slots_l${level}_max`])) {
+        finalSetAttrs[`spell_slots_l${level}_toggle`] = 'on';
+        finalSetAttrs[`spells_level_${level}_show`] = true;
       } else {
-        finalSetAttrs[`spells_level_${i}_show`] = true;
+        finalSetAttrs[`spell_slots_l${level}_toggle`] = 0;
+
+        if (showLevelIfAllSlotsAreUsed && getIntValue(v[`spell_slots_l${level}_max`])) {
+          finalSetAttrs[`spells_level_${level}_show`] = true;
+        } else {
+          finalSetAttrs[`spells_level_${level}_show`] = '';
+        }
       }
     }
+
     setFinalAttrs(v, finalSetAttrs);
   });
 };
@@ -3544,10 +3550,11 @@ const watchForSpellChanges = () => {
   for (let i = 0; i <= 9; i++) {
     spellsWatch.push(`change:spells_level_${i}_macro_var`);
     spellsWatch.push(`change:spell_slots_l${i}`);
+    spellsWatch.push(`change:spell_slots_l${i}_max`);
   }
 
   on(spellsWatch.join(' '), () => {
-    updateSpellChatMacroShow();
+    updateSpellShowHide();
   });
 };
 watchForSpellChanges();
@@ -5487,7 +5494,7 @@ const sheetOpened = () => {
         updateAbilityChecksMacro();
         updateInitiative();
         updateArmor();
-        updateSpellChatMacroShow();
+        updateSpellShowHide();
       });
     } else {
       if (versionCompare(version, '2.1.0') < 0) {
@@ -5585,9 +5592,6 @@ const sheetOpened = () => {
         updateNPCHD();
         switchToNPC();
       }
-      if (versionCompare(version, '4.0.3') < 0) {
-        updateSpellChatMacroShow();
-      }
       if (versionCompare(version, '4.1.4') < 0) {
         updateDefaultAbility();
         updateArmorAbility();
@@ -5614,6 +5618,9 @@ const sheetOpened = () => {
       }
       if (versionCompare(version, '4.2.4') < 0) {
         updateAttack();
+      }
+      if (versionCompare(version, '4.3.2') < 0) {
+        updateSpellShowHide();
       }
     }
 
