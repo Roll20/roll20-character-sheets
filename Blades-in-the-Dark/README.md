@@ -10,9 +10,14 @@ Report any problems, suggestions or features by sending a private message on Rol
 
 ## Todo
 * Change to only show crit value if there are more than one 6 in the roll.
-* Add in Crew sheets.
 
 ## Changelog
+
+### 0.0.6
+* Reformatted header
+    * Added Blades in the Dark logo image (hosted on imgur).
+    * Added toggle for Crew/Character.
+* Added Crew sheet with Crew/Faction tabs.
 
 ### 0.0.5
 * 0.0.3 roll macros are now working properly! Updated all roll macros.
