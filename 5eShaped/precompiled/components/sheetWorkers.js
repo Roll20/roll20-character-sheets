@@ -189,20 +189,20 @@ const parseAttackComponent = (v, repeatingString, finalSetAttrs, options) => {
       }
       finalSetAttrs[`${repeatingString}parsed`] += ` ${options.parseName}`;
     }
-    if (options.attackAbility && isUndefinedOrEmpty(v[`${repeatingString}attack_ability`])) {
+    if (options.attackAbility && isUndefined(v[`${repeatingString}attack_ability`])) {
       finalSetAttrs[`${repeatingString}attack_ability`] = v.default_ability;
     }
 
     if (options.addCastingModifier) {
-      if (!isUndefinedOrEmpty(v[`${repeatingString}damage`]) && isUndefinedOrEmpty(v[`${repeatingString}damage_ability`])) {
+      if (!isUndefinedOrEmpty(v[`${repeatingString}damage`]) && isUndefined(v[`${repeatingString}damage_ability`])) {
         finalSetAttrs[`${repeatingString}damage_ability`] = v.default_ability;
       }
-      if (!isUndefinedOrEmpty(v[`${repeatingString}heal`]) && isUndefinedOrEmpty(v[`${repeatingString}heal_ability`])) {
+      if (!isUndefinedOrEmpty(v[`${repeatingString}heal`]) && isUndefined(v[`${repeatingString}heal_ability`])) {
         finalSetAttrs[`${repeatingString}heal_ability`] = v.default_ability;
       }
     }
     if (options.addSecondCastingModifier) {
-      if (!isUndefinedOrEmpty(v[`${repeatingString}second_damage`]) && isUndefinedOrEmpty(v[`${repeatingString}second_damage_ability`])) {
+      if (!isUndefinedOrEmpty(v[`${repeatingString}second_damage`]) && isUndefined(v[`${repeatingString}second_damage_ability`])) {
         finalSetAttrs[`${repeatingString}second_damage_ability`] = v.default_ability;
       }
     }
@@ -2437,7 +2437,7 @@ const updateAttackToggle = (v, finalSetAttrs, repeatingString, options) => {
     }
 
     let attackAbility = v[`${repeatingString}attack_ability`];
-    if (isUndefined(attackAbility) && v[`${repeatingString}type`] === 'Ranged Weapon') {
+    if (v[`${repeatingString}type`] === 'Ranged Weapon') {
       attackAbility = 'dexterity';
       finalSetAttrs[`${repeatingString}attack_ability`] = attackAbility;
     } else if (finalSetAttrs[`${repeatingString}attack_ability`]) {
