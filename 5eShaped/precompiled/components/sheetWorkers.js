@@ -3274,6 +3274,27 @@ on('change:global_attack_bonus change:global_melee_attack_bonus change:global_ra
   updateAction('lairaction');
 });
 
+const setSpellLevelToNewSystem = () => {
+  const repeatingItem = 'repeating_spell';
+  const collectionArray = [];
+  const finalSetAttrs = {};
+
+  getSectionIDs(repeatingItem, (ids) => {
+    for (const id of ids) {
+      const repeatingString = `${repeatingItem}_${id}_`;
+      collectionArray.push(`${repeatingString}spell_level`);
+    }
+
+    getAttrs(collectionArray, (v) => {
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
+        finalSetAttrs[`${repeatingString}spell_level`] = `@{spell_level_${v[`${repeatingString}spell_level`]}}`;
+      }
+      setFinalAttrs(v, finalSetAttrs);
+    });
+  });
+};
+
 const updateSpell = (rowId) => {
   const repeatingItem = 'repeating_spell';
   const collectionArray = ['is_npc', 'pb', 'finesse_mod', 'global_spell_attack_bonus', 'global_spell_damage_bonus', 'global_spell_dc_bonus', 'global_spell_heal_bonus', 'default_ability', 'caster_level'];
@@ -5729,6 +5750,7 @@ const sheetOpened = () => {
       if (versionCompare(version, '4.4.0') < 0) {
         updateCustomSavingThrows();
         newAttackToggle();
+        setSpellLevelToNewSystem();
       }
     }
 
