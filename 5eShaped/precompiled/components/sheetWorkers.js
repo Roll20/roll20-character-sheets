@@ -3582,7 +3582,9 @@ const generateHigherLevelQueries = () => {
   const finalSetAttrs = {};
 
   for (let i = 1; i <= 8; i++) {
+    collectionArray.push(`cast_as_level_${i}`);
     collectionArray.push(`higher_level_query_${i}`);
+
   }
   for (let i = 1; i <= 9; i++) {
     collectionArray.push(`spell_slots_l${i}`);
@@ -3605,7 +3607,7 @@ const generateHigherLevelQueries = () => {
         }
         higherLevelQuery = spellLevel;
       } else {
-        let levelQuery;
+        let levelQuery = '';
         for (let j = i; j <= 9; j++) {
           if (getIntValue(v[`spell_slots_l${j}`])) {
             levelQuery += `|${j}`;
@@ -3617,6 +3619,11 @@ const generateHigherLevelQueries = () => {
         finalSetAttrs[`higher_level_query_${i}`] = higherLevelQuery;
       } else {
         finalSetAttrs[`higher_level_query_${i}`] = i;
+      }
+      if (v[`spell_slots_l${i}`] === '0' && higherLevelQuery !== i) {
+        finalSetAttrs[`cast_as_level_${i}`] = higherLevelQuery;
+      } else {
+        finalSetAttrs[`cast_as_level_${i}`] = '';
       }
     }
     setFinalAttrs(v, finalSetAttrs);
@@ -5683,7 +5690,6 @@ const sheetOpened = () => {
         updateDamageResistancesVar();
       }
       if (versionCompare(version, '3.5.0') < 0) {
-        generateHigherLevelQueries();
         updateSpellChatMacro();
       }
       if (versionCompare(version, '3.5.1') < 0) {
@@ -5725,6 +5731,7 @@ const sheetOpened = () => {
         newAttackToggle();
         updateSpellShowHide();
         updateSpell();
+        generateHigherLevelQueries();
       }
     }
 
