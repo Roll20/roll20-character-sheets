@@ -195,6 +195,11 @@ const parseAttackComponent = (v, repeatingString, finalSetAttrs, options) => {
         finalSetAttrs[`${repeatingString}heal_ability`] = v.default_ability;
       }
     }
+    if (options.addSecondCastingModifier) {
+      if (!isUndefined(v[`${repeatingString}second_damage`]) && isUndefined(v[`${repeatingString}second_damage_ability`])) {
+        finalSetAttrs[`${repeatingString}second_damage_ability`] = v.default_ability;
+      }
+    }
   }
 };
 const hasUpperCase = (string) => {
@@ -2596,6 +2601,7 @@ const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
   finalSetAttrs[`${repeatingString}damage_formula`] = damageFormula;
 
   const secondDamageParse = {
+    addSecondCastingModifier: exists(v[`${repeatingString}add_second_casting_modifier`]),
     parseName: 'secondDamage',
     toggleField: 'second_damage_toggle',
     toggleFieldSetTo: toggleVars.second_damage,
@@ -3322,6 +3328,7 @@ const updateSpell = (rowId) => {
       collectionArray.push(`${repeatingString}heal_bonus`);
       collectionArray.push(`${repeatingString}heal_query_toggle`);
       collectionArray.push(`${repeatingString}add_casting_modifier`);
+      collectionArray.push(`${repeatingString}add_second_casting_modifier`);
       collectionArray.push(`${repeatingString}higher_level_toggle`);
       collectionArray.push(`${repeatingString}higher_level_dice`);
       collectionArray.push(`${repeatingString}higher_level_die`);
