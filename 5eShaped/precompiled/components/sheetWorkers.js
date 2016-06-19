@@ -3563,20 +3563,19 @@ const updateSpellShowHide = () => {
   }
 
   getAttrs(collectionArray, (v) => {
-    const showLevelIfAllSlotsAreUsed = v.spells_show_spell_level_if_all_slots_are_used === 'on' || isUndefined(v.spells_show_spell_level_if_all_slots_are_used);
+    const showLevelIfAllSlotsAreUsed = isUndefined(v.spells_show_spell_level_if_all_slots_are_used) || v.spells_show_spell_level_if_all_slots_are_used === 'on';
 
     for (let level = 0; level <= 9; level++) {
       if (v[`spells_level_${level}_macro_var`] || getIntValue(v[`spell_slots_l${level}`]) || getIntValue(v[`spell_slots_l${level}_max`])) {
         finalSetAttrs[`spell_slots_l${level}_toggle`] = 'on';
-        finalSetAttrs[`spells_level_${level}_show`] = true;
       } else {
         finalSetAttrs[`spell_slots_l${level}_toggle`] = 0;
+      }
 
-        if (showLevelIfAllSlotsAreUsed && getIntValue(v[`spell_slots_l${level}_max`])) {
-          finalSetAttrs[`spells_level_${level}_show`] = true;
-        } else {
-          finalSetAttrs[`spells_level_${level}_show`] = '';
-        }
+      if ((getIntValue(v[`spell_slots_l${level}`]) || showLevelIfAllSlotsAreUsed) && (v[`spells_level_${level}_macro_var`] && getIntValue(v[`spell_slots_l${level}_max`]) === 0)) {
+        finalSetAttrs[`spells_level_${level}_show`] = true;
+      } else {
+        finalSetAttrs[`spells_level_${level}_show`] = '';
       }
     }
 
@@ -5744,13 +5743,11 @@ const sheetOpened = () => {
       if (versionCompare(version, '4.2.4') < 0) {
         updateAttack();
       }
-      if (versionCompare(version, '4.3.2') < 0) {
-        updateSpellShowHide();
-      }
       if (versionCompare(version, '4.4.0') < 0) {
         updateCustomSavingThrows();
         newAttackToggle();
         setSpellLevelToNewSystem();
+        updateSpellShowHide();
       }
     }
 
