@@ -2796,22 +2796,33 @@ const setCritDamage = (v, finalSetAttrs, repeatingString) => {
 const findAmmo = (name, callback) => {
   const repeatingItem = 'repeating_ammo';
   const collectionArray = [];
+  const finalSetAttrs = {};
+
+  let repeatingString;
 
   getSectionIDs(repeatingItem, (ids) => {
     for (const id of ids) {
-      const repeatingString = `${repeatingItem}_${id}_`;
+      repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}qty`);
     }
 
     getAttrs(collectionArray, (v) => {
       for (const id of ids) {
-        const repeatingString = `${repeatingItem}_${id}_`;
+        repeatingString = `${repeatingItem}_${id}_`;
         if (v[`${repeatingString}name`] === name) {
           callback(`@{${repeatingString}qty}`);
+          return;
         }
       }
-      console.warn(`cannot find ammo field by the name ${name}`);
+      console.warn(`cannot find ammo field by the name ${name}, adding it`);
+
+      repeatingString = `${repeatingItem}_${generateRowID()}_`;
+      finalSetAttrs[`${repeatingString}name`] = name;
+      finalSetAttrs[`${repeatingString}qty`] = 20;
+      callback(`@{${repeatingString}qty}`);
+
+      setFinalAttrs(v, finalSetAttrs);
     });
   });
 };
