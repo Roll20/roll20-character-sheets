@@ -26,7 +26,7 @@ const CLASSES = ['barbarian', 'bard', 'cleric', 'druid', 'fighter', 'monk', 'pal
 const ABILITIES = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
 
 const toggleVars = {
-  roll: '{{vs_ac=1}} @{roll_info} {{roll1=[[@{shaped_d20}cs>@{crit_range} + @{attack_formula}]]}} @{roll_setting}cs>@{crit_range} + @{attack_formula}]]}} {{targetAC=@{attacks_vs_target_ac}}} {{targetName=@{attacks_vs_target_name}}}',
+  roll: '{{vs_ac=1}} {{vs_saving_throw=@{attacks_vs_a_saving_throw}}} @{roll_info} {{roll1=[[@{shaped_d20}cs>@{crit_range} + @{attack_formula}]]}} @{roll_setting}cs>@{crit_range} + @{attack_formula}]]}} {{targetAC=@{attacks_vs_target_ac}}} {{targetName=@{attacks_vs_target_name}}}',
   saving_throw: '{{saving_throw_condition=@{saving_throw_condition}}} {{saving_throw_dc=@{saving_throw_dc}}} {{saving_throw_vs_ability=@{saving_throw_vs_ability}}} {{saving_throw_failure=@{saving_throw_failure}}} {{saving_throw_success=@{saving_throw_success}}} {{targetName=@{attacks_vs_target_name}}}',
   damage: '{{damage=[[@{damage_formula}]]}} {{damage_type=@{damage_type}}} {{crit_damage=[[0d0 + @{damage_crit}[crit damage] @{damage_crit_formula}]]}}',
   second_damage: '{{second_damage=[[@{second_damage_formula}]]}} {{second_damage_type=@{second_damage_type}}} {{second_crit_damage=[[0d0 + @{second_damage_crit}[crit damage] @{second_damage_crit_formula}]]}}',
@@ -3590,7 +3590,7 @@ const generateHigherLevelQueries = () => {
 
   getAttrs(collectionArray, (v) => {
     for (let i = 1; i <= 8; i++) {
-      let levelQuery = '';
+      let higherLevelQuery = '';
 
       if (i < 6 && v.number_of_classes === 1 && v.warlock_level > 0 && Math.ceil(getIntValue(v.warlock_level) / 2) >= i) {
         let spellLevel = 1;
@@ -3603,16 +3603,18 @@ const generateHigherLevelQueries = () => {
         } else if (v.warlock_level >= 3) {
           spellLevel = 2;
         }
-        levelQuery += `|${spellLevel}`;
+        higherLevelQuery = spellLevel;
       } else {
+        let levelQuery;
         for (let j = i; j <= 9; j++) {
           if (getIntValue(v[`spell_slots_l${j}`])) {
             levelQuery += `|${j}`;
           }
         }
+        higherLevelQuery = `?{Spell Level${levelQuery}}`;
       }
-      if (levelQuery !== '') {
-        finalSetAttrs[`higher_level_query_${i}`] = `?{Spell Level${levelQuery}}`;
+      if (higherLevelQuery !== '') {
+        finalSetAttrs[`higher_level_query_${i}`] = higherLevelQuery;
       } else {
         finalSetAttrs[`higher_level_query_${i}`] = i;
       }
@@ -3930,8 +3932,12 @@ on('change:skills_srd', () => {
   updateSkillsFromSRD();
 });
 
-const updateSavingThrow = (ability) => {
-  const collectionArray = ['pb', `${ability}_mod`, `${ability}_save_prof`, `${ability}_save_bonus`, 'global_saving_throw_bonus', 'saving_throws_half_proficiency'];
+const updateSavingThrow = (ability, savingThrowName) => {
+  if (!savingThrowName) {
+    savingThrowName = ability;
+  }
+
+  const collectionArray = ['pb', `${ability}_mod`, `${savingThrowName}_save_prof`, `${savingThrowName}_save_bonus`, 'global_saving_throw_bonus', 'saving_throws_half_proficiency'];
   const finalSetAttrs = {};
 
   getAttrs(collectionArray, (v) => {
@@ -3940,7 +3946,7 @@ const updateSavingThrow = (ability) => {
     let totalFormula = `${abilityMod}[${getAbilityShortName(ability)}]`;
 
     const pb = getIntValue(v.pb);
-    if (v[`${ability}_save_prof`] === '@{PB}') {
+    if (v[`${savingThrowName}_save_prof`] === '@{PB}') {
       total += pb;
       totalFormula += `${addArithmeticOperator(totalFormula, pb)}[proficient]`;
     } else if (v.saving_throws_half_proficiency === 'on') {
@@ -3949,7 +3955,7 @@ const updateSavingThrow = (ability) => {
       totalFormula += `${addArithmeticOperator(totalFormula, halfPB)}[half proficiency]`;
     }
 
-    const abilitySavingThrowBonus = getIntValue(v[`${ability}_save_bonus`]);
+    const abilitySavingThrowBonus = getIntValue(v[`${savingThrowName}_save_bonus`]);
     if (abilitySavingThrowBonus) {
       total += abilitySavingThrowBonus;
       totalFormula += `${addArithmeticOperator(totalFormula, abilitySavingThrowBonus)}[${getAbilityShortName(ability)}saving throw bonus]`;
@@ -3963,8 +3969,8 @@ const updateSavingThrow = (ability) => {
       totalFormula += `${addArithmeticOperator(totalFormula, globalSavingThrowBonus)}[global saving throw bonus]`;
     }
 
-    finalSetAttrs[`${ability}_saving_throw_mod`] = totalFormula;
-    finalSetAttrs[`${ability}_saving_throw_mod_with_sign`] = showSign(total);
+    finalSetAttrs[`${savingThrowName}_saving_throw_mod`] = totalFormula;
+    finalSetAttrs[`${savingThrowName}_saving_throw_mod_with_sign`] = showSign(total);
     setFinalAttrs(v, finalSetAttrs);
   });
 };
@@ -3975,6 +3981,7 @@ const updateSavingThrows = () => {
   updateSavingThrow('intelligence');
   updateSavingThrow('wisdom');
   updateSavingThrow('charisma');
+  updateCustomSavingThrows();
 };
 on('change:pb change:global_saving_throw_bonus change:saving_throws_half_proficiency', () => {
   updateSavingThrows();
@@ -3996,6 +4003,59 @@ on('change:wisdom_mod change:wisdom_save_prof change:wisdom_save_bonus', () => {
 });
 on('change:charisma_mod change:charisma_save_prof change:charisma_save_bonus', () => {
   updateSavingThrow('charisma');
+});
+
+const getHighestAbilityForCustomSavingThrows = (savingThrowName, callback) => {
+  const collectionArray = [];
+
+  for (const ability of ABILITIES) {
+    collectionArray.push(`${ability}_mod`);
+    collectionArray.push(`${savingThrowName}_${ability}`);
+  }
+
+  getAttrs(collectionArray, (v) => {
+    let abilityName;
+    let highestValue;
+
+    for (const ability of ABILITIES) {
+      if ((v[`${savingThrowName}_${ability}`] === '1' && !highestValue) || v[`${ability}_mod`] > highestValue) {
+        abilityName = ability;
+      }
+    }
+    callback(abilityName);
+  });
+};
+const updateCustomSavingThrows = () => {
+  updateCustomSavingThrow('fortitude');
+  updateCustomSavingThrow('reflex');
+  updateCustomSavingThrow('will');
+};
+const updateCustomSavingThrow = (savingThrowName) => {
+  getHighestAbilityForCustomSavingThrows(savingThrowName, (abilityName) => {
+    if (!abilityName) {
+      if (savingThrowName === 'fortitude') {
+        abilityName = 'constitution';
+      } else if (savingThrowName === 'reflex') {
+        abilityName = 'dexterity';
+      } else if (savingThrowName === 'will') {
+        abilityName = 'wisdom';
+      }
+    }
+    updateSavingThrow(abilityName, savingThrowName);
+  });
+};
+
+on('change:strength_mod change:dexterity_mod change:constitution_mod change:intelligence_mod change:wisdom_mod change:charisma_mod', () => {
+  updateCustomSavingThrows();
+});
+on('change:fortitude_save_prof change:fortitude_save_bonus', () => {
+  updateCustomSavingThrow('fortitude');
+});
+on('change:reflex_save_prof change:reflex_save_bonus', () => {
+  updateCustomSavingThrow('reflex');
+});
+on('change:will_save_prof change:will_save_bonus', () => {
+  updateCustomSavingThrow('will');
 });
 
 const updateSavingThrowsFromSRD = () => {
@@ -5304,6 +5364,32 @@ const updateActionComponents = () => {
   }
 };
 
+const newAttackToggle = () => {
+  const repeatingItems = ['repeating_attack', 'repeating_spell', 'repeating_trait', 'repeating_action', 'repeating_reaction', 'repeating_legendaryaction', 'repeating_lairaction', 'repeating_regionaleffect'];
+  const collectionArray = [];
+  const finalSetAttrs = {};
+
+  for (const repeatingItem of repeatingItems) {
+    getSectionIDs(repeatingItem, (ids) => {
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
+        collectionArray.push(`${repeatingString}roll_toggle`);
+      }
+
+      getAttrs(collectionArray, (v) => {
+        for (const id of ids) {
+          const repeatingString = `${repeatingItem}_${id}_`;
+
+          if (v[`${repeatingString}roll_toggle`] === '{{vs_ac=1}} @{roll_info} {{roll1=[[@{shaped_d20}cs>@{crit_range} + @{attack_formula}]]}} @{roll_setting}cs>@{crit_range} + @{attack_formula}]]}} {{targetAC=@{attacks_vs_target_ac}}} {{targetName=@{attacks_vs_target_name}}}') {
+            finalSetAttrs[`${repeatingString}roll_toggle`] = toggleVars.roll;
+          }
+        }
+        setFinalAttrs(v, finalSetAttrs);
+      });
+    });
+  }
+};
+
 const changeOldToggleToNew = (v, finalSetAttrs, field, oldValue, newValue) => {
   if (v[field] === `@{${oldValue}}`) {
     finalSetAttrs[field] = newValue;
@@ -5639,6 +5725,10 @@ const sheetOpened = () => {
       }
       if (versionCompare(version, '4.3.2') < 0) {
         updateSpellShowHide();
+      }
+      if (versionCompare(version, '4.4.0') < 0) {
+        updateCustomSavingThrows();
+        newAttackToggle();
       }
     }
 
