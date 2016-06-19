@@ -3291,7 +3291,7 @@ const updateSpell = (rowId) => {
     for (const id of ids) {
       const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
-      collectionArray.push(`${repeatingString}cast_as_level`);
+      collectionArray.push(`${repeatingString}friendly_level`);
       collectionArray.push(`${repeatingString}type`);
       collectionArray.push(`${repeatingString}roll_toggle`);
       collectionArray.push(`${repeatingString}to_hit`);
@@ -3362,7 +3362,7 @@ const updateSpell = (rowId) => {
           finalSetAttrs[`${repeatingString}spell_level`] = spellLevel;
           finalSetAttrs[`${repeatingString}is_prepared`] = 'on';
         }
-        finalSetAttrs[`${repeatingString}cast_as_level`] = `@{cast_as_level_${spellLevel}}`;
+        finalSetAttrs[`${repeatingString}friendly_level`] = ordinalSpellLevel(spellLevel);
 
         const concentration = v[`${repeatingString}concentration`];
         if (concentration === 'Yes') {
