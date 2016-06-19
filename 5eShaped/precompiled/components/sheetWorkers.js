@@ -51,6 +51,12 @@ const calculatePercentDifference = (oldValue, newValue) => {
   return Math.abs(((oldValue - newValue) / oldValue) * 100);
 };
 const isUndefined = (value) => {
+  if (typeof value === 'undefined') {
+    return true;
+  }
+  return false;
+};
+const isUndefinedOrEmpty = (value) => {
   if (typeof value === 'undefined' || value === '') {
     return true;
   }
@@ -72,7 +78,7 @@ const getFloatValue = (value, defaultValue) => {
   return parseFloat(value) || defaultValue;
 };
 const exists = (value) => {
-  if (isUndefined(value) || value === '' || value === '0' || value === 0) {
+  if (isUndefinedOrEmpty(value) || value === '' || value === '0' || value === 0) {
     return false;
   }
   return true;
@@ -163,40 +169,40 @@ const fromVOrFinalSetAttrs = (v, finalSetAttrs, value) => {
 const parseAttackComponent = (v, repeatingString, finalSetAttrs, options) => {
   let parsed = v[`${repeatingString}parsed`];
 
-  if (isUndefined(parsed)) {
+  if (isUndefinedOrEmpty(parsed)) {
     parsed = finalSetAttrs[`${repeatingString}parsed`];
   }
 
-  if (isUndefined(parsed) || parsed.indexOf(options.parseName) === -1) {
+  if (isUndefinedOrEmpty(parsed) || parsed.indexOf(options.parseName) === -1) {
     let aTriggerFieldExists = false;
 
     for (const triggerField of options.triggerFields) {
-      if (!isUndefined(v[repeatingString + triggerField])) {
+      if (!isUndefinedOrEmpty(v[repeatingString + triggerField])) {
         aTriggerFieldExists = true;
       }
     }
-    if (aTriggerFieldExists && isUndefined(v[repeatingString + options.toggleField])) {
+    if (aTriggerFieldExists && isUndefinedOrEmpty(v[repeatingString + options.toggleField])) {
       finalSetAttrs[repeatingString + options.toggleField] = options.toggleFieldSetTo;
 
-      if (isUndefined(finalSetAttrs[`${repeatingString}parsed`])) {
+      if (isUndefinedOrEmpty(finalSetAttrs[`${repeatingString}parsed`])) {
         finalSetAttrs[`${repeatingString}parsed`] = '';
       }
       finalSetAttrs[`${repeatingString}parsed`] += ` ${options.parseName}`;
     }
-    if (options.attackAbility && isUndefined(v[`${repeatingString}attack_ability`])) {
+    if (options.attackAbility && isUndefinedOrEmpty(v[`${repeatingString}attack_ability`])) {
       finalSetAttrs[`${repeatingString}attack_ability`] = v.default_ability;
     }
 
     if (options.addCastingModifier) {
-      if (!isUndefined(v[`${repeatingString}damage`]) && isUndefined(v[`${repeatingString}damage_ability`])) {
+      if (!isUndefinedOrEmpty(v[`${repeatingString}damage`]) && isUndefinedOrEmpty(v[`${repeatingString}damage_ability`])) {
         finalSetAttrs[`${repeatingString}damage_ability`] = v.default_ability;
       }
-      if (!isUndefined(v[`${repeatingString}heal`]) && isUndefined(v[`${repeatingString}heal_ability`])) {
+      if (!isUndefinedOrEmpty(v[`${repeatingString}heal`]) && isUndefinedOrEmpty(v[`${repeatingString}heal_ability`])) {
         finalSetAttrs[`${repeatingString}heal_ability`] = v.default_ability;
       }
     }
     if (options.addSecondCastingModifier) {
-      if (!isUndefined(v[`${repeatingString}second_damage`]) && isUndefined(v[`${repeatingString}second_damage_ability`])) {
+      if (!isUndefinedOrEmpty(v[`${repeatingString}second_damage`]) && isUndefinedOrEmpty(v[`${repeatingString}second_damage_ability`])) {
         finalSetAttrs[`${repeatingString}second_damage_ability`] = v.default_ability;
       }
     }
@@ -574,7 +580,7 @@ const setTrait = (obj) => {
       }
 
       repeatingString = `${repeatingItem}_${itemId}_`;
-      if (!obj.clear && isUndefined(v[`${repeatingString}storage_name`])) {
+      if (!obj.clear && isUndefinedOrEmpty(v[`${repeatingString}storage_name`])) {
         finalSetAttrs[`${repeatingString}storage_name`] = obj.storageName;
       }
       if (!obj.clear && v[`${repeatingString}name`] !== obj.name) {
@@ -585,14 +591,14 @@ const setTrait = (obj) => {
       if (obj.clear) {
         delete obj.clear;
         for (const prop in obj) {
-          if (obj.hasOwnProperty(prop) && !isUndefined(v[`${repeatingString}${prop}`])) {
+          if (obj.hasOwnProperty(prop) && !isUndefinedOrEmpty(v[`${repeatingString}${prop}`])) {
             finalSetAttrs[`${repeatingString}${prop}`] = obj[prop];
           }
         }
       } else {
         for (const prop in obj) {
           if (obj.hasOwnProperty(prop)) {
-            if ((prop === 'name' || prop === 'freetext') && (isUndefined(v[`${repeatingString}${prop}`]) || calculatePercentDifference(v[`${repeatingString}${prop}`].length, obj[prop].length) < 10)) {
+            if ((prop === 'name' || prop === 'freetext') && (isUndefinedOrEmpty(v[`${repeatingString}${prop}`]) || calculatePercentDifference(v[`${repeatingString}${prop}`].length, obj[prop].length) < 10)) {
               finalSetAttrs[`${repeatingString}${prop}`] = obj[prop];
             } else if (v[`${repeatingString}${prop}`] !== obj[prop]) {
               finalSetAttrs[`${repeatingString}${prop}`] = obj[prop];
@@ -608,13 +614,13 @@ const setTrait = (obj) => {
         if (obj.heal || obj.heal_ability || obj.heal_bonus || obj.heal_query_toggle) {
           finalSetAttrs[`${repeatingString}heal_toggle`] = toggleVars.heal;
         }
-        if (obj.freetext && isUndefined(v[`${repeatingString}extras_toggle`])) {
+        if (obj.freetext && isUndefinedOrEmpty(v[`${repeatingString}extras_toggle`])) {
           finalSetAttrs[`${repeatingString}extras_toggle`] = toggleVars.extras;
         }
-        if (obj.uses_max && !obj.uses && isUndefined(v[`${repeatingString}uses`])) {
+        if (obj.uses_max && !obj.uses && isUndefinedOrEmpty(v[`${repeatingString}uses`])) {
           finalSetAttrs[`${repeatingString}uses`] = obj.uses_max;
         }
-        if (obj.freetext && repeatingItem === 'repeating_trait' && (isUndefined(v[`${repeatingString}display_text`]) ||
+        if (obj.freetext && repeatingItem === 'repeating_trait' && (isUndefinedOrEmpty(v[`${repeatingString}display_text`]) ||
           calculatePercentDifference(v[`${repeatingString}display_text`].length, obj.freetext.length) < 10)) {
           finalSetAttrs[`${repeatingString}display_text`] = obj.freetext;
         }
@@ -692,7 +698,7 @@ const setClassFeatures = () => {
         uses_max: rageUses,
       });
 
-      if (isUndefined(v.ac_unarmored_ability)) {
+      if (isUndefinedOrEmpty(v.ac_unarmored_ability)) {
         finalSetAttrs.ac_unarmored_ability = 'constitution';
       }
       setTrait({
@@ -996,7 +1002,7 @@ const setClassFeatures = () => {
     }
 
     if (v.monk_level) {
-      if (isUndefined(v.ac_unarmored_ability)) {
+      if (isUndefinedOrEmpty(v.ac_unarmored_ability)) {
         finalSetAttrs.ac_unarmored_ability = 'wisdom';
       }
       setTrait({
@@ -1698,7 +1704,7 @@ const updateSpellSlots = () => {
 
         if (spellSlotMax > 0) {
           finalSetAttrs[`${repeatingString}_max`] = spellSlotMax;
-          if (isUndefined(slots)) {
+          if (isUndefinedOrEmpty(slots)) {
             finalSetAttrs[repeatingString] = spellSlotMax;
           }
         } else {
@@ -1724,10 +1730,10 @@ const updateHD = (v, finalSetAttrs, hd) => {
         finalSetAttrs[`hd_${key}_query`] += '}';
         finalSetAttrs[`hd_${key}_toggle`] = 1;
       } else {
-        if (!isUndefined(v[`hd_${key}_max`])) {
+        if (!isUndefinedOrEmpty(v[`hd_${key}_max`])) {
           finalSetAttrs[`hd_${key}_max`] = 0;
         }
-        if (!isUndefined(v[`hd_${key}_query`])) {
+        if (!isUndefinedOrEmpty(v[`hd_${key}_query`])) {
           finalSetAttrs[`hd_${key}_query`] = '';
         }
         if (exists(v[`hd_${key}_toggle`])) {
@@ -1845,11 +1851,11 @@ const updateLevels = (repeatingInfo) => {
         let className = v[`${repeatingString}name`];
         let classLevel = v[`${repeatingString}level`];
 
-        if (isUndefined(className) && isUndefined(classLevel)) {
+        if (isUndefinedOrEmpty(className) && isUndefinedOrEmpty(classLevel)) {
           continue;
         }
 
-        if (isUndefined(className)) {
+        if (isUndefinedOrEmpty(className)) {
           className = 'barbarian';
         }
         if (className === 'custom') {
@@ -1864,7 +1870,7 @@ const updateLevels = (repeatingInfo) => {
           finalSetAttrs[`${repeatingString}custom_class_toggle`] = 0;
         }
 
-        if (isUndefined(classLevel)) {
+        if (isUndefinedOrEmpty(classLevel)) {
           classLevel = 1;
           finalSetAttrs[`${repeatingString}level`] = classLevel;
           finalSetAttrs[`${className}_level`] = classLevel;
@@ -1879,7 +1885,7 @@ const updateLevels = (repeatingInfo) => {
         }
 
         let classHd = v[`${repeatingString}hd`];
-        if (isUndefined(classHd) || repeatingInfo.field === 'name') {
+        if (isUndefinedOrEmpty(classHd) || repeatingInfo.field === 'name') {
           if (defaultClassDetails.hasOwnProperty(className)) {
             classHd = defaultClassDetails[className].hd;
           } else {
@@ -1892,7 +1898,7 @@ const updateLevels = (repeatingInfo) => {
         }
 
         let classSpellcasting = v[`${repeatingString}spellcasting`];
-        if (isUndefined(classSpellcasting)) {
+        if (isUndefinedOrEmpty(classSpellcasting)) {
           if (defaultClassDetails.hasOwnProperty(className)) {
             classSpellcasting = defaultClassDetails[className].spellcasting;
             if (classSpellcasting) {
@@ -1940,7 +1946,7 @@ const updateLevels = (repeatingInfo) => {
       for (const className of CLASSES) {
         if (finalSetAttrs[`${className}_level`] > 0) {
           finalSetAttrs[`has_${className}_levels`] = 1;
-        } else if (!isUndefined(v[`has_${className}_levels`])) {
+        } else if (!isUndefinedOrEmpty(v[`has_${className}_levels`])) {
           finalSetAttrs[`has_${className}_levels`] = 0;
         }
       }
@@ -2177,12 +2183,12 @@ const updateArmor = (rowId) => {
       for (const id of ids) {
         const repeatingString = `${repeatingItem}_${id}_`;
 
-        if (isUndefined(v[`${repeatingString}parsed`]) || v[`${repeatingString}parsed`].indexOf('acBonus') === -1) {
+        if (isUndefinedOrEmpty(v[`${repeatingString}parsed`]) || v[`${repeatingString}parsed`].indexOf('acBonus') === -1) {
           const armorModifiers = v[`${repeatingString}modifiers`];
           if (exists(armorModifiers)) {
             finalSetAttrs[`${repeatingString}ac_bonus`] = armorModifiers.replace(/^\D+/g, '');
           }
-          if (isUndefined(finalSetAttrs[`${repeatingString}parsed`])) {
+          if (isUndefinedOrEmpty(finalSetAttrs[`${repeatingString}parsed`])) {
             finalSetAttrs[`${repeatingString}parsed`] = '';
           }
           finalSetAttrs[`${repeatingString}parsed`] += ' acBonus';
@@ -2255,7 +2261,7 @@ const updateEquipment = (rowId) => {
       for (const id of ids) {
         const repeatingString = `${repeatingItem}_${id}_`;
 
-        if (isUndefined(v[`${repeatingString}parsed`]) || v[`${repeatingString}parsed`].indexOf('content') === -1) {
+        if (isUndefinedOrEmpty(v[`${repeatingString}parsed`]) || v[`${repeatingString}parsed`].indexOf('content') === -1) {
           let content = v[`${repeatingString}content`];
           if (exists(content)) {
             content = content.replace(/\s(\d+d\d+\s(?:\+|\-)\s\d+)\s/g, ' [[$1]] ')
@@ -2264,7 +2270,7 @@ const updateEquipment = (rowId) => {
 
             finalSetAttrs[`${repeatingString}content`] = content;
 
-            if (isUndefined(finalSetAttrs[`${repeatingString}parsed`])) {
+            if (isUndefinedOrEmpty(finalSetAttrs[`${repeatingString}parsed`])) {
               finalSetAttrs[`${repeatingString}parsed`] = '';
             }
             finalSetAttrs[`${repeatingString}parsed`] += ' content';
@@ -2431,7 +2437,7 @@ const updateAttackToggle = (v, finalSetAttrs, repeatingString, options) => {
     }
 
     let attackAbility = v[`${repeatingString}attack_ability`];
-    if (isUndefined(attackAbility) && v[`${repeatingString}type`] === 'Ranged Weapon') {
+    if (isUndefinedOrEmpty(attackAbility) && v[`${repeatingString}type`] === 'Ranged Weapon') {
       attackAbility = 'dexterity';
       finalSetAttrs[`${repeatingString}attack_ability`] = attackAbility;
     } else if (finalSetAttrs[`${repeatingString}attack_ability`]) {
@@ -2518,7 +2524,7 @@ const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
   let damageString = '';
   let damageFormula = '';
   const damageToggle = v[`${repeatingString}damage_toggle`];
-  let damageAbility;
+  let damageAbility = v[`${repeatingString}damage_ability`];
   let damageType;
 
   if (!damageToggle || damageToggle === toggleVars.damage) {
@@ -2534,7 +2540,6 @@ const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
       options.defaultDamageAbility = 0;
     }
 
-    damageAbility = v[`${repeatingString}damage_ability`];
     if (isUndefined(damageAbility) && v[`${repeatingString}type`] === 'Melee Weapon') {
       damageAbility = 'strength';
       finalSetAttrs[`${repeatingString}damage_ability`] = damageAbility;
@@ -2648,7 +2653,7 @@ const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
       damageString += ` ${secondDamageType}`;
     }
 
-    if (isUndefined(v[`${repeatingString}parsed`]) || v[`${repeatingString}parsed`].indexOf('damageProperties') === -1) {
+    if (isUndefinedOrEmpty(v[`${repeatingString}parsed`]) || v[`${repeatingString}parsed`].indexOf('damageProperties') === -1) {
       const damageProperties = v[`${repeatingString}properties`];
       if (exists(damageProperties)) {
         if (damageProperties.indexOf('Versatile') !== -1) {
@@ -2956,7 +2961,7 @@ const updateAction = (type, rowId) => {
         const repeatingString = `${repeatingItem}_${id}_`;
 
         const actionName = v[`${repeatingString}name`];
-        if (!isUndefined(actionName)) {
+        if (!isUndefinedOrEmpty(actionName)) {
           const rechargeResult = rechargeRegex.exec(actionName);
           if (rechargeResult) {
             finalSetAttrs[`${repeatingString}recharge`] = rechargeResult[1] || rechargeResult[2];
@@ -2971,7 +2976,7 @@ const updateAction = (type, rowId) => {
 
         if (v[`${repeatingString}uses`] || v[`${repeatingString}uses_max`]) {
           finalSetAttrs[`${repeatingString}has_uses`] = 1;
-        } else if (!isUndefined(v[`${repeatingString}has_uses`])) {
+        } else if (!isUndefinedOrEmpty(v[`${repeatingString}has_uses`])) {
           finalSetAttrs[`${repeatingString}has_uses`] = 0;
         }
 
@@ -3121,11 +3126,11 @@ const updateAttack = (rowId) => {
         const repeatingString = `${repeatingItem}_${id}_`;
 
         const attackName = v[`${repeatingString}name`];
-        if (isUndefined(attackName)) {
+        if (isUndefinedOrEmpty(attackName)) {
           return;
         }
 
-        if (isUndefined(v[`${repeatingString}parsed`]) || v[`${repeatingString}parsed`].indexOf('modifiers') === -1) {
+        if (isUndefinedOrEmpty(v[`${repeatingString}parsed`]) || v[`${repeatingString}parsed`].indexOf('modifiers') === -1) {
           const attackModifiers = v[`${repeatingString}modifiers`];
           if (exists(attackModifiers)) {
             const attackBonus = attackModifiers.replace(/.*(?:Melee|Ranged) Attacks \+(\d+).*/gi, '$1');
@@ -3139,7 +3144,7 @@ const updateAttack = (rowId) => {
             finalSetAttrs[`${repeatingString}parsed`] += ' modifiers';
           }
         }
-        if (isUndefined(v[`${repeatingString}parsed`]) || v[`${repeatingString}parsed`].indexOf('attackProperties') === -1) {
+        if (isUndefinedOrEmpty(v[`${repeatingString}parsed`]) || v[`${repeatingString}parsed`].indexOf('attackProperties') === -1) {
           const attackProperties = v[`${repeatingString}properties`];
           if (exists(attackProperties)) {
             if (attackProperties.indexOf('Reach') !== -1) {
@@ -3170,7 +3175,7 @@ const updateAttack = (rowId) => {
 
         const ammoName = v[`${repeatingString}ammo_field_name`];
         const ammoUsed = getIntValue(v[`${repeatingString}ammo_used`], 1);
-        if (!isUndefined(ammoName)) {
+        if (!isUndefinedOrEmpty(ammoName)) {
           let ammoAutoUse;
           if (v.ammo_auto_use === '1') {
             ammoAutoUse = 1;
@@ -3368,7 +3373,7 @@ const updateSpell = (rowId) => {
         if (concentration === 'Yes') {
           finalSetAttrs[`${repeatingString}concentration_show`] = 1;
           finalSetAttrs[`${repeatingString}concentration_text`] = 'Concentration, ';
-        } else if (!isUndefined(v[`${repeatingString}concentration_text`])) {
+        } else if (!isUndefinedOrEmpty(v[`${repeatingString}concentration_text`])) {
           finalSetAttrs[`${repeatingString}concentration_text`] = '';
           finalSetAttrs[`${repeatingString}concentration_show`] = 0;
         }
@@ -3380,17 +3385,17 @@ const updateSpell = (rowId) => {
           finalSetAttrs[`${repeatingString}ritual_show`] = 1;
           finalSetAttrs[`${repeatingString}ritual_output`] = '?{Cast as|Ritual,{{ritual=1&#125;&#125;|Spell,}';
         } else {
-          if (!isUndefined(v[`${repeatingString}ritual_show`])) {
+          if (!isUndefinedOrEmpty(v[`${repeatingString}ritual_show`])) {
             finalSetAttrs[`${repeatingString}ritual_show`] = 0;
           }
-          if (!isUndefined(v[`${repeatingString}ritual_output`])) {
+          if (!isUndefinedOrEmpty(v[`${repeatingString}ritual_output`])) {
             finalSetAttrs[`${repeatingString}ritual_output`] = '';
           }
         }
         const materials = v[`${repeatingString}materials`];
-        if (!isUndefined(materials) && materials !== '') {
+        if (!isUndefinedOrEmpty(materials) && materials !== '') {
           finalSetAttrs[`${repeatingString}materials_show`] = 1;
-        } else if (!isUndefined(v[`${repeatingString}materials_show`])) {
+        } else if (!isUndefinedOrEmpty(v[`${repeatingString}materials_show`])) {
           finalSetAttrs[`${repeatingString}materials_show`] = 0;
         }
 
@@ -3443,7 +3448,7 @@ const updateSpell = (rowId) => {
 
         updateHigherLevelToggle(v, finalSetAttrs, repeatingString);
 
-        if (isUndefined(v[`${repeatingString}extras_toggle`]) && (v[`${repeatingString}emote`] || v[`${repeatingString}freetext`] || v[`${repeatingString}freeform`])) {
+        if (isUndefinedOrEmpty(v[`${repeatingString}extras_toggle`]) && (v[`${repeatingString}emote`] || v[`${repeatingString}freetext`] || v[`${repeatingString}freeform`])) {
           finalSetAttrs[`${repeatingString}extras_toggle`] = toggleVars.extras;
         }
       }
@@ -3494,7 +3499,7 @@ const updateSpellChatMacro = () => {
     getAttrs(collectionArray, (v) => {
       for (const id of ids) {
         const repeatingString = `${repeatingItem}_${id}_`;
-        const showUnprepared = v.spells_show_unprepared === 'on' || isUndefined(v.spells_show_unprepared);
+        const showUnprepared = v.spells_show_unprepared === 'on' || isUndefinedOrEmpty(v.spells_show_unprepared);
         const spellName = v[`${repeatingString}name`];
         const spellLevel = getIntValue(v[`${repeatingString}spell_level`], 0);
         const spellPrepared = v[`${repeatingString}is_prepared`] === 'on';
@@ -3543,7 +3548,7 @@ const updateSpellShowHide = () => {
   }
 
   getAttrs(collectionArray, (v) => {
-    const showLevelIfAllSlotsAreUsed = isUndefined(v.spells_show_spell_level_if_all_slots_are_used) || v.spells_show_spell_level_if_all_slots_are_used === 'on';
+    const showLevelIfAllSlotsAreUsed = isUndefinedOrEmpty(v.spells_show_spell_level_if_all_slots_are_used) || v.spells_show_spell_level_if_all_slots_are_used === 'on';
 
     for (let level = 0; level <= 9; level++) {
       if (v[`spells_level_${level}_macro_var`] || getIntValue(v[`spell_slots_l${level}`]) || getIntValue(v[`spell_slots_l${level}_max`])) {
@@ -3771,7 +3776,7 @@ const updateSkill = (rowId) => {
         const repeatingString = `${repeatingItem}_${id}_`;
 
         const skillName = v[`${repeatingString}name`];
-        if (isUndefined(skillName)) {
+        if (isUndefinedOrEmpty(skillName)) {
           return;
         }
 
@@ -3838,7 +3843,7 @@ const updateSkill = (rowId) => {
 
         finalSetAttrs[`${repeatingString}skill_info`] = '';
 
-        if (!isUndefined(v[`${repeatingString}skill_d20`])) {
+        if (!isUndefinedOrEmpty(v[`${repeatingString}skill_d20`])) {
           if (v[`${repeatingString}skill_d20`].indexOf('kh1') !== -1) {
             finalSetAttrs[`${repeatingString}skill_info`] = '{{advantage=1}}';
             advantageOrDisadvantage = 5;
@@ -3894,7 +3899,7 @@ const updateSkillsFromSRD = () => {
       let skillName;
       let repeatingString;
 
-      if (!isUndefined(skillsFromSRD)) {
+      if (!isUndefinedOrEmpty(skillsFromSRD)) {
         for (const id of ids) {
           repeatingString = `${repeatingItem}_${id}_`;
           skillName = v[`${repeatingString}name`];
@@ -3969,7 +3974,7 @@ const updateSavingThrow = (ability, savingThrowName) => {
     }
 
     const globalSavingThrowBonus = v.global_saving_throw_bonus;
-    if (!isUndefined(globalSavingThrowBonus)) {
+    if (!isUndefinedOrEmpty(globalSavingThrowBonus)) {
       if (!isNaN(globalSavingThrowBonus)) {
         total += getIntValue(globalSavingThrowBonus);
       }
@@ -4519,7 +4524,7 @@ const displayTextForTraits = () => {
       for (const id of ids) {
         const repeatingString = `${repeatingItem}_${id}_`;
 
-        if (isUndefined(v.display_text)) {
+        if (isUndefinedOrEmpty(v.display_text)) {
           finalSetAttrs[`${repeatingString}display_text`] = v[`${repeatingString}freetext`];
         }
       }
@@ -4807,7 +4812,7 @@ const switchToNPC = () => {
   getAttrs(collectionArray, (v) => {
     const isNPC = getIntValue(v.is_npc) === 1;
 
-    if (isNPC && isUndefined(v.size)) {
+    if (isNPC && isUndefinedOrEmpty(v.size)) {
       finalSetAttrs.size = 'Large';
     }
 
@@ -5282,7 +5287,7 @@ const extasToExtrasFix = (repeatingItem) => {
       for (const id of ids) {
         const repeatingString = `${repeatingItem}_${id}_`;
 
-        if (!isUndefined(v[`${repeatingString}extas_toggle`])) {
+        if (!isUndefinedOrEmpty(v[`${repeatingString}extas_toggle`])) {
           finalSetAttrs[`${repeatingString}extras_toggle`] = v[`${repeatingString}extas_toggle`];
         }
       }
@@ -5535,7 +5540,7 @@ const updateArmorAbility = () => {
   const finalSetAttrs = {};
 
   getAttrs(collectionArray, (v) => {
-    if (!isUndefined(v.ac_unarmored_ability)) {
+    if (!isUndefinedOrEmpty(v.ac_unarmored_ability)) {
       finalSetAttrs.ac_unarmored_ability = getAbilityName(v.ac_unarmored_ability);
     }
     setFinalAttrs(v, finalSetAttrs);
@@ -5547,7 +5552,7 @@ const updateDefaultAbility = () => {
   const finalSetAttrs = {};
 
   getAttrs(collectionArray, (v) => {
-    if (!isUndefined(v.default_ability)) {
+    if (!isUndefinedOrEmpty(v.default_ability)) {
       finalSetAttrs.default_ability = getAbilityName(v.default_ability);
     }
     setFinalAttrs(v, finalSetAttrs);
@@ -5575,26 +5580,26 @@ const sheetOpened = () => {
       if (!v.import_data) {
         finalSetAttrs.edit_mode = 'on';
       }
-      if (isUndefined(v.roll_setting)) { // API Script import sets this when making characters
+      if (isUndefinedOrEmpty(v.roll_setting)) { // API Script import sets this when making characters
         finalSetAttrs.roll_setting = '{{ignore=[[0';
       }
       const setAbilities = {};
-      if (isUndefined(v.strength)) {
+      if (isUndefinedOrEmpty(v.strength)) {
         setAbilities.strength = 10;
       }
-      if (isUndefined(v.dexterity)) {
+      if (isUndefinedOrEmpty(v.dexterity)) {
         setAbilities.dexterity = 10;
       }
-      if (isUndefined(v.constitution)) {
+      if (isUndefinedOrEmpty(v.constitution)) {
         setAbilities.constitution = 10;
       }
-      if (isUndefined(v.intelligence)) {
+      if (isUndefinedOrEmpty(v.intelligence)) {
         setAbilities.intelligence = 10;
       }
-      if (isUndefined(v.wisdom)) {
+      if (isUndefinedOrEmpty(v.wisdom)) {
         setAbilities.wisdom = 10;
       }
-      if (isUndefined(v.charisma)) {
+      if (isUndefinedOrEmpty(v.charisma)) {
         setAbilities.charisma = 10;
       }
       setFinalAttrs(v, setAbilities, () => {
@@ -5735,7 +5740,7 @@ const sheetOpened = () => {
       }
     }
 
-    if (isUndefined(version) || !version || version !== currentVersion) {
+    if (isUndefinedOrEmpty(version) || !version || version !== currentVersion) {
       finalSetAttrs.version = currentVersion;
     }
 
