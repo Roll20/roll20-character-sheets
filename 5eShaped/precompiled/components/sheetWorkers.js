@@ -2437,7 +2437,7 @@ const updateAttackToggle = (v, finalSetAttrs, repeatingString, options) => {
     }
 
     let attackAbility = v[`${repeatingString}attack_ability`];
-    if (isUndefinedOrEmpty(attackAbility) && v[`${repeatingString}type`] === 'Ranged Weapon') {
+    if (isUndefined(attackAbility) && v[`${repeatingString}type`] === 'Ranged Weapon') {
       attackAbility = 'dexterity';
       finalSetAttrs[`${repeatingString}attack_ability`] = attackAbility;
     } else if (finalSetAttrs[`${repeatingString}attack_ability`]) {
