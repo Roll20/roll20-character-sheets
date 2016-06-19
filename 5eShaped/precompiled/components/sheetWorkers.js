@@ -3274,27 +3274,6 @@ on('change:global_attack_bonus change:global_melee_attack_bonus change:global_ra
   updateAction('lairaction');
 });
 
-const setSpellLevelToNewSystem = () => {
-  const repeatingItem = 'repeating_spell';
-  const collectionArray = [];
-  const finalSetAttrs = {};
-
-  getSectionIDs(repeatingItem, (ids) => {
-    for (const id of ids) {
-      const repeatingString = `${repeatingItem}_${id}_`;
-      collectionArray.push(`${repeatingString}spell_level`);
-    }
-
-    getAttrs(collectionArray, (v) => {
-      for (const id of ids) {
-        const repeatingString = `${repeatingItem}_${id}_`;
-        finalSetAttrs[`${repeatingString}spell_level`] = `@{spell_level_${v[`${repeatingString}spell_level`]}}`;
-      }
-      setFinalAttrs(v, finalSetAttrs);
-    });
-  });
-};
-
 const updateSpell = (rowId) => {
   const repeatingItem = 'repeating_spell';
   const collectionArray = ['is_npc', 'pb', 'finesse_mod', 'global_spell_attack_bonus', 'global_spell_damage_bonus', 'global_spell_dc_bonus', 'global_spell_heal_bonus', 'default_ability', 'caster_level'];
@@ -3312,6 +3291,7 @@ const updateSpell = (rowId) => {
     for (const id of ids) {
       const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}name`);
+      collectionArray.push(`${repeatingString}cast_as_level`);
       collectionArray.push(`${repeatingString}type`);
       collectionArray.push(`${repeatingString}roll_toggle`);
       collectionArray.push(`${repeatingString}to_hit`);
@@ -3382,7 +3362,7 @@ const updateSpell = (rowId) => {
           finalSetAttrs[`${repeatingString}spell_level`] = spellLevel;
           finalSetAttrs[`${repeatingString}is_prepared`] = 'on';
         }
-        finalSetAttrs[`${repeatingString}friendly_level`] = ordinalSpellLevel(spellLevel);
+        finalSetAttrs[`${repeatingString}cast_as_level`] = `@{cast_as_level_${spellLevel}}`;
 
         const concentration = v[`${repeatingString}concentration`];
         if (concentration === 'Yes') {
@@ -5688,9 +5668,6 @@ const sheetOpened = () => {
         armorPlusDexRemoval();
         updateArmor();
       }
-      if (versionCompare(version, '2.6.3') < 0) {
-        updateSpell();
-      }
       if (versionCompare(version, '3.1.0') < 0) {
         updateAttackChatMacro();
       }
@@ -5746,8 +5723,8 @@ const sheetOpened = () => {
       if (versionCompare(version, '4.4.0') < 0) {
         updateCustomSavingThrows();
         newAttackToggle();
-        setSpellLevelToNewSystem();
         updateSpellShowHide();
+        updateSpell();
       }
     }
 
