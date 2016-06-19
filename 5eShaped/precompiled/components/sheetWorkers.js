@@ -4027,10 +4027,12 @@ const getHighestAbilityForCustomSavingThrows = (savingThrowName, callback) => {
 
   getAttrs(collectionArray, (v) => {
     let abilityName;
-    let highestValue;
+    let highestValue = 0;
 
     for (const ability of ABILITIES) {
-      if ((v[`${savingThrowName}_${ability}`] === '1' && !highestValue) || v[`${ability}_mod`] > highestValue) {
+      const abilityMod = getIntValue(v[`${ability}_mod`]);
+      if (v[`${savingThrowName}_${ability}`] === '1' && (highestValue === 0 || abilityMod > highestValue)) {
+        highestValue = abilityMod;
         abilityName = ability;
       }
     }
@@ -4056,19 +4058,28 @@ const updateCustomSavingThrow = (savingThrowName) => {
     updateSavingThrow(abilityName, savingThrowName);
   });
 };
-
-on('change:strength_mod change:dexterity_mod change:constitution_mod change:intelligence_mod change:wisdom_mod change:charisma_mod', () => {
-  updateCustomSavingThrows();
-});
-on('change:fortitude_save_prof change:fortitude_save_bonus', () => {
-  updateCustomSavingThrow('fortitude');
-});
-on('change:reflex_save_prof change:reflex_save_bonus', () => {
-  updateCustomSavingThrow('reflex');
-});
-on('change:will_save_prof change:will_save_bonus', () => {
-  updateCustomSavingThrow('will');
-});
+const watchAbilityModChanges = () => {
+  const classFeatureWatch = [];
+  for (const ability of ABILITIES) {
+    classFeatureWatch.push(`change:${ability}_mod`);
+  }
+  on(classFeatureWatch.join(' '), () => {
+    updateCustomSavingThrows();
+  });
+};
+watchAbilityModChanges();
+const watchForCustomSavingThrowChanges = (savingThrowName) => {
+  const classFeatureWatch = [`change:${savingThrowName}_save_prof`, `change:${savingThrowName}_save_bonus`];
+  for (const ability of ABILITIES) {
+    classFeatureWatch.push(`change:${savingThrowName}_${ability}`);
+  }
+  on(classFeatureWatch.join(' '), () => {
+    updateCustomSavingThrow(savingThrowName);
+  });
+};
+watchForCustomSavingThrowChanges('fortitude');
+watchForCustomSavingThrowChanges('reflex');
+watchForCustomSavingThrowChanges('will');
 
 const updateSavingThrowsFromSRD = () => {
   const collectionArray = ['saving_throws_srd'];
