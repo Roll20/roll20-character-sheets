@@ -1,7 +1,7 @@
 /* global setAttrs:false, getAttrs:false, on:false, getSectionIDs:false, generateRowID:false, getTranslationByKey:false */
 'use strict';
 
-const currentVersion = '4.3.4';
+const currentVersion = '4.4.0';
 const SKILLS = {
   ACROBATICS: 'dexterity',
   ANIMALHANDLING: 'wisdom',
