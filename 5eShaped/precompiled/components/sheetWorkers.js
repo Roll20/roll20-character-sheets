@@ -427,16 +427,21 @@ const getSetRepeatingItems = (obj) => {
         ids = [];
         ids.push(obj.rowId);
       }
-      for (const id of ids) {
-        const repeatingString = `${repeatingItem}_${id}_`;
-        for (const addItem of obj.collectionArrayAddItems) {
-          collectionArray.push(`${repeatingString}${addItem}`);
-        }
-        for (const itemToPush of obj.itemsToPush) {
-          collectionArray.push(`${repeatingString}${itemToPush}_${obj.itemToPushSuffix}`);
+      if (ids) {
+        for (const id of ids) {
+          const repeatingString = `${repeatingItem}_${id}_`;
+          if (obj.collectionArrayAddItems) {
+            for (const addItem of obj.collectionArrayAddItems) {
+              collectionArray.push(`${repeatingString}${addItem}`);
+            }
+          }
+          if (obj.itemsToPush) {
+            for (const itemToPush of obj.itemsToPush) {
+              collectionArray.push(`${repeatingString}${itemToPush}_${obj.itemToPushSuffix}`);
+            }
+          }
         }
       }
-
       getAttrs(collectionArray, (v) => {
         if (obj.callback) {
           obj.callback(v, finalSetAttrs, ids, repeatingItem);
