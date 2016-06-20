@@ -3853,6 +3853,23 @@ watchForCustomSavingThrowChanges('fortitude');
 watchForCustomSavingThrowChanges('reflex');
 watchForCustomSavingThrowChanges('will');
 
+const updateCustomSavingThrowToggle = () => {
+  getSetItems({
+    collectionArray: ['use_custom_saving_throws', 'saving_throw_macro_var', 'custom_saving_throw_macro_var'],
+    callback: (v, finalSetAttrs) => {
+      if (v.use_custom_saving_throws === '1') {
+        finalSetAttrs.saving_throw_macro_var_to_use = v.custom_saving_throw_macro_var;
+      } else {
+        finalSetAttrs.saving_throw_macro_var_to_use = v.saving_throw_macro_var;
+      }
+    },
+  });
+};
+on('change:use_custom_saving_throws', () => {
+  updateCustomSavingThrowToggle();
+});
+
+
 const updateSavingThrowsFromSRD = () => {
   getSetItems({
     collectionArray: ['saving_throws_srd'],
@@ -5272,6 +5289,7 @@ const sheetOpened = () => {
         }
         if (versionCompare(version, '4.4.2') < 0) {
           updateSpellShowHide();
+          updateCustomSavingThrowToggle();
         }
       }
 
