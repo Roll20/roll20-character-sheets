@@ -172,9 +172,11 @@ const parseAttackComponent = (v, repeatingString, finalSetAttrs, options) => {
   if (isUndefinedOrEmpty(parsed) || parsed.indexOf(options.parseName) === -1) {
     let aTriggerFieldExists = false;
 
-    for (const triggerField of options.triggerFields) {
-      if (!isUndefinedOrEmpty(v[repeatingString + triggerField])) {
-        aTriggerFieldExists = true;
+    if (options.triggerFields) {
+      for (const triggerField of options.triggerFields) {
+        if (!isUndefinedOrEmpty(v[repeatingString + triggerField])) {
+          aTriggerFieldExists = true;
+        }
       }
     }
     if (aTriggerFieldExists && isUndefinedOrEmpty(v[repeatingString + options.toggleField])) {
@@ -421,41 +423,43 @@ const getSetRepeatingItems = (obj) => {
   const collectionArray = obj.collectionArray || [];
   const finalSetAttrs = {};
 
-  for (const repeatingItem of obj.repeatingItems) {
-    getSectionIDs(repeatingItem, (ids) => {
-      if (obj.rowId) {
-        ids = [];
-        ids.push(obj.rowId);
-      }
-      if (ids) {
-        for (const id of ids) {
-          const repeatingString = `${repeatingItem}_${id}_`;
-          if (obj.collectionArrayAddItems) {
-            for (const addItem of obj.collectionArrayAddItems) {
-              collectionArray.push(`${repeatingString}${addItem}`);
+  if (obj.repeatingItems) {
+    for (const repeatingItem of obj.repeatingItems) {
+      getSectionIDs(repeatingItem, (ids) => {
+        if (obj.rowId) {
+          ids = [];
+          ids.push(obj.rowId);
+        }
+        if (ids) {
+          for (const id of ids) {
+            const repeatingString = `${repeatingItem}_${id}_`;
+            if (obj.collectionArrayAddItems) {
+              for (const addItem of obj.collectionArrayAddItems) {
+                collectionArray.push(`${repeatingString}${addItem}`);
+              }
             }
-          }
-          if (obj.itemsToPush) {
-            for (const itemToPush of obj.itemsToPush) {
-              collectionArray.push(`${repeatingString}${itemToPush}_${obj.itemToPushSuffix}`);
+            if (obj.itemsToPush) {
+              for (const itemToPush of obj.itemsToPush) {
+                collectionArray.push(`${repeatingString}${itemToPush}_${obj.itemToPushSuffix}`);
+              }
             }
           }
         }
-      }
-      getAttrs(collectionArray, (v) => {
-        if (obj.callback) {
-          obj.callback(v, finalSetAttrs, ids, repeatingItem);
-        }
-        setFinalAttrs(v, finalSetAttrs, () => {
-          if (obj.setFinalAttrsCallback) {
-            obj.setFinalAttrsCallback();
+        getAttrs(collectionArray, (v) => {
+          if (obj.callback) {
+            obj.callback(v, finalSetAttrs, ids, repeatingItem);
+          }
+          setFinalAttrs(v, finalSetAttrs, () => {
+            if (obj.setFinalAttrsCallback) {
+              obj.setFinalAttrsCallback();
+            }
+          });
+          if (obj.returnCallback) {
+            obj.returnCallback();
           }
         });
-        if (obj.returnCallback) {
-          obj.returnCallback();
-        }
       });
-    });
+    }
   }
 };
 
