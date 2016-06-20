@@ -398,13 +398,13 @@ const camelize = (str) => {
   });
 };
 
-const getSetItems = () => {
+const getSetItems = (obj) => {
   const collectionArray = obj.collectionArray || [];
   const finalSetAttrs = {};
 
   getAttrs(collectionArray, (v) => {
     if (obj.callback) {
-      obj.callback(v, finalSetAttrs, ids, repeatingItem);
+      obj.callback(v, finalSetAttrs);
     }
     setFinalAttrs(v, finalSetAttrs, () => {
       if (obj.setFinalAttrsCallback) {
@@ -3359,7 +3359,10 @@ const updateSpellShowHide = () => {
           finalSetAttrs[`spell_slots_l${level}_toggle`] = 0;
         }
 
-        if ((getIntValue(v[`spell_slots_l${level}`]) || showLevelIfAllSlotsAreUsed) && (v[`spells_level_${level}_macro_var`] && getIntValue(v[`spell_slots_l${level}_max`]) === 0)) {
+        const hasSlots = getIntValue(v[`spell_slots_l${level}`]);
+        const hasSpells = v[`spells_level_${level}_macro_var`];
+
+        if ((hasSlots || showLevelIfAllSlotsAreUsed) && hasSpells) {
           finalSetAttrs[`spells_level_${level}_show`] = true;
         } else {
           finalSetAttrs[`spells_level_${level}_show`] = '';
@@ -5252,12 +5255,14 @@ const sheetOpened = () => {
         if (versionCompare(version, '4.4.0') < 0) {
           updateCustomSavingThrows();
           newAttackToggle();
-          updateSpellShowHide();
           updateSpell();
           generateHigherLevelQueries();
         }
         if (versionCompare(version, '4.4.1') < 0) {
           newAbilityDefaults();
+        }
+        if (versionCompare(version, '4.4.2') < 0) {
+          updateSpellShowHide();
         }
       }
 
