@@ -97,12 +97,8 @@ const getAbilityName = (varName) => {
   }
   return getAbilityModName(varName).replace('_mod', '');
 };
-const getAbilityValue = (v, varName, defaultAbility) => {
-  if (typeof varName === 'undefined') {
-    if (defaultAbility) {
-      return getIntValue(v[`${defaultAbility}_mod`]);
-    }
-  } else if (exists(varName)) {
+const getAbilityValue = (v, varName) => {
+  if (exists(varName)) {
     varName = getAbilityModName(varName);
     return getIntValue(v[`${varName}_mod`], 0);
   }
@@ -2160,6 +2156,48 @@ const sumRepeating = (options, sumItems) => {
   });
 };
 
+const getSkillIdByStorageName = (v, repeatingItem, ids, prop) => {
+  for (const id of ids) {
+    const repeatingString = `${repeatingItem}_${id}_`;
+    if (v[`${repeatingString}storage_name`] === prop || v[`${repeatingString}storage_name`] === camelize(prop)) {
+      return id;
+    }
+  }
+};
+
+const setAdvantageOnStealth = (mode) => {
+  const repeatingItem = 'repeating_skill';
+  const collectionArray = [];
+  const finalSetAttrs = {};
+  let repeatingString;
+
+  getSectionIDs(repeatingItem, (ids) => {
+    for (const id of ids) {
+      repeatingString = `${repeatingItem}_${id}_`;
+      collectionArray.push(`${repeatingString}storage_name`);
+      collectionArray.push(`${repeatingString}skill_d20`);
+    }
+
+    getAttrs(collectionArray, (v) => {
+      for (const prop in SKILLS) {
+        if (SKILLS.hasOwnProperty(prop)) {
+          const skillId = getSkillIdByStorageName(v, repeatingItem, ids, prop);
+          repeatingString = `${repeatingItem}_${skillId}_`;
+
+          if (v[`${repeatingString}storage_name`] === 'STEALTH') {
+            if (mode === 'dis') {
+              finalSetAttrs[`${repeatingString}skill_d20`] = '2d20@{d20_mod}kl1';
+            } else if (mode === 'normal') {
+              finalSetAttrs[`${repeatingString}skill_d20`] = '@{shaped_d20}';
+            }
+          }
+        }
+      }
+      setFinalAttrs(v, finalSetAttrs);
+    });
+  });
+};
+
 const updateArmor = (rowId) => {
   const repeatingItem = 'repeating_armor';
   const collectionArray = [];
@@ -2443,7 +2481,7 @@ const updateAttackToggle = (v, finalSetAttrs, repeatingString, options) => {
     } else if (finalSetAttrs[`${repeatingString}attack_ability`]) {
       attackAbility = finalSetAttrs[`${repeatingString}attack_ability`];
     }
-    attackAbility = getAbilityValue(v, attackAbility, options.defaultAbility);
+    attackAbility = getAbilityValue(v, attackAbility);
     if (exists(attackAbility)) {
       toHit += attackAbility;
       attackFormula += `${addArithmeticOperator(attackFormula, attackAbility)}[${getAbilityShortName(v[`${repeatingString}attack_ability`])}]`;
@@ -2536,10 +2574,6 @@ const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
       damageFormula += `${damage}[damage]`;
     }
 
-    if (!options.defaultDamageAbility) {
-      options.defaultDamageAbility = 0;
-    }
-
     if (isUndefined(damageAbility) && v[`${repeatingString}type`] === 'Melee Weapon') {
       damageAbility = 'strength';
       finalSetAttrs[`${repeatingString}damage_ability`] = damageAbility;
@@ -2548,8 +2582,8 @@ const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
       damageAbility = 'dexterity';
       finalSetAttrs[`${repeatingString}damage_ability`] = damageAbility;
     }
-    if (exists(damageAbility) || options.defaultDamageAbility) {
-      const damageAbilityValue = getAbilityValue(v, damageAbility, options.defaultDamageAbility);
+    if (exists(damageAbility)) {
+      const damageAbilityValue = getAbilityValue(v, damageAbility);
       if (exists(damageAbilityValue)) {
         damageAddition += damageAbilityValue;
         damageFormula += `${addArithmeticOperator(damageFormula, damageAbilityValue)}[${getAbilityShortName(v[`${repeatingString}damage_ability`])}]`;
@@ -2994,7 +3028,6 @@ const updateAction = (type, rowId) => {
         let attackOptions = {};
         if (type !== 'trait') {
           attackOptions = {
-            defaultAbility: 'strength',
             globalAttackBonus: v.global_attack_bonus,
             globalAttackBonusLabel: 'global attack bonus',
             globalMeleeAttackBonus: v.global_melee_attack_bonus,
@@ -3009,7 +3042,6 @@ const updateAction = (type, rowId) => {
         let damageOptions = {};
         if (type !== 'trait') {
           damageOptions = {
-            defaultDamageAbility: 'strength',
             globalDamageBonus: v.global_damage_bonus,
             globalMeleeDamageBonus: v.global_melee_damage_bonus,
             globalRangedDamageBonus: v.global_ranged_damage_bonus,
@@ -3164,7 +3196,6 @@ const updateAttack = (rowId) => {
         }
 
         const attackOptions = {
-          defaultAbility: 'strength',
           globalAttackBonus: v.global_attack_bonus,
           globalAttackBonusLabel: 'global attack bonus',
           globalMeleeAttackBonus: v.global_melee_attack_bonus,
@@ -3193,7 +3224,6 @@ const updateAttack = (rowId) => {
         updateSavingThrowToggle(v, finalSetAttrs, repeatingString);
 
         const damageOptions = {
-          defaultDamageAbility: 'strength',
           globalDamageBonus: v.global_damage_bonus,
           globalMeleeDamageBonus: v.global_melee_damage_bonus,
           globalRangedDamageBonus: v.global_ranged_damage_bonus,
@@ -3589,7 +3619,6 @@ const generateHigherLevelQueries = () => {
   for (let i = 1; i <= 8; i++) {
     collectionArray.push(`cast_as_level_${i}`);
     collectionArray.push(`higher_level_query_${i}`);
-
   }
   for (let i = 1; i <= 9; i++) {
     collectionArray.push(`spell_slots_l${i}`);
@@ -3986,6 +4015,47 @@ const updateSavingThrow = (ability, savingThrowName) => {
     setFinalAttrs(v, finalSetAttrs);
   });
 };
+const getHighestAbilityForCustomSavingThrows = (savingThrowName, callback) => {
+  const collectionArray = [];
+
+  for (const ability of ABILITIES) {
+    collectionArray.push(`${ability}_mod`);
+    collectionArray.push(`${savingThrowName}_${ability}`);
+  }
+
+  getAttrs(collectionArray, (v) => {
+    let abilityName;
+    let highestValue = 0;
+
+    for (const ability of ABILITIES) {
+      const abilityMod = getIntValue(v[`${ability}_mod`]);
+      if (v[`${savingThrowName}_${ability}`] === '1' && (highestValue === 0 || abilityMod > highestValue)) {
+        highestValue = abilityMod;
+        abilityName = ability;
+      }
+    }
+    callback(abilityName);
+  });
+};
+const updateCustomSavingThrow = (savingThrowName) => {
+  getHighestAbilityForCustomSavingThrows(savingThrowName, (abilityName) => {
+    if (!abilityName) {
+      if (savingThrowName === 'fortitude') {
+        abilityName = 'constitution';
+      } else if (savingThrowName === 'reflex') {
+        abilityName = 'dexterity';
+      } else if (savingThrowName === 'will') {
+        abilityName = 'wisdom';
+      }
+    }
+    updateSavingThrow(abilityName, savingThrowName);
+  });
+};
+const updateCustomSavingThrows = () => {
+  updateCustomSavingThrow('fortitude');
+  updateCustomSavingThrow('reflex');
+  updateCustomSavingThrow('will');
+};
 const updateSavingThrows = () => {
   updateSavingThrow('strength');
   updateSavingThrow('dexterity');
@@ -4016,48 +4086,6 @@ on('change:wisdom_mod change:wisdom_save_prof change:wisdom_save_bonus', () => {
 on('change:charisma_mod change:charisma_save_prof change:charisma_save_bonus', () => {
   updateSavingThrow('charisma');
 });
-
-const getHighestAbilityForCustomSavingThrows = (savingThrowName, callback) => {
-  const collectionArray = [];
-
-  for (const ability of ABILITIES) {
-    collectionArray.push(`${ability}_mod`);
-    collectionArray.push(`${savingThrowName}_${ability}`);
-  }
-
-  getAttrs(collectionArray, (v) => {
-    let abilityName;
-    let highestValue = 0;
-
-    for (const ability of ABILITIES) {
-      const abilityMod = getIntValue(v[`${ability}_mod`]);
-      if (v[`${savingThrowName}_${ability}`] === '1' && (highestValue === 0 || abilityMod > highestValue)) {
-        highestValue = abilityMod;
-        abilityName = ability;
-      }
-    }
-    callback(abilityName);
-  });
-};
-const updateCustomSavingThrows = () => {
-  updateCustomSavingThrow('fortitude');
-  updateCustomSavingThrow('reflex');
-  updateCustomSavingThrow('will');
-};
-const updateCustomSavingThrow = (savingThrowName) => {
-  getHighestAbilityForCustomSavingThrows(savingThrowName, (abilityName) => {
-    if (!abilityName) {
-      if (savingThrowName === 'fortitude') {
-        abilityName = 'constitution';
-      } else if (savingThrowName === 'reflex') {
-        abilityName = 'dexterity';
-      } else if (savingThrowName === 'will') {
-        abilityName = 'wisdom';
-      }
-    }
-    updateSavingThrow(abilityName, savingThrowName);
-  });
-};
 const watchAbilityModChanges = () => {
   const classFeatureWatch = [];
   for (const ability of ABILITIES) {
@@ -4778,7 +4806,6 @@ const countAction = (type) => {
   const collectionArray = [`${type}s_exist`];
   const finalSetAttrs = {};
 
-
   getSectionIDs(repeatingItem, (ids) => {
     getAttrs(collectionArray, (v) => {
       if (ids.length > 0) {
@@ -5189,48 +5216,6 @@ const classFeaturesToTraits = () => {
   });
 };
 
-const getSkillIdByStorageName = (v, repeatingItem, ids, prop) => {
-  for (const id of ids) {
-    const repeatingString = `${repeatingItem}_${id}_`;
-    if (v[`${repeatingString}storage_name`] === prop || v[`${repeatingString}storage_name`] === camelize(prop)) {
-      return id;
-    }
-  }
-};
-
-const setAdvantageOnStealth = (mode) => {
-  const repeatingItem = 'repeating_skill';
-  const collectionArray = [];
-  const finalSetAttrs = {};
-  let repeatingString;
-
-  getSectionIDs(repeatingItem, (ids) => {
-    for (const id of ids) {
-      repeatingString = `${repeatingItem}_${id}_`;
-      collectionArray.push(`${repeatingString}storage_name`);
-      collectionArray.push(`${repeatingString}skill_d20`);
-    }
-
-    getAttrs(collectionArray, (v) => {
-      for (const prop in SKILLS) {
-        if (SKILLS.hasOwnProperty(prop)) {
-          const skillId = getSkillIdByStorageName(v, repeatingItem, ids, prop);
-          repeatingString = `${repeatingItem}_${skillId}_`;
-
-          if (v[`${repeatingString}storage_name`] === 'STEALTH') {
-            if (mode === 'dis') {
-              finalSetAttrs[`${repeatingString}skill_d20`] = '2d20@{d20_mod}kl1';
-            } else if (mode === 'normal') {
-              finalSetAttrs[`${repeatingString}skill_d20`] = '@{shaped_d20}';
-            }
-          }
-        }
-      }
-      setFinalAttrs(v, finalSetAttrs);
-    });
-  });
-};
-
 const generateSkills = () => {
   const repeatingItem = 'repeating_skill';
   const collectionArray = [];
@@ -5405,6 +5390,36 @@ const newAttackToggle = () => {
 
           if (v[`${repeatingString}roll_toggle`] === '{{vs_ac=1}} @{roll_info} {{roll1=[[@{shaped_d20}cs>@{crit_range} + @{attack_formula}]]}} @{roll_setting}cs>@{crit_range} + @{attack_formula}]]}} {{targetAC=@{attacks_vs_target_ac}}} {{targetName=@{attacks_vs_target_name}}}') {
             finalSetAttrs[`${repeatingString}roll_toggle`] = toggleVars.roll;
+          }
+        }
+        setFinalAttrs(v, finalSetAttrs);
+      });
+    });
+  }
+};
+
+const newAbilityDefaults = () => {
+  const repeatingItems = ['repeating_attack', 'repeating_trait', 'repeating_action', 'repeating_reaction', 'repeating_legendaryaction', 'repeating_lairaction', 'repeating_regionaleffect'];
+  const collectionArray = [];
+  const finalSetAttrs = {};
+
+  for (const repeatingItem of repeatingItems) {
+    getSectionIDs(repeatingItem, (ids) => {
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
+        collectionArray.push(`${repeatingString}roll_ability`);
+        collectionArray.push(`${repeatingString}damage_ability`);
+      }
+
+      getAttrs(collectionArray, (v) => {
+        for (const id of ids) {
+          const repeatingString = `${repeatingItem}_${id}_`;
+
+          if (isUndefined(v[`${repeatingString}roll_ability`])) {
+            finalSetAttrs[`${repeatingString}roll_ability`] = 'strength';
+          }
+          if (isUndefined(v[`${repeatingString}damage_ability`])) {
+            finalSetAttrs[`${repeatingString}damage_ability`] = 'strength';
           }
         }
         setFinalAttrs(v, finalSetAttrs);
@@ -5748,6 +5763,9 @@ const sheetOpened = () => {
         updateSpellShowHide();
         updateSpell();
         generateHigherLevelQueries();
+      }
+      if (versionCompare(version, '4.4.1') < 0) {
+        newAbilityDefaults();
       }
     }
 
