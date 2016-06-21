@@ -11747,7 +11747,7 @@ var SWUtils = SWUtils || (function () {
         //TAS.debug("calling searchAndReplaceFields with values=" + exprStr);
         searchAndReplaceFields(exprStr, function (replacedStr) {
             var evaluated,newexprStr,matches;
-            //TAS.debug("search and replace of " + exprStr + " resulted in " + replacedStr);
+            TAS.debug("search and replace of " + exprStr + " resulted in " + replacedStr);
             replacedStr = replacedStr.replace(/\s+/g, '').replace(/\[\[/g, "(").replace(/\]\]/g, ")").replace(/\[/g, "(").replace(/\]/g, ")");
 			try {
 				newexprStr = convertKL1KH1toMinMax(replacedStr);
@@ -11759,16 +11759,19 @@ var SWUtils = SWUtils || (function () {
 				TAS.error("error from replacedKH1KL1",kl1err) ;
 			}
 
-            if (!isNaN(parseFloat(replacedStr)) && isFinite(replacedStr)) {
+            if (!isNaN(Number(replacedStr)) && isFinite(replacedStr)) {
+				//TAS.debug("replacedStr starts with a number:" + replacedStr);
 				//check that nothing is after number
-				matches = replacedStr.match(/([\+\-]*)(\d+)(\.*)(\d*)/);
-				if (matches && matches[0].length === replacedStr.length){
+				try{
 					evaluated = parseFloat(replacedStr);
-					callback(evaluated);
+					if (!isNaN(evaluated)) { callback(evaluated); }
+				} catch (err3){
+					TAS.error("error trying to convert to number:"+err3);
 				}
             }
-            if (!isNaN(evaluated)) { callback(evaluated); }
-            else if (typeof replacedStr !== "undefined" && replacedStr !== null && validNumericStr(replacedStr)) {
+            
+            if (typeof replacedStr !== "undefined" && replacedStr !== null && validNumericStr(replacedStr)) {
+				
                 evaluated = ExExp.handleExpression(replacedStr);
                 //TAS.debug("sending back " + evaluated);
                 callback(evaluated);
@@ -11821,6 +11824,7 @@ var SWUtils = SWUtils || (function () {
     *
     */
     evaluateAndSetNumber = function (readField, writeField, defaultVal, callback) {
+		TAS.debug("at evaluateAndSetNumber");
         getAttrs([readField, writeField], function (values) {
             var setter = {}, 
                 trueDefault = defaultVal || 0,
@@ -11828,13 +11832,14 @@ var SWUtils = SWUtils || (function () {
                 hasCallback=(typeof callback ==="function"),
                 value = Number(values[readField]);
 
+			TAS.debug("value of "+readField+" is:"+value);
 			//0 is ok, but undefined is not.
-			if (value!=0){value=value||trueDefault;}
+			//if (value!=0){value=value||trueDefault;}
 
             if (!isNaN(value)) {
-                //TAS.debug("it was a number");
+                TAS.debug("it was a number");
                 if (currVal !== value) {
-                    //TAS.debug({ "function": "evaluateAndSetNumber", "currVal": currVal, "newVal": value });
+                    TAS.debug({ "function": "evaluateAndSetNumber", "currVal": currVal, "newVal": value });
                     setter[writeField] = value;
                     if (hasCallback){
                         setAttrs(setter,{},callback(value));
@@ -11843,14 +11848,14 @@ var SWUtils = SWUtils || (function () {
                     }
                 }
             } else {
-                //TAS.debug("ok evaluate " + values[readField]);
+                TAS.debug("ok evaluate " + values[readField]);
                 evaluateExpression(values[readField], function (value2) {
-                    //TAS.debug("came back with " + value2 + ", is it NaN?:" + isNaN(value2));
+                    TAS.debug("came back with " + value2 + ", is it NaN?:" + isNaN(value2));
                     //look for ( and ) at beginning and end
 
                     value2 = isNaN(value2) ? trueDefault : value2;
                     if (isNaN(currVal) || currVal !== value2) {
-                        //TAS.debug({ "function": "evaluateAndSetNumber", "currVal": currVal, "newVal": value2 });
+                        TAS.debug({ "function": "evaluateAndSetNumber", "currVal": currVal, "newVal": value2 });
                         setter[writeField] = value2;
                         if (hasCallback){
                             setAttrs(setter,{},callback(value2));
