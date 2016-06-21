@@ -5309,7 +5309,6 @@ const importData = () => {
     collectionArray: ['import_data', 'version'],
     callback: (v, finalSetAttrs) => {
       if (v.import_data) {
-        finalSetAttrs = {};
         const importObject = JSON.parse(v.import_data);
 
         if (importObject.npc) {
