@@ -4970,14 +4970,14 @@ const newAttackToggle = () => {
 const newAbilityDefaults = () => {
   getSetRepeatingItems({
     repeatingItems: ['repeating_attack', 'repeating_trait', 'repeating_action', 'repeating_reaction', 'repeating_legendaryaction', 'repeating_lairaction', 'repeating_regionaleffect'],
-    collectionArrayAddItems: ['roll_ability', 'damage_ability'],
+    collectionArrayAddItems: ['roll_toggle', 'roll_ability', 'damage_toggle', 'damage_ability'],
     callback: (v, finalSetAttrs, ids, repeatingItem) => {
       for (const id of ids) {
         const repeatingString = `${repeatingItem}_${id}_`;
-        if (isUndefined(v[`${repeatingString}roll_ability`])) {
+        if (!isUndefinedOrEmpty(v[`${repeatingString}roll_toggle`]) && isUndefined(v[`${repeatingString}roll_ability`])) {
           finalSetAttrs[`${repeatingString}roll_ability`] = 'strength';
         }
-        if (isUndefined(v[`${repeatingString}damage_ability`])) {
+        if (!isUndefinedOrEmpty(v[`${repeatingString}damage_toggle`]) && isUndefined(v[`${repeatingString}damage_ability`])) {
           finalSetAttrs[`${repeatingString}damage_ability`] = 'strength';
         }
       }
@@ -5299,7 +5299,6 @@ const sheetOpened = () => {
     },
   });
 };
-
 on('sheet:opened', () => {
   sheetOpened();
 });
