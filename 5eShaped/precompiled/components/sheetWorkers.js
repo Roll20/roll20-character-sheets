@@ -1,7 +1,7 @@
-/* global setAttrs:false, getAttrs:false, on:false, getSectionIDs:false, generateRowID:false */
+/* global setAttrs:false, getAttrs:false, on:false, getSectionIDs:false, generateRowID:false, getTranslationByKey:false */
 'use strict';
 
-const currentVersion = '4.1.1';
+const currentVersion = '4.3.1';
 const SKILLS = {
   ACROBATICS: 'dexterity',
   ANIMALHANDLING: 'wisdom',
@@ -24,6 +24,17 @@ const SKILLS = {
 };
 const CLASSES = ['barbarian', 'bard', 'cleric', 'druid', 'fighter', 'monk', 'paladin', 'ranger', 'rogue', 'sorcerer', 'warlock', 'wizard'];
 const ABILITIES = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
+
+const toggleVars = {
+  roll: '{{vs_ac=1}} @{roll_info} {{roll1=[[@{shaped_d20}cs>@{crit_range} + @{attack_formula}]]}} @{roll_setting}cs>@{crit_range} + @{attack_formula}]]}} {{targetAC=@{attacks_vs_target_ac}}} {{targetName=@{attacks_vs_target_name}}}',
+  saving_throw: '{{saving_throw_condition=@{saving_throw_condition}}} {{saving_throw_dc=@{saving_throw_dc}}} {{saving_throw_vs_ability=@{saving_throw_vs_ability}}} {{saving_throw_failure=@{saving_throw_failure}}} {{saving_throw_success=@{saving_throw_success}}} {{targetName=@{attacks_vs_target_name}}}',
+  damage: '{{damage=[[@{damage_formula}]]}} {{damage_type=@{damage_type}}} {{crit_damage=[[0d0 + @{damage_crit}[crit damage] @{damage_crit_formula}]]}}',
+  second_damage: '{{second_damage=[[@{second_damage_formula}]]}} {{second_damage_type=@{second_damage_type}}} {{second_crit_damage=[[0d0 + @{second_damage_crit}[crit damage] @{second_damage_crit_formula}]]}}',
+  heal: '{{heal=[[@{heal_formula}]]}}',
+  heal_query: '?{Heal Bonus Amount|}',
+  extras: '{{emote=@{emote}}} {{freetext=@{freetext}}} @{freeform}',
+  higher_level: '{{cast_as_level=@{higher_level_query}}}',
+};
 
 const capitalize = (string) => {
   return string.replace(/\w\S*/g, (txt) => {
@@ -83,11 +94,11 @@ const getAbilityName = (varName) => {
 const getAbilityValue = (v, varName, defaultAbility) => {
   if (typeof varName === 'undefined') {
     if (defaultAbility) {
-      return getIntValue(v[defaultAbility]);
+      return getIntValue(v[`${defaultAbility}_mod`]);
     }
   } else if (exists(varName)) {
     varName = getAbilityModName(varName);
-    return getIntValue(v[varName], 0);
+    return getIntValue(v[`${varName}_mod`], 0);
   }
   return 0;
 };
@@ -95,7 +106,7 @@ const getAbilityShortName = (varName, capital) => {
   if (!varName) {
     return 'Str';
   }
-  varName = getAbilityModName(varName);
+  varName = varName.replace(/\W/g, '');
   if (capital) {
     varName = capitalize(varName);
   }
@@ -290,23 +301,23 @@ const getCorrectAbilityBasedOnBonus = (finalSetAttrs, repeatingString, fieldName
       closest = findClosest(spellMods, bonus);
       bonus -= closest;
       if (closest === spellMods[0]) {
-        finalSetAttrs[repeatingString + fieldName] = '@{intelligence_mod}';
+        finalSetAttrs[repeatingString + fieldName] = 'intelligence';
       } else if (closest === spellMods[1]) {
-        finalSetAttrs[repeatingString + fieldName] = '@{wisdom_mod}';
+        finalSetAttrs[repeatingString + fieldName] = 'wisdom';
       } else if (closest === spellMods[2]) {
-        finalSetAttrs[repeatingString + fieldName] = '@{charisma_mod}';
+        finalSetAttrs[repeatingString + fieldName] = 'charisma';
       }
     } else {
       if (rangedAttack) {
-        finalSetAttrs[`${repeatingString}attack_ability`] = '@{dexterity_mod}';
+        finalSetAttrs[`${repeatingString}attack_ability`] = 'dexterity';
         bonus -= dexMod;
       } else {
         closest = findClosest(meleeMods, bonus);
         bonus -= closest;
         if (closest === meleeMods[0]) {
-          finalSetAttrs[repeatingString + fieldName] = '@{strength_mod}';
+          finalSetAttrs[repeatingString + fieldName] = 'strength';
         } else if (closest === meleeMods[1]) {
-          finalSetAttrs[repeatingString + fieldName] = '@{dexterity_mod}';
+          finalSetAttrs[repeatingString + fieldName] = 'dexterity';
         }
       }
     }
@@ -321,17 +332,17 @@ const getAnyCorrectAbilityBasedOnBonus = (finalSetAttrs, repeatingString, fieldN
     bonus -= closest;
 
     if (closest === abilityMods[0]) {
-      finalSetAttrs[repeatingString + fieldName] = '@{strength_mod}';
+      finalSetAttrs[repeatingString + fieldName] = 'strength';
     } else if (closest === abilityMods[1]) {
-      finalSetAttrs[repeatingString + fieldName] = '@{dexterity_mod}';
+      finalSetAttrs[repeatingString + fieldName] = 'dexterity';
     } else if (closest === abilityMods[2]) {
-      finalSetAttrs[repeatingString + fieldName] = '@{constitution_mod}';
+      finalSetAttrs[repeatingString + fieldName] = 'constitution';
     } else if (closest === abilityMods[3]) {
-      finalSetAttrs[repeatingString + fieldName] = '@{intelligence_mod}';
+      finalSetAttrs[repeatingString + fieldName] = 'intelligence';
     } else if (closest === abilityMods[4]) {
-      finalSetAttrs[repeatingString + fieldName] = '@{wisdom_mod}';
+      finalSetAttrs[repeatingString + fieldName] = 'wisdom';
     } else if (closest === abilityMods[5]) {
-      finalSetAttrs[repeatingString + fieldName] = '@{charisma_mod}';
+      finalSetAttrs[repeatingString + fieldName] = 'charisma';
     }
   } else {
     finalSetAttrs[repeatingString + fieldName] = 0;
@@ -434,7 +445,11 @@ const updateAbilityModifier = (ability) => {
     const abilityMod = getAbilityMod(abilityScoreCalc);
 
     let abilityCheck = abilityMod;
-    let abilityCheckFormula = `${abilityMod}[${firstThree(ability)} mod with bonus]`;
+    let abilityCheckFormula = '';
+
+    if (abilityMod !== 0) {
+      abilityCheckFormula = `${abilityMod}[${firstThree(ability)} mod with bonus]`;
+    }
     if ((ability === 'strength' || ability === 'dexterity' || ability === 'constitution') && v.remarkable_athlete_toggle === '@{remarkable_athlete}') {
       const remarkableAthlete = getIntValue(v.remarkable_athlete);
       abilityCheck += remarkableAthlete;
@@ -580,16 +595,16 @@ const setTrait = (obj) => {
           }
         }
         if (obj.saving_throw_ability || obj.saving_throw_bonus || obj.saving_throw_vs_ability) {
-          finalSetAttrs[`${repeatingString}saving_throw_toggle`] = '@{saving_throw_toggle_var}';
+          finalSetAttrs[`${repeatingString}saving_throw_toggle`] = toggleVars.saving_throw;
         }
         if (obj.damage || obj.damage_ability || obj.damage_bonus) {
-          finalSetAttrs[`${repeatingString}damage_toggle`] = '@{damage_toggle_var}';
+          finalSetAttrs[`${repeatingString}damage_toggle`] = toggleVars.damage;
         }
         if (obj.heal || obj.heal_ability || obj.heal_bonus || obj.heal_query_toggle) {
-          finalSetAttrs[`${repeatingString}heal_toggle`] = '@{heal_toggle_var}';
+          finalSetAttrs[`${repeatingString}heal_toggle`] = toggleVars.heal;
         }
         if (obj.freetext && isUndefined(v[`${repeatingString}extras_toggle`])) {
-          finalSetAttrs[`${repeatingString}extras_toggle`] = '@{extras_var}';
+          finalSetAttrs[`${repeatingString}extras_toggle`] = toggleVars.extras;
         }
         if (obj.uses_max && !obj.uses && isUndefined(v[`${repeatingString}uses`])) {
           finalSetAttrs[`${repeatingString}uses`] = obj.uses_max;
@@ -608,7 +623,7 @@ const setTrait = (obj) => {
 
 const setClassFeatures = () => {
   const finalSetAttrs = {};
-  const collectionArray = ['ac_unarmored_ability', 'lang', 'jack_of_all_trades_toggle', 'careful_spell_toggle', 'distant_spell_toggle', 'empowered_spell_toggle', 'extended_spell_toggle', 'heightened_spell_toggle', 'quickened_spell_toggle', 'subtle_spell_toggle', 'twinned_spell_toggle'];
+  const collectionArray = ['ac_unarmored_ability', 'jack_of_all_trades_toggle', 'careful_spell_toggle', 'distant_spell_toggle', 'empowered_spell_toggle', 'extended_spell_toggle', 'heightened_spell_toggle', 'quickened_spell_toggle', 'subtle_spell_toggle', 'twinned_spell_toggle'];
 
   for (const ability of ABILITIES) {
     collectionArray.push(`${ability}_mod`);
@@ -673,7 +688,7 @@ const setClassFeatures = () => {
       });
 
       if (isUndefined(v.ac_unarmored_ability)) {
-        finalSetAttrs.ac_unarmored_ability = '@{constitution_mod}';
+        finalSetAttrs.ac_unarmored_ability = 'constitution';
       }
       setTrait({
         freetext: getTranslationByKey('CLASS_FEATURE_UNARMORED_DEFENSE_BARBARIAN_TEXT'),
@@ -859,8 +874,8 @@ const setClassFeatures = () => {
         setTrait({
           freetext: turnUndeadText,
           name: getTranslationByKey('CLASS_FEATURE_CHANNEL_DIVINITY_TURN_UNDEAD'),
-          saving_throw_ability: '@{wisdom_mod}',
-          saving_throw_vs_ability: 'Wisdom',
+          saving_throw_ability: 'wisdom',
+          saving_throw_vs_ability: 'WISDOM',
           storageName: 'Turn Undead',
         });
         if (v.cleric_level >= 10) {
@@ -977,7 +992,7 @@ const setClassFeatures = () => {
 
     if (v.monk_level) {
       if (isUndefined(v.ac_unarmored_ability)) {
-        finalSetAttrs.ac_unarmored_ability = '@{wisdom_mod}';
+        finalSetAttrs.ac_unarmored_ability = 'wisdom';
       }
       setTrait({
         freetext: getTranslationByKey('CLASS_FEATURE_UNARMORED_DEFENSE_MONK_TEXT'),
@@ -1049,9 +1064,9 @@ const setClassFeatures = () => {
         setTrait({
           freetext: getTranslationByKey('CLASS_FEATURE_STUNNING_STRIKE_TEXT'),
           name: getTranslationByKey('CLASS_FEATURE_STUNNING_STRIKE'),
-          saving_throw_ability: '@{wisdom_mod}',
+          saving_throw_ability: 'wisdom',
           saving_throw_failure: getTranslationByKey('CLASS_FEATURE_STUNNING_STRIKE_SAVING_THROW_FAILURE'),
-          saving_throw_vs_ability: 'Constitution',
+          saving_throw_vs_ability: 'CONSTITUTION',
           storageName: 'Stunning Strike',
         });
       }
@@ -1129,7 +1144,7 @@ const setClassFeatures = () => {
       });
       setTrait({
         freetext: getTranslationByKey('CLASS_FEATURE_LAY_ON_HANDS_TEXT'),
-        heal_query_toggle: '@{heal_query}',
+        heal_query_toggle: toggleVars.heal_query,
         name: getTranslationByKey('CLASS_FEATURE_LAY_ON_HANDS'),
         recharge: 'Long Rest',
         storageName: 'Lay on Hands',
@@ -1144,7 +1159,7 @@ const setClassFeatures = () => {
         });
         setTrait({
           damage: '(?{Spell Level|1|2|3|4+, 4} + 1)d8',
-          damage_type: getTranslationByKey('DAMAGE_TYPES.RADIANT'),
+          damage_type: getTranslationByKey('RADIANT'),
           freeform: '{{subheader=(as ?{Spell Level|1|2|3|4+})}}',
           freetext: getTranslationByKey('CLASS_FEATURE_DIVINE_SMITE_TEXT'),
           name: getTranslationByKey('CLASS_FEATURE_DIVINE_SMITE'),
@@ -1379,56 +1394,56 @@ const setClassFeatures = () => {
       }
     }
 
-    if (v.careful_spell_toggle === '@{careful_spell_toggle_var}') {
+    if (v.careful_spell_toggle === '1') {
       setTrait({
         freetext: getTranslationByKey('CLASS_FEATURE_METAMAGIC_CAREFUL_SPELL_TEXT'),
         name: getTranslationByKey('CLASS_FEATURE_METAMAGIC_CAREFUL_SPELL'),
         storageName: 'Careful Spell',
       });
     }
-    if (v.distant_spell_toggle === '@{distant_spell_toggle_var}') {
+    if (v.distant_spell_toggle === '1') {
       setTrait({
         freetext: getTranslationByKey('CLASS_FEATURE_METAMAGIC_DISTANT_SPELL_TEXT'),
         name: getTranslationByKey('CLASS_FEATURE_METAMAGIC_DISTANT_SPELL'),
         storageName: 'Distant Spell',
       });
     }
-    if (v.empowered_spell_toggle === '@{empowered_spell_toggle_var}') {
+    if (v.empowered_spell_toggle === '1') {
       setTrait({
         freetext: getTranslationByKey('CLASS_FEATURE_METAMAGIC_EMPOWERED_SPELL_TEXT'),
         name: getTranslationByKey('CLASS_FEATURE_METAMAGIC_EMPOWERED_SPELL'),
         storageName: 'Empowered Spell',
       });
     }
-    if (v.extended_spell_toggle === '@{extended_spell_toggle_var}') {
+    if (v.extended_spell_toggle === '1') {
       setTrait({
         freetext: getTranslationByKey('CLASS_FEATURE_METAMAGIC_EXTENDED_SPELL_TEXT'),
         name: getTranslationByKey('CLASS_FEATURE_METAMAGIC_EXTENDED_SPELL'),
         storageName: 'Extended Spell',
       });
     }
-    if (v.heightened_spell_toggle === '@{heightened_spell_toggle_var}') {
+    if (v.heightened_spell_toggle === '1') {
       setTrait({
         freetext: getTranslationByKey('CLASS_FEATURE_METAMAGIC_HEIGHTENED_SPELL_TEXT'),
         name: getTranslationByKey('CLASS_FEATURE_METAMAGIC_HEIGHTENED_SPELL'),
         storageName: 'Heightened Spell',
       });
     }
-    if (v.quickened_spell_toggle === '@{quickened_spell_toggle_var}') {
+    if (v.quickened_spell_toggle === '1') {
       setTrait({
         freetext: getTranslationByKey('CLASS_FEATURE_METAMAGIC_QUICKENED_SPELL_TEXT'),
         name: getTranslationByKey('CLASS_FEATURE_METAMAGIC_QUICKENED_SPELL'),
         storageName: 'Quickened Spell',
       });
     }
-    if (v.subtle_spell_toggle === '@{subtle_spell_toggle_var}') {
+    if (v.subtle_spell_toggle === '1') {
       setTrait({
         freetext: getTranslationByKey('CLASS_FEATURE_METAMAGIC_SUBTLE_SPELL_TEXT'),
         name: getTranslationByKey('CLASS_FEATURE_METAMAGIC_SUBTLE_SPELL'),
         storageName: 'Subtle Spell',
       });
     }
-    if (v.twinned_spell_toggle === '@{twinned_spell_toggle_var}') {
+    if (v.twinned_spell_toggle === '1') {
       setTrait({
         freetext: getTranslationByKey('CLASS_FEATURE_METAMAGIC_TWINNED_SPELL_TEXT'),
         name: getTranslationByKey('CLASS_FEATURE_METAMAGIC_TWINNED_SPELL'),
@@ -1724,7 +1739,7 @@ const updateHD = (v, finalSetAttrs, hd) => {
 
 const updateLevels = (repeatingInfo) => {
   const repeatingItem = 'repeating_class';
-  const collectionArray = ['is_npc', 'lang', 'caster_level', 'caster_type', 'class_and_level', 'level', 'xp_next_level'];
+  const collectionArray = ['is_npc', 'caster_level', 'caster_type', 'class_and_level', 'level', 'xp_next_level'];
   const finalSetAttrs = {};
 
   for (const className of CLASSES) {
@@ -2143,6 +2158,8 @@ const updateArmor = (rowId) => {
   const collectionArray = [];
   const finalSetAttrs = {};
 
+  let stealthPenalty;
+
   getSectionIDs(repeatingItem, (ids) => {
     if (rowId) {
       ids = [];
@@ -2152,6 +2169,7 @@ const updateArmor = (rowId) => {
       const repeatingString = `${repeatingItem}_${id}_`;
       collectionArray.push(`${repeatingString}parsed`);
       collectionArray.push(`${repeatingString}modifiers`);
+      collectionArray.push(`${repeatingString}stealth`);
     }
 
     getAttrs(collectionArray, (v) => {
@@ -2168,7 +2186,17 @@ const updateArmor = (rowId) => {
           }
           finalSetAttrs[`${repeatingString}parsed`] += ' acBonus';
         }
+
+        if (v[`${repeatingString}stealth`] === 'Disadvantage') {
+          stealthPenalty = true;
+        }
       }
+      if (stealthPenalty) {
+        setAdvantageOnStealth('dis');
+      } else {
+        setAdvantageOnStealth('normal');
+      }
+
       setFinalAttrs(v, finalSetAttrs);
     });
   });
@@ -2384,7 +2412,7 @@ const updateAttackToggle = (v, finalSetAttrs, repeatingString, options) => {
     attackAbility: options.attackAbility,
     parseName: 'attack',
     toggleField: 'roll_toggle',
-    toggleFieldSetTo: '@{roll_toggle_var}',
+    toggleFieldSetTo: toggleVars.roll,
     triggerFields: ['type', 'attack_bonus'],
   };
   parseAttackComponent(v, repeatingString, finalSetAttrs, attackParse);
@@ -2393,7 +2421,7 @@ const updateAttackToggle = (v, finalSetAttrs, repeatingString, options) => {
   const attackToggle = v[`${repeatingString}roll_toggle`];
 
   let toHit = 0;
-  if (!attackToggle || attackToggle === '@{roll_toggle_var}') {
+  if (!attackToggle || attackToggle === toggleVars.roll) {
     const proficiency = v[`${repeatingString}proficiency`];
     if (!proficiency || proficiency === 'on') {
       const pb = getIntValue(v.pb);
@@ -2403,7 +2431,7 @@ const updateAttackToggle = (v, finalSetAttrs, repeatingString, options) => {
 
     let attackAbility = v[`${repeatingString}attack_ability`];
     if (isUndefined(attackAbility) && v[`${repeatingString}type`] === 'Ranged Weapon') {
-      attackAbility = '@{dexterity_mod}';
+      attackAbility = 'dexterity';
       finalSetAttrs[`${repeatingString}attack_ability`] = attackAbility;
     } else if (finalSetAttrs[`${repeatingString}attack_ability`]) {
       attackAbility = finalSetAttrs[`${repeatingString}attack_ability`];
@@ -2453,13 +2481,13 @@ const updateSavingThrowToggle = (v, finalSetAttrs, repeatingString, options) => 
   const savingThrowParse = {
     parseName: 'savingThrow',
     toggleField: 'saving_throw_toggle',
-    toggleFieldSetTo: '@{saving_throw_toggle_var}',
+    toggleFieldSetTo: toggleVars.saving_throw,
     triggerFields: ['saving_throw_ability', 'saving_throw_bonus', 'saving_throw_vs_ability'],
   };
   parseAttackComponent(v, repeatingString, finalSetAttrs, savingThrowParse);
 
   const savingThrowToggle = v[`${repeatingString}saving_throw_toggle`];
-  if (savingThrowToggle === '@{saving_throw_toggle_var}') {
+  if (savingThrowToggle === toggleVars.saving_throw) {
     let savingThrowDC = 8 + getIntValue(v.pb);
     let savingThrowAbility = v[`${repeatingString}saving_throw_ability`];
     if (!savingThrowAbility && savingThrowAbility !== '0') {
@@ -2467,7 +2495,7 @@ const updateSavingThrowToggle = (v, finalSetAttrs, repeatingString, options) => 
       finalSetAttrs[`${repeatingString}saving_throw_ability`] = v.default_ability;
     }
 
-    savingThrowDC += getAbilityValue(v, savingThrowAbility, 'strength_mod');
+    savingThrowDC += getAbilityValue(v, savingThrowAbility, 'strength');
     if (options && options.bonusDC) {
       savingThrowDC += getIntValue(options.bonusDC);
     }
@@ -2481,7 +2509,7 @@ const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
     addCastingModifier: exists(v[`${repeatingString}add_casting_modifier`]),
     parseName: 'damage',
     toggleField: 'damage_toggle',
-    toggleFieldSetTo: '@{damage_toggle_var}',
+    toggleFieldSetTo: toggleVars.damage,
     triggerFields: ['damage', 'damage_ability', 'damage_bonus', 'damage_type'],
   };
   parseAttackComponent(v, repeatingString, finalSetAttrs, damageParse);
@@ -2492,7 +2520,7 @@ const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
   let damageAbility;
   let damageType;
 
-  if (!damageToggle || damageToggle === '@{damage_toggle_var}') {
+  if (!damageToggle || damageToggle === toggleVars.damage) {
     let damageAddition = 0;
 
     const damage = v[`${repeatingString}damage`];
@@ -2506,8 +2534,12 @@ const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
     }
 
     damageAbility = v[`${repeatingString}damage_ability`];
+    if (isUndefined(damageAbility) && v[`${repeatingString}type`] === 'Melee Weapon') {
+      damageAbility = 'strength';
+      finalSetAttrs[`${repeatingString}damage_ability`] = damageAbility;
+    }
     if (isUndefined(damageAbility) && v[`${repeatingString}type`] === 'Ranged Weapon') {
-      damageAbility = '@{dexterity_mod}';
+      damageAbility = 'dexterity';
       finalSetAttrs[`${repeatingString}damage_ability`] = damageAbility;
     }
     if (exists(damageAbility) || options.defaultDamageAbility) {
@@ -2570,7 +2602,7 @@ const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
   const secondDamageParse = {
     parseName: 'secondDamage',
     toggleField: 'second_damage_toggle',
-    toggleFieldSetTo: '@{second_damage_toggle_var}',
+    toggleFieldSetTo: toggleVars.second_damage,
     triggerFields: ['second_damage', 'second_damage_ability', 'second_damage_bonus', 'second_damage_type'],
   };
   parseAttackComponent(v, repeatingString, finalSetAttrs, secondDamageParse);
@@ -2578,7 +2610,7 @@ const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
   let secondDamageFormula = '';
 
   const secondDamageToggle = fromVOrFinalSetAttrs(v, finalSetAttrs, `${repeatingString}second_damage_toggle`);
-  if (secondDamageToggle === '@{second_damage_toggle_var}') {
+  if (secondDamageToggle === toggleVars.second_damage) {
     let secondDamageAddition = 0;
     const secondDamage = v[`${repeatingString}second_damage`];
     if (exists(secondDamage)) {
@@ -2619,7 +2651,7 @@ const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
       if (exists(damageProperties)) {
         if (damageProperties.indexOf('Versatile') !== -1) {
           if (!exists(damageAbility)) {
-            damageAbility = '@{strength_mod}';
+            damageAbility = 'strength';
           }
           finalSetAttrs[`${repeatingString}second_damage_ability`] = damageAbility;
           finalSetAttrs[`${repeatingString}second_damage_type`] = damageType;
@@ -2645,32 +2677,32 @@ const updateHealToggle = (v, finalSetAttrs, repeatingString) => {
     addCastingModifier: exists(v[`${repeatingString}add_casting_modifier`]),
     parseName: 'heal',
     toggleField: 'heal_toggle',
-    toggleFieldSetTo: '@{heal_toggle_var}',
+    toggleFieldSetTo: toggleVars.heal,
     triggerFields: ['heal', 'heal_query_toggle'],
   };
   parseAttackComponent(v, repeatingString, finalSetAttrs, healParse);
-
-  let healFormula = '@{heal}[heal]';
+  let healFormula = '';
   const healToggle = v[`${repeatingString}heal_toggle`];
-  if (healToggle === '@{heal_toggle_var}') {
-    let healAbility = v[`${repeatingString}heal_ability`];
-    healAbility = getAbilityValue(v, healAbility);
-    if (exists(healAbility)) {
+  if (healToggle === toggleVars.heal) {
+    if (!isUndefined(v[`${repeatingString}heal`])) {
+      healFormula = '@{heal}[heal]';
+    }
+    if (!isUndefined(v[`${repeatingString}heal_ability`])) {
+      const healAbility = getAbilityValue(v, v[`${repeatingString}heal_ability`]);
       healFormula += `${addArithmeticOperator(healFormula, healAbility)}[${getAbilityShortName(v[`${repeatingString}heal_ability`])}]`;
     }
-
-    const healBonus = getIntValue(v[`${repeatingString}heal_bonus`]);
-    if (exists(healBonus)) {
+    if (!isUndefined(v[`${repeatingString}heal_bonus`])) {
+      const healBonus = getIntValue(v[`${repeatingString}heal_bonus`]);
       healFormula += `${addArithmeticOperator(healFormula, healBonus)}[bonus]`;
     }
 
-    if (exists(v.global_spell_heal_bonus)) {
+    if (!isUndefined(v.global_spell_heal_bonus)) {
       if (healFormula) {
         healFormula += ' + ';
       }
       healFormula += '@{global_spell_heal_bonus}[global spell heal bonus]';
     }
-    if (v[`${repeatingString}heal_query_toggle`] === '@{heal_query}') {
+    if (v[`${repeatingString}heal_query_toggle`] === toggleVars.heal_query) {
       if (healFormula) {
         healFormula += ' + ';
       }
@@ -2686,32 +2718,32 @@ const updateHigherLevelToggle = (v, finalSetAttrs, repeatingString) => {
     addCastingModifier: exists(v[`${repeatingString}add_casting_modifier`]),
     parseName: 'higherLevel',
     toggleField: 'higher_level_toggle',
-    toggleFieldSetTo: '@{higher_level_toggle_var}',
+    toggleFieldSetTo: toggleVars.higher_level,
     triggerFields: ['higher_level_dice', 'higher_level_die', 'second_higher_level_dice', 'second_higher_level_die', 'higher_level_heal'],
   };
   parseAttackComponent(v, repeatingString, finalSetAttrs, higherLevelParse);
 
   const higherLevelToggle = v[`${repeatingString}higher_level_toggle`];
-  if (exists(higherLevelToggle) && higherLevelToggle === '@{higher_level_toggle_var}') {
+  if (exists(higherLevelToggle) && higherLevelToggle === toggleVars.higher_level) {
     const spellLevel = getIntValue(v[`${repeatingString}spell_level`]);
     finalSetAttrs[`${repeatingString}higher_level_query`] = `@{higher_level_query_${spellLevel}}`;
 
     const damageToggle = v[`${repeatingString}damage_toggle`];
-    if (damageToggle && damageToggle === '@{damage_toggle_var}') {
+    if (damageToggle && damageToggle === toggleVars.damage) {
       const higherLevelDamage = '((@{higher_level_query} - @{spell_level}) * @{higher_level_dice})@{higher_level_die}[higher lvl]';
       finalSetAttrs[`${repeatingString}damage_formula`] += addArithmeticOperator(finalSetAttrs[`${repeatingString}damage_formula`], higherLevelDamage);
       finalSetAttrs[`${repeatingString}damage_crit_formula`] = higherLevelDamage;
     }
 
     const secondDamageToggle = v[`${repeatingString}second_damage_toggle`];
-    if (secondDamageToggle && secondDamageToggle === '@{second_damage_toggle_var}') {
+    if (secondDamageToggle && secondDamageToggle === toggleVars.second_damage) {
       const higherLevelSecondDamage = '((@{higher_level_query} - @{spell_level}) * @{second_higher_level_dice})@{second_higher_level_die}[higher lvl]';
       finalSetAttrs[`${repeatingString}second_damage_formula`] += addArithmeticOperator(finalSetAttrs[`${repeatingString}second_damage_formula`], higherLevelSecondDamage);
       finalSetAttrs[`${repeatingString}second_damage_crit_formula`] = higherLevelSecondDamage;
     }
 
     const healToggle = v[`${repeatingString}heal_toggle`];
-    if (healToggle && healToggle === '@{heal_toggle_var}') {
+    if (healToggle && healToggle === toggleVars.heal) {
       if (finalSetAttrs[`${repeatingString}heal_formula`]) {
         finalSetAttrs[`${repeatingString}heal_formula`] += ' + ';
       }
@@ -2944,7 +2976,7 @@ const updateAction = (type, rowId) => {
         let attackOptions = {};
         if (type !== 'trait') {
           attackOptions = {
-            defaultAbility: 'strength_mod',
+            defaultAbility: 'strength',
             globalAttackBonus: v.global_attack_bonus,
             globalAttackBonusLabel: 'global attack bonus',
             globalMeleeAttackBonus: v.global_melee_attack_bonus,
@@ -2959,7 +2991,7 @@ const updateAction = (type, rowId) => {
         let damageOptions = {};
         if (type !== 'trait') {
           damageOptions = {
-            defaultDamageAbility: 'strength_mod',
+            defaultDamageAbility: 'strength',
             globalDamageBonus: v.global_damage_bonus,
             globalMeleeDamageBonus: v.global_melee_damage_bonus,
             globalRangedDamageBonus: v.global_ranged_damage_bonus,
@@ -2977,8 +3009,8 @@ const updateAction = (type, rowId) => {
 
         updateHealToggle(v, finalSetAttrs, repeatingString);
 
-        if (v[`${repeatingString}emote`] || v[`${repeatingString}freetext`] || v[`${repeatingString}freeform`]) {
-          finalSetAttrs[`${repeatingString}extras_toggle`] = '@{extras_var}';
+        if (isUndefined(v[`${repeatingString}extras_toggle`]) && (v[`${repeatingString}emote`] || v[`${repeatingString}freetext`] || v[`${repeatingString}freeform`])) {
+          finalSetAttrs[`${repeatingString}extras_toggle`] = toggleVars.extras;
         }
       }
       setFinalAttrs(v, finalSetAttrs);
@@ -3103,8 +3135,8 @@ const updateAttack = (rowId) => {
               finalSetAttrs[`${repeatingString}reach`] = '5 ft';
             }
             if (attackProperties.indexOf('Finesse') !== -1) {
-              finalSetAttrs[`${repeatingString}attack_ability`] = '@{finesse_mod}';
-              finalSetAttrs[`${repeatingString}damage_ability`] = '@{finesse_mod}';
+              finalSetAttrs[`${repeatingString}attack_ability`] = 'finesse';
+              finalSetAttrs[`${repeatingString}damage_ability`] = 'finesse';
             }
             if (!finalSetAttrs[`${repeatingString}parsed`]) {
               finalSetAttrs[`${repeatingString}parsed`] = '';
@@ -3114,7 +3146,7 @@ const updateAttack = (rowId) => {
         }
 
         const attackOptions = {
-          defaultAbility: 'strength_mod',
+          defaultAbility: 'strength',
           globalAttackBonus: v.global_attack_bonus,
           globalAttackBonusLabel: 'global attack bonus',
           globalMeleeAttackBonus: v.global_melee_attack_bonus,
@@ -3127,7 +3159,7 @@ const updateAttack = (rowId) => {
         const ammoUsed = getIntValue(v[`${repeatingString}ammo_used`], 1);
         if (!isUndefined(ammoName)) {
           let ammoAutoUse;
-          if (v.ammo_auto_use === '@{ammo_auto_use_var}') {
+          if (v.ammo_auto_use === '1') {
             ammoAutoUse = 1;
           } else {
             ammoAutoUse = 0;
@@ -3143,7 +3175,7 @@ const updateAttack = (rowId) => {
         updateSavingThrowToggle(v, finalSetAttrs, repeatingString);
 
         const damageOptions = {
-          defaultDamageAbility: 'strength_mod',
+          defaultDamageAbility: 'strength',
           globalDamageBonus: v.global_damage_bonus,
           globalMeleeDamageBonus: v.global_melee_damage_bonus,
           globalRangedDamageBonus: v.global_ranged_damage_bonus,
@@ -3215,14 +3247,7 @@ const updateAttackChatMacro = () => {
     });
   });
 };
-
-on('change:repeating_attack', (eventInfo) => {
-  const repeatingInfo = getRepeatingInfo('repeating_attack', eventInfo);
-  if (repeatingInfo && repeatingInfo.field === 'name') {
-    updateAttackChatMacro();
-  }
-});
-on('remove:repeating_attack', () => {
+on('change:repeating_attack remove:repeating_attack', () => {
   updateAttackChatMacro();
 });
 on('change:repeating_attack:carried change:repeating_attack:qty change:repeating_attack:weight remove:repeating_attack', () => {
@@ -3403,8 +3428,8 @@ const updateSpell = (rowId) => {
 
         updateHigherLevelToggle(v, finalSetAttrs, repeatingString);
 
-        if (v[`${repeatingString}emote`] || v[`${repeatingString}freetext`] || v[`${repeatingString}freeform`]) {
-          finalSetAttrs[`${repeatingString}extras_toggle`] = '@{extras_var}';
+        if (isUndefined(v[`${repeatingString}extras_toggle`]) && (v[`${repeatingString}emote`] || v[`${repeatingString}freetext`] || v[`${repeatingString}freeform`])) {
+          finalSetAttrs[`${repeatingString}extras_toggle`] = toggleVars.extras;
         }
       }
       setFinalAttrs(v, finalSetAttrs);
@@ -3505,10 +3530,8 @@ const updateSpellChatMacroShow = () => {
 
     for (let i = 0; i <= 9; i++) {
       if ((!showLevelIfAllSlotsAreUsed && !getIntValue(v[`spell_slots_l${i}`])) || !v[`spells_level_${i}_macro_var`]) {
-        console.log('in if');
         finalSetAttrs[`spells_level_${i}_show`] = '';
       } else {
-        console.log('in else');
         finalSetAttrs[`spells_level_${i}_show`] = true;
       }
     }
@@ -3583,7 +3606,7 @@ function updateD20Mod() {
 
   getAttrs(collectionArray, (v) => {
     if (v.halfling_luck === 'on') {
-      finalSetAttrs.d20_mod = 'ro<1[halfling luck]';
+      finalSetAttrs.d20_mod = 'ro<1';
     } else {
       finalSetAttrs.d20_mod = '';
     }
@@ -3624,7 +3647,7 @@ const updateAbilityChecksMacro = () => {
           updateAbilityChecksMacro();
         }
 
-        finalSetAttrs.ability_checks_query_var += `|${capitalize(ability)},{{title=${capitalize(ability)}&#125;&#125; {{roll1=[[@{preroll}d20@{postroll}@{d20_mod} + ${v[`${ability}_check_mod`]}]]&#125;&#125; @{roll_setting}@{d20_mod} + ${v[`${ability}_check_mod`]}]]&#125;&#125;`;
+        finalSetAttrs.ability_checks_query_var += `|${capitalize(ability)},{{title=${capitalize(ability)}&#125;&#125; {{roll1=[[@{shaped_d20} + ${v[`${ability}_check_mod`]}]]&#125;&#125; @{roll_setting} + ${v[`${ability}_check_mod`]}]]&#125;&#125;`;
         if (v.ability_checks_show_totals === 'on') {
           finalSetAttrs.ability_checks_macro_var += `[${capitalize(ability)} ${v[`${ability}_check_mod_with_sign`]}](~shaped_${ability}_check)`;
         } else {
@@ -3634,7 +3657,7 @@ const updateAbilityChecksMacro = () => {
       }
       for (const id of ids) {
         const repeatingString = `${repeatingItem}_${id}_`;
-        finalSetAttrs.ability_checks_query_var += `|${v[`${repeatingString}name`]}, {{title=${v[`${repeatingString}name`]} (${capitalize(getAbilityShortName(v[`${repeatingString}ability`]))})&#125;&#125; {{roll1=[[@{preroll}d20@{postroll}@{d20_mod} + @{${repeatingString}formula}]]&#125;&#125; @{roll_setting}@{d20_mod} + @{${repeatingString}formula}]]&#125;&#125;`;
+        finalSetAttrs.ability_checks_query_var += `|${v[`${repeatingString}name`]}, {{title=${v[`${repeatingString}name`]} (${capitalize(getAbilityShortName(v[`${repeatingString}ability`]))})&#125;&#125; {{roll1=[[@{shaped_d20} + @{${repeatingString}formula}]]&#125;&#125; @{roll_setting} + @{${repeatingString}formula}]]&#125;&#125;`;
         if (id !== ids[0]) {
           finalSetAttrs.ability_checks_macro_var += ', ';
           finalSetAttrs.skills_macro_var += ', ';
@@ -3654,30 +3677,27 @@ const updateAbilityChecksMacro = () => {
   });
 };
 
-const updatePreAndPostRoll = () => {
-  const collectionArray = ['roll_setting', 'roll_info', 'preroll', 'postroll'];
+const updateShapedD20 = () => {
+  const collectionArray = ['roll_setting', 'roll_info', 'shaped_d20'];
   const finalSetAttrs = {};
 
   getAttrs(collectionArray, (v) => {
     finalSetAttrs.roll_info = '';
-    finalSetAttrs.preroll = '';
-    finalSetAttrs.postroll = '';
+    finalSetAttrs.shaped_d20 = 'd20';
 
-    if (v.roll_setting === '@{roll_advantage}') {
+    if (v.roll_setting === 'adv {{ignore=[[0') {
       finalSetAttrs.roll_info = '{{advantage=1}}';
-      finalSetAttrs.preroll = 2;
-      finalSetAttrs.postroll = 'kh1';
-    } else if (v.roll_setting === '@{roll_disadvantage}') {
+      finalSetAttrs.shaped_d20 = '2d20@{d20_mod}kh1';
+    } else if (v.roll_setting === 'dis {{ignore=[[0') {
       finalSetAttrs.roll_info = '{{disadvantage=1}}';
-      finalSetAttrs.preroll = 2;
-      finalSetAttrs.postroll = 'kl1';
+      finalSetAttrs.shaped_d20 = '2d20@{d20_mod}kl1';
     }
 
     setFinalAttrs(v, finalSetAttrs);
   });
 };
 on('change:roll_setting', () => {
-  updatePreAndPostRoll();
+  updateShapedD20();
 });
 
 const updateSkill = (rowId) => {
@@ -3697,6 +3717,8 @@ const updateSkill = (rowId) => {
     }
     for (const id of ids) {
       const repeatingString = `${repeatingItem}_${id}_`;
+      collectionArray.push(`${repeatingString}skill_d20`);
+      collectionArray.push(`${repeatingString}skill_info`);
       collectionArray.push(`${repeatingString}proficiency`);
       collectionArray.push(`${repeatingString}name`);
       collectionArray.push(`${repeatingString}storage_name`);
@@ -3720,8 +3742,8 @@ const updateSkill = (rowId) => {
         }
 
         const ability = getAbilityModName(v[`${repeatingString}ability`]);
-        const abilityName = getAbilityName(v[`${repeatingString}ability`]);
-        finalSetAttrs[`${repeatingString}ability_key`] = abilityName.toUpperCase();
+        const abilityName = getAbilityName(ability);
+        finalSetAttrs[`${repeatingString}ability_key`] = getAbilityShortName(v[`${repeatingString}ability`]).toUpperCase();
 
         let total = 0;
         let totalFormula = '';
@@ -3746,10 +3768,10 @@ const updateSkill = (rowId) => {
           totalFormula += `${exp}[expertise]`;
         }
 
-        const skillAbility = getAbilityValue(v, ability, 'strength_mod');
-        if (exists(skillAbility)) {
-          total += skillAbility;
-          totalFormula += `${addArithmeticOperator(totalFormula, skillAbility)}[${getAbilityShortName(ability)}]`;
+        const abilityValue = getAbilityValue(v, ability, 'strength');
+        if (exists(abilityValue)) {
+          total += abilityValue;
+          totalFormula += `${addArithmeticOperator(totalFormula, abilityValue)}[${getAbilityShortName(ability)}]`;
         }
 
         const skillBonus = getIntValue(v[`${repeatingString}bonus`]);
@@ -3758,9 +3780,8 @@ const updateSkill = (rowId) => {
           totalFormula += `${addArithmeticOperator(totalFormula, skillBonus)}[bonus]`;
         }
 
-        const skillAbilityName = getAbilityName(ability);
-        if (exists(skillAbilityName)) {
-          let checkBonus = v[`${skillAbilityName}_check_bonus`];
+        if (exists(abilityName)) {
+          let checkBonus = v[`${abilityName}_check_bonus`];
           if (exists(checkBonus)) {
             checkBonus = getIntValue(checkBonus);
             total += checkBonus;
@@ -3779,7 +3800,21 @@ const updateSkill = (rowId) => {
           totalFormula += '(@{global_check_bonus})[global check bonus]';
         }
         const passiveBonus = getIntValue(v[`${repeatingString}passive_bonus`]);
-        const passiveTotal = 10 + total + passiveBonus;
+        let advantageOrDisadvantage = 0;
+
+        finalSetAttrs[`${repeatingString}skill_info`] = '';
+
+        if (!isUndefined(v[`${repeatingString}skill_d20`])) {
+          if (v[`${repeatingString}skill_d20`].indexOf('kh1') !== -1) {
+            finalSetAttrs[`${repeatingString}skill_info`] = '{{advantage=1}}';
+            advantageOrDisadvantage = 5;
+          } else if (v[`${repeatingString}skill_d20`].indexOf('kl1') !== -1) {
+            finalSetAttrs[`${repeatingString}skill_info`] = '{{disadvantage=1}}';
+            advantageOrDisadvantage = -5;
+          }
+        }
+
+        const passiveTotal = 10 + total + passiveBonus + advantageOrDisadvantage;
 
         finalSetAttrs[`${repeatingString}total`] = total;
         finalSetAttrs[`${repeatingString}passive`] = passiveTotal;
@@ -4433,7 +4468,7 @@ const parseDamage = (finalSetAttrs, repeatingString, freetext, regex, name, spel
       finalSetAttrs[`${repeatingString}${name}_bonus`] = damageBonus;
     }
     freetext = freetext.replace(regex, '');
-    finalSetAttrs[`${repeatingString}${name}_toggle`] = `@{${name}_toggle_var}`;
+    finalSetAttrs[`${repeatingString}${name}_toggle`] = toggleVars[name];
   }
   return freetext;
 };
@@ -4562,7 +4597,7 @@ const parseAction = (type, rowId) => {
             finalSetAttrs[`${repeatingString}attack_bonus`] = hitBonus;
           }
           freetext = freetext.replace(toHitRegex, '');
-          finalSetAttrs[`${repeatingString}roll_toggle`] = '@{roll_toggle_var}';
+          finalSetAttrs[`${repeatingString}roll_toggle`] = toggleVars.roll;
         } else {
           finalSetAttrs[`${repeatingString}roll_toggle`] = '0';
         }
@@ -4580,10 +4615,10 @@ const parseAction = (type, rowId) => {
               finalSetAttrs[`${repeatingString}saving_throw_bonus`] = savingThrowTotal;
             }
             freetext = freetext.replace(savingThrowRegex, '');
-            finalSetAttrs[`${repeatingString}saving_throw_toggle`] = '@{saving_throw_toggle_var}';
+            finalSetAttrs[`${repeatingString}saving_throw_toggle`] = toggleVars.saving_throw;
           }
           if (savingThrow[2]) {
-            finalSetAttrs[`${repeatingString}saving_throw_vs_ability`] = savingThrow[2];
+            finalSetAttrs[`${repeatingString}saving_throw_vs_ability`] = savingThrow[2].toUpperCase();
           }
           const halfDamage = saveSuccessRegex.exec(freetext);
           if (halfDamage && halfDamage[1]) {
@@ -4601,7 +4636,7 @@ const parseAction = (type, rowId) => {
           freetext = parseDamage(finalSetAttrs, repeatingString, freetext, damageRegex, 'second_damage', spellMods, meleeMods, spellAttack, rangedAttack, dexMod);
         }
 
-        finalSetAttrs[`${repeatingString}extras_toggle`] = '@{extras_var}';
+        finalSetAttrs[`${repeatingString}extras_toggle`] = toggleVars.extras;
       }
       setFinalAttrs(v, finalSetAttrs, () => {
         updateAction(type, rowId);
@@ -4674,7 +4709,7 @@ on('change:repeating_regionaleffect remove:repeating_regionaleffect', () => {
 });
 
 const switchToNPC = () => {
-  const collectionArray = ['is_npc', 'size', 'npc_whisper'];
+  const collectionArray = ['is_npc', 'size'];
   const finalSetAttrs = {};
 
   getAttrs(collectionArray, (v) => {
@@ -4685,9 +4720,9 @@ const switchToNPC = () => {
     }
 
     if (isNPC) {
-      finalSetAttrs.hit_dice_output_option = '@{output_to_gm}';
+      finalSetAttrs.hit_dice_output_option = '/w GM';
     } else {
-      finalSetAttrs.hit_dice_output_option = '@{output_to_all}';
+      finalSetAttrs.hit_dice_output_option = '';
     }
 
     setFinalAttrs(v, finalSetAttrs);
@@ -4967,7 +5002,7 @@ const resourcesToTraits = () => {
 const classFeaturesToTraits = () => {
   const repeatingItem = 'repeating_classfeature';
   const newRepeatingItem = 'repeating_trait';
-  const collectionArray = ['lang'];
+  const collectionArray = [];
   const finalSetAttrs = {};
 
   let repeatingString;
@@ -5046,11 +5081,52 @@ const classFeaturesToTraits = () => {
   });
 };
 
+const getSkillIdByStorageName = (v, repeatingItem, ids, prop) => {
+  for (const id of ids) {
+    const repeatingString = `${repeatingItem}_${id}_`;
+    if (v[`${repeatingString}storage_name`] === prop || v[`${repeatingString}storage_name`] === camelize(prop)) {
+      return id;
+    }
+  }
+};
+
+const setAdvantageOnStealth = (mode) => {
+  const repeatingItem = 'repeating_skill';
+  const collectionArray = [];
+  const finalSetAttrs = {};
+  let repeatingString;
+
+  getSectionIDs(repeatingItem, (ids) => {
+    for (const id of ids) {
+      repeatingString = `${repeatingItem}_${id}_`;
+      collectionArray.push(`${repeatingString}storage_name`);
+      collectionArray.push(`${repeatingString}skill_d20`);
+    }
+
+    getAttrs(collectionArray, (v) => {
+      for (const prop in SKILLS) {
+        if (SKILLS.hasOwnProperty(prop)) {
+          const skillId = getSkillIdByStorageName(v, repeatingItem, ids, prop);
+          repeatingString = `${repeatingItem}_${skillId}_`;
+
+          if (v[`${repeatingString}storage_name`] === 'STEALTH') {
+            if (mode === 'dis') {
+              finalSetAttrs[`${repeatingString}skill_d20`] = '2d20@{d20_mod}kl1';
+            } else if (mode === 'normal') {
+              finalSetAttrs[`${repeatingString}skill_d20`] = '@{shaped_d20}';
+            }
+          }
+        }
+      }
+      setFinalAttrs(v, finalSetAttrs);
+    });
+  });
+};
+
 const generateSkills = () => {
   const repeatingItem = 'repeating_skill';
-  const collectionArray = ['lang'];
+  const collectionArray = [];
   const finalSetAttrs = {};
-
   let repeatingString;
 
   getSectionIDs(repeatingItem, (ids) => {
@@ -5064,15 +5140,8 @@ const generateSkills = () => {
     getAttrs(collectionArray, (v) => {
       for (const prop in SKILLS) {
         if (SKILLS.hasOwnProperty(prop)) {
-          let skillId;
+          let skillId = getSkillIdByStorageName(v, repeatingItem, ids, prop);
 
-          for (const id of ids) {
-            repeatingString = `${repeatingItem}_${id}_`;
-            if (v[`${repeatingString}storage_name`] === prop || v[`${repeatingString}storage_name`] === camelize(prop)) {
-              skillId = id;
-              break;
-            }
-          }
           if (!skillId) {
             skillId = generateRowID();
           }
@@ -5080,7 +5149,7 @@ const generateSkills = () => {
 
           finalSetAttrs[`${repeatingString}storage_name`] = prop;
           finalSetAttrs[`${repeatingString}name`] = getTranslationByKey(prop);
-          finalSetAttrs[`${repeatingString}ability`] = `@{${SKILLS[prop]}_mod}`;
+          finalSetAttrs[`${repeatingString}ability`] = SKILLS[prop];
           updateSkill(skillId);
         }
       }
@@ -5100,6 +5169,12 @@ on('change:pb', () => {
   updateRemarkableAthlete();
   updateActions();
 });
+on('change:strength_mod change:dexterity_mod change:constitution_mod change:intelligence_mod change:wisdom_mod change:charisma_mod', () => {
+  updateSkill();
+  updateAttack();
+  updateSpell();
+  updateActions();
+});
 
 const extasToExtrasFix = (repeatingItem) => {
   const collectionArray = [];
@@ -5115,9 +5190,8 @@ const extasToExtrasFix = (repeatingItem) => {
       for (const id of ids) {
         const repeatingString = `${repeatingItem}_${id}_`;
 
-        const extrasToggle = v[`${repeatingString}extas_toggle`];
-        if (!isUndefined(extrasToggle)) {
-          finalSetAttrs[`${repeatingString}extras_toggle`] = extrasToggle;
+        if (!isUndefined(v[`${repeatingString}extas_toggle`])) {
+          finalSetAttrs[`${repeatingString}extras_toggle`] = v[`${repeatingString}extas_toggle`];
         }
       }
       setFinalAttrs(v, finalSetAttrs);
@@ -5156,13 +5230,19 @@ const fixRollTwo = () => {
 
   getAttrs(collectionArray, (v) => {
     if (v.roll_setting === '@{attr_roll_2}') {
-      finalSetAttrs.roll_setting = '@{roll_2}';
+      finalSetAttrs.roll_setting = '{{roll2=[[d20@{d20_mod}';
     }
     setFinalAttrs(v, finalSetAttrs);
   });
 };
 
-const updateSavingThrowVs = () => {
+const atSyntaxToAbilityName = (v, finalSetAttrs, repeatingString, field) => {
+  if (v[`${repeatingString}${field}`]) {
+    finalSetAttrs[`${repeatingString}${field}`] = getAbilityName(v[`${repeatingString}${field}`]);
+  }
+};
+
+const updateActionComponents = () => {
   const repeatingItems = ['repeating_attack', 'repeating_spell', 'repeating_trait', 'repeating_action', 'repeating_reaction', 'repeating_legendaryaction', 'repeating_lairaction', 'repeating_regionaleffect'];
   const collectionArray = [];
   const finalSetAttrs = {};
@@ -5171,23 +5251,189 @@ const updateSavingThrowVs = () => {
     getSectionIDs(repeatingItem, (ids) => {
       for (const id of ids) {
         const repeatingString = `${repeatingItem}_${id}_`;
+        collectionArray.push(`${repeatingString}attack_ability`);
+        collectionArray.push(`${repeatingString}damage_ability`);
+        collectionArray.push(`${repeatingString}second_damage_ability`);
+        collectionArray.push(`${repeatingString}heal_ability`);
+        collectionArray.push(`${repeatingString}saving_throw_ability`);
         collectionArray.push(`${repeatingString}saving_throw_vs_ability`);
       }
 
       getAttrs(collectionArray, (v) => {
         for (const id of ids) {
           const repeatingString = `${repeatingItem}_${id}_`;
-          const oldSavingThrowVsAbility = v[`${repeatingString}saving_throw_vs_ability`];
 
+          atSyntaxToAbilityName(v, finalSetAttrs, repeatingString, 'attack_ability');
+          atSyntaxToAbilityName(v, finalSetAttrs, repeatingString, 'damage_ability');
+          atSyntaxToAbilityName(v, finalSetAttrs, repeatingString, 'second_damage_ability');
+          atSyntaxToAbilityName(v, finalSetAttrs, repeatingString, 'heal_ability');
+          atSyntaxToAbilityName(v, finalSetAttrs, repeatingString, 'saving_throw_ability');
 
-          if (oldSavingThrowVsAbility) {
-            finalSetAttrs[`${repeatingString}saving_throw_vs_ability`] = oldSavingThrowVsAbility.toUpperCase();
+          if (v[`${repeatingString}saving_throw_vs_ability`]) {
+            finalSetAttrs[`${repeatingString}saving_throw_vs_ability`] = v[`${repeatingString}saving_throw_vs_ability`].toUpperCase();
           }
         }
         setFinalAttrs(v, finalSetAttrs);
       });
     });
   }
+};
+
+const changeOldToggleToNew = (v, finalSetAttrs, field, oldValue, newValue) => {
+  if (v[field] === `@{${oldValue}}`) {
+    finalSetAttrs[field] = newValue;
+  }
+};
+const removeToggleVar = () => {
+  const collectionArray = ['careful_spell_toggle', 'distant_spell_toggle', 'empowered_spell_toggle', 'extended_spell_toggle', 'heightened_spell_toggle', 'quickened_spell_toggle', 'subtle_spell_toggle', 'twinned_spell_toggle', 'initiative_tie_breaker', 'ammo_auto_use', 'hide_attack', 'hide_damage', 'hide_saving_throw_dc', 'hide_spell_content', 'hide_action_freetext', 'hide_saving_throw_failure', 'hide_saving_throw_success', 'hide_recharge', 'initiative_output_option', 'output_option', 'death_save_output_option', 'hit_dice_output_option', 'roll_setting', 'show_character_name', 'attacks_vs_target_ac', 'attacks_vs_target_name', 'initiative_roll', 'initiative_to_tracker'];
+  const finalSetAttrs = {};
+
+  getAttrs(collectionArray, (v) => {
+    changeOldToggleToNew(v, finalSetAttrs, 'careful_spell_toggle', 'careful_spell_toggle_var', '1');
+    changeOldToggleToNew(v, finalSetAttrs, 'distant_spell_toggle', 'distant_spell_toggle_var', '1');
+    changeOldToggleToNew(v, finalSetAttrs, 'empowered_spell_toggle', 'empowered_spell_toggle_var', '1');
+    changeOldToggleToNew(v, finalSetAttrs, 'extended_spell_toggle', 'extended_spell_toggle_var', '1');
+    changeOldToggleToNew(v, finalSetAttrs, 'heightened_spell_toggle', 'heightened_spell_toggle_var', '1');
+    changeOldToggleToNew(v, finalSetAttrs, 'quickened_spell_toggle', 'quickened_spell_toggle_var', '1');
+    changeOldToggleToNew(v, finalSetAttrs, 'subtle_spell_toggle', 'subtle_spell_toggle_var', '1');
+    changeOldToggleToNew(v, finalSetAttrs, 'twinned_spell_toggle', 'twinned_spell_toggle_var', '1');
+    changeOldToggleToNew(v, finalSetAttrs, 'initiative_tie_breaker', 'initiative_tie_breaker_var', '[[@{initiative} / 100]][tie breaker]');
+    changeOldToggleToNew(v, finalSetAttrs, 'ammo_auto_use', 'ammo_auto_use_var', '1');
+
+    changeOldToggleToNew(v, finalSetAttrs, 'hide_attack', 'hide_attack_var', '{{hide_attack=1}}');
+    changeOldToggleToNew(v, finalSetAttrs, 'hide_damage', 'hide_damage_var', '{{hide_damage=1}}');
+    changeOldToggleToNew(v, finalSetAttrs, 'hide_saving_throw_dc', 'hide_saving_throw_dc_var', '{{hide_saving_throw_dc=1}}');
+    changeOldToggleToNew(v, finalSetAttrs, 'hide_spell_content', 'hide_spell_content_var', '{{hide_spell_content=1}}');
+    changeOldToggleToNew(v, finalSetAttrs, 'hide_action_freetext', 'hide_action_freetext_var', '{{hide_freetext=1}}');
+    changeOldToggleToNew(v, finalSetAttrs, 'hide_saving_throw_failure', 'hide_saving_throw_failure_var', '{{hide_saving_throw_failure=1}}');
+    changeOldToggleToNew(v, finalSetAttrs, 'hide_saving_throw_success', 'hide_saving_throw_success_var', '{{hide_saving_throw_success=1}}');
+    changeOldToggleToNew(v, finalSetAttrs, 'hide_recharge', 'hide_recharge_var', '{{hide_recharge=1}}');
+
+    changeOldToggleToNew(v, finalSetAttrs, 'initiative_output_option', 'output_to_all', '');
+    changeOldToggleToNew(v, finalSetAttrs, 'initiative_output_option', 'output_to_gm', '/w GM');
+    changeOldToggleToNew(v, finalSetAttrs, 'output_option', 'output_to_all', '');
+    changeOldToggleToNew(v, finalSetAttrs, 'output_option', 'output_to_gm', '/w GM');
+    changeOldToggleToNew(v, finalSetAttrs, 'death_save_output_option', 'output_to_all', '');
+    changeOldToggleToNew(v, finalSetAttrs, 'death_save_output_option', 'output_to_gm', '/w GM');
+    changeOldToggleToNew(v, finalSetAttrs, 'hit_dice_output_option', 'output_to_all', '');
+    changeOldToggleToNew(v, finalSetAttrs, 'hit_dice_output_option', 'output_to_gm', '/w GM');
+
+    changeOldToggleToNew(v, finalSetAttrs, 'roll_setting', 'roll_advantage', 'adv {{ignore=[[0');
+    changeOldToggleToNew(v, finalSetAttrs, 'roll_setting', 'roll_disadvantage', 'dis {{ignore=[[0');
+    changeOldToggleToNew(v, finalSetAttrs, 'roll_setting', 'roll_1', '{{ignore=[[0');
+    changeOldToggleToNew(v, finalSetAttrs, 'roll_setting', 'roll_2', '{{roll2=[[d20@{d20_mod}');
+
+    changeOldToggleToNew(v, finalSetAttrs, 'show_character_name', 'show_character_name_no', '');
+    changeOldToggleToNew(v, finalSetAttrs, 'show_character_name', 'show_character_name_yes', '{{show_character_name=1}}');
+    changeOldToggleToNew(v, finalSetAttrs, 'attacks_vs_target_ac', 'attacks_vs_target_ac_no', '');
+    changeOldToggleToNew(v, finalSetAttrs, 'attacks_vs_target_ac', 'attacks_vs_target_ac_yes', '[[@{target|AC}]]');
+    changeOldToggleToNew(v, finalSetAttrs, 'attacks_vs_target_name', 'attacks_vs_target_name_no', '');
+    changeOldToggleToNew(v, finalSetAttrs, 'attacks_vs_target_name', 'attacks_vs_target_name_yes', '@{target|token_name}');
+
+    changeOldToggleToNew(v, finalSetAttrs, 'initiative_roll', 'normal_initiative', '@{shaped_d20}');
+    changeOldToggleToNew(v, finalSetAttrs, 'initiative_roll', 'advantage_on_initiative', '2d20@{d20_mod}kh1');
+    changeOldToggleToNew(v, finalSetAttrs, 'initiative_roll', 'disadvantage_on_initiative', '2d20@{d20_mod}kl1');
+
+    changeOldToggleToNew(v, finalSetAttrs, 'initiative_to_tracker', 'initiative_to_tracker_yes', '@{selected|initiative_formula} &{tracker}');
+    changeOldToggleToNew(v, finalSetAttrs, 'initiative_to_tracker', 'initiative_to_tracker_no', '@{initiative_formula}');
+
+    setFinalAttrs(v, finalSetAttrs);
+  });
+};
+
+const changeOldRepeatingToggleToNew = (v, finalSetAttrs, repeatingString, field, oldValue, newValue) => {
+  if (v[`${repeatingString}${field}`] === `@{${oldValue}}`) {
+    finalSetAttrs[`${repeatingString}${field}`] = newValue;
+  }
+};
+const updateActionComponentsToRemoveExtraFields = () => {
+  const repeatingItems = ['repeating_attack', 'repeating_spell', 'repeating_trait', 'repeating_action', 'repeating_reaction', 'repeating_legendaryaction', 'repeating_lairaction', 'repeating_regionaleffect'];
+  const collectionArray = [];
+  const finalSetAttrs = {};
+
+  for (const repeatingItem of repeatingItems) {
+    getSectionIDs(repeatingItem, (ids) => {
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
+        collectionArray.push(`${repeatingString}roll_toggle`);
+        collectionArray.push(`${repeatingString}content_toggle`);
+        collectionArray.push(`${repeatingString}saving_throw_toggle`);
+        collectionArray.push(`${repeatingString}damage_toggle`);
+        collectionArray.push(`${repeatingString}second_damage_toggle`);
+        collectionArray.push(`${repeatingString}extras_toggle`);
+        collectionArray.push(`${repeatingString}heal_toggle`);
+        collectionArray.push(`${repeatingString}heal_query_toggle`);
+        collectionArray.push(`${repeatingString}higher_level_toggle`);
+        collectionArray.push(`${repeatingString}special_effects_toggle`);
+      }
+
+      getAttrs(collectionArray, (v) => {
+        for (const id of ids) {
+          const repeatingString = `${repeatingItem}_${id}_`;
+
+          changeOldRepeatingToggleToNew(v, finalSetAttrs, repeatingString, 'roll_toggle', 'roll_toggle_var', '{{vs_ac=1}} @{roll_info} {{roll1=[[@{shaped_d20}cs>@{crit_range} + @{attack_formula}]]}} @{roll_setting}cs>@{crit_range} + @{attack_formula}]]}} {{targetAC=@{attacks_vs_target_ac}}} {{targetName=@{attacks_vs_target_name}}}');
+          changeOldRepeatingToggleToNew(v, finalSetAttrs, repeatingString, 'content_toggle', 'content_toggle_var', '{{content=@{content}}}');
+          changeOldRepeatingToggleToNew(v, finalSetAttrs, repeatingString, 'saving_throw_toggle', 'saving_throw_toggle_var', '{{saving_throw_condition=@{saving_throw_condition}}} {{saving_throw_dc=@{saving_throw_dc}}} {{saving_throw_vs_ability=@{saving_throw_vs_ability}}} {{saving_throw_failure=@{saving_throw_failure}}} {{saving_throw_success=@{saving_throw_success}}} {{targetName=@{attacks_vs_target_name}}}');
+          changeOldRepeatingToggleToNew(v, finalSetAttrs, repeatingString, 'damage_toggle', 'damage_toggle_var', '{{damage=[[@{damage_formula}]]}} {{damage_type=@{damage_type}}} {{crit_damage=[[0d0 + @{damage_crit}[crit damage] @{damage_crit_formula}]]}}');
+          changeOldRepeatingToggleToNew(v, finalSetAttrs, repeatingString, 'second_damage_toggle', 'second_damage_toggle_var', '{{second_damage=[[@{second_damage_formula}]]}} {{second_damage_type=@{second_damage_type}}} {{second_crit_damage=[[0d0 + @{second_damage_crit}[crit damage] @{second_damage_crit_formula}]]}}');
+          changeOldRepeatingToggleToNew(v, finalSetAttrs, repeatingString, 'extras_toggle', 'extras_var', '{{emote=@{emote}}} {{freetext=@{freetext}}} @{freeform}');
+          changeOldRepeatingToggleToNew(v, finalSetAttrs, repeatingString, 'heal_toggle', 'heal_toggle_var', '{{heal=[[@{heal_formula}]]}}');
+          changeOldRepeatingToggleToNew(v, finalSetAttrs, repeatingString, 'heal_query_toggle', 'heal_query', '?{Heal Bonus Amount|}');
+          changeOldRepeatingToggleToNew(v, finalSetAttrs, repeatingString, 'higher_level_toggle', 'higher_level_toggle_var', '{{cast_as_level=@{higher_level_query}}}');
+          changeOldRepeatingToggleToNew(v, finalSetAttrs, repeatingString, 'special_effects_toggle', 'special_effects_var', '{{fx=@{type}-@{color} @{points_of_origin}}}');
+        }
+        setFinalAttrs(v, finalSetAttrs);
+      });
+    });
+  }
+};
+
+const updateSkillAbility = () => {
+  const repeatingItems = ['repeating_skill'];
+  const collectionArray = [];
+  const finalSetAttrs = {};
+
+  for (const repeatingItem of repeatingItems) {
+    getSectionIDs(repeatingItem, (ids) => {
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
+        collectionArray.push(`${repeatingString}ability`);
+      }
+
+      getAttrs(collectionArray, (v) => {
+        for (const id of ids) {
+          const repeatingString = `${repeatingItem}_${id}_`;
+
+          atSyntaxToAbilityName(v, finalSetAttrs, repeatingString, 'ability');
+        }
+        setFinalAttrs(v, finalSetAttrs);
+      });
+    });
+  }
+};
+
+const updateArmorAbility = () => {
+  const collectionArray = ['ac_unarmored_ability'];
+  const finalSetAttrs = {};
+
+  getAttrs(collectionArray, (v) => {
+    if (!isUndefined(v.ac_unarmored_ability)) {
+      finalSetAttrs.ac_unarmored_ability = getAbilityName(v.ac_unarmored_ability);
+    }
+    setFinalAttrs(v, finalSetAttrs);
+  });
+};
+
+const updateDefaultAbility = () => {
+  const collectionArray = ['default_ability'];
+  const finalSetAttrs = {};
+
+  getAttrs(collectionArray, (v) => {
+    if (!isUndefined(v.default_ability)) {
+      finalSetAttrs.default_ability = getAbilityName(v.default_ability);
+    }
+    setFinalAttrs(v, finalSetAttrs);
+  });
 };
 
 const checkVersionFormat = (version, finalSetAttrs) => {
@@ -5212,7 +5458,7 @@ const sheetOpened = () => {
         finalSetAttrs.edit_mode = 'on';
       }
       if (isUndefined(v.roll_setting)) { // API Script import sets this when making characters
-        finalSetAttrs.roll_setting = '@{roll_1}';
+        finalSetAttrs.roll_setting = '{{ignore=[[0';
       }
       const setAbilities = {};
       if (isUndefined(v.strength)) {
@@ -5287,9 +5533,6 @@ const sheetOpened = () => {
         extasToExtrasFix('repeating_action');
         extasToExtrasFix('repeating_spell');
       }
-      if (versionCompare(version, '2.2.15') < 0) {
-        updatePreAndPostRoll();
-      }
       if (versionCompare(version, '2.3.3') < 0) {
         updateAttachers();
       }
@@ -5302,9 +5545,6 @@ const sheetOpened = () => {
       }
       if (versionCompare(version, '2.4.3') < 0) {
         setClassFeatures();
-      }
-      if (versionCompare(version, '2.4.4') < 0) {
-        updateAttack();
       }
       if (versionCompare(version, '2.4.7') < 0) {
         classFeaturesToTraits();
@@ -5345,14 +5585,35 @@ const sheetOpened = () => {
         updateNPCHD();
         switchToNPC();
       }
-      if (versionCompare(version, '4.0.2') < 0) {
-        updateSavingThrowVs();
-      }
       if (versionCompare(version, '4.0.3') < 0) {
         updateSpellChatMacroShow();
       }
-      if (versionCompare(version, '4.1.0') < 0) {
+      if (versionCompare(version, '4.1.4') < 0) {
+        updateDefaultAbility();
+        updateArmorAbility();
+        updateActionComponents();
+        updateSkillAbility();
+      }
+      if (versionCompare(version, '4.1.5') < 0) {
         updateSkill();
+      }
+      if (versionCompare(version, '4.2.0') < 0) {
+        updateD20Mod();
+        updateShapedD20();
+      }
+      if (versionCompare(version, '4.2.1') < 0) {
+        updateActionComponentsToRemoveExtraFields();
+        updateAbilityChecksMacro();
+        removeToggleVar();
+      }
+      if (versionCompare(version, '4.2.2') < 0) {
+        updateActions();
+      }
+      if (versionCompare(version, '4.2.3') < 0) {
+        updateArmor();
+      }
+      if (versionCompare(version, '4.2.4') < 0) {
+        updateAttack();
       }
     }
 
