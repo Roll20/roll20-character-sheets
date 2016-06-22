@@ -3108,7 +3108,7 @@ const updateAttack = (rowId) => {
 };
 on('change:repeating_attack', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_attack', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'damage_crit' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'second_damage_crit' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'qty' && repeatingInfo.field !== 'weight' && repeatingInfo.field !== 'parsed') {
+  if (repeatingInfo && repeatingInfo.field !== 'roll_toggle' && repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'damage_crit' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'second_damage_crit' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'qty' && repeatingInfo.field !== 'weight' && repeatingInfo.field !== 'parsed') {
     updateAttack(repeatingInfo.row);
   }
 });
@@ -3275,8 +3275,7 @@ const updateSpell = (rowId) => {
 };
 on('change:repeating_spell', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_spell', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'damage_crit' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'second_damage_crit' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'heal_formula' && repeatingInfo.field !== 'higher_level_query' && repeatingInfo.field !== 'parsed') {
-    console.info('spell repeatingInfo.field', repeatingInfo.field);
+  if (repeatingInfo && repeatingInfo.field !== 'roll_toggle' && repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'damage_crit' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'second_damage_crit' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'heal_formula' && repeatingInfo.field !== 'higher_level_query' && repeatingInfo.field !== 'parsed') {
     updateSpell(repeatingInfo.rowId);
   }
 });
@@ -3648,7 +3647,7 @@ const updateSkill = (rowId) => {
 
 on('change:repeating_skill', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_skill', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'ability_key' && repeatingInfo.field !== 'total' && repeatingInfo.field !== 'total_with_sign' && repeatingInfo.field !== 'passive_total' && repeatingInfo.field !== 'passive_total_with_sign' && repeatingInfo.field !== 'formula') {
+  if (repeatingInfo && repeatingInfo.field !== 'skill_d20' && repeatingInfo.field !== 'ability_key' && repeatingInfo.field !== 'ability_key' && repeatingInfo.field !== 'total' && repeatingInfo.field !== 'total_with_sign' && repeatingInfo.field !== 'passive_total' && repeatingInfo.field !== 'passive_total_with_sign' && repeatingInfo.field !== 'formula') {
     updateSkill(repeatingInfo.rowId);
   }
 });
