@@ -3082,9 +3082,7 @@ const updateAttack = (rowId) => {
           }
 
           findAmmo(ammoName, (ammoQtyName) => {
-            const setAmmo = {};
-            setAmmo[`${repeatingString}ammo_toggle_var`] = `{{ammo=[[${ammoQtyName}-${ammoAutoUse * ammoUsed}]]}} {{ammo_name=${ammoName}}}`;
-            setFinalAttrs(v, setAmmo);
+            finalSetAttrs[`${repeatingString}ammo_toggle_var`] = `{{ammo=[[${ammoQtyName}-${ammoAutoUse * ammoUsed}]]}} {{ammo_name=${ammoName}}}`;
           });
         }
 
@@ -4969,7 +4967,7 @@ const newAttackToggle = () => {
 
 const newAbilityDefaults = () => {
   getSetRepeatingItems({
-    repeatingItems: ['repeating_attack', 'repeating_trait', 'repeating_action', 'repeating_reaction', 'repeating_legendaryaction', 'repeating_lairaction', 'repeating_regionaleffect'],
+    repeatingItems: ['repeating_attack', 'repeating_action', 'repeating_reaction', 'repeating_legendaryaction', 'repeating_lairaction', 'repeating_regionaleffect'],
     collectionArrayAddItems: ['roll_toggle', 'roll_ability', 'damage_toggle', 'damage_ability'],
     callback: (v, finalSetAttrs, ids, repeatingItem) => {
       for (const id of ids) {
