@@ -211,21 +211,22 @@ const hasUpperCase = (string) => {
 };
 const ordinalSpellLevel = (level) => {
   let spellLevel = '';
+  level = getIntValue(level);
   if (level === 0) {
-    spellLevel = 'Cantrip';
+    spellLevel = 'CANTRIP';
   } else {
     switch (level % 10) {
       case 1:
-        spellLevel = `${level}st-level`;
+        spellLevel = `${level}ST_LEVEL`;
         break;
       case 2:
-        spellLevel = `${level}nd-level`;
+        spellLevel = `${level}ND_LEVEL`;
         break;
       case 3:
-        spellLevel = `${level}rd-level`;
+        spellLevel = `${level}RD_LEVEL`;
         break;
       default:
-        spellLevel = `${level}th-level`;
+        spellLevel = `${level}TH_LEVEL`;
         break;
     }
   }
@@ -3166,6 +3167,73 @@ on('change:global_attack_bonus change:global_melee_attack_bonus change:global_ra
   updateAction('lairaction');
 });
 
+const updateSpellToTranslations = () => {
+  getSetRepeatingItems({
+    repeatingItems: ['repeating_spell'],
+    collectionArrayAddItems: ['spell_level', 'school', 'casting_time', 'components', 'duration', 'concentration', 'saving_throw_vs_ability'],
+    callback: (v, finalSetAttrs, ids, repeatingItem) => {
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
+        if (v[`${repeatingString}spell_level`]) {
+          finalSetAttrs[`${repeatingString}spell_level`] = ordinalSpellLevel(v[`${repeatingString}spell_level`]);
+        }
+        if (v[`${repeatingString}school`]) {
+          finalSetAttrs[`${repeatingString}school`] = v[`${repeatingString}school`].toUpperCase();
+        }
+        if (v[`${repeatingString}casting_time`]) {
+          finalSetAttrs[`${repeatingString}casting_time`] = v[`${repeatingString}casting_time`].trim().toUpperCase().replace(/\s/g, '_');
+        }
+        if (v[`${repeatingString}components`]) {
+          finalSetAttrs[`${repeatingString}components`] = `COMPONENTS_${v[`${repeatingString}components`].trim().toUpperCase().replace(/\s/g, '_')}`;
+        }
+        if (v[`${repeatingString}duration`]) {
+          let duration = '';
+          if (v[`${repeatingString}concentration`] === 'Yes') {
+            duration += 'CONCENTRATION_';
+          }
+          duration += v[`${repeatingString}duration`].trim().toUpperCase().replace(/\s/g, '_');
+          finalSetAttrs[`${repeatingString}duration`] = duration;
+        }
+        if (finalSetAttrs[`${repeatingString}saving_throw_vs_ability`]) {
+          finalSetAttrs[`${repeatingString}saving_throw_vs_ability`] = v[`${repeatingString}saving_throw_vs_ability`].toUpperCase();
+        }
+      }
+    },
+  });
+};
+
+const updateSpellFromSRD = (v, finalSetAttrs, repeatingString) => {
+  if (v[`${repeatingString}level_from_srd`]) {
+    finalSetAttrs[`${repeatingString}spell_level`] = ordinalSpellLevel(v[`${repeatingString}spell_level_from_srd`]);
+    finalSetAttrs[`${repeatingString}spell_level_from_srd`] = '';
+  }
+  if (v[`${repeatingString}school_from_srd`]) {
+    finalSetAttrs[`${repeatingString}school`] = v[`${repeatingString}school_from_srd`].toUpperCase();
+    finalSetAttrs[`${repeatingString}school_from_srd`] = '';
+  }
+  if (v[`${repeatingString}casting_time_from_srd`]) {
+    finalSetAttrs[`${repeatingString}casting_time`] = v[`${repeatingString}casting_time_from_srd`].trim().toUpperCase().replace(/\s/g, '_');
+    finalSetAttrs[`${repeatingString}casting_time_from_srd`] = '';
+  }
+  if (v[`${repeatingString}components_from_srd`]) {
+    finalSetAttrs[`${repeatingString}components`] = `COMPONENTS_${v[`${repeatingString}components_from_srd`].trim().toUpperCase().replace(/\s/g, '_')}`;
+    finalSetAttrs[`${repeatingString}components_from_srd`] = '';
+  }
+  if (v[`${repeatingString}duration_from_srd`]) {
+    let duration = '';
+    if (v[`${repeatingString}concentration`] === 'Yes') {
+      duration += 'CONCENTRATION_';
+    }
+    duration += v[`${repeatingString}duration_from_srd`].trim().toUpperCase().replace(/\s/g, '_');
+    finalSetAttrs[`${repeatingString}duration`] = duration;
+    finalSetAttrs[`${repeatingString}duration_from_srd`] = '';
+  }
+  if (v[`${repeatingString}saving_throw_vs_ability_from_srd`]) {
+    finalSetAttrs[`${repeatingString}saving_throw_vs_ability`] = v[`${repeatingString}saving_throw_vs_ability_from_srd`].toUpperCase();
+    finalSetAttrs[`${repeatingString}saving_throw_vs_ability_from_srd`] = '';
+  }
+};
+
 const updateSpell = (rowId) => {
   const collectionArray = ['is_npc', 'pb', 'finesse_mod', 'global_spell_attack_bonus', 'global_spell_damage_bonus', 'global_spell_dc_bonus', 'global_spell_heal_bonus', 'default_ability', 'caster_level'];
   for (const ability of ABILITIES) {
@@ -3174,63 +3242,32 @@ const updateSpell = (rowId) => {
   getSetRepeatingItems({
     repeatingItems: ['repeating_spell'],
     collectionArray,
-    collectionArrayAddItems: ['name', 'name', 'friendly_level', 'type', 'roll_toggle', 'to_hit', 'attack_formula', 'proficiency', 'attack_ability', 'attack_bonus', 'saving_throw_toggle', 'saving_throw_ability', 'saving_throw_vs_ability', 'saving_throw_bonus', 'saving_throw_dc', 'damage_toggle', 'damage_formula', 'damage', 'damage_ability', 'damage_bonus', 'damage_type', 'damage_crit', 'second_damage_toggle', 'second_damage_formula', 'second_damage', 'second_damage_ability', 'second_damage_bonus', 'second_damage_type', 'second_damage_crit', 'damage_string', 'parsed', 'spell_level', 'casting_time', 'components', 'heal_toggle', 'heal', 'heal_ability', 'heal_bonus', 'heal_query_toggle', 'add_casting_modifier', 'add_second_casting_modifier', 'higher_level_toggle', 'higher_level_dice', 'higher_level_die', 'second_higher_level_dice', 'second_higher_level_die', 'higher_level_heal', 'components_verbal', 'components_somatic', 'components_material', 'duration', 'concentration', 'concentration_text', 'ritual', 'ritual_output', 'ritual_show', 'materials', 'materials_show', 'extras_toggle', 'emote', 'freetext', 'freeform'],
+    collectionArrayAddItems: ['name', 'school', 'school_from_srd', 'casting_time', 'casting_time_from_srd', 'components', 'components_from_srd', 'concentration', 'duration', 'duration_from_srd', 'roll_toggle', 'to_hit', 'attack_formula', 'proficiency', 'attack_ability', 'attack_bonus', 'saving_throw_toggle', 'saving_throw_ability', 'saving_throw_vs_ability', 'saving_throw_vs_ability_from_srd', 'saving_throw_bonus', 'saving_throw_dc', 'damage_toggle', 'damage_formula', 'damage', 'damage_ability', 'damage_bonus', 'damage_type', 'damage_crit', 'second_damage_toggle', 'second_damage_formula', 'second_damage', 'second_damage_ability', 'second_damage_bonus', 'second_damage_type', 'second_damage_crit', 'damage_string', 'parsed', 'spell_level', 'heal_toggle', 'heal', 'heal_ability', 'heal_bonus', 'heal_query_toggle', 'add_casting_modifier', 'add_second_casting_modifier', 'higher_level_toggle', 'higher_level_dice', 'higher_level_die', 'second_higher_level_dice', 'second_higher_level_die', 'higher_level_heal', 'ritual', 'ritual_output', 'materials', 'materials_show', 'extras_toggle', 'emote', 'freetext', 'freeform'],
     rowId,
     callback: (v, finalSetAttrs, ids, repeatingItem) => {
       for (const id of ids) {
         const repeatingString = `${repeatingItem}_${id}_`;
 
-        const spellLevel = getIntValue(v[`${repeatingString}spell_level`]);
-        if (spellLevel === 0) {
-          finalSetAttrs[`${repeatingString}spell_level`] = spellLevel;
+        updateSpellFromSRD(v, finalSetAttrs, repeatingString);
+
+        if (v[`${repeatingString}spell_level`] === 'CANTRIP') {
           finalSetAttrs[`${repeatingString}is_prepared`] = 'on';
         }
-        finalSetAttrs[`${repeatingString}friendly_level`] = ordinalSpellLevel(spellLevel);
 
-        const concentration = v[`${repeatingString}concentration`];
-        if (concentration === 'Yes') {
-          finalSetAttrs[`${repeatingString}concentration_show`] = 1;
-          finalSetAttrs[`${repeatingString}concentration_text`] = 'Concentration, ';
-        } else if (!isUndefinedOrEmpty(v[`${repeatingString}concentration_text`])) {
-          finalSetAttrs[`${repeatingString}concentration_text`] = '';
-          finalSetAttrs[`${repeatingString}concentration_show`] = 0;
+        if (fromVOrFinalSetAttrs(v, finalSetAttrs, `${repeatingString}duration`).indexOf('CONCENTRATION') !== -1) {
+          finalSetAttrs[`${repeatingString}concentration`] = 'Yes';
+        } else {
+          finalSetAttrs[`${repeatingString}concentration`] = '';
         }
-        if (v.duration) {
-          finalSetAttrs.duration = v.duration.toLowerCase();
-        }
-        const ritual = v[`${repeatingString}ritual`];
-        if (ritual === 'Yes') {
-          finalSetAttrs[`${repeatingString}ritual_show`] = 1;
+        if (v[`${repeatingString}ritual`] === 'Yes') {
           finalSetAttrs[`${repeatingString}ritual_output`] = '?{Cast as|Ritual,{{ritual=1&#125;&#125;|Spell,}';
         } else {
-          if (!isUndefinedOrEmpty(v[`${repeatingString}ritual_show`])) {
-            finalSetAttrs[`${repeatingString}ritual_show`] = 0;
-          }
-          if (!isUndefinedOrEmpty(v[`${repeatingString}ritual_output`])) {
-            finalSetAttrs[`${repeatingString}ritual_output`] = '';
-          }
+          finalSetAttrs[`${repeatingString}ritual_output`] = '';
         }
-        const materials = v[`${repeatingString}materials`];
-        if (!isUndefinedOrEmpty(materials) && materials !== '') {
+        if (!isUndefinedOrEmpty(v[`${repeatingString}materials`])) {
           finalSetAttrs[`${repeatingString}materials_show`] = 1;
         } else if (!isUndefinedOrEmpty(v[`${repeatingString}materials_show`])) {
           finalSetAttrs[`${repeatingString}materials_show`] = 0;
-        }
-
-        const spellComponents = v[`${repeatingString}components`];
-        finalSetAttrs[`${repeatingString}components_verbal`] = 0;
-        finalSetAttrs[`${repeatingString}components_somatic`] = 0;
-        finalSetAttrs[`${repeatingString}components_material`] = 0;
-        if (exists(spellComponents)) {
-          if (spellComponents.indexOf('V') !== -1) {
-            finalSetAttrs[`${repeatingString}components_verbal`] = 1;
-          }
-          if (spellComponents.indexOf('S') !== -1) {
-            finalSetAttrs[`${repeatingString}components_somatic`] = 1;
-          }
-          if (spellComponents.indexOf('M') !== -1) {
-            finalSetAttrs[`${repeatingString}components_material`] = 1;
-          }
         }
 
         const attackOptions = {
@@ -5287,6 +5324,9 @@ const sheetOpened = () => {
         if (versionCompare(version, '4.4.2') < 0) {
           updateSpellShowHide();
           updateCustomSavingThrowToggle();
+        }
+        if (versionCompare(version, '4.7.0') < 0) {
+          updateSpellToTranslations();
         }
       }
 
