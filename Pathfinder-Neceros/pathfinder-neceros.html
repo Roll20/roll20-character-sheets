@@ -10526,8 +10526,8 @@ var TAS = TAS || (function () {
 }());
 
 /* ---- END: TheAaronSheet.js ---- */
-TAS.config({ logging: { debug: true} });
-TAS.debugMode();
+TAS.config({ logging: { debug: false} });
+//TAS.debugMode();
 
 
 var ExExp = ExExp || (function () {
@@ -16018,76 +16018,71 @@ var PFSheet = PFSheet || (function () {
 
 
     migrateSpellRanges = function(callback) {
-        //TAS.debug("at migrateSpellRanges ");
-        getSectionIDs("repeating_spells",function(ids){
-            var fields = [];
-            _.each(ids,function(id){
-                var prefix = "repeating_spells_"  + getRepeatingIDStr(id);
-                fields=fields.concat([ prefix + "casterlevel", prefix + "range", prefix + "range_numeric", prefix + "range_pick", prefix + "targets", prefix+"name"]);
-                });
-            //TAS.debug(fields);
-            getAttrs(fields,function(v){
-                var  setter={};
-                //TAS.debug(v);
-                _.each(ids,function(id){
-                    var prefix = "repeating_spells_"  + getRepeatingIDStr(id)
-                        , casterlevel = parseInt(v[prefix + "casterlevel"],10)||1
-                        , chosenRange = v[prefix+"range_pick"]
-                        , rangeText = v[prefix+"range"]||""
-                        , areaEffect = v[prefix+"targets"]||""
-						, name = v[prefix+"name"]
-                        , newRange = 0, rangeUpdates
-						, resetDropdown=false
-                        ;
-					if (chosenRange && chosenRange[0]==="{") {
-						if (rangeText){
-							chosenRange="blank";
-							resetDropdown=true;
+        TAS.debug("at migrateSpellRanges ");
+		getAttrs(["spellranges_migrated"],function(m){
+			if (m["spellranges_migrated"]=="1"){
+				return;
+			}
+			getSectionIDs("repeating_spells",function(ids){
+				var fields = [];
+				_.each(ids,function(id){
+					var prefix = "repeating_spells_"  + getRepeatingIDStr(id);
+					fields=fields.concat([ prefix + "casterlevel", prefix + "range", prefix + "range_numeric", prefix + "range_pick", prefix + "targets", prefix+"name"]);
+					});
+				//TAS.debug(fields);
+				getAttrs(fields,function(v){
+					var  setter={};
+					//TAS.debug(v);
+					_.each(ids,function(id){
+						var prefix = "repeating_spells_"  + getRepeatingIDStr(id)
+							, casterlevel = parseInt(v[prefix + "casterlevel"],10)||1
+							, chosenRange = v[prefix+"range_pick"]
+							, rangeText = v[prefix+"range"]||""
+							, areaEffect = v[prefix+"targets"]||""
+							, name = v[prefix+"name"]
+							, newRange = 0, rangeUpdates
+							, resetDropdown=false
+							;
+	
+						//if dropdown is blank but text filled in try to migrate
+						if (!chosenRange && !rangeText){
+							setter[prefix+"range"]="";
+							setter[prefix+"range_numeric"]=0;
+							setter[prefix+"range_pick"]="blank";
+						} else if (((!chosenRange) || chosenRange==="blank") && rangeText) {
+							rangeUpdates = parseSpellRangeText(rangeText,areaEffect);
+							if (rangeUpdates){
+								chosenRange = rangeUpdates.dropdown;
+								if (chosenRange==="number"||chosenRange==="perlevel" || rangeUpdates.useorig) {
+									rangeText = rangeUpdates.rangeText;
+								} 
+								newRange = findSpellRange(rangeText,chosenRange, casterlevel)||0;
+							} else {
+								//error
+								chosenRange="unknownrange";
+								newRange=0;
+							}
+							//else just keep range text in case they have something they want to keep
+							setter[prefix+"range"]=rangeText;
+							setter[prefix+"range_numeric"]=newRange;
+							setter[prefix+"range_pick"]=chosenRange;
+						} 
+					});
+					if (_.size(setter)>0){
+						if (typeof callback === "function"){
+							setAttrs(setter,{silent:true},callback());
 						} else {
-							chosenRange=chosenRange.slice(2,chosenRange.indexOf("="));
-							resetDropdown=true;
+							setAttrs(setter,{silent:true});
 						}
+					} else if (typeof callback === "function"){
+						callback();
 					}
-					//TAS.debug("migrateRanges evaluating "+name+", dropdown:"+ chosenRange +" rangetext;"+rangeText );
-                    //if dropdown is blank but text filled in try to migrate
-					if (!chosenRange && !rangeText){
-						setter[prefix+"range"]="";
-                        setter[prefix+"range_numeric"]=0;
-                        setter[prefix+"range_pick"]="blank";
-					} else if (((!chosenRange) || chosenRange==="blank") && rangeText) {
-                        rangeUpdates = parseSpellRangeText(rangeText,areaEffect);
-                        chosenRange = rangeUpdates.dropdown;
-                        if (chosenRange==="number"||chosenRange==="perlevel" || rangeUpdates.useorig) {
-                            rangeText = rangeUpdates.rangeText;
-                        } else if ( chosenRange==="blank" || chosenRange==="close" || chosenRange==="medium" || chosenRange==="long" ){
-                            rangeText="";
-                        } else {
-							//rangeText = rangeUpdates.rangeText;
-						}
-                        newRange = findSpellRange(rangeText,chosenRange, casterlevel)||0;
-                        setter[prefix+"range"]=rangeText;
-                        setter[prefix+"range_numeric"]=newRange;
-                        setter[prefix+"range_pick"]=chosenRange;
-                    } else if (resetDropdown){
-                        newRange = findSpellRange(rangeText,chosenRange, casterlevel)||0;
-                        setter[prefix+"range_numeric"]=newRange;
-                        setter[prefix+"range_pick"]=chosenRange;
-					}
-                });
-                if (_.size(setter)>0){
-                    if (typeof callback === "function"){
-                        setAttrs(setter,{silent:true},callback());
-                    } else {
-                        setAttrs(setter,{silent:true});
-                    }
-                } else if (typeof callback === "function"){
-                    //TAS.debug("no spell ranges left to migrate");
-                    callback();
-                }
+					setAttrs({"spellranges_migrated":"1"},{silent:true});
 
-            });
-        });
-    },
+				});
+			});
+		});
+	},
 
 
 
