@@ -3518,12 +3518,6 @@ const updateAbilityChecksMacro = () => {
 
 
       for (const ability of ABILITIES) {
-        if (!v[`${ability}_check_mod_with_sign`]) {
-          console.warn('rerun until the fields are set');
-          updateAbilityModifiers();
-          updateAbilityChecksMacro();
-        }
-
         finalSetAttrs.ability_checks_query_var += `|${capitalize(ability)},{{title=${capitalize(ability)}&#125;&#125; {{roll1=[[@{shaped_d20} + ${v[`${ability}_check_mod`]}]]&#125;&#125; @{roll_setting} + ${v[`${ability}_check_mod`]}]]&#125;&#125;`;
         if (v.ability_checks_show_totals === 'on') {
           finalSetAttrs.ability_checks_macro_var += `[${capitalize(ability)} ${v[`${ability}_check_mod_with_sign`]}](~shaped_${ability}_check)`;
@@ -3595,15 +3589,13 @@ const updateSkill = (rowId) => {
           return;
         }
 
-        const ability = getAbilityModName(v[`${repeatingString}ability`]);
-        const abilityName = getAbilityName(ability);
         finalSetAttrs[`${repeatingString}ability_key`] = getAbilityShortName(v[`${repeatingString}ability`]).toUpperCase();
 
         let total = 0;
         let totalFormula = '';
         const proficiency = v[`${repeatingString}proficiency`];
         if (!proficiency || proficiency === 'unproficient') {
-          if ((abilityName === 'strength' || abilityName === 'dexterity' || abilityName === 'constitution') && v.remarkable_athlete_toggle === '@{remarkable_athlete}') {
+          if ((v[`${repeatingString}ability`] === 'strength' || v[`${repeatingString}ability`] === 'dexterity' || v[`${repeatingString}ability`] === 'constitution') && v.remarkable_athlete_toggle === '@{remarkable_athlete}') {
             const remarkableAthlete = getIntValue(v.remarkable_athlete);
             total += remarkableAthlete;
             totalFormula += `${remarkableAthlete}[remarkable athlete]`;
@@ -3622,10 +3614,10 @@ const updateSkill = (rowId) => {
           totalFormula += `${exp}[expertise]`;
         }
 
-        const abilityValue = getAbilityValue(v, ability, 'strength');
+        const abilityValue = getAbilityValue(v, v[`${repeatingString}ability`], 'strength');
         if (exists(abilityValue)) {
           total += abilityValue;
-          totalFormula += `${addArithmeticOperator(totalFormula, abilityValue)}[${getAbilityShortName(ability)}]`;
+          totalFormula += `${addArithmeticOperator(totalFormula, abilityValue)}[${getAbilityShortName(v[`${repeatingString}ability`])}]`;
         }
 
         const skillBonus = getIntValue(v[`${repeatingString}bonus`]);
@@ -3634,12 +3626,12 @@ const updateSkill = (rowId) => {
           totalFormula += `${addArithmeticOperator(totalFormula, skillBonus)}[bonus]`;
         }
 
-        if (exists(abilityName)) {
-          let checkBonus = v[`${abilityName}_check_bonus`];
+        if (exists(v[`${repeatingString}ability`])) {
+          let checkBonus = v[`${v[`${repeatingString}ability`]}_check_bonus`];
           if (exists(checkBonus)) {
             checkBonus = getIntValue(checkBonus);
             total += checkBonus;
-            totalFormula += `${addArithmeticOperator(totalFormula, checkBonus)}[${getAbilityShortName(ability)} check bonus]`;
+            totalFormula += `${addArithmeticOperator(totalFormula, checkBonus)}[${getAbilityShortName(v[`${repeatingString}ability`])} check bonus]`;
           }
         }
 
@@ -3658,14 +3650,14 @@ const updateSkill = (rowId) => {
 
         finalSetAttrs[`${repeatingString}skill_info`] = '';
 
-        if (!isUndefinedOrEmpty(v[`${repeatingString}skill_d20`])) {
-          if (v[`${repeatingString}skill_d20`].indexOf('kh1') !== -1) {
-            finalSetAttrs[`${repeatingString}skill_info`] = '{{advantage=1}}';
-            advantageOrDisadvantage = 5;
-          } else if (v[`${repeatingString}skill_d20`].indexOf('kl1') !== -1) {
-            finalSetAttrs[`${repeatingString}skill_info`] = '{{disadvantage=1}}';
-            advantageOrDisadvantage = -5;
-          }
+        if (v[`${repeatingString}skill_d20`] && v[`${repeatingString}skill_d20`].indexOf('kh1') !== -1) {
+          finalSetAttrs[`${repeatingString}skill_info`] = '{{advantage=1}}';
+          advantageOrDisadvantage = 5;
+        } else if (v[`${repeatingString}skill_d20`] && v[`${repeatingString}skill_d20`].indexOf('kl1') !== -1) {
+          finalSetAttrs[`${repeatingString}skill_info`] = '{{disadvantage=1}}';
+          advantageOrDisadvantage = -5;
+        } else {
+          finalSetAttrs[`${repeatingString}skill_info`] = '';
         }
 
         const passiveTotal = 10 + total + passiveBonus + advantageOrDisadvantage;
@@ -3684,7 +3676,7 @@ const updateSkill = (rowId) => {
 
 on('change:repeating_skill', (eventInfo) => {
   const repeatingInfo = getRepeatingInfo('repeating_skill', eventInfo);
-  if (repeatingInfo && repeatingInfo.field !== 'skill_d20' && repeatingInfo.field !== 'ability_key' && repeatingInfo.field !== 'ability_key' && repeatingInfo.field !== 'total' && repeatingInfo.field !== 'total_with_sign' && repeatingInfo.field !== 'passive_total' && repeatingInfo.field !== 'passive_total_with_sign' && repeatingInfo.field !== 'formula') {
+  if (repeatingInfo && repeatingInfo.field !== 'ability_key' && repeatingInfo.field !== 'total' && repeatingInfo.field !== 'total_with_sign' && repeatingInfo.field !== 'passive_total' && repeatingInfo.field !== 'passive_total_with_sign' && repeatingInfo.field !== 'formula') {
     updateSkill(repeatingInfo.rowId);
   }
 });
@@ -4895,6 +4887,9 @@ const generateSkills = () => {
         }
       }
     },
+    setFinalAttrsCallback: () => {
+      updateAbilityChecksMacro();
+    },
   });
 };
 on('change:generate_skills', () => {
@@ -5187,11 +5182,12 @@ const sheetOpened = () => {
           updatePb();
           generateSkills();
           updateSavingThrows();
+          updateCustomSavingThrowToggle();
           updateLevels();
-          updateAbilityChecksMacro();
           updateInitiative();
           updateArmor();
           updateSpellShowHide();
+          updateAbilityModifiers();
         });
       } else {
         if (versionCompare(version, '2.1.0') < 0) {
@@ -5218,9 +5214,6 @@ const sheetOpened = () => {
         }
         if (versionCompare(version, '2.1.15') < 0) {
           displayTextForTraits();
-        }
-        if (versionCompare(version, '2.2.1') < 0) {
-          updateAbilityModifiers();
         }
         if (versionCompare(version, '2.2.2') < 0) {
           resourcesToTraits();
