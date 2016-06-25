@@ -2524,7 +2524,7 @@ const updateSavingThrowToggle = (v, finalSetAttrs, repeatingString, options) => 
   };
   parseAttackComponent(v, repeatingString, finalSetAttrs, savingThrowParse);
   if (fromVOrFinalSetAttrs(v, finalSetAttrs, `${repeatingString}saving_throw_toggle`) === toggleVars.saving_throw) {
-    let savingThrowDC = 8 + getIntValue(v.pb);
+    let savingThrowDC = v.base_dc + getIntValue(v.pb);
     let savingThrowAbility = v[`${repeatingString}saving_throw_ability`];
     if (isUndefined(savingThrowAbility) && v.default_ability) {
       savingThrowAbility = v.default_ability;
@@ -2888,7 +2888,7 @@ const updateActionChatMacro = (type) => {
 const updateAction = (type, rowId) => {
   const rechargeRegex = /\s*?\((?:Recharge\s*?(\d+\-\d+|\d+)|Recharges\safter\sa\s(.*))\)/gi;
   const rechargeDayRegex = /\s*?\((\d+\/Day)\)/gi;
-  const collectionArray = ['pb', 'strength_mod', 'finesse_mod', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability'];
+  const collectionArray = ['pb', 'strength_mod', 'finesse_mod', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability', 'base_dc'];
 
   for (const ability of ABILITIES) {
     collectionArray.push(`${ability}_mod`);
@@ -3010,7 +3010,7 @@ on('change:repeating_regionaleffect', (eventInfo) => {
 });
 
 const updateAttack = (rowId) => {
-  const collectionArray = ['pb', 'strength_mod', 'finesse_mod', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability', 'ammo_auto_use'];
+  const collectionArray = ['pb', 'strength_mod', 'finesse_mod', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability', 'ammo_auto_use', 'base_dc'];
   for (const ability of ABILITIES) {
     collectionArray.push(`${ability}_mod`);
   }
@@ -3233,7 +3233,7 @@ const updateSpellFromSRD = (v, finalSetAttrs, repeatingString) => {
 };
 
 const updateSpell = (rowId) => {
-  const collectionArray = ['is_npc', 'pb', 'finesse_mod', 'global_spell_attack_bonus', 'global_spell_damage_bonus', 'global_spell_dc_bonus', 'global_spell_heal_bonus', 'default_ability', 'caster_level'];
+  const collectionArray = ['is_npc', 'pb', 'finesse_mod', 'global_spell_attack_bonus', 'global_spell_damage_bonus', 'global_spell_dc_bonus', 'global_spell_heal_bonus', 'default_ability', 'caster_level', 'base_dc'];
   for (const ability of ABILITIES) {
     collectionArray.push(`${ability}_mod`);
   }
