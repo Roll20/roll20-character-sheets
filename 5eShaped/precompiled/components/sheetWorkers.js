@@ -1,7 +1,7 @@
 /* global setAttrs:false, getAttrs:false, on:false, getSectionIDs:false, generateRowID:false, getTranslationByKey:false */
 'use strict';
 
-const currentVersion = '4.6.3';
+const currentVersion = '5.0.0';
 const SKILLS = {
   ACROBATICS: 'dexterity',
   ANIMALHANDLING: 'wisdom',
@@ -5325,7 +5325,7 @@ const sheetOpened = () => {
           updateSpellShowHide();
           updateCustomSavingThrowToggle();
         }
-        if (versionCompare(version, '4.7.0') < 0) {
+        if (versionCompare(version, '5.0.0') < 0) {
           updateSpellToTranslations();
         }
       }
