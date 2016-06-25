@@ -2523,17 +2523,15 @@ const updateSavingThrowToggle = (v, finalSetAttrs, repeatingString, options) => 
     triggerFields: ['saving_throw_ability', 'saving_throw_bonus', 'saving_throw_vs_ability'],
   };
   parseAttackComponent(v, repeatingString, finalSetAttrs, savingThrowParse);
-
-  const savingThrowToggle = v[`${repeatingString}saving_throw_toggle`];
-  if (savingThrowToggle === toggleVars.saving_throw) {
+  if (fromVOrFinalSetAttrs(v, finalSetAttrs, `${repeatingString}saving_throw_toggle`) === toggleVars.saving_throw) {
     let savingThrowDC = 8 + getIntValue(v.pb);
     let savingThrowAbility = v[`${repeatingString}saving_throw_ability`];
-    if (!savingThrowAbility && savingThrowAbility !== '0') {
+    if (isUndefined(savingThrowAbility) && v.default_ability) {
       savingThrowAbility = v.default_ability;
       finalSetAttrs[`${repeatingString}saving_throw_ability`] = v.default_ability;
     }
 
-    savingThrowDC += getAbilityValue(v, savingThrowAbility, 'strength');
+    savingThrowDC += getAbilityValue(v, savingThrowAbility);
     if (options && options.bonusDC) {
       savingThrowDC += getIntValue(options.bonusDC);
     }
