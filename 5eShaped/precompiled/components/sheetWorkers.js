@@ -3405,7 +3405,7 @@ const updateSpellShowHide = () => {
         const hasSlots = getIntValue(v[`spell_slots_l${level}`]);
         const hasSpells = v[`spells_level_${level}_macro_var`];
 
-        if ((hasSlots || showLevelIfAllSlotsAreUsed) && hasSpells) {
+        if ((hasSlots || showLevelIfAllSlotsAreUsed) && (hasSlots || hasSpells)) {
           finalSetAttrs[`spells_level_${level}_show`] = true;
         } else {
           finalSetAttrs[`spells_level_${level}_show`] = '';
