@@ -3879,12 +3879,12 @@ watchForCustomSavingThrowChanges('will');
 
 const updateCustomSavingThrowToggle = () => {
   getSetItems({
-    collectionArray: ['use_custom_saving_throws', 'saving_throw_macro_var', 'custom_saving_throw_macro_var'],
+    collectionArray: ['use_custom_saving_throws', 'saving_throw_macro_var_to_use'],
     callback: (v, finalSetAttrs) => {
       if (v.use_custom_saving_throws === '1') {
-        finalSetAttrs.saving_throw_macro_var_to_use = v.custom_saving_throw_macro_var;
+        finalSetAttrs.saving_throw_macro_var_to_use = '@{custom_saving_throw_macro_var}';
       } else {
-        finalSetAttrs.saving_throw_macro_var_to_use = v.saving_throw_macro_var;
+        finalSetAttrs.saving_throw_macro_var_to_use = '@{saving_throw_macro_var}';
       }
     },
   });
@@ -5180,7 +5180,6 @@ const sheetOpened = () => {
           updatePb();
           generateSkills();
           updateSavingThrows();
-          updateCustomSavingThrowToggle();
           updateLevels();
           updateInitiative();
           updateArmor();
@@ -5307,7 +5306,6 @@ const sheetOpened = () => {
         }
         if (versionCompare(version, '4.4.2') < 0) {
           updateSpellShowHide();
-          updateCustomSavingThrowToggle();
         }
         if (versionCompare(version, '5.0.0') < 0) {
           updateSpellToTranslations();
@@ -5316,6 +5314,7 @@ const sheetOpened = () => {
           updateSpell();
           updateAttack();
           updateActions();
+          updateCustomSavingThrowToggle();
         }
       }
 
