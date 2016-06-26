@@ -2524,7 +2524,7 @@ const updateSavingThrowToggle = (v, finalSetAttrs, repeatingString, options) => 
   };
   parseAttackComponent(v, repeatingString, finalSetAttrs, savingThrowParse);
   if (fromVOrFinalSetAttrs(v, finalSetAttrs, `${repeatingString}saving_throw_toggle`) === toggleVars.saving_throw) {
-    let savingThrowDC = v.base_dc + getIntValue(v.pb);
+    let savingThrowDC = getIntValue(v.base_dc) + getIntValue(v.pb);
     let savingThrowAbility = v[`${repeatingString}saving_throw_ability`];
     if (isUndefined(savingThrowAbility) && v.default_ability) {
       savingThrowAbility = v.default_ability;
@@ -5294,19 +5294,12 @@ const sheetOpened = () => {
           updateAbilityChecksMacro();
           removeToggleVar();
         }
-        if (versionCompare(version, '4.2.2') < 0) {
-          updateActions();
-        }
         if (versionCompare(version, '4.2.3') < 0) {
           updateArmor();
-        }
-        if (versionCompare(version, '4.2.4') < 0) {
-          updateAttack();
         }
         if (versionCompare(version, '4.4.0') < 0) {
           updateCustomSavingThrows();
           newAttackToggle();
-          updateSpell();
           generateHigherLevelQueries();
         }
         if (versionCompare(version, '4.4.1') < 0) {
@@ -5318,6 +5311,11 @@ const sheetOpened = () => {
         }
         if (versionCompare(version, '5.0.0') < 0) {
           updateSpellToTranslations();
+        }
+        if (versionCompare(version, '5.0.3') < 0) {
+          updateSpell();
+          updateAttack();
+          updateActions();
         }
       }
 
