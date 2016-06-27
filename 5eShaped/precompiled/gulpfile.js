@@ -142,7 +142,15 @@ gulp.task('sass-lint', function() {
 
 gulp.task('sort-translations', function() {
   return gulp.src('../translations/*.json')
-    .pipe(sortJSON({ space: 2 }))
+    .pipe(sortJSON({ space: 1 }))
+    .pipe(replaceTask({
+      patterns: [
+        {
+          match: /\"\:\s\"/g,
+          replacement: '":"'
+        }
+      ]
+    }))
     .pipe(gulp.dest('../translations/'));
 });
 
