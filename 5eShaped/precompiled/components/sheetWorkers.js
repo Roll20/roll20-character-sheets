@@ -2451,7 +2451,7 @@ const updateAttackToggle = (v, finalSetAttrs, repeatingString, options) => {
     parseName: 'attack',
     toggleField: 'roll_toggle',
     toggleFieldSetTo: toggleVars.roll,
-    triggerFields: ['type', 'attack_bonus'],
+    triggerFields: ['type', 'proficiency', 'attack_ability', 'attack_bonus'],
   };
   parseAttackComponent(v, repeatingString, finalSetAttrs, attackParse);
 
