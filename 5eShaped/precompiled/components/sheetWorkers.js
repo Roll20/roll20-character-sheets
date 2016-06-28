@@ -2762,14 +2762,14 @@ const updateHigherLevelToggle = (v, finalSetAttrs, repeatingString) => {
 
     const damageToggle = v[`${repeatingString}damage_toggle`];
     if (damageToggle && damageToggle === toggleVars.damage) {
-      const higherLevelDamage = '((@{higher_level_query} - @{spell_level}) * @{higher_level_dice})@{higher_level_die}[higher lvl]';
+      const higherLevelDamage = `((@{higher_level_query} - ${spellLevel}) * @{higher_level_dice})@{higher_level_die}[higher lvl]`;
       finalSetAttrs[`${repeatingString}damage_formula`] += addArithmeticOperator(finalSetAttrs[`${repeatingString}damage_formula`], higherLevelDamage);
       finalSetAttrs[`${repeatingString}damage_crit_formula`] = higherLevelDamage;
     }
 
     const secondDamageToggle = v[`${repeatingString}second_damage_toggle`];
     if (secondDamageToggle && secondDamageToggle === toggleVars.second_damage) {
-      const higherLevelSecondDamage = '((@{higher_level_query} - @{spell_level}) * @{second_higher_level_dice})@{second_higher_level_die}[higher lvl]';
+      const higherLevelSecondDamage = `((@{higher_level_query} - ${spellLevel}) * @{second_higher_level_dice})@{second_higher_level_die}[higher lvl]`;
       finalSetAttrs[`${repeatingString}second_damage_formula`] += addArithmeticOperator(finalSetAttrs[`${repeatingString}second_damage_formula`], higherLevelSecondDamage);
       finalSetAttrs[`${repeatingString}second_damage_crit_formula`] = higherLevelSecondDamage;
     }
@@ -2779,7 +2779,7 @@ const updateHigherLevelToggle = (v, finalSetAttrs, repeatingString) => {
       if (finalSetAttrs[`${repeatingString}heal_formula`]) {
         finalSetAttrs[`${repeatingString}heal_formula`] += ' + ';
       }
-      finalSetAttrs[`${repeatingString}heal_formula`] += '((@{higher_level_query} - @{spell_level}) * @{higher_level_dice})@{higher_level_die}[higher lvl] + (@{higher_level_heal} * (@{higher_level_query} - @{spell_level}))[higher lvl flat amount]';
+      finalSetAttrs[`${repeatingString}heal_formula`] += `((@{higher_level_query} - ${spellLevel}) * @{higher_level_dice})@{higher_level_die}[higher lvl] + (@{higher_level_heal} * (@{higher_level_query} - ${spellLevel}))[higher lvl flat amount]`;
     }
   }
 };
@@ -3201,7 +3201,7 @@ const updateSpellToTranslations = () => {
 };
 
 const updateSpellFromSRD = (v, finalSetAttrs, repeatingString) => {
-  if (v[`${repeatingString}level_from_srd`]) {
+  if (v[`${repeatingString}spell_level_from_srd`]) {
     finalSetAttrs[`${repeatingString}spell_level`] = ordinalSpellLevel(v[`${repeatingString}spell_level_from_srd`]);
     finalSetAttrs[`${repeatingString}spell_level_from_srd`] = '';
   }
@@ -3240,7 +3240,7 @@ const updateSpell = (rowId) => {
   getSetRepeatingItems({
     repeatingItems: ['repeating_spell'],
     collectionArray,
-    collectionArrayAddItems: ['name', 'school', 'school_from_srd', 'casting_time', 'casting_time_from_srd', 'components', 'components_from_srd', 'concentration', 'duration', 'duration_from_srd', 'roll_toggle', 'to_hit', 'attack_formula', 'proficiency', 'attack_ability', 'attack_bonus', 'saving_throw_toggle', 'saving_throw_ability', 'saving_throw_vs_ability', 'saving_throw_vs_ability_from_srd', 'saving_throw_bonus', 'saving_throw_dc', 'damage_toggle', 'damage_formula', 'damage', 'damage_ability', 'damage_bonus', 'damage_type', 'damage_crit', 'second_damage_toggle', 'second_damage_formula', 'second_damage', 'second_damage_ability', 'second_damage_bonus', 'second_damage_type', 'second_damage_crit', 'damage_string', 'parsed', 'spell_level', 'heal_toggle', 'heal', 'heal_ability', 'heal_bonus', 'heal_query_toggle', 'add_casting_modifier', 'add_second_casting_modifier', 'higher_level_toggle', 'higher_level_dice', 'higher_level_die', 'second_higher_level_dice', 'second_higher_level_die', 'higher_level_heal', 'ritual', 'ritual_output', 'materials', 'materials_show', 'extras_toggle', 'emote', 'freetext', 'freeform'],
+    collectionArrayAddItems: ['name', 'school', 'spell_level', 'spell_level_from_srd', 'school_from_srd', 'casting_time', 'casting_time_from_srd', 'components', 'components_from_srd', 'concentration', 'duration', 'duration_from_srd', 'roll_toggle', 'to_hit', 'attack_formula', 'proficiency', 'attack_ability', 'attack_bonus', 'saving_throw_toggle', 'saving_throw_ability', 'saving_throw_vs_ability', 'saving_throw_vs_ability_from_srd', 'saving_throw_bonus', 'saving_throw_dc', 'damage_toggle', 'damage_formula', 'damage', 'damage_ability', 'damage_bonus', 'damage_type', 'damage_crit', 'second_damage_toggle', 'second_damage_formula', 'second_damage', 'second_damage_ability', 'second_damage_bonus', 'second_damage_type', 'second_damage_crit', 'damage_string', 'parsed', 'heal_toggle', 'heal', 'heal_ability', 'heal_bonus', 'heal_query_toggle', 'add_casting_modifier', 'add_second_casting_modifier', 'higher_level_toggle', 'higher_level_dice', 'higher_level_die', 'second_higher_level_dice', 'second_higher_level_die', 'higher_level_heal', 'ritual', 'ritual_output', 'materials', 'materials_show', 'extras_toggle', 'emote', 'freetext', 'freeform'],
     rowId,
     callback: (v, finalSetAttrs, ids, repeatingItem) => {
       for (const id of ids) {
@@ -4224,7 +4224,7 @@ const setDefaultAbility = (v, finalSetAttrs) => {
     highestAbilityName = 'charisma';
   }
 
-  finalSetAttrs.default_ability = `@{${highestAbilityName}_mod}`;
+  finalSetAttrs.default_ability = '${highestAbilityName}';
 };
 
 const parseSRDContentSection = (content, finalSetAttrs, title, name) => {
