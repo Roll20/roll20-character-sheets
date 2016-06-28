@@ -5276,7 +5276,6 @@ const sheetOpened = () => {
           switchToNPC();
         }
         if (versionCompare(version, '4.1.4') < 0) {
-          updateDefaultAbility();
           updateArmorAbility();
           updateActionComponents();
           updateSkillAbility();
@@ -5315,6 +5314,9 @@ const sheetOpened = () => {
           updateAttack();
           updateActions();
           updateCustomSavingThrowToggle();
+        }
+        if (versionCompare(version, '5.0.4') < 0) {
+          updateDefaultAbility();
         }
       }
 
