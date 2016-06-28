@@ -3081,7 +3081,9 @@ const updateAttack = (rowId) => {
           }
 
           findAmmo(ammoName, (ammoQtyName) => {
-            finalSetAttrs[`${repeatingString}ammo_toggle_var`] = `{{ammo=[[${ammoQtyName}-${ammoAutoUse * ammoUsed}]]}} {{ammo_name=${ammoName}}}`;
+            const setAmmo = {};
+            setAmmo[`${repeatingString}ammo_toggle_var`] = `{{ammo=[[${ammoQtyName}-${ammoAutoUse * ammoUsed}]]}} {{ammo_name=${ammoName}}}`;
+            setFinalAttrs(v, setAmmo);
           });
         }
 
@@ -4224,7 +4226,7 @@ const setDefaultAbility = (v, finalSetAttrs) => {
     highestAbilityName = 'charisma';
   }
 
-  finalSetAttrs.default_ability = '${highestAbilityName}';
+  finalSetAttrs.default_ability = highestAbilityName;
 };
 
 const parseSRDContentSection = (content, finalSetAttrs, title, name) => {
