@@ -10,9 +10,23 @@ Report any problems, suggestions or features by sending a private message on Rol
 
 ## Todo
 * Change to only show crit value if there are more than one 6 in the roll.
-* Add in Crew sheets.
 
 ## Changelog
+
+### 0.0.6
+* Reformatted header
+    * Added Blades in the Dark logo image (hosted on imgur).
+    * Added toggle for Crew/Character sheet
+* Added Crew sheet
+    - Crew tab with complete blank crew sheet including claims map with toggleable connectors.
+    - Faction tab with blank sections for each faction type and the War effects.
+* Added a roll template (background hosted on imgur).
+* Updated roll macros for actions to prompt for position and effect.
+* Updated roll macros to use the roll template.
+* Changed Misc roll to Fortune with prompts for several common uses (Vice, Engagement, etc).
+* Relocated character sheet XP condition reminders.
+* Reformatted the character Veteran special ability to remove extra checkboxes and added placeholder to clarify that Veteran abilities may be taken up to three times (per https://plus.google.com/117439479714858586537/posts/MYms9jVjoo4)
+* Miscellaneous formatting alignment adjustments
 
 ### 0.0.5
 * 0.0.3 roll macros are now working properly! Updated all roll macros.
