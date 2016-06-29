@@ -3220,7 +3220,6 @@ const updateSpellLevelForCantrips = () => {
   });
 };
 
-
 const updateSpellFromSRD = (v, finalSetAttrs, repeatingString) => {
   if (v[`${repeatingString}spell_level_from_srd`]) {
     finalSetAttrs[`${repeatingString}spell_level`] = ordinalSpellLevel(v[`${repeatingString}spell_level_from_srd`]);
@@ -3273,7 +3272,7 @@ const updateSpell = (rowId) => {
           finalSetAttrs[`${repeatingString}is_prepared`] = 'on';
         }
 
-        if (fromVOrFinalSetAttrs(v, finalSetAttrs, `${repeatingString}duration`).indexOf('CONCENTRATION') !== -1) {
+        if (!isUndefined(fromVOrFinalSetAttrs(v, finalSetAttrs, `${repeatingString}duration`)) && fromVOrFinalSetAttrs(v, finalSetAttrs, `${repeatingString}duration`).indexOf('CONCENTRATION') !== -1) {
           finalSetAttrs[`${repeatingString}concentration`] = 'Yes';
         } else {
           finalSetAttrs[`${repeatingString}concentration`] = '';
