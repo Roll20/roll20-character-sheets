@@ -3205,6 +3205,21 @@ const updateSpellToTranslations = () => {
     },
   });
 };
+const updateSpellLevelForCantrips = () => {
+  getSetRepeatingItems({
+    repeatingItems: ['repeating_spell'],
+    collectionArrayAddItems: ['spell_level'],
+    callback: (v, finalSetAttrs, ids, repeatingItem) => {
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
+        if (isUndefinedOrEmpty(v[`${repeatingString}spell_level`]) || v[`${repeatingString}spell_level`] === '0' || v[`${repeatingString}spell_level`] === 0) {
+          finalSetAttrs[`${repeatingString}spell_level`] = 'CANTRIP';
+        }
+      }
+    },
+  });
+};
+
 
 const updateSpellFromSRD = (v, finalSetAttrs, repeatingString) => {
   if (v[`${repeatingString}spell_level_from_srd`]) {
@@ -5323,6 +5338,9 @@ const sheetOpened = () => {
         }
         if (versionCompare(version, '5.0.4') < 0) {
           updateDefaultAbility();
+        }
+        if (versionCompare(version, '5.0.6') < 0) {
+          updateSpellLevelForCantrips();
         }
       }
 
