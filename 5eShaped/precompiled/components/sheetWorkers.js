@@ -174,7 +174,7 @@ const parseAttackComponent = (v, repeatingString, finalSetAttrs, options) => {
 
     if (options.triggerFields) {
       for (const triggerField of options.triggerFields) {
-        if (!isUndefinedOrEmpty(v[repeatingString + triggerField])) {
+        if (!isUndefinedOrEmpty(v[`${repeatingString}${triggerField}`])) {
           aTriggerFieldExists = true;
         }
       }
@@ -2451,7 +2451,7 @@ const updateAttackToggle = (v, finalSetAttrs, repeatingString, options) => {
     parseName: 'attack',
     toggleField: 'roll_toggle',
     toggleFieldSetTo: toggleVars.roll,
-    triggerFields: ['type', 'proficiency', 'attack_ability', 'attack_bonus'],
+    triggerFields: ['type', 'attack_bonus'],
   };
   parseAttackComponent(v, repeatingString, finalSetAttrs, attackParse);
 
@@ -2468,7 +2468,11 @@ const updateAttackToggle = (v, finalSetAttrs, repeatingString, options) => {
     }
 
     let attackAbility = v[`${repeatingString}attack_ability`];
-    if (v[`${repeatingString}type`] === 'Ranged Weapon') {
+
+    if (isUndefined(attackAbility) && v[`${repeatingString}type`] === 'Melee Weapon') {
+      attackAbility = 'strength';
+      finalSetAttrs[`${repeatingString}attack_ability`] = attackAbility;
+    } else if (isUndefined(attackAbility) && v[`${repeatingString}type`] === 'Ranged Weapon') {
       attackAbility = 'dexterity';
       finalSetAttrs[`${repeatingString}attack_ability`] = attackAbility;
     } else if (finalSetAttrs[`${repeatingString}attack_ability`]) {
@@ -3221,7 +3225,7 @@ const updateSpellFromSRD = (v, finalSetAttrs, repeatingString) => {
   }
   if (v[`${repeatingString}duration_from_srd`]) {
     let duration = '';
-    if (v[`${repeatingString}concentration`] === 'Yes') {
+    if (v[`${repeatingString}duration_from_srd`].toLowerCase().indexOf('up to') !== -1) {
       duration += 'CONCENTRATION_';
     }
     duration += v[`${repeatingString}duration_from_srd`].trim().toUpperCase().replace(/\s/g, '_');
@@ -3242,7 +3246,7 @@ const updateSpell = (rowId) => {
   getSetRepeatingItems({
     repeatingItems: ['repeating_spell'],
     collectionArray,
-    collectionArrayAddItems: ['name', 'school', 'spell_level', 'spell_level_from_srd', 'school_from_srd', 'casting_time', 'casting_time_from_srd', 'components', 'components_from_srd', 'concentration', 'duration', 'duration_from_srd', 'roll_toggle', 'to_hit', 'attack_formula', 'proficiency', 'attack_ability', 'attack_bonus', 'saving_throw_toggle', 'saving_throw_ability', 'saving_throw_vs_ability', 'saving_throw_vs_ability_from_srd', 'saving_throw_bonus', 'saving_throw_dc', 'damage_toggle', 'damage_formula', 'damage', 'damage_ability', 'damage_bonus', 'damage_type', 'damage_crit', 'second_damage_toggle', 'second_damage_formula', 'second_damage', 'second_damage_ability', 'second_damage_bonus', 'second_damage_type', 'second_damage_crit', 'damage_string', 'parsed', 'heal_toggle', 'heal', 'heal_ability', 'heal_bonus', 'heal_query_toggle', 'add_casting_modifier', 'add_second_casting_modifier', 'higher_level_toggle', 'higher_level_dice', 'higher_level_die', 'second_higher_level_dice', 'second_higher_level_die', 'higher_level_heal', 'ritual', 'ritual_output', 'materials', 'materials_show', 'extras_toggle', 'emote', 'freetext', 'freeform'],
+    collectionArrayAddItems: ['name', 'school', 'spell_level', 'spell_level_from_srd', 'school_from_srd', 'casting_time', 'casting_time_from_srd', 'components', 'components_from_srd', 'concentration', 'duration', 'duration_from_srd', 'type', 'roll_toggle', 'to_hit', 'attack_formula', 'proficiency', 'attack_ability', 'attack_bonus', 'saving_throw_toggle', 'saving_throw_ability', 'saving_throw_vs_ability', 'saving_throw_vs_ability_from_srd', 'saving_throw_bonus', 'saving_throw_dc', 'damage_toggle', 'damage_formula', 'damage', 'damage_ability', 'damage_bonus', 'damage_type', 'damage_crit', 'second_damage_toggle', 'second_damage_formula', 'second_damage', 'second_damage_ability', 'second_damage_bonus', 'second_damage_type', 'second_damage_crit', 'damage_string', 'parsed', 'heal_toggle', 'heal', 'heal_ability', 'heal_bonus', 'heal_query_toggle', 'add_casting_modifier', 'add_second_casting_modifier', 'higher_level_toggle', 'higher_level_dice', 'higher_level_die', 'second_higher_level_dice', 'second_higher_level_die', 'higher_level_heal', 'ritual', 'ritual_output', 'materials', 'materials_show', 'extras_toggle', 'emote', 'freetext', 'freeform'],
     rowId,
     callback: (v, finalSetAttrs, ids, repeatingItem) => {
       for (const id of ids) {
