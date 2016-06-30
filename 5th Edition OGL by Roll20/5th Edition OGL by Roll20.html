@@ -593,7 +593,7 @@
                     </div>
                     <input type="hidden" name="attr_updateflag">
                     <input type="hidden" name="attr_rollbase">
-                    <button type="roll" style="display: none;" name="roll_npc_dmg" value="@{wtype}&{template:npcdmg} @{damage_flag} {{dmg1=[[@{attack_damage}+0]]}} {{dmg1type=@{attack_damagetype}}} {{dmg2=[[@{attack_damage2}+0]]}} {{dmg2type=@{attack_damagetype2}}} {{crit1=[[@{attack_crit}+0]]}} {{crit2=[[@{attack_crit2}+0]]}}"></button>
+                    <button type="roll" style="display: none;" name="roll_npc_dmg" value="@{wtype}&{template:npcdmg} @{damage_flag} {{dmg1=[[@{attack_damage}+0]]}} {{dmg1type=@{attack_damagetype}}} {{dmg2=[[@{attack_damage2}+0]]}} {{dmg2type=@{attack_damagetype2}}}"></button>
                     <button type="roll" style="display: none;" name="roll_npc_crit" value="@{wtype}&{template:npcdmg} @{damage_flag} {{crit=1}} {{dmg1=[[@{attack_damage}+0]]}} {{dmg1type=@{attack_damagetype}}} {{dmg2=[[@{attack_damage2}+0]]}} {{dmg2type=@{attack_damagetype2}}} {{crit1=[[@{attack_crit}+0]]}} {{crit2=[[@{attack_crit2}+0]]}}"></button>
                 </div>
             </fieldset>
@@ -1168,6 +1168,8 @@
                                     <option value="@{wisdom_mod}" data-i18n="wisdom-u">WISDOM</option>
                                     <option value="@{charisma_mod}" data-i18n="charisma-u">CHARISMA</option>
                                 </select>
+                                <span data-i18n="mods:-u">MODS:</span>
+                                <input type="text" name="attr_tool_mod" title="@{tool_mod}" value="0">
                             </div>
                         </div>
                         <div class="display">
@@ -1390,8 +1392,8 @@
                     <input type="hidden" name="attr_hldmg">
                     <input type="hidden" name="attr_spelllevel">
                     <input type="hidden" name="attr_rollbase">
-                    <button type="roll" name="roll_attack_dmg" style="display: none;" value="@{wtype}&{template:dmg} {{rname=@{atkname}}} @{atkflag} {{range=@{atkrange}}} @{dmgflag} {{dmg1=[[@{hidden_dmg1}]]}} {{dmg1type=@{hidden_dmg1type}}} @{dmg2flag} {{dmg2=[[@{hidden_dmg2}]]}}} {{dmg2type=@{hidden_dmg2type}}} @{saveflag} {{desc=@{atk_desc}}} @{hldmg} @{spelllevel} @{charname_output}"></button>
-                    <button type="roll" name="roll_attack_crit" style="display: none;" value="@{wtype}&{template:dmg} {{crit=1}} {{rname=@{atkname}}} @{atkflag} {{range=@{atkrange}}} @{dmgflag} {{dmg1=[[@{hidden_dmg1}]]}} {{dmg1type=@{hidden_dmg1type}}} @{dmg2flag} {{dmg2=[[@{hidden_dmg2}]]}}} {{dmg2type=@{hidden_dmg2type}}} {{crit1=[[@{hidden_crit1}]]}} {{crit2=[[@{hidden_crit2}]]}} @{saveflag} {{desc=@{atk_desc}}} @{hldmg} @{spelllevel} @{charname_output}"></button>
+                    <button type="roll" name="roll_attack_dmg" style="display: none;" value="@{wtype}&{template:dmg} {{rname=@{atkname}}} @{atkflag} {{range=@{atkrange}}} @{dmgflag} {{dmg1=[[@{hidden_dmg1}]]}} {{dmg1type=@{hidden_dmg1type}}} @{dmg2flag} {{dmg2=[[@{hidden_dmg2}]]}} {{dmg2type=@{hidden_dmg2type}}} @{saveflag} {{desc=@{atk_desc}}} @{hldmg} @{spelllevel} @{charname_output}"></button>
+                    <button type="roll" name="roll_attack_crit" style="display: none;" value="@{wtype}&{template:dmg} {{crit=1}} {{rname=@{atkname}}} @{atkflag} {{range=@{atkrange}}} @{dmgflag} {{dmg1=[[@{hidden_dmg1}]]}} {{dmg1type=@{hidden_dmg1type}}} @{dmg2flag} {{dmg2=[[@{hidden_dmg2}]]}} {{dmg2type=@{hidden_dmg2type}}} {{crit1=[[@{hidden_crit1}]]}} {{crit2=[[@{hidden_crit2}]]}} @{saveflag} {{desc=@{atk_desc}}} @{hldmg} @{spelllevel} @{charname_output}"></button>
                     <input type="hidden" name="attr_itemid">
                     <input type="hidden" name="attr_spellid">
                 </fieldset>
@@ -1635,7 +1637,7 @@
                 <span class="label" data-i18n="spell-ability-u">SPELLCASTING ABILITY</span>
             </div>
             <div class="part">
-                <input type="text" name="attr_spell_save_dc" value="(@{spellcasting_ability}(8+@{pb}))" disabled="true">
+                <input type="text" name="attr_spell_save_dc" value="(@{spellcasting_ability}(8+@{pb}+@{spell_dc_mod}))" disabled="true">
                 <span class="label" data-i18n="spell-save-dc-u">SPELL SAVE DC</span>
             </div>
             <div class="part">
@@ -3415,6 +3417,35 @@
                     <input type="text" class="num" name="attr_caster_level">
                 </div>
                 <div class="row">
+                    <span data-i18n="spell_dc_mod:-u">SPELL SAVE DC MOD:</span>
+                    <input type="text" class="num" name="attr_spell_dc_mod" placeholde="0" value="0">
+                </div>
+                <div class="row">
+                    <input type="checkbox" name="attr_custom_ac_flag" value="1">
+                    <span data-i18n="custom_ac:-u">CUSTOM AC:</span>
+                    <input type="text" class="num" name="attr_custom_ac_base" placeholde="10" value="10">
+                    <span>+</span>
+                    <select name="attr_custom_ac_part1">
+                        <option value="none" selected="selected" data-i18n="none-u">NONE</option>
+                        <option value="Strength" data-i18n="str-u">STR</option>
+                        <option value="Dexterity" data-i18n="dex-u">DEX</option>
+                        <option value="Constitution" data-i18n="con-u">CON</option>
+                        <option value="Intelligence" data-i18n="int-u">INT</option>
+                        <option value="Wisdom" data-i18n="wis-u">WIS</option>
+                        <option value="Charisma" data-i18n="cha-u">CHA</option>
+                    </select>
+                    <span>+</span>
+                    <select name="attr_custom_ac_part2">
+                        <option value="none" selected="selected" data-i18n="none-u">NONE</option>
+                        <option value="Strength" data-i18n="str-u">STR</option>
+                        <option value="Dexterity" data-i18n="dex-u">DEX</option>
+                        <option value="Constitution" data-i18n="con-u">CON</option>
+                        <option value="Intelligence" data-i18n="int-u">INT</option>
+                        <option value="Wisdom" data-i18n="wis-u">WIS</option>
+                        <option value="Charisma" data-i18n="cha-u">CHA</option>
+                    </select>
+                </div>
+                <div class="row">
                     <input type="checkbox" name="attr_halflingluck_flag" value="1">
                     <span data-i18n="halfling-luck-u">HALFLING LUCK</span>
                 </div>
@@ -3427,7 +3458,7 @@
                     <span data-i18n="arcane-rogue-u">ARCANE ROGUE</span>
                 </div>
                 <div class="row title">
-                    <span data-i18n="class-options-u">CLASS OPTIONS (<input type="text" name="attr_class_label" value="@{class}" disabled="true">)</span>
+                    <span data-i18n="class-options-u">CLASS OPTIONS (<span name="attr_class" data-i18n-dynamic></span>)</span>
                 </div>
             </div>
             <div class="class_options">
@@ -4759,7 +4790,7 @@
         });
     });
     
-    on("change:repeating_tool:toolname_base change:repeating_tool:toolbonus_base change:repeating_tool:toolattr_base", function() {
+    on("change:repeating_tool:toolname_base change:repeating_tool:toolbonus_base change:repeating_tool:toolattr_base change:repeating_tool:tool_mod", function() {
         updateTool();
     });
     
@@ -5176,11 +5207,27 @@
         updateglobalsave();
     });
 
-    on("change:dexterity change:repeating_inventory:equipped change:globalacmod change:repeating_inventory:itemmodifiers", function() {
-        updateac();
+    on("change:dexterity change:repeating_inventory:equipped change:globalacmod change:repeating_inventory:itemmodifiers change:custom_ac_flag change:custom_ac_base change:custom_ac_part1 change:custom_ac_part2", function() {
+        getAttrs(["simpleinventory","custom_ac_flag"], function(v) {
+            if(v.custom_ac_flag === "1") {
+                getAttrs(["custom_ac_base","custom_ac_part1","custom_ac_part2","strength","dexterity","constitution","intelligence","wisdom","charisma"], function(b) {
+                    var base = isNaN(parseInt(b.custom_ac_base, 10)) === false ? parseInt(b.custom_ac_base, 10) : 10;
+                    var part1attr = b.custom_ac_part1.toLowerCase();
+                    var part2attr = b.custom_ac_part2.toLowerCase();
+                    var part1 = part1attr === "none" ? 0 : Math.floor((parseInt(b[part1attr])-10)/2);
+                    var part2 = part2attr === "none" ? 0 : Math.floor((parseInt(b[part2attr])-10)/2);
+                    var total = base + part1 + part2;
+                    setAttrs({ac: total});
+                });
+            }
+            else if(v.simpleinventory === "complex") {
+                updateac();
+            }
+        });
     });
 
     on("change:repeating_inventory:itemmodifiers", function() {
+        updateglobalsave();
         getAttrs(["repeating_inventory_itemmodifiers"], function(v) {
             if(v.repeating_inventory_itemmodifiers && v.repeating_inventory_itemmodifiers.toLowerCase().indexOf("spell attack") > -1) {
                 var spellbonus = 0;
@@ -6176,13 +6223,14 @@
     };
     
     var updateTool = function() {
-        getAttrs(["repeating_tool_toolname_base","repeating_tool_toolbonus_base","level","repeating_tool_toolattr_base","strength","dexterity","constitution","intelligence","wisdom","charisma"], function(v) {
-            pb = (Math.ceil((v.level)/1e10) + Math.ceil((v.level)/4))
+        getAttrs(["repeating_tool_toolname_base","repeating_tool_toolbonus_base","repeating_tool_tool_mod","level","repeating_tool_toolattr_base","strength","dexterity","constitution","intelligence","wisdom","charisma"], function(v) {
+            var pb = (Math.ceil((v.level)/1e10) + Math.ceil((v.level)/4))
             if(v.repeating_tool_toolbonus_base === "(@{pb})") {bonus = pb}
             else if(v.repeating_tool_toolbonus_base === "(@{pb}*2)") {bonus = pb*2}
             else if(v.repeating_tool_toolbonus_base === "(floor(@{pb}/2))") {bonus = Math.floor(pb/2)};
-            attr = v.repeating_tool_toolattr_base.substring(0, v.repeating_tool_toolattr_base.length - 5).substr(2).toUpperCase();
-            bonus = bonus + Math.floor((parseInt(v[attr.toLowerCase()],10) - 10) / 2);
+            var attr = v.repeating_tool_toolattr_base.substring(0, v.repeating_tool_toolattr_base.length - 5).substr(2).toUpperCase();
+            var mod = v.repeating_tool_tool_mod && isNaN(parseInt(v.repeating_tool_tool_mod,10)) === false ? parseInt(v.repeating_tool_tool_mod,10) : 0;
+            var bonus = bonus + Math.floor((parseInt(v[attr.toLowerCase()],10) - 10) / 2) + mod;
             setAttrs({
                 repeating_tool_toolname: v.repeating_tool_toolname_base,
                 repeating_tool_toolbonus: bonus,
@@ -6314,7 +6362,7 @@
             }
             if(v.dtype === "full") {
                 pickbase = "full";
-                rollbase = "@{wtype}&{template:atkdmg} {{mod=@{atkbonus}}} {{rname=@{atkname}}} {{r1=[[@{hidden_r1base}@{halflingluck}cs>@{atkcritrange}@{hidden_atkbonus}]]}} @{hidden_r2base}@{halflingluck}cs>@{atkcritrange}@{hidden_atkbonus}]]}} @{atkflag} {{range=@{atkrange}}} @{dmgflag} {{dmg1=[[@{hidden_dmg1}]]}} {{dmg1type=@{hidden_dmg1type}}} @{dmg2flag} {{dmg2=[[@{hidden_dmg2}]]}}} {{dmg2type=@{hidden_dmg2type}}} {{crit1=[[@{hidden_crit1}]]}} {{crit2=[[@{hidden_crit2}]]}} @{saveflag} {{desc=@{atk_desc}}} @{hldmg} @{spelllevel} ammo=@{ammo} @{charname_output}";
+                rollbase = "@{wtype}&{template:atkdmg} {{mod=@{atkbonus}}} {{rname=@{atkname}}} {{r1=[[@{hidden_r1base}@{halflingluck}cs>@{atkcritrange}@{hidden_atkbonus}]]}} @{hidden_r2base}@{halflingluck}cs>@{atkcritrange}@{hidden_atkbonus}]]}} @{atkflag} {{range=@{atkrange}}} @{dmgflag} {{dmg1=[[@{hidden_dmg1}]]}} {{dmg1type=@{hidden_dmg1type}}} @{dmg2flag} {{dmg2=[[@{hidden_dmg2}]]}} {{dmg2type=@{hidden_dmg2type}}} {{crit1=[[@{hidden_crit1}]]}} {{crit2=[[@{hidden_crit2}]]}} @{saveflag} {{desc=@{atk_desc}}} @{hldmg} @{spelllevel} ammo=@{ammo} @{charname_output}";
             }
             else if(v.repeating_attack_atkflag && v.repeating_attack_atkflag != 0) {
                 pickbase = "pick";
@@ -6322,7 +6370,7 @@
             }
             else if(v.repeating_attack_dmgflag && v.repeating_attack_dmgflag != 0) {
                 pickbase = "dmg";
-                rollbase = "@{wtype}&{template:dmg} {{rname=@{atkname}}} @{atkflag} {{range=@{atkrange}}} @{dmgflag} {{dmg1=[[@{hidden_dmg1}]]}} {{dmg1type=@{hidden_dmg1type}}} @{dmg2flag} {{dmg2=[[@{hidden_dmg2}]]}}} {{dmg2type=@{hidden_dmg2type}}} @{saveflag} {{desc=@{atk_desc}}} @{hldmg} @{spelllevel} ammo=@{ammo} @{charname_output}"
+                rollbase = "@{wtype}&{template:dmg} {{rname=@{atkname}}} @{atkflag} {{range=@{atkrange}}} @{dmgflag} {{dmg1=[[@{hidden_dmg1}]]}} {{dmg1type=@{hidden_dmg1type}}} @{dmg2flag} {{dmg2=[[@{hidden_dmg2}]]}} {{dmg2type=@{hidden_dmg2type}}} @{saveflag} {{desc=@{atk_desc}}} @{hldmg} @{spelllevel} ammo=@{ammo} @{charname_output}"
             }
             else {
                 pickbase = "empty";
@@ -6399,6 +6447,7 @@
                     }
                     else {
                         quietupdate["repeating_attack_" + atkid + "_atkattr_base"] = v.spellcasting_ability.slice(0, -1);
+                        quietupdate["repeating_attack_" + atkid + "_atkflag"] = "{{attack=1}}";
                     }
                     if(v["repeating_spell" + cat + "_" + repid + "spelldamage"] && v["repeating_spell" + cat + "_" + repid + "spelldamage"] != "") {
                         quietupdate["repeating_attack_" + atkid + "_dmgbase"] = v["repeating_spell" + cat + "_" + repid + "spelldamage"];
@@ -6485,7 +6534,6 @@
                     }
                 }
             }
-            console.log(quietupdate);
             setAttrs(quietupdate, {silent: true});
             setAttrs(update);
         });
@@ -6548,31 +6596,31 @@
             var languages = v.npc_languages && v.npc_languages != "" ? v.npc_languages : "-";
             var challenge = v.npc_challenge && v.npc_challenge != "" ? v.npc_challenge : "-";
             var xp = v.npc_xp && v.npc_xp != "" ? "(" + v.npc_xp + " XP)" : "(-)";
-            // 1 = First Entry Single Digit, 2 = First Entry Double Digit, 3 = Later Entry Single Digit, 4 = Later Entry Double Digit
-            if(v.npc_str_save && v.npc_str_save != "") {str_save = parseInt(v.npc_str_save, 10); if(first_save === 0 && str_save < 10) {str_save_flag = 1} else if(first_save === 0 && str_save > 9) {str_save_flag = 2}  else if(first_save === 1 && str_save < 10) {str_save_flag = 3} else if(first_save === 1 && str_save > 9) {str_save_flag = 4}; first_save = 1;} else {str_save_flag = 0; str_save = "";}
-            if(v.npc_dex_save && v.npc_dex_save != "") {dex_save = parseInt(v.npc_dex_save, 10); if(first_save === 0 && dex_save < 10) {dex_save_flag = 1} else if(first_save === 0 && dex_save > 9) {dex_save_flag = 2}  else if(first_save === 1 && dex_save < 10) {dex_save_flag = 3} else if(first_save === 1 && dex_save > 9) {dex_save_flag = 4}; first_save = 1;} else {dex_save_flag = 0; dex_save = "";}
-            if(v.npc_con_save && v.npc_con_save != "") {con_save = parseInt(v.npc_con_save, 10); if(first_save === 0 && con_save < 10) {con_save_flag = 1} else if(first_save === 0 && con_save > 9) {con_save_flag = 2}  else if(first_save === 1 && con_save < 10) {con_save_flag = 3} else if(first_save === 1 && con_save > 9) {con_save_flag = 4}; first_save = 1;} else {con_save_flag = 0; con_save = "";}
-            if(v.npc_int_save && v.npc_int_save != "") {int_save = parseInt(v.npc_int_save, 10); if(first_save === 0 && int_save < 10) {int_save_flag = 1} else if(first_save === 0 && int_save > 9) {int_save_flag = 2}  else if(first_save === 1 && int_save < 10) {int_save_flag = 3} else if(first_save === 1 && int_save > 9) {int_save_flag = 4}; first_save = 1;} else {int_save_flag = 0; int_save = "";}
-            if(v.npc_wis_save && v.npc_wis_save != "") {wis_save = parseInt(v.npc_wis_save, 10); if(first_save === 0 && wis_save < 10) {wis_save_flag = 1} else if(first_save === 0 && wis_save > 9) {wis_save_flag = 2}  else if(first_save === 1 && wis_save < 10) {wis_save_flag = 3} else if(first_save === 1 && wis_save > 9) {wis_save_flag = 4}; first_save = 1;} else {wis_save_flag = 0; wis_save = "";}
-            if(v.npc_cha_save && v.npc_cha_save != "") {cha_save = parseInt(v.npc_cha_save, 10); if(first_save === 0 && cha_save < 10) {cha_save_flag = 1} else if(first_save === 0 && cha_save > 9) {cha_save_flag = 2}  else if(first_save === 1 && cha_save < 10) {cha_save_flag = 3} else if(first_save === 1 && cha_save > 9) {cha_save_flag = 4}; first_save = 1;} else {cha_save_flag = 0; cha_save = "";}
-            if(v.npc_acrobatics && v.npc_acrobatics != "") {acrobatics = parseInt(v.npc_acrobatics, 10); if(first_skill === 0 && acrobatics < 10) {acrobatics_flag = 1} else if(first_skill === 0 && acrobatics > 9) {acrobatics_flag = 2}  else if(first_skill === 1 && acrobatics < 10) {acrobatics_flag = 3} else if(first_skill === 1 && acrobatics > 9) {acrobatics_flag = 4}; first_skill = 1;} else {acrobatics_flag = 0; acrobatics = "";}
-            if(v.npc_animal_handling && v.npc_animal_handling != "") {animal_handling = parseInt(v.npc_animal_handling, 10); if(first_skill === 0 && animal_handling < 10) {animal_handling_flag = 1} else if(first_skill === 0 && animal_handling > 9) {animal_handling_flag = 2}  else if(first_skill === 1 && animal_handling < 10) {animal_handling_flag = 3} else if(first_skill === 1 && animal_handling > 9) {animal_handling_flag = 4}; first_skill = 1;} else {animal_handling_flag = 0; animal_handling = "";}
-            if(v.npc_arcana && v.npc_arcana != "") {arcana = parseInt(v.npc_arcana, 10); if(first_skill === 0 && arcana < 10) {arcana_flag = 1} else if(first_skill === 0 && arcana > 9) {arcana_flag = 2}  else if(first_skill === 1 && arcana < 10) {arcana_flag = 3} else if(first_skill === 1 && arcana > 9) {arcana_flag = 4}; first_skill = 1;} else {arcana_flag = 0; arcana = "";}
-            if(v.npc_athletics && v.npc_athletics != "") {athletics = parseInt(v.npc_athletics, 10); if(first_skill === 0 && athletics < 10) {athletics_flag = 1} else if(first_skill === 0 && athletics > 9) {athletics_flag = 2}  else if(first_skill === 1 && athletics < 10) {athletics_flag = 3} else if(first_skill === 1 && athletics > 9) {athletics_flag = 4}; first_skill = 1;} else {athletics_flag = 0; athletics = "";}
-            if(v.npc_deception && v.npc_deception != "") {deception = parseInt(v.npc_deception, 10); if(first_skill === 0 && deception < 10) {deception_flag = 1} else if(first_skill === 0 && deception > 9) {deception_flag = 2}  else if(first_skill === 1 && deception < 10) {deception_flag = 3} else if(first_skill === 1 && deception > 9) {deception_flag = 4}; first_skill = 1;} else {deception_flag = 0; deception = "";}
-            if(v.npc_history && v.npc_history != "") {history = parseInt(v.npc_history, 10); if(first_skill === 0 && history < 10) {history_flag = 1} else if(first_skill === 0 && history > 9) {history_flag = 2}  else if(first_skill === 1 && history < 10) {history_flag = 3} else if(first_skill === 1 && history > 9) {history_flag = 4}; first_skill = 1;} else {history_flag = 0; history = "";}
-            if(v.npc_insight && v.npc_insight != "") {insight = parseInt(v.npc_insight, 10); if(first_skill === 0 && insight < 10) {insight_flag = 1} else if(first_skill === 0 && insight > 9) {insight_flag = 2}  else if(first_skill === 1 && insight < 10) {insight_flag = 3} else if(first_skill === 1 && insight > 9) {insight_flag = 4}; first_skill = 1;} else {insight_flag = 0; insight = "";}
-            if(v.npc_intimidation && v.npc_intimidation != "") {intimidation = parseInt(v.npc_intimidation, 10); if(first_skill === 0 && intimidation < 10) {intimidation_flag = 1} else if(first_skill === 0 && intimidation > 9) {intimidation_flag = 2}  else if(first_skill === 1 && intimidation < 10) {intimidation_flag = 3} else if(first_skill === 1 && intimidation > 9) {intimidation_flag = 4}; first_skill = 1;} else {intimidation_flag = 0; intimidation = "";}
-            if(v.npc_investigation && v.npc_investigation != "") {investigation = parseInt(v.npc_investigation, 10); if(first_skill === 0 && investigation < 10) {investigation_flag = 1} else if(first_skill === 0 && investigation > 9) {investigation_flag = 2}  else if(first_skill === 1 && investigation < 10) {investigation_flag = 3} else if(first_skill === 1 && investigation > 9) {investigation_flag = 4}; first_skill = 1;} else {investigation_flag = 0; investigation = "";}
-            if(v.npc_medicine && v.npc_medicine != "") {medicine = parseInt(v.npc_medicine, 10); if(first_skill === 0 && medicine < 10) {medicine_flag = 1} else if(first_skill === 0 && medicine > 9) {medicine_flag = 2}  else if(first_skill === 1 && medicine < 10) {medicine_flag = 3} else if(first_skill === 1 && medicine > 9) {medicine_flag = 4}; first_skill = 1;} else {medicine_flag = 0; medicine = "";}
-            if(v.npc_nature && v.npc_nature != "") {nature = parseInt(v.npc_nature, 10); if(first_skill === 0 && nature < 10) {nature_flag = 1} else if(first_skill === 0 && nature > 9) {nature_flag = 2}  else if(first_skill === 1 && nature < 10) {nature_flag = 3} else if(first_skill === 1 && nature > 9) {nature_flag = 4}; first_skill = 1;} else {nature_flag = 0; nature = "";}
-            if(v.npc_perception && v.npc_perception != "") {perception = parseInt(v.npc_perception, 10); if(first_skill === 0 && perception < 10) {perception_flag = 1} else if(first_skill === 0 && perception > 9) {perception_flag = 2}  else if(first_skill === 1 && perception < 10) {perception_flag = 3} else if(first_skill === 1 && perception > 9) {perception_flag = 4}; first_skill = 1;} else {perception_flag = 0; perception = "";}
-            if(v.npc_performance && v.npc_performance != "") {sperformance = parseInt(v.npc_performance, 10); if(first_skill === 0 && sperformance < 10) {performance_flag = 1} else if(first_skill === 0 && sperformance > 9) {performance_flag = 2}  else if(first_skill === 1 && sperformance < 10) {performance_flag = 3} else if(first_skill === 1 && sperformance > 9) {performance_flag = 4}; first_skill = 1;} else {performance_flag = 0; sperformance = "";}
-            if(v.npc_persuasion && v.npc_persuasion != "") {persuasion = parseInt(v.npc_persuasion, 10); if(first_skill === 0 && persuasion < 10) {persuasion_flag = 1} else if(first_skill === 0 && persuasion > 9) {persuasion_flag = 2}  else if(first_skill === 1 && persuasion < 10) {persuasion_flag = 3} else if(first_skill === 1 && persuasion > 9) {persuasion_flag = 4}; first_skill = 1;} else {persuasion_flag = 0; persuasion = "";}
-            if(v.npc_religion && v.npc_religion != "") {religion = parseInt(v.npc_religion, 10); if(first_skill === 0 && religion < 10) {religion_flag = 1} else if(first_skill === 0 && religion > 9) {religion_flag = 2}  else if(first_skill === 1 && religion < 10) {religion_flag = 3} else if(first_skill === 1 && religion > 9) {religion_flag = 4}; first_skill = 1;} else {religion_flag = 0; religion = "";}
-            if(v.npc_sleight_of_hand && v.npc_sleight_of_hand != "") {sleight_of_hand = parseInt(v.npc_sleight_of_hand, 10); if(first_skill === 0 && sleight_of_hand < 10) {sleight_of_hand_flag = 1} else if(first_skill === 0 && sleight_of_hand > 9) {sleight_of_hand_flag = 2}  else if(first_skill === 1 && sleight_of_hand < 10) {sleight_of_hand_flag = 3} else if(first_skill === 1 && sleight_of_hand > 9) {sleight_of_hand_flag = 4}; first_skill = 1;} else {sleight_of_hand_flag = 0; sleight_of_hand = "";}
-            if(v.npc_stealth && v.npc_stealth != "") {stealth = parseInt(v.npc_stealth, 10); if(first_skill === 0 && stealth < 10) {stealth_flag = 1} else if(first_skill === 0 && stealth > 9) {stealth_flag = 2}  else if(first_skill === 1 && stealth < 10) {stealth_flag = 3} else if(first_skill === 1 && stealth > 9) {stealth_flag = 4}; first_skill = 1;} else {stealth_flag = 0; stealth = "";}
-            if(v.npc_survival && v.npc_survival != "") {survival = parseInt(v.npc_survival, 10); if(first_skill === 0 && survival < 10) {survival_flag = 1} else if(first_skill === 0 && survival > 9) {survival_flag = 2}  else if(first_skill === 1 && survival < 10) {survival_flag = 3} else if(first_skill === 1 && survival > 9) {survival_flag = 4}; first_skill = 1;} else {survival_flag = 0; survival = "";}
+            // 1 = First Entry Single Digit, 2 = First Entry Double Digit, 3 = Later Entry Single Digit, 4 = Later Entry Double Digit, 5 = Negative Bonus
+            if(v.npc_str_save && v.npc_str_save != "") {str_save = parseInt(v.npc_str_save, 10); if(str_save < 0) {str_save_flag = 5} else if(first_save === 0 && str_save < 10) {str_save_flag = 1} else if(first_save === 0 && str_save > 9) {str_save_flag = 2}  else if(first_save === 1 && str_save < 10) {str_save_flag = 3} else if(first_save === 1 && str_save > 9) {str_save_flag = 4}; first_save = 1;} else {str_save_flag = 0; str_save = "";}
+            if(v.npc_dex_save && v.npc_dex_save != "") {dex_save = parseInt(v.npc_dex_save, 10); if(dex_save < 0) {dex_save_flag = 5} else if(first_save === 0 && dex_save < 10) {dex_save_flag = 1} else if(first_save === 0 && dex_save > 9) {dex_save_flag = 2}  else if(first_save === 1 && dex_save < 10) {dex_save_flag = 3} else if(first_save === 1 && dex_save > 9) {dex_save_flag = 4}; first_save = 1;} else {dex_save_flag = 0; dex_save = "";}
+            if(v.npc_con_save && v.npc_con_save != "") {con_save = parseInt(v.npc_con_save, 10); if(con_save < 0) {con_save_flag = 5} else if(first_save === 0 && con_save < 10) {con_save_flag = 1} else if(first_save === 0 && con_save > 9) {con_save_flag = 2}  else if(first_save === 1 && con_save < 10) {con_save_flag = 3} else if(first_save === 1 && con_save > 9) {con_save_flag = 4}; first_save = 1;} else {con_save_flag = 0; con_save = "";}
+            if(v.npc_int_save && v.npc_int_save != "") {int_save = parseInt(v.npc_int_save, 10); if(int_save < 0) {int_save_flag = 5} else if(first_save === 0 && int_save < 10) {int_save_flag = 1} else if(first_save === 0 && int_save > 9) {int_save_flag = 2}  else if(first_save === 1 && int_save < 10) {int_save_flag = 3} else if(first_save === 1 && int_save > 9) {int_save_flag = 4}; first_save = 1;} else {int_save_flag = 0; int_save = "";}
+            if(v.npc_wis_save && v.npc_wis_save != "") {wis_save = parseInt(v.npc_wis_save, 10); if(wis_save < 0) {wis_save_flag = 5} else if(first_save === 0 && wis_save < 10) {wis_save_flag = 1} else if(first_save === 0 && wis_save > 9) {wis_save_flag = 2}  else if(first_save === 1 && wis_save < 10) {wis_save_flag = 3} else if(first_save === 1 && wis_save > 9) {wis_save_flag = 4}; first_save = 1;} else {wis_save_flag = 0; wis_save = "";}
+            if(v.npc_cha_save && v.npc_cha_save != "") {cha_save = parseInt(v.npc_cha_save, 10); if(cha_save < 0) {cha_save_flag = 5} else if(first_save === 0 && cha_save < 10) {cha_save_flag = 1} else if(first_save === 0 && cha_save > 9) {cha_save_flag = 2}  else if(first_save === 1 && cha_save < 10) {cha_save_flag = 3} else if(first_save === 1 && cha_save > 9) {cha_save_flag = 4}; first_save = 1;} else {cha_save_flag = 0; cha_save = "";}
+            if(v.npc_acrobatics && v.npc_acrobatics != "") {acrobatics = parseInt(v.npc_acrobatics, 10); if(acrobatics < 0) {acrobatics_flag = 5} else if(first_skill === 0 && acrobatics < 10) {acrobatics_flag = 1} else if(first_skill === 0 && acrobatics > 9) {acrobatics_flag = 2}  else if(first_skill === 1 && acrobatics < 10) {acrobatics_flag = 3} else if(first_skill === 1 && acrobatics > 9) {acrobatics_flag = 4}; first_skill = 1;} else {acrobatics_flag = 0; acrobatics = "";}
+            if(v.npc_animal_handling && v.npc_animal_handling != "") {animal_handling = parseInt(v.npc_animal_handling, 10); if(animal_handling < 0) {animal_handling_flag = 5} else if(first_skill === 0 && animal_handling < 10) {animal_handling_flag = 1} else if(first_skill === 0 && animal_handling > 9) {animal_handling_flag = 2}  else if(first_skill === 1 && animal_handling < 10) {animal_handling_flag = 3} else if(first_skill === 1 && animal_handling > 9) {animal_handling_flag = 4}; first_skill = 1;} else {animal_handling_flag = 0; animal_handling = "";}
+            if(v.npc_arcana && v.npc_arcana != "") {arcana = parseInt(v.npc_arcana, 10); if(arcana < 0) {arcana_flag = 5} else if(first_skill === 0 && arcana < 10) {arcana_flag = 1} else if(first_skill === 0 && arcana > 9) {arcana_flag = 2}  else if(first_skill === 1 && arcana < 10) {arcana_flag = 3} else if(first_skill === 1 && arcana > 9) {arcana_flag = 4}; first_skill = 1;} else {arcana_flag = 0; arcana = "";}
+            if(v.npc_athletics && v.npc_athletics != "") {athletics = parseInt(v.npc_athletics, 10); if(athletics < 0) {athletics_flag = 5} else if(first_skill === 0 && athletics < 10) {athletics_flag = 1} else if(first_skill === 0 && athletics > 9) {athletics_flag = 2}  else if(first_skill === 1 && athletics < 10) {athletics_flag = 3} else if(first_skill === 1 && athletics > 9) {athletics_flag = 4}; first_skill = 1;} else {athletics_flag = 0; athletics = "";}
+            if(v.npc_deception && v.npc_deception != "") {deception = parseInt(v.npc_deception, 10); if(deception < 0) {deception_flag = 5} else if(first_skill === 0 && deception < 10) {deception_flag = 1} else if(first_skill === 0 && deception > 9) {deception_flag = 2}  else if(first_skill === 1 && deception < 10) {deception_flag = 3} else if(first_skill === 1 && deception > 9) {deception_flag = 4}; first_skill = 1;} else {deception_flag = 0; deception = "";}
+            if(v.npc_history && v.npc_history != "") {history = parseInt(v.npc_history, 10); if(history < 0) {history_flag = 5} else if(first_skill === 0 && history < 10) {history_flag = 1} else if(first_skill === 0 && history > 9) {history_flag = 2}  else if(first_skill === 1 && history < 10) {history_flag = 3} else if(first_skill === 1 && history > 9) {history_flag = 4}; first_skill = 1;} else {history_flag = 0; history = "";}
+            if(v.npc_insight && v.npc_insight != "") {insight = parseInt(v.npc_insight, 10); if(insight < 0) {insight_flag = 5} else if(first_skill === 0 && insight < 10) {insight_flag = 1} else if(first_skill === 0 && insight > 9) {insight_flag = 2}  else if(first_skill === 1 && insight < 10) {insight_flag = 3} else if(first_skill === 1 && insight > 9) {insight_flag = 4}; first_skill = 1;} else {insight_flag = 0; insight = "";}
+            if(v.npc_intimidation && v.npc_intimidation != "") {intimidation = parseInt(v.npc_intimidation, 10); if(intimidation < 0) {intimidation_flag = 5} else if(first_skill === 0 && intimidation < 10) {intimidation_flag = 1} else if(first_skill === 0 && intimidation > 9) {intimidation_flag = 2}  else if(first_skill === 1 && intimidation < 10) {intimidation_flag = 3} else if(first_skill === 1 && intimidation > 9) {intimidation_flag = 4}; first_skill = 1;} else {intimidation_flag = 0; intimidation = "";}
+            if(v.npc_investigation && v.npc_investigation != "") {investigation = parseInt(v.npc_investigation, 10); if(investigation < 0) {investigation_flag = 5} else if(first_skill === 0 && investigation < 10) {investigation_flag = 1} else if(first_skill === 0 && investigation > 9) {investigation_flag = 2}  else if(first_skill === 1 && investigation < 10) {investigation_flag = 3} else if(first_skill === 1 && investigation > 9) {investigation_flag = 4}; first_skill = 1;} else {investigation_flag = 0; investigation = "";}
+            if(v.npc_medicine && v.npc_medicine != "") {medicine = parseInt(v.npc_medicine, 10); if(medicine < 0) {medicine_flag = 5} else if(first_skill === 0 && medicine < 10) {medicine_flag = 1} else if(first_skill === 0 && medicine > 9) {medicine_flag = 2}  else if(first_skill === 1 && medicine < 10) {medicine_flag = 3} else if(first_skill === 1 && medicine > 9) {medicine_flag = 4}; first_skill = 1;} else {medicine_flag = 0; medicine = "";}
+            if(v.npc_nature && v.npc_nature != "") {nature = parseInt(v.npc_nature, 10); if(nature < 0) {nature_flag = 5} else if(first_skill === 0 && nature < 10) {nature_flag = 1} else if(first_skill === 0 && nature > 9) {nature_flag = 2}  else if(first_skill === 1 && nature < 10) {nature_flag = 3} else if(first_skill === 1 && nature > 9) {nature_flag = 4}; first_skill = 1;} else {nature_flag = 0; nature = "";}
+            if(v.npc_perception && v.npc_perception != "") {perception = parseInt(v.npc_perception, 10); if(perception < 0) {perception_flag = 5} else if(first_skill === 0 && perception < 10) {perception_flag = 1} else if(first_skill === 0 && perception > 9) {perception_flag = 2}  else if(first_skill === 1 && perception < 10) {perception_flag = 3} else if(first_skill === 1 && perception > 9) {perception_flag = 4}; first_skill = 1;} else {perception_flag = 0; perception = "";}
+            if(v.npc_performance && v.npc_performance != "") {sperformance = parseInt(v.npc_performance, 10); if(sperformance < 0) {performance_flag = 5} else if(first_skill === 0 && sperformance < 10) {performance_flag = 1} else if(first_skill === 0 && sperformance > 9) {performance_flag = 2}  else if(first_skill === 1 && sperformance < 10) {performance_flag = 3} else if(first_skill === 1 && sperformance > 9) {performance_flag = 4}; first_skill = 1;} else {performance_flag = 0; sperformance = "";}
+            if(v.npc_persuasion && v.npc_persuasion != "") {persuasion = parseInt(v.npc_persuasion, 10); if(persuasion < 0) {persuasion_flag = 5} else if(first_skill === 0 && persuasion < 10) {persuasion_flag = 1} else if(first_skill === 0 && persuasion > 9) {persuasion_flag = 2}  else if(first_skill === 1 && persuasion < 10) {persuasion_flag = 3} else if(first_skill === 1 && persuasion > 9) {persuasion_flag = 4}; first_skill = 1;} else {persuasion_flag = 0; persuasion = "";}
+            if(v.npc_religion && v.npc_religion != "") {religion = parseInt(v.npc_religion, 10); if(religion < 0) {religion_flag = 5} else if(first_skill === 0 && religion < 10) {religion_flag = 1} else if(first_skill === 0 && religion > 9) {religion_flag = 2}  else if(first_skill === 1 && religion < 10) {religion_flag = 3} else if(first_skill === 1 && religion > 9) {religion_flag = 4}; first_skill = 1;} else {religion_flag = 0; religion = "";}
+            if(v.npc_sleight_of_hand && v.npc_sleight_of_hand != "") {sleight_of_hand = parseInt(v.npc_sleight_of_hand, 10); if(sleight_of_hand < 0) {sleight_of_hand_flag = 5} else if(first_skill === 0 && sleight_of_hand < 10) {sleight_of_hand_flag = 1} else if(first_skill === 0 && sleight_of_hand > 9) {sleight_of_hand_flag = 2}  else if(first_skill === 1 && sleight_of_hand < 10) {sleight_of_hand_flag = 3} else if(first_skill === 1 && sleight_of_hand > 9) {sleight_of_hand_flag = 4}; first_skill = 1;} else {sleight_of_hand_flag = 0; sleight_of_hand = "";}
+            if(v.npc_stealth && v.npc_stealth != "") {stealth = parseInt(v.npc_stealth, 10); if(stealth < 0) {stealth_flag = 5} else if(first_skill === 0 && stealth < 10) {stealth_flag = 1} else if(first_skill === 0 && stealth > 9) {stealth_flag = 2}  else if(first_skill === 1 && stealth < 10) {stealth_flag = 3} else if(first_skill === 1 && stealth > 9) {stealth_flag = 4}; first_skill = 1;} else {stealth_flag = 0; stealth = "";}
+            if(v.npc_survival && v.npc_survival != "") {survival = parseInt(v.npc_survival, 10); if(survival < 0) {survival_flag = 5} else if(first_skill === 0 && survival < 10) {survival_flag = 1} else if(first_skill === 0 && survival > 9) {survival_flag = 2}  else if(first_skill === 1 && survival < 10) {survival_flag = 3} else if(first_skill === 1 && survival > 9) {survival_flag = 4}; first_skill = 1;} else {survival_flag = 0; survival = "";}
             leg_act = v.npc_legendary_actions && v.npc_legendary_actions != "" ? v.npc_legendary_actions : 0;
             react = v.npcreactionsflag && v.npcreactionsflag != "0" ? v.npcreactionsflag : 0;
             npcspells = v.npcspellcastingflag && v.npcspellcastingflag != "0" ? v.npcspellcastingflag : 0;
@@ -7484,6 +7532,10 @@
         force_refresh_attacks();
         doneupdating();
     }
+
+    var upgrade_1_5_to_1_6 = function(doneupdating) {
+        doneupdating();
+    }
     
     var versioning = function() {
         getAttrs(["version"], function(v) {
@@ -7527,8 +7579,15 @@
                     versioning();
                 });
             }
+            else if(v["version"] === "1.5") {
+                console.log("UPGRADING TO v1.6");
+                upgrade_1_5_to_1_6(function() {
+                    setAttrs({version: "1.6"});
+                    versioning();
+                });
+            }
             else {
-                setAttrs({version: "1.5"});
+                setAttrs({version: "1.6"});
                 console.log("5th Edition OGL by Roll20 version " + v["version"]);
             }
         });
