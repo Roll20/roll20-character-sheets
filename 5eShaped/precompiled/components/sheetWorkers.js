@@ -3782,17 +3782,72 @@ on('change:skills_srd', () => {
   updateSkillsFromSRD();
 });
 
-const updateSavingThrow = (ability, savingThrowName) => {
-  if (!savingThrowName) {
-    savingThrowName = ability;
+const getHighestOfAbilityScoresForSavingThrow = (v, savingThrowName) => {
+  let abilityName;
+  let highestValue = 0;
+  for (const ability of ABILITIES) {
+    const abilityMod = getIntValue(v[`${ability}_mod`]);
+    if (v[`${savingThrowName}_${ability}`] === '1' && (highestValue === 0 || abilityMod > highestValue)) {
+      highestValue = abilityMod;
+      abilityName = ability;
+    }
+  }
+  return abilityName;
+};
+const getAverageOfAbilityScoresForSavingThrow = (v, savingThrowName) => {
+  let obj = {
+    abilitiesUsed: []
+  };
+  let sum = 0;
+  for (const ability of ABILITIES) {
+    if (v[`${savingThrowName}_${ability}`] === '1') {
+      obj.abilitiesUsed.push(getAbilityShortName(ability));
+      sum += (getIntValue(v[`${ability}_calculated`]) - 10) / 2;
+    }
+  }
+
+  if (obj.abilitiesUsed.length > 0) {
+    console.log('sum', sum, obj.abilitiesUsed.length);
+    obj.avg = Math.floor(sum / obj.abilitiesUsed.length)
+  }
+  return obj;
+};
+
+const updateSavingThrow = (savingThrowName) => {
+  const collectionArray = ['pb', `${savingThrowName}_save_prof`, `${savingThrowName}_save_bonus`, 'global_saving_throw_bonus', 'saving_throws_half_proficiency', 'average_of_abilities'];
+  for (const ability of ABILITIES) {
+    collectionArray.push(`${ability}_calculated`);
+    collectionArray.push(`${ability}_mod`);
+    collectionArray.push(`${savingThrowName}_${ability}`);
   }
 
   getSetItems({
-    collectionArray: ['pb', `${ability}_mod`, `${savingThrowName}_save_prof`, `${savingThrowName}_save_bonus`, 'global_saving_throw_bonus', 'saving_throws_half_proficiency'],
+    collectionArray,
     callback: (v, finalSetAttrs) => {
-      const abilityMod = getIntValue(v[`${ability}_mod`]);
-      let total = abilityMod;
-      let totalFormula = `${abilityMod}[${getAbilityShortName(ability)}]`;
+      let total = '';
+      let totalFormula = '';
+      let ability;
+
+      if (savingThrowName === 'fortitude' || savingThrowName === 'reflex' || savingThrowName === 'will') {
+        if (v.average_of_abilities === '1') {
+          let obj = getAverageOfAbilityScoresForSavingThrow(v, savingThrowName);
+
+          if (obj.avg) {
+            total = obj.avg;
+            totalFormula = `${obj.avg}[${obj.abilitiesUsed.join(' ')}]`;
+          }
+        } else {
+          ability = getHighestOfAbilityScoresForSavingThrow(v, savingThrowName);
+        }
+      } else {
+        ability = savingThrowName;
+      }
+
+      if (ability) {
+        const abilityMod = getIntValue(v[`${ability}_mod`]);
+        total = abilityMod;
+        totalFormula = `${abilityMod}[${getAbilityShortName(ability)}]`;
+      }
 
       const pb = getIntValue(v.pb);
       if (v[`${savingThrowName}_save_prof`] === '@{PB}') {
@@ -3823,46 +3878,10 @@ const updateSavingThrow = (ability, savingThrowName) => {
     },
   });
 };
-const getHighestAbilityForCustomSavingThrows = (savingThrowName, callback) => {
-  const collectionArray = [];
-
-  for (const ability of ABILITIES) {
-    collectionArray.push(`${ability}_mod`);
-    collectionArray.push(`${savingThrowName}_${ability}`);
-  }
-
-  getAttrs(collectionArray, (v) => {
-    let abilityName;
-    let highestValue = 0;
-
-    for (const ability of ABILITIES) {
-      const abilityMod = getIntValue(v[`${ability}_mod`]);
-      if (v[`${savingThrowName}_${ability}`] === '1' && (highestValue === 0 || abilityMod > highestValue)) {
-        highestValue = abilityMod;
-        abilityName = ability;
-      }
-    }
-    callback(abilityName);
-  });
-};
-const updateCustomSavingThrow = (savingThrowName) => {
-  getHighestAbilityForCustomSavingThrows(savingThrowName, (abilityName) => {
-    if (!abilityName) {
-      if (savingThrowName === 'fortitude') {
-        abilityName = 'constitution';
-      } else if (savingThrowName === 'reflex') {
-        abilityName = 'dexterity';
-      } else if (savingThrowName === 'will') {
-        abilityName = 'wisdom';
-      }
-    }
-    updateSavingThrow(abilityName, savingThrowName);
-  });
-};
 const updateCustomSavingThrows = () => {
-  updateCustomSavingThrow('fortitude');
-  updateCustomSavingThrow('reflex');
-  updateCustomSavingThrow('will');
+  updateSavingThrow('fortitude');
+  updateSavingThrow('reflex');
+  updateSavingThrow('will');
 };
 const updateSavingThrows = () => {
   updateSavingThrow('strength');
@@ -3894,23 +3913,24 @@ on('change:wisdom_mod change:wisdom_save_prof change:wisdom_save_bonus', () => {
 on('change:charisma_mod change:charisma_save_prof change:charisma_save_bonus', () => {
   updateSavingThrow('charisma');
 });
-const watchAbilityModChanges = () => {
+const watchAbilityChanges = () => {
   const classFeatureWatch = [];
   for (const ability of ABILITIES) {
+    classFeatureWatch.push(`change:${ability}`);
     classFeatureWatch.push(`change:${ability}_mod`);
   }
   on(classFeatureWatch.join(' '), () => {
     updateCustomSavingThrows();
   });
 };
-watchAbilityModChanges();
+watchAbilityChanges();
 const watchForCustomSavingThrowChanges = (savingThrowName) => {
-  const classFeatureWatch = [`change:${savingThrowName}_save_prof`, `change:${savingThrowName}_save_bonus`];
+  const classFeatureWatch = [`change:${savingThrowName}_save_prof`, `change:${savingThrowName}_save_bonus`, 'change:average_of_abilities'];
   for (const ability of ABILITIES) {
     classFeatureWatch.push(`change:${savingThrowName}_${ability}`);
   }
   on(classFeatureWatch.join(' '), () => {
-    updateCustomSavingThrow(savingThrowName);
+    updateSavingThrow(savingThrowName);
   });
 };
 watchForCustomSavingThrowChanges('fortitude');
