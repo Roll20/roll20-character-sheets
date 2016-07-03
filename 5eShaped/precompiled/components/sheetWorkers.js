@@ -2381,21 +2381,33 @@ on('change:remarkable_athlete_toggle', () => {
 });
 
 const updateInitiative = () => {
+  const collectionArray = ['initiative', 'initiative_ability', 'initiative_formula', 'initiative_bonus', 'jack_of_all_trades_toggle', 'jack_of_all_trades', 'remarkable_athlete_toggle', 'remarkable_athlete', 'global_check_bonus'];
+  for (const ability of ABILITIES) {
+    collectionArray.push(`${ability}_mod`);
+    collectionArray.push(`${ability}_check_bonus`);
+  }
+
   getSetItems({
-    collectionArray: ['initiative', 'initiative_formula', 'dexterity_mod', 'dexterity_check_bonus', 'initiative_bonus', 'jack_of_all_trades_toggle', 'jack_of_all_trades', 'remarkable_athlete_toggle', 'remarkable_athlete', 'global_check_bonus'],
+    collectionArray,
     callback: (v, finalSetAttrs) => {
       finalSetAttrs.initiative = 0;
 
-      const dexMod = getIntValue(v.dexterity_mod);
-      if (exists(dexMod)) {
-        finalSetAttrs.initiative += dexMod;
-      }
-      finalSetAttrs.initiative_formula = `${dexMod}[dex]`;
+      let initiativeAbility = v.initiative_ability;
 
-      const dexCheckBonus = getIntValue(v.dexterity_check_bonus);
-      if (exists(dexCheckBonus)) {
-        finalSetAttrs.initiative += dexCheckBonus;
-        finalSetAttrs.initiative_formula += `${addArithmeticOperator(finalSetAttrs.initiative_formula, dexCheckBonus)}[dex check bonus]`;
+      if (isUndefined(initiativeAbility)) {
+        initiativeAbility = 'dexterity';
+      }
+
+      const abilityMod = getAbilityValue(v, initiativeAbility);
+      if (exists(abilityMod)) {
+        finalSetAttrs.initiative += abilityMod;
+      }
+      finalSetAttrs.initiative_formula = `${abilityMod}[${getAbilityShortName(initiativeAbility)}]`;
+
+      const abilityCheckBonus = getIntValue(v[`${initiativeAbility}_check_bonus`]);
+      if (exists(abilityCheckBonus)) {
+        finalSetAttrs.initiative += abilityCheckBonus;
+        finalSetAttrs.initiative_formula += `${addArithmeticOperator(finalSetAttrs.initiative_formula, abilityCheckBonus)}[${getAbilityShortName(initiativeAbility)} check bonus]`;
       }
 
       const initiativeBonus = v.initiative_bonus;
@@ -2430,9 +2442,17 @@ const updateInitiative = () => {
     },
   });
 };
-on('change:dexterity_mod change:dexterity_check_bonus change:initiative_bonus change:jack_of_all_trades_toggle change:jack_of_all_trades change:remarkable_athlete_toggle change:remarkable_athlete change:global_check_bonus', () => {
-  updateInitiative();
-});
+const watchInitiativeChanges = () => {
+  const initiativeWatch = ['change:initiative_ability', 'change:initiative_bonus', 'change:jack_of_all_trades_toggle', 'change:jack_of_all_trades', 'change:remarkable_athlete_toggle', 'change:remarkable_athlete', 'change:global_check_bonus'];
+  for (const ability of ABILITIES) {
+    initiativeWatch.push(`change:${ability}_mod`);
+    initiativeWatch.push(`change:${ability}_check_bonus`);
+  }
+  on(initiativeWatch.join(' '), () => {
+    updateInitiative();
+  });
+};
+watchInitiativeChanges();
 
 const updateWeight = () => {
   getSetItems({
