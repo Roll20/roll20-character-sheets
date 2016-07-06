@@ -1,7 +1,7 @@
 /* global setAttrs:false, getAttrs:false, on:false, getSectionIDs:false, generateRowID:false, getTranslationByKey:false */
 'use strict';
 
-const currentVersion = '5.0.4';
+const currentVersion = '5.0.6';
 const SKILLS = {
   ACROBATICS: 'dexterity',
   ANIMALHANDLING: 'wisdom',
@@ -174,7 +174,7 @@ const parseAttackComponent = (v, repeatingString, finalSetAttrs, options) => {
 
     if (options.triggerFields) {
       for (const triggerField of options.triggerFields) {
-        if (!isUndefinedOrEmpty(v[repeatingString + triggerField])) {
+        if (!isUndefinedOrEmpty(v[`${repeatingString}${triggerField}`])) {
           aTriggerFieldExists = true;
         }
       }
@@ -2381,21 +2381,33 @@ on('change:remarkable_athlete_toggle', () => {
 });
 
 const updateInitiative = () => {
+  const collectionArray = ['initiative', 'initiative_ability', 'initiative_formula', 'initiative_bonus', 'jack_of_all_trades_toggle', 'jack_of_all_trades', 'remarkable_athlete_toggle', 'remarkable_athlete', 'global_check_bonus'];
+  for (const ability of ABILITIES) {
+    collectionArray.push(`${ability}_mod`);
+    collectionArray.push(`${ability}_check_bonus`);
+  }
+
   getSetItems({
-    collectionArray: ['initiative', 'initiative_formula', 'dexterity_mod', 'dexterity_check_bonus', 'initiative_bonus', 'jack_of_all_trades_toggle', 'jack_of_all_trades', 'remarkable_athlete_toggle', 'remarkable_athlete', 'global_check_bonus'],
+    collectionArray,
     callback: (v, finalSetAttrs) => {
       finalSetAttrs.initiative = 0;
 
-      const dexMod = getIntValue(v.dexterity_mod);
-      if (exists(dexMod)) {
-        finalSetAttrs.initiative += dexMod;
-      }
-      finalSetAttrs.initiative_formula = `${dexMod}[dex]`;
+      let initiativeAbility = v.initiative_ability;
 
-      const dexCheckBonus = getIntValue(v.dexterity_check_bonus);
-      if (exists(dexCheckBonus)) {
-        finalSetAttrs.initiative += dexCheckBonus;
-        finalSetAttrs.initiative_formula += `${addArithmeticOperator(finalSetAttrs.initiative_formula, dexCheckBonus)}[dex check bonus]`;
+      if (isUndefined(initiativeAbility)) {
+        initiativeAbility = 'dexterity';
+      }
+
+      const abilityMod = getAbilityValue(v, initiativeAbility);
+      if (exists(abilityMod)) {
+        finalSetAttrs.initiative += abilityMod;
+      }
+      finalSetAttrs.initiative_formula = `${abilityMod}[${getAbilityShortName(initiativeAbility)}]`;
+
+      const abilityCheckBonus = getIntValue(v[`${initiativeAbility}_check_bonus`]);
+      if (exists(abilityCheckBonus)) {
+        finalSetAttrs.initiative += abilityCheckBonus;
+        finalSetAttrs.initiative_formula += `${addArithmeticOperator(finalSetAttrs.initiative_formula, abilityCheckBonus)}[${getAbilityShortName(initiativeAbility)} check bonus]`;
       }
 
       const initiativeBonus = v.initiative_bonus;
@@ -2430,9 +2442,17 @@ const updateInitiative = () => {
     },
   });
 };
-on('change:dexterity_mod change:dexterity_check_bonus change:initiative_bonus change:jack_of_all_trades_toggle change:jack_of_all_trades change:remarkable_athlete_toggle change:remarkable_athlete change:global_check_bonus', () => {
-  updateInitiative();
-});
+const watchInitiativeChanges = () => {
+  const initiativeWatch = ['change:initiative_ability', 'change:initiative_bonus', 'change:jack_of_all_trades_toggle', 'change:jack_of_all_trades', 'change:remarkable_athlete_toggle', 'change:remarkable_athlete', 'change:global_check_bonus'];
+  for (const ability of ABILITIES) {
+    initiativeWatch.push(`change:${ability}_mod`);
+    initiativeWatch.push(`change:${ability}_check_bonus`);
+  }
+  on(initiativeWatch.join(' '), () => {
+    updateInitiative();
+  });
+};
+watchInitiativeChanges();
 
 const updateWeight = () => {
   getSetItems({
@@ -2451,7 +2471,7 @@ const updateAttackToggle = (v, finalSetAttrs, repeatingString, options) => {
     parseName: 'attack',
     toggleField: 'roll_toggle',
     toggleFieldSetTo: toggleVars.roll,
-    triggerFields: ['type', 'proficiency', 'attack_ability', 'attack_bonus'],
+    triggerFields: ['type', 'attack_bonus'],
   };
   parseAttackComponent(v, repeatingString, finalSetAttrs, attackParse);
 
@@ -2468,7 +2488,11 @@ const updateAttackToggle = (v, finalSetAttrs, repeatingString, options) => {
     }
 
     let attackAbility = v[`${repeatingString}attack_ability`];
-    if (v[`${repeatingString}type`] === 'Ranged Weapon') {
+
+    if (isUndefined(attackAbility) && v[`${repeatingString}type`] === 'Melee Weapon') {
+      attackAbility = 'strength';
+      finalSetAttrs[`${repeatingString}attack_ability`] = attackAbility;
+    } else if (isUndefined(attackAbility) && v[`${repeatingString}type`] === 'Ranged Weapon') {
       attackAbility = 'dexterity';
       finalSetAttrs[`${repeatingString}attack_ability`] = attackAbility;
     } else if (finalSetAttrs[`${repeatingString}attack_ability`]) {
@@ -3201,6 +3225,20 @@ const updateSpellToTranslations = () => {
     },
   });
 };
+const updateSpellLevelForCantrips = () => {
+  getSetRepeatingItems({
+    repeatingItems: ['repeating_spell'],
+    collectionArrayAddItems: ['spell_level'],
+    callback: (v, finalSetAttrs, ids, repeatingItem) => {
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
+        if (isUndefinedOrEmpty(v[`${repeatingString}spell_level`]) || v[`${repeatingString}spell_level`] === '0' || v[`${repeatingString}spell_level`] === 0) {
+          finalSetAttrs[`${repeatingString}spell_level`] = 'CANTRIP';
+        }
+      }
+    },
+  });
+};
 
 const updateSpellFromSRD = (v, finalSetAttrs, repeatingString) => {
   if (v[`${repeatingString}spell_level_from_srd`]) {
@@ -3221,7 +3259,7 @@ const updateSpellFromSRD = (v, finalSetAttrs, repeatingString) => {
   }
   if (v[`${repeatingString}duration_from_srd`]) {
     let duration = '';
-    if (v[`${repeatingString}concentration`] === 'Yes') {
+    if (v[`${repeatingString}duration_from_srd`].toLowerCase().indexOf('up to') !== -1) {
       duration += 'CONCENTRATION_';
     }
     duration += v[`${repeatingString}duration_from_srd`].trim().toUpperCase().replace(/\s/g, '_');
@@ -3242,7 +3280,7 @@ const updateSpell = (rowId) => {
   getSetRepeatingItems({
     repeatingItems: ['repeating_spell'],
     collectionArray,
-    collectionArrayAddItems: ['name', 'school', 'spell_level', 'spell_level_from_srd', 'school_from_srd', 'casting_time', 'casting_time_from_srd', 'components', 'components_from_srd', 'concentration', 'duration', 'duration_from_srd', 'roll_toggle', 'to_hit', 'attack_formula', 'proficiency', 'attack_ability', 'attack_bonus', 'saving_throw_toggle', 'saving_throw_ability', 'saving_throw_vs_ability', 'saving_throw_vs_ability_from_srd', 'saving_throw_bonus', 'saving_throw_dc', 'damage_toggle', 'damage_formula', 'damage', 'damage_ability', 'damage_bonus', 'damage_type', 'damage_crit', 'second_damage_toggle', 'second_damage_formula', 'second_damage', 'second_damage_ability', 'second_damage_bonus', 'second_damage_type', 'second_damage_crit', 'damage_string', 'parsed', 'heal_toggle', 'heal', 'heal_ability', 'heal_bonus', 'heal_query_toggle', 'add_casting_modifier', 'add_second_casting_modifier', 'higher_level_toggle', 'higher_level_dice', 'higher_level_die', 'second_higher_level_dice', 'second_higher_level_die', 'higher_level_heal', 'ritual', 'ritual_output', 'materials', 'materials_show', 'extras_toggle', 'emote', 'freetext', 'freeform'],
+    collectionArrayAddItems: ['name', 'school', 'spell_level', 'spell_level_from_srd', 'school_from_srd', 'casting_time', 'casting_time_from_srd', 'components', 'components_from_srd', 'concentration', 'duration', 'duration_from_srd', 'type', 'roll_toggle', 'to_hit', 'attack_formula', 'proficiency', 'attack_ability', 'attack_bonus', 'saving_throw_toggle', 'saving_throw_ability', 'saving_throw_vs_ability', 'saving_throw_vs_ability_from_srd', 'saving_throw_bonus', 'saving_throw_dc', 'damage_toggle', 'damage_formula', 'damage', 'damage_ability', 'damage_bonus', 'damage_type', 'damage_crit', 'second_damage_toggle', 'second_damage_formula', 'second_damage', 'second_damage_ability', 'second_damage_bonus', 'second_damage_type', 'second_damage_crit', 'damage_string', 'parsed', 'heal_toggle', 'heal', 'heal_ability', 'heal_bonus', 'heal_query_toggle', 'add_casting_modifier', 'add_second_casting_modifier', 'higher_level_toggle', 'higher_level_dice', 'higher_level_die', 'second_higher_level_dice', 'second_higher_level_die', 'higher_level_heal', 'ritual', 'ritual_output', 'materials', 'materials_show', 'extras_toggle', 'emote', 'freetext', 'freeform'],
     rowId,
     callback: (v, finalSetAttrs, ids, repeatingItem) => {
       for (const id of ids) {
@@ -3254,7 +3292,7 @@ const updateSpell = (rowId) => {
           finalSetAttrs[`${repeatingString}is_prepared`] = 'on';
         }
 
-        if (fromVOrFinalSetAttrs(v, finalSetAttrs, `${repeatingString}duration`).indexOf('CONCENTRATION') !== -1) {
+        if (!isUndefined(fromVOrFinalSetAttrs(v, finalSetAttrs, `${repeatingString}duration`)) && fromVOrFinalSetAttrs(v, finalSetAttrs, `${repeatingString}duration`).indexOf('CONCENTRATION') !== -1) {
           finalSetAttrs[`${repeatingString}concentration`] = 'Yes';
         } else {
           finalSetAttrs[`${repeatingString}concentration`] = '';
@@ -3744,17 +3782,72 @@ on('change:skills_srd', () => {
   updateSkillsFromSRD();
 });
 
-const updateSavingThrow = (ability, savingThrowName) => {
-  if (!savingThrowName) {
-    savingThrowName = ability;
+const getHighestOfAbilityScoresForSavingThrow = (v, savingThrowName) => {
+  let abilityName;
+  let highestValue = 0;
+  for (const ability of ABILITIES) {
+    const abilityMod = getIntValue(v[`${ability}_mod`]);
+    if (v[`${savingThrowName}_${ability}`] === '1' && (highestValue === 0 || abilityMod > highestValue)) {
+      highestValue = abilityMod;
+      abilityName = ability;
+    }
+  }
+  return abilityName;
+};
+const getAverageOfAbilityScoresForSavingThrow = (v, savingThrowName) => {
+  let obj = {
+    abilitiesUsed: []
+  };
+  let sum = 0;
+  for (const ability of ABILITIES) {
+    if (v[`${savingThrowName}_${ability}`] === '1') {
+      obj.abilitiesUsed.push(getAbilityShortName(ability));
+      sum += (getIntValue(v[`${ability}_calculated`]) - 10) / 2;
+    }
+  }
+
+  if (obj.abilitiesUsed.length > 0) {
+    console.log('sum', sum, obj.abilitiesUsed.length);
+    obj.avg = Math.floor(sum / obj.abilitiesUsed.length)
+  }
+  return obj;
+};
+
+const updateSavingThrow = (savingThrowName) => {
+  const collectionArray = ['pb', `${savingThrowName}_save_prof`, `${savingThrowName}_save_bonus`, 'global_saving_throw_bonus', 'saving_throws_half_proficiency', 'average_of_abilities'];
+  for (const ability of ABILITIES) {
+    collectionArray.push(`${ability}_calculated`);
+    collectionArray.push(`${ability}_mod`);
+    collectionArray.push(`${savingThrowName}_${ability}`);
   }
 
   getSetItems({
-    collectionArray: ['pb', `${ability}_mod`, `${savingThrowName}_save_prof`, `${savingThrowName}_save_bonus`, 'global_saving_throw_bonus', 'saving_throws_half_proficiency'],
+    collectionArray,
     callback: (v, finalSetAttrs) => {
-      const abilityMod = getIntValue(v[`${ability}_mod`]);
-      let total = abilityMod;
-      let totalFormula = `${abilityMod}[${getAbilityShortName(ability)}]`;
+      let total = '';
+      let totalFormula = '';
+      let ability;
+
+      if (savingThrowName === 'fortitude' || savingThrowName === 'reflex' || savingThrowName === 'will') {
+        if (v.average_of_abilities === '1') {
+          let obj = getAverageOfAbilityScoresForSavingThrow(v, savingThrowName);
+
+          if (obj.avg) {
+            total = obj.avg;
+            totalFormula = `${obj.avg}[${obj.abilitiesUsed.join(' ')}]`;
+          }
+        } else {
+          ability = getHighestOfAbilityScoresForSavingThrow(v, savingThrowName);
+        }
+      } else {
+        ability = savingThrowName;
+      }
+
+      if (ability) {
+        const abilityMod = getIntValue(v[`${ability}_mod`]);
+        total = abilityMod;
+        totalFormula = `${abilityMod}[${getAbilityShortName(ability)}]`;
+      }
 
       const pb = getIntValue(v.pb);
       if (v[`${savingThrowName}_save_prof`] === '@{PB}') {
@@ -3785,46 +3878,10 @@ const updateSavingThrow = (ability, savingThrowName) => {
     },
   });
 };
-const getHighestAbilityForCustomSavingThrows = (savingThrowName, callback) => {
-  const collectionArray = [];
-
-  for (const ability of ABILITIES) {
-    collectionArray.push(`${ability}_mod`);
-    collectionArray.push(`${savingThrowName}_${ability}`);
-  }
-
-  getAttrs(collectionArray, (v) => {
-    let abilityName;
-    let highestValue = 0;
-
-    for (const ability of ABILITIES) {
-      const abilityMod = getIntValue(v[`${ability}_mod`]);
-      if (v[`${savingThrowName}_${ability}`] === '1' && (highestValue === 0 || abilityMod > highestValue)) {
-        highestValue = abilityMod;
-        abilityName = ability;
-      }
-    }
-    callback(abilityName);
-  });
-};
-const updateCustomSavingThrow = (savingThrowName) => {
-  getHighestAbilityForCustomSavingThrows(savingThrowName, (abilityName) => {
-    if (!abilityName) {
-      if (savingThrowName === 'fortitude') {
-        abilityName = 'constitution';
-      } else if (savingThrowName === 'reflex') {
-        abilityName = 'dexterity';
-      } else if (savingThrowName === 'will') {
-        abilityName = 'wisdom';
-      }
-    }
-    updateSavingThrow(abilityName, savingThrowName);
-  });
-};
 const updateCustomSavingThrows = () => {
-  updateCustomSavingThrow('fortitude');
-  updateCustomSavingThrow('reflex');
-  updateCustomSavingThrow('will');
+  updateSavingThrow('fortitude');
+  updateSavingThrow('reflex');
+  updateSavingThrow('will');
 };
 const updateSavingThrows = () => {
   updateSavingThrow('strength');
@@ -3856,23 +3913,24 @@ on('change:wisdom_mod change:wisdom_save_prof change:wisdom_save_bonus', () => {
 on('change:charisma_mod change:charisma_save_prof change:charisma_save_bonus', () => {
   updateSavingThrow('charisma');
 });
-const watchAbilityModChanges = () => {
+const watchAbilityChanges = () => {
   const classFeatureWatch = [];
   for (const ability of ABILITIES) {
+    classFeatureWatch.push(`change:${ability}`);
     classFeatureWatch.push(`change:${ability}_mod`);
   }
   on(classFeatureWatch.join(' '), () => {
     updateCustomSavingThrows();
   });
 };
-watchAbilityModChanges();
+watchAbilityChanges();
 const watchForCustomSavingThrowChanges = (savingThrowName) => {
-  const classFeatureWatch = [`change:${savingThrowName}_save_prof`, `change:${savingThrowName}_save_bonus`];
+  const classFeatureWatch = [`change:${savingThrowName}_save_prof`, `change:${savingThrowName}_save_bonus`, 'change:average_of_abilities'];
   for (const ability of ABILITIES) {
     classFeatureWatch.push(`change:${savingThrowName}_${ability}`);
   }
   on(classFeatureWatch.join(' '), () => {
-    updateCustomSavingThrow(savingThrowName);
+    updateSavingThrow(savingThrowName);
   });
 };
 watchForCustomSavingThrowChanges('fortitude');
@@ -5319,6 +5377,9 @@ const sheetOpened = () => {
         }
         if (versionCompare(version, '5.0.4') < 0) {
           updateDefaultAbility();
+        }
+        if (versionCompare(version, '5.0.6') < 0) {
+          updateSpellLevelForCantrips();
         }
       }
 
