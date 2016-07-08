@@ -685,6 +685,24 @@ var TAS = TAS || (function(){
   on("change:repeating_miracles", function (eventInfo) {
     TAS.repeatingSimpleSum('miracles','committed_effort','total_miracle_committed_effort');
   });
+
+  on("change:repeating_npc-tactics", function(eventInfo) {
+    TAS.repeating('npc-tactics')
+       .fields('tactic_description')
+       .attrs('total_npc_tactics')
+       .reduce(function(memo, row, attrSet, id, rowSet) {
+         memo = memo + 1;
+         return memo;
+       }, 0, function(memo, rowSet, attrSet) {
+         setAttrs({total_npc_tactics: memo});
+       })
+       .execute();
+  });
+
+  on("change:repeating_npc-effort", function(eventInfo) {
+       debugger;
+    TAS.repeatingSimpleSum('npc-effort', 'npc_effort_cost', 'total_npc_committed_effort');
+  });
 </script>
 
 <div class='sheet-container'>
@@ -908,7 +926,7 @@ var TAS = TAS || (function(){
             </td>
             <td class='sheet-field-content'>
               <input type="number" min="1" name="attr_npc_save" class='sheet-npc sheet-input' value="15" />
-              <button type="roll" name="roll_npc_attack" value="&{template:default} {{name=Save by @{character_name}}} {{roll=[[1d20>@{npc_save}]]}}" class='sheet-button'></button>
+              <button type="roll" name="roll_npc_attack" value="&{template:default} {{name=Save by @{character_name}}} {{roll=[[1d20>@{npc_save} + ?{Modifier|0}]]}}" class='sheet-button'></button>
             </td>
           </tr>
           <tr>
@@ -925,7 +943,7 @@ var TAS = TAS || (function(){
             </td>
             <td class='sheet-field-content'>
               <input type="number" min="1" name="attr_npc_morale" class='sheet-npc sheet-input' value="10" />
-              <button type="roll" name="roll_npc_attack" value="&{template:default} {{name=Morale Check by @{character_name}}} {{roll=[[1d20>@{npc_morale}]]}}" class='sheet-button'></button>
+              <button type="roll" name="roll_npc_attack" value="&{template:default} {{name=Morale Check by @{character_name}}} {{roll=[[1d20>@{npc_morale} + ?{Modifier|0}]]}}" class='sheet-button'></button>
             </td>
           </tr>
           <tr>
@@ -961,7 +979,7 @@ var TAS = TAS || (function(){
             </td>
             <td class='sheet-field-content'>
               <input type="number" name="attr_npc_attack_qty" class='sheet-npc sheet-input' value="0" />
-              <button type="roll" name="roll_npc_attack" value="&{template:default} {{name=Attack by @{character_name}}} {{roll=[[1d20 + @{npc_attack_bonus}]]}} {{damage=[[@{npc_damage}]] @{npc_damage_type}}}" class='sheet-button'></button>
+              <button type="roll" name="roll_npc_attack" value="&{template:default} {{name=Attack by @{character_name}}} {{roll=[[1d20 + @{npc_attack_bonus} + ?{Modifier|0} + ?{Target AC|9}]]}} {{damage=[[@{npc_damage}]] @{npc_damage_type}}}" class='sheet-button'></button>
             </td>
           </tr>
         </tbody>
@@ -1016,13 +1034,12 @@ var TAS = TAS || (function(){
         </tbody>
 
     </div>
->>>>>>> d400478... tweaks
   </div>
   <div class="sheet-tab-content sheet-character">
     <div class='sheet-column'>
       <div name='info-section' class='sheet-info'>
         <label for='info-section' class='sheet-title sheet-title-label'>
-          GODBOUND
+        Godbound
         </label>
         <div class='sheet-name'>
           <label for="attr_character_name" class='sheet-field-title'>Name</label>
