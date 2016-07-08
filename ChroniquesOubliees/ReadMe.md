@@ -9,9 +9,14 @@ Cette feuilles de personnage inclue quelques jets et r&egrave;gles optionnelles.
 Le jeu complet, des suppl&eacute;ments et des t&eacute;l&eacute;chargements gratuits sont disponibles sur le site de l&apos;&eacute;diteur [Black Book Editions](http://www.black-book-editions.fr/produit.php?id=1590).
 
 # Version courante
-1.2 [Screenshot](co_v1.png)
+1.3 [Screenshot](co_v1.png)
 
 # Notes de version
+
+##v1.3 (2015-11-06)
+
+* Gestion de la règle optionnelle des caractéristiques supérieures
+* Affichage des dégâts doublés sur attaque critique
 
 ##v1.2 (2015-07-27)
 Am&eacute;lioration de la lisibilit&eacute; des infos-bulles des jets de d&eacute;.
