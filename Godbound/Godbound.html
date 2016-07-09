@@ -700,9 +700,37 @@ var TAS = TAS || (function(){
   });
 
   on("change:repeating_npc-effort", function(eventInfo) {
-       debugger;
     TAS.repeatingSimpleSum('npc-effort', 'npc_effort_cost', 'total_npc_committed_effort');
   });
+
+  on("change:repeating_faction-problems", function(eventInfo) {
+    TAS.repeatingSimpleSum('faction-problems', 'faction_problem_cost', 'faction_trouble');
+  });
+
+  on("change:repeating_faction-projects", function(eventInfo) {
+    TAS.repeatingSimpleSum('faction-projects', 'faction_project_spent', 'faction_dominion_spent');
+  });
+
+  power_map = {
+    "6": 1,
+    "8": 2,
+    "10": 3,
+    "12": 4,
+    "20": 5
+  };
+
+  on("change:faction_action_die_sides", function(eventInfo) {
+    getAttrs([eventInfo.sourceAttribute], function(values) {
+      for (key in values) {
+        setAttrs({
+          faction_action_die: "1d" + values[key],
+          faction_power: power_map[values[key]],
+          faction_cohesion: power_map[values[key]]
+        });
+      }
+    });
+  });
+
 </script>
 
 <div class='sheet-container'>
@@ -737,7 +765,7 @@ var TAS = TAS || (function(){
                   <option value="12">1d12</option>
                   <option value="20">1d20</option>
                 </select>
-                <button type="roll" name="roll_faction_action_die" value="&{template:default} {{name=Action Die @{faction_action_die}}} {{roll=[[(@{faction_action_die})]]}}" class='sheet-button'></button>
+                <button type="roll" name="roll_faction_action_die" value="&{template:default} {{name=Action Die @{faction_action_die}}} {{roll=[[(@{faction_action_die}) + ?{Modifier|0}]]}}" class='sheet-button'></button>
               </td>
             </tr>
             <tr>
