@@ -731,6 +731,11 @@ var TAS = TAS || (function(){
     });
   });
 
+  on("change:repeating_projects", function(eventInfo) {
+    TAS.repeatingSimpleSum('projects', 'project_dominion_spent', 'dominion_spent');
+    TAS.repeatingSimpleSum('projects', 'project_influence_spent', 'influence_spent');
+  });
+
 </script>
 
 <div class='sheet-container'>
@@ -1285,14 +1290,14 @@ var TAS = TAS || (function(){
             <tr>
               <td class="sheet-resources-table-element">Influence</td>
               <td class="sheet-resources-table-element"><input type="number" min="0" name="attr_influence_total" class='sheet-resources sheet-input' value="((@{adj_level}) + 2)" disabled=true /></td>
-              <td class="sheet-resources-table-element"><input type="number" min="0" name="attr_influence_spent" class='sheet-resources sheet-input' value="0" /></td>
+              <td class="sheet-resources-table-element"><input type="number" min="0" name="attr_influence_spent" class='sheet-resources sheet-input' readonly /></td>
               <td class="sheet-resources-table-element"><input type="number" min="0" name="attr_influence_free" class='sheet-resources sheet-input' disabled="true" value="((@{influence_total}) - (@{influence_spent}))" /></td>
               <td class="sheet-resources-table-element"></td>
             </tr>
             <tr>
               <td class="sheet-resources-table-element">Dominion</td>
               <td class="sheet-resources-table-element"><input type="number" min="0" name="attr_dominion_total" class='sheet-resources sheet-input' value="0" /></td>
-              <td class="sheet-resources-table-element"><input type="number" min="0" name="attr_dominion_spent" class='sheet-resources sheet-input' value="0" /></td>
+              <td class="sheet-resources-table-element"><input type="number" min="0" name="attr_dominion_spent" class='sheet-resources sheet-input' readonly /></td>
               <td class="sheet-resources-table-element"><input type="number" min="0" name="attr_dominion_free" class='sheet-resources sheet-input' disabled="true" value="((@{dominion_total}) - (@{dominion_spent}))" /></td>
               <td class="sheet-resources-table-element"><input type="number" min="0" name="attr_dominion_earned" class='sheet-resources sheet-input' value="0" /></td>
             </tr>
@@ -1501,6 +1506,71 @@ var TAS = TAS || (function(){
             </div>
           </fieldset>
         </div>
+      </div>
+    </div>
+
+    <div class="sheet-projects-section">
+      <label for="repeating_projects" class="sheet-title-label">Projects</label>
+      <div class="sheet-projects">
+        <fieldset class="repeating_projects">
+          <div class="sheet-project">
+
+            <div class="sheet-project-name-section">
+              <input type="text" min="0" name="attr_project_name" class='sheet-project-element sheet-input' value="" placeholder="Project name" />
+            </div>
+
+            <div class="sheet-project-details-subsection">
+              <select name="attr_project_difficulty" class="sheet-dropdown sheet-project-element">
+                <option value="1">Plausible</option>
+                <option value="2">Improbable</option>
+                <option value="4">Impossible</option>
+              </select>
+
+              <select name="attr_project_scope" class="sheet-dropdown sheet-project-element">
+                <option value="1">Village</option>
+                <option value="2">City</option>
+                <option value="4">Region</option>
+                <option value="8">Nation</option>
+                <option value="16">Realm</option>
+              </select>
+            </div>
+
+            <div class="sheet-project-completed-subsection">
+              <label for="attr_project_completed" class="sheet-field-title">Completed?</label>
+              <input type="checkbox" name="attr_project_completed" class="sheet-project-element" />
+            </div>
+
+            <table class="sheet-project-dominion-tally sheet-project-element">
+              <thead class="sheet-project-dominion-tally-headers">
+                <tr>
+                  <th class="sheet-project-field-title" colspan="4">Dominion</th>
+                </tr>
+                <tr>
+                  <th class="sheet-project-field-title" >Dominion</th>
+                  <th class="sheet-project-field-title" >Influence</th>
+                  <th class="sheet-project-field-title" >Cost</th>
+                  <th class="sheet-project-field-title" >Remaining</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <input type="number" min="0" name="attr_project_dominion_spent" class='sheet-project-element sheet-input sheet-max' value="0" />
+                  </td>
+                  <td>
+                    <input type="number" min="0" name="attr_project_influence_spent" class='sheet-project-element sheet-input sheet-max' value="0" />
+                  </td>
+                  <td>
+                    <input type="number" min="0" name="attr_project_cost" class='sheet-project-element sheet-input sheet-max' value="(@{project_difficulty}) * (@{project_scope})" disabled="true"/>
+                  </td>
+                  <td>
+                    <input type="number" min="0" name="attr_project_remaining" class='sheet-project-element sheet-input sheet-max' value="(@{project_cost}) - ((@{project_dominion_spent}) + (@{project_influence_spent}))" disabled="true"/>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </fieldset>
       </div>
     </div>
   </div>
