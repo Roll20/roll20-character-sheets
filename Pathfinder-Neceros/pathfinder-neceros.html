@@ -343,6 +343,16 @@
 	</div>
 </nav>	
 <main role="main">
+	<input type="checkbox" class="sheet-tab1 sheet-pagetab1" name="attr_tab" value="1" style="display:none;" />
+	<input type="checkbox" class="sheet-tab2 sheet-pagetab2" name="attr_tab" value="2" style="display:none;" />
+	<input type="checkbox" class="sheet-tab3 sheet-pagetab3" name="attr_tab" value="3" style="display:none;" />
+	<input type="checkbox" class="sheet-tab4 sheet-pagetab4" name="attr_tab" value="4" style="display:none;" />
+	<input type="checkbox" class="sheet-tab5 sheet-pagetab5" name="attr_tab" value="5" style="display:none;" />
+	<input type="checkbox" class="sheet-tab6 sheet-pagetab6" name="attr_tab" value="6" style="display:none;" />
+	<input type="checkbox" class="sheet-tab7 sheet-pagetab7" name="attr_tab" value="7" style="display:none;" />
+	<input type="checkbox" class="sheet-tab8 sheet-pagetab8" name="attr_tab" value="8" style="display:none;" />
+	<input type="checkbox" class="sheet-tab9 sheet-pagetab9" name="attr_tab" value="9" style="display:none;" />
+	<input type="checkbox" class="sheet-tab99 sheet-pagetab99" name="attr_tab" value="99" style="display:none;" />
 	<div class="sheet-main">
 	<section role="region" aria-label="Core" data-i18n-aria-label="core">
 		<div class="sheet-section sheet-section-core">
@@ -12042,7 +12052,7 @@ var SWUtils = SWUtils || (function () {
 var PFSheet = PFSheet || (function () {
     'use strict';
 
-    var version = 0.54,
+    var version = 0.55,
 
     /***************************************Lists of Fields ************************************************************/
     //add any new repeating sections here. This is the word after "repeating_"
@@ -12243,6 +12253,7 @@ var PFSheet = PFSheet || (function () {
             setAttrs(setter);
         });
     },
+
 
     /*********************************** NOTES ****************************************/
 
@@ -13617,6 +13628,7 @@ var PFSheet = PFSheet || (function () {
             , attackGridFields[attype].size, attackGridFields[attype].buff]);
     },
 
+
     /****Attack and Damage Effect section ********/
     /* handles the attacks effects row
     */
@@ -13655,6 +13667,7 @@ var PFSheet = PFSheet || (function () {
                 }
             });
     },
+
 
 
     /********* REPEATING WEAPON FIELDSET *********/
@@ -15018,7 +15031,9 @@ var PFSheet = PFSheet || (function () {
 			optionText+=spellOptions.cast_defDC.replace("REPLACE",defDC);
 		}
 		if(toggleValues.showdescription){
-			optionText+=spellOptions.description.replace("REPLACE",SWUtils.escapeRollTemplate(rowValues[prefix+"description"]));
+			optionText+=spellOptions.description.replace("REPLACE","@{description}");
+		} else {
+			optionText+="{{description=}}";
 		}
 		//TAS.debug("returning :"+optionText);
 		return optionText;		
@@ -15028,7 +15043,7 @@ var PFSheet = PFSheet || (function () {
         var prefix = "repeating_spells_"  + getRepeatingIDStr(id)
             , allFields;
 		//TAS.debug("at resetSpellOptions");
-		allFields= _.chain(spellOptionAttributes)
+		allFields= _.chain(spellOptionAttributesNoDescription)
 			.union(spellOptionHelperAttributes)
 			.flatten(true)
 			.map(function(field){
@@ -15075,9 +15090,9 @@ var PFSheet = PFSheet || (function () {
 					, "Concentration-2-def":(parseInt(tv["Concentration-2-def"],10)||0)
 					} )
 				.value();
-            if (showDescription){
-                optionFields=optionFields.concat(["description"]);
-            }
+            //if (showDescription){
+            //    optionFields=optionFields.concat(["description"]);
+            //}
             getSectionIDs("repeating_spells",function(ids){
                 var fields = _.map(ids,function(id){
                     var prefix = "repeating_spells_"  + getRepeatingIDStr(id),
@@ -16805,6 +16820,10 @@ var PFSheet = PFSheet || (function () {
             updateAttackMacros();
 			resetSpellsPrepared();
         }
+		if (oldversion < .55) {
+			resetAllSpellsOptions();
+		}		
+		
     },
 
 
