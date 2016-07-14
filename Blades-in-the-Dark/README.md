@@ -13,6 +13,10 @@ Report any problems, suggestions or features by sending a private message on Rol
 
 ## Changelog
 
+### 0.0.7
+* Added Clocks Tab To Player Sheets
+   - Clocks sheet that can track 4,6,8, and 12 segment clocks
+
 ### 0.0.6
 * Reformatted header
     * Added Blades in the Dark logo image (hosted on imgur).
