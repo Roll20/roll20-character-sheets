@@ -3794,20 +3794,49 @@ const getHighestOfAbilityScoresForSavingThrow = (v, savingThrowName) => {
   }
   return abilityName;
 };
-const getAverageOfAbilityScoresForSavingThrow = (v, savingThrowName) => {
+const findHighest = (arr) => {
+  const highestAbility = Math.max.apply(Math, arr.map((ability) => ability.score));
+  return arr.find((ability) => ability.score === highestAbility);
+};
+
+const getHighestAbilityScores = (v, savingThrowName) => {
+  const abilities = [];
+  for (const ability of ABILITIES) {
+    if (v[`${savingThrowName}_${ability}`] === '1') {
+      abilities.push({
+        name: ability,
+        score: getIntValue(v[`${ability}_calculated`]),
+      });
+    }
+  }
+
+  const highestAbilities = [];
+  if (abilities.length > 0) {
+    const highestAbilityObj = findHighest(abilities);
+
+    highestAbilities.push(highestAbilityObj);
+    abilities.splice(abilities.findIndex((ability) => ability.name === highestAbilityObj.name), 1);
+  }
+  if (abilities.length > 0) {
+    const secondHighestAbilityObj = findHighest(abilities);
+    highestAbilities.push(secondHighestAbilityObj);
+  }
+
+  return highestAbilities;
+};
+const getAverageOfHighestAbilityScoresForSavingThrow = (v, savingThrowName) => {
   let obj = {
     abilitiesUsed: []
   };
   let sum = 0;
-  for (const ability of ABILITIES) {
-    if (v[`${savingThrowName}_${ability}`] === '1') {
-      obj.abilitiesUsed.push(getAbilityShortName(ability));
-      sum += (getIntValue(v[`${ability}_calculated`]) - 10) / 2;
-    }
+
+  const highestAbilities = getHighestAbilityScores(v, savingThrowName);
+  for (const ability of highestAbilities) {
+    obj.abilitiesUsed.push(getAbilityShortName(ability.name));
+    sum += (getIntValue(v[`${ability.name}_calculated`]) - 10) / 2;
   }
 
   if (obj.abilitiesUsed.length > 0) {
-    console.log('sum', sum, obj.abilitiesUsed.length);
     obj.avg = Math.floor(sum / obj.abilitiesUsed.length)
   }
   return obj;
@@ -3830,11 +3859,11 @@ const updateSavingThrow = (savingThrowName) => {
 
       if (savingThrowName === 'fortitude' || savingThrowName === 'reflex' || savingThrowName === 'will') {
         if (v.average_of_abilities === '1') {
-          let obj = getAverageOfAbilityScoresForSavingThrow(v, savingThrowName);
+          let obj = getAverageOfHighestAbilityScoresForSavingThrow(v, savingThrowName);
 
           if (obj.avg) {
             total = obj.avg;
-            totalFormula = `${obj.avg}[${obj.abilitiesUsed.join(' ')}]`;
+            totalFormula = `${obj.avg}[${obj.abilitiesUsed.join(' ')} avg]`;
           }
         } else {
           ability = getHighestOfAbilityScoresForSavingThrow(v, savingThrowName);
