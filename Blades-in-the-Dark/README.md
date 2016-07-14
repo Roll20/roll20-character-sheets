@@ -10,7 +10,7 @@ Report any problems, suggestions or features by sending a private message on Rol
 
 ## Todo
 * Change to only show crit value if there are more than one 6 in the roll.
-* Convert all checkboxes to radio buttons for consistency. Or vice-versa.
+* Convert Coin, Bandolier, and Recovery checkboxes in the player sheet to radio buttons for consistency. Or vice-versa.
 
 ## Changelog
 
