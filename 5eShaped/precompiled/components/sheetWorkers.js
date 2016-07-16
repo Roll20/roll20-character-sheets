@@ -5070,7 +5070,7 @@ const updateActionComponents = () => {
 
 const newAttackToggle = () => {
   getSetRepeatingItems({
-    repeatingItems: ['repeating_attack', 'repeating_spell', 'repeating_trait', 'repeating_action', 'repeating_reaction', 'repeating_legendaryaction', 'repeating_lairaction', 'repeating_regionaleffect'],
+    repeatingItems: ['repeating_attack', 'repeating_spell', 'repeating_action', 'repeating_reaction', 'repeating_legendaryaction', 'repeating_lairaction', 'repeating_regionaleffect'],
     collectionArrayAddItems: ['roll_toggle'],
     callback: (v, finalSetAttrs, ids, repeatingItem) => {
       for (const id of ids) {
@@ -5085,7 +5085,7 @@ const newAttackToggle = () => {
 
 const newAttackToggleTwo = () => {
   getSetRepeatingItems({
-    repeatingItems: ['repeating_attack', 'repeating_spell', 'repeating_trait', 'repeating_action', 'repeating_reaction', 'repeating_legendaryaction', 'repeating_lairaction', 'repeating_regionaleffect'],
+    repeatingItems: ['repeating_attack', 'repeating_spell', 'repeating_action', 'repeating_reaction', 'repeating_legendaryaction', 'repeating_lairaction', 'repeating_regionaleffect'],
     collectionArrayAddItems: ['roll_toggle'],
     callback: (v, finalSetAttrs, ids, repeatingItem) => {
       for (const id of ids) {
