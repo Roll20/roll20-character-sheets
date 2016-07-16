@@ -26,7 +26,7 @@ const CLASSES = ['barbarian', 'bard', 'cleric', 'druid', 'fighter', 'monk', 'pal
 const ABILITIES = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
 
 const toggleVars = {
-  roll: '{{vs_ac=1}} {{vs_saving_throw=@{attacks_vs_a_saving_throw}}} @{roll_info} {{roll1=[[@{shaped_d20}cs>@{crit_range} + @{attack_formula}]]}} @{roll_setting}cs>@{crit_range} + @{attack_formula}]]}} {{targetAC=@{attacks_vs_target_ac}}} {{targetName=@{attacks_vs_target_name}}}',
+  roll: '{{vs_ac=1}} @{roll_info} {{roll1=[[@{shaped_d20}cs>@{crit_range} + @{attack_formula}]]}} @{roll_setting}cs>@{crit_range} + @{attack_formula}]]}} {{targetAC=@{attacks_vs_target_ac}}} {{targetName=@{attacks_vs_target_name}}}',
   saving_throw: '{{saving_throw_condition=@{saving_throw_condition}}} {{saving_throw_dc=@{saving_throw_dc}}} {{saving_throw_vs_ability=@{saving_throw_vs_ability}}} {{saving_throw_failure=@{saving_throw_failure}}} {{saving_throw_success=@{saving_throw_success}}} {{targetName=@{attacks_vs_target_name}}}',
   damage: '{{damage=[[@{damage_formula}]]}} {{damage_type=@{damage_type}}} {{crit_damage=[[0d0 + @{damage_crit}[crit damage] @{damage_crit_formula}]]}}',
   second_damage: '{{second_damage=[[@{second_damage_formula}]]}} {{second_damage_type=@{second_damage_type}}} {{second_crit_damage=[[0d0 + @{second_damage_crit}[crit damage] @{second_damage_crit_formula}]]}}',
@@ -5083,6 +5083,21 @@ const newAttackToggle = () => {
   });
 };
 
+const newAttackToggleTwo = () => {
+  getSetRepeatingItems({
+    repeatingItems: ['repeating_attack', 'repeating_spell', 'repeating_trait', 'repeating_action', 'repeating_reaction', 'repeating_legendaryaction', 'repeating_lairaction', 'repeating_regionaleffect'],
+    collectionArrayAddItems: ['roll_toggle'],
+    callback: (v, finalSetAttrs, ids, repeatingItem) => {
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
+        if (v[`${repeatingString}roll_toggle`] === '{{vs_ac=1}} {{vs_saving_throw=@{attacks_vs_a_saving_throw}}} @{roll_info} {{roll1=[[@{shaped_d20}cs>@{crit_range} + @{attack_formula}]]}} @{roll_setting}cs>@{crit_range} + @{attack_formula}]]}} {{targetAC=@{attacks_vs_target_ac}}} {{targetName=@{attacks_vs_target_name}}}') {
+          finalSetAttrs[`${repeatingString}roll_toggle`] = toggleVars.roll;
+        }
+      }
+    },
+  });
+};
+
 const newAbilityDefaults = () => {
   getSetRepeatingItems({
     repeatingItems: ['repeating_attack', 'repeating_action', 'repeating_reaction', 'repeating_legendaryaction', 'repeating_lairaction', 'repeating_regionaleffect'],
@@ -5409,6 +5424,9 @@ const sheetOpened = () => {
         }
         if (versionCompare(version, '5.0.6') < 0) {
           updateSpellLevelForCantrips();
+        }
+        if (versionCompare(version, '5.0.8') < 0) {
+          newAttackToggleTwo();
         }
       }
 
