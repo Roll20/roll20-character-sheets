@@ -4,6 +4,9 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### Changelog
 
+# v1.1.3 - 3rd Apr 2016
+Added default roll options pane (accessible through the gear at the top-right of the character sheet header) and a "Use Default" option to each roll configuration panel.
+
 * v1.1 - 21st Feb 2016
 Releases will now have a version numberto aid in building scripting to migrate data from one version to another with minimum user action.  This version primarily intoruces roll options to saving throws, skill/ability checks, and weapon attacks.  the roll options allow users to customise the output of the macro for a particualr action on an individual basis to suit their own preferences.  Other minor additions include :- defaults added to weapon section and core section for a few fields that would cause errors if not populated, made use of nested roll feature to tidy up output on all sections except spells (this needs a revamp and versioning to do).
 
