@@ -3759,7 +3759,7 @@ const updateSkillsFromSRD = () => {
               const skillBonus = getIntValue(match[2]) - abilityValue;
 
               if (skillBonus >= expertise) {
-                if (v.expertise_as_advantage) {
+                if (v.expertise_as_advantage === '1') {
                   finalSetAttrs[`${repeatingString}skill_d20`] = '2d20@{d20_mod}kh1';
                   finalSetAttrs[`${repeatingString}proficiency`] = 'proficient';
                 } else {
@@ -3847,22 +3847,39 @@ const getAverageOfHighestAbilityScoresForSavingThrow = (v, savingThrowName) => {
   return obj;
 };
 
+const setCustomSaveProf = (v, finalSetAttrs, savingThrowName) => {
+  const pbVar = '@{PB}';
+  for (const ability of ABILITIES) {
+    if (v[`${savingThrowName}_${ability}`] === '1' && v[`${ability}_save_prof`] === pbVar && !exists(v[`${savingThrowName}_save_prof`])) {
+      finalSetAttrs[`${savingThrowName}_save_prof`] = pbVar;
+    }
+  }
+};
+
 const updateSavingThrow = (savingThrowName) => {
   const collectionArray = ['pb', `${savingThrowName}_save_prof`, `${savingThrowName}_save_bonus`, 'global_saving_throw_bonus', 'saving_throws_half_proficiency', 'average_of_abilities'];
+  const customSaves = ['fortitude', 'reflex', 'will'];
+  const customSavingThrow = customSaves.indexOf(savingThrowName) !== -1;
   for (const ability of ABILITIES) {
     collectionArray.push(`${ability}_calculated`);
     collectionArray.push(`${ability}_mod`);
     collectionArray.push(`${savingThrowName}_${ability}`);
+    if (customSavingThrow) {
+      collectionArray.push(`${ability}_save_prof`);
+      for (const ability of ABILITIES) {
+        collectionArray.push(`${savingThrowName}_${ability}`);
+      }
+    }
   }
 
   getSetItems({
     collectionArray,
     callback: (v, finalSetAttrs) => {
-      let total = '';
+      let total = 0;
       let totalFormula = '';
       let ability;
 
-      if (savingThrowName === 'fortitude' || savingThrowName === 'reflex' || savingThrowName === 'will') {
+      if (customSavingThrow) {
         if (v.average_of_abilities === '1') {
           const obj = getAverageOfHighestAbilityScoresForSavingThrow(v, savingThrowName);
 
@@ -3873,6 +3890,7 @@ const updateSavingThrow = (savingThrowName) => {
         } else {
           ability = getHighestOfAbilityScoresForSavingThrow(v, savingThrowName);
         }
+        setCustomSaveProf(v, finalSetAttrs, savingThrowName);
       } else {
         ability = savingThrowName;
       }
