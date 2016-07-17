@@ -3825,8 +3825,8 @@ const getHighestAbilityScores = (v, savingThrowName) => {
   return highestAbilities;
 };
 const getAverageOfHighestAbilityScoresForSavingThrow = (v, savingThrowName) => {
-  let obj = {
-    abilitiesUsed: []
+  const obj = {
+    abilitiesUsed: [],
   };
   let sum = 0;
 
@@ -3837,7 +3837,7 @@ const getAverageOfHighestAbilityScoresForSavingThrow = (v, savingThrowName) => {
   }
 
   if (obj.abilitiesUsed.length > 0) {
-    obj.avg = Math.floor(sum / obj.abilitiesUsed.length)
+    obj.avg = Math.floor(sum / obj.abilitiesUsed.length);
   }
   return obj;
 };
@@ -3859,7 +3859,7 @@ const updateSavingThrow = (savingThrowName) => {
 
       if (savingThrowName === 'fortitude' || savingThrowName === 'reflex' || savingThrowName === 'will') {
         if (v.average_of_abilities === '1') {
-          let obj = getAverageOfHighestAbilityScoresForSavingThrow(v, savingThrowName);
+          const obj = getAverageOfHighestAbilityScoresForSavingThrow(v, savingThrowName);
 
           if (obj.avg) {
             total = obj.avg;
@@ -3981,7 +3981,6 @@ const updateCustomSavingThrowToggle = () => {
 on('change:use_custom_saving_throws', () => {
   updateCustomSavingThrowToggle();
 });
-
 
 const updateSavingThrowsFromSRD = () => {
   getSetItems({
