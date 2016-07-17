@@ -3728,7 +3728,7 @@ on('change:jack_of_all_trades_toggle change:jack_of_all_trades change:remarkable
 const updateSkillsFromSRD = () => {
   getSetRepeatingItems({
     repeatingItems: ['repeating_skill'],
-    collectionArray: ['skills_srd', 'level', 'challenge', 'strength_mod', 'dexterity_mod', 'constitution_mod', 'intelligence_mod', 'wisdom_mod', 'charisma_mod'],
+    collectionArray: ['skills_srd', 'level', 'challenge', 'strength_mod', 'dexterity_mod', 'constitution_mod', 'intelligence_mod', 'wisdom_mod', 'charisma_mod', 'expertise_as_advantage'],
     collectionArrayAddItems: ['name', 'ability'],
     callback: (v, finalSetAttrs, ids, repeatingItem) => {
       const skillsFromSRD = v.skills_srd;
@@ -3759,7 +3759,12 @@ const updateSkillsFromSRD = () => {
               const skillBonus = getIntValue(match[2]) - abilityValue;
 
               if (skillBonus >= expertise) {
-                finalSetAttrs[`${repeatingString}proficiency`] = 'expertise';
+                if (v.expertise_as_advantage) {
+                  finalSetAttrs[`${repeatingString}skill_d20`] = '2d20@{d20_mod}kh1';
+                  finalSetAttrs[`${repeatingString}proficiency`] = 'proficient';
+                } else {
+                  finalSetAttrs[`${repeatingString}proficiency`] = 'expertise';
+                }
                 if (skillBonus > expertise) {
                   finalSetAttrs[`${repeatingString}bonus`] = skillBonus - expertise;
                 }
