@@ -10,8 +10,15 @@ Report any problems, suggestions or features by sending a private message on Rol
 
 ## Todo
 * Change to only show crit value if there are more than one 6 in the roll.
+* Convert Coin, Bandolier, and Recovery checkboxes in the player sheet to radio buttons for consistency.
 
 ## Changelog
+
+### 0.0.7
+* Added Clocks Tab To Player Sheets
+   - Clocks tab can track 4,6,8, and 12 segment clocks
+* Bugfixes
+   - Fixed issues with the crew sheet where certain rows of boxes would populate fully instead of only up to what was clicked
 
 ### 0.0.6
 * Reformatted header
