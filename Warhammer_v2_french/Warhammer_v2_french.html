@@ -305,7 +305,7 @@
             </div>
             <fieldset class="repeating_weapons">
                 <div class="dark_row">
-                <button  type="roll" style="margin-left:0px;line_height:10px;height:20px;margin-bottom:2px;" title="Combat" name="roll_Arme" value="&{template:war2_combat}{{name=@{ArmeNom}}} {{Carac=[[@{CC_Actuel}+?{mod|0}]]}}  {{Roll=[[ 1D100cs<[[@{CC_Actuel}+?{mod|0}]]cf>[[@{CC_Actuel}+?{mod|0} ]]]]}}  {{Rollbis=[[[[1D100]]cs<[[@{CC_Actuel}+?{mod|0}]]cf>[[@{CC_Actuel}+?{mod|0}]]]]}} {{degats=[[1D10+@{ArmeDeg}]]}} {{degatsbis=[[1D10!+@{ArmeDeg}]]}} "></button>
+                <button  type="roll" style="margin-left:0px;line_height:10px;height:20px;margin-bottom:2px;" title="Combat" name="roll_Arme" value="&{template:war2_combat}{{name=@{ArmeNom}}} {{Carac=[[@{CC_Actuel}+?{mod|0}]]}}  {{Roll=[[ 1D100cs<[[@{CC_Actuel}+?{mod|0}]]cf>[[@{CC_Actuel}+?{mod|0} ]]]]}}  {{Rollbis=[[[[1D100]]cs<[[@{CC_Actuel}+?{mod|0}]]cf>[[@{CC_Actuel}+?{mod|0}]]]]}} {{degats=?{Percutant(e) ?|Non,[[1D10+@{ArmeDeg}|Oui,[[2D10k1+@{ArmeDeg}}]]}} {{degatsbis=[[1D10!+@{ArmeDeg}}]]}}"></button>
                 <input class="arme" type="text" name="attr_ArmeNom" style="width:150px;margin-left:0px;"/>
                 <input class="arme" type="text" name="attr_ArmeDeg" style="width:50px;text-align:center;"/>
                 <input class="arme" type="text" name="attr_ArmeGroup" style="width:150px;"/>
@@ -324,7 +324,7 @@
             </div>            
              <fieldset class="repeating_rangedweapons">
                 <div class="dark_row">
-                <button  type="roll" style="margin-left:0px;line_height:10px;height:20px;margin-bottom:2px;" title="Combat à distance" name="roll_Distance" value="&{template:war2_combat}{{name=@{RangedWeaponName}}} {{Carac=[[@{CT_Actuel}+?{mod|0}]]}}  {{Roll=[[1D100cs<[[@{CT_Actuel}+?{mod|0}]]cf>[[@{CT_Actuel}+?{mod|0}]]]]}} {{degats=[[1D10+@{RangedWeaponDmg}]]}} {{degatsbis=[[1D10!+@{RangedWeaponDmg}]]}} "></button>
+                <button  type="roll" style="margin-left:0px;line_height:10px;height:20px;margin-bottom:2px;" title="Combat à distance" name="roll_Distance" value="&{template:war2_combat}{{name=@{RangedWeaponName}}} {{Carac=[[@{CT_Actuel}+?{mod|0}]]}}  {{Roll=[[1D100cs<[[@{CT_Actuel}+?{mod|0}]]cf>[[@{CT_Actuel}+?{mod|0}]]]]}} {{degats=?{Percutant(e) ?|Non,[[1D10+@{RangedWeaponDmg}|Oui,[[2D10k1+@{RangedWeaponDmg}]]}} {{degatsbis=[[1D10!+@{RangedWeaponDmg}}]]}} "></button>
                 <input class="arme" type="text" name="attr_RangedWeaponName" style="width:150px;margin-left:0px;"/>
                 <input class="arme" type="text" name="attr_RangedWeaponDmg" style="width:40px;text-align:center;"/>
                 <input class="arme" type="text" name="attr_RangedWeaponRange" style="width:60px;text-align:center;"/>
@@ -651,6 +651,17 @@
             </fieldset>
             </div>
             </div> <!-- fin Equipement-->
+            <div  style="margin-top:20px;"><table>
+            <tr><td COLSPAN="3" style="font-weight:bolder;font-size:20px;text-align:center;color:black;font-weight:bolder;">BOURSE</td></tr>
+            <tr>
+            <td style="color:black;paddinng:0px 20px;">Couronnes d'Or</td><td style="color:black;padding:0px 20px;">Pistoles d'Argent</td><td style="color:black;padding:0px 20px;">Sous de Cuivre</td>            </tr>
+            <tr>
+            <td style="text-align:center"><input type="number" name="attr_co" style="text-align:center"></td>
+            <td style="text-align:center"><input type="number" name="attr_pa" style="text-align:center"></td>
+            <td style="text-align:center"><input type="number" name="attr_sc" style="text-align:center"></td>
+            </tr>
+            </table>
+            </div>
             </div> <!-- fin Colonne de droite-->
             </div>
             </div> <!-- Fin Deuxième Onglet-->
@@ -685,6 +696,9 @@
         		        {{#rollLess() Roll Carac}}
                             <td COLSPAN="2" style="text-align:center;font-style:oblique;font-weight:bolder;color: #3FB315;">Succès !</td>
                         {{/rollLess() Roll Carac}}
+						{{#rollTotal() Roll Carac}}
+                            <td COLSPAN="2" style="text-align:center;font-style:oblique;font-weight:bolder;color: #3FB315;">Succès !</td>
+                        {{/rollTotal() Roll Carac}}
 			{{/Roll}}
             <tr>
         <tr>
@@ -718,8 +732,29 @@
             </tr>
              <tr>   {{#rollGreater() Roll Carac}}
                             <td COLSPAN="2" style="text-align:center;font-style:oblique;font-weight:bolder;color: #B31515;">Echec</td>
-                        {{/rollGreater() Roll Carac}}
-        		        {{#rollLess() Roll Carac}}
+                    {{/rollGreater() Roll Carac}}
+                    {{#rollTotal() Roll Carac}}
+                            <td class="tcat">Dégâts :</td>
+                            <td>{{degats}}</td>
+                                <tr>
+                                {{#rollWasCrit() degats }}
+    					            <tr>
+						            {{#rollGreater() Rollbis Carac}}
+						            <td COLSPAN="2" style="text-align:center;font-style:oblique;font-weight:bolder;color: #B31515;">Critique échoué</td>
+                                    {{/rollGreater() Rollbis Carac}}
+                                    {{#rollLess() Rollbis Carac}}
+                                    <tr>
+                                    <td COLSPAN="2" class="tcat" style="text-align:center;font-style:oblique;font-weight:bolder;color: #3FB315;">Critique !</td>
+                                    </tr>
+                                    <tr>
+                                    <td COLSPAN="2" style="text-align:center;font-style:oblique;font-weight:bolder;"> Dégâts critiques : {{degatsbis}}</td>
+                                    </tr>
+                                    {{/rollLess() Rollbis Carac}}
+			                        {{/rollWasCrit() degats }}
+                                </tr>
+                    {{/rollTotal() Roll Carac}}
+                        
+        		    {{#rollLess() Roll Carac}}
                             <td class="tcat">Dégâts :</td>
                             <td>{{degats}}</td>
                                 <tr>
@@ -738,7 +773,7 @@
                                     {{/rollLess() Rollbis Carac}}
 			                        {{/rollWasCrit() degats }}
                                 </tr>
-                        {{/rollLess() Roll Carac}}
+                    {{/rollLess() Roll Carac}}
 			{{/Roll}}
             </tr>
            
