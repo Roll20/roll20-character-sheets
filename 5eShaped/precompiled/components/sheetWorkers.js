@@ -5259,6 +5259,16 @@ const updateDefaultAbility = () => {
     },
   });
 };
+const updateHideFreetext = () => {
+  getSetItems({
+    collectionArray: ['hide_freetext', 'hide_action_freetext'],
+    callback: (v, finalSetAttrs) => {
+      if (!isUndefinedOrEmpty(v.hide_action_freetext)) {
+        finalSetAttrs.hide_freetext = v.hide_action_freetext;
+      }
+    },
+  });
+};
 
 const checkVersionFormat = (version, finalSetAttrs) => {
   const versionRegex = /\d+\.\d+\.\d+/gi;
@@ -5449,6 +5459,9 @@ const sheetOpened = () => {
         }
         if (versionCompare(version, '5.0.8') < 0) {
           newAttackToggleTwo();
+        }
+        if (versionCompare(version, '5.2.3') < 0) {
+          updateHideFreetext();
         }
       }
 
