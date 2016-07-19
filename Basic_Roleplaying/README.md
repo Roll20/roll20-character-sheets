@@ -1,0 +1,1 @@
+Character sheet for Basic Roleplaying 4th (Big Gold Book) Edition. The sheet has split up by category.  A future version may include an option to remove catagories. The sheet is configurable to use Hit locations or the major wound system. The EDU and Fatigue stats can also be removed.
