@@ -1,4 +1,6 @@
-import { getSetItems, getIntValue, isUndefined, addArithmeticOperator, getAbilityValue, getAbilityShortName } from './utilities';
+/* global on:false */
+
+import { getSetItems, getIntValue, isUndefined, addArithmeticOperator, getAbilityValue, getAbilityShortName, exists } from './utilities';
 import { ABILITIES } from './constants';
 
 const updateInitiative = () => {

@@ -1,7 +1,7 @@
-/* on:false */
+/* global on:false */
 
 import { ABILITIES } from './constants';
-import { getSetRepeatingItems } from './utilities';
+import { getSetRepeatingItems, exists } from './utilities';
 
 const updateAttachers = () => {
   const collectionArray = ['attacher_initiative', 'attacher_death_saving_throw', 'attacher_hit_dice', 'attacher_attack', 'attacher_spell', 'attacher_skill', 'attacher_crit'];

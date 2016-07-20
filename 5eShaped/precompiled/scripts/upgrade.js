@@ -1,8 +1,8 @@
-/* global on:false generateRowID:false */
+/* global on:false, generateRowID:false */
 
 import { updateAbilityModifiers } from './abilities';
 import { updateSkill, updateAbilityChecksMacro } from './abilityChecks';
-import { updateActions, updateAction, updateActionChatMacro } from './actions';
+import { updateActions, updateActionChatMacro } from './actions';
 import { updateAttachers } from './attachers';
 import { updateAttack, updateAttackChatMacro } from './attacks';
 import { updateLevels, updateAlignment, updateD20Mod } from './character';
@@ -16,6 +16,7 @@ import { updateSavingThrows, updateCustomSavingThrows, updateCustomSavingThrowTo
 import { updateShapedD20 } from './settings';
 import { updateSpell, updateSpellSlots, updateSpellShowHide, updateSpellChatMacro, generateHigherLevelQueries } from './spells';
 import { isUndefined, isUndefinedOrEmpty, getAbilityName, ordinalSpellLevel, getSetItems, getSetRepeatingItems } from './utilities';
+import { currentVersion } from './version';
 
 const extasToExtrasFix = (repeatingSection) => {
   getSetRepeatingItems('extasToExtrasFix', {
@@ -77,6 +78,11 @@ const updateHideFreetext = () => {
     },
   });
 };
+const atSyntaxToAbilityName = (v, finalSetAttrs, repeatingString, field) => {
+  if (v[`${repeatingString}${field}`]) {
+    finalSetAttrs[`${repeatingString}${field}`] = getAbilityName(v[`${repeatingString}${field}`]);
+  }
+};
 const updateSkillAbility = () => {
   getSetRepeatingItems('updateSkillAbility', {
     repeatingItems: ['repeating_skill'],
@@ -98,11 +104,6 @@ const updateArmorAbility = () => {
       }
     },
   });
-};
-const atSyntaxToAbilityName = (v, finalSetAttrs, repeatingString, field) => {
-  if (v[`${repeatingString}${field}`]) {
-    finalSetAttrs[`${repeatingString}${field}`] = getAbilityName(v[`${repeatingString}${field}`]);
-  }
 };
 
 const updateActionComponents = () => {
@@ -427,7 +428,7 @@ const versionCompare = (v1, v2, options) => {
   return 0;
 };
 const upgrade = () => {
-  if (versionCompare(version, '2.1.0') < 0) {
+  if (versionCompare(currentVersion, '2.1.0') < 0) {
     updateNPCChallenge();
     updateDamageVulnerabilities();
     updateDamageResistances();
@@ -436,129 +437,129 @@ const upgrade = () => {
     updateLanguages();
     updateSenses();
   }
-  if (versionCompare(version, '2.1.3') < 0) {
+  if (versionCompare(currentVersion, '2.1.3') < 0) {
     updateType();
     updateAlignment();
   }
-  if (versionCompare(version, '2.1.5') < 0) {
+  if (versionCompare(currentVersion, '2.1.5') < 0) {
     updateNPCAC();
   }
-  if (versionCompare(version, '2.1.10') < 0) {
+  if (versionCompare(currentVersion, '2.1.10') < 0) {
     updateSavingThrows();
   }
-  if (versionCompare(version, '2.1.13') < 0) {
+  if (versionCompare(currentVersion, '2.1.13') < 0) {
     weighEquipment();
   }
-  if (versionCompare(version, '2.1.15') < 0) {
+  if (versionCompare(currentVersion, '2.1.15') < 0) {
     displayTextForTraits();
   }
-  if (versionCompare(version, '2.2.2') < 0) {
+  if (versionCompare(currentVersion, '2.2.2') < 0) {
     resourcesToTraits();
   }
-  if (versionCompare(version, '2.2.4') < 0) {
+  if (versionCompare(currentVersion, '2.2.4') < 0) {
     updateInitiative();
   }
-  if (versionCompare(version, '2.2.5') < 0) {
+  if (versionCompare(currentVersion, '2.2.5') < 0) {
     weighAmmo();
   }
-  if (versionCompare(version, '2.2.6') < 0) {
+  if (versionCompare(currentVersion, '2.2.6') < 0) {
     updateLevels();
     extasToExtrasFix('repeating_attack');
     extasToExtrasFix('repeating_action');
     extasToExtrasFix('repeating_spell');
   }
-  if (versionCompare(version, '2.3.3') < 0) {
+  if (versionCompare(currentVersion, '2.3.3') < 0) {
     updateAttachers();
   }
-  if (versionCompare(version, '2.4.2') < 0) {
+  if (versionCompare(currentVersion, '2.4.2') < 0) {
     updateAbilityModifiers();
     updateActionChatMacro('trait');
     updateActionChatMacro('action');
     updateActionChatMacro('reaction');
     updateActionChatMacro('legendaryaction');
   }
-  if (versionCompare(version, '2.4.3') < 0) {
+  if (versionCompare(currentVersion, '2.4.3') < 0) {
     setClassFeatures();
   }
-  if (versionCompare(version, '2.4.7') < 0) {
+  if (versionCompare(currentVersion, '2.4.7') < 0) {
     classFeaturesToTraits();
   }
-  if (versionCompare(version, '2.4.8') < 0) {
+  if (versionCompare(currentVersion, '2.4.8') < 0) {
     fixRollTwo();
   }
-  if (versionCompare(version, '2.4.12') < 0) {
+  if (versionCompare(currentVersion, '2.4.12') < 0) {
     armorPlusDexRemoval();
     updateArmor();
   }
-  if (versionCompare(version, '3.1.0') < 0) {
+  if (versionCompare(currentVersion, '3.1.0') < 0) {
     updateAttackChatMacro();
   }
-  if (versionCompare(version, '3.2.1') < 0) {
+  if (versionCompare(currentVersion, '3.2.1') < 0) {
     updateCritDamage();
   }
-  if (versionCompare(version, '3.2.3') < 0) {
+  if (versionCompare(currentVersion, '3.2.3') < 0) {
     updateDamageResistancesVar();
   }
-  if (versionCompare(version, '3.5.0') < 0) {
+  if (versionCompare(currentVersion, '3.5.0') < 0) {
     updateSpellChatMacro();
   }
-  if (versionCompare(version, '3.5.1') < 0) {
+  if (versionCompare(currentVersion, '3.5.1') < 0) {
     updateSpellSlots();
   }
-  if (versionCompare(version, '3.6.1') < 0) {
+  if (versionCompare(currentVersion, '3.6.1') < 0) {
     updateNPCHD();
     switchToNPC();
   }
-  if (versionCompare(version, '4.1.4') < 0) {
+  if (versionCompare(currentVersion, '4.1.4') < 0) {
     updateArmorAbility();
     updateActionComponents();
     updateSkillAbility();
   }
-  if (versionCompare(version, '4.1.5') < 0) {
+  if (versionCompare(currentVersion, '4.1.5') < 0) {
     updateSkill();
   }
-  if (versionCompare(version, '4.2.0') < 0) {
+  if (versionCompare(currentVersion, '4.2.0') < 0) {
     updateD20Mod();
     updateShapedD20();
   }
-  if (versionCompare(version, '4.2.1') < 0) {
+  if (versionCompare(currentVersion, '4.2.1') < 0) {
     updateActionComponentsToRemoveExtraFields();
     updateAbilityChecksMacro();
     removeToggleVar();
   }
-  if (versionCompare(version, '4.2.3') < 0) {
+  if (versionCompare(currentVersion, '4.2.3') < 0) {
     updateArmor();
   }
-  if (versionCompare(version, '4.4.0') < 0) {
+  if (versionCompare(currentVersion, '4.4.0') < 0) {
     updateCustomSavingThrows();
     newAttackToggle();
     generateHigherLevelQueries();
   }
-  if (versionCompare(version, '4.4.1') < 0) {
+  if (versionCompare(currentVersion, '4.4.1') < 0) {
     newAbilityDefaults();
   }
-  if (versionCompare(version, '4.4.2') < 0) {
+  if (versionCompare(currentVersion, '4.4.2') < 0) {
     updateSpellShowHide();
   }
-  if (versionCompare(version, '5.0.0') < 0) {
+  if (versionCompare(currentVersion, '5.0.0') < 0) {
     updateSpellToTranslations();
   }
-  if (versionCompare(version, '5.0.3') < 0) {
+  if (versionCompare(currentVersion, '5.0.3') < 0) {
     updateSpell();
     updateAttack();
     updateActions();
     updateCustomSavingThrowToggle();
   }
-  if (versionCompare(version, '5.0.4') < 0) {
+  if (versionCompare(currentVersion, '5.0.4') < 0) {
     updateDefaultAbility();
   }
-  if (versionCompare(version, '5.0.6') < 0) {
+  if (versionCompare(currentVersion, '5.0.6') < 0) {
     updateSpellLevelForCantrips();
   }
-  if (versionCompare(version, '5.0.8') < 0) {
+  if (versionCompare(currentVersion, '5.0.8') < 0) {
     newAttackToggleTwo();
   }
-  if (versionCompare(version, '5.2.3') < 0) {
+  if (versionCompare(currentVersion, '5.2.3') < 0) {
     updateHideFreetext();
   }
 };

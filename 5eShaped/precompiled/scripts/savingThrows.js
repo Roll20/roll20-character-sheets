@@ -1,5 +1,7 @@
+/* global on:false */
+
 import { ABILITIES } from './constants';
-import { getSetItems, getIntValue, getAbilityShortName, addArithmeticOperator, isUndefinedOrEmpty } from './utilities';
+import { getSetItems, getIntValue, getAbilityShortName, addArithmeticOperator, isUndefinedOrEmpty, exists, showSign } from './utilities';
 
 const getHighestOfAbilityScoresForSavingThrow = (v, savingThrowName) => {
   let abilityName;
@@ -77,9 +79,6 @@ const updateSavingThrow = (savingThrowName) => {
     collectionArray.push(`${savingThrowName}_${ability}`);
     if (customSavingThrow) {
       collectionArray.push(`${ability}_save_prof`);
-      for (const ability of ABILITIES) {
-        collectionArray.push(`${savingThrowName}_${ability}`);
-      }
     }
   }
 

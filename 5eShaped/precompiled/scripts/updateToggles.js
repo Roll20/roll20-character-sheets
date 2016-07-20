@@ -1,5 +1,5 @@
 import { TOGGLE_VARS } from './constants';
-import { fromVOrFinalSetAttrs, getIntValue, getAbilityValue, addArithmeticOperator, getAbilityShortName, hasUpperCase, isUndefinedOrEmpty } from './utilities';
+import { fromVOrFinalSetAttrs, getIntValue, getAbilityValue, addArithmeticOperator, getAbilityShortName, hasUpperCase, isUndefined, isUndefinedOrEmpty, exists } from './utilities';
 
 const parseAttackComponent = (v, repeatingString, finalSetAttrs, options) => {
   let parsed = v[`${repeatingString}parsed`];

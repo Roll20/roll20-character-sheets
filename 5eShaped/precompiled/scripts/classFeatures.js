@@ -296,7 +296,10 @@ const setClassFeatures = () => {
             wildShapeUses = 2;
           }
           setTrait({
-            freetext: getTranslationByKey('CLASS_FEATURE_WILD_SHAPE_TEXT').replace('WILD_SHAPE_HOURS', wildShapeHours).replace('CHALLENGE_RATING', wildShapeCR).replace('LIMITATIONS', ` ${wildShapeLimitations}`),
+            freetext: getTranslationByKey('CLASS_FEATURE_WILD_SHAPE_TEXT')
+              .replace('WILD_SHAPE_HOURS', wildShapeHours)
+              .replace('CHALLENGE_RATING', wildShapeCR)
+              .replace('LIMITATIONS', ` ${wildShapeLimitations}`),
             name: getTranslationByKey('CLASS_FEATURE_WILD_SHAPE'),
             recharge: 'Short Rest',
             storageName: 'Wild Shape',

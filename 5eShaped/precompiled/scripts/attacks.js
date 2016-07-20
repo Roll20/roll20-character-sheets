@@ -1,5 +1,6 @@
-/* global generateRowID:false */
-import { getSetRepeatingItems, isUndefinedOrEmpty, setFinalAttrs, setCritDamage, sumRepeating, lowercaseDamageTypes } from './utilities';
+/* global on:false, generateRowID:false */
+import { ABILITIES } from './constants';
+import { getSetRepeatingItems, isUndefinedOrEmpty, setFinalAttrs, setCritDamage, sumRepeating, lowercaseDamageTypes, exists, getIntValue, getRepeatingInfo } from './utilities';
 import { updateAttackToggle, updateSavingThrowToggle, updateDamageToggle } from './updateToggles';
 
 const findAmmo = (name, callback) => {

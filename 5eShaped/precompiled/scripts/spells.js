@@ -1,5 +1,5 @@
-/* global generateRowID:false */
-import { getSetItems, getSetRepeatingItems, ordinalSpellLevel, getIntValue, isUndefinedOrEmpty, setCritDamage, fromVOrFinalSetAttrs, lowercaseDamageTypes, getRepeatingInfo } from './utilities';
+/* global on:false, generateRowID:false */
+import { getSetItems, getSetRepeatingItems, ordinalSpellLevel, getIntValue, isUndefined, isUndefinedOrEmpty, setCritDamage, fromVOrFinalSetAttrs, lowercaseDamageTypes, getRepeatingInfo, exists } from './utilities';
 import { updateAttackToggle, updateSavingThrowToggle, updateDamageToggle, updateHealToggle, updateHigherLevelToggle } from './updateToggles';
 import { ABILITIES, TOGGLE_VARS } from './constants';
 

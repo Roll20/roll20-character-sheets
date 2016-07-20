@@ -1,4 +1,4 @@
-import { isUndefinedOrEmpty } from './utilities';
+import { isUndefinedOrEmpty, exists } from './utilities';
 
 const updateHD = (v, finalSetAttrs, hd) => {
   for (const key in hd) {

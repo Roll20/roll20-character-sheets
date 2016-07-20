@@ -1,5 +1,7 @@
-import { getSetItems, getSetRepeatingItems, getSkillIdByStorageName, getFloatValue, sumRepeating, isUndefinedOrEmpty, getRepeatingInfo } from './utilities';
-import { SKILLS } from './constants';
+/* global on:false */
+
+import { getSetItems, getSetRepeatingItems, getSkillIdByStorageName, getFloatValue, sumRepeating, isUndefinedOrEmpty, getRepeatingInfo, exists, round } from './utilities';
+import { ABILITIES, SKILLS } from './constants';
 
 const setAdvantageOnStealth = (mode) => {
   getSetRepeatingItems('setAdvantageOnStealth', {

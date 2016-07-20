@@ -101,22 +101,9 @@ gulp.task('compile', ['sass', 'translationDist'], function () {
     .pipe(gulp.dest('../'))
 });
 
-const esLintConfig = {
-  parser: 'babel-eslint',
-  extends: 'airbnb/base',
-  rules: {
-    'arrow-body-style': 0,
-    'indent': 0,
-    'max-len': 0,
-    'no-cond-assign': 0,
-    'no-console': 0,
-    'no-param-reassign': 0,
-    'no-undef': 0
-  }
-};
 gulp.task('lint', function () {
-  return gulp.src('./scripts/sheetWorkers.js')
-    .pipe(eslint(esLintConfig))
+  return gulp.src(['./scripts/*.js'])
+    .pipe(eslint())
     .pipe(eslint.format())
     .pipe(eslint.failAfterError());
 });

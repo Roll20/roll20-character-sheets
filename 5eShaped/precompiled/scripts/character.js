@@ -1,9 +1,10 @@
 /* global on:false */
 
 import { ABILITIES, CLASSES } from './constants';
-import { getSetItems, getSetRepeatingItems, isUndefinedOrEmpty, getIntValue } from './utilities';
 import { setClassFeatures } from './classFeatures';
+import { updateSpellSlots } from './spells';
 import { updateHD } from './hd';
+import { getSetItems, getSetRepeatingItems, isUndefinedOrEmpty, getIntValue, exists, capitalize, getRepeatingInfo } from './utilities';
 
 const updateLevels = (repeatingInfo) => {
   const defaultClassDetails = {
@@ -262,7 +263,7 @@ const updateRemarkableAthlete = () => {
     },
   });
 };
-function updateD20Mod() {
+const updateD20Mod = () => {
   getSetItems('updateD20Mod', {
     collectionArray: ['halfling_luck'],
     callback: (v, finalSetAttrs) => {
@@ -273,7 +274,7 @@ function updateD20Mod() {
       }
     },
   });
-}
+};
 const updateAlignment = () => {
   getSetItems('updateAlignment', {
     collectionArray: ['alignment', 'is_npc'],
@@ -314,7 +315,4 @@ const characterSetup = () => {
   watchForClassLevelChanges();
 };
 
-
 export { characterSetup, updateLevels, updateAlignment, updateD20Mod };
-
-

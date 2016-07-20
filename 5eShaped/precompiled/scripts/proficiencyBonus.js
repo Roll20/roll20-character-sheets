@@ -1,4 +1,6 @@
-import { getSetItems, getIntValue } from './utilities';
+/* global on:false */
+
+import { getSetItems, getIntValue, exists } from './utilities';
 
 const getPB = (level, challenge) => {
   let pb = 2;

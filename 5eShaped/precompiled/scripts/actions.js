@@ -1,5 +1,7 @@
+/* global on:false */
+
 import { ABILITIES, TOGGLE_VARS } from './constants';
-import { getSetRepeatingItems, isUndefined, isUndefinedOrEmpty, fromVOrFinalSetAttrs, setCritDamage, getCorrectAbilityBasedOnBonus, getAnyCorrectAbilityBasedOnBonus, getIntValue, getRepeatingInfo, lowercaseDamageTypes } from './utilities';
+import { getSetRepeatingItems, isUndefined, isUndefinedOrEmpty, fromVOrFinalSetAttrs, setCritDamage, getCorrectAbilityBasedOnBonus, getAnyCorrectAbilityBasedOnBonus, getIntValue, getRepeatingInfo, lowercaseDamageTypes, exists } from './utilities';
 import { updateAttackToggle, updateSavingThrowToggle, updateDamageToggle, updateHealToggle } from './updateToggles';
 import { getPB } from './proficiencyBonus';
 

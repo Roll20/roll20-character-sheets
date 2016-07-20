@@ -4,7 +4,7 @@ import { updateSkill } from './abilityChecks';
 import { updateActions } from './actions';
 import { updateAttack } from './attacks';
 import { updateSpell } from './spells';
-import { getSetItems, getIntValue, getFloatValue, getAbilityMod, addArithmeticOperator, showSign } from './utilities';
+import { getSetItems, getIntValue, getFloatValue, getAbilityMod, addArithmeticOperator, showSign, firstThree } from './utilities';
 
 const updateAbilityModifier = (ability) => {
   const collectionArray = [ability, `${ability}_bonus`, `${ability}_mod`, `${ability}_mod_with_sign`, `${ability}_check_mod`, `${ability}_check_mod_formula`, `${ability}_check_bonus`, 'global_ability_bonus', 'strength_mod', 'dexterity_mod', 'jack_of_all_trades_toggle', 'jack_of_all_trades', 'remarkable_athlete_toggle', 'remarkable_athlete', 'global_check_bonus'];

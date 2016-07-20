@@ -3,27 +3,16 @@
 import { updateAbilityModifiers } from './abilities';
 import { updateSkill, updateAbilityChecksMacro } from './abilityChecks';
 import { updateLevels } from './character';
+import { SKILLS } from './constants';
 import { updateArmor } from './equipment';
 import { updateInitiative } from './initiative';
 import { updatePb } from './proficiencyBonus';
 import { updateSavingThrows } from './savingThrows';
 import { updateSpellShowHide } from './spells';
-import { getSetItems, getSetRepeatingItems, getIntValue, isUndefinedOrEmpty, setFinalAttrs, getSkillIdByStorageName } from './utilities';
+import { upgrade } from './upgrade';
+import { getSetItems, getSetRepeatingItems, isUndefinedOrEmpty, setFinalAttrs, getSkillIdByStorageName } from './utilities';
 import { currentVersion } from './version';
 
-const setDefaultAbility = (v, finalSetAttrs) => {
-  const abilityScores = [getIntValue(v.intelligence), getIntValue(v.wisdom), getIntValue(v.charisma)];
-  const highestAbilityScore = Math.max.apply(Math, abilityScores);
-  let highestAbilityName = 'intelligence';
-
-  if (highestAbilityScore === abilityScores[1]) {
-    highestAbilityName = 'wisdom';
-  } else if (highestAbilityScore === abilityScores[2]) {
-    highestAbilityName = 'charisma';
-  }
-
-  finalSetAttrs.default_ability = highestAbilityName;
-};
 const generateSkills = () => {
   getSetRepeatingItems('generateSkills', {
     repeatingItems: ['repeating_skill'],

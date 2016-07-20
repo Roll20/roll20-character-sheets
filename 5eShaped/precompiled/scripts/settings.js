@@ -1,3 +1,5 @@
+/* global on:false */
+
 import { getSetItems } from './utilities';
 
 const updateShapedD20 = () => {

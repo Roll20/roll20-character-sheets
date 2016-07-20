@@ -1,9 +1,56 @@
 /* global on:false, generateRowID:false, getTranslationByKey:false */
 
-import { getSetRepeatingItems, isUndefinedOrEmpty, getAbilityValue, getAbilityShortName, getIntValue, addArithmeticOperator, showSign, getSkillIdByStorageName, capitalize } from './utilities';
+import { getSetRepeatingItems, isUndefinedOrEmpty, getAbilityValue, getAbilityShortName, getIntValue, addArithmeticOperator, showSign, capitalize, exists, getRepeatingInfo } from './utilities';
 import { ABILITIES } from './constants';
 import { getPB } from './proficiencyBonus';
 
+
+const updateAbilityChecksMacro = () => {
+  const collectionArray = ['ability_checks_query_var', 'ability_checks_macro_var', 'ability_checks_show_totals'];
+  for (const ability of ABILITIES) {
+    collectionArray.push(`${ability}_check_mod`);
+    collectionArray.push(`${ability}_check_mod_with_sign`);
+  }
+
+  getSetRepeatingItems('updateAbilityChecksMacro', {
+    repeatingItems: ['repeating_skill'],
+    collectionArray,
+    collectionArrayAddItems: ['name', 'ability', 'total_with_sign'],
+    callback: (v, finalSetAttrs, ids, repeatingItem) => {
+      finalSetAttrs.ability_checks_query_var = '?{Ability Check';
+      finalSetAttrs.ability_checks_macro_var = '';
+      finalSetAttrs.skills_macro_var = '';
+
+
+      for (const ability of ABILITIES) {
+        finalSetAttrs.ability_checks_query_var += `|${capitalize(ability)},{{title=${capitalize(ability)}&#125;&#125; {{roll1=[[@{shaped_d20} + ${v[`${ability}_check_mod`]}]]&#125;&#125; @{roll_setting} + ${v[`${ability}_check_mod`]}]]&#125;&#125;`;
+        if (v.ability_checks_show_totals === 'on') {
+          finalSetAttrs.ability_checks_macro_var += `[${capitalize(ability)} ${v[`${ability}_check_mod_with_sign`]}](~shaped_${ability}_check)`;
+        } else {
+          finalSetAttrs.ability_checks_macro_var += `[${capitalize(ability)}](~shaped_${ability}_check)`;
+        }
+        finalSetAttrs.ability_checks_macro_var += ', ';
+      }
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
+        finalSetAttrs.ability_checks_query_var += `|${v[`${repeatingString}name`]}, {{title=${v[`${repeatingString}name`]} (${capitalize(getAbilityShortName(v[`${repeatingString}ability`]))})&#125;&#125; {{roll1=[[@{shaped_d20} + @{${repeatingString}formula}]]&#125;&#125; @{roll_setting} + @{${repeatingString}formula}]]&#125;&#125;`;
+        if (id !== ids[0]) {
+          finalSetAttrs.ability_checks_macro_var += ', ';
+          finalSetAttrs.skills_macro_var += ', ';
+        }
+        let skillButton;
+        if (v.ability_checks_show_totals === 'on') {
+          skillButton = `[${v[`${repeatingString}name`]} ${v[`${repeatingString}total_with_sign`]}](~repeating_skill_${id}_skill)`;
+        } else {
+          skillButton = `[${v[`${repeatingString}name`]}](~repeating_skill_${id}_skill)`;
+        }
+        finalSetAttrs.ability_checks_macro_var += skillButton;
+        finalSetAttrs.skills_macro_var += skillButton;
+      }
+      finalSetAttrs.ability_checks_query_var += '}';
+    },
+  });
+};
 const updateSkill = (rowId) => {
   const collectionArray = ['jack_of_all_trades_toggle', 'jack_of_all_trades', 'remarkable_athlete_toggle', 'remarkable_athlete', 'pb', 'exp', 'global_check_bonus'];
   for (const ability of ABILITIES) {
@@ -164,52 +211,6 @@ const updateSkillsFromSRD = () => {
           }
         }
       }
-    },
-  });
-};
-const updateAbilityChecksMacro = () => {
-  const collectionArray = ['ability_checks_query_var', 'ability_checks_macro_var', 'ability_checks_show_totals'];
-  for (const ability of ABILITIES) {
-    collectionArray.push(`${ability}_check_mod`);
-    collectionArray.push(`${ability}_check_mod_with_sign`);
-  }
-
-  getSetRepeatingItems('updateAbilityChecksMacro', {
-    repeatingItems: ['repeating_skill'],
-    collectionArray,
-    collectionArrayAddItems: ['name', 'ability', 'total_with_sign'],
-    callback: (v, finalSetAttrs, ids, repeatingItem) => {
-      finalSetAttrs.ability_checks_query_var = '?{Ability Check';
-      finalSetAttrs.ability_checks_macro_var = '';
-      finalSetAttrs.skills_macro_var = '';
-
-
-      for (const ability of ABILITIES) {
-        finalSetAttrs.ability_checks_query_var += `|${capitalize(ability)},{{title=${capitalize(ability)}&#125;&#125; {{roll1=[[@{shaped_d20} + ${v[`${ability}_check_mod`]}]]&#125;&#125; @{roll_setting} + ${v[`${ability}_check_mod`]}]]&#125;&#125;`;
-        if (v.ability_checks_show_totals === 'on') {
-          finalSetAttrs.ability_checks_macro_var += `[${capitalize(ability)} ${v[`${ability}_check_mod_with_sign`]}](~shaped_${ability}_check)`;
-        } else {
-          finalSetAttrs.ability_checks_macro_var += `[${capitalize(ability)}](~shaped_${ability}_check)`;
-        }
-        finalSetAttrs.ability_checks_macro_var += ', ';
-      }
-      for (const id of ids) {
-        const repeatingString = `${repeatingItem}_${id}_`;
-        finalSetAttrs.ability_checks_query_var += `|${v[`${repeatingString}name`]}, {{title=${v[`${repeatingString}name`]} (${capitalize(getAbilityShortName(v[`${repeatingString}ability`]))})&#125;&#125; {{roll1=[[@{shaped_d20} + @{${repeatingString}formula}]]&#125;&#125; @{roll_setting} + @{${repeatingString}formula}]]&#125;&#125;`;
-        if (id !== ids[0]) {
-          finalSetAttrs.ability_checks_macro_var += ', ';
-          finalSetAttrs.skills_macro_var += ', ';
-        }
-        let skillButton;
-        if (v.ability_checks_show_totals === 'on') {
-          skillButton = `[${v[`${repeatingString}name`]} ${v[`${repeatingString}total_with_sign`]}](~repeating_skill_${id}_skill)`;
-        } else {
-          skillButton = `[${v[`${repeatingString}name`]}](~repeating_skill_${id}_skill)`;
-        }
-        finalSetAttrs.ability_checks_macro_var += skillButton;
-        finalSetAttrs.skills_macro_var += skillButton;
-      }
-      finalSetAttrs.ability_checks_query_var += '}';
     },
   });
 };

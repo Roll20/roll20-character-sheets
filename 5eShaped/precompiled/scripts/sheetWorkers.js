@@ -12,7 +12,7 @@ import { initializeSetup } from './initialize';
 import { initiativeSetup } from './initiative';
 import { npcSetup } from './npc';
 import { proficiencyBonusSetup } from './proficiencyBonus';
-import { resistancesSetup, } from './resistances';
+import { resistancesSetup } from './resistances';
 import { savingThrowsSetup } from './savingThrows';
 import { settingsSetup } from './settings';
 import { spellsSetup } from './spells';

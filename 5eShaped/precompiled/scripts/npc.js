@@ -1,4 +1,7 @@
-import { getSetItems, getIntValue, isUndefinedOrEmpty, addArithmeticOperator, getAbilityMod, numberWithCommas } from './utilities';
+/* global on:false, generateRowID:false */
+
+import { getSetItems, getIntValue, isUndefinedOrEmpty, addArithmeticOperator, getAbilityMod, numberWithCommas, exists } from './utilities';
+import { ABILITIES } from './constants';
 import { updateHD } from './hd';
 
 const updateType = () => {
@@ -276,6 +279,20 @@ const parseSRDContentSection = (content, finalSetAttrs, title, name) => {
     }
   }
   return content;
+};
+
+const setDefaultAbility = (v, finalSetAttrs) => {
+  const abilityScores = [getIntValue(v.intelligence), getIntValue(v.wisdom), getIntValue(v.charisma)];
+  const highestAbilityScore = Math.max.apply(Math, abilityScores);
+  let highestAbilityName = 'intelligence';
+
+  if (highestAbilityScore === abilityScores[1]) {
+    highestAbilityName = 'wisdom';
+  } else if (highestAbilityScore === abilityScores[2]) {
+    highestAbilityName = 'charisma';
+  }
+
+  finalSetAttrs.default_ability = highestAbilityName;
 };
 const updateNPCContent = () => {
   const collectionArray = ['content_srd'];

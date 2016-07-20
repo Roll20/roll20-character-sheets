@@ -1,6 +1,6 @@
 /* global generateRowID:falsee */
 import { getSetRepeatingItems, isUndefinedOrEmpty, calculatePercentDifference } from './utilities';
-import { TOGGLE_VARS } from './constants'
+import { TOGGLE_VARS } from './constants';
 
 const setTrait = (obj) => {
   if (!obj.name) {

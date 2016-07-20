@@ -1,3 +1,5 @@
+/* global on:false */
+
 import { getSetItems, lowercaseDamageTypes } from './utilities';
 
 const updateDamageResistancesVar = () => {
