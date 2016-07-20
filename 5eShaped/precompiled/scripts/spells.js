@@ -1,7 +1,7 @@
 /* global generateRowID:false */
 import { getSetItems, getSetRepeatingItems, ordinalSpellLevel, getIntValue, isUndefinedOrEmpty, setCritDamage, fromVOrFinalSetAttrs, lowercaseDamageTypes, getRepeatingInfo } from './utilities';
 import { updateAttackToggle, updateSavingThrowToggle, updateDamageToggle, updateHealToggle, updateHigherLevelToggle } from './updateToggles';
-import { TOGGLE_VARS } from './constants';
+import { ABILITIES, TOGGLE_VARS } from './constants';
 
 const updateSpellFromSRD = (v, finalSetAttrs, repeatingString) => {
   if (v[`${repeatingString}spell_level_from_srd`]) {
