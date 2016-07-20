@@ -1,4 +1,6 @@
-import { getSetRepeatingItems, isUndefinedOrEmpty, getAbilityValue, getAbilityShortName, getIntValue, addArithmeticOperator, showSign } from './utilities';
+/* global on:false, generateRowID:false, getTranslationByKey:false */
+
+import { getSetRepeatingItems, isUndefinedOrEmpty, getAbilityValue, getAbilityShortName, getIntValue, addArithmeticOperator, showSign, getSkillIdByStorageName, capitalize } from './utilities';
 import { ABILITIES } from './constants';
 import { getPB } from './proficiencyBonus';
 
@@ -212,4 +214,25 @@ const updateAbilityChecksMacro = () => {
   });
 };
 
-export { updateSkill, updateSkillsFromSRD, updateAbilityChecksMacro };
+const abilityChecksSetup = () => {
+  on('change:repeating_skill', (eventInfo) => {
+    const repeatingInfo = getRepeatingInfo('repeating_skill', eventInfo);
+    if (repeatingInfo && repeatingInfo.field !== 'ability_key' && repeatingInfo.field !== 'total' && repeatingInfo.field !== 'total_with_sign' && repeatingInfo.field !== 'passive_total' && repeatingInfo.field !== 'passive_total_with_sign' && repeatingInfo.field !== 'formula') {
+      updateSkill(repeatingInfo.rowId);
+    }
+  });
+  on('change:jack_of_all_trades_toggle change:jack_of_all_trades change:remarkable_athlete_toggle change:remarkable_athlete change:global_check_bonus change:strength_check_bonus change:dexterity_check_bonus change:constitution_check_bonus change:intelligence_check_bonus change:wisdom_check_bonus change:charisma_check_bonus', () => {
+    updateSkill();
+  });
+  on('change:skills_srd', () => {
+    updateSkillsFromSRD();
+  });
+  on('remove:repeating_skill change:ability_checks_show_totals', () => {
+    updateAbilityChecksMacro();
+  });
+  on('change:pb', () => {
+    updateSkill();
+  });
+};
+
+export { abilityChecksSetup, updateSkill, updateAbilityChecksMacro };

@@ -1,4 +1,4 @@
-import { getSetItems, getSetRepeatingItems, getSkillIdByStorageName, getFloatValue } from './utilities';
+import { getSetItems, getSetRepeatingItems, getSkillIdByStorageName, getFloatValue, sumRepeating, isUndefinedOrEmpty, getRepeatingInfo } from './utilities';
 import { SKILLS } from './constants';
 
 const setAdvantageOnStealth = (mode) => {
@@ -144,5 +144,52 @@ const updateWeight = () => {
     },
   });
 };
+const calculateGold = () => {
+  getSetItems('calculateGold', {
+    collectionArray: ['cp', 'copper_per_gold', 'sp', 'silver_per_gold', 'ep', 'electrum_per_gold', 'gp', 'pp', 'platinum_per_gold'],
+    callback: (v, finalSetAttrs) => {
+      const copperPieces = getFloatValue(v.cp);
+      const silverPieces = getFloatValue(v.sp);
+      const electrumPieces = getFloatValue(v.ep);
+      const goldPieces = getFloatValue(v.gp);
+      const platinumPieces = getFloatValue(v.pp);
+      const copperPerGold = getFloatValue(v.copper_per_gold, 100);
+      const silverPerGold = getFloatValue(v.silver_per_gold, 10);
+      const electrumPerGold = getFloatValue(v.electrum_per_gold, 2);
+      const platinumPerGold = getFloatValue(v.platinum_per_gold, 10);
 
-export { setAdvantageOnStealth, updateArmor, updateEquipment, weighEquipment, weighAmmo, updateWeight };
+      finalSetAttrs.total_gp = ((copperPieces / copperPerGold) + (silverPieces / silverPerGold) + (electrumPieces / electrumPerGold) + goldPieces + (platinumPieces * platinumPerGold)).toFixed(2);
+      finalSetAttrs.weight_coinage = (copperPieces + silverPieces + electrumPieces + goldPieces + platinumPieces) / 50;
+    },
+  });
+};
+
+const equipmentSetup = () => {
+  on('change:repeating_armor', (eventInfo) => {
+    const repeatingInfo = getRepeatingInfo('repeating_armor', eventInfo);
+    if (repeatingInfo && repeatingInfo.field !== 'ac_total') {
+      updateArmor(repeatingInfo.rowId);
+    }
+  });
+  on('change:dexterity_mod change:medium_armor_max_dex change:ac_unarmored_ability remove:repeating_armor', () => {
+    updateArmor();
+  });
+  on('change:repeating_equipment', (eventInfo) => {
+    const repeatingInfo = getRepeatingInfo('repeating_equipment', eventInfo);
+    updateEquipment(repeatingInfo.rowId);
+  });
+  on('change:repeating_equipment:carried change:repeating_equipment:qty change:repeating_equipment:weight remove:repeating_equipment', () => {
+    weighEquipment();
+  });
+  on('change:repeating_ammo:weight change:repeating_ammo:qty', () => {
+    weighAmmo();
+  });
+  on('change:weight_attacks change:weight_ammo change:weight_armor change:weight_equipment change:weight_coinage', () => {
+    updateWeight();
+  });
+  on('change:cp change:copper_per_gold change:sp change:silver_per_gold change:ep change:electrum_per_gold change:gp change:pp change:platinum_per_gold', () => {
+    calculateGold();
+  });
+};
+
+export { equipmentSetup, updateArmor, weighEquipment, weighAmmo };

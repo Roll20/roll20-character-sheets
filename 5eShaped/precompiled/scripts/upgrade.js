@@ -1,5 +1,21 @@
-import { isUndefined, isUndefinedOrEmpty, getAbilityName, ordinalSpellLevel, getSetItems, getSetRepeatingItems } from './utilities';
+/* global on:false generateRowID:false */
+
+import { updateAbilityModifiers } from './abilities';
+import { updateSkill, updateAbilityChecksMacro } from './abilityChecks';
+import { updateActions, updateAction, updateActionChatMacro } from './actions';
+import { updateAttachers } from './attachers';
+import { updateAttack, updateAttackChatMacro } from './attacks';
+import { updateLevels, updateAlignment, updateD20Mod } from './character';
+import { setClassFeatures } from './classFeatures';
 import { TOGGLE_VARS } from './constants';
+import { updateArmor, weighEquipment, weighAmmo } from './equipment';
+import { updateInitiative } from './initiative';
+import { updateNPCChallenge, updateLanguages, updateSenses, updateType, updateNPCAC, updateNPCHD, switchToNPC } from './npc';
+import { updateDamageResistancesVar, updateDamageVulnerabilities, updateDamageResistances, updateDamageImmunities, updateConditionImmunities } from './resistances';
+import { updateSavingThrows, updateCustomSavingThrows, updateCustomSavingThrowToggle } from './savingThrows';
+import { updateShapedD20 } from './settings';
+import { updateSpell, updateSpellSlots, updateSpellShowHide, updateSpellChatMacro, generateHigherLevelQueries } from './spells';
+import { isUndefined, isUndefinedOrEmpty, getAbilityName, ordinalSpellLevel, getSetItems, getSetRepeatingItems } from './utilities';
 
 const extasToExtrasFix = (repeatingSection) => {
   getSetRepeatingItems('extasToExtrasFix', {
@@ -307,5 +323,244 @@ const updateSpellLevelForCantrips = () => {
     },
   });
 };
+const updateCritDamage = () => {
+  getSetRepeatingItems('updateCritDamage', {
+    repeatingItems: ['repeating_attack', 'repeating_spell', 'repeating_trait', 'repeating_action', 'repeating_reaction', 'repeating_legendaryaction', 'repeating_lairaction', 'repeating_regionaleffect'],
+    collectionArrayAddItems: ['damage', 'damage_crit', 'second_damage', 'second_damage_crit'],
+    callback: (v, finalSetAttrs, ids, repeatingItem) => {
+      for (const id of ids) {
+        const repeatingString = `${repeatingItem}_${id}_`;
+        if (!v[`${repeatingString}damage_crit`] && v[`${repeatingString}damage`]) {
+          finalSetAttrs[`${repeatingString}damage_crit`] = v[`${repeatingString}damage`];
+        } else if (v[`${repeatingString}damage`] && v[`${repeatingString}damage_crit`]) {
+          finalSetAttrs[`${repeatingString}damage_crit`] = `${v[`${repeatingString}damage`]} + ${v[`${repeatingString}damage_crit`]}`;
+        }
+        if (!v[`${repeatingString}second_damage_crit`] && v[`${repeatingString}second_damage`]) {
+          finalSetAttrs[`${repeatingString}second_damage_crit`] = v[`${repeatingString}second_damage`];
+        } else if (v[`${repeatingString}second_damage`] && v[`${repeatingString}second_damage_crit`]) {
+          finalSetAttrs[`${repeatingString}second_damage_crit`] = `${v[`${repeatingString}second_damage`]} + ${v[`${repeatingString}second_damage_crit`]}`;
+        }
+      }
+    },
+  });
+};
 
-export { extasToExtrasFix, armorPlusDexRemoval, fixRollTwo, updateDefaultAbility, updateHideFreetext, updateSkillAbility, updateArmorAbility, atSyntaxToAbilityName, updateActionComponents, newAttackToggle, newAttackToggleTwo, newAbilityDefaults, changeOldToggleToNew, removeToggleVar, changeOldRepeatingToggleToNew, updateActionComponentsToRemoveExtraFields, displayTextForTraits, updateSpellToTranslations, updateSpellLevelForCantrips };
+const oldValueToNew = (v, finalSetAttrs, repeatingString, newRepeatingString, field) => {
+  finalSetAttrs[`${newRepeatingString}${field}`] = v[`${repeatingString}${field}`];
+};
+const resourcesToTraits = () => {
+  getSetRepeatingItems('resourcesToTraits', {
+    repeatingItems: ['repeating_resource'],
+    collectionArrayAddItems: ['name', 'uses', 'uses_max', 'toggle_details', 'recharge', 'extras_toggle', 'freetext', 'freeform'],
+    callback: (v, finalSetAttrs, ids, repeatingItem) => {
+      const fieldsToSwap = ['name', 'uses', 'uses_max', 'toggle_details', 'recharge', 'extras_toggle', 'freetext', 'freeform'];
+      for (const id of ids) {
+        for (const field of fieldsToSwap) {
+          oldValueToNew(v, finalSetAttrs, `${repeatingItem}_${id}_`, `repeating_trait_${generateRowID()}_`, field);
+        }
+      }
+    },
+  });
+};
+const classFeaturesToTraits = () => {
+  getSetRepeatingItems('classFeaturesToTraits', {
+    repeatingItems: ['repeating_classfeature'],
+    collectionArrayAddItems: ['name', 'uses', 'uses_max', 'recharge', 'saving_throw_toggle', 'saving_throw_condition', 'saving_throw_ability', 'saving_throw_bonus', 'saving_throw_vs_ability', 'saving_throw_failure', 'saving_throw_success', 'damage_toggle', 'damage', 'damage_ability', 'damage_bonus', 'damage_type', 'second_damage_toggle', 'second_damage', 'second_damage_ability', 'second_damage_bonus', 'second_damage_type', 'heal', 'heal_ability', 'heal_bonus', 'heal_query_toggle', 'extras_toggle', 'emote', 'freetext', 'freeform'],
+    callback: (v, finalSetAttrs, ids, repeatingItem) => {
+      const fieldsToSwap = ['name', 'uses', 'uses_max', 'recharge', 'saving_throw_toggle', 'saving_throw_condition', 'saving_throw_ability', 'saving_throw_bonus', 'saving_throw_vs_ability', 'saving_throw_failure', 'saving_throw_success', 'damage_toggle', 'damage', 'damage_ability', 'damage_bonus', 'damage_type', 'second_damage_toggle', 'second_damage', 'second_damage_ability', 'second_damage_bonus', 'second_damage_type', 'heal', 'heal_ability', 'heal_bonus', 'heal_query_toggle', 'extras_toggle', 'emote', 'freetext', 'display_text', 'freeform'];
+
+      for (const id of ids) {
+        for (const field of fieldsToSwap) {
+          oldValueToNew(v, finalSetAttrs, `${repeatingItem}_${id}_`, `repeating_trait_${generateRowID()}_`, field);
+        }
+      }
+    },
+  });
+};
+
+const versionCompare = (v1, v2, options) => {
+  const lexicographical = options && options.lexicographical;
+  const zeroExtend = options && options.zeroExtend;
+  let v1parts = v1.split('.');
+  let v2parts = v2.split('.');
+
+  const isValidPart = (x) => {
+    return (lexicographical ? /^\d+[A-Za-z]*$/ : /^\d+$/).test(x);
+  };
+
+  if (!v1parts.every(isValidPart) || !v2parts.every(isValidPart)) {
+    return NaN;
+  }
+
+  if (zeroExtend) {
+    while (v1parts.length < v2parts.length) {
+      v1parts.push('0');
+    }
+    while (v2parts.length < v1parts.length) {
+      v2parts.push('0');
+    }
+  }
+
+  if (!lexicographical) {
+    v1parts = v1parts.map(Number);
+    v2parts = v2parts.map(Number);
+  }
+
+  for (let i = 0; i < v1parts.length; ++i) {
+    if (v2parts.length === i) {
+      return 1;
+    }
+
+    if (v1parts[i] === v2parts[i]) {
+      continue;
+    } else if (v1parts[i] > v2parts[i]) {
+      return 1;
+    } else {
+      return -1;
+    }
+  }
+
+  if (v1parts.length !== v2parts.length) {
+    return -1;
+  }
+
+  return 0;
+};
+const upgrade = () => {
+  if (versionCompare(version, '2.1.0') < 0) {
+    updateNPCChallenge();
+    updateDamageVulnerabilities();
+    updateDamageResistances();
+    updateDamageImmunities();
+    updateConditionImmunities();
+    updateLanguages();
+    updateSenses();
+  }
+  if (versionCompare(version, '2.1.3') < 0) {
+    updateType();
+    updateAlignment();
+  }
+  if (versionCompare(version, '2.1.5') < 0) {
+    updateNPCAC();
+  }
+  if (versionCompare(version, '2.1.10') < 0) {
+    updateSavingThrows();
+  }
+  if (versionCompare(version, '2.1.13') < 0) {
+    weighEquipment();
+  }
+  if (versionCompare(version, '2.1.15') < 0) {
+    displayTextForTraits();
+  }
+  if (versionCompare(version, '2.2.2') < 0) {
+    resourcesToTraits();
+  }
+  if (versionCompare(version, '2.2.4') < 0) {
+    updateInitiative();
+  }
+  if (versionCompare(version, '2.2.5') < 0) {
+    weighAmmo();
+  }
+  if (versionCompare(version, '2.2.6') < 0) {
+    updateLevels();
+    extasToExtrasFix('repeating_attack');
+    extasToExtrasFix('repeating_action');
+    extasToExtrasFix('repeating_spell');
+  }
+  if (versionCompare(version, '2.3.3') < 0) {
+    updateAttachers();
+  }
+  if (versionCompare(version, '2.4.2') < 0) {
+    updateAbilityModifiers();
+    updateActionChatMacro('trait');
+    updateActionChatMacro('action');
+    updateActionChatMacro('reaction');
+    updateActionChatMacro('legendaryaction');
+  }
+  if (versionCompare(version, '2.4.3') < 0) {
+    setClassFeatures();
+  }
+  if (versionCompare(version, '2.4.7') < 0) {
+    classFeaturesToTraits();
+  }
+  if (versionCompare(version, '2.4.8') < 0) {
+    fixRollTwo();
+  }
+  if (versionCompare(version, '2.4.12') < 0) {
+    armorPlusDexRemoval();
+    updateArmor();
+  }
+  if (versionCompare(version, '3.1.0') < 0) {
+    updateAttackChatMacro();
+  }
+  if (versionCompare(version, '3.2.1') < 0) {
+    updateCritDamage();
+  }
+  if (versionCompare(version, '3.2.3') < 0) {
+    updateDamageResistancesVar();
+  }
+  if (versionCompare(version, '3.5.0') < 0) {
+    updateSpellChatMacro();
+  }
+  if (versionCompare(version, '3.5.1') < 0) {
+    updateSpellSlots();
+  }
+  if (versionCompare(version, '3.6.1') < 0) {
+    updateNPCHD();
+    switchToNPC();
+  }
+  if (versionCompare(version, '4.1.4') < 0) {
+    updateArmorAbility();
+    updateActionComponents();
+    updateSkillAbility();
+  }
+  if (versionCompare(version, '4.1.5') < 0) {
+    updateSkill();
+  }
+  if (versionCompare(version, '4.2.0') < 0) {
+    updateD20Mod();
+    updateShapedD20();
+  }
+  if (versionCompare(version, '4.2.1') < 0) {
+    updateActionComponentsToRemoveExtraFields();
+    updateAbilityChecksMacro();
+    removeToggleVar();
+  }
+  if (versionCompare(version, '4.2.3') < 0) {
+    updateArmor();
+  }
+  if (versionCompare(version, '4.4.0') < 0) {
+    updateCustomSavingThrows();
+    newAttackToggle();
+    generateHigherLevelQueries();
+  }
+  if (versionCompare(version, '4.4.1') < 0) {
+    newAbilityDefaults();
+  }
+  if (versionCompare(version, '4.4.2') < 0) {
+    updateSpellShowHide();
+  }
+  if (versionCompare(version, '5.0.0') < 0) {
+    updateSpellToTranslations();
+  }
+  if (versionCompare(version, '5.0.3') < 0) {
+    updateSpell();
+    updateAttack();
+    updateActions();
+    updateCustomSavingThrowToggle();
+  }
+  if (versionCompare(version, '5.0.4') < 0) {
+    updateDefaultAbility();
+  }
+  if (versionCompare(version, '5.0.6') < 0) {
+    updateSpellLevelForCantrips();
+  }
+  if (versionCompare(version, '5.0.8') < 0) {
+    newAttackToggleTwo();
+  }
+  if (versionCompare(version, '5.2.3') < 0) {
+    updateHideFreetext();
+  }
+};
+
+export { upgrade, extasToExtrasFix, armorPlusDexRemoval, fixRollTwo, updateDefaultAbility, updateHideFreetext, updateSkillAbility, updateArmorAbility, atSyntaxToAbilityName, updateActionComponents, newAttackToggle, newAttackToggleTwo, newAbilityDefaults, changeOldToggleToNew, removeToggleVar, changeOldRepeatingToggleToNew, updateActionComponentsToRemoveExtraFields, displayTextForTraits, updateSpellToTranslations, updateSpellLevelForCantrips, updateCritDamage, resourcesToTraits, classFeaturesToTraits };

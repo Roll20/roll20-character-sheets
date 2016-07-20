@@ -1,3 +1,5 @@
+import { getSetItems, getIntValue } from './utilities';
+
 const getPB = (level, challenge) => {
   let pb = 2;
 
@@ -26,4 +28,10 @@ const updatePb = () => {
   });
 };
 
-export { getPB, updatePb };
+const proficiencyBonusSetup = () => {
+  on('change:level', () => {
+    updatePb();
+  });
+};
+
+export { proficiencyBonusSetup, getPB, updatePb };

@@ -1,5 +1,5 @@
 /* global generateRowID:false */
-import { getSetItems, getSetRepeatingItems, ordinalSpellLevel, getIntValue, isUndefinedOrEmpty, setCritDamage, fromVOrFinalSetAttrs, lowercaseDamageTypes } from './utilities';
+import { getSetItems, getSetRepeatingItems, ordinalSpellLevel, getIntValue, isUndefinedOrEmpty, setCritDamage, fromVOrFinalSetAttrs, lowercaseDamageTypes, getRepeatingInfo } from './utilities';
 import { updateAttackToggle, updateSavingThrowToggle, updateDamageToggle, updateHealToggle, updateHigherLevelToggle } from './updateToggles';
 import { TOGGLE_VARS } from './constants';
 
@@ -380,5 +380,91 @@ const updateSpellChatMacro = () => {
     },
   });
 };
+const generateHigherLevelQueries = () => {
+  const collectionArray = ['warlock_level', 'number_of_classes'];
+  for (let i = 1; i <= 8; i++) {
+    collectionArray.push(`cast_as_level_${i}`);
+    collectionArray.push(`higher_level_query_${i}`);
+  }
+  for (let i = 1; i <= 9; i++) {
+    collectionArray.push(`spell_slots_l${i}`);
+  }
 
-export { updateSpellFromSRD, updateSpellsFromSRD, updateSpell, updateSpellSlots, updateSpellShowHide, watchForSpellChanges, updateSpellChatMacro };
+  getSetItems('generateHigherLevelQueries', {
+    collectionArray,
+    callback: (v, finalSetAttrs) => {
+      for (let i = 1; i <= 8; i++) {
+        let higherLevelQuery = '';
+
+        if (i < 6 && v.number_of_classes === 1 && v.warlock_level > 0 && Math.ceil(getIntValue(v.warlock_level) / 2) >= i) {
+          let spellLevel = 1;
+          if (v.warlock_level >= 9) {
+            spellLevel = 5;
+          } else if (v.warlock_level >= 7) {
+            spellLevel = 4;
+          } else if (v.warlock_level >= 5) {
+            spellLevel = 3;
+          } else if (v.warlock_level >= 3) {
+            spellLevel = 2;
+          }
+          higherLevelQuery = spellLevel;
+        } else {
+          let levelQuery = '';
+          for (let j = i; j <= 9; j++) {
+            if (getIntValue(v[`spell_slots_l${j}`])) {
+              levelQuery += `|${j}`;
+            }
+          }
+          higherLevelQuery = `?{Spell Level${levelQuery}}`;
+        }
+        if (higherLevelQuery !== '') {
+          finalSetAttrs[`higher_level_query_${i}`] = higherLevelQuery;
+        } else {
+          finalSetAttrs[`higher_level_query_${i}`] = i;
+        }
+        if (v[`spell_slots_l${i}`] === '0' && higherLevelQuery !== i) {
+          finalSetAttrs[`cast_as_level_${i}`] = higherLevelQuery;
+        } else {
+          finalSetAttrs[`cast_as_level_${i}`] = '';
+        }
+      }
+    },
+  });
+};
+
+const spellsSetup = () => {
+  on('change:repeating_spell', (eventInfo) => {
+    const repeatingInfo = getRepeatingInfo('repeating_spell', eventInfo);
+    if (repeatingInfo && repeatingInfo.field !== 'roll_toggle' && repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'damage_crit' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'second_damage_crit' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'heal_formula' && repeatingInfo.field !== 'higher_level_query' && repeatingInfo.field !== 'parsed') {
+      updateSpell(repeatingInfo.rowId);
+    }
+  });
+  on('change:pbchange:global_spell_attack_bonus change:global_spell_damage_bonus change:global_spell_dc_bonus change:global_spell_heal_bonus', () => {
+    updateSpell();
+  });
+
+  on('change:spells_srd', () => {
+    updateSpellsFromSRD();
+  });
+  on('change:spell_slots_l1_bonus change:spell_slots_l2_bonus change:spell_slots_l3_bonus change:spell_slots_l4_bonus change:spell_slots_l5_bonus change:spell_slots_l6_bonus change:spell_slots_l7_bonus change:spell_slots_l8_bonus change:spell_slots_l9_bonus', () => {
+    updateSpellSlots();
+  });
+  watchForSpellChanges();
+  on('change:repeating_spell', (eventInfo) => {
+    const repeatingInfo = getRepeatingInfo('repeating_spell', eventInfo);
+    if (repeatingInfo && (repeatingInfo.field === 'name' || repeatingInfo.field === 'spell_level' || repeatingInfo.field === 'is_prepared')) {
+      updateSpellChatMacro();
+    }
+  });
+  on('remove:repeating_spell', () => {
+    updateSpellChatMacro();
+  });
+  on('change:spells_show_unprepared', () => {
+    updateSpellChatMacro();
+  });
+  on('change:warlock_level change:spell_slots_l1 change:spell_slots_l2 change:spell_slots_l3 change:spell_slots_l4 change:spell_slots_l5 change:spell_slots_l6 change:spell_slots_l7 change:spell_slots_l8 change:spell_slots_l9', () => {
+    generateHigherLevelQueries();
+  });
+};
+
+export { spellsSetup, updateSpell, updateSpellSlots, updateSpellShowHide, updateSpellChatMacro, generateHigherLevelQueries };

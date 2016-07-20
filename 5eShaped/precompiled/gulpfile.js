@@ -74,7 +74,7 @@ const compileSheetHTML = () => {
     }));
 };
 const compileSheetWorkers = () => {
-  return browserify('script/sheetWorkers.js')
+  return browserify('./scripts/sheetWorkers.js')
     .transform(babelify, {
       presets: ['es2015'],
       comments: false,
@@ -86,8 +86,6 @@ const compileSheetWorkers = () => {
       header: '<script type="text/worker">',
       footer: '</script>'
     }))
-
-
 };
 const compileRollTemplate = () => {
   return gulp.src(['./components/rollTemplate.html']);
@@ -117,7 +115,7 @@ const esLintConfig = {
   }
 };
 gulp.task('lint', function () {
-  return gulp.src(['script/*.js'])
+  return gulp.src('./scripts/sheetWorkers.js')
     .pipe(eslint(esLintConfig))
     .pipe(eslint.format())
     .pipe(eslint.failAfterError());

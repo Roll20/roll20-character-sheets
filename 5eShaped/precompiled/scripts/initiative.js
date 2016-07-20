@@ -1,4 +1,4 @@
-import { getSetItems, getIntValue, addArithmeticOperator, getAbilityValue } from './utilities';
+import { getSetItems, getIntValue, isUndefined, addArithmeticOperator, getAbilityValue, getAbilityShortName } from './utilities';
 import { ABILITIES } from './constants';
 
 const updateInitiative = () => {
@@ -63,7 +63,7 @@ const updateInitiative = () => {
     },
   });
 };
-const watchInitiativeChanges = () => {
+const initiativeSetup = () => {
   const initiativeWatch = ['change:initiative_ability', 'change:initiative_bonus', 'change:jack_of_all_trades_toggle', 'change:jack_of_all_trades', 'change:remarkable_athlete_toggle', 'change:remarkable_athlete', 'change:global_check_bonus'];
   for (const ability of ABILITIES) {
     initiativeWatch.push(`change:${ability}_mod`);
@@ -74,4 +74,4 @@ const watchInitiativeChanges = () => {
   });
 };
 
-export { updateInitiative, watchInitiativeChanges };
+export { updateInitiative, initiativeSetup };

@@ -163,54 +163,6 @@ const ordinalSpellLevel = (level) => {
   }
   return spellLevel;
 };
-const versionCompare = (v1, v2, options) => {
-  const lexicographical = options && options.lexicographical;
-  const zeroExtend = options && options.zeroExtend;
-  let v1parts = v1.split('.');
-  let v2parts = v2.split('.');
-
-  const isValidPart = (x) => {
-    return (lexicographical ? /^\d+[A-Za-z]*$/ : /^\d+$/).test(x);
-  };
-
-  if (!v1parts.every(isValidPart) || !v2parts.every(isValidPart)) {
-    return NaN;
-  }
-
-  if (zeroExtend) {
-    while (v1parts.length < v2parts.length) {
-      v1parts.push('0');
-    }
-    while (v2parts.length < v1parts.length) {
-      v2parts.push('0');
-    }
-  }
-
-  if (!lexicographical) {
-    v1parts = v1parts.map(Number);
-    v2parts = v2parts.map(Number);
-  }
-
-  for (let i = 0; i < v1parts.length; ++i) {
-    if (v2parts.length === i) {
-      return 1;
-    }
-
-    if (v1parts[i] === v2parts[i]) {
-      continue;
-    } else if (v1parts[i] > v2parts[i]) {
-      return 1;
-    } else {
-      return -1;
-    }
-  }
-
-  if (v1parts.length !== v2parts.length) {
-    return -1;
-  }
-
-  return 0;
-};
 const addArithmeticOperator = (string, number) => {
   let value = number;
   if (string) {
@@ -381,15 +333,6 @@ const getSetRepeatingItems = (name, obj) => {
     }
   }
 };
-const checkVersionFormat = (version, finalSetAttrs) => {
-  const versionRegex = /\d+\.\d+\.\d+/gi;
-  const versionIsProperFormat = versionRegex.exec(version);
-
-  if (version && !versionIsProperFormat) {
-    finalSetAttrs.version = version = currentVersion;
-  }
-  return version;
-};
 const sumRepeating = (options, sumItems) => {
   const repeatingItem = `repeating_${options.collection}`;
   let collectionArray = [];
@@ -518,4 +461,4 @@ const setCritDamage = (v, finalSetAttrs, repeatingString) => {
   }
 };
 
-export { capitalize, camelize, firstThree, round, calculatePercentDifference, isUndefined, isUndefinedOrEmpty, isEmpty, exists, getIntValue, getFloatValue, getAbilityMod, getAbilityModName, getAbilityName, getAbilityValue, getAbilityShortName, getRepeatingInfo, setFinalAttrs, fromVOrFinalSetAttrs, hasUpperCase, ordinalSpellLevel, versionCompare, addArithmeticOperator, showSign, numberWithCommas, findClosest, getCorrectAbilityBasedOnBonus, getAnyCorrectAbilityBasedOnBonus, lowercaseDamageTypes, getSetItems, getSetRepeatingItems, checkVersionFormat, sumRepeating, getSkillIdByStorageName, setCritDamage };
+export { capitalize, camelize, firstThree, round, calculatePercentDifference, isUndefined, isUndefinedOrEmpty, isEmpty, exists, getIntValue, getFloatValue, getAbilityMod, getAbilityModName, getAbilityName, getAbilityValue, getAbilityShortName, getRepeatingInfo, setFinalAttrs, fromVOrFinalSetAttrs, hasUpperCase, ordinalSpellLevel, addArithmeticOperator, showSign, numberWithCommas, findClosest, getCorrectAbilityBasedOnBonus, getAnyCorrectAbilityBasedOnBonus, lowercaseDamageTypes, getSetItems, getSetRepeatingItems, sumRepeating, getSkillIdByStorageName, setCritDamage };
