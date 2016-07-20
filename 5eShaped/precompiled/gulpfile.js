@@ -21,6 +21,11 @@ const request = require('request');
 const gutil = require('gulp-util');
 const sortJSON = require('gulp-json-sort').default;
 
+const browserify = require('browserify');
+const babelify = require('babelify');
+const source = require('vinyl-source-stream');
+const buffer = require('vinyl-buffer');
+
 String.prototype.capitalize = function () {
   return this.replace(/\w\S*/g, function (txt) {
     return txt.charAt(0).toUpperCase() + txt.substr(1)
@@ -69,16 +74,20 @@ const compileSheetHTML = () => {
     }));
 };
 const compileSheetWorkers = () => {
-  return gulp.src(['components/sheetWorkers.js'])
-    .pipe(babel({
+  return browserify('script/sheetWorkers.js')
+    .transform(babelify, {
       presets: ['es2015'],
       comments: false,
       compact: true
-    }))
+    }).bundle()
+    .pipe(source('sheetWorkers.js'))
+    .pipe(buffer())
     .pipe(wrapper({
       header: '<script type="text/worker">',
       footer: '</script>'
-    }));
+    }))
+
+
 };
 const compileRollTemplate = () => {
   return gulp.src(['./components/rollTemplate.html']);
@@ -108,7 +117,7 @@ const esLintConfig = {
   }
 };
 gulp.task('lint', function () {
-  return gulp.src(['components/sheetWorkers.js'])
+  return gulp.src(['script/*.js'])
     .pipe(eslint(esLintConfig))
     .pipe(eslint.format())
     .pipe(eslint.failAfterError());
