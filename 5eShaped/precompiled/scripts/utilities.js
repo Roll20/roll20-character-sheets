@@ -17,9 +17,6 @@ const firstThree = (string) => {
 const round = (value, places) => {
   return +(`${Math.round(`${value}e+${places}`)}e-${places}`);
 };
-const calculatePercentDifference = (oldValue, newValue) => {
-  return Math.abs(((oldValue - newValue) / oldValue) * 100);
-};
 const isUndefined = (value) => {
   if (typeof value === 'undefined') {
     return true;
@@ -64,23 +61,17 @@ const getFloatValue = (value, defaultValue) => {
 const getAbilityMod = (score) => {
   return Math.floor((getIntValue(score) - 10) / 2);
 };
-const getAbilityModName = (varName) => {
+const getAbilityName = (varName) => {
   if (!varName) {
-    return 'strength_mod';
+    return 'strength';
   } else if (typeof varName === 'string') {
     varName = varName.replace(/\W/g, '');
   }
   return varName;
 };
-const getAbilityName = (varName) => {
-  if (!varName) {
-    return 'strength';
-  }
-  return getAbilityModName(varName).replace('_mod', '');
-};
 const getAbilityValue = (v, varName) => {
   if (exists(varName)) {
-    varName = getAbilityModName(varName);
+    varName = getAbilityName(varName);
     return getIntValue(v[`${varName}_mod`], 0);
   }
   return 0;
@@ -458,5 +449,30 @@ const setCritDamage = (v, finalSetAttrs, repeatingString) => {
     finalSetAttrs[`${repeatingString}second_damage_crit`] = v[`${repeatingString}second_damage`];
   }
 };
+const updateHD = (v, finalSetAttrs, hd) => {
+  for (const key in hd) {
+    if (hd.hasOwnProperty(key)) {
+      if (hd[key] && hd[key] !== 0) {
+        finalSetAttrs[`hd_${key}_max`] = hd[key];
+        finalSetAttrs[`hd_${key}_query`] = '?{HD';
+        for (let x = 1; x <= hd[key]; x++) {
+          finalSetAttrs[`hd_${key}_query`] += `|${x}`;
+        }
+        finalSetAttrs[`hd_${key}_query`] += '}';
+        finalSetAttrs[`hd_${key}_toggle`] = 1;
+      } else {
+        if (!isUndefinedOrEmpty(v[`hd_${key}_max`])) {
+          finalSetAttrs[`hd_${key}_max`] = 0;
+        }
+        if (!isUndefinedOrEmpty(v[`hd_${key}_query`])) {
+          finalSetAttrs[`hd_${key}_query`] = '';
+        }
+        if (exists(v[`hd_${key}_toggle`])) {
+          finalSetAttrs[`hd_${key}_toggle`] = 0;
+        }
+      }
+    }
+  }
+};
 
-export { capitalize, camelize, firstThree, round, calculatePercentDifference, isUndefined, isUndefinedOrEmpty, isEmpty, exists, getIntValue, getFloatValue, getAbilityMod, getAbilityModName, getAbilityName, getAbilityValue, getAbilityShortName, getRepeatingInfo, setFinalAttrs, fromVOrFinalSetAttrs, hasUpperCase, ordinalSpellLevel, addArithmeticOperator, showSign, numberWithCommas, findClosest, getCorrectAbilityBasedOnBonus, getAnyCorrectAbilityBasedOnBonus, lowercaseDamageTypes, getSetItems, getSetRepeatingItems, sumRepeating, getSkillIdByStorageName, setCritDamage };
+export { capitalize, camelize, firstThree, round, isUndefined, isUndefinedOrEmpty, isEmpty, exists, getIntValue, getFloatValue, getAbilityMod, getAbilityName, getAbilityValue, getAbilityShortName, getRepeatingInfo, setFinalAttrs, fromVOrFinalSetAttrs, hasUpperCase, ordinalSpellLevel, addArithmeticOperator, showSign, numberWithCommas, findClosest, getCorrectAbilityBasedOnBonus, getAnyCorrectAbilityBasedOnBonus, lowercaseDamageTypes, getSetItems, getSetRepeatingItems, sumRepeating, getSkillIdByStorageName, setCritDamage, updateHD };

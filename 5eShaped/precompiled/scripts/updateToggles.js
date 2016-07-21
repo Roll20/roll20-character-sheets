@@ -45,16 +45,14 @@ const parseAttackComponent = (v, repeatingString, finalSetAttrs, options) => {
     }
   }
 };
-
 const updateAttackToggle = (v, finalSetAttrs, repeatingString, options) => {
-  const attackParse = {
+  parseAttackComponent(v, repeatingString, finalSetAttrs, {
     attackAbility: options.attackAbility,
     parseName: 'attack',
     toggleField: 'roll_toggle',
     toggleFieldSetTo: TOGGLE_VARS.roll,
     triggerFields: ['type', 'attack_bonus'],
-  };
-  parseAttackComponent(v, repeatingString, finalSetAttrs, attackParse);
+  });
 
   let attackFormula = '';
   const attackToggle = v[`${repeatingString}roll_toggle`];
@@ -119,15 +117,13 @@ const updateAttackToggle = (v, finalSetAttrs, repeatingString, options) => {
     finalSetAttrs[`${repeatingString}to_hit`] = toHit;
   }
 };
-
 const updateSavingThrowToggle = (v, finalSetAttrs, repeatingString, options) => {
-  const savingThrowParse = {
+  parseAttackComponent(v, repeatingString, finalSetAttrs, {
     parseName: 'savingThrow',
     toggleField: 'saving_throw_toggle',
     toggleFieldSetTo: TOGGLE_VARS.saving_throw,
     triggerFields: ['saving_throw_ability', 'saving_throw_bonus', 'saving_throw_vs_ability'],
-  };
-  parseAttackComponent(v, repeatingString, finalSetAttrs, savingThrowParse);
+  });
   if (fromVOrFinalSetAttrs(v, finalSetAttrs, `${repeatingString}saving_throw_toggle`) === TOGGLE_VARS.saving_throw) {
     let savingThrowDC = getIntValue(v.base_dc) + getIntValue(v.pb);
     let savingThrowAbility = v[`${repeatingString}saving_throw_ability`];
@@ -144,16 +140,14 @@ const updateSavingThrowToggle = (v, finalSetAttrs, repeatingString, options) => 
     finalSetAttrs[`${repeatingString}saving_throw_dc`] = savingThrowDC;
   }
 };
-
 const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
-  const damageParse = {
+  parseAttackComponent(v, repeatingString, finalSetAttrs, {
     addCastingModifier: exists(v[`${repeatingString}add_casting_modifier`]),
     parseName: 'damage',
     toggleField: 'damage_toggle',
     toggleFieldSetTo: TOGGLE_VARS.damage,
     triggerFields: ['damage', 'damage_ability', 'damage_bonus', 'damage_type'],
-  };
-  parseAttackComponent(v, repeatingString, finalSetAttrs, damageParse);
+  });
 
   let damageString = '';
   let damageFormula = '';
@@ -234,14 +228,13 @@ const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
   }
   finalSetAttrs[`${repeatingString}damage_formula`] = damageFormula;
 
-  const secondDamageParse = {
+  parseAttackComponent(v, repeatingString, finalSetAttrs, {
     addSecondCastingModifier: exists(v[`${repeatingString}add_second_casting_modifier`]),
     parseName: 'secondDamage',
     toggleField: 'second_damage_toggle',
     toggleFieldSetTo: TOGGLE_VARS.second_damage,
     triggerFields: ['second_damage', 'second_damage_ability', 'second_damage_bonus', 'second_damage_type'],
-  };
-  parseAttackComponent(v, repeatingString, finalSetAttrs, secondDamageParse);
+  });
 
   let secondDamageFormula = '';
 
@@ -307,16 +300,14 @@ const updateDamageToggle = (v, finalSetAttrs, repeatingString, options) => {
     finalSetAttrs[`${repeatingString}damage_string`] = damageString;
   }
 };
-
 const updateHealToggle = (v, finalSetAttrs, repeatingString) => {
-  const healParse = {
+  parseAttackComponent(v, repeatingString, finalSetAttrs, {
     addCastingModifier: exists(v[`${repeatingString}add_casting_modifier`]),
     parseName: 'heal',
     toggleField: 'heal_toggle',
     toggleFieldSetTo: TOGGLE_VARS.heal,
     triggerFields: ['heal', 'heal_query_toggle'],
-  };
-  parseAttackComponent(v, repeatingString, finalSetAttrs, healParse);
+  });
   let healFormula = '';
   const healToggle = v[`${repeatingString}heal_toggle`];
   if (healToggle === TOGGLE_VARS.heal) {
@@ -348,16 +339,14 @@ const updateHealToggle = (v, finalSetAttrs, repeatingString) => {
     finalSetAttrs[`${repeatingString}heal_formula`] = healFormula;
   }
 };
-
 const updateHigherLevelToggle = (v, finalSetAttrs, repeatingString) => {
-  const higherLevelParse = {
+  parseAttackComponent(v, repeatingString, finalSetAttrs, {
     addCastingModifier: exists(v[`${repeatingString}add_casting_modifier`]),
     parseName: 'higherLevel',
     toggleField: 'higher_level_toggle',
     toggleFieldSetTo: TOGGLE_VARS.higher_level,
     triggerFields: ['higher_level_dice', 'higher_level_die', 'second_higher_level_dice', 'second_higher_level_die', 'higher_level_heal'],
-  };
-  parseAttackComponent(v, repeatingString, finalSetAttrs, higherLevelParse);
+  });
 
   const higherLevelToggle = v[`${repeatingString}higher_level_toggle`];
   if (exists(higherLevelToggle) && higherLevelToggle === TOGGLE_VARS.higher_level) {

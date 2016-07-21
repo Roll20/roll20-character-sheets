@@ -26,12 +26,12 @@ const babelify = require('babelify');
 const source = require('vinyl-source-stream');
 const buffer = require('vinyl-buffer');
 
-String.prototype.capitalize = function () {
-  return this.replace(/\w\S*/g, function (txt) {
+String.prototype.capitalize = () => {
+  return this.replace(/\w\S*/g, (txt) => {
     return txt.charAt(0).toUpperCase() + txt.substr(1)
   });
 };
-String.prototype.lowercase = function () {
+String.prototype.lowercase = () => {
   return this.toLowerCase();
 };
 
@@ -91,7 +91,7 @@ const compileRollTemplate = () => {
   return gulp.src(['./components/rollTemplate.html']);
 };
 
-gulp.task('compile', ['sass', 'translationDist'], function () {
+gulp.task('compile', ['sass', 'translationDist'], () => {
   return streamqueue({objectMode: true},
     compileSheetHTML(),
     compileSheetWorkers(),
@@ -101,7 +101,7 @@ gulp.task('compile', ['sass', 'translationDist'], function () {
     .pipe(gulp.dest('../'))
 });
 
-gulp.task('lint', function () {
+gulp.task('lint', () => {
   return gulp.src(['./scripts/*.js'])
     .pipe(eslint())
     .pipe(eslint.format())
@@ -120,21 +120,21 @@ const sassConfig = {
     include: 0
   }
 };
-gulp.task('sass', function () {
+gulp.task('sass', () => {
   return gulp.src('./5eShaped.scss')
     .pipe(sass().on('error', sass.logError))
     .pipe(autoprefixer())
     .pipe(minifyCss())
     .pipe(gulp.dest('../'));
 });
-gulp.task('sass-lint', function() {
+gulp.task('sass-lint', () => {
   return gulp.src('./5eShaped.scss')
     .pipe(sassLint(sassConfig))
     .pipe(sassLint.format())
     .pipe(sassLint.failOnError())
 });
 
-gulp.task('sort-translations', function() {
+gulp.task('sort-translations', () => {
   return gulp.src('../translations/*.json')
     .pipe(sortJSON({ space: 1 }))
     .pipe(replaceTask({
@@ -186,7 +186,7 @@ gulp.task('submit', ['compile'], (done) => {
   );
 });
 
-gulp.task('translationDist', function () {
+gulp.task('translationDist', () => {
   return gulp.src('../translations/en.json')
     .pipe(rename('translation.json'))
     .pipe(gulp.dest('../'));
