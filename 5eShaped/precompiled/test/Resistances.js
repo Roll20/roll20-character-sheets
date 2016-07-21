@@ -2,7 +2,7 @@
 
 import { getSetItems, lowercaseDamageTypes } from './utilities';
 
-export class resistances {
+export class Resistances {
   updateDamageResistancesVar() {
     getSetItems('resistances.updateDamageResistancesVar', {
       collectionArray: ['damage_resistances_var', 'damage_vulnerabilities_exist', 'damage_resistances_exist', 'damage_immunities_exist', 'condition_immunities_exist'],
@@ -79,10 +79,20 @@ export class resistances {
     });
   }
   setup() {
-    on('change:damage_vulnerabilities change:damage_resistances change:damage_immunities change:condition_immunities', this.updateDamageResistancesVar());
-    on('change:damage_vulnerabilities', this.updateDamageVulnerabilities());
-    on('change:damage_resistances', this.updateDamageResistances());
-    on('change:damage_immunities', this.updateDamageImmunities());
-    on('change:condition_immunities', this.updateConditionImmunities());
+    on('change:damage_vulnerabilities change:damage_resistances change:damage_immunities change:condition_immunities', () => {
+      this.updateDamageResistancesVar();
+    });
+    on('change:damage_vulnerabilities', () => {
+      this.updateDamageVulnerabilities();
+    });
+    on('change:damage_resistances', () => {
+      this.updateDamageResistances();
+    });
+    on('change:damage_immunities', () => {
+      this.updateDamageImmunities();
+    });
+    on('change:condition_immunities', () => {
+      this.updateConditionImmunities();
+    });
   }
 }

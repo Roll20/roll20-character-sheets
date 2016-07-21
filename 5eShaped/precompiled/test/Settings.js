@@ -2,7 +2,7 @@
 
 import { getSetItems } from './utilities';
 
-export class settings {
+export class Settings {
   updateShapedD20() {
     getSetItems('settings.updateShapedD20', {
       collectionArray: ['roll_setting', 'roll_info', 'shaped_d20'],
@@ -22,6 +22,8 @@ export class settings {
   }
 
   setup() {
-    on('change:roll_setting', this.updateShapedD20());
+    on('change:roll_setting', () => {
+      this.updateShapedD20();
+    });
   }
 }

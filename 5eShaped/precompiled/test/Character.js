@@ -1,11 +1,13 @@
 /* global on:false */
 
 import { ABILITIES, CLASSES } from './constants';
-import { classFeatures } from './classFeatures';
-import { spells } from './spells';
+import { ClassFeatures } from './ClassFeatures';
+const classFeatures = new ClassFeatures();
+import { Spells } from './Spells';
+const spells = new Spells();
 import { getSetItems, getSetRepeatingItems, isUndefinedOrEmpty, getIntValue, exists, capitalize, getRepeatingInfo, updateHD } from './utilities';
 
-export class character {
+export class Character {
   updateLevels(repeatingInfo) {
     const defaultClassDetails = {
       barbarian: {
@@ -243,7 +245,9 @@ export class character {
     classFeatureWatch.push('change:subtle_spell_toggle');
     classFeatureWatch.push('change:twinned_spell_toggle');
 
-    on(classFeatureWatch.join(' '), classFeatures.set());
+    on(classFeatureWatch.join(' '), () => {
+      classFeatures.set();
+    });
   }
   updateJackOfAllTrades() {
     getSetItems('character.updateJackOfAllTrades', {
@@ -290,11 +294,21 @@ export class character {
         this.updateLevels(repeatingInfo);
       }
     });
-    on('remove:repeating_class', this.updateLevels());
-    on('change:halfling_luck', this.updateD20Mod());
-    on('change:alignment', this.updateAlignment());
-    on('change:pb change:remarkable_athlete_toggle', this.updateRemarkableAthlete());
-    on('change:pb change:jack_of_all_trades_toggle', this.updateJackOfAllTrades());
+    on('remove:repeating_class', () => {
+      this.updateLevels();
+    });
+    on('change:halfling_luck', () => {
+      this.updateD20Mod();
+    });
+    on('change:alignment', () => {
+      this.updateAlignment();
+    });
+    on('change:pb change:remarkable_athlete_toggle', () => {
+      this.updateRemarkableAthlete();
+    });
+    on('change:pb change:jack_of_all_trades_toggle', () => {
+      this.updateJackOfAllTrades();
+    });
     this.watchForClassLevelChanges();
   }
 }

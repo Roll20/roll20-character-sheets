@@ -1,8 +1,9 @@
 /* global generateRowID:falsee */
-import { getSetRepeatingItems, isUndefinedOrEmpty } from './utilities';
-import { TOGGLE_VARS } from './constants';
 
-export class traits {
+import { TOGGLE_VARS } from './constants';
+import { getSetRepeatingItems, isUndefinedOrEmpty } from './utilities';
+
+export class Traits {
   calculatePercentDifference(oldValue, newValue) {
     return Math.abs(((oldValue - newValue) / oldValue) * 100);
   }

@@ -1,9 +1,9 @@
 /* global on:false, generateRowID:false */
 
-import { getSetItems, getIntValue, isUndefinedOrEmpty, addArithmeticOperator, getAbilityMod, numberWithCommas, exists, updateHD } from './utilities';
 import { ABILITIES } from './constants';
+import { getSetItems, getIntValue, isUndefinedOrEmpty, addArithmeticOperator, getAbilityMod, numberWithCommas, exists, updateHD } from './utilities';
 
-export class npc {
+export class Npc {
   updateType() {
     getSetItems('npc.updateType', {
       collectionArray: ['type'],
@@ -391,18 +391,44 @@ export class npc {
     });
   }
   setup() {
-    on('change:type', this.updateType());
-    on('change:size', this.updateSize());
-    on('change:ac_srd', this.updateAC());
-    on('change:is_npc', this.switchTo());
-    on('change:challenge', this.updateChallenge());
-    on('change:hp_srd', this.updateHPFromSRD());
-    on('change:hit_dice change:hit_die change:hp_extra change:constitution_mod', this.updateHP());
-    on('change:hit_dice change:hit_die', this.updateHD());
-    on('change:content_srd', this.updateContent());
-    on('change:senses', this.updateSenses());
-    on('change:languages', this.updateLanguages());
-    on('change:npc_speed', this.updateSpeed());
-    on('change:ac_note', this.updateACNote());
+    on('change:type', () => {
+      this.updateType();
+    });
+    on('change:size', () => {
+      this.updateSize();
+    });
+    on('change:ac_srd', () => {
+      this.updateAC();
+    });
+    on('change:is_npc', () => {
+      this.switchTo();
+    });
+    on('change:challenge', () => {
+      this.updateChallenge();
+    });
+    on('change:hp_srd', () => {
+      this.updateHPFromSRD();
+    });
+    on('change:hit_dice change:hit_die change:hp_extra change:constitution_mod', () => {
+      this.updateHP();
+    });
+    on('change:hit_dice change:hit_die', () => {
+      this.updateHD();
+    });
+    on('change:content_srd', () => {
+      this.updateContent();
+    });
+    on('change:senses', () => {
+      this.updateSenses();
+    });
+    on('change:languages', () => {
+      this.updateLanguages();
+    });
+    on('change:npc_speed', () => {
+      this.updateSpeed();
+    });
+    on('change:ac_note', () => {
+      this.updateACNote();
+    });
   }
 }

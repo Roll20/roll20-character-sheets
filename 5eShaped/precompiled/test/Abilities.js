@@ -1,12 +1,16 @@
 /* global on:false */
 
-import { abilityChecks } from './abilityChecks';
-import { actions } from './actions';
-import { attacks } from './attacks';
-import { spells } from './spells';
+import { AbilityChecks } from './AbilityChecks';
+const abilityChecks = new AbilityChecks();
+import { Actions } from './Actions';
+const actions = new Actions();
+import { Attacks } from './Attacks';
+const attacks = new Attacks();
+import { Spells } from './Spells';
+const spells = new Spells();
 import { getSetItems, getIntValue, getFloatValue, getAbilityMod, addArithmeticOperator, showSign, firstThree } from './utilities';
 
-export class abilities {
+export class Abilities {
   updateModifier(ability) {
     const collectionArray = [ability, `${ability}_bonus`, `${ability}_mod`, `${ability}_mod_with_sign`, `${ability}_check_mod`, `${ability}_check_mod_formula`, `${ability}_check_bonus`, 'global_ability_bonus', 'strength_mod', 'dexterity_mod', 'jack_of_all_trades_toggle', 'jack_of_all_trades', 'remarkable_athlete_toggle', 'remarkable_athlete', 'global_check_bonus'];
     if (ability === 'strength' || ability === 'dexterity') {
@@ -93,13 +97,27 @@ export class abilities {
     this.updateModifier('charisma');
   }
   setup() {
-    on('change:jack_of_all_trades_toggle change:jack_of_all_trades change:global_ability_bonus change:global_check_bonus', this.updateModifiers());
-    on('change:strength change:strength_bonus change:strength_check_mod change:strength_check_bonus change:remarkable_athlete_toggle change:remarkable_athlete change:weight_multiplier', this.updateModifier('strength'));
-    on('change:dexterity change:dexterity_bonus change:dexterity_check_mod change:dexterity_check_bonus change:remarkable_athlete_toggle change:remarkable_athlete', this.updateModifier('dexterity'));
-    on('change:constitution change:constitution_bonus change:constitution_check_mod change:constitution_check_bonus change:remarkable_athlete_toggle change:remarkable_athlete', this.updateModifier('constitution'));
-    on('change:intelligence change:intelligence_bonus change:intelligence_check_mod change:intelligence_check_bonus', this.updateModifier('intelligence'));
-    on('change:wisdom change:wisdom_bonus change:wisdom_check_mod change:wisdom_check_bonus', this.updateModifier('wisdom'));
-    on('change:charisma change:charisma_bonus change:charisma_check_mod change:charisma_check_bonus', this.updateModifier('charisma'));
+    on('change:jack_of_all_trades_toggle change:jack_of_all_trades change:global_ability_bonus change:global_check_bonus', () => {
+      this.updateModifiers();
+    });
+    on('change:strength change:strength_bonus change:strength_check_mod change:strength_check_bonus change:remarkable_athlete_toggle change:remarkable_athlete change:weight_multiplier', () => {
+      this.updateModifier('strength');
+    });
+    on('change:dexterity change:dexterity_bonus change:dexterity_check_mod change:dexterity_check_bonus change:remarkable_athlete_toggle change:remarkable_athlete', () => {
+      this.updateModifier('dexterity');
+    });
+    on('change:constitution change:constitution_bonus change:constitution_check_mod change:constitution_check_bonus change:remarkable_athlete_toggle change:remarkable_athlete', () => {
+      this.updateModifier('constitution');
+    });
+    on('change:intelligence change:intelligence_bonus change:intelligence_check_mod change:intelligence_check_bonus', () => {
+      this.updateModifier('intelligence');
+    });
+    on('change:wisdom change:wisdom_bonus change:wisdom_check_mod change:wisdom_check_bonus', () => {
+      this.updateModifier('wisdom');
+    });
+    on('change:charisma change:charisma_bonus change:charisma_check_mod change:charisma_check_bonus', () => {
+      this.updateModifier('charisma');
+    });
     on('change:strength_mod change:dexterity_mod change:constitution_mod change:intelligence_mod change:wisdom_mod change:charisma_mod', () => {
       abilityChecks.updateSkill();
       attacks.update();

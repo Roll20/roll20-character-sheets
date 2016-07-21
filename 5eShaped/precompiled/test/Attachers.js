@@ -3,7 +3,7 @@
 import { ABILITIES } from './constants';
 import { getSetRepeatingItems, exists } from './utilities';
 
-export class attachers {
+export class Attachers {
   update() {
     const collectionArray = ['attacher_initiative', 'attacher_death_saving_throw', 'attacher_hit_dice', 'attacher_attack', 'attacher_spell', 'attacher_skill', 'attacher_crit'];
     const itemsToPush = ['initiative', 'death_saving_throw', 'hit_dice', 'attack', 'spell', 'skill'];
@@ -53,6 +53,8 @@ export class attachers {
     });
   }
   setup() {
-    on('change:repeating_attacher remove:repeating_attacher', this.update());
+    on('change:repeating_attacher remove:repeating_attacher', () => {
+      this.update();
+    });
   }
 }

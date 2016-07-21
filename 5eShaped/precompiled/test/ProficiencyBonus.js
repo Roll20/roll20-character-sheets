@@ -2,7 +2,7 @@
 
 import { getSetItems, getIntValue, exists } from './utilities';
 
-export class proficiencyBonus {
+export class ProficiencyBonus {
   get(level, challenge) {
     let pb = 2;
 
@@ -31,6 +31,8 @@ export class proficiencyBonus {
     });
   }
   setup() {
-    on('change:level', this.update());
+    on('change:level', () => {
+      this.update();
+    });
   }
 }

@@ -1,23 +1,36 @@
 /* global on:false, generateRowID:false */
 
-import { abilities } from './abilities';
-import { abilityChecks } from './abilityChecks';
-import { actions } from './actions';
-import { attachers } from './attachers';
-import { attacks } from './attacks';
-import { character } from './character';
-import { classFeatures } from './classFeatures';
+import { Abilities } from './Abilities';
+const abilities = new Abilities();
+import { AbilityChecks } from './AbilityChecks';
+const abilityChecks = new AbilityChecks();
+import { Actions } from './Actions';
+const actions = new Actions();
+import { Attachers } from './Attachers';
+const attachers = new Attachers();
+import { Attacks } from './Attacks';
+const attacks = new Attacks();
+import { Character } from './Character';
+const character = new Character();
+import { ClassFeatures } from './ClassFeatures';
+const classFeatures = new ClassFeatures();
 import { TOGGLE_VARS } from './constants';
-import { equipment } from './equipment';
-import { npc } from './npc';
-import { resistances } from './resistances';
-import { savingThrows } from './savingThrows';
-import { settings } from './settings';
-import { spells } from './spells';
+import { Equipment } from './Equipment';
+const equipment = new Equipment();
+import { Npc } from './Npc';
+const npc = new Npc();
+import { Resistances } from './Resistances';
+const resistances = new Resistances();
+import { SavingThrows } from './SavingThrows';
+const savingThrows = new SavingThrows();
+import { Settings } from './Settings';
+const settings = new Settings();
+import { Spells } from './Spells';
+const spells = new Spells();
 import { isUndefined, isUndefinedOrEmpty, getAbilityName, ordinalSpellLevel, getSetItems, getSetRepeatingItems } from './utilities';
 import { currentVersion } from './version';
 
-export class upgrade {
+export class Upgrade {
   extasToExtrasFix(repeatingSection) {
     getSetRepeatingItems('upgrade.extasToExtrasFix', {
       repeatingItems: [repeatingSection],

@@ -2,9 +2,10 @@
 
 import { getSetItems, isUndefinedOrEmpty, getIntValue } from './utilities';
 import { CLASSES, ABILITIES, TOGGLE_VARS } from './constants';
-import { traits } from './traits';
+import { Traits } from './Traits';
+const traits = new Traits();
 
-export class classFeatures {
+export class ClassFeatures {
   extraAttack(v) {
     if (v.fighter_level >= 5) {
       let extraAttackTimes;

@@ -1,9 +1,9 @@
 /* global on:false */
 
-import { ABILITIES } from './constants';
 import { getSetItems, getIntValue, getAbilityShortName, addArithmeticOperator, isUndefinedOrEmpty, exists, showSign, getAbilityMod } from './utilities';
+import { ABILITIES } from './constants';
 
-export class savingThrows {
+export class SavingThrows {
   getHighestOfAbilityScoresForSavingThrow(v, savingThrowName) {
     let abilityName;
     let highestValue = 0;
@@ -200,7 +200,9 @@ export class savingThrows {
     for (const ability of ABILITIES) {
       classFeatureWatch.push(`change:${savingThrowName}_${ability}`);
     }
-    on(classFeatureWatch.join(' '), this.updateSavingThrow(savingThrowName));
+    on(classFeatureWatch.join(' '), () => {
+      this.updateSavingThrow(savingThrowName);
+    });
   }
   watchAbilityChanges() {
     const classFeatureWatch = [];
@@ -208,18 +210,38 @@ export class savingThrows {
       classFeatureWatch.push(`change:${ability}`);
       classFeatureWatch.push(`change:${ability}_mod`);
     }
-    on(classFeatureWatch.join(' '), this.updateCustomSavingThrows());
+    on(classFeatureWatch.join(' '), () => {
+      this.updateCustomSavingThrows();
+    });
   }
   setup() {
-    on('change:strength_mod change:strength_save_prof change:strength_save_bonus', this.updateSavingThrow('strength'));
-    on('change:dexterity_mod change:dexterity_save_prof change:dexterity_save_bonus', this.updateSavingThrow('dexterity'));
-    on('change:constitution_mod change:constitution_save_prof change:constitution_save_bonus', this.updateSavingThrow('constitution'));
-    on('change:intelligence_mod change:intelligence_save_prof change:intelligence_save_bonus', this.updateSavingThrow('intelligence'));
-    on('change:wisdom_mod change:wisdom_save_prof change:wisdom_save_bonus', this.updateSavingThrow('wisdom'));
-    on('change:charisma_mod change:charisma_save_prof change:charisma_save_bonus', this.updateSavingThrow('charisma'));
-    on('change:pb change:global_saving_throw_bonus change:saving_throws_half_proficiency', this.update());
-    on('change:use_custom_saving_throws', this.updateCustomSavingThrowToggle());
-    on('change:saving_throws_srd', this.updateFromSRD());
+    on('change:strength_mod change:strength_save_prof change:strength_save_bonus', () => {
+      this.updateSavingThrow('strength');
+    });
+    on('change:dexterity_mod change:dexterity_save_prof change:dexterity_save_bonus', () => {
+      this.updateSavingThrow('dexterity');
+    });
+    on('change:constitution_mod change:constitution_save_prof change:constitution_save_bonus', () => {
+      this.updateSavingThrow('constitution');
+    });
+    on('change:intelligence_mod change:intelligence_save_prof change:intelligence_save_bonus', () => {
+      this.updateSavingThrow('intelligence');
+    });
+    on('change:wisdom_mod change:wisdom_save_prof change:wisdom_save_bonus', () => {
+      this.updateSavingThrow('wisdom');
+    });
+    on('change:charisma_mod change:charisma_save_prof change:charisma_save_bonus', () => {
+      this.updateSavingThrow('charisma');
+    });
+    on('change:pb change:global_saving_throw_bonus change:saving_throws_half_proficiency', () => {
+      this.update();
+    });
+    on('change:use_custom_saving_throws', () => {
+      this.updateCustomSavingThrowToggle();
+    });
+    on('change:saving_throws_srd', () => {
+      this.updateFromSRD();
+    });
     this.watchForCustomSavingThrowChanges('fortitude');
     this.watchForCustomSavingThrowChanges('reflex');
     this.watchForCustomSavingThrowChanges('will');

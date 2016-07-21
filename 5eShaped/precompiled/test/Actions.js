@@ -1,11 +1,12 @@
 /* global on:false */
 
 import { ABILITIES, TOGGLE_VARS } from './constants';
+import { ProficiencyBonus } from './ProficiencyBonus';
+const proficiencyBonus = new ProficiencyBonus();
 import { getSetRepeatingItems, isUndefined, isUndefinedOrEmpty, fromVOrFinalSetAttrs, setCritDamage, getCorrectAbilityBasedOnBonus, getAnyCorrectAbilityBasedOnBonus, getIntValue, getRepeatingInfo, lowercaseDamageTypes, exists } from './utilities';
 import { updateAttackToggle, updateSavingThrowToggle, updateDamageToggle, updateHealToggle } from './updateToggles';
-import { proficiencyBonus } from './proficiencyBonus';
 
-export class actions {
+export class Actions {
   updateAll() {
     this.update('trait');
     this.update('action');
@@ -364,13 +365,27 @@ export class actions {
     });
   }
   setup() {
-    on('change:pb', this.update());
-    on('change:repeating_trait', (eventInfo) => this.updateIfTriggered('trait', eventInfo));
-    on('change:repeating_action', (eventInfo) => this.updateIfTriggered('action', eventInfo));
-    on('change:repeating_reaction', (eventInfo) => this.updateIfTriggered('reaction', eventInfo));
-    on('change:repeating_legendaryaction', (eventInfo) => this.updateIfTriggered('legendaryaction', eventInfo));
-    on('change:repeating_lairaction', (eventInfo) => this.updateIfTriggered('lairaction', eventInfo));
-    on('change:repeating_regionaleffect', (eventInfo) => this.updateIfTriggered('regionaleffect', eventInfo));
+    on('change:pb', () => {
+      this.update();
+    });
+    on('change:repeating_trait', (eventInfo) => {
+      this.updateIfTriggered('trait', eventInfo);
+    });
+    on('change:repeating_action', (eventInfo) => {
+      this.updateIfTriggered('action', eventInfo);
+    });
+    on('change:repeating_reaction', (eventInfo) => {
+      this.updateIfTriggered('reaction', eventInfo);
+    });
+    on('change:repeating_legendaryaction', (eventInfo) => {
+      this.updateIfTriggered('legendaryaction', eventInfo);
+    });
+    on('change:repeating_lairaction', (eventInfo) => {
+      this.updateIfTriggered('lairaction', eventInfo);
+    });
+    on('change:repeating_regionaleffect', (eventInfo) => {
+      this.updateIfTriggered('regionaleffect', eventInfo);
+    });
     on('change:repeating_trait remove:repeating_trait', () => {
       this.count('trait');
       this.updateChatMacro('trait');
@@ -395,11 +410,21 @@ export class actions {
       this.count('regionaleffect');
       this.updateChatMacro('regionaleffect');
     });
-    on('change:repeating_trait:freetext', (eventInfo) => this.parse('trait', getRepeatingInfo('repeating_trait', eventInfo).rowId));
-    on('change:repeating_action:freetext', (eventInfo) => this.parse('action', getRepeatingInfo('repeating_action', eventInfo).rowId));
-    on('change:repeating_reaction:freetext', (eventInfo) => this.parse('reaction', getRepeatingInfo('repeating_reaction', eventInfo).rowId));
-    on('change:repeating_legendaryaction:freetext', (eventInfo) => this.parse('legendaryaction', getRepeatingInfo('repeating_legendaryaction', eventInfo).rowId));
-    on('change:repeating_lairaction:freetext', (eventInfo) => this.parse('lairaction', getRepeatingInfo('repeating_lairaction', eventInfo).rowId));
+    on('change:repeating_trait:freetext', (eventInfo) => {
+      this.parse('trait', getRepeatingInfo('repeating_trait', eventInfo).rowId);
+    });
+    on('change:repeating_action:freetext', (eventInfo) => {
+      this.parse('action', getRepeatingInfo('repeating_action', eventInfo).rowId);
+    });
+    on('change:repeating_reaction:freetext', (eventInfo) => {
+      this.parse('reaction', getRepeatingInfo('repeating_reaction', eventInfo).rowId);
+    });
+    on('change:repeating_legendaryaction:freetext', (eventInfo) => {
+      this.parse('legendaryaction', getRepeatingInfo('repeating_legendaryaction', eventInfo).rowId);
+    });
+    on('change:repeating_lairaction:freetext', (eventInfo) => {
+      this.parse('lairaction', getRepeatingInfo('repeating_lairaction', eventInfo).rowId);
+    });
     on('change:global_attack_bonus change:global_melee_attack_bonus change:global_ranged_attack_bonus change:global_damage_bonus change:global_melee_damage_bonus change:global_ranged_damage_bonus change:ammo_auto_use', () => {
       this.update('action');
       this.update('reaction');

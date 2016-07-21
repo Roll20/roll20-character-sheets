@@ -1,9 +1,10 @@
 /* global on:false, generateRowID:false */
 
+import { Initialize } from './Initialize';
+const initialize = new Initialize();
 import { getSetItems } from './utilities';
-import { initialize } from './initialize';
 
-export class importData {
+export class ImportData {
   import() {
     getSetItems('importData.import', {
       collectionArray: ['import_data', 'version'],
@@ -51,7 +52,11 @@ export class importData {
     });
   }
   setup() {
-    on('change:accept_import', this.import);
-    on('change:reject_import', this.delete);
+    on('change:accept_import', () => {
+      this.import();
+    });
+    on('change:reject_import', () => {
+      this.delete();
+    });
   }
 }

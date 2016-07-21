@@ -1,9 +1,10 @@
 /* global on:false, generateRowID:false */
-import { getSetItems, getSetRepeatingItems, ordinalSpellLevel, getIntValue, isUndefined, isUndefinedOrEmpty, setCritDamage, fromVOrFinalSetAttrs, lowercaseDamageTypes, getRepeatingInfo, exists } from './utilities';
-import { updateAttackToggle, updateSavingThrowToggle, updateDamageToggle, updateHealToggle, updateHigherLevelToggle } from './updateToggles';
-import { ABILITIES, TOGGLE_VARS } from './constants';
 
-export class spells {
+import { ABILITIES, TOGGLE_VARS } from './constants';
+import { updateAttackToggle, updateSavingThrowToggle, updateDamageToggle, updateHealToggle, updateHigherLevelToggle } from './updateToggles';
+import { getSetItems, getSetRepeatingItems, ordinalSpellLevel, getIntValue, isUndefined, isUndefinedOrEmpty, setCritDamage, fromVOrFinalSetAttrs, lowercaseDamageTypes, getRepeatingInfo, exists } from './utilities';
+
+export class Spells {
   parseSRD(v, finalSetAttrs, repeatingString) {
     if (v[`${repeatingString}spell_level_from_srd`]) {
       finalSetAttrs[`${repeatingString}spell_level`] = ordinalSpellLevel(v[`${repeatingString}spell_level_from_srd`]);
@@ -425,7 +426,9 @@ export class spells {
       spellsWatch.push(`change:spell_slots_l${i}`);
       spellsWatch.push(`change:spell_slots_l${i}_max`);
     }
-    on(spellsWatch.join(' '), this.updateShowHide());
+    on(spellsWatch.join(' '), () => {
+      this.updateShowHide();
+    });
   }
   setup() {
     on('change:repeating_spell', (eventInfo) => {
@@ -434,9 +437,15 @@ export class spells {
         this.update(repeatingInfo.rowId);
       }
     });
-    on('change:pbchange:global_spell_attack_bonus change:global_spell_damage_bonus change:global_spell_dc_bonus change:global_spell_heal_bonus', this.update());
-    on('change:spells_srd', this.updateFromSRD());
-    on('change:spell_slots_l1_bonus change:spell_slots_l2_bonus change:spell_slots_l3_bonus change:spell_slots_l4_bonus change:spell_slots_l5_bonus change:spell_slots_l6_bonus change:spell_slots_l7_bonus change:spell_slots_l8_bonus change:spell_slots_l9_bonus', this.updateSlots());
+    on('change:pbchange:global_spell_attack_bonus change:global_spell_damage_bonus change:global_spell_dc_bonus change:global_spell_heal_bonus', () => {
+      this.update();
+    });
+    on('change:spells_srd', () => {
+      this.updateFromSRD();
+    });
+    on('change:spell_slots_l1_bonus change:spell_slots_l2_bonus change:spell_slots_l3_bonus change:spell_slots_l4_bonus change:spell_slots_l5_bonus change:spell_slots_l6_bonus change:spell_slots_l7_bonus change:spell_slots_l8_bonus change:spell_slots_l9_bonus', () => {
+      this.updateSlots();
+    });
     this.watchForChanges();
     on('change:repeating_spell', (eventInfo) => {
       const repeatingInfo = getRepeatingInfo('repeating_spell', eventInfo);
@@ -444,7 +453,11 @@ export class spells {
         this.updateChatMacro();
       }
     });
-    on('change:spells_show_unprepared remove:repeating_spell', this.updateChatMacro());
-    on('change:warlock_level change:spell_slots_l1 change:spell_slots_l2 change:spell_slots_l3 change:spell_slots_l4 change:spell_slots_l5 change:spell_slots_l6 change:spell_slots_l7 change:spell_slots_l8 change:spell_slots_l9', this.generateHigherLevelQueries());
+    on('change:spells_show_unprepared remove:repeating_spell', () => {
+      this.updateChatMacro();
+    });
+    on('change:warlock_level change:spell_slots_l1 change:spell_slots_l2 change:spell_slots_l3 change:spell_slots_l4 change:spell_slots_l5 change:spell_slots_l6 change:spell_slots_l7 change:spell_slots_l8 change:spell_slots_l9', () => {
+      this.generateHigherLevelQueries();
+    });
   }
 }

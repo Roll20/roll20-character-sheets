@@ -1,9 +1,9 @@
 /* global on:false */
 
-import { getSetItems, getSetRepeatingItems, getSkillIdByStorageName, getFloatValue, sumRepeating, isUndefinedOrEmpty, getRepeatingInfo, exists, round } from './utilities';
 import { ABILITIES, SKILLS } from './constants';
+import { getSetItems, getSetRepeatingItems, getSkillIdByStorageName, getFloatValue, sumRepeating, isUndefinedOrEmpty, getRepeatingInfo, exists, round } from './utilities';
 
-export class equipment {
+export class Equipment {
   setAdvantageOnStealth(mode) {
     getSetRepeatingItems('equipment.setAdvantageOnStealth', {
       repeatingItems: ['repeating_skill'],
@@ -173,11 +173,23 @@ export class equipment {
         this.updateArmor(repeatingInfo.rowId);
       }
     });
-    on('change:dexterity_mod change:medium_armor_max_dex change:ac_unarmored_ability remove:repeating_armor', this.updateArmor());
-    on('change:repeating_equipment', (eventInfo) => this.update(getRepeatingInfo('repeating_equipment', eventInfo).rowId));
-    on('change:repeating_equipment:carried change:repeating_equipment:qty change:repeating_equipment:weight remove:repeating_equipment', this.weigh());
-    on('change:repeating_ammo:weight change:repeating_ammo:qty', this.weighAmmo());
-    on('change:weight_attacks change:weight_ammo change:weight_armor change:weight_equipment change:weight_coinage', this.updateWeight());
-    on('change:cp change:copper_per_gold change:sp change:silver_per_gold change:ep change:electrum_per_gold change:gp change:pp change:platinum_per_gold', this.calculateGold());
+    on('change:dexterity_mod change:medium_armor_max_dex change:ac_unarmored_ability remove:repeating_armor', () => {
+      this.updateArmor();
+    });
+    on('change:repeating_equipment', (eventInfo) => {
+      this.update(getRepeatingInfo('repeating_equipment', eventInfo).rowId);
+    });
+    on('change:repeating_equipment:carried change:repeating_equipment:qty change:repeating_equipment:weight remove:repeating_equipment', () => {
+      this.weigh();
+    });
+    on('change:repeating_ammo:weight change:repeating_ammo:qty', () => {
+      this.weighAmmo();
+    });
+    on('change:weight_attacks change:weight_ammo change:weight_armor change:weight_equipment change:weight_coinage', () => {
+      this.updateWeight();
+    });
+    on('change:cp change:copper_per_gold change:sp change:silver_per_gold change:ep change:electrum_per_gold change:gp change:pp change:platinum_per_gold', () => {
+      this.calculateGold();
+    });
   }
 }

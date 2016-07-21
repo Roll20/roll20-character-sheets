@@ -1,9 +1,9 @@
 /* global on:false, generateRowID:false */
 import { ABILITIES } from './constants';
-import { getSetRepeatingItems, isUndefinedOrEmpty, setFinalAttrs, setCritDamage, sumRepeating, lowercaseDamageTypes, exists, getIntValue, getRepeatingInfo } from './utilities';
 import { updateAttackToggle, updateSavingThrowToggle, updateDamageToggle } from './updateToggles';
+import { getSetRepeatingItems, isUndefinedOrEmpty, setFinalAttrs, setCritDamage, sumRepeating, lowercaseDamageTypes, exists, getIntValue, getRepeatingInfo } from './utilities';
 
-export class attacks {
+export class Attacks {
   findAmmo(name, callback) {
     let repeatingString;
 
@@ -170,8 +170,14 @@ export class attacks {
         this.update(repeatingInfo.row);
       }
     });
-    on('change:pb, change:global_attack_bonus change:global_melee_attack_bonus change:global_ranged_attack_bonus change:global_damage_bonus change:global_melee_damage_bonus change:global_ranged_damage_bonus change:ammo_auto_use', this.update());
-    on('change:repeating_attack:carried change:repeating_attack:qty change:repeating_attack:weight remove:repeating_attack', this.weigh());
-    on('change:repeating_attack remove:repeating_attack', this.updateChatMacro());
+    on('change:pb, change:global_attack_bonus change:global_melee_attack_bonus change:global_ranged_attack_bonus change:global_damage_bonus change:global_melee_damage_bonus change:global_ranged_damage_bonus change:ammo_auto_use', () => {
+      this.update();
+    });
+    on('change:repeating_attack:carried change:repeating_attack:qty change:repeating_attack:weight remove:repeating_attack', () => {
+      this.weigh();
+    });
+    on('change:repeating_attack remove:repeating_attack', () => {
+      this.updateChatMacro();
+    });
   }
 }

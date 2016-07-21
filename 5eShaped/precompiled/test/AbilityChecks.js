@@ -2,9 +2,10 @@
 
 import { getSetItems, getSetRepeatingItems, isUndefinedOrEmpty, getAbilityValue, getAbilityShortName, getIntValue, addArithmeticOperator, showSign, capitalize, exists, getRepeatingInfo, isUndefined } from './utilities';
 import { ABILITIES } from './constants';
-import { proficiencyBonus } from './proficiencyBonus';
+import { ProficiencyBonus } from './ProficiencyBonus';
+const proficiencyBonus = new ProficiencyBonus();
 
-export class abilityChecks {
+export class AbilityChecks {
   updateMacro() {
     const collectionArray = ['ability_checks_query_var', 'ability_checks_macro_var', 'ability_checks_show_totals'];
     for (const ability of ABILITIES) {
@@ -283,14 +284,22 @@ export class abilityChecks {
         this.updateSkill(repeatingInfo.rowId);
       }
     });
-    on('change:pb change:jack_of_all_trades_toggle change:jack_of_all_trades change:remarkable_athlete_toggle change:remarkable_athlete change:global_check_bonus change:strength_check_bonus change:dexterity_check_bonus change:constitution_check_bonus change:intelligence_check_bonus change:wisdom_check_bonus change:charisma_check_bonus', this.updateSkill());
-    on('change:skills_srd', this.updateSkillsFromSRD());
-    on('remove:repeating_skill change:ability_checks_show_totals', this.updateMacro());
+    on('change:pb change:jack_of_all_trades_toggle change:jack_of_all_trades change:remarkable_athlete_toggle change:remarkable_athlete change:global_check_bonus change:strength_check_bonus change:dexterity_check_bonus change:constitution_check_bonus change:intelligence_check_bonus change:wisdom_check_bonus change:charisma_check_bonus', () => {
+      this.updateSkill();
+    });
+    on('change:skills_srd', () => {
+      this.updateSkillsFromSRD();
+    });
+    on('remove:repeating_skill change:ability_checks_show_totals', () => {
+      this.updateMacro();
+    });
     const initiativeWatch = ['change:initiative_ability', 'change:initiative_bonus', 'change:jack_of_all_trades_toggle', 'change:jack_of_all_trades', 'change:remarkable_athlete_toggle', 'change:remarkable_athlete', 'change:global_check_bonus'];
     for (const ability of ABILITIES) {
       initiativeWatch.push(`change:${ability}_mod`);
       initiativeWatch.push(`change:${ability}_check_bonus`);
     }
-    on(initiativeWatch.join(' '), this.updateInitiative());
+    on(initiativeWatch.join(' '), () => {
+      this.updateInitiative();
+    });
   }
 }

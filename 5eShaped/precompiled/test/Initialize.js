@@ -1,18 +1,27 @@
 /* global on:false, generateRowID:false, getTranslationByKey:false */
 
-import { abilities } from './abilities';
-import { abilityChecks } from './abilityChecks';
-import { character } from './character';
+import { Abilities } from './Abilities';
+const abilities = new Abilities();
+import { AbilityChecks } from './AbilityChecks';
+const abilityChecks = new AbilityChecks();
+import { Character } from './Character';
+const character = new Character();
 import { SKILLS } from './constants';
-import { equipment } from './equipment';
-import { proficiencyBonus } from './proficiencyBonus';
-import { savingThrows } from './savingThrows';
-import { spells } from './spells';
-import { upgrade } from './upgrade';
+import { Equipment } from './Equipment';
+const equipment = new Equipment();
+import { ProficiencyBonus } from './ProficiencyBonus';
+const proficiencyBonus = new ProficiencyBonus();
+import { SavingThrows } from './SavingThrows';
+const savingThrows = new SavingThrows();
+import { Spells } from './Spells';
+const spells = new Spells();
+import { Upgrade } from './Upgrade';
+const upgrade = new Upgrade();
 import { getSetItems, getSetRepeatingItems, isUndefinedOrEmpty, setFinalAttrs, getSkillIdByStorageName } from './utilities';
 import { currentVersion } from './version';
 
-export class initialize {
+
+export class Initialize {
   generateSkills() {
     getSetRepeatingItems('initialize.generateSkills', {
       repeatingItems: ['repeating_skill'],
@@ -49,6 +58,7 @@ export class initialize {
     return version;
   }
   sheetOpened() {
+    console.log('initialize.sheetOpened');
     getSetItems('initialize.sheetOpened', {
       collectionArray: ['version', 'strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma', 'import_data', 'roll_setting'],
       callback: (v, finalSetAttrs) => {
@@ -101,7 +111,11 @@ export class initialize {
     });
   }
   setup() {
-    on('change:generate_skills', this.generateSkills());
-    on('sheet:opened', this.sheetOpened());
+    on('change:generate_skills', () => {
+      this.generateSkills();
+    });
+    on('sheet:opened', () => {
+      this.sheetOpened();
+    });
   }
 }
