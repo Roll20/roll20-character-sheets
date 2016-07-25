@@ -195,10 +195,10 @@ export class Npc {
 
               if (!splitFormula[1] || splitFormula[1] === '+') {
                 totalHP += amount;
-                hpFormula += `${addArithmeticOperator(hpFormula, amount)}`;
+                hpFormula += ` + ${amount}`;
               } else if (splitFormula[1] === '-') {
                 totalHP -= amount;
-                hpFormula += `${addArithmeticOperator(hpFormula, amount)}`;
+                hpFormula += ` - ${amount}`;
               }
             }
             v.hp_extra.toString().replace(splitFormula[0], '');
