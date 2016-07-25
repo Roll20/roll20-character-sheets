@@ -89,6 +89,7 @@ export class Spells {
           const attackOptions = {
             attackAbility: true,
             globalAttackBonus: v.global_spell_attack_bonus,
+            globalAttackBonusLabel: 'global spell attack bonus',
             type: 'spell',
           };
           updateAttackToggle(v, finalSetAttrs, repeatingString, attackOptions);
@@ -100,6 +101,7 @@ export class Spells {
 
           const damageOptions = {
             globalDamageBonus: v.global_spell_damage_bonus,
+            globalDamageBonusLabel: 'global spell damage bonus',
             type: 'spell',
           };
           updateDamageToggle(v, finalSetAttrs, repeatingString, damageOptions);
@@ -437,7 +439,7 @@ export class Spells {
         this.update(repeatingInfo.rowId);
       }
     });
-    on('change:pbchange:global_spell_attack_bonus change:global_spell_damage_bonus change:global_spell_dc_bonus change:global_spell_heal_bonus', () => {
+    on('change:pb change:global_spell_attack_bonus change:global_spell_damage_bonus change:global_spell_dc_bonus change:global_spell_heal_bonus', () => {
       this.update();
     });
     on('change:spells_srd', () => {
