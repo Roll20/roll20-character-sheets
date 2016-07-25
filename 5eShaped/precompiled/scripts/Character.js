@@ -137,7 +137,7 @@ export class Character {
           }
 
           let classHd = v[`${repeatingString}hd`];
-          if (isUndefinedOrEmpty(classHd) || repeatingInfo.field === 'name') {
+          if (isUndefinedOrEmpty(classHd) || (repeatingInfo && repeatingInfo.field === 'name')) {
             if (defaultClassDetails.hasOwnProperty(className)) {
               classHd = defaultClassDetails[className].hd;
             } else {
