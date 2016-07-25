@@ -174,66 +174,6 @@ const numberWithCommas = (x) => {
   parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   return parts.join('.');
 };
-const findClosest = (array, goal) => {
-  return array.reduce((prev, curr) => {
-    return (Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev);
-  });
-};
-const getCorrectAbilityBasedOnBonus = (finalSetAttrs, repeatingString, fieldName, bonus, spellMods, meleeMods, spellAttack, rangedAttack, dexMod) => {
-  let closest;
-  if (bonus) {
-    if (spellAttack) {
-      closest = findClosest(spellMods, bonus);
-      bonus -= closest;
-      if (closest === spellMods[0]) {
-        finalSetAttrs[repeatingString + fieldName] = 'intelligence';
-      } else if (closest === spellMods[1]) {
-        finalSetAttrs[repeatingString + fieldName] = 'wisdom';
-      } else if (closest === spellMods[2]) {
-        finalSetAttrs[repeatingString + fieldName] = 'charisma';
-      }
-    } else {
-      if (rangedAttack) {
-        finalSetAttrs[`${repeatingString}attack_ability`] = 'dexterity';
-        bonus -= dexMod;
-      } else {
-        closest = findClosest(meleeMods, bonus);
-        bonus -= closest;
-        if (closest === meleeMods[0]) {
-          finalSetAttrs[repeatingString + fieldName] = 'strength';
-        } else if (closest === meleeMods[1]) {
-          finalSetAttrs[repeatingString + fieldName] = 'dexterity';
-        }
-      }
-    }
-  } else {
-    finalSetAttrs[repeatingString + fieldName] = 0;
-  }
-  return bonus;
-};
-const getAnyCorrectAbilityBasedOnBonus = (finalSetAttrs, repeatingString, fieldName, bonus, abilityMods) => {
-  const closest = findClosest(abilityMods, bonus);
-  if (bonus) {
-    bonus -= closest;
-
-    if (closest === abilityMods[0]) {
-      finalSetAttrs[repeatingString + fieldName] = 'strength';
-    } else if (closest === abilityMods[1]) {
-      finalSetAttrs[repeatingString + fieldName] = 'dexterity';
-    } else if (closest === abilityMods[2]) {
-      finalSetAttrs[repeatingString + fieldName] = 'constitution';
-    } else if (closest === abilityMods[3]) {
-      finalSetAttrs[repeatingString + fieldName] = 'intelligence';
-    } else if (closest === abilityMods[4]) {
-      finalSetAttrs[repeatingString + fieldName] = 'wisdom';
-    } else if (closest === abilityMods[5]) {
-      finalSetAttrs[repeatingString + fieldName] = 'charisma';
-    }
-  } else {
-    finalSetAttrs[repeatingString + fieldName] = 0;
-  }
-  return bonus;
-};
 const lowercaseDamageTypes = (string) => {
   if (!string) {
     string = '';
@@ -347,9 +287,6 @@ const sumRepeating = (options, sumItems) => {
         if (sumItem.armorType) {
           collectionArray.push(repeatingString + sumItem.armorType);
         }
-        if (sumItem.addOnAfterQty) {
-          collectionArray.push(repeatingString + sumItem.addOnAfterQty);
-        }
       }
     }
     if (options.getExtraFields) {
@@ -381,10 +318,6 @@ const sumRepeating = (options, sumItems) => {
           }
 
           let itemTotal = round((qty * fieldToAdd), 2);
-
-          if (sumItem.addOnAfterQty) {
-            itemTotal += getFloatValue(v[repeatingString + sumItem.addOnAfterQty]);
-          }
 
           itemTotal = round(itemTotal, 2);
 
@@ -475,4 +408,4 @@ const updateHD = (v, finalSetAttrs, hd) => {
   }
 };
 
-export { capitalize, camelize, firstThree, round, isUndefined, isUndefinedOrEmpty, isEmpty, exists, getIntValue, getFloatValue, getAbilityMod, getAbilityName, getAbilityValue, getAbilityShortName, getRepeatingInfo, setFinalAttrs, fromVOrFinalSetAttrs, hasUpperCase, ordinalSpellLevel, addArithmeticOperator, showSign, numberWithCommas, findClosest, getCorrectAbilityBasedOnBonus, getAnyCorrectAbilityBasedOnBonus, lowercaseDamageTypes, getSetItems, getSetRepeatingItems, sumRepeating, getSkillIdByStorageName, setCritDamage, updateHD };
+export { capitalize, camelize, firstThree, round, isUndefined, isUndefinedOrEmpty, isEmpty, exists, getIntValue, getFloatValue, getAbilityMod, getAbilityName, getAbilityValue, getAbilityShortName, getRepeatingInfo, setFinalAttrs, fromVOrFinalSetAttrs, hasUpperCase, ordinalSpellLevel, addArithmeticOperator, showSign, numberWithCommas, lowercaseDamageTypes, getSetItems, getSetRepeatingItems, sumRepeating, getSkillIdByStorageName, setCritDamage, updateHD };

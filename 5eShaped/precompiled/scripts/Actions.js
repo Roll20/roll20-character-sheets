@@ -3,7 +3,7 @@
 import { ABILITIES, TOGGLE_VARS } from './constants';
 import { ProficiencyBonus } from './ProficiencyBonus';
 const proficiencyBonus = new ProficiencyBonus();
-import { getSetRepeatingItems, isUndefined, isUndefinedOrEmpty, fromVOrFinalSetAttrs, setCritDamage, getCorrectAbilityBasedOnBonus, getAnyCorrectAbilityBasedOnBonus, getIntValue, getRepeatingInfo, lowercaseDamageTypes, exists } from './utilities';
+import { getSetRepeatingItems, isUndefined, isUndefinedOrEmpty, fromVOrFinalSetAttrs, setCritDamage, getIntValue, getRepeatingInfo, lowercaseDamageTypes, exists } from './utilities';
 import { updateAttackToggle, updateSavingThrowToggle, updateDamageToggle, updateHealToggle } from './updateToggles';
 
 export class Actions {
@@ -157,6 +157,66 @@ export class Actions {
       },
     });
   }
+  findClosest(array, goal) {
+    return array.reduce((prev, curr) => {
+      return (Math.abs(curr - goal) < Math.abs(prev - goal) ? curr : prev);
+    });
+  }
+  getCorrectAbilityBasedOnBonus(finalSetAttrs, repeatingString, fieldName, bonus, spellMods, meleeMods, spellAttack, rangedAttack, dexMod) {
+    let closest;
+    if (bonus) {
+      if (spellAttack) {
+        closest = this.findClosest(spellMods, bonus);
+        bonus -= closest;
+        if (closest === spellMods[0]) {
+          finalSetAttrs[repeatingString + fieldName] = 'intelligence';
+        } else if (closest === spellMods[1]) {
+          finalSetAttrs[repeatingString + fieldName] = 'wisdom';
+        } else if (closest === spellMods[2]) {
+          finalSetAttrs[repeatingString + fieldName] = 'charisma';
+        }
+      } else {
+        if (rangedAttack) {
+          finalSetAttrs[`${repeatingString}attack_ability`] = 'dexterity';
+          bonus -= dexMod;
+        } else {
+          closest = this.findClosest(meleeMods, bonus);
+          bonus -= closest;
+          if (closest === meleeMods[0]) {
+            finalSetAttrs[repeatingString + fieldName] = 'strength';
+          } else if (closest === meleeMods[1]) {
+            finalSetAttrs[repeatingString + fieldName] = 'dexterity';
+          }
+        }
+      }
+    } else {
+      finalSetAttrs[repeatingString + fieldName] = 0;
+    }
+    return bonus;
+  }
+  getAnyCorrectAbilityBasedOnBonus(finalSetAttrs, repeatingString, fieldName, bonus, abilityMods) {
+    const closest = this.findClosest(abilityMods, bonus);
+    if (bonus) {
+      bonus -= closest;
+
+      if (closest === abilityMods[0]) {
+        finalSetAttrs[repeatingString + fieldName] = 'strength';
+      } else if (closest === abilityMods[1]) {
+        finalSetAttrs[repeatingString + fieldName] = 'dexterity';
+      } else if (closest === abilityMods[2]) {
+        finalSetAttrs[repeatingString + fieldName] = 'constitution';
+      } else if (closest === abilityMods[3]) {
+        finalSetAttrs[repeatingString + fieldName] = 'intelligence';
+      } else if (closest === abilityMods[4]) {
+        finalSetAttrs[repeatingString + fieldName] = 'wisdom';
+      } else if (closest === abilityMods[5]) {
+        finalSetAttrs[repeatingString + fieldName] = 'charisma';
+      }
+    } else {
+      finalSetAttrs[repeatingString + fieldName] = 0;
+    }
+    return bonus;
+  }
   parseDamage(finalSetAttrs, repeatingString, freetext, regex, name, spellMods, meleeMods, spellAttack, rangedAttack, dexMod) {
     const damageParseRegex = /(\d+d?\d+)(?:\s?(?:\+|\-)\s?(\d+))?/gi;
     const damage = regex.exec(freetext);
@@ -177,7 +237,7 @@ export class Actions {
           }
         }
       }
-      damageBonus = getCorrectAbilityBasedOnBonus(finalSetAttrs, repeatingString, `${name}_ability`, damageBonus, spellMods, meleeMods, spellAttack, rangedAttack, dexMod);
+      damageBonus = this.getCorrectAbilityBasedOnBonus(finalSetAttrs, repeatingString, `${name}_ability`, damageBonus, spellMods, meleeMods, spellAttack, rangedAttack, dexMod);
       if (damage[2]) {
         finalSetAttrs[`${repeatingString}${name}_type`] = damage[2];
       }
@@ -297,7 +357,7 @@ export class Actions {
             let hitBonus = toHit[1];
             hitBonus -= pb;
 
-            hitBonus = getCorrectAbilityBasedOnBonus(finalSetAttrs, repeatingString, 'attack_ability', hitBonus, spellMods, meleeMods, spellAttack, rangedAttack, dexMod);
+            hitBonus = this.getCorrectAbilityBasedOnBonus(finalSetAttrs, repeatingString, 'attack_ability', hitBonus, spellMods, meleeMods, spellAttack, rangedAttack, dexMod);
 
             if (hitBonus) {
               finalSetAttrs[`${repeatingString}attack_bonus`] = hitBonus;
@@ -315,7 +375,7 @@ export class Actions {
               savingThrowTotal -= 8;
               savingThrowTotal -= pb;
 
-              savingThrowTotal = getAnyCorrectAbilityBasedOnBonus(finalSetAttrs, repeatingString, 'saving_throw_ability', savingThrowTotal, abilityMods);
+              savingThrowTotal = this.getAnyCorrectAbilityBasedOnBonus(finalSetAttrs, repeatingString, 'saving_throw_ability', savingThrowTotal, abilityMods);
 
               if (savingThrowTotal) {
                 finalSetAttrs[`${repeatingString}saving_throw_bonus`] = savingThrowTotal;
