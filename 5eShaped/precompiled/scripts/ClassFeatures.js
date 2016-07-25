@@ -59,6 +59,7 @@ export class ClassFeatures {
         name: getTranslationByKey('CLASS_FEATURE_RAGE'),
         recharge: 'Long Rest',
         storageName: 'Rage',
+        type: 'Other',
         uses_max: rageUses,
       });
 
