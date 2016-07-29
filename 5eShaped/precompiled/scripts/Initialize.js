@@ -7,6 +7,8 @@ const abilityChecks = new AbilityChecks();
 import { Character } from './Character';
 const character = new Character();
 import { SKILLS } from './constants';
+import { Convert } from './Convert';
+const convert = new Convert();
 import { Equipment } from './Equipment';
 const equipment = new Equipment();
 import { ProficiencyBonus } from './ProficiencyBonus';
@@ -99,6 +101,7 @@ export class Initialize {
             equipment.updateArmor();
             spells.updateShowHide();
             abilities.updateModifiers();
+            convert.convertFromOGL();
           });
         } else {
           upgrade.upgrade();
