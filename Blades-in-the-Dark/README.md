@@ -6,8 +6,7 @@ This sheet was created for use in Blades in the Dark on Roll20.
 
 Report any problems, suggestions or features by sending a private message on Roll20 or submitting an issue on Github.
 
-[Stephen Malone](https://app.roll20.net/users/552705/) on Roll20
-[Phalanks](https://app.roll20.net/users/843545/) on Roll20
+[Stephen Malone](https://app.roll20.net/users/552705/) or [Phalanks](https://app.roll20.net/users/843545/) on Roll20
 
 ## Todo
 * Change to only show crit value if there are more than one 6 in the roll.
