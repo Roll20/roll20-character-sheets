@@ -331,6 +331,30 @@ export class Upgrade {
       },
     });
   }
+  spellEffectsNaming() {
+    getSetRepeatingItems('upgrade.spellEffectsNaming', {
+      repeatingItems: ['repeating_spell'],
+      collectionArrayAddItems: ['special_effects_toggle', 'type', 'color', 'points_of_origin'],
+      callback: (v, finalSetAttrs, ids, repeatingItem) => {
+        for (const id of ids) {
+          const repeatingString = `${repeatingItem}_${id}_`;
+          if (!isUndefinedOrEmpty(v[`${repeatingString}special_effects_toggle`])) {
+            finalSetAttrs[`${repeatingString}special_effects_toggle`] = '{{fx=@{special_effects_type}-@{special_effects_color} @{special_effects_points_of_origin}}}';
+
+            if (!isUndefinedOrEmpty(v[`${repeatingString}type`]) && v[`${repeatingString}type`] !== 'Ranged' && v[`${repeatingString}type`] !== 'Melee') {
+              finalSetAttrs[`${repeatingString}special_effects_type`] = v[`${repeatingString}type`];
+            }
+            if (!isUndefinedOrEmpty(v[`${repeatingString}color`])) {
+              finalSetAttrs[`${repeatingString}special_effects_color`] = v[`${repeatingString}color`];
+            }
+            if (!isUndefinedOrEmpty(v[`${repeatingString}points_of_origin`])) {
+              finalSetAttrs[`${repeatingString}special_effects_points_of_origin`] = v[`${repeatingString}points_of_origin`];
+            }
+          }
+        }
+      },
+    });
+  }
   critDamage() {
     getSetRepeatingItems('upgrade.critDamage', {
       repeatingItems: ['repeating_attack', 'repeating_spell', 'repeating_trait', 'repeating_action', 'repeating_reaction', 'repeating_legendaryaction', 'repeating_lairaction', 'repeating_regionaleffect'],
@@ -567,6 +591,9 @@ export class Upgrade {
       spells.update();
       attacks.update();
       actions.updateAll();
+    }
+    if (this.versionCompare(currentVersion, '6.0.4') < 0) {
+      this.spellEffectsNaming();
     }
   }
 }
