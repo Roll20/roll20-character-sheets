@@ -10,14 +10,20 @@ Report any problems, suggestions or features by sending a private message on Rol
 
 ## Todo
 * Change to only show crit value if there are more than one 6 in the roll.
-* Convert Coin, Bandolier, and Recovery checkboxes in the character tab to left-fillable radio buttons for consistency.
-* Convert Load on the playbook tab to a radio button - can't have multiple loads simultaneously.
-* Wrap the 8-clock track at 4 ticks to allow for wider input boxes for the clock descriptions.
 * Add a Name field for Cohorts?
 * Add a repeatable Item field for items that have no load?
 * Add a button to the Crew sheet to roll Heat for Entanglements - display with a roll template to make it easy for the GM to look up the results?
+* Display the Clocks tab for Crew sheets as well as Character sheets
+* Add a min-width to rows that shouldn't be wrapped when the sheet's width is narrow.
 
 ## Changelog
+
+### 0.0.9
+* Added display formatting for Turf to overlay on Rep nicely.
+* Converted some checkboxes to radios - Load, Friends, Contacts, Recovery, Bandoliers
+* Improved layout for Clock tab
+* Bugfixes
+    - Windows Chrome no longer wraps the Crew claims map badly
 
 ### 0.0.8
 * Added a button to Indulge in Vice 
