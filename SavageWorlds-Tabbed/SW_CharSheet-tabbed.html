@@ -1,3 +1,540 @@
+<!-- SHEET WORKERS -->
+<script type="text/worker">
+	/* ---- BEGIN: TheAaronSheet.js ---- */
+	// Github:   https://github.com/shdwjk/TheAaronSheet/blob/master/TheAaronSheet.js
+	// By:       The Aaron, Arcane Scriptomancer
+	// Contact:  https://app.roll20.net/users/104025/the-aaron
+
+	var TAS = TAS || (function(){
+		'use strict';
+
+		var version = '0.2.0',
+			lastUpdate = 1448523710,
+
+			queuedUpdates = {}, //< Used for delaying saves till the last momment.
+
+		log = function(){
+			_.each(arguments,function(m){
+				switch(typeof m){
+					case 'string':
+						console.log('<TAS> :: '+m);
+						break;
+					case 'number':
+						console.log('<TAS> :: [number]: '+m);
+						break;
+					default:
+						console.log('<TAS> :: ['+typeof m +']:');
+						console.log(m);
+						console.log('<TAS> :: =========================================================');
+				}
+			});
+		},
+
+		prepareUpdate = function( attribute, value ){
+			queuedUpdates[attribute]=value;
+		},
+
+		applyQueuedUpdates = function() {
+		  setAttrs(queuedUpdates);
+		  queuedUpdates = {};
+		},
+
+		namesFromArgs = function(args,base){
+			return _.chain(args)
+				.reduce(function(memo,attr){
+					if('string' === typeof attr) {
+						memo.push(attr);
+					} else if(_.isArray(args) || _.isArguments(args)){
+						memo = namesFromArgs(attr,memo);
+					}
+					return memo;
+				},(_.isArray(base) && base) || [])
+				.uniq()
+				.value();
+		},
+
+		addId = function(obj,value){
+			Object.defineProperty(obj,'id',{
+				value: value,
+				writeable: false,
+				enumerable: false
+			});
+		},
+
+		addProp = function(obj,prop,value,fullname){
+			(function(){
+				var pname=(_.contains(['S','F','I','D'],prop) ? '_'+prop : prop),
+					full_pname = fullname || prop,
+					pvalue=value;
+
+				_.each(['S','I','F'],function(p){
+					if( !_.has(obj,p)){
+						Object.defineProperty(obj, p, {
+							value: {},
+							enumerable: false,
+							readonly: true
+						});
+					}
+				});
+				if( !_.has(obj,'D')){
+					Object.defineProperty(obj, 'D', {
+						value: _.reduce(_.range(10),function(m,d){
+								Object.defineProperty(m, d, {
+									value: {},
+									enumerable: true,
+									readonly: true
+								});
+								return m;
+							},{}),
+						enumerable: false,
+						readonly: true
+					});
+				}
+
+
+				// Raw value
+				Object.defineProperty(obj, pname, {
+					enumerable: true,
+					set: function(v){
+						pvalue=v;
+						prepareUpdate(full_pname,v);
+					},
+					get: function(){
+						return pvalue;
+					}
+				});
+			
+				// string value
+				Object.defineProperty(obj.S, pname, {
+					enumerable: true,
+					set: function(v){
+						var val=v.toString();
+						pvalue=val;
+						prepareUpdate(full_pname,val);
+					},
+					get: function(){
+						return pvalue.toString();
+					}
+				});
+
+				// int value
+				Object.defineProperty(obj.I, pname, {
+					enumerable: true,
+					set: function(v){
+						var val=parseInt(v,10) || 0;
+						pvalue=val;
+						prepareUpdate(full_pname,val);
+					},
+					get: function(){
+						return parseInt(pvalue,10) || 0;
+					}
+				});
+
+				// float value
+				Object.defineProperty(obj.F, pname, {
+					enumerable: true,
+					set: function(v){
+						var val=parseFloat(v) || 0;
+						pvalue=val;
+						prepareUpdate(full_pname,val);
+					},
+					get: function(){
+						return parseFloat(pvalue) || 0;
+					}
+				});
+				_.each(_.range(10),function(d){
+					Object.defineProperty(obj.D[d], pname, {
+						enumerable: true,
+						set: function(v){
+							var val=(parseFloat(v) || 0).toFixed(d);
+							pvalue=val;
+							prepareUpdate(full_pname,val);
+						},
+						get: function(){
+							return (parseFloat(pvalue) || 0).toFixed(d);
+						}
+					});
+				});
+
+			}());
+		},
+	
+		repeating = function( section ) {
+			return (function(s){
+				var sectionName = s,
+					attrNames = [],
+					fieldNames = [],
+					operations = [],
+			
+				repAttrs = function(){
+					attrNames = namesFromArgs(arguments,attrNames);
+					return this;
+				},
+				repFields = function(){
+					fieldNames = namesFromArgs(arguments,fieldNames);
+					return this;
+				},
+				repReduce = function(func, initial, final, context) { 
+					operations.push({
+						type: 'reduce',
+						func: (func && _.isFunction(func) && func) || _.noop,
+						memo: (_.isUndefined(initial) && 0) || initial,
+						final: (final && _.isFunction(final) && final) || _.noop,
+						context: context || {}
+					});
+					return this;
+				},
+				repMap = function(func, final, context) {
+					operations.push({
+						type: 'map',
+						func: (func && _.isFunction(func) && func) || _.noop,
+						final: (final && _.isFunction(final) && final) || _.noop,
+						context: context || {}
+					});
+					return this;
+				},
+				repEach = function(func, final, context) {
+					operations.push({
+						type: 'each',
+						func: (func && _.isFunction(func) && func) || _.noop,
+						final: (final && _.isFunction(final) && final) || _.noop,
+						context: context || {}
+					});
+					return this;
+				},
+				repTap = function(final, context) {
+					operations.push({
+						type: 'tap',
+						final: (final && _.isFunction(final) && final) || _.noop,
+						context: context || {}
+					});
+					return this;
+				},
+				repExecute = function(){
+					var rowSet = {},
+						attrSet = {},
+						fieldIds = [],
+						fullFieldNames = [];
+
+					// call each operation per row.
+					// call each operation's final
+					getSectionIDs("repeating_"+sectionName,function(ids){
+						fieldIds = ids;
+						fullFieldNames = _.reduce(fieldIds,function(memo,id){
+							return memo.concat(_.map(fieldNames,function(name){
+								return 'repeating_'+sectionName+'_'+id+'_'+name;  
+							}));
+						},[]);
+						getAttrs( _.uniq(attrNames.concat(fullFieldNames)), function(values){
+							_.each(attrNames,function(aname){
+								if(values.hasOwnProperty(aname)){
+									addProp(attrSet,aname,values[aname]);
+								}
+							});
+
+							rowSet = _.reduce(fieldIds,function(memo,id){
+								var r={};
+								addId(r,id);
+								_.each(fieldNames,function(name){
+									var fn = 'repeating_'+sectionName+'_'+id+'_'+name;  
+									addProp(r,name,values[fn],fn);
+								});
+
+								memo[id]=r;
+
+								return memo;
+							},{});
+
+							_.each(operations,function(op){
+								var res;
+								switch(op.type){
+									case 'tap':
+										_.bind(op.final,op.context,rowSet,attrSet)();
+										break;
+
+									case 'each':
+										_.each(rowSet,function(r){
+											_.bind(op.func,op.context,r,attrSet,r.id,rowSet)();
+										});
+										_.bind(op.final,op.context,rowSet,attrSet)();
+										break;
+
+									case 'map':
+										res = _.map(rowSet,function(r){
+											return _.bind(op.func,op.context,r,attrSet,r.id,rowSet)();
+										});
+										_.bind(op.final,op.context,res,rowSet,attrSet)();
+										break;
+
+									case 'reduce':
+										res = op.memo;
+										_.each(rowSet,function(r){
+											res = _.bind(op.func,op.context,res,r,attrSet,r.id,rowSet)();
+										});
+										_.bind(op.final,op.context,res,rowSet,attrSet)();
+										break;
+								}
+							});
+
+							// finalize attrs
+							applyQueuedUpdates();
+						});
+					});
+				};
+				
+				return {
+					attrs: repAttrs,
+					attr: repAttrs,
+
+					column: repFields,
+					columns: repFields,
+					field: repFields,
+					fields: repFields,
+
+					reduce: repReduce,
+					inject: repReduce,
+					foldl: repReduce,
+
+					map: repMap,
+					collect: repMap,
+
+					each: repEach,
+					forEach: repEach,
+
+					tap: repTap,
+					'do': repTap,
+
+					execute: repExecute,
+					go: repExecute,
+					run: repExecute
+				};
+			}(section));
+		},
+
+
+		repeatingSimpleSum = function(section, field, destination){
+			repeating(section)
+				.attr(destination)
+				.field(field)
+				.reduce(function(m,r){
+					return m + (r.F[field]);
+				},0,function(t,r,a){
+					a[destination]=t;
+				})
+				.execute();
+		};
+
+		console.log('-=> TheAaronSheet v'+version+' <=-  ['+(new Date(lastUpdate*1000))+']');
+
+		return {
+			repeatingSimpleSum: repeatingSimpleSum,
+			repeating: repeating
+		};
+	}());
+
+	/* ---- END: TheAaronSheet.js ---- */
+	
+	//Set Rank according to the XP value
+	on("sheet:opened change:xp change:rank", function() {
+		getAttrs(["xp", "rank"], function(value) {
+			console.log("xp value: " + value.xp);
+			console.log("rank value: " + value.rank);
+      		if (value.xp >=80) {
+      			console.log("Setting rank to Legendary");
+      			setAttrs({Rank: 5});
+      		}
+      		else if (value.xp >=60) {
+      			console.log("Setting rank to Heroic");
+      			setAttrs({Rank: 4});
+      		}
+      		else if (value.xp >=40) {
+      			console.log("Setting rank to Veteran");
+      			setAttrs({Rank: 3});
+      		}
+      		else if (value.xp >=20) {
+      			console.log("Setting rank to Seasoned");
+      			setAttrs({Rank: 2});
+      		}
+      		else {
+      			console.log("Setting rank to Novice");
+      			setAttrs({Rank: 1});
+      		}
+   		});
+	});
+	//End Rank
+	
+	//Set Toughness
+	on("sheet:opened change:vigor change:vimod change:toughness", function() {
+		getAttrs(["vigor", "vimod"], function(vvalue) {
+			console.log("vigor value: " + vvalue.vigor);
+			console.log("vimod value: " + vvalue.vimod);
+			var Vigor = parseInt(vvalue.vigor);
+			var ViMod = parseInt(vvalue.vimod);
+            var totVigor = Vigor + ViMod;
+      		setAttrs({ toughness: Math.floor(totVigor/2) + 2 });
+   		});
+	});
+	
+	//Set Max Fatigue
+	on("change:increasedfatigue", function() {
+		getAttrs(["increasedfatigue", "fatigue_max"], function(vvalue) {
+			console.log("Increase Fatigue value: " + vvalue.increasedfatigue);
+			console.log("Max Fatigue value: " + vvalue.fatigue_max);
+			if (vvalue.increasedfatigue === "1") {
+      			console.log("Increase Max Fatigue to 3");
+      			setAttrs({fatigue_max: 3});
+      		}
+      		else {
+      			setAttrs({ fatigue_max: 2 });
+      		}
+   		});
+	});
+	
+	//Set Parry
+	on("sheet:opened change:fighting change:fightingmod change:parry change:parryMod", function() {
+		getAttrs(["fighting", "FightingMod", "parryMod"], function(pvalue) {
+			console.log("fighting value: " + pvalue.fighting);
+			console.log("mod value: " + pvalue.FightingMod);
+			console.log("parry mod: " + pvalue.parryMod);
+			var Fighting = parseInt(pvalue.fighting);
+			var FightingMod = parseInt(pvalue.FightingMod);
+            var totFighting = Fighting + FightingMod;
+            var parryMod = parseInt(pvalue.parryMod);
+            var parryCalc = Math.floor(totFighting/2) + 2;
+      		setAttrs({ parry: parryCalc  });
+      		setAttrs({ parryCur:  parryCalc + parryMod });
+   		});
+	});
+	
+	//Example of SimpleSum usage
+	//on('change:repeating_weapons',function(){
+	//	TAS.repeatingSimpleSum('weapons','cost','spentbudget');
+	//});
+	
+	// Calculate Strain
+	on('change:repeating_augmentation remove:repeating_augmentation',function(){
+		TAS.repeatingSimpleSum('augmentation','augStrain','totalStrain');
+	});
+	
+	//Set Current Strain
+	on('change:totalstrain', function() {
+		getAttrs(["totalStrain"], function(svalue) {
+			var strain = parseInt(svalue.totalStrain);
+      		setAttrs({ StrainCur: strain  });
+   		});
+	});	
+	
+	//Calculate Max Strain
+	on("sheet:opened change:strain change:strainmod", function() {
+		getAttrs(["strain", "StrainMod"], function(svalue) {
+			console.log("strain value: " + svalue.strain);
+			console.log("mod value: " + svalue.StrainMod);
+			var base = parseInt(svalue.strain);
+			var sMod = parseInt(svalue.StrainMod);
+            var maxStrain = base + sMod;
+      		setAttrs({ strain_max: maxStrain });
+   		});
+	});
+	
+	//Visual Cue of Strain(ger) Danger
+	on("change:strain_max change:totalstrain", function() {
+		console.log("<====== Checking for Strain Fatigue ======>");
+		getAttrs(["Strain_max","totalStrain"], function(cvalue) {
+			console.log("max strain: " + cvalue.Strain_max);
+			console.log("tot strain: " + cvalue.totalStrain);
+			var max_Strain = parseInt(cvalue.Strain_max);
+			var tot_Strain = parseInt(cvalue.totalStrain);
+			console.log("maxStrain = " + typeof max_Strain);
+			console.log("totStrain = " + typeof tot_Strain);
+			strainzone = Math.floor(parseFloat((tot_Strain / max_Strain)) * 100);
+			console.log("Danger Zone: " + strainzone);
+			if (strainzone >= 100) {
+      			console.log("At or exceeded Max Strain");
+      			setAttrs({straincrit: 1,
+      					  straindanger: 0});
+      		}
+      		else if (strainzone >= 75) {
+      			console.log("Nearing Max Strain");
+      			setAttrs({straincrit: 0,
+      					  straindanger: 1});
+      		}
+      		else {
+      			console.log("Nothing to worry about yet");
+      			setAttrs({straincrit: 0,
+      					  straindanger: 0});
+      		}
+		});
+	});
+	
+	// Calculate Armor Weights
+	on('change:repeating_armor remove:repeating_armor',function(){
+		TAS.repeatingSimpleSum('armor','ArmorTypeWeight','armortotalweightcarried');
+	});
+	
+	// Calculate Melee Weapon Weights
+	on('change:repeating_meleeweapons remove:repeating_meleeweapons',function(){
+		TAS.repeatingSimpleSum('meleeweapons','WeaponWeight','meleetotalweightcarried');
+	});
+	
+	// Calculate Range Weapon Weights
+	on('change:repeating_rangeweapons remove:repeating_rangeweapons',function(){
+		TAS.repeatingSimpleSum('rangeweapons','RWeaponWeight','rangedtotalweightcarried');
+	});
+	
+	// Calculate Gear Weights
+	on('change:repeating_gear remove:repeating_gear',function(){
+		TAS.repeatingSimpleSum('gear','itemWeight','geartotalweightcarried');
+	});
+	
+	//Calculate Load Limit
+	on("sheet:opened change:strength change:stmod change:loadlimitmulitplier change:loadlimitmod",function(){
+		//'use strict';
+		getAttrs(["strength", "stMod", "loadlimitmulitplier", "loadlimitmod"], function(lvalue) {
+			console.log("strength value: " + lvalue.strength);
+			console.log("stMod value: " + lvalue.stmod);
+			console.log("LL Multiplier: " + lvalue.loadlimitmulitplier);
+			console.log("LL Modifier: " + lvalue.loadlimitmod);
+			//((@{strength}+@{stMod}) * @{loadlimitmulitplier}) + @{loadlimitmod}
+			var Strength = parseInt(lvalue.strength);
+			var stMod = parseInt(lvalue.stMod);
+            var totStr = Strength + stMod;
+            var multiplier = parseInt(lvalue.loadlimitmulitplier);
+            var lMod = parseInt(lvalue.loadlimitmod);
+      		setAttrs({ loadlimit: (totStr * multiplier) + lMod });
+   		});
+	});
+	//Calculate Total Load Carried
+	on("sheet:opened change:armortotalweightcarried change:meleetotalweightcarried change:rangedtotalweightcarried change:geartotalweightcarried",function(){
+		//'use strict';
+		getAttrs(["armortotalweightcarried", "meleetotalweightcarried", "rangedtotalweightcarried", "geartotalweightcarried"], function(lvalue) {
+			//@{armortotalweightcarried} + @{meleetotalweightcarried} + @{rangedtotalweightcarried} + @{geartotalweightcarried}
+			var armor = parseInt(lvalue.armortotalweightcarried);
+			var melee = parseInt(lvalue.meleetotalweightcarried);
+            var range = parseInt(lvalue.rangedtotalweightcarried);
+            var gear = parseInt(lvalue.geartotalweightcarried);
+      		setAttrs({ totalloadcarried: armor + melee + range + gear });
+   		});
+	});
+	
+	//Calculate Encumbrance Penalty
+	on("sheet:opened change:loadlimit change:totalloadcarried change:loadlimit",function(){
+		//'use strict';
+		getAttrs(["loadlimit", "totalloadcarried"], function(lvalue) {
+			//floor(((@{loadlimit}) - (@{totalloadcarried}))/(@{loadlimit}))
+			var load = parseInt(lvalue.totalloadcarried);
+			if (load === 0) {
+      			load = 1; //If there is no current load, then need to set it to 1, so the result of the calc = 0
+      		}
+			var limit = parseInt(lvalue.loadlimit);
+           
+      		setAttrs({ encumbrance: Math.floor((limit - load) / limit) });
+   		});
+	});
+	
+	
+</script>
+<!-- END SHEET WORKERS -->
+
 <div class='sheet-maindiv' style="width: 840px;">
 	<div class="sheet-useBackground">
 		<input type="radio" class="sheet-useBackground" style="display: none;" name="attr_background" value="1" checked />
@@ -13,13 +550,15 @@
 		<!-- Be sure to update the CSS with the file information) -->
 		<div class='sheet-background'>
 			<div class='sheet-cdiv'>
-				<input class="sheet-HideConfig" type="checkbox" checked name="attr_is_config" /><span class="sheet-is-config"></span>
+				<input class="sheet-HideConfig" type="checkbox" checked name="attr_is_config" /><span class="sheet-is-config"><span style='font-family:"Pictos";'>y</span></span>
 				<!--                           -->
 				<!-- BEGIN CONFIGURATION STUFF -->
 				<!--                           -->
 				<div class="sheet-config" style='border-style: dotted; border-color: #dbc792; padding: 5px; background-color: white; background-image: none;'>
-					sheet version: 01 August 2015
+					sheet version: 25 Apr 2016
 					<div class='sheet-row'><h2 class='sheet-sectionHeader'>CONFIGURATION</h2></div>
+					API: Initiative Edges <span class="sheet-tooltip">i<span><strong style='line-height: 30px; text-align: center;'>DealInit API Script</strong><br><p>Initiative Edges must be stored in a comma separated list in an Attribute named InitEdges. (e.g. Qu,LH)</p><p>The Edge shorthand is as follows:<br /><ul><li><strong>Qui</strong> = Quick</li><li><strong>LH</strong> = Level Headed</li><li><strong>ILH</strong> = Improved Level Headed</li><li><strong>WCE</strong> = Any Joker Activated Wild Card Edge</li></ul></p></span></span>
+					<input class="sheet-standard" type="text" title="@{InitEdges}" name="attr_InitEdges"/><br />
 					<input type="checkbox" class="sheet-HideUITweaks" name="attr_wcUIConfig" checked /><span class="sheet-is-wcUI"></span>
 					<div class='UITweaks' style="padding: 10px;">
 						<div class="sheet-row">
@@ -28,7 +567,7 @@
 									<h3>Backgrounds</h3>
 										<span class="sheet-5pxshim">
 											<input type="checkbox" class="sheet-useBackground" style="width: 15px;" name="attr_background" value="1" title="No Background Image" checked /> No Background Image<br />
-											<input type="checkbox" class="sheet-useBackground" style="width: 15px;" name="attr_background" value="7" title="Cyberpunk" /> Cypberpunk<br />
+											<input type="checkbox" class="sheet-useBackground" style="width: 15px;" name="attr_background" value="7" title="Cyberpunk" /> Cyberpunk<br />
 											<input type="checkbox" class="sheet-useBackground" style="width: 15px;" name="attr_background" value="8" title="Hellfrost" /> Hellfrost<br />
 											<input type="checkbox" class="sheet-useBackground" style="width: 15px;" name="attr_background" value="9" title="Hellfrost: Land of Fire" /> Hellfrost: Land of Fire<br />
 											<input type="checkbox" class="sheet-useBackground" style="width: 15px;" name="attr_background" value="5" title="Last Parsec" /> Last Parsec<br />
@@ -65,11 +604,12 @@
 							<div class="sheet-col" style="padding-right: 10px; margin-right: 0px; border-right: solid 1px;">
 								<span class="sheet-5pxshim"></span><input type="checkbox" class="sheet-NewDieType" name="attr_DieTypeConfig" style="width: 15px;" /> Use Dice Drop Down Menus (Attributes & Skills)<br />
 								<input type="checkbox" class="sheet-NewDieType" name="attr_WildDieTypeConfig" style="width: 15px;" /> Use Dice Drop Down Menus (Wild Die)<br />
-								<input type="checkbox" class="hideArcanum" name="attr_ArcanumTab" style="width: 15px;"> Hide the Arcanum Tab
+								<input type="checkbox" class="sheet-hideArcanum" name="attr_ArcanumTab" style="width: 15px;"> Hide the Arcanum Tab<br />
+								<input class="sheet-showAdvancements" type="checkbox" name="attr_showAdvancements" /> Show Advancements (on Journal Tab)
 							</div>
 							<div class="sheet-col" style="margin-left: -5px; border-left: solid 1px; padding-left: 10px;">
-								<input class="sheet-showAdvancements" type="checkbox" name="attr_showAdvancements" /> Show Advancements (on Journal Tab)<br />
-								<input class="sheet-useVehicles" type="checkbox" name="attr_vehicle" /> Show Vehicles (on Equipment Tab)<br />
+								<input type="checkbox" class="sheet-showVehicles sheet-useVehicles" name="attr_vehicle" style="width: 15px;"> Show the Vehicles Tab<br />
+								<!--<input class="sheet-useVehicles" type="checkbox" name="attr_vehicle" /> Show Vehicles (on Equipment Tab)<br />-->
 								<div class="sheet-vehicleTypes">
 									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input class="sheet-useSailingShips" type="checkbox" name="attr_sailingShip" /> Show Sailing Ship<br />
 									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input class="sheet-useFlyingShips" type="checkbox" name="attr_flyingShip" /> Show Flying Ship<br />
@@ -180,6 +720,8 @@
 									<h4 class="sheet-subsectionHeader">Field Replacements</h4>
 										<!--Clams--><span title="Replaces 'Money' with 'Clams'. Appropriate for Low Life or any other setting where Clams may be an appropriate replacement for money."><input type="checkbox" class="sheet-usePieces" name="attr_50fPo8Clams" style="width: 15px;" value="2" />Clams (Money)</span><br />
 										<!--Code Name--><span title="Useful for games where the character is known by a code- or superhero name such as Necessary Evil or spy themed games. This will add an additional field for Civilian Name."><input type="checkbox" class="sheet-useCodeName" name="attr_codename" style="width: 15px;" />Code Name (Character Name)</span><br />
+										<!--Credits--><span title="Replaces 'Money' with 'Credits'. Appropriate for Interface Zero or any other setting where Credits may be an appropriate replacement for money."><input type="checkbox" class="sheet-usePieces" name="attr_50fPo8Clams" style="width: 15px;" value="4" />Credits (Money)</span><br />
+										<!--Increased Max Fatigue--><span title="Modify the Max Fatigue value to three (3). Useful for Interface Zero and other settings with a higher max fatigue value."><input type="checkbox" class="sheet-useParaHuman" name="attr_increasedfatigue" style="width: 15px;" value="1" />Increased Max Fatigue (3)</span><br />
 										<!--Lankhmar Money--><span title="Replaces 'Money' with: Iron Tiks, Bronze Agols, Silver Smerduks, and Gold Rilks. Appropriate for the Lankhmar: City of Thieves setting."><input type="checkbox" class="sheet-usePieces" name="attr_50fPo8Clams" style="width: 15px;" value="3" />Lankhmar Currency (Money)</span><br />
 										<!--Pieces of Eight--><span title="Replaces 'Money' with 'Pieces of Eight'. Appropriate for 50 Fathoms or any other Pirate themed setting."><input type="checkbox" class="sheet-usePieces" name="attr_50fPo8Clams" style="width: 15px;" value="1" />Pieces of Eight (Money)</span><br />
 										<!--Origina of Parahuman Abilities--><span title="Modify the Physical Appearance Text Area to include the Origins of Parahuman Abilties. Useful for Necessary Evil and other Superhero-esque settings."><input type="checkbox" class="sheet-useParaHuman" name="attr_powerOrigins" style="width: 15px;" />Origin of Parahuman Abilities</span><br />	
@@ -300,6 +842,10 @@
 					<input type="radio" class="sheet-tab sheet-tab4" name="attr_core-tab" value="4" title="Equipment" /> 
 					<span class="sheet-tab sheet-tab4" style='line-height: 40px;'>EQUIPMENT</span>
 					
+					<input type="checkbox" class="sheet-showVehicles" name="attr_vehicle" style="width: 15px; display: none;" />
+					<input type="radio" class="sheet-tab sheet-tab7" name="attr_core-tab" value="7" title="Vehicles" /> 
+					<span class="sheet-tab sheet-tab7" style='line-height: 40px;'>VEHICLES</span>
+					
 					<input type="checkbox" class="sheet-hideArcanum" name="attr_ArcanumTab" style="width: 15px; display: none;">
 					<input type="radio" class="sheet-tab sheet-tab5" name="attr_core-tab" value="5" title="Arcanum" /> 
 					<span class="sheet-tab sheet-tab5" style='line-height: 40px;'>ARCANUM</span>
@@ -308,6 +854,8 @@
 					<span class="sheet-tab sheet-tab6" style='line-height: 40px;'>JOURNAL</span>
 					<input type="radio" class="sheet-tab sheet-tab99" name="attr_core-tab" value="99" title="All" />
 					<span class="sheet-tab sheet-tab99" style='line-height: 40px;'>ALL</span>
+					<input type="radio" class="sheet-combat sheet-tab8" name="attr_core-tab" value="8" title="Combat Options" />
+					<span class="sheet-combat sheet-tab8" style='line-height: 40px;'>&#9876;</span>
 					<!-- End Tab setup -->
 					<span class="sheet-spacer"></span>
 					<!--</div>-->
@@ -360,10 +908,12 @@
 									<input type="number" name="attr_paceCur" title="@{paceCur}" class="sheet-derivedStat" value="@{pace}+@{paceMod}" disabled="true" /><br />
 					
 								<label class='sheet-nameRankXp'>Parry:</label>
-									<input type="number" name="attr_parry" title="@{parry}" class="sheet-derivedStat" style='color: black;' value="floor((@{Fighting}+@{FightingMod})/2)+2" disabled="true" />
+									<!--<input type="number" name="attr_parry" title="@{parry}" class="sheet-derivedStat" style='color: black;' value="floor((@{Fighting}+@{FightingMod})/2)+2" disabled="true" />-->
+									<input type="number" name="attr_parry" title="@{parry}" class="sheet-derivedStat" style='color: black;' readonly />
 									<input type="number" name="attr_parryMod" title="@{parryMod}" class="sheet-standardNum" value="0" />
 									<span class="sheet-numSpan">&nbsp;</span>
-									<input type="number" name="attr_parryCur" title="@{parryCur}" class="sheet-derivedStat" value="@{parry} + @{parryMod}" disabled="true" /><br />
+									<!--<input type="number" name="attr_parryCur" title="@{parryCur}" class="sheet-derivedStat" value="@{parry} + @{parryMod}" disabled="true" /><br />-->
+									<input type="number" name="attr_parryCur" title="@{parryCur}" class="sheet-derivedStat" readonly /><br />
 					
 								<input type="checkbox" class="sheet-useSanity" name="attr_tdsanity" style="width: 15px; display: none;" />
 								<div class="sheet-Sanity">
@@ -416,7 +966,8 @@
 								</div>
 								
 								<label class='sheet-nameRankXp'>Toughness:</label>
-									<input type="number" name="attr_toughness" title="@{toughness}" class="sheet-derivedStat" value="floor(((@{vigor}+@{viMod})/2)+2)" disabled="true" />
+									<!--<input type="number" name="attr_toughness" title="@{toughness}" class="sheet-derivedStat" value="floor(((@{vigor}+@{viMod})/2)+2)" disabled="true" />-->
+									<input type="number" name="attr_toughness" title="@{toughness}" class="sheet-derivedStat" readonly />
 									<input type="number" name="attr_tufnessMod" title="@{tufnessMod}" class="sheet-standardNum" value="0" />
 									<input type="hidden" name="attr_tufnsPlusMod"  title="@{tufnsPlusMod}" value="(@{toughnessbase})+{@toughnessMod}" />
 									<input type="number" name="attr_toughnessArmor" title="@{toughnessArmor}" class="sheet-standardNum" value="0" />&nbsp;
@@ -444,13 +995,41 @@
 								
 								<input type="checkbox" class="sheet-useStrain" style="width: 15px; display: none;" name="attr_izStrain" />
 								<div class="sheet-Strain">
-									<div class="sheet-col" style="width: 90px;"> </div><div class="sheet-numSpan" style="border-top-left-radius: 5px; border-bottom-left-radius: 5px;">Max</div><div class="sheet-numSpan">&nbsp;</div><div class="sheet-numSpan">Mod</div><div class="sheet-numSpan" style="width: 55px; border-top-right-radius: 5px; border-bottom-right-radius: 5px;">Current</div><br />
+									<div class="sheet-col" style="width: 90px;"> </div><div class="sheet-numSpan" style="border-top-left-radius: 5px; border-bottom-left-radius: 5px;">Base<span class="sheet-tooltip">i<span><p>Equal to the die type of the characters unaugmented Spirit or Vigor, whichever is lower.</p></span></span></div><div class="sheet-numSpan">Mod<span class="sheet-tooltip">i<span><p>Number of additional points of Strain the character can handle.</p></span></span></div><div class="sheet-numSpan">Max<span class="sheet-tooltip">i<span><p>Base + Mod = Max Strain</p></span></span></div><div class="sheet-numSpan" style="width: 55px; border-top-right-radius: 5px; border-bottom-right-radius: 5px;">Current</div><br />
 									<!--<div class="sheet-col" style="width:90px;"> </di><div class="sheet-numSpan" style="border-top-left-radius: 5px; border-bottom-left-radius: 5px;">Max</div><div class="sheet-numSpan">Mod</div><div class="sheet-numSpan"> </div><div class="sheet-numSpan" style="width: 55px; border-top-right-radius: 5px; border-bottom-right-radius: 5px;">Current</div><br />-->
 									<label class='sheet-nameRankXp'>Strain:</label>
-									<input class="sheet-derivedStat" type="number" name="attr_Strain_max" title="@{Strain_max}" />
-									<span class="sheet-numSpan">&nbsp;</span>
-									<input type="number" name="attr_StrainMod" title="@{StrainMod}" class="sheet-standardNum" value="0" />
-									<input type="number" name="attr_StrainCur" title="@{StrainCur}" class="sheet-derivedStat" value="@{totalStrain} + @{StrainMod}" disabled="true" /><br />
+									<!--Unaug-->
+									<input type="checkbox" class="sheet-NewDieType" name="attr_DieTypeConfig" style="width: 15px; display: none;" />
+									<div class="sheet-dtypedropdown" style="vertical-align: top; width:50px;">
+										<div class="sheet-dietype">
+											<input type="radio" name="attr_strain" title="@{strain}" value="4" checked="true" style="width:10px;" /> <span>d4</span>
+											<input type="radio" name="attr_strain" title="@{strain}" value="6" style="width:10px;"/> <span>d6</span>
+											<input type="radio" name="attr_strain" title="@{strain}" value="8" style="width:10px;"/> <span>d8</span>
+											<input type="radio" name="attr_strain" title="@{strain}" value="10" style="width:10px;"/> <span>d10</span>
+											<input type="radio" name="attr_strain" title="@{strain}" value="12" style="width:10px;"/> <span>d12</span>
+											<div class="sheet-d4" style="width: 35px; height: 30px; margin-top: -1px; line-height: 20px;">d</div>
+											<div class="sheet-d6" style="width: 35px; height: 30px; margin-top: -2px; line-height: 29px;">f</div>
+											<div class="sheet-d8" style="width: 35px; height: 30px; margin-top: -2px; line-height: 31px;">h</div>
+											<div class="sheet-d10" style="width: 35px; height: 30px; margin-top: -2px; line-height: 25px;">k</div>
+											<div class="sheet-d12" style="width: 35px; height: 30px; margin-top: -2px; line-height: 30px;">l</div>
+										</div>
+									</div>
+									<input type="checkbox" class="sheet-NewDieType" name="attr_DieTypeConfig" style="width: 15px; display: none;" />
+									<div class="sheet-dtypeOrig" style="width:50px;">
+										<select name="attr_strain" title="@{strain}" class="dtype" value="4" style='width:35px;'>
+											<option value="4">d4</option>
+											<option value="6">d6</option>
+											<option value="8">d8</option>
+											<option value="10">d10</option>
+											<option value="12">d12</option>
+										 </select>
+									 </div>
+									<!--end Unaug-->
+									<input type="number" name="attr_StrainMod" title="@{StrainMod}" class="sheet-standardNum" style='margin-left: 10px;' value="0" />
+									<input class="sheet-standardNum" type="number" name="attr_Strain_max" title="@{Strain_max}" />
+									<input class="sheet-danger" type="checkbox" name="attr_straindanger" value="1" />
+									<input class="sheet-critical" type="checkbox" name="attr_straincrit" value="1" />
+									<input type="number" name="attr_StrainCur" title="@{StrainCur}" class="sheet-derivedStat sheet-strain" style="margin-left: 5px;" value="0" readonly /><br />
 								</div>
 							</div>
 							<!-- Third Column of Demographics -->
@@ -496,6 +1075,7 @@
 									<input type="checkbox" class="sheet-usePieces" name="attr_50fPo8Clams" value="1" style="width: 15px; display: none;" />
 									<input type="checkbox" class="sheet-usePieces" name="attr_50fPo8Clams" value="2" style="width: 15px; display: none;" />
 									<input type="checkbox" class="sheet-usePieces" name="attr_50fPo8Clams" value="3" style="width: 15px; display: none;" />
+									<input type="checkbox" class="sheet-usePieces" name="attr_50fPo8Clams" value="4" style="width: 15px; display: none;" />
 									<label class='sheet-Money sheet-nameRankXp'></label>
 										<input class="sheet-standard" style="width: 117px;" type="text" name="attr_money" title="@{money}" value="0"/>
 										<!-- Additional Lankhmar Money Fields -->
@@ -714,7 +1294,7 @@
 									<div class="sheet-col" style="width: 48%;  text-align: center;">
 										<label class="sheet-nameRankXp" style="width: 45px;">Fatigue</label><br />
 										<input class="sheet-standardNum" style="width: 35px;" type="number" name="attr_fatigue" title="@{fatigue}" style='margin-left:4px;' value="0"/><span class="sheet-spaceBetween"> of </span>
-										<input class="sheet-standardNum" style="width: 35px; border: none;" type="number" name="attr_fatigue_max" title="@{fatigue_max}" value="2" disabled="true"/>
+										<input class="sheet-standardNum" style="width: 35px; border: none;" type="number" name="attr_fatigue_max" title="@{fatigue_max}" value="2" readonly/>
 									</div>
 								</div>
 								<input type="checkbox" class="sheet-useNoS" name="attr_Nerves" style="width: 15px; display:none;" />
@@ -780,11 +1360,14 @@
 									<label class="sheet-nameRankXp sheet-loadlimit" style='width:140px;'>Max Load Modifier</label>
 										<input type="number" class="sheet-modifier sheet-loadlimit" name="attr_loadlimitmod" title="@{loadlimitmod}" style='margin-left:4px;' value="0"/>
 									<label class="sheet-nameRankXp" style='width:145px;'>Load Limit</label>
-										<input type="number" class="sheet-derivedStat" name="attr_loadlimit" title="@{loadlimit}" value="((@{strength}+@{stMod}) * @{loadlimitmulitplier}) + @{loadlimitmod}" disabled="true" /><br />
+										<!--<input type="number" class="sheet-derivedStat" name="attr_loadlimit" title="@{loadlimit}" value="((@{strength}+@{stMod}) * @{loadlimitmulitplier}) + @{loadlimitmod}" disabled="true" /><br />-->
+										<input type="number" class="sheet-derivedStat" name="attr_loadlimit" title="@{loadlimit}" readonly /><br />
 									<label class="sheet-nameRankXp" style='width:145px;'>Total Load Carried</label>
-										<input type="number" class="sheet-derivedStat" name="attr_totalloadcarried" title="@{totalloadcarried}" value="@{armortotalweightcarried} + @{meleetotalweightcarried} + @{rangedtotalweightcarried} + @{geartotalweightcarried}" disabled="true"/><br />
+										<!--<input type="number" class="sheet-derivedStat" name="attr_totalloadcarried" title="@{totalloadcarried}" value="@{armortotalweightcarried} + @{meleetotalweightcarried} + @{rangedtotalweightcarried} + @{geartotalweightcarried}" disabled="true"/><br />-->
+										<input type="number" class="sheet-derivedStat" name="attr_totalloadcarried" title="@{totalloadcarried}" readonly /><br />
 									<label class="sheet-nameRankXp" style='width:145px; font-size: 13px;'>Encumbrance Penalty</label>
-										<input type="number" class="sheet-derivedStat" name="attr_encumbrance" title="@{encumbrance}" value="floor(((@{loadlimit}) - (@{totalloadcarried}))/(@{loadlimit}))" disabled="true" /><br />
+										<!--<input type="number" class="sheet-derivedStat" name="attr_encumbrance" title="@{encumbrance}" value="floor(((@{loadlimit}) - (@{totalloadcarried}))/(@{loadlimit}))" disabled="true" /><br />-->
+										<input type="number" class="sheet-derivedStat" name="attr_encumbrance" title="@{encumbrance}" readonly />
 									<label class="sheet-nameRankXp" style='width:140px;'># of Bennies Used</label>
 										<input type="number" class="sheet-standardNum" name="attr_BenniesUsed" title="@{BenniesUsed}" style='margin-left:4px;' value="0"/>
 										<button type='roll' name='roll_extraxp' title="@{extraxp}" value='/em @{character_name} rolls @{BenniesUsed} dice to try and score additional experience and gets [[@{BenniesUsed}d6>5]] extra experience points!'></button><br />
@@ -908,20 +1491,45 @@
 						</div><!--End of Row-->
 						<div class='sheet-row'>
 							<br />
-							<!--<div class="sheet-row sheet-WCSkillsRow">
-								<div class='sheet-col' style='width:280px;'>
-									<input type="hidden" name="attr_Unskilled" value="4" />
-									<label style="width: 60px;">Unskilled</label> + <input type="checkbox" name="attr_JackOfAllTrades" value="2" style="width:15px" /> Jack of All Trades
+							<!--Skill Check Boxes-->
+							<input type="checkbox" class="sheet-HideWCSkills2" name="attr_wcSkillsConfig2" checked /><span class="sheet-is-wcSkills2"></span>
+							<div class='sheet-wcSkills2' style="width: 790px;">
+								<div class='sheet-3colrow sheet-WCSkillsRow' style="padding: 10px;">
+									<div class='sheet-col'>
+										<input class="StaticSkill" type="checkbox" name="attr_staticBoating" style='width:15px;' /> Show Boating <br />
+										<input class="StaticSkill" type="checkbox" name="attr_staticClimbing" style='width:15px;' /> Show Climbing <br />
+										<input class="StaticSkill" type="checkbox" name="attr_staticDriving" style='width:15px;' /> Show Driving <br />
+										<input class="StaticSkill" type="checkbox" name="attr_staticFaith" style="width: 15px;" /> Show Faith <br />
+										<input class="StaticSkill" type="checkbox" name="attr_staticGambling" style='width:15px;' /> Show Gambling <br />
+										<input class="StaticSkill" type="checkbox" name="attr_staticGuts" style='width:15px;' /> Show Guts <br />
+										<input class="StaticSkill" type="checkbox" name="attr_staticHealing" style='width:15px;' /> Show Healing <br />
+										<input class="StaticSkill" type="checkbox" name="attr_staticIntimidation" style='width:15px;' /> Show Intimidation <br />
+										<input class="StaticSkill" type="checkbox" name="attr_staticInvestigation" style='width:15px;' /> Show Investigation <br />
+									</div>
+									<div class='sheet-col'>
+										<input class="StaticSkill" type="checkbox" name="attr_staticLockpicking" style='width:15px;' /> Show Lockpicking <br />
+										<input class="StaticSkill" type="checkbox" name="attr_staticNotice" style='width:15px;' /> Show Notice <br />
+										<input class="StaticSkill" type="checkbox" name="attr_staticPersuasion" style='width:15px;' /> Show Persuasion <br />
+										<input class="StaticSkill" type="checkbox" name="attr_staticPiloting" style='width:15px;' /> Show Piloting <br />
+										<input class="StaticSkill" type="checkbox" name="attr_staticPsionics" style='width:15px;' /> Show Psionics <br />
+										<input class="StaticSkill" type="checkbox" name="attr_staticRepair" style='width:15px;' /> Show Repair <br />
+										<input class="StaticSkill" type="checkbox" name="attr_staticRiding" style='width:15px;' /> Show Riding <br />
+										<input class="StaticSkill" type="checkbox" name="attr_staticRitual" style='width:15px;' /> Show Ritual <br />
+										<input class="StaticSkill" type="checkbox" name="attr_staticShooting" style='width:15px;' /> Show Shooting <br />
+									</div>
+									<div class='sheet-col'>
+										<input class="StaticSkill" type="checkbox" name="attr_staticSpellcasting" style='width:15px;' /> Show Spellcasting <br />
+										<input class="StaticSkill" type="checkbox" name="attr_staticStealth" style='width:15px;' /> Show Stealth <br />
+										<input class="StaticSkill" type="checkbox" name="attr_staticStreetwise" style='width:15px;' /> Show Streetwise <br />
+										<input class="StaticSkill" type="checkbox" name="attr_staticSurvival" style='width:15px;' /> Show Survival <br />
+										<input class="StaticSkill" type="checkbox" name="attr_staticSwimming" style='width:15px;' /> Show Swimming <br />
+										<input class="StaticSkill" type="checkbox" name="attr_staticTaunt" style='width:15px;' /> Show Taunt <br />
+										<input class="StaticSkill" type="checkbox" name="attr_staticThrowing" style='width:15px;' /> Show Throwing <br />
+										<input class="StaticSkill" type="checkbox" name="attr_staticTracking" style='width:15px;' /> Show Tracking <br />
+										<input class="StaticSkill" type="checkbox" name="attr_staticWeirdScience" style='width:15px;' /> Show Weird Science <br />
+									</div>
 								</div>
-								<div class='sheet-col' style='width:180px;'>&nbsp;</div>
-								<div class='sheet-col' style='width:190px; text-align:center;'>
-									<input type="checkbox" name="attr_UnskilledEncumbrance" title="@{UnskilledEncumbrance}" value="1" style="width:20px;" />
-								</div>
-								<div class='sheet-col' style='width:81px;'>
-									<button type='roll' name='roll_UnskilledRoll' title="@{UnskilledRoll}" value='/em @{character_name} attempts to not suck and rolls: [[{1d@{Unskilled}![Unskilled], 1d@{wilddie}![Wild Die]}kh1 -2[Unskilled Penalty] + {0,@{JackOfAllTrades}}kh1[Jack of All Trades Modifier] + @{ttmod}[Trait Test Modifier] +(@{UnskilledEncumbrance}*@{encumbrance})[Encumbrance Penalty] - @{woundsMod}[Wounds] - @{fatigue}[Fatigue]]]!'></button><button type='roll' class="sheet-GM-button" name='roll_gmUnskilledRoll' title="@{gmUnskilledRoll}" value='/w gm @{character_name} attempts to not suck and rolls: [[{1d@{Unskilled}![Unskilled], 1d@{wilddie}![Wild Die]}kh1 -2[Unskilled Penalty] + {0,@{JackOfAllTrades}}kh1[Jack of All Trades Modifier] + @{ttmod}[Trait Test Modifier] +(@{UnskilledEncumbrance}*@{encumbrance})[Encumbrance Penalty] - @{woundsMod}[Wounds] - @{fatigue}[Fatigue]]]!'></button>
-									<input type='hidden' name='attr_rollUnskilled' value='/em @{character_name} attempts to not suck and rolls: [[{1d@{Unskilled}![Unskilled], 1d@{wilddie}![Wild Die]}kh1 -2[Unskilled Penalty] + {0,@{JackOfAllTrades}}kh1[Jack of All Trades Modifier] + @{ttmod}[Trait Test Modifier] +(@{UnskilledEncumbrance}*@{encumbrance})[Encumbrance Penalty] - @{woundsMod}[Wounds] - @{fatigue}[Fatigue]]]!' />
-								</div>
-							</div>-->
+							</div><!-- End Wild Card Core Skills --><br />
 							<!-- Break -->
 							<div class="sheet-row sheet-WCSkillsRow">
 								<div class='sheet-col' style='width:280px;'>
@@ -1681,11 +2289,7 @@
 									</div>+ <input type="number" name="attr_PsionicsMod" title="@{PsionicsMod}" class="sheet-modifier" style="width:35px;" value="0"/>
 									<label style='width:152px;'>&nbsp;Psionics</label>
 								</div>
-								<!--<div class='sheet-col' style='width:115px; text-align:left;'>
-									<span style='text-align:bottom; font-weight:bold;'>d</span><input type="number" class="sheet-LinkedAtt" style="width: 15px;" name="attr_LinkedGutsAtt" value="@{LinkedGuts}" disabled="true" />
-									<input type="hidden" name="attr_LinkedGuts" value="@{spirit}" />
-									<label style='width:75px;'>&nbsp;Spirit</label>
-								</div>-->
+								
 								<div class='sheet-col' style='width:115px;'>
 									<span style='text-align:bottom; font-weight:bold;'>d</span><input type="number" class="sheet-LinkedAtt" style="width: 15px;" name="attr_LinkedPsionicsAttScore" value="@{LinkedPsionicsAtt}" disabled="true" />
 									<label style='width:75px;'>
@@ -2561,23 +3165,23 @@
 									</div>
 								</div>
 							</fieldset>
-							<div class='sheet-row'><!-- Set up the Total Weight box -->
-								<div class='sheet-col' style='width:85px;'> <!-- Armor Type (150px) -->
+							<!--<div class='sheet-row'>
+								<div class='sheet-col' style='width:85px;'> 
 									&nbsp;
 								</div>
-								<div class='sheet-col' style='width:90px;'> <!-- Area Protcted (150px) -->
+								<div class='sheet-col' style='width:90px;'> 
 									&nbsp;
 								</div>
-								<div class='sheet-col' style='width:160px; text-align:right;'> <!-- Protection (100px)-->
+								<div class='sheet-col' style='width:160px; text-align:right;'> 
 									<h4 class="sheet-weight">Total Weight:</h4>
 								</div>
-								<div class='sheet-col' style='width:60px;'> <!-- Weight (60px)-->
+								<div class='sheet-col' style='width:60px;'> 
 									<input type="number" name="attr_armortotalweight" title="@{armortotalweight}" class="sheet-standardNum" />
 								</div>
-								<div class='sheet-col' style='width:350px;'> <!-- Notes (350px) -->
+								<div class='sheet-col' style='width:350px;'> 
 									&nbsp;
 								</div>
-							</div>
+							</div>-->
 							<div class='sheet-row'><!-- Set up the Total Weight Carried box -->
 								<div class='sheet-col' style='width:85px;'> <!-- Armor Type (150px) -->
 									&nbsp;
@@ -2589,7 +3193,7 @@
 									<h4 class="sheet-weight">Total Weight Carried:</h4>
 								</div>
 								<div class='sheet-col' style='width:60px;'> <!-- Weight (60px)-->
-									<input type="number" name="attr_armortotalweightcarried" title="@{armortotalweightcarried}" class="sheet-standardNum" value="0" />
+									<input type="number" name="attr_armortotalweightcarried" title="@{armortotalweightcarried}" class="sheet-standardNum" value="0" readonly />
 								</div>
 								<div class='sheet-col' style='width:350px;'> <!-- Notes (350px) -->
 									&nbsp;
@@ -2597,6 +3201,13 @@
 							</div>
 							<hr />
 						</div><!-- End Armor -->
+						
+						<br />
+						
+						<!-- Begin Weapons -->
+						
+						<input class="sheet-HideMelee" type="checkbox" name="attr_is_melee" /><span class="sheet-is-melee-tab"> Melee Weapons</span>
+						<div class="sheet-melee" style="width: 100%; margin: -5px; padding: 0px;">
 						<!-- Attack Roll Buttons -->
 						<div style="width: 100%; text-align: center;">
 							<input class="sheet-buttonbox" type="checkbox" name="attr_skillrt" value="0" style="display:none;" />
@@ -2606,7 +3217,8 @@
 							<input class="sheet-buttonbox" type="checkbox" name="attr_skillrt" value="0" style="display:none;" />
 							<button class="sheet-templatebutton" type='roll' name='roll_tFightingRoll' title="@{tFightingRoll}" value='@{skillrt} @{defsTemplate} @{rolltFighting}' style="font-size: 1em;"> Fighting<!--(d<input type='number' name='attr_fght' value="@{Fighting}" disabled='true' style='font-size: 1em; width:10px; padding: 0px; margin: 0px;' />)--></button><button class="sheet-templatebutton sheet-GM-button" type='roll' name='roll_tgmFightingRoll' title="@{tgmFightingRoll}" value='/w gm @{skillrt} @{defsTemplate} @{rolltFighting}' style="font-size: 1em;"></button>
 							<button class="sheet-normalbutton" type='roll' name='roll_FightingRoll' title="@{FightingRoll}" value='/em @{character_name} attempts to hit something and rolls @{rollFighting}!' style="font-size: 1em;"> Fighting</button><button class="sheet-normalbutton sheet-GM-button" type='roll' name='roll_gmFightingRoll' title="@{gmFightingRoll}" value='/w gm @{character_name} attempts to hit something and rolls @{rollFighting}!' style="font-size: 1em;"></button>
-						
+							
+							<!-- Don't need these Ranged Things above Melee
 							<input class="sheet-StaticSkill" type="checkbox" name="attr_staticShooting" style='display:none;'/>
 							<div class="sheet-staticShooting">
 								<input class="sheet-buttonbox" type="checkbox" name="attr_skillrt" value="0" style="display:none;" /> || 
@@ -2619,18 +3231,10 @@
 								<input class="sheet-buttonbox" type="checkbox" name="attr_skillrt" value="0" style="display:none;" /> || 
 								<button class="sheet-templatebutton" type='roll' name='roll_tThrowingRoll' title="@{tThrowingRoll}" value='@{skillrt} @{defsTemplate} @{rolltThrowing}' style="font-size: 1em;"> Throwing</button><button class="sheet-templatebutton sheet-GM-button" type='roll' name='roll_tgmThrowingRoll' title="@{tgmThrowingRoll}" value='/w gm @{skillrt} @{defsTemplate} @{rolltThrowing}' style="font-size: 1em;"></button>
 								<button class="sheet-normalbutton" type='roll' name='roll_ThrowingRoll' title="@{ThrowingRoll}" value='/em @{character_name} attempts to throw and rolls @{rollThrowing}!' style="font-size: 1em;"> Throwing</button><button class="sheet-normalbutton sheet-GM-button" type='roll' name='roll_gmThrowingRoll' title="@{gmThrowingRoll}" value='/w gm @{character_name} attempts to throw and rolls @{rollThrowing}!' style="font-size: 1em;"></button>
-							</div>
+							</div> -->
 						</div>
-						<!-- End Attack Roll Buttons -->
-						<br />
-						<!-- Begin Weapons -->
-						<!--<textarea style="display: none;" name="attr_tMeleeWeapontest">/w gm &{template:spadestrait2} {{name=@{character_name}}} {{skill_name=Agility}} {{skill_rank=@{Agility}}} {{skill_rank_mod=@{agMod}}} {{skill_mod=@{agrollMod}}} {{ttmod=@{ttmod}}} {{wounds= -@{wounds}}} {{fatigue= -@{fatigue}}} {{skill_roll=[[1d@{agility}! + @{agMod} + @{agrollMod}[Skill Modifier] + @{ModSum}[Other Modifiers]]}} {{wild_die_rank=@{wilddie}}} {{wild_die=[[1d@{wilddie}! + @{agMod} + @{agrollMod}[Skill Modifier] + @{ModSum}[Other Modifiers]]}}
-						
-						&{template:soliddamage} {{name=@{character_name}}} {{weapon=@{repeating_meleeweapons_0_WeaponType}}} {{damage_type=Str+d@{repeating_meleeweapons_0_DmgType}+@{repeating_meleeweapons_0_MDmgMod}}} {{damage=[[1d@{Strength}![Strength]+1d@{repeating_meleeweapons_0_DmgType}+@{repeating_meleeweapons_0_MDmgMod}[Weapon Damage]+@{dmgmod}[Damage Modifier]+1d@{repeating_meleeweapons_0_DmgRaise}[Bonus Damage]]]}} {{raise=@{repeating_meleeweapons_0_DmgRaise}}} {{dmgmod=@{dmgmod}}}</textarea>
-						<button type='roll' name='roll_tMeleeWeapontest' value='@{tMeleeWeapontest}'></button>
-						<hr />-->
-						<input class="sheet-HideMelee" type="checkbox" name="attr_is_melee" /><span class="sheet-is-melee-tab"> Melee Weapons</span>
-						<div class="sheet-melee" style="width: 100%; margin: -5px; padding: 0px;"><h3 class="sheet-subsectionHeader" style="margin: 5px;">Melee Weapons / Strength-based Weapons</h3></div>
+						<!-- End Attack Roll Buttons -->						
+						<h3 class="sheet-subsectionHeader" style="margin: 5px;">Melee Weapons / Strength-based Weapons</h3></div>
 						<div class="sheet-melee">
 							<span class="sheet-spacer"></span>
 							<div class='sheet-row'>
@@ -2697,23 +3301,23 @@
 									</div>
 								</div>
 							</fieldset>
-							<div class='sheet-row'><!-- Set up the Total Weight box -->
-								<div class='sheet-col' style='width:120px;'> <!-- Armor Type (150px) -->
+							<!--<div class='sheet-row'>
+								<div class='sheet-col' style='width:120px;'> 
 									&nbsp;
 								</div>
-								<div class='sheet-col' style='width:80px;'> <!-- Area Protcted (150px) -->
+								<div class='sheet-col' style='width:80px;'> 
 									&nbsp;
 								</div>
-								<div class='sheet-col' style='width:160px; text-align:right;'> <!-- Protection (100px)-->
+								<div class='sheet-col' style='width:160px; text-align:right;'>
 									<h4 class="sheet-weight">Total Weight:</h4>
 								</div>
-								<div class='sheet-col' style='width:60px;'> <!-- Weight (60px)-->
+								<div class='sheet-col' style='width:60px;'> 
 									<input type="number" name="attr_meleetotalweight" title="@{meleetotalweight}" class="sheet-standardNum" />
 								</div>
-								<div class='sheet-col' style='width:344px;'> <!-- Notes (350px) -->
+								<div class='sheet-col' style='width:344px;'> 
 									&nbsp;
 								</div>
-							</div>
+							</div>-->
 							<div class='sheet-row'><!-- Set up the Total Weight Carried box -->
 								<div class='sheet-col' style='width:120px;'> <!-- Armor Type (150px) -->
 									&nbsp;
@@ -2725,7 +3329,7 @@
 									<h4 class="sheet-weight">Total Weight Carried:</h4>
 								</div>
 								<div class='sheet-col' style='width:60px;'> <!-- Weight (60px)-->
-									<input type="number" name="attr_meleetotalweightcarried" title="@{meleetotalweightcarried}" class="sheet-standardNum" value="0"/>
+									<input type="number" name="attr_meleetotalweightcarried" title="@{meleetotalweightcarried}" class="sheet-standardNum" value="0" readonly />
 								</div>
 								<div class='sheet-col' style='width:344px;'> <!-- Notes (350px) -->
 									&nbsp;
@@ -2754,8 +3358,33 @@
 							</div>
 							<hr />
 						</div><!-- End Melee Weapons -->
+						
+						<br />
 						<input class="sheet-HideRanged" type="checkbox" name="attr_is_ranged" /><span class="sheet-is-ranged-tab"> Ranged Weapons</span><br />
-						<div class="sheet-ranged" style="width: 100%; margin: -5px; padding: 0px;"><h3 class="sheet-subsectionHeader" style="margin: 5px;">Ranged Weapons / Non-Strength-based Weapons</h3></div><!-- Begin Ranged Weapons -->
+						<input class="sheet-StaticSkill" type="checkbox" name="attr_staticShooting" style='display:none;'/>
+						<div class="sheet-ranged" style="width: 100%; margin: -5px; padding: 0px;">
+						<!-- Attack Buttons -->
+							<div style="width: 100%; text-align: center;">
+								<input class="sheet-buttonbox" type="checkbox" name="attr_skillrt" value="0" style="display:none;" />
+								<button class="sheet-templatebutton" type='roll' name='roll_tUnskilledRoll' title="@{tUnskilledRoll}" value='@{skillrt} @{defsTemplate} @{rolltUnskilled}' style="font-size: 1em;"> Unskilled</button><button class="sheet-templatebutton sheet-GM-button" type='roll' name='roll_tgmUnskilledRoll' title="@{tgmUnskilledRoll}" value='/w gm @{skillrt} @{defsTemplate} @{rolltUnskilled}' style="font-size: 1em;"></button>
+								<button class="sheet-normalbutton" type='roll' name='roll_UnskilledRoll' title="@{UnskilledRoll}" value='/em @{character_name} attempts to not suck and rolls: @{rollUnskilled}!' style="font-size: 1em;"> Unskilled</button><button type='roll' class="sheet-normalbutton sheet-GM-button" name='roll_gmUnskilledRoll' title="@{gmUnskilledRoll}" value='/w gm @{character_name} attempts to not suck and rolls: @{rollUnskilled}!' style="font-size: 1em;"></button>
+								
+								<input class="sheet-StaticSkill" type="checkbox" name="attr_staticShooting" style='display:none;'/>
+								<div class="sheet-staticShooting">
+									<input class="sheet-buttonbox" type="checkbox" name="attr_skillrt" value="0" style="display:none;" /> || 
+									<button class="sheet-staticShooting sheet-templatebutton" type='roll' name='roll_tShootingRoll' title="@{tShootingRoll}" value='@{skillrt} @{defsTemplate} @{rolltShooting}' style="font-size: 1em;"> Shooting</button><button class="sheet-staticShooting sheet-templatebutton sheet-GM-button" type='roll' name='roll_tgmShootingRoll' title="@{tgmShootingRoll}" value='/w gm @{skillrt} @{defsTemplate} @{rolltShooting}' style="font-size: 1em;"></button>
+									<button class="sheet-staticShooting sheet-normalbutton" type='roll' name='roll_ShootingRoll' title="@{ShootingRoll}" value='/em @{character_name} attempts to shoot and rolls @{rollShooting}!' style="font-size: 1em;"> Shooting</button><button class="sheet-staticShooting sheet-normalbutton sheet-GM-button" type='roll' name='roll_gmShootingRoll' title="@{gmShootingRoll}" value='/w gm @{character_name} attempts to shoot and rolls @{rollShooting}!' style="font-size: 1em;"></button>
+								</div>
+						
+								<input class="sheet-StaticSkill" type="checkbox" name="attr_staticThrowing" style='display:none;'/>
+								<div class="sheet-staticThrowing">
+									<input class="sheet-buttonbox" type="checkbox" name="attr_skillrt" value="0" style="display:none;" /> || 
+									<button class="sheet-templatebutton" type='roll' name='roll_tThrowingRoll' title="@{tThrowingRoll}" value='@{skillrt} @{defsTemplate} @{rolltThrowing}' style="font-size: 1em;"> Throwing</button><button class="sheet-templatebutton sheet-GM-button" type='roll' name='roll_tgmThrowingRoll' title="@{tgmThrowingRoll}" value='/w gm @{skillrt} @{defsTemplate} @{rolltThrowing}' style="font-size: 1em;"></button>
+									<button class="sheet-normalbutton" type='roll' name='roll_ThrowingRoll' title="@{ThrowingRoll}" value='/em @{character_name} attempts to throw and rolls @{rollThrowing}!' style="font-size: 1em;"> Throwing</button><button class="sheet-normalbutton sheet-GM-button" type='roll' name='roll_gmThrowingRoll' title="@{gmThrowingRoll}" value='/w gm @{character_name} attempts to throw and rolls @{rollThrowing}!' style="font-size: 1em;"></button>
+								</div>
+							</div>
+						<!-- End Attack Buttons -->
+						<h3 class="sheet-subsectionHeader" style="margin: 5px;">Ranged Weapons / Non-Strength-based Weapons</h3></div><!-- Begin Ranged Weapons -->
 						<div class="sheet-ranged">
 							<span class="sheet-spacer"></span>
 							<div class='sheet-row'>
@@ -2830,20 +3459,20 @@
 									</div>
 								</div>
 							</fieldset>
-							<div class='sheet-row'><!-- Set up the Total Weight box -->
-								<div class='sheet-col' style='width:150px;'> <!-- Armor Type (150px) -->
+							<!--<div class='sheet-row'>
+								<div class='sheet-col' style='width:150px;'> 
 									&nbsp;
 								</div>
-								<div class='sheet-col' style='width:50px;'> <!-- Area Protcted (150px) -->
+								<div class='sheet-col' style='width:50px;'> 
 									&nbsp;
 								</div>
-								<div class='sheet-col' style='width:160px; text-align:right;'> <!-- Protection (100px)-->
+								<div class='sheet-col' style='width:160px; text-align:right;'> 
 									<h4 class="sheet-weight">Total Weight:</h4>
 								</div>
-								<div class='sheet-col' style='width:45px;'> <!-- Weight (60px)-->
+								<div class='sheet-col' style='width:45px;'> 
 									<input type="number" name="attr_rangedtotalweight" title="@{rangedtotalweight}" class="sheet-standardNum" />
 								</div>
-							</div>
+							</div>-->
 							<div class='sheet-row'><!-- Set up the Total Weight box -->
 								<div class='sheet-col' style='width:150px;'> <!-- Armor Type (150px) -->
 									&nbsp;
@@ -2855,7 +3484,7 @@
 									<h4 class="sheet-weight">Total Weight Carried:</h4>
 								</div>
 								<div class='sheet-col' style='width:45px;'> <!-- Weight (60px)-->
-									<input type="number" name="attr_rangedtotalweightcarried" title="@{rangedtotalweightcarried}" class="sheet-standardNum" value="0" />
+									<input type="number" name="attr_rangedtotalweightcarried" title="@{rangedtotalweightcarried}" class="sheet-standardNum" value="0" readonly />
 								</div>
 							</div>
 							<div class="templatebutton">
@@ -2880,6 +3509,36 @@
 							</div>
 							<hr />
 						</div><!-- End Range Weapons -->
+						
+						<!-- Gear -->
+						<input class="sheet-HideGear" type="checkbox" name="attr_is_gear" /><span class="sheet-is-gear-tab" /> Gear</span>
+						<div class="sheet-gear" style="width:100%; margin: -5px; padding: 0px;"><h3 class="sheet-subsectionHeader" style="margin: 5px;">Gear</h3></div><!-- Begin Gear -->
+						
+						<div class="sheet-2colrow sheet-gear" style="width: 800px; padding: 0px;">
+							<div class="sheet-col sheet-gear" style="margin-right:.5px; width: 415px;">
+								<h4 class="sheet-subsectionHeader">Worn</h4>
+								<fieldset class="repeating_gear">
+									<input class="sheet-standard" style='width:360px;' placeholder="Item" type="text" name="attr_item" title="@{repeating_gear_$#_item}" />
+									<input type="number" placeholder="weight" name="attr_itemWeight" title="@{repeating_gear_$#_itemWeight}" class="sheet-standardNum" />
+								</fieldset>
+								<br />
+								<div class='sheet-row style="width: 100%;"'><!-- Set up the Total Weight box -->
+									<div class='sheet-col' style='width:195px; margin:0px;'>&nbsp;</div>
+									<div class='sheet-col' style='width:160px; text-align:right; margin:0px;'> <!-- Protection (100px)-->
+										<h4 class="sheet-weight">Total Weight Carried:</h4>
+									</div>
+									<div class='sheet-col' style='width:45px; margin:0px;'> <!-- Weight (60px)-->
+										<input type="number" name="attr_geartotalweightcarried" title="@{geartotalweightcarried}" class="sheet-standardNum" value="0" readonly />
+									</div>
+								</div>
+							</div>
+							<div class="sheet-col sheet-gear" style="margin-left: .5px; width: 365px;">
+								<h4 class="sheet-subsectionHeader">Stashed</h4>
+								<textarea name="attr_gear" class="sheet-standardtext" style='width:97%;'></textarea>								
+							</div>
+						</div> 
+						<!-- End Gear -->
+						<br />
 						<!-- Start Augmentations -->
 						<input type="checkbox" class="sheet-useAugmentations" name="attr_augment" style="width: 15px; display: none;" />
 						<div class='sheet-Augmentations'>
@@ -2893,23 +3552,26 @@
 							<div class='sheet-col' style='width:540px;'> <!-- Weapon Type (150px) -->
 								<h4 class="sheet-repeatingHeader">Details</h4>
 							</div>
-							<div class='sheet-aug124' style="margin: 0px;"> <!--First set of 4 fields-->
-								<input type="text" class="sheet-standard" name="attr_augment1" title="@{augment1}" placeholder="Augmentation 1" style="width:200px;"/>
-								<input type="number" class="sheet-standardNum" name="attr_augStrain1" title="@{augStrain1}" style="width:50px;" value="0" />
-								<textarea class="sheet-standardtext" name="attr_augDeets1" title="@{augDeets1}" row="2" style="width:530px; height: 50px;"></textarea><br />
+							<fieldset class="repeating_augmentation" >
+								<div class='sheet-aug124' style="margin: 0px;"> <!--First set of 4 fields-->
+									<input type="text" class="sheet-standard" name="attr_augment" title="@{repeating_augmentation_$#_augment}" placeholder="Augmentation" style="width:200px;"/>
+									<input type="number" class="sheet-standardNum" name="attr_augStrain" title="@{repeating_augmentation_$#_augStrain}" style="width:50px;" value="0" />
+									<textarea class="sheet-standardtext" name="attr_augDeets" title="@{repeating_augmentation_$#_augDeets}" row="2" style="width:530px; height: 50px;"></textarea><br />
+								</div>
+							</fieldset>
+							<!-- Old Augmentation Section
+									<input type="text" class="sheet-standard" name="attr_augment2" title="@{augment2}" placeholder="Augmentation 2" style="width:200px;"/>
+									<input type="number" class="sheet-standardNum" name="attr_augStrain2" title="@{augStrain2}" style="width:50px;" value="0" />
+									<textarea class="sheet-standardtext" name="attr_augDeets2" title="@{augDeets2}" style="width:530px; height: 50px;"></textarea><br />
 								
-								<input type="text" class="sheet-standard" name="attr_augment2" title="@{augment2}" placeholder="Augmentation 2" style="width:200px;"/>
-								<input type="number" class="sheet-standardNum" name="attr_augStrain2" title="@{augStrain2}" style="width:50px;" value="0" />
-								<textarea class="sheet-standardtext" name="attr_augDeets2" title="@{augDeets2}" style="width:530px; height: 50px;"></textarea><br />
+									<input type="text" class="sheet-standard" name="attr_augment3" title="@{augment3}" placeholder="Augmentation 3" style="width:200px;"/>
+									<input type="number" class="sheet-standardNum" name="attr_augStrain3" title="@{augStrain3}" style="width:50px;" value="0" />
+									<textarea class="sheet-standardtext" name="attr_augDeets3" title="@{augDeets3}" style="width:530px; height: 50px;"></textarea><br />
 								
-								<input type="text" class="sheet-standard" name="attr_augment3" title="@{augment3}" placeholder="Augmentation 3" style="width:200px;"/>
-								<input type="number" class="sheet-standardNum" name="attr_augStrain3" title="@{augStrain3}" style="width:50px;" value="0" />
-								<textarea class="sheet-standardtext" name="attr_augDeets3" title="@{augDeets3}" style="width:530px; height: 50px;"></textarea><br />
-								
-								<input type="text" class="sheet-standard" name="attr_augment4" title="@{augment4}" placeholder="Augmentation 4" style="width:200px;"/>
-								<input type="number" class="sheet-standardNum" name="attr_augStrain4" title="@{augStrain4}" style="width:50px;" value="0" />
-								<textarea class="sheet-standardtext" name="attr_augDeets4" title="@{augDeets4}" style="width:530px; height: 50px;"></textarea>
-							</div>
+									<input type="text" class="sheet-standard" name="attr_augment4" title="@{augment4}" placeholder="Augmentation 4" style="width:200px;"/>
+									<input type="number" class="sheet-standardNum" name="attr_augStrain4" title="@{augStrain4}" style="width:50px;" value="0" />
+									<textarea class="sheet-standardtext" name="attr_augDeets4" title="@{augDeets4}" style="width:530px; height: 50px;"></textarea>
+								</div>
 							
 							<input type="checkbox" class="sheet-h9212" name="attr_aug9212" style="display:none;" />
 							<input type="checkbox" class="sheet-h528" name="attr_aug258" style="display:none;" />
@@ -2934,7 +3596,7 @@
 							<input type="checkbox" class="sheet-hide528" name="attr_aug258" /><span class="sheet-h528"> 4 rows</span><br />
 							
 							<input type="checkbox" class="sheet-use9212" name="attr_aug9212" /><span class="sheet-9212"> 4 rows</span><br />
-							<div class='sheet-aug9212' style="margin-top: -18px;"> <!--Third set of 4 fields-->
+							<div class='sheet-aug9212' style="margin-top: -18px;"> 
 								<input type="text" class="sheet-standard" name="attr_augment9" title="@{augment9}" placeholder="Augmentation 9" style="width:200px;"/>
 								<input type="number" class="sheet-standardNum" name="attr_augStrain9" title="@{augStrain9}" style="width:50px;" value="0" />
 								<textarea class="sheet-standardtext" name="attr_augDeets9" title="@{augDeets9}" row="2" style="width:530px; height: 50px;"></textarea><br />
@@ -2951,32 +3613,40 @@
 								<input type="number" class="sheet-standardNum" name="attr_augStrain12" title="@{augStrain12}" style="width:50px;" value="0" />
 								<textarea class="sheet-standardtext" name="attr_augDeets12" title="@{augDeets12}" row="2" style="width:530px; height: 50px;"></textarea><br />
 							</div>
-							<input type="checkbox" class="sheet-augEnd" name="attr_aug9212" /><span class="sheet-aEnd"> 4 rows</span><br />
+							<input type="checkbox" class="sheet-augEnd" name="attr_aug9212" /><span class="sheet-aEnd"> 4 rows</span><br /> -->
 							<div class="sheet-row">
 								<div class="sheet-col" style="width:100px;">&nbsp;</div>
 								<div class="sheet-col" style="width:100px;"><h4 class="sheet-weight">Total Strain:</h4></div>
 								<div class="sheet-col" style="width:50px;">
-									<input type="number" class="sheet-standardNum" name="attr_totalStrain" title="@{totalStrain}" value="0+@{augStrain1}+@{augStrain2}+@{augStrain3}+@{augStrain4}+@{augStrain5}+@{augStrain6}+@{augStrain7}+@{augStrain8}+@{augStrain9}+@{augStrain10}+@{augStrain11}+@{augStrain12}" disabled="true" />
+									<input class="sheet-danger" type="checkbox" name="attr_straindanger" value="1" />
+									<input class="sheet-critical" type="checkbox" name="attr_straincrit" value="1" />
+									<input type="number" class="sheet-standardNum sheet-strain" name="attr_totalStrain" title="@{totalStrain}" readonly />
 								</div>
 							</div>
 							<hr />
 						</div>
-						<!-- Vehicles -->
-						<input type="checkbox" class="sheet-useVehicles" name="attr_vehicle" style="width: 15px; display: none;" />
-						<input class="sheet-vehicleTypes sheet-HideVehicles" type="checkbox" name="attr_is_vehicle" /><span class="sheet-vehicleTypes sheet-is-vehicle-tab"> Vehicles</span><br />
-						<div class="sheet-vehicleTypes sheet-allVehicles" style="width: 100%;"> <!-- Vehicles -->
-							<h3 class="sheet-subsectionHeader">Vehicles</h3>
-							
+						<!-- Vehicles Used to be here -->
+						<span class="sheet-spacer"></span>
+					</div><!-- End Equipment Tab -->
+					
+					<input type="checkbox" class="sheet-showVehicles" name="attr_vehicle" style="width: 15px; display: none;">
+					<div class="sheet-section-vehicles"><!-- Vehicles Tab -->
+						<div class='sheet-row' style="width: 800px;">
+							<div class='sheet-row'><h2 class='sheet-sectionHeader'>VEHICLES</h2></div>
 							<!-- Sailing Ship -->
 							<input class="sheet-useSailingShips" type="checkbox" name="attr_sailingShip" style="display: none;" />
 							<div class="sheet-ship-sailing" style="width: 800px;">
 								<input class="sheet-HideSailing" type="checkbox" name="attr_is_sailing" /><span class="sheet-is-sailing-tab"> Sailing Ship</span>
 								<div class="sheet-isSailing" style="width: 800px;">
-									<h4 class="sheet-subsubsectionHeader">Sailing Ship</h4>
+									<h3 class="sheet-subsubsectionHeader">Sailing Ship</h3>
 									<div class="sheet-row" style="width: 100%; text-align: center;">
 										<input type="text" class="sheet-standard" name="attr_SailingShipName" title="@{SailingShipName}" placeholder="Ship's Name" style="font-size: 200%; width: 790px; text-align: center;" /><br />
 										<input type="text" class="sheet-standard" name="attr_SShipCaptain" title="@{SShipCaptain}" placeholder="Ship's Captain" style="font-size: 150%; width: 790px; text-align: center;" /><br />
 										<input type="text" class="sheet-standard" name="attr_SShipType" title="@{SShipType}" placeholder="Type of Ship" style="font-size: 100%; width: 790px; text-align: center;" />
+										<div class="sheet-standardtext" style="text-align: center; width: 790px; margin-left: 5px; padding: 5px;">
+											<h3 style="width: 100%; text-align: center;">WOUNDS</h3>
+											<input type="number" class="sheet-standardNum" name="attr_SShipWounds" title="@{SShipWounds}" style="text-align: center; margin-bottom:-3px;" value="0" /> of <input type="number" class="sheet-standardNum" name="attr_SShipWounds_max" title="@{SShipWounds_max}" style="text-align: center; margin-bottom: -3px;" value="2" />							
+										</div>
 									</div>
 									<span class="sheet-spacer"></span>
 									<div class="sheet-3colrow">
@@ -2984,9 +3654,9 @@
 											<label class="sheet-nameRankXp">Acceleration:</label><input type="number" class="sheet-standardNum" name="attr_SShipAcc" title="@{SShipAcc}" /><br />
 											<!--<label class="sheet-nameRankXp">Travel Speed:</label><input type="number" class="sheet-standardNum" name="attr_SShipTrSpeed" title="@{SShipTrSpeed}" /><br />-->
 											<label class="sheet-nameRankXp">Top Speed:</label><input type="number" class="sheet-standardNum" name="attr_SShipTopSpeed" title="@{SShipTopSpeed}" /><br />
-											<label class="sheet-nameRankXp">Toughness:</label><input type="number" class="sheet-standardNum" name="attr_SShipToughness" title="@{SShipToughness}" /><br />
+											<label class="sheet-nameRankXp">Toughness:</label><input type="text" class="sheet-standardNum" name="attr_SShipToughness" title="@{SShipToughness}" /><br />
 											<label class="sheet-nameRankXp">Handling:</label><input type="number" class="sheet-standardNum" name="attr_SShipHandling" title="@{SShipHandling}" /><br />
-											<label class="sheet-nameRankXp">Crew:</label><input type="number" class="sheet-standardNum" name="attr_SShipCrew" title="@{SShipCrew}" /><br />
+											<label class="sheet-nameRankXp">Crew:</label><input type="text" class="sheet-standardNum" name="attr_SShipCrew" title="@{SShipCrew}" /><br />
 											<label class="sheet-nameRankXp">Cargo Slots:</label><input type="number" class="sheet-standardNum" name="attr_SShipSlots" title="@{SShipSlots}" /><br />
 											<label class="sheet-nameRankXp">Orignal Cost:</label><input type="number" class="sheet-standardNum" name="attr_SShipOCost" title="@{SShipOCost}" /><br />
 											<label class="sheet-nameRankXp">Days at Sea:</label><input type="number" class="sheet-standardNum" name="attr_SShipAtSea" title="@{SShipAtSea}" /><br />
@@ -3065,13 +3735,13 @@
 												</div>
 												<div class='sheet-col' style='width: 280px;'>
 													<input type="text" class="sheet-standard" style="width: 210px;" name="attr_SShipWeaponPlacement" placeholder="Placement" />
-												
+											
 													<input type='hidden' name='attr_rollSSRangeWeapon' value="[[@{NoDmgDice}@{RDmgType}+@{RDmgMod}[Weapon Damage]+@{dmgmod}[Damage Modifier]+1d@{RDmgRaise}[Bonus Damage]]]" />
 													<input type='hidden' name='attr_rolltSSRangeWeapon' value="{{name=@{character_name}}} {{weapon=@{SShipWeaponType}}} {{damage_type=@{NoDmgDice}@{RDmgType}+@{RDmgMod}}} {{damage=@{rollSSRangeWeapon}}} {{raise=@{RDmgRaise}}} {{dmgmod=@{dmgmod}}}" />
-												
+											
 													<button class='sheet-templatebutton' type='roll' name='roll_tRangeWeapon' title="@{repeating_sailweapons_#_tRangeWeaponRoll}" value='@{skillwrt} @{defdTemplate} @{rolltSSRangeWeapon}'></button><button class="sheet-templatebutton sheet-GM-button" type='roll' name='roll_tgmSSRangeWeaponRoll' title="@{repeating_sailweapons_#_tgmSSRangeWeaponRoll}" value='/w gm @{skillwrt} @{defdTemplate} @{rolltSSRangeWeapon}'></button>
 													<button class='sheet-normalbutton' type='roll' name='roll_rWeaponTypeRoll' title="@{repeating_sailweapons_#_rWeaponTypeRoll}" value='/em @{character_name} attempts to do damage with a @{SShipWeaponType} and rolls: @{rollSSRangeWeapon}!'></button><button type='roll' class="sheet-normalbutton sheet-GM-button" name='roll_gmrWeaponTypeRoll' title="@{repeating_sailweapons_#_gmrWeaponTypeRoll}" value='/w gm @{character_name} attempts to do damage with a @{SShipWeaponType} and rolls: @{rollSSRangeWeapon}!'></button>
-												
+											
 													<!--<button type='roll' name='roll_srWeaponTypeRoll' value='/em @{character_name} attempts to do damage with a @{SShipWeaponType} and rolls: [[@{NoDmgDice}@{RDmgType}+@{RDmgMod}[Weapon Damage]+@{dmgmod}[Damage Modifier]+@{RDmgRaise}[Bonus Damage]]]!'></button><button type='roll' class="sheet-GM-button" name='roll_gmsrWeaponTypeRoll' value='/w gm @{character_name} attempts to do damage with a @{SShipWeaponType} and rolls: [[@{NoDmgDice}@{RDmgType}+@{RDmgMod}[Weapon Damage]+@{dmgmod}[Damage Modifier]+@{RDmgRaise}[Bonus Damage]]]!'></button>-->
 												</div>
 												<h4 class="sheet-repeatingHeader">Notes</h4>
@@ -3127,7 +3797,7 @@
 												<input type="text" class="sheet-standard" style="width: 100px;" name="attr_SShipCrewName" />
 												<input type="text" class="sheet-standard" style="width: 100px;" name="attr_SShipCrewType" />
 												<input type="text" class="sheet-standard" style="width: 100px;" name="attr_SShipCrewPos" />
-												<input type="number" class="sheet-standardNum" style="width: 100px;" name="attr_SShipCrewSalary" />
+												<input type="text" class="sheet-standardNum" style="width: 100px;" name="attr_SShipCrewSalary" />
 												<input type="number" class="sheet-standardNum" style="width: 65px;" name="attr_SShipCrewShares" />
 												<textarea class='standardtext' style="width: 305px; height: 50px;" name="attr_SShipCrewNotes"></textarea>
 											</div>
@@ -3139,17 +3809,21 @@
 								</div>
 							</div>
 							<!-- END Sailing -->
-
+							
 							<!-- Flying Ship -->
 							<input class="sheet-useFlyingShips" type="checkbox" name="attr_flyingShip" style="display: none;" />
 							<div class="sheet-ship-flying" style="width: 800px;">
 								<input class="sheet-HideFlying" type="checkbox" name="attr_is_flying" /><span class="sheet-is-flying-tab"> Flying Ship</span>
 								<div class="sheet-isFlying" style="width: 800px;">
-									<h4 class="sheet-subsubsectionHeader">Flying Ship</h4>
+									<h3 class="sheet-subsubsectionHeader">Flying Ship</h3>
 									<div class="sheet-row" style="width: 100%; text-align: center;">
 										<input type="text" class="sheet-standard" name="attr_FlyingShipName" title="@{FlyingShipName}" placeholder="Ship's Name" style="font-size: 200%; width: 790px; text-align: center;" /><br />
 										<input type="text" class="sheet-standard" name="attr_FShipCaptain" title="@{FShipCaptain}" placeholder="Ship's Captain" style="font-size: 150%; width: 790px; text-align: center;" /><br />
 										<input type="text" class="sheet-standard" name="attr_FShipType" title="@{FShipType}" placeholder="Type of Ship" style="font-size: 100%; width: 790px; text-align: center;" />
+										<div class="sheet-standardtext" style="text-align: center; width: 790px; margin-left: 5px; padding: 5px;">
+											<h3 style="width: 100%; text-align: center;">WOUNDS</h3>
+											<input type="number" class="sheet-standardNum" name="attr_FShipWounds" title="@{FShipWounds}" style="text-align: center; margin-bottom:-3px;" value="0" /> of <input type="number" class="sheet-standardNum" name="attr_FShipWounds_max" title="@{FShipWounds_max}" style="text-align: center; margin-bottom: -3px;" value="2" />							
+										</div>
 									</div>
 									<span class="sheet-spacer"></span>
 									<div class="sheet-3colrow">
@@ -3158,14 +3832,14 @@
 											<label class="sheet-nameRankXp">Acceleration:</label><input type="number" class="sheet-standardNum" name="attr_FShipAcc" title="@{FShipAcc}" /><br />
 											<!--<label class="sheet-nameRankXp">Travel Speed:</label><input type="number" class="sheet-standardNum" name="attr_FShipTrSpeed" title="@{FShipTrSpeed}" /><br />-->
 											<label class="sheet-nameRankXp">Top Speed:</label><input type="number" class="sheet-standardNum" name="attr_FShipTopSpeed" title="@{FShipTopSpeed}" /><br />
-											<label class="sheet-nameRankXp">Toughness:</label><input type="number" class="sheet-standardNum" name="attr_FShipToughness" title="@{FShipToughness}" /><br />
+											<label class="sheet-nameRankXp">Toughness:</label><input type="text" class="sheet-standardNum" name="attr_FShipToughness" title="@{FShipToughness}" /><br />
 											<label class="sheet-nameRankXp">Handling:</label><input type="number" class="sheet-standardNum" name="attr_FShipHandling" title="@{FShipHandling}" /><br />
 											<label class="sheet-nameRankXp">Climb:</label><input type="number" class="sheet-standardNum" name="attr_FShipClimb" title="@{FShipClimb}" /><br />
 											<label class="sheet-nameRankXp">Energy:</label><input type="number" class="sheet-standardNum" name="attr_FShipEnergy" title="@{FShipEnergy}" /><br />
-											<label class="sheet-nameRankXp">Crew:</label><input type="number" class="sheet-standardNum" name="attr_FShipCrew" title="@{FShipCrew}" /><br />
+											<label class="sheet-nameRankXp">Crew:</label><input type="text" class="sheet-standardNum" name="attr_FShipCrew" title="@{FShipCrew}" /><br />
 											<label class="sheet-nameRankXp">Total Mod Slots:</label><input type="number" class="sheet-standardNum" name="attr_FShipSlots" title="@{FShipSlots}" /><br />
 											<label class="sheet-nameRankXp">Used Mod Slots:</label><input type="number" class="sheet-standardNum" name="attr_FShipSlotsUsed" title="@{FShipSlotsUsed}" /><br />
-											<label class="sheet-nameRankXp">Orignal Cost:</label><input type="number" class="sheet-standardNum" name="attr_FShipOCost" title="@{FShipOCost}" /><br />
+											<label class="sheet-nameRankXp">Orignal Cost:</label><input type="text" class="sheet-standardNum" name="attr_FShipOCost" title="@{FShipOCost}" /><br />
 										</div>
 										<div class="sheet-col" style="width: 33%;">
 											<h4 class="sheet-subsectionHeader">Provisions</h4>
@@ -3181,13 +3855,13 @@
 											<textarea class="sheet-standardtext"  style="width: 95%; height: 100px;" name="attr_FShipCritHit" title="@{FShipCritHit}"></textarea>
 										</div>
 									</div>
-								
+							
 									<input type="checkbox" class="sheet-HideFShipEdges" name="attr_hidefshipedges" /><span class="sheet-HideFSEdges"> Ship's Edges</span>
 									<div class="sheet-FShipEdges">
 										<h4 class="sheet-subsectionHeader">Edges</h4>
 										<textarea class="sheet-standardtext"  style="width: 98%; height: 100px;" name="attr_FShipEdges" title="@{FShipEdges}"></textarea>
 									</div>
-								
+							
 									<span class="sheet-spacer"></span>
 									<input type="checkbox" class="sheet-HideFShipWeapons" name="attr_hidefshipweapons" /><span class="sheet-HideFSWeapons"> Ship's Weapons</span>
 									<div class="sheet-FShipWeapons">
@@ -3244,7 +3918,7 @@
 												<input type="text" class="sheet-standard" style="width: 210px;" name="attr_FShipWeaponPlacement" placeholder="Placement" />
 												<input type='hidden' name='attr_rollFSRangeWeapon' value="[[@{NoDmgDice}@{RDmgType}+@{RDmgMod}[Weapon Damage]+@{dmgmod}[Damage Modifier]+1d@{RDmgRaise}[Bonus Damage]]]" />
 												<input type='hidden' name='attr_rolltFSRangeWeapon' value="{{name=@{character_name}}} {{weapon=@{FShipWeaponType}}} {{damage_type=@{NoDmgDice}@{RDmgType}+@{RDmgMod}}} {{damage=@{rollFSRangeWeapon}}} {{raise=@{RDmgRaise}}} {{dmgmod=@{dmgmod}}}" />
-												
+											
 												<button class='sheet-templatebutton' type='roll' name='roll_tRangeWeapon' title="@{repeating_flyingweapons_#_tRangeWeaponRoll}" value='@{skillwrt} @{defdTemplate} @{rolltFSRangeWeapon}'></button><button class="sheet-templatebutton sheet-GM-button" type='roll' name='roll_tgmFSRangeWeaponRoll' title="@{repeating_flyingweapons_#_tgmFSRangeWeaponRoll}" value='/w gm @{skillwrt} @{defdTemplate} @{rolltFSRangeWeapon}'></button>
 												<button class='sheet-normalbutton' type='roll' name='roll_rWeaponTypeRoll' title="@{repeating_flyingweapons_#_rWeaponTypeRoll}" value='/em @{character_name} attempts to do damage with a @{FShipWeaponType} and rolls: @{rollFSRangeWeapon}!'></button><button type='roll' class="sheet-normalbutton sheet-GM-button" name='roll_gmrWeaponTypeRoll' title="@{repeating_flyingweapons_#_gmrWeaponTypeRoll}" value='/w gm @{character_name} attempts to do damage with a @{FShipWeaponType} and rolls: @{rollFSRangeWeapon}!'></button>
 
@@ -3303,7 +3977,7 @@
 												<input type="text" class="sheet-standard" style="width: 100px;" name="attr_FShipCrewName" />
 												<input type="text" class="sheet-standard" style="width: 100px;" name="attr_FShipCrewType" />
 												<input type="text" class="sheet-standard" style="width: 100px;" name="attr_FShipCrewPos" />
-												<input type="number" class="sheet-standardNum" style="width: 100px;" name="attr_FShipCrewSalary" />
+												<input type="text" class="sheet-standardNum" style="width: 100px;" name="attr_FShipCrewSalary" />
 												<input type="number" class="sheet-standardNum" style="width: 65px;" name="attr_FShipCrewShares" />
 												<textarea class='standardtext' style="width: 305px; height: 50px;" name="attr_FShipCrewNotes"></textarea>
 											</div>
@@ -3315,17 +3989,21 @@
 								</div>
 							</div>
 							<!-- END Flying -->
-
+							
 							<!-- Ground Vehicles -->
 							<input class="sheet-useGroundVehicle" type="checkbox" name="attr_groundVehicle" style="display: none;" />
 							<div class="sheet-ship-groundvehicle" style="width: 800px;">
 								<input class="sheet-HideGround" type="checkbox" name="attr_is_ground" /><span class="sheet-is-ground-tab"> Ground Vehicle</span>
 								<div class="sheet-isGround" style="width: 800px;">
-									<h4 class="sheet-subsubsectionHeader">Ground Vehicle</h4>
+									<h3 class="sheet-subsubsectionHeader">Ground Vehicle</h3>
 									<div class="sheet-row" style="width: 100%; text-align: center;">
 										<!--<input type="text" class="sheet-standard" name="attr_FlyingShipName" title="@{FlyingShipName}" placeholder="Ship's Name" style="font-size: 200%; width: 790px; text-align: center;" /><br />
 										<input type="text" class="sheet-standard" name="attr_FShipCaptain" title="@{FShipCaptain}" placeholder="Ship's Captain" style="font-size: 150%; width: 790px; text-align: center;" /><br />-->
 										<input type="text" class="sheet-standard" name="attr_GVType" title="@{GVType}" placeholder="Type of Ship" style="font-size: 100%; width: 790px; text-align: center;" />
+										<div class="sheet-standardtext" style="text-align: center; width: 790px; margin-left: 5px; padding: 5px;">
+											<h3 style="width: 100%; text-align: center;">WOUNDS</h3>
+											<input type="number" class="sheet-standardNum" name="attr_GVWounds" title="@{GVWounds}" style="text-align: center; margin-bottom:-3px;" value="0" /> of <input type="number" class="sheet-standardNum" name="attr_GVWounds_max" title="@{GVWounds_max}" style="text-align: center; margin-bottom: -3px;" value="2" />							
+										</div>
 									</div>
 									<span class="sheet-spacer"></span>
 									<div class="sheet-3colrow">
@@ -3334,13 +4012,13 @@
 											<label class="sheet-nameRankXp">Acceleration:</label><input type="number" class="sheet-standardNum" name="attr_GVAcc" title="@{GVAcc}" /><br />
 											<!--<label class="sheet-nameRankXp">Travel Speed:</label><input type="number" class="sheet-standardNum" name="attr_GVTrSpeed" title="@{GVTrSpeed}" /><br />-->
 											<label class="sheet-nameRankXp">Top Speed:</label><input type="number" class="sheet-standardNum" name="attr_GVTopSpeed" title="@{GVTopSpeed}" /><br />
-											<label class="sheet-nameRankXp">Toughness:</label><input type="number" class="sheet-standardNum" name="attr_GVToughness" title="@{GVToughness}" /><br />
+											<label class="sheet-nameRankXp">Toughness:</label><input type="text" class="sheet-standardNum" name="attr_GVToughness" title="@{GVToughness}" /><br />
 											<label class="sheet-nameRankXp">Handling:</label><input type="number" class="sheet-standardNum" name="attr_GVHandling" title="@{GVHandling}" /><br />
-											<label class="sheet-nameRankXp">Crew:</label><input type="number" class="sheet-standardNum" name="attr_GVCrew" title="@{GVCrew}" /><br />
+											<label class="sheet-nameRankXp">Crew:</label><input type="text" class="sheet-standardNum" name="attr_GVCrew" title="@{GVCrew}" /><br />
 											<!--<label class="sheet-nameRankXp">Fuel:</label><input type="number" class="sheet-standardNum" name="attr_GVEnergy" title="@{GVEnergy}" /><br />-->
 											<!--<label class="sheet-nameRankXp">Total Mod Slots:</label><input type="number" class="sheet-standardNum" name="attr_GVSlots" title="@{GVSlots}" /><br />
 											<label class="sheet-nameRankXp">Used Mod Slots:</label><input type="number" class="sheet-standardNum" name="attr_GVSlotsUsed" title="@{GVSlotsUsed}" /><br />-->
-											<label class="sheet-nameRankXp">Orignal Cost:</label><input type="number" class="sheet-standardNum" name="attr_GVOCost" title="@{GVOCost}" /><br />
+											<label class="sheet-nameRankXp">Orignal Cost:</label><input type="text" class="sheet-standardNum" name="attr_GVOCost" title="@{GVOCost}" /><br />
 										</div>
 										<div class="sheet-col" style="width: 33%;">
 											<h4 class="sheet-subsectionHeader">Provisions</h4>
@@ -3417,7 +4095,7 @@
 												<input type="text" class="sheet-standard" style="width: 210px;" name="attr_GVWeaponPlacement" placeholder="Placement" />
 												<input type='hidden' name='attr_rollGVRangeWeapon' value="[[@{NoDmgDice}@{RDmgType}+@{RDmgMod}[Weapon Damage]+@{dmgmod}[Damage Modifier]+1d@{RDmgRaise}[Bonus Damage]]]" />
 												<input type='hidden' name='attr_rolltGVRangeWeapon' value="{{name=@{character_name}}} {{weapon=@{GVWeaponType}}} {{damage_type=@{NoDmgDice}@{RDmgType}+@{RDmgMod}}} {{damage=@{rollGVRangeWeapon}}} {{raise=@{RDmgRaise}}} {{dmgmod=@{dmgmod}}}" />
-												
+											
 												<button class='sheet-templatebutton' type='roll' name='roll_tRangeWeapon' title="@{repeating_groundweapons_#_tRangeWeaponRoll}" value='@{skillwrt} @{defdTemplate} @{rolltGVRangeWeapon}'></button><button class="sheet-templatebutton sheet-GM-button" type='roll' name='roll_tgmGVRangeWeaponRoll' title="@{repeating_groundweapons_#_tgmGVRangeWeaponRoll}" value='/w gm @{skillwrt} @{defdTemplate} @{rolltGVRangeWeapon}'></button>
 												<button class='sheet-normalbutton' type='roll' name='roll_rWeaponTypeRoll' title="@{repeating_groundweapons_#_rWeaponTypeRoll}" value='/em @{character_name} attempts to do damage with a @{GVWeaponType} and rolls: @{rollGVRangeWeapon}!'></button><button type='roll' class="sheet-normalbutton sheet-GM-button" name='roll_gmrWeaponTypeRoll' title="@{repeating_groundweapons_#_gmrWeaponTypeRoll}" value='/w gm @{character_name} attempts to do damage with a @{GVWeaponType} and rolls: @{rollGVRangeWeapon}!'></button>
 
@@ -3477,7 +4155,7 @@
 												<input type="text" class="sheet-standard" style="width: 100px;" name="attr_GVCrewName" />
 												<input type="text" class="sheet-standard" style="width: 100px;" name="attr_GVCrewType" />
 												<input type="text" class="sheet-standard" style="width: 100px;" name="attr_GVCrewPos" />
-												<input type="number" class="sheet-standardNum" style="width: 100px;" name="attr_GVCrewSalary" />
+												<input type="text" class="sheet-standardNum" style="width: 100px;" name="attr_GVCrewSalary" />
 												<input type="number" class="sheet-standardNum" style="width: 65px;" name="attr_GVCrewShares" />
 												<textarea class='standardtext' style="width: 305px; height: 50px;" name="attr_GVCrewNotes"></textarea>
 											</div>
@@ -3489,18 +4167,22 @@
 								</div>
 							</div>
 							<!-- END Ground Vehicles -->
-							
+						
 							<!-- Start Walkers -->
-							
+						
 							<input class="sheet-useWalker" type="checkbox" name="attr_Walker" style="display: none;" />
 							<div class="sheet-ship-walker" style="width: 800px;">
 								<input class="sheet-HideWalker" type="checkbox" name="attr_is_walker" /><span class="sheet-is-walker-tab"> Walker</span>
 								<div class="sheet-isWalker" style="width: 800px;">
-									<h4 class="sheet-subsubsectionHeader">Walker</h4>
+									<h3 class="sheet-subsubsectionHeader">Walker</h3>
 									<div class="sheet-row" style="width: 100%; text-align: center;">
 										<!--<input type="text" class="sheet-standard" name="attr_FlyingShipName" title="@{FlyingShipName}" placeholder="Ship's Name" style="font-size: 200%; width: 790px; text-align: center;" /><br />
 										<input type="text" class="sheet-standard" name="attr_FShipCaptain" title="@{FShipCaptain}" placeholder="Ship's Captain" style="font-size: 150%; width: 790px; text-align: center;" /><br />-->
 										<input type="text" class="sheet-standard" name="attr_WalkerType" title="@{GVType}" placeholder="Type of Walker" style="font-size: 100%; width: 790px; text-align: center;" />
+										<div class="sheet-standardtext" style="text-align: center; width: 790px; margin-left: 5px; padding: 5px;">
+											<h3 style="width: 100%; text-align: center;">WOUNDS</h3>
+											<input type="number" class="sheet-standardNum" name="attr_WalkerWounds" title="@{WalkerWounds}" style="text-align: center; margin-bottom:-3px;" value="0" /> of <input type="number" class="sheet-standardNum" name="attr_WalkerWounds_max" title="@{WalkerWounds_max}" style="text-align: center; margin-bottom: -3px;" value="2" />							
+										</div>
 									</div>
 									<span class="sheet-spacer"></span>
 									<div class="sheet-3colrow">
@@ -3509,13 +4191,13 @@
 											<label class="sheet-nameRankXp">Acceleration:</label><input type="number" class="sheet-standardNum" name="attr_WalkerAcc" title="@{WalkerAcc}" /><br />
 											<!--<label class="sheet-nameRankXp">Travel Speed:</label><input type="number" class="sheet-standardNum" name="attr_WalkerTrSpeed" title="@{WalkerTrSpeed}" /><br />-->
 											<label class="sheet-nameRankXp">Top Speed:</label><input type="number" class="sheet-standardNum" name="attr_WalkerTopSpeed" title="@{WalkerTopSpeed}" /><br />
-											<label class="sheet-nameRankXp">Toughness:</label><input type="number" class="sheet-standardNum" name="attr_WalkerToughness" title="@{WalkerToughness}" /><br />
+											<label class="sheet-nameRankXp">Toughness:</label><input type="text" class="sheet-standardNum" name="attr_WalkerToughness" title="@{WalkerToughness}" /><br />
 											<label class="sheet-nameRankXp">Handling:</label><input type="number" class="sheet-standardNum" name="attr_WalkerHandling" title="@{WalkerHandling}" /><br />
-											<label class="sheet-nameRankXp">Crew:</label><input type="number" class="sheet-standardNum" name="attr_WalkerCrew" title="@{WalkerCrew}" /><br />
+											<label class="sheet-nameRankXp">Crew:</label><input type="text" class="sheet-standardNum" name="attr_WalkerCrew" title="@{WalkerCrew}" /><br />
 											<!--<label class="sheet-nameRankXp">Fuel:</label><input type="number" class="sheet-standardNum" name="attr_WalkerEnergy" title="@{WalkerEnergy}" /><br />-->
 											<!--<label class="sheet-nameRankXp">Total Mod Slots:</label><input type="number" class="sheet-standardNum" name="attr_WalkerSlots" title="@{WalkerSlots}" /><br />
 											<label class="sheet-nameRankXp">Used Mod Slots:</label><input type="number" class="sheet-standardNum" name="attr_WalkerSlotsUsed" title="@{WalkerSlotsUsed}" /><br />-->
-											<label class="sheet-nameRankXp">Orignal Cost:</label><input type="number" class="sheet-standardNum" name="attr_WalkerOCost" title="@{WalkerOCost}" /><br />
+											<label class="sheet-nameRankXp">Orignal Cost:</label><input type="text" class="sheet-standardNum" name="attr_WalkerOCost" title="@{WalkerOCost}" /><br />
 										</div>
 										<div class="sheet-col" style="width: 33%;">
 											<h4 class="sheet-subsectionHeader">Provisions</h4>
@@ -3592,7 +4274,7 @@
 												<input type="text" class="sheet-standard" style="width: 210px;" name="attr_WalkerWeaponPlacement" placeholder="Placement" />
 												<input type='hidden' name='attr_rollWRangeWeapon' value="[[@{NoDmgDice}@{RDmgType}+@{RDmgMod}[Weapon Damage]+@{dmgmod}[Damage Modifier]+1d@{RDmgRaise}[Bonus Damage]]]" />
 												<input type='hidden' name='attr_rolltWRangeWeapon' value="{{name=@{character_name}}} {{weapon=@{WalkerWeaponType}}} {{damage_type=@{NoDmgDice}@{RDmgType}+@{RDmgMod}}} {{damage=@{rollWRangeWeapon}}} {{raise=@{RDmgRaise}}} {{dmgmod=@{dmgmod}}}" />
-												
+											
 												<button class='sheet-templatebutton' type='roll' name='roll_tRangeWeapon' title="@{repeating_wsweapons_#_tRangeWeaponRoll}" value='@{skillwrt} @{defdTemplate} @{rolltWRangeWeapon}'></button><button class="sheet-templatebutton sheet-GM-button" type='roll' name='roll_tgmWRangeWeaponRoll' title="@{repeating_wsweapons_#_tgmWRangeWeaponRoll}" value='/w gm @{skillwrt} @{defdTemplate} @{rolltWRangeWeapon}'></button>
 												<button class='sheet-normalbutton' type='roll' name='roll_rWeaponTypeRoll' title="@{repeating_wsweapons_#_rWeaponTypeRoll}" value='/em @{character_name} attempts to do damage with a @{WalkerWeaponType} and rolls: @{rollWRangeWeapon}!'></button><button type='roll' class="sheet-normalbutton sheet-GM-button" name='roll_gmrWeaponTypeRoll' title="@{repeating_wsweapons_#_gmrWeaponTypeRoll}" value='/w gm @{character_name} attempts to do damage with a @{WalkerWeaponType} and rolls: @{rollWRangeWeapon}!'></button>
 
@@ -3652,7 +4334,7 @@
 												<input type="text" class="sheet-standard" style="width: 100px;" name="attr_WalkerCrewName" />
 												<input type="text" class="sheet-standard" style="width: 100px;" name="attr_WalkerCrewType" />
 												<input type="text" class="sheet-standard" style="width: 100px;" name="attr_WalkerCrewPos" />
-												<input type="number" class="sheet-standardNum" style="width: 100px;" name="attr_WalkerCrewSalary" />
+												<input type="text" class="sheet-standardNum" style="width: 100px;" name="attr_WalkerCrewSalary" />
 												<input type="number" class="sheet-standardNum" style="width: 65px;" name="attr_WalkerCrewShares" />
 												<textarea class='standardtext' style="width: 305px; height: 50px;" name="attr_WalkerCrewNotes"></textarea>
 											</div>
@@ -3663,44 +4345,10 @@
 									<span class="sheet-spacer"></span>
 								</div>
 							</div>
-							<!-- End Walkers -->							
-						</div> <!-- End Vehicles -->
-												
-						<input class="sheet-HideGear" type="checkbox" name="attr_is_gear" /><span class="sheet-is-gear-tab" /> Gear</span>
-						<div class="sheet-gear" style="width:100%; margin: -5px; padding: 0px;"><h3 class="sheet-subsectionHeader" style="margin: 5px;">Gear</h3></div><!-- Begin Gear -->
-						<div class="sheet-gear">
-							<textarea name="attr_gear" class="sheet-standardtext" style='width:775px;'></textarea>
-							<div class='sheet-row'><!-- Set up the Total Weight box -->
-								<div class='sheet-col' style='width:150px;'> <!-- Armor Type (150px) -->
-									&nbsp;
-								</div>
-								<div class='sheet-col' style='width:50px;'> <!-- Area Protcted (150px) -->
-									&nbsp;
-								</div>
-								<div class='sheet-col' style='width:160px; text-align:right;'> <!-- Protection (100px)-->
-									<h4 class="sheet-weight">Total Weight:</h4>
-								</div>
-								<div class='sheet-col' style='width:45px;'> <!-- Weight (60px)-->
-									<input type="number" name="attr_geartotalweight" title="@{geartotalweight}" class="sheet-standardNum" />
-								</div>
-							</div>
-							<div class='sheet-row'><!-- Set up the Total Weight box -->
-								<div class='sheet-col' style='width:150px;'> <!-- Armor Type (150px) -->
-									&nbsp;
-								</div>
-								<div class='sheet-col' style='width:50px;'> <!-- Area Protcted (150px) -->
-									&nbsp;
-								</div>
-								<div class='sheet-col' style='width:160px; text-align:right;'> <!-- Protection (100px)-->
-									<h4 class="sheet-weight">Total Weight Carried:</h4>
-								</div>
-								<div class='sheet-col' style='width:45px;'> <!-- Weight (60px)-->
-									<input type="number" name="attr_geartotalweightcarried" title="@{geartotalweightcarried}" class="sheet-standardNum" value="1" />
-								</div>
-							</div>
+							<!-- End Walkers -->	
 						</div>
-						<span class="sheet-spacer"></span>
-					</div><!-- End Equipment Tab -->
+					</div><!-- End Vehicle Tab -->
+					
 					<input type="checkbox" class="sheet-hideArcanum" name="attr_ArcanumTab" style="width: 15px; display: none;">
 					<div class="sheet-section-arcanum" style="width: 800px;"><!-- Begin Arcanum -->
 						<div class='sheet-row'><h2 class='sheet-sectionHeader'>ARCANUM</h2></div>
@@ -3969,13 +4617,246 @@
 								</div>
 						</div>
 					</div><!-- End Journal Tab -->
+					<div class="sheet-section-combat" style="width: 800px;"><!-- Begin Combat Options -->
+						<div class='sheet-row'><h2 class='sheet-sectionHeader'>Combat Options</h2></div>
+						&#128679; Under Construction &#128679;
+						<div class="sheet-row" style="width: 100%; text-align: center;">
+							<input type="radio" class="sheet-combat-options sheet-attacks" name="attr_combat-tab" value="1" title="Attack Options" checked="checked"/> 
+							<span class="sheet-combat-options sheet-attacks" style='line-height: 40px;'>Attack</span>
+							<input type="radio" class="sheet-combat-options sheet-defend" name="attr_combat-tab" value="2" title="Defense Options" /> 
+							<span class="sheet-combat-options sheet-defend" style='line-height: 40px;'>Defend</span>
+							<input type="radio" class="sheet-combat-options sheet-misc" name="attr_combat-tab" value="3" title="Misc. Options" /> 
+							<span class="sheet-combat-options sheet-misc" style='line-height: 40px;'>Other</span>
+							<!-- Attack Options -->
+							<div class="sheet-options-attack" style='width:100%;'>
+								<div class="sheet-2colrow sheet-options-attack" style='width: 100%;'>
+									<div class='sheet-col' style='width: 45%;'>
+										<h3 class='sheet-subsectionHeader'>Melee Attack Options</h3>
+										<table class='sheet-combatoptions'>
+											<tr>
+												<th style='width: 33%;'>Attack Option</th><th>Why do it?</th>
+											</tr>
+											<tr>
+												<td>Called Shot</td>
+												<td>
+													You can deal additional damage to your opponent, but penalties apply to Fighting.
+													<ul>
+														<li>Head/Vitals: -4 to hit, +4 Damage</li>
+														<li>Limb: -2 to hit, +2 Damage</li>
+														<li>Small Target: -4 to hit, Special Damage</li>
+														<li>Tiny Target: -6 to hit, Special Damage</li>
+													</ul>
+												</td>
+											</tr>
+											<tr>
+												<td>Disarm</td><td>Renders your opponent weaponless, requires a called shot.</td>
+											</tr>
+											<tr>
+												<td>Draw & Attack</td><td>Get a jab in quickly. -2 to Fighting.</td>
+											</tr>
+											<tr>
+												<td>The Drop</td><td>You're catching someone completely unawares (GM's discretion). +4 to Fighting and Damage.</td>
+											</tr>
+											<tr>
+												<td>Finishing Move (insta-kill)</td><td>The foe is utterly helpless and needs to be taken out.</td>
+											</tr>
+											<tr>
+												<td>Frenzy</td><td>Get to two attacks with the same weapon. Requires an Edge.</td>
+											</tr>
+											<tr>
+												<td>Gang-up</td><td>Strength in numbers. +1 to Fighting/per Ally, to a max +4</td>
+											</tr>
+											<tr>
+												<td>Grappling</td><td>You don't want to kill your opponent, just subdue him.</td>
+											</tr>
+											<tr>
+												<td>Improvised Weapon</td><td>You need a weapon, and it's all that's available. -1 to Fighting and Parry</td>
+											</tr>
+											<tr>
+												<td>Multi-action</td><td>You're surrounded or just need to put your foe(s) down ASAP. -2 to all rolls per additional action.</td>
+											</tr>
+											<tr>
+												<td>Non-lethal Damage</td><td>You don't want to kill your opponent, just subdue her. If using an edged weapon, suffer a -1 to the Fighting roll.</td>
+											</tr>
+											<tr>
+												<td>Off-hand Attack</td><td>Your dominant hand is otherwise occupied and you need to do <em>something</em>. -2 to Fighting</td>
+											</tr>
+											<tr>
+												<td>Push</td><td>You need to reposition your opponent. Opposed Strength rolls. Can move your foe up to 2".</td>
+											</tr>
+											<tr>
+												<td>Rapid Attack</td><td>You're desperate and you've done the math... Allows you to make 3 Fighting attacks. -4 to all Fighting rolls, and uses a single Wild Die. You suffer -2 to Parry until next your next action</td>
+											</tr>
+											<tr>
+												<td>Touch attack</td><td>You're using something that just needs to touch your opponent, but not necessarily physically hurt them. +2 to Fighting</td>
+											</tr>
+											<tr>
+												<td>Use two weapons</td><td>You took the Edge and want to get in two attacks with no multi-action penalty (off-hand penalty still applies)</td>
+											</tr>
+											<tr>
+												<td>Unarmed Defender</td><td>Your opponent has no weapon and suffers a -2 to Parry.</td>
+											</tr>
+											<tr>
+												<td>Wild Attack</td><td>You need to put the enemy down, so give it all you've got. +2 to Fighting and Damage, -2 to Parry.</td>
+											</tr>
+										</table>
+									</div>
+									<div class='sheet-col' style='width: 45%;'>
+										<h3 class='sheet-subsectionHeader'>Ranged Attack Options</h3>
+										<table class='sheet-combatoptions'>
+											<tr>
+												<th style="width: 33%;">Attack Option</th><th>Why do it?</th>
+											</tr>
+											<tr>
+												<td>Aim</td><td>Improve your chances of hitting your opponent. +2 to Shooting/Throwing (requires a round to aim).</td>
+											</tr>
+											<tr>
+												<td>Called Shot</td>
+												<td>
+													You can deal additional damage to your opponent, but penalties apply to Shooting/Throwing.
+													<ul>
+														<li>Head/Vitals: -4 to hit, +4 Damage</li>
+														<li>Limb: -2 to hit, +2 Damage</li>
+														<li>Small Target: -4 to hit, Special Damage</li>
+														<li>Tiny Target: -6 to hit, Special Damage</li>
+													</ul>
+												</td>
+											</tr>
+											<tr>
+												<td>Disarm</td><td>Renders your opponent weaponless, requires a called shot.</td>
+											</tr>
+											<tr>
+												<td>Double-tap</td><td>Shoot like a cop! +1 to Shooting, expends 2 bullets</td>
+											</tr>
+											<tr>
+												<td>Draw & Attack</td><td>Get a jab in quickly. -2 to Fighting.</td>
+											</tr>
+											<tr>
+												<td>The Drop</td><td>You're catching someone completely unawares (GM's discretion). +4 to Fighting and Damage.</td>
+											</tr>
+											<tr>
+												<td>Finishing Move (insta-kill)</td><td>The foe is utterly helpless and needs to be taken out.</td>
+											</tr>
+											<tr>
+												<td>Firing Blind</td><td>You know someone is "there," but you can't see them. -4 to Shooting/Throwing</td>
+											</tr>
+											<tr>
+												<td>Full Auto</td><td>You need to fill the air with lead, fast. Roll 3 Shooting dice and 1 Wild Die, all rolls are at -2.</td>
+											</tr>
+											<tr>
+												<td>Improvised Weapon</td><td>You need a weapon, and it's all that's available. -1 to Throwing and Parry</td>
+											</tr>
+											<tr>
+												<td>Multi-action</td><td>You're surrounded or just need to put your foe(s) down ASAP. -2 to all rolls per additional action.</td>
+											</tr>
+											<tr>
+												<td>Off-hand Attack</td><td>Your dominant hand is otherwise occupied and you need to do <em>something</em>. -2 to Shooting/Throwing</td>
+											</tr>
+											<tr>
+												<td>Rapid Attack/Fanning the Hammer</td><td>You're desperate and you've done the math... Allows you to make 6 Shooting attacks. -4 to all Fighting rolls, and uses a single Wild Die. You suffer -2 to Parry until next your next action</td>
+											</tr>
+											<tr>
+												<td>Suppressive Fire</td><td>You need to keep heads down. Requires Full-Auto. Spray a Medium Burst Template.</td>
+											</tr>
+											<tr>
+												<td>Three Round Burst</td><td>Need to improve your accuracy to hit your opponent. +2 to Shooting, expends 3 bullets</td>
+											</tr>
+											<tr>
+												<td>Use two weapons</td><td>You took the Edge and want to get in two attacks with no multi-action penalty (off-hand penalty still applies)</td>
+											</tr>
+										</table>
+									</div>
+								</div>
+							</div> <!-- End Attack Options -->
+							
+							<!-- Defense Options -->
+							<div class="sheet-options-defend" style='width: 100%;'>
+								<table class='sheet-combatoptions' style='width:100%;'>
+									<tr>
+										<th style='width: 33%;'>Attack Option</th><th>Why do it?</th>
+									</tr>
+									<tr>
+										<td>Cover</td>
+										<td>
+											You're getting attack and don't have enough armor—or you just don't want to get hit.
+											<ul>
+												<li>Light: attacker suffers -1 to hit</li>
+												<li>Medium: attacker suffers -2 to hit</li>
+												<li>Heavy: attacker suffers -4 to hit</li>
+												<li>Total: attacker suffers -6 to hit</li>
+											</ul>
+										</td>
+									</tr>
+									<tr>
+										<td>Defend</td><td>Want to withdraw from combat, or just don't want to get hit in a melee fight? +2 to Parry and can move half pace.</td>
+									</tr>
+									<tr>
+										<td>Disarm</td><td>Renders your opponent weaponless, requires a called shot.</td>
+									</tr>
+									<tr>
+										<td>Full Defense</td><td>You really can't afford to get hit, and just need to buy some time for the cavalry to arrive... Make a Fighting roll +2, and this is your new Parry—your Parry can not get worse, because of this manuever.</td>
+									</tr>
+									<tr>
+										<td>Illumination</td>
+										<td>
+											Your opponent can see you too easily—make it dark!
+											<ul>
+												<li>Dim: attacker suffers -1 to hit</li>
+												<li>Dark: attacker suffers -2 to hit</li>
+												<li>Pitch Dark: attacker suffers -4 to hit</li>
+											</ul>
+											If you suffer these penalties, try turning on the lights...
+										</td>
+									</tr>
+									<tr>
+										<td>Prone</td>
+										<td>
+											Make yourself harder to hit when being shot at: in most instances functions as medium cover.<br />
+											Just don't go prone in Melee...-2 to Parry and Fighting.
+										</td>
+									</tr>
+									<tr>
+										<td>Withdraw</td><td>Take your chances and get the heck out of dodge. All adjacent foes get a free attack, but you might get out unscathed and live to fight another day.</td>
+									</tr>
+								</table>
+							</div>
+							<!-- Other Options -->
+							<div class="sheet-options-other" style='width:100%;'>
+								<table class='sheet-combatoptions' style='width:100%;'>
+									<tr>
+										<th style='width: 33%;'>Attack Option</th><th>Why do it?</th>
+									</tr>
+									<tr>
+										<td>Movement</td>
+										<td>
+											Don't just stand there...move around.
+											<ul>
+												<li>Crawling: move 2"/turn and counts as prone when being fired upon.</li>
+												<li>Crouching: move at half pace, ranged attacks suffer -1.</li>
+												<li>Walking: move your full pace as a free action.</li>
+												<li>Running: move your full pace +1d6 as an action.</li>
+												<li>Jumping: jump horizontally 1" (from dead stop), or 2" with a run. A success Strength roll adds an addition 1".</li>
+												<li>Go Prone: fall prone at any time during your action. Getting up costs 2" of movement.</li>
+											</ul>
+										</td>
+									</tr>
+									<tr>
+										<td>Test of Wills</td><td>You're quick witted or scarier than your foe. Use a Taunt or Intimidation skill. Success gives +2 to your next action against the opponent, and a Raise scores a Shaken result in addition.</td>
+									</tr>
+									<tr>
+										<td>Tricks</td><td>Your foe isn't as nimble, or smart as you. Use a Smarts or Agility Trick. Success and the foe suffers -2 to Parry until their next action, on a Raise your opponent is also Shaken.</td>
+									</tr>
+								</table>
+							</div>
+						</div>
+					</div><!-- End Combat Options Tab -->
 				</div><!-- End Player Sheet -->
 
 				<!--           -->
-				<!-- NPC Sheet -->
+				<!-- NPC Sheet -->  
 				<!--           -->
-				<div class="sheet-npc" style='width:810px; background-color:#e0e0e0;'>
-					<div class='sheet-row' style="width: 800px;"><!-- Beign First Row of Basic Info -->
+				<div class="sheet-npc" style='width:810px; background-image: url("http://i.imgur.com/NxNpxoP.png");'>
+					<div class='sheet-row' style='width: 800px;'><!-- Beign First Row of Basic Info -->
 						<div class='sheet-col' style='width:245px;'>
 							<br />
 							<input type="checkbox" class="sheet-useCodeName" name="attr_codename" style="width: 15px; display: none;" />
@@ -4263,6 +5144,44 @@
 					<hr />
 					<input class="HideSkills" type="checkbox" name="attr_is_skills" /><span class="sheet-is-skills-tab"></span>
 					<div class="sheet-mskills" style="width: 800px;">
+						<input type="checkbox" class="sheet-HidemSkills" name="attr_mSkillsConfig2" style="width:158px;" checked /><span class="sheet-is-mSkills2" style='width: 158px; margin-left: -158px;'>core skills selection</span>
+						<div class='sheet-mSkills2' style="width: 790px;">
+							<div class='sheet-3colrow' style="padding: 10px;">
+								<div class='sheet-col'>
+									<input class="StaticSkill" type="checkbox" name="attr_staticmBoating" style='width:15px;' /> Show Boating <br />
+									<input class="StaticSkill" type="checkbox" name="attr_staticmClimbing" style='width:15px;' /> Show Climbing <br />
+									<input class="StaticSkill" type="checkbox" name="attr_staticmDriving" style='width:15px;' /> Show Driving <br />
+									<input class="StaticSkill" type="checkbox" name="attr_staticmFaith" style="width: 15px;" /> Show Faith <br />
+									<input class="StaticSkill" type="checkbox" name="attr_staticmGambling" style='width:15px;' /> Show Gambling <br />
+									<input class="StaticSkill" type="checkbox" name="attr_staticmGuts" style='width:15px;' /> Show Guts <br />
+									<input class="StaticSkill" type="checkbox" name="attr_staticmHealing" style='width:15px;' /> Show Healing <br />
+									<input class="StaticSkill" type="checkbox" name="attr_staticmIntimidation" style='width:15px;' /> Show Intimidation <br />
+									<input class="StaticSkill" type="checkbox" name="attr_staticmInvestigation" style='width:15px;' /> Show Investigation <br />
+								</div>
+								<div class='sheet-col'>
+									<input class="StaticSkill" type="checkbox" name="attr_staticmLockpicking" style='width:15px;' /> Show Lockpicking <br />
+									<input class="StaticSkill" type="checkbox" name="attr_staticmNotice" style='width:15px;' /> Show Notice <br />
+									<input class="StaticSkill" type="checkbox" name="attr_staticmPersuasion" style='width:15px;' /> Show Persuasion <br />
+									<input class="StaticSkill" type="checkbox" name="attr_staticmPiloting" style='width:15px;' /> Show Piloting <br />
+									<input class="StaticSkill" type="checkbox" name="attr_staticmPsionics" style='width:15px;' /> Show Psionics <br />
+									<input class="StaticSkill" type="checkbox" name="attr_staticmRepair" style='width:15px;' /> Show Repair <br />
+									<input class="StaticSkill" type="checkbox" name="attr_staticmRiding" style='width:15px;' /> Show Riding <br />
+									<input class="StaticSkill" type="checkbox" name="attr_staticmRitual" style='width:15px;' /> Show Ritual <br />
+									<input class="StaticSkill" type="checkbox" name="attr_staticmShooting" style='width:15px;' /> Show Shooting <br />
+								</div>
+								<div class='sheet-col'>
+									<input class="StaticSkill" type="checkbox" name="attr_staticmSpellcasting" style='width:15px;' /> Show Spellcasting <br />
+									<input class="StaticSkill" type="checkbox" name="attr_staticmStealth" style='width:15px;' /> Show Stealth <br />
+									<input class="StaticSkill" type="checkbox" name="attr_staticmStreetwise" style='width:15px;' /> Show Streetwise <br />
+									<input class="StaticSkill" type="checkbox" name="attr_staticmSurvival" style='width:15px;' /> Show Survival <br />
+									<input class="StaticSkill" type="checkbox" name="attr_staticmSwimming" style='width:15px;' /> Show Swimming <br />
+									<input class="StaticSkill" type="checkbox" name="attr_staticmTaunt" style='width:15px;' /> Show Taunt <br />
+									<input class="StaticSkill" type="checkbox" name="attr_staticmThrowing" style='width:15px;' /> Show Throwing <br />
+									<input class="StaticSkill" type="checkbox" name="attr_staticmTracking" style='width:15px;' /> Show Tracking <br />
+									<input class="StaticSkill" type="checkbox" name="attr_staticmWeirdScience" style='width:15px;' /> Show Weird Science <br />
+								</div>
+							</div>
+						</div><!-- End Core Skills -->
 						<!-- Skills Row -->
 						<div class='sheet-row' style='width:800px;'>
 							<div class='sheet-col' style='width:277px;'><!--container column-->
@@ -5341,7 +6260,7 @@
 		<h2 class="sheet-caption">{{name}}</h2>
 		<div class="sheet-rtcard">
 			<table>
-				<caption>{{skill_name}}</caption>
+				<caption>{{skill_name}}{{#skill_nameHeader}}:<br />{{skill_nameHeader}}{{/skill_nameHeader}}</caption>
 				<tbody>
 					<tr class="sheet-rth">
 						<th colspan="2">Roll Results</th>
@@ -5468,7 +6387,7 @@
 		<h2 class="sheet-caption">{{name}}</h2>
 		<div class="sheet-rtcard">
 			<table>
-				<caption>{{skill_name}}</caption>
+				<caption>{{skill_name}}{{#skill_nameHeader}}:<br />{{skill_nameHeader}}{{/skill_nameHeader}}</caption>
 				<tbody>
 					<tr class="sheet-rth">
 						<th colspan="2">Roll Results</th>
