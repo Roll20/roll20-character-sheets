@@ -136,7 +136,7 @@ gulp.task('sass-lint', () => {
 
 gulp.task('sort-translations', () => {
   return gulp.src('../translations/*.json')
-    .pipe(sortJSON({ space: 1 }))
+    .pipe(sortJSON({ space: 2 }))
     .pipe(replaceTask({
       patterns: [
         {
