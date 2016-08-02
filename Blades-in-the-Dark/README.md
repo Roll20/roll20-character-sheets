@@ -6,18 +6,26 @@ This sheet was created for use in Blades in the Dark on Roll20.
 
 Report any problems, suggestions or features by sending a private message on Roll20 or submitting an issue on Github.
 
-[Stephen Malone](https://app.roll20.net/users/552705/) on Roll20
+[Stephen Malone](https://app.roll20.net/users/552705/) or [Phalanks](https://app.roll20.net/users/843545/) on Roll20
 
 ## Todo
 * Change to only show crit value if there are more than one 6 in the roll.
 * Convert Coin, Bandolier, and Recovery checkboxes in the character tab to left-fillable radio buttons for consistency.
 * Convert Load on the playbook tab to a radio button - can't have multiple loads simultaneously.
-* Wrap the 8-clock track at 4 ticks to allow for wider input boxes for the clock descriptions.
-* Add a Name field for Cohorts?
 * Add a repeatable Item field for items that have no load?
 * Add a button to the Crew sheet to roll Heat for Entanglements - display with a roll template to make it easy for the GM to look up the results?
+* Change Shady Friends checkboxes to radio buttons. A rival can't also be a best friend.
+* Format claims checkboxes to match the rest of the sheet
 
 ## Changelog
+
+### 0.0.9
+* Added Cohort Name and Type dropdown
+* Wrapped 8 clicks on 4 ticks
+* Moved claims checkbox to left side of the text area to mirror what's provided by the book
+* Bugfixes
+    - Fixed Claims map wrapping issue
+    - Fixed blank vice roll if Vice text box is blank
 
 ### 0.0.8
 * Added a button to Indulge in Vice 
