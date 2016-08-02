@@ -8,7 +8,20 @@ Report any problems, suggestions or features by sending a private message on Rol
 
 [Kevin Searle](https://app.roll20.net/users/565104/) on Roll20 or [@kevinsearle](https://twitter.com/kevinsearle) on Twitter
 
+### Contributors
+
+[MankiGames](https://github.com/MankiGames)
+[Shadowriku](https://github.com/Shadowriku)
+[RonaldZ](https://github.com/RonaldZ)
+[jfredett](https://github.com/jfredett)
+[CoalPoweredPuppet](https://github.com/CoalPoweredPuppet)
+
 ### Changelog
+
+#### 0.1.1
+
+* Weapon auto-attack calculated by attribute modifier and skill level.
+* Drop-down menu added for those fields.
 
 #### 0.1.0
 
