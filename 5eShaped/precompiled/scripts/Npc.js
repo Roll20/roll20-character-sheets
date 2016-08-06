@@ -321,7 +321,6 @@ export class Npc {
               repeatingString = `repeating_regionaleffect_${generateRowID()}_`;
               finalSetAttrs[`${repeatingString}freetext`] = regionalEffect.trim();
             });
-            finalSetAttrs.regional_effects_fade = regionalEffectsList.slice(-1)[0];
           }
           if (content.indexOf('Lair Actions') !== -1) {
             const lairActionsSplit = content.split(/Lair Actions\n/);
