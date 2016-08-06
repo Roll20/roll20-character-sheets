@@ -1,8 +1,215 @@
 /* global on:false, generateRowID:false */
 
-import { getSetItems, isUndefinedOrEmpty } from './utilities';
+import { ABILITIES, SKILLS, TOGGLE_VARS } from './constants';
+import { Traits } from './Traits';
+const traits = new Traits();
+import { getSetItems, getSetRepeatingItems, isUndefinedOrEmpty, capitalize, getAbilityShortName, getSkillIdByStorageName, getIntValue, ordinalSpellLevel } from './utilities';
 
 export class Convert {
+  parseSizeTypeAlignment(v, finalSetAttrs) {
+    const type = v.npc_type;
+    const match = type.match(/(.*?) (.*?), (.*)/i);
+    if (!type || !type[1] || !type[2] || !type[3]) {
+      console.error('Character doesn\'t have valid type/size/alignment format');
+    }
+    finalSetAttrs.size = capitalize(match[1]);
+    finalSetAttrs.type = match[2];
+    finalSetAttrs.alignment = match[3];
+  }
+  parseHD(v, finalSetAttrs) {
+    finalSetAttrs.hp_srd = `${v.hp_max} (${v.npc_hpformula})`;
+  }
+  parseSavingThrows(v, finalSetAttrs) {
+    const savingThrows = [];
+    for (const ability of ABILITIES) {
+      const saveValue = v[`npc_${getAbilityShortName(ability).toLowerCase()}_save`];
+      console.log('saveValue', saveValue);
+      if (saveValue) {
+        savingThrows.push(`${getAbilityShortName(ability)} +${saveValue}`);
+      }
+    }
+    if (savingThrows.length > 1) {
+      finalSetAttrs.saving_throws_srd = savingThrows.join(', ');
+    }
+  }
+  parseNPCSkills(v, finalSetAttrs) {
+    const skills = [];
+    for (const skill in SKILLS) {
+      if (SKILLS.hasOwnProperty(skill)) {
+        const skillValue = v[`npc_${skill.toLowerCase()}`];
+        if (skillValue) {
+          skills.push(`${capitalize(skill.toLowerCase())} +${skillValue}`);
+        }
+      }
+    }
+    if (skills.length > 1) {
+      finalSetAttrs.skills_srd = skills.join(', ');
+    }
+  }
+  convertJackOfAllTrades(v, finalSetAttrs) {
+    if (v.jack_of_all_trades === '(floor(@{pb}/2))') {
+      finalSetAttrs.jack_of_all_trades_toggle = '@{jack_of_all_trades}';
+    }
+  }
+  convertProficienciesAndLanguages(v, finalSetAttrs) {
+    if (v.other_proficiencies_and_languages) {
+      const proficieniesMatch = v.other_proficiencies_and_languages.match(/Proficiencies. (.*)/i);
+      if (proficieniesMatch && proficieniesMatch[1]) {
+        finalSetAttrs.proficiencies = proficieniesMatch[1];
+      }
+      const languagesMatch = v.other_proficiencies_and_languages.match(/Languages. (.*)/i);
+      if (languagesMatch && languagesMatch[1]) {
+        finalSetAttrs.languages = languagesMatch[1];
+      }
+    }
+  }
+  convertClass() {
+    getSetRepeatingItems('convert.convertClass', {
+      repeatingItems: ['repeating_class'],
+      collectionArray: ['class', 'base_level', 'multiclass1_flag'],
+      callback: (v, finalSetAttrs, ids, repeatingItem) => {
+        if (v.class) {
+          let repeatingString = `${repeatingItem}_${generateRowID()}_`;
+          finalSetAttrs[`${repeatingString}name`] = v.class.toLowerCase();
+          finalSetAttrs[`${repeatingString}level`] = getIntValue(v.base_level);
+
+          for (let i = 1; i <= 3; i++) {
+            if (v[`multiclass${i}_flag`]) {
+              repeatingString = `${repeatingItem}_${generateRowID()}_`;
+              finalSetAttrs[`${repeatingString}name`] = v[`multiclass${i}`].toLowerCase();
+              finalSetAttrs[`${repeatingString}level`] = getIntValue(v[`multiclass${i}_lvl`]);
+            }
+          }
+        }
+      },
+    });
+  }
+  convertPCSkills() {
+    const collectionArray = [];
+    for (const skill in SKILLS) {
+      if (SKILLS.hasOwnProperty(skill)) {
+        collectionArray.push(`${skill.toLowerCase()}_prof`);
+        collectionArray.push(`${skill.toLowerCase()}_type`);
+      }
+    }
+    getSetRepeatingItems('convert.convertPCSkills', {
+      repeatingItems: ['repeating_skill'],
+      collectionArray,
+      collectionArrayAddItems: ['proficiency'],
+      callback: (v, finalSetAttrs, ids, repeatingItem) => {
+        for (const skill in SKILLS) {
+          if (SKILLS.hasOwnProperty(skill)) {
+            const skillId = getSkillIdByStorageName(v, repeatingItem, ids, skill);
+            const repeatingString = `${repeatingItem}_${skillId}_`;
+
+            if (v[`${skill.toLowerCase()}_type`] === '2') {
+              finalSetAttrs[`${repeatingString}proficiency`] = 'expertise';
+            } else if (v[`${skill.toLowerCase()}_prof`]) {
+              finalSetAttrs[`${repeatingString}proficiency`] = 'proficient';
+            }
+          }
+        }
+      },
+    });
+  }
+  convertTraits() {
+    getSetRepeatingItems('convert.convertTraits', {
+      repeatingItems: ['repeating_npctrait'],
+      collectionArrayAddItems: ['name', 'desc'],
+      callback: (v, finalSetAttrs, ids, repeatingItem) => {
+        for (const id of ids) {
+          const repeatingString = `${repeatingItem}_${id}_`;
+          traits.set({
+            freetext: v[`${repeatingString}desc`],
+            name: v[`${repeatingString}name`].replace('.', ''),
+          });
+        }
+      },
+    });
+  }
+  convertActions(oldRepeatingName, repeatingName) {
+    getSetRepeatingItems('convert.convertActions', {
+      repeatingItems: [`repeating_${oldRepeatingName}`],
+      collectionArrayAddItems: ['name', 'attack_flag', 'attack_type_display', 'attack_tohitrange', 'attack_onhit', 'description'],
+      callback: (v, finalSetAttrs, ids, repeatingItem) => {
+        for (const id of ids) {
+          const repeatingStringOld = `${repeatingItem}_${id}_`;
+          const repeatingString = `repeating_${repeatingName}_${generateRowID()}_`;
+          finalSetAttrs[`${repeatingString}name`] = v[`${repeatingStringOld}name`];
+          if (v[`${repeatingStringOld}attack_flag`]) {
+            finalSetAttrs[`${repeatingString}roll_toggle`] = TOGGLE_VARS.roll
+            finalSetAttrs[`${repeatingString}freetext`] = `${v[`${repeatingStringOld}attack_type_display`]} ${v[`${repeatingStringOld}attack_tohitrange`]}\nHit: `;
+            if (v[`${repeatingStringOld}attack_onhit`]) {
+              finalSetAttrs[`${repeatingString}freetext`] += `${v[`${repeatingStringOld}attack_onhit`]}\n`;
+            }
+            if (v[`${repeatingStringOld}description`]) {
+              finalSetAttrs[`${repeatingString}freetext`] += `${v[`${repeatingStringOld}description`]}`;
+            }
+          } else {
+            finalSetAttrs[`${repeatingString}freetext`] = v[`${repeatingStringOld}description`];
+          }
+        }
+      },
+    });
+  }
+  convertNPCSpells() {
+    getSetRepeatingItems('convert.convertNPCSpells', {
+      repeatingItems: ['repeating_spell-npc'],
+      collectionArrayAddItems: ['spellname_base', 'spellprepared', 'spellritual', 'spellschool', 'spellcastingtime', 'spellrange', 'spelltarget', 'spellcomp_v', 'spellcomp_s', 'spellcomp_m', 'spellcomp_materials', 'spellconcentration', 'spellduration', 'spelldescription', 'spellathigherlevels'],
+      callback: (v, finalSetAttrs, ids, repeatingItem) => {
+        for (const id of ids) {
+          const repeatingStringOld = `${repeatingItem}_${id}_`;
+          const repeatingString = `repeating_spell_${generateRowID()}_`;
+
+          const nameLevelMatch = v[`${repeatingStringOld}spellname_base`].match(/(.*) \((.*)\)/i);
+          if (nameLevelMatch && nameLevelMatch[1]) {
+            finalSetAttrs[`${repeatingString}name`] = nameLevelMatch[1];
+            if (nameLevelMatch[2] && nameLevelMatch[2] === 'Cantrip') {
+              finalSetAttrs[`${repeatingString}level`] = ordinalSpellLevel(0);
+            } else if (nameLevelMatch[2]) {
+              finalSetAttrs[`${repeatingString}level`] = ordinalSpellLevel(nameLevelMatch[2]);
+            }
+          }
+          if (v[`${repeatingStringOld}spellprepared`]) {
+            finalSetAttrs[`${repeatingString}is_prepared`] = 'on';
+          }
+          if (v[`${repeatingStringOld}spellritual`]) {
+            finalSetAttrs[`${repeatingString}ritual`] = 'Yes';
+          }
+          finalSetAttrs[`${repeatingString}school`] = v[`${repeatingStringOld}spellschool`].toUpperCase();
+          finalSetAttrs[`${repeatingString}casting_time`] = v[`${repeatingStringOld}spellcastingtime`].trim().toUpperCase().replace(/\s/g, '_');
+          finalSetAttrs[`${repeatingString}range`] = v[`${repeatingStringOld}spellrange`];
+          finalSetAttrs[`${repeatingString}target`] = v[`${repeatingStringOld}spelltarget`];
+
+          const components = [];
+          if (v[`${repeatingStringOld}spellcomp_v`]) {
+            components.push('V');
+          }
+          if (v[`${repeatingStringOld}spellcomp_s`]) {
+            components.push('S');
+          }
+          if (v[`${repeatingStringOld}spellcomp_m`]) {
+            components.push('M');
+          }
+          if (components) {
+            finalSetAttrs[`${repeatingString}components`] = `COMPONENTS_${components.join('_')}`;
+          }
+          finalSetAttrs[`${repeatingString}materials`] = v[`${repeatingStringOld}spellcomp_materials`];
+
+          if (v[`${repeatingString}duration`]) {
+            let duration = '';
+            if (v[`${repeatingStringOld}spellconcentration`]) {
+              duration += 'CONCENTRATION_';
+            }
+            duration += v[`${repeatingStringOld}spellduration`].trim().toUpperCase().replace(/\s/g, '_');
+            finalSetAttrs[`${repeatingString}duration`] = duration;
+          }
+          finalSetAttrs[`${repeatingString}content`] = `${v[`${repeatingStringOld}spelldescription`]}\nAt Higher Levels: ${v[`${repeatingStringOld}spellathigherlevels`]}`;
+        }
+      },
+    });
+  }
+
   convertFromOGL() {
     const oldToNew = {
       npc: 'is_npc',
@@ -20,44 +227,71 @@ export class Convert {
       experience: 'xp',
       spellcasting_ability: 'default_ability',
     };
-    const collectionArray = [];
-    for (var key in oldToNew) {
+    const collectionArray = ['npc_type', 'hp_max', 'npc_hpformula', 'jack_of_all_trades', 'other_proficiencies_and_languages'];
+
+    for (const ability of ABILITIES) {
+      if (ABILITIES.hasOwnProperty(ability)) {
+        collectionArray.push(`npc_${getAbilityShortName(ability).toLowerCase()}_save`);
+      }
+    }
+    for (const skill in SKILLS) {
+      if (SKILLS.hasOwnProperty(skill)) {
+        collectionArray.push(`npc_${skill.toLowerCase()}`);
+      }
+    }
+    for (const key in oldToNew) {
       if (oldToNew.hasOwnProperty(key)) {
         collectionArray.push(key);
         collectionArray.push(oldToNew[key]);
       }
     }
-
     getSetItems('convert.convertFromOGL', {
       collectionArray,
       callback: (v, finalSetAttrs) => {
-        for (var key in oldToNew) {
+        finalSetAttrs.tab = 'core';
+        for (const key in oldToNew) {
           if (oldToNew.hasOwnProperty(key)) {
-            if (isUndefinedOrEmpty(v[oldToNew[key]]) && v[key]) {
+            console.log('oldToNew', v[key]);
+            if (v[key]) {
+              console.log('oldToNew[key]', oldToNew[key]);
+              console.log('v[key]', v[key]);
               finalSetAttrs[oldToNew[key]] = v[key];
             }
           }
         }
+        this.parseSizeTypeAlignment(v, finalSetAttrs);
+        this.parseHD(v, finalSetAttrs);
+        this.parseSavingThrows(v, finalSetAttrs);
+        this.parseNPCSkills(v, finalSetAttrs);
+        this.convertJackOfAllTrades(v, finalSetAttrs);
+        this.convertProficienciesAndLanguages(v, finalSetAttrs);
       },
     });
+    this.convertPCSkills();
+    this.convertTraits();
+    this.convertActions('npcaction', 'action');
+    this.convertActions('npcaction-l', 'legendaryaction');
+    this.convertClass();
+    this.convertNPCSpells();
   }
 }
 
-//convert "npc_type" to size, type, alignment
-//convert "npc_hpformula" to hd
-//convert "npc_str_save" to save prof -- all attributes
-//convert "npc_acrobatics" to repeating skills -- all skills
-//convert "acrobatics_prof" to repeating skills -- all skills
-//convert "repeating_npctrait" to repeating traits. "name", "desc"
-//convert "repeating_npcaction" to repeating actions. "name", "attack_flag" to attack toggle, "attack_type" to type - "Melee" or "Ranged", "attack_range" to reach and range, "attack_tohit" as integer, "attack_target" ignored, "attack_damage" to "damage", "attack_damagetype" to "damage_type", "attack_damage2" to "second_damage", "attack_damagetype2" to "second_damage_type", "description" empty?
-//convert "other_proficiencies_and_languages" to profs and languages: "Proficiencies. All armor, shields, simple weapons, martial weapons, carpenter’s tools, vehicles (land)   Languages. Common, Elvish"
-//convert "hit_dice_max" to something
-//convert "attacks" to repeating attacks
-//convert "class" and "base_level" to repeating class
-//convert "repeating_inventory" to equipment. "itemcount" to "qty", "itemname", "itemweight", "equipped"
+//
 
-//convert "repeating_spell-cantrip", "repeating_spell-1" etc to "repeating_spells". "spellname_base", "spellprepared", "spellschool", "spellritual", "spellcastingtime", "spellrange", "spelltarget" to "target", "spellcomp_v" and "spellcomp_s" and "spellcomp_m" and "spellcomp_materials", "spellconcentration", "spellduration", "spelloutput", "spelldescription", "spellathigherlevels"
+/*
+NPC Convcersion
+ * convert "hit_dice_max" to something
+ *
+ * things to fix:
+  * weapons like "3 (1d6-1) bludgeoning damage plus 3 (1d6) poison damage" aren't converting both damages
+  * Spells are not doing attack, dmg, etc
+  * Erroring spell added for each normal spell
+  *
 
-//convert ac to some armor
+PC Conversion:
+ * convert "attacks" to repeating attacks
+ * convert "repeating_inventory" to equipment. "itemcount" to "qty", "itemname", "itemweight", "equipped"
+ * convert "repeating_spell-cantrip", "repeating_spell-1" etc to "repeating_spells". "spellname_base", "spellprepared", "spellschool", "spellritual", "spellcastingtime", "spellrange", "spelltarget" to "target", "spellcomp_v" and "spellcomp_s" and "spellcomp_m" and "spellcomp_materials", "spellconcentration", "spellduration", "spelloutput", "spelldescription", "spellathigherlevels"
+ * convert ac to some armor
 
-
+ */
