@@ -227,6 +227,7 @@ export class Npc {
     const collectionArray = ['hit_dice', 'hit_die'];
     for (const key in hd) {
       if (hd.hasOwnProperty(key)) {
+        collectionArray.push(`hd_${key}`);
         collectionArray.push(`hd_${key}_max`);
         collectionArray.push(`hd_${key}_query`);
         collectionArray.push(`hd_${key}_toggle`);
