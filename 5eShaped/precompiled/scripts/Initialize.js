@@ -85,6 +85,7 @@ export class Initialize {
             abilities.updateModifiers();
           });
           if (convertOGL) {
+            proficiencyBonus.update();
             this.generateSkills();
             savingThrows.update();
             abilities.updateModifiers();
