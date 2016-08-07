@@ -227,6 +227,7 @@ export class Npc {
     const collectionArray = ['hit_dice', 'hit_die'];
     for (const key in hd) {
       if (hd.hasOwnProperty(key)) {
+        collectionArray.push(`hd_${key}`);
         collectionArray.push(`hd_${key}_max`);
         collectionArray.push(`hd_${key}_query`);
         collectionArray.push(`hd_${key}_toggle`);
@@ -321,7 +322,6 @@ export class Npc {
               repeatingString = `repeating_regionaleffect_${generateRowID()}_`;
               finalSetAttrs[`${repeatingString}freetext`] = regionalEffect.trim();
             });
-            finalSetAttrs.regional_effects_fade = regionalEffectsList.slice(-1)[0];
           }
           if (content.indexOf('Lair Actions') !== -1) {
             const lairActionsSplit = content.split(/Lair Actions\n/);

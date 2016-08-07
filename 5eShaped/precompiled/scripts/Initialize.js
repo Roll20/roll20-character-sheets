@@ -6,7 +6,9 @@ import { AbilityChecks } from './AbilityChecks';
 const abilityChecks = new AbilityChecks();
 import { Character } from './Character';
 const character = new Character();
-import { SKILLS } from './constants';
+import { ABILITIES, SKILLS } from './constants';
+import { Convert } from './Convert';
+const convert = new Convert();
 import { Equipment } from './Equipment';
 const equipment = new Equipment();
 import { ProficiencyBonus } from './ProficiencyBonus';
@@ -48,47 +50,29 @@ export class Initialize {
       },
     });
   }
-  checkVersionFormat(version, finalSetAttrs) {
-    const versionRegex = /\d+\.\d+\.\d+/gi;
-    const versionIsProperFormat = versionRegex.exec(version);
 
-    if (version && !versionIsProperFormat) {
-      finalSetAttrs.version = version = currentVersion;
-    }
-    return version;
-  }
   sheetOpened() {
     console.log('initialize.sheetOpened');
+    const collectionArray = ['version', 'npc', 'base_level', 'convertedFromOGL', 'import_data', 'roll_setting'];
+    for (const ability of ABILITIES) {
+      collectionArray.push(ability);
+    }
     getSetItems('initialize.sheetOpened', {
-      collectionArray: ['version', 'strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma', 'import_data', 'roll_setting'],
+      collectionArray,
       callback: (v, finalSetAttrs) => {
-        const version = this.checkVersionFormat(v.version, finalSetAttrs);
-
-        if (!version) {
-          if (!v.import_data) {
+        const convertOGL = (v.npc || v.base_level) && !v.convertedFromOGL;
+        if (!v.version || convertOGL) {
+          if (!v.import_data && !convertOGL) {
             finalSetAttrs.edit_mode = 'on';
           }
           if (isUndefinedOrEmpty(v.roll_setting)) { // API Script import sets this when making characters
             finalSetAttrs.roll_setting = '{{ignore=[[0';
           }
           const setAbilities = {};
-          if (isUndefinedOrEmpty(v.strength)) {
-            setAbilities.strength = 10;
-          }
-          if (isUndefinedOrEmpty(v.dexterity)) {
-            setAbilities.dexterity = 10;
-          }
-          if (isUndefinedOrEmpty(v.constitution)) {
-            setAbilities.constitution = 10;
-          }
-          if (isUndefinedOrEmpty(v.intelligence)) {
-            setAbilities.intelligence = 10;
-          }
-          if (isUndefinedOrEmpty(v.wisdom)) {
-            setAbilities.wisdom = 10;
-          }
-          if (isUndefinedOrEmpty(v.charisma)) {
-            setAbilities.charisma = 10;
+          for (const ability of ABILITIES) {
+            if (isUndefinedOrEmpty(v[ability])) {
+              setAbilities[ability] = 10;
+            }
           }
           setFinalAttrs(v, setAbilities, 'initialize', () => {
             proficiencyBonus.update();
@@ -100,13 +84,21 @@ export class Initialize {
             spells.updateShowHide();
             abilities.updateModifiers();
           });
+          if (convertOGL) {
+            proficiencyBonus.update();
+            this.generateSkills();
+            savingThrows.update();
+            abilities.updateModifiers();
+            convert.convertFromOGL();
+          }
         } else {
           upgrade.upgrade();
         }
 
-        if (isUndefinedOrEmpty(version) || !version || version !== currentVersion) {
+        if (isUndefinedOrEmpty(v.version) || !v.version || v.version !== currentVersion) {
           finalSetAttrs.version = currentVersion;
         }
+        //finalSetAttrs.convertedFromOGL = true;
       },
     });
   }
