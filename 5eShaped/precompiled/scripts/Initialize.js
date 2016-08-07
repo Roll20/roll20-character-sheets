@@ -98,7 +98,9 @@ export class Initialize {
         if (isUndefinedOrEmpty(v.version) || !v.version || v.version !== currentVersion) {
           finalSetAttrs.version = currentVersion;
         }
-        //finalSetAttrs.convertedFromOGL = true;
+        if (isUndefinedOrEmpty(v.convertedFromOGL) || !v.convertedFromOGL) {
+          finalSetAttrs.convertedFromOGL = true;
+        }
       },
     });
   }
