@@ -153,7 +153,6 @@ export class Convert {
                 finalSetAttrs[`${repeatingString}freetext`] += ` ${v[`${repeatingStringOld}description`]}`;
               }
               finalSetAttrs[`${repeatingString}freetext`] += '\n';
-
             } else {
               if (v[`${repeatingStringOld}description`]) {
                 finalSetAttrs[`${repeatingString}freetext`] += `${v[`${repeatingStringOld}description`]}`;
@@ -325,10 +324,7 @@ export class Convert {
 
 /*
 NPC Convcersion
- * convert "hit_dice_max" to something
- *
- * things to fix:
-  * weapons like "3 (1d6-1) bludgeoning damage plus 3 (1d6) poison damage" aren't converting both damages
+ * weapons like "3 (1d6-1) bludgeoning damage plus 3 (1d6) poison damage" aren't converting both damages
 
 PC Conversion:
  * convert "attacks" to repeating attacks
