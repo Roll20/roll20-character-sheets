@@ -3,9 +3,19 @@
 import { ABILITIES, SKILLS, TOGGLE_VARS } from './constants';
 import { Traits } from './Traits';
 const traits = new Traits();
-import { getSetItems, getSetRepeatingItems, isUndefinedOrEmpty, capitalize, getAbilityShortName, getSkillIdByStorageName, getIntValue, ordinalSpellLevel } from './utilities';
+import { getSetItems, getSetRepeatingItems, capitalize, getAbilityShortName, getSkillIdByStorageName, getIntValue, ordinalSpellLevel } from './utilities';
 
 export class Convert {
+  parseSpellcastingAbility(v, finalSetAttrs) {
+    if (v.spellcasting_ability) {
+      finalSetAttrs.default_ability = v.spellcasting_ability
+        .replace('@', '')
+        .replace('{', '')
+        .replace('_mod', '')
+        .replace('}', '')
+        .replace('+', '');
+    }
+  }
   parseSizeTypeAlignment(v, finalSetAttrs) {
     const type = v.npc_type;
     const match = type.match(/(.*?) (.*?), (.*)/i);
@@ -22,13 +32,12 @@ export class Convert {
   parseSavingThrows(v, finalSetAttrs) {
     const savingThrows = [];
     for (const ability of ABILITIES) {
-      const saveValue = v[`npc_${getAbilityShortName(ability).toLowerCase()}_save`];
-      console.log('saveValue', saveValue);
+      const saveValue = v[`npc_${getAbilityShortName(ability)}_save`];
       if (saveValue) {
-        savingThrows.push(`${getAbilityShortName(ability)} +${saveValue}`);
+        savingThrows.push(`${getAbilityShortName(ability, true)} +${saveValue}`);
       }
     }
-    if (savingThrows.length > 1) {
+    if (savingThrows.length > 0) {
       finalSetAttrs.saving_throws_srd = savingThrows.join(', ');
     }
   }
@@ -130,24 +139,30 @@ export class Convert {
   convertActions(oldRepeatingName, repeatingName) {
     getSetRepeatingItems('convert.convertActions', {
       repeatingItems: [`repeating_${oldRepeatingName}`],
-      collectionArrayAddItems: ['name', 'attack_flag', 'attack_type_display', 'attack_tohitrange', 'attack_onhit', 'description'],
+      collectionArrayAddItems: ['name', 'attack_type_display', 'attack_tohitrange', 'attack_tohit', 'attack_onhit', 'description'],
       callback: (v, finalSetAttrs, ids, repeatingItem) => {
         for (const id of ids) {
           const repeatingStringOld = `${repeatingItem}_${id}_`;
           const repeatingString = `repeating_${repeatingName}_${generateRowID()}_`;
           finalSetAttrs[`${repeatingString}name`] = v[`${repeatingStringOld}name`];
-          if (v[`${repeatingStringOld}attack_flag`]) {
-            finalSetAttrs[`${repeatingString}roll_toggle`] = TOGGLE_VARS.roll
-            finalSetAttrs[`${repeatingString}freetext`] = `${v[`${repeatingStringOld}attack_type_display`]} ${v[`${repeatingStringOld}attack_tohitrange`]}\nHit: `;
+          if (v[`${repeatingStringOld}attack_type_display`]) {
+            finalSetAttrs[`${repeatingString}freetext`] = `${v[`${repeatingStringOld}attack_type_display`]} ${v[`${repeatingStringOld}attack_tohitrange`]} Hit: `;
             if (v[`${repeatingStringOld}attack_onhit`]) {
-              finalSetAttrs[`${repeatingString}freetext`] += `${v[`${repeatingStringOld}attack_onhit`]}\n`;
-            }
-            if (v[`${repeatingStringOld}description`]) {
-              finalSetAttrs[`${repeatingString}freetext`] += `${v[`${repeatingStringOld}description`]}`;
+              finalSetAttrs[`${repeatingString}freetext`] += `${v[`${repeatingStringOld}attack_onhit`]}`;
+              if (v[`${repeatingStringOld}description`]) {
+                finalSetAttrs[`${repeatingString}freetext`] += ` ${v[`${repeatingStringOld}description`]}`;
+              }
+              finalSetAttrs[`${repeatingString}freetext`] += '\n';
+
+            } else {
+              if (v[`${repeatingStringOld}description`]) {
+                finalSetAttrs[`${repeatingString}freetext`] += `${v[`${repeatingStringOld}description`]}`;
+              }
             }
           } else {
             finalSetAttrs[`${repeatingString}freetext`] = v[`${repeatingStringOld}description`];
           }
+          finalSetAttrs[`${repeatingString}freetext`] = finalSetAttrs[`${repeatingString}freetext`].replace(/Attack:\s?\+(\d+)/i, 'Attack: +$1 to hit');
         }
       },
     });
@@ -155,7 +170,7 @@ export class Convert {
   convertNPCSpells() {
     getSetRepeatingItems('convert.convertNPCSpells', {
       repeatingItems: ['repeating_spell-npc'],
-      collectionArrayAddItems: ['spellname_base', 'spellprepared', 'spellritual', 'spellschool', 'spellcastingtime', 'spellrange', 'spelltarget', 'spellcomp_v', 'spellcomp_s', 'spellcomp_m', 'spellcomp_materials', 'spellconcentration', 'spellduration', 'spelldescription', 'spellathigherlevels'],
+      collectionArrayAddItems: ['spellname_base', 'spellprepared', 'spellritual', 'spellschool', 'spellcastingtime', 'spellrange', 'spelltarget', 'spellcomp_v', 'spellcomp_s', 'spellcomp_m', 'spellcomp_materials', 'spellconcentration', 'spellduration', 'spelldescription', 'spellathigherlevels', 'spelloutput', 'spelldamage', 'spelldamagetype', 'spelldamage2', 'spelldamagetype2', 'spellhealing', 'spellsave', 'spellsavesuccess', 'spellhldie'],
       callback: (v, finalSetAttrs, ids, repeatingItem) => {
         for (const id of ids) {
           const repeatingStringOld = `${repeatingItem}_${id}_`;
@@ -167,10 +182,10 @@ export class Convert {
             if (nameLevelMatch[2] && nameLevelMatch[2] === 'Cantrip') {
               finalSetAttrs[`${repeatingString}level`] = ordinalSpellLevel(0);
             } else if (nameLevelMatch[2]) {
-              finalSetAttrs[`${repeatingString}level`] = ordinalSpellLevel(nameLevelMatch[2]);
+              finalSetAttrs[`${repeatingString}spell_level`] = ordinalSpellLevel(getIntValue(nameLevelMatch[2].replace('Level ', '')));
             }
           }
-          if (v[`${repeatingStringOld}spellprepared`]) {
+          if (!v[`${repeatingStringOld}spellprepared`] || v[`${repeatingStringOld}spellprepared`] === '1') {
             finalSetAttrs[`${repeatingString}is_prepared`] = 'on';
           }
           if (v[`${repeatingStringOld}spellritual`]) {
@@ -182,21 +197,21 @@ export class Convert {
           finalSetAttrs[`${repeatingString}target`] = v[`${repeatingStringOld}spelltarget`];
 
           const components = [];
-          if (v[`${repeatingStringOld}spellcomp_v`]) {
+          if (v[`${repeatingStringOld}spellcomp_v`] === '{{v=1}}') {
             components.push('V');
           }
-          if (v[`${repeatingStringOld}spellcomp_s`]) {
+          if (v[`${repeatingStringOld}spellcomp_s`] === '{{s=1}}') {
             components.push('S');
           }
-          if (v[`${repeatingStringOld}spellcomp_m`]) {
+          if (v[`${repeatingStringOld}spellcomp_m`] === '{{m=1}}') {
             components.push('M');
           }
-          if (components) {
+          if (components.length > 0) {
             finalSetAttrs[`${repeatingString}components`] = `COMPONENTS_${components.join('_')}`;
           }
           finalSetAttrs[`${repeatingString}materials`] = v[`${repeatingStringOld}spellcomp_materials`];
 
-          if (v[`${repeatingString}duration`]) {
+          if (v[`${repeatingStringOld}spellduration`]) {
             let duration = '';
             if (v[`${repeatingStringOld}spellconcentration`]) {
               duration += 'CONCENTRATION_';
@@ -204,7 +219,41 @@ export class Convert {
             duration += v[`${repeatingStringOld}spellduration`].trim().toUpperCase().replace(/\s/g, '_');
             finalSetAttrs[`${repeatingString}duration`] = duration;
           }
+          if (v[`${repeatingStringOld}spelloutput`] === 'ATTACK') {
+            finalSetAttrs[`${repeatingString}roll_toggle`] = TOGGLE_VARS.roll;
+          }
+          if (v[`${repeatingStringOld}spelldamage`]) {
+            finalSetAttrs[`${repeatingString}damage_toggle`] = TOGGLE_VARS.damage;
+            finalSetAttrs[`${repeatingString}damage`] = v[`${repeatingStringOld}spelldamage`];
+          }
+          if (v[`${repeatingStringOld}spelldamagetype`]) {
+            finalSetAttrs[`${repeatingString}damage_type`] = v[`${repeatingStringOld}spelldamagetype`];
+          }
+          if (v[`${repeatingStringOld}spelldamage2`]) {
+            finalSetAttrs[`${repeatingString}second_damage`] = v[`${repeatingStringOld}spelldamage2`];
+          }
+          if (v[`${repeatingStringOld}spelldamagetype2`]) {
+            finalSetAttrs[`${repeatingString}second_damage_type`] = v[`${repeatingStringOld}spelldamagetype2`];
+          }
+          if (v[`${repeatingStringOld}spellhealing`]) {
+            finalSetAttrs[`${repeatingString}heal`] = v[`${repeatingStringOld}spellhealing`];
+          }
+          if (v[`${repeatingStringOld}spellsave`]) {
+            finalSetAttrs[`${repeatingString}saving_throw_vs_ability`] = v[`${repeatingStringOld}spellsave`].toUpperCase();
+          }
+          if (v[`${repeatingStringOld}spellsavesuccess`]) {
+            finalSetAttrs[`${repeatingString}saving_throw_success`] = v[`${repeatingStringOld}spellsavesuccess`];
+          }
+          if (v[`${repeatingStringOld}spellhldie`]) {
+            finalSetAttrs[`${repeatingString}higher_level_dice`] = v[`${repeatingStringOld}spellhldie`];
+          }
+          if (v[`${repeatingStringOld}spellhldietype`]) {
+            finalSetAttrs[`${repeatingString}higher_level_die`] = v[`${repeatingStringOld}spellhldietype`];
+          }
+
           finalSetAttrs[`${repeatingString}content`] = `${v[`${repeatingStringOld}spelldescription`]}\nAt Higher Levels: ${v[`${repeatingStringOld}spellathigherlevels`]}`;
+
+          finalSetAttrs[`${repeatingString}toggle_details`] = '0';
         }
       },
     });
@@ -225,14 +274,12 @@ export class Convert {
       npc_languages: 'languages',
       hp_temp: 'temp_HP',
       experience: 'xp',
-      spellcasting_ability: 'default_ability',
+      npc_legendary_actions: 'legendary_action_amount',
     };
-    const collectionArray = ['npc_type', 'hp_max', 'npc_hpformula', 'jack_of_all_trades', 'other_proficiencies_and_languages'];
+    const collectionArray = ['npc_type', 'hp_max', 'npc_hpformula', 'jack_of_all_trades', 'other_proficiencies_and_languages', 'spellcasting_ability'];
 
     for (const ability of ABILITIES) {
-      if (ABILITIES.hasOwnProperty(ability)) {
-        collectionArray.push(`npc_${getAbilityShortName(ability).toLowerCase()}_save`);
-      }
+      collectionArray.push(`npc_${getAbilityShortName(ability).toLowerCase()}_save`);
     }
     for (const skill in SKILLS) {
       if (SKILLS.hasOwnProperty(skill)) {
@@ -242,7 +289,6 @@ export class Convert {
     for (const key in oldToNew) {
       if (oldToNew.hasOwnProperty(key)) {
         collectionArray.push(key);
-        collectionArray.push(oldToNew[key]);
       }
     }
     getSetItems('convert.convertFromOGL', {
@@ -259,6 +305,7 @@ export class Convert {
             }
           }
         }
+        this.parseSpellcastingAbility(v, finalSetAttrs);
         this.parseSizeTypeAlignment(v, finalSetAttrs);
         this.parseHD(v, finalSetAttrs);
         this.parseSavingThrows(v, finalSetAttrs);
@@ -271,6 +318,7 @@ export class Convert {
     this.convertTraits();
     this.convertActions('npcaction', 'action');
     this.convertActions('npcaction-l', 'legendaryaction');
+    this.convertActions('npcreaction', 'reaction');
     this.convertClass();
     this.convertNPCSpells();
   }
