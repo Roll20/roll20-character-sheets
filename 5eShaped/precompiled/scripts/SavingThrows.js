@@ -1,6 +1,6 @@
 /* global on:false */
 
-import { getSetItems, getIntValue, getAbilityShortName, addArithmeticOperator, isUndefinedOrEmpty, exists, showSign, getAbilityMod } from './utilities';
+import { getSetItems, getIntValue, getAbilityShortName, addArithmeticOperator, isUndefinedOrEmpty, exists, showSign, getAbilityMod, getAbilityValue } from './utilities';
 import { ABILITIES } from './constants';
 
 export class SavingThrows {
@@ -168,29 +168,29 @@ export class SavingThrows {
     this.updateCustomSavingThrows();
   }
   updateFromSRD() {
+    const collectionArray = ['pb', 'saving_throws_srd'];
+    for (const ability of ABILITIES) {
+      collectionArray.push(`${ability}_mod`);
+      collectionArray.push(`${ability}_save_prof`);
+      collectionArray.push(`${ability}_save_bonus`);
+    }
     getSetItems('savingThrows.updateFromSRD', {
-      collectionArray: ['saving_throws_srd'],
+      collectionArray,
       callback: (v, finalSetAttrs) => {
-        const savingThrowsFromSRD = v.saving_throws_srd;
-        const pbVar = '@{PB}';
+        for (const ability of ABILITIES) {
+          const shortAbility = getAbilityShortName(ability, true);
+          if (v.saving_throws_srd && v.saving_throws_srd.indexOf(shortAbility) !== -1) {
+            finalSetAttrs[`${ability}_save_prof`] = '@{PB}';
 
-        if (savingThrowsFromSRD.indexOf('Str') !== -1) {
-          finalSetAttrs.strength_save_prof = pbVar;
-        }
-        if (savingThrowsFromSRD.indexOf('Dex') !== -1) {
-          finalSetAttrs.dexterity_save_prof = pbVar;
-        }
-        if (savingThrowsFromSRD.indexOf('Con') !== -1) {
-          finalSetAttrs.constitution_save_prof = pbVar;
-        }
-        if (savingThrowsFromSRD.indexOf('Int') !== -1) {
-          finalSetAttrs.intelligence_save_prof = pbVar;
-        }
-        if (savingThrowsFromSRD.indexOf('Wis') !== -1) {
-          finalSetAttrs.wisdom_save_prof = pbVar;
-        }
-        if (savingThrowsFromSRD.indexOf('Cha') !== -1) {
-          finalSetAttrs.charisma_save_prof = pbVar;
+            const regex = new RegExp(`${shortAbility}\\s?\\+(\\d+)`, 'i');
+            const match = v.saving_throws_srd.match(regex);
+            if (match && match[1]) {
+              const savingThrowValue = getIntValue(match[1]) - getIntValue(v.pb) - getAbilityValue(v, ability);
+              if (savingThrowValue !== 0) {
+                finalSetAttrs[`${ability}_save_bonus`] = savingThrowValue;
+              }
+            }
+          }
         }
       },
     });
