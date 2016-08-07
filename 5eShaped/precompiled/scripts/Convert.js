@@ -297,10 +297,7 @@ export class Convert {
         finalSetAttrs.tab = 'core';
         for (const key in oldToNew) {
           if (oldToNew.hasOwnProperty(key)) {
-            console.log('oldToNew', v[key]);
             if (v[key]) {
-              console.log('oldToNew[key]', oldToNew[key]);
-              console.log('v[key]', v[key]);
               finalSetAttrs[oldToNew[key]] = v[key];
             }
           }
@@ -332,9 +329,6 @@ NPC Convcersion
  *
  * things to fix:
   * weapons like "3 (1d6-1) bludgeoning damage plus 3 (1d6) poison damage" aren't converting both damages
-  * Spells are not doing attack, dmg, etc
-  * Erroring spell added for each normal spell
-  *
 
 PC Conversion:
  * convert "attacks" to repeating attacks
