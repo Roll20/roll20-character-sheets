@@ -11,6 +11,8 @@ Création.
 
 ##v1.1 (2016-02-24)
 
-Ajustement des feildset pour qu'ils fonctionne
-mettre le minimun dans les input number
-une petit formatage du html
+-Ajustement des feildset pour qu'ils fonctionne
+
+-mettre le minimun dans les input number
+
+-une petit formatage du html
