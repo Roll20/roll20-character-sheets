@@ -9,7 +9,7 @@ Je n'ai pas utilisé de CSS.
 
 Création.
 
-##v1.1 (2016-02-24)
+##v1.1 (2016-08-14)
 
 -Ajustement des feildset pour qu'ils fonctionne
 
