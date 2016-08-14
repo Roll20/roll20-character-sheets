@@ -13,6 +13,6 @@ Création.
 
 -Ajustement des feildset pour qu'ils fonctionne
 
--mettre le minimun dans les input number
+-mettre le minimun dans les input number et rajouter des input pour les champs
 
 -une petit formatage du html
