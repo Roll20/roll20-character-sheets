@@ -3,7 +3,7 @@
 Feuille de personnage (FdP) avec jets intégrés pour **Savage Worlds** et **Deadlands Reloaded**, basée sur le Livre de Base (LdB) de la version éditée en français par [Black Book Editions](http://www.black-book-editions.fr/catalogue.php?id=58).
 
 # Version courante
-1.5 [Capture d'écran](sawofr.jpg)  
+1.6 [Capture d'écran](sawofr.jpg)  
 [Style Deadlands](sawofr_style_deadlands.png)
 
 #Notes sur les Jets
@@ -81,6 +81,13 @@ Les suggestions sont les bienvenues à ce sujet.
 NB : décrémenter les PP automatiquement au lancement d'un pouvoir nécessiterait l'utilisation d'un script API, donc d'un compte "Pro".
 
 # Notes de version
+
+##v1.6 (2016-07-30)
+
+* Ajout d'un jet de compétence "Non entraîné", afin de pouvoir masquer toutes les compétences non entraînées et faire les jets tout de même
+* Ajout d'une champ de saisie de "Notes" en fin de feuille
+* Correction des compétences personnalisées : il est désormais possible de saisir un malus (<0)
+* Ajout de la portée et légère remise en page sur l'affichage des pouvoirs dans le chat
 
 ##v1.5 (2016-02-28)
 Correction d'affichage sous Firefox.
