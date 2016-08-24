@@ -8,7 +8,28 @@ Report any problems, suggestions or features by sending a private message on Rol
 
 [Kevin Searle](https://app.roll20.net/users/565104/) on Roll20 or [@kevinsearle](https://twitter.com/kevinsearle) on Twitter
 
+### Contributors
+
+[MankiGames](https://github.com/MankiGames)
+[Shadowriku](https://github.com/Shadowriku)
+[RonaldZ](https://github.com/RonaldZ)
+[jfredett](https://github.com/jfredett)
+[CoalPoweredPuppet](https://github.com/CoalPoweredPuppet)
+
 ### Changelog
+
+#### 0.1.1
+
+* Weapon auto-attack calculated by attribute modifier and skill level.
+* Drop-down menu added for those fields.
+
+#### 0.1.0
+
+* Attribute modifiers are now auto-calculated
+* Split Basic Attack button into Basic Melee Attack and Basic Ranged Attack buttons
+* Basic Attacks use auto-calculated attribute modifier based on type of attack
+* Attack roll template handle Basic Attacks and Weapon attacks
+* Added character name to Weapon Attack and Basic Attack roll templates
 
 #### 0.0.9
 
