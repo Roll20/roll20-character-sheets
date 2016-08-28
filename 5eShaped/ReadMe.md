@@ -29,8 +29,8 @@ Please report any bugs in the [issues tab](https://github.com/mlenser/roll20-cha
   * Roll settings to choose to always roll with advantage, disadvantage, or query for both
   * Optional bonuses to all skills, abilities, saving throws, etc.
 
-![PC sheet](http://i.imgur.com/T2hbvnA.jpg "PC sheet")
-![NPC sheet](http://i.imgur.com/li1ETpJ.jpg "NPC sheet")
+![NPC sheet](http://i.imgur.com/CTSxo4a.png "NPC sheet")
+![PC sheet](http://i.imgur.com/ufXveK2.png "PC sheet")
 
 ## How to Update the sheet yourself (as Pro):
 
@@ -40,7 +40,9 @@ Please report any bugs in the [issues tab](https://github.com/mlenser/roll20-cha
 4. In the HTML tab paste the HTML code
 5. Copy the [css](https://raw.githubusercontent.com/mlenser/roll20-character-sheets/master/5eShaped/5eShaped.css) from github
 6. On Roll20 in the CSS tab paste the CSS code.
-7. Hit save.
+7. Copy the [translation](https://github.com/mlenser/roll20-character-sheets/tree/master/5eShaped/translations) from the appropriate file on github (en is English, fr is French, de is German, it is Italian, etc)
+8. On Roll20 in the Translation tab paste the JSON from the appropriate file.
+9. Hit save.
 
 ## Contribute
 Since many have asked for it: If you appreciate what I do and want to compensate me for the countless hours that I have spent building this character sheet feel free to support me on [Patreon](https://www.patreon.com/mlenser) or Paypal (mlenser@gmail.com).

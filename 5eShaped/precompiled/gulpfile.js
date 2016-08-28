@@ -21,12 +21,17 @@ const request = require('request');
 const gutil = require('gulp-util');
 const sortJSON = require('gulp-json-sort').default;
 
-String.prototype.capitalize = function () {
-  return this.replace(/\w\S*/g, function (txt) {
+const browserify = require('browserify');
+const babelify = require('babelify');
+const source = require('vinyl-source-stream');
+const buffer = require('vinyl-buffer');
+
+String.prototype.capitalize = () => {
+  return this.replace(/\w\S*/g, (txt) => {
     return txt.charAt(0).toUpperCase() + txt.substr(1)
   });
 };
-String.prototype.lowercase = function () {
+String.prototype.lowercase = () => {
   return this.toLowerCase();
 };
 
@@ -69,22 +74,24 @@ const compileSheetHTML = () => {
     }));
 };
 const compileSheetWorkers = () => {
-  return gulp.src(['components/sheetWorkers.js'])
-    .pipe(babel({
+  return browserify('./scripts/sheetWorkers.js')
+    .transform(babelify, {
       presets: ['es2015'],
       comments: false,
       compact: true
-    }))
+    }).bundle()
+    .pipe(source('sheetWorkers.js'))
+    .pipe(buffer())
     .pipe(wrapper({
       header: '<script type="text/worker">',
       footer: '</script>'
-    }));
+    }))
 };
 const compileRollTemplate = () => {
   return gulp.src(['./components/rollTemplate.html']);
 };
 
-gulp.task('compile', ['sass', 'translationDist'], function () {
+gulp.task('compile', ['sass', 'translationDist'], () => {
   return streamqueue({objectMode: true},
     compileSheetHTML(),
     compileSheetWorkers(),
@@ -94,22 +101,9 @@ gulp.task('compile', ['sass', 'translationDist'], function () {
     .pipe(gulp.dest('../'))
 });
 
-const esLintConfig = {
-  parser: 'babel-eslint',
-  extends: 'airbnb/base',
-  rules: {
-    'arrow-body-style': 0,
-    'indent': 0,
-    'max-len': 0,
-    'no-cond-assign': 0,
-    'no-console': 0,
-    'no-param-reassign': 0,
-    'no-undef': 0
-  }
-};
-gulp.task('lint', function () {
-  return gulp.src(['components/sheetWorkers.js'])
-    .pipe(eslint(esLintConfig))
+gulp.task('lint', () => {
+  return gulp.src(['./scripts/*.js'])
+    .pipe(eslint())
     .pipe(eslint.format())
     .pipe(eslint.failAfterError());
 });
@@ -126,23 +120,23 @@ const sassConfig = {
     include: 0
   }
 };
-gulp.task('sass', function () {
+gulp.task('sass', () => {
   return gulp.src('./5eShaped.scss')
     .pipe(sass().on('error', sass.logError))
     .pipe(autoprefixer())
     .pipe(minifyCss())
     .pipe(gulp.dest('../'));
 });
-gulp.task('sass-lint', function() {
+gulp.task('sass-lint', () => {
   return gulp.src('./5eShaped.scss')
     .pipe(sassLint(sassConfig))
     .pipe(sassLint.format())
     .pipe(sassLint.failOnError())
 });
 
-gulp.task('sort-translations', function() {
+gulp.task('sort-translations', () => {
   return gulp.src('../translations/*.json')
-    .pipe(sortJSON({ space: 1 }))
+    .pipe(sortJSON({ space: 2 }))
     .pipe(replaceTask({
       patterns: [
         {
@@ -192,7 +186,7 @@ gulp.task('submit', ['compile'], (done) => {
   );
 });
 
-gulp.task('translationDist', function () {
+gulp.task('translationDist', () => {
   return gulp.src('../translations/en.json')
     .pipe(rename('translation.json'))
     .pipe(gulp.dest('../'));
