@@ -50,6 +50,30 @@ export class Spells {
       },
     });
   }
+  updateDefaultAbility() {
+    getSetRepeatingItems('spells.update', {
+      repeatingItems: ['repeating_spell'],
+      collectionArray: ['default_ability'],
+      collectionArrayAddItems: ['attack_ability', 'damage_ability', 'second_damage_ability', 'saving_throw_ability', 'heal_ability'],
+      callback: (v, finalSetAttrs, ids, repeatingItem) => {
+        for (const id of ids) {
+          const repeatingString = `${repeatingItem}_${id}_`;
+
+          finalSetAttrs[`${repeatingString}attack_ability`] = v.default_ability;
+          if (v[`${repeatingString}damage_ability`]) {
+            finalSetAttrs[`${repeatingString}damage_ability`] = v.default_ability;
+          }
+          if (v[`${repeatingString}second_damage_ability`]) {
+            finalSetAttrs[`${repeatingString}second_damage_ability`] = v.default_ability;
+          }
+          finalSetAttrs[`${repeatingString}saving_throw_ability`] = v.default_ability;
+          if (v[`${repeatingString}heal_ability`]) {
+            finalSetAttrs[`${repeatingString}heal_ability`] = v.default_ability;
+          }
+        }
+      },
+    });
+  }
   update(rowId) {
     const collectionArray = ['is_npc', 'pb', 'finesse_mod', 'global_spell_attack_bonus', 'global_spell_damage_bonus', 'global_spell_dc_bonus', 'global_spell_heal_bonus', 'default_ability', 'caster_level', 'base_dc'];
     for (const ability of ABILITIES) {
@@ -438,6 +462,9 @@ export class Spells {
       if (repeatingInfo && repeatingInfo.field !== 'roll_toggle' && repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'damage_crit' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'second_damage_crit' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'heal_formula' && repeatingInfo.field !== 'higher_level_query' && repeatingInfo.field !== 'parsed') {
         this.update(repeatingInfo.rowId);
       }
+    });
+    on('change:default_ability', () => {
+      this.updateDefaultAbility();
     });
     on('change:pb change:global_spell_attack_bonus change:global_spell_damage_bonus change:global_spell_dc_bonus change:global_spell_heal_bonus', () => {
       this.update();
