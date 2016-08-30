@@ -273,6 +273,7 @@ export class Actions {
     const spellcastingRegex = /(\d+)\w+\slevel\s\((\d+)\s?slot(?:s)?\)/gi;
     const spellcastingLevelRegex = /(\d+)(?:st|dn|rd|th)-level spellcaster/i;
     const spellcastingAbilityRegex = /spellcasting ability is (\w+)/i;
+    const spellcastingAbilityRegexSecond = /uses (\w+) as his spellcasting ability/i;
 
     getSetRepeatingItems('actions.parse', {
       repeatingItems: [`repeating_${type}`],
@@ -303,8 +304,12 @@ export class Actions {
           if (name && name.indexOf('Spellcasting') !== -1) {
             const spellcastingSearch = spellcastingAbilityRegex.exec(freetext);
             if (spellcastingSearch && spellcastingSearch[1]) {
-              const spellcastingAbility = spellcastingSearch[1].toLowerCase();
-              finalSetAttrs.default_ability = `@{${spellcastingAbility}_mod}`;
+              finalSetAttrs.default_ability = spellcastingSearch[1].toLowerCase();
+            } else {
+              const spellcastingSearchSecond = spellcastingAbilityRegexSecond.exec(freetext);
+              if (spellcastingSearchSecond && spellcastingSearchSecond[1]) {
+                finalSetAttrs.default_ability = spellcastingSearchSecond[1].toLowerCase();
+              }
             }
             const spellcastingLevelSearch = spellcastingLevelRegex.exec(freetext);
             if (spellcastingLevelSearch && spellcastingLevelSearch[1]) {
@@ -323,7 +328,7 @@ export class Actions {
           if (actionType) {
             if (actionType[1]) {
               actionType[1] = actionType[1].toLowerCase();
-              if (isUndefined(v[`${repeatingString}type`]) && actionType[1] === 'melee') {
+              if (isUndefined(v[`${repeatingString}type`]) && (actionType[1] === 'melee' || actionType[1] === 'melee or ranged')) {
                 finalSetAttrs[`${repeatingString}type`] = 'Melee Weapon';
               } else if (isUndefined(v[`${repeatingString}type`]) && actionType[1] === 'ranged') {
                 finalSetAttrs[`${repeatingString}type`] = 'Ranged Weapon';
