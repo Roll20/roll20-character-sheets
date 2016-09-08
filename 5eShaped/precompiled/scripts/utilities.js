@@ -386,6 +386,7 @@ const updateHD = (v, finalSetAttrs, hd) => {
   for (const key in hd) {
     if (hd.hasOwnProperty(key)) {
       if (hd[key] && hd[key] !== 0) {
+        finalSetAttrs[`hd_${key}`] = hd[key];
         finalSetAttrs[`hd_${key}_max`] = hd[key];
         finalSetAttrs[`hd_${key}_query`] = '?{HD';
         for (let x = 1; x <= hd[key]; x++) {
@@ -394,6 +395,9 @@ const updateHD = (v, finalSetAttrs, hd) => {
         finalSetAttrs[`hd_${key}_query`] += '}';
         finalSetAttrs[`hd_${key}_toggle`] = 1;
       } else {
+        if (!isUndefinedOrEmpty(v[`hd_${key}`])) {
+          finalSetAttrs[`hd_${key}`] = 0;
+        }
         if (!isUndefinedOrEmpty(v[`hd_${key}_max`])) {
           finalSetAttrs[`hd_${key}_max`] = 0;
         }
