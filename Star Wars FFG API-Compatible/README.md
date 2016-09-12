@@ -12,3 +12,8 @@ Fixed display of Species/Career/Specialization to look more crisp.
 Fixed spelling mistakes
 Code cleanup
 Changed display of Old Vehicle Tabs
+
+6.3.0 Updates
+NPC Sheet
+Skill Suggestion Engine
+Collapsible sections
