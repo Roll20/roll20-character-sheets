@@ -1,11 +1,19 @@
 # Dungeon World VF
 
-Feuille de Personnage en français pour [Dungeon World](http://dungeonworld-fr.blogspot.fr/), adaptée de la feuille VO de Willem den Besten (Morenim) et Devindra Payment (@Ardnived) ... et considérablement modifiée.
+Feuille de Personnage en français pour [Dungeon World V1 et V2](http://dungeonworld-fr.blogspot.fr/), adaptée de la feuille VO de Willem den Besten (Morenim) et Devindra Payment (@Ardnived) ... et considérablement modifiée.
 
 # Version courante
-2.0 [Capture d'écran](dwfr.png)
+3.0 [Capture d'écran](dwfr.png)
 
 # Notes de version
+
+##v3.0 (2016-08-12)
+
+Adaptation pour [Dungeon World VF V2](http://www.500nuancesdegeek.fr/dungeon-world-v2/) :
+
+* Ajout des nouvelles classes (+ Ranger devient Eclaireur)
+* Ajout des nouvelles actions de base, spéciales et de départ
+* Toutes les actions avec jets gèrent désormais les résultats 12+, 10+, 7 à 9, 6-
 
 ##v2.0 (2016-03-06)
 

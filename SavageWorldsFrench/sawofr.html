@@ -960,7 +960,11 @@ on("change:atkcible", function () {
     <input type="text" disabled hidden name="attr_relRollArmeFixe3DgtPlus" value="{ floor( ( @{jetRollArmeFixe3Dgt}+1d6!! - (@{cibleresistance}[Résistance] - 4 ) ) /4), 0d0 }kh1 " />
 
     <!-- COMPETENCES -->
-    <input type="text" disabled hidden name="attr_RollArcane" value="{ 1d@{arcane_de}!![@{arcane_nom}],@{joker_de}!![Joker]}kh1 + (@{arcane_bonus})[Bonus] - @{malusblessures}[Blessures] - @{malusfatigue}[Fatigue] + (?{Modificateur|0})[Modificateur]" />
+    <input type="text" disabled hidden name="attr_RollIncomp" value="{ 1d4!![Non entraîné],@{joker_de}!![Joker]}kh1 + (-2)[Bonus] - @{malusblessures}[Blessures] - @{malusfatigue}[Fatigue] + (?{Modificateur|0})[Modificateur]" />
+    <input type="text" disabled hidden name="attr_relRollIncomp" value="&{template:sawo} {{etat=[[@{templateetat}]]}} {{name=Non entraîné}} {{perso=@{character_name}}} {{secoue=[[@{secoue}]]}} {{relances=[[  { floor( ( { @{RollIncomp} } ) /(?{Difficulté|4})[Difficulté]), 0d0 }kh1 ]]}} {{blessures=[[@{blessures}]]}} {{fatigue=[[@{fatigue}]]}}" />
+    <input type="text" disabled hidden name="attr_jetRollIncomp" value="&{template:sawo} {{etat=[[@{templateetat}]]}} {{name=Non entraîné}} {{perso=@{character_name}}} {{secoue=[[@{secoue}]]}} {{jet=[[@{RollIncomp}]]}} {{blessures=[[@{blessures}]]}} {{fatigue=[[@{fatigue}]]}}" />
+
+<input type="text" disabled hidden name="attr_RollArcane" value="{ 1d@{arcane_de}!![@{arcane_nom}],@{joker_de}!![Joker]}kh1 + (@{arcane_bonus})[Bonus] - @{malusblessures}[Blessures] - @{malusfatigue}[Fatigue] + (?{Modificateur|0})[Modificateur]" />
     <input type="text" disabled hidden name="attr_relRollArcane" value="&{template:sawo} {{etat=[[@{templateetat}]]}} {{name=@{arcane_nom}}} {{perso=@{character_name}}} {{secoue=[[@{secoue}]]}} {{relances=[[  { floor( ( { @{RollArcane} } ) /(?{Difficulté|4})[Difficulté]), 0d0 }kh1 ]]}} {{blessures=[[@{blessures}]]}} {{fatigue=[[@{fatigue}]]}}" />
     <input type="text" disabled hidden name="attr_jetRollArcane" value="&{template:sawo} {{etat=[[@{templateetat}]]}} {{name=@{arcane_nom}}} {{perso=@{character_name}}} {{secoue=[[@{secoue}]]}} {{jet=[[@{RollArcane}]]}} {{blessures=[[@{blessures}]]}} {{fatigue=[[@{fatigue}]]}}" />
 
@@ -1063,7 +1067,7 @@ on("change:atkcible", function () {
     <!-- onglets -->
     <input type="radio" name="attr_chkvie" value="0" class="sheet-onglmain" title="Feuille" checked /><span>Feuille</span>
     <input type="radio" name="attr_chkvie" value="1" class="sheet-onglconfig" title="Configuration" /><span>Configuration</span>
-    <span style="display:inline-block;width:150px;text-align: center;color: #888888;font-size: 0.9em;">v1.5 (28/02/2016)</span>
+    <span style="display:inline-block;width:150px;text-align: center;color: #888888;font-size: 0.9em;">v1.6 (30/07/2016)</span>
     <!-- Style FdP -->
     <input type="checkbox" name="attr_sheetDead" value="1" class="sheet-chkSheetDead" />
     <!-- paramètres cachés -->
@@ -1250,6 +1254,24 @@ on("change:atkcible", function () {
             </div> <!-- FIN ATTRIBUTS -->
             <div> <!-- COMPETENCES -->
                 <div class="sheet-redtitle2">COMPÉTENCES</div>
+                <div class="sheet-input">
+                    <button type="roll"
+                            name="Btrel-Incomp"
+                            class="sheet-btRolrel"
+                            value="@{relRollIncomp}"
+                            >Non entraîné</button>
+                    <button type="roll"
+                        name="Btjet-Incomp"
+                        class="sheet-btRoljet"
+                        value="@{jetRollIncomp}"
+                        >Non entraîné</button>
+                    <button type="roll"
+                        name="BtBrut-Incomp"
+                        class="sheet-btRolbrut"
+                        value="/em @{character_name} fait un jet non entraîné
+/roll @{RollIncomp}"
+                        >Non entraîné</button>
+                </div>
                 <div class="sheet-input sheet-chkArcane"> <!-- ARCANES -->
                     <button type="roll"
                         name="Btrel-Arcane"
@@ -1969,7 +1991,7 @@ on("change:atkcible", function () {
                             <OPTION value="10">d10</OPTION>
                             <OPTION value="12">d12</OPTION>
                         </SELECT>
-                        +<input type="number" class="sheet-selde" name="attr_comp_bonus" value="0" min="0" />
+                        +<input type="number" class="sheet-selde" name="attr_comp_bonus" value="0" />
                     </div>
                 </fieldset> <!-- COMPETENCE (S) LIBRE(S) -->
             </div> <!-- FIN COMPETENCES -->
@@ -2377,7 +2399,7 @@ Dégâts supplémentaires si relance : [[1d6!!]]"
          <fieldset class="repeating_pouvoirs">
             <div class="sheet-input"> <!-- POUVOIR DYNAMIQUE -->
                 <button type="roll" class="sheet-btDesc"
-                    value="&{template:sawo} {{name=@{pouv_nom}}} {{perso=@{character_name}}} {{pouvoir=1}} {{pp=@{pouv_pp}}} {{portee=@{pouv_portee}}} {{description=@{pouv_effets}}}"
+                    value="&{template:sawo} {{name=@{pouv_nom}}} {{perso=@{character_name}}} {{pouvoir=1}} {{pp=@{pouv_pp}}} {{portee=@{pouv_portee}}} {{duree=@{pouv_duree}}} {{description=@{pouv_effets}}}"
                 ></button>
                 <input type="text" name="attr_pouv_nom" style="width: 200px;font-weight:bold;" placeholder="Nom du pouvoir" title="Nom du pouvoir" />
                 <SELECT name="attr_pouv_rang" style="width: 30px;margin-left:3px;margin-right:3px;" title="Rang d'accès à ce pouvoir">
@@ -2395,6 +2417,11 @@ Dégâts supplémentaires si relance : [[1d6!!]]"
             </div> <!-- FIN POUVOIR DYNAMIQUE -->
         </fieldset>
    </div> <!-- ** FIN POUVOIRS ** -->
+   <div class="sheet-colblock"> <!-- ** NOTES/DIVERS ** -->
+        <div class="sheet-redtitle1" style="display: inline-block;width: 220px;">NOTES</div>
+        <textarea name="attr_divnotes" placeholder="Notes / Divers"></textarea>
+        
+   </div> <!-- ** FIN NOTES/DIVERS ** -->
 </div> <!-- FIN MAIN -->
 <!-- CONFIGURATION -->
 <div class="sheet-configuration">
@@ -2567,12 +2594,16 @@ Dégâts supplémentaires si relance : [[1d6!!]]"
         {{/jet}}
         {{#pouvoir}}
             <tr>
-                <td style="text-align: right;">PP</td>
-                <td class="sheet-info" style="font-weight: bold;">{{pp}}</td>
+                <td style="text-align: right; padding-right: 4px;">PP</td>
+                <td class="sheet-info" style="width:100%;text-align:left; font-weight: bold;">{{pp}}</td>
             </tr>
             <tr>
-                <td style="text-align: right;">Portée</td>
-                <td class="sheet-info" style="font-weight: bold;">{{portee}}</td>
+                <td style="text-align: right; padding-right: 4px;">Portée</td>
+                <td class="sheet-info" style="width:100%;text-align:left; font-weight: bold;">{{portee}}</td>
+            </tr>
+            <tr>
+                <td style="text-align: right; padding-right: 4px;">Durée</td>
+                <td class="sheet-info" style="width:100%;text-align:left; font-weight: bold;">{{duree}}</td>
             </tr>
             <tr>
                 <td colspan="2">
