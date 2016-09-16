@@ -375,6 +375,21 @@
    		});
 	});
 	
+	//Set Max Fatigue
+	on("change:increasedfatigue", function() {
+		getAttrs(["increasedfatigue", "fatigue_max"], function(vvalue) {
+			console.log("Increase Fatigue value: " + vvalue.increasedfatigue);
+			console.log("Max Fatigue value: " + vvalue.fatigue_max);
+			if (vvalue.increasedfatigue === "1") {
+      			console.log("Increase Max Fatigue to 3");
+      			setAttrs({fatigue_max: 3});
+      		}
+      		else {
+      			setAttrs({ fatigue_max: 2 });
+      		}
+   		});
+	});
+	
 	//Set Parry
 	on("sheet:opened change:fighting change:fightingmod change:parry change:parryMod", function() {
 		getAttrs(["fighting", "FightingMod", "parryMod"], function(pvalue) {
@@ -493,10 +508,10 @@
 		//'use strict';
 		getAttrs(["armortotalweightcarried", "meleetotalweightcarried", "rangedtotalweightcarried", "geartotalweightcarried"], function(lvalue) {
 			//@{armortotalweightcarried} + @{meleetotalweightcarried} + @{rangedtotalweightcarried} + @{geartotalweightcarried}
-			var armor = parseInt(lvalue.armortotalweightcarried);
-			var melee = parseInt(lvalue.meleetotalweightcarried);
-            var range = parseInt(lvalue.rangedtotalweightcarried);
-            var gear = parseInt(lvalue.geartotalweightcarried);
+			var armor = parseInt(lvalue.armortotalweightcarried)||0;
+			var melee = parseInt(lvalue.meleetotalweightcarried)||0;
+            var range = parseInt(lvalue.rangedtotalweightcarried)||0;
+            var gear = parseInt(lvalue.geartotalweightcarried)||0;
       		setAttrs({ totalloadcarried: armor + melee + range + gear });
    		});
 	});
@@ -506,11 +521,11 @@
 		//'use strict';
 		getAttrs(["loadlimit", "totalloadcarried"], function(lvalue) {
 			//floor(((@{loadlimit}) - (@{totalloadcarried}))/(@{loadlimit}))
-			var load = parseInt(lvalue.totalloadcarried);
+			var load = parseInt(lvalue.totalloadcarried)||0;
 			if (load === 0) {
       			load = 1; //If there is no current load, then need to set it to 1, so the result of the calc = 0
       		}
-			var limit = parseInt(lvalue.loadlimit);
+			var limit = parseInt(lvalue.loadlimit)||0;
            
       		setAttrs({ encumbrance: Math.floor((limit - load) / limit) });
    		});
@@ -540,7 +555,7 @@
 				<!-- BEGIN CONFIGURATION STUFF -->
 				<!--                           -->
 				<div class="sheet-config" style='border-style: dotted; border-color: #dbc792; padding: 5px; background-color: white; background-image: none;'>
-					sheet version: 03 Feb 2016
+					sheet version: 25 Apr 2016
 					<div class='sheet-row'><h2 class='sheet-sectionHeader'>CONFIGURATION</h2></div>
 					API: Initiative Edges <span class="sheet-tooltip">i<span><strong style='line-height: 30px; text-align: center;'>DealInit API Script</strong><br><p>Initiative Edges must be stored in a comma separated list in an Attribute named InitEdges. (e.g. Qu,LH)</p><p>The Edge shorthand is as follows:<br /><ul><li><strong>Qui</strong> = Quick</li><li><strong>LH</strong> = Level Headed</li><li><strong>ILH</strong> = Improved Level Headed</li><li><strong>WCE</strong> = Any Joker Activated Wild Card Edge</li></ul></p></span></span>
 					<input class="sheet-standard" type="text" title="@{InitEdges}" name="attr_InitEdges"/><br />
@@ -552,7 +567,7 @@
 									<h3>Backgrounds</h3>
 										<span class="sheet-5pxshim">
 											<input type="checkbox" class="sheet-useBackground" style="width: 15px;" name="attr_background" value="1" title="No Background Image" checked /> No Background Image<br />
-											<input type="checkbox" class="sheet-useBackground" style="width: 15px;" name="attr_background" value="7" title="Cyberpunk" /> Cypberpunk<br />
+											<input type="checkbox" class="sheet-useBackground" style="width: 15px;" name="attr_background" value="7" title="Cyberpunk" /> Cyberpunk<br />
 											<input type="checkbox" class="sheet-useBackground" style="width: 15px;" name="attr_background" value="8" title="Hellfrost" /> Hellfrost<br />
 											<input type="checkbox" class="sheet-useBackground" style="width: 15px;" name="attr_background" value="9" title="Hellfrost: Land of Fire" /> Hellfrost: Land of Fire<br />
 											<input type="checkbox" class="sheet-useBackground" style="width: 15px;" name="attr_background" value="5" title="Last Parsec" /> Last Parsec<br />
@@ -705,6 +720,8 @@
 									<h4 class="sheet-subsectionHeader">Field Replacements</h4>
 										<!--Clams--><span title="Replaces 'Money' with 'Clams'. Appropriate for Low Life or any other setting where Clams may be an appropriate replacement for money."><input type="checkbox" class="sheet-usePieces" name="attr_50fPo8Clams" style="width: 15px;" value="2" />Clams (Money)</span><br />
 										<!--Code Name--><span title="Useful for games where the character is known by a code- or superhero name such as Necessary Evil or spy themed games. This will add an additional field for Civilian Name."><input type="checkbox" class="sheet-useCodeName" name="attr_codename" style="width: 15px;" />Code Name (Character Name)</span><br />
+										<!--Credits--><span title="Replaces 'Money' with 'Credits'. Appropriate for Interface Zero or any other setting where Credits may be an appropriate replacement for money."><input type="checkbox" class="sheet-usePieces" name="attr_50fPo8Clams" style="width: 15px;" value="4" />Credits (Money)</span><br />
+										<!--Increased Max Fatigue--><span title="Modify the Max Fatigue value to three (3). Useful for Interface Zero and other settings with a higher max fatigue value."><input type="checkbox" class="sheet-useParaHuman" name="attr_increasedfatigue" style="width: 15px;" value="1" />Increased Max Fatigue (3)</span><br />
 										<!--Lankhmar Money--><span title="Replaces 'Money' with: Iron Tiks, Bronze Agols, Silver Smerduks, and Gold Rilks. Appropriate for the Lankhmar: City of Thieves setting."><input type="checkbox" class="sheet-usePieces" name="attr_50fPo8Clams" style="width: 15px;" value="3" />Lankhmar Currency (Money)</span><br />
 										<!--Pieces of Eight--><span title="Replaces 'Money' with 'Pieces of Eight'. Appropriate for 50 Fathoms or any other Pirate themed setting."><input type="checkbox" class="sheet-usePieces" name="attr_50fPo8Clams" style="width: 15px;" value="1" />Pieces of Eight (Money)</span><br />
 										<!--Origina of Parahuman Abilities--><span title="Modify the Physical Appearance Text Area to include the Origins of Parahuman Abilties. Useful for Necessary Evil and other Superhero-esque settings."><input type="checkbox" class="sheet-useParaHuman" name="attr_powerOrigins" style="width: 15px;" />Origin of Parahuman Abilities</span><br />	
@@ -1058,6 +1075,7 @@
 									<input type="checkbox" class="sheet-usePieces" name="attr_50fPo8Clams" value="1" style="width: 15px; display: none;" />
 									<input type="checkbox" class="sheet-usePieces" name="attr_50fPo8Clams" value="2" style="width: 15px; display: none;" />
 									<input type="checkbox" class="sheet-usePieces" name="attr_50fPo8Clams" value="3" style="width: 15px; display: none;" />
+									<input type="checkbox" class="sheet-usePieces" name="attr_50fPo8Clams" value="4" style="width: 15px; display: none;" />
 									<label class='sheet-Money sheet-nameRankXp'></label>
 										<input class="sheet-standard" style="width: 117px;" type="text" name="attr_money" title="@{money}" value="0"/>
 										<!-- Additional Lankhmar Money Fields -->
@@ -1276,7 +1294,7 @@
 									<div class="sheet-col" style="width: 48%;  text-align: center;">
 										<label class="sheet-nameRankXp" style="width: 45px;">Fatigue</label><br />
 										<input class="sheet-standardNum" style="width: 35px;" type="number" name="attr_fatigue" title="@{fatigue}" style='margin-left:4px;' value="0"/><span class="sheet-spaceBetween"> of </span>
-										<input class="sheet-standardNum" style="width: 35px; border: none;" type="number" name="attr_fatigue_max" title="@{fatigue_max}" value="2" disabled="true"/>
+										<input class="sheet-standardNum" style="width: 35px; border: none;" type="number" name="attr_fatigue_max" title="@{fatigue_max}" value="2" readonly/>
 									</div>
 								</div>
 								<input type="checkbox" class="sheet-useNoS" name="attr_Nerves" style="width: 15px; display:none;" />
