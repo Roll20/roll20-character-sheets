@@ -597,6 +597,9 @@ export class Upgrade {
     if (this.versionCompare(currentVersion, '6.1.1') < 0) {
       settings.updateShapedD20();
     }
+    if (this.versionCompare(currentVersion, '6.1.3') < 0) {
+      abilities.updateModifier('strength');
+    }
 
   }
 }
