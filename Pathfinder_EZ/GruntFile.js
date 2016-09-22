@@ -23,12 +23,18 @@ module.exports = function(grunt) {
           'sheet.css': 'sheet.css'
         },
         options: {
-          replacements: [{
-            pattern: /\.((?!charsheet)[^ \n]+)(?=.+\{)/g,
-            replacement: function(match, p1) {
-              return '.sheet-' + p1;
+          replacements: [
+            {
+              pattern: /,\n/g,
+              replacement: ', '
+            },
+            {
+              pattern: /\.((?!charsheet)[^ .\n]+)(?=.+\{)/g,
+              replacement: function(match, p1) {
+                return '.sheet-' + p1;
+              }
             }
-          }]
+          ]
         }
       }
     }
