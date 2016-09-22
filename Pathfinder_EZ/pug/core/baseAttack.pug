@@ -1,22 +1,45 @@
-+labelledBoxV('Base Attack Bonus')(style='vertical-align: top; width: 1in;'): +input('number', 'bab')
-.inlineBlock(style='width: 4in;')
-  div: +labelledBoxH('Melee')(style='width: 100%;')
-    +labelledUnderlined('Total'): +readOnlyBox('melee_total')
-    .mathOperator =
-    +labelledUnderlined('BAB'): +readOnlyBox('bab')
-    .mathOperator +
-    +labelledUnderlined('Str mod'): +readOnlyBox('str_mod')
-    .mathOperator +
-    +labelledUnderlined('Size'): +readOnlyBox('size_attack_mod')
-    .mathOperator +
-    +labelledUnderlined('Misc')(style='width: 0.5in;'): +input('number', 'melee_misc')
-  div: +labelledBoxH('Ranged')(style='width: 100%;')
-    +labelledUnderlined('Total'): +readOnlyBox('ranged_total')
-    .mathOperator =
-    +labelledUnderlined('BAB'): +readOnlyBox('bab')
-    .mathOperator +
-    +labelledUnderlined('Dex mod'): +readOnlyBox('dex_mod')
-    .mathOperator +
-    +labelledUnderlined('Size'): +readOnlyBox('size_attack_mod')
-    .mathOperator +
-    +labelledUnderlined('Misc')(style='width: 0.5in;'): +input('number', 'ranged_misc')
+.inlineBlock(style='vertical-align: middle;')
+  h3 Attacks
+  +labelledBoxV('Base Attack Bonus')(style='vertical-align: top; width: 1in;'): +input('number', 'bab')
+
+.inlineBlock(style='vertical-align: middle; width: 80%;')
+  mixin attack(attackName, abilityName, abilityShortName)
+    - var attackNameCap = attackName.charAt(0).toUpperCase() + attackName.slice(1);
+    td.blackBox
+      .attackName= attackNameCap
+      .abilityName= abilityName
+    td: +readOnlyBox(attackName)
+    td: .mathOperator =
+    td: +readOnlyBox('bab')(style='width: 0.25in;')
+    td: .mathOperator +
+    td: +readOnlyBox(abilityShortName + '_mod')(style='width: 0.25in;')
+    td: .mathOperator +
+    td: +readOnlyBox('attack_size')(style='width: 0.25in;')
+    td: .mathOperator +
+    td: +fieldBox('number', attackName + '_equipment')
+    td: .mathOperator +
+    td: +fieldBox('number', attackName + '_misc')
+    td: .mathOperator +
+    td: +fieldBox('number', attackName + '_temp')
+    td: +labelledUnderlined('Conditional Modifiers')(style='margin-left: 1em; width: 100%;'): +input('text', attackName + '_notes')
+
+  table.attacks
+    thead: tr
+      th
+      th Total
+      th
+      th(style='width: 0.25in;') BAB
+      th
+      th(style='width: 0.25in;') Ability Mod
+      th
+      th(style='width: 0.25in;') Size
+      th
+      th Equipment
+      th
+      th Misc +/-
+      th
+      th Temp +/-
+      th(style='width: 2in;')
+    tbody
+      tr: +attack('melee', 'Strength', 'str')
+      tr: +attack('ranged', 'Dexterity', 'dex')
