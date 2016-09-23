@@ -14,7 +14,7 @@
    * Promise-wrapped setAttrs.
    */
   function _setAttrs(values) {
-    return new Promise(resolve, reject => {
+    return new Promise((resolve, reject) => {
       setAttrs(values, undefined, () => {
         resolve();
       });
@@ -22,9 +22,7 @@
   }
 
   on('sheet:opened', () => {
-    (new Promise((resolve, reject) => {
-      resolve(42);
-    }))
+    Promise.resolve(42)
     .then(value => {
       return _setAttrs({
         debug: value
