@@ -167,8 +167,11 @@ export class SavingThrows {
     this.updateSavingThrow('charisma');
     this.updateCustomSavingThrows();
   }
-  updateFromSRD() {
+  updateFromSRD(checkedSavingThrowSRDCount) {
     const collectionArray = ['pb', 'saving_throws_srd'];
+    if (!checkedSavingThrowSRDCount) {
+      checkedSavingThrowSRDCount = 0;
+    }
     for (const ability of ABILITIES) {
       collectionArray.push(`${ability}_mod`);
       collectionArray.push(`${ability}_save_prof`);
@@ -177,6 +180,11 @@ export class SavingThrows {
     getSetItems('savingThrows.updateFromSRD', {
       collectionArray,
       callback: (v, finalSetAttrs) => {
+        if (v.pb === 2 && checkedSavingThrowSRDCount < 50) {
+          checkedSavingThrowSRDCount += 1;
+          this.updateFromSRD(checkedSavingThrowSRDCount); //timeouts lose context so just have to bruteforce it.
+          return;
+        }
         for (const ability of ABILITIES) {
           const shortAbility = getAbilityShortName(ability, true);
           if (v.saving_throws_srd && v.saving_throws_srd.indexOf(shortAbility) !== -1) {
