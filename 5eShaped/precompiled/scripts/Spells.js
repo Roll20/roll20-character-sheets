@@ -315,9 +315,11 @@ export class Spells {
   }
   updateWarlockSlots() {
     getSetItems('spells.updateShowHide', {
-      collectionArray: ['warlock_spell_slots_calc', 'warlock_spell_slots_bonus', 'warlock_spell_slots_max'],
+      collectionArray: ['warlock_spell_slots', 'warlock_spell_slots_calc', 'warlock_spell_slots_bonus', 'warlock_spell_slots_max'],
       callback: (v, finalSetAttrs) => {
-        finalSetAttrs['warlock_spell_slots_max'] = getIntValue(v.warlock_spell_slots_calc) + getIntValue(v.warlock_spell_slots_bonus);
+        const warlockSlots = getIntValue(v.warlock_spell_slots_calc) + getIntValue(v.warlock_spell_slots_bonus);
+        finalSetAttrs['warlock_spell_slots'] = warlockSlots;
+        finalSetAttrs['warlock_spell_slots_max'] = warlockSlots;
       },
     });
   }
