@@ -785,24 +785,6 @@ export class ClassFeatures {
   }
   warlock(v) {
     if (v.warlock_level) {
-      let warlockSpellSlots;
-      if (v.warlock_level >= 17) {
-        warlockSpellSlots = 4;
-      } else if (v.warlock_level >= 11) {
-        warlockSpellSlots = 3;
-      } else if (v.warlock_level >= 2) {
-        warlockSpellSlots = 2;
-      } else {
-        warlockSpellSlots = 1;
-      }
-      traits.set({
-        freetext: getTranslationByKey('CLASS_FEATURE_WARLOCK_SPELL_SLOTS_TEXT'),
-        name: getTranslationByKey('CLASS_FEATURE_WARLOCK_SPELL_SLOTS'),
-        recharge: 'Short Rest',
-        storageName: 'Warlock Spell Slots',
-        uses_max: warlockSpellSlots,
-      });
-
       if (v.warlock_level >= 2) {
         let eldritchInvocations;
         if (v.warlock_level >= 17) {

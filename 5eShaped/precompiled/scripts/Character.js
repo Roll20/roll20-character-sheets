@@ -92,7 +92,7 @@ export class Character {
     getSetRepeatingItems('character.updateLevels', {
       repeatingItems: ['repeating_class'],
       collectionArray,
-      collectionArrayAddItems: ['level', 'name', 'custom_name', 'hd', 'spellcasting', 'custom_class_toggle'],
+      collectionArrayAddItems: ['level', 'name', 'custom_name', 'hd', 'spellcasting', 'custom_class_toggle', 'has_warlock_slots', 'warlock_spell_slots_calc', 'warlock_spells_max_level'],
       callback: (v, finalSetAttrs, ids, repeatingItem) => {
         for (const className of CLASSES) {
           finalSetAttrs[`${className}_level`] = 0;
@@ -223,6 +223,40 @@ export class Character {
           finalSetAttrs.caster_type = 'half';
         } else if (spellcasting.third) {
           finalSetAttrs.caster_type = 'third';
+        }
+
+        if (spellcasting.warlock) {
+          finalSetAttrs.has_warlock_slots = 1;
+
+          let warlockSpellSlots;
+          if (spellcasting.warlock >= 17) {
+            warlockSpellSlots = 4;
+          } else if (spellcasting.warlock >= 11) {
+            warlockSpellSlots = 3;
+          } else if (spellcasting.warlock >= 2) {
+            warlockSpellSlots = 2;
+          } else {
+            warlockSpellSlots = 1;
+          }
+          finalSetAttrs.warlock_spell_slots_calc = warlockSpellSlots;
+
+          let warlockSpellsMaxLevel;
+          if (spellcasting.warlock >= 9) {
+            warlockSpellsMaxLevel = 5;
+          } else if (spellcasting.warlock >= 7) {
+            warlockSpellsMaxLevel = 4;
+          } else if (spellcasting.warlock >= 5) {
+            warlockSpellsMaxLevel = 3;
+          } else if (spellcasting.warlock >= 3) {
+            warlockSpellsMaxLevel = 2;
+          } else {
+            warlockSpellsMaxLevel = 1;
+          }
+          finalSetAttrs.warlock_spells_max_level = warlockSpellsMaxLevel;
+        } else {
+          finalSetAttrs.has_warlock_slots = 0;
+          finalSetAttrs.warlock_spell_slots_calc = 0;
+          finalSetAttrs.warlock_spells_max_level = 1;
         }
       },
       setFinalAttrsCallback: () => {
