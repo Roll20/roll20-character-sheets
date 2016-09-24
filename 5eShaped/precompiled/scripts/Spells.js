@@ -92,6 +92,9 @@ export class Spells {
 
           if (v[`${repeatingString}spell_level`] === 'CANTRIP') {
             finalSetAttrs[`${repeatingString}is_prepared`] = 'on';
+          } else {
+            const spellLevel = getIntValue(v[`${repeatingString}spell_level`]);
+            finalSetAttrs[`${repeatingString}cast_as_level`] = `@{cast_as_level_${spellLevel}}`;
           }
 
           if (!isUndefined(fromVOrFinalSetAttrs(v, finalSetAttrs, `${repeatingString}duration`)) && fromVOrFinalSetAttrs(v, finalSetAttrs, `${repeatingString}duration`).indexOf('CONCENTRATION') !== -1) {
@@ -407,6 +410,7 @@ export class Spells {
   generateHigherLevelQueries() {
     const collectionArray = ['warlock_level', 'warlock_spell_slots', 'warlock_spells_max_level', 'number_of_classes'];
     for (let i = 1; i <= 8; i++) {
+      collectionArray.push(`cast_as_level_${i}`);
       collectionArray.push(`higher_level_query_${i}`);
     }
     for (let i = 1; i <= 9; i++) {
@@ -430,12 +434,21 @@ export class Spells {
             }
           }
 
+          let higherLevelQuery;
+
           if (spellLevels.length > 1) {
-            finalSetAttrs[`higher_level_query_${i}`] = `?{Spell Level|${spellLevels.join('|')}}`;
+            higherLevelQuery = `?{Spell Level|${spellLevels.join('|')}}`;
           } else if (spellLevels.length === 1) {
-            finalSetAttrs[`higher_level_query_${i}`] = spellLevels[0];
+            higherLevelQuery = spellLevels[0];
           } else {
-            finalSetAttrs[`higher_level_query_${i}`] = i;
+            higherLevelQuery = i;
+          }
+          finalSetAttrs[`higher_level_query_${i}`] = higherLevelQuery;
+
+          if (v[`spell_slots_l${i}`] === '0' && higherLevelQuery !== i) {
+            finalSetAttrs[`cast_as_level_${i}`] = higherLevelQuery;
+          } else {
+            finalSetAttrs[`cast_as_level_${i}`] = '';
           }
         }
       },
