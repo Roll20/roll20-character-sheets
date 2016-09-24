@@ -38,7 +38,7 @@ function updateAbilityMod(attr, values) {
 
 function updateSkill(skill, ability, hasArmorPen, values) {
   var total = values[ability + '_mod'] + values[skill + '_ranks'] + values[skill + '_misc'];
-  if(values[skill + '_class'])
+  if(values[skill + '_class'] && values[skill + '_ranks'] > 0)
     total += 3;
   if(hasArmorPen)
     total += values.armor_penalty;
