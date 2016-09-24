@@ -419,12 +419,13 @@ export class Spells {
         for (let i = 1; i <= 8; i++) {
           const spellLevels = [];
           const warlockSpellsMaxLevel = getIntValue(v.warlock_spells_max_level);
+          let addWarlockLevel = 0;
           if (getIntValue(v.warlock_spell_slots) > 0 && warlockSpellsMaxLevel > 0 && i < warlockSpellsMaxLevel) {
-            spellLevels.push(warlockSpellsMaxLevel);
+            addWarlockLevel = warlockSpellsMaxLevel;
           }
 
           for (let j = i; j <= 9; j++) {
-            if (getIntValue(v[`spell_slots_l${j}`])) {
+            if (getIntValue(v[`spell_slots_l${j}`]) || j === warlockSpellsMaxLevel) {
               spellLevels.push(j);
             }
           }
