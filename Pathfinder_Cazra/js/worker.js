@@ -27,6 +27,7 @@ function parseAttrs(attrs, cb) {
   });
 }
 
+
 // Update funcs
 
 function updateAbilityMod(attr, values) {
@@ -49,6 +50,8 @@ function updateSkill(skill, ability, hasArmorPen, values) {
 
 
 // Change events
+
+// Ability modifiers
 
 onChangeParse(['str', 'str_temp'], values => {
   updateAbilityMod('str', values);
@@ -74,13 +77,15 @@ onChangeParse(['cha', 'cha_temp'], values => {
   updateAbilityMod('cha', values);
 });
 
-
+// Initiative
 
 onChangeParse(['dex_mod', 'init_misc'], values => {
   setAttrs({
     init: values.dex_mod + values.init_misc
   });
 });
+
+// AC
 
 onChangeParse(['ac_equipment', 'dex_mod', 'size', 'ac_misc', 'ac_temp'], values => {
   setAttrs({
@@ -89,6 +94,8 @@ onChangeParse(['ac_equipment', 'dex_mod', 'size', 'ac_misc', 'ac_temp'], values 
     ac_flatfoot: 10 + values.ac_equipment + values.size + values.ac_misc + values.ac_temp,
   });
 });
+
+// Saving throws
 
 onChangeParse(['fort_base', 'con_mod', 'fort_equipment', 'fort_misc', 'fort_temp'], values => {
   setAttrs({
@@ -108,17 +115,62 @@ onChangeParse(['will_base', 'wis_mod', 'will_equipment', 'will_misc', 'will_temp
   });
 });
 
-onChangeParse(['bab', 'str_mod', 'size', 'melee_equipment', 'melee_misc', 'melee_temp'], values => {
-  setAttrs({
-    melee: values.bab + values.str_mod + values.size + values.melee_equipment + values.melee_misc + values.melee_temp
+
+// Attacks
+onChangeParse(['bab', 'size'], values => {
+  getSectionIDs('repeating_attacks', ids => {
+    _.each(ids, id => {
+      var prefix = 'repeating_attacks_' + id + '_';
+
+      setAttrs({
+        [prefix + 'attack_bab']: values.bab,
+        [prefix + 'attack_size']: values.size
+      });
+    });
   });
 });
 
-onChangeParse(['bab', 'dex_mod', 'size', 'ranged_equipment', 'ranged_misc', 'ranged_temp'], values => {
-  setAttrs({
-    ranged: values.bab + values.dex_mod + values.size + values.ranged_equipment + values.ranged_misc + values.ranged_temp
+onChangeParse(['str_mod', 'dex_mod', 'con_mod', 'int_mod', 'wis_mod', 'cha_mod'], values => {
+  getSectionIDs('repeating_attacks', ids => {
+    _.each(ids, id => {
+      var repAbility = 'repeating_attacks_' + id + '_attack_ability';
+
+      parseAttrs([repAbility], attackValues => {
+        var repAbilityMod = 'repeating_attacks_' + id + '_attack_ability_mod';
+        var abilityMod = attackValues[repAbility] + '_mod';
+        setAttrs({
+          [repAbilityMod]: values[abilityMod]
+        });
+      });
+    });
   });
 });
+
+on('change:repeating_attacks', (evt) => {
+  getSectionIDs('repeating_attacks', ids => {
+    _.each(ids, id => {
+      var prefix = 'repeating_attacks_' + id + '_attack';
+      var repAbility = 'repeating_attacks_' + id + '_attack_ability';
+
+      var attrNames = _.map(['ability', 'bab', 'ability_mod', 'size', 'equipment', 'misc', 'temp'], name => {
+        return prefix + '_' + name;
+      });
+      attrNames = attrNames.concat(['str_mod', 'dex_mod', 'con_mod', 'int_mod', 'wis_mod', 'cha_mod']);
+      parseAttrs(attrNames, values => {
+        var repAbilityMod = 'repeating_attacks_' + id + '_attack_ability_mod';
+        var abilityModName = values[repAbility] + '_mod';
+
+        setAttrs({
+          [prefix]: values[prefix + '_bab'] + values[abilityModName] + values[prefix + '_size'] + values[prefix + '_equipment'] + values[prefix + '_misc'] + values[prefix + '_temp'],
+          [prefix + '_ability_mod']: values[abilityModName]
+        }, { silent: true });
+      });
+    });
+  });
+});
+
+
+// CMB/CMD
 
 onChangeParse(['size'], values => {
   setAttrs({
@@ -139,6 +191,7 @@ onChangeParse(['bab', 'str_mod', 'dex_mod', 'cmd_size', 'cmd_misc', 'cmd_temp'],
   });
 });
 
+// Skills
 
 var skills = [
   { skill: 'acrobatics', ability: 'dex', armorPenalty: true },
