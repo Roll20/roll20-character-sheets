@@ -396,7 +396,8 @@
 			<label class="sheet-small-label2" style="width: 100%;"><textarea class="sheet-inline-textarea" title="@{character_description}" type="text" name="attr_character_description" placeholder="Description" data-i18n-placeholder="description"></textarea><span data-i18n="description">Description</span></label>
 		</div>
 
-		<input type="hidden" name="attr_checks-cond" />
+		
+		<input type="hidden" name="attr_checks-cond" value="0" />
 		<div class="sheet-cheat"></div>
 		<input class="sheet-showarrow sheet-h2arrow" type="checkbox" name="attr_ability-scores-show"  data-i18n-aria-label="ability-scores" value="1" checked="checked"/>
 		<h2 class="sheet-clickheader sheet-showsect"><label   title="Click to expand" data-i18n-title="showsect-cmd" data-i18n="ability-scores">Ability Scores</label></h2>
@@ -12314,8 +12315,8 @@ var TAS = TAS || (function () {
 /* ---- END: TheAaronSheet.js ---- */
 //TAS.config({ logging: { info: false} });
 TAS.config({ logging: { info: false, debug:false} });
+//TAS.config({ logging: { info: true, debug:true} });
 //TAS.debugMode();
-
 
 var ExExp = ExExp || (function () {
     'use strict';
@@ -14203,8 +14204,6 @@ var PFSheet = PFSheet || (function () {
 
 
 
-
-
 	/*********************** OPTIONS ******************************/
 
 	/* shouldNotDisplayOption- return true if we should nt display this option value in rolltemplate
@@ -14238,8 +14237,6 @@ var PFSheet = PFSheet || (function () {
 	},
 	
   /*********************************ROW ********************************************/
-
-
 
 
     /* setRowIds
@@ -14379,7 +14376,6 @@ var PFSheet = PFSheet || (function () {
 			});
 		});
     },
-
 
 	
 	checkRTArray=["-ReqTrain","-ranks"],
@@ -14674,7 +14670,6 @@ var PFSheet = PFSheet || (function () {
 						else {
 							orderedList = idarray;
 						}
-
 
 						
 						filteredIds = _.filter(orderedList,function(id){
@@ -16263,7 +16258,6 @@ var PFSheet = PFSheet || (function () {
 				}
 				return newCurrText;
 			},
-
 
 		
 		
@@ -18004,7 +17998,6 @@ var PFSheet = PFSheet || (function () {
                     callback();
                 }
 
-
             });
         });
     },
@@ -18634,7 +18627,7 @@ var PFSheet = PFSheet || (function () {
     },
     // events pass in the column updated macro-text is "either", buffs are auto only
     buffEvents={
-         "Ranged":[updateAttack],"Melee":[updateAttack],
+         //"Ranged":[updateAttack],"Melee":[updateAttack],
 		 "DMG":[updateDamage]
 		,"Fort":[updateSave],"Will":[updateSave],"Ref":[updateSave]
         ,"STR":[updateAbility], "DEX":[updateAbility], "CON":[updateAbility], "INT":[updateAbility], "WIS":[updateAbility], "CHA":[updateAbility]
@@ -19677,8 +19670,15 @@ var PFSheet = PFSheet || (function () {
 			updateLoadsAndLift();
 			recalculateSkills();
 		}
+		if (oldversion < 0.67){
+			PFSheet.updateAttack('melee',null);
+			PFSheet.updateAttack('melee2',null);
+			PFSheet.updateAttack('ranged',null);
+			PFSheet.updateAttack('ranged2',null);			
+			PFSheet.updateAttack('CMB',null);			
+			PFSheet.updateAttack('CMB2',null);			
+		}
     },
-
 
 
     /* checkForUpdate looks at current version of page in PFSheet_Version and compares to code PFSheet.version
@@ -20004,6 +20004,22 @@ var PFEventHandler = PFEventHandler || (function () {
         })
     );
 
+	on("change:buff_Melee-total",TAS.callback(function meleebuffEvent(eventInfo){
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		if (eventInfo.sourceType !== "player"){
+			PFSheet.updateAttack('melee',eventInfo);
+			PFSheet.updateAttack('melee2',eventInfo);
+			PFSheet.updateAttack('CMB',eventInfo);
+			PFSheet.updateAttack('CMB2',eventInfo);
+		}
+	}));
+	on("change:buff_Ranged-total",TAS.callback(function meleebuffEvent(eventInfo){
+		TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+		if (eventInfo.sourceType !== "player"){
+			PFSheet.updateAttack('ranged',eventInfo);
+			PFSheet.updateAttack('ranged2',eventInfo);
+		}
+	}));
     //generic easy buff total updates
     _.each(PFSheet.lists.buffEvents,function(functions,col){
         var eventToWatch="change:buff_"+col+"-total";
@@ -20249,7 +20265,6 @@ var PFEventHandler = PFEventHandler || (function () {
             }
         })
     );
-
 
     on("change:wound_threshold-show",
         TAS.callback(function eventResetConditionWounds(eventInfo) {
@@ -20593,7 +20608,6 @@ var PFEventHandler = PFEventHandler || (function () {
 			}
 		})
 	);
-
 
 	on("change:size_display change:cr_compendium change:npc-hd change:npc-hd2",
 		TAS.callback(function eventUpdateNPCPage2(eventInfo){
@@ -20954,6 +20968,5 @@ var PFEventHandler = PFEventHandler || (function () {
 		}
 	});
 }());
-
 
 </script>
