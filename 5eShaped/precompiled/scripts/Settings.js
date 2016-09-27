@@ -8,7 +8,7 @@ export class Settings {
       collectionArray: ['roll_setting', 'roll_info', 'shaped_d20'],
       callback: (v, finalSetAttrs) => {
         finalSetAttrs.roll_info = '';
-        finalSetAttrs.shaped_d20 = 'd20';
+        finalSetAttrs.shaped_d20 = 'd20@{d20_mod}';
 
         if (v.roll_setting === 'adv {{ignore=[[0') {
           finalSetAttrs.roll_info = '{{advantage=1}}';

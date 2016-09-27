@@ -550,7 +550,6 @@ export class Upgrade {
     }
     if (this.versionCompare(currentVersion, '4.2.0') < 0) {
       character.updateD20Mod();
-      settings.updateShapedD20();
     }
     if (this.versionCompare(currentVersion, '4.2.1') < 0) {
       this.actionComponentsToRemoveExtraFields();
@@ -595,5 +594,9 @@ export class Upgrade {
     if (this.versionCompare(currentVersion, '6.0.4') < 0) {
       this.spellEffectsNaming();
     }
+    if (this.versionCompare(currentVersion, '6.1.1') < 0) {
+      settings.updateShapedD20();
+    }
+
   }
 }
