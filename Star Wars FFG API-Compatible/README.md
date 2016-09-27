@@ -17,3 +17,6 @@ Changed display of Old Vehicle Tabs
 NPC Sheet
 Skill Suggestion Engine
 Collapsible sections
+
+6.3.2 Updates
+Fixed broken images.
