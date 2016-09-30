@@ -3,7 +3,7 @@ Character sheet, with integrated rolls and optional API script, for the Cypher S
 It can look like and be used as a sheet for _Numen&eacute;ra_ (except the armor stat cost, as per the CSR rule) or _The Strange_ (except the armor stat cost thing also, and the recursion management which requires several characters/sheets, one per recursion).
 
 # Current version:
-Version 1.2 (October 4th, 2015).
+Version 1.6 (February 21st, 2016).
 
 * Screenshot [Generic Cypher System style](CypherSystem.png)
 * Screenshot [Numenera style](CypherSystem_style_Numenera.png)
@@ -42,8 +42,34 @@ Set up the API script:
 
 # Release Notes
 
+##Release 1.6 (February 21st, 2016)
+Cosmetic changes, to ease access to the delete button on repeatable sections, and diminish repeatable sections line height.
+
+##Release 1.5 (December 21st, 2015)
+
+* New "Attacks" section (one per stat), with integrated rolls, taking in account skill level, costs, damage etc.
+* Stat and skill rolls don't ask/use damage effort anymore (use the new attack sections/rolls instead)
+* New options to simplify rolls: choose if rolls ask for/use assets, bonus and cost. Default is now not askink/using them.
+* "Name" button to logo/info button
+* Info button can be dragged to the macro bar
+* Added info button to equipment and consummables
+* Damage track taken in account for effort cost calculation
+
+##Release 1.4 (November 21st, 2015)
+[See detailed post on the Roll20 forum](https://app.roll20.net/forum/post/2357046/cypher-system-core-rule-book-sheet/?pageforid=2645489#post-2645489)
+
+* New setting to choose the roll parameters type: via the Action section or Roll Queries
+* New button to show Special Abilitie, Cyphers, or Artefacts details in the chat
+
+##Release 1.3 (October 25th, 2015)
+
+* Corrected roll with difficulty and inability: now compute the total difficulty
+* Replace "Action" parameter inputs by drop-down lists, to ensure that Roll20 updates correctly the attributes
+* Negative edge allowed (handicaps)
+* Removed the word "target" from the HTML and template roll code to avoid confusion with the Roll20 keyword "Target", allowing to create custom macros
+
 ##Release 1.2 (October 4th, 2015)
-The API script must be updated in version 1.2.
+The optional [API script](https://github.com/Roll20/roll20-api-scripts/blob/master/CypherSystemSheet/cyphersystemsheet.js) must be updated in version 1.2.
 
 * It's now possible to change the style/look of the PC sheet (to the ones of the generic Cypher System,  Numen&eacute;ra or The Strange), or turn it into an NPC sheet.
 * By popular demand, the stat/skill roll template has been unified and only rolls one d20 dice (for the 3D dice users out there), whatever is the "Difficulty" roll parameter from the "Action" section. If the difficulty parameter has been set to 0, the beaten difficulty is no longer calculated (due to Roll20 limitations), but the raw d20 dice is shown, as the special natural rolls (1 or 17+), and the steps modifiying the difficulty are displayed (and summed).
@@ -54,7 +80,7 @@ The API script must be updated in version 1.2.
 Layout changes: larger stat pools and slightly smaller buttons.
 
 Addition of 2 API buttons: reset Action parameters, and reset/complete rest of the character.
-The [API script](https://github.com/Roll20/roll20-api-scripts/blob/master/CypherSystemSheet/cyphersystemsheet.js) must be updated.
+The optional [API script](https://github.com/Roll20/roll20-api-scripts/blob/master/CypherSystemSheet/cyphersystemsheet.js) must be updated.
 
 ##Release 1.0 (September 2015)
 Creation of the sheet.
