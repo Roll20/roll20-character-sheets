@@ -254,7 +254,7 @@ export class Actions {
     for (const ability of ABILITIES) {
       collectionArray.push(`${ability}_mod`);
     }
-    const damageSyntax = /(?:(\d+d?\d+(?:\s?(\+|\-)\s?\d+)?)(?:\))?)\s*?/;
+    const damageSyntax = /(?:(\d+d?\d+(?:\s?(?:\+|\-)\s?\d+)?)(?:\))?)\s*?/;
     const damageType = /((?:[a-zA-Z]+|[a-zA-Z]+\s(?:or|and)\s[a-zA-Z]+)(?:\s*?\([a-zA-Z\s]+\))?)\s*damage\s?(\([a-zA-Z'\s]+\))?/;
     const altDamageSyntax = /(?:,\s*?or\s*?)/;
     const plus = /\s*?plus\s*?/;
