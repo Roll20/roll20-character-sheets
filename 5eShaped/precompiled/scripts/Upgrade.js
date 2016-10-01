@@ -493,7 +493,6 @@ export class Upgrade {
       equipment.weighAmmo();
     }
     if (this.versionCompare(currentVersion, '2.2.6') < 0) {
-      character.updateLevels();
       this.extasToExtrasFix('repeating_attack');
       this.extasToExtrasFix('repeating_action');
       this.extasToExtrasFix('repeating_spell');
@@ -600,6 +599,8 @@ export class Upgrade {
     if (this.versionCompare(currentVersion, '6.1.3') < 0) {
       abilities.updateModifier('strength');
     }
-
+    if (this.versionCompare(currentVersion, '6.4.2') < 0) {
+      character.updateLevels();
+    }
   }
 }
