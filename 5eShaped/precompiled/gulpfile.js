@@ -3,11 +3,12 @@
 const gulp = require('gulp');
 const include = require('gulp-include');
 const inject = require('gulp-inject');
-const minifyHTML = require('gulp-minify-html');
+const htmlmin = require('gulp-htmlmin');
 const minifyCss = require('gulp-minify-css');
 const concat = require('gulp-concat');
 const sass = require('gulp-sass');
 const sassLint = require('gulp-sass-lint');
+const autoprefixer = require('gulp-autoprefixer');
 const replaceTask = require('gulp-replace-task');
 const rename = require('gulp-rename');
 const change = require('gulp-change');
@@ -18,24 +19,21 @@ const wrapper = require('gulp-wrapper');
 const streamqueue = require('streamqueue');
 const request = require('request');
 const gutil = require('gulp-util');
+const sortJSON = require('gulp-json-sort').default;
 
-const translations = {};
+const browserify = require('browserify');
+const babelify = require('babelify');
+const source = require('vinyl-source-stream');
+const buffer = require('vinyl-buffer');
 
-String.prototype.capitalize = function () {
-  return this.replace(/\w\S*/g, function (txt) {
+String.prototype.capitalize = () => {
+  return this.replace(/\w\S*/g, (txt) => {
     return txt.charAt(0).toUpperCase() + txt.substr(1)
   });
 };
-String.prototype.lowercase = function () {
+String.prototype.lowercase = () => {
   return this.toLowerCase();
 };
-
-function getTranslation() {
-  translations.en = JSON.parse(fs.readFileSync('./translations/en.json'));
-  translations.de = JSON.parse(fs.readFileSync('./translations/de.json'));
-  translations.fr = JSON.parse(fs.readFileSync('./translations/fr.json'));
-  translations.ru = JSON.parse(fs.readFileSync('./translations/ru.json'));
-}
 
 function objByString(o, s) {
   s = s.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties
@@ -50,27 +48,6 @@ function objByString(o, s) {
     }
   }
   return o;
-}
-
-function getTranslationsIfTheyDontExist() {
-  if (Object.keys(translations).length === 0) {
-    getTranslation();
-  }
-}
-function translationWrapper(lang, key) {
-  let translation = objByString(translations[lang], key);
-
-  if (!translation) {
-    translation = objByString(translations.en, key)
-  }
-
-  return '<span class=' + lang + '>' + translation + '</span>';
-}
-function translate(key) {
-  getTranslationsIfTheyDontExist();
-  const translation = translationWrapper('en', key) + translationWrapper('de', key) + translationWrapper('fr', key) + translationWrapper('ru', key);
-
-  return translation;
 }
 function duplicate(file, limit, start) {
   const template = file.contents.toString('utf8');
@@ -92,53 +69,29 @@ function duplicate(file, limit, start) {
 const compileSheetHTML = () => {
   return gulp.src('./5eShaped.html')
     .pipe(include())
-    .pipe(replaceTask({
-      patterns: [
-        {
-          match: /\x7B\x7B'([A-Za-z_0-9\.]+)'\s\|\stranslate\x7D\x7D/g,
-          replacement: function ($1, $2) {
-            return translate($2);
-          }
-        }
-      ]
-    }))
-    .pipe(minifyHTML({
-      whitespace: true
+    .pipe(htmlmin({
+      collapseWhitespace: true
     }));
 };
 const compileSheetWorkers = () => {
-  return gulp.src(['components/sheetWorkers.js'])
-    .pipe(replaceTask({
-      patterns: [
-        {
-          match: /(let TRANSLATIONS;)/i,
-          replacement: function () {
-            let translations = {
-              de: JSON.parse(fs.readFileSync('./translations/de.json')),
-              en: JSON.parse(fs.readFileSync('./translations/en.json')),
-              fr: JSON.parse(fs.readFileSync('./translations/fr.json')),
-              ru: JSON.parse(fs.readFileSync('./translations/ru.json'))
-            };
-            return `const TRANSLATIONS = ${JSON.stringify(translations)};`;
-          }
-        }
-      ]
-    }))
-    .pipe(babel({
+  return browserify('./scripts/sheetWorkers.js')
+    .transform(babelify, {
       presets: ['es2015'],
       comments: false,
       compact: true
-    }))
+    }).bundle()
+    .pipe(source('sheetWorkers.js'))
+    .pipe(buffer())
     .pipe(wrapper({
       header: '<script type="text/worker">',
       footer: '</script>'
-    }));
+    }))
 };
 const compileRollTemplate = () => {
   return gulp.src(['./components/rollTemplate.html']);
 };
 
-gulp.task('compile', ['sass'], function () {
+gulp.task('compile', ['sass', 'translationDist'], () => {
   return streamqueue({objectMode: true},
     compileSheetHTML(),
     compileSheetWorkers(),
@@ -148,22 +101,9 @@ gulp.task('compile', ['sass'], function () {
     .pipe(gulp.dest('../'))
 });
 
-const esLintConfig = {
-  parser: 'babel-eslint',
-  extends: 'airbnb/base',
-  rules: {
-    'arrow-body-style': 0,
-    'indent': 0,
-    'max-len': 0,
-    'no-cond-assign': 0,
-    'no-console': 0,
-    'no-param-reassign': 0,
-    'no-undef': 0
-  }
-};
-gulp.task('lint', function () {
-  return gulp.src(['components/sheetWorkers.js'])
-    .pipe(eslint(esLintConfig))
+gulp.task('lint', () => {
+  return gulp.src(['./scripts/*.js'])
+    .pipe(eslint())
     .pipe(eslint.format())
     .pipe(eslint.failAfterError());
 });
@@ -174,37 +114,58 @@ const sassConfig = {
     'force-element-nesting': 0,
     'hex-length': 'long',
     'empty-line-between-blocks': 0,
+    'nesting-depth': 0,
+    'no-url-protocols': 0,
+    'no-important': 0,
     include: 0
   }
 };
-gulp.task('sass', function () {
+gulp.task('sass', () => {
   return gulp.src('./5eShaped.scss')
-    /*
-     .pipe(sassLint(sassConfig))
-     .pipe(sassLint.format())
-     .pipe(sassLint.failOnError())
-     */
     .pipe(sass().on('error', sass.logError))
+    .pipe(autoprefixer())
     .pipe(minifyCss())
     .pipe(gulp.dest('../'));
+});
+gulp.task('sass-lint', () => {
+  return gulp.src('./5eShaped.scss')
+    .pipe(sassLint(sassConfig))
+    .pipe(sassLint.format())
+    .pipe(sassLint.failOnError())
+});
+
+gulp.task('sort-translations', () => {
+  return gulp.src('../translations/*.json')
+    .pipe(sortJSON({ space: 2 }))
+    .pipe(replaceTask({
+      patterns: [
+        {
+          match: /\"\:\s\"/g,
+          replacement: '":"'
+        }
+      ]
+    }))
+    .pipe(gulp.dest('../translations/'));
 });
 
 gulp.task('submit', ['compile'], (done) => {
   const html = fs.readFileSync('../5eShaped.html', 'utf-8');
   const css = fs.readFileSync('../5eShaped.css', 'utf-8');
+  const translation = fs.readFileSync('../translations/en.json', 'utf-8');
   const props = require('./submitProps.json');
 
-  const url = `https://app.roll20.net/campaigns/savesettings/${props.campaignId}`;
+  const url = `https://app.${props[props.which].roll20}.net/campaigns/savesettings/${props[props.which].campaignId}`;
 
   var j = request.jar();
-  var cookie = request.cookie(`rack.session=${props.rackSessionId}`);
-  j.setCookie(cookie, 'https://app.roll20.net');
+  var cookie = request.cookie(`rack.session=${props[props.which].rackSessionId}`);
+  j.setCookie(cookie, `https://app.${props[props.which].roll20}.net`);
 
   request.post({
       url,
       form: {
         customcharsheet_layout: html,
         customcharsheet_style: css,
+        customcharsheet_translation: translation,
         allowcharacterimport: false,
         bgimage: 'none',
         publicaccess: false,
@@ -215,7 +176,7 @@ gulp.task('submit', ['compile'], (done) => {
     },
     (err, httpResponse, body) => {
       if (httpResponse.statusCode !== 303 ||
-        httpResponse.headers.location !== `https://app.roll20.net/campaigns/campaignsettings/${props.campaignId}`) {
+        httpResponse.headers.location !== `https://app.${props[props.which].roll20}.net/campaigns/campaignsettings/${props[props.which].campaignId}`) {
         gutil.log('Problem submitting sheet, response headers:');
         gutil.log(httpResponse.headers);
         return done(httpResponse.statusMessage);
@@ -223,5 +184,10 @@ gulp.task('submit', ['compile'], (done) => {
       return done(err);
     }
   );
+});
 
+gulp.task('translationDist', () => {
+  return gulp.src('../translations/en.json')
+    .pipe(rename('translation.json'))
+    .pipe(gulp.dest('../'));
 });

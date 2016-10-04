@@ -8,3 +8,11 @@ Je n'ai pas utilisé de CSS.
 ##v1.0 (2016-02-24)
 
 Création.
+
+##v1.1 (2016-08-14)
+
+-Ajustement des feildset pour qu'ils fonctionne
+
+-mettre le minimun dans les input number et rajouter des input pour les champs
+
+-une petit formatage du html
