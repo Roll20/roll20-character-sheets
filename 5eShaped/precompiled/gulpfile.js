@@ -157,7 +157,7 @@ gulp.task('submit', ['compile'], (done) => {
   const url = `https://app.${props[props.which].roll20}.net/campaigns/savesettings/${props[props.which].campaignId}`;
 
   var j = request.jar();
-  var cookie = request.cookie(`rack.session=${props[props.which].rackSessionId}`);
+  var cookie = request.cookie(`rack.session=${props.rackSessionId}`);
   j.setCookie(cookie, `https://app.${props[props.which].roll20}.net`);
 
   request.post({
