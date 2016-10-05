@@ -315,7 +315,7 @@ export class Character {
     getSetItems('character.updateAlignment', {
       collectionArray: ['alignment', 'is_npc'],
       callback: (v, finalSetAttrs) => {
-        if (v.alignment && v.is_npc === '1') {
+        if (v.alignment && getIntValue(v.is_npc) === 1) {
           finalSetAttrs.alignment = v.alignment.toLowerCase();
         }
       },

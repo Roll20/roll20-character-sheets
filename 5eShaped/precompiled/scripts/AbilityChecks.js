@@ -191,7 +191,7 @@ export class AbilityChecks {
                 const skillBonus = getIntValue(match[2]) - abilityValue;
 
                 if (skillBonus >= expertise) {
-                  if (v.expertise_as_advantage === '1') {
+                  if (getIntValue(v.expertise_as_advantage) === 1) {
                     finalSetAttrs[`${repeatingString}skill_d20`] = '2d20@{d20_mod}kh1';
                     finalSetAttrs[`${repeatingString}proficiency`] = 'proficient';
                   } else {
