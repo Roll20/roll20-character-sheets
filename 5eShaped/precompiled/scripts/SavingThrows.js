@@ -9,7 +9,7 @@ export class SavingThrows {
     let highestValue = 0;
     for (const ability of ABILITIES) {
       const abilityMod = getIntValue(v[`${ability}_mod`]);
-      if (v[`${savingThrowName}_${ability}`] === '1' && (highestValue === 0 || abilityMod > highestValue)) {
+      if (getIntValue(v[`${savingThrowName}_${ability}`]) === 1 && (highestValue === 0 || abilityMod > highestValue)) {
         highestValue = abilityMod;
         abilityName = ability;
       }
@@ -23,7 +23,7 @@ export class SavingThrows {
   getHighestAbilityScores(v, savingThrowName) {
     const abilities = [];
     for (const ability of ABILITIES) {
-      if (v[`${savingThrowName}_${ability}`] === '1') {
+      if (getIntValue(v[`${savingThrowName}_${ability}`]) === 1) {
         abilities.push({
           name: ability,
           score: getIntValue(v[`${ability}_calculated`]),
@@ -65,7 +65,7 @@ export class SavingThrows {
   setCustomSaveProf(v, finalSetAttrs, savingThrowName) {
     const pbVar = '@{PB}';
     for (const ability of ABILITIES) {
-      if (v[`${savingThrowName}_${ability}`] === '1' && v[`${ability}_save_prof`] === pbVar && !exists(v[`${savingThrowName}_save_prof`])) {
+      if (getIntValue(v[`${savingThrowName}_${ability}`]) === 1 && v[`${ability}_save_prof`] === pbVar && !exists(v[`${savingThrowName}_save_prof`])) {
         finalSetAttrs[`${savingThrowName}_save_prof`] = pbVar;
       }
     }
@@ -77,9 +77,9 @@ export class SavingThrows {
     for (const ability of ABILITIES) {
       collectionArray.push(`${ability}_calculated`);
       collectionArray.push(`${ability}_mod`);
-      collectionArray.push(`${savingThrowName}_${ability}`);
       if (customSavingThrow) {
         collectionArray.push(`${ability}_save_prof`);
+        collectionArray.push(`${savingThrowName}_${ability}`);
       }
     }
 
@@ -91,7 +91,7 @@ export class SavingThrows {
         let ability;
 
         if (customSavingThrow) {
-          if (v.average_of_abilities === '1') {
+          if (getIntValue(v.average_of_abilities) === 1) {
             const obj = this.getAverageOfHighestAbilityScoresForSavingThrow(v, savingThrowName);
 
             if (obj.avg) {
@@ -150,7 +150,7 @@ export class SavingThrows {
     getSetItems('savingThrows.updateCustomSavingThrowToggle', {
       collectionArray: ['use_custom_saving_throws', 'saving_throw_macro_var_to_use'],
       callback: (v, finalSetAttrs) => {
-        if (v.use_custom_saving_throws === '1') {
+        if (getIntValue(v.use_custom_saving_throws) === 1) {
           finalSetAttrs.saving_throw_macro_var_to_use = '@{custom_saving_throw_macro_var}';
         } else {
           finalSetAttrs.saving_throw_macro_var_to_use = '@{saving_throw_macro_var}';
