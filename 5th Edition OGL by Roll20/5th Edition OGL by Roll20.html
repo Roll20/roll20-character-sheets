@@ -4,7 +4,7 @@
 
 <div class="container npc" style="width: 350px;">
     <input class="npc_options-flag" type="checkbox" name="attr_npc_options-flag" checked="checked"><span>y</span>
-    <div class="npc_options compendium-drop-target">
+    <div class="npc_options compendium-drop-target monsters">
         <div class="row title">
             <span data-i18n="npc-options-u">NPC OPTIONS</span>
         </div>
@@ -5692,6 +5692,28 @@
         });
     });
 
+    on("change:npc_name", function() {
+        getAttrs(["npc"], function(v) {
+            if(v["npc"] != 1) {
+                setAttrs({
+                    npc: "1",
+                    npc_toggle: "1"
+                });
+            }
+        });
+    });
+
+    on("sheet:compendium-drop", function() {
+        getAttrs(["hp_max"], function(v) {
+            setDefaultToken({
+                bar1_link: "npc_speed",
+                bar2_link: "npc_ac",
+                bar3_value: v["hp_max"],
+                bar3_max: v["hp_max"]
+            })
+        });
+    });
+
     var updateitemweight = function() {
         var wtotal = 0;
         getAttrs(["cp","sp","ep","gp","pp"], function(v) {
@@ -6153,7 +6175,7 @@
                         break;
                     case "Paladin":
                         update["hitdietype"] = 10;
-                        update["spellcasting_ability"] = "@{wisdom_mod}+";
+                        update["spellcasting_ability"] = "@{charisma_mod}+";
                         if(!v.wisdom_save_prof || v.wisdom_save_prof != "(@{pb})" || !v.charisma_save_prof || v.charisma_save_prof != "(@{pb})") {
                             update["strength_save_prof"] = 0;
                             update["dexterity_save_prof"] = 0;
