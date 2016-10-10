@@ -91,7 +91,7 @@ export class Attacks {
           const ammoUsed = getIntValue(v[`${repeatingString}ammo_used`], 1);
           if (!isUndefinedOrEmpty(ammoName)) {
             let ammoAutoUse;
-            if (v.ammo_auto_use === '1') {
+            if (getIntValue(v.ammo_auto_use) === 1) {
               ammoAutoUse = 1;
             } else {
               ammoAutoUse = 0;
