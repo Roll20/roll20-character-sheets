@@ -269,11 +269,12 @@
                 <label>Size</label>
                 <div class="inner">
                   <select name="attr_size">
+                    <option>Choose One </option>
                     <option value="-8">Colossal</option>
                     <option value="-4">Gargantuan</option>
                     <option value="-2">Huge</option>
                     <option value="-1">Large</option>
-                    <option value="0" selected="selected">Medium</option>
+                    <option value="0">Medium</option>
                     <option value="1">Small</option>
                     <option value="2">Tiny</option>
                     <option value="4">Diminuitive</option>
@@ -357,7 +358,7 @@
                     <input type="hidden" name="attr_init"/>
                   </div>
                 </div>
-                <div class="mathOperator">= 10 +</div>
+                <div class="mathOperator">= </div>
                 <div class="labelledUnderlined">
                   <label>Dex mod</label>
                   <div class="inner">
@@ -773,6 +774,7 @@
                               <button type="roll" value="&amp;{template:pf} {{charName=@{character_name}}} {{attr=attack}} {{result=[[1d20 + @{attack}]]}}{{notes=@{attack_notes}}}"></button>
                               <input type="text" name="attr_attack_name"/>
                               <select name="attr_attack_ability">
+                                <option value="Choose One">Choose One</option>
                                 <option value="str">Strength</option>
                                 <option value="dex">Dexterity</option>
                                 <option value="con">Constitution</option>
@@ -3947,6 +3949,7 @@
             <label>Ability</label>
             <div class="inner">
               <select name="attr_caster_ability" style="width: 1in">
+                <option value="Choose One">Choose One</option>
                 <option value="str">Strength</option>
                 <option value="dex">Dexterity</option>
                 <option value="con">Constitution</option>
@@ -4434,7 +4437,24 @@
     </div>
   </div>
 </div>
-<script type="text/worker">
+<script type="text/worker">/**
+ * Forces an update on a list of numerical fields, also making sure that
+ * any undefined fields are set to 0.
+ * @param {string[]} attrs
+ * @param {function} cb
+ */
+function forceUpdate(attrs, cb) {
+  parseAttrs(attrs, values => {
+    let tempValues = {};
+    _.each(attrs, attr => {
+      tempValues[attr] = -9999;
+    });
+    setAttrs(tempValues);
+    setAttrs(values);
+  });
+}
+
+
 function onChange(attrs, cb) {
   attrs = _.map(attrs, attr => {
     return 'change:' + attr;
@@ -4582,7 +4602,13 @@ onChangeParse(['str_mod', 'dex_mod', 'con_mod', 'int_mod', 'wis_mod', 'cha_mod']
   });
 });
 
+var testCounter = 0;
+
 on('change:repeating_attacks', (evt) => {
+  forceUpdate(['bab', 'size']);
+  testCounter++;
+  setAttrs({debug: testCounter})
+
   getSectionIDs('repeating_attacks', ids => {
     _.each(ids, id => {
       var prefix = 'repeating_attacks_' + id + '_attack';
@@ -4718,6 +4744,13 @@ onChangeParse(['spell_dc_base'], values => {
     spell_level_8_dc: values.spell_dc_base + 8,
     spell_level_9_dc: values.spell_dc_base + 9
   });
+});
+
+on('sheet:opened', () => {
+  forceUpdate([
+    'str', 'dex', 'con', 'int', 'wis', 'cha',
+    'bab', 'size'
+  ]);
 });
 
 </script>
