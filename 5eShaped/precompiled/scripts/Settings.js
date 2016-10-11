@@ -20,10 +20,25 @@ export class Settings {
       },
     });
   }
+  updateWeightSystem() {
+    getSetItems('settings.updateWeightSystem', {
+      collectionArray: ['weight_system', 'weight_per_coin'],
+      callback: (v, finalSetAttrs) => {
+        if (v.weight_system === 'feet') {
+          finalSetAttrs.weight_per_coin = .02;
+        } else if (v.weight_system === 'meters') {
+          finalSetAttrs.weight_per_coin = .00907;
+        }
+      },
+    });
+  }
 
   setup() {
     on('change:roll_setting', () => {
       this.updateShapedD20();
+    });
+    on('change:weight_system', () => {
+      this.updateWeightSystem();
     });
   }
 }
