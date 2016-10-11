@@ -1,7 +1,7 @@
 /* global on:false */
 
 import { ABILITIES, SKILLS } from './constants';
-import { getSetItems, getSetRepeatingItems, getSkillIdByStorageName, getFloatValue, sumRepeating, isUndefinedOrEmpty, getRepeatingInfo, exists, round } from './utilities';
+import { getSetItems, getSetRepeatingItems, getSkillIdByStorageName, getIntValue, getFloatValue, sumRepeating, isUndefinedOrEmpty, getRepeatingInfo, exists, round } from './utilities';
 
 export class Equipment {
   setAdvantageOnStealth(mode) {
@@ -28,7 +28,6 @@ export class Equipment {
   }
   updateArmor(rowId) {
     let stealthPenalty;
-
     getSetRepeatingItems('equipment.updateArmor', {
       repeatingItems: ['repeating_armor'],
       collectionArrayAddItems: ['parsed', 'modifiers', 'stealth'],
@@ -149,7 +148,7 @@ export class Equipment {
   }
   calculateGold() {
     getSetItems('equipment.calculateGold', {
-      collectionArray: ['cp', 'copper_per_gold', 'sp', 'silver_per_gold', 'ep', 'electrum_per_gold', 'gp', 'pp', 'platinum_per_gold'],
+      collectionArray: ['cp', 'copper_per_gold', 'sp', 'silver_per_gold', 'ep', 'electrum_per_gold', 'gp', 'pp', 'platinum_per_gold', 'weight_per_coin'],
       callback: (v, finalSetAttrs) => {
         const copperPieces = getFloatValue(v.cp);
         const silverPieces = getFloatValue(v.sp);
@@ -160,12 +159,27 @@ export class Equipment {
         const silverPerGold = getFloatValue(v.silver_per_gold, 10);
         const electrumPerGold = getFloatValue(v.electrum_per_gold, 2);
         const platinumPerGold = getFloatValue(v.platinum_per_gold, 10);
+        const weightPerCoin = getFloatValue(v.weight_per_coin, 10);
 
         finalSetAttrs.total_gp = ((copperPieces / copperPerGold) + (silverPieces / silverPerGold) + (electrumPieces / electrumPerGold) + goldPieces + (platinumPieces * platinumPerGold)).toFixed(2);
-        finalSetAttrs.weight_coinage = (copperPieces + silverPieces + electrumPieces + goldPieces + platinumPieces) / 50;
+        finalSetAttrs.weight_coinage = (copperPieces + silverPieces + electrumPieces + goldPieces + platinumPieces) * weightPerCoin;
       },
     });
   }
+  updateCarryingCapacity() {
+    getSetItems('equipment.updateCarryingCapacity', {
+      collectionArray: ['strength_calculated', 'weight_multiplier', 'carrying_capacity', 'max_push_drag_lift', 'encumbered', 'heavily_encumbered', ''],
+      callback: (v, finalSetAttrs) => {
+        const strength = getIntValue(v.strength_calculated);
+        const weightMultiplier = getFloatValue(v.weight_multiplier, 1);
+        finalSetAttrs.carrying_capacity = strength * 15 * weightMultiplier;
+        finalSetAttrs.max_push_drag_lift = strength * 30 * weightMultiplier;
+        finalSetAttrs.encumbered = strength * 5 * weightMultiplier;
+        finalSetAttrs.heavily_encumbered = strength * 10 * weightMultiplier;
+      },
+    });
+  }
+
   setup() {
     on('change:repeating_armor', (eventInfo) => {
       const repeatingInfo = getRepeatingInfo('repeating_armor', eventInfo);
@@ -188,8 +202,11 @@ export class Equipment {
     on('change:weight_attacks change:weight_ammo change:weight_armor change:weight_equipment change:weight_coinage', () => {
       this.updateWeight();
     });
-    on('change:cp change:copper_per_gold change:sp change:silver_per_gold change:ep change:electrum_per_gold change:gp change:pp change:platinum_per_gold', () => {
+    on('change:cp change:copper_per_gold change:sp change:silver_per_gold change:ep change:electrum_per_gold change:gp change:pp change:platinum_per_gold change:weight_per_coin', () => {
       this.calculateGold();
+    });
+    on('change:strength_calculated change:weight_multiplier', () => {
+      this.updateCarryingCapacity();
     });
   }
 }
