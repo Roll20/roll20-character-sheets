@@ -16,13 +16,6 @@ export class Abilities {
     if (ability === 'strength' || ability === 'dexterity') {
       collectionArray.push('finesse_mod');
     }
-    if (ability === 'strength') {
-      collectionArray.push('weight_multiplier');
-      collectionArray.push('carrying_capacity');
-      collectionArray.push('max_push_drag_lift');
-      collectionArray.push('encumbered');
-      collectionArray.push('heavily_encumbered');
-    }
 
     getSetItems('abilities.updateModifier', {
       collectionArray,
@@ -77,11 +70,6 @@ export class Abilities {
 
         if (ability === 'strength') {
           finalSetAttrs.finesse_mod = Math.max(abilityMod, getIntValue(v.dexterity_mod));
-          const weightMultiplier = getFloatValue(v.weight_multiplier, 1);
-          finalSetAttrs.carrying_capacity = abilityScoreCalc * 15 * weightMultiplier;
-          finalSetAttrs.max_push_drag_lift = abilityScoreCalc * 30 * weightMultiplier;
-          finalSetAttrs.encumbered = abilityScoreCalc * 5 * weightMultiplier;
-          finalSetAttrs.heavily_encumbered = abilityScoreCalc * 10 * weightMultiplier;
         } else if (ability === 'dexterity') {
           finalSetAttrs.finesse_mod = Math.max(abilityMod, getIntValue(v.strength_mod));
         }
@@ -100,7 +88,7 @@ export class Abilities {
     on('change:jack_of_all_trades_toggle change:jack_of_all_trades change:global_ability_bonus change:global_check_bonus', () => {
       this.updateModifiers();
     });
-    on('change:strength change:strength_bonus change:strength_check_mod change:strength_check_bonus change:remarkable_athlete_toggle change:remarkable_athlete change:weight_multiplier', () => {
+    on('change:strength change:strength_bonus change:strength_check_mod change:strength_check_bonus change:remarkable_athlete_toggle change:remarkable_athlete', () => {
       this.updateModifier('strength');
     });
     on('change:dexterity change:dexterity_bonus change:dexterity_check_mod change:dexterity_check_bonus change:remarkable_athlete_toggle change:remarkable_athlete', () => {
