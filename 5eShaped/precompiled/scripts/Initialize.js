@@ -52,7 +52,6 @@ export class Initialize {
   }
 
   sheetOpened() {
-    console.log('initialize.sheetOpened');
     const collectionArray = ['version', 'npc', 'base_level', 'convertedFromOGL', 'import_data', 'roll_setting'];
     for (const ability of ABILITIES) {
       collectionArray.push(ability);

@@ -24,7 +24,6 @@ export class Settings {
     getSetItems('settings.updateWeightSystem', {
       collectionArray: ['weight_system', 'weight_per_coin', 'carrying_capacity_multiplier', 'max_push_drag_lift_multiplier', 'encumbered_multiplier', 'heavily_encumbered_multiplier'],
       callback: (v, finalSetAttrs) => {
-        console.log('updateWeightSystem', v);
         if (v.weight_system === 'pounds') {
           finalSetAttrs.weight_per_coin = .02;
           finalSetAttrs.carrying_capacity_multiplier = 15;
