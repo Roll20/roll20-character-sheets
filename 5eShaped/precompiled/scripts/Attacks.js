@@ -1,6 +1,8 @@
 /* global on:false, generateRowID:false */
 import { ABILITIES } from './constants';
 import { updateAttackToggle, updateSavingThrowToggle, updateDamageToggle } from './updateToggles';
+import { Equipment } from './Equipment';
+const equipment = new Equipment();
 import { getSetRepeatingItems, isUndefinedOrEmpty, setFinalAttrs, setCritDamage, sumRepeating, lowercaseDamageTypes, exists, getIntValue, getRepeatingInfo } from './utilities';
 
 export class Attacks {
@@ -27,7 +29,7 @@ export class Attacks {
     });
   }
   update(rowId) {
-    const collectionArray = ['pb', 'strength_mod', 'finesse_mod', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability', 'ammo_auto_use', 'base_dc'];
+    const collectionArray = ['pb', 'strength_mod', 'finesse_mod', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability', 'ammo_auto_use', 'base_dc', 'weight_system'];
     for (const ability of ABILITIES) {
       collectionArray.push(`${ability}_mod`);
     }
@@ -35,7 +37,7 @@ export class Attacks {
     getSetRepeatingItems('attacks.update', {
       repeatingItems: ['repeating_attack'],
       collectionArray,
-      collectionArrayAddItems: ['name', 'type', 'roll_toggle', 'to_hit', 'attack_formula', 'proficiency', 'attack_ability', 'attack_bonus', 'ammo_toggle_var', 'ammo_field_name', 'ammo_used', 'saving_throw_toggle', 'saving_throw_ability', 'saving_throw_bonus', 'saving_throw_dc', 'damage_toggle', 'damage_formula', 'damage', 'damage_ability', 'damage_bonus', 'damage_type', 'damage_crit', 'second_damage_toggle', 'second_damage_formula', 'second_damage', 'second_damage_ability', 'second_damage_bonus', 'second_damage_type', 'second_damage_crit', 'damage_string', 'modifiers', 'properties', 'weight', 'parsed'],
+      collectionArrayAddItems: ['name', 'type', 'roll_toggle', 'to_hit', 'attack_formula', 'proficiency', 'attack_ability', 'attack_bonus', 'ammo_toggle_var', 'ammo_field_name', 'ammo_used', 'saving_throw_toggle', 'saving_throw_ability', 'saving_throw_bonus', 'saving_throw_dc', 'damage_toggle', 'damage_formula', 'damage', 'damage_ability', 'damage_bonus', 'damage_type', 'damage_crit', 'second_damage_toggle', 'second_damage_formula', 'second_damage', 'second_damage_ability', 'second_damage_bonus', 'second_damage_type', 'second_damage_crit', 'damage_string', 'modifiers', 'properties', 'weight', 'weight_system', 'parsed'],
       rowId,
       callback: (v, finalSetAttrs, ids, repeatingItem) => {
         for (const id of ids) {
@@ -120,6 +122,8 @@ export class Attacks {
             finalSetAttrs.second_damage_type = lowercaseDamageTypes(v.second_damage_type);
           }
           setCritDamage(v, finalSetAttrs, repeatingString);
+
+          equipment.changeWeightSystem(v, finalSetAttrs, repeatingString);
         }
       },
     });
@@ -170,7 +174,7 @@ export class Attacks {
         this.update(repeatingInfo.row);
       }
     });
-    on('change:pb, change:global_attack_bonus change:global_melee_attack_bonus change:global_ranged_attack_bonus change:global_damage_bonus change:global_melee_damage_bonus change:global_ranged_damage_bonus change:ammo_auto_use', () => {
+    on('change:pb, change:global_attack_bonus change:global_melee_attack_bonus change:global_ranged_attack_bonus change:global_damage_bonus change:global_melee_damage_bonus change:global_ranged_damage_bonus change:ammo_auto_use change:weight_system', () => {
       this.update();
     });
     on('change:repeating_attack:carried change:repeating_attack:qty change:repeating_attack:weight remove:repeating_attack', () => {

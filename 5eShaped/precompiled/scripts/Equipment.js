@@ -26,11 +26,26 @@ export class Equipment {
       },
     });
   }
+  changeWeightSystem(v, finalSetAttrs, repeatingString) {
+    let globalWeightSystem = v.weight_system;
+    let localWeightSystem = v[`${repeatingString}weight_system`] || 'pounds';
+
+    const weight = getFloatValue(v[`${repeatingString}weight`]);
+    if (exists(weight) && localWeightSystem !== globalWeightSystem) {
+      if (globalWeightSystem === 'pounds') { //convert to pounds
+        finalSetAttrs[`${repeatingString}weight`] = round(weight * 2.20462262185, 3);
+      } else if (globalWeightSystem === 'kilograms') { //convert to kilos
+        finalSetAttrs[`${repeatingString}weight`] = round(weight * 0.45359237, 3);
+      }
+    }
+    finalSetAttrs[`${repeatingString}weight_system`] = globalWeightSystem;
+  }
   updateArmor(rowId) {
     let stealthPenalty;
     getSetRepeatingItems('equipment.updateArmor', {
       repeatingItems: ['repeating_armor'],
-      collectionArrayAddItems: ['parsed', 'modifiers', 'stealth'],
+      collectionArray: ['weight_system'],
+      collectionArrayAddItems: ['parsed', 'modifiers', 'stealth', 'weight', 'weight_system'],
       rowId,
       callback: (v, finalSetAttrs, ids, repeatingItem) => {
         for (const id of ids) {
@@ -49,6 +64,8 @@ export class Equipment {
           if (v[`${repeatingString}stealth`] === 'Disadvantage') {
             stealthPenalty = true;
           }
+
+          this.changeWeightSystem(v, finalSetAttrs, repeatingString);
         }
         if (stealthPenalty) {
           this.setAdvantageOnStealth('dis');
@@ -85,7 +102,8 @@ export class Equipment {
   update(rowId) {
     getSetRepeatingItems('equipment.update', {
       repeatingItems: ['repeating_equipment'],
-      collectionArrayAddItems: ['content'],
+      collectionArray: ['weight_system'],
+      collectionArrayAddItems: ['content', 'weight', 'weight_system'],
       rowId,
       callback: (v, finalSetAttrs, ids, repeatingItem) => {
         for (const id of ids) {
@@ -106,6 +124,7 @@ export class Equipment {
               finalSetAttrs[`${repeatingString}parsed`] += ' content';
             }
           }
+          this.changeWeightSystem(v, finalSetAttrs, repeatingString);
         }
       },
     });
@@ -172,7 +191,7 @@ export class Equipment {
       callback: (v, finalSetAttrs) => {
         const strength = getIntValue(v.strength_calculated);
         const weightMultiplier = getFloatValue(v.weight_multiplier, 1);
-        const carringCapacityMultiplier = getFloatValue(v.carrying_capacity_multiplier, 1);
+        const carringCapacityMultiplier = getFloatValue(v.carrying_capacity_multiplier);
 
         finalSetAttrs.carrying_capacity = strength * carringCapacityMultiplier * weightMultiplier;
       },
@@ -184,7 +203,7 @@ export class Equipment {
       callback: (v, finalSetAttrs) => {
         const strength = getIntValue(v.strength_calculated);
         const weightMultiplier = getFloatValue(v.weight_multiplier, 1);
-        const maxPushDragLiftMultiplier = getFloatValue(v.max_push_drag_lift_multiplier, 1);
+        const maxPushDragLiftMultiplier = getFloatValue(v.max_push_drag_lift_multiplier);
 
         finalSetAttrs.max_push_drag_lift = strength * maxPushDragLiftMultiplier * weightMultiplier;
       },
@@ -196,7 +215,7 @@ export class Equipment {
       callback: (v, finalSetAttrs) => {
         const strength = getIntValue(v.strength_calculated);
         const weightMultiplier = getFloatValue(v.weight_multiplier, 1);
-        const encumberedMultiplier = getFloatValue(v.encumbered_multiplier, 1);
+        const encumberedMultiplier = getFloatValue(v.encumbered_multiplier);
 
         finalSetAttrs.encumbered = strength * encumberedMultiplier * weightMultiplier;
       },
@@ -208,7 +227,7 @@ export class Equipment {
       callback: (v, finalSetAttrs) => {
         const strength = getIntValue(v.strength_calculated);
         const weightMultiplier = getFloatValue(v.weight_multiplier, 1);
-        const heavilyEncumberedMultiplier = getFloatValue(v.heavily_encumbered_multiplier, 1);
+        const heavilyEncumberedMultiplier = getFloatValue(v.heavily_encumbered_multiplier);
 
         finalSetAttrs.heavily_encumbered = strength * heavilyEncumberedMultiplier * weightMultiplier;
       },
@@ -251,6 +270,10 @@ export class Equipment {
     });
     on('change:strength_calculated change:weight_multiplier change:heavily_encumbered_multiplier', () => {
       this.updateHeavilyEncumbered();
+    });
+    on('change:weight_system', () => {
+      this.updateArmor();
+      this.update();
     });
   }
 }
