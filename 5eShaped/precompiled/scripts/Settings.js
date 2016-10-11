@@ -22,17 +22,25 @@ export class Settings {
   }
   updateWeightSystem() {
     getSetItems('settings.updateWeightSystem', {
-      collectionArray: ['weight_system', 'weight_per_coin'],
+      collectionArray: ['weight_system', 'weight_per_coin', 'carrying_capacity_multiplier', 'max_push_drag_lift_multiplier', 'encumbered_multiplier', 'heavily_encumbered_multiplier'],
       callback: (v, finalSetAttrs) => {
-        if (v.weight_system === 'feet') {
+        console.log('updateWeightSystem', v);
+        if (v.weight_system === 'pounds') {
           finalSetAttrs.weight_per_coin = .02;
-        } else if (v.weight_system === 'meters') {
+          finalSetAttrs.carrying_capacity_multiplier = 15;
+          finalSetAttrs.max_push_drag_lift_multiplier = 30;
+          finalSetAttrs.encumbered_multiplier = 5;
+          finalSetAttrs.heavily_encumbered_multiplier = 10;
+        } else if (v.weight_system === 'kilograms') {
           finalSetAttrs.weight_per_coin = .00907;
+          finalSetAttrs.carrying_capacity_multiplier = 6.8;
+          finalSetAttrs.max_push_drag_lift_multiplier = 13.6;
+          finalSetAttrs.encumbered_multiplier = 2.27;
+          finalSetAttrs.heavily_encumbered_multiplier = 4.54;
         }
       },
     });
   }
-
   setup() {
     on('change:roll_setting', () => {
       this.updateShapedD20();
