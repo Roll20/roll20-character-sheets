@@ -168,14 +168,49 @@ export class Equipment {
   }
   updateCarryingCapacity() {
     getSetItems('equipment.updateCarryingCapacity', {
-      collectionArray: ['strength_calculated', 'weight_multiplier', 'carrying_capacity', 'max_push_drag_lift', 'encumbered', 'heavily_encumbered', ''],
+      collectionArray: ['strength_calculated', 'weight_multiplier', 'carrying_capacity', 'carrying_capacity_multiplier'],
       callback: (v, finalSetAttrs) => {
         const strength = getIntValue(v.strength_calculated);
         const weightMultiplier = getFloatValue(v.weight_multiplier, 1);
-        finalSetAttrs.carrying_capacity = strength * 15 * weightMultiplier;
-        finalSetAttrs.max_push_drag_lift = strength * 30 * weightMultiplier;
-        finalSetAttrs.encumbered = strength * 5 * weightMultiplier;
-        finalSetAttrs.heavily_encumbered = strength * 10 * weightMultiplier;
+        const carringCapacityMultiplier = getFloatValue(v.carrying_capacity_multiplier, 1);
+
+        finalSetAttrs.carrying_capacity = strength * carringCapacityMultiplier * weightMultiplier;
+      },
+    });
+  }
+  updateMaxPushDragLift() {
+    getSetItems('equipment.updateMaxPushDragLift', {
+      collectionArray: ['strength_calculated', 'weight_multiplier', 'max_push_drag_lift', 'max_push_drag_lift_multiplier'],
+      callback: (v, finalSetAttrs) => {
+        const strength = getIntValue(v.strength_calculated);
+        const weightMultiplier = getFloatValue(v.weight_multiplier, 1);
+        const maxPushDragLiftMultiplier = getFloatValue(v.max_push_drag_lift_multiplier, 1);
+
+        finalSetAttrs.max_push_drag_lift = strength * maxPushDragLiftMultiplier * weightMultiplier;
+      },
+    });
+  }
+  updateEncumbered() {
+    getSetItems('equipment.updateEncumbered', {
+      collectionArray: ['strength_calculated', 'weight_multiplier', 'encumbered', 'encumbered_multiplier'],
+      callback: (v, finalSetAttrs) => {
+        const strength = getIntValue(v.strength_calculated);
+        const weightMultiplier = getFloatValue(v.weight_multiplier, 1);
+        const encumberedMultiplier = getFloatValue(v.encumbered_multiplier, 1);
+
+        finalSetAttrs.encumbered = strength * encumberedMultiplier * weightMultiplier;
+      },
+    });
+  }
+  updateHeavilyEncumbered() {
+    getSetItems('equipment.updateHeavilyEncumbered', {
+      collectionArray: ['strength_calculated', 'weight_multiplier', 'heavily_encumbered', 'heavily_encumbered_multiplier'],
+      callback: (v, finalSetAttrs) => {
+        const strength = getIntValue(v.strength_calculated);
+        const weightMultiplier = getFloatValue(v.weight_multiplier, 1);
+        const heavilyEncumberedMultiplier = getFloatValue(v.heavily_encumbered_multiplier, 1);
+
+        finalSetAttrs.heavily_encumbered = strength * heavilyEncumberedMultiplier * weightMultiplier;
       },
     });
   }
@@ -205,8 +240,17 @@ export class Equipment {
     on('change:cp change:copper_per_gold change:sp change:silver_per_gold change:ep change:electrum_per_gold change:gp change:pp change:platinum_per_gold change:weight_per_coin', () => {
       this.calculateGold();
     });
-    on('change:strength_calculated change:weight_multiplier', () => {
+    on('change:strength_calculated change:weight_multiplier change:carrying_capacity_multiplier', () => {
       this.updateCarryingCapacity();
+    });
+    on('change:strength_calculated change:weight_multiplier change:max_push_drag_lift_multiplier', () => {
+      this.updateMaxPushDragLift();
+    });
+    on('change:strength_calculated change:weight_multiplier change:encumbered_multiplier', () => {
+      this.updateEncumbered();
+    });
+    on('change:strength_calculated change:weight_multiplier change:heavily_encumbered_multiplier', () => {
+      this.updateHeavilyEncumbered();
     });
   }
 }
