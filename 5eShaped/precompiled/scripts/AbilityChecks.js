@@ -1,6 +1,6 @@
 /* global on:false, generateRowID:false, getTranslationByKey:false */
 
-import { getSetItems, getSetRepeatingItems, isUndefinedOrEmpty, getAbilityValue, getAbilityShortName, getIntValue, addArithmeticOperator, showSign, capitalize, exists, getRepeatingInfo, isUndefined } from './utilities';
+import { getSetItems, getSetRepeatingItems, isUndefinedOrEmpty, getAbilityValue, getAbilityShortName, getIntValue, addArithmeticOperator, showSign, exists, getRepeatingInfo, isUndefined } from './utilities';
 import { ABILITIES } from './constants';
 import { ProficiencyBonus } from './ProficiencyBonus';
 const proficiencyBonus = new ProficiencyBonus();

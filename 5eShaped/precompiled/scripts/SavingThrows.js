@@ -182,7 +182,7 @@ export class SavingThrows {
       callback: (v, finalSetAttrs) => {
         if (v.pb === 2 && checkedSavingThrowSRDCount < 50) {
           checkedSavingThrowSRDCount += 1;
-          this.updateFromSRD(checkedSavingThrowSRDCount); //timeouts lose context so just have to bruteforce it.
+          this.updateFromSRD(checkedSavingThrowSRDCount); // timeouts lose context so just have to bruteforce it.
           return;
         }
         for (const ability of ABILITIES) {

@@ -321,8 +321,8 @@ export class Spells {
       collectionArray: ['warlock_spell_slots', 'warlock_spell_slots_calc', 'warlock_spell_slots_bonus', 'warlock_spell_slots_max'],
       callback: (v, finalSetAttrs) => {
         const warlockSlots = getIntValue(v.warlock_spell_slots_calc) + getIntValue(v.warlock_spell_slots_bonus);
-        finalSetAttrs['warlock_spell_slots'] = warlockSlots;
-        finalSetAttrs['warlock_spell_slots_max'] = warlockSlots;
+        finalSetAttrs.warlock_spell_slots = warlockSlots;
+        finalSetAttrs.warlock_spell_slots_max = warlockSlots;
       },
     });
   }
@@ -423,10 +423,6 @@ export class Spells {
         for (let i = 1; i <= 8; i++) {
           const spellLevels = [];
           const warlockSpellsMaxLevel = getIntValue(v.warlock_spells_max_level);
-          let addWarlockLevel = 0;
-          if (getIntValue(v.warlock_spell_slots) > 0 && warlockSpellsMaxLevel > 0 && i < warlockSpellsMaxLevel) {
-            addWarlockLevel = warlockSpellsMaxLevel;
-          }
 
           for (let j = i; j <= 9; j++) {
             if (getIntValue(v[`spell_slots_l${j}`]) || j === warlockSpellsMaxLevel) {

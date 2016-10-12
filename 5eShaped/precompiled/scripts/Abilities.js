@@ -8,7 +8,7 @@ import { Attacks } from './Attacks';
 const attacks = new Attacks();
 import { Spells } from './Spells';
 const spells = new Spells();
-import { getSetItems, getIntValue, getFloatValue, getAbilityMod, addArithmeticOperator, showSign, firstThree } from './utilities';
+import { getSetItems, getIntValue, getAbilityMod, addArithmeticOperator, showSign, firstThree } from './utilities';
 
 export class Abilities {
   updateModifier(ability) {
