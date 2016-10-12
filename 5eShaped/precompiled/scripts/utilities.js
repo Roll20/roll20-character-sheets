@@ -14,8 +14,26 @@ const camelize = (str) => {
 const firstThree = (string) => {
   return string.substring(0, 3);
 };
-const round = (value, places) => {
-  return +(`${Math.round(`${value}e+${places}`)}e-${places}`);
+const decimalAdjust = (type, value, exp) => {
+  // If the exp is undefined or zero...
+  if (typeof exp === 'undefined' || +exp === 0) {
+    return Math[type](value);
+  }
+  value = +value;
+  exp = +exp;
+  // If the value is not a number or the exp is not an integer...
+  if (isNaN(value) || !(typeof exp === 'number' && exp % 1 === 0)) {
+    return NaN;
+  }
+  // Shift
+  value = value.toString().split('e');
+  value = Math[type](+(value[0] + 'e' + (value[1] ? (+value[1] - exp) : -exp)));
+  // Shift back
+  value = value.toString().split('e');
+  return +(value[0] + 'e' + (value[1] ? (+value[1] + exp) : exp));
+};
+const round = (value, exp) => {
+  return decimalAdjust('round', value, exp);
 };
 const isUndefined = (value) => {
   if (typeof value === 'undefined') {
@@ -317,9 +335,7 @@ const sumRepeating = (options, sumItems) => {
             }
           }
 
-          let itemTotal = round((qty * fieldToAdd), 2);
-
-          itemTotal = round(itemTotal, 2);
+          const itemTotal = round((qty * fieldToAdd), -2);
 
           if (sumItem.itemTotal) {
             finalSetAttrs[repeatingString + sumItem.itemTotal] = itemTotal;
@@ -354,6 +370,12 @@ const sumRepeating = (options, sumItems) => {
         }
         if (sumItem.totalFieldSecondary && !exists(finalSetAttrs[sumItem.totalFieldSecondary])) {
           finalSetAttrs[sumItem.totalFieldSecondary] = 0;
+        }
+        if (finalSetAttrs[sumItem.totalField]) {
+          finalSetAttrs[sumItem.totalField] = round(finalSetAttrs[sumItem.totalField], -2);
+        }
+        if (finalSetAttrs[sumItem.totalFieldSecondary]) {
+          finalSetAttrs[sumItem.totalFieldSecondary] = round(finalSetAttrs[sumItem.totalFieldSecondary], -2);
         }
       }
 
