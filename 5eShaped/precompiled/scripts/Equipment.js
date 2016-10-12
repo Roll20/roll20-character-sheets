@@ -26,16 +26,16 @@ export class Equipment {
       },
     });
   }
-  changeWeightSystem(v, finalSetAttrs, repeatingString) {
-    let globalWeightSystem = v.weight_system;
-    let localWeightSystem = v[`${repeatingString}weight_system`] || 'pounds';
+  changeWeightSystem(v, finalSetAttrs, repeatingString, defaultWeight) {
+    const globalWeightSystem = v.weight_system;
+    const localWeightSystem = v[`${repeatingString}weight_system`] || 'pounds';
 
-    const weight = getFloatValue(v[`${repeatingString}weight`]);
+    const weight = getFloatValue(v[`${repeatingString}weight`]) || defaultWeight;
     if (exists(weight) && localWeightSystem !== globalWeightSystem) {
-      if (globalWeightSystem === 'pounds') { //convert to pounds
-        finalSetAttrs[`${repeatingString}weight`] = round(weight * 2.20462262185, 3);
-      } else if (globalWeightSystem === 'kilograms') { //convert to kilos
-        finalSetAttrs[`${repeatingString}weight`] = round(weight * 0.45359237, 3);
+      if (globalWeightSystem === 'pounds') { // convert to pounds
+        finalSetAttrs[`${repeatingString}weight`] = round(weight * 2.204622621848776, -3);
+      } else if (globalWeightSystem === 'kilograms') { // convert to kilos
+        finalSetAttrs[`${repeatingString}weight`] = round(weight * 0.45359237, -3);
       }
     }
     finalSetAttrs[`${repeatingString}weight_system`] = globalWeightSystem;
@@ -148,11 +148,23 @@ export class Equipment {
     getSetItems('equipment.updateWeight', {
       collectionArray: ['weight_attacks', 'weight_ammo', 'weight_armor', 'weight_equipment', 'weight_coinage'],
       callback: (v, finalSetAttrs) => {
-        finalSetAttrs.weight_total = round((getFloatValue(v.weight_attacks) + getFloatValue(v.weight_ammo) + getFloatValue(v.weight_armor) + getFloatValue(v.weight_equipment) + getFloatValue(v.weight_coinage)), 2);
+        finalSetAttrs.weight_total = round((getFloatValue(v.weight_attacks) + getFloatValue(v.weight_ammo) + getFloatValue(v.weight_armor) + getFloatValue(v.weight_equipment) + getFloatValue(v.weight_coinage)), -2);
       },
     });
   }
   weighAmmo() {
+    getSetRepeatingItems('equipment.weighAmmo', {
+      repeatingItems: ['repeating_ammo'],
+      collectionArray: ['weight_system'],
+      collectionArrayAddItems: ['weight', 'weight_system'],
+      callback: (v, finalSetAttrs, ids, repeatingItem) => {
+        for (const id of ids) {
+          const repeatingString = `${repeatingItem}_${id}_`;
+
+          this.changeWeightSystem(v, finalSetAttrs, repeatingString, 0.05);
+        }
+      },
+    });
     const options = {
       collection: 'ammo',
       qty: 'qty',
@@ -193,7 +205,7 @@ export class Equipment {
         const weightMultiplier = getFloatValue(v.weight_multiplier, 1);
         const carringCapacityMultiplier = getFloatValue(v.carrying_capacity_multiplier);
 
-        finalSetAttrs.carrying_capacity = strength * carringCapacityMultiplier * weightMultiplier;
+        finalSetAttrs.carrying_capacity = round((strength * carringCapacityMultiplier * weightMultiplier), -2);
       },
     });
   }
@@ -205,7 +217,7 @@ export class Equipment {
         const weightMultiplier = getFloatValue(v.weight_multiplier, 1);
         const maxPushDragLiftMultiplier = getFloatValue(v.max_push_drag_lift_multiplier);
 
-        finalSetAttrs.max_push_drag_lift = strength * maxPushDragLiftMultiplier * weightMultiplier;
+        finalSetAttrs.max_push_drag_lift = round((strength * maxPushDragLiftMultiplier * weightMultiplier), -2);
       },
     });
   }
@@ -217,7 +229,7 @@ export class Equipment {
         const weightMultiplier = getFloatValue(v.weight_multiplier, 1);
         const encumberedMultiplier = getFloatValue(v.encumbered_multiplier);
 
-        finalSetAttrs.encumbered = strength * encumberedMultiplier * weightMultiplier;
+        finalSetAttrs.encumbered = round((strength * encumberedMultiplier * weightMultiplier), -2);
       },
     });
   }
@@ -229,7 +241,7 @@ export class Equipment {
         const weightMultiplier = getFloatValue(v.weight_multiplier, 1);
         const heavilyEncumberedMultiplier = getFloatValue(v.heavily_encumbered_multiplier);
 
-        finalSetAttrs.heavily_encumbered = strength * heavilyEncumberedMultiplier * weightMultiplier;
+        finalSetAttrs.heavily_encumbered = round((strength * heavilyEncumberedMultiplier * weightMultiplier), -2);
       },
     });
   }
@@ -274,6 +286,7 @@ export class Equipment {
     on('change:weight_system', () => {
       this.updateArmor();
       this.update();
+      this.weighAmmo();
     });
   }
 }
