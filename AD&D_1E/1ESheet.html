@@ -122,7 +122,7 @@
 			<td><input type="text" class="sheet-input-small" name="attr_EncumbranceBonus" title="@{EncumbranceBonus}" value="0" /></td>
 			<td class="sheet-right"><button class="sheet-button" type="roll" name="attr_MinorStrengthFeat-roll" title="%{selected|MinorStrengthFeat-roll}" value="&{template:general} {{name=@{character_name}}} {{subtag=Minor Strength Feat}} {{1d6 Roll=[[1d6cs<@{MinorStrengthFeat}cf>@{MinorStrengthFeat}]] }}" >&nbsp;Open Doors</button></td>
 			<td><input type="text" class="sheet-input-small" name="attr_MinorStrengthFeat" title="@{MinorStrengthFeat}" value="0" /></td>
-			<td class="sheet-right"><button class="sheet-button" type="roll" name="attr_MajorStrengthFeat-roll" title="%{selected|MajorStrengthFeat-roll}" value="&{template:general} {{name=@{character_name}}} {{subtag=Major Strength Feat}} {{ Major STR Feat=[[1d100cs>@{MajorStrengthFeat}cf<@{MajorStrengthFeat} ]] %}}" >&nbsp;Bend Bars</button></td>
+			<td class="sheet-right"><button class="sheet-button" type="roll" name="attr_MajorStrengthFeat-roll" title="%{selected|MajorStrengthFeat-roll}" value="&{template:general} {{name=@{character_name}}} {{subtag=Major Strength Feat}} {{ Major STR Feat=[[1d100cs<@{MajorStrengthFeat}cf>@{MajorStrengthFeat} ]] %}}" >&nbsp;Bend Bars</button></td>
 			<td><input type="text" class="sheet-input-small" name="attr_MajorStrengthFeat" title="@{MajorStrengthFeat}" value="0" /></td>
 		</tr>
 		<tr>
@@ -611,7 +611,7 @@
 <div class="sheet-footer">
 	<div class="sheet-table sheet-text-small">
 		<div class="sheet-table-row">
-			<span class="sheet-data sheet-center">Original Author: Adam Ness | Contributions by: Vince, & Roll20 Community. | Version <i>2.28.16'</i></span>
+			<span class="sheet-data sheet-center">Original Author: Adam Ness | Contributions by: Vince, & Roll20 Community. | Version <i>08.25.16'</i></span>
 		</div>
 		<div class="sheet-table-row">
 			<span class="sheet-data sheet-center">Questions/feedback? Please use the Character Sheets forum:<input type="text" style="border:none; line-height:12px; width:256px;" value="https://app.roll20.net/forum/post/2791950/ad-and-d-1e-update-beta" /></span>		
@@ -683,8 +683,8 @@
 var TAS = TAS || (function(){
     'use strict';
 
-    var version = '0.2.1',
-        lastUpdate = 1453794214,
+    var version = '0.2.4',
+        lastUpdate = 1457098091,
 
         loggingSettings = {
             debug: {
@@ -852,7 +852,7 @@ var TAS = TAS || (function(){
 
         coloredLoggerFunction = function(message){
             console.log(
-                '%c '+label+': %c '+message,
+                '%c '+label+': %c '+message + ' ',
                 'background-color: '+lBGColor+';color: '+lTxtColor+'; font-weight:bold;',
                 'background-color: '+mBGColor+';color: '+mTxtColor+';'
             ); 
@@ -876,9 +876,9 @@ var TAS = TAS || (function(){
 
     registerCallstack = function(callstack,label){
         var idx=_.findIndex(callstackRegistry,function(o){
-            return (_.difference(o.stack,callstack).length === _.difference(callstack,o.stack).length)
-                && _.difference(o.stack,callstack).length === 0
-                && o.label === label;
+            return (_.difference(o.stack,callstack).length === _.difference(callstack,o.stack).length) &&
+                _.difference(o.stack,callstack).length === 0 &&
+                o.label === label;
         });
         if(-1 === idx){
             idx=callstackRegistry.length;
@@ -940,7 +940,7 @@ var TAS = TAS || (function(){
     },
 
 
-    wrapCallback = function (label, callback,context){
+    wrapCallback = function (label, callback, context){
         var callstack;
         if('function' === typeof label){
             context=callback;
@@ -960,12 +960,15 @@ var TAS = TAS || (function(){
         
         return (function(cb,ctx,cs,lbl){
             var ctxref=registerCallstack(cs,lbl);
+
+            /*jshint -W054 */
             return new Function('cb','ctx','TASlog',
                 "return function TAS_CALLSTACK_"+ctxref+"(){"+
                     "TASlog('Entering: '+(cb.name||'(anonymous function)'));"+
                     "cb.apply(ctx||{},arguments);"+
                     "TASlog('Exiting: '+(cb.name||'(anonymous function)'));"+
                 "};")(cb,ctx,log);
+            /*jshint +W054 */
         }(callback,context,callstack,label));
     },
 
@@ -1036,8 +1039,10 @@ var TAS = TAS || (function(){
 			Object.defineProperty(obj, pname, {
                 enumerable: true,
 				set: function(v){
-					pvalue=v;
-                    prepareUpdate(full_pname,v);
+                    if(v!==pvalue) {
+                        pvalue=v;
+                        prepareUpdate(full_pname,v);
+                    }
 				},
 				get: function(){
 					return pvalue;
@@ -1049,8 +1054,10 @@ var TAS = TAS || (function(){
                 enumerable: true,
 				set: function(v){
                     var val=v.toString();
-					pvalue=val;
-                    prepareUpdate(full_pname,val);
+                    if(val !== pvalue) {
+                        pvalue=val;
+                        prepareUpdate(full_pname,val);
+                    }
 				},
 				get: function(){
 					return pvalue.toString();
@@ -1062,8 +1069,10 @@ var TAS = TAS || (function(){
                 enumerable: true,
 				set: function(v){
                     var val=parseInt(v,10) || 0;
-					pvalue=val;
-                    prepareUpdate(full_pname,val);
+                    if(val !== pvalue){
+                        pvalue=val;
+                        prepareUpdate(full_pname,val);
+                    }
 				},
 				get: function(){
 					return parseInt(pvalue,10) || 0;
@@ -1075,8 +1084,10 @@ var TAS = TAS || (function(){
                 enumerable: true,
 				set: function(v){
                     var val=parseFloat(v) || 0;
-					pvalue=val;
-                    prepareUpdate(full_pname,val);
+                    if(val !== pvalue) {
+                        pvalue=val;
+                        prepareUpdate(full_pname,val);
+                    }
 				},
 				get: function(){
 					return parseFloat(pvalue) || 0;
@@ -1087,8 +1098,10 @@ var TAS = TAS || (function(){
                     enumerable: true,
                     set: function(v){
                         var val=(parseFloat(v) || 0).toFixed(d);
-                        pvalue=val;
-                        prepareUpdate(full_pname,val);
+                        if(val !== pvalue){
+                            pvalue=val;
+                            prepareUpdate(full_pname,val);
+                        }
                     },
                     get: function(){
                         return (parseFloat(pvalue) || 0).toFixed(d);
@@ -1276,7 +1289,7 @@ var TAS = TAS || (function(){
             .reduce(function(m,r){
                 return m + (r.F[field]);
             },0,function(t,r,a){
-                a[destination]=t;
+                a.S[destination]=t;
             })
             .execute();
     };
