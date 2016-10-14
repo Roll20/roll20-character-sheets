@@ -150,16 +150,15 @@ export class Character {
           }
 
           let classSpellcasting = v[`${repeatingString}spellcasting`];
-          if (isUndefinedOrEmpty(classSpellcasting)) {
-            if (defaultClassDetails.hasOwnProperty(className)) {
-              classSpellcasting = defaultClassDetails[className].spellcasting;
-              if (classSpellcasting) {
-                finalSetAttrs[`${repeatingString}spellcasting`] = classSpellcasting;
-              }
-            } else {
-              finalSetAttrs[`${repeatingString}spellcasting`] = 'none';
+          if (defaultClassDetails.hasOwnProperty(className)) {
+            classSpellcasting = defaultClassDetails[className].spellcasting;
+            if (classSpellcasting) {
+              finalSetAttrs[`${repeatingString}spellcasting`] = classSpellcasting;
             }
-          } else if (classSpellcasting === 'warlock') {
+          } else {
+            finalSetAttrs[`${repeatingString}spellcasting`] = 'none';
+          }
+          if (classSpellcasting === 'warlock') {
             spellcasting[classSpellcasting] += classLevel;
           } else {
             classesWithSpellcasting += 1;
