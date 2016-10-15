@@ -5,6 +5,9 @@ This is my fork of Suldae's initial sheet.
 
 ### ChangeLog
 
+#### Bug Fix Update - March 2016
+* Changed Armor Qualitiese and Upgrades fields from number type to text type and widened them
+
 #### Bug Fix Update - February 2016
 * Added attribute names (or used unique names) to various attributes so they would work properly, such as drag-n-drop of initiative onto desktop
 

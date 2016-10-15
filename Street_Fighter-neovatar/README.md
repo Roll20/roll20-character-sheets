@@ -43,5 +43,8 @@ This will create `Street_Fighter-neovatar.[css|html]` that you can copy and past
 
 ### Changelog
 
+**1.1.0:**
+* User sheet worker scripts to track wounds and used resources and to syncronize it with attributes shown with tokens (hp, willpower, chi)
+
 **1.0.0:**
 * Intitial release
