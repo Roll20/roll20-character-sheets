@@ -54,8 +54,6 @@ export class Psionics {
         for (const id of ids) {
           const repeatingString = `${repeatingItem}_${id}_`;
 
-          this.parseSRD(v, finalSetAttrs, repeatingString);
-
           if (v[`${repeatingString}power_level`] !== 'TALENT') {
             const psionicLevel = getIntValue(v[`${repeatingString}power_level`]);
             finalSetAttrs[`${repeatingString}manifest_as_level`] = `@{manifest_as_level_${psionicLevel}}`;
