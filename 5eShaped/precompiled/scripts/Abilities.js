@@ -8,6 +8,8 @@ import { Attacks } from './Attacks';
 const attacks = new Attacks();
 import { Spells } from './Spells';
 const spells = new Spells();
+import { Psionics } from './Psionics';
+const psionics = new Psionics();
 import { getSetItems, getIntValue, getAbilityMod, addArithmeticOperator, showSign, firstThree } from './utilities';
 
 export class Abilities {
@@ -110,6 +112,7 @@ export class Abilities {
       abilityChecks.updateSkill();
       attacks.update();
       spells.update();
+      psionics.update();
       actions.updateAll();
     });
   }
