@@ -1,4 +1,4 @@
-<!-- version: 1.4.1 -->
+<!-- version: 1.5.0 -->
 
 <div style="display:none;">
 	<b style="color:red;font-size:150%;">Attention: </b>
@@ -102,7 +102,7 @@
           </div>
           <div class="sheet-table-row">
             <span class="sheet-table-data sheet-center">
-              <button title="Roll basic melee attack" class="sheet-round-button" title="%{BM-check}" type="roll" value="&{template:13thage_generic} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=Basic melee}} {{Attack result=[[1d20+[[@{BM-mod}+@{BM-misc}+@{BM-item}+@{level}+@{escdie}]]]]}} {{Damage on hit=[[@{level}@{BMDMG-die}+[[@{BMDMG-mod}+@{BMDMG-misc}+@{BMDMG-item}]]]]}} {{Damage on miss=[[@{BMDMG-miss}]]}}" name="roll_BM-check"></button>
+              <button title="Roll basic melee attack" class="sheet-round-button" title="%{BM-check}" type="roll" value="&{template:13thage_generic} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=Basic melee}} {{Attack result=[[1d20+?{Situational Attack Modifier|0}+[[@{BM-mod}+@{BM-misc}+@{BM-item}+@{level}+@{escdie}]]]]}} {{Damage on hit=[[@{level}@{BMDMG-die}+[[@{BMDMG-mod}+@{BMDMG-misc}+@{BMDMG-item}]]]]}} {{Damage on miss=[[@{BMDMG-miss}]]}}" name="roll_BM-check"></button>
             </span>
             <span class="sheet-table-data sheet-left">
               <select name="attr_BM-mod" style="width:3.25em;display:inlineblock;">
@@ -160,7 +160,7 @@
           </div>
           <div class="sheet-table-row">
             <span class="sheet-table-data sheet-center">
-              <button  title="Roll basic ranged attack" class="sheet-round-button" title="%{BR-check}" type="roll" value="&{template:13thage_generic} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=Basic ranged}} {{Attack result=[[1d20+[[@{BR-mod}+@{BR-misc}+@{BR-item}+@{level}+@{escdie}]]]]}} {{Damage on hit=[[@{level}@{BRDMG-die}+[[@{BRDMG-mod}+@{BRDMG-misc}+@{BRDMG-item}]]]]}} {{Damage on miss=[[@{BRDMG-miss}]]}}" name="roll_BR-check"></button>
+              <button  title="Roll basic ranged attack" class="sheet-round-button" title="%{BR-check}" type="roll" value="&{template:13thage_generic} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=Basic ranged}} {{Attack result=[[1d20+?{Situational Attack Modifier|0}+[[@{BR-mod}+@{BR-misc}+@{BR-item}+@{level}+@{escdie}]]]]}} {{Damage on hit=[[@{level}@{BRDMG-die}+[[@{BRDMG-mod}+@{BRDMG-misc}+@{BRDMG-item}]]]]}} {{Damage on miss=[[@{BRDMG-miss}]]}}" name="roll_BR-check"></button>
             </span>
             <span class="sheet-table-data sheet-left">
               <select name="attr_BR-mod" style="width:3.25em;display:inlineblock;">
@@ -276,12 +276,12 @@
             <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{HP}" type="number" name="attr_HP" value="10"></span>
             <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{HP-temp}" type="number" name="attr_HP-temp" value="0"></span>
             <span class="sheet-table-data sheet-left">
+              <input style="width:100%;" title="@{HP-lvlmod}" name="attr_HP-lvlmod" value="0" type="hidden" />
               <input style="width:100%;" title="@{HP-formula}" name="attr_HP-formula" value="((@{HP-base}+((@{CON-mod})+abs((@{CON-mod})))/2)*@{HP-lvlmod})+@{HP-misc}" type="hidden" />
               <input style="width:100%;" class="sheet-total sheet-center" title="@{HP_max}" type="number" name="attr_HP_max" value="@{HP-formula}" disabled="true">
             </span>
             <span class="sheet-table-data sheet-table-padding"></span>
             <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{HP-base}" type="number" name="attr_HP-base" value="10"></span>
-            <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{HP-lvlmod}" type="number" name="attr_HP-lvlmod" value="0"></span>
             <span class="sheet-table-data sheet-left"><input style="width:100%;" class="sheet-total sheet-center" title="@{HP-misc}" type="number" name="attr_HP-misc" value="0"></span>
             </span>
           </div>
@@ -292,7 +292,6 @@
             <span class="sheet-table-data sheet-center sheet-table-smallsub">Max.</span>
             <span class="sheet-table-data sheet-center sheet-table-smallsub"></span>
             <span class="sheet-table-data sheet-center sheet-table-smallsub">Base</span>
-            <span class="sheet-table-data sheet-center sheet-table-smallsub">Lvlmod.</span>
             <span class="sheet-table-data sheet-center sheet-table-smallsub">Misc.</span>
           </div>
         </div>
@@ -967,7 +966,7 @@
       </div>
     </div>
   </div>
-  <div style="font-size:8px" class="sheet-right"><br>Sheet Version: 1.4.1</div>
+  <div style="font-size:8px" class="sheet-right"><br>Sheet Version: 1.5.0</div>
 </div>
 
 <!-- roll templates -->
@@ -1036,3 +1035,19 @@
     {{/allprops() character_name character_id name_link}}
   </table>
 </rolltemplate>
+
+<!-- WORKERS -->
+<script type="text/worker">
+  on("change:level", function() {
+    getAttrs(["level"], function(v) {
+      level = v["level"] && isNaN(v["level"]) === false ? parseInt(v["level"], 10) : 1;
+      if (level < 5) {lvlmod = level + 2;}
+      else if (level < 8) {lvlmod = ((level-4)*2) + 6;}
+      else {lvlmod = ((level-7)*4) + 12;};
+      console.log("setting HP-lvlmod" + lvlmod);
+      setAttrs({
+        "HP-lvlmod": lvlmod
+      });
+    });
+  });
+</script>

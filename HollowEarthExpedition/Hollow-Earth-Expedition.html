@@ -1,0 +1,566 @@
+﻿<div class="sheet-hex">
+    <script type="text/worker">
+        //Set encumbrance based on strength
+        on("change:strength", function () {
+            getAttrs(["strength"], function (values) {
+                switch (values.strength) {
+                    case "1":
+                        setAttrs({ enclight: 10, encmedium: 25, encheavy: 50 });
+                        break;
+                    case "2":
+                        setAttrs({ enclight: 25, encmedium: 50, encheavy: 100 });
+                        break;
+                    case "3":
+                        setAttrs({ enclight: 50, encmedium: 100, encheavy: 250 });
+                        break;
+                    case "4":
+                        setAttrs({ enclight: 100, encmedium: 250, encheavy: 500 });
+                        break;
+                    case "5":
+                        setAttrs({ enclight: 250, encmedium: 500, encheavy: 750 });
+                        break;
+                    case "6":
+                        setAttrs({ enclight: 500, encmedium: 750, encheavy: 1000 });
+                        break;
+                    default:
+                        setAttrs({ enclight: 0, encmedium: 0, encheavy: 0 });
+                        break;
+                } //end switch
+            }); //end getAttrs
+        }); //end on("change:strength")
+
+        //Calculate averages for weapons and skills and enter in HEX n+ notation style
+        on("change:repeating_skills:skillrating", function (e) {
+            getAttrs(["repeating_skills_skillrating"], function (values) {
+                var n = "("+Math.floor(values.repeating_skills_skillrating / 2).toString();
+                n += (values.repeating_skills_skillrating % 2 > 0) ? "+)" : ")";
+                setAttrs({ repeating_skills_skillaverage: n });
+            });
+        });
+        on("change:repeating_weapons:weaponattack", function (e) {
+            getAttrs(["repeating_weapons_weaponattack"], function (values) {
+                var n = "("+Math.floor(values.repeating_weapons_weaponattack / 2).toString();
+                n += (values.repeating_weapons_weaponattack % 2 > 0) ? "+)" : ")";
+                setAttrs({ repeating_weapons_weaponaverage: n });
+            });
+        });
+
+        //Inventory weight tallying
+        on("change:repeating_equipment:equipweight remove:repeating_equipment", function (e) {
+            getSectionIDs("repeating_equipment", function (idarr) {
+                var totalWeight = 0;
+                var weightTally = _.after(idarr.length, function() {
+                    setAttrs({invweight:Math.round(totalWeight)});
+                });
+                for (var i = 0; i < idarr.length; i++) {
+                    getAttrs(["repeating_equipment_" + idarr[i] + "_equipweight"], function (v) {
+                        totalWeight += parseFloat(v[Object.keys(v)[0]]);
+                        weightTally();
+                    });
+                }
+            });
+        });
+    </script>
+    <div class="sheet-2colrow">
+        <!-- Left column -->
+        <div class="sheet-col sheet-primary">
+            <h1>Primary Attributes</h1>
+            <div class="sheet-2colrow">
+                <div class="sheet-col sheet-collapse-margin">
+                    <label class="sheet-attr-input-label">
+                        Body
+                        <input class="sheet-attr-input-text body" name="attr_body" type="text" title="Resistance check"/>
+                        <button type="roll" class="sheet-roll-button" name="roll_bodyroll" value="&{template:default} {{name=Body}} {{Successes=[[(@{body}*2)d2>2]]}}"></button>
+                    </label>
+                    <label class="sheet-attr-input-label">
+                        Dexterity
+                        <input class="sheet-attr-input-text dexterity" name="attr_dexterity" type="text" title="Balance check" />
+                        <button type="roll" class="sheet-roll-button" value="&{template:default} {{name=Dexterity}} {{Successes=[[(@{dexterity}*2)d2>2]]}}"></button>
+                    </label>
+                    <label class="sheet-attr-input-label">
+                        Strength
+                        <input class="sheet-attr-input-text strength" name="attr_strength" type="text" title="Feats of strength check"/>
+                        <button type="roll" class="sheet-roll-button" value="&{template:default} {{name=Strength}} {{Successes=[[(@{strength}*2)d2>2]]}}"></button>
+                    </label>
+                </div>
+                <div class="sheet-col sheet-collapse-margin">
+                    <label class="sheet-attr-input-label">
+                        Charisma
+                        <input class="sheet-attr-input-text charisma" name="attr_charisma" type="text" title="Influence check" />
+                        <button type="roll" class="sheet-roll-button" value="&{template:default} {{name=Charisma}} {{Successes=[[(@{charisma}*2)d2>2]]}}"></button>
+                    </label>
+                    <label class="sheet-attr-input-label">
+                        Intelligence
+                        <input class="sheet-attr-input-text intelligence" name="attr_intelligence" type="text" title="Reason check" />
+                        <button type="roll" class="sheet-roll-button" value="&{template:default} {{name=Intelligence}} {{Successes=[[(@{intelligence}*2)d2>2]]}}"></button>
+                    </label>
+                    <label class="sheet-attr-input-label">
+                        Willpower
+                        <input class="sheet-attr-input-text willpower" name="attr_willpower" type="text" title="Courage check"/>
+                        <button type="roll" class="sheet-roll-button" value="&{template:default} {{name=Willpower}} {{Successes=[[(@{willpower}*2)d2>2]]}}"></button>
+                    </label>
+                </div>
+            </div>
+            <!-- Secondary Attributes -->
+            <h1 class="sheet-top-separator">Secondary Attributes</h1>
+            <div class="sheet-2colrow">
+                <div class="sheet-col sheet-collapse-margin">
+                    <label class="sheet-attr-input-label">
+                        Size
+                        <input class="sheet-attr-input-text" name="attr_size" type="text" value="0" />
+                    </label>
+                    <label class="sheet-attr-input-label">
+                        Move
+                        <input class="sheet-attr-input-text" name="attr_move" type="text" title="Move = Strength + Dexterity"/>
+                    </label>
+                    <label class="sheet-attr-input-label">
+                        Perception
+                        <input class="sheet-attr-input-text perception" name="attr_perception" type="text" title="Perception = Intelligence + Willpower"/>
+                        <button type="roll" class="sheet-roll-button" value="&{template:default} {{name=Perception}} {{Successes=[[@{perception}d2>2]]}}"></button>
+                    </label>
+                </div>
+                <div class="sheet-col sheet-collapse-margin">
+                    <label class="sheet-attr-input-label">
+                        Initiative
+                        <input class="sheet-attr-input-text initiative" name="attr_initiative" type="text" title="Initiative = Dexterity + Intelligence" />
+                        <button type="roll" class="sheet-roll-button" value="&{template:default} {{name=Initiative}} {{Regular=[[@{initiative}d2>2]]}} {{Continuous=[[10-@{initiative}d2>2]]}}"></button>
+                    </label>
+                    <label class="sheet-attr-input-label">
+                        Defense
+                        <input class="sheet-attr-input-text defense" name="attr_defense" type="text" title="Defense = Passive+Active-Size, Passive = Body, Active = Dexterity" />
+                        <button type="roll" class="sheet-roll-button" value="&{template:default} {{name=Defense}} {{Success=[[@{defense}d2>2]]}}"></button>
+                    </label>
+
+                    <label class="sheet-attr-input-label">
+                        Stun
+                        <input class="sheet-attr-input-text" type="text" title="Stun = Body"/>
+                    </label>
+                </div>
+            </div>
+            <!-- Skills -->
+            <div class="sheet-top-separator sheet-heading-with-columns">
+                <h1>Skills</h1>
+                <div class="sheet-column-headings">
+                    <div class="sheet-skill-name"></div>
+                    <div class="sheet-skill-base">Base</div>
+                    <div class="sheet-skill-levels">Levels</div>
+                    <div class="sheet-skill-rating">Rating</div>
+                    <div class="sheet-skill-avg">(Avg)</div>
+                    <div class="sheet-skill-roll"></div>
+                </div>
+                <fieldset class="repeating_skills">
+                    <div class="sheet-skill-row-1">
+                        <div class="sheet-skill-name">
+                            <input type="text" name="attr_skillname" class="sheet-free-input skillname" />
+                        </div>
+                        <div class="sheet-skill-base">
+                            <input type="text" name="attr_skillbase" class="sheet-free-input" />
+                        </div>
+                        <div class="sheet-skill-levels">
+                            <input type="text" name="attr_skilllevel" class="sheet-free-input" />
+                        </div>
+                        <div class="sheet-skill-rating">
+                            <input type="text" name="attr_skillrating" class="sheet-free-input skillrating" />
+                        </div>
+                        <div class="sheet-skill-avg">
+                            <input type="text" name="attr_skillaverage" class="sheet-free-input skillsaverage" readonly="readonly" />
+                        </div>
+                        <div class="sheet-skill-roll">
+                            <button type="roll" value="&{template:default} {{name=@{skillname}}} {{Successes=[[@{skillrating}d2>2]]}}" name="roll_@{skillname}"></button>
+                        </div>
+                    </div>
+                </fieldset>
+                <p class="sheet-footnote">* specialized skill</p="sheet-skill-footnote">
+            </div>
+            <!-- Weapons -->
+            <div class="sheet-top-separator sheet-bottom-separator sheet-heading-with-columns sheet-weapons">
+                <h1>Weapons</h1>
+                <fieldset class="repeating_weapons">
+                    <div class="sheet-weapon-row-1">
+                        <div class="sheet-weapon-name">
+                            <input type="text" name="attr_weaponname" class="sheet-free-input weaponname" />
+                        </div>
+                        <div class="sheet-weapon-dmg">
+                            <input type="text" name="attr_weapondmg" class="sheet-free-input weapondmg" />
+                            <span>Dmg</span>
+                        </div>
+                        <div class="sheet-weapon-mod">
+                            <input type="text" name="attr_weaponmod" class="sheet-free-input weaponmod" />
+                            <span>Mod</span>
+                        </div>
+                        <div class="sheet-weapon-attack">
+                            <input type="text" name="attr_weaponattack" class="sheet-free-input weaponattack" />
+                            <span>Attack</span>
+                        </div>
+                        <div class="sheet-weapon-avg">
+                            <input type="text" name="attr_weaponaverage" class="sheet-free-input weaponaverage" readonly="readonly" />
+                            <span>(Avg)</span>
+                        </div>
+                        <div class="sheet-weapon-roll">
+                            <button type="roll" value="&{template:default} {{name=@{weaponname}}} {{Successes=[[@{weaponattack}d2>2]]}}"></button>
+                        </div>
+                    </div>
+                    <div class="sheet-weapon-row-2">
+                        <input type="checkbox" name="attr_moredetails" class="sheet-weapon-isranged" />
+                        <span class="sheet-ranged-weapon">More details</span>
+                        <div class="sheet-ranged-stats">
+                            <div class="sheet-weapon-notes">
+                                <input type="text" name="attr_weaponnotes" class="sheet-free-input" />
+                                <span>Notes</span>
+                            </div>
+                            <div class="sheet-weapon-speed">
+                                <input type="text" name="attr_weaponspeed" class="sheet-free-input" />
+                                <span>Spd</span>
+                            </div>
+                            <div class="sheet-weapon-range">
+                                <input type="text" name="attr_weaponrange" class="sheet-free-input" />
+                                <span>Rng</span>
+                            </div>
+                            <div class="sheet-weapon-capacity">
+                                <input type="text" name="attr_weaponcapacity" class="sheet-free-input" />
+                                <span>Cap</span>
+                            </div>
+                            <div class="sheet-weapon-ammo">
+                                <input type="text" name="attr_weaponammo" class="sheet-free-input" />
+                                <span>Ammo</span>
+                            </div>
+                            <div class="sheet-weapon-rate">
+                                <input type="text" name="attr_weaponrate" class="sheet-free-input" />
+                                <span>Rate</span>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <!-- Talents -->
+            <h1 class="sheet-top-separator">Talents</h1>
+            <fieldset class="repeating_talents">
+                <input class="sheet-free-input" name="attr_talent" type="text" />
+            </fieldset>
+
+            <h1 class="sheet-top-separator">Resources</h1>
+            <fieldset class="repeating_resources">
+                <input class="sheet-free-input" name="attr_resource" type="text" />
+            </fieldset>
+
+            <h1 class="sheet-top-separator">Flaws</h1>
+            <fieldset class="repeating_flaws">
+                <input class="sheet-free-input" name="attr_flaw" type="text" />
+            </fieldset>
+
+            <!-- Languages, Money, Encumbrance -->
+            <div class="sheet-2colrow sheet-top-separator">
+                <div class="sheet-col sheet-languages-money">
+                    <h1>Languages</h1>
+                    <textarea type="text" class="sheet-languages" name="attr_languages"></textarea>
+                    <h1>Money</h1>
+                    <textarea type="text" class="sheet-money" name="attr_money"></textarea>
+                </div>
+                <div class="sheet-col sheet-encumbrance">
+                    <h1>Encumbrance</h1>
+                    <label class="sheet-attr-input-label">
+                        <span class="sheet-field">Light</span>
+                        <input class="sheet-widest-input-text" name="attr_enclight" type="text" readonly="readonly" />
+                        <span class="sheet-subtext">lbs</span>
+                    </label>
+                    <label class="sheet-attr-input-label">
+                        <span class="sheet-field">Medium</span>
+                        <input class="sheet-widest-input-text" type="text" name="attr_encmedium" readonly="readonly" title="-1 Dexterity and Move"/>
+                        <span class="sheet-subtext">lbs</span>
+                    </label>
+                    <label class="sheet-attr-input-label">
+                        <span class="sheet-field">Heavy</span>
+                        <input class="sheet-widest-input-text" type="text" name="attr_encheavy" readonly="readonly" title="-2 Dexterity and Move"/>
+                        <span class="sheet-subtext">lbs</span>
+                    </label>
+                    <label class="sheet-attr-input-label">
+                        <span class="sheet-field">Equip</span>
+                        <input class="sheet-widest-input-text invweight" type="text" name="attr_invweight" readonly="readonly"/>
+                        <span class="sheet-subtext">lbs</span>
+                    </label>
+                </div>
+            </div>
+            <!-- Equipment -->
+            <div class="sheet-top-separator sheet-heading-with-columns">
+                <h1>Equipment</h1>
+                <div class="sheet-column-headings">
+                    <div class="sheet-equip-item">&nbsp;</div>
+                    <div class="sheet-equip-num">#</div>
+                    <div class="sheet-equip-weight">Weight</div>
+                </div>
+                <fieldset class="repeating_equipment">
+                    <div class="sheet-equip-item">
+                        <input type="text" name="attr_equipitem" class="sheet-free-input" />
+                    </div>
+                    <div class="sheet-equip-num">
+                        <input type="text" name="attr_equipnum" class="sheet-free-input" />
+                    </div>
+                    <div class="sheet-equip-weight">
+                        <input type="text" name="attr_equipweight" class="sheet-free-input equipweight" />
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+        <!-- Right column -->
+        <div class="sheet-col sheet-sidebar">
+            <label class="sheet-side-input-label">
+                <span class="sheet-side-heading">Style</span>
+                <input type="number" step="1" min="0" name="attr_style" class="sheet-widest-input-text" />
+            </label>
+            <label class="sheet-side-input-label">
+                <span class="sheet-side-heading">Health</span>
+                <input type="text" name="attr_health" class="sheet-widest-input-text" title="Health = Body + Willpower + Size"/>
+            </label>
+            <div class="sheet-health-meter">
+                <table>
+                    <thead>
+                        <tr>
+                            <th colspan="2">Wounds</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>12</td>
+                            <td>
+                                <div class="sheet-pip-circle">
+                                    <input type="radio" class="sheet-pip-circle sheet-healthy-pip" name="attr_h12" value="12H" />
+                                    <input type="radio" class="sheet-pip-circle sheet-l-pip" name="attr_h12" value="12L" />
+                                    <input type="radio" class="sheet-pip-circle sheet-nl-pip" name="attr_h12" value="12NL" />
+                                    <span class="sheet-pip-circle sheet-nl-pip">&#9994;</span>
+                                    <span class="sheet-pip-circle sheet-l-pip">&#128299;</span>
+                                    <span class="sheet-pip-circle sheet-healthy-pip"></span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>11</td>
+                            <td>
+                                <div class="sheet-pip-circle">
+                                    <input type="radio" class="sheet-pip-circle sheet-healthy-pip" name="attr_h11" value="11H" />
+                                    <input type="radio" class="sheet-pip-circle sheet-l-pip" name="attr_h11" value="11L" />
+                                    <input type="radio" class="sheet-pip-circle sheet-nl-pip" name="attr_h11" value="11NL" />
+                                    <span class="sheet-pip-circle sheet-nl-pip">&#9994;</span>
+                                    <span class="sheet-pip-circle sheet-l-pip">&#128299;</span>
+                                    <span class="sheet-pip-circle sheet-healthy-pip"></span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>10</td>
+                            <td>
+                                <div class="sheet-pip-circle">
+                                    <input type="radio" class="sheet-pip-circle sheet-healthy-pip" name="attr_h10" value="10H" />
+                                    <input type="radio" class="sheet-pip-circle sheet-l-pip" name="attr_h10" value="10L" />
+                                    <input type="radio" class="sheet-pip-circle sheet-nl-pip" name="attr_h10" value="10NL" />
+                                    <span class="sheet-pip-circle sheet-nl-pip">&#9994;</span>
+                                    <span class="sheet-pip-circle sheet-l-pip">&#128299;</span>
+                                    <span class="sheet-pip-circle sheet-healthy-pip"></span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>9</td>
+                            <td>
+                                <div class="sheet-pip-circle">
+                                    <input type="radio" class="sheet-pip-circle sheet-healthy-pip" name="attr_h9" value="9H" />
+                                    <input type="radio" class="sheet-pip-circle sheet-l-pip" name="attr_h9" value="9L" />
+                                    <input type="radio" class="sheet-pip-circle sheet-nl-pip" name="attr_h9" value="9NL" />
+                                    <span class="sheet-pip-circle sheet-nl-pip">&#9994;</span>
+                                    <span class="sheet-pip-circle sheet-l-pip">&#128299;</span>
+                                    <span class="sheet-pip-circle sheet-healthy-pip"></span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>8</td>
+                            <td>
+                                <div class="sheet-pip-circle">
+                                    <input type="radio" class="sheet-pip-circle sheet-healthy-pip" name="attr_h8" value="8H" />
+                                    <input type="radio" class="sheet-pip-circle sheet-l-pip" name="attr_h8" value="8L" />
+                                    <input type="radio" class="sheet-pip-circle sheet-nl-pip" name="attr_h8" value="8NL" />
+                                    <span class="sheet-pip-circle sheet-nl-pip">&#9994;</span>
+                                    <span class="sheet-pip-circle sheet-l-pip">&#128299;</span>
+                                    <span class="sheet-pip-circle sheet-healthy-pip"></span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>7</td>
+                            <td>
+                                <div class="sheet-pip-circle">
+                                    <input type="radio" class="sheet-pip-circle sheet-healthy-pip" name="attr_h7" value="7H" />
+                                    <input type="radio" class="sheet-pip-circle sheet-l-pip" name="attr_h7" value="7L" />
+                                    <input type="radio" class="sheet-pip-circle sheet-nl-pip" name="attr_h7" value="7NL" />
+                                    <span class="sheet-pip-circle sheet-nl-pip">&#9994;</span>
+                                    <span class="sheet-pip-circle sheet-l-pip">&#128299;</span>
+                                    <span class="sheet-pip-circle sheet-healthy-pip"></span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td>
+                                <div class="sheet-pip-circle">
+                                    <input type="radio" class="sheet-pip-circle sheet-healthy-pip" name="attr_h6" value="6H" />
+                                    <input type="radio" class="sheet-pip-circle sheet-l-pip" name="attr_h6" value="6L" />
+                                    <input type="radio" class="sheet-pip-circle sheet-nl-pip" name="attr_h6" value="6NL" />
+                                    <span class="sheet-pip-circle sheet-nl-pip">&#9994;</span>
+                                    <span class="sheet-pip-circle sheet-l-pip">&#128299;</span>
+                                    <span class="sheet-pip-circle sheet-healthy-pip"></span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>
+                                <div class="sheet-pip-circle">
+                                    <input type="radio" class="sheet-pip-circle sheet-healthy-pip" name="attr_h5" value="5H" />
+                                    <input type="radio" class="sheet-pip-circle sheet-l-pip" name="attr_h5" value="5L" />
+                                    <input type="radio" class="sheet-pip-circle sheet-nl-pip" name="attr_h5" value="5NL" />
+                                    <span class="sheet-pip-circle sheet-nl-pip">&#9994;</span>
+                                    <span class="sheet-pip-circle sheet-l-pip">&#128299;</span>
+                                    <span class="sheet-pip-circle sheet-healthy-pip"></span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>
+                                <div class="sheet-pip-circle">
+                                    <input type="radio" class="sheet-pip-circle sheet-healthy-pip" name="attr_h4" value="4H" />
+                                    <input type="radio" class="sheet-pip-circle sheet-l-pip" name="attr_h4" value="4L" />
+                                    <input type="radio" class="sheet-pip-circle sheet-nl-pip" name="attr_h4" value="4NL" />
+                                    <span class="sheet-pip-circle sheet-nl-pip">&#9994;</span>
+                                    <span class="sheet-pip-circle sheet-l-pip">&#128299;</span>
+                                    <span class="sheet-pip-circle sheet-healthy-pip"></span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>
+                                <div class="sheet-pip-circle">
+                                    <input type="radio" class="sheet-pip-circle sheet-healthy-pip" name="attr_h3" value="3H" />
+                                    <input type="radio" class="sheet-pip-circle sheet-l-pip" name="attr_h3" value="3L" />
+                                    <input type="radio" class="sheet-pip-circle sheet-nl-pip" name="attr_h3" value="3NL" />
+                                    <span class="sheet-pip-circle sheet-nl-pip">&#9994;</span>
+                                    <span class="sheet-pip-circle sheet-l-pip">&#128299;</span>
+                                    <span class="sheet-pip-circle sheet-healthy-pip"></span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>
+                                <div class="sheet-pip-circle">
+                                    <input type="radio" class="sheet-pip-circle sheet-healthy-pip" name="attr_h2" value="2H" />
+                                    <input type="radio" class="sheet-pip-circle sheet-l-pip" name="attr_h2" value="2L" />
+                                    <input type="radio" class="sheet-pip-circle sheet-nl-pip" name="attr_h2" value="2NL" />
+                                    <span class="sheet-pip-circle sheet-nl-pip">&#9994;</span>
+                                    <span class="sheet-pip-circle sheet-l-pip">&#128299;</span>
+                                    <span class="sheet-pip-circle sheet-healthy-pip"></span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>
+                                <div class="sheet-pip-circle">
+                                    <input type="radio" class="sheet-pip-circle sheet-healthy-pip" name="attr_h1" value="1H" />
+                                    <input type="radio" class="sheet-pip-circle sheet-l-pip" name="attr_h1" value="1L" />
+                                    <input type="radio" class="sheet-pip-circle sheet-nl-pip" name="attr_h1" value="1NL" />
+                                    <span class="sheet-pip-circle sheet-nl-pip">&#9994;</span>
+                                    <span class="sheet-pip-circle sheet-l-pip">&#128299;</span>
+                                    <span class="sheet-pip-circle sheet-healthy-pip"></span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>0</td>
+                            <td>
+                                <div class="sheet-pip-circle">
+                                    <input type="radio" class="sheet-pip-circle sheet-healthy-pip" name="attr_h0" value="0H" />
+                                    <input type="radio" class="sheet-pip-circle sheet-l-pip" name="attr_h0" value="0L" />
+                                    <input type="radio" class="sheet-pip-circle sheet-nl-pip" name="attr_h0" value="0NL" />
+                                    <span class="sheet-pip-circle sheet-nl-pip">&#9994;</span>
+                                    <span class="sheet-pip-circle sheet-l-pip">&#128299;</span>
+                                    <span class="sheet-pip-circle sheet-healthy-pip"></span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>-1</td>
+                            <td>
+                                <div class="sheet-pip-circle">
+                                    <input type="radio" class="sheet-pip-circle sheet-healthy-pip" name="attr_hn1" value="-1H" />
+                                    <input type="radio" class="sheet-pip-circle sheet-l-pip" name="attr_hn1" value="-1L" />
+                                    <input type="radio" class="sheet-pip-circle sheet-nl-pip" name="attr_hn1" value="-1NL" />
+                                    <span class="sheet-pip-circle sheet-nl-pip">&#9994;</span>
+                                    <span class="sheet-pip-circle sheet-l-pip">&#128299;</span>
+                                    <span class="sheet-pip-circle sheet-healthy-pip"></span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>-2</td>
+                            <td>
+                                <div class="sheet-pip-circle">
+                                    <input type="radio" class="sheet-pip-circle sheet-healthy-pip" name="attr_hn2" value="-2H" />
+                                    <input type="radio" class="sheet-pip-circle sheet-l-pip" name="attr_hn2" value="-2L" />
+                                    <input type="radio" class="sheet-pip-circle sheet-nl-pip" name="attr_hn2" value="-2NL" />
+                                    <span class="sheet-pip-circle sheet-nl-pip">&#9994;</span>
+                                    <span class="sheet-pip-circle sheet-l-pip">&#128299;</span>
+                                    <span class="sheet-pip-circle sheet-healthy-pip"></span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>-3</td>
+                            <td>
+                                <div class="sheet-pip-circle">
+                                    <input type="radio" class="sheet-pip-circle sheet-healthy-pip" name="attr_hn3" value="-3H" />
+                                    <input type="radio" class="sheet-pip-circle sheet-l-pip" name="attr_hn3" value="-3L" />
+                                    <input type="radio" class="sheet-pip-circle sheet-nl-pip" name="attr_hn3" value="-3NL" />
+                                    <span class="sheet-pip-circle sheet-nl-pip">&#9994;</span>
+                                    <span class="sheet-pip-circle sheet-l-pip">&#128299;</span>
+                                    <span class="sheet-pip-circle sheet-healthy-pip"></span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>-4</td>
+                            <td>
+                                <div class="sheet-pip-circle">
+                                    <input type="radio" class="sheet-pip-circle sheet-healthy-pip" name="attr_hn4" value="-4H" />
+                                    <input type="radio" class="sheet-pip-circle sheet-l-pip" name="attr_hn4" value="-4L" />
+                                    <input type="radio" class="sheet-pip-circle sheet-nl-pip" name="attr_hn4" value="-4NL" />
+                                    <span class="sheet-pip-circle sheet-nl-pip">&#9994;</span>
+                                    <span class="sheet-pip-circle sheet-l-pip">&#128299;</span>
+                                    <span class="sheet-pip-circle sheet-healthy-pip"></span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>-5</td>
+                            <td>
+                                <div class="sheet-pip-circle">
+                                    <input type="radio" class="sheet-pip-circle sheet-healthy-pip" name="attr_hn5" value="-5H" />
+                                    <input type="radio" class="sheet-pip-circle sheet-l-pip" name="attr_hn5" value="-5L" />
+                                    <input type="radio" class="sheet-pip-circle sheet-nl-pip" name="attr_hn5" value="-5NL" />
+                                    <span class="sheet-pip-circle sheet-nl-pip">&#9994;</span>
+                                    <span class="sheet-pip-circle sheet-l-pip">&#128299;</span>
+                                    <span class="sheet-pip-circle sheet-healthy-pip"></span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <label class="sheet-side-input-label">
+                XP<br />
+                <input type="text" name="attr_xp" class="sheet-widest-input-text" />
+            </label>
+        </div>
+    </div>
+</div>
+
