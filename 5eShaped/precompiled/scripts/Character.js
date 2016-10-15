@@ -35,6 +35,10 @@ export class Character {
         hd: 'd10',
         spellcasting: 'half',
       },
+      psion: {
+        hd: 'd6',
+        spellcasting: 'full-psionics',
+      },
       ranger: {
         hd: 'd10',
         spellcasting: 'half',
@@ -45,6 +49,14 @@ export class Character {
       sorcerer: {
         hd: 'd6',
         spellcasting: 'full',
+      },
+      soulknife: {
+        hd: 'd10',
+        spellcasting: 'half-psionics',
+      },
+      summoner: {
+        hd: 'd6',
+        spellcasting: 'warlock',
       },
       warlock: {
         hd: 'd8',
@@ -69,6 +81,9 @@ export class Character {
       full: 0,
       half: 0,
       third: 0,
+      'full-psionics': 0,
+      'half-psionics': 0,
+      'third-psionics': 0,
       warlock: 0,
     };
     let totalLevel = 0;
