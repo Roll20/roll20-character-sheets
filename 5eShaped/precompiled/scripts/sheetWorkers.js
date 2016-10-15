@@ -45,3 +45,6 @@ settings.setup();
 import { Spells } from './Spells';
 const spells = new Spells();
 spells.setup();
+import { Psionics } from './Psionics';
+const psionics = new Psionics();
+psionics.setup();
