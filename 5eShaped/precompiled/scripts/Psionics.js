@@ -54,7 +54,9 @@ export class Psionics {
         for (const id of ids) {
           const repeatingString = `${repeatingItem}_${id}_`;
 
-          if (v[`${repeatingString}power_level`] !== 'TALENT') {
+          if (!v[`${repeatingString}power_level`] || v[`${repeatingString}power_level`] !== 'TALENT') {
+            finalSetAttrs[`${repeatingString}manifest_as_level`] = '';
+          } else {
             const psionicLevel = getIntValue(v[`${repeatingString}power_level`]);
             finalSetAttrs[`${repeatingString}manifest_as_level`] = `@{manifest_as_level_${psionicLevel}}`;
           }
