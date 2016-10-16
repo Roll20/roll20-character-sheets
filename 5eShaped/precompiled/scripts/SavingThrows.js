@@ -54,11 +54,11 @@ export class SavingThrows {
     const highestAbilities = this.getHighestAbilityScores(v, savingThrowName);
     for (const ability of highestAbilities) {
       obj.abilitiesUsed.push(getAbilityShortName(ability.name));
-      sum += getAbilityMod(v[`${ability.name}_calculated`]);
+      sum += getIntValue(v[`${ability.name}_calculated`]);
     }
 
     if (obj.abilitiesUsed.length > 0) {
-      obj.avg = Math.floor(sum / obj.abilitiesUsed.length);
+      obj.avg = getAbilityMod(sum / obj.abilitiesUsed.length);
     }
     return obj;
   }
