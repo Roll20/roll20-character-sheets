@@ -54,7 +54,7 @@ export class Psionics {
         for (const id of ids) {
           const repeatingString = `${repeatingItem}_${id}_`;
 
-          if (!v[`${repeatingString}power_level`] || v[`${repeatingString}power_level`] !== 'TALENT') {
+          if (isUndefinedOrEmpty(v[`${repeatingString}power_level`]) || v[`${repeatingString}power_level`] === 'TALENT') {
             finalSetAttrs[`${repeatingString}manifest_as_level`] = '';
           } else {
             const psionicLevel = getIntValue(v[`${repeatingString}power_level`]);
@@ -193,7 +193,7 @@ export class Psionics {
   setup() {
     on('change:repeating_psionics', (eventInfo) => {
       const repeatingInfo = getRepeatingInfo('repeating_psionics', eventInfo);
-      if (repeatingInfo && repeatingInfo.field !== 'roll_toggle' && repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'damage_crit' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'second_damage_crit' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'heal_formula' && repeatingInfo.field !== 'psionic_higher_level_query' && repeatingInfo.field !== 'parsed') {
+      if (repeatingInfo && repeatingInfo.field !== 'roll_toggle' && repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'damage_crit' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'second_damage_crit' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'heal_formula' && repeatingInfo.field !== 'psionic_higher_level_query' && repeatingInfo.field !== 'manifest_as_level' && repeatingInfo.field !== 'parsed') {
         this.update(repeatingInfo.rowId);
       }
     });
