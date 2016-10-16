@@ -223,25 +223,27 @@ export class Equipment {
   }
   updateEncumbered() {
     getSetItems('equipment.updateEncumbered', {
-      collectionArray: ['strength_calculated', 'weight_multiplier', 'encumbered', 'encumbered_multiplier'],
+      collectionArray: ['strength_calculated', 'weight_multiplier', 'encumbered', 'encumbered_multiplier', 'encumbrance_multiplier'],
       callback: (v, finalSetAttrs) => {
         const strength = getIntValue(v.strength_calculated);
         const weightMultiplier = getFloatValue(v.weight_multiplier, 1);
         const encumberedMultiplier = getFloatValue(v.encumbered_multiplier);
+        const encumbranceMultiplier = getFloatValue(v.encumbrance_multiplier, 1);
 
-        finalSetAttrs.encumbered = round((strength * encumberedMultiplier * weightMultiplier), -2);
+        finalSetAttrs.encumbered = round((strength * encumberedMultiplier * encumbranceMultiplier * weightMultiplier), -2);
       },
     });
   }
   updateHeavilyEncumbered() {
     getSetItems('equipment.updateHeavilyEncumbered', {
-      collectionArray: ['strength_calculated', 'weight_multiplier', 'heavily_encumbered', 'heavily_encumbered_multiplier'],
+      collectionArray: ['strength_calculated', 'weight_multiplier', 'heavily_encumbered', 'heavily_encumbered_multiplier', 'encumbrance_multiplier'],
       callback: (v, finalSetAttrs) => {
         const strength = getIntValue(v.strength_calculated);
         const weightMultiplier = getFloatValue(v.weight_multiplier, 1);
         const heavilyEncumberedMultiplier = getFloatValue(v.heavily_encumbered_multiplier);
+        const encumbranceMultiplier = getFloatValue(v.encumbrance_multiplier, 1);
 
-        finalSetAttrs.heavily_encumbered = round((strength * heavilyEncumberedMultiplier * weightMultiplier), -2);
+        finalSetAttrs.heavily_encumbered = round((strength * heavilyEncumberedMultiplier * encumbranceMultiplier * weightMultiplier), -2);
       },
     });
   }
@@ -277,10 +279,10 @@ export class Equipment {
     on('change:strength_calculated change:weight_multiplier change:max_push_drag_lift_multiplier', () => {
       this.updateMaxPushDragLift();
     });
-    on('change:strength_calculated change:weight_multiplier change:encumbered_multiplier', () => {
+    on('change:strength_calculated change:weight_multiplier change:encumbered_multiplier change:encumbrance_multiplier', () => {
       this.updateEncumbered();
     });
-    on('change:strength_calculated change:weight_multiplier change:heavily_encumbered_multiplier', () => {
+    on('change:strength_calculated change:weight_multiplier change:heavily_encumbered_multiplier change:encumbrance_multiplier', () => {
       this.updateHeavilyEncumbered();
     });
     on('change:weight_system', () => {
