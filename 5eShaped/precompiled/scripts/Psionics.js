@@ -48,7 +48,7 @@ export class Psionics {
     getSetRepeatingItems('psionics.update', {
       repeatingItems: ['repeating_psionics'],
       collectionArray,
-      collectionArrayAddItems: ['name', 'discipline', 'power_level', 'manifesting_time', 'display', 'concentration', 'duration', 'type', 'roll_toggle', 'to_hit', 'attack_formula', 'proficiency', 'attack_ability', 'attack_bonus', 'saving_throw_toggle', 'saving_throw_ability', 'saving_throw_vs_ability', 'saving_throw_bonus', 'saving_throw_dc', 'damage_toggle', 'damage_formula', 'damage', 'damage_ability', 'damage_bonus', 'damage_type', 'damage_crit', 'second_damage_toggle', 'second_damage_formula', 'second_damage', 'second_damage_ability', 'second_damage_bonus', 'second_damage_type', 'second_damage_crit', 'damage_string', 'parsed', 'heal_toggle', 'heal', 'heal_ability', 'heal_bonus', 'heal_query_toggle', 'higher_level_toggle', 'higher_level_dice', 'higher_level_die', 'second_higher_level_dice', 'second_higher_level_die', 'higher_level_heal', 'ritual', 'ritual_output', 'materials', 'materials_show', 'extras_toggle', 'emote', 'freetext', 'freeform'],
+      collectionArrayAddItems: ['name', 'discipline', 'power_level', 'manifesting_time', 'display', 'concentration', 'duration', 'type', 'roll_toggle', 'to_hit', 'attack_formula', 'proficiency', 'attack_ability', 'attack_bonus', 'saving_throw_toggle', 'saving_throw_ability', 'saving_throw_vs_ability', 'saving_throw_bonus', 'saving_throw_dc', 'damage_toggle', 'damage_formula', 'damage', 'damage_ability', 'damage_bonus', 'damage_type', 'damage_crit', 'second_damage_toggle', 'second_damage_formula', 'second_damage', 'second_damage_ability', 'second_damage_bonus', 'second_damage_type', 'second_damage_crit', 'damage_string', 'parsed', 'heal_toggle', 'heal', 'heal_ability', 'heal_bonus', 'heal_query_toggle', 'higher_level_toggle', 'higher_level_dice', 'higher_level_die', 'second_higher_level_dice', 'second_higher_level_die', 'higher_level_heal', 'meditate', 'meditate_output', 'materials', 'materials_show', 'extras_toggle', 'emote', 'freetext', 'freeform'],
       rowId,
       callback: (v, finalSetAttrs, ids, repeatingItem) => {
         for (const id of ids) {
@@ -64,10 +64,10 @@ export class Psionics {
           } else {
             finalSetAttrs[`${repeatingString}concentration`] = '';
           }
-          if (v[`${repeatingString}ritual`] === 'Yes') {
-            finalSetAttrs[`${repeatingString}ritual_output`] = '?{Cast as|Ritual,{{ritual=1&#125;&#125;|Psionic,}';
+          if (v[`${repeatingString}meditate`] === 'Yes') {
+            finalSetAttrs[`${repeatingString}meditate_output`] = '?{Cast as|Meditate,{{meditate=1&#125;&#125;|Psionic,}';
           } else {
-            finalSetAttrs[`${repeatingString}ritual_output`] = '';
+            finalSetAttrs[`${repeatingString}meditate_output`] = '';
           }
           if (!isUndefinedOrEmpty(v[`${repeatingString}materials`])) {
             finalSetAttrs[`${repeatingString}materials_show`] = 1;
