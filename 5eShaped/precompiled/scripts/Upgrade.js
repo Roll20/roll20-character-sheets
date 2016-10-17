@@ -27,7 +27,7 @@ import { Settings } from './Settings';
 const settings = new Settings();
 import { Spells } from './Spells';
 const spells = new Spells();
-import { isUndefined, isUndefinedOrEmpty, getAbilityName, ordinalSpellLevel, getSetItems, getSetRepeatingItems } from './utilities';
+import { isUndefined, isUndefinedOrEmpty, getAbilityName, getIntValue, getSetItems, getSetRepeatingItems, ordinalSpellLevel } from './utilities';
 import { currentVersion } from './version';
 
 export class Upgrade {
@@ -408,6 +408,16 @@ export class Upgrade {
       },
     });
   }
+  updateWarlockMaxLevelOrdinal() {
+    getSetItems('upgrade.updateWarlockMaxLevelOrdinal', {
+      collectionArray: ['warlock_spells_max_level'],
+      callback: (v, finalSetAttrs) => {
+        finalSetAttrs.warlock_spells_max_level = ordinalSpellLevel(getIntValue(v.warlock_spells_max_level));
+      },
+    });
+  }
+
+
   versionCompare(v1, v2, options) {
     const lexicographical = options && options.lexicographical;
     const zeroExtend = options && options.zeroExtend;
@@ -601,6 +611,9 @@ export class Upgrade {
     }
     if (this.versionCompare(currentVersion, '6.4.2') < 0) {
       character.updateLevels();
+    }
+    if (this.versionCompare(currentVersion, '6.9.0') < 0) {
+      this.updateWarlockMaxLevelOrdinal();
     }
   }
 }
