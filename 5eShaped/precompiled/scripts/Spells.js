@@ -317,12 +317,17 @@ export class Spells {
     });
   }
   updateWarlockSlots() {
-    getSetItems('spells.updateShowHide', {
+    getSetItems('spells.updateWarlockSlots', {
       collectionArray: ['warlock_spell_slots', 'warlock_spell_slots_calc', 'warlock_spell_slots_bonus', 'warlock_spell_slots_max'],
       callback: (v, finalSetAttrs) => {
         const warlockSlots = getIntValue(v.warlock_spell_slots_calc) + getIntValue(v.warlock_spell_slots_bonus);
         finalSetAttrs.warlock_spell_slots = warlockSlots;
         finalSetAttrs.warlock_spell_slots_max = warlockSlots;
+        if (warlockSlots) {
+          finalSetAttrs.has_warlock_spell_slots = true;
+        } else {
+          finalSetAttrs.has_warlock_spell_slots = '';
+        }
       },
     });
   }
@@ -357,7 +362,7 @@ export class Spells {
           const hasSlots = getIntValue(v[`spell_slots_l${level}`]) > 0;
           const hasSlotsMax = getIntValue(v[`spell_slots_l${level}_max`]) > 0;
 
-          if (hasSlots || hasSlotsMax) {
+          if (hasSpells || hasSlots || hasSlotsMax) {
             finalSetAttrs[`spell_slots_l${level}_toggle`] = 'on';
           } else {
             finalSetAttrs[`spell_slots_l${level}_toggle`] = 0;
@@ -367,7 +372,7 @@ export class Spells {
           const warlockSpellsMaxLevel = getIntValue(v.warlock_spells_max_level);
           const hasSlotsOrWarlockSlots = hasSlots || (warlockSlots && level <= warlockSpellsMaxLevel);
 
-          if (hasSlotsOrWarlockSlots || (hasSpells && hasHigherLevelSlots)) {
+          if (hasSpells || hasSlotsOrWarlockSlots || hasHigherLevelSlots) {
             finalSetAttrs[`spells_level_${level}_show`] = true;
           } else {
             finalSetAttrs[`spells_level_${level}_show`] = '';
