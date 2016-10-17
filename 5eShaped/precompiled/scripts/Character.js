@@ -5,7 +5,7 @@ import { ClassFeatures } from './ClassFeatures';
 const classFeatures = new ClassFeatures();
 import { Spells } from './Spells';
 const spells = new Spells();
-import { getSetItems, getSetRepeatingItems, isUndefinedOrEmpty, getIntValue, exists, capitalize, getRepeatingInfo, updateHD } from './utilities';
+import { getSetItems, getSetRepeatingItems, isUndefinedOrEmpty, getIntValue, exists, capitalize, getRepeatingInfo, ordinalSpellLevel, updateHD } from './utilities';
 
 export class Character {
   updateLevels(repeatingInfo) {
@@ -266,11 +266,11 @@ export class Character {
           } else {
             warlockSpellsMaxLevel = 1;
           }
-          finalSetAttrs.warlock_spells_max_level = warlockSpellsMaxLevel;
+          finalSetAttrs.warlock_spells_max_level = ordinalSpellLevel(warlockSpellsMaxLevel);
         } else {
           finalSetAttrs.has_warlock_slots = 0;
           finalSetAttrs.warlock_spell_slots_calc = 0;
-          finalSetAttrs.warlock_spells_max_level = 1;
+          finalSetAttrs.warlock_spells_max_level = ordinalSpellLevel(1);
         }
       },
       setFinalAttrsCallback: () => {
