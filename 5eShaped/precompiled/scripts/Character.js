@@ -81,9 +81,9 @@ export class Character {
       full: 0,
       half: 0,
       third: 0,
-      'full-psionics': 0,
-      'half-psionics': 0,
-      'third-psionics': 0,
+      fullPsionics: 0,
+      halfPsionics: 0,
+      thirdPsionics: 0,
       warlock: 0,
     };
     let totalLevel = 0;
@@ -152,7 +152,7 @@ export class Character {
           }
 
           let classHd = v[`${repeatingString}hd`];
-          if (isUndefinedOrEmpty(classHd) || (repeatingInfo && repeatingInfo.field === 'name')) {
+          if (repeatingInfo && repeatingInfo.field === 'name') {
             if (defaultClassDetails.hasOwnProperty(className)) {
               classHd = defaultClassDetails[className].hd;
             } else {
@@ -165,17 +165,18 @@ export class Character {
           }
 
           let classSpellcasting = v[`${repeatingString}spellcasting`];
-          if (defaultClassDetails.hasOwnProperty(className)) {
-            classSpellcasting = defaultClassDetails[className].spellcasting;
-            if (classSpellcasting) {
+          if (repeatingInfo && repeatingInfo.field === 'name') {
+            if (defaultClassDetails.hasOwnProperty(className) && defaultClassDetails[className].spellcasting) {
+              classSpellcasting = defaultClassDetails[className].spellcasting;
               finalSetAttrs[`${repeatingString}spellcasting`] = classSpellcasting;
+            } else {
+              finalSetAttrs[`${repeatingString}spellcasting`] = 'none';
             }
-          } else {
-            finalSetAttrs[`${repeatingString}spellcasting`] = 'none';
           }
+
           if (classSpellcasting === 'warlock') {
             spellcasting[classSpellcasting] += classLevel;
-          } else {
+          } else if (classSpellcasting) {
             classesWithSpellcasting += 1;
             spellcasting[classSpellcasting] += classLevel;
           }
