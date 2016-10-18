@@ -429,7 +429,7 @@ export class Spells {
     });
   }
   generateHigherLevelQueries() {
-    const collectionArray = ['warlock_level', 'warlock_spell_slots', 'warlock_spells_max_level', 'number_of_classes'];
+    const collectionArray = ['warlock_spell_slots', 'warlock_spells_max_level'];
     for (let i = 1; i <= 8; i++) {
       collectionArray.push(`cast_as_level_${i}`);
       collectionArray.push(`higher_level_query_${i}`);
@@ -467,6 +467,30 @@ export class Spells {
           } else {
             finalSetAttrs[`cast_as_level_${i}`] = '';
           }
+        }
+      },
+    });
+  }
+  updateHasSpellSlots() {
+    getSetItems('spells.updateHasSpellSlots', {
+      collectionArray: ['spell_slots_toggle', 'has_spell_slots'],
+      callback: (v, finalSetAttrs) => {
+        if (v.spell_slots_toggle === 'on') {
+          finalSetAttrs.has_spell_slots = true;
+        } else {
+          finalSetAttrs.has_spell_slots = '';
+        }
+      },
+    });
+  }
+  updateHasSpellPoints() {
+    getSetItems('spells.updateHasSpellPoints', {
+      collectionArray: ['spell_points_toggle', 'has_spell_points'],
+      callback: (v, finalSetAttrs) => {
+        if (v.spell_points_toggle === 'on') {
+          finalSetAttrs.has_spell_points = true;
+        } else {
+          finalSetAttrs.has_spell_points = '';
         }
       },
     });
@@ -514,7 +538,13 @@ export class Spells {
     on('change:spells_show_unprepared remove:repeating_spell', () => {
       this.updateChatMacro();
     });
-    on('change:warlock_spell_slots change:spell_slots_l1 change:spell_slots_l2 change:spell_slots_l3 change:spell_slots_l4 change:spell_slots_l5 change:spell_slots_l6 change:spell_slots_l7 change:spell_slots_l8 change:spell_slots_l9', () => {
+    on('change:spell_slots_toggle', () => {
+      this.updateHasSpellSlots();
+    });
+    on('change:spell_points_toggle', () => {
+      this.updateHasSpellPoints();
+    });
+    on('change:warlock_spell_slots change:warlock_spells_max_level change:spell_slots_l1 change:spell_slots_l2 change:spell_slots_l3 change:spell_slots_l4 change:spell_slots_l5 change:spell_slots_l6 change:spell_slots_l7 change:spell_slots_l8 change:spell_slots_l9', () => {
       this.generateHigherLevelQueries();
     });
   }
