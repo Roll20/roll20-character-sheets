@@ -608,9 +608,6 @@ export class Upgrade {
     if (this.versionCompare(currentVersion, '6.1.3') < 0) {
       abilities.updateModifier('strength');
     }
-    if (this.versionCompare(currentVersion, '6.4.2') < 0) {
-      character.updateLevels();
-    }
     if (this.versionCompare(currentVersion, '6.9.0') < 0) {
       this.updateWarlockMaxLevelOrdinal();
     }
@@ -618,6 +615,7 @@ export class Upgrade {
       spells.updateWarlockSlots();
       spells.updateHasSpellSlots();
       spells.updateHasSpellPoints();
+      character.updateLevels();
     }
   }
 }
