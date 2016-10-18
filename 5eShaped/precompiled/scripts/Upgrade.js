@@ -417,7 +417,6 @@ export class Upgrade {
     });
   }
 
-
   versionCompare(v1, v2, options) {
     const lexicographical = options && options.lexicographical;
     const zeroExtend = options && options.zeroExtend;
@@ -614,6 +613,11 @@ export class Upgrade {
     }
     if (this.versionCompare(currentVersion, '6.9.0') < 0) {
       this.updateWarlockMaxLevelOrdinal();
+    }
+    if (this.versionCompare(currentVersion, '6.9.1') < 0) {
+      spells.updateWarlockSlots();
+      spells.updateHasSpellSlots();
+      spells.updateHasSpellPoints();
     }
   }
 }
