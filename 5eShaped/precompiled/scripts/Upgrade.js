@@ -538,9 +538,6 @@ export class Upgrade {
     if (this.versionCompare(currentVersion, '3.2.3') < 0) {
       resistances.updateDamageResistancesVar();
     }
-    if (this.versionCompare(currentVersion, '3.5.0') < 0) {
-      spells.updateChatMacro();
-    }
     if (this.versionCompare(currentVersion, '3.5.1') < 0) {
       spells.updateSlots();
     }
@@ -616,6 +613,9 @@ export class Upgrade {
       spells.updateHasSpellSlots();
       spells.updateHasSpellPoints();
       character.updateLevels();
+    }
+    if (this.versionCompare(currentVersion, '6.10.0') < 0) {
+      spells.updateChatMacro();
     }
   }
 }

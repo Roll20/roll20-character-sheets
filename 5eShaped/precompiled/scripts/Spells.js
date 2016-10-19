@@ -345,7 +345,7 @@ export class Spells {
     return hasHigherLevelSlots;
   }
   updateShowHide() {
-    const collectionArray = ['spells_show_spell_level_if_all_slots_are_used', 'warlock_spell_slots', 'warlock_spells_max_level'];
+    const collectionArray = ['warlock_spell_slots', 'warlock_spells_max_level'];
     for (let i = 0; i <= 9; i++) {
       collectionArray.push(`spell_slots_l${i}`);
       collectionArray.push(`spell_slots_l${i}_max`);
@@ -402,19 +402,32 @@ export class Spells {
     getSetRepeatingItems('spells.updateChatMacro', {
       repeatingItems: ['repeating_spell'],
       collectionArray,
-      collectionArrayAddItems: ['name', 'spell_level', 'is_prepared'],
+      collectionArrayAddItems: ['name', 'spell_level', 'is_prepared', 'ritual', 'concentration', 'components', 'casting_time'],
       callback: (v, finalSetAttrs, ids, repeatingItem) => {
         for (const id of ids) {
           const repeatingString = `${repeatingItem}_${id}_`;
-          const showUnprepared = v.spells_show_unprepared === 'on' || isUndefinedOrEmpty(v.spells_show_unprepared);
           const spellName = v[`${repeatingString}name`];
           const spellLevel = getIntValue(v[`${repeatingString}spell_level`], 0);
-          const spellPrepared = v[`${repeatingString}is_prepared`] === 'on';
 
-          if (spellName && spellPrepared) {
-            spellSlots[spellLevel].push(`[${spellName}](~repeating_spell_${id}_spell)`);
-          } else if (spellName && showUnprepared) {
-            spellSlots[spellLevel].push(`<span class="sheet-unprepared">[${spellName}](~repeating_spell_${id}_spell)</span>`);
+          let classes = [];
+          classes.push(`${v[`${repeatingString}spell_level`]}`);
+          if (v[`${repeatingString}is_prepared`] === 'on') {
+            classes.push('prepared');
+          }
+          if (v[`${repeatingString}ritual`] === 'Yes') {
+            classes.push('ritual');
+          }
+          if (v[`${repeatingString}concentration`] === 'Yes') {
+            classes.push('concentration');
+          }
+          classes.push(`${v[`${repeatingString}components`]}`);
+          classes.push(`${v[`${repeatingString}casting_time`]}`);
+
+          classes = classes.map((className) => {
+            return `sheet-${className}`;
+          }).join(' ');
+          if (spellName) {
+            spellSlots[spellLevel].push(`<span class="${classes}">[${spellName}](~repeating_spell_${id}_spell)</span>`);
           }
         }
 
@@ -496,13 +509,16 @@ export class Spells {
     });
   }
   watchForChanges() {
-    const spellsWatch = ['change:spells_show_spell_level_if_all_slots_are_used'];
+    let spellsWatch = ['warlock_spells_max_level', 'warlock_spell_slots'];
     for (let i = 0; i <= 9; i++) {
-      spellsWatch.push(`change:spells_level_${i}_macro_var`);
-      spellsWatch.push(`change:spell_slots_l${i}`);
-      spellsWatch.push(`change:spell_slots_l${i}_max`);
+      spellsWatch.push(`spells_level_${i}_macro_var`);
+      spellsWatch.push(`spell_slots_l${i}`);
+      spellsWatch.push(`spell_slots_l${i}_max`);
     }
-    on(spellsWatch.join(' '), () => {
+    spellsWatch = spellsWatch.map((item) => {
+      return `change:${item}`;
+    }).join(' ');
+    on(spellsWatch, () => {
       this.updateShowHide();
     });
   }
