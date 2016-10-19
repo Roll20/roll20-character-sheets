@@ -5359,11 +5359,21 @@
                         if(desc.substring(0,2) === ": " || encodeURI(desc.substring(0,2)) === ":%C2%A0") {
                             desc = desc.substring(2);
                         }
-                        if(desc.indexOf("Weapon Attack:") > -1) {
+                        if(desc.indexOf(" Attack:") > -1) {
                             update["repeating_npcaction_" + newrowid + "_attack_flag"] = "on";
                             update["repeating_npcaction_" + newrowid + "_attack_display_flag"] = "{{attack=1}}";
                             update["repeating_npcaction_" + newrowid + "_attack_options"] = "{{attack=1}}";
-                            attacktype = desc.split(" Weapon Attack:")[0];
+                            if(desc.indexOf(" Weapon Attack:") > -1) {
+                                attacktype = desc.split(" Weapon Attack:")[0];
+                            }
+                            else if(desc.indexOf(" Spell Attack:") > -1) {
+                                attacktype = desc.split(" Spell Attack:")[0];
+                            }
+                            else {
+                                console.log("FAILED TO IMPORT ATTACK - NO ATTACK TYPE FOUND (Weapon Attack/Spell Attack)");
+                                return;
+                            }
+                            
                             update["repeating_npcaction_" + newrowid + "_attack_type"] = attacktype;
                             if(attacktype === "Melee") {
                                 update["repeating_npcaction_" + newrowid + "_attack_range"] = (desc.match(/reach (.*?),/) || ["",""])[1];
@@ -5376,7 +5386,7 @@
                             if(desc.toLowerCase().indexOf("damage") > -1 && npc_exception_actions.indexOf(name) === -1) {
                                 update["repeating_npcaction_" + newrowid + "_attack_damage"] = (desc.match(/\(([^)]+)\)/) || ["",""])[1];
                                 update["repeating_npcaction_" + newrowid + "_attack_damagetype"] = (desc.match(/\) (.*?) damage/) || ["",""])[1];
-                                if((desc.match(/\(/g) || []).length > 1 && desc.match(/\((?!.*\()([^)]+)\)/).indexOf(" DC")[1] === -1) {
+                                if((desc.match(/\(/g) || []).length > 1 && (!desc.match(/\((?!.*\()([^)]+)\)/).indexOf(" DC")[1] || desc.match(/\((?!.*\()([^)]+)\)/).indexOf(" DC")[1] === -1)) {
                                     update["repeating_npcaction_" + newrowid + "_attack_damage2"] = (desc.match(/\((?!.*\()([^)]+)\)/) || ["",""])[1];
                                     update["repeating_npcaction_" + newrowid + "_attack_damagetype2"] = (desc.match(/\)(?!.*\)) (.*?) damage/) || ["",""])[1];
                                 }
@@ -5433,11 +5443,20 @@
                         if(desc.substring(0,2) === ": " || encodeURI(desc.substring(0,2)) === ":%C2%A0") {
                             desc = desc.substring(2);
                         }
-                        if(desc.indexOf("Weapon Attack:") > -1) {
+                        if(desc.indexOf(" Attack:") > -1) {
                             update["repeating_npcaction-l_" + newrowid + "_attack_flag"] = "on";
                             update["repeating_npcaction-l_" + newrowid + "_attack_display_flag"] = "{{attack=1}}";
                             update["repeating_npcaction-l_" + newrowid + "_attack_options"] = "{{attack=1}}";
-                            attacktype = desc.split(" Weapon Attack:")[0];
+                            if(desc.indexOf(" Weapon Attack:") > -1) {
+                                attacktype = desc.split(" Weapon Attack:")[0];
+                            }
+                            else if(desc.indexOf(" Spell Attack:") > -1) {
+                                attacktype = desc.split(" Spell Attack:")[0];
+                            }
+                            else {
+                                console.log("FAILED TO IMPORT ATTACK - NO ATTACK TYPE FOUND (Weapon Attack/Spell Attack)");
+                                return;
+                            }
                             update["repeating_npcaction-l_" + newrowid + "_attack_type"] = attacktype;
                             if(attacktype === "Melee") {
                                 update["repeating_npcaction-l_" + newrowid + "_attack_range"] = (desc.match(/reach (.*?),/) || ["",""])[1];
@@ -5449,7 +5468,7 @@
                             update["repeating_npcaction-l_" + newrowid + "_attack_target"] = (desc.match(/\.,(?!.*\.,)(.*)\. Hit:/) || ["",""])[1];
                             update["repeating_npcaction-l_" + newrowid + "_attack_damage"] = (desc.match(/\(([^)]+)\)/) || ["",""])[1];
                             update["repeating_npcaction-l_" + newrowid + "_attack_damagetype"] = (desc.match(/\) (.*?) damage/) || ["",""])[1];
-                            if((desc.match(/\(/g) || []).length > 1) {
+                            if((desc.match(/\(/g) || []).length > 1 && (!desc.match(/\((?!.*\()([^)]+)\)/).indexOf(" DC")[1] || desc.match(/\((?!.*\()([^)]+)\)/).indexOf(" DC")[1] === -1)) {
                                 update["repeating_npcaction-l_" + newrowid + "_attack_damage2"] = (desc.match(/\((?!.*\()([^)]+)\)/) || ["",""])[1];
                                 update["repeating_npcaction-l_" + newrowid + "_attack_damagetype2"] = (desc.match(/\)(?!.*\)) (.*?) damage/) || ["",""])[1];
                             }
