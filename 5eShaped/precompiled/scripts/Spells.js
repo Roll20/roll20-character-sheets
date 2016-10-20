@@ -2,7 +2,7 @@
 
 import { ABILITIES, TOGGLE_VARS } from './constants';
 import { updateAttackToggle, updateSavingThrowToggle, updateDamageToggle, updateHealToggle, updateHigherLevelToggle } from './updateToggles';
-import { getSetItems, getSetRepeatingItems, ordinalSpellLevel, getIntValue, isUndefined, isUndefinedOrEmpty, setCritDamage, fromVOrFinalSetAttrs, lowercaseDamageTypes, getRepeatingInfo, exists } from './utilities';
+import { getSetItems, getSetRepeatingItems, ordinalSpellLevel, getIntValue, emptyRepeatingSection, isUndefined, isUndefinedOrEmpty, setCritDamage, fromVOrFinalSetAttrs, lowercaseDamageTypes, getRepeatingInfo, exists } from './utilities';
 
 export class Spells {
   parseSRD(v, finalSetAttrs, repeatingString) {
@@ -381,6 +381,39 @@ export class Spells {
       },
     });
   }
+  updateSheetList() {
+    const repeatingSpellListLevel = 'repeating_spelllistlevel';
+    for (let i = 0; i <= 9; i++) {
+      emptyRepeatingSection({
+        repeatingItems: [`${repeatingSpellListLevel}${i}`],
+      });
+    }
+
+    const collectionArray = [];
+    getSetRepeatingItems('spells.updateSheetList', {
+      repeatingItems: ['repeating_spell'],
+      collectionArray,
+      collectionArrayAddItems: ['name', 'spell_level', 'is_prepared', 'ritual', 'concentration', 'components', 'casting_time'],
+      callback: (v, finalSetAttrs, ids, repeatingItem) => {
+        for (const id of ids) {
+          const repeatingString = `${repeatingItem}_${id}_`;
+          const spellName = v[`${repeatingString}name`];
+          const spellLevel = getIntValue(v[`${repeatingString}spell_level`], 0);
+
+          if (spellName) {
+            const newRepeatingString = `${repeatingSpellListLevel}${spellLevel}_${generateRowID()}_`;
+            finalSetAttrs[`${newRepeatingString}name`] = spellName;
+            finalSetAttrs[`${newRepeatingString}spell_level`] = spellLevel;
+            finalSetAttrs[`${newRepeatingString}is_prepared`] = v[`${repeatingString}is_prepared`];
+            finalSetAttrs[`${newRepeatingString}ritual`] = v[`${repeatingString}ritual`];
+            finalSetAttrs[`${newRepeatingString}concentration`] = v[`${repeatingString}concentration`];
+            finalSetAttrs[`${newRepeatingString}components`] = v[`${repeatingString}components`];
+            finalSetAttrs[`${newRepeatingString}casting_time`] = v[`${repeatingString}casting_time`];
+          }
+        }
+      },
+    });
+  }
   updateChatMacro() {
     const spellSlots = {
       0: [],
@@ -545,6 +578,15 @@ export class Spells {
       this.updateWarlockSlots();
     });
     this.watchForChanges();
+    on('change:repeating_spell', (eventInfo) => {
+      const repeatingInfo = getRepeatingInfo('repeating_spell', eventInfo);
+      if (repeatingInfo && (repeatingInfo.field === 'name')) {
+        this.updateSheetList();
+      }
+    });
+    on('remove:repeating_spell', () => {
+      this.updateSheetList();
+    });
     on('change:repeating_spell', (eventInfo) => {
       const repeatingInfo = getRepeatingInfo('repeating_spell', eventInfo);
       if (repeatingInfo && (repeatingInfo.field === 'name' || repeatingInfo.field === 'spell_level' || repeatingInfo.field === 'is_prepared')) {

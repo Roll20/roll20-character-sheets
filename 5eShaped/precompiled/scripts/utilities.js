@@ -237,6 +237,17 @@ const getSetItems = (name, obj) => {
     }
   });
 };
+const emptyRepeatingSection = (obj) => {
+  if (obj.repeatingItems) {
+    for (const repeatingItem of obj.repeatingItems) {
+      getSectionIDs(repeatingItem, (ids) => {
+        for (const id of ids) {
+          removeRepeatingRow(`${repeatingItem}_${id}`);
+        }
+      });
+    }
+  }
+};
 const getSetRepeatingItems = (name, obj) => {
   const collectionArray = obj.collectionArray || [];
   const finalSetAttrs = {};
@@ -434,4 +445,4 @@ const updateHD = (v, finalSetAttrs, hd) => {
   }
 };
 
-export { capitalize, camelize, firstThree, round, isUndefined, isUndefinedOrEmpty, isEmpty, exists, getIntValue, getFloatValue, getAbilityMod, getAbilityName, getAbilityValue, getAbilityShortName, getRepeatingInfo, setFinalAttrs, fromVOrFinalSetAttrs, hasUpperCase, ordinalSpellLevel, addArithmeticOperator, showSign, numberWithCommas, lowercaseDamageTypes, getSetItems, getSetRepeatingItems, sumRepeating, getSkillIdByStorageName, setCritDamage, updateHD };
+export { capitalize, camelize, firstThree, round, emptyRepeatingSection, isUndefined, isUndefinedOrEmpty, isEmpty, exists, getIntValue, getFloatValue, getAbilityMod, getAbilityName, getAbilityValue, getAbilityShortName, getRepeatingInfo, setFinalAttrs, fromVOrFinalSetAttrs, hasUpperCase, ordinalSpellLevel, addArithmeticOperator, showSign, numberWithCommas, lowercaseDamageTypes, getSetItems, getSetRepeatingItems, sumRepeating, getSkillIdByStorageName, setCritDamage, updateHD };

@@ -616,6 +616,7 @@ export class Upgrade {
     }
     if (this.versionCompare(currentVersion, '6.10.0') < 0) {
       spells.updateChatMacro();
+      spells.updateSheetList();
     }
   }
 }
