@@ -409,6 +409,7 @@ export class Spells {
             finalSetAttrs[`${newRepeatingString}concentration`] = v[`${repeatingString}concentration`];
             finalSetAttrs[`${newRepeatingString}components`] = v[`${repeatingString}components`];
             finalSetAttrs[`${newRepeatingString}casting_time`] = v[`${repeatingString}casting_time`];
+            finalSetAttrs[`${newRepeatingString}spell_output`] = `@{${repeatingString}spell_output}`;
           }
         }
       },
