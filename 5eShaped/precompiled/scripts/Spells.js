@@ -581,7 +581,7 @@ export class Spells {
     this.watchForChanges();
     on('change:repeating_spell', (eventInfo) => {
       const repeatingInfo = getRepeatingInfo('repeating_spell', eventInfo);
-      if (repeatingInfo && (repeatingInfo.field === 'name')) {
+      if (repeatingInfo && (repeatingInfo.field === 'name' || repeatingInfo.field === 'spell_level')) {
         this.updateSheetList();
       }
     });
