@@ -1,4 +1,4 @@
-/* global setAttrs:false, getAttrs:false, getSectionIDs:false */
+/* global setAttrs:false, getAttrs:false, getSectionIDs:false, removeRepeatingRow:false */
 
 const capitalize = (string) => {
   return string.replace(/\w\S*/g, (txt) => {
@@ -25,12 +25,14 @@ const decimalAdjust = (type, value, exp) => {
   if (isNaN(value) || !(typeof exp === 'number' && exp % 1 === 0)) {
     return NaN;
   }
+  /* eslint-disable */
   // Shift
   value = value.toString().split('e');
   value = Math[type](+(value[0] + 'e' + (value[1] ? (+value[1] - exp) : -exp)));
   // Shift back
   value = value.toString().split('e');
   return +(value[0] + 'e' + (value[1] ? (+value[1] + exp) : exp));
+  /* eslint-enable */
 };
 const round = (value, exp) => {
   return decimalAdjust('round', value, exp);
@@ -400,12 +402,15 @@ const sumRepeating = (options, sumItems) => {
   });
 };
 const getSkillIdByStorageName = (v, repeatingItem, ids, prop) => {
+  let returnId;
   for (const id of ids) {
     const repeatingString = `${repeatingItem}_${id}_`;
     if (v[`${repeatingString}storage_name`] === prop || v[`${repeatingString}storage_name`] === camelize(prop)) {
-      return id;
+      returnId = id;
+      break;
     }
   }
+  return returnId;
 };
 const setCritDamage = (v, finalSetAttrs, repeatingString) => {
   if (!v[`${repeatingString}damage_crit`] && v[`${repeatingString}damage`]) {

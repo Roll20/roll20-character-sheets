@@ -2,17 +2,17 @@
 
 import { ABILITIES, TOGGLE_VARS } from './constants';
 import { updateAttackToggle, updateSavingThrowToggle, updateDamageToggle, updateHealToggle, updateHigherLevelToggle } from './updateToggles';
-import { getSetItems, getSetRepeatingItems, ordinalSpellLevel, getIntValue, isUndefined, isUndefinedOrEmpty, setCritDamage, fromVOrFinalSetAttrs, lowercaseDamageTypes, getRepeatingInfo, exists } from './utilities';
+import { getSetItems, getSetRepeatingItems, getIntValue, isUndefined, isUndefinedOrEmpty, setCritDamage, fromVOrFinalSetAttrs, lowercaseDamageTypes, getRepeatingInfo } from './utilities';
 const levelToPsiCost = {
-  1:2,
-  2:3,
-  3:5,
-  4:6,
-  5:7,
-  6:9,
-  7:10,
-  8:11,
-  9:13,
+  1: 2,
+  2: 3,
+  3: 5,
+  4: 6,
+  5: 7,
+  6: 9,
+  7: 10,
+  8: 11,
+  9: 13,
 };
 
 export class Psionics {

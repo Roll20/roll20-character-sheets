@@ -335,7 +335,7 @@ export class Spells {
     const warlockSlots = getIntValue(v.warlock_spell_slots);
     const warlockSpellsMaxLevel = getIntValue(v.warlock_spells_max_level);
     let hasHigherLevelSlots = false;
-    for (let level = spellLevel+1; level <= 9; level++) {
+    for (let level = spellLevel + 1; level <= 9; level++) {
       const hasSlotsOrWarlockSlots = (getIntValue(v[`spell_slots_l${level}`]) > 0) || (warlockSlots && level <= warlockSpellsMaxLevel);
       if (hasSlotsOrWarlockSlots) {
         hasHigherLevelSlots = true;
