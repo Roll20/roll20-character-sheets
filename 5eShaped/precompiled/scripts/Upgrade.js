@@ -495,9 +495,6 @@ export class Upgrade {
     if (this.versionCompare(currentVersion, '2.2.2') < 0) {
       this.resourcesToTraits();
     }
-    if (this.versionCompare(currentVersion, '2.2.4') < 0) {
-      abilityChecks.updateInitiative();
-    }
     if (this.versionCompare(currentVersion, '2.2.5') < 0) {
       equipment.weighAmmo();
     }
@@ -593,7 +590,6 @@ export class Upgrade {
     if (this.versionCompare(currentVersion, '6.0.1') < 0) {
       this.newAttackToggleTwo();
       spells.update();
-      attacks.update();
       actions.updateAll();
     }
     if (this.versionCompare(currentVersion, '6.0.4') < 0) {
@@ -617,6 +613,10 @@ export class Upgrade {
     if (this.versionCompare(currentVersion, '6.10.1') < 0) {
       this.updateWarlockMaxLevelOrdinal();
       spells.updateSheetList();
+    }
+    if (this.versionCompare(currentVersion, '6.10.3') < 0) {
+      attacks.update();
+      abilityChecks.updateInitiative();
     }
   }
 }
