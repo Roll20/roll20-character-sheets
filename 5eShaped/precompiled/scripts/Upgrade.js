@@ -605,9 +605,6 @@ export class Upgrade {
     if (this.versionCompare(currentVersion, '6.1.3') < 0) {
       abilities.updateModifier('strength');
     }
-    if (this.versionCompare(currentVersion, '6.9.0') < 0) {
-      this.updateWarlockMaxLevelOrdinal();
-    }
     if (this.versionCompare(currentVersion, '6.9.1') < 0) {
       spells.updateWarlockSlots();
       spells.updateHasSpellSlots();
@@ -616,6 +613,9 @@ export class Upgrade {
     }
     if (this.versionCompare(currentVersion, '6.10.0') < 0) {
       spells.updateChatMacro();
+    }
+    if (this.versionCompare(currentVersion, '6.10.1') < 0) {
+      this.updateWarlockMaxLevelOrdinal();
       spells.updateSheetList();
     }
   }
