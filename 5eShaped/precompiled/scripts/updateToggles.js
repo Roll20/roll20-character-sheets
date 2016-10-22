@@ -1,5 +1,5 @@
 import { TOGGLE_VARS } from './constants';
-import { fromVOrFinalSetAttrs, getIntValue, getAbilityValue, addArithmeticOperator, getAbilityShortName, hasUpperCase, isUndefined, isUndefinedOrEmpty, exists } from './utilities';
+import { fromVOrFinalSetAttrs, getIntValue, getAbilityValue, addArithmeticOperator, getAbilityShortName, hasUpperCase, isUndefined, isUndefinedOrEmpty, exists, showSign } from './utilities';
 
 const parseAttackComponent = (v, repeatingString, finalSetAttrs, options) => {
   let parsed = v[`${repeatingString}parsed`];
@@ -114,7 +114,7 @@ const updateAttackToggle = (v, finalSetAttrs, repeatingString, options) => {
     finalSetAttrs[`${repeatingString}attack_formula`] = attackFormula;
   }
   if (options.type === 'attack') {
-    finalSetAttrs[`${repeatingString}to_hit`] = toHit;
+    finalSetAttrs[`${repeatingString}to_hit`] = showSign(toHit);
   }
 };
 const updateSavingThrowToggle = (v, finalSetAttrs, repeatingString, options) => {
