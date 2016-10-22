@@ -4,6 +4,7 @@ import { ABILITIES, TOGGLE_VARS } from './constants';
 import { updateAttackToggle, updateSavingThrowToggle, updateDamageToggle, updateHealToggle, updateHigherLevelToggle } from './updateToggles';
 import { getSetItems, getSetRepeatingItems, getIntValue, emptyRepeatingSection, isUndefined, isUndefinedOrEmpty, setCritDamage, fromVOrFinalSetAttrs, lowercaseDamageTypes, getRepeatingInfo } from './utilities';
 const levelToPsiCost = {
+  0: 0,
   1: 2,
   2: 3,
   3: 5,
@@ -122,7 +123,6 @@ export class Psionics {
   updateShowHide() {
     const collectionArray = ['psi_limit'];
     for (let i = 0; i <= 9; i++) {
-      collectionArray.push(`psionics_level_${i}_toggle`);
       collectionArray.push(`psionics_level_${i}_macro_var`);
       collectionArray.push(`psionics_level_${i}_show`);
     }
