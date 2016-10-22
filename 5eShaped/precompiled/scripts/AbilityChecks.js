@@ -267,6 +267,10 @@ export class AbilityChecks {
           }
         }
 
+        if (finalSetAttrs.initiative) {
+          finalSetAttrs.initiative = showSign(finalSetAttrs.initiative);
+        }
+
         const globalCheckBonus = v.global_check_bonus;
         if (exists(globalCheckBonus)) {
           if (finalSetAttrs.initiative_formula) {
