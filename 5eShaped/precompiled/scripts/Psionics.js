@@ -2,7 +2,7 @@
 
 import { ABILITIES, TOGGLE_VARS } from './constants';
 import { updateAttackToggle, updateSavingThrowToggle, updateDamageToggle, updateHealToggle, updateHigherLevelToggle } from './updateToggles';
-import { getSetItems, getSetRepeatingItems, getIntValue, isUndefined, isUndefinedOrEmpty, setCritDamage, fromVOrFinalSetAttrs, lowercaseDamageTypes, getRepeatingInfo } from './utilities';
+import { getSetItems, getSetRepeatingItems, getIntValue, emptyRepeatingSection, isUndefined, isUndefinedOrEmpty, setCritDamage, fromVOrFinalSetAttrs, lowercaseDamageTypes, getRepeatingInfo } from './utilities';
 const levelToPsiCost = {
   1: 2,
   2: 3,
@@ -67,7 +67,7 @@ export class Psionics {
             finalSetAttrs[`${repeatingString}concentration`] = '';
           }
           if (v[`${repeatingString}meditate`] === 'Yes') {
-            finalSetAttrs[`${repeatingString}meditate_output`] = '?{Cast as|Meditate,{{meditate=1&#125;&#125;|Psionic,}';
+            finalSetAttrs[`${repeatingString}meditate_output`] = '?{Cast as|Meditate,{{meditate=1&#125;&#125;|Psionic Power,}';
           } else {
             finalSetAttrs[`${repeatingString}meditate_output`] = '';
           }
@@ -114,6 +114,63 @@ export class Psionics {
 
           if (isUndefinedOrEmpty(v[`${repeatingString}extras_toggle`]) && (v[`${repeatingString}emote`] || v[`${repeatingString}freetext`] || v[`${repeatingString}freeform`])) {
             finalSetAttrs[`${repeatingString}extras_toggle`] = TOGGLE_VARS.extras;
+          }
+        }
+      },
+    });
+  }
+  updateShowHide() {
+    const collectionArray = ['psi_limit'];
+    for (let i = 0; i <= 9; i++) {
+      collectionArray.push(`psionics_level_${i}_toggle`);
+      collectionArray.push(`psionics_level_${i}_macro_var`);
+      collectionArray.push(`psionics_level_${i}_show`);
+    }
+
+    getSetItems('psionics.updateShowHide', {
+      collectionArray,
+      callback: (v, finalSetAttrs) => {
+        const psiLimit = getIntValue(v.psi_limit);
+        for (let level = 0; level <= 9; level++) {
+          const hasPowers = v[`psionics_level_${level}_macro_var`];
+          const belowPsiLimit = levelToPsiCost[level] <= psiLimit;
+
+          if (hasPowers && belowPsiLimit) {
+            finalSetAttrs[`psionics_level_${level}_show`] = true;
+          } else {
+            finalSetAttrs[`psionics_level_${level}_show`] = '';
+          }
+        }
+      },
+    });
+  }
+  updateSheetList() {
+    const repeatingPsionicsListLevel = 'repeating_psionicslistlevel';
+    for (let i = 0; i <= 9; i++) {
+      emptyRepeatingSection({
+        repeatingItems: [`${repeatingPsionicsListLevel}${i}`],
+      });
+    }
+
+    const collectionArray = [];
+    getSetRepeatingItems('psionics.updateSheetList', {
+      repeatingItems: ['repeating_psionics'],
+      collectionArray,
+      collectionArrayAddItems: ['name', 'power_level', 'meditate', 'concentration', 'manifesting_time'],
+      callback: (v, finalSetAttrs, ids, repeatingItem) => {
+        for (const id of ids) {
+          const repeatingString = `${repeatingItem}_${id}_`;
+          const powerName = v[`${repeatingString}name`];
+          const powerLevel = getIntValue(v[`${repeatingString}power_level`], 0);
+
+          if (powerName) {
+            const newRepeatingString = `${repeatingPsionicsListLevel}${powerLevel}_${generateRowID()}_`;
+            finalSetAttrs[`${newRepeatingString}name`] = powerName;
+            finalSetAttrs[`${newRepeatingString}power_level`] = powerLevel;
+            finalSetAttrs[`${newRepeatingString}meditate`] = v[`${repeatingString}meditate`];
+            finalSetAttrs[`${newRepeatingString}concentration`] = v[`${repeatingString}concentration`];
+            finalSetAttrs[`${newRepeatingString}manifesting_time`] = v[`${repeatingString}manifesting_time`];
+            finalSetAttrs[`${newRepeatingString}psionic_power_output`] = `@{${repeatingString}psionic_power_output}`;
           }
         }
       },

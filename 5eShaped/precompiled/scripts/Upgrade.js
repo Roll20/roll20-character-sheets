@@ -27,6 +27,8 @@ import { Settings } from './Settings';
 const settings = new Settings();
 import { Spells } from './Spells';
 const spells = new Spells();
+import { Psionics } from './Psionics';
+const psionics = new Psionics();
 import { isUndefined, isUndefinedOrEmpty, getAbilityName, getIntValue, getSetItems, getSetRepeatingItems, ordinalSpellLevel } from './utilities';
 import { currentVersion } from './version';
 
@@ -588,18 +590,19 @@ export class Upgrade {
     if (this.versionCompare(currentVersion, '6.1.3') < 0) {
       abilities.updateModifier('strength');
     }
-    if (this.versionCompare(currentVersion, '6.9.1') < 0) {
+    if (this.versionCompare(currentVersion, '6.11.0') < 0) {
       spells.updateWarlockSlots();
       spells.updateHasSpellSlots();
       spells.updateHasSpellPoints();
       character.updateLevels();
-    }
-    if (this.versionCompare(currentVersion, '6.10.4') < 0) {
       spells.updateChatMacro();
       this.updateWarlockMaxLevelOrdinal();
       spells.updateSheetList();
       attacks.update();
       abilityChecks.updateInitiative();
+      psionics.updateChatMacro();
+      psionics.updateSheetList();
+      psionics.updateShowHide();
     }
   }
 }
