@@ -142,7 +142,7 @@ export class Psionics {
     getSetItems('psionics.updateShowHide', {
       collectionArray,
       callback: (v, finalSetAttrs) => {
-        const psiLimit = getIntValue(v.psi_limit);
+        const psiLimit = getIntValue(v.psi_limit, 2);
         for (let level = 0; level <= 9; level++) {
           const hasPowers = v[`psionics_level_${level}_macro_var`];
           const belowPsiLimit = levelToPsiCost[level] <= psiLimit;
@@ -267,7 +267,20 @@ export class Psionics {
       },
     });
   }
+  watchForChanges() {
+    let watch = [];
+    for (let i = 0; i <= 9; i++) {
+      watch.push(`psionics_level_${i}_macro_var`);
+    }
+    watch = watch.map((item) => {
+      return `change:${item}`;
+    }).join(' ');
+    on(watch, () => {
+      this.updateShowHide();
+    });
+  }
   setup() {
+    this.watchForChanges();
     on('change:repeating_psionics', (eventInfo) => {
       const repeatingInfo = getRepeatingInfo('repeating_psionics', eventInfo);
       if (repeatingInfo && repeatingInfo.field !== 'roll_toggle' && repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'damage_crit' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'second_damage_crit' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'heal_formula' && repeatingInfo.field !== 'psionic_higher_level_query' && repeatingInfo.field !== 'manifest_as_level' && repeatingInfo.field !== 'parsed') {
@@ -282,8 +295,10 @@ export class Psionics {
     });
     on('change:repeating_psionics', (eventInfo) => {
       const repeatingInfo = getRepeatingInfo('repeating_psionics', eventInfo);
+      console.log('repeatingInfo.field', repeatingInfo.field);
       if (repeatingInfo && (repeatingInfo.field === 'name' || repeatingInfo.field === 'power_level')) {
         this.updateChatMacro();
+        this.updateSheetList();
       }
     });
     on('remove:repeating_psionics', () => {
