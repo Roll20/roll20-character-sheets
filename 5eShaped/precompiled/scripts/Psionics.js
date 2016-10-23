@@ -21,10 +21,16 @@ export class Psionics {
     getSetRepeatingItems('psionics.update', {
       repeatingItems: ['repeating_psionics'],
       collectionArray: ['default_ability'],
-      collectionArrayAddItems: ['attack_ability', 'damage_ability', 'second_damage_ability', 'saving_throw_ability', 'heal_ability'],
+      collectionArrayAddItems: ['name', 'attack_ability', 'damage_ability', 'second_damage_ability', 'saving_throw_ability', 'heal_ability'],
       callback: (v, finalSetAttrs, ids, repeatingItem) => {
         for (const id of ids) {
           const repeatingString = `${repeatingItem}_${id}_`;
+          const psionicName = v[`${repeatingString}name`];
+
+          if (!psionicName) {
+            removeRepeatingRow(`${repeatingItem}_${id}`);
+            continue;
+          }
 
           finalSetAttrs[`${repeatingString}attack_ability`] = v.default_ability;
           if (v[`${repeatingString}damage_ability`]) {
@@ -54,6 +60,12 @@ export class Psionics {
       callback: (v, finalSetAttrs, ids, repeatingItem) => {
         for (const id of ids) {
           const repeatingString = `${repeatingItem}_${id}_`;
+          const psionicName = v[`${repeatingString}name`];
+
+          if (!psionicName) {
+            removeRepeatingRow(`${repeatingItem}_${id}`);
+            continue;
+          }
 
           if (isUndefinedOrEmpty(v[`${repeatingString}power_level`]) || v[`${repeatingString}power_level`] === 'TALENT') {
             finalSetAttrs[`${repeatingString}manifest_as_level`] = '';
@@ -160,18 +172,21 @@ export class Psionics {
       callback: (v, finalSetAttrs, ids, repeatingItem) => {
         for (const id of ids) {
           const repeatingString = `${repeatingItem}_${id}_`;
-          const powerName = v[`${repeatingString}name`];
+          const psionicName = v[`${repeatingString}name`];
           const powerLevel = getIntValue(v[`${repeatingString}power_level`], 0);
 
-          if (powerName) {
-            const newRepeatingString = `${repeatingPsionicsListLevel}${powerLevel}_${generateRowID()}_`;
-            finalSetAttrs[`${newRepeatingString}name`] = powerName;
-            finalSetAttrs[`${newRepeatingString}power_level`] = powerLevel;
-            finalSetAttrs[`${newRepeatingString}meditate`] = v[`${repeatingString}meditate`];
-            finalSetAttrs[`${newRepeatingString}concentration`] = v[`${repeatingString}concentration`];
-            finalSetAttrs[`${newRepeatingString}manifesting_time`] = v[`${repeatingString}manifesting_time`];
-            finalSetAttrs[`${newRepeatingString}psionic_power_output`] = `@{${repeatingString}psionic_power_output}`;
+          if (!psionicName) {
+            removeRepeatingRow(`${repeatingItem}_${id}`);
+            continue;
           }
+
+          const newRepeatingString = `${repeatingPsionicsListLevel}${powerLevel}_${generateRowID()}_`;
+          finalSetAttrs[`${newRepeatingString}name`] = psionicName;
+          finalSetAttrs[`${newRepeatingString}power_level`] = powerLevel;
+          finalSetAttrs[`${newRepeatingString}meditate`] = v[`${repeatingString}meditate`];
+          finalSetAttrs[`${newRepeatingString}concentration`] = v[`${repeatingString}concentration`];
+          finalSetAttrs[`${newRepeatingString}manifesting_time`] = v[`${repeatingString}manifesting_time`];
+          finalSetAttrs[`${newRepeatingString}psionic_power_output`] = `@{${repeatingString}psionic_power_output}`;
         }
       },
     });
@@ -203,6 +218,11 @@ export class Psionics {
           const repeatingString = `${repeatingItem}_${id}_`;
           const psionicName = v[`${repeatingString}name`];
           const psionicLevel = getIntValue(v[`${repeatingString}power_level`], 0);
+
+          if (!psionicName) {
+            removeRepeatingRow(`${repeatingItem}_${id}`);
+            continue;
+          }
 
           if (psionicName) {
             psionicLevels[psionicLevel].push(`[${psionicName}](~repeating_psionics_${id}_power)`);
