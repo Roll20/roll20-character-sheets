@@ -429,7 +429,7 @@ export class Spells {
       9: [],
     };
 
-    const collectionArray = ['spells_show_unprepared'];
+    const collectionArray = [];
     for (let i = 0; i <= 9; i++) {
       collectionArray.push(`spells_level_${0}_macro_var`);
     }
@@ -581,20 +581,18 @@ export class Spells {
     this.watchForChanges();
     on('change:repeating_spell', (eventInfo) => {
       const repeatingInfo = getRepeatingInfo('repeating_spell', eventInfo);
-      if (repeatingInfo && (repeatingInfo.field === 'name' || repeatingInfo.field === 'spell_level')) {
+      if (repeatingInfo && (repeatingInfo.field === 'name' || repeatingInfo.field === 'spell_level' || repeatingInfo.field === 'spell_level_from_srd' || repeatingInfo.field === 'is_prepared')) {
+        this.updateChatMacro();
+      }
+      if (repeatingInfo && (repeatingInfo.field === 'name' || repeatingInfo.field === 'spell_level' || repeatingInfo.field === 'spell_level_from_srd')) {
         this.updateSheetList();
       }
     });
     on('remove:repeating_spell', () => {
+      this.updateChatMacro();
       this.updateSheetList();
     });
-    on('change:repeating_spell', (eventInfo) => {
-      const repeatingInfo = getRepeatingInfo('repeating_spell', eventInfo);
-      if (repeatingInfo && (repeatingInfo.field === 'name' || repeatingInfo.field === 'spell_level' || repeatingInfo.field === 'is_prepared')) {
-        this.updateChatMacro();
-      }
-    });
-    on('change:spells_show_unprepared remove:repeating_spell', () => {
+    on('change:spells_show_unprepared', () => {
       this.updateChatMacro();
     });
     on('change:spell_slots_toggle', () => {
