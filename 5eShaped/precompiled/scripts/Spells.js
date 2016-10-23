@@ -54,10 +54,16 @@ export class Spells {
     getSetRepeatingItems('spells.update', {
       repeatingItems: ['repeating_spell'],
       collectionArray: ['default_ability'],
-      collectionArrayAddItems: ['attack_ability', 'damage_ability', 'second_damage_ability', 'saving_throw_ability', 'heal_ability'],
+      collectionArrayAddItems: ['name', 'attack_ability', 'damage_ability', 'second_damage_ability', 'saving_throw_ability', 'heal_ability'],
       callback: (v, finalSetAttrs, ids, repeatingItem) => {
         for (const id of ids) {
           const repeatingString = `${repeatingItem}_${id}_`;
+          const spellName = v[`${repeatingString}name`];
+
+          if (!spellName) {
+            removeRepeatingRow(`${repeatingItem}_${id}`);
+            continue;
+          }
 
           finalSetAttrs[`${repeatingString}attack_ability`] = v.default_ability;
           if (v[`${repeatingString}damage_ability`]) {
@@ -87,6 +93,12 @@ export class Spells {
       callback: (v, finalSetAttrs, ids, repeatingItem) => {
         for (const id of ids) {
           const repeatingString = `${repeatingItem}_${id}_`;
+          const spellName = v[`${repeatingString}name`];
+
+          if (!spellName) {
+            removeRepeatingRow(`${repeatingItem}_${id}`);
+            continue;
+          }
 
           this.parseSRD(v, finalSetAttrs, repeatingString);
 
@@ -400,17 +412,20 @@ export class Spells {
           const spellName = v[`${repeatingString}name`];
           const spellLevel = getIntValue(v[`${repeatingString}spell_level`], 0);
 
-          if (spellName) {
-            const newRepeatingString = `${repeatingSpellListLevel}${spellLevel}_${generateRowID()}_`;
-            finalSetAttrs[`${newRepeatingString}name`] = spellName;
-            finalSetAttrs[`${newRepeatingString}spell_level`] = spellLevel;
-            finalSetAttrs[`${newRepeatingString}is_prepared`] = v[`${repeatingString}is_prepared`];
-            finalSetAttrs[`${newRepeatingString}ritual`] = v[`${repeatingString}ritual`];
-            finalSetAttrs[`${newRepeatingString}concentration`] = v[`${repeatingString}concentration`];
-            finalSetAttrs[`${newRepeatingString}components`] = v[`${repeatingString}components`];
-            finalSetAttrs[`${newRepeatingString}casting_time`] = v[`${repeatingString}casting_time`];
-            finalSetAttrs[`${newRepeatingString}spell_output`] = `@{${repeatingString}spell_output}`;
+          if (!spellName) {
+            removeRepeatingRow(`${repeatingItem}_${id}`);
+            continue;
           }
+
+          const newRepeatingString = `${repeatingSpellListLevel}${spellLevel}_${generateRowID()}_`;
+          finalSetAttrs[`${newRepeatingString}name`] = spellName;
+          finalSetAttrs[`${newRepeatingString}spell_level`] = spellLevel;
+          finalSetAttrs[`${newRepeatingString}is_prepared`] = v[`${repeatingString}is_prepared`];
+          finalSetAttrs[`${newRepeatingString}ritual`] = v[`${repeatingString}ritual`];
+          finalSetAttrs[`${newRepeatingString}concentration`] = v[`${repeatingString}concentration`];
+          finalSetAttrs[`${newRepeatingString}components`] = v[`${repeatingString}components`];
+          finalSetAttrs[`${newRepeatingString}casting_time`] = v[`${repeatingString}casting_time`];
+          finalSetAttrs[`${newRepeatingString}spell_output`] = `@{${repeatingString}spell_output}`;
         }
       },
     });
@@ -443,6 +458,11 @@ export class Spells {
           const spellName = v[`${repeatingString}name`];
           const spellLevel = getIntValue(v[`${repeatingString}spell_level`], 0);
 
+          if (!spellName) {
+            removeRepeatingRow(`${repeatingItem}_${id}`);
+            continue;
+          }
+
           let classes = [];
           classes.push(`${v[`${repeatingString}spell_level`]}`);
           if (v[`${repeatingString}is_prepared`] === 'on') {
@@ -460,9 +480,7 @@ export class Spells {
           classes = classes.map((className) => {
             return `sheet-${className}`;
           }).join(' ');
-          if (spellName) {
-            spellSlots[spellLevel].push(`<span class="${classes}">[${spellName}](~repeating_spell_${id}_spell)</span>`);
-          }
+          spellSlots[spellLevel].push(`<span class="${classes}">[${spellName}](~repeating_spell_${id}_spell)</span>`);
         }
 
         for (let i = 0; i <= 9; i++) {
