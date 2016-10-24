@@ -101,6 +101,8 @@ gulp.task('compile', ['sass', 'translationDist'], () => {
     .pipe(gulp.dest('../'))
 });
 
+gulp.task('compileSubmit', ['compile', 'submit']);
+
 gulp.task('lint', () => {
   return gulp.src(['./scripts/*.js'])
     .pipe(eslint())
@@ -148,17 +150,18 @@ gulp.task('sort-translations', () => {
     .pipe(gulp.dest('../translations/'));
 });
 
-gulp.task('submit', ['compile'], (done) => {
+gulp.task('submit', (done) => {
   const html = fs.readFileSync('../5eShaped.html', 'utf-8');
   const css = fs.readFileSync('../5eShaped.css', 'utf-8');
   const translation = fs.readFileSync('../translations/en.json', 'utf-8');
   const props = require('./submitProps.json');
+  const campaign = props[props.which];
 
-  const url = `https://app.${props[props.which].roll20}.net/campaigns/savesettings/${props[props.which].campaignId}`;
+  const url = `https://app.${campaign.roll20}.net/campaigns/savesettings/${campaign.campaignId}`;
 
   var j = request.jar();
   var cookie = request.cookie(`rack.session=${props.rackSessionId}`);
-  j.setCookie(cookie, `https://app.${props[props.which].roll20}.net`);
+  j.setCookie(cookie, `https://app.${campaign.roll20}.net`);
 
   request.post({
       url,
@@ -176,7 +179,7 @@ gulp.task('submit', ['compile'], (done) => {
     },
     (err, httpResponse, body) => {
       if (httpResponse.statusCode !== 303 ||
-        httpResponse.headers.location !== `https://app.${props[props.which].roll20}.net/campaigns/campaignsettings/${props[props.which].campaignId}`) {
+        httpResponse.headers.location !== `https://app.${campaign.roll20}.net/campaigns/campaignsettings/${campaign.campaignId}`) {
         gutil.log('Problem submitting sheet, response headers:');
         gutil.log(httpResponse.headers);
         return done(httpResponse.statusMessage);
