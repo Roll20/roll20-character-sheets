@@ -370,7 +370,7 @@ export class Actions {
             freetext = freetext.replace(toHitRegex, '');
             finalSetAttrs[`${repeatingString}roll_toggle`] = TOGGLE_VARS.roll;
           } else {
-            finalSetAttrs[`${repeatingString}roll_toggle`] = '0';
+            finalSetAttrs[`${repeatingString}roll_toggle`] = '';
           }
 
           const savingThrow = savingThrowRegex.exec(freetext);

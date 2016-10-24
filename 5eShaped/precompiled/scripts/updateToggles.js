@@ -58,7 +58,7 @@ const updateAttackToggle = (v, finalSetAttrs, repeatingString, options) => {
   const attackToggle = v[`${repeatingString}roll_toggle`];
 
   let toHit = 0;
-  if (!attackToggle || attackToggle === TOGGLE_VARS.roll) {
+  if (attackToggle === TOGGLE_VARS.roll) {
     const proficiency = v[`${repeatingString}proficiency`];
     if (!proficiency || proficiency === 'on') {
       const pb = getIntValue(v.pb);
