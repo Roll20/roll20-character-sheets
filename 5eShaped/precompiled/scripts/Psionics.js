@@ -295,7 +295,6 @@ export class Psionics {
     });
     on('change:repeating_psionics', (eventInfo) => {
       const repeatingInfo = getRepeatingInfo('repeating_psionics', eventInfo);
-      console.log('repeatingInfo.field', repeatingInfo.field);
       if (repeatingInfo && (repeatingInfo.field === 'name' || repeatingInfo.field === 'power_level')) {
         this.updateChatMacro();
         this.updateSheetList();
