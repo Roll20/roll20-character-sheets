@@ -139,29 +139,40 @@ export class Convert {
   convertActions(oldRepeatingName, repeatingName) {
     getSetRepeatingItems('convert.convertActions', {
       repeatingItems: [`repeating_${oldRepeatingName}`],
-      collectionArrayAddItems: ['name', 'attack_type_display', 'attack_tohitrange', 'attack_tohit', 'attack_onhit', 'description'],
+      collectionArrayAddItems: ['name', 'attack_flag', 'attack_type_display', 'attack_tohitrange', 'attack_tohit', 'attack_onhit', 'description'],
       callback: (v, finalSetAttrs, ids, repeatingItem) => {
         for (const id of ids) {
           const repeatingStringOld = `${repeatingItem}_${id}_`;
           const repeatingString = `repeating_${repeatingName}_${generateRowID()}_`;
+
+          if (!v[`${repeatingStringOld}name`]) {
+            continue;
+          }
+
           finalSetAttrs[`${repeatingString}name`] = v[`${repeatingStringOld}name`];
-          if (v[`${repeatingStringOld}attack_type_display`]) {
-            finalSetAttrs[`${repeatingString}freetext`] = `${v[`${repeatingStringOld}attack_type_display`]} ${v[`${repeatingStringOld}attack_tohitrange`]} Hit: `;
-            if (v[`${repeatingStringOld}attack_onhit`]) {
-              finalSetAttrs[`${repeatingString}freetext`] += `${v[`${repeatingStringOld}attack_onhit`]}`;
-              if (v[`${repeatingStringOld}description`]) {
-                finalSetAttrs[`${repeatingString}freetext`] += ` ${v[`${repeatingStringOld}description`]}`;
-              }
-              finalSetAttrs[`${repeatingString}freetext`] += '\n';
-            } else {
-              if (v[`${repeatingStringOld}description`]) {
-                finalSetAttrs[`${repeatingString}freetext`] += `${v[`${repeatingStringOld}description`]}`;
-              }
+          finalSetAttrs[`${repeatingString}freetext`] = '';
+          if (v[`${repeatingStringOld}attack_flag`] === 'on' && v[`${repeatingStringOld}attack_type_display`]) {
+            finalSetAttrs[`${repeatingString}roll_toggle`] = TOGGLE_VARS.roll;
+            finalSetAttrs[`${repeatingString}freetext`] += `${v[`${repeatingStringOld}attack_type_display`]} ${v[`${repeatingStringOld}attack_tohitrange`]} Hit: `;
+          }
+          if (v[`${repeatingStringOld}attack_onhit`]) {
+            finalSetAttrs[`${repeatingString}freetext`] += `${v[`${repeatingStringOld}attack_onhit`]}`;
+            if (v[`${repeatingStringOld}description`]) {
+              finalSetAttrs[`${repeatingString}freetext`] += ` ${v[`${repeatingStringOld}description`]}`;
             }
           } else {
-            finalSetAttrs[`${repeatingString}freetext`] = v[`${repeatingStringOld}description`];
+            if (v[`${repeatingStringOld}description`]) {
+              finalSetAttrs[`${repeatingString}freetext`] += `${v[`${repeatingStringOld}description`]}`;
+            }
           }
-          finalSetAttrs[`${repeatingString}freetext`] = finalSetAttrs[`${repeatingString}freetext`].replace(/Attack:\s?\+(\d+)/i, 'Attack: +$1 to hit');
+          finalSetAttrs[`${repeatingString}freetext`] = finalSetAttrs[`${repeatingString}freetext`]
+            .replace(/Attack:\s?\+(\d+)/i, 'Attack: +$1 to hit')
+            .trim()
+            .replace(/.*(\\n)/, '')
+            .trim()
+            .replace(/.*(\\n)/, '')
+            .trim()
+            .replace(/.*(\\n)/, '');
         }
       },
     });
