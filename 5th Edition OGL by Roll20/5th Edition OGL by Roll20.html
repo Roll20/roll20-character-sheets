@@ -4,7 +4,7 @@
 
 <div class="container npc" style="width: 350px;">
     <input class="npc_options-flag" type="checkbox" name="attr_npc_options-flag" checked="checked"><span>y</span>
-    <div class="npc_options compendium-drop-target">
+    <div class="npc_options compendium-drop-target monsters">
         <div class="row title">
             <span data-i18n="npc-options-u">NPC OPTIONS</span>
         </div>
@@ -5338,7 +5338,7 @@
                     _.each(traitsobj, function(desc, name) {
                         newrowid = generateRowID();
                         update["repeating_npctrait_" + newrowid + "_name"] = name + ".";
-                        if(desc.substring(0,2) === ": ") {
+                        if(desc.substring(0,2) === ": " || encodeURI(desc.substring(0,2)) === ":%C2%A0") {
                             desc = desc.substring(2);
                         }
                         update["repeating_npctrait_" + newrowid + "_desc"] = desc.trim();
@@ -5356,14 +5356,24 @@
                         newrowid = generateRowID();
                         update["repeating_npcaction_" + newrowid + "_npc_options-flag"] = "0";
                         update["repeating_npcaction_" + newrowid + "_name"] = name;
-                        if(desc.substring(0,2) === ": ") {
+                        if(desc.substring(0,2) === ": " || encodeURI(desc.substring(0,2)) === ":%C2%A0") {
                             desc = desc.substring(2);
                         }
-                        if(desc.indexOf("Weapon Attack:") > -1) {
+                        if(desc.indexOf(" Attack:") > -1) {
                             update["repeating_npcaction_" + newrowid + "_attack_flag"] = "on";
                             update["repeating_npcaction_" + newrowid + "_attack_display_flag"] = "{{attack=1}}";
                             update["repeating_npcaction_" + newrowid + "_attack_options"] = "{{attack=1}}";
-                            attacktype = desc.split(" Weapon Attack:")[0];
+                            if(desc.indexOf(" Weapon Attack:") > -1) {
+                                attacktype = desc.split(" Weapon Attack:")[0];
+                            }
+                            else if(desc.indexOf(" Spell Attack:") > -1) {
+                                attacktype = desc.split(" Spell Attack:")[0];
+                            }
+                            else {
+                                console.log("FAILED TO IMPORT ATTACK - NO ATTACK TYPE FOUND (Weapon Attack/Spell Attack)");
+                                return;
+                            }
+                            
                             update["repeating_npcaction_" + newrowid + "_attack_type"] = attacktype;
                             if(attacktype === "Melee") {
                                 update["repeating_npcaction_" + newrowid + "_attack_range"] = (desc.match(/reach (.*?),/) || ["",""])[1];
@@ -5376,7 +5386,7 @@
                             if(desc.toLowerCase().indexOf("damage") > -1 && npc_exception_actions.indexOf(name) === -1) {
                                 update["repeating_npcaction_" + newrowid + "_attack_damage"] = (desc.match(/\(([^)]+)\)/) || ["",""])[1];
                                 update["repeating_npcaction_" + newrowid + "_attack_damagetype"] = (desc.match(/\) (.*?) damage/) || ["",""])[1];
-                                if((desc.match(/\(/g) || []).length > 1 && desc.match(/\((?!.*\()([^)]+)\)/).indexOf(" DC")[1] === -1) {
+                                if((desc.match(/\(/g) || []).length > 1 && (!desc.match(/\((?!.*\()([^)]+)\)/).indexOf(" DC")[1] || desc.match(/\((?!.*\()([^)]+)\)/).indexOf(" DC")[1] === -1)) {
                                     update["repeating_npcaction_" + newrowid + "_attack_damage2"] = (desc.match(/\((?!.*\()([^)]+)\)/) || ["",""])[1];
                                     update["repeating_npcaction_" + newrowid + "_attack_damagetype2"] = (desc.match(/\)(?!.*\)) (.*?) damage/) || ["",""])[1];
                                 }
@@ -5411,7 +5421,7 @@
                     _.each(reactionsobj, function(desc, name) {
                         newrowid = generateRowID();
                         update["repeating_npcreaction_" + newrowid + "_name"] = name + ".";
-                        if(desc.substring(0,2) === ": ") {
+                        if(desc.substring(0,2) === ": " || encodeURI(desc.substring(0,2)) === ":%C2%A0") {
                             desc = desc.substring(2);
                         }
                         update["repeating_npcreaction_" + newrowid + "_desc"] = desc.trim();
@@ -5430,14 +5440,23 @@
                         newrowid = generateRowID();
                         update["repeating_npcaction-l_" + newrowid + "_npc_options-flag"] = "0";
                         update["repeating_npcaction-l_" + newrowid + "_name"] = name;
-                        if(desc.substring(0,2) === ": ") {
+                        if(desc.substring(0,2) === ": " || encodeURI(desc.substring(0,2)) === ":%C2%A0") {
                             desc = desc.substring(2);
                         }
-                        if(desc.indexOf("Weapon Attack:") > -1) {
+                        if(desc.indexOf(" Attack:") > -1) {
                             update["repeating_npcaction-l_" + newrowid + "_attack_flag"] = "on";
                             update["repeating_npcaction-l_" + newrowid + "_attack_display_flag"] = "{{attack=1}}";
                             update["repeating_npcaction-l_" + newrowid + "_attack_options"] = "{{attack=1}}";
-                            attacktype = desc.split(" Weapon Attack:")[0];
+                            if(desc.indexOf(" Weapon Attack:") > -1) {
+                                attacktype = desc.split(" Weapon Attack:")[0];
+                            }
+                            else if(desc.indexOf(" Spell Attack:") > -1) {
+                                attacktype = desc.split(" Spell Attack:")[0];
+                            }
+                            else {
+                                console.log("FAILED TO IMPORT ATTACK - NO ATTACK TYPE FOUND (Weapon Attack/Spell Attack)");
+                                return;
+                            }
                             update["repeating_npcaction-l_" + newrowid + "_attack_type"] = attacktype;
                             if(attacktype === "Melee") {
                                 update["repeating_npcaction-l_" + newrowid + "_attack_range"] = (desc.match(/reach (.*?),/) || ["",""])[1];
@@ -5449,7 +5468,7 @@
                             update["repeating_npcaction-l_" + newrowid + "_attack_target"] = (desc.match(/\.,(?!.*\.,)(.*)\. Hit:/) || ["",""])[1];
                             update["repeating_npcaction-l_" + newrowid + "_attack_damage"] = (desc.match(/\(([^)]+)\)/) || ["",""])[1];
                             update["repeating_npcaction-l_" + newrowid + "_attack_damagetype"] = (desc.match(/\) (.*?) damage/) || ["",""])[1];
-                            if((desc.match(/\(/g) || []).length > 1) {
+                            if((desc.match(/\(/g) || []).length > 1 && (!desc.match(/\((?!.*\()([^)]+)\)/).indexOf(" DC")[1] || desc.match(/\((?!.*\()([^)]+)\)/).indexOf(" DC")[1] === -1)) {
                                 update["repeating_npcaction-l_" + newrowid + "_attack_damage2"] = (desc.match(/\((?!.*\()([^)]+)\)/) || ["",""])[1];
                                 update["repeating_npcaction-l_" + newrowid + "_attack_damagetype2"] = (desc.match(/\)(?!.*\)) (.*?) damage/) || ["",""])[1];
                             }
@@ -5689,6 +5708,28 @@
             else {
                 setAttrs({ammoflag: "hide"});
             }
+        });
+    });
+
+    on("change:npc_name", function() {
+        getAttrs(["npc"], function(v) {
+            if(v["npc"] != 1) {
+                setAttrs({
+                    npc: "1",
+                    npc_toggle: "1"
+                });
+            }
+        });
+    });
+
+    on("sheet:compendium-drop", function() {
+        getAttrs(["hp_max"], function(v) {
+            setDefaultToken({
+                bar1_link: "npc_speed",
+                bar2_link: "npc_ac",
+                bar3_value: v["hp_max"],
+                bar3_max: v["hp_max"]
+            })
         });
     });
 

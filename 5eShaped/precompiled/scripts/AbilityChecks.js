@@ -24,17 +24,17 @@ export class AbilityChecks {
 
 
         for (const ability of ABILITIES) {
-          finalSetAttrs.ability_checks_query_var += `|${capitalize(ability)},{{title=${capitalize(ability)}&#125;&#125; {{roll1=[[@{shaped_d20} + ${v[`${ability}_check_mod`]}]]&#125;&#125; @{roll_setting} + ${v[`${ability}_check_mod`]}]]&#125;&#125;`;
+          finalSetAttrs.ability_checks_query_var += `|${getTranslationByKey(ability.toUpperCase())},{{title=${getTranslationByKey(ability.toUpperCase())}&#125;&#125; {{roll1=[[@{shaped_d20} + ${v[`${ability}_check_mod`]}]]&#125;&#125; @{roll_setting} + ${v[`${ability}_check_mod`]}]]&#125;&#125;`;
           if (v.ability_checks_show_totals === 'on') {
-            finalSetAttrs.ability_checks_macro_var += `[${capitalize(ability)} ${v[`${ability}_check_mod_with_sign`]}](~shaped_${ability}_check)`;
+            finalSetAttrs.ability_checks_macro_var += `[${getTranslationByKey(ability.toUpperCase())} ${v[`${ability}_check_mod_with_sign`]}](~shaped_${ability}_check)`;
           } else {
-            finalSetAttrs.ability_checks_macro_var += `[${capitalize(ability)}](~shaped_${ability}_check)`;
+            finalSetAttrs.ability_checks_macro_var += `[${getTranslationByKey(ability.toUpperCase())}](~shaped_${ability}_check)`;
           }
           finalSetAttrs.ability_checks_macro_var += ', ';
         }
         for (const id of ids) {
           const repeatingString = `${repeatingItem}_${id}_`;
-          finalSetAttrs.ability_checks_query_var += `|${v[`${repeatingString}name`]}, {{title=${v[`${repeatingString}name`]} (${capitalize(getAbilityShortName(v[`${repeatingString}ability`]))})&#125;&#125; {{roll1=[[@{shaped_d20} + @{${repeatingString}formula}]]&#125;&#125; @{roll_setting} + @{${repeatingString}formula}]]&#125;&#125;`;
+          finalSetAttrs.ability_checks_query_var += `|${v[`${repeatingString}name`]}, {{title=${v[`${repeatingString}name`]} (${getTranslationByKey(getAbilityShortName(v[`${repeatingString}ability`]).toUpperCase())})&#125;&#125; {{roll1=[[@{shaped_d20} + @{${repeatingString}formula}]]&#125;&#125; @{roll_setting} + @{${repeatingString}formula}]]&#125;&#125;`;
           if (id !== ids[0]) {
             finalSetAttrs.ability_checks_macro_var += ', ';
             finalSetAttrs.skills_macro_var += ', ';
@@ -191,7 +191,7 @@ export class AbilityChecks {
                 const skillBonus = getIntValue(match[2]) - abilityValue;
 
                 if (skillBonus >= expertise) {
-                  if (v.expertise_as_advantage === '1') {
+                  if (getIntValue(v.expertise_as_advantage) === 1) {
                     finalSetAttrs[`${repeatingString}skill_d20`] = '2d20@{d20_mod}kh1';
                     finalSetAttrs[`${repeatingString}proficiency`] = 'proficient';
                   } else {
