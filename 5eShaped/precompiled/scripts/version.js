@@ -1,3 +1,3 @@
-const currentVersion = '6.11.2';
+const currentVersion = '6.11.3';
 
 export { currentVersion };
