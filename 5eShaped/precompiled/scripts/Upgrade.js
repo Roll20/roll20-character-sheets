@@ -48,6 +48,21 @@ export class Upgrade {
       },
     });
   }
+  attackToggle(repeatingSection) {
+    getSetRepeatingItems('upgrade.attackToggle', {
+      repeatingItems: [repeatingSection],
+      collectionArrayAddItems: ['roll_toggle'],
+      callback: (v, finalSetAttrs, ids, repeatingItem) => {
+        for (const id of ids) {
+          const repeatingString = `${repeatingItem}_${id}_`;
+
+          if (!isUndefinedOrEmpty(v[`${repeatingString}roll_toggle`])) {
+            finalSetAttrs[`${repeatingString}roll_toggle`] = TOGGLE_VARS.roll;
+          }
+        }
+      },
+    });
+  }
   armorPlusDexRemoval() {
     getSetRepeatingItems('upgrade.armorPlusDexRemoval', {
       repeatingItems: ['repeating_armor'],
@@ -590,7 +605,7 @@ export class Upgrade {
     if (this.versionCompare(currentVersion, '6.1.3') < 0) {
       abilities.updateModifier('strength');
     }
-    if (this.versionCompare(currentVersion, '6.11.1') < 0) {
+    if (this.versionCompare(currentVersion, '6.11.2') < 0) {
       spells.updateWarlockSlots();
       spells.updateHasSpellSlots();
       spells.updateHasSpellPoints();
@@ -603,6 +618,10 @@ export class Upgrade {
       psionics.updateChatMacro();
       psionics.updateSheetList();
       psionics.updateShowHide();
+      this.attackToggle('repeating_attack');
+      this.attackToggle('repeating_action');
+      this.attackToggle('repeating_reaction');
+      this.attackToggle('repeating_legendaryaction');
     }
   }
 }
