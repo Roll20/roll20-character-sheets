@@ -101,8 +101,6 @@ gulp.task('compile', ['sass', 'translationDist'], () => {
     .pipe(gulp.dest('../'))
 });
 
-gulp.task('compileSubmit', ['compile', 'submit']);
-
 gulp.task('lint', () => {
   return gulp.src(['./scripts/*.js'])
     .pipe(eslint())
@@ -150,7 +148,7 @@ gulp.task('sort-translations', () => {
     .pipe(gulp.dest('../translations/'));
 });
 
-gulp.task('submit', (done) => {
+gulp.task('submit', ['compile'], (done) => {
   const html = fs.readFileSync('../5eShaped.html', 'utf-8');
   const css = fs.readFileSync('../5eShaped.css', 'utf-8');
   const translation = fs.readFileSync('../translations/en.json', 'utf-8');
