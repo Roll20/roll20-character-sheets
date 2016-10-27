@@ -464,12 +464,11 @@ export class Upgrade {
       }
       return -1;
     }
-    if (v1parts.length != v2parts.length) {
+    if (v1parts.length !== v2parts.length) {
       return -1;
     }
     return 0;
   }
-  
   upgrade() {
     if (this.versionCompare(currentVersion, '2.1.0') < 0) {
       npc.updateChallenge();

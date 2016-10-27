@@ -1,4 +1,4 @@
-/* global on:false, generateRowID:false */
+/* global on:false, generateRowID:false, removeRepeatingRow:false */
 
 import { ABILITIES, TOGGLE_VARS } from './constants';
 import { updateAttackToggle, updateSavingThrowToggle, updateDamageToggle, updateHealToggle, updateHigherLevelToggle } from './updateToggles';
