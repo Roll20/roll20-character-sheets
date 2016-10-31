@@ -92,6 +92,9 @@ export class Spells {
 
           if (v[`${repeatingString}spell_level`] === 'CANTRIP') {
             finalSetAttrs[`${repeatingString}is_prepared`] = 'on';
+          } else {
+            const spellLevel = getIntValue(v[`${repeatingString}spell_level`]);
+            finalSetAttrs[`${repeatingString}cast_as_level`] = `@{cast_as_level_${spellLevel}}`;
           }
 
           if (!isUndefined(fromVOrFinalSetAttrs(v, finalSetAttrs, `${repeatingString}duration`)) && fromVOrFinalSetAttrs(v, finalSetAttrs, `${repeatingString}duration`).indexOf('CONCENTRATION') !== -1) {
@@ -313,6 +316,16 @@ export class Spells {
       },
     });
   }
+  updateWarlockSlots() {
+    getSetItems('spells.updateShowHide', {
+      collectionArray: ['warlock_spell_slots', 'warlock_spell_slots_calc', 'warlock_spell_slots_bonus', 'warlock_spell_slots_max'],
+      callback: (v, finalSetAttrs) => {
+        const warlockSlots = getIntValue(v.warlock_spell_slots_calc) + getIntValue(v.warlock_spell_slots_bonus);
+        finalSetAttrs['warlock_spell_slots'] = warlockSlots;
+        finalSetAttrs['warlock_spell_slots_max'] = warlockSlots;
+      },
+    });
+  }
   updateShowHide() {
     const collectionArray = ['spells_show_spell_level_if_all_slots_are_used'];
     for (let i = 0; i <= 9; i++) {
@@ -395,7 +408,7 @@ export class Spells {
     });
   }
   generateHigherLevelQueries() {
-    const collectionArray = ['warlock_level', 'number_of_classes'];
+    const collectionArray = ['warlock_level', 'warlock_spell_slots', 'warlock_spells_max_level', 'number_of_classes'];
     for (let i = 1; i <= 8; i++) {
       collectionArray.push(`cast_as_level_${i}`);
       collectionArray.push(`higher_level_query_${i}`);
@@ -408,34 +421,30 @@ export class Spells {
       collectionArray,
       callback: (v, finalSetAttrs) => {
         for (let i = 1; i <= 8; i++) {
-          let higherLevelQuery = '';
+          const spellLevels = [];
+          const warlockSpellsMaxLevel = getIntValue(v.warlock_spells_max_level);
+          let addWarlockLevel = 0;
+          if (getIntValue(v.warlock_spell_slots) > 0 && warlockSpellsMaxLevel > 0 && i < warlockSpellsMaxLevel) {
+            addWarlockLevel = warlockSpellsMaxLevel;
+          }
 
-          if (i < 6 && v.number_of_classes === 1 && v.warlock_level > 0 && Math.ceil(getIntValue(v.warlock_level) / 2) >= i) {
-            let spellLevel = 1;
-            if (v.warlock_level >= 9) {
-              spellLevel = 5;
-            } else if (v.warlock_level >= 7) {
-              spellLevel = 4;
-            } else if (v.warlock_level >= 5) {
-              spellLevel = 3;
-            } else if (v.warlock_level >= 3) {
-              spellLevel = 2;
+          for (let j = i; j <= 9; j++) {
+            if (getIntValue(v[`spell_slots_l${j}`]) || j === warlockSpellsMaxLevel) {
+              spellLevels.push(j);
             }
-            higherLevelQuery = spellLevel;
-          } else {
-            let levelQuery = '';
-            for (let j = i; j <= 9; j++) {
-              if (getIntValue(v[`spell_slots_l${j}`])) {
-                levelQuery += `|${j}`;
-              }
-            }
-            higherLevelQuery = `?{Spell Level${levelQuery}}`;
           }
-          if (higherLevelQuery !== '') {
-            finalSetAttrs[`higher_level_query_${i}`] = higherLevelQuery;
+
+          let higherLevelQuery;
+
+          if (spellLevels.length > 1) {
+            higherLevelQuery = `?{Spell Level|${spellLevels.join('|')}}`;
+          } else if (spellLevels.length === 1) {
+            higherLevelQuery = spellLevels[0];
           } else {
-            finalSetAttrs[`higher_level_query_${i}`] = i;
+            higherLevelQuery = i;
           }
+          finalSetAttrs[`higher_level_query_${i}`] = higherLevelQuery;
+
           if (v[`spell_slots_l${i}`] === '0' && higherLevelQuery !== i) {
             finalSetAttrs[`cast_as_level_${i}`] = higherLevelQuery;
           } else {
@@ -475,6 +484,9 @@ export class Spells {
     on('change:spell_slots_l1_bonus change:spell_slots_l2_bonus change:spell_slots_l3_bonus change:spell_slots_l4_bonus change:spell_slots_l5_bonus change:spell_slots_l6_bonus change:spell_slots_l7_bonus change:spell_slots_l8_bonus change:spell_slots_l9_bonus', () => {
       this.updateSlots();
     });
+    on('change:warlock_spell_slots_calc change:warlock_spell_slots_bonus', () => {
+      this.updateWarlockSlots();
+    });
     this.watchForChanges();
     on('change:repeating_spell', (eventInfo) => {
       const repeatingInfo = getRepeatingInfo('repeating_spell', eventInfo);
@@ -485,7 +497,7 @@ export class Spells {
     on('change:spells_show_unprepared remove:repeating_spell', () => {
       this.updateChatMacro();
     });
-    on('change:warlock_level change:spell_slots_l1 change:spell_slots_l2 change:spell_slots_l3 change:spell_slots_l4 change:spell_slots_l5 change:spell_slots_l6 change:spell_slots_l7 change:spell_slots_l8 change:spell_slots_l9', () => {
+    on('change:warlock_spell_slots change:spell_slots_l1 change:spell_slots_l2 change:spell_slots_l3 change:spell_slots_l4 change:spell_slots_l5 change:spell_slots_l6 change:spell_slots_l7 change:spell_slots_l8 change:spell_slots_l9', () => {
       this.generateHigherLevelQueries();
     });
   }

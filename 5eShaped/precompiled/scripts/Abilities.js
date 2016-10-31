@@ -78,10 +78,10 @@ export class Abilities {
         if (ability === 'strength') {
           finalSetAttrs.finesse_mod = Math.max(abilityMod, getIntValue(v.dexterity_mod));
           const weightMultiplier = getFloatValue(v.weight_multiplier, 1);
-          finalSetAttrs.carrying_capacity = abilityScore * 15 * weightMultiplier;
-          finalSetAttrs.max_push_drag_lift = abilityScore * 30 * weightMultiplier;
-          finalSetAttrs.encumbered = abilityScore * 5 * weightMultiplier;
-          finalSetAttrs.heavily_encumbered = abilityScore * 10 * weightMultiplier;
+          finalSetAttrs.carrying_capacity = abilityScoreCalc * 15 * weightMultiplier;
+          finalSetAttrs.max_push_drag_lift = abilityScoreCalc * 30 * weightMultiplier;
+          finalSetAttrs.encumbered = abilityScoreCalc * 5 * weightMultiplier;
+          finalSetAttrs.heavily_encumbered = abilityScoreCalc * 10 * weightMultiplier;
         } else if (ability === 'dexterity') {
           finalSetAttrs.finesse_mod = Math.max(abilityMod, getIntValue(v.strength_mod));
         }

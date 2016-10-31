@@ -184,7 +184,7 @@ export class Convert {
               finalSetAttrs[`${repeatingString}spell_level`] = ordinalSpellLevel(getIntValue(nameLevelMatch[2].replace('Level ', '')));
             }
           }
-          if (!v[`${repeatingStringOld}spellprepared`] || v[`${repeatingStringOld}spellprepared`] === '1') {
+          if (!v[`${repeatingStringOld}spellprepared`] || getIntValue(v[`${repeatingStringOld}spellprepared`]) === 1) {
             finalSetAttrs[`${repeatingString}is_prepared`] = 'on';
           }
           if (v[`${repeatingStringOld}spellritual`]) {
