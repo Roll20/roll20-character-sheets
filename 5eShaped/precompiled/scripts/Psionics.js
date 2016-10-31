@@ -295,7 +295,7 @@ export class Psionics {
     });
     on('change:repeating_psionics', (eventInfo) => {
       const repeatingInfo = getRepeatingInfo('repeating_psionics', eventInfo);
-      if (repeatingInfo && (repeatingInfo.field === 'name' || repeatingInfo.field === 'power_level')) {
+      if (repeatingInfo && (repeatingInfo.field === 'name' || repeatingInfo.field === 'power_level' || repeatingInfo.field === 'meditate' || repeatingInfo.field === 'concentration' || repeatingInfo.field === 'manifesting_time')) {
         this.updateChatMacro();
         this.updateSheetList();
       }
