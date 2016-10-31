@@ -604,19 +604,19 @@ export class Upgrade {
     if (this.versionCompare(currentVersion, '6.1.3') < 0) {
       abilities.updateModifier('strength');
     }
-    if (this.versionCompare(currentVersion, '6.11.5') < 0) {
+    if (this.versionCompare(currentVersion, '6.11.7') < 0) {
       spells.updateWarlockSlots();
       spells.updateHasSpellSlots();
       spells.updateHasSpellPoints();
-      character.updateLevels();
       spells.updateChatMacro();
-      this.updateWarlockMaxLevelOrdinal();
       spells.updateSheetList();
-      attacks.update();
-      abilityChecks.updateInitiative();
+      this.updateWarlockMaxLevelOrdinal();
       psionics.updateChatMacro();
       psionics.updateSheetList();
       psionics.updateShowHide();
+      character.updateLevels();
+      attacks.update();
+      abilityChecks.updateInitiative();
       this.attackToggle('repeating_attack');
       this.attackToggle('repeating_action');
       this.attackToggle('repeating_reaction');
