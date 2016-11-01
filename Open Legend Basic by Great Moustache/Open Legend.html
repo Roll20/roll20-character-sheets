@@ -1,24 +1,24 @@
 <!-- List of all attributes "attr_*"
 attr_character_name		attr_player_name	attr_archetype		attr_level		attr_xp		attr_description
 attr_attribute_points	attr_attribute_points_spent
-attr_agility_score		attr_agility_cost		attr_agility_dice_number		attr_agility_dice_type			attr_agility_dice
-attr_fortitude_score	attr_fortitude_cost		attr_fortitude_dice_number		attr_fortitude_dice_type		attr_fortitude_dice
-attr_might_score		attr_might_cost			attr_might_dice_number			attr_might_dice_type			attr_might_dice
-attr_deception_score	attr_deception_cost		attr_deception_dice_number		attr_deception_dice_type		attr_deception_dice
-attr_presence_score		attr_presence_cost		attr_presence_dice_number		attr_presence_dice_type			attr_presence_dice
-attr_persuasion_score	attr_persuasion_cost	attr_persuasion_dice_number		attr_persuasion_dice_type		attr_persuasion_dice
-attr_learning_score		attr_learning_cost		attr_learning_dice_number		attr_learning_dice_type			attr_learning_dice
-attr_logic_score		attr_logic_cost			attr_logic_dice_number			attr_logic_dice_type			attr_logic_dice
-attr_perception_score	attr_perception_cost	attr_perception_dice_number		attr_perception_dice_type		attr_perception_dice
-attr_will_score			attr_will_cost			attr_will_dice_number			attr_will_dice_type				attr_will_dice
-attr_alteration_score	attr_alteration_cost	attr_alteration_dice_number		attr_alteration_dice_type		attr_alteration_dice
-attr_creation_score		attr_creation_cost		attr_creation_dice_number		attr_creation_dice_type			attr_creation_dice
-attr_energy_score		attr_energy_cost		attr_energy_dice_number			attr_energy_dice_type			attr_energy_dice
-attr_entropy_score		attr_entropy_cost		attr_entropy_dice_number		attr_entropy_dice_type			attr_entropy_dice
-attr_influence_score	attr_influence_cost		attr_influence_dice_number		attr_influence_dice_type		attr_influence_dice
-attr_movement_score		attr_movement_cost		attr_movement_dice_number		attr_movement_dice_type			attr_movement_dice
-attr_prescience_score	attr_prescience_cost	attr_prescience_dice_number		attr_prescience_dice_type		attr_prescience_dice
-attr_protection_score	attr_protection_cost	attr_protection_dice_number		attr_protection_dice_type		attr_protection_dice
+attr_agility_score		attr_agility_cost		attr_agility_dice_roll		    attr_agility_dice
+attr_fortitude_score	attr_fortitude_cost		attr_fortitude_dice_roll		attr_fortitude_dice
+attr_might_score		attr_might_cost			attr_might_dice_roll			attr_might_dice
+attr_deception_score	attr_deception_cost		attr_deception_dice_roll		attr_deception_dice
+attr_presence_score		attr_presence_cost		attr_presence_dice_roll		    attr_presence_dice
+attr_persuasion_score	attr_persuasion_cost	attr_persuasion_dice_roll		attr_persuasion_dice
+attr_learning_score		attr_learning_cost		attr_learning_dice_roll		    attr_learning_dice
+attr_logic_score		attr_logic_cost			attr_logic_dice_roll			attr_logic_dice
+attr_perception_score	attr_perception_cost	attr_perception_dice_roll		attr_perception_dice
+attr_will_score			attr_will_cost			attr_will_dice_roll			    attr_will_dice
+attr_alteration_score	attr_alteration_cost	attr_alteration_dice_roll		attr_alteration_dice
+attr_creation_score		attr_creation_cost		attr_creation_dice_roll		    attr_creation_dice
+attr_energy_score		attr_energy_cost		attr_energy_dice_roll			attr_energy_dice
+attr_entropy_score		attr_entropy_cost		attr_entropy_dice_roll		    attr_entropy_dice
+attr_influence_score	attr_influence_cost		attr_influence_dice_roll		attr_influence_dice
+attr_movement_score		attr_movement_cost		attr_movement_dice_roll		    attr_movement_dice
+attr_prescience_score	attr_prescience_cost	attr_prescience_dice_roll		attr_prescience_dice
+attr_protection_score	attr_protection_cost	attr_protection_dice_roll		attr_protection_dice
 attr_armor		attr_shield   (each shown 2x for evasion and toughness)
 attr_evasion	attr_show_agility_score		attr_evasion_other
 attr_toughness	attr_show_fortitude_score	attr_toughness_other
@@ -43,6 +43,34 @@ repeating_flaws
 -->
 <!-- Worker Scripts -->
 <script type="text/worker">
+	// The first time the sheet is opened, run all functions that calculate fields in case of any changes or updates
+	on('sheet:opened', function() {
+		calcAttributePointsSpent();
+		calcEvasion();
+		calcToughness();
+		calcResolve();
+		calcHitPoints();
+		calcXPchanges();
+		calcAgility();
+		calcFortitude();
+		calcMight();
+		calcDeception();
+		calcPresence();
+		calcPersuasion();
+		calcLearning();
+		calcLogic();
+		calcPerception();
+		calcWill();
+		calcAlteration();
+		calcCreation();
+		calcEnergy();
+		calcEntropy();
+		calcInfluence();
+		calcMovement();
+		calcPrescience();
+		calcProtection();
+	});
+
     // Function to determine dice number :: takes in the attribute score :: outputs the dice number
     function calcAttributeDiceNumber(value) {
         if(value*1 === 0) { return 0;
@@ -71,6 +99,12 @@ repeating_flaws
         });
     };
     
+    // Anytime Armor, Shield, Evasion_other, toughness_other changed, update toughness and evasion
+    on("change:armor change:shield change:evasion_other change:toughness_other", function() {
+        calcEvasion();
+        calcToughness();
+    });
+    
     // Function to calculate Evasion, called when changes made to Armor, Shield, Agility, or evasion other
     function calcEvasion() {
         getAttrs(["agility_score", "armor", "shield", "evasion_other"], function(values) {
@@ -89,6 +123,11 @@ repeating_flaws
         });
     };
     
+    // Anytime resolve_other changed, update resolve
+    on("change:resolve_other", function() {
+        calcResolve();
+    });
+    
     // Function to calculate Resolve, called when changes made to presence, will, or resolve other
     function calcResolve() {
         getAttrs(["presence_score", "will_score", "resolve_other"], function(values) {
@@ -106,9 +145,14 @@ repeating_flaws
             });
         });
     };
-
+	
     // Anytime XP is updated, recalculate Attribute Points and Feat Points and Level
     on("change:xp", function() {
+		calcXPchanges();
+    });
+
+	// Function to run when XP is changed
+	function calcXPchanges() {
         getAttrs(["xp"], function(values) {
             setAttrs({
                 "level": Math.floor(values.xp/3) + 1,
@@ -116,331 +160,500 @@ repeating_flaws
                 "feat_total_points": values.xp*1 + 6
             });
         });
-    });
-    
-    // Anytime Armor, Shield, Evasion_other, toughness_other changed, update toughness and evasion
-    on("change:armor change:shield change:evasion_other change:toughness_other", function() {
-        calcEvasion();
-        calcToughness();
-    });
-    
-    // Anytime resolve_other changed, update resolve
-    on("change:resolve_other", function() {
-        calcResolve();
-    });
+	};
     
     // Anytime Agility score is changed, update cost and dice
     on("change:agility_score", function() {
+		calcAgility();
+        calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
+        calcEvasion();                  // call to recalculate evasion score
+    });
+	
+	// Function for calculating everything to do with Agility
+	function calcAgility() {
         getAttrs(["agility_score"], function(values) {
             var score = values.agility_score*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
+			var roll = "";
+			if(score === 0) {
+				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+			} else {
+				roll = "[[1d20!! + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}" + number + "]]";
+			}
             setAttrs({
                 "agility_cost": (score*1 * (score*1 + 1))/2,
-                "agility_dice_number": number,
-                "agility_dice_type": type,
+                "agility_dice_roll": roll,
                 "agility_dice": dice
             });
-        calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
-        calcEvasion();                  // call to recalculate evasion score
         });
-    });
+	};
     
     // Anytime fortitude score is changed, update cost and dice
     on("change:fortitude_score", function() {
+		calcFortitude();
+        calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
+        calcToughness();                // call to recalute toughness
+        calcHitPoints();                // call to update hitpoints
+    });
+	
+	// Function for calculating everything to do with Fortitude
+	function calcFortitude() {
         getAttrs(["fortitude_score"], function(values) {
             var score = values.fortitude_score*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
+			var roll = "";
+			if(score === 0) {
+				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+			} else {
+				roll = "[[1d20!! + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}" + number + "]]";
+			}
             setAttrs({
                 "fortitude_cost": (score*1 * (score*1 + 1))/2,
-                "fortitude_dice_number": number,
-                "fortitude_dice_type": type,
+                "fortitude_dice_roll": roll,
                 "fortitude_dice": dice
             });
-        calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
-        calcToughness();                // call to recalute toughness
-        calcHitPoints();                // call to update hitpoints
         });
-    });
+	};
     
     // Anytime might score is changed, update cost and dice
     on("change:might_score", function() {
+		calcMight();
+        calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
+    });
+	
+	// Function for calculating everything to do with Might
+	function calcMight() {
         getAttrs(["might_score"], function(values) {
             var score = values.might_score*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
+			var roll = "";
+			if(score === 0) {
+				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+			} else {
+				roll = "[[1d20!! + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}" + number + "]]";
+			}
             setAttrs({
                 "might_cost": (score*1 * (score*1 + 1))/2,
-                "might_dice_number": number,
-                "might_dice_type": type,
+                "might_dice_roll": roll,
                 "might_dice": dice
             });
-        calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
         });
-    });
+	};
     
     // Anytime deception score is changed, update cost and dice
     on("change:deception_score", function() {
+		calcDeception();
+        calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
+    });
+	
+	// Function for calculating everything to do with Deception
+	function calcDeception() {
         getAttrs(["deception_score"], function(values) {
             var score = values.deception_score*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
+			var roll = "";
+			if(score === 0) {
+				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+			} else {
+				roll = "[[1d20!! + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}" + number + "]]";
+			}
             setAttrs({
                 "deception_cost": (score*1 * (score*1 + 1))/2,
-                "deception_dice_number": number,
-                "deception_dice_type": type,
+                "deception_dice_roll": roll,
                 "deception_dice": dice
             });
-        calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
         });
-    });
-    
+	};
+	
     // Anytime presence score is changed, update cost and dice
     on("change:presence_score", function() {
+		calcPresence();
+        calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
+        calcResolve();                  // call to recalculate resolve
+        calcHitPoints();                // call to update hitpoints
+    });
+	
+	// Function for calculating everything to do with Presence
+	function calcPresence() {
         getAttrs(["presence_score"], function(values) {
             var score = values.presence_score*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
+			var roll = "";
+			if(score === 0) {
+				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+			} else {
+				roll = "[[1d20!! + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}" + number + "]]";
+			}
             setAttrs({
                 "presence_cost": (score*1 * (score*1 + 1))/2,
-                "presence_dice_number": number,
-                "presence_dice_type": type,
+                "presence_dice_roll": roll,
                 "presence_dice": dice
             });
-        calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
-        calcResolve();                  // call to recalculate resolve
-        calcHitPoints();                // call to update hitpoints
         });
-    });
+	};
     
     // Anytime persuasion score is changed, update cost and dice
     on("change:persuasion_score", function() {
+		calcPersuasion();
+        calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
+    });
+	
+	// Function for calculating everything to do with Persuasion
+	function calcPersuasion() {
         getAttrs(["persuasion_score"], function(values) {
             var score = values.persuasion_score*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
+			var roll = "";
+			if(score === 0) {
+				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+			} else {
+				roll = "[[1d20!! + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}" + number + "]]";
+			}
             setAttrs({
                 "persuasion_cost": (score*1 * (score*1 + 1))/2,
-                "persuasion_dice_number": number,
-                "persuasion_dice_type": type,
+                "persuasion_dice_roll": roll,
                 "persuasion_dice": dice
             });
-        calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
         });
-    });
+	};
     
     // Anytime learning score is changed, update cost and dice
     on("change:learning_score", function() {
+		calcLearning();
+        calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
+    });
+	
+	// Function for calculating everything to do with Learning
+	function calcLearning() {
         getAttrs(["learning_score"], function(values) {
             var score = values.learning_score*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
+			var roll = "";
+			if(score === 0) {
+				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+			} else {
+				roll = "[[1d20!! + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}" + number + "]]";
+			}
             setAttrs({
                 "learning_cost": (score*1 * (score*1 + 1))/2,
-                "learning_dice_number": number,
-                "learning_dice_type": type,
+                "learning_dice_roll": roll,
                 "learning_dice": dice
             });
-        calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
         });
-    });
-    
+	};
+	
     // Anytime logic score is changed, update cost and dice
     on("change:logic_score", function() {
+		calcLogic();
+        calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
+    });
+	
+	// Function for calculating everything to do with Logic
+	function calcLogic() {
         getAttrs(["logic_score"], function(values) {
             var score = values.logic_score*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
+			var roll = "";
+			if(score === 0) {
+				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+			} else {
+				roll = "[[1d20!! + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}" + number + "]]";
+			}
             setAttrs({
                 "logic_cost": (score*1 * (score*1 + 1))/2,
-                "logic_dice_number": number,
-                "logic_dice_type": type,
+                "logic_dice_roll": roll,
                 "logic_dice": dice
             });
-        calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
         });
-    });
+	};
     
     // Anytime perception score is changed, update cost and dice
     on("change:perception_score", function() {
+		calcPerception();
+        calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
+    });
+	
+	// Function for calculating everything to do with Perception
+	function calcPerception() {
         getAttrs(["perception_score"], function(values) {
             var score = values.perception_score*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
+			var roll = "";
+			if(score === 0) {
+				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+			} else {
+				roll = "[[1d20!! + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}" + number + "]]";
+			}
             setAttrs({
                 "perception_cost": (score*1 * (score*1 + 1))/2,
-                "perception_dice_number": number,
-                "perception_dice_type": type,
+                "perception_dice_roll": roll,
                 "perception_dice": dice
             });
-        calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
         });
-    });
-    
+	};
+	
     // Anytime will score is changed, update cost and dice
     on("change:will_score", function() {
+		calcWill();
+        calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
+        calcResolve();                  // call to recalculate resolve
+        calcHitPoints();                // call to update hitpoints
+    });
+	
+	// Function for calculating everything to do with Will
+	function calcWill() {
         getAttrs(["will_score"], function(values) {
             var score = values.will_score*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
+			var roll = "";
+			if(score === 0) {
+				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+			} else {
+				roll = "[[1d20!! + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}" + number + "]]";
+			}
             setAttrs({
                 "will_cost": (score*1 * (score*1 + 1))/2,
-                "will_dice_number": number,
-                "will_dice_type": type,
+                "will_dice_roll": roll,
                 "will_dice": dice
             });
-        calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
-        calcResolve();                  // call to recalculate resolve
-        calcHitPoints();                // call to update hitpoints
         });
-    });
-    
+	};
+	
     // Anytime alteration score is changed, update cost and dice
     on("change:alteration_score", function() {
+		calcAlteration();
+        calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
+    });
+	
+	// Function for calculating everything to do with Alteration
+	function calcAlteration() {
         getAttrs(["alteration_score"], function(values) {
             var score = values.alteration_score*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
+			var roll = "";
+			if(score === 0) {
+				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+			} else {
+				roll = "[[1d20!! + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}" + number + "]]";
+			}
             setAttrs({
                 "alteration_cost": (score*1 * (score*1 + 1))/2,
-                "alteration_dice_number": number,
-                "alteration_dice_type": type,
+                "alteration_dice_roll": roll,
                 "alteration_dice": dice
             });
-        calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
         });
-    });
-    
+	};
+	
     // Anytime creation score is changed, update cost and dice
     on("change:creation_score", function() {
+		calcCreation();
+        calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
+    });
+	
+	// Function for calculating everything to do with Creation
+	function calcCreation() {
         getAttrs(["creation_score"], function(values) {
             var score = values.creation_score*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
+			var roll = "";
+			if(score === 0) {
+				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+			} else {
+				roll = "[[1d20!! + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}" + number + "]]";
+			}
             setAttrs({
                 "creation_cost": (score*1 * (score*1 + 1))/2,
-                "creation_dice_number": number,
-                "creation_dice_type": type,
+                "creation_dice_roll": roll,
                 "creation_dice": dice
             });
-        calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
         });
-    });
-    
+	};
+	
     // Anytime energy score is changed, update cost and dice
     on("change:energy_score", function() {
+		calcEnergy();
+        calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
+    });
+	
+	// Function for calculating everything to do with Energy
+	function calcEnergy() {
         getAttrs(["energy_score"], function(values) {
             var score = values.energy_score*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
+			var roll = "";
+			if(score === 0) {
+				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+			} else {
+				roll = "[[1d20!! + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}" + number + "]]";
+			}
             setAttrs({
                 "energy_cost": (score*1 * (score*1 + 1))/2,
-                "energy_dice_number": number,
-                "energy_dice_type": type,
+                "energy_dice_roll": roll,
                 "energy_dice": dice
             });
-        calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
         });
-    });
-    
+	};
+	
     // Anytime entropy score is changed, update cost and dice
     on("change:entropy_score", function() {
+		calcEntropy();
+        calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
+    });
+	
+	// Function for calculating everything to do with Entropy
+	function calcEntropy() {
         getAttrs(["entropy_score"], function(values) {
             var score = values.entropy_score*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
+			var roll = "";
+			if(score === 0) {
+				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+			} else {
+				roll = "[[1d20!! + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}" + number + "]]";
+			}
             setAttrs({
                 "entropy_cost": (score*1 * (score*1 + 1))/2,
-                "entropy_dice_number": number,
-                "entropy_dice_type": type,
+                "entropy_dice_roll": roll,
                 "entropy_dice": dice
             });
-        calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
         });
-    });
-    
+	};
+	
     // Anytime influence score is changed, update cost and dice
     on("change:influence_score", function() {
+		calcInfluence();
+        calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
+    });
+	
+	// Function for calculating everything to do with Influence
+	function calcInfluence() {
         getAttrs(["influence_score"], function(values) {
             var score = values.influence_score*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
+			var roll = "";
+			if(score === 0) {
+				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+			} else {
+				roll = "[[1d20!! + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}" + number + "]]";
+			}
             setAttrs({
                 "influence_cost": (score*1 * (score*1 + 1))/2,
-                "influence_dice_number": number,
-                "influence_dice_type": type,
+                "influence_dice_roll": roll,
                 "influence_dice": dice
             });
-        calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
         });
-    });
-    
+	};
+	
     // Anytime movement score is changed, update cost and dice
     on("change:movement_score", function() {
+		calcMovement();
+        calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
+    });
+	
+	// Function for calculating everything to do with Movement
+	function calcMovement() {
         getAttrs(["movement_score"], function(values) {
             var score = values.movement_score*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
+			var roll = "";
+			if(score === 0) {
+				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+			} else {
+				roll = "[[1d20!! + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}" + number + "]]";
+			}
             setAttrs({
                 "movement_cost": (score*1 * (score*1 + 1))/2,
-                "movement_dice_number": number,
-                "movement_dice_type": type,
+                "movement_dice_roll": roll,
                 "movement_dice": dice
             });
-        calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
         });
-    });
-    
+	};
+	
     // Anytime prescience score is changed, update cost and dice
     on("change:prescience_score", function() {
+		calcPrescience();
+        calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
+    });
+	
+	// Function for calculating everything to do with Prescience
+	function calcPrescience() {
         getAttrs(["prescience_score"], function(values) {
             var score = values.prescience_score*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
+			var roll = "";
+			if(score === 0) {
+				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+			} else {
+				roll = "[[1d20!! + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}" + number + "]]";
+			}
             setAttrs({
                 "prescience_cost": (score*1 * (score*1 + 1))/2,
-                "prescience_dice_number": number,
-                "prescience_dice_type": type,
+                "prescience_dice_roll": roll,
                 "prescience_dice": dice
             });
-        calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
         });
-    });
-    
+	};
+	
     // Anytime protection score is changed, update cost and dice
     on("change:protection_score", function() {
+		calcProtection();
+        calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
+    });
+	
+	// Function for calculating everything to do with Protection
+	function calcProtection() {
         getAttrs(["protection_score"], function(values) {
             var score = values.protection_score*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
+			var roll = "";
+			if(score === 0) {
+				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+			} else {
+				roll = "[[1d20!! + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}" + number + "]]";
+			}
             setAttrs({
                 "protection_cost": (score*1 * (score*1 + 1))/2,
-                "protection_dice_number": number,
-                "protection_dice_type": type,
+                "protection_dice_roll": roll,
                 "protection_dice": dice
             });
-        calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
         });
-    });
+	};
 </script>
 <!-- End Worker Scripts -->
 <!-- Main body of Character Sheet -->
@@ -499,39 +712,36 @@ repeating_flaws
       <!-- Agility -->
         <div class="row width100">
             <div class="column width1of3 inlineBlock textLeft textLarge bold italic attributeButton">
-                <button type="roll" value="&{template:default} {{name= Agility Roll}} {{roll= [[1d20!! + [[@{agility_dice_number}+?{# of Advantage/Disadvantage Dice|0}]]@{agility_dice_type}k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}@{agility_dice_number}]]}}">Agility</button>
+                <button type="roll" value="&{template:default} {{name= Agility Roll}} {{roll= @{agility_dice_roll}}}">Agility</button>
             </div>
             <div class="width2of3 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_agility_score" value=0 /></div>
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_agility_cost" value=0 /></div>
-                <input type="hidden" name="attr_agility_dice_number" value=0 />     <!-- hidden value of how many dice to roll (appended with dice_type to make dice for display [seperated to make advantage/disadvantage work]) -->
-                <input type="hidden" name="attr_agility_dice_type" value=0 />       <!-- hidden value of dice type/size (appended with dice_number to make dice for display) -->
+                <input type="hidden" name="attr_agility_dice_roll" value=0 />     <!-- hidden value of the roll button string -->
                 <div class="column width1of3 inlineBlock textCenter inputDice"><input type="text" style="text-align: center;" name="attr_agility_dice" value=0 /></div>
             </div>}
         </div>
       <!-- Fortitude -->
         <div class="row width100">
             <div class="column width1of3 inlineBlock textLeft textLarge bold italic attributeButton">
-                <button type="roll" value="&{template:default} {{name= Fortitude Roll}} {{roll= [[1d20!! + [[@{fortitude_dice_number}+?{# of Advantage/Disadvantage Dice|0}]]@{fortitude_dice_type}k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}@{fortitude_dice_number}]]}}">Fortitude</button>
+                <button type="roll" value="&{template:default} {{name= Fortitude Roll}} {{roll= @{fortitude_dice_roll}}}">Fortitude</button>
             </div>
             <div class="width2of3 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_fortitude_score" value=0 /></div>
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_fortitude_cost" value=0 /></div>
-                <input type="hidden" name="attr_fortitude_dice_number" value=0 />     <!-- hidden value of how many dice to roll (appended with dice_type to make dice for display [seperated to make advantage/disadvantage work]) -->
-                <input type="hidden" name="attr_fortitude_dice_type" value=0 />       <!-- hidden value of dice type/size (appended with dice_number to make dice for display) -->
+                <input type="hidden" name="attr_fortitude_dice_roll" value=0 />     <!-- hidden value of the roll button string -->
                 <div class="column width1of3 inlineBlock textCenter inputDice"><input type="text" style="text-align: center;" name="attr_fortitude_dice" value=0 /></div>
             </div>
         </div>
       <!-- Might -->
         <div class="row width100">
             <div class="column width1of3 inlineBlock textLeft textLarge bold italic attributeButton">
-                <button type="roll" value="&{template:default} {{name= Might Roll}} {{roll= [[1d20!! + [[@{might_dice_number}+?{# of Advantage/Disadvantage Dice|0}]]@{might_dice_type}k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}@{might_dice_number}]]}}">Might</button>
+                <button type="roll" value="&{template:default} {{name= Might Roll}} {{roll= @{might_dice_roll}}}">Might</button>
             </div>
             <div class="width2of3 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_might_score" value=0 /></div>
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_might_cost" value=0 /></div>
-                <input type="hidden" name="attr_might_dice_number" value=0 />     <!-- hidden value of how many dice to roll (appended with dice_type to make dice for display [seperated to make advantage/disadvantage work]) -->
-                <input type="hidden" name="attr_might_dice_type" value=0 />       <!-- hidden value of dice type/size (appended with dice_number to make dice for display) -->
+                <input type="hidden" name="attr_might_dice_roll" value=0 />     <!-- hidden value of the roll button string -->
                 <div class="column width1of3 inlineBlock textCenter inputDice"><input type="text" style="text-align: center;" name="attr_might_dice" value=0 /></div>
             </div>
         </div>
@@ -550,39 +760,36 @@ repeating_flaws
       <!-- Deception -->
         <div class="row width100">
             <div class="column width1of3 inlineBlock textLeft textLarge bold italic attributeButton">
-                <button type="roll" value="&{template:default} {{name= Deception Roll}} {{roll= [[1d20!! + [[@{deception_dice_number}+?{# of Advantage/Disadvantage Dice|0}]]@{deception_dice_type}k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}@{deception_dice_number}]]}}">Deception</button>
+                <button type="roll" value="&{template:default} {{name= Deception Roll}} {{roll= @{deception}}}">Deception</button>
             </div>
             <div class="width2of3 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_deception_score" value=0 /></div>
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_deception_cost" value=0 /></div>
-                <input type="hidden" name="attr_deception_dice_number" value=0 />     <!-- hidden value of how many dice to roll (appended with dice_type to make dice for display [seperated to make advantage/disadvantage work]) -->
-                <input type="hidden" name="attr_deception_dice_type" value=0 />       <!-- hidden value of dice type/size (appended with dice_number to make dice for display) -->
+                <input type="hidden" name="attr_deception_dice_roll" value=0 />     <!-- hidden value of the roll button string -->
                 <div class="column width1of3 inlineBlock textCenter inputDice"><input type="text" style="text-align: center;" name="attr_deception_dice" value=0 /></div>
             </div>
         </div>
       <!-- Presence -->
         <div class="row width100">
             <div class="column width1of3 inlineBlock textLeft textLarge bold italic attributeButton">
-                <button type="roll" value="&{template:default} {{name= Presence Roll}} {{roll= [[1d20!! + [[@{presence_dice_number}+?{# of Advantage/Disadvantage Dice|0}]]@{presence_dice_type}k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}@{presence_dice_number}]]}}">Presence</button>
+                <button type="roll" value="&{template:default} {{name= Presence Roll}} {{roll= @{presence_dice_roll}}}">Presence</button>
             </div>
             <div class="width2of3 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_presence_score" value=0 /></div>
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_presence_cost" value=0 /></div>
-                <input type="hidden" name="attr_presence_dice_number" value=0 />     <!-- hidden value of how many dice to roll (appended with dice_type to make dice for display [seperated to make advantage/disadvantage work]) -->
-                <input type="hidden" name="attr_presence_dice_type" value=0 />       <!-- hidden value of dice type/size (appended with dice_number to make dice for display) -->
+                <input type="hidden" name="attr_presence_dice_roll" value=0 />     <!-- hidden value of the roll button string -->
                 <div class="column width1of3 inlineBlock textCenter inputDice"><input type="text" style="text-align: center;" name="attr_presence_dice" value=0 /></div>
             </div>
         </div>
       <!-- Persuasion -->
         <div class="row width100">
             <div class="column width1of3 inlineBlock textLeft textLarge bold italic attributeButton">
-                <button type="roll" value="&{template:default} {{name= Persuasion Roll}} {{roll= [[1d20!! + [[@{persuasion_dice_number}+?{# of Advantage/Disadvantage Dice|0}]]@{persuasion_dice_type}k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}@{persuasion_dice_number}]]}}">Persuasion</button>
+                <button type="roll" value="&{template:default} {{name= Persuasion Roll}} {{roll= @{persuasion_dice_roll}}}">Persuasion</button>
             </div>
             <div class="width2of3 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_persuasion_score" value=0 /></div>
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_persuasion_cost" value=0 /></div>
-                <input type="hidden" name="attr_persuasion_dice_number" value=0 />     <!-- hidden value of how many dice to roll (appended with dice_type to make dice for display [seperated to make advantage/disadvantage work]) -->
-                <input type="hidden" name="attr_persuasion_dice_type" value=0 />       <!-- hidden value of dice type/size (appended with dice_number to make dice for display) -->
+                <input type="hidden" name="attr_persuasion_dice_roll" value=0 />     <!-- hidden value of the roll button string -->
                 <div class="column width1of3 inlineBlock textCenter inputDice"><input type="text" style="text-align: center;" name="attr_persuasion_dice" value=0 /></div>
             </div>
         </div>
@@ -601,52 +808,48 @@ repeating_flaws
       <!-- Learning -->
         <div class="row width100">
             <div class="column width1of3 inlineBlock textLeft textLarge bold italic attributeButton">
-                <button type="roll" value="&{template:default} {{name= Learning Roll}} {{roll= [[1d20!! + [[@{learning_dice_number}+?{# of Advantage/Disadvantage Dice|0}]]@{learning_dice_type}k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}@{learning_dice_number}]]}}">Learning</button>
+                <button type="roll" value="&{template:default} {{name= Learning Roll}} {{roll= @{learning_dice_roll}}}">Learning</button>
             </div>
             <div class="width2of3 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_learning_score" value=0 /></div>
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_learning_cost" value=0 /></div>
-                <input type="hidden" name="attr_learning_dice_number" value=0 />     <!-- hidden value of how many dice to roll (appended with dice_type to make dice for display [seperated to make advantage/disadvantage work]) -->
-                <input type="hidden" name="attr_learning_dice_type" value=0 />       <!-- hidden value of dice type/size (appended with dice_number to make dice for display) -->
+                <input type="hidden" name="attr_learning_dice_roll" value=0 />     <!-- hidden value of the roll button string -->
                 <div class="column width1of3 inlineBlock textCenter inputDice"><input type="text" style="text-align: center;" name="attr_learning_dice" value=0 /></div>
             </div>
         </div>
       <!-- Logic -->
         <div class="row width100">
             <div class="column width1of3 inlineBlock textLeft textLarge bold italic attributeButton">
-                <button type="roll" value="&{template:default} {{name= Logic Roll}} {{roll= [[1d20!! + [[@{logic_dice_number}+?{# of Advantage/Disadvantage Dice|0}]]@{logic_dice_type}k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}@{logic_dice_number}]]}}">Logic</button>
+                <button type="roll" value="&{template:default} {{name= Logic Roll}} {{roll= @{logic_dice_roll}}}">Logic</button>
             </div>
             <div class="width2of3 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_logic_score" value=0 /></div>
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_logic_cost" value=0 /></div>
-                <input type="hidden" name="attr_logic_dice_number" value=0 />     <!-- hidden value of how many dice to roll (appended with dice_type to make dice for display [seperated to make advantage/disadvantage work]) -->
-                <input type="hidden" name="attr_logic_dice_type" value=0 />       <!-- hidden value of dice type/size (appended with dice_number to make dice for display) -->
+                <input type="hidden" name="attr_logic_dice_roll" value=0 />     <!-- hidden value of the roll button string -->
                 <div class="column width1of3 inlineBlock textCenter inputDice"><input type="text" style="text-align: center;" name="attr_logic_dice" value=0 /></div>
             </div>
         </div>
       <!-- Perception -->
         <div class="row width100">
             <div class="column width1of3 inlineBlock textLeft textLarge bold italic attributeButton">
-                <button type="roll" value="&{template:default} {{name= Perception Roll}} {{roll= [[1d20!! + [[@{perception_dice_number}+?{# of Advantage/Disadvantage Dice|0}]]@{perception_dice_type}k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}@{perception_dice_number}]]}}">Perception</button>
+                <button type="roll" value="&{template:default} {{name= Perception Roll}} {{roll= @{perception_dice_roll}}}">Perception</button>
             </div>
             <div class="width2of3 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_perception_score" value=0 /></div>
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_perception_cost" value=0 /></div>
-                <input type="hidden" name="attr_perception_dice_number" value=0 />     <!-- hidden value of how many dice to roll (appended with dice_type to make dice for display [seperated to make advantage/disadvantage work]) -->
-                <input type="hidden" name="attr_perception_dice_type" value=0 />       <!-- hidden value of dice type/size (appended with dice_number to make dice for display) -->
+                <input type="hidden" name="attr_perception_dice_roll" value=0 />     <!-- hidden value of the roll button string -->
                 <div class="column width1of3 inlineBlock textCenter inputDice"><input type="text" style="text-align: center;" name="attr_perception_dice" value=0 /></div>
             </div>
         </div>
       <!-- Will -->
         <div class="row width100">
             <div class="column width1of3 inlineBlock textLeft textLarge bold italic attributeButton">
-                <button type="roll" value="&{template:default} {{name= Will Roll}} {{roll= [[1d20!! + [[@{will_dice_number}+?{# of Advantage/Disadvantage Dice|0}]]@{will_dice_type}k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}@{will_dice_number}]]}}">Will</button>
+                <button type="roll" value="&{template:default} {{name= Will Roll}} {{roll= @{will_dice_roll}}}">Will</button>
             </div>
             <div class="width2of3 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_will_score" value=0 /></div>
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_will_cost" value=0 /></div>
-                <input type="hidden" name="attr_will_dice_number" value=0 />     <!-- hidden value of how many dice to roll (appended with dice_type to make dice for display [seperated to make advantage/disadvantage work]) -->
-                <input type="hidden" name="attr_will_dice_type" value=0 />       <!-- hidden value of dice type/size (appended with dice_number to make dice for display) -->
+                <input type="hidden" name="attr_will_dice_roll" value=0 />     <!-- hidden value of the roll button string -->
                 <div class="column width1of3 inlineBlock textCenter inputDice"><input type="text" style="text-align: center;" name="attr_will_dice" value=0 /></div>
             </div>
         </div>
@@ -665,104 +868,96 @@ repeating_flaws
       <!-- Alteration -->
         <div class="row width100">
             <div class="column width1of3 inlineBlock textLeft textLarge bold italic attributeButton">
-                <button type="roll" value="&{template:default} {{name= Alteration Roll}} {{roll= [[1d20!! + [[@{alteration_dice_number}+?{# of Advantage/Disadvantage Dice|0}]]@{alteration_dice_type}k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}@{alteration_dice_number}]]}}">Alteration</button>
+                <button type="roll" value="&{template:default} {{name= Alteration Roll}} {{roll= @{alteration_dice_roll}}}">Alteration</button>
             </div>
             <div class="width2of3 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_alteration_score" value=0 /></div>
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_alteration_cost" value=0 /></div>
-                <input type="hidden" name="attr_alteration_dice_number" value=0 />     <!-- hidden value of how many dice to roll (appended with dice_type to make dice for display [seperated to make advantage/disadvantage work]) -->
-                <input type="hidden" name="attr_alteration_dice_type" value=0 />       <!-- hidden value of dice type/size (appended with dice_number to make dice for display) -->
+                <input type="hidden" name="attr_alteration_dice_roll" value=0 />     <!-- hidden value of the roll button string -->
                 <div class="column width1of3 inlineBlock textCenter inputDice"><input type="text" style="text-align: center;" name="attr_alteration_dice" value=0 /></div>
             </div>
         </div>
       <!-- Creation -->
         <div class="row width100">
             <div class="column width1of3 inlineBlock textLeft textLarge bold italic attributeButton">
-                <button type="roll" value="&{template:default} {{name= Creation Roll}} {{roll= [[1d20!! + [[@{creation_dice_number}+?{# of Advantage/Disadvantage Dice|0}]]@{creation_dice_type}k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}@{creation_dice_number}]]}}">Creation</button>
+                <button type="roll" value="&{template:default} {{name= Creation Roll}} {{roll= @{creation_dice_roll}}}">Creation</button>
             </div>
             <div class="width2of3 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_creation_score" value=0 /></div>
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_creation_cost" value=0 /></div>
-                <input type="hidden" name="attr_creation_dice_number" value=0 />     <!-- hidden value of how many dice to roll (appended with dice_type to make dice for display [seperated to make advantage/disadvantage work]) -->
-                <input type="hidden" name="attr_creation_dice_type" value=0 />       <!-- hidden value of dice type/size (appended with dice_number to make dice for display) -->
+                <input type="hidden" name="attr_creation_dice_roll" value=0 />     <!-- hidden value of the roll button string -->
                 <div class="column width1of3 inlineBlock textCenter inputDice"><input type="text" style="text-align: center;" name="attr_creation_dice" value=0 /></div>
             </div>
         </div>
       <!-- Energy -->
         <div class="row width100">
             <div class="column width1of3 inlineBlock textLeft textLarge bold italic attributeButton">
-                <button type="roll" value="&{template:default} {{name= Energy Roll}} {{roll= [[1d20!! + [[@{energy_dice_number}+?{# of Advantage/Disadvantage Dice|0}]]@{energy_dice_type}k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}@{energy_dice_number}]]}}">Energy</button>
+                <button type="roll" value="&{template:default} {{name= Energy Roll}} {{roll= @{energy_dice_roll}}}">Energy</button>
             </div>
             <div class="width2of3 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_energy_score" value=0 /></div>
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_energy_cost" value=0 /></div>
-                <input type="hidden" name="attr_energy_dice_number" value=0 />     <!-- hidden value of how many dice to roll (appended with dice_type to make dice for display [seperated to make advantage/disadvantage work]) -->
-                <input type="hidden" name="attr_energy_dice_type" value=0 />       <!-- hidden value of dice type/size (appended with dice_number to make dice for display) -->
+                <input type="hidden" name="attr_energy_dice_roll" value=0 />     <!-- hidden value of the roll button string -->
                 <div class="column width1of3 inlineBlock textCenter inputDice"><input type="text" style="text-align: center;" name="attr_energy_dice" value=0 /></div>
             </div>
         </div>
       <!-- Entropy -->
         <div class="row width100">
             <div class="column width1of3 inlineBlock textLeft textLarge bold italic attributeButton">
-                <button type="roll" value="&{template:default} {{name= Entropy Roll}} {{roll= [[1d20!! + [[@{entropy_dice_number}+?{# of Advantage/Disadvantage Dice|0}]]@{entropy_dice_type}k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}@{entropy_dice_number}]]}}">Entropy</button>
+                <button type="roll" value="&{template:default} {{name= Entropy Roll}} {{roll= @{entropy_dice_roll}}}">Entropy</button>
             </div>
             <div class="width2of3 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_entropy_score" value=0 /></div>
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_entropy_cost" value=0 /></div>
-                <input type="hidden" name="attr_entropy_dice_number" value=0 />     <!-- hidden value of how many dice to roll (appended with dice_type to make dice for display [seperated to make advantage/disadvantage work]) -->
-                <input type="hidden" name="attr_entropy_dice_type" value=0 />       <!-- hidden value of dice type/size (appended with dice_number to make dice for display) -->
+                <input type="hidden" name="attr_entropy_dice_roll" value=0 />     <!-- hidden value of the roll button string -->
                 <div class="column width1of3 inlineBlock textCenter inputDice"><input type="text" style="text-align: center;" name="attr_entropy_dice" value=0 /></div>
             </div>
         </div>
       <!-- Influence -->
         <div class="row width100">
             <div class="column width1of3 inlineBlock textLeft textLarge bold italic attributeButton">
-                <button type="roll" value="&{template:default} {{name= Influence Roll}} {{roll= [[1d20!! + [[@{influence_dice_number}+?{# of Advantage/Disadvantage Dice|0}]]@{influence_dice_type}k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}@{influence_dice_number}]]}}">Influence</button>
+                <button type="roll" value="&{template:default} {{name= Influence Roll}} {{roll= @{influence_dice_roll}}}">Influence</button>
             </div>
             <div class="width2of3 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_influence_score" value=0 /></div>
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_influence_cost" value=0 /></div>
-                <input type="hidden" name="attr_influence_dice_number" value=0 />     <!-- hidden value of how many dice to roll (appended with dice_type to make dice for display [seperated to make advantage/disadvantage work]) -->
-                <input type="hidden" name="attr_influence_dice_type" value=0 />       <!-- hidden value of dice type/size (appended with dice_number to make dice for display) -->
+                <input type="hidden" name="attr_influence_dice_roll" value=0 />     <!-- hidden value of the roll button string -->
                 <div class="column width1of3 inlineBlock textCenter inputDice"><input type="text" style="text-align: center;" name="attr_influence_dice" value=0 /></div>
             </div>
         </div>
       <!-- Movement -->
         <div class="row width100">
             <div class="column width1of3 inlineBlock textLeft textLarge bold italic attributeButton">
-                <button type="roll" value="&{template:default} {{name= Movement Roll}} {{roll= [[1d20!! + [[@{movement_dice_number}+?{# of Advantage/Disadvantage Dice|0}]]@{movement_dice_type}k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}@{movement_dice_number}]]}}">Movement</button>
+                <button type="roll" value="&{template:default} {{name= Movement Roll}} {{roll= @{movement_dice_roll}}}">Movement</button>
             </div>
             <div class="width2of3 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_movement_score" value=0 /></div>
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_movement_cost" value=0 /></div>
-                <input type="hidden" name="attr_movement_dice_number" value=0 />     <!-- hidden value of how many dice to roll (appended with dice_type to make dice for display [seperated to make advantage/disadvantage work]) -->
-                <input type="hidden" name="attr_movement_dice_type" value=0 />       <!-- hidden value of dice type/size (appended with dice_number to make dice for display) -->
+                <input type="hidden" name="attr_movement_dice_roll" value=0 />     <!-- hidden value of the roll button string -->
                 <div class="column width1of3 inlineBlock textCenter inputDice"><input type="text" style="text-align: center;" name="attr_movement_dice" value=0 /></div>
             </div>
         </div>
       <!-- Prescience -->
         <div class="row width100">
             <div class="column width1of3 inlineBlock textLeft textLarge bold italic attributeButton">
-                <button type="roll" value="&{template:default} {{name= Prescience Roll}} {{roll= [[1d20!! + [[@{prescience_dice_number}+?{# of Advantage/Disadvantage Dice|0}]]@{prescience_dice_type}k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}@{prescience_dice_number}]]}}">Prescience</button>
+                <button type="roll" value="&{template:default} {{name= Prescience Roll}} {{roll= @{prescience_dice_roll}}}">Prescience</button>
             </div>
             <div class="width2of3 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_prescience_score" value=0 /></div>
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_prescience_cost" value=0 /></div>
-                <input type="hidden" name="attr_prescience_dice_number" value=0 />     <!-- hidden value of how many dice to roll (appended with dice_type to make dice for display [seperated to make advantage/disadvantage work]) -->
-                <input type="hidden" name="attr_prescience_dice_type" value=0 />       <!-- hidden value of dice type/size (appended with dice_number to make dice for display) -->
+                <input type="hidden" name="attr_prescience_dice_roll" value=0 />     <!-- hidden value of the roll button string -->
                 <div class="column width1of3 inlineBlock textCenter inputDice"><input type="text" style="text-align: center;" name="attr_prescience_dice" value=0 /></div>
             </div>
         </div>
       <!-- Protection -->
         <div class="row width100">
             <div class="column width1of3 inlineBlock textLeft textLarge bold italic attributeButton">
-                <button type="roll" value="&{template:default} {{name= Protection Roll}} {{roll= [[1d20!! + [[@{protection_dice_number}+?{# of Advantage/Disadvantage Dice|0}]]@{protection_dice_type}k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}@{protection_dice_number}]]}}">Protection</button>
+                <button type="roll" value="&{template:default} {{name= Protection Roll}} {{roll= @{protection_dice_roll}}}">Protection</button>
             </div>
             <div class="width2of3 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_protection_score" value=0 /></div>
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_protection_cost" value=0 /></div>
-                <input type="hidden" name="attr_protection_dice_number" value=0 />     <!-- hidden value of how many dice to roll (appended with dice_type to make dice for display [seperated to make advantage/disadvantage work]) -->
-                <input type="hidden" name="attr_protection_dice_type" value=0 />       <!-- hidden value of dice type/size (appended with dice_number to make dice for display) -->
+                <input type="hidden" name="attr_protection_dice_roll" value=0 />     <!-- hidden value of the roll button string -->
                 <div class="column width1of3 inlineBlock textCenter inputDice"><input type="text" style="text-align: center;" name="attr_protection_dice" value=0 /></div>
             </div>
         </div>
@@ -904,24 +1099,24 @@ repeating_flaws
                         <div class="column width15 inlineBlock inputSelect">
                             <select name="attr_action_attribute">
                                 <option value="None" selected="selected">None</option>
-                                <option value="[[1d20!! + [Agility][[@{agility_dice_number}+?{# of Advantage/Disadvantage Dice|0}]]@{agility_dice_type}k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}@{agility_dice_number}]]">Agility</option>
-                                <option value="[[1d20!! + [Fortitude][[@{fortitude_dice_number}+?{# of Advantage/Disadvantage Dice|0}]]@{fortitude_dice_type}k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}@{fortitude_dice_number}]]">Fortitude</option>
-                                <option value="[[1d20!! + [Might][[@{might_dice_number}+?{# of Advantage/Disadvantage Dice|0}]]@{might_dice_type}k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}@{might_dice_number}]]">Might</option>
-                                <option value="[[1d20!! + [Deception][[@{deception_dice_number}+?{# of Advantage/Disadvantage Dice|0}]]@{deception_dice_type}k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}@{deception_dice_number}]]">Deception</option>
-                                <option value="[[1d20!! + [Presence][[@{presence_dice_number}+?{# of Advantage/Disadvantage Dice|0}]]@{presence_dice_type}k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}@{presence_dice_number}]]">Presence</option>
-                                <option value="[[1d20!! + [Persuasion][[@{persuasion_dice_number}+?{# of Advantage/Disadvantage Dice|0}]]@{persuasion_dice_type}k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}@{persuasion_dice_number}]]">Persuasion</option>
-                                <option value="[[1d20!! + [Learning][[@{learning_dice_number}+?{# of Advantage/Disadvantage Dice|0}]]@{learning_dice_type}k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}@{learning_dice_number}]]">Learning</option>
-                                <option value="[[1d20!! + [Logic][[@{logic_dice_number}+?{# of Advantage/Disadvantage Dice|0}]]@{logic_dice_type}k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}@{logic_dice_number}]]">Logic</option>
-                                <option value="[[1d20!! + [Perception][[@{perception_dice_number}+?{# of Advantage/Disadvantage Dice|0}]]@{perception_dice_type}k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}@{perception_dice_number}]]">Perception</option>
-                                <option value="[[1d20!! + [Will][[@{will_dice_number}+?{# of Advantage/Disadvantage Dice|0}]]@{will_dice_type}k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}@{will_dice_number}]]">Will</option>
-                                <option value="[[1d20!! + [Alteration][[@{alteration_dice_number}+?{# of Advantage/Disadvantage Dice|0}]]@{alteration_dice_type}k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}@{alteration_dice_number}]]">Alteration</option>
-                                <option value="[[1d20!! + [Creation][[@{creation_dice_number}+?{# of Advantage/Disadvantage Dice|0}]]@{creation_dice_type}k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}@{creation_dice_number}]]">Creation</option>
-                                <option value="[[1d20!! + [Energy][[@{energy_dice_number}+?{# of Advantage/Disadvantage Dice|0}]]@{energy_dice_type}k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}@{energy_dice_number}]]">Energy</option>
-                                <option value="[[1d20!! + [Entropy][[@{entropy_dice_number}+?{# of Advantage/Disadvantage Dice|0}]]@{entropy_dice_type}k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}@{entropy_dice_number}]]">Entropy</option>
-                                <option value="[[1d20!! + [Influence][[@{influence_dice_number}+?{# of Advantage/Disadvantage Dice|0}]]@{influence_dice_type}k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}@{influence_dice_number}]]">Influence</option>
-                                <option value="[[1d20!! + [Movement][[@{movement_dice_number}+?{# of Advantage/Disadvantage Dice|0}]]@{movement_dice_type}k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}@{movement_dice_number}]]">Movement</option>
-                                <option value="[[1d20!! + [Prescience][[@{prescience_dice_number}+?{# of Advantage/Disadvantage Dice|0}]]@{prescience_dice_type}k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}@{prescience_dice_number}]]">Prescience</option>
-                                <option value="[[1d20!! + [Protection][[@{protection_dice_number}+?{# of Advantage/Disadvantage Dice|0}]]@{protection_dice_type}k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}@{protection_dice_number}]]">Protection</option>
+                                <option value="@{agility_dice_roll} Agility">Agility</option>
+                                <option value="@{fortitude_dice_roll} Fortitude">Fortitude</option>
+                                <option value="@{might_dice_roll} Might">Might</option>
+                                <option value="@{deception_dice_roll} Deception">Deception</option>
+                                <option value="@{presence_dice_roll} Presence">Presence</option>
+                                <option value="@{persuasion_dice_roll} Persuasion">Persuasion</option>
+                                <option value="@{learning_dice_roll} Learning">Learning</option>
+                                <option value="@{logic_dice_roll} Logic">Logic</option>
+                                <option value="@{perception_dice_roll} Perception">Perception</option>
+                                <option value="@{will_dice_roll} Will">Will</option>
+                                <option value="@{alteration_dice_roll} Alteration">Alteration</option>
+                                <option value="@{creation_dice_roll} Creation">Creation</option>
+                                <option value="@{energy_dice_roll} Energy">Energy</option>
+                                <option value="@{entropy_dice_roll} Entropy">Entropy</option>
+                                <option value="@{influence_dice_roll} Influence">Influence</option>
+                                <option value="@{movement_dice_roll} Movement">Movement</option>
+                                <option value="@{prescience_dice_roll} Prescience">Prescience</option>
+                                <option value="@{protection_dice_roll} Protection">Protection</option>
                             </select>
                         </div>
                         <div class="column width5 inlineBlock bold italic textCenter">vs</div>
