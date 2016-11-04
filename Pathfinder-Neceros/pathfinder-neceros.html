@@ -15529,16 +15529,16 @@ var PFMigrate = PFMigrate || (function () {
 					}
 				}),
 				migrateNPCHP = function () {
-					getAttrs(["HP-ability", "HP-ability-mod", "npc-type", "CON-mod", "CHA-mod", "npc-hd-misc", "NPC-HD-misc-mod", "HP-misc", "HP-formula-macro-text", "HP-formula-mod"], function (v) {
+					getAttrs(["HP-ability", "HP-ability-mod", "npc-type", "CON-mod", "CHA-mod", "npc-hd-misc", "npc-hd-misc-mod", "HP-misc", "HP-formula-macro-text", "HP-formula-mod"], function (v) {
 						var isUndead = /undead/i.test(v["npc-type"]),
 							hpMod = isUndead ? (parseInt(v["CHA-mod"], 10) || 0) : (parseInt(v["HP-ability-mod"], 10) || 0),
-							newMisc = (parseInt(v["NPC-HD-misc-mod"], 10) || 0) - hpMod,
+							newMisc = (parseInt(v["npc-hd-misc-mod"], 10) || 0) - hpMod,
 							setter = {
 								"HP-misc": newMisc,
 								"HP-formula-macro-text": v["npc-hd-misc"],
-								"HP-formula-mod": v["NPC-HD-misc-mod"],
+								"HP-formula-mod": v["npc-hd-misc-mod"],
 								"npc-hd-misc": "",
-								"NPC-HD-misc-mod": 0
+								"npc-hd-misc-mod": 0
 							};
 						if (isUndead && PFUtils.findAbilityInString(v["HP-ability"]) != "CHA-mod") {
 							setter["HP-ability"] = "@{CHA-mod}";
@@ -20144,6 +20144,7 @@ var PFSkills = PFSkills || (function () {
 				}
 				if (oldversion > 0.60 && oldversion < 0.69) {
 					setAdvancedMacroCheckbox();
+					PFNPCprev100.updateNPCMaxHP();
 				}
 				migrateOldClassSkillValue();
 				migrateSkillMacrosToV65();
@@ -22497,7 +22498,7 @@ var PFNPCprev100 = PFNPCprev100 || (function () {
 					isnpc = parseInt(v["is_npc"], 10) || 0;
 					try {
 						if (isnpc) {
-							newmaxhp = getNPCHP(parseInt(v["npc-hd-num"], 10) || 0, parseInt(v["npc-hd"], 10) || 0, parseInt(v["npc-hd-num2"], 10) || 0, parseInt(v["npc-hd2"], 10) || 0, parseInt(v["HP-formula-mod"], 10) || 0, parseInt(v["HP-misc"], 10) || 0, parseInt(v["HP-ability-mod"], 10) || 0);
+							newmaxhp = getNPCHP(parseInt(v["npc-hd-num"], 10) || 0, parseInt(v["npc-hd"], 10) || 0, parseInt(v["npc-hd-num2"], 10) || 0, parseInt(v["npc-hd2"], 10) || 0, parseInt(v["npc-hd-misc-mod"], 10) || 0, parseInt(v["HP-misc"], 10) || 0, parseInt(v["HP-ability-mod"], 10) || 0);
 							currmaxhp = parseInt(v["NPC-HP_max"], 10) || 0;
 							currhp = parseInt(v["NPC-HP"], 10) || 0;
 							updatehp = parseInt(v.sync_npc_pc_hp, 10) || 0;
@@ -22516,7 +22517,7 @@ var PFNPCprev100 = PFNPCprev100 || (function () {
 								}, done);
 								if (v["wound_threshold-show"] == "1") {
 									//can we use the modifier as ability modifier, it has extra in it from toughness or racial.
-									//parseInt(v["NPC-HD-misc-mod"], 10) || 0
+									//parseInt(v["npc-hd-misc-mod"], 10) || 0
 									PFHealth.setWoundThreshholds(newhp, newmaxhp, parseInt(v["condition-Wounds"], 10) || 0, 0);
 								}
 							} else {
@@ -22557,6 +22558,12 @@ var PFNPCprev100 = PFNPCprev100 || (function () {
 							syncCurrNPCHP(eventInfo, true, false);
 						}
 					}));
+					on("change:NPC-HP_max", TAS.callback(function eventUpdateNPCHP(eventInfo) {
+						if (eventInfo.sourceType !== "player") {
+							TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+							syncCurrNPCHP(eventInfo, true, false);
+						}
+					}));					
 					on("change:HP", TAS.callback(function eventUpdateNPCHPFromHP(eventInfo) {
 						if (eventInfo.sourceType === "player") {
 							TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
@@ -22584,15 +22591,21 @@ var PFNPCprev100 = PFNPCprev100 || (function () {
 						}
 					}));
 					//npc sheet
-					on("change:npc-hd change:npc-hd-num change:npc-hd2 change:npc-hd-num2 change:npc-hd-misc-mod", TAS.callback(function eventupdateNPCMaxHP(eventInfo) {
-						if (eventInfo.sourceType === "player" || /hd-misc-mod/i.test(eventInfo.sourceAttribute)) {
+					on("change:npc-hd change:npc-hd-num change:npc-hd2 change:npc-hd-num2", TAS.callback(function eventupdateNPCMaxHP(eventInfo) {
+						if (eventInfo.sourceType === "player" ) {
+							TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+							updateNPCMaxHP();
+						}
+					}));
+					on("change:npc-hd-misc-mod", TAS.callback(function eventupdateNPCHPMiscAuto(eventInfo) {
+						if (eventInfo.sourceType !== "player" ) {
 							TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
 							updateNPCMaxHP();
 						}
 					}));
 					on("change:npc-hd-misc", TAS.callback(function eventNpcHdMisc(eventInfo) {
 						TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
-						SWUtils.evaluateAndSetNumber("NPC-HD-misc", "NPC-HD-misc-mod");
+						SWUtils.evaluateAndSetNumber("NPC-HD-misc", "npc-hd-misc-mod");
 					}));
 				}
 			};
@@ -22636,7 +22649,7 @@ var PFNPC = PFNPC || (function () {
 				isnpc = parseInt(v["is_npc"], 10) || 0;
 				try {
 					if (isnpc) {
-						if (!donotloop && (v["npc-hd-misc"] || (!isNaN(parseInt(v["NPC-HD-misc-mod"], 10))))) {
+						if (!donotloop && (v["npc-hd-misc"] || (!isNaN(parseInt(v["npc-hd-misc-mod"], 10))))) {
 							PFMigrate.migrateNPCHP(function () {
 								updateNPCMaxHP(eventInfo, true);
 							});
@@ -22661,7 +22674,7 @@ var PFNPC = PFNPC || (function () {
 							}
 							if (v["wound_threshold-show"] == "1") {
 								//can we use the modifier as ability modifier, it has extra in it from toughness or racial.
-								//parseInt(v["NPC-HD-misc-mod"], 10) || 0
+								//parseInt(v["npc-hd-misc-mod"], 10) || 0
 								PFHealth.setWoundThreshholds(newhp, newmaxhp, parseInt(v["condition-Wounds"], 10) || 0, 0);
 							}
 						}
