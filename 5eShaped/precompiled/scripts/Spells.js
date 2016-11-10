@@ -599,10 +599,8 @@ export class Spells {
     this.watchForChanges();
     on('change:repeating_spell', (eventInfo) => {
       const repeatingInfo = getRepeatingInfo('repeating_spell', eventInfo);
-      if (repeatingInfo && (repeatingInfo.field === 'name' || repeatingInfo.field === 'spell_level' || repeatingInfo.field === 'spell_level_from_srd' || repeatingInfo.field === 'is_prepared')) {
+      if (repeatingInfo && (repeatingInfo.field === 'name' || repeatingInfo.field === 'spell_level' || repeatingInfo.field === 'spell_level_from_srd' || repeatingInfo.field === 'is_prepared' || repeatingInfo.field === 'ritual' || repeatingInfo.field === 'concentration' || repeatingInfo.field === 'components' || repeatingInfo.field === 'casting_time')) {
         this.updateChatMacro();
-      }
-      if (repeatingInfo && (repeatingInfo.field === 'name' || repeatingInfo.field === 'spell_level' || repeatingInfo.field === 'spell_level_from_srd')) {
         this.updateSheetList();
       }
     });
