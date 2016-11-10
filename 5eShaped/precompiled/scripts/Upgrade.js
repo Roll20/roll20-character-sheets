@@ -609,10 +609,8 @@ export class Upgrade {
       spells.updateHasSpellSlots();
       spells.updateHasSpellPoints();
       spells.updateChatMacro();
-      spells.updateSheetList();
       this.updateWarlockMaxLevelOrdinal();
       psionics.updateChatMacro();
-      psionics.updateSheetList();
       psionics.updateShowHide();
       character.updateLevels();
       attacks.update();
