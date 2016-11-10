@@ -51,8 +51,12 @@ export class Spells {
     });
   }
   updateDefaultAbility() {
+    const repeatingItems = [];
+    for (let i = 0; i <= 9; i++) {
+      repeatingItems.push(`repeating_spell${i}`);
+    }
     getSetRepeatingItems('spells.update', {
-      repeatingItems: ['repeating_spell'],
+      repeatingItems,
       collectionArray: ['default_ability'],
       collectionArrayAddItems: ['name', 'attack_ability', 'damage_ability', 'second_damage_ability', 'saving_throw_ability', 'heal_ability'],
       callback: (v, finalSetAttrs, ids, repeatingItem) => {
@@ -80,13 +84,13 @@ export class Spells {
       },
     });
   }
-  update(rowId) {
+  update(rowId, level) {
     const collectionArray = ['is_npc', 'pb', 'finesse_mod', 'global_spell_attack_bonus', 'global_spell_damage_bonus', 'global_spell_dc_bonus', 'global_spell_heal_bonus', 'default_ability', 'caster_level', 'base_dc'];
     for (const ability of ABILITIES) {
       collectionArray.push(`${ability}_mod`);
     }
     getSetRepeatingItems('spells.update', {
-      repeatingItems: ['repeating_spell'],
+      repeatingItems: [`repeating_spell${level}`],
       collectionArray,
       collectionArrayAddItems: ['name', 'school', 'spell_level', 'spell_level_from_srd', 'school_from_srd', 'casting_time', 'casting_time_from_srd', 'components', 'components_from_srd', 'concentration', 'duration', 'duration_from_srd', 'type', 'roll_toggle', 'to_hit', 'attack_formula', 'proficiency', 'attack_ability', 'attack_bonus', 'saving_throw_toggle', 'saving_throw_ability', 'saving_throw_vs_ability', 'saving_throw_vs_ability_from_srd', 'saving_throw_bonus', 'saving_throw_dc', 'damage_toggle', 'damage_formula', 'damage', 'damage_ability', 'damage_bonus', 'damage_type', 'damage_crit', 'second_damage_toggle', 'second_damage_formula', 'second_damage', 'second_damage_ability', 'second_damage_bonus', 'second_damage_type', 'second_damage_crit', 'damage_string', 'parsed', 'heal_toggle', 'heal', 'heal_ability', 'heal_bonus', 'heal_query_toggle', 'add_casting_modifier', 'add_second_casting_modifier', 'higher_level_toggle', 'higher_level_dice', 'higher_level_die', 'second_higher_level_dice', 'second_higher_level_die', 'higher_level_heal', 'ritual', 'ritual_output', 'materials', 'materials_show', 'extras_toggle', 'emote', 'freetext', 'freeform'],
       rowId,
@@ -393,44 +397,7 @@ export class Spells {
       },
     });
   }
-  updateSheetList() {
-    const repeatingSpellListLevel = 'repeating_spelllistlevel';
-    for (let i = 0; i <= 9; i++) {
-      emptyRepeatingSection({
-        repeatingItems: [`${repeatingSpellListLevel}${i}`],
-      });
-    }
-
-    const collectionArray = [];
-    getSetRepeatingItems('spells.updateSheetList', {
-      repeatingItems: ['repeating_spell'],
-      collectionArray,
-      collectionArrayAddItems: ['name', 'spell_level', 'is_prepared', 'ritual', 'concentration', 'components', 'casting_time'],
-      callback: (v, finalSetAttrs, ids, repeatingItem) => {
-        for (const id of ids) {
-          const repeatingString = `${repeatingItem}_${id}_`;
-          const spellName = v[`${repeatingString}name`];
-          const spellLevel = getIntValue(v[`${repeatingString}spell_level`], 0);
-
-          if (!spellName) {
-            removeRepeatingRow(`${repeatingItem}_${id}`);
-            continue;
-          }
-
-          const newRepeatingString = `${repeatingSpellListLevel}${spellLevel}_${generateRowID()}_`;
-          finalSetAttrs[`${newRepeatingString}name`] = spellName;
-          finalSetAttrs[`${newRepeatingString}spell_level`] = spellLevel;
-          finalSetAttrs[`${newRepeatingString}is_prepared`] = v[`${repeatingString}is_prepared`];
-          finalSetAttrs[`${newRepeatingString}ritual`] = v[`${repeatingString}ritual`];
-          finalSetAttrs[`${newRepeatingString}concentration`] = v[`${repeatingString}concentration`];
-          finalSetAttrs[`${newRepeatingString}components`] = v[`${repeatingString}components`];
-          finalSetAttrs[`${newRepeatingString}casting_time`] = v[`${repeatingString}casting_time`];
-          finalSetAttrs[`${newRepeatingString}spell_output`] = `@{${repeatingString}spell_output}`;
-        }
-      },
-    });
-  }
-  updateChatMacro() {
+  updateChatMacro(level) {
     const spellSlots = {
       0: [],
       1: [],
@@ -444,12 +411,21 @@ export class Spells {
       9: [],
     };
 
+    let minSpellLevel = 0;
+    let maxSpellLevel = 9;
+    if (level) {
+      minSpellLevel = level;
+      maxSpellLevel = level;
+    }
+
     const collectionArray = [];
-    for (let i = 0; i <= 9; i++) {
-      collectionArray.push(`spells_level_${0}_macro_var`);
+    const repeatingItems = [];
+    for (let i = minSpellLevel; i <= maxSpellLevel; i++) {
+      collectionArray.push(`spells_level_${i}_macro_var`);
+      repeatingItems.push(`repeating_spell${i}`);
     }
     getSetRepeatingItems('spells.updateChatMacro', {
-      repeatingItems: ['repeating_spell'],
+      repeatingItems,
       collectionArray,
       collectionArrayAddItems: ['name', 'spell_level', 'is_prepared', 'ritual', 'concentration', 'components', 'casting_time'],
       callback: (v, finalSetAttrs, ids, repeatingItem) => {
@@ -463,7 +439,7 @@ export class Spells {
             continue;
           }
 
-          let classes = [];
+          let classes = ['spell-wrapper'];
           classes.push(`${v[`${repeatingString}spell_level`]}`);
           if (v[`${repeatingString}is_prepared`] === 'on') {
             classes.push('prepared');
@@ -480,10 +456,10 @@ export class Spells {
           classes = classes.map((className) => {
             return `sheet-${className}`;
           }).join(' ');
-          spellSlots[spellLevel].push(`<span class="${classes}">[${spellName}](~repeating_spell_${id}_spell)</span>`);
+          spellSlots[spellLevel].push(`<span class="${classes}">[${spellName}](~repeating_spell${spellLevel}_${id}_spell)</span>`);
         }
 
-        for (let i = 0; i <= 9; i++) {
+        for (let i = minSpellLevel; i <= maxSpellLevel; i++) {
           if (spellSlots[i].length > 0) {
             finalSetAttrs[`spells_level_${i}_macro_var`] = spellSlots[i].join(', ');
           } else {
@@ -574,13 +550,25 @@ export class Spells {
       this.updateShowHide();
     });
   }
+  repeatingSectionChange() {
+    for (let level = 0; level <= 9; level++) {
+      on(`change:repeating_spell${level}`, (eventInfo) => {
+        const repeatingInfo = getRepeatingInfo(`repeating_spell${level}`, eventInfo);
+        if (repeatingInfo && repeatingInfo.field !== 'roll_toggle' && repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'damage_crit' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'second_damage_crit' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'heal_formula' && repeatingInfo.field !== 'higher_level_query' && repeatingInfo.field !== 'parsed') {
+          this.update(repeatingInfo.rowId, level);
+        }
+        if (repeatingInfo && (repeatingInfo.field === 'name' || repeatingInfo.field === 'spell_level' || repeatingInfo.field === 'spell_level_from_srd' || repeatingInfo.field === 'is_prepared')) {
+          this.updateChatMacro(level);
+        }
+      });
+      on(`remove:repeating_spell${level}`, () => {
+        this.updateChatMacro(level);
+      });
+    }
+  }
   setup() {
-    on('change:repeating_spell', (eventInfo) => {
-      const repeatingInfo = getRepeatingInfo('repeating_spell', eventInfo);
-      if (repeatingInfo && repeatingInfo.field !== 'roll_toggle' && repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'damage_crit' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'second_damage_crit' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'heal_formula' && repeatingInfo.field !== 'higher_level_query' && repeatingInfo.field !== 'parsed') {
-        this.update(repeatingInfo.rowId);
-      }
-    });
+    this.repeatingSectionChange();
+    this.watchForChanges();
     on('change:default_ability', () => {
       this.updateDefaultAbility();
     });
@@ -595,21 +583,6 @@ export class Spells {
     });
     on('change:warlock_spell_slots_calc change:warlock_spell_slots_bonus', () => {
       this.updateWarlockSlots();
-    });
-    this.watchForChanges();
-    on('change:repeating_spell', (eventInfo) => {
-      const repeatingInfo = getRepeatingInfo('repeating_spell', eventInfo);
-      if (repeatingInfo && (repeatingInfo.field === 'name' || repeatingInfo.field === 'spell_level' || repeatingInfo.field === 'spell_level_from_srd' || repeatingInfo.field === 'is_prepared' || repeatingInfo.field === 'ritual' || repeatingInfo.field === 'concentration' || repeatingInfo.field === 'components' || repeatingInfo.field === 'casting_time')) {
-        this.updateChatMacro();
-        this.updateSheetList();
-      }
-    });
-    on('remove:repeating_spell', () => {
-      this.updateChatMacro();
-      this.updateSheetList();
-    });
-    on('change:spells_show_unprepared', () => {
-      this.updateChatMacro();
     });
     on('change:spell_slots_toggle', () => {
       this.updateHasSpellSlots();
