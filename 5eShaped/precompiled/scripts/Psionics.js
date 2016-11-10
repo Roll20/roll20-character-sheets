@@ -18,8 +18,12 @@ const levelToPsiCost = {
 
 export class Psionics {
   updateDefaultAbility() {
+    const repeatingItems = [];
+    for (let i = 0; i <= 9; i++) {
+      repeatingItems.push(`repeating_psionic${i}`);
+    }
     getSetRepeatingItems('psionics.update', {
-      repeatingItems: ['repeating_psionics'],
+      repeatingItems,
       collectionArray: ['default_ability'],
       collectionArrayAddItems: ['name', 'attack_ability', 'damage_ability', 'second_damage_ability', 'saving_throw_ability', 'heal_ability'],
       callback: (v, finalSetAttrs, ids, repeatingItem) => {
@@ -47,13 +51,13 @@ export class Psionics {
       },
     });
   }
-  update(rowId) {
+  update(rowId, level) {
     const collectionArray = ['is_npc', 'pb', 'finesse_mod', 'global_psionics_attack_bonus', 'global_psionics_damage_bonus', 'global_psionics_dc_bonus', 'global_psionics_heal_bonus', 'default_ability', 'caster_level', 'base_dc'];
     for (const ability of ABILITIES) {
       collectionArray.push(`${ability}_mod`);
     }
     getSetRepeatingItems('psionics.update', {
-      repeatingItems: ['repeating_psionics'],
+      repeatingItems: [`repeating_psionic${level}`],
       collectionArray,
       collectionArrayAddItems: ['name', 'discipline', 'power_level', 'manifesting_time', 'display', 'concentration', 'duration', 'type', 'roll_toggle', 'to_hit', 'attack_formula', 'proficiency', 'attack_ability', 'attack_bonus', 'saving_throw_toggle', 'saving_throw_ability', 'saving_throw_vs_ability', 'saving_throw_bonus', 'saving_throw_dc', 'damage_toggle', 'damage_formula', 'damage', 'damage_ability', 'damage_bonus', 'damage_type', 'damage_crit', 'second_damage_toggle', 'second_damage_formula', 'second_damage', 'second_damage_ability', 'second_damage_bonus', 'second_damage_type', 'second_damage_crit', 'damage_string', 'parsed', 'heal_toggle', 'heal', 'heal_ability', 'heal_bonus', 'heal_query_toggle', 'higher_level_toggle', 'higher_level_dice', 'higher_level_die', 'second_higher_level_dice', 'second_higher_level_die', 'higher_level_heal', 'meditate', 'meditate_output', 'materials', 'materials_show', 'extras_toggle', 'emote', 'freetext', 'freeform'],
       rowId,
@@ -156,42 +160,7 @@ export class Psionics {
       },
     });
   }
-  updateSheetList() {
-    const repeatingPsionicsListLevel = 'repeating_psionicslistlevel';
-    for (let i = 0; i <= 9; i++) {
-      emptyRepeatingSection({
-        repeatingItems: [`${repeatingPsionicsListLevel}${i}`],
-      });
-    }
-
-    const collectionArray = [];
-    getSetRepeatingItems('psionics.updateSheetList', {
-      repeatingItems: ['repeating_psionics'],
-      collectionArray,
-      collectionArrayAddItems: ['name', 'power_level', 'meditate', 'concentration', 'manifesting_time'],
-      callback: (v, finalSetAttrs, ids, repeatingItem) => {
-        for (const id of ids) {
-          const repeatingString = `${repeatingItem}_${id}_`;
-          const psionicName = v[`${repeatingString}name`];
-          const powerLevel = getIntValue(v[`${repeatingString}power_level`], 0);
-
-          if (!psionicName) {
-            removeRepeatingRow(`${repeatingItem}_${id}`);
-            continue;
-          }
-
-          const newRepeatingString = `${repeatingPsionicsListLevel}${powerLevel}_${generateRowID()}_`;
-          finalSetAttrs[`${newRepeatingString}name`] = psionicName;
-          finalSetAttrs[`${newRepeatingString}power_level`] = powerLevel;
-          finalSetAttrs[`${newRepeatingString}meditate`] = v[`${repeatingString}meditate`];
-          finalSetAttrs[`${newRepeatingString}concentration`] = v[`${repeatingString}concentration`];
-          finalSetAttrs[`${newRepeatingString}manifesting_time`] = v[`${repeatingString}manifesting_time`];
-          finalSetAttrs[`${newRepeatingString}psionic_power_output`] = `@{${repeatingString}psionic_power_output}`;
-        }
-      },
-    });
-  }
-  updateChatMacro() {
+  updateChatMacro(level) {
     const psionicLevels = {
       0: [],
       1: [],
@@ -204,13 +173,22 @@ export class Psionics {
       8: [],
       9: [],
     };
-    const collectionArray = [];
 
-    for (let i = 0; i <= 9; i++) {
-      collectionArray.push(`psionics_level_${0}_macro_var`);
+    let minSpellLevel = 0;
+    let maxSpellLevel = 9;
+    if (level) {
+      minSpellLevel = level;
+      maxSpellLevel = level;
+    }
+
+    const collectionArray = []
+    const repeatingItems = [];
+    for (let i = minSpellLevel; i <= maxSpellLevel; i++) {
+      collectionArray.push(`psionics_level_${i}_macro_var`);
+      repeatingItems.push(`repeating_psionic${i}`);
     }
     getSetRepeatingItems('psionics.updateChatMacro', {
-      repeatingItems: ['repeating_psionics'],
+      repeatingItems,
       collectionArray,
       collectionArrayAddItems: ['name', 'power_level', 'is_prepared'],
       callback: (v, finalSetAttrs, ids, repeatingItem) => {
@@ -225,11 +203,11 @@ export class Psionics {
           }
 
           if (psionicName) {
-            psionicLevels[psionicLevel].push(`[${psionicName}](~repeating_psionics_${id}_power)`);
+            psionicLevels[psionicLevel].push(`<span class="sheet-psionic-wrapper">[${psionicName}](~repeating_psionic${psionicLevel}_${id}_power)</span>span>`);
           }
         }
 
-        for (let i = 0; i <= 9; i++) {
+        for (let i = minSpellLevel; i <= maxSpellLevel; i++) {
           if (psionicLevels[i].length > 0) {
             finalSetAttrs[`psionics_level_${i}_macro_var`] = psionicLevels[i].join(', ');
           } else {
@@ -261,7 +239,7 @@ export class Psionics {
           } else {
             higherLevelQuery = i;
           }
-          finalSetAttrs[`psionic_higher_level_query_${i}`] = higherLevelQuery;
+          finalSetAttrs[`higher_level_query_${i}`] = higherLevelQuery;
           finalSetAttrs[`manifest_as_level_${i}`] = higherLevelQuery;
         }
       },
@@ -279,29 +257,30 @@ export class Psionics {
       this.updateShowHide();
     });
   }
+  repeatingSectionChange() {
+    for (let level = 0; level <= 9; level++) {
+      on(`change:repeating_psionic${level}`, (eventInfo) => {
+        const repeatingInfo = getRepeatingInfo(`repeating_psionics${level}`, eventInfo);
+        if (repeatingInfo && repeatingInfo.field !== 'roll_toggle' && repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'damage_crit' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'second_damage_crit' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'heal_formula' && repeatingInfo.field !== 'higher_level_query' && repeatingInfo.field !== 'manifest_as_level' && repeatingInfo.field !== 'parsed') {
+          this.update(repeatingInfo.rowId, level);
+        }
+        if (repeatingInfo && (repeatingInfo.field === 'name' || repeatingInfo.field === 'power_level')) {
+          this.updateChatMacro(level);
+        }
+      });
+      on(`remove:repeating_psionic${level}`, () => {
+        this.updateChatMacro(level);
+      });
+    }
+  }
   setup() {
+    this.repeatingSectionChange();
     this.watchForChanges();
-    on('change:repeating_psionics', (eventInfo) => {
-      const repeatingInfo = getRepeatingInfo('repeating_psionics', eventInfo);
-      if (repeatingInfo && repeatingInfo.field !== 'roll_toggle' && repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'damage_crit' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'second_damage_crit' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'heal_formula' && repeatingInfo.field !== 'psionic_higher_level_query' && repeatingInfo.field !== 'manifest_as_level' && repeatingInfo.field !== 'parsed') {
-        this.update(repeatingInfo.rowId);
-      }
-    });
     on('change:default_ability', () => {
       this.updateDefaultAbility();
     });
     on('change:pb change:global_psionics_attack_bonus change:global_psionics_damage_bonus change:global_psionics_dc_bonus change:global_psionics_heal_bonus', () => {
       this.update();
-    });
-    on('change:repeating_psionics', (eventInfo) => {
-      const repeatingInfo = getRepeatingInfo('repeating_psionics', eventInfo);
-      if (repeatingInfo && (repeatingInfo.field === 'name' || repeatingInfo.field === 'power_level' || repeatingInfo.field === 'meditate' || repeatingInfo.field === 'concentration' || repeatingInfo.field === 'manifesting_time')) {
-        this.updateChatMacro();
-        this.updateSheetList();
-      }
-    });
-    on('remove:repeating_psionics', () => {
-      this.updateChatMacro();
     });
     on('change:psi_limit', () => {
       this.generateHigherLevelQueries();
