@@ -441,7 +441,7 @@ export class Spells {
 
           let classes = ['spell-wrapper'];
           classes.push(`${v[`${repeatingString}spell_level`]}`);
-          if (v[`${repeatingString}is_prepared`] === 'on') {
+          if (!v[`${repeatingString}is_prepared`] || v[`${repeatingString}is_prepared`] === 'Yes') {
             classes.push('prepared');
           }
           if (v[`${repeatingString}ritual`] === 'Yes') {
