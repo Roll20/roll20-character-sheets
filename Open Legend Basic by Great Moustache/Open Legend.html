@@ -781,6 +781,718 @@ repeating_items
             calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
         });
 	};
+	// Show/Hide settings area
+        // Function call to simplifiy coding for showing/hiding settings
+    function showHide(value) {
+        if(value === "on") {    return "show";  // If the checkbox is CHECKED then show the section
+        } else {    return "hide";  }           // If the checkbox is UNchecked then hide the section
+    };
+        // Repeating sections show/hide settings
+    on("change:repeating_actions:settingsflag", function() {
+        getAttrs(["repeating_actions_settingsFlag"], function(values) {
+            setAttrs({
+                "repeating_actions_displaySettingsFlag": showHide(values.repeating_actions_settingsFlag)
+            });
+        });
+    });
+    on("change:repeating_featsLeft:settingsflag", function() {
+        getAttrs(["repeating_featsLeft_settingsFlag"], function(values) {
+            setAttrs({
+                "repeating_featsLeft_displaySettingsFlag": showHide(values.repeating_featsLeft_settingsFlag)
+            });
+        });
+    });
+    on("change:repeating_featsRight:settingsflag", function() {
+        getAttrs(["repeating_featsRight_settingsFlag"], function(values) {
+            setAttrs({
+                "repeating_featsRight_displaySettingsFlag": showHide(values.repeating_featsRight_settingsFlag)
+            });
+        });
+    });
+        // Perks
+    on("change:repeating_perks:settingsflag", function() {
+        getAttrs(["repeating_perks_settingsFlag"], function(values) {
+            setAttrs({
+                "repeating_perks_displaySettingsFlag": showHide(values.repeating_perks_settingsFlag)
+            });
+        });
+    });
+    on("change:repeating_perksRight:settingsflag", function() {
+        getAttrs(["repeating_perksRight_settingsFlag"], function(values) {
+            setAttrs({
+                "repeating_perksRight_displaySettingsFlag": showHide(values.repeating_perksRight_settingsFlag)
+            });
+        });
+    });
+        // Flaws
+    on("change:repeating_flaws:settingsflag", function() {
+        getAttrs(["repeating_flaws_settingsFlag"], function(values) {
+            setAttrs({
+                "repeating_flaws_displaySettingsFlag": showHide(values.repeating_flaws_settingsFlag)
+            });
+        });
+    });
+    on("change:repeating_flawsRight:settingsflag", function() {
+        getAttrs(["repeating_flawsRight_settingsFlag"], function(values) {
+            setAttrs({
+                "repeating_flawsRight_displaySettingsFlag": showHide(values.repeating_flawsRight_settingsFlag)
+            });
+        });
+    });
+    on("change:repeating_featsLeft", function() {
+        TAS.repeatingSimpleSum('featsLeft','feat_left_cost','featLeft_points_spent')
+    });
+    on("change:repeating_featsRight", function() {
+        TAS.repeatingSimpleSum('featsRight','feat_right_cost','featRight_points_spent')
+    });
+/* ---- BEGIN: TheAaronSheet.js ---- */
+// Github:   https://github.com/shdwjk/TheAaronSheet/blob/master/TheAaronSheet.js
+// By:       The Aaron, Arcane Scriptomancer
+// Contact:  https://app.roll20.net/users/104025/the-aaron
+
+var TAS = TAS || (function(){
+    'use strict';
+
+    var version = '0.2.4',
+        lastUpdate = 1457098091,
+
+        loggingSettings = {
+            debug: {
+                key:     'debug',
+                title:   'DEBUG',
+                color: {
+                    bgLabel: '#7732A2',
+                    label:   '#F2EF40',
+                    bgText:  '#FFFEB7',
+                    text:    '#7732A2'
+                }
+            },
+            error: {
+                key:     'error',
+                title:   'Error',
+                color: {
+                    bgLabel: '#C11713',
+                    label:   'white',
+                    bgText:  '#C11713',
+                    text:    'white'
+                }
+            },
+            warn: {
+                key:     'warn',
+                title:   'Warning',
+                color: {
+                    bgLabel: '#F29140',
+                    label:   'white',
+                    bgText:  '#FFD8B7',
+                    text:    'black'
+                }
+            },
+            info: {
+                key:     'info',
+                title:   'Info',
+                color: {
+                    bgLabel: '#413FA9',
+                    label:   'white',
+                    bgText:  '#B3B2EB',
+                    text:    'black'
+                }
+            },
+            notice: {
+                key:     'notice',
+                title:   'Notice',
+                color: {
+                    bgLabel: '#33C133',
+                    label:   'white',
+                    bgText:  '#ADF1AD',
+                    text:    'black'
+                }
+            },
+            log: {
+                key:     'log',
+                title:   'Log',
+                color: {
+                    bgLabel: '#f2f240',
+                    label:   'black',
+                    bgText:  '#ffff90',
+                    text:    'black'
+                }
+            },
+            callstack: {
+                key:     'TAS',
+                title:   'function',
+                color: {
+                    bgLabel: '#413FA9',
+                    label:   'white',
+                    bgText:  '#B3B2EB',
+                    text:    'black'
+                }
+            },
+            callstack_async: {
+                key:     'TAS',
+                title:   'ASYNC CALL',
+                color: {
+                    bgLabel: '#413FA9',
+                    label:   'white',
+                    bgText:  '#413FA9',
+                    text:    'white'
+                }
+            },
+            TAS: {
+                key:     'TAS',
+                title:   'TAS',
+                color: {
+                    bgLabel: 'grey',
+                    label:   'black;background:linear-gradient(#304352,#d7d2cc,#d7d2cc,#d7d2cc,#304352)',
+                    bgText:  'grey',
+                    text:    'black;background:linear-gradient(#304352,#d7d2cc,#d7d2cc,#d7d2cc,#304352)'
+                }
+            }
+        },
+
+
+        config = {
+            debugMode: false,
+            logging: {
+                log: true,
+                notice: true,
+                info: true,
+                warn: true,
+                error: true,
+                debug: false
+            }
+        },
+
+        callstackRegistry = [],
+		queuedUpdates = {}, //< Used for delaying saves till the last momment.
+
+    complexType = function(o){
+        switch(typeof o){
+            case 'string':
+                return 'string';
+            case 'boolean':
+                return 'boolean';
+            case 'number':
+                return (_.isNaN(o) ? 'NaN' : (o.toString().match(/\./) ? 'decimal' : 'integer'));
+            case 'function':
+                return 'function: '+(o.name ? o.name+'()' : '(anonymous)');
+            case 'object':
+                return (_.isArray(o) ? 'array' : (_.isArguments(o) ? 'arguments' : ( _.isNull(o) ? 'null' : 'object')));
+            default:
+                return typeof o;
+        }
+    },
+
+	dataLogger = function(primaryLogger,secondaryLogger,data){
+        _.each(data,function(m){
+            var type = complexType(m);
+            switch(type){
+                case 'string':
+                    primaryLogger(m);
+                    break;
+                case 'undefined':
+                case 'null':
+                case 'NaN':
+                    primaryLogger('['+type+']');
+                    break;
+                case 'number':
+                case 'not a number':
+                case 'integer':
+                case 'decimal':
+                case 'boolean':
+                    primaryLogger('['+type+']: '+m);
+                    break;
+                default:
+                    primaryLogger('['+type+']:=========================================');
+                    secondaryLogger(m);
+                    primaryLogger('=========================================================');
+                    break;
+            }
+        });
+	},
+
+
+    colorLog = function(options){
+        var coloredLoggerFunction,
+            key = options.key,
+            label = options.title || 'TAS',
+            lBGColor = (options.color && options.color.bgLabel) || 'blue',
+            lTxtColor = (options.color && options.color.label) || 'white',
+            mBGColor = (options.color && options.color.bgText) || 'blue',
+            mTxtColor = (options.color && options.color.text) || 'white';
+
+        coloredLoggerFunction = function(message){
+            console.log(
+                '%c '+label+': %c '+message + ' ',
+                'background-color: '+lBGColor+';color: '+lTxtColor+'; font-weight:bold;',
+                'background-color: '+mBGColor+';color: '+mTxtColor+';'
+            ); 
+        };
+        return function(){
+            if('TAS'===key || config.logging[key]){
+               dataLogger(coloredLoggerFunction,function(m){console.log(m);},_.toArray(arguments)); 
+            }
+        };
+    },
+
+    logDebug  = colorLog(loggingSettings.debug),
+    logError  = colorLog(loggingSettings.error),
+    logWarn   = colorLog(loggingSettings.warn),
+    logInfo   = colorLog(loggingSettings.info),
+    logNotice = colorLog(loggingSettings.notice),
+    logLog    = colorLog(loggingSettings.log),
+    log       = colorLog(loggingSettings.TAS),
+    logCS     = colorLog(loggingSettings.callstack),
+    logCSA    = colorLog(loggingSettings.callstack_async),
+
+    registerCallstack = function(callstack,label){
+        var idx=_.findIndex(callstackRegistry,function(o){
+            return (_.difference(o.stack,callstack).length === _.difference(callstack,o.stack).length) &&
+                _.difference(o.stack,callstack).length === 0 &&
+                o.label === label;
+        });
+        if(-1 === idx){
+            idx=callstackRegistry.length;
+            callstackRegistry.push({
+                stack: callstack,
+                label: label
+            });
+        }
+        return idx;
+    },
+
+    setConfigOption = function(options){
+        var newconf =_.defaults(options,config);
+        newconf.logging=_.defaults(
+            (options && options.logging)||{},
+            config.logging
+        );
+        config=newconf;
+    },
+    
+    debugMode = function(){
+        config.logging.debug=true;
+        config.debugMode = true;
+    },
+
+    getCallstack = function(){
+        var e = new Error('dummy'),
+            stack = _.map(_.rest(e.stack.replace(/^[^\(]+?[\n$]/gm, '')
+            .replace(/^\s+at\s+/gm, '')
+            .replace(/^Object.<anonymous>\s*\(/gm, '{anonymous}()@')
+            .split('\n')),function(l){
+                return l.replace(/\s+.*$/,'');
+            });
+        return stack;
+    },
+    logCallstackSub = function(cs){
+        var matches, csa;
+        _.find(cs,function(line){
+            matches = line.match(/TAS_CALLSTACK_(\d+)/);
+            if(matches){
+               csa=callstackRegistry[matches[1]];
+               logCSA( '===================='+(csa.label ? '> '+csa.label+' <' : '')+'====================');
+               logCallstackSub(csa.stack);
+               return true;
+            } 
+            logCS(line);
+            return false;
+        });
+    },
+    logCallstack = function(){
+        var cs;
+        if(config.debugMode){
+            cs = getCallstack();
+            cs.shift();
+            log('==============================> CALLSTACK <==============================');
+            logCallstackSub(cs);
+            log('=========================================================================');
+        }
+    },
+
+
+    wrapCallback = function (label, callback, context){
+        var callstack;
+        if('function' === typeof label){
+            context=callback;
+            callback=label;
+            label=undefined;
+        }
+        if(!config.debugMode){
+            return (function(cb,ctx){
+                return function(){
+                    cb.apply(ctx||{},arguments);
+                };
+            }(callback,context));
+        }
+        
+        callstack = getCallstack();
+        callstack.shift();
+        
+        return (function(cb,ctx,cs,lbl){
+            var ctxref=registerCallstack(cs,lbl);
+
+            /*jshint -W054 */
+            return new Function('cb','ctx','TASlog',
+                "return function TAS_CALLSTACK_"+ctxref+"(){"+
+                    "TASlog('Entering: '+(cb.name||'(anonymous function)'));"+
+                    "cb.apply(ctx||{},arguments);"+
+                    "TASlog('Exiting: '+(cb.name||'(anonymous function)'));"+
+                "};")(cb,ctx,log);
+            /*jshint +W054 */
+        }(callback,context,callstack,label));
+    },
+
+
+    prepareUpdate = function( attribute, value ){
+        queuedUpdates[attribute]=value;
+    },
+
+    applyQueuedUpdates = function() {
+      setAttrs(queuedUpdates);
+      queuedUpdates = {};
+    },
+
+	namesFromArgs = function(args,base){
+        return _.chain(args)
+            .reduce(function(memo,attr){
+                if('string' === typeof attr) {
+                    memo.push(attr);
+                } else if(_.isArray(args) || _.isArguments(args)){
+                    memo = namesFromArgs(attr,memo);
+                }
+                return memo;
+            },(_.isArray(base) && base) || [])
+            .uniq()
+            .value();
+	},
+
+	addId = function(obj,value){
+		Object.defineProperty(obj,'id',{
+			value: value,
+			writeable: false,
+			enumerable: false
+		});
+	},
+
+	addProp = function(obj,prop,value,fullname){
+		(function(){
+            var pname=(_.contains(['S','F','I','D'],prop) ? '_'+prop : prop),
+			    full_pname = fullname || prop,
+                pvalue=value;
+
+            _.each(['S','I','F'],function(p){
+                if( !_.has(obj,p)){
+                    Object.defineProperty(obj, p, {
+                        value: {},
+                        enumerable: false,
+                        readonly: true
+                    });
+                }
+            });
+            if( !_.has(obj,'D')){
+                Object.defineProperty(obj, 'D', {
+                    value: _.reduce(_.range(10),function(m,d){
+                            Object.defineProperty(m, d, {
+                                value: {},
+                                enumerable: true,
+                                readonly: true
+                            });
+                            return m;
+                        },{}),
+                    enumerable: false,
+                    readonly: true
+                });
+            }
+
+
+            // Raw value
+			Object.defineProperty(obj, pname, {
+                enumerable: true,
+				set: function(v){
+                    if(v!==pvalue) {
+                        pvalue=v;
+                        prepareUpdate(full_pname,v);
+                    }
+				},
+				get: function(){
+					return pvalue;
+				}
+			});
+            
+            // string value
+			Object.defineProperty(obj.S, pname, {
+                enumerable: true,
+				set: function(v){
+                    var val=v.toString();
+                    if(val !== pvalue) {
+                        pvalue=val;
+                        prepareUpdate(full_pname,val);
+                    }
+				},
+				get: function(){
+					return pvalue.toString();
+				}
+			});
+
+            // int value
+			Object.defineProperty(obj.I, pname, {
+                enumerable: true,
+				set: function(v){
+                    var val=parseInt(v,10) || 0;
+                    if(val !== pvalue){
+                        pvalue=val;
+                        prepareUpdate(full_pname,val);
+                    }
+				},
+				get: function(){
+					return parseInt(pvalue,10) || 0;
+				}
+			});
+
+            // float value
+			Object.defineProperty(obj.F, pname, {
+                enumerable: true,
+				set: function(v){
+                    var val=parseFloat(v) || 0;
+                    if(val !== pvalue) {
+                        pvalue=val;
+                        prepareUpdate(full_pname,val);
+                    }
+				},
+				get: function(){
+					return parseFloat(pvalue) || 0;
+				}
+			});
+            _.each(_.range(10),function(d){
+                Object.defineProperty(obj.D[d], pname, {
+                    enumerable: true,
+                    set: function(v){
+                        var val=(parseFloat(v) || 0).toFixed(d);
+                        if(val !== pvalue){
+                            pvalue=val;
+                            prepareUpdate(full_pname,val);
+                        }
+                    },
+                    get: function(){
+                        return (parseFloat(pvalue) || 0).toFixed(d);
+                    }
+                });
+            });
+
+		}());
+	},
+	
+	repeating = function( section ) {
+		return (function(s){
+			var sectionName = s,
+				attrNames = [],
+				fieldNames = [],
+				operations = [],
+                after = [],
+			
+			repAttrs = function TAS_Repeating_Attrs(){
+				attrNames = namesFromArgs(arguments,attrNames);
+				return this;
+			},
+			repFields = function TAS_Repeating_Fields(){
+				fieldNames = namesFromArgs(arguments,fieldNames);
+				return this;
+			},
+			repReduce = function TAS_Repeating_Reduce(func, initial, final, context) { 
+				operations.push({
+                    type: 'reduce',
+                    func: (func && _.isFunction(func) && func) || _.noop,
+                    memo: (_.isUndefined(initial) && 0) || initial,
+                    final: (final && _.isFunction(final) && final) || _.noop,
+                    context: context || {}
+                });
+				return this;
+			},
+			repMap = function TAS_Repeating_Map(func, final, context) {
+				operations.push({
+                    type: 'map',
+                    func: (func && _.isFunction(func) && func) || _.noop,
+                    final: (final && _.isFunction(final) && final) || _.noop,
+                    context: context || {}
+                });
+				return this;
+			},
+            repEach = function TAS_Repeating_Each(func, final, context) {
+				operations.push({
+                    type: 'each',
+                    func: (func && _.isFunction(func) && func) || _.noop,
+                    final: (final && _.isFunction(final) && final) || _.noop,
+                    context: context || {}
+                });
+				return this;
+            },
+            repTap = function TAS_Repeating_Tap(final, context) {
+				operations.push({
+                    type: 'tap',
+                    final: (final && _.isFunction(final) && final) || _.noop,
+                    context: context || {}
+                });
+				return this;
+            },
+            repAfter = function TAS_Repeating_After(callback,context) {
+				after.push({
+                    callback: (callback && _.isFunction(callback) && callback) || _.noop,
+                    context: context || {}
+                });
+				return this;
+            },
+			repExecute = function TAS_Repeating_Execute(callback,context){
+				var rowSet = {},
+					attrSet = {},
+					fieldIds = [],
+					fullFieldNames = [];
+
+                repAfter(callback,context);
+
+				// call each operation per row.
+				// call each operation's final
+				getSectionIDs("repeating_"+sectionName,function(ids){
+					fieldIds = ids;
+					fullFieldNames = _.reduce(fieldIds,function(memo,id){
+						return memo.concat(_.map(fieldNames,function(name){
+							return 'repeating_'+sectionName+'_'+id+'_'+name;  
+						}));
+					},[]);
+					getAttrs( _.uniq(attrNames.concat(fullFieldNames)), function(values){
+						_.each(attrNames,function(aname){
+							if(values.hasOwnProperty(aname)){
+								addProp(attrSet,aname,values[aname]);
+							}
+						});
+
+						rowSet = _.reduce(fieldIds,function(memo,id){
+							var r={};
+							addId(r,id);
+							_.each(fieldNames,function(name){
+								var fn = 'repeating_'+sectionName+'_'+id+'_'+name;  
+								addProp(r,name,values[fn],fn);
+							});
+
+							memo[id]=r;
+
+							return memo;
+						},{});
+
+                        _.each(operations,function(op){
+                            var res;
+                            switch(op.type){
+                                case 'tap':
+                                    _.bind(op.final,op.context,rowSet,attrSet)();
+                                    break;
+
+                                case 'each':
+                                    _.each(rowSet,function(r){
+                                        _.bind(op.func,op.context,r,attrSet,r.id,rowSet)();
+                                    });
+                                    _.bind(op.final,op.context,rowSet,attrSet)();
+                                    break;
+
+                                case 'map':
+                                    res = _.map(rowSet,function(r){
+                                        return _.bind(op.func,op.context,r,attrSet,r.id,rowSet)();
+                                    });
+                                    _.bind(op.final,op.context,res,rowSet,attrSet)();
+                                    break;
+
+                                case 'reduce':
+                                    res = op.memo;
+                                    _.each(rowSet,function(r){
+                                        res = _.bind(op.func,op.context,res,r,attrSet,r.id,rowSet)();
+                                    });
+                                    _.bind(op.final,op.context,res,rowSet,attrSet)();
+                                    break;
+                            }
+                        });
+
+                        // finalize attrs
+                        applyQueuedUpdates();
+                        _.each(after,function(op){
+                            _.bind(op.callback,op.context)();
+                        });
+					});
+				});
+			};
+				
+			return {
+				attrs: repAttrs,
+				attr: repAttrs,
+
+				column: repFields,
+				columns: repFields,
+				field: repFields,
+				fields: repFields,
+
+				reduce: repReduce,
+				inject: repReduce,
+				foldl: repReduce,
+
+				map: repMap,
+				collect: repMap,
+
+				each: repEach,
+                forEach: repEach,
+
+                tap: repTap,
+                'do': repTap,
+
+				after: repAfter,
+				last: repAfter,
+				done: repAfter,
+
+				execute: repExecute,
+				go: repExecute,
+				run: repExecute
+			};
+		}(section));
+	},
+
+
+    repeatingSimpleSum = function(section, field, destination){
+        repeating(section)
+            .attr(destination)
+            .field(field)
+            .reduce(function(m,r){
+                return m + (r.F[field]);
+            },0,function(t,r,a){
+                a.S[destination]=t;
+            })
+            .execute();
+    };
+
+	console.log('%c•.¸¸.•*´¨`*•.¸¸.•*´¨`*•.¸  The Aaron Sheet  v'+version+'  ¸.•*´¨`*•.¸¸.•*´¨`*•.¸¸.•','background: linear-gradient(to right,green,white,white,green); color:black;text-shadow: 0 0 8px white;');
+	console.log('%c•.¸¸.•*´¨`*•.¸¸.•*´¨`*•.¸  Last update: '+(new Date(lastUpdate*1000))+'  ¸.•*´¨`*•.¸¸.•*´¨`*•.¸¸.•','background: linear-gradient(to right,green,white,white,green); color:black;text-shadow: 0 0 8px white;');
+
+
+    return {
+        /* Repeating Sections */
+        repeatingSimpleSum: repeatingSimpleSum,
+		repeating: repeating,
+
+        /* Configuration */
+        config: setConfigOption,
+
+        /* Debugging */
+        callback: wrapCallback,
+        callstack: logCallstack,
+        debugMode: debugMode,
+        _fn: wrapCallback,
+
+        /* Logging */
+        debug: logDebug,
+        error: logError,
+        warn: logWarn,
+        info: logInfo,
+        notice: logNotice,
+        log: logLog
+    };
+}());
+
+/* ---- END: TheAaronSheet.js ---- */
 </script>
 <!-- End Worker Scripts -->
 <!-- Main body of Character Sheet -->
@@ -817,9 +1529,10 @@ repeating_items
     <div class="row">
  <!-- Left Column for Attributes -->
    <!-- Attributes are setup so that clicking the name of the attribute will roll it -->
-    <div class="width1of3 inlineBlock vertTop">
-        <div class="row padBottom">     <!-- Ribbon Title -->
-            <div class="column width100 ribbon blue textLargest bold">ATTRIBUTES</div>
+    <div class="third inlineBlock vertTop">
+        <div class="attributes padTop">
+            <div class="width100 height5"></div>
+            <div class="column width100 textLargest bold">Attributes</div>
         </div>
         <div class="row padBottom">
             <div class="column width30 inlineBlock textCenter vertBottom bold">Total Points</div>   <!-- Track how many points you have TO spend -->
@@ -1093,83 +1806,83 @@ repeating_items
     <!-- end of supernatural attributes -->
     </div>
  <!-- end of left column for Attributes -->
- <!-- Right column for everything else (divided in 2 for part) -->
-    <div class="width2of3 inlineBlock vertTop">
+ <!-- Right column for everything else (divided in 2 for part -->
+    <div class="twoThird inlineBlock vertTop">
      <!-- Top Half divided into 2 columns -->
      <!-- Top Half left side -->
-        <div class="width50 inlineBlock">
+        <div class="third inlineBlock vertTop">
        <!-- Evasion information -->
             <div class="width100 padAll">
-                <div class="width50 height100 inlineBlock borderAll boxShadow vertTop">
-                    <div class="column width100 textCenter bold textLarge">Evasion</div>
-                    <div class="column width100 inputNumberLarge"><input type="number" name="attr_evasion" value=0 /></div>
-                </div>
-                <div class="width50 inlineBlock vertTop">
-                    <div class="height10"></div>
-                    <div class="width100 height80 borderAll">
-                        <div class="column width2of3 italic bold inlineBlock">Agility</div>
-                        <div class="column width1of3 inputNumber30 inlineBlock"><input type="number" name="attr_show_agility_score" value="@{agility_score}" disabled="disabled" /></div>
-                        <div class="column width2of3 italic bold inlineBlock">Armor</div>
-                        <div class="column width1of3 inputNumber30 inlineBlock"><input type="number" name="attr_show_armor" value="@{armor}" disabled="disabled" /></div>
-                        <div class="column width2of3 italic bold inlineBlock">Shield</div>
-                        <div class="column width1of3 inputNumber30 inlineBlock"><input type="number" name="attr_show_shield" value="@{shield}" disabled="disabled" /></div>
-                        <div class="column width2of3 italic bold inlineBlock">Other</div>
-                        <div class="column width1of3 inputNumber30 inlineBlock"><input type="number" name="attr_evasion_other" value="0" /></div>
+                <div class="evasion vertTop padTop">
+                    <div class="inlineBlock vertTop padTop" style="width: 155px;">
+                        <div class="column width100 textCenter bold textLargest padBottom">Evasion</div>
+                        <div class="column width100 inputNumberLarge padTop"><input type="number" name="attr_evasion" value=0 /></div>
                     </div>
-                    <div class="height10"></div>
+                    <div class="inlineBlock vertTop" style="width: 120px;">
+                        <div class="width100">
+                            <div class="column width100 height5"></div>
+                            <div class="column width1of3 inputNumber30 inlineBlock"><input type="number" name="attr_show_agility_score" value="@{agility_score}" disabled="disabled" /></div>
+                            <div class="column width2of3 italic bold textLarge textLeft inlineBlock">Agility</div>
+                            <div class="column width1of3 inputNumber30 inlineBlock"><input type="number" name="attr_show_armor" value="@{armor}" disabled="disabled" /></div>
+                            <div class="column width2of3 italic bold textLarge padTop textLeft inlineBlock">Armor</div>
+                            <div class="column width1of3 inputNumber30 inlineBlock"><input type="number" name="attr_show_shield" value="@{shield}" disabled="disabled" /></div>
+                            <div class="column width2of3 italic bold textLarge padTop textLeft inlineBlock">Shield</div>
+                            <div class="column width1of3 inputNumber30 inlineBlock"><input type="number" name="attr_evasion_other" value="0" /></div>
+                            <div class="column width2of3 italic bold textLarge padTop textLeft inlineBlock">Other</div>
+                        </div>
+                    </div>
                 </div>
             </div>
        <!-- End evasion -->
        <!-- Toughness information -->
             <div class="width100 padAll">
-                <div class="width50 height100 inlineBlock borderAll boxShadow vertTop">
-                    <div class="column width100 textCenter bold textLarge">Toughness</div>
-                    <div class="column width100 inputNumberLarge"><input type="number" name="attr_toughness" value=0 /></div>
-                </div>
-                <div class="width50 inlineBlock vertTop">
-                    <div class="height10"></div>
-                    <div class="width100 height80 borderAll">
-                        <div class="column width2of3 italic bold inlineBlock">Fortitude</div>
-                        <div class="column width1of3 inputNumber30 inlineBlock"><input type="number" name="attr_show_fortitude_score" value="@{fortitude_score}" disabled="true" /></div>
-                        <div class="column width2of3 italic bold inlineBlock">Presence</div>
-                        <div class="column width1of3 inputNumber30 inlineBlock"><input type="number" name="attr_show_presence_score" value="@{presence_score}" disabled="true" /></div>
-                        <div class="column width2of3 italic bold inlineBlock">Other</div>
-                        <div class="column width1of3 inputNumber30 inlineBlock"><input type="number" name="attr_toughness_other" value="0" /></div>
+                <div class="toughness vertTop padTop">
+                    <div class="inlineBlock vertTop padTop" style="width: 155px;">
+                        <div class="column width100 textCenter bold textLargest padBottom">Toughness</div>
+                        <div class="column width100 inputNumberLarge padTop"><input type="number" name="attr_toughness" value=0 /></div>
                     </div>
-                    <div class="height10"></div>
+                    <div class="inlineBlock vertTop" style="width: 120px;">
+                        <div class="width100 padTop">
+                            <div class="column width1of3 inputNumber30 inlineBlock"><input type="number" name="attr_show_fortitude_score" value="@{fortitude_score}" disabled="true" /></div>
+                            <div class="column width2of3 italic bold textLarge textLeft inlineBlock padTop">Fortitude</div>
+                            <div class="column width1of3 inputNumber30 inlineBlock"><input type="number" name="attr_show_presence_score" value="@{presence_score}" disabled="true" /></div>
+                            <div class="column width2of3 italic bold textLarge textLeft inlineBlock padTop">Presence</div>
+                            <div class="column width1of3 inputNumber30 inlineBlock"><input type="number" name="attr_toughness_other" value="0" /></div>
+                            <div class="column width2of3 italic bold textLarge textLeft inlineBlock padTop">Other</div>
+                        </div>
+                    </div>
                 </div>
             </div>
        <!-- end toughness -->
        <!-- Resolve information -->
             <div class="width100 padAll">
-                <div class="width50 height100 inlineBlock borderAll boxShadow vertTop">
-                    <div class="column width100 textCenter bold textLarge">Resolve</div>
-                    <div class="column width100 inputNumberLarge"><input type="number" name="attr_resolve" value=0 /></div>
-                </div>
-                <div class="width50 inlineBlock vertTop">
-                    <div class="height10"></div>
-                    <div class="width100 height80 borderAll">
-                        <div class="column width2of3 italic bold inlineBlock">Presence</div>
-                        <div class="column width1of3 inputNumber30 inlineBlock"><input type="number" name="attr_show_presence_score" value="@{presence_score}" disabled="true" /></div>
-                        <div class="column width2of3 italic bold inlineBlock">Will</div>
-                        <div class="column width1of3 inputNumber30 inlineBlock"><input type="number" name="attr_show_will_score" value="@{will_score}" disabled="true" /></div>
-                        <div class="column width2of3 italic bold inlineBlock">Other</div>
-                        <div class="column width1of3 inputNumber30 inlineBlock"><input type="number" name="attr_resolve_other" value="0" /></div>
+                <div class="resolve vertTop padTop">
+                    <div class="inlineBlock vertTop padTop" style="width: 155px;">
+                        <div class="column width100 textCenter bold textLargest padBottom">Resolve</div>
+                        <div class="column width100 inputNumberLarge padTop"><input type="number" name="attr_resolve" value=0 /></div>
                     </div>
-                    <div class="height10"></div>
+                    <div class="inlineBlock vertTop" style="width: 120px;">
+                        <div class="width100 padTop">
+                            <div class="column width1of3 inputNumber30 inlineBlock"><input type="number" name="attr_show_presence_score" value="@{presence_score}" disabled="true" /></div>
+                            <div class="column width2of3 italic bold textLarge textLeft inlineBlock padTop">Presence</div>
+                            <div class="column width1of3 inputNumber30 inlineBlock"><input type="number" name="attr_show_will_score" value="@{will_score}" disabled="true" /></div>
+                            <div class="column width2of3 italic bold textLarge textLeft inlineBlock padTop">Will</div>
+                            <div class="column width1of3 inputNumber30 inlineBlock"><input type="number" name="attr_resolve_other" value="0" /></div>
+                            <div class="column width2of3 italic bold textLarge textLeft inlineBlock padTop">Other</div>
+                        </div>
+                    </div>
                 </div>
             </div>
        <!-- end Resolve -->
         </div>
      <!-- End Top Half left side -->
      <!-- Top Half right side -->
-        <div class="width50 inlineBlock vertTop">
+        <div class="third inlineBlock vertTop">
          <!-- Hit Points Section -->
-            <div class="borderAll padBottom">
-                <div class="row">     <!-- Ribbon Title -->
-                    <div class="column width100 ribbon red textLargest bold">Hit Points</div>
-                </div>
-                <div class="width100">
+            <div class="hitPoints padTop padBottom">
+                <div class="width100 height25"></div>
+                <div class="column width100 textLargest bold padTop padBottom">Hit Points</div>
+                <div class="width100 padTop">
                     <div class="column width50 inlineBlock borderRight textLarge italic bold">Current</div>
                     <div class="column width50 inlineBlock borderLeft textLarge italic bold">Max</div>
                     <div class="column width50 inlineBlock borderRight inputNumberLarge"><input type="number" name="attr_hit_point" value=0 /></div>
@@ -1178,126 +1891,200 @@ repeating_items
             </div>
          <!-- End Hit Points Section -->
          <!-- Legend Points & Speed Section -->
-            <div class="width45 marginTop marginRight marginBottom borderAll inlineBlock padBottom">
-                <div class="column width100 textCenter bold textLarge black">Lethal Damage</div>
-                <div class="column width100 inlineBlock inputNumberLarge"><input type="number" name="attr_lethal_damage" value=0 /></div>
-            </div>
-            <div class="width5 inlineBlock"></div>
-            <div class="width45 marginTop marginRight marginBottom borderAll inlineBlock padBottom">
-                <div class="column width40 inlineBlock textCenter bold textLarge">Speed</div>
-                <div class="column width60 inlineBlock vertTop inputNumber30">Base <input type="number" name="attr_base_speed" value=30 /></div>
-                <div class="column width100 inputNumberLarge"><input type="number" name="attr_speed" value=0 /></div>
+            <div class="speedLethalDamage padTop">
+                <div class="width45 inlineBlock padBottom vertTop">
+                    <div class="column width100 textCenter bold textLarge marginTop">Speed</div>
+                    <div class="column width100 inputNumberLarge padTop padBottom"><input type="number" name="attr_speed" value=0 /></div>
+                    <div class="column width100 vertTop inputNumber30">Base <input type="number" name="attr_base_speed" value=30 /></div>
+                </div>
+                <div class="width10 inlineBlock"></div>
+                <div class="width45 inlineBlock padBottom vertTop">
+                    <div class="column width100 textCenter bold textLarge black marginTop">Lethal Damage</div>
+                    <div class="column width100 inlineBlock inputNumberLarge padTop"><input type="number" name="attr_lethal_damage" value=0 /></div>
+                </div>
             </div>
          <!-- End Legend Points & Speed Section -->
          <!-- Wealth Level Information -->
-            <div class="row">     <!-- Ribbon Title -->
-                <div class="column width100 ribbon green textLarge bold inputNumber30">Wealth Level</div>
+            <div class="column width100 textLargest bold padTop">Wealth Level</div>
+            <div class="wealth">
+                <div class="width100 height15"></div>
+                <div class="column width100 inputNumber60 padTop"><input type="number" name="attr_wealth_level" value=2 /></div>
             </div>
-            <div class="column width100 inputNumber60"><input type="number" name="attr_wealth_level" value=2 /></div>
          <!-- End Wealth Level Information -->
         </div>
      <!-- end Top Half Right side -->
      <!-- Bottom Half -->
-        <div class="row width100 padTop padLeft">
+        <div class="third inlineBlock vertTop">
        <!-- Actions Area -->
-            <div class="width100 borderAll padBottom marginBottom">
-                <div class="column width100 textLargest bold textLeft textShadow padTop">Actions</div>
+            <div class="actionsTop padTop padLeft">
+                <div class="column width100 textLargest bold textShadow padTop">Actions</div>
             <!-- Headings for the actions -->
-                <div class="column width10 bold italic inlineBlock textCenter">Roll</div>
-                <div class="column width25 bold italic inlineBlock textLeft">Name</div>
-                <div class="column width15 bold italic inlineBlock textCenter">Attribute</div>
-                <div class="column width5 bold italic inlineBlock textCenter">vs</div>
-                <div class="column width15 bold italic inlineBlock textCenter">Target</div>
-                <div class="column width30 bold italic inlineBlock textCenter">Special</div>
+                <div class="column width25 bold italic inlineBlock textCenter padLeft">Settings</div>
+                <div class="column width75 bold italic inlineBlock textCenter">Name (click to roll)</div>
+            </div>
+            <div class="actionsMiddle padTop padRight">
             <!-- Add actions as needed Section (repeating fields) -->
-                <div class="width100 vertTop">
+                <div class="width100 vertTop padRight">
                     <fieldset class="repeating_actions">
-                        <div class="column width10 inlineBlock attributeButton">
-                            <button type="roll" value="&{template:default} {{name= @{action_name}}} {{vs= @{action_target}}} {{roll= @{action_attribute}}} {{Description= @{action_special}}}">Roll</button>
+                        <div class="width25 inlineBlock vertTop"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>y</span></div>
+                        <div class="width75 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" value="&{template:default} {{name= @{action_name}}} {{vs= @{action_target}}} {{roll= @{action_attribute}}} {{Description= @{action_special}}}"><input type="text" style="text-align: center;" name="attr_action_name" /></button></div>
+                        <input type="hidden" class="displaySettingsFlag" name="attr_displaySettingsFlag" />
+                        <div class="width100 displaySettings padLeft">
+                            <div class="column width25 inlineBlock bold">Name: </div>
+                            <div class="column width75 inlineBlock inputNameShort"><input type="text" name="attr_action_name" /></div>
+                            <div class="column width45 inlineBlock bold textSmall">Attribute</div>
+                            <div class="column width10 inlineBlock bold textSmall">vs</div>
+                            <div class="column width45 inlineBlock bold textSmall">Target</div>
+                            <div class="column width45 inlineBlock inputSelect">
+                                <select name="attr_action_attribute">
+                                    <option value="None" selected="selected">None</option>
+                                    <option value="@{agility_dice_roll} Agility">Agility</option>
+                                    <option value="@{fortitude_dice_roll} Fortitude">Fortitude</option>
+                                    <option value="@{might_dice_roll} Might">Might</option>
+                                    <option value="@{deception_dice_roll} Deception">Deception</option>
+                                    <option value="@{presence_dice_roll} Presence">Presence</option>
+                                    <option value="@{persuasion_dice_roll} Persuasion">Persuasion</option>
+                                    <option value="@{learning_dice_roll} Learning">Learning</option>
+                                    <option value="@{logic_dice_roll} Logic">Logic</option>
+                                    <option value="@{perception_dice_roll} Perception">Perception</option>
+                                    <option value="@{will_dice_roll} Will">Will</option>
+                                    <option value="@{alteration_dice_roll} Alteration">Alteration</option>
+                                    <option value="@{creation_dice_roll} Creation">Creation</option>
+                                    <option value="@{energy_dice_roll} Energy">Energy</option>
+                                    <option value="@{entropy_dice_roll} Entropy">Entropy</option>
+                                    <option value="@{influence_dice_roll} Influence">Influence</option>
+                                    <option value="@{movement_dice_roll} Movement">Movement</option>
+                                    <option value="@{prescience_dice_roll} Prescience">Prescience</option>
+                                    <option value="@{protection_dice_roll} Protection">Protection</option>
+                                </select>
+                            </div>
+                            <div class="column width10 inlineBlock bold italic textCenter">vs</div>
+                            <div class="column width45 inlineBlock inputSelect">
+                                <select name="attr_action_target">
+                                    <option value="None" selected="selected">None</option>
+                                    <option value="Evasion">Evasion</option>
+                                    <option value="Toughness">Toughness</option>
+                                    <option value="Resolve">Resolve</option>
+                                </select>
+                            </div>
+                            <div class="column width100 bold textSmall">Description/Special/Flavor Text</div>
+                            <div class="column width100 resizeVert vertTop"><textarea class="height50" name="attr_action_special"></textarea></div>
                         </div>
-                        <div class="column width25 inlineBlock inputName"><input type="text" name="attr_action_name" /></div>
-                        <div class="column width15 inlineBlock inputSelect">
-                            <select name="attr_action_attribute">
-                                <option value="None" selected="selected">None</option>
-                                <option value="@{agility_dice_roll} Agility">Agility</option>
-                                <option value="@{fortitude_dice_roll} Fortitude">Fortitude</option>
-                                <option value="@{might_dice_roll} Might">Might</option>
-                                <option value="@{deception_dice_roll} Deception">Deception</option>
-                                <option value="@{presence_dice_roll} Presence">Presence</option>
-                                <option value="@{persuasion_dice_roll} Persuasion">Persuasion</option>
-                                <option value="@{learning_dice_roll} Learning">Learning</option>
-                                <option value="@{logic_dice_roll} Logic">Logic</option>
-                                <option value="@{perception_dice_roll} Perception">Perception</option>
-                                <option value="@{will_dice_roll} Will">Will</option>
-                                <option value="@{alteration_dice_roll} Alteration">Alteration</option>
-                                <option value="@{creation_dice_roll} Creation">Creation</option>
-                                <option value="@{energy_dice_roll} Energy">Energy</option>
-                                <option value="@{entropy_dice_roll} Entropy">Entropy</option>
-                                <option value="@{influence_dice_roll} Influence">Influence</option>
-                                <option value="@{movement_dice_roll} Movement">Movement</option>
-                                <option value="@{prescience_dice_roll} Prescience">Prescience</option>
-                                <option value="@{protection_dice_roll} Protection">Protection</option>
-                            </select>
-                        </div>
-                        <div class="column width5 inlineBlock bold italic textCenter">vs</div>
-                        <div class="column width15 inlineBlock inputSelect">
-                            <select name="attr_action_target">
-                                <option value="None" selected="selected">None</option>
-                                <option value="Evasion">Evasion</option>
-                                <option value="Toughness">Toughness</option>
-                                <option value="Resolve">Resolve</option>
-                            </select>
-                        </div>
-                        <div class="column width30 inlineBlock resizeVert vertTop"><textarea class="height25" name="attr_action_special"></textarea></div>
                     </fieldset>
                 </div>
             </div>
+            <div class="actionsBottom"></div>
+        </div>
        <!-- End Actions Area -->
        <!-- Feats, Perks, Flaws Area -->
-            <div class="width100 borderAll padBottom">
-           <!-- Left 2/3 for 2 columns of Feats -->
-                <div class="width2of3 inlineBlock vertTop borderRight">
-                    <div class="column width20 inlineBlock textLeft bold textLargest textShadow vertTop padTop">Feats</div>
-               <!-- sub sections for feat points spent and total -->
-                    <div class="width40 inlineBlock vertTop">
-                        <div class="column width2of3 inlineBlock textRight bold italic">Total Points</div>
-                        <div class="column width1of3 inlineBlock inputNumber"><input type="number" name="attr_feat_total_points" value=0 /></div>
-                    </div>
-                    <div class="width40 inlineBlock vertTop">
-                        <div class="column width2of3 inlineBlock textRight bold italic">Points Spent</div>
-                        <div class="column width1of3 inlineBlock inputNumber"><input type="number" name="attr_feat_points_spent" value=0 /></div>
-                    </div>
-                    <div class="width50 inlineBlock vertTop padTop">
-                        <fieldset class="repeating_featsLeft">
-                            <div class="column width95 resizeVert vertTop"><textarea class="height50" name="attr_feat_left_description"></textarea></div>
-                        </fieldset>
-                    </div>
-                    <div class="width50 inlineBlock vertTop padTop">
-                        <fieldset class="repeating_featsRight">
-                            <div class="column width95 resizeVert vertTop"><textarea class="height50" name="attr_feat_right_description"></textarea></div>
-                        </fieldset>
-                    </div>
+        <div class="third inlineBlock vertTop">
+           <!-- Columns of Feats -->
+            <div class="actionsTop padTop padLeft padRight">
+                <div class="column width100 textCenter bold textLargest textShadow vertTop padTop">Feats</div>
+           <!-- sub sections for feat points spent and total -->
+                <div class="width50 inlineBlock vertTop padLeft">
+                    <div class="column width2of3 inlineBlock textRight bold italic">Total Points</div>
+                    <div class="column width1of3 inlineBlock inputNumber"><input type="number" name="attr_feat_total_points" value=0 /></div>
                 </div>
-           <!-- End Left 2/3 for 2 columns of Feats -->
-                <div class="width1of3 inlineBlock borderLeft">
-           <!-- Right 1/3, Top for Perks -->
-                    <div class="column width100 textLeft bold textLargest textShadow vertTop padTop">Perks</div>
-                    <div class="width100 vertTop padTop">
-                        <fieldset class="repeating_perks">
-                            <div class="column width100 resizeVert vertTop"><textarea class="height50" name="attr_perk_description"></textarea></div>
-                        </fieldset>
-                    </div>
-           <!-- End Right 1/3, Top for Perks -->
-           <!-- Right 1/3, Bottom for Flaws -->
-                    <div class="column width100 textLeft bold textLargest textShadow vertTop padTop">Flaws</div>
-                    <div class="width100 vertTop padTop">
-                        <fieldset class="repeating_flaws">
-                            <div class="column width100 resizeVert vertTop"><textarea class="height50" name="attr_flaw_description"></textarea></div>
-                        </fieldset>
-                    </div>
-           <!-- End Right 1/3, Bottom for Flaws -->
+                <div class="width50 inlineBlock vertTop padRight">
+                    <div class="column width2of3 inlineBlock textRight bold italic">Points Used</div>
+                    <input type="hidden" name="attr_featLeft_points_spent" value=0 />
+                    <input type="hidden" name="attr_featRight_points_spent" value=0 />
+                    <div class="column width1of3 inlineBlock inputNumber"><input type="number" name="attr_feat_points_spent" value="@{featLeft_points_spent}+@{featRight_points_spent}" disabled="disabled" /></div>
                 </div>
             </div>
+            <div class="actionsMiddle padTop padLeft padRight">
+                <div class="width50 inlineBlock vertTop padTop">
+                    <fieldset class="repeating_featsLeft">
+                        <div class="width15 inlineBlock vertTop"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>y</span></div>
+                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" value="&{template:default} {{name= @{feat_left_name}}} {{Description= @{feat_left_description}}}"><input type="text" style="text-align: center;" name="attr_feat_left_name" /></button></div>
+                        <input type="hidden" class="displaySettingsFlag" name="attr_displaySettingsFlag" />
+                        <div class="width100 displaySettings">
+                            <div class="column width75 inlineBlock bold textSmall">Name</div>
+                            <div class="column width25 inlineBlock bold textSmall">Cost</div>
+                            <div class="column width75 inlineBlock inputNameShort"><input type="text" name="attr_feat_left_name" /></div>
+                            <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_feat_left_cost" /></div>
+                            <div class="column width100 bold textSmall">Description</div>
+                            <div class="column width95 resizeVert vertTop"><textarea class="height50" name="attr_feat_left_description"></textarea></div>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="width50 inlineBlock vertTop padTop">
+                    <fieldset class="repeating_featsRight">
+                        <div class="width15 inlineBlock vertTop"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>y</span></div>
+                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" value="&{template:default} {{name= @{feat_right_name}}} {{Description= @{feat_right_description}}}"><input type="text" style="text-align: center;" name="attr_feat_right_name" /></button></div>
+                        <input type="hidden" class="displaySettingsFlag" name="attr_displaySettingsFlag" />
+                        <div class="width100 displaySettings">
+                            <div class="column width75 inlineBlock bold textSmall">Name</div>
+                            <div class="column width25 inlineBlock bold textSmall">Cost</div>
+                            <div class="column width75 inlineBlock inputNameShort"><input type="text" name="attr_feat_right_name" /></div>
+                            <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_feat_right_cost" /></div>
+                            <div class="column width100 bold textSmall">Description</div>
+                            <div class="column width95 resizeVert vertTop"><textarea class="height50" name="attr_feat_right_description"></textarea></div>
+                        </div>
+                    </fieldset>
+                </div>
+       <!-- End Columns of Feats -->
+       <!-- Column for Perks -->
+                <div class="column width100 textCenter bold textLargest textShadow vertTop padTop padBottom">Perks</div>
+                <div class="width50 inlineBlock vertTop">
+                    <fieldset class="repeating_perks">
+                        <div class="width15 inlineBlock vertTop"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>y</span></div>
+                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" value="&{template:default} {{name= @{perks_name}}} {{Description= @{perks_description}}}"><input type="text" style="text-align: center;" name="attr_perks_name" /></button></div>
+                        <input type="hidden" class="displaySettingsFlag" name="attr_displaySettingsFlag" />
+                        <div class="width100 displaySettings">
+                            <div class="column width100 bold textSmall">Name</div>
+                            <div class="column width100 inputNameShort"><input type="text" name="attr_perks_name" /></div>
+                            <div class="column width100 bold textSmall">Description</div>
+                            <div class="column width95 resizeVert vertTop"><textarea class="height50" name="attr_perks_description"></textarea></div>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="width50 inlineBlock vertTop">
+                    <fieldset class="repeating_perksRight">
+                        <div class="width15 inlineBlock vertTop"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>y</span></div>
+                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" value="&{template:default} {{name= @{perksRight_name}}} {{Description= @{perksRight_description}}}"><input type="text" style="text-align: center;" name="attr_perksRight_name" /></button></div>
+                        <input type="hidden" class="displaySettingsFlag" name="attr_displaySettingsFlag" />
+                        <div class="width100 displaySettings">
+                            <div class="column width100 bold textSmall">Name</div>
+                            <div class="column width100 inputNameShort"><input type="text" name="attr_perksRight_name" /></div>
+                            <div class="column width100 bold textSmall">Description</div>
+                            <div class="column width95 resizeVert vertTop"><textarea class="height50" name="attr_perksRight_description"></textarea></div>
+                        </div>
+                    </fieldset>
+                </div>
+       <!-- end Column for Perks -->
+       <!-- Column for Flaws -->
+                <div class="column width100 textCenter bold textLargest textShadow vertTop padTop padBottom">Flaws</div>
+                <div class="width50 inlineBlock vertTop">
+                    <fieldset class="repeating_flaws">
+                        <div class="width15 inlineBlock vertTop"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>y</span></div>
+                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" value="&{template:default} {{name= @{flaws_name}}} {{Description= @{flaws_description}}}"><input type="text" style="text-align: center;" name="attr_flaws_name" /></button></div>
+                        <input type="hidden" class="displaySettingsFlag" name="attr_displaySettingsFlag" />
+                        <div class="width100 displaySettings">
+                            <div class="column width100 bold textSmall">Name</div>
+                            <div class="column width100 inputNameShort"><input type="text" name="attr_flaws_name" /></div>
+                            <div class="column width100 bold textSmall">Description</div>
+                            <div class="column width95 resizeVert vertTop"><textarea class="height50" name="attr_flaws_description"></textarea></div>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="width50 inlineBlock vertTop">
+                    <fieldset class="repeating_flawsRight">
+                        <div class="width15 inlineBlock vertTop"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>y</span></div>
+                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" value="&{template:default} {{name= @{flawsRight_name}}} {{Description= @{flawsRight_description}}}"><input type="text" style="text-align: center;" name="attr_flawsRight_name" /></button></div>
+                        <input type="hidden" class="displaySettingsFlag" name="attr_displaySettingsFlag" />
+                        <div class="width100 displaySettings">
+                            <div class="column width100 bold textSmall">Name</div>
+                            <div class="column width100 inputNameShort"><input type="text" name="attr_flawsRight_name" /></div>
+                            <div class="column width100 bold textSmall">Description</div>
+                            <div class="column width95 resizeVert vertTop"><textarea class="height50" name="attr_flawsRight_description"></textarea></div>
+                        </div>
+                    </fieldset>
+                </div>
+       <!-- end Column for Flaws -->
+            </div>
+            <div class="actionsBottom"></div>
        <!-- End Feats, Perks, Flaws Area -->
         </div>
      <!-- End Bottom Half -->
