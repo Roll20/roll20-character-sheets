@@ -665,7 +665,6 @@ export class Upgrade {
       spells.updateHasSpellSlots();
       spells.updateHasSpellPoints();
       this.updateWarlockMaxLevelOrdinal();
-      psionics.updateChatMacro();
       psionics.updateShowHide();
       character.updateLevels();
       attacks.update();
@@ -678,7 +677,7 @@ export class Upgrade {
     if (this.versionCompare(currentVersion, '7.0.0') < 0) {
       this.spellsToRepeatingSectionsForEachLevel();
       this.psionicsToRepeatingSectionsForEachLevel();
-      spells.updateChatMacro();
+      psionics.updateChatMacro();
     }
   }
 }
