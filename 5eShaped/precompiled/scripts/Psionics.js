@@ -311,6 +311,7 @@ export class Psionics {
     });
     on('change:psi_limit', () => {
       this.generateHigherLevelQueries();
+      this.updateShowHide();
     });
   }
 }
