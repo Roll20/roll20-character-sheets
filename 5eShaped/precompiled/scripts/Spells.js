@@ -176,9 +176,9 @@ export class Spells {
       finalSetAttrs[`${newRepeatingString}${field}`] = v[`${repeatingString}${field}`];
     }
   }
-  changeSpellLevel(rowId, oldLevel) {
-    const collectionArrayAddItems = ['toggle_details', 'name', 'spell_level', 'school', 'ritual', 'ritual_output', 'is_prepared', 'casting_time', 'range', 'components', 'materials', 'materials_show', 'duration', 'concentration','add_casting_modifier', 'add_second_casting_modifier', 'type', 'parsed', 'content_toggle', 'content', 'roll_toggle', 'proficiency', 'attack_ability', 'attack_bonus', 'crit_range', 'saving_throw_toggle', 'saving_throw_condition', 'saving_throw_ability', 'saving_throw_bonus', 'saving_throw_vs_ability', 'saving_throw_failure', 'saving_throw_success', 'damage_toggle', 'damage', 'damage_ability', 'damage_bonus', 'damage_type', 'damage_crit', 'second_damage_toggle', 'second_damage', 'second_damage_ability', 'second_damage_bonus', 'second_damage_type', 'second_damage_crit', 'heal_toggle', 'heal', 'heal_ability', 'heal_bonus', 'heal_query_toggle', 'higher_level_toggle', 'higher_level_dice', 'higher_level_die', 'second_higher_level_dice', 'second_higher_level_die', 'higher_level_heal', 'extras_toggle', 'emote', 'freetext', 'freeform', 'special_effects_toggle', 'special_effects_type', 'special_effects_color', 'special_effects_points_of_origin'];
-    getSetRepeatingItems('spells.changeSpellLevel', {
+  changeLevel(rowId, oldLevel) {
+    const collectionArrayAddItems = ['toggle_details', 'name', 'spell_level', 'school', 'ritual', 'ritual_output', 'is_prepared', 'casting_time', 'range', 'components', 'materials', 'materials_show', 'duration', 'concentration', 'add_casting_modifier', 'add_second_casting_modifier', 'type', 'parsed', 'content_toggle', 'content', 'roll_toggle', 'proficiency', 'attack_ability', 'attack_bonus', 'crit_range', 'saving_throw_toggle', 'saving_throw_condition', 'saving_throw_ability', 'saving_throw_bonus', 'saving_throw_vs_ability', 'saving_throw_failure', 'saving_throw_success', 'damage_toggle', 'damage', 'damage_ability', 'damage_bonus', 'damage_type', 'damage_crit', 'second_damage_toggle', 'second_damage', 'second_damage_ability', 'second_damage_bonus', 'second_damage_type', 'second_damage_crit', 'heal_toggle', 'heal', 'heal_ability', 'heal_bonus', 'heal_query_toggle', 'higher_level_toggle', 'higher_level_dice', 'higher_level_die', 'second_higher_level_dice', 'second_higher_level_die', 'higher_level_heal', 'extras_toggle', 'emote', 'freetext', 'freeform', 'special_effects_toggle', 'special_effects_type', 'special_effects_color', 'special_effects_points_of_origin'];
+    getSetRepeatingItems('spells.changeLevel', {
       repeatingItems: [`repeating_spell${oldLevel}`],
       collectionArrayAddItems,
       rowId,
@@ -582,7 +582,7 @@ export class Spells {
         const repeatingInfo = getRepeatingInfo(`repeating_spell${level}`, eventInfo);
         if (repeatingInfo) {
           if (repeatingInfo.field === 'spell_level') {
-            this.changeSpellLevel(repeatingInfo.rowId, level);
+            this.changeLevel(repeatingInfo.rowId, level);
           }
           if (repeatingInfo.field === 'name' || repeatingInfo.field === 'spell_level' || repeatingInfo.field === 'spell_level_from_srd' || repeatingInfo.field === 'is_prepared') {
             this.updateChatMacro(level);
@@ -590,7 +590,7 @@ export class Spells {
           if (repeatingInfo.field === 'spell_level') {
             return;
           }
-          if (repeatingInfo.field !== 'roll_toggle' && repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'damage_crit' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'second_damage_crit' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'heal_formula' && repeatingInfo.field !== 'higher_level_query' && repeatingInfo.field !== 'parsed') {
+          if (repeatingInfo.field !== 'roll_toggle' && repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'damage_crit' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'second_damage_crit' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'heal_formula' && repeatingInfo.field !== 'higher_level_query' && repeatingInfo.field !== 'cast_as_level' && repeatingInfo.field !== 'parsed') {
             this.update(repeatingInfo.rowId, level);
           }
         }
