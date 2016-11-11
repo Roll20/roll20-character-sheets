@@ -563,7 +563,9 @@ export class Spells {
   watchForChanges() {
     let watch = ['warlock_spells_max_level', 'warlock_spell_slots'];
     for (let level = 0; level <= 9; level++) {
-      watch.push(`spells_level_${level}_macro_var`);
+      on(`change:spells_level_${level}_macro_var`, () => {
+        this.updateShowHide(level);
+      });
       watch.push(`spell_slots_l${level}`);
       watch.push(`spell_slots_l${level}_max`);
     }
