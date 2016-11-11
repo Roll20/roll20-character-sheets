@@ -52,8 +52,8 @@ export class Spells {
   }
   updateDefaultAbility() {
     const repeatingItems = [];
-    for (let i = 0; i <= 9; i++) {
-      repeatingItems.push(`repeating_spell${i}`);
+    for (let level = 0; level <= 9; level++) {
+      repeatingItems.push(`repeating_spell${level}`);
     }
     getSetRepeatingItems('spells.update', {
       repeatingItems,
@@ -386,20 +386,26 @@ export class Spells {
     }
     return hasHigherLevelSlots;
   }
-  updateShowHide() {
+  updateShowHide(levelToUpdate) {
+    let minLevel = 0;
+    let maxLevel = 9;
+    if (levelToUpdate) {
+      minLevel = levelToUpdate;
+      maxLevel = levelToUpdate;
+    }
     const collectionArray = ['warlock_spell_slots', 'warlock_spells_max_level'];
-    for (let i = 0; i <= 9; i++) {
-      collectionArray.push(`spell_slots_l${i}`);
-      collectionArray.push(`spell_slots_l${i}_max`);
-      collectionArray.push(`spell_slots_l${i}_toggle`);
-      collectionArray.push(`spells_level_${i}_macro_var`);
-      collectionArray.push(`spells_level_${i}_show`);
+    for (let level = minLevel; level <= maxLevel; level++) {
+      collectionArray.push(`spell_slots_l${level}`);
+      collectionArray.push(`spell_slots_l${level}_max`);
+      collectionArray.push(`spell_slots_l${level}_toggle`);
+      collectionArray.push(`spells_level_${level}_macro_var`);
+      collectionArray.push(`spells_level_${level}_show`);
     }
 
     getSetItems('spells.updateShowHide', {
       collectionArray,
       callback: (v, finalSetAttrs) => {
-        for (let level = 0; level <= 9; level++) {
+        for (let level = minLevel; level <= maxLevel; level++) {
           const hasSpells = v[`spells_level_${level}_macro_var`];
           const hasSlots = getIntValue(v[`spell_slots_l${level}`]) > 0;
           const hasSlotsMax = getIntValue(v[`spell_slots_l${level}_max`]) > 0;
@@ -423,21 +429,20 @@ export class Spells {
       },
     });
   }
-  updateChatMacro(level) {
+  updateChatMacro(levelToUpdate) {
     const levels = {};
     let minLevel = 0;
     let maxLevel = 9;
-    if (level) {
-      minLevel = level;
-      maxLevel = level;
+    if (levelToUpdate) {
+      minLevel = levelToUpdate;
+      maxLevel = levelToUpdate;
     }
-
     const collectionArray = [];
     const repeatingItems = [];
-    for (let i = minLevel; i <= maxLevel; i++) {
-      levels[i] = [];
-      collectionArray.push(`spells_level_${i}_macro_var`);
-      repeatingItems.push(`repeating_spell${i}`);
+    for (let level = minLevel; level <= maxLevel; level++) {
+      levels[level] = [];
+      collectionArray.push(`spells_level_${level}_macro_var`);
+      repeatingItems.push(`repeating_spell${level}`);
     }
     getSetRepeatingItems('spells.updateChatMacro', {
       repeatingItems,
@@ -490,22 +495,22 @@ export class Spells {
   }
   generateHigherLevelQueries() {
     const collectionArray = ['warlock_spell_slots', 'warlock_spells_max_level'];
-    for (let i = 1; i <= 8; i++) {
-      collectionArray.push(`cast_as_level_${i}`);
-      collectionArray.push(`higher_level_query_${i}`);
+    for (let level = 1; level <= 8; level++) {
+      collectionArray.push(`cast_as_level_${level}`);
+      collectionArray.push(`higher_level_query_${level}`);
     }
-    for (let i = 1; i <= 9; i++) {
-      collectionArray.push(`spell_slots_l${i}`);
+    for (let level = 1; level <= 9; level++) {
+      collectionArray.push(`spell_slots_l${level}`);
     }
 
     getSetItems('spells.generateHigherLevelQueries', {
       collectionArray,
       callback: (v, finalSetAttrs) => {
-        for (let i = 1; i <= 8; i++) {
+        for (let level = 1; level <= 8; level++) {
           const levels = [];
           const warlockSpellsMaxLevel = getIntValue(v.warlock_spells_max_level);
 
-          for (let j = i; j <= 9; j++) {
+          for (let j = level; j <= 9; j++) {
             if (getIntValue(v[`spell_slots_l${j}`]) || j === warlockSpellsMaxLevel) {
               levels.push(j);
             }
@@ -518,14 +523,14 @@ export class Spells {
           } else if (levels.length === 1) {
             higherLevelQuery = levels[0];
           } else {
-            higherLevelQuery = i;
+            higherLevelQuery = level;
           }
-          finalSetAttrs[`higher_level_query_${i}`] = higherLevelQuery;
+          finalSetAttrs[`higher_level_query_${level}`] = higherLevelQuery;
 
-          if (v[`spell_slots_l${i}`] === '0' && higherLevelQuery !== i) {
-            finalSetAttrs[`cast_as_level_${i}`] = higherLevelQuery;
+          if (v[`spell_slots_l${level}`] === '0' && higherLevelQuery !== level) {
+            finalSetAttrs[`cast_as_level_${level}`] = higherLevelQuery;
           } else {
-            finalSetAttrs[`cast_as_level_${i}`] = '';
+            finalSetAttrs[`cast_as_level_${level}`] = '';
           }
         }
       },
@@ -557,10 +562,10 @@ export class Spells {
   }
   watchForChanges() {
     let watch = ['warlock_spells_max_level', 'warlock_spell_slots'];
-    for (let i = 0; i <= 9; i++) {
-      watch.push(`spells_level_${i}_macro_var`);
-      watch.push(`spell_slots_l${i}`);
-      watch.push(`spell_slots_l${i}_max`);
+    for (let level = 0; level <= 9; level++) {
+      watch.push(`spells_level_${level}_macro_var`);
+      watch.push(`spell_slots_l${level}`);
+      watch.push(`spell_slots_l${level}_max`);
     }
     watch = watch.map((item) => {
       return `change:${item}`;
