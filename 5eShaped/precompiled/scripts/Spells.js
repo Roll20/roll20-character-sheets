@@ -424,19 +424,7 @@ export class Spells {
     });
   }
   updateChatMacro(level) {
-    const levels = {
-      0: [],
-      1: [],
-      2: [],
-      3: [],
-      4: [],
-      5: [],
-      6: [],
-      7: [],
-      8: [],
-      9: [],
-    };
-
+    const levels = {};
     let minLevel = 0;
     let maxLevel = 9;
     if (level) {
@@ -447,6 +435,7 @@ export class Spells {
     const collectionArray = [];
     const repeatingItems = [];
     for (let i = minLevel; i <= maxLevel; i++) {
+      levels[i] = [];
       collectionArray.push(`spells_level_${i}_macro_var`);
       repeatingItems.push(`repeating_spell${i}`);
     }
@@ -464,7 +453,9 @@ export class Spells {
             removeRepeatingRow(`${repeatingItem}_${id}`);
             continue;
           }
-
+          if (!levels[spellLevel]) {
+            levels[spellLevel] = [];
+          }
           let classes = ['spell-wrapper'];
           classes.push(`${v[`${repeatingString}spell_level`]}`);
           if (!v[`${repeatingString}is_prepared`] || v[`${repeatingString}is_prepared`] === 'Yes') {
@@ -485,11 +476,13 @@ export class Spells {
           levels[spellLevel].push(`<span class="${classes}">[${name}](~repeating_spell${spellLevel}_${id}_spell)</span>`);
         }
 
-        for (let i = minLevel; i <= maxLevel; i++) {
-          if (levels[i].length > 0) {
-            finalSetAttrs[`spells_level_${i}_macro_var`] = levels[i].join(', ');
-          } else {
-            finalSetAttrs[`spells_level_${i}_macro_var`] = '';
+        for (const level in levels) {
+          if (levels.hasOwnProperty(level)) {
+            if (level.length > 0) {
+              finalSetAttrs[`spells_level_${level}_macro_var`] = levels[level].join(', ');
+            } else {
+              finalSetAttrs[`spells_level_${level}_macro_var`] = '';
+            }
           }
         }
       },
@@ -584,8 +577,10 @@ export class Spells {
           if (repeatingInfo.field === 'spell_level') {
             this.changeLevel(repeatingInfo.rowId, level);
           }
-          if (repeatingInfo.field !== 'roll_toggle' && repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'damage_crit' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'second_damage_crit' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'heal_formula' && repeatingInfo.field !== 'higher_level_query' && repeatingInfo.field !== 'cast_as_level' && repeatingInfo.field !== 'parsed') {
-            this.update(repeatingInfo.rowId, level);
+          if (repeatingInfo.field !== 'roll_toggle' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'damage_crit' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'second_damage_crit' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'heal_formula' && repeatingInfo.field !== 'higher_level_query' && repeatingInfo.field !== 'cast_as_level' && repeatingInfo.field !== 'parsed') {
+            if (repeatingInfo.field !== 'toggle_details') {
+              this.update(repeatingInfo.rowId, level);
+            }
             this.updateChatMacro(level);
           }
         }

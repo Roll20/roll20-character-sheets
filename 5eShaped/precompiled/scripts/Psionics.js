@@ -187,19 +187,7 @@ export class Psionics {
     });
   }
   updateChatMacro(level) {
-    const levels = {
-      0: [],
-      1: [],
-      2: [],
-      3: [],
-      4: [],
-      5: [],
-      6: [],
-      7: [],
-      8: [],
-      9: [],
-    };
-
+    const levels = {};
     let minLevel = 0;
     let maxLevel = 9;
     if (level) {
@@ -210,10 +198,10 @@ export class Psionics {
     const collectionArray = [];
     const repeatingItems = [];
     for (let i = minLevel; i <= maxLevel; i++) {
+      levels[i] = [];
       collectionArray.push(`psionics_level_${i}_macro_var`);
       repeatingItems.push(`repeating_psionic${i}`);
     }
-    console.log('repeatingItems', repeatingItems);
     getSetRepeatingItems('psionics.updateChatMacro', {
       repeatingItems,
       collectionArray,
@@ -229,16 +217,19 @@ export class Psionics {
             continue;
           }
 
-          if (name) {
-            levels[psionicLevel].push(`<span class="sheet-psionic-wrapper">[${name}](~repeating_psionic${psionicLevel}_${id}_power)</span>span>`);
+          if (!levels[psionicLevel]) {
+            levels[psionicLevel] = [];
           }
+          levels[psionicLevel].push(`<span class="sheet-psionic-wrapper">[${name}](~repeating_psionic${psionicLevel}_${id}_power)</span>`);
         }
 
-        for (let i = minLevel; i <= maxLevel; i++) {
-          if (levels[i].length > 0) {
-            finalSetAttrs[`psionics_level_${i}_macro_var`] = levels[i].join(', ');
-          } else {
-            finalSetAttrs[`psionics_level_${i}_macro_var`] = '';
+        for (const level in levels) {
+          if (levels.hasOwnProperty(level)) {
+            if (level.length > 0) {
+              finalSetAttrs[`psionics_level_${level}_macro_var`] = levels[level].join(', ');
+            } else {
+              finalSetAttrs[`psionics_level_${level}_macro_var`] = '';
+            }
           }
         }
       },
@@ -292,8 +283,10 @@ export class Psionics {
           if (repeatingInfo.field === 'power_level') {
             this.changeLevel(repeatingInfo.rowId, level);
           }
-          if (repeatingInfo.field !== 'roll_toggle' && repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'damage_crit' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'second_damage_crit' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'heal_formula' && repeatingInfo.field !== 'higher_level_query' && repeatingInfo.field !== 'manifest_as_level' && repeatingInfo.field !== 'parsed') {
-            this.update(repeatingInfo.rowId, level);
+          if (repeatingInfo.field !== 'roll_toggle' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'damage_crit' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'second_damage_crit' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'heal_formula' && repeatingInfo.field !== 'higher_level_query' && repeatingInfo.field !== 'manifest_as_level' && repeatingInfo.field !== 'parsed') {
+            if (repeatingInfo.field !== 'toggle_details') {
+              this.update(repeatingInfo.rowId, level);
+            }
             this.updateChatMacro(level);
           }
         }
