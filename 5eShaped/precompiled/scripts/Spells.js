@@ -62,9 +62,9 @@ export class Spells {
       callback: (v, finalSetAttrs, ids, repeatingItem) => {
         for (const id of ids) {
           const repeatingString = `${repeatingItem}_${id}_`;
-          const spellName = v[`${repeatingString}name`];
+          const name = v[`${repeatingString}name`];
 
-          if (!spellName) {
+          if (!name) {
             removeRepeatingRow(`${repeatingItem}_${id}`);
             continue;
           }
@@ -97,9 +97,9 @@ export class Spells {
       callback: (v, finalSetAttrs, ids, repeatingItem) => {
         for (const id of ids) {
           const repeatingString = `${repeatingItem}_${id}_`;
-          const spellName = v[`${repeatingString}name`];
+          const name = v[`${repeatingString}name`];
 
-          if (!spellName) {
+          if (!name) {
             removeRepeatingRow(`${repeatingItem}_${id}`);
             continue;
           }
@@ -199,7 +199,7 @@ export class Spells {
   }
   updateSlots() {
     const collectionArray = ['caster_level', 'caster_type'];
-    const spellSlots = {
+    const levels = {
       1: 0,
       2: 0,
       3: 0,
@@ -210,8 +210,8 @@ export class Spells {
       8: 0,
       9: 0,
     };
-    for (const level in spellSlots) {
-      if (spellSlots.hasOwnProperty(level)) {
+    for (const level in levels) {
+      if (levels.hasOwnProperty(level)) {
         const repeatingString = `spell_slots_l${level}`;
         collectionArray.push(`${repeatingString}_calc`);
         collectionArray.push(`${repeatingString}_bonus`);
@@ -228,120 +228,120 @@ export class Spells {
 
         if (casterType === 'full') {
           if (casterLevel >= 3) {
-            spellSlots[1] = 4;
+            levels[1] = 4;
           } else if (casterLevel === 2) {
-            spellSlots[1] = 3;
+            levels[1] = 3;
           } else if (casterLevel === 1) {
-            spellSlots[1] = 2;
+            levels[1] = 2;
           }
           if (casterLevel >= 4) {
-            spellSlots[2] = 3;
+            levels[2] = 3;
           } else if (casterLevel === 3) {
-            spellSlots[2] = 2;
+            levels[2] = 2;
           }
           if (casterLevel >= 6) {
-            spellSlots[3] = 3;
+            levels[3] = 3;
           } else if (casterLevel === 5) {
-            spellSlots[3] = 2;
+            levels[3] = 2;
           }
           if (casterLevel >= 9) {
-            spellSlots[4] = 3;
+            levels[4] = 3;
           } else if (casterLevel === 8) {
-            spellSlots[4] = 2;
+            levels[4] = 2;
           } else if (casterLevel === 7) {
-            spellSlots[4] = 1;
+            levels[4] = 1;
           }
           if (casterLevel >= 18) {
-            spellSlots[5] = 3;
+            levels[5] = 3;
           } else if (casterLevel >= 10) {
-            spellSlots[5] = 2;
+            levels[5] = 2;
           } else if (casterLevel === 9) {
-            spellSlots[5] = 1;
+            levels[5] = 1;
           }
           if (casterLevel >= 19) {
-            spellSlots[6] = 2;
+            levels[6] = 2;
           } else if (casterLevel >= 11) {
-            spellSlots[6] = 1;
+            levels[6] = 1;
           }
           if (casterLevel >= 20) {
-            spellSlots[7] = 2;
+            levels[7] = 2;
           } else if (casterLevel >= 13) {
-            spellSlots[7] = 1;
+            levels[7] = 1;
           }
           if (casterLevel >= 15) {
-            spellSlots[8] = 1;
+            levels[8] = 1;
           }
           if (casterLevel >= 17) {
-            spellSlots[9] = 1;
+            levels[9] = 1;
           }
         }
 
         if (casterType === 'half') {
           if (casterLevel >= 5) {
-            spellSlots[1] = 4;
+            levels[1] = 4;
           } else if (casterLevel >= 3) {
-            spellSlots[1] = 3;
+            levels[1] = 3;
           } else if (casterLevel === 2) {
-            spellSlots[1] = 2;
+            levels[1] = 2;
           }
           if (casterLevel >= 7) {
-            spellSlots[2] = 3;
+            levels[2] = 3;
           } else if (casterLevel >= 5) {
-            spellSlots[2] = 2;
+            levels[2] = 2;
           }
           if (casterLevel >= 11) {
-            spellSlots[3] = 3;
+            levels[3] = 3;
           } else if (casterLevel >= 9) {
-            spellSlots[3] = 2;
+            levels[3] = 2;
           }
           if (casterLevel >= 17) {
-            spellSlots[4] = 3;
+            levels[4] = 3;
           } else if (casterLevel >= 15) {
-            spellSlots[4] = 2;
+            levels[4] = 2;
           } else if (casterLevel >= 13) {
-            spellSlots[4] = 1;
+            levels[4] = 1;
           }
           if (casterLevel >= 19) {
-            spellSlots[5] = 2;
+            levels[5] = 2;
           } else if (casterLevel >= 17) {
-            spellSlots[5] = 1;
+            levels[5] = 1;
           }
         }
 
         if (casterType === 'third') {
           if (casterLevel >= 7) {
-            spellSlots[1] = 4;
+            levels[1] = 4;
           } else if (casterLevel >= 4) {
-            spellSlots[1] = 3;
+            levels[1] = 3;
           } else if (casterLevel === 3) {
-            spellSlots[1] = 2;
+            levels[1] = 2;
           }
           if (casterLevel >= 10) {
-            spellSlots[2] = 3;
+            levels[2] = 3;
           } else if (casterLevel >= 7) {
-            spellSlots[2] = 2;
+            levels[2] = 2;
           }
           if (casterLevel >= 16) {
-            spellSlots[3] = 3;
+            levels[3] = 3;
           } else if (casterLevel >= 13) {
-            spellSlots[3] = 2;
+            levels[3] = 2;
           }
           if (casterLevel >= 19) {
-            spellSlots[4] = 1;
+            levels[4] = 1;
           }
         }
 
-        for (const level in spellSlots) {
-          if (spellSlots.hasOwnProperty(level)) {
+        for (const level in levels) {
+          if (levels.hasOwnProperty(level)) {
             const repeatingString = `spell_slots_l${level}`;
             finalSetAttrs[repeatingString] = 0;
-            if (spellSlots[level] !== 0 || exists(v[`${repeatingString}_calc`])) {
-              finalSetAttrs[`spell_slots_l${level}_calc`] = spellSlots[level];
+            if (levels[level] !== 0 || exists(v[`${repeatingString}_calc`])) {
+              finalSetAttrs[`spell_slots_l${level}_calc`] = levels[level];
             }
 
             const slots = v[`${repeatingString}`];
             const slotBonus = getIntValue(v[`${repeatingString}_bonus`]);
-            const spellSlotMax = spellSlots[level] + slotBonus;
+            const spellSlotMax = levels[level] + slotBonus;
 
             if (spellSlotMax > 0) {
               finalSetAttrs[`${repeatingString}_max`] = spellSlotMax;
@@ -424,7 +424,7 @@ export class Spells {
     });
   }
   updateChatMacro(level) {
-    const spellSlots = {
+    const levels = {
       0: [],
       1: [],
       2: [],
@@ -437,16 +437,16 @@ export class Spells {
       9: [],
     };
 
-    let minSpellLevel = 0;
-    let maxSpellLevel = 9;
+    let minLevel = 0;
+    let maxLevel = 9;
     if (level) {
-      minSpellLevel = level;
-      maxSpellLevel = level;
+      minLevel = level;
+      maxLevel = level;
     }
 
     const collectionArray = [];
     const repeatingItems = [];
-    for (let i = minSpellLevel; i <= maxSpellLevel; i++) {
+    for (let i = minLevel; i <= maxLevel; i++) {
       collectionArray.push(`spells_level_${i}_macro_var`);
       repeatingItems.push(`repeating_spell${i}`);
     }
@@ -457,10 +457,10 @@ export class Spells {
       callback: (v, finalSetAttrs, ids, repeatingItem) => {
         for (const id of ids) {
           const repeatingString = `${repeatingItem}_${id}_`;
-          const spellName = v[`${repeatingString}name`];
+          const name = v[`${repeatingString}name`];
           const spellLevel = getIntValue(v[`${repeatingString}spell_level`], 0);
 
-          if (!spellName) {
+          if (!name) {
             removeRepeatingRow(`${repeatingItem}_${id}`);
             continue;
           }
@@ -482,12 +482,12 @@ export class Spells {
           classes = classes.map((className) => {
             return `sheet-${className}`;
           }).join(' ');
-          spellSlots[spellLevel].push(`<span class="${classes}">[${spellName}](~repeating_spell${spellLevel}_${id}_spell)</span>`);
+          levels[spellLevel].push(`<span class="${classes}">[${name}](~repeating_spell${spellLevel}_${id}_spell)</span>`);
         }
 
-        for (let i = minSpellLevel; i <= maxSpellLevel; i++) {
-          if (spellSlots[i].length > 0) {
-            finalSetAttrs[`spells_level_${i}_macro_var`] = spellSlots[i].join(', ');
+        for (let i = minLevel; i <= maxLevel; i++) {
+          if (levels[i].length > 0) {
+            finalSetAttrs[`spells_level_${i}_macro_var`] = levels[i].join(', ');
           } else {
             finalSetAttrs[`spells_level_${i}_macro_var`] = '';
           }
@@ -509,21 +509,21 @@ export class Spells {
       collectionArray,
       callback: (v, finalSetAttrs) => {
         for (let i = 1; i <= 8; i++) {
-          const spellLevels = [];
+          const levels = [];
           const warlockSpellsMaxLevel = getIntValue(v.warlock_spells_max_level);
 
           for (let j = i; j <= 9; j++) {
             if (getIntValue(v[`spell_slots_l${j}`]) || j === warlockSpellsMaxLevel) {
-              spellLevels.push(j);
+              levels.push(j);
             }
           }
 
           let higherLevelQuery;
 
-          if (spellLevels.length > 1) {
-            higherLevelQuery = `?{Spell Level|${spellLevels.join('|')}}`;
-          } else if (spellLevels.length === 1) {
-            higherLevelQuery = spellLevels[0];
+          if (levels.length > 1) {
+            higherLevelQuery = `?{Spell Level|${levels.join('|')}}`;
+          } else if (levels.length === 1) {
+            higherLevelQuery = levels[0];
           } else {
             higherLevelQuery = i;
           }
@@ -563,16 +563,16 @@ export class Spells {
     });
   }
   watchForChanges() {
-    let spellsWatch = ['warlock_spells_max_level', 'warlock_spell_slots'];
+    let watch = ['warlock_spells_max_level', 'warlock_spell_slots'];
     for (let i = 0; i <= 9; i++) {
-      spellsWatch.push(`spells_level_${i}_macro_var`);
-      spellsWatch.push(`spell_slots_l${i}`);
-      spellsWatch.push(`spell_slots_l${i}_max`);
+      watch.push(`spells_level_${i}_macro_var`);
+      watch.push(`spell_slots_l${i}`);
+      watch.push(`spell_slots_l${i}_max`);
     }
-    spellsWatch = spellsWatch.map((item) => {
+    watch = watch.map((item) => {
       return `change:${item}`;
     }).join(' ');
-    on(spellsWatch, () => {
+    on(watch, () => {
       this.updateShowHide();
     });
   }

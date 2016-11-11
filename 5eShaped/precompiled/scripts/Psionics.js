@@ -29,9 +29,9 @@ export class Psionics {
       callback: (v, finalSetAttrs, ids, repeatingItem) => {
         for (const id of ids) {
           const repeatingString = `${repeatingItem}_${id}_`;
-          const psionicName = v[`${repeatingString}name`];
+          const name = v[`${repeatingString}name`];
 
-          if (!psionicName) {
+          if (!name) {
             removeRepeatingRow(`${repeatingItem}_${id}`);
             continue;
           }
@@ -64,9 +64,9 @@ export class Psionics {
       callback: (v, finalSetAttrs, ids, repeatingItem) => {
         for (const id of ids) {
           const repeatingString = `${repeatingItem}_${id}_`;
-          const psionicName = v[`${repeatingString}name`];
+          const name = v[`${repeatingString}name`];
 
-          if (!psionicName) {
+          if (!name) {
             removeRepeatingRow(`${repeatingItem}_${id}`);
             continue;
           }
@@ -174,10 +174,10 @@ export class Psionics {
       callback: (v, finalSetAttrs) => {
         const psiLimit = getIntValue(v.psi_limit, 2);
         for (let level = 0; level <= 9; level++) {
-          const hasPowers = v[`psionics_level_${level}_macro_var`];
+          const hasPsionics = v[`psionics_level_${level}_macro_var`];
           const belowPsiLimit = levelToPsiCost[level] <= psiLimit;
 
-          if (hasPowers && belowPsiLimit) {
+          if (hasPsionics && belowPsiLimit) {
             finalSetAttrs[`psionics_level_${level}_show`] = true;
           } else {
             finalSetAttrs[`psionics_level_${level}_show`] = '';
@@ -187,7 +187,7 @@ export class Psionics {
     });
   }
   updateChatMacro(level) {
-    const psionicLevels = {
+    const levels = {
       0: [],
       1: [],
       2: [],
@@ -200,42 +200,43 @@ export class Psionics {
       9: [],
     };
 
-    let minSpellLevel = 0;
-    let maxSpellLevel = 9;
+    let minLevel = 0;
+    let maxLevel = 9;
     if (level) {
-      minSpellLevel = level;
-      maxSpellLevel = level;
+      minLevel = level;
+      maxLevel = level;
     }
 
-    const collectionArray = []
+    const collectionArray = [];
     const repeatingItems = [];
-    for (let i = minSpellLevel; i <= maxSpellLevel; i++) {
+    for (let i = minLevel; i <= maxLevel; i++) {
       collectionArray.push(`psionics_level_${i}_macro_var`);
       repeatingItems.push(`repeating_psionic${i}`);
     }
+    console.log('repeatingItems', repeatingItems);
     getSetRepeatingItems('psionics.updateChatMacro', {
       repeatingItems,
       collectionArray,
-      collectionArrayAddItems: ['name', 'power_level', 'is_prepared'],
+      collectionArrayAddItems: ['name', 'power_level'],
       callback: (v, finalSetAttrs, ids, repeatingItem) => {
         for (const id of ids) {
           const repeatingString = `${repeatingItem}_${id}_`;
-          const psionicName = v[`${repeatingString}name`];
+          const name = v[`${repeatingString}name`];
           const psionicLevel = getIntValue(v[`${repeatingString}power_level`], 0);
 
-          if (!psionicName) {
+          if (!name) {
             removeRepeatingRow(`${repeatingItem}_${id}`);
             continue;
           }
 
-          if (psionicName) {
-            psionicLevels[psionicLevel].push(`<span class="sheet-psionic-wrapper">[${psionicName}](~repeating_psionic${psionicLevel}_${id}_power)</span>span>`);
+          if (name) {
+            levels[psionicLevel].push(`<span class="sheet-psionic-wrapper">[${name}](~repeating_psionic${psionicLevel}_${id}_power)</span>span>`);
           }
         }
 
-        for (let i = minSpellLevel; i <= maxSpellLevel; i++) {
-          if (psionicLevels[i].length > 0) {
-            finalSetAttrs[`psionics_level_${i}_macro_var`] = psionicLevels[i].join(', ');
+        for (let i = minLevel; i <= maxLevel; i++) {
+          if (levels[i].length > 0) {
+            finalSetAttrs[`psionics_level_${i}_macro_var`] = levels[i].join(', ');
           } else {
             finalSetAttrs[`psionics_level_${i}_macro_var`] = '';
           }
@@ -245,23 +246,23 @@ export class Psionics {
   }
   generateHigherLevelQueries() {
     const collectionArray = ['psi_limit'];
-    getSetItems('spells.generateHigherLevelQueries', {
+    getSetItems('psionics.generateHigherLevelQueries', {
       collectionArray,
       callback: (v, finalSetAttrs) => {
         const psiLimit = getIntValue(v.psi_limit);
         for (let i = 1; i <= 8; i++) {
-          const spellLevels = [];
+          const levels = [];
 
           for (let j = levelToPsiCost[i]; j <= psiLimit; j++) {
-            spellLevels.push(j);
+            levels.push(j);
           }
 
           let higherLevelQuery;
 
-          if (spellLevels.length > 1) {
-            higherLevelQuery = `?{Psi Points|${spellLevels.join('|')}}`;
-          } else if (spellLevels.length === 1) {
-            higherLevelQuery = spellLevels[0];
+          if (levels.length > 1) {
+            higherLevelQuery = `?{Psi Points|${levels.join('|')}}`;
+          } else if (levels.length === 1) {
+            higherLevelQuery = levels[0];
           } else {
             higherLevelQuery = i;
           }
@@ -286,19 +287,14 @@ export class Psionics {
   repeatingSectionChange() {
     for (let level = 0; level <= 9; level++) {
       on(`change:repeating_psionic${level}`, (eventInfo) => {
-        const repeatingInfo = getRepeatingInfo(`repeating_psionics${level}`, eventInfo)
+        const repeatingInfo = getRepeatingInfo(`repeating_psionic${level}`, eventInfo);
         if (repeatingInfo) {
           if (repeatingInfo.field === 'power_level') {
             this.changeLevel(repeatingInfo.rowId, level);
           }
-          if (repeatingInfo.field === 'name' || repeatingInfo.field === 'power_level') {
-            this.updateChatMacro(level);
-          }
-          if (repeatingInfo.field === 'power_level') {
-            return;
-          }
           if (repeatingInfo.field !== 'roll_toggle' && repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'damage_crit' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'second_damage_crit' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'heal_formula' && repeatingInfo.field !== 'higher_level_query' && repeatingInfo.field !== 'manifest_as_level' && repeatingInfo.field !== 'parsed') {
             this.update(repeatingInfo.rowId, level);
+            this.updateChatMacro(level);
           }
         }
       });
