@@ -19,8 +19,8 @@ const levelToPsiCost = {
 export class Psionics {
   updateDefaultAbility() {
     const repeatingItems = [];
-    for (let i = 0; i <= 9; i++) {
-      repeatingItems.push(`repeating_psionic${i}`);
+    for (let level = 0; level <= 9; level++) {
+      repeatingItems.push(`repeating_psionic${level}`);
     }
     getSetRepeatingItems('psionics.update', {
       repeatingItems,
@@ -162,18 +162,23 @@ export class Psionics {
       },
     });
   }
-  updateShowHide() {
-    const collectionArray = ['psi_limit'];
-    for (let i = 0; i <= 9; i++) {
-      collectionArray.push(`psionics_level_${i}_macro_var`);
-      collectionArray.push(`psionics_level_${i}_show`);
+  updateShowHide(levelToUpdate) {
+    let minLevel = 0;
+    let maxLevel = 9;
+    if (levelToUpdate) {
+      minLevel = levelToUpdate;
+      maxLevel = levelToUpdate;
     }
-
+    const collectionArray = ['psi_limit'];
+    for (let level = minLevel; level <= maxLevel; level++) {
+      collectionArray.push(`psionics_level_${level}_macro_var`);
+      collectionArray.push(`psionics_level_${level}_show`);
+    }
     getSetItems('psionics.updateShowHide', {
       collectionArray,
       callback: (v, finalSetAttrs) => {
         const psiLimit = getIntValue(v.psi_limit, 2);
-        for (let level = 0; level <= 9; level++) {
+        for (let level = minLevel; level <= maxLevel; level++) {
           const hasPsionics = v[`psionics_level_${level}_macro_var`];
           const belowPsiLimit = levelToPsiCost[level] <= psiLimit;
 
@@ -186,21 +191,20 @@ export class Psionics {
       },
     });
   }
-  updateChatMacro(level) {
+  updateChatMacro(levelToUpdate) {
     const levels = {};
     let minLevel = 0;
     let maxLevel = 9;
-    if (level) {
-      minLevel = level;
-      maxLevel = level;
+    if (levelToUpdate) {
+      minLevel = levelToUpdate;
+      maxLevel = levelToUpdate;
     }
-
     const collectionArray = [];
     const repeatingItems = [];
-    for (let i = minLevel; i <= maxLevel; i++) {
-      levels[i] = [];
-      collectionArray.push(`psionics_level_${i}_macro_var`);
-      repeatingItems.push(`repeating_psionic${i}`);
+    for (let level = minLevel; level <= maxLevel; level++) {
+      levels[level] = [];
+      collectionArray.push(`psionics_level_${level}_macro_var`);
+      repeatingItems.push(`repeating_psionic${level}`);
     }
     getSetRepeatingItems('psionics.updateChatMacro', {
       repeatingItems,
@@ -246,11 +250,11 @@ export class Psionics {
       collectionArray,
       callback: (v, finalSetAttrs) => {
         const psiLimit = getIntValue(v.psi_limit);
-        for (let i = 1; i <= 8; i++) {
+        for (let level = 1; level <= 8; level++) {
           const levels = [];
 
-          for (let j = levelToPsiCost[i]; j <= psiLimit; j++) {
-            levels.push(j);
+          for (let psiCost = levelToPsiCost[level]; psiCost <= psiLimit; psiCost++) {
+            levels.push(psiCost);
           }
 
           let higherLevelQuery;
@@ -260,25 +264,20 @@ export class Psionics {
           } else if (levels.length === 1) {
             higherLevelQuery = levels[0];
           } else {
-            higherLevelQuery = i;
+            higherLevelQuery = level;
           }
-          finalSetAttrs[`higher_level_query_${i}`] = higherLevelQuery;
-          finalSetAttrs[`manifest_as_level_${i}`] = higherLevelQuery;
+          finalSetAttrs[`higher_level_query_${level}`] = higherLevelQuery;
+          finalSetAttrs[`manifest_as_level_${level}`] = higherLevelQuery;
         }
       },
     });
   }
   watchForChanges() {
-    let watch = [];
-    for (let i = 0; i <= 9; i++) {
-      watch.push(`psionics_level_${i}_macro_var`);
+    for (let level = 0; level <= 9; level++) {
+      on(`change:psionics_level_${level}_macro_var`, () => {
+        this.updateShowHide(level);
+      });
     }
-    watch = watch.map((item) => {
-      return `change:${item}`;
-    }).join(' ');
-    on(watch, () => {
-      this.updateShowHide();
-    });
   }
   repeatingSectionChange() {
     for (let level = 0; level <= 9; level++) {
