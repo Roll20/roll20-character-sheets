@@ -409,18 +409,12 @@ export class Spells {
           const hasSpells = v[`spells_level_${level}_macro_var`];
           const hasSlots = getIntValue(v[`spell_slots_l${level}`]) > 0;
           const hasSlotsMax = getIntValue(v[`spell_slots_l${level}_max`]) > 0;
-
-          if (hasSpells || hasSlots || hasSlotsMax) {
-            finalSetAttrs[`spell_slots_l${level}_toggle`] = 'on';
-          } else {
-            finalSetAttrs[`spell_slots_l${level}_toggle`] = 0;
-          }
           const hasHigherLevelSlots = this.checkIfSpellHasHigherLevelSlots(v, level);
           const warlockSlots = getIntValue(v.warlock_spell_slots);
           const warlockSpellsMaxLevel = getIntValue(v.warlock_spells_max_level);
           const hasSlotsOrWarlockSlots = hasSlots || (warlockSlots && level <= warlockSpellsMaxLevel);
 
-          if (hasSpells || hasSlotsOrWarlockSlots || hasHigherLevelSlots) {
+          if (hasSpells || hasSlotsOrWarlockSlots || hasSlotsMax || hasHigherLevelSlots) {
             finalSetAttrs[`spells_level_${level}_show`] = true;
           } else {
             finalSetAttrs[`spells_level_${level}_show`] = '';
