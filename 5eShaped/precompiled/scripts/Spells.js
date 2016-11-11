@@ -107,7 +107,7 @@ export class Spells {
           this.parseSRD(v, finalSetAttrs, repeatingString);
 
           if (v[`${repeatingString}spell_level`] === 'CANTRIP') {
-            finalSetAttrs[`${repeatingString}is_prepared`] = 'on';
+            finalSetAttrs[`${repeatingString}is_prepared`] = 'Yes';
           } else {
             const spellLevel = getIntValue(v[`${repeatingString}spell_level`]);
             finalSetAttrs[`${repeatingString}cast_as_level`] = `@{cast_as_level_${spellLevel}}`;
