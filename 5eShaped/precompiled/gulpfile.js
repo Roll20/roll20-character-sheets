@@ -117,6 +117,9 @@ const sassConfig = {
     'nesting-depth': 0,
     'no-url-protocols': 0,
     'no-important': 0,
+    'force-attribute-nesting': 0,
+    'force-pseudo-nesting': 0,
+    'no-qualifying-elements': 0,
     include: 0
   }
 };
