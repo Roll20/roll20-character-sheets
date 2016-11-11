@@ -390,6 +390,15 @@ export class Npc {
       },
     });
   }
+  npcDroppedOnTabletop() {
+    getSetItems('npc.npcDroppedOnTabletop', {
+      collectionArray: ['is_npc', 'edit_mode'],
+      callback: (v, finalSetAttrs) => {
+        finalSetAttrs.is_npc = 1;
+        finalSetAttrs.edit_mode = 0;
+      },
+    });
+  }
   setup() {
     on('change:type', () => {
       this.updateType();
@@ -429,6 +438,9 @@ export class Npc {
     });
     on('change:ac_note', () => {
       this.updateACNote();
+    });
+    on('sheet:compendium-drop', () => {
+      this.npcDroppedOnTabletop();
     });
   }
 }
