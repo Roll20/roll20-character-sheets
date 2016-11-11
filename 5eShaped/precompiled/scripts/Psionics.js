@@ -216,11 +216,16 @@ export class Psionics {
             removeRepeatingRow(`${repeatingItem}_${id}`);
             continue;
           }
-
           if (!levels[psionicLevel]) {
             levels[psionicLevel] = [];
           }
-          levels[psionicLevel].push(`<span class="sheet-psionic-wrapper">[${name}](~repeating_psionic${psionicLevel}_${id}_power)</span>`);
+          let classes = ['psionic-wrapper'];
+
+
+          classes = classes.map((className) => {
+            return `sheet-${className}`;
+          }).join(' ');
+          levels[psionicLevel].push(`<span class="${classes}">[${name}](~repeating_psionic${psionicLevel}_${id}_power)</span>`);
         }
 
         for (const level in levels) {
