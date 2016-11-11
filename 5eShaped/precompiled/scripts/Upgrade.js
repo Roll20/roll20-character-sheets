@@ -677,7 +677,6 @@ export class Upgrade {
     if (this.versionCompare(currentVersion, '7.0.0') < 0) {
       this.spellsToRepeatingSectionsForEachLevel();
       this.psionicsToRepeatingSectionsForEachLevel();
-      psionics.updateChatMacro();
     }
   }
 }
