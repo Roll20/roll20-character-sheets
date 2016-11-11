@@ -1,4 +1,4 @@
-/* global on:false, generateRowID:false */
+/* global on:false, generateRowID:false, removeRepeatingRow:false */
 
 import { Abilities } from './Abilities';
 const abilities = new Abilities();
@@ -394,7 +394,9 @@ export class Upgrade {
     });
   }
   oldValueToNew(v, finalSetAttrs, repeatingString, newRepeatingString, field) {
-    finalSetAttrs[`${newRepeatingString}${field}`] = v[`${repeatingString}${field}`];
+    if (v[`${repeatingString}${field}`]) {
+      finalSetAttrs[`${newRepeatingString}${field}`] = v[`${repeatingString}${field}`];
+    }
   }
   resourcesToTraits() {
     getSetRepeatingItems('upgrade.resourcesToTraits', {
@@ -430,6 +432,29 @@ export class Upgrade {
       collectionArray: ['warlock_spells_max_level'],
       callback: (v, finalSetAttrs) => {
         finalSetAttrs.warlock_spells_max_level = ordinalSpellLevel(getIntValue(v.warlock_spells_max_level));
+      },
+    });
+  }
+  spellsToRepeatingSectionsForEachLevel() {
+    const collectionArrayAddItems = ['name', 'spell_level', 'school', 'ritual', 'ritual_output', 'casting_time', 'range', 'components', 'materials', 'materials_show', 'duration', 'concentration','add_casting_modifier', 'add_second_casting_modifier', 'type', 'parsed', 'content_toggle', 'content', 'roll_toggle', 'proficiency', 'attack_ability', 'attack_bonus', 'crit_range', 'saving_throw_toggle', 'saving_throw_condition', 'saving_throw_ability', 'saving_throw_bonus', 'saving_throw_vs_ability', 'saving_throw_failure', 'saving_throw_success', 'damage_toggle', 'damage', 'damage_ability', 'damage_bonus', 'damage_type', 'damage_crit', 'second_damage_toggle', 'second_damage', 'second_damage_ability', 'second_damage_bonus', 'second_damage_type', 'second_damage_crit', 'heal_toggle', 'heal', 'heal_ability', 'heal_bonus', 'heal_query_toggle', 'higher_level_toggle', 'higher_level_dice', 'higher_level_die', 'second_higher_level_dice', 'second_higher_level_die', 'higher_level_heal', 'extras_toggle', 'emote', 'freetext', 'freeform', 'special_effects_toggle', 'special_effects_type', 'special_effects_color', 'special_effects_points_of_origin'];
+    getSetRepeatingItems('upgrade.spellsToRepeatingSectionsForEachLevel', {
+      repeatingItems: [`repeating_spell`],
+      collectionArrayAddItems,
+      callback: (v, finalSetAttrs, ids, repeatingItem) => {
+        for (const id of ids) {
+          const repeatingString = `${repeatingItem}_${id}_`;
+          const spellName = v[`${repeatingString}name`];
+          if (!spellName) {
+            removeRepeatingRow(`${repeatingItem}_${id}`);
+            continue;
+          }
+          const newLevel = getIntValue(v[`${repeatingString}spell_level`]);
+          const newRepeatingString = `repeating_spell${newLevel}_${generateRowID()}_`;
+          for (const field of collectionArrayAddItems) {
+            this.oldValueToNew(v, finalSetAttrs, repeatingString, newRepeatingString, field);
+          }
+          removeRepeatingRow(`${repeatingItem}_${id}`);
+        }
       },
     });
   }
@@ -619,6 +644,9 @@ export class Upgrade {
       this.attackToggle('repeating_action');
       this.attackToggle('repeating_reaction');
       this.attackToggle('repeating_legendaryaction');
+    }
+    if (this.versionCompare(currentVersion, '7.0.0') < 0) {
+      this.spellsToRepeatingSectionsForEachLevel();
     }
   }
 }
