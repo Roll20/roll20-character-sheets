@@ -584,14 +584,9 @@ export class Spells {
           if (repeatingInfo.field === 'spell_level') {
             this.changeLevel(repeatingInfo.rowId, level);
           }
-          if (repeatingInfo.field === 'name' || repeatingInfo.field === 'spell_level' || repeatingInfo.field === 'spell_level_from_srd' || repeatingInfo.field === 'is_prepared') {
-            this.updateChatMacro(level);
-          }
-          if (repeatingInfo.field === 'spell_level') {
-            return;
-          }
           if (repeatingInfo.field !== 'roll_toggle' && repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'damage_crit' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'second_damage_crit' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'heal_formula' && repeatingInfo.field !== 'higher_level_query' && repeatingInfo.field !== 'cast_as_level' && repeatingInfo.field !== 'parsed') {
             this.update(repeatingInfo.rowId, level);
+            this.updateChatMacro(level);
           }
         }
       });
