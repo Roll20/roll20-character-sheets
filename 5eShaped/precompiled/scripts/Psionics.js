@@ -136,6 +136,32 @@ export class Psionics {
       },
     });
   }
+  oldValueToNew(v, finalSetAttrs, repeatingString, newRepeatingString, field) {
+    if (typeof v[`${repeatingString}${field}`] !== 'undefined') {
+      finalSetAttrs[`${newRepeatingString}${field}`] = v[`${repeatingString}${field}`];
+    }
+  }
+  changeLevel(rowId, oldLevel) {
+    const collectionArrayAddItems = ['toggle_details', 'name', 'power_level', 'discipline', 'meditate', 'meditate_output', 'manifesting_time', 'range', 'display', 'materials', 'materials_show', 'duration', 'concentration', 'add_casting_modifier', 'add_second_casting_modifier', 'type', 'parsed', 'content_toggle', 'content', 'roll_toggle', 'proficiency', 'attack_ability', 'attack_bonus', 'crit_range', 'saving_throw_toggle', 'saving_throw_condition', 'saving_throw_ability', 'saving_throw_bonus', 'saving_throw_vs_ability', 'saving_throw_failure', 'saving_throw_success', 'damage_toggle', 'damage', 'damage_ability', 'damage_bonus', 'damage_type', 'damage_crit', 'second_damage_toggle', 'second_damage', 'second_damage_ability', 'second_damage_bonus', 'second_damage_type', 'second_damage_crit', 'heal_toggle', 'heal', 'heal_ability', 'heal_bonus', 'heal_query_toggle', 'higher_level_toggle', 'higher_level_dice', 'higher_level_die', 'second_higher_level_dice', 'second_higher_level_die', 'higher_level_heal', 'extras_toggle', 'emote', 'freetext', 'freeform', 'special_effects_toggle', 'special_effects_type', 'special_effects_color', 'special_effects_points_of_origin'];
+    getSetRepeatingItems('psionics.changePsionicLevel', {
+      repeatingItems: [`repeating_psionic${oldLevel}`],
+      collectionArrayAddItems,
+      rowId,
+      callback: (v, finalSetAttrs, ids, repeatingItem) => {
+        for (const id of ids) {
+          const repeatingString = `${repeatingItem}_${id}_`;
+          const newLevel = getIntValue(v[`${repeatingString}power_level`]);
+          if (oldLevel !== newLevel) {
+            const newRepeatingString = `repeating_psionic${newLevel}_${generateRowID()}_`;
+            for (const field of collectionArrayAddItems) {
+              this.oldValueToNew(v, finalSetAttrs, repeatingString, newRepeatingString, field);
+            }
+            removeRepeatingRow(`${repeatingItem}_${id}`);
+          }
+        }
+      },
+    });
+  }
   updateShowHide() {
     const collectionArray = ['psi_limit'];
     for (let i = 0; i <= 9; i++) {
@@ -260,12 +286,20 @@ export class Psionics {
   repeatingSectionChange() {
     for (let level = 0; level <= 9; level++) {
       on(`change:repeating_psionic${level}`, (eventInfo) => {
-        const repeatingInfo = getRepeatingInfo(`repeating_psionics${level}`, eventInfo);
-        if (repeatingInfo && repeatingInfo.field !== 'roll_toggle' && repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'damage_crit' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'second_damage_crit' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'heal_formula' && repeatingInfo.field !== 'higher_level_query' && repeatingInfo.field !== 'manifest_as_level' && repeatingInfo.field !== 'parsed') {
-          this.update(repeatingInfo.rowId, level);
-        }
-        if (repeatingInfo && (repeatingInfo.field === 'name' || repeatingInfo.field === 'power_level')) {
-          this.updateChatMacro(level);
+        const repeatingInfo = getRepeatingInfo(`repeating_psionics${level}`, eventInfo)
+        if (repeatingInfo) {
+          if (repeatingInfo.field === 'power_level') {
+            this.changeLevel(repeatingInfo.rowId, level);
+          }
+          if (repeatingInfo.field === 'name' || repeatingInfo.field === 'power_level') {
+            this.updateChatMacro(level);
+          }
+          if (repeatingInfo.field === 'power_level') {
+            return;
+          }
+          if (repeatingInfo.field !== 'roll_toggle' && repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'damage_crit' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'second_damage_crit' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'heal_formula' && repeatingInfo.field !== 'higher_level_query' && repeatingInfo.field !== 'manifest_as_level' && repeatingInfo.field !== 'parsed') {
+            this.update(repeatingInfo.rowId, level);
+          }
         }
       });
       on(`remove:repeating_psionic${level}`, () => {
