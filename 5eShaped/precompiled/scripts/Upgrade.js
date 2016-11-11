@@ -394,7 +394,7 @@ export class Upgrade {
     });
   }
   oldValueToNew(v, finalSetAttrs, repeatingString, newRepeatingString, field) {
-    if (v[`${repeatingString}${field}`]) {
+    if (typeof v[`${repeatingString}${field}`] !== 'undefined') {
       finalSetAttrs[`${newRepeatingString}${field}`] = v[`${repeatingString}${field}`];
     }
   }
@@ -436,7 +436,7 @@ export class Upgrade {
     });
   }
   spellsToRepeatingSectionsForEachLevel() {
-    const collectionArrayAddItems = ['name', 'spell_level', 'school', 'ritual', 'ritual_output', 'casting_time', 'range', 'components', 'materials', 'materials_show', 'duration', 'concentration','add_casting_modifier', 'add_second_casting_modifier', 'type', 'parsed', 'content_toggle', 'content', 'roll_toggle', 'proficiency', 'attack_ability', 'attack_bonus', 'crit_range', 'saving_throw_toggle', 'saving_throw_condition', 'saving_throw_ability', 'saving_throw_bonus', 'saving_throw_vs_ability', 'saving_throw_failure', 'saving_throw_success', 'damage_toggle', 'damage', 'damage_ability', 'damage_bonus', 'damage_type', 'damage_crit', 'second_damage_toggle', 'second_damage', 'second_damage_ability', 'second_damage_bonus', 'second_damage_type', 'second_damage_crit', 'heal_toggle', 'heal', 'heal_ability', 'heal_bonus', 'heal_query_toggle', 'higher_level_toggle', 'higher_level_dice', 'higher_level_die', 'second_higher_level_dice', 'second_higher_level_die', 'higher_level_heal', 'extras_toggle', 'emote', 'freetext', 'freeform', 'special_effects_toggle', 'special_effects_type', 'special_effects_color', 'special_effects_points_of_origin'];
+    const collectionArrayAddItems = ['toggle_details', 'name', 'spell_level', 'school', 'ritual', 'ritual_output', 'is_prepared', 'casting_time', 'range', 'components', 'materials', 'materials_show', 'duration', 'concentration','add_casting_modifier', 'add_second_casting_modifier', 'type', 'parsed', 'content_toggle', 'content', 'roll_toggle', 'proficiency', 'attack_ability', 'attack_bonus', 'crit_range', 'saving_throw_toggle', 'saving_throw_condition', 'saving_throw_ability', 'saving_throw_bonus', 'saving_throw_vs_ability', 'saving_throw_failure', 'saving_throw_success', 'damage_toggle', 'damage', 'damage_ability', 'damage_bonus', 'damage_type', 'damage_crit', 'second_damage_toggle', 'second_damage', 'second_damage_ability', 'second_damage_bonus', 'second_damage_type', 'second_damage_crit', 'heal_toggle', 'heal', 'heal_ability', 'heal_bonus', 'heal_query_toggle', 'higher_level_toggle', 'higher_level_dice', 'higher_level_die', 'second_higher_level_dice', 'second_higher_level_die', 'higher_level_heal', 'extras_toggle', 'emote', 'freetext', 'freeform', 'special_effects_toggle', 'special_effects_type', 'special_effects_color', 'special_effects_points_of_origin'];
     getSetRepeatingItems('upgrade.spellsToRepeatingSectionsForEachLevel', {
       repeatingItems: [`repeating_spell`],
       collectionArrayAddItems,
@@ -451,7 +451,15 @@ export class Upgrade {
           const newLevel = getIntValue(v[`${repeatingString}spell_level`]);
           const newRepeatingString = `repeating_spell${newLevel}_${generateRowID()}_`;
           for (const field of collectionArrayAddItems) {
-            this.oldValueToNew(v, finalSetAttrs, repeatingString, newRepeatingString, field);
+            if (field === 'is_prepared') {
+              if (v[`${repeatingString}is_prepared`] === 'on') {
+                finalSetAttrs[`${newRepeatingString}is_prepared`] = 'Yes';
+              } else {
+                finalSetAttrs[`${newRepeatingString}is_prepared`] = 0;
+              }
+            } else {
+              this.oldValueToNew(v, finalSetAttrs, repeatingString, newRepeatingString, field);
+            }
           }
           removeRepeatingRow(`${repeatingItem}_${id}`);
         }
@@ -633,7 +641,6 @@ export class Upgrade {
       spells.updateWarlockSlots();
       spells.updateHasSpellSlots();
       spells.updateHasSpellPoints();
-      spells.updateChatMacro();
       this.updateWarlockMaxLevelOrdinal();
       psionics.updateChatMacro();
       psionics.updateShowHide();
@@ -647,6 +654,7 @@ export class Upgrade {
     }
     if (this.versionCompare(currentVersion, '7.0.0') < 0) {
       this.spellsToRepeatingSectionsForEachLevel();
+      spells.updateChatMacro();
     }
   }
 }
