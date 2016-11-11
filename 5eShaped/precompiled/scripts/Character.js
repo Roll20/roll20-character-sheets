@@ -20,10 +20,12 @@ export class Character {
       cleric: {
         hd: 'd8',
         spellcasting: 'full',
+        preparedCasting: true,
       },
       druid: {
         hd: 'd8',
         spellcasting: 'full',
+        preparedCasting: true,
       },
       fighter: {
         hd: 'd10',
@@ -34,6 +36,7 @@ export class Character {
       paladin: {
         hd: 'd10',
         spellcasting: 'half',
+        preparedCasting: true,
       },
       psion: {
         hd: 'd6',
@@ -65,6 +68,7 @@ export class Character {
       wizard: {
         hd: 'd6',
         spellcasting: 'full',
+        preparedCasting: true,
       },
     };
     const hd = {
@@ -89,6 +93,7 @@ export class Character {
     let totalLevel = 0;
     const classLevels = {};
     let classesWithSpellcasting = 0;
+    let preparedCasting = false;
     const xpTable = [0, 300, 900, 2700, 6500, 14000, 23000, 34000, 48000, 64000, 85000, 100000, 120000, 140000, 165000, 195000, 225000, 265000, 305000, 355000, 385000, 405000, 435000, 465000, 495000, 525000, 555000, 585000, 605000, 635000, 665000];
 
     const collectionArray = ['is_npc', 'caster_level', 'caster_type', 'class_and_level', 'level', 'xp_next_level'];
@@ -107,7 +112,7 @@ export class Character {
     getSetRepeatingItems('character.updateLevels', {
       repeatingItems: ['repeating_class'],
       collectionArray,
-      collectionArrayAddItems: ['level', 'name', 'custom_name', 'hd', 'spellcasting', 'custom_class_toggle', 'spell_slots_toggle', 'has_warlock_slots', 'warlock_spell_slots_calc', 'warlock_spells_max_level'],
+      collectionArrayAddItems: ['level', 'name', 'custom_name', 'hd', 'spellcasting', 'custom_class_toggle', 'spell_slots_toggle', 'has_warlock_slots', 'warlock_spell_slots_calc', 'warlock_spells_max_level', 'prepared_matters'],
       callback: (v, finalSetAttrs, ids, repeatingItem) => {
         for (const className of CLASSES) {
           finalSetAttrs[`${className}_level`] = 0;
@@ -172,6 +177,9 @@ export class Character {
             } else {
               finalSetAttrs[`${repeatingString}spellcasting`] = 'none';
             }
+            if (!preparedCasting && defaultClassDetails.hasOwnProperty(className) && defaultClassDetails[className].preparedCasting) {
+              preparedCasting = true;
+            }
           }
 
           if (classSpellcasting === 'warlock') {
@@ -180,6 +188,11 @@ export class Character {
             classesWithSpellcasting += 1;
             spellcasting[classSpellcasting] += classLevel;
           }
+        }
+        if (preparedCasting) {
+          finalSetAttrs.prepared_matters = 1;
+        } else {
+          finalSetAttrs.prepared_matters = 0;
         }
 
         finalSetAttrs.number_of_classes = 0;
