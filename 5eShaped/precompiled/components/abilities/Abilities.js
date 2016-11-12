@@ -2,15 +2,15 @@
 
 import { AbilityChecks } from './AbilityChecks';
 const abilityChecks = new AbilityChecks();
-import { Actions } from './../components/actions/Actions';
+import { Actions } from './../actions/Actions';
 const actions = new Actions();
-import { Attacks } from './../components/attacks/Attacks';
+import { Attacks } from './../attacks/Attacks';
 const attacks = new Attacks();
-import { Spells } from './../components/spells/Spells';
+import { Spells } from './../spells/Spells';
 const spells = new Spells();
-import { Psionics } from './../components/psionics/Psionics';
+import { Psionics } from './../psionics/Psionics';
 const psionics = new Psionics();
-import { getSetItems, getIntValue, getAbilityMod, addArithmeticOperator, showSign, firstThree } from './utilities';
+import { getSetItems, getIntValue, getAbilityMod, addArithmeticOperator, showSign, firstThree } from './../../scripts/utilities';
 
 export class Abilities {
   updateModifier(ability) {

@@ -1,9 +1,9 @@
 /* global setAttrs:false, getAttrs:false, on:false, getSectionIDs:false, generateRowID:false, getTranslationByKey:false */
 
-import { Abilities } from './Abilities';
+import { Abilities } from './../components/abilities/Abilities';
 const abilities = new Abilities();
 abilities.setup();
-import { AbilityChecks } from './AbilityChecks';
+import { AbilityChecks } from './../components/abilities/AbilityChecks';
 const abilityChecks = new AbilityChecks();
 abilityChecks.setup();
 import { Actions } from './../components/actions/Actions';

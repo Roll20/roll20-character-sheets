@@ -1,8 +1,8 @@
 /* global on:false, generateRowID:false, removeRepeatingRow:false */
 
-import { Abilities } from './Abilities';
+import { Abilities } from './../components/abilities/Abilities';
 const abilities = new Abilities();
-import { AbilityChecks } from './AbilityChecks';
+import { AbilityChecks } from './../components/abilities/AbilityChecks';
 const abilityChecks = new AbilityChecks();
 import { Actions } from './../components/actions/Actions';
 const actions = new Actions();

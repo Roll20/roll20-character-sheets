@@ -1,8 +1,8 @@
 /* global on:false, generateRowID:false, getTranslationByKey:false */
 
-import { getSetItems, getSetRepeatingItems, isUndefinedOrEmpty, getAbilityValue, getAbilityShortName, getIntValue, addArithmeticOperator, showSign, exists, getRepeatingInfo, isUndefined } from './utilities';
-import { ABILITIES } from './constants';
-import { ProficiencyBonus } from './../components/core/ProficiencyBonus';
+import { getSetItems, getSetRepeatingItems, isUndefinedOrEmpty, getAbilityValue, getAbilityShortName, getIntValue, addArithmeticOperator, showSign, exists, getRepeatingInfo, isUndefined } from './../../scripts/utilities';
+import { ABILITIES } from './../../scripts/constants';
+import { ProficiencyBonus } from './../core/ProficiencyBonus';
 const proficiencyBonus = new ProficiencyBonus();
 
 export class AbilityChecks {
