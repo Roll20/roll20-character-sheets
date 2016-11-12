@@ -12,7 +12,7 @@ actions.setup();
 import { Attachers } from './Attachers';
 const attachers = new Attachers();
 attachers.setup();
-import { Attacks } from './Attacks';
+import { Attacks } from './../components/attacks/Attacks';
 const attacks = new Attacks();
 attacks.setup();
 import { Character } from './../components/character/Character';

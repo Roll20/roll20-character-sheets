@@ -8,7 +8,7 @@ import { Actions } from './Actions';
 const actions = new Actions();
 import { Attachers } from './Attachers';
 const attachers = new Attachers();
-import { Attacks } from './Attacks';
+import { Attacks } from './../components/attacks/Attacks';
 const attacks = new Attacks();
 import { Character } from './../components/character/Character';
 const character = new Character();

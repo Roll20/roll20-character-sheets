@@ -4,7 +4,7 @@ import { AbilityChecks } from './AbilityChecks';
 const abilityChecks = new AbilityChecks();
 import { Actions } from './Actions';
 const actions = new Actions();
-import { Attacks } from './Attacks';
+import { Attacks } from './../components/attacks/Attacks';
 const attacks = new Attacks();
 import { Spells } from './../components/spells/Spells';
 const spells = new Spells();

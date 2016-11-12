@@ -1,9 +1,9 @@
 /* global on:false, generateRowID:false */
-import { ABILITIES } from './constants';
-import { updateAttackToggle, updateSavingThrowToggle, updateDamageToggle } from './updateToggles';
-import { Equipment } from './../components/equipment/Equipment';
+import { ABILITIES } from './../../scripts/constants';
+import { updateAttackToggle, updateSavingThrowToggle, updateDamageToggle } from './../../scripts/updateToggles';
+import { Equipment } from './../equipment/Equipment';
 const equipment = new Equipment();
-import { getSetRepeatingItems, isUndefinedOrEmpty, setFinalAttrs, setCritDamage, sumRepeating, lowercaseDamageTypes, exists, getIntValue, getRepeatingInfo } from './utilities';
+import { getSetRepeatingItems, isUndefinedOrEmpty, setFinalAttrs, setCritDamage, sumRepeating, lowercaseDamageTypes, exists, getIntValue, getRepeatingInfo } from './../../scripts/utilities';
 
 export class Attacks {
   findAmmo(name, callback) {
