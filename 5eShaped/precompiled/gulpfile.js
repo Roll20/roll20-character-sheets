@@ -88,7 +88,7 @@ const compileSheetWorkers = () => {
     }))
 };
 const compileRollTemplate = () => {
-  return gulp.src(['./components/rollTemplate.html']);
+  return gulp.src('./components/rollTemplate/rollTemplate.html');
 };
 
 gulp.task('compile', ['sass', 'translationDist'], () => {
