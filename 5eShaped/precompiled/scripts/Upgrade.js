@@ -12,7 +12,7 @@ import { Attacks } from './Attacks';
 const attacks = new Attacks();
 import { Character } from './../components/character/Character';
 const character = new Character();
-import { Classes } from './Classes';
+import { Classes } from './../components/classes/Classes';
 const classes = new Classes();
 import { TOGGLE_VARS } from './constants';
 import { Equipment } from './../components/equipment/Equipment';
