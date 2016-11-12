@@ -3,20 +3,23 @@
 import { ABILITIES, TOGGLE_VARS } from './constants';
 import { updateAttackToggle, updateSavingThrowToggle, updateDamageToggle, updateHealToggle, updateHigherLevelToggle } from './updateToggles';
 import { getSetItems, getSetRepeatingItems, getIntValue, isUndefined, isUndefinedOrEmpty, setCritDamage, fromVOrFinalSetAttrs, lowercaseDamageTypes, getRepeatingInfo } from './utilities';
-const levelToPsiCost = {
-  0: 0,
-  1: 2,
-  2: 3,
-  3: 5,
-  4: 6,
-  5: 7,
-  6: 9,
-  7: 10,
-  8: 11,
-  9: 13,
-};
 
 export class Psionics {
+  constructor() {
+    this.conversionArray = ['type', 'add_casting_modifier', 'add_second_casting_modifier', 'manifest_as_level', 'name', 'power_level', 'discipline', 'meditate', 'meditate_output', 'manifesting_time', 'range', 'display', 'materials', 'materials_show', 'duration', 'concentration', 'content_toggle', 'content', 'toggle_details', 'attack_formula', 'roll_toggle', 'proficiency', 'attack_ability', 'attack_bonus', 'crit_range', 'saving_throw_toggle', 'saving_throw_condition', 'saving_throw_ability', 'saving_throw_bonus', 'saving_throw_dc', 'saving_throw_vs_ability', 'saving_throw_failure', 'saving_throw_success', 'damage_formula', 'damage_crit_formula', 'damage_toggle', 'damage', 'damage_ability', 'damage_bonus', 'damage_type', 'damage_crit', 'second_damage_formula', 'second_damage_crit_formula', 'second_damage_toggle', 'second_damage', 'second_damage_ability', 'second_damage_bonus', 'second_damage_type', 'second_damage_crit', 'heal_formula', 'heal_toggle', 'heal', 'heal_ability', 'heal_bonus', 'heal_query_toggle', 'higher_level_query', 'higher_level_toggle', 'higher_level_dice', 'higher_level_die', 'second_higher_level_dice', 'second_higher_level_die', 'higher_level_heal', 'extras_toggle', 'emote', 'freetext', 'freeform', 'special_effects_toggle', 'special_effects_type', 'special_effects_color', 'special_effects_points_of_origin', 'parsed'];
+    this.levelToPsiCost = {
+      0: 0,
+      1: 2,
+      2: 3,
+      3: 5,
+      4: 6,
+      5: 7,
+      6: 9,
+      7: 10,
+      8: 11,
+      9: 13,
+    };
+  }
   updateDefaultAbility() {
     const repeatingItems = [];
     for (let level = 0; level <= 9; level++) {
@@ -142,7 +145,7 @@ export class Psionics {
     }
   }
   changeLevel(rowId, oldLevel) {
-    const collectionArrayAddItems = ['type', 'add_casting_modifier', 'add_second_casting_modifier', 'manifest_as_level', 'name', 'power_level', 'discipline', 'meditate', 'meditate_output', 'manifesting_time', 'range', 'display', 'materials', 'materials_show', 'duration', 'concentration', 'content_toggle', 'content', 'toggle_details', 'attack_formula', 'roll_toggle', 'proficiency', 'attack_ability', 'attack_bonus', 'crit_range', 'saving_throw_toggle', 'saving_throw_condition', 'saving_throw_ability', 'saving_throw_bonus', 'saving_throw_dc', 'saving_throw_vs_ability', 'saving_throw_failure', 'saving_throw_success', 'damage_formula', 'damage_crit_formula', 'damage_toggle', 'damage', 'damage_ability', 'damage_bonus', 'damage_type', 'damage_crit', 'second_damage_formula', 'second_damage_crit_formula', 'second_damage_toggle', 'second_damage', 'second_damage_ability', 'second_damage_bonus', 'second_damage_type', 'second_damage_crit', 'heal_formula', 'heal_toggle', 'heal', 'heal_ability', 'heal_bonus', 'heal_query_toggle', 'higher_level_query', 'higher_level_toggle', 'higher_level_dice', 'higher_level_die', 'second_higher_level_dice', 'second_higher_level_die', 'higher_level_heal', 'extras_toggle', 'emote', 'freetext', 'freeform', 'special_effects_toggle', 'special_effects_type', 'special_effects_color', 'special_effects_points_of_origin', 'parsed'];
+    const collectionArrayAddItems = this.conversionArray;
     getSetRepeatingItems('psionics.changePsionicLevel', {
       repeatingItems: [`repeating_psionic${oldLevel}`],
       collectionArrayAddItems,
@@ -180,7 +183,7 @@ export class Psionics {
         const psiLimit = getIntValue(v.psi_limit, 2);
         for (let level = minLevel; level <= maxLevel; level++) {
           const hasPsionics = v[`psionics_level_${level}_macro_var`];
-          const belowPsiLimit = levelToPsiCost[level] <= psiLimit;
+          const belowPsiLimit = this.levelToPsiCost[level] <= psiLimit;
 
           if (hasPsionics && belowPsiLimit) {
             finalSetAttrs[`psionics_level_${level}_show`] = true;
@@ -253,7 +256,7 @@ export class Psionics {
         for (let level = 1; level <= 8; level++) {
           const levels = [];
 
-          for (let psiCost = levelToPsiCost[level]; psiCost <= psiLimit; psiCost++) {
+          for (let psiCost = this.levelToPsiCost[level]; psiCost <= psiLimit; psiCost++) {
             levels.push(psiCost);
           }
 

@@ -5,6 +5,9 @@ import { updateAttackToggle, updateSavingThrowToggle, updateDamageToggle, update
 import { getSetItems, getSetRepeatingItems, ordinalSpellLevel, getIntValue, isUndefined, isUndefinedOrEmpty, setCritDamage, fromVOrFinalSetAttrs, lowercaseDamageTypes, getRepeatingInfo, exists } from './utilities';
 
 export class Spells {
+  constructor() {
+    this.conversionArray = ['type', 'add_casting_modifier', 'add_second_casting_modifier', 'cast_as_level', 'name', 'spell_level', 'school', 'ritual', 'ritual_output', 'is_prepared', 'casting_time', 'range', 'components', 'materials', 'materials_show', 'duration', 'concentration', 'content_toggle', 'content', 'toggle_details', 'attack_formula', 'roll_toggle', 'proficiency', 'attack_ability', 'attack_bonus', 'crit_range', 'saving_throw_toggle', 'saving_throw_condition', 'saving_throw_ability', 'saving_throw_bonus', 'saving_throw_dc', 'saving_throw_vs_ability', 'saving_throw_failure', 'saving_throw_success', 'damage_formula', 'damage_crit_formula', 'damage_toggle', 'damage', 'damage_ability', 'damage_bonus', 'damage_type', 'damage_crit', 'second_damage_formula', 'second_damage_crit_formula', 'second_damage_toggle', 'second_damage', 'second_damage_ability', 'second_damage_bonus', 'second_damage_type', 'second_damage_crit', 'heal_formula', 'heal_toggle', 'heal', 'heal_ability', 'heal_bonus', 'heal_query_toggle', 'higher_level_query', 'higher_level_toggle', 'higher_level_dice', 'higher_level_die', 'second_higher_level_dice', 'second_higher_level_die', 'higher_level_heal', 'extras_toggle', 'emote', 'freetext', 'freeform', 'special_effects_toggle', 'special_effects_type', 'special_effects_color', 'special_effects_points_of_origin', 'parsed'];
+  }
   parseSRD(v, finalSetAttrs, repeatingString) {
     if (v[`${repeatingString}spell_level_from_srd`]) {
       finalSetAttrs[`${repeatingString}spell_level`] = ordinalSpellLevel(v[`${repeatingString}spell_level_from_srd`]);
@@ -177,7 +180,7 @@ export class Spells {
     }
   }
   changeLevel(rowId, oldLevel) {
-    const collectionArrayAddItems = ['type', 'add_casting_modifier', 'add_second_casting_modifier', 'cast_as_level', 'name', 'spell_level', 'school', 'ritual', 'ritual_output', 'is_prepared', 'casting_time', 'range', 'components', 'materials', 'materials_show', 'duration', 'concentration', 'content_toggle', 'content', 'toggle_details', 'attack_formula', 'roll_toggle', 'proficiency', 'attack_ability', 'attack_bonus', 'crit_range', 'saving_throw_toggle', 'saving_throw_condition', 'saving_throw_ability', 'saving_throw_bonus', 'saving_throw_dc', 'saving_throw_vs_ability', 'saving_throw_failure', 'saving_throw_success', 'damage_formula', 'damage_crit_formula', 'damage_toggle', 'damage', 'damage_ability', 'damage_bonus', 'damage_type', 'damage_crit', 'second_damage_formula', 'second_damage_crit_formula', 'second_damage_toggle', 'second_damage', 'second_damage_ability', 'second_damage_bonus', 'second_damage_type', 'second_damage_crit', 'heal_formula', 'heal_toggle', 'heal', 'heal_ability', 'heal_bonus', 'heal_query_toggle', 'higher_level_query', 'higher_level_toggle', 'higher_level_dice', 'higher_level_die', 'second_higher_level_dice', 'second_higher_level_die', 'higher_level_heal', 'extras_toggle', 'emote', 'freetext', 'freeform', 'special_effects_toggle', 'special_effects_type', 'special_effects_color', 'special_effects_points_of_origin', 'parsed'];
+    const collectionArrayAddItems = this.conversionArray;
     getSetRepeatingItems('spells.changeLevel', {
       repeatingItems: [`repeating_spell${oldLevel}`],
       collectionArrayAddItems,
