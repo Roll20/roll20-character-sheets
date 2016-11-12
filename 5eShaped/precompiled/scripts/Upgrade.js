@@ -12,8 +12,8 @@ import { Attacks } from './Attacks';
 const attacks = new Attacks();
 import { Character } from './../components/character/Character';
 const character = new Character();
-import { ClassFeatures } from './ClassFeatures';
-const classFeatures = new ClassFeatures();
+import { Classes } from './Classes';
+const classes = new Classes();
 import { TOGGLE_VARS } from './constants';
 import { Equipment } from './../components/equipment/Equipment';
 const equipment = new Equipment();
@@ -564,7 +564,7 @@ export class Upgrade {
     }
     if (this.versionCompare(currentVersion, '2.4.3') < 0) {
       this.start();
-      classFeatures.set();
+      classes.set();
     }
     if (this.versionCompare(currentVersion, '2.4.7') < 0) {
       this.start();

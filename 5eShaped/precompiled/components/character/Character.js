@@ -1,8 +1,8 @@
 /* global on:false */
 
 import { ABILITIES, CLASSES } from './../../scripts/constants';
-import { ClassFeatures } from './../../scripts/ClassFeatures';
-const classFeatures = new ClassFeatures();
+import { Classes } from './../../scripts/Classes';
+const classes = new Classes();
 import { Spells } from './../spells/Spells';
 const spells = new Spells();
 import { getSetItems, getSetRepeatingItems, isUndefinedOrEmpty, getIntValue, exists, capitalize, getRepeatingInfo, ordinalSpellLevel, updateHD } from './../../scripts/utilities';
@@ -288,7 +288,7 @@ export class Character {
         }
       },
       setFinalAttrsCallback: () => {
-        classFeatures.set();
+        classes.set();
         spells.updateSlots();
       },
     });
@@ -308,7 +308,7 @@ export class Character {
     classFeatureWatch.push('change:twinned_spell_toggle');
 
     on(classFeatureWatch.join(' '), () => {
-      classFeatures.set();
+      classes.set();
     });
   }
   updateJackOfAllTrades() {

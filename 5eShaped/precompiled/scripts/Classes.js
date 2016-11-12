@@ -5,7 +5,7 @@ import { CLASSES, ABILITIES, TOGGLE_VARS } from './constants';
 import { Traits } from './Traits';
 const traits = new Traits();
 
-export class ClassFeatures {
+export class Classes {
   extraAttack(v) {
     if (v.fighter_level >= 5) {
       let extraAttackTimes;
@@ -925,7 +925,7 @@ export class ClassFeatures {
       collectionArray.push(`${className}_level`);
     }
 
-    getSetItems('classFeatures.set', {
+    getSetItems('classes.set', {
       collectionArray,
       callback: (v, finalSetAttrs) => {
         this.extraAttack(v);
