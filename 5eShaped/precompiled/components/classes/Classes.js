@@ -2,7 +2,7 @@
 
 import { getSetItems, isUndefinedOrEmpty, getIntValue, getSetRepeatingItems } from './../../scripts/utilities';
 import { CLASSES, ABILITIES, TOGGLE_VARS } from './../../scripts/constants';
-import { Traits } from './../../scripts/Traits';
+import { Traits } from './../traits/Traits';
 const traits = new Traits();
 
 export class Classes {

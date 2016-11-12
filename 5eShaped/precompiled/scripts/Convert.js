@@ -1,7 +1,7 @@
 /* global on:false, generateRowID:false */
 
 import { ABILITIES, SKILLS, TOGGLE_VARS } from './constants';
-import { Traits } from './Traits';
+import { Traits } from './../components/traits/Traits';
 const traits = new Traits();
 import { getSetItems, getSetRepeatingItems, capitalize, getAbilityShortName, getSkillIdByStorageName, getIntValue, ordinalSpellLevel } from './utilities';
 
