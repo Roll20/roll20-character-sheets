@@ -1,5 +1,7 @@
 /* global on:false, getSetItems:false */
 
+import { getSetItems } from './../../scripts/utilities';
+
 export class Overlay {
   close() {
     getSetItems('Overlay.close', {
