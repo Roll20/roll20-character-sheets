@@ -54,6 +54,5 @@ export class Character {
     on('change:pb change:jack_of_all_trades_toggle', () => {
       this.updateJackOfAllTrades();
     });
-    this.watchForClassLevelChanges();
   }
 }

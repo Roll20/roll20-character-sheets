@@ -1259,5 +1259,6 @@ export class Classes {
     on('remove:repeating_class', () => {
       this.updateLevels();
     });
+    this.watchForClassLevelChanges();
   }
 }
