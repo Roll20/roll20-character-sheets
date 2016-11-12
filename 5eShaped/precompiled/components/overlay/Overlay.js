@@ -5,7 +5,7 @@ export class Overlay {
     getSetItems('Overlay.close', {
       collectionArray: ['processing'],
       callback: (v, finalSetAttrs) => {
-        finalSetAttrs.processing = '';
+        finalSetAttrs.processing = false;
       },
     });
   }
