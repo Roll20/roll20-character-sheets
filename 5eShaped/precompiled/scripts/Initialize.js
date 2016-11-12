@@ -77,7 +77,7 @@ export class Initialize {
             proficiencyBonus.update();
             this.generateSkills();
             savingThrows.update();
-            character.updateLevels();
+            classes.updateLevels();
             abilityChecks.updateInitiative();
             equipment.updateArmor();
             spells.updateShowHide();

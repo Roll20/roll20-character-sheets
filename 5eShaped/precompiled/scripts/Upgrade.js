@@ -694,7 +694,7 @@ export class Upgrade {
       this.start();
       spells.spellsToRepeatingSectionsForEachLevel();
       this.psionicsToRepeatingSectionsForEachLevel();
-      character.updateLevels();
+      classes.updateLevels();
     }
     overlay.close();
   }

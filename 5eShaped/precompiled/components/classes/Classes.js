@@ -109,7 +109,7 @@ export class Classes {
       }
     }
 
-    getSetRepeatingItems('character.updateLevels', {
+    getSetRepeatingItems('classes.updateLevels', {
       repeatingItems: ['repeating_class'],
       collectionArray,
       collectionArrayAddItems: ['level', 'name', 'custom_name', 'hd', 'spellcasting', 'custom_class_toggle', 'has_warlock_slots', 'warlock_spell_slots_calc', 'warlock_spells_max_level', 'prepared_matters'],
