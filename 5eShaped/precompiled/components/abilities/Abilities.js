@@ -1,6 +1,6 @@
 /* global on:false */
 
-import { AbilityChecks } from './AbilityChecks';
+import { AbilityChecks } from './../abilityChecks/AbilityChecks';
 const abilityChecks = new AbilityChecks();
 import { Actions } from './../actions/Actions';
 const actions = new Actions();

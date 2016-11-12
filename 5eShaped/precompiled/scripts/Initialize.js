@@ -2,7 +2,7 @@
 
 import { Abilities } from './../components/abilities/Abilities';
 const abilities = new Abilities();
-import { AbilityChecks } from './../components/abilities/AbilityChecks';
+import { AbilityChecks } from './../components/abilityChecks/AbilityChecks';
 const abilityChecks = new AbilityChecks();
 import { Character } from './../components/character/Character';
 const character = new Character();

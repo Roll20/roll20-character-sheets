@@ -3,7 +3,7 @@
 import { Abilities } from './../components/abilities/Abilities';
 const abilities = new Abilities();
 abilities.setup();
-import { AbilityChecks } from './../components/abilities/AbilityChecks';
+import { AbilityChecks } from './../components/abilityChecks/AbilityChecks';
 const abilityChecks = new AbilityChecks();
 abilityChecks.setup();
 import { Actions } from './../components/actions/Actions';
