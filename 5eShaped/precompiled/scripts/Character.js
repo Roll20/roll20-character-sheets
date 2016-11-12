@@ -112,7 +112,7 @@ export class Character {
     getSetRepeatingItems('character.updateLevels', {
       repeatingItems: ['repeating_class'],
       collectionArray,
-      collectionArrayAddItems: ['level', 'name', 'custom_name', 'hd', 'spellcasting', 'custom_class_toggle', 'spell_slots_toggle', 'has_warlock_slots', 'warlock_spell_slots_calc', 'warlock_spells_max_level', 'prepared_matters'],
+      collectionArrayAddItems: ['level', 'name', 'custom_name', 'hd', 'spellcasting', 'custom_class_toggle', 'has_warlock_slots', 'warlock_spell_slots_calc', 'warlock_spells_max_level', 'prepared_matters'],
       callback: (v, finalSetAttrs, ids, repeatingItem) => {
         for (const className of CLASSES) {
           finalSetAttrs[`${className}_level`] = 0;
@@ -251,11 +251,6 @@ export class Character {
           finalSetAttrs.caster_type = 'half';
         } else if (spellcasting.third) {
           finalSetAttrs.caster_type = 'third';
-        }
-        if (classesWithSpellcasting >= 1) {
-          finalSetAttrs.spell_slots_toggle = 'on';
-        } else {
-          finalSetAttrs.spell_slots_toggle = '';
         }
 
         if (spellcasting.warlock) {
