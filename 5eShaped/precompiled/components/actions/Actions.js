@@ -1,10 +1,10 @@
 /* global on:false */
 
-import { ABILITIES, TOGGLE_VARS } from './constants';
-import { ProficiencyBonus } from './ProficiencyBonus';
+import { ABILITIES, TOGGLE_VARS } from './../../scripts/constants';
+import { ProficiencyBonus } from './../../scripts/ProficiencyBonus';
 const proficiencyBonus = new ProficiencyBonus();
-import { getSetRepeatingItems, isUndefined, isUndefinedOrEmpty, fromVOrFinalSetAttrs, setCritDamage, getIntValue, getRepeatingInfo, lowercaseDamageTypes, exists } from './utilities';
-import { updateAttackToggle, updateSavingThrowToggle, updateDamageToggle, updateHealToggle } from './updateToggles';
+import { getSetRepeatingItems, isUndefined, isUndefinedOrEmpty, fromVOrFinalSetAttrs, setCritDamage, getIntValue, getRepeatingInfo, lowercaseDamageTypes, exists } from './../../scripts/utilities';
+import { updateAttackToggle, updateSavingThrowToggle, updateDamageToggle, updateHealToggle } from './../../scripts/updateToggles';
 
 export class Actions {
   updateAll() {

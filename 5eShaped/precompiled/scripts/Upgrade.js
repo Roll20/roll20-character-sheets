@@ -4,7 +4,7 @@ import { Abilities } from './Abilities';
 const abilities = new Abilities();
 import { AbilityChecks } from './AbilityChecks';
 const abilityChecks = new AbilityChecks();
-import { Actions } from './Actions';
+import { Actions } from './../components/actions/Actions';
 const actions = new Actions();
 import { Attachers } from './Attachers';
 const attachers = new Attachers();

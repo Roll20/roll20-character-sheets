@@ -6,7 +6,7 @@ abilities.setup();
 import { AbilityChecks } from './AbilityChecks';
 const abilityChecks = new AbilityChecks();
 abilityChecks.setup();
-import { Actions } from './Actions';
+import { Actions } from './../components/actions/Actions';
 const actions = new Actions();
 actions.setup();
 import { Attachers } from './Attachers';
