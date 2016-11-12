@@ -1,9 +1,11 @@
-/* global getTranslationByKey:false */
+/* global on:false getTranslationByKey:false */
 
-import { getSetItems, isUndefinedOrEmpty, getIntValue, getSetRepeatingItems } from './../../scripts/utilities';
+import { getSetItems, getSetRepeatingItems, isUndefinedOrEmpty, getIntValue, exists, capitalize, getRepeatingInfo, ordinalSpellLevel, updateHD } from './../../scripts/utilities';
 import { CLASSES, ABILITIES, TOGGLE_VARS } from './../../scripts/constants';
 import { Traits } from './../traits/Traits';
 const traits = new Traits();
+import { Spells } from './../spells/Spells';
+const spells = new Spells();
 
 export class Classes {
   updateLevels(repeatingInfo) {
@@ -286,7 +288,7 @@ export class Classes {
         }
       },
       setFinalAttrsCallback: () => {
-        classes.set();
+        this.set();
         spells.updateSlots();
       },
     });
@@ -306,7 +308,7 @@ export class Classes {
     classFeatureWatch.push('change:twinned_spell_toggle');
 
     on(classFeatureWatch.join(' '), () => {
-      classes.set();
+      this.set();
     });
   }
   extraAttack(v) {
@@ -1218,7 +1220,6 @@ export class Classes {
       });
     }
   }
-
   set() {
     const collectionArray = ['ac_unarmored_ability', 'jack_of_all_trades_toggle', 'careful_spell_toggle', 'distant_spell_toggle', 'empowered_spell_toggle', 'extended_spell_toggle', 'heightened_spell_toggle', 'quickened_spell_toggle', 'subtle_spell_toggle', 'twinned_spell_toggle'];
     for (const ability of ABILITIES) {
@@ -1248,8 +1249,7 @@ export class Classes {
       },
     });
   }
-
-  setup () {
+  setup() {
     on('change:repeating_class', (eventInfo) => {
       const repeatingInfo = getRepeatingInfo('repeating_class', eventInfo);
       if (repeatingInfo) {

@@ -102,7 +102,7 @@ gulp.task('compile', ['sass', 'translationDist'], () => {
 });
 
 gulp.task('lint', () => {
-  return gulp.src(['./scripts/*.js'])
+  return gulp.src(['./scripts/*.js', './components/**/*.js'])
     .pipe(eslint())
     .pipe(eslint.format())
     .pipe(eslint.failAfterError());

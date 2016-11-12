@@ -1,9 +1,6 @@
 /* global on:false */
 
-import { ABILITIES } from './../../scripts/constants';
-import { Spells } from './../spells/Spells';
-const spells = new Spells();
-import { getSetItems, getSetRepeatingItems, isUndefinedOrEmpty, getIntValue, exists, capitalize, getRepeatingInfo, ordinalSpellLevel, updateHD } from './../../scripts/utilities';
+import { getSetItems, getIntValue } from './../../scripts/utilities';
 
 export class Character {
   updateJackOfAllTrades() {
