@@ -6,9 +6,9 @@ import { Actions } from './Actions';
 const actions = new Actions();
 import { Attacks } from './Attacks';
 const attacks = new Attacks();
-import { Spells } from './Spells';
+import { Spells } from './../components/spells/Spells';
 const spells = new Spells();
-import { Psionics } from './Psionics';
+import { Psionics } from './../components/psionics/Psionics';
 const psionics = new Psionics();
 import { getSetItems, getIntValue, getAbilityMod, addArithmeticOperator, showSign, firstThree } from './utilities';
 

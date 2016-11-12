@@ -1,7 +1,7 @@
 /* global on:false, generateRowID:false */
 import { ABILITIES } from './constants';
 import { updateAttackToggle, updateSavingThrowToggle, updateDamageToggle } from './updateToggles';
-import { Equipment } from './Equipment';
+import { Equipment } from './../components/equipment/Equipment';
 const equipment = new Equipment();
 import { getSetRepeatingItems, isUndefinedOrEmpty, setFinalAttrs, setCritDamage, sumRepeating, lowercaseDamageTypes, exists, getIntValue, getRepeatingInfo } from './utilities';
 

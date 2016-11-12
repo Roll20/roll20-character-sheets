@@ -1,7 +1,7 @@
 /* global on:false */
 
-import { ABILITIES, SKILLS } from './constants';
-import { getSetItems, getSetRepeatingItems, getSkillIdByStorageName, getIntValue, getFloatValue, sumRepeating, isUndefinedOrEmpty, getRepeatingInfo, exists, round } from './utilities';
+import { ABILITIES, SKILLS } from './../../scripts/constants';
+import { getSetItems, getSetRepeatingItems, getSkillIdByStorageName, getIntValue, getFloatValue, sumRepeating, isUndefinedOrEmpty, getRepeatingInfo, exists, round } from './../../scripts/utilities';
 
 export class Equipment {
   setAdvantageOnStealth(mode) {

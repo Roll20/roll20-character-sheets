@@ -1,7 +1,7 @@
 /* global on:false, generateRowID:false */
 
-import { ABILITIES } from './constants';
-import { getSetItems, getIntValue, isUndefinedOrEmpty, addArithmeticOperator, getAbilityMod, numberWithCommas, exists, updateHD } from './utilities';
+import { ABILITIES } from './../../scripts/constants';
+import { getSetItems, getIntValue, isUndefinedOrEmpty, addArithmeticOperator, getAbilityMod, numberWithCommas, exists, updateHD } from './../../scripts/utilities';
 
 export class Npc {
   updateType() {

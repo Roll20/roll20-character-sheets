@@ -1,6 +1,6 @@
 /* global on:false */
 
-import { getSetItems } from './utilities';
+import { getSetItems } from './../../scripts/utilities';
 
 export class Settings {
   updateShapedD20() {

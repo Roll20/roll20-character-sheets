@@ -1,11 +1,11 @@
 /* global on:false */
 
-import { ABILITIES, CLASSES } from './constants';
-import { ClassFeatures } from './ClassFeatures';
+import { ABILITIES, CLASSES } from './../../scripts/constants';
+import { ClassFeatures } from './../../scripts/ClassFeatures';
 const classFeatures = new ClassFeatures();
-import { Spells } from './Spells';
+import { Spells } from './../spells/Spells';
 const spells = new Spells();
-import { getSetItems, getSetRepeatingItems, isUndefinedOrEmpty, getIntValue, exists, capitalize, getRepeatingInfo, ordinalSpellLevel, updateHD } from './utilities';
+import { getSetItems, getSetRepeatingItems, isUndefinedOrEmpty, getIntValue, exists, capitalize, getRepeatingInfo, ordinalSpellLevel, updateHD } from './../../scripts/utilities';
 
 export class Character {
   updateLevels(repeatingInfo) {
