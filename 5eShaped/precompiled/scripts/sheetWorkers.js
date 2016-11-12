@@ -33,7 +33,7 @@ overlay.setup();
 import { Npc } from './../components/npc/Npc';
 const npc = new Npc();
 npc.setup();
-import { ProficiencyBonus } from './ProficiencyBonus';
+import { ProficiencyBonus } from './../components/core/ProficiencyBonus';
 const proficiencyBonus = new ProficiencyBonus();
 proficiencyBonus.setup();
 import { Resistances } from './Resistances';

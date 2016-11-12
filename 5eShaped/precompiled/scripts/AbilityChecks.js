@@ -2,7 +2,7 @@
 
 import { getSetItems, getSetRepeatingItems, isUndefinedOrEmpty, getAbilityValue, getAbilityShortName, getIntValue, addArithmeticOperator, showSign, exists, getRepeatingInfo, isUndefined } from './utilities';
 import { ABILITIES } from './constants';
-import { ProficiencyBonus } from './ProficiencyBonus';
+import { ProficiencyBonus } from './../components/core/ProficiencyBonus';
 const proficiencyBonus = new ProficiencyBonus();
 
 export class AbilityChecks {

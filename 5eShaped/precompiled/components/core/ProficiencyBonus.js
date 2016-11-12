@@ -1,6 +1,6 @@
 /* global on:false */
 
-import { getSetItems, getIntValue, exists } from './utilities';
+import { getSetItems, getIntValue, exists } from './../../scripts/utilities';
 
 export class ProficiencyBonus {
   get(level, challenge) {

@@ -11,7 +11,7 @@ import { Convert } from './Convert';
 const convert = new Convert();
 import { Equipment } from './../components/equipment/Equipment';
 const equipment = new Equipment();
-import { ProficiencyBonus } from './ProficiencyBonus';
+import { ProficiencyBonus } from './../components/core/ProficiencyBonus';
 const proficiencyBonus = new ProficiencyBonus();
 import { SavingThrows } from './SavingThrows';
 const savingThrows = new SavingThrows();
