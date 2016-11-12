@@ -1,6 +1,6 @@
 /* global on:false */
 
-import { getSetItems, lowercaseDamageTypes } from './utilities';
+import { getSetItems, lowercaseDamageTypes } from './../../scripts/utilities';
 
 export class Resistances {
   updateDamageResistancesVar() {

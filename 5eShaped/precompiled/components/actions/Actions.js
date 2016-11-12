@@ -1,10 +1,10 @@
 /* global on:false */
 
 import { ABILITIES, TOGGLE_VARS } from './../../scripts/constants';
-import { ProficiencyBonus } from './../core/ProficiencyBonus';
+import { ProficiencyBonus } from './../proficiencyBonus/ProficiencyBonus';
 const proficiencyBonus = new ProficiencyBonus();
 import { getSetRepeatingItems, isUndefined, isUndefinedOrEmpty, fromVOrFinalSetAttrs, setCritDamage, getIntValue, getRepeatingInfo, lowercaseDamageTypes, exists } from './../../scripts/utilities';
-import { updateAttackToggle, updateSavingThrowToggle, updateDamageToggle, updateHealToggle } from './../../scripts/updateToggles';
+import { updateAttackToggle, updateSavingThrowToggle, updateDamageToggle, updateHealToggle } from './../actionComponents/updateToggles';
 
 export class Actions {
   updateAll() {

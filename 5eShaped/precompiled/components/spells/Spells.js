@@ -1,7 +1,7 @@
 /* global on:false, generateRowID:false, removeRepeatingRow:false */
 
 import { ABILITIES, TOGGLE_VARS } from './../../scripts/constants';
-import { updateAttackToggle, updateSavingThrowToggle, updateDamageToggle, updateHealToggle, updateHigherLevelToggle } from './../../scripts/updateToggles';
+import { updateAttackToggle, updateSavingThrowToggle, updateDamageToggle, updateHealToggle, updateHigherLevelToggle } from './../actionComponents/updateToggles';
 import { getSetItems, getSetRepeatingItems, ordinalSpellLevel, getIntValue, isUndefined, isUndefinedOrEmpty, setCritDamage, fromVOrFinalSetAttrs, lowercaseDamageTypes, getRepeatingInfo, exists } from './../../scripts/utilities';
 
 export class Spells {

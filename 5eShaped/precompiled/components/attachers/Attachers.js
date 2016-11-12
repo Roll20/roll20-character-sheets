@@ -1,7 +1,7 @@
 /* global on:false */
 
-import { ABILITIES } from './constants';
-import { getSetRepeatingItems, exists } from './utilities';
+import { ABILITIES } from './../../scripts/constants';
+import { getSetRepeatingItems, exists } from './../../scripts/utilities';
 
 export class Attachers {
   update() {

@@ -1,6 +1,6 @@
 /* global on:false, generateRowID:false */
 import { ABILITIES } from './../../scripts/constants';
-import { updateAttackToggle, updateSavingThrowToggle, updateDamageToggle } from './../../scripts/updateToggles';
+import { updateAttackToggle, updateSavingThrowToggle, updateDamageToggle } from './../actionComponents/updateToggles';
 import { Equipment } from './../equipment/Equipment';
 const equipment = new Equipment();
 import { getSetRepeatingItems, isUndefinedOrEmpty, setFinalAttrs, setCritDamage, sumRepeating, lowercaseDamageTypes, exists, getIntValue, getRepeatingInfo } from './../../scripts/utilities';
