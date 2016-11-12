@@ -13,7 +13,7 @@ import { Equipment } from './../components/equipment/Equipment';
 const equipment = new Equipment();
 import { ProficiencyBonus } from './../components/core/ProficiencyBonus';
 const proficiencyBonus = new ProficiencyBonus();
-import { SavingThrows } from './SavingThrows';
+import { SavingThrows } from './../components/savingThrows/SavingThrows';
 const savingThrows = new SavingThrows();
 import { Spells } from './../components/spells/Spells';
 const spells = new Spells();

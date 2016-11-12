@@ -23,7 +23,7 @@ import { Npc } from './../components/npc/Npc';
 const npc = new Npc();
 import { Resistances } from './Resistances';
 const resistances = new Resistances();
-import { SavingThrows } from './SavingThrows';
+import { SavingThrows } from './../components/savingThrows/SavingThrows';
 const savingThrows = new SavingThrows();
 import { Settings } from './../components/settings/Settings';
 const settings = new Settings();

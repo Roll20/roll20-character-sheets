@@ -1,7 +1,7 @@
 /* global on:false */
 
-import { getSetItems, getIntValue, getAbilityShortName, addArithmeticOperator, isUndefinedOrEmpty, exists, showSign, getAbilityMod, getAbilityValue } from './utilities';
-import { ABILITIES } from './constants';
+import { getSetItems, getIntValue, getAbilityShortName, addArithmeticOperator, isUndefinedOrEmpty, exists, showSign, getAbilityMod, getAbilityValue } from './../../scripts/utilities';
+import { ABILITIES } from './../../scripts/constants';
 
 export class SavingThrows {
   getHighestOfAbilityScoresForSavingThrow(v, savingThrowName) {

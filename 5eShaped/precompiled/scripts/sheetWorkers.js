@@ -39,7 +39,7 @@ proficiencyBonus.setup();
 import { Resistances } from './Resistances';
 const resistances = new Resistances();
 resistances.setup();
-import { SavingThrows } from './SavingThrows';
+import { SavingThrows } from './../components/savingThrows/SavingThrows';
 const savingThrows = new SavingThrows();
 savingThrows.setup();
 import { Settings } from './../components/settings/Settings';
