@@ -17,7 +17,7 @@ const classFeatures = new ClassFeatures();
 import { TOGGLE_VARS } from './constants';
 import { Equipment } from './Equipment';
 const equipment = new Equipment();
-import { Overlay } from './Overlay';
+import { Overlay } from './../components/overlay/Overlay';
 const overlay = new Overlay();
 import { Npc } from './Npc';
 const npc = new Npc();
