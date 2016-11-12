@@ -594,9 +594,46 @@ export class Spells {
       });
     }
   }
+  spellsToRepeatingSectionsForEachLevel() {
+    const collectionArrayAddItems = this.conversionArray;
+    getSetRepeatingItems('spells.spellsToRepeatingSectionsForEachLevel', {
+      repeatingItems: ['repeating_spell'],
+      collectionArrayAddItems,
+      callback: (v, finalSetAttrs, ids, repeatingItem) => {
+        for (const id of ids) {
+          const repeatingString = `${repeatingItem}_${id}_`;
+          const spellName = v[`${repeatingString}name`];
+          if (!spellName) {
+            removeRepeatingRow(`${repeatingItem}_${id}`);
+            continue;
+          }
+          const newLevel = getIntValue(v[`${repeatingString}spell_level`]);
+          const newRepeatingString = `repeating_spell${newLevel}_${generateRowID()}_`;
+          for (const field of collectionArrayAddItems) {
+            if (field === 'is_prepared') {
+              if (v[`${repeatingString}is_prepared`] === 'on') {
+                finalSetAttrs[`${newRepeatingString}is_prepared`] = 'Yes';
+              }
+            } else {
+              this.oldValueToNew(v, finalSetAttrs, repeatingString, newRepeatingString, field);
+            }
+          }
+          removeRepeatingRow(`${repeatingItem}_${id}`);
+        }
+      },
+    });
+  }
   setup() {
     this.repeatingSectionChange();
     this.watchForChanges();
+    on('change:repeating_spell', (eventInfo) => {
+      const repeatingInfo = getRepeatingInfo('repeating_spell', eventInfo);
+      if (repeatingInfo) {
+        if (repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'roll_toggle' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'damage_crit' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'second_damage_crit' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'heal_formula' && repeatingInfo.field !== 'higher_level_query' && repeatingInfo.field !== 'cast_as_level' && repeatingInfo.field !== 'parsed') {
+          this.spellsToRepeatingSectionsForEachLevel();
+        }
+      }
+    });
     on('change:default_ability', () => {
       this.updateDefaultAbility();
     });
