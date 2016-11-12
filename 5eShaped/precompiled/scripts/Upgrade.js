@@ -17,6 +17,8 @@ const classFeatures = new ClassFeatures();
 import { TOGGLE_VARS } from './constants';
 import { Equipment } from './Equipment';
 const equipment = new Equipment();
+import { Overlay } from './Overlay';
+const overlay = new Overlay();
 import { Npc } from './Npc';
 const npc = new Npc();
 import { Resistances } from './Resistances';
@@ -435,37 +437,6 @@ export class Upgrade {
       },
     });
   }
-  spellsToRepeatingSectionsForEachLevel() {
-    const collectionArrayAddItems = spells.conversionArray;
-    getSetRepeatingItems('upgrade.spellsToRepeatingSectionsForEachLevel', {
-      repeatingItems: ['repeating_spell'],
-      collectionArrayAddItems,
-      callback: (v, finalSetAttrs, ids, repeatingItem) => {
-        for (const id of ids) {
-          const repeatingString = `${repeatingItem}_${id}_`;
-          const spellName = v[`${repeatingString}name`];
-          if (!spellName) {
-            removeRepeatingRow(`${repeatingItem}_${id}`);
-            continue;
-          }
-          const newLevel = getIntValue(v[`${repeatingString}spell_level`]);
-          const newRepeatingString = `repeating_spell${newLevel}_${generateRowID()}_`;
-          for (const field of collectionArrayAddItems) {
-            if (field === 'is_prepared') {
-              if (v[`${repeatingString}is_prepared`] === 'on') {
-                finalSetAttrs[`${newRepeatingString}is_prepared`] = 'Yes';
-              } else {
-                finalSetAttrs[`${newRepeatingString}is_prepared`] = 0;
-              }
-            } else {
-              this.oldValueToNew(v, finalSetAttrs, repeatingString, newRepeatingString, field);
-            }
-          }
-          removeRepeatingRow(`${repeatingItem}_${id}`);
-        }
-      },
-    });
-  }
   psionicsToRepeatingSectionsForEachLevel() {
     const collectionArrayAddItems = psionics.conversionArray;
     getSetRepeatingItems('upgrade.psionicsToRepeatingSectionsForEachLevel', {
@@ -486,6 +457,14 @@ export class Upgrade {
           }
           removeRepeatingRow(`${repeatingItem}_${id}`);
         }
+      },
+    });
+  }
+  start() {
+    getSetItems('upgrade.start', {
+      collectionArray: ['processing'],
+      callback: (v, finalSetAttrs) => {
+        finalSetAttrs.processing = true;
       },
     });
   }
@@ -527,6 +506,7 @@ export class Upgrade {
   }
   upgrade() {
     if (this.versionCompare(currentVersion, '2.1.0') < 0) {
+      this.start();
       npc.updateChallenge();
       resistances.updateDamageVulnerabilities();
       resistances.updateDamageResistances();
@@ -536,36 +516,46 @@ export class Upgrade {
       npc.updateSenses();
     }
     if (this.versionCompare(currentVersion, '2.1.3') < 0) {
+      this.start();
       npc.updateType();
       character.updateAlignment();
     }
     if (this.versionCompare(currentVersion, '2.1.5') < 0) {
+      this.start();
       npc.updateAC();
     }
     if (this.versionCompare(currentVersion, '2.1.10') < 0) {
+      this.start();
       savingThrows.update();
     }
     if (this.versionCompare(currentVersion, '2.1.13') < 0) {
+      this.start();
       equipment.weigh();
     }
     if (this.versionCompare(currentVersion, '2.1.15') < 0) {
+      this.start();
       this.displayTextForTraits();
     }
     if (this.versionCompare(currentVersion, '2.2.2') < 0) {
+      this.start();
       this.resourcesToTraits();
     }
     if (this.versionCompare(currentVersion, '2.2.5') < 0) {
+      this.start();
       equipment.weighAmmo();
     }
     if (this.versionCompare(currentVersion, '2.2.6') < 0) {
+      this.start();
       this.extasToExtrasFix('repeating_attack');
       this.extasToExtrasFix('repeating_action');
       this.extasToExtrasFix('repeating_spell');
     }
     if (this.versionCompare(currentVersion, '2.3.3') < 0) {
+      this.start();
       attachers.update();
     }
     if (this.versionCompare(currentVersion, '2.4.2') < 0) {
+      this.start();
       abilities.updateModifiers();
       actions.updateChatMacro('trait');
       actions.updateChatMacro('action');
@@ -573,94 +563,121 @@ export class Upgrade {
       actions.updateChatMacro('legendaryaction');
     }
     if (this.versionCompare(currentVersion, '2.4.3') < 0) {
+      this.start();
       classFeatures.set();
     }
     if (this.versionCompare(currentVersion, '2.4.7') < 0) {
+      this.start();
       this.classFeaturesToTraits();
     }
     if (this.versionCompare(currentVersion, '2.4.8') < 0) {
+      this.start();
       this.fixRollTwo();
     }
     if (this.versionCompare(currentVersion, '2.4.12') < 0) {
+      this.start();
       this.armorPlusDexRemoval();
       equipment.updateArmor();
     }
     if (this.versionCompare(currentVersion, '3.1.0') < 0) {
+      this.start();
       attacks.updateChatMacro();
     }
     if (this.versionCompare(currentVersion, '3.2.1') < 0) {
+      this.start();
       this.critDamage();
     }
     if (this.versionCompare(currentVersion, '3.2.3') < 0) {
+      this.start();
       resistances.updateDamageResistancesVar();
     }
     if (this.versionCompare(currentVersion, '3.5.1') < 0) {
+      this.start();
       spells.updateSlots();
     }
     if (this.versionCompare(currentVersion, '3.6.1') < 0) {
+      this.start();
       npc.updateHD();
       npc.switchTo();
     }
     if (this.versionCompare(currentVersion, '4.1.4') < 0) {
+      this.start();
       this.armorAbility();
       this.actionComponents();
       this.skillAbility();
     }
     if (this.versionCompare(currentVersion, '4.1.5') < 0) {
+      this.start();
       abilityChecks.updateSkill();
     }
     if (this.versionCompare(currentVersion, '4.2.0') < 0) {
+      this.start();
       character.updateD20Mod();
     }
     if (this.versionCompare(currentVersion, '4.2.1') < 0) {
+      this.start();
       this.actionComponentsToRemoveExtraFields();
       abilityChecks.updateMacro();
       this.removeToggleVar();
     }
     if (this.versionCompare(currentVersion, '4.2.3') < 0) {
+      this.start();
       equipment.updateArmor();
     }
     if (this.versionCompare(currentVersion, '4.4.0') < 0) {
+      this.start();
       savingThrows.updateCustomSavingThrows();
       this.newAttackToggle();
       spells.generateHigherLevelQueries();
     }
     if (this.versionCompare(currentVersion, '4.4.1') < 0) {
+      this.start();
       this.newAbilityDefaults();
     }
     if (this.versionCompare(currentVersion, '4.4.2') < 0) {
+      this.start();
       spells.updateShowHide();
     }
     if (this.versionCompare(currentVersion, '5.0.0') < 0) {
+      this.start();
       this.spellToTranslations();
     }
     if (this.versionCompare(currentVersion, '5.0.3') < 0) {
+      this.start();
       savingThrows.updateCustomSavingThrowToggle();
     }
     if (this.versionCompare(currentVersion, '5.0.4') < 0) {
+      this.start();
       this.defaultAbility();
     }
     if (this.versionCompare(currentVersion, '5.0.6') < 0) {
+      this.start();
       this.spellLevelForCantrips();
     }
     if (this.versionCompare(currentVersion, '5.2.3') < 0) {
+      this.start();
       this.hideFreetext();
     }
     if (this.versionCompare(currentVersion, '6.0.1') < 0) {
+      this.start();
       this.newAttackToggleTwo();
       spells.update();
       actions.updateAll();
     }
     if (this.versionCompare(currentVersion, '6.0.4') < 0) {
+      this.start();
       this.spellEffectsNaming();
     }
     if (this.versionCompare(currentVersion, '6.1.1') < 0) {
+      this.start();
       settings.updateShapedD20();
     }
     if (this.versionCompare(currentVersion, '6.1.3') < 0) {
+      this.start();
       abilities.updateModifier('strength');
     }
     if (this.versionCompare(currentVersion, '6.11.6') < 0) {
+      this.start();
       spells.updateWarlockSlots();
       spells.updateHasSpellSlots();
       spells.updateHasSpellPoints();
@@ -674,9 +691,11 @@ export class Upgrade {
       this.attackToggle('repeating_legendaryaction');
     }
     if (this.versionCompare(currentVersion, '7.0.1') < 0) {
-      this.spellsToRepeatingSectionsForEachLevel();
+      this.start();
+      spells.spellsToRepeatingSectionsForEachLevel();
       this.psionicsToRepeatingSectionsForEachLevel();
       character.updateLevels();
     }
+    overlay.close();
   }
 }
