@@ -4976,7 +4976,7 @@
         getAttrs(["repeating_spell_spell_damage_progression", "repeating_spell_spelldamage"], function(v) {
             console.log(v);
             if(v.repeating_spell_spell_damage_progression && v.repeating_spell_spell_damage_progression === "Cantrip Dice" && v.repeating_spell_spelldamage && v.repeating_spell_spelldamage.substring(0,2) === "1d") {
-                var damageformula = "[[((@{level} + 1) / 6 + 0.5)]]" + v.repeating_spell_spelldamage.substring(1);
+                var damageformula = "[[round((@{level} + 1) / 6 + 0.5)]]" + v.repeating_spell_spelldamage.substring(1);
                 setAttrs({
                     repeating_spell_spelldamage: damageformula
                 });
@@ -6366,7 +6366,8 @@
             if(v.repeating_attack_dmgflag && v.repeating_attack_dmgflag != 0) {
                 if(spellattack === true && dmgbase.indexOf("@{level}") > -1) {
                     // SPECIAL CANTRIP DAMAGE
-                    dmg = ((parseInt(v.level, 10) + 1) / 6) + 0.5 + dmgbase.match(/d.*/);
+                    dmgdiestring = Math.round(((parseInt(v.level, 10) + 1) / 6) + 0.5).toString()
+                    dmg = dmgdiestring + dmgbase.substring(dmgbase.lastIndexOf("d")) + " " + dmgtype;
                 }
                 else {
                     if(dmgbase === 0 && (dmgattr + dmgmod === 0)){
