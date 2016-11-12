@@ -436,7 +436,7 @@ export class Upgrade {
     });
   }
   spellsToRepeatingSectionsForEachLevel() {
-    const collectionArrayAddItems = ['toggle_details', 'name', 'spell_level', 'school', 'ritual', 'ritual_output', 'is_prepared', 'casting_time', 'range', 'components', 'materials', 'materials_show', 'duration', 'concentration', 'add_casting_modifier', 'add_second_casting_modifier', 'type', 'parsed', 'content_toggle', 'content', 'roll_toggle', 'proficiency', 'attack_ability', 'attack_bonus', 'crit_range', 'saving_throw_toggle', 'saving_throw_condition', 'saving_throw_ability', 'saving_throw_bonus', 'saving_throw_vs_ability', 'saving_throw_failure', 'saving_throw_success', 'damage_toggle', 'damage', 'damage_ability', 'damage_bonus', 'damage_type', 'damage_crit', 'second_damage_toggle', 'second_damage', 'second_damage_ability', 'second_damage_bonus', 'second_damage_type', 'second_damage_crit', 'heal_toggle', 'heal', 'heal_ability', 'heal_bonus', 'heal_query_toggle', 'higher_level_toggle', 'higher_level_dice', 'higher_level_die', 'second_higher_level_dice', 'second_higher_level_die', 'higher_level_heal', 'extras_toggle', 'emote', 'freetext', 'freeform', 'special_effects_toggle', 'special_effects_type', 'special_effects_color', 'special_effects_points_of_origin'];
+    const collectionArrayAddItems = ['type', 'add_casting_modifier', 'add_second_casting_modifier', 'cast_as_level', 'name', 'spell_level', 'school', 'ritual', 'ritual_output', 'is_prepared', 'casting_time', 'range', 'components', 'materials', 'materials_show', 'duration', 'concentration', 'content_toggle', 'content', 'toggle_details', 'attack_formula', 'roll_toggle', 'proficiency', 'attack_ability', 'attack_bonus', 'crit_range', 'saving_throw_toggle', 'saving_throw_condition', 'saving_throw_ability', 'saving_throw_bonus', 'saving_throw_dc', 'saving_throw_vs_ability', 'saving_throw_failure', 'saving_throw_success', 'damage_formula', 'damage_crit_formula', 'damage_toggle', 'damage', 'damage_ability', 'damage_bonus', 'damage_type', 'damage_crit', 'second_damage_formula', 'second_damage_crit_formula', 'second_damage_toggle', 'second_damage', 'second_damage_ability', 'second_damage_bonus', 'second_damage_type', 'second_damage_crit', 'heal_formula', 'heal_toggle', 'heal', 'heal_ability', 'heal_bonus', 'heal_query_toggle', 'higher_level_query', 'higher_level_toggle', 'higher_level_dice', 'higher_level_die', 'second_higher_level_dice', 'second_higher_level_die', 'higher_level_heal', 'extras_toggle', 'emote', 'freetext', 'freeform', 'special_effects_toggle', 'special_effects_type', 'special_effects_color', 'special_effects_points_of_origin', 'parsed'];
     getSetRepeatingItems('upgrade.spellsToRepeatingSectionsForEachLevel', {
       repeatingItems: ['repeating_spell'],
       collectionArrayAddItems,
@@ -467,7 +467,7 @@ export class Upgrade {
     });
   }
   psionicsToRepeatingSectionsForEachLevel() {
-    const collectionArrayAddItems = ['toggle_details', 'name', 'power_level', 'discipline', 'meditate', 'meditate_output', 'manifesting_time', 'range', 'display', 'materials', 'materials_show', 'duration', 'concentration', 'add_casting_modifier', 'add_second_casting_modifier', 'type', 'parsed', 'content_toggle', 'content', 'roll_toggle', 'proficiency', 'attack_ability', 'attack_bonus', 'crit_range', 'saving_throw_toggle', 'saving_throw_condition', 'saving_throw_ability', 'saving_throw_bonus', 'saving_throw_vs_ability', 'saving_throw_failure', 'saving_throw_success', 'damage_toggle', 'damage', 'damage_ability', 'damage_bonus', 'damage_type', 'damage_crit', 'second_damage_toggle', 'second_damage', 'second_damage_ability', 'second_damage_bonus', 'second_damage_type', 'second_damage_crit', 'heal_toggle', 'heal', 'heal_ability', 'heal_bonus', 'heal_query_toggle', 'higher_level_toggle', 'higher_level_dice', 'higher_level_die', 'second_higher_level_dice', 'second_higher_level_die', 'higher_level_heal', 'extras_toggle', 'emote', 'freetext', 'freeform', 'special_effects_toggle', 'special_effects_type', 'special_effects_color', 'special_effects_points_of_origin'];
+    const collectionArrayAddItems = ['type', 'add_casting_modifier', 'add_second_casting_modifier', 'manifest_as_level', 'name', 'power_level', 'discipline', 'meditate', 'meditate_output', 'manifesting_time', 'range', 'display', 'materials', 'materials_show', 'duration', 'concentration', 'content_toggle', 'content', 'toggle_details', 'attack_formula', 'roll_toggle', 'proficiency', 'attack_ability', 'attack_bonus', 'crit_range', 'saving_throw_toggle', 'saving_throw_condition', 'saving_throw_ability', 'saving_throw_bonus', 'saving_throw_dc', 'saving_throw_vs_ability', 'saving_throw_failure', 'saving_throw_success', 'damage_formula', 'damage_crit_formula', 'damage_toggle', 'damage', 'damage_ability', 'damage_bonus', 'damage_type', 'damage_crit', 'second_damage_formula', 'second_damage_crit_formula', 'second_damage_toggle', 'second_damage', 'second_damage_ability', 'second_damage_bonus', 'second_damage_type', 'second_damage_crit', 'heal_formula', 'heal_toggle', 'heal', 'heal_ability', 'heal_bonus', 'heal_query_toggle', 'higher_level_query', 'higher_level_toggle', 'higher_level_dice', 'higher_level_die', 'second_higher_level_dice', 'second_higher_level_die', 'higher_level_heal', 'extras_toggle', 'emote', 'freetext', 'freeform', 'special_effects_toggle', 'special_effects_type', 'special_effects_color', 'special_effects_points_of_origin', 'parsed'];
     getSetRepeatingItems('upgrade.psionicsToRepeatingSectionsForEachLevel', {
       repeatingItems: ['repeating_psionics'],
       collectionArrayAddItems,
@@ -666,7 +666,6 @@ export class Upgrade {
       spells.updateHasSpellPoints();
       this.updateWarlockMaxLevelOrdinal();
       psionics.updateShowHide();
-      character.updateLevels();
       attacks.update();
       abilityChecks.updateInitiative();
       this.attackToggle('repeating_attack');
@@ -674,9 +673,10 @@ export class Upgrade {
       this.attackToggle('repeating_reaction');
       this.attackToggle('repeating_legendaryaction');
     }
-    if (this.versionCompare(currentVersion, '7.0.0') < 0) {
+    if (this.versionCompare(currentVersion, '7.0.1') < 0) {
       this.spellsToRepeatingSectionsForEachLevel();
       this.psionicsToRepeatingSectionsForEachLevel();
+      character.updateLevels();
     }
   }
 }
