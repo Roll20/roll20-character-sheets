@@ -644,8 +644,9 @@ export class Upgrade {
     this.upgradeCheckAndExecute(currentVersion, '7.0.1', () => {
       spells.spellsToRepeatingSectionsForEachLevel();
       this.psionicsToRepeatingSectionsForEachLevel();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '7.0.3', () => {
       classes.updateLevels();
-      overlay.close();
     });
   }
 }
