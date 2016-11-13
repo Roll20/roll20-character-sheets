@@ -50,7 +50,11 @@ export class Initialize {
       },
     });
   }
-
+  setCurrentVersion(v, finalSetAttrs) {
+    if (isUndefinedOrEmpty(v.version) || !v.version || v.version !== currentVersion) {
+      finalSetAttrs.version = currentVersion;
+    }
+  }
   sheetOpened() {
     const collectionArray = ['version', 'npc', 'base_level', 'convertedFromOGL', 'import_data', 'roll_setting'];
     for (const ability of ABILITIES) {
@@ -89,16 +93,14 @@ export class Initialize {
             savingThrows.update();
             abilities.updateModifiers();
             convert.convertFromOGL();
+            if (isUndefinedOrEmpty(v.convertedFromOGL) || !v.convertedFromOGL) {
+              finalSetAttrs.convertedFromOGL = true;
+            }
           }
+          this.setCurrentVersion(v, finalSetAttrs);
         } else {
-          upgrade.upgrade();
-        }
-
-        if (isUndefinedOrEmpty(v.version) || !v.version || v.version !== currentVersion) {
-          finalSetAttrs.version = currentVersion;
-        }
-        if (isUndefinedOrEmpty(v.convertedFromOGL) || !v.convertedFromOGL) {
-          finalSetAttrs.convertedFromOGL = true;
+          upgrade.upgrade(v.version);
+          this.setCurrentVersion(v, finalSetAttrs);
         }
       },
     });

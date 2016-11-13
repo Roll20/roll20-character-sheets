@@ -32,7 +32,6 @@ const spells = new Spells();
 import { Psionics } from './../components/psionics/Psionics';
 const psionics = new Psionics();
 import { isUndefined, isUndefinedOrEmpty, getAbilityName, getIntValue, getSetItems, getSetRepeatingItems, ordinalSpellLevel } from './utilities';
-import { currentVersion } from './version';
 
 export class Upgrade {
   extasToExtrasFix(repeatingSection) {
@@ -468,45 +467,34 @@ export class Upgrade {
       },
     });
   }
-  isPositiveInteger(x) {
-    return /^\d+$/.test(x);
-  }
-  validateParts(parts) {
-    for (let i = 0; i < parts.length; ++i) {
-      if (!this.isPositiveInteger(parts[i])) {
-        return false;
-      }
+  versionCompare(left, right) {
+    if (typeof left !== 'string' || typeof right !== 'string') {
+      return false;
     }
-    return true;
-  }
-  versionCompare(v1, v2) {
-    const v1parts = v1.split('.');
-    const v2parts = v2.split('.');
+    const a = left.split('.');
+    const b = right.split('.');
 
-    if (!this.validateParts(v1parts) || !this.validateParts(v2parts)) {
-      return NaN;
-    }
-    for (let i = 0; i < v1parts.length; ++i) {
-      if (v2parts.length === i) {
-        return 1;
-      }
+    const len = Math.max(a.length, b.length);
 
-      if (v1parts[i] === v2parts[i]) {
-        continue;
-      }
-      if (v1parts[i] > v2parts[i]) {
+    for (let i = 0; i < len; i++) {
+      if ((a[i] && !b[i] && parseInt(a[i], 10) > 0) || (parseInt(a[i], 10) > parseInt(b[i], 10))) {
         return 1;
+      } else if ((b[i] && !a[i] && parseInt(b[i], 10) > 0) || (parseInt(a[i], 10) < parseInt(b[i], 10))) {
+        return -1;
       }
-      return -1;
-    }
-    if (v1parts.length !== v2parts.length) {
-      return -1;
     }
     return 0;
   }
-  upgrade() {
-    if (this.versionCompare(currentVersion, '2.1.0') < 0) {
+  upgradeCheckAndExecute(currentVersion, version, callback) {
+    if (this.versionCompare(currentVersion, version) < 0) {
+      console.info(`version ${version} upgrade`);
       this.start();
+      callback();
+      overlay.close();
+    }
+  }
+  upgrade(currentVersion) {
+    this.upgradeCheckAndExecute(currentVersion, '2.1.0', () => {
       npc.updateChallenge();
       resistances.updateDamageVulnerabilities();
       resistances.updateDamageResistances();
@@ -514,170 +502,133 @@ export class Upgrade {
       resistances.updateConditionImmunities();
       npc.updateLanguages();
       npc.updateSenses();
-    }
-    if (this.versionCompare(currentVersion, '2.1.3') < 0) {
-      this.start();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '2.1.3', () => {
       npc.updateType();
       character.updateAlignment();
-    }
-    if (this.versionCompare(currentVersion, '2.1.5') < 0) {
-      this.start();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '2.1.5', () => {
       npc.updateAC();
-    }
-    if (this.versionCompare(currentVersion, '2.1.10') < 0) {
-      this.start();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '2.1.10', () => {
       savingThrows.update();
-    }
-    if (this.versionCompare(currentVersion, '2.1.13') < 0) {
-      this.start();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '2.1.13', () => {
       equipment.weigh();
-    }
-    if (this.versionCompare(currentVersion, '2.1.15') < 0) {
-      this.start();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '2.1.15', () => {
       this.displayTextForTraits();
-    }
-    if (this.versionCompare(currentVersion, '2.2.2') < 0) {
-      this.start();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '2.2.2', () => {
       this.resourcesToTraits();
-    }
-    if (this.versionCompare(currentVersion, '2.2.5') < 0) {
-      this.start();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '2.2.5', () => {
       equipment.weighAmmo();
-    }
-    if (this.versionCompare(currentVersion, '2.2.6') < 0) {
-      this.start();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '2.2.6', () => {
       this.extasToExtrasFix('repeating_attack');
       this.extasToExtrasFix('repeating_action');
       this.extasToExtrasFix('repeating_spell');
-    }
-    if (this.versionCompare(currentVersion, '2.3.3') < 0) {
-      this.start();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '2.3.3', () => {
       attachers.update();
-    }
-    if (this.versionCompare(currentVersion, '2.4.2') < 0) {
-      this.start();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '2.4.2', () => {
       abilities.updateModifiers();
       actions.updateChatMacro('trait');
       actions.updateChatMacro('action');
       actions.updateChatMacro('reaction');
       actions.updateChatMacro('legendaryaction');
-    }
-    if (this.versionCompare(currentVersion, '2.4.3') < 0) {
-      this.start();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '2.4.3', () => {
       classes.set();
-    }
-    if (this.versionCompare(currentVersion, '2.4.7') < 0) {
-      this.start();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '2.4.7', () => {
       this.classFeaturesToTraits();
-    }
-    if (this.versionCompare(currentVersion, '2.4.8') < 0) {
-      this.start();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '2.4.8', () => {
       this.fixRollTwo();
-    }
-    if (this.versionCompare(currentVersion, '2.4.12') < 0) {
-      this.start();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '2.4.12', () => {
       this.armorPlusDexRemoval();
       equipment.updateArmor();
-    }
-    if (this.versionCompare(currentVersion, '3.1.0') < 0) {
-      this.start();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '3.1.0', () => {
       attacks.updateChatMacro();
-    }
-    if (this.versionCompare(currentVersion, '3.2.1') < 0) {
-      this.start();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '3.2.1', () => {
       this.critDamage();
-    }
-    if (this.versionCompare(currentVersion, '3.2.3') < 0) {
-      this.start();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '3.2.3', () => {
       resistances.updateDamageResistancesVar();
-    }
-    if (this.versionCompare(currentVersion, '3.5.1') < 0) {
-      this.start();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '3.5.1', () => {
       spells.updateSlots();
-    }
-    if (this.versionCompare(currentVersion, '3.6.1') < 0) {
-      this.start();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '3.6.1', () => {
       npc.updateHD();
       npc.switchTo();
-    }
-    if (this.versionCompare(currentVersion, '4.1.4') < 0) {
-      this.start();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '4.1.4', () => {
       this.armorAbility();
       this.actionComponents();
       this.skillAbility();
-    }
-    if (this.versionCompare(currentVersion, '4.1.5') < 0) {
-      this.start();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '4.1.5', () => {
       abilityChecks.updateSkill();
-    }
-    if (this.versionCompare(currentVersion, '4.2.0') < 0) {
-      this.start();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '4.2.0', () => {
       character.updateD20Mod();
-    }
-    if (this.versionCompare(currentVersion, '4.2.1') < 0) {
-      this.start();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '4.2.1', () => {
       this.actionComponentsToRemoveExtraFields();
       abilityChecks.updateMacro();
       this.removeToggleVar();
-    }
-    if (this.versionCompare(currentVersion, '4.2.3') < 0) {
-      this.start();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '4.2.3', () => {
       equipment.updateArmor();
-    }
-    if (this.versionCompare(currentVersion, '4.4.0') < 0) {
-      this.start();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '4.4.0', () => {
       savingThrows.updateCustomSavingThrows();
       this.newAttackToggle();
       spells.generateHigherLevelQueries();
-    }
-    if (this.versionCompare(currentVersion, '4.4.1') < 0) {
-      this.start();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '4.4.1', () => {
       this.newAbilityDefaults();
-    }
-    if (this.versionCompare(currentVersion, '4.4.2') < 0) {
-      this.start();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '4.4.2', () => {
       spells.updateShowHide();
-    }
-    if (this.versionCompare(currentVersion, '5.0.0') < 0) {
-      this.start();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '5.0.0', () => {
       this.spellToTranslations();
-    }
-    if (this.versionCompare(currentVersion, '5.0.3') < 0) {
-      this.start();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '5.0.3', () => {
       savingThrows.updateCustomSavingThrowToggle();
-    }
-    if (this.versionCompare(currentVersion, '5.0.4') < 0) {
-      this.start();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '5.0.4', () => {
       this.defaultAbility();
-    }
-    if (this.versionCompare(currentVersion, '5.0.6') < 0) {
-      this.start();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '5.0.6', () => {
       this.spellLevelForCantrips();
-    }
-    if (this.versionCompare(currentVersion, '5.2.3') < 0) {
-      this.start();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '5.2.3', () => {
       this.hideFreetext();
-    }
-    if (this.versionCompare(currentVersion, '6.0.1') < 0) {
-      this.start();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '6.0.1', () => {
       this.newAttackToggleTwo();
       spells.update();
       actions.updateAll();
-    }
-    if (this.versionCompare(currentVersion, '6.0.4') < 0) {
-      this.start();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '6.0.4', () => {
       this.spellEffectsNaming();
-    }
-    if (this.versionCompare(currentVersion, '6.1.1') < 0) {
-      this.start();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '6.1.1', () => {
       settings.updateShapedD20();
-    }
-    if (this.versionCompare(currentVersion, '6.1.3') < 0) {
-      this.start();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '6.1.3', () => {
       abilities.updateModifier('strength');
-    }
-    if (this.versionCompare(currentVersion, '6.11.6') < 0) {
-      this.start();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '6.11.6', () => {
       spells.updateWarlockSlots();
       spells.updateHasSpellSlots();
       spells.updateHasSpellPoints();
@@ -689,13 +640,12 @@ export class Upgrade {
       this.attackToggle('repeating_action');
       this.attackToggle('repeating_reaction');
       this.attackToggle('repeating_legendaryaction');
-    }
-    if (this.versionCompare(currentVersion, '7.0.1') < 0) {
-      this.start();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '7.0.1', () => {
       spells.spellsToRepeatingSectionsForEachLevel();
       this.psionicsToRepeatingSectionsForEachLevel();
       classes.updateLevels();
-    }
-    overlay.close();
+      overlay.close();
+    });
   }
 }
