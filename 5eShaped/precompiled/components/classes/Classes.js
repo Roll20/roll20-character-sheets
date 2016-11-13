@@ -156,12 +156,10 @@ export class Classes {
             }
           }
 
-          let classHd = v[`${repeatingString}hd`];
+          let classHd = v[`${repeatingString}hd`] || 'd12';
           if (repeatingInfo && repeatingInfo.field === 'name') {
             if (defaultClassDetails.hasOwnProperty(className)) {
               classHd = defaultClassDetails[className].hd;
-            } else {
-              classHd = 'd12';
             }
             finalSetAttrs[`${repeatingString}hd`] = classHd;
           }
