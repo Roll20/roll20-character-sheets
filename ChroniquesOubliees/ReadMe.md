@@ -9,9 +9,18 @@ Cette feuilles de personnage inclue quelques jets et r&egrave;gles optionnelles.
 Le jeu complet, des suppl&eacute;ments et des t&eacute;l&eacute;chargements gratuits sont disponibles sur le site de l&apos;&eacute;diteur [Black Book Editions](http://www.black-book-editions.fr/catalogue.php?id=13).
 
 # Version courante
-1.5 [Screenshot](co_v1.png)
+1.6 [Screenshot](co_v2.png)
 
 # Notes de version
+
+##v1.6 (2016-11-01)
+
+* Légère refonte de la mise en page
+* Ajout d'un champ "Portée" pour les Armes/Attaques
+* Ajout d'une sélection de mode de jet pour les jets de capacités : Normal, garder le plus haut score, garder le score le plus faible (permet de gérer les jets avec caractéristiques supérieures par exemple)
+* Ajout du nom du personnage sur le template de chat de tous les jets
+* Ajout d'une zone de notes/divers
+
 
 ##v1.5 (2016-07-13)
 
