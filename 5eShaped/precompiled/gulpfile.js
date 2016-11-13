@@ -1,8 +1,7 @@
 'use strict';
 
 const gulp = require('gulp');
-const include = require('gulp-include');
-const inject = require('gulp-inject');
+const nunjucksRender = require('gulp-nunjucks-render');
 const htmlmin = require('gulp-htmlmin');
 const minifyCss = require('gulp-minify-css');
 const concat = require('gulp-concat');
@@ -68,7 +67,18 @@ function duplicate(file, limit, start) {
 }
 const compileSheetHTML = () => {
   return gulp.src('./5eShaped.html')
-    .pipe(include())
+    .pipe(nunjucksRender({
+      envOptions: {
+        tags: {
+          blockStart: '{%',
+          blockEnd: '%}',
+          variableStart: '{$',
+          variableEnd: '$}',
+          commentStart: '{#',
+          commentEnd: '#}'
+        },
+      }
+    }))
     .pipe(htmlmin({
       collapseWhitespace: true
     }));
