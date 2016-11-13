@@ -1,4 +1,4 @@
-/* global on:false getTranslationByKey:false */
+/* global on:false, getTranslationByKey:false */
 
 import { getSetItems, getSetRepeatingItems, isUndefinedOrEmpty, getIntValue, exists, capitalize, getRepeatingInfo, ordinalSpellLevel, updateHD } from './../../scripts/utilities';
 import { CLASSES, ABILITIES, TOGGLE_VARS } from './../../scripts/constants';
