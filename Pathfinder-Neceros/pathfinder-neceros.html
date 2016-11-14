@@ -13779,7 +13779,7 @@ var SWUtils = SWUtils || (function () {
 	}
 	());
 var PFConst = {
-	version: 0.69,
+	version: 0.70,
 	/***************************************Lists of Fields ************************************************************/
 	//add any new repeating sections here. This is the word after "repeating_"
 	repeatingSections: ["weapon", "class-ability", "feat", "racial-trait", "trait", "item", "npc-spell-like-abilities", "mythic-ability", "mythic-feat", "buff", "spells"],
@@ -14464,13 +14464,12 @@ var PFAbilityScores = PFAbilityScores || (function () {
 						if (ability === "DEX" && (parseInt(values["condition-Helpless"], 10) || 0) === 1) {
 							newVal = 0;
 							mod = -5;
-						}
-						if (rawDmg>=newVal){
+						} else if (rawDmg>=newVal){
 							newVal=0;
 							mod=-5;
 						} else if ((rawPen+rawDmg+rawCond) >= (newVal-1)){
 							//min of 1
-							mod=-4;
+							mod=-5;
 						}
 						//TAS.debug("base:" + base + ", newval:" + newVal + ", mod:" + mod);
 						if (isNaN(base)) {
@@ -14513,7 +14512,7 @@ var PFAbilityScores = PFAbilityScores || (function () {
 						thecount++;
 						callatend(anychanged);
 					};
-				_.each(PFAbilityScores.abilities, function (ability) {
+				_.each(abilities, function (ability) {
 					updateAbilityScore(ability, null, calleach, silently);
 				});
 			},
@@ -20143,6 +20142,9 @@ var PFSkills = PFSkills || (function () {
 				if (oldversion > 0.60 && oldversion < 0.69) {
 					setAdvancedMacroCheckbox();
 					PFNPCprev100.updateNPCMaxHP();
+				}
+				if (oldversion < 0.70){
+					PFAbilityScores.updateAbilityScores();
 				}
 				migrateOldClassSkillValue();
 				migrateSkillMacrosToV65();
