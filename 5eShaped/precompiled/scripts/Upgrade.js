@@ -452,7 +452,11 @@ export class Upgrade {
           const newLevel = getIntValue(v[`${repeatingString}power_level`]);
           const newRepeatingString = `repeating_psionic${newLevel}_${generateRowID()}_`;
           for (const field of collectionArrayAddItems) {
-            this.oldValueToNew(v, finalSetAttrs, repeatingString, newRepeatingString, field);
+            if (field === 'power_level') {
+              finalSetAttrs[`${newRepeatingString}psionic_level`] = newLevel;
+            } else {
+              this.oldValueToNew(v, finalSetAttrs, repeatingString, newRepeatingString, field);
+            }
           }
           removeRepeatingRow(`${repeatingItem}_${id}`);
         }
@@ -643,10 +647,13 @@ export class Upgrade {
     });
     this.upgradeCheckAndExecute(currentVersion, '7.0.1', () => {
       spells.spellsToRepeatingSectionsForEachLevel();
-      this.psionicsToRepeatingSectionsForEachLevel();
     });
     this.upgradeCheckAndExecute(currentVersion, '7.0.3', () => {
       classes.updateLevels();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '7.0.4', () => {
+      this.psionicsToRepeatingSectionsForEachLevel();
+      psionics.updateChatMacro();
     });
   }
 }

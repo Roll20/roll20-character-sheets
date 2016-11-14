@@ -6,7 +6,7 @@ import { getSetItems, getSetRepeatingItems, getIntValue, isUndefined, isUndefine
 
 export class Psionics {
   constructor() {
-    this.conversionArray = ['type', 'add_casting_modifier', 'add_second_casting_modifier', 'manifest_as_level', 'name', 'power_level', 'discipline', 'meditate', 'meditate_output', 'manifesting_time', 'range', 'display', 'materials', 'materials_show', 'duration', 'concentration', 'content_toggle', 'content', 'toggle_details', 'attack_formula', 'roll_toggle', 'proficiency', 'attack_ability', 'attack_bonus', 'crit_range', 'saving_throw_toggle', 'saving_throw_condition', 'saving_throw_ability', 'saving_throw_bonus', 'saving_throw_dc', 'saving_throw_vs_ability', 'saving_throw_failure', 'saving_throw_success', 'damage_formula', 'damage_crit_formula', 'damage_toggle', 'damage', 'damage_ability', 'damage_bonus', 'damage_type', 'damage_crit', 'second_damage_formula', 'second_damage_crit_formula', 'second_damage_toggle', 'second_damage', 'second_damage_ability', 'second_damage_bonus', 'second_damage_type', 'second_damage_crit', 'heal_formula', 'heal_toggle', 'heal', 'heal_ability', 'heal_bonus', 'heal_query_toggle', 'higher_level_query', 'higher_level_toggle', 'higher_level_dice', 'higher_level_die', 'second_higher_level_dice', 'second_higher_level_die', 'higher_level_heal', 'extras_toggle', 'emote', 'freetext', 'freeform', 'special_effects_toggle', 'special_effects_type', 'special_effects_color', 'special_effects_points_of_origin', 'parsed'];
+    this.conversionArray = ['type', 'add_casting_modifier', 'add_second_casting_modifier', 'manifest_as_level', 'name', 'psionic_level', 'discipline', 'meditate', 'meditate_output', 'manifesting_time', 'range', 'display', 'materials', 'materials_show', 'duration', 'concentration', 'content_toggle', 'content', 'toggle_details', 'attack_formula', 'roll_toggle', 'proficiency', 'attack_ability', 'attack_bonus', 'crit_range', 'saving_throw_toggle', 'saving_throw_condition', 'saving_throw_ability', 'saving_throw_bonus', 'saving_throw_dc', 'saving_throw_vs_ability', 'saving_throw_failure', 'saving_throw_success', 'damage_formula', 'damage_crit_formula', 'damage_toggle', 'damage', 'damage_ability', 'damage_bonus', 'damage_type', 'damage_crit', 'second_damage_formula', 'second_damage_crit_formula', 'second_damage_toggle', 'second_damage', 'second_damage_ability', 'second_damage_bonus', 'second_damage_type', 'second_damage_crit', 'heal_formula', 'heal_toggle', 'heal', 'heal_ability', 'heal_bonus', 'heal_query_toggle', 'higher_level_query', 'higher_level_toggle', 'higher_level_dice', 'higher_level_die', 'second_higher_level_dice', 'second_higher_level_die', 'higher_level_heal', 'extras_toggle', 'emote', 'freetext', 'freeform', 'special_effects_toggle', 'special_effects_type', 'special_effects_color', 'special_effects_points_of_origin', 'parsed'];
     this.levelToPsiCost = {
       0: 0,
       1: 2,
@@ -62,7 +62,7 @@ export class Psionics {
     getSetRepeatingItems('psionics.update', {
       repeatingItems: [`repeating_psionic${level}`],
       collectionArray,
-      collectionArrayAddItems: ['name', 'discipline', 'power_level', 'manifesting_time', 'display', 'concentration', 'duration', 'type', 'roll_toggle', 'to_hit', 'attack_formula', 'proficiency', 'attack_ability', 'attack_bonus', 'saving_throw_toggle', 'saving_throw_ability', 'saving_throw_vs_ability', 'saving_throw_bonus', 'saving_throw_dc', 'damage_toggle', 'damage_formula', 'damage', 'damage_ability', 'damage_bonus', 'damage_type', 'damage_crit', 'second_damage_toggle', 'second_damage_formula', 'second_damage', 'second_damage_ability', 'second_damage_bonus', 'second_damage_type', 'second_damage_crit', 'damage_string', 'parsed', 'heal_toggle', 'heal', 'heal_ability', 'heal_bonus', 'heal_query_toggle', 'higher_level_toggle', 'higher_level_dice', 'higher_level_die', 'second_higher_level_dice', 'second_higher_level_die', 'higher_level_heal', 'meditate', 'meditate_output', 'materials', 'materials_show', 'extras_toggle', 'emote', 'freetext', 'freeform'],
+      collectionArrayAddItems: ['name', 'discipline', 'psionic_level', 'manifesting_time', 'display', 'concentration', 'duration', 'type', 'roll_toggle', 'to_hit', 'attack_formula', 'proficiency', 'attack_ability', 'attack_bonus', 'saving_throw_toggle', 'saving_throw_ability', 'saving_throw_vs_ability', 'saving_throw_bonus', 'saving_throw_dc', 'damage_toggle', 'damage_formula', 'damage', 'damage_ability', 'damage_bonus', 'damage_type', 'damage_crit', 'second_damage_toggle', 'second_damage_formula', 'second_damage', 'second_damage_ability', 'second_damage_bonus', 'second_damage_type', 'second_damage_crit', 'damage_string', 'parsed', 'heal_toggle', 'heal', 'heal_ability', 'heal_bonus', 'heal_query_toggle', 'higher_level_toggle', 'higher_level_dice', 'higher_level_die', 'second_higher_level_dice', 'second_higher_level_die', 'higher_level_heal', 'meditate', 'meditate_output', 'materials', 'materials_show', 'extras_toggle', 'emote', 'freetext', 'freeform'],
       rowId,
       callback: (v, finalSetAttrs, ids, repeatingItem) => {
         for (const id of ids) {
@@ -74,10 +74,10 @@ export class Psionics {
             continue;
           }
 
-          if (isUndefinedOrEmpty(v[`${repeatingString}power_level`]) || v[`${repeatingString}power_level`] === 'TALENT') {
+          if (isUndefinedOrEmpty(v[`${repeatingString}psionic_level`]) || v[`${repeatingString}psionic_level`] === 'TALENT') {
             finalSetAttrs[`${repeatingString}manifest_as_level`] = '';
           } else {
-            const psionicLevel = getIntValue(v[`${repeatingString}power_level`]);
+            const psionicLevel = getIntValue(v[`${repeatingString}psionic_level`]);
             finalSetAttrs[`${repeatingString}manifest_as_level`] = `@{manifest_as_level_${psionicLevel}}`;
           }
 
@@ -87,7 +87,7 @@ export class Psionics {
             finalSetAttrs[`${repeatingString}concentration`] = '';
           }
           if (v[`${repeatingString}meditate`] === 'Yes') {
-            finalSetAttrs[`${repeatingString}meditate_output`] = '?{Cast as|Meditate,{{meditate=1&#125;&#125;|Psionic Power,}';
+            finalSetAttrs[`${repeatingString}meditate_output`] = '?{Cast as|Meditate,{{meditate=1&#125;&#125;|Psionic,}';
           } else {
             finalSetAttrs[`${repeatingString}meditate_output`] = '';
           }
@@ -153,7 +153,7 @@ export class Psionics {
       callback: (v, finalSetAttrs, ids, repeatingItem) => {
         for (const id of ids) {
           const repeatingString = `${repeatingItem}_${id}_`;
-          const newLevel = getIntValue(v[`${repeatingString}power_level`]);
+          const newLevel = getIntValue(v[`${repeatingString}psionic_level`]);
           if (oldLevel !== newLevel) {
             const newRepeatingString = `repeating_psionic${newLevel}_${generateRowID()}_`;
             for (const field of collectionArrayAddItems) {
@@ -212,12 +212,12 @@ export class Psionics {
     getSetRepeatingItems('psionics.updateChatMacro', {
       repeatingItems,
       collectionArray,
-      collectionArrayAddItems: ['name', 'power_level'],
+      collectionArrayAddItems: ['name', 'psionic_level'],
       callback: (v, finalSetAttrs, ids, repeatingItem) => {
         for (const id of ids) {
           const repeatingString = `${repeatingItem}_${id}_`;
           const name = v[`${repeatingString}name`];
-          const psionicLevel = getIntValue(v[`${repeatingString}power_level`], 0);
+          const psionicLevel = getIntValue(v[`${repeatingString}psionic_level`], 0);
 
           if (!name) {
             removeRepeatingRow(`${repeatingItem}_${id}`);
@@ -232,7 +232,7 @@ export class Psionics {
           classes = classes.map((className) => {
             return `sheet-${className}`;
           }).join(' ');
-          levels[psionicLevel].push(`<span class="${classes}">[${name}](~repeating_psionic${psionicLevel}_${id}_power)</span>`);
+          levels[psionicLevel].push(`<span class="${classes}">[${name}](~repeating_psionic${psionicLevel}_${id}_psionic)</span>`);
         }
 
         for (const level in levels) {
@@ -287,7 +287,7 @@ export class Psionics {
       on(`change:repeating_psionic${level}`, (eventInfo) => {
         const repeatingInfo = getRepeatingInfo(`repeating_psionic${level}`, eventInfo);
         if (repeatingInfo) {
-          if (repeatingInfo.field === 'power_level') {
+          if (repeatingInfo.field === 'psionic_level') {
             this.changeLevel(repeatingInfo.rowId, level);
           }
           if (repeatingInfo.field !== 'roll_toggle' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'damage_crit' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'second_damage_crit' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'heal_formula' && repeatingInfo.field !== 'higher_level_query' && repeatingInfo.field !== 'manifest_as_level' && repeatingInfo.field !== 'parsed') {
