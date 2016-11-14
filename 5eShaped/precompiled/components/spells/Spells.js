@@ -594,11 +594,12 @@ export class Spells {
       });
     }
   }
-  spellsToRepeatingSectionsForEachLevel() {
+  spellsToRepeatingSectionsForEachLevel(rowId) {
     const collectionArrayAddItems = this.conversionArray;
     getSetRepeatingItems('spells.spellsToRepeatingSectionsForEachLevel', {
       repeatingItems: ['repeating_spell'],
       collectionArrayAddItems,
+      rowId,
       callback: (v, finalSetAttrs, ids, repeatingItem) => {
         for (const id of ids) {
           const repeatingString = `${repeatingItem}_${id}_`;
@@ -630,7 +631,7 @@ export class Spells {
       const repeatingInfo = getRepeatingInfo('repeating_spell', eventInfo);
       if (repeatingInfo) {
         if (repeatingInfo.field !== 'toggle_details' && repeatingInfo.field !== 'roll_toggle' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'damage_crit' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'second_damage_crit' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'heal_formula' && repeatingInfo.field !== 'higher_level_query' && repeatingInfo.field !== 'cast_as_level' && repeatingInfo.field !== 'parsed') {
-          this.spellsToRepeatingSectionsForEachLevel();
+          this.spellsToRepeatingSectionsForEachLevel(repeatingInfo.rowId);
         }
       }
     });
