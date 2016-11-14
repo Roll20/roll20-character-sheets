@@ -437,7 +437,7 @@ export class Upgrade {
     });
   }
   psionicsToRepeatingSectionsForEachLevel() {
-    const collectionArrayAddItems = psionics.conversionArray;
+    const collectionArrayAddItems = psionics.conversionArray.push('power_level');
     getSetRepeatingItems('upgrade.psionicsToRepeatingSectionsForEachLevel', {
       repeatingItems: ['repeating_psionics'],
       collectionArrayAddItems,
