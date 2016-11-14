@@ -1,11 +1,18 @@
 # Dungeon World VF
 
-Feuille de Personnage en français pour [Dungeon World V1 et V2](http://dungeonworld-fr.blogspot.fr/), adaptée de la feuille VO de Willem den Besten (Morenim) et Devindra Payment (@Ardnived) ... et considérablement modifiée.
+Feuille de Personnage en français pour [Dungeon World V1 et V2](http://dungeonworld.pbta.fr/).
+Basée sur la feuille VO de Willem den Besten (Morenim) et Devindra Payment (@Ardnived) ... et considérablement modifiée.
 
 # Version courante
-3.0 [Capture d'écran](dwfr.png)
+3.1 [Capture d'écran](dwfr.png)
 
 # Notes de version
+
+##v3.1 (2016-11-11)
+
+* Ajout de 2 options, pour des bonus interactifs aux jets et dégâts
+* Ajout d'un onglet "Notes" ... pour noter des choses
+* Info-bulle plus détaillée des jets dans le roll template / chat
 
 ##v3.0 (2016-08-12)
 
@@ -27,12 +34,12 @@ Merci à Acritarche, Antoine P., MaxiMax, Eric Nieudan et les autres pour leur a
   * Actions de Bases et Spéciales pré renseignées, modifiables dans une certaine mesure
   * Actions de Départ pré renseignées, si une classe est choisie, et modifiables dans une certaine mesure
   * Possibilité d'ajouter des actions "customs" pour tous les types d'Actions / onglets.
-* Actions custom et Avancées : 
+* Actions custom et Avancées :
   * coche "oeil" pour afficher/masquer la  description de l'action dans le template de jet de l'action
   * coche pour faire un jet  2d6+choix carac (ou aucune/0) dans le template de jet de l'action
   * coche pour faire un jet de dégâts dans le template de jet de l'action
   * ajout de 3 zones de texte pour afficher le résultat du jet (si jet il y a) sur 10+, 7-9 et 6-.
-* Sorts : 
+* Sorts :
   * Ajout d'une zone de saisie pour le niveau du sort
   * Ajout d'une coche "Préparé" (si cochée/décochée, met à jour le total de niveaux de sorts préparés, cf. ci-dessous)
   * Ajout d'une zone de saisie du nombre à ajouter au niveau pour calculer le maximum de niveaux de sort "préparables" (et affichage de ce maximum, donc)
@@ -46,7 +53,7 @@ Merci à Acritarche, Antoine P., MaxiMax, Eric Nieudan et les autres pour leur a
 * Ajout du logo
 * Affichage légèrement plus compact
 * Ajout du nombre d'utilisations (courante et maximum) dans le matériel
-* Affichage direct de la base de PV et de la base de Charge 
+* Affichage direct de la base de PV et de la base de Charge
 * Reformatage des sorts sur la colonne de droite, sous les actions
 
 ##v1.0 (2016-02-21)
