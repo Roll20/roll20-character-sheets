@@ -463,14 +463,6 @@ export class Upgrade {
       },
     });
   }
-  start() {
-    getSetItems('upgrade.start', {
-      collectionArray: ['processing'],
-      callback: (v, finalSetAttrs) => {
-        finalSetAttrs.processing = true;
-      },
-    });
-  }
   versionCompare(left, right) {
     if (typeof left !== 'string' || typeof right !== 'string') {
       return false;
@@ -492,9 +484,7 @@ export class Upgrade {
   upgradeCheckAndExecute(currentVersion, version, callback) {
     if (this.versionCompare(currentVersion, version) < 0) {
       console.info(`version ${version} upgrade`);
-      this.start();
       callback();
-      overlay.close();
     }
   }
   upgrade(currentVersion) {
