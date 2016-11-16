@@ -22,7 +22,6 @@ const upgrade = new Upgrade();
 import { getSetItems, getSetRepeatingItems, isUndefinedOrEmpty, setFinalAttrs, getSkillIdByStorageName } from './utilities';
 import { currentVersion } from './version';
 
-
 export class Initialize {
   generateSkills() {
     getSetRepeatingItems('initialize.generateSkills', {
@@ -60,6 +59,10 @@ export class Initialize {
     for (const ability of ABILITIES) {
       collectionArray.push(ability);
     }
+    for (let level = 0; level <= 9; level++) {
+      collectionArray.push(`spells_level_${level}_macro_var`);
+      collectionArray.push(`psionics_level_${level}_macro_var`);
+    }
     getSetItems('initialize.sheetOpened', {
       collectionArray,
       callback: (v, finalSetAttrs) => {
@@ -75,6 +78,14 @@ export class Initialize {
           for (const ability of ABILITIES) {
             if (isUndefinedOrEmpty(v[ability])) {
               setAbilities[ability] = 10;
+            }
+          }
+          for (let level = 0; level <= 9; level++) {
+            if (isUndefinedOrEmpty(v[`spells_level_${level}_macro_var`])) {
+              finalSetAttrs[`spells_level_${level}_macro_var`] = '';
+            }
+            if (isUndefinedOrEmpty(v[`psionics_level_${level}_macro_var`])) {
+              finalSetAttrs[`psionics_level_${level}_macro_var`] = '';
             }
           }
           setFinalAttrs(v, setAbilities, 'initialize', () => {
