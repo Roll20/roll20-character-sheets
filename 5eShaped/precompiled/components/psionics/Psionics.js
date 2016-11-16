@@ -230,7 +230,7 @@ export class Psionics {
           chatMacro.push(`<span class="${classes}">[${name}](~repeating_psionic${level}_${id}_psionic)</span>`);
         }
 
-        finalSetAttrs[`psionics_level_${level}_macro_var`] = levels[level].join(', ');
+        finalSetAttrs[`psionics_level_${level}_macro_var`] = chatMacro.join(', ');
       },
     });
   }
