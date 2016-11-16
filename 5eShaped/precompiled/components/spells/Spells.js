@@ -428,19 +428,15 @@ export class Spells {
     });
   }
   updateChatMacro(levelsToUpdate) {
-    console.log('spells updateChatMacro', levelsToUpdate);
     const collectionArray = [];
     const repeatingItems = [];
-    const levels = {};
     if (!levelsToUpdate) {
       levelsToUpdate = [];
       for (let level = 0; level <= 9; level++) {
         levelsToUpdate.push(level);
       }
     }
-    console.log('levelsToUpdate', levelsToUpdate);
     for (const level of levelsToUpdate) {
-      levels[level] = [];
       collectionArray.push(`spells_level_${level}_macro_var`);
       repeatingItems.push(`repeating_spell${level}`);
     }
@@ -449,11 +445,11 @@ export class Spells {
       collectionArray,
       collectionArrayAddItems: ['name', 'is_prepared'],
       callback: (v, finalSetAttrs, ids, repeatingItem) => {
+        const chatMacro = [];
+        const level = getIntValue(repeatingItem.substr(repeatingItem.length - 1));
         for (const id of ids) {
           const repeatingString = `${repeatingItem}_${id}_`;
           const name = v[`${repeatingString}name`];
-          const level = getIntValue(repeatingItem.substr(repeatingItem.length - 1));
-          console.log('level', level);
 
           if (!name) {
             removeRepeatingRow(`${repeatingItem}_${id}`);
@@ -466,14 +462,10 @@ export class Spells {
           classes = classes.map((className) => {
             return `sheet-${className}`;
           }).join(' ');
-          levels[level].push(`<span class="${classes}">[${name}](~repeating_spell${level}_${id}_spell)</span>`);
+          chatMacro.push(`<span class="${classes}">[${name}](~repeating_spell${level}_${id}_spell)</span>`);
         }
 
-        for (const level in levels) {
-          if (levels.hasOwnProperty(level)) {
-            finalSetAttrs[`spells_level_${level}_macro_var`] = levels[level].join(', ');
-          }
-        }
+        finalSetAttrs[`spells_level_${level}_macro_var`] = chatMacro.join(', ');
       },
     });
   }

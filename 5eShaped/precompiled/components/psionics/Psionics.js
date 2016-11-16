@@ -196,19 +196,15 @@ export class Psionics {
     });
   }
   updateChatMacro(levelsToUpdate) {
-    console.log('psionics updateChatMacro');
     const collectionArray = [];
     const repeatingItems = [];
-    const levels = {};
     if (!levelsToUpdate) {
       levelsToUpdate = [];
       for (let level = 0; level <= 9; level++) {
         levelsToUpdate.push(level);
       }
     }
-    console.log('levelsToUpdate', levelsToUpdate);
     for (const level of levelsToUpdate) {
-      levels[level] = [];
       collectionArray.push(`psionics_level_${level}_macro_var`);
       repeatingItems.push(`repeating_psionic${level}`);
     }
@@ -217,11 +213,11 @@ export class Psionics {
       collectionArray,
       collectionArrayAddItems: ['name'],
       callback: (v, finalSetAttrs, ids, repeatingItem) => {
+        const chatMacro = [];
+        const level = getIntValue(repeatingItem.substr(repeatingItem.length - 1));
         for (const id of ids) {
           const repeatingString = `${repeatingItem}_${id}_`;
           const name = v[`${repeatingString}name`];
-          const level = getIntValue(repeatingItem.substr(repeatingItem.length - 1));
-          console.log('level', level);
 
           if (!name) {
             removeRepeatingRow(`${repeatingItem}_${id}`);
@@ -231,15 +227,10 @@ export class Psionics {
           classes = classes.map((className) => {
             return `sheet-${className}`;
           }).join(' ');
-          levels[level].push(`<span class="${classes}">[${name}](~repeating_psionic${level}_${id}_psionic)</span>`);
+          chatMacro.push(`<span class="${classes}">[${name}](~repeating_psionic${level}_${id}_psionic)</span>`);
         }
-        console.log('levels', levels);
 
-        for (const level in levels) {
-          if (levels.hasOwnProperty(level)) {
-            finalSetAttrs[`psionics_level_${level}_macro_var`] = levels[level].join(', ');
-          }
-        }
+        finalSetAttrs[`psionics_level_${level}_macro_var`] = levels[level].join(', ');
       },
     });
   }
