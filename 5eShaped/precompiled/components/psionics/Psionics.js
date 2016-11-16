@@ -146,6 +146,7 @@ export class Psionics {
   }
   changeLevel(rowId, oldLevel) {
     const collectionArrayAddItems = this.conversionArray;
+    let newLevel;
     getSetRepeatingItems('psionics.changePsionicLevel', {
       repeatingItems: [`repeating_psionic${oldLevel}`],
       collectionArrayAddItems,
@@ -153,16 +154,18 @@ export class Psionics {
       callback: (v, finalSetAttrs, ids, repeatingItem) => {
         for (const id of ids) {
           const repeatingString = `${repeatingItem}_${id}_`;
-          const newLevel = getIntValue(v[`${repeatingString}psionic_level`]);
+          newLevel = getIntValue(v[`${repeatingString}psionic_level`]);
           if (oldLevel !== newLevel) {
             const newRepeatingString = `repeating_psionic${newLevel}_${generateRowID()}_`;
             for (const field of collectionArrayAddItems) {
               this.oldValueToNew(v, finalSetAttrs, repeatingString, newRepeatingString, field);
             }
             removeRepeatingRow(`${repeatingItem}_${id}`);
-            this.updateChatMacro([oldLevel, newLevel]);
           }
         }
+      },
+      setFinalAttrsCallback: () => {
+        this.updateChatMacro([oldLevel, newLevel]);
       },
     });
   }

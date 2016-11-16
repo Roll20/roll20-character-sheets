@@ -181,6 +181,7 @@ export class Spells {
   }
   changeLevel(rowId, oldLevel) {
     const collectionArrayAddItems = this.conversionArray;
+    let newLevel;
     getSetRepeatingItems('spells.changeLevel', {
       repeatingItems: [`repeating_spell${oldLevel}`],
       collectionArrayAddItems,
@@ -188,16 +189,18 @@ export class Spells {
       callback: (v, finalSetAttrs, ids, repeatingItem) => {
         for (const id of ids) {
           const repeatingString = `${repeatingItem}_${id}_`;
-          const newLevel = getIntValue(v[`${repeatingString}spell_level`]);
+          newLevel = getIntValue(v[`${repeatingString}spell_level`]);
           if (oldLevel !== newLevel) {
             const newRepeatingString = `repeating_spell${newLevel}_${generateRowID()}_`;
             for (const field of collectionArrayAddItems) {
               this.oldValueToNew(v, finalSetAttrs, repeatingString, newRepeatingString, field);
             }
             removeRepeatingRow(`${repeatingItem}_${id}`);
-            this.updateChatMacro([oldLevel, newLevel]);
           }
         }
+      },
+      setFinalAttrsCallback: () => {
+        this.updateChatMacro([oldLevel, newLevel]);
       },
     });
   }
