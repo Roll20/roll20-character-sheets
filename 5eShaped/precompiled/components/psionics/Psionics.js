@@ -160,20 +160,21 @@ export class Psionics {
               this.oldValueToNew(v, finalSetAttrs, repeatingString, newRepeatingString, field);
             }
             removeRepeatingRow(`${repeatingItem}_${id}`);
+            this.updateChatMacro([oldLevel, newLevel]);
           }
         }
       },
     });
   }
-  updateShowHide(levelToUpdate) {
-    let minLevel = 0;
-    let maxLevel = 9;
-    if (levelToUpdate) {
-      minLevel = levelToUpdate;
-      maxLevel = levelToUpdate;
-    }
+  updateShowHide(levelsToUpdate) {
     const collectionArray = ['psi_limit'];
-    for (let level = minLevel; level <= maxLevel; level++) {
+    if (!levelsToUpdate) {
+      levelsToUpdate = [];
+      for (let level = 0; level <= 9; level++) {
+        levelsToUpdate.push(level);
+      }
+    }
+    for (let level of levelsToUpdate) {
       collectionArray.push(`psionics_level_${level}_macro_var`);
       collectionArray.push(`psionics_level_${level}_show`);
     }
@@ -181,7 +182,7 @@ export class Psionics {
       collectionArray,
       callback: (v, finalSetAttrs) => {
         const psiLimit = getIntValue(v.psi_limit, 2);
-        for (let level = minLevel; level <= maxLevel; level++) {
+        for (let level of levelsToUpdate) {
           const hasPsionics = v[`psionics_level_${level}_macro_var`];
           const belowPsiLimit = this.levelToPsiCost[level] <= psiLimit;
 
@@ -194,17 +195,19 @@ export class Psionics {
       },
     });
   }
-  updateChatMacro(levelToUpdate) {
-    const levels = {};
-    let minLevel = 0;
-    let maxLevel = 9;
-    if (levelToUpdate) {
-      minLevel = levelToUpdate;
-      maxLevel = levelToUpdate;
-    }
+  updateChatMacro(levelsToUpdate) {
+    console.log('psionics updateChatMacro');
     const collectionArray = [];
     const repeatingItems = [];
-    for (let level = minLevel; level <= maxLevel; level++) {
+    const levels = {};
+    if (!levelsToUpdate) {
+      levelsToUpdate = [];
+      for (let level = 0; level <= 9; level++) {
+        levelsToUpdate.push(level);
+      }
+    }
+    console.log('levelsToUpdate', levelsToUpdate);
+    for (let level of levelsToUpdate) {
       levels[level] = [];
       collectionArray.push(`psionics_level_${level}_macro_var`);
       repeatingItems.push(`repeating_psionic${level}`);
@@ -212,36 +215,29 @@ export class Psionics {
     getSetRepeatingItems('psionics.updateChatMacro', {
       repeatingItems,
       collectionArray,
-      collectionArrayAddItems: ['name', 'psionic_level'],
+      collectionArrayAddItems: ['name'],
       callback: (v, finalSetAttrs, ids, repeatingItem) => {
         for (const id of ids) {
           const repeatingString = `${repeatingItem}_${id}_`;
           const name = v[`${repeatingString}name`];
-          const psionicLevel = getIntValue(v[`${repeatingString}psionic_level`], 0);
+          const level = getIntValue(repeatingItem.substr(repeatingItem.length - 1));
+          console.log('level', level);
 
           if (!name) {
             removeRepeatingRow(`${repeatingItem}_${id}`);
             continue;
           }
-          if (!levels[psionicLevel]) {
-            levels[psionicLevel] = [];
-          }
           let classes = ['psionic-wrapper'];
-
-
           classes = classes.map((className) => {
             return `sheet-${className}`;
           }).join(' ');
-          levels[psionicLevel].push(`<span class="${classes}">[${name}](~repeating_psionic${psionicLevel}_${id}_psionic)</span>`);
+          levels[level].push(`<span class="${classes}">[${name}](~repeating_psionic${level}_${id}_psionic)</span>`);
         }
+        console.log('levels', levels);
 
         for (const level in levels) {
           if (levels.hasOwnProperty(level)) {
-            if (level.length > 0) {
-              finalSetAttrs[`psionics_level_${level}_macro_var`] = levels[level].join(', ');
-            } else {
-              finalSetAttrs[`psionics_level_${level}_macro_var`] = '';
-            }
+            finalSetAttrs[`psionics_level_${level}_macro_var`] = levels[level].join(', ');
           }
         }
       },
@@ -278,7 +274,7 @@ export class Psionics {
   watchForChanges() {
     for (let level = 0; level <= 9; level++) {
       on(`change:psionics_level_${level}_macro_var`, () => {
-        this.updateShowHide(level);
+        this.updateShowHide([level]);
       });
     }
   }
@@ -290,16 +286,16 @@ export class Psionics {
           if (repeatingInfo.field === 'psionic_level') {
             this.changeLevel(repeatingInfo.rowId, level);
           }
-          if (repeatingInfo.field !== 'roll_toggle' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'damage_crit' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'second_damage_crit' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'heal_formula' && repeatingInfo.field !== 'higher_level_query' && repeatingInfo.field !== 'manifest_as_level' && repeatingInfo.field !== 'parsed') {
+          if (repeatingInfo.field !== 'psionic_level' && repeatingInfo.field !== 'roll_toggle' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'damage_crit' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'second_damage_crit' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'heal_formula' && repeatingInfo.field !== 'higher_level_query' && repeatingInfo.field !== 'manifest_as_level' && repeatingInfo.field !== 'parsed') {
             if (repeatingInfo.field !== 'toggle_details') {
               this.update(repeatingInfo.rowId, level);
             }
-            this.updateChatMacro(level);
+            this.updateChatMacro([level]);
           }
         }
       });
       on(`remove:repeating_psionic${level}`, () => {
-        this.updateChatMacro(level);
+        this.updateChatMacro([level]);
       });
     }
   }

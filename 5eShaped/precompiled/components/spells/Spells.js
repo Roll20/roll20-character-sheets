@@ -195,6 +195,7 @@ export class Spells {
               this.oldValueToNew(v, finalSetAttrs, repeatingString, newRepeatingString, field);
             }
             removeRepeatingRow(`${repeatingItem}_${id}`);
+            this.updateChatMacro([oldLevel, newLevel]);
           }
         }
       },
@@ -389,15 +390,15 @@ export class Spells {
     }
     return hasHigherLevelSlots;
   }
-  updateShowHide(levelToUpdate) {
-    let minLevel = 0;
-    let maxLevel = 9;
-    if (levelToUpdate) {
-      minLevel = levelToUpdate;
-      maxLevel = levelToUpdate;
-    }
+  updateShowHide(levelsToUpdate) {
     const collectionArray = ['warlock_spell_slots', 'warlock_spells_max_level'];
-    for (let level = minLevel; level <= maxLevel; level++) {
+    if (!levelsToUpdate) {
+      levelsToUpdate = [];
+      for (let level = 0; level <= 9; level++) {
+        levelsToUpdate.push(level);
+      }
+    }
+    for (let level of levelsToUpdate) {
       collectionArray.push(`spell_slots_l${level}`);
       collectionArray.push(`spell_slots_l${level}_max`);
       collectionArray.push(`spell_slots_l${level}_toggle`);
@@ -408,7 +409,7 @@ export class Spells {
     getSetItems('spells.updateShowHide', {
       collectionArray,
       callback: (v, finalSetAttrs) => {
-        for (let level = minLevel; level <= maxLevel; level++) {
+        for (let level of levelsToUpdate) {
           const hasSpells = v[`spells_level_${level}_macro_var`];
           const hasSlots = getIntValue(v[`spell_slots_l${level}`]) > 0;
           const hasSlotsMax = getIntValue(v[`spell_slots_l${level}_max`]) > 0;
@@ -426,17 +427,19 @@ export class Spells {
       },
     });
   }
-  updateChatMacro(levelToUpdate) {
-    const levels = {};
-    let minLevel = 0;
-    let maxLevel = 9;
-    if (levelToUpdate) {
-      minLevel = levelToUpdate;
-      maxLevel = levelToUpdate;
-    }
+  updateChatMacro(levelsToUpdate) {
+    console.log('spells updateChatMacro', levelsToUpdate);
     const collectionArray = [];
     const repeatingItems = [];
-    for (let level = minLevel; level <= maxLevel; level++) {
+    const levels = {};
+    if (!levelsToUpdate) {
+      levelsToUpdate = [];
+      for (let level = 0; level <= 9; level++) {
+        levelsToUpdate.push(level);
+      }
+    }
+    console.log('levelsToUpdate', levelsToUpdate);
+    for (let level of levelsToUpdate) {
       levels[level] = [];
       collectionArray.push(`spells_level_${level}_macro_var`);
       repeatingItems.push(`repeating_spell${level}`);
@@ -444,47 +447,32 @@ export class Spells {
     getSetRepeatingItems('spells.updateChatMacro', {
       repeatingItems,
       collectionArray,
-      collectionArrayAddItems: ['name', 'spell_level', 'is_prepared', 'ritual', 'concentration', 'components', 'casting_time'],
+      collectionArrayAddItems: ['name', 'is_prepared'],
       callback: (v, finalSetAttrs, ids, repeatingItem) => {
         for (const id of ids) {
           const repeatingString = `${repeatingItem}_${id}_`;
           const name = v[`${repeatingString}name`];
-          const spellLevel = getIntValue(v[`${repeatingString}spell_level`], 0);
+          const level = getIntValue(repeatingItem.substr(repeatingItem.length - 1));
+          console.log('level', level);
 
           if (!name) {
             removeRepeatingRow(`${repeatingItem}_${id}`);
             continue;
           }
-          if (!levels[spellLevel]) {
-            levels[spellLevel] = [];
-          }
           let classes = ['spell-wrapper'];
-          classes.push(`${v[`${repeatingString}spell_level`]}`);
           if (v[`${repeatingString}is_prepared`] === 'Yes') {
             classes.push('prepared');
           }
-          if (v[`${repeatingString}ritual`] === 'Yes') {
-            classes.push('ritual');
-          }
-          if (v[`${repeatingString}concentration`] === 'Yes') {
-            classes.push('concentration');
-          }
-          classes.push(`${v[`${repeatingString}components`]}`);
-          classes.push(`${v[`${repeatingString}casting_time`]}`);
-
           classes = classes.map((className) => {
             return `sheet-${className}`;
           }).join(' ');
-          levels[spellLevel].push(`<span class="${classes}">[${name}](~repeating_spell${spellLevel}_${id}_spell)</span>`);
+          levels[level].push(`<span class="${classes}">[${name}](~repeating_spell${level}_${id}_spell)</span>`);
         }
+        console.log('levels', levels);
 
         for (const level in levels) {
           if (levels.hasOwnProperty(level)) {
-            if (level.length > 0) {
-              finalSetAttrs[`spells_level_${level}_macro_var`] = levels[level].join(', ');
-            } else {
-              finalSetAttrs[`spells_level_${level}_macro_var`] = '';
-            }
+            finalSetAttrs[`spells_level_${level}_macro_var`] = levels[level].join(', ');
           }
         }
       },
@@ -561,7 +549,7 @@ export class Spells {
     let watch = ['warlock_spells_max_level', 'warlock_spell_slots'];
     for (let level = 0; level <= 9; level++) {
       on(`change:spells_level_${level}_macro_var`, () => {
-        this.updateShowHide(level);
+        this.updateShowHide([level]);
       });
       watch.push(`spell_slots_l${level}`);
       watch.push(`spell_slots_l${level}_max`);
@@ -581,16 +569,17 @@ export class Spells {
           if (repeatingInfo.field === 'spell_level') {
             this.changeLevel(repeatingInfo.rowId, level);
           }
-          if (repeatingInfo.field !== 'roll_toggle' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'damage_crit' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'second_damage_crit' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'heal_formula' && repeatingInfo.field !== 'higher_level_query' && repeatingInfo.field !== 'cast_as_level' && repeatingInfo.field !== 'parsed') {
+          if (repeatingInfo.field !== 'spell_level' && repeatingInfo.field !== 'roll_toggle' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'damage_crit' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'second_damage_crit' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'heal_formula' && repeatingInfo.field !== 'higher_level_query' && repeatingInfo.field !== 'cast_as_level' && repeatingInfo.field !== 'parsed') {
             if (repeatingInfo.field !== 'toggle_details') {
               this.update(repeatingInfo.rowId, level);
             }
-            this.updateChatMacro(level);
+            this.updateChatMacro([level]);
           }
         }
       });
       on(`remove:repeating_spell${level}`, () => {
-        this.updateChatMacro(level);
+        console.log('spell removed at level', level);
+        this.updateChatMacro([level]);
       });
     }
   }
