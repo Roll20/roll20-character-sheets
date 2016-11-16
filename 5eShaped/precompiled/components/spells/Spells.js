@@ -398,7 +398,7 @@ export class Spells {
         levelsToUpdate.push(level);
       }
     }
-    for (let level of levelsToUpdate) {
+    for (const level of levelsToUpdate) {
       collectionArray.push(`spell_slots_l${level}`);
       collectionArray.push(`spell_slots_l${level}_max`);
       collectionArray.push(`spell_slots_l${level}_toggle`);
@@ -409,7 +409,7 @@ export class Spells {
     getSetItems('spells.updateShowHide', {
       collectionArray,
       callback: (v, finalSetAttrs) => {
-        for (let level of levelsToUpdate) {
+        for (const level of levelsToUpdate) {
           const hasSpells = v[`spells_level_${level}_macro_var`];
           const hasSlots = getIntValue(v[`spell_slots_l${level}`]) > 0;
           const hasSlotsMax = getIntValue(v[`spell_slots_l${level}_max`]) > 0;
@@ -439,7 +439,7 @@ export class Spells {
       }
     }
     console.log('levelsToUpdate', levelsToUpdate);
-    for (let level of levelsToUpdate) {
+    for (const level of levelsToUpdate) {
       levels[level] = [];
       collectionArray.push(`spells_level_${level}_macro_var`);
       repeatingItems.push(`repeating_spell${level}`);
@@ -468,7 +468,6 @@ export class Spells {
           }).join(' ');
           levels[level].push(`<span class="${classes}">[${name}](~repeating_spell${level}_${id}_spell)</span>`);
         }
-        console.log('levels', levels);
 
         for (const level in levels) {
           if (levels.hasOwnProperty(level)) {

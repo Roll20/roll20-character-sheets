@@ -174,7 +174,7 @@ export class Psionics {
         levelsToUpdate.push(level);
       }
     }
-    for (let level of levelsToUpdate) {
+    for (const level of levelsToUpdate) {
       collectionArray.push(`psionics_level_${level}_macro_var`);
       collectionArray.push(`psionics_level_${level}_show`);
     }
@@ -182,7 +182,7 @@ export class Psionics {
       collectionArray,
       callback: (v, finalSetAttrs) => {
         const psiLimit = getIntValue(v.psi_limit, 2);
-        for (let level of levelsToUpdate) {
+        for (const level of levelsToUpdate) {
           const hasPsionics = v[`psionics_level_${level}_macro_var`];
           const belowPsiLimit = this.levelToPsiCost[level] <= psiLimit;
 
@@ -207,7 +207,7 @@ export class Psionics {
       }
     }
     console.log('levelsToUpdate', levelsToUpdate);
-    for (let level of levelsToUpdate) {
+    for (const level of levelsToUpdate) {
       levels[level] = [];
       collectionArray.push(`psionics_level_${level}_macro_var`);
       repeatingItems.push(`repeating_psionic${level}`);
