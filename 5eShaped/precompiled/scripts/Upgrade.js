@@ -17,8 +17,6 @@ const classes = new Classes();
 import { TOGGLE_VARS } from './constants';
 import { Equipment } from './../components/equipment/Equipment';
 const equipment = new Equipment();
-import { Overlay } from './../components/overlay/Overlay';
-const overlay = new Overlay();
 import { Npc } from './../components/npc/Npc';
 const npc = new Npc();
 import { Resistances } from './../components/resistances/Resistances';
