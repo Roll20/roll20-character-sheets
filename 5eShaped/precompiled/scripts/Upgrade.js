@@ -645,5 +645,8 @@ export class Upgrade {
       this.psionicsToRepeatingSectionsForEachLevel();
       psionics.updateChatMacro();
     });
+    this.upgradeCheckAndExecute(currentVersion, '7.0.6', () => {
+      settings.updatePreparedMatters();
+    });
   }
 }

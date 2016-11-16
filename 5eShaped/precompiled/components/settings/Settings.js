@@ -1,6 +1,6 @@
 /* global on:false */
 
-import { getSetItems } from './../../scripts/utilities';
+import { getSetItems, getIntValue } from './../../scripts/utilities';
 
 export class Settings {
   updateShapedD20() {
@@ -40,12 +40,28 @@ export class Settings {
       },
     });
   }
+  updatePreparedMatters() {
+    getSetItems('settings.updatePreparedMatters', {
+      collectionArray: ['prepared_matters', 'prepared_matters_var'],
+      callback: (v, finalSetAttrs) => {
+        console.log('getIntValue(v.prepared_matters)', getIntValue(v.prepared_matters));
+        if (getIntValue(v.prepared_matters)) {
+          finalSetAttrs.prepared_matters_var = true;
+        } else {
+          finalSetAttrs.prepared_matters_var = '';
+        }
+      },
+    });
+  }
   setup() {
     on('change:roll_setting', () => {
       this.updateShapedD20();
     });
     on('change:weight_system', () => {
       this.updateWeightSystem();
+    });
+    on('change:prepared_matters', () => {
+      this.updatePreparedMatters();
     });
   }
 }
