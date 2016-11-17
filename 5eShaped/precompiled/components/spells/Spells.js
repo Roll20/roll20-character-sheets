@@ -58,7 +58,7 @@ export class Spells {
     for (let level = 0; level <= 9; level++) {
       repeatingItems.push(`repeating_spell${level}`);
     }
-    getSetRepeatingItems('spells.update', {
+    getSetRepeatingItems('spells.updateDefaultAbility', {
       repeatingItems,
       collectionArray: ['default_ability'],
       collectionArrayAddItems: ['name', 'attack_ability', 'damage_ability', 'second_damage_ability', 'saving_throw_ability', 'heal_ability'],
