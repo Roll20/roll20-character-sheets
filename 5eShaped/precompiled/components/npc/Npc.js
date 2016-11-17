@@ -401,8 +401,10 @@ export class Npc {
         const senses = v.senses.toLowerCase();
         let radius;
         let dimRadius;
-        const darkvisionMatch = senses.match(/darkvision (\d+)/);
+        const darkvisionRegex = /darkvision (\d+)/;
+        const darkvisionMatch = senses.match(darkvisionRegex);
         if (darkvisionMatch && darkvisionMatch[1]) {
+          senses.replace(darkvisionRegex, '');
           radius = round(darkvisionMatch[1] * 1.166666666666);
           dimRadius = round(-5 * (darkvisionMatch[1] / 60));
         }
