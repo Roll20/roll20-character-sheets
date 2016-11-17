@@ -390,6 +390,14 @@ export class Npc {
       },
     });
   }
+  updateCasterLevel() {
+    getSetItems('npc.updateCasterLevel', {
+      collectionArray: ['spellcaster_level', 'caster_level'],
+      callback: (v, finalSetAttrs) => {
+        finalSetAttrs.caster_level = getIntValue(v.spellcaster_level);
+      },
+    });
+  }
   npcDroppedOnTabletop() {
     getSetItems('npc.npcDroppedOnTabletop', {
       collectionArray: ['is_npc', 'edit_mode', 'hp_max', 'senses'],
@@ -481,6 +489,9 @@ export class Npc {
     });
     on('change:ac_note', () => {
       this.updateACNote();
+    });
+    on('change:spellcaster_level', () => {
+      this.updateCasterLevel();
     });
     on('sheet:compendium-drop', () => {
       this.npcDroppedOnTabletop();

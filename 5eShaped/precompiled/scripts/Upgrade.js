@@ -444,6 +444,14 @@ export class Upgrade {
       },
     });
   }
+  setSpellcasterLevel() {
+    getSetItems('upgrade.setSpellcasterLevel', {
+      collectionArray: ['spellcaster_level', 'caster_level'],
+      callback: (v, finalSetAttrs) => {
+        finalSetAttrs.spellcaster_level = ordinalSpellLevel(v.caster_level);
+      },
+    });
+  }
   psionicsToRepeatingSectionsForEachLevel() {
     const collectionArrayAddItems = psionics.conversionArray.push('power_level');
     getSetRepeatingItems('upgrade.psionicsToRepeatingSectionsForEachLevel', {
@@ -657,7 +665,7 @@ export class Upgrade {
     });
     this.upgradeCheckAndExecute(currentVersion, '7.1.0', () => {
       this.defaultAbilityTranslate();
+      this.setSpellcasterLevel();
     });
-
   }
 }
