@@ -122,7 +122,7 @@ const updateSavingThrowToggle = (v, finalSetAttrs, repeatingString, options) => 
     parseName: 'savingThrowToggle',
     toggleField: 'saving_throw_toggle',
     toggleFieldSetTo: TOGGLE_VARS.saving_throw,
-    triggerFields: ['saving_throw_ability', 'saving_throw_bonus', 'saving_throw_vs_ability'],
+    triggerFields: ['saving_throw_bonus', 'saving_throw_vs_ability'],
   });
   if (fromVOrFinalSetAttrs(v, finalSetAttrs, `${repeatingString}saving_throw_toggle`) === TOGGLE_VARS.saving_throw) {
     let savingThrowDC = getIntValue(v.base_dc) + getIntValue(v.pb);
