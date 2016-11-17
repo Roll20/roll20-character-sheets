@@ -250,7 +250,7 @@ export class Actions {
     return freetext;
   }
   parse(type, rowId) {
-    const collectionArray = ['level', 'challenge', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability'];
+    const collectionArray = ['level', 'challenge', 'global_attack_bonus', 'global_melee_attack_bonus', 'global_ranged_attack_bonus', 'global_damage_bonus', 'global_melee_damage_bonus', 'global_ranged_damage_bonus', 'default_ability', 'spellcasting_class', 'innate_spellcasting', 'spellcasting'];
     for (const ability of ABILITIES) {
       collectionArray.push(`${ability}_mod`);
     }
@@ -273,7 +273,9 @@ export class Actions {
     const spellcastingRegex = /(\d+)\w+\slevel\s\((\d+)\s?slot(?:s)?\)/gi;
     const spellcastingLevelRegex = /(\d+)(?:st|dn|rd|th)-level spellcaster/i;
     const spellcastingAbilityRegex = /spellcasting ability is (\w+)/i;
-    const spellcastingAbilityRegexSecond = /uses (\w+) as his spellcasting ability/i;
+    const spellcastingAbilityRegexSecond = /uses (\w+) as (her|his) spellcasting ability/i;
+    const spellcastingClassRegex = /following (\w+) spells prepared/i;
+    const spellcastingClassRegexSecond = /following spells prepared from the (\w+) list/i;
 
     getSetRepeatingItems('actions.parse', {
       repeatingItems: [`repeating_${type}`],
@@ -315,6 +317,20 @@ export class Actions {
             if (spellcastingLevelSearch && spellcastingLevelSearch[1]) {
               finalSetAttrs.caster_level = spellcastingLevelSearch[1];
               finalSetAttrs.spellcaster_level = ordinalSpellLevel(spellcastingLevelSearch[1]);
+            }
+            const spellcastingClassSearch = spellcastingClassRegex.exec(freetext);
+            if (spellcastingClassSearch && spellcastingClassSearch[1]) {
+              finalSetAttrs.spellcasting_class = spellcastingClassSearch[1].toUpperCase();
+            } else {
+              const spellcastingClassSearchSecond = spellcastingClassRegexSecond.exec(freetext);
+              if (spellcastingClassSearchSecond && spellcastingClassSearchSecond[1]) {
+                finalSetAttrs.spellcasting_class = spellcastingClassSearchSecond[1].toUpperCase();
+              }
+            }
+            if (name === 'Innate Spellcasting') {
+              finalSetAttrs.innate_spellcasting = 1;
+            } if (name === 'Spellcasting') {
+              finalSetAttrs.spellcasting = 1;
             }
 
             let match;
