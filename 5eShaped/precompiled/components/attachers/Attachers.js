@@ -1,23 +1,31 @@
 /* global on:false */
 
-import { ABILITIES } from './../../scripts/constants';
+import { ABILITIES, CUSTOM_SAVING_THROWS } from './../../scripts/constants';
 import { getSetRepeatingItems, exists } from './../../scripts/utilities';
 
 export class Attachers {
   update() {
-    const collectionArray = ['attacher_initiative', 'attacher_death_saving_throw', 'attacher_hit_dice', 'attacher_attack', 'attacher_spell', 'attacher_skill', 'attacher_crit'];
-    const itemsToPush = ['initiative', 'death_saving_throw', 'hit_dice', 'attack', 'spell', 'skill'];
+    let collectionArray = ['initiative', 'death_saving_throw', 'hit_dice', 'attack', 'spell', 'psionic', 'skill', 'crit'];
     for (const ability of ABILITIES) {
-      collectionArray.push(`attacher_${ability}_check`);
-      collectionArray.push(`attacher_${ability}_saving_throw`);
-      itemsToPush.push(`${ability}_check`);
-      itemsToPush.push(`${ability}_saving_throw`);
+      collectionArray.push(`${ability}_check`);
+      collectionArray.push(`${ability}_saving_throw`);
     }
+    for (const customSavingThrow of CUSTOM_SAVING_THROWS) {
+      collectionArray.push(`${customSavingThrow}_saving_throw`);
+    }
+    for (let level = 0; level <= 9; level++) {
+      collectionArray.push(`spell_level_${level}`);
+      collectionArray.push(`psionic_level_${level}`);
+    }
+    const itemsToPush = collectionArray.slice(0); // copy the array
+    collectionArray = collectionArray.map((attacher) => {
+      return `attacher_${attacher}`;
+    });
 
     getSetRepeatingItems('attachers.update', {
       repeatingItems: ['repeating_attacher'],
       collectionArray,
-      collectionArrayAddItems: ['name', 'freetext', 'freeform', 'crit_attacher'],
+      collectionArrayAddItems: ['name', 'freetext', 'freeform'],
       itemsToPush,
       itemToPushSuffix: 'attacher',
       callback: (v, finalSetAttrs, ids, repeatingItem) => {
