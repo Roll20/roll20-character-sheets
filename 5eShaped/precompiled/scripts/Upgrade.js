@@ -633,13 +633,11 @@ export class Upgrade {
       this.attackToggle('repeating_reaction');
       this.attackToggle('repeating_legendaryaction');
     });
-    this.upgradeCheckAndExecute(currentVersion, '7.0.1', () => {
-      spells.spellsToRepeatingSectionsForEachLevel();
-    });
     this.upgradeCheckAndExecute(currentVersion, '7.0.3', () => {
       classes.updateLevels();
     });
     this.upgradeCheckAndExecute(currentVersion, '7.0.4', () => {
+      spells.spellsToRepeatingSectionsForEachLevel();
       this.psionicsToRepeatingSectionsForEachLevel();
     });
     this.upgradeCheckAndExecute(currentVersion, '7.0.6', () => {
