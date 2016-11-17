@@ -39,16 +39,16 @@ export class Psionics {
             continue;
           }
 
-          finalSetAttrs[`${repeatingString}attack_ability`] = getAbilityShortName(v.default_ability);
+          finalSetAttrs[`${repeatingString}attack_ability`] = v.default_ability.toLowerCase();
           if (v[`${repeatingString}damage_ability`]) {
-            finalSetAttrs[`${repeatingString}damage_ability`] = getAbilityShortName(v.default_ability);
+            finalSetAttrs[`${repeatingString}damage_ability`] = v.default_ability.toLowerCase();
           }
           if (v[`${repeatingString}second_damage_ability`]) {
-            finalSetAttrs[`${repeatingString}second_damage_ability`] = getAbilityShortName(v.default_ability);
+            finalSetAttrs[`${repeatingString}second_damage_ability`] = v.default_ability.toLowerCase();
           }
-          finalSetAttrs[`${repeatingString}saving_throw_ability`] = getAbilityShortName(v.default_ability);
+          finalSetAttrs[`${repeatingString}saving_throw_ability`] = v.default_ability.toLowerCase();
           if (v[`${repeatingString}heal_ability`]) {
-            finalSetAttrs[`${repeatingString}heal_ability`] = getAbilityShortName(v.default_ability);
+            finalSetAttrs[`${repeatingString}heal_ability`] = v.default_ability.toLowerCase();
           }
         }
       },
