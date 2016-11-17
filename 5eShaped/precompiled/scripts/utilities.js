@@ -155,20 +155,9 @@ const ordinalSpellLevel = (level) => {
   if (level === 0) {
     spellLevel = 'CANTRIP';
   } else {
-    switch (level % 10) {
-      case 1:
-        spellLevel = `${level}ST_LEVEL`;
-        break;
-      case 2:
-        spellLevel = `${level}ND_LEVEL`;
-        break;
-      case 3:
-        spellLevel = `${level}RD_LEVEL`;
-        break;
-      default:
-        spellLevel = `${level}TH_LEVEL`;
-        break;
-    }
+    const s = ['TH', 'ST', 'ND', 'RD'];
+    const v = level % 100;
+    spellLevel = `${level + (s[(v - 20) % 10] || s[v] || s[0])}_LEVEL`;
   }
   return spellLevel;
 };
