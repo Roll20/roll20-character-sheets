@@ -1,7 +1,7 @@
-/* global on:false, generateRowID:false */
+/* global on:false, generateRowID:false, setDefaultToken:false */
 
 import { ABILITIES } from './../../scripts/constants';
-import { getSetItems, getIntValue, isUndefinedOrEmpty, addArithmeticOperator, getAbilityMod, numberWithCommas, exists, updateHD } from './../../scripts/utilities';
+import { getSetItems, getIntValue, isUndefinedOrEmpty, addArithmeticOperator, getAbilityMod, numberWithCommas, exists, updateHD, round } from './../../scripts/utilities';
 
 export class Npc {
   updateType() {
@@ -392,10 +392,51 @@ export class Npc {
   }
   npcDroppedOnTabletop() {
     getSetItems('npc.npcDroppedOnTabletop', {
-      collectionArray: ['is_npc', 'edit_mode'],
+      collectionArray: ['is_npc', 'edit_mode', 'hp_max', 'senses'],
       callback: (v, finalSetAttrs) => {
         finalSetAttrs.is_npc = 1;
         finalSetAttrs.edit_mode = 0;
+
+        const hp = getIntValue(v.hp_max);
+        const senses = v.senses.toLowerCase();
+        let radius;
+        let dimRadius;
+        const darkvisionMatch = senses.match(/darkvision (\d+)/);
+        if (darkvisionMatch && darkvisionMatch[1]) {
+          radius = round(darkvisionMatch[1] * 1.166666666666);
+          dimRadius = round(-5 * (darkvisionMatch[1] / 60));
+        }
+        if (senses.match(/(blindsight|tremorsense|truesight)/)) {
+          const betterRadius = Math.max.apply(Math, senses.match(/\d+/g));
+          if (!radius) {
+            radius = betterRadius;
+          } else if (betterRadius > radius) {
+            radius = betterRadius;
+            dimRadius = null;
+          } else if (betterRadius < radius) {
+            dimRadius = betterRadius;
+          }
+        }
+
+        const tokenProps = {
+          bar1_value: hp,
+          bar1_max: hp,
+          bar2_link: 'AC',
+          bar3_link: 'speed',
+          showname: true,
+          showplayers_aura1: true,
+          showplayers_aura2: true,
+          light_angle: 360,
+          light_hassight: true,
+          light_losangle: 360,
+        };
+        if (radius) {
+          tokenProps.light_radius = radius;
+        }
+        if (dimRadius) {
+          tokenProps.light_dimradius = dimRadius;
+        }
+        setDefaultToken(tokenProps);
       },
     });
   }
