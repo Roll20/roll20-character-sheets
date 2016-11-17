@@ -120,7 +120,7 @@ export class Classes {
         for (const id of ids) {
           const repeatingString = `${repeatingItem}_${id}_`;
 
-          let className = v[`${repeatingString}name`];
+          let className = v[`${repeatingString}name`].toLowerCase();
           let classLevel = v[`${repeatingString}level`];
 
           if (isUndefinedOrEmpty(className) && isUndefinedOrEmpty(classLevel)) {

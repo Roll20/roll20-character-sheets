@@ -357,6 +357,18 @@ export class Upgrade {
       },
     });
   }
+  classNamesTranslate() {
+    getSetRepeatingItems('upgrade.classNamesTranslate', {
+      repeatingItems: ['repeating_class'],
+      collectionArrayAddItems: ['name'],
+      callback: (v, finalSetAttrs, ids, repeatingItem) => {
+        for (const id of ids) {
+          const repeatingString = `${repeatingItem}_${id}_`;
+          finalSetAttrs[`${repeatingString}name`] = v[`${repeatingString}name`].toUpperCase();
+        }
+      },
+    });
+  }
   spellEffectsNaming() {
     getSetRepeatingItems('upgrade.spellEffectsNaming', {
       repeatingItems: ['repeating_spell'],
@@ -665,6 +677,7 @@ export class Upgrade {
     });
     this.upgradeCheckAndExecute(currentVersion, '7.1.0', () => {
       this.defaultAbilityTranslate();
+      this.classNamesTranslate();
       this.setSpellcasterLevel();
     });
   }
