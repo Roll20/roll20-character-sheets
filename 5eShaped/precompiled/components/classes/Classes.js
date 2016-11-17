@@ -241,6 +241,7 @@ export class Classes {
             casterLevel = spellcasting.full + spellcasting.half + spellcasting.third;
           }
           finalSetAttrs.caster_level = casterLevel;
+          finalSetAttrs.spellcaster_level = ordinalSpellLevel(casterLevel);
         }
 
         if (classesWithSpellcasting > 1 || spellcasting.full) {

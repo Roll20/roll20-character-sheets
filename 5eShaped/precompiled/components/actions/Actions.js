@@ -3,7 +3,7 @@
 import { ABILITIES, TOGGLE_VARS } from './../../scripts/constants';
 import { ProficiencyBonus } from './../proficiencyBonus/ProficiencyBonus';
 const proficiencyBonus = new ProficiencyBonus();
-import { getSetRepeatingItems, isUndefined, isUndefinedOrEmpty, fromVOrFinalSetAttrs, setCritDamage, getIntValue, getRepeatingInfo, lowercaseDamageTypes, exists } from './../../scripts/utilities';
+import { getSetRepeatingItems, isUndefined, isUndefinedOrEmpty, fromVOrFinalSetAttrs, setCritDamage, getIntValue, getRepeatingInfo, lowercaseDamageTypes, exists, ordinalSpellLevel } from './../../scripts/utilities';
 import { updateAttackToggle, updateSavingThrowToggle, updateDamageToggle, updateHealToggle } from './../actionComponents/updateToggles';
 
 export class Actions {
@@ -314,6 +314,7 @@ export class Actions {
             const spellcastingLevelSearch = spellcastingLevelRegex.exec(freetext);
             if (spellcastingLevelSearch && spellcastingLevelSearch[1]) {
               finalSetAttrs.caster_level = spellcastingLevelSearch[1];
+              finalSetAttrs.spellcaster_level = ordinalSpellLevel(spellcastingLevelSearch[1]);
             }
 
             let match;
