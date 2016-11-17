@@ -9,11 +9,13 @@ export class Convert {
   parseSpellcastingAbility(v, finalSetAttrs) {
     if (v.spellcasting_ability) {
       finalSetAttrs.default_ability = v.spellcasting_ability
+        .replace('0*', '')
         .replace('@', '')
         .replace('{', '')
         .replace('_mod', '')
         .replace('}', '')
-        .replace('+', '');
+        .replace('+', '')
+        .toUpperCase();
     }
   }
   parseSizeTypeAlignment(v, finalSetAttrs) {

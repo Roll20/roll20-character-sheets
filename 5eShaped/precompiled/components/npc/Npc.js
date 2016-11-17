@@ -292,7 +292,7 @@ export class Npc {
       highestAbilityName = 'charisma';
     }
 
-    finalSetAttrs.default_ability = highestAbilityName;
+    finalSetAttrs.default_ability = highestAbilityName.toUpperCase();
   }
   updateContent() {
     const collectionArray = ['content_srd'];

@@ -27,20 +27,20 @@ const parseAttackComponent = (v, repeatingString, finalSetAttrs, options) => {
       finalSetAttrs[`${repeatingString}parsed`] += ` ${options.parseName}`;
     }
     if (options.attackAbility && isUndefined(v[`${repeatingString}attack_ability`])) {
-      finalSetAttrs[`${repeatingString}attack_ability`] = v.default_ability;
+      finalSetAttrs[`${repeatingString}attack_ability`] = getAbilityShortName(v.default_ability);
     }
 
     if (options.addCastingModifier) {
       if (!isUndefinedOrEmpty(v[`${repeatingString}damage`]) && isUndefined(v[`${repeatingString}damage_ability`])) {
-        finalSetAttrs[`${repeatingString}damage_ability`] = v.default_ability;
+        finalSetAttrs[`${repeatingString}damage_ability`] = getAbilityShortName(v.default_ability);
       }
       if (!isUndefinedOrEmpty(v[`${repeatingString}heal`]) && isUndefined(v[`${repeatingString}heal_ability`])) {
-        finalSetAttrs[`${repeatingString}heal_ability`] = v.default_ability;
+        finalSetAttrs[`${repeatingString}heal_ability`] = getAbilityShortName(v.default_ability);
       }
     }
     if (options.addSecondCastingModifier) {
       if (!isUndefinedOrEmpty(v[`${repeatingString}second_damage`]) && isUndefined(v[`${repeatingString}second_damage_ability`])) {
-        finalSetAttrs[`${repeatingString}second_damage_ability`] = v.default_ability;
+        finalSetAttrs[`${repeatingString}second_damage_ability`] = getAbilityShortName(v.default_ability);
       }
     }
   }
@@ -128,8 +128,8 @@ const updateSavingThrowToggle = (v, finalSetAttrs, repeatingString, options) => 
     let savingThrowDC = getIntValue(v.base_dc) + getIntValue(v.pb);
     let savingThrowAbility = v[`${repeatingString}saving_throw_ability`];
     if (isUndefined(savingThrowAbility) && v.default_ability) {
-      savingThrowAbility = v.default_ability;
-      finalSetAttrs[`${repeatingString}saving_throw_ability`] = v.default_ability;
+      savingThrowAbility = getAbilityShortName(v.default_ability);
+      finalSetAttrs[`${repeatingString}saving_throw_ability`] = getAbilityShortName(v.default_ability);
     }
 
     savingThrowDC += getAbilityValue(v, savingThrowAbility);

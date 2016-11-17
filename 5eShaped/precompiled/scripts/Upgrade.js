@@ -97,6 +97,16 @@ export class Upgrade {
       },
     });
   }
+  defaultAbilityTranslate() {
+    getSetItems('upgrade.defaultAbilityTranslate', {
+      collectionArray: ['default_ability'],
+      callback: (v, finalSetAttrs) => {
+        if (!isUndefinedOrEmpty(v.default_ability)) {
+          finalSetAttrs.default_ability = v.default_ability.toUpperCase();
+        }
+      },
+    });
+  }
   hideFreetext() {
     getSetItems('upgrade.hideFreetext', {
       collectionArray: ['hide_freetext', 'hide_action_freetext'],
@@ -645,5 +655,9 @@ export class Upgrade {
       spells.updateChatMacro();
       psionics.updateChatMacro();
     });
+    this.upgradeCheckAndExecute(currentVersion, '7.1.0', () => {
+      this.defaultAbilityTranslate();
+    });
+
   }
 }

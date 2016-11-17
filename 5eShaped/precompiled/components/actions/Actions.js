@@ -304,11 +304,11 @@ export class Actions {
           if (name && name.indexOf('Spellcasting') !== -1) {
             const spellcastingSearch = spellcastingAbilityRegex.exec(freetext);
             if (spellcastingSearch && spellcastingSearch[1]) {
-              finalSetAttrs.default_ability = spellcastingSearch[1].toLowerCase();
+              finalSetAttrs.default_ability = spellcastingSearch[1].toUpperCase();
             } else {
               const spellcastingSearchSecond = spellcastingAbilityRegexSecond.exec(freetext);
               if (spellcastingSearchSecond && spellcastingSearchSecond[1]) {
-                finalSetAttrs.default_ability = spellcastingSearchSecond[1].toLowerCase();
+                finalSetAttrs.default_ability = spellcastingSearchSecond[1].toUpperCase();
               }
             }
             const spellcastingLevelSearch = spellcastingLevelRegex.exec(freetext);
