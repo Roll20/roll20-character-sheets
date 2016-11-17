@@ -20,6 +20,7 @@ const SKILLS = {
 };
 const CLASSES = ['barbarian', 'bard', 'cleric', 'druid', 'fighter', 'monk', 'paladin', 'ranger', 'rogue', 'sorcerer', 'warlock', 'wizard'];
 const ABILITIES = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'];
+const CUSTOM_SAVING_THROWS = ['fortitude', 'reflex', 'will'];
 const TOGGLE_VARS = {
   roll: '{{vs_ac=1}} @{roll_info} {{roll1=[[@{shaped_d20}cs>@{crit_range} + @{attack_formula}]]}} @{roll_setting}cs>@{crit_range} + @{attack_formula}]]}} {{targetAC=@{attacks_vs_target_ac}}} {{targetName=@{attacks_vs_target_name}}}',
   saving_throw: '{{saving_throw_condition=@{saving_throw_condition}}} {{saving_throw_dc=@{saving_throw_dc}}} {{saving_throw_vs_ability=@{saving_throw_vs_ability}}} {{saving_throw_failure=@{saving_throw_failure}}} {{saving_throw_success=@{saving_throw_success}}} {{targetName=@{attacks_vs_target_name}}}',
@@ -31,4 +32,4 @@ const TOGGLE_VARS = {
   higher_level: '{{cast_as_level=@{higher_level_query}}}',
 };
 
-export { SKILLS, CLASSES, ABILITIES, TOGGLE_VARS };
+export { SKILLS, CLASSES, ABILITIES, CUSTOM_SAVING_THROWS, TOGGLE_VARS };

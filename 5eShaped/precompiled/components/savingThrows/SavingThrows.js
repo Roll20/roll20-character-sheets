@@ -1,7 +1,7 @@
 /* global on:false */
 
 import { getSetItems, getIntValue, getAbilityShortName, addArithmeticOperator, isUndefinedOrEmpty, exists, showSign, getAbilityMod, getAbilityValue } from './../../scripts/utilities';
-import { ABILITIES } from './../../scripts/constants';
+import { ABILITIES, CUSTOM_SAVING_THROWS } from './../../scripts/constants';
 
 export class SavingThrows {
   getHighestOfAbilityScoresForSavingThrow(v, savingThrowName) {
@@ -72,8 +72,7 @@ export class SavingThrows {
   }
   updateSavingThrow(savingThrowName) {
     const collectionArray = ['pb', `${savingThrowName}_save_prof`, `${savingThrowName}_save_bonus`, 'global_saving_throw_bonus', 'saving_throws_half_proficiency', 'average_of_abilities'];
-    const customSaves = ['fortitude', 'reflex', 'will'];
-    const customSavingThrow = customSaves.indexOf(savingThrowName) !== -1;
+    const customSavingThrow = CUSTOM_SAVING_THROWS.indexOf(savingThrowName) !== -1;
     for (const ability of ABILITIES) {
       collectionArray.push(`${ability}_calculated`);
       collectionArray.push(`${ability}_mod`);
