@@ -241,7 +241,6 @@ const emptyRepeatingSection = (obj) => {
 };
 const getSetRepeatingItems = (name, obj) => {
   const collectionArray = obj.collectionArray || [];
-  const finalSetAttrs = {};
 
   if (obj.repeatingItems) {
     getSetItems(`${name} processing`, {
@@ -258,6 +257,7 @@ const getSetRepeatingItems = (name, obj) => {
         finalSetAttrs.processing = finalSetAttrs.processing.join(', ');
       },
     });
+    const finalSetAttrs = {};
     for (const repeatingItem of obj.repeatingItems) {
       getSectionIDs(repeatingItem, (ids) => {
         if (obj.rowId) {
