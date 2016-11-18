@@ -343,6 +343,7 @@ export class Actions {
             }
             if (name.indexOf('Innate') === -1) {
               finalSetAttrs.show_spells = 1;
+              finalSetAttrs.spell_slots_toggle = 'on';
               finalSetAttrs.spellcasting = 1;
 
               let match;

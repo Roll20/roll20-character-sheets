@@ -231,6 +231,10 @@ export class Classes {
 
         updateHD(v, finalSetAttrs, hd);
 
+        if (classesWithSpellcasting > 0) {
+          finalSetAttrs.spell_slots_toggle = 'on';
+        }
+
         let casterLevel = 0;
         if (!v.is_npc || v.is_npc === '0' || v.is_npc === 0) {
           if (classesWithSpellcasting > 1) {
