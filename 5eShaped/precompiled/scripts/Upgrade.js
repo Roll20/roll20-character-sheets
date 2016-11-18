@@ -461,6 +461,14 @@ export class Upgrade {
       },
     });
   }
+  spellsTabShownForOldSheets() {
+    getSetItems('upgrade.spellsTabShownForOldSheets', {
+      collectionArray: ['show_spells_tab'],
+      callback: (v, finalSetAttrs) => {
+        finalSetAttrs.show_spells_tab = 1;
+      },
+    });
+  }
   versionCompare(left, right) {
     if (typeof left !== 'string' || typeof right !== 'string') {
       return false;
@@ -644,6 +652,9 @@ export class Upgrade {
       settings.updatePreparedMatters();
       spells.updateChatMacro();
       psionics.updateChatMacro();
+    });
+    this.upgradeCheckAndExecute(currentVersion, '7.1.0', () => {
+      this.spellsTabShownForOldSheets();
     });
   }
 }
