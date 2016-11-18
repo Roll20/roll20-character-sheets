@@ -252,7 +252,9 @@ const getSetRepeatingItems = (name, obj) => {
         } else {
           finalSetAttrs.processing = [];
         }
-        finalSetAttrs.processing.push(name);
+        if (finalSetAttrs.processing.indexOf(name) === -1) {
+          finalSetAttrs.processing.push(name);
+        }
         finalSetAttrs.processing = finalSetAttrs.processing.join(', ');
       },
     });
