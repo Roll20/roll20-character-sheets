@@ -1,4 +1,4 @@
-/* global on:false */
+/* global on:false, removeRepeatingRow:false */
 
 import { ABILITIES, TOGGLE_VARS } from './../../scripts/constants';
 import { ProficiencyBonus } from './../proficiencyBonus/ProficiencyBonus';
@@ -276,6 +276,8 @@ export class Actions {
     const spellcastingAbilityRegexSecond = /uses (\w+) as (her|his) spellcasting ability/i;
     const spellcastingClassRegex = /following (\w+) spells prepared/i;
     const spellcastingClassRegexSecond = /following spells prepared from the (\w+) list/i;
+    const innateSpellcastingComponentRegex = /requiring no material components:(.*)/i; // todo solve javascript not supporting s
+    const innateSpellcastingComponentRegexSecond = /requiring only verbal components:(.*)/i; // todo solve javascript not supporting s
 
     getSetRepeatingItems('actions.parse', {
       repeatingItems: [`repeating_${type}`],
@@ -301,9 +303,13 @@ export class Actions {
           let spellAttack = false;
 
           const name = v[`${repeatingString}name`];
+          if (!name) {
+            removeRepeatingRow(`${repeatingItem}_${id}`);
+            continue;
+          }
           let freetext = v[`${repeatingString}freetext`];
 
-          if (name && name.indexOf('Spellcasting') !== -1) {
+          if (name.indexOf('Spellcasting') !== -1) {
             const spellcastingSearch = spellcastingAbilityRegex.exec(freetext);
             if (spellcastingSearch && spellcastingSearch[1]) {
               finalSetAttrs.default_ability = spellcastingSearch[1].toUpperCase();
@@ -313,31 +319,59 @@ export class Actions {
                 finalSetAttrs.default_ability = spellcastingSearchSecond[1].toUpperCase();
               }
             }
-            const spellcastingLevelSearch = spellcastingLevelRegex.exec(freetext);
-            if (spellcastingLevelSearch && spellcastingLevelSearch[1]) {
-              finalSetAttrs.caster_level = spellcastingLevelSearch[1];
-              finalSetAttrs.spellcaster_level = ordinalSpellLevel(spellcastingLevelSearch[1]);
-            }
-            const spellcastingClassSearch = spellcastingClassRegex.exec(freetext);
-            if (spellcastingClassSearch && spellcastingClassSearch[1]) {
-              finalSetAttrs.spellcasting_class = spellcastingClassSearch[1].toUpperCase();
-            } else {
-              const spellcastingClassSearchSecond = spellcastingClassRegexSecond.exec(freetext);
-              if (spellcastingClassSearchSecond && spellcastingClassSearchSecond[1]) {
-                finalSetAttrs.spellcasting_class = spellcastingClassSearchSecond[1].toUpperCase();
-              }
-            }
-            if (name === 'Innate Spellcasting') {
+            if (name.indexOf('Innate') !== -1) {
+              finalSetAttrs.show_spells = 1;
               finalSetAttrs.innate_spellcasting = 1;
-            } if (name === 'Spellcasting') {
-              finalSetAttrs.spellcasting = 1;
-            }
 
-            let match;
-            while ((match = spellcastingRegex.exec(freetext)) !== null) {
-              if (match && match[1] && match[2]) {
-                finalSetAttrs[`spell_slots_l${match[1]}_bonus`] = match[2];
+              const innateSpellcastingComponentSearch = innateSpellcastingComponentRegex.exec(freetext);
+              if (innateSpellcastingComponentSearch) {
+                console.log('innatezz if', innateSpellcastingComponentSearch);
+                finalSetAttrs.innate_spellcasting_components = 'INNATE_SPELLCASTING_NO_MATERIAL';
+                if (innateSpellcastingComponentSearch[1]) {
+                  finalSetAttrs.innate_spellcasting_blurb = innateSpellcastingComponentSearch[1]; // todo: remove line break at start
+                }
+              } else {
+                const innateSpellcastingComponentSearchSecond = innateSpellcastingComponentRegexSecond.exec(freetext);
+                console.log('innatezz else', innateSpellcastingComponentSearchSecond);
+                if (innateSpellcastingComponentSearchSecond) {
+                  finalSetAttrs.innate_spellcasting_components = 'INNATE_SPELLCASTING_ONLY_VERBAL';
+                  console.log('innatezz second if', innateSpellcastingComponentSearchSecond[1]);
+                  if (innateSpellcastingComponentSearchSecond[1]) {
+                    console.log('innatezz third if');
+                    finalSetAttrs.innate_spellcasting_blurb = innateSpellcastingComponentSearchSecond[1]; // todo: remove line break at start
+                  }
+                }
               }
+              removeRepeatingRow(`${repeatingItem}_${id}`);
+              continue;
+            }
+            if (name.indexOf('Innate') === -1) {
+              finalSetAttrs.show_spells = 1;
+              finalSetAttrs.spellcasting = 1;
+
+              let match;
+              while ((match = spellcastingRegex.exec(freetext)) !== null) {
+                if (match && match[1] && match[2]) {
+                  finalSetAttrs[`spell_slots_l${match[1]}_bonus`] = match[2];
+                }
+              }
+
+              const spellcastingLevelSearch = spellcastingLevelRegex.exec(freetext);
+              if (spellcastingLevelSearch && spellcastingLevelSearch[1]) {
+                finalSetAttrs.caster_level = spellcastingLevelSearch[1];
+                finalSetAttrs.spellcaster_level = ordinalSpellLevel(spellcastingLevelSearch[1]);
+              }
+              const spellcastingClassSearch = spellcastingClassRegex.exec(freetext);
+              if (spellcastingClassSearch && spellcastingClassSearch[1]) {
+                finalSetAttrs.spellcasting_class = spellcastingClassSearch[1].toUpperCase();
+              } else {
+                const spellcastingClassSearchSecond = spellcastingClassRegexSecond.exec(freetext);
+                if (spellcastingClassSearchSecond && spellcastingClassSearchSecond[1]) {
+                  finalSetAttrs.spellcasting_class = spellcastingClassSearchSecond[1].toUpperCase();
+                }
+              }
+              removeRepeatingRow(`${repeatingItem}_${id}`);
+              continue;
             }
           }
 
@@ -493,7 +527,8 @@ export class Actions {
       this.updateChatMacro('regionaleffect');
     });
     on('change:repeating_trait:freetext', (eventInfo) => {
-      this.parse('trait', getRepeatingInfo('repeating_trait', eventInfo).rowId);
+      const repeatingInfo = getRepeatingInfo('repeating_trait', eventInfo);
+      this.parse('trait', repeatingInfo.rowId);
     });
     on('change:repeating_action:freetext', (eventInfo) => {
       this.parse('action', getRepeatingInfo('repeating_action', eventInfo).rowId);
