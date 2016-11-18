@@ -671,9 +671,6 @@ export class Upgrade {
       this.attackToggle('repeating_reaction');
       this.attackToggle('repeating_legendaryaction');
     });
-    this.upgradeCheckAndExecute(currentVersion, '7.0.3', () => {
-      classes.updateLevels();
-    });
     this.upgradeCheckAndExecute(currentVersion, '7.0.4', () => {
       spells.spellsToRepeatingSectionsForEachLevel();
       this.psionicsToRepeatingSectionsForEachLevel();
@@ -689,6 +686,7 @@ export class Upgrade {
       this.classNamesTranslate();
       this.setSpellcasterLevel();
       npc.updateCasterDCAndAttack();
+      classes.updateLevels();
     });
   }
 }
