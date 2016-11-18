@@ -20,6 +20,7 @@ export class Equipment {
               } else if (mode === 'normal') {
                 finalSetAttrs[`${repeatingString}skill_d20`] = '@{shaped_d20}';
               }
+              break;
             }
           }
         }
