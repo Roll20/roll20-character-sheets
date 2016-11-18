@@ -328,7 +328,7 @@ export class Actions {
                 console.log('innatezz if', innateSpellcastingComponentSearch);
                 finalSetAttrs.innate_spellcasting_components = 'INNATE_SPELLCASTING_NO_MATERIAL';
                 if (innateSpellcastingComponentSearch[1]) {
-                  finalSetAttrs.innate_spellcasting_blurb = freetext.replace(innateSpellcastingComponentSearch[1], '');
+                  finalSetAttrs.innate_spellcasting_blurb = freetext.replace(innateSpellcastingComponentSearch[1], '').trim();
                 }
               } else {
                 const innateSpellcastingComponentSearchSecond = innateSpellcastingComponentRegexSecond.exec(freetext);
@@ -337,7 +337,7 @@ export class Actions {
                   finalSetAttrs.innate_spellcasting_components = 'INNATE_SPELLCASTING_ONLY_VERBAL';
                   if (innateSpellcastingComponentSearchSecond[1]) {
                     console.log('innatezz third if');
-                    finalSetAttrs.innate_spellcasting_blurb = freetext.replace(innateSpellcastingComponentSearchSecond[1], '');
+                    finalSetAttrs.innate_spellcasting_blurb = freetext.replace(innateSpellcastingComponentSearchSecond[1], '').trim();
                   }
                 }
               }
