@@ -105,12 +105,6 @@ export class Actions {
       },
     });
   }
-  updateIfTriggered(type, eventInfo) {
-    const repeatingInfo = getRepeatingInfo(`repeating_${type}`, eventInfo);
-    if (repeatingInfo && repeatingInfo.field !== 'name' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'damage_crit' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'second_damage_crit' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
-      this.update(type, repeatingInfo.rowId);
-    }
-  }
   updateChatMacro(type) {
     getSetRepeatingItems('actions.updateChatMacro', {
       repeatingItems: [`repeating_${type}`],
@@ -279,6 +273,8 @@ export class Actions {
     const innateSpellcastingComponentRegex = /(.*requiring no material components:)/i;
     const innateSpellcastingComponentRegexSecond = /(.*requiring only verbal components:)/i;
 
+    let deleteItem = false;
+
     getSetRepeatingItems('actions.parse', {
       repeatingItems: [`repeating_${type}`],
       collectionArray,
@@ -341,6 +337,7 @@ export class Actions {
                   }
                 }
               }
+              deleteItem = true;
               removeRepeatingRow(`${repeatingItem}_${id}`);
               continue;
             }
@@ -369,6 +366,7 @@ export class Actions {
                   finalSetAttrs.spellcasting_class = spellcastingClassSearchSecond[1].toUpperCase();
                 }
               }
+              deleteItem = true;
               removeRepeatingRow(`${repeatingItem}_${id}`);
               continue;
             }
@@ -462,7 +460,9 @@ export class Actions {
         }
       },
       setFinalAttrsCallback: () => {
-        this.update(type, rowId);
+        if (!deleteItem) {
+          this.update(type, rowId);
+        }
       },
     });
   }
@@ -478,6 +478,12 @@ export class Actions {
         }
       },
     });
+  }
+  updateIfTriggered(type, eventInfo) {
+    const repeatingInfo = getRepeatingInfo(`repeating_${type}`, eventInfo);
+    if (repeatingInfo && repeatingInfo.field !== 'name' && repeatingInfo.field !== 'freetext' && repeatingInfo.field !== 'to_hit' && repeatingInfo.field !== 'attack_formula' && repeatingInfo.field !== 'damage_formula' && repeatingInfo.field !== 'damage_crit' && repeatingInfo.field !== 'second_damage_formula' && repeatingInfo.field !== 'second_damage_crit' && repeatingInfo.field !== 'damage_string' && repeatingInfo.field !== 'saving_throw_dc' && repeatingInfo.field !== 'parsed' && repeatingInfo.field !== 'recharge_display') {
+      this.update(type, repeatingInfo.rowId);
+    }
   }
   setup() {
     on('change:pb', () => {
