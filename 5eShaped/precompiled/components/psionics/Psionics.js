@@ -2,7 +2,7 @@
 
 import { ABILITIES, TOGGLE_VARS } from './../../scripts/constants';
 import { updateAttackToggle, updateSavingThrowToggle, updateDamageToggle, updateHealToggle, updateHigherLevelToggle } from './../actionComponents/updateToggles';
-import { getSetItems, getSetRepeatingItems, getIntValue, isUndefined, isUndefinedOrEmpty, setCritDamage, fromVOrFinalSetAttrs, lowercaseDamageTypes, getRepeatingInfo, getAbilityShortName } from './../../scripts/utilities';
+import { getSetItems, getSetRepeatingItems, getIntValue, isUndefined, isUndefinedOrEmpty, setCritDamage, fromVOrFinalSetAttrs, lowercaseDamageTypes, getRepeatingInfo } from './../../scripts/utilities';
 
 export class Psionics {
   constructor() {
