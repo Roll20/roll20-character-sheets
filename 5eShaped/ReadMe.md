@@ -8,7 +8,7 @@ This is the redesigned Shaped character sheet for use on Roll20.net with the 5th
 
 [Documentation](https://docs.google.com/document/d/1yPcIZ_bIc3JlnWsKZt2tAB0EQSIVEfeMtT0GifbpJIg)
 
-Please report any bugs in the [issues tab](https://github.com/mlenser/roll20-character-sheets/issues)
+Please report any bugs in the [issues tab](https://bitbucket.org/mlenser/5eshaped/issues)
 
 ##Features
 
@@ -29,8 +29,7 @@ Please report any bugs in the [issues tab](https://github.com/mlenser/roll20-cha
   * Roll settings to choose to always roll with advantage, disadvantage, or query for both
   * Optional bonuses to all skills, abilities, saving throws, etc.
 
-![NPC sheet](http://i.imgur.com/CTSxo4a.png "NPC sheet")
-![PC sheet](http://i.imgur.com/ufXveK2.png "PC sheet")
+![Sheet](http://i.imgur.com/ZVymw3T.jpg "Sheet")
 
 ## How to Update the sheet yourself (as Pro):
 
