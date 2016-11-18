@@ -276,8 +276,8 @@ export class Actions {
     const spellcastingAbilityRegexSecond = /uses (\w+) as (her|his) spellcasting ability/i;
     const spellcastingClassRegex = /following (\w+) spells prepared/i;
     const spellcastingClassRegexSecond = /following spells prepared from the (\w+) list/i;
-    const innateSpellcastingComponentRegex = /requiring no material components:(.*)/i; // todo solve javascript not supporting s
-    const innateSpellcastingComponentRegexSecond = /requiring only verbal components:(.*)/i; // todo solve javascript not supporting s
+    const innateSpellcastingComponentRegex = /(.*requiring no material components:)/i;
+    const innateSpellcastingComponentRegexSecond = /(.*requiring only verbal components:)/i;
 
     getSetRepeatingItems('actions.parse', {
       repeatingItems: [`repeating_${type}`],
@@ -328,17 +328,16 @@ export class Actions {
                 console.log('innatezz if', innateSpellcastingComponentSearch);
                 finalSetAttrs.innate_spellcasting_components = 'INNATE_SPELLCASTING_NO_MATERIAL';
                 if (innateSpellcastingComponentSearch[1]) {
-                  finalSetAttrs.innate_spellcasting_blurb = innateSpellcastingComponentSearch[1]; // todo: remove line break at start
+                  finalSetAttrs.innate_spellcasting_blurb = freetext.replace(innateSpellcastingComponentSearch[1], '');
                 }
               } else {
                 const innateSpellcastingComponentSearchSecond = innateSpellcastingComponentRegexSecond.exec(freetext);
                 console.log('innatezz else', innateSpellcastingComponentSearchSecond);
                 if (innateSpellcastingComponentSearchSecond) {
                   finalSetAttrs.innate_spellcasting_components = 'INNATE_SPELLCASTING_ONLY_VERBAL';
-                  console.log('innatezz second if', innateSpellcastingComponentSearchSecond[1]);
                   if (innateSpellcastingComponentSearchSecond[1]) {
                     console.log('innatezz third if');
-                    finalSetAttrs.innate_spellcasting_blurb = innateSpellcastingComponentSearchSecond[1]; // todo: remove line break at start
+                    finalSetAttrs.innate_spellcasting_blurb = freetext.replace(innateSpellcastingComponentSearchSecond[1], '');
                   }
                 }
               }
