@@ -688,6 +688,7 @@ export class Upgrade {
       this.defaultAbilityTranslate();
       this.classNamesTranslate();
       this.setSpellcasterLevel();
+      npc.updateCasterDCAndAttack();
     });
   }
 }

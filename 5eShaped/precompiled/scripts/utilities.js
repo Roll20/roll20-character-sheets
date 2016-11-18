@@ -85,7 +85,7 @@ const getAbilityName = (varName) => {
   if (!varName) {
     return 'strength';
   } else if (typeof varName === 'string') {
-    varName = varName.replace(/\W/g, '');
+    varName = varName.replace(/\W/g, '').toLowerCase();
   }
   return varName;
 };

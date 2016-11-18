@@ -1,7 +1,7 @@
 /* global on:false, generateRowID:false, setDefaultToken:false */
 
 import { ABILITIES } from './../../scripts/constants';
-import { getSetItems, getIntValue, isUndefinedOrEmpty, addArithmeticOperator, getAbilityMod, numberWithCommas, exists, updateHD, round } from './../../scripts/utilities';
+import { getSetItems, getIntValue, isUndefinedOrEmpty, addArithmeticOperator, getAbilityMod, numberWithCommas, exists, updateHD, round, getAbilityValue, showSign } from './../../scripts/utilities';
 
 export class Npc {
   updateType() {
@@ -450,6 +450,22 @@ export class Npc {
       },
     });
   }
+  updateCasterDCAndAttack() {
+    const collectionArray = ['pb', 'default_ability', 'base_dc', 'spell_save_DC', 'spell_to_hit', 'finesse_mod'];
+    for (const ability of ABILITIES) {
+      collectionArray.push(`${ability}_mod`);
+    }
+    getSetItems('npc.updateCasterDCAndAttack', {
+      collectionArray,
+      callback: (v, finalSetAttrs) => {
+        const baseDC = getIntValue(v.base_dc, 8);
+        const pb = getIntValue(v.pb);
+        const abilityMod = getAbilityValue(v, v.default_ability);
+        finalSetAttrs.spell_save_DC = baseDC + pb + abilityMod;
+        finalSetAttrs.spell_to_hit = showSign((pb + abilityMod));
+      },
+    });
+  }
   setup() {
     on('change:type', () => {
       this.updateType();
@@ -492,6 +508,9 @@ export class Npc {
     });
     on('change:spellcaster_level', () => {
       this.updateCasterLevel();
+    });
+    on('change:default_ability change:pb', () => {
+      this.updateCasterDCAndAttack();
     });
     on('sheet:compendium-drop', () => {
       this.npcDroppedOnTabletop();
