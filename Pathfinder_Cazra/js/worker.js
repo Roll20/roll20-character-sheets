@@ -1,3 +1,20 @@
+/**
+ * Forces an update on a list of numerical fields, also making sure that
+ * any undefined fields are set to 0.
+ * @param {string[]} attrs
+ * @param {function} cb
+ */
+function forceUpdate(attrs, cb) {
+  parseAttrs(attrs, values => {
+    let tempValues = {};
+    _.each(attrs, attr => {
+      tempValues[attr] = -9999;
+    });
+    setAttrs(tempValues);
+    setAttrs(values);
+  });
+}
+
 
 function onChange(attrs, cb) {
   attrs = _.map(attrs, attr => {
@@ -146,7 +163,13 @@ onChangeParse(['str_mod', 'dex_mod', 'con_mod', 'int_mod', 'wis_mod', 'cha_mod']
   });
 });
 
+var testCounter = 0;
+
 on('change:repeating_attacks', (evt) => {
+  forceUpdate(['bab', 'size']);
+  testCounter++;
+  setAttrs({debug: testCounter})
+
   getSectionIDs('repeating_attacks', ids => {
     _.each(ids, id => {
       var prefix = 'repeating_attacks_' + id + '_attack';
@@ -282,4 +305,11 @@ onChangeParse(['spell_dc_base'], values => {
     spell_level_8_dc: values.spell_dc_base + 8,
     spell_level_9_dc: values.spell_dc_base + 9
   });
+});
+
+on('sheet:opened', () => {
+  forceUpdate([
+    'str', 'dex', 'con', 'int', 'wis', 'cha',
+    'bab', 'size'
+  ]);
 });
