@@ -2,17 +2,17 @@
 
 import { getSetItems } from './../../scripts/utilities';
 
-export class Overlay {
+export class Processing {
   close() {
-    getSetItems('Overlay.close', {
+    getSetItems('Processing.close', {
       collectionArray: ['processing'],
       callback: (v, finalSetAttrs) => {
-        finalSetAttrs.processing = false;
+        finalSetAttrs.processing = '';
       },
     });
   }
   setup() {
-    on('change:close_overlay', () => {
+    on('change:close_processing', () => {
       this.close();
     });
   }
