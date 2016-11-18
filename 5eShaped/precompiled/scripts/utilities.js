@@ -255,6 +255,18 @@ const getSetRepeatingItems = (name, obj) => {
   const finalSetAttrs = {};
 
   if (obj.repeatingItems) {
+    getSetItems(`${name} processing`, {
+      collectionArray: ['processing'],
+      callback: (v, finalSetAttrs) => {
+        if (!isUndefinedOrEmpty(v.processing)) {
+          finalSetAttrs.processing = v.processing.split(', ');
+        } else {
+          finalSetAttrs.processing = [];
+        }
+        finalSetAttrs.processing.push(name);
+        finalSetAttrs.processing = finalSetAttrs.processing.join(', ');
+      },
+    });
     for (const repeatingItem of obj.repeatingItems) {
       getSectionIDs(repeatingItem, (ids) => {
         if (obj.rowId) {
@@ -276,9 +288,24 @@ const getSetRepeatingItems = (name, obj) => {
             }
           }
         }
+        collectionArray.push('processing');
         getAttrs(collectionArray, (v) => {
           if (obj.callback) {
             obj.callback(v, finalSetAttrs, ids, repeatingItem);
+          }
+          if (!isUndefinedOrEmpty(v.processing)) {
+            finalSetAttrs.processing = v.processing.split(', ');
+          } else {
+            finalSetAttrs.processing = [];
+          }
+          const index = finalSetAttrs.processing.indexOf(name);
+          if (index >= 0) {
+            finalSetAttrs.processing.splice(index, 1);
+          }
+          if (finalSetAttrs.processing.length > 0) {
+            finalSetAttrs.processing = finalSetAttrs.processing.join(', ');
+          } else {
+            finalSetAttrs.processing = '';
           }
           setFinalAttrs(v, finalSetAttrs, name, () => {
             if (obj.setFinalAttrsCallback) {

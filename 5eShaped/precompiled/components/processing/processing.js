@@ -7,7 +7,7 @@ export class Processing {
     getSetItems('Processing.close', {
       collectionArray: ['processing'],
       callback: (v, finalSetAttrs) => {
-        finalSetAttrs.processing = false;
+        finalSetAttrs.processing = '';
       },
     });
   }
