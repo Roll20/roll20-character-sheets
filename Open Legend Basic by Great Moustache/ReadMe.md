@@ -5,7 +5,19 @@
 
 ### Changelog
 
-### 1.1.0
+### 1.4.0 on 2016 November 21st
+* Added gear/settings tab next to all 18 attributes
+	- Click expands further information about each attribute
+	- Options to Increase/Decrease both the dice size and cost of the attribute due to feats
+	- Option to give Advantage/Disadvantage to the d20 part of the attribute roll due to feats and possibly boons/banes
+	- Further development needed for Physical Attributes to include an "Attribute Substitution" drop down menu, to be implimented next.
+	
+### 1.1.5 on 2016 November 20th
+* Made "Evasion", "Toughness", & "Resolve" clickable buttons that roll d20 for resisting banes (after watching HyperRPG mini-series)
+* Put in commented out code for possible change to Toughness calculation
+	- Presence might bet switching to Will for Toughness
+
+### 1.1.0 on 2016 November 19th
 * Fixed CSS to look correctly in Mozilla Firefox
 * Added fields under Hit Points
 	- From Feats & From Others so you can increase your total Hit Points
