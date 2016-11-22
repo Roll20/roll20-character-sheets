@@ -5,6 +5,19 @@
 
 ### Changelog
 
+### 1.5.0 on 2016 November 21st
+* Added the character's name to be displayed on chat window on rolls
+* Updated the Actions section to calculate the roll string like the attributes
+	- Needed to seperate it from just reading Attribute roll, as Advantage/Disadvantage for d20 in non-combat situations
+* Added additional calculations for the extra sections on Physical attributes
+	- For all 3, drop down to select Attribute Substitution (Agility for Evasion, Fortitude for Toughness & Hit Points)
+	- For might, a checkbox, checked means the Attribute Substitution applies to max heavy carry
+* Updated Javascript to reflect attribute substitution possibilities
+* Updated calculations to Speed to change to 0 for certain cases
+	- If over max heavy carry
+	- If over 2 bulky items
+* NOTE: Players will have to reselect attributes to use for Actions do to the drop down menu being updated with different values.
+
 ### 1.4.0 on 2016 November 21st
 * Added gear/settings tab next to all 18 attributes
 	- Click expands further information about each attribute
@@ -23,7 +36,7 @@
 	- From Feats & From Others so you can increase your total Hit Points
 * Added an example area (place holder) that can be shown/hidden beneath Prescience Attribute
 	- For further development to include changes that feats may have to Attribute Scores/Dice and Other
-		--Place holder for now, will be expanded upon for each Attribute
+		-Place holder for now, will be expanded upon for each Attribute
 
 ### 1.0.0
 * SHEET READY for mass consumption
