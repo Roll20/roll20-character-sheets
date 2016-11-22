@@ -669,7 +669,7 @@ on("change:repeating_items:itemweight", function() {
             var chkjet = parseInt(values.repeating_actionsbase_actionbasejet) || 0;
             var jet="0";
             if (chkjet == 1) {
-                jet= "[[2d6+@{actionbasemod}+(@{actionbasebonus})]]";
+                jet= "[[2d6 + (@{actionbasemod})[Mod.Carac.] + (@{actionbasebonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]";
             } else {
                 jet="0";
             }
@@ -684,7 +684,7 @@ on("change:repeating_items:itemweight", function() {
             var chkjet = parseInt(values.repeating_actionsspe_actionspejet) || 0;
             var jet="0";
             if( chkjet == 1) {
-                jet="[[2d6+@{actionspemod}+(@{actionspebonus})]]";
+                jet="[[2d6 + (@{actionspemod})[Mod.Carac.] + (@{actionspebonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]";
             } else {
                 jet="0";
             }
@@ -699,7 +699,7 @@ on("change:repeating_items:itemweight", function() {
             var chkjet = parseInt(values.repeating_actionsdepart_actiondepjet) || 0;
             var jet="0";
             if( chkjet == 1) {
-                jet="[[2d6+@{actiondepmod}+(@{actiondepbonus})]]";
+                jet="[[2d6 + (@{actiondepmod})[Mod.Carac.] + (@{actiondepbonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]";
             } else {
                 jet="0";
             }
@@ -714,7 +714,7 @@ on("change:repeating_items:itemweight", function() {
             var chkjet = parseInt(values.repeating_moves_movejet) || 0;
             var jet="0";
             if( chkjet == 1) {
-                jet="[[2d6+@{movemod}+(@{movebonus})]]";
+                jet="[[2d6 + (@{movemod})[Mod.Carac.] + (@{movebonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]";
             } else {
                 jet="0";
             }
@@ -746,7 +746,7 @@ on("change:repeating_items:itemweight", function() {
     on("change:repeating_spells:spellprep change:repeating_spells:spellniveau", function() {
         getAttrs(["repeating_spells_spellprep","repeating_spells_spellniveau"], function(values) {
             var chk = parseInt(values.repeating_spells_spellprep) || 0;
-            var niv = parseInt(values.repeating_spells_spellniveau) || 0;            
+            var niv = parseInt(values.repeating_spells_spellniveau) || 0;
             tot = niv*chk;
             setAttrs({
                 repeating_spells_spellvalue: tot
@@ -924,9 +924,9 @@ on("change:repeating_items:itemweight", function() {
 
 <!-- ==== IDENTITÉ ==== -->
 <div class="sheet-topbar">
-    <img style="width: 200px;" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/DungeonWorldFrench/dwlogo.png" />    
+    <img style="width: 200px;" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/DungeonWorldFrench/dwlogo.png" alt="Dungeon World VF, feuille version 3.1 (21/11/2016)" title="Dungeon World VF, feuille version 3.1 (21/11/2016)" />
     <div><input class="sheet-field-name" type="text" placeholder="Nom" name="attr_character_name" /></div>
-    <div>        
+    <div>
         <SELECT name="attr_laclasse" class="sheet-field-class" title="Sélectionner une classe existante pour pré-remplir certains champs et faire apparaître les Actions de Départ de la classe choisie">
             <OPTION value="custom" selected>Personnalisée</OPTION>
             <OPTION value="barbare">Le Barbare</OPTION>
@@ -951,8 +951,8 @@ on("change:repeating_items:itemweight", function() {
     <div class="sheet-header">
         <div class="sheet-section-name">Dégâts</div>
         <input type="text" style="font-size: 14px;width: 60px;" name="attr_dtype" placeholder="ex:d6+1" title="Saisissez le dégâts de votre classe (ex : d6), éventuellement avec un bonus (ex: d8+2)" />
-        <button type='roll' name='roll_RollDamage' title="Jet de dégâts" 
-            value="&{template:jet} {{perso=@{character_name}}} {{name=Dégâts}} {{degats=[[1@{dtype}]]}}"
+        <button type='roll' name='roll_RollDamage' title="Jet de dégâts"
+            value="&{template:jet} {{perso=@{character_name}}} {{name=Dégâts}} {{degats=[[1@{dtype} + (@{degpjbonus})[Bonus circonstanciel] ]]}}"
         ></button>
     </div>
     <div class="sheet-header">
@@ -966,13 +966,13 @@ on("change:repeating_items:itemweight", function() {
     <div class="sheet-header">
         <div class="sheet-section-name">PX</div>
         <input type="number" name="attr_xp" title="Points d'Expérience courants" value="0">
-        <span>/</span>  
+        <span>/</span>
         <input type="number" name="attr_xp_max" value="[[@{level}+7]]" title="Points d'Expérience pour atteindre le niveau suivant" disabled>
     </div>
     <div class="sheet-header">
         <div class="sheet-section-name">PV</div>
         <input type="number" name="attr_hp" value="0" title="Points de Vie courants" />
-        <span>/</span>  
+        <span>/</span>
         <input type="number" name="attr_hp_max" value="[[@{basehp} + @{constitution}]]" disabled title="Points de Vie maximum" />
         <span style="font-size:12px;">(Base</span>
         <input type="number" name="attr_basehp" style="padding:0;font-size:14px;margin:0;width:35px;height: 20px;"  title="PV de Base de votre classe, avant l'ajout de la Constitution" value="0" /><span style="font-size:12px;">)</span>
@@ -997,8 +997,8 @@ on("change:repeating_items:itemweight", function() {
 
         <div class="sheet-row-3">
             <input type="number" name="attr_strmod" value="0" title="Ajustement" readonly />
-            <button type="roll" name="Force" 
-                value="&{template:jet} {{perso=@{character_name}}} {{name=Force}} {{jetshow=[[1]]}} {{subtags=Action}} {{jet=[[2d6 + @{strmod}]]}}"
+            <button type="roll" name="Force"
+                value="&{template:jet} {{perso=@{character_name}}} {{name=Force}} {{jetshow=[[1]]}} {{subtags=Action}} {{jet=[[2d6 + (@{strmod})[Mod.Carac.] + (@{jetpjbonus})[Bonus circonstanciel] ]]}}"
             ></button>
         </div>
 
@@ -1020,8 +1020,8 @@ on("change:repeating_items:itemweight", function() {
 
         <div class="sheet-row-3">
             <input type="number" name="attr_dexmod" value="0" title="Ajustement" readonly />
-            <button type="roll" name="Dexterite" 
-                value="&{template:jet} {{perso=@{character_name}}} {{name=Dextérité}} {{jetshow=[[1]]}} {{subtags=Action}} {{jet=[[2d6 + @{dexmod}]]}}"
+            <button type="roll" name="Dexterite"
+                value="&{template:jet} {{perso=@{character_name}}} {{name=Dextérité}} {{jetshow=[[1]]}} {{subtags=Action}} {{jet=[[2d6 + (@{dexmod})[Mod.Carac.] + (@{jetpjbonus})[Bonus circonstanciel] ]]}}"
             ></button>
         </div>
 
@@ -1043,8 +1043,8 @@ on("change:repeating_items:itemweight", function() {
 
         <div class="sheet-row-3">
             <input type="number" name="attr_conmod" value="0" readonly title="Ajustement" />
-            <button type="roll" name="Constitution" 
-                value="&{template:jet} {{perso=@{character_name}}} {{name=Constitution}} {{jetshow=[[1]]}} {{subtags=Action}} {{jet=[[2d6 + @{conmod}]]}}"
+            <button type="roll" name="Constitution"
+                value="&{template:jet} {{perso=@{character_name}}} {{name=Constitution}} {{jetshow=[[1]]}} {{subtags=Action}} {{jet=[[2d6 + (@{conmod})[Mod.Carac.] + (@{jetpjbonus})[Bonus circonstanciel] ]]}}"
             ></button>
         </div>
 
@@ -1066,8 +1066,8 @@ on("change:repeating_items:itemweight", function() {
 
         <div class="sheet-row-3">
             <input type="number" name="attr_intmod" value="0" readonly title="Ajustement" />
-            <button type="roll" name="Intelligence" 
-                value="&{template:jet} {{perso=@{character_name}}} {{name=Intelligence}} {{jetshow=[[1]]}} {{subtags=Action}} {{jet=[[2d6 + @{intmod}]]}}"
+            <button type="roll" name="Intelligence"
+                value="&{template:jet} {{perso=@{character_name}}} {{name=Intelligence}} {{jetshow=[[1]]}} {{subtags=Action}} {{jet=[[2d6 + (@{intmod})[Mod.Carac.] + (@{jetpjbonus})[Bonus circonstanciel] ]]}}"
             ></button>
         </div>
 
@@ -1089,8 +1089,8 @@ on("change:repeating_items:itemweight", function() {
 
         <div class="sheet-row-3">
             <input type="number" name="attr_wismod" value="0" readonly title="Ajustement" />
-            <button type="roll" name="Sagesse" 
-                value="&{template:jet} {{perso=@{character_name}}} {{name=Sagesse}} {{jetshow=[[1]]}} {{subtags=Action}} {{jet=[[2d6 + @{wismod}]]}}"
+            <button type="roll" name="Sagesse"
+                value="&{template:jet} {{perso=@{character_name}}} {{name=Sagesse}} {{jetshow=[[1]]}} {{subtags=Action}} {{jet=[[2d6 + (@{wismod})[Mod.Carac.] + (@{jetpjbonus})[Bonus circonstanciel] ]]}}"
             ></button>
         </div>
 
@@ -1112,8 +1112,8 @@ on("change:repeating_items:itemweight", function() {
 
         <div class="sheet-row-3">
             <input type="number" name="attr_chamod" value="0" readonly title="Ajustement">
-            <button type="roll" name="Charisme" 
-                value="&{template:jet} {{perso=@{character_name}}} {{name=Charisme}} {{jetshow=[[1]]}} {{subtags=Action}} {{jet=[[2d6 + @{chamod}]]}}"
+            <button type="roll" name="Charisme"
+                value="&{template:jet} {{perso=@{character_name}}} {{name=Charisme}} {{jetshow=[[1]]}} {{subtags=Action}} {{jet=[[2d6 + (@{chamod})[Mod.Carac.] + (@{jetpjbonus})[Bonus circonstanciel] ]]}}"
             ></button>
         </div>
 
@@ -1150,14 +1150,14 @@ on("change:repeating_items:itemweight", function() {
             <textarea placeholder="Lien vide" name="attr_bond"></textarea>
         </fieldset>
     </div> <!-- FIN LIENS -->
-    
+
     <!-- ===== EQUIPEMENT ===== -->
     <div class="sheet-header" style="width: 315px;">
         <div class="sheet-section-name">Équipement</div>
         <span>Charge</span>
         <input type="number" style="width: 2em;" name="attr_load" title="Charge courante" value="0" readonly />
         <span>/</span>
-        <input type="number" style="width: 2em;" name="attr_load_max" value="[[@{baseload} + @{strmod}]]" title="Charge maximum" disabled />     
+        <input type="number" style="width: 2em;" name="attr_load_max" value="[[@{baseload} + @{strmod}]]" title="Charge maximum" disabled />
         <span style="font-size:12px;">(Base</span>
         <input type="number" name="attr_baseload" style="padding:0;font-size:14px;margin:0;width:35px;height: 20px;" title="Charge de base" value="0" /><span style="font-size:12px;">)</span>
     </div>
@@ -1179,20 +1179,28 @@ on("change:repeating_items:itemweight", function() {
 <div class="sheet-col-right">
     <!-- ===== ACTIONS ===== -->
     <div class="sheet-header" style="width: 100%;">
-        <div class="sheet-section-name" style="width: 100%;">Actions</div>
+        <div class="sheet-section-name" style="width: 100%;">
+            Actions
+            <div style="display:inline-block;width:440px;text-align:right;color:lightgrey;font-size:10px;">
+                <input type="checkbox" name="attr_jetpjbonus" value="?{Bonus/Malus au jet|0}" title="Chaque jet propose de saisir un bonus/malus circonstanciel au jet">Bonus aux jets</input>
+                &nbsp;
+                <input type="checkbox" name="attr_degpjbonus" value="?{Bonus/Malus aux dégâts|0}" title="Les jets de dégâts proposent de saisir un bonus/malus circonstanciel">Bonus aux dégâts</input>
+            </div>
+    </div>
     </div>
     <input type="radio" name="attr_onglaction" value="0" class="sheet-onglbase" title="Actions de Base" checked /><span>Base</span>
     <input type="radio" name="attr_onglaction" value="1" class="sheet-onglspecial" title="Actions Spéciales" /><span>Spéciales</span>
     <input type="radio" name="attr_onglaction" value="2" class="sheet-onglclasse" title="Actions de Départ de Classe" /><span>Départ</span>
     <input type="radio" name="attr_onglaction" value="3" class="sheet-onglavance" title="Actions Avancées de Classe" /><span>Avancées</span>
     <input type="radio" name="attr_onglaction" value="4" class="sheet-onglsort" title="Sorts" /><span>Sorts</span>
-    
+    <input type="radio" name="attr_onglaction" value="5" class="sheet-onglnote" title="Notes" /><span>Notes</span>
+
     <!-- ===== BASE ===== -->
     <div class="sheet-onglbase">
         <!-- ===== TAILLER EN PIECES ===== -->
         <div class="sheet-action">
             <button type="roll" class="sheet-btAction" name="TaillerEnPieces" title="Lancer le Jet d'Action"
-                value="&{template:jet} {{perso=@{character_name}}} {{name=@{taillename}}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6+@{taillemod}+(@{taillebonus})]]}} {{sucsup=@{taillesucsup}}} {{succes=@{taillesucces}}} {{partiel=@{taillepartiel}}} {{echec=@{tailleechec}}} {{degatsaction=@{tailledegats}}}"
+                value="&{template:jet} {{perso=@{character_name}}} {{name=@{taillename}}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{taillemod})[Mod.Carac.] + (@{taillebonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{sucsup=@{taillesucsup}}} {{succes=@{taillesucces}}} {{partiel=@{taillepartiel}}} {{echec=@{tailleechec}}} {{degatsaction=@{tailledegats}}}"
             ></button>
             <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_taille-show" value="1" /><span>y</span>
             <input type="text" name="attr_taillename" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" value="Tailler En Pièces" />
@@ -1203,7 +1211,7 @@ on("change:repeating_items:itemweight", function() {
                 </div>
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Jet : </span>
-                    2d6 + 
+                    2d6 +
                     <SELECT name="attr_taillemod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
                         <OPTION value="0">-</OPTION>
                         <OPTION value="@{strmod}" selected>FOR</OPTION>
@@ -1216,7 +1224,7 @@ on("change:repeating_items:itemweight", function() {
                     +
                     <input type="number" class="sheet-action" name="attr_taillebonus" value="0" title="Bonus/Malus au jet" />
                     <span class="sheet-action">&nbsp;Cette Action inflige des dégâts</span>
-                    <input type="checkbox" class="sheet-selcheck" name="attr_tailledegats" value="[[1@{dtype}]]" title="Cocher pour que l'action lance les dégâts" checked /><span>3</span>
+                    <input type="checkbox" class="sheet-selcheck" name="attr_tailledegats" value="[[1@{dtype} + (@{degpjbonus})[Bonus circonstanciel] ]]" title="Cocher pour que l'action lance les dégâts" checked /><span>3</span>
                 </div>
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Sur 12+ : </span>
@@ -1239,7 +1247,7 @@ on("change:repeating_items:itemweight", function() {
         <!-- ===== SALVE ===== -->
         <div class="sheet-action">
             <button type="roll" class="sheet-btAction" name="Salve" title="Lancer le Jet d'Action"
-                value="&{template:jet} {{perso=@{character_name}}} {{name=@{salvename}}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6+@{salvemod}+(@{salvebonus})]]}} {{succes=@{salvesucces}}} {{partiel=@{salvepartiel}}} {{sucsup=@{salvesucsup}}} {{echec=@{salveechec}}} {{degatsaction=@{salvedegats}}}"
+                value="&{template:jet} {{perso=@{character_name}}} {{name=@{salvename}}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6+(@{salvemod})[Mod.Carac.]+(@{salvebonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{succes=@{salvesucces}}} {{partiel=@{salvepartiel}}} {{sucsup=@{salvesucsup}}} {{echec=@{salveechec}}} {{degatsaction=@{salvedegats}}}"
             ></button>
             <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_salve-show" value="1" /><span>y</span>
             <input type="text" name="attr_salvename" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" value="Salve" />
@@ -1250,7 +1258,7 @@ on("change:repeating_items:itemweight", function() {
                 </div>
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Jet : </span>
-                    2d6 + 
+                    2d6 +
                     <SELECT name="attr_salvemod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
                         <OPTION value="0">-</OPTION>
                         <OPTION value="@{strmod}">FOR</OPTION>
@@ -1263,7 +1271,7 @@ on("change:repeating_items:itemweight", function() {
                     +
                     <input type="number" class="sheet-action" name="attr_salvebonus" value="0" title="Bonus/Malus au jet" />
                     <span class="sheet-action">&nbsp;Cette Action inflige des dégâts</span>
-                    <input type="checkbox" class="sheet-selcheck" name="attr_salvedegats" value="[[1@{dtype}]]" title="Cocher pour que l'action lance les dégâts" checked /><span>3</span>
+                    <input type="checkbox" class="sheet-selcheck" name="attr_salvedegats" value="[[1@{dtype} + (@{degpjbonus})[Bonus circonstanciel] ]]" title="Cocher pour que l'action lance les dégâts" checked /><span>3</span>
                 </div>
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Sur 12+ : </span>
@@ -1289,22 +1297,22 @@ on("change:repeating_items:itemweight", function() {
         <!-- ===== DÉFIER LE DANGER ===== -->
         <div class="sheet-action">
             <button type="roll" class="sheet-btAction" name="DefierLeDangerFOR" title="Lancer le Jet d'Action"
-                value="&{template:jet} {{perso=@{character_name}}} {{name=@{defiername} (FOR)}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6+@{strmod}]]}} {{sucsup=@{defiersucsup}}} {{echec=@{defierechec}}} {{succes=@{defiersucces}}} {{partiel=@{defierpartiel}}}"
+                value="&{template:jet} {{perso=@{character_name}}} {{name=@{defiername} (FOR)}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{strmod})[FOR] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{sucsup=@{defiersucsup}}} {{echec=@{defierechec}}} {{succes=@{defiersucces}}} {{partiel=@{defierpartiel}}}"
             ></button>FOR
             <button type="roll" class="sheet-btAction" name="DefierLeDangerDEX" title="Lancer le Jet d'Action"
-                value="&{template:jet} {{perso=@{character_name}}} {{name=@{defiername} (DEX)}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6+@{dexmod}]]}} {{sucsup=@{defiersucsup}}} {{echec=@{defierechec}}} {{succes=@{defiersucces}}} {{partiel=@{defierpartiel}}}"
+                value="&{template:jet} {{perso=@{character_name}}} {{name=@{defiername} (DEX)}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{dexmod})[DEX] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{sucsup=@{defiersucsup}}} {{echec=@{defierechec}}} {{succes=@{defiersucces}}} {{partiel=@{defierpartiel}}}"
             ></button>DEX
             <button type="roll" class="sheet-btAction" name="DefierLeDangerCON" title="Lancer le Jet d'Action"
-                value="&{template:jet} {{perso=@{character_name}}} {{name=@{defiername} (CON)}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6+@{conmod}]]}} {{sucsup=@{defiersucsup}}} {{echec=@{defierechec}}} {{succes=@{defiersucces}}} {{partiel=@{defierpartiel}}}"
+                value="&{template:jet} {{perso=@{character_name}}} {{name=@{defiername} (CON)}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{conmod})[CON] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{sucsup=@{defiersucsup}}} {{echec=@{defierechec}}} {{succes=@{defiersucces}}} {{partiel=@{defierpartiel}}}"
             ></button>CON
             <button type="roll" class="sheet-btAction" name="DefierLeDangerINT" title="Lancer le Jet d'Action"
-                value="&{template:jet} {{perso=@{character_name}}} {{name=@{defiername} (INT)}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6+@{intmod}]]}} {{sucsup=@{defiersucsup}}} {{echec=@{defierechec}}} {{succes=@{defiersucces}}} {{partiel=@{defierpartiel}}}"
+                value="&{template:jet} {{perso=@{character_name}}} {{name=@{defiername} (INT)}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{intmod})[INT] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{sucsup=@{defiersucsup}}} {{echec=@{defierechec}}} {{succes=@{defiersucces}}} {{partiel=@{defierpartiel}}}"
             ></button>INT
             <button type="roll" class="sheet-btAction" name="DefierLeDangerSAG" title="Lancer le Jet d'Action"
-                value="&{template:jet} {{perso=@{character_name}}} {{name=@{defiername} (SAG)}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6+@{wismod}]]}} {{sucsup=@{defiersucsup}}} {{echec=@{defierechec}}} {{succes=@{defiersucces}}} {{partiel=@{defierpartiel}}}"
+                value="&{template:jet} {{perso=@{character_name}}} {{name=@{defiername} (SAG)}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{wismod})[SAG] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{sucsup=@{defiersucsup}}} {{echec=@{defierechec}}} {{succes=@{defiersucces}}} {{partiel=@{defierpartiel}}}"
             ></button>SAG
             <button type="roll" class="sheet-btAction" name="DefierLeDangerCHA" title="Lancer le Jet d'Action"
-                value="&{template:jet} {{perso=@{character_name}}} {{name=@{defiername} (CHA)}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6+@{chamod}]]}} {{sucsup=@{defiersucsup}}} {{echec=@{defierechec}}} {{succes=@{defiersucces}}} {{partiel=@{defierpartiel}}}"
+                value="&{template:jet} {{perso=@{character_name}}} {{name=@{defiername} (CHA)}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{chamod})[CHA] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{sucsup=@{defiersucsup}}} {{echec=@{defierechec}}} {{succes=@{defiersucces}}} {{partiel=@{defierpartiel}}}"
             ></button>CHA
             <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_defier-show" value="1" /><span>y</span>
             <input type="text" name="attr_defiername" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" value="Défier le Danger" style="width:172px;" />
@@ -1340,7 +1348,7 @@ on("change:repeating_items:itemweight", function() {
         <!-- ===== DEFENDRE ===== -->
         <div class="sheet-action">
             <button type="roll" class="sheet-btAction" name="Defendre" title="Lancer le Jet d'Action"
-                value="&{template:jet} {{perso=@{character_name}}} {{name=@{defendrename}}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6+@{defendremod}+(@{defendrebonus})]]}} {{sucsup=@{defendresucsup}}} {{echec=@{defendreechec}}} {{succes=@{defendresucces}}} {{partiel=@{defendrepartiel}}}"
+                value="&{template:jet} {{perso=@{character_name}}} {{name=@{defendrename}}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{defendremod})[Mod.Carac.] +(@{defendrebonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{sucsup=@{defendresucsup}}} {{echec=@{defendreechec}}} {{succes=@{defendresucces}}} {{partiel=@{defendrepartiel}}}"
             ></button>
             <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_defendre-show" value="1" /><span>y</span>
             <input type="text" name="attr_defendrename" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" value="Défendre" />
@@ -1356,7 +1364,7 @@ Aussi longtemps que vous défendez, dès lors que vous (ou ce que vous protégez
                 </div>
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Jet : </span>
-                    2d6 + 
+                    2d6 +
                     <SELECT name="attr_defendremod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
                         <OPTION value="0">-</OPTION>
                         <OPTION value="@{strmod}">FOR</OPTION>
@@ -1384,7 +1392,7 @@ Aussi longtemps que vous défendez, dès lors que vous (ou ce que vous protégez
                 </div>
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Sur 7-9 : </span>
-                    <textarea name="attr_defendrepartiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Retenez 1 parmi : 
+                    <textarea name="attr_defendrepartiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Retenez 1 parmi :
 - redirigez vers vous l'attaque ennemie
 - diminuer de moitié l'effet ou les dégâts de l'attaque
 - offrir à un allié un avantage de +1 sur sa prochaine action envers l'attaquant
@@ -1400,7 +1408,7 @@ Aussi longtemps que vous défendez, dès lors que vous (ou ce que vous protégez
         <!-- ===== ETALER SA SCIENCE ===== -->
         <div class="sheet-action">
             <button type="roll" class="sheet-btAction" name="EtalerSaScience" title="Lancer le Jet d'Action"
-                value="&{template:jet} {{perso=@{character_name}}} {{name=@{etalername}}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6+@{etalermod}+(@{etalerbonus})]]}} {{sucsup=@{etalersucsup}}} {{echec=@{etalerechec}}} {{succes=@{etalersucces}}} {{partiel=@{etalerpartiel}}}"
+                value="&{template:jet} {{perso=@{character_name}}} {{name=@{etalername}}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{etalermod})[Mod.Carac.] +(@{etalerbonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{sucsup=@{etalersucsup}}} {{echec=@{etalerechec}}} {{succes=@{etalersucces}}} {{partiel=@{etalerpartiel}}}"
             ></button>
             <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_etaler-show" value="1" /><span>y</span>
             <input type="text" name="attr_etalername" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" value="Etaler sa Science" />
@@ -1411,7 +1419,7 @@ Aussi longtemps que vous défendez, dès lors que vous (ou ce que vous protégez
                 </div>
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Jet : </span>
-                    2d6 + 
+                    2d6 +
                     <SELECT name="attr_etalermod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
                         <OPTION value="0">-</OPTION>
                         <OPTION value="@{strmod}">FOR</OPTION>
@@ -1445,7 +1453,7 @@ Aussi longtemps que vous défendez, dès lors que vous (ou ce que vous protégez
         <!-- ===== DISCERNER LA RÉALITÉ ===== -->
         <div class="sheet-action">
             <button type="roll" class="sheet-btAction" name="DiscernerLaRealite" title="Lancer le Jet d'Action"
-                value="&{template:jet} {{perso=@{character_name}}} {{name=@{discernername}}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6+@{discernermod}+(@{discernerbonus})]]}} {{sucsup=@{discernersucsup}}} {{echec=@{discernerechec}}} {{succes=@{discernersucces}}} {{partiel=@{discernerpartiel}}}"
+                value="&{template:jet} {{perso=@{character_name}}} {{name=@{discernername}}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{discernermod})[Mod.Carac.] + (@{discernerbonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{sucsup=@{discernersucsup}}} {{echec=@{discernerechec}}} {{succes=@{discernersucces}}} {{partiel=@{discernerpartiel}}}"
             ></button>
             <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_discerner-show" value="1" /><span>y</span>
             <input type="text" name="attr_discernername" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" value="Discerner la Réalité" />
@@ -1456,7 +1464,7 @@ Aussi longtemps que vous défendez, dès lors que vous (ou ce que vous protégez
                 </div>
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Jet : </span>
-                    2d6 + 
+                    2d6 +
                     <SELECT name="attr_discernermod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
                         <OPTION value="0">-</OPTION>
                         <OPTION value="@{strmod}">FOR</OPTION>
@@ -1502,7 +1510,7 @@ Aussi longtemps que vous défendez, dès lors que vous (ou ce que vous protégez
         <!-- ===== NEGOCIER ===== -->
         <div class="sheet-action">
             <button type="roll" class="sheet-btAction" name="Negocier" title="Lancer le Jet d'Action"
-                value="&{template:jet} {{perso=@{character_name}}} {{name=@{negociername}}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6+@{negociermod}+(@{negocierbonus})]]}} {{sucsup=@{negociersucsup}}} {{echec=@{negocierechec}}} {{succes=@{negociersucces}}} {{partiel=@{negocierpartiel}}}"
+                value="&{template:jet} {{perso=@{character_name}}} {{name=@{negociername}}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{negociermod})[Mod.Carac.] + (@{negocierbonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{sucsup=@{negociersucsup}}} {{echec=@{negocierechec}}} {{succes=@{negociersucces}}} {{partiel=@{negocierpartiel}}}"
             ></button>
             <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_negocier-show" value="1" /><span>y</span>
             <input type="text" name="attr_negociername" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" value="Négocier" />
@@ -1513,7 +1521,7 @@ Aussi longtemps que vous défendez, dès lors que vous (ou ce que vous protégez
                 </div>
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Jet : </span>
-                    2d6 + 
+                    2d6 +
                     <SELECT name="attr_negociermod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
                         <OPTION value="0">-</OPTION>
                         <OPTION value="@{strmod}">FOR</OPTION>
@@ -1547,7 +1555,7 @@ Aussi longtemps que vous défendez, dès lors que vous (ou ce que vous protégez
         <!-- ===== AIDER OU GÊNER ===== -->
         <div class="sheet-action">
             <button type="roll" class="sheet-btAction" name="AiderOuGener" title="Lancer le Jet d'Action"
-                value="&{template:jet} {{perso=@{character_name}}} {{name=@{aidername}}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6+?{LIEN|0}]]}}  {{sucsup=@{aidersucsup}}} {{echec=@{aiderechec}}} {{succes=@{aidersucces}}} {{partiel=@{aiderpartiel}}}"
+                value="&{template:jet} {{perso=@{character_name}}} {{name=@{aidername}}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6 + (?{LIENS|0})[Liens] + (@{jetpjbonus})[Bonus circonstanciel] ]]}}  {{sucsup=@{aidersucsup}}} {{echec=@{aiderechec}}} {{succes=@{aidersucces}}} {{partiel=@{aiderpartiel}}}"
             ></button>
             <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_aider-show" value="1" /><span>y</span>
             <input type="text" name="attr_aidername" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" value="Aide ou Gêner" />
@@ -1594,9 +1602,9 @@ Aussi longtemps que vous défendez, dès lors que vous (ou ce que vous protégez
                     </div>
                     <div class="sheet-actionligne">
                         <input type="checkbox" class="sheet-selcheck" name="attr_actionbasejet" value="1" title="Cette Action lance un jet" checked /><span>3</span>
-                        <input type="hidden" name="attr_actionbaseroll" value="[[2d6+@{actionbasemod}+(@{actionbasebonus})]]" />
+                        <input type="hidden" name="attr_actionbaseroll" value="[[2d6 + (@{actionbasemod})[Mod.Carac.] + (@{actionbasebonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]" />
                         <span class="sheet-action" style="min-width: 35px;width: 35px">Jet : </span>
-                        2d6 + 
+                        2d6 +
                         <SELECT name="attr_actionbasemod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
                             <OPTION value="0">-</OPTION>
                             <OPTION value="@{strmod}">FOR</OPTION>
@@ -1609,7 +1617,7 @@ Aussi longtemps que vous défendez, dès lors que vous (ou ce que vous protégez
                         +
                         <input type="number" class="sheet-action" name="attr_actionbasebonus" value="0" title="Bonus/Malus au jet" />
                         <span>&nbsp;Cette Action inflige des dégâts</span>
-                        <input type="checkbox" class="sheet-selcheck" name="attr_actionbasedegats" value="[[1@{dtype}]]"  title="Cocher pour que l'action lance les dégâts" /><span>3</span>
+                        <input type="checkbox" class="sheet-selcheck" name="attr_actionbasedegats" value="[[1@{dtype} + (@{degpjbonus})[Bonus circonstanciel] ]]"  title="Cocher pour que l'action lance les dégâts" /><span>3</span>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 12+ : </span>
@@ -1636,7 +1644,7 @@ Aussi longtemps que vous défendez, dès lors que vous (ou ce que vous protégez
         <!-- ===== DERNIER SOUPIR ===== -->
         <div class="sheet-action">
             <button type="roll" class="sheet-btAction" name="DernierSoupir" title="Lancer le Jet d'Action"
-                value="&{template:jet} {{perso=@{character_name}}} {{name=@{soupirname}}} {{subtags=Action Spéciale}} {{jetshow=[[1]]}} {{jet=[[2d6+@{soupirmod}+(@{soupirbonus})]]}} {{sucsup=@{soupirsucsup}}} {{succes=@{soupirsucces}}} {{partiel=@{soupirpartiel}}} {{echec=@{soupirechec}}}"
+                value="&{template:jet} {{perso=@{character_name}}} {{name=@{soupirname}}} {{subtags=Action Spéciale}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{soupirmod})[Mod.Carac.] + (@{soupirbonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{sucsup=@{soupirsucsup}}} {{succes=@{soupirsucces}}} {{partiel=@{soupirpartiel}}} {{echec=@{soupirechec}}}"
             ></button>
             <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_soupir-show" value="1" /><span>y</span>
             <input type="text" name="attr_soupirname" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" value="Dernier Soupir" />
@@ -1647,7 +1655,7 @@ Aussi longtemps que vous défendez, dès lors que vous (ou ce que vous protégez
                 </div>
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Jet : </span>
-                    2d6 + 
+                    2d6 +
                     <SELECT name="attr_soupirmod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
                         <OPTION value="0" selected >-</OPTION>
                         <OPTION value="@{strmod}">FOR</OPTION>
@@ -1692,7 +1700,7 @@ Aussi longtemps que vous défendez, dès lors que vous (ou ce que vous protégez
                 </div>
             </div>
         </div>
-        <!-- ===== ENCOMBREMENT ===== --> 
+        <!-- ===== ENCOMBREMENT ===== -->
         <div class="sheet-action">
             <button type="roll" class="sheet-btAction" name="Encombrement" title="Lancer le Jet d'Action"
                 value="&{template:jet} {{perso=@{character_name}}} {{name=@{encombrementname}}} {{subtags=Action Spéciale}} {{descshow=[[1]]}} {{desc=@{encombrementbody}}}"
@@ -1702,7 +1710,7 @@ Aussi longtemps que vous défendez, dès lors que vous (ou ce que vous protégez
             <div class="sheet-dispcheck">
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Desc : </span>
-                    <textarea name="attr_encombrementbody" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Quand vous tentez une action en portant une charge, vous risquez d'être encombré. Si le Poids que vous portez est: 
+                    <textarea name="attr_encombrementbody" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Quand vous tentez une action en portant une charge, vous risquez d'être encombré. Si le Poids que vous portez est:
 - égal ou inférieur à votre charge, vous n'êtes pas pénalisé.
 - égal ou inférieur à votre charge +2, vous subissez une pénalité de -1 tant que vous ne vous êtes pas allégé
 - supérieur à votre charge +2, allégez-vous d'au moins 1 poids et agissez à -1 ou échouez automatiquement</textarea>
@@ -1712,7 +1720,7 @@ Aussi longtemps que vous défendez, dès lors que vous (ou ce que vous protégez
         <!-- ===== TOUR DE GARDE ===== -->
         <div class="sheet-action">
             <button type="roll" class="sheet-btAction" name="TourDeGarde" title="Lancer le Jet d'Action"
-                value="&{template:jet} {{perso=@{character_name}}} {{name=@{gardename}}} {{subtags=Action Spéciale}} {{jetshow=[[1]]}} {{jet=[[2d6+@{gardemod}+(@{gardebonus})]]}} {{sucsup=@{gardesucsup}}} {{succes=@{gardesucces}}} {{partiel=@{gardepartiel}}} {{echec=@{gardeechec}}}"
+                value="&{template:jet} {{perso=@{character_name}}} {{name=@{gardename}}} {{subtags=Action Spéciale}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{gardemod})[Mod.Carac.] + (@{gardebonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{sucsup=@{gardesucsup}}} {{succes=@{gardesucces}}} {{partiel=@{gardepartiel}}} {{echec=@{gardeechec}}}"
             ></button>
             <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_garde-show" value="1" /><span>y</span>
             <input type="text" name="attr_gardename" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" value="Tour de Garde" />
@@ -1723,7 +1731,7 @@ Aussi longtemps que vous défendez, dès lors que vous (ou ce que vous protégez
                 </div>
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Jet : </span>
-                    2d6 + 
+                    2d6 +
                     <SELECT name="attr_gardemod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
                         <OPTION value="0">-</OPTION>
                         <OPTION value="@{strmod}">FOR</OPTION>
@@ -1757,7 +1765,7 @@ Aussi longtemps que vous défendez, dès lors que vous (ou ce que vous protégez
         <!-- ===== ENTREPRENDRE UN VOYAGE PERILLEUX ===== -->
         <div class="sheet-action">
             <button type="roll" class="sheet-btAction" name="EntreprendreUnVoyagePerilleux" title="Lancer le Jet d'Action"
-                value="&{template:jet} {{perso=@{character_name}}} {{name=@{voyagename}}} {{subtags=Action Spéciale}} {{jetshow=[[1]]}} {{jet=[[2d6+@{voyagemod}+(@{voyagebonus})]]}} {{sucsup=@{voyagesucsup}}} {{succes=@{voyagesucces}}} {{partiel=@{voyagepartiel}}} {{echec=@{voyageechec}}}"
+                value="&{template:jet} {{perso=@{character_name}}} {{name=@{voyagename}}} {{subtags=Action Spéciale}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{voyagemod})[Mod.Carac.] + (@{voyagebonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{sucsup=@{voyagesucsup}}} {{succes=@{voyagesucces}}} {{partiel=@{voyagepartiel}}} {{echec=@{voyageechec}}}"
             ></button>
             <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_voyage-show" value="1" /><span>y</span>
             <input type="text" name="attr_voyagename" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" value="Entreprendre un Voyage Perilleux" />
@@ -1770,7 +1778,7 @@ Si vous n'attribuez pas l'un ou plusieurs de ces rôles, cela vaut comme si vous
                 </div>
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Jet : </span>
-                    2d6 + 
+                    2d6 +
                     <SELECT name="attr_voyagemod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
                         <OPTION value="0">-</OPTION>
                         <OPTION value="@{strmod}">FOR</OPTION>
@@ -1813,7 +1821,7 @@ Si vous n'attribuez pas l'un ou plusieurs de ces rôles, cela vaut comme si vous
             <div class="sheet-dispcheck">
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Desc : </span>
-                    <textarea name="attr_sessionbody" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Quand vous finissez une session (soirée) de jeu, si vous pensez qu'un de vos liens est résolu (vous en avez fait le tour, il n'est plus pertinent, ou autre), demandez au joueur du PJ lié au vôtre s'il pense de même. Si c'est le cas, marquez 1 PX et créez un nouveau lien avec qui vous voulez, si vous le voulez. Une fois tous  vos  liens  passés  en  revue,  vérifiez  si  vous  avez  agi  en fonction de votre alignement au moins une fois dans la session. 
+                    <textarea name="attr_sessionbody" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Quand vous finissez une session (soirée) de jeu, si vous pensez qu'un de vos liens est résolu (vous en avez fait le tour, il n'est plus pertinent, ou autre), demandez au joueur du PJ lié au vôtre s'il pense de même. Si c'est le cas, marquez 1 PX et créez un nouveau lien avec qui vous voulez, si vous le voulez. Une fois tous  vos  liens  passés  en  revue,  vérifiez  si  vous  avez  agi  en fonction de votre alignement au moins une fois dans la session.
 Si c'est le cas, marquez 1 PX.
 Ensuite, le groupe doit répondre à ces trois questions:
 - Avons-nous appris quelque chose de nouveau et d'important sur le monde ?
@@ -1842,10 +1850,10 @@ Pour chaque oui, chaque PJ marque 1 PX.</textarea>
                 </div>
             </div>
         </div>
-        <!-- ===== RIPAILLER ===== --> 
+        <!-- ===== RIPAILLER ===== -->
         <div class="sheet-action">
             <button type="roll" class="sheet-btAction" name="Ripailler" title="Lancer le Jet d'Action"
-                value="&{template:jet} {{perso=@{character_name}}} {{name=@{ripaillername}}} {{subtags=Action Spéciale}} {{jetshow=[[1]]}} {{jet=[[2d6+@{ripaillermod}+(@{ripaillerbonus})+(?{Tranches de 100 Po|0})]]}} {{sucsup=@{ripaillersucsup}}} {{succes=@{ripaillersucces}}} {{partiel=@{ripaillerpartiel}}} {{echec=@{ripaillerechec}}}"
+                value="&{template:jet} {{perso=@{character_name}}} {{name=@{ripaillername}}} {{subtags=Action Spéciale}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{ripaillermod})[Mod.Carac.] + (@{ripaillerbonus})[Bonus] + (?{Tranches de 100 Po|0})[Tranches de 100 Po] ]]}} {{sucsup=@{ripaillersucsup}}} {{succes=@{ripaillersucces}}} {{partiel=@{ripaillerpartiel}}} {{echec=@{ripaillerechec}}}"
             ></button>
             <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_ripailler-show" value="1" /><span>y</span>
             <input type="text" name="attr_ripaillername" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" value="Ripailler" />
@@ -1856,7 +1864,7 @@ Pour chaque oui, chaque PJ marque 1 PX.</textarea>
                 </div>
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Jet : </span>
-                    2d6 + 
+                    2d6 +
                     <SELECT name="attr_ripaillermod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
                         <OPTION value="0" selected >-</OPTION>
                         <OPTION value="@{strmod}">FOR</OPTION>
@@ -1902,7 +1910,7 @@ Pour chaque oui, chaque PJ marque 1 PX.</textarea>
         <!-- ===== ACHATS ===== -->
         <div class="sheet-action">
             <button type="roll" class="sheet-btAction" name="Achats" title="Lancer le Jet d'Action"
-                value="&{template:jet} {{perso=@{character_name}}} {{name=@{achatsname}}} {{subtags=Action Spéciale}} {{jetshow=[[1]]}} {{jet=[[2d6+@{achatsmod}+(@{achatsbonus})]]}} {{sucsup=@{achatssucsup}}} {{succes=@{achatssucces}}} {{partiel=@{achatspartiel}}} {{echec=@{achatsechec}}}"
+                value="&{template:jet} {{perso=@{character_name}}} {{name=@{achatsname}}} {{subtags=Action Spéciale}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{achatsmod})[Mod.Carac.] + (@{achatsbonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{sucsup=@{achatssucsup}}} {{succes=@{achatssucces}}} {{partiel=@{achatspartiel}}} {{echec=@{achatsechec}}}"
             ></button>
             <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_achats-show" value="1" /><span>y</span>
             <input type="text" name="attr_achatsname" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" value="Achats" />
@@ -1913,7 +1921,7 @@ Pour chaque oui, chaque PJ marque 1 PX.</textarea>
                 </div>
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Jet : </span>
-                    2d6 + 
+                    2d6 +
                     <SELECT name="attr_achatsmod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
                         <OPTION value="0">-</OPTION>
                         <OPTION value="@{strmod}">FOR</OPTION>
@@ -1961,14 +1969,14 @@ Pour chaque oui, chaque PJ marque 1 PX.</textarea>
         <!-- ===== RECRUTER ===== -->
         <div class="sheet-action">
             <button type="roll" class="sheet-btAction" name="Recruter" title="Lancer le Jet d'Action"
-                value="&{template:jet} {{perso=@{character_name}}} {{name=@{recrutername}}} {{subtags=Action Spéciale}} {{jetshow=[[1]]}} {{jet=[[2d6+@{recrutermod}+(@{recruterbonus})+(?{Modificateurs|0})]]}} {{descshow=[[1]]}} {{desc=@{recruterbody}}}"
+                value="&{template:jet} {{perso=@{character_name}}} {{name=@{recrutername}}} {{subtags=Action Spéciale}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{recrutermod})[Mod.Carac.] + (@{recruterbonus})[Bonus] + (?{Modificateurs|0})[Modificateurs] ]]}} {{descshow=[[1]]}} {{desc=@{recruterbody}}}"
             ></button>
             <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_recruter-show" value="1" /><span>y</span>
             <input type="text" name="attr_recrutername" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" value="Recruter" />
             <div class="sheet-dispcheck">
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Desc : </span>
-                    <textarea name="attr_recruterbody" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Quand  vous  faites  savoir  que  vous  cherchez  à  embaucher  du renfort, lancez les dés: 
+                    <textarea name="attr_recruterbody" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Quand  vous  faites  savoir  que  vous  cherchez  à  embaucher  du renfort, lancez les dés:
 +1 si vous annoncez que le salaire est généreux,
 +1 si vous faites connaître vos projets,
 +1 si vous faites savoir que vous distribuerez une part de ce que vous trouverez,
@@ -1976,7 +1984,7 @@ Pour chaque oui, chaque PJ marque 1 PX.</textarea>
                 </div>
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Jet : </span>
-                    2d6 + 
+                    2d6 +
                     <SELECT name="attr_recrutermod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
                         <OPTION value="0" selected >-</OPTION>
                         <OPTION value="@{strmod}">FOR</OPTION>
@@ -1994,7 +2002,7 @@ Pour chaque oui, chaque PJ marque 1 PX.</textarea>
         <!-- ===== AVIS DE RECHERCHE ===== -->
         <div class="sheet-action">
             <button type="roll" class="sheet-btAction" name="AvisDeRecherche" title="Lancer le Jet d'Action"
-                value="&{template:jet} {{perso=@{character_name}}} {{name=@{avisrechname}}} {{subtags=Action Spéciale}} {{jetshow=[[1]]}} {{jet=[[2d6+@{avisrechmod}+(@{avisrechbonus})]]}} {{sucsup=@{avisrechsucsup}}} {{echec=@{avisrechechec}}} {{succes=@{avisrechsucces}}} {{partiel=@{avisrechpartiel}}}"
+                value="&{template:jet} {{perso=@{character_name}}} {{name=@{avisrechname}}} {{subtags=Action Spéciale}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{avisrechmod})[Mod.Carac.] + (@{avisrechbonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{sucsup=@{avisrechsucsup}}} {{echec=@{avisrechechec}}} {{succes=@{avisrechsucces}}} {{partiel=@{avisrechpartiel}}}"
             ></button>
             <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_avisrech-show" value="1" /><span>y</span>
             <input type="text" name="attr_avisrechname" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" value="Avis de Recherche" />
@@ -2005,7 +2013,7 @@ Pour chaque oui, chaque PJ marque 1 PX.</textarea>
                 </div>
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Jet : </span>
-                    2d6 + 
+                    2d6 +
                     <SELECT name="attr_avisrechmod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
                         <OPTION value="0">-</OPTION>
                         <OPTION value="@{strmod}">FOR</OPTION>
@@ -2039,7 +2047,7 @@ Pour chaque oui, chaque PJ marque 1 PX.</textarea>
                     <textarea name="attr_avisrechechec" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un échec" title="Résultat de l'Action sur un échec"></textarea>
                 </div>
             </div>
-        </div>        
+        </div>
         <!-- ===== PREPARATION ===== -->
         <div class="sheet-action">
             <button type="roll" class="sheet-btAction" name="Preparation" title="Lancer le Jet d'Action"
@@ -2070,9 +2078,9 @@ Pour chaque oui, chaque PJ marque 1 PX.</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <input type="checkbox" class="sheet-selcheck" name="attr_actionspejet" value="1" title="Cette Action lance un jet" checked /><span>3</span>
-                        <input type="hidden" name="attr_actionsperoll" value="[[2d6+@{actionspemod}+(@{actionspebonus})]]" />
+                        <input type="hidden" name="attr_actionsperoll" value="[[2d6 + (@{actionspemod})[Mod.Carac.] + (@{actionspebonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]" />
                         <span class="sheet-action" style="min-width: 35px;width: 35px">Jet : </span>
-                        2d6 + 
+                        2d6 +
                         <SELECT name="attr_actionspemod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
                             <OPTION value="0">-</OPTION>
                             <OPTION value="@{strmod}">FOR</OPTION>
@@ -2085,7 +2093,7 @@ Pour chaque oui, chaque PJ marque 1 PX.</textarea>
                         +
                         <input type="number" class="sheet-action" name="attr_actionspebonus" value="0" title="Bonus/Malus au jet" />
                         <span class="sheet-action">&nbsp;Cette Action inflige des dégâts</span>
-                        <input type="checkbox" class="sheet-selcheck" name="attr_actionspedegats" value="[[1@{dtype}]]" title="Cocher pour que l'action lance les dégâts" /><span>3</span>
+                        <input type="checkbox" class="sheet-selcheck" name="attr_actionspedegats" value="[[1@{dtype} + (@{degpjbonus})[Bonus circonstanciel] ]]" title="Cocher pour que l'action lance les dégâts" /><span>3</span>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 12+ : </span>
@@ -2105,9 +2113,9 @@ Pour chaque oui, chaque PJ marque 1 PX.</textarea>
                     </div>
                 </div>
             </div>
-        </fieldset>        
+        </fieldset>
     </div> <!-- FIN SPECIALES -->
-    
+
     <!-- ===== DEPART ===== -->
     <div class="sheet-onglclasse">
         <input type="radio" name="attr_laclasse" class="sheet-barbare" value="barbare" />
@@ -2122,7 +2130,7 @@ Pour chaque oui, chaque PJ marque 1 PX.</textarea>
         <input type="radio" name="attr_laclasse" class="sheet-paladin" value="paladin" />
         <input type="radio" name="attr_laclasse" class="sheet-ranger" value="ranger" />
         <input type="radio" name="attr_laclasse" class="sheet-voleur" value="voleur" />
-        
+
         <!-- ===== BARBARE ===== -->
         <div class="sheet-barbare">
             <!-- ===== Bardé d'acier ===== -->
@@ -2232,7 +2240,7 @@ Pour chaque oui, chaque PJ marque 1 PX.</textarea>
              <!-- ===== Qu'est-ce que t'attends ? ===== -->
             <div class="sheet-action">
                 <button type="roll" class="sheet-btAction" name="ACTION" title="Lancer le Jet d'Action"
-                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{barbare-attend-name}}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6+@{barbare-attend-mod}+(@{barbare-attend-bonus})]]}} {{sucsup=@{barbare-attend-sucsup}}} {{succes=@{barbare-attend-succes}}} {{partiel=@{barbare-attend-partiel}}} {{echec=@{barbare-attend-echec}}}"
+                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{barbare-attend-name}}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{barbare-attend-mod})[Mod.Carac.] + (@{barbare-attend-bonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{sucsup=@{barbare-attend-sucsup}}} {{succes=@{barbare-attend-succes}}} {{partiel=@{barbare-attend-partiel}}} {{echec=@{barbare-attend-echec}}}"
                 ></button>
                 <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_barbare-attend-show" value="1" /><span>y</span>
                 <input type="text" name="attr_barbare-attend-name" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" value="Qu'est-ce que t'attends ?" />
@@ -2243,7 +2251,7 @@ Pour chaque oui, chaque PJ marque 1 PX.</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Jet : </span>
-                        2d6 + 
+                        2d6 +
                         <SELECT name="attr_barbare-attend-mod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
                             <OPTION value="0">-</OPTION>
                             <OPTION value="@{strmod}">FOR</OPTION>
@@ -2281,7 +2289,7 @@ Pour chaque oui, chaque PJ marque 1 PX.</textarea>
             <!-- ===== ARTS ARCANIQUES ===== -->
             <div class="sheet-action">
                 <button type="roll" class="sheet-btAction" name="ArtsArcaniques" title="Lancer le Jet d'Action"
-                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{barde-art-name}}} {{subtags=Action de Départ de Barde}} {{jetshow=[[1]]}} {{jet=[[2d6+@{barde-art-mod}+(@{barde-art-bonus})]]}} {{sucsup=@{barde-art-sucsup}}} {{echec=@{barde-art-echec}}} {{succes=@{barde-art-succes}}} {{partiel=@{barde-art-partiel}}}"
+                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{barde-art-name}}} {{subtags=Action de Départ de Barde}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{barde-art-mod})[Mod.Carac.] + (@{barde-art-bonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{sucsup=@{barde-art-sucsup}}} {{echec=@{barde-art-echec}}} {{succes=@{barde-art-succes}}} {{partiel=@{barde-art-partiel}}}"
                 ></button>
                 <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_barde-art-show" value="1" /><span>y</span>
                 <input type="text" name="attr_barde-art-name" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" value="Arts Arcaniques" />
@@ -2292,7 +2300,7 @@ Pour chaque oui, chaque PJ marque 1 PX.</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Jet : </span>
-                        2d6 + 
+                        2d6 +
                         <SELECT name="attr_barde-art-mod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
                             <OPTION value="0">-</OPTION>
                             <OPTION value="@{strmod}" >FOR</OPTION>
@@ -2398,7 +2406,7 @@ L'allié bénéficie de l'effet choisi parmi :
             <!-- ===== Expertise des pièges ===== -->
             <div class="sheet-action">
                 <button type="roll" class="sheet-btAction" name="CambExpertiseDesPieges" title="Lancer le Jet d'Action"
-                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{cambrioleur-piege-name}}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6+@{cambrioleur-piege-mod}+(@{cambrioleur-piege-bonus})]]}} {{sucsup=@{cambrioleur-piege-sucsup}}} {{succes=@{cambrioleur-piege-succes}}} {{partiel=@{cambrioleur-piege-partiel}}} {{echec=@{cambrioleur-piege-echec}}}"
+                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{cambrioleur-piege-name}}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{cambrioleur-piege-mod})[Mod.Carac.] + (@{cambrioleur-piege-bonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{sucsup=@{cambrioleur-piege-sucsup}}} {{succes=@{cambrioleur-piege-succes}}} {{partiel=@{cambrioleur-piege-partiel}}} {{echec=@{cambrioleur-piege-echec}}}"
                 ></button>
                 <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_cambrioleur-piege-show" value="1" /><span>y</span>
                 <input type="text" name="attr_cambrioleur-piege-name" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" value="Expertise des pièges" />
@@ -2409,7 +2417,7 @@ L'allié bénéficie de l'effet choisi parmi :
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Jet : </span>
-                        2d6 + 
+                        2d6 +
                         <SELECT name="attr_cambrioleur-piege-mod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
                             <OPTION value="0">-</OPTION>
                             <OPTION value="@{strmod}">FOR</OPTION>
@@ -2430,7 +2438,7 @@ L'allié bénéficie de l'effet choisi parmi :
                         <span class="sheet-action">Sur 10+ : </span>
                         <textarea name="attr_cambrioleur-piege-succes" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet">Prenez 3 et dépensez 1 pour poser une des questions suivantes pendant que vous vous déplacez dans cette zone :
 - Y a-t-il un piège ici et si oui, comment se déclenche-t-il ?
-- Que fait ce piège quand il se déclenche ? 
+- Que fait ce piège quand il se déclenche ?
 - Qu'y a-t-il d'autre caché ici ?
                         </textarea>
                     </div>
@@ -2438,7 +2446,7 @@ L'allié bénéficie de l'effet choisi parmi :
                         <span class="sheet-action">Sur 7-9 : </span>
                         <textarea name="attr_cambrioleur-piege-partiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Posez une des questions suivantes pendant que vous vous déplacez dans cette zone :
 - Y a-t-il un piège ici et si oui, comment se déclenche-t-il ?
-- Que fait ce piège quand il se déclenche ? 
+- Que fait ce piège quand il se déclenche ?
 - Qu'y a-t-il d'autre caché ici ?</textarea>
                     </div>
                     <div class="sheet-actionligne">
@@ -2450,7 +2458,7 @@ L'allié bénéficie de l'effet choisi parmi :
             <!-- ===== Ficelles du métier ===== -->
             <div class="sheet-action">
                 <button type="roll" class="sheet-btAction" name="CambFicellesDuMetier" title="Lancer le Jet d'Action"
-                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{cambrioleur-ficelle-name}}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6+@{cambrioleur-ficelle-mod}+(@{cambrioleur-ficelle-bonus})]]}} {{sucsup=@{cambrioleur-ficelle-sucsup}}} {{succes=@{cambrioleur-ficelle-succes}}} {{partiel=@{cambrioleur-ficelle-partiel}}} {{echec=@{cambrioleur-ficelle-echec}}}"
+                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{cambrioleur-ficelle-name}}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{cambrioleur-ficelle-mod})[Mod.Carac.] + (@{cambrioleur-ficelle-bonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{sucsup=@{cambrioleur-ficelle-sucsup}}} {{succes=@{cambrioleur-ficelle-succes}}} {{partiel=@{cambrioleur-ficelle-partiel}}} {{echec=@{cambrioleur-ficelle-echec}}}"
                 ></button>
                 <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_cambrioleur-ficelle-show" value="1" /><span>y</span>
                 <input type="text" name="attr_cambrioleur-ficelle-name" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" value="Ficelles du métier" />
@@ -2461,7 +2469,7 @@ L'allié bénéficie de l'effet choisi parmi :
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Jet : </span>
-                        2d6 + 
+                        2d6 +
                         <SELECT name="attr_cambrioleur-ficelle-mod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
                             <OPTION value="0">-</OPTION>
                             <OPTION value="@{strmod}">FOR</OPTION>
@@ -2510,7 +2518,7 @@ L'allié bénéficie de l'effet choisi parmi :
             <!-- ===== Attaque sournoise ===== -->
             <div class="sheet-action">
                 <button type="roll" class="sheet-btAction" name="CambAttaqueSournoise" title="Lancer le Jet d'Action"
-                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{cambrioleur-sournoise-name}}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6+@{cambrioleur-sournoise-mod}+(@{cambrioleur-sournoise-bonus})]]}} {{sucsup=@{cambrioleur-sournoise-sucsup}}} {{succes=@{cambrioleur-sournoise-succes}}} {{partiel=@{cambrioleur-sournoise-partiel}}} {{echec=@{cambrioleur-sournoise-echec}}}"
+                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{cambrioleur-sournoise-name}}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{cambrioleur-sournoise-mod})[Mod.Carac.] + (@{cambrioleur-sournoise-bonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{sucsup=@{cambrioleur-sournoise-sucsup}}} {{succes=@{cambrioleur-sournoise-succes}}} {{partiel=@{cambrioleur-sournoise-partiel}}} {{echec=@{cambrioleur-sournoise-echec}}}"
                 ></button>
                 <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_cambrioleur-sournoise-show" value="1" /><span>y</span>
                 <input type="text" name="attr_cambrioleur-sournoise-name" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" value="Ficelles du métier" />
@@ -2521,7 +2529,7 @@ L'allié bénéficie de l'effet choisi parmi :
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Jet : </span>
-                        2d6 + 
+                        2d6 +
                         <SELECT name="attr_cambrioleur-sournoise-mod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
                             <OPTION value="0">-</OPTION>
                             <OPTION value="@{strmod}">FOR</OPTION>
@@ -2645,7 +2653,7 @@ L'allié bénéficie de l'effet choisi parmi :
              <!-- ===== Langage des esprits ===== -->
             <div class="sheet-action">
                 <button type="roll" class="sheet-btAction" name="ChamanLangEsprit" title="Lancer le Jet d'Action"
-                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{chaman-langage-name}}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6+@{chaman-langage-mod}+(@{chaman-langage-bonus})]]}} {{sucsup=@{chaman-langage-sucsup}}} {{succes=@{chaman-langage-succes}}} {{partiel=@{chaman-langage-partiel}}} {{echec=@{chaman-langage-echec}}}"
+                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{chaman-langage-name}}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{chaman-langage-mod})[Mod.Carac.] + (@{chaman-langage-bonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{sucsup=@{chaman-langage-sucsup}}} {{succes=@{chaman-langage-succes}}} {{partiel=@{chaman-langage-partiel}}} {{echec=@{chaman-langage-echec}}}"
                 ></button>
                 <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_chaman-langage-show" value="1" /><span>y</span>
                 <input type="text" name="attr_chaman-langage-name" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" value="Langage des esprits" />
@@ -2656,7 +2664,7 @@ L'allié bénéficie de l'effet choisi parmi :
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Jet : </span>
-                        2d6 + 
+                        2d6 +
                         <SELECT name="attr_chaman-langage-mod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
                             <OPTION value="0">-</OPTION>
                             <OPTION value="@{strmod}">FOR</OPTION>
@@ -2693,7 +2701,7 @@ L'allié bénéficie de l'effet choisi parmi :
              <!-- ===== Capture d'esprit ===== -->
             <div class="sheet-action">
                 <button type="roll" class="sheet-btAction" name="ChamanLangEsprit" title="Lancer le Jet d'Action"
-                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{chaman-capture-name}}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6+@{chaman-capture-mod}+(@{chaman-capture-bonus})]]}} {{sucsup=@{chaman-capture-sucsup}}} {{succes=@{chaman-capture-succes}}} {{partiel=@{chaman-capture-partiel}}} {{echec=@{chaman-capture-echec}}}"
+                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{chaman-capture-name}}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{chaman-capture-mod})[Mod.Carac.] + (@{chaman-capture-bonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{sucsup=@{chaman-capture-sucsup}}} {{succes=@{chaman-capture-succes}}} {{partiel=@{chaman-capture-partiel}}} {{echec=@{chaman-capture-echec}}}"
                 ></button>
                 <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_chaman-capture-show" value="1" /><span>y</span>
                 <input type="text" name="attr_chaman-capture-name" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" value="Capture d'esprit" />
@@ -2704,7 +2712,7 @@ L'allié bénéficie de l'effet choisi parmi :
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Jet : </span>
-                        2d6 + 
+                        2d6 +
                         <SELECT name="attr_chaman-capture-mod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
                             <OPTION value="0">-</OPTION>
                             <OPTION value="@{strmod}">FOR</OPTION>
@@ -2739,7 +2747,7 @@ L'allié bénéficie de l'effet choisi parmi :
                 </div>
             </div>
         </div> <!-- FIN CHAMAN -->
-        
+
         <!-- ===== CLERC ===== -->
         <div class="sheet-clerc">
             <!-- ===== DIVINITÉ ===== -->
@@ -2773,7 +2781,7 @@ L'allié bénéficie de l'effet choisi parmi :
                             <OPTION>est sectaire et isolée (Accéder à des secrets).</OPTION>
                             <OPTION>a d'importants rites sacrificiels (Offrande).</OPTION>
                             <OPTION>croit à l'épreuve du combat (Victoire personnelle).</OPTION>
-                        </SELECT>                        
+                        </SELECT>
                     </div>
                 </div>
             </div>
@@ -2794,7 +2802,7 @@ L'allié bénéficie de l'effet choisi parmi :
             <!-- ===== REPOUSSER LES MORTS VIVANTS ===== -->
             <div class="sheet-action">
                 <button type="roll" class="sheet-btAction" name="RepousserLesMortsVivants" title="Lancer le Jet d'Action"
-                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{clerc-repousser-name}}} {{subtags=Action de Départ de Clerc}} {{jetshow=[[1]]}} {{jet=[[2d6+@{clerc-repousser-mod}+(@{clerc-repousser-bonus})]]}} {{sucsup=@{clerc-repousser-sucsup}}} {{echec=@{clerc-repousser-echec}}} {{succes=@{clerc-repousser-succes}}} {{partiel=@{clerc-repousser-partiel}}}"
+                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{clerc-repousser-name}}} {{subtags=Action de Départ de Clerc}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{clerc-repousser-mod})[Mod.Carac.] + (@{clerc-repousser-bonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{sucsup=@{clerc-repousser-sucsup}}} {{echec=@{clerc-repousser-echec}}} {{succes=@{clerc-repousser-succes}}} {{partiel=@{clerc-repousser-partiel}}}"
                 ></button>
                 <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_clerc-repousser-show" value="1" /><span>y</span>
                 <input type="text" name="attr_clerc-repousser-name" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" value="Repousser les Morts Vivants" />
@@ -2805,7 +2813,7 @@ L'allié bénéficie de l'effet choisi parmi :
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Jet : </span>
-                        2d6 + 
+                        2d6 +
                         <SELECT name="attr_clerc-repousser-mod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
                             <OPTION value="0">-</OPTION>
                             <OPTION value="@{strmod}">FOR</OPTION>
@@ -2838,7 +2846,7 @@ L'allié bénéficie de l'effet choisi parmi :
                     </div>
                 </div>
             </div>
-            <!-- ===== COMMUNIER ===== --> 
+            <!-- ===== COMMUNIER ===== -->
             <div class="sheet-action">
                 <button type="roll" class="sheet-btAction" name="Communier" title="Lancer le Jet d'Action"
                     value="&{template:jet} {{perso=@{character_name}}} {{name=@{clerc-communier-name}}} {{subtags=Action de Départ de Clerc}} {{descshow=[[1]]}} {{desc=@{clerc-communier-body}}}"
@@ -2858,7 +2866,7 @@ L'allié bénéficie de l'effet choisi parmi :
             <!-- ===== LANCER UN SORT ===== -->
             <div class="sheet-action">
                 <button type="roll" class="sheet-btAction" name="LancerUnSort" title="Lancer le Jet d'Action"
-                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{clerc-sort-name}}} {{subtags=Action de Départ de Clerc}} {{jetshow=[[1]]}} {{jet=[[2d6+@{clerc-sort-mod}+(@{clerc-sort-bonus})]]}} {{sucsup=@{clerc-sort-sucsup}}} {{echec=@{clerc-sort-echec}}} {{succes=@{clerc-sort-succes}}} {{partiel=@{clerc-sort-partiel}}}"
+                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{clerc-sort-name}}} {{subtags=Action de Départ de Clerc}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{clerc-sort-mod})[Mod.Carac.] + (@{clerc-sort-bonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{sucsup=@{clerc-sort-sucsup}}} {{echec=@{clerc-sort-echec}}} {{succes=@{clerc-sort-succes}}} {{partiel=@{clerc-sort-partiel}}}"
                 ></button>
                 <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_clerc-sort-show" value="1" /><span>y</span>
                 <input type="text" name="attr_clerc-sort-name" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" value="Lancer Un Sort" />
@@ -2870,7 +2878,7 @@ A noter que maintenir des sorts et leurs effets peut parfois entraîner une pén
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Jet : </span>
-                        2d6 + 
+                        2d6 +
                         <SELECT name="attr_clerc-sort-mod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
                             <OPTION value="0">-</OPTION>
                             <OPTION value="@{strmod}">FOR</OPTION>
@@ -2905,7 +2913,7 @@ A noter que maintenir des sorts et leurs effets peut parfois entraîner une pén
                 </div>
             </div>
         </div> <!-- FIN CLERC -->
-        
+
         <!-- ===== DRUIDE ===== -->
         <div class="sheet-druide">
             <!-- ===== CONTEMPLATION DE L'ESSENCE ===== -->
@@ -2925,7 +2933,7 @@ A noter que maintenir des sorts et leurs effets peut parfois entraîner une pén
             <!-- ===== CHANGEFORME ===== -->
             <div class="sheet-action">
                 <button type="roll" class="sheet-btAction" name="Changeforme" title="Lancer le Jet d'Action"
-                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{druide-changeforme-name}}} {{subtags=Action de Départ de Druide}} {{jetshow=[[1]]}} {{jet=[[2d6+@{druide-changeforme-mod}+(@{druide-changeforme-bonus})]]}} {{sucsup=@{druide-changeforme-sucsup}}} {{succes=@{druide-changeforme-succes}}} {{partiel=@{druide-changeforme-partiel}}} {{echec=@{druide-changeforme-echec}}}"
+                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{druide-changeforme-name}}} {{subtags=Action de Départ de Druide}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{druide-changeforme-mod})[Mod.Carac.] + (@{druide-changeforme-bonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{sucsup=@{druide-changeforme-sucsup}}} {{succes=@{druide-changeforme-succes}}} {{partiel=@{druide-changeforme-partiel}}} {{echec=@{druide-changeforme-echec}}}"
                 ></button>
                 <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_druide-changeforme-show" value="1" /><span>y</span>
                 <input type="text" name="attr_druide-changeforme-name" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" value="Changeforme" />
@@ -2936,7 +2944,7 @@ A noter que maintenir des sorts et leurs effets peut parfois entraîner une pén
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Jet : </span>
-                        2d6 + 
+                        2d6 +
                         <SELECT name="attr_druide-changeforme-mod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
                             <OPTION value="0">-</OPTION>
                             <OPTION value="@{strmod}">FOR</OPTION>
@@ -3037,13 +3045,13 @@ Choisissez un aspect – un attribut physique qui vous identifie comme enfant du
                 </div>
             </div>
         </div> <!-- FIN DRUIDE -->
-        
+
         <!-- ===== GUERRIER ===== -->
         <div class="sheet-guerrier">
             <!-- ===== Forcer Portes et Herses ===== -->
             <div class="sheet-action">
                 <button type="roll" class="sheet-btAction" name="ForcerPortesEtHerses" title="Lancer le Jet d'Action"
-                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{guerrier-forcer-name}}} {{subtags=Action de Départ de Guerrier}} {{jetshow=[[1]]}} {{jet=[[2d6+@{guerrier-forcer-mod}+(@{guerrier-forcer-bonus})]]}} {{sucsup=@{guerrier-forcer-sucsup}}} {{echec=@{guerrier-forcer-echec}}} {{succes=@{guerrier-forcer-succes}}} {{partiel=@{guerrier-forcer-partiel}}}"
+                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{guerrier-forcer-name}}} {{subtags=Action de Départ de Guerrier}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{guerrier-forcer-mod})[Mod.Carac.] + (@{guerrier-forcer-bonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{sucsup=@{guerrier-forcer-sucsup}}} {{echec=@{guerrier-forcer-echec}}} {{succes=@{guerrier-forcer-succes}}} {{partiel=@{guerrier-forcer-partiel}}}"
                 ></button>
                 <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_guerrier-forcer-show" value="1" /><span>y</span>
                 <input type="text" name="attr_guerrier-forcer-name" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" value="Forcer Portes et Herses" />
@@ -3054,7 +3062,7 @@ Choisissez un aspect – un attribut physique qui vous identifie comme enfant du
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Jet : </span>
-                        2d6 + 
+                        2d6 +
                         <SELECT name="attr_guerrier-forcer-mod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
                             <OPTION value="0">-</OPTION>
                             <OPTION value="@{strmod}" selected>FOR</OPTION>
@@ -3092,7 +3100,7 @@ Choisissez un aspect – un attribut physique qui vous identifie comme enfant du
                         <textarea name="attr_guerrier-forcer-echec" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un échec" title="Résultat de l'Action sur un échec"></textarea>
                     </div>
                 </div>
-            </div>            
+            </div>
             <!-- ===== CUIRASSE ===== -->
             <div class="sheet-action">
                 <button type="roll" class="sheet-btAction" name="Cuirasse" title="Lancer le Jet d'Action"
@@ -3183,7 +3191,7 @@ Choisissez un aspect – un attribut physique qui vous identifie comme enfant du
              <!-- ===== Tison ardent ===== -->
             <div class="sheet-action">
                 <button type="roll" class="sheet-btAction" name="ImmoTison" title="Lancer le Jet d'Action"
-                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{immolateur-tison-name}}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6+@{immolateur-tison-mod}+(@{immolateur-tison-bonus})]]}} {{sucsup=@{immolateur-tison-sucsup}}} {{succes=@{immolateur-tison-succes}}} {{partiel=@{immolateur-tison-partiel}}} {{echec=@{immolateur-tison-echec}}}"
+                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{immolateur-tison-name}}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{immolateur-tison-mod})[Mod.Carac.] + (@{immolateur-tison-bonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{sucsup=@{immolateur-tison-sucsup}}} {{succes=@{immolateur-tison-succes}}} {{partiel=@{immolateur-tison-partiel}}} {{echec=@{immolateur-tison-echec}}}"
                 ></button>
                 <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_immolateur-tison-show" value="1" /><span>y</span>
                 <input type="text" name="attr_immolateur-tison-name" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" value="Tison ardent" />
@@ -3194,7 +3202,7 @@ Choisissez un aspect – un attribut physique qui vous identifie comme enfant du
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Jet : </span>
-                        2d6 + 
+                        2d6 +
                         <SELECT name="attr_immolateur-tison-mod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
                             <OPTION value="0">-</OPTION>
                             <OPTION value="@{strmod}">FOR</OPTION>
@@ -3214,8 +3222,8 @@ Choisissez un aspect – un attribut physique qui vous identifie comme enfant du
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 10+ : </span>
                         <textarea name="attr_immolateur-tison-succes" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet">Choisissez deux des marqueurs suivants.
-Vous pouvez remplacer votre FOR ou votre DEX par INT pour vos attaques avec cette arme. 
-L'arme démarre toujours avec les marqueurs enflammé, toucher, dangereux et 3 utilisations. 
+Vous pouvez remplacer votre FOR ou votre DEX par INT pour vos attaques avec cette arme.
+L'arme démarre toujours avec les marqueurs enflammé, toucher, dangereux et 3 utilisations.
 Chaque attaque avec cette arme dépense une utilisation.
 - Contact
 - Lancé, Courte
@@ -3226,8 +3234,8 @@ Chaque attaque avec cette arme dépense une utilisation.
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 7-9 : </span>
                         <textarea name="attr_immolateur-tison-partiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Choisissez un des marqueurs suivants.
-Vous pouvez remplacer votre FOR ou votre DEX par INT pour vos attaques avec cette arme. 
-L'arme démarre toujours avec les marqueurs enflammé, toucher, dangereux et 3 utilisations. 
+Vous pouvez remplacer votre FOR ou votre DEX par INT pour vos attaques avec cette arme.
+L'arme démarre toujours avec les marqueurs enflammé, toucher, dangereux et 3 utilisations.
 Chaque attaque avec cette arme dépense une utilisation.
 - Contact
 - Lancé, Courte
@@ -3257,7 +3265,7 @@ Chaque attaque avec cette arme dépense une utilisation.
              <!-- ===== La marque de Zuko ===== -->
             <div class="sheet-action">
                 <button type="roll" class="sheet-btAction" name="ImmoZuko" title="Lancer le Jet d'Action"
-                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{immolateur-zuko-name}}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6+@{immolateur-zuko-mod}+(@{immolateur-zuko-bonus})]]}} {{sucsup=@{immolateur-zuko-sucsup}}} {{succes=@{immolateur-zuko-succes}}} {{partiel=@{immolateur-zuko-partiel}}} {{echec=@{immolateur-zuko-echec}}}"
+                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{immolateur-zuko-name}}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{immolateur-zuko-mod})[Mod.Carac.] + (@{immolateur-zuko-bonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{sucsup=@{immolateur-zuko-sucsup}}} {{succes=@{immolateur-zuko-succes}}} {{partiel=@{immolateur-zuko-partiel}}} {{echec=@{immolateur-zuko-echec}}}"
                 ></button>
                 <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_immolateur-zuko-show" value="1" /><span>y</span>
                 <input type="text" name="attr_immolateur-zuko-name" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" value="La marque de Zuko" />
@@ -3268,7 +3276,7 @@ Chaque attaque avec cette arme dépense une utilisation.
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Jet : </span>
-                        2d6 + 
+                        2d6 +
                         <SELECT name="attr_immolateur-zuko-mod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
                             <OPTION value="0">-</OPTION>
                             <OPTION value="@{strmod}">FOR</OPTION>
@@ -3298,7 +3306,7 @@ Chaque attaque avec cette arme dépense une utilisation.
                         <textarea name="attr_immolateur-zuko-echec" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un échec" title="Résultat de l'Action sur un échec"></textarea>
                     </div>
                 </div>
-            </div>        
+            </div>
             <!-- ===== Allumeeeeer le feu ! ===== -->
             <div class="sheet-action">
                 <button type="roll" class="sheet-btAction" name="ImmoAllumer" title="Lancer le Jet d'Action"
@@ -3328,7 +3336,7 @@ Chaque attaque avec cette arme dépense une utilisation.
                 </div>
             </div>
         </div> <!-- FIN IMMOLATEUR -->
-        
+
         <!-- ===== MAGICIEN ===== -->
         <div class="sheet-magicien">
             <!-- ===== DÉFENSE MAGIQUE ===== -->
@@ -3400,7 +3408,7 @@ Chaque attaque avec cette arme dépense une utilisation.
             <!-- ===== LANCER UN SORT ===== -->
             <div class="sheet-action">
                 <button type="roll" class="sheet-btAction" name="MagicienLancerUnSort" title="Lancer le Jet d'Action"
-                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{magicien-sort-name}}} {{subtags=Action de Départ de Magicien}} {{jetshow=[[1]]}} {{jet=[[2d6+@{magicien-sort-mod}+(@{magicien-sort-bonus})]]}} {{sucsup=@{magicien-sort-sucsup}}} {{echec=@{magicien-sort-echec}}} {{succes=@{magicien-sort-succes}}} {{partiel=@{magicien-sort-partiel}}}"
+                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{magicien-sort-name}}} {{subtags=Action de Départ de Magicien}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{magicien-sort-mod})[Mod.Carac.] + (@{magicien-sort-bonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{sucsup=@{magicien-sort-sucsup}}} {{echec=@{magicien-sort-echec}}} {{succes=@{magicien-sort-succes}}} {{partiel=@{magicien-sort-partiel}}}"
                 ></button>
                 <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_magicien-sort-show" value="1" /><span>y</span>
                 <input type="text" name="attr_magicien-sort-name" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" value="Lancer un Sort" />
@@ -3411,7 +3419,7 @@ Chaque attaque avec cette arme dépense une utilisation.
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Jet : </span>
-                        2d6 + 
+                        2d6 +
                         <SELECT name="attr_magicien-sort-mod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
                             <OPTION value="0">-</OPTION>
                             <OPTION value="@{strmod}">FOR</OPTION>
@@ -3446,13 +3454,13 @@ Chaque attaque avec cette arme dépense une utilisation.
                 </div>
             </div>
         </div> <!-- FIN MAGICIEN -->
-        
+
         <!-- ===== PALADIN ===== -->
         <div class="sheet-paladin">
             <!-- ===== IMPOSITION DES MAINS ===== -->
             <div class="sheet-action">
                 <button type="roll" class="sheet-btAction" name="ImpositionDesMains" title="Lancer le Jet d'Action"
-                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{paladin-imposition-name}}} {{subtags=Action de Départ de Paladin}} {{jetshow=[[1]]}} {{jet=[[2d6+@{paladin-imposition-mod}+(@{paladin-imposition-bonus})]]}} {{sucsup=@{paladin-imposition-sucsup}}} {{echec=@{paladin-imposition-echec}}} {{succes=@{paladin-imposition-succes}}} {{partiel=@{paladin-imposition-partiel}}}"
+                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{paladin-imposition-name}}} {{subtags=Action de Départ de Paladin}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{paladin-imposition-mod})[Mod.Carac.] + (@{paladin-imposition-bonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{sucsup=@{paladin-imposition-sucsup}}} {{echec=@{paladin-imposition-echec}}} {{succes=@{paladin-imposition-succes}}} {{partiel=@{paladin-imposition-partiel}}}"
                 ></button>
                 <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_paladin-imposition-show" value="1" /><span>y</span>
                 <input type="text" name="attr_paladin-imposition-name" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" value="Imposition des Mains" />
@@ -3463,7 +3471,7 @@ Chaque attaque avec cette arme dépense une utilisation.
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Jet : </span>
-                        2d6 + 
+                        2d6 +
                         <SELECT name="attr_paladin-imposition-mod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
                             <OPTION value="0">-</OPTION>
                             <OPTION value="@{strmod}">FOR</OPTION>
@@ -3511,7 +3519,7 @@ Chaque attaque avec cette arme dépense une utilisation.
             <!-- ===== LA LOI C'EST MOI ===== -->
             <div class="sheet-action">
                 <button type="roll" class="sheet-btAction" name="LaLoiCestMoi" title="Lancer le Jet d'Action"
-                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{paladin-loi-name}}} {{subtags=Action de Départ de Paladin}} {{jetshow=[[1]]}} {{jet=[[2d6+@{paladin-loi-mod}+(@{paladin-loi-bonus})]]}} {{sucsup=@{paladin-loi-sucsup}}} {{succes=@{paladin-loi-succes}}} {{partiel=@{paladin-loi-partiel}}} {{echec=@{paladin-loi-echec}}}"
+                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{paladin-loi-name}}} {{subtags=Action de Départ de Paladin}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{paladin-loi-mod})[Mod.Carac.] + (@{paladin-loi-bonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{sucsup=@{paladin-loi-sucsup}}} {{succes=@{paladin-loi-succes}}} {{partiel=@{paladin-loi-partiel}}} {{echec=@{paladin-loi-echec}}}"
                 ></button>
                 <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_paladin-loi-show" value="1" /><span>y</span>
                 <input type="text" name="attr_paladin-loi-name" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" value="La Loi C'est Moi" />
@@ -3522,7 +3530,7 @@ Chaque attaque avec cette arme dépense une utilisation.
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Jet : </span>
-                        2d6 + 
+                        2d6 +
                         <SELECT name="attr_paladin-loi-mod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
                             <OPTION value="0">-</OPTION>
                             <OPTION value="@{strmod}">FOR</OPTION>
@@ -3587,7 +3595,7 @@ Vous avez aussi +1 à suivre contre lui.</textarea>
                 </div>
             </div>
         </div> <!-- FIN PALADIN -->
-        
+
         <!-- ===== RANGER ===== -->
         <div class="sheet-ranger">
             <!-- ===== ANIMAL FAMILIER ===== -->
@@ -3666,7 +3674,7 @@ Votre animal familier est dressé à attaquer des humanoïdes.</textarea>
             <!-- ===== CHASSER ET PISTER ===== -->
             <div class="sheet-action">
                 <button type="roll" class="sheet-btAction" name="ChasserEtPister" title="Lancer le Jet d'Action"
-                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{ranger-chasser-name}}} {{subtags=Action de Départ de Ranger}} {{jetshow=[[1]]}} {{jet=[[2d6+@{ranger-chasser-mod}+(@{ranger-chasser-bonus})]]}} {{sucsup=@{ranger-chasser-sucsup}}} {{echec=@{ranger-chasser-echec}}} {{succes=@{ranger-chasser-succes}}} {{partiel=@{ranger-chasser-partiel}}}"
+                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{ranger-chasser-name}}} {{subtags=Action de Départ de Ranger}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{ranger-chasser-mod})[Mod.Carac.] + (@{ranger-chasser-bonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{sucsup=@{ranger-chasser-sucsup}}} {{echec=@{ranger-chasser-echec}}} {{succes=@{ranger-chasser-succes}}} {{partiel=@{ranger-chasser-partiel}}}"
                 ></button>
                 <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_ranger-chasser-show" value="1" /><span>y</span>
                 <input type="text" name="attr_ranger-chasser-name" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" value="Chasser et Pister" />
@@ -3677,7 +3685,7 @@ Votre animal familier est dressé à attaquer des humanoïdes.</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Jet : </span>
-                        2d6 + 
+                        2d6 +
                         <SELECT name="attr_ranger-chasser-mod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
                             <OPTION value="0">-</OPTION>
                             <OPTION value="@{strmod}">FOR</OPTION>
@@ -3713,7 +3721,7 @@ Votre animal familier est dressé à attaquer des humanoïdes.</textarea>
             <!-- ===== TIR PRÉCIS ===== -->
             <div class="sheet-action">
                 <button type="roll" class="sheet-btAction" name="TirPrecis" title="Lancer le Jet d'Action"
-                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{ranger-tir-name}}} {{subtags=Action de Départ de Ranger}} {{jetshow=[[1]]}} {{jet=[[2d6+@{ranger-tir-mod}+(@{ranger-tir-bonus})]]}} {{sucsup=@{ranger-tir-sucsup}}} {{echec=@{ranger-tir-echec}}} {{succes=@{ranger-tir-succes}}} {{partiel=@{ranger-tir-partiel}}} {{degatsaction=@{ranger-tir-degats}}}"
+                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{ranger-tir-name}}} {{subtags=Action de Départ de Ranger}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{ranger-tir-mod})[Mod.Carac.] + (@{ranger-tir-bonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{sucsup=@{ranger-tir-sucsup}}} {{echec=@{ranger-tir-echec}}} {{succes=@{ranger-tir-succes}}} {{partiel=@{ranger-tir-partiel}}} {{degatsaction=@{ranger-tir-degats}}}"
                 ></button>
                 <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_ranger-tir-show" value="1" /><span>y</span>
                 <input type="text" name="attr_ranger-tir-name" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" value="Tir Précis" />
@@ -3724,7 +3732,7 @@ Votre animal familier est dressé à attaquer des humanoïdes.</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Jet : </span>
-                        2d6 + 
+                        2d6 +
                         <SELECT name="attr_ranger-tir-mod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
                             <OPTION value="0">-</OPTION>
                             <OPTION value="@{strmod}">FOR</OPTION>
@@ -3737,7 +3745,7 @@ Votre animal familier est dressé à attaquer des humanoïdes.</textarea>
                         +
                         <input type="number" class="sheet-action" name="attr_ranger-tir-bonus" value="0" title="Bonus/Malus au jet" />
                         <span class="sheet-action">&nbsp;Cette Action inflige des dégâts</span>
-                        <input type="checkbox" class="sheet-selcheck" name="attr_ranger-tir-degats" value="[[1@{dtype}]]" title="Cocher pour que l'action lance les dégâts" checked /><span>3</span>
+                        <input type="checkbox" class="sheet-selcheck" name="attr_ranger-tir-degats" value="[[1@{dtype} + (@{degpjbonus})[Bonus circonstanciel] ]]" title="Cocher pour que l'action lance les dégâts" checked /><span>3</span>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 12+ : </span>
@@ -3764,13 +3772,13 @@ Votre animal familier est dressé à attaquer des humanoïdes.</textarea>
                 </div>
             </div>
         </div> <!-- FIN RANGER -->
-        
+
         <!-- ===== VOLEUR ===== -->
         <div class="sheet-voleur">
             <!-- ===== EXPERTISE DES PIÈGES ===== -->
             <div class="sheet-action">
                 <button type="roll" class="sheet-btAction" name="ExpertiseDesPieges" title="Lancer le Jet d'Action"
-                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{voleur-piege-name}}} {{subtags=Action de Départ de Voleur}} {{jetshow=[[1]]}} {{jet=[[2d6+@{voleur-piege-mod}+(@{voleur-piege-bonus})]]}} {{sucsup=@{voleur-piege-sucsup}}} {{echec=@{voleur-piege-echec}}} {{succes=@{voleur-piege-succes}}} {{partiel=@{voleur-piege-partiel}}}"
+                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{voleur-piege-name}}} {{subtags=Action de Départ de Voleur}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{voleur-piege-mod})[Mod.Carac.] + (@{voleur-piege-bonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{sucsup=@{voleur-piege-sucsup}}} {{echec=@{voleur-piege-echec}}} {{succes=@{voleur-piege-succes}}} {{partiel=@{voleur-piege-partiel}}}"
                 ></button>
                 <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_voleur-piege-show" value="1" /><span>y</span>
                 <input type="text" name="attr_voleur-piege-name" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" value="Expertise des Pièges" />
@@ -3781,7 +3789,7 @@ Votre animal familier est dressé à attaquer des humanoïdes.</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Jet : </span>
-                        2d6 + 
+                        2d6 +
                         <SELECT name="attr_voleur-piege-mod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
                             <OPTION value="0">-</OPTION>
                             <OPTION value="@{strmod}">FOR</OPTION>
@@ -3800,18 +3808,18 @@ Votre animal familier est dressé à attaquer des humanoïdes.</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 10+ : </span>
-                        <textarea name="attr_voleur-piege-succes" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet">Prenez 3 et dépensez 1 pour poser une des questions suivantes pendantque 
+                        <textarea name="attr_voleur-piege-succes" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet">Prenez 3 et dépensez 1 pour poser une des questions suivantes pendantque
 vous vous déplacez dans cette zone :
 - Y a-t-il un piège ici et si oui, comment se déclenche-t-il ?
-- Que fait ce piège quand il se déclenche ? 
+- Que fait ce piège quand il se déclenche ?
 - Qu'est-ce qu'il y a d'autre caché ici ?</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 7-9 : </span>
-                        <textarea name="attr_voleur-piege-partiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Prenez 1 et dépensez 1 pour poser une des questions suivantes pendantque 
+                        <textarea name="attr_voleur-piege-partiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Prenez 1 et dépensez 1 pour poser une des questions suivantes pendantque
 vous vous déplacez dans cette zone :
 - Y a-t-il un piège ici et si oui, comment se déclenche-t-il ?
-- Que fait ce piège quand il se déclenche ? 
+- Que fait ce piège quand il se déclenche ?
 - Qu'est-ce qu'il y a d'autre caché ici ?</textarea>
                     </div>
                     <div class="sheet-actionligne">
@@ -3823,7 +3831,7 @@ vous vous déplacez dans cette zone :
             <!-- ===== FICELLES DU MÉTIER ===== -->
             <div class="sheet-action">
                 <button type="roll" class="sheet-btAction" name="FicellesDuMetier" title="Lancer le Jet d'Action"
-                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{voleur-metier-name}}} {{subtags=Action de Départ de Voleur}} {{jetshow=[[1]]}} {{jet=[[2d6+@{voleur-metier-mod}+(@{voleur-metier-bonus})]]}} {{sucsup=@{voleur-metier-sucsup}}} {{echec=@{voleur-metier-echec}}} {{succes=@{voleur-metier-succes}}} {{partiel=@{voleur-metier-partiel}}}"
+                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{voleur-metier-name}}} {{subtags=Action de Départ de Voleur}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{voleur-metier-mod})[Mod.Carac.] + (@{voleur-metier-bonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{sucsup=@{voleur-metier-sucsup}}} {{echec=@{voleur-metier-echec}}} {{succes=@{voleur-metier-succes}}} {{partiel=@{voleur-metier-partiel}}}"
                 ></button>
                 <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_voleur-metier-show" value="1" /><span>y</span>
                 <input type="text" name="attr_voleur-metier-name" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" value="Ficelles du Métier" />
@@ -3834,7 +3842,7 @@ vous vous déplacez dans cette zone :
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Jet : </span>
-                        2d6 + 
+                        2d6 +
                         <SELECT name="attr_voleur-metier-mod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
                             <OPTION value="0">-</OPTION>
                             <OPTION value="@{strmod}">FOR</OPTION>
@@ -3868,7 +3876,7 @@ vous vous déplacez dans cette zone :
             <!-- ===== ATTAQUE SOURNOISE ===== -->
             <div class="sheet-action">
                 <button type="roll" class="sheet-btAction" name="AttaqueSournoise" title="Lancer le Jet d'Action"
-                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{voleur-sournoise-name}}} {{subtags=Action de Départ de Voleur}} {{jetshow=[[1]]}} {{jet=[[2d6+@{voleur-sournoise-mod}+(@{voleur-sournoise-bonus})]]}} {{sucsup=@{voleur-sournoise-sucsup}}} {{echec=@{voleur-sournoise-echec}}} {{succes=@{voleur-sournoise-succes}}} {{partiel=@{voleur-sournoise-partiel}}} {{degatsaction=@{voleur-sournoise-degats}}}"
+                    value="&{template:jet} {{perso=@{character_name}}} {{name=@{voleur-sournoise-name}}} {{subtags=Action de Départ de Voleur}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{voleur-sournoise-mod})[Mod.Carac.] + (@{voleur-sournoise-bonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{sucsup=@{voleur-sournoise-sucsup}}} {{echec=@{voleur-sournoise-echec}}} {{succes=@{voleur-sournoise-succes}}} {{partiel=@{voleur-sournoise-partiel}}} {{degatsaction=@{voleur-sournoise-degats}}}"
                 ></button>
                 <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_voleur-sournoise-show" value="1" /><span>y</span>
                 <input type="text" name="attr_voleur-sournoise-name" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" value="Attaque Sournoise" />
@@ -3879,7 +3887,7 @@ vous vous déplacez dans cette zone :
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Jet : </span>
-                        2d6 + 
+                        2d6 +
                         <SELECT name="attr_voleur-sournoise-mod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
                             <OPTION value="0">-</OPTION>
                             <OPTION value="@{strmod}">FOR</OPTION>
@@ -3892,7 +3900,7 @@ vous vous déplacez dans cette zone :
                         +
                         <input type="number" class="sheet-action" name="attr_voleur-sournoise-bonus" value="0" title="Bonus/Malus au jet" />
                         <span class="sheet-action">&nbsp;Cette Action inflige des dégâts</span>
-                        <input type="checkbox" class="sheet-selcheck" name="attr_voleur-sournoise-degats" value="[[1@{dtype}]]" title="Cocher pour que l'action lance les dégâts" checked /><span>3</span>
+                        <input type="checkbox" class="sheet-selcheck" name="attr_voleur-sournoise-degats" value="[[1@{dtype} + (@{degpjbonus})[Bonus circonstanciel] ]]" title="Cocher pour que l'action lance les dégâts" checked /><span>3</span>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 12+ : </span>
@@ -3953,7 +3961,7 @@ vous vous déplacez dans cette zone :
         <!-- ===== DEPART DYNAMIQUE ===== -->
         <fieldset class="repeating_actionsdepart">
             <div class="sheet-action">
-                <button type="roll" class="sheet-btAction" name="Depart" 
+                <button type="roll" class="sheet-btAction" name="Depart"
                     value="&{template:jet} {{perso=@{character_name}}} {{name=@{actiondepname}}} {{subtags=Action de Départ}} {{jetshow=[[@{actiondepjet}]]}} {{jet=@{actiondeproll}}} {{descshow=[[@{actiondepbodydisp}]]}} {{desc=@{actiondepbody}}}{{sucsup=@{actiondepsucsup}}}  {{succes=@{actiondepsucces}}} {{partiel=@{actiondeppartiel}}} {{echec=@{actiondepechec}}} {{degatsaction=@{actiondepdegats}}}"
                 ></button>
                 <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_actiondep-show" value="1" checked /><span>y</span>
@@ -3966,9 +3974,9 @@ vous vous déplacez dans cette zone :
                     </div>
                     <div class="sheet-actionligne">
                         <input type="checkbox" class="sheet-selcheck" name="attr_actiondepjet" value="1" title="Cette Action lance un jet" checked /><span>3</span>
-                        <input type="hidden" name="attr_actiondeproll" value="[[2d6+@{actiondepmod}+(@{actiondepbonus})]]" />
+                        <input type="hidden" name="attr_actiondeproll" value="[[2d6 + (@{actiondepmod})[Mod.Carac.] + (@{actiondepbonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]" />
                         <span class="sheet-action" style="min-width: 35px;width: 35px">Jet : </span>
-                        2d6 + 
+                        2d6 +
                         <SELECT name="attr_actiondepmod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
                             <OPTION value="0" selected>-</OPTION>
                             <OPTION value="@{strmod}">FOR</OPTION>
@@ -3981,7 +3989,7 @@ vous vous déplacez dans cette zone :
                         +
                         <input type="number" class="sheet-action" name="attr_actiondepbonus" value="0" title="Bonus/Malus au jet" />
                         <span class="sheet-action">&nbsp;Cette Action inflige des dégâts</span>
-                        <input type="checkbox" class="sheet-selcheck" name="attr_actiondepdegats" value="[[1@{dtype}]]" title="Cocher pour que l'action lance les dégâts" /><span>3</span>
+                        <input type="checkbox" class="sheet-selcheck" name="attr_actiondepdegats" value="[[1@{dtype} + (@{degpjbonus})[Bonus circonstanciel] ]]" title="Cocher pour que l'action lance les dégâts" /><span>3</span>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 12+ : </span>
@@ -3999,16 +4007,16 @@ vous vous déplacez dans cette zone :
                         <span class="sheet-action">Sur 6- : </span>
                         <textarea name="attr_actiondepechec" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un échec" title="Résultat de l'Action sur un échec"></textarea>
                     </div>
-                </div>            
+                </div>
             </div>
         </fieldset>
     </div> <!-- FIN DEPART -->
-    
+
     <!-- ===== AVANCEES DYNAMIQUE ===== -->
     <div class="sheet-onglavance">
         <fieldset class="repeating_moves">
             <div class="sheet-action">
-                <button type="roll" class="sheet-btAction" name="Avancee" 
+                <button type="roll" class="sheet-btAction" name="Avancee"
                     value="&{template:jet} {{perso=@{character_name}}} {{name=@{movename}}} {{subtags=Action Avancée}} {{jetshow=[[@{movejet}]]}} {{jet=@{moveroll}}} {{descshow=[[@{movebodydisp}]]}} {{desc=@{movebody}}} {{sucsup=@{movesucsup}}} {{succes=@{movesucces}}} {{partiel=@{movepartiel}}} {{echec=@{moveechec}}} {{degatsaction=@{movedegats}}}"
                 ></button>
                 <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_move-show" value="1" checked /><span>y</span>
@@ -4021,9 +4029,9 @@ vous vous déplacez dans cette zone :
                     </div>
                     <div class="sheet-actionligne">
                         <input type="checkbox" class="sheet-selcheck" name="attr_movejet" value="1" title="Cette Action lance un jet" checked /><span>3</span>
-                        <input type="hidden" name="attr_moveroll" value="[[2d6+@{movemod}+(@{movebonus})]]" />
+                        <input type="hidden" name="attr_moveroll" value="[[2d6 + (@{movemod})[Mod.Carac.] + (@{movebonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]" />
                         <span class="sheet-action" style="min-width: 35px;width: 35px">Jet : </span>
-                        2d6 + 
+                        2d6 +
                         <SELECT name="attr_movemod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
                             <OPTION value="0" selected>-</OPTION>
                             <OPTION value="@{strmod}">FOR</OPTION>
@@ -4036,7 +4044,7 @@ vous vous déplacez dans cette zone :
                         +
                         <input type="number" class="sheet-action" name="attr_movebonus" value="0" title="Bonus/Malus au jet" />
                         <span class="sheet-action">&nbsp;Cette Action inflige des dégâts</span>
-                        <input type="checkbox" class="sheet-selcheck" name="attr_movedegats" value="[[1@{dtype}]]" title="Cocher pour que l'action lance les dégâts" /><span>3</span>
+                        <input type="checkbox" class="sheet-selcheck" name="attr_movedegats" value="[[1@{dtype} + (@{degpjbonus})[Bonus circonstanciel] ]]" title="Cocher pour que l'action lance les dégâts" /><span>3</span>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 12+ : </span>
@@ -4054,7 +4062,7 @@ vous vous déplacez dans cette zone :
                         <span class="sheet-action">Sur 6- : </span>
                         <textarea name="attr_moveechec" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un échec" title="Résultat de l'Action sur un échec"></textarea>
                     </div>
-                </div>            
+                </div>
             </div>
         </fieldset>
     </div> <!-- FIN AVANCEES -->
@@ -4075,7 +4083,7 @@ vous vous déplacez dans cette zone :
         </div>
         <fieldset class="repeating_spells">
             <div class="sheet-action">
-                <button type="roll" class="sheet-btAction" name="JetSort" 
+                <button type="roll" class="sheet-btAction" name="JetSort"
                     value="&{template:jet} {{perso=@{character_name}}} {{name=@{spellname}}} {{subtags=Sort}} {{jetshow=[[@{spelljet}]]}} {{jetsort=@{spellroll}}} {{descshow=[[@{spellbodydisp}]]}} {{desc=@{spellbody}}}"
                 ></button>
                 <input type="checkbox" class="sheet-dispcheck" title="Afficher/Masquer la description" name="attr_spell-show" value="1" checked /><span>y</span>
@@ -4084,7 +4092,7 @@ vous vous déplacez dans cette zone :
                 <input type="number" class="sheet-action" name="attr_spellniveau" value="0" min="0" title="Niveau du sort" />
                 <span class="sheet-action">Préparé : </span>
                 <input type="checkbox" class="sheet-selcheck" name="attr_spellprep" value="1" title="Le sort a été préparé." /><span>3</span>
-                <input type="hidden" name="attr_spellvalue" value="0" /> 
+                <input type="hidden" name="attr_spellvalue" value="0" />
                 <div class="sheet-dispcheck">
                     <div class="sheet-actionligne">
                         <input type="checkbox" class="sheet-selcheck" name="attr_spellbodydisp" value="1" title="Montrer la description du sort dans le template de jet" checked /><span>E</span>
@@ -4097,10 +4105,15 @@ vous vous déplacez dans cette zone :
                         <span class="sheet-action" style="min-width: 35px;width: 35px">Jet : </span>
                         <input type="text" name="attr_spelldice" style="width: 250px;" placeholder="Jet pour le sort, par exemple : '2d4+3'" title="Jet pour le sort, par exemple : '2d4+3'" />
                     </div>
-                </div>            
+                </div>
             </div>
         </fieldset>
     </div> <!-- FIN SORTS -->
+
+    <!-- ==== NOTES ===== -->
+    <div class="sheet-onglnote">
+        <textarea name="attr_divnotes" style="height:300px;" placeholder="Notes / Divers"></textarea>
+    </div>
 
 </div>  <!-- ==== FIN COLONNE DROITE ==== -->
 
@@ -4188,7 +4201,7 @@ vous vous déplacez dans cette zone :
                         {{#succes}}
                             <tr><td colspan="2"><div class="jetdesc">{{succes}}</div></td></tr>
                         {{/succes}}
-                    {{/rollBetween() jet 10 11}}                    
+                    {{/rollBetween() jet 10 11}}
                 {{/sucsup}}
                 {{^sucsup}}
                     {{#succes}}
@@ -4213,7 +4226,7 @@ vous vous déplacez dans cette zone :
                     <tr>
                         <td class="tcat">Dégâts</td>
                         <td>{{degatsaction}}</td>
-                    </tr>                
+                    </tr>
                 {{/rollGreater() degatsaction 0}}
             {{/rollTotal() jetshow 0}}
         {{/jet}}
@@ -4228,7 +4241,7 @@ vous vous déplacez dans cette zone :
                 <tr>
                     <td class="tcat">Jet</td>
                     <td>{{jetsort}}</td>
-                </tr>                    
+                </tr>
             {{/rollTotal() jetshow 1}}
         {{/jetsort}}
     </table>
