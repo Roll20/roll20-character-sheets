@@ -5,6 +5,23 @@ use with Roll20.net and released open source under the MIT License.
 
 ### Changelog ###
 
+**Release 5.3 - October 4, 2015**
+- Added Max HP
+- Fixed a bug with rangers having modifiers that shouldn't have been negative.
+
+**Release 5.2 - September 14, 2015**
+- Initiative is based on d20 + dexterity bonus, and I had it set to dexterity MODIFIER (a miscellaneous modifier for dex... not the same thing as the bonus).  This is now corrected.
+
+**Release 5.1 - July 13, 2015**
+- Bugfix: Armor Class now accounts for the miscellaneous modifiers.
+
+**Release 5.0 - May 12, 2015**
+- New layout with a tab-controlled interface
+- Added miscellaneous modifiers to stats, skills, weapons, and armor.
+- Moved all attack rolls to exist on a per-weapon basis.  
+- Reintroduced a spells section, now on a new tab.  Contains the full breakdown of the spell rolls.
+- Implemented inline rolls so hovering over results won't splash a big wall of math at you.
+
 **Release 4.5 - March 16, 2015**
 - Added note to initiative roll to explain initiative roll calculation.
 - Moved all roll calculation explanations to title attributes.  Now the explanations display when you hover over the buttons.  You are all now delivered from the cursed wall of text.
