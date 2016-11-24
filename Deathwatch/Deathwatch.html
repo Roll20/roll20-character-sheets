@@ -2201,7 +2201,7 @@
                             <input name="attr_meleeweaponpen" type="text" value="0">
                         </div>
                         <div class="sheet-item" style="width:16%">
-                            <button name="roll_meleedamage" type="roll" value="/me does [[@{meleeweapondamage}+ [[ @{Strength-bonus} ]] ]] @{meleeweapontype} damage! (Pen: @{meleeweaponpen})">
+                            <button name="roll_meleedamage" type="roll" value="/me does [[@{meleeweapondamage}+ [[ @{relevant_strength-bonus} ]] ]] @{meleeweapontype} damage! (Pen: @{meleeweaponpen})">
                                 <label>Damage</label>
                             </button>
                         </div>
@@ -2223,24 +2223,33 @@
                     </div>
         <!--    %%%%%%%%%%%%    Added   %%%%%%%%%%%%    -->
                     <div class="sheet-row">
-                        <div class="sheet-item" style="width:28%">
-                            <label>Strength Bonus:</label>
+                        <div class="sheet-item" style="width:6%">
+							<input type="checkbox" name="attr_useSB" value="1" checked="true" title="Use the Strength Bonus for this weapon?">		
+						</div>
+                        <div class="sheet-item" style="width:9%">
+                            <label name="Strength Bonus">SB:</label>
                         </div>
-                        <div class="sheet-item" style="width:12%">
-                            <input type="number" name="attr_str-bonus" value="(floor((@{strength} + @{advanceS})/10))" disabled='true'/>
+                        <div class="sheet-item" style="width:8%">
+                            <input type="number" name="attr_str-bonus" value="(floor(@{strength}/10))" disabled='true'/>
                         </div>
-                        <div class="sheet-item" style="width:18%">
-                            <label>Unnatural:</label>
+						<div class="sheet-item" style="width:15%">
+                            <label>Unn. SB:</label>
                         </div>
-                        <div class="sheet-item" style="width:15%">
+                        <div class="sheet-item" style="width:8%">
                             <input type="number" name="attr_unnatural_str-bonus" value="@{unnatural-Strength} * @{str-bonus}" disabled='true'/>
                         </div>
-                        <div class="sheet-item" style="width:12%">
-                            <label>Total:</label>
+						<div class="sheet-item" style="width:15%" title="Astartes Power Armour Enhanced Strength Bonus">
+                            <label>PA SB:</label>
                         </div>
-                        <div class="sheet-item" style="width:15%">
-                            <input type="number" name="attr_Strength-bonus" value="(((@{unnatural_str-bonus} + @{str-bonus}) + abs(@{unnatural_str-bonus} - @{str-bonus})) / 2)" disabled='true'/>
+                        <div class="sheet-item" style="width:8%" title="Astartes Power Armour Enhanced Strength Bonus">
+                            <input type="number" name="attr_powerarmourSB" value="2"/>
                         </div>
+				        <div class="sheet-item" style="width:20%" title="Relevant Strength Bonus added to damage from this weapon">
+                            <label>rel. Bonus:</label>
+                        </div>
+                        <div class="sheet-item" style="width:8%" title="Relevant Strength Bonus added to damage from this weapon">
+                            <input type="number" name="attr_relevant_strength-bonus" value="( (((@{unnatural_str-bonus} + @{str-bonus}) + abs(@{unnatural_str-bonus} - @{str-bonus})) / 2) + @{powerarmourSB}) * @{useSB}" disabled='true'/>
+                		</div>
                     </div>
                 </div>
                 </fieldset>
@@ -2289,10 +2298,10 @@
                         <input name="attr_Fatigue" type="number">
                     </div>
                     
-                    <div class="sheet-item" style="width:10%">
+                    <div class="sheet-item" style="width:10%" title="Astartes Power Armour Movement Bonus">
                         <label>Misc: </label>
                     </div>
-                    <div class="sheet-item" style="width:8%">
+                    <div class="sheet-item" style="width:8%" title="Astartes Power Armour Movement Bonus">
                         <input name="attr_misc_move" type="number" value="1">
                     </div>
                 </div>
@@ -2302,25 +2311,30 @@
                 <h3>Armour & Defence</h3>
                 
                 <div class="sheet-2colrow">
-                    <div class="sheet-col">
+					<div class="sheet-hidden">
+						<input type="number" name="attr_tough-bonus" value="(floor(@{Toughness}/10))" disabled='true'/>
+						<input type="number" name="attr_unnatural_tough-bonus" value="@{unnatural-Toughness} * @{tough-bonus}" disabled="true"/>
+						<input type="number" name="attr_relevant_tough-bonus" value="(((@{unnatural_tough-bonus} + @{tough-bonus}) + abs(@{unnatural_tough-bonus} - @{tough-bonus})) / 2)" disabled="true"/>
+					</div>
+					<div class="sheet-col">
                         <div class="sheet-armourblock"></div>
                         <div class="sheet-quickborder sheet-armourblock">
-                            <label>Head</label> <input name="attr_HArmour" type="number"> <label>(1-10)</label> <input disabled="true" name="attr_HTotal" type="number" value="@{HArmour}+floor(@{Toughness}/10)">
+                            <label>Head</label> <input name="attr_HArmour" type="number"> <label>(1-10)</label> <input disabled="true" name="attr_HTotal" type="number" value="@{HArmour}+@{relevant_tough-bonus}">
                         </div><br>
                         <div class="sheet-quickborder sheet-armourblock">
-                            <label>AR</label> <input name="attr_ArArmour" type="number"> <label>(11-20)</label> <input disabled="true" name="attr_ArTotal" type="number" value="@{ArArmour}+floor(@{Toughness}/10)">
+                            <label>AR</label> <input name="attr_ArArmour" type="number"> <label>(11-20)</label> <input disabled="true" name="attr_ArTotal" type="number" value="@{ArArmour}+@{relevant_tough-bonus}">
                         </div>
                         <div class="sheet-quickborder sheet-armourblock">
-                            <label>Body</label> <input name="attr_BArmour" type="number"> <label>(31-70)</label> <input disabled="true" name="attr_BTotal" type="number" value="@{BArmour}+floor(@{Toughness}/10)">
+                            <label>Body</label> <input name="attr_BArmour" type="number"> <label>(31-70)</label> <input disabled="true" name="attr_BTotal" type="number" value="@{BArmour}+@{relevant_tough-bonus}">
                         </div>
                         <div class="sheet-quickborder sheet-armourblock">
-                            <label>AL</label> <input name="attr_AlArmour" type="number"> <label>(21-30)</label> <input disabled="true" name="attr_AlTotal" type="number" value="@{AlArmour}+floor(@{Toughness}/10)">
+                            <label>AL</label> <input name="attr_AlArmour" type="number"> <label>(21-30)</label> <input disabled="true" name="attr_AlTotal" type="number" value="@{AlArmour}+@{relevant_tough-bonus}">
                         </div>
                         <div class="sheet-quickborder sheet-armourblock" style="margin: 20px auto auto 11%;">
-                            <label>LR</label> <input name="attr_LrArmour" type="number"> <label>(71-85)</label> <input disabled="true" name="attr_LrTotal" type="number" value="@{LrArmour}+floor(@{Toughness}/10)">
+                            <label>LR</label> <input name="attr_LrArmour" type="number"> <label>(71-85)</label> <input disabled="true" name="attr_LrTotal" type="number" value="@{LrArmour}+@{relevant_tough-bonus}">
                         </div>
                         <div class="sheet-quickborder sheet-armourblock" style="margin: 20px auto auto 11%;">
-                            <label>LL</label> <input name="attr_LlArmour" type="number"> <label>(86-00)</label> <input disabled="true" name="attr_LlTotal" type="number" value="@{LlArmour}+floor(@{Toughness}/10)">
+                            <label>LL</label> <input name="attr_LlArmour" type="number"> <label>(86-00)</label> <input disabled="true" name="attr_LlTotal" type="number" value="@{LlArmour}+@{relevant_tough-bonus}">
                         </div>
                     </div>
                 
