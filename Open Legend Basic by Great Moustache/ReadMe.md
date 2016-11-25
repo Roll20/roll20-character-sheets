@@ -5,6 +5,11 @@
 
 ### Changelog
 
+### 1.5.1 on 2016 November 25th
+* Changed the code for Toughness
+	- Uncommented the relvent code, and deleted the old
+	- Toughness = 10 + Forititude + Will (used to be presence)
+
 ### 1.5.0 on 2016 November 21st
 * Added the character's name to be displayed on chat window on rolls
 * Updated the Actions section to calculate the roll string like the attributes
