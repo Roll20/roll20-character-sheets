@@ -5,6 +5,13 @@
 
 ### Changelog
 
+### 1.6.1 on 2016 November 29th
+* Added the ability to add roll buttons to macro quick bar
+	- Actions can be dragged to the marcro quick bar
+	- "Speed" aka Initiative can be dragged to macro quick bar
+	- "Evasion", "Toughness", and/or "Resolve" aka Resist Bane can be dragged to macro quick bar (all are the same as each other)
+	- Currently Attributes, Feats, Flaws, and Perks can NOT be added to the macro quick bar (nor are plans to implement at this time)
+
 ### 1.6.0 on 2016 November 28th
 * Added graphics for the roll/chat window
 	- Updated buttons for rolling to use the new template "openLegend"
@@ -106,26 +113,26 @@
 
 ## Plans
 * Fix Top info section of sheet to compress when page is shrunk
-* Make Action rolls calculate their own string for Rolls
-	+Have a spot for advantage/disadvantage that is permanent to that action roll
-* Make a settings section for each Attribute
-	+ For the physical: drop down menu for attribute subsitution
-	+ For might, checkbox on whether attribute subsitution affects heavy carry
-	+ For all, an option to increase or decrease dice size above/below what the attribute score would normally allow
-	+ Option to Keep Highest/Lowest of d20 (based on certain feats)
-[done 2016 Nov 19] * Have fields for adjusting the Hit Point total for feats and other
+* [done] Make Action rolls calculate their own string for Rolls
+	+[no longer planned due to complexity of roll string] Have a spot for advantage/disadvantage that is permanent to that action roll
+* [done] Make a settings section for each Attribute
+	+ [done] For the physical: drop down menu for attribute subsitution
+	+ [done] For might, checkbox on whether attribute subsitution affects heavy carry
+	+ [done] For all, an option to increase or decrease dice size above/below what the attribute score would normally allow
+	+ [done] Option to Keep Highest/Lowest of d20 (based on certain feats)
+* [done 2016 Nov 19] Have fields for adjusting the Hit Point total for feats and other
 	[done 2016 Nov 19] + Have "Fortitude, Presence, & Will" listed below Hit Points so people know which attributes affect Hit Points
-[done]* Make Inventory Section
-[done]* Include more fields for Feats, Perks, & Flaws
-	[done]+ Plus ability to click to roll them so all can see info about
-[done]* Include Inventory into speed (how it affects)
-[done]* Creation of a "fancy (advanced)" version of the sheet
-	+ More optimization for web (and potentially mobile)
-	+ Sections that disappear with a click
+* [done] Make Inventory Section
+* [done] Include more fields for Feats, Perks, & Flaws
+	+[done] Plus ability to click to roll them so all can see info about
+* [done] Include Inventory into speed (how it affects)
+* [done] Creation of a "fancy (advanced)" version of the sheet
+	+ [done] More optimization for web (and potentially mobile)
+	+ [done] Sections that disappear with a click
 * A settings section where you could modify certain values
 	+ For "homebrew" and if changes come up before final release of product
-* A rolltemplete that isn't using the default
-	+ Adding in a pop-up for target CR to caculate and do the math if you hit & damage
+* [done] A rolltemplete that isn't using the default
+	+ [in progress] Adding in a pop-up for target CR to caculate and do the math if you hit & damage
 * Clean up the CSS code
 	- Currently includes a lot from a previous sheet I was using, some code doesn't apply
 
