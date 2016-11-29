@@ -5,6 +5,44 @@
 
 ### Changelog
 
+### 1.5.1 on 2016 November 25th
+* Changed the code for Toughness
+	- Uncommented the relvent code, and deleted the old
+	- Toughness = 10 + Forititude + Will (used to be presence)
+
+### 1.5.0 on 2016 November 21st
+* Added the character's name to be displayed on chat window on rolls
+* Updated the Actions section to calculate the roll string like the attributes
+	- Needed to seperate it from just reading Attribute roll, as Advantage/Disadvantage for d20 in non-combat situations
+* Added additional calculations for the extra sections on Physical attributes
+	- For all 3, drop down to select Attribute Substitution (Agility for Evasion, Fortitude for Toughness & Hit Points)
+	- For might, a checkbox, checked means the Attribute Substitution applies to max heavy carry
+* Updated Javascript to reflect attribute substitution possibilities
+* Updated calculations to Speed to change to 0 for certain cases
+	- If over max heavy carry
+	- If over 2 bulky items
+* NOTE: Players will have to reselect attributes to use for Actions do to the drop down menu being updated with different values.
+
+### 1.4.0 on 2016 November 21st
+* Added gear/settings tab next to all 18 attributes
+	- Click expands further information about each attribute
+	- Options to Increase/Decrease both the dice size and cost of the attribute due to feats
+	- Option to give Advantage/Disadvantage to the d20 part of the attribute roll due to feats and possibly boons/banes
+	- Further development needed for Physical Attributes to include an "Attribute Substitution" drop down menu, to be implimented next.
+	
+### 1.1.5 on 2016 November 20th
+* Made "Evasion", "Toughness", & "Resolve" clickable buttons that roll d20 for resisting banes (after watching HyperRPG mini-series)
+* Put in commented out code for possible change to Toughness calculation
+	- Presence might bet switching to Will for Toughness
+
+### 1.1.0 on 2016 November 19th
+* Fixed CSS to look correctly in Mozilla Firefox
+* Added fields under Hit Points
+	- From Feats & From Others so you can increase your total Hit Points
+* Added an example area (place holder) that can be shown/hidden beneath Prescience Attribute
+	- For further development to include changes that feats may have to Attribute Scores/Dice and Other
+		-Place holder for now, will be expanded upon for each Attribute
+
 ### 1.0.0
 * SHEET READY for mass consumption
 * Equipment section graphically fixed
@@ -64,7 +102,15 @@
 
 ## Plans
 * Fix Top info section of sheet to compress when page is shrunk
-* 
+* Make Action rolls calculate their own string for Rolls
+	+Have a spot for advantage/disadvantage that is permanent to that action roll
+* Make a settings section for each Attribute
+	+ For the physical: drop down menu for attribute subsitution
+	+ For might, checkbox on whether attribute subsitution affects heavy carry
+	+ For all, an option to increase or decrease dice size above/below what the attribute score would normally allow
+	+ Option to Keep Highest/Lowest of d20 (based on certain feats)
+[done 2016 Nov 19] * Have fields for adjusting the Hit Point total for feats and other
+	[done 2016 Nov 19] + Have "Fortitude, Presence, & Will" listed below Hit Points so people know which attributes affect Hit Points
 [done]* Make Inventory Section
 [done]* Include more fields for Feats, Perks, & Flaws
 	[done]+ Plus ability to click to roll them so all can see info about

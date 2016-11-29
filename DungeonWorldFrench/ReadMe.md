@@ -8,7 +8,7 @@ Basée sur la feuille VO de Willem den Besten (Morenim) et Devindra Payment (@Ar
 
 # Notes de version
 
-##v3.1 (2016-11-11)
+##v3.1 (2016-11-21)
 
 * Ajout de 2 options, pour des bonus interactifs aux jets et dégâts
 * Ajout d'un onglet "Notes" ... pour noter des choses
