@@ -5,6 +5,10 @@
 
 ### Changelog
 
+### 1.6.0 on 2016 November 28th
+* Added graphics for the roll/chat window
+	- Updated buttons for rolling to use the new template "openLegend"
+
 ### 1.5.1 on 2016 November 25th
 * Changed the code for Toughness
 	- Uncommented the relvent code, and deleted the old
