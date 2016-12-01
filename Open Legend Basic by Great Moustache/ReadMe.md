@@ -5,6 +5,10 @@
 
 ### Changelog
 
+### 1.6.2 on 2016 November 30th
+* Quick Patch to fix a random mess up in Prescience Worker Script
+	- Was not executing the call to update values.
+
 ### 1.6.1 on 2016 November 29th
 * Added the ability to add roll buttons to macro quick bar
 	- Actions can be dragged to the marcro quick bar
