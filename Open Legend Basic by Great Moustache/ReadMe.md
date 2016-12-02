@@ -5,6 +5,10 @@
 
 ### Changelog
 
+### 1.6.5 on 2016 December 1st
+* Fixed Actions to recalculate the roll string when any attribute is changed
+	- Prior, you had to make a change to the action for the roll string to update if an attribute had been changed.
+
 ### 1.6.2 on 2016 November 30th
 * Quick Patch to fix a random mess up in Prescience Worker Script
 	- Was not executing the call to update values.
