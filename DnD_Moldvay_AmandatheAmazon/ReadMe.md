@@ -9,6 +9,8 @@ This is a re-creation of the "green-sheet" for the D&D Basic Moldvay Red box gam
 
 #### 1.15
 * Fixed chances for finding secret doors, listening, and finding traps, all of which were too high by 1 (e.g. 1/6 chance for all of those for non-demihumans, was 2/6)
+* Fixed roll templates for the above, removing the critical successes in favor of operating properly
+* Moving calculation for chance to open doors to a Sheet Worker to enfoce minimum and maximum values
 
 #### 1.14
 * Separated out the two sheets (Character Record and Monster) so that they are more noticeable to the GM/Players
