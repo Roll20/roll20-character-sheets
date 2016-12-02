@@ -8,9 +8,9 @@ This is the redesigned Shaped character sheet for use on Roll20.net with the 5th
 
 [Documentation](https://docs.google.com/document/d/1yPcIZ_bIc3JlnWsKZt2tAB0EQSIVEfeMtT0GifbpJIg)
 
-Please report any bugs in the [issues tab](https://bitbucket.org/mlenser/5eshaped/issues)
+### Please report any bugs in the [issues tab](https://bitbucket.org/mlenser/5eshaped/issues). Please include screenshots if appropriate and please provide a full reproduction path (on a clean character sheet if possible).
 
-##Features
+## Features
 
 * **High performance** sheet without the lag of old versions (100% sheet workers)
 * Improved styling to match the [5e paper sheet](http://i.imgur.com/87GaRhL.jpg) with nearly all elements clickable to output to chat
