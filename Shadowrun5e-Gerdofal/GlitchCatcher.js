@@ -1,13 +1,11 @@
 on('chat:message', function (msg) {
-    
-    if((msg.type == 'general' && (msg.rolltemplate.indexOf('sr1') >= 0)) || msg.type == 'rollresult') { //todo JSON.parse(msg.content) to get the rollresult obj
-        
-        if(msg.type == 'rollresult') {
+    if(((msg.type == 'general' || msg.type == 'whisper') && (msg.rolltemplate.indexOf('sr1') >= 0)) || (msg.type == 'rollresult' || msg.type == 'gmrollresult')) { //todo JSON.parse(msg.content) to get the rollresult obj
+        if(msg.type == 'rollresult' || msg.type == 'gmrollresult') {
             var rollResult = JSON.parse(msg.content);
             log(rollResult);
             var poolSize = rollResult.rolls[0].dice;
             var dice = rollResult.rolls[0].results;
-        } else {
+        }else {
             log(msg.inlinerolls);
             var poolSize = msg.inlinerolls[1].results.rolls[0].dice;
             var dice = msg.inlinerolls[1].results.rolls[0].results;
