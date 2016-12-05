@@ -480,6 +480,7 @@ repeating_items
     on("change:agility_score change:agility_dice_d20 change:agility_cost_modifier change:agility_dice_modifier", function() {
 		calcAgility();
         calcEvasion();                  // call to recalculate evasion score
+        calcAllActionRolls();
     });
 	
 	// Function for calculating everything to do with Agility
@@ -491,15 +492,19 @@ repeating_items
             var type = calcAttributeDiceType(score);
             var dice = number + type;
 			var roll = "";
+			var rollInitiative = "";
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				rollInitiative = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}&{tracker}]]";
 			} else {
 				roll = "[[" + values.agility_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}" + number + "]]";
+				rollInitiative = "[[" + values.agility_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
 			}
             setAttrs({
                 "agility_cost": (scoreCost*1 * (scoreCost*1 + 1))/2,
                 "agility_dice_roll": roll,
-                "agility_dice": dice
+                "agility_dice": dice,
+                "agility_initiative": rollInitiative
             });
             calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
         });
@@ -510,6 +515,7 @@ repeating_items
 		calcFortitude();
         calcToughness();                // call to recalute toughness
         calcHitPoints();                // call to update hitpoints
+        calcAllActionRolls();
     });
 	
 	// Function for calculating everything to do with Fortitude
@@ -539,6 +545,7 @@ repeating_items
     on("change:might_score change:might_dice_d20 change:might_cost_modifier change:might_dice_modifier", function() {
 		calcMight();
 		calcHeavy();
+        calcAllActionRolls();
     });
 	
 	// Function for calculating everything to do with Might
@@ -571,6 +578,7 @@ repeating_items
         calcEvasion();
         calcToughness();
         calcHitPoints();
+        calcAllActionRolls();
     });
 	
 	// Function for calculating everything to do with Deception
@@ -604,6 +612,7 @@ repeating_items
         calcEvasion();
         calcToughness();
         calcHitPoints();
+        calcAllActionRolls();
     });
 	
 	// Function for calculating everything to do with Presence
@@ -636,6 +645,7 @@ repeating_items
         calcEvasion();
         calcToughness();
         calcHitPoints();
+        calcAllActionRolls();
     });
 	
 	// Function for calculating everything to do with Persuasion
@@ -668,6 +678,7 @@ repeating_items
         calcEvasion();
         calcToughness();
         calcHitPoints();
+        calcAllActionRolls();
     });
 	
 	// Function for calculating everything to do with Learning
@@ -700,6 +711,7 @@ repeating_items
         calcEvasion();
         calcToughness();
         calcHitPoints();
+        calcAllActionRolls();
     });
 	
 	// Function for calculating everything to do with Logic
@@ -732,6 +744,7 @@ repeating_items
         calcEvasion();
         calcToughness();
         calcHitPoints();
+        calcAllActionRolls();
     });
 	
 	// Function for calculating everything to do with Perception
@@ -765,6 +778,7 @@ repeating_items
         calcHitPoints();                // call to update hitpoints
         calcEvasion();
         calcHitPoints();
+        calcAllActionRolls();
     });
 	
 	// Function for calculating everything to do with Will
@@ -797,6 +811,7 @@ repeating_items
         calcEvasion();
         calcToughness();
         calcHitPoints();
+        calcAllActionRolls();
     });
 	
 	// Function for calculating everything to do with Alteration
@@ -829,6 +844,7 @@ repeating_items
         calcEvasion();
         calcToughness();
         calcHitPoints();
+        calcAllActionRolls();
     });
 	
 	// Function for calculating everything to do with Creation
@@ -861,6 +877,7 @@ repeating_items
         calcEvasion();
         calcToughness();
         calcHitPoints();
+        calcAllActionRolls();
     });
 	
 	// Function for calculating everything to do with Energy
@@ -893,6 +910,7 @@ repeating_items
         calcEvasion();
         calcToughness();
         calcHitPoints();
+        calcAllActionRolls();
     });
 	
 	// Function for calculating everything to do with Entropy
@@ -925,6 +943,7 @@ repeating_items
         calcEvasion();
         calcToughness();
         calcHitPoints();
+        calcAllActionRolls();
     });
 	
 	// Function for calculating everything to do with Influence
@@ -957,6 +976,7 @@ repeating_items
         calcEvasion();
         calcToughness();
         calcHitPoints();
+        calcAllActionRolls();
     });
 	
 	// Function for calculating everything to do with Movement
@@ -981,17 +1001,18 @@ repeating_items
             calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
         });
 	};
-	
-    // Anytime prescience score is changed, update cost and dice
+
+	// Anytime prescience score is changed, update cost and dice
     on("change:prescience_score change:prescience_dice_d20 change:prescience_cost_modifier change:prescience_dice_modifier", function() {
 		calcPrescience();
         calcHeavy();
         calcEvasion();
         calcToughness();
         calcHitPoints();
+        calcAllActionRolls();
     });
 	
-	// Function for calculating everything to do with Prescience
+	// Function for calculating everything to do with Protection
 	function calcPrescience() {
         getAttrs(["prescience_score", "prescience_dice_d20", "prescience_cost_modifier", "prescience_dice_modifier"], function(values) {
             var score = values.prescience_score*1 + values.prescience_dice_modifier*1;
@@ -1000,7 +1021,7 @@ repeating_items
             var type = calcAttributeDiceType(score);
             var dice = number + type;
 			var roll = "";
-			if(scoreDice === 0) {
+			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
 			} else {
 				roll = "[[" + values.prescience_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}" + number + "]]";
@@ -1021,6 +1042,7 @@ repeating_items
         calcEvasion();
         calcToughness();
         calcHitPoints();
+        calcAllActionRolls();
     });
 	
 	// Function for calculating everything to do with Protection
@@ -1230,6 +1252,72 @@ repeating_items
             });
         });
     });
+
+
+	// Function for calculating rolls for Actions
+    function calcAllActionRolls () {
+        getSectionIDs("repeating_actions", function(actionsArray) {
+         if(actionsArray.length > 0) {
+            _.each(actionsArray, function(currentID, i) {
+                getAttrs(["repeating_actions_" + currentID + "_action_attribute", "repeating_actions_" + currentID + "_dice_d20", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(v) {
+                    var update = {};
+                    var score = 0;
+                    if(v["repeating_actions_" + currentID + "_action_attribute"] === "Agility") {
+                        score = v.agility_score*1 + v.agility_dice_modifier*1;
+                    } else if(v["repeating_actions_" + currentID + "_action_attribute"] === "Fortitude") {
+                        score = v.fortitude_score*1 + v.fortitude_dice_modifier*1;
+                    } else if(v["repeating_actions_" + currentID + "_action_attribute"] === "Might") {
+                        score = v.might_score*1 + v.might_dice_modifier*1;
+                    } else if(v["repeating_actions_" + currentID + "_action_attribute"] === "Learning") {
+                        score = v.learning_score*1 + v.learning_dice_modifier*1;
+                    } else if(v["repeating_actions_" + currentID + "_action_attribute"] === "Logic") {
+                        score = v.logic_score*1 + v.logic_dice_modifier*1;
+                    } else if(v["repeating_actions_" + currentID + "_action_attribute"] === "Perception") {
+                        score = v.perception_score*1 + v.perception_dice_modifier*1;
+                    } else if(v["repeating_actions_" + currentID + "_action_attribute"] === "Will") {
+                        score = v.will_score*1 + v.will_dice_modifier*1;
+                    } else if(v["repeating_actions_" + currentID + "_action_attribute"] === "Deception") {
+                        score = v.deception_score*1 + v.deception_dice_modifier*1;
+                    } else if(v["repeating_actions_" + currentID + "_action_attribute"] === "Persuasion") {
+                        score = v.persuasion_score*1 + v.persuasion_dice_modifier*1;
+                    } else if(v["repeating_actions_" + currentID + "_action_attribute"] === "Presence") {
+                        score = v.presence_score*1 + v.presence_dice_modifier*1;
+                    } else if(v["repeating_actions_" + currentID + "_action_attribute"] === "Alteration") {
+                        score = v.alteration_score*1 + v.alteration_dice_modifier*1;
+                    } else if(v["repeating_actions_" + currentID + "_action_attribute"] === "Creation") {
+                        score = v.creation_score*1 + v.creation_dice_modifier*1;
+                    } else if(v["repeating_actions_" + currentID + "_action_attribute"] === "Energy") {
+                        score = v.energy_score*1 + v.energy_dice_modifier*1;
+                    } else if(v["repeating_actions_" + currentID + "_action_attribute"] === "Entropy") {
+                        score = v.entropy_score*1 + v.entropy_dice_modifier*1;
+                    } else if(v["repeating_actions_" + currentID + "_action_attribute"] === "Influence") {
+                        score = v.influence_score*1 + v.influence_dice_modifier*1;
+                    } else if(v["repeating_actions_" + currentID + "_action_attribute"] === "Movement") {
+                        score = v.movement_score*1 + v.movement_dice_modifier*1;
+                    } else if(v["repeating_actions_" + currentID + "_action_attribute"] === "Prescience") {
+                        score = v.prescience_score*1 + v.prescience_dice_modifier*1;
+                    } else if(v["repeating_actions_" + currentID + "_action_attribute"] === "Protection") {
+                        score = v.protection_score*1 + v.protection_dice_modifier*1;
+                    }
+                    var number = calcAttributeDiceNumber(score);
+                    var type = calcAttributeDiceType(score);
+                    var roll = "";
+        			if(score === 0) {
+        				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+        			} else {
+        			    if(isNaN(v["repeating_actions_" + currentID + "_dice_d20"])) {
+            				roll = "[[1d20!! + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}" + number + "]]";
+        			    } else {
+            				roll = "[[" + v["repeating_actions_" + currentID + "_dice_d20"] + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}" + number + "]]";
+        			    }
+        			}
+        			update["repeating_actions_" + currentID + "_dice_roll"] = roll;
+        			setAttrs(update);
+                });
+            });
+         }
+        });
+    };
 	
 	// On Change for calculating rolls for Actions
     on("change:repeating_actions:action_attribute change:repeating_actions:dice_d20", function() {
@@ -2002,7 +2090,7 @@ var TAS = TAS || (function(){
         <div class="row width100">
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_agility_settings_flag" value="on" /><span>y</span></div>
             <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton">
-                <button type="roll" value="&{template:default} {{name= Agility Roll}} {{char= @{character_name}}} {{roll= @{agility_dice_roll}}}">Agility</button>
+                <button type="roll" value="&{template:openLegend} {{title= Agility Roll}} {{subTitle= @{character_name}}} {{roll= @{agility_dice_roll}}}">Agility</button>
             </div>
             <div class="width55 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_agility_score" value=0 /></div>
@@ -2054,7 +2142,7 @@ var TAS = TAS || (function(){
         <div class="row width100">
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_fortitude_settings_flag" value="on" /><span>y</span></div>
             <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton">
-                <button type="roll" value="&{template:default} {{name= Fortitude Roll}} {{char= @{character_name}}} {{roll= @{fortitude_dice_roll}}}">Fortitude</button>
+                <button type="roll" value="&{template:openLegend} {{title= Fortitude Roll}} {{subTitle= @{character_name}}} {{roll= @{fortitude_dice_roll}}}">Fortitude</button>
             </div>
             <div class="width55 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_fortitude_score" value=0 /></div>
@@ -2106,7 +2194,7 @@ var TAS = TAS || (function(){
         <div class="row width100">
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_might_settings_flag" value="on" /><span>y</span></div>
             <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton">
-                <button type="roll" value="&{template:default} {{name= Might Roll}} {{char= @{character_name}}} {{roll= @{might_dice_roll}}}">Might</button>
+                <button type="roll" value="&{template:openLegend} {{title= Might Roll}} {{subTitle= @{character_name}}} {{roll= @{might_dice_roll}}}">Might</button>
             </div>
             <div class="width55 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_might_score" value=0 /></div>
@@ -2172,7 +2260,7 @@ var TAS = TAS || (function(){
         <div class="row width100">
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_deception_settings_flag" value="on" /><span>y</span></div>
             <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton">
-                <button type="roll" value="&{template:default} {{name= Deception Roll}} {{char= @{character_name}}} {{roll= @{deception}}}">Deception</button>
+                <button type="roll" value="&{template:openLegend} {{title= Deception Roll}} {{subTitle= @{character_name}}} {{roll= @{deception_dice_roll}}}">Deception</button>
             </div>
             <div class="width55 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_deception_score" value=0 /></div>
@@ -2201,7 +2289,7 @@ var TAS = TAS || (function(){
         <div class="row width100">
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_presence_settings_flag" value="on" /><span>y</span></div>
             <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton">
-                <button type="roll" value="&{template:default} {{name= Presence Roll}} {{char= @{character_name}}} {{roll= @{presence_dice_roll}}}">Presence</button>
+                <button type="roll" value="&{template:openLegend} {{title= Presence Roll}} {{subTitle= @{character_name}}} {{roll= @{presence_dice_roll}}}">Presence</button>
             </div>
             <div class="width55 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_presence_score" value=0 /></div>
@@ -2230,7 +2318,7 @@ var TAS = TAS || (function(){
         <div class="row width100">
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_persuasion_settings_flag" value="on" /><span>y</span></div>
             <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton">
-                <button type="roll" value="&{template:default} {{name= Persuasion Roll}} {{char= @{character_name}}} {{roll= @{persuasion_dice_roll}}}">Persuasion</button>
+                <button type="roll" value="&{template:openLegend} {{title= Persuasion Roll}} {{subTitle= @{character_name}}} {{roll= @{persuasion_dice_roll}}}">Persuasion</button>
             </div>
             <div class="width55 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_persuasion_score" value=0 /></div>
@@ -2271,7 +2359,7 @@ var TAS = TAS || (function(){
         <div class="row width100">
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_learning_settings_flag" value="on" /><span>y</span></div>
             <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton">
-                <button type="roll" value="&{template:default} {{name= Learning Roll}} {{char= @{character_name}}} {{roll= @{learning_dice_roll}}}">Learning</button>
+                <button type="roll" value="&{template:openLegend} {{title= Learning Roll}} {{subTitle= @{character_name}}} {{roll= @{learning_dice_roll}}}">Learning</button>
             </div>
             <div class="width55 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_learning_score" value=0 /></div>
@@ -2300,7 +2388,7 @@ var TAS = TAS || (function(){
         <div class="row width100">
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_logic_settings_flag" value="on" /><span>y</span></div>
             <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton">
-                <button type="roll" value="&{template:default} {{name= Logic Roll}} {{char= @{character_name}}} {{roll= @{logic_dice_roll}}}">Logic</button>
+                <button type="roll" value="&{template:openLegend} {{title= Logic Roll}} {{subTitle= @{character_name}}} {{roll= @{logic_dice_roll}}}">Logic</button>
             </div>
             <div class="width55 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_logic_score" value=0 /></div>
@@ -2329,7 +2417,7 @@ var TAS = TAS || (function(){
         <div class="row width100">
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_perception_settings_flag" value="on" /><span>y</span></div>
             <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton">
-                <button type="roll" value="&{template:default} {{name= Perception Roll}} {{char= @{character_name}}} {{roll= @{perception_dice_roll}}}">Perception</button>
+                <button type="roll" value="&{template:openLegend} {{title= Perception Roll}} {{subTitle= @{character_name}}} {{roll= @{perception_dice_roll}}}">Perception</button>
             </div>
             <div class="width55 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_perception_score" value=0 /></div>
@@ -2358,7 +2446,7 @@ var TAS = TAS || (function(){
         <div class="row width100">
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_will_settings_flag" value="on" /><span>y</span></div>
             <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton">
-                <button type="roll" value="&{template:default} {{name= Will Roll}} {{char= @{character_name}}} {{roll= @{will_dice_roll}}}">Will</button>
+                <button type="roll" value="&{template:openLegend} {{title= Will Roll}} {{subTitle= @{character_name}}} {{roll= @{will_dice_roll}}}">Will</button>
             </div>
             <div class="width55 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_will_score" value=0 /></div>
@@ -2399,7 +2487,7 @@ var TAS = TAS || (function(){
         <div class="row width100">
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_alteration_settings_flag" value="on" /><span>y</span></div>
             <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton">
-                <button type="roll" value="&{template:default} {{name= Alteration Roll}} {{char= @{character_name}}} {{roll= @{alteration_dice_roll}}}">Alteration</button>
+                <button type="roll" value="&{template:openLegend} {{title= Alteration Roll}} {{subTitle= @{character_name}}} {{roll= @{alteration_dice_roll}}}">Alteration</button>
             </div>
             <div class="width55 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_alteration_score" value=0 /></div>
@@ -2428,7 +2516,7 @@ var TAS = TAS || (function(){
         <div class="row width100">
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_creation_settings_flag" value="on" /><span>y</span></div>
             <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton">
-                <button type="roll" value="&{template:default} {{name= Creation Roll}} {{char= @{character_name}}} {{roll= @{creation_dice_roll}}}">Creation</button>
+                <button type="roll" value="&{template:openLegend} {{title= Creation Roll}} {{subTitle= @{character_name}}} {{roll= @{creation_dice_roll}}}">Creation</button>
             </div>
             <div class="width55 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_creation_score" value=0 /></div>
@@ -2457,7 +2545,7 @@ var TAS = TAS || (function(){
         <div class="row width100">
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_energy_settings_flag" value="on" /><span>y</span></div>
             <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton">
-                <button type="roll" value="&{template:default} {{name= Energy Roll}} {{char= @{character_name}}} {{roll= @{energy_dice_roll}}}">Energy</button>
+                <button type="roll" value="&{template:openLegend} {{title= Energy Roll}} {{subTitle= @{character_name}}} {{roll= @{energy_dice_roll}}}">Energy</button>
             </div>
             <div class="width55 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_energy_score" value=0 /></div>
@@ -2486,7 +2574,7 @@ var TAS = TAS || (function(){
         <div class="row width100">
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_entropy_settings_flag" value="on" /><span>y</span></div>
             <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton">
-                <button type="roll" value="&{template:default} {{name= Entropy Roll}} {{char= @{character_name}}} {{roll= @{entropy_dice_roll}}}">Entropy</button>
+                <button type="roll" value="&{template:openLegend} {{title= Entropy Roll}} {{subTitle= @{character_name}}} {{roll= @{entropy_dice_roll}}}">Entropy</button>
             </div>
             <div class="width55 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_entropy_score" value=0 /></div>
@@ -2515,7 +2603,7 @@ var TAS = TAS || (function(){
         <div class="row width100">
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_influence_settings_flag" value="on" /><span>y</span></div>
             <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton">
-                <button type="roll" value="&{template:default} {{name= Influence Roll}} {{char= @{character_name}}} {{roll= @{influence_dice_roll}}}">Influence</button>
+                <button type="roll" value="&{template:openLegend} {{title= Influence Roll}} {{subTitle= @{character_name}}} {{roll= @{influence_dice_roll}}}">Influence</button>
             </div>
             <div class="width55 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_influence_score" value=0 /></div>
@@ -2544,7 +2632,7 @@ var TAS = TAS || (function(){
         <div class="row width100">
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_movement_settings_flag" value="on" /><span>y</span></div>
             <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton">
-                <button type="roll" value="&{template:default} {{name= Movement Roll}} {{char= @{character_name}}} {{roll= @{movement_dice_roll}}}">Movement</button>
+                <button type="roll" value="&{template:openLegend} {{title= Movement Roll}} {{subTitle= @{character_name}}} {{roll= @{movement_dice_roll}}}">Movement</button>
             </div>
             <div class="width55 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_movement_score" value=0 /></div>
@@ -2573,7 +2661,7 @@ var TAS = TAS || (function(){
         <div class="row width100">
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_prescience_settings_flag" value="on" /><span>y</span></div>
             <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton">
-                <button type="roll" value="&{template:default} {{name= Prescience Roll}} {{char= @{character_name}}} {{roll= @{prescience_dice_roll}}}">Prescience</button>
+                <button type="roll" value="&{template:openLegend} {{title= Prescience Roll}} {{subTitle= @{character_name}}} {{roll= @{prescience_dice_roll}}}">Prescience</button>
             </div>
             <div class="width55 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_prescience_score" value=0 /></div>
@@ -2602,7 +2690,7 @@ var TAS = TAS || (function(){
         <div class="row width100">
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_protection_settings_flag" value="on" /><span>y</span></div>
             <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton">
-                <button type="roll" value="&{template:default} {{name= Protection Roll}} {{char= @{character_name}}} {{roll= @{protection_dice_roll}}}">Protection</button>
+                <button type="roll" value="&{template:openLegend} {{title= Protection Roll}} {{subTitle= @{character_name}}} {{roll= @{protection_dice_roll}}}">Protection</button>
             </div>
             <div class="width55 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_protection_score" value=0 /></div>
@@ -2637,7 +2725,7 @@ var TAS = TAS || (function(){
             <div class="evasion vertTop padTop">
                 <div class="inlineBlock vertTop padTop" style="width: 155px;">
                     <div class="column width100 textCenter resistButton">
-                        <button type="roll" value="&{template:default} {{name= Resist Bane Roll}} {{char= @{character_name}}} {{roll= [[1d20]] 10+ bane is removed}}">Evasion</button>
+                        <button type="roll" name="roll_resist_bane" value="&{template:openLegend} {{title= Resist Bane Roll}} {{subTitle= @{character_name}}} {{roll= [[1d20]]}} {{target= 10+ bane is removed}}">Evasion</button>
                     </div>
                     <div class="column width100 inputNumberLarge padTop"><input type="number" name="attr_evasion" value=0 /></div>
                 </div>
@@ -2662,7 +2750,7 @@ var TAS = TAS || (function(){
             <div class="toughness vertTop padTop">
                 <div class="inlineBlock vertTop padTop" style="width: 155px;">
                     <div class="column width100 textCenter resistButton">
-                        <button type="roll" value="&{template:default} {{name= Resist Bane Roll}} {{char= @{character_name}}} {{roll= [[1d20]] 10+ bane is removed}}">Toughness</button>
+                        <button type="roll" name="roll_resist_bane" value="&{template:openLegend} {{title= Resist Bane Roll}} {{subTitle= @{character_name}}} {{roll= [[1d20]]}} {{target= 10+ bane is removed}}">Toughness</button>
                     </div>
                     <div class="column width100 inputNumberLarge padTop"><input type="number" name="attr_toughness" value=0 /></div>
                 </div>
@@ -2684,7 +2772,7 @@ var TAS = TAS || (function(){
             <div class="resolve vertTop padTop">
                 <div class="inlineBlock vertTop padTop" style="width: 155px;">
                     <div class="column width100 textCenter resistButton">
-                        <button type="roll" value="&{template:default} {{name= Resist Bane Roll}} {{char= @{character_name}}} {{roll= [[1d20]] 10+ bane is removed}}">Resolve</button>
+                        <button type="roll" name="roll_resist_bane" value="&{template:openLegend} {{title= Resist Bane Roll}} {{subTitle= @{character_name}}} {{roll= [[1d20]]}} {{target= 10+ bane is removed}}">Resolve</button>
                     </div>
                     <div class="column width100 inputNumberLarge padTop"><input type="number" name="attr_resolve" value=0 /></div>
                 </div>
@@ -2714,7 +2802,7 @@ var TAS = TAS || (function(){
                 <fieldset class="repeating_actions">
                     <div class="row">   <!-- Fix for Mozilla squishing +Add & Modify buttons -->
                         <div class="width15 inlineBlock vertTop padLeft"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>y</span></div>
-                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" value="&{template:default} {{name= @{action_name}}} {{char= @{character_name}}} {{using= @{action_attribute}}} {{vs= @{action_target}}} {{roll= @{dice_roll}}} {{Description= @{action_special}}}"><input type="text" style="text-align: center;" name="attr_action_name" /></button></div>
+                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" name="roll_action" value="&{template:openLegend} {{title= @{action_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= @{action_attribute}}} {{target= @{action_target}}} {{roll= @{dice_roll}}} {{description= @{action_special}}}"><input type="text" style="text-align: center;" name="attr_action_name" /></button></div>
                         <input type="hidden" class="displaySettingsFlag" name="attr_displaySettingsFlag" />
                         <div class="width100 displaySettings padLeft">
                             <div class="column width25 inlineBlock bold">Name: </div>
@@ -2756,6 +2844,7 @@ var TAS = TAS || (function(){
                             </div>
                             <input type="hidden" name="attr_dice_roll" value=0 />
                             <div class="column width55 inlineBlock">d20 for this action is:</div>
+                            <input type="hidden" name="attr_dice_d20" value="1d20!!" />
                             <div class="column width45 inlineBlock inputSelect">
                                 <select name="attr_dice_d20">
                                     <option value="1d20!!" selected="selected">Normal</option>
@@ -2800,7 +2889,8 @@ var TAS = TAS || (function(){
      <!-- Legend Points & Speed Section -->
         <div class="speedLethalDamage padTop">
             <div class="width50 inlineBlock vertTop">
-                <div class="column width100 textCenter bold textLarge marginTop">Speed</div>
+                <input type="hidden" name="attr_agility_initiative" value=0 />
+                <div class="column width100 textCenter textLarge speedButton"><button type="roll" name="roll_initiative" value="&{template:openLegend} {{title= Initiative Roll}} {{subTitle= @{character_name}}} {{subTitleAdd= Agility}} {{roll= @{agility_initiative}}} {{description= Make sure to you selected your token to have it automatically added to the turn order.}}">Speed</button></div>
                 <div class="column width100 vertTop inputNumber30 textSmall bold">Base <input type="number" name="attr_base_speed" value=30 /></div>
                 <div class="column width100 inputNumberLarge"><input type="number" name="attr_speed" value=0 /></div>
                 <div class="width100 column inputNumber30 textSmall bold">Armor Penalty(ft) <input type="number" name="attr_armor_penalty" value=0 /></div>
@@ -2842,7 +2932,7 @@ var TAS = TAS || (function(){
                 <fieldset class="repeating_featsLeft">
                     <div class="row">   <!-- Fix for Mozilla squishing the +Add & Modify button text -->
                         <div class="width15 inlineBlock vertTop"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>y</span></div>
-                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" value="&{template:default} {{name= @{feat_left_name}}} {{char= @{character_name}}} {{Description= @{feat_left_description}}}"><input type="text" style="text-align: center;" name="attr_feat_left_name" /></button></div>
+                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" value="&{template:openLegend} {{title= @{feat_left_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= Feat}} {{description= @{feat_left_description}}}"><input type="text" style="text-align: center;" name="attr_feat_left_name" /></button></div>
                         <input type="hidden" class="displaySettingsFlag" name="attr_displaySettingsFlag" />
                         <div class="width100 displaySettings">
                             <div class="column width75 inlineBlock bold textSmall">Name</div>
@@ -2859,7 +2949,7 @@ var TAS = TAS || (function(){
                 <fieldset class="repeating_featsRight">
                     <div class="row">   <!-- Fix for Mozilla squishing the +Add & Modify button text -->
                         <div class="width15 inlineBlock vertTop"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>y</span></div>
-                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" value="&{template:default} {{name= @{feat_right_name}}} {{char= @{character_name}}} {{Description= @{feat_right_description}}}"><input type="text" style="text-align: center;" name="attr_feat_right_name" /></button></div>
+                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" value="&{template:openLegend} {{title= @{feat_right_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= Feat}} {{description= @{feat_right_description}}}"><input type="text" style="text-align: center;" name="attr_feat_right_name" /></button></div>
                         <input type="hidden" class="displaySettingsFlag" name="attr_displaySettingsFlag" />
                         <div class="width100 displaySettings">
                             <div class="column width75 inlineBlock bold textSmall">Name</div>
@@ -2879,7 +2969,7 @@ var TAS = TAS || (function(){
                 <fieldset class="repeating_perks">
                     <div class="row">   <!-- Fix for Mozilla squishing the +Add & Modify button text -->
                         <div class="width15 inlineBlock vertTop"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>y</span></div>
-                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" value="&{template:default} {{name= @{perks_name}}} {{char= @{character_name}}} {{Description= @{perks_description}}}"><input type="text" style="text-align: center;" name="attr_perks_name" /></button></div>
+                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" value="&{template:openLegend} {{title= @{perks_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= Perk}} {{description= @{perks_description}}}"><input type="text" style="text-align: center;" name="attr_perks_name" /></button></div>
                         <input type="hidden" class="displaySettingsFlag" name="attr_displaySettingsFlag" />
                         <div class="width100 displaySettings">
                             <div class="column width100 bold textSmall">Name</div>
@@ -2894,7 +2984,7 @@ var TAS = TAS || (function(){
                 <fieldset class="repeating_perksRight">
                     <div class="row">   <!-- Fix for Mozilla squishing the +Add & Modify button text -->
                         <div class="width15 inlineBlock vertTop"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>y</span></div>
-                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" value="&{template:default} {{name= @{perksRight_name}}} {{char= @{character_name}}} {{Description= @{perksRight_description}}}"><input type="text" style="text-align: center;" name="attr_perksRight_name" /></button></div>
+                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" value="&{template:openLegend} {{title= @{perksRight_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= Perk}} {{description= @{perksRight_description}}}"><input type="text" style="text-align: center;" name="attr_perksRight_name" /></button></div>
                         <input type="hidden" class="displaySettingsFlag" name="attr_displaySettingsFlag" />
                         <div class="width100 displaySettings">
                             <div class="column width100 bold textSmall">Name</div>
@@ -2912,7 +3002,7 @@ var TAS = TAS || (function(){
                 <fieldset class="repeating_flaws">
                     <div class="row">   <!-- Fix for Mozilla squishing the +Add & Modify button text -->
                         <div class="width15 inlineBlock vertTop"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>y</span></div>
-                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" value="&{template:default} {{name= @{flaws_name}}} {{char= @{character_name}}} {{Description= @{flaws_description}}}"><input type="text" style="text-align: center;" name="attr_flaws_name" /></button></div>
+                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" value="&{template:openLegend} {{title= @{flaws_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= Flaw}} {{description= @{flaws_description}}}"><input type="text" style="text-align: center;" name="attr_flaws_name" /></button></div>
                         <input type="hidden" class="displaySettingsFlag" name="attr_displaySettingsFlag" />
                         <div class="width100 displaySettings">
                             <div class="column width100 bold textSmall">Name</div>
@@ -2927,7 +3017,7 @@ var TAS = TAS || (function(){
                 <fieldset class="repeating_flawsRight">
                     <div class="row">   <!-- Fix for Mozilla squishing the +Add & Modify button text -->
                         <div class="width15 inlineBlock vertTop"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>y</span></div>
-                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" value="&{template:default} {{name= @{flawsRight_name}}} {{char= @{character_name}}} {{Description= @{flawsRight_description}}}"><input type="text" style="text-align: center;" name="attr_flawsRight_name" /></button></div>
+                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" value="&{template:openLegend} {{title= @{flawsRight_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= Flaw}} {{description= @{flawsRight_description}}}"><input type="text" style="text-align: center;" name="attr_flawsRight_name" /></button></div>
                         <input type="hidden" class="displaySettingsFlag" name="attr_displaySettingsFlag" />
                         <div class="width100 displaySettings">
                             <div class="column width100 bold textSmall">Name</div>
@@ -3269,5 +3359,57 @@ var TAS = TAS || (function(){
 </div>
 <!-- End Main body of Character Sheet -->
 <!-- Roll Templates Area -->
-
+<rolltemplate class="sheet-rolltemplate-openLegend">
+  <!-- Top of scroll graphic -->
+    <div class="rollTop"></div>
+  <!-- Middle of scroll graphic -->
+    <div class="rollMiddle padLeft padRight">
+      <!-- Display the title given -->
+        <div class="row padBottom">
+            <div class="column width100 textCenter textLarger bolder">{{title}}</div>
+          <!-- Display any sub title given -->
+            {{#subTitle}}
+            <div class="column width100 textCenter textLarge italic">{{subTitle}}{{#subTitleAdd}} &bullet; {{subTitleAdd}}{{/subTitleAdd}}</div>
+            {{/subTitle}}
+          <!-- Display any sub title given -->
+            {{#subTitle2}}
+            <div class="column width100 textCenter textLarge italic">{{subTitle2}}{{#subTitle2Add}} &bullet; {{subTitle2Add}}{{/subTitle2Add}}</div>
+            {{/subTitle2}}
+          <!-- Display any sub title given -->
+            {{#subTitle2}}
+            <div class="column width100 textCenter textLarge italic">{{subTitle2}}{{#subTitle2Add}} &bullet; {{subTitle2Add}}{{/subTitle2Add}}</div>
+            {{/subTitle2}}
+        </div>
+      <!-- Display emote if provided -->
+        {{#emote}}
+        <div class="row">
+            <div class="column width95 inlineBlock textCenter borderAllDotted borderRound">{{emote}}</div>
+        </div>
+        {{/emote}}
+      <!-- Display target plus the roll if target given -->
+        {{#target}}
+        <div class="row">
+            <div class="column textCenter width30 inlineBlock">{{roll}}</div>
+            <div class="column textCenter width10 inlineBlock">vs</div>
+            <div class="column textCenter width60 inlineBlock bold">{{target}}</div>
+        </div>
+        {{/target}}
+      <!-- Display just the roll if no target given -->
+        {{^target}}{{#roll}}
+        <div class="row">
+            <div class="column textCenter width30 inlineBlock">{{roll}}</div>
+            <div class="column textCenter width65 inlineBlock">Total Roll</div>
+        </div>
+        {{/roll}}{{/target}}
+      <!-- Display description if provided -->
+        {{#description}}
+        <div class="row">
+            <div class="column width100 textCenter bold borderBottom">Description/Flavor Text</div>
+            <div class="column width100 textCenter">{{description}}</div>
+        </div>
+        {{/description}}
+    </div>
+  <!-- Bottom of scroll graphic -->
+    <div class="rollBottom"></div>
+</rolltemplate>
 <!-- End Roll Templates Area -->
