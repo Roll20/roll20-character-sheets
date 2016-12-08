@@ -5,6 +5,12 @@
 
 ### Changelog
 
+### 1.6.7 on 2016 December 7th
+* Fixed a strange error where Presence would add 20 at a time to HP
+	- Caused by fortitude substitution not be forced into an integer type
+* Added an indicator at top left of sheet to display current version of the sheet
+	- More functionality later with the gear to add changing of default values for the sheet
+
 ### 1.6.5 on 2016 December 1st
 * Fixed Actions to recalculate the roll string when any attribute is changed
 	- Prior, you had to make a change to the action for the roll string to update if an attribute had been changed.
