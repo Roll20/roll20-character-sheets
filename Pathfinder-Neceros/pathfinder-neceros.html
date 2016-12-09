@@ -17384,6 +17384,7 @@ var PFAttacks = PFAttacks || (function () {
 					enhanceField = "repeating_weapon_" + idStr + "enhance",
 					miscDmgField = "repeating_weapon_" + idStr + "damage-mod",
 					abilityMultField = "repeating_weapon_" + idStr + "damage_ability_mult";
+				TAS.debug("PFAttacks.updateRepeatingWeaponDamage:"+id);
 				getAttrs([maxname, modname, "DMG-mod", totalDamageField, enhanceField, miscDmgField, abilityMultField], function (v) {
 					var maxA = Math.abs(parseInt(v[maxname], 10) || 9999),
 						ability = parseInt(v[modname], 10) || 0,
@@ -17395,11 +17396,12 @@ var PFAttacks = PFAttacks || (function () {
 						enhance = parseInt(v[enhanceField], 10) || 0,
 						totalDamage = abilityTot + globalBuffConds + miscDmg + enhance,
 						setter = {};
+					TAS.debug("");
 					if (totalDamage !== currTotalDmg || isNaN(currTotalDmg)) {
 						setter[totalDamageField] = totalDamage;
 					}
 					if (_.size(setter)) {
-						setAttrs(setter, {silent: true},resetOptionsWhenDone);
+						setAttrs(setter, {},resetOptionsWhenDone);
 					}
 				});
 			},
@@ -17481,6 +17483,7 @@ var PFAttacks = PFAttacks || (function () {
 			},
 			/* updateRepeatingWeaponDamages - updates all attacks when DMG-mod changes */
 			updateRepeatingWeaponDamages = function (eventInfo) {
+				TAS.debug("PFAttacks.updateRepeatingWeaponDamages");
 				getSectionIDs("repeating_weapon", function (ids) {
 					_.each(ids, function (id) {
 						updateRepeatingWeaponDamage(id,eventInfo);
@@ -17767,8 +17770,8 @@ var PFAttacks = PFAttacks || (function () {
 					}
 				}));
 				on("change:dmg-mod", TAS.callback(function eventUpdateRepeatingWeaponDamageTotal(eventInfo) {
+					TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
 					if (eventInfo.sourceType !== "player") {
-						TAS.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
 						updateRepeatingWeaponDamages(eventInfo);
 					}
 				}));
@@ -22272,7 +22275,6 @@ var PFBuffs = PFBuffs || (function () {
 				// events pass in the column updated macro-text is "either", buffs are auto only
 				buffTotalNonAbilityEvents: {
 					//ranged and attack are in the PFAttackGrid module
-					"DMG": [PFAttackGrid.updateDamage],
 					"Fort": [PFSaves.updateSave],
 					"Will": [PFSaves.updateSave],
 					"Ref": [PFSaves.updateSave]
@@ -22287,6 +22289,7 @@ var PFBuffs = PFBuffs || (function () {
 				},
 				// events do NOT pass in column updated
 				buffTotalEventsNoParam: {
+					"DMG": [PFAttackGrid.updateDamage],
 					"AC": [PFDefense.updateDefenses],
 					"Touch": [PFDefense.updateDefenses],
 					"CMD": [PFDefense.updateDefenses],
