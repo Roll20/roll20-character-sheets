@@ -5,6 +5,14 @@
 
 ### Changelog
 
+### 1.6.7 on 2016 December 10th
+* Fixed a strange error where Presence would add 20 at a time to HP
+	- Caused by fortitude substitution not be forced into an integer type
+* Fixed Attribute Substitution not updating if the Primary Attribute is changed
+	- Modified On Change to be function, and calling from calcAgility function as well
+* Added an indicator at top left of sheet to display current version of the sheet
+	- More functionality later with the gear to add changing of default values for the sheet
+
 ### 1.6.5 on 2016 December 1st
 * Fixed Actions to recalculate the roll string when any attribute is changed
 	- Prior, you had to make a change to the action for the roll string to update if an attribute had been changed.

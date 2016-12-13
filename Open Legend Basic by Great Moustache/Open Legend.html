@@ -71,6 +71,9 @@ repeating_actions
 	attr_action_target
 	attr_action_special
 	attr_action_settings
+	attr_power_target
+	attr_use_power_level
+	attr_power_level
 attr_feat_total_points		attr_feat_points_spent
 repeating_featsLeft
 	attr_feat_left_name         attr_feat_left_show_name        attr_feat_left_cost
@@ -129,6 +132,7 @@ repeating_items
 		calcMovement();
 		calcPrescience();
 		calcProtection();
+		calcAllActionRolls();
 	});
 
     // Function to determine dice number :: takes in the attribute score :: outputs the dice number
@@ -167,7 +171,11 @@ repeating_items
 
     // Anytime Agility Substitution is selected
     on("change:agility_substitution_select", function() {
-        getAttrs(["agility_substitution_select", "learning_score", "logic_score", "perception_score", "will_score", "deception_score", "persuasion_score", "alteration_score", "creation_score", "energy_score", "entropy_score", "influence_score", "movement_score", "prescience_score", "protection_score"], function(values) {
+        calcAgilitySub();
+    });
+    // Function for Agility Substitution is selected
+    function calcAgilitySub() {
+        getAttrs(["agility_substitution_select", "learning_score", "logic_score", "perception_score", "will_score", "deception_score", "persuasion_score", "presence_score", "alteration_score", "creation_score", "energy_score", "entropy_score", "influence_score", "movement_score", "prescience_score", "protection_score"], function(values) {
             var score = 0;
             if(values.agility_substitution_select === "Learning") {
                 score = values.learning_score*1;
@@ -204,11 +212,15 @@ repeating_items
                 "agility_substitution": score
             });
         });
-    });
+    };
 
     // Anytime Fortitude Substitution is selected
     on("change:fortitude_substitution_select", function() {
-        getAttrs(["fortitude_substitution_select", "learning_score", "logic_score", "perception_score", "will_score", "deception_score", "persuasion_score", "alteration_score", "creation_score", "energy_score", "entropy_score", "influence_score", "movement_score", "prescience_score", "protection_score"], function(values) {
+        calcFortitudeSub();
+    });
+    // Anytime Fortitude Substitution is selected
+    function calcFortitudeSub() {
+        getAttrs(["fortitude_substitution_select", "learning_score", "logic_score", "perception_score", "will_score", "deception_score", "persuasion_score", "presence_score", "alteration_score", "creation_score", "energy_score", "entropy_score", "influence_score", "movement_score", "prescience_score", "protection_score"], function(values) {
             var score = 0;
             if(values.fortitude_substitution_select === "Learning") {
                 score = values.learning_score*1;
@@ -245,11 +257,15 @@ repeating_items
                 "fortitude_substitution": score
             });
         });
-    });
+    };
 
     // Anytime Might Substitution is selected
     on("change:might_substitution_select", function() {
-        getAttrs(["might_substitution_select", "learning_score", "logic_score", "perception_score", "will_score", "deception_score", "persuasion_score", "alteration_score", "creation_score", "energy_score", "entropy_score", "influence_score", "movement_score", "prescience_score", "protection_score"], function(values) {
+        calcMightSub();
+    });
+    // Anytime Might Substitution is selected
+    function calcMightSub() {
+        getAttrs(["might_substitution_select", "learning_score", "logic_score", "perception_score", "will_score", "deception_score", "persuasion_score", "presence_score", "alteration_score", "creation_score", "energy_score", "entropy_score", "influence_score", "movement_score", "prescience_score", "protection_score"], function(values) {
             var score = 0;
             if(values.might_substitution_select === "Learning") {
                 score = values.learning_score*1;
@@ -286,13 +302,13 @@ repeating_items
                 "might_substitution": score
             });
         });
-    });
+    };
 
     // Function to calculate Evasion, called when changes made to Armor, Shield, Agility, or evasion other
     function calcEvasion() {
         getAttrs(["agility_score", "agility_substitution", "armor", "shield", "evasion_other"], function(values) {
             var score = 0;
-            if (values.agility_score*1 > values.agility_substitution*1) {
+            if (values.agility_score*1 >= values.agility_substitution*1) {
                 score = values.agility_score*1;
             } else {
                 score = values.agility_substitution*1;
@@ -307,7 +323,7 @@ repeating_items
     function calcToughness() {
         getAttrs(["fortitude_score", "fortitude_substitution", "will_score", "toughness_other"], function(values) {
             var score = 0;
-            if (values.fortitude_score*1 > values.fortitude_substitution*1) {
+            if (values.fortitude_score*1 >= values.fortitude_substitution*1) {
                 score = values.fortitude_score*1;
             } else {
                 score = values.fortitude_substitution*1;
@@ -449,10 +465,10 @@ repeating_items
     function calcHitPoints() {
         getAttrs(["fortitude_score", "fortitude_substitution", "presence_score", "will_score", "lethal_damage", "hit_point_feats", "hit_point_other"], function(values) {
             var score = 0;
-            if(values.fortitude_score*1 > values.fortitude_substitution*1) {
+            if(values.fortitude_score*1 >= values.fortitude_substitution*1) {
                 score = values.fortitude_score*1;
             } else {
-                score = values.fortitude_substitution;
+                score = values.fortitude_substitution*1;
             }
             setAttrs({
                 "hit_point_max": 2*(score + values.presence_score*1 + values.will_score*1) + 10 - values.lethal_damage*1 + values.hit_point_feats*1 + values.hit_point_other*1
@@ -478,13 +494,14 @@ repeating_items
     
     // Anytime Agility score is changed, update cost and dice
     on("change:agility_score change:agility_dice_d20 change:agility_cost_modifier change:agility_dice_modifier", function() {
-		calcAgility();
+        calcAgility();
         calcEvasion();                  // call to recalculate evasion score
         calcAllActionRolls();
     });
 	
 	// Function for calculating everything to do with Agility
 	function calcAgility() {
+        calcAgilitySub();
         getAttrs(["agility_score", "agility_dice_d20", "agility_cost_modifier", "agility_dice_modifier"], function(values) {
             var score = values.agility_score*1 + values.agility_dice_modifier*1;
             var scoreCost = values.agility_score*1 + values.agility_cost_modifier*1;
@@ -520,6 +537,7 @@ repeating_items
 	
 	// Function for calculating everything to do with Fortitude
 	function calcFortitude() {
+        calcFortitudeSub();
         getAttrs(["fortitude_score", "fortitude_dice_d20", "fortitude_cost_modifier", "fortitude_dice_modifier"], function(values) {
             var score = values.fortitude_score*1 + values.fortitude_dice_modifier*1;
             var scoreCost = values.fortitude_score*1 + values.fortitude_cost_modifier*1;
@@ -550,6 +568,7 @@ repeating_items
 	
 	// Function for calculating everything to do with Might
 	function calcMight() {
+        calcMightSub();
         getAttrs(["might_score", "might_dice_d20", "might_cost_modifier", "might_dice_modifier"], function(values) {
             var score = values.might_score*1 + values.might_dice_modifier*1;
             var scoreCost = values.might_score*1 + values.might_cost_modifier*1;
@@ -574,10 +593,9 @@ repeating_items
     // Anytime deception score is changed, update cost and dice
     on("change:deception_score change:deception_dice_d20 change:deception_cost_modifier change:deception_dice_modifier", function() {
 		calcDeception();
-        calcHeavy();
-        calcEvasion();
-        calcToughness();
-        calcHitPoints();
+        calcAgility();
+        calcFortitude();
+        calcMight();
         calcAllActionRolls();
     });
 	
@@ -608,10 +626,9 @@ repeating_items
     on("change:presence_score change:presence_dice_d20 change:presence_cost_modifier change:presence_dice_modifier", function() {
 		calcPresence();
 		calcResolve();
-        calcHeavy();
-        calcEvasion();
-        calcToughness();
-        calcHitPoints();
+        calcAgility();
+        calcFortitude();
+        calcMight();
         calcAllActionRolls();
     });
 	
@@ -641,10 +658,9 @@ repeating_items
     // Anytime persuasion score is changed, update cost and dice
     on("change:persuasion_score change:persuasion_dice_d20 change:persuasion_cost_modifier change:persuasion_dice_modifier", function() {
 		calcPersuasion();
-        calcHeavy();
-        calcEvasion();
-        calcToughness();
-        calcHitPoints();
+        calcAgility();
+        calcFortitude();
+        calcMight();
         calcAllActionRolls();
     });
 	
@@ -674,10 +690,9 @@ repeating_items
     // Anytime learning score is changed, update cost and dice
     on("change:learning_score change:learning_dice_d20 change:learning_cost_modifier change:learning_dice_modifier", function() {
 		calcLearning();
-        calcHeavy();
-        calcEvasion();
-        calcToughness();
-        calcHitPoints();
+        calcAgility();
+        calcFortitude();
+        calcMight();
         calcAllActionRolls();
     });
 	
@@ -707,10 +722,9 @@ repeating_items
     // Anytime logic score is changed, update cost and dice
     on("change:logic_score change:logic_dice_d20 change:logic_cost_modifier change:logic_dice_modifier", function() {
 		calcLogic();
-        calcHeavy();
-        calcEvasion();
-        calcToughness();
-        calcHitPoints();
+        calcAgility();
+        calcFortitude();
+        calcMight();
         calcAllActionRolls();
     });
 	
@@ -740,10 +754,9 @@ repeating_items
     // Anytime perception score is changed, update cost and dice
     on("change:perception_score change:perception_dice_d20 change:perception_cost_modifier change:perception_dice_modifier", function() {
 		calcPerception();
-        calcHeavy();
-        calcEvasion();
-        calcToughness();
-        calcHitPoints();
+        calcAgility();
+        calcFortitude();
+        calcMight();
         calcAllActionRolls();
     });
 	
@@ -774,10 +787,9 @@ repeating_items
     on("change:will_score change:will_dice_d20 change:will_cost_modifier change:will_dice_modifier", function() {
 		calcWill();
         calcResolve();                  // call to recalculate resolve
-        calcToughness();                // For if/when Presence is switched with Will to determine Toughness
-        calcHitPoints();                // call to update hitpoints
-        calcEvasion();
-        calcHitPoints();
+        calcAgility();
+        calcFortitude();
+        calcMight();
         calcAllActionRolls();
     });
 	
@@ -807,10 +819,9 @@ repeating_items
     // Anytime alteration score is changed, update cost and dice
     on("change:alteration_score change:alteration_dice_d20 change:alteration_cost_modifier change:alteration_dice_modifier", function() {
 		calcAlteration();
-        calcHeavy();
-        calcEvasion();
-        calcToughness();
-        calcHitPoints();
+        calcAgility();
+        calcFortitude();
+        calcMight();
         calcAllActionRolls();
     });
 	
@@ -840,10 +851,9 @@ repeating_items
     // Anytime creation score is changed, update cost and dice
     on("change:creation_score change:creation_dice_d20 change:creation_cost_modifier change:creation_dice_modifier", function() {
 		calcCreation();
-        calcHeavy();
-        calcEvasion();
-        calcToughness();
-        calcHitPoints();
+        calcAgility();
+        calcFortitude();
+        calcMight();
         calcAllActionRolls();
     });
 	
@@ -873,10 +883,9 @@ repeating_items
     // Anytime energy score is changed, update cost and dice
     on("change:energy_score change:energy_dice_d20 change:energy_cost_modifier change:energy_dice_modifier", function() {
 		calcEnergy();
-        calcHeavy();
-        calcEvasion();
-        calcToughness();
-        calcHitPoints();
+        calcAgility();
+        calcFortitude();
+        calcMight();
         calcAllActionRolls();
     });
 	
@@ -906,10 +915,9 @@ repeating_items
     // Anytime entropy score is changed, update cost and dice
     on("change:entropy_score change:entropy_dice_d20 change:entropy_cost_modifier change:entropy_dice_modifier", function() {
 		calcEntropy();
-        calcHeavy();
-        calcEvasion();
-        calcToughness();
-        calcHitPoints();
+        calcAgility();
+        calcFortitude();
+        calcMight();
         calcAllActionRolls();
     });
 	
@@ -939,10 +947,9 @@ repeating_items
     // Anytime influence score is changed, update cost and dice
     on("change:influence_score change:influence_dice_d20 change:influence_cost_modifier change:influence_dice_modifier", function() {
 		calcInfluence();
-        calcHeavy();
-        calcEvasion();
-        calcToughness();
-        calcHitPoints();
+        calcAgility();
+        calcFortitude();
+        calcMight();
         calcAllActionRolls();
     });
 	
@@ -972,10 +979,9 @@ repeating_items
     // Anytime movement score is changed, update cost and dice
     on("change:movement_score change:movement_dice_d20 change:movement_cost_modifier change:movement_dice_modifier", function() {
 		calcMovement();
-        calcHeavy();
-        calcEvasion();
-        calcToughness();
-        calcHitPoints();
+        calcAgility();
+        calcFortitude();
+        calcMight();
         calcAllActionRolls();
     });
 	
@@ -1005,10 +1011,9 @@ repeating_items
 	// Anytime prescience score is changed, update cost and dice
     on("change:prescience_score change:prescience_dice_d20 change:prescience_cost_modifier change:prescience_dice_modifier", function() {
 		calcPrescience();
-        calcHeavy();
-        calcEvasion();
-        calcToughness();
-        calcHitPoints();
+        calcAgility();
+        calcFortitude();
+        calcMight();
         calcAllActionRolls();
     });
 	
@@ -1038,10 +1043,9 @@ repeating_items
 	// Anytime protection score is changed, update cost and dice
     on("change:protection_score change:protection_dice_d20 change:protection_cost_modifier change:protection_dice_modifier", function() {
 		calcProtection();
-        calcHeavy();
-        calcEvasion();
-        calcToughness();
-        calcHitPoints();
+        calcAgility();
+        calcFortitude();
+        calcMight();
         calcAllActionRolls();
     });
 	
@@ -1259,7 +1263,7 @@ repeating_items
         getSectionIDs("repeating_actions", function(actionsArray) {
          if(actionsArray.length > 0) {
             _.each(actionsArray, function(currentID, i) {
-                getAttrs(["repeating_actions_" + currentID + "_action_attribute", "repeating_actions_" + currentID + "_dice_d20", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(v) {
+                getAttrs(["repeating_actions_" + currentID + "_action_attribute", "repeating_actions_" + currentID + "_dice_d20", "repeating_actions_" + currentID + "_use_power_level", "repeating_actions_" + currentID + "_power_level", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(v) {
                     var update = {};
                     var score = 0;
                     if(v["repeating_actions_" + currentID + "_action_attribute"] === "Agility") {
@@ -1311,6 +1315,11 @@ repeating_items
             				roll = "[[" + v["repeating_actions_" + currentID + "_dice_d20"] + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}" + number + "]]";
         			    }
         			}
+                    if(v["repeating_actions_" + currentID + "_use_power_level"] === "Yes") {
+                        update["repeating_actions_" + currentID + "_power_target"] = "[[10 + " + v["repeating_actions_" + currentID + "_power_level"]*2 + "]]";
+                    } else {
+                        update["repeating_actions_" + currentID + "_power_target"] = "";
+                    }
         			update["repeating_actions_" + currentID + "_dice_roll"] = roll;
         			setAttrs(update);
                 });
@@ -1319,6 +1328,20 @@ repeating_items
         });
     };
 	
+	// On Change for Use Power Level in actions
+    on("change:repeating_actions:use_power_level change:repeating_actions:power_level", function() {
+        getAttrs(["repeating_actions_use_power_level", "repeating_actions_power_level"], function(values) {
+            if(values.repeating_actions_use_power_level === "Yes") {
+                setAttrs({
+                    "repeating_actions_power_target": "[[10 + " + values.repeating_actions_power_level*2 + "]]"
+                });
+            } else {
+                setAttrs({
+                    "repeating_actions_power_target": ""
+                });
+            }
+        });
+    });
 	// On Change for calculating rolls for Actions
     on("change:repeating_actions:action_attribute change:repeating_actions:dice_d20", function() {
         getAttrs(["repeating_actions_action_attribute", "repeating_actions_dice_d20", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(values) {
@@ -2032,8 +2055,11 @@ var TAS = TAS || (function(){
 <!-- End Worker Scripts -->
 <!-- Main body of Character Sheet -->
 <div class="container">     <!-- defines the width/height & behavior of the page -->
+    <div class="row width100 padBottom">
+        <div class="column textSmall textRight padRight">2016.12.07 <span class="bold">Version 1.6.7 </span> <input class="settings" type="checkbox" name="attr_sheet_settings_flag" value="hide" /><span>y</span></div>
+    </div>
  <!-- section for basic Character information -->
-    <div class="row width825 marginBottom">     <!-- section for basic Character information -->
+    <div class="row width825 marginBottom">
         <div class="width1of3 inlineBlock">      <!-- Left Third of 2/3 rows for info (Name & Player) -->
             <div class="column width100 textCenter bold vertBottom">Character Name</div>
             <div class="column width100 textCenter inputName"><input type="text" name="attr_character_name" /></div>
@@ -2791,18 +2817,19 @@ var TAS = TAS || (function(){
    <!-- end Resolve -->
    <!-- Actions Area -->
         <div class="actionsTop padTop padLeft">
-            <div class="column width100 textLargest bold textShadow padTop">Actions</div>
+            <div class="column width100 textLargest bold textShadow padTop">Primary Actions</div>
+            <div class="column width100 italic marginTop">Attacks, Boons, & Banes</div>
+        </div>
+        <div class="actionsMiddle padTop padRight">
         <!-- Headings for the actions -->
             <div class="column width25 bold italic inlineBlock textCenter padLeft">Settings</div>
             <div class="column width75 bold italic inlineBlock textCenter">Name (click to roll)</div>
-        </div>
-        <div class="actionsMiddle padTop padRight">
         <!-- Add actions as needed Section (repeating fields) -->
             <div class="column width100 vertTop padRight">
                 <fieldset class="repeating_actions">
                     <div class="row">   <!-- Fix for Mozilla squishing +Add & Modify buttons -->
                         <div class="width15 inlineBlock vertTop padLeft"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>y</span></div>
-                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" name="roll_action" value="&{template:openLegend} {{title= @{action_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= @{action_attribute}}} {{target= @{action_target}}} {{roll= @{dice_roll}}} {{description= @{action_special}}}"><input type="text" style="text-align: center;" name="attr_action_name" /></button></div>
+                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" name="roll_action" value="&{template:openLegend} {{title= @{action_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= @{action_attribute}}} {{target= @{action_target}}} {{roll= @{dice_roll}}} {{powertarget=@{power_target}}} {{powerlevel= @{power_level}}} {{description= @{action_special}}}"><input type="text" style="text-align: center;" name="attr_action_name" /></button></div>
                         <input type="hidden" class="displaySettingsFlag" name="attr_displaySettingsFlag" />
                         <div class="width100 displaySettings padLeft">
                             <div class="column width25 inlineBlock bold">Name: </div>
@@ -2852,6 +2879,9 @@ var TAS = TAS || (function(){
                                     <option value="2d20!!kl1">Disadvantage</option>
                                 </select>
                             </div>
+                            <input type="hidden" name="attr_power_target" value="" />
+                            <div class="column width75 inlineBlock"><input type="checkbox" class="checks25" name="attr_use_power_level" value="Yes" /> Use Power level:</div>
+                            <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_power_level" value=0 /></div>
                             <div class="column width100 bold textSmall">Description/Special/Flavor Text</div>
                             <div class="column width100 resizeVert vertTop"><textarea class="height50" name="attr_action_special"></textarea></div>
                         </div>
@@ -2887,20 +2917,23 @@ var TAS = TAS || (function(){
         </div>
      <!-- End Hit Points Section -->
      <!-- Legend Points & Speed Section -->
-        <div class="speedLethalDamage padTop">
+        <div class="speedLethalDamage">
             <div class="width50 inlineBlock vertTop">
+                <div class="column width100 height5"></div>
                 <input type="hidden" name="attr_agility_initiative" value=0 />
-                <div class="column width100 textCenter textLarge speedButton"><button type="roll" name="roll_initiative" value="&{template:openLegend} {{title= Initiative Roll}} {{subTitle= @{character_name}}} {{subTitleAdd= Agility}} {{roll= @{agility_initiative}}} {{description= Make sure to you selected your token to have it automatically added to the turn order.}}">Speed</button></div>
+                <div class="column width100 textCenter textLarge speedButton"><button type="roll" name="roll_initiative" value="&{template:openLegend} {{title= Initiative Roll}} {{subTitle= @{character_name}}} {{subTitleAdd= Agility}} {{roll= @{agility_initiative}}} {{description= Make sure to you selected your token to have it automatically added to the turn order.}}">Speed</span></button></div>
+                <div class="column width100 textCenter textSmall" style="line-height: 10px;">Click to roll Initiative</div>
                 <div class="column width100 vertTop inputNumber30 textSmall bold">Base <input type="number" name="attr_base_speed" value=30 /></div>
                 <div class="column width100 inputNumberLarge"><input type="number" name="attr_speed" value=0 /></div>
                 <div class="width100 column inputNumber30 textSmall bold">Armor Penalty(ft) <input type="number" name="attr_armor_penalty" value=0 /></div>
                 <div class="width100 column  inputNumber30 textSmall bold">Armor Feat(ft) <input type="number" name="attr_armor_training" value=0 /></div>
             </div>
             <div class="width50 inlineBlock vertTop">
+                <div class="column width100 height10"></div>
                 <div class="column width5 inlineBlock"></div>
-                <div class="column width90 inlineBlock textCenter bold textLarge black marginTop">Lethal Damage</div>
+                <div class="column width90 inlineBlock textCenter bold textLarge black">Lethal Damage</div>
                 <div class="column width5 inlineBlock"></div>
-                <div class="column width100">&nbsp;</div>
+                <div class="column width100" style="height: 29px;"></div>
                 <div class="column width100 inlineBlock inputNumberLarge"><input type="number" name="attr_lethal_damage" value=0 /></div>
             </div>
         </div>
@@ -3401,6 +3434,21 @@ var TAS = TAS || (function(){
             <div class="column textCenter width65 inlineBlock">Total Roll</div>
         </div>
         {{/roll}}{{/target}}
+      <!-- Display power level if provided -->
+        {{#powertarget}}
+        <div class="row textCenter">
+            {{#rollLess() roll powertarget}}
+            <div class="column width90 inlineBlock red textLarge bold">Success with Twist<br />or Failure</div>
+            {{/rollLess() roll powertarget}}
+            {{#^rollLess() roll powertarget}}
+            <div class="column width90 inlineBlock green textLarge bold">Success</div>
+            {{/^rollLess() roll powertarget}}
+            <div class="column width45 inlineBlock textCenter bold borderRight">Boon CR</div>
+            <div class="column width45 inlineBlock textCenter bold">Power Level</div>
+            <div class="column width45 inlineBlock textCenter borderRight">{{powertarget}}</div>
+            <div class="column width45 inlineBlock textCenter">{{powerlevel}}</div>
+        </div>
+        {{/powertarget}}
       <!-- Display description if provided -->
         {{#description}}
         <div class="row">
