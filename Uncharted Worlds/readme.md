@@ -1,30 +1,17 @@
-This is my first markdown document.
-# This is an <h1> tag
-## This is an <h2> tag
-###### This is an <h6> tag
+# Uncharted Worlds - Character Sheet
+## for [Roll20.net](http://www.roll20.net)
+### [Uncharted Worlds](http://uncharted-worlds.com) &copy; Sean Gomes 
+### Author: Oliver Lind | [http://www.geeks-and-dice.de](http://www.geeks-and-dice.de) | G+: +OliverLind | Twitter: @cthuloid
+#### Version 1.0 | Release Date: 2016-12-13
+This is my first shot at a Roll20.net custom character sheet.
 
-*This text will be italic*
-_This will also be italic_
-**This text will be bold**
-__This will also be bold__
-*You **can** combine them*
+Hints & Features: 
+- rolls for stats are automated. Just click on the icon next to the stat.
+- Stats have to be entered with "+ or -". 
 
-LISTS
-* Item 1
-* Item 2
- * Item 2a
- * Item 2b
-
- 1. Item 1
-2. Item 2
-3. Item 3
- * Item 3a
- * Item 3b
-
- IMAGES
-![GitHub Logo](/images/logo.png)
-Format: ![Alt Text](url)
-
-LINKS
-http://github.com - automatic!
-[GitHub](http://github.com)
+Todos
+- Replace front/back radio buttons with something pretty
+- scaling doesn't work too well
+- implement user dialog for Moves that use "any" as a stat. 
+After clicking the Move, the sheet needs to prompt the user for the stat to use, then roll.
+Currently these Moves are not clickable.
