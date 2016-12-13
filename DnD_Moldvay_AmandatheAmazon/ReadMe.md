@@ -3,9 +3,12 @@
 This is a re-creation of the "green-sheet" for the D&D Basic Moldvay Red box game.  It was created for the Roll20 Moldvay Basic Contest.
 
 ## Current Version
-1.15
+1.16
 
 ### Changelog
+
+#### 1.16
+* Fixing sheet worker to calculate chance to open door on sheet open and STR mod change
 
 #### 1.15
 * Fixed chances for finding secret doors, listening, and finding traps, all of which were too high by 1 (e.g. 1/6 chance for all of those for non-demihumans, was 2/6)
