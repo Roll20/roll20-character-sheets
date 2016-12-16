@@ -1,5 +1,35 @@
 <!-- Basic D&D: Moldvay Character Sheet -->
-<!-- Version 1.14 -->
+<!-- Version 1.16 -->
+
+<!-- Sheet Worker Script -->
+
+<script type="text/worker">
+on("change:mod_str", function() {
+    updateOpenDoorsChance();
+});
+
+on("sheet:opened", function() {
+    updateOpenDoorsChance();
+});
+
+var updateOpenDoorsChance = function() {
+	getAttrs(["MOD_STR"], function(values) {
+		var openDoorsChance = parseInt(values.MOD_STR) || 0;
+		openDoorsChance += 2;
+		if (openDoorsChance > 5) {
+			openDoorsChance = 5;
+		}
+		if (openDoorsChance < 1) {
+			openDoorsChance = 1;
+		}
+		setAttrs({
+			"OpenDoors-chance": openDoorsChance
+		});
+	});
+};
+</script>
+
+<!-- END Sheet Worker Script -->
 
 <!-- Overall Sheet Wrapper -->
 <div class="sheet-overall-wrapper">
@@ -123,7 +153,6 @@
                                 <div class="sheet-col-1-11 sheet-ability-mod sheet-vert-middle"><input name="attr_MOD_STR" type="number" class="sheet-ability-mod" placeholder="0" value="0" /></div>
                                 <div class="sheet-col-6-17 sheet-ability-text sheet-vert-middle">To Hit, Damage, Open doors</div>
                                 <input type="hidden" name="attr_OpenDoors-die" value="1d6cs1cf6">
-                                <input type="hidden" name="attr_OpenDoors-chance" value="[[2 + [[@{MOD_STR}]]]]">
                                 <div class="sheet-col-1-16 sheet-vert-middle"><button type='roll' name="Open Doors" value="&{template:odnd} {{stat=1}} {{name=@{Name}}} {{title=Open Doors}} {{strskill=[[@{OpenDoors-die}]]}} {{chance=[[@{OpenDoors-chance}]]}}" title="Open Doors"></button></div>
                             </div> <!-- END STR -->
 
@@ -665,17 +694,17 @@
 
                             <!-- HIDDEN VALUES -->
                             <input type="hidden" name="attr_DetectSecret-die" value="1d6cs1cf6" />
-                            <input type="hidden" name="attr_DetectSecret-chance" value="2" />
-                            <input type="hidden" name="attr_Elf_DetectSecret-chance" value="3" />
+                            <input type="hidden" name="attr_DetectSecret-chance" value="1" />
+                            <input type="hidden" name="attr_Elf_DetectSecret-chance" value="2" />
                             <input type="hidden" name="attr_Listen-die" value="1d6cs1cf6" />
-                            <input type="hidden" name="attr_Listen-chance" value="2" />
-                            <input type="hidden" name="attr_ElfDwarfHalfling_Listen-chance" value="3" />
+                            <input type="hidden" name="attr_Listen-chance" value="1" />
+                            <input type="hidden" name="attr_ElfDwarfHalfling_Listen-chance" value="2" />
                             <input type="hidden" name="attr_RetainerReaction-die" value="2d6" />
                             <input type="hidden" name="attr_RetainerMorale-die" value="2d6cs1cf6" />
                             <input type="hidden" name="attr_RetainerMorale-chance" value="@{retainermorale_CHA}" />
                             <input type="hidden" name="attr_FindTraps-die" value="1d6cs1cf6" />
-                            <input type="hidden" name="attr_FindTraps-chance" value="2" />
-                            <input type="hidden" name="attr_Dwarf_FindTraps-chance" value="3" />
+                            <input type="hidden" name="attr_FindTraps-chance" value="1" />
+                            <input type="hidden" name="attr_Dwarf_FindTraps-chance" value="2" />
                             <input type="hidden" name="attr_Surprise-die" value="1d6cs6cf1" />
                             <input type="hidden" name="attr_Surprise-chance" value="2" />
                             <input type="hidden" name="attr_TurnUndead-die" value="2d6" />
@@ -2304,24 +2333,18 @@
                         <div class="sheet-col-5-14 sheet-padl sheet-padr sheet-RollTemp-rollname">Roll : </div>
                         <div class="sheet-col-9-14 sheet-padr sheet-RollTemp-rollresult">{{strskill}}</div>
                     </div>
-                    {{#rollWasCrit() strskill}}
-                    <div class="sheet-row">
-                        <div class="sheet-col-1-1">&nbsp;</div>
-                        <div class="sheet-col-19-20 sheet-padl sheet-padr sheet-RollTemp-critsuccess">GREAT SUCCESS !</div>
-                    </div>
-                    {{/rollWasCrit() strskill}}
                     {{#rollGreater() strskill chance}}
                         <div class="sheet-row">
                             <div class="sheet-col-1-1">&nbsp;</div>
                             <div class="sheet-col-11-12 sheet-padl sheet-padr sheet-RollTemp-fail">FAILURE !</div>
                         </div>
                     {{/rollGreater() strskill chance}}
-                    {{#rollBetween() strskill 2 chance}}
+                    {{#rollBetween() strskill 1 chance}}
                         <div class="sheet-row">
                             <div class="sheet-col-1-1">&nbsp;</div>
                             <div class="sheet-col-11-12 sheet-padl sheet-padr sheet-RollTemp-success">SUCCESS !</div>
                         </div>
-                    {{/rollBetween() strskill 2 chance}}
+                    {{/rollBetween() strskill 1 chance}}
                 {{/strskill}}
 
                 <!-- CHA Reactions -->
@@ -2338,24 +2361,18 @@
                         <div class="sheet-col-5-14 sheet-padl sheet-padr sheet-RollTemp-rollname">Roll : </div>
                         <div class="sheet-col-9-14 sheet-padr sheet-RollTemp-rollresult">{{ability}}</div>
                     </div>
-                    {{#rollWasCrit() ability}}
-                    <div class="sheet-row">
-                        <div class="sheet-col-1-1">&nbsp;</div>
-                        <div class="sheet-col-19-20 sheet-padl sheet-padr sheet-RollTemp-critsuccess">GREAT SUCCESS !</div>
-                    </div>
-                    {{/rollWasCrit() ability}}
                     {{#rollGreater() ability stattype}}
                         <div class="sheet-row">
                             <div class="sheet-col-1-1">&nbsp;</div>
                             <div class="sheet-col-11-12 sheet-padl sheet-padr sheet-RollTemp-fail">FAILURE !</div>
                         </div>
                     {{/rollGreater() ability stattype}}
-                    {{#rollBetween() ability 2 stattype}}
+                    {{#rollBetween() ability 1 stattype}}
                         <div class="sheet-row">
                             <div class="sheet-col-1-1">&nbsp;</div>
                             <div class="sheet-col-11-12 sheet-padl sheet-padr sheet-RollTemp-success">SUCCESS !</div>
                         </div>
-                    {{/rollBetween() ability 2 stattype}}
+                    {{/rollBetween() ability 1 stattype}}
                 {{/ability}}
 
                 <!-- Saving Throws -->
@@ -2384,24 +2401,18 @@
                         <div class="sheet-col-5-14 sheet-padl sheet-padr sheet-RollTemp-rollname">Roll : </div>
                         <div class="sheet-col-9-14 sheet-padr sheet-RollTemp-rollresult">{{classability}}</div>
                     </div>
-                    {{#rollWasCrit() classability}}
-                    <div class="sheet-row">
-                        <div class="sheet-col-1-1">&nbsp;</div>
-                        <div class="sheet-col-19-20 sheet-padl sheet-padr sheet-RollTemp-critsuccess">GREAT SUCCESS !</div>
-                    </div>
-                    {{/rollWasCrit() classability}}
                     {{#rollGreater() classability chance}}
                         <div class="sheet-row">
                             <div class="sheet-col-1-1">&nbsp;</div>
                             <div class="sheet-col-11-12 sheet-padl sheet-padr sheet-RollTemp-fail">FAILURE !</div>
                         </div>
                     {{/rollGreater() classability chance}}
-                    {{#rollBetween() classability 2 chance}}
+                    {{#rollBetween() classability 1 chance}}
                         <div class="sheet-row">
                             <div class="sheet-col-1-1">&nbsp;</div>
                             <div class="sheet-col-11-12 sheet-padl sheet-padr sheet-RollTemp-success">SUCCESS !</div>
                         </div>
-                    {{/rollBetween() classability 2 chance}}
+                    {{/rollBetween() classability 1 chance}}
                 {{/classability}}
 
                 <!-- CHA Morale Check -->

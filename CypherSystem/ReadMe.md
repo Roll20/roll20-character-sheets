@@ -3,7 +3,7 @@ Character sheet, with integrated rolls and optional API script, for the Cypher S
 It can look like and be used as a sheet for _Numen&eacute;ra_ (except the armor stat cost, as per the CSR rule) or _The Strange_ (except the armor stat cost thing also, and the recursion management which requires several characters/sheets, one per recursion).
 
 # Current version:
-Version 1.5 (December 21st, 2015).
+Version 1.6 (February 21st, 2016).
 
 * Screenshot [Generic Cypher System style](CypherSystem.png)
 * Screenshot [Numenera style](CypherSystem_style_Numenera.png)
@@ -41,6 +41,9 @@ Set up the API script:
 
 
 # Release Notes
+
+##Release 1.6 (February 21st, 2016)
+Cosmetic changes, to ease access to the delete button on repeatable sections, and diminish repeatable sections line height.
 
 ##Release 1.5 (December 21st, 2015)
 
