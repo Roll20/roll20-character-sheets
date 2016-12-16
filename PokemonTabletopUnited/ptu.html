@@ -101,12 +101,12 @@ on("change:repeating_moves:move_db", function() {
     var statUp = function(){
         getAttrs(["base_HP","HP","base_ATK","ATK","ATK_Stage","base_DEF","DEF","DEF_Stage","base_SPATK","SPATK","SPATK_Stage","base_SPDEF","SPDEF","SPDEF_Stage","base_SPEED","SPEED","SPEED_Stage"], function(v) {
         setAttrs({
-          HP_total: v.base_HP + v.HP,
-          ATK_total: (v.base_ATK + v.ATK)*v.ATK_Stage,
-          DEF_total: (v.base_DEF*1 + v.DEF*1)*v.DEF_Stage,
-          SPATK_total: (v.base_SPATK + v.SPATK)*v.SPATK_Stage,
-          SPDEF_total: (v.base_SPDEF + v.SPDEF)*v.SPDEF_Stage,
-          SPEED_total: (v.base_SPEED*1 + v.SPEED*1)*v.SPEED_Stage
+          HP_total: 1*v.base_HP + 1*v.HP,
+          ATK_total: Math.floor((1*v.base_ATK + 1*v.ATK)*v.ATK_Stage),
+          DEF_total: Math.floor((1*v.base_DEF*1 + v.DEF*1)*v.DEF_Stage),
+          SPATK_total: Math.floor((1*v.base_SPATK + 1*v.SPATK)*v.SPATK_Stage),
+          SPDEF_total: Math.floor((1*v.base_SPDEF + 1*v.SPDEF)*v.SPDEF_Stage),
+          SPEED_total: Math.floor((v.base_SPEED*1 + v.SPEED*1)*v.SPEED_Stage)
         });
         });
     };
@@ -117,7 +117,6 @@ on("change:repeating_moves:move_db", function() {
         sdef = Math.min(Math.floor(v["SPDEF_total"]/5),6);
         speed = Math.min(Math.floor(v["SPEED_total"]/5),6);
         eva = v["Eva"];
-        console.log('This');
         setAttrs({
           PE: def,
           PEB: eva,
@@ -134,18 +133,18 @@ on("change:repeating_moves:move_db", function() {
     
     var hpCalc = function (){
         getAttrs(["Level","CharType","HP_Total", "Injuries"], function(v) {
-            x = Math.floor(v.Level*(v.CharType + 1) + v.HP_Total*3 + 10)
+            x = Math.floor(v.Level*(1*v.CharType + 1) + v.HP_Total*3 + 10);
             setAttrs({
-                HitPoints_max:x * (1-v.Injuries/10),
+                HitPoints_max:Math.floor(x * (1-1*v.Injuries/10)),
                 HitPoints_permmax:x,
-                75_hp:Math.floor(x*.75),
-                50_hp:Math.floor(x*.5),
-                25_hp:Math.floor(x*.25),
-                13_hp:Math.floor(x*(1/3)),
-                16_hp:Math.floor(x*(1/6)),
-                18_hp:Math.floor(x*(1/8)),
-                110_hp:Math.floor(x*(1/10)),
-                116_hp:Math.floor(x*(1/16)),
+                a75_hp:Math.floor(x*0.75),
+                a50_hp:Math.floor(x*0.5),
+                a25_hp:Math.floor(x*0.25),
+                a13_hp:Math.floor(x*(1/3)),
+                a16_hp:Math.floor(x*(1/6)),
+                a18_hp:Math.floor(x*(1/8)),
+                a110_hp:Math.floor(x*(1/10)),
+                a116_hp:Math.floor(x*(1/16))
             });
         });
     };
@@ -547,7 +546,7 @@ on("change:repeating_moves:move_db", function() {
             </tr>
             <tr>
                 <td class='sheet-table-header'>Injuries</td>
-                <td><input type='number' name='attr_Injures' value = 0 /></td>
+                <td><input type='number' name='attr_Injuries' value = 0 /></td>
             </tr>
         </table>
         <br/>
@@ -555,27 +554,27 @@ on("change:repeating_moves:move_db", function() {
         <table class='sheet-table'>
             <tr>
                 <td class='sheet-table-header'>75%</td>
-                <td><input type='number' name='attr_75_hp'/></td>
+                <td><input type='number' name='attr_a75_hp'/></td>
                 <td class='sheet-table-header'>50%</td>
-                <td><input type='number' name='attr_50_hp'/></td>
+                <td><input type='number' name='attr_a50_hp'/></td>
             </tr>
             <tr>
                 <td class='sheet-table-header'>25%</td>
-                <td><input type='number' name='attr_25_hp'/></td>
+                <td><input type='number' name='attr_a25_hp'/></td>
                 <td class='sheet-table-header'>1/3rd</td>
-                <td><input type='number' name='attr_13_hp'/></td>
+                <td><input type='number' name='attr_a13_hp'/></td>
             </tr>
             <tr>
                 <td class='sheet-table-header'>1/6th</td>
-                <td><input type='number' name='attr_16_hp'/></td>
+                <td><input type='number' name='attr_a16_hp'/></td>
                 <td class='sheet-table-header'>1/8th</td>
-                <td><input type='number' name='attr_18_hp'/></td>
+                <td><input type='number' name='attr_a18_hp'/></td>
             </tr>
             <tr>
                 <td class='sheet-table-header'>1/10th (Tick Value)</td>
-                <td><input type='number' name='attr_110_hp'/></td>
+                <td><input type='number' name='attr_a110_hp'/></td>
                 <td class='sheet-table-header'>1/16th</td>
-                <td><input type='number' name='attr_116_hp'/></td>
+                <td><input type='number' name='attr_a116_hp'/></td>
             </tr>
         </table>
         <br />
@@ -720,7 +719,7 @@ on("change:repeating_moves:move_db", function() {
                 <td><input type='number' name='attr_Move4_DB'/></td>
             </tr>
             <tr>
-                <td class='sheet-table-header'>Damage Base:</td>
+                <td class='sheet-table-header'>Damage Dice:</td>
                 <td><input type='number' name='attr_Move4_Amount'/><select class='sheet-shortfield2' name="attr_Move4_Dice" class="dtype">                
                       <option value="d6">d6</option>
                       <option value="d8">d8</option>
@@ -781,7 +780,7 @@ on("change:repeating_moves:move_db", function() {
                 <td><input type='number' name='attr_Move2_DB'/></td>
             </tr>
             <tr>
-                <td class='sheet-table-header'>Damage Base:</td>
+                <td class='sheet-table-header'>Damage Dice:</td>
                 <td><input type='number' name='attr_Move2_Amount'/><select class='sheet-shortfield2' name="attr_Move2_Dice" class="dtype">                
                       <option value="d6">d6</option>
                       <option value="d8">d8</option>
@@ -840,7 +839,7 @@ on("change:repeating_moves:move_db", function() {
                 <td><input type='number' name='attr_Move5_DB'/></td>
             </tr>
             <tr>
-                <td class='sheet-table-header'>Damage Base:</td>
+                <td class='sheet-table-header'>Damage Dice:</td>
                 <td><input type='number' name='attr_Move5_Amount'/><select class='sheet-shortfield2' name="attr_Move5_Dice" class="dtype">                
                       <option value="d6">d6</option>
                       <option value="d8">d8</option>
@@ -901,7 +900,7 @@ on("change:repeating_moves:move_db", function() {
                 <td><input type='number' name='attr_Move3_DB'/></td>
             </tr>
             <tr>
-                <td class='sheet-table-header'>Damage Base:</td>
+                <td class='sheet-table-header'>Damage Dice:</td>
                 <td><input type='number' name='attr_Move3_Amount'/><select class='sheet-shortfield2' name="attr_Move3_Dice" class="dtype">                
                       <option value="d6">d6</option>
                       <option value="d8">d8</option>
@@ -960,7 +959,7 @@ on("change:repeating_moves:move_db", function() {
                 <td><input type='number' name='attr_Move6_DB'/></td>
             </tr>
             <tr>
-                <td class='sheet-table-header'>Damage Base:</td>
+                <td class='sheet-table-header'>Damage Dice:</td>
                 <td><input type='number' name='attr_Move6_Amount'/><select class='sheet-shortfield2' name="attr_Move6_Dice" class="dtype">                
                       <option value="d6">d6</option>
                       <option value="d8">d8</option>
@@ -1022,7 +1021,7 @@ on("change:repeating_moves:move_db", function() {
                 <td><input type='number' name='attr_Struggle_DB' value = "4"/></td>
             </tr>
             <tr>
-                <td class='sheet-table-header'>Damage Base:</td>
+                <td class='sheet-table-header'>Damage Dice:</td>
                 <td><input type='number' name='attr_Struggle_Amount' value = "1" /><select class='sheet-shortfield2' name="attr_Struggle_Dice" class="dtype">
                       <option value="d6">d6</option>
                       <option value="d8" selected="selected">d8</option>
@@ -1039,7 +1038,7 @@ on("change:repeating_moves:move_db", function() {
             <tr>
                <td class='sheet-table-header'>Damage Rolls:</td>
                <td>
-                <button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=Struggle}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Struggle_AC}}} {{Type=@{Struggle_Type}}} {{Frequency=At-Will}} {{damage=[[@{Struggle_Amount}@{Struggle_Dice}+@{Struggle_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit=[[(@{Struggle_Amount}(2+@{sniper}))@{Struggle_Dice}+(2+@{sniper})*@{Struggle_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcat=Physical}} {{range=@{Struggle_Range}}} {{effect=@{Struggle_Effects}}}' name='roll_StruggleAtkPhys' />  <img src="http://www.serebii.net/pokedex-dp/type/physical.png">
+                <button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=Struggle}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Struggle_AC}}} {{Type=@{Struggle_Type}}} {{Frequency=At-Will}} {{damage=[[@{Struggle_Amount}@{Struggle_Dice}+@{Struggle_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcrit=[[(@{Struggle_Amount}*(2+@{sniper}))@{Struggle_Dice}+(2+@{sniper})*@{Struggle_Bonus}+@{dam_B}+@{ATK_total}]]}} {{dmgcat=Physical}} {{range=@{Struggle_Range}}} {{effect=@{Struggle_Effects}}}' name='roll_StruggleAtkPhys' />  <img src="http://www.serebii.net/pokedex-dp/type/physical.png">
                 <button type='roll' value='&{template:PTU} {{nick=@{nickname}}} {{name=Struggle}} {{AR=[[1d20+@{Acc}]]}} {{AC=@{Struggle_AC}}} {{Type=@{Struggle_Type}}} {{Frequency=At-Will}} {{damage=[[@{Struggle_Amount}@{Struggle_Dice}+@{Struggle_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcrit=[[(@{Struggle_Amount}*(2+@{sniper}))@{Struggle_Dice}+(2+@{sniper})*@{Struggle_Bonus}+@{dam_B}+@{SPATK_total}]]}} {{dmgcat=Special}} {{range=@{Struggle_Range}}} {{effect=@{Struggle_Effects}}}' name='roll_StruggleAtkSpec' />  <img src="http://www.serebii.net/pokedex-dp/type/special.png">
                </td>
             </tr>
@@ -1084,7 +1083,7 @@ on("change:repeating_moves:move_db", function() {
                     <td><input type='number' name='attr_Move_DB'/></td>
                 </tr>
                 <tr>
-                    <td class='sheet-table-header-1'>Damage Base:</td>
+                    <td class='sheet-table-header-1'>Damage Dice:</td>
                     <td colspan="3"><input type='number' name='attr_Move_Amount'/><select class='sheet-shortfield2' name="attr_Move_Dice" class="dtype">
                           <option value="d6">d6</option>
                           <option value="d8">d8</option>

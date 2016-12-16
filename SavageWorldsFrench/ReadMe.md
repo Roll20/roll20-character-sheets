@@ -3,7 +3,7 @@
 Feuille de personnage (FdP) avec jets intégrés pour **Savage Worlds**, basée sur le Livre de Base (LdB) de la version éditée en français par [Black Book Editions](http://www.black-book-editions.fr/index.php?site_id=278).
 
 # Version courante
-1.1 [Capture d'écran](sawofr.png)
+1.2 [Capture d'écran](sawofr.png)
 
 #Divers notes
 
@@ -82,6 +82,10 @@ Les suggestions sont les bienvenues à ce sujet.
 NB : décrémenter les PP automatiquement au lancement d'un pouvoir nécessiterait l'utilisation d'un script API, donc d'un compte "Pro".
 
 # Notes de version
+
+##v1.2 (2015-12-22)
+
+Equipement / Inventaire / Encombrement : ajout du poids individuel, gestion des poids décimaux, correction d'un bug lors de la suppression d'une ligne.
 
 ##v1.1 (2015-11-30)
 Merci à The Aaron pour son script [TAS](https://github.com/shdwjk/TheAaronSheet).

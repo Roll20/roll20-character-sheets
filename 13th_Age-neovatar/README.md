@@ -1,8 +1,8 @@
 # A new 13th Age Character Sheet for roll20.net
 
-*This character sheet has a website with an interactive preview!*
+* [View Interactive Sheet Preview](http://neovatar.github.io/roll20-character-sheets/13th_Age-neovatar/testbed/)
 
-[View Interactive Sheet Preview](http://neovatar.github.io/roll20-character-sheets/13th_Age-neovatar/testbed/)
+* [Character sheets documentation in the Roll20 wiki](https://wiki.roll20.net/13th_Age_Character_Sheet_neovatar)
 
 ### Usage
 
@@ -93,8 +93,24 @@ grunt build
 This will create `13th_Age-neovatar.[css|html]` that you can copy and paste into Roll 20 directly.
 
 ### Changelog
+**1.4.0:**
+
+***Breaking changes:***
+
+* Added select boxes for basic attacks. You can select DEX or STR.
+  On existing character sheets if the macro does not work correctly, please re-select the ability you use (switch to the other value and switch back to the one you want to use)
+* Added select boxes to icon rolls
+  You need to re-select the number of points that you have with each icons
+
+***Non-breaking changes:***
+
+* Added popup for background checks and removed ability column. When you do a background check, you get a popup and can select the ability that you want to use for the check roll
+* New style for roll buttons
+* New style for section headers
+* Added at-will check box to power repeating section
 
 **1.3.1:**
+
   * fixed minor spelling typo
 
 **1.3.0:**
