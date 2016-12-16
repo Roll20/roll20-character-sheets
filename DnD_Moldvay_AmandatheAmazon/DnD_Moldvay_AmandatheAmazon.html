@@ -1,10 +1,18 @@
 <!-- Basic D&D: Moldvay Character Sheet -->
-<!-- Version 1.15 -->
+<!-- Version 1.16 -->
 
 <!-- Sheet Worker Script -->
 
 <script type="text/worker">
-on("change:MOD_STR", function() {
+on("change:mod_str", function() {
+    updateOpenDoorsChance();
+});
+
+on("sheet:opened", function() {
+    updateOpenDoorsChance();
+});
+
+var updateOpenDoorsChance = function() {
 	getAttrs(["MOD_STR"], function(values) {
 		var openDoorsChance = parseInt(values.MOD_STR) || 0;
 		openDoorsChance += 2;
@@ -15,10 +23,10 @@ on("change:MOD_STR", function() {
 			openDoorsChance = 1;
 		}
 		setAttrs({
-			OpenDoors-chance: openDoorsChance
+			"OpenDoors-chance": openDoorsChance
 		});
 	});
-});
+};
 </script>
 
 <!-- END Sheet Worker Script -->
@@ -145,8 +153,6 @@ on("change:MOD_STR", function() {
                                 <div class="sheet-col-1-11 sheet-ability-mod sheet-vert-middle"><input name="attr_MOD_STR" type="number" class="sheet-ability-mod" placeholder="0" value="0" /></div>
                                 <div class="sheet-col-6-17 sheet-ability-text sheet-vert-middle">To Hit, Damage, Open doors</div>
                                 <input type="hidden" name="attr_OpenDoors-die" value="1d6cs1cf6">
-				<!-- Disabling in favor of Sheet Worker -->
-				<!-- <input type="hidden" name="attr_OpenDoors-chance" value="[[2 + [[@{MOD_STR}]]]]"> -->
                                 <div class="sheet-col-1-16 sheet-vert-middle"><button type='roll' name="Open Doors" value="&{template:odnd} {{stat=1}} {{name=@{Name}}} {{title=Open Doors}} {{strskill=[[@{OpenDoors-die}]]}} {{chance=[[@{OpenDoors-chance}]]}}" title="Open Doors"></button></div>
                             </div> <!-- END STR -->
 
