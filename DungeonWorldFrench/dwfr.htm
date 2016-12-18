@@ -4,11 +4,12 @@
 // Github:   https://github.com/shdwjk/TheAaronSheet/blob/master/TheAaronSheet.js
 // By:       The Aaron, Arcane Scriptomancer
 // Contact:  https://app.roll20.net/users/104025/the-aaron
+
 var TAS = TAS || (function(){
     'use strict';
 
-    var version = '0.2.1',
-        lastUpdate = 1453794214,
+    var version = '0.2.4',
+        lastUpdate = 1457098091,
 
         loggingSettings = {
             debug: {
@@ -176,7 +177,7 @@ var TAS = TAS || (function(){
 
         coloredLoggerFunction = function(message){
             console.log(
-                '%c '+label+': %c '+message,
+                '%c '+label+': %c '+message + ' ',
                 'background-color: '+lBGColor+';color: '+lTxtColor+'; font-weight:bold;',
                 'background-color: '+mBGColor+';color: '+mTxtColor+';'
             );
@@ -200,9 +201,9 @@ var TAS = TAS || (function(){
 
     registerCallstack = function(callstack,label){
         var idx=_.findIndex(callstackRegistry,function(o){
-            return (_.difference(o.stack,callstack).length === _.difference(callstack,o.stack).length)
-                && _.difference(o.stack,callstack).length === 0
-                && o.label === label;
+            return (_.difference(o.stack,callstack).length === _.difference(callstack,o.stack).length) &&
+                _.difference(o.stack,callstack).length === 0 &&
+                o.label === label;
         });
         if(-1 === idx){
             idx=callstackRegistry.length;
@@ -264,7 +265,7 @@ var TAS = TAS || (function(){
     },
 
 
-    wrapCallback = function (label, callback,context){
+    wrapCallback = function (label, callback, context){
         var callstack;
         if('function' === typeof label){
             context=callback;
@@ -284,12 +285,15 @@ var TAS = TAS || (function(){
 
         return (function(cb,ctx,cs,lbl){
             var ctxref=registerCallstack(cs,lbl);
+
+            /*jshint -W054 */
             return new Function('cb','ctx','TASlog',
                 "return function TAS_CALLSTACK_"+ctxref+"(){"+
                     "TASlog('Entering: '+(cb.name||'(anonymous function)'));"+
                     "cb.apply(ctx||{},arguments);"+
                     "TASlog('Exiting: '+(cb.name||'(anonymous function)'));"+
                 "};")(cb,ctx,log);
+            /*jshint +W054 */
         }(callback,context,callstack,label));
     },
 
@@ -360,8 +364,10 @@ var TAS = TAS || (function(){
             Object.defineProperty(obj, pname, {
                 enumerable: true,
                 set: function(v){
-                    pvalue=v;
-                    prepareUpdate(full_pname,v);
+                    if(v!==pvalue) {
+                        pvalue=v;
+                        prepareUpdate(full_pname,v);
+                    }
                 },
                 get: function(){
                     return pvalue;
@@ -373,8 +379,10 @@ var TAS = TAS || (function(){
                 enumerable: true,
                 set: function(v){
                     var val=v.toString();
-                    pvalue=val;
-                    prepareUpdate(full_pname,val);
+                    if(val !== pvalue) {
+                        pvalue=val;
+                        prepareUpdate(full_pname,val);
+                    }
                 },
                 get: function(){
                     return pvalue.toString();
@@ -386,8 +394,10 @@ var TAS = TAS || (function(){
                 enumerable: true,
                 set: function(v){
                     var val=parseInt(v,10) || 0;
-                    pvalue=val;
-                    prepareUpdate(full_pname,val);
+                    if(val !== pvalue){
+                        pvalue=val;
+                        prepareUpdate(full_pname,val);
+                    }
                 },
                 get: function(){
                     return parseInt(pvalue,10) || 0;
@@ -399,8 +409,10 @@ var TAS = TAS || (function(){
                 enumerable: true,
                 set: function(v){
                     var val=parseFloat(v) || 0;
-                    pvalue=val;
-                    prepareUpdate(full_pname,val);
+                    if(val !== pvalue) {
+                        pvalue=val;
+                        prepareUpdate(full_pname,val);
+                    }
                 },
                 get: function(){
                     return parseFloat(pvalue) || 0;
@@ -411,8 +423,10 @@ var TAS = TAS || (function(){
                     enumerable: true,
                     set: function(v){
                         var val=(parseFloat(v) || 0).toFixed(d);
-                        pvalue=val;
-                        prepareUpdate(full_pname,val);
+                        if(val !== pvalue){
+                            pvalue=val;
+                            prepareUpdate(full_pname,val);
+                        }
                     },
                     get: function(){
                         return (parseFloat(pvalue) || 0).toFixed(d);
@@ -600,7 +614,7 @@ var TAS = TAS || (function(){
             .reduce(function(m,r){
                 return m + (r.F[field]);
             },0,function(t,r,a){
-                a[destination]=t;
+                a.S[destination]=t;
             })
             .execute();
     };
@@ -924,7 +938,7 @@ on("change:repeating_items:itemweight", function() {
 
 <!-- ==== IDENTITÉ ==== -->
 <div class="sheet-topbar">
-    <img style="width: 200px;" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/DungeonWorldFrench/dwlogo.png" alt="Dungeon World VF, feuille version 3.1 (21/11/2016)" title="Dungeon World VF, feuille version 3.1 (21/11/2016)" />
+    <img style="width: 200px;" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/DungeonWorldFrench/dwlogo.png" alt="Dungeon World VF, feuille version 3.2 (18/12/2016)" title="Dungeon World VF, feuille version 3.2 (18/12/2016)" />
     <div><input class="sheet-field-name" type="text" placeholder="Nom" name="attr_character_name" /></div>
     <div>
         <SELECT name="attr_laclasse" class="sheet-field-class" title="Sélectionner une classe existante pour pré-remplir certains champs et faire apparaître les Actions de Départ de la classe choisie">
@@ -1177,6 +1191,7 @@ on("change:repeating_items:itemweight", function() {
 
 <!-- ===== COLONNE DROITE (actions et sorts) ===== -->
 <div class="sheet-col-right">
+
     <!-- ===== ACTIONS ===== -->
     <div class="sheet-header" style="width: 100%;">
         <div class="sheet-section-name" style="width: 100%;">
@@ -1186,14 +1201,13 @@ on("change:repeating_items:itemweight", function() {
                 &nbsp;
                 <input type="checkbox" name="attr_degpjbonus" value="?{Bonus/Malus aux dégâts|0}" title="Les jets de dégâts proposent de saisir un bonus/malus circonstanciel">Bonus aux dégâts</input>
             </div>
-    </div>
+        </div>
     </div>
     <input type="radio" name="attr_onglaction" value="0" class="sheet-onglbase" title="Actions de Base" checked /><span>Base</span>
     <input type="radio" name="attr_onglaction" value="1" class="sheet-onglspecial" title="Actions Spéciales" /><span>Spéciales</span>
     <input type="radio" name="attr_onglaction" value="2" class="sheet-onglclasse" title="Actions de Départ de Classe" /><span>Départ</span>
     <input type="radio" name="attr_onglaction" value="3" class="sheet-onglavance" title="Actions Avancées de Classe" /><span>Avancées</span>
     <input type="radio" name="attr_onglaction" value="4" class="sheet-onglsort" title="Sorts" /><span>Sorts</span>
-    <input type="radio" name="attr_onglaction" value="5" class="sheet-onglnote" title="Notes" /><span>Notes</span>
 
     <!-- ===== BASE ===== -->
     <div class="sheet-onglbase">
@@ -1224,7 +1238,8 @@ on("change:repeating_items:itemweight", function() {
                     +
                     <input type="number" class="sheet-action" name="attr_taillebonus" value="0" title="Bonus/Malus au jet" />
                     <span class="sheet-action">&nbsp;Cette Action inflige des dégâts</span>
-                    <input type="checkbox" class="sheet-selcheck" name="attr_tailledegats" value="[[1@{dtype} + (@{degpjbonus})[Bonus circonstanciel] ]]" title="Cocher pour que l'action lance les dégâts" checked /><span>3</span>
+                    <input type="checkbox" class="sheet-selcheck" name="attr_tailledegats" value="[[1@{dtype} + (@{taillerdegmod})[Bonus permanent] + (@{degpjbonus})[Bonus circonstanciel] ]]" title="Cocher pour que l'action lance les dégâts" checked /><span>3</span>
+                    <div class="sheet-dispdegmod">+ <input type="number" name="attr_taillerdegmod" value="0" class="" title="Modificateur de dégâts"></div>
                 </div>
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Sur 12+ : </span>
@@ -1283,10 +1298,7 @@ on("change:repeating_items:itemweight", function() {
                 </div>
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Sur 7-9 : </span>
-                    <textarea name="attr_salvepartiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Infligez vos dégâts et choisissez une option:
-- vous vous exposez au danger pour tirer (au choix du MJ)
-- vous tirez au jugé : -1d6 dégâts
-- vous devez vous y reprendre à plusieurs fois : épuisez 1 munition</textarea>
+                    <textarea name="attr_salvepartiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Infligez vos dégâts et choisissez une option:&#010;• vous vous exposez au danger pour tirer (au choix du MJ)&#010;• vous tirez au jugé : -1d6 dégâts&#010;• vous devez vous y reprendre à plusieurs fois : épuisez 1 munition</textarea>
                 </div>
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Sur 6- : </span>
@@ -1319,13 +1331,7 @@ on("change:repeating_items:itemweight", function() {
             <div class="sheet-dispcheck">
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Desc : </span>
-                    <textarea name="attr_defierbody" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Quand vous agissez malgré une menace imminente ou que vous subissez une catastrophe, décrivez la façon de vous y prendre et lancez 2d6…
-+FOR si vous passez en force
-+DEX si vous agissez rapidement ou évitez le danger
-+CON si vous endurez ce qui vous arrive
-+INT si vous faites preuve d'ingéniosité
-+SAG si vous usez de patience ou de volonté
-+CHA si vous usez de vos charmes ou d'un talent de société</textarea>
+                    <textarea name="attr_defierbody" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Quand vous agissez malgré une menace imminente ou que vous subissez une catastrophe, décrivez la façon de vous y prendre et lancez 2d6…&#010;+FOR si vous passez en force&#010;+DEX si vous agissez rapidement ou évitez le danger&#010;+CON si vous endurez ce qui vous arrive&#010;+INT si vous faites preuve d'ingéniosité&#010;+SAG si vous usez de patience ou de volonté&#010;+CHA si vous usez de vos charmes ou d'un talent de société</textarea>
                 </div>
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Sur 12+ : </span>
@@ -1355,12 +1361,7 @@ on("change:repeating_items:itemweight", function() {
             <div class="sheet-dispcheck">
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Desc : </span>
-                    <textarea name="attr_defendrebody" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Quand vous défendez une personne, un objet ou un endroit d'une attaque, lancez 2d6+CON.
-Aussi longtemps que vous défendez, dès lors que vous (ou ce que vous protégez) subissez une attaque, vous pouvez dépenser 1 pour choisir l'une des options suivantes :
-- redirigez vers vous l'attaque ennemie
-- diminuer de moitié l'effet ou les dégâts de l'attaque
-- offrir à un allié un avantage de +1 sur sa prochaine action envers l'attaquant
-- infliger autant de dégâts que votre niveau à l'adversaire</textarea>
+                    <textarea name="attr_defendrebody" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Quand vous défendez une personne, un objet ou un endroit d'une attaque, lancez 2d6+CON.&#010;Aussi longtemps que vous défendez, dès lors que vous (ou ce que vous protégez) subissez une attaque, vous pouvez dépenser 1 pour choisir l'une des options suivantes :&#010;• redirigez vers vous l'attaque ennemie&#010;• diminuer de moitié l'effet ou les dégâts de l'attaque&#010;• offrir à un allié un avantage de +1 sur sa prochaine action envers l'attaquant&#010;• infliger autant de dégâts que votre niveau à l'adversaire</textarea>
                 </div>
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Jet : </span>
@@ -1383,20 +1384,12 @@ Aussi longtemps que vous défendez, dès lors que vous (ou ce que vous protégez
                 </div>
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Sur 10+ : </span>
-                    <textarea name="attr_defendresucces" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet">Retenez 3 parmi :
-- redirigez vers vous l'attaque ennemie
-- diminuer de moitié l'effet ou les dégâts de l'attaque
-- offrir à un allié un avantage de +1 sur sa prochaine action envers l'attaquant
-- infliger autant de dégâts que votre niveau à l'adversaire
+                    <textarea name="attr_defendresucces" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet">Retenez 3 parmi :&#010;• redirigez vers vous l'attaque ennemie&#010;• diminuer de moitié l'effet ou les dégâts de l'attaque&#010;• offrir à un allié un avantage de +1 sur sa prochaine action envers l'attaquant&#010;• infliger autant de dégâts que votre niveau à l'adversaire
                     </textarea>
                 </div>
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Sur 7-9 : </span>
-                    <textarea name="attr_defendrepartiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Retenez 1 parmi :
-- redirigez vers vous l'attaque ennemie
-- diminuer de moitié l'effet ou les dégâts de l'attaque
-- offrir à un allié un avantage de +1 sur sa prochaine action envers l'attaquant
-- infliger autant de dégâts que votre niveau à l'adversaire
+                    <textarea name="attr_defendrepartiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Retenez 1 parmi :&#010;• redirigez vers vous l'attaque ennemie&#010;• diminuer de moitié l'effet ou les dégâts de l'attaque&#010;• offrir à un allié un avantage de +1 sur sa prochaine action envers l'attaquant&#010;• infliger autant de dégâts que votre niveau à l'adversaire
                     </textarea>
                 </div>
                 <div class="sheet-actionligne">
@@ -1483,23 +1476,11 @@ Aussi longtemps que vous défendez, dès lors que vous (ou ce que vous protégez
                 </div>
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Sur 10+ : </span>
-                    <textarea name="attr_discernersucces" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet">Posez 3 questions de la liste ci-dessous :
-• Que s'est-il passé ici récemment ?
-• Que va-t-il se passer ?
-• A quoi dois-je être attentif ?
-• Qu'est-ce qui pourrait m'être utile ou précieux ici ?
-• Qui est vraiment maître de la situation ici ?
-• Qu'est-ce qui n'est pas ce qu'il paraît être ici ?</textarea>
+                    <textarea name="attr_discernersucces" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet">Posez 3 questions de la liste ci-dessous :&#010;• Que s'est-il passé ici récemment ?&#010;• Que va-t-il se passer ?&#010;• A quoi dois-je être attentif ?&#010;• Qu'est-ce qui pourrait m'être utile ou précieux ici ?&#010;• Qui est vraiment maître de la situation ici ?&#010;• Qu'est-ce qui n'est pas ce qu'il paraît être ici ?</textarea>
                 </div>
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Sur 7-9 : </span>
-                    <textarea name="attr_discernerpartiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Posez une question de la liste ci-dessous. Vous avez +1 à la prochaine action qui tient compte de la réponse.
-• Que s'est-il passé ici récemment ?
-• Que va-t-il se passer ?
-• A quoi dois-je être attentif ?
-• Qu'est-ce qui pourrait m'être utile ou précieux ici ?
-• Qui est vraiment maître de la situation ici ?
-• Qu'est-ce qui n'est pas ce qu'il paraît être ici ?</textarea>
+                    <textarea name="attr_discernerpartiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Posez une question de la liste ci-dessous. Vous avez +1 à la prochaine action qui tient compte de la réponse.&#010;• Que s'est-il passé ici récemment ?&#010;• Que va-t-il se passer ?&#010;• A quoi dois-je être attentif ?&#010;• Qu'est-ce qui pourrait m'être utile ou précieux ici ?&#010;• Qui est vraiment maître de la situation ici ?&#010;• Qu'est-ce qui n'est pas ce qu'il paraît être ici ?</textarea>
                 </div>
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Sur 6- : </span>
@@ -1596,49 +1577,58 @@ Aussi longtemps que vous défendez, dès lors que vous (ou ce que vous protégez
                 <input type="text" name="attr_actionbasename" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" />
                 <div class="sheet-dispcheck">
                     <div class="sheet-actionligne">
-                        <input type="checkbox" class="sheet-selcheck" name="attr_actionbasebodydisp" value="1" title="Montrer la description de l'action dans le template de jet" /><span>E</span>
+                        <input type="checkbox" class="sheet-selcheck" name="attr_actionbasebodydisp" value="1" title="Montrer la description de l'action dans le chat" /><span>E</span>
                         <span class="sheet-action" style="min-width: 35px;width: 35px">Desc : </span>
                         <textarea name="attr_actionbasebody" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action"></textarea>
                     </div>
                     <div class="sheet-actionligne">
+                        <span class="sheet-action" style="width: 180px;">Cette Action inflige des dégâts</span>
+                        <input type="checkbox" class="sheet-selcheck" name="attr_actionbasedegats" value="[[1@{dtype} + (@{actionbasedegmod}) + (@{degpjbonus})[Bonus circonstanciel] ]]"  title="Cocher pour que l'action lance les dégâts" /><span>3</span>
+                        <div class="sheet-dispdegmod">+ <input type="number" name="attr_actionbasedegmod" value="0" class="" title="Modificateur de dégâts">
+                    </div>
+                    <div class="sheet-actionligne">
+                        <span class="sheet-action" style="width: 180px;">Cette Action nécessite un jet</span>
                         <input type="checkbox" class="sheet-selcheck" name="attr_actionbasejet" value="1" title="Cette Action lance un jet" checked /><span>3</span>
-                        <input type="hidden" name="attr_actionbaseroll" value="[[2d6 + (@{actionbasemod})[Mod.Carac.] + (@{actionbasebonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]" />
-                        <span class="sheet-action" style="min-width: 35px;width: 35px">Jet : </span>
-                        2d6 +
-                        <SELECT name="attr_actionbasemod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
-                            <OPTION value="0">-</OPTION>
-                            <OPTION value="@{strmod}">FOR</OPTION>
-                            <OPTION value="@{dexmod}">DEX</OPTION>
-                            <OPTION value="@{conmod}">CON</OPTION>
-                            <OPTION value="@{intmod}">INT</OPTION>
-                            <OPTION value="@{wismod}">SAG</OPTION>
-                            <OPTION value="@{chamod}">CHA</OPTION>
-                        </SELECT>
-                        +
-                        <input type="number" class="sheet-action" name="attr_actionbasebonus" value="0" title="Bonus/Malus au jet" />
-                        <span>&nbsp;Cette Action inflige des dégâts</span>
-                        <input type="checkbox" class="sheet-selcheck" name="attr_actionbasedegats" value="[[1@{dtype} + (@{degpjbonus})[Bonus circonstanciel] ]]"  title="Cocher pour que l'action lance les dégâts" /><span>3</span>
-                    </div>
-                    <div class="sheet-actionligne">
-                        <span class="sheet-action">Sur 12+ : </span>
-                        <textarea name="attr_actionbasesucsup" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès exceptionnel" title="Résultat de l'Action sur un succès exceptionnel"></textarea>
-                    </div>
-                    <div class="sheet-actionligne">
-                        <span class="sheet-action">Sur 10+ : </span>
-                        <textarea name="attr_actionbasesucces" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet"></textarea>
-                    </div>
-                    <div class="sheet-actionligne">
-                        <span class="sheet-action">Sur 7-9 : </span>
-                        <textarea name="attr_actionbasepartiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel"></textarea>
-                    </div>
-                    <div class="sheet-actionligne">
-                        <span class="sheet-action">Sur 6- : </span>
-                        <textarea name="attr_actionbaseechec" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un échec" title="Résultat de l'Action sur un échec"></textarea>
+                        <div class="dispactionjet">
+                            <div class="sheet-actionligne">
+                                <span class="sheet-action" style="min-width: 35px;width: 35px">Jet : </span>
+                                <input type="hidden" name="attr_actionbaseroll" value="[[2d6 + (@{actionbasemod})[Mod.Carac.] + (@{actionbasebonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]" />
+                                2d6 +
+                                <SELECT name="attr_actionbasemod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
+                                    <OPTION value="0">-</OPTION>
+                                    <OPTION value="@{strmod}">FOR</OPTION>
+                                    <OPTION value="@{dexmod}">DEX</OPTION>
+                                    <OPTION value="@{conmod}">CON</OPTION>
+                                    <OPTION value="@{intmod}">INT</OPTION>
+                                    <OPTION value="@{wismod}">SAG</OPTION>
+                                    <OPTION value="@{chamod}">CHA</OPTION>
+                                </SELECT>
+                                +
+                                <input type="number" class="sheet-action" name="attr_actionbasebonus" value="0" title="Bonus/Malus au jet" />
+                            </div>
+                            <div class="sheet-actionligne">
+                                <span class="sheet-action">Sur 12+ : </span>
+                                <textarea name="attr_actionbasesucsup" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès exceptionnel" title="Résultat de l'Action sur un succès exceptionnel"></textarea>
+                            </div>
+                            <div class="sheet-actionligne">
+                                <span class="sheet-action">Sur 10+ : </span>
+                                <textarea name="attr_actionbasesucces" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet"></textarea>
+                            </div>
+                            <div class="sheet-actionligne">
+                                <span class="sheet-action">Sur 7-9 : </span>
+                                <textarea name="attr_actionbasepartiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel"></textarea>
+                            </div>
+                            <div class="sheet-actionligne">
+                                <span class="sheet-action">Sur 6- : </span>
+                                <textarea name="attr_actionbaseechec" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un échec" title="Résultat de l'Action sur un échec"></textarea>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </fieldset>
     </div> <!-- FIN BASE -->
+
     <!-- ===== SPECIALES ===== -->
     <div class="sheet-onglspecial">
         <!-- ===== DERNIER SOUPIR ===== -->
@@ -1710,10 +1700,7 @@ Aussi longtemps que vous défendez, dès lors que vous (ou ce que vous protégez
             <div class="sheet-dispcheck">
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Desc : </span>
-                    <textarea name="attr_encombrementbody" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Quand vous tentez une action en portant une charge, vous risquez d'être encombré. Si le Poids que vous portez est:
-- égal ou inférieur à votre charge, vous n'êtes pas pénalisé.
-- égal ou inférieur à votre charge +2, vous subissez une pénalité de -1 tant que vous ne vous êtes pas allégé
-- supérieur à votre charge +2, allégez-vous d'au moins 1 poids et agissez à -1 ou échouez automatiquement</textarea>
+                    <textarea name="attr_encombrementbody" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Quand vous tentez une action en portant une charge, vous risquez d'être encombré. Si le Poids que vous portez est:&#010;• égal ou inférieur à votre charge, vous n'êtes pas pénalisé.&#010;• égal ou inférieur à votre charge +2, vous subissez une pénalité de -1 tant que vous ne vous êtes pas allégé&#010;• supérieur à votre charge +2, allégez-vous d'au moins 1 poids et agissez à -1 ou échouez automatiquement</textarea>
                 </div>
             </div>
         </div>
@@ -1772,8 +1759,7 @@ Aussi longtemps que vous défendez, dès lors que vous (ou ce que vous protégez
             <div class="sheet-dispcheck">
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Desc : </span>
-                    <textarea name="attr_voyagebody" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Lorsque vous voyagez à travers un territoire hostile, désignez un éclaireur, un serre-file et un intendant. Chacun d'entre eux lance 2d6+SAG.
-Si vous n'attribuez pas l'un ou plusieurs de ces rôles, cela vaut comme si vous aviez fait 6-.
+                    <textarea name="attr_voyagebody" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Lorsque vous voyagez à travers un territoire hostile, désignez un éclaireur, un serre-file et un intendant. Chacun d'entre eux lance 2d6+SAG.&#010;Si vous n'attribuez pas l'un ou plusieurs de ces rôles, cela vaut comme si vous aviez fait 6-.
                     </textarea>
                 </div>
                 <div class="sheet-actionligne">
@@ -1797,9 +1783,7 @@ Si vous n'attribuez pas l'un ou plusieurs de ces rôles, cela vaut comme si vous
                 </div>
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Sur 10+ : </span>
-                    <textarea name="attr_voyagesucces" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet">- l'intendant réduit le nombre de rations nécessaires de 1
-- le serre-file réduit le temps nécessaire pour parvenir à destination (le MJ vous dira de combien)
-- l'éclaireur repère les dangers éventuels suffisamment tôt pour vous donner l'avantage.</textarea>
+                    <textarea name="attr_voyagesucces" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet">• l'intendant réduit le nombre de rations nécessaires de 1&#010;• le serre-file réduit le temps nécessaire pour parvenir à destination (le MJ vous dira de combien)&#010;• l'éclaireur repère les dangers éventuels suffisamment tôt pour vous donner l'avantage.</textarea>
                 </div>
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Sur 7-9 : </span>
@@ -1821,13 +1805,7 @@ Si vous n'attribuez pas l'un ou plusieurs de ces rôles, cela vaut comme si vous
             <div class="sheet-dispcheck">
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Desc : </span>
-                    <textarea name="attr_sessionbody" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Quand vous finissez une session (soirée) de jeu, si vous pensez qu'un de vos liens est résolu (vous en avez fait le tour, il n'est plus pertinent, ou autre), demandez au joueur du PJ lié au vôtre s'il pense de même. Si c'est le cas, marquez 1 PX et créez un nouveau lien avec qui vous voulez, si vous le voulez. Une fois tous  vos  liens  passés  en  revue,  vérifiez  si  vous  avez  agi  en fonction de votre alignement au moins une fois dans la session.
-Si c'est le cas, marquez 1 PX.
-Ensuite, le groupe doit répondre à ces trois questions:
-- Avons-nous appris quelque chose de nouveau et d'important sur le monde ?
-- Avons-nous vaincu un ennemi ou un monstre remarquable ?
-- Avons-nous trouvé un trésor mémorable ?
-Pour chaque oui, chaque PJ marque 1 PX.</textarea>
+                    <textarea name="attr_sessionbody" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Quand vous finissez une session (soirée) de jeu, si vous pensez qu'un de vos liens est résolu (vous en avez fait le tour, il n'est plus pertinent, ou autre), demandez au joueur du PJ lié au vôtre s'il pense de même. Si c'est le cas, marquez 1 PX et créez un nouveau lien avec qui vous voulez, si vous le voulez. Une fois tous  vos  liens  passés  en  revue,  vérifiez  si  vous  avez  agi  en fonction de votre alignement au moins une fois dans la session.&#010;Si c'est le cas, marquez 1 PX.&#010;Ensuite, le groupe doit répondre à ces trois questions :&#010;• Avons-nous appris quelque chose de nouveau et d'important sur le monde ?&#010;• Avons-nous vaincu un ennemi ou un monstre remarquable ?&#010;• Avons-nous trouvé un trésor mémorable ?&#010;Pour chaque oui, chaque PJ marque 1 PX.</textarea>
                 </div>
             </div>
         </div>
@@ -1841,12 +1819,7 @@ Pour chaque oui, chaque PJ marque 1 PX.</textarea>
             <div class="sheet-dispcheck">
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Desc : </span>
-                    <textarea name="attr_niveaubody" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Quand vous avez du temps libre devant vous (heures ou jours) et que le nombre de vos PX est égal ou supérieur à votre niveau +7, vous tirez les leçons de vos aventures et améliorez vos talents:
-- soustrayez votre niveau +7 de vos PX,
-- augmentez votre niveau de 1,
-- choisissez une nouvelle action avancée de votre classe,
-- si vous êtes Magicien, ajoutez un sort à votre grimoire,
-- augmentez d'un point l'une de vos caractéristiques et augmentez son  ajustement  si  nécessaire.  Augmenter  le  score  de CON augmente aussi le nombre de points de vie. Aucune caractéristique ne peut dépasser 18.</textarea>
+                    <textarea name="attr_niveaubody" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Quand vous avez du temps libre devant vous (heures ou jours) et que le nombre de vos PX est égal ou supérieur à votre niveau +7, vous tirez les leçons de vos aventures et améliorez vos talents:&#010;• soustrayez votre niveau +7 de vos PX,&#010;• augmentez votre niveau de 1,&#010;• choisissez une nouvelle action avancée de votre classe,&#010;• si vous êtes Magicien, ajoutez un sort à votre grimoire,&#010;• augmentez d'un point l'une de vos caractéristiques et augmentez son  ajustement  si  nécessaire.  Augmenter  le  score  de CON augmente aussi le nombre de points de vie. Aucune caractéristique ne peut dépasser 18.</textarea>
                 </div>
             </div>
         </div>
@@ -1883,27 +1856,15 @@ Pour chaque oui, chaque PJ marque 1 PX.</textarea>
                 </div>
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Sur 10+ : </span>
-                    <textarea name="attr_ripaillersucces" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet">Choisissez 3 parmi :
-- vous vous liez d'amitié avec un PNJ utile
-- vous apprenez des rumeurs sur une opportunité
-- vous recevez des informations utiles
-- vous ne vous faites pas embrouiller, ensorceler ou duper</textarea>
+                    <textarea name="attr_ripaillersucces" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet">Choisissez 3 parmi :&#010;• vous vous liez d'amitié avec un PNJ utile&#010;• vous apprenez des rumeurs sur une opportunité&#010;• vous recevez des informations utiles&#010;• vous ne vous faites pas embrouiller, ensorceler ou duper</textarea>
                 </div>
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Sur 7-9 : </span>
-                    <textarea name="attr_ripaillerpartiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Choisissez 1 parmi :
-- vous vous liez d'amitié avec un PNJ utile
-- vous apprenez des rumeurs sur une opportunité
-- vous recevez des informations utiles
-- vous ne vous faites pas embrouiller, ensorceler ou duper</textarea>
+                    <textarea name="attr_ripaillerpartiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Choisissez 1 parmi :&#010;• vous vous liez d'amitié avec un PNJ utile&#010;• vous apprenez des rumeurs sur une opportunité&#010;• vous recevez des informations utiles&#010;• vous ne vous faites pas embrouiller, ensorceler ou duper</textarea>
                 </div>
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Sur 6- : </span>
-                    <textarea name="attr_ripaillerechec" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un échec" title="Résultat de l'Action sur un échec">Choisissez 1 mais les choses dérapent franchement (le MJ vous dira comment) :
-- vous vous liez d'amitié avec un PNJ utile
-- vous apprenez des rumeurs sur une opportunité
-- vous recevez des informations utiles
-- vous ne vous faites pas embrouiller, ensorceler ou duper</textarea>
+                    <textarea name="attr_ripaillerechec" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un échec" title="Résultat de l'Action sur un échec">Choisissez 1 mais les choses dérapent franchement (le MJ vous dira comment) :&#010;• vous vous liez d'amitié avec un PNJ utile&#010;• vous apprenez des rumeurs sur une opportunité&#010;• vous recevez des informations utiles&#010;• vous ne vous faites pas embrouiller, ensorceler ou duper</textarea>
                 </div>
             </div>
         </div>
@@ -1976,11 +1937,7 @@ Pour chaque oui, chaque PJ marque 1 PX.</textarea>
             <div class="sheet-dispcheck">
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Desc : </span>
-                    <textarea name="attr_recruterbody" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Quand  vous  faites  savoir  que  vous  cherchez  à  embaucher  du renfort, lancez les dés:
-+1 si vous annoncez que le salaire est généreux,
-+1 si vous faites connaître vos projets,
-+1 si vous faites savoir que vous distribuerez une part de ce que vous trouverez,
-+1 si vous avez une bonne réputation dans le coin.</textarea>
+                    <textarea name="attr_recruterbody" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Quand  vous  faites  savoir  que  vous  cherchez  à  embaucher  du renfort, lancez les dés :&#010;+1 si vous annoncez que le salaire est généreux,&#010;+1 si vous faites connaître vos projets,&#010;+1 si vous faites savoir que vous distribuerez une part de ce que vous trouverez,&#010;+1 si vous avez une bonne réputation dans le coin.</textarea>
                 </div>
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Jet : </span>
@@ -2036,10 +1993,7 @@ Pour chaque oui, chaque PJ marque 1 PX.</textarea>
                 </div>
                 <div class="sheet-actionligne">
                     <span class="sheet-action">Sur 7-9 : </span>
-                    <textarea name="attr_avisrechpartiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Le récit de vos « exploits » s'est répandu et tout le monde vous reconnaît, et le MJ choisit une complication :
-- La police locale a lancé un avis de recherche à votre encontre.
-- Quelqu'un a mis votre tête à prix.
-- Quelqu'un qui compte pour vous a été inquiété à la suite de vos actions.
+                    <textarea name="attr_avisrechpartiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Le récit de vos « exploits » s'est répandu et tout le monde vous reconnaît, et le MJ choisit une complication :&#010;• La police locale a lancé un avis de recherche à votre encontre.&#010;• Quelqu'un a mis votre tête à prix.&#010;• Quelqu'un qui compte pour vous a été inquiété à la suite de vos actions.
                     </textarea>
                 </div>
                 <div class="sheet-actionligne">
@@ -2072,44 +2026,52 @@ Pour chaque oui, chaque PJ marque 1 PX.</textarea>
                 <input type="text" name="attr_actionspename" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" />
                 <div class="sheet-dispcheck">
                     <div class="sheet-actionligne">
-                        <input type="checkbox" class="sheet-selcheck" name="attr_actionspebodydisp" value="1" title="Montrer la description de l'action dans le template de jet" /><span>E</span>
+                        <input type="checkbox" class="sheet-selcheck" name="attr_actionspebodydisp" value="1" title="Montrer la description de l'action dans le chat" /><span>E</span>
                         <span class="sheet-action" style="min-width: 35px;width: 35px">Desc : </span>
                         <textarea name="attr_actionspebody" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action"></textarea>
                     </div>
                     <div class="sheet-actionligne">
+                        <span class="sheet-action" style="width: 180px;">Cette Action inflige des dégâts</span>
+                        <input type="checkbox" class="sheet-selcheck" name="attr_actionspedegats" value="[[1@{dtype} + (@{actionspedegmod})[Modificateur] + (@{degpjbonus})[Bonus circonstanciel] ]]" title="Cocher pour que l'action lance les dégâts" /><span>3</span>
+                        <div class="sheet-dispdegmod">+ <input type="number" name="attr_actionspedegmod" value="0" class="" title="Modificateur de dégâts">
+                    </div>
+                    <div class="sheet-actionligne">
+                        <span class="sheet-action" style="width: 180px;">Cette Action nécessite un jet</span>
                         <input type="checkbox" class="sheet-selcheck" name="attr_actionspejet" value="1" title="Cette Action lance un jet" checked /><span>3</span>
-                        <input type="hidden" name="attr_actionsperoll" value="[[2d6 + (@{actionspemod})[Mod.Carac.] + (@{actionspebonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]" />
-                        <span class="sheet-action" style="min-width: 35px;width: 35px">Jet : </span>
-                        2d6 +
-                        <SELECT name="attr_actionspemod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
-                            <OPTION value="0">-</OPTION>
-                            <OPTION value="@{strmod}">FOR</OPTION>
-                            <OPTION value="@{dexmod}">DEX</OPTION>
-                            <OPTION value="@{conmod}">CON</OPTION>
-                            <OPTION value="@{intmod}">INT</OPTION>
-                            <OPTION value="@{wismod}">SAG</OPTION>
-                            <OPTION value="@{chamod}">CHA</OPTION>
-                        </SELECT>
-                        +
-                        <input type="number" class="sheet-action" name="attr_actionspebonus" value="0" title="Bonus/Malus au jet" />
-                        <span class="sheet-action">&nbsp;Cette Action inflige des dégâts</span>
-                        <input type="checkbox" class="sheet-selcheck" name="attr_actionspedegats" value="[[1@{dtype} + (@{degpjbonus})[Bonus circonstanciel] ]]" title="Cocher pour que l'action lance les dégâts" /><span>3</span>
-                    </div>
-                    <div class="sheet-actionligne">
-                        <span class="sheet-action">Sur 12+ : </span>
-                        <textarea name="attr_actionspesucsup" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès exceptionnel" title="Résultat de l'Action sur un succès exceptionnel"></textarea>
-                    </div>
-                    <div class="sheet-actionligne">
-                        <span class="sheet-action">Sur 10+ : </span>
-                        <textarea name="attr_actionspesucces" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet"></textarea>
-                    </div>
-                    <div class="sheet-actionligne">
-                        <span class="sheet-action">Sur 7-9 : </span>
-                        <textarea name="attr_actionspepartiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel"></textarea>
-                    </div>
-                    <div class="sheet-actionligne">
-                        <span class="sheet-action">Sur 6- : </span>
-                        <textarea name="attr_actionspeechec" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un échec" title="Résultat de l'Action sur un échec"></textarea>
+                        <div class="dispactionjet">
+                            <div class="sheet-actionligne">
+                                <input type="hidden" name="attr_actionsperoll" value="[[2d6 + (@{actionspemod})[Mod.Carac.] + (@{actionspebonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]" />
+                                <span class="sheet-action" style="min-width: 35px;width: 35px">Jet : </span>
+                                2d6 +
+                                <SELECT name="attr_actionspemod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
+                                    <OPTION value="0">-</OPTION>
+                                    <OPTION value="@{strmod}">FOR</OPTION>
+                                    <OPTION value="@{dexmod}">DEX</OPTION>
+                                    <OPTION value="@{conmod}">CON</OPTION>
+                                    <OPTION value="@{intmod}">INT</OPTION>
+                                    <OPTION value="@{wismod}">SAG</OPTION>
+                                    <OPTION value="@{chamod}">CHA</OPTION>
+                                </SELECT>
+                                +
+                                <input type="number" class="sheet-action" name="attr_actionspebonus" value="0" title="Bonus/Malus au jet" />
+                            </div>
+                            <div class="sheet-actionligne">
+                                <span class="sheet-action">Sur 12+ : </span>
+                                <textarea name="attr_actionspesucsup" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès exceptionnel" title="Résultat de l'Action sur un succès exceptionnel"></textarea>
+                            </div>
+                            <div class="sheet-actionligne">
+                                <span class="sheet-action">Sur 10+ : </span>
+                                <textarea name="attr_actionspesucces" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet"></textarea>
+                            </div>
+                            <div class="sheet-actionligne">
+                                <span class="sheet-action">Sur 7-9 : </span>
+                                <textarea name="attr_actionspepartiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel"></textarea>
+                            </div>
+                            <div class="sheet-actionligne">
+                                <span class="sheet-action">Sur 6- : </span>
+                                <textarea name="attr_actionspeechec" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un échec" title="Résultat de l'Action sur un échec"></textarea>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2319,20 +2281,11 @@ Pour chaque oui, chaque PJ marque 1 PX.</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 10+ : </span>
-                        <textarea name="attr_barde-art-succes" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet">L'allié bénéficie de l'effet choisi parmi :
-- Soignez 1d8 dégâts.
-- Ajoutez 1d4 aux prochains dégâts qu'il inflige.
-- Son esprit est libéré d'un enchantement.
-- La prochaine fois qu'on l'aide, il reçoit +2 au lieu de +1.</textarea>
+                        <textarea name="attr_barde-art-succes" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet">L'allié bénéficie de l'effet choisi parmi :&#010;• Soignez 1d8 dégâts.&#010;• Ajoutez 1d4 aux prochains dégâts qu'il inflige.&#010;• Son esprit est libéré d'un enchantement.&#010;• La prochaine fois qu'on l'aide, il reçoit +2 au lieu de +1.</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 7-9 : </span>
-                        <textarea name="attr_barde-art-partiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Votre magie fonctionne mais vous attirez une attention malvenue ou votre sort se propage à d'autres cibles (au choix du MJ) et les affecte également.
-L'allié bénéficie de l'effet choisi parmi :
-- Soignez 1d8 dégâts.
-- Ajoutez 1d4 aux prochains dégâts qu'il inflige.
-- Son esprit est libéré d'un enchantement.
-- La prochaine fois qu'on l'aide, il reçoit +2 au lieu de +1.</textarea>
+                        <textarea name="attr_barde-art-partiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Votre magie fonctionne mais vous attirez une attention malvenue ou votre sort se propage à d'autres cibles (au choix du MJ) et les affecte également.&#010;L'allié bénéficie de l'effet choisi parmi :&#010;• Soignez 1d8 dégâts.&#010;• Ajoutez 1d4 aux prochains dégâts qu'il inflige.&#010;• Son esprit est libéré d'un enchantement.&#010;• La prochaine fois qu'on l'aide, il reçoit +2 au lieu de +1.</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 6- : </span>
@@ -2390,12 +2343,7 @@ L'allié bénéficie de l'effet choisi parmi :
                 <div class="sheet-dispcheck">
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Desc : </span>
-                        <textarea name="attr_barde-charmant-body" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Quand vous discutez franchement avec quelqu'un, vous pouvez poser  une  question  de  la  liste  ci-dessous  à  son  joueur  (MJ compris). Il  doit répondre sincèrement et peut à  son  tour  vous poser  une  question  de  la  liste,  à  laquelle  vous  devez  répondre sincèrement.
-- Qui sers-tu ?
-- Que souhaiterais-tu que je fasse ?
-- Comment pourrais-je t'amener à (faire) _______ ?
-- Que ressens-tu vraiment en ce moment ?
-- Que désires-tu le plus ?</textarea>
+                        <textarea name="attr_barde-charmant-body" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Quand vous discutez franchement avec quelqu'un, vous pouvez poser  une  question  de  la  liste  ci-dessous  à  son  joueur  (MJ compris). Il  doit répondre sincèrement et peut à  son  tour  vous poser  une  question  de  la  liste,  à  laquelle  vous  devez  répondre sincèrement.&#010;• Qui sers-tu ?&#010;• Que souhaiterais-tu que je fasse ?&#010;• Comment pourrais-je t'amener à (faire) _______ ?&#010;• Que ressens-tu vraiment en ce moment ?&#010;• Que désires-tu le plus ?</textarea>
                     </div>
                 </div>
             </div>
@@ -2436,18 +2384,12 @@ L'allié bénéficie de l'effet choisi parmi :
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 10+ : </span>
-                        <textarea name="attr_cambrioleur-piege-succes" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet">Prenez 3 et dépensez 1 pour poser une des questions suivantes pendant que vous vous déplacez dans cette zone :
-- Y a-t-il un piège ici et si oui, comment se déclenche-t-il ?
-- Que fait ce piège quand il se déclenche ?
-- Qu'y a-t-il d'autre caché ici ?
+                        <textarea name="attr_cambrioleur-piege-succes" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet">Prenez 3 et dépensez 1 pour poser une des questions suivantes pendant que vous vous déplacez dans cette zone :&#010;• Y a-t-il un piège ici et si oui, comment se déclenche-t-il ?&#010;• Que fait ce piège quand il se déclenche ?&#010;• Qu'y a-t-il d'autre caché ici ?
                         </textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 7-9 : </span>
-                        <textarea name="attr_cambrioleur-piege-partiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Posez une des questions suivantes pendant que vous vous déplacez dans cette zone :
-- Y a-t-il un piège ici et si oui, comment se déclenche-t-il ?
-- Que fait ce piège quand il se déclenche ?
-- Qu'y a-t-il d'autre caché ici ?</textarea>
+                        <textarea name="attr_cambrioleur-piege-partiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Posez une des questions suivantes pendant que vous vous déplacez dans cette zone :&#010;• Y a-t-il un piège ici et si oui, comment se déclenche-t-il ?&#010;• Que fait ce piège quand il se déclenche ?&#010;• Qu'y a-t-il d'autre caché ici ?</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 6- : </span>
@@ -2548,19 +2490,11 @@ L'allié bénéficie de l'effet choisi parmi :
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 10+ : </span>
-                        <textarea name="attr_cambrioleur-sournoise-succes" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet">Choisissez 2 options parmi :
-- Vous évitez le corps à corps avec votre adversaire.
-- Vous infligez vos dégâts +1d6.
-- Vous obtenez un avantage de +1 à suivre pour un allié ou vous même si vous en profitez.
-- Vous réduisez son armure de 1 jusqu'à ce qu'il la répare.</textarea>
+                        <textarea name="attr_cambrioleur-sournoise-succes" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet">Choisissez 2 options parmi :&#010;• Vous évitez le corps à corps avec votre adversaire.&#010;• Vous infligez vos dégâts +1d6.&#010;• Vous obtenez un avantage de +1 à suivre pour un allié ou vous même si vous en profitez.&#010;• Vous réduisez son armure de 1 jusqu'à ce qu'il la répare.</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 7-9 : </span>
-                        <textarea name="attr_cambrioleur-sournoise-partiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Choisissez 1 option parmi :
-- Vous évitez le corps à corps avec votre adversaire.
-- Vous infligez vos dégâts +1d6.
-- Vous obtenez un avantage de +1 à suivre pour un allié ou vous même si vous en profitez.
-- Vous réduisez son armure de 1 jusqu'à ce qu'il la répare.</textarea>
+                        <textarea name="attr_cambrioleur-sournoise-partiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Choisissez 1 option parmi :&#010;• Vous évitez le corps à corps avec votre adversaire.&#010;• Vous infligez vos dégâts +1d6.&#010;• Vous obtenez un avantage de +1 à suivre pour un allié ou vous même si vous en profitez.&#010;• Vous réduisez son armure de 1 jusqu'à ce qu'il la répare.</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 6- : </span>
@@ -2687,10 +2621,7 @@ L'allié bénéficie de l'effet choisi parmi :
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 7-9 : </span>
-                        <textarea name="attr_chaman-langage-partiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">L'esprit est libéré mais choisissez 1 parmi :
-- Vous attirez une attention malvenue ou vous vous exposez (le MJ vous décrira comment).
-- Votre réputation dans le monde des esprits est altérée. Vous avez-1 continu à votre langage des esprits jusqu'à ce que vous preniez une heure pour honorer les esprits par le rituel qui convient.
-- Une charge de votre totem est consommée malgré tout.</textarea>
+                        <textarea name="attr_chaman-langage-partiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">L'esprit est libéré mais choisissez 1 parmi :&#010;• Vous attirez une attention malvenue ou vous vous exposez (le MJ vous décrira comment).&#010;• Votre réputation dans le monde des esprits est altérée. Vous avez-1 continu à votre langage des esprits jusqu'à ce que vous preniez une heure pour honorer les esprits par le rituel qui convient.&#010;• Une charge de votre totem est consommée malgré tout.</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 6- : </span>
@@ -2735,10 +2666,7 @@ L'allié bénéficie de l'effet choisi parmi :
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 7-9 : </span>
-                        <textarea name="attr_chaman-capture-partiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">L'esprit est capturé mais une complication survient. Le MJ vous dira laquelle, comme par exemple :
-- L'esprit est imprévisible.
-- Un effet indésirable survient également.
-- L'esprit est agité et doit être libéré après un certain délai.</textarea>
+                        <textarea name="attr_chaman-capture-partiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">L'esprit est capturé mais une complication survient. Le MJ vous dira laquelle, comme par exemple :&#010;• L'esprit est imprévisible.&#010;• Un effet indésirable survient également.&#010;• L'esprit est agité et doit être libéré après un certain délai.</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 6- : </span>
@@ -2832,13 +2760,11 @@ L'allié bénéficie de l'effet choisi parmi :
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 10+ : </span>
-                        <textarea name="attr_clerc-repousser-succes" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet">Vous étourdissez momentanément les morts vivants intelligents et provoquez la fuite des autres.
-    La moindre agression brise cet effet et ils peuvent alors agir normalement. Les morts vivants intelligents peuvent toujours trouver moyen de vous nuire à distance. Ils sont malins vous savez !</textarea>
+                        <textarea name="attr_clerc-repousser-succes" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet">Vous étourdissez momentanément les morts vivants intelligents et provoquez la fuite des autres.&#010;La moindre agression brise cet effet et ils peuvent alors agir normalement. Les morts vivants intelligents peuvent toujours trouver moyen de vous nuire à distance. Ils sont malins vous savez !</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 7-9 : </span>
-                        <textarea name="attr_clerc-repousser-partiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Les morts-vivants demeurent hors de portée de vous tant que vous priez dans cette posture.
-    La moindre agression brise cet effet et ils peuvent alors agir normalement. Les morts vivants intelligents peuvent toujours trouver moyen de vous nuire à distance. Ils sont malins vous savez !</textarea>
+                        <textarea name="attr_clerc-repousser-partiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Les morts-vivants demeurent hors de portée de vous tant que vous priez dans cette posture.&#010;La moindre agression brise cet effet et ils peuvent alors agir normalement. Les morts vivants intelligents peuvent toujours trouver moyen de vous nuire à distance. Ils sont malins vous savez !</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 6- : </span>
@@ -2856,10 +2782,7 @@ L'allié bénéficie de l'effet choisi parmi :
                 <div class="sheet-dispcheck">
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Desc : </span>
-                        <textarea name="attr_clerc-communier-body" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Quand vous consacrez un moment ininterrompu (environ 1 heure) en communion tranquille:
-- vous perdez tous les sorts qu'il vous reste
-- vous recevez de nouveaux sorts de votre choix dont le niveau ne dépasse pas le vôtre et dont les niveaux additionnés ne dépassent pas votre niveau+1.
-- vos prières sont à nouveau toutes disponibles, elles ne comptent pas dans la limite de niveau.</textarea>
+                        <textarea name="attr_clerc-communier-body" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Quand vous consacrez un moment ininterrompu (environ 1 heure) en communion tranquille :&#010;• vous perdez tous les sorts qu'il vous reste&#010;• vous recevez de nouveaux sorts de votre choix dont le niveau ne dépasse pas le vôtre et dont les niveaux additionnés ne dépassent pas votre niveau+1.&#010;• vos prières sont à nouveau toutes disponibles, elles ne comptent pas dans la limite de niveau.</textarea>
                     </div>
                 </div>
             </div>
@@ -2873,8 +2796,7 @@ L'allié bénéficie de l'effet choisi parmi :
                 <div class="sheet-dispcheck">
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Desc : </span>
-                        <textarea name="attr_clerc-sort-body" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Quand vous lancez un sort que votre divinité vous a accordé (prières comprises), lancez 2d6+SAG.
-A noter que maintenir des sorts et leurs effets peut parfois entraîner une pénalité pour lancer un autre sort.</textarea>
+                        <textarea name="attr_clerc-sort-body" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Quand vous lancez un sort que votre divinité vous a accordé (prières comprises), lancez 2d6+SAG.&#010;A noter que maintenir des sorts et leurs effets peut parfois entraîner une pénalité pour lancer un autre sort.</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Jet : </span>
@@ -2901,10 +2823,7 @@ A noter que maintenir des sorts et leurs effets peut parfois entraîner une pén
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 7-9 : </span>
-                        <textarea name="attr_clerc-sort-partiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Sur 7-9 le sort est lancé mais choisissez une option:
-- Vous attirez une attention malvenue ou vous vous exposez (le MJ vous décrira comment).
-- Vous vous éloignez de votre divinité : vous avez -1 continu pour lancer un sort jusqu'à ce que vous communiez de nouveau.
-- Une fois lancé, le sort est révoqué par votre divinité. Vous ne pouvez plus le lancer tant que vous n'avez pas communié et reçu ce sort à nouveau.</textarea>
+                        <textarea name="attr_clerc-sort-partiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Sur 7-9 le sort est lancé mais choisissez une option :&#010;• Vous attirez une attention malvenue ou vous vous exposez (le MJ vous décrira comment).&#010;• Vous vous éloignez de votre divinité : vous avez -1 continu pour lancer un sort jusqu'à ce que vous communiez de nouveau.&#010;• Une fois lancé, le sort est révoqué par votre divinité. Vous ne pouvez plus le lancer tant que vous n'avez pas communié et reçu ce sort à nouveau.</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 6- : </span>
@@ -2963,21 +2882,15 @@ A noter que maintenir des sorts et leurs effets peut parfois entraîner une pén
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 10+ : </span>
-                        <textarea name="attr_druide-changeforme-succes" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet">Retenez 3.
-Vous pouvez prendre la forme de toute espèce dont vous avez contemplé l'essence ou qui vit dans votre région; vous et vos possessions se fondent en une parfaite copie de la forme de cette espèce. Vous avez toutes les capacités et faiblesses innées de cette forme: griffes, ailes, branchies vous permettant de respirer sous l'eau. Vous utilisez vos caractéristiques normales, mais certaines actions peuvent être plus difficiles à mettre en œuvre (un chat aura plus de mal à se battre contre un ogre).
-Le MJ vous indiquera une ou plusieurs actions associées à votre nouvelle forme. Utilisez 1 pour accomplir cette action. Quand vous n'avez plus de retenue, vous revenez à votre forme normale. A tout moment, vous pouvez dépenser toutes vos retenues pour revenir à votre forme normale.</textarea>
+                        <textarea name="attr_druide-changeforme-succes" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet">Retenez 3.&#010;Vous pouvez prendre la forme de toute espèce dont vous avez contemplé l'essence ou qui vit dans votre région; vous et vos possessions se fondent en une parfaite copie de la forme de cette espèce. Vous avez toutes les capacités et faiblesses innées de cette forme: griffes, ailes, branchies vous permettant de respirer sous l'eau. Vous utilisez vos caractéristiques normales, mais certaines actions peuvent être plus difficiles à mettre en œuvre (un chat aura plus de mal à se battre contre un ogre).&#010;Le MJ vous indiquera une ou plusieurs actions associées à votre nouvelle forme. Utilisez 1 pour accomplir cette action. Quand vous n'avez plus de retenue, vous revenez à votre forme normale. A tout moment, vous pouvez dépenser toutes vos retenues pour revenir à votre forme normale.</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 7-9 : </span>
-                        <textarea name="attr_druide-changeforme-partiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Retenez 2.
-Vous pouvez prendre la forme de toute espèce dont vous avez contemplé l'essence ou qui vit dans votre région; vous et vos possessions se fondent en une parfaite copie de la forme de cette espèce. Vous avez toutes les capacités et faiblesses innées de cette forme: griffes, ailes, branchies vous permettant de respirer sous l'eau. Vous utilisez vos caractéristiques normales, mais certaines actions peuvent être plus difficiles à mettre en œuvre (un chat aura plus de mal à se battre contre un ogre).
-Le MJ vous indiquera une ou plusieurs actions associées à votre nouvelle forme. Utilisez 1 pour accomplir cette action. Quand vous n'avez plus de retenue, vous revenez à votre forme normale. A tout moment, vous pouvez dépenser toutes vos retenues pour revenir à votre forme normale.</textarea>
+                        <textarea name="attr_druide-changeforme-partiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Retenez 2.&#010;Vous pouvez prendre la forme de toute espèce dont vous avez contemplé l'essence ou qui vit dans votre région; vous et vos possessions se fondent en une parfaite copie de la forme de cette espèce. Vous avez toutes les capacités et faiblesses innées de cette forme: griffes, ailes, branchies vous permettant de respirer sous l'eau. Vous utilisez vos caractéristiques normales, mais certaines actions peuvent être plus difficiles à mettre en œuvre (un chat aura plus de mal à se battre contre un ogre).&#010;Le MJ vous indiquera une ou plusieurs actions associées à votre nouvelle forme. Utilisez 1 pour accomplir cette action. Quand vous n'avez plus de retenue, vous revenez à votre forme normale. A tout moment, vous pouvez dépenser toutes vos retenues pour revenir à votre forme normale.</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 6- : </span>
-                        <textarea name="attr_druide-changeforme-echec" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un échec" title="Résultat de l'Action sur un échec">Retenez 1 en plus de ce que dira le MJ.
-Vous pouvez prendre la forme de toute espèce dont vous avez contemplé l'essence ou qui vit dans votre région; vous et vos possessions se fondent en une parfaite copie de la forme de cette espèce. Vous avez toutes les capacités et faiblesses innées de cette forme: griffes, ailes, branchies vous permettant de respirer sous l'eau. Vous utilisez vos caractéristiques normales, mais certaines actions peuvent être plus difficiles à mettre en œuvre (un chat aura plus de mal à se battre contre un ogre).
-Le MJ vous indiquera une ou plusieurs actions associées à votre nouvelle forme. Utilisez 1 pour accomplir cette action. Quand vous n'avez plus de retenue, vous revenez à votre forme normale. A tout moment, vous pouvez dépenser toutes vos retenues pour revenir à votre forme normale.</textarea>
+                        <textarea name="attr_druide-changeforme-echec" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un échec" title="Résultat de l'Action sur un échec">Retenez 1 en plus de ce que dira le MJ.&#010;Vous pouvez prendre la forme de toute espèce dont vous avez contemplé l'essence ou qui vit dans votre région; vous et vos possessions se fondent en une parfaite copie de la forme de cette espèce. Vous avez toutes les capacités et faiblesses innées de cette forme: griffes, ailes, branchies vous permettant de respirer sous l'eau. Vous utilisez vos caractéristiques normales, mais certaines actions peuvent être plus difficiles à mettre en œuvre (un chat aura plus de mal à se battre contre un ogre).&#010;Le MJ vous indiquera une ou plusieurs actions associées à votre nouvelle forme. Utilisez 1 pour accomplir cette action. Quand vous n'avez plus de retenue, vous revenez à votre forme normale. A tout moment, vous pouvez dépenser toutes vos retenues pour revenir à votre forme normale.</textarea>
                     </div>
                 </div>
             </div>
@@ -3019,8 +2932,7 @@ Le MJ vous indiquera une ou plusieurs actions associées à votre nouvelle forme
                 <div class="sheet-dispcheck">
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Desc : </span>
-                        <textarea name="attr_druide-enfant-body" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Vous avez appris votre magie dans un lieu où les esprits sont forts et anciens. Ils vous ont marqué(e) comme l'un des leurs. Où que vous alliez, ils vivent en vous et vous permettent de prendre leur forme. Choisissez une région ci-dessous; c'est celle avec laquelle vous êtes en harmonie. Lorsque vous changez de forme, vous pouvez prendre celle d'un animal qui pourrait vivre dans votre région.
-Choisissez un aspect – un attribut physique qui vous identifie comme enfant du pays – qui reflète l'esprit de votre région. Ce peut être une caractéristique animale comme des bois ou des taches de léopard ou quelque chose de plus général: une chevelure de feuilles, des yeux de cristal brillant. Votre aspect demeure quelle que soit votre forme.</textarea>
+                        <textarea name="attr_druide-enfant-body" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Vous avez appris votre magie dans un lieu où les esprits sont forts et anciens. Ils vous ont marqué(e) comme l'un des leurs. Où que vous alliez, ils vivent en vous et vous permettent de prendre leur forme. Choisissez une région ci-dessous; c'est celle avec laquelle vous êtes en harmonie. Lorsque vous changez de forme, vous pouvez prendre celle d'un animal qui pourrait vivre dans votre région.&#010;Choisissez un aspect – un attribut physique qui vous identifie comme enfant du pays – qui reflète l'esprit de votre région. Ce peut être une caractéristique animale comme des bois ou des taches de léopard ou quelque chose de plus général: une chevelure de feuilles, des yeux de cristal brillant. Votre aspect demeure quelle que soit votre forme.</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Région : </span>
@@ -3081,19 +2993,11 @@ Choisissez un aspect – un attribut physique qui vous identifie comme enfant du
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 10+ : </span>
-                        <textarea name="attr_guerrier-forcer-succes" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet">Choisissez  3 :
-- Ça ne prend pas longtemps.
-- Rien de valeur n'est endommagé.
-- Cela ne fait pas un bruit énorme.
-- Vous pouvez réparer ça sans trop d'effort.</textarea>
+                        <textarea name="attr_guerrier-forcer-succes" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet">Choisissez 3 :&#010;• Ça ne prend pas longtemps.&#010;• Rien de valeur n'est endommagé.&#010;• Cela ne fait pas un bruit énorme.&#010;• Vous pouvez réparer ça sans trop d'effort.</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 7-9 : </span>
-                        <textarea name="attr_guerrier-forcer-partiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Choisissez  2 :
-- Ça ne prend pas longtemps.
-- Rien de valeur n'est endommagé.
-- Cela ne fait pas un bruit énorme.
-- Vous pouvez réparer ça sans trop d'effort.</textarea>
+                        <textarea name="attr_guerrier-forcer-partiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Choisissez 2 :&#010;• Ça ne prend pas longtemps.&#010;• Rien de valeur n'est endommagé.&#010;• Cela ne fait pas un bruit énorme.&#010;• Vous pouvez réparer ça sans trop d'effort.</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 6- : </span>
@@ -3221,26 +3125,12 @@ Choisissez un aspect – un attribut physique qui vous identifie comme enfant du
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 10+ : </span>
-                        <textarea name="attr_immolateur-tison-succes" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet">Choisissez deux des marqueurs suivants.
-Vous pouvez remplacer votre FOR ou votre DEX par INT pour vos attaques avec cette arme.
-L'arme démarre toujours avec les marqueurs enflammé, toucher, dangereux et 3 utilisations.
-Chaque attaque avec cette arme dépense une utilisation.
-- Contact
-- Lancé, Courte
-- +1 dégâts
-- Retirez le marqueur dangereux
+                        <textarea name="attr_immolateur-tison-succes" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet">Choisissez deux des marqueurs suivants.&#010;Vous pouvez remplacer votre FOR ou votre DEX par INT pour vos attaques avec cette arme.&#010;L'arme démarre toujours avec les marqueurs enflammé, toucher, dangereux et 3 utilisations.&#010;Chaque attaque avec cette arme dépense une utilisation.&#010;• Contact&#010;• Lancé, Courte&#010;• +1 dégâts&#010;• Retirez le marqueur dangereux
                         </textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 7-9 : </span>
-                        <textarea name="attr_immolateur-tison-partiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Choisissez un des marqueurs suivants.
-Vous pouvez remplacer votre FOR ou votre DEX par INT pour vos attaques avec cette arme.
-L'arme démarre toujours avec les marqueurs enflammé, toucher, dangereux et 3 utilisations.
-Chaque attaque avec cette arme dépense une utilisation.
-- Contact
-- Lancé, Courte
-- +1 dégâts
-- Retirez le marqueur dangereux</textarea>
+                        <textarea name="attr_immolateur-tison-partiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Choisissez un des marqueurs suivants.&#010;Vous pouvez remplacer votre FOR ou votre DEX par INT pour vos attaques avec cette arme.&#010;L'arme démarre toujours avec les marqueurs enflammé, toucher, dangereux et 3 utilisations.&#010;Chaque attaque avec cette arme dépense une utilisation.&#010;• Contact&#010;• Lancé, Courte&#010;• +1 dégâts&#010;• Retirez le marqueur dangereux</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 6- : </span>
@@ -3262,7 +3152,7 @@ Chaque attaque avec cette arme dépense une utilisation.
                     </div>
                 </div>
             </div>
-             <!-- ===== La marque de Zuko ===== -->
+            <!-- ===== La marque de Zuko ===== -->
             <div class="sheet-action">
                 <button type="roll" class="sheet-btAction" name="ImmoZuko" title="Lancer le Jet d'Action"
                     value="&{template:jet} {{perso=@{character_name}}} {{name=@{immolateur-zuko-name}}} {{subtags=Action de Base}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{immolateur-zuko-mod})[Mod.Carac.] + (@{immolateur-zuko-bonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{sucsup=@{immolateur-zuko-sucsup}}} {{succes=@{immolateur-zuko-succes}}} {{partiel=@{immolateur-zuko-partiel}}} {{echec=@{immolateur-zuko-echec}}}"
@@ -3363,14 +3253,7 @@ Chaque attaque avec cette arme dépense une utilisation.
                 <div class="sheet-dispcheck">
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Desc : </span>
-                        <textarea name="attr_magicien-rituel-body" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Quand  vous  créez  un  effet  magique  à  partir  d'un  lieu  de pouvoir, indiquez au MJ votre objectif. Les effets du rituel sont toujours possibles mais le MJ posera une à quatre des conditions suivantes:
-- Ca va prendre des jours/semaines/mois
-- D'abord, il te faudra________
-- Tu auras besoin de l'aide de________
-- Cela va coûter beaucoup d'argent
-- Tu parviens à un effet moindre, peu fiable et limité
-- Tes alliés et toi-même encourez un risque venant de________
-- Tu vas devoir désenchanter ________pour le faire</textarea>
+                        <textarea name="attr_magicien-rituel-body" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Quand  vous  créez  un  effet  magique  à  partir  d'un  lieu  de pouvoir, indiquez au MJ votre objectif. Les effets du rituel sont toujours possibles mais le MJ posera une à quatre des conditions suivantes:&#010;• Ca va prendre des jours/semaines/mois&#010;• D'abord, il te faudra________&#010;• Tu auras besoin de l'aide de________&#010;• Cela va coûter beaucoup d'argent&#010;• Tu parviens à un effet moindre, peu fiable et limité&#010;• Tes alliés et toi-même encourez un risque venant de________&#010;• Tu vas devoir désenchanter ________pour le faire</textarea>
                     </div>
                 </div>
             </div>
@@ -3398,10 +3281,7 @@ Chaque attaque avec cette arme dépense une utilisation.
                 <div class="sheet-dispcheck">
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Desc : </span>
-                        <textarea name="attr_magicien-preparer-body" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Quand  vous  consacrez  un  moment  ininterrompu  (environ  1 heure) en apprentissage tranquille de votre grimoire:
-- vous perdez tous les sorts que vous aviez préparés,
-- vous préparez de nouveaux sorts choisis dans votre grimoire dont le niveau total ne peut pas dépasser votre propre niveau+1,
--  vous  préparez  aussi  tous  vos  sorts  mineurs  qui  ne  comptent jamais dans la limite de niveau de sorts.</textarea>
+                        <textarea name="attr_magicien-preparer-body" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Quand  vous  consacrez  un  moment  ininterrompu  (environ  1 heure) en apprentissage tranquille de votre grimoire:&#010;• vous perdez tous les sorts que vous aviez préparés,&#010;• vous préparez de nouveaux sorts choisis dans votre grimoire dont le niveau total ne peut pas dépasser votre propre niveau+1,&#010;• vous  préparez  aussi  tous  vos  sorts  mineurs  qui  ne  comptent jamais dans la limite de niveau de sorts.</textarea>
                     </div>
                 </div>
             </div>
@@ -3442,10 +3322,7 @@ Chaque attaque avec cette arme dépense une utilisation.
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 7-9 : </span>
-                        <textarea name="attr_magicien-sort-partiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Le  sort  est  lancé  mais  choisissez  une option :
-- vous attirez une attention malvenue ou vous vous exposez (le MJ vous décrira comment).
--  ce  sort  perturbe  le  tissu  de  la  réalité  :  vous  avez  -1  continu pour lancer un sort jusqu'à ce que vous prépariez vos sorts de nouveau.
-- une fois lancé, le sort est oublié. Vous ne pouvez plus le lancer tant que vous n'avez pas préparé vos sorts à nouveau.</textarea>
+                        <textarea name="attr_magicien-sort-partiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Le sort est lancé mais choisissez une option :&#010;• vous attirez une attention malvenue ou vous vous exposez (le MJ vous décrira comment).&#010;• ce sort perturbe le tissu de la réalité : vous avez -1 continu pour lancer un sort jusqu'à ce que vous prépariez vos sorts de nouveau.&#010;• une fois lancé, le sort est oublié. Vous ne pouvez plus le lancer tant que vous n'avez pas préparé vos sorts à nouveau.</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 6- : </span>
@@ -3549,18 +3426,11 @@ Chaque attaque avec cette arme dépense une utilisation.
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 10+ : </span>
-                        <textarea name="attr_paladin-loi-succes" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet">Le PNJ choisit entre:
-- s'exécuter,
-- reculer avec précaution avant de fuir,
-- vous attaquer.
-Vous avez aussi +1 à suivre contre lui.</textarea>
+                        <textarea name="attr_paladin-loi-succes" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet">Le PNJ choisit entre:&#010;• s'exécuter,&#010;• reculer avec précaution avant de fuir,&#010;• vous attaquer.&#010;Vous avez aussi +1 à suivre contre lui.</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 7-9 : </span>
-                        <textarea name="attr_paladin-loi-partiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Le PNJ choisit entre:
-- s'exécuter,
-- reculer avec précaution avant de fuir,
-- vous attaquer.</textarea>
+                        <textarea name="attr_paladin-loi-partiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Le PNJ choisit entre:&#010;• s'exécuter,&#010;• reculer avec précaution avant de fuir,&#010;• vous attaquer.</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 6- : </span>
@@ -3608,9 +3478,7 @@ Vous avez aussi +1 à suivre contre lui.</textarea>
                 <div class="sheet-dispcheck">
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Desc : </span>
-                        <textarea name="attr_ranger-familier-body" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Vous avez un lien surnaturel avec un animal loyal. Vous ne pouvez pas lui parler véritablement mais il agit comme vous le souhaitez.
-Nommez votre animal familier, choisissez une espèce, une base, autant de qualités que sa férocité, autant  de  dressages  supplémentaires  que  sa  ruse et autant de faiblesses que son instinct.
-Votre animal familier est dressé à attaquer des humanoïdes.</textarea>
+                        <textarea name="attr_ranger-familier-body" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Vous avez un lien surnaturel avec un animal loyal. Vous ne pouvez pas lui parler véritablement mais il agit comme vous le souhaitez.&#010;Nommez votre animal familier, choisissez une espèce, une base, autant de qualités que sa férocité, autant  de  dressages  supplémentaires  que  sa  ruse et autant de faiblesses que son instinct.&#010;Votre animal familier est dressé à attaquer des humanoïdes.</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Race : </span>
@@ -3661,13 +3529,7 @@ Votre animal familier est dressé à attaquer des humanoïdes.</textarea>
                 <div class="sheet-dispcheck">
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Desc : </span>
-                        <textarea name="attr_ranger-ordonner-body" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Lorsque  vous  accomplissez  une  action  pour  laquelle  votre  animal familier est dressé et que...
-…vous attaquez la même cible, ajoutez sa férocité à vos dégâts.
-…vous pistez, ajoutez sa ruse à votre jet.
-…vous subissez des dégâts, ajoutez son armure à la vôtre.
-…vous discernez la réalité, ajoutez sa ruse à votre jet.
-…vous négociez, ajoutez sa ruse à votre jet.
-…quelqu'un cherche à vous gêner, ajoutez son instinct à son jet</textarea>
+                        <textarea name="attr_ranger-ordonner-body" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Lorsque  vous  accomplissez  une  action  pour  laquelle  votre  animal familier est dressé et que ...&#010;• vous attaquez la même cible, ajoutez sa férocité à vos dégâts.&#010;• vous pistez, ajoutez sa ruse à votre jet.&#010;• vous subissez des dégâts, ajoutez son armure à la vôtre.&#010;• vous discernez la réalité, ajoutez sa ruse à votre jet.&#010;• vous négociez, ajoutez sa ruse à votre jet.&#010;• quelqu'un cherche à vous gêner, ajoutez son instinct à son jet</textarea>
                     </div>
                 </div>
             </div>
@@ -3704,13 +3566,11 @@ Votre animal familier est dressé à attaquer des humanoïdes.</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 10+ : </span>
-                        <textarea name="attr_ranger-chasser-succes" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet">Vous suivez la piste de la créature jusqu'à ce  qu'un  changement significatif  dans  sa  direction  ou  son  moyen  de déplacement ne survienne, et vous choisissez aussi une option :
-- vous recevez une information utile sur votre proie. Le MJ vous dira quoi.
-- vous déterminez ce qui a interrompu la piste.</textarea>
+                        <textarea name="attr_ranger-chasser-succes" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet">Vous suivez la piste de la créature jusqu'à ce qu'un changement significatif dans sa direction ou son moyen de déplacement ne survienne, et vous choisissez aussi une option :&#010;• vous recevez une information utile sur votre proie. Le MJ vous dira quoi.&#010;• vous déterminez ce qui a interrompu la piste.</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 7-9 : </span>
-                        <textarea name="attr_ranger-chasser-partiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Vous suivez la piste de la créature jusqu'à ce  qu'un  changement significatif  dans  sa  direction  ou  son  moyen  de déplacement ne survienne.</textarea>
+                        <textarea name="attr_ranger-chasser-partiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Vous suivez la piste de la créature jusqu'à ce qu'un changement significatif dans sa direction ou son moyen de déplacement ne survienne.</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 6- : </span>
@@ -3753,17 +3613,11 @@ Votre animal familier est dressé à attaquer des humanoïdes.</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 10+ : </span>
-                        <textarea name="attr_ranger-tir-succes" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet">Infligez vos dégâts et :
-- Tête : l'ennemi reste debout sans rien faire sauf baver quelques instants.
-- Bras : l'ennemi lâche tout ce qu'il portait.
-- Jambes : l'ennemi est ralenti et boite.</textarea>
+                        <textarea name="attr_ranger-tir-succes" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet">Infligez vos dégâts et :&#010;• Tête : l'ennemi reste debout sans rien faire sauf baver quelques instants.&#010;• Bras : l'ennemi lâche tout ce qu'il portait.&#010;• Jambes : l'ennemi est ralenti et boite.</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 7-9 : </span>
-                        <textarea name="attr_ranger-tir-partiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Ne tenez pas compte des dégâts et :
-- Tête : l'ennemi reste debout sans rien faire sauf baver quelques instants.
-- Bras : l'ennemi lâche tout ce qu'il portait.
-- Jambes : l'ennemi est ralenti et boite.</textarea>
+                        <textarea name="attr_ranger-tir-partiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Ne tenez pas compte des dégâts et :&#010;• Tête : l'ennemi reste debout sans rien faire sauf baver quelques instants.&#010;• Bras : l'ennemi lâche tout ce qu'il portait.&#010;• Jambes : l'ennemi est ralenti et boite.</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 6- : </span>
@@ -3808,19 +3662,11 @@ Votre animal familier est dressé à attaquer des humanoïdes.</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 10+ : </span>
-                        <textarea name="attr_voleur-piege-succes" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet">Prenez 3 et dépensez 1 pour poser une des questions suivantes pendantque
-vous vous déplacez dans cette zone :
-- Y a-t-il un piège ici et si oui, comment se déclenche-t-il ?
-- Que fait ce piège quand il se déclenche ?
-- Qu'est-ce qu'il y a d'autre caché ici ?</textarea>
+                        <textarea name="attr_voleur-piege-succes" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet">Prenez 3 et dépensez 1 pour poser une des questions suivantes pendantque vous vous déplacez dans cette zone :&#010;• Y a-t-il un piège ici et si oui, comment se déclenche-t-il ?&#010;• Que fait ce piège quand il se déclenche ?&#010;• Qu'est-ce qu'il y a d'autre caché ici ?</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 7-9 : </span>
-                        <textarea name="attr_voleur-piege-partiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Prenez 1 et dépensez 1 pour poser une des questions suivantes pendantque
-vous vous déplacez dans cette zone :
-- Y a-t-il un piège ici et si oui, comment se déclenche-t-il ?
-- Que fait ce piège quand il se déclenche ?
-- Qu'est-ce qu'il y a d'autre caché ici ?</textarea>
+                        <textarea name="attr_voleur-piege-partiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Prenez 1 et dépensez 1 pour poser une des questions suivantes pendantque vous vous déplacez dans cette zone :&#010;• Y a-t-il un piège ici et si oui, comment se déclenche-t-il ?&#010;• Que fait ce piège quand il se déclenche ?&#010;• Qu'est-ce qu'il y a d'autre caché ici ?</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 6- : </span>
@@ -3908,19 +3754,11 @@ vous vous déplacez dans cette zone :
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 10+ : </span>
-                        <textarea name="attr_voleur-sournoise-succes" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet">Choisissez 2 options parmi :
-- Vous évitez le corps à corps avec votre adversaire.
-- Vous infligez vos dégâts +1d6.
-- Vous obtenez un avantage de +1 à suivre pour un allié ou vous même si vous en profitez.
-- Vous réduisez son armure de 1 jusqu'à ce qu'il la répare.</textarea>
+                        <textarea name="attr_voleur-sournoise-succes" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet">Choisissez 2 options parmi :&#010;• Vous évitez le corps à corps avec votre adversaire.&#010;• Vous infligez vos dégâts +1d6.&#010;• Vous obtenez un avantage de +1 à suivre pour un allié ou vous même si vous en profitez.&#010;• Vous réduisez son armure de 1 jusqu'à ce qu'il la répare.</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 7-9 : </span>
-                        <textarea name="attr_voleur-sournoise-partiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Choisissez 1 option parmi :
-- Vous évitez le corps à corps avec votre adversaire.
-- Vous infligez vos dégâts +1d6.
-- Vous obtenez un avantage de +1 à suivre pour un allié ou vous même si vous en profitez.
-- Vous réduisez son armure de 1 jusqu'à ce qu'il la répare.</textarea>
+                        <textarea name="attr_voleur-sournoise-partiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel">Choisissez 1 option parmi :&#010;• Vous évitez le corps à corps avec votre adversaire.&#010;• Vous infligez vos dégâts +1d6.&#010;• Vous obtenez un avantage de +1 à suivre pour un allié ou vous même si vous en profitez.&#010;• Vous réduisez son armure de 1 jusqu'à ce qu'il la répare.</textarea>
                     </div>
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Sur 6- : </span>
@@ -3938,7 +3776,7 @@ vous vous déplacez dans cette zone :
                 <div class="sheet-dispcheck">
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Desc : </span>
-                        <textarea name="attr_voleur-empoisonneur-body" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Vous maîtrisez l'usage d'un poison. Choisissez un poison sur la liste  d'équipement  :  ce  poison  n'est  désormais  plus  dangereux pour vous. Vous commencez le jeu avec 3 doses de ce poison. Si vous avez le temps et les composants, vous pouvez distiller 3 nouvelles doses de ce poison.</textarea>
+                        <textarea name="attr_voleur-empoisonneur-body" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Vous maîtrisez l'usage d'un poison. Choisissez un poison sur la liste d'équipement : ce poison n'est désormais plus dangereux pour vous. Vous commencez le jeu avec 3 doses de ce poison. Si vous avez le temps et les composants, vous pouvez distiller 3 nouvelles doses de ce poison.</textarea>
                     </div>
                 </div>
             </div>
@@ -3952,7 +3790,7 @@ vous vous déplacez dans cette zone :
                 <div class="sheet-dispcheck">
                     <div class="sheet-actionligne">
                         <span class="sheet-action">Desc : </span>
-                        <textarea name="attr_voleur-morale-body" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Quand  quelqu'un  essaie  de  déterminer  votre  alignement,  vous pouvez répondre par l'alignement qui vous chante.</textarea>
+                        <textarea name="attr_voleur-morale-body" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action">Quand quelqu'un essaie de déterminer votre alignement, vous pouvez répondre par l'alignement qui vous chante.</textarea>
                     </div>
                 </div>
             </div>
@@ -3968,44 +3806,52 @@ vous vous déplacez dans cette zone :
                 <input type="text" name="attr_actiondepname" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" />
                 <div class="sheet-dispcheck">
                     <div class="sheet-actionligne">
-                        <input type="checkbox" class="sheet-selcheck" name="attr_actiondepbodydisp" value="1" title="Montrer la description de l'action dans le template de jet" /><span>E</span>
+                        <input type="checkbox" class="sheet-selcheck" name="attr_actiondepbodydisp" value="1" title="Montrer la description de l'action dans le chat" /><span>E</span>
                         <span class="sheet-action" style="min-width: 35px;width: 35px">Desc : </span>
                         <textarea name="attr_actiondepbody" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action"></textarea>
                     </div>
                     <div class="sheet-actionligne">
+                        <span class="sheet-action" style="width: 180px;">Cette Action inflige des dégâts</span>
+                        <input type="checkbox" class="sheet-selcheck" name="attr_actiondepdegats" value="[[1@{dtype} + (@{actiondepdegmod})[Modificateur] + (@{degpjbonus})[Bonus circonstanciel] ]]" title="Cocher pour que l'action lance les dégâts" /><span>3</span>
+                        <div class="sheet-dispdegmod">+ <input type="number" name="attr_actiondepdegmod" value="0" class="" title="Modificateur de dégâts">
+                    </div>
+                    <div class="sheet-actionligne">
+                        <span class="sheet-action" style="width: 180px;">Cette Action nécessite un jet</span>
                         <input type="checkbox" class="sheet-selcheck" name="attr_actiondepjet" value="1" title="Cette Action lance un jet" checked /><span>3</span>
-                        <input type="hidden" name="attr_actiondeproll" value="[[2d6 + (@{actiondepmod})[Mod.Carac.] + (@{actiondepbonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]" />
-                        <span class="sheet-action" style="min-width: 35px;width: 35px">Jet : </span>
-                        2d6 +
-                        <SELECT name="attr_actiondepmod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
-                            <OPTION value="0" selected>-</OPTION>
-                            <OPTION value="@{strmod}">FOR</OPTION>
-                            <OPTION value="@{dexmod}">DEX</OPTION>
-                            <OPTION value="@{conmod}">CON</OPTION>
-                            <OPTION value="@{intmod}">INT</OPTION>
-                            <OPTION value="@{wismod}">SAG</OPTION>
-                            <OPTION value="@{chamod}">CHA</OPTION>
-                        </SELECT>
-                        +
-                        <input type="number" class="sheet-action" name="attr_actiondepbonus" value="0" title="Bonus/Malus au jet" />
-                        <span class="sheet-action">&nbsp;Cette Action inflige des dégâts</span>
-                        <input type="checkbox" class="sheet-selcheck" name="attr_actiondepdegats" value="[[1@{dtype} + (@{degpjbonus})[Bonus circonstanciel] ]]" title="Cocher pour que l'action lance les dégâts" /><span>3</span>
-                    </div>
-                    <div class="sheet-actionligne">
-                        <span class="sheet-action">Sur 12+ : </span>
-                        <textarea name="attr_actiondepsucsup" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès exceptionnel" title="Résultat de l'Action sur un succès exceptionnel"></textarea>
-                    </div>
-                    <div class="sheet-actionligne">
-                        <span class="sheet-action">Sur 10+ : </span>
-                        <textarea name="attr_actiondepsucces" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet"></textarea>
-                    </div>
-                    <div class="sheet-actionligne">
-                        <span class="sheet-action">Sur 7-9 : </span>
-                        <textarea name="attr_actiondeppartiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel"></textarea>
-                    </div>
-                    <div class="sheet-actionligne">
-                        <span class="sheet-action">Sur 6- : </span>
-                        <textarea name="attr_actiondepechec" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un échec" title="Résultat de l'Action sur un échec"></textarea>
+                        <div class="dispactionjet">
+                            <div class="sheet-actionligne">
+                                <span class="sheet-action" style="min-width: 35px;width: 35px">Jet : </span>
+                                <input type="hidden" name="attr_actiondeproll" value="[[2d6 + (@{actiondepmod})[Mod.Carac.] + (@{actiondepbonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]" />
+                                2d6 +
+                                <SELECT name="attr_actiondepmod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
+                                    <OPTION value="0" selected>-</OPTION>
+                                    <OPTION value="@{strmod}">FOR</OPTION>
+                                    <OPTION value="@{dexmod}">DEX</OPTION>
+                                    <OPTION value="@{conmod}">CON</OPTION>
+                                    <OPTION value="@{intmod}">INT</OPTION>
+                                    <OPTION value="@{wismod}">SAG</OPTION>
+                                    <OPTION value="@{chamod}">CHA</OPTION>
+                                </SELECT>
+                                +
+                                <input type="number" class="sheet-action" name="attr_actiondepbonus" value="0" title="Bonus/Malus au jet" />
+                            </div>
+                            <div class="sheet-actionligne">
+                                <span class="sheet-action">Sur 12+ : </span>
+                                <textarea name="attr_actiondepsucsup" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès exceptionnel" title="Résultat de l'Action sur un succès exceptionnel"></textarea>
+                            </div>
+                            <div class="sheet-actionligne">
+                                <span class="sheet-action">Sur 10+ : </span>
+                                <textarea name="attr_actiondepsucces" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet"></textarea>
+                            </div>
+                            <div class="sheet-actionligne">
+                                <span class="sheet-action">Sur 7-9 : </span>
+                                <textarea name="attr_actiondeppartiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel"></textarea>
+                            </div>
+                            <div class="sheet-actionligne">
+                                <span class="sheet-action">Sur 6- : </span>
+                                <textarea name="attr_actiondepechec" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un échec" title="Résultat de l'Action sur un échec"></textarea>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -4023,44 +3869,53 @@ vous vous déplacez dans cette zone :
                 <input type="text" name="attr_movename" class="sheet-actionname" placeholder="Nom de l'action" title="Nom de l'action" />
                 <div class="sheet-dispcheck">
                     <div class="sheet-actionligne">
-                        <input type="checkbox" class="sheet-selcheck" name="attr_movebodydisp" value="1" title="Montrer la description de l'action dans le template de jet" /><span>E</span>
+                        <input type="checkbox" class="sheet-selcheck" name="attr_movebodydisp" value="1" title="Montrer la description de l'action dans le chat" /><span>E</span>
                         <span class="sheet-action" style="min-width: 35px;width: 35px">Desc : </span>
                         <textarea name="attr_movebody" class="sheet-actiondesc" placeholder="Description de l'Action" title="Description de l'Action"></textarea>
                     </div>
                     <div class="sheet-actionligne">
+                        <span class="sheet-action" style="width: 180px;">Cette Action inflige des dégâts</span>
+                        <input type="checkbox" class="sheet-selcheck" name="attr_movedegats" value="[[1@{dtype} + (@{movedegmod})[Modificateur] + (@{degpjbonus})[Bonus circonstanciel] ]]" title="Cocher pour que l'action lance les dégâts" /><span>3</span>
+                        <div class="sheet-dispdegmod">+ <input type="number" name="attr_movedegmod" value="0" class="" title="Modificateur de dégâts">
+                    </div>
+                    <div class="sheet-actionligne">
+                        <span class="sheet-action" style="width: 180px;">Cette Action nécessite un jet</span>
+                        <div class="sheet-actionligne">
                         <input type="checkbox" class="sheet-selcheck" name="attr_movejet" value="1" title="Cette Action lance un jet" checked /><span>3</span>
-                        <input type="hidden" name="attr_moveroll" value="[[2d6 + (@{movemod})[Mod.Carac.] + (@{movebonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]" />
-                        <span class="sheet-action" style="min-width: 35px;width: 35px">Jet : </span>
-                        2d6 +
-                        <SELECT name="attr_movemod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
-                            <OPTION value="0" selected>-</OPTION>
-                            <OPTION value="@{strmod}">FOR</OPTION>
-                            <OPTION value="@{dexmod}">DEX</OPTION>
-                            <OPTION value="@{conmod}">CON</OPTION>
-                            <OPTION value="@{intmod}">INT</OPTION>
-                            <OPTION value="@{wismod}">SAG</OPTION>
-                            <OPTION value="@{chamod}">CHA</OPTION>
-                        </SELECT>
-                        +
-                        <input type="number" class="sheet-action" name="attr_movebonus" value="0" title="Bonus/Malus au jet" />
-                        <span class="sheet-action">&nbsp;Cette Action inflige des dégâts</span>
-                        <input type="checkbox" class="sheet-selcheck" name="attr_movedegats" value="[[1@{dtype} + (@{degpjbonus})[Bonus circonstanciel] ]]" title="Cocher pour que l'action lance les dégâts" /><span>3</span>
-                    </div>
-                    <div class="sheet-actionligne">
-                        <span class="sheet-action">Sur 12+ : </span>
-                        <textarea name="attr_movesucsup" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès exceptionnel" title="Résultat de l'Action sur un succès exceptionnel"></textarea>
-                    </div>
-                    <div class="sheet-actionligne">
-                        <span class="sheet-action">Sur 10+ : </span>
-                        <textarea name="attr_movesucces" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet"></textarea>
-                    </div>
-                    <div class="sheet-actionligne">
-                        <span class="sheet-action">Sur 7-9 : </span>
-                        <textarea name="attr_movepartiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel"></textarea>
-                    </div>
-                    <div class="sheet-actionligne">
-                        <span class="sheet-action">Sur 6- : </span>
-                        <textarea name="attr_moveechec" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un échec" title="Résultat de l'Action sur un échec"></textarea>
+                        <div class="dispactionjet">
+                            <div class="sheet-actionligne">
+                                <span class="sheet-action" style="min-width: 35px;width: 35px">Jet : </span>
+                                <input type="hidden" name="attr_moveroll" value="[[2d6 + (@{movemod})[Mod.Carac.] + (@{movebonus})[Bonus] + (@{jetpjbonus})[Bonus circonstanciel] ]]" />
+                                2d6 +
+                                <SELECT name="attr_movemod" class="sheet-action" title="Caractéristique utilisée pour le jet d'Action">
+                                    <OPTION value="0" selected>-</OPTION>
+                                    <OPTION value="@{strmod}">FOR</OPTION>
+                                    <OPTION value="@{dexmod}">DEX</OPTION>
+                                    <OPTION value="@{conmod}">CON</OPTION>
+                                    <OPTION value="@{intmod}">INT</OPTION>
+                                    <OPTION value="@{wismod}">SAG</OPTION>
+                                    <OPTION value="@{chamod}">CHA</OPTION>
+                                </SELECT>
+                                +
+                                <input type="number" class="sheet-action" name="attr_movebonus" value="0" title="Bonus/Malus au jet" />
+                            </div>
+                            <div class="sheet-actionligne">
+                                <span class="sheet-action">Sur 12+ : </span>
+                                <textarea name="attr_movesucsup" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès exceptionnel" title="Résultat de l'Action sur un succès exceptionnel"></textarea>
+                            </div>
+                            <div class="sheet-actionligne">
+                                <span class="sheet-action">Sur 10+ : </span>
+                                <textarea name="attr_movesucces" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès complet" title="Résultat de l'Action sur un succès complet"></textarea>
+                            </div>
+                            <div class="sheet-actionligne">
+                                <span class="sheet-action">Sur 7-9 : </span>
+                                <textarea name="attr_movepartiel" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un succès partiel" title="Résultat de l'Action sur un succès partiel"></textarea>
+                            </div>
+                            <div class="sheet-actionligne">
+                                <span class="sheet-action">Sur 6- : </span>
+                                <textarea name="attr_moveechec" class="sheet-actiondesc" placeholder="Résultat de l'Action sur un échec" title="Résultat de l'Action sur un échec"></textarea>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -4110,10 +3965,63 @@ vous vous déplacez dans cette zone :
         </fieldset>
     </div> <!-- FIN SORTS -->
 
+    <!-- ===== FIN ACTIONS ===== -->
+
+    <!-- ===== DIVERS ===== -->
+    <div class="sheet-header" style="width: 100%;">
+        <div class="sheet-section-name" style="width: 100%;">
+            Divers
+        </div>
+    </div>
+    <input type="radio" name="attr_ongldivers" value="0" class="sheet-onglnote" title="Notes" checked /><span>Notes</span>
+    <input type="radio" name="attr_ongldivers" value="1" class="sheet-onglrecrue" title="Recrues" /><span>Recrues</span>
+
     <!-- ==== NOTES ===== -->
     <div class="sheet-onglnote">
-        <textarea name="attr_divnotes" style="height:300px;" placeholder="Notes / Divers"></textarea>
+        <textarea name="attr_divnotes" style="height:250px;" placeholder="Notes / Divers"></textarea>
     </div>
+    <!-- ==== RECRUE ===== -->
+    <div class="sheet-onglrecrue">
+        <fieldset class="repeating_moves">
+            <div class="sheet-action">
+                <div class="sheet-actionligne">
+                    <span class="sheet-action">Nom</span>
+                    <input type="text" name="attr_recruename" class="sheet-actionname" style="width: 180px;" placeholder="Nom de la recrue" />
+                    <button type="roll" class="sheet-btAction" name="Loyaute" title="Jet de Loyauté de la recrue"
+                    value="&{template:jet} {{perso=@{character_name}}} {{name=Commander}} {{subtags=@{recruename}}} {{jetshow=[[1]]}} {{jet=[[2d6 + (@{recrueloyaute})[Loyauté] + (@{jetpjbonus})[Bonus circonstanciel] ]]}} {{descshow=[[1]]}} {{desc=Lorsque vos ordres placent une recrue dans une situation dangereuse, dégradante ou franchement dingue, lancez 2d6+Loyauté.}} {{succes=Elle tient bon et exécute l'ordre.}} {{partiel=Elle s'exécute sur le moment, mais manifeste, plus tard, certaines revendications. Donnez-y satisfaction ou la recrue démissionne dans les pires termes.}}"
+                    ></button>
+                    <span class="sheet-action">Salaire</span>
+                    <input type="text" name="attr_recruesalaire" class="sheet-action" style="width: 180px;" placeholder="Salaire" />
+                </div>
+                <div class="sheet-actionligne">
+                    <span class="sheet-action" style="width: 80px;">Loyauté</span>
+                    <input type="number" name="attr_recrueloyaute" value="0" class="sheet-action" title="Loyauté de la recrue" />
+                    <span class="sheet-action" style="width: 80px;">Adepte</span>
+                    <input type="number" name="attr_recrueadepte" value="0" class="sheet-action" />
+                    <span class="sheet-action" style="width: 80px;">Crocheteur</span>
+                    <input type="number" name="attr_recruecrocheteur" value="0" class="sheet-action" />
+                    <span class="sheet-action" style="width: 80px;">Ménestrel</span>
+                    <input type="number" name="attr_recruemenestrel" value="0" class="sheet-action" />
+                </div>
+                <div class="sheet-actionligne">
+                    <span class="sheet-action" style="width: 80px;">Prêtre</span>
+                    <input type="number" name="attr_recruepretre" value="0" class="sheet-action" />
+                    <span class="sheet-action" style="width: 80px;">Protecteur</span>
+                    <input type="number" name="attr_recrueprotecteur" value="0" class="sheet-action" />
+                    <span class="sheet-action" style="width: 80px;">Pisteur</span>
+                    <input type="number" name="attr_recruepisteur" value="0" class="sheet-action" />
+                    <span class="sheet-action" style="width: 80px;">Soldat</span>
+                    <input type="number" name="attr_recruesoldat" value="0" class="sheet-action" />
+                </div>
+                <div class="sheet-actionligne">
+                    <span class="sheet-action">Notes</span>
+                    <textarea name="attr_recruenotes" class="sheet-actiondesc" placeholder="Notes sur la recrue" title="Notes sur la recrue"></textarea>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+
+    <!-- ===== FIN DIVERS ===== -->
 
 </div>  <!-- ==== FIN COLONNE DROITE ==== -->
 
