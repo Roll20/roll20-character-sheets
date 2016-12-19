@@ -10,6 +10,7 @@ Basée sur la feuille VO de Willem den Besten (Morenim) et Devindra Payment (@Ar
 
 ##v3.2 (2016-12-18)
 
+* Dans les actions appropriées, ajout d'un modificateur en saisie, à ajouter au jet de dégâts
 * Ajout d'une section "Divers"
 * Déplacement de l'onglet "Notes" dans la section "Divers"
 * Ajout d'une section répétable pour la gestion des Recrues dans la section "Divers"
