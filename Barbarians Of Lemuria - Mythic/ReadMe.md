@@ -6,7 +6,7 @@ Graphic design is based on the french edition.
 Background image courtesy of [Emmanuel Roudier](http://roudier-neandertal.blogspot.fr/), lead artist on BoL:Mythic, french edition.
 
 # Current version
-1.0 [Screenshot](bolm.jpg)
+1.1 [Screenshot](bolm.jpg)
 
 The sheet has some integrated rolls (with chat roll templates).  
 Every roll asks for, at least, a modifier (default 0).  
@@ -22,6 +22,11 @@ Every roll asks for, at least, a modifier (default 0).
 Due to some temporary technical translation limitations of Roll20, the french version asks for roll variable (range, modifier etc.) in english, for now.
 
 # Release notes
+
+##v1.1 (2016-12-20)
+
+* Bug fix: Agility penalty due to Armour and/or Shield was not applied to attack rolls using Agility (Melee or Ranged)
+* Bug fix: Damage rolls using Half Strength were not properly calculated with negative Strength
 
 ##v1.0 (2016-12-08)
 
