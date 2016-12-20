@@ -177,6 +177,7 @@ repeating_items
     function calcAgilitySub() {
         getAttrs(["agility_substitution_select", "learning_score", "logic_score", "perception_score", "will_score", "deception_score", "persuasion_score", "presence_score", "alteration_score", "creation_score", "energy_score", "entropy_score", "influence_score", "movement_score", "prescience_score", "protection_score"], function(values) {
             var score = 0;
+            var sub = "show";
             if(values.agility_substitution_select === "Learning") {
                 score = values.learning_score*1;
             } else if(values.agility_substitution_select === "Logic") {
@@ -207,9 +208,12 @@ repeating_items
                 score = values.prescience_score*1;
             } else if(values.agility_substitution_select === "Protection") {
                 score = values.protection_score*1;
+            } else {
+                sub = "hide";
             }
             setAttrs({
-                "agility_substitution": score
+                "agility_substitution": score,
+                "agility_display_sub_flag": sub
             });
         });
     };
@@ -222,6 +226,7 @@ repeating_items
     function calcFortitudeSub() {
         getAttrs(["fortitude_substitution_select", "learning_score", "logic_score", "perception_score", "will_score", "deception_score", "persuasion_score", "presence_score", "alteration_score", "creation_score", "energy_score", "entropy_score", "influence_score", "movement_score", "prescience_score", "protection_score"], function(values) {
             var score = 0;
+            var sub = "show";
             if(values.fortitude_substitution_select === "Learning") {
                 score = values.learning_score*1;
             } else if(values.fortitude_substitution_select === "Logic") {
@@ -252,9 +257,12 @@ repeating_items
                 score = values.prescience_score*1;
             } else if(values.fortitude_substitution_select === "Protection") {
                 score = values.protection_score*1;
+            } else {
+                sub = "hide";
             }
             setAttrs({
-                "fortitude_substitution": score
+                "fortitude_substitution": score,
+                "fortitude_display_sub_flag": sub
             });
         });
     };
@@ -267,6 +275,7 @@ repeating_items
     function calcMightSub() {
         getAttrs(["might_substitution_select", "learning_score", "logic_score", "perception_score", "will_score", "deception_score", "persuasion_score", "presence_score", "alteration_score", "creation_score", "energy_score", "entropy_score", "influence_score", "movement_score", "prescience_score", "protection_score"], function(values) {
             var score = 0;
+            var sub = "show";
             if(values.might_substitution_select === "Learning") {
                 score = values.learning_score*1;
             } else if(values.might_substitution_select === "Logic") {
@@ -297,9 +306,12 @@ repeating_items
                 score = values.prescience_score*1;
             } else if(values.might_substitution_select === "Protection") {
                 score = values.protection_score*1;
+            } else {
+                sub = "hide";
             }
             setAttrs({
-                "might_substitution": score
+                "might_substitution": score,
+                "might_display_sub_flag": sub
             });
         });
     };
@@ -457,7 +469,7 @@ repeating_items
     };
 
     // If lethal damage changed, recalculate max HP
-    on("change:lethal_damage change:hit_point_feats change:hit_point_other change:fortitude_substitution", function() {
+    on("change:lethal_damage change:hit_point_feats change:hit_point_other change:fortitude_substitution change:fortitude_score change:presence_score change:will_score", function() {
         calcHitPoints();
     });
     
@@ -1079,6 +1091,77 @@ repeating_items
         } else {    return "hide";  }           // If the checkbox is UNchecked then hide the section
     };
         // Repeating sections show/hide settings
+    on("change:output_character", function() {
+        getAttrs(["output_character"], function(values) {
+            setAttrs({
+                "display_character_flag": showHide(values.output_character)
+            });
+        });
+    });
+    on("change:output_attributes", function() {
+        getAttrs(["output_attributes"], function(values) {
+            setAttrs({
+                "display_attributes_flag": showHide(values.output_attributes)
+            });
+        });
+    });
+    on("change:output_defenses", function() {
+        getAttrs(["output_defenses"], function(values) {
+            setAttrs({
+                "display_defenses_flag": showHide(values.output_defenses)
+            });
+        });
+    });
+    on("change:output_healthspeed", function() {
+        getAttrs(["output_healthspeed"], function(values) {
+            setAttrs({
+                "display_healthspeed_flag": showHide(values.output_healthspeed)
+            });
+        });
+    });
+    on("change:output_favoredactions", function() {
+        getAttrs(["output_favoredactions"], function(values) {
+            setAttrs({
+                "display_favoredactions_flag": showHide(values.output_favoredactions)
+            });
+        });
+    });
+    on("change:output_otheractions", function() {
+        getAttrs(["output_otheractions"], function(values) {
+            setAttrs({
+                "display_otheractions_flag": showHide(values.output_otheractions)
+            });
+        });
+    });
+    on("change:output_feats", function() {
+        getAttrs(["output_feats"], function(values) {
+            setAttrs({
+                "display_feats_flag": showHide(values.output_feats)
+            });
+        });
+    });
+    on("change:output_perksflaws", function() {
+        getAttrs(["output_perksflaws"], function(values) {
+            setAttrs({
+                "display_perksflaws_flag": showHide(values.output_perksflaws)
+            });
+        });
+    });
+    on("change:output_inventory", function() {
+        getAttrs(["output_inventory"], function(values) {
+            setAttrs({
+                "display_inventory_flag": showHide(values.output_inventory)
+            });
+        });
+    });
+    on("change:output_sanity", function() {
+        getAttrs(["output_sanity"], function(values) {
+            setAttrs({
+                "display_sanity_flag": showHide(values.output_sanity)
+            });
+        });
+    });
+
     on("change:agility_settings_flag", function() {
         getAttrs(["agility_settings_flag"], function(values) {
             setAttrs({
@@ -1205,10 +1288,18 @@ repeating_items
             });
         });
     });
+    
     on("change:repeating_actions:settingsflag", function() {
         getAttrs(["repeating_actions_settingsFlag"], function(values) {
             setAttrs({
                 "repeating_actions_displaySettingsFlag": showHide(values.repeating_actions_settingsFlag)
+            });
+        });
+    });
+    on("change:repeating_otheractions:settingsflag", function() {
+        getAttrs(["repeating_otheractions_settingsFlag"], function(values) {
+            setAttrs({
+                "repeating_otheractions_displaySettingsFlag": showHide(values.repeating_otheractions_settingsFlag)
             });
         });
     });
@@ -1257,9 +1348,12 @@ repeating_items
         });
     });
 
-
-	// Function for calculating rolls for Actions
     function calcAllActionRolls () {
+        calcFavoredActionRolls();
+        calcOtherActionRolls();
+    };
+	// Function for calculating rolls for Actions
+    function calcFavoredActionRolls () {
         getSectionIDs("repeating_actions", function(actionsArray) {
          if(actionsArray.length > 0) {
             _.each(actionsArray, function(currentID, i) {
@@ -1327,13 +1421,98 @@ repeating_items
          }
         });
     };
+	// Function for calculating rolls for Actions
+    function calcOtherActionRolls () {
+        getSectionIDs("repeating_otheractions", function(actionsArray) {
+         if(actionsArray.length > 0) {
+            _.each(actionsArray, function(currentID, i) {
+                getAttrs(["repeating_otheractions_" + currentID + "_action_attribute", "repeating_otheractions_" + currentID + "_dice_d20", "repeating_otheractions_" + currentID + "_use_power_level", "repeating_otheractions_" + currentID + "_power_level", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(v) {
+                    var updateother = {};
+                    var score = 0;
+                    if(v["repeating_otheractions_" + currentID + "_action_attribute"] === "Agility") {
+                        score = v.agility_score*1 + v.agility_dice_modifier*1;
+                    } else if(v["repeating_otheractions_" + currentID + "_action_attribute"] === "Fortitude") {
+                        score = v.fortitude_score*1 + v.fortitude_dice_modifier*1;
+                    } else if(v["repeating_otheractions_" + currentID + "_action_attribute"] === "Might") {
+                        score = v.might_score*1 + v.might_dice_modifier*1;
+                    } else if(v["repeating_otheractions_" + currentID + "_action_attribute"] === "Learning") {
+                        score = v.learning_score*1 + v.learning_dice_modifier*1;
+                    } else if(v["repeating_otheractions_" + currentID + "_action_attribute"] === "Logic") {
+                        score = v.logic_score*1 + v.logic_dice_modifier*1;
+                    } else if(v["repeating_otheractions_" + currentID + "_action_attribute"] === "Perception") {
+                        score = v.perception_score*1 + v.perception_dice_modifier*1;
+                    } else if(v["repeating_otheractions_" + currentID + "_action_attribute"] === "Will") {
+                        score = v.will_score*1 + v.will_dice_modifier*1;
+                    } else if(v["repeating_otheractions_" + currentID + "_action_attribute"] === "Deception") {
+                        score = v.deception_score*1 + v.deception_dice_modifier*1;
+                    } else if(v["repeating_otheractions_" + currentID + "_action_attribute"] === "Persuasion") {
+                        score = v.persuasion_score*1 + v.persuasion_dice_modifier*1;
+                    } else if(v["repeating_otheractions_" + currentID + "_action_attribute"] === "Presence") {
+                        score = v.presence_score*1 + v.presence_dice_modifier*1;
+                    } else if(v["repeating_otheractions_" + currentID + "_action_attribute"] === "Alteration") {
+                        score = v.alteration_score*1 + v.alteration_dice_modifier*1;
+                    } else if(v["repeating_otheractions_" + currentID + "_action_attribute"] === "Creation") {
+                        score = v.creation_score*1 + v.creation_dice_modifier*1;
+                    } else if(v["repeating_otheractions_" + currentID + "_action_attribute"] === "Energy") {
+                        score = v.energy_score*1 + v.energy_dice_modifier*1;
+                    } else if(v["repeating_otheractions_" + currentID + "_action_attribute"] === "Entropy") {
+                        score = v.entropy_score*1 + v.entropy_dice_modifier*1;
+                    } else if(v["repeating_otheractions_" + currentID + "_action_attribute"] === "Influence") {
+                        score = v.influence_score*1 + v.influence_dice_modifier*1;
+                    } else if(v["repeating_otheractions_" + currentID + "_action_attribute"] === "Movement") {
+                        score = v.movement_score*1 + v.movement_dice_modifier*1;
+                    } else if(v["repeating_otheractions_" + currentID + "_action_attribute"] === "Prescience") {
+                        score = v.prescience_score*1 + v.prescience_dice_modifier*1;
+                    } else if(v["repeating_otheractions_" + currentID + "_action_attribute"] === "Protection") {
+                        score = v.protection_score*1 + v.protection_dice_modifier*1;
+                    }
+                    var number = calcAttributeDiceNumber(score);
+                    var type = calcAttributeDiceType(score);
+                    var roll = "";
+        			if(score === 0) {
+        				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+        			} else {
+        			    if(isNaN(v["repeating_otheractions_" + currentID + "_dice_d20"])) {
+            				roll = "[[1d20!! + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}" + number + "]]";
+        			    } else {
+            				roll = "[[" + v["repeating_otheractions_" + currentID + "_dice_d20"] + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}" + number + "]]";
+        			    }
+        			}
+                    if(v["repeating_otheractions_" + currentID + "_use_power_level"] === "Yes") {
+                        updateother["repeating_otheractions_" + currentID + "_power_target"] = "[[10 + " + v["repeating_otheractions_" + currentID + "_power_level"]*2 + "]]";
+                    } else {
+                        updateother["repeating_otheractions_" + currentID + "_power_target"] = "";
+                    }
+        			updateother["repeating_otheractions_" + currentID + "_dice_roll"] = roll;
+        			setAttrs(updateother);
+                });
+            });
+         }
+        });    
+	};
 	
 	// On Change for Use Power Level in actions
-    on("change:repeating_actions:use_power_level change:repeating_actions:power_level", function() {
-        getAttrs(["repeating_actions_use_power_level", "repeating_actions_power_level"], function(values) {
+    on("change:repeating_otheractions:use_power_level change:repeating_otheractions:power_level change:repeating_otheractions:power_level_max", function() {
+        getAttrs(["repeating_otheractions_use_power_level", "repeating_otheractions_power_level", "repeating_otheractions_power_level_max"], function(values) {
+            if(values.repeating_otheractions_use_power_level === "Yes") {
+                setAttrs({
+                    "repeating_otheractions_power_target": "[[10 + " + values.repeating_otheractions_power_level*2 + "]]",
+                    "repeating_otheractions_power_target_max": "[[10 + " + values.repeating_otheractions_power_level_max*2 + "]]"
+                });
+            } else {
+               setAttrs({
+                    "repeating_otheractions_power_target": ""
+                });
+            }
+        });
+    });
+	// On Change for Use Power Level in actions
+    on("change:repeating_actions:use_power_level change:repeating_actions:power_level change:repeating_actions:power_level_max", function() {
+        getAttrs(["repeating_actions_use_power_level", "repeating_actions_power_level", "repeating_actions_power_level_max"], function(values) {
             if(values.repeating_actions_use_power_level === "Yes") {
                 setAttrs({
-                    "repeating_actions_power_target": "[[10 + " + values.repeating_actions_power_level*2 + "]]"
+                    "repeating_actions_power_target": "[[10 + " + values.repeating_actions_power_level*2 + "]]",
+                    "repeating_actions_power_target_max": "[[10 + " + values.repeating_actions_power_level_max*2 + "]]"
                 });
             } else {
                 setAttrs({
@@ -1396,7 +1575,61 @@ repeating_items
             });
         });
     });
-        // Calculate the total of Feat Points spent with special code from The Aaron (below)
+	// On Change for calculating rolls for Actions
+    on("change:repeating_otheractions:action_attribute change:repeating_otheractions:dice_d20", function() {
+        getAttrs(["repeating_otheractions_action_attribute", "repeating_otheractions_dice_d20", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(values) {
+            var score = 0;
+            if(values.repeating_otheractions_action_attribute === "Agility") {
+                score = values.agility_score*1 + values.agility_dice_modifier*1;
+            } else if(values.repeating_otheractions_action_attribute === "Fortitude") {
+                score = values.fortitude_score*1 + values.fortitude_dice_modifier*1;
+            } else if(values.repeating_otheractions_action_attribute === "Might") {
+                score = values.might_score*1 + values.might_dice_modifier*1;
+            } else if(values.repeating_otheractions_action_attribute === "Learning") {
+                score = values.learning_score*1 + values.learning_dice_modifier*1;
+            } else if(values.repeating_otheractions_action_attribute === "Logic") {
+                score = values.logic_score*1 + values.logic_dice_modifier*1;
+            } else if(values.repeating_otheractions_action_attribute === "Perception") {
+                score = values.perception_score*1 + values.perception_dice_modifier*1;
+            } else if(values.repeating_otheractions_action_attribute === "Will") {
+                score = values.will_score*1 + values.will_dice_modifier*1;
+            } else if(values.repeating_otheractions_action_attribute === "Deception") {
+                score = values.deception_score*1 + values.deception_dice_modifier*1;
+            } else if(values.repeating_otheractions_action_attribute === "Persuasion") {
+                score = values.persuasion_score*1 + values.persuasion_dice_modifier*1;
+            } else if(values.repeating_otheractions_action_attribute === "Presence") {
+                score = values.presence_score*1 + values.presence_dice_modifier*1;
+            } else if(values.repeating_otheractions_action_attribute === "Alteration") {
+                score = values.alteration_score*1 + values.alteration_dice_modifier*1;
+            } else if(values.repeating_otheractions_action_attribute === "Creation") {
+                score = values.creation_score*1 + values.creation_dice_modifier*1;
+            } else if(values.repeating_otheractions_action_attribute === "Energy") {
+                score = values.energy_score*1 + values.energy_dice_modifier*1;
+            } else if(values.repeating_otheractions_action_attribute === "Entropy") {
+                score = values.entropy_score*1 + values.entropy_dice_modifier*1;
+            } else if(values.repeating_otheractions_action_attribute === "Influence") {
+                score = values.influence_score*1 + values.influence_dice_modifier*1;
+            } else if(values.repeating_otheractions_action_attribute === "Movement") {
+                score = values.movement_score*1 + values.movement_dice_modifier*1;
+            } else if(values.repeating_otheractions_action_attribute === "Prescience") {
+                score = values.prescience_score*1 + values.prescience_dice_modifier*1;
+            } else if(values.repeating_otheractions_action_attribute === "Protection") {
+                score = values.protection_score*1 + values.protection_dice_modifier*1;
+            }
+            var number = calcAttributeDiceNumber(score);
+            var type = calcAttributeDiceType(score);
+			var roll = "";
+			if(score === 0) {
+				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+			} else {
+				roll = "[[" + values.repeating_otheractions_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}" + number + "]]";
+			}
+            setAttrs({
+                "repeating_otheractions_dice_roll": roll
+            });
+        });
+    });
+    // Calculate the total of Feat Points spent with special code from The Aaron (below)
     on("change:repeating_featsLeft", function() {
         TAS.repeatingSimpleSum('featsLeft','feat_left_cost','featLeft_points_spent')
     });
@@ -2056,10 +2289,55 @@ var TAS = TAS || (function(){
 <!-- Main body of Character Sheet -->
 <div class="container">     <!-- defines the width/height & behavior of the page -->
     <div class="row width100 padBottom">
-        <div class="column textSmall textRight padRight">2016.12.07 <span class="bold">Version 1.6.7 </span> <input class="settings" type="checkbox" name="attr_sheet_settings_flag" value="hide" /><span>y</span></div>
+        <div class="column textSmall textRight padRight">2016.12.15 <span class="bold">Version 1.7.1 </span> <input class="settings" type="checkbox" name="attr_sheet_settings_flag" value="hide" /><span>y</span></div>
+    </div>
+    <div class="row width100">
+        <div class="column width10 inlineBlock textSmall bold">Character Info</div>
+        <div class="column width10 inlineBlock textSmall bold">Attributes</div>
+        <div class="column width10 inlineBlock textSmall bold">Defenses</div>
+        <div class="column width10 inlineBlock textSmall bold">Health & Speed</div>
+        <div class="column width10 inlineBlock textSmall bold">Favored Actions</div>
+        <div class="column width10 inlineBlock textSmall bold">Other Actions</div>
+        <div class="column width10 inlineBlock textSmall bold">Feats</div>
+        <div class="column width10 inlineBlock textSmall bold">Perks & Flaws</div>
+        <div class="column width10 inlineBlock textSmall bold">Inventory</div>
+        <div class="column width10 inlineBlock textSmall bold">TBA</div>
+    </div>
+    <div class="row width100">
+        <div class="column width10 inlineBlock">
+            <div class="checkboxSlider"><input type="checkbox" class="checkboxSliderInvis" name="attr_output_character" checked="checked" value="on" /><label></label></div>   
+        </div>
+        <div class="column width10 inlineBlock">
+            <div class="checkboxSlider"><input type="checkbox" class="checkboxSliderInvis" name="attr_output_attributes" checked="checked" value="on" /><label></label></div>   
+        </div>
+        <div class="column width10 inlineBlock">
+            <div class="checkboxSlider"><input type="checkbox" class="checkboxSliderInvis" name="attr_output_defenses" checked="checked" value="on" /><label></label></div>   
+        </div>
+        <div class="column width10 inlineBlock">
+            <div class="checkboxSlider"><input type="checkbox" class="checkboxSliderInvis" name="attr_output_healthspeed" checked="checked" value="on" /><label></label></div>   
+        </div>
+        <div class="column width10 inlineBlock">
+            <div class="checkboxSlider"><input type="checkbox" class="checkboxSliderInvis" name="attr_output_favoredactions" checked="checked" value="on" /><label></label></div>   
+        </div>
+        <div class="column width10 inlineBlock">
+            <div class="checkboxSlider"><input type="checkbox" class="checkboxSliderInvis" name="attr_output_otheractions" checked="checked" value="on" /><label></label></div>   
+        </div>
+        <div class="column width10 inlineBlock">
+            <div class="checkboxSlider"><input type="checkbox" class="checkboxSliderInvis" name="attr_output_feats" checked="checked" value="on" /><label></label></div>   
+        </div>
+        <div class="column width10 inlineBlock">
+            <div class="checkboxSlider"><input type="checkbox" class="checkboxSliderInvis" name="attr_output_perksflaws" checked="checked" value="on" /><label></label></div>   
+        </div>
+        <div class="column width10 inlineBlock">
+            <div class="checkboxSlider"><input type="checkbox" class="checkboxSliderInvis" name="attr_output_inventory" checked="checked" value="on" /><label></label></div>   
+        </div>
+        <div class="column width10 inlineBlock">
+            <div class="checkboxSlider"><input type="checkbox" class="checkboxSliderInvis" name="attr_output_sanity" checked="checked" value="on" /><label></label></div>   
+        </div>
     </div>
  <!-- section for basic Character information -->
-    <div class="row width825 marginBottom">
+    <input type="hidden" class="display_character_flag" name="attr_display_character_flag" value="show" />
+    <div class="row width825 marginBottom displayCharacter">
         <div class="width1of3 inlineBlock">      <!-- Left Third of 2/3 rows for info (Name & Player) -->
             <div class="column width100 textCenter bold vertBottom">Character Name</div>
             <div class="column width100 textCenter inputName"><input type="text" name="attr_character_name" /></div>
@@ -2090,7 +2368,8 @@ var TAS = TAS || (function(){
     <div class="row">
  <!-- Left Column for Attributes -->
    <!-- Attributes are setup so that clicking the name of the attribute will roll it -->
-    <div class="third inlineBlock vertTop">
+    <input type="hidden" class="display_attributes_flag" name="attr_display_attributes_flag" value="show" />
+    <div class="third inlineBlock vertTop displayAttributes">
         <div class="attributes padTop">
             <div class="width100 height5"></div>
             <div class="column width100 textLargest bold">Attributes</div>
@@ -2115,7 +2394,8 @@ var TAS = TAS || (function(){
       <!-- Agility -->
         <div class="row width100">
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_agility_settings_flag" value="on" /><span>y</span></div>
-            <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton">
+            <input type="hidden" class="agility_display_sub_flag" name="attr_agility_display_sub_flag" value="hide" />
+            <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton sub">
                 <button type="roll" value="&{template:openLegend} {{title= Agility Roll}} {{subTitle= @{character_name}}} {{roll= @{agility_dice_roll}}}">Agility</button>
             </div>
             <div class="width55 inlineBlock">
@@ -2167,7 +2447,8 @@ var TAS = TAS || (function(){
       <!-- Fortitude -->
         <div class="row width100">
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_fortitude_settings_flag" value="on" /><span>y</span></div>
-            <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton">
+            <input type="hidden" class="agility_display_sub_flag" name="attr_fortitude_display_sub_flag" value="hide" />
+            <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton sub">
                 <button type="roll" value="&{template:openLegend} {{title= Fortitude Roll}} {{subTitle= @{character_name}}} {{roll= @{fortitude_dice_roll}}}">Fortitude</button>
             </div>
             <div class="width55 inlineBlock">
@@ -2219,7 +2500,8 @@ var TAS = TAS || (function(){
       <!-- Might -->
         <div class="row width100">
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_might_settings_flag" value="on" /><span>y</span></div>
-            <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton">
+            <input type="hidden" class="agility_display_sub_flag" name="attr_might_display_sub_flag" value="hide" />
+            <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton sub">
                 <button type="roll" value="&{template:openLegend} {{title= Might Roll}} {{subTitle= @{character_name}}} {{roll= @{might_dice_roll}}}">Might</button>
             </div>
             <div class="width55 inlineBlock">
@@ -2744,8 +3026,10 @@ var TAS = TAS || (function(){
     <!-- end of supernatural attributes -->
     </div>
  <!-- end of left column for Attributes -->
+<div class="twoThird inlineBlock">
  <!-- Middle column for defenses & actions -->
-    <div class="third inlineBlock vertTop">
+    <input type="hidden" class="display_defenses_flag" name="attr_display_defenses_flag" value="show" />
+    <div class="third inlineBlock vertTop displayDefenses">
    <!-- Evasion information -->
         <div class="width100 padAll">
             <div class="evasion vertTop padTop">
@@ -2815,9 +3099,67 @@ var TAS = TAS || (function(){
             </div>
         </div>
    <!-- end Resolve -->
+    </div>
+ <!-- end Middle column for defenses & actions -->
+    <input type="hidden" class="display_healthspeed_flag" name="attr_display_healthspeed_flag" value="show" />
+    <div class="third inlineBlock vertTop displayHealthSpeed">
+ <!-- Right column for Health, speed, wealth, feats, perks, and flaws -->
+     <!-- Hit Points Section -->
+        <div class="hitPoints padTop padBottom">
+            <div class="width100 height25"></div>
+            <div class="column width100 textLargest bold padTop">Hit Points</div>
+            <div class="column width100 textSmall italic bold">Fortitude, Presence, & Will</div>
+            <div class="width100">
+                <div class="column width50 inlineBlock borderRight textLarge italic bold">Current</div>
+                <div class="column width50 inlineBlock borderLeft textLarge italic bold">Max</div>
+                <div class="column width50 inlineBlock borderRight inputNumberLarge"><input type="number" name="attr_hit_point" value=0 /></div>
+                <div class="column width50 inlineBlock borderLeft inputNumberLarge"><input type="number" name="attr_hit_point_max" value=0 /></div>
+                <div class="width25 inlineBlock"></div>
+                <div class="column width30 inlineBlock bold">From Feats</div>
+                <div class="column width10 inlineBlock inputNumber30"><input type="number" name="attr_hit_point_feats" value=0 /></div>
+                <div class="width35 inlineBlock"></div>
+                <div class="width25 inlineBlock"></div>
+                <div class="column width30 inlineBlock bold">From Other</div>
+                <div class="column width10 inlineBlock inputNumber30"><input type="number" name="attr_hit_point_other" value=0 /></div>
+                <div class="width35 inlineBlock"></div>
+            </div>
+        </div>
+     <!-- End Hit Points Section -->
+     <!-- Legend Points & Speed Section -->
+        <div class="speedLethalDamage">
+            <div class="width50 inlineBlock vertTop">
+                <div class="column width100 height5"></div>
+                <input type="hidden" name="attr_agility_initiative" value=0 />
+                <div class="column width100 textCenter textLarge speedButton"><button type="roll" name="roll_initiative" value="&{template:openLegend} {{title= Initiative Roll}} {{subTitle= @{character_name}}} {{subTitleAdd= Agility}} {{roll= @{agility_initiative}}} {{description= Make sure to you selected your token to have it automatically added to the turn order.}}">Speed</span></button></div>
+                <div class="column width100 textCenter textSmall" style="line-height: 10px;">Click to roll Initiative</div>
+                <div class="column width100 vertTop inputNumber30 textSmall bold">Base <input type="number" name="attr_base_speed" value=30 /></div>
+                <div class="column width100 inputNumberLarge"><input type="number" name="attr_speed" value=0 /></div>
+                <div class="width100 column inputNumber30 textSmall bold">Armor Penalty(ft) <input type="number" name="attr_armor_penalty" value=0 /></div>
+                <div class="width100 column  inputNumber30 textSmall bold">Armor Feat(ft) <input type="number" name="attr_armor_training" value=0 /></div>
+            </div>
+            <div class="width50 inlineBlock vertTop">
+                <div class="column width100 height10"></div>
+                <div class="column width5 inlineBlock"></div>
+                <div class="column width90 inlineBlock textCenter bold textLarge black">Lethal Damage</div>
+                <div class="column width5 inlineBlock"></div>
+                <div class="column width100" style="height: 29px;"></div>
+                <div class="column width100 inlineBlock inputNumberLarge"><input type="number" name="attr_lethal_damage" value=0 /></div>
+            </div>
+        </div>
+     <!-- End Legend Points & Speed Section -->
+     <!-- Wealth Level Information -->
+        <div class="column width100 textLargest bold padTop">Wealth Level</div>
+        <div class="wealth">
+            <div class="width100 height15"></div>
+            <div class="column width100 inputNumber60 padTop"><input type="number" name="attr_wealth_level" value=2 /></div>
+        </div>
+     <!-- End Wealth Level Information -->
+    </div>
+    <input type="hidden" class="display_favoredactions_flag" name="attr_display_favoredactions_flag" value="show" />
+    <div class="third inlineBlock vertTop displayFavoredActions">
    <!-- Actions Area -->
         <div class="actionsTop padTop padLeft">
-            <div class="column width100 textLargest bold textShadow padTop">Primary Actions</div>
+            <div class="column width100 textLargest bold textShadow padTop">Favored Actions</div>
             <div class="column width100 italic marginTop">Attacks, Boons, & Banes</div>
         </div>
         <div class="actionsMiddle padTop padRight">
@@ -2829,7 +3171,91 @@ var TAS = TAS || (function(){
                 <fieldset class="repeating_actions">
                     <div class="row">   <!-- Fix for Mozilla squishing +Add & Modify buttons -->
                         <div class="width15 inlineBlock vertTop padLeft"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>y</span></div>
-                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" name="roll_action" value="&{template:openLegend} {{title= @{action_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= @{action_attribute}}} {{target= @{action_target}}} {{roll= @{dice_roll}}} {{powertarget=@{power_target}}} {{powerlevel= @{power_level}}} {{description= @{action_special}}}"><input type="text" style="text-align: center;" name="attr_action_name" /></button></div>
+                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" name="roll_action" value="&{template:openLegend} {{title= @{action_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= @{action_attribute}}} {{target= @{action_target}}} {{roll= @{dice_roll}}} {{powertarget=@{power_target}}} {{powerlevel= @{power_level}}} {{powertargetmax= @{power_target_max}}} {{powerlevelmax= @{power_level_max}}} {{description= @{action_special}}}"><input type="text" style="text-align: center;" name="attr_action_name" /></button></div>
+                        <input type="hidden" class="displaySettingsFlag" name="attr_displaySettingsFlag" />
+                        <div class="width100 displaySettings padLeft">
+                            <div class="column width25 inlineBlock bold">Name: </div>
+                            <div class="column width75 inlineBlock inputNameShort"><input type="text" name="attr_action_name" /></div>
+                            <div class="column width45 inlineBlock bold textSmall">Attribute</div>
+                            <div class="column width10 inlineBlock bold textSmall">vs</div>
+                            <div class="column width45 inlineBlock bold textSmall">Target</div>
+                            <div class="column width45 inlineBlock inputSelect">
+                                <select name="attr_action_attribute">
+                                    <option value="None" selected="selected">None</option>
+                                    <option value="Agility">Agility</option>
+                                    <option value="Fortitude">Fortitude</option>
+                                    <option value="Might">Might</option>
+                                    <option value="Deception">Deception</option>
+                                    <option value="Presence">Presence</option>
+                                    <option value="Persuasion">Persuasion</option>
+                                    <option value="Learning">Learning</option>
+                                    <option value="Logic">Logic</option>
+                                    <option value="Perception">Perception</option>
+                                    <option value="Will">Will</option>
+                                    <option value="Alteration">Alteration</option>
+                                    <option value="Creation">Creation</option>
+                                    <option value="Energy">Energy</option>
+                                    <option value="Entropy">Entropy</option>
+                                    <option value="Influence">Influence</option>
+                                    <option value="Movement">Movement</option>
+                                    <option value="Prescience">Prescience</option>
+                                    <option value="Protection">Protection</option>
+                                </select>
+                            </div>
+                            <div class="column width10 inlineBlock bold italic textCenter">vs</div>
+                            <div class="column width45 inlineBlock inputSelect">
+                                <select name="attr_action_target">
+                                    <option value="None" selected="selected">None</option>
+                                    <option value="Evasion">Evasion</option>
+                                    <option value="Toughness">Toughness</option>
+                                    <option value="Resolve">Resolve</option>
+                                </select>
+                            </div>
+                            <input type="hidden" name="attr_dice_roll" value=0 />
+                            <div class="column width55 inlineBlock">d20 for this action is:</div>
+                            <input type="hidden" name="attr_dice_d20" value="1d20!!" />
+                            <div class="column width45 inlineBlock inputSelect">
+                                <select name="attr_dice_d20">
+                                    <option value="1d20!!" selected="selected">Normal</option>
+                                    <option value="2d20!!kh1">Advantage</option>
+                                    <option value="2d20!!kl1">Disadvantage</option>
+                                </select>
+                            </div>
+                            <input type="hidden" name="attr_power_target" value="" />
+                            <input type="hidden" name="attr_power_target_max" value=0 />
+                            <div class="column width50 inlineBlock"></div>
+                            <div class="column width25 inlineBlock textSmall bold">Minimum</div>
+                            <div class="column width25 inlineBlock textSmall bold">Maximum</div>
+                            <div class="column width50 inlineBlock"><input type="checkbox" class="checks25" name="attr_use_power_level" value="Yes" /> Use Power level</div>
+                            <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_power_level" value=0 /></div>
+                            <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_power_level_max" value=0 /></div>
+                            <div class="column width100 bold textSmall">Description/Special/Flavor Text</div>
+                            <div class="column width100 resizeVert vertTop"><textarea class="height50" name="attr_action_special"></textarea></div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+        <div class="actionsBottom"></div>
+   <!-- End Actions Area -->
+    </div>
+    <input type="hidden" class="display_otheractions_flag" name="attr_display_otheractions_flag" value="show" />
+    <div class="third inlineBlock vertTop displayOtherActions">
+   <!-- Other Actions Area -->
+        <div class="actionsTop padTop padLeft">
+            <div class="column width100 textLargest bold textShadow padTop">Other Actions</div>
+            <div class="column width100 italic marginTop">Attacks, Boons, & Banes</div>
+        </div>
+        <div class="actionsMiddle padTop padRight">
+        <!-- Headings for the actions -->
+            <div class="column width25 bold italic inlineBlock textCenter padLeft">Settings</div>
+            <div class="column width75 bold italic inlineBlock textCenter">Name (click to roll)</div>
+        <!-- Add actions as needed Section (repeating fields) -->
+            <div class="column width100 vertTop padRight">
+                <fieldset class="repeating_otheractions">
+                    <div class="row">   <!-- Fix for Mozilla squishing +Add & Modify buttons -->
+                        <div class="width15 inlineBlock vertTop padLeft"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>y</span></div>
+                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" name="roll_action_other" value="&{template:openLegend} {{title= @{action_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= @{action_attribute}}} {{target= @{action_target}}} {{roll= @{dice_roll}}} {{powertarget=@{power_target}}} {{powerlevel= @{power_level}}} {{description= @{action_special}}}"><input type="text" style="text-align: center;" name="attr_action_name" /></button></div>
                         <input type="hidden" class="displaySettingsFlag" name="attr_displaySettingsFlag" />
                         <div class="width100 displaySettings padLeft">
                             <div class="column width25 inlineBlock bold">Name: </div>
@@ -2890,62 +3316,11 @@ var TAS = TAS || (function(){
             </div>
         </div>
         <div class="actionsBottom"></div>
-   <!-- End Actions Area -->
+   <!-- End Other Actions Area -->
     </div>
- <!-- end Middle column for defenses & actions -->
- <!-- Right column for Health, speed, wealth, feats, perks, and flaws -->
-    <div class="third inlineBlock vertTop">
-     <!-- Hit Points Section -->
-        <div class="hitPoints padTop padBottom">
-            <div class="width100 height25"></div>
-            <div class="column width100 textLargest bold padTop">Hit Points</div>
-            <div class="column width100 textSmall italic bold">Fortitude, Presence, & Will</div>
-            <div class="width100">
-                <div class="column width50 inlineBlock borderRight textLarge italic bold">Current</div>
-                <div class="column width50 inlineBlock borderLeft textLarge italic bold">Max</div>
-                <div class="column width50 inlineBlock borderRight inputNumberLarge"><input type="number" name="attr_hit_point" value=0 /></div>
-                <div class="column width50 inlineBlock borderLeft inputNumberLarge"><input type="number" name="attr_hit_point_max" value=0 /></div>
-                <div class="width25 inlineBlock"></div>
-                <div class="column width30 inlineBlock bold">From Feats</div>
-                <div class="column width10 inlineBlock inputNumber30"><input type="number" name="attr_hit_point_feats" value=0 /></div>
-                <div class="width35 inlineBlock"></div>
-                <div class="width25 inlineBlock"></div>
-                <div class="column width30 inlineBlock bold">From Other</div>
-                <div class="column width10 inlineBlock inputNumber30"><input type="number" name="attr_hit_point_other" value=0 /></div>
-                <div class="width35 inlineBlock"></div>
-            </div>
-        </div>
-     <!-- End Hit Points Section -->
-     <!-- Legend Points & Speed Section -->
-        <div class="speedLethalDamage">
-            <div class="width50 inlineBlock vertTop">
-                <div class="column width100 height5"></div>
-                <input type="hidden" name="attr_agility_initiative" value=0 />
-                <div class="column width100 textCenter textLarge speedButton"><button type="roll" name="roll_initiative" value="&{template:openLegend} {{title= Initiative Roll}} {{subTitle= @{character_name}}} {{subTitleAdd= Agility}} {{roll= @{agility_initiative}}} {{description= Make sure to you selected your token to have it automatically added to the turn order.}}">Speed</span></button></div>
-                <div class="column width100 textCenter textSmall" style="line-height: 10px;">Click to roll Initiative</div>
-                <div class="column width100 vertTop inputNumber30 textSmall bold">Base <input type="number" name="attr_base_speed" value=30 /></div>
-                <div class="column width100 inputNumberLarge"><input type="number" name="attr_speed" value=0 /></div>
-                <div class="width100 column inputNumber30 textSmall bold">Armor Penalty(ft) <input type="number" name="attr_armor_penalty" value=0 /></div>
-                <div class="width100 column  inputNumber30 textSmall bold">Armor Feat(ft) <input type="number" name="attr_armor_training" value=0 /></div>
-            </div>
-            <div class="width50 inlineBlock vertTop">
-                <div class="column width100 height10"></div>
-                <div class="column width5 inlineBlock"></div>
-                <div class="column width90 inlineBlock textCenter bold textLarge black">Lethal Damage</div>
-                <div class="column width5 inlineBlock"></div>
-                <div class="column width100" style="height: 29px;"></div>
-                <div class="column width100 inlineBlock inputNumberLarge"><input type="number" name="attr_lethal_damage" value=0 /></div>
-            </div>
-        </div>
-     <!-- End Legend Points & Speed Section -->
-     <!-- Wealth Level Information -->
-        <div class="column width100 textLargest bold padTop">Wealth Level</div>
-        <div class="wealth">
-            <div class="width100 height15"></div>
-            <div class="column width100 inputNumber60 padTop"><input type="number" name="attr_wealth_level" value=2 /></div>
-        </div>
-     <!-- End Wealth Level Information -->
-       <!-- Columns of Feats -->
+    <input type="hidden" class="display_feats_flag" name="attr_display_feats_flag" value="show" />
+    <div class="third inlineBlock vertTop displayFeats">
+   <!-- Columns of Feats -->
         <div class="actionsTop padTop padLeft padRight">
             <div class="column width100 textCenter bold textLargest textShadow vertTop padTop">Feats</div>
        <!-- sub sections for feat points spent and total -->
@@ -2996,8 +3371,18 @@ var TAS = TAS || (function(){
                 </fieldset>
             </div>
    <!-- End Columns of Feats -->
+        </div>
+        <div class="actionsBottom"></div>
+   <!-- End Feats, Perks, Flaws Area -->
+    </div>
+    <input type="hidden" class="display_perksflaws_flag" name="attr_display_perksflaws_flag" value="show" />
+    <div class="third inlineBlock vertTop displayPerksFlaws">
+   <!-- Columns of Feats -->
+        <div class="actionsTop padTop padLeft padRight">
    <!-- Column for Perks -->
             <div class="column width100 textCenter bold textLargest textShadow vertTop padTop padBottom">Perks</div>
+        </div>
+        <div class="actionsMiddle padTop padLeft padRight">
             <div class="column width50 inlineBlock vertTop">
                 <fieldset class="repeating_perks">
                     <div class="row">   <!-- Fix for Mozilla squishing the +Add & Modify button text -->
@@ -3066,8 +3451,11 @@ var TAS = TAS || (function(){
         <div class="actionsBottom"></div>
    <!-- End Feats, Perks, Flaws Area -->
     </div>
+</div>
  <!-- end Right column for Health, speed, wealth, feats, perks, and flaws -->
  <!-- Equipment section -->
+  <input type="hidden" class="display_inventory_flag" name="attr_display_inventory_flag" value="show" />
+  <div class="row inlineBlock displayInventory"
    <!-- container 1st column of items -->
     <div class="fifth inlineBlock vertTop">
         <div class="equipmentTop"></div>
@@ -3387,6 +3775,7 @@ var TAS = TAS || (function(){
         </div>
         <div class="equipmentBottom"></div>
     </div>
+  </div>
   <!-- end 5th column of equipment -->
 <!-- end Equipment section -->
 </div>
@@ -3443,10 +3832,14 @@ var TAS = TAS || (function(){
             {{#^rollLess() roll powertarget}}
             <div class="column width90 inlineBlock green textLarge bold">Success</div>
             {{/^rollLess() roll powertarget}}
-            <div class="column width45 inlineBlock textCenter bold borderRight">Boon CR</div>
-            <div class="column width45 inlineBlock textCenter bold">Power Level</div>
-            <div class="column width45 inlineBlock textCenter borderRight">{{powertarget}}</div>
-            <div class="column width45 inlineBlock textCenter">{{powerlevel}}</div>
+            <div class="column width55 inlineBlock textCenter bold borderRight">Challenge Rating</div>
+            <div class="column width40 inlineBlock textCenter bold">Power Level</div>
+            <div class="column width15 inlineBlock textCenter bold textSmall">Min</div>
+            <div class="column width40 inlineBlock textCenter borderRight">{{powertarget}}</div>
+            <div class="column width40 inlineBlock textCenter">{{powerlevel}}</div>
+            <div class="column width15 inlineBlock textCenter bold textSmall">Max</div>
+            <div class="column width40 inlineBlock textCenter borderRight">{{powertargetmax}}</div>
+            <div class="column width40 inlineBlock textCenter">{{powerlevelmax}}</div>
         </div>
         {{/powertarget}}
       <!-- Display description if provided -->
