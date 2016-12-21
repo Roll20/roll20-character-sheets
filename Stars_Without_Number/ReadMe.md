@@ -2,7 +2,19 @@
 
 This sheet is created for use in Stars Without Number on Roll20. Based on the character sheet design by OneSevenDesign at http://www.onesevendesign.com/swn_charsheets_oneseven.pdf.
 
+### Feedback
+
+Report any problems, suggestions or features by sending a private message on Roll20 or submitting an issue on Github.
+
+[Kevin Searle](https://app.roll20.net/users/565104/) on Roll20 or [@kevinsearle](https://twitter.com/kevinsearle) on Twitter
+
 ### Changelog
+
+#### 0.0.9
+
+* Fix weapon repeatable field widths
+* Fix attack roll failure due to null attack bonus
+* Added Languages text area
 
 #### 0.0.8
 
@@ -48,9 +60,3 @@ This sheet is created for use in Stars Without Number on Roll20. Based on the ch
 #### 201411011226
 
 * First release, supporting basic features.
-
-### Feedback
-
-Report any problems, suggestions or features by sending a private message on Roll20 or submitting an issue on Github.
-
-[Joe Fredette](https://app.roll20.net/users/161749/joe-f) on Roll20

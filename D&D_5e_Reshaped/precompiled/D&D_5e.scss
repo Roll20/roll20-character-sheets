@@ -1,0 +1,2069 @@
+$duration: .2s;
+$transparent: rgba(0, 0, 0, 0);
+$black: #000000;
+$transparent-black: rgba(0, 0, 0, .75);
+$white: #ffffff;
+$red: #ff0000;
+$deep-red: #591209;
+$pinkish-red: #8c6075;
+$deep-green: #51624b;
+$light-green: #879a6a;
+$deep-blue: #416696;
+$bright-blue: #3f88e6;
+$light-gray: #cecece;
+$gray: #a19a91;
+$grayer-gray: #8c8c8c;
+$light-gray: #a0a0a0;
+$border-radius: 3px;
+$light-yellow: #f2f5d3;
+$teal: #E6F5F9;
+$scrollbar-size: .5em;
+
+$classes: 'barbarian', 'bard', 'cleric', 'druid', 'fighter', 'monk', 'paladin', 'ranger', 'rogue', 'sorcerer', 'warlock', 'wizard';
+
+@mixin no-highlight {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+@mixin text-shadow {
+	text-shadow: -1px 0 $black, 0 1px $black, 1px 0 $black, 0 -1px $black;
+}
+
+@mixin tab-toggle($tab, $width, $padding) {
+	@if $padding == 'padding' {
+		$width: $width + 4;
+	} @else if $padding == 'halfPadding' {
+		$width: $width + 2;
+	}
+
+	input.sheet-toggle-#{$tab},
+	span.sheet-toggle-#{$tab} {
+		width: $width;
+	}
+	span.sheet-toggle-#{$tab} {
+		margin-left: -$width;
+	}
+}
+
+@mixin slide-toggle($name, $width, $height, $leftColor, $rightColor, $small-sides, $vertical) {
+	$multiplier: 2;
+	@if $small-sides {
+		$multiplier: 4;
+	}
+	input.sheet-slide-input-#{$name},
+	label.sheet-slide-toggle-#{$name} {
+		height: $height;
+		width: $width * $multiplier;
+	}
+	label.sheet-slide-toggle-#{$name} {
+		@if $vertical {
+			margin-top: -$height;
+		} @else {
+			margin-left: -$width * $multiplier;
+		}
+		line-height: $height;
+		.sheet-slide-cover {
+			@if $small-sides {
+				width: $width * 3;
+			} @else {
+				width: $width;
+			}
+			height: $height;
+			$volume-color: darken($leftColor, 10);
+			box-shadow: 0 .12em .01em rgba($volume-color, 1),
+			0 .12em .3em rgba($volume-color, .6),
+			0 .12em 2em rgba(0, 0, 0, .3),
+			-.12em .15em .2em rgba(0, 0, 0, .2);
+		}
+	}
+	input[type='checkbox'].sheet-slide-input-#{$name} + label.sheet-slide-toggle-#{$name} {
+		.sheet-slide-cover {
+			background-color: $leftColor;
+			text-shadow: 0 .05em 0 darken($leftColor, 05);
+			@if $small-sides {
+				margin-right: $width;
+			}
+		}
+		span[class^='sheet-slide-toggle-'] {
+			@if $small-sides {
+				width: 25%;
+			} @else {
+				width: 50%;
+			}
+			color: $leftColor;
+		}
+	}
+	span.sheet-slide-toggle-#{$name}-left {
+		@if $small-sides {
+			font-size: 11px;
+		}
+	}
+	span.sheet-slide-toggle-#{$name}-right {
+		@if $small-sides {
+			margin-left: 50%;
+			font-weight: bold;
+			font-size: 10px;
+		}
+	}
+	input[type='checkbox'].sheet-slide-input-#{$name}:checked + label.sheet-slide-toggle-#{$name} {
+		.sheet-slide-cover {
+			background-color: $rightColor;
+			@if $small-sides {
+				margin-right: 0;
+			} @else {
+				margin-right: $width;
+			}
+			border-bottom: .03em solid lighten($rightColor, 10);
+			text-shadow: 0 .05em 0 darken($rightColor, 10);
+			$volume-color: darken($rightColor, 10);
+			box-shadow: 0 .12em .01em rgba($volume-color, 1),
+			0 .12em .3em rgba($volume-color, .6),
+			0 .12em 2em rgba(0, 0, 0, .3),
+			.12em .15em .2em rgba(0, 0, 0, .2);
+		}
+		span[class^='sheet-slide-toggle-'] {
+			color: $rightColor;
+		}
+	}
+}
+@mixin scrollbars($size, $foreground-color, $background-color: mix($foreground-color, $white,  50%)) {
+	// For Google Chrome
+	::-webkit-scrollbar {
+		height: $size;
+		width: $size;
+	}
+
+	::-webkit-scrollbar-thumb {
+		background: $foreground-color;
+		border-radius: 10px;
+	}
+
+	// For Internet Explorer
+	body {
+		scrollbar-face-color: $foreground-color;
+	}
+}
+
+@mixin fadedBorderBottom() {
+	border-left: 0;
+	border-right: 0;
+	border-image: linear-gradient(to right, transparent, rgba(0, 0, 0, .75), transparent) 1;
+}
+
+*, .sheet-rolltemplate-5e-shaped * {
+	box-sizing: border-box;
+	line-height: 100%;
+}
+
+@include scrollbars($scrollbar-size, slategray);
+
+input, select, textarea,
+.sheet-wrapper {
+	font-size: 12px;
+}
+
+button {
+	//overwrite roll20
+	&[type=roll] {
+		background-image: none;
+		border: 0;
+		box-shadow: none;
+		-webkit-box-shadow: none;
+		text-align: left;
+		text-shadow: initial;
+
+		&.btn {
+			font-size: inherit;
+			margin: 0;
+
+			&:not(.sheet-visible-button) {
+				background-color: transparent;
+				padding: 0;
+
+				&:hover {
+					color: $bright-blue !important;
+					input,
+					span {
+						color: $bright-blue !important;
+					}
+				}
+			}
+
+			&.sheet-visible-button {
+				background-color: $bright-blue;
+				border-radius: $border-radius;
+				box-shadow: 0 2px 5px 0 rgba(0,0,0,.26);
+				color: rgba(255,255,255, .87);
+				font-size: 11px;
+				padding: 3px;
+				&:hover {
+					color: rgba(255,255,255, .87);
+				}
+				&:active {
+					box-shadow: 0 4px 8px 0 rgba(0,0,0,.4);
+				}
+			}
+		}
+
+		&:hover {
+			background-position: initial;
+		}
+		&::before {
+			content: '' !important;
+		}
+		&:active {
+			box-shadow: none;
+			-webkit-box-shadow: none;
+		}
+	}
+
+	&.repcontrol_add,
+	&.repcontrol_edit {
+		font-size: 10px;
+		padding: 1px 3px;
+	}
+
+	&.repcontrol_del {
+		font-size: 13px;
+		padding: 0 3px 2px;
+		position: relative;
+		z-index: 999;
+	}
+	&.repcontrol_add,
+	&.repcontrol_edit,
+	&.repcontrol_del {
+		border-radius: $border-radius;
+		width: auto !important;
+	}
+}
+.btn {
+	&.repcontrol_move {
+		padding: 2px 6px;
+		background: transparent;
+		border: none;
+		font-size: 16px;
+		font-weight: bold;
+		position: relative;
+		z-index: 999;
+	}
+}
+
+input.sheet-toggle-pseudo-button {
+	height: 17px;
+}
+span.sheet-toggle-pseudo-button {
+	background-color: $bright-blue !important;
+	box-shadow: 0 2px 5px 0 rgba(0,0,0,.26);
+	font-size: 11px !important;
+	height: 17px;
+	padding: 3px !important;
+}
+
+.sheet-wrapper-button {
+	width: 100%;
+}
+
+p {
+	margin: 0;
+}
+
+ul, ol {
+	margin: 0 0 0 15px;
+}
+
+input[type=number],
+input[type=text],
+select,
+textarea,
+button {
+	border-left: 0;
+	border-right: 0;
+	border-top: 0;
+	border-radius: 0;
+	box-shadow: none;
+	margin-bottom: 0 !important;
+	padding: 1px;
+
+	&.sheet-no-border {
+		border-bottom: 0;
+	}
+	&.sheet-no-pad {
+		padding: 0;
+	}
+
+	&:focus{
+		outline: none;
+	}
+}
+
+.sheet-border-bottom {
+	border-bottom: 1px solid #ccc;
+}
+
+input[type=number],
+input[type=text],
+select,
+textarea {
+	width: 100% !important;
+}
+
+select {
+	-moz-appearance: none;
+	-webkit-appearance: none;
+	appearance: none;
+	height: 17px;
+}
+
+input[type=number] {
+	text-align: center;
+}
+
+.sheet-pseudo-input {
+	display: block;
+	padding: 2px;
+	min-height: 17px;
+}
+
+input[disabled],
+input[readonly],
+input[type=number].sheet-no-spin {
+	-moz-appearance: textfield;
+}
+
+input[disabled] {
+	background-color: transparent;
+	cursor: inherit;
+}
+
+input[type=number].sheet-no-spin::-webkit-outer-spin-button,
+input[type=number].sheet-no-spin::-webkit-inner-spin-button,
+input[disabled]::-webkit-inner-spin-button,
+input[disabled]::-webkit-outer-spin-button,
+input[readonly]::-webkit-inner-spin-button,
+input[readonly]::-webkit-outer-spin-button{
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+.sheet-float-right {
+	float: right;
+}
+
+$sizes: (
+	sm: 2,
+	smd: 4,
+	md: 5,
+	lg: 10,
+	xl: 15,
+	xxl: 20
+);
+$sides: (
+	t: 'top',
+	r: 'right',
+	b: 'bottom',
+	l: 'left'
+);
+$pad-mar: (
+	mar: 'margin',
+	pad: 'padding'
+);
+@each $side, $side-value in $sides {
+  @each $size, $size-value in $sizes {
+    @each $type, $type-value in $pad-mar {
+      .sheet-#{$type}-#{$side}-#{$size} {
+        #{$type-value}-#{$side-value}: #{$size-value}px;
+      }
+    }
+
+    @if ($side == t) and ($size == sm) or ($size == md) {
+      .sheet-rolltemplate-5e-shaped .sheet-mar-#{$side}-#{$size} {
+        margin-#{$side-value}: #{$size-value}px !important;
+      }
+    }
+  }
+}
+.sheet-pad-t-twelve {
+	padding-top: 12px;
+}
+.sheet-pad-t-eight {
+	padding-top: 8px;
+}
+.sheet-pad-l-hundred {
+	padding-left: 100px;
+}
+.sheet-pad-t-hundred {
+	padding-top: 100px;
+}
+
+.sheet-hidden {
+	display: none !important;
+}
+
+.sheet-mar-b-smd {
+	margin-bottom: 4px;
+}
+
+.sheet-wrapper {
+	min-width: 834px;
+}
+
+.sheet-import-data-present {
+	&:not(:checked) ~ .sheet-overlay {
+		display: none;
+	}
+}
+
+.sheet-overlay {
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0,0,0,0.75);
+	z-index: 9999;
+}
+
+.charsheet {
+	background: rgb(237, 237, 237) url('http://i.imgur.com/RggDtsN.png');
+	margin-top: -10px;
+	padding: 2px 3px !important;
+}
+
+.sheet-slide-input-pc {
+	&:checked ~ div .sheet-pc,
+	&:checked ~ .sheet-pc,
+	&:not(:checked) ~ div .sheet-npc,
+	&:not(:checked) ~ .sheet-npc {
+		display: none;
+	}
+}
+
+.sheet-small-note {
+	font-size: 10px;
+	text-align: center;
+}
+
+.sheet-wrap-box {
+	background-color: white;
+	border: 1px solid black;
+	border-radius: $border-radius;
+	padding: 2px;
+}
+
+.sheet-tooltip-position-wrapper {
+	position: absolute;
+	top: 1px;
+	right: 1px;
+	z-index: 99;
+}
+.sheet-tooltip {
+	position: relative;
+}
+.sheet-tooltip-toggle-text, {
+	background-color: black;
+	border-radius: 50%;
+	color: rgba(255,255,255, .87);
+	font-size: 77%;
+	font-weight: bold;
+	height: 10px;
+	width: 10px;
+	padding: 1px 2px;
+}
+[class*='sheet-tooltip-content'] {
+	background-color: $black;
+	border-bottom-right-radius: 4px;
+	border-bottom-left-radius: 4px;
+	color: rgba(255,255,255, .87);
+	margin-top: -15px;
+	opacity: .9;
+	padding: 4px;
+	position: absolute;
+	width: 260px;
+	text-align: left;
+	visibility: hidden;
+	z-index: 99;
+	&::after {
+		border-bottom: 8px solid transparent;
+		border-top: 8px solid transparent;
+		content: '';
+		margin-top: -8px;
+		position: absolute;
+		top: 9px;
+	}
+}
+.sheet-tooltip-small {
+	width: 80px;
+}
+.sheet-tooltip-content-left {
+	border-top-left-radius: 4px;
+	margin-right: 12px;
+	right: 100%;
+}
+.sheet-tooltip-content-right {
+	border-top-right-radius: 4px;
+	left: 100%;
+	margin-left: 12px;
+}
+.sheet-tooltip-content-left::after {
+	border-left: 8px solid $black;
+	right: -8px;
+}
+.sheet-tooltip-content-right::after {
+	border-right: 8px solid $black;
+	left: -8px;
+}
+.sheet-tooltip:hover [class*='sheet-tooltip-content'],
+.sheet-tooltip:focus [class*='sheet-tooltip-content'] {
+	visibility: visible;
+	z-index: 450;
+}
+
+.sheet-dnd-image-wrapper {
+	margin-bottom: 1px;
+	img {
+		display: block;
+		max-height: 27px;
+	}
+}
+
+.sheet-character-name {
+	input[type=text] {
+		border: 1px solid black;
+		border-bottom-left-radius: 5px !important;
+		border-right-width: 0;
+		border-top-left-radius: 5px !important;
+		font-size: 20px;
+		font-weight: bold;
+		padding: 0 2px;
+	}
+	.sheet-wrap-box-label {
+		margin-top: 1px;
+	}
+}
+
+.sheet-ability-wrapper {
+	height: 69px;
+	margin-bottom: 12px;
+	position: relative;
+
+	& .sheet-ability-score-wrapper {
+		background-color: white;
+		border: 1px solid black;
+		border-radius: 50%;
+		bottom: -8px;
+		left: 0;
+		margin-right: auto;
+		margin-left: auto;
+		padding: 2px;
+		position: absolute;
+		right: 0;
+		width: 40px !important;
+
+		input.sheet-toggle-edit-mode:checked ~ div & {
+			width: 60px !important;
+		}
+
+		input {
+			font-size: 11px;
+			background: transparent;
+			border-radius: 50%;
+		}
+	}
+}
+
+.sheet-ability-name {
+	font-size: 9px;
+	font-weight: bold;
+	text-transform: uppercase;
+}
+
+.sheet-ability-modifier {
+	font-size: 24px;
+	font-weight: bold;
+	padding-bottom: 8px !important;
+	padding-top: 8px !important;
+
+	input.sheet-toggle-edit-mode:checked ~ div & {
+		padding-bottom: 0 !important;
+		padding-top: 0 !important;
+	}
+}
+
+.sheet-spell-slots-points {
+	input[type=number] {
+		background-color: transparent;
+		font-size: 12px;
+		padding: 0;
+	}
+}
+
+.sheet-attacks,
+.sheet-spell {
+	input[readonly] {
+		background: #dedede;
+	}
+}
+.sheet-gray-bg {
+	background: #dedede;
+}
+
+.sheet-flex-grow {
+	flex-grow: 1;
+}
+.sheet-no-shrink {
+	flex-shrink: 0;
+}
+
+.sheet-inline {
+	display: inline;
+}
+.sheet-inline-block {
+	display: inline-block;
+}
+.sheet-block {
+	display: block;
+}
+.sheet-pre-line {
+	white-space: pre-line;
+}
+
+.sheet-relative,
+.sheet-rolltemplate-5e-shaped .sheet-relative {
+	position: relative;
+}
+.sheet-absolute {
+	position: absolute;
+	top: 0;
+}
+.sheet-fixed {
+	position: fixed;
+}
+
+.sheet-section-core {
+	.sheet-ability-saving-throw-name,
+	.sheet-skill-name {
+		font-size: 11px;
+	}
+	.sheet-heading {
+		font-weight: bold;
+		font-style: italic;
+		margin-left: 8px;
+	}
+}
+.sheet-heading {
+	text-transform: capitalize !important;
+}
+
+.sheet-input-like {
+	padding: 1px;
+}
+.sheet-skill-ability {
+	color: $light-gray;
+	font-size: 10px;
+}
+
+.sheet-skills {
+	select {
+		padding: 0;
+	}
+}
+.sheet-skills-ability-selector {
+	background: transparent;
+	border-bottom: 0;
+	color: #909090;
+	font-size: 9px;
+	height: 11px !important;
+}
+.sheet-skill-select-wrapper {
+	select {
+		font-size: 14px;
+		height: 16px;
+	}
+}
+
+.sheet-skills-ability-selector-wrapper,
+.sheet-parenthesis-wrapper {
+	color: #909090;
+	font-size: 9px;
+  input {
+    padding-left: 3px;
+    padding-right: 3px;
+  }
+}
+
+.sheet-shield {
+	height: 55px;
+	margin-left: auto;
+	margin-right: auto;
+	width: 52px;
+	padding-top: 7px;
+	padding-right: 2px;
+	position: relative;
+	z-index: 5;
+
+	&::before {
+		color: white;
+		content: 'b';
+		font-family: 'Pictos Three';
+		font-size: 72px;
+		left: -1px;
+		line-height: 51px;
+		position: absolute;
+		@include text-shadow();
+		top: 3px;
+		z-index: -1;
+	}
+
+	.sheet-big-text {
+		padding: 1px;
+	}
+
+	.sheet-wrap-box-title {
+		margin-top: 1px;
+	}
+}
+
+.sheet-bold,
+.sheet-rolltemplate-5e-shaped .sheet-bold {
+	font-weight: bold;
+}
+.sheet-italic,
+.sheet-rolltemplate-5e-shaped .sheet-italic {
+	font-style: italic;
+}
+
+.sheet-capitalize {
+	text-transform: capitalize !important;
+}
+.sheet-uppercase {
+	text-transform: uppercase !important
+}
+
+.sheet-big-text {
+	font-size: 16px;
+}
+.sheet-initiative,
+.sheet-speed {
+	.sheet-big-text {
+		padding: .4em;
+	}
+}
+
+.sheet-heart-divider {
+	font-size: 15px;
+}
+
+.sheet-wrap-box-label,
+.sheet-wrap-box-title {
+	text-transform: uppercase;
+}
+
+.sheet-wrap-box-title {
+	font-weight: bold;
+	font-size: 9px;
+	margin: 5px 0 0;
+}
+
+.sheet-wrap-box-label {
+	font-size: 80%;
+}
+
+.sheet-light-label {
+	color: $light-gray
+}
+
+.sheet-heart,
+.sheet-temp-heart {
+	height: 68px;
+	width: 80px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 4px;
+	position: relative;
+	z-index: 5;
+
+	&::after {
+		position: absolute;
+		z-index: -1;
+		top: 21px;
+		left: 0;
+		content: 'k';
+		font-family: 'Pictos';
+		font-size: 90px;
+		color: white;
+		@include text-shadow();
+	}
+
+	> .sheet-shaped-row {
+		padding-top: 8px;
+	}
+
+	input[type=number] {
+		border-radius: 7px;
+		padding: 1px;
+		background-color: transparent;
+	}
+}
+
+.sheet-temp-heart {
+	margin-top: 10px;
+	height: 54px;
+	width: 63px;
+	&::after {
+		top: 16px;
+		font-size: 70px;
+	}
+
+	> .sheet-shaped-row {
+		padding-top: 10px;
+	}
+	.sheet-wrap-box-title {
+		margin-top: 2px;
+	}
+}
+
+.sheet-checkbox-wrap,
+[class^='sheet-checkbox-label'] {
+	cursor: pointer;
+	margin-bottom: 0;
+	padding-right: 0;
+	font-size: 100%;
+	font-weight: normal;
+	white-space: nowrap;
+}
+
+.sheet-white-space-no-wrap {
+	white-space: nowrap;
+}
+
+.sheet-small-checkbox {
+	-webkit-transform: scale(.8);
+	transform: scale(.8);
+}
+
+.sheet-checkbox-label-sm {
+	font-size: 9px;
+
+	& input[type=checkbox] {
+		-webkit-transform: scale(.6);
+		transform: scale(.6);
+		height: 10px;
+		margin-top: -1px;
+	}
+}
+
+.sheet-checkbox-label-md {
+	font-size: 85%;
+
+	& input[type=checkbox] {
+		-webkit-transform: scale(.7);
+		transform: scale(.7);
+		margin-top: -1px;
+	}
+}
+
+.sheet-checkbox-label {
+	display: inline-block;
+	[type='checkbox'] {
+		display: none;
+		+ span {
+			display: inline-block;
+			padding: 1px;
+			text-align: center;
+			font-weight: bold;
+		}
+	}
+}
+
+.sheet-proficiency-bonus,
+.sheet-inspiration,
+.sheet-exhaustion {
+	margin-left: 3px;
+
+	.sheet-wrap-box-title {
+		margin-bottom: 3px;
+	}
+}
+
+.sheet-big-font {
+	font-size: 15px;
+}
+
+.sheet-inspiration .sheet-checkbox-label span,
+.sheet-proficiency-bonus-wrapper,
+.sheet-exhaustion-wrapper {
+	border: 1px solid black;
+	border-radius: 50%;
+	height: 27px;
+	left: -5px;
+	top: -3px;
+	position: absolute;
+	width: 27px !important;
+}
+.sheet-proficiency-bonus-wrapper,
+.sheet-exhaustion-wrapper {
+	background-color: $white;
+	border-radius: 50%;
+	padding: 3px;
+}
+.sheet-proficiency-bonus {
+	.sheet-wrap-box-title {
+		margin-left: 22px;
+	}
+}
+.sheet-inspiration,
+.sheet-exhaustion {
+	.sheet-wrap-box-title {
+		margin-left: 24px;
+	}
+}
+
+.sheet-coin {
+	margin-left: -6px;
+}
+.sheet-coin-value-wrap {
+	position: relative;
+	left: -2px;
+}
+
+
+.sheet-inspiration .sheet-checkbox-label span {
+	border-radius: $border-radius;
+}
+
+.sheet-inspiration {
+	.sheet-checkbox-label {
+		[type='checkbox'] {
+			+ span {
+				background-color: white;
+			}
+			&:checked {
+				+ span {
+					background-image: url('http://i.imgur.com/m5WFImZ.png');
+				}
+			}
+		}
+	}
+	.sheet-small-input {
+		font-size: 10px;
+		padding: 0;
+	}
+}
+
+.sheet-death-success,
+.sheet-death-fail {
+	$death-saving-throw-circle-size: 14px;
+	.sheet-checkbox-label {
+		height: $death-saving-throw-circle-size;
+		width: $death-saving-throw-circle-size;
+		margin: 0 2px;
+		position: relative;
+		z-index: 5;
+
+		[type='checkbox'] {
+			+ span {
+				background-color: white;
+				border: 1px solid black;
+				border-radius: 50%;
+				height: $death-saving-throw-circle-size;
+				width: $death-saving-throw-circle-size;
+			}
+		}
+	}
+	[type='radio'] {
+		margin: 1px;
+		opacity: 0;
+		position: relative;
+		z-index: 99;
+
+		&,
+		& + span {
+			height: $death-saving-throw-circle-size;
+			width: $death-saving-throw-circle-size;
+		}
+
+		+ span {
+			border: 1px solid black;
+			border-radius: 50%;
+			display: inline-block;
+			margin-left: -$death-saving-throw-circle-size;
+			position: relative;
+			vertical-align: middle;
+			z-index: 5;
+		}
+
+		&:first-of-type {
+			&,
+			+ span {
+				left: -12px;
+				position: absolute;
+				top: 1px;
+			}
+			+ span {
+				background-color: $white;
+				border: none;
+				color: #980000;
+				font-size: 15px;
+				margin-left: 0;
+			}
+			&:checked {
+				+ span {
+					opacity: 0;
+				}
+			}
+		}
+		&:checked {
+			~ input[type='radio'] + span {
+				background-color: $white;
+			}
+		}
+	}
+}
+.sheet-death-success {
+	[type='radio'] {
+		+ span {
+			background-color: $light-green;
+		}
+	}
+}
+.sheet-death-fail {
+	[type='radio'] {
+		+ span {
+			background-color: $pinkish-red;
+		}
+	}
+}
+
+.sheet-death-saving-throw-hr {
+	top: 2px;
+	width: 100%;
+}
+
+.sheet-rolltemplate-5e-shaped {
+	.sheet-no-border {
+		border-bottom: 0 !important;
+	}
+
+	a[href^="~"] {
+		background-color: transparent;
+		border: none;
+		color: #ce0f69;
+		display: inline;
+		padding: 0;
+	}
+
+	.withoutavatars & {
+		margin-left: -4px;
+	}
+	margin-left: -34px;
+	margin-right: -4px;
+
+	.sheet-rt-card {
+		background-color: $white;
+		border: black 1px solid;
+		border-radius: $border-radius;
+		box-sizing: border-box;
+		font-size: 12px;
+		margin-right: 10px;
+		padding: 4px 0 2px;
+	}
+
+	.inlinerollresult {
+		background: transparent;
+		border: 2px solid transparent;
+	}
+
+	.sheet-rt-header {
+		background-color: #5c5c5c;
+		background-image: linear-gradient(rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
+		box-shadow: 0 2px 0 rgba(0, 0, 0, .3);
+		color: $white;
+		margin: 0 -10px 2px;
+		padding: 3px;
+		text-align: center;
+
+		.inlinerollresult {
+			border: none;
+			padding: 0;
+			font-weight: normal;
+			font-size: 100%;
+		}
+
+		&::before,
+		&::after {
+			content: '';
+			position: absolute;
+			border-style: solid;
+			border-color: transparent;
+			bottom: -10px;
+		}
+
+		&::before {
+			border-width: 0 10px 10px 0;
+			border-right-color: #222222;
+			left: 0;
+		}
+		&::after {
+			border-width: 0 0 10px 10px;
+			border-left-color: #222222;
+			right: 0;
+		}
+
+		&.sheet-attack,
+		&.sheet-action {
+			background-color: #2c5d28;
+
+			&::before {
+				border-right-color: #375035;
+			}
+			&::after {
+				border-left-color: #375035;
+			}
+		}
+
+		&.sheet-spell {
+			background-color: #45285d;
+			&::before {
+				border-right-color: #443550;
+			}
+			&::after {
+				border-left-color: #443550;
+			}
+		}
+
+		&.sheet-ability {
+			background-color: #28595d;
+			&::before {
+				border-right-color: #354e50;
+			}
+			&::after {
+				border-left-color: #354e50;
+			}
+		}
+
+		&.sheet-saving-throw {
+			background-color: #5d2828;
+			&::before {
+				border-right-color: #503535;
+			}
+			&::after {
+				border-left-color: #503535;
+			}
+		}
+
+		&.sheet-death-saving-throw {
+			background-color: #240f0f;
+			&::before {
+				border-right-color: #1f1414;
+			}
+			&::after {
+				border-left-color: #1f1414;
+			}
+		}
+	}
+
+	.inlinerollresult {
+		border-radius: $border-radius;
+		font-size: 105%;
+		line-height: 130%;
+		padding: 0 3px;
+	}
+
+	.sheet-rt-title {
+		font-size: 1.7em;
+	}
+
+	.sheet-rt-subheader {
+		line-height: 1.2em;
+	}
+
+	.sheet-rt-content {
+		& > div {
+			padding: 2px 3px;
+      &:not(:last-of-type) {
+				border-bottom: 1px;
+				border-top: 0;
+				@include fadedBorderBottom();
+      }
+		}
+	}
+
+	.sheet-shaped-row {
+		padding: 2px;
+	}
+
+	.sheet-rt-emote {
+		border: green 1px dashed;
+		border-radius: $border-radius;
+		font-family: Arial;
+		font-size: 11px;
+		font-style: italic;
+		margin: 0 3px 2px;
+		padding: 0px 4px;
+		text-align: center;
+	}
+
+	.sheet-output {
+		font-size: 1.7em;
+		text-align: center;
+	}
+	.sheet-output-small-label {
+		color: #676767;
+		font-style: italic;
+		text-align: center;
+	}
+}
+
+div[class='repcontainer editmode'] ~ div[class^='repcontrol'] button[class='btn repcontrol_add'] {
+	display: inline-block !important;
+	visibility: hidden;
+}
+
+input[class^='sheet-toggle-'],
+span[class^='sheet-toggle-'] {
+	vertical-align: top;
+}
+
+.sheet-vert-middle {
+  vertical-align: middle;
+}
+
+input[class^='sheet-toggle-'] {
+	cursor: pointer;
+	opacity: 0;
+	position: relative;
+	z-index: 200;
+
+	&:active + span[class^='sheet-toggle-'].sheet-button {
+		box-shadow: 0 4px 8px 0 rgba(0,0,0,.4);
+	}
+}
+
+
+span[class^='sheet-toggle-'] {
+	background-color: $gray;
+	border-radius: $border-radius;
+	color: rgba(255,255,255, .87);
+	cursor: pointer;
+	display: inline-block;
+	font-size: 10px;
+	padding: 1px;
+	position: relative;
+	text-align: center;
+}
+
+@include tab-toggle('page-core', 32px, 'padding');
+@include tab-toggle('page-spells', 39px, 'padding');
+@include tab-toggle('page-character', 65px, 'padding');
+@include tab-toggle('page-equipment', 65px, 'padding');
+@include tab-toggle('page-settings', 15px, 'padding');
+@include tab-toggle('page-all', 20px, 'padding');
+
+@include tab-toggle('icon-attack-settings', 13px, 'padding');
+@include tab-toggle('edit-mode', 19px, 'padding');
+
+@include tab-toggle('pseudo-button', 100px, 'padding');
+
+@include tab-toggle('roll-normal', 34px, 'padding');
+@include tab-toggle('roll-advantage', 53px, 'padding');
+@include tab-toggle('roll-disadvantage', 66px, 'padding');
+@include tab-toggle('roll-two', 28px, 'padding');
+
+@include tab-toggle('spells-filter-condense', 50px, 'padding');
+@include tab-toggle('spells-filter-prepared', 43px, 'padding');
+@include tab-toggle('spells-prepared', 43px, 'padding');
+@include tab-toggle('spells-filter-ritual', 26px, 'padding');
+@include tab-toggle('spells-ritual', 26px, 'padding');
+@include tab-toggle('spells-filter-concentration', 65px, 'padding');
+@include tab-toggle('spells-concentration', 65px, 'padding');
+@include tab-toggle('spells-filter-verbal', 9px, 'padding');
+@include tab-toggle('spells-filter-somatic', 9px, 'padding');
+@include tab-toggle('spells-filter-material', 10px, 'padding');
+@include tab-toggle('spell-vsm-v', 9px, 'padding');
+@include tab-toggle('spell-vsm-s', 9px, 'padding');
+@include tab-toggle('spell-vsm-m', 10px, 'padding');
+@include tab-toggle('spell-filters', 29px, 'padding');
+@include tab-toggle('spells-filter-level-cantrips', 39px, 'padding');
+@include tab-toggle('spells-filter-level-all', 13px, 'padding');
+@include tab-toggle('spells-filter-level-1', 7px, 'padding');
+@include tab-toggle('spells-filter-level-2', 7px, 'padding');
+@include tab-toggle('spells-filter-level-3', 7px, 'padding');
+@include tab-toggle('spells-filter-level-4', 7px, 'padding');
+@include tab-toggle('spells-filter-level-5', 7px, 'padding');
+@include tab-toggle('spells-filter-level-6', 7px, 'padding');
+@include tab-toggle('spells-filter-level-7', 7px, 'padding');
+@include tab-toggle('spells-filter-level-8', 7px, 'padding');
+@include tab-toggle('spells-filter-level-9', 7px, 'padding');
+@include tab-toggle('spells-filter-casting-time-all', 13px, 'padding');
+@include tab-toggle('spells-filter-casting-time-reaction', 39px, 'padding');
+@include tab-toggle('spells-filter-casting-time-bonus', 31px, 'padding');
+@include tab-toggle('spells-filter-casting-time-action', 30px, 'padding');
+@include tab-toggle('description', 53px, 'padding');
+@include tab-toggle('saving-throw', 26px, 'padding');
+@include tab-toggle('heal', 23px, 'padding');
+@include tab-toggle('effects', 34px, 'padding');
+@include tab-toggle('spell-source', 35px, 'padding');
+@include tab-toggle('spell-from', 25px, 'padding');
+@include tab-toggle('recharge', 47px, 'padding');
+@include tab-toggle('spell-slots', 49px, 'padding');
+@include tab-toggle('spell-points', 56px, 'padding');
+@include tab-toggle('spell-slots-all', 13px, 'padding');
+
+span.sheet-toggle-spells-filter-level-cantrips,
+span.sheet-toggle-spells-filter-casting-time-reaction {
+	border-bottom-right-radius: 0;
+	border-top-right-radius: 0;
+}
+
+span.sheet-toggle-spells-filter-level-1,
+span.sheet-toggle-spells-filter-level-2,
+span.sheet-toggle-spells-filter-level-3,
+span.sheet-toggle-spells-filter-level-4,
+span.sheet-toggle-spells-filter-level-5,
+span.sheet-toggle-spells-filter-level-6,
+span.sheet-toggle-spells-filter-level-7,
+span.sheet-toggle-spells-filter-level-8,
+span.sheet-toggle-spells-filter-level-9,
+span.sheet-toggle-spells-filter-casting-time-bonus,
+span.sheet-toggle-spells-filter-casting-time-action {
+	border-radius: 0;
+}
+
+span.sheet-toggle-spells-filter-level-all,
+span.sheet-toggle-spells-filter-casting-time-all {
+	border-bottom-left-radius: 0;
+	border-top-left-radius: 0;
+}
+
+@include tab-toggle('jack-of-all-trades', 78px, 'padding');
+@include tab-toggle('remarkable-athlete', 93px, 'padding');
+@include tab-toggle('query', 30px, 'padding');
+@include tab-toggle('halfling-luck', 61px, 'padding');
+
+input[value=en]:not(:checked) ~ label .sheet-en,
+input[value=de]:not(:checked) ~ label .sheet-de,
+input[value=fr]:not(:checked) ~ label .sheet-fr,
+input[value=ru]:not(:checked) ~ label .sheet-ru,
+input[value=es]:not(:checked) ~ label .sheet-es,
+input[value=en]:not(:checked) ~ span .sheet-en,
+input[value=de]:not(:checked) ~ span .sheet-de,
+input[value=fr]:not(:checked) ~ span .sheet-fr,
+input[value=ru]:not(:checked) ~ span .sheet-ru,
+input[value=es]:not(:checked) ~ span .sheet-es,
+input[value=en]:not(:checked) ~ div .sheet-en,
+input[value=de]:not(:checked) ~ div .sheet-de,
+input[value=fr]:not(:checked) ~ div .sheet-fr,
+input[value=ru]:not(:checked) ~ div .sheet-ru,
+input[value=es]:not(:checked) ~ div .sheet-es {
+	display: none;
+}
+
+input.sheet-toggle-language,
+span.sheet-toggle-language {
+	height: 11px;
+	width: 16px;
+}
+
+input.sheet-toggle-language:checked + span.sheet-toggle-language {
+	opacity: 1;
+}
+
+span.sheet-toggle-language {
+	background-repeat: no-repeat;
+	margin-left: 2px;
+	margin-right: -16px;
+	opacity: .4;
+
+	&.sheet-en {
+		background: url('http://i.imgur.com/TniJIqt.png');
+	}
+	&.sheet-de {
+		background: url('http://i.imgur.com/xUhfiqu.png');
+	}
+	&.sheet-fr {
+		background: url('http://i.imgur.com/94SeipS.png');
+	}
+	&.sheet-ru {
+		background: url('http://i.imgur.com/9XCOBJX.png');
+	}
+	&.sheet-es {
+		background: url('http://i.imgur.com/UcndHqG.png');
+	}
+
+}
+
+/* Main Sheet Tabs */
+[class^='sheet-section-'] {
+	display: none;
+}
+input.sheet-slide-input-pc:checked ~ div.sheet-section-core,
+input.sheet-slide-input-pc:not(:checked) ~ div.sheet-section-npc {
+	display: none !important;
+}
+input.sheet-slide-input-pc:not(:checked) ~ input.sheet-toggle-page-core:checked ~ div.sheet-section-core,
+input.sheet-slide-input-pc:checked ~ input.sheet-toggle-page-core:checked ~ div.sheet-section-npc,
+input.sheet-toggle-page-spells:checked ~ div.sheet-section-spells,
+input.sheet-toggle-page-character:checked ~ div.sheet-section-character,
+input.sheet-toggle-page-equipment:checked ~ div.sheet-section-equipment,
+input.sheet-toggle-page-settings:checked ~ div.sheet-section-settings,
+input.sheet-slide-input-pc:checked ~ input.sheet-toggle-page-all:checked ~ div[class^='sheet-section-']:not(.sheet-pc),
+input.sheet-slide-input-pc:not(:checked) ~ input.sheet-toggle-page-all:checked ~ div[class^='sheet-section-']:not(.sheet-npc) {
+	display: block;
+}
+
+input.sheet-toggle-page-all:checked ~ div[class^='sheet-section-'] {
+	&:not(:last-of-type) {
+		border-bottom: 10px solid black;
+		margin-bottom: 5px;
+		padding-bottom: 5px;
+	}
+}
+
+input[class^='sheet-toggle-page-'],
+span[class^='sheet-toggle-page-'] {
+	height: 16px;
+}
+
+span[class^='sheet-toggle-page-'] {
+	font-size: 12px;
+	font-weight: bold;
+	padding: 2px;
+}
+
+input[class^='sheet-toggle-page-']:checked + span[class^='sheet-toggle-page-'] {
+	background-color: $deep-blue !important;
+}
+
+.sheet-spell .sheet-wrap-box {
+	background-color: rgb(245, 245, 245);
+	box-shadow: 0 0 5px #676767;
+	padding: 3px;
+}
+
+input[readonly] {
+	background-color: inherit;
+	cursor: inherit;
+}
+
+$toggle-height: 12px;
+
+input[class^='sheet-slide-input-'] {
+	cursor: pointer;
+	display: inline-block;
+	margin: 0;
+	opacity: 0;
+	position: relative;
+	vertical-align: top;
+	z-index: 5;
+}
+
+label[class^='sheet-slide-toggle-'] {
+	@include no-highlight;
+	$brick-color: white;
+	background-color: $brick-color;
+	border: 1px solid darken($brick-color, 15);
+	border-bottom-color: darken($brick-color, 10);
+	border-radius: 2px;
+	box-shadow: inset 0 .1em .03em rgba(0, 0, 0, .2),
+	inset 0 .1em .3em rgba(0, 0, 0, .3),
+	0 0 2em rgba($brick-color, .6);
+	box-sizing: border-box;
+	display: inline-block;
+	font-size: 10px;
+	font-weight: normal;
+	margin-bottom: 0;
+	padding: 0;
+	perspective: 300px;
+	position: relative;
+	text-align: left;
+	vertical-align: top;
+
+	.sheet-slide-cover {
+		background-color: #f5f5f5;
+		box-shadow: .1em 0 .2em rgba(0, 0, 0, .3);
+		color: $white;
+		display: inline-block;
+		margin-right: -1px;
+		margin-top: -1px;
+		position: absolute;
+		right: 0;
+		text-align: center;
+		top: 0;
+		transition: all $duration ease-in-out;
+		transition-duration: $duration / 1.5;
+		transition-timing-function: cubic-bezier(.52, -.41, .55, 1.46);
+	}
+	span[class^='sheet-slide-toggle-'] {
+		display: inline-block;
+		text-align: center;
+		transition: all $duration ease-in-out;
+	}
+}
+
+@include slide-toggle('pc', 40px, $toggle-height, $deep-green, $deep-red, false, false);
+
+input.sheet-toggle-hidden-info:checked ~ div.sheet-toggle-hidden-info {
+	display: block;
+}
+
+input.sheet-toggle-icon-settings:not(:checked) ~ div.sheet-details,
+input.sheet-toggle-icon-settings:not(:checked) ~ div .sheet-details,
+input.sheet-toggle-edit-mode:not(:checked) ~ div .sheet-edit,
+input.sheet-toggle-edit-mode:checked ~ div .sheet-presentation,
+
+input.sheet-toggle-hd-d2:not(:checked) ~ div.sheet-toggle-hd-d2,
+input.sheet-toggle-hd-d4:not(:checked) ~ div.sheet-toggle-hd-d4,
+input.sheet-toggle-hd-d6:not(:checked) ~ div.sheet-toggle-hd-d6,
+input.sheet-toggle-hd-d8:not(:checked) ~ div.sheet-toggle-hd-d8,
+input.sheet-toggle-hd-d10:not(:checked) ~ div.sheet-toggle-hd-d10,
+input.sheet-toggle-hd-d12:not(:checked) ~ div.sheet-toggle-hd-d12,
+input.sheet-toggle-hd-d20:not(:checked) ~ div.sheet-toggle-hd-d20,
+
+input.sheet-toggle-spell-slots:not(:checked) ~ .sheet-spell-slots,
+input.sheet-toggle-spell-points:not(:checked) ~ .sheet-spell-points,
+
+input.sheet-toggle-spell-filters:not(:checked) ~ [class^=sheet-toggle-spells-filter],
+
+input.sheet-toggle-spell-level-1:not(:checked) ~ div .sheet-toggle-spells-filter-level-1,
+input.sheet-toggle-spell-level-2:not(:checked) ~ div .sheet-toggle-spells-filter-level-2,
+input.sheet-toggle-spell-level-3:not(:checked) ~ div .sheet-toggle-spells-filter-level-3,
+input.sheet-toggle-spell-level-4:not(:checked) ~ div .sheet-toggle-spells-filter-level-4,
+input.sheet-toggle-spell-level-5:not(:checked) ~ div .sheet-toggle-spells-filter-level-5,
+input.sheet-toggle-spell-level-6:not(:checked) ~ div .sheet-toggle-spells-filter-level-6,
+input.sheet-toggle-spell-level-7:not(:checked) ~ div .sheet-toggle-spells-filter-level-7,
+input.sheet-toggle-spell-level-8:not(:checked) ~ div .sheet-toggle-spells-filter-level-8,
+input.sheet-toggle-spell-level-9:not(:checked) ~ div .sheet-toggle-spells-filter-level-9,
+input.sheet-toggle-spell-level-1:not(:checked) ~ div input.sheet-toggle-spell-slots-all:not(:checked) ~ div .sheet-spell-level-1,
+input.sheet-toggle-spell-level-2:not(:checked) ~ div input.sheet-toggle-spell-slots-all:not(:checked) ~ div .sheet-spell-level-2,
+input.sheet-toggle-spell-level-3:not(:checked) ~ div input.sheet-toggle-spell-slots-all:not(:checked) ~ div .sheet-spell-level-3,
+input.sheet-toggle-spell-level-4:not(:checked) ~ div input.sheet-toggle-spell-slots-all:not(:checked) ~ div .sheet-spell-level-4,
+input.sheet-toggle-spell-level-5:not(:checked) ~ div input.sheet-toggle-spell-slots-all:not(:checked) ~ div .sheet-spell-level-5,
+input.sheet-toggle-spell-level-6:not(:checked) ~ div input.sheet-toggle-spell-slots-all:not(:checked) ~ div .sheet-spell-level-6,
+input.sheet-toggle-spell-level-7:not(:checked) ~ div input.sheet-toggle-spell-slots-all:not(:checked) ~ div .sheet-spell-level-7,
+input.sheet-toggle-spell-level-8:not(:checked) ~ div input.sheet-toggle-spell-slots-all:not(:checked) ~ div .sheet-spell-level-8,
+input.sheet-toggle-spell-level-9:not(:checked) ~ div input.sheet-toggle-spell-slots-all:not(:checked) ~ div .sheet-spell-level-9,
+
+input.sheet-show-concentration:not(:checked) ~ .sheet-show-concentration,
+input.sheet-show-ritual:not(:checked) ~ .sheet-show-ritual,
+input.sheet-show-materials:not(:checked) ~ .sheet-show-materials,
+
+input.sheet-toggle-custom-class:not(:checked) ~ .sheet-custom-class,
+
+input.sheet-attack-toggle:not(:checked) ~ div.sheet-attack-toggle,
+
+input.sheet-show-uses:not(:checked) ~ .sheet-show-uses {
+	display: none;
+}
+
+input.sheet-toggle-spell-filters:checked {
+	& ~ input.sheet-toggle-spells-filter-condense:checked ~ .repcontainer .sheet-condense,
+	& ~ input.sheet-toggle-spells-filter-prepared:checked ~ .repcontainer input.sheet-toggle-spells-prepared:not(:checked) ~ .sheet-spell,
+	& ~ input.sheet-toggle-spells-filter-ritual:checked ~ .repcontainer input.sheet-toggle-spells-ritual:not(:checked) ~ .sheet-spell,
+
+	& ~ input.sheet-toggle-spells-filter-level-cantrips:checked ~ .repcontainer input.sheet-toggle-spell-level-cantrip:not(:checked) ~ .sheet-spell,
+	& ~ input.sheet-toggle-spells-filter-level-1:checked ~ .repcontainer input.sheet-toggle-spell-level-1:not(:checked) ~ .sheet-spell,
+	& ~ input.sheet-toggle-spells-filter-level-2:checked ~ .repcontainer input.sheet-toggle-spell-level-2:not(:checked) ~ .sheet-spell,
+	& ~ input.sheet-toggle-spells-filter-level-3:checked ~ .repcontainer input.sheet-toggle-spell-level-3:not(:checked) ~ .sheet-spell,
+	& ~ input.sheet-toggle-spells-filter-level-4:checked ~ .repcontainer input.sheet-toggle-spell-level-4:not(:checked) ~ .sheet-spell,
+	& ~ input.sheet-toggle-spells-filter-level-5:checked ~ .repcontainer input.sheet-toggle-spell-level-5:not(:checked) ~ .sheet-spell,
+	& ~ input.sheet-toggle-spells-filter-level-6:checked ~ .repcontainer input.sheet-toggle-spell-level-6:not(:checked) ~ .sheet-spell,
+	& ~ input.sheet-toggle-spells-filter-level-7:checked ~ .repcontainer input.sheet-toggle-spell-level-7:not(:checked) ~ .sheet-spell,
+	& ~ input.sheet-toggle-spells-filter-level-8:checked ~ .repcontainer input.sheet-toggle-spell-level-8:not(:checked) ~ .sheet-spell,
+	& ~ input.sheet-toggle-spells-filter-level-9:checked ~ .repcontainer input.sheet-toggle-spell-level-9:not(:checked) ~ .sheet-spell,
+
+	& ~ input.sheet-toggle-spells-filter-casting-time-reaction:checked ~ .repcontainer input.sheet-toggle-casting-time-reaction:not(:checked) ~ .sheet-spell,
+	& ~ input.sheet-toggle-spells-filter-casting-time-bonus:checked ~ .repcontainer input.sheet-toggle-casting-time-bonus:not(:checked) ~ .sheet-spell,
+	& ~ input.sheet-toggle-spells-filter-casting-time-action:checked ~ .repcontainer input.sheet-toggle-casting-time-action:not(:checked) ~ .sheet-spell,
+
+	& ~ input.sheet-toggle-spells-filter-concentration:not(:checked) ~ .repcontainer input.sheet-toggle-spells-concentration:checked ~ .sheet-spell,
+	& ~ input.sheet-toggle-spells-filter-verbal:not(:checked) ~ .repcontainer input.sheet-toggle-spell-vsm-v:checked ~ .sheet-spell,
+	& ~ input.sheet-toggle-spells-filter-somatic:not(:checked) ~ .repcontainer input.sheet-toggle-spell-vsm-s:checked ~ .sheet-spell,
+	& ~ input.sheet-toggle-spells-filter-material:not(:checked) ~ .repcontainer input.sheet-toggle-spell-vsm-m:checked ~ .sheet-spell {
+		display: none;
+	}
+}
+
+@each $class in $classes {
+	input.sheet-has-#{$class}-levels:not([value="1"]) ~ div .sheet-has-#{$class}-levels {
+		display: none;
+	}
+}
+
+.sheet-spells-filter {
+	display: inline-block;
+	font-size: 11px;
+}
+
+input[class^='sheet-toggle-spells-filter'],
+span[class^='sheet-toggle-spells-filter'] {
+	height: 12px;
+}
+
+.sheet-spell {
+  input,
+  select,
+  textarea {
+    background-color: transparent;
+  }
+}
+
+.sheet-no-overflow {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.sheet-action-name,
+.sheet-spell-name,
+.sheet-creature-name {
+	border: 0;
+	font-family: 'Times New Roman';
+	font-size: 17px;
+	font-weight: bold;
+	line-height: 1.1em;
+	padding: 0 !important;
+}
+.sheet-spell-name,
+.sheet-creature-name {
+	color: $deep-red;
+}
+
+input[class^='sheet-toggle']:checked + span[class^='sheet-toggle'] {
+	background-color: $deep-green;
+}
+
+input[class^='sheet-toggle-icon']:checked + span[class^='sheet-toggle-icon'],
+input[class^='sheet-toggle-edit-mode']:checked + span[class^='sheet-toggle-edit-mode'] {
+	background-color: transparent;
+	color: rgba(255,255,1,.95);
+	@include text-shadow();
+}
+
+input[class^='sheet-toggle-spells']:checked + span[class^='sheet-toggle-spells'] {
+	background-color: $deep-red;
+}
+
+span[class^='sheet-toggle-spells-filter'] {
+	font-size: 10px;
+}
+
+.sheet-zebra,
+.sheet-rolltemplate-5e-shaped .sheet-zebra {
+	background-color: $teal;
+}
+
+.sheet-zebra-rows,
+.sheet-spell-slots,
+.sheet-spell-points {
+	.sheet-shaped-row:nth-child(even) {
+		background-color: $teal;
+	}
+}
+
+.sheet-spell-slots {
+	input {
+		background: transparent;
+	}
+}
+
+$toggle-icon-width: 15px;
+.sheet-toggle-icon-settings {
+	height: 16px;
+	position: absolute !important;
+	right: 0;
+	top: 0;
+	width: $toggle-icon-width;
+}
+input.sheet-toggle-icon-settings {
+	height: 16px;
+}
+.sheet-toggle-spells-prepared {
+	position: absolute !important;
+	right: $toggle-icon-width + 2;
+	top: 2px;
+}
+
+span.sheet-toggle-icon-settings,
+span.sheet-toggle-edit-mode {
+	background-color: transparent;
+	color: $grayer-gray;
+	margin-top: 0;
+	@include text-shadow();
+}
+
+span.sheet-toggle-icon-settings {
+	font-size: 14px;
+	height: 16px;
+}
+span.sheet-toggle-edit-mode {
+	font-size: 22px;
+}
+input.sheet-toggle-edit-mode,
+span.sheet-toggle-edit-mode {
+	height: 24px;
+	&.sheet-negative-mar-t-eight {
+		margin-top: -8px;
+	}
+}
+
+input.sheet-toggle-edit-mode:checked ~ div {
+	input,
+	select,
+	textarea {
+		&:not([readonly]) {
+			background-color: rgba(255, 255, 1, .25);
+		}
+	}
+}
+input.sheet-toggle-edit-mode:not(:checked) ~ div {
+	.repcontrol,
+	.sheet-item-to-toggle {
+		display: none;
+	}
+}
+.sheet-item-toggle[value="1"] {
+	& + .sheet-item-to-toggle {
+		display: block !important;
+	}
+	& ~ .sheet-trait {
+		.sheet-heading:first-child {
+			margin-left: 17%;
+		}
+	}
+}
+
+.sheet-no-background {
+	background-color: transparent !important;
+}
+
+.sheet-small-label,
+.sheet-rolltemplate-5e-shaped .sheet-small-label,
+.sheet-slide-input-pc:not(:checked) ~ div .sheet-traits-presentation-wrapper {
+	font-size: 11px;
+	input {
+		font-size: 11px;
+	}
+}
+.sheet-small-label {
+	select {
+		-moz-appearance: none;
+		-webkit-appearance: none;
+		appearance: none;
+	}
+}
+
+[class*='sheet-pictos'] {
+	font-size: 14px;
+}
+.sheet-pictos {
+	font-family: 'Pictos';
+}
+
+.sheet-border-right,
+.sheet-rolltemplate-5e-shaped .sheet-border-right {
+	border-right: 1px solid $black;
+}
+.sheet-border-left,
+.sheet-rolltemplate-5e-shaped .sheet-border-left {
+	border-left: 1px solid $black;
+}
+
+hr {
+	margin: 5px 0;
+}
+hr {
+	background-image: linear-gradient(to right, $transparent, $transparent-black, $transparent);
+	border: 0;
+	height: 1px;
+}
+
+span.sheet-spacer {
+	display: block;
+	margin-top: 5px;
+}
+
+.sheet-spacer-smd {
+	margin-top: 4px;
+}
+
+.sheet-left {
+	text-align: left !important;
+}
+.sheet-center,
+.sheet-rolltemplate-5e-shaped .sheet-center {
+	text-align: center;
+}
+.sheet-right {
+	text-align: right;
+}
+
+textarea {
+	height: 150px;
+	resize: both;
+}
+
+.sheet-personality-traits {
+	border-bottom-left-radius: 0;
+	border-bottom-right-radius: 0;
+}
+.sheet-ideals,
+.sheet-bonds {
+	border-radius: 0;
+}
+.sheet-flaws {
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
+}
+
+.sheet-xs-textarea,
+.sheet-one-line-textarea {
+	height: 1.417em;
+}
+.sheet-two-line-textarea {
+	height: 2.15em;
+}
+.sheet-three-line-textarea {
+	height: 3.2em;
+}
+.sheet-four-line-textarea {
+	height: 4.2em;
+}
+.sheet-five-line-textarea {
+	height: 5.2em;
+}
+.sheet-six-line-textarea {
+	height: 6.2em;
+}
+.sheet-eight-line-textarea {
+  height: 8.3em;
+}
+
+.sheet-important-text,
+.sheet-rolltemplate-5e-shaped .sheet-important-text {
+	color: $red;
+}
+
+.sheet-shaped-row,
+.sheet-rolltemplate-5e-shaped .sheet-shaped-row,
+.sheet-section-spells .repcontainer,
+.sheet-section-npc .sheet-skills .repcontainer,
+.sheet-ammo .repcontainer {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	&.sheet-center {
+		justify-content: center;
+	}
+	&.sheet-vert-top {
+		align-items: flex-start;
+	}
+	&.sheet-vert-center {
+		align-items: center;
+	}
+	&.sheet-flex-end {
+		align-items: flex-end;
+	}
+	&.sheet-no-wrap {
+		flex-wrap: nowrap;
+	}
+}
+.sheet-section-spells {
+	.repitem {
+		&:nth-child(even) {
+			padding-left: 3px;
+		}
+		&:nth-child(odd) {
+			padding-right: 3px;
+		}
+		border-bottom: 0;
+		border-top: 1px;
+		padding-bottom: 5px;
+		padding-top: 5px;
+		width: 50%;
+		@include fadedBorderBottom();
+
+		&:first-child,
+		&:nth-child(2) {
+			border-image: none;
+			padding-top: 0;
+		}
+
+		&:last-child,
+		&:nth-last-child(2) {
+			padding-bottom: 0;
+		}
+	}
+}
+
+.sheet-ammo .repitem {
+	.sheet-section-core & {
+		width: 25%;
+	}
+	.sheet-section-equipment & {
+		width: 20%;
+	}
+	padding-left: 2px;
+	padding-right: 2px;
+}
+
+.sheet-section-spells .sheet-wrap-box textarea {
+	font-size: 11px;
+}
+
+.sheet-col-1-3 {
+	width: 33.33333%;
+}
+
+.sheet-col-2-3 {
+	width: 66.66667%;
+}
+
+.sheet-col-1-6 {
+	width: 16.66667%;
+}
+
+.sheet-col-1-8 {
+	width: 12.5%;
+}
+
+.sheet-col-1-12 {
+	width: 8.33333%;
+}
+
+.sheet-col-1-3-em {
+	width: 1.3em;
+}
+.sheet-col-2-em {
+	width: 2em;
+}
+
+@for $i from 01 through 100 {
+	$width-name: $i;
+	@if $i < 10 {
+		$width-name: 0 + '' + $i;
+	}
+	.sheet-col-#{$width-name},
+	.sheet-rolltemplate-5e-shaped .sheet-col-#{$width-name} {
+		width: round(percentage($i/100));
+	}
+}
+
+.sheet-offset-20 {
+	margin-left: 20%;
+}
+
+.sheet-gm-info-flex,
+.sheet-rolltemplate-5e-shaped .sheet-gm-info-flex,
+.sheet-gm-info-block,
+.sheet-rolltemplate-5e-shaped .sheet-gm-info-block,
+.sheet-gm-info-inline-block,
+.sheet-rolltemplate-5e-shaped .sheet-gm-info-inline-block {
+	background-color: $light-yellow !important;
+	display: none;
+}
+
+
+/* NPC */
+.sheet-section-npc {
+	input,
+	textarea,
+	select {
+		background: transparent;
+		color: inherit;
+		padding-bottom: 0;
+		padding-top: 0;
+	}
+
+	select {
+		height: 1.1em;
+	}
+
+	.btn {
+		&[type=roll] {
+			font-size: 13px !important;
+		}
+	}
+
+	.sheet-bar {
+		height: 5px;
+		background: #E69A28;
+		background: repeating-linear-gradient(15deg, #E69A28, #CA8929 5px, #CA8929 5px, #E69A28 10px);
+		border: 1px solid #000;
+		position: relative;
+		z-index: 1;
+	}
+
+	.sheet-npc-content-wrap {
+		background: url('http://i.imgur.com/hggz0ed.jpg') repeat;
+		font-family: 'Noto Sans', 'Myriad Pro', Calibri, Helvetica, Arial, sans-serif;
+		font-size: 14px;
+		padding: .6em .3em;
+		border: 1px #DDD solid;
+		box-shadow: 0 0 1.5em #867453;
+		position: relative;
+		z-index: 0;
+		margin-left: 2px;
+		margin-right: 2px;
+	}
+
+	.sheet-parenthesis-wrapper {
+		&::before,
+		&::after {
+			font-size: 13px;
+			top: 1px;
+			color: #3A0E06;
+		}
+	}
+
+  .sheet-creature-name {
+    font-family: 'Lora', 'Calisto MT', 'Bookman Old Style', Bookman, 'Goudy Old Style', Garamond, 'Hoefler Text', 'Bitstream Charter', Georgia, serif;
+    color: #3A0E06;
+    font-weight: 700;
+    margin-top: -6px;
+    margin-bottom: -2px;
+    font-size: 25px;
+    letter-spacing: 2px;
+    font-variant: small-caps;
+  }
+
+  h3 {
+    border-bottom: 1px solid #3A0E06;
+    color: #3A0E06;
+    font-size: 20px;
+    font-variant: small-caps;
+    font-weight: normal;
+    margin: 0;
+    line-height: 110%;
+  }
+
+  .sheet-heading {
+		font-weight: bold;
+  }
+
+  .sheet-top-stats {
+		color: #3A0E06;
+		input,
+		textarea,
+		button {
+			color: #3A0E06;
+		}
+  }
+
+	.sheet-divider {
+		border-top: 3px solid transparent;
+		border-bottom: 3px solid transparent;
+		border-left: 400px solid #922610;
+		margin: 5px 0;
+	}
+
+	.sheet-skills {
+		.repitem {
+      &:last-child {
+        .sheet-comma {
+          display: none;
+        }
+      }
+		}
+	}
+}
