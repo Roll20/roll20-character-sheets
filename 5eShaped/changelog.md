@@ -2,10 +2,8 @@
 
 ### Breaking Changes
 
-* Character tab removed as many of the items belong on the core page (movement, senses)
-  * Vision, movement, and appearance moved to the core page
-  * Notes moved to the settings page
 * Spells tab removed. The behavior on the core page with the expand option covers this need. This will save sheets with lots of spells between 10-30% of loading time, processing time, etc
+* Vision, movement, and class features moved to the core page from the character page
 
 ### Features
 
