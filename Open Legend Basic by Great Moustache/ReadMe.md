@@ -5,6 +5,34 @@
 
 ### Changelog
 
+### 1.7.1 on 2016 December 15th
+* Modified power level to have a min and max value to input
+	- Success message in chat output based on min value, but tells you for both.
+* Mozilla Firefox UI issues should now be resolved.
+
+### 1.7.0 on 2016 December 13th
+* Added another actions section
+	- Renamed Actions to "Favored Actions"
+	- Created "Other Actions"
+	- Allows players to better organize their actions, and with 1.6.8, hide so less cluttered
+* Added checkbox within actions if you need to specify a power level to roll at (for boons)
+	- Roll templete now will tell if you were Successful, or Failed to reach the power level
+
+### 1.6.9 on 2016 December 12th
+* Added a graphical change (blue highlight) to show which Physical Attribute is using substitution
+
+### 1.6.8 on 2016 December 11th
+* Added "check boxes" to show/hide different areas of the sheet
+	- Allows players to only see the information they want at a given time
+
+### 1.6.7 on 2016 December 10th
+* Fixed a strange error where Presence would add 20 at a time to HP
+	- Caused by fortitude substitution not be forced into an integer type
+* Fixed Attribute Substitution not updating if the Primary Attribute is changed
+	- Modified On Change to be function, and calling from calcAgility function as well
+* Added an indicator at top left of sheet to display current version of the sheet
+	- More functionality later with the gear to add changing of default values for the sheet
+
 ### 1.6.5 on 2016 December 1st
 * Fixed Actions to recalculate the roll string when any attribute is changed
 	- Prior, you had to make a change to the action for the roll string to update if an attribute had been changed.
