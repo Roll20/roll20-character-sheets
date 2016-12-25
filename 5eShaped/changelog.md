@@ -24,3 +24,4 @@
 * Cleanup around other areas like abilities, ability checks, skills, saving throws, etc to speed them up a little bit.
 * Ability checks and Saving throws macros are now generated in a more maintainable way. Both the chat macro and the query macro are visible on the page now.
 * [#68: Spell duplication on script import of spellcasting monsters](https://bitbucket.org/mlenser/5eshaped/issues/68/spell-duplication-on-script-import-of). When parsing spells from the traits section it will check to see if each spell exists. If a spell by that name exists then it will not create a new one.
+* [Coin weight](https://bitbucket.org/mlenser/5eshaped/issues/74/coin-weight)
