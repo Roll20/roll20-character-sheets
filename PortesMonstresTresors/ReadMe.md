@@ -5,46 +5,81 @@ Feuille de Personnage pour **PMT**, un r&eacute;tro-clone de **Donjons & Dragons
 
 PMT est une adaptation de **Labyrinth Lord**, r&eacute;alis&eacute;e par [Arasmo](http://www.legrog.org/biographies/james-arasmo-manez).
 
-Le jeu complet est disponible gratuitement en PDF sur le site du [Scriptorium.D100.fr](http://www.scriptorium.d100.fr/index.php/lesparchemins/portes-monstres-tresors/), et en version papier sur [Lulu](http://www.lulu.com/shop/daniel-proctor-and-james-manez/portes-monstres-tr%C3%A9sors/hardcover/product-22096059.html).
+Le jeu complet est disponible gratuitement en PDF sur le site du [Scriptorium](https://le-scriptorium.fr/jeux-de-role/portes-monstres-tresors/), et en version papier sur [Lulu](http://www.lulu.com/shop/daniel-proctor-and-james-manez/portes-monstres-tr%C3%A9sors/hardcover/product-22096059.html) ou [Amazon](http://www.amazon.fr/Portes-Monstres-Tresors-daventures-fantastiques/dp/1508659044).
 
 # Version courante
-3.0 [Screenshot](pmt_v3.jpg)
+4.3 [Screenshot](pmt_v4.jpg)
 
 # Script API de création de personnage
-Un [script API](pmt.js) est disponible pour créer des personnages rapidement (le taux de mortalité est élevé en OSR ;) ).  
+Un [script API](pmt.js) est disponible pour créer des personnages rapidement (le taux de mortalité est élevé en OSR ;) ).
 Ce type de script nécessite un compte Roll20 Pro pour être exécuté.
 
 Ajoutez le script à votre campagne (pensez à resauvegarder le script avant chaque session, sans modification, si jamais il ne répond plus. L'API Roll20 a parfois du mal à se "réveiller").
 
-Pour lancer le tirage d'un personnage, utilisez les commandes suivantes (ou créez des macros contenant ces commandes) :   
+Pour lancer le tirage d'un personnage, utilisez les commandes suivantes (ou créez des macros contenant ces commandes) :
 
-* 3d6 dans l'ordre :  
+* 3d6 dans l'ordre :
 ```
 !pmt-rollchar 0
-```  
-* 4d6 dont on garde les 3 meilleurs, dans l'ordre :  
+```
+* 4d6 dont on garde les 3 meilleurs, dans l'ordre :
 ```
 !pmt-rollchar 1
 ```
 
-Dans le chat s'affiche le tirage de caractéristiques, suivi de boutons API (rose) indiquant le nom des classes que vous pouvez créer (en fonction de prérequis et du tirage) :  
+Dans le chat s'affiche le tirage de caractéristiques, suivi de boutons API (rose) indiquant le nom des classes que vous pouvez créer (en fonction de prérequis et du tirage) :
 ![Tirage et choix de classe](pmt_v3_creapj_01.jpg)
 
-Cliquez sur une des classes.  
-Un nom de personnage doit être renseigné :  
+Cliquez sur une des classes.
+Un nom de personnage doit être renseigné :
 ![Saisie du nom du personnage](pmt_v3_creapj_02.jpg)
 
-Un message dans le chat indique lorsque la création du personnage est terminée, et un lien permet d'ouvrir la feuille de personnage Roll20 (il faudra probablement cliquer sur l'onglet "Character Sheet" pour voir la feuille) :  
+Un message dans le chat indique lorsque la création du personnage est terminée, et un lien permet d'ouvrir la feuille de personnage Roll20 (il faudra probablement cliquer sur l'onglet "Character Sheet" pour voir la feuille) :
 ![Personnage créé et ouverture de la feuille](pmt_v3_creapj_03.jpg)
 
-**NB** : lors de la première ouverture de la session après la création du personnage, des opérations sont menées pour finaliser la feuille : complétion des sections répétables de sort, attaques et équipements.  
+**NB** : lors de la première ouverture de la session après la création du personnage, des opérations sont menées pour finaliser la feuille : complétion des sections répétables de sort, attaques et équipements.
 Si ces informations n'apparaissent pas, fermer la feuille et réouvrez la après quelques secondes. Au pire, recharger la campagne en rafraîchissant le cache (Ctrl+F5) et réouvrez la feuille.
 
 Par défaut, le personnage créé est attribué au joueur qui a cliqué dans le chat (même s'il est visible par tous, seul ce joueur et le MJ pourront modifier le personnage).
 
 # Notes de version
+
+##v4.3 (18 Décembre 2016).
+Correction du calcul d'encombrement.
+
+##v4.2 (28 Février 2016).
+* Correction de l'infobulle de la case à cocher "R" dans les sorts : il s'agissait de "Sort Réversible"
+* Correction de l'affichage des sorts avec Firefox
+
+##v4.1 (22 Février 2016).
+Possibilité d'agrandir/réduire le champ de description d'un sort.
+
+##v4.0 (29 Janvier 2016).
+* Changement de la police des zones de saisie de 'Times' à 'Patrick Hand' (aspect plus 'manuscrit')
+* Quelques ajustements de mise en page
+* Élargissement du template de jet dans le chat
+* Agrandissement et complétion de la section "Sorts" avec l'ajout du caractère réversible du sort, durée, portée et description du sort.
+* Ajout d'un bouton d'information sur les sorts, permettant de montrer le sort dans le chat
+* Mise à jour du [script API](pmt.js) de création de personnage :
+  * Correction des sorts d'elfe et magicien : conformément aux règles, 2 sorts de niveau 1 et un sort de niveau 2 sont tirés au hasard
+  * Les sorts de niveau 1 et 2 d'elfe et magicien ont toutes les informations pré-renseignées
+  * Tous les sorts de Clerc de niveau 1 ont toutes les informations pré-renseignées
+
+##v3.1 (17 Janvier 2016).
+* Ajout du nom du personnage sur tous les templates de jet dans le chat (utile lorsqu'un joueur contrôle plusieurs personnages)
+* Ajout de champs de saisie pour le titre et les langues supplémentaires du personnage
+* Agrandissement de la zone du modificateur de DEX pour le calcul de la CA (une valeur négative n'était pas visible)
+* Correction du calcul automatique des distances de mouvement en fonction de l'encombrement
+* Correction de l'indicateur de succès ou d'échec sur les jets de caractéristiques : un résultat égal est une réussite
+* Correction du jets de dégâts des attaques : le minimum affiché est désormais 1
+* Mise à jour du [script API](pmt.js) de création de personnage :
+  * Correction des sorts de Clerc : désormais, tous les sorts de niveau 1 sont ajoutés à la feuille
+  * La CA ascendante est désormais activée par défaut
+  * Correction du nom des armures, en vertue de l'[errata de PMT du 03/01/2016](http://www.scriptorium.d100.fr/wp-content/uploads/2016/01/PMT-errata-3-01-16.pdf)
+  * Les distances de mouvement se mettent correctement à jour à la création du personnage
+
 ##v3.0 (Janvier 2016).
-Les personnages existants ne sont malheureusement que partiellement rétro-compatibles.  
+Les personnages existants ne sont malheureusement que partiellement rétro-compatibles.
 Il faudra reprendre certains éléments : classe, attaques et équipements notamment.
 
 Nouveautés :

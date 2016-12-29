@@ -5,7 +5,7 @@ Elle est aussi utilisable (et styl&eacute;e) pour _Numen&eacute;ra_ (modulo la g
 La VF s'appuie sur la traduction de Numen&eacute;ra par Black Book Editions.
 
 # Version courante :
-Version 1.5 (22 Décembre 2015) :
+Version 1.6 (21 Février 2016) :
 
 * Capture d'&eacute;cran [style Cypher System g&eacute;n&eacute;rique](CypherSystem.png)
 * Capture d'&eacute;cran [style Numen&eacute;ra](CypherSystem_style_Numenera.png)
@@ -53,7 +53,10 @@ Le script API permet que l'&eacute;tat du personnage soit automatiquement mis &a
 
 # Notes de version
 
-##Release 1.5 (21 Décembre 2015)
+##Version 1.6 (21 Février 2016)
+Changements esthétiques, pour faciliter l'accès au bouton de suppression de ligne répétable, et diminuer la hauteur des lignes répétables.
+
+##Version 1.5 (21 Décembre 2015)
 
 * Nouvelles sections "Attaques" (1 par caractéristique) avec jets intégrés, prenant en compte le niveau de compétence, le coûts, les dégats etc.
 * Les jets de Caractéristiques et Compétences ne demandent plus/n'utilisent plus les efforts aux dégâts (utilisez les nouvelles sections Attaques en lieu et place)
