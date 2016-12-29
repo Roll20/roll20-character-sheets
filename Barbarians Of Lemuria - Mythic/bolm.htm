@@ -59,11 +59,45 @@
                 });
             });
         });
+    on("change:strength", function(){
+        getAttrs(["strength"], function(values) {
+            var str = parseInt(values.strength) || 0;
+            var half = 0;
+            if (str < 0 ) {
+                half = str;
+            } else {
+                half = Math.floor(str/2);
+            }
+            setAttrs({
+                strengthhalf: half
+            });
+        });
+    });
+    on('sheet:opened',function(){
+        getAttrs(["SHEETVERSION"], function(values) {
+            var vers = parseInt(values.SHEETVERSION) || 0;
+            if (vers == 0) {
+                getAttrs(["strength"], function(values) {
+                    var str = parseInt(values.strength) || 0;
+                    var half = 0;
+                    if (str < 0 ) {
+                        half = str;
+                    } else {
+                        half = Math.floor(str/2);
+                    }
+                    setAttrs({
+                        strengthhalf: half,
+                        SHEETVERSION: 1.1
+                    });
+                });
+            }
+        });
+    });
 </script>
 
 <!-- ========= SHEET ========= -->
 <div class="sheet-bgmain">
-
+    <input type="hidden" name="attr_SHEETVERSION" value="0" />
     <!-- ========= BASICS ========= -->
     <div class="sheet-absinp sheet-whitelab1" style="left: 226px;top:35px;text-align: right;">
         <span class="sheet-libBlack1" data-i18n="name">Name</span>
@@ -103,7 +137,7 @@
     </div>
     <div class="sheet-absinp" style="left: 114px;top:184px;">
         <input type="number" name="attr_strength" class="sheet-iptnumrond" data-i18n-title="strength" title="Strength" value="0" />
-        <input type="hidden" name="attr_strengthhalf" value="[[floor(@{strength}/2)]]" disabled />
+        <input type="hidden" name="attr_strengthhalf" value="0" />
     </div>
     <div class="sheet-absinp" style="left: 70px;top:188px;">
         <button type="roll" class="sheet-butd6small block" name="RollStrength" data-i18n-title="strength-roll" title="Strength roll" value="&{template:tmplt} {{character=@{character_name}}} {{title=^{strength}}} {{subtitle=-}} {{task=1}} {{roll=[[2d6+(@{strength})[Strength]+(?{Modifier|0})[Modifier]]]}}" ></button>
@@ -173,11 +207,11 @@
         <input type="number" name="attr_melee" class="sheet-iptnumrond" data-i18n-title="melee" title="Melee" value="0" />
     </div>
     <div class="sheet-absinp" style="left: 110px;top:414px;">
-        <button type="roll" class="sheet-butd6small" name="RollMelee" data-i18n-title="melee-roll" title="Melee attack roll" value="&{template:tmplt} {{character=@{character_name}}} {{title=^{melee-attack}}} {{subtitle=-}} {{task=1}} {{roll=[[2d6+(?{Attribute|Agility,@{agility}|Strengh,@{strength}})[Attribute]+(@{melee})[Melee]-(?{Target’s defence|0})[Target’s defence]+(?{Modifier|0})[Modifier]]]}}" ></button>
+        <button type="roll" class="sheet-butd6small" name="RollMelee" data-i18n-title="melee-roll" title="Melee attack roll" value="&{template:tmplt} {{character=@{character_name}}} {{title=^{melee-attack}}} {{subtitle=-}} {{task=1}} {{roll=[[2d6+?{Attribute|Agility,(@{agility})[Agility]+(@{armourpenalty})[Armour penalty]|Strengh,(@{strength})[Strengh]}+(@{melee})[Melee]-(?{Target’s defence|0})[Target’s defence]+(?{Modifier|0})[Modifier]]]}}" ></button>
     </div>
     <div class="sheet-absinp" style="left: 95px;top:450px;">
-        <button type="roll" class="sheet-butd6smallgreen" name="RollMeleeBonus" data-i18n-title="melee-roll-bonus-die" title="Melee attack roll with a Bonus die" value="&{template:tmplt} {{character=@{character_name}}} {{title=^{melee-attack}}} {{task=1}} {{subtitle=^{with-bonus-die}}} {{roll=[[3d6kh2+(?{Attribute|Agility,@{agility}|Strengh,@{strength}})[Attribute]+(@{melee})[Melee]-(?{Target’s defence|0})[Target’s defence]+(?{Modifier|0})[Modifier]]]}}" ></button>
-        <button type="roll" class="sheet-butd6smallred" name="RollMeleePenalty" data-i18n-title="melee-roll-penalty-die" title="Melee attack roll with a Penalty die" value="&{template:tmplt} {{character=@{character_name}}} {{title=^{melee-attack}}} {{task=1}} {{subtitle=^{with-penalty-die}}} {{roll=[[3d6kl2+(?{Attribute|Agility,@{agility}|Strengh,@{strength}})[Attribute]+(@{melee})[Melee]-(?{Target’s defence|0})[Target’s defence]+(?{Modifier|0})[Modifier]]]}}" ></button>
+        <button type="roll" class="sheet-butd6smallgreen" name="RollMeleeBonus" data-i18n-title="melee-roll-bonus-die" title="Melee attack roll with a Bonus die" value="&{template:tmplt} {{character=@{character_name}}} {{title=^{melee-attack}}} {{task=1}} {{subtitle=^{with-bonus-die}}} {{roll=[[3d6kh2+?{Attribute|Agility,(@{agility})[Agility]+(@{armourpenalty})[Armour penalty]|Strengh,(@{strength})[Strengh]}+(@{melee})[Melee]-(?{Target’s defence|0})[Target’s defence]+(?{Modifier|0})[Modifier]]]}}" ></button>
+        <button type="roll" class="sheet-butd6smallred" name="RollMeleePenalty" data-i18n-title="melee-roll-penalty-die" title="Melee attack roll with a Penalty die" value="&{template:tmplt} {{character=@{character_name}}} {{title=^{melee-attack}}} {{task=1}} {{subtitle=^{with-penalty-die}}} {{roll=[[3d6kl2+?{Attribute|Agility,(@{agility})[Agility]+(@{armourpenalty})[Armour penalty]|Strengh,(@{strength})[Strengh]}+(@{melee})[Melee]-(?{Target’s defence|0})[Target’s defence]+(?{Modifier|0})[Modifier]]]}}" ></button>
     </div>
     <!-- RANGE -->
     <div class="sheet-absinp" style="left: 73px;top:520px;">
@@ -187,11 +221,11 @@
         <input type="number" name="attr_ranged" class="sheet-iptnumrond" data-i18n-title="ranged" title="Ranged" value="0" />
     </div>
     <div class="sheet-absinp" style="left: 110px;top:498px;">
-        <button type="roll" class="sheet-butd6small" name="RollRanged" data-i18n-title="range-roll" title="Ranged attack roll" value="&{template:tmplt} {{character=@{character_name}}} {{title=^{ranged-attack}}} {{subtitle=-}} {{task=1}} {{roll=[[2d6+(?{Range|Point Blank,1|Close,0|Medium,-1|Long,-2|Distant,-4|Extreme,-6|Utmost,-8})[Range]+(@{agility})[Agility]+(@{ranged})[Ranged]-(?{Target’s defence|0})[Target’s defence]+(?{Modifier|0})[Modifier]]]}}" ></button>
+        <button type="roll" class="sheet-butd6small" name="RollRanged" data-i18n-title="range-roll" title="Ranged attack roll" value="&{template:tmplt} {{character=@{character_name}}} {{title=^{ranged-attack}}} {{subtitle=-}} {{task=1}} {{roll=[[2d6+(?{Range|Point Blank,1|Close,0|Medium,-1|Long,-2|Distant,-4|Extreme,-6|Utmost,-8})[Range]+(@{agility})[Agility]+(@{armourpenalty})[Armour penalty]+(@{ranged})[Ranged]-(?{Target’s defence|0})[Target’s defence]+(?{Modifier|0})[Modifier]]]}}" ></button>
     </div>
     <div class="sheet-absinp" style="left: 95px;top:534px;">
-        <button type="roll" class="sheet-butd6smallgreen" name="RollRangeBonus" data-i18n-title="range-roll-bonus-die" title="Ranged attack roll with a Bonus die" value="&{template:tmplt} {{character=@{character_name}}} {{title=^{ranged-attack}}} {{task=1}} {{subtitle=^{with-bonus-die}}} {{roll=[[3d6kh2+(?{Range|Point Blank,1|Close,0|Medium,-1|Long,-2|Distant,-4|Extreme,-6|Utmost,-8})[Range]+(@{agility})[Agility]+(@{ranged})[Ranged]-(?{Target’s defence|0})[Target’s defence]+(?{Modifier|0})[Modifier]]]}}" ></button>
-        <button type="roll" class="sheet-butd6smallred" name="RollRangePenalty" data-i18n-title="range-roll-penalty-die" title="Ranged attack roll with a Penalty die" value="&{template:tmplt} {{character=@{character_name}}} {{title=^{ranged-attack}}} {{task=1}} {{subtitle=^{with-penalty-die}}} {{roll=[[3d6kl2+(?{Range|Point Blank,1|Close,0|Medium,-1|Long,-2|Distant,-4|Extreme,-6|Utmost,-8})[Range]+(@{agility})[Agility]+(@{ranged})[Ranged]-(?{Target’s defence|0})[Target’s defence]+(?{Modifier|0})[Modifier]]]}}" ></button>
+        <button type="roll" class="sheet-butd6smallgreen" name="RollRangeBonus" data-i18n-title="range-roll-bonus-die" title="Ranged attack roll with a Bonus die" value="&{template:tmplt} {{character=@{character_name}}} {{title=^{ranged-attack}}} {{task=1}} {{subtitle=^{with-bonus-die}}} {{roll=[[3d6kh2+(?{Range|Point Blank,1|Close,0|Medium,-1|Long,-2|Distant,-4|Extreme,-6|Utmost,-8})[Range]+(@{agility})[Agility]+(@{armourpenalty})[Armour penalty]+(@{ranged})[Ranged]-(?{Target’s defence|0})[Target’s defence]+(?{Modifier|0})[Modifier]]]}}" ></button>
+        <button type="roll" class="sheet-butd6smallred" name="RollRangePenalty" data-i18n-title="range-roll-penalty-die" title="Ranged attack roll with a Penalty die" value="&{template:tmplt} {{character=@{character_name}}} {{title=^{ranged-attack}}} {{task=1}} {{subtitle=^{with-penalty-die}}} {{roll=[[3d6kl2+(?{Range|Point Blank,1|Close,0|Medium,-1|Long,-2|Distant,-4|Extreme,-6|Utmost,-8})[Range]+(@{agility})[Agility]+(@{armourpenalty})[Armour penalty]+(@{ranged})[Ranged]-(?{Target’s defence|0})[Target’s defence]+(?{Modifier|0})[Modifier]]]}}" ></button>
     </div>
     <!-- DEFENSE -->
     <div class="sheet-absinp" style="left: 73px;top:605px;">

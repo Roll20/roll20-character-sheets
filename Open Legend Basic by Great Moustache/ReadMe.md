@@ -5,6 +5,13 @@
 
 ### Changelog
 
+### 1.7.3 on 2016 December 23rd
+* Added an option under "Favored Actions" and "Other Actions" to allow modification of dice size for rolling
+	- This is mainly for the "Martial Focus" feat, or anyothers that may come along (maybe even items).
+
+### 1.7.2 ON 2016 December 23rd
+* Changed refrences from Supernatural to Extraordinary where applicable
+
 ### 1.7.1 on 2016 December 15th
 * Modified power level to have a min and max value to input
 	- Success message in chat output based on min value, but tells you for both.
