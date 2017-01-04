@@ -164,7 +164,7 @@ repeating_items
     };
     
     // Anytime Armor, Shield, Evasion_other, toughness_other changed, update toughness and evasion
-    on("change:armor change:shield change:evasion_other change:toughness_other change:agility_substitution change:fortitude_substitution", function() {
+    on("change:armor change:shield change:evasion_other change:toughness_other change:agility_substitution change:fortitude_substitution change:might_substitution", function() {
         calcEvasion();
         calcToughness();
     });
@@ -318,15 +318,20 @@ repeating_items
 
     // Function to calculate Evasion, called when changes made to Armor, Shield, Agility, or evasion other
     function calcEvasion() {
-        getAttrs(["agility_score", "agility_substitution", "armor", "shield", "evasion_other"], function(values) {
+        getAttrs(["agility_score", "agility_substitution", "might_score", "might_substitution", "armor", "evasion_other"], function(values) {
             var score = 0;
             if (values.agility_score*1 >= values.agility_substitution*1) {
                 score = values.agility_score*1;
             } else {
                 score = values.agility_substitution*1;
             }
+            if (values.might_score*1 >= values.might_substitution*1) {
+                score = score + values.might_score*1;
+            } else {
+                score = score + values.might_substitution*1;
+            }
             setAttrs({
-                "evasion": score + values.armor*1 + values.shield*1 + values.evasion_other*1 + 10
+                "evasion": score + values.armor*1 + values.evasion_other*1 + 10
             });
         });
     };
@@ -575,6 +580,7 @@ repeating_items
     on("change:might_score change:might_dice_d20 change:might_cost_modifier change:might_dice_modifier", function() {
 		calcMight();
 		calcHeavy();
+		calcEvasion();
         calcAllActionRolls();
     });
 	
@@ -2319,7 +2325,7 @@ var TAS = TAS || (function(){
 <!-- Main body of Character Sheet -->
 <div class="container">     <!-- defines the width/height & behavior of the page -->
     <div class="row width100 padBottom">
-        <div class="column textSmall textRight padRight">2016.12.29 <span class="bold">Version 1.7.4 </span> <input class="settings" type="checkbox" name="attr_sheet_settings_flag" value="hide" /><span>y</span></div>
+        <div class="column textSmall textRight padRight">2017.01.04 <span class="bold">Version 1.7.5 </span> <input class="settings" type="checkbox" name="attr_sheet_settings_flag" value="hide" /><span>y</span></div>
     </div>
     <div class="row width100">
         <div class="column width10 inlineBlock textSmall bold">Character Info</div>
@@ -3065,7 +3071,7 @@ var TAS = TAS || (function(){
             <div class="evasion vertTop padTop">
                 <div class="inlineBlock vertTop padTop" style="width: 155px;">
                     <div class="column width100 textCenter resistButton">
-                        <button type="roll" name="roll_resist_bane" value="&{template:openLegend} {{title= Resist Bane Roll}} {{subTitle= @{character_name}}} {{roll= [[1d20]]}} {{target= 10+ bane is removed}}">Evasion</button>
+                        <button type="roll" name="roll_resist_bane" value="&{template:openLegend} {{title= Resist Bane Roll}} {{subTitle= @{character_name}}} {{roll= [[1d20]]}} {{target= 10+ bane is removed}}">Resilience</button>
                     </div>
                     <div class="column width100 inputNumberLarge padTop"><input type="number" name="attr_evasion" value=0 /></div>
                 </div>
@@ -3074,10 +3080,13 @@ var TAS = TAS || (function(){
                         <div class="column width100 height5"></div>
                         <div class="column width1of3 inputNumber30 inlineBlock"><input type="number" name="attr_show_agility_score" value="@{agility_score}" disabled="disabled" /></div>
                         <div class="column width2of3 italic bold textLarge textLeft inlineBlock">Agility</div>
+                        <div class="column width1of3 inputNumber30 inlineBlock"><input type="number" name="attr_show_might_score" value="@{might_score}" disabled="disabled" /></div>
+                        <div class="column width2of3 italic bold textLarge padTop textLeft inlineBlock">Might</div>
                         <div class="column width1of3 inputNumber30 inlineBlock"><input type="number" name="attr_armor" value=0 /></div>
                         <div class="column width2of3 italic bold textLarge padTop textLeft inlineBlock">Armor</div>
-                        <div class="column width1of3 inputNumber30 inlineBlock"><input type="number" name="attr_shield" value=0 /></div>
+<!--                        <div class="column width1of3 inputNumber30 inlineBlock"><input type="number" name="attr_shield" value=0 /></div>
                         <div class="column width2of3 italic bold textLarge padTop textLeft inlineBlock">Shield</div>
+-->
                         <div class="column width1of3 inputNumber30 inlineBlock"><input type="number" name="attr_evasion_other" value="0" /></div>
                         <div class="column width2of3 italic bold textLarge padTop textLeft inlineBlock">Other</div>
                     </div>
