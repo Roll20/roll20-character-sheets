@@ -5,6 +5,38 @@
 
 ### Changelog
 
+### 1.7.4 on 2016 December 29th
+* Fixed an error in Workerscripts where it was unable to calculate b/c of a void value.
+	- Only happened on pre-existing Actions, newly created ones would work fine.
+* Added Power Level Min & Max to Other actions.
+
+### 1.7.3 on 2016 December 23rd
+* Added an option under "Favored Actions" and "Other Actions" to allow modification of dice size for rolling
+	- This is mainly for the "Martial Focus" feat, or anyothers that may come along (maybe even items).
+
+### 1.7.2 ON 2016 December 23rd
+* Changed refrences from Supernatural to Extraordinary where applicable
+
+### 1.7.1 on 2016 December 15th
+* Modified power level to have a min and max value to input
+	- Success message in chat output based on min value, but tells you for both.
+* Mozilla Firefox UI issues should now be resolved.
+
+### 1.7.0 on 2016 December 13th
+* Added another actions section
+	- Renamed Actions to "Favored Actions"
+	- Created "Other Actions"
+	- Allows players to better organize their actions, and with 1.6.8, hide so less cluttered
+* Added checkbox within actions if you need to specify a power level to roll at (for boons)
+	- Roll templete now will tell if you were Successful, or Failed to reach the power level
+
+### 1.6.9 on 2016 December 12th
+* Added a graphical change (blue highlight) to show which Physical Attribute is using substitution
+
+### 1.6.8 on 2016 December 11th
+* Added "check boxes" to show/hide different areas of the sheet
+	- Allows players to only see the information they want at a given time
+
 ### 1.6.7 on 2016 December 10th
 * Fixed a strange error where Presence would add 20 at a time to HP
 	- Caused by fortitude substitution not be forced into an integer type
