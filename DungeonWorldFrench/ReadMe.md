@@ -4,9 +4,18 @@ Feuille de Personnage en français pour [Dungeon World V1 et V2](http://dungeonw
 Basée sur la feuille VO de Willem den Besten (Morenim) et Devindra Payment (@Ardnived) ... et considérablement modifiée.
 
 # Version courante
-3.1 [Capture d'écran](dwfr.png)
+3.2 [Capture d'écran](dwfr.png)
 
 # Notes de version
+
+##v3.2 (2016-12-18)
+
+* Dans les actions appropriées, ajout d'un modificateur en saisie, à ajouter au jet de dégâts
+* Ajout d'une section "Divers"
+* Déplacement de l'onglet "Notes" dans la section "Divers"
+* Ajout d'une section répétable pour la gestion des Recrues dans la section "Divers"
+* Correction d'une anomalie occasionnelle dans la totalisation automatique de l'encombrement
+* Correction technique interne sur la gestion des retours à la ligne dans les Actions
 
 ##v3.1 (2016-11-21)
 

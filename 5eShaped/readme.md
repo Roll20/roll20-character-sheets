@@ -8,6 +8,8 @@ This is the redesigned Shaped character sheet for use on Roll20.net with the 5th
 
 [Documentation](https://docs.google.com/document/d/1yPcIZ_bIc3JlnWsKZt2tAB0EQSIVEfeMtT0GifbpJIg)
 
+[Changelog](https://github.com/mlenser/roll20-character-sheets/blob/master/5eShaped/changelog.md)
+
 ### Please report any bugs in the [issues tab](https://bitbucket.org/mlenser/5eshaped/issues). Please include screenshots if appropriate and please provide a full reproduction path (on a clean character sheet if possible).
 
 ## Features
