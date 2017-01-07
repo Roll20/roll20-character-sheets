@@ -1,3 +1,20 @@
+## 8.1.0
+
+### Features
+
+* Armor calculations have been refactored to be much easier to understand. Each armor type can now be "Light Armor", "Medium Armor", "Heavy Armor", or "Shield". Light, Medium, and Heavy add to Armored AC. Shield adds to both Armored and Unarmored AC. Unarmored AC is set more intuitively (see screenshot)
+
+![alt text](http://i.imgur.com/qwBZx8G.png "New Unarmored AC")
+
+### Bug Fixes
+
+* Movement and senses no longer have line breaks between the label and the input while in edit mode.
+* Every Armor type was adding dex as a result of some refactoring quite a while ago. This was most noticable on "Shield" ACs. This is fixed as per the new Armor calculations.
+
+### User Interface Changes
+
+* Inputs no longer have bottom borders by default. A few places have it manually.
+
 ## 8.0.0
 
 ### Breaking Changes
@@ -22,7 +39,6 @@
 * Size for PCs moved to the header next to race.
 
 ![alt text](http://i.imgur.com/7u7sJDI.png "Honor and Sanity")
-
 
 ### Bug Fixes
 
