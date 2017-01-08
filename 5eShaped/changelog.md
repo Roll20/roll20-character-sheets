@@ -1,3 +1,15 @@
+## 8.1.1
+
+### Bug Fixes
+
+* AC bonus for armor items is now correctly being added.
+* +X magic items of the versatile property now add the bonus damage to the secondary damage section. As a subset to this I now parse finesse and versatile at the start of the weapon parse so this should help clean up some code.
+* Ability checks macro now correctly adds the total value of each skill.
+
+### User Interface Changes
+
+* The top 2 rows of the center column for PCs have each had their width changed and other small styling tweaks
+
 ## 8.1.0
 
 ### Features
