@@ -1,3 +1,10 @@
+## 8.2.0
+
+### Features
+
+* Reliable talent added for rogue. This will work for rolling normally, with advantage, disadvantage, roll2, etc. This required a fair bit of refactoring around how "roll_setting" was set. The new version is much cleaner and easier to work with. Everything should be upgraded and working as intended.
+* Many tooltips are now translated (no forced upgrade, but any new sheet or any change to force it to recalc will update it)
+
 ## 8.1.1
 
 ### Bug Fixes
