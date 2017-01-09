@@ -1,3 +1,9 @@
+## 8.2.1
+
+### Bug Fixes
+
+* [#86: NPC action type changes after editing of freetext](https://bitbucket.org/mlenser/5eshaped/issues/86/npc-action-type-changes-after-editing-of). Also did some other refactoring to clean this area up. The toggle button is no longer cleared after each update (only on the initial one).
+
 ## 8.2.0
 
 ### Features
