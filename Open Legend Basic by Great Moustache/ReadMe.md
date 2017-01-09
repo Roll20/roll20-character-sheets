@@ -6,8 +6,8 @@
 ### Changelog
 
 ### 1.7.5 on 2017 January 4th
-* Updated for new calculation of evasion, and evasion's name changed to Resilience
-	- Resilience = 10 + Agility + Might + Armor + Other
+* Updated for new calculation of evasion, and evasion's name changed to Guard
+	- Guard = 10 + Agility + Might + Armor + Other
 
 ### 1.7.4 on 2016 December 29th
 * Fixed an error in Workerscripts where it was unable to calculate b/c of a void value.
