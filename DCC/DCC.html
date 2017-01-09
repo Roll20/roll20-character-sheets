@@ -16,10 +16,18 @@
   }
 
   /*
-   * Take a given ability score and recalculate it's modifier
+   * Take an ability score from a change event and recalculate its modifier
    */
   function abilityScoreChanged(event) {
     var ability = event.sourceAttribute;
+    saveAbilityScoreModifier(ability);
+  }
+
+  /*
+   * Recalculate and save an ability score's modifier based on its currently
+   * set value.
+   */
+  function saveAbilityScoreModifier(ability) {
     getAttrs([ability], function(values) {
       var params = {};
       params[ability+"_mod"] = calculateModifier(parseInt(values[ability], 10));
@@ -27,8 +35,20 @@
     });
   }
 
-  _.each(abilityScores, function(ability) {
-    on("change:"+ability, abilityScoreChanged);
+  on("sheet:opened", function() {
+    /*
+     * Whenever an ability score is changed, we update its modifier
+     */
+    _.each(abilityScores, function(ability) {
+      on("change:"+ability, abilityScoreChanged);
+    });
+
+    /*
+     * Ensure that there is an initial value set
+     */
+    _.each(abilityScores, function(ability) {
+      saveAbilityScoreModifier(ability);
+    });
   });
 </script>
 
