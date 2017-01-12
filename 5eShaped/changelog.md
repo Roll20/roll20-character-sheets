@@ -1,3 +1,12 @@
+## 8.3.0
+
+### Features
+
+* Attack, Saving Throw, Damage, Extras, Content, Ammo, etc toggles have all been revamped. I should no longer need to force the whole sheets to update when I change some variables here. These toggles are now stored in "roll_formula" which the sheet generates. This also allows me to improve the way that crit damage is added to the roll, closing [#88: [3D Dice] Crit damage dice should only show for attacks](https://bitbucket.org/mlenser/5eshaped/issues/88/3d-dice-crit-damage-dice-should-only-show)
+* Recharge has been revamped for translation again. Recharge can now be "Short or Long Rest", "Long Rest", "Turn", "Recharge 5-6", "Recharge 6". In the display it'll show as "1/Long Rest". All of this should be upgraded and parse from SRD properly
+* [#89: Magic Missile should drag from SRD as per RAW](https://bitbucket.org/mlenser/5eshaped/issues/89/magic-missile-should-drag-from-srd-as-per)
+* Added "per_use" for Attacks, Armor, and Equipment
+
 ## 8.2.1
 
 ### Bug Fixes
