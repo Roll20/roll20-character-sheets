@@ -6,7 +6,7 @@ Graphic design is based on the french edition.
 Background image courtesy of [Emmanuel Roudier](http://roudier-neandertal.blogspot.fr/), lead artist on BoL:Mythic, french edition.
 
 # Current version
-1.2 [Screenshot](bolm.jpg)
+1.3 [Screenshot](bolm.jpg)
 
 The sheet has integrated rolls (with chat roll templates).
 Every roll as a PC or NPC asks for, at least, a modifier (default 0).
@@ -22,6 +22,10 @@ Every roll as a PC or NPC asks for, at least, a modifier (default 0).
 Due to some temporary technical translation limitations of Roll20, the french version asks for roll variable (range, modifier etc.) in english, for now.
 
 # Release notes
+
+##v1.3 (2017-01-13)
+
+* Added (unofficial) German translation, by Marc M. (id 4134)
 
 ##v1.2 (2017-01-02)
 
