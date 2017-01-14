@@ -4,7 +4,7 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### Changelog
 
-* Roll templates update - date TBC
+* Roll templates update - 10th March
 Large update to switch the sheet to use the new roll20 roll template system for all output.  This has enabled some additional features to be added to the sheet but has required some minor changes to a few fields that will require user action to update once the sheet goes live.  [Full details can be found on the Roll20 forum](https://app.roll20.net/forum/post/1690480/#post-1690480)
 
 * Minor update - 15th November 2014
