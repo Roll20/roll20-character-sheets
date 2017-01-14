@@ -1,3 +1,9 @@
+## 8.5.0
+
+### Features
+
+* [#1: Track spells Prepared/Known](https://bitbucket.org/mlenser/5eshaped/issues/1/track-spells-prepared-known). Cantrips are not included as part of the known or prepared calculations.
+
 ## 8.4.0
 
 ### Features
