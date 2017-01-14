@@ -1,3 +1,15 @@
+## 8.4.0
+
+### Features
+
+* Psionics have been removed as I plan to use [psionics as spells](http://homebrewery.naturalcrit.com/share/r1bPpZOb8e)
+
+### Bug Fixes
+
+* The toggle upgrade was not toggling content for spells and was always toggling saving throw and extras for everything. This has been fixed now. As part of this toggle detection has been redone.
+* Size, Speed, and Senses in the NPC statblock macro are now fixed.
+* Recharge and cost now shows as part of action names in chat macros
+
 ## 8.3.0
 
 ### Features
