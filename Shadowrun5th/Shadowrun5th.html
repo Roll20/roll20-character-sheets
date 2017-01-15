@@ -9021,7 +9021,6 @@ on("change:chummercheckbox", function(){
                     attributes["armorcapacity"+i]="0";
                     attributes["armornotes"+i]="";
                 }
-                console.log(attributes);
                 try{
                     if(chummerfile.characters.character.metatype!=null)
                         attributes.metatype=chummerfile.characters.character.metatype;
@@ -9411,8 +9410,14 @@ on("change:chummercheckbox", function(){
                                 if(chummerfile.characters.character.spells.spell[i].category=="Rituals"){
                                     attributes["repeating_spells_"+newrowid+"_spellschool"]="@{skillrating67}";
                                     attributes["repeating_spells_"+newrowid+"_spelldrain"]="*2";
+                                    attributes["repeating_spells_"+newrowid+"_spellbonus"]=chummerfile.characters.character.spells.spell[i].dicepool-chummerfile.characters.character.skills.skill[58].total;
                                 }else{
                                     attributes["repeating_spells_"+newrowid+"_spellcategory"]=chummerfile.characters.character.spells.spell[i].category;
+                                    attributes["repeating_spells_"+newrowid+"_spellbonus"]=chummerfile.characters.character.spells.spell[i].dicepool-chummerfile.characters.character.skills.skill[62].total;
+                                    if(chummerfile.characters.character.spells.spell[i].alchemy=="True"){
+                                        attributes["repeating_spells_"+newrowid+"_spellschool"]="@{skillrating58}";
+                                        attributes["repeating_spells_"+newrowid+"_spellbonus"]=chummerfile.characters.character.spells.spell[i].dicepool-chummerfile.characters.character.skills.skill[1].total;
+                                    }
                                 }
                                 attributes["repeating_spells_"+newrowid+"_spellrange"]=chummerfile.characters.character.spells.spell[i].range;
                                 attributes["repeating_spells_"+newrowid+"_spellduration"]=chummerfile.characters.character.spells.spell[i].duration;
@@ -9421,13 +9426,24 @@ on("change:chummercheckbox", function(){
                             var newrowid=generateRowID();
                             attributes["repeating_spells_"+newrowid+"_spellname"]=chummerfile.characters.character.spells.spell.name;
                             attributes["repeating_spells_"+newrowid+"_spelltype"]=chummerfile.characters.character.spells.spell.type;
-                            attributes["repeating_spells_"+newrowid+"_spellcategory"]=chummerfile.characters.character.spells.spell.category;
-                            attributes["repeating_spells_"+newrowid+"_spellrange"]=chummerfile.characters.character.spells.spell.range;
-                            attributes["repeating_spells_"+newrowid+"_spellduration"]=chummerfile.characters.character.spells.spell.duration;
-                            if(chummerfile.characters.character.spells.spell[i].dv.match(/(\-|\+)\d/)!=null)
+                            if(chummerfile.characters.character.spells.spell.dv.match(/(\-|\+)\d/)!=null)
                                 attributes["repeating_spells_"+newrowid+"_spelldrain"]=chummerfile.characters.character.spells.spell.dv.match(/(\-|\+)\d/)[0];
                             else
                                 attributes["repeating_spells_"+newrowid+"_spelldrain"]="-0";
+                            if(chummerfile.characters.character.spells.spell.category=="Rituals"){
+                                attributes["repeating_spells_"+newrowid+"_spellschool"]="@{skillrating67}";
+                                attributes["repeating_spells_"+newrowid+"_spelldrain"]="*2";
+                                attributes["repeating_spells_"+newrowid+"_spellbonus"]=chummerfile.characters.character.spells.spell.dicepool-chummerfile.characters.character.skills.skill[58].total;
+                            }else{
+                                attributes["repeating_spells_"+newrowid+"_spellcategory"]=chummerfile.characters.character.spells.spell.category;
+                                attributes["repeating_spells_"+newrowid+"_spellbonus"]=chummerfile.characters.character.spells.spell.dicepool-chummerfile.characters.character.skills.skill[62].total;
+                                if(chummerfile.characters.character.spells.spell[i].alchemy=="True"){
+                                    attributes["repeating_spells_"+newrowid+"_spellschool"]="@{skillrating58}";
+                                    attributes["repeating_spells_"+newrowid+"_spellbonus"]=chummerfile.characters.character.spells.spell.dicepool-chummerfile.characters.character.skills.skill[1].total;
+                                }
+                            }
+                            attributes["repeating_spells_"+newrowid+"_spellrange"]=chummerfile.characters.character.spells.spell.range;
+                            attributes["repeating_spells_"+newrowid+"_spellduration"]=chummerfile.characters.character.spells.spell.duration;
                         }
                     }
                 }catch(err){
@@ -9614,12 +9630,10 @@ on("change:chummercheckbox", function(){
                                                     attributes["repeating_vehicles_"+newrowid+"_vehicleweaponnotes"]="";
                                                     if(typeof chummerfile.characters.character.vehicles.vehicle.mods.mod[j].weapons.weapon.accessories != "undefined"){
                                                         if(chummerfile.characters.character.vehicles.vehicle.mods.mod[j].weapons.weapon.accessories.accessory.length>1){
-                                                            console.log("dafuq");
                                                             for(var j=0;j<chummerfile.characters.character.vehicles.vehicle.mods.mod[j].weapons.weapon.accessories.accessory.length;j++){
                                                                 attributes["repeating_vehicles_"+newrowid+"_vehicleweaponnotes"]+=chummerfile.characters.character.vehicles.vehicle.mods.mod[j].weapons.weapon.accessories.accessory[j].name+"\n";
                                                             }
                                                         }else{
-                                                            console.log("not dafuq");
                                                             attributes["repeating_vehicles_"+newrowid+"_vehicleweaponnotes"]+=chummerfile.characters.character.vehicles.vehicle.mods.mod[j].weapons.weapon.accessories.accessory.name+"\n";
                                                         }
                                                     }
@@ -9646,12 +9660,10 @@ on("change:chummercheckbox", function(){
                                                 attributes["repeating_vehicles_"+newrowid+"_vehicleweaponnotes"]="";
                                                 if(typeof chummerfile.characters.character.vehicles.vehicle.mods.mod.weapons.weapon.accessories != "undefined"){
                                                     if(chummerfile.characters.character.vehicles.vehicle.mods.mod.weapons.weapon.accessories.accessory.length>1){
-                                                        console.log("dafuq");
                                                         for(var j=0;j<chummerfile.characters.character.vehicles.vehicle.mods.mod.weapons.weapon.accessories.accessory.length;j++){
                                                             attributes["repeating_vehicles_"+newrowid+"_vehicleweaponnotes"]+=chummerfile.characters.character.vehicles.vehicle.mods.mod.weapons.weapon.accessories.accessory[j].name+"\n";
                                                         }
                                                     }else{
-                                                        console.log("not dafuq");
                                                         attributes["repeating_vehicles_"+newrowid+"_vehicleweaponnotes"]+=chummerfile.characters.character.vehicles.vehicle.mods.mod.weapons.weapon.accessories.accessory.name+"\n";
                                                     }
                                                 }
@@ -9672,7 +9684,6 @@ on("change:chummercheckbox", function(){
                     var name='skillname'+i;
                     index[i-1]=name;
                 }
-                console.log("dafuq12");
                 getAttrs(index, function(names){
                     var exotics=73;
                     try{
@@ -9730,6 +9741,7 @@ on("change:chummercheckbox", function(){
                                                 if(chummerfile.characters.character.weapons.weapon[h-1].category!="Gear"){
                                                     if(names[compname]==chummerfile.characters.character.weapons.weapon[h-1].skill){
                                                         attributes["weaponcategory"+h]="@{skillrating"+j+"}";
+                                                        attributes["weaponbonus"+h]=chummerfile.characters.character.weapons.weapon[h-1].dicepool-chummerfile.characters.character.skills.skill[i].total;
                                                     }
                                                 }
                                             }
@@ -9737,6 +9749,7 @@ on("change:chummercheckbox", function(){
                                             if(chummerfile.characters.character.weapons.weapon.category!="Gear"){
                                                 if(names[compname]==chummerfile.characters.character.weapons.weapon.skill){
                                                     attributes["weaponcategory1"]="@{skillrating"+j+"}";
+                                                    attributes["weaponbonus1"]=chummerfile.characters.character.weapons.weapon.dicepool-chummerfile.characters.character.skills.skill[i].total;
                                                 }
                                             }
                                         }
