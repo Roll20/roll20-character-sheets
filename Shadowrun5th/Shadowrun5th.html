@@ -8974,6 +8974,10 @@ on("change:chummercheckbox", function(){
                     for(var i=0; i < idarrayd.length; i++) {
                     removeRepeatingRow("repeating_ware_"+idarrayd[i] );
                 }});
+                getSectionIDs("repeating_martial", function(idarrayd) {
+                    for(var i=0; i < idarrayd.length; i++) {
+                    removeRepeatingRow("repeating_martial_"+idarrayd[i] );
+                }});
                 getSectionIDs("repeating_spells", function(idarraye) {
                     for(var i=0; i < idarraye.length; i++) {
                     removeRepeatingRow("repeating_spells_"+idarraye[i] );
@@ -9397,60 +9401,6 @@ on("change:chummercheckbox", function(){
                     error="Error with Weapons"
                 }
                 try{
-                    if(chummerfile.characters.character.spells!=null){
-                        if(chummerfile.characters.character.spells.spell.length>1){
-                            for(var i=0;i<chummerfile.characters.character.spells.spell.length;i++){
-                                var newrowid=generateRowID();
-                                attributes["repeating_spells_"+newrowid+"_spellname"]=chummerfile.characters.character.spells.spell[i].name;
-                                attributes["repeating_spells_"+newrowid+"_spelltype"]=chummerfile.characters.character.spells.spell[i].type;
-                                if(chummerfile.characters.character.spells.spell[i].dv.match(/(\-|\+)\d/)!=null)
-                                    attributes["repeating_spells_"+newrowid+"_spelldrain"]=chummerfile.characters.character.spells.spell[i].dv.match(/(\-|\+)\d/)[0];
-                                else
-                                    attributes["repeating_spells_"+newrowid+"_spelldrain"]="-0";
-                                if(chummerfile.characters.character.spells.spell[i].category=="Rituals"){
-                                    attributes["repeating_spells_"+newrowid+"_spellschool"]="@{skillrating67}";
-                                    attributes["repeating_spells_"+newrowid+"_spelldrain"]="*2";
-                                    attributes["repeating_spells_"+newrowid+"_spellbonus"]=chummerfile.characters.character.spells.spell[i].dicepool-chummerfile.characters.character.skills.skill[58].total;
-                                }else{
-                                    attributes["repeating_spells_"+newrowid+"_spellcategory"]=chummerfile.characters.character.spells.spell[i].category;
-                                    attributes["repeating_spells_"+newrowid+"_spellbonus"]=chummerfile.characters.character.spells.spell[i].dicepool-chummerfile.characters.character.skills.skill[62].total;
-                                    if(chummerfile.characters.character.spells.spell[i].alchemy=="True"){
-                                        attributes["repeating_spells_"+newrowid+"_spellschool"]="@{skillrating58}";
-                                        attributes["repeating_spells_"+newrowid+"_spellbonus"]=chummerfile.characters.character.spells.spell[i].dicepool-chummerfile.characters.character.skills.skill[1].total;
-                                    }
-                                }
-                                attributes["repeating_spells_"+newrowid+"_spellrange"]=chummerfile.characters.character.spells.spell[i].range;
-                                attributes["repeating_spells_"+newrowid+"_spellduration"]=chummerfile.characters.character.spells.spell[i].duration;
-                            }
-                        }else{
-                            var newrowid=generateRowID();
-                            attributes["repeating_spells_"+newrowid+"_spellname"]=chummerfile.characters.character.spells.spell.name;
-                            attributes["repeating_spells_"+newrowid+"_spelltype"]=chummerfile.characters.character.spells.spell.type;
-                            if(chummerfile.characters.character.spells.spell.dv.match(/(\-|\+)\d/)!=null)
-                                attributes["repeating_spells_"+newrowid+"_spelldrain"]=chummerfile.characters.character.spells.spell.dv.match(/(\-|\+)\d/)[0];
-                            else
-                                attributes["repeating_spells_"+newrowid+"_spelldrain"]="-0";
-                            if(chummerfile.characters.character.spells.spell.category=="Rituals"){
-                                attributes["repeating_spells_"+newrowid+"_spellschool"]="@{skillrating67}";
-                                attributes["repeating_spells_"+newrowid+"_spelldrain"]="*2";
-                                attributes["repeating_spells_"+newrowid+"_spellbonus"]=chummerfile.characters.character.spells.spell.dicepool-chummerfile.characters.character.skills.skill[58].total;
-                            }else{
-                                attributes["repeating_spells_"+newrowid+"_spellcategory"]=chummerfile.characters.character.spells.spell.category;
-                                attributes["repeating_spells_"+newrowid+"_spellbonus"]=chummerfile.characters.character.spells.spell.dicepool-chummerfile.characters.character.skills.skill[62].total;
-                                if(chummerfile.characters.character.spells.spell[i].alchemy=="True"){
-                                    attributes["repeating_spells_"+newrowid+"_spellschool"]="@{skillrating58}";
-                                    attributes["repeating_spells_"+newrowid+"_spellbonus"]=chummerfile.characters.character.spells.spell.dicepool-chummerfile.characters.character.skills.skill[1].total;
-                                }
-                            }
-                            attributes["repeating_spells_"+newrowid+"_spellrange"]=chummerfile.characters.character.spells.spell.range;
-                            attributes["repeating_spells_"+newrowid+"_spellduration"]=chummerfile.characters.character.spells.spell.duration;
-                        }
-                    }
-                }catch(err){
-                    goodcode=false;
-                    error="Error with Spells"
-                }
-                try{
                     if(chummerfile.characters.character.complexforms!=null){
                         if(chummerfile.characters.character.complexforms.complexform.length>1){
                             for(var i=0;i<chummerfile.characters.character.complexforms.complexform.length;i++){
@@ -9686,8 +9636,20 @@ on("change:chummercheckbox", function(){
                 }
                 getAttrs(index, function(names){
                     var exotics=73;
+                    var alchemy=0;
+                    var spellcasting=0;
+                    var ritual=0;
                     try{
                         for(var i=0;i<chummerfile.characters.character.skills.skill.length;i++){
+                            if(chummerfile.characters.character.skills.skill[i].name=="Alchemy"){
+                                alchemy=i;
+                            }
+                            if(chummerfile.characters.character.skills.skill[i].name=="Spellcasting"){
+                                spellcasting=i;
+                            }
+                            if(chummerfile.characters.character.skills.skill[i].name=="Ritual Spellcasting"){
+                                ritual=i;
+                            }
                             if(chummerfile.characters.character.skills.skill[i].knowledge=="True"){
                                 var newrowid=generateRowID();
                                 attributes["repeating_knowledge_"+newrowid+"_knowledgename"]=chummerfile.characters.character.skills.skill[i].name;
@@ -9761,9 +9723,63 @@ on("change:chummercheckbox", function(){
                         goodcode=false;
                         error="Error with Skills"
                     }
+                    try{
+                        if(chummerfile.characters.character.spells!=null){
+                            if(chummerfile.characters.character.spells.spell.length>1){
+                                for(var i=0;i<chummerfile.characters.character.spells.spell.length;i++){
+                                    var newrowid=generateRowID();
+                                    attributes["repeating_spells_"+newrowid+"_spellname"]=chummerfile.characters.character.spells.spell[i].name;
+                                    attributes["repeating_spells_"+newrowid+"_spelltype"]=chummerfile.characters.character.spells.spell[i].type;
+                                    if(chummerfile.characters.character.spells.spell[i].dv.match(/(\-|\+)\d/)!=null)
+                                        attributes["repeating_spells_"+newrowid+"_spelldrain"]=chummerfile.characters.character.spells.spell[i].dv.match(/(\-|\+)\d/)[0];
+                                    else
+                                        attributes["repeating_spells_"+newrowid+"_spelldrain"]="-0";
+                                    if(chummerfile.characters.character.spells.spell[i].category=="Rituals"){
+                                        attributes["repeating_spells_"+newrowid+"_spellschool"]="@{skillrating67}";
+                                        attributes["repeating_spells_"+newrowid+"_spelldrain"]="*2";
+                                        attributes["repeating_spells_"+newrowid+"_spellbonus"]=chummerfile.characters.character.spells.spell[i].dicepool-chummerfile.characters.character.skills.skill[ritual].total;
+                                    }else{
+                                        attributes["repeating_spells_"+newrowid+"_spellcategory"]=chummerfile.characters.character.spells.spell[i].category;
+                                        attributes["repeating_spells_"+newrowid+"_spellbonus"]=chummerfile.characters.character.spells.spell[i].dicepool-chummerfile.characters.character.skills.skill[spellcasting].total;
+                                        if(chummerfile.characters.character.spells.spell[i].alchemy=="True"){
+                                            attributes["repeating_spells_"+newrowid+"_spellschool"]="@{skillrating58}";
+                                            attributes["repeating_spells_"+newrowid+"_spellbonus"]=chummerfile.characters.character.spells.spell[i].dicepool-chummerfile.characters.character.skills.skill[alchemy].total;
+                                        }
+                                    }
+                                    attributes["repeating_spells_"+newrowid+"_spellrange"]=chummerfile.characters.character.spells.spell[i].range;
+                                    attributes["repeating_spells_"+newrowid+"_spellduration"]=chummerfile.characters.character.spells.spell[i].duration;
+                                }
+                            }else{
+                                var newrowid=generateRowID();
+                                attributes["repeating_spells_"+newrowid+"_spellname"]=chummerfile.characters.character.spells.spell.name;
+                                attributes["repeating_spells_"+newrowid+"_spelltype"]=chummerfile.characters.character.spells.spell.type;
+                                if(chummerfile.characters.character.spells.spell.dv.match(/(\-|\+)\d/)!=null)
+                                    attributes["repeating_spells_"+newrowid+"_spelldrain"]=chummerfile.characters.character.spells.spell.dv.match(/(\-|\+)\d/)[0];
+                                else
+                                    attributes["repeating_spells_"+newrowid+"_spelldrain"]="-0";
+                                if(chummerfile.characters.character.spells.spell.category=="Rituals"){
+                                    attributes["repeating_spells_"+newrowid+"_spellschool"]="@{skillrating67}";
+                                    attributes["repeating_spells_"+newrowid+"_spelldrain"]="*2";
+                                    attributes["repeating_spells_"+newrowid+"_spellbonus"]=chummerfile.characters.character.spells.spell.dicepool-chummerfile.characters.character.skills.skill[ritual].total;
+                                }else{
+                                    attributes["repeating_spells_"+newrowid+"_spellcategory"]=chummerfile.characters.character.spells.spell.category;
+                                    attributes["repeating_spells_"+newrowid+"_spellbonus"]=chummerfile.characters.character.spells.spell.dicepool-chummerfile.characters.character.skills.skill[spellcasting].total;
+                                    if(chummerfile.characters.character.spells.spell[i].alchemy=="True"){
+                                        attributes["repeating_spells_"+newrowid+"_spellschool"]="@{skillrating58}";
+                                        attributes["repeating_spells_"+newrowid+"_spellbonus"]=chummerfile.characters.character.spells.spell.dicepool-chummerfile.characters.character.skills.skill[alchemy].total;
+                                    }
+                                }
+                                attributes["repeating_spells_"+newrowid+"_spellrange"]=chummerfile.characters.character.spells.spell.range;
+                                attributes["repeating_spells_"+newrowid+"_spellduration"]=chummerfile.characters.character.spells.spell.duration;
+                            }
+                        }
+                    }catch(err){
+                        goodcode=false;
+                        error="Error with Spells"
+                    }
                     attributes.warningcheckbox="0";
                     attributes.chummercheckbox="0";
-                    attributes.chummertext="Please check the following values manually:\n-Character Name\n-Limitmodifiers global or applying to single skills\n-Cyberdeck and Matrix Actions\n-Vehicle and Drone Autosofts\n-Weapon and Spell Specializations and Modifiers\n-SINs + Lifestyles"
+                    attributes.chummertext="Please check the following values manually:\n-Character Name\n-Limitmodifiers global or applying to single skills\n-Cyberdeck and Matrix Actions\n-Vehicle and Drone Autosofts\n-SINs + Lifestyles"
                     if(goodcode){
                         try{
                             setAttrs(attributes);
