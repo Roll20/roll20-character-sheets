@@ -1,3 +1,12 @@
+## 8.5.1
+
+### Bug Fixes
+
+* Speed and Senses now round to the nearest full number when converting to meters.
+* [#94: Weapon damage ability modifier reseting](https://bitbucket.org/mlenser/5eshaped/issues/94/weapon-damage-ability-modifier-reseting). Also fixed the attack ability and use the meters/feet toggle to read the distance for reach parsing.
+* Spell widths adjusted to be more consistent. [#91: Low width for spells outside condensed mode](https://bitbucket.org/mlenser/5eshaped/issues/91/low-width-for-spells-outside-condensed)
+* Possibly fixed [#92: Check Valid data entry of "senses"](https://bitbucket.org/mlenser/5eshaped/issues/92/check-valid-data-entry-of-senses), but it's impossible to tell as I don't have Volo.
+
 ## 8.5.0
 
 ### Features
