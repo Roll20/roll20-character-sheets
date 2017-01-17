@@ -222,6 +222,7 @@
         <input type="hidden" name="attr_npc_passiveperceptionbase" accept="Passive Perception">
         <input type="hidden" name="attr_npc_skillsbase" accept="Skills">
         <input type="hidden" name="attr_npc_content" accept="Content">
+        <input type="hidden" name="attr_token_size" accept="Token Size">
         <div class="row title">
             <span data-i18n="gen-opts-u">GENERAL OPTIONS</span>
         </div>
@@ -5737,12 +5738,29 @@
 
     on("sheet:compendium-drop", function() {
         setAttrs({dtype: "full"});
-        getAttrs(["hp_max","npc_senses"], function(v) {
-            var lr = ""
-             if(v["npc_senses"].toLowerCase().match(/(darkvision|blindsight|tremorsense|truesight)/)) {
+        getAttrs(["hp_max","npc_senses","token_size"], function(v) {
+            var lr = "";
+            var tokenwidth = 70;
+            var tokenheight = 70;
+            if(v["npc_senses"].toLowerCase().match(/(darkvision|blindsight|tremorsense|truesight)/)) {
                 lr = Math.max.apply(Math, v["npc_senses"].match(/\d+/g));
-             }
+            }
+            if(v["token_size"]) {
+                var squarelength = 70;
+                if(v["token_size"].indexOf(",") > -1) {
+                    var setwidth = !isNaN(v["token_size"].split(",")[0]) ? v["token_size"].split(",")[0] : 1;
+                    var setheight = !isNaN(v["token_size"].split(",")[1]) ? v["token_size"].split(",")[1] : 1;
+                    tokenwidth = setwidth * squarelength;
+                    tokenheight = setheight * squarelength;
+                } 
+                else {
+                    tokenwidth = squarelength * v["token_size"]
+                    tokenheight = squarelength * v["token_size"]
+                };
+            }
             setDefaultToken({
+                width: tokenwidth,
+                height: tokenheight,
                 bar2_link: "npc_ac",
                 bar1_value: v["hp_max"],
                 bar1_max: v["hp_max"],
