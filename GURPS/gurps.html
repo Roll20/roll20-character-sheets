@@ -2105,3 +2105,52 @@
 </span>
 
 <br />
+
+<script type="text/worker">
+	// Update the line total weight and cost
+	on("change:repeating_item:count change:repeating_item:count change:repeating_item:weight", function (e) {
+		getAttrs([
+			"repeating_item_count",
+			"repeating_item_cost",
+			"repeating_item_weight",
+			"repeating_item_carried"
+		], function (item) {
+			setAttrs({
+				repeating_item_weighttotal: Math.round(item.repeating_item_count * item.repeating_item_weight * item.repeating_item_carried * 100) / 100,
+				repeating_item_costtotal: Math.round(item.repeating_item_count * item.repeating_item_cost * 100) / 100
+			});
+		});
+	});
+
+	// Update the total weight of all carried items.
+	on("change:repeating_item:weighttotal remove:repeating_item", function (e) {
+		getSectionIDs("repeating_item", function (itemIDs) {
+			var totalWeight = 0;
+			var weightTally = _.after(itemIDs.length, function () {
+				setAttrs({ total_weight: Math.round(totalWeight * 100) / 100 });
+			});
+			for (var i = 0; i < itemIDs.length; i++) {
+				getAttrs(["repeating_item_" + itemIDs[i] + "_weighttotal"], function (v) {
+					totalWeight += parseFloat(v[Object.keys(v)[0]]);
+					weightTally();
+				});
+			}
+		});
+	});
+
+	// Update the total cost of all items.
+	on("change:repeating_item:costtotal remove:repeating_item", function (e) {
+		getSectionIDs("repeating_item", function (itemIDs) {
+			var totalCost = 0;
+			var costTally = _.after(itemIDs.length, function () {
+				setAttrs({ total_value: Math.round(totalCost * 100) / 100 });
+			});
+			for (var i = 0; i < itemIDs.length; i++) {
+				getAttrs(["repeating_item_" + itemIDs[i] + "_costtotal"], function (v) {
+					totalCost += parseFloat(v[Object.keys(v)[0]]);
+					costTally();
+				});
+			}
+		});
+	});
+</script>
