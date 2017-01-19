@@ -164,7 +164,7 @@ repeating_items
     };
     
     // Anytime Armor, Shield, Evasion_other, toughness_other changed, update toughness and evasion
-    on("change:armor change:shield change:evasion_other change:toughness_other change:agility_substitution change:fortitude_substitution", function() {
+    on("change:armor change:shield change:evasion_other change:toughness_other change:agility_substitution change:fortitude_substitution change:might_substitution", function() {
         calcEvasion();
         calcToughness();
     });
@@ -318,15 +318,20 @@ repeating_items
 
     // Function to calculate Evasion, called when changes made to Armor, Shield, Agility, or evasion other
     function calcEvasion() {
-        getAttrs(["agility_score", "agility_substitution", "armor", "shield", "evasion_other"], function(values) {
+        getAttrs(["agility_score", "agility_substitution", "might_score", "might_substitution", "armor", "evasion_other"], function(values) {
             var score = 0;
             if (values.agility_score*1 >= values.agility_substitution*1) {
                 score = values.agility_score*1;
             } else {
                 score = values.agility_substitution*1;
             }
+            if (values.might_score*1 >= values.might_substitution*1) {
+                score = score + values.might_score*1;
+            } else {
+                score = score + values.might_substitution*1;
+            }
             setAttrs({
-                "evasion": score + values.armor*1 + values.shield*1 + values.evasion_other*1 + 10
+                "evasion": score + values.armor*1 + values.evasion_other*1 + 10
             });
         });
     };
@@ -575,6 +580,7 @@ repeating_items
     on("change:might_score change:might_dice_d20 change:might_cost_modifier change:might_dice_modifier", function() {
 		calcMight();
 		calcHeavy();
+		calcEvasion();
         calcAllActionRolls();
     });
 	
@@ -1357,7 +1363,7 @@ repeating_items
         getSectionIDs("repeating_actions", function(actionsArray) {
          if(actionsArray.length > 0) {
             _.each(actionsArray, function(currentID, i) {
-                getAttrs(["repeating_actions_" + currentID + "_action_attribute", "repeating_actions_" + currentID + "_dice_d20", "repeating_actions_" + currentID + "_use_power_level", "repeating_actions_" + currentID + "_power_level", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(v) {
+                getAttrs(["repeating_actions_" + currentID + "_action_attribute", "repeating_actions_" + currentID + "_dice_d20", "repeating_actions_" + currentID + "_dice_modifier", "repeating_actions_" + currentID + "_use_power_level", "repeating_actions_" + currentID + "_power_level", "repeating_actions_" + currentID + "_power_level_max", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(v) {
                     var update = {};
                     var score = 0;
                     if(v["repeating_actions_" + currentID + "_action_attribute"] === "Agility") {
@@ -1397,6 +1403,11 @@ repeating_items
                     } else if(v["repeating_actions_" + currentID + "_action_attribute"] === "Protection") {
                         score = v.protection_score*1 + v.protection_dice_modifier*1;
                     }
+                    if(isNaN(v["repeating_actions_" + currentID + "_dice_modifier"])) {
+                        update["repeating_actions_" + currentID + "_dice_modifier"] = 0;
+                    } else {
+                        score = score*1 + v["repeating_actions_" + currentID + "_dice_modifier"]*1;
+                    }
                     var number = calcAttributeDiceNumber(score);
                     var type = calcAttributeDiceType(score);
                     var roll = "";
@@ -1411,6 +1422,7 @@ repeating_items
         			}
                     if(v["repeating_actions_" + currentID + "_use_power_level"] === "Yes") {
                         update["repeating_actions_" + currentID + "_power_target"] = "[[10 + " + v["repeating_actions_" + currentID + "_power_level"]*2 + "]]";
+                        update["repeating_actions_" + currentID + "_power_target_max"] = "[[10 + " + v["repeating_actions_" + currentID + "_power_level_max"]*2 + "]]";
                     } else {
                         update["repeating_actions_" + currentID + "_power_target"] = "";
                     }
@@ -1426,7 +1438,7 @@ repeating_items
         getSectionIDs("repeating_otheractions", function(actionsArray) {
          if(actionsArray.length > 0) {
             _.each(actionsArray, function(currentID, i) {
-                getAttrs(["repeating_otheractions_" + currentID + "_action_attribute", "repeating_otheractions_" + currentID + "_dice_d20", "repeating_otheractions_" + currentID + "_use_power_level", "repeating_otheractions_" + currentID + "_power_level", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(v) {
+                getAttrs(["repeating_otheractions_" + currentID + "_action_attribute", "repeating_otheractions_" + currentID + "_dice_d20", "repeating_otheractions_" + currentID + "_dice_modifier", "repeating_otheractions_" + currentID + "_use_power_level", "repeating_otheractions_" + currentID + "_power_level", "repeating_otheractions_" + currentID + "_power_level_max", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(v) {
                     var updateother = {};
                     var score = 0;
                     if(v["repeating_otheractions_" + currentID + "_action_attribute"] === "Agility") {
@@ -1466,6 +1478,11 @@ repeating_items
                     } else if(v["repeating_otheractions_" + currentID + "_action_attribute"] === "Protection") {
                         score = v.protection_score*1 + v.protection_dice_modifier*1;
                     }
+                    if(isNaN(v["repeating_otheractions_" + currentID + "_dice_modifier"])) {
+                        update["repeating_otheractions_" + currentID + "_dice_modifier"] = 0;
+                    } else {
+                        score = score*1 + v["repeating_otheractions_" + currentID + "_dice_modifier"]*1;
+                    }
                     var number = calcAttributeDiceNumber(score);
                     var type = calcAttributeDiceType(score);
                     var roll = "";
@@ -1480,6 +1497,7 @@ repeating_items
         			}
                     if(v["repeating_otheractions_" + currentID + "_use_power_level"] === "Yes") {
                         updateother["repeating_otheractions_" + currentID + "_power_target"] = "[[10 + " + v["repeating_otheractions_" + currentID + "_power_level"]*2 + "]]";
+                        updateother["repeating_otheractions_" + currentID + "_power_target_max"] = "[[10 + " + v["repeating_otheractions_" + currentID + "_power_level_max"]*2 + "]]";
                     } else {
                         updateother["repeating_otheractions_" + currentID + "_power_target"] = "";
                     }
@@ -1522,8 +1540,8 @@ repeating_items
         });
     });
 	// On Change for calculating rolls for Actions
-    on("change:repeating_actions:action_attribute change:repeating_actions:dice_d20", function() {
-        getAttrs(["repeating_actions_action_attribute", "repeating_actions_dice_d20", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(values) {
+    on("change:repeating_actions:action_attribute change:repeating_actions:dice_d20 change:repeating_actions:dice_modifier", function() {
+        getAttrs(["repeating_actions_action_attribute", "repeating_actions_dice_d20", "repeating_actions_dice_modifier", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(values) {
             var score = 0;
             if(values.repeating_actions_action_attribute === "Agility") {
                 score = values.agility_score*1 + values.agility_dice_modifier*1;
@@ -1562,13 +1580,22 @@ repeating_items
             } else if(values.repeating_actions_action_attribute === "Protection") {
                 score = values.protection_score*1 + values.protection_dice_modifier*1;
             }
+            if(isNaN(values.repeating_actions_dice_modifier)) {
+                setAttrs({  "repeating_actions_dice_modifier": 0    });
+            } else {
+                score = score*1 + values.repeating_actions_dice_modifier*1;
+            }
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
 			var roll = "";
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
 			} else {
-				roll = "[[" + values.repeating_actions_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}" + number + "]]";
+			    if(isNaN(values.repeating_actions_dice_d20)) {
+    				roll = "[[1d20!! + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}" + number + "]]";
+			    } else {
+    				roll = "[[" + values.repeating_actions_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}" + number + "]]";
+			    }
 			}
             setAttrs({
                 "repeating_actions_dice_roll": roll
@@ -1576,8 +1603,8 @@ repeating_items
         });
     });
 	// On Change for calculating rolls for Actions
-    on("change:repeating_otheractions:action_attribute change:repeating_otheractions:dice_d20", function() {
-        getAttrs(["repeating_otheractions_action_attribute", "repeating_otheractions_dice_d20", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(values) {
+    on("change:repeating_otheractions:action_attribute change:repeating_otheractions:dice_d20 change:repeating_otheractions:dice_modifier", function() {
+        getAttrs(["repeating_otheractions_action_attribute", "repeating_otheractions_dice_d20", "repeating_otheractions_dice_modifier", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(values) {
             var score = 0;
             if(values.repeating_otheractions_action_attribute === "Agility") {
                 score = values.agility_score*1 + values.agility_dice_modifier*1;
@@ -1616,13 +1643,22 @@ repeating_items
             } else if(values.repeating_otheractions_action_attribute === "Protection") {
                 score = values.protection_score*1 + values.protection_dice_modifier*1;
             }
+            if(isNaN(values.repeating_otheractions_dice_modifier)) {
+                setAttrs({  "repeating_otheractions_dice_modifier": 0    });
+            } else {
+                score = score*1 + values.repeating_otheractions_dice_modifier*1;
+            }
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
 			var roll = "";
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
 			} else {
-				roll = "[[" + values.repeating_otheractions_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}" + number + "]]";
+			    if(isNaN(values.repeating_otheractions_dice_d20)) {
+    				roll = "[[1d20!! + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}" + number + "]]";
+			    } else {
+    				roll = "[[" + values.repeating_otheractions_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither,h|Advantage,h|Disadvantage,l}" + number + "]]";
+			    }
 			}
             setAttrs({
                 "repeating_otheractions_dice_roll": roll
@@ -2289,7 +2325,7 @@ var TAS = TAS || (function(){
 <!-- Main body of Character Sheet -->
 <div class="container">     <!-- defines the width/height & behavior of the page -->
     <div class="row width100 padBottom">
-        <div class="column textSmall textRight padRight">2016.12.15 <span class="bold">Version 1.7.1 </span> <input class="settings" type="checkbox" name="attr_sheet_settings_flag" value="hide" /><span>y</span></div>
+        <div class="column textSmall textRight padRight">2017.01.04 <span class="bold">Version 1.7.5 </span> <input class="settings" type="checkbox" name="attr_sheet_settings_flag" value="hide" /><span>y</span></div>
     </div>
     <div class="row width100">
         <div class="column width10 inlineBlock textSmall bold">Character Info</div>
@@ -2780,8 +2816,8 @@ var TAS = TAS || (function(){
             </div>
         </div>
     <!-- end mental attributes -->
-    <!-- Supernatural Attributes -->
-        <div class="column width100 textLeft bold textLarger gray">SUPERNATURAL</div>
+    <!-- Extraordinary Attributes -->
+        <div class="column width100 textLeft bold textLarger gray">EXTRAORDINARY</div>
       <!-- Header Area -->
         <div class="row width100">
             <div class="column width45 inlineBlock textSmall textLeft bold italic">Click name to Roll</div>
@@ -3023,7 +3059,7 @@ var TAS = TAS || (function(){
                 </div>
             </div>
         </div>
-    <!-- end of supernatural attributes -->
+    <!-- end of EXTRAORDINARY attributes -->
     </div>
  <!-- end of left column for Attributes -->
 <div class="twoThird inlineBlock">
@@ -3035,7 +3071,7 @@ var TAS = TAS || (function(){
             <div class="evasion vertTop padTop">
                 <div class="inlineBlock vertTop padTop" style="width: 155px;">
                     <div class="column width100 textCenter resistButton">
-                        <button type="roll" name="roll_resist_bane" value="&{template:openLegend} {{title= Resist Bane Roll}} {{subTitle= @{character_name}}} {{roll= [[1d20]]}} {{target= 10+ bane is removed}}">Evasion</button>
+                        <button type="roll" name="roll_resist_bane" value="&{template:openLegend} {{title= Resist Bane Roll}} {{subTitle= @{character_name}}} {{roll= [[1d20]]}} {{target= 10+ bane is removed}}">Guard</button>
                     </div>
                     <div class="column width100 inputNumberLarge padTop"><input type="number" name="attr_evasion" value=0 /></div>
                 </div>
@@ -3044,10 +3080,13 @@ var TAS = TAS || (function(){
                         <div class="column width100 height5"></div>
                         <div class="column width1of3 inputNumber30 inlineBlock"><input type="number" name="attr_show_agility_score" value="@{agility_score}" disabled="disabled" /></div>
                         <div class="column width2of3 italic bold textLarge textLeft inlineBlock">Agility</div>
+                        <div class="column width1of3 inputNumber30 inlineBlock"><input type="number" name="attr_show_might_score" value="@{might_score}" disabled="disabled" /></div>
+                        <div class="column width2of3 italic bold textLarge padTop textLeft inlineBlock">Might</div>
                         <div class="column width1of3 inputNumber30 inlineBlock"><input type="number" name="attr_armor" value=0 /></div>
                         <div class="column width2of3 italic bold textLarge padTop textLeft inlineBlock">Armor</div>
-                        <div class="column width1of3 inputNumber30 inlineBlock"><input type="number" name="attr_shield" value=0 /></div>
+<!--                        <div class="column width1of3 inputNumber30 inlineBlock"><input type="number" name="attr_shield" value=0 /></div>
                         <div class="column width2of3 italic bold textLarge padTop textLeft inlineBlock">Shield</div>
+-->
                         <div class="column width1of3 inputNumber30 inlineBlock"><input type="number" name="attr_evasion_other" value="0" /></div>
                         <div class="column width2of3 italic bold textLarge padTop textLeft inlineBlock">Other</div>
                     </div>
@@ -3212,6 +3251,8 @@ var TAS = TAS || (function(){
                                 </select>
                             </div>
                             <input type="hidden" name="attr_dice_roll" value=0 />
+                            <div class="column width75 inlineBlock">Increase/Decrease dice size:</div>
+                            <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_dice_modifier" value=0 /></div>
                             <div class="column width55 inlineBlock">d20 for this action is:</div>
                             <input type="hidden" name="attr_dice_d20" value="1d20!!" />
                             <div class="column width45 inlineBlock inputSelect">
@@ -3296,6 +3337,8 @@ var TAS = TAS || (function(){
                                 </select>
                             </div>
                             <input type="hidden" name="attr_dice_roll" value=0 />
+                            <div class="column width75 inlineBlock">Increase/Decrease dice size:</div>
+                            <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_dice_modifier" value=0 /></div>
                             <div class="column width55 inlineBlock">d20 for this action is:</div>
                             <input type="hidden" name="attr_dice_d20" value="1d20!!" />
                             <div class="column width45 inlineBlock inputSelect">
@@ -3306,8 +3349,13 @@ var TAS = TAS || (function(){
                                 </select>
                             </div>
                             <input type="hidden" name="attr_power_target" value="" />
-                            <div class="column width75 inlineBlock"><input type="checkbox" class="checks25" name="attr_use_power_level" value="Yes" /> Use Power level:</div>
+                            <input type="hidden" name="attr_power_target_max" value=0 />
+                            <div class="column width50 inlineBlock"></div>
+                            <div class="column width25 inlineBlock textSmall bold">Minimum</div>
+                            <div class="column width25 inlineBlock textSmall bold">Maximum</div>
+                            <div class="column width50 inlineBlock"><input type="checkbox" class="checks25" name="attr_use_power_level" value="Yes" /> Use Power level</div>
                             <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_power_level" value=0 /></div>
+                            <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_power_level_max" value=0 /></div>
                             <div class="column width100 bold textSmall">Description/Special/Flavor Text</div>
                             <div class="column width100 resizeVert vertTop"><textarea class="height50" name="attr_action_special"></textarea></div>
                         </div>
