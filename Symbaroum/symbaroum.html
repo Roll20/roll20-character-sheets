@@ -1,5 +1,8 @@
 <!--
 *********LATEST CHANGES/ADDITIONS*********
+- fixed spelling error of "Disdvantage"
+- [by community request] added query to attribute rolls
+- [by community request] added sheetworker script with version check and a simple migration to convert weapon1-quality from a selector to a text input.  converts existing attribute data to text.
 - added and changed -moz-appearance: none; to -moz-appearance: textfield; since FF was nearly completely covering inputs with
 - fixed the fieldset name for burdens to "repeating_burdens"
 - updated fr.json to have lowercase translation for some of the roll template text
@@ -17,7 +20,13 @@ New Roll Template styles
 Advantage button - auto calculate +2atk and 1d4dmg
 Concentration check    
 ******************************************
+
 -->
+
+<!-- ADDED sheet_version. Used to establish sheet changes -->
+<span style="font-size: 12px;float: right;clear: both;margin-top: -.5em;">v<input name="attr_sheet_version" type="text" value="0" style="font-size: 12px;width: 3em;height: 1.5em; vertical-align: text-bottom;" readonly /></span>
+<!-- ADDED recalc checkbox to force sheet worker events. temp unhide for testing purposes-->
+<input name="attr_recalc1" type="checkbox" title="RECALC" style="display:none;">
 
 <!--*********MENU-->
 <input type="radio" name="attr_page-number" class="sheet-tab sheet-tab1" value="1" title="Character Sheet" data-i18n-title="title-character-sheet" checked="checked"/>
@@ -89,56 +98,56 @@ Concentration check
                 </div> 
                 <div>
                     <label data-i18n="accurate">Accurate</label>
-                    <button type='roll' value='/roll 1d20<[[@{accurate}]] Accurate ' name='roll_AccurateCheck'></button>
+                    <button type='roll' value='/roll 1d20<[[@{accurate}+?{Enemy Disadvantage|0}]] Accurate ' name='roll_AccurateCheck'></button>
                 </div>
             </div>    
             <div>
                 <div><input type="number"  class="sheet-number-circle" value="10" min="5" max="15" name="attr_cunning"/></div>
                 <div>
                     <label data-i18n="cunning">Cunning</label>
-                    <button type='roll' class="sheet-hidden" value='/roll 1d20<[[@{cunning}]] Cunning ' name='roll_CunningCheck'></button>
+                    <button type='roll' class="sheet-hidden" value='/roll 1d20<[[@{cunning}+?{Enemy Disadvantage|0}]] Cunning ' name='roll_CunningCheck'></button>
                 </div>
             </div>    
             <div>
                 <div><input type="number" class="sheet-number-circle" value="10" min="5" max="15" name="attr_discreet"/></div>
                 <div>
                     <label data-i18n="discreet">Discreet</label>
-                    <button type='roll' class="sheet-hidden" value='/roll 1d20<[[@{discreet}]] Discreet ' name='roll_DiscreetCheck'></button> 
+                    <button type='roll' class="sheet-hidden" value='/roll 1d20<[[@{discreet}+?{Enemy Disadvantage|0}]] Discreet ' name='roll_DiscreetCheck'></button> 
                 </div>
             </div>    
             <div>
                 <div><input type="number" class="sheet-number-circle" value="10" min="5" max="15" name="attr_persuasive"/></div>
                 <div>
                     <label data-i18n="persuasive">Persuasive</label>
-                    <button type='roll' class="sheet-hidden" value='/roll 1d20<[[@{persuasive}]] Persuasive ' name='roll_PersuasiveCheck'></button>
+                    <button type='roll' class="sheet-hidden" value='/roll 1d20<[[@{persuasive}+?{Enemy Disadvantage|0}]] Persuasive ' name='roll_PersuasiveCheck'></button>
                 </div>
             </div>
             <div>
                 <div><input type="number" class="sheet-number-circle" value="10" min="5" max="15" name="attr_quick"/></div>
                 <div>
                     <label data-i18n="quick">Quick</label>
-                    <button type='roll' class="sheet-hidden" value='/roll 1d20<[[@{quick}]] Quick ' name='roll_QuickCheck'></button>
+                    <button type='roll' class="sheet-hidden" value='/roll 1d20<[[@{quick}+?{Enemy Disadvantage|0}]] Quick ' name='roll_QuickCheck'></button>
                 </div>
             </div>    
             <div>
                 <div><input type="number" class="sheet-number-circle" value="10" min="5" max="15" name="attr_resolute"/></div>
                 <div>
                     <label data-i18n="resolute">Resolute</label>
-                    <button type='roll' class="sheet-hidden" value='/roll 1d20<[[@{resolute}]] Resolute ' name='roll_ResoluteCheck'></button> 
+                    <button type='roll' class="sheet-hidden" value='/roll 1d20<[[@{resolute}+?{Enemy Disadvantage|0}]] Resolute ' name='roll_ResoluteCheck'></button> 
                 </div> 
             </div>    
             <div>
                 <div><input type="number" class="sheet-number-circle" value="10" min="5" max="15" name="attr_strong"/></div>
                 <div>
                     <label data-i18n="strong">Strong</label>
-                    <button type='roll' class="sheet-hidden" value='/roll 1d20<[[@{strong}]] Strong ' name='roll_StrongCheck'></button>
+                    <button type='roll' class="sheet-hidden" value='/roll 1d20<[[@{strong}+?{Enemy Disadvantage|0}]] Strong ' name='roll_StrongCheck'></button>
                 </div>  
             </div>    
             <div>
                 <div><input type="number" class="sheet-number-circle" value="10" min="5" max="15" name="attr_vigilant"/></div>
                 <div>
                     <label data-i18n="vigilant">Vigilant</label>
-                    <button type='roll' class="sheet-hidden" value='/roll 1d20<[[@{vigilant}]] Vigilant ' name='roll_VigilantCheck'></button>
+                    <button type='roll' class="sheet-hidden" value='/roll 1d20<[[@{vigilant}+?{Enemy Disadvantage|0}]] Vigilant ' name='roll_VigilantCheck'></button>
                 </div>
             </div> 
             <div>
@@ -156,7 +165,7 @@ Concentration check
         <label class="sheet-label-large" style="margin: .5em 0 -.5em 0;" data-i18n="attacks">Attacks</label>    
         <div class="sheet-row-with-labels">
             <div>
-                <button type='roll' name="roll_attack" title="Use attack!" data-i18n-title="title-use-attack" value='&{template:attack}{{name=@{weapon1-name}}}{{attribute=[[@{attack-ability1}+?{Enemy Disdvantage|0}+@{weapon1-extra-attack}]]}}{{attribute1=[[@{attack-ability1}+?{Enemy Disdvantage|0}+@{weapon1-extra-attack}+1]]}} {{attack=[[1d20]]}} {{damage=[[@{weapon1-dtype}+@{weapon1-extra-dtype}+@{weapon1-extra-damage}]]}} {{damage-crit=[[1d6]]}} {{character-name=@{character-name}}} {{attack-type=[[@{attack-ability1}]]}}'style="background-image:url(http://i.imgur.com/EPH4536.png);background-position:center;background-repeat:no-repeat;height:100%;width:100%"></button>
+                <button type='roll' name="roll_attack" title="Use attack!" data-i18n-title="title-use-attack" value='&{template:attack}{{name=@{weapon1-name}}}{{attribute=[[@{attack-ability1}+?{Enemy Disadvantage|0}+@{weapon1-extra-attack}]]}}{{attribute1=[[@{attack-ability1}+?{Enemy Disadvantage|0}+@{weapon1-extra-attack}+1]]}} {{attack=[[1d20]]}} {{damage=[[@{weapon1-dtype}+@{weapon1-extra-dtype}+@{weapon1-extra-damage}]]}} {{damage-crit=[[1d6]]}} {{character-name=@{character-name}}} {{attack-type=[[@{attack-ability1}]]}}'style="background-image:url(http://i.imgur.com/EPH4536.png);background-position:center;background-repeat:no-repeat;height:100%;width:100%"></button>
             </div>
             <div>
                 <label data-i18n="weapon-or-power">Weapon or Power</label>
@@ -189,16 +198,7 @@ Concentration check
             </div>
             <div class="sheet-col-medium">
                 <label data-i18n="quality">Quality</label>
-				<select name="attr_weapon1-quality">
-                    <option value="0" selected> </option>
-                    <option value="1" data-i18n="balanced">Balanced</option>
-                    <option value="2" data-i18n="blunt">Blunt</option>
-                    <option value="3" data-i18n="deep-impact">Deep Impact</option>
-                    <option value="4" data-i18n="jointed">Jointed</option>
-                    <option value="5" data-i18n="long">Long</option>
-                    <option value="6" data-i18n="precise">Precise</option>
-                    <option value="7" data-i18n="short">Short</option>
-                </select>
+				<input type="text" name="attr_weapon1-quality" title="Balanced, Blunt, Deep Impact, Jointed, Long, Precise, Short, etc." data-i18n-title="title-weapon-quality" placeholder="Balanced" data-i18n="balanced" style="width:7em;">
             </div>
             <div class="sheet-faded" style="margin-left:1em;">
                 <label style="width:100%;" data-i18n="bonuses-and-advantages">Bonuses/Disadvantages</label>
@@ -257,17 +257,8 @@ Concentration check
                         <option value="d12">d12</option>
                     </select>
                 </div>
-                <div class="sheet-col-medium">			
-                    <select name="attr_weapon1-quality">
-                        <option value="0" selected> </option>
-                        <option value="1" data-i18n="balanced">Balanced</option>
-                        <option value="2" data-i18n="blunt">Blunt</option>
-                        <option value="3" data-i18n="deep-impact">Deep Impact</option>
-                        <option value="4" data-i18n="jointed">Jointed</option>
-                        <option value="5" data-i18n="long">Long</option>
-                        <option value="6" data-i18n="precise">Precise</option>
-                        <option value="7" data-i18n="short">Short</option>
-                    </select>
+                <div class="sheet-col-medium">
+				<input type="text" name="attr_weapon1-quality" title="Balanced, Blunt, Deep Impact, Jointed, Long, Precise, Short, etc." data-i18n-title="title-weapon-quality" placeholder="Balanced" data-i18n="balanced" style="width:7em;">
                 </div>
                 <div class="sheet-faded" style="margin-left:1em;">
                     <div>
@@ -840,3 +831,108 @@ Concentration check
         {{/rollGreater() attack-type 0}} 
     </table>
 </rolltemplate>
+
+<script type="text/worker">
+
+var Sheet = Sheet || (function() {
+
+	var version= 0.1,
+	Debug = false,	
+// convert weapon quality selector from numeric value to text
+	qualitySwap = function() {
+// get weapon quality text values
+		getAttrs(["weapon1-quality"], function(values) {
+			var qualityName, 
+				list=["None", "Balanced", "Blunt", "Deep Impact", "Jointed", "Long", "Precise", "Short"],
+				index = ~~values["weapon1-quality"];
+				qualityName = list[index];
+			console.log("....Given: " + values["weapon1-quality"] );
+			console.log("....Index: " + index );
+			console.log("....QualityName: " + qualityName );
+				setAttrs({
+					"weapon1-quality":qualityName
+				});
+		});
+
+// get repeating weapon quality text values
+		getSectionIDs("repeating_weapons", function(ids) {
+			var fields = _.map(ids,function(id) {
+				return "repeating_weapons_" + id + "_weapon1-quality";
+				console.log("....Row id " + id );
+			});
+
+			getAttrs(fields, function(values) {
+				_.each(ids, function(rowid, i) {												
+					console.log("....repeating_weapons_" + rowid + "_weapon1-quality");
+					var qualityName,
+						list=["None", "Balanced", "Blunt", "Deep Impact", "Jointed", "Long", "Precise", "Short"],
+						index = ~~values["repeating_weapons_" + rowid + "_weapon1-quality"];
+						qualityName = list[index];
+					console.log("....Row id " + rowid );
+					console.log("....Given: " + values["repeating_weapons_" + rowid + "_weapon1-quality"] );
+					console.log("....Index: " + index );
+					console.log("....QualityName: " + qualityName );
+						setAttrs({
+						["repeating_weapons_" + rowid + "_weapon1-quality"]:qualityName
+					});
+				});
+			});
+		});		
+
+	},
+
+/* recalculateSheet */
+	recalculateSheet = function(oldversion) {
+		if (oldversion < 0.1) {
+//call your functions here
+		qualitySwap();
+		}
+	},
+	
+/* checkForUpdate looks at current version of page in
+ * sheet_version and compares to code Sheet.version calls
+ * recalulateSheet if versions don't match or if recalculate
+ * button was pressed. */
+	checkForUpdate = function() {
+		getAttrs(["sheet_version","sheet_forcesync","recalc1"],function(v){
+			var setter={},currVer=0,setAny=0,recalc=false;
+			currVer=parseFloat(v["sheet_version"],10)||0;
+			console.log("Current sheet data version:"+currVer+", Sheet code version:" + version );
+			
+			if ( currVer!== version ) {
+				recalc=true;
+				setter["sheet_version"]= version;
+				setAny=1;
+			}
+			if (v["recalc1"] && v["recalc1"]!="0" ) {
+				currVer=-1;
+				recalc=true;
+				setter["recalc1"]=0;
+				setAny=1;
+			}
+			if (v["sheet_forcesync"] && v["sheet_forcesync"]!="0" ) {
+				currVer=-1;
+				recalc=true;
+				setter["sheet_forcesync"]=0;
+				setAny=1;
+			}
+			if (setAny) {
+				 setAttrs( setter);
+			}
+			if (recalc) {
+				recalculateSheet(currVer);
+			}
+		});
+	};
+	return {
+		version:version,
+		checkForUpdate:checkForUpdate,
+		qualitySwap:qualitySwap
+	};
+}());
+
+//sheet
+on("sheet:opened",function() {Sheet.checkForUpdate();});
+on("change:recalc1",function() {Sheet.checkForUpdate();});
+
+</script>
