@@ -2,14 +2,14 @@
 
 Character sheet for Barbarians of Lemuria - Mythic Edition, in [english](http://barbariansoflemuria.webs.com/) and [french](http://www.ludospherik.fr/content/14-barbarians-of-lemuria), by [Natha](https://github.com/NathaTerrien/roll20-wip/blob/master/README.md).
 
-Graphic design is based on the french edition.  
+Graphic design is based on the french edition.
 Background image courtesy of [Emmanuel Roudier](http://roudier-neandertal.blogspot.fr/), lead artist on BoL:Mythic, french edition.
 
 # Current version
-1.1 [Screenshot](bolm.jpg)
+1.3 [Screenshot](bolm.jpg)
 
-The sheet has some integrated rolls (with chat roll templates).  
-Every roll asks for, at least, a modifier (default 0).  
+The sheet has integrated rolls (with chat roll templates).
+Every roll as a PC or NPC asks for, at least, a modifier (default 0).
   * Attributes. 3 roll buttons per Attribute: standard (2d6), with Bonus Die (3d6kh2) and with Penalty Die (3d6kl2). Checks against 9.
     * Agility: accounts for Armour and Shield penalty.
   * Combat Abilities. 3 roll buttons per Ability: standard (2d6), with Bonus Die (3d6kh2) and with Penalty Die (3d6kl2).
@@ -22,6 +22,22 @@ Every roll asks for, at least, a modifier (default 0).
 Due to some temporary technical translation limitations of Roll20, the french version asks for roll variable (range, modifier etc.) in english, for now.
 
 # Release notes
+
+##v1.3 (2017-01-13)
+
+* Added (unofficial) German translation, by Marc M. (id 4134)
+
+##v1.2 (2017-01-02)
+
+* Added an NPC mode and a Beast mode (NPC) to the sheet :
+  * in NPC mode, the sheet is identical to the PC sheet but all rolls are whispered to the gm.
+  * in Beast mode, sheet is simplified and all rolls are whispered to the gm.
+* Added d3,d6 and d6H with Bonus die weapons damage
+* Handle Masterwork, Uncommon and Legendary Weapons and Armour
+* Added a current / max Advance points
+* Added Craft Points handling
+* Fix design overlays
+* Correct french translation in the weapons damage list
 
 ##v1.1 (2016-12-20)
 

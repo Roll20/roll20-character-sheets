@@ -5,6 +5,15 @@
 
 ### Changelog
 
+### 1.7.5 on 2017 January 4th
+* Updated for new calculation of evasion, and evasion's name changed to Guard
+	- Guard = 10 + Agility + Might + Armor + Other
+
+### 1.7.4 on 2016 December 29th
+* Fixed an error in Workerscripts where it was unable to calculate b/c of a void value.
+	- Only happened on pre-existing Actions, newly created ones would work fine.
+* Added Power Level Min & Max to Other actions.
+
 ### 1.7.3 on 2016 December 23rd
 * Added an option under "Favored Actions" and "Other Actions" to allow modification of dice size for rolling
 	- This is mainly for the "Martial Focus" feat, or anyothers that may come along (maybe even items).
