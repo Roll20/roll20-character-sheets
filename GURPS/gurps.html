@@ -3,6 +3,14 @@
     <!-- HIDDEN FIELDS -->
     <input type="hidden" name="attr_10" value="10" disabled="disabled" />
     <input type="hidden" name="attr_VS" value="vs:" disabled="disabled" />
+	<input type="hidden" name="attr_languages_points" value="0" />
+	<input type="hidden" name="attr_cf_points" value="0" />
+	<input type="hidden" name="attr_advantages_points" value="0" />
+	<input type="hidden" name="attr_disadvantages_points" value="0" />
+	<input type="hidden" name="attr_racial_points" value="0" />
+	<input type="hidden" name="attr_skills_points" value="0" />
+	<input type="hidden" name="attr_techniques_points" value="0" />
+	<input type="hidden" name="attr_spells_points" value="0" />
     <!-- /HIDDEN FIELDS -->
     
     <!-- ===== ===== ===== ===== TABS ===== ===== ===== ===== -->
@@ -835,7 +843,7 @@
 	                	Traits
 	                </div>
 	                <div class="sheet-cell sheet-col1">
-	                	<input type="text" name="attr_trait_points" value="0" />
+	                	<input type="text" name="attr_trait_points" disabled="disabled" value="@{tl_pts} + @{appearance} + @{languages_points} + @{cf_points} + @{advantages_points} + @{disadvantages_points} + @{racial_points}" />
 	                </div>
 	            </div> <!-- .sheet-row -->
 	            <div class="sheet-row sheet-row-skills">
@@ -843,7 +851,7 @@
 	                    Skills
 	                </div>
 	                <div class="sheet-cell sheet-col1">
-	                    <input type="text" name="attr_skill_points" value="0" />
+	                    <input type="text" name="attr_skill_points" disabled="disabled" value="@{skills_points} + @{techniques_points} + @{spells_points}" />
 	                </div>
 	            </div> <!-- .sheet-row -->
 	            <div class="sheet-row sheet-row-other">
@@ -1082,7 +1090,7 @@
 								<option value="2">Accented</option>
 								<option value="1.0">One-Way</option>
 								<option value="1">Broken</option>
-								<option value="0">None</option>
+								<option value="0" selected>None</option>
 							</select>
 						</div>
 						<div class="sheet-cell sheet-col2">
@@ -1091,7 +1099,7 @@
 								<option value="2">Accented</option>
 								<option value="1.0">One-Way</option>
 								<option value="1">Broken</option>
-								<option value="0">None</option>
+								<option value="0" selected>None</option>
 							</select>
                         </div>
 						<div class="sheet-cell sheet-col3">
@@ -1117,7 +1125,7 @@
 							<input type="text" name="attr_name" />
 						</div>
 						<div class="sheet-cell sheet-col1">
-							<input type="number" name="attr_points" value="1" />
+							<input type="number" name="attr_points" />
 						</div>
 					</div> <!-- .sheet-row -->
 				</fieldset> <!-- .repeating_languages -->
@@ -1343,7 +1351,7 @@
 							<input type="number" name="attr_bonus" value="0" />
 						</div>
 						<div class="sheet-cell sheet-col6">
-							<input type="number" name="attr_points" value="1" />
+							<input type="number" name="attr_points" />
 						</div>
 						<div class="sheet-cell sheet-col7">
 							<input type="text" name="attr_ref" />
@@ -1403,7 +1411,7 @@
 							<input type="number" name="attr_bonus" value="0" />
 						</div>
 						<div class="sheet-cell sheet-col7">
-							<input type="number" name="attr_points" value="0" />
+							<input type="number" name="attr_points" />
 						</div>
 						<div class="sheet-cell sheet-col8">
 							<input type="text" name="attr_ref" />
@@ -2011,10 +2019,10 @@
 							<input type="text" name="attr_weight" value="0" />
 						</div>
 						<div class="sheet-cell sheet-col5">
-							<input type="text" name="attr_costtotal" disabled="disabled" value="@{count} * @{cost}" />
+							<span name="attr_costtotal" value="0" />
 						</div>
 						<div class="sheet-cell sheet-col6">
-							<input type="text" name="attr_weighttotal" disabled="disabled" value="@{count} * @{weight} * @{carried}" />
+							<span name="attr_weighttotal" value="0" />
 						</div>
 					</div> <!-- .sheet-row -->
 					<div class="sheet-row sheet-row-details">
@@ -2111,10 +2119,10 @@
 							</select>
 						</div>
 						<div class="sheet-cell sheet-col4">
-							<input type="number" name="attr_points" value="1" />
+							<input type="number" name="attr_points" />
 						</div>
 						<div class="sheet-cell sheet-col5">
-							<input type="text" name="attr_casttime" value="1"/>
+							<input type="text" name="attr_casttime" />
 						</div>
 						<div class="sheet-cell sheet-col6">
 							<input type="text" name="attr_duration" />
@@ -2137,10 +2145,10 @@
 							<input type="text" name="attr_notes" />
 						</div>
 					</div> <!-- .sheet-row -->
-				</fieldset> <!-- .repeating_skills -->
+				</fieldset> <!-- .repeating_spells -->
 			</div> <!-- .sheet-table -->
-		</div> <!-- .sheet-box .sheet-skills -->
-	</div> <!-- .sheet-tab3 -->
+		</div> <!-- .sheet-box .sheet-spells -->
+	</div> <!-- .sheet-tab6 -->
 
     <!-- ===== ===== ===== ===== LOGO ===== ===== ===== ===== -->
 
@@ -2204,8 +2212,111 @@
 <br />
 
 <script type="text/worker">
+
+	// function to sum a field from a repeating section
+	function sumRepeating(sectionName, fieldName, callback) {
+		getSectionIDs(sectionName, function (ids) {
+			var total = 0;
+			var tally = _.after(ids.length, function () {
+				total = total || 0;
+				console.log('****** Sum Repeating Section ******\n' + 
+					'* Section: ' + sectionName + '\n' + 
+					'* Field  : ' + fieldName + '\n' + 
+					'* #      : ' + ids.length + '\n' +
+					'* Sum    : ' + total + '\n' + 
+					'***********************************');
+				callback(total);
+			});
+			if (ids.length === 0 ) {
+				callback(0);
+			}
+			for (var i = 0; i < ids.length; i++) {
+				var fieldId = sectionName + '_' + ids[i] + '_' + fieldName;
+				getAttrs([fieldId], function (item) {
+					var value = parseFloat(item[Object.keys(item)[0]]) || 0;
+					total += value;
+					tally();
+				});
+			}
+		});
+	};
+
+	// Update the total cost of Languages
+	on("change:repeating_languages:spoken change:repeating_languages:written remove:repeating_languages", function (e) {
+		var total = 0;
+		var tally = _.after(2, function () {
+			setAttrs({ languages_points: total });
+		});
+		sumRepeating("repeating_languages", "spoken", function(v) {
+			console.log('Spoken: ' + v);
+			total += v;
+			tally();
+		});
+		sumRepeating("repeating_languages", "written", function(v) {
+			console.log('Written: ' + v);
+			total += v;
+			tally();
+		});
+	});
+
+	// Update the total cost of Cultural Familiarities
+	on("change:repeating_cultures:points remove:repeating_cultures", function (e) {
+		sumRepeating("repeating_cultures", "points", function(v) {
+			setAttrs({ cf_points: v });
+		});
+	});
+
+	// Update the total cost of Advantages
+	on("change:repeating_traits:points remove:repeating_traits", function (e) {
+		sumRepeating("repeating_traits", "points", function(v) {
+			setAttrs({ advantages_points: v });
+		});
+	});
+
+	// Update the total cost of Disadvantages
+	on("change:repeating_disadvantages:points remove:repeating_disadvantages", function (e) {
+		sumRepeating("repeating_disadvantages", "points", function(v) {
+			setAttrs({ disadvantages_points: v });
+		});
+	});
+
+	// Update the total cost of Racial Traits
+	on("change:repeating_racial:points remove:repeating_racial", function (e) {
+		sumRepeating("repeating_racial", "points", function(v) {
+			setAttrs({ racial_points: v });
+		});
+	});
+
+	// Update the total cost of Skills
+	on("change:repeating_skills:points remove:repeating_skills", function (e) {
+		sumRepeating("repeating_skills", "points", function(v) {
+			setAttrs({ skills_points: v });
+		});
+	});
+
+	// Update the total cost of Techniques
+	on("change:repeating_techniques:points remove:repeating_techniques", function (e) {
+		sumRepeating("repeating_techniques", "points", function(v) {
+			setAttrs({ techniques_points: v });
+		});
+	});
+
+	// Update the total cost of Spells
+	on("change:repeating_spells:points remove:repeating_spells", function (e) {
+		sumRepeating("repeating_spells", "points", function(v) {
+			setAttrs({ spells_points: v });
+		});
+	});
+		
+	// Update Summery
+	on("change:tl_pts change:appearance change:languages_points change:cf_points change:advantages_points change:disadvantages_points change:racial_points", function (e) {
+		sumRepeating("repeating_spells", "points", function(v) {
+			setAttrs({ attr_trait_points: tl_pts + appearance + languages_points + cf_points + advantages_points + disadvantages_points + racial_points });
+		});
+	});
+
 	// Update the line total weight and cost
-	on("change:repeating_item:count change:repeating_item:carried change:repeating_item:weight", function (e) {
+	on("change:repeating_item:count change:repeating_item:cost change:repeating_item:carried change:repeating_item:weight", function (e) {
 		getAttrs([
 			"repeating_item_count",
 			"repeating_item_cost",
@@ -2221,33 +2332,15 @@
 
 	// Update the total weight of all carried items.
 	on("change:repeating_item:weighttotal remove:repeating_item", function (e) {
-		getSectionIDs("repeating_item", function (itemIDs) {
-			var totalWeight = 0;
-			var weightTally = _.after(itemIDs.length, function () {
-				setAttrs({ total_weight: Math.round(totalWeight * 100) / 100 });
+		sumRepeating("repeating_item", "weighttotal", function(v) {
+			setAttrs({ total_weight: (v * 100) / 100 });
 			});
-			for (var i = 0; i < itemIDs.length; i++) {
-				getAttrs(["repeating_item_" + itemIDs[i] + "_weighttotal"], function (v) {
-					totalWeight += parseFloat(v[Object.keys(v)[0]]);
-					weightTally();
-				});
-			}
 		});
-	});
 
 	// Update the total cost of all items.
 	on("change:repeating_item:costtotal remove:repeating_item", function (e) {
-		getSectionIDs("repeating_item", function (itemIDs) {
-			var totalCost = 0;
-			var costTally = _.after(itemIDs.length, function () {
-				setAttrs({ total_value: Math.round(totalCost * 100) / 100 });
-			});
-			for (var i = 0; i < itemIDs.length; i++) {
-				getAttrs(["repeating_item_" + itemIDs[i] + "_costtotal"], function (v) {
-					totalCost += parseFloat(v[Object.keys(v)[0]]);
-					costTally();
-				});
-			}
+		sumRepeating("repeating_item", "costtotal", function(v) {
+			setAttrs({ total_value: (v * 100) / 100 });
 		});
 	});
 </script>
