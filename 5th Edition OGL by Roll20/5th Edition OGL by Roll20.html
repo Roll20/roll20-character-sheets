@@ -4,7 +4,7 @@
 
 <div class="container npc" style="width: 350px;">
     <input class="npc_options-flag" type="checkbox" name="attr_npc_options-flag" checked="checked"><span>y</span>
-    <div class="npc_options compendium-drop-target">
+    <div class="npc_options compendium-drop-target monsters">
         <div class="row title">
             <span data-i18n="npc-options-u">NPC OPTIONS</span>
         </div>
@@ -222,6 +222,7 @@
         <input type="hidden" name="attr_npc_passiveperceptionbase" accept="Passive Perception">
         <input type="hidden" name="attr_npc_skillsbase" accept="Skills">
         <input type="hidden" name="attr_npc_content" accept="Content">
+        <input type="hidden" name="attr_token_size" accept="Token Size">
         <div class="row title">
             <span data-i18n="gen-opts-u">GENERAL OPTIONS</span>
         </div>
@@ -256,7 +257,7 @@
     </div>
     <div class="display">
         <div class="row title red">
-            <button type="roll" name="roll_npc_init" value="@{wtype}&{template:npc} {{name=@{npc_name}}} {{rname=Initiative}} {{mod=[[[[@{dexterity_mod}]][DEX]]]}} {{r1=[[1d20+[[@{dexterity_mod}]][DEX] &{tracker}]]}} {{normal=1}}">
+            <button type="roll" name="roll_npc_init" style="width: 100%;" value="@{wtype}&{template:npc} {{name=@{npc_name}}} {{rname=Initiative}} {{mod=[[[[@{dexterity_mod}]][DEX]]]}} {{r1=[[1d20+[[@{dexterity_mod}]][DEX] &{tracker}]]}} {{normal=1}}">
                 <input type="text" name="attr_npcd_name" style="text-align: left; margin-left: -4px;">
             </button>
         </div>
@@ -1800,6 +1801,7 @@
                             <input type="hidden" name="attr_spellattackid">
                             <input type="hidden" name="attr_spelllevel" accept="Level">
                             <input type="hidden" name="attr_spell_updateflag">
+                            <input type="hidden" name="attr_spell_damage_progression" accept="Damage Progression">
                         </div>
                         <div class="display">
                             <input type="hidden" name="attr_rollcontent" value="@{wtype}&{template:spell} {{level=@{spellschool} @{spelllevel}}}  {{name=@{spellname_base}}} {{castingtime=@{spellcastingtime}}} {{range=@{spellrange}}} {{target=@{spelltarget}}} @{spellcomp_v} @{spellcomp_s} @{spellcomp_m} {{material=@{spellcomp_materials}}} {{duration=@{spellduration}}} {{description=@{spelldescription}}} {{athigherlevels=@{spellathigherlevels}}} @{spellritual} @{spellconcentration} @{charname_output}">
@@ -4971,6 +4973,18 @@
         });
     });
 
+    on("change:repeating_spell-cantrip:spell_damage_progression", function() {
+        getAttrs(["repeating_spell_spell_damage_progression", "repeating_spell_spelldamage"], function(v) {
+            console.log(v);
+            if(v.repeating_spell_spell_damage_progression && v.repeating_spell_spell_damage_progression === "Cantrip Dice" && v.repeating_spell_spelldamage && v.repeating_spell_spelldamage.substring(0,2) === "1d") {
+                var damageformula = "[[round((@{level} + 1) / 6 + 0.5)]]" + v.repeating_spell_spelldamage.substring(1);
+                setAttrs({
+                    repeating_spell_spelldamage: damageformula
+                });
+            }
+        });
+    })
+
     // on("change:repeating_spell-cantrip:spelldmgmod change:repeating_spell-1:spelldmgmod change:repeating_spell-2:spelldmgmod change:repeating_spell-3:spelldmgmod change:repeating_spell-4:spelldmgmod change:repeating_spell-5:spelldmgmod change:repeating_spell-6:spelldmgmod change:repeating_spell-7:spelldmgmod change:repeating_spell-8:spelldmgmod change:repeating_spell-9:spelldmgmod", function() {
     //     getAttrs(["repeating_spell_spelldmgmod","repeating_spell_spelldamage","repeating_spell_spelldamage2","repeating_spell_spellhealing"], function(v) {
     //         if(v.repeating_spell_spelldmgmod && v.repeating_spell_spelldmgmod != "" && (!v.repeating_spell_spellhealing) || v.repeating_spell_spellhealing ==="") {
@@ -5308,22 +5322,22 @@
                 }
                 var contentarray = v.npc_content;
                 if(contentarray && contentarray.indexOf("Legendary Actions") > -1) {
-                    temp = contentarray.split(/Legendary Actions\n/)
+                    temp = contentarray.split(/\n Legendary Actions\n/)
                     var legendaryactionsarray = temp[1];
                     contentarray = temp[0];
                 }
                 if(contentarray && contentarray.indexOf("Reactions") > -1) {
-                    temp = contentarray.split(/Reactions\n/)
+                    temp = contentarray.split(/\n Reactions\n/)
                     var reactionsarray = temp[1];
                     contentarray = temp[0];
                 }
                 if(contentarray && contentarray.indexOf("Actions") > -1) {
-                    temp = contentarray.split(/Actions\n/)
+                    temp = contentarray.split(/\n Actions\n/)
                     var actionsarray = temp[1];
                     contentarray = temp[0];
                 }
                 if(contentarray && contentarray.indexOf("Traits") > -1) {
-                    temp = contentarray.split(/Traits\n/)
+                    temp = contentarray.split(/\n Traits\n/)
                     var traitsarray = temp[1];
                     contentarray = temp[0];
                 }
@@ -5338,7 +5352,7 @@
                     _.each(traitsobj, function(desc, name) {
                         newrowid = generateRowID();
                         update["repeating_npctrait_" + newrowid + "_name"] = name + ".";
-                        if(desc.substring(0,2) === ": ") {
+                        if(desc.substring(0,2) === ": " || encodeURI(desc.substring(0,2)) === ":%C2%A0") {
                             desc = desc.substring(2);
                         }
                         update["repeating_npctrait_" + newrowid + "_desc"] = desc.trim();
@@ -5356,14 +5370,24 @@
                         newrowid = generateRowID();
                         update["repeating_npcaction_" + newrowid + "_npc_options-flag"] = "0";
                         update["repeating_npcaction_" + newrowid + "_name"] = name;
-                        if(desc.substring(0,2) === ": ") {
+                        if(desc.substring(0,2) === ": " || encodeURI(desc.substring(0,2)) === ":%C2%A0") {
                             desc = desc.substring(2);
                         }
-                        if(desc.indexOf("Weapon Attack:") > -1) {
+                        if(desc.indexOf(" Attack:") > -1) {
                             update["repeating_npcaction_" + newrowid + "_attack_flag"] = "on";
                             update["repeating_npcaction_" + newrowid + "_attack_display_flag"] = "{{attack=1}}";
                             update["repeating_npcaction_" + newrowid + "_attack_options"] = "{{attack=1}}";
-                            attacktype = desc.split(" Weapon Attack:")[0];
+                            if(desc.indexOf(" Weapon Attack:") > -1) {
+                                attacktype = desc.split(" Weapon Attack:")[0];
+                            }
+                            else if(desc.indexOf(" Spell Attack:") > -1) {
+                                attacktype = desc.split(" Spell Attack:")[0];
+                            }
+                            else {
+                                console.log("FAILED TO IMPORT ATTACK - NO ATTACK TYPE FOUND (Weapon Attack/Spell Attack)");
+                                return;
+                            }
+                            
                             update["repeating_npcaction_" + newrowid + "_attack_type"] = attacktype;
                             if(attacktype === "Melee") {
                                 update["repeating_npcaction_" + newrowid + "_attack_range"] = (desc.match(/reach (.*?),/) || ["",""])[1];
@@ -5376,7 +5400,7 @@
                             if(desc.toLowerCase().indexOf("damage") > -1 && npc_exception_actions.indexOf(name) === -1) {
                                 update["repeating_npcaction_" + newrowid + "_attack_damage"] = (desc.match(/\(([^)]+)\)/) || ["",""])[1];
                                 update["repeating_npcaction_" + newrowid + "_attack_damagetype"] = (desc.match(/\) (.*?) damage/) || ["",""])[1];
-                                if((desc.match(/\(/g) || []).length > 1 && desc.match(/\((?!.*\()([^)]+)\)/).indexOf(" DC")[1] === -1) {
+                                if((desc.match(/\(/g) || []).length > 1 && (!desc.match(/\((?!.*\()([^)]+)\)/).indexOf(" DC")[1] || desc.match(/\((?!.*\()([^)]+)\)/).indexOf(" DC")[1] === -1)) {
                                     update["repeating_npcaction_" + newrowid + "_attack_damage2"] = (desc.match(/\((?!.*\()([^)]+)\)/) || ["",""])[1];
                                     update["repeating_npcaction_" + newrowid + "_attack_damagetype2"] = (desc.match(/\)(?!.*\)) (.*?) damage/) || ["",""])[1];
                                 }
@@ -5411,7 +5435,7 @@
                     _.each(reactionsobj, function(desc, name) {
                         newrowid = generateRowID();
                         update["repeating_npcreaction_" + newrowid + "_name"] = name + ".";
-                        if(desc.substring(0,2) === ": ") {
+                        if(desc.substring(0,2) === ": " || encodeURI(desc.substring(0,2)) === ":%C2%A0") {
                             desc = desc.substring(2);
                         }
                         update["repeating_npcreaction_" + newrowid + "_desc"] = desc.trim();
@@ -5430,14 +5454,23 @@
                         newrowid = generateRowID();
                         update["repeating_npcaction-l_" + newrowid + "_npc_options-flag"] = "0";
                         update["repeating_npcaction-l_" + newrowid + "_name"] = name;
-                        if(desc.substring(0,2) === ": ") {
+                        if(desc.substring(0,2) === ": " || encodeURI(desc.substring(0,2)) === ":%C2%A0") {
                             desc = desc.substring(2);
                         }
-                        if(desc.indexOf("Weapon Attack:") > -1) {
+                        if(desc.indexOf(" Attack:") > -1) {
                             update["repeating_npcaction-l_" + newrowid + "_attack_flag"] = "on";
                             update["repeating_npcaction-l_" + newrowid + "_attack_display_flag"] = "{{attack=1}}";
                             update["repeating_npcaction-l_" + newrowid + "_attack_options"] = "{{attack=1}}";
-                            attacktype = desc.split(" Weapon Attack:")[0];
+                            if(desc.indexOf(" Weapon Attack:") > -1) {
+                                attacktype = desc.split(" Weapon Attack:")[0];
+                            }
+                            else if(desc.indexOf(" Spell Attack:") > -1) {
+                                attacktype = desc.split(" Spell Attack:")[0];
+                            }
+                            else {
+                                console.log("FAILED TO IMPORT ATTACK - NO ATTACK TYPE FOUND (Weapon Attack/Spell Attack)");
+                                return;
+                            }
                             update["repeating_npcaction-l_" + newrowid + "_attack_type"] = attacktype;
                             if(attacktype === "Melee") {
                                 update["repeating_npcaction-l_" + newrowid + "_attack_range"] = (desc.match(/reach (.*?),/) || ["",""])[1];
@@ -5449,7 +5482,7 @@
                             update["repeating_npcaction-l_" + newrowid + "_attack_target"] = (desc.match(/\.,(?!.*\.,)(.*)\. Hit:/) || ["",""])[1];
                             update["repeating_npcaction-l_" + newrowid + "_attack_damage"] = (desc.match(/\(([^)]+)\)/) || ["",""])[1];
                             update["repeating_npcaction-l_" + newrowid + "_attack_damagetype"] = (desc.match(/\) (.*?) damage/) || ["",""])[1];
-                            if((desc.match(/\(/g) || []).length > 1) {
+                            if((desc.match(/\(/g) || []).length > 1 && (!desc.match(/\((?!.*\()([^)]+)\)/).indexOf(" DC")[1] || desc.match(/\((?!.*\()([^)]+)\)/).indexOf(" DC")[1] === -1)) {
                                 update["repeating_npcaction-l_" + newrowid + "_attack_damage2"] = (desc.match(/\((?!.*\()([^)]+)\)/) || ["",""])[1];
                                 update["repeating_npcaction-l_" + newrowid + "_attack_damagetype2"] = (desc.match(/\)(?!.*\)) (.*?) damage/) || ["",""])[1];
                             }
@@ -5689,6 +5722,52 @@
             else {
                 setAttrs({ammoflag: "hide"});
             }
+        });
+    });
+
+    on("change:npc_name", function() {
+        getAttrs(["npc"], function(v) {
+            if(v["npc"] != 1) {
+                setAttrs({
+                    npc: "1",
+                    npc_toggle: "1"
+                });
+            }
+        });
+    });
+
+    on("sheet:compendium-drop", function() {
+        setAttrs({dtype: "full"});
+        getAttrs(["hp_max","npc_senses","token_size"], function(v) {
+            var lr = "";
+            var tokenwidth = 70;
+            var tokenheight = 70;
+            if(v["npc_senses"].toLowerCase().match(/(darkvision|blindsight|tremorsense|truesight)/)) {
+                lr = Math.max.apply(Math, v["npc_senses"].match(/\d+/g));
+            }
+            if(v["token_size"]) {
+                var squarelength = 70;
+                if(v["token_size"].indexOf(",") > -1) {
+                    var setwidth = !isNaN(v["token_size"].split(",")[0]) ? v["token_size"].split(",")[0] : 1;
+                    var setheight = !isNaN(v["token_size"].split(",")[1]) ? v["token_size"].split(",")[1] : 1;
+                    tokenwidth = setwidth * squarelength;
+                    tokenheight = setheight * squarelength;
+                } 
+                else {
+                    tokenwidth = squarelength * v["token_size"]
+                    tokenheight = squarelength * v["token_size"]
+                };
+            }
+            setDefaultToken({
+                width: tokenwidth,
+                height: tokenheight,
+                bar2_link: "npc_ac",
+                bar1_value: v["hp_max"],
+                bar1_max: v["hp_max"],
+                showname: true,
+                light_radius: lr,
+                light_hassight: true
+            })
         });
     });
 
@@ -6153,7 +6232,7 @@
                         break;
                     case "Paladin":
                         update["hitdietype"] = 10;
-                        update["spellcasting_ability"] = "@{wisdom_mod}+";
+                        update["spellcasting_ability"] = "@{charisma_mod}+";
                         if(!v.wisdom_save_prof || v.wisdom_save_prof != "(@{pb})" || !v.charisma_save_prof || v.charisma_save_prof != "(@{pb})") {
                             update["strength_save_prof"] = 0;
                             update["dexterity_save_prof"] = 0;
@@ -6303,19 +6382,26 @@
                 bonus = "-";
             }
             if(v.repeating_attack_dmgflag && v.repeating_attack_dmgflag != 0) {
-                if(dmgbase === 0 && (dmgattr + dmgmod === 0)){
-                    dmg = 0;
+                if(spellattack === true && dmgbase.indexOf("@{level}") > -1) {
+                    // SPECIAL CANTRIP DAMAGE
+                    dmgdiestring = Math.round(((parseInt(v.level, 10) + 1) / 6) + 0.5).toString()
+                    dmg = dmgdiestring + dmgbase.substring(dmgbase.lastIndexOf("d")) + " " + dmgtype;
                 }
-                if(dmgbase != 0) {
-                    dmg = dmgbase;
+                else {
+                    if(dmgbase === 0 && (dmgattr + dmgmod === 0)){
+                        dmg = 0;
+                    }
+                    if(dmgbase != 0) {
+                        dmg = dmgbase;
+                    }
+                    if(dmgbase != 0 && (dmgattr + dmgmod != 0)){
+                        dmg = dmgattr + dmgmod > 0 ? dmg + "+" : dmg;
+                    }
+                    if(dmgattr + dmgmod != 0) {
+                        dmg = dmg + (dmgattr + dmgmod);
+                    }
+                    dmg = dmg + " " + dmgtype;
                 }
-                if(dmgbase != 0 && (dmgattr + dmgmod != 0)){
-                    dmg = dmgattr + dmgmod > 0 ? dmg + "+" : dmg;
-                }
-                if(dmgattr + dmgmod != 0) {
-                    dmg = dmg + (dmgattr + dmgmod);
-                }
-                dmg = dmg + " " + dmgtype;
             }
             else {
                 dmg = "";
@@ -6438,8 +6524,8 @@
         var npcspell = false;
         if((eventinfo && eventinfo.sourceAttribute && eventinfo.sourceAttribute.split("_")[1] === "spell-npc") || (category && category === "npc")) {
             npcspell = true;
-        }
-        getAttrs(["npc_spellattackmod","level","npc_spelldc","repeating_spell" + cat + "_" + repid + "spellname_base","repeating_spell" + cat + "_" + repid + "spellprepared","repeating_spell" + cat + "_" + repid + "spellrange","repeating_spell" + cat + "_" + repid + "spelltarget","repeating_spell" + cat + "_" + repid + "spellattack","repeating_spell" + cat + "_" + repid + "spelldamage","repeating_spell" + cat + "_" + repid + "spelldamagetype","repeating_spell" + cat + "_" + repid + "spelldamage2","repeating_spell" + cat + "_" + repid + "spelldamagetype2","repeating_spell" + cat + "_" + repid + "spellhealing","repeating_spell" + cat + "_" + repid + "spelldmgmod","repeating_spell" + cat + "_" + repid + "spellsave","repeating_spell" + cat + "_" + repid + "spellsavesuccess","repeating_spell" + cat + "_" + repid + "spellhldie","repeating_spell" + cat + "_" + repid + "spellhldietype","repeating_spell" + cat + "_" + repid + "spellhlbonus","repeating_spell" + cat + "_" + repid + "spellattackid","character_id","repeating_spell" + cat + "_" + repid + "spelloutput","repeating_spell" + cat + "_" + repid + "spelllevel","spellcasting_ability"], function(v) {
+        } 
+        getAttrs(["npc_spellattackmod","level","npc_spelldc","repeating_spell" + cat + "_" + repid + "spellname_base","repeating_spell" + cat + "_" + repid + "spellprepared","repeating_spell" + cat + "_" + repid + "spellrange","repeating_spell" + cat + "_" + repid + "spelltarget","repeating_spell" + cat + "_" + repid + "spellattack","repeating_spell" + cat + "_" + repid + "spelldamage","repeating_spell" + cat + "_" + repid + "spelldamagetype","repeating_spell" + cat + "_" + repid + "spelldamage2","repeating_spell" + cat + "_" + repid + "spelldamagetype2","repeating_spell" + cat + "_" + repid + "spellhealing","repeating_spell" + cat + "_" + repid + "spelldmgmod","repeating_spell" + cat + "_" + repid + "spellsave","repeating_spell" + cat + "_" + repid + "spellsavesuccess","repeating_spell" + cat + "_" + repid + "spellhldie","repeating_spell" + cat + "_" + repid + "spellhldietype","repeating_spell" + cat + "_" + repid + "spellhlbonus","repeating_spell" + cat + "_" + repid + "spellattackid","character_id","repeating_spell" + cat + "_" + repid + "spelloutput","repeating_spell" + cat + "_" + repid + "spelllevel","spellcasting_ability","repeating_spell" + cat + "_" + repid + "spell_damage_progression"], function(v) {
             update["repeating_spell" + cat + "_" + repid + "spellname"] = v["repeating_spell" + cat + "_" + repid + "spellname_base"] ? v["repeating_spell" + cat + "_" + repid + "spellname_base"] : "";
             update["repeating_spell" + cat + "_" + repid + "prep"] = v["repeating_spell" + cat + "_" + repid + "spellprepared"] ? v["repeating_spell" + cat + "_" + repid + "spellprepared"] : 1;
             update["repeating_spell" + cat + "_" + repid + "spellattackinfoflag"] = v["repeating_spell" + cat + "_" + repid + "spelloutput"] && v["repeating_spell" + cat + "_" + repid + "spelloutput"] === "ATTACK" ? "show" : "hide";
