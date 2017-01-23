@@ -2,22 +2,22 @@
 
 This is the redesigned Shaped character sheet for use on Roll20.net with the 5th edition of Dungeons & Dragons (5e). The sheet is designed to be usable by all Roll20 users regardless of subscription level.
 
-*If you are updating an existing campaign I highly recommend you duplicate your campaign and use that to copy data over. I also recommend starting each character from a fresh sheet.*
+*If you are ever concerned about data loss I recommend you duplicate your campaign and use that to copy to see how it'll work.*
 
 [Shaped Character Sheet Companion Script](https://github.com/symposion/roll20-api-scripts/tree/master/5eShapedCompanion/latest)
 
 [Documentation](https://docs.google.com/document/d/1yPcIZ_bIc3JlnWsKZt2tAB0EQSIVEfeMtT0GifbpJIg)
 
-Please report any bugs in the [issues tab](https://github.com/mlenser/roll20-character-sheets/issues)
+### Please report any bugs in the [issues tab](https://bitbucket.org/mlenser/5eshaped/issues). Please include screenshots if appropriate and please provide a full reproduction path (on a clean character sheet if possible).
 
-##Features
+## Features
 
 * **High performance** sheet without the lag of old versions (100% sheet workers)
 * Improved styling to match the [5e paper sheet](http://i.imgur.com/87GaRhL.jpg) with nearly all elements clickable to output to chat
 * **Compendium Integration** for NPCs, Armor, Equipment, Spells, Weapons
 * **NPC actions and traits** are parsed and clickable.
 * **Customizable skills** with the option to change the ability on the fly
-* Translations (English and French so far)
+* Translations (All languages supported by Roll20)
 * Auto populated Class Features which include things like Lay on Hands or Sneak Attack
 * **Spells** with filtering and the option to cast at a higher level
 * Customizable Classes - Change Name, HD, or spellcasting level of the classes
@@ -29,8 +29,7 @@ Please report any bugs in the [issues tab](https://github.com/mlenser/roll20-cha
   * Roll settings to choose to always roll with advantage, disadvantage, or query for both
   * Optional bonuses to all skills, abilities, saving throws, etc.
 
-![NPC sheet](http://i.imgur.com/CTSxo4a.png "NPC sheet")
-![PC sheet](http://i.imgur.com/ufXveK2.png "PC sheet")
+![Sheet](http://i.imgur.com/ZVymw3T.jpg "Sheet")
 
 ## How to Update the sheet yourself (as Pro):
 
