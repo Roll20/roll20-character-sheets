@@ -3,9 +3,19 @@
 This is a re-creation of the "green-sheet" for the D&D Basic Moldvay Red box game.  It was created for the Roll20 Moldvay Basic Contest.
 
 ## Current Version
-1.16
+2.0
 
 ### Changelog
+
+#### 2.0
+* Monster Sheet Update
+* Monster Initiative can now be rolled within sheet
+* Monster HP can now be rolled within sheet - result sent to GM
+* Monster Morale checks can now be rolled within sheet - result sent to GM
+* Monster Surprise checks can now be rolled within sheet - result sent to GM
+* Monsters now have saves (Moldvay: Add monster saves #1898)
+* Monsters now can have multiple damage dice per attack (Moldvay: Monster multiple monster attack die #1897)
+* Monsters now have abilities section for non-attack roll abilities (Moldvay: Add monster abilities #1896)
 
 #### 1.16
 * Fixing sheet worker to calculate chance to open door on sheet open and STR mod change
