@@ -234,7 +234,7 @@ Can lift overhead (Strength + Nethits) x 5kg}}" />
                 <div class="rollrow">
                     <div class="rolllabel"><label>With Wounds</label></div>
                     <div class="rolllabel">
-                        <button type="roll" class="standardroll" name="roll_standardroll" title="Roll with a given Dicepool with Woundpenalty" value="@{gmroll}&{template:shadowrun}{{name=@{character_name}}}{{val1=Dice-Pool}}{{val1_num=[[?{Dice-Pool|6}]]}}{{limit=Limit}}{{limit_num=[[?{Limit|6}]]}}{{wounds_num=[[@{wound_total}]]}}{{result=[[(?{Dice-Pool}-[[@{wound_total}]])d6cs>5>5sdkh(?{Limit})]]}}{{description=?{Description}}}" /> 
+                        <button type="roll" class="standardroll" name="roll_standardroll" title="Roll with a given Dicepool with Woundpenalty" value="@{gmroll}&{template:shadowrun}{{name=@{character_name}}}{{val1=Dice-Pool}}{{val1_num=[[?{Dice-Pool|6}]]}}{{limit=Limit}}{{limit_num=[[?{Limit|6}]]}}{{wounds_num=[[@{wound_total}]]}}{{result=[[(?{Dice-Pool}-[[@{wound_total}]])d6cs>5>5sdkh[[?{Limit}]]]]}}{{description=?{Description}}}" /> 
                     </div>
                     <div class="rolllabel">
                         <button type="roll" class="standardroll" name="roll_edgeroll" title="Roll with a given Dicepool + Edge and exploding sixes with Woundpenalty" value="@{gmroll}&{template:shadowrun}{{name=@{character_name}}}{{val1=Dice-Pool}}{{val1_num=[[?{Dice-Pool|6}]]}}{{val2=Edge}}{{val2_num=[[@{edg_total}]]}}{{wounds_num=[[@{wound_total}]]}}{{result=[[(?{Dice-Pool}+@{edg_total}-[[@{wound_total}]])d6!cs>5>5sd]]}}{{description=?{Description}}}" /> 
@@ -8941,7 +8941,7 @@ on("sheet:opened", function() {
         }
         values.warningcheckbox=0;
         values.chummercheckbox=0;
-        values.chummertext="In Chummer make sure to mark your character as created\nwith a created character go to File->Export->Export JSON\nopen the file in notepad\ncopy and past the whole file into this textfield overriding this text\nclick import and accept";
+        values.chummertext="In Chummer make sure to mark your character as created\nwith a created character go to File->Export->Export JSON\ncopy the file and past it into this textfield overriding this text\nclick import and accept";
     setAttrs(values);
     });
 });
@@ -9207,7 +9207,7 @@ on("change:chummercheckbox", function(){
                                     if(chummerfile.characters.character.qualities.quality.extra==null)
                                         attributes["repeating_posqualities_"+newrowid+"_posqualityname"]=chummerfile.characters.character.qualities.quality[i].name;
                                     else
-                                        attributes["repeating_posqualities_"+newrowid+"_posqualityname"]=chummerfile.characters.character.qualities.quality[i].name+": "+chummerfile.characters.character.qualities.quality.extra;
+                                        attributes["repeating_posqualities_"+newrowid+"_posqualityname"]=chummerfile.characters.character.qualities.quality[i].name+": "+chummerfile.characters.character.qualities.quality[i].extra;
                                     attributes["repeating_posqualities_"+newrowid+"_posqualitykarma"]=chummerfile.characters.character.qualities.quality[i].bp;
                                 }
                             }
@@ -9215,17 +9215,19 @@ on("change:chummercheckbox", function(){
                             var newrowid=generateRowID();
                             if(chummerfile.characters.character.qualities.quality.qualitytype_english=="Negative")
                             {
-                                if(chummerfile.characters.character.qualities.quality.extra==null)
+                                if(chummerfile.characters.character.qualities.quality.extra==null){
                                     attributes["repeating_negqualities_"+newrowid+"_negqualityname"]=chummerfile.characters.character.qualities.quality.name;
-                                else
+                                }else{
                                     attributes["repeating_negqualities_"+newrowid+"_negqualityname"]=chummerfile.characters.character.qualities.quality.name+": "+chummerfile.characters.character.qualities.quality.extra;
+                                }
                                 attributes["repeating_negqualities_"+newrowid+"_negqualitykarma"]=chummerfile.characters.character.qualities.quality.bp;
                             }else
                             {
-                                if(chummerfile.characters.character.qualities.quality[i].extra==null)
+                                if(chummerfile.characters.character.qualities.quality.extra==null){
                                     attributes["repeating_posqualities_"+newrowid+"_posqualityname"]=chummerfile.characters.character.qualities.quality.name;
-                                else
+                                }else{
                                     attributes["repeating_posqualities_"+newrowid+"_posqualityname"]=chummerfile.characters.character.qualities.quality.name+": "+chummerfile.characters.character.qualities.quality.extra;
+                                }
                                 attributes["repeating_posqualities_"+newrowid+"_posqualitykarma"]=chummerfile.characters.character.qualities.quality.bp;
                             }
                         }
@@ -9408,10 +9410,11 @@ on("change:chummercheckbox", function(){
                                 attributes["repeating_spells_"+newrowid+"_spellname"]=chummerfile.characters.character.complexforms.complexform[i].name;
                                 attributes["repeating_spells_"+newrowid+"_spellschool"]="@{skillrating42}";
                                 attributes["repeating_spells_"+newrowid+"_spellduration"]=chummerfile.characters.character.complexforms.complexform[i].duration;
-                                if(chummerfile.characters.character.complexforms.complexform[i].dv.match(/(\-|\+)\d/)!=null)
-                                    attributes["repeating_spells_"+newrowid+"_spelldrain"]=chummerfile.characters.character.complexforms.complexform[i].dv.match(/(\-|\+)\d/)[0];
-                                else
+                                if(chummerfile.characters.character.complexforms.complexform[i].fv.match(/(\-|\+)\d/)!=null){
+                                    attributes["repeating_spells_"+newrowid+"_spelldrain"]=chummerfile.characters.character.complexforms.complexform[i].fv.match(/(\-|\+)\d/);
+                                }else{
                                     attributes["repeating_spells_"+newrowid+"_spelldrain"]="-0";
+                                }
                             }
                         }else{
                             var newrowid=generateRowID();
@@ -9419,7 +9422,7 @@ on("change:chummercheckbox", function(){
                             attributes["repeating_spells_"+newrowid+"_spellschool"]="@{skillrating42}";
                             attributes["repeating_spells_"+newrowid+"_spellduration"]=chummerfile.characters.character.complexforms.complexform.duration;
                             if(chummerfile.characters.character.complexforms.complexform.fv.match(/(\-|\+)\d/)!=null)
-                                attributes["repeating_spells_"+newrowid+"_spelldrain"]=chummerfile.characters.character.complexforms.complexform.fv.match(/(\-|\+)\d/)[0];
+                                attributes["repeating_spells_"+newrowid+"_spelldrain"]=chummerfile.characters.character.complexforms.complexform.fv.match(/(\-|\+)\d/);
                             else
                                 attributes["repeating_spells_"+newrowid+"_spelldrain"]="-0";
                         }
@@ -9641,6 +9644,7 @@ on("change:chummercheckbox", function(){
                     var ritual=0;
                     try{
                         for(var i=0;i<chummerfile.characters.character.skills.skill.length;i++){
+                            console.log(chummerfile.characters.character.skills.skill[i].name);
                             if(chummerfile.characters.character.skills.skill[i].name=="Alchemy"){
                                 alchemy=i;
                             }
@@ -9653,7 +9657,9 @@ on("change:chummercheckbox", function(){
                             if(chummerfile.characters.character.skills.skill[i].knowledge=="True"){
                                 var newrowid=generateRowID();
                                 attributes["repeating_knowledge_"+newrowid+"_knowledgename"]=chummerfile.characters.character.skills.skill[i].name;
-                                attributes["repeating_knowledge_"+newrowid+"_knowledgeattr"]="@{"+chummerfile.characters.character.skills.skill[i].skillcategory_english.toLowerCase();
+                                console.log(chummerfile.characters.character.skills.skill[i]);
+                                if(chummerfile.characters.character.skills.skill[i].skillcategory_english!=null)
+                                    attributes["repeating_knowledge_"+newrowid+"_knowledgeattr"]="@{"+chummerfile.characters.character.skills.skill[i].skillcategory_english.toLowerCase();
                                 if(chummerfile.characters.character.skills.skill[i].rating>0){
                                     attributes["repeating_knowledge_"+newrowid+"_knowledgerating"]=chummerfile.characters.character.skills.skill[i].rating;
                                     attributes["repeating_knowledge_"+newrowid+"_knowledgebonus"]=chummerfile.characters.character.skills.skill[i].total-chummerfile.characters.character.skills.skill[i].rating-chummerfile.characters.character.skills.skill[i].attributemod;
@@ -9675,7 +9681,7 @@ on("change:chummercheckbox", function(){
                                     attributes["skillrating"+exotics]="-1";
                                     attributes["skillbonus"+exotics]=chummerfile.characters.character.skills.skill[i].total-chummerfile.characters.character.skills.skill[i].rating-chummerfile.characters.character.skills.skill[i].attributemod+1;
                                 }
-                                attributes["skillattr"+exotics]="@{"+chummerfile.characters.character.skills.skill[i].attribute.toLowerCase()+"_total}";
+                                attributes["skillattr"+exotics]="@{"+chummerfile.characters.character.skills.skill[i].attribute.toLowerCase();
                                 if(chummerfile.characters.character.skills.skill[i].skillspecializations!=null)
                                     attributes["skillspec"+exotics]=chummerfile.characters.character.skills.skill[i].skillspecializations.skillspecialization.name;
                                 else
@@ -9684,8 +9690,8 @@ on("change:chummercheckbox", function(){
                             }
                             for(var j=1;j<73;j++){
                                 var compname='skillname'+j;
-                                if(names[compname]==chummerfile.characters.character.skills.skill[i].name){
-                                    attributes["skillattr"+j]="@{"+chummerfile.characters.character.skills.skill[i].attribute.toLowerCase()+"_total}";
+                                if((names[compname]==chummerfile.characters.character.skills.skill[i].name)||(chummerfile.characters.character.skills.skill[i].name=="Locksmith"&&j==29)||(chummerfile.characters.character.skills.skill[i].name=="Pilot Ground Craft"&&j==55)){
+                                    attributes["skillattr"+j]="@{"+chummerfile.characters.character.skills.skill[i].attribute.toLowerCase();
                                     if(chummerfile.characters.character.skills.skill[i].rating>0){
                                         attributes["skillrating"+j]=chummerfile.characters.character.skills.skill[i].rating;
                                         attributes["skillbonus"+j]=chummerfile.characters.character.skills.skill[i].total-chummerfile.characters.character.skills.skill[i].rating-chummerfile.characters.character.skills.skill[i].attributemod;
@@ -9723,6 +9729,7 @@ on("change:chummercheckbox", function(){
                         goodcode=false;
                         error="Error with Skills"
                     }
+                    console.log("dafuq");
                     try{
                         if(chummerfile.characters.character.spells!=null){
                             if(chummerfile.characters.character.spells.spell.length>1){
