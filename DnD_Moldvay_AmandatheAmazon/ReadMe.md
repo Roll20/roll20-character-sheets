@@ -9,6 +9,7 @@ This is a re-creation of the "green-sheet" for the D&D Basic Moldvay Red box gam
 
 #### 2.1
 * Spells now have roll templates
+* Fixed formatting issue with dropdown boxes
 
 #### 2.0
 * Monster Sheet Update
