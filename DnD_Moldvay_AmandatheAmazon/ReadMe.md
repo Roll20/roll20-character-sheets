@@ -3,12 +3,9 @@
 This is a re-creation of the "green-sheet" for the D&D Basic Moldvay Red box game.  It was created for the Roll20 Moldvay Basic Contest.
 
 ## Current Version
-2.1
+2.0
 
 ### Changelog
-
-#### 2.1
-* Added in Roll Templates for Casting Spells
 
 #### 2.0
 * Monster Sheet Update
