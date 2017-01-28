@@ -2,7 +2,12 @@
 
 ### TODO:
 
-* convert from old sheet
+* fully convert from old sheet (most everything is converted - still working through some cases - could use some testing here)
+* Fix conversion from OGL
+* It should be possible to disable the output of the "Melee weapon attack. ..." part of an attack.
+* Range on spells always shows ft, that's bad for range Touch, Self...
+* **9.1.0** cannot edit trait uses outside edit mode
+* **Roll20 should fix** longbow (and other weapons, I suppose) gets all of its text dumped into content, that's not very practical
 
 ### Breaking Changes
 
