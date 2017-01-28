@@ -1,3 +1,42 @@
+## 9.0.0
+
+### TODO:
+
+* convert from old sheet
+
+### Breaking Changes
+
+* Completely revamped how attacks, saving throws, and damage is entered into the sheet. The new model is that attack has damage and secondary damage, saving throw has damage and secondary damage, and there is damage that is not tied to either. Saving Throw damage will not multiply on a crit, but the others will.
+  * Editing uses of Attacks, Actions, and Traits can not be done in presentation mode. I will likely re-enable this in a very hacky solution in 9.1.0 if users desire it (which I assume they will).
+  * Damage of all types is now split between the die size and the amount of dice for critical damage changes and for ease of higher level for spells.
+  * Ability selects are now stored as 3 characters instead of the full name. (some areas had breaking changes as a result).
+  * Content is the new freetext field for all attacks, spells, etc. Freetext still exists, but content is where the main content goes. Freetext will be purely for users to edit.
+  * Saving throw condition and saving throw failure are no longer fields. Saving throws are rather diverse in their wording and subscribing a setup for them is too difficult at this time. It's best to leave the conditions and saving throw failure in the text. Save success is extracted as it is commonly used for half damage.
+
+### Features
+
+* NPC actions that have an attack now recalculate everything when a relevant field is changed.
+* Critical damage is automatically calculated with the option to use the maximum damage as a houserule. Additionally you can select the half-orc savage attacks to be added automatically as well as manually enter an amount to be added on a critical (after toggling on "extra on a crit" on the settings page).
+* The UI of attacks, saving throws, etc is created is now all based on inline editing with auto expanding input widths.
+* Auto-expand inputs are used for nearly every input on the sheet. This really improves the styling in some areas. Some noticeable areas: Skill ability selects, attack/damage sections.
+* [#98: Add Artificer](https://bitbucket.org/mlenser/5eshaped/issues/98/add-artificer)
+* Added Ranger UA to the class options list. Closes part of [#102: Increasing character class level reverts changes made to traits](https://bitbucket.org/mlenser/5eshaped/issues/102/increasing-character-class-level-reverts).
+* [#96: Add the ability to change the unarmored formula](https://bitbucket.org/mlenser/5eshaped/issues/96/add-the-ability-to-change-the-unarmored)
+* Dondense buttons added to attacks, actions, reactions, and legendary actions. It remains on traits for both PCs and NPCs.
+* Added distance "ft." to senses and speed and several other areas. This updates when you change your distance in the setting page.
+* Resistances are hidden for PCs if they are empty.
+* Section titles on the NPC core page are now clickable (actions, reactions, legendary actions, etc). They output the chat macro.
+* NPC names are now clickable. They output the statblock.
+* Class proficiencies are automatically added now. Armor, Weapons, Tools, and Saving Throws.
+* Added a spells toggle on core for PCs which is viewable in edit mode.
+* Added a link to report an issue to the sheet (next to documentation)
+* Emote, Freetext, and Freeform are not shown by default, but can be turned on 1 by 1 on the settings page.
+* Crit Range and Extra damage on a crit are not shown by default, but can be turned on 1 by 1 on the settings page.
+
+### Bug Fixes
+
+* NPC tokens show the correct radius when dragging a token on the map. Closes [#92: Check Valid data entry of "senses"](https://bitbucket.org/mlenser/5eshaped/issues/92/check-valid-data-entry-of-senses)
+
 ## 8.5.1
 
 ### Bug Fixes
