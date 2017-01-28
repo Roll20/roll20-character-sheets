@@ -2,7 +2,7 @@
 
 ### TODO:
 
-* fully convert from old sheet (most everything is converted - still working through some cases - could use some testing here)
+* fully convert from old pre-9.0.0 (most everything is converted - still working through some cases - could use some testing here). Definitely some weird cases if coming from ealy versions where upgrades do not run sequentially.
 * Fix conversion from OGL
 * It should be possible to disable the output of the "Melee weapon attack. ..." part of an attack.
 * Range on spells always shows ft, that's bad for range Touch, Self...
@@ -20,14 +20,14 @@
 
 ### Features
 
-* NPC actions that have an attack now recalculate everything when a relevant field is changed.
+* NPC actions that have an attack now recalculate everything when a relevant field is changed. Generating nice texts like "Melee Weapon Attack:+4 to hit, reach 5 ft., one target.Hit:6 (1d6 + 2) piercing damage."
 * Critical damage is automatically calculated with the option to use the maximum damage as a houserule. Additionally you can select the half-orc savage attacks to be added automatically as well as manually enter an amount to be added on a critical (after toggling on "extra on a crit" on the settings page).
 * The UI of attacks, saving throws, etc is created is now all based on inline editing with auto expanding input widths.
 * Auto-expand inputs are used for nearly every input on the sheet. This really improves the styling in some areas. Some noticeable areas: Skill ability selects, attack/damage sections.
 * [#98: Add Artificer](https://bitbucket.org/mlenser/5eshaped/issues/98/add-artificer)
 * Added Ranger UA to the class options list. Closes part of [#102: Increasing character class level reverts changes made to traits](https://bitbucket.org/mlenser/5eshaped/issues/102/increasing-character-class-level-reverts).
 * [#96: Add the ability to change the unarmored formula](https://bitbucket.org/mlenser/5eshaped/issues/96/add-the-ability-to-change-the-unarmored)
-* Dondense buttons added to attacks, actions, reactions, and legendary actions. It remains on traits for both PCs and NPCs.
+* Condense buttons added to attacks, actions, reactions, and legendary actions. It remains on traits for both PCs and NPCs.
 * Added distance "ft." to senses and speed and several other areas. This updates when you change your distance in the setting page.
 * Resistances are hidden for PCs if they are empty.
 * Section titles on the NPC core page are now clickable (actions, reactions, legendary actions, etc). They output the chat macro.
