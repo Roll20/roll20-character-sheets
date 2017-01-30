@@ -3,9 +3,13 @@
 This is a re-creation of the "green-sheet" for the D&D Basic Moldvay Red box game.  It was created for the Roll20 Moldvay Basic Contest.
 
 ## Current Version
-2.0
+2.1
 
 ### Changelog
+
+#### 2.1
+* Spells now have roll templates
+* Fixed formatting issue with dropdown boxes
 
 #### 2.0
 * Monster Sheet Update
@@ -17,6 +21,7 @@ This is a re-creation of the "green-sheet" for the D&D Basic Moldvay Red box gam
 * Monsters now can have multiple damage dice per attack (Moldvay: Monster multiple monster attack die #1897)
 * Monsters now have abilities section for non-attack roll abilities (Moldvay: Add monster abilities #1896)
 * Fumbles no longer show damage done
+
 
 #### 1.16
 * Fixing sheet worker to calculate chance to open door on sheet open and STR mod change
