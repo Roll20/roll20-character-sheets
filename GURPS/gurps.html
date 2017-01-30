@@ -3,6 +3,14 @@
     <!-- HIDDEN FIELDS -->
     <input type="hidden" name="attr_10" value="10" disabled="disabled" />
     <input type="hidden" name="attr_VS" value="vs:" disabled="disabled" />
+	<input type="hidden" name="attr_languages_points" value="0" />
+	<input type="hidden" name="attr_cf_points" value="0" />
+	<input type="hidden" name="attr_advantages_points" value="0" />
+	<input type="hidden" name="attr_disadvantages_points" value="0" />
+	<input type="hidden" name="attr_racial_points" value="0" />
+	<input type="hidden" name="attr_skills_points" value="0" />
+	<input type="hidden" name="attr_techniques_points" value="0" />
+	<input type="hidden" name="attr_spells_points" value="0" />
     <!-- /HIDDEN FIELDS -->
     
     <!-- ===== ===== ===== ===== TABS ===== ===== ===== ===== -->
@@ -11,6 +19,7 @@
 	<input type="radio" name="attr_tab" class="sheet-tab sheet-tab3" value="3" title="Skills" />
 	<input type="radio" name="attr_tab" class="sheet-tab sheet-tab4" value="4" title="Combat" />
 	<input type="radio" name="attr_tab" class="sheet-tab sheet-tab5" value="5" title="Wealth" />
+	<input type="radio" name="attr_tab" class="sheet-tab sheet-tab6" value="6" title="Grimoire" />
     <div class="sheet-tab-br"></div>
     
 
@@ -834,7 +843,7 @@
 	                	Traits
 	                </div>
 	                <div class="sheet-cell sheet-col1">
-	                	<input type="text" name="attr_trait_points" value="0" />
+	                	<input type="text" name="attr_trait_points" disabled="disabled" value="@{tl_pts} + @{appearance} + @{languages_points} + @{cf_points} + @{advantages_points} + @{disadvantages_points} + @{racial_points}" />
 	                </div>
 	            </div> <!-- .sheet-row -->
 	            <div class="sheet-row sheet-row-skills">
@@ -842,7 +851,7 @@
 	                    Skills
 	                </div>
 	                <div class="sheet-cell sheet-col1">
-	                    <input type="text" name="attr_skill_points" value="0" />
+	                    <input type="text" name="attr_skill_points" disabled="disabled" value="@{skills_points} + @{techniques_points} + @{spells_points}" />
 	                </div>
 	            </div> <!-- .sheet-row -->
 	            <div class="sheet-row sheet-row-other">
@@ -1081,7 +1090,7 @@
 								<option value="2">Accented</option>
 								<option value="1.0">One-Way</option>
 								<option value="1">Broken</option>
-								<option value="0">None</option>
+								<option value="0" selected>None</option>
 							</select>
 						</div>
 						<div class="sheet-cell sheet-col2">
@@ -1090,7 +1099,7 @@
 								<option value="2">Accented</option>
 								<option value="1.0">One-Way</option>
 								<option value="1">Broken</option>
-								<option value="0">None</option>
+								<option value="0" selected>None</option>
 							</select>
                         </div>
 						<div class="sheet-cell sheet-col3">
@@ -1116,7 +1125,7 @@
 							<input type="text" name="attr_name" />
 						</div>
 						<div class="sheet-cell sheet-col1">
-							<input type="number" name="attr_points" value="1" />
+							<input type="number" name="attr_points" />
 						</div>
 					</div> <!-- .sheet-row -->
 				</fieldset> <!-- .repeating_languages -->
@@ -1342,7 +1351,7 @@
 							<input type="number" name="attr_bonus" value="0" />
 						</div>
 						<div class="sheet-cell sheet-col6">
-							<input type="number" name="attr_points" value="1" />
+							<input type="number" name="attr_points" />
 						</div>
 						<div class="sheet-cell sheet-col7">
 							<input type="text" name="attr_ref" />
@@ -1402,7 +1411,7 @@
 							<input type="number" name="attr_bonus" value="0" />
 						</div>
 						<div class="sheet-cell sheet-col7">
-							<input type="number" name="attr_points" value="0" />
+							<input type="number" name="attr_points" />
 						</div>
 						<div class="sheet-cell sheet-col8">
 							<input type="text" name="attr_ref" />
@@ -1999,7 +2008,6 @@
 						</div>
 						<div class="sheet-cell sheet-col1">
 							<input class="sheet-boolean" type="checkbox" name="attr_carried" value="1" checked />
-							<span class="sheet-checkbox"></span>
 						</div>
 						<div class="sheet-cell sheet-col2">
 							<input type="text" name="attr_count" value="1" />
@@ -2011,10 +2019,10 @@
 							<input type="text" name="attr_weight" value="0" />
 						</div>
 						<div class="sheet-cell sheet-col5">
-							<input type="text" name="attr_costtotal" disabled="disabled" value="@{count} * @{cost}" />
+							<span name="attr_costtotal" value="0" />
 						</div>
 						<div class="sheet-cell sheet-col6">
-							<input type="text" name="attr_weighttotal" disabled="disabled" value="@{count} * @{weight} * @{carried}" />
+							<span name="attr_weighttotal" value="0" />
 						</div>
 					</div> <!-- .sheet-row -->
 					<div class="sheet-row sheet-row-details">
@@ -2045,8 +2053,105 @@
 	
 	</div> <!-- .sheet-tab5 -->       
 
-    <!-- ===== ===== ===== ===== LOGO ===== ===== ===== ===== -->
+
+    <!-- ===== ===== ===== ===== GRIMOIRE TAB ===== ===== ===== ===== -->
+    <div class="sheet-tab6">
+
+		<!-- _____ _____ SPELLS SETUP _____ _____ -->
+		<div class="sheet-box sheet-spells">
+			<div class="sheet-table">
+				<div class="sheet-header">
+					<div class="sheet-cell"> Spells Based on: </div>
+					<div class="sheet-cell sheet-col3">
+						<select name="attr_base">
+							<option value="@{strength}">ST</option>
+							<option value="@{dexterity}">DX</option>
+							<option value="@{intelligence}" selected>IQ</option>
+							<option value="@{health}">HT</option>
+							<option value="@{willpower}">Will</option>
+							<option value="@{perception}">Per</option>
+							<option value="10">10</option>
+						</select>
+					</div>
+					<div class="sheet-cell"> Magery/PI/Bonus Level: </div>
+					<div class="sheet-cell sheet-col4">
+						<input type="number" name="attr_bonus" value="0" />
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+	    <!-- _____ _____ SPELLS BOX _____ _____ -->
 	
+		<div class="sheet-box sheet-spells">
+			<div class="sheet-table">
+				<div class="sheet-header">
+					<div class="sheet-cell sheet-col0">Spell</div>
+					<div class="sheet-cell sheet-col1"></div>
+					<div class="sheet-cell sheet-col2">Level</div>
+					<div class="sheet-cell sheet-col3">Diff</div>
+					<div class="sheet-cell sheet-col4">Pts</div>
+					<div class="sheet-cell sheet-col5">Time</div>
+					<div class="sheet-cell sheet-col6">Duration</div>
+					<div class="sheet-cell sheet-col7">Cost</div>
+					<div class="sheet-cell sheet-col8">Maintain</div>
+					<div class="sheet-cell sheet-col9">Ref</div>
+				</div> <!-- .sheet-header -->
+				<fieldset class="repeating_spells">
+					<input class="sheet-toggle" type="checkbox" />
+					<span class="sheet-checkbox"></span>
+					<div class="sheet-row sheet-row-stats">
+						<div class="sheet-cell sheet-col0">
+							<input type="text" name="attr_name" />
+						</div>
+						<div class="sheet-cell sheet-col1">
+		                    <button type="roll" value="@{roll} [[3d6]] @{VS} @{name} [[@{level} + @{modifier}]]" name="roll_vsSL" />
+                        </div>
+						<div class="sheet-cell sheet-col2">
+							<input type="number" name="attr_level" disabled="disabled" 
+								value="@{base} + @{difficulty} + @{bonus} + (floor((@{points} * 0.25) + 2) * ceil( ( ( @{points} - 2 ) + abs( @{points} - 2) ) / 256 ) + @{points} * abs( ceil( ( ( @{points} - 2 ) + abs( @{points} - 2) ) / 256 ) - 1 ))"/>
+						</div>
+						<div class="sheet-cell sheet-col3">
+							<select name="attr_difficulty">
+								<option value="-3">H</option>
+								<option value="-4">VH</option>
+							</select>
+						</div>
+						<div class="sheet-cell sheet-col4">
+							<input type="number" name="attr_points" />
+						</div>
+						<div class="sheet-cell sheet-col5">
+							<input type="text" name="attr_casttime" />
+						</div>
+						<div class="sheet-cell sheet-col6">
+							<input type="text" name="attr_duration" />
+						</div>
+						<div class="sheet-cell sheet-col7">
+							<input type="text" name="attr_cost" />
+						</div>
+						<div class="sheet-cell sheet-col8">
+							<input type="text" name="attr_maintain" />
+						</div>
+						<div class="sheet-cell sheet-col9">
+							<input type="text" name="attr_ref" />
+						</div>
+					</div> <!-- .sheet-row -->
+					<div class="sheet-row sheet-row-details">
+						<div class="sheet-cell sheet-col0 sheet-label">
+							Notes
+						</div>
+						<div class="sheet-cell sheet-col1">
+							<input type="text" name="attr_notes" />
+						</div>
+					</div> <!-- .sheet-row -->
+				</fieldset> <!-- .repeating_spells -->
+			</div> <!-- .sheet-table -->
+		</div> <!-- .sheet-box .sheet-spells -->
+	</div> <!-- .sheet-tab6 -->
+
+    <!-- ===== ===== ===== ===== LOGO ===== ===== ===== ===== -->
+
 	<div style="text-align: center; margin-top: 10px;">
 		<img height="30px" src="http://www.sjgames.com/poweredbygurps/img/logo.gif" />
 	</div>
@@ -2105,3 +2210,137 @@
 </span>
 
 <br />
+
+<script type="text/worker">
+
+	// function to sum a field from a repeating section
+	function sumRepeating(sectionName, fieldName, callback) {
+		getSectionIDs(sectionName, function (ids) {
+			var total = 0;
+			var tally = _.after(ids.length, function () {
+				total = total || 0;
+				console.log('****** Sum Repeating Section ******\n' + 
+					'* Section: ' + sectionName + '\n' + 
+					'* Field  : ' + fieldName + '\n' + 
+					'* #      : ' + ids.length + '\n' +
+					'* Sum    : ' + total + '\n' + 
+					'***********************************');
+				callback(total);
+			});
+			if (ids.length === 0 ) {
+				callback(0);
+			}
+			for (var i = 0; i < ids.length; i++) {
+				var fieldId = sectionName + '_' + ids[i] + '_' + fieldName;
+				getAttrs([fieldId], function (item) {
+					var value = parseFloat(item[Object.keys(item)[0]]) || 0;
+					total += value;
+					tally();
+				});
+			}
+		});
+	};
+
+	// Update the total cost of Languages
+	on("change:repeating_languages:spoken change:repeating_languages:written remove:repeating_languages", function (e) {
+		var total = 0;
+		var tally = _.after(2, function () {
+			setAttrs({ languages_points: total });
+		});
+		sumRepeating("repeating_languages", "spoken", function(v) {
+			console.log('Spoken: ' + v);
+			total += v;
+			tally();
+		});
+		sumRepeating("repeating_languages", "written", function(v) {
+			console.log('Written: ' + v);
+			total += v;
+			tally();
+		});
+	});
+
+	// Update the total cost of Cultural Familiarities
+	on("change:repeating_cultures:points remove:repeating_cultures", function (e) {
+		sumRepeating("repeating_cultures", "points", function(v) {
+			setAttrs({ cf_points: v });
+		});
+	});
+
+	// Update the total cost of Advantages
+	on("change:repeating_traits:points remove:repeating_traits", function (e) {
+		sumRepeating("repeating_traits", "points", function(v) {
+			setAttrs({ advantages_points: v });
+		});
+	});
+
+	// Update the total cost of Disadvantages
+	on("change:repeating_disadvantages:points remove:repeating_disadvantages", function (e) {
+		sumRepeating("repeating_disadvantages", "points", function(v) {
+			setAttrs({ disadvantages_points: v });
+		});
+	});
+
+	// Update the total cost of Racial Traits
+	on("change:repeating_racial:points remove:repeating_racial", function (e) {
+		sumRepeating("repeating_racial", "points", function(v) {
+			setAttrs({ racial_points: v });
+		});
+	});
+
+	// Update the total cost of Skills
+	on("change:repeating_skills:points remove:repeating_skills", function (e) {
+		sumRepeating("repeating_skills", "points", function(v) {
+			setAttrs({ skills_points: v });
+		});
+	});
+
+	// Update the total cost of Techniques
+	on("change:repeating_techniques:points remove:repeating_techniques", function (e) {
+		sumRepeating("repeating_techniques", "points", function(v) {
+			setAttrs({ techniques_points: v });
+		});
+	});
+
+	// Update the total cost of Spells
+	on("change:repeating_spells:points remove:repeating_spells", function (e) {
+		sumRepeating("repeating_spells", "points", function(v) {
+			setAttrs({ spells_points: v });
+		});
+	});
+		
+	// Update Summery
+	on("change:tl_pts change:appearance change:languages_points change:cf_points change:advantages_points change:disadvantages_points change:racial_points", function (e) {
+		sumRepeating("repeating_spells", "points", function(v) {
+			setAttrs({ attr_trait_points: tl_pts + appearance + languages_points + cf_points + advantages_points + disadvantages_points + racial_points });
+		});
+	});
+
+	// Update the line total weight and cost
+	on("change:repeating_item:count change:repeating_item:cost change:repeating_item:carried change:repeating_item:weight", function (e) {
+		getAttrs([
+			"repeating_item_count",
+			"repeating_item_cost",
+			"repeating_item_weight",
+			"repeating_item_carried"
+		], function (item) {
+			setAttrs({
+				repeating_item_weighttotal: Math.round(item.repeating_item_count * item.repeating_item_weight * item.repeating_item_carried * 100) / 100,
+				repeating_item_costtotal: Math.round(item.repeating_item_count * item.repeating_item_cost * 100) / 100
+			});
+		});
+	});
+
+	// Update the total weight of all carried items.
+	on("change:repeating_item:weighttotal remove:repeating_item", function (e) {
+		sumRepeating("repeating_item", "weighttotal", function(v) {
+			setAttrs({ total_weight: (v * 100) / 100 });
+			});
+		});
+
+	// Update the total cost of all items.
+	on("change:repeating_item:costtotal remove:repeating_item", function (e) {
+		sumRepeating("repeating_item", "costtotal", function(v) {
+			setAttrs({ total_value: (v * 100) / 100 });
+		});
+	});
+</script>
