@@ -20,7 +20,8 @@ This is a re-creation of the "green-sheet" for the D&D Basic Moldvay Red box gam
 * Monsters now have saves (Moldvay: Add monster saves #1898)
 * Monsters now can have multiple damage dice per attack (Moldvay: Monster multiple monster attack die #1897)
 * Monsters now have abilities section for non-attack roll abilities (Moldvay: Add monster abilities #1896)
-* Fumbles no longer show damage
+* Fumbles no longer show damage done
+
 
 #### 1.16
 * Fixing sheet worker to calculate chance to open door on sheet open and STR mod change
