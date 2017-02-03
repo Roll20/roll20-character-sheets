@@ -39,8 +39,8 @@
 
 ### Bug Fixes
 
-* NPC tokens show the correct radius when dragging a token on the map. Closes [#92: Check Valid data entry of "senses"](https://bitbucket.org/mlenser/5eshaped/issues/92/check-valid-data-entry-of-senses)
-* Many other 9.0.0 bugs. See the recent activity on my [issue tracker](https://bitbucket.org/mlenser/5eshaped/issues)
+* NPC tokens show the correct radius when dragging a token on the map. Closes [#92: Check Valid data entry of "senses"](https://bitbucket..org/mlenser/5eshaped/issues/92/check-valid-data-entry-of-senses)
+* Many other 9.0.0 bugs. See the recent activity on my [issue tracker](https://bitbucket.org/mlenser/5eshaped/issues).
 
 ## 8.5.1
 
