@@ -15,21 +15,23 @@ This is the redesigned Shaped character sheet for use on Roll20.net with the 5th
 ## Features
 
 * **High performance** sheet without the lag of old versions (100% sheet workers)
-* Improved styling to match the [5e paper sheet](http://i.imgur.com/87GaRhL.jpg) with nearly all elements clickable to output to chat
-* **Compendium Integration** for NPCs, Armor, Equipment, Spells, Weapons
-* **NPC actions and traits** are parsed and clickable.
+* Styling that matches the [5e paper sheet](http://i.imgur.com/87GaRhL.jpg)
+* **Compendium Integration** for NPCs, Spells, Weapons, Armor, Equipment
+* **NPC actions and traits** are parsed and clickable. The text on the sheet and in the output macro will adjust if you adjust an ability score.
 * **Customizable skills** with the option to change the ability on the fly
-* Translations (All languages supported by Roll20)
-* Auto populated Class Features which include things like Lay on Hands or Sneak Attack
-* **Spells** with filtering and the option to cast at a higher level
-* Customizable Classes - Change Name, HD, or spellcasting level of the classes
-* **Armor** - Covers normal armor as well as unarmored ability cases like monk, barbarian, etc.
+* **Spells** with the option to cast at a higher level
+  * Filters to limit which spells are displayed
+* **Chat macros** that are kept in sync with the contents of the sheet. Ability Checks, Saving Throws, Attacks, Actions, Stablock, etc.
+* Critical damage is automatically calculated with the possibility of selecting features like brutal critical or houserules that critical hits do maximum dice damage plus the normal damage.
+* Classes automatically select proficiencies (Weapon, Armor, Tools, Saving Throws) and class features.
+  * Customizable Classes - Change Name, HD, or spellcasting level of the classes
+* Translations
+* **Armor** Covers normal armor as well as unarmored ability cases like monk, barbarian, etc.
 * **Equipment** with gold and weight automatically calculated. Equipment Items are clickable from the core page for items like Potion of Healing
-* Attachers can be used to remind yourself to add to saving throws while within 10 feet of your paladin
-* Extra features: Jack of all trades, halfling luck, vision, movement, appearance.
 * **Settings** for how to output all rolls, death saves, initiative, etc
   * Roll settings to choose to always roll with advantage, disadvantage, or query for both
   * Optional bonuses to all skills, abilities, saving throws, etc.
+* Attachers can be used to remind yourself to add to saving throws while within 10 feet of your paladin
 
 ![Sheet](http://i.imgur.com/ZVymw3T.jpg "Sheet")
 

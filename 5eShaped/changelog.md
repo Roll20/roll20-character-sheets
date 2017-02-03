@@ -1,46 +1,46 @@
 ## 9.0.0
 
-### TODO:
-
-* fully convert from old pre-9.0.0 (most everything is converted - still working through some cases - could use some testing here). Definitely some weird cases if coming from ealy versions where upgrades do not run sequentially.
-* Fix conversion from OGL
-* It should be possible to disable the output of the "Melee weapon attack. ..." part of an attack.
-* Range on spells always shows ft, that's bad for range Touch, Self...
-* **9.1.0** cannot edit trait uses outside edit mode
-* **Roll20 should fix** longbow (and other weapons, I suppose) gets all of its text dumped into content, that's not very practical
-
 ### Breaking Changes
 
-* Completely revamped how attacks, saving throws, and damage is entered into the sheet. The new model is that attack has damage and secondary damage, saving throw has damage and secondary damage, and there is damage that is not tied to either. Saving Throw damage will not multiply on a crit, but the others will.
-  * Editing uses of Attacks, Actions, and Traits can not be done in presentation mode. I will likely re-enable this in a very hacky solution in 9.1.0 if users desire it (which I assume they will).
+* Completely revamped how attacks, saving throws, and damage is entered into the sheet. The new model is that attack has damage and secondary damage, saving throw has damage and secondary damage, and there is damage that is not tied to either.
+  * Editing uses of Attacks, Actions, and Traits can be done in presentation mode.
   * Damage of all types is now split between the die size and the amount of dice for critical damage changes and for ease of higher level for spells.
+  * Saving Throw damage will not multiply on a crit, but the others will.
   * Ability selects are now stored as 3 characters instead of the full name. (some areas had breaking changes as a result).
   * Content is the new freetext field for all attacks, spells, etc. Freetext still exists, but content is where the main content goes. Freetext will be purely for users to edit.
   * Saving throw condition and saving throw failure are no longer fields. Saving throws are rather diverse in their wording and subscribing a setup for them is too difficult at this time. It's best to leave the conditions and saving throw failure in the text. Save success is extracted as it is commonly used for half damage.
+  * Attacks always have an attack roll. This has always been implied by name and and written about on the forums. If you previously had things without attacks in this section they likely belong in another section (spells, features & traits).
+* Saving throws from things like spells, attacks, traits, actions, etc in the chat output now use @{selected} instead of @{target}. This should be much easier for PCs and slightly easier for NPCs.
+* The roll template has had many fields added and removed. The styling is also adjusted to be left aligned.
+* Upgrade scripts for sheets older than 3.0.0 have been removed. 3.0.0+ upgrades will still be run on those sheets, but no older upgrades than that. 3.0.0 was released April 30th 2016 so that should've allowed plenty of time for people to upgrade.
 
 ### Features
 
-* NPC actions that have an attack now recalculate everything when a relevant field is changed. Generating nice texts like "Melee Weapon Attack:+4 to hit, reach 5 ft., one target.Hit:6 (1d6 + 2) piercing damage."
+* Colors have been adjusted to increase contrast (readability)
+* Adding a class automatically adds proficiencies (armor, weapon, tools, and saving throws) as well as the spell_ability and it toggles the appropriate spell toggles such as spells, cantrips, spell slots, prepared matters.
+* NPC actions that have an attack now recalculate everything when a relevant field is changed. Generating nice texts like "Melee Weapon Attack: +4 to hit, reach 5 ft., one target. Hit: 6 (1d6 + 2) piercing damage."
 * Critical damage is automatically calculated with the option to use the maximum damage as a houserule. Additionally you can select the half-orc savage attacks to be added automatically as well as manually enter an amount to be added on a critical (after toggling on "extra on a crit" on the settings page).
+* Crit Range and Extra damage on a crit are not shown by default, but can be turned on 1 by 1 on the settings page.
 * The UI of attacks, saving throws, etc is created is now all based on inline editing with auto expanding input widths.
 * Auto-expand inputs are used for nearly every input on the sheet. This really improves the styling in some areas. Some noticeable areas: Skill ability selects, attack/damage sections.
+* Versatile weapons are now split into two different weapons when they are dragged from SRD.
 * [#98: Add Artificer](https://bitbucket.org/mlenser/5eshaped/issues/98/add-artificer)
 * Added Ranger UA to the class options list. Closes part of [#102: Increasing character class level reverts changes made to traits](https://bitbucket.org/mlenser/5eshaped/issues/102/increasing-character-class-level-reverts).
 * [#96: Add the ability to change the unarmored formula](https://bitbucket.org/mlenser/5eshaped/issues/96/add-the-ability-to-change-the-unarmored)
+* [#104: Allow higher level to query for all levels, not just available spell slot levels](https://bitbucket.org/mlenser/5eshaped/issues/104/allow-higher-level-to-query-for-all-levels)
 * Condense buttons added to attacks, actions, reactions, and legendary actions. It remains on traits for both PCs and NPCs.
 * Added distance "ft." to senses and speed and several other areas. This updates when you change your distance in the setting page.
 * Resistances are hidden for PCs if they are empty.
 * Section titles on the NPC core page are now clickable (actions, reactions, legendary actions, etc). They output the chat macro.
 * NPC names are now clickable. They output the statblock.
-* Class proficiencies are automatically added now. Armor, Weapons, Tools, and Saving Throws.
 * Added a spells toggle on core for PCs which is viewable in edit mode.
 * Added a link to report an issue to the sheet (next to documentation)
 * Emote, Freetext, and Freeform are not shown by default, but can be turned on 1 by 1 on the settings page.
-* Crit Range and Extra damage on a crit are not shown by default, but can be turned on 1 by 1 on the settings page.
 
 ### Bug Fixes
 
 * NPC tokens show the correct radius when dragging a token on the map. Closes [#92: Check Valid data entry of "senses"](https://bitbucket.org/mlenser/5eshaped/issues/92/check-valid-data-entry-of-senses)
+* Many other 9.0.0 bugs. See the recent activity on my [issue tracker](https://bitbucket.org/mlenser/5eshaped/issues)
 
 ## 8.5.1
 
