@@ -33,7 +33,7 @@ This is the redesigned Shaped character sheet for use on Roll20.net with the 5th
   * Optional bonuses to all skills, abilities, saving throws, etc.
 * Attachers can be used to remind yourself to add to saving throws while within 10 feet of your paladin
 
-![Sheet](http://i.imgur.com/ZVymw3T.jpg "Sheet")
+![Sheet](http://i.cubeupload.com/RwfoVZ.jpg "Sheet")
 
 ## How to Update the sheet yourself (as Pro):
 
