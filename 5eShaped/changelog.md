@@ -1,3 +1,24 @@
+## 9.0.1
+
+The following issues should have no impact on the stability of the sheet. All are minor issues. I purposefully avoided anything that may cause other issues.
+
+### Bug Fixes
+
+* freetext and display_text were only being cleared if content was empty and that wasn't always true. Now it correctly determines if it should be set to content or added to content. Either way both are cleared in all cases it seems. Closes [#150: Upgrade 7.12.2 to 9.0.0](https://bitbucket.org/mlenser/5eshaped/issues/150/upgrade-7122-to-900) and [#159: Automatically-created class features fail to clear freetext on conversion](https://bitbucket.org/mlenser/5eshaped/issues/159/automatically-created-class-features-fail)
+* Spells with ranged attacks were being upgraded as melee spell attacks. This is solved as part of the upgrade to 9.0.0. The upgrade will not rerun for 9.0.1. Closes [#154: Wizard Spell Upgrade 7.12.2 to 9.0.0](https://bitbucket.org/mlenser/5eshaped/issues/154/wizard-spell-upgrade-7122-to-900)
+* New attacks will not show "undefined" as part of the damage string. Closes [#153: Attacks created default to bad damage string](https://bitbucket.org/mlenser/5eshaped/issues/153/attacks-created-default-to-bad-damage)
+* [#155: Condense on Equipment not functioning](https://bitbucket.org/mlenser/5eshaped/issues/155/condense-on-equipment-not-functioning)
+* Any ability with freeform will now toggle "show_freeform" to be on for the whole sheet.
+* [#161: Removing character levels does not remove character_level attribute](https://bitbucket.org/mlenser/5eshaped/issues/161/removing-character-levels-does-not-remove)
+* [#162: NPC Action free text sometimes remains behind](https://bitbucket.org/mlenser/5eshaped/issues/162/npc-action-free-text-sometimes-remains)
+
+### Known Issues
+
+* **Duplicate repeating Item:** It is possible for some duplication of versatile weapons during the upgrade. This is a race condition that I had squashed on another character. This likely won't appear on a character without spellcasting. It's a difficult bug to stop - like all race conditions are. The real fix is revamping my updates to use silent, but that's a later version. I think this is an issue we'll have to accept. See [#158: Quarterstaff (Versatile) created 3 times on upgrade](https://bitbucket.org/mlenser/5eshaped/issues/158/quarterstaff-versatile-created-3-times-on)
+* **Duplicate repeating Item:** Fighting Styles are split to class specific traits now. The user will have to determine to delete the old fighting style. This was done to prevent data loss. See [#151: Fighting Style Upgrades](https://bitbucket.org/mlenser/5eshaped/issues/151/fighting-style-upgrades)
+* **Attack/Damage/Saving Throw toggled:** While upgrading I had to be more liberal with how I determine if one of the toggles is selected for various reasons. The toggles will be selected if there is anything in "damage", "damage_ability", "damage_bonus", "damage_type", "heal", etc. You can simply untoggle them. See [#152: Abilities with Superiority Die in Description](https://bitbucket.org/mlenser/5eshaped/issues/152/abilities-with-superiority-die-in)
+* **Handled for new imports and a workaround** [#147: NPC action: changing ability bonus for attack to "nothing" is reset to Str](https://bitbucket.org/mlenser/5eshaped/issues/147/npc-action-changing-ability-bonus-for) This is an edge case that only applies to things like Bat. It needs to be solved, but it requires a change that alters how I get and save data from the server. That is too risky for 9.0.x. In the mean time importing from SRD or JSON will parse the correct attack or damage by adding positive or negative bonuses. It can be manually adjusted as well. I will solve this for 9.1.0 or later.
+
 ## 9.0.0
 
 ### Breaking Changes
