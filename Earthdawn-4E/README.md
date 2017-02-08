@@ -6,7 +6,7 @@ DISCLAIMER: This is NOT a Character Builder.  It does very little math for you.
 You will need a Pro account in order to use this Custom Character Sheet.
 
 This is written to work with the following API scripts:
-- Ammo v0.3.3
+- ChatSetAttr version 1.2.1
 - Power Cards 3.2.23
 
 Power Cards will require you to create a Handout named "PowerCards Formats" that is visible to all Players with the following information:
