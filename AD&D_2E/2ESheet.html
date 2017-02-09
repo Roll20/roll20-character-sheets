@@ -987,27 +987,120 @@ Current weight:<input type="number" name="attr_gearweighttotal" class="sheet-nob
 </div>
 
 <rolltemplate class="sheet-rolltemplate-2Edefault">
-    <div class="default-container">
+    <div class="sheet-template-container">
         <div class="sheet-default-head">
             <table>
-                <tr><td class="default-c0">{{name}}</td></tr>
+                <tr><th class="sheet-template-title1">{{name}}</th></tr>
+				{{#subtitle}}
+					<tr><th class="sheet-template-subtitle1">{{subtitle}}</th></tr>
+				{{/subtitle}}
             </table>
         </div>
-        <div class="sheet-default_body">
+        <div class="sheet-template-body">
+		<table>
+			{{#allprops() desc desc1 desc2 name subtitle}}
+				<tr><td class="default-c1">{{key}}</td><td class="default-c2">{{value}}</td>
+			{{/allprops() desc desc1 desc2 name subtitle}}
+			{{#desc}}
+				<tr><td class="default-c3" colspan="2">{{desc}}</td></tr>
+			{{/desc}}
+			{{#desc1}}
+				<tr><td class="default-c3" colspan="2">{{desc1}}</td></tr>
+			{{/desc1}}
+			{{#desc2}}
+				<tr><td class="default-c3" colspan="2">{{desc2}}</td></tr>
+			{{/desc2}}
+		</table>
+        </div>
+    </div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-2Eattack">
+	<div class="sheet-template-container">
+		<div class="sheet-attack-head">
+			<table>
+				<tr><th class="sheet-template-title1">{{title}}</th></tr>
+				<tr><th class="sheet-template-subtitle1">{{subtitle}}</th></tr>
+			</table>
+		</div>
+		<div class="sheet-template-body">
+			<table>
+				<tr><td colspan="3"><span class="weapon-used">{{weapon_used}}</span></td></tr>
+				<tr>
+					<td class="attack-c1"><b>S/M</b></td>
+					<td class="attack-c2" rowspan="2">{{ac_hit}}</td>
+					<td class="attack-c1"><b>L</b></td>
+				</tr>
+				<tr>
+					<td class="attack-c3" rowspan="2">{{dmg_s}}</td>
+					<td class="attack-c3" rowspan="2">{{dmg_l}}</td>
+				</tr>
+				<tr>
+					<td class="attack-c4"><b>AC Hit</b></td>
+				</tr>
+				{{#rollWasCrit() ac_hit }}
+					<tr><td colspan="3" class="attack-c5">CRITICAL HIT!{{#crit}}<br><span class='attack-crit'>{{crit}}</span>{{/crit}}</td></tr>
+				{{/rollWasCrit() ac_hit }}
+				{{#rollWasFumble() ac_hit }}
+					<tr><td colspan="3" class="attack-c6">FUMBLE!{{#fumble}}<br><span class='attack-fumble'>{{fumble}}</span>{{/fumble}}</td></tr>
+				{{/rollWasFumble() ac_hit }}
+			</table>
+		</div>
+	</div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-2Espell">
+    <div class="sheet-template-container">
+        <div class="sheet-spell-head">
             <table>
-            {{#allprops() desc desc1 desc2}}
-                <tr><td class="default-c1">{{key}}</td><td class="default-c2">{{value}}</td>
-            {{/allprops() desc desc1 desc2}}
-            {{#desc}}
-                <tr><td class="default-c3" colspan="2">{{desc}}</td></tr>
-            {{/desc}}
-            {{#desc1}}
-                <tr><td class="default-c3" colspan="2">{{desc1}}</td></tr>
-            {{/desc1}}
-            {{#desc2}}
-                <tr><td class="default-c3" colspan="2">{{desc2}}</td></tr>
-            {{/desc2}}
+                <tr><th class="sheet-template-title1">{{title}}</th></tr>
+                <tr><th class="sheet-template-subtitle1">{{splevel}} * {{school}}</th></tr>
+                {{#sphere}}
+					<tr><th class="sheet-template-subtitle1">Priest Sphere: {{sphere}}</th></tr>
+                {{/sphere}}
+            </table>
+        </div>
+        <div class="sheet-template-body">
+            <table>
+                <tr><td class="sheet-spell-c1"><span class="sheet-spell-prop">Components</span><br>{{components}}</td><td class="spell-c1"><span class="sheet-spell-prop">Casting Time</span><br>{{time}}</td></tr>
+                <tr><td class="sheet-spell-c1"><span class="sheet-spell-prop">Range</span><br>{{range}}</td><td class="spell-c1"><span class="sheet-spell-prop">Duration</span><br>{{duration}}</td></tr>
+                <tr><td class="sheet-spell-c1"><span class="sheet-spell-prop">Area of Effect</span><br>{{aoe}}</td><td class="spell-c1"><span class="sheet-spell-prop">Saving Throw</span><br>{{save}}</td></tr>
+                {{#damage}}
+                    <tr><td colspan="2" class="sheet-spell-c1"><span class="sheet-spell-prop">Damage:</span> {{damage}} {{damagetype}}</td></tr>
+                {{/damage}}
+                {{#healing}}
+                    <tr><td colspan="2" class="sheet-spell-c1"><span class="sheet-spproperty">Healing:</span> {{healing}}</td></tr>
+                {{/healing}}
+                {{#effects}}
+                    <tr><td colspan="2" class="sheet-spell-c2"><span class="sheet-spell-prop">Effects:</span> {{effects}}</td></tr>
+                {{/effects}}
             </table>
         </div>
     </div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-2Esave">
+    <div class="sheet-template-container">
+        <div class="save-head">
+            <table>
+                <tr><th class="sheet-template-title2">Save vs. {{savevs}}</th></tr>
+                <tr><th class="sheet-template-subtitle2">for {{character}}</th></tr>
+            </table>
+        </div>
+        <div class="sheet-template-body">
+            <table>
+				<tr><td class="save-c1">Saving Throw Roll:</td><td class="save-c2">{{saveroll}}</td></tr>
+				<tr><td class="save-c1">Saving Throw Target:</td><td class="save-c2">{{savetarget}}</td></tr>
+                {{#rollTotal() saveroll savetarget}}
+                    <tr><td class="save-c3" colspan="2">Success!</td></tr>
+                {{/rollTotal() saveroll savetarget}}
+                {{#rollGreater() saveroll savetarget}}
+                    <tr><td class="save-c3" colspan="2">Success!</td></tr>
+                {{/rollGreater() saveroll savetarget}}
+                {{#rollLess() saveroll savetarget}}
+                    <tr><td class="save-c4" colspan="2">Failed!</td></tr>
+                {{/rollLess() saveroll savetarget}}
+            </table>
+        </div>
+    </div>    
 </rolltemplate>
