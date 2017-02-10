@@ -26,5 +26,7 @@ November 21 - Fixed the coin weight formula.
 
 Janaury 11 - Shifted weapon specialization down to combat section, editted wording on dice rolls, editted attribute modifiers so they do not show all the math but just results, editted secondary skills to include a modifier input, editted class skills to apply attribute mods to skill score instead of roll. Working on autocalculation for the encumbrance (code not included in this revision due to not working).
 
+Febuary - Added a few new features. Racial note field below basic ability checks, added racial saving throw modifiers, still working on the encumbrance autocalculation.
+
 **Credit Where Credit is Due**
 The CSS and much of the layout is lifted from the work of allenmaher's BECMI sheet who lifted the excellent work of John Myles (@Actoba on roll20) and the 5e Dungeons and Dragons sheet.
