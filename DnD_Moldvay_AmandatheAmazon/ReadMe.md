@@ -3,9 +3,16 @@
 This is a re-creation of the "green-sheet" for the D&D Basic Moldvay Red box game.  It was created for the Roll20 Moldvay Basic Contest.
 
 ## Current Version
-2.1
+2.2
 
 ### Changelog
+
+#### 2.2
+* Added the ability to use Bonus or Minus roll query to your open doors check (using a crowbar for instance)
+* Formatted the Open Doors roll template so you see your chance out of 6 to open the door upon rolling
+* Removed the Sheet Worker script for Open Doors because sheet workers do not work with roll queries
+* [Request] Added information to the mouseover on Rolls for Attacks to indicate which rolls are THAC0, Dice Roll, Bonus'
+* Centered Success and Failure text
 
 #### 2.1
 * Spells now have roll templates
