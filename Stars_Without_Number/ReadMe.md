@@ -18,6 +18,10 @@ Report any problems, suggestions or features by sending a private message on Rol
 
 ### Changelog
 
+#### 0.1.3
+
+* Added Sheet Worker to enforce System Strain constraints against Maximum Strain and Permanent Strain
+
 #### 0.1.2
 
 * Added ship weapon power field

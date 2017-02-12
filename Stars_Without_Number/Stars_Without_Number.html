@@ -112,7 +112,7 @@
       </div>
     </div>
     <div class="sheet-row">
-      <div class="sheet-col sheet-swn-min">Version 0.1.2</div>
+      <div class="sheet-col sheet-swn-min">Version 0.1.3</div>
     </div>
     <h3>Core Stats</h3>
     <div class="sheet-2colrow sheet-stats">
@@ -283,7 +283,7 @@
       </div>
     </div>
     <div class="sheet-row">
-      <div class="sheet-col sheet-swn-min">Version 0.1.2</div>
+      <div class="sheet-col sheet-swn-min">Version 0.1.3</div>
     </div>
     <h3>Core Stats</h3>
     <div class="sheet-row sheet-stats">
@@ -372,10 +372,24 @@
           </div>
         </div>
         <div class="sheet-row">
-          <div class="sheet-col sheet-attribute-ext-label"><label for="attr_strain">System Strain</label></div>
-          <div class="sheet-col"><input type="number" name="attr_strain" class="sheet-stats-half"></div>
-          <div class="sheet-col sheet-attribute-ext-label"><label for="attr_strain_max">Max Strain</label></div>
-          <div class="sheet-col"><input type="number" disabled="true" value="@{Con}" name="attr_strain_max" class="sheet-stats-half"></div>
+          <div class="sheet-col sheet-attribute-ext-label">
+            <label for="attr_strain">System Strain</label>
+          </div>
+          <div class="sheet-col">
+            <input type="number" name="attr_strain" class="sheet-stats-half">
+          </div>
+          <div class="sheet-col sheet-attribute-label">
+            <label for="attr_strain_max">Max</label>
+          </div>
+          <div class="sheet-col">
+            <input type="number" value="@{Con}" name="attr_strain_max" class="sheet-stats-half">
+          </div>
+          <div class="sheet-col sheet-attribute-label">
+            <label for="attr_strain_perm">Perm</label>
+          </div>
+          <div class="sheet-col">
+            <input type="number" name="attr_strain_perm" class="sheet-stats-half">
+          </div>
         </div>
         <div class="sheet-row">
           <div class="sheet-col sheet-attribute-ext-label"><label for="attr_hp">Hit Points</label></div>
@@ -1225,3 +1239,39 @@
     </div>
   </div>
 </div>
+
+<!-- Sheet Workers -->
+<script type="text/worker">
+on("sheet:opened", function() {
+    validateStrain();
+});
+on("change:strain", function(){
+    validateStrain();
+});
+on("change:strain_perm", function(){
+    validateStrain();
+});
+    on("change:strain_max", function(){
+    validateStrain();
+});
+
+function validateStrain() {
+    getAttrs(["strain", "strain_perm", "strain_max"], function(v) {
+        if (!v.strain || (!v.strain_perm && !v.strain_max)) return false;
+
+        v.strain = +v.strain;
+        if (v.strain_perm) +v.strain_perm;
+        if (v.strain_max) +v.strain_max;
+
+        if (v.strain_perm && v.strain < v.strain_perm) {
+            setAttrs({strain: v.strain_perm}, function() {
+                console.log('[Stars Without Number] System strain tried to go below permanent strain');
+            });
+        } else if (v.strain_max && v.strain > v.strain_max) {
+            setAttrs({strain: v.strain_max}, function() {
+                console.log('[Stars Without Number] System strain tried to go above maximum strain');
+            });
+        }
+    });
+}
+</script>
