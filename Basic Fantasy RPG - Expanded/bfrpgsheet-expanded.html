@@ -44,6 +44,679 @@ on("sheet:opened", function() {
   });
 });
 </script>
+<script type=“text/worker”>
+/* ---- BEGIN: TheAaronSheet.js ---- */
+// Github:   https://github.com/shdwjk/TheAaronSheet/blob/master/TheAaronSheet.js
+// By:       The Aaron, Arcane Scriptomancer
+// Contact:  https://app.roll20.net/users/104025/the-aaron
+
+var TAS = TAS || (function(){
+    'use strict';
+
+    var version = '0.2.4',
+        lastUpdate = 1457098091,
+
+        loggingSettings = {
+            debug: {
+                key:     'debug',
+                title:   'DEBUG',
+                color: {
+                    bgLabel: '#7732A2',
+                    label:   '#F2EF40',
+                    bgText:  '#FFFEB7',
+                    text:    '#7732A2'
+                }
+            },
+            error: {
+                key:     'error',
+                title:   'Error',
+                color: {
+                    bgLabel: '#C11713',
+                    label:   'white',
+                    bgText:  '#C11713',
+                    text:    'white'
+                }
+            },
+            warn: {
+                key:     'warn',
+                title:   'Warning',
+                color: {
+                    bgLabel: '#F29140',
+                    label:   'white',
+                    bgText:  '#FFD8B7',
+                    text:    'black'
+                }
+            },
+            info: {
+                key:     'info',
+                title:   'Info',
+                color: {
+                    bgLabel: '#413FA9',
+                    label:   'white',
+                    bgText:  '#B3B2EB',
+                    text:    'black'
+                }
+            },
+            notice: {
+                key:     'notice',
+                title:   'Notice',
+                color: {
+                    bgLabel: '#33C133',
+                    label:   'white',
+                    bgText:  '#ADF1AD',
+                    text:    'black'
+                }
+            },
+            log: {
+                key:     'log',
+                title:   'Log',
+                color: {
+                    bgLabel: '#f2f240',
+                    label:   'black',
+                    bgText:  '#ffff90',
+                    text:    'black'
+                }
+            },
+            callstack: {
+                key:     'TAS',
+                title:   'function',
+                color: {
+                    bgLabel: '#413FA9',
+                    label:   'white',
+                    bgText:  '#B3B2EB',
+                    text:    'black'
+                }
+            },
+            callstack_async: {
+                key:     'TAS',
+                title:   'ASYNC CALL',
+                color: {
+                    bgLabel: '#413FA9',
+                    label:   'white',
+                    bgText:  '#413FA9',
+                    text:    'white'
+                }
+            },
+            TAS: {
+                key:     'TAS',
+                title:   'TAS',
+                color: {
+                    bgLabel: 'grey',
+                    label:   'black;background:linear-gradient(#304352,#d7d2cc,#d7d2cc,#d7d2cc,#304352)',
+                    bgText:  'grey',
+                    text:    'black;background:linear-gradient(#304352,#d7d2cc,#d7d2cc,#d7d2cc,#304352)'
+                }
+            }
+        },
+
+
+        config = {
+            debugMode: false,
+            logging: {
+                log: true,
+                notice: true,
+                info: true,
+                warn: true,
+                error: true,
+                debug: false
+            }
+        },
+
+        callstackRegistry = [],
+		queuedUpdates = {}, //< Used for delaying saves till the last momment.
+
+    complexType = function(o){
+        switch(typeof o){
+            case 'string':
+                return 'string';
+            case 'boolean':
+                return 'boolean';
+            case 'number':
+                return (_.isNaN(o) ? 'NaN' : (o.toString().match(/\./) ? 'decimal' : 'integer'));
+            case 'function':
+                return 'function: '+(o.name ? o.name+'()' : '(anonymous)');
+            case 'object':
+                return (_.isArray(o) ? 'array' : (_.isArguments(o) ? 'arguments' : ( _.isNull(o) ? 'null' : 'object')));
+            default:
+                return typeof o;
+        }
+    },
+
+	dataLogger = function(primaryLogger,secondaryLogger,data){
+        _.each(data,function(m){
+            var type = complexType(m);
+            switch(type){
+                case 'string':
+                    primaryLogger(m);
+                    break;
+                case 'undefined':
+                case 'null':
+                case 'NaN':
+                    primaryLogger('['+type+']');
+                    break;
+                case 'number':
+                case 'not a number':
+                case 'integer':
+                case 'decimal':
+                case 'boolean':
+                    primaryLogger('['+type+']: '+m);
+                    break;
+                default:
+                    primaryLogger('['+type+']:=========================================');
+                    secondaryLogger(m);
+                    primaryLogger('=========================================================');
+                    break;
+            }
+        });
+	},
+
+
+    colorLog = function(options){
+        var coloredLoggerFunction,
+            key = options.key,
+            label = options.title || 'TAS',
+            lBGColor = (options.color && options.color.bgLabel) || 'blue',
+            lTxtColor = (options.color && options.color.label) || 'white',
+            mBGColor = (options.color && options.color.bgText) || 'blue',
+            mTxtColor = (options.color && options.color.text) || 'white';
+
+        coloredLoggerFunction = function(message){
+            console.log(
+                '%c '+label+': %c '+message + ' ',
+                'background-color: '+lBGColor+';color: '+lTxtColor+'; font-weight:bold;',
+                'background-color: '+mBGColor+';color: '+mTxtColor+';'
+            ); 
+        };
+        return function(){
+            if('TAS'===key || config.logging[key]){
+               dataLogger(coloredLoggerFunction,function(m){console.log(m);},_.toArray(arguments)); 
+            }
+        };
+    },
+
+    logDebug  = colorLog(loggingSettings.debug),
+    logError  = colorLog(loggingSettings.error),
+    logWarn   = colorLog(loggingSettings.warn),
+    logInfo   = colorLog(loggingSettings.info),
+    logNotice = colorLog(loggingSettings.notice),
+    logLog    = colorLog(loggingSettings.log),
+    log       = colorLog(loggingSettings.TAS),
+    logCS     = colorLog(loggingSettings.callstack),
+    logCSA    = colorLog(loggingSettings.callstack_async),
+
+    registerCallstack = function(callstack,label){
+        var idx=_.findIndex(callstackRegistry,function(o){
+            return (_.difference(o.stack,callstack).length === _.difference(callstack,o.stack).length) &&
+                _.difference(o.stack,callstack).length === 0 &&
+                o.label === label;
+        });
+        if(-1 === idx){
+            idx=callstackRegistry.length;
+            callstackRegistry.push({
+                stack: callstack,
+                label: label
+            });
+        }
+        return idx;
+    },
+
+    setConfigOption = function(options){
+        var newconf =_.defaults(options,config);
+        newconf.logging=_.defaults(
+            (options && options.logging)||{},
+            config.logging
+        );
+        config=newconf;
+    },
+    
+    debugMode = function(){
+        config.logging.debug=true;
+        config.debugMode = true;
+    },
+
+    getCallstack = function(){
+        var e = new Error('dummy'),
+            stack = _.map(_.rest(e.stack.replace(/^[^\(]+?[\n$]/gm, '')
+            .replace(/^\s+at\s+/gm, '')
+            .replace(/^Object.<anonymous>\s*\(/gm, '{anonymous}()@')
+            .split('\n')),function(l){
+                return l.replace(/\s+.*$/,'');
+            });
+        return stack;
+    },
+    logCallstackSub = function(cs){
+        var matches, csa;
+        _.find(cs,function(line){
+            matches = line.match(/TAS_CALLSTACK_(\d+)/);
+            if(matches){
+               csa=callstackRegistry[matches[1]];
+               logCSA( '===================='+(csa.label ? '> '+csa.label+' <' : '')+'====================');
+               logCallstackSub(csa.stack);
+               return true;
+            } 
+            logCS(line);
+            return false;
+        });
+    },
+    logCallstack = function(){
+        var cs;
+        if(config.debugMode){
+            cs = getCallstack();
+            cs.shift();
+            log('==============================> CALLSTACK <==============================');
+            logCallstackSub(cs);
+            log('=========================================================================');
+        }
+    },
+
+
+    wrapCallback = function (label, callback, context){
+        var callstack;
+        if('function' === typeof label){
+            context=callback;
+            callback=label;
+            label=undefined;
+        }
+        if(!config.debugMode){
+            return (function(cb,ctx){
+                return function(){
+                    cb.apply(ctx||{},arguments);
+                };
+            }(callback,context));
+        }
+        
+        callstack = getCallstack();
+        callstack.shift();
+        
+        return (function(cb,ctx,cs,lbl){
+            var ctxref=registerCallstack(cs,lbl);
+
+            /*jshint -W054 */
+            return new Function('cb','ctx','TASlog',
+                "return function TAS_CALLSTACK_"+ctxref+"(){"+
+                    "TASlog('Entering: '+(cb.name||'(anonymous function)'));"+
+                    "cb.apply(ctx||{},arguments);"+
+                    "TASlog('Exiting: '+(cb.name||'(anonymous function)'));"+
+                "};")(cb,ctx,log);
+            /*jshint +W054 */
+        }(callback,context,callstack,label));
+    },
+
+
+    prepareUpdate = function( attribute, value ){
+        queuedUpdates[attribute]=value;
+    },
+
+    applyQueuedUpdates = function() {
+      setAttrs(queuedUpdates);
+      queuedUpdates = {};
+    },
+
+	namesFromArgs = function(args,base){
+        return _.chain(args)
+            .reduce(function(memo,attr){
+                if('string' === typeof attr) {
+                    memo.push(attr);
+                } else if(_.isArray(args) || _.isArguments(args)){
+                    memo = namesFromArgs(attr,memo);
+                }
+                return memo;
+            },(_.isArray(base) && base) || [])
+            .uniq()
+            .value();
+	},
+
+	addId = function(obj,value){
+		Object.defineProperty(obj,'id',{
+			value: value,
+			writeable: false,
+			enumerable: false
+		});
+	},
+
+	addProp = function(obj,prop,value,fullname){
+		(function(){
+            var pname=(_.contains(['S','F','I','D'],prop) ? '_'+prop : prop),
+			    full_pname = fullname || prop,
+                pvalue=value;
+
+            _.each(['S','I','F'],function(p){
+                if( !_.has(obj,p)){
+                    Object.defineProperty(obj, p, {
+                        value: {},
+                        enumerable: false,
+                        readonly: true
+                    });
+                }
+            });
+            if( !_.has(obj,'D')){
+                Object.defineProperty(obj, 'D', {
+                    value: _.reduce(_.range(10),function(m,d){
+                            Object.defineProperty(m, d, {
+                                value: {},
+                                enumerable: true,
+                                readonly: true
+                            });
+                            return m;
+                        },{}),
+                    enumerable: false,
+                    readonly: true
+                });
+            }
+
+
+            // Raw value
+			Object.defineProperty(obj, pname, {
+                enumerable: true,
+				set: function(v){
+                    if(v!==pvalue) {
+                        pvalue=v;
+                        prepareUpdate(full_pname,v);
+                    }
+				},
+				get: function(){
+					return pvalue;
+				}
+			});
+            
+            // string value
+			Object.defineProperty(obj.S, pname, {
+                enumerable: true,
+				set: function(v){
+                    var val=v.toString();
+                    if(val !== pvalue) {
+                        pvalue=val;
+                        prepareUpdate(full_pname,val);
+                    }
+				},
+				get: function(){
+					return pvalue.toString();
+				}
+			});
+
+            // int value
+			Object.defineProperty(obj.I, pname, {
+                enumerable: true,
+				set: function(v){
+                    var val=parseInt(v,10) || 0;
+                    if(val !== pvalue){
+                        pvalue=val;
+                        prepareUpdate(full_pname,val);
+                    }
+				},
+				get: function(){
+					return parseInt(pvalue,10) || 0;
+				}
+			});
+
+            // float value
+			Object.defineProperty(obj.F, pname, {
+                enumerable: true,
+				set: function(v){
+                    var val=parseFloat(v) || 0;
+                    if(val !== pvalue) {
+                        pvalue=val;
+                        prepareUpdate(full_pname,val);
+                    }
+				},
+				get: function(){
+					return parseFloat(pvalue) || 0;
+				}
+			});
+            _.each(_.range(10),function(d){
+                Object.defineProperty(obj.D[d], pname, {
+                    enumerable: true,
+                    set: function(v){
+                        var val=(parseFloat(v) || 0).toFixed(d);
+                        if(val !== pvalue){
+                            pvalue=val;
+                            prepareUpdate(full_pname,val);
+                        }
+                    },
+                    get: function(){
+                        return (parseFloat(pvalue) || 0).toFixed(d);
+                    }
+                });
+            });
+
+		}());
+	},
+	
+	repeating = function( section ) {
+		return (function(s){
+			var sectionName = s,
+				attrNames = [],
+				fieldNames = [],
+				operations = [],
+                after = [],
+			
+			repAttrs = function TAS_Repeating_Attrs(){
+				attrNames = namesFromArgs(arguments,attrNames);
+				return this;
+			},
+			repFields = function TAS_Repeating_Fields(){
+				fieldNames = namesFromArgs(arguments,fieldNames);
+				return this;
+			},
+			repReduce = function TAS_Repeating_Reduce(func, initial, final, context) { 
+				operations.push({
+                    type: 'reduce',
+                    func: (func && _.isFunction(func) && func) || _.noop,
+                    memo: (_.isUndefined(initial) && 0) || initial,
+                    final: (final && _.isFunction(final) && final) || _.noop,
+                    context: context || {}
+                });
+				return this;
+			},
+			repMap = function TAS_Repeating_Map(func, final, context) {
+				operations.push({
+                    type: 'map',
+                    func: (func && _.isFunction(func) && func) || _.noop,
+                    final: (final && _.isFunction(final) && final) || _.noop,
+                    context: context || {}
+                });
+				return this;
+			},
+            repEach = function TAS_Repeating_Each(func, final, context) {
+				operations.push({
+                    type: 'each',
+                    func: (func && _.isFunction(func) && func) || _.noop,
+                    final: (final && _.isFunction(final) && final) || _.noop,
+                    context: context || {}
+                });
+				return this;
+            },
+            repTap = function TAS_Repeating_Tap(final, context) {
+				operations.push({
+                    type: 'tap',
+                    final: (final && _.isFunction(final) && final) || _.noop,
+                    context: context || {}
+                });
+				return this;
+            },
+            repAfter = function TAS_Repeating_After(callback,context) {
+				after.push({
+                    callback: (callback && _.isFunction(callback) && callback) || _.noop,
+                    context: context || {}
+                });
+				return this;
+            },
+			repExecute = function TAS_Repeating_Execute(callback,context){
+				var rowSet = {},
+					attrSet = {},
+					fieldIds = [],
+					fullFieldNames = [];
+
+                repAfter(callback,context);
+
+				// call each operation per row.
+				// call each operation's final
+				getSectionIDs("repeating_"+sectionName,function(ids){
+					fieldIds = ids;
+					fullFieldNames = _.reduce(fieldIds,function(memo,id){
+						return memo.concat(_.map(fieldNames,function(name){
+							return 'repeating_'+sectionName+'_'+id+'_'+name;  
+						}));
+					},[]);
+					getAttrs( _.uniq(attrNames.concat(fullFieldNames)), function(values){
+						_.each(attrNames,function(aname){
+							if(values.hasOwnProperty(aname)){
+								addProp(attrSet,aname,values[aname]);
+							}
+						});
+
+						rowSet = _.reduce(fieldIds,function(memo,id){
+							var r={};
+							addId(r,id);
+							_.each(fieldNames,function(name){
+								var fn = 'repeating_'+sectionName+'_'+id+'_'+name;  
+								addProp(r,name,values[fn],fn);
+							});
+
+							memo[id]=r;
+
+							return memo;
+						},{});
+
+                        _.each(operations,function(op){
+                            var res;
+                            switch(op.type){
+                                case 'tap':
+                                    _.bind(op.final,op.context,rowSet,attrSet)();
+                                    break;
+
+                                case 'each':
+                                    _.each(rowSet,function(r){
+                                        _.bind(op.func,op.context,r,attrSet,r.id,rowSet)();
+                                    });
+                                    _.bind(op.final,op.context,rowSet,attrSet)();
+                                    break;
+
+                                case 'map':
+                                    res = _.map(rowSet,function(r){
+                                        return _.bind(op.func,op.context,r,attrSet,r.id,rowSet)();
+                                    });
+                                    _.bind(op.final,op.context,res,rowSet,attrSet)();
+                                    break;
+
+                                case 'reduce':
+                                    res = op.memo;
+                                    _.each(rowSet,function(r){
+                                        res = _.bind(op.func,op.context,res,r,attrSet,r.id,rowSet)();
+                                    });
+                                    _.bind(op.final,op.context,res,rowSet,attrSet)();
+                                    break;
+                            }
+                        });
+
+                        // finalize attrs
+                        applyQueuedUpdates();
+                        _.each(after,function(op){
+                            _.bind(op.callback,op.context)();
+                        });
+					});
+				});
+			};
+				
+			return {
+				attrs: repAttrs,
+				attr: repAttrs,
+
+				column: repFields,
+				columns: repFields,
+				field: repFields,
+				fields: repFields,
+
+				reduce: repReduce,
+				inject: repReduce,
+				foldl: repReduce,
+
+				map: repMap,
+				collect: repMap,
+
+				each: repEach,
+                forEach: repEach,
+
+                tap: repTap,
+                'do': repTap,
+
+				after: repAfter,
+				last: repAfter,
+				done: repAfter,
+
+				execute: repExecute,
+				go: repExecute,
+				run: repExecute
+			};
+		}(section));
+	},
+
+
+    repeatingSimpleSum = function(section, field, destination){
+        repeating(section)
+            .attr(destination)
+            .field(field)
+            .reduce(function(m,r){
+                return m + (r.F[field]);
+            },0,function(t,r,a){
+                a.S[destination]=t;
+            })
+            .execute();
+    };
+
+	console.log('%c•.¸¸.•*´¨`*•.¸¸.•*´¨`*•.¸  The Aaron Sheet  v'+version+'  ¸.•*´¨`*•.¸¸.•*´¨`*•.¸¸.•','background: linear-gradient(to right,green,white,white,green); color:black;text-shadow: 0 0 8px white;');
+	console.log('%c•.¸¸.•*´¨`*•.¸¸.•*´¨`*•.¸  Last update: '+(new Date(lastUpdate*1000))+'  ¸.•*´¨`*•.¸¸.•*´¨`*•.¸¸.•','background: linear-gradient(to right,green,white,white,green); color:black;text-shadow: 0 0 8px white;');
+
+
+    return {
+        /* Repeating Sections */
+        repeatingSimpleSum: repeatingSimpleSum,
+		repeating: repeating,
+
+        /* Configuration */
+        config: setConfigOption,
+
+        /* Debugging */
+        callback: wrapCallback,
+        callstack: logCallstack,
+        debugMode: debugMode,
+        _fn: wrapCallback,
+
+        /* Logging */
+        debug: logDebug,
+        error: logError,
+        warn: logWarn,
+        info: logInfo,
+        notice: logNotice,
+        log: logLog
+    };
+}());
+
+/* ---- END: TheAaronSheet.js ---- */
+</script>
+<script type=“text/worker”>
+// Calculate Worn Weight
+	on('change:repeating_inventtab1 remove:repeating_inventtab1',function(){
+		TAS.repeatingSimpleSum('inventtab1','itemwornenc','itemwornenctotal');
+	});
+	
+	// Calculate Carried Weight
+	on('change:repeating_inventtab2 remove:repeating_inventtab2',function(){
+		TAS.repeatingSimpleSum('inventtab2','itemcarriedenc','itemcarriedenctotal');
+	});
+	
+	//Calculate Total Load Carried
+    on("sheet:opened change:itemwornenctotal change:itemcarriedenctotal",function(){
+	    //'use strict';
+	    getAttrs(["itemwornenctotal", "itemcarriedenctotal", "rangedtotalweightcarried", "geartotalweightcarried"], function(lvalue) {
+		    console.log("Item Worn Total: " + lvalue.itemwornenctotal);
+		    console.log("Item Worn Total: " + lvalue.itemcarriedenctotal);	
+		    var worn = parseInt(lvalue.itemwornenctotal)||0;
+		    var carried = parseInt(lvalue.itemcarriedenctotal)||0;
+	    setAttrs({ totalloadcarried: worn + carried });
+	    });
+    });
+</script>
 
 <!-- Sheet code -->
 
@@ -54,7 +727,7 @@ on("sheet:opened", function() {
         <div class="sheet-row">
 			<div class="sheet-col-1-4 sheet-margin-top"><img src="http://imgur.com/TprZw4p.png" alt="Basic Fantasy RPG" width=150 ></div>
 			<div class="sheet-col-1-4 sheet-small-label sheet-center"><input class="sheet-underlined sheet-center" type="text" name="attr_character_name"><br/>Character Name</div>
-			<div class="sheet-col-1-8 sheet-small-label sheet-center"><input class="sheet-underlined sheet-center" type="text" name="attr_class"><br/>Class</div>
+			<div class="sheet-col-1-4 sheet-small-label sheet-center"><input class="sheet-underlined sheet-center" type="text" name="attr_class"><br/>Class</div>
 			<div class="sheet-col-1-8 sheet-small-label sheet-center"><input class="sheet-underlined sheet-center" type="number" name="attr_level" value="1"><br/>Level</div>
 		</div>
 	</div>
@@ -79,14 +752,16 @@ on("sheet:opened", function() {
 		<input class="sheet-is-npc" type="checkbox" name="attr_is_npc" value="1"><span class="sheet-is-npc-tab"></span>
 		<div class="sheet-npcinfo">
 			<div class="sheet-row">
-				<div class="sheet-col-1-8 sheet-small-label sheet-center"><input class="sheet-underlined sheet-center" type="text" name="attr_hitdice"><br/>Hit Dice</div>
-				<div class="sheet-col-1-8 sheet-small-label sheet-center"><input class="sheet-underlined sheet-center" type="text" name="attr_numappear"><br/>Number<br/>Appearing</div>
-				<div class="sheet-col-1-16 sheet-small-label sheet-center"><input class="sheet-underlined sheet-center" type="text" name="attr_saveas"><br/>Save As</div>
-				<div class="sheet-col-1-16 sheet-small-label sheet-center"><input class="sheet-underlined sheet-center" type="number" name="attr_morale"><br/>Morale</div>
-				<div class="sheet-col-1-8 sheet-small-label sheet-center"><input class="sheet-underlined sheet-center" type="text" name="attr_treasuretype"><br/>Treasure Type</div>
-				<div class="sheet-col-1-4 sheet-small-label sheet-center"><input class="sheet-underlined sheet-center" type="text" name="attr_monstertype"><br/>Monster Type</div>
-				<div class="sheet-col-1-8 sheet-small-label sheet-center"><input class="sheet-underlined sheet-center" type="text" name="attr_frequency"><br/>Frequency</div>
-				<div class="sheet-col-1-8 sheet-small-label sheet-center"><input class="sheet-underlined sheet-center" type="number" name="attr_xpvalue"><br/>XP Value</div>
+			    <div class="sheet-col-1-16 sheet-small-label sheet-center"><input class="sheet-underlined sheet-center" type="number" title="attr_npcac" name="attr_npcac"><br/>Armor Class</div>
+				<div class="sheet-col-1-16 sheet-small-label sheet-center"><input class="sheet-underlined sheet-center" type="number" title="attr_hitdice" name="attr_hitdice"><br/>Hit Dice</div>
+				<div class="sheet-col-1-8 sheet-small-label sheet-center"><input class="sheet-underlined sheet-center" type="text" title="attr_numberattacks" name="attr_numberattacks"><br/>Number of Attacks</div>
+				<div class="sheet-col-1-8 sheet-small-label sheet-center"><input class="sheet-underlined sheet-center" type="text" title="attr_hitdice" name="attr_damage"><br/>Damage</div>
+				<div class="sheet-col-1-8 sheet-small-label sheet-center"><input class="sheet-underlined sheet-center" type="text" title="attr_npcmovement" name="attr_npcmovement"><br/>Movement</div>
+				<div class="sheet-col-1-8 sheet-small-label sheet-center"><input class="sheet-underlined sheet-center" type="text" title="attr_numappear" name="attr_numappear"><br/>Number<br/>Appearing</div>
+				<div class="sheet-col-1-16 sheet-small-label sheet-center"><input class="sheet-underlined sheet-center" type="text" title="attr_saveas" name="attr_saveas"><br/>Save As</div>
+				<div class="sheet-col-1-16 sheet-small-label sheet-center"><input class="sheet-underlined sheet-center" type="number" title="attr_morale" name="attr_morale"><br/>Morale</div>
+				<div class="sheet-col-1-8 sheet-small-label sheet-center"><input class="sheet-underlined sheet-center" type="text" title="attr_treasuretype" name="attr_treasuretype"><br/>Treasure Type</div>
+				<div class="sheet-col-1-8 sheet-small-label sheet-center"><input class="sheet-underlined sheet-center" type="number" title="attr_xpvalue" name="attr_xpvalue"><br/>XP Value</div>
 			</div>
 		</div>
 		<h4 class="sheet-center">Appearance, Vision, Languages and Alignment</h4>
@@ -195,42 +870,53 @@ on("sheet:opened", function() {
 					<h4 class="sheet-center">Saving Throws</h4>
 					<div class="sheet-row sheet-sub-header">
 						<div class="sheet-col-1-6 sheet-center sheet-small-label">Score</div>
-						<div class="sheet-col-1-2 sheet-center sheet-small-label">&nbsp;</div>
+						<div class="sheet-col-1-2 sheet-center sheet-small-label">Save type</div>
+						<div class="sheet-col-1-6 sheet-right sheet-small-label">Modifier</div>
 						<div class="sheet-col-1-8 sheet-center sheet-small-label">Roll</div>
 					</div>
 					<div class="sheet-row">
-						<div class="sheet-col-1-6 sheet-padr"><input type="number" name="attr_save_death_ray" min="1" step="1" /></div>
+						<div class="sheet-col-1-8 sheet-padr"><input type="number" name="attr_save_death_ray" min="1" step="1" /></div>
 						<div class="sheet-col-1-2 sheet-small-label">Death Ray or Poison</div>
+						<div class="sheet-col-1-10 sheet-center sheet-small-label">&nbsp;</div>
+						<div class="sheet-col-1-8 sheet-left"><input type="number" name="attr_save_death_ray_mod" Title="Modifier" value="0" min="1" step="1" /></div>
 						<div class="sheet-col-1-8 sheet-center">
-							<button type="roll" name="roll_SDR" value="&{template:5eDefault} {{save=1}} {{title=Death Ray or Poison}} {{subheader=@{character_name} Saving Throw}} {{rollname=Success: N(0)/Y(1))}} {{roll=[[{1d20}>@{save_death_ray}]]}}"></button>
+							<button type="roll" name="roll_SDR" value="&{template:5eDefault} {{save=1}} {{title=Death Ray or Poison}} {{subheader=@{character_name} Saving Throw}} {{rollname=Success: N(0)/Y(1))}} {{roll=[[{1d20+@{save_death_ray_mod}}>@{save_death_ray}]]}}"></button>
 						</div>
 					</div>
 					<div class="sheet-row">
-						<div class="sheet-col-1-6 sheet-padr"><input type="number" name="attr_save_magic_wand" min="1" step="1" /></div>
+						<div class="sheet-col-1-8 sheet-padr"><input type="number" name="attr_save_magic_wand" min="1" step="1" /></div>
 						<div class="sheet-col-1-2 sheet-small-label">Magic Wands</div>
+						<div class="sheet-col-1-10 sheet-center sheet-small-label">&nbsp;</div>
+						<div class="sheet-col-1-8 sheet-left"><input type="number" name="attr_save_magic_wand_mod" Title="Modifier" value="0" min="1" step="1" /></div>
 						<div class="sheet-col-1-8 sheet-center">
-							<button type="roll" name="roll_SMW" value="&{template:5eDefault} {{save=1}} {{title=Magic Wands}} {{subheader=@{character_name} Saving Throw}} {{rollname=Success: N(0)/Y(1))}} {{roll=[[{1d20}>@{save_magic_wand}]]}}"></button>
+							<button type="roll" name="roll_SMW" value="&{template:5eDefault} {{save=1}} {{title=Magic Wands}} {{subheader=@{character_name} Saving Throw}} {{rollname=Success: N(0)/Y(1))}} {{roll=[[{1d20+@{save_magic_wand_mod}}>@{save_magic_wand}]]}}"></button>
 						</div>
 					</div>
 					<div class="sheet-row">
-						<div class="sheet-col-1-6 sheet-padr"><input type="number" name="attr_save_paralysis" min="1" step="1" /></div>
+						<div class="sheet-col-1-8 sheet-padr"><input type="number" name="attr_save_paralysis" min="1" step="1" /></div>
 						<div class="sheet-col-1-2 sheet-small-label">Paralysis or Turn to Stone</div>
+						<div class="sheet-col-1-10 sheet-center sheet-small-label">&nbsp;</div>
+						<div class="sheet-col-1-8 sheet-left"><input type="number" name="attr_save_paralysis_mod" Title="Modifier" value="0" min="1" step="1" /></div>
 						<div class="sheet-col-1-8 sheet-center">
-							<button type="roll" name="roll_SPTTS" value="&{template:5eDefault} {{save=1}} {{title=Paralysis or Turn to Stone}} {{subheader=@{character_name} Saving Throw}} {{rollname=Success: N(0)/Y(1))}} {{roll=[[{1d20}>@{save_paralysis}]]}}"></button>
+							<button type="roll" name="roll_SPTTS" value="&{template:5eDefault} {{save=1}} {{title=Paralysis or Turn to Stone}} {{subheader=@{character_name} Saving Throw}} {{rollname=Success: N(0)/Y(1))}} {{roll=[[{1d20+@{save_paralysis_mod}}>@{save_paralysis}]]}}"></button>
 						</div>
 					</div>
 					<div class="sheet-row">
-						<div class="sheet-col-1-6 sheet-padr"><input type="number" name="attr_save_dragons_breath" min="1" step="1" /></div>
+						<div class="sheet-col-1-8 sheet-padr"><input type="number" name="attr_save_dragons_breath" min="1" step="1" /></div>
 						<div class="sheet-col-1-2 sheet-small-label">Dragon's Breath</div>
+						<div class="sheet-col-1-10 sheet-center sheet-small-label">&nbsp;</div>
+						<div class="sheet-col-1-8 sheet-left"><input type="number" name="attr_save_dragons_breath_mod" Title="Modifier" value="0" min="1" step="1" /></div>
 						<div class="sheet-col-1-8 sheet-center">
-							<button type="roll" name="roll_SDB" value="&{template:5eDefault} {{save=1}} {{title=Dragon's Breath}} {{subheader=@{character_name} Saving Throw}} {{rollname=Success: N(0)/Y(1))}} {{roll=[[{1d20}>@{save_dragons_breath}]]}}"></button>
+							<button type="roll" name="roll_SDB" value="&{template:5eDefault} {{save=1}} {{title=Dragon's Breath}} {{subheader=@{character_name} Saving Throw}} {{rollname=Success: N(0)/Y(1))}} {{roll=[[{1d20+@{save_dragons_breath_mod}}>@{save_dragons_breath}]]}}"></button>
 						</div>
 					</div>
 					<div class="sheet-row">
-						<div class="sheet-col-1-6 sheet-padr"><input type="number" name="attr_save_rod_staff_spell" min="1" step="1" /></div>
+						<div class="sheet-col-1-8 sheet-padr"><input type="number" name="attr_save_rod_staff_spell" min="1" step="1" /></div>
 						<div class="sheet-col-1-2 sheet-small-label">Rod, Staff, or Spell</div>
+						<div class="sheet-col-1-10 sheet-center sheet-small-label">&nbsp;</div>
+						<div class="sheet-col-1-8 sheet-left"><input type="number" name="attr_save_rod_staff_spell_mod" Title="Modifier" value="0" min="1" step="1" /></div>
 						<div class="sheet-col-1-8 sheet-center">
-							<button type="roll" name="roll_SRSS" value="&{template:5eDefault} {{save=1}} {{title=Rod Staff Spell}} {{subheader=@{character_name} Saving Throw}} {{rollname=Success: N(0)/Y(1))}} {{roll=[[{1d20}>@{save_rod_staff_spell}]]}}"></button>
+							<button type="roll" name="roll_SRSS" value="&{template:5eDefault} {{save=1}} {{title=Rod Staff Spell}} {{subheader=@{character_name} Saving Throw}} {{rollname=Success: N(0)/Y(1))}} {{roll=[[{1d20+@{save_rod_staff_spell_mod}}>@{save_rod_staff_spell}]]}}"></button>
 						</div>
 					</div>
 					<span class="sheet-spacer"></span>
@@ -248,7 +934,7 @@ on("sheet:opened", function() {
 				</div>
 			</div>
 	</div>
-	<!--Abilities -->
+	<!--Class Abilities -->
 	<div class="sheet-section-class">
 		<div class="sheet-row">
 			<!-- Class Abilities-->
@@ -275,6 +961,7 @@ on("sheet:opened", function() {
 										<option value="@{constitution_mod}*5">Con</option>
 										<option value="@{charisma_mod}*5">Cha</option>
 									</select>
+									
 								</div>
 								<div class="sheet-col-1-8 sheet-padl sheet-center">
 									<button type='roll' class="sheet-roll" name='roll_skill_roll' value="&{template:5eDefault} {{ability=1}} {{title=@{character_name}'s}} {{subheader=@{ability_name} Skill Check}} {{rollname=Success N(0)/Y(1)}} {{roll=[[{1d100}<[[@{ability_rank}+@{ability_stat}]] ]]}} "></button>
@@ -580,6 +1267,13 @@ on("sheet:opened", function() {
 					</div>
 				</div>
 				<div class="sheet-row">
+					<div class="sheet-col-1-2 sheet-padr sheet-small-label sheet-right">Spotting Secret Doors</div>
+					<div class="sheet-col-1-4 sheet-padl sheet-center"><input type="number" name="attr_detectsecret" value="1"></div>
+					<div class="sheet-col-1-8 sheet-padl sheet-center">
+						<button type='roll' class="sheet-roll" name='roll_detectsecret' value="&{template:5eDefault} {{ability=1}} {{title=@{character_name} wants to look for secret doors}} {{rollname=Success N(0)/Y(1)}} {{roll=[[{1d6}<@{spotsecret}]]}}> "></button>
+					</div>
+				</div>
+				<div class="sheet-row">
 					<div class="sheet-col-1-2 sheet-padr sheet-small-label sheet-right">Finding Traps</div>
 					<div class="sheet-col-1-4 sheet-padl sheet-center"><input type="number" name="attr_findingtraps" value="1"></div>
 					<div class="sheet-col-1-8 sheet-padl sheet-center">
@@ -600,6 +1294,7 @@ on("sheet:opened", function() {
 						<button type='roll' class="sheet-roll" name='roll_openingdoors' value="&{template:5eDefault} {{ability=1}} {{title=@{character_name} wants to force open a door}} {{rollname=Success N(0)/Y(1)}} {{roll=[[{1d6}<@{openingdoors}]]}}> "></button>
 					</div>
 				</div>
+				<textarea name="attr_racialnotes" title="Racial notes"></textarea>
 			</div>
 		</div>
 	</div>
@@ -612,23 +1307,23 @@ on("sheet:opened", function() {
 						<div class="sheet-row sheet-sub-header sheet-small-label">
 							<div class="sheet-col-1-4 sheet-padl">Name</div>
 							<div class="sheet-col-1-6 sheet-center">Modifier</div>
-							<div class="sheet-col-1-6 sheet-center">lists as</div>
+							<div class="sheet-col-1-6 sheet-center">Considered as</div>
 							<div class="sheet-col-1-4 sheet-center">Stat</div>
 							<div class="sheet-col-1-8 sheet-right">Roll</div>
 						</div>
 						<fieldset class="repeating_generalskills">
 							<div class="sheet-row" sheet-center>
-								<div class="sheet-col-1-4 sheet-padr sheet-left"><input type="text" name="attr_skillname" ></div>
-								<div class="sheet-col-1-6 sheet-padr sheet-center"><input type="number" name="attr_skillmod" value="0"></div>
+								<div class="sheet-col-1-4 sheet-padr sheet-left"><input type="text" title="Skill's name" name="attr_skillname" ></div>
+								<div class="sheet-col-1-6 sheet-padr sheet-center"><input type="number" title="Place skill level and/or other modifiers" name="attr_skillmod" value="0"></div>
                                 <div class="sheet-col-1-4 sheet-padr sheet-left">
-									<select name="attr_skilled">
-									    <option value="20">Non-class</option>
+									<select title="All skills on another class list are considered non-skilled; All non-trained skills from the general list or your character's class are considered General; Selected Skills are considered Class" name="attr_skilled">
+									    <option value="20">Non-Skilled</option>
 									    <option value="17">General</option>
                                         <option value="@{osr}">Class</option>
 									</select>
 								</div>
 								<div class="sheet-col-1-6 sheet-left">
-									<select name="attr_skill_stat">
+									<select title="Choose appropiate attribute that is used by the skill" name="attr_skill_stat">
                                         <option value="0">None</option>
 										<option value="@{strength_mod}">Str</option>
 										<option value="@{intelligence_mod}">Int</option>
@@ -641,6 +1336,20 @@ on("sheet:opened", function() {
 								<div class="sheet-col-1-8 sheet-padl sheet-right">
 									<button type='roll' class="sheet-roll" name='roll_skill_roll' value="&{template:5eDefault} {{title=@{character_name}'s}} {{subheader=@{skillname} Skill Check}} {{rollname=Success N(0)/Y(1)}}} {{roll=[[{1d20+@{skillmod}+[[@{skill_stat}]]}>@{skilled}]]}} "></button>
 								</div>
+							</div>
+						</fieldset>
+				</div>
+				<!--Specializations --><!--This section is based from the optional rules in the combat option supplement-->
+				<div class="sheet-col-1-2 sheet-padl">
+					<h4 class="sheet-center">Combat Specialization </h4>
+						<div class="sheet-row sheet-sub-header sheet-small-label">
+							<div class="sheet-col-1-4 sheet-padl sheet-padr">Specialization</div>
+							<div class="sheet-col-1-4 sheet-padl sheet-center">Notes</div>
+						</div>
+						<fieldset class="repeating_specialization">
+							<div class="sheet-row">
+								<div class="sheet-col-1-4 sheet-padr sheet-small-label sheet-left"><input type="text" title="Name of specialization" name="attr_specializationname"></div>
+								<div class="sheet-col-1-2 sheet-padl sheet-small-label sheet-left"><input type="text" title="Game info for the specialization" name="attr_specializationnotes"></div>
 							</div>
 						</fieldset>
 				</div>
@@ -662,10 +1371,9 @@ on("sheet:opened", function() {
 					<h4 class="sheet-center">Movement </h4>
 					<div class="sheet-row sheet-padb">
 						<div class="sheet-row">
-							<div class="sheet-col-1-6 sheet-small-label sheet-center"><input class="sheet-underlined" type="number" name="attr_move_encounter" value="40" step="10" min="10"><br/>Per Round</div>
-                            <div class="sheet-col-1-6 sheet-small-label sheet-center"><input class="sheet-underlined" type="number" name="attr_move_run" value="(@{move_encounter}*2)" disabled=true><br/>Running</div>
-							<div class="sheet-col-1-6 sheet-small-label sheet-center"><input class="sheet-underlined" type="number" name="attr_move_normal" value="((@{move_encounter}*3))" disabled=true><br/>Per Turn</div>
-							<div class="sheet-col-1-6 sheet-small-label sheet-center"><input class="sheet-underlined" type="number" name="attr_move_other" min="0" step="1"><br/>Other</div>
+							<div class="sheet-col-1-6 sheet-small-label sheet-center"><input class="sheet-underlined" type="number" title="Combat Movement" name="attr_move_encounter" value="40" step="10" min="10"><br/>Per Round</div>
+                            <div class="sheet-col-1-6 sheet-small-label sheet-center"><input class="sheet-underlined" type="number" title="Running in a round" name="attr_move_run" value="(@{move_encounter}*2)" disabled=true><br/>Running</div>
+							<div class="sheet-col-1-6 sheet-small-label sheet-center"><input class="sheet-underlined" type="number" title="Alternative Movement, such as swimming or flight, speed" name="attr_move_other" min="0" step="1"><br/>Other</div>
 						</div>
 					</div>
 				</div>
@@ -681,7 +1389,7 @@ on("sheet:opened", function() {
 					<h4 class="sheet-center">Initiative</h4>
                     <div class="sheet-row sheet-center">
                             <div class="sheet-col-1-3 sheet-right sheet-padl">
-                            <select name="attr_Initiativedice" value="1d6">
+                            <select name="attr_Initiativedice" title="Core rules is 1d6+Dex mod but Alternative dice is listed" value="1d6">
                                 <option value="1d6">1d6</option>
                                 <option value="1d10">1d10</option>
                                 <option value="1d12">1d12</option>
@@ -715,7 +1423,7 @@ on("sheet:opened", function() {
 				<div class="sheet-row">
 					<div class="sheet-col-1-6 sheet-padr"><input type="text" name="attr_meleeweaponname"></div>
 					<div class="sheet-col-1-7 sheet-padl sheet-padr ">
-									<select name="attr_masteryrank">
+									<select name="attr_masteryrank" title="Combat option supplement: Weapon specialization">
                                         <option value="0">None</option>
 										<option value="1">Basic</option>
                                         <option value="2">Trained</option>
