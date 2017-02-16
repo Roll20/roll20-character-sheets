@@ -5,32 +5,32 @@ module.exports = function(grunt) {
   grunt.initConfig({
     // Metadata.
     pkg: grunt.file.readJSON('package.json'),
-    banner: '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
-      '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
-      '<%= pkg.homepage ? "* " + pkg.homepage + "\\n" : "" %>' +
-      '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;' +
-      ' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */\n',
   includereplace: {
         development: {
             options: {
                 globals: {
-                    'img_prefix': '../img'
+                    'img_prefix': '../img',
+                    'version': '<%= pkg.version %>'
                 }
             },
             files: [
-                {src: '*', dest: 'testbed/', expand: true, cwd: 'src/testbed'},
-                {src: 'src/13th_Age-neovatar.css', dest: 'testbed/13th_Age-neovatar.css'}
+                {src: 'src/index.html', dest: 'testbed/index.html'},
+                {src: 'src/13th_Age-neovatar.css', dest: 'testbed/13th_Age-neovatar.css'},
+                {src: 'src/editor.css', dest: 'testbed/editor.css'},
+                {src: 'src/base.css', dest: 'testbed/base.css'},
             ]
         },
         production: {
             options: {
                 globals: {
-                    img_prefix: 'https://neovatar.github.io/roll20-character-sheets/13th_Age-neovatar/img'
+                    img_prefix: 'https://neovatar.github.io/roll20-character-sheets/13th_Age-neovatar/img',
+                    'version': '<%= pkg.version %>'
                 }
             },
             files: [ 
-                {src: 'src/sheet.html', dest: '13th_Age-neovatar.html'},
-                {src: 'src/13th_Age-neovatar.css', dest: '13th_Age-neovatar.css'}
+                {src: 'src/13th_Age-neovatar.html', dest: '13th_Age-neovatar.html'},
+                {src: 'src/13th_Age-neovatar.css', dest: '13th_Age-neovatar.css'},
+                {src: 'src/sheet.json', dest: 'sheet.json'}
             ]
         }
   },

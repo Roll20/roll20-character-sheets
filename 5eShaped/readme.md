@@ -1,0 +1,56 @@
+# D&D 5e Shaped Character Sheet
+
+This is the redesigned Shaped character sheet for use on Roll20.net with the 5th edition of Dungeons & Dragons (5e). The sheet is designed to be usable by all Roll20 users regardless of subscription level.
+
+*If you are ever concerned about data loss I recommend you duplicate your campaign and use that to copy to see how it'll work.*
+
+[Shaped Character Sheet Companion Script](https://github.com/symposion/roll20-api-scripts/tree/master/5eShapedCompanion/latest)
+
+[Documentation](https://docs.google.com/document/d/1yPcIZ_bIc3JlnWsKZt2tAB0EQSIVEfeMtT0GifbpJIg)
+
+[Changelog](https://github.com/mlenser/roll20-character-sheets/blob/master/5eShaped/changelog.md)
+
+### Please report any bugs in the [issues tab](https://bitbucket.org/mlenser/5eshaped/issues). Please include screenshots if appropriate and please provide a full reproduction path (on a clean character sheet if possible).
+
+## Features
+
+* **High performance** sheet without the lag of old versions (100% sheet workers)
+* Styling that matches the [5e paper sheet](http://i.imgur.com/87GaRhL.jpg)
+* **Compendium Integration** for NPCs, Spells, Weapons, Armor, Equipment
+* **NPC actions and traits** are parsed and clickable. The text on the sheet and in the output macro will adjust if you adjust an ability score.
+* **Customizable skills** with the option to change the ability on the fly
+* **Spells** with the option to cast at a higher level
+  * Filters to limit which spells are displayed
+* **Chat macros** that are kept in sync with the contents of the sheet. Ability Checks, Saving Throws, Attacks, Actions, Stablock, etc.
+* Critical damage is automatically calculated with the possibility of selecting features like brutal critical or houserules that critical hits do maximum dice damage plus the normal damage.
+* Classes automatically select proficiencies (Weapon, Armor, Tools, Saving Throws) and class features.
+  * Customizable Classes - Change Name, HD, or spellcasting level of the classes
+* Translations
+* **Armor** Covers normal armor as well as unarmored ability cases like monk, barbarian, etc.
+* **Equipment** with gold and weight automatically calculated. Equipment Items are clickable from the core page for items like Potion of Healing
+* **Settings** for how to output all rolls, death saves, initiative, etc
+  * Roll settings to choose to always roll with advantage, disadvantage, or query for both
+  * Optional bonuses to all skills, abilities, saving throws, etc.
+* Attachers can be used to remind yourself to add to saving throws while within 10 feet of your paladin
+
+![Sheet](http://i.cubeupload.com/RwfoVZ.jpg "Sheet")
+
+## How to Update the sheet yourself (as Pro):
+
+1. Copy the [html](https://raw.githubusercontent.com/mlenser/roll20-character-sheets/master/5eShaped/5eShaped.html) from github
+2. In Roll20 go to campaign settings and choose a custom character sheet.
+3. Choose D&D 5e as the SRD
+4. In the HTML tab paste the HTML code
+5. Copy the [css](https://raw.githubusercontent.com/mlenser/roll20-character-sheets/master/5eShaped/5eShaped.css) from github
+6. On Roll20 in the CSS tab paste the CSS code.
+7. Copy the [translation](https://github.com/mlenser/roll20-character-sheets/tree/master/5eShaped/translations) from the appropriate file on github (en is English, fr is French, de is German, it is Italian, etc)
+8. On Roll20 in the Translation tab paste the JSON from the appropriate file.
+9. Hit save.
+
+## Contribute
+Since many have asked for it: If you appreciate what I do and want to compensate me for the countless hours that I have spent building this character sheet feel free to support me on [Patreon](https://www.patreon.com/mlenser) or Paypal (mlenser@gmail.com).
+Thanks so much for your support.
+
+---
+
+Mark Lenser ([Kryx](https://app.roll20.net/users/277007/kryx) on roll20)
