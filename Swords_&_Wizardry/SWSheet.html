@@ -316,7 +316,7 @@
                     setAttrs({
                         hp_max: oldhp,
                         gearweight: oldwt,
-                        sheetversion: 2.0
+                        sheetversion: 2.1
                     });
                 });
             }
@@ -325,14 +325,17 @@
     on("change:repeating_treasure:treasurewt",function(){
         getSectionIDs("repeating_treasure", function(idws) {
             var totwght = 0.0;
-            idws.forEach(function(idw,index){
+            idws.forEach(function(idw,index,arr){
                 var uwght = "repeating_treasure_" + idw + "_treasurewt";
+                var lng = parseInt(arr.length) || 0;
                 getAttrs(['' + uwght], function(val) {
                     var swght = parseFloat(val[uwght]) || 0.0;
                     totwght = totwght + swght;
-                    setAttrs({
-                        treasurewt: totwght
-                    });
+                    if ( (index+1) == lng ){
+                        setAttrs({
+                            treasurewt: totwght
+                        });
+                    }
                 });
             });
         });
@@ -340,17 +343,28 @@
     on("change:repeating_gear:gearqty change:repeating_gear:gearwt",function(){
         getSectionIDs("repeating_gear", function(idws) {
             var totwght = 0.0;
-            idws.forEach(function(idw,index){
+            idws.forEach(function(idw,index,arr){
                 var uqte = "repeating_gear_" + idw + "_gearqty";
                 var uwght = "repeating_gear_" + idw + "_gearwt";
+                var lng = parseInt(arr.length) || 0;
                 getAttrs(['' + uqte,'' + uwght], function(val) {
                     var sqte = parseFloat(val[uqte]) || 0.0;
                     var swght = parseFloat(val[uwght]) || 0.0;
                     totwght = totwght + (sqte * swght);
-                    setAttrs({
-                        gearweight: totwght
-                    });
+                    if ( (index+1) == lng ){
+                        setAttrs({
+                            gearweight: totwght
+                        });
+                    }
                 });
+            });
+        });
+    });
+    on("change:gearweight change:treasurewt", function(){
+        getAttrs(["gearweight","treasurewt"], function(val){
+            var tot = (parseFloat(val.gearweight) || 0.0) + (parseFloat(val.treasurewt) || 0.0);
+            setAttrs({
+                totalweight: tot
             });
         });
     });
@@ -406,7 +420,7 @@
         </div> <!-- END BIO and PHYISCAL -->
         <div class="sheet-mycol"> <!-- LOGO and Languages -->
             <div class="sheet-ligne" style="text-align: center;">
-                <img style="width:300px;" src="http://i.imgur.com/lhVW5Ak.gif" alt="Swords & Wizardry">
+                <img style="width:300px;" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Swords_%26_Wizardry/SWSheet_logo.gif" alt="Swords & Wizardry">
             </div>
             <div class="sheet-ligne" style="text-align: center;">
                 <span class="sheet-lib1 sheet-wid70" data-i18n="languages">Languages</span>
@@ -490,7 +504,7 @@
                 <span class="sheet-libmin1 sheet-wid70" data-i18n="new-spell%">New Spell%</span>
                 <input type="number" class="sheet-tinyinput" name="attr_newspellpct" value="0" data-i18n-title="chance-new-spell" title="Chance to Understand New Spell. Automatically calculted when INT is modified. Can be overriden." />
                 <span class="sheet-libmin1" data-i18n="min-max-spells">Min/Max Spells</span>
-                <input type="text" class="sheet-tinyinput" name="attr_minmaxspell" value="0/0" data-i18n-title="min-max-spells" title="Min/Max Spells. Automatically calculted when INT is modified. Can be overriden."/>
+                <input type="text" class="sheet-tinyinput" name="attr_minmaxspell" value="0/0" data-i18n-title="min-max-spells-title" title="Min/Max Spells. Automatically calculted when INT is modified. Can be overriden."/>
             </div>
             <div class="sheet-ligne">
                 <span class="sheet-lib0 sheet-wid30" data-i18n="WIS">WIS</span>
@@ -568,14 +582,18 @@
             <div class="sheet-greybg" style="width:550px; margin-top: 4px;">
                 <div class="sheet-ligne"> <!-- MOVEMENT -->
                     <span class="sheet-libred" data-i18n="movement">Movement</span>
-                </div>
-                <div class="sheet-ligne">
-                    <span class="sheet-lib2 sheet-wid70" data-i18n="gear-wt">Gear Wt.</span>
-                    <input type="number" name="attr_gearweight" value="0" class="sheet-medinput" data-i18n-title="gear-wt-title" title="Total gear weight. Automatically calculted based on (quantity * weight) of each item in the gear list. Can be overriden."  />
-                    <span class="sheet-lib2 sheet-wid80" data-i18n="treasure-wt">Treasure Wt.</span>
-                    <input type="number" name="attr_treasurewt" value="0" class="sheet-medinput" data-i18n-title="treasurewt-title" title="Total weight of treasures. Automatically calculted based on the weight of each item in the treasure list. Can be overriden." />
                     <span class="sheet-lib2 sheet-wid80" data-i18n="move-squares">Move Squares</span>
                     <input type="number" name="attr_movesquares" value="4" class="sheet-shortinput" data-i18n-title="movesquares-title" title="Base movement. Not calculted automatically. Has to be input manually, depending on the house rules and distance measurement used in the game." />
+                </div>
+                <div class="sheet-ligne">
+                    <span class="sheet-lib2 sheet-wid70" data-i18n="total-weight">Total Wt.</span>
+                    <input type="number" name="attr_totalweight" value="0" class="sheet-medinput" data-i18n-title="totalweight-title" title="Total weight. Automatically calculted based on the treasure and gear weights. Can be overriden." />
+                    =
+                    <span class="sheet-lib2 sheet-wid70" data-i18n="gear-wt">Gear Wt.</span>
+                    <input type="number" name="attr_gearweight" value="0" class="sheet-medinput" data-i18n-title="gear-wt-title" title="Total gear weight. Automatically calculted based on (quantity * weight) of each item in the gear list. Can be overriden."  />
+                    +
+                    <span class="sheet-lib2 sheet-wid70" data-i18n="treasure-wt">Treasure Wt.</span>
+                    <input type="number" name="attr_treasurewt" value="0" class="sheet-medinput" data-i18n-title="treasurewt-title" title="Total weight of treasures. Automatically calculted based on the weight of each item in the treasure list. Can be overriden." />
                 </div>
                 <div class="sheet-ligne">
                     <span class="sheet-lib2 sheet-wid80" data-i18n="0-75-lbs">0-75 lbs</span>:<span data-i18n="4-sqrs">4 sqrs</span>
