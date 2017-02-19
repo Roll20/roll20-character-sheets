@@ -1,3 +1,53 @@
+## 9.1.0
+
+### Features
+
+* Unit tests are being added progressively as issues come up. There is little coverage so far, but I will be expanding these as more work is done. This should increase the stability of the sheet where a function might not be doing as I expect.
+* [#166: Change all data saving to run silently](https://bitbucket.org/mlenser/5eshaped/issues/166/change-all-data-saving-to-run-silently) should give a great boost to performance and along with the upgrade changes this should reduce a fair number of bugs caused by incompatible updates occurring simultaneously.
+* Upgrades have been entirely revamped to run in one server call as much as possible. This prevents strange errors where multiple conflicting upgrades are occurring at the same time. It also allows me to close the processing message after the upgrade is complete. Therefore that now spans the whole sheet. There is a slight delay of processing after the message closes for cases where all actions are updated (9.1.0), but that willworked on in the future.
+* [#172: Parse Actions, Reactions, Legendary Actions, Lair Actions from the new Monster Manual format](https://bitbucket.org/mlenser/5eshaped/issues/172/parse-actions-reactions-legendary-actions)
+* [#9: Handle Repeatable attacks, saves, and damage for cases like Call Lightning, Scorching Ray, Hunter's Mark](https://bitbucket.org/mlenser/5eshaped/issues/9/handle-repeatable-attacks-saves-and-damage)
+* [#2: Meters instead of feet](https://bitbucket.org/mlenser/5eshaped/issues/2/meters-instead-of-feet)
+* [#145: Handle "if used with two hands" when parsing monsters](https://bitbucket.org/mlenser/5eshaped/issues/145/handle-if-used-with-two-hands-when-parsing)
+* [#146: Have Armor items output the content field to the chat, as per other equipment items](https://bitbucket.org/mlenser/5eshaped/issues/146/have-armor-items-output-the-content-field)
+* If custom saving throws are used normal saving throws will be converted to that system for "saving_throw_vs_ability" as well as content fields of attacks, actions, spells, etc. For example "Dexterity" would be replaced by "Reflex".
+* Traits are now split to "Racial Features", "Class Features", "Feats", and "Traits". Closes [#140: Add Feats repeating section](https://bitbucket.org/mlenser/5eshaped/issues/140/add-feats-repeating-section)
+* When a Class Feature is toggled off it is removed from the list of class features (toggling the class does not remove all class features, they must be done individually).
+  * "Create Class Features" has been removed from the settings as it can now be toggled directly. Once a class feature has been toggled off it will not be generated again.
+* [#171: Incorporating Proficiency Die option to Spell Save DC](https://bitbucket.org/mlenser/5eshaped/issues/171/incorporating-proficiency-die-option-to)
+* Spells displaying no longer require Slots or Points to be toggled. So the user must select "Spells" and then from there they can either turn off filters (which now shows all levels) or click "All" for spell level with filters on. The vast majority of cases will have a class which will add the necessary toggles, but this should help cases without a class figure out how to input spells. I'd like to improve it further potentially, but it's difficult to default to "auto" while showing some levels to start. Closes [#160: Spells gained via trait on non-casters](https://bitbucket.org/mlenser/5eshaped/issues/160/spells-gained-via-trait-on-non-casters)
+* Initiative now has more of its calculations done via sheet workers. I has cleaned up its code which should make it more reliable with all the bonuses that can add on. I've also changed the value of "initiative_to_tracker" and "initiative_tie_breaker" on the settings page to both be 1.
+* Critical damage from the default damage can be turned off, allowing for no crits at all or custom critical damage when combined with "extra on a crit". Closes [#167: Custom critical damage no longer supported](https://bitbucket.org/mlenser/5eshaped/issues/167/custom-critical-damage-no-longer-supported)
+* [#179: Add repeating section identifier to roll templates](https://bitbucket.org/mlenser/5eshaped/issues/179/add-repeating-section-identifier-to-roll)
+* Skill generation has been optimized for new characters so it creates 3 server calls instead of 20.
+* Hit Dice have been revamped to work entirely on sheetworkers.
+
+### UI Adjustments
+
+* The roll template is formatted differently to have the type on the line above.
+
+![alt text](http://i.imgur.com/86r2M6P.png "9.1.0 roll template")
+* [#103: When Actions, Attacks, Traits, etc are condensed show them in a list like spells](https://bitbucket.org/mlenser/5eshaped/issues/103/when-actions-attacks-traits-etc-are)
+* [#156: Core Page Expanded Spellbook Improvement](https://bitbucket.org/mlenser/5eshaped/issues/156/core-page-expanded-spellbook-improvement)
+
+### Bug Fixes
+
+Many of these are discovered as part of the 9.1.0 changes and did not exist previously. I have included them anyways.
+
+* [#198: Conversion to 9.0.1 mangles many SRD imported Actions/Attacks](https://bitbucket.org/mlenser/5eshaped/issues/198/conversion-to-901-mangles-many-srd)
+* [#181: Monster Manual - Tokens droped from journal are not scaling or are not visable](https://bitbucket.org/mlenser/5eshaped/issues/181/monster-manual-tokens-droped-from-journal)
+* [#82: Import of Orc War Chief doesn't apply Gruumsh's Fury correctly to attacks.](https://bitbucket.org/mlenser/5eshaped/issues/82/import-of-orc-war-chief-doesnt-apply)
+* [#148: Bat Bite attack imports wrongly.](https://bitbucket.org/mlenser/5eshaped/issues/148/bat-bite-attack-imports-wrongly)
+* [#173: Saving throw second damage crit showing](https://bitbucket.org/mlenser/5eshaped/issues/173/saving-throw-second-damage-crit-showing)
+* [#174: Equal padding for roll and attack rolls for roll2](https://bitbucket.org/mlenser/5eshaped/issues/174/equal-padding-for-roll-and-attack-rolls)
+* [#176: Spell Macro always shows Spell Points](https://bitbucket.org/mlenser/5eshaped/issues/176/spell-macro-always-shows-spell-points)
+* [#187: Global Spellcasting Attack Modifier](https://bitbucket.org/mlenser/5eshaped/issues/187/global-spellcasting-attack-modifier)
+* [#200: Brutal Critical](https://bitbucket.org/mlenser/5eshaped/issues/200/brutal-critical)
+* [#195: Skill Rolls for Non-Proficient Skill broken](https://bitbucket.org/mlenser/5eshaped/issues/195/skill-rolls-for-non-proficient-skill)
+* [#197: Saving Throw Rolls - Proficient](https://bitbucket.org/mlenser/5eshaped/issues/197/saving-throw-rolls-proficient)
+* [#193: Monster Manual - Strenght modifier applied to 1d1 attacks](https://bitbucket.org/mlenser/5eshaped/issues/193/monster-manual-strenght-modifier-applied)
+* [#199: Different rounding on mean damage](https://bitbucket.org/mlenser/5eshaped/issues/199/different-rounding-on-mean-damage)
+
 ## 9.0.1
 
 The following issues should have no impact on the stability of the sheet. All are minor issues. I purposefully avoided anything that may cause other issues.
