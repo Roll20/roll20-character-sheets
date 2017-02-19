@@ -5,6 +5,9 @@
 
 ### Changelog
 
+### 1.7.7.9 on 2017 February 19th
+* Fixed a missing call to output the Max power level for Other Actions
+
 ### 1.7.7.5 on 2017 February 6th
 * Added "Size" field to character information.
 
