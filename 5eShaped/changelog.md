@@ -7,6 +7,8 @@
 * Upgrades have been entirely revamped to run in one server call as much as possible. This prevents strange errors where multiple conflicting upgrades are occurring at the same time. It also allows me to close the processing message after the upgrade is complete. Therefore that now spans the whole sheet. There is a slight delay of processing after the message closes for cases where all actions are updated (9.1.0), but that willworked on in the future.
 * [#172: Parse Actions, Reactions, Legendary Actions, Lair Actions from the new Monster Manual format](https://bitbucket.org/mlenser/5eshaped/issues/172/parse-actions-reactions-legendary-actions)
 * [#9: Handle Repeatable attacks, saves, and damage for cases like Call Lightning, Scorching Ray, Hunter's Mark](https://bitbucket.org/mlenser/5eshaped/issues/9/handle-repeatable-attacks-saves-and-damage)
+
+![alt text](http://i.imgur.com/O7mDQiS.png "9.1.0 spell repeat")
 * [#2: Meters instead of feet](https://bitbucket.org/mlenser/5eshaped/issues/2/meters-instead-of-feet)
 * [#145: Handle "if used with two hands" when parsing monsters](https://bitbucket.org/mlenser/5eshaped/issues/145/handle-if-used-with-two-hands-when-parsing)
 * [#146: Have Armor items output the content field to the chat, as per other equipment items](https://bitbucket.org/mlenser/5eshaped/issues/146/have-armor-items-output-the-content-field)
