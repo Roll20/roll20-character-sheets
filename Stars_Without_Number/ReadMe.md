@@ -18,6 +18,10 @@ Report any problems, suggestions or features by sending a private message on Rol
 
 ### Changelog
 
+#### 0.1.2
+
+* Added ship weapon power field
+
 #### 0.1.1
 
 * Weapon auto-attack calculated by attribute modifier and skill level.
