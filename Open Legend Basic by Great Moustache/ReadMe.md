@@ -5,6 +5,21 @@
 
 ### Changelog
 
+### 1.7.7.5 on 2017 February 6th
+* Added "Size" field to character information.
+
+### 1.7.7 on 2017 January 27th
+* Added Attribute Substitution for all Attributes
+	- Fixed drop downs to have ALL attributes except for the current attribute being looked at
+* Updated all function calls to account for 1.7.6
+	- Including calculations to display prorperly if attribute subsitution was being used
+
+### 1.7.6 on 2017 January 24th
+* Added new universal function for determining attribute substitution values
+	- Reusable code so less lines of code
+* Updated drop down menus to reflect change of Evasion > Guard
+* Renames lines "Increase/Decrease Dice Size" to be "Attribute Dice Bonus/Penalty"
+
 ### 1.7.5 on 2017 January 4th
 * Updated for new calculation of evasion, and evasion's name changed to Guard
 	- Guard = 10 + Agility + Might + Armor + Other
