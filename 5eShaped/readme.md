@@ -59,7 +59,7 @@ I regularly release new versions. If you'd like to be involved in the testing pe
 ## Supported Versions
 I support the currently released version on Roll20 and on Github (they often differ as Pros can use a newer version).
 
-For upgrades I support a smooth upgrade for any version within the last 6 months. Currently that version 6.1.0.
+For upgrades I support a smooth upgrade for any version within the last 6 months. Currently that is version 6.1.0.
 
 ## Contribute
 Since many have asked for it: If you appreciate what I do and want to compensate me for the countless hours that I have spent building this character sheet feel free to support me on [Patreon](https://www.patreon.com/mlenser) or Paypal (mlenser@gmail.com).
