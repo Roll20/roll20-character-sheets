@@ -12,6 +12,10 @@
 * [#239: Lair actions and Regional effects](https://bitbucket.org/mlenser/5eshaped/issues/239/lair-actions-and-regional-effects)
 * [#241: Clicking GP for total gold results in error on new characters sheet without any gold.](https://bitbucket.org/mlenser/5eshaped/issues/241/clicking-gp-for-total-gold-results-in)
 * [#240: Swarm import](https://bitbucket.org/mlenser/5eshaped/issues/240/swarm-import)
+* [#205: Spellcasting parsing doesn't work](https://bitbucket.org/mlenser/5eshaped/issues/205/spellcasting-parsing-doesnt-work)
+* [#217: NPC Spell from SRD Error](https://bitbucket.org/mlenser/5eshaped/issues/217/npc-spell-from-srd-error)
+* [#236: Class Features Macro is empty](https://bitbucket.org/mlenser/5eshaped/issues/236/class-features-macro-is-empty)
+* [#242: Conversion from Storm King's Thunder incomplete](https://bitbucket.org/mlenser/5eshaped/issues/242/conversion-from-storm-kings-thunder)
 
 #### Silent update bugs
 
