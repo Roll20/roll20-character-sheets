@@ -9933,7 +9933,7 @@
                     <option>VIII</option>
                 </select>
                 <input type="text" name="attr_LiturgieWirkung" style="width: 25em;">
-                <button type="roll" value="&{template:DSA-Liturgien} {{name=@{LiturgieName}}} {{subtag=Liturgie}}} {{subtag1=@{Kirche}}} {{subtag2=Grad: @{Liturgiegrad}}} {{Liturgie=[[ [[{0d1 + @{Liturgiekenntnis} - (?{Erleichterung (−) oder Erschwernis (+)|0}), 0d1}kh1]] - {1d20cs1cf20 + [[{0d1 + (?{Erleichterung (−) oder Erschwernis (+)|0}) - @{Liturgiekenntnis}, 0d1}kh1]] - @{MU}, 0d1}kh1 - {1d20cs1cf20 + [[{0d1 + (?{Erleichterung (−) oder Erschwernis (+)|0}) - @{Liturgiekenntnis}, 0d1}kh1]] - @{IN}, 0d1}kh1 - {1d20cs1cf20 + [[{0d1 + (?{Erleichterung (−) oder Erschwernis (+)|0}) - @{Liturgiekenntnis}, 0d1}kh1]] - @{CH}, 0d1}kh1]]}}"></button>
+                <button type="roll" value="&{template:DSA-Liturgien} {{name=@{LiturgieName}}} {{mod=[[?{Erleichterung (−) oder Erschwernis (+)|0}d1cs0cf2]]}} {{lkw=[[@{Liturgiekenntnis}]]}} {{stat1=[[@{MU}]]}} {{stat2=[[@{IN}]]}} {{stat3=[[@{CH}]]}} {{Liturgie=[[ { [[{0d1 + @{Liturgiekenntnis} - (?{Erleichterung (−) oder Erschwernis (+)|0}), 0d1}kh1]] - {1d20cs1cf20 + [[{0d1 + (?{Erleichterung (−) oder Erschwernis (+)|0}) - @{Liturgiekenntnis}, 0d1}kh1]] - @{MU}, 0d1}kh1 - {1d20cs1cf20 + [[{0d1 + (?{Erleichterung (−) oder Erschwernis (+)|0}) - @{Liturgiekenntnis}, 0d1}kh1]] - @{IN}, 0d1}kh1 - {1d20cs1cf20 + [[{0d1 + (?{Erleichterung (−) oder Erschwernis (+)|0}) - @{Liturgiekenntnis}, 0d1}kh1]] - @{CH}, 0d1}kh1, {0d1 + @{Liturgiekenntnis}, 0d1}}dh1]]}}"></button>
                 <button type="roll" value="/w GM &{template:DSA-Liturgien} {{name=@{LiturgieName}}} {{subtag=Liturgie}}} {{subtag1=@{Kirche}}} {{subtag2=Grad: @{Liturgiegrad}}} {{Liturgie=[[ [[{0d1 + @{Liturgiekenntnis} - (?{Erleichterung (−) oder Erschwernis (+)|0}), 0d1}kh1]] - {1d20cs1cf20 + [[{0d1 + (?{Erleichterung (−) oder Erschwernis (+)|0}) - @{Liturgiekenntnis}, 0d1}kh1]] - @{MU}, 0d1}kh1 - {1d20cs1cf20 + [[{0d1 + (?{Erleichterung (−) oder Erschwernis (+)|0}) - @{Liturgiekenntnis}, 0d1}kh1]] - @{IN}, 0d1}kh1 - {1d20cs1cf20 + [[{0d1 + (?{Erleichterung (−) oder Erschwernis (+)|0}) - @{Liturgiekenntnis}, 0d1}kh1]] - @{CH}, 0d1}kh1]]}}">GM</button>
             </fieldset>
         </div>
@@ -12521,21 +12521,37 @@
 </rolltemplate>
 
 <rolltemplate class="sheet-rolltemplate-DSA-Liturgien">
-    <table>
+{{#rollGreater() Liturgie -1}}
+    <table class="sheet-templates-gelungen">
+{{/rollGreater() Liturgie -1}}
+{{#rollLess() Liturgie 0}}
+    <table class="sheet-templates-misslungen">
+{{/rollLess() Liturgie 0}}
         <tr>
-            <th>{{name}}</th>
+            <th colspan="2">{{name}}</th>
         </tr>
         <tr>
-            <td class="subheader">{{subtag}}, {{subtag1}}, {{subtag2}}</td>
+            <td colspan="2" class="sheet-templates-result">Mirakelprobe {{#rollGreater() Liturgie -1}}ge{{/rollGreater() Liturgie -1}}{{#rollLess() Liturgie 0}}miss{{/rollLess() Liturgie 0}}lungen ({{Liturgie}} <span class="sheet-abbr" title="übrigbehaltene Liturgiekenntnispunkte">LkP*</span>).</td>
         </tr>
-        <tr class="arrow-container">
-            <td>
-                <div class="arrow-right"></div>
-            </td>
+        <tr>
+            <td><span class="sheet-abbr" title="Liturgiekenntniswert">LkW</span>: {{lkw}}</td>
+            <td>Erschwernis: {{#rollLess() mod 0}}{{mod}}{{/rollLess() mod 0}}
+{{#rollTotal() mod 0}}&#177;{{mod}}{{/rollTotal() mod 0}}
+{{#rollGreater() mod 0}}+{{mod}}{{/rollGreater() mod 0}}</td>
         </tr>
-        <tr class="rowcolor">
-            <td><span class="tcat">Liturgieprobe: </span>{{Liturgie}}</td>
+        <tr>
+            <td colspan="2">Eigenschaften: {{stat1}}/{{stat2}}/{{stat3}}</td>
         </tr>
+        {{#rollWasCrit() Liturgie}}
+        <tr>
+            <td colspan="2" class="sheet-templates-warning"><span class="sheet-abbr" title="Der Wurf enthält mindestens eine 1. Ob nur eine, zwei oder sogar drei Einsen gewürfelt wurden, kann nicht erkannt werden. Bitte überprüfen Sie daher den Wurf und passen Sie die Auswirkungen entsprechend an.">Auf Mehrfach-1 prüfen!</span></td>
+        </tr>
+        {{/rollWasCrit() Liturgie}}
+        {{#rollWasFumble() Liturgie}}
+        <tr>
+            <td colspan="2" class="sheet-templates-warning"><span class="sheet-abbr" title="Der Wurf enthält mindestens eine 20. Ob nur eine, zwei oder sogar drei Zwanziger gewürfelt wurden, kann nicht erkannt werden. Bitte überprüfen Sie daher den Wurf und passen Sie die Auswirkungen entsprechend an.">Auf Mehrfach-20 prüfen!</span></td>
+        </tr>
+        {{/rollWasFumble() Liturgie}}
     </table>
 </rolltemplate>
 
