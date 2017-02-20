@@ -5,7 +5,7 @@
 
 ### Changelog
 
-### 1.8.0 on 2017 February 20th
+### 1.7.8 on 2017 February 20th
 * Added for future compatibility: Attributes able to go to level 11 with new dice
 	- This is mainly for Artifacts to be released soon
 * Added more sections to the sheet that can be soon or hidden:
