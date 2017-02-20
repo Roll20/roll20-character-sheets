@@ -56,7 +56,7 @@ When I release a new version it takes time to reach the public. Roll20 must merg
 ## Testing new versions
 I regularly release new versions. If you'd like to be involved in the testing period follow this thread. You can also see t he latest code on [my test campaign](https://app.roll20.net/join/1206379/qP-T_Q)
 
-## Version Supports
+## Supported Versions
 I support the currently released version on Roll20 and on Github (they often differ as Pros can use a newer version).
 
 For upgrades I support a smooth upgrade for any version within the last 6 months. Currently that version 6.1.0.
