@@ -3,8 +3,6 @@ This is the redesigned Shaped character sheet for use on Roll20.net with the 5th
 
 ## Features
 
-[<img src="http://i.cubeupload.com/RwfoVZ.jpg" style="width: 300px; float: right; margin-left: 5px;">](http://i.cubeupload.com/RwfoVZ.jpg)
-
 * **High performance** sheet without the lag of old versions (100% sheet workers)
 * Styling that matches the [5e paper sheet](http://i.imgur.com/87GaRhL.jpg)
 * **Compendium Integration** for NPCs, Spells, Weapons, Armor, Equipment
@@ -24,6 +22,8 @@ This is the redesigned Shaped character sheet for use on Roll20.net with the 5th
   * Roll settings to choose to always roll with advantage, disadvantage, or query for both
   * Optional bonuses to all skills, abilities, saving throws, etc.
 * Attachers can be used to remind yourself to add to saving throws while within 10 feet of your paladin
+
+[![Sheet](http://i.cubeupload.com/peLpOm.jpg "5e Shaped Sheet")](http://i.cubeupload.com/RwfoVZ.jpg)
 
 ### [Shaped Character Sheet Companion Script](https://github.com/symposion/roll20-api-scripts/tree/master/5eShapedCompanion/latest)
 
