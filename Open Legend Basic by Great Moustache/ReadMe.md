@@ -5,6 +5,15 @@
 
 ### Changelog
 
+### 1.8.0 on 2017 February 20th
+* Added for future compatibility: Attributes able to go to level 11 with new dice
+	- This is mainly for Artifacts to be released soon
+* Added more sections to the sheet that can be soon or hidden:
+	- Goals & Beliefs [in progress]
+	- Sanity Points [complete]
+	- Other Inventory & Notes [in progress]
+	- Currently all three can be displayed, but nothing for the "in progress" ones but a place holder
+
 ### 1.7.7.9 on 2017 February 19th
 * Fixed a missing call to output the Max power level for Other Actions
 
