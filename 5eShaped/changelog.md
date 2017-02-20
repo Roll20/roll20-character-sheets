@@ -1,3 +1,30 @@
+## 9.1.1
+
+### Bug Fixes
+
+* [#223: Initiative rolls don't send to tracker](https://bitbucket.org/mlenser/5eshaped/issues/223/initiative-rolls-dont-send-to-tracker)
+* [#209: Ammo field is generated every time a weapon is edited](https://bitbucket.org/mlenser/5eshaped/issues/209/ammo-field-is-generated-every-time-a)
+* [#230: Upgrade from 7.12.2, Fire Bolt becomes melee](https://bitbucket.org/mlenser/5eshaped/issues/230/upgrade-from-7122-fire-bolt-becomes-melee)
+* [#229: Spell with custom (maximized) damage loses damage on upgrade](https://bitbucket.org/mlenser/5eshaped/issues/229/spell-with-custom-maximized-damage-loses)
+* [#233: Sorcerer metamagic not adding](https://bitbucket.org/mlenser/5eshaped/issues/233/sorcerer-metamagic-not-adding)
+* [#235: Condense Buttons for Feature Section only have one toggle state between them.](https://bitbucket.org/mlenser/5eshaped/issues/235/condense-buttons-for-feature-section-only)
+* [#238: Experience Points macro](https://bitbucket.org/mlenser/5eshaped/issues/238/experience-points-macro)
+* [#239: Lair actions and Regional effects](https://bitbucket.org/mlenser/5eshaped/issues/239/lair-actions-and-regional-effects)
+* [#241: Clicking GP for total gold results in error on new characters sheet without any gold.](https://bitbucket.org/mlenser/5eshaped/issues/241/clicking-gp-for-total-gold-results-in)
+* [#240: Swarm import](https://bitbucket.org/mlenser/5eshaped/issues/240/swarm-import)
+
+#### Silent update bugs
+
+* [#206: Class Features don't generate output](https://bitbucket.org/mlenser/5eshaped/issues/206/class-features-dont-generate-output)
+* [#212: Proficiency Bonus calculation/update](https://bitbucket.org/mlenser/5eshaped/issues/212/proficiency-bonus-calculation-update)
+* [#221: Characters upgraded from 9.0.1 have “send to tracker” turned off by default](https://bitbucket.org/mlenser/5eshaped/issues/221/characters-upgraded-from-901-have-send-to)
+* Initialized new sheets for [#222: New character’s initiative rolls are blank](https://bitbucket.org/mlenser/5eshaped/issues/222/new-character-s-initiative-rolls-are-blank), [#224: The saving throw chat dump macro is blank for new character without any save proficiencies](https://bitbucket.org/mlenser/5eshaped/issues/224/the-saving-throw-chat-dump-macro-is-blank)
+* [#219: No proficiency bonus being added to skills](https://bitbucket.org/mlenser/5eshaped/issues/219/no-proficiency-bonus-being-added-to-skills)
+
+### UI Adjustments
+
+* Condensed attacks, traits, etc look as they do in 9.0.0
+
 ## 9.1.0
 
 ### Features
