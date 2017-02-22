@@ -6,7 +6,6 @@ Character sheet for the German system "Das Schwarze Auge" (The Dark Eye) version
 * Skill checks do not take double 1 (automatic success with max. result), double 20 (automatic failure) and triple 20 (disastrous failure) into account
 * Speed calculation does not take the stat Gewandtheit into account
 * The whole combat system is a mess and should be used with great care only; some highlighted points:
-  * TP/KK calculation does not conform to the rulebook(s)
   * "Ansage" may be higher than the corresponding skill value (TaW)
   * Target is not considered (distances class, special skills such as "Aufmerksamkeit")
   * Target hit zone cannot be selected
