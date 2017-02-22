@@ -10,6 +10,7 @@ Character sheet for the German system "Das Schwarze Auge" (The Dark Eye) version
   * "Ansage" may be higher than the corresponding skill value (TaW)
   * Target is not considered (distances class, special skills such as "Aufmerksamkeit")
   * Target hit zone cannot be selected
+* 1d20 checks (such as attack) always roll 2d20 for technical reasons (one real roll and the confirmation roll in case of 1/20), therefore 3D dice are less useful.
 * Some spells are missing
   * Elemental analogs
   * Umbraporta (obscuromancy)
