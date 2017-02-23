@@ -1,3 +1,27 @@
+## 9.2.0
+
+### Features
+
+* The way that data is retrieved from the server when referencing a repeating section has been altered to minimize the number of http requests I make to the server. The result is incredibly fast upgrades (20 seconds from the moment the sheet is clicked for a 6.5.1 PC loaded with spells). The new architecture allows me to retrieve multiple repeating sections and vary the id I get from each section or vary the fields I get from each section - it significantly improves the process. This will also allow me to run more functions in parallel.
+
+### Bug Fixes
+
+* Removed damage_crit from saving throw damage
+* [#276: Race condition with spell slot parsing](https://bitbucket.org/mlenser/5eshaped/issues/276/race-condition-with-spell-slot-parsing)
+* [#256: Saving throws and Ability Check macros always include "Honor" and "Sanity"](https://bitbucket.org/mlenser/5eshaped/issues/256/saving-throws-and-ability-check-macros)
+* [#267: Inspiration chat post initially shows 1](https://bitbucket.org/mlenser/5eshaped/issues/267/inspiration-chat-post-initially-shows-1)
+* [#269: Proficiency text is replaced on upgrade and level up.](https://bitbucket.org/mlenser/5eshaped/issues/269/proficiency-text-is-replaced-on-upgrade)
+* [#258: Death saving throw bonus isn't displayed in macros](https://bitbucket.org/mlenser/5eshaped/issues/258/death-saving-throw-bonus-isnt-displayed-in)
+* [#262: "Auto" spell list does not show when there are no slots or points](https://bitbucket.org/mlenser/5eshaped/issues/262/auto-spell-list-does-not-show-when-there)
+* "per_use" for things like ammo, armor, equipment, traits, attacks, actions, etc is now a "text" field so that it can allow things like custom queries.
+* Attributes are now generated on sheet initialize. Closes [#237: Deflect Missile Monk Feature has issues with calculating the absorbed damage - Attributes not defined](https://bitbucket.org/mlenser/5eshaped/issues/237/deflect-missile-monk-feature-has-issues)
+* [#245: Hitdice dont get retracted from a character after levels in a class are deleted.](https://bitbucket.org/mlenser/5eshaped/issues/245/hitdice-dont-get-retracted-from-a)
+* [#275: The four new features and traits sections are not hidden in presentation mode](https://bitbucket.org/mlenser/5eshaped/issues/275/the-four-new-features-and-traits-sections)
+* [#273: Spells don't prompt for level when they should](https://bitbucket.org/mlenser/5eshaped/issues/273/spells-dont-prompt-for-level-when-they). Additionally, spells will prompt for a level if you have no slots of that level or higher.
+* [#218: Spell level change not running](https://bitbucket.org/mlenser/5eshaped/issues/218/spell-level-change-not-running)
+* [#211: Total weight not calculating](https://bitbucket.org/mlenser/5eshaped/issues/211/total-weight-not-calculating)
+* [#276: Race condition with spell slot parsing](https://bitbucket.org/mlenser/5eshaped/issues/276/race-condition-with-spell-slot-parsing)
+
 ## 9.1.1
 
 ### Bug Fixes
