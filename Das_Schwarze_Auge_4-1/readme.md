@@ -10,11 +10,6 @@ Character sheet for the German system "Das Schwarze Auge" (The Dark Eye) version
   * Target is not considered (distances class, special skills such as "Aufmerksamkeit")
   * Target hit zone cannot be selected
 * 1d20 checks (such as attack) always roll 2d20 for technical reasons (one real roll and the confirmation roll in case of 1/20), therefore 3D dice are less useful.
-* Some spells are missing
-  * Elemental analogs
-  * Umbraporta (obscuromancy)
-  * All new spells from "Elementare Gewalten"
-* 1d20 checks (such as attack) always roll 2d20 for technical reasons (one real roll and the confirmation roll in case of 1/20), therefore 3D dice are less useful.
 * Spells are not associated with a representation
 * Rituals are basically unimplemented
 * Miracles work rudimentally only and are lacking the comfort from talents and spells for activation
