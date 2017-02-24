@@ -1,3 +1,12 @@
+## 9.2.2
+
+### Bug Fixes
+
+* [#298: higher_level_query_1ST_LEVEL attribute not being created](https://bitbucket.org/mlenser/5eshaped/issues/298/higher_level_query_1st_level-attribute-not)
+* [#292: Ankheg drag from SRD has no actions](https://bitbucket.org/mlenser/5eshaped/issues/292/ankheg-drag-from-srd-has-no-actions)
+* [#296: Include identifier in roll template for repeated spells](https://bitbucket.org/mlenser/5eshaped/issues/296/include-identifier-in-roll-template-for)
+* [#293: Adding Armor does not update AC properly on PC](https://bitbucket.org/mlenser/5eshaped/issues/293/adding-armor-does-not-update-ac-properly)
+
 ## 9.2.1
 
 ### Bug Fixes
