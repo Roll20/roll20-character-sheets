@@ -1,3 +1,16 @@
+<!-- This area is for sheet worker scripts -->
+<script type="text/worker">
+on("change:repeating_rangedweapons", function() {
+   getSectionIDs("repeating_rangedweapons", function(idarray) {
+      let setOps={};
+      for(var i=0; i < idarray.length; i++) {
+         setOps['repeating_rangedweapons_'+idarray[i]+'_my_hidden_row_id']=idarray[i];
+      }
+      setAttrs(setOps);
+   });
+});
+</script>
+
 <!-- This is the main tab set up -->
 <input type="radio" class="sheet-tab sheet-tab1" name="attr_core-tab" value="1" title="Player Sheet" checked="checked"/> 
 <span data-i18n="player-sheet-u" class="sheet-tab sheet-tab1" style='line-height: 40px;'>Player Sheet</span>
@@ -3197,7 +3210,7 @@
 							    </div>
 							    <div class="sheet-item" style="width: 10%;"><span data-i18n="penetration-u">Pen:</span></div>
 							<div class="sheet-item" style="width: 10%;"><input name="attr_NPCmeleeweaponpen" type="text" value="0" style="text-align: center;"/></div>
-							<div class="sheet-item sheet-redbgns" style="width: 15%;"><button name="roll_NPCmeleedamage" type="roll" value="/em rolls for @{NPCName}, who deals [[@{NPCmeleeweapondamage}+@{UnS}+(floor(@{strength}/10))]] damage! (Pen: @{NPCmeleeweaponpen})"> <span data-i18n="damage-u">Damage</span> </button></div>
+							<div class="sheet-item sheet-redbgns" style="width: 15%;"><button name="roll_NPCmeleedamage" type="roll" value="/em rolls for @{NPCName}, who deals [[@{NPCmeleeweapondamage}+@{NPCUnS}+(floor(@{strength}/10))]] damage! (Pen: @{NPCmeleeweaponpen})"> <span data-i18n="damage-u">Damage</span> </button></div>
 						</div>
 							<div class="sheet-row">
 							<div class="sheet-item" style="width: 15%;"><span data-i18n="special-u">Special:</span></div>
@@ -3319,10 +3332,14 @@
 				<div class="sheet-row">
 					<div class="sheet-item" style="width: 8%;"><span data-i18n="name-u">Name:</span></div>
 					<div class="sheet-item" style="width: 27%;"><input name="attr_VehName" type="text" /></div>
-					<div class="sheet-item" style="width: 8%;"><span data-i18n="type-u">Type:</span></div>
-					<div class="sheet-item" style="width: 22%;"><input name="attr_VehType" type="text" /></div>
-					<div class="sheet-item" style="width: 8%;"><span data-i18n="armour-u">Armour:</span></div>
-					<div class="sheet-item" style="width: 27%;"><input name="attr_VehSize" type="text" /></div>
+					<div class="sheet-item" style="width: 6%;"><span data-i18n="type-u">Type:</span></div>
+					<div class="sheet-item" style="width: 17%;"><input name="attr_VehType" type="text" /></div>
+					<div class="sheet-item" style="width: 6%;"><span data-i18n="front-u">Front:</span></div>
+					<div class="sheet-item" style="width: 8%;"><input name="attr_VehFront" type="text" /></div>
+					<div class="sheet-item" style="width: 6%;"><span data-i18n="side-u">Side:</span></div>
+					<div class="sheet-item" style="width: 8%;"><input name="attr_VehSide" type="text" /></div>
+					<div class="sheet-item" style="width: 6%;"><span data-i18n="rear-u">Rear:</span></div>
+					<div class="sheet-item" style="width: 8%;"><input name="attr_VehRear" type="text" /></div>
 				</div>
 				<div class="sheet-row">
 					<div class="sheet-item" style="width: 13%;"><span data-i18n="tactical-speed-u">Tactical Speed:</span></div>
@@ -3334,7 +3351,7 @@
 					<div class="sheet-item" style="width: 8%;"><span data-i18n="integrity-u">Integrity:</span></div>
 					<div class="sheet-item" style="width: 5%;"><input name="attr_VehIntegrity" type="text" /></div>
 					<div class="sheet-item" style="width: 8%;"><span data-i18n="size-u">Size:</span></div>
-					<div class="sheet-item" style="width: 16%;"><input name="attr_VehArmour" type="text" /></div>					
+					<div class="sheet-item" style="width: 16%;"><input name="attr_VehSize" type="text" /></div>					
 				</div>
 				<div class="sheet-row">
 					<div class="sheet-item" style="width: 8%;;"><span data-i18n="traits-u">Traits:</span></div>
@@ -3492,7 +3509,7 @@
 				<fieldset class="repeating_Rangedweapons">
 					<div class="sheet-quickborder">
 						<div class="sheet-row">
-							<div class="sheet-item" style="width: 15%;"><span data-i18n="name-u">Name:</span></div>
+							<div class="sheet-item" style="width: 15%;"><span data-i18n="name-u">Name:</span></div><input type="hidden" name="attr_my_hidden_row_id" />
 							<div class="sheet-item" style="width: 38%;"><input name="attr_Rangedweaponname" type="text" /></div>
 								<div class="sheet-item" style="width: 7%;"><span data-i18n="weight-u">Wt.:</span></div>
 							<div class="sheet-item" style="width: 11%;"><input name="attr_rangedwwt" type="number" value="0" data-i18n-placeholder="kilograms-u" placeholder="kg" style="text-align:center;"/></div>
@@ -3542,7 +3559,9 @@
 						<div class="sheet-row">
 							<div class="sheet-item" style="width: 15%;"><span data-i18n="special-u">Special:</span></div>
 							<div class="sheet-item" style="width: 76%;"><input name="attr_Rangedweaponspecial" type="text" /></div>
-							<div class="sheet-item sheet-redbgns" style="width: 9%;"><button name="roll_Rangedhit" type="roll" value="!roll40k @{character_name}, @{BallisticSkill}, [[(?{Aim | Half aim (+10),+10| No aim (+0),+0 | Full aim (+20),+20} + ?{Range | Point Blank (+30),+30 | Short Range (+10),+10 | Standard range (+0),+0 | Long Range (-10),-10 | Extreme Range (-30),-30} + ?{Rate of Fire/Attack Type|Standard (+10),+10 | Semi auto (+0),+0 | Full Auto (-10),-10 | Called Shot (-20),-20 | Suppressing Fire (-20),-20} + ?{Modifier|0})]]"> <span data-i18n="hit-u">Hit</span> </button></div>
+							<div class="sheet-item sheet-redbgns" style="width: 9%;"><button name="roll_Rangedhit" type="roll" value="***@{character_name} fires @{rangedweaponname}!***
+!roll40k @{character_name}, @{BallisticSkill}, [[(?{Aim | Half aim (+10),+10| No aim (+0),+0 | Full aim (+20),+20} + ?{Range | Point Blank (+30),+30 | Short Range (+10),+10 | Standard range (+0),+0 | Long Range (-10),-10 | Extreme Range (-30),-30} + ?{Rate of Fire/Attack Type|Standard (+10),+10 | Semi auto (+0),+0 | Full Auto (-10),-10 | Called Shot (-20),-20 | Suppressing Fire (-20),-20} + ?{Modifier|0})]]
+!ammo @{character_id} repeating_Rangedweapons_@{my_hidden_row_id}_Rangedweaponclip ?{Ammo?|Single,-1|Semi-Auto,-@{Rangedweaponsemi}|Full Auto,-@{Rangedweaponfull}}"> <span data-i18n="hit-u">Hit</span> </button></div>
 						</div>
 					</div>
 				</fieldset>
@@ -3758,7 +3777,7 @@
 							<input name="attr_Peer1Inf" value="0" type="number" title="Total Influence gained">
 						</div>
 					<div class="sheet-item sheet-Impskull" style="width: 9%;">
-						<button name="roll_P1Fel" type="roll" value="!roll40k @{character_name}, @{Fellowship} , [[ (+@{Peer1Inf}  * 10)]]" title="Modified Fellowship Roll"></button>
+						<button name="roll_P1Fel" type="roll" value="!roll40k @{character_name} for relationship with @{Peer1}, @{Fellowship}, [[(@{Peer1Inf}*10)+?{Modifier|0}]]" title="Modified Fellowship Roll"></button>
 						</div>
 				<fieldset class="repeating_Peers">
 				<div class="sheet-item sheet-socialspan" style="width:12%">
@@ -3771,7 +3790,7 @@
 							<input name="attr_PeerReInf" value="0" type="number" title="Times Taken">
 						</div>
 					<div class="sheet-item sheet-Impskull" style="width: 9%;">
-						<button name="roll_P1Fel" type="roll" value="!roll40k @{character_name}'s Fellowship, @{Fellowship} , [[ (+@{PeerReInf}  * 10)]]" title="Modified Fellowship Roll"></button>
+						<button name="roll_P1Fel" type="roll" value="!roll40k @{character_name}'s relationship with @{PeerRe}, @{Fellowship}, [[ (+@{PeerReInf}*10)+?{Modifier|0}]]" title="Modified Fellowship Roll"></button>
 						</div>				
 				</fieldset>
                 </div>
@@ -3790,7 +3809,7 @@
 							<input name="attr_Enemy1Inf" value="0" type="number" title="Times taken">
 						</div>
 					<div class="sheet-item sheet-Impskull" style="width: 9%;">
-						<button name="roll_E1Fel" type="roll" value="!roll40k @{character_name}, @{Fellowship} , [[ (-@{Enemy1Inf}  * 10)]]" title="Modified Fellowship Roll"></button>
+						<button name="roll_E1Fel" type="roll" value="!roll40k @{character_name}'s relationship with @{Enemy1}, @{Fellowship}, [[(-@{Enemy1Inf}*10)+?{Modifier|0}]]" title="Modified Fellowship Roll"></button>
 						</div>
 				<fieldset class="repeating_Enemies">
 				<div class="sheet-item sheet-socialspan" style="width:14%">
@@ -3803,7 +3822,7 @@
 							<input name="attr_EnemyReInf" value="0" type="number" title="Times gained">
 						</div>
 					<div class="sheet-item sheet-Impskull" style="width: 9%;">
-						<button name="roll_E1Fel" type="roll" value="!roll40k @{character_name}'s Fellowship, @{Fellowship} , [[ (-@{enemyReInf}  * 10)]]" title="Modified Fellowship Roll"></button>
+						<button name="roll_E1Fel" type="roll" value="!roll40k @{character_name}'s relationship with @{EnemyRe}, @{Fellowship}, [[-(@{enemyReInf}*10)+?{Modifier|0}]]" title="Modified Fellowship Roll"></button>
 						</div>				
 				</fieldset>
 
