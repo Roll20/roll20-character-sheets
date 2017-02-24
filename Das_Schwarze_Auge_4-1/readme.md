@@ -4,7 +4,6 @@ Character sheet for the German system "Das Schwarze Auge" (The Dark Eye) version
 ## Known Issues
 * Internal names for the "Paralysis" spell and the "Kartographie" and "Stimmenimitieren" skills are "paralys" and "karthographie" and "stimmenimmitieren" (unchanged for the sake of compatibility)
 * Skill checks do not take double 1 (automatic success with max. result), double 20 (automatic failure) and triple 20 (disastrous failure) into account
-* Speed calculation does not take the stat Gewandtheit into account
 * The whole combat system is a mess and should be used with great care only; some highlighted points:
   * "Ansage" may be higher than the corresponding skill value (TaW)
   * Target is not considered (distances class, special skills such as "Aufmerksamkeit")
