@@ -1,3 +1,15 @@
+## 9.2.1
+
+### Bug Fixes
+
+* [#287: Ranger UA (2016) Natural Explorer](https://bitbucket.org/mlenser/5eshaped/issues/287/ranger-ua-2016-natural-explorer)
+* [#279: Add a way for legendary actions to be identified](https://bitbucket.org/mlenser/5eshaped/issues/279/add-a-way-for-legendary-actions-to-be)
+* [#176: Spell Macro always shows Spell Points](https://bitbucket.org/mlenser/5eshaped/issues/176/spell-macro-always-shows-spell-points)
+* [#288: Ammo Field Replicating](https://bitbucket.org/mlenser/5eshaped/issues/288/ammo-field-replicating)
+* [#281: Manually entered spells are moved to cantrips and sometimes duplicated on upgrade from 9.0.1](https://bitbucket.org/mlenser/5eshaped/issues/281/manually-entered-spells-are-moved-to)
+* [#214: Spells macro shows non-existing warlock slots](https://bitbucket.org/mlenser/5eshaped/issues/214/spells-macro-shows-non-existing-warlock)
+* [#285: Firefox: Checkboxes for attacks, saving throws, heal, etc become centered when toggled](https://bitbucket.org/mlenser/5eshaped/issues/285/firefox-checkboxes-for-attacks-saving)
+
 ## 9.2.0
 
 ### Features
