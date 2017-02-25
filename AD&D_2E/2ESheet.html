@@ -4,22 +4,24 @@
 		<h2 style="margin-bottom:-15px;">Recent Changes</h2><br>
 		<p style="font-size:10pt;color:black;">Sheet version: 1.0.2</p>
 		<div class="sheet-announce-items">
-			<p style="font-size:9pt;color:black;font-style:italic;">Adding new roll Templates to the Sheet:
+			<p style="font-size:9pt;color:black;font-style:italic;">Added new roll Templates to the Sheet:
 			<ul>
-				<li>These new rolltemplates are not integrated into the sheet roll buttons, they are merely being published and made available for those who wish to use them.</li>
-				<li>Templates include 2Edefault, 2Eattack, 2Esave, and 2Espell.</li>
-				<li>See the template documentation <span class="sheet-selectable">https://tinyurl.com/hxzf6s3</span></li>
+				<li>Added 2Echeck template and relevant css</li>
+				<li>Updated Information header</li>
+				<li>Added an attribute to the checkbox for hiding rogue skills so that it will stay hidden when checked.</li>
+				<li>Added support for custom critical hit damage to the 2Eattack template.</li>
+				<li>Improved handling of styles used for table headers to reduce the code footprint of the sheet.</li>
 			</ul></p>
                 <h2 style="margin-bottom:-15px;">Proposed Changes</h2><br>
-			<p style="font-size:9pt;color:black;font-style:italic;">Upgrading Memorized spells section of the character sheet:
+			<p style="font-size:9pt;color:black;font-style:italic;">Adding an option to display an "Alternate Character Sheet" with the following features:
 			<ul>
-				<li>Adding a small table for listing "Spells per day" at the top of the memorized spells section.</li>
-				<li>Switching the checkbox for "Cast Today" to an attribute[number} so players can indicate the number of times the spell has been memorized.</li>
-				<li>Adding Check boxes to expand spell entry to allow input of spell stats &amp; information.</li>
-				<li>Integrating the spell template with a new "Cast" roll button.</li>
+				<li>Roll buttons with full template integration.</li>
+				<li>Upgraded spellbook section.</li>
+				<li>Upgraded repeating weapons section.</li>
+				<li>Does not affect the layout or any information entered on the standard Character Sheet Display.</li>
 			</ul></p>
 			<p style="font-size:10pt;color:black;font-style:normal;">Please join the discussion and provide feedback on the forums! <span class="sheet-selectable">https://tinyurl.com/hcvs56k</span><br>
-			To view the full change log and sheet documentation, please visit the wiki page! <span class="sheet-selectable">(Coming Soon!)</span> </p>
+			To view the full change log and sheet documentation, please visit the wiki page! <span class="sheet-selectable">https://wiki.roll20.net/ADnD_2nd_Edition_Character_sheet</span> </p>
 		</div>
 	</div>
 </div><br>
@@ -585,15 +587,10 @@ Current weight:<input type="number" name="attr_movweighttotal" value="@{gearweig
     </tr>
 </table></fieldset><br><b>Notes</b><textarea name="attr_weaponnotes"></textarea><hr>
 
-
-
-
-
 <h4>Special Abilities and Attacks</h4><br><textarea name="attr_abilitiesnotes"></textarea><br>
 
     <h4>Rogue Skills</h4><div><input type="checkbox" name="attr_rsChk" class="arrow" /><span></span>Hide
     <div class="body">
-
     
 <strong>Backstab Multiplier:</strong><input type="text" name="attr_backstabmultiplier" class="tiny">
 <table style='border-collapse: collapse; border-spacing: 0;'>
@@ -725,7 +722,6 @@ Current weight:<input type="number" name="attr_movweighttotal" value="@{gearweig
     </tr>
 </table>Skills with an asterisk (*) are from Skills & Powers, and may be ignored for campaigns using core rules.</div>
 </div><br><hr>
-
 
 <div class="sheet-2colrow">
     <div class="sheet-col">
@@ -1050,19 +1046,14 @@ Current weight:<input type="number" name="attr_gearweighttotal" class="sheet-nob
 		<div class="sheet-template-body">
 			<table>
 				<tr><td colspan="3"><span class="weapon-used">{{weapon_used}}</span></td></tr>
-				<tr>
-					<td class="attack-c1"><b>S/M</b></td>
-					<td class="attack-c2" rowspan="2">{{ac_hit}}</td>
-					<td class="attack-c1"><b>L</b></td>
-				</tr>
-				<tr>
-					<td class="attack-c3" rowspan="2">{{dmg_s}}</td>
-					<td class="attack-c3" rowspan="2">{{dmg_l}}</td>
-				</tr>
-				<tr>
-					<td class="attack-c4"><b>AC Hit</b></td>
-				</tr>
-				{{#rollWasCrit() ac_hit }}
+				<tr><td class="attack-c1"><b>S/M</b></td><td class="attack-c2" rowspan="2">{{ac_hit}}</td><td class="attack-c1"><b>L</b></td></tr>
+				{{#^rollWasCrit() ac_hit}}
+                    <tr><td class="attack-c3" rowspan="2">{{dmg_s}}</td><td class="attack-c3" rowspan="2">{{dmg_l}}</td></tr>
+                    <tr><td class="attack-c4"><b>AC Hit</b></td></tr>
+				{{/^rollWasCrit() ac_hit}}
+				{{#rollWasCrit() ac_hit}}
+                    <tr><td class="attack-c3" rowspan="2">{{crit_s}}</td><td class="attack-c3" rowspan="2">{{crit_l}}</td></tr>
+                    <tr><td class="attack-c4"><b>AC Hit</b></td></tr>
 					<tr><td colspan="3" class="attack-c5">CRITICAL HIT!{{#crit}}<br><span class='attack-crit'>{{crit}}</span>{{/crit}}</td></tr>
 				{{/rollWasCrit() ac_hit }}
 				{{#rollWasFumble() ac_hit }}
