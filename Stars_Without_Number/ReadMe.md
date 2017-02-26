@@ -21,6 +21,9 @@ Report any problems, suggestions or features by sending a private message on Rol
 #### 0.1.3
 
 * Added Sheet Worker to enforce System Strain constraints against Maximum Strain and Permanent Strain
+* Added Stowed and Other attribute to Gear in addition to Readied
+* Changed Readied/Stowed/Other to radio from checkbox
+* Added Sheet Worker to auto-calculate Current Readied and Current Stowed gear
 
 #### 0.1.2
 
