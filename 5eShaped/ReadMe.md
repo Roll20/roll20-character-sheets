@@ -2,35 +2,38 @@
 
 This is the redesigned Shaped character sheet for use on Roll20.net with the 5th edition of Dungeons & Dragons (5e). The sheet is designed to be usable by all Roll20 users regardless of subscription level.
 
-*If you are updating an existing campaign I highly recommend you duplicate your campaign and use that to copy data over. I also recommend starting each character from a fresh sheet.*
+*If you are ever concerned about data loss I recommend you duplicate your campaign and use that to copy to see how it'll work.*
 
 [Shaped Character Sheet Companion Script](https://github.com/symposion/roll20-api-scripts/tree/master/5eShapedCompanion/latest)
 
 [Documentation](https://docs.google.com/document/d/1yPcIZ_bIc3JlnWsKZt2tAB0EQSIVEfeMtT0GifbpJIg)
 
-Please report any bugs in the [issues tab](https://github.com/mlenser/roll20-character-sheets/issues)
+[Changelog](https://github.com/mlenser/roll20-character-sheets/blob/master/5eShaped/changelog.md)
 
-##Features
+### Please report any bugs in the [issues tab](https://bitbucket.org/mlenser/5eshaped/issues). Please include screenshots if appropriate and please provide a full reproduction path (on a clean character sheet if possible).
+
+## Features
 
 * **High performance** sheet without the lag of old versions (100% sheet workers)
-* Improved styling to match the [5e paper sheet](http://i.imgur.com/87GaRhL.jpg) with nearly all elements clickable to output to chat
-* **Compendium Integration** for NPCs, Armor, Equipment, Spells, Weapons
-* **NPC actions and traits** are parsed and clickable.
+* Styling that matches the [5e paper sheet](http://i.imgur.com/87GaRhL.jpg)
+* **Compendium Integration** for NPCs, Spells, Weapons, Armor, Equipment
+* **NPC actions and traits** are parsed and clickable. The text on the sheet and in the output macro will adjust if you adjust an ability score.
 * **Customizable skills** with the option to change the ability on the fly
-* Translations (English and French so far)
-* Auto populated Class Features which include things like Lay on Hands or Sneak Attack
-* **Spells** with filtering and the option to cast at a higher level
-* Customizable Classes - Change Name, HD, or spellcasting level of the classes
-* **Armor** - Covers normal armor as well as unarmored ability cases like monk, barbarian, etc.
+* **Spells** with the option to cast at a higher level
+  * Filters to limit which spells are displayed
+* **Chat macros** that are kept in sync with the contents of the sheet. Ability Checks, Saving Throws, Attacks, Actions, Stablock, etc.
+* Critical damage is automatically calculated with the possibility of selecting features like brutal critical or houserules that critical hits do maximum dice damage plus the normal damage.
+* Classes automatically select proficiencies (Weapon, Armor, Tools, Saving Throws) and class features.
+  * Customizable Classes - Change Name, HD, or spellcasting level of the classes
+* Translations
+* **Armor** Covers normal armor as well as unarmored ability cases like monk, barbarian, etc.
 * **Equipment** with gold and weight automatically calculated. Equipment Items are clickable from the core page for items like Potion of Healing
-* Attachers can be used to remind yourself to add to saving throws while within 10 feet of your paladin
-* Extra features: Jack of all trades, halfling luck, vision, movement, appearance.
 * **Settings** for how to output all rolls, death saves, initiative, etc
   * Roll settings to choose to always roll with advantage, disadvantage, or query for both
   * Optional bonuses to all skills, abilities, saving throws, etc.
+* Attachers can be used to remind yourself to add to saving throws while within 10 feet of your paladin
 
-![NPC sheet](http://i.imgur.com/CTSxo4a.png "NPC sheet")
-![PC sheet](http://i.imgur.com/ufXveK2.png "PC sheet")
+![Sheet](http://i.cubeupload.com/RwfoVZ.jpg "Sheet")
 
 ## How to Update the sheet yourself (as Pro):
 
