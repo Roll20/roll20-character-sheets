@@ -1,3 +1,15 @@
+## 9.2.3
+
+### Bug Fixes
+
+* [#303: 9.2.2 - Unarmored AC not calculating correctly](https://bitbucket.org/mlenser/5eshaped/issues/303/922-unarmored-ac-not-calculating-correctly). I believe this also closes [#300: DC displayed incorrectly for some monster actions](https://bitbucket.org/mlenser/5eshaped/issues/300/dc-displayed-incorrectly-for-some-monster), but will need Miodziek to verify when I release.
+* [#304: Jack of all Trades and Remarkable Athlete not applying correctly](https://bitbucket.org/mlenser/5eshaped/issues/304/jack-of-all-trades-and-remarkable-athlete)
+* [#307: Hit die roll should have a minimum of zero](https://bitbucket.org/mlenser/5eshaped/issues/307/hit-die-roll-should-have-a-minimum-of-zero)
+* [#308: Roll template is omitting uses when it's zero](https://bitbucket.org/mlenser/5eshaped/issues/308/roll-template-is-omitting-uses-when-its)
+* [#305: Characters with custom classes lose hit dice 9.0.1 -> 9.2.3](https://bitbucket.org/mlenser/5eshaped/issues/305/characters-with-custom-classes-lose-hit)
+* [#306: Add "process spell slots automatically" option](https://bitbucket.org/mlenser/5eshaped/issues/306/add-process-spell-slots-automatically)
+* [#284: Warlock spells require casting level choice](https://bitbucket.org/mlenser/5eshaped/issues/284/warlock-spells-require-casting-level)
+
 ## 9.2.2
 
 ### Bug Fixes
