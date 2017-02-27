@@ -3,9 +3,18 @@
 This is a re-creation of the "green-sheet" for the D&D Basic Moldvay Red box game.  It was created for the Roll20 Moldvay Basic Contest.
 
 ## Current Version
-2.2
+2.3
 
 ### Changelog
+
+#### 2.3
+* Added Sheet Worker to automatically add in Halfing Missile Bonus if Halfling Class is selected (#2325)
+* Halfling Quick Bonus is now actually optional - selected within the Halfling class
+* Add Sheet Worker to automatically calculate all To Hit Rolls (for both player and monster sheets) that are not THAC0 with the lowest value being 2
+* Added new art for AC, HP and HP Max Boxes (#2329)
+* Default values for Ability Scores and Saving Throws are now present on new character sheets (#2333)
+* Cleaned up Monster Sheet background so its not blurry
+* Alignment and HP Die are no longer drop-down boxes (#2332)
 
 #### 2.2
 * Added the ability to use Bonus or Minus roll query to your open doors check (using a crowbar for instance)
