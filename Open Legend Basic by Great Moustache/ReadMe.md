@@ -5,6 +5,11 @@
 
 ### Changelog
 
+### 1.7.8.1 on 2017 February 27th
+* Took out Sanity Points as this was not Core Rules.
+	- Just committed out, so can access it via custom sheets
+* Took out Attribute dice calculation for Attribute 11, highest meant to be 10.
+
 ### 1.7.8 on 2017 February 20th
 * Added for future compatibility: Attributes able to go to level 11 with new dice
 	- This is mainly for Artifacts to be released soon
