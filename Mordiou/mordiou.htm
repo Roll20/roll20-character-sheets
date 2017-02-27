@@ -1,0 +1,365 @@
+<!-- === SCRIPT === -->
+<script type="text/worker">
+/* ---- mordiou ---------------------- */
+    var mordiou = mordiou || (function(){
+        'use strict';
+        var version = '1.0',
+        basejet = '({floor(1d6/2)-1,0d0}kh1)',
+        jetplus = ' + ' + basejet,
+        calcJet = function (pVal) {
+            var nb = parseInt(pVal) || 0;
+            if (nb > 8) {nb = 8};
+            var jetarr = [];
+            var jet = '0d0';
+            if (nb > 0) {jet = basejet + jetplus.repeat(nb-1)};
+            jetarr.push(jet); // jet normal
+            jetarr.push(jet + jetplus.repeat(2)); // jet aspect
+            jet = '0d0';
+            if (nb > 2) jet = basejet + jetplus.repeat(nb-3);
+            jetarr.push(jet); // jet difficile
+            return jetarr;
+        };
+        return {
+            calcJet: calcJet
+        };
+    }());
+/* ---- FIN mordiou ---------------------- */
+    on("change:fortune change:defense change:aide change:maniere", function(){
+        getAttrs(["fortune","defense","aide","maniere","attention","eloquence","erudition","panache","resolution","ruse","vigueur"], function(values) {
+            var mods = (parseInt(values.fortune) || 0) + (parseInt(values.aide) || 0) - (parseInt(values.defense) || 0) - ((parseInt(values.maniere) || 0)*2);
+            // Attention
+            var attention_arr = mordiou.calcJet(mods + (parseInt(values.attention) || 0));
+            // Eloquence
+            var eloquence_arr = mordiou.calcJet(mods + (parseInt(values.eloquence) || 0));
+            // Erudition
+            var erudition_arr = mordiou.calcJet(mods + (parseInt(values.erudition) || 0));
+            // Panache
+            var panache_arr = mordiou.calcJet(mods + (parseInt(values.panache) || 0));
+            // Resolution
+            var resolution_arr = mordiou.calcJet(mods + (parseInt(values.resolution) || 0));
+            // Ruse
+            var ruse_arr = mordiou.calcJet(mods + (parseInt(values.ruse) || 0));
+            // Vigueur
+            var vigueur_arr = mordiou.calcJet(mods + (parseInt(values.vigueur) || 0));
+            setAttrs({
+                attention_jet: attention_arr[0],
+                attention_jetplus: attention_arr[1],
+                attention_jetmoins: attention_arr[2],
+                eloquence_jet: eloquence_arr[0],
+                eloquence_jetplus: eloquence_arr[1],
+                eloquence_jetmoins: eloquence_arr[2],
+                erudition_jet: erudition_arr[0],
+                erudition_jetplus: erudition_arr[1],
+                erudition_jetmoins: erudition_arr[2],
+                panache_jet: panache_arr[0],
+                panache_jetplus: panache_arr[1],
+                panache_jetmoins: panache_arr[2],
+                resolution_jet: resolution_arr[0],
+                resolution_jetplus: resolution_arr[1],
+                resolution_jetmoins: resolution_arr[2],
+                ruse_jet: ruse_arr[0],
+                ruse_jetplus: ruse_arr[1],
+                ruse_jetmoins: ruse_arr[2],
+                vigueur_jet: vigueur_arr[0],
+                vigueur_jetplus: vigueur_arr[1],
+                vigueur_jetmoins: vigueur_arr[2]
+            });
+        });
+    });
+    on("change:attention", function(){
+        getAttrs(["attention","fortune","defense","aide","maniere"], function(values) {
+            var jetarr = mordiou.calcJet((parseInt(values.attention) || 0) + (parseInt(values.fortune) || 0) + (parseInt(values.aide) || 0) - (parseInt(values.defense) || 0) - ((parseInt(values.maniere) || 0)*2));
+            setAttrs({
+                attention_jet: jetarr[0],
+                attention_jetplus: jetarr[1],
+                attention_jetmoins: jetarr[2]
+            });
+        });
+    });
+    on("change:eloquence", function(){
+        getAttrs(["eloquence","fortune","defense","aide","maniere"], function(values) {
+            var jetarr = mordiou.calcJet((parseInt(values.eloquence) || 0) + (parseInt(values.fortune) || 0) + (parseInt(values.aide) || 0) - (parseInt(values.defense) || 0) - ((parseInt(values.maniere) || 0)*2));
+            setAttrs({
+                eloquence_jet: jetarr[0],
+                eloquence_jetplus: jetarr[1],
+                eloquence_jetmoins: jetarr[2]
+            });
+        });
+    });
+    on("change:erudition", function(){
+        getAttrs(["erudition","fortune","defense","aide","maniere"], function(values) {
+            var jetarr = mordiou.calcJet((parseInt(values.erudition) || 0) + (parseInt(values.fortune) || 0) + (parseInt(values.aide) || 0) - (parseInt(values.defense) || 0) - ((parseInt(values.maniere) || 0)*2));
+            setAttrs({
+                erudition_jet: jetarr[0],
+                erudition_jetplus: jetarr[1],
+                erudition_jetmoins: jetarr[2]
+            });
+        });
+    });
+    on("change:panache", function(){
+        getAttrs(["panache","fortune","defense","aide","maniere"], function(values) {
+            var jetarr = mordiou.calcJet((parseInt(values.panache) || 0) + (parseInt(values.fortune) || 0) + (parseInt(values.aide) || 0) - (parseInt(values.defense) || 0) - ((parseInt(values.maniere) || 0)*2));
+            setAttrs({
+                panache_jet: jetarr[0],
+                panache_jetplus: jetarr[1],
+                panache_jetmoins: jetarr[2]
+            });
+        });
+    });
+    on("change:resolution", function(){
+        getAttrs(["resolution","fortune","defense","aide","maniere"], function(values) {
+            var jetarr = mordiou.calcJet((parseInt(values.resolution) || 0) + (parseInt(values.fortune) || 0) + (parseInt(values.aide) || 0) - (parseInt(values.defense) || 0) - ((parseInt(values.maniere) || 0)*2));
+            setAttrs({
+                resolution_jet: jetarr[0],
+                resolution_jetplus: jetarr[1],
+                resolution_jetmoins: jetarr[2]
+            });
+        });
+    });
+    on("change:ruse", function(){
+        getAttrs(["ruse","fortune","defense","aide","maniere"], function(values) {
+            var jetarr = mordiou.calcJet((parseInt(values.ruse) || 0) + (parseInt(values.fortune) || 0) + (parseInt(values.aide) || 0) - (parseInt(values.defense) || 0) - ((parseInt(values.maniere) || 0)*2));
+            setAttrs({
+                ruse_jet: jetarr[0],
+                ruse_jetplus: jetarr[1],
+                ruse_jetmoins: jetarr[2]
+            });
+        });
+    });
+    on("change:vigueur", function(){
+        getAttrs(["vigueur","fortune","defense","aide","maniere"], function(values) {
+            var jetarr = mordiou.calcJet((parseInt(values.vigueur) || 0) + (parseInt(values.fortune) || 0) + (parseInt(values.aide) || 0) - (parseInt(values.defense) || 0) - ((parseInt(values.maniere) || 0)*2));
+            setAttrs({
+                vigueur_jet: jetarr[0],
+                vigueur_jetplus: jetarr[1],
+                vigueur_jetmoins: jetarr[2]
+            });
+        });
+    });
+</script>
+<!-- === jets cachées === -->
+<div style="display: none;">
+    <!-- attention -->
+    <input readonly name="attr_attention_jet" value="({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1)" />
+    <input readonly name="attr_attention_jetplus" value="({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1)" />
+    <input readonly name="attr_attention_jetmoins" value="({floor(1d6/2)-1,0d0}kh1)" />
+    <!-- eloquence -->
+    <input readonly name="attr_eloquence_jet" value="({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1)" />
+    <input readonly name="attr_eloquence_jetplus" value="({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1)" />
+    <input readonly name="attr_eloquence_jetmoins" value="({floor(1d6/2)-1,0d0}kh1)" />
+    <!-- erudition -->
+    <input readonly name="attr_erudition_jet" value="({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1)" />
+    <input readonly name="attr_erudition_jetplus" value="({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1)" />
+    <input readonly name="attr_erudition_jetmoins" value="({floor(1d6/2)-1,0d0}kh1)" />
+    <!-- panache -->
+    <input readonly name="attr_panache_jet" value="({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1)" />
+    <input readonly name="attr_panache_jetplus" value="({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1)" />
+    <input readonly name="attr_panache_jetmoins" value="({floor(1d6/2)-1,0d0}kh1)" />
+    <!-- resolution -->
+    <input readonly name="attr_resolution_jet" value="({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1)" />
+    <input readonly name="attr_resolution_jetplus" value="({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1)" />
+    <input readonly name="attr_resolution_jetmoins" value="({floor(1d6/2)-1,0d0}kh1)" />
+    <!-- ruse -->
+    <input readonly name="attr_ruse_jet" value="({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1)" />
+    <input readonly name="attr_ruse_jetplus" value="({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1)" />
+    <input readonly name="attr_ruse_jetmoins" value="({floor(1d6/2)-1,0d0}kh1)" />
+    <!-- vigueur -->
+    <input readonly name="attr_vigueur_jet" value="({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1)" />
+    <input readonly name="attr_vigueur_jetplus" value="({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1) + ({floor(1d6/2)-1,0d0}kh1)" />
+    <input readonly name="attr_vigueur_jetmoins" value="({floor(1d6/2)-1,0d0}kh1)" />
+</div> <!-- === FIN jets cachées === -->
+<!-- === SHEET === -->
+<div class="bgmain">
+    <div class="abs" style="left: 540px;top:16px;">
+        <input type="text" name="attr_character_name" class="inptxt1" style="width: 280px;" placeholder="Nom du personnage" />
+    </div>
+    <div class="abs" style="left: 830px;top:21px;">
+        <input type="text" name="attr_pseudos" class="" style="width: 340px;" placeholder="Pseudonymes et surnoms" />
+    </div>
+    <!-- NOM -->
+    <div class="abs" style="left: 490px;top: 175px;">
+        <textarea name="attr_description" style="width: 684px;height: 105px;" placeholder="Description"></textarea>
+    </div> <!-- DESCRIPTION -->
+    <!-- ASPECTS -->
+    <div class="abs" style="left: 490px;top:52px;">
+        <input type="text" name="attr_aspect1" class="aspect" placeholder="Aspect" />
+    </div>
+    <div class="abs" style="left: 490px;top:79px;">
+        <input type="text" name="attr_aspect2" class="aspect" placeholder="Aspect" />
+    </div>
+    <div class="abs" style="left: 490px;top:108px;">
+        <input type="text" name="attr_aspect3" class="aspect" placeholder="Aspect" />
+    </div>
+    <div class="abs" style="left: 490px;top:136px;">
+        <input type="text" name="attr_aspect4" class="aspect" placeholder="Aspect" />
+    </div>
+    <!-- FIN ASPECTS -->
+    <!-- Aspect de conflits -->
+    <div class="abs" style="left: 1020px;top:52px;">
+        <input type="text" name="attr_conflit1" style="width: 135px;" placeholder="Aspect de conflit" />
+    </div>
+    <div class="abs" style="left: 1157px;top:60px;">
+        <input type="checkbox" name="attr_conflituse1" value="1" class="smallchk" title="Aspect de conflit utilisé" /><span>&#9884;</span>
+    </div>
+    <div class="abs" style="left: 1020px;top:80px;">
+        <input type="text" name="attr_conflit2" style="width: 135px;" placeholder="Aspect de conflit" />
+    </div>
+    <div class="abs" style="left: 1157px;top:90px;">
+        <input type="checkbox" name="attr_conflituse2" value="1" class="smallchk" title="Aspect de conflit utilisé" /><span>&#9884;</span>
+    </div>
+    <div class="abs" style="left: 1020px;top:109px;">
+        <input type="text" name="attr_conflit3" style="width: 135px;" placeholder="Aspect de conflit" />
+    </div>
+    <div class="abs" style="left: 1157px;top:117px;">
+        <input type="checkbox" name="attr_conflituse3" value="1" class="smallchk" title="Aspect de conflit utilisé" /><span>&#9884;</span>
+    </div>
+    <div class="abs" style="left: 1020px;top:137px;">
+        <input type="text" name="attr_conflit4" style="width: 135px;" placeholder="Aspect de conflit" />
+    </div>
+    <div class="abs" style="left: 1157px;top:146px;">
+        <input type="checkbox" name="attr_conflituse4" value="1" class="smallchk" title="Aspect de conflit utilisé" /><span>&#9884;</span>
+    </div>
+    <!-- FIN Aspect de conflits -->
+    <!-- Fortune -->
+    <div class="abs" style="left: 145px;top:133px;width: 125px;text-align: center;">
+        <input type="number" name="attr_fortune" value="3" min="0" class="numbig2" title="Points de Fortune courants" />
+        <div class="asbignb">|</div>
+        <input type="number" name="attr_fortune_max" value="3" min="0" class="numbig2 nummax" title="Points de Fortune maximums" />
+    </div>
+    <!-- FIN Fortune -->
+    <!-- Défense -->
+    <div class="abs" style="left: 298px;top:124px;width: 125px;text-align: center;">
+        <input type="number" name="attr_defense" value="0" min="0" class="numbig2" title="Dés placés en Défense" />
+    </div>
+    <!-- FIN Défense -->
+    <!-- Aide -->
+    <div class="abs" style="left: 85px;top:260px;width: 125px;text-align: center;">
+        <input type="number" name="attr_aide" value="0" min="0" class="numbig2" title="Dés d'Aide" />
+    </div>
+    <!-- FIN Aide -->
+    <!-- Manière -->
+    <div class="abs" style="left: 340px;top:210px;">
+        <div style="display: table-cell;padding-left:13px;vertical-align: middle; height: 90px;width: 90px;text-align: center;border: 1px solid #949597; border-radius:50%;">
+            <input type="number" name="attr_maniere" value="0" min="0" class="numbig1" title="Manières (1 Manière = -2D)" />
+            <span style="font-family: 'Shadows Into Light';font-style: italic;font-weight: bold;font-size: 15px;">Manières</span>
+        </div>
+    </div>
+    <!-- FIN Manière -->
+    <!-- Réserves -->
+    <div class="abs" style="left: 215px;top:260px;width: 125px;text-align: center;">
+        <input type="number" name="attr_reserves" value="0" min="0" class="numbig2" title="Réserves" />
+    </div>
+    <!-- FIN Réserves -->
+    <!-- EFFORT -->
+    <div class="abs" style="left: 363px;top:311px;width:350px;text-align: left;white-space: nowrap;">
+        <input type="radio" name="attr_effort" value="0" class="bigchk" checked title="Remettre les Efforts à zéro" /><span></span>
+        <input type="radio" name="attr_effort" value="1" class="bigchk" style="margin-left: 1px;" title="1er Effort" /><span>&#9884;</span>
+        <input type="radio" name="attr_effort" value="2" style="margin-left: 10px;" class="bigchk" title="2nd Effort" /><span>&#9884;</span>
+        <input type="radio" name="attr_effort" value="3" style="margin-left: 9px;" class="bigchk" title="3ième Effort" /><span>&#9884;</span>
+        <input type="radio" name="attr_effort" value="4" style="margin-left: 10px;" class="bigchk" title="4ième Effort" /><span>&#9884;</span>
+        <input type="radio" name="attr_effort" value="5" style="margin-left: 9px;" class="bigchk" title="5ième Effort" /><span>&#9884;</span>
+    </div>
+    <!-- FIN EFFORT -->
+    <!-- AIDE Dés -->
+    <div class="abs" style="left: 1000px;top: 305px;">
+        <table>
+            <tr>
+                <td>D6</td>
+                <td>1</td>
+                <td>2</td>
+                <td>3</td>
+                <td>4</td>
+                <td>5</td>
+                <td>6</td>
+            </tr>
+            <tr>
+                <td>Qualités</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>1</td>
+                <td>1</td>
+                <td>2</td>
+            </tr>
+        </table>
+    </div>
+    <!-- FIN AIDE Dés -->
+    <!-- Attention -->
+    <div class="abs" style="left: 90px;top:428px;">
+        <input type="number" name="attr_attention" value="0" min="0" class="numbig1 numtxt" />
+    </div>
+    <div class="abs" style="left: 58px;top:420px;">
+        <button type="roll" class="sheet-butd6small block" name="Jet_Attention" title="Jet d'Attention" value="&{template:tmpl} {{personnage=@{character_name}}} {{style=Attention (@{attention})}} {{fortune=@{fortune}}} {{aide=@{aide}}} {{defense=@{defense}}} {{maniere=[[@{maniere}*2]]}} {{poignee=[[{({(0d0+@{attention}[Style]+@{fortune}[Fortune]+@{aide}[Aide]-(@{maniere}*2)[Manières]-@{defense}[Défense]),0d0+0}kh1),0d0+8}kl1]]}} {{qualites=[[@{attention_jet}]]}}" ></button>
+        <button type="roll" class="sheet-butd6smallgreen block" name="Jet_AttentionAspect" title="Jet d'Attention + 2D (Aspect applicable)" value="&{template:tmpl} {{personnage=@{character_name}}} {{style=Attention (@{attention})}} {{fortune=@{fortune}}} {{aide=@{aide}}} {{defense=@{defense}}} {{maniere=[[@{maniere}*2]]}} {{aspect=1}} {{poignee=[[{({(0d0+@{attention}[Style]+@{fortune}[Fortune]+@{aide}[Aide]-(@{maniere}*2)[Manières]-@{defense}[Défense]+2[Aspect]),0d0+0}kh1),0d0+8}kl1]]}} {{qualites=[[@{attention_jetplus}]]}}" ></button>
+        <button type="roll" class="sheet-butd6smallred block" name="Jet_AttentionDef" title="Jet d'Attention - 2D (circonstances défavorables)" value="&{template:tmpl} {{personnage=@{character_name}}} {{style=Attention (@{attention})}} {{fortune=@{fortune}}} {{aide=@{aide}}} {{defense=@{defense}}} {{maniere=[[@{maniere}*2]]}} {{circonstance=1}} {{poignee=[[{({(0d0+@{attention}[Style]+@{fortune}[Fortune]+@{aide}[Aide]-(@{maniere}*2)[Manières]-@{defense}[Défense]-2[Circonstances]),0d0+0}kh1),0d0+8}kl1]]}} {{qualites=[[@{attention_jetmoins}]]}}" ></button>
+    </div>
+    <!-- FIN Attention -->
+    <!-- Eloquence -->
+    <div class="abs" style="left: 266px;top:428px;">
+        <input type="number" name="attr_eloquence" value="0" min="0" class="numbig1 numtxt" />
+    </div>
+    <div class="abs" style="left: 234px;top:420px;">
+        <button type="roll" class="sheet-butd6small block" name="Jet_Eloquence" title="Jet d'Eloquence" value="&{template:tmpl} {{personnage=@{character_name}}} {{style=Eloquence (@{eloquence})}} {{fortune=@{fortune}}} {{aide=@{aide}}} {{defense=@{defense}}} {{maniere=[[@{maniere}*2]]}} {{poignee=[[{({(0d0+@{eloquence}[Style]+@{fortune}[Fortune]+@{aide}[Aide]-(@{maniere}*2)[Manières]-@{defense}[Défense]),0d0+0}kh1),0d0+8}kl1]]}} {{qualites=[[@{eloquence_jet}]]}}" ></button>
+        <button type="roll" class="sheet-butd6smallgreen block" name="Jet_EloquenceAspect" title="Jet d'Eloquence + 2D (Aspect applicable)" value="&{template:tmpl} {{personnage=@{character_name}}} {{style=Eloquence (@{eloquence})}} {{fortune=@{fortune}}} {{aide=@{aide}}} {{defense=@{defense}}} {{maniere=[[@{maniere}*2]]}} {{aspect=1}} {{poignee=[[{({(0d0+@{eloquence}[Style]+@{fortune}[Fortune]+@{aide}[Aide]-(@{maniere}*2)[Manières]-@{defense}[Défense]+2[Aspect]),0d0+0}kh1),0d0+8}kl1]]}} {{qualites=[[@{eloquence_jetplus}]]}}" ></button>
+        <button type="roll" class="sheet-butd6smallred block" name="Jet_EloquenceDef" title="Jet d'Eloquence - 2D (circonstances défavorables)" value="&{template:tmpl} {{personnage=@{character_name}}} {{style=Eloquence (@{eloquence})}} {{fortune=@{fortune}}} {{aide=@{aide}}} {{defense=@{defense}}} {{maniere=[[@{maniere}*2]]}} {{circonstance=1}} {{poignee=[[{({(0d0+@{eloquence}[Style]+@{fortune}[Fortune]+@{aide}[Aide]-(@{maniere}*2)[Manières]-@{defense}[Défense]-2[Circonstances]),0d0+0}kh1),0d0+8}kl1]]}} {{qualites=[[@{eloquence_jetmoins}]]}}" ></button>
+    </div>
+    <!-- FIN ELOQUENCE -->
+    <!-- Erudition -->
+    <div class="abs" style="left: 442px;top:428px;">
+        <input type="number" name="attr_erudition" value="0" min="0" class="numbig1 numtxt" />
+    </div>
+    <div class="abs" style="left: 410px;top:420px;">
+        <button type="roll" class="sheet-butd6small block" name="Jet_Erudition" title="Jet d'Erudition" value="&{template:tmpl} {{personnage=@{character_name}}} {{style=Erudition (@{erudition})}} {{fortune=@{fortune}}} {{aide=@{aide}}} {{defense=@{defense}}} {{maniere=[[@{maniere}*2]]}} {{poignee=[[{({(0d0+@{erudition}[Style]+@{fortune}[Fortune]+@{aide}[Aide]-(@{maniere}*2)[Manières]-@{defense}[Défense]),0d0+0}kh1),0d0+8}kl1]]}} {{qualites=[[@{erudition_jet}]]}}" ></button>
+        <button type="roll" class="sheet-butd6smallgreen block" name="Jet_EruditionAspect" title="Jet d'Erudition + 2D (Aspect applicable)" value="&{template:tmpl} {{personnage=@{character_name}}} {{style=Erudition (@{erudition})}} {{fortune=@{fortune}}} {{aide=@{aide}}} {{defense=@{defense}}} {{maniere=[[@{maniere}*2]]}} {{aspect=1}} {{poignee=[[{({(0d0+@{erudition}[Style]+@{fortune}[Fortune]+@{aide}[Aide]-(@{maniere}*2)[Manières]-@{defense}[Défense]+2[Aspect]),0d0+0}kh1),0d0+8}kl1]]}} {{qualites=[[@{erudition_jetplus}]]}}" ></button>
+        <button type="roll" class="sheet-butd6smallred block" name="Jet_EruditionDef" title="Jet d'Erudition - 2D (circonstances défavorables)" value="&{template:tmpl} {{personnage=@{character_name}}} {{style=Erudition (@{erudition})}} {{fortune=@{fortune}}} {{aide=@{aide}}} {{defense=@{defense}}} {{maniere=[[@{maniere}*2]]}} {{circonstance=1}} {{poignee=[[{({(0d0+@{erudition}[Style]+@{fortune}[Fortune]+@{aide}[Aide]-(@{maniere}*2)[Manières]-@{defense}[Défense]-2[Circonstances]),0d0+0}kh1),0d0+8}kl1]]}} {{qualites=[[@{erudition_jetmoins}]]}}" ></button>
+    </div>
+    <!-- FIN ERUDITION -->
+    <!-- Panache -->
+    <div class="abs" style="left: 619px;top:428px;">
+        <input type="number" name="attr_panache" value="0" min="0" class="numbig1 numtxt" />
+    </div>
+    <div class="abs" style="left: 587px;top:420px;">
+        <button type="roll" class="sheet-butd6small block" name="Jet_Panache" title="Jet de Panache" value="&{template:tmpl} {{personnage=@{character_name}}} {{style=Panache (@{panache})}} {{fortune=@{fortune}}} {{aide=@{aide}}} {{defense=@{defense}}} {{maniere=[[@{maniere}*2]]}} {{poignee=[[{({(0d0+@{panache}[Style]+@{fortune}[Fortune]+@{aide}[Aide]-(@{maniere}*2)[Manières]-@{defense}[Défense]),0d0+0}kh1),0d0+8}kl1]]}} {{qualites=[[@{panache_jet}]]}}" ></button>
+        <button type="roll" class="sheet-butd6smallgreen block" name="Jet_PanacheAspect" title="Jet de Panache + 2D (Aspect applicable)" value="&{template:tmpl} {{personnage=@{character_name}}} {{style=Panache (@{panache})}} {{fortune=@{fortune}}} {{aide=@{aide}}} {{defense=@{defense}}} {{maniere=[[@{maniere}*2]]}} {{aspect=1}} {{poignee=[[{({(0d0+@{panache}[Style]+@{fortune}[Fortune]+@{aide}[Aide]-(@{maniere}*2)[Manières]-@{defense}[Défense]+2[Aspect]),0d0+0}kh1),0d0+8}kl1]]}} {{qualites=[[@{panache_jetplus}]]}}" ></button>
+        <button type="roll" class="sheet-butd6smallred block" name="Jet_PanacheDef" title="Jet de Panache - 2D (circonstances défavorables)" value="&{template:tmpl} {{personnage=@{character_name}}} {{style=Panache (@{panache})}} {{fortune=@{fortune}}} {{aide=@{aide}}} {{defense=@{defense}}} {{maniere=[[@{maniere}*2]]}} {{circonstance=1}} {{poignee=[[{({(0d0+@{panache}[Style]+@{fortune}[Fortune]+@{aide}[Aide]-(@{maniere}*2)[Manières]-@{defense}[Défense]-2[Circonstances]),0d0+0}kh1),0d0+8}kl1]]}} {{qualites=[[@{panache_jetmoins}]]}}" ></button>
+    </div>
+    <!-- FIN PANACHE -->
+    <!-- Resolution -->
+    <div class="abs" style="left: 796px;top:428px;">
+        <input type="number" name="attr_resolution" value="0" min="0" class="numbig1 numtxt" />
+    </div>
+    <div class="abs" style="left: 764px;top:420px;">
+        <button type="roll" class="sheet-butd6small block" name="Jet_Resolution" title="Jet de Résolution" value="&{template:tmpl} {{personnage=@{character_name}}} {{style=Résolution (@{resolution})}} {{fortune=@{fortune}}} {{aide=@{aide}}} {{defense=@{defense}}} {{maniere=[[@{maniere}*2]]}} {{poignee=[[{({(0d0+@{resolution}[Style]+@{fortune}[Fortune]+@{aide}[Aide]-(@{maniere}*2)[Manières]-@{defense}[Défense]),0d0+0}kh1),0d0+8}kl1]]}} {{qualites=[[@{resolution_jet}]]}}" ></button>
+        <button type="roll" class="sheet-butd6smallgreen block" name="Jet_ResolutionAspect" title="Jet de Résolution + 2D (Aspect applicable)" value="&{template:tmpl} {{personnage=@{character_name}}} {{style=Résolution (@{resolution})}} {{fortune=@{fortune}}} {{aide=@{aide}}} {{defense=@{defense}}} {{maniere=[[@{maniere}*2]]}} {{aspect=1}} {{poignee=[[{({(0d0+@{resolution}[Style]+@{fortune}[Fortune]+@{aide}[Aide]-(@{maniere}*2)[Manières]-@{defense}[Défense]+2[Aspect]),0d0+0}kh1),0d0+8}kl1]]}} {{qualites=[[@{resolution_jetplus}]]}}" ></button>
+        <button type="roll" class="sheet-butd6smallred block" name="Jet_ResolutionDef" title="Jet de Résolution - 2D (circonstances défavorables)" value="&{template:tmpl} {{personnage=@{character_name}}} {{style=Résolution (@{resolution})}} {{fortune=@{fortune}}} {{aide=@{aide}}} {{defense=@{defense}}} {{maniere=[[@{maniere}*2]]}} {{circonstance=1}} {{poignee=[[{({(0d0+@{resolution}[Style]+@{fortune}[Fortune]+@{aide}[Aide]-(@{maniere}*2)[Manières]-@{defense}[Défense]-2[Circonstances]),0d0+0}kh1),0d0+8}kl1]]}} {{qualites=[[@{resolution_jetmoins}]]}}" ></button>
+    </div>
+    <!-- FIN RESOLUTION -->
+    <!-- Ruse -->
+    <div class="abs" style="left: 973px;top:428px;">
+        <input type="number" name="attr_ruse" value="0" min="0" class="numbig1 numtxt" />
+    </div>
+    <div class="abs" style="left: 941px;top:420px;">
+        <button type="roll" class="sheet-butd6small block" name="Jet_Ruse" title="Jet de Ruse" value="&{template:tmpl} {{personnage=@{character_name}}} {{style=Ruse (@{ruse})}} {{fortune=@{fortune}}} {{aide=@{aide}}} {{defense=@{defense}}} {{maniere=[[@{maniere}*2]]}} {{poignee=[[{({(0d0+@{ruse}[Style]+@{fortune}[Fortune]+@{aide}[Aide]-(@{maniere}*2)[Manières]-@{defense}[Défense]),0d0+0}kh1),0d0+8}kl1]]}} {{qualites=[[@{ruse_jet}]]}}" ></button>
+        <button type="roll" class="sheet-butd6smallgreen block" name="Jet_RuseAspect" title="Jet de Ruse + 2D (Aspect applicable)" value="&{template:tmpl} {{personnage=@{character_name}}} {{style=Ruse (@{ruse})}} {{fortune=@{fortune}}} {{aide=@{aide}}} {{defense=@{defense}}} {{maniere=[[@{maniere}*2]]}} {{aspect=1}} {{poignee=[[{({(0d0+@{ruse}[Style]+@{fortune}[Fortune]+@{aide}[Aide]-(@{maniere}*2)[Manières]-@{defense}[Défense]+2[Aspect]),0d0+0}kh1),0d0+8}kl1]]}} {{qualites=[[@{ruse_jetplus}]]}}" ></button>
+        <button type="roll" class="sheet-butd6smallred block" name="Jet_RuseDef" title="Jet de Ruse - 2D (circonstances défavorables)" value="&{template:tmpl} {{personnage=@{character_name}}} {{style=Ruse (@{ruse})}} {{fortune=@{fortune}}} {{aide=@{aide}}} {{defense=@{defense}}} {{maniere=[[@{maniere}*2]]}} {{circonstance=1}} {{poignee=[[{({(0d0+@{ruse}[Style]+@{fortune}[Fortune]+@{aide}[Aide]-(@{maniere}*2)[Manières]-@{defense}[Défense]-2[Circonstances]),0d0+0}kh1),0d0+8}kl1]]}} {{qualites=[[@{ruse_jetmoins}]]}}" ></button>
+    </div>
+    <!-- FIN RUSE -->
+    <!-- Vigueur -->
+    <div class="abs" style="left: 1149px;top:428px;">
+        <input type="number" name="attr_vigueur" value="0" min="0" class="numbig1 numtxt" />
+    </div>
+    <div class="abs" style="left: 1117px;top:420px;">
+        <button type="roll" class="sheet-butd6small block" name="Jet_Vigueur" title="Jet de Vigueur" value="&{template:tmpl} {{personnage=@{character_name}}} {{style=Vigueur (@{vigueur})}} {{fortune=@{fortune}}} {{aide=@{aide}}} {{defense=@{defense}}} {{maniere=[[@{maniere}*2]]}} {{poignee=[[{({(0d0+@{vigueur}[Style]+@{fortune}[Fortune]+@{aide}[Aide]-(@{maniere}*2)[Manières]-@{defense}[Défense]),0d0+0}kh1),0d0+8}kl1]]}} {{qualites=[[@{vigueur_jet}]]}}" ></button>
+        <button type="roll" class="sheet-butd6smallgreen block" name="Jet_VigueurAspect" title="Jet de Vigueur + 2D (Aspect applicable)" value="&{template:tmpl} {{personnage=@{character_name}}} {{style=Vigueur (@{vigueur})}} {{fortune=@{fortune}}} {{aide=@{aide}}} {{defense=@{defense}}} {{maniere=[[@{maniere}*2]]}} {{aspect=1}} {{poignee=[[{({(0d0+@{vigueur}[Style]+@{fortune}[Fortune]+@{aide}[Aide]-(@{maniere}*2)[Manières]-@{defense}[Défense]+2[Aspect]),0d0+0}kh1),0d0+8}kl1]]}} {{qualites=[[@{vigueur_jetplus}]]}}" ></button>
+        <button type="roll" class="sheet-butd6smallred block" name="Jet_VigueurDef" title="Jet de Vigueur - 2D (circonstances défavorables)" value="&{template:tmpl} {{personnage=@{character_name}}} {{style=Vigueur (@{vigueur})}} {{fortune=@{fortune}}} {{aide=@{aide}}} {{defense=@{defense}}} {{maniere=[[@{maniere}*2]]}} {{circonstance=1}} {{poignee=[[{({(0d0+@{vigueur}[Style]+@{fortune}[Fortune]+@{aide}[Aide]-(@{maniere}*2)[Manières]-@{defense}[Défense]-2[Circonstances]),0d0+0}kh1),0d0+8}kl1]]}} {{qualites=[[@{vigueur_jetmoins}]]}}" ></button>
+    </div>
+    <!-- FIN VIGUEUR -->
+</div>
+<!-- === TEMPLATE   === -->
+<rolltemplate class="sheet-rolltemplate-tmpl">
+    <div class="tplmain">
+        <div class="perso">{{personnage}}</div>
+        <div class="poignee"><span class="lib">Poignée : </span><span class="fat">{{style}}</span> + Fortune ({{fortune}}) + Aide ({{aide}}){{#aspect}} + Aspect (2){{/aspect}}{{#circonstance}} - Circonstances (2){{/circonstance}} - Manières ({{maniere}}) - Défense ({{defense}}) = <span class="fat">{{poignee}}</span></div>
+        <div class="qualites"><span class="lib plus">Qualités : </span>{{qualites}}</div>
+    </div>
+</rolltemplate>
