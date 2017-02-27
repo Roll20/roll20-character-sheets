@@ -1,5 +1,12 @@
 ## 10.0.0
 
+### Bug Fixes
+
+* Minor spacing fixes based on how the html is compiled as part of 10.0.0
+* Converting from ft. to m. no longer adds two periods at the end.
+
+## 10.0.0
+
 ### Breaking Changes
 
 * [#326: Rename "Racial Features" to "Racial Traits"](https://bitbucket.org/mlenser/5eshaped/issues/326/rename-racial-features-to-racial-traits). An upgrade is included so all items should be moved over to the new section if any were created after 9.1.0
