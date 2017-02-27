@@ -1,3 +1,16 @@
+## 10.0.0
+
+### Breaking Changes
+
+* [#326: Rename "Racial Features" to "Racial Traits"](https://bitbucket.org/mlenser/5eshaped/issues/326/rename-racial-features-to-racial-traits). An upgrade is included so all items should be moved over to the new section if any were created after 9.1.0
+
+### Bug Fixes
+
+* Removed "weight_multiplier" and "encumbrance_multiplier" in favor of just using the 4 multipliers: "carrying_capacity_multiplier", "max_push_drag_lift_multiplier", "encumbered_multiplier", "heavily_encumbered_multiplier".
+* [#243: Long trait name use count is outside brackets](https://bitbucket.org/mlenser/5eshaped/issues/243/long-trait-name-use-count-is-outside). This required a change to how white spaces are compiled. They are now manually added so please let me know if I've missed any areas.
+* [#317: HP posted in chat has the wrong font-size](https://bitbucket.org/mlenser/5eshaped/issues/317/hp-posted-in-chat-has-the-wrong-font-size)
+* [#323: Class Features not showing in presentation mode after an upgrades](https://bitbucket.org/mlenser/5eshaped/issues/323/class-features-not-showing-in-presentation)
+
 ## 9.2.3
 
 ### Bug Fixes
