@@ -665,11 +665,12 @@ on(actions1Event, calculateVice);
 /* CALCULATE WANTED */
 on('change:wanted', function() {
 	getAttrs(['wanted'], function(v) {
-		let setting = {};
-		setting.wanted1 = 0;
-		setting.wanted2 = 0;
-		setting.wanted3 = 0;
-		setting.wanted4 = 0;
+		let setting = {
+			wanted1: 0,
+			wanted2: 0,
+			wanted3: 0,
+			wanted4: 0
+		};
 		switch(v.wanted) {
 			case '4':
 				setting.wanted4 = 1;
@@ -767,10 +768,8 @@ itemChecks.forEach(function(name) {
 });
 
 on('sheet:opened', function() {
-	getAttrs(['version'], function(v) {
-		setAttrs({
-			version: '0.3.1'
-		});
+	setAttrs({
+		version: '0.4'
 	});
 });
 </script>
