@@ -769,7 +769,7 @@ itemChecks.forEach(function(name) {
 
 on('sheet:opened', function() {
 	setAttrs({
-		version: '0.4.1'
+		version: '0.4.2'
 	});
 });
 </script>
