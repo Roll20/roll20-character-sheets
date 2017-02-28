@@ -1,3 +1,16 @@
+## 10.1.0
+
+### Features
+
+* Added "Powerful Build" as a racial trait. Closes [#331: Change to encumbrance multiplier](https://bitbucket.org/mlenser/5eshaped/issues/331/change-to-encumbrance-multiplier)
+
+### Bug Fixes
+
+* [#333: NPC actions with "plus" damage do not set plus toggle](https://bitbucket.org/mlenser/5eshaped/issues/333/npc-actions-with-plus-damage-do-not-set)
+* [#290: Adding bonus damage to hit updates saving throw average damage](https://bitbucket.org/mlenser/5eshaped/issues/290/adding-bonus-damage-to-hit-updates-saving)
+* [#329: Racial Features -> Racial Traits upgrade fails](https://bitbucket.org/mlenser/5eshaped/issues/329/racial-features-racial-traits-upgrade)
+* [#327: NPC spellcasting Upgrade](https://bitbucket.org/mlenser/5eshaped/issues/327/npc-spellcasting-upgrade)
+
 ## 10.0.1
 
 ### Bug Fixes
