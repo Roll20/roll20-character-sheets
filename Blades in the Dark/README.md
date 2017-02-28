@@ -9,6 +9,10 @@ This is a character sheet for Blades in the Dark for use on Roll20.
 
 ## Changelog
 
+### 0.4.1
+* Improved behaviour when sheet is popped-out
+* CSS cleanup
+
 ### 0.4
 * Added Factions section on crew sheet to record faction status
 
