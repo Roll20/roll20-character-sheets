@@ -92,7 +92,8 @@
                         <button type='roll' value='&{template:default} {{name=*@{name}* attacks with **@{atkname}**}} {{attack=[[([[2d6]]+([[(@{ACV})]]+[[(@{atkACVMod})]]))]]}} {{damage= [[(@{atkDamage})]]}}' name='roll_Attack'></button>     
                         NAME:<input type="text" name="attr_atkname">
                         LEVEL:<input type="number" name="attr_atkLevel" value="0">
-                        TOTAL COST:<input type="number" name="attr_atkTotalCost" value="(@{atkLevel}*2)+@{atkVarCost}" disabled="true">
+                        TOTAL COST:<input type="number" name="attr_atkTotalCost" value="(floor(((@{atkLevel}*2)+@{atkVarCost})/(1+@{atkIsItem})))" disabled="true">
+                        ITEM?:<input type='checkbox' name='attr_atkIsItem' value='1'>
                         <BR>
                         DAMAGE:<input type="number" name="attr_atkDamage" value="((@{atkLevel}*(@{atkCumuDM}))+((@{ACV})*@{atkACVtoDMG})+(@{atkACVMod}))" disabled="true"> 
                         ACV MOD:<input type="number" name="attr_atkACVMod" value="0">
@@ -127,7 +128,8 @@
                         <input type='checkbox' name='attr_attrAddLevelToRoll' value='1' checked='true' >
                         LEVEL:<input type="number" name="attr_atrLevel" value="0">
                         COST/LEVEL:<input type="number" name="attr_atrLevelCost" value="0">
-                        TOTAL COST:<input type="number" name="attr_atrTotalCost" value="(@{atrLevel}*@{atrLevelCost})+@{atrVarCost}" disabled="true">
+                        TOTAL COST:<input type="number" name="attr_atrTotalCost" value="(floor(((@{atrLevel}*@{atrLevelCost})+@{atrVarCost})/(1+@{attrIsItem})))" disabled="true">
+                        ITEM?:<input type='checkbox' name='attr_attrIsItem' value='1'>
                         <BR>
                         <div class="sheet-2colrow">
                             <div class="sheet-col">
@@ -164,13 +166,28 @@
             <div class="sheet-table-row">
                 <div class="sheet-table-cell sheet-cell-100">
                     <div class="sheet-section2">
-                        <button type='roll' value='&{template:default} {{name=*@{name}* uses **@{sklname}**}}{{Level= [[@{sklLevel}]]}}{{Roll = [[2d6]]}}{{Specializations= @{sklSpecializations}}}' name='roll_Skl'></button>
+                        <button type='roll' value='&{template:default} {{name=*@{name}* uses **@{sklname}**}}{{Level= [[@{sklLevel}]]}}{{Roll = [[2d6+(@{sklRelStat})+@{sklLevel}]]}}{{Specializations= @{sklSpecializations}}}' name='roll_Skl'></button>
                         NAME:<input type="text" name="attr_sklname">
                         LEVEL:<input type="number" name="attr_sklLevel" value="0">
                         COST/LEVEL:<input type="number" name="attr_sklLevelCost" value="0">
                         TOTAL COST:<input type="number" name="attr_sklTotalCost" value="(@{sklLevel}*@{sklLevelCost})+@{sklVarCost}" disabled="true">
                         <BR>
-                        SPECIALIZATIONS: ↓ SPECIALIZATION COST:<input type="number" name="attr_sklVarCost" value="0"> 
+                        <div class="sheet-2colrow">
+                            <div class="sheet-col">
+                                SPECIALIZATIONS: ↓ SPECIALIZATION COST:<input type="number" name="attr_sklVarCost" value="0"> 
+                            </div>
+                            <div class="sheet-col">
+                                RELEVANT STAT:
+                                <select name="attr_sklRelStat" type="number">
+                                    <option value="0">N/A</option>
+                                    <option value="@{body}">BODY</option>
+                                    <option value="@{mind}">MIND</option>
+                                    <option value="@{soul}">SOUL</option>
+                                </select>
+                                <input type="number" name="attr_sklRelStatValue" value="(@{sklRelStat})" disabled="true">
+                            </div>
+                        </div>
+                        
                         <BR>
                         <textarea name='attr_sklSpecializations'></textarea>
                         <BR>
