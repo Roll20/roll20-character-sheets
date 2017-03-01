@@ -2097,7 +2097,7 @@
 							<input type="number" name="attr_cost" value="0" />
 						</div>
 						<div class="sheet-cell sheet-col4">
-							<input type="number" name="attr_weight" value="0" />
+							<input type="number" name="attr_weight" value="0" step="any" />
 						</div>
 						<div class="sheet-cell sheet-col5">
 							<span name="attr_costtotal" value="0" />
@@ -2297,21 +2297,37 @@
 
 <script type="text/worker">
 
+	var version = 1.3;
+
 	/* Due to the change from auto-calc fields to helper scrips,
 	 * I'm running a "on open" to set various fields. At some point
 	 * in the future this might no longer be needed.
 	 */
 	on('sheet:opened', function() {
 		console.log('********* Sheet Opened *********');
-		getAttrs(["strength_base", "dexterity_base", "intelligence_base", "health_base"], function(checkValues) {
-			var missingValues = (Object.keys(checkValues).length < 4);
-			if (missingValues) {
+		getAttrs(["sheet_version"], function(v) {
+			if (!v.sheet_version || v.sheet_version != version) {
+				setAttrs({ sheet_version: version });
 				// Get all the data we need to populate driviative fields:
 				getAttrs(["strength_points", "strength_mod", "dexterity_points", "dexterity_mod", "intelligence_points", "intelligence_mod", "health_points", "health_mod"], function (v) {
-					updateST(v);
-					updateDX(v);
-					updateIQ(v);
-					updateHT(v);
+					setAttrs({ 
+						strength_base: 0,
+						dexterity_base: 0,
+						intelligence_base: 0,
+						health_base: 0,
+						perception_base: 0,
+						willpower_base: 0,
+						basic_speed_base: 0,
+						basic_move_base: 0,
+						dodge_base: 0,
+						lift_st_base: 0,
+						striking_st_base: 0
+					}, {silent: "false"}, function () {
+						updateST(v);
+						updateDX(v);
+						updateIQ(v);
+						updateHT(v);
+					});
 				});
 				// initalize any empty fields in repeating sections since the 
 				// default values were removed.
@@ -2345,7 +2361,9 @@
 				fieldArray.push(sectionName + '_' + ids[i] + '_' + fieldName);
 			}
 			getAttrs(fieldArray, function (fieldValues) {
-				var total = Object.values(fieldValues).reduce(getSum);
+				var vals = Object.values(fieldValues);
+				vals.push(0);
+				var total = vals.reduce(getSum);
 				callback(total);
 			});
 		});
@@ -2590,7 +2608,7 @@
 
 	// Encumbered/injured move and dodge
 	on("change:encumbrance_level change:dodge change:basic_move change:hit_points change:fatigue_points", function (e) {
-		getAttrs(["encumbrance_level", "dodge", "basic_move", "hit_points", "hit_points_max", "fatigue_points", "fatigue_points_max"], function(v) {
+		getAttrs(["encumbrance_level", "dodge", "basic_move", "hit_points", "hit_points_max", "fatigue_points", "fatigue_points_max", "strength_base", "strength_mod"], function(v) {
 			updateMoveDodge(v);
 		});
 	});
@@ -2599,22 +2617,29 @@
 		console.log('***** UPDATE MOVE/DODGE *****');
 		var dodge = v.dodge;
 		var move = v.basic_move;
+		var strength = +v.strength_base + +v.strength_mod;
 		if (v.encumbrance_level === 5) {
 			dodge = 0;
 			move = 0;
 		} else {
-			if (v.hit_points < v.hit_points_max / 3 || v.fatigue_points < v.fatigue_points_max ) {
-				dodge = Math.ceil(dodge/2);
-				move = Math.ceil(move/2);
-			}
 			dodge = dodge - v.encumbrance_level;
 			move = Math.floor(v.basic_move * (1 - (0.2 * v.encumbrance_level)));
 			dodge = dodge < 0 ? 0 : dodge;
 			move = move < 0 ? 0 : move;
 		}
+		if (v.hit_points < v.hit_points_max / 3) {
+			dodge = Math.ceil(dodge/2);
+			move = Math.ceil(move/2);
+		}
+		if (v.fatigue_points < v.fatigue_points_max / 3 ) {
+			dodge = Math.ceil(dodge/2);
+			move = Math.ceil(move/2);
+			strength = Math.ceil(strength/2);
+		}
 		setAttrs({
 			current_move: move,
-			current_dodge: dodge
+			current_dodge: dodge,
+			strength: strength
 		});
 	}
 
@@ -2665,12 +2690,12 @@
 		});
 		sumRepeating("repeating_languages", "spoken", function(v) {
 			console.log('Spoken: ' + v);
-			total += v;
+			total += +v;
 			tally();
 		});
 		sumRepeating("repeating_languages", "written", function(v) {
 			console.log('Written: ' + v);
-			total += v;
+			total += +v;
 			tally();
 		});
 	});
@@ -2727,7 +2752,9 @@
 	// Update Summery
 	on("change:tl_pts change:appearance change:languages_points change:cf_points change:advantages_points change:disadvantages_points change:racial_points", function (e) {
 		getAttrs(["tl_pts", "appearance", "languages_points", "cf_points", "advantages_points", "disadvantages_points", "racial_points"], function(v) {
-			setAttrs({ trait_points: Object.values(v).reduce(getSum) });
+			var vals = Object.values(v);
+			vals.push(0);
+			setAttrs({ trait_points: vals.reduce(getSum) });
 		});
 	});
 
@@ -2754,9 +2781,9 @@
 	});
 
 	// Get Encumbrance Level:
-	on("change:total_weight change:strength_base", function (e) {
-		getAttrs(["strength_base", "total_weight"], function(val) {
-			var basicLift = Math.round((val.strength_base * val.strength_base) / 5);
+	on("change:total_weight change:basic_lift", function (e) {
+		getAttrs(["basic_lift", "total_weight"], function(val) {
+			var basicLift = +val.basic_lift;
 			var encumbranceLevel = Math.floor(val.total_weight / basicLift);
 			if (encumbranceLevel > 0 && (val.total_weight % basicLift) === 0) {
 				encumbranceLevel--;
