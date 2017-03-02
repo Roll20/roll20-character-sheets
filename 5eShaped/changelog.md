@@ -1,3 +1,11 @@
+## 10.1.1
+
+### Bug Fixes
+
+* Show arithmetic sign for initiatives of "0". "+0" is the result for 0 now.
+* Added "character_sheet" field which will help API authors identify the sheet. It'll follow the format Aaron and I agreed on: "Shaped v10.1.1". Version will still exist. See [Aaron's post on the topic](https://app.roll20.net/forum/post/4714038/character-sheet-authors-a-request-from-api-authors/#post-4714038).
+* Changed how "initiative_formula" is stored so it can be used for scripts like Group Initiative. See the [documentation](https://docs.google.com/document/d/1yPcIZ_bIc3JlnWsKZt2tAB0EQSIVEfeMtT0GifbpJIg/edit#heading=h.2sgngharia1b) for how to set this up properly.
+
 ## 10.1.0
 
 ### Features
