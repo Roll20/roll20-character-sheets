@@ -6653,7 +6653,7 @@
 												<input type="hidden" name="attr_MercurialMagic_luck_bonus" value="[[([[@{LCK}]] * (10))]]" />
 												<div class="sheet-col-11-23 sheet-vert-middle sheet-left">
 													<button type="roll" class="sheet-roll sheet-vert-middle" name="roll_MercurialMagic" title="The first time you attempt to run this Program - Roll for your Mercurial Magic Effect."
-													value="&{template:MccTabbed} {{background=[[1d3]]}} {{spell=1}} {{name=@{character_name}}} {{title=Mercurial Magic}} {{flavortext=Enter your mercurial effect text into the approrpiate box on your Programcard.}} {{rolltype=Mercurial Effect : }} {{spellmercurial=[[ {({(1d100 + @{MercurialMagic_luck_bonus}),1d1}kh1),100d1}kl1 ]]  }}" >Mercurial Magic Roll</button>
+													value="&{template:MccTabbed} {{background=[[1d3]]}} {{spell=1}} {{name=@{character_name}}} {{title=Mercurial Magic}} {{flavortext=Enter your mercurial effect text into the approrpiate box on your Programcard.}} {{rolltype=Mercurial Effect : }} {{spellmercurial=[[ {({(1d100 + @{MercurialMagic_luck_bonus}),1d1}kh1),0d0+100}kl1 ]]  }}" >Mercurial Magic Roll</button>
 												</div>
 											</div>
 										</div>
@@ -10629,68 +10629,65 @@ var TAS=TAS||function(){"use strict";var a="0.2.4",b=1457098091,c={debug:{key:"d
         console.log ("ArmorTotalAC");
     });*/
 
-//Armor Calc Sheet Worker using TAS - trying IF/THEN/ELSE
-    on('change:repeating_armor', function(){
+on("change:repeating_armor:armorcheck change:repeating_armor:armoracbase change:repeating_armor:armormagicbonus change:repeating_armor:armorspeed change:repeating_armor:armoractive change:repeating_armor:armoractiveunarmored", function() {
+    getAttrs(["AC_CalcZero", "AC_Unarmored_CalcZero", "ArmorCheckZero", "ArmorSpeedZero", "AGI", "ArmorClassLuckyRoll"], function(v) {
+        setAttrs({AC_CalcZero: parseInt(10)});
+        setAttrs({AC_Unarmored_CalcZero: parseInt(10)});
+        setAttrs({ArmorCheckZero: parseInt(0)});
+        setAttrs({ArmorSpeedZero: parseInt(0)});
+    });
 
-    TAS.repeating('armor')
-        .attrs('AC_CalcZero','AC_Unarmored_CalcZero','ArmorCheckZero','ArmorSpeedZero','AGI','ArmorClassLuckyRoll')  
-        .fields('ArmorACBase','ArmorMagicBonus','ArmorCheck','ArmorSpeed','ArmorActive','ArmorActiveUnarmored')
-        if (row.ArmorActive===1 && row.ArmorActiveUnarmored===0) {
-            .reduce(function(m,r){
-                m.ac+=(r.I.ArmorACBase+r.I.ArmorMagicBonus);
-                r.D[0].totalac=(r.I.ArmorACBase*r.I.ArmorMagicBonus);
-                m.accheck+=(r.I.ArmorCheck);
-                r.D[0].runningcheck=m.accheck;
-                m.acspeed+=(r.I.ArmorSpeed);
-                r.D[0].runningspeed=m.acspeed;
-                return m;
+    TAS.repeating("armor")
+        .attrs("AC_CalcZero", "AC_Unarmored_CalcZero", "ArmorCheckZero", "ArmorSpeedZero", "AGI", "ArmorClassLuckyRoll")
+        .fields("ArmorACBase","ArmorMagicBonus","ArmorCheck","ArmorSpeed","ArmorActive","ArmorActiveUnarmored")
+        .map(function(row, attrSet, id, rowSet) {
+
+        	console.log(row.ArmorActive);
+
+        	var Check = parseInt(row.ArmorCheck)||0;
+            var Speed = parseInt(row.ArmorSpeed)||0;
+            //var CheckArmor = (row.ArmorActive);
+            var CheckArmor = (row.ArmorActive == 'on') ? true : false;
+            //var CheckNoArmor = (row.ArmorActiveUnarmored);
+            var CheckNoArmor = (row.ArmorActiveUnarmored == 'on') ? true : false;
+            var ACBase = parseInt(row.ArmorACBase)||0;
+            var ACBonus = parseInt(row.ArmorMagicBonus)||0;
+
+            attrSet.AC_Unarmored_CalcZero += parseInt(ACBase) + parseInt(ACBonus);
+            attrSet.AC_CalcZero += parseInt(ACBase) + parseInt(ACBonus);
+
+        	console.log("CheckBonus="+ Check);
+	        console.log("SpeedBonus="+ Speed);
+	        console.log("Active Armor Checked="+ CheckArmor);
+	        console.log("Unarmored Checked="+ CheckNoArmor);
+	        console.log("Base Armor="+ ACBase);
+	        console.log("Bonus Armor="+ ACBonus);
+
+	        console.log("AGI Mod="+ attrSet.AGI);
+	        console.log("LuckyRoll="+ attrSet.ArmorClassLuckyRoll);
+
+            if (((CheckArmor) == true)&&((CheckNoArmor) == false)) {
+            	console.log("1");
+                attrSet.AC_CalcZero += parseInt(ACBase) + parseInt(ACBonus);
+                attrSet.ArmorCheckZero += parseInt(Check);
+                attrSet.ArmorSpeedZero += parseInt(Speed);
+            } else if (((CheckArmor) == false)&&((CheckNoArmor) == true)) {
+            	console.log("2");
+                attrSet.AC_Unarmored_CalcZero += parseInt(ACBase) + parseInt(ACBonus);
+                attrSet.ArmorCheckZero += parseInt(Check);
+                attrSet.ArmorSpeedZero += parseInt(Speed);
+            } else if (((CheckArmor) == true)&&((CheckNoArmor) == true)) {
+            	console.log("3");
+            	console.log(((row.ArmorActive)))
+                attrSet.AC_Unarmored_CalcZero += parseInt(ACBase) + parseInt(ACBonus);
+                attrSet.AC_CalcZero += parseInt(ACBase) + parseInt(ACBonus);
+                attrSet.ArmorCheckZero += parseInt(Check);
+                attrSet.ArmorSpeedZero += parseInt(Speed);
+            } else if (((CheckArmor) == false)&&((CheckNoArmor) == false)) {
+            	console.log("4");
+            }
                 
-            },{ac:0,accheck:0, acspeed:0},function(m,r,a){
-                a.D[0].AC_CalcZero=(10 + attrSet.ArmorClassLuckyRoll + m.ac);
-                a.D[0].AC_Unarmored_CalcZero=(10);
-                a.D[0].ArmorCheckZero=m.accheck;
-                a.D[0].ArmorSpeedZero=m.acspeed;
-            })
-        }
-        else if (row.ArmorActiveUnarmored===1 && row.ArmorActive===0) {
-           .reduce(function(m,r){
-                m.ac+=(r.I.ArmorACBase+r.I.ArmorMagicBonus);
-                r.D[0].totalac=(r.I.ArmorACBase*r.I.ArmorMagicBonus);
-                m.accheck+=(r.I.ArmorCheck);
-                r.D[0].runningcheck=m.accheck;
-                m.acspeed+=(r.I.ArmorSpeed);
-                r.D[0].runningspeed=m.acspeed;
-                /*r.D[2].runningtotal=m.cost;
-                m.desc.push(r.item+(r.I.quantity>1 ? ' (x'+r.S.quantity+')' : ''));*/
-                return m;
-                
-            },{ac:0,accheck:0, acspeed:0},function(m,r,a){
-                /*a.summary=m.desc.join(', ');*/
-                a.D[0].AC_Unarmored_CalcZero=(10 + attrSet.ArmorClassLuckyRoll + m.ac);
-                a.D[0].ArmorCheckZero=m.accheck;
-                a.D[0].ArmorSpeedZero=m.acspeed;
-            })
-        }
-        else if (row.ArmorActiveUnarmored===1 && row.ArmorActive===1) {
-           .reduce(function(m,r){
-                m.ac+=(r.I.ArmorACBase+r.I.ArmorMagicBonus);
-                r.D[0].totalac=(r.I.ArmorACBase*r.I.ArmorMagicBonus);
-                m.accheck+=(r.I.ArmorCheck);
-                r.D[0].runningcheck=m.accheck;
-                m.acspeed+=(r.I.ArmorSpeed);
-                r.D[0].runningspeed=m.acspeed;
-                /*r.D[2].runningtotal=m.cost;
-                m.desc.push(r.item+(r.I.quantity>1 ? ' (x'+r.S.quantity+')' : ''));*/
-                return m;
-                
-            },{ac:0,accheck:0, acspeed:0},function(m,r,a){
-                /*a.summary=m.desc.join(', ');*/
-                a.D[0].AC_Unarmored_CalcZero=(10 + attrSet.ArmorClassLuckyRoll + m.ac);
-                a.D[0].AC_CalcZero=(10 + attrSet.ArmorClassLuckyRoll + m.ac);
-                a.D[0].ArmorCheckZero=m.accheck;
-                a.D[0].ArmorSpeedZero=m.acspeed;
-            })
-        }
+        })
         .execute();
 });
 
