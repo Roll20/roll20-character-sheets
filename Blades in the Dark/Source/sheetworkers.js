@@ -325,14 +325,12 @@ var crewData = {
 		xp_condition: 'You addressed a challenge with violence or coercion.'
 	},
 	ghost: {
-		attune1: '1',
 		gatherinfo1: 'What do they intend to do?',
 		gatherinfo2: 'How can I get them to [X]?',
 		gatherinfo3: 'What are they really feeling?',
 		gatherinfo4: 'What should I look out for?',
 		gatherinfo5: 'Where\'s the weakness here?',
 		gatherinfo6: 'How can I find [X]?',
-		hunt1: '1',
 		playbook_description: 'A spirit without a body',
 		setting_showitem_0: '0',
 		setting_showitem_1: '0',
@@ -378,7 +376,6 @@ var crewData = {
 		xp_condition: 'You addressed a challenge with tracking or violence.'
 	},
 	hull: {
-		attune1: '1',
 		gatherinfo1: 'What do they intend to do?',
 		gatherinfo2: 'How can I get them to [X]?',
 		gatherinfo3: 'What are they really feeling?',
@@ -387,7 +384,7 @@ var crewData = {
 		gatherinfo6: 'How can I find [X]?',
 		playbook_description: 'A spirit animating a clockwork frame',
 		setting_load_h: '7',
-// 		setting_show_frame: 'on',
+ 		setting_show_frame: 'on',
 		setting_showitem_0: '0',
 		setting_showitem_1: '0',
 		setting_showitem_2: '0',
@@ -402,7 +399,6 @@ var crewData = {
 		setting_trauma_name: 'Wear',
  		setting_traumata_set: 'hull',
 		setting_vice_type: 'hull',
-		skirmish1: '1',
 		xp_condition: 'You fulfilled your functions despite difficulty or danger.',
 		xp_condition2: 'You suppressed or ignored your former human beliefs, drives, heritage, or background.',
 		xp_condition3: 'You struggled with issues from your wear during the session.'
@@ -533,22 +529,18 @@ var crewData = {
 		xp_condition: 'You addressed a challenge with knowledge or arcane power.'
 	},
 	vampire: {
-		attune1: '1',
-		command1: '1',
 		gatherinfo1: 'What do they intend to do?',
 		gatherinfo2: 'How can I get them to [X]?',
 		gatherinfo3: 'What are they really feeling?',
 		gatherinfo4: 'What should I look out for?',
 		gatherinfo5: 'Where\'s the weakness here?',
 		gatherinfo6: 'How can I find [X]?',
-		hunt1: '1',
 		item_3_desc: 'Fine shadow cloak',
 		item_4_desc: 'Fine clothes and accoutrements',
 		item_5_desc: 'Fine personal weapon',
 		item_7_desc: 'Demonbane charm',
 		item_8_desc: 'Spiritbane charm',
 		playbook_description: 'A spirit animating an undead body',
-		prowl1: '1',
 		setting_extra_stress1: 'on',
 		setting_extra_stress2: 'on',
 		setting_extra_stress3: 'on',
@@ -556,19 +548,23 @@ var crewData = {
 		setting_showitem_0: '0',
 		setting_showitem_1: '0',
 		setting_showitem_2: '0',
+		setting_showitem_3: 'on',
+		setting_showitem_4: 'on',
+		setting_showitem_5: 'on',
 		setting_showitem_6: '0',
+		setting_showitem_7: 'on',
+		setting_showitem_8: 'on',
 		setting_showitem_9: '0',
  		setting_show_strictures: 'on',
  		setting_traumata_set: 'normal',
 		setting_vice_type: 'vampire',
-		skirmish1: '1',
-		sway1: '1',
 		trauma: '4',
 		xp_condition: 'You displayed your dominance or slayed without mercy.',
 		xp_condition2: 'You expressed your beliefs, drives, heritage, or background.',
 		xp_condition3: 'You struggled with issues from your vice, traumas, or strictures during the session.'
 	}
 	},
+	spiritPlaybooks = ['ghost', 'hull', 'vampire'],
 	crewAttributes = _.chain(crewData).map(o => _.keys(o)).flatten().uniq().value(),
 	playbookAttributes = _.chain(playbookData).map(o => _.keys(o)).flatten().uniq().value(),
 	watchedAttributes = _.union(crewAttributes, playbookAttributes);
@@ -587,12 +583,15 @@ on('change:crew_type change:playbook', function (event) {
 		}
 		/* Change unset attributes to default */
 		if (data) {
-			let finalSettings = _.reduce(baseData, function(settings, name) {
-				if (!_.contains(changedAttributes, name)) {
-					settings[name] = '';
-				}
-				return settings;
-			}, {});
+			let finalSettings = {};
+			if (event.sourceAttribute === 'crew_type' || !_.contains(spiritPlaybooks, attrValues.playbook.toLowerCase())) {
+				finalSettings = _.reduce(baseData, function(settings, name) {
+					if (!_.contains(changedAttributes, name)) {
+						settings[name] = '';
+					}
+					return settings;
+				}, {});
+			}
 			_.reduce(data, function(settings, value, name) {
 				if (!_.contains(changedAttributes, name)) {
 					settings[name] = value;
@@ -662,6 +661,348 @@ var actions = {
 	};
 on(actions1Event, calculateVice);
 
+/* FACTIONS AUTOFILL */
+var factionsData = {
+		factions1: [
+			{
+				name: 'The Unseen',
+				tier: 'IV',
+				hold: 'S'
+			},
+			{
+				name: 'The Hive',
+				tier: 'IV',
+				hold: 'S'
+			},
+			{
+				name: 'The Circle of Flame',
+				tier: 'III',
+				hold: 'S'
+			},
+			{
+				name: 'The Silver Nails',
+				tier: 'III',
+				hold: 'S'
+			},
+			{
+				name: 'Lord Scurlock',
+				tier: 'III',
+				hold: 'S'
+			},
+			{
+				name: 'The Crows',
+				tier: 'II',
+				hold: 'W'
+			},
+			{
+				name: 'The Lampblacks',
+				tier: 'II',
+				hold: 'W'
+			},
+			{
+				name: 'The Red Sashes',
+				tier: 'II',
+				hold: 'W'
+			},
+			{
+				name: 'The Dimmer Sisters',
+				tier: 'II',
+				hold: 'S'
+			},
+			{
+				name: 'The Grinders',
+				tier: 'II',
+				hold: 'W'
+			},
+			{
+				name: 'The Billhooks',
+				tier: 'II',
+				hold: 'W'
+			},
+			{
+				name: 'The Wraiths',
+				tier: 'II',
+				hold: 'W'
+			},
+			{
+				name: 'The Gray Cloaks',
+				tier: 'II',
+				hold: 'S'
+			},
+			{
+				name: 'Ulf Ironborn',
+				tier: 'I',
+				hold: 'S'
+			},
+			{
+				name: 'The Foghounds',
+				tier: 'I',
+				hold: 'W'
+			},
+			{
+				name: 'The Lost',
+				tier: 'I',
+				hold: 'W'
+			}
+		],
+		factions2: [
+			{
+				name: 'Imperial Military',
+				tier: 'VI',
+				hold: 'S'
+			},
+			{
+				name: 'City Council',
+				tier: 'V',
+				hold: 'S'
+			},
+			{
+				name: 'Ministry of Preservation',
+				tier: 'V',
+				hold: 'S'
+			},
+			{
+				name: 'Leviathan Hunters',
+				tier: 'V',
+				hold: 'S'
+			},
+			{
+				name: 'Ironhook Prison',
+				tier: 'IV',
+				hold: 'S'
+			},
+			{
+				name: 'Sparkwrights',
+				tier: 'IV',
+				hold: 'S'
+			},
+			{
+				name: 'Spirit Wardens',
+				tier: 'IV',
+				hold: 'S'
+			},
+			{
+				name: 'Bluecoats',
+				tier: 'III',
+				hold: 'S'
+			},
+			{
+				name: 'Inspectors',
+				tier: 'III',
+				hold: 'S'
+			},
+			{
+				name: 'Iruvian Consulate',
+				tier: 'III',
+				hold: 'S'
+			},
+			{
+				name: 'Skovlan Consulate',
+				tier: 'III',
+				hold: 'W'
+			},
+			{
+				name: 'The Brigade',
+				tier: 'II',
+				hold: 'S'
+			},
+			{
+				name: 'Severosi Consulate',
+				tier: 'I',
+				hold: 'S'
+			},
+			{
+				name: 'Dagger Isles Consulate',
+				tier: 'I',
+				hold: 'S'
+			}
+		],
+		factions3: [
+			{
+				name: 'The Foundation',
+				tier: 'IV',
+				hold: 'S'
+			},
+			{
+				name: 'Dockers',
+				tier: 'III',
+				hold: 'S'
+			},
+			{
+				name: 'Gondoliers',
+				tier: 'III',
+				hold: 'S'
+			},
+			{
+				name: 'Sailors',
+				tier: 'III',
+				hold: 'W'
+			},
+			{
+				name: 'Laborers',
+				tier: 'III',
+				hold: 'W'
+			},
+			{
+				name: 'Cabbies',
+				tier: 'II',
+				hold: 'W'
+			},
+			{
+				name: 'Cyphers',
+				tier: 'II',
+				hold: 'S'
+			},
+			{
+				name: 'Ink Rakes',
+				tier: 'II',
+				hold: 'W'
+			},
+			{
+				name: 'Rail Jacks',
+				tier: 'II',
+				hold: 'W'
+			},
+			{
+				name: 'Servants',
+				tier: 'II',
+				hold: 'W'
+			}
+		],
+		factions4: [
+			{
+				name: 'The Church of Ecstasy',
+				tier: 'IV',
+				hold: 'S'
+			},
+			{
+				name: 'The Horde',
+				tier: 'III',
+				hold: 'S'
+			},
+			{
+				name: 'The Path of Echoes',
+				tier: 'III',
+				hold: 'S'
+			},
+			{
+				name: 'The Forgotten Gods',
+				tier: 'III',
+				hold: 'W'
+			},
+			{
+				name: 'The Reconciled',
+				tier: 'III',
+				hold: 'S'
+			},
+			{
+				name: 'Skovlander Refugees',
+				tier: 'III',
+				hold: 'W'
+			},
+			{
+				name: 'The Weeping Lady',
+				tier: 'II',
+				hold: 'S'
+			},
+			{
+				name: 'Deathlands Scavengers',
+				tier: 'II',
+				hold: 'W'
+			}
+		],
+		factions5: [
+			{
+				name: 'Whitecrown',
+				tier: 'V',
+				hold: 'S'
+			},
+			{
+				name: 'Brightstone',
+				tier: 'IV',
+				hold: 'S'
+			},
+			{
+				name: 'Charterhall',
+				tier: 'IV',
+				hold: 'S'
+			},
+			{
+				name: 'Six Towers',
+				tier: 'III',
+				hold: 'W'
+			},
+			{
+				name: 'Silkshore',
+				tier: 'II',
+				hold: 'S'
+			},
+			{
+				name: 'Nightmarket',
+				tier: 'II',
+				hold: 'S'
+			},
+			{
+				name: 'Crow\'s Foot',
+				tier: 'II',
+				hold: 'S'
+			},
+			{
+				name: 'The Docks',
+				tier: 'II',
+				hold: 'S'
+			},
+			{
+				name: 'Barrowcleft',
+				tier: 'II',
+				hold: 'S'
+			},
+			{
+				name: 'Coalridge',
+				tier: 'II',
+				hold: 'W'
+			},
+			{
+				name: 'Charhollow',
+				tier: 'I',
+				hold: 'S'
+			},
+			{
+				name: 'Dunslough',
+				tier: 'I',
+				hold: 'W'
+			}
+		]
+	};
+on('change:generate_factions', function(event) {
+	if (event.sourceType === 'sheetworker') return;
+	setAttrs({
+		generate_factions: 0
+	});
+	_.each(factionsData, function (dataList, sectionName) {
+		getSectionIDs(`repeating_${sectionName}`, function(idList) {
+			let rowNameAttributes = _.map(idList, id => `repeating_${sectionName}_${id}_name`);
+			getAttrs(rowNameAttributes, function (attrs) {
+				let existingRows = _.values(attrs);
+				let setting = _.chain(dataList)
+					.reject(o => _.contains(existingRows, o.name))
+					.map(function(o) {
+						let rowID = generateRowID();
+						return _.reduce(o, function(m,v,k) {
+							m[`repeating_${sectionName}_${rowID}_${k}`] = v;
+							return m;
+						}, {})
+					})
+					.reduce(function(m,o) {
+						return _.extend(m,o);
+					},{})
+					.value();
+				setAttrs(setting);
+			});
+		});
+	});
+});
+
 /* CALCULATE WANTED */
 on('change:wanted', function() {
 	getAttrs(['wanted'], function(v) {
@@ -682,6 +1023,56 @@ on('change:wanted', function() {
 				setting.wanted1 = 1;
 		}
 		setAttrs(setting);
+	});
+});
+/* CALCULATE COHORT QUALITY */
+var calcCohortDots = function(t1, t2, t3, t4, imp, type, prefix) {
+	let numDots = parseInt(t1) + parseInt(t2) + parseInt(t3) + parseInt(t4);
+	if (imp === 'on') {
+		numDots = numDots - 1;
+	}
+	if (type === 'elite' || type === 'expert') {
+		numDots = numDots + 1;
+	}
+	let setting = {};
+	setting[`${prefix}die1`] = 0;
+	setting[`${prefix}die2`] = 0;
+	setting[`${prefix}die3`] = 0;
+	setting[`${prefix}die4`] = 0;
+	setting[`${prefix}die5`] = 0;
+	switch(numDots) {
+		case 5:
+			setting[`${prefix}die5`] = 1;
+		case 4:
+			setting[`${prefix}die4`] = 1;
+		case 3:
+			setting[`${prefix}die3`] = 1;
+		case 2:
+			setting[`${prefix}die2`] = 1;
+		case 1:
+			setting[`${prefix}die1`] = 1;
+	}
+	return setting;
+},
+	qualityAttrs = ['crew_tier1', 'crew_tier2', 'crew_tier3', 'crew_tier4', 'cohort1_impaired', 'cohort1_type'],
+	qualityEvent = _.map(qualityAttrs, str => `change:${str}`).join(' ');
+on(qualityEvent, function() {
+	getAttrs(qualityAttrs, function (attrs) {
+		setting = calcCohortDots(attrs.crew_tier1, attrs.crew_tier2, attrs.crew_tier3, attrs.crew_tier4, attrs.cohort1_impaired, attrs.cohort1_type, 'cohort1_');
+		setAttrs(setting);
+	});
+});
+var repeatingQualityAttrs = ['crew_tier1', 'crew_tier2', 'crew_tier3', 'crew_tier4', 'repeating_cohort:impaired', 'repeating_cohort:type'],
+	repeatingQualityEvent = _.map(repeatingQualityAttrs, str => `change:${str}`).join(' ');
+on(repeatingQualityEvent + ' change:repeating_cohort:name', function() {
+	getSectionIDs('repeating_cohort', function(list) {
+		list.forEach(function(id) {
+			let attrList = _.map(repeatingQualityAttrs, str => str.replace(':', '_'+id+'_'));
+			getAttrs(attrList, function(attrs) {
+				let setting = calcCohortDots(attrs.crew_tier1, attrs.crew_tier2, attrs.crew_tier3, attrs.crew_tier4, attrs[attrList[4]], attrs[attrList[5]], `repeating_cohort_${id}_`);
+				setAttrs(setting);
+			});
+		});
 	});
 });
 
@@ -768,8 +1159,52 @@ itemChecks.forEach(function(name) {
 });
 
 on('sheet:opened', function() {
+	/* Make sure sheet_type is never 0 */
+	getAttrs(['sheet_type'], function(v) {
+		if (v.sheet_type === '0' || v.sheet_type === 0) {
+			setAttrs({
+				sheet_type: 'character'
+			});
+		}
+	});
+	/* Convert legacy status section */
+	getAttrs(['version'], function(v) {
+		if (v.version && v.version.split('.')[0] === '0' && parseInt(v.version.split('.')[1]) < 7) {
+			getSectionIDs('repeating_faction', function(list) {
+				let sectionList = _.union(['faction1', 'faction2'],	_.map(list, str => `repeating_faction_${str}`)),
+					attrList = _.chain(sectionList)
+					.map(str => [`${str}_name`, `${str}_status`, `${str}_description`])
+					.flatten().value();
+				getAttrs(attrList, function (attrs) {
+					let output = _.map(sectionList, function(str) {
+						return 'Name: ' + attrs[`${str}_name`] + '\n' +
+							'Status: ' + (attrs[`${str}_status`] || '') + '\n' +
+							'Notes: ' + (attrs[`${str}_description`] || '') + '\n';
+					}).join('\n');
+					setAttrs({
+						faction_notes: output
+					});
+					setAttrs({
+						faction1_name: '',
+						faction1_status: '',
+						faction1_description: '',
+						faction1_expand: '',
+						faction2_name: '',
+						faction2_status: '',
+						faction2_description: '',
+						faction2_expand: ''
+					});
+					_.each(list, function(id) {
+						removeRepeatingRow(`repeating_faction_${id}`);
+					});
+				});
+			});
+		}
+	});
+	/* Set version */
 	setAttrs({
-		version: '0.4.2'
+		version: '0.7',
+		character_sheet: 'Blades in the Dark v0.7'
 	});
 });
 </script>
