@@ -5,6 +5,42 @@
 
 ### Changelog
 
+### 1.7.8.1 on 2017 February 27th
+* Took out Sanity Points as this was not Core Rules.
+	- Just committed out, so can access it via custom sheets
+* Took out Attribute dice calculation for Attribute 11, highest meant to be 10.
+
+### 1.7.8 on 2017 February 20th
+* Added for future compatibility: Attributes able to go to level 11 with new dice
+	- This is mainly for Artifacts to be released soon
+* Added more sections to the sheet that can be soon or hidden:
+	- Goals & Beliefs [in progress]
+	- Sanity Points [complete]
+	- Other Inventory & Notes [in progress]
+	- Currently all three can be displayed, but nothing for the "in progress" ones but a place holder
+
+### 1.7.7.9 on 2017 February 19th
+* Fixed a missing call to output the Max power level for Other Actions
+
+### 1.7.7.5 on 2017 February 6th
+* Added "Size" field to character information.
+
+### 1.7.7 on 2017 January 27th
+* Added Attribute Substitution for all Attributes
+	- Fixed drop downs to have ALL attributes except for the current attribute being looked at
+* Updated all function calls to account for 1.7.6
+	- Including calculations to display prorperly if attribute subsitution was being used
+
+### 1.7.6 on 2017 January 24th
+* Added new universal function for determining attribute substitution values
+	- Reusable code so less lines of code
+* Updated drop down menus to reflect change of Evasion > Guard
+* Renames lines "Increase/Decrease Dice Size" to be "Attribute Dice Bonus/Penalty"
+
+### 1.7.5 on 2017 January 4th
+* Updated for new calculation of evasion, and evasion's name changed to Guard
+	- Guard = 10 + Agility + Might + Armor + Other
+
 ### 1.7.4 on 2016 December 29th
 * Fixed an error in Workerscripts where it was unable to calculate b/c of a void value.
 	- Only happened on pre-existing Actions, newly created ones would work fine.

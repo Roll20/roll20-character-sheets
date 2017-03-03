@@ -3,9 +3,41 @@
 This is a re-creation of the "green-sheet" for the D&D Basic Moldvay Red box game.  It was created for the Roll20 Moldvay Basic Contest.
 
 ## Current Version
-1.16
+2.3
 
 ### Changelog
+
+#### 2.3
+* Added Sheet Worker to automatically add in Halfing Missile Bonus if Halfling Class is selected (#2325)
+* Halfling Quick Bonus is now actually optional - selected within the Halfling class
+* Add Sheet Worker to automatically calculate all To Hit Rolls (for both player and monster sheets) that are not THAC0 with the lowest value being 2
+* Added new art for AC, HP and HP Max Boxes (#2329)
+* Default values for Ability Scores and Saving Throws are now present on new character sheets (#2333)
+* Cleaned up Monster Sheet background so its not blurry
+* Alignment and HP Die are no longer drop-down boxes (#2332)
+
+#### 2.2
+* Added the ability to use Bonus or Minus roll query to your open doors check (using a crowbar for instance)
+* Formatted the Open Doors roll template so you see your chance out of 6 to open the door upon rolling
+* Removed the Sheet Worker script for Open Doors because sheet workers do not work with roll queries
+* [Request] Added information to the mouseover on Rolls for Attacks to indicate which rolls are THAC0, Dice Roll, Bonus'
+* Centered Success and Failure text
+
+#### 2.1
+* Spells now have roll templates
+* Fixed formatting issue with dropdown boxes
+
+#### 2.0
+* Monster Sheet Update
+* Monster Initiative can now be rolled within sheet
+* Monster HP can now be rolled within sheet - result sent to GM
+* Monster Morale checks can now be rolled within sheet - result sent to GM
+* Monster Surprise checks can now be rolled within sheet - result sent to GM
+* Monsters now have saves (Moldvay: Add monster saves #1898)
+* Monsters now can have multiple damage dice per attack (Moldvay: Monster multiple monster attack die #1897)
+* Monsters now have abilities section for non-attack roll abilities (Moldvay: Add monster abilities #1896)
+* Fumbles no longer show damage done
+
 
 #### 1.16
 * Fixing sheet worker to calculate chance to open door on sheet open and STR mod change
@@ -13,7 +45,7 @@ This is a re-creation of the "green-sheet" for the D&D Basic Moldvay Red box gam
 #### 1.15
 * Fixed chances for finding secret doors, listening, and finding traps, all of which were too high by 1 (e.g. 1/6 chance for all of those for non-demihumans, was 2/6)
 * Fixed roll templates for the above, removing the critical successes in favor of operating properly
-* Moving calculation for chance to open doors to a Sheet Worker to enfoce minimum and maximum values
+* Moving calculation for chance to open doors to a Sheet Worker to enforce minimum and maximum values
 
 #### 1.14
 * Separated out the two sheets (Character Record and Monster) so that they are more noticeable to the GM/Players
