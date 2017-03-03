@@ -440,6 +440,12 @@
 							</div>
 						</div> 
 					</div>
+					<div class="sheet-table">
+						<div class="sheet-table-data-center" style="vertical-align:top;">
+							<span class="sheet-table-data-left" style="width: 192px;" name="attr_knownlanguagesl"></span>
+							<span class="sheet-table-data-left" style="width: 192px;" name="attr_knownlanguagesr"></span>
+						</div>
+					</div>
 				<hr/>
 				</div>
 
@@ -10685,48 +10691,68 @@ on("change:repeating_lang", function() {
 		SkillChange("repeating_lang_languagewrittenranks");
 //  <!---- If repeating_lang_* changes, make a nice summary for the front page for me ---->
 			console.log('/*----------- next create rep-languages summary------*/');
-	    getAttrs(["knownlanguages"], function(values){
-		  
+	    getAttrs(["knownlanguages","cat-communications-rankbonus","rebonus","mebonus","embonus","cat-communications-profbonus","cat-communications-specialbonus","cat-communications-itembonus"], function(values){
+			catbonus=parseInt(values["cat-communications-rankbonus"], 10) +parseInt(values.rebonus, 10) +parseInt(values.mebonus, 10) +parseInt(values["cat-communications-profbonus"], 10) +parseInt(values["cat-communications-specialbonus"], 10) +parseInt(values["cat-communications-itembonus"], 10);
+//			 console.log("catbonus: "+catbonus);
 		    getSectionIDs("repeating_lang", function(idarray){
-		        langs = "";
+		        langs1 = "";
+				langs2 = "";
 				langpt1 = "";
 
 				if (idarray.length>0) {
 				    console.log("ID array length: "+idarray.length);
+					var count=0;
 					_.each(idarray, function(currentID) {
-/*						getAttrs(["repeating_lang_"+currentID+"_languagename",
-									"repeating_lang_"+currentID+"_languagespokenranks",
-									"repeating_lang_"+currentID+"_languagespoken",
-									"repeating_lang_"+currentID+"_languagespokenstat",
-									"repeating_lang_"+currentID+"_languagewrittenranks",
-									"repeating_lang_"+currentID+"_languagewritten"], function(x) {
-									  console.log("current id: "+currentID);
-									  langs +=x["repeating_lang_"+currentID+"_languagename"]+
-											" S:"+x["repeating_lang_"+currentID+"_languagespokenranks"]+
-											"/"+x["repeating_lang_"+currentID+"_languagespoken"]+
-											"/"+x["repeating_lang_"+currentID+"_languagespokenstat"]+
-											" W:"+x["repeating_lang_"+currentID+"_languagewrittenranks"]+
-											"/"+x["repeating_lang_"+currentID+"_languagewritten"]+".  ";
-									  console.log("Langs: "+langs);
-									}
-						); */
 						getAttrs(["repeating_lang_"+currentID+"_languagename",
-									"repeating_lang_"+currentID+"_languagespokenranks",
-									"repeating_lang_"+currentID+"_languagewrittenranks"], function(x) {
+									"repeating_lang_"+currentID+"_languagespokenranks", 
+									"repeating_lang_"+currentID+"_languagespokenrankbonus",
+									"repeating_lang_"+currentID+"_languagespokenspecialmod",
+									"repeating_lang_"+currentID+"_languagespokenitemmod",
+									"repeating_lang_"+currentID+"_languagewrittenranks", 
+									"repeating_lang_"+currentID+"_languagewrittenrankbonus", 
+									"repeating_lang_"+currentID+"_languagewrittenspecialmod", 
+									"repeating_lang_"+currentID+"_languagewrittenitemmod"], function(x) {
 									  console.log("current id: "+currentID);
-/*									  langs +=x["repeating_lang_"+currentID+"_languagename"]+
-											" S:"+x["repeating_lang_"+currentID+"_languagespokenranks"]+
-											" W:"+x["repeating_lang_"+currentID+"_languagewrittenranks"]+". . . . . . . . . .  ";
-									  console.log("Langs: "+langs);*/
+									  langspokenspecial=parseInt(x["repeating_lang_"+currentID+"_languagespokenspecialmod"], 10);
+									  if (isNaN(langspokenspecial))
+											langspokenspecial = 0;
+//									   console.log("langspokenspecial: "+langspokenspecial);
+									  langspokenitem=parseInt(x["repeating_lang_"+currentID+"_languagespokenitemmod"], 10);
+									  if (isNaN(langspokenitem))
+											langspokenitem = 0;
+//									   console.log("langspokenitem: "+langspokenitem);
+									  langwrittenspecial=parseInt(x["repeating_lang_"+currentID+"_languagewrittenspecialmod"], 10);
+									  if (isNaN(langwrittenspecial))
+											langwrittenspecial = 0;
+//									   console.log("langwrittenspecial: "+langwrittenspecial);
+									  langwrittenitem=parseInt(x["repeating_lang_"+currentID+"_languagewrittenitemmod"], 10);
+									  if (isNaN(langwrittenitem))
+											langwrittenitem = 0;
+//									   console.log("langwrittenitem: "+langwrittenitem);
+									  langspoken = parseInt(x["repeating_lang_"+currentID+"_languagespokenrankbonus"], 10) +parseInt(values.embonus, 10) +catbonus +langspokenspecial +langspokenitem;
+//									   console.log("langspoken: "+langspoken);
+									  langwritten = parseInt(x["repeating_lang_"+currentID+"_languagewrittenrankbonus"], 10) +parseInt(values.embonus, 10) +catbonus +langwrittenspecial +langwrittenitem;
+//									   console.log("langwritten: "+langwritten);
 									  langpt1 =x["repeating_lang_"+currentID+"_languagename"]+
 											" S:"+x["repeating_lang_"+currentID+"_languagespokenranks"]+
-											" W:"+x["repeating_lang_"+currentID+"_languagewrittenranks"]
-										for( var i=0; i<(16-langpt1.length); i++){				////  why doesn't this work???? ask Jason for help.
-										console.log("index: "+i+"  length:"+langpt1.length);
+											"/"+langspoken+
+											" W:"+x["repeating_lang_"+currentID+"_languagewrittenranks"]+
+											"/"+langwritten+ ". ";
+										l=29-langpt1.length;
+//										console.log("l:"+l);
+										for( var i=0; i<l; i++){				////  pad out the width so it is about one lang/line.
+//										console.log("--------------index: "+i+"  length:"+langpt1.length+"/"+l);
 											langpt1 +=". ";
 										}
-									  langs +=langpt1;
-									  console.log("Langs: "+langs);
+//									console.log("count: "+count);
+									  if((count%2)==1){
+										langs1 +=langpt1;
+									  }else{
+										langs2 +=langpt1;
+									  }
+//									  console.log("Langs1: "+langs1);
+//									  console.log("Langs2: "+langs2);
+										count++;
 									}
 						);
 					});
@@ -10734,7 +10760,8 @@ on("change:repeating_lang", function() {
 			});
 					console.log("end langs?");
 					setAttrs({
-						knownlanguages : langs
+						knownlanguagesr : langs1,
+						knownlanguagesl	: langs2
 					});
 			
 		});
