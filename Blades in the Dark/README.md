@@ -4,6 +4,9 @@ This is a character sheet for Blades in the Dark for use on Roll20.
 
 ## Changelog
 
+### 0.8
+* Added buttons to generate special abilities and friends/contacts (in the settings menu)
+
 ### 0.7
 * Faction mode added (to Character Mode and Crew Mode)
 * Old "Factions & Status" section is removed, all the content added to a notes box
