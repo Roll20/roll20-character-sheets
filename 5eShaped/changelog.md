@@ -1,3 +1,16 @@
+## 10.1.2
+
+### Bug Fixes
+
+* [#342: Top hit dice not clickable](https://bitbucket.org/mlenser/5eshaped/issues/342/top-hit-dice-not-clickable)
+* Class Level is now a select
+* [#337: Spellcasting parsing doesn't always detect class](https://bitbucket.org/mlenser/5eshaped/issues/337/spellcasting-parsing-doesnt-always-detect)
+* [#328: NPC Multiattack gains "Ranged Spell Attack" on upgrade to 10.0.1](https://bitbucket.org/mlenser/5eshaped/issues/328/npc-multiattack-gains-ranged-spell-attack)
+
+### Code Cleanup
+
+* Removed import_data is it's now done via API directly
+
 ## 10.1.1
 
 ### Bug Fixes
