@@ -1291,7 +1291,7 @@ var actions = {
 	};
 on(actions1Event, calculateVice);
 
-/* FACTIONS AUTOFILL */
+/* GENERATE FACTIONS */
 var fillRepeatingSectionFromData = function(sectionName, dataList) {
 	getSectionIDs(`repeating_${sectionName}`, function(idList) {
 		let rowNameAttributes = _.map(idList, id => `repeating_${sectionName}_${id}_name`);
@@ -1631,7 +1631,6 @@ on('change:generate_factions', function(event) {
 		fillRepeatingSectionFromData(sectionName, dataList);
 	});
 });
-
 /* GENERATE ABILITIES */
 on('change:generate_abilities', function() {
 	getAttrs(['generate_source'], function (v) {
@@ -1778,7 +1777,7 @@ var handleFourBoxesFill = function(name) {
 /* Action ratings */
 actionsFlat.forEach(handleFourBoxesFill);
 /* Crew Tier */
-['crew_tier'].forEach(handleFourBoxesFill);
+handleFourBoxesFill('crew_tier');
 /* Items/Upgrades */
 var itemChecks = [
 	'item_1_check',
