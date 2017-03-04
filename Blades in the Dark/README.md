@@ -4,6 +4,9 @@ This is a character sheet for Blades in the Dark for use on Roll20.
 
 ## Changelog
 
+### 0.8.1
+* Added names for all roll buttons
+
 ### 0.8
 * Added buttons to generate special abilities and friends/contacts (in the settings menu)
 
