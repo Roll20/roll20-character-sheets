@@ -1,3 +1,16 @@
+## 10.1.3
+
+### Bug Fixes
+
+* [#345: Default Sheet Settings sets wrong values for integer fields](https://bitbucket.org/mlenser/5eshaped/issues/345/default-sheet-settings-sets-wrong-values)
+* [#348: Critical Damage on Cantrips using the cantrip formula when crit dmg maximized](https://bitbucket.org/mlenser/5eshaped/issues/348/critical-damage-on-cantrips-using-the)
+* [#350: Eldritch blast issues](https://bitbucket.org/mlenser/5eshaped/issues/350/eldritch-blast-issues)
+* Ensured that when a spell is dragged from the SRD to a level that does not match its level that it maintains all data passed from the SRD when it is moved to the proper level. This solves higher level damage issues and closes [#351: Shatter spell issue](https://bitbucket.org/mlenser/5eshaped/issues/351/shatter-spell-issue)
+* Magic Missile now imports without a higher level damage_dice. Closes part of [#349: Magic missiles issues](https://bitbucket.org/mlenser/5eshaped/issues/349/magic-missiles-issues)
+* [#354: Extra crit damage for saving throw shows for secondary damage](https://bitbucket.org/mlenser/5eshaped/issues/354/extra-crit-damage-for-saving-throw-shows)
+* [#353: Slight vertical misalignment on traits section usages in condensed mode](https://bitbucket.org/mlenser/5eshaped/issues/353/slight-vertical-misalignment-on-traits)
+* Adding/Changing a class or updating levels does not change the spell_ability, therefore resetting all spells. Closes the bug from [#352: Changing spellcasting ability changes it for all spells](https://bitbucket.org/mlenser/5eshaped/issues/352/changing-spellcasting-ability-changes-it)
+
 ## 10.1.2
 
 ### Bug Fixes
