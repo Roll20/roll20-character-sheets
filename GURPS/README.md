@@ -4,9 +4,9 @@ Styling is inspired primarily by GCS, but also with some influence from the offi
 
 
 TODO
- - Implement auto-calc for the point summary (if possible).
-    - Done
- - Automatic encumberance calculation, or at least highlighting.
-    - Done
- - Automatic stat reduction at low HP/FP
-    - Done
+ - Add a damage calculator that:
+    - Takes inputs for Damage Amount, Damage Type, and Location
+    - Reduce amount by DR for location
+    - Apply damage multiplier for type/location
+ - Populate Swing and Thrust damage based on Striking ST.
+ - Use Sw or Thr as options for weapon damage

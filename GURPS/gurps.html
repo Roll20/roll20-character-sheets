@@ -648,7 +648,7 @@
 						</span>
 					</div>
 					<div class="sheet-cell sheet-col1">
-						<input type="number" name="attr_hit_points" value="0" />
+						<input type="number" name="attr_hit_points" />
 					</div>
 				</div> <!-- .sheet-row -->
 				<div class="sheet-row sheet-row-fatigue-points">
@@ -722,7 +722,7 @@
 						</span>
 					</div>
 					<div class="sheet-cell sheet-col1">
-						<input type="number" name="attr_fatigue_points" value="0" />
+						<input type="number" name="attr_fatigue_points" />
 					</div>
 				</div> <!-- .sheet-row -->
 				<div class="sheet-row sheet-row-energy-points">
@@ -2297,7 +2297,9 @@
 
 <script type="text/worker">
 
-	var version = 1.3;
+	var noop = function () {}; // do nothing.
+
+	var version = '1.3.1';
 
 	/* Due to the change from auto-calc fields to helper scrips,
 	 * I'm running a "on open" to set various fields. At some point
@@ -2307,38 +2309,56 @@
 		console.log('********* Sheet Opened *********');
 		getAttrs(["sheet_version"], function(v) {
 			if (!v.sheet_version || v.sheet_version != version) {
+				// Set sheet version:
 				setAttrs({ sheet_version: version });
-				// Get all the data we need to populate driviative fields:
-				getAttrs(["strength_points", "strength_mod", "dexterity_points", "dexterity_mod", "intelligence_points", "intelligence_mod", "health_points", "health_mod"], function (v) {
-					setAttrs({ 
-						strength_base: 0,
-						dexterity_base: 0,
-						intelligence_base: 0,
-						health_base: 0,
-						perception_base: 0,
-						willpower_base: 0,
-						basic_speed_base: 0,
-						basic_move_base: 0,
-						dodge_base: 0,
-						lift_st_base: 0,
-						striking_st_base: 0
-					}, {silent: "false"}, function () {
-						updateST(v);
-						updateDX(v);
-						updateIQ(v);
-						updateHT(v);
-					});
-				});
-				// initalize any empty fields in repeating sections since the 
-				// default values were removed.
+
+				// initalize any empty fields in repeating sections since the default values were removed.
 				loadRepeating("repeating_languages", "spoken", 0);
 				loadRepeating("repeating_languages", "written", 0);
 				loadRepeating("repeating_skills", "points", 1);
 				loadRepeating("repeating_cultures", "points", 1);
 				loadRepeating("repeating_techniques", "points", 1);
 				loadRepeating("repeating_spells", "points", 1);
-				sumRepeating("repeating_item", "weighttotal", function(v) {
-					setAttrs({ total_weight: (v * 100) / 100 });
+				sumRepeating("repeating_item", "weighttotal", function (v) {
+					setAttrs({ total_weight: (v * 100) / 100 }, {silent: false}, thenEncumbrance);
+				});
+
+				// After DX and HT
+				var thenSpeedMoveDodge = _.after(2, function () {
+					updateBasicSpeed(function () {
+						// After Basic Speed...
+						updateBasicMove(thenCurrentMoveDodge);
+						updateDodge(thenCurrentMoveDodge);
+					});
+				});
+
+				var thenEncumbrance = _.after(2, function () {
+					updateEncLevel(thenCurrentMoveDodge);
+				});
+
+				var thenCurrentMoveDodge = _.after(4, function () {
+					updateMoveDodge();
+				});
+				
+				// Update attributes, then secondary characteristics, and so on...
+				updateST(function () {
+					// After ST...
+					updateHP(thenCurrentMoveDodge);
+					updateLift(thenEncumbrance);
+					updateStrikingST();
+				});
+				updateDX(thenSpeedMoveDodge);
+				updateIQ(function () {
+					// After IQ...
+					updateWill();
+					updatePer(function () {
+						// After Per...
+						updateSense();
+					});
+				});
+				updateHT(function () {
+					updateFP();
+					thenSpeedMoveDodge();
 				});
 			}
 		});
@@ -2392,293 +2412,317 @@
 
 	// Strength Change
 	on("change:strength_points change:strength_mod", function (e) {
-		getAttrs(["strength_points", "strength_mod"], function(v) {
-			updateST(v);
-		});
+		updateST();
 	});
 	// Update Strength
-	function updateST(v) {
+	function updateST(callback) {
+		callback = callback || noop;
 		console.log('********* updateST *********');
-		var base = 10 + ((v.strength_points || 0) / 10 | 0);
-		var mod = v.strength_mod || 0;
-		setAttrs({
-			strength_base: +base,
-			strength: +base + +mod
+		getAttrs(["strength_points", "strength_mod"], function(v) {
+			var base = 10 + ((v.strength_points || 0) / 10 | 0);
+			var mod = v.strength_mod || 0;
+			setAttrs({
+				strength_base: +base,
+				strength: +base + +mod
+			}, {silent: false}, callback);
 		});
 	}
 
 	// Dexterity Change
 	on("change:dexterity_points change:dexterity_mod", function (e) {
-		getAttrs(["dexterity_points", "dexterity_mod"], function(v) {
-			updateDX(v);
-		});
+		updateDX();
 	});
 	// Update Dexterity
-	function updateDX(v) {
+	function updateDX(callback) {
+		callback = callback || noop;
 		console.log('********* updateDX *********');
-		var base = 10 + ((v.dexterity_points || 0) / 20 | 0);
-		var mod = v.dexterity_mod || 0;
-		setAttrs({
-			dexterity_base: +base,
-			dexterity: +base + +mod
+		getAttrs(["dexterity_points", "dexterity_mod"], function(v) {
+			var base = 10 + ((v.dexterity_points || 0) / 20 | 0);
+			var mod = v.dexterity_mod || 0;
+			setAttrs({
+				dexterity_base: +base,
+				dexterity: +base + +mod
+			}, {silent: false}, callback);
 		});
 	}
 
 	// Intelligence
 	on("change:intelligence_points change:intelligence_mod", function (e) {
-		getAttrs(["intelligence_points", "intelligence_mod"], function(v) {
-			updateIQ(v);
-		});
+		updateIQ();
 	});
 	// Update Intelligence
-	function updateIQ(v) {
+	function updateIQ(callback) {
+		callback = callback || noop;
 		console.log('********* updateIQ *********');
-		var base = 10 + ((v.intelligence_points || 0) / 20 | 0);
-		var mod = v.intelligence_mod || 0;
-		setAttrs({
-			intelligence_base: +base,
-			intelligence: +base + +mod
+		getAttrs(["intelligence_points", "intelligence_mod"], function(v) {
+			var base = 10 + ((v.intelligence_points || 0) / 20 | 0);
+			var mod = v.intelligence_mod || 0;
+			setAttrs({
+				intelligence_base: +base,
+				intelligence: +base + +mod
+			}, {silent: false}, callback);
 		});
 	}
 
 	// Health
 	on("change:health_points change:health_mod", function (e) {
-		getAttrs(["health_points", "health_mod"], function(v) {
-			updateHT(v);
-		});
+		updateHT();
 	});
 	// Update Health
-	function updateHT(v) {
+	function updateHT(callback) {
+		callback = callback || noop;
 		console.log('********* updateHT *********');
-		var base = 10 + ((v.health_points || 0) / 10 | 0);
-		var mod = v.health_mod || 0;
-		setAttrs({
-			health_base: +base,
-			health: +base + +mod
+		getAttrs(["health_points", "health_mod"], function(v) {
+			var base = 10 + ((v.health_points || 0) / 10 | 0);
+			var mod = v.health_mod || 0;
+			setAttrs({
+				health_base: +base,
+				health: +base + +mod
+			}, {silent: false}, callback);
 		});
 	}
 
 	// HP
 	on("change:strength_base change:hit_points_points", function (e) {
-		getAttrs(["strength_base", "hit_points_points"], function(v) {
-			updateHP(v);
-		});
+		updateHP();
 	});
 	// Update HP
-	function updateHP(v) {
+	function updateHP(callback) {
 		console.log('********* updateHP *********');
-		var base = v.strength_base + ((v.hit_points_points || 0) / 2 | 0);
-		setAttrs({
-			hit_points_max: +base
+		callback = callback || noop;
+		getAttrs(["strength_base", "hit_points_points"], function(v) {
+			var base = v.strength_base + ((v.hit_points_points || 0) / 2 | 0);
+			setAttrs({
+				hit_points_max: +base
+			}, {silent: false}, function () {
+				getAttrs(["hit_points"], function(v2) {
+					if (v2.hit_points == null) {
+						setAttrs({ hit_points: +base }, {silent: false}, callback);
+					} else {
+						callback();
+					}
+				});
+			});
 		});
 	}
 
 	// FP
 	on("change:health_base change:fatigue_points_points", function (e) {
-		getAttrs(["health_base", "fatigue_points_points"], function(v) {
-			updateFP(v);
-		});
+		updateFP();
 	});
 	// Update FP
-	function updateFP(v) {
+	function updateFP() {
 		console.log('********* updateFP *********');
-		var base = v.health_base + ((v.fatigue_points_points || 0) / 3 | 0);
-		setAttrs({
-			fatigue_points_max: +base
+		getAttrs(["health_base", "fatigue_points_points"], function(v) {
+			var base = v.health_base + ((v.fatigue_points_points || 0) / 3 | 0);
+			setAttrs({
+				fatigue_points_max: +base
+			}, {silent: false}, function () {
+				getAttrs(["fatigue_points"], function(v2) {
+					if (v2.fatigue_points == null) {
+						setAttrs({ fatigue_points: +base });
+					}
+				});
+			});
 		});
 	}
 
 	// Perception
 	on("change:intelligence_base change:perception_points change:perception_mod", function (e) {
-		getAttrs(["intelligence_base", "perception_points", "perception_mod"], function(v) {
-			updatePer(v);
-		});
+		updatePer();
 	});
 	// Update Perception
-	function updatePer(v) {
+	function updatePer(callback) {
 		console.log('********* updatePer *********');
-		var base = v.intelligence_base + ((v.perception_points || 0) / 5 | 0);
-		var mod = v.perception_mod || 0;
-		setAttrs({
-			perception_base: +base,
-			perception: +base + +mod
+		callback = callback || noop;
+		getAttrs(["intelligence_base", "perception_points", "perception_mod"], function(v) {
+			var base = v.intelligence_base + ((v.perception_points || 0) / 5 | 0);
+			var mod = v.perception_mod || 0;
+			setAttrs({
+				perception_base: +base,
+				perception: +base + +mod
+			}, {silent: false}, callback);
 		});
 	}
 
 	// Vision, Hearing, Smell, Touch
 	on("change:perception_base change:vision_points change:vision_mod change:hearing_points change:hearing_mod change:taste_smell_points change:taste_smell_mod change:touch_points change:touch_mod", function (e) {
-		getAttrs(["perception_base", "vision_points", "vision_mod", "hearing_points", "hearing_mod", "taste_smell_points", "taste_smell_mod", "touch_points", "touch_mod"], function(v) {
-			updateSense(v);
-		});
+		updateSense();
 	});
 	// Update Vision, Hearing, Smell, Touch
-	function updateSense(v) {
+	function updateSense() {
 		console.log('********* updateSense *********');
-		var visionBase = v.perception_base + ((v.vision_points || 0) / 2 | 0);
-		var visionMod = v.vision_mod || 0;
-		var hearingBase = v.perception_base + ((v.hearing_points || 0) / 2 | 0);
-		var hearingMod = v.hearing_mod || 0;
-		var tasteSmellBase = v.perception_base + ((v.taste_smell_points || 0) / 2 | 0);
-		var tasteSmellMod = v.taste_smell_mod || 0;
-		var touchBase = v.perception_base + ((v.touch_points || 0) / 2 | 0);
-		var touchMod = v.touch_mod || 0;
-		setAttrs({
-			vision_base: +visionBase,
-			vision: +visionBase + +visionMod,
-			hearing_base: +hearingBase,
-			hearing: +hearingBase + +hearingMod,
-			taste_smell_base: +tasteSmellBase,
-			taste_smell: +tasteSmellBase + +tasteSmellMod,
-			touch_base: +touchBase,
-			touch: +touchBase + +touchMod
+		getAttrs(["perception_base", "vision_points", "vision_mod", "hearing_points", "hearing_mod", "taste_smell_points", "taste_smell_mod", "touch_points", "touch_mod"], function(v) {
+			var visionBase = v.perception_base + ((v.vision_points || 0) / 2 | 0);
+			var visionMod = v.vision_mod || 0;
+			var hearingBase = v.perception_base + ((v.hearing_points || 0) / 2 | 0);
+			var hearingMod = v.hearing_mod || 0;
+			var tasteSmellBase = v.perception_base + ((v.taste_smell_points || 0) / 2 | 0);
+			var tasteSmellMod = v.taste_smell_mod || 0;
+			var touchBase = v.perception_base + ((v.touch_points || 0) / 2 | 0);
+			var touchMod = v.touch_mod || 0;
+			setAttrs({
+				vision_base: +visionBase,
+				vision: +visionBase + +visionMod,
+				hearing_base: +hearingBase,
+				hearing: +hearingBase + +hearingMod,
+				taste_smell_base: +tasteSmellBase,
+				taste_smell: +tasteSmellBase + +tasteSmellMod,
+				touch_base: +touchBase,
+				touch: +touchBase + +touchMod
+			});
 		});
 	}
 
 	// Updage Willpower, Fear
 	on("change:intelligence_base change:willpower_points change:willpower_mod change:fear_check_points change:fear_check_mod", function (e) {
-		getAttrs(["intelligence_base", "willpower_points", "willpower_mod", "fear_check_points", "fear_check_mod"], function(v) {
-			updateWill(v);
-		});
+		updateWill();
 	});
 	// Updage Willpower, Fear
-	function updateWill(v) {
+	function updateWill() {
 		console.log('********* updateWill *********');
-		var wBase = v.intelligence_base + ((v.willpower_points || 0) / 5 | 0);
-		var wMod = v.willpower_mod || 0;
-		var fBase = wBase + ((v.fear_check_points || 0) / 2 | 0);
-		var fMod = v.fear_check_mod || 0;
-		setAttrs({
-			willpower_base: +wBase,
-			willpower: +wBase + +wMod,
-			fear_check_base: +fBase,
-			fear_check: +fBase + +fMod
+		getAttrs(["intelligence_base", "willpower_points", "willpower_mod", "fear_check_points", "fear_check_mod"], function(v) {
+			var wBase = v.intelligence_base + ((v.willpower_points || 0) / 5 | 0);
+			var wMod = v.willpower_mod || 0;
+			var fBase = wBase + ((v.fear_check_points || 0) / 2 | 0);
+			var fMod = v.fear_check_mod || 0;
+			setAttrs({
+				willpower_base: +wBase,
+				willpower: +wBase + +wMod,
+				fear_check_base: +fBase,
+				fear_check: +fBase + +fMod
+			});
 		});
 	}
 
 	// Speed
 	on("change:dexterity_base change:health_base change:basic_speed_points change:basic_speed_mod", function (e) {
-		getAttrs(["dexterity_base", "health_base", "basic_speed_points", "basic_speed_mod"], function(v) {
-			updateBasicSpeed(v);
-		});
+		updateBasicSpeed();
 	});
 	// Update Speed
-	function updateBasicSpeed(v) {
+	function updateBasicSpeed(callback) {
 		console.log('********* updateBasicSpeed *********');
-		var base = (v.dexterity_base + v.health_base) / 4 + (((v.basic_speed_points || 0) / 5 | 0) * 0.25);
-		var mod = v.basic_speed_mod || 0;
-		setAttrs({
-			basic_speed_base: +base,
-			basic_speed: +base + +mod
+		callback = callback || noop;
+		getAttrs(["dexterity_base", "health_base", "basic_speed_points", "basic_speed_mod"], function(v) {
+			var base = (v.dexterity_base + v.health_base) / 4 + (((v.basic_speed_points || 0) / 5 | 0) * 0.25);
+			var mod = v.basic_speed_mod || 0;
+			setAttrs({
+				basic_speed_base: +base,
+				basic_speed: +base + +mod
+			}, {silent: false}, callback);
 		});
 	}
 
 	// Move
 	on("change:basic_speed_base change:basic_move_points change:basic_move_mod", function (e) {
-		getAttrs(["basic_speed_base", "basic_move_points", "basic_move_mod"], function(v) {
-			updateBasicMove(v);
-		});
+		updateBasicMove();
 	});
 	// Update Move
-	function updateBasicMove(v) {
+	function updateBasicMove(callback) {
 		console.log('********* updateBasicMove *********');
-		var base = Math.floor(v.basic_speed_base) + ((v.basic_move_points || 0) / 5 | 0);
-		var mod = v.basic_move_mod || 0;
-		setAttrs({
-			basic_move_base: +base,
-			basic_move: +base + +mod
+		callback = callback || noop;
+		getAttrs(["basic_speed_base", "basic_move_points", "basic_move_mod"], function(v) {
+			var base = Math.floor(v.basic_speed_base) + ((v.basic_move_points || 0) / 5 | 0);
+			var mod = v.basic_move_mod || 0;
+			setAttrs({
+				basic_move_base: +base,
+				basic_move: +base + +mod
+			}, {silent: false}, callback);
 		});
 	}
 
 	// Dodge
 	on("change:basic_speed change:dodge_mod", function (e) {
-		getAttrs(["basic_speed", "dodge_mod"], function(v) {
-			updateDodge(v);
-		});
+		updateDodge();
 	});
 	// Update Dodge
-	function updateDodge(v) {
+	function updateDodge(callback) {
 		console.log('********* updateDodge *********');
-		var base = Math.floor(v.basic_speed) + 3;
-		var mod = v.dodge_mod || 0;
-		setAttrs({
-			dodge_base: +base,
-			dodge: +base + +mod
+		callback = callback || noop;
+		getAttrs(["basic_speed", "dodge_mod"], function(v) {
+			var base = Math.floor(v.basic_speed) + 3;
+			var mod = v.dodge_mod || 0;
+			setAttrs({
+				dodge_base: +base,
+				dodge: +base + +mod
+			}, {silent: false}, callback);
 		});
 	}
 
 	// Encumbered/injured move and dodge
 	on("change:encumbrance_level change:dodge change:basic_move change:hit_points change:fatigue_points", function (e) {
-		getAttrs(["encumbrance_level", "dodge", "basic_move", "hit_points", "hit_points_max", "fatigue_points", "fatigue_points_max", "strength_base", "strength_mod"], function(v) {
-			updateMoveDodge(v);
-		});
+		updateMoveDodge();
 	});
 	// Update encumbered/injured move and dodge
-	function updateMoveDodge(v) {
+	function updateMoveDodge() {
 		console.log('***** UPDATE MOVE/DODGE *****');
-		var dodge = v.dodge;
-		var move = v.basic_move;
-		var strength = +v.strength_base + +v.strength_mod;
-		if (v.encumbrance_level === 5) {
-			dodge = 0;
-			move = 0;
-		} else {
-			dodge = dodge - v.encumbrance_level;
-			move = Math.floor(v.basic_move * (1 - (0.2 * v.encumbrance_level)));
-			dodge = dodge < 0 ? 0 : dodge;
-			move = move < 0 ? 0 : move;
-		}
-		if (v.hit_points < v.hit_points_max / 3) {
-			dodge = Math.ceil(dodge/2);
-			move = Math.ceil(move/2);
-		}
-		if (v.fatigue_points < v.fatigue_points_max / 3 ) {
-			dodge = Math.ceil(dodge/2);
-			move = Math.ceil(move/2);
-			strength = Math.ceil(strength/2);
-		}
-		setAttrs({
-			current_move: move,
-			current_dodge: dodge,
-			strength: strength
+		getAttrs(["encumbrance_level", "dodge", "basic_move", "hit_points", "hit_points_max", "fatigue_points", "fatigue_points_max", "strength_base", "strength_mod"], function(v) {
+			var dodge = v.dodge;
+			var move = v.basic_move;
+			var strength = +v.strength_base + +v.strength_mod;
+			if (v.encumbrance_level === 5) {
+				dodge = 0;
+				move = 0;
+			} else {
+				dodge = dodge - v.encumbrance_level;
+				move = Math.floor(v.basic_move * (1 - (0.2 * v.encumbrance_level)));
+				dodge = dodge < 0 ? 0 : dodge;
+				move = move < 0 ? 0 : move;
+			}
+			if (v.hit_points < v.hit_points_max / 3) {
+				dodge = Math.ceil(dodge/2);
+				move = Math.ceil(move/2);
+			}
+			if (v.fatigue_points < v.fatigue_points_max / 3 ) {
+				dodge = Math.ceil(dodge/2);
+				move = Math.ceil(move/2);
+				strength = Math.ceil(strength/2);
+			}
+			setAttrs({
+				current_move: move,
+				current_dodge: dodge,
+				strength: strength
+			});
 		});
 	}
 
 	// Lifting ST
 	on("change:strength_base change:lift_st_points change:lift_st_mod", function (e) {
-		getAttrs(["strength_base", "lift_st_points", "lift_st_mod"], function(v) {
-			updateLift(v);
-		});
+		updateLift();
 	});
 	// Update Lift
-	function updateLift(v) {
+	function updateLift(callback) {
 		console.log('********* updateLift *********');
-		var base = v.strength_base + ((v.lift_st_points || 0) / 3 | 0);
-		var modded = +base + +v.lift_st_mod;
-		var basicLift = (modded * modded) / 5;
-		if (basicLift >= 10) {
-			basicLift = Math.round(basicLift);
-		}
-		setAttrs({
-			lift_st_base: +base,
-			lift_st: +modded,
-			basic_lift: basicLift
+		callback = callback || noop;
+		getAttrs(["strength_base", "lift_st_points", "lift_st_mod"], function(v) {
+			var base = v.strength_base + ((v.lift_st_points || 0) / 3 | 0);
+			var modded = +base + +v.lift_st_mod;
+			var basicLift = (modded * modded) / 5;
+			if (basicLift >= 10) {
+				basicLift = Math.round(basicLift);
+			}
+			setAttrs({
+				lift_st_base: +base,
+				lift_st: +modded,
+				basic_lift: basicLift
+			}, {silent: false}, callback);
 		});
 	}
 
 	// Striking ST
 	on("change:strength_base change:striking_st_points change:striking_st_mod", function (e) {
-		getAttrs(["strength_base", "striking_st_points", "striking_st_mod"], function(v) {
-			updateStrikingST(v);
-		});
+		updateStrikingST();
 	});
 	// Update Striking
-	function updateStrikingST(v) {
+	function updateStrikingST() {
 		console.log('********* updateStrikingST *********');
-		var base = v.strength_base + ((v.striking_st_points || 0) / 5 | 0);
-		var mod = v.striking_st_mod;
-		setAttrs({
-			striking_st_base: +base,
-			striking_st: +base + +mod
+		getAttrs(["strength_base", "striking_st_points", "striking_st_mod"], function(v) {
+			var base = v.strength_base + ((v.striking_st_points || 0) / 5 | 0);
+			var mod = v.striking_st_mod;
+			setAttrs({
+				striking_st_base: +base,
+				striking_st: +base + +mod
+			});
 		});
 	}
 
@@ -2760,12 +2804,7 @@
 
 	// Update the line total weight and cost
 	on("change:repeating_item:count change:repeating_item:cost change:repeating_item:carried change:repeating_item:weight", function (e) {
-		getAttrs([
-			"repeating_item_count",
-			"repeating_item_cost",
-			"repeating_item_weight",
-			"repeating_item_carried"
-		], function (item) {
+		getAttrs(["repeating_item_count", "repeating_item_cost", "repeating_item_weight", "repeating_item_carried"], function (item) {
 			setAttrs({
 				repeating_item_weighttotal: Math.round(item.repeating_item_count * item.repeating_item_weight * item.repeating_item_carried * 100) / 100,
 				repeating_item_costtotal: Math.round(item.repeating_item_count * item.repeating_item_cost * 100) / 100
@@ -2782,10 +2821,14 @@
 
 	// Get Encumbrance Level:
 	on("change:total_weight change:basic_lift", function (e) {
-		getAttrs(["basic_lift", "total_weight"], function(val) {
-			var basicLift = +val.basic_lift;
-			var encumbranceLevel = Math.floor(val.total_weight / basicLift);
-			if (encumbranceLevel > 0 && (val.total_weight % basicLift) === 0) {
+		updateEncLevel();
+	});
+	function updateEncLevel(callback) {
+		getAttrs(["basic_lift", "total_weight"], function(v) {
+			callback = callback || noop;
+			var basicLift = +v.basic_lift;
+			var encumbranceLevel = Math.floor(v.total_weight / basicLift);
+			if (encumbranceLevel > 0 && (v.total_weight % basicLift) === 0) {
 				encumbranceLevel--;
 			}
 			if (encumbranceLevel >= 10) {
@@ -2795,9 +2838,13 @@
 			} else if (encumbranceLevel >= 3) {
 				encumbranceLevel = 3;
 			}
-			setAttrs({ encumbrance_level: encumbranceLevel });
+			setAttrs(
+				{ encumbrance_level: encumbranceLevel },
+				{silent: false},
+				callback
+			);
 		});
-	});
+	}
 
 	// Update the total cost of all items.
 	on("change:repeating_item:costtotal remove:repeating_item", function (e) {
