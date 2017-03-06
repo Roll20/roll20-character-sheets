@@ -1866,12 +1866,11 @@ on('sheet:opened', function() {
 					});
 				});
 			});
-		}
-	});
-	/* Set version */
-	setAttrs({
-		version: '0.8',
-		character_sheet: 'Blades in the Dark v0.8'
+		};
+		setAttrs({
+			version: '0.8',
+			character_sheet: 'Blades in the Dark v0.8'
+		});
 	});
 });
 </script>
