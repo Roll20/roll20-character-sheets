@@ -4,6 +4,9 @@ This is a character sheet for Blades in the Dark for use on Roll20.
 
 ## Changelog
 
+### 0.9
+* Sheet-worker-based solution to displaying a row for abilities/friends/crew abilities/contacts by default
+
 ### 0.8.1
 * Added names for all roll buttons
 

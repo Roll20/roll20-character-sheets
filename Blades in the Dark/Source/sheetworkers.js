@@ -1278,7 +1278,7 @@ var actions = {
 					return _.chain(array)
 						.map(str => values[str])
 						.reduce((s,v) => s + parseInt(v||0), 0)
-						.value()
+						.value();
 				})
 				.min().value(),
 				setting = {};
@@ -1304,7 +1304,7 @@ var fillRepeatingSectionFromData = function(sectionName, dataList) {
 					return _.reduce(o, function(m,v,k) {
 						m[`repeating_${sectionName}_${rowID}_${k}`] = v;
 						return m;
-					}, {})
+					}, {});
 				})
 				.reduce(function(m,o) {
 					return _.extend(m,o);
@@ -1313,7 +1313,17 @@ var fillRepeatingSectionFromData = function(sectionName, dataList) {
 			setAttrs(setting);
 		});
 	});
-};
+},
+	emptyFirstRowIfUnnamed = function(sectionName) {
+		getSectionIDs(`repeating_${sectionName}`, function(idList) {
+			let id = idList[0];
+			getAttrs([`repeating_${sectionName}_${id}_name`], function(v) {
+				if (!v[`repeating_${sectionName}_${id}_name`]) {
+					removeRepeatingRow(`repeating_${sectionName}_${id}`);
+				};
+			});
+		});
+	};
 var factionsData = {
 		factions1: [
 			{
@@ -1634,7 +1644,7 @@ on('change:generate_factions', function(event) {
 /* GENERATE ABILITIES */
 on('change:generate_abilities', function() {
 	getAttrs(['generate_source'], function (v) {
-		let prefix, data;
+		let sectionName, dataList;
 		if (_.has(crewData, v.generate_source)) {
 			sectionName = 'crewability';
 			dataList = crewData[v.generate_source].abilities;
@@ -1642,13 +1652,14 @@ on('change:generate_abilities', function() {
 			sectionName = 'ability';
 			dataList = playbookData[v.generate_source].abilities;
 		};
+		emptyFirstRowIfUnnamed(sectionName);
 		fillRepeatingSectionFromData(sectionName, dataList);
 	});
 });
 /* GENERATE FRIENDS */
 on('change:generate_friends', function() {
 	getAttrs(['generate_source'], function (v) {
-		let prefix, data;
+		let sectionName, dataList;
 		if (_.has(crewData, v.generate_source)) {
 			sectionName = 'contact';
 			dataList = _.map(crewData[v.generate_source].contacts, function (n) {
@@ -1664,6 +1675,7 @@ on('change:generate_friends', function() {
 				};
 			});
 		};
+		emptyFirstRowIfUnnamed(sectionName);
 		fillRepeatingSectionFromData(sectionName, dataList);
 	});
 });
@@ -1724,13 +1736,13 @@ var calcCohortDots = function(t1, t2, t3, t4, imp, type, prefix) {
 	qualityEvent = _.map(qualityAttrs, str => `change:${str}`).join(' ');
 on(qualityEvent, function() {
 	getAttrs(qualityAttrs, function (attrs) {
-		setting = calcCohortDots(attrs.crew_tier1, attrs.crew_tier2, attrs.crew_tier3, attrs.crew_tier4, attrs.cohort1_impaired, attrs.cohort1_type, 'cohort1_');
+		let setting = calcCohortDots(attrs.crew_tier1, attrs.crew_tier2, attrs.crew_tier3, attrs.crew_tier4, attrs.cohort1_impaired, attrs.cohort1_type, 'cohort1_');
 		setAttrs(setting);
 	});
 });
 var repeatingQualityAttrs = ['crew_tier1', 'crew_tier2', 'crew_tier3', 'crew_tier4', 'repeating_cohort:impaired', 'repeating_cohort:type'],
 	repeatingQualityEvent = _.map(repeatingQualityAttrs, str => `change:${str}`).join(' ');
-on(repeatingQualityEvent + ' change:repeating_cohort:name', function() {
+on(repeatingQualityEvent + ' change:repeating_cohort:name change:repeating_cohort:subtype change:repeating_cohort:edges change:repeating_cohort:flaws change:repeating_cohort:description', function() {
 	getSectionIDs('repeating_cohort', function(list) {
 		list.forEach(function(id) {
 			let attrList = _.map(repeatingQualityAttrs, str => str.replace(':', '_'+id+'_'));
@@ -1826,6 +1838,12 @@ itemChecks.forEach(function(name) {
 
 /* INITIALISATION AND UPGRADES */
 on('sheet:opened', function() {
+	let initialRows = [
+		'ability',
+		'friend',
+		'crewability',
+		'contact'
+	];
 	/* Make sure sheet_type is never 0 */
 	getAttrs(['sheet_type'], function(v) {
 		if (v.sheet_type === '0' || v.sheet_type === 0) {
@@ -1834,8 +1852,17 @@ on('sheet:opened', function() {
 			});
 		}
 	});
-	/* Convert legacy status section */
+	/* Initial setup */
 	getAttrs(['version'], function(v) {
+		// Setup initial rows in repeating sections
+		if (!v.version) {
+			let setting = _.reduce(initialRows, function(memo, sectionName) {
+				memo[`repeating_${sectionName}_${generateRowID()}_dummy`] = 1;
+				return memo;
+			},{});
+			setAttrs(setting);
+		};
+		// Upgrade to 0.7: Convert legacy faction repeating section to text
 		if (v.version && v.version.split('.')[0] === '0' && parseInt(v.version.split('.')[1]) < 7) {
 			getSectionIDs('repeating_faction', function(list) {
 				let sectionList = _.union(['faction1', 'faction2'],	_.map(list, str => `repeating_faction_${str}`)),
@@ -1867,9 +1894,37 @@ on('sheet:opened', function() {
 				});
 			});
 		};
+		// Upgrade to 0.9: Convert ability/friend/crewability/contact first row
+		if (v.version && v.version.split('.')[0] === '0' && parseInt(v.version.split('.')[1]) < 9) {
+			let attrs = ['ability1_check', 'ability1_name', 'ability1_description',
+				'friend1_status', 'friend1_name',
+				'crew_ability1_check', 'crew_ability1_name', 'crew_ability1_description',
+				'contact1_check', 'contact1_name'];
+			getAttrs(attrs, function(attrValues) {
+				fillRepeatingSectionFromData('ability', [{
+					check: attrValues.ability1_check,
+					description: attrValues.ability1_description,
+					name: attrValues.ability1_name
+				}]);
+				fillRepeatingSectionFromData('friend', [{
+					name: attrValues.friend1_name,
+					status: attrValues.friend1_status
+				}]);
+				fillRepeatingSectionFromData('crewability', [{
+					check: attrValues.crew_ability1_check,
+					description: attrValues.crew_ability1_description,
+					name: attrValues.crew_ability1_name
+				}]);
+				fillRepeatingSectionFromData('contact', [{
+					check: attrValues.contact1_check,
+					name: attrValues.contact1_name
+				}]);
+			});
+		};
+		// Set version number
 		setAttrs({
-			version: '0.8',
-			character_sheet: 'Blades in the Dark v0.8'
+			version: '0.9',
+			character_sheet: 'Blades in the Dark v0.9'
 		});
 	});
 });
