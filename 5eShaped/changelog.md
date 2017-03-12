@@ -1,3 +1,15 @@
+## 10.1.5
+
+### Bug Fixes
+
+* [#372: Skill proficiency doesn't import from SRD properly](https://bitbucket.org/mlenser/5eshaped/issues/372/skill-proficiency-doesnt-import-from-srd)
+* [#365: Macro buttons in the settings throw errors if there's "" in the character name](https://bitbucket.org/mlenser/5eshaped/issues/365/macro-buttons-in-the-settings-throw-errors)
+
+### UI Adjustments
+
+* Added some left margin to passive skills. [#340: Passive Skill display enhancement](https://bitbucket.org/mlenser/5eshaped/issues/340/passive-skill-display-enhancement)
+* Reworded Advantage query to "Query (Advantage default). [#255: Advantage and Disadvantage Roll Query are reversed.](https://bitbucket.org/mlenser/5eshaped/issues/255/advantage-and-disadvantage-roll-query-are)
+
 ## 10.1.4
 
 ### Bug Fixes
