@@ -21916,7 +21916,7 @@ var _PFMigrate = __webpack_require__(6);
 
 var PFMigrate = _interopRequireWildcard(_PFMigrate);
 
-var _PFClassRaceGrid = __webpack_require__(21);
+var _PFClassRaceGrid = __webpack_require__(22);
 
 var PFClassRaceGrid = _interopRequireWildcard(_PFClassRaceGrid);
 
@@ -23545,6 +23545,688 @@ _PFLog.PFLog.modulecount++;
 
 
 Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.ifSpellClassExists = ifSpellClassExists;
+exports.updateMultiClassedCasterFlag = updateMultiClassedCasterFlag;
+exports.applyConditions = applyConditions;
+exports.setCasterClassFromDropdown = setCasterClassFromDropdown;
+exports.updateCasterFromClassLevel = updateCasterFromClassLevel;
+exports.migrate = migrate;
+exports.recalculate = recalculate;
+
+var _underscore = __webpack_require__(2);
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+var _exportsLoaderTASTheAaronSheet = __webpack_require__(1);
+
+var _exportsLoaderTASTheAaronSheet2 = _interopRequireDefault(_exportsLoaderTASTheAaronSheet);
+
+var _PFLog = __webpack_require__(0);
+
+var _PFConst = __webpack_require__(3);
+
+var _PFConst2 = _interopRequireDefault(_PFConst);
+
+var _SWUtils = __webpack_require__(4);
+
+var SWUtils = _interopRequireWildcard(_SWUtils);
+
+var _PFUtils = __webpack_require__(5);
+
+var PFUtils = _interopRequireWildcard(_PFUtils);
+
+var _PFUtilsAsync = __webpack_require__(7);
+
+var PFUtilsAsync = _interopRequireWildcard(_PFUtilsAsync);
+
+var _PFMigrate = __webpack_require__(6);
+
+var PFMigrate = _interopRequireWildcard(_PFMigrate);
+
+var _PFSpells = __webpack_require__(14);
+
+var PFSpells = _interopRequireWildcard(_PFSpells);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+//the 3 spell classes at top of spells page
+
+/**  returns whether a base spell level is filled in or not
+*@param {int} spellclassidx 0,1,2 sellcasting class
+*@param {function} callback - to call if exists
+*@param {function} noExistCallback - to call if not exists
+*/
+function ifSpellClassExists(spellclassidx, callback, noExistCallback) {
+    getAttrs(["use_spells", "spellclass-" + spellclassidx + "-exists"], function (v) {
+        try {
+            if (!parseInt(v.use_spells, 10)) {
+                if (typeof noExistCallback === "function") {
+                    noExistCallback();
+                }
+            } else if (parseInt(v["spellclass-" + spellclassidx + "-exists"], 10)) {
+                if (typeof callback === "function") {
+                    callback();
+                }
+            } else {
+                if (typeof noExistCallback === "function") {
+                    noExistCallback();
+                }
+            }
+        } catch (err) {
+            _exportsLoaderTASTheAaronSheet2.default.error("PFSpellCasterClasses.ifSpellClassExists", err);
+            if (typeof noExistCallback === "function") {
+                noExistCallback();
+            }
+        }
+    });
+}
+/**  sets {spellclasses_multiclassed} to 1 if more than one spellclass-X-exists is 1
+*@param {nothing} dummy - only here so eventhandlers can call it, since spellclass index is in this position.
+*@param {eventinfo} eventInfo  unused eventinfo from 'on' method
+*/
+function updateMultiClassedCasterFlag(dummy, eventInfo, callback) {
+    var done = _underscore2.default.once(function () {
+        _exportsLoaderTASTheAaronSheet2.default.debug("leaving updateMultiClassedCasterFlag");
+        if (typeof callback === "function") {
+            callback();
+        }
+    });
+    getAttrs(["spellclass-0-exists", "spellclass-1-exists", "spellclass-2-exists"], function (v) {
+        var multiclassed = parseInt(v["spellclasses_multiclassed"], 10) || 0,
+            setter = {};
+        if ((parseInt(v["spellclass-0-exists"], 10) || 0) + (parseInt(v["spellclass-1-exists"], 10) || 0) + (parseInt(v["spellclass-2-exists"], 10) || 0) > 1) {
+            if (!multiclassed) {
+                setter.spellclasses_multiclassed = 1;
+            }
+        } else if (multiclassed) {
+            setter.spellclasses_multiclassed = 0;
+        }
+        if (_underscore2.default.size(setter) > 0) {
+            setAttrs(setter, _PFConst2.default.silentParams, done);
+        } else {
+            done();
+        }
+    });
+}
+/** updates the ranges at the top for this spellcasting class
+*@param {int} spellclassidx 0,1,2 the spell casting tab
+*@param {eventinfo} eventInfo unused eventinfo from 'on' method
+*@param {bool} force if true update no matter if new ranges are same or not.
+*@param {function} callback - to call when done.
+*@param {bool} silently if true update with PFConst.silentParams
+*/
+function updateCasterRanges(spellclassidx, eventInfo, force, callback, silently) {
+    var done = function done() {
+        if (typeof callback === "function") {
+            callback();
+        }
+    },
+        prefix = "spellclass-" + spellclassidx,
+        lvlField = prefix + "-level-total",
+        closeField = prefix + "-close",
+        medField = prefix + "-medium",
+        longField = prefix + "-long";
+    getAttrs([lvlField, closeField, medField, longField], function (v) {
+        var level = parseInt(v[lvlField], 10) || 0,
+            closeRng = parseInt(v[closeField], 10) || 0,
+            medRng = parseInt(v[medField], 10) || 0,
+            longRng = parseInt(v[longField], 10) || 0,
+            ranges = {},
+            setter = {},
+            params = {};
+        try {
+            ranges = PFUtils.calculateSpellRanges(level);
+            if (force || ranges.close !== closeRng || ranges.medium !== medRng || ranges["long"] !== longRng) {
+                setter[closeField] = ranges.close;
+                setter[medField] = ranges.medium;
+                setter[longField] = ranges["long"];
+            }
+        } catch (err) {
+            _exportsLoaderTASTheAaronSheet2.default.error("PFSpellCasterClasses.updateCasterRanges", err);
+        } finally {
+            if (_underscore2.default.size(setter) > 0) {
+                if (silently) {
+                    params = _PFConst2.default.silentParams;
+                }
+                setAttrs(setter, params, done);
+            } else {
+                done();
+            }
+        }
+    });
+}
+/** updateConcentration - updates concentration for spellclass
+*@param {int} classidx 0,1,2 the spellclass
+*@param {eventinfo} eventInfo unused eventinfo from 'on' method
+*@param {function} callback - to call when done.
+*@param {bool} silently if true update with PFConst.silentParams
+*/
+function updateConcentration(classidx, eventInfo, callback, silently) {
+    //TAS.debug("at PFSpellCasterClasses.updateConcentration");
+    SWUtils.updateRowTotal(["Concentration-" + classidx, "spellclass-" + classidx + "-level-total", "Concentration-" + classidx + "-mod", "Concentration-" + classidx + "-misc"], 0, null, false, callback, silently);
+}
+/*********************************** SPELLS PER DAY section *************************************/
+/** updateSaveDCs - update save DCs on left  column of Spells Per Day grid
+*@param {int} classidx 0,1,2 the spellclass
+*@param {eventinfo} eventInfo unused eventinfo from 'on' method
+*@param {function} callback - to call when done.
+*@param {bool} silently if true update with PFConst.silentParams
+*/
+function updateSaveDCs(classidx, eventInfo, callback, silently) {
+    var done = _underscore2.default.once(function () {
+        if (typeof callback === "function") {
+            callback();
+        }
+    });
+    getAttrs(["Concentration-" + classidx + "-mod", "spellclass-" + classidx + "-level-0-savedc"], function (v) {
+        var mod = parseInt(v["Concentration-" + classidx + "-mod"], 10) || 0,
+            dcLvlZero = 10 + mod,
+            currDC = parseInt(v["spellclass-" + classidx + "-level-0-savedc"], 10),
+            setter = {},
+            params = {},
+            i;
+        try {
+            //if 0 is different then rest are different. if 0 is same, rest are same.
+            if (currDC !== dcLvlZero || isNaN(currDC)) {
+                setter["spellclass-" + classidx + "-level-0-savedc"] = dcLvlZero;
+                for (i = 1; i < 10; i++) {
+                    setter["spellclass-" + classidx + "-level-" + i + "-savedc"] = dcLvlZero + i;
+                }
+            }
+        } catch (err) {
+            _exportsLoaderTASTheAaronSheet2.default.error("PFSpellCasterClasses.updateSaveDCs", err);
+        } finally {
+            if (_underscore2.default.size(setter) > 0) {
+                if (silently) {
+                    params = _PFConst2.default.silentParams;
+                }
+                setAttrs(setter, params, done);
+            } else {
+                done();
+            }
+        }
+    });
+}
+/** updateBonusSpells - updates Bonus Spells for the class
+* Uses attribute, not the attribute-mod. So it does not change with ability damage or penalties.
+*@param {number} classidx 0,1,2 the spellclass
+*@param {eventinfo} eventInfo unused eventinfo from 'on' method
+*@param {function} callback - to call when done.
+*@param {bool} silently if true update with PFConst.silentParams
+*/
+function updateBonusSpells(classidx, eventInfo, callback, silently) {
+    var done = _underscore2.default.once(function () {
+        if (typeof callback === "function") {
+            callback();
+        }
+    }),
+        conAbility = "Concentration-" + classidx + "-ability";
+    getAttrs([conAbility, "INT", "WIS", "CHA", "STR", "DEX", "CON"], function (v) {
+        //eliminate the modifier, we just want @{INT} not @{INT-mod}
+        var abilityName = PFUtils.findAbilityInString(v[conAbility]).replace("-mod", ""),
+            abilityVal = parseInt(v[abilityName], 10),
+            setter = {},
+            params = {
+            silent: true
+        },
+            bonusSpells,
+            bonusName,
+            i,
+            prefix = "spellclass-" + classidx + "-level-";
+        try {
+            if (!isNaN(abilityVal)) {
+                if (abilityVal >= 12) {
+                    for (i = 1; i < 10; i++) {
+                        bonusSpells = Math.floor(Math.max(Math.floor((abilityVal - 10) / 2) + 4 - i, 0) / 4);
+                        bonusName = prefix + i + "-bonus";
+                        setter[bonusName] = bonusSpells;
+                    }
+                } else {
+                    for (i = 1; i < 10; i++) {
+                        bonusName = prefix + i + "-bonus";
+                        setter[bonusName] = 0;
+                    }
+                }
+            }
+        } catch (err) {
+            _exportsLoaderTASTheAaronSheet2.default.error("PFSpellCasterClasses.updateBonusSpells", err);
+        } finally {
+            if (_underscore2.default.size(setter) > 0) {
+                setAttrs(setter, params, done);
+            } else {
+                done();
+            }
+        }
+    });
+}
+/* updateMaxSpellsPerDay */
+function updateMaxSpellsPerDay(classidx, spelllvl, callback, silently) {
+    var done = _underscore2.default.once(function () {
+        if (typeof callback === "function") {
+            callback();
+        }
+    });
+    getAttrs(["spellclass-" + classidx + "-level-" + spelllvl + "-spells-per-day_max", "spellclass-" + classidx + "-level-" + spelllvl + "-class", "spellclass-" + classidx + "-level-" + spelllvl + "-bonus", "spellclass-" + classidx + "-level-" + spelllvl + "-misc"], function (v) {
+        var newCount = 0,
+            base = 0,
+            rest = 0,
+            total = 0,
+            curr = 0,
+            setter = {};
+        base = parseInt(v["spellclass-" + classidx + "-level-" + spelllvl + "-class"], 10);
+        curr = parseInt(v["spellclass-" + classidx + "-level-" + spelllvl + "-spells-per-day_max"], 10) || 0;
+        if (isNaN(base)) {
+            newCount = 0;
+        } else {
+            rest = (parseInt(v["spellclass-" + classidx + "-level-" + spelllvl + "-bonus"], 10) || 0) + (parseInt(v["spellclass-" + classidx + "-level-" + spelllvl + "-misc"], 10) || 0);
+            newCount = base + rest;
+        }
+        if (newCount !== curr) {
+            setter["spellclass-" + classidx + "-level-" + spelllvl + "-spells-per-day_max"] = newCount;
+            setAttrs(setter, {}, done);
+        } else {
+            done();
+        }
+    });
+    //SWUtils.updateRowTotal(["spellclass-" + classidx + "-level-" + spelllvl + "-spells-per-day_max", "spellclass-" + classidx + "-level-" + spelllvl + "-class", "spellclass-" + classidx + "-level-" + spelllvl + "-bonus", "spellclass-" + classidx + "-level-" + spelllvl + "-misc"], 0, [], false, callback, silently);
+}
+/**  applyConditions - for condition deafened update {SpellFailureNote} on DEFENSE PAGE
+* note drain should have already been applied
+*@param {function} callback - to call when done.
+*@param {bool} silently if true update with PFConst.silentParams
+*/
+function applyConditions(callback, silently) {
+    var done = _underscore2.default.once(function () {
+        if (typeof callback === "function") {
+            callback();
+        }
+    });
+    //TAS.debug("at PFSpellCasterClasses.applyConditions");
+    getAttrs(["condition-Deafened", "SpellFailureNote"], function (v) {
+        var setter = {},
+            params = {};
+        try {
+            if (parseInt(v["condition-Deafened"], 10) === 4) {
+                if (!v["SpellFailureNote"]) {
+                    setter["SpellFailureNote"] = "Yes";
+                }
+            } else {
+                if (v["SpellFailureNote"]) {
+                    setter["SpellFailureNote"] = "";
+                }
+            }
+        } catch (err) {
+            _exportsLoaderTASTheAaronSheet2.default.error("PFSpellCasterClasses.applyConditions", err);
+        } finally {
+            if (_underscore2.default.size(setter) > 0) {
+                if (silently) {
+                    params = _PFConst2.default.silentParams;
+                }
+                setAttrs(setter, params, done);
+            } else {
+                done();
+            }
+        }
+    });
+}
+function recalcOneClass(spellClassIdx, callback, silently) {
+    var done = _underscore2.default.once(function () {
+        _exportsLoaderTASTheAaronSheet2.default.debug("leaving PFSpells.recalculate.recalcOneClass");
+        if (typeof callback === "function") {
+            callback();
+        }
+    }),
+        doneOne = _underscore2.default.after(4, done);
+    //TAS.debug("at PFSpellCasterClasses.recalcOneClass");
+    _underscore2.default.times(10, function (spelllvl) {
+        updateMaxSpellsPerDay(spellClassIdx, spelllvl);
+    });
+
+    updateConcentration(spellClassIdx, null, doneOne, silently);
+    updateSaveDCs(spellClassIdx, null, doneOne, silently);
+    updateCasterRanges(spellClassIdx, null, true, doneOne, silently);
+    updateBonusSpells(spellClassIdx, null, doneOne, silently);
+}
+/** updates {spellclass-X-level-total}, sets minimum of 1 if {spellclass-X-level} is > 0
+*@param {int} spellclassidx 0,1,2 the spell casting tab
+*@param {eventInfo} eventInfo unused eventinfo from 'on' method
+*@param {int} classlevel optional override for class level, use this if you know it and sheet attribute might not be updated yet.
+*@param {function} callback - to call when done.
+*@param {bool} silently if true update with PFConst.silentParams
+*/
+function updateCasterLevel(spellclassidx, eventInfo, classlevel, callback, silently) {
+    var done = _underscore2.default.once(function () {
+        _exportsLoaderTASTheAaronSheet2.default.debug("leaving updateCasterLevel " + spellclassidx);
+        if (typeof callback === "function") {
+            callback();
+        }
+    });
+    getAttrs(["spellclass-" + spellclassidx + "-level", "spellclass-" + spellclassidx + "-level-total", "spellclass-" + spellclassidx + "-level-misc", "buff_CasterLevel-total", "CasterLevel-Penalty", "spellclass-" + spellclassidx + "-exists"], function (v) {
+        var baseLevel = classlevel || parseInt(v["spellclass-" + spellclassidx + "-level"], 10) || 0,
+            totalLevel = parseInt(v["spellclass-" + spellclassidx + "-level-total"], 10) || 0,
+            spellClassExists = parseInt(v["spellclass-" + spellclassidx + "-exists"], 10) || 0,
+            casterlevel = 0,
+            setter = {},
+            recalcAfter = 0,
+            params = {};
+        try {
+            casterlevel = baseLevel + (parseInt(v["spellclass-" + spellclassidx + "-level-misc"], 10) || 0) + (parseInt(v["buff_CasterLevel-total"], 10) || 0) + (parseInt(v["CasterLevel-Penalty"], 10) || 0);
+            //if has spells then minimum level is 1 no matter what minuses apply
+            if (casterlevel <= 0) {
+                if (baseLevel > 0) {
+                    casterlevel = 1;
+                } else {
+                    casterlevel = 0;
+                }
+            }
+            if (casterlevel !== totalLevel) {
+                setter["spellclass-" + spellclassidx + "-level-total"] = casterlevel;
+                if (totalLevel === 0 && eventInfo) {
+                    recalcAfter = 1;
+                }
+            }
+            if (baseLevel > 0) {
+                if (spellClassExists === 0) {
+                    setter["spellclass-" + spellclassidx + "-exists"] = "1";
+                    recalcAfter = 1;
+                }
+            } else if (spellClassExists === 1) {
+                setter["spellclass-" + spellclassidx + "-exists"] = "0";
+            }
+        } catch (err) {
+            _exportsLoaderTASTheAaronSheet2.default.error("PFSpellCasterClasses.updateCasterLevel", err);
+        } finally {
+            if (_underscore2.default.size(setter) > 0) {
+                if (silently) {
+                    params = _PFConst2.default.silentParams;
+                }
+                setAttrs(setter, params, function () {
+                    if (recalcAfter) {
+                        recalcOneClass(spellclassidx, done, silently);
+                    } else {
+                        done();
+                    }
+                });
+            } else {
+                done();
+            }
+        }
+    });
+}
+/** updates all 3 caster class levels, usually due to change in buffs or debuffs 
+*@param {nothing} dummy - only here so eventhandlers can call it, since spellclass index is in this position.
+*@param {eventinfo} eventInfo unused eventinfo from 'on' method
+*@param {function} callback - to call when done.
+*@param {bool} silently if true update with PFConst.silentParams
+*/
+function updateCasterLevels(dummy, eventInfo, callback, silently) {
+    updateCasterLevel(0, eventInfo, 0, callback, silently);
+    updateCasterLevel(1, eventInfo, 0, callback, silently);
+    updateCasterLevel(2, eventInfo, 0, callback, silently);
+}
+/** sets {spellclass-X-name} and {spellclass-X-level} from the class dropdown {spellclass-X}
+* called when the class dropdown is changed.
+*@param {int} spellclassidx 0,1,2 the spell casting tab
+*@param {eventinfo} eventInfo unused eventinfo from 'on' method
+*@param {function} callback - to call when done.
+*@param {bool} silently if true update with PFConst.silentParams
+*/
+function setCasterClassFromDropdown(spellclassidx, eventInfo, callback, silently) {
+    var done = _underscore2.default.once(function () {
+        if (typeof callback === "function") {
+            callback();
+        }
+    }),
+        spellclassdropdown = "spellclass-" + spellclassidx,
+        spellclasslevel = "spellclass-" + spellclassidx + "-level";
+    getAttrs([spellclassdropdown, spellclasslevel], function (va) {
+        var classidx = parseInt(va[spellclassdropdown], 10),
+            currClassLevel = parseInt(va[spellclasslevel], 10),
+            spellclassname,
+            classname,
+            classlevel;
+        try {
+            if (isNaN(classidx) || !va[spellclassdropdown] || parseInt(va[spellclassdropdown], 10) === -1) {
+                done();
+                return;
+            }
+            spellclassname = "spellclass-" + spellclassidx + "-name";
+            classname = "class-" + classidx + "-name";
+            classlevel = "class-" + classidx + "-level";
+            //if race indicated: use race and HD
+            if (classidx === 6) {
+                classname = "race";
+                classlevel = "npc-hd-num";
+            }
+            getAttrs([classname, classlevel, spellclassname], function (v) {
+                var setter = {},
+                    setAny = 0,
+                    updateLevel = 0,
+                    newClassLevel = parseInt(v[classlevel], 10) || 0;
+                try {
+                    if (currClassLevel !== newClassLevel || isNaN(currClassLevel)) {
+                        setter[spellclasslevel] = newClassLevel;
+                        updateLevel = 1;
+                    }
+                    if (v[classname] && v[classname] !== v[spellclassname]) {
+                        setter[spellclassname] = v[classname];
+                    }
+                } catch (err) {
+                    _exportsLoaderTASTheAaronSheet2.default.error("PFSpellCasterClasses.setCasterClassFromDropdown", err);
+                } finally {
+                    if (_underscore2.default.size(setter) > 0) {
+                        setAttrs(setter, {
+                            silent: true
+                        }, done);
+                        if (updateLevel) {
+                            updateCasterLevel(spellclassidx, eventInfo, newClassLevel);
+                        }
+                    } else {
+                        done();
+                    }
+                }
+            });
+        } catch (errOuter) {
+            _exportsLoaderTASTheAaronSheet2.default.error("PFSpellCasterClasses.setCasterClassFromDropdown outer", errOuter);
+            done();
+        }
+    });
+}
+/** update level on SPELL page when updated on CLASS page, but not vice versa
+*@param {int} classidx 0..6 the row on the CLASS GRID starting with 0 to grab level from, or 6 if {npc-hd-num}
+*@param {eventinfo} eventInfo unused eventinfo from 'on' method
+*@param {bool} force if true update no matter if new ranges are same or not.
+*@param {function} callback - to call when done.
+*@param {bool} silently if true update with PFConst.silentParams
+*/
+function updateCasterFromClassLevel(classidx, eventInfo, force, callback, silently) {
+    var done = _underscore2.default.once(function () {
+        if (typeof callback === "function") {
+            callback();
+        }
+    }),
+        spellclassdropdown0 = "spellclass-0",
+        spellclassdropdown1 = "spellclass-1",
+        spellclassdropdown2 = "spellclass-2";
+    if (classidx === "npc-hd-num") {
+        classidx = 6;
+    } else {
+        classidx = parseInt(classidx, 10) || 0;
+    }
+    getAttrs([spellclassdropdown0, spellclassdropdown1, spellclassdropdown2], function (va) {
+        var spellclassidx, spellclasslevelField, classlevelField, prefix, classNameField;
+        if (parseInt(va[spellclassdropdown0], 10) === classidx) {
+            spellclassidx = 0;
+        } else if (parseInt(va[spellclassdropdown1], 10) === classidx) {
+            spellclassidx = 1;
+        } else if (parseInt(va[spellclassdropdown2], 10) === classidx) {
+            spellclassidx = 2;
+        } else {
+            return;
+        }
+        prefix = "spellclass-" + spellclassidx;
+        spellclasslevelField = prefix + "-level";
+        classlevelField = "class-" + classidx + "-level";
+        classNameField = "class-" + classidx + "-name";
+        getAttrs([spellclasslevelField, classlevelField, classNameField], function (v) {
+            var setter = {},
+                newCasterLevel = parseInt(v[classlevelField], 10) || 0,
+                currCasterLevel = parseInt(v[spellclasslevelField], 10);
+            if (newCasterLevel !== currCasterLevel || isNaN(currCasterLevel) || force) {
+                setter[spellclasslevelField] = newCasterLevel;
+                setter[prefix + "-name"] = v[classNameField];
+                setAttrs(setter, {
+                    silent: true
+                });
+                updateCasterLevel(classidx, eventInfo, newCasterLevel);
+            }
+        });
+    });
+}
+function migrate(callback, oldversion) {
+    //TAS.debug("At PFSpellCasterClasses.migrate");
+    PFMigrate.migrateUsesSpellFlag(callback);
+}
+function recalculate(callback, silently, oldversion) {
+    var done = _underscore2.default.once(function () {
+        _exportsLoaderTASTheAaronSheet2.default.info("leaving PFSpellCasterClasses.recalculate");
+        if (typeof callback === "function") {
+            callback();
+        }
+    }),
+        recalcTopSection = function recalcTopSection(callback, silently) {
+        var done = _underscore2.default.once(function () {
+            _exportsLoaderTASTheAaronSheet2.default.debug("leaving PFSpellCasterClasses.recalculate.recalcTopSection");
+            if (typeof callback === "function") {
+                callback();
+            }
+        }),
+            doneOne = _underscore2.default.after(3, done);
+        //TAS.debug("at PFSpellCasterClasses.recalculate.recalcTopSection");
+        _underscore2.default.each(_PFConst2.default.spellClassIndexes, function (spellClassIdx) {
+            try {
+                setCasterClassFromDropdown(spellClassIdx, null, function () {
+                    updateCasterLevel(spellClassIdx, null, 0, function () {
+                        ifSpellClassExists(spellClassIdx, function () {
+                            recalcOneClass(spellClassIdx, doneOne, silently);
+                        }, doneOne);
+                    }, silently);
+                }, silently);
+            } catch (err) {
+                _exportsLoaderTASTheAaronSheet2.default.error("PFSpellCasterClasses.recalculate_recalcTopSection", err);
+                doneOne();
+            }
+        });
+    },
+        finishAndLeave = _underscore2.default.once(function () {
+        updateMultiClassedCasterFlag(null, null, function () {
+            PFSpells.recalculate(done, silently, oldversion);
+        });
+    }),
+        callTopSection = _underscore2.default.once(function () {
+        recalcTopSection(finishAndLeave, silently);
+    }),
+        callApplyConditions = _underscore2.default.once(function () {
+        applyConditions(callTopSection, silently);
+    });
+    migrate(function () {
+        callApplyConditions();
+    }, oldversion);
+}
+var events = {
+    // events for updates to top of class page, each one calls isSpellClassExists
+    spellcastingClassEventsAuto: {
+        "change:concentration-REPLACE-mod": [updateBonusSpells, updateSaveDCs, updateConcentration, PFSpells.updateSpellsCasterAbilityRelated],
+        "change:spellclass-REPLACE-level-total": [updateConcentration, updateCasterRanges, PFSpells.updateSpellsCasterLevelRelated],
+        "change:spellclass-REPLACE-SP-mod": [PFSpells.updateSpellsCasterLevelRelated]
+    },
+    spellcastingClassEventsPlayer: {
+        "change:concentration-REPLACE-misc": [updateConcentration, PFSpells.updateSpellsCasterLevelRelated],
+        "change:concentration-REPLACE-def": [PFSpells.updateSpellsCasterLevelRelated]
+    },
+    // events for updates to top of class page even if no spellcasting class exists
+    spellcastingClassEventsIgnoreLevel: {
+        "change:spellclass-REPLACE-level-misc": [updateCasterLevel],
+        "change:spellclass-REPLACE": [setCasterClassFromDropdown],
+        "change:spellclass-REPLACE-level": [updateCasterLevel, updateMultiClassedCasterFlag],
+        "change:buff_CasterLevel-total change:condition-Drained change:CasterLevel-Penalty": [updateCasterLevels]
+    },
+    //events for updateBonusSpells section CLASSIDX is the 0-2 classes, SPELLLEVEL is 0-9
+    spellcastingClassEventsPerSpellLevel: "change:spellclass-CLASSIDX-level-SPELLLEVEL-class change:spellclass-CLASSIDX-level-SPELLLEVEL-bonus change:spellclass-CLASSIDX-level-SPELLLEVEL-misc"
+};
+function registerEventHandlers() {
+    //spellclass section (3 tabs at top of spell page)
+    _underscore2.default.each(_PFConst2.default.spellClassIndexes, function (spellClassIdx) {
+        var numberIdx = parseInt(spellClassIdx, 10) || 0;
+        on("change:Concentration-" + numberIdx + "-ability", _exportsLoaderTASTheAaronSheet2.default.callback(function eventChangeSpellDropdown(eventInfo) {
+            _exportsLoaderTASTheAaronSheet2.default.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+            PFUtilsAsync.setDropdownValue("Concentration-" + numberIdx + "-ability", "Concentration-" + numberIdx + "-mod");
+        }));
+        _underscore2.default.each(events.spellcastingClassEventsPlayer, function (functions, event) {
+            var eventToWatch = event.replace(/REPLACE/g, numberIdx);
+            _underscore2.default.each(functions, function (methodToCall) {
+                on(eventToWatch, _exportsLoaderTASTheAaronSheet2.default.callback(function eventSpellcasterClassSpecificUpdatePlayerOnly(eventInfo) {
+                    if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
+                        _exportsLoaderTASTheAaronSheet2.default.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+                        ifSpellClassExists(numberIdx, function () {
+                            methodToCall(numberIdx, eventInfo);
+                        });
+                    }
+                }));
+            });
+        });
+        _underscore2.default.each(events.spellcastingClassEventsAuto, function (functions, event) {
+            var eventToWatch = event.replace(/REPLACE/g, numberIdx);
+            _underscore2.default.each(functions, function (methodToCall) {
+                on(eventToWatch, _exportsLoaderTASTheAaronSheet2.default.callback(function eventSpellcasterClassSpecificUpdateAuto(eventInfo) {
+                    if (eventInfo.sourceType === "sheetworker") {
+                        _exportsLoaderTASTheAaronSheet2.default.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+                        ifSpellClassExists(numberIdx, function () {
+                            methodToCall(numberIdx, eventInfo);
+                        });
+                    }
+                }));
+            });
+        });
+        //ignore level means do not call "ifSpellClassExists" first
+        _underscore2.default.each(events.spellcastingClassEventsIgnoreLevel, function (functions, event) {
+            var eventToWatch = event.replace(/REPLACE/g, numberIdx);
+            _underscore2.default.each(functions, function (methodToCall) {
+                on(eventToWatch, _exportsLoaderTASTheAaronSheet2.default.callback(function eventSpellcasterClassUpdate(eventInfo) {
+                    _exportsLoaderTASTheAaronSheet2.default.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+                    methodToCall(numberIdx, eventInfo);
+                }));
+            });
+        });
+        //spells per day
+        _underscore2.default.each(PFSpells.spellLevels, function (spellLevel) {
+            var spellNumber = parseInt(spellLevel, 10),
+                eventToWatch = events.spellcastingClassEventsPerSpellLevel.replace(/CLASSIDX/g, numberIdx).replace(/SPELLLEVEL/g, spellNumber);
+            on(eventToWatch, _exportsLoaderTASTheAaronSheet2.default.callback(function eventSpellsPerDay(eventInfo) {
+                _exportsLoaderTASTheAaronSheet2.default.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
+                ifSpellClassExists(numberIdx, function () {
+                    updateMaxSpellsPerDay(numberIdx, spellNumber);
+                });
+            }));
+        });
+    }); //end of spell classes
+}
+registerEventHandlers();
+_PFLog.PFConsole.log('PFSpellCasterClasses module loaded');
+_PFLog.PFLog.modulecount++;
+
+/***/ }),
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 exports.resetCommandMacro = resetCommandMacro;
@@ -23590,7 +24272,7 @@ var _PFMenus = __webpack_require__(13);
 
 var PFMenus = _interopRequireWildcard(_PFMenus);
 
-var _PFDB = __webpack_require__(22);
+var _PFDB = __webpack_require__(23);
 
 var PFDB = _interopRequireWildcard(_PFDB);
 
@@ -23602,7 +24284,7 @@ var _PFAttackGrid = __webpack_require__(8);
 
 var PFAttackGrid = _interopRequireWildcard(_PFAttackGrid);
 
-var _PFFeatures = __webpack_require__(24);
+var _PFFeatures = __webpack_require__(25);
 
 var PFFeatures = _interopRequireWildcard(_PFFeatures);
 
@@ -24607,7 +25289,7 @@ _PFLog.PFConsole.log('   PFAbility module loaded        ');
 _PFLog.PFLog.modulecount++;
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -25015,7 +25697,7 @@ _PFLog.PFConsole.log('   PFBuffs module loaded          ');
 _PFLog.PFLog.modulecount++;
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -25055,6 +25737,10 @@ var PFUtils = _interopRequireWildcard(_PFUtils);
 var _PFSpells = __webpack_require__(14);
 
 var PFSpells = _interopRequireWildcard(_PFSpells);
+
+var _PFSpellCasterClasses = __webpack_require__(19);
+
+var PFSpellCasterClasses = _interopRequireWildcard(_PFSpellCasterClasses);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -25369,7 +26055,7 @@ function registerEventHandlers() {
                 //can we move this to spells? or keep here
                 //or do we even need to do it, isn't roll20 handling?
                 if (/level/i.test(eventInfo.sourceAttribute)) {
-                    PFSpells.updateCasterFromClassLevel(parseInt(row, 10), eventInfo);
+                    PFSpellCasterClasses.updateCasterFromClassLevel(parseInt(row, 10), eventInfo);
                 }
             }
         }));
@@ -25379,7 +26065,7 @@ function registerEventHandlers() {
         if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
             autoCalcClassHpGrid(null, null, eventInfo);
             if (eventInfo.sourceAttribute === "npc-hd-num") {
-                PFSpells.updateCasterFromClassLevel(6, eventInfo);
+                PFSpellCasterClasses.updateCasterFromClassLevel(6, eventInfo);
             }
         }
     }));
@@ -25395,7 +26081,7 @@ _PFLog.PFConsole.log('   PFClassRaceGrid module loaded  ');
 _PFLog.PFLog.modulecount++;
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -25480,7 +26166,7 @@ exports.default = {
 };
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26083,7 +26769,7 @@ _PFLog.PFConsole.log('   PFEncumbrance module loaded    ');
 _PFLog.PFLog.modulecount++;
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26573,7 +27259,7 @@ _PFLog.PFConsole.log('   PFFeatures module loaded       ');
 _PFLog.PFLog.modulecount++;
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26658,7 +27344,7 @@ _PFLog.PFConsole.log('   PFInitiative module loaded     ');
 _PFLog.PFLog.modulecount++;
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28483,7 +29169,7 @@ _PFLog.PFConsole.log('   PFInventory module loaded      ');
 _PFLog.PFLog.modulecount++;
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -28526,7 +29212,7 @@ var _PFMigrate = __webpack_require__(6);
 
 var PFMigrate = _interopRequireWildcard(_PFMigrate);
 
-var _PFEncumbrance = __webpack_require__(23);
+var _PFEncumbrance = __webpack_require__(24);
 
 var PFEncumbrance = _interopRequireWildcard(_PFEncumbrance);
 
@@ -28845,686 +29531,6 @@ _PFLog.PFConsole.log('   PFSize module loaded           ');
 _PFLog.PFLog.modulecount++;
 
 /***/ }),
-/* 28 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.ifSpellClassExists = ifSpellClassExists;
-exports.updateMultiClassedCasterFlag = updateMultiClassedCasterFlag;
-exports.applyConditions = applyConditions;
-exports.migrate = migrate;
-exports.recalculate = recalculate;
-
-var _underscore = __webpack_require__(2);
-
-var _underscore2 = _interopRequireDefault(_underscore);
-
-var _exportsLoaderTASTheAaronSheet = __webpack_require__(1);
-
-var _exportsLoaderTASTheAaronSheet2 = _interopRequireDefault(_exportsLoaderTASTheAaronSheet);
-
-var _PFLog = __webpack_require__(0);
-
-var _PFConst = __webpack_require__(3);
-
-var _PFConst2 = _interopRequireDefault(_PFConst);
-
-var _SWUtils = __webpack_require__(4);
-
-var SWUtils = _interopRequireWildcard(_SWUtils);
-
-var _PFUtils = __webpack_require__(5);
-
-var PFUtils = _interopRequireWildcard(_PFUtils);
-
-var _PFUtilsAsync = __webpack_require__(7);
-
-var PFUtilsAsync = _interopRequireWildcard(_PFUtilsAsync);
-
-var _PFMigrate = __webpack_require__(6);
-
-var PFMigrate = _interopRequireWildcard(_PFMigrate);
-
-var _PFSpells = __webpack_require__(14);
-
-var PFSpells = _interopRequireWildcard(_PFSpells);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-//the 3 spell classes at top of spells page
-
-/**  returns whether a base spell level is filled in or not
-*@param {int} spellclassidx 0,1,2 sellcasting class
-*@param {function} callback - to call if exists
-*@param {function} noExistCallback - to call if not exists
-*/
-function ifSpellClassExists(spellclassidx, callback, noExistCallback) {
-    getAttrs(["use_spells", "spellclass-" + spellclassidx + "-exists"], function (v) {
-        try {
-            if (!parseInt(v.use_spells, 10)) {
-                if (typeof noExistCallback === "function") {
-                    noExistCallback();
-                }
-            } else if (parseInt(v["spellclass-" + spellclassidx + "-exists"], 10)) {
-                if (typeof callback === "function") {
-                    callback();
-                }
-            } else {
-                if (typeof noExistCallback === "function") {
-                    noExistCallback();
-                }
-            }
-        } catch (err) {
-            _exportsLoaderTASTheAaronSheet2.default.error("PFSpellCasterClasses.ifSpellClassExists", err);
-            if (typeof noExistCallback === "function") {
-                noExistCallback();
-            }
-        }
-    });
-}
-/**  sets {spellclasses_multiclassed} to 1 if more than one spellclass-X-exists is 1
-*@param {nothing} dummy - only here so eventhandlers can call it, since spellclass index is in this position.
-*@param {eventinfo} eventInfo  unused eventinfo from 'on' method
-*/
-function updateMultiClassedCasterFlag(dummy, eventInfo, callback) {
-    var done = _underscore2.default.once(function () {
-        _exportsLoaderTASTheAaronSheet2.default.debug("leaving updateMultiClassedCasterFlag");
-        if (typeof callback === "function") {
-            callback();
-        }
-    });
-    getAttrs(["spellclass-0-exists", "spellclass-1-exists", "spellclass-2-exists"], function (v) {
-        var multiclassed = parseInt(v["spellclasses_multiclassed"], 10) || 0,
-            setter = {};
-        if ((parseInt(v["spellclass-0-exists"], 10) || 0) + (parseInt(v["spellclass-1-exists"], 10) || 0) + (parseInt(v["spellclass-2-exists"], 10) || 0) > 1) {
-            if (!multiclassed) {
-                setter.spellclasses_multiclassed = 1;
-            }
-        } else if (multiclassed) {
-            setter.spellclasses_multiclassed = 0;
-        }
-        if (_underscore2.default.size(setter) > 0) {
-            setAttrs(setter, _PFConst2.default.silentParams, done);
-        } else {
-            done();
-        }
-    });
-}
-/** updates the ranges at the top for this spellcasting class
-*@param {int} spellclassidx 0,1,2 the spell casting tab
-*@param {eventinfo} eventInfo unused eventinfo from 'on' method
-*@param {bool} force if true update no matter if new ranges are same or not.
-*@param {function} callback - to call when done.
-*@param {bool} silently if true update with PFConst.silentParams
-*/
-function updateCasterRanges(spellclassidx, eventInfo, force, callback, silently) {
-    var done = function done() {
-        if (typeof callback === "function") {
-            callback();
-        }
-    },
-        prefix = "spellclass-" + spellclassidx,
-        lvlField = prefix + "-level-total",
-        closeField = prefix + "-close",
-        medField = prefix + "-medium",
-        longField = prefix + "-long";
-    getAttrs([lvlField, closeField, medField, longField], function (v) {
-        var level = parseInt(v[lvlField], 10) || 0,
-            closeRng = parseInt(v[closeField], 10) || 0,
-            medRng = parseInt(v[medField], 10) || 0,
-            longRng = parseInt(v[longField], 10) || 0,
-            ranges = {},
-            setter = {},
-            params = {};
-        try {
-            ranges = PFUtils.calculateSpellRanges(level);
-            if (force || ranges.close !== closeRng || ranges.medium !== medRng || ranges["long"] !== longRng) {
-                setter[closeField] = ranges.close;
-                setter[medField] = ranges.medium;
-                setter[longField] = ranges["long"];
-            }
-        } catch (err) {
-            _exportsLoaderTASTheAaronSheet2.default.error("PFSpellCasterClasses.updateCasterRanges", err);
-        } finally {
-            if (_underscore2.default.size(setter) > 0) {
-                if (silently) {
-                    params = _PFConst2.default.silentParams;
-                }
-                setAttrs(setter, params, done);
-            } else {
-                done();
-            }
-        }
-    });
-}
-/** updateConcentration - updates concentration for spellclass
-*@param {int} classidx 0,1,2 the spellclass
-*@param {eventinfo} eventInfo unused eventinfo from 'on' method
-*@param {function} callback - to call when done.
-*@param {bool} silently if true update with PFConst.silentParams
-*/
-function updateConcentration(classidx, eventInfo, callback, silently) {
-    //TAS.debug("at PFSpellCasterClasses.updateConcentration");
-    SWUtils.updateRowTotal(["Concentration-" + classidx, "spellclass-" + classidx + "-level-total", "Concentration-" + classidx + "-mod", "Concentration-" + classidx + "-misc"], 0, null, false, callback, silently);
-}
-/*********************************** SPELLS PER DAY section *************************************/
-/** updateSaveDCs - update save DCs on left  column of Spells Per Day grid
-*@param {int} classidx 0,1,2 the spellclass
-*@param {eventinfo} eventInfo unused eventinfo from 'on' method
-*@param {function} callback - to call when done.
-*@param {bool} silently if true update with PFConst.silentParams
-*/
-function updateSaveDCs(classidx, eventInfo, callback, silently) {
-    var done = _underscore2.default.once(function () {
-        if (typeof callback === "function") {
-            callback();
-        }
-    });
-    getAttrs(["Concentration-" + classidx + "-mod", "spellclass-" + classidx + "-level-0-savedc"], function (v) {
-        var mod = parseInt(v["Concentration-" + classidx + "-mod"], 10) || 0,
-            dcLvlZero = 10 + mod,
-            currDC = parseInt(v["spellclass-" + classidx + "-level-0-savedc"], 10),
-            setter = {},
-            params = {},
-            i;
-        try {
-            //if 0 is different then rest are different. if 0 is same, rest are same.
-            if (currDC !== dcLvlZero || isNaN(currDC)) {
-                setter["spellclass-" + classidx + "-level-0-savedc"] = dcLvlZero;
-                for (i = 1; i < 10; i++) {
-                    setter["spellclass-" + classidx + "-level-" + i + "-savedc"] = dcLvlZero + i;
-                }
-            }
-        } catch (err) {
-            _exportsLoaderTASTheAaronSheet2.default.error("PFSpellCasterClasses.updateSaveDCs", err);
-        } finally {
-            if (_underscore2.default.size(setter) > 0) {
-                if (silently) {
-                    params = _PFConst2.default.silentParams;
-                }
-                setAttrs(setter, params, done);
-            } else {
-                done();
-            }
-        }
-    });
-}
-/** updateBonusSpells - updates Bonus Spells for the class
-* Uses attribute, not the attribute-mod. So it does not change with ability damage or penalties.
-*@param {number} classidx 0,1,2 the spellclass
-*@param {eventinfo} eventInfo unused eventinfo from 'on' method
-*@param {function} callback - to call when done.
-*@param {bool} silently if true update with PFConst.silentParams
-*/
-function updateBonusSpells(classidx, eventInfo, callback, silently) {
-    var done = _underscore2.default.once(function () {
-        if (typeof callback === "function") {
-            callback();
-        }
-    }),
-        conAbility = "Concentration-" + classidx + "-ability";
-    getAttrs([conAbility, "INT", "WIS", "CHA", "STR", "DEX", "CON"], function (v) {
-        //eliminate the modifier, we just want @{INT} not @{INT-mod}
-        var abilityName = PFUtils.findAbilityInString(v[conAbility]).replace("-mod", ""),
-            abilityVal = parseInt(v[abilityName], 10),
-            setter = {},
-            params = {
-            silent: true
-        },
-            bonusSpells,
-            bonusName,
-            i,
-            prefix = "spellclass-" + classidx + "-level-";
-        try {
-            if (!isNaN(abilityVal)) {
-                if (abilityVal >= 12) {
-                    for (i = 1; i < 10; i++) {
-                        bonusSpells = Math.floor(Math.max(Math.floor((abilityVal - 10) / 2) + 4 - i, 0) / 4);
-                        bonusName = prefix + i + "-bonus";
-                        setter[bonusName] = bonusSpells;
-                    }
-                } else {
-                    for (i = 1; i < 10; i++) {
-                        bonusName = prefix + i + "-bonus";
-                        setter[bonusName] = 0;
-                    }
-                }
-            }
-        } catch (err) {
-            _exportsLoaderTASTheAaronSheet2.default.error("PFSpellCasterClasses.updateBonusSpells", err);
-        } finally {
-            if (_underscore2.default.size(setter) > 0) {
-                setAttrs(setter, params, done);
-            } else {
-                done();
-            }
-        }
-    });
-}
-/* updateMaxSpellsPerDay */
-function updateMaxSpellsPerDay(classidx, spelllvl, callback, silently) {
-    var done = _underscore2.default.once(function () {
-        if (typeof callback === "function") {
-            callback();
-        }
-    });
-    getAttrs(["spellclass-" + classidx + "-level-" + spelllvl + "-spells-per-day_max", "spellclass-" + classidx + "-level-" + spelllvl + "-class", "spellclass-" + classidx + "-level-" + spelllvl + "-bonus", "spellclass-" + classidx + "-level-" + spelllvl + "-misc"], function (v) {
-        var newCount = 0,
-            base = 0,
-            rest = 0,
-            total = 0,
-            curr = 0,
-            setter = {};
-        base = parseInt(v["spellclass-" + classidx + "-level-" + spelllvl + "-class"], 10);
-        curr = parseInt(v["spellclass-" + classidx + "-level-" + spelllvl + "-spells-per-day_max"], 10) || 0;
-        if (isNaN(base)) {
-            newCount = 0;
-        } else {
-            rest = (parseInt(v["spellclass-" + classidx + "-level-" + spelllvl + "-bonus"], 10) || 0) + (parseInt(v["spellclass-" + classidx + "-level-" + spelllvl + "-misc"], 10) || 0);
-            newCount = base + rest;
-        }
-        if (newCount !== curr) {
-            setter["spellclass-" + classidx + "-level-" + spelllvl + "-spells-per-day_max"] = newCount;
-            setAttrs(setter, {}, done);
-        } else {
-            done();
-        }
-    });
-    //SWUtils.updateRowTotal(["spellclass-" + classidx + "-level-" + spelllvl + "-spells-per-day_max", "spellclass-" + classidx + "-level-" + spelllvl + "-class", "spellclass-" + classidx + "-level-" + spelllvl + "-bonus", "spellclass-" + classidx + "-level-" + spelllvl + "-misc"], 0, [], false, callback, silently);
-}
-/**  applyConditions - for condition deafened update {SpellFailureNote} on DEFENSE PAGE
-* note drain should have already been applied
-*@param {function} callback - to call when done.
-*@param {bool} silently if true update with PFConst.silentParams
-*/
-function applyConditions(callback, silently) {
-    var done = _underscore2.default.once(function () {
-        if (typeof callback === "function") {
-            callback();
-        }
-    });
-    //TAS.debug("at PFSpellCasterClasses.applyConditions");
-    getAttrs(["condition-Deafened", "SpellFailureNote"], function (v) {
-        var setter = {},
-            params = {};
-        try {
-            if (parseInt(v["condition-Deafened"], 10) === 4) {
-                if (!v["SpellFailureNote"]) {
-                    setter["SpellFailureNote"] = "Yes";
-                }
-            } else {
-                if (v["SpellFailureNote"]) {
-                    setter["SpellFailureNote"] = "";
-                }
-            }
-        } catch (err) {
-            _exportsLoaderTASTheAaronSheet2.default.error("PFSpellCasterClasses.applyConditions", err);
-        } finally {
-            if (_underscore2.default.size(setter) > 0) {
-                if (silently) {
-                    params = _PFConst2.default.silentParams;
-                }
-                setAttrs(setter, params, done);
-            } else {
-                done();
-            }
-        }
-    });
-}
-function recalcOneClass(spellClassIdx, callback, silently) {
-    var done = _underscore2.default.once(function () {
-        _exportsLoaderTASTheAaronSheet2.default.debug("leaving PFSpells.recalculate.recalcOneClass");
-        if (typeof callback === "function") {
-            callback();
-        }
-    }),
-        doneOne = _underscore2.default.after(4, done);
-    //TAS.debug("at PFSpellCasterClasses.recalcOneClass");
-    _underscore2.default.times(10, function (spelllvl) {
-        updateMaxSpellsPerDay(spellClassIdx, spelllvl);
-    });
-
-    updateConcentration(spellClassIdx, null, doneOne, silently);
-    updateSaveDCs(spellClassIdx, null, doneOne, silently);
-    updateCasterRanges(spellClassIdx, null, true, doneOne, silently);
-    updateBonusSpells(spellClassIdx, null, doneOne, silently);
-}
-/** updates {spellclass-X-level-total}, sets minimum of 1 if {spellclass-X-level} is > 0
-*@param {int} spellclassidx 0,1,2 the spell casting tab
-*@param {eventInfo} eventInfo unused eventinfo from 'on' method
-*@param {int} classlevel optional override for class level, use this if you know it and sheet attribute might not be updated yet.
-*@param {function} callback - to call when done.
-*@param {bool} silently if true update with PFConst.silentParams
-*/
-function updateCasterLevel(spellclassidx, eventInfo, classlevel, callback, silently) {
-    var done = _underscore2.default.once(function () {
-        _exportsLoaderTASTheAaronSheet2.default.debug("leaving updateCasterLevel " + spellclassidx);
-        if (typeof callback === "function") {
-            callback();
-        }
-    });
-    getAttrs(["spellclass-" + spellclassidx + "-level", "spellclass-" + spellclassidx + "-level-total", "spellclass-" + spellclassidx + "-level-misc", "buff_CasterLevel-total", "CasterLevel-Penalty", "spellclass-" + spellclassidx + "-exists"], function (v) {
-        var baseLevel = classlevel || parseInt(v["spellclass-" + spellclassidx + "-level"], 10) || 0,
-            totalLevel = parseInt(v["spellclass-" + spellclassidx + "-level-total"], 10) || 0,
-            spellClassExists = parseInt(v["spellclass-" + spellclassidx + "-exists"], 10) || 0,
-            casterlevel = 0,
-            setter = {},
-            recalcAfter = 0,
-            params = {};
-        try {
-            casterlevel = baseLevel + (parseInt(v["spellclass-" + spellclassidx + "-level-misc"], 10) || 0) + (parseInt(v["buff_CasterLevel-total"], 10) || 0) + (parseInt(v["CasterLevel-Penalty"], 10) || 0);
-            //if has spells then minimum level is 1 no matter what minuses apply
-            if (casterlevel <= 0) {
-                if (baseLevel > 0) {
-                    casterlevel = 1;
-                } else {
-                    casterlevel = 0;
-                }
-            }
-            if (casterlevel !== totalLevel) {
-                setter["spellclass-" + spellclassidx + "-level-total"] = casterlevel;
-                if (totalLevel === 0 && eventInfo) {
-                    recalcAfter = 1;
-                }
-            }
-            if (baseLevel > 0) {
-                if (spellClassExists === 0) {
-                    setter["spellclass-" + spellclassidx + "-exists"] = "1";
-                    recalcAfter = 1;
-                }
-            } else if (spellClassExists === 1) {
-                setter["spellclass-" + spellclassidx + "-exists"] = "0";
-            }
-        } catch (err) {
-            _exportsLoaderTASTheAaronSheet2.default.error("PFSpellCasterClasses.updateCasterLevel", err);
-        } finally {
-            if (_underscore2.default.size(setter) > 0) {
-                if (silently) {
-                    params = _PFConst2.default.silentParams;
-                }
-                setAttrs(setter, params, function () {
-                    if (recalcAfter) {
-                        recalcOneClass(spellclassidx, done, silently);
-                    } else {
-                        done();
-                    }
-                });
-            } else {
-                done();
-            }
-        }
-    });
-}
-/** updates all 3 caster class levels, usually due to change in buffs or debuffs 
-*@param {nothing} dummy - only here so eventhandlers can call it, since spellclass index is in this position.
-*@param {eventinfo} eventInfo unused eventinfo from 'on' method
-*@param {function} callback - to call when done.
-*@param {bool} silently if true update with PFConst.silentParams
-*/
-function updateCasterLevels(dummy, eventInfo, callback, silently) {
-    updateCasterLevel(0, eventInfo, 0, callback, silently);
-    updateCasterLevel(1, eventInfo, 0, callback, silently);
-    updateCasterLevel(2, eventInfo, 0, callback, silently);
-}
-/** sets {spellclass-X-name} and {spellclass-X-level} from the class dropdown {spellclass-X}
-* called when the class dropdown is changed.
-*@param {int} spellclassidx 0,1,2 the spell casting tab
-*@param {eventinfo} eventInfo unused eventinfo from 'on' method
-*@param {function} callback - to call when done.
-*@param {bool} silently if true update with PFConst.silentParams
-*/
-function setCasterClassFromDropdown(spellclassidx, eventInfo, callback, silently) {
-    var done = _underscore2.default.once(function () {
-        if (typeof callback === "function") {
-            callback();
-        }
-    }),
-        spellclassdropdown = "spellclass-" + spellclassidx,
-        spellclasslevel = "spellclass-" + spellclassidx + "-level";
-    getAttrs([spellclassdropdown, spellclasslevel], function (va) {
-        var classidx = parseInt(va[spellclassdropdown], 10),
-            currClassLevel = parseInt(va[spellclasslevel], 10),
-            spellclassname,
-            classname,
-            classlevel;
-        try {
-            if (isNaN(classidx) || !va[spellclassdropdown] || parseInt(va[spellclassdropdown], 10) === -1) {
-                done();
-                return;
-            }
-            spellclassname = "spellclass-" + spellclassidx + "-name";
-            classname = "class-" + classidx + "-name";
-            classlevel = "class-" + classidx + "-level";
-            //if race indicated: use race and HD
-            if (classidx === 6) {
-                classname = "race";
-                classlevel = "npc-hd-num";
-            }
-            getAttrs([classname, classlevel, spellclassname], function (v) {
-                var setter = {},
-                    setAny = 0,
-                    updateLevel = 0,
-                    newClassLevel = parseInt(v[classlevel], 10) || 0;
-                try {
-                    if (currClassLevel !== newClassLevel || isNaN(currClassLevel)) {
-                        setter[spellclasslevel] = newClassLevel;
-                        updateLevel = 1;
-                    }
-                    if (v[classname] && v[classname] !== v[spellclassname]) {
-                        setter[spellclassname] = v[classname];
-                    }
-                } catch (err) {
-                    _exportsLoaderTASTheAaronSheet2.default.error("PFSpellCasterClasses.setCasterClassFromDropdown", err);
-                } finally {
-                    if (_underscore2.default.size(setter) > 0) {
-                        setAttrs(setter, {
-                            silent: true
-                        }, done);
-                        if (updateLevel) {
-                            updateCasterLevel(spellclassidx, eventInfo, newClassLevel);
-                        }
-                    } else {
-                        done();
-                    }
-                }
-            });
-        } catch (errOuter) {
-            _exportsLoaderTASTheAaronSheet2.default.error("PFSpellCasterClasses.setCasterClassFromDropdown outer", errOuter);
-            done();
-        }
-    });
-}
-/** update level on SPELL page when updated on CLASS page, but not vice versa
-*@param {int} classidx 0..6 the row on the CLASS GRID starting with 0 to grab level from, or 6 if {npc-hd-num}
-*@param {eventinfo} eventInfo unused eventinfo from 'on' method
-*@param {bool} force if true update no matter if new ranges are same or not.
-*@param {function} callback - to call when done.
-*@param {bool} silently if true update with PFConst.silentParams
-*/
-function updateCasterFromClassLevel(classidx, eventInfo, force, callback, silently) {
-    var done = _underscore2.default.once(function () {
-        if (typeof callback === "function") {
-            callback();
-        }
-    }),
-        spellclassdropdown0 = "spellclass-0",
-        spellclassdropdown1 = "spellclass-1",
-        spellclassdropdown2 = "spellclass-2";
-    if (classidx === "npc-hd-num") {
-        classidx = 6;
-    } else {
-        classidx = parseInt(classidx, 10) || 0;
-    }
-    getAttrs([spellclassdropdown0, spellclassdropdown1, spellclassdropdown2], function (va) {
-        var spellclassidx, spellclasslevelField, classlevelField, prefix, classNameField;
-        if (parseInt(va[spellclassdropdown0], 10) === classidx) {
-            spellclassidx = 0;
-        } else if (parseInt(va[spellclassdropdown1], 10) === classidx) {
-            spellclassidx = 1;
-        } else if (parseInt(va[spellclassdropdown2], 10) === classidx) {
-            spellclassidx = 2;
-        } else {
-            return;
-        }
-        prefix = "spellclass-" + spellclassidx;
-        spellclasslevelField = prefix + "-level";
-        classlevelField = "class-" + classidx + "-level";
-        classNameField = "class-" + classidx + "-name";
-        getAttrs([spellclasslevelField, classlevelField, classNameField], function (v) {
-            var setter = {},
-                newCasterLevel = parseInt(v[classlevelField], 10) || 0,
-                currCasterLevel = parseInt(v[spellclasslevelField], 10);
-            if (newCasterLevel !== currCasterLevel || isNaN(currCasterLevel) || force) {
-                setter[spellclasslevelField] = newCasterLevel;
-                setter[prefix + "-name"] = v[classNameField];
-                setAttrs(setter, {
-                    silent: true
-                });
-                updateCasterLevel(classidx, eventInfo, newCasterLevel);
-            }
-        });
-    });
-}
-function migrate(callback, oldversion) {
-    //TAS.debug("At PFSpellCasterClasses.migrate");
-    PFMigrate.migrateUsesSpellFlag(callback);
-}
-function recalculate(callback, silently, oldversion) {
-    var done = _underscore2.default.once(function () {
-        _exportsLoaderTASTheAaronSheet2.default.info("leaving PFSpellCasterClasses.recalculate");
-        if (typeof callback === "function") {
-            callback();
-        }
-    }),
-        recalcTopSection = function recalcTopSection(callback, silently) {
-        var done = _underscore2.default.once(function () {
-            _exportsLoaderTASTheAaronSheet2.default.debug("leaving PFSpellCasterClasses.recalculate.recalcTopSection");
-            if (typeof callback === "function") {
-                callback();
-            }
-        }),
-            doneOne = _underscore2.default.after(3, done);
-        //TAS.debug("at PFSpellCasterClasses.recalculate.recalcTopSection");
-        _underscore2.default.each(_PFConst2.default.spellClassIndexes, function (spellClassIdx) {
-            try {
-                setCasterClassFromDropdown(spellClassIdx, null, function () {
-                    updateCasterLevel(spellClassIdx, null, 0, function () {
-                        ifSpellClassExists(spellClassIdx, function () {
-                            recalcOneClass(spellClassIdx, doneOne, silently);
-                        }, doneOne);
-                    }, silently);
-                }, silently);
-            } catch (err) {
-                _exportsLoaderTASTheAaronSheet2.default.error("PFSpellCasterClasses.recalculate_recalcTopSection", err);
-                doneOne();
-            }
-        });
-    },
-        finishAndLeave = _underscore2.default.once(function () {
-        updateMultiClassedCasterFlag(null, null, function () {
-            PFSpells.recalculate(done, silently, oldversion);
-        });
-    }),
-        callTopSection = _underscore2.default.once(function () {
-        recalcTopSection(finishAndLeave, silently);
-    }),
-        callApplyConditions = _underscore2.default.once(function () {
-        applyConditions(callTopSection, silently);
-    });
-    migrate(function () {
-        callApplyConditions();
-    }, oldversion);
-}
-var events = {
-    // events for updates to top of class page, each one calls isSpellClassExists
-    spellcastingClassEventsAuto: {
-        "change:concentration-REPLACE-mod": [updateBonusSpells, updateSaveDCs, updateConcentration, PFSpells.updateSpellsCasterAbilityRelated],
-        "change:spellclass-REPLACE-level-total": [updateConcentration, updateCasterRanges, PFSpells.updateSpellsCasterLevelRelated],
-        "change:spellclass-REPLACE-SP-mod": [PFSpells.updateSpellsCasterLevelRelated]
-    },
-    spellcastingClassEventsPlayer: {
-        "change:concentration-REPLACE-misc": [updateConcentration, PFSpells.updateSpellsCasterLevelRelated],
-        "change:concentration-REPLACE-def": [PFSpells.updateSpellsCasterLevelRelated]
-    },
-    // events for updates to top of class page even if no spellcasting class exists
-    spellcastingClassEventsIgnoreLevel: {
-        "change:spellclass-REPLACE-level-misc": [updateCasterLevel],
-        "change:spellclass-REPLACE": [setCasterClassFromDropdown],
-        "change:spellclass-REPLACE-level": [updateCasterLevel, updateMultiClassedCasterFlag],
-        "change:buff_CasterLevel-total change:condition-Drained change:CasterLevel-Penalty": [updateCasterLevels]
-    },
-    //events for updateBonusSpells section CLASSIDX is the 0-2 classes, SPELLLEVEL is 0-9
-    spellcastingClassEventsPerSpellLevel: "change:spellclass-CLASSIDX-level-SPELLLEVEL-class change:spellclass-CLASSIDX-level-SPELLLEVEL-bonus change:spellclass-CLASSIDX-level-SPELLLEVEL-misc"
-};
-function registerEventHandlers() {
-    //spellclass section (3 tabs at top of spell page)
-    _underscore2.default.each(_PFConst2.default.spellClassIndexes, function (spellClassIdx) {
-        var numberIdx = parseInt(spellClassIdx, 10) || 0;
-        on("change:Concentration-" + numberIdx + "-ability", _exportsLoaderTASTheAaronSheet2.default.callback(function eventChangeSpellDropdown(eventInfo) {
-            _exportsLoaderTASTheAaronSheet2.default.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
-            PFUtilsAsync.setDropdownValue("Concentration-" + numberIdx + "-ability", "Concentration-" + numberIdx + "-mod");
-        }));
-        _underscore2.default.each(events.spellcastingClassEventsPlayer, function (functions, event) {
-            var eventToWatch = event.replace(/REPLACE/g, numberIdx);
-            _underscore2.default.each(functions, function (methodToCall) {
-                on(eventToWatch, _exportsLoaderTASTheAaronSheet2.default.callback(function eventSpellcasterClassSpecificUpdatePlayerOnly(eventInfo) {
-                    if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api") {
-                        _exportsLoaderTASTheAaronSheet2.default.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
-                        ifSpellClassExists(numberIdx, function () {
-                            methodToCall(numberIdx, eventInfo);
-                        });
-                    }
-                }));
-            });
-        });
-        _underscore2.default.each(events.spellcastingClassEventsAuto, function (functions, event) {
-            var eventToWatch = event.replace(/REPLACE/g, numberIdx);
-            _underscore2.default.each(functions, function (methodToCall) {
-                on(eventToWatch, _exportsLoaderTASTheAaronSheet2.default.callback(function eventSpellcasterClassSpecificUpdateAuto(eventInfo) {
-                    if (eventInfo.sourceType === "sheetworker") {
-                        _exportsLoaderTASTheAaronSheet2.default.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
-                        ifSpellClassExists(numberIdx, function () {
-                            methodToCall(numberIdx, eventInfo);
-                        });
-                    }
-                }));
-            });
-        });
-        //ignore level means do not call "ifSpellClassExists" first
-        _underscore2.default.each(events.spellcastingClassEventsIgnoreLevel, function (functions, event) {
-            var eventToWatch = event.replace(/REPLACE/g, numberIdx);
-            _underscore2.default.each(functions, function (methodToCall) {
-                on(eventToWatch, _exportsLoaderTASTheAaronSheet2.default.callback(function eventSpellcasterClassUpdate(eventInfo) {
-                    _exportsLoaderTASTheAaronSheet2.default.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
-                    methodToCall(numberIdx, eventInfo);
-                }));
-            });
-        });
-        //spells per day
-        _underscore2.default.each(PFSpells.spellLevels, function (spellLevel) {
-            var spellNumber = parseInt(spellLevel, 10),
-                eventToWatch = events.spellcastingClassEventsPerSpellLevel.replace(/CLASSIDX/g, numberIdx).replace(/SPELLLEVEL/g, spellNumber);
-            on(eventToWatch, _exportsLoaderTASTheAaronSheet2.default.callback(function eventSpellsPerDay(eventInfo) {
-                _exportsLoaderTASTheAaronSheet2.default.debug("caught " + eventInfo.sourceAttribute + " event: " + eventInfo.sourceType);
-                ifSpellClassExists(numberIdx, function () {
-                    updateMaxSpellsPerDay(numberIdx, spellNumber);
-                });
-            }));
-        });
-    }); //end of spell classes
-}
-registerEventHandlers();
-_PFLog.PFConsole.log('PFSpellCasterClasses module loaded');
-_PFLog.PFLog.modulecount++;
-
-/***/ }),
 /* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -29567,7 +29573,7 @@ var _PFDefense = __webpack_require__(12);
 
 var PFDefense = _interopRequireWildcard(_PFDefense);
 
-var _PFSize = __webpack_require__(27);
+var _PFSize = __webpack_require__(28);
 
 var PFSize = _interopRequireWildcard(_PFSize);
 
@@ -29575,7 +29581,7 @@ var _PFUtilsAsync = __webpack_require__(7);
 
 var PFUtilsAsync = _interopRequireWildcard(_PFUtilsAsync);
 
-var _PFInitiative = __webpack_require__(25);
+var _PFInitiative = __webpack_require__(26);
 
 var PFInitiative = _interopRequireWildcard(_PFInitiative);
 
@@ -29583,11 +29589,11 @@ var _PFSkills = __webpack_require__(18);
 
 var PFSkills = _interopRequireWildcard(_PFSkills);
 
-var _PFEncumbrance = __webpack_require__(23);
+var _PFEncumbrance = __webpack_require__(24);
 
 var PFEncumbrance = _interopRequireWildcard(_PFEncumbrance);
 
-var _PFInventory = __webpack_require__(26);
+var _PFInventory = __webpack_require__(27);
 
 var PFInventory = _interopRequireWildcard(_PFInventory);
 
@@ -29595,7 +29601,7 @@ var _PFAbilityScores = __webpack_require__(10);
 
 var PFAbilityScores = _interopRequireWildcard(_PFAbilityScores);
 
-var _PFBuffs = __webpack_require__(20);
+var _PFBuffs = __webpack_require__(21);
 
 var PFBuffs = _interopRequireWildcard(_PFBuffs);
 
@@ -29611,7 +29617,7 @@ var _PFChecks = __webpack_require__(15);
 
 var PFChecks = _interopRequireWildcard(_PFChecks);
 
-var _PFAbility = __webpack_require__(19);
+var _PFAbility = __webpack_require__(20);
 
 var PFAbility = _interopRequireWildcard(_PFAbility);
 
@@ -29627,7 +29633,7 @@ var _PFAttacks = __webpack_require__(31);
 
 var PFAttacks = _interopRequireWildcard(_PFAttacks);
 
-var _PFFeatures = __webpack_require__(24);
+var _PFFeatures = __webpack_require__(25);
 
 var PFFeatures = _interopRequireWildcard(_PFFeatures);
 
@@ -29635,7 +29641,7 @@ var _PFSpells = __webpack_require__(14);
 
 var PFSpells = _interopRequireWildcard(_PFSpells);
 
-var _PFSpellCasterClasses = __webpack_require__(28);
+var _PFSpellCasterClasses = __webpack_require__(19);
 
 var PFSpellCasterClasses = _interopRequireWildcard(_PFSpellCasterClasses);
 
@@ -29647,7 +29653,7 @@ var _PFMythic = __webpack_require__(33);
 
 var PFMythic = _interopRequireWildcard(_PFMythic);
 
-var _PFClassRaceGrid = __webpack_require__(21);
+var _PFClassRaceGrid = __webpack_require__(22);
 
 var PFClassRaceGrid = _interopRequireWildcard(_PFClassRaceGrid);
 
@@ -31334,7 +31340,7 @@ var _PFAttackGrid = __webpack_require__(8);
 
 var PFAttackGrid = _interopRequireWildcard(_PFAttackGrid);
 
-var _PFInventory = __webpack_require__(26);
+var _PFInventory = __webpack_require__(27);
 
 var PFInventory = _interopRequireWildcard(_PFInventory);
 
@@ -31342,7 +31348,7 @@ var _PFSpells = __webpack_require__(14);
 
 var PFSpells = _interopRequireWildcard(_PFSpells);
 
-var _PFAbility = __webpack_require__(19);
+var _PFAbility = __webpack_require__(20);
 
 var PFAbility = _interopRequireWildcard(_PFAbility);
 
@@ -32166,11 +32172,11 @@ var _PFConst = __webpack_require__(3);
 
 var _PFConst2 = _interopRequireDefault(_PFConst);
 
-var _PFInitiative = __webpack_require__(25);
+var _PFInitiative = __webpack_require__(26);
 
 var PFInitiative = _interopRequireWildcard(_PFInitiative);
 
-var _PFSpellCasterClasses = __webpack_require__(28);
+var _PFSpellCasterClasses = __webpack_require__(19);
 
 var PFSpellCasterClasses = _interopRequireWildcard(_PFSpellCasterClasses);
 
@@ -32600,7 +32606,7 @@ var _PFConst = __webpack_require__(3);
 
 var _PFConst2 = _interopRequireDefault(_PFConst);
 
-var _PFDB = __webpack_require__(22);
+var _PFDB = __webpack_require__(23);
 
 var _PFDB2 = _interopRequireDefault(_PFDB);
 
@@ -32612,7 +32618,7 @@ var _PFUtils = __webpack_require__(5);
 
 var PFUtils = _interopRequireWildcard(_PFUtils);
 
-var _PFSize = __webpack_require__(27);
+var _PFSize = __webpack_require__(28);
 
 var PFSize = _interopRequireWildcard(_PFSize);
 
@@ -32624,7 +32630,7 @@ var _PFAbilityScores = __webpack_require__(10);
 
 var PFAbilityScores = _interopRequireWildcard(_PFAbilityScores);
 
-var _PFBuffs = __webpack_require__(20);
+var _PFBuffs = __webpack_require__(21);
 
 var PFBuffs = _interopRequireWildcard(_PFBuffs);
 
