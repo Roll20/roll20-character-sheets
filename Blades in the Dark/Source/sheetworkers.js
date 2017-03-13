@@ -1,6 +1,5 @@
 <script type="text/worker">
-/* DEFAULT FILLS FOR PLAYBOOKS AND CREWS */
-/* Set some default fields when setting crew type or playbook */
+/* DATA */
 var crewData = {
 	assassins: {
 		abilities: [
@@ -572,6 +571,7 @@ var crewData = {
 		],
 		base: {
 			command1: '1',
+			friends_title: 'Dangerous Friends',
 			gatherinfo1: 'How can I hurt them?',
 			gatherinfo2: 'Who\'s most afraid of me?',
 			gatherinfo3: 'Who\'s most dangerous here?',
@@ -627,6 +627,7 @@ var crewData = {
 			}
 		],
 		base: {
+			friends_title: 'Enemies & Rivals',
 			gatherinfo1: 'What do they intend to do?',
 			gatherinfo2: 'How can I get them to [X]?',
 			gatherinfo3: 'What are they really feeling?',
@@ -686,6 +687,7 @@ var crewData = {
 			}
 		],
 		base: {
+			friends_title: 'Deadly Friends',
 			gatherinfo1: 'What do they intend to do?',
 			gatherinfo2: 'How can I get them to [X]?',
 			gatherinfo3: 'What are they really feeling?',
@@ -815,6 +817,7 @@ var crewData = {
 			}
 		],
 		base: {
+			friends_title: 'Clever Friends',
 			gatherinfo1: 'What do they intend to do?',
 			gatherinfo2: 'How can I get them to [X]?',
 			gatherinfo3: 'Are they telling the truth?',
@@ -883,6 +886,7 @@ var crewData = {
 			}
 		],
 		base: {
+			friends_title: 'Shady Friends',
 			finesse1: '1',
 			gatherinfo1: 'What do they intend to do?',
 			gatherinfo2: 'How can I get them to [X]?',
@@ -951,6 +955,7 @@ var crewData = {
 			}
 		],
 		base: {
+			friends_title: 'Sly Friends',
 			consort1: '1',
 			gatherinfo1: 'What do they intend to do?',
 			gatherinfo2: 'How can I get them to [X]?',
@@ -1021,6 +1026,7 @@ var crewData = {
 		base: {
 			consort1: '1',
 			consort2: '1',
+			friends_title: 'Shrewd Friends',
 			gatherinfo1: 'What do they want most?',
 			gatherinfo2: 'What should I look out for?',
 			gatherinfo3: 'Where\'s the leverage here?',
@@ -1089,6 +1095,7 @@ var crewData = {
 		base: {
 			attune1: '1',
 			attune2: '1',
+			friends_title: 'Strange Friends',
 			gatherinfo1: 'What is arcane or weird here?',
 			gatherinfo2: 'What echoes in the ghost field?',
 			gatherinfo3: 'What is hidden or lost here?',
@@ -1147,6 +1154,7 @@ var crewData = {
 			}
 		],
 		base: {
+			friends_title: 'Dark Servants',
 			gatherinfo1: 'What do they intend to do?',
 			gatherinfo2: 'How can I get them to [X]?',
 			gatherinfo3: 'What are they really feeling?',
@@ -1190,141 +1198,7 @@ var crewData = {
 		]
 	}
 	},
-	spiritPlaybooks = ['ghost', 'hull', 'vampire'],
-	crewAttributes = _.chain(crewData).map(o => _.keys(o.base)).flatten().uniq().value(),
-	playbookAttributes = _.chain(playbookData).map(o => _.keys(o.base)).flatten().uniq().value(),
-	watchedAttributes = _.union(crewAttributes, playbookAttributes);
-on('change:crew_type change:playbook', function (event) {
-	getAttrs(['crew_type', 'playbook', 'changed_attributes'], function (attrValues) {
-		let changedAttributes = (attrValues.changed_attributes||'').split(','),
-			data, baseData;
-		switch(event.sourceAttribute) {
-			case 'crew_type':
-				if (_.has(crewData, attrValues.crew_type.toLowerCase())) {
-					data = crewData[attrValues.crew_type.toLowerCase()].base;
-					baseData = crewAttributes;
-				};
-				break;
-			case 'playbook':
-				if (_.has(playbookData, attrValues.playbook.toLowerCase())) {
-					data = playbookData[attrValues.playbook.toLowerCase()].base;
-					baseData = playbookAttributes;
-				};
-		};
-		/* Change unset attributes to default */
-		if (data) {
-			let finalSettings = {};
-			if (event.sourceAttribute === 'crew_type' || !_.contains(spiritPlaybooks, attrValues.playbook.toLowerCase())) {
-				finalSettings = _.reduce(baseData, function(settings, name) {
-					if (!_.contains(changedAttributes, name)) {
-						settings[name] = '';
-					};
-					return settings;
-				}, {});
-			};
-			_.reduce(data, function(settings, value, name) {
-				if (!_.contains(changedAttributes, name)) {
-					settings[name] = value;
-				};
-				return settings;
-				}, finalSettings);
-			setAttrs(finalSettings);
-		};
-	});
-});
-/* Watch for changes in auto-set attributes */
-watchedAttributes.forEach(function(name) {
-		on(`change:${name}`, function(eventInfo) {
-			if (eventInfo.sourceType === 'player') {
-				getAttrs(['changed_attributes'], function(v) {
-					let changedAttributes = _.union((v.changed_attributes||'').split(','),[name]).join(',');
-					setAttrs({
-						changed_attributes: changedAttributes
-					});
-				});
-			}
-		});
-	});
-
-/* VICE CALCULATION */
-var actions = {
-	insight: [
-		'hunt',
-		'study',
-		'survey',
-		'tinker'
-	],
-	prowess: [
-		'finesse',
-		'prowl',
-		'skirmish',
-		'wreck'
-	],
-	resolve: [
-		'attune',
-		'command',
-		'consort',
-		'sway'
-	]
-},
-	actions1 = _.mapObject(actions, array => _.map(array, str => str + '1')),
-	actionsFlat = _.chain(actions).map(x => x).flatten().value(),
-	actions1Flat = _.map(actionsFlat, str => str + '1'),
-	actions1Event = _.map(actions1Flat, str => `change:${str}`).join(' '),
-	calculateVice = function() {
-		getAttrs(actions1Flat, function(values) {
-			let numDice = _.chain(actions1)
-				.map(function(array) {
-					return _.chain(array)
-						.map(str => values[str])
-						.reduce((s,v) => s + parseInt(v||0), 0)
-						.value();
-				})
-				.min().value(),
-				setting = {};
-			setting.vice1 = (numDice > 0) ? 1 : 0;
-			setting.vice2 = (numDice > 1) ? 1 : 0;
-			setting.vice3 = (numDice > 2) ? 1 : 0;
-			setting.vice4 = (numDice > 3) ? 1 : 0;
-			setAttrs(setting);
-		});
-	};
-on(actions1Event, calculateVice);
-
-/* GENERATE FACTIONS */
-var fillRepeatingSectionFromData = function(sectionName, dataList) {
-	getSectionIDs(`repeating_${sectionName}`, function(idList) {
-		let rowNameAttributes = _.map(idList, id => `repeating_${sectionName}_${id}_name`);
-		getAttrs(rowNameAttributes, function (attrs) {
-			let existingRows = _.values(attrs);
-			let setting = _.chain(dataList)
-				.reject(o => _.contains(existingRows, o.name))
-				.map(function(o) {
-					let rowID = generateRowID();
-					return _.reduce(o, function(m,v,k) {
-						m[`repeating_${sectionName}_${rowID}_${k}`] = v;
-						return m;
-					}, {});
-				})
-				.reduce(function(m,o) {
-					return _.extend(m,o);
-				},{})
-				.value();
-			setAttrs(setting);
-		});
-	});
-},
-	emptyFirstRowIfUnnamed = function(sectionName) {
-		getSectionIDs(`repeating_${sectionName}`, function(idList) {
-			let id = idList[0];
-			getAttrs([`repeating_${sectionName}_${id}_name`], function(v) {
-				if (!v[`repeating_${sectionName}_${id}_name`]) {
-					removeRepeatingRow(`repeating_${sectionName}_${id}`);
-				};
-			});
-		});
-	};
-var factionsData = {
+	factionsData = {
 		factions1: [
 			{
 				name: 'The Unseen',
@@ -1635,7 +1509,166 @@ var factionsData = {
 				hold: 'W'
 			}
 		]
+	},
+	actionData = {
+	insight: [
+		'hunt',
+		'study',
+		'survey',
+		'tinker'
+	],
+	prowess: [
+		'finesse',
+		'prowl',
+		'skirmish',
+		'wreck'
+	],
+	resolve: [
+		'attune',
+		'command',
+		'consort',
+		'sway'
+	]
+},
+	spiritPlaybooks = ['ghost', 'hull', 'vampire'];
+
+/* UTILITY FUNCTIONS */
+var setDiceFromTotal = function(name, numDice, upToFive) {
+	let setting = {};
+	setting[`${name}1`] = (numDice > 0) ? 1 : 0;
+	setting[`${name}2`] = (numDice > 1) ? 1 : 0;
+	setting[`${name}3`] = (numDice > 2) ? 1 : 0;
+	setting[`${name}4`] = (numDice > 3) ? 1 : 0;
+	if (upToFive) {
+		setting[`${name}5`] = (numDice > 4) ? 1 : 0;
 	};
+	setAttrs(setting);
+},
+	fillRepeatingSectionFromData = function(sectionName, dataList) {
+	getSectionIDs(`repeating_${sectionName}`, function(idList) {
+		let rowNameAttributes = _.map(idList, id => `repeating_${sectionName}_${id}_name`);
+		getAttrs(rowNameAttributes, function (attrs) {
+			let existingRows = _.values(attrs);
+			let setting = _.chain(dataList)
+				.reject(o => _.contains(existingRows, o.name))
+				.map(function(o) {
+					let rowID = generateRowID();
+					return _.reduce(o, function(m,v,k) {
+						m[`repeating_${sectionName}_${rowID}_${k}`] = v;
+						return m;
+					}, {});
+				})
+				.reduce(function(m,o) {
+					return _.extend(m,o);
+				},{})
+				.value();
+			setAttrs(setting);
+		});
+	});
+},
+	emptyFirstRowIfUnnamed = function(sectionName) {
+	getSectionIDs(`repeating_${sectionName}`, function(idList) {
+		let id = idList[0];
+		getAttrs([`repeating_${sectionName}_${id}_name`], function(v) {
+			if (!v[`repeating_${sectionName}_${id}_name`]) {
+				removeRepeatingRow(`repeating_${sectionName}_${id}`);
+			};
+		});
+	});
+};
+
+/* DEFAULT FILLS FOR PLAYBOOKS AND CREWS */
+/* Set some default fields when setting crew type or playbook */
+var crewAttributes = _.chain(crewData).map(o => _.keys(o.base)).flatten().uniq().value(),
+	playbookAttributes = _.chain(playbookData).map(o => _.keys(o.base)).flatten().uniq().value(),
+	watchedAttributes = _.union(crewAttributes, playbookAttributes);
+on('change:crew_type change:playbook', function (event) {
+	getAttrs(['crew_type', 'playbook', 'changed_attributes'], function (attrValues) {
+		let changedAttributes = (attrValues.changed_attributes||'').split(','),
+			data, baseData, sourceName;
+		switch(event.sourceAttribute) {
+			case 'crew_type':
+				sourceName = attrValues.crew_type.toLowerCase();
+				if (_.has(crewData, sourceName)) {
+					data = crewData[sourceName].base;
+					baseData = crewAttributes;
+				};
+				break;
+			case 'playbook':
+				sourceName = attrValues.playbook.toLowerCase();
+				if (_.has(playbookData, sourceName)) {
+					data = playbookData[sourceName].base;
+					baseData = playbookAttributes;
+				};
+		};
+		/* Change unset attributes to default */
+		if (data) {
+			let finalSettings = {};
+			if (!_.contains(spiritPlaybooks, sourceName)) {
+				 _.reduce(baseData, function(settings, name) {
+					if (!_.contains(changedAttributes, name)) {
+						settings[name] = '';
+					};
+					return settings;
+				}, finalSettings);
+			};
+			_.reduce(data, function(settings, value, name) {
+				if (!_.contains(changedAttributes, name)) {
+					settings[name] = value;
+				};
+				return settings;
+			}, finalSettings);
+			setAttrs(finalSettings);
+		};
+	});
+});
+/* Watch for changes in auto-set attributes */
+watchedAttributes.forEach(function(name) {
+	on(`change:${name}`, function(eventInfo) {
+		if (eventInfo.sourceType === 'player') {
+			getAttrs(['changed_attributes'], function(v) {
+				let changedAttributes = _.union((v.changed_attributes||'').split(','),[name]).join(',');
+				setAttrs({
+					changed_attributes: changedAttributes
+				});
+			});
+		}
+	});
+});
+
+/* DERIVED DICE NUMBERS */
+var actions1 = _.mapObject(actionData, array => _.map(array, str => str + '1')),
+	actionsFlat = _.chain(actionData).map(x => x).flatten().value(),
+	actions1Flat = _.map(actionsFlat, str => str + '1'),
+	calculateResistance = function(name) {
+		getAttrs(actions1[name], function(attrs) {
+			let numDice = _.chain(attrs).values().reduce((s,v) => s + parseInt(v||0), 0).value();
+			setDiceFromTotal(name, numDice);
+		});
+	},
+	calculateVice = function() {
+		getAttrs(actions1Flat, function(values) {
+			let numDice = _.chain(actions1)
+				.map(function(array) {
+					return _.chain(array)
+						.map(str => values[str])
+						.reduce((s,v) => s + parseInt(v||0), 0)
+						.value();
+				})
+				.min().value();
+			setDiceFromTotal('vice', numDice);
+		});
+	};
+
+/* Register attribute/action event handlers */
+_.each(actionData, function(array, attributeName) {
+	_.each(array, function(actionName) {
+		on(`change:${actionName}1`, _.partial(calculateResistance, attributeName));
+	});
+	on(`change:${attributeName}1 change:${attributeName}2 change:${attributeName}3 change:${attributeName}4`, calculateVice);
+});
+
+/* GENERATE FACTIONS */
 on('change:generate_factions', function(event) {
 	_.each(factionsData, function (dataList, sectionName) {
 		fillRepeatingSectionFromData(sectionName, dataList);
@@ -1662,14 +1695,14 @@ on('change:generate_friends', function() {
 		let sectionName, dataList;
 		if (_.has(crewData, v.generate_source)) {
 			sectionName = 'contact';
-			dataList = _.map(crewData[v.generate_source].contacts, function (n) {
+			dataList = _.map(crewData[v.generate_source].contacts, function(n) {
 				return {
 					name: n
 				};
 			});
 		}	else if (_.has(playbookData, v.generate_source)) {
 			sectionName = 'friend';
-			dataList = _.map(playbookData[v.generate_source].friends, function (n) {
+			dataList = _.map(playbookData[v.generate_source].friends, function(n) {
 				return {
 					name: n
 				};
@@ -1683,28 +1716,12 @@ on('change:generate_friends', function() {
 /* CALCULATE WANTED */
 on('change:wanted', function() {
 	getAttrs(['wanted'], function(v) {
-		let setting = {
-			wanted1: 0,
-			wanted2: 0,
-			wanted3: 0,
-			wanted4: 0
-		};
-		switch(v.wanted) {
-			case '4':
-				setting.wanted4 = 1;
-			case '3':
-				setting.wanted3 = 1;
-			case '2':
-				setting.wanted2 = 1;
-			case '1':
-				setting.wanted1 = 1;
-		};
-		setAttrs(setting);
+		setDiceFromTotal('wanted', parseInt(v.wanted));
 	});
 });
 
 /* CALCULATE COHORT QUALITY */
-var calcCohortDots = function(t1, t2, t3, t4, imp, type, prefix) {
+var calculateCohortDots = function(t1, t2, t3, t4, imp, type, prefix) {
 	let numDots = parseInt(t1) + parseInt(t2) + parseInt(t3) + parseInt(t4);
 	if (imp === 'on') {
 		numDots = numDots - 1;
@@ -1712,47 +1729,29 @@ var calcCohortDots = function(t1, t2, t3, t4, imp, type, prefix) {
 	if (type === 'elite' || type === 'expert') {
 		numDots = numDots + 1;
 	};
-	let setting = {};
-	setting[`${prefix}die1`] = 0;
-	setting[`${prefix}die2`] = 0;
-	setting[`${prefix}die3`] = 0;
-	setting[`${prefix}die4`] = 0;
-	setting[`${prefix}die5`] = 0;
-	switch(numDots) {
-		case 5:
-			setting[`${prefix}die5`] = 1;
-		case 4:
-			setting[`${prefix}die4`] = 1;
-		case 3:
-			setting[`${prefix}die3`] = 1;
-		case 2:
-			setting[`${prefix}die2`] = 1;
-		case 1:
-			setting[`${prefix}die1`] = 1;
-	};
-	return setting;
+	setDiceFromTotal(`${prefix}die`, numDots, true);
 },
 	qualityAttrs = ['crew_tier1', 'crew_tier2', 'crew_tier3', 'crew_tier4', 'cohort1_impaired', 'cohort1_type'],
-	qualityEvent = _.map(qualityAttrs, str => `change:${str}`).join(' ');
-on(qualityEvent, function() {
-	getAttrs(qualityAttrs, function (attrs) {
-		let setting = calcCohortDots(attrs.crew_tier1, attrs.crew_tier2, attrs.crew_tier3, attrs.crew_tier4, attrs.cohort1_impaired, attrs.cohort1_type, 'cohort1_');
-		setAttrs(setting);
-	});
-});
+	qualityEvent = _.map(qualityAttrs, str => `change:${str}`).join(' '),
+	calculateCohort1Dice = function() {
+		getAttrs(qualityAttrs, function (attrs) {
+			calculateCohortDots(attrs.crew_tier1, attrs.crew_tier2, attrs.crew_tier3, attrs.crew_tier4, attrs.cohort1_impaired, attrs.cohort1_type, 'cohort1_');
+		});
+	};
+on(qualityEvent, calculateCohort1Dice);
 var repeatingQualityAttrs = ['crew_tier1', 'crew_tier2', 'crew_tier3', 'crew_tier4', 'repeating_cohort:impaired', 'repeating_cohort:type'],
-	repeatingQualityEvent = _.map(repeatingQualityAttrs, str => `change:${str}`).join(' ');
-on(repeatingQualityEvent + ' change:repeating_cohort:name change:repeating_cohort:subtype change:repeating_cohort:edges change:repeating_cohort:flaws change:repeating_cohort:description', function() {
-	getSectionIDs('repeating_cohort', function(list) {
-		list.forEach(function(id) {
-			let attrList = _.map(repeatingQualityAttrs, str => str.replace(':', '_'+id+'_'));
-			getAttrs(attrList, function(attrs) {
-				let setting = calcCohortDots(attrs.crew_tier1, attrs.crew_tier2, attrs.crew_tier3, attrs.crew_tier4, attrs[attrList[4]], attrs[attrList[5]], `repeating_cohort_${id}_`);
-				setAttrs(setting);
+	repeatingQualityEvent = _.map(repeatingQualityAttrs, str => `change:${str}`).join(' '),
+	calculateRepeatingCohortDice = function() {
+		getSectionIDs('repeating_cohort', function(list) {
+			list.forEach(function(id) {
+				let attrList = _.map(repeatingQualityAttrs, str => str.replace(':', `_${id}_`));
+				getAttrs(attrList, function(attrs) {
+					calculateCohortDots(attrs.crew_tier1, attrs.crew_tier2, attrs.crew_tier3, attrs.crew_tier4, attrs[attrList[4]], attrs[attrList[5]], `repeating_cohort_${id}_`);
+				});
 			});
 		});
-	});
-});
+	};
+on(repeatingQualityEvent + ' change:repeating_cohort:name change:repeating_cohort:subtype change:repeating_cohort:edges change:repeating_cohort:flaws change:repeating_cohort:description', calculateRepeatingCohortDice);
 
 /* LEFT-FILL CHECKBOXES */
 var handleFourBoxesFill = function(name) {
@@ -1921,10 +1920,15 @@ on('sheet:opened', function() {
 				}]);
 			});
 		};
+		// Upgrade to 0.10: Make sure that resistance values are calculated correctly.
+		if (v.version && parseInt(v.version.split('.')[0]) < 1) {
+			_.each(_.keys(actionData), calculateResistance);
+			calculateVice();
+		};
 		// Set version number
 		setAttrs({
-			version: '0.9',
-			character_sheet: 'Blades in the Dark v0.9'
+			version: '1.0',
+			character_sheet: 'Blades in the Dark v1.0'
 		});
 	});
 });
