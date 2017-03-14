@@ -20204,7 +20204,7 @@ _PFLog.PFLog.modulecount++;
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.defaultDeletedMacroAttrs = exports.defaultRepeatingMacroMap = exports.defaultRepeatingMacro = exports.classesUsingOtherSpellLists = exports.spellLevels = undefined;
+exports.classesUsingOtherSpellLists = exports.spellLevels = undefined;
 exports.resetCommandMacro = resetCommandMacro;
 exports.createAttackEntryFromRow = createAttackEntryFromRow;
 exports.updateAssociatedAttack = updateAssociatedAttack;
@@ -20272,9 +20272,9 @@ classesUsingOtherSpellLists = exports.classesUsingOtherSpellLists = {
     "warpriest": "cleric",
     "skald": "bard",
     "bloodrager": "sorcerer"
-},
-    defaultRepeatingMacro = exports.defaultRepeatingMacro = '&{template:pf_spell} @{toggle_spell_accessible} @{toggle_rounded_flag} {{color=@{rolltemplate_color}}} {{header_image=@{header_image-pf_spell}}} {{name=@{name}}} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{subtitle}} {{deafened_note=@{SpellFailureNote}}} @{spell_options}',
-    defaultRepeatingMacroMap = exports.defaultRepeatingMacroMap = {
+};
+var defaultRepeatingMacro = '&{template:pf_spell} @{toggle_spell_accessible} @{toggle_rounded_flag} {{color=@{rolltemplate_color}}} {{header_image=@{header_image-pf_spell}}} {{name=@{name}}} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{subtitle}} {{deafened_note=@{SpellFailureNote}}} @{spell_options}',
+    defaultRepeatingMacroMap = {
     '&{template:': { 'current': 'pf_spell}', old: ['pf_generic}', 'pf_block}'] },
     '@{toggle_spell_accessible}': { 'current': '@{toggle_spell_accessible}' },
     '@{toggle_rounded_flag}': { 'current': '@{toggle_rounded_flag}' },
@@ -20286,7 +20286,7 @@ classesUsingOtherSpellLists = exports.classesUsingOtherSpellLists = {
     '{{subtitle}}': { 'current': '{{subtitle}}' },
     '{{deafened_note=': { 'current': '@{SpellFailureNote}}}' },
     '@{spell_options}': { 'current': '@{spell_options}' } },
-    defaultDeletedMacroAttrs = exports.defaultDeletedMacroAttrs = ['@{toggle_accessible_flag}'];
+    defaultDeletedMacroAttrs = ['@{toggle_accessible_flag}'];
 
 function resetCommandMacro(eventInfo, callback) {
     //TAS.debug("at PFSpells.resetCommandMacro");
@@ -20400,9 +20400,9 @@ function resetCommandMacro(eventInfo, callback) {
                             return { id: id,
                                 level: spellSlot,
                                 levelstr: "^{level} " + String(spellSlot),
-                                rawlevel: parseInt(values[prefix + "spell_level"], 10),
+                                rawlevel: parseInt(values[prefix + "spell_level"], 10) || 0,
                                 school: schoolForGroup,
-                                spellClass: parseInt(values[prefix + "spellclass_number"], 10),
+                                spellClass: parseInt(values[prefix + "spellclass_number"], 10) || 0,
                                 spellClassstr: "class" + values[prefix + "spellclass_number"],
                                 isDomain: parseInt(values[prefix + "isDomain"], 10) || 0,
                                 isMythic: usesMythic * parseInt(values[prefix + "isMythic"], 10) || 0,
@@ -20410,7 +20410,7 @@ function resetCommandMacro(eventInfo, callback) {
                                 name: values[prefix + "name"] || ""
                             };
                         }).omit(function (spellObj) {
-                            return isNaN(spellObj.rawlevel) || isNaN(spellObj.spellClass) || hideUnprepared[spellObj.spellClass] && spellObj.uses === 0 && !(showDomain[spellObj.spellClass] && spellObj.isDomain);
+                            return isNaN(spellObj.rawlevel) || isNaN(spellObj.spellClass) || hideUnprepared[spellObj.spellClass] && isPrepared[spellObj.spellClass] && spellObj.uses === 0 && !(showDomain[spellObj.spellClass] && spellObj.isDomain);
                         }).map(function (spellObj) {
                             var spellName = spellObj.name,
                                 usesStr = "",
