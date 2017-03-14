@@ -20438,7 +20438,7 @@ function resetCommandMacro(eventInfo, callback) {
                         spellsByClass = _underscore2.default.chain(orderedList).map(function (id) {
                             var prefix = "repeating_spells_" + SWUtils.getRepeatingIDStr(id),
                                 metaMagic = parseInt(values[prefix + "metamagic"], 10) || 0,
-                                spellSlot = metaMagic ? values[prefix + "slot"] : values[prefix + "spell_level"],
+                                spellSlot = metaMagic ? values[prefix + "slot"] || values[prefix + "spell_level"] : values[prefix + "spell_level"],
                                 matches,
                                 schoolForGroup = values[prefix + "school"] || "";
                             matches = spellSchoolReg.exec(values[prefix + "school"] || "");
@@ -20452,14 +20452,14 @@ function resetCommandMacro(eventInfo, callback) {
                                 rawlevel: parseInt(values[prefix + "spell_level"], 10) || 0,
                                 school: schoolForGroup,
                                 spellClass: parseInt(values[prefix + "spellclass_number"], 10) || 0,
-                                spellClassstr: "class" + values[prefix + "spellclass_number"],
+                                spellClassstr: "class" + (values[prefix + "spellclass_number"] || "0"),
                                 isDomain: parseInt(values[prefix + "isDomain"], 10) || 0,
                                 isMythic: usesMythic * parseInt(values[prefix + "isMythic"], 10) || 0,
                                 uses: parseInt(values[prefix + "used"], 10) || 0,
                                 name: values[prefix + "name"] || ""
                             };
                         }).omit(function (spellObj) {
-                            return isNaN(spellObj.rawlevel) || isNaN(spellObj.spellClass) || hideUnprepared[spellObj.spellClass] && isPrepared[spellObj.spellClass] && spellObj.uses === 0 && !(showDomain[spellObj.spellClass] && spellObj.isDomain);
+                            return hideUnprepared[spellObj.spellClass] && isPrepared[spellObj.spellClass] && spellObj.uses === 0 && !(showDomain[spellObj.spellClass] && spellObj.isDomain);
                         }).map(function (spellObj) {
                             var spellName = spellObj.name,
                                 usesStr = "",
