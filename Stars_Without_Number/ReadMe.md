@@ -18,6 +18,11 @@ Report any problems, suggestions or features by sending a private message on Rol
 
 ### Changelog
 
+#### 0.1.4
+
+* Removed attribute auto-calculated values and replaced with sheet workers.
+* Added sheet version variable.
+
 #### 0.1.3
 
 * Added Sheet Worker to enforce System Strain constraints against Maximum Strain and Permanent Strain
