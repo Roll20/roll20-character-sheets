@@ -18,4 +18,4 @@ Avec les armes, cliquer sur 'Jet' lance une attaque, cliquer sur Dégats lance l
 Le lancé le plus important est le jet %{characteristic}. ([[(@{characteristic}+?{Modifier|0}-1d100)/10]] degré(s) de réussite !)
 Cela prend les caractéristique de la liste, ensuite vous pouvez ajouter un bonus/malus, ensuite cela lance un d100 et soustrait le modificateur. Le tout divisé par 10 pour vous donner le degrés de succès.
 
-
+Ajout pour la version fr, les pouvoir psy ont été séparé dans une autre page, merci à Shawn Abreu pour le code original
