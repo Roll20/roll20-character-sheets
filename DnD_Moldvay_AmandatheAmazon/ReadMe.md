@@ -9,6 +9,8 @@ This is a re-creation of the "green-sheet" for the D&D Basic Moldvay Red box gam
 
 #### 2.4
 * Fix for Monster THAC0 being set to read-only (#2426)
+* Added field for Monster Initiative Bonus vs it being inside the roll (#2427)
+* Cleaned up some odd spacing issues on Monster sheet
 
 #### 2.3
 * Added Sheet Worker to automatically add in Halfing Missile Bonus if Halfling Class is selected (#2325)
