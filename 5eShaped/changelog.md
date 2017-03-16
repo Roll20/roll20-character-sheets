@@ -1,3 +1,231 @@
+## 10.1.5
+
+### Bug Fixes
+
+* [#372: Skill proficiency doesn't import from SRD properly](https://bitbucket.org/mlenser/5eshaped/issues/372/skill-proficiency-doesnt-import-from-srd)
+* [#365: Macro buttons in the settings throw errors if there's "" in the character name](https://bitbucket.org/mlenser/5eshaped/issues/365/macro-buttons-in-the-settings-throw-errors)
+
+### UI Adjustments
+
+* Added some left margin to passive skills. [#340: Passive Skill display enhancement](https://bitbucket.org/mlenser/5eshaped/issues/340/passive-skill-display-enhancement)
+* Reworded Advantage query to "Query (Advantage default). [#255: Advantage and Disadvantage Roll Query are reversed.](https://bitbucket.org/mlenser/5eshaped/issues/255/advantage-and-disadvantage-roll-query-are)
+
+## 10.1.4
+
+### Bug Fixes
+
+* Health from OGL conversion now converts properly for the (seemingly) few cases it wasn't working before. Closes [#261: ConvertFromOGL SKT -> 9.1 issues](https://bitbucket.org/mlenser/5eshaped/issues/261/convertfromogl-skt-91-issues)
+* [#361: Paladin class data typos/issues](https://bitbucket.org/mlenser/5eshaped/issues/361/paladin-class-data-typos-issues)
+* Removed 99% of logging from my sheet. There will be some cases, but they should be rare. Closes [#289: More controllable logging](https://bitbucket.org/mlenser/5eshaped/issues/289/more-controllable-logging)
+* Added some callbacks to OGL conversion which was causing it to not update traits, actions, etc when converting. Addresses part of [#362: ConvertFromOGL Lost Halls of Everforge](https://bitbucket.org/mlenser/5eshaped/issues/362/convertfromogl-lost-halls-of-everforge)
+
+## 10.1.3
+
+### Bug Fixes
+
+* [#345: Default Sheet Settings sets wrong values for integer fields](https://bitbucket.org/mlenser/5eshaped/issues/345/default-sheet-settings-sets-wrong-values)
+* [#348: Critical Damage on Cantrips using the cantrip formula when crit dmg maximized](https://bitbucket.org/mlenser/5eshaped/issues/348/critical-damage-on-cantrips-using-the)
+* [#350: Eldritch blast issues](https://bitbucket.org/mlenser/5eshaped/issues/350/eldritch-blast-issues)
+* Ensured that when a spell is dragged from the SRD to a level that does not match its level that it maintains all data passed from the SRD when it is moved to the proper level. This solves higher level damage issues and closes [#351: Shatter spell issue](https://bitbucket.org/mlenser/5eshaped/issues/351/shatter-spell-issue)
+* Magic Missile now imports without a higher level damage_dice. Closes part of [#349: Magic missiles issues](https://bitbucket.org/mlenser/5eshaped/issues/349/magic-missiles-issues)
+* [#354: Extra crit damage for saving throw shows for secondary damage](https://bitbucket.org/mlenser/5eshaped/issues/354/extra-crit-damage-for-saving-throw-shows)
+* [#353: Slight vertical misalignment on traits section usages in condensed mode](https://bitbucket.org/mlenser/5eshaped/issues/353/slight-vertical-misalignment-on-traits)
+* Adding/Changing a class or updating levels does not change the spell_ability, therefore resetting all spells. Closes the bug from [#352: Changing spellcasting ability changes it for all spells](https://bitbucket.org/mlenser/5eshaped/issues/352/changing-spellcasting-ability-changes-it)
+
+## 10.1.2
+
+### Bug Fixes
+
+* [#342: Top hit dice not clickable](https://bitbucket.org/mlenser/5eshaped/issues/342/top-hit-dice-not-clickable)
+* Class Level is now a select
+* [#337: Spellcasting parsing doesn't always detect class](https://bitbucket.org/mlenser/5eshaped/issues/337/spellcasting-parsing-doesnt-always-detect)
+* [#328: NPC Multiattack gains "Ranged Spell Attack" on upgrade to 10.0.1](https://bitbucket.org/mlenser/5eshaped/issues/328/npc-multiattack-gains-ranged-spell-attack)
+
+### Code Cleanup
+
+* Removed import_data is it's now done via API directly
+
+## 10.1.1
+
+### Bug Fixes
+
+* Show arithmetic sign for initiatives of "0". "+0" is the result for 0 now.
+* Added "character_sheet" field which will help API authors identify the sheet. It'll follow the format Aaron and I agreed on: "Shaped v10.1.1". Version will still exist. See [Aaron's post on the topic](https://app.roll20.net/forum/post/4714038/character-sheet-authors-a-request-from-api-authors/#post-4714038).
+* Changed how "initiative_formula" is stored so it can be used for scripts like Group Initiative. See the [documentation](https://docs.google.com/document/d/1yPcIZ_bIc3JlnWsKZt2tAB0EQSIVEfeMtT0GifbpJIg/edit#heading=h.2sgngharia1b) for how to set this up properly.
+
+## 10.1.0
+
+### Features
+
+* Added "Powerful Build" as a racial trait. Closes [#331: Change to encumbrance multiplier](https://bitbucket.org/mlenser/5eshaped/issues/331/change-to-encumbrance-multiplier)
+
+### Bug Fixes
+
+* [#333: NPC actions with "plus" damage do not set plus toggle](https://bitbucket.org/mlenser/5eshaped/issues/333/npc-actions-with-plus-damage-do-not-set)
+* [#290: Adding bonus damage to hit updates saving throw average damage](https://bitbucket.org/mlenser/5eshaped/issues/290/adding-bonus-damage-to-hit-updates-saving)
+* [#329: Racial Features -> Racial Traits upgrade fails](https://bitbucket.org/mlenser/5eshaped/issues/329/racial-features-racial-traits-upgrade)
+* [#327: NPC spellcasting Upgrade](https://bitbucket.org/mlenser/5eshaped/issues/327/npc-spellcasting-upgrade)
+
+## 10.0.1
+
+### Bug Fixes
+
+* Minor spacing fixes based on how the html is compiled as part of 10.0.0
+* Converting from ft. to m. no longer adds two periods at the end.
+
+## 10.0.0
+
+### Breaking Changes
+
+* [#326: Rename "Racial Features" to "Racial Traits"](https://bitbucket.org/mlenser/5eshaped/issues/326/rename-racial-features-to-racial-traits). An upgrade is included so all items should be moved over to the new section if any were created after 9.1.0
+* Removed "weight_multiplier" and "encumbrance_multiplier" in favor of just using the 4 multipliers: "carrying_capacity_multiplier", "max_push_drag_lift_multiplier", "encumbered_multiplier", "heavily_encumbered_multiplier".
+
+### Bug Fixes
+
+* [#243: Long trait name use count is outside brackets](https://bitbucket.org/mlenser/5eshaped/issues/243/long-trait-name-use-count-is-outside). This required a change to how white spaces are compiled. They are now manually added so please let me know if I've missed any areas.
+* [#317: HP posted in chat has the wrong font-size](https://bitbucket.org/mlenser/5eshaped/issues/317/hp-posted-in-chat-has-the-wrong-font-size)
+* [#323: Class Features not showing in presentation mode after an upgrades](https://bitbucket.org/mlenser/5eshaped/issues/323/class-features-not-showing-in-presentation)
+
+## 9.2.3
+
+### Bug Fixes
+
+* [#303: 9.2.2 - Unarmored AC not calculating correctly](https://bitbucket.org/mlenser/5eshaped/issues/303/922-unarmored-ac-not-calculating-correctly). I believe this also closes [#300: DC displayed incorrectly for some monster actions](https://bitbucket.org/mlenser/5eshaped/issues/300/dc-displayed-incorrectly-for-some-monster), but will need Miodziek to verify when I release.
+* [#304: Jack of all Trades and Remarkable Athlete not applying correctly](https://bitbucket.org/mlenser/5eshaped/issues/304/jack-of-all-trades-and-remarkable-athlete)
+* [#307: Hit die roll should have a minimum of zero](https://bitbucket.org/mlenser/5eshaped/issues/307/hit-die-roll-should-have-a-minimum-of-zero)
+* [#308: Roll template is omitting uses when it's zero](https://bitbucket.org/mlenser/5eshaped/issues/308/roll-template-is-omitting-uses-when-its)
+* [#305: Characters with custom classes lose hit dice 9.0.1 -> 9.2.3](https://bitbucket.org/mlenser/5eshaped/issues/305/characters-with-custom-classes-lose-hit)
+* [#306: Add "process spell slots automatically" option](https://bitbucket.org/mlenser/5eshaped/issues/306/add-process-spell-slots-automatically)
+* [#284: Warlock spells require casting level choice](https://bitbucket.org/mlenser/5eshaped/issues/284/warlock-spells-require-casting-level)
+
+## 9.2.2
+
+### Bug Fixes
+
+* [#298: higher_level_query_1ST_LEVEL attribute not being created](https://bitbucket.org/mlenser/5eshaped/issues/298/higher_level_query_1st_level-attribute-not)
+* [#292: Ankheg drag from SRD has no actions](https://bitbucket.org/mlenser/5eshaped/issues/292/ankheg-drag-from-srd-has-no-actions)
+* [#296: Include identifier in roll template for repeated spells](https://bitbucket.org/mlenser/5eshaped/issues/296/include-identifier-in-roll-template-for)
+* [#293: Adding Armor does not update AC properly on PC](https://bitbucket.org/mlenser/5eshaped/issues/293/adding-armor-does-not-update-ac-properly)
+
+## 9.2.1
+
+### Bug Fixes
+
+* [#287: Ranger UA (2016) Natural Explorer](https://bitbucket.org/mlenser/5eshaped/issues/287/ranger-ua-2016-natural-explorer)
+* [#279: Add a way for legendary actions to be identified](https://bitbucket.org/mlenser/5eshaped/issues/279/add-a-way-for-legendary-actions-to-be)
+* [#176: Spell Macro always shows Spell Points](https://bitbucket.org/mlenser/5eshaped/issues/176/spell-macro-always-shows-spell-points)
+* [#288: Ammo Field Replicating](https://bitbucket.org/mlenser/5eshaped/issues/288/ammo-field-replicating)
+* [#281: Manually entered spells are moved to cantrips and sometimes duplicated on upgrade from 9.0.1](https://bitbucket.org/mlenser/5eshaped/issues/281/manually-entered-spells-are-moved-to)
+* [#214: Spells macro shows non-existing warlock slots](https://bitbucket.org/mlenser/5eshaped/issues/214/spells-macro-shows-non-existing-warlock)
+* [#285: Firefox: Checkboxes for attacks, saving throws, heal, etc become centered when toggled](https://bitbucket.org/mlenser/5eshaped/issues/285/firefox-checkboxes-for-attacks-saving)
+
+## 9.2.0
+
+### Features
+
+* The way that data is retrieved from the server when referencing a repeating section has been altered to minimize the number of http requests I make to the server. The result is incredibly fast upgrades (20 seconds from the moment the sheet is clicked for a 6.5.1 PC loaded with spells). The new architecture allows me to retrieve multiple repeating sections and vary the id I get from each section or vary the fields I get from each section - it significantly improves the process. This will also allow me to run more functions in parallel.
+
+### Bug Fixes
+
+* Removed damage_crit from saving throw damage
+* [#276: Race condition with spell slot parsing](https://bitbucket.org/mlenser/5eshaped/issues/276/race-condition-with-spell-slot-parsing)
+* [#256: Saving throws and Ability Check macros always include "Honor" and "Sanity"](https://bitbucket.org/mlenser/5eshaped/issues/256/saving-throws-and-ability-check-macros)
+* [#267: Inspiration chat post initially shows 1](https://bitbucket.org/mlenser/5eshaped/issues/267/inspiration-chat-post-initially-shows-1)
+* [#269: Proficiency text is replaced on upgrade and level up.](https://bitbucket.org/mlenser/5eshaped/issues/269/proficiency-text-is-replaced-on-upgrade)
+* [#258: Death saving throw bonus isn't displayed in macros](https://bitbucket.org/mlenser/5eshaped/issues/258/death-saving-throw-bonus-isnt-displayed-in)
+* [#262: "Auto" spell list does not show when there are no slots or points](https://bitbucket.org/mlenser/5eshaped/issues/262/auto-spell-list-does-not-show-when-there)
+* "per_use" for things like ammo, armor, equipment, traits, attacks, actions, etc is now a "text" field so that it can allow things like custom queries.
+* Attributes are now generated on sheet initialize. Closes [#237: Deflect Missile Monk Feature has issues with calculating the absorbed damage - Attributes not defined](https://bitbucket.org/mlenser/5eshaped/issues/237/deflect-missile-monk-feature-has-issues)
+* [#245: Hitdice dont get retracted from a character after levels in a class are deleted.](https://bitbucket.org/mlenser/5eshaped/issues/245/hitdice-dont-get-retracted-from-a)
+* [#275: The four new features and traits sections are not hidden in presentation mode](https://bitbucket.org/mlenser/5eshaped/issues/275/the-four-new-features-and-traits-sections)
+* [#273: Spells don't prompt for level when they should](https://bitbucket.org/mlenser/5eshaped/issues/273/spells-dont-prompt-for-level-when-they). Additionally, spells will prompt for a level if you have no slots of that level or higher.
+* [#218: Spell level change not running](https://bitbucket.org/mlenser/5eshaped/issues/218/spell-level-change-not-running)
+* [#211: Total weight not calculating](https://bitbucket.org/mlenser/5eshaped/issues/211/total-weight-not-calculating)
+* [#276: Race condition with spell slot parsing](https://bitbucket.org/mlenser/5eshaped/issues/276/race-condition-with-spell-slot-parsing)
+
+## 9.1.1
+
+### Bug Fixes
+
+* [#223: Initiative rolls don't send to tracker](https://bitbucket.org/mlenser/5eshaped/issues/223/initiative-rolls-dont-send-to-tracker)
+* [#209: Ammo field is generated every time a weapon is edited](https://bitbucket.org/mlenser/5eshaped/issues/209/ammo-field-is-generated-every-time-a)
+* [#230: Upgrade from 7.12.2, Fire Bolt becomes melee](https://bitbucket.org/mlenser/5eshaped/issues/230/upgrade-from-7122-fire-bolt-becomes-melee)
+* [#229: Spell with custom (maximized) damage loses damage on upgrade](https://bitbucket.org/mlenser/5eshaped/issues/229/spell-with-custom-maximized-damage-loses)
+* [#233: Sorcerer metamagic not adding](https://bitbucket.org/mlenser/5eshaped/issues/233/sorcerer-metamagic-not-adding)
+* [#235: Condense Buttons for Feature Section only have one toggle state between them.](https://bitbucket.org/mlenser/5eshaped/issues/235/condense-buttons-for-feature-section-only)
+* [#238: Experience Points macro](https://bitbucket.org/mlenser/5eshaped/issues/238/experience-points-macro)
+* [#239: Lair actions and Regional effects](https://bitbucket.org/mlenser/5eshaped/issues/239/lair-actions-and-regional-effects)
+* [#241: Clicking GP for total gold results in error on new characters sheet without any gold.](https://bitbucket.org/mlenser/5eshaped/issues/241/clicking-gp-for-total-gold-results-in)
+* [#240: Swarm import](https://bitbucket.org/mlenser/5eshaped/issues/240/swarm-import)
+* [#205: Spellcasting parsing doesn't work](https://bitbucket.org/mlenser/5eshaped/issues/205/spellcasting-parsing-doesnt-work)
+* [#217: NPC Spell from SRD Error](https://bitbucket.org/mlenser/5eshaped/issues/217/npc-spell-from-srd-error)
+* [#236: Class Features Macro is empty](https://bitbucket.org/mlenser/5eshaped/issues/236/class-features-macro-is-empty)
+* [#242: Conversion from Storm King's Thunder incomplete](https://bitbucket.org/mlenser/5eshaped/issues/242/conversion-from-storm-kings-thunder)
+
+#### Silent update bugs
+
+* [#206: Class Features don't generate output](https://bitbucket.org/mlenser/5eshaped/issues/206/class-features-dont-generate-output)
+* [#212: Proficiency Bonus calculation/update](https://bitbucket.org/mlenser/5eshaped/issues/212/proficiency-bonus-calculation-update)
+* [#221: Characters upgraded from 9.0.1 have “send to tracker” turned off by default](https://bitbucket.org/mlenser/5eshaped/issues/221/characters-upgraded-from-901-have-send-to)
+* Initialized new sheets for [#222: New character’s initiative rolls are blank](https://bitbucket.org/mlenser/5eshaped/issues/222/new-character-s-initiative-rolls-are-blank), [#224: The saving throw chat dump macro is blank for new character without any save proficiencies](https://bitbucket.org/mlenser/5eshaped/issues/224/the-saving-throw-chat-dump-macro-is-blank)
+* [#219: No proficiency bonus being added to skills](https://bitbucket.org/mlenser/5eshaped/issues/219/no-proficiency-bonus-being-added-to-skills)
+
+### UI Adjustments
+
+* Condensed attacks, traits, etc look as they do in 9.0.0
+
+## 9.1.0
+
+### Features
+
+* Unit tests are being added progressively as issues come up. There is little coverage so far, but I will be expanding these as more work is done. This should increase the stability of the sheet where a function might not be doing as I expect.
+* [#166: Change all data saving to run silently](https://bitbucket.org/mlenser/5eshaped/issues/166/change-all-data-saving-to-run-silently) should give a great boost to performance and along with the upgrade changes this should reduce a fair number of bugs caused by incompatible updates occurring simultaneously.
+* Upgrades have been entirely revamped to run in one server call as much as possible. This prevents strange errors where multiple conflicting upgrades are occurring at the same time. It also allows me to close the processing message after the upgrade is complete. Therefore that now spans the whole sheet. There is a slight delay of processing after the message closes for cases where all actions are updated (9.1.0), but that willworked on in the future.
+* [#172: Parse Actions, Reactions, Legendary Actions, Lair Actions from the new Monster Manual format](https://bitbucket.org/mlenser/5eshaped/issues/172/parse-actions-reactions-legendary-actions)
+* [#9: Handle Repeatable attacks, saves, and damage for cases like Call Lightning, Scorching Ray, Hunter's Mark](https://bitbucket.org/mlenser/5eshaped/issues/9/handle-repeatable-attacks-saves-and-damage)
+
+![alt text](http://i.imgur.com/O7mDQiS.png "9.1.0 spell repeat")
+* [#2: Meters instead of feet](https://bitbucket.org/mlenser/5eshaped/issues/2/meters-instead-of-feet)
+* [#145: Handle "if used with two hands" when parsing monsters](https://bitbucket.org/mlenser/5eshaped/issues/145/handle-if-used-with-two-hands-when-parsing)
+* [#146: Have Armor items output the content field to the chat, as per other equipment items](https://bitbucket.org/mlenser/5eshaped/issues/146/have-armor-items-output-the-content-field)
+* If custom saving throws are used normal saving throws will be converted to that system for "saving_throw_vs_ability" as well as content fields of attacks, actions, spells, etc. For example "Dexterity" would be replaced by "Reflex".
+* Traits are now split to "Racial Features", "Class Features", "Feats", and "Traits". Closes [#140: Add Feats repeating section](https://bitbucket.org/mlenser/5eshaped/issues/140/add-feats-repeating-section)
+* When a Class Feature is toggled off it is removed from the list of class features (toggling the class does not remove all class features, they must be done individually).
+  * "Create Class Features" has been removed from the settings as it can now be toggled directly. Once a class feature has been toggled off it will not be generated again.
+* [#171: Incorporating Proficiency Die option to Spell Save DC](https://bitbucket.org/mlenser/5eshaped/issues/171/incorporating-proficiency-die-option-to)
+* Spells displaying no longer require Slots or Points to be toggled. So the user must select "Spells" and then from there they can either turn off filters (which now shows all levels) or click "All" for spell level with filters on. The vast majority of cases will have a class which will add the necessary toggles, but this should help cases without a class figure out how to input spells. I'd like to improve it further potentially, but it's difficult to default to "auto" while showing some levels to start. Closes [#160: Spells gained via trait on non-casters](https://bitbucket.org/mlenser/5eshaped/issues/160/spells-gained-via-trait-on-non-casters)
+* Initiative now has more of its calculations done via sheet workers. I has cleaned up its code which should make it more reliable with all the bonuses that can add on. I've also changed the value of "initiative_to_tracker" and "initiative_tie_breaker" on the settings page to both be 1.
+* Critical damage from the default damage can be turned off, allowing for no crits at all or custom critical damage when combined with "extra on a crit". Closes [#167: Custom critical damage no longer supported](https://bitbucket.org/mlenser/5eshaped/issues/167/custom-critical-damage-no-longer-supported)
+* [#179: Add repeating section identifier to roll templates](https://bitbucket.org/mlenser/5eshaped/issues/179/add-repeating-section-identifier-to-roll)
+* Skill generation has been optimized for new characters so it creates 3 server calls instead of 20.
+* Hit Dice have been revamped to work entirely on sheetworkers.
+
+### UI Adjustments
+
+* The roll template is formatted differently to have the type on the line above.
+
+![alt text](http://i.imgur.com/86r2M6P.png "9.1.0 roll template")
+* [#103: When Actions, Attacks, Traits, etc are condensed show them in a list like spells](https://bitbucket.org/mlenser/5eshaped/issues/103/when-actions-attacks-traits-etc-are)
+* [#156: Core Page Expanded Spellbook Improvement](https://bitbucket.org/mlenser/5eshaped/issues/156/core-page-expanded-spellbook-improvement)
+
+### Bug Fixes
+
+Many of these are discovered as part of the 9.1.0 changes and did not exist previously. I have included them anyways.
+
+* [#198: Conversion to 9.0.1 mangles many SRD imported Actions/Attacks](https://bitbucket.org/mlenser/5eshaped/issues/198/conversion-to-901-mangles-many-srd)
+* [#181: Monster Manual - Tokens droped from journal are not scaling or are not visable](https://bitbucket.org/mlenser/5eshaped/issues/181/monster-manual-tokens-droped-from-journal)
+* [#82: Import of Orc War Chief doesn't apply Gruumsh's Fury correctly to attacks.](https://bitbucket.org/mlenser/5eshaped/issues/82/import-of-orc-war-chief-doesnt-apply)
+* [#148: Bat Bite attack imports wrongly.](https://bitbucket.org/mlenser/5eshaped/issues/148/bat-bite-attack-imports-wrongly)
+* [#173: Saving throw second damage crit showing](https://bitbucket.org/mlenser/5eshaped/issues/173/saving-throw-second-damage-crit-showing)
+* [#174: Equal padding for roll and attack rolls for roll2](https://bitbucket.org/mlenser/5eshaped/issues/174/equal-padding-for-roll-and-attack-rolls)
+* [#176: Spell Macro always shows Spell Points](https://bitbucket.org/mlenser/5eshaped/issues/176/spell-macro-always-shows-spell-points)
+* [#187: Global Spellcasting Attack Modifier](https://bitbucket.org/mlenser/5eshaped/issues/187/global-spellcasting-attack-modifier)
+* [#200: Brutal Critical](https://bitbucket.org/mlenser/5eshaped/issues/200/brutal-critical)
+* [#195: Skill Rolls for Non-Proficient Skill broken](https://bitbucket.org/mlenser/5eshaped/issues/195/skill-rolls-for-non-proficient-skill)
+* [#197: Saving Throw Rolls - Proficient](https://bitbucket.org/mlenser/5eshaped/issues/197/saving-throw-rolls-proficient)
+* [#193: Monster Manual - Strenght modifier applied to 1d1 attacks](https://bitbucket.org/mlenser/5eshaped/issues/193/monster-manual-strenght-modifier-applied)
+* [#199: Different rounding on mean damage](https://bitbucket.org/mlenser/5eshaped/issues/199/different-rounding-on-mean-damage)
+
 ## 9.0.1
 
 The following issues should have no impact on the stability of the sheet. All are minor issues. I purposefully avoided anything that may cause other issues.
