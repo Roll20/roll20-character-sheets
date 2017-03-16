@@ -3,9 +3,12 @@
 This is a re-creation of the "green-sheet" for the D&D Basic Moldvay Red box game.  It was created for the Roll20 Moldvay Basic Contest.
 
 ## Current Version
-2.3
+2.4
 
 ### Changelog
+
+#### 2.4
+* Fix for Monster THAC0 being set to read-only (#2426)
 
 #### 2.3
 * Added Sheet Worker to automatically add in Halfing Missile Bonus if Halfling Class is selected (#2325)
