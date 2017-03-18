@@ -4,6 +4,8 @@ Styling is inspired primarily by GCS, but also with some influence from the offi
 
 
 TODO
+ - Allow for free native language
+ - Add option for Language talent to reduce cost.
  - Add a damage calculator that:
     - Takes inputs for Damage Amount, Damage Type, and Location
     - Reduce amount by DR for location

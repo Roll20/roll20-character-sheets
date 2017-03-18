@@ -5,7 +5,12 @@
 
 ### Changelog
 
-### 1.7.8.1 on 2017 February 27th
+### 1.7.9 on 2017 March 10th
+* Added Goals, Beliefs, and Instincts section for characters to record each that might help them in roleplaying their characters better.
+* Added a "non-essential" inventory and notes section.
+	- Players could potentially use this to add homebrew material for record keeping.
+
+### 1.7.8.5 on 2017 February 27th
 * Took out Sanity Points as this was not Core Rules.
 	- Just committed out, so can access it via custom sheets
 * Took out Attribute dice calculation for Attribute 11, highest meant to be 10.
