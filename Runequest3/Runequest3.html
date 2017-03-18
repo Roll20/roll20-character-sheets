@@ -1,4 +1,4 @@
-﻿	<input type="radio" name="attr_tab1" class="sheet-tab sheet-tab1" value="1" title="Background" checked="checked" /><span title="Basic"></span>
+﻿ 	<input type="radio" name="attr_tab1" class="sheet-tab sheet-tab1" value="1" title="Background" checked="checked" /><span title="Basic"></span>
 	<input type="radio" name="attr_tab1" class="sheet-tab sheet-tab2" value="2" title="Skills" /><span title="Skills"></span>
 	<input type="radio" name="attr_tab1" class="sheet-tab sheet-tab3" value="3" title="Combat" /><span title="Combat"></span>
 	<input type="radio" name="attr_tab1" class="sheet-tab sheet-tab4" value="4" title="Equipment" /><span title="Equipment"></span>
@@ -610,7 +610,18 @@
 					<input class="sheet-skill_values" type="text" value="5" name="attr_track_value" />
 					<input class="sheet-skill_values" type="text" disabled value="[@{perception_mod}+@{track_value}+@{fatigue_mod}]" name="attr_track_total" />
 				</div>
-				
+				<fieldset class="repeating_pskills">
+					<div style="margin-bottom:2px">	
+						<input  style="display:inline-block" type="checkbox" name="attr_pskill_check" />
+						<input  class="sheet-blank_skill"  style="display:inline-block;" type="text" name="attr_pskill_name" />
+						
+						<button style="font-family:dicefontd20;margin:0px;" type="roll" value="&{template:skillRoll} {{name=@{character_name}}} {{skillvalue=@{pskill_total}}} {{fumble=[[95+ceil((@{pskill_total}/20))]]}} {{crit=[[round(@{pskill_total}/20)+1]]}} {{special=[[round((@{pskill_total})/5)+1]]}}         {{success=[[@{pskill_total}]]}} {{roll=[[1d100]]}} {{skillname=@{pskill_name}}}" >t</button>								
+						<button type="roll" value="&{template:skillRoll} {{name=@{character_name}}} {{skillvalue=@{pskill_total}}} {{fumble=[[95+ceil(((@{pskill_total}+?{mods|0})/20))]]}} {{crit=[[round((@{pskill_total}+?{mods|0})/20)+1]]}} {{special=[[round(((@{pskill_total}+?{mods|0}))/5)+1]]}}         {{success=[[@{pskill_total}+?{mods|0}]]}} {{roll=[[1d100]]}} {{skillname=@{pskill_name}}}"  ><div class="sheet-skill_mod_button">-?</div></button>
+						<input type="text"  class="sheet-skill_values" value="0" name="attr_pskill_value" />
+						<input type="text"  class="sheet-skill_values" disabled name="attr_pskill_total" value="@{pskill_value}+@{manipulation_mod}+@{fatigue_mod}" />
+						
+					</div>				
+				</fieldset>				
 				
 				
 				</div>
@@ -639,6 +650,21 @@
 					<input class="sheet-skill_values" type="text" value="10" name="attr_sneak_value" />
 					<input class="sheet-skill_values" type="text" disabled value="[@{stealth_mod}+@{sneak_value}+@{fatigue_mod}]" name="attr_sneak_total" />
 				</div>
+				<fieldset class="repeating_sskill">
+					<div style="margin-bottom:2px">	
+						<input  style="display:inline-block" type="checkbox" name="attr_sskill_check" />
+						<input  class="sheet-blank_skill"  style="display:inline-block;" type="text" name="attr_sskill_name" />
+						
+						<button style="font-family:dicefontd20;margin:0px;" type="roll" value="&{template:skillRoll} {{name=@{character_name}}} {{skillvalue=@{sskill_total}}} {{fumble=[[95+ceil((@{sskill_total}/20))]]}} {{crit=[[round(@{sskill_total}/20)+1]]}} {{special=[[round((@{sskill_total})/5)+1]]}}         {{success=[[@{sskill_total}]]}} {{roll=[[1d100]]}} {{skillname=@{sskill_name}}}" >t</button>								
+						<button type="roll" value="&{template:skillRoll} {{name=@{character_name}}} {{skillvalue=@{sskill_total}}} {{fumble=[[95+ceil(((@{sskill_total}+?{mods|0})/20))]]}} {{crit=[[round((@{sskill_total}+?{mods|0})/20)+1]]}} {{special=[[round(((@{sskill_total}+?{mods|0}))/5)+1]]}}         {{success=[[@{sskill_total}+?{mods|0}]]}} {{roll=[[1d100]]}} {{skillname=@{sskill_name}}}"  ><div class="sheet-skill_mod_button">-?</div></button>
+						<input type="text"  class="sheet-skill_values" value="0" name="attr_sskill_value" />
+						<input type="text"  class="sheet-skill_values" disabled name="attr_sskill_total" value="@{sskill_value}+@{manipulation_mod}+@{fatigue_mod}" />
+						
+					</div>				
+				</fieldset>					
+				
+				
+				
 				</div>	
 			</div>
 
@@ -646,11 +672,11 @@
 </div> <!--- End of Tab 2 -->
 <div style="background-color: #ac6e73" class="sheet-tab-content sheet-tab3">
    <br />
-   <div style="background-color:white;padding-bottom:13px;border-radius:6px">
+   <div style="background-color:white;padding-top:5px;padding-bottom:13px;border-radius:6px">
 
 	<label style="display:inline-Block;width:136px">Weapon Skills</label>
 	(A&#37; <span name="attr_manipulation_mod"></span>)&nbsp; &nbsp; (P&#37; <span name="attr_agility_mod"></span>) 
-	Fatigue ( <span name="attr_fatigue_mod"></span>%)
+	Fatigue ( <span name="attr_fatigue_mod"></span>%) Other Modifiers <input type="number" name="attr_gen_mod" value="0" />
 	</div>
    <br />
 
@@ -681,14 +707,27 @@
 			  <input type="number" name="attr_wpn_sr" />
 			  <input type="number" disabled name="attr_total_wpn_sr" value="[@{wpn_sr}+@{melee_srm}]" />
 			  <input type="number" name="attr_wpn_attk_value" />
-			  <input type="number" disabled name="attr_wpn_attk_total" value="@{wpn_attk_value}+@{manipulation_mod}+@{fatigue_mod}+@{minmod}" />
+			  <input type="number" disabled name="attr_wpn_attk_total" value="@{wpn_attk_value}+@{manipulation_mod}+@{fatigue_mod}+@{minmod}+@{gen_mod}" />
 			  
-							<button style="font-family:dicefontd20;margin:0px;" type="roll" value="&{template:melee-roll} {{name=@{character_name}}} {{tot=[[@{wpn_damage}+@{damagebonus}]]}}{{skillvalue=@{wpn_attk_total}}} {{fumble=[[95+ceil((@{wpn_attk_total}/20))]]}} {{crit=[[round(@{wpn_attk_total}/20)+1]]}} {{special=[[round((@{wpn_attk_total})/5)+1]]}}         {{success=[[@{wpn_attk_total}]]}} {{roll=[[1d100]]}} {{skillname=@{weapon_type} attack}}" >t</button>								
-							<button type="roll" value="&{template:melee-roll} {{name=@{character_name}}} {{tot=[[@{wpn_damage}+@{damagebonus}]]}}{{skillvalue=@{wpn_attk_total}}} {{fumble=[[95+ceil(((@{wpn_attk_total}+?{mods|0})/20))]]}} {{crit=[[round((@{wpn_attk_total}+?{mods|0})/20)+1]]}} {{special=[[round(((@{wpn_attk_total}+?{mods|0}))/5)+1]]}}         {{success=[[@{wpn_attk_total}+?{mods|0}]]}} {{roll=[[1d100]]}} {{skillname=@{weapon_type} attack}}"  ><div class="sheet-skill_mod_button">-?</div></button>		
+							<button style="font-family:dicefontd20;margin:0px;" type="roll" value="@{melee_value}" >t</button>
+							<textarea name="attr_melee_value" style="display:none">&{template:melee-roll} {{name=@{character_name}}} {{tot=[[@{wpn_damage}+@{damagebonus}]]}}{{skillvalue=@{wpn_attk_total}}} {{fumble=[[95+ceil((@{wpn_attk_total}/20))]]}} {{crit=[[round(@{wpn_attk_total}/20)+1]]}} {{special=[[round((@{wpn_attk_total})/5)+1]]}}         {{success=[[@{wpn_attk_total}]]}} {{roll=[[1d100]]}} {{skillname=@{weapon_type} attack}} 
+
+							&{template:@{creature_hit_location}Melee}} {{roll=[[@{selected_die_roll}]]}}</textarea>
+							
+							<button type="roll" value="@{meleemod_value}"  ><div class="sheet-skill_mod_button">-?</div></button>
+
+							<textarea name="attr_meleemod_value" style="display:none">&{template:melee-roll} {{name=@{character_name}}} {{tot=[[@{wpn_damage}+@{damagebonus}]]}}{{skillvalue=@{wpn_attk_total}}} {{fumble=[[95+ceil(((@{wpn_attk_total}+?{mods|0})/20))]]}} {{crit=[[round((@{wpn_attk_total}+?{mods|0})/20)+1]]}} {{special=[[round(((@{wpn_attk_total}+?{mods|0}))/5)+1]]}}         {{success=[[@{wpn_attk_total}+?{mods|0}]]}} {{roll=[[1d100]]}} {{skillname=@{weapon_type} attack}} 
+							
+							&{template:@{creature_hit_location}Melee}} {{roll=[[@{selected_die_roll}]]}}</textarea>							
+
+
+
+							
 			  <input type="text" style="width:79px" name="attr_wpn_damage" />    
 			  <input type="number" name="attr_wpn_parry_value" />
 			  <input type="number" disabled name="attr_parry_total" value="@{wpn_parry_value}+@{agility_mod}+@{fatigue_mod}" />
-			<button style="font-family:dicefontd20;margin:0px;" type="roll" value="&{template:skillRoll} {{name=@{character_name}}} {{tot=[[@{wpn_damage}+@{damagebonus}]]}}{{skillvalue=@{parry_total}}} {{fumble=[[95+ceil((@{parry_total}/20))]]}} {{crit=[[round(@{parry_total}/20)+1]]}} {{special=[[round((@{parry_total})/5)+1]]}}         {{success=[[@{parry_total}]]}} {{roll=[[1d100]]}} {{skillname=@{weapon_type} parry}}" >t</button>				  
+			<button style="font-family:dicefontd20;margin:0px;" type="roll" value="&{template:skillRoll} {{name=@{character_name}}} {{tot=[[@{wpn_damage}+@{damagebonus}]]}}{{skillvalue=@{parry_total}}} {{fumble=[[95+ceil((@{parry_total}/20))]]}} {{crit=[[round(@{parry_total}/20)+1]]}} {{special=[[round((@{parry_total})/5)+1]]}}         {{success=[[@{parry_total}]]}} {{roll=[[1d100]]}} {{skillname=@{weapon_type} parry}}" >t</button>	
+		
 			<button type="roll" value="&{template:skillRoll} {{name=@{character_name}}} {{skillvalue=@{parry_total}}} {{fumble=[[95+ceil(((@{parry_total}+?{mods|0})/20))]]}} {{crit=[[round((@{parry_total}+?{mods|0})/20)+1]]}} {{special=[[round(((@{parry_total}+?{mods|0}))/5)+1]]}}         {{success=[[@{parry_total}+?{mods|0}]]}} {{roll=[[1d100]]}} {{skillname=@{weapon_type} parry}} "  ><div class="sheet-skill_mod_button">-?</div></button>
 			  <!--<input type="number" name="attr_wpn_ap_max" />/-->
 			  <input type="number" name="attr_wpn_ap" />
@@ -705,7 +744,7 @@
    <label style="margin-left:18px;width:95px">Weapon</label>
    <label style="width:124px">STR/DEX</label>   
    <label style="width:30px">DSR</label>
-   <label style="width:146px">Attack Skill</label>
+   <label style="width:136px">Attack Skill</label>
    <label style="width:54px">Damage</label>
    <label style="width:13px">DB</label>
    <label style="width:75px">Range</label>		
@@ -721,9 +760,16 @@
 	  <input type="text" readonly style="width:30px;" value="0" name="attr_minmod" />
       <input type="number" disabled name="attr_total_wpn_sr" value="[@{dex_srm}]" />
       <input type="number" value="0" name="attr_wpn_attk_value" />
-      <input type="number" disabled name="attr_wpn_attk_total" value="[@{wpn_attk_value}+@{manipulation_mod}+@{fatigue_mod}+@{minmod}]" />
-					<button style="font-family:dicefontd20;margin:0px;" type="roll" value="&{template:melee-roll} {{name=@{character_name}}} {{tot=[[@{wpn_damage}+@{wpnmdb}]]}}{{skillvalue=@{wpn_attk_total}}} {{fumble=[[95+ceil((@{wpn_attk_total}/20))]]}} {{crit=[[round(@{wpn_attk_total}/20)+1]]}} {{special=[[round((@{wpn_attk_total})/5)+1]]}}         {{success=[[@{wpn_attk_total}]]}} {{roll=[[1d100]]}} {{skillname=@{weapon_type}}}" >t</button>								
-					<button type="roll" value="&{template:melee-roll} {{name=@{character_name}}} {{tot=[[@{wpn_damage}+@{wpnmdb}]]}}{{skillvalue=@{wpn_attk_total}}} {{fumble=[[95+ceil(((@{wpn_attk_total}+?{mods|0})/20))]]}} {{crit=[[round((@{wpn_attk_total}+?{mods|0})/20)+1]]}} {{special=[[round(((@{wpn_attk_total}+?{mods|0}))/5)+1]]}}         {{success=[[@{wpn_attk_total}+?{mods|0}]]}} {{roll=[[1d100]]}} {{skillname=@{weapon_type}}}"  ><div class="sheet-skill_mod_button">-?</div></button>		      <input type="text" style="width:69px" name="attr_wpn_damage" />
+      <input type="number" disabled name="attr_wpn_attk_total" value="[@{wpn_attk_value}+@{manipulation_mod}+@{fatigue_mod}+@{minmod}+@{gen_mod}}]" />
+					<button style="font-family:dicefontd20;margin:0px;" type="roll" value="@{missle_value}" >t</button>	
+					<textarea name="attr_missle_value" style="display:none">&{template:melee-roll} {{name=@{character_name}}} {{tot=[[@{wpn_damage}+@{wpnmdb}]]}}{{skillvalue=@{wpn_attk_total}}} {{fumble=[[95+ceil((@{wpn_attk_total}/20))]]}} {{crit=[[round(@{wpn_attk_total}/20)+1]]}} {{special=[[round((@{wpn_attk_total})/5)+1]]}}         {{success=[[@{wpn_attk_total}]]}} {{roll=[[1d100]]}} {{skillname=@{weapon_type}}}
+					
+					&{template:@{creature_hit_location}Missle}} {{roll=[[@{selected_die_roll}]]}}</textarea>
+					
+					<button type="roll" value="@{misslemod_value}"  ><div class="sheet-skill_mod_button">-?</div></button>		      <input type="text" style="width:69px" name="attr_wpn_damage" />
+					<textarea name="attr_misslemod_value" style="display:none">&{template:melee-roll} {{name=@{character_name}}} {{tot=[[@{wpn_damage}+@{wpnmdb}]]}}{{skillvalue=@{wpn_attk_total}}} {{fumble=[[95+ceil(((@{wpn_attk_total}+?{mods|0})/20))]]}} {{crit=[[round((@{wpn_attk_total}+?{mods|0})/20)+1]]}} {{special=[[round(((@{wpn_attk_total}+?{mods|0}))/5)+1]]}}         {{success=[[@{wpn_attk_total}+?{mods|0}]]}} {{roll=[[1d100]]}} {{skillname=@{weapon_type}}}
+					
+					&{template:@{creature_hit_location}Missle}} {{roll=[[@{selected_die_roll}]]}}</textarea>					
 	  <input type="checkbox"  name="attr_mdbtoggle" />
 	  <input type="text" style="width:80px;" name="attr_wpn_range" />
       <input type="text" style="width:50px;" name="attr_wpn_rof" />
@@ -836,7 +882,7 @@
             </tr>
          </tbody>
       </table>
-	  <p>*Strenghting Enchantment</p>
+	  <p>*Strengthening Enchantment</p>
       <!--
          <fieldset class="repeating_hlocations">
          	<table>
@@ -924,16 +970,32 @@
          <button style="font-family:dicefontd20;margin:0px;" type="roll" value="&{template:Melee-Attack-Fumble} {{table=[[@{selected_fumble_table}]]}} {{roll=[[1d100]]}}">t</button>
          <div style="display:inline">
             Roll
-            <select name="attr_selected_hit_location" style="margin-top: 7px; height: 24px ; width: 75px">
-               <option value="0">Human</option>
+            <select name="attr_creature_hit_location" style="margin-top: 7px; height: 24px ; width: 106px">
+               <option value="HL-">Human</option>
+               <option value="FLL-">Four-Legged</option>
+			   <option value="WalkL-">Walktapus</option>			   
             </select>
+            <select name="attr_selected_wpn_type" style="margin-top: 7px; height: 24px ; width: 106px">
+               <option value="Melee">Melee</option>
+               <option value="Missle">Missle</option>			   
+            </select>			
+            Die
+            <select name="attr_selected_die_roll" style="margin-top: 7px; height: 24px ; width: 84px">
+               <option value="1d20">1d20</option>
+               <option value="1d10+10">1d10+10</option>
+               <option value="1d8+12">1d8+12</option>
+               <option value="1d10">1d10</option>
+               <option value="1d8">1d8</option>			   			   
+            </select>
+			<button type="roll" value="&{template:@{creature_hit_location}@{selected_wpn_type}} {{roll=[[@{selected_die_roll}]]}}" ><div style="font-family:dicefontd20;margin:0px;">t</div></button>
+			<!--	
             Hit Location
-            <button style="background-color: white;font-size:0;height:32px" name="roll_melee-location"  type="roll" value="&{template:HL-Melee} {{roll=[[1d20]]}}"   class="btn ui-draggable">						  
+            <button style="background-color: white;font-size:0;height:32px" name="roll_melee-location"  type="roll" value="&{template:HL-Melee} {{roll=[[@{selected_die_roll}]]}}"   class="btn ui-draggable">						  
             <img src="https://i.imgur.com/Is6m9rX.png" />
             </button>				
-            <button style="background-color: white;font-size:0;height:32px" name="roll_missle-location"  type="roll" value="&{template:HL-Missle} {{roll=[[1d20]]}}"   class="btn ui-draggable ">
+            <button style="background-color: white;font-size:0;height:32px" name="roll_missle-location"  type="roll" value="&{template:HL-Missle} {{roll=[[@{selected_die_roll}]]}}"   class="btn ui-draggable ">
             <img src="https://i.imgur.com/IxuyBxY.png" />
-            </button>
+            </button>-->
          </div>
       </div>
    </div>
@@ -1810,6 +1872,66 @@ D20	    Result	       AP/HP
 	</div> <!--- End of Tab 5 -->
 		
 	<script type="text/worker">
+	
+			//Set Damage Bonus
+		on("change:curstr change:cursiz", function() {
+			getAttrs(["curstr", "cursiz", "damagebonus"], function(pvalue) {
+				console.log("************ Start Damage Bonus ************");
+				console.log("curstr value: " + pvalue.curstr);
+				console.log("cursiz value: " + pvalue.cursiz);
+				console.log("damagebonus value: " + pvalue.damagebonus);
+				var curStrength = parseInt(pvalue.curstr);
+				var curSize = parseInt(pvalue.cursiz);
+				var curDB = parseInt(pvalue.damagebonus);
+				var StplusSi = curStrength + curSize;
+				console.log("Str+Size value: " + StplusSi);
+				var DBonus = "-1d4";
+				var mDBonus = "-1d2";
+				var DBonusC = 0;
+							
+				//Determine Bonus
+				if (StplusSi < 18) {
+					console.log("-- Str+Siz is less than 18 --");
+					DBonus = "-1d4";
+					mDBonus = "-1d2";					
+					console.log("DBonus value: " + DBonus);
+					setAttrs({ damagebonus: DBonus,mdamagebonus: mDBonus  });
+				}
+				else if (StplusSi < 25) {
+					console.log("-- Str+Siz is less than 25 --");
+					DBonus = "0";
+					mDBonus = "0";
+					console.log("DBonus value: " + DBonus);
+					setAttrs({ damagebonus: DBonus,mdamagebonus: mDBonus  });
+				}
+				else if (StplusSi < 33) {
+					console.log("-- Str+Siz is less than 31 --");
+					DBonus = "1d4";
+					mDBonus = "1d2";					
+					console.log("DBonus value: " + DBonus);
+					setAttrs({ damagebonus: DBonus,mdamagebonus: mDBonus  });
+				}
+				else if (StplusSi < 41) {
+					console.log("-- Str+Siz is less than 31 --");
+					DBonus = "1d6";
+					mDBonus = "1d3";					
+					console.log("DBonus value: " + DBonus);
+					setAttrs({ damagebonus: DBonus,mdamagebonus: mDBonus  });
+				}			
+				else { //StplusSi is greater than 
+					DBonusC = 2+Math.floor(parseFloat((StplusSi - 40) / 16));
+					console.log("DBonusC value: " + DBonusC);
+
+					DBonus = DBonusC + "d6";
+					mDBonus = DBonusC + "d3";					
+					console.log("DBonus value: " + DBonus);
+					setAttrs({ damagebonus: DBonus,mdamagebonus: mDBonus });
+				}            
+				console.log("************ End Damage Bonus ************");
+			});
+		});
+		
+	
 
 	//animal 2 hit points
 	on("change:animal2_con change:animal2_siz ", function() {
@@ -1898,7 +2020,7 @@ D20	    Result	       AP/HP
 	
 	//reset weapon str/ def penalties if str changes
 
-		on("change:curstr change:curdex", function() {
+		on("change:curstr change:curdex change:cursiz", function() {
 		
 			    console.log("start weapon str/dex min checks ");
 				
@@ -1965,16 +2087,18 @@ D20	    Result	       AP/HP
 				getSectionIDs("repeating_missle", function(idArray) {
 					if (idArray.length > 0) {
 						_.each(idArray, function(currentID, i) {
-							getAttrs(["repeating_missle_" + currentID + "_wpnstr","repeating_missle_" + currentID + "_wpndex","curstr","curdex" ], function(values) {
+							getAttrs(["repeating_missle_" + currentID + "_mdbtoggle","repeating_missle_" + currentID + "_wpnstr","repeating_missle_" + currentID + "_wpndex","curstr","curdex","mdamagebonus" ], function(values) {
 								console.log("what have we here");
 								var wStr = parseInt(values["repeating_missle_" + idArray[i] + "_wpnstr"]);
 								var wDex = parseInt(values["repeating_missle_" + idArray[i] + "_wpndex"]);
+								var mdb = values["repeating_missle_" + idArray[i] + "_mdbtoggle"]
 								var cStr = parseInt(values.curstr);
 								var cDex = parseInt(values.curdex);
 								var minMod = 0;
 								var strMod = cStr-wStr;
 								var dexMod = cDex-wDex;
 								var totmod = 0;
+								var mdbStr = "0";
 								var attrsToSet = {};
 								if (strMod < 0){
 									console.log("Below min str");
@@ -1993,6 +2117,17 @@ D20	    Result	       AP/HP
 								console.log(attrsToSet);		
 								setAttrs(attrsToSet);
 								
+								//set missle damage bonus
+								var missletoggleId = "repeating_missle_" + idArray[i] + "_wpnmdb";
+								if (mdb=="on"){
+									
+									mdbStr = values.mdamagebonus;
+								}
+
+								attrsToSet[missletoggleId] = mdbStr;
+								console.log("new missle bonus");
+								console.log(attrsToSet);		
+								setAttrs(attrsToSet);								
 								
 								/*
 								console.log("wStr");
@@ -2027,7 +2162,7 @@ D20	    Result	       AP/HP
 				var mdb =  values.repeating_missle_mdbtoggle;
 				var mdbStr = "0";
 				if (mdb=="on"){
-					console.log("ballbag");
+					
 					mdbStr = values.mdamagebonus;
 				}
 				setAttrs({repeating_missle_wpnmdb:mdbStr});	
@@ -2759,64 +2894,7 @@ D20	    Result	       AP/HP
 			});
 		});
 		
-		//Set Damage Bonus
-		on("change:curstr change:cursiz", function() {
-			getAttrs(["curstr", "cursiz", "damagebonus"], function(pvalue) {
-				console.log("************ Start Damage Bonus ************");
-				console.log("curstr value: " + pvalue.curstr);
-				console.log("cursiz value: " + pvalue.cursiz);
-				console.log("damagebonus value: " + pvalue.damagebonus);
-				var curStrength = parseInt(pvalue.curstr);
-				var curSize = parseInt(pvalue.cursiz);
-				var curDB = parseInt(pvalue.damagebonus);
-				var StplusSi = curStrength + curSize;
-				console.log("Str+Size value: " + StplusSi);
-				var DBonus = "-1d4";
-				var mDBonus = "-1d2";
-				var DBonusC = 0;
-							
-				//Determine Bonus
-				if (StplusSi < 18) {
-					console.log("-- Str+Siz is less than 18 --");
-					DBonus = "-1d4";
-					mDBonus = "-1d2";					
-					console.log("DBonus value: " + DBonus);
-					setAttrs({ damagebonus: DBonus,mdamagebonus: mDBonus  });
-				}
-				else if (StplusSi < 25) {
-					console.log("-- Str+Siz is less than 25 --");
-					DBonus = "0";
-					mDBonus = "0";
-					console.log("DBonus value: " + DBonus);
-					setAttrs({ damagebonus: DBonus,mdamagebonus: mDBonus  });
-				}
-				else if (StplusSi < 33) {
-					console.log("-- Str+Siz is less than 31 --");
-					DBonus = "1d4";
-					mDBonus = "1d2";					
-					console.log("DBonus value: " + DBonus);
-					setAttrs({ damagebonus: DBonus,mdamagebonus: mDBonus  });
-				}
-				else if (StplusSi < 41) {
-					console.log("-- Str+Siz is less than 31 --");
-					DBonus = "1d6";
-					mDBonus = "1d3";					
-					console.log("DBonus value: " + DBonus);
-					setAttrs({ damagebonus: DBonus,mdamagebonus: mDBonus  });
-				}			
-				else { //StplusSi is greater than 
-					DBonusC = 2+Math.floor(parseFloat((StplusSi - 40) / 16));
-					console.log("DBonusC value: " + DBonusC);
 
-					DBonus = DBonusC + "d6";
-					mDBonus = DBonusC + "d3";					
-					console.log("DBonus value: " + DBonus);
-					setAttrs({ damagebonus: DBonus,mdamagebonus: mDBonus });
-				}            
-				console.log("************ End Damage Bonus ************");
-			});
-		});
-		
 		//Set Animal 1 Damage Bonus
 		on("change:animal1_str change:animal1_siz", function() {
 			getAttrs(["animal1_str", "animal1_siz"], function(pvalue) {
@@ -3621,7 +3699,7 @@ D20	    Result	       AP/HP
 
 <rolltemplate class="sheet-rolltemplate-HL-Melee">
 	<table class="skillRoll" style="border 1px black">
-		<tr><th colspan="1">Melee Hit location roll</th></tr>
+		<tr><th colspan="1">Human Melee Hit location roll</th></tr>
 		<tr>
 		{{#rollBetween() roll 1 4}}<td class="template_label">Hit on the Left Leg</td>{{/rollBetween() roll 1 4}}
 		{{#rollBetween() roll 5 8}}<td class="template_label">Hit on the Right Leg</td>{{/rollBetween() roll 5 8}}
@@ -3640,7 +3718,7 @@ D20	    Result	       AP/HP
 
 <rolltemplate class="sheet-rolltemplate-HL-Missle">
 	<table class="skillRoll" style="border 1px black">
-		<tr><th colspan="1">Missle Hit location roll</th></tr>
+		<tr><th colspan="1">Human Missle Hit location roll</th></tr>
 		<tr>
 		{{#rollBetween() roll 1 3}}<td class="template_label">Hit on the Left Leg</td>{{/rollBetween() roll 1 3}}
 		{{#rollBetween() roll 4 6}}<td class="template_label">Hit on the Right Leg</td>{{/rollBetween() roll 4 6}}
@@ -3655,6 +3733,84 @@ D20	    Result	       AP/HP
 	</table>
 </rolltemplate>
 
+
+<rolltemplate class="sheet-rolltemplate-FLL-Missle">
+	<table class="skillRoll" style="border 1px black">
+		<tr><th colspan="1">Four-legged Missle Hit location roll</th></tr>
+		<tr>
+		{{#rollBetween() roll 1 2}}<td class="template_label">Hit on the RH Leg</td>{{/rollBetween() roll 1 2}}
+		{{#rollBetween() roll 3 4}}<td class="template_label">Hit on the LH Leg</td>{{/rollBetween() roll 3 4}}
+		{{#rollBetween() roll 5 7}}<td class="template_label">Hit on the  Hind Q</td>{{/rollBetween() roll 5 7}}
+		{{#rollBetween() roll 8 10}}<td class="template_label">Hit on the Fore Q</td>{{/rollBetween() roll 8 10}}
+		{{#rollBetween() roll 11 13}}<td class="template_label">Hit on the RF Leg</td>{{/rollBetween() roll 11 13}}
+		{{#rollBetween() roll 14 16}}<td class="template_label">Hit on the LF Leg</td>{{/rollBetween() roll 14 16}}
+		{{#rollBetween() roll 17 20}}<td class="template_label">Hit on the Head</td>{{/rollBetween() roll 17 20}}		
+		</tr>
+	</table>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-FLL-Melee">
+	<table class="skillRoll" style="border 1px black">
+		<tr><th colspan="1">Four-legged Melee Hit location roll</th></tr>
+		<tr>
+		{{#rollBetween() roll 1 2}}<td class="template_label">Hit on the RH Leg</td>{{/rollBetween() roll 1 2}}
+		{{#rollBetween() roll 3 4}}<td class="template_label">Hit on the LH Leg</td>{{/rollBetween() roll 3 4}}
+		{{#rollBetween() roll 5 7}}<td class="template_label">Hit on the  Hind Q</td>{{/rollBetween() roll 5 7}}
+		{{#rollBetween() roll 8 10}}<td class="template_label">Hit on the Fore Q</td>{{/rollBetween() roll 8 10}}
+		{{#rollBetween() roll 11 13}}<td class="template_label">Hit on the RF Leg</td>{{/rollBetween() roll 11 13}}
+		{{#rollBetween() roll 14 16}}<td class="template_label">Hit on the LF Leg</td>{{/rollBetween() roll 14 16}}
+		{{#rollBetween() roll 17 20}}<td class="template_label">Hit on the Head</td>{{/rollBetween() roll 17 20}}		
+		</tr>
+	</table>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-WalkL-Melee">
+	<table class="skillRoll" style="border 1px black">
+		<tr><th colspan="1">Walktapus Melee Hit location roll</th></tr>
+		<tr>
+		{{#rollBetween() roll 1 2}}<td class="template_label">Hit on the R Leg</td>{{/rollBetween() roll 1 2}}
+		{{#rollBetween() roll 3 4}}<td class="template_label">Hit on the L Leg</td>{{/rollBetween() roll 3 4}}
+		{{#rollTotal() roll 5}}<td class="template_label">Hit on the  Abdomen</td>{{/rollTotal() roll 5}}
+		{{#rollTotal() roll 6}}<td class="template_label">Hit on the  Chest</td>{{/rollTotal() roll 6}}		
+		{{#rollBetween() roll 7 8}}<td class="template_label">Hit on the R Arm</td>{{/rollBetween() roll 7 8}}
+		{{#rollBetween() roll 9 10}}<td class="template_label">Hit on the L Arm</td>{{/rollBetween() roll 9 10}}
+		{{#rollTotal() roll 11}}<td class="template_label">Hit on the  Tentacle 1</td>{{/rollTotal() roll 11}}
+		{{#rollTotal() roll 12}}<td class="template_label">Hit on the  Tentacle 2</td>{{/rollTotal() roll 12}}				
+		{{#rollTotal() roll 13}}<td class="template_label">Hit on the  Tentacle 3</td>{{/rollTotal() roll 13}}				
+		{{#rollTotal() roll 14}}<td class="template_label">Hit on the  Tentacle 4</td>{{/rollTotal() roll 14}}
+		{{#rollTotal() roll 15}}<td class="template_label">Hit on the  Tentacle 5</td>{{/rollTotal() roll 15}}
+		{{#rollTotal() roll 16}}<td class="template_label">Hit on the  Tentacle 6</td>{{/rollTotal() roll 16}}				
+		{{#rollTotal() roll 17}}<td class="template_label">Hit on the  Tentacle 7</td>{{/rollTotal() roll 17}}				
+		{{#rollTotal() roll 18}}<td class="template_label">Hit on the  Tentacle 8</td>{{/rollTotal() roll 18}}				
+		{{#rollBetween() roll 19 20}}<td class="template_label">Hit on Head</td>{{/rollBetween() roll 19 20}}		
+		</tr>
+	</table>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-WalkL-Missle">
+	<table class="skillRoll" style="border 1px black">
+		<tr><th colspan="1">Walktapus Missle Hit location roll</th></tr>
+		<tr>
+	
+		{{#rollTotal() roll 1}}<td class="template_label">Hit on the  R Leg</td>{{/rollTotal() roll 1}}		
+		{{#rollTotal() roll 2}}<td class="template_label">Hit on the  L Leg</td>{{/rollTotal() roll 2}}
+		{{#rollBetween() roll 3 4}}<td class="template_label">Hit on Abdomen</td>{{/rollBetween() roll 3 4}}
+		{{#rollBetween() roll 5 7}}<td class="template_label">Hit on chest</td>{{/rollBetween() roll 5 7}}
+		{{#rollTotal() roll 8}}<td class="template_label">Hit on the  R Arm</td>{{/rollTotal() roll 8}}		
+		{{#rollTotal() roll 9}}<td class="template_label">Hit on the  L Arm</td>{{/rollTotal() roll 9}}		
+		{{#rollTotal() roll 10}}<td class="template_label">Hit on the  Tentacle 1</td>{{/rollTotal() roll 10}}
+		{{#rollTotal() roll 11}}<td class="template_label">Hit on the  Tentacle 2</td>{{/rollTotal() roll 11}}				
+		{{#rollTotal() roll 12}}<td class="template_label">Hit on the  Tentacle 3</td>{{/rollTotal() roll 12}}				
+		{{#rollTotal() roll 13}}<td class="template_label">Hit on the  Tentacle 4</td>{{/rollTotal() roll 13}}
+		{{#rollTotal() roll 14}}<td class="template_label">Hit on the  Tentacle 5</td>{{/rollTotal() roll 14}}
+		{{#rollTotal() roll 15}}<td class="template_label">Hit on the  Tentacle 6</td>{{/rollTotal() roll 15}}				
+		{{#rollTotal() roll 16}}<td class="template_label">Hit on the  Tentacle 7</td>{{/rollTotal() roll 16}}				
+		{{#rollTotal() roll 17}}<td class="template_label">Hit on the  Tentacle 8</td>{{/rollTotal() roll 17}}				
+		{{#rollBetween() roll 18 20}}<td class="template_label">Hit on Head</td>{{/rollBetween() roll 18 20}}		
+
+		</tr>
+	</table>
+</rolltemplate>
 
 
 

@@ -1,3 +1,24 @@
+## 10.1.5
+
+### Bug Fixes
+
+* [#372: Skill proficiency doesn't import from SRD properly](https://bitbucket.org/mlenser/5eshaped/issues/372/skill-proficiency-doesnt-import-from-srd)
+* [#365: Macro buttons in the settings throw errors if there's "" in the character name](https://bitbucket.org/mlenser/5eshaped/issues/365/macro-buttons-in-the-settings-throw-errors)
+
+### UI Adjustments
+
+* Added some left margin to passive skills. [#340: Passive Skill display enhancement](https://bitbucket.org/mlenser/5eshaped/issues/340/passive-skill-display-enhancement)
+* Reworded Advantage query to "Query (Advantage default). [#255: Advantage and Disadvantage Roll Query are reversed.](https://bitbucket.org/mlenser/5eshaped/issues/255/advantage-and-disadvantage-roll-query-are)
+
+## 10.1.4
+
+### Bug Fixes
+
+* Health from OGL conversion now converts properly for the (seemingly) few cases it wasn't working before. Closes [#261: ConvertFromOGL SKT -> 9.1 issues](https://bitbucket.org/mlenser/5eshaped/issues/261/convertfromogl-skt-91-issues)
+* [#361: Paladin class data typos/issues](https://bitbucket.org/mlenser/5eshaped/issues/361/paladin-class-data-typos-issues)
+* Removed 99% of logging from my sheet. There will be some cases, but they should be rare. Closes [#289: More controllable logging](https://bitbucket.org/mlenser/5eshaped/issues/289/more-controllable-logging)
+* Added some callbacks to OGL conversion which was causing it to not update traits, actions, etc when converting. Addresses part of [#362: ConvertFromOGL Lost Halls of Everforge](https://bitbucket.org/mlenser/5eshaped/issues/362/convertfromogl-lost-halls-of-everforge)
+
 ## 10.1.3
 
 ### Bug Fixes
