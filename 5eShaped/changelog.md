@@ -1,3 +1,29 @@
+## 11.0.0
+
+### Breaking Changes
+
+* Some unused fields related to abilities and saving throws have been removed
+* [#338: Click to roll damage](https://bitbucket.org/mlenser/5eshaped/issues/338/click-to-roll-damage) has been completed for both attacks and saving throws.
+* Spell filters have been revamped. Levels and casting time are toggled individually now. Concentration's behavior is now more clear. The filters are now consistent between PCs and NPCs. Adding spells on a new pc that doesn't have spellcasting should be much more clear. The macro output matches the levels that are toggled on.
+* Rests are always showing now. In 11.1.0 or 12.0.0 rests will be fully moved to the sheet so non-Pro members can use them to recharge things like hit points, hit dice, exhaustion, class features, etc.
+* Ability checks, Saving throws, and Spells chat macros now use the normal size of text used by attacks, actions, etc. It is no longer possible to configure them to be smaller.
+
+### Features
+
+* [#178: 3D dice should roll the appropriate amount of dice](https://bitbucket.org/mlenser/5eshaped/issues/178/3d-dice-should-roll-the-appropriate-amount)
+* [#359: Option to hide AC using stylish](https://bitbucket.org/mlenser/5eshaped/issues/359/option-to-hide-ac-using-stylish)
+* Distances entered into places like senses or speed will now convert the distance if the entered distance type (meters) doesn't match the text (feet).
+* [#204: Nowhere to store usage of lair and regional actions](https://bitbucket.org/mlenser/5eshaped/issues/204/nowhere-to-store-usage-of-lair-and)
+* Added configurable recharges to warlock slots and spell points (defaulting to short rest and long rest respectively)
+* [#244: Extra Attack Class Feature missing from togglable lists.](https://bitbucket.org/mlenser/5eshaped/issues/244/extra-attack-class-feature-missing-from)
+* Added styling for an upcoming API feature (Spells and Monster import revamp)
+
+### Bug Fixes
+
+* [#369: NPC Hit dice not able to be changed](https://bitbucket.org/mlenser/5eshaped/issues/369/npc-hit-dice-not-able-to-be-changed)
+* [#378: Hit dice formula error](https://bitbucket.org/mlenser/5eshaped/issues/378/hit-dice-formula-error). You may need to clear your chat archive for this one (I did, but I'm unsure if it is required)
+* [#379: Spell repeat does not work with freeform if there is a new line in freeform](https://bitbucket.org/mlenser/5eshaped/issues/379/spell-repeat-does-not-work-with-freeform)
+
 ## 10.1.5
 
 ### Bug Fixes
