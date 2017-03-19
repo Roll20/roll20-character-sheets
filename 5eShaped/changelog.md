@@ -1,3 +1,17 @@
+## 11.0.1
+
+### Bug Fixes
+
+* Added default higher level queries
+* A spell changing to another level now ensures that the filter for that level is turned on.
+* Freeform is now at the end of repeats as well. Referencing [#379: Spell repeat does not work with freeform if there is a new line in freeform](https://bitbucket.org/mlenser/5eshaped/issues/379/spell-repeat-does-not-work-with-freeform)
+* [#388: Click to roll damage does not work if the output is from the shaped chat macros](https://bitbucket.org/mlenser/5eshaped/issues/388/click-to-roll-damage-does-not-work-if-the)
+* [#389: Click to roll damage cannot determine a crit on attack](https://bitbucket.org/mlenser/5eshaped/issues/389/click-to-roll-damage-cannot-determine-a)
+
+### UI Change
+
+* [#207: second damage roll template](https://bitbucket.org/mlenser/5eshaped/issues/207/second-damage-roll-template)
+
 ## 11.0.0
 
 ### Breaking Changes
