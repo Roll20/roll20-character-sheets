@@ -1,6 +1,6 @@
-# DCC Tabbed Character Sheet
+# MCC Tabbed Character Sheet
 
-This is a DCC sheet that uses tabs and Roll Templates.  It also includes a 0-level sheet, and a Monster sheet.
+This is a MCC sheet that uses tabs and Roll Templates.  It also includes a 0-level sheet, and a Monster sheet.  It is based on my DCC sheet.
 
 ## Current Version
 1.0
