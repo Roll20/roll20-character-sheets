@@ -3,7 +3,7 @@
 Feuille de personnage (FdP) avec jets intégrés pour **Savage Worlds** et **Deadlands Reloaded**, basée sur le Livre de Base (LdB) de la version éditée en français par [Black Book Editions](http://www.black-book-editions.fr/catalogue.php?id=58).
 
 # Version courante
-1.7 [Capture d'écran](sawofr.jpg)  
+1.8 [Capture d'écran](sawofr.jpg)  
 [Style Deadlands](sawofr_style_deadlands.png)
 
 #Notes sur les Jets
@@ -81,6 +81,9 @@ Les suggestions sont les bienvenues à ce sujet.
 NB : décrémenter les PP automatiquement au lancement d'un pouvoir nécessiterait l'utilisation d'un script API, donc d'un compte "Pro".
 
 # Notes de version
+
+##v1.8 (2017-02-18)
+Nouvelle correction d'un bug occasionnel de calcul de l'encombrement.
 
 ##v1.7 (2016-12-18)
 Correction d'un bug occasionnel de calcul de l'encombrement.

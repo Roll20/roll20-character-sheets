@@ -1,3 +1,28 @@
+<div aria-label="Announces changes to sheet" class="sheet-announcements">
+	<input type="checkbox" name="attr_anchk1" class="sheet-anchk sheet-chkannounce" value="1" title="Show Announcements" /><span></span><b style="color:red;">Announcements</b>
+        <div class="sheet-chk-announce sheet-chkannounce" selectable="true">
+		<h2 style="margin-bottom:-15px;">Recent Changes</h2><br>
+		<p style="font-size:10pt;color:black;">Sheet version: 1.0.3a</p>
+		<div class="sheet-announce-items">
+			<p style="font-size:9pt;color:black;font-style:italic;">Added 2Echeck template and relevant css<br>
+			Updated Information header.<br>
+			Added an attribute to the checkbox for hiding rogue skills so that it will stay hidden when checked.<br>
+			Added support for custom critical hit damage to the 2Eattack template.<br>
+			Fixed 2Eattack template to check if crit damage values are used.<br>
+			Improved handling of styles used for table headers to reduce the code footprint of the sheet.</p>
+                	<h2 style="margin-bottom:-15px;">Proposed Changes</h2><br>
+			<p style="font-size:9pt;color:black;font-style:italic;">Adding an option to display an "Alternate Character Sheet" with the following features:
+			<ul>
+				<li>Roll buttons with full template integration.</li>
+				<li>Upgraded spellbook section.</li>
+				<li>Upgraded repeating weapons section.</li>
+				<li>Does not affect the layout or any information entered on the standard Character Sheet Display.</li>
+			</ul></p>
+			<p style="font-size:10pt;color:black;font-style:normal;">Please join the discussion and provide feedback on the forums! <span class="sheet-selectable">https://tinyurl.com/hcvs56k</span><br>
+			To view the full change log and sheet documentation, please visit the wiki page! <span class="sheet-selectable">https://wiki.roll20.net/ADnD_2nd_Edition_Character_sheet</span> </p>
+		</div>
+	</div>
+</div><br>
 
 <input type="radio" name="attr_tab" class="sheet-tab sheet-tab1" value="1" checked="checked" /><span></span>Character Sheet | Monster Sheet&nbsp;&nbsp;<input type="radio" name="attr_tab" class="sheet-tab sheet-tab2" value="2"/><span></span>
 <br><br>
@@ -560,16 +585,10 @@ Current weight:<input type="number" name="attr_movweighttotal" value="@{gearweig
     </tr>
 </table></fieldset><br><b>Notes</b><textarea name="attr_weaponnotes"></textarea><hr>
 
-
-
-
-
 <h4>Special Abilities and Attacks</h4><br><textarea name="attr_abilitiesnotes"></textarea><br>
 
-    <h4>Rogue Skills</h4><div><input type="checkbox" class="arrow" /><span></span>Hide
-    
+    <h4>Rogue Skills</h4><div><input type="checkbox" name="attr_rsChk" class="arrow" /><span></span>Hide
     <div class="body">
-
     
 <strong>Backstab Multiplier:</strong><input type="text" name="attr_backstabmultiplier" class="tiny">
 <table style='border-collapse: collapse; border-spacing: 0;'>
@@ -701,7 +720,6 @@ Current weight:<input type="number" name="attr_movweighttotal" value="@{gearweig
     </tr>
 </table>Skills with an asterisk (*) are from Skills & Powers, and may be ignored for campaigns using core rules.</div>
 </div><br><hr>
-
 
 <div class="sheet-2colrow">
     <div class="sheet-col">
@@ -1026,21 +1044,23 @@ Current weight:<input type="number" name="attr_gearweighttotal" class="sheet-nob
 		<div class="sheet-template-body">
 			<table>
 				<tr><td colspan="3"><span class="weapon-used">{{weapon_used}}</span></td></tr>
-				<tr>
-					<td class="attack-c1"><b>S/M</b></td>
-					<td class="attack-c2" rowspan="2">{{ac_hit}}</td>
-					<td class="attack-c1"><b>L</b></td>
-				</tr>
-				<tr>
-					<td class="attack-c3" rowspan="2">{{dmg_s}}</td>
-					<td class="attack-c3" rowspan="2">{{dmg_l}}</td>
-				</tr>
-				<tr>
-					<td class="attack-c4"><b>AC Hit</b></td>
-				</tr>
-				{{#rollWasCrit() ac_hit }}
-					<tr><td colspan="3" class="attack-c5">CRITICAL HIT!{{#crit}}<br><span class='attack-crit'>{{crit}}</span>{{/crit}}</td></tr>
-				{{/rollWasCrit() ac_hit }}
+				<tr><td class="attack-c1"><b>S/M</b></td><td class="attack-c2" rowspan="2">{{ac_hit}}</td><td class="attack-c1"><b>L</b></td></tr>
+                {{#crit_s}}{{#crit_l}}
+                    {{#rollWasCrit() ac_hit}}
+                        <tr><td class="attack-c3" rowspan="2">{{crit_s}}</td><td class="attack-c3" rowspan="2">{{crit_l}}</td></tr>
+                        <tr><td class="attack-c4"><b>AC Hit</b></td></tr>
+                        <tr><td colspan="3" class="attack-c5">CRITICAL HIT!{{#crit}}<br><span class='attack-crit'>{{crit}}</span>{{/crit}}</td></tr>
+                    {{/rollWasCrit() ac_hit }}
+                    {{#^rollWasCrit() ac_hit}}
+                        <tr><td class="attack-c3" rowspan="2">{{dmg_s}}</td><td class="attack-c3" rowspan="2">{{dmg_l}}</td></tr>
+                        <tr><td class="attack-c4"><b>AC Hit</b></td></tr>
+                    {{/^rollWasCrit() ac_hit}}
+                {{/crit_l}}{{/crit_s}}
+                {{^crit_s}}{{^crit_l}}
+                    <tr><td class="attack-c3" rowspan="2">{{dmg_s}}</td><td class="attack-c3" rowspan="2">{{dmg_l}}</td></tr>
+                    <tr><td class="attack-c4"><b>AC Hit</b></td></tr>
+                    {{#rollWasCrit() ac_hit}}<tr><td colspan="3" class="attack-c5">CRITICAL HIT!{{#crit}}<br><span class='attack-crit'>{{crit}}</span>{{/crit}}</td></tr>{{/rollWasCrit() ac_hit}}
+                {{/crit_l}}{{/crit_s}}
 				{{#rollWasFumble() ac_hit }}
 					<tr><td colspan="3" class="attack-c6">FUMBLE!{{#fumble}}<br><span class='attack-fumble'>{{fumble}}</span>{{/fumble}}</td></tr>
 				{{/rollWasFumble() ac_hit }}
@@ -1100,6 +1120,32 @@ Current weight:<input type="number" name="attr_gearweighttotal" class="sheet-nob
                 {{#rollLess() saveroll savetarget}}
                     <tr><td class="save-c4" colspan="2">Failed!</td></tr>
                 {{/rollLess() saveroll savetarget}}
+            </table>
+        </div>
+    </div>    
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-2Echeck">
+    <div class="sheet-template-container">
+        <div class="sheet-check-head">
+            <table>
+                <tr><th class="sheet-template-title1">Check vs. {{checkvs}}</th></tr>
+                <tr><th class="sheet-template-subtitle1">for {{character}}</th></tr>
+            </table>
+        </div>
+        <div class="sheet-template-body">
+            <table>
+				<tr><td class="sheet-check-c1">Check Roll:</td><td class="sheet-check-c2">{{checkroll}}</td></tr>
+				<tr><td class="sheet-check-c1">Check Target:</td><td class="sheet-check-c2">{{checktarget}}</td></tr>
+                {{#rollTotal() checkroll checktarget}}
+                    <tr><td class="sheet-check-c3" colspan="2">Success!</td></tr>
+                {{/rollTotal() checkroll checktarget}}
+                {{#rollLess() checkroll checktarget}}
+                    <tr><td class="sheet-check-c3" colspan="2">Success!</td></tr>
+                {{/rollLess() checkroll checktarget}}
+                {{#rollGreater() checkroll checktarget}}
+                    <tr><td class="sheet-check-c4" colspan="2">Failed!</td></tr>
+                {{/rollGreater() checkroll checktarget}}
             </table>
         </div>
     </div>    
