@@ -3,10 +3,31 @@
 /* ---- PMT ---------------------- */
     var PMT = PMT || (function(){
         'use strict';
-        var version = '1.0',
-        majEncombrement = function () {
+        var version = '1.0'
+        ,majPoids = function() {
+            getSectionIDs("repeating_equipement", function(idws) {
+                var totwght = 0.0;
+                idws.forEach(function(idw,index,arr){
+                    var uqte = "repeating_equipement_" + idw + "_equipqte";
+                    var uwght = "repeating_equipement_" + idw + "_equippoids";
+                    var lng = parseInt(arr.length) || 0;
+                    getAttrs(['' + uqte,'' + uwght], function(val) {
+                        var sqte = parseFloat(val[uqte]) || 0.0;
+                        var swght = parseFloat(val[uwght]) || 0.0;
+                        totwght = totwght + (sqte * swght);
+                        if ( (index+1) == lng ){
+                            setAttrs({
+                                encombrement: totwght
+                            });
+                        }
+                    });
+                });
+            });
+        }
+        ,majEncombrement = function () {
             getAttrs(["encombrement"], function (values) {
                 var enc = parseFloat(values.encombrement) || 0.0;
+                var encfinal = enc.toFixed(2);
                 var explo = 0;
                 var combat = 0;
                 if (enc>=71) {
@@ -26,6 +47,7 @@
                     combat = 12;
                 }
                 setAttrs({
+                    encombrement: encfinal,
                     mvtexploration: explo,
                     mvtcombat: combat,
                     mvtcourse: explo,
@@ -34,340 +56,10 @@
             });
         };
         return {
-            majEncombrement: majEncombrement
+            majEncombrement: majEncombrement,
+            majPoids: majPoids
         };
     }());
-/* ---- BEGIN: TheAaronSheet.js ---- */
-// Github:   https://github.com/shdwjk/TheAaronSheet/blob/master/TheAaronSheet.js
-// By:       The Aaron, Arcane Scriptomancer
-// Contact:  https://app.roll20.net/users/104025/the-aaron
-var TAS = TAS || (function(){
-    'use strict';
-
-    var version = '0.2.0',
-        lastUpdate = 1448523710,
-
-        queuedUpdates = {}, //< Used for delaying saves till the last momment.
-
-    log = function(){
-        _.each(arguments,function(m){
-            switch(typeof m){
-                case 'string':
-                    console.log('<TAS> :: '+m);
-                    break;
-                case 'number':
-                    console.log('<TAS> :: [number]: '+m);
-                    break;
-                default:
-                    console.log('<TAS> :: ['+typeof m +']:');
-                    console.log(m);
-                    console.log('<TAS> :: =========================================================');
-            }
-        });
-    },
-
-    prepareUpdate = function( attribute, value ){
-        queuedUpdates[attribute]=value;
-    },
-
-    applyQueuedUpdates = function() {
-      setAttrs(queuedUpdates);
-      queuedUpdates = {};
-    },
-
-    namesFromArgs = function(args,base){
-        return _.chain(args)
-            .reduce(function(memo,attr){
-                if('string' === typeof attr) {
-                    memo.push(attr);
-                } else if(_.isArray(args) || _.isArguments(args)){
-                    memo = namesFromArgs(attr,memo);
-                }
-                return memo;
-            },(_.isArray(base) && base) || [])
-            .uniq()
-            .value();
-    },
-
-    addId = function(obj,value){
-        Object.defineProperty(obj,'id',{
-            value: value,
-            writeable: false,
-            enumerable: false
-        });
-    },
-
-    addProp = function(obj,prop,value,fullname){
-        (function(){
-            var pname=(_.contains(['S','F','I','D'],prop) ? '_'+prop : prop),
-                full_pname = fullname || prop,
-                pvalue=value;
-
-            _.each(['S','I','F'],function(p){
-                if( !_.has(obj,p)){
-                    Object.defineProperty(obj, p, {
-                        value: {},
-                        enumerable: false,
-                        readonly: true
-                    });
-                }
-            });
-            if( !_.has(obj,'D')){
-                Object.defineProperty(obj, 'D', {
-                    value: _.reduce(_.range(10),function(m,d){
-                            Object.defineProperty(m, d, {
-                                value: {},
-                                enumerable: true,
-                                readonly: true
-                            });
-                            return m;
-                        },{}),
-                    enumerable: false,
-                    readonly: true
-                });
-            }
-
-
-            // Raw value
-            Object.defineProperty(obj, pname, {
-                enumerable: true,
-                set: function(v){
-                    pvalue=v;
-                    prepareUpdate(full_pname,v);
-                },
-                get: function(){
-                    return pvalue;
-                }
-            });
-
-            // string value
-            Object.defineProperty(obj.S, pname, {
-                enumerable: true,
-                set: function(v){
-                    var val=v.toString();
-                    pvalue=val;
-                    prepareUpdate(full_pname,val);
-                },
-                get: function(){
-                    return pvalue.toString();
-                }
-            });
-
-            // int value
-            Object.defineProperty(obj.I, pname, {
-                enumerable: true,
-                set: function(v){
-                    var val=parseInt(v,10) || 0;
-                    pvalue=val;
-                    prepareUpdate(full_pname,val);
-                },
-                get: function(){
-                    return parseInt(pvalue,10) || 0;
-                }
-            });
-
-            // float value
-            Object.defineProperty(obj.F, pname, {
-                enumerable: true,
-                set: function(v){
-                    var val=parseFloat(v) || 0;
-                    pvalue=val;
-                    prepareUpdate(full_pname,val);
-                },
-                get: function(){
-                    return parseFloat(pvalue) || 0;
-                }
-            });
-            _.each(_.range(10),function(d){
-                Object.defineProperty(obj.D[d], pname, {
-                    enumerable: true,
-                    set: function(v){
-                        var val=(parseFloat(v) || 0).toFixed(d);
-                        pvalue=val;
-                        prepareUpdate(full_pname,val);
-                    },
-                    get: function(){
-                        return (parseFloat(pvalue) || 0).toFixed(d);
-                    }
-                });
-            });
-
-        }());
-    },
-
-    repeating = function( section ) {
-        return (function(s){
-            var sectionName = s,
-                attrNames = [],
-                fieldNames = [],
-                operations = [],
-
-            repAttrs = function(){
-                attrNames = namesFromArgs(arguments,attrNames);
-                return this;
-            },
-            repFields = function(){
-                fieldNames = namesFromArgs(arguments,fieldNames);
-                return this;
-            },
-            repReduce = function(func, initial, final, context) {
-                operations.push({
-                    type: 'reduce',
-                    func: (func && _.isFunction(func) && func) || _.noop,
-                    memo: (_.isUndefined(initial) && 0) || initial,
-                    final: (final && _.isFunction(final) && final) || _.noop,
-                    context: context || {}
-                });
-                return this;
-            },
-            repMap = function(func, final, context) {
-                operations.push({
-                    type: 'map',
-                    func: (func && _.isFunction(func) && func) || _.noop,
-                    final: (final && _.isFunction(final) && final) || _.noop,
-                    context: context || {}
-                });
-                return this;
-            },
-            repEach = function(func, final, context) {
-                operations.push({
-                    type: 'each',
-                    func: (func && _.isFunction(func) && func) || _.noop,
-                    final: (final && _.isFunction(final) && final) || _.noop,
-                    context: context || {}
-                });
-                return this;
-            },
-            repTap = function(final, context) {
-                operations.push({
-                    type: 'tap',
-                    final: (final && _.isFunction(final) && final) || _.noop,
-                    context: context || {}
-                });
-                return this;
-            },
-            repExecute = function(){
-                var rowSet = {},
-                    attrSet = {},
-                    fieldIds = [],
-                    fullFieldNames = [];
-
-                // call each operation per row.
-                // call each operation's final
-                getSectionIDs("repeating_"+sectionName,function(ids){
-                    fieldIds = ids;
-                    fullFieldNames = _.reduce(fieldIds,function(memo,id){
-                        return memo.concat(_.map(fieldNames,function(name){
-                            return 'repeating_'+sectionName+'_'+id+'_'+name;
-                        }));
-                    },[]);
-                    getAttrs( _.uniq(attrNames.concat(fullFieldNames)), function(values){
-                        _.each(attrNames,function(aname){
-                            if(values.hasOwnProperty(aname)){
-                                addProp(attrSet,aname,values[aname]);
-                            }
-                        });
-
-                        rowSet = _.reduce(fieldIds,function(memo,id){
-                            var r={};
-                            addId(r,id);
-                            _.each(fieldNames,function(name){
-                                var fn = 'repeating_'+sectionName+'_'+id+'_'+name;
-                                addProp(r,name,values[fn],fn);
-                            });
-
-                            memo[id]=r;
-
-                            return memo;
-                        },{});
-
-                        _.each(operations,function(op){
-                            var res;
-                            switch(op.type){
-                                case 'tap':
-                                    _.bind(op.final,op.context,rowSet,attrSet)();
-                                    break;
-
-                                case 'each':
-                                    _.each(rowSet,function(r){
-                                        _.bind(op.func,op.context,r,attrSet,r.id,rowSet)();
-                                    });
-                                    _.bind(op.final,op.context,rowSet,attrSet)();
-                                    break;
-
-                                case 'map':
-                                    res = _.map(rowSet,function(r){
-                                        return _.bind(op.func,op.context,r,attrSet,r.id,rowSet)();
-                                    });
-                                    _.bind(op.final,op.context,res,rowSet,attrSet)();
-                                    break;
-
-                                case 'reduce':
-                                    res = op.memo;
-                                    _.each(rowSet,function(r){
-                                        res = _.bind(op.func,op.context,res,r,attrSet,r.id,rowSet)();
-                                    });
-                                    _.bind(op.final,op.context,res,rowSet,attrSet)();
-                                    break;
-                            }
-                        });
-
-                        // finalize attrs
-                        applyQueuedUpdates();
-                    });
-                });
-            };
-
-            return {
-                attrs: repAttrs,
-                attr: repAttrs,
-
-                column: repFields,
-                columns: repFields,
-                field: repFields,
-                fields: repFields,
-
-                reduce: repReduce,
-                inject: repReduce,
-                foldl: repReduce,
-
-                map: repMap,
-                collect: repMap,
-
-                each: repEach,
-                forEach: repEach,
-
-                tap: repTap,
-                'do': repTap,
-
-                execute: repExecute,
-                go: repExecute,
-                run: repExecute
-            };
-        }(section));
-    },
-
-
-    repeatingSimpleSum = function(section, field, destination){
-        repeating(section)
-            .attr(destination)
-            .field(field)
-            .reduce(function(m,r){
-                return m + (r.F[field]);
-            },0,function(t,r,a){
-                a[destination]=t;
-            })
-            .execute();
-    };
-
-    console.log('-=> TheAaronSheet v'+version+' <=-  ['+(new Date(lastUpdate*1000))+']');
-
-    return {
-        repeatingSimpleSum: repeatingSimpleSum,
-        repeating: repeating
-    };
-}());
-/* ---- END: TheAaronSheet.js ---- */
 /* ---- FIN PMT ---------------------- */
 // Création perso -- Ouverture de la fiche
     on('sheet:opened',function(){
@@ -380,7 +72,7 @@ var TAS = TAS || (function(){
                 var TabEq = [];
                 var arrayLength = 0;
                 var obj = {};
-                TabEq = values.todoequip.split("|");                
+                TabEq = values.todoequip.split("|");
                 arrayLength = TabEq.length;
                 if (arrayLength > 0){
                     setAttrs({todoequip: ""});
@@ -400,7 +92,7 @@ var TAS = TAS || (function(){
                     }
                     setAttrs({encombrement: totpoids});
                     PMT.majEncombrement();
-                }            
+                }
             }
         });
         getAttrs(["todosort"], function(values) {
@@ -457,22 +149,17 @@ var TAS = TAS || (function(){
                 }
                 setAttrs({todoatk: ""});
             }
-        });        
+        });
     });
 // Inventaire / équipement
     on("change:repeating_equipement:equipqte change:repeating_equipement:equippoids", function() {
-        getAttrs(["repeating_equipement_equipqte", "repeating_equipement_equippoids"], function(values) {
-                setAttrs({
-                    repeating_equipement_equippoidstot: ((parseFloat(values.repeating_equipement_equipqte) || 1.0)*(parseFloat(values.repeating_equipement_equippoids) || 0.0)).toFixed(1)
-                });
-                TAS.repeatingSimpleSum('equipement','equippoidstot','encombrement');
-            });
+        PMT.majPoids();
+    });
+     on('remove:repeating_equipement',function(){
+        PMT.majPoids();
     });
     on("change:encombrement", function() {
         PMT.majEncombrement();
-    });
-     on('remove:repeating_equipement',function(){
-        TAS.repeatingSimpleSum('equipement','equippoidstot','encombrement');
     });
 // Gestion CA
     on("change:sheetoptionca", function() {
@@ -618,7 +305,7 @@ var TAS = TAS || (function(){
     });
 </script>
 <!-- PARAMETRAGES -->
-<span class="sheet-smallspan">v4.2 - <b>Options :</b></span>
+<span class="sheet-smallspan">v4.4 - <b>Options :</b></span>
 <input type="radio" name="attr_sheetOptionCa" value="0" class="sheet-optionCaDesc" checked="checked" title="Utiliser la Classe d'Armure (CA) descendante" /><span>CA descendante</span>
 <input type="radio" name="attr_sheetOptionCa" value="1" class="sheet-optionCaAsc" title="Utiliser la Classe d'Armure (CA) ascendante" /><span>CA ascendante</span>
 <input type="radio" name="attr_Classe" value="0" class="sheet-classeClerc" checked="checked" />
@@ -673,7 +360,7 @@ var TAS = TAS || (function(){
                     </tr>
                     <tr>
                         <td class="sheet-libel1">Titre</td>
-                        <td class="sheet-libel1" colspan="2">Langues supplémentaires</td>                        
+                        <td class="sheet-libel1" colspan="2">Langues supplémentaires</td>
                     </tr>
                     <tr>
                         <td>
@@ -736,7 +423,7 @@ var TAS = TAS || (function(){
                             <input name="attr_Force" type="number" class="sheet-carac-num" value="10"/>
                         </div>
                         <div class="sheet-carac-roll">
-                            <button type="roll" 
+                            <button type="roll"
                             value="&{template:pmt} {{perso=@{character_name}}} {{name=Force}} {{subtags=Jet de Caractéristique}} {{carac=[[1d20-(?{Bonus/Malus|0})]]}} {{target=[[@{Force}]]}}"
                              name='FOR' />
                         </div>
@@ -753,7 +440,7 @@ var TAS = TAS || (function(){
                             <input name="attr_Dexterite" type="number" class="sheet-carac-num" value="10"/>
                         </div>
                         <div class="sheet-carac-roll">
-                            <button type="roll" 
+                            <button type="roll"
                             value="&{template:pmt} {{perso=@{character_name}}} {{name=Dextérité}} {{subtags=Jet de Caractéristique}} {{carac=[[1d20-(?{Bonus/Malus|0})]]}} {{target=[[@{Dexterite}]]}}"
                              name='DEX' />
                         </div>
@@ -770,7 +457,7 @@ var TAS = TAS || (function(){
                             <input name="attr_Constitution" type="number" class="sheet-carac-num" value="10"/>
                         </div>
                         <div class="sheet-carac-roll">
-                            <button type="roll"  
+                            <button type="roll"
                             value="&{template:pmt} {{perso=@{character_name}}} {{name=Constitution}} {{subtags=Jet de Caractéristique}} {{carac=[[1d20-(?{Bonus/Malus|0})]]}} {{target=[[@{Constitution}]]}}"
                              name='CON' />
                         </div>
@@ -787,7 +474,7 @@ var TAS = TAS || (function(){
                             <input name="attr_Intelligence" type="number" class="sheet-carac-num" value="10"/>
                         </div>
                         <div class="sheet-carac-roll">
-                            <button type="roll" 
+                            <button type="roll"
                             value="&{template:pmt} {{perso=@{character_name}}} {{name=Intelligence}} {{subtags=Jet de Caractéristique}} {{carac=[[1d20-(?{Bonus/Malus|0})]]}} {{target=[[@{Intelligence}]]}}"
                              name='INT' />
                         </div>
@@ -1488,7 +1175,7 @@ var TAS = TAS || (function(){
                 R<input type="checkbox" name="attr_sort-reversible" value="1" style="margin-right: -7px;" title="Sort réversible" />
                 <input type="text" name="attr_sort-niveau" class="sheet-inMainNum"  style="width: 20px;" placeholder="1" title="Niveau du sort" />
                 <input type="text" name="attr_sort-duree" class="sheet-inPetitTxt"  style="width: 80px;" placeholder="Durée" title="Durée du sort" />
-                <input type="text" name="attr_sort-portee" class="sheet-inPetitTxt"  style="width: 50px;" placeholder="Portée" title="Portée du sort" />                
+                <input type="text" name="attr_sort-portee" class="sheet-inPetitTxt"  style="width: 50px;" placeholder="Portée" title="Portée du sort" />
                 <input type="checkbox" name="attr_sort-disp" class="sheet-dispcheck" title="Agrandir/Réduire la description" /><span class="sheet-dispcheck">s</span>
                 <textarea name="attr_sort-desc" class="sheet-textdesc" style="width: 300px;" placeholder="Description" title="Description du sort"></textarea>
                 P<input type="checkbox" name="attr_sort-prepare1" title="Sort préparé une fois" style="margin-right: -7px;" />

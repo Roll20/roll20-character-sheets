@@ -1,687 +1,6 @@
 <!-- **** SCRIPTS / SHEET WORKERS -->
 <script type="text/worker">
-/* ---- BEGIN: TheAaronSheet.js ---- */
-// Github:   https://github.com/shdwjk/TheAaronSheet/blob/master/TheAaronSheet.js
-// By:       The Aaron, Arcane Scriptomancer
-// Contact:  https://app.roll20.net/users/104025/the-aaron
-var TAS = TAS || (function(){
-    'use strict';
-
-    var version = '0.2.1',
-        lastUpdate = 1453794214,
-
-        loggingSettings = {
-            debug: {
-                key:     'debug',
-                title:   'DEBUG',
-                color: {
-                    bgLabel: '#7732A2',
-                    label:   '#F2EF40',
-                    bgText:  '#FFFEB7',
-                    text:    '#7732A2'
-                }
-            },
-            error: {
-                key:     'error',
-                title:   'Error',
-                color: {
-                    bgLabel: '#C11713',
-                    label:   'white',
-                    bgText:  '#C11713',
-                    text:    'white'
-                }
-            },
-            warn: {
-                key:     'warn',
-                title:   'Warning',
-                color: {
-                    bgLabel: '#F29140',
-                    label:   'white',
-                    bgText:  '#FFD8B7',
-                    text:    'black'
-                }
-            },
-            info: {
-                key:     'info',
-                title:   'Info',
-                color: {
-                    bgLabel: '#413FA9',
-                    label:   'white',
-                    bgText:  '#B3B2EB',
-                    text:    'black'
-                }
-            },
-            notice: {
-                key:     'notice',
-                title:   'Notice',
-                color: {
-                    bgLabel: '#33C133',
-                    label:   'white',
-                    bgText:  '#ADF1AD',
-                    text:    'black'
-                }
-            },
-            log: {
-                key:     'log',
-                title:   'Log',
-                color: {
-                    bgLabel: '#f2f240',
-                    label:   'black',
-                    bgText:  '#ffff90',
-                    text:    'black'
-                }
-            },
-            callstack: {
-                key:     'TAS',
-                title:   'function',
-                color: {
-                    bgLabel: '#413FA9',
-                    label:   'white',
-                    bgText:  '#B3B2EB',
-                    text:    'black'
-                }
-            },
-            callstack_async: {
-                key:     'TAS',
-                title:   'ASYNC CALL',
-                color: {
-                    bgLabel: '#413FA9',
-                    label:   'white',
-                    bgText:  '#413FA9',
-                    text:    'white'
-                }
-            },
-            TAS: {
-                key:     'TAS',
-                title:   'TAS',
-                color: {
-                    bgLabel: 'grey',
-                    label:   'black;background:linear-gradient(#304352,#d7d2cc,#d7d2cc,#d7d2cc,#304352)',
-                    bgText:  'grey',
-                    text:    'black;background:linear-gradient(#304352,#d7d2cc,#d7d2cc,#d7d2cc,#304352)'
-                }
-            }
-        },
-
-
-        config = {
-            debugMode: false,
-            logging: {
-                log: true,
-                notice: true,
-                info: true,
-                warn: true,
-                error: true,
-                debug: false
-            }
-        },
-
-        callstackRegistry = [],
-        queuedUpdates = {}, //< Used for delaying saves till the last momment.
-
-    complexType = function(o){
-        switch(typeof o){
-            case 'string':
-                return 'string';
-            case 'boolean':
-                return 'boolean';
-            case 'number':
-                return (_.isNaN(o) ? 'NaN' : (o.toString().match(/\./) ? 'decimal' : 'integer'));
-            case 'function':
-                return 'function: '+(o.name ? o.name+'()' : '(anonymous)');
-            case 'object':
-                return (_.isArray(o) ? 'array' : (_.isArguments(o) ? 'arguments' : ( _.isNull(o) ? 'null' : 'object')));
-            default:
-                return typeof o;
-        }
-    },
-
-    dataLogger = function(primaryLogger,secondaryLogger,data){
-        _.each(data,function(m){
-            var type = complexType(m);
-            switch(type){
-                case 'string':
-                    primaryLogger(m);
-                    break;
-                case 'undefined':
-                case 'null':
-                case 'NaN':
-                    primaryLogger('['+type+']');
-                    break;
-                case 'number':
-                case 'not a number':
-                case 'integer':
-                case 'decimal':
-                case 'boolean':
-                    primaryLogger('['+type+']: '+m);
-                    break;
-                default:
-                    primaryLogger('['+type+']:=========================================');
-                    secondaryLogger(m);
-                    primaryLogger('=========================================================');
-                    break;
-            }
-        });
-    },
-
-
-    colorLog = function(options){
-        var coloredLoggerFunction,
-            key = options.key,
-            label = options.title || 'TAS',
-            lBGColor = (options.color && options.color.bgLabel) || 'blue',
-            lTxtColor = (options.color && options.color.label) || 'white',
-            mBGColor = (options.color && options.color.bgText) || 'blue',
-            mTxtColor = (options.color && options.color.text) || 'white';
-
-        coloredLoggerFunction = function(message){
-            console.log(
-                '%c '+label+': %c '+message,
-                'background-color: '+lBGColor+';color: '+lTxtColor+'; font-weight:bold;',
-                'background-color: '+mBGColor+';color: '+mTxtColor+';'
-            );
-        };
-        return function(){
-            if('TAS'===key || config.logging[key]){
-               dataLogger(coloredLoggerFunction,function(m){console.log(m);},_.toArray(arguments));
-            }
-        };
-    },
-
-    logDebug  = colorLog(loggingSettings.debug),
-    logError  = colorLog(loggingSettings.error),
-    logWarn   = colorLog(loggingSettings.warn),
-    logInfo   = colorLog(loggingSettings.info),
-    logNotice = colorLog(loggingSettings.notice),
-    logLog    = colorLog(loggingSettings.log),
-    log       = colorLog(loggingSettings.TAS),
-    logCS     = colorLog(loggingSettings.callstack),
-    logCSA    = colorLog(loggingSettings.callstack_async),
-
-    registerCallstack = function(callstack,label){
-        var idx=_.findIndex(callstackRegistry,function(o){
-            return (_.difference(o.stack,callstack).length === _.difference(callstack,o.stack).length)
-                && _.difference(o.stack,callstack).length === 0
-                && o.label === label;
-        });
-        if(-1 === idx){
-            idx=callstackRegistry.length;
-            callstackRegistry.push({
-                stack: callstack,
-                label: label
-            });
-        }
-        return idx;
-    },
-
-    setConfigOption = function(options){
-        var newconf =_.defaults(options,config);
-        newconf.logging=_.defaults(
-            (options && options.logging)||{},
-            config.logging
-        );
-        config=newconf;
-    },
-
-    debugMode = function(){
-        config.logging.debug=true;
-        config.debugMode = true;
-    },
-
-    getCallstack = function(){
-        var e = new Error('dummy'),
-            stack = _.map(_.rest(e.stack.replace(/^[^\(]+?[\n$]/gm, '')
-            .replace(/^\s+at\s+/gm, '')
-            .replace(/^Object.<anonymous>\s*\(/gm, '{anonymous}()@')
-            .split('\n')),function(l){
-                return l.replace(/\s+.*$/,'');
-            });
-        return stack;
-    },
-    logCallstackSub = function(cs){
-        var matches, csa;
-        _.find(cs,function(line){
-            matches = line.match(/TAS_CALLSTACK_(\d+)/);
-            if(matches){
-               csa=callstackRegistry[matches[1]];
-               logCSA( '===================='+(csa.label ? '> '+csa.label+' <' : '')+'====================');
-               logCallstackSub(csa.stack);
-               return true;
-            }
-            logCS(line);
-            return false;
-        });
-    },
-    logCallstack = function(){
-        var cs;
-        if(config.debugMode){
-            cs = getCallstack();
-            cs.shift();
-            log('==============================> CALLSTACK <==============================');
-            logCallstackSub(cs);
-            log('=========================================================================');
-        }
-    },
-
-
-    wrapCallback = function (label, callback,context){
-        var callstack;
-        if('function' === typeof label){
-            context=callback;
-            callback=label;
-            label=undefined;
-        }
-        if(!config.debugMode){
-            return (function(cb,ctx){
-                return function(){
-                    cb.apply(ctx||{},arguments);
-                };
-            }(callback,context));
-        }
-
-        callstack = getCallstack();
-        callstack.shift();
-
-        return (function(cb,ctx,cs,lbl){
-            var ctxref=registerCallstack(cs,lbl);
-            return new Function('cb','ctx','TASlog',
-                "return function TAS_CALLSTACK_"+ctxref+"(){"+
-                    "TASlog('Entering: '+(cb.name||'(anonymous function)'));"+
-                    "cb.apply(ctx||{},arguments);"+
-                    "TASlog('Exiting: '+(cb.name||'(anonymous function)'));"+
-                "};")(cb,ctx,log);
-        }(callback,context,callstack,label));
-    },
-
-
-    prepareUpdate = function( attribute, value ){
-        queuedUpdates[attribute]=value;
-    },
-
-    applyQueuedUpdates = function() {
-      setAttrs(queuedUpdates);
-      queuedUpdates = {};
-    },
-
-    namesFromArgs = function(args,base){
-        return _.chain(args)
-            .reduce(function(memo,attr){
-                if('string' === typeof attr) {
-                    memo.push(attr);
-                } else if(_.isArray(args) || _.isArguments(args)){
-                    memo = namesFromArgs(attr,memo);
-                }
-                return memo;
-            },(_.isArray(base) && base) || [])
-            .uniq()
-            .value();
-    },
-
-    addId = function(obj,value){
-        Object.defineProperty(obj,'id',{
-            value: value,
-            writeable: false,
-            enumerable: false
-        });
-    },
-
-    addProp = function(obj,prop,value,fullname){
-        (function(){
-            var pname=(_.contains(['S','F','I','D'],prop) ? '_'+prop : prop),
-                full_pname = fullname || prop,
-                pvalue=value;
-
-            _.each(['S','I','F'],function(p){
-                if( !_.has(obj,p)){
-                    Object.defineProperty(obj, p, {
-                        value: {},
-                        enumerable: false,
-                        readonly: true
-                    });
-                }
-            });
-            if( !_.has(obj,'D')){
-                Object.defineProperty(obj, 'D', {
-                    value: _.reduce(_.range(10),function(m,d){
-                            Object.defineProperty(m, d, {
-                                value: {},
-                                enumerable: true,
-                                readonly: true
-                            });
-                            return m;
-                        },{}),
-                    enumerable: false,
-                    readonly: true
-                });
-            }
-
-
-            // Raw value
-            Object.defineProperty(obj, pname, {
-                enumerable: true,
-                set: function(v){
-                    pvalue=v;
-                    prepareUpdate(full_pname,v);
-                },
-                get: function(){
-                    return pvalue;
-                }
-            });
-
-            // string value
-            Object.defineProperty(obj.S, pname, {
-                enumerable: true,
-                set: function(v){
-                    var val=v.toString();
-                    pvalue=val;
-                    prepareUpdate(full_pname,val);
-                },
-                get: function(){
-                    return pvalue.toString();
-                }
-            });
-
-            // int value
-            Object.defineProperty(obj.I, pname, {
-                enumerable: true,
-                set: function(v){
-                    var val=parseInt(v,10) || 0;
-                    pvalue=val;
-                    prepareUpdate(full_pname,val);
-                },
-                get: function(){
-                    return parseInt(pvalue,10) || 0;
-                }
-            });
-
-            // float value
-            Object.defineProperty(obj.F, pname, {
-                enumerable: true,
-                set: function(v){
-                    var val=parseFloat(v) || 0;
-                    pvalue=val;
-                    prepareUpdate(full_pname,val);
-                },
-                get: function(){
-                    return parseFloat(pvalue) || 0;
-                }
-            });
-            _.each(_.range(10),function(d){
-                Object.defineProperty(obj.D[d], pname, {
-                    enumerable: true,
-                    set: function(v){
-                        var val=(parseFloat(v) || 0).toFixed(d);
-                        pvalue=val;
-                        prepareUpdate(full_pname,val);
-                    },
-                    get: function(){
-                        return (parseFloat(pvalue) || 0).toFixed(d);
-                    }
-                });
-            });
-
-        }());
-    },
-
-    repeating = function( section ) {
-        return (function(s){
-            var sectionName = s,
-                attrNames = [],
-                fieldNames = [],
-                operations = [],
-                after = [],
-
-            repAttrs = function TAS_Repeating_Attrs(){
-                attrNames = namesFromArgs(arguments,attrNames);
-                return this;
-            },
-            repFields = function TAS_Repeating_Fields(){
-                fieldNames = namesFromArgs(arguments,fieldNames);
-                return this;
-            },
-            repReduce = function TAS_Repeating_Reduce(func, initial, final, context) {
-                operations.push({
-                    type: 'reduce',
-                    func: (func && _.isFunction(func) && func) || _.noop,
-                    memo: (_.isUndefined(initial) && 0) || initial,
-                    final: (final && _.isFunction(final) && final) || _.noop,
-                    context: context || {}
-                });
-                return this;
-            },
-            repMap = function TAS_Repeating_Map(func, final, context) {
-                operations.push({
-                    type: 'map',
-                    func: (func && _.isFunction(func) && func) || _.noop,
-                    final: (final && _.isFunction(final) && final) || _.noop,
-                    context: context || {}
-                });
-                return this;
-            },
-            repEach = function TAS_Repeating_Each(func, final, context) {
-                operations.push({
-                    type: 'each',
-                    func: (func && _.isFunction(func) && func) || _.noop,
-                    final: (final && _.isFunction(final) && final) || _.noop,
-                    context: context || {}
-                });
-                return this;
-            },
-            repTap = function TAS_Repeating_Tap(final, context) {
-                operations.push({
-                    type: 'tap',
-                    final: (final && _.isFunction(final) && final) || _.noop,
-                    context: context || {}
-                });
-                return this;
-            },
-            repAfter = function TAS_Repeating_After(callback,context) {
-                after.push({
-                    callback: (callback && _.isFunction(callback) && callback) || _.noop,
-                    context: context || {}
-                });
-                return this;
-            },
-            repExecute = function TAS_Repeating_Execute(callback,context){
-                var rowSet = {},
-                    attrSet = {},
-                    fieldIds = [],
-                    fullFieldNames = [];
-
-                repAfter(callback,context);
-
-                // call each operation per row.
-                // call each operation's final
-                getSectionIDs("repeating_"+sectionName,function(ids){
-                    fieldIds = ids;
-                    fullFieldNames = _.reduce(fieldIds,function(memo,id){
-                        return memo.concat(_.map(fieldNames,function(name){
-                            return 'repeating_'+sectionName+'_'+id+'_'+name;
-                        }));
-                    },[]);
-                    getAttrs( _.uniq(attrNames.concat(fullFieldNames)), function(values){
-                        _.each(attrNames,function(aname){
-                            if(values.hasOwnProperty(aname)){
-                                addProp(attrSet,aname,values[aname]);
-                            }
-                        });
-
-                        rowSet = _.reduce(fieldIds,function(memo,id){
-                            var r={};
-                            addId(r,id);
-                            _.each(fieldNames,function(name){
-                                var fn = 'repeating_'+sectionName+'_'+id+'_'+name;
-                                addProp(r,name,values[fn],fn);
-                            });
-
-                            memo[id]=r;
-
-                            return memo;
-                        },{});
-
-                        _.each(operations,function(op){
-                            var res;
-                            switch(op.type){
-                                case 'tap':
-                                    _.bind(op.final,op.context,rowSet,attrSet)();
-                                    break;
-
-                                case 'each':
-                                    _.each(rowSet,function(r){
-                                        _.bind(op.func,op.context,r,attrSet,r.id,rowSet)();
-                                    });
-                                    _.bind(op.final,op.context,rowSet,attrSet)();
-                                    break;
-
-                                case 'map':
-                                    res = _.map(rowSet,function(r){
-                                        return _.bind(op.func,op.context,r,attrSet,r.id,rowSet)();
-                                    });
-                                    _.bind(op.final,op.context,res,rowSet,attrSet)();
-                                    break;
-
-                                case 'reduce':
-                                    res = op.memo;
-                                    _.each(rowSet,function(r){
-                                        res = _.bind(op.func,op.context,res,r,attrSet,r.id,rowSet)();
-                                    });
-                                    _.bind(op.final,op.context,res,rowSet,attrSet)();
-                                    break;
-                            }
-                        });
-
-                        // finalize attrs
-                        applyQueuedUpdates();
-                        _.each(after,function(op){
-                            _.bind(op.callback,op.context)();
-                        });
-                    });
-                });
-            };
-
-            return {
-                attrs: repAttrs,
-                attr: repAttrs,
-
-                column: repFields,
-                columns: repFields,
-                field: repFields,
-                fields: repFields,
-
-                reduce: repReduce,
-                inject: repReduce,
-                foldl: repReduce,
-
-                map: repMap,
-                collect: repMap,
-
-                each: repEach,
-                forEach: repEach,
-
-                tap: repTap,
-                'do': repTap,
-
-                after: repAfter,
-                last: repAfter,
-                done: repAfter,
-
-                execute: repExecute,
-                go: repExecute,
-                run: repExecute
-            };
-        }(section));
-    },
-
-
-    repeatingSimpleSum = function(section, field, destination){
-        repeating(section)
-            .attr(destination)
-            .field(field)
-            .reduce(function(m,r){
-                return m + (r.F[field]);
-            },0,function(t,r,a){
-                a[destination]=t;
-            })
-            .execute();
-    };
-
-    console.log('%c•.¸¸.•*´¨`*•.¸¸.•*´¨`*•.¸  The Aaron Sheet  v'+version+'  ¸.•*´¨`*•.¸¸.•*´¨`*•.¸¸.•','background: linear-gradient(to right,green,white,white,green); color:black;text-shadow: 0 0 8px white;');
-    console.log('%c•.¸¸.•*´¨`*•.¸¸.•*´¨`*•.¸  Last update: '+(new Date(lastUpdate*1000))+'  ¸.•*´¨`*•.¸¸.•*´¨`*•.¸¸.•','background: linear-gradient(to right,green,white,white,green); color:black;text-shadow: 0 0 8px white;');
-
-
-    return {
-        /* Repeating Sections */
-        repeatingSimpleSum: repeatingSimpleSum,
-        repeating: repeating,
-
-        /* Configuration */
-        config: setConfigOption,
-
-        /* Debugging */
-        callback: wrapCallback,
-        callstack: logCallstack,
-        debugMode: debugMode,
-        _fn: wrapCallback,
-
-        /* Logging */
-        debug: logDebug,
-        error: logError,
-        warn: logWarn,
-        info: logInfo,
-        notice: logNotice,
-        log: logLog
-    };
-}());
-/* ---- END: TheAaronSheet.js ---- */
-
-// Ouverture de la feuille : correction compétence d'arme.
-on('sheet:opened',function(){
-    // **** Gestion 1ière ouverture de la fiche pour transition 1.x -> 1.4
-    getAttrs(["sheetarmectrl"], function(values) {
-        if(values.sheetarmectrl == 0) {
-            getAttrs(["joker_de","arme1_comp","arme2_comp","arme3_comp","blessures","fatigue"], function(values) {
-                var extra = 0;
-                var malusblessures = 0;
-                var malusfatigue = 0;
-                var chkPossessions = 1;
-                if (values.joker_de == "0d4") {
-                    extra = 1;
-                    chkPossessions = 0;
-                }
-                if (values.blessures > 3) {
-                    malusblessures = 3;
-                } else {
-                    malusblessures = values.blessures;
-                }
-                if (values.fatigue > 2) {
-                    malusfatigue = 2;
-                } else {
-                    malusfatigue = values.fatigue;
-                }
-                setAttrs({
-                    arme1_comp_brut: "@{RollBast" + values.arme1_comp + "}",
-                    arme2_comp_brut: "@{RollBast" + values.arme2_comp + "}",
-                    arme3_comp_brut: "@{RollBast" + values.arme3_comp + "}",
-                    extra: extra,
-                    pnj: extra,
-                    chkPossessions: chkPossessions,
-                    templateetat: extra,
-                    malusblessures: malusblessures,
-                    malusfatigue: malusfatigue
-                });
-            });
-            TAS.repeating('armes')
-                .fields('armeD_comp','armeD_comp_brut')
-                .reduce(function(m,r){
-                    r.S.armeD_comp_brut="@{RollBast" + r.S.armeD_comp + "}";
-                    return m;
-                })
-                .execute();
-            setAttrs({sheetarmectrl: 1});
-        }
-    });
-});
-// JOKER / PNJ / EXTRA
+// === JOKER / PNJ / EXTRA
 on("change:joker_de", function() {
     getAttrs(["joker_de","pnj","chkPossessions","templateetat"], function(values) {
         var extra = 0;
@@ -717,7 +36,7 @@ on("change:pnj", function(){
         }
     });
 });
-// BLESSURES et Malus blessure
+// === BLESSURES et Malus blessure
 on("change:blessures", function() {
     getAttrs(["blessures"], function(values) {
         var malusblessures = 0;
@@ -731,7 +50,7 @@ on("change:blessures", function() {
         });
     });
 });
-// FATIGUE et Malus blessure
+// === FATIGUE et Malus blessure
 on("change:fatigue", function() {
     getAttrs(["fatigue"], function(values) {
         var malusfatigue = 0;
@@ -745,7 +64,7 @@ on("change:fatigue", function() {
         });
     });
 });
-// ARMES FIXES
+// === ARMES FIXES
 on("change:arme1_comp", function() {
     getAttrs(["arme1_comp"], function(values) {
         setAttrs({
@@ -773,7 +92,7 @@ on("change:arme3_comp", function() {
         });
     });
 });
-// ARMES DYNAMIQUES
+// === ARMES DYNAMIQUES
 on("change:repeating_armes:armed_comp", function() {
     getAttrs(["repeating_armes_armeD_comp"], function(values) {
         setAttrs({
@@ -783,7 +102,7 @@ on("change:repeating_armes:armed_comp", function() {
         });
     });
 });
-// CARACS DÉRIVÉES
+// === CARACS DÉRIVÉES
 //    Charisme
 on("change:charisme_base change:charisme_bonus", function() {
     getAttrs(["charisme_base","charisme_bonus"], function(values) {
@@ -841,24 +160,37 @@ on("change:chkAllComp", function() {
         });
     });
 });
-//Inventaire et encombrement
+// === Inventaire et encombrement
+on("change:force_de", function() {
+    getAttrs(["force_de"], function(values) {
+        setAttrs({
+            encombmax: parseInt(values.force_de)*2.5
+        });
+    });
+});
 on("change:repeating_equipements:equipqte change:repeating_equipements:equippdsunit", function() {
     getAttrs(["repeating_equipements_equipqte", "repeating_equipements_equippdsunit"], function(values) {
         var qte = parseFloat(values.repeating_equipements_equipqte) || 1.0;
         var pds = parseFloat(values.repeating_equipements_equippdsunit) || 0.0;
         setAttrs({
-         repeating_equipements_equippoids: qte*pds
+            repeating_equipements_equippoids: qte*pds
         });
    });
-   TAS.repeatingSimpleSum('equipements','equippoids','encombpoids');
 });
- on('remove:repeating_equipements',function(){
-    TAS.repeatingSimpleSum('equipements','equippoids','encombpoids');
-});
-on("change:force_de", function() {
-    getAttrs(["force_de"], function(values) {
-        setAttrs({
-            encombmax: parseInt(values.force_de)*2.5
+ on("remove:repeating_equipements change:repeating_equipements:equippoids",function(){
+    getSectionIDs("repeating_equipements", function(idws) {
+        var totwght = 0.0;
+        idws.forEach(function(idw,index,arr){
+            var uwght = "repeating_equipements_" + idw + "_equippoids";
+            var lng = parseInt(arr.length) || 0;
+            getAttrs([uwght], function(val) {
+                totwght = totwght + parseFloat(val[uwght]) || 0.0;
+                if ( (index+1) == lng ){
+                    setAttrs({
+                        encombpoids: totwght
+                    });
+                }
+            });
         });
     });
 });
@@ -871,6 +203,7 @@ on("change:encombpoids change:encombmax", function() {
         });
     });
 });
+// === Attaques
 on("change:atkcible", function () {
     getAttrs(["atkcible"], function(values){
         var cibleparade = "",
@@ -964,7 +297,7 @@ on("change:atkcible", function () {
     <input type="text" disabled hidden name="attr_relRollIncomp" value="&{template:sawo} {{etat=[[@{templateetat}]]}} {{name=Non entraîné}} {{perso=@{character_name}}} {{secoue=[[@{secoue}]]}} {{relances=[[  { floor( ( { @{RollIncomp} } ) /(?{Difficulté|4})[Difficulté]), 0d0 }kh1 ]]}} {{blessures=[[@{blessures}]]}} {{fatigue=[[@{fatigue}]]}}" />
     <input type="text" disabled hidden name="attr_jetRollIncomp" value="&{template:sawo} {{etat=[[@{templateetat}]]}} {{name=Non entraîné}} {{perso=@{character_name}}} {{secoue=[[@{secoue}]]}} {{jet=[[@{RollIncomp}]]}} {{blessures=[[@{blessures}]]}} {{fatigue=[[@{fatigue}]]}}" />
 
-<input type="text" disabled hidden name="attr_RollArcane" value="{ 1d@{arcane_de}!![@{arcane_nom}],@{joker_de}!![Joker]}kh1 + (@{arcane_bonus})[Bonus] - @{malusblessures}[Blessures] - @{malusfatigue}[Fatigue] + (?{Modificateur|0})[Modificateur]" />
+    <input type="text" disabled hidden name="attr_RollArcane" value="{ 1d@{arcane_de}!![@{arcane_nom}],@{joker_de}!![Joker]}kh1 + (@{arcane_bonus})[Bonus] - @{malusblessures}[Blessures] - @{malusfatigue}[Fatigue] + (?{Modificateur|0})[Modificateur]" />
     <input type="text" disabled hidden name="attr_relRollArcane" value="&{template:sawo} {{etat=[[@{templateetat}]]}} {{name=@{arcane_nom}}} {{perso=@{character_name}}} {{secoue=[[@{secoue}]]}} {{relances=[[  { floor( ( { @{RollArcane} } ) /(?{Difficulté|4})[Difficulté]), 0d0 }kh1 ]]}} {{blessures=[[@{blessures}]]}} {{fatigue=[[@{fatigue}]]}}" />
     <input type="text" disabled hidden name="attr_jetRollArcane" value="&{template:sawo} {{etat=[[@{templateetat}]]}} {{name=@{arcane_nom}}} {{perso=@{character_name}}} {{secoue=[[@{secoue}]]}} {{jet=[[@{RollArcane}]]}} {{blessures=[[@{blessures}]]}} {{fatigue=[[@{fatigue}]]}}" />
 
@@ -1067,7 +400,7 @@ on("change:atkcible", function () {
     <!-- onglets -->
     <input type="radio" name="attr_chkvie" value="0" class="sheet-onglmain" title="Feuille" checked /><span>Feuille</span>
     <input type="radio" name="attr_chkvie" value="1" class="sheet-onglconfig" title="Configuration" /><span>Configuration</span>
-    <span style="display:inline-block;width:150px;text-align: center;color: #888888;font-size: 0.9em;">v1.6 (30/07/2016)</span>
+    <span style="display:inline-block;width:150px;text-align: center;color: #888888;font-size: 0.9em;">v1.8 (18/02/2017)</span>
     <!-- Style FdP -->
     <input type="checkbox" name="attr_sheetDead" value="1" class="sheet-chkSheetDead" />
     <!-- paramètres cachés -->
@@ -2094,7 +1427,7 @@ on("change:atkcible", function () {
                     <input type="text" style="width: 145px;" name="attr_equipnom" placeholder="&Eacute;quipement" title="Nom de l'équipement" />
                     <input type="number" style="width: 35px;" name="attr_equipqte" value="1" min="0" title="Quantité" />
                     <input type="number" style="width: 35px;" name="attr_equippdsunit" value="0" min="0" title="Poids unitaire" />
-                    <input type="text" style="width: 35px;text-align:right" name="attr_equippoids" value="0" min="0" title="Poids total de l'équipement" readonly />
+                    <input type="number" style="width: 35px;text-align:right" name="attr_equippoids" value="0" min="0" title="Poids total de l'équipement" readonly />
                 </div>
             </fieldset>
         </div><!-- FIN EQUIPEMENT -->
@@ -2420,7 +1753,7 @@ Dégâts supplémentaires si relance : [[1d6!!]]"
    <div class="sheet-colblock"> <!-- ** NOTES/DIVERS ** -->
         <div class="sheet-redtitle1" style="display: inline-block;width: 220px;">NOTES</div>
         <textarea name="attr_divnotes" placeholder="Notes / Divers"></textarea>
-        
+
    </div> <!-- ** FIN NOTES/DIVERS ** -->
 </div> <!-- FIN MAIN -->
 <!-- CONFIGURATION -->
