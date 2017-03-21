@@ -1,3 +1,12 @@
+## 11.0.2
+
+* [#391: Other second damage not in the blue damage area of the template](https://bitbucket.org/mlenser/5eshaped/issues/391/other-second-damage-not-in-the-blue-damage)
+
+### UI Change
+
+* Styling for the import message
+* Styling for !shaped-config
+
 ## 11.0.1
 
 ### Bug Fixes
