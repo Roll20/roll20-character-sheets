@@ -4,6 +4,9 @@ This is a character sheet for Blades in the Dark for use on Roll20.
 
 ## Changelog
 
+### 1.0.1
+* Corrected an issue with number inputs not saving their values in Firefox
+
 ### 1.0
 * Overly long character names will now be shortened in roll templates, instead of becoming an unreadable mess
 * Negative bonus dice (up to -3) can now be selected
