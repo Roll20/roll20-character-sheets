@@ -66,7 +66,7 @@
                 </div>
                 
                 <div class="sheet-flexrow">
-                    <button type="roll" class="sheet-button" value="[[4df + @{intellect}]]" name="roll_intellect"></button>
+                    <button type="roll" class="sheet-button" value="[[4df + @{@mantle-approach}]]" name="roll_mantle"></button>
                     <input type="number" class="sheet-number" name="attr_mantle-approach" title="@{mantle-approach}" placeholder="0" />
                     <input type="text" placeholder="Mantle" />
                 </div>
@@ -203,7 +203,7 @@
         <div class="sheet-text-header">STUNTS</div>
         <fieldset class="repeating_stunt">
             <div class="sheet-flexrow" style="height:32px;">
-                <input type="number" class="sheet-number" name="attr_stunt-cost" placeholder="0" />
+                <input type="number" class="sheet-number" name="attr_stunt-cost" title="@{stunt-cost}" placeholder="0" />
                 <input type="text" class="sheet-hover" name="attr_stunt-name" style="margin-right:-26px;"/>
                 <span name="attr_power-tooltip" class="sheet-tooltip"></span>
                 <input type="checkbox" class="sheet-hover-hidden" style="width:28px; height:28px;"><span></span>
@@ -244,23 +244,9 @@ on('change:repeating_condition remove:repeating_condition', function(eventInfo) 
     });
 });
 
-on('change:repeating_stress remove:repeating_stress', function(eventInfo) {
-    getSectionIDs('repeating_stress', function(idarray) {
-        var costIds = idarray.map(function(rowid) { return 'repeating_stress_' + rowid + '_stress-cost'; });
-        getAttrs(costIds, function(values) {
-            var total = i = 0;
-            for(; i < costIds.length; i++) {
-                total -= parseInt(values[costIds[i]]) || 0;
-            }
-            
-            setAttrs({ 'stressCost': total });
-        });
-    });
-});
-
-on('change:stressCost change:stuntCost change:conditionCost', function(eventInfo) {
-    getAttrs(['stressCost','stuntCost','conditionCost'], function(values) {
-        var sum = 0 - values.stressCost - values.stuntCost - values.conditionCost;
+on('change:stuntCost change:conditionCost', function(eventInfo) {
+    getAttrs(['stuntCost','conditionCost'], function(values) {
+        var sum = 0 - values.stuntCost - values.conditionCost;
         
         setAttrs({ 'refresh-spent': sum });
     });
