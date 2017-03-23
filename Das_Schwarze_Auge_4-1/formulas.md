@@ -99,14 +99,14 @@ For specializations, whenever `@{skill}` is mentioned, a ` + 2` was added, becau
 These two conditions cannot be caught with Roll20 rolls at present. Roll templates check for `WasCrit` and `WasFumble`, but this is just a boolean and does not give the number of 1s and 20s. Therefore, an info is printed in rolls with at least one 1 or one 20.
 
 ## Bonus Damage from High Strength (TP/KK)
-Weapons come with a pair of values for the calculation of increased/decreased damage based on your strength. The first value is the threshold, which describes the strength needed use the weapon in a balanced way. The second is the strength step needed to determine at which strength values more/less damage can be dealt.
+Weapons come with a pair of values for the calculation of increased/decreased damage based on your strength. The first value is the threshold, which describes the strength needed to use the weapon in a balanced way. The second is the strength step needed to determine at which strength values more/less damage can be dealt.
 
 The calculation is not simple, therefore I want to start with pre-calculated values from WdS, p. 82:
 
 * TP/KK = 12/2 (threshold: 12, step: 2)
 * Strength 12 - 2 * 2 = 8: Damage - 2
 * Strength 12 - 1 * 2 = 10: Damage - 1
-* Strength 12: Damage ± 0 
+* Strength 12 ± 0 * 2 = 12: Damage ± 0 
 * Strength 12 + 1 * 2 = 14: Damage + 1
 * Strength 12 + 2 * 2 = 16: Damage + 2
 * Strength 12 + 3 * 2 = 18: Damage + 3
