@@ -1661,8 +1661,7 @@ on('change:generate_abilities', function () {
 		if (_.has(crewData, v.generate_source)) {
 			sectionName = 'crewability';
 			dataList = crewData[v.generate_source].abilities;
-		}
-		else if (_.has(playbookData, v.generate_source)) {
+		} else if (_.has(playbookData, v.generate_source)) {
 			sectionName = 'ability';
 			dataList = playbookData[v.generate_source].abilities;
 		};
@@ -1677,8 +1676,7 @@ on('change:generate_friends', function () {
 		if (_.has(crewData, v.generate_source)) {
 			sectionName = 'contact';
 			dataList = _.map(crewData[v.generate_source].contacts, n => ({ name: n }));
-		}
-		else if (_.has(playbookData, v.generate_source)) {
+		} else if (_.has(playbookData, v.generate_source)) {
 			sectionName = 'friend';
 			dataList = _.map(playbookData[v.generate_source].friends, n => ({ name: n }));
 		};
@@ -1899,8 +1897,8 @@ on('sheet:opened', function () {
 		};
 		// Set version number
 		setAttrs({
-			version: '1.0.1',
-			character_sheet: 'Blades in the Dark v1.0.1'
+			version: '1.0.2',
+			character_sheet: 'Blades in the Dark v1.0.2'
 		});
 	});
 });

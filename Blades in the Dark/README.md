@@ -4,6 +4,9 @@ This is a character sheet for Blades in the Dark for use on Roll20.
 
 ## Changelog
 
+### 1.0.2
+* Small styling tweaks
+
 ### 1.0.1
 * Corrected an issue with number inputs not saving their values in Firefox
 
