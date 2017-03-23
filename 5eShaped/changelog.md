@@ -1,4 +1,15 @@
+## 11.0.3
+
+### Bug Fixes
+
+* [#392: Spells macro empty after update](https://bitbucket.org/mlenser/5eshaped/issues/392/spells-macro-empty-after-update)
+* Change the name of the concentration filter so that it matches its new behavior. Also solves [#396: Setting a spell's duration to "Concentration" will delete the spell](https://bitbucket.org/mlenser/5eshaped/issues/396/setting-a-spells-duration-to-concentration)
+* [#395: Saving throws and Ability checks Query Macros are broken](https://bitbucket.org/mlenser/5eshaped/issues/395/saving-throws-and-ability-checks-query)
+* [#398: Hide AC does not work](https://bitbucket.org/mlenser/5eshaped/issues/398/hide-ac-does-not-work)
+
 ## 11.0.2
+
+### Bug Fixes
 
 * [#391: Other second damage not in the blue damage area of the template](https://bitbucket.org/mlenser/5eshaped/issues/391/other-second-damage-not-in-the-blue-damage)
 
