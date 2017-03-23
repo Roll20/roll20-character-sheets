@@ -17,3 +17,9 @@ Changed display of Old Vehicle Tabs
 NPC Sheet
 Skill Suggestion Engine
 Collapsible sections
+
+6.3.2 Updates
+Fixed broken images.
+
+6.4.0 Updates
+Implement translation tags for character vehicule and group sheet
