@@ -5,7 +5,7 @@ Note: there's a french version of the very same sheet/macros/scripts, for those 
 Follow [this link](https://github.com/Roll20/roll20-character-sheets/tree/master/Numenera_NathasNumenera_French).
 
 # Current version:
-Version 4.6 (August 2015) : [Screenshot](NathasNumenera_tabs_v4-5.jpg).
+Version 4.8 (October 10th, 2015) : [Screenshot](NathasNumenera_tabs_v4-5.jpg).
 
 # Basic use:
 
@@ -18,12 +18,7 @@ Version 4.6 (August 2015) : [Screenshot](NathasNumenera_tabs_v4-5.jpg).
 
 ## How to set up a character and its token
 1. Create a new _"Character"_ in the _"Journal"_
-2. Fill at least (even if it's zero):
-  1. Might, Speed and Intellect (current, max and edge) and Effort.
-  2. Before using the Roll buttons: Difficulty, Cost, Effort (both) and Bonus.
-  3. Before using the Initiative button: Cost, Effort and Bonus.
-  4. Before using the Recovery button: Recovery bonus.
-3. (Optionally) Create/use a token for the character as in this [screenshot](NathasNumenera_setup_the_character_token.jpg):
+2. Create/use a token for the character as in this [screenshot](NathasNumenera_setup_the_character_token.jpg):
   1. Make sure it representents the character you've created
   2. Assign _"bar1"_ to the _"might"_ attribute
   3. Assign _"bar2"_ to the _"speed"_ attribute
@@ -44,6 +39,19 @@ Version 4.6 (August 2015) : [Screenshot](NathasNumenera_tabs_v4-5.jpg).
 3. If needed, to create you own macros or buttons, read the [Wiki page](https://wiki.roll20.net/Script:Numenera_Natha).
 
 # Release Notes
+
+##Release 4.8 (October 10th, 2015)
+The API script must be updated in version 4.8.
+
+* By popular demand, the basic (non API) stat/skill roll template has been unified and only rolls one d20 dice (for the 3D dice users out there), whatever is the "Difficulty" roll parameter from the "Action" section. If the difficulty parameter has been set to 0, the beaten difficulty is no longer calculated (due to Roll20 limitations), but the raw d20 dice is shown, as the special natural rolls (1 or 17+), and the steps modifiying the difficulty are displayed (and summed).
+* New (small) API button to reset Action parameters
+
+##Release 4.7 (September 2015)
+Note that the [API script](https://github.com/Roll20/roll20-api-scripts/blob/master/Numenera_Natha/Numenera_Natha.js) needs to be updated to use the red buttons!
+
+Default values are now correctly set through the sheet or API so that every roll (with or without API/red or green buttons) can be used immediately after character creation.
+
+Roll templates have been clarified a bit and should look almost the same between basic and API rolls/buttons (+ API button for stat costs updates in the basic roll template).
 
 ##Release 4.6 (August 2015)
 Enhanced basic roll templates (without using the API) to show Success of Failure.
