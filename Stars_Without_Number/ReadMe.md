@@ -18,6 +18,22 @@ Report any problems, suggestions or features by sending a private message on Rol
 
 ### Changelog
 
+#### 0.1.4
+
+* Removed attribute auto-calculated values and replaced with sheet workers.
+* Added sheet version variable.
+
+#### 0.1.3
+
+* Added Sheet Worker to enforce System Strain constraints against Maximum Strain and Permanent Strain
+* Added Stowed and Other attribute to Gear in addition to Readied
+* Changed Readied/Stowed/Other to radio from checkbox
+* Added Sheet Worker to auto-calculate Current Readied and Current Stowed gear
+
+#### 0.1.2
+
+* Added ship weapon power field
+
 #### 0.1.1
 
 * Weapon auto-attack calculated by attribute modifier and skill level.
