@@ -11,6 +11,12 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 11.0.4
+
+### Bug Fixes
+
+* OGL conversion changes based on the silent updates. Solves [#408: Yawning Portal Conversion - Senses are missing](https://bitbucket.org/mlenser/5eshaped/issues/408/yawning-portal-conversion-senses-are), [#407: Yawning Portal Conversion - Speed Attribute](https://bitbucket.org/mlenser/5eshaped/issues/407/yawning-portal-conversion-speed-attribute), [#410: Yawning Portal Conversion - Proficiency Bonus](https://bitbucket.org/mlenser/5eshaped/issues/410/yawning-portal-conversion-proficiency), [#409: Yawning Portal Conversion - Ability Check Proficiency and Expertise](https://bitbucket.org/mlenser/5eshaped/issues/409/yawning-portal-conversion-ability-check)
+
 ## 11.0.3
 
 ### Bug Fixes
