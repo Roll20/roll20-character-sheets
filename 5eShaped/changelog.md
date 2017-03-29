@@ -11,6 +11,19 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 11.2.0
+
+### Features
+
+* Short and Long Rest are now on the sheet for all users. They no longer require a Pro subscription. Lucian's next version of the script will support the chat messages that accompany this feature.
+* If hit points are adjusted to be above 0 then death saving throws will reset in accordance with the rules: "The number of both is reset to zero when you regain any hit points or become stable"
+* Divine Smite's formula changed to allow automatic spell reduction - will require the script to set this all up. You can untoggle and retoggle divine smite to get the new formula.
+
+### Bug Fixes
+
+* Spell saving throw DC and spell attack will no longer use an ability modifier of -5 if there is no spell_ability selected.
+* Sheet based rests recharge short rests on a long rest now
+
 ## 11.1.0
 
 ### Features
