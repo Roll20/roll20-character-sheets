@@ -22,7 +22,9 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 #### 0.1.5
 
-* 
+* Added misc bonus to attributes
+* Rearranged location of Hit Points and System Strain
+* Removed sheet version variable
 
 #### 0.1.4
 
