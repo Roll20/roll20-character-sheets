@@ -11,6 +11,19 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 11.1.0
+
+### Features
+
+* PCs hit points will be calculated automatically if "Automatic hit points" is turned on on the settings page. Closes [#402: PCs should have the option of displaying default hit points](https://bitbucket.org/mlenser/5eshaped/issues/402/pcs-should-have-the-option-of-displaying)
+* OGL conversion now happens as one server call. The process should be quicker and notification window will now go away at the end.
+* OGL conversion will now remove all repeating sections from the OGL sheet to reduce the number of fields on the sheet. Less fields = less lag.
+
+### Bug Fixes
+
+* [#414: OGL Conversion - Statblock Macro](https://bitbucket.org/mlenser/5eshaped/issues/414/ogl-conversion-statblock-macro)
+* [#411: OGL Conversion - Spells are not sorted by level](https://bitbucket.org/mlenser/5eshaped/issues/411/ogl-conversion-spells-are-not-sorted-by)
+
 ## 11.0.4
 
 ### Bug Fixes
