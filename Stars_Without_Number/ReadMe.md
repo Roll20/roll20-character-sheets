@@ -25,7 +25,7 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 * Added misc bonus to attributes
 * Rearranged location of Hit Points and System Strain
 * Removed sheet version variable
-* Maximum strain auto-calculated
+* Maximum strain auto-calculated on sheet open and when Con changes
 
 #### 0.1.4
 
