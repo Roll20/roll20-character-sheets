@@ -413,7 +413,7 @@
               </tr>
               <tr>
                 <td><label for="attr_strain_max">Max</label></td>
-                <td><input type="number" value="@{Con}" name="attr_strain_max" class="sheet-stats-half"></td>
+                <td><input type="number" name="attr_strain_max" readonly class="sheet-stats-half"></td>
               </tr>
               <tr>
                 <td><label for="attr_strain_perm">Perm</label></td>
@@ -1923,31 +1923,42 @@ var TAS = TAS || (function(){
 }());
 /* ---- END: TheAaronSheet.js ---- */
 
+/**
+ * Events
+ */
 on("sheet:opened", function() {
   validateAttrMods();
   validateStrain();
   validateGear();
 });
+
 on("change:str change:int change:dex change:wis change:con change:cha", function(e) {
   var attr = e.sourceAttribute;
   calculateMod([attr]);
+
+  console.log(attr);
+  if (attr === 'con') {
+    calculateMaxStrain();
+  }
 });
+
 on("change:str_misc change:int_misc change:dex_misc change:wis_misc change:con_misc change:cha_misc", function(e) {
   var attr = e.sourceAttribute.substr(0,3);
   calculateMod([attr]);
 });
+
 on("change:strain", function() {
   validateStrain();
 });
+
 on("change:strain_perm", function() {
   validateStrain();
 });
-on("change:strain_max", function() {
-  validateStrain();
-});
+
 on("change:gear_readied_max", function() {
   validateReadiedMax();
 });
+
 on("change:repeating_gear", function() {
   getAttrs(["gear_readied_current","gear_stowed_current"], function(v) {
     setAttrs({gear_readied_current: parseInt(0)});
@@ -1967,6 +1978,9 @@ on("change:repeating_gear", function() {
     .execute();
 });
 
+/**
+ * Calculations
+ */
 calculateMod = function(attributes) {
   attributes.map(function(attr) {
     var attrModMisc = attr + '_misc';
@@ -1997,6 +2011,15 @@ calculateMod = function(attributes) {
   });
 }
 
+calculateMaxStrain = function() {
+  getAttrs(['con'], function(v) {
+    setAttrs({strain_max: parseInt(v.con)});
+  });
+}
+
+/**
+ * Validations
+ */
 validateAttrMods = function() {
   calculateMod(['str', 'int', 'dex', 'wis', 'con', 'cha']);
 }
@@ -2021,6 +2044,7 @@ validateGear = function() {
   validateReadiedMax();
   validateStowedMax();
 }
+
 validateReadiedMax = function() {
   getAttrs(["str","gear_readied_max"], function(v) {
     if (!v.str) return false;
@@ -2034,6 +2058,7 @@ validateReadiedMax = function() {
     setAttrs({gear_readied_max: readied_max});
   });
 }
+
 validateStowedMax = function() {
   getAttrs(["str","gear_stowed_max"], function(v) {
     if (!v.str) return false;
