@@ -11,6 +11,21 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 11.3.0
+
+### Features
+
+* Implemented a flag to detect when a monster is complete from being dragged from SRD mostly from a PR from Lucian. This will help his script attach on at the appropriate times.
+
+### Bug Fixes
+
+* Resting has had a few minor bugs fixed: long rests now recharge short rests as well as turn recharges and "Recharge X". Same for short rests.
+* Saving throw capitalization is now consistent with the rest of the sheet. For example the title of a strength saving throw will now be "Strength saving throw" instead of "Strength Saving throw".
+* save_prof has been renamed to saving_throw_prof for all the saving throws (str, dex, con, death..) The upgrade handles the change.
+* [#419: OGL Conversion - Saving Throws](https://bitbucket.org/mlenser/5eshaped/issues/419/ogl-conversion-saving-throws)
+* [#420: OGL Conversion - Reactions](https://bitbucket.org/mlenser/5eshaped/issues/420/ogl-conversion-reactions)
+* [#421: OGL Conversion - Legendary Actions](https://bitbucket.org/mlenser/5eshaped/issues/421/ogl-conversion-legendary-actions)
+
 ## 11.2.0
 
 ### Features
