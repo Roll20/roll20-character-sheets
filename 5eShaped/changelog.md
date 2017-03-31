@@ -11,6 +11,13 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 11.3.1
+
+### Bug Fixes
+
+* [#423: Crit damage not rolling](https://bitbucket.org/mlenser/5eshaped/issues/423/crit-damage-not-rolling)
+* [#424: Click to Roll is missing damage macro](https://bitbucket.org/mlenser/5eshaped/issues/424/click-to-roll-is-missing-damage-macro)
+
 ## 11.3.0
 
 ### Features
