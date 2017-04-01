@@ -11,6 +11,13 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 11.3.2
+
+### Bug Fixes
+
+* [#427: Saving throw proficiencies lost on update](https://bitbucket.org/mlenser/5eshaped/issues/427/saving-throw-proficiencies-lost-on-update)
+* Parsing of a range with only one number ("120 ft.") now works as well as the normal two number range ("20/120 ft."). I've added a test to ensure all other parsing succeeds.
+
 ## 11.3.1
 
 ### Bug Fixes
