@@ -11,6 +11,13 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 11.3.3
+
+### Bug Fixes
+
+* [#431: Cantrip damage scaling wrong for NPCs](https://bitbucket.org/mlenser/5eshaped/issues/431/cantrip-damage-scaling-wrong-for-npcs) wasn't converted to the new damage system.
+* [#432: level attribute not set for npcs imported via script](https://bitbucket.org/mlenser/5eshaped/issues/432/level-attribute-not-set-for-npcs-imported)
+
 ## 11.3.2
 
 ### Bug Fixes
