@@ -5,5 +5,8 @@ Styling is inspired primarily by GCS, but also with some influence from the offi
 
 TODO
  - Implement auto-calc for the point summary (if possible).
+    - Done
  - Automatic encumberance calculation, or at least highlighting.
+    - Done
  - Automatic stat reduction at low HP/FP
+    - Done
