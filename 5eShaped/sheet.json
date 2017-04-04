@@ -95,12 +95,16 @@
     {
       "attribute": "initiative_to_tracker",
       "displayname": "Initiative to tracker",
-      "type": "select",
-      "options": [
-        "Send to tracker|@{selected|initiative_formula} &{tracker}",
-        "Don't|@{initiative_formula}"
-      ],
+      "type": "checkbox",
+      "value": "1",
       "description": "Choose how initiative sends to the tracker"
+    },
+    {
+      "attribute": "initiative_tie_breaker",
+      "displayname": "Initiative tie breaker",
+      "type": "checkbox",
+      "value": "1",
+      "description": "Add Dexterity modifier to initiative to break ties"
     },
     {
       "attribute": "show_character_name",
@@ -115,27 +119,22 @@
     {
       "attribute": "attacks_vs_target_ac",
       "displayname": "Target's AC on Attacks",
-      "type": "select",
-      "options": [
-        "No|",
-        "Yes|[[@{target|AC}]]"
-      ],
+      "type": "checkbox",
+      "value": "1",
       "description": "Target an enemy's AC with attacks"
     },
     {
       "attribute": "attacks_vs_target_name",
       "displayname": "Target's name on Attacks and Saves",
-      "type": "select",
-      "options": [
-        "No|",
-        "Yes|@{target|token_name}"
-      ],
+      "type": "checkbox",
+      "value": "1",
       "description": "Show target's name on roll templates"
     },
     {
       "attribute": "show_rests",
       "displayname": "Show Rests",
       "type": "checkbox",
+      "value": "1",
       "description": "Show rests on the core page (API feature)"
     },
     {
@@ -181,18 +180,25 @@
       "description": "Show crit range"
     },
     {
+      "attribute": "show_dice_modifiers",
+      "displayname": "Dice modifiers",
+      "type": "checkbox",
+      "value": "1",
+      "description": "Show dice modifiers (useful for things like GWF or other ro<2)"
+    },
+    {
+      "attribute": "show_crit_range",
+      "displayname": "Crit range",
+      "type": "checkbox",
+      "value": "1",
+      "description": "Show crit range"
+    },
+    {
       "attribute": "extra_on_a_crit",
       "displayname": "Extra on a crit",
       "type": "checkbox",
       "value": "1",
       "description": "Show extra damage on a critical hit"
-    },
-    {
-      "attribute": "create_class_features",
-      "displayname": "Create class features",
-      "type": "checkbox",
-      "value": "1",
-      "description": "Create class features automatically"
     },
     {
       "attribute": "ammo_auto_use",
@@ -209,6 +215,13 @@
       "description": "Automatically revert (dis)advantage (API feature)"
     },
     {
+      "attribute": "automatically_expend_spell_resources",
+      "displayname": "Automatically expend spell resources",
+      "type": "checkbox",
+      "value": "1",
+      "description": "Automatically expend spell resources (API feature)"
+    },
+    {
       "attribute": "inspiration_multiple",
       "displayname": "Multiple inspiration",
       "type": "checkbox",
@@ -216,10 +229,14 @@
       "description": "Allow for multiple inspirations"
     },
     {
-      "attribute": "critical_damage_maximized",
+      "attribute": "critical_damage_houserule",
       "displayname": "Critical damage is maximized",
-      "type": "checkbox",
-      "value": "1",
+      "type": "select",
+      "options": [
+        "Normal|NORMAL",
+        "Critical damage is maximized|CRITICAL_DAMAGE_IS_MAXIMIZED",
+        "No extra damage on a critical hit from the default damage|NO_CRITICAL_DAMAGE_FROM_DEFAULT_DAMAGE"
+      ],
       "description": "Critical damage is maximized"
     },
     {
@@ -254,12 +271,14 @@
       "attribute": "medium_armor_max_dex",
       "displayname": "Medium armor max dex",
       "type": "number",
+      "value": "2",
       "description": "Medium armor max dex"
     },
     {
       "attribute": "base_dc",
       "displayname": "Base DC",
       "type": "number",
+      "value": "8",
       "description": "Base DC for saving throws"
     },
     {
@@ -280,6 +299,7 @@
       "attribute": "saving_throws_half_proficiency",
       "displayname": "Add half proficiency to unproficient saving throws",
       "type": "checkbox",
+      "value": "1",
       "description": "Add half proficiency to unproficient saving throws"
     },
     {
@@ -489,41 +509,77 @@
       "attribute": "copper_per_gold",
       "displayname": "Copper per Gold",
       "type": "number",
+      "value": "100",
       "description": "Copper per Gold"
     },
     {
       "attribute": "silver_per_gold",
       "displayname": "Silver per Gold",
       "type": "number",
+      "value": "10",
       "description": "Silver per Gold"
     },
     {
       "attribute": "electrum_per_gold",
       "displayname": "Electrum per Gold",
       "type": "number",
+      "value": "2",
       "description": "Electrum per Gold"
     },
     {
       "attribute": "platinum_per_gold",
       "displayname": "Platinum per Gold",
       "type": "number",
+      "value": "10",
       "description": "Platinum per Gold"
+    },
+    {
+      "attribute": "distance_system",
+      "displayname": "Distance",
+      "type": "select",
+      "options": [
+        "Feet|FEET",
+        "Meters|METERS"
+      ],
+      "description": "Choose which distance system to use"
     },
     {
       "attribute": "weight_system",
       "displayname": "Weight",
       "type": "select",
       "options": [
-        "Pounds|pounds",
-        "Kilograms|kilograms"
+        "Pounds|POUNDS",
+        "Kilograms|KILOGRAMS"
       ],
       "description": "Choose which weight system to use"
     },
     {
-      "attribute": "encumbrance_multiplier",
-      "displayname": "Encumbrance multiplier",
+      "attribute": "carrying_capacity_multiplier",
+      "displayname": "Carrying Capacity multiplier",
       "type": "number",
-      "description": "This number increases encumbrance"
+      "value": "15",
+      "description": "This number increases the Carrying Capacity multiplier (defaults to 15)"
+    },
+    {
+      "attribute": "max_push_drag_lift_multiplier",
+      "displayname": "Push, Drag, Life multiplier",
+      "type": "number",
+      "value": "30",
+      "description": "This number increases the Push, Drag, Life multiplier (defaults to 30)"
+    },
+    {
+      "attribute": "encumbered_multiplier",
+      "displayname": "Encumbered multiplier",
+      "type": "number",
+      "value": "5",
+      "description": "This number increases the Encumbered multiplier (defaults to 5)"
+    },
+    {
+      "attribute": "heavily_encumbered_multiplier",
+      "displayname": "Heavily Encumbered multiplier",
+      "type": "number",
+      "value": "10",
+      "description": "This number increases the Heavily Encumbered multiplier (defaults to 10)"
     }
   ]
 }
