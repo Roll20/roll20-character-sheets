@@ -12,10 +12,15 @@ Ce jeu s’adresse à tous ceux qui recherchent :
 + Une magie qui use de formules magiques, où les rimes sont l’élément déclencheur de puissants sortilèges.
 
 # Version courante
-1.0 [Capture d'écran](brigandyne.jpg)
+1.1 [Capture d'écran](brigandyne.jpg)
 
 # Notes de version
 
-##v1.0 (2017-03-26)
+## v1.1 (2017-04-05)
+
+* Optimisation CSS.
+* Relocalisation des images sur le github principal de Roll20
+
+## v1.0 (2017-03-26)
 
 Création de la feuille.
