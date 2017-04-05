@@ -18,8 +18,9 @@ Ce jeu s’adresse à tous ceux qui recherchent :
 
 ## v1.1 (2017-04-05)
 
-* Optimisation CSS.
+* Optimisation CSS
 * Relocalisation des images sur le github principal de Roll20
+* En cas d'échec à l'attaque, les dégâts de l'arme ne sont plus affichés dans le chat
 
 ## v1.0 (2017-03-26)
 
