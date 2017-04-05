@@ -121,7 +121,7 @@ var crewData = {
 				}
 			],
 			base: {
-				claim_1_desc: '+1 scale for your\nSkulks cohorts',
+				claim_1_desc: '+1 scale for your\nThugs cohorts',
 				claim_1_name: 'Barracks',
 				claim_2_desc: '',
 				claim_2_name: '\nTurf',
