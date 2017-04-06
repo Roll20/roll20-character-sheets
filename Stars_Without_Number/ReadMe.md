@@ -24,6 +24,8 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 * Removed damage message from missed weapon attacks
 * Added roll templates for basic attacks
+* Swapped background image on roll templates
+* Style tweaks to roll templates
 
 #### 0.1.5
 
