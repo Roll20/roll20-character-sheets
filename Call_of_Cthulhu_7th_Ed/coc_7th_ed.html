@@ -1789,68 +1789,125 @@
 		</tr>
     </table>
 </rolltemplate>
-
 <!-- WORKERS -->
 <script type="text/worker">
-on("add:siz add:str change:siz change:str", function() {
-  getAttrs(["str", "siz"], function(values) {
-    var siz_str_tot = parseInt(values.str) + parseInt(values.siz);
-    switch (true) {
-      case (siz_str_tot < 65):
-        setAttrs({
-          damage_bonus: "-2",
-          build: "-2"
-        });
-        break;
-      case (siz_str_tot > 64 && siz_str_tot < 85):
-        setAttrs({
-          damage_bonus: "-1",
-          build: "-1"
-        });
-        break;
-      case (siz_str_tot > 84 && siz_str_tot < 125):
-        setAttrs({
-          damage_bonus: "0",
-          build: "0"
-        });
-        break;
-      case (siz_str_tot > 124 && siz_str_tot < 165):
-        setAttrs({
-          damage_bonus: "1d4",
-          build: "+1"
-        });
-        break;
-      case (siz_str_tot > 164 && siz_str_tot < 205):
-        setAttrs({
-          damage_bonus: "1d6",
-          build: "+2"
-        });
-        break;
-      case (siz_str_tot > 204 && siz_str_tot < 285):
-        setAttrs({
-          damage_bonus: "2d6",
-          build: "+3"
-        });
-        break;
-      case (siz_str_tot > 284 && siz_str_tot < 365):
-        setAttrs({
-          damage_bonus: "3d6",
-          build: "+4"
-        });
-        break;
-      case (siz_str_tot > 364 && siz_str_tot < 445):
-        setAttrs({
-          damage_bonus: "4d6",
-          build: "+5"
-        });
-        break;
-      case (siz_str_tot > 444 && siz_str_tot < 525):
-        setAttrs({
-          damage_bonus: "5d6",
-          build: "+6"
-        });
-        break;
-    } //end switch (true)
-  }); //end getAttrs
-}); //end on("add:siz...
+  on("add:dex add:siz add:str change:dex change:siz change:str", function() {
+    getAttrs(["str", "siz", "dex", "age"], function(values) {
+      var istr = parseInt(values.str);
+      var isiz = parseInt(values.siz);
+      var idex = parseInt(values.dex);
+	  var iage = parseInt(values.age);
+      var siz_str_tot = istr + isiz;
+      switch (true) {
+        case (siz_str_tot < 65):
+          setAttrs({
+            damage_bonus: "-2",
+            build: "-2"
+          });
+          break;
+        case (siz_str_tot > 64 && siz_str_tot < 85):
+          setAttrs({
+            damage_bonus: "-1",
+            build: "-1"
+          });
+          break;
+        case (siz_str_tot > 84 && siz_str_tot < 125):
+          setAttrs({
+            damage_bonus: "0",
+            build: "0"
+          });
+          break;
+        case (siz_str_tot > 124 && siz_str_tot < 165):
+          setAttrs({
+            damage_bonus: "1d4",
+            build: "+1"
+          });
+          break;
+        case (siz_str_tot > 164 && siz_str_tot < 205):
+          setAttrs({
+            damage_bonus: "1d6",
+            build: "+2"
+          });
+          break;
+        case (siz_str_tot > 204 && siz_str_tot < 285):
+          setAttrs({
+            damage_bonus: "2d6",
+            build: "+3"
+          });
+          break;
+        case (siz_str_tot > 284 && siz_str_tot < 365):
+          setAttrs({
+            damage_bonus: "3d6",
+            build: "+4"
+          });
+          break;
+        case (siz_str_tot > 364 && siz_str_tot < 445):
+          setAttrs({
+            damage_bonus: "4d6",
+            build: "+5"
+          });
+          break;
+        case (siz_str_tot > 444 && siz_str_tot < 525):
+          setAttrs({
+            damage_bonus: "5d6",
+            build: "+6"
+          });
+          break;
+      } //end switch (true)
+	if (idex < isiz && istr < isiz) {
+        var imov = 7;
+      } else if (idex > isiz && istr > isiz) {
+        var imov = 9;
+      } else {
+        var imov = 8;
+      }
+    if (iage < 40) {
+      imov = imov;
+    } else if (iage > 39 && iage < 50) {
+      imov = imov - 1;
+    } else if (iage > 49 && iage < 60) {
+      imov = imov - 2;
+    } else if (iage > 59 && iage < 70) {
+      imov = imov - 3;
+    } else if (iage > 69 && iage < 80) {
+      imov = imov - 4;
+    } else if (iage > 79 && iage < 90) {
+      imov = imov - 5;
+    } else if (iage > 89) {
+      imov = imov - 6;
+    }
+    setAttrs({mov: imov});
+    }); //end getAttrs
+  }); //end on("add:siz...
+  on("add:age change:age", function() {
+    getAttrs(["str", "siz", "dex", "age"], function(values) {
+      var iage = parseInt(values.age);
+	  var istr = parseInt(values.str);
+      var isiz = parseInt(values.siz);
+      var idex = parseInt(values.dex);
+	if (idex < isiz && istr < isiz) {
+        var imov = 7;
+      } else if (idex > isiz && istr > isiz) {
+        var imov = 9;
+      } else {
+        var imov = 8;
+      }
+    if (iage < 40) {
+      imov = imov;
+    } else if (iage > 39 && iage < 50) {
+      imov = imov - 1;
+    } else if (iage > 49 && iage < 60) {
+      imov = imov - 2;
+    } else if (iage > 59 && iage < 70) {
+      imov = imov - 3;
+    } else if (iage > 69 && iage < 80) {
+      imov = imov - 4;
+    } else if (iage > 79 && iage < 90) {
+      imov = imov - 5;
+    } else if (iage > 89) {
+      imov = imov - 6;
+    }
+    setAttrs({mov: imov});
+    }); //end getAttrs
+  }); //end on("add:siz...
 </script>
