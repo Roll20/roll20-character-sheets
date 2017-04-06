@@ -20,6 +20,11 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 ### Changelog
 
+#### 0.1.6
+
+* Removed damage message from missed weapon attacks
+* Added roll templates for basic attacks
+
 #### 0.1.5
 
 * Added misc bonus to attributes
