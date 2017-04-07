@@ -37,6 +37,7 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 * Fixed error with attacks/skills/init using old attr mod name
 * Link to QA campaign
 * Fixed issue with Combat/Unarmed not being applied to damage rolls
+* Rearranged attributes to match order shown in character creation page
 
 #### 0.1.5
 
