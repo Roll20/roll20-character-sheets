@@ -26,6 +26,7 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 * Added roll templates for basic attacks
 * Swapped background image on roll templates
 * Style tweaks to roll templates
+* Fixed error with attacks/skills/init using old attr mod name
 
 #### 0.1.5
 
