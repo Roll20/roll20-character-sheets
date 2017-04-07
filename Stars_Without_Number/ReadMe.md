@@ -2,10 +2,6 @@
 
 This sheet is created for use in Stars Without Number on Roll20. Originally based on the [character sheet design](http://www.onesevendesign.com/swn_charsheets_oneseven.pdf) by OneSevenDesign.
 
-### Feedback
-
-Report any problems, suggestions, or features by [creating an issue](https://github.com/kevinsearle/roll20-character-sheets/issues) on Github.
-
 ### Author/Maintainer
 
 [Kevin Searle](https://app.roll20.net/users/565104/)
@@ -18,6 +14,18 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 * [jfredett](https://github.com/jfredett)
 * [CoalPoweredPuppet](https://github.com/CoalPoweredPuppet)
 
+### QA/Testing
+
+* [tipsta](https://github.com/mistatipsta)
+
+### Testing Help
+
+If you wish to test new features, fixes, and changes use the [development campaign](https://app.roll20dev.net/join/39986/aOV4kg). Use the command !charsheet to create a new character sheet before each feature/bug to test in order to start with a clean character sheet.
+
+### Feedback
+
+Report any problems, suggestions, or features by [creating an issue](https://github.com/kevinsearle/roll20-character-sheets/issues) on Github.
+
 ### Changelog
 
 #### 0.1.6
@@ -27,6 +35,7 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 * Swapped background image on roll templates
 * Style tweaks to roll templates
 * Fixed error with attacks/skills/init using old attr mod name
+* Link to QA campaign
 
 #### 0.1.5
 
