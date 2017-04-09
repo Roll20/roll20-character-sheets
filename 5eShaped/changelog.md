@@ -11,6 +11,23 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 11.4.0
+
+### Features
+
+* Added a second ability to initiative for archetypes that allow you to add a second ability modifier to initiative.
+* Attack type "Ranged Spell Attack" or "Melee Weapon Attack" is now a link to an attack/action/etc's attack so it can be repeated.
+
+### Bug Fixes
+
+* [#441: global damage bonus not being applied](https://bitbucket.org/mlenser/5eshaped/issues/441/global-damage-bonus-not-being-applied)
+* [#437: Settings > House Rules > HPs recovered on long rest value doesn't stick](https://bitbucket.org/mlenser/5eshaped/issues/437/settings-house-rules-hps-recovered-on-long)
+* [#444: Elder Brain Lair Actions don't import](https://bitbucket.org/mlenser/5eshaped/issues/444/elder-brain-lair-actions-dont-import)
+
+### UI Change
+
+* "Save failure" now reads as "Saving throw failure". Same for success.
+
 ## 11.3.3
 
 ### Bug Fixes
