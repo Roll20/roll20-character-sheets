@@ -1909,8 +1909,8 @@ on('sheet:opened', function () {
 		};
 		// Set version number
 		setAttrs({
-			version: '1.1',
-			character_sheet: 'Blades in the Dark v1.1'
+			version: '1.2',
+			character_sheet: 'Blades in the Dark v1.2'
 		});
 	});
 });
