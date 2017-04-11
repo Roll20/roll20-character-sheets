@@ -1533,18 +1533,21 @@ var setDiceFromTotal = function (name, numDice, upToFive, value) {
 		getSectionIDs(`repeating_${sectionName}`, function (idList) {
 			let rowNameAttributes = idList.map(id => `repeating_${sectionName}_${id}_name`);
 			getAttrs(rowNameAttributes, function (attrs) {
-				let existingRows = Object.keys(attrs).map(x => attrs[x]);
+				let existingRows = Object.keys(attrs).map(x => attrs[x]),
+					createdIDs = [];
 				let setting = dataList.filter(o => !existingRows.includes(o.name))
 					.map(function (o) {
-						let rowID = generateRowID();
+						let rowID;
+						while (!rowID) {
+							let newID = generateRowID();
+							if (!createdIDs.includes(newID)) rowID = newID;
+						}
 						return Object.keys(o).reduce(function (m, key) {
 							m[`repeating_${sectionName}_${rowID}_${key}`] = o[key];
 							return m;
 						}, {});
 					})
-					.reduce(function (m, o) {
-						return Object.assign(m, o);
-					}, {});
+					.reduce((m, o) => Object.assign(m, o), {});
 				setAttrs(setting);
 			});
 		});
