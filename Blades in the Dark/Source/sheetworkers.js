@@ -1540,7 +1540,10 @@ var setDiceFromTotal = function (name, numDice, upToFive, value) {
 						let rowID;
 						while (!rowID) {
 							let newID = generateRowID();
-							if (!createdIDs.includes(newID)) rowID = newID;
+							if (!createdIDs.includes(newID)) {
+							 rowID = newID;
+							 createdIDs.push(rowID);
+							}
 						}
 						return Object.keys(o).reduce(function (m, key) {
 							m[`repeating_${sectionName}_${rowID}_${key}`] = o[key];
