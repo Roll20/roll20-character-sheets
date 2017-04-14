@@ -5,7 +5,7 @@ Bas&eacute;e sur la feuille de personnage "Numenera" d&eacute;j&agrave; pr&eacut
 Voir en fin de fichier pour les notes de versions.
 
 # Version courante :
-Version 4.5 (13 Juin 2015) : [Capture d'&eacute;cran](NathasNumenera_tabs_v4-5.jpg).
+Version 4.8 (10 Octobre 2015) : [Capture d'&eacute;cran](NathasNumenera_tabs_v4-5.jpg).
 
 # Utilisation basique :
 
@@ -16,7 +16,7 @@ Version 4.5 (13 Juin 2015) : [Capture d'&eacute;cran](NathasNumenera_tabs_v4-5.j
 4. Dans la liste d&eacute;roulante, choisir _"Numenera (French)"_ sous _"Cypher System"_
 5. Descendre dans la page et cliquer sur _"Save changes"_
 
-Alternative (permettant de modifier les sources &agrave; votre convenance si vous avez un compte _"Mentor"_) :
+Alternative (permettant de modifier les sources &agrave; votre convenance si vous avez un compte _"Pro"_) :
 
 1. Dans la campagne Roll20 concern&eacute;e, cliquer sur _"Voir les d&eacute;tails"_
 2. Cliquer sur _"Campaign Settings"_
@@ -26,14 +26,9 @@ Alternative (permettant de modifier les sources &agrave; votre convenance si vou
 6. Dans l'onglet _"CSS Styling"_, coller le contenu de ce [fichier CSS](NathasNumenera_tabs.css)
 7. Descendre en bas de la page et cliquer sur _"Save Changes"_
 
-## Cr&eacute;er un personnage
+## Cr&eacute;er un personnage et son pion
 1. Cr&eacute;er un _"Character"_ dans le journal
-2. Remplir &agrave; minima (m&ecirc;me si &eacute;gal &agrave; z&eacute;ro) :
-  1. Robustesse, Vivacit&eacute;, Mental (Valeur, Max et Atout) et Effort.
-  2. Avant d'utiliser les boutons de Jet : Difficult&eacute;, Co&ucirc;t, Efforts (les deux) et Bonus.
-  3. Avant d'utiliser le bouton d'Initiative : Co&ucirc;t, Effort et Bonus.
-  4. Avant d'utiliser un jet de R&eacute;cup&eacute;ration : Bonus de r&eacute;cup&eacute;ration.
-3. (Optionnel) Modifier un pion (token) comme sur cette [image](NathasNumenera_setup_the_character_token.jpg) :
+2. Modifier un pion (token) comme sur cette [image](NathasNumenera_setup_the_character_token.jpg) :
   1. S'assurer que le pion repr&eacute;sente le personnage
   2. S&eacute;lectionner l'attribut _"might"_ pour la bar 1
   3. S&eacute;lectionner l'attribut _"speed"_ pour la bar 2
@@ -54,6 +49,22 @@ Alternative (permettant de modifier les sources &agrave; votre convenance si vou
 3. Si n&eacute;cessaire, pour cr&eacute;er vos propres macros ou boutons, lisez le [Wiki](https://wiki.roll20.net/Script:Numenera_Natha).
 
 # Notes de version
+
+##Version 4.8 (10 Octobre 2015)
+Le script API doit &ecirc;tre mis &agrave; jour en version 4.8.
+
+* &Agrave; la demande d'utilisateurs de la FdP, le template de jet basique (non API) a &eacute;t&eacute; unifi&eacute;, en ne lan&ccedil;ant qu'un seul d20 dont le r&eacute;sultat brut est affich&eacute;. Si le param&egrave;tre de difficult&eacute; n'est pas pas renseign&eacute; dans le groupe "Action" (=0), la difficult&eacute; battue n'est plus calcul&eacute;e (du fait de limitations technique de Roll20), mais seulement les niveaux la diminuant ou l'augmentant.
+* Ajout d'un bouton de remise &agrave; z&eacute;ro des param&egrave;tres de jet dans la section "Action"
+
+##Version 4.7 (19 Septembre 2015)
+Notez que le [script API](https://github.com/Roll20/roll20-api-scripts/blob/master/Numenera_Natha/Numenera_Natha.js) doit &ecirc;tre mis &agrave; jour pour utiliser les boutons "rouges" !
+
+Les valeurs par d&eacute;faut sont d&eacute;sormais valu&eacute;es automatiquement par la fiche ou l'API, au besoin, et donc les boutons de jets sont imm&eacute;diatement utilisables apr&egrave;s la cr&eacute;tion du personnage.
+
+Les templates de jets ont &eacute;t&eacute; modifi&eacute;s pour une l&eacute;g&egrave;re clarification, et pour harmoniser l'affichage entre les jets par l'API et les jets "basiques".
+
+##Version 4.6 (30 Ao&ucirc;t 2015)
+Am&eacute;lioration de l'affichage des r&eacute;sultats des jets basiques d'attributs (hors API) avec indication de succ&egrave;s ou d'&eacute;chec.
 
 ##Version 4.5 (13 Juin 2015)
 Ajout des d&eacute;g&acirc;ts sp&eacute;ciaux dans la gestion de l'&Eacute;tat du personnage.
