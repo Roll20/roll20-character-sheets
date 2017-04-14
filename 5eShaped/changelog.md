@@ -11,6 +11,29 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 11.5.0
+
+### UI Changes
+
+* Conditions have been hidden from the sheet as their current setup has never really been fully supported.
+* Hit points have been moved to after speed to better match the paper sheet. Temporary hit points and hit point maximum reduced have been moved inside the heart.
+* Burrow, Climb, Fly, and Swim have been moved to the first line of the core page for better visibility. They only show in presentation mode when they have content.
+
+![alt text](http://i.imgur.com/AXgeFlr.png "new core")
+![alt text](http://i.imgur.com/JBBdhdo.png "new core fly")
+![alt text](http://i.imgur.com/q2iCzCX.png "new core edit")
+
+
+### Bug Fixes
+
+* Fixed a config for the script. See the first item at [the script's 9.1.0 release](https://app.roll20.net/forum/permalink/4912230/)
+
+## 11.4.1
+
+### Bug Fixes
+
+* [#442: Hit Dice should restore a minimum of 1 when using "half" recovery](#442: Hit Dice should restore a minimum of 1 when using "half" recovery)
+
 ## 11.4.0
 
 ### Features
@@ -18,15 +41,15 @@ The sheet will always upgrade itself unless I specify otherwise, though some thi
 * Added a second ability to initiative for archetypes that allow you to add a second ability modifier to initiative.
 * Attack type "Ranged Spell Attack" or "Melee Weapon Attack" is now a link to an attack/action/etc's attack so it can be repeated.
 
+### UI Changes
+
+* "Save failure" now reads as "Saving throw failure". Same for success.
+
 ### Bug Fixes
 
 * [#441: global damage bonus not being applied](https://bitbucket.org/mlenser/5eshaped/issues/441/global-damage-bonus-not-being-applied)
 * [#437: Settings > House Rules > HPs recovered on long rest value doesn't stick](https://bitbucket.org/mlenser/5eshaped/issues/437/settings-house-rules-hps-recovered-on-long)
 * [#444: Elder Brain Lair Actions don't import](https://bitbucket.org/mlenser/5eshaped/issues/444/elder-brain-lair-actions-dont-import)
-
-### UI Change
-
-* "Save failure" now reads as "Saving throw failure". Same for success.
 
 ## 11.3.3
 
@@ -111,7 +134,7 @@ The sheet will always upgrade itself unless I specify otherwise, though some thi
 
 * [#391: Other second damage not in the blue damage area of the template](https://bitbucket.org/mlenser/5eshaped/issues/391/other-second-damage-not-in-the-blue-damage)
 
-### UI Change
+### UI Changes
 
 * Styling for the import message
 * Styling for !shaped-config
@@ -120,15 +143,15 @@ The sheet will always upgrade itself unless I specify otherwise, though some thi
 
 ### Bug Fixes
 
+### UI Changes
+
+* [#207: second damage roll template](https://bitbucket.org/mlenser/5eshaped/issues/207/second-damage-roll-template)
+
 * Added default higher level queries
 * A spell changing to another level now ensures that the filter for that level is turned on.
 * Freeform is now at the end of repeats as well. Referencing [#379: Spell repeat does not work with freeform if there is a new line in freeform](https://bitbucket.org/mlenser/5eshaped/issues/379/spell-repeat-does-not-work-with-freeform)
 * [#388: Click to roll damage does not work if the output is from the shaped chat macros](https://bitbucket.org/mlenser/5eshaped/issues/388/click-to-roll-damage-does-not-work-if-the)
 * [#389: Click to roll damage cannot determine a crit on attack](https://bitbucket.org/mlenser/5eshaped/issues/389/click-to-roll-damage-cannot-determine-a)
-
-### UI Change
-
-* [#207: second damage roll template](https://bitbucket.org/mlenser/5eshaped/issues/207/second-damage-roll-template)
 
 ## 11.0.0
 
