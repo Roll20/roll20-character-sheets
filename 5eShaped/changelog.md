@@ -11,6 +11,19 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 11.6.0
+
+### UI Changes
+
+* Senses are now in the first row like speeds.
+* Both speeds and senses have a toggle to show the "other" speeds/senses. The defaults shown are "Speed" and "Darkvision".
+* Temp hp and hit point maximum reduced now default to 0.
+* Hit point divider is now a straight line.
+
+### Bug Fixes
+
+* [#450: Missing space between Spell Level and Spell School](https://bitbucket.org/mlenser/5eshaped/issues/450/missing-space-between-spell-level-and)
+
 ## 11.5.0
 
 ### UI Changes
