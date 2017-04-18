@@ -35,5 +35,7 @@ March 10 - Removed all sheetworkers and add some additional UI.
 
 April 9 - Added additional modifier fields and tweaked the UI some.
 
+April 18 - updated the preview image and the jason file to reflect it.
+
 **Credit Where Credit is Due**
 The CSS and much of the layout is lifted from the work of allenmaher's BECMI sheet who lifted the excellent work of John Myles (@Actoba on roll20) and the 5e Dungeons and Dragons sheet.
