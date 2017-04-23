@@ -121,7 +121,7 @@ var crewData = {
 				}
 			],
 			base: {
-				claim_1_desc: '+1 scale for your\nSkulks cohorts',
+				claim_1_desc: '+1 scale for your\nThugs cohorts',
 				claim_1_name: 'Barracks',
 				claim_2_desc: '',
 				claim_2_name: '\nTurf',
@@ -1533,18 +1533,24 @@ var setDiceFromTotal = function (name, numDice, upToFive, value) {
 		getSectionIDs(`repeating_${sectionName}`, function (idList) {
 			let rowNameAttributes = idList.map(id => `repeating_${sectionName}_${id}_name`);
 			getAttrs(rowNameAttributes, function (attrs) {
-				let existingRows = Object.keys(attrs).map(x => attrs[x]);
+				let existingRows = Object.keys(attrs).map(x => attrs[x]),
+					createdIDs = [];
 				let setting = dataList.filter(o => !existingRows.includes(o.name))
 					.map(function (o) {
-						let rowID = generateRowID();
+						let rowID;
+						while (!rowID) {
+							let newID = generateRowID();
+							if (!createdIDs.includes(newID)) {
+							 rowID = newID;
+							 createdIDs.push(rowID);
+							}
+						}
 						return Object.keys(o).reduce(function (m, key) {
 							m[`repeating_${sectionName}_${rowID}_${key}`] = o[key];
 							return m;
 						}, {});
 					})
-					.reduce(function (m, o) {
-						return Object.assign(m, o);
-					}, {});
+					.reduce((m, o) => Object.assign(m, o), {});
 				setAttrs(setting);
 			});
 		});
@@ -1909,8 +1915,8 @@ on('sheet:opened', function () {
 		};
 		// Set version number
 		setAttrs({
-			version: '1.1',
-			character_sheet: 'Blades in the Dark v1.1'
+			version: '1.2',
+			character_sheet: 'Blades in the Dark v1.2'
 		});
 	});
 });
