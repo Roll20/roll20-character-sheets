@@ -531,6 +531,100 @@ var crewData = {
 				'Decker, an anarchist',
 				'Esme, a tavern owner'
 			]
+		},
+		vigilantes: {
+			abilities: [{
+					check: 'on',
+					name: 'As Good as Your Word',
+					description: 'You may spend rep as coin in downtime actions. Vigilantes gain Obligation as a second vice.'
+				},
+				{
+					name: 'Avengers',
+					description: 'Each PC may add +1 action rating to Hunt, Prowl,or Command (up to a max rating of 3).'
+				},
+				{
+					name: 'Thorn in your Side',
+					description: 'When you use Stealth or Assault plans against a higher Tier faction, your Tier counts as +1.'
+				},
+				{
+					name: 'Misdirection',
+					description: 'At the end of a score, you may sacrifice half the rep gained to make another faction lose status with your target instead of your crew. How do you pin it on someone else?'
+				},
+				{
+					name: 'Uncanny Preparation',
+					description: 'Twice per session during a Desperate action, improve your effect or position. Describe a flashback that gives you the advantage now (setup action).'
+				},
+				{
+					name: 'Moral Compass',
+					description: 'Each PC gains an additional xp trigger: You fulfilled an obligation at a cost to you or the crew.'
+				},
+				{
+					name: 'Favors',
+					description: 'Spend one rep and describe how one of your contacts is put out to help you. Everyone in your crew gets one dot in an action your contact is skilled in for this score.'
+				},
+				{
+					name: 'Roots',
+					description: 'During downtime one of your contacts or cohorts may take a downtime action to acquire an asset, reduce heat, or recover.'
+				}
+			],
+			base: {
+				claim_1_desc: 'All your experts\nare loyal',
+				claim_1_name: '\nFierce Allies',
+				claim_2_desc: '+1d to indulge\nvice',
+				claim_2_name: '\nLocal Heroes',
+				claim_3_desc: '+2 rep on\ntakedown scores',
+				claim_3_name: '\nPublicity',
+				claim_4_desc: '+1d to Prowl back\nto your lair',
+				claim_4_name: '\nHidden Paths',
+				claim_5_desc: '+1d to Study or\nTinker on site',
+				claim_5_name: '\nCatacombs',
+				claim_6_desc: 'Large gang who\nwill fight for you',
+				claim_6_name: 'Defiant\nCitizens',
+				claim_7_desc: '',
+				claim_7_name: '\nTurf',
+				claim_9_desc: '',
+				claim_9_name: '\nTurf',
+				claim_10_desc: '+1d to healing\nrolls',
+				claim_10_name: '\nInfirmary',
+				claim_11_desc: '-1 Wanted Level\nif Citizens faction\nstatus is +3',
+				claim_11_name: 'Above\nthe Law',
+				claim_12_desc: '-2 heat per score',
+				claim_12_name: 'Bluecoat\nConfidants',
+				claim_13_desc: '+1d to Survey or\nHunt on your turf',
+				claim_13_name: 'Lookouts',
+				claim_14_desc: 'Smugglers, +1d to\nacquire asets',
+				claim_14_name: 'The Hookup',
+				claim_15_desc: '+2 rep on scores\nagainst the law',
+				claim_15_name: 'Doskvol\'s\nMost Wanted',
+				claim_bridge_2_3: 0,
+				claim_bridge_3_4: 0,
+				claim_bridge_6_11: 0,
+				claim_bridge_10_15: 0,
+				claim_bridge_12_13: 0,
+				claim_bridge_13_14: 0,
+				cohort1_type: 'expert',
+				crew_description: 'Deluded\nAvengers',
+				crew_xp_condition: 'Interfere with criminal scores, protect citizens, or antagonize the law.',
+				hunting_grounds_type: 'Protected Grounds:',
+				hunting_grounds_description: 'Uniting - Interference - Resistance - Terror',
+				setting_show_origin: 'on',
+				upgrade_1_desc: 'Unbroken (+1 trauma box)',
+				upgrade_2_desc: 'Vigilantes attire (2 free load of weapons or supplies)',
+				upgrade_2_tall: 'on',
+				upgrade_3_desc: 'Irregulars (Experts gain +1d to Gather Information)',
+				upgrade_3_tall: 'on',
+				upgrade_4_desc: 'Willing to Fight (Experts are braves)',
+				upgrade_5_desc: 'Spark-craft Technology',
+				upgrade_22_check: 'on' /* Resolve */
+			},
+			contacts: [
+				'Mara, a chief inspector',
+				'Twelves, a Leviathan Hunter',
+				'Soren, a restless ghost',
+				'Poriso, famous opera singer',
+				'Anis, a Spirit Warden',
+				'Badger, a brilliant inventor'
+			]
 		}
 	},
 	playbookData = {
@@ -1915,8 +2009,8 @@ on('sheet:opened', function () {
 		};
 		// Set version number
 		setAttrs({
-			version: '1.2',
-			character_sheet: 'Blades in the Dark v1.2'
+			version: '1.3',
+			character_sheet: 'Blades in the Dark v1.3'
 		});
 	});
 });
