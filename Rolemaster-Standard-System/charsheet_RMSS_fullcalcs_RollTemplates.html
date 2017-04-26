@@ -1,10 +1,10 @@
 <!-- RoleMaster Standard System Character Sheet -->
 <!-- by Diana P. -->
 <!-- I borrowed some code/equations from Brian. And Sam. And Aaron I. And others -->
-<!-- Version 2.3.4 (full nested calculations; sheet helpers.) dated 4/22/2017 -->
+<!-- Version 2.3.5 (full nested calculations; sheet helpers.) dated 4/25/2017 -->
 <input type="hidden" name="attr_character_sheet" title="character-sheet" value="RMSS-FullCalcs"/>
-<input type="hidden" name="attr_currentsheetversion" title="currentsheetversion" value="3.4" />
-<p style="font-size: 0.6em;">V2.<span name="attr_sheetversion" title="sheetversion" ></span> 4/22/17 by Diana P.</p>
+<input type="hidden" name="attr_currentsheetversion" title="currentsheetversion" value="3.5" />
+<p style="font-size: 0.6em;">V2.<span name="attr_sheetversion" title="sheetversion" ></span> 4/25/17 by Diana P.</p>
 <input type="radio" class="sheet-switch-pc-show sheet-switch" title="npc-show" name="attr_npc-show" value="1" checked /><span style="text-align: left;"><span data-i18n="pc">PC</span> &nbsp; &nbsp; </span>
 <input type="radio" class="sheet-switch-npc-show sheet-switch" title="npc-show" name="attr_npc-show" value="2" /><span style="text-align: left;"><span data-i18n="npc">NPC</span> &nbsp; &nbsp; </span>
 <input type="radio" class="sheet-switch-rtmplt-show sheet-switch" title="npc-show" name="attr_npc-show" value="3" /><span style="text-align: left;" data-i18n="roll-templates">Roll Templates</span>
@@ -9739,7 +9739,8 @@
 	  let mod = 0;
 //	  console.log('/* ----------inside GenSkillMod rank:'+rank+'------------ */');
 	  if (rank == 0) {
-	      mod = prog0;
+		  if (isNaN(prog0)) {mod=0;}
+			else {mod = prog0;}
 //		  mod = -15;
 	  } else if (rank < 11) {
 	      mod = rank * prog10;
@@ -9856,13 +9857,13 @@
 	  } else if (rselect == 3) {	//mentalism
 		  mod = premod;
 	  } else if (rselect == 4) {	//chan/ess
-		  mod = Math.floor((intmod + empmod)/2);
+		  mod = Math.round((intmod + empmod)/2);
 	  } else if (rselect == 5) {	//chan/ment
-		  mod = Math.floor((intmod + premod) / 2);
+		  mod = Math.round((intmod + premod) / 2);
 	  } else if (rselect == 6) {	//ess/ment
-		  mod = Math.floor((empmod + premod) / 2);
+		  mod = Math.round((empmod + premod) / 2);
 	  } else if (rselect == 7) {	//arcane
-		  mod = Math.floor((intmod + empmod + premod) / 3);
+		  mod = Math.round((intmod + empmod + premod) / 3);
 	  }
 //	  console.log('/* ----------leaving SetRealmMod mod:'+mod+'------------ */');
 	  return mod;  
@@ -9982,7 +9983,10 @@
 				else if (pindex == 20) {mod = 0;}
 				else if (pindex == 30) {mod = 0;}
 				else if (pindex == 31) {mod = 0;}
-		} else if (racialindex == 1) {mod = currentval;}		//------Custom------
+		} else if (racialindex == 1) {						//------Custom------
+			if (isNaN(currentval)) {mod = 0;}
+				else {mod = currentval;}
+		}
 //	  console.log('/* ----------leaving PPDevProgMod mod:'+mod+'------------ */');
 	  return mod;  
 	}
@@ -10706,27 +10710,27 @@ on("change:professionindex change:professioncalc", function() {
 
 //	<!---- update realm stat when realm or realm stat changes---->	
 on("change:realmselect change:inbonus change:embonus change:prbonus ", function() {
-//   console.log('/* ---------- entering ppsetup call------------ */');
+//   console.log('/* ---------- entering realm setup call------------ */');
 	getAttrs(["realmselect", "inbonus", "embonus", "prbonus", "realm"], function(values) {
 		setAttrs({
 			realm: SetRealm(parseInt(values.realmselect,10), parseInt(values.inbonus,10), parseInt(values.embonus,10), parseInt(values.prbonus,10))
 		});
 	});
-//   console.log('/* ---------- exiting ppdev setup call------------ */');
+//   console.log('/* ---------- exiting realm setup call------------ */');
 }); 
 	
 //	<!---- update ppdev progression when realm or racialindex change---->	
-on("change:realmselect change:racialindex change:inbonus change:embonus change:prbonus change:racialcalc", function() {
+on("change:realmselect change:racialindex change:racialcalc", function() {
 //   console.log('/* ---------- entering ppsetup call------------ */');
 	getAttrs(["realmselect", "racialindex", "ppdevprog0", "ppdevprog10", "ppdevprog20", "ppdevprog30", "ppdevprog31", "racialcalc"], function(values) {
 		if (parseInt(values.racialcalc,10) == 1){
 //   console.log('/* ---------- racial calc is 1; setup ppdev!------------ */');
 			setAttrs({
-				ppdevprog0: PPDevProgMod(parseInt(values.realmselect,10), parseInt(values.racialindex,10), 0),
-				ppdevprog10: PPDevProgMod(parseInt(values.realmselect,10), parseInt(values.racialindex,10), 10),
-				ppdevprog20: PPDevProgMod(parseInt(values.realmselect,10), parseInt(values.racialindex,10), 20),
-				ppdevprog30: PPDevProgMod(parseInt(values.realmselect,10), parseInt(values.racialindex,10), 30),
-				ppdevprog31: PPDevProgMod(parseInt(values.realmselect,10), parseInt(values.racialindex,10), 31)
+				ppdevprog0: PPDevProgMod(parseInt(values.realmselect,10), parseInt(values.racialindex,10), 0,parseFloat(values.ppdevprog0)),
+				ppdevprog10: PPDevProgMod(parseInt(values.realmselect,10), parseInt(values.racialindex,10), 10,parseFloat(values.ppdevprog10)),
+				ppdevprog20: PPDevProgMod(parseInt(values.realmselect,10), parseInt(values.racialindex,10), 20,parseFloat(values.ppdevprog20)),
+				ppdevprog30: PPDevProgMod(parseInt(values.realmselect,10), parseInt(values.racialindex,10), 30,parseFloat(values.ppdevprog30)),
+				ppdevprog31: PPDevProgMod(parseInt(values.realmselect,10), parseInt(values.racialindex,10), 31,parseFloat(values.ppdevprog31))
 			});
 		}
 	});
@@ -10734,9 +10738,10 @@ on("change:realmselect change:racialindex change:inbonus change:embonus change:p
 }); 
 	
 //  <!---- Then update PPdev rank bonus ........... even if rank has not changed ----->
-on("change:realm change:ppdevprog0 change:ppdevprog10 change:ppdevprog20 change:ppdevprog30 change:ppdevprog31 change:skillcalc change:racialcalc", function() {
+on("change:realm change:ppdevranks change:ppdevprog0 change:ppdevprog10 change:ppdevprog20 change:ppdevprog30 change:ppdevprog31 change:skillcalc change:racialcalc change:inbonus change:embonus change:prbonus", function() {
   getAttrs(["ppdevranks", "ppdevprog0", "ppdevprog10", "ppdevprog20", "ppdevprog30", "ppdevprog31", "skillcalc", "racialcalc"], function(values) {
-	if ((parseInt(values.skillcalc,10) == 1) && (parseInt(values.racialcalc,10) == 1)) {
+//  console.log('/* ------------------ppdevranks:'+parseInt(values.ppdevranks,10)+' ppdevprog0:'+parseFloat(values.ppdevprog0)+' ppdevprog10:'+parseFloat(values.ppdevprog10)+' ppdevprog20:'+parseFloat(values.ppdevprog20)+' ppdevprog30:'+parseFloat(values.ppdevprog30)+' ppdevprog31:'+parseFloat(values.ppdevprog31)+'-----------*/');
+	if ((parseInt(values.skillcalc,10) == 1)) {
 		setAttrs({
 		  ppdevrankbonus: GenSkillMod(parseInt(values.ppdevranks,10), parseFloat(values.ppdevprog0), parseFloat(values.ppdevprog10), parseFloat(values.ppdevprog20), parseFloat(values.ppdevprog30), parseFloat(values.ppdevprog31))
 		});
