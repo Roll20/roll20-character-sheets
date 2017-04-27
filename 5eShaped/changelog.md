@@ -1,3 +1,144 @@
+## Versioning
+I use [Semantic Versioning](http://semver.org/) which has 3 numbers separated by a dot: Major.Minor.Patch
+
+I use Major versions a bit liberally - I consider the following to be major changes:
+* Any changes to existing roll template fields
+* Any change to a repeating section which makes existing macro references break
+
+New features are a minor version.
+
+Bugs fall into the patch category.
+
+The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
+
+## 11.3.3
+
+### Bug Fixes
+
+* [#431: Cantrip damage scaling wrong for NPCs](https://bitbucket.org/mlenser/5eshaped/issues/431/cantrip-damage-scaling-wrong-for-npcs) wasn't converted to the new damage system.
+* [#432: level attribute not set for npcs imported via script](https://bitbucket.org/mlenser/5eshaped/issues/432/level-attribute-not-set-for-npcs-imported)
+
+## 11.3.2
+
+### Bug Fixes
+
+* [#427: Saving throw proficiencies lost on update](https://bitbucket.org/mlenser/5eshaped/issues/427/saving-throw-proficiencies-lost-on-update)
+* Parsing of a range with only one number ("120 ft.") now works as well as the normal two number range ("20/120 ft."). I've added a test to ensure all other parsing succeeds.
+
+## 11.3.1
+
+### Bug Fixes
+
+* [#423: Crit damage not rolling](https://bitbucket.org/mlenser/5eshaped/issues/423/crit-damage-not-rolling)
+* [#424: Click to Roll is missing damage macro](https://bitbucket.org/mlenser/5eshaped/issues/424/click-to-roll-is-missing-damage-macro)
+
+## 11.3.0
+
+### Features
+
+* Implemented a flag to detect when a monster is complete from being dragged from SRD mostly from a PR from Lucian. This will help his script attach on at the appropriate times.
+
+### Bug Fixes
+
+* Resting has had a few minor bugs fixed: long rests now recharge short rests as well as turn recharges and "Recharge X". Same for short rests.
+* Saving throw capitalization is now consistent with the rest of the sheet. For example the title of a strength saving throw will now be "Strength saving throw" instead of "Strength Saving throw".
+* save_prof has been renamed to saving_throw_prof for all the saving throws (str, dex, con, death..) The upgrade handles the change.
+* [#419: OGL Conversion - Saving Throws](https://bitbucket.org/mlenser/5eshaped/issues/419/ogl-conversion-saving-throws)
+* [#420: OGL Conversion - Reactions](https://bitbucket.org/mlenser/5eshaped/issues/420/ogl-conversion-reactions)
+* [#421: OGL Conversion - Legendary Actions](https://bitbucket.org/mlenser/5eshaped/issues/421/ogl-conversion-legendary-actions)
+
+## 11.2.0
+
+### Features
+
+* Short and Long Rest are now on the sheet for all users. They no longer require a Pro subscription. Lucian's next version of the script will support the chat messages that accompany this feature.
+* If hit points are adjusted to be above 0 then death saving throws will reset in accordance with the rules: "The number of both is reset to zero when you regain any hit points or become stable"
+* Divine Smite's formula changed to allow automatic spell reduction - will require the script to set this all up. You can untoggle and retoggle divine smite to get the new formula.
+
+### Bug Fixes
+
+* Spell saving throw DC and spell attack will no longer use an ability modifier of -5 if there is no spell_ability selected.
+* Sheet based rests recharge short rests on a long rest now
+
+## 11.1.0
+
+### Features
+
+* PCs hit points will be calculated automatically if "Automatic hit points" is turned on on the settings page. Closes [#402: PCs should have the option of displaying default hit points](https://bitbucket.org/mlenser/5eshaped/issues/402/pcs-should-have-the-option-of-displaying)
+* OGL conversion now happens as one server call. The process should be quicker and notification window will now go away at the end.
+* OGL conversion will now remove all repeating sections from the OGL sheet to reduce the number of fields on the sheet. Less fields = less lag.
+
+### Bug Fixes
+
+* [#414: OGL Conversion - Statblock Macro](https://bitbucket.org/mlenser/5eshaped/issues/414/ogl-conversion-statblock-macro)
+* [#411: OGL Conversion - Spells are not sorted by level](https://bitbucket.org/mlenser/5eshaped/issues/411/ogl-conversion-spells-are-not-sorted-by)
+
+## 11.0.4
+
+### Bug Fixes
+
+* OGL conversion changes based on the silent updates. Solves [#408: Yawning Portal Conversion - Senses are missing](https://bitbucket.org/mlenser/5eshaped/issues/408/yawning-portal-conversion-senses-are), [#407: Yawning Portal Conversion - Speed Attribute](https://bitbucket.org/mlenser/5eshaped/issues/407/yawning-portal-conversion-speed-attribute), [#410: Yawning Portal Conversion - Proficiency Bonus](https://bitbucket.org/mlenser/5eshaped/issues/410/yawning-portal-conversion-proficiency), [#409: Yawning Portal Conversion - Ability Check Proficiency and Expertise](https://bitbucket.org/mlenser/5eshaped/issues/409/yawning-portal-conversion-ability-check)
+
+## 11.0.3
+
+### Bug Fixes
+
+* [#392: Spells macro empty after update](https://bitbucket.org/mlenser/5eshaped/issues/392/spells-macro-empty-after-update)
+* Change the name of the concentration filter so that it matches its new behavior. Also solves [#396: Setting a spell's duration to "Concentration" will delete the spell](https://bitbucket.org/mlenser/5eshaped/issues/396/setting-a-spells-duration-to-concentration)
+* [#395: Saving throws and Ability checks Query Macros are broken](https://bitbucket.org/mlenser/5eshaped/issues/395/saving-throws-and-ability-checks-query)
+* [#398: Hide AC does not work](https://bitbucket.org/mlenser/5eshaped/issues/398/hide-ac-does-not-work)
+
+## 11.0.2
+
+### Bug Fixes
+
+* [#391: Other second damage not in the blue damage area of the template](https://bitbucket.org/mlenser/5eshaped/issues/391/other-second-damage-not-in-the-blue-damage)
+
+### UI Change
+
+* Styling for the import message
+* Styling for !shaped-config
+
+## 11.0.1
+
+### Bug Fixes
+
+* Added default higher level queries
+* A spell changing to another level now ensures that the filter for that level is turned on.
+* Freeform is now at the end of repeats as well. Referencing [#379: Spell repeat does not work with freeform if there is a new line in freeform](https://bitbucket.org/mlenser/5eshaped/issues/379/spell-repeat-does-not-work-with-freeform)
+* [#388: Click to roll damage does not work if the output is from the shaped chat macros](https://bitbucket.org/mlenser/5eshaped/issues/388/click-to-roll-damage-does-not-work-if-the)
+* [#389: Click to roll damage cannot determine a crit on attack](https://bitbucket.org/mlenser/5eshaped/issues/389/click-to-roll-damage-cannot-determine-a)
+
+### UI Change
+
+* [#207: second damage roll template](https://bitbucket.org/mlenser/5eshaped/issues/207/second-damage-roll-template)
+
+## 11.0.0
+
+### Breaking Changes
+
+* Some unused fields related to abilities and saving throws have been removed
+* [#338: Click to roll damage](https://bitbucket.org/mlenser/5eshaped/issues/338/click-to-roll-damage) has been completed for both attacks and saving throws.
+* Spell filters have been revamped. Levels and casting time are toggled individually now. Concentration's behavior is now more clear. The filters are now consistent between PCs and NPCs. Adding spells on a new pc that doesn't have spellcasting should be much more clear. The macro output matches the levels that are toggled on.
+* Rests are always showing now. In 11.1.0 or 12.0.0 rests will be fully moved to the sheet so non-Pro members can use them to recharge things like hit points, hit dice, exhaustion, class features, etc.
+* Ability checks, Saving throws, and Spells chat macros now use the normal size of text used by attacks, actions, etc. It is no longer possible to configure them to be smaller.
+
+### Features
+
+* [#178: 3D dice should roll the appropriate amount of dice](https://bitbucket.org/mlenser/5eshaped/issues/178/3d-dice-should-roll-the-appropriate-amount)
+* [#359: Option to hide AC using stylish](https://bitbucket.org/mlenser/5eshaped/issues/359/option-to-hide-ac-using-stylish)
+* Distances entered into places like senses or speed will now convert the distance if the entered distance type (meters) doesn't match the text (feet).
+* [#204: Nowhere to store usage of lair and regional actions](https://bitbucket.org/mlenser/5eshaped/issues/204/nowhere-to-store-usage-of-lair-and)
+* Added configurable recharges to warlock slots and spell points (defaulting to short rest and long rest respectively)
+* [#244: Extra Attack Class Feature missing from togglable lists.](https://bitbucket.org/mlenser/5eshaped/issues/244/extra-attack-class-feature-missing-from)
+* Added styling for an upcoming API feature (Spells and Monster import revamp)
+
+### Bug Fixes
+
+* [#369: NPC Hit dice not able to be changed](https://bitbucket.org/mlenser/5eshaped/issues/369/npc-hit-dice-not-able-to-be-changed)
+* [#378: Hit dice formula error](https://bitbucket.org/mlenser/5eshaped/issues/378/hit-dice-formula-error). You may need to clear your chat archive for this one (I did, but I'm unsure if it is required)
+* [#379: Spell repeat does not work with freeform if there is a new line in freeform](https://bitbucket.org/mlenser/5eshaped/issues/379/spell-repeat-does-not-work-with-freeform)
+
 ## 10.1.5
 
 ### Bug Fixes

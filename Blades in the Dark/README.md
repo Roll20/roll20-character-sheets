@@ -4,6 +4,27 @@ This is a character sheet for Blades in the Dark for use on Roll20.
 
 ## Changelog
 
+### 1.3
+* Added Vigilantes data
+
+### 1.2
+* Roll titles are moved to the roll template so they are no longer displayed as links
+* Fortune rolls will ask for bonus dice first to remedy confusion
+* Minor data fix for Bravos barracks claim
+* Fixed a bug where sometimes not all rows in a repeating section would be created
+
+### 1.1
+* Some small visual changes, mostly around boxes for stress/rep/heat/coin/stash
+* Maximum number of stress boxes increased to 14
+* Image hosting moved to Github
+* Updated 6-segment clock to use correct image
+
+### 1.0.2
+* Small styling tweaks
+
+### 1.0.1
+* Corrected an issue with number inputs not saving their values in Firefox
+
 ### 1.0
 * Overly long character names will now be shortened in roll templates, instead of becoming an unreadable mess
 * Negative bonus dice (up to -3) can now be selected
