@@ -808,7 +808,7 @@
             <td><input type="number" name="attr_melee_weapon_attack_dam_misc" value="0"/></input></td>
             <td><input type="number" name="attr_melee_weapon_attack_crit_target" value="20"></input></td>
             <td><input type="text" name="attr_melee_weapon_attack_notes"/></input></td>
-            <td><button type="roll" name="roll_melee_weapon_attack" value="&{template:5eDefault} {{character_name=@{char_name}}} {{title=Melee Weapon Attack}} {{subheader=@{char_name}}} {{attack=[[1d20cs>@{melee_weapon_attack_crit_target}+@{melee_weapon_attack_total}]]}} {{damage=[[d@{dam_die_melee}*@{melee_weapon_attack_dam_total}]]}}{{emote=*Melee Weapon attack*}}"></button></td>
+            <td><button type="roll" name="roll_melee_weapon_attack" value="&{template:5eDefault} {{character_name=@{char_name}}} {{title=Melee Weapon Attack}} {{subheader=@{char_name}}} {{attack=[[1d20cs>@{melee_weapon_attack_crit_target}+@{melee_weapon_attack_total}]]}} {{damage=[[d@{dam_die_melee}*@{melee_weapon_attack_dam_total}]]}}{{critdamage=[[@{dam_die_melee}*@{melee_weapon_attack_dam_total}+d@{dam_die_melee}*@{melee_weapon_attack_dam_total}]]}}{{emote=*Melee Weapon attack*}}"></button></td>
         </tr>
         <tr>
             <td>Ranged</td>
@@ -824,7 +824,7 @@
             <td><input type="number" name="attr_ranged_attack_dam_misc" value="0"></input></td>
             <td><input type="number" name="attr_ranged_attack_crit_target" value="20"></input></td>
             <td><input type="text" name="attr_melee_weapon_attack_notes"</></td>
-            <td><button type="roll" name="roll_ranged_weapon_attack" value="&{template:5eDefault} {{character_name=@{char_name}}} {{title=Ranged Weapon Attack}} {{subheader=@{char_name}}} {{attack=[[1d20cs>@{ranged_attack_crit_target}+@{ranged_attack_total}]]}} {{damage=[[d@{dam_die_ranged}*@{ranged_attack_dam_total}]]}}{{emote=*Ranged Weapon attack*}}"></button></td>
+            <td><button type="roll" name="roll_ranged_weapon_attack" value="&{template:5eDefault} {{character_name=@{char_name}}} {{title=Ranged Weapon Attack}} {{subheader=@{char_name}}} {{attack=[[1d20cs>@{ranged_attack_crit_target}+@{ranged_attack_total}]]}} {{damage=[[d@{dam_die_ranged}*@{ranged_attack_dam_total}]]}}{{critdamage=[[@{dam_die_ranged}*@{ranged_attack_dam_total}+d@{dam_die_ranged}*@{ranged_attack_dam_total}]]}}{{emote=*Ranged Weapon attack*}}"></button></td>
         </tr>
 		<tr>
             <td>Unarmed Combat</td>
@@ -840,7 +840,7 @@
             <td><input type="number" name="attr_unarmed_attack_dam_misc" value="0"></input></td>
             <td><input type="number" name="attr_unarmed_attack_crit_target" value="20"></input></td>
             <td><input type="text" name="attr_melee_weapon_attack_notes"</></td>
-            <td><button type="roll" name="roll_unarmed_combat_attack" value="&{template:5eDefault} {{character_name=@{char_name}}} {{title=Unarmed Combat Attack}} {{subheader=@{char_name}}} {{attack=[[1d20cs>@{unarmed_attack_crit_target}+@{unarmed_attack_total}]]}} {{damage=[[d@{dam_die_unarmed}*@{unarmed_attack_dam_total}]]}}{{emote=*Unarmed attack*}}"></button></td>
+            <td><button type="roll" name="roll_unarmed_combat_attack" value="&{template:5eDefault} {{character_name=@{char_name}}} {{title=Unarmed Combat Attack}} {{subheader=@{char_name}}} {{attack=[[1d20cs>@{unarmed_attack_crit_target}+@{unarmed_attack_total}]]}} {{damage=[[d@{dam_die_unarmed}*@{unarmed_attack_dam_total}]]}}{{critdamage=[[@{dam_die_unarmed}*@{unarmed_attack_dam_total}+d@{dam_die_unarmed}*@{unarmed_attack_dam_total}]]}}{{emote=*Unarmed attack*}}"></button></td>
         </tr>
     </table>
 </div>
@@ -1176,18 +1176,24 @@ var update_defenses=function(){
 				{{/attack}}
 
 				{{#damage}}
-				<div class="sheet-row">
-					<div class="sheet-col-5-12 sheet-padl sheet-padr sheet-rt-key">Damage</div>
-					<div class="sheet-col-7-12 sheet-padr sheet-rt-value">{{damage}}</div>
-				</div>
+    				{{#rollWasCrit() attack}}
+        				<div class="sheet-row">
+        					<div class="sheet-col-5-12 sheet-padl sheet-padr sheet-rt-key">Crit damage</div>
+        					<div class="sheet-col-7-12 sheet-padr sheet-rt-value">{{critdamage}}</div>
+        				</div>
+    				{{/rollWasCrit() attack}}
+    				{{#^rollWasCrit() attack}}
+        				<div class="sheet-row">
+        					<div class="sheet-col-5-12 sheet-padl sheet-padr sheet-rt-key">Damage</div>
+        					<div class="sheet-col-7-12 sheet-padr sheet-rt-value">{{damage}}</div>
+        				</div>
+    				{{/^rollWasCrit() attack}}
+				
+				
 				{{/damage}}
 
-				{{#rollWasCrit() attack}}
-				<div class="sheet-row">
-					<div class="sheet-col-5-12 sheet-padl sheet-padr sheet-rt-key">Crit</div>
-					<div class="sheet-col-7-12 sheet-padr sheet-rt-value">{{critdamage}}</div>
-				</div>
-				{{/rollWasCrit() attack}}
+				
+
 
 
 				<!--Spellcasting-->
