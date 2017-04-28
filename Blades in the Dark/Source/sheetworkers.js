@@ -121,7 +121,7 @@ var crewData = {
 				}
 			],
 			base: {
-				claim_1_desc: '+1 scale for your\nSkulks cohorts',
+				claim_1_desc: '+1 scale for your\nThugs cohorts',
 				claim_1_name: 'Barracks',
 				claim_2_desc: '',
 				claim_2_name: '\nTurf',
@@ -530,6 +530,100 @@ var crewData = {
 				'Nyelle, a spirit trafficker',
 				'Decker, an anarchist',
 				'Esme, a tavern owner'
+			]
+		},
+		vigilantes: {
+			abilities: [{
+					check: 'on',
+					name: 'As Good as Your Word',
+					description: 'You may spend rep as coin in downtime actions. Vigilantes gain Obligation as a second vice.'
+				},
+				{
+					name: 'Avengers',
+					description: 'Each PC may add +1 action rating to Hunt, Prowl,or Command (up to a max rating of 3).'
+				},
+				{
+					name: 'Thorn in your Side',
+					description: 'When you use Stealth or Assault plans against a higher Tier faction, your Tier counts as +1.'
+				},
+				{
+					name: 'Misdirection',
+					description: 'At the end of a score, you may sacrifice half the rep gained to make another faction lose status with your target instead of your crew. How do you pin it on someone else?'
+				},
+				{
+					name: 'Uncanny Preparation',
+					description: 'Twice per session during a Desperate action, improve your effect or position. Describe a flashback that gives you the advantage now (setup action).'
+				},
+				{
+					name: 'Moral Compass',
+					description: 'Each PC gains an additional xp trigger: You fulfilled an obligation at a cost to you or the crew.'
+				},
+				{
+					name: 'Favors',
+					description: 'Spend one rep and describe how one of your contacts is put out to help you. Everyone in your crew gets one dot in an action your contact is skilled in for this score.'
+				},
+				{
+					name: 'Roots',
+					description: 'During downtime one of your contacts or cohorts may take a downtime action to acquire an asset, reduce heat, or recover.'
+				}
+			],
+			base: {
+				claim_1_desc: 'All your experts\nare loyal',
+				claim_1_name: '\nFierce Allies',
+				claim_2_desc: '+1d to indulge\nvice',
+				claim_2_name: '\nLocal Heroes',
+				claim_3_desc: '+2 rep on\ntakedown scores',
+				claim_3_name: '\nPublicity',
+				claim_4_desc: '+1d to Prowl back\nto your lair',
+				claim_4_name: '\nHidden Paths',
+				claim_5_desc: '+1d to Study or\nTinker on site',
+				claim_5_name: '\nCatacombs',
+				claim_6_desc: 'Large gang who\nwill fight for you',
+				claim_6_name: 'Defiant\nCitizens',
+				claim_7_desc: '',
+				claim_7_name: '\nTurf',
+				claim_9_desc: '',
+				claim_9_name: '\nTurf',
+				claim_10_desc: '+1d to healing\nrolls',
+				claim_10_name: '\nInfirmary',
+				claim_11_desc: '-1 Wanted Level\nif Citizens faction\nstatus is +3',
+				claim_11_name: 'Above\nthe Law',
+				claim_12_desc: '-2 heat per score',
+				claim_12_name: 'Bluecoat\nConfidants',
+				claim_13_desc: '+1d to Survey or\nHunt on your turf',
+				claim_13_name: 'Lookouts',
+				claim_14_desc: 'Smugglers, +1d to\nacquire asets',
+				claim_14_name: 'The Hookup',
+				claim_15_desc: '+2 rep on scores\nagainst the law',
+				claim_15_name: 'Doskvol\'s\nMost Wanted',
+				claim_bridge_2_3: 0,
+				claim_bridge_3_4: 0,
+				claim_bridge_6_11: 0,
+				claim_bridge_10_15: 0,
+				claim_bridge_12_13: 0,
+				claim_bridge_13_14: 0,
+				cohort1_type: 'expert',
+				crew_description: 'Deluded\nAvengers',
+				crew_xp_condition: 'Interfere with criminal scores, protect citizens, or antagonize the law.',
+				hunting_grounds_type: 'Protected Grounds:',
+				hunting_grounds_description: 'Uniting - Interference - Resistance - Terror',
+				setting_show_origin: 'on',
+				upgrade_1_desc: 'Unbroken (+1 trauma box)',
+				upgrade_2_desc: 'Vigilantes attire (2 free load of weapons or supplies)',
+				upgrade_2_tall: 'on',
+				upgrade_3_desc: 'Irregulars (Experts gain +1d to Gather Information)',
+				upgrade_3_tall: 'on',
+				upgrade_4_desc: 'Willing to Fight (Experts are braves)',
+				upgrade_5_desc: 'Spark-craft Technology',
+				upgrade_22_check: 'on' /* Resolve */
+			},
+			contacts: [
+				'Mara, a chief inspector',
+				'Twelves, a Leviathan Hunter',
+				'Soren, a restless ghost',
+				'Poriso, famous opera singer',
+				'Anis, a Spirit Warden',
+				'Badger, a brilliant inventor'
 			]
 		}
 	},
@@ -1157,9 +1251,7 @@ var crewData = {
 				item_7_desc: 'Demonbane charm',
 				item_8_desc: 'Spiritbane charm',
 				playbook_description: 'A spirit animating an undead body',
-				setting_extra_stress1: 'on',
-				setting_extra_stress2: 'on',
-				setting_extra_stress3: 'on',
+				setting_extra_stress: '3',
 				setting_vampirexp: 'on',
 				setting_showitem_0: '0',
 				setting_showitem_1: '0',
@@ -1517,40 +1609,48 @@ var crewData = {
 	},
 	spiritPlaybooks = ['ghost', 'hull', 'vampire'];
 /* UTILITY FUNCTIONS */
-var setDiceFromTotal = function (name, numDice, upToFive) {
+var setDiceFromTotal = function (name, numDice, upToFive, value) {
+		'use strict';
+		value = value || 1;
 		let setting = {};
-		setting[`${name}1`] = (numDice > 0) ? 1 : 0;
-		setting[`${name}2`] = (numDice > 1) ? 1 : 0;
-		setting[`${name}3`] = (numDice > 2) ? 1 : 0;
-		setting[`${name}4`] = (numDice > 3) ? 1 : 0;
+		setting[`${name}1`] = (numDice > 0) ? value : 0;
+		setting[`${name}2`] = (numDice > 1) ? value : 0;
+		setting[`${name}3`] = (numDice > 2) ? value : 0;
+		setting[`${name}4`] = (numDice > 3) ? value : 0;
 		if (upToFive) {
-			setting[`${name}5`] = (numDice > 4) ? 1 : 0;
+			setting[`${name}5`] = (numDice > 4) ? value : 0;
 		};
 		setAttrs(setting);
 	},
 	fillRepeatingSectionFromData = function (sectionName, dataList) {
+		'use strict';
 		getSectionIDs(`repeating_${sectionName}`, function (idList) {
-			let rowNameAttributes = _.map(idList, id => `repeating_${sectionName}_${id}_name`);
+			let rowNameAttributes = idList.map(id => `repeating_${sectionName}_${id}_name`);
 			getAttrs(rowNameAttributes, function (attrs) {
-				let existingRows = _.values(attrs);
-				let setting = _.chain(dataList)
-					.reject(o => _.contains(existingRows, o.name))
+				let existingRows = Object.keys(attrs).map(x => attrs[x]),
+					createdIDs = [];
+				let setting = dataList.filter(o => !existingRows.includes(o.name))
 					.map(function (o) {
-						let rowID = generateRowID();
-						return _.reduce(o, function (m, v, k) {
-							m[`repeating_${sectionName}_${rowID}_${k}`] = v;
+						let rowID;
+						while (!rowID) {
+							let newID = generateRowID();
+							if (!createdIDs.includes(newID)) {
+							 rowID = newID;
+							 createdIDs.push(rowID);
+							}
+						}
+						return Object.keys(o).reduce(function (m, key) {
+							m[`repeating_${sectionName}_${rowID}_${key}`] = o[key];
 							return m;
 						}, {});
 					})
-					.reduce(function (m, o) {
-						return _.extend(m, o);
-					}, {})
-					.value();
+					.reduce((m, o) => Object.assign(m, o), {});
 				setAttrs(setting);
 			});
 		});
 	},
 	emptyFirstRowIfUnnamed = function (sectionName) {
+		'use strict';
 		getSectionIDs(`repeating_${sectionName}`, function (idList) {
 			let id = idList[0];
 			getAttrs([`repeating_${sectionName}_${id}_name`], function (v) {
@@ -1562,24 +1662,25 @@ var setDiceFromTotal = function (name, numDice, upToFive) {
 	};
 /* DEFAULT FILLS FOR PLAYBOOKS AND CREWS */
 /* Set some default fields when setting crew type or playbook */
-var crewAttributes = _.chain(crewData).map(o => _.keys(o.base)).flatten().uniq().value(),
-	playbookAttributes = _.chain(playbookData).map(o => _.keys(o.base)).flatten().uniq().value(),
-	watchedAttributes = _.union(crewAttributes, playbookAttributes);
+var crewAttributes = [...new Set([].concat(...Object.keys(crewData).map(x => Object.keys(crewData[x].base))))],
+	playbookAttributes = [...new Set([].concat(...Object.keys(playbookData).map(x => Object.keys(playbookData[x].base))))],
+	watchedAttributes = new Set([].concat(crewAttributes, playbookAttributes));
 on('change:crew_type change:playbook', function (event) {
+	'use strict';
 	getAttrs(['crew_type', 'playbook', 'changed_attributes'], function (attrValues) {
 		let changedAttributes = (attrValues.changed_attributes || '').split(','),
 			data, baseData, sourceName;
 		switch (event.sourceAttribute) {
 		case 'crew_type':
 			sourceName = attrValues.crew_type.toLowerCase();
-			if (_.has(crewData, sourceName)) {
+			if (crewData.hasOwnProperty(sourceName)) {
 				data = crewData[sourceName].base;
 				baseData = crewAttributes;
 			};
 			break;
 		case 'playbook':
 			sourceName = attrValues.playbook.toLowerCase();
-			if (_.has(playbookData, sourceName)) {
+			if (playbookData.hasOwnProperty(sourceName)) {
 				data = playbookData[sourceName].base;
 				baseData = playbookAttributes;
 			};
@@ -1587,30 +1688,23 @@ on('change:crew_type change:playbook', function (event) {
 		/* Change unset attributes to default */
 		if (data) {
 			let finalSettings = {};
-			if (!_.contains(spiritPlaybooks, sourceName)) {
-				_.reduce(baseData, function (settings, name) {
-					if (!_.contains(changedAttributes, name)) {
-						settings[name] = '';
-					};
-					return settings;
-				}, finalSettings);
+			if (!spiritPlaybooks.includes(sourceName)) {
+				baseData.filter(name => !changedAttributes.includes(name))
+					.forEach(name => (finalSettings[name] = ''));
 			};
-			_.reduce(data, function (settings, value, name) {
-				if (!_.contains(changedAttributes, name)) {
-					settings[name] = value;
-				};
-				return settings;
-			}, finalSettings);
+			Object.keys(data).filter(name => !changedAttributes.includes(name))
+				.forEach(name => (finalSettings[name] = data[name]));
 			setAttrs(finalSettings);
 		};
 	});
 });
 /* Watch for changes in auto-set attributes */
 watchedAttributes.forEach(function (name) {
+	'use strict';
 	on(`change:${name}`, function (eventInfo) {
 		if (eventInfo.sourceType === 'player') {
 			getAttrs(['changed_attributes'], function (v) {
-				let changedAttributes = _.union((v.changed_attributes || '').split(','), [name]).join(',');
+				let changedAttributes = [...new Set(v.changed_attributes.split(',').concat(name))].filter(x => !!x).join(',');
 				setAttrs({
 					changed_attributes: changedAttributes
 				});
@@ -1619,49 +1713,52 @@ watchedAttributes.forEach(function (name) {
 	});
 });
 /* DERIVED DICE NUMBERS */
-var actions1 = _.mapObject(actionData, array => _.map(array, str => str + '1')),
-	actionsFlat = _.chain(actionData).map(x => x).flatten().value(),
-	actions1Flat = _.map(actionsFlat, str => str + '1'),
+var actions1 = Object.keys(actionData).reduce(function (m, k) {
+		m[k] = actionData[k].map(s => `${s}1`);
+		return m;
+	}, {}),
+	actionsFlat = [].concat(...Object.keys(actionData).map(x => actionData[x])),
+	actions1Flat = actionsFlat.map(str => str + '1'),
 	calculateResistance = function (name) {
+		'use strict';
 		getAttrs(actions1[name], function (attrs) {
-			let numDice = _.chain(attrs).values().reduce((s, v) => s + parseInt(v || 0), 0).value();
+			let numDice = Object.keys(attrs).map(x => attrs[x]).reduce((s, v) => s + parseInt(v || 0), 0);
 			setDiceFromTotal(name, numDice);
 		});
 	},
 	calculateVice = function () {
+		'use strict';
 		getAttrs(actions1Flat, function (values) {
-			let numDice = _.chain(actions1)
-				.map(function (array) {
-					return _.chain(array)
-						.map(str => values[str])
-						.reduce((s, v) => s + parseInt(v || 0), 0)
-						.value();
-				})
-				.min().value();
+			let numDice = Math.min(...Object.keys(actions1).map(function (name) {
+				return actions1[name].reduce((s, str) => s + parseInt(values[str] || 0), 0);
+			}));
 			setDiceFromTotal('vice', numDice);
 		});
 	};
 /* Register attribute/action event handlers */
-_.each(actionData, function (array, attributeName) {
-	_.each(array, function (actionName) {
-		on(`change:${actionName}1`, _.partial(calculateResistance, attributeName));
+Object.keys(actionData).forEach(function (attributeName) {
+	'use strict';
+	actionData[attributeName].forEach(function (actionName) {
+		on(`change:${actionName}1`, () => calculateResistance(attributeName));
 	});
 	on(`change:${attributeName}1 change:${attributeName}2 change:${attributeName}3 change:${attributeName}4`, calculateVice);
 });
 /* GENERATE FACTIONS */
 on('change:generate_factions', function (event) {
-	_.each(factionsData, function (dataList, sectionName) {
-		fillRepeatingSectionFromData(sectionName, dataList);
+	'use strict';
+	Object.keys(factionsData).forEach(function (sectionName) {
+		fillRepeatingSectionFromData(sectionName, factionsData[sectionName]);
 	});
 });
 /* GENERATE ABILITIES */
 on('change:generate_abilities', function () {
+	'use strict';
 	getAttrs(['generate_source'], function (v) {
 		let sectionName, dataList;
-		if (_.has(crewData, v.generate_source)) {
+		if (crewData.hasOwnProperty(v.generate_source)) {
 			sectionName = 'crewability';
 			dataList = crewData[v.generate_source].abilities;
-		} else if (_.has(playbookData, v.generate_source)) {
+		} else if (playbookData.hasOwnProperty(v.generate_source)) {
 			sectionName = 'ability';
 			dataList = playbookData[v.generate_source].abilities;
 		};
@@ -1671,14 +1768,19 @@ on('change:generate_abilities', function () {
 });
 /* GENERATE FRIENDS */
 on('change:generate_friends', function () {
+	'use strict';
 	getAttrs(['generate_source'], function (v) {
 		let sectionName, dataList;
-		if (_.has(crewData, v.generate_source)) {
+		if (crewData.hasOwnProperty(v.generate_source)) {
 			sectionName = 'contact';
-			dataList = _.map(crewData[v.generate_source].contacts, n => ({ name: n }));
-		} else if (_.has(playbookData, v.generate_source)) {
+			dataList = crewData[v.generate_source].contacts.map(n => ({
+				name: n
+			}));
+		} else if (playbookData.hasOwnProperty(v.generate_source)) {
 			sectionName = 'friend';
-			dataList = _.map(playbookData[v.generate_source].friends, n => ({ name: n }));
+			dataList = playbookData[v.generate_source].friends.map(n => ({
+				name: n
+			}));
 		};
 		emptyFirstRowIfUnnamed(sectionName);
 		fillRepeatingSectionFromData(sectionName, dataList);
@@ -1686,12 +1788,21 @@ on('change:generate_friends', function () {
 });
 /* CALCULATE WANTED */
 on('change:wanted', function () {
+	'use strict';
 	getAttrs(['wanted'], function (v) {
 		setDiceFromTotal('wanted', parseInt(v.wanted));
 	});
 });
+/* EXTRA STRESS BOXES */
+on('change:setting_extra_stress', function () {
+	'use strict';
+	getAttrs(['setting_extra_stress'], function (v) {
+		setDiceFromTotal('setting_extra_stress', parseInt(v.setting_extra_stress), true, 'on');
+	});
+});
 /* CALCULATE COHORT QUALITY */
 var calculateCohortDots = function (t1, t2, t3, t4, imp, type, prefix) {
+		'use strict';
 		let numDots = parseInt(t1) + parseInt(t2) + parseInt(t3) + parseInt(t4);
 		if (imp === 'on') {
 			numDots = numDots - 1;
@@ -1702,19 +1813,21 @@ var calculateCohortDots = function (t1, t2, t3, t4, imp, type, prefix) {
 		setDiceFromTotal(`${prefix}die`, numDots, true);
 	},
 	qualityAttrs = ['crew_tier1', 'crew_tier2', 'crew_tier3', 'crew_tier4', 'cohort1_impaired', 'cohort1_type'],
-	qualityEvent = _.map(qualityAttrs, str => `change:${str}`).join(' '),
+	qualityEvent = qualityAttrs.map(str => `change:${str}`).join(' '),
 	calculateCohort1Dice = function () {
+		'use strict';
 		getAttrs(qualityAttrs, function (attrs) {
 			calculateCohortDots(attrs.crew_tier1, attrs.crew_tier2, attrs.crew_tier3, attrs.crew_tier4, attrs.cohort1_impaired, attrs.cohort1_type, 'cohort1_');
 		});
 	};
 on(qualityEvent, calculateCohort1Dice);
 var repeatingQualityAttrs = ['crew_tier1', 'crew_tier2', 'crew_tier3', 'crew_tier4', 'repeating_cohort:impaired', 'repeating_cohort:type'],
-	repeatingQualityEvent = _.map(repeatingQualityAttrs, str => `change:${str}`).join(' '),
+	repeatingQualityEvent = repeatingQualityAttrs.map(str => `change:${str}`).join(' '),
 	calculateRepeatingCohortDice = function () {
+		'use strict';
 		getSectionIDs('repeating_cohort', function (list) {
 			list.forEach(function (id) {
-				let attrList = _.map(repeatingQualityAttrs, str => str.replace(':', `_${id}_`));
+				let attrList = repeatingQualityAttrs.map(str => str.replace(':', `_${id}_`));
 				getAttrs(attrList, function (attrs) {
 					calculateCohortDots(attrs.crew_tier1, attrs.crew_tier2, attrs.crew_tier3, attrs.crew_tier4, attrs[attrList[4]], attrs[attrList[5]], `repeating_cohort_${id}_`);
 				});
@@ -1724,6 +1837,7 @@ var repeatingQualityAttrs = ['crew_tier1', 'crew_tier2', 'crew_tier3', 'crew_tie
 on(repeatingQualityEvent + ' change:repeating_cohort:name change:repeating_cohort:subtype change:repeating_cohort:edges change:repeating_cohort:flaws change:repeating_cohort:description', calculateRepeatingCohortDice);
 /* LEFT-FILL CHECKBOXES */
 var handleFourBoxesFill = function (name) {
+	'use strict';
 	on(`change:${name}1 change:${name}2 change:${name}3 change:${name}4`, function (event) {
 		getAttrs([event.sourceAttribute], function (v) {
 			let rName = event.sourceAttribute.slice(0, -1);
@@ -1771,6 +1885,7 @@ var itemChecks = [
 	'bandolier2_check'
 ];
 itemChecks.forEach(function (name) {
+	'use strict';
 	on(`change:${name} change:${name}_b change:${name}_c change:${name}_d change:${name}_e`, function (event) {
 		getAttrs([event.sourceAttribute], function (v) {
 			if (v[event.sourceAttribute] === 'on') {
@@ -1806,6 +1921,7 @@ itemChecks.forEach(function (name) {
 });
 /* INITIALISATION AND UPGRADES */
 on('sheet:opened', function () {
+	'use strict';
 	let initialRows = [
 		'ability',
 		'friend',
@@ -1813,8 +1929,8 @@ on('sheet:opened', function () {
 		'contact'
 	];
 	/* Make sure sheet_type is never 0 */
-	getAttrs(['sheet_type'], function (v) {
-		if (v.sheet_type === '0' || v.sheet_type === 0) {
+	getAttrs(['sheet_type', 'changed_attributes'], function (v) {
+		if (!['character', 'crew', 'faction'].includes(v.sheet_type)) {
 			setAttrs({
 				sheet_type: 'character'
 			});
@@ -1824,7 +1940,7 @@ on('sheet:opened', function () {
 	getAttrs(['version'], function (v) {
 		// Setup initial rows in repeating sections
 		if (!v.version) {
-			let setting = _.reduce(initialRows, function (memo, sectionName) {
+			let setting = initialRows.reduce(function (memo, sectionName) {
 				memo[`repeating_${sectionName}_${generateRowID()}_dummy`] = 1;
 				return memo;
 			}, {});
@@ -1833,12 +1949,10 @@ on('sheet:opened', function () {
 		// Upgrade to 0.7: Convert legacy faction repeating section to text
 		if (v.version && v.version.split('.')[0] === '0' && parseInt(v.version.split('.')[1]) < 7) {
 			getSectionIDs('repeating_faction', function (list) {
-				let sectionList = _.union(['faction1', 'faction2'], _.map(list, str => `repeating_faction_${str}`)),
-					attrList = _.chain(sectionList)
-					.map(str => [`${str}_name`, `${str}_status`, `${str}_description`])
-					.flatten().value();
+				let sectionList = ['faction1', 'faction2'].concat(list.map(str => `repeating_faction_${str}`)),
+					attrList = [].concat(...sectionList.map(str => [`${str}_name`, `${str}_status`, `${str}_description`]));
 				getAttrs(attrList, function (attrs) {
-					let output = _.map(sectionList, function (str) {
+					let output = sectionList.map(function (str) {
 						return 'Name: ' + attrs[`${str}_name`] + '\n' +
 							'Status: ' + (attrs[`${str}_status`] || '') + '\n' +
 							'Notes: ' + (attrs[`${str}_description`] || '') + '\n';
@@ -1856,9 +1970,7 @@ on('sheet:opened', function () {
 						faction2_description: '',
 						faction2_expand: ''
 					});
-					_.each(list, function (id) {
-						removeRepeatingRow(`repeating_faction_${id}`);
-					});
+					list.forEach(id => removeRepeatingRow(`repeating_faction_${id}`));
 				});
 			});
 		};
@@ -1892,13 +2004,13 @@ on('sheet:opened', function () {
 		};
 		// Upgrade to 1.0: Make sure that resistance values are calculated correctly.
 		if (v.version && parseInt(v.version.split('.')[0]) < 1) {
-			_.each(_.keys(actionData), calculateResistance);
+			Object.keys(actionData).forEach(calculateResistance);
 			calculateVice();
 		};
 		// Set version number
 		setAttrs({
-			version: '1.0.2',
-			character_sheet: 'Blades in the Dark v1.0.2'
+			version: '1.3',
+			character_sheet: 'Blades in the Dark v1.3'
 		});
 	});
 });
