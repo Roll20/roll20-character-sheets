@@ -5,6 +5,10 @@
 
 ### Changelog
 
+### 1.8.0 on 2017 April 24th
+* Added in Extraordinary/Legendary Item section
+* Fixed an issue where Advantage/Disadvantage to the d20 wasn't working
+
 ### 1.7.91 on 2017 March 25th
 * Re-arranged the attributes to match the website order
 
