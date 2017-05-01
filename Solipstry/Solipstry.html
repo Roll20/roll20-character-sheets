@@ -64,7 +64,7 @@
             	<label class="sheet-inline" name="attr_char_race_label">Race</label>
             </div>
             <div class="sheet-right-attr" style="position:relative; margin-top:-20px">
-            	<input class="sheet-inline" type="text" name ="attr_race_name" style="width:100px;" />f
+            	<input class="sheet-inline" type="text" name ="attr_race_name" style="width:100px;" />
             	<select name="attr_race_size" style="width:100px; margin-top:8px">
             	    <option value="small">Small</option>
             	    <option selected value="medium">Medium</option>
@@ -796,7 +796,7 @@
         </tr>
         <tr>
             <td>Melee Weapon</td>
-            <input type="hidden" name="attr_base_damage_die_melee" value="1"/>
+            <input type="hidden" name="attr_base_damage_die_melee" value="2"/>
             <td><input name="attr_melee_weapon_attack_two_handed" type="checkbox" style=""/></td>
             <td><input type="number" name="attr_melee_weapon_range_misc" value="0"></input></td>
             <td><input type="number" name="attr_melee_weapon_range_total" disabled="true" value="(@{melee_weapon_range_misc})"/></input></td> 
@@ -812,7 +812,7 @@
         </tr>
         <tr>
             <td>Ranged</td>
-            <input type="hidden" name="attr_base_damage_die_ranged" value="1"/>
+            <input type="hidden" name="attr_base_damage_die_ranged" value="4"/>
             <td><input name="attr_ranged_attack_two_handed" type="checkbox" style=""/></td>
             <td><input type="number" name="attr_ranged_range_misc" value="0"></input></td>
             <td><input type="number" name="attr_ranged_range_total" disabled="true" value="((@{ranged_range_misc}) + (2 * @{skill_ranged_mod}))"</input></td> 
@@ -828,7 +828,7 @@
         </tr>
 		<tr>
             <td>Unarmed Combat</td>
-            <input type="hidden" name="attr_base_damage_die_unarmed" value="1"/>
+            <input type="hidden" name="attr_base_damage_die_unarmed" value="2"/>
             <td><!--No two handed for unarmed-->N/A</td>
             <td><input type="number" name="attr_unarmed_range_misc" value="0"></input></td>
             <td><input type="number" name="attr_unarmed_range_total" disabled="true" value="(@{unarmed_range_misc})"</input></td> 
@@ -893,25 +893,24 @@
 
 
 on("change:race_size change:armor_type change:has_shield change:skill_light_armor_mod change:skill_heavy_armor_mod change:conmod change:dexmod change:spdmod change:ac_misc change:reflex_misc change:fort_misc change:will_misc", function() {
-    console.log("AT BREAKPOINT ONE") 
    update_defenses(); 
 });
 
 on("change:acrobatics_major change:athletics_major change:block_major change:chemistry_major change:control_major change:craft_major change:destruction_major change:disguise_major change:engineering_major change:enhancement_major change:enlightenment_major change:escape_major change:heavy_armor_major change:interaction_major change:knowledge_major change:light_armor_major change:medicine_major change:melee_weapon_major change:perception_major change:ranged_major change:ride_drive_major change:security_major change:sense_motive_major change:sleight_of_hand_major change:survival_major change:stealth_major change:unarmed_combat_major change:utility_major change:race_size change:has_shield change:ride_drive change:ride_drive_mod change:ride_drive_misc change:sense_motive change:sense_motive_mod change:skill_melee_weapon_mod change:skill_melee_weapon_misc change:skill_unarmed_combat_mod change:skill_unarmed_combat_misc change:skill_acrobatics_mod change:skill_acrobatics_misc change:skill_athletics_mod change:skill_athletics_misc change:skill_block_mod change:skill_block_misc change:skill_chemistry_mod change:skill_chemistry_misc change:skill_control_mod change:skill_control_misc change:skill_craft_mod change:skill_craft_misc change:skill_destruction_mod change:skill_destruction_misc change:skill_disguise_mod change:skill_disguise_misc change:skill_engineering_mod change:skill_engineering_misc change:skill_enhancement_mod change:skill_enhancement_misc change:skill_enlightenment_mod change:skill_enlightenment_misc change:skill_escape_mod change:skill_escape_misc change:skill_heavy_armor_mod change:skill_heavy_armor_misc change:skill_interaction_mod change:skill_interaction_misc change:skill_knowledge_mod change:skill_knowledge_misc change:skill_light_armor_mod change:skill_light_armor_misc change:skill_medicine_mod change:skill_medicine_misc change:skill_perception_mod change:skill_perception_misc change:skill_ranged_mod change:skill_ranged_misc change:skill_security_mod change:skill_security_misc change:skill_sleight_of_hand_mod change:skill_sleight_of_hand_misc change:skill_survival_mod change:skill_survival_misc change:skill_stealth_mod change:skill_stealth_misc change:skill_utility_mod change:skill_utility_misc change:conmod change:dexmod change:spdmod change:wismod change:strmod change:intmod change:chamod", function(){
-    console.log('TRIGGERED');
 	update_skills();
 	});
 
 on("change:race_size change:has_shield change:ride_drive change:ride_drive_mod change:ride_drive_misc change:sense_motive change:sense_motive_mod change:skill_melee_weapon change:skill_unarmed_combat change:skill_acrobatics change:skill_athletics change:skill_block change:skill_chemistry change:skill_control change:skill_craft change:skill_destruction change:skill_disguise change:skill_engineering change:skill_enhancement change:skill_enlightenment change:skill_escape change:skill_heavy_armor change:skill_interaction change:skill_knowledge change:skill_light_armor change:skill_medicine change:skill_perception change:skill_ranged change:skill_security change:skill_sleight_of_hand change:skill_survival change:skill_stealth change:skill_utility", function(){
-    console.log("ACTIVATED change_skill_mod BREAKPOINT")
     update_skill_mods();
 }); 
 
+on("change:race_size change:melee_weapon_attack_two_handed change:ranged_attack_two_handed", function() {
+    update_damage_dice();
+});
+
+
 var update_skills=function(){
      getAttrs(["acrobatics_major", "athletics_major", "block_major", "chemistry_major", "control_major", "craft_major", "destruction_major", "disguise_major", "engineering_major", "enhancement_major", "enlightenment_major", "escape_major", "heavy_armor_major", "interaction_major", "knowledge_major", "light_armor_major", "medicine_major", "melee_weapon_major", "perception_major", "ranged_major", "ride_drive_major", "security_major", "sense_motive_major", "sleight_of_hand_major", "survival_major", "stealth_major", "unarmed_combat_major", "utility_major", "race_size", "has_shield", "skill_ride_drive", "skill_ride_drive_mod", "skill_ride_drive_misc",  "skill_acrobatics_mod", "skill_acrobatics_misc", "skill_sense_motive", "skill_sense_motive_mod", "skill_sense_motive_misc", "skill_melee_weapon", "skill_melee_weapon_mod", "skill_melee_weapon_misc",  "skill_athletics_mod", "skill_athletics_misc", "skill_unarmed_combat", "skill_unarmed_combat_mod", "skill_unarmed_combat_misc",  "skill_block_mod", "skill_block_misc",  "skill_chemistry_mod", "skill_chemistry_misc",  "skill_control_mod", "skill_control_misc",  "skill_craft_mod", "skill_craft_misc",  "skill_destruction_mod", "skill_destruction_misc",  "skill_disguise_mod", "skill_disguise_misc",  "skill_engineering_mod", "skill_engineering_misc",  "skill_enhancement_mod", "skill_enhancement_misc",  "skill_enlightenment_mod", "skill_enlightenment_misc",  "skill_escape_mod", "skill_escape_misc", "skill_heavy_armor", "skill_heavy_armor_mod", "skill_heavy_armor_misc",  "skill_interaction_mod", "skill_interaction_misc",  "skill_knowledge_mod", "skill_knowledge_misc", "skill_light_armor", "skill_light_armor_mod", "skill_light_armor_misc",  "skill_medicine_mod", "skill_medicine_misc",  "skill_perception_mod", "skill_perception_misc",  "skill_ranged_mod", "skill_ranged_misc",  "skill_security_mod", "skill_security_misc", "skill_sleight_of_hand", "skill_sleight_of_hand_mod", "skill_sleight_of_hand_misc",  "skill_survival_mod", "skill_survival_misc",  "skill_stealth_mod", "skill_stealth_misc",  "skill_utility_mod", "skill_utility_misc", "conmod", "dexmod", "spdmod", "wismod", "strmod", "intmod", "chamod"], function(values) {
-           //TODO 
-         console.log("ENTERED UPDATE SKILLS FUNCTION")
-         console.log(values)
              
         var acrobatics_base = 10;
         if(values.acrobatics_major == 'on'){
@@ -1101,7 +1100,62 @@ var update_skill_mods=function(){
     });
 }
 
-//If size changes, so does weaponsize, defenses and skills (stealth)
+
+
+var update_damage_dice = function(){
+    console.log("IN FUNCTION");
+
+    getAttrs(["race_size", "melee_weapon_attack_two_handed", "ranged_attack_two_handed"], function(values){
+        
+        var meleedam = 4;
+        var rangeddam = 4;
+        var unarmeddam = 2;
+        
+        var dam_size_mod = 0;
+        
+          switch(values.race_size){
+              case 'medium':
+              dam_size_mod = 0;
+              break;
+          case 'large':
+              dam_size_mod = 2;
+              break;
+          case 'small':
+              dam_size_mod = -2;
+              break;
+          }
+          
+        meleedam += dam_size_mod;
+        rangeddam += dam_size_mod;
+        unarmeddam += dam_size_mod;
+        
+        if(values.melee_weapon_attack_two_handed == "on"){
+            meleedam += 2;
+        }
+        if(values.ranged_attack_two_handed == "on"){
+            rangeddam += 2;
+        }
+        
+        if(meleedam < 1){
+            meleedam = 1;
+        }
+        if(rangeddam < 1){
+            rangeddam = 1;
+        }
+        if(unarmeddam < 1){
+            unarmeddam = 1;
+        }
+        
+           setAttrs({
+            base_damage_die_ranged: rangeddam,
+            base_damage_die_unarmedd:unarmeddam,
+            base_damage_die_melee:meleedam
+         });
+        
+        
+    });
+
+}
 
 
 var update_defenses=function(){
@@ -1138,7 +1192,6 @@ var update_defenses=function(){
               
               refval = 10 + greaterval;
           }
-
           
           setAttrs({
             ac: acval,
