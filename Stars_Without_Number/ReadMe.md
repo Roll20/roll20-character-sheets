@@ -28,6 +28,16 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 ### Changelog
 
+#### 0.1.7
+
+* Revamped and made consistent all roll templates for:
+ * Saves
+ * Weapon Attacks
+ * Basic Attacks
+ * Skills
+* Initiative now using roll templates
+* Removed unused Morale roll template
+
 #### 0.1.6
 
 * Removed damage message from missed weapon attacks
