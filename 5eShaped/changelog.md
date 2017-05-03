@@ -11,6 +11,34 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 12.0.0
+
+### Breaking Changes
+
+* Modifiers have replaced global bonuses. Modifiers are much more expressive:
+
+![alt text](http://i.imgur.com/16kXDWe.png "Modifiers")
+
+### Features
+
+* The defense and equipment section's styling has been revamped to more closely match the system used by Attacks, Actions, Class Features, etc.
+* Items in the defense section can now handle unarmored defense. This and the modifiers expansion closes [#367: Add back "other" armor type that doesn't do any calculations](https://bitbucket.org/mlenser/5eshaped/issues/367/add-back-other-armor-type-that-doesnt-do)
+
+![alt text](http://i.imgur.com/7cZdsjt.png "New armor")
+
+* Removed Expand/Contract in favor of a tab for "Spells", "Equipment", and "Features". In technical implementation these are showing the sections on the core page in an expanded way.
+* Added an output toggle to the navigation which allows for quick whispering of abilities, spells, attacks, etc. Closes [#446: Easier method to output a roll to GM](https://bitbucket.org/mlenser/5eshaped/issues/446/easier-method-to-output-a-roll-to-gm)
+
+![alt text](http://i.imgur.com/HjDx2Jf.png "New nav")
+
+### Bug Fixes
+
+* Refactored edit mode detection to use the similar value="1" that I use elsewhere. We'll see if this has any impact on the issue that some people have with it.
+* Repeat for spells now correctly hides the content (seems there may have been a change on roll20's end that broke this).
+* [#457: Hitpoint output adding 0 to end of current HP](https://bitbucket.org/mlenser/5eshaped/issues/457/hitpoint-output-adding-0-to-end-of-current)
+* [#458: Issue with Spiritual Weapon Higher Level Dice](https://bitbucket.org/mlenser/5eshaped/issues/458/issue-with-spiritual-weapon-higher-level)
+* [#355: Reduced number of skills causes overlap between stats and damage resistances section](https://bitbucket.org/mlenser/5eshaped/issues/355/reduced-number-of-skills-causes-overlap)
+
 ## 11.6.0
 
 ### UI Changes
