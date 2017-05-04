@@ -11,6 +11,17 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 12.0.2
+
+### Bug Fixes
+
+* [#469: Modifiers: AC not being added](https://bitbucket.org/mlenser/5eshaped/issues/469/modifiers-ac-not-being-added)
+* Parse attack type from SRD after changing the way they are stored to translations.
+* Parsed Melee or Ranged Weapon attack for weapons like dagger.
+* [#470: Modifiers: Ability Score does nothing](https://bitbucket.org/mlenser/5eshaped/issues/470/modifiers-ability-score-does-nothing)
+* [#467: Multiple modifiers of the same type cause "double plus" on rolls, making the rolls 0](https://bitbucket.org/mlenser/5eshaped/issues/467/multiple-modifiers-of-the-same-type-cause)
+* [#462: Spell repeat button with no slots remaining](https://bitbucket.org/mlenser/5eshaped/issues/462/spell-repeat-button-with-no-slots)
+
 ## 12.0.1
 
 ### Bug Fixes
