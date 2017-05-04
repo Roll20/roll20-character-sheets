@@ -11,6 +11,12 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 12.0.1
+
+### Bug Fixes
+
+* [#466: AC values wrong](https://bitbucket.org/mlenser/5eshaped/issues/466/ac-values-wrong)
+
 ## 12.0.0
 
 ### Breaking Changes
