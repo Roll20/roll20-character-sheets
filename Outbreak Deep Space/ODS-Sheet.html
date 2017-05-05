@@ -1,0 +1,1468 @@
+<!-- Variables
+
+     attr_char_name         - Character Name
+     
+     attr_str               - Strength
+     attr_per               - Perception
+     attr_emp               - Empathy
+     attr_will              - Willpower
+     attr_str_bonus         - Strength Bonus
+     attr_per_bonus         - Perception Bonus
+     attr_emp_bonus         - Empathy Bonus
+     attr_will_bonus        - Willpower Bonus
+     
+     attr_gest              - Gestalt Level
+     attr_gest_dic          - Gestalt Dice
+     attr_morale            - Morale Value
+     attr_cargo             - Cargo Level
+     attr_sp                - Survival Points
+     attr_sp_total          - Survival Points Total
+     
+     attr_injury            - Repeating Injury Description
+     attr_damage            - Numbe of Point of Damage Taken
+     attr_hp                - Health Points Remaining
+     
+     attr_total_Defense     - Total Defense
+     attr_basedef           - Base Defense
+     attr_gearbon           - Gear Defense Bonus
+     attr_miscbon           - Gear Miscellaneous Bonus
+     
+     attr_acres             - Acid Resistance
+     attr_blres             - Bludgeoning Resistance
+     attr_elres             - Electrical Resistance
+     attr_inres             - Infection Resistance
+     attr_pires             - Piercing Resistance
+     attr_pores             - Poison Resistance
+     attr_slres             - Slashing Resistance
+     aatr_thres             - Thermal Resistance
+     aatr_otres             - Other Resistances
+     
+     attr_damage            - Total Damage Taken
+     attr_damage_thresh     - Damage Threshold
+     attr_hp                - Health Points
+     attr_vd                - Viral Damage
+     
+     attr_abihanmot         - Repeating Ability, Handicap, or Motivation
+     attr_tiernum           - Repeating Ability, Handicap, or Motivation Tier Number
+     
+     attr_descriptor        - Repeating Descriptor
+     attr_dlv               - Repeating Descriptor Level
+     
+     attr_<skillcode>Main   - The main attribute used for the skill
+     attr_<skillcode>Bon    - The attribute bonus used for the skill
+     attr_<skillcode>Skill  - The points invested in improving the skill
+     attr_<skillcode>Total  - The final percentage for the skill
+     
+                                                                                        -->
+
+
+<!-- Worker Scripts -->
+<script type="text/worker">
+    
+    // Calculate Bonus for each Attribute //
+	on("change:str change:per change:emp change:will", function() {
+        getAttrs(["str", "per", "emp", "will"], function(values) {
+            setAttrs({
+                str_bonus: Math.floor(values.str/10),
+                per_bonus: Math.floor(values.per/10),
+                emp_bonus: Math.floor(values.emp/10),
+                will_bonus: Math.floor(values.will/10),
+            });
+        });
+    });
+    
+    // Calculate Defense //
+	on("change:basedef change:gearbon change:miscbon", function() {
+        getAttrs(["basedef", "gearbon", "miscbon"], function(values) {
+            setAttrs({
+                total_Defense: (values.basedef*1+values.gearbon*1+values.miscbon*1),
+            });
+        });
+    });
+    
+    // Calculate Basic Skill Total //
+    on("change:balskill change:brlskill change:climskill change:cmpsskill change:doskill change:endskill change:grplskill change:hideskill change:holdskill change:jlskill change:lpskill change:rpaiskill change:srchskill change:snkskill change:sptliskill", function() {
+        getAttrs(["str", "per", "emp", "will", "str_bonus", "emp_bonus", "will_bonus", "per_bonus", "balSkill", "brlSkill", "climSkill", "cmpsSkill", "doSkill", "endSkill", "grplSkill", "hideSkill", "holdSkill", "jlSkill", "lpSkill", "rpaiSkill", "srchSkill", "snkSkill", "sptliSkill"], function(values) {
+            setAttrs({
+                balTotal: (values.per*1+values.will_bonus*1+values.balSkill*1),
+                brlTotal: (values.str*1+values.per_bonus*1+values.brlSkill*1),
+                climTotal: (values.str*1+values.will_bonus*1+values.climSkill*1),
+                cmpsTotal: (values.will*1+values.emp_bonus*1+values.cmpsSkill*1),
+                doTotal: (values.per*1+values.str_bonus*1+values.doSkill*1),
+                endTotal: (values.str*1+values.will_bonus*1+values.endSkill*1),
+                grplTotal: (values.str*1+values.will_bonus*1+values.grplSkill*1),
+                hideTotal: (values.per*1+values.will_bonus*1+values.hideSkill*1),
+                holdTotal: (values.will*1+values.per_bonus*1+values.holdSkill*1),
+                jlTotal: (values.str*1+values.will_bonus*1+values.jlSkill*1),
+                lpTotal: (values.str*1+values.will_bonus*1+values.lpSkill*1),
+                rpaiTotal: (values.will*1+values.str_bonus*1+values.rpaiSkill*1),
+                srchTotal: (values.per*1+values.will_bonus*1+values.srchSkill*1),
+                snkTotal: (values.per*1+values.will_bonus*1+values.snkSkill*1),
+                sptliTotal: (values.per*1+values.will_bonus*1+values.sptliSkill*1),
+            });
+        });
+    });
+    
+    // Calculate Trained Skill Total //
+    on("change:calmskill change:daskskill change:dbbskill change:dexskill change:dcdskill change:ddmskill change:dintskill change:dgtlsysskill change:enrgskill change:frmlskill change:frmpskill change:faidskill change:maskill change:navskill change:swimskill change:thrwskill", function() {
+        getAttrs(["str", "per", "emp", "will", "str_bonus", "emp_bonus", "will_bonus", "per_bonus", "calmSkill", "daskSkill", "dbbSkill", "dexSkill", "dcdSkill", "ddmSkill", "dintSkill", "dgtlsysSkill", "enrgSkill", "frmlSkill", "frmpSkill", "faidSkill", "maSkill", "navSkill", "swimSkill", "thrwSkill" ], function(values) {
+            setAttrs({
+                calmTotal: (values.emp*1+values.will_bonus*1+values.calmSkill*1),
+                daskTotal: (values.emp*1+values.per_bonus*1+values.daskSkill*1),
+                dbbTotal: (values.emp*1+values.will_bonus*1+values.dbbSkill*1),
+                dexTotal: (values.emp*1+values.per_bonus*1+values.dexSkill*1),
+                dcdTotal: (values.emp*1+values.will_bonus*1+values.dcdSkill*1),
+                ddmTotal: (values.emp*1+values.per_bonus*1+values.ddmSkill*1),
+                dintTotal: (values.emp*1+values.str_bonus*1+values.dintSkill*1),
+                dgtlsysTotal: (values.per*1+values.will_bonus*1+values.dgtlsysSkill*1),
+                enrgTotal: (values.per*1+values.will_bonus*1+values.enrgSkill*1),
+                frmlTotal: (values.per*1+values.will_bonus*1+values.frmlSkill*1),
+                frmpTotal: (values.per*1+values.will_bonus*1+values.frmpSkill*1),
+                faidTotal: (values.per*1+values.will_bonus*1+values.faidSkill*1),
+                maTotal: (values.str*1+values.per_bonus*1+values.maSkill*1),
+                navTotal: (values.per*1+values.will_bonus*1+values.navSkill*1),
+                swimTotal: (values.str*1+values.will_bonus*1+values.swimSkill*1),
+                thrwTotal: (values.per*1+values.str_bonus*1+values.thrwSkill*1),
+            });
+        });
+    });
+    
+    // Calculate Expert Skill Total //
+    on("change:amedskill change:asteskill change:coenskill change:mtlaskill change:pilskill change:sciskill change:srvlskill change:tghskill", function() {
+        getAttrs(["str", "per", "emp", "will", "str_bonus", "emp_bonus", "will_bonus", "per_bonus", "amedSkill", "asteSkill", "coenSkill", "mtlaSkill", "pilSkill", "sciSkill", "srvlSkill", "tghSkill"], function(values) {
+            setAttrs({
+                amedTotal: (values.per*1+values.will_bonus*1+values.amedSkill*1),
+                asteTotal: (values.per*1+values.will_bonus*1+values.asteSkill*1),
+                coenTotal: (values.per*1+values.will_bonus*1+values.coenSkill*1),
+                mtlaTotal: (values.str*1+values.will_bonus*1+values.mtlaSkill*1),
+                pilTotal: (values.per*1+values.will_bonus*1+values.pilSkill*1),
+                sciTotal: (values.per*1+values.will_bonus*1+values.sciSkill*1),
+                srvlTotal: (values.per*1+values.will_bonus*1+values.srvlSkill*1),
+                tghTotal: (values.str*1+values.will_bonus*1+values.tghSkill*1),
+            });
+        });
+    });
+    
+</script>
+
+<div class="container">
+    <!-- Basic Characer Info -->
+    <div class='top'>
+        <!-- Character Name -->
+        <div class='cname'>
+            <div class="section_top"></div>
+            <div class="section_middle">
+                <label style="margin-top: 10px; margin-left: 20px; width: 40px">Name:</label>
+                <input style="width: 290px;" type="text" name="attr_char_name" />
+            </div>
+            <div class="section_bottom"></div>
+        </div>
+        <!-- Player Name -->
+        <div class='pname'>
+            <div class="section_top"></div>
+            <div class="section_middle">
+                <label style="margin-top: 10px; margin-left: 20px; width: 40px">Player:</label>
+                <input style="width: 290px;" type="text" name="attr_player_name" />
+            </div>
+            <div class="section_bottom"></div>
+        </div>
+    </div>
+    
+    <!-- Other Attributes Panel -->
+    <div class="otherAttr">
+        <div class="section_top"></div>
+        <div class="section_middle">
+            <div style="height: 40px; width: 800px;">
+                <label style="font-size: 18px; margin: 10px -10px 0px 35px; width: 40px; float: left">Morale:</label>
+                <input type="text" name='attr_morale' class='sheet-short' style="float: left;">
+                <label style="font-size: 18px; margin: 10px -15px 0px 25px; width: 40px; float: left">Cargo:</label>
+                <input type="text" name='attr_cargo' class='sheet-short' style="float: left;">
+                <label style="font-size: 18px; margin: 2px -10px 0px 25px; width: 45px; float: left; text-align: right;">Gestalt Level</label>
+                <input type="text" name='attr_gest' class='sheet-short' style="float: left;">
+                <label style="font-size: 18px; margin: 2px -10px 0px 25px; width: 45px; float: left; text-align: right;">Gestalt Dice</label>
+                <input type="text" name='attr_gest_dice' class='sheet-short' style="float: left;">
+                <label style="font-size: 18px; margin: 2px -10px 0px 25px; width: 50px; float: left; text-align: right">Survival Points</label>
+                <input type="text" name='attr_sp' class='sheet-short' style="float: left; width: 85px">
+                <label style="font-size: 16px; margin: 2px -10px 0px 25px; width: 20px; float: left; text-align: right">Attr. Lvl</label>
+                <input type="text" name='attr_spattr_lvl' class='sheet-small' style="float: left; margin: 7px 0px 0px 10px;">
+                <label style="font-size: 16px; margin: 2px -10px 0px 15px; width: 20px; float: left; text-align: right">Skill Pnts</label>
+                <input type="text" name='attr_spskil_lvl' class='sheet-small' style="float: left; margin: 7px 0px 0px 10px;">
+            </div>
+        </div>
+        <div class="section_bottom"></div>
+    </div>
+    
+    <!-- Main Section -->
+    <div class='main'>
+        <!-- S.P.E.W. Attributes -->
+        <div class='attributes'>
+            <div class="section_top"> </div>
+            <div class="section_middle">
+                <h2>S.P.E.W. Attributes</h2>
+                <div class="Desc"> Score <span style="display: inline-block; width: 15px";></span>Bonus</div>
+            
+                <!-- Stength Button -->
+                <div class="attributeButton" style="display: inline-block;">
+                    <button type="roll" value="&{template:default} {{name=Strength Roll}} {{Character=@{char_name}}} {{roll=[[1d100+@{str_bonus}]]}}"> Strength </button>
+                </div>
+		        <div style="display: inline-block;">
+		            <input type="text" class="sheet-short" name="attr_str" value="0" />
+		        </div>
+		        <div style="display: inline-block; margin-left: 12px;">
+		            <input type="hidden" name="attr_str_bonus" value="0" />
+		            <input type="text" class="sheet-short" name="attr_strBonus" value="@{str_bonus}" disabled="true" />
+		        </div>
+		    
+		        <!-- Perception Button -->
+                <div class="attributeButton" style="display: inline-block;">
+                    <button type="roll" value="&{template:default} {{name=Perception Roll}} {{Character=@{char_name}}} {{roll=[[1d100+@{per_bonus}]]}}"> Perception </button>
+                </div>
+		        <div style="display: inline-block;">
+		            <input type="text" class="sheet-short" name="attr_per" value="0" /><br />
+		        </div>
+		        <div style="display: inline-block; margin-left: 12px;">
+		            <input type="hidden" name="attr_per_bonus" value="0" />
+		            <input type="text" class="sheet-short" name="attr_perBonus" value="@{per_bonus}" disabled="true" /><br />
+		        </div>
+		
+		        <!-- Empathy Button -->
+                <div class="attributeButton" style="display: inline-block;">
+                    <button type="roll" value="&{template:default} {{name=Empathy Roll}} {{Character=@{char_name}}} {{roll=[[1d100+@{emp_bonus}]]}}"> Empathy </button>
+                </div>
+		        <div style="display: inline-block;">
+		            <input type="text" class="sheet-short" name="attr_emp" value="0" /><br />
+		        </div>
+		        <div style="display: inline-block; margin-left: 12px;">
+		            <input type="hidden" name="attr_emp_bonus" value="0" />
+		            <input type="text" class="sheet-short" name="attr_empBonus" value="@{emp_bonus}" disabled="true" /><br />
+		        </div>
+		    
+		        <!-- Willpower Button -->
+                <div class="attributeButton" style="display: inline-block;">
+                    <button type="roll" value="&{template:default} {{name=Willpower Roll}} {{Character=@{char_name}}} {{roll=[[1d100+@{will_bonus}]]}}"> Willpower </button>
+                </div>
+		        <div style="display: inline-block;">
+		            <input type="text" class="sheet-short" name="attr_will" value="0" /><br />
+		        </div>
+		        <div style="display: inline-block; margin-left: 12px; padding-bottom: 5px;">
+		            <input type="hidden" name="attr_will_bonus" value="0" />
+		            <input type="text" class="sheet-short" name="attr_willBonus" value="@{will_bonus}" disabled="true" /><br />
+		        </div>
+            </div>		    
+            <div class="section_bottom"></div>
+        </div>
+        
+        <!-- Defenses Panel -->
+        <div class="defenses"> 
+            <div class="section_top"></div>
+            <div class="section_middle">
+                <h2 style="margin-left: 0px; margin-bottom: -10px">Defenses</h2>
+                <div class="desc2" style="margin-left: 18px;">Base</div><div class="desc2" style="margin-left: 13px">Gear</div><div class="desc2" style="margin-left: 14px">Misc</div>
+                <div style="margin-top: 7px; font-size: 20px; font-weight: bolder;">
+                    <input type="text" name='attr_basedef' class='sheet-small' style="margin-left:20px; margin-top: -1px;" value=0> +
+                    <input type="text" name='attr_gearbon' class='sheet-small' style="margin-top: -1px;" value=0> +
+                    <input type="text" name='attr_miscbon' class='sheet-small' style="margin-top: -1px;" value=0>
+                </div>
+                <hr style="background: rgba(0,204,163,.5); border:0; height:1px; width: 128px; margin: 2px 0px 2px 10px;" />
+                <label style="margin: 10px -10px 0px 20px; font-size: 18px;">Total</label>
+                <div style="margin-top: -30px; margin-left: 45px;">
+                    <input type="hidden" name="attr_total_Defense" value="0" />
+                    <input type="text" class='sheet-short' name="attr_totalDefense" value="@{total_Defense}" disabled="true" /><br />
+                </div>
+                <hr style="background: rgba(0,204,163,.5); border:0; height:1px; width: 128px; margin: 2px 0px 2px 10px;" />
+                <div style="margin-left: -2px; width: 100%; text-align: center; font-weight: bolder;">Resistances</div>
+                <div style="width: 135px; margin-left: 7px;">
+                    <label class="res" title="Acid Resistance">Ac</label><input type="text" name='attr_acres' class='sheet-small' value=0 />
+                    <label class="res" title="Piercing Resistance">Pi</label><input type="text" name='attr_pires' class='sheet-small' value=0 />
+                    <label class="res" title="Slashing Resistance">Sl</label><input type="text" name='attr_slres' class='sheet-small' value=0><br />
+                    <label class="res" title="Bludgeoning Resistance">Bl</label><input type="text" name='attr_blres' class='sheet-small' value=0 />
+                    <label class="res" title="Poison Resistance">Po</label><input type="text" name='attr_pores' class='sheet-small' value=0 />
+                    <label class="res" title="Thermal Resistance">Th</label><input type="text" name='attr_thres' class='sheet-small' value=0 /><br />
+                    <label class="res" title="Electrical Damage">El</label><input type="text" name='attr_elres' class='sheet-small' value=0 />
+                    <label class="res" title="Radiation Damage">Ra</label><input type="text" name='attr_rares' class='sheet-small' value=0 />
+                    <label class="res" title="Other Types">Ot</label><input type="text" name='attr_otres' class='sheet-small' value=0><br />
+                </div>
+            </div>
+            <div class="section_bottom"></div>
+        </div>
+        
+        <!-- Damage Panel -->
+        <div class="damage">
+            <div class="section_top"></div>
+            <div class="section_middle">
+                <h2 style="margin-left: -5px;">Vitality</h2>
+                <div style="width: 100% px; margin-left: 7px">
+                    <label class="res" style="margin-left: 7px; width: 50px; text-align: center">Damage Taken</label><input type="text" name='attr_damage' class='sheet-short' style="margin: -23px 0px 0px 0px" value="0">
+                    <input type="text" name='attr_damage_thresh' class='sheet-short' style="margin: -23px 2px 0px 0px;" value="0" /><label class="res" style="width: 60px; text-align: center;">Damage Threshold</label><br />
+                    <label class="res" style="margin-left: 7px; width: 50px; text-align: center">Health Points</label><input type="text" name='attr_hp' class='sheet-short' style="margin: -23px 0px 0px 0px" value="5">
+                    <input type="text" name='attr_vd' class='sheet-short' style="margin: -23px 2px 0px 0px;" value="0"><label class="res" style="width: 60px; text-align: center;">Viral Points</label>
+                </div>
+                <div style="padding-bottom: 1px;">
+                    <label class="res" style="width: 80%; text-align: left; margin-left: 15px; text-decoration: underline;">Chronic Injuries</label>
+                    <textarea style="width: 185px; margin-left: 15px; margin-top: -5px; height: 63px; resize: none;"></textarea>
+                </div>
+            </div>
+            <div class="section_bottom" style="margin-top: -10px"></div>
+        </div>
+    
+        <!-- Injuries Panel -->
+        <div class="injuries">
+            <div class="section_top"></div>
+            <div class="section_middle">
+                <h2 style="margin-bottom: 5px;">Injuries</h2>
+                <fieldset class="repeating_injuries">
+                    <textarea name='attr_injury' rows="1" data-min-rows="1" placeholder='Injury Description' style="margin-left: 10px; width: 145px"></textarea>
+                </fieldset>
+            </div>
+            <div class="section_bottom"></div>
+        </div>
+    </div>
+
+    <!-- Seconday -->
+    <div class='secondary'>
+    
+        <!-- Abilities/Handicaps/Motivations -->
+        <div class='abihanmot'>
+            <div class="section_top"></div>
+            <div class="section_middle"  style="padding-bottom: 5px">
+                <div style="margin-left: 5px; width: 375px;">
+                    <h2 style="margin-bottom: 10px;">Abilities/Handicaps/Motivations</h2>
+                    <div class="desc3">Name<span style="margin-right: 277px;"></span>Tier</div>
+
+                    <fieldset class="repeating_abihanmots" style="margin-bottom: 5px;">            
+                        <input type="text" name='attr_abihanmot' style="margin: 0px -10px 0px 10px; width: 310px">
+                        <input type="text" class="sheet-short" name='attr_tiernum'>
+                    </fieldset>
+                </div>
+            </div>
+            <div class="section_bottom"></div>
+        </div>
+    
+        <!-- Descriptors -->
+        <div class='descriptors'>
+            <div class="section_top"></div>
+            <div class="section_middle" style="padding-bottom: 5px">
+                <div style="margin-left: 5px; width: 375px;">
+                    <h2 style="margin-bottom: 10px;">Descriptors</h2>
+                    <div class="desc3">Descriptor<span style="margin-right: 230px;"></span>Level</div>
+
+                    <fieldset class="repeating_descriptors" style="margin-bottom: 5px;">            
+                        <input type="text" name='attr_descriptor' style="margin: 0px -10px 0px 10px; width: 310px">
+                        <input type="text" class="sheet-short" name='attr_dlv'>
+                    </fieldset>
+                </div>
+            </div>
+            <div class="section_bottom"></div>
+        </div>
+    </div>
+    
+    <!-- Skills Container -->
+    <div class="skills">
+        
+        <!-- Basic Skills -->
+        <div class="basic">
+            <div class="section_top"></div>
+            <div class="section_middle">
+                <h2>Basic Skill Checks</h2>
+                <div class="desc4">Main<span style="margin-left: 15px"></span>Bonus<span style="margin-left: 16px;"></span>Skill<span style="margin-left: 19px;"></span>Total<span style="margin-left: 10px;"></span>Kit<span style="margin-left: 8px;"></span>Sup</div>
+                <div style="margin-left: 5px;">
+                    
+                    <!-- Balance -->
+                    <div class="skillButton" style="display: inline-block;">
+                        <button type="roll" value="&{template:default} {{name=Balance Roll}}">Balance {Bal%} - </button>
+                    </div>
+		            <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+		                <input type="hidden" name="attr_per" value="0" />
+		                <input type="text" class="sheet-small" name="attr_balMain" value="@{per}" title="Perception" disabled="true" /> +
+		            </div>
+		            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		                <input type="hidden" name="attr_will_bonus" value="0" />
+		                <input type="text" class="sheet-small" name="attr_balBon" value="@{will_bonus}" title="Willpower Bonus" disabled="true" /> +
+		            </div>
+		            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		                <input type="text" class="sheet-small" name="attr_balSkill" value="0" title="Skill Level" /> =
+		            </div>
+		            <div style="display: inline-block;">
+		                <input type="hidden" name="attr_balTotal" value="0" />
+		                <input type="text" class="sheet-small" name="attr_TotalBalance" value="@{balTotal}" title="Total" disabled="true" />
+		            </div>
+		            <div style="display: inline-block; margin-left: 5px;">
+		                <input type="checkbox" name="attr_balKit" title="Modified by Kit" />
+		            </div>
+		            <div style="display: inline-block; margin-left: 5px;">
+		                <input type="checkbox" name="attr_balSup" title="Supported" />
+		            </div>
+
+		            <!-- Brawl -->
+                    <div class="skillButton" style="display: inline-block;">
+                        <button type="roll" value="&{template:default} {{name=Brawl Roll}}">Brawl {Brl%} - </button>
+                    </div>
+		            <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+		                <input type="hidden" name="attr_str" value="0" />
+		                <input type="text" class="sheet-small" name="attr_brlMain" value="@{str}" title="Strength" disabled="true" /> +
+		            </div>
+		            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		                <input type="hidden" name="attr_per_bonus" value="0" />
+		                <input type="text" class="sheet-small" name="attr_brlBon" value="@{per_bonus}" title="Perception Bonus" disabled="true" /> +
+		            </div>
+		            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		                <input type="text" class="sheet-small" name="attr_brlSkill" value="0" title="Skill Level" /> =
+		            </div>
+		            <div style="display: inline-block;">
+		                <input type="hidden" name="attr_brlTotal" value="0" />
+		                <input type="text" class="sheet-small" name="attr_TotalBrawl" value="@{brlTotal}" title="Total" disabled="true" />
+		            </div>
+		            <div style="display: inline-block; margin-left: 5px;">
+		                <input type="checkbox" name="attr_brlKit" title="Modified by Kit" />
+		            </div>
+		            <div style="display: inline-block; margin-left: 5px;">
+		                <input type="checkbox" name="attr_brlSup" title="Supported" />
+		            </div>
+                    
+                    <!-- Climb -->
+                    <div class="skillButton" style="display: inline-block;">
+                        <button type="roll" value="&{template:default} {{name=Climb Roll}}">Climb {Clim%} - </button>
+                    </div>
+		            <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+		                <input type="hidden" name="attr_str" value="0" />
+		                <input type="text" class="sheet-small" name="attr_climMain" value="@{str}" title="Strength" disabled="true" /> +
+		            </div>
+		            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		                <input type="hidden" name="attr_will_bonus" value="0" />
+		                <input type="text" class="sheet-small" name="attr_climBon" value="@{will_bonus}" title="Willpower Bonus" disabled="true" /> +
+		            </div>
+		            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		                <input type="text" class="sheet-small" name="attr_climSkill" value="0" title="Skill Level" /> =
+		            </div>
+		            <div style="display: inline-block;">
+		                <input type="hidden" name="attr_climTotal" value="0" />
+		                <input type="text" class="sheet-small" name="attr_TotalClimb" value="@{climTotal}" title="Total" disabled="true" />
+		            </div>
+		            <div style="display: inline-block; margin-left: 5px;">
+		                <input type="checkbox" name="attr_climKit" title="Modified by Kit" />
+		            </div>
+		            <div style="display: inline-block; margin-left: 5px;">
+		                <input type="checkbox" name="attr_climSup" title="Supported" />
+		            </div>
+                    
+                    <!-- Composure -->
+                    <div class="skillButton" style="display: inline-block;">
+                        <button type="roll" value="&{template:default} {{name=Composure Roll}}">Composure {Cmps%} - </button>
+                    </div>
+		            <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+		                <input type="hidden" name="attr_will" value="0" />
+		                <input type="text" class="sheet-small" name="attr_cmpsMain" value="@{will}" title="Willpower" disabled="true" /> +
+		            </div>
+		            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		                <input type="hidden" name="attr_emp_bonus" value="0" />
+		                <input type="text" class="sheet-small" name="attr_cmpsBon" value="@{emp_bonus}" title="Empathy Bonus" disabled="true" /> +
+		            </div>
+		            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		                <input type="text" class="sheet-small" name="attr_cmpsSkill" value="0" title="Skill Level" /> =
+		            </div>
+		            <div style="display: inline-block;">
+		                <input type="hidden" name="attr_cmpsTotal" value="0" />
+		                <input type="text" class="sheet-small" name="attr_TotalComposure" value="@{cmpsTotal}" title="Total" disabled="true" />
+		            </div>
+		            <div style="display: inline-block; margin-left: 5px;">
+		                <input type="checkbox" name="attr_cmpsKit" title="Modified by Kit" />
+		            </div>
+		            <div style="display: inline-block; margin-left: 5px;">
+		                <input type="checkbox" name="attr_cmpsSup" title="Supported" />
+		            </div>
+                    
+                    <!-- Dodge -->
+                    <div class="skillButton" style="display: inline-block;">
+                        <button type="roll" value="&{template:default} {{name=Dodge Roll}}">Dodge {Do%} - </button>
+                    </div>
+		            <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+		                <input type="hidden" name="attr_per" value="0" />
+		                <input type="text" class="sheet-small" name="attr_doMain" value="@{per}" title="Perception" disabled="true" /> +
+		            </div>
+		            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		                <input type="hidden" name="attr_str_bonus" value="0" />
+		                <input type="text" class="sheet-small" name="attr_doBon" value="@{str_bonus}" title="Strength Bonus" disabled="true" /> +
+		            </div>
+		            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		                <input type="text" class="sheet-small" name="attr_doSkill" value="0" title="Skill Level" /> =
+		            </div>
+		            <div style="display: inline-block;">
+		                <input type="hidden" name="attr_doTotal" value="0" />
+		                <input type="text" class="sheet-small" name="attr_TotalDodge" value="@{doTotal}" title="Total" disabled="true" />
+		            </div>
+		            <div style="display: inline-block; margin-left: 5px;">
+		                <input type="checkbox" name="attr_doKit" title="Modified by Kit" />
+		            </div>
+		            <div style="display: inline-block; margin-left: 5px;">
+		                <input type="checkbox" name="attr_doSup" title="Supported" />
+		            </div>
+                    
+                    <!-- Endurance -->
+                    <div class="skillButton" style="display: inline-block;">
+                        <button type="roll" value="&{template:default} {{name=Endurance Roll}}">Endurance {End%} - </button>
+                    </div>
+		            <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+		                <input type="hidden" name="attr_str" value="0" />
+		                <input type="text" class="sheet-small" name="attr_endMain" value="@{str}" title="Strength" disabled="true" /> +
+		            </div>
+		            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		                <input type="hidden" name="attr_will_bonus" value="0" />
+		                <input type="text" class="sheet-small" name="attr_endBon" value="@{will_bonus}" title="Willpower Bonus" disabled="true" /> +
+		            </div>
+		            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		                <input type="text" class="sheet-small" name="attr_endSkill" value="0" title="Skill Level" /> =
+		            </div>
+		            <div style="display: inline-block;">
+		                <input type="hidden" name="attr_endTotal" value="0" />
+		                <input type="text" class="sheet-small" name="attr_TotalEndurance" value="@{endTotal}" title="Total" disabled="true" />
+		            </div>
+		            <div style="display: inline-block; margin-left: 5px;">
+		                <input type="checkbox" name="attr_endKit" title="Modified by Kit" />
+		            </div>
+		            <div style="display: inline-block; margin-left: 5px;">
+		                <input type="checkbox" name="attr_endSup" title="Supported" />
+		            </div>
+                    
+                    <!-- Grapple -->
+                    <div class="skillButton" style="display: inline-block;">
+                        <button type="roll" value="&{template:default} {{name=Grapple Roll}}">Grapple {Grpl%} - </button>
+                    </div>
+		            <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+		                <input type="hidden" name="attr_str" value="0" />
+		                <input type="text" class="sheet-small" name="attr_grplMain" value="@{str}" title="Strength" disabled="true" /> +
+		            </div>
+		            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		                <input type="hidden" name="attr_will_bonus" value="0" />
+		                <input type="text" class="sheet-small" name="attr_grplBon" value="@{will_bonus}" title="Willpower Bonus" disabled="true" /> +
+		            </div>
+		            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		                <input type="text" class="sheet-small" name="attr_grplSkill" value="0" title="Skill Level" /> =
+		            </div>
+		            <div style="display: inline-block;">
+		                <input type="hidden" name="attr_grplTotal" value="0" />
+		                <input type="text" class="sheet-small" name="attr_TotalGrapple" value="@{grplTotal}" title="Total" disabled="true" />
+		            </div>
+		            <div style="display: inline-block; margin-left: 5px;">
+		                <input type="checkbox" name="attr_grplKit" title="Modified by Kit" />
+		            </div>
+		            <div style="display: inline-block; margin-left: 5px;">
+		                <input type="checkbox" name="attr_grplSup" title="Supported" />
+		            </div>
+                    
+                    <!-- Hide -->
+                    <div class="skillButton" style="display: inline-block;">
+                        <button type="roll" value="&{template:default} {{name=Hide Roll}}">Hide {Hide%} - </button>
+                    </div>
+		            <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+		                <input type="hidden" name="attr_per" value="0" />
+		                <input type="text" class="sheet-small" name="attr_hideMain" value="@{per}" title="Perception" disabled="true" /> +
+		            </div>
+		            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		                <input type="hidden" name="attr_will_bonus" value="0" />
+		                <input type="text" class="sheet-small" name="attr_hideBon" value="@{will_bonus}" title="Willpower Bonus" disabled="true" /> +
+		            </div>
+		            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		                <input type="text" class="sheet-small" name="attr_hideSkill" value="0" title="Skill Level" /> =
+		            </div>
+		            <div style="display: inline-block;">
+		                <input type="hidden" name="attr_hideTotal" value="0" />
+		                <input type="text" class="sheet-small" name="attr_TotalHide" value="@{hideTotal}" title="Total" disabled="true" />
+		            </div>
+		            <div style="display: inline-block; margin-left: 5px;">
+		                <input type="checkbox" name="attr_hideKit" title="Modified by Kit" />
+		            </div>
+		            <div style="display: inline-block; margin-left: 5px;">
+		                <input type="checkbox" name="attr_hideSup" title="Supported" />
+		            </div>
+                    
+                    <!-- Hold -->
+                    <div class="skillButton" style="display: inline-block;">
+                        <button type="roll" value="&{template:default} {{name=Hold Roll}}">Hold {Hold%} - </button>
+                    </div>
+		            <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+		                <input type="hidden" name="attr_will" value="0" />
+		                <input type="text" class="sheet-small" name="attr_holdMain" value="@{will}" title="Willpower" disabled="true" /> +
+		            </div>
+		            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		                <input type="hidden" name="attr_per_bonus" value="0" />
+		                <input type="text" class="sheet-small" name="attr_holdBon" value="@{per_bonus}" title="Perception Bonus" disabled="true" /> +
+		            </div>
+		            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		                <input type="text" class="sheet-small" name="attr_holdSkill" value="0" title="Skill Level" /> =
+		            </div>
+		            <div style="display: inline-block;">
+		                <input type="hidden" name="attr_holdTotal" value="0" />
+		                <input type="text" class="sheet-small" name="attr_TotalHold" value="@{holdTotal}" title="Total" disabled="true" />
+		            </div>
+		            <div style="display: inline-block; margin-left: 5px;">
+		                <input type="checkbox" name="attr_holdKit" title="Modified by Kit" />
+		            </div>
+		            <div style="display: inline-block; margin-left: 5px;">
+		                <input type="checkbox" name="attr_holdSup" title="Supported" />
+		            </div>
+                    
+                    <!-- Jump/Leap -->
+                    <div class="skillButton" style="display: inline-block;">
+                        <button type="roll" value="&{template:default} {{name=Jump/Leap Roll}}">Jump/Leap {J/L%} - </button>
+                    </div>
+		            <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+		                <input type="hidden" name="attr_str" value="0" />
+		                <input type="text" class="sheet-small" name="attr_jlMain" value="@{str}" title="Strength" disabled="true" /> +
+		            </div>
+		            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		                <input type="hidden" name="attr_will_bonus" value="0" />
+		                <input type="text" class="sheet-small" name="attr_jlBon" value="@{will_bonus}" title="Willpower Bonus" disabled="true" /> +
+		            </div>
+		            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		                <input type="text" class="sheet-small" name="attr_jlSkill" value="0" title="Skill Level" /> =
+		            </div>
+		            <div style="display: inline-block;">
+		                <input type="hidden" name="attr_jlTotal" value="0" />
+		                <input type="text" class="sheet-small" name="attr_TotalJumpLeap" value="@{jlTotal}" title="Total" disabled="true" />
+		            </div>
+		            <div style="display: inline-block; margin-left: 5px;">
+		                <input type="checkbox" name="attr_jlKit" title="Modified by Kit" />
+		            </div>
+		            <div style="display: inline-block; margin-left: 5px;">
+		                <input type="checkbox" name="attr_jlSup" title="Supported" />
+		            </div>
+                    
+                    <!-- Lift/Pull -->
+                    <div class="skillButton" style="display: inline-block;">
+                        <button type="roll" value="&{template:default} {{name=Lift/Pull Roll}}">Lift/Pull {L/P%} - </button>
+                    </div>
+		            <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+		                <input type="hidden" name="attr_str" value="0" />
+		                <input type="text" class="sheet-small" name="attr_lpMain" value="@{str}" title="Strength" disabled="true" /> +
+		            </div>
+		            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		                <input type="hidden" name="attr_will_bonus" value="0" />
+		                <input type="text" class="sheet-small" name="attr_lpBon" value="@{will_bonus}" title="Willpower Bonus" disabled="true" /> +
+		            </div>
+		            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		                <input type="text" class="sheet-small" name="attr_lpSkill" value="0" title="Skill Level" /> =
+		            </div>
+		            <div style="display: inline-block;">
+		                <input type="hidden" name="attr_lpTotal" value="0" />
+		                <input type="text" class="sheet-small" name="attr_TotalLiftPull" value="@{lpTotal}" title="Total" disabled="true" />
+		            </div>
+		            <div style="display: inline-block; margin-left: 5px;">
+		                <input type="checkbox" name="attr_lpKit" title="Modified by Kit" />
+		            </div>
+		            <div style="display: inline-block; margin-left: 5px;">
+		                <input type="checkbox" name="attr_lpSup" title="Supported" />
+		            </div>
+                    
+                    <!-- Resist Pain -->
+                    <div class="skillButton" style="display: inline-block;">
+                        <button type="roll" value="&{template:default} {{name=Resist Pain Roll}}">Resist Pain {RPai%} - </button>
+                    </div>
+		            <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+		                <input type="hidden" name="attr_will" value="0" />
+		                <input type="text" class="sheet-small" name="attr_rpaiMain" value="@{will}" title="Willpower" disabled="true" /> +
+		            </div>
+		            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		                <input type="hidden" name="attr_str_bonus" value="0" />
+		                <input type="text" class="sheet-small" name="attr_rpaiBon" value="@{str_bonus}" title="Strength Bonus" disabled="true" /> +
+		            </div>
+		            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		                <input type="text" class="sheet-small" name="attr_rpaiSkill" value="0" title="Skill Level" /> =
+		            </div>
+		            <div style="display: inline-block;">
+		                <input type="hidden" name="attr_rpaiTotal" value="0" />
+		                <input type="text" class="sheet-small" name="attr_TotalResistPain" value="@{rpaiTotal}" title="Total" disabled="true" />
+		            </div>
+		            <div style="display: inline-block; margin-left: 5px;">
+		                <input type="checkbox" name="attr_rpaiKit" title="Modified by Kit" />
+		            </div>
+		            <div style="display: inline-block; margin-left: 5px;">
+		                <input type="checkbox" name="attr_rpaiSup" title="Supported" />
+		            </div>
+                    
+                    <!-- Search -->
+                    <div class="skillButton" style="display: inline-block;">
+                        <button type="roll" value="&{template:default} {{name=Search Roll}}">Search {Srch%} - </button>
+                    </div>
+		            <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+		                <input type="hidden" name="attr_per" value="0" />
+		                <input type="text" class="sheet-small" name="attr_srchMain" value="@{per}" title="Perception" disabled="true" /> +
+		            </div>
+		            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		                <input type="hidden" name="attr_will_bonus" value="0" />
+		                <input type="text" class="sheet-small" name="attr_srchBon" value="@{will_bonus}" title="Willpower Bonus" disabled="true" /> +
+		            </div>
+		            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		                <input type="text" class="sheet-small" name="attr_srchSkill" value="0" title="Skill Level" /> =
+		            </div>
+		            <div style="display: inline-block;">
+		                <input type="hidden" name="attr_srchTotal" value="0" />
+		                <input type="text" class="sheet-small" name="attr_TotalSearch" value="@{srchTotal}" title="Total" disabled="true" />
+		            </div>
+		            <div style="display: inline-block; margin-left: 5px;">
+		                <input type="checkbox" name="attr_srchKit" title="Modified by Kit" />
+		            </div>
+		            <div style="display: inline-block; margin-left: 5px;">
+		                <input type="checkbox" name="attr_srchSup" title="Supported" />
+		            </div>
+                    
+                    <!-- Sneak -->
+                    <div class="skillButton" style="display: inline-block;">
+                        <button type="roll" value="&{template:default} {{name=Sneak Roll}}">Sneak {Snk%} - </button>
+                    </div>
+		            <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+		                <input type="hidden" name="attr_per" value="0" />
+		                <input type="text" class="sheet-small" name="attr_snkMain" value="@{per}" title="Perception" disabled="true" /> +
+		            </div>
+		            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		                <input type="hidden" name="attr_will_bonus" value="0" />
+		                <input type="text" class="sheet-small" name="attr_snkBon" value="@{will_bonus}" title="Willpower Bonus" disabled="true" /> +
+		            </div>
+		            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		                <input type="text" class="sheet-small" name="attr_snkSkill" value="0" title="Skill Level" /> =
+		            </div>
+		            <div style="display: inline-block;">
+		                <input type="hidden" name="attr_snkTotal" value="0" />
+		                <input type="text" class="sheet-small" name="attr_TotalSneak" value="@{snkTotal}" title="Total" disabled="true" />
+		            </div>
+		            <div style="display: inline-block; margin-left: 5px;">
+		                <input type="checkbox" name="attr_snkKit" title="Modified by Kit" />
+		            </div>
+		            <div style="display: inline-block; margin-left: 5px;">
+		                <input type="checkbox" name="attr_snkSup" title="Supported" />
+		            </div>
+                    
+                    <!-- Spot/Listen -->
+                    <div class="skillButton" style="display: inline-block;">
+                        <button type="roll" value="&{template:default} {{name=Spot/Listen Roll}}">Spot/Listen {Spt/Li%} - </button>
+                    </div>
+		            <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+		                <input type="hidden" name="attr_per" value="0" />
+		                <input type="text" class="sheet-small" name="attr_sptliMain" value="@{per}" title="Perception" disabled="true" /> +
+		            </div>
+		            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		                <input type="hidden" name="attr_will_bonus" value="0" />
+		                <input type="text" class="sheet-small" name="attr_sptliBon" value="@{will_bonus}" title="Willpower Bonus" disabled="true" /> +
+		            </div>
+		            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		                <input type="text" class="sheet-small" name="attr_sptliSkill" value="0" title="Skill Level" /> =
+		            </div>
+		            <div style="display: inline-block;">
+		                <input type="hidden" name="attr_sptliTotal" value="0" />
+		                <input type="text" class="sheet-small" name="attr_TotalSpotListen" value="@{sptliTotal}" title="Total" disabled="true" />
+		            </div>
+		            <div style="display: inline-block; margin-left: 5px;">
+		                <input type="checkbox" name="attr_sptliKit" title="Modified by Kit" />
+		            </div>
+		            <div style="display: inline-block; margin-left: 5px;">
+		                <input type="checkbox" name="attr_sptliSup" title="Supported" />
+		            </div>
+                </div>
+            </div>
+            <div class="section_bottom"></div>
+        </div>
+        
+        <!-- Trained Skills -->
+        <div class="trained">
+            <div class="section_top"></div>
+            <div class="section_middle">
+                <h2>Trained Skill Checks</h2>
+                <div class="desc4" style="margin-left: 202px;">Main<span style="margin-left: 15px"></span>Bonus<span style="margin-left: 16px;"></span>Skill<span style="margin-left: 19px;"></span>Total<span style="margin-left: 10px;"></span>Kit<span style="margin-left: 8px;"></span>Sup</div>
+                
+                <!-- Calm -->
+                <div class="skillButton2" style="display: inline-block;">
+                    <button type="roll" value="&{template:default} {{name=Calm Roll}}">Calm {Calm%} - </button>
+                </div>
+		        <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+		            <input type="hidden" name="attr_emp" value="0" />
+		            <input type="text" class="sheet-small" name="attr_calmMain" value="@{emp}" title="Empathy" disabled="true" /> +
+		        </div>
+		        <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		            <input type="hidden" name="attr_will_bonus" value="0" />
+		            <input type="text" class="sheet-small" name="attr_calmBon" value="@{will_bonus}" title="Willpower Bonus" disabled="true" /> +
+		        </div>
+		        <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		            <input type="text" class="sheet-small" name="attr_calmSkill" value="0" title="Skill Level" /> =
+		        </div>
+		        <div style="display: inline-block;">
+		            <input type="hidden" name="attr_calmTotal" value="0" />
+		            <input type="text" class="sheet-small" name="attr_TotalCalm" value="@{calmTotal}" title="Total" disabled="true" />
+		        </div>
+		        <div style="display: inline-block; margin-left: 5px;">
+		            <input type="checkbox" name="attr_calmKit" title="Modified by Kit" />
+		        </div>
+		        <div style="display: inline-block; margin-left: 5px;">
+		            <input type="checkbox" name="attr_calmSup" title="Supported" />
+		        </div>
+		        
+		        <!-- Diplomacy (ASK) -->
+                <div class="skillButton2" style="display: inline-block;">
+                    <button type="roll" value="&{template:default} {{name=Diplomacy (Ask) Roll}}">Diplomacy (Ask) {D-Ask%} - </button>
+                </div>
+		        <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+		            <input type="hidden" name="attr_emp" value="0" />
+		            <input type="text" class="sheet-small" name="attr_daskMain" value="@{emp}" title="Empathy" disabled="true" /> +
+		        </div>
+		        <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		            <input type="hidden" name="attr_per_bonus" value="0" />
+		            <input type="text" class="sheet-small" name="attr_daskBon" value="@{per_bonus}" title="Perception Bonus" disabled="true" /> +
+		        </div>
+		        <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		            <input type="text" class="sheet-small" name="attr_daskSkill" value="0" title="Skill Level" /> =
+		        </div>
+		        <div style="display: inline-block;">
+		            <input type="hidden" name="attr_daskTotal" value="0" />
+		            <input type="text" class="sheet-small" name="attr_TotalDAsk" value="@{daskTotal}" title="Total" disabled="true" />
+		        </div>
+		        <div style="display: inline-block; margin-left: 5px;">
+		            <input type="checkbox" name="attr_daskKit" title="Modified by Kit" />
+		        </div>
+		        <div style="display: inline-block; margin-left: 5px;">
+		            <input type="checkbox" name="attr_daskSup" title="Supported" />
+		        </div>
+		        
+		        <!-- Dpl. (Barter/Bribe) -->
+                <div class="skillButton2" style="display: inline-block;">
+                    <button type="roll" value="&{template:default} {{name=Diplomacy (Barter/Bribe) Roll}}">Dipl. (Barter/Bribe) {D-BB%} - </button>
+                </div>
+		        <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+		            <input type="hidden" name="attr_emp" value="0" />
+		            <input type="text" class="sheet-small" name="attr_dbbMain" value="@{emp}" title="Empathy" disabled="true" /> +
+		        </div>
+		        <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		            <input type="hidden" name="attr_will_bonus" value="0" />
+		            <input type="text" class="sheet-small" name="attr_dbbBon" value="@{will_bonus}" title="Willpower Bonus" disabled="true" /> +
+		        </div>
+		        <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		            <input type="text" class="sheet-small" name="attr_dbbSkill" value="0" title="Skill Level" /> =
+		        </div>
+		        <div style="display: inline-block;">
+		            <input type="hidden" name="attr_dbbTotal" value="0" />
+		            <input type="text" class="sheet-small" name="attr_TotalDBarBri" value="@{dbbTotal}" title="Total" disabled="true" />
+		        </div>
+		        <div style="display: inline-block; margin-left: 5px;">
+		            <input type="checkbox" name="attr_dbbKit" title="Modified by Kit" />
+		        </div>
+		        <div style="display: inline-block; margin-left: 5px;">
+		            <input type="checkbox" name="attr_dbbSup" title="Supported" />
+		        </div>
+		        
+                <!-- Diplomacy (Expression) -->
+                <div class="skillButton2" style="display: inline-block;">
+                    <button type="roll" value="&{template:default} {{name=Diplomacy (Expression) Roll}}">Diplomacy (Expression) {D-Ex%} - </button>
+                </div>
+		        <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+		            <input type="hidden" name="attr_emp" value="0" />
+		            <input type="text" class="sheet-small" name="attr_deexMain" value="@{emp}" title="Empathy" disabled="true" /> +
+		        </div>
+		        <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		            <input type="hidden" name="attr_per_bonus" value="0" />
+		            <input type="text" class="sheet-small" name="attr_dexBon" value="@{per_bonus}" title="Perception Bonus" disabled="true" /> +
+		        </div>
+		        <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		            <input type="text" class="sheet-small" name="attr_dexSkill" value="0" title="Skill Level" /> =
+		        </div>
+		        <div style="display: inline-block;">
+		            <input type="hidden" name="attr_dexTotal" value="0" />
+		            <input type="text" class="sheet-small" name="attr_TotalDExp" value="@{dexTotal}" title="Total" disabled="true" />
+		        </div>
+		        <div style="display: inline-block; margin-left: 5px;">
+		            <input type="checkbox" name="attr_dexKit" title="Modified by Kit" />
+		        </div>
+		        <div style="display: inline-block; margin-left: 5px;">
+		            <input type="checkbox" name="attr_dexSup" title="Supported" />
+		        </div>
+                
+                <!-- Diplomacy (Command) -->
+                <div class="skillButton2" style="display: inline-block;">
+                    <button type="roll" value="&{template:default} {{name=Diplomacy (Command) Roll}}">Diplomacy (Command) {D-Cd%} - </button>
+                </div>
+		        <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+		            <input type="hidden" name="attr_emp" value="0" />
+		            <input type="text" class="sheet-small" name="attr_dcdMain" value="@{emp}" title="Empathy" disabled="true" /> +
+		        </div>
+		        <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		            <input type="hidden" name="attr_will_bonus" value="0" />
+		            <input type="text" class="sheet-small" name="attr_dcdBon" value="@{will_bonus}" title="Willpower Bonus" disabled="true" /> +
+		        </div>
+		        <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		            <input type="text" class="sheet-small" name="attr_dcdSkill" value="0" title="Skill Level" /> =
+		        </div>
+		        <div style="display: inline-block;">
+		            <input type="hidden" name="attr_dcdTotal" value="0" />
+		            <input type="text" class="sheet-small" name="attr_TotalDComm" value="@{dcdTotal}" title="Total" disabled="true" />
+		        </div>
+		        <div style="display: inline-block; margin-left: 5px;">
+		            <input type="checkbox" name="attr_dcdKit" title="Modified by Kit" />
+		        </div>
+		        <div style="display: inline-block; margin-left: 5px;">
+		            <input type="checkbox" name="attr_dcdSup" title="Supported" />
+		        </div>
+		        
+		        <!-- Dipl. (Det. Motives) -->
+                <div class="skillButton2" style="display: inline-block;">
+                    <button type="roll" value="&{template:default} {{name=Diplomacy (Det. Motives) Roll}}">Dipl. (Det. Motives) {D-DM%} - </button>
+                </div>
+		        <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+		            <input type="hidden" name="attr_emp" value="0" />
+		            <input type="text" class="sheet-small" name="attr_ddmMain" value="@{emp}" title="Empathy" disabled="true" /> +
+		        </div>
+		        <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		            <input type="hidden" name="attr_per_bonus" value="0" />
+		            <input type="text" class="sheet-small" name="attr_ddmBon" value="@{per_bonus}" title="Perception Bonus" disabled="true" /> +
+		        </div>
+		        <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		            <input type="text" class="sheet-small" name="attr_ddmSkill" value="0" title="Skill Level" /> =
+		        </div>
+		        <div style="display: inline-block;">
+		            <input type="hidden" name="attr_ddmTotal" value="0" />
+		            <input type="text" class="sheet-small" name="attr_TotalDipDM" value="@{ddmTotal}" title="Total" disabled="true" />
+		        </div>
+		        <div style="display: inline-block; margin-left: 5px;">
+		            <input type="checkbox" name="attr_ddmKit" title="Modified by Kit" />
+		        </div>
+		        <div style="display: inline-block; margin-left: 5px;">
+		            <input type="checkbox" name="attr_ddmSup" title="Supported" />
+		        </div>
+                
+                <!-- Dipl. (Intimidate) -->
+                <div class="skillButton2" style="display: inline-block;">
+                    <button type="roll" value="&{template:default} {{name=Diplomacy (Intimidate) Roll}}">Dipl. (Intimidate) {D-Int%} - </button>
+                </div>
+		        <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+		            <input type="hidden" name="attr_emp" value="0" />
+		            <input type="text" class="sheet-small" name="attr_dintMain" value="@{emp}" title="Empathy" disabled="true" /> +
+		        </div>
+		        <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		            <input type="hidden" name="attr_str_bonus" value="0" />
+		            <input type="text" class="sheet-small" name="attr_dintBon" value="@{str_bonus}" title="Strength Bonus" disabled="true" /> +
+		        </div>
+		        <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		            <input type="text" class="sheet-small" name="attr_dintSkill" value="0" title="Skill Level" /> =
+		        </div>
+		        <div style="display: inline-block;">
+		            <input type="hidden" name="attr_dintTotal" value="0" />
+		            <input type="text" class="sheet-small" name="attr_TotalDInt" value="@{dintTotal}" title="Total" disabled="true" />
+		        </div>
+		        <div style="display: inline-block; margin-left: 5px;">
+		            <input type="checkbox" name="attr_dintKit" title="Modified by Kit" />
+		        </div>
+		        <div style="display: inline-block; margin-left: 5px;">
+		            <input type="checkbox" name="attr_dintSup" title="Supported" />
+		        </div>
+		        
+		        <!-- Digital Systems -->
+                <div class="skillButton2" style="display: inline-block;">
+                    <button type="roll" value="&{template:default} {{name=Digital Systems Roll}}">Digital Systems {DgtlSys%} - </button>
+                </div>
+		        <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+		            <input type="hidden" name="attr_per" value="0" />
+		            <input type="text" class="sheet-small" name="attr_dgtlsysMain" value="@{per}" title="Perception" disabled="true" /> +
+		        </div>
+		        <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		            <input type="hidden" name="attr_will_bonus" value="0" />
+		            <input type="text" class="sheet-small" name="attr_dgtlsysBon" value="@{will_bonus}" title="Willpower Bonus" disabled="true" /> +
+		        </div>
+		        <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		            <input type="text" class="sheet-small" name="attr_dgtlsysSkill" value="0" title="Skill Level" /> =
+		        </div>
+		        <div style="display: inline-block;">
+		            <input type="hidden" name="attr_dgtlsysTotal" value="0" />
+		            <input type="text" class="sheet-small" name="attr_TotalDgtlSys" value="@{dgtlsysTotal}" title="Total" disabled="true" />
+		        </div>
+		        <div style="display: inline-block; margin-left: 5px;">
+		            <input type="checkbox" name="attr_dgtlsysKit" title="Modified by Kit" />
+		        </div>
+		        <div style="display: inline-block; margin-left: 5px;">
+		            <input type="checkbox" name="attr_dgtlsysSup" title="Supported" />
+		        </div>
+		        
+		        <!-- Energy (Type) -->
+                <div class="skillButton2" style="display: inline-block;">
+                    <button type="roll" value="&{template:default} {{name=Energy (Type) Roll}}">Engergy (Type) {Enrg%} - </button>
+                </div>
+		        <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+		            <input type="hidden" name="attr_per" value="0" />
+		            <input type="text" class="sheet-small" name="attr_enrgMain" value="@{per}" title="Perception" disabled="true" /> +
+		        </div>
+		        <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		            <input type="hidden" name="attr_will_bonus" value="0" />
+		            <input type="text" class="sheet-small" name="attr_enrgBon" value="@{will_bonus}" title="Willpower Bonus" disabled="true" /> +
+		        </div>
+		        <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		            <input type="text" class="sheet-small" name="attr_enrgSkill" value="0" title="Skill Level" /> =
+		        </div>
+		        <div style="display: inline-block;">
+		            <input type="hidden" name="attr_enrgTotal" value="0" />
+		            <input type="text" class="sheet-small" name="attr_TotalEnergy" value="@{enrgTotal}" title="Total" disabled="true" />
+		        </div>
+		        <div style="display: inline-block; margin-left: 5px;">
+		            <input type="checkbox" name="attr_enrgKit" title="Modified by Kit" />
+		        </div>
+		        <div style="display: inline-block; margin-left: 5px;">
+		            <input type="checkbox" name="attr_enrgSup" title="Supported" />
+		        </div>
+		        
+		        <!-- Firearms (Long Gun) -->
+                <div class="skillButton2" style="display: inline-block;">
+                    <button type="roll" value="&{template:default} {{name=Firearms (Long Gun) Roll}}">Firearms (Long Gun) {Frm-L%} - </button>
+                </div>
+		        <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+		            <input type="hidden" name="attr_per" value="0" />
+		            <input type="text" class="sheet-small" name="attr_frmlMain" value="@{per}" title="Perception" disabled="true" /> +
+		        </div>
+		        <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		            <input type="hidden" name="attr_will_bonus" value="0" />
+		            <input type="text" class="sheet-small" name="attr_frmlBon" value="@{will_bonus}" title="Willpower Bonus" disabled="true" /> +
+		        </div>
+		        <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		            <input type="text" class="sheet-small" name="attr_frmlSkill" value="0" title="Skill Level" /> =
+		        </div>
+		        <div style="display: inline-block;">
+		            <input type="hidden" name="attr_frmlTotal" value="0" />
+		            <input type="text" class="sheet-small" name="attr_TotalFLongGun" value="@{frmlTotal}" title="Total" disabled="true" />
+		        </div>
+		        <div style="display: inline-block; margin-left: 5px;">
+		            <input type="checkbox" name="attr_frmlKit" title="Modified by Kit" />
+		        </div>
+		        <div style="display: inline-block; margin-left: 5px;">
+		            <input type="checkbox" name="attr_frmlSup" title="Supported" />
+		        </div>
+                
+                <!-- Firearms (Pistol) -->
+                <div class="skillButton2" style="display: inline-block;">
+                    <button type="roll" value="&{template:default} {{name=Firearms (Pistol) Roll}}">Firearms (Pistol) {Frm-P%} - </button>
+                </div>
+		        <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+		            <input type="hidden" name="attr_per" value="0" />
+		            <input type="text" class="sheet-small" name="attr_frmpMain" value="@{per}" title="Perception" disabled="true" /> +
+		        </div>
+		        <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		            <input type="hidden" name="attr_will_bonus" value="0" />
+		            <input type="text" class="sheet-small" name="attr_frmpBon" value="@{will_bonus}" title="Willpower Bonus" disabled="true" /> +
+		        </div>
+		        <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		            <input type="text" class="sheet-small" name="attr_frmpSkill" value="0" title="Skill Level" /> =
+		        </div>
+		        <div style="display: inline-block;">
+		            <input type="hidden" name="attr_frmpTotal" value="0" />
+		            <input type="text" class="sheet-small" name="attr_TotalFPistol" value="@{frmpTotal}" title="Total" disabled="true" />
+		        </div>
+		        <div style="display: inline-block; margin-left: 5px;">
+		            <input type="checkbox" name="attr_frmpKit" title="Modified by Kit" />
+		        </div>
+		        <div style="display: inline-block; margin-left: 5px;">
+		            <input type="checkbox" name="attr_frmpSup" title="Supported" />
+		        </div>
+                
+                <!-- First Aid -->
+                <div class="skillButton2" style="display: inline-block;">
+                    <button type="roll" value="&{template:default} {{name=First Aid Roll}}">First Aid {FAid%} - </button>
+                </div>
+		        <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+		            <input type="hidden" name="attr_per" value="0" />
+		            <input type="text" class="sheet-small" name="attr_faidMain" value="@{per}" title="Perception" disabled="true" /> +
+		        </div>
+		        <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		            <input type="hidden" name="attr_will_bonus" value="0" />
+		            <input type="text" class="sheet-small" name="attr_faidBon" value="@{will_bonus}" title="Willpower Bonus" disabled="true" /> +
+		        </div>
+		        <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		            <input type="text" class="sheet-small" name="attr_faidSkill" value="0" title="Skill Level" /> =
+		        </div>
+		        <div style="display: inline-block;">
+		            <input type="hidden" name="attr_faidTotal" value="0" />
+		            <input type="text" class="sheet-small" name="attr_TotalFirstAid" value="@{faidTotal}" title="Total" disabled="true" />
+		        </div>
+		        <div style="display: inline-block; margin-left: 5px;">
+		            <input type="checkbox" name="attr_faidKit" title="Modified by Kit" />
+		        </div>
+		        <div style="display: inline-block; margin-left: 5px;">
+		            <input type="checkbox" name="attr_faidSup" title="Supported" />
+		        </div>
+                
+                <!-- Melee Attack -->
+                <div class="skillButton2" style="display: inline-block;">
+                    <button type="roll" value="&{template:default} {{name=Melee Attack Roll}}">Melee Attack {MA%} - </button>
+                </div>
+		        <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+		            <input type="hidden" name="attr_str" value="0" />
+		            <input type="text" class="sheet-small" name="attr_maMain" value="@{str}" title="Strength" disabled="true" /> +
+		        </div>
+		        <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		            <input type="hidden" name="attr_per_bonus" value="0" />
+		            <input type="text" class="sheet-small" name="attr_maBon" value="@{per_bonus}" title="Perception Bonus" disabled="true" /> +
+		        </div>
+		        <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		            <input type="text" class="sheet-small" name="attr_maSkill" value="0" title="Skill Level" /> =
+		        </div>
+		        <div style="display: inline-block;">
+		            <input type="hidden" name="attr_maTotal" value="0" />
+		            <input type="text" class="sheet-small" name="attr_TotalMeleeAttack" value="@{maTotal}" title="Total" disabled="true" />
+		        </div>
+		        <div style="display: inline-block; margin-left: 5px;">
+		            <input type="checkbox" name="attr_maKit" title="Modified by Kit" />
+		        </div>
+		        <div style="display: inline-block; margin-left: 5px;">
+		            <input type="checkbox" name="attr_maSup" title="Supported" />
+		        </div>
+                
+                <!-- Navigation -->
+                <div class="skillButton2" style="display: inline-block;">
+                    <button type="roll" value="&{template:default} {{name=Navigation Roll}}">Navigation {Nav%} - </button>
+                </div>
+		        <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+		            <input type="hidden" name="attr_per" value="0" />
+		            <input type="text" class="sheet-small" name="attr_navMain" value="@{per}" title="Perception" disabled="true" /> +
+		        </div>
+		        <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		            <input type="hidden" name="attr_will_bonus" value="0" />
+		            <input type="text" class="sheet-small" name="attr_navBon" value="@{will_bonus}" title="Willpower Bonus" disabled="true" /> +
+		        </div>
+		        <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		            <input type="text" class="sheet-small" name="attr_navSkill" value="0" title="Skill Level" /> =
+		        </div>
+		        <div style="display: inline-block;">
+		            <input type="hidden" name="attr_navTotal" value="0" />
+		            <input type="text" class="sheet-small" name="attr_TotalNavigation" value="@{navTotal}" title="Total" disabled="true" />
+		        </div>
+		        <div style="display: inline-block; margin-left: 5px;">
+		            <input type="checkbox" name="attr_navKit" title="Modified by Kit" />
+		        </div>
+		        <div style="display: inline-block; margin-left: 5px;">
+		            <input type="checkbox" name="attr_navSup" title="Supported" />
+		        </div>
+                
+                <!-- Swim -->
+                <div class="skillButton2" style="display: inline-block;">
+                    <button type="roll" value="&{template:default} {{name=Swim Roll}}">Swim {Swim%} - </button>
+                </div>
+		        <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+		            <input type="hidden" name="attr_str" value="0" />
+		            <input type="text" class="sheet-small" name="attr_swimMain" value="@{str}" title="Strength" disabled="true" /> +
+		        </div>
+		        <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		            <input type="hidden" name="attr_will_bonus" value="0" />
+		            <input type="text" class="sheet-small" name="attr_swimBon" value="@{will_bonus}" title="Willpower Bonus" disabled="true" /> +
+		        </div>
+		        <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		            <input type="text" class="sheet-small" name="attr_swimSkill" value="0" title="Skill Level" /> =
+		        </div>
+		        <div style="display: inline-block;">
+		            <input type="hidden" name="attr_swimTotal" value="0" />
+		            <input type="text" class="sheet-small" name="attr_TotalSwim" value="@{swimTotal}" title="Total" disabled="true" />
+		        </div>
+		        <div style="display: inline-block; margin-left: 5px;">
+		            <input type="checkbox" name="attr_swimKit" title="Modified by Kit" />
+		        </div>
+		        <div style="display: inline-block; margin-left: 5px;">
+		            <input type="checkbox" name="attr_swimSup" title="Supported" />
+		        </div>
+		        
+		        <!-- Throw -->
+                <div class="skillButton2" style="display: inline-block;">
+                    <button type="roll" value="&{template:default} {{name=Throw Roll}}">Throw {Thrw%} - </button>
+                </div>
+		        <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+		            <input type="hidden" name="attr_per" value="0" />
+		            <input type="text" class="sheet-small" name="attr_thrwMain" value="@{per}" title="Perception" disabled="true" /> +
+		        </div>
+		        <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		            <input type="hidden" name="attr_str_bonus" value="0" />
+		            <input type="text" class="sheet-small" name="attr_thrwBon" value="@{str_bonus}" title="Strength Bonus" disabled="true" /> +
+		        </div>
+		        <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+		            <input type="text" class="sheet-small" name="attr_thrwSkill" value="0" title="Skill Level" /> =
+		        </div>
+		        <div style="display: inline-block;">
+		            <input type="hidden" name="attr_thrwTotal" value="0" />
+		            <input type="text" class="sheet-small" name="attr_TotalThrow" value="@{thrwTotal}" title="Total" disabled="true" />
+		        </div>
+		        <div style="display: inline-block; margin-left: 5px;">
+		            <input type="checkbox" name="attr_thrwKit" title="Modified by Kit" />
+		        </div>
+		        <div style="display: inline-block; margin-left: 5px;">
+		            <input type="checkbox" name="attr_thrwSup" title="Supported" />
+		        </div>
+                
+            </div>
+            <div class="section_bottom"></div>            
+        </div>
+        
+        <!-- Expert Skills -->
+        <div class="expert">
+            <div class="section_top"></div>
+            <div class="section_middle">
+                <h2>Expert Skill Checks</h2>
+
+                <div class="desc4" style="margin-left: 228px;">Main<span style="margin-left: 15px"></span>Bonus<span style="margin-left: 16px;"></span>Skill<span style="margin-left: 19px;"></span>Total<span style="margin-left: 10px;"></span>Kit<span style="margin-left: 8px;"></span>Sup</div>
+                
+                <!-- Advanced Medicine -->
+                <div class="skillButton3" style="display: inline-block;">
+                    <button type="roll" value="&{template:default} {{name=Advanced Medicine Roll}}">Advanced Medicine {AMed%} - </button>
+                </div>
+	            <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+	                <input type="hidden" name="attr_per" value="0" />
+	                <input type="text" class="sheet-small" name="attr_amedMain" value="@{per}" title="Perception" disabled="true" /> +
+	            </div>
+	            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+	                <input type="hidden" name="attr_will_bonus" value="0" />
+	                <input type="text" class="sheet-small" name="attr_amedBon" value="@{will_bonus}" title="Willpower Bonus" disabled="true" /> +
+	            </div>
+	            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+	                <input type="text" class="sheet-small" name="attr_amedSkill" value="0" title="Skill Level" /> =
+	            </div>
+	            <div style="display: inline-block;">
+	                <input type="hidden" name="attr_amedTotal" value="0" />
+	                <input type="text" class="sheet-small" name="attr_TotalAdvMed" value="@{amedTotal}" title="Total" disabled="true" />
+	            </div>
+	            <div style="display: inline-block; margin-left: 5px;">
+	                <input type="checkbox" name="attr_amedKit" title="Modified by Kit" />
+	            </div>
+	            <div style="display: inline-block; margin-left: 5px;">
+	                <input type="checkbox" name="attr_amedSup" title="Supported" />
+	            </div>
+	            
+	            <!-- Astrogation/Telemetry -->
+                <div class="skillButton3" style="display: inline-block;">
+                    <button type="roll" value="&{template:default} {{name=Astrogation/Telemetry Roll}}">Astrogation/Telemetry {As/Te%} - </button>
+                </div>
+	            <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+	                <input type="hidden" name="attr_per" value="0" />
+	                <input type="text" class="sheet-small" name="attr_asteMain" value="@{per}" title="Perception" disabled="true" /> +
+	            </div>
+	            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+	                <input type="hidden" name="attr_will_bonus" value="0" />
+	                <input type="text" class="sheet-small" name="attr_asteBon" value="@{will_bonus}" title="Willpower Bonus" disabled="true" /> +
+	            </div>
+	            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+	                <input type="text" class="sheet-small" name="attr_asteSkill" value="0" title="Skill Level" /> =
+	            </div>
+	            <div style="display: inline-block;">
+	                <input type="hidden" name="attr_asteTotal" value="0" />
+	                <input type="text" class="sheet-small" name="attr_TotalAstroTel" value="@{asteTotal}" title="Total" disabled="true" />
+	            </div>
+	            <div style="display: inline-block; margin-left: 5px;">
+	                <input type="checkbox" name="attr_asteKit" title="Modified by Kit" />
+	            </div>
+	            <div style="display: inline-block; margin-left: 5px;">
+	                <input type="checkbox" name="attr_asteSup" title="Supported" />
+	            </div>
+	            
+	            <!-- Construction/Engineering -->
+                <div class="skillButton3" style="display: inline-block;">
+                    <button type="roll" value="&{template:default} {{name=Construction/Engineering Roll}}">Construction/Engineering {Co/En%} - </button>
+                </div>
+	            <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+	                <input type="hidden" name="attr_per" value="0" />
+	                <input type="text" class="sheet-small" name="attr_coenMain" value="@{per}" title="Perception" disabled="true" /> +
+	            </div>
+	            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+	                <input type="hidden" name="attr_will_bonus" value="0" />
+	                <input type="text" class="sheet-small" name="attr_coenBon" value="@{will_bonus}" title="Willpower Bonus" disabled="true" /> +
+	            </div>
+	            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+	                <input type="text" class="sheet-small" name="attr_coenSkill" value="0" title="Skill Level" /> =
+	            </div>
+	            <div style="display: inline-block;">
+	                <input type="hidden" name="attr_coenTotal" value="0" />
+	                <input type="text" class="sheet-small" name="attr_TotalConstrEngin" value="@{coenTotal}" title="Total" disabled="true" />
+	            </div>
+	            <div style="display: inline-block; margin-left: 5px;">
+	                <input type="checkbox" name="attr_coenKit" title="Modified by Kit" />
+	            </div>
+	            <div style="display: inline-block; margin-left: 5px;">
+	                <input type="checkbox" name="attr_coenSup" title="Supported" />
+	            </div>
+	            
+	            <!-- Martial Arts -->
+                <div class="skillButton3" style="display: inline-block;">
+                    <button type="roll" value="&{template:default} {{name=Martial Arts Roll}}">Martial Arts {MtlA%} - </button>
+                </div>
+	            <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+	                <input type="hidden" name="attr_str" value="0" />
+	                <input type="text" class="sheet-small" name="attr_mtlaMain" value="@{str}" title="Strength" disabled="true" /> +
+	            </div>
+	            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+	                <input type="hidden" name="attr_will_bonus" value="0" />
+	                <input type="text" class="sheet-small" name="attr_mtlaBon" value="@{will_bonus}" title="Willpower Bonus" disabled="true" /> +
+	            </div>
+	            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+	                <input type="text" class="sheet-small" name="attr_mtlaSkill" value="0" title="Skill Level" /> =
+	            </div>
+	            <div style="display: inline-block;">
+	                <input type="hidden" name="attr_mtlaTotal" value="0" />
+	                <input type="text" class="sheet-small" name="attr_TotalMartialArts" value="@{mtlaTotal}" title="Total" disabled="true" />
+	            </div>
+	            <div style="display: inline-block; margin-left: 5px;">
+	                <input type="checkbox" name="attr_mtlaKit" title="Modified by Kit" />
+	            </div>
+	            <div style="display: inline-block; margin-left: 5px;">
+	                <input type="checkbox" name="attr_mtlaSup" title="Supported" />
+	            </div>
+	            
+	            <!-- Pilot (Vehicle) -->
+                <div class="skillButton3" style="display: inline-block;">
+                    <button type="roll" value="&{template:default} {{name=Pilot (Vehicle) Roll}}">Pilot (Vehicle) {Pil%} - </button>
+                </div>
+	            <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+	                <input type="hidden" name="attr_per" value="0" />
+	                <input type="text" class="sheet-small" name="attr_pilMain" value="@{per}" title="Perception" disabled="true" /> +
+	            </div>
+	            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+	                <input type="hidden" name="attr_will_bonus" value="0" />
+	                <input type="text" class="sheet-small" name="attr_pilBon" value="@{will_bonus}" title="Willpower Bonus" disabled="true" /> +
+	            </div>
+	            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+	                <input type="text" class="sheet-small" name="attr_pilSkill" value="0" title="Skill Level" /> =
+	            </div>
+	            <div style="display: inline-block;">
+	                <input type="hidden" name="attr_pilTotal" value="0" />
+	                <input type="text" class="sheet-small" name="attr_TotalPilot" value="@{pilTotal}" title="Total" disabled="true" />
+	            </div>
+	            <div style="display: inline-block; margin-left: 5px;">
+	                <input type="checkbox" name="attr_pilKit" title="Modified by Kit" />
+	            </div>
+	            <div style="display: inline-block; margin-left: 5px;">
+	                <input type="checkbox" name="attr_pilSup" title="Supported" />
+	            </div>
+	            
+	            <!-- Science (Field) -->
+                <div class="skillButton3" style="display: inline-block;">
+                    <button type="roll" value="&{template:default} {{name=Science (Field) Roll}}">Science (Field) {Sci%} - </button>
+                </div>
+	            <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+	                <input type="hidden" name="attr_per" value="0" />
+	                <input type="text" class="sheet-small" name="attr_sciMain" value="@{per}" title="Perception" disabled="true" /> +
+	            </div>
+	            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+	                <input type="hidden" name="attr_will_bonus" value="0" />
+	                <input type="text" class="sheet-small" name="attr_sciBon" value="@{will_bonus}" title="Willpower Bonus" disabled="true" /> +
+	            </div>
+	            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+	                <input type="text" class="sheet-small" name="attr_sciSkill" value="0" title="Skill Level" /> =
+	            </div>
+	            <div style="display: inline-block;">
+	                <input type="hidden" name="attr_sciTotal" value="0" />
+	                <input type="text" class="sheet-small" name="attr_TotalScience" value="@{sciTotal}" title="Total" disabled="true" />
+	            </div>
+	            <div style="display: inline-block; margin-left: 5px;">
+	                <input type="checkbox" name="attr_sciKit" title="Modified by Kit" />
+	            </div>
+	            <div style="display: inline-block; margin-left: 5px;">
+	                <input type="checkbox" name="attr_sciSup" title="Supported" />
+	            </div>
+	            
+	            <!-- Survival -->
+                <div class="skillButton3" style="display: inline-block;">
+                    <button type="roll" value="&{template:default} {{name=Survival Roll}}">Survival {Srvl%} - </button>
+                </div>
+	            <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+	                <input type="hidden" name="attr_per" value="0" />
+	                <input type="text" class="sheet-small" name="attr_srvlMain" value="@{per}" title="Perception" disabled="true" /> +
+	            </div>
+	            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+	                <input type="hidden" name="attr_will_bonus" value="0" />
+	                <input type="text" class="sheet-small" name="attr_srvlBon" value="@{will_bonus}" title="Willpower Bonus" disabled="true" /> +
+	            </div>
+	            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+	                <input type="text" class="sheet-small" name="attr_srvlSkill" value="0" title="Skill Level" /> =
+	            </div>
+	            <div style="display: inline-block;">
+	                <input type="hidden" name="attr_srvlTotal" value="0" />
+	                <input type="text" class="sheet-small" name="attr_TotalSurvival" value="@{srvlTotal}" title="Total" disabled="true" />
+	            </div>
+	            <div style="display: inline-block; margin-left: 5px;">
+	                <input type="checkbox" name="attr_srvlKit" title="Modified by Kit" />
+	            </div>
+	            <div style="display: inline-block; margin-left: 5px;">
+	                <input type="checkbox" name="attr_srvlSup" title="Supported" />
+	            </div>
+	            
+	            <!-- Toughness -->
+                <div class="skillButton3" style="display: inline-block;">
+                    <button type="roll" value="&{template:default} {{name=Toughness Roll}}">Toughness {Tgh%} - </button>
+                </div>
+	            <div style="display: inline-block; margin-left: 5px; font-size: 18px; font-weight: bolder">
+	                <input type="hidden" name="attr_str" value="0" />
+	                <input type="text" class="sheet-small" name="attr_tghMain" value="@{str}" title="Strength" disabled="true" /> +
+	            </div>
+	            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+	                <input type="hidden" name="attr_will_bonus" value="0" />
+	                <input type="text" class="sheet-small" name="attr_tghBon" value="@{will_bonus}" title="Willpower Bonus" disabled="true" /> +
+	            </div>
+	            <div style="display: inline-block; font-size: 18px; font-weight: bolder">
+	                <input type="text" class="sheet-small" name="attr_tghSkill" value="0" title="Skill Level" /> =
+	            </div>
+	            <div style="display: inline-block;">
+	                <input type="hidden" name="attr_tghTotal" value="0" />
+	                <input type="text" class="sheet-small" name="attr_TotalToughness" value="@{tghTotal}" title="Total" disabled="true" />
+	            </div>
+	            <div style="display: inline-block; margin-left: 5px;">
+	                <input type="checkbox" name="attr_tghKit" title="Modified by Kit" />
+	            </div>
+	            <div style="display: inline-block; margin-left: 5px;">
+	                <input type="checkbox" name="attr_tghSup" title="Supported" />
+	            </div>
+            </div>
+            <div class="section_bottom"></div>            
+        </div>
+          
+        <!-- Specialties/Notes -->
+        <div class="specialties">
+            <div class="section_top"></div>
+            <div class="section_middle" style="padding-bottom: 5px;">
+                <h2>Specialties & Notes</h2>
+                <textarea style="width: 290px; height: 200px; margin-left: 17px; resize: none; scroll: auto;"></textarea>
+            </div>
+            <div class="section_bottom" style="margin-top:-10px;"></div>
+        </div>
+    </div>
+    
+    <!-- Gear and Equipment -->
+    <div class="gear">
+        <div style="float:left; margin: 5px 350px">
+            <div class="section_top"></div>
+            <div class="section_middle">
+                <h2 style="width: 100px; margin-left: 5px;">Kits</h2>
+            </div>
+            <div class="section_bottom"></div>
+        </div>
+        
+        <fieldset class="repeating_gear" style="margin-bottom: 5px;">
+            <div class="equipwrapper">
+                <div class="section_top"></div>
+                <div class="section_middle">
+                    <div style="font-size: 16px; font-weight: bolder; display: inline-block;">
+                        <label style="margin: 15px 0px 0px 20px; display: inline-block;">Name:</label><input type="text" name='attr_gearname' style="display: inline-block; margin: -35px 0px 0px 65px; width: 300px">
+                        <label style="margin: 10px 0px 0px 20px; display: inline-block">Type:</label><input type="text" name='attr_greartype' style="display: inline-block; margin: -35px 0px 0px 65px; width: 300px">
+                        <label style="margin: -1px 0px 0px 20px; display: inline-block; width: 80px">Tech Level:</label><input type="text" name="attr_geartl" class="sheet-small" style="margin: -7px 0px 0px -15px; display: inline-block;">
+                        <label style="margin: 10px 0px 0px 10px; display: inline-block; width: 80px;">CU:</label><input type="text" name="attr_gearcu" class="sheet-small" style="margin: -7px 0px 0px -65px; display: inline-block;">
+                        <label style="margin: 10px 0px 0px 10px; display: inline-block; width: 80px">FC:</label><input type="text" name="attr_gearfc" class="sheet-small" style="margin: -7px 0px 0px -67px; display: inline-block;">
+                        <label style="margin: 10px 0px 0px 10px; display: inline-block; width: 80px;">Tech Points:</label><input type="text" name="attr_geartp" class="sheet-small" style="margin: -7px 0px 0px -8px; display: inline-block;">
+                        <label style="margin: 10px 0px 0px 20px; display: inline-block; width: 80px">Durability:</label><input type="text" name="attr_geardur" class="sheet-small" style="margin: -7px 0px 0px -15px; display: inline-block;">
+                        <label style="margin: 10px 0px 0px 21px; display: inline-block; width: 80px">Capacity:</label><input type="text" name="attr_gearcap" class="sheet-small" style="margin: -7px 0px 0px -29px; display: inline-block;">
+                        <label style="margin: 10px 0px 0px 21px; display: inline-block; width: 80px">Speed:</label><input type="text" name="attr_gearspd" class="sheet-small" style="margin: -7px 0px 0px -40px; display: inline-block; width: 60px">
+                        <label style="margin: 10px -25px 0px 20px; display: inline-block; width: 80px">Lethality:</label>x<input type="text" name="attr_gearleth1" class="sheet-small" style="margin: -5px 2px 0px 2px; display: inline-block;">/ x<input type="text" name="attr_gearleth2" class="sheet-small" style="margin: -5px 2px 0px 2px; display: inline-block;">/ x<input type="text" name="attr_gearleth3" class="sheet-small" style="margin: -5px 0px 0px 2px; display: inline-block;">
+                        <label style="margin: 10px -25px 0px 50px; display: inline-block; width: 80px">Multiplier:</label>x <input type="text" name="attr_gearmult" class="sheet-small" style="margin: -5px 2px 0px 2px; display: inline-block;">
+                        <label style="margin: 10px 0px 0px 20px; display: inline-block; width: 80px;">Skill Checks</label>{<input type="text" name="attr_gearsc1" class="sheet-small" style="margin: -5px 2px 0px 2px; display: inline-block; width: 50px">%} , {<input type="text" name="attr_gearsc2" class="sheet-small" style="margin: -5px 2px 0px 2px; display: inline-block; width: 50px;">%} , {<input type="text" name="attr_gearsc3" class="sheet-small" style="margin: -5px 2px 0px 2px; display: inline-block; width: 50px;">%}<br />
+                        <label style="margin: 10px 0px 0px 20px; display: inline-block; width: 80px;"> .</label>{<input type="text" name="attr_gearsc4" class="sheet-small" style="margin: -5px 2px 0px 2px; display: inline-block; width: 50px">%} , {<input type="text" name="attr_gearsc5" class="sheet-small" style="margin: -5px 2px 0px 2px; display: inline-block; width: 50px;">%} , {<input type="text" name="attr_gearsc6" class="sheet-small" style="margin: -5px 2px 0px 2px; display: inline-block; width: 50px;">%}
+                        <label style="margin: 15px 0px 0px 20px; display: inline-block">Descriptors/DLv.</label><textarea style="width: 85%; margin-left: 20px; margin-top: 5px"></textarea>
+                        <label style="margin: 0px 0px 0px 20px; display: inline-block">External Mods</label><textarea style="width: 85%; margin-left: 20px; margin-top: 5px"></textarea>
+                        <label style="margin: 0px 0px 0px 20px; display: inline-block">Tech Point Upgrades/Tier</label><textarea style="width: 85%; margin-left: 20px; margin-top: 5px"></textarea>
+                        <label style="margin: 0px 0px 0px 20px; display: inline-block">Effects</label><textarea style="width: 85%; margin-left: 20px; margin-top: 5px"></textarea>
+                    </div>
+                </div>
+                <div class="section_bottom"></div>
+            </div>
+        </fieldset>
+    </div>
+    
+</div>
+
+
+
+
+
+
+
+
