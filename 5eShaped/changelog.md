@@ -11,6 +11,17 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 12.0.3
+
+### Bug Fixes
+
+* [#472: Ability check addition in modifiers doesn't seem to add to anything](https://bitbucket.org/mlenser/5eshaped/issues/472/ability-check-addition-in-modifiers-doesnt)
+* [#471: Extra 0 (or number) on ability scores](https://bitbucket.org/mlenser/5eshaped/issues/471/extra-0-or-number-on-ability-scores)
+* [#475: Statblock macro displays unmodified Ability scores](https://bitbucket.org/mlenser/5eshaped/issues/475/statblock-macro-displays-unmodified)
+* [#476: Modifiers: check boxes inside the modifier not honored](https://bitbucket.org/mlenser/5eshaped/issues/476/modifiers-check-boxes-inside-the-modifier)
+* [#461: Long Rest does not do Multiclass Hit Dice correctly](https://bitbucket.org/mlenser/5eshaped/issues/461/long-rest-does-not-do-multiclass-hit-dice)
+* [#473: Spell Repeat does not work unless the spell can be cast at a higher level](https://bitbucket.org/mlenser/5eshaped/issues/473/spell-repeat-does-not-work-unless-the)
+
 ## 12.0.2
 
 ### Bug Fixes
