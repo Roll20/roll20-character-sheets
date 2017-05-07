@@ -11,6 +11,13 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 12.0.4
+
+### Bug Fixes
+
+* Styling cleanups
+* Modifiers now toggle the section on upgrade from the old "Bonuses & Penalties".
+
 ## 12.0.3
 
 ### Bug Fixes
