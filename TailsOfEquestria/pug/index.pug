@@ -1,0 +1,104 @@
+include fields.pug
+
++input('hidden', 'character_sheet')(value='TailsOfEquestria', style='display: none;')
+
+.top
+  img(src='http://ninjadivision.com/wp-content/uploads/2017/02/MLP-Website-Header-900x325.jpg')
+  .mask
+.main-container
+  div
+    .bio
+      +labelledUnderlined('Pony Name:'): +input('text', 'character_name')
+      +labelledUnderlined('Player Name:'): +input('text', 'player_name')
+      +labelledUnderlined('Pony Type:'): +input('text', 'race')
+      +labelledUnderlined('Level:'): +input('number', 'level')
+      +labelledUnderlined('Element of Harmony:'): +select('elementOfHarmony')
+        +option('generosity')
+        +option('honesty')
+        +option('kindness')
+        +option('laughter')
+        +option('loyalty')
+        +option('magic')
+        +option('other')
+    .friendshipTokens
+      h1
+        span F
+        span R
+        span I
+        span E
+        span N
+        span D
+        span S
+        span H
+        span I
+        span P
+      +input('number', 'friendshipTokens')(value='0')
+  div
+    .stamina
+      h1 Stamina:
+      +fraction('stamina')
+    .traits
+      .trait.body
+        label Body
+        +rollButton('body')
+        +selectDice('body')
+      .trait.mind 
+        label Mind
+        +rollButton('mind')
+        +selectDice('mind')
+      .trait.charm
+        label Charm
+        +rollButton('charm')
+        +selectDice('charm')
+  div
+    .talents
+      mixin talent(isCutieMark)
+        - var prefix = isCutieMark ? 'talent_cutieMark_' : '';
+        .talent(class=isCutieMark ? 'talentCutieMark' : '')
+          if(isCutieMark)
+            label CM:
+          else
+            label T:
+          button(type='roll', value='&{template:toe} {{charName=@{character_name}}} {{attr=@{' + prefix + 'name}}} {{result=[[@{' + prefix + 'equation}]]}} {{notes=@{' + prefix + 'notes}}}')
+          +labelledUnderlined(''): +input('text', prefix + 'name')
+          +labelledUnderlined('Dice:'): +selectDice(prefix + 'dice')
+          +labelledUnderlined('Trait'): +selectTrait(prefix + 'trait')
+          +labelledUnderlined('Notes:'): +input('text', prefix + 'notes')
+          +input('hidden', prefix + 'equation')
+
+      h1 Talents:
+      +talent(true)
+      +repeating('talents')
+        +talent(false)
+  div
+    .quirks
+      mixin quirk(isMain)
+        -var prefix = isMain ? 'quirk_main_' : '';
+        .quirk(class=isMain ? 'quirkMain' : '')
+          if(isMain)
+            label Main:
+          else
+            label Q:
+          +labelledUnderlined(''): +input('text', prefix + 'name')
+          +labelledUnderlined('Notes'): +input('text', prefix + 'notes')
+      
+      h1 Quirks:
+      +quirk(true)
+      +repeating('quirks')
+        +quirk(false)
+  
+  div
+    .inlineBlock(style='margin-right: 1em; vertical-align: top; width: 48%;')
+      h1 Equipment:
+      +textarea('equipment')(style='height: 4in;')
+    .inlineBlock(style='width: 48%;')
+      h1 Appearance/Cutie Mark:
+      +textarea('appearance')
+      
+      h1 Campaign Notes:
+      +textarea('campaignNotes')  
+
+script(type='text/worker')
+  include ../js/worker.js
+
+include rolltemplate.pug
