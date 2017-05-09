@@ -5,6 +5,15 @@
 
 ### Changelog
 
+### 1.8.5 on 2017 May 6th
+* Fixed an error that caused actions to not roll because of 'undefined'
+	- Caused by previous fix to Advantage/Disadvantage to the d20 in 1.8.0
+* Added support for modifying the "Level" to calculate XP, Feat Points, and Attribute Points
+	- Previously it was only if you modified XP, now works for both
+* If value higher than 9 or lower than 0 is entered for Attribute, changes it to 0 or 9 as needed
+	- Shouldn't be able to have values higher or lower than these
+	- If value of 10 needed for dice size, can be done via input field within attribute settings "Attribute Dice Bonus/Penalty
+
 ### 1.8.0 on 2017 April 24th
 * Added in Extraordinary/Legendary Item section
 * Fixed an issue where Advantage/Disadvantage to the d20 wasn't working
