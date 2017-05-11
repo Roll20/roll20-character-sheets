@@ -992,30 +992,31 @@
 
 
 
-        <div class="sheet-row">
-            <fieldset class="repeating_custom_skill">
-                <div class='sheet-row'>
-                    <div style="float:left; width:23%; " ><input type="text" style="width:100%; margin-left:-10px" class=""  name="attr_custom_skill_name"></div>
-                    <div style="float:left; width:18%; " ><select style="width:100%;margin-left:-10px" name="attr_custom_skill_governing_attr">
-                        	    <option value="cha">CHA</option>
-                        	    <option value="con">CON</option>
-                        	    <option value="dex">DEX</option>
-                        	    <option value="int">INT</option>
-                        	    <option value="lck">LCK</option>
-                        	    <option value="spd">SPD</option>
-                        	    <option value="str">STR</option>
-                        	    <option value="wis">WIS</option>
-                        	    <!--TODO autopolualte custom attributes-->
-                        	</select></div>
-                    <div style="float:left; width:12%; margin-right:2px " ><input style="width:100%;margin-left:-8px" class="" type="number" name ="attr_custom_skill_score"/></div>
-                    <div style="float:left; width:12%; margin-right:2px " ><input style="width:100%" class="" type="number" name="attr_custom_skill_mod"/></div>
-                    <div style="float:left; width:12%; margin-right:2px " ><input style="width:100%;margin-left:2px" class="" type="number" name="attr_custom_skill_misc"/></div>
-                    <div style="float:left; width:12%; margin-right:2px "><input style="width:100%;margin-left:7px" class="" type="number" name="attr_custom_skill_tallies"/></div>
-                    <div style="float:left; width:6%;"><button style="width:100%;margin-left:7px"  type="roll" name="roll_cust_skill_Check" value="&{template:5eDefault} {{character_name=@{char_name}}}{{title=@{custom_skill_name}}} {{subheader=@{char_name}}} {{subheaderright=Skill}} {{ability=1}} {{simple=1}} {{roll= [[1d20+@{custom_skill_mod}]]}}"></button></button></div>
-                </div>
-            </fieldset>
-        
-        </div>
+   <div class="sheet-row" style="float-left; display:inline">
+		<fieldset class="repeating_skill">
+			<div class="sheet-row" style="clear:none;float:left; display:inline">
+				<div style="float:left; width:23%; " ><input type="text" style="width:100%; margin-left:-10px" class=""  name="attr_custom_skill_name"></div>
+				<div style="float:left; width:18%; " ><select style="width:100%;margin-left:-10px" name="attr_cust_skill_parent_attr">
+							<option value="cha">CHA</option>
+							<option value="con">CON</option>
+							<option value="dex">DEX</option>
+							<option value="int">INT</option>
+							<option value="lck">LCK</option>
+							<option value="spd">SPD</option>
+							<option value="str">STR</option>
+							<option value="wis">WIS</option>
+							<!--TODO autopolualte custom attributes-->
+						</select></div>
+				<div style="float:left; width:12%; margin-right:2px " ><input style="width:100%;margin-left:-8px" class="" type="hidden" name ="attr_cust_skill_score"/></div>
+				<div style="float:left; width:12%; margin-right:2px " ><input style="width:100%;margin-left:-8px" class="" disabled="true" type="number" name ="attr_cust_skill_score_actual" value="@{cust_skill_score}"/></div>
+				<div style="float:left; width:12%; margin-right:2px " ><input style="width:100%" class="" type="hidden" name="attr_cust_skill_mod"/></div>
+				<div style="float:left; width:12%; margin-right:2px " ><input style="width:100%" class="" type="number" disabled="true" name="attr_cust_skill_mod_actual" value="@{cust_skill_mod}"/></div>
+				<div style="float:left; width:12%; margin-right:2px " ><input style="width:100%;margin-left:2px" class="" type="number" name="attr_cust_skill_misc"/></div>
+				<div style="float:left; width:12%; margin-right:2px "><input style="width:100%;margin-left:7px" class="" type="number" name="attr_cust_skill_tallies"/></div>
+				<div style="float:left; width:6%;"><button style="width:100%;margin-left:7px;margin-top:2px"  type="roll" name="roll_cust_skill_Check" value="&{template:5eDefault} {{character_name=@{char_name}}}{{title=@{custom_skill_name}}} {{subheader=@{char_name}}} {{subheaderright=Skill}} {{ability=1}} {{simple=1}} {{roll= [[1d20+@{cust_skill_mod}]]}}"></button></button></div>
+			</div>
+		</fieldset>
+	</div>
 
 
 
@@ -1167,7 +1168,6 @@
 
 //Attributes change
  on("change:strength change:constitution change:dexterity change:intelligence change:wisdom change:charisma change:speed change:luck change:repeating_attribute:custom_att_score change:hp_misc change:abil_misc change:abil_regen_misc change:fortune_misc change:movement_misc change:init_misc", function() {
-   console.log("THE WARDS ARE STILL UP");
    getAttrs(["Strength", "Constitution", "Dexterity", "Intelligence", "Wisdom", "Charisma", "Speed", "Luck", "repeating_attribute_custom_att_score", "hp_misc", "abil_misc", "abil_regen_misc", "fortune_misc", "movement_misc", "init_misc"], function(values) {
      //Update Attribute modifiers
         setAttrs({
@@ -1191,6 +1191,7 @@
    });
   update_skills(); 
   update_defenses();
+  update_custom_skills();
   
    
 });
@@ -1212,7 +1213,111 @@ on("change:race_size change:melee_weapon_attack_two_handed change:ranged_attack_
     update_damage_dice();
 });
 
+on("change:repeating_skill:cust_skill_misc change:repeating_skill:cust_skill_parent_attr", function() {
+ update_custom_skills();
+});
+
+var update_custom_skills=function(){
+
+ /*  
+    getSectionIDs("repeating_skill", function(idarray) {
+      for(var i=0; i < idarray.length; i++) {
+         console.log(idarray[i])
+         getAttrs(["strmod", "conmod", "dexmod", "intmod", "wismod", "chamod", "spdmod", "lckmod","repeating_skill" + idarray[i] + "_cust_skill_misc", "repeating_skill" + idarray[i] + "_cust_skill_parent_attr" ], function(values{
+             
+             
+             
+        var attBonus = 0;
+        
+    
+        switch(values["repeating_skill" + idarray[i] + "_cust_skill_parent_attr"]){
+            case 'str':
+                attBonus = values.strmod
+                break;
+            case 'con':
+                attBonus = values.conmod
+               break;
+            case 'dex':
+                attBonus = values.dexmod
+               break;
+            case 'int':
+                attBonus = values.intmod
+                break;
+            case 'wis':
+                attBonus = values.wismod
+                break;
+            case 'cha':
+                attBonus = values.chamod
+                break;
+            case 'spd':
+                attBonus = values.spdmod
+                break;
+            case 'lck':
+                attBonus = values.lckmod
+                break;
+        }
+
+
+        setAttrs({
+
+          "repeating_skill" + idarray[i] + "_cust_skill_parent_attr": parseInt(values["repeating_skill" + idarray[i] + "_cust_skill_cust_misc") + attBonus
+        });
+             
+             
+             
+         }))
+      }
+   });
+     
+    */
+
+ 
+  getAttrs(["strmod", "conmod", "dexmod", "intmod", "wismod", "chamod", "spdmod", "lckmod", "repeating_skill_cust_skill_misc", "repeating_skill_cust_skill_parent_attr"], function(values) {
+     //Update Attribute modifiers
+    
+    var attrBonus = 0;
+    
+    switch(values.repeating_skill_cust_skill_parent_attr){
+        case 'str':
+            attrBonus = values.strmod
+            break;
+        case 'con':
+            attrBonus = values.conmod
+           break;
+        case 'dex':
+            attrBonus = values.dexmod
+           break;
+        case 'int':
+            attrBonus = values.intmod
+            break;
+        case 'wis':
+            attrBonus = values.wismod
+            break;
+        case 'cha':
+            attrBonus = values.chamod
+            break;
+        case 'spd':
+            attrBonus = values.spdmod
+            break;
+        case 'lck':
+            attrBonus = values.lckmod
+            break;
+    }
+
+
+        setAttrs({
+
+          "repeating_skill_cust_skill_score": parseInt(values.repeating_skill_cust_skill_misc) + attrBonus,
+          "repeating_skill_cust_skill_mod": Math.floor((parseInt(values.repeating_skill_cust_skill_misc) + attrBonus)/10)
+        });
+   });
+
+}
+
+
 var update_skills=function(){
+
+ 
      getAttrs(["race_size", "has_shield", "acrobatics_major", "athletics_major", "block_major", "chemistry_major", "control_major", "craft_major", "destruction_major", "disguise_major", "engineering_major", "enhancement_major", "enlightenment_major", "escape_major", "heavy_armor_major", "interaction_major", "knowledge_major", "light_armor_major", "medicine_major", "melee_weapon_major", "perception_major", "ranged_major", "ride_drive_major", "security_major", "sense_motive_major", "sleight_of_hand_major", "survival_major", "stealth_major", "unarmed_combat_major", "utility_major", "race_size", "has_shield", "skill_ride_drive", "skill_ride_drive_mod", "skill_ride_drive_misc",  "skill_acrobatics_mod", "skill_acrobatics_misc", "skill_sense_motive", "skill_sense_motive_mod", "skill_sense_motive_misc", "skill_melee_weapon", "skill_melee_weapon_mod", "skill_melee_weapon_misc",  "skill_athletics_mod", "skill_athletics_misc", "skill_unarmed_combat", "skill_unarmed_combat_mod", "skill_unarmed_combat_misc",  "skill_block_mod", "skill_block_misc",  "skill_chemistry_mod", "skill_chemistry_misc",  "skill_control_mod", "skill_control_misc",  "skill_craft_mod", "skill_craft_misc",  "skill_destruction_mod", "skill_destruction_misc",  "skill_disguise_mod", "skill_disguise_misc",  "skill_engineering_mod", "skill_engineering_misc",  "skill_enhancement_mod", "skill_enhancement_misc",  "skill_enlightenment_mod", "skill_enlightenment_misc",  "skill_escape_mod", "skill_escape_misc", "skill_heavy_armor", "skill_heavy_armor_mod", "skill_heavy_armor_misc",  "skill_interaction_mod", "skill_interaction_misc",  "skill_knowledge_mod", "skill_knowledge_misc", "skill_light_armor", "skill_light_armor_mod", "skill_light_armor_misc",  "skill_medicine_mod", "skill_medicine_misc",  "skill_perception_mod", "skill_perception_misc",  "skill_ranged_mod", "skill_ranged_misc",  "skill_security_mod", "skill_security_misc", "skill_sleight_of_hand", "skill_sleight_of_hand_mod", "skill_sleight_of_hand_misc",  "skill_survival_mod", "skill_survival_misc",  "skill_stealth_mod", "skill_stealth_misc",  "skill_utility_mod", "skill_utility_misc", "conmod", "dexmod", "spdmod", "wismod", "strmod", "intmod", "chamod"], function(values) {
              
         var acrobatics_base = 10;
@@ -1424,8 +1529,6 @@ var update_skill_mods=function(){
 
 
 var update_damage_dice = function(){
-    console.log("IN FUNCTION");
-
     getAttrs(["race_size", "melee_weapon_attack_two_handed", "ranged_attack_two_handed"], function(values){
         
         var meleedam = 4;
