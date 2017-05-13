@@ -11,6 +11,20 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 13.0.0
+
+### Breaking Changes
+
+* Bonuses for ability scores, ability checks, initiative, saving throws, and ***skills*** have been moved to the "Modifiers" section. Closes [#478: Ability modifier for specific skills?](https://bitbucket.org/mlenser/5eshaped/issues/478/ability-modifier-for-specific-skills) and opens the door to doing [#59: Make attachers work for skills](https://bitbucket.org/mlenser/5eshaped/issues/59/make-attachers-work-for-skills) in the same way.
+* All repeating section macros will now be ordered based on the order that is shown on the sheet. Closes [#185: Regenerate Repeating Section macros when order being changed](https://bitbucket.org/mlenser/5eshaped/issues/185/regenerate-repeating-section-macros-when)
+
+### Bug Fixes
+
+* [#482: "Attack:" should be "Roll:"](https://bitbucket.org/mlenser/5eshaped/issues/482/attack-should-be-roll)
+* [#480: Attack and damage modifiers don't apply to spells](https://bitbucket.org/mlenser/5eshaped/issues/480/attack-and-damage-modifiers-dont-apply-to)
+* Hit points heart is refactored to no longer use Roll20's font to create the heart as it didn't render correctly on iOS.
+* [#477: Ability modifier does not reliably toggle](https://bitbucket.org/mlenser/5eshaped/issues/477/ability-modifier-does-not-reliably-toggle)
+
 ## 12.0.4
 
 ### Bug Fixes
