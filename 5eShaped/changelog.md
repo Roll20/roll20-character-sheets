@@ -20,6 +20,7 @@ The sheet will always upgrade itself unless I specify otherwise, though some thi
 * qty has been removed everywhere on the sheet including ammo which may break ammo reduction. I have upgraded qty for ammo and equipment, but not attacks.
 * Attacks have been renamed `Offense` and they no longer require an attack. `Utility` has been added below `Offense` and it contains healing and content. In some upcoming versions I will add some SRD importing data to utility. Closes [#168: Expand Equipment](https://bitbucket.org/mlenser/5eshaped/issues/168/expand-equipment)
 * Quick removed from equipment and armor. Armor never needed it and equipment only needed it because the utility section didn't exist.
+* passive skills are now named `passive_SKILLNAME`. For example: `passive_perception`.
 
 ### Features
 
