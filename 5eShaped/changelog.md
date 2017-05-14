@@ -11,6 +11,22 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 14.0.0
+
+### Breaking Changes
+
+*There are several breaking changes with regards to the script in this version. See [Ammo qty renamed to "uses"](https://github.com/symposion/roll20-shaped-scripts/issues/489) and [Attacks have been renamed "Offense"](https://github.com/symposion/roll20-shaped-scripts/issues/491). Meaning ammo will likely not auto subtract until it is fixed as well as the attacks token action needing to be updated to offense.*
+
+* qty has been removed everywhere on the sheet including ammo which may break ammo reduction. I have upgraded qty for ammo and equipment, but not attacks.
+* Attacks have been renamed `Offense` and they no longer require an attack. `Utility` has been added below `Offense` and it contains healing and content. In some upcoming versions I will add some SRD importing data to utility. Closes [#168: Expand Equipment](https://bitbucket.org/mlenser/5eshaped/issues/168/expand-equipment)
+* Quick removed from equipment and armor. Armor never needed it and equipment only needed it because the utility section didn't exist.
+
+### Features
+
+* Potions will now automatically add uses and base their weight on uses
+* [#375: Spell uses](https://bitbucket.org/mlenser/5eshaped/issues/375/spell-uses), though they are not editable in presentation mode and the script needs to add functionality to support them
+* [#483: Skill list sorting for different languages](https://bitbucket.org/mlenser/5eshaped/issues/483/skill-list-sorting-for-different-languages)
+
 ## 13.0.1
 
 ### Bug Fixes
@@ -26,7 +42,7 @@ The sheet will always upgrade itself unless I specify otherwise, though some thi
 
 ### Breaking Changes
 
-* Bonuses for ability scores, ability checks, initiative, saving throws, and ***skills*** have been moved to the "Modifiers" section. Closes [#478: Ability modifier for specific skills?](https://bitbucket.org/mlenser/5eshaped/issues/478/ability-modifier-for-specific-skills) and opens the door to doing [#59: Make attachers work for skills](https://bitbucket.org/mlenser/5eshaped/issues/59/make-attachers-work-for-skills) in the same way.
+* Bonuses for ability scores, ability checks, initiative, saving throws, and ***skills*** have been moved to the `Modifiers` section. Closes [#478: Ability modifier for specific skills?](https://bitbucket.org/mlenser/5eshaped/issues/478/ability-modifier-for-specific-skills) and opens the door to doing [#59: Make attachers work for skills](https://bitbucket.org/mlenser/5eshaped/issues/59/make-attachers-work-for-skills) in the same way.
 * All repeating section macros will now be ordered based on the order that is shown on the sheet. Closes [#185: Regenerate Repeating Section macros when order being changed](https://bitbucket.org/mlenser/5eshaped/issues/185/regenerate-repeating-section-macros-when)
 
 ### Bug Fixes
