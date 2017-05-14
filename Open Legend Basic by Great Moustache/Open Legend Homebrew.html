@@ -7,7 +7,6 @@
 		calcToughness();
 		calcResolve();
 		calcHitPoints();
-		calcXPchanges();
 		calcHeavy();
 		calcBulky();
 		calcSpeed();
@@ -31,6 +30,13 @@
 		calcProtection();
 		calcAllActionRolls();
 	});
+	
+	// Function to combine the double columns in Feats, Perks, and Flaws
+	// **** To be removed after a few months, only needed for pre-existing characters
+	// **** Put in 7th of May, 2017
+//	function tempFixColumns() {
+//	    s
+//	};
 
     // Function to determine dice number :: takes in the attribute score :: outputs the dice number
     function calcAttributeDiceNumber(value) {
@@ -766,7 +772,7 @@
             "feat_total_points": value*1 + 6
         });
 	};
-    
+
     // Anytime Agility score is changed, update cost and dice
     on("change:agility_score change:agility_dice_d20 change:agility_cost_modifier change:agility_dice_modifier", function() {
         calcAttributes();
@@ -1879,7 +1885,7 @@
                         score = v.protection_score*1 + v.protection_dice_modifier*1;
                     }
                     if(isNaN(v["repeating_otheractions_" + currentID + "_dice_modifier"])) {
-                        update["repeating_otheractions_" + currentID + "_dice_modifier"] = 0;
+                        updateother["repeating_otheractions_" + currentID + "_dice_modifier"] = 0;
                     } else {
                         score = score*1 + v["repeating_otheractions_" + currentID + "_dice_modifier"]*1;
                     }
@@ -1911,7 +1917,7 @@
 	};
 
 	// Function for calculating rolls for Legendary Items
-    on("change:repeating_legendary:dice_d20 change:repeating_legendary:dice_modifier", function() {
+    on("change:repeating_legendary:dice_roll_d20 change:repeating_legendary:dice_modifier", function() {
         getAttrs(["repeating_legendary_dice_roll_d20", "repeating_legendary_dice_modifier"], function(values) {
             var score = values.repeating_legendary_dice_modifier*1;
             var number = 0;
@@ -2139,8 +2145,8 @@
         });
     });
 	// On Change for calculating rolls for Actions
-    on("change:repeating_otheractions:action_attribute change:repeating_otheractions:dice_d20 change:repeating_otheractions:dice_modifier", function() {
-        getAttrs(["repeating_otheractions_action_attribute", "repeating_otheractions_dice_d20", "repeating_otheractions_dice_modifier", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(values) {
+    on("change:repeating_otheractions:action_attribute change:repeating_otheractions:dice_roll_d20 change:repeating_otheractions:dice_modifier", function() {
+        getAttrs(["repeating_otheractions_action_attribute", "repeating_otheractions_dice_roll_d20", "repeating_otheractions_dice_modifier", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(values) {
             var score = 0;
             if(values.repeating_otheractions_action_attribute === "Agility") {
                 score = values.agility_score*1 + values.agility_dice_modifier*1;
@@ -2190,7 +2196,7 @@
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
 			} else {
-				roll = "[[" + values.repeating_otheractions_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				roll = "[[" + values.repeating_otheractions_dice_roll_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
 			}
             setAttrs({
                 "repeating_otheractions_dice_roll": roll
@@ -2857,7 +2863,7 @@ var TAS = TAS || (function(){
 <!-- Main body of Character Sheet -->
 <div class="container">     <!-- defines the width/height & behavior of the page -->
     <div class="row width100 padBottom">
-        <div class="column textSmall textRight padRight">Fixed Pre-existing Actions not rolling & Can now modify Level & Min/Max Attribute Score enforced :: 2017.05.06 <span class="bold">Version 1.8.5 </span> <input class="settings" type="checkbox" name="attr_sheet_settings_flag" value="hide" /><span>y</span></div>
+        <div class="column textSmall textRight padRight">Fixed Pre-existing Actions not rolling & Can now modify Level & Min/Max Attribute Score enforced :: 2017.05.14 <span class="bold">Version 1.8.6 </span> <input class="settings" type="checkbox" name="attr_sheet_settings_flag" value="hide" /><span>y</span></div>
     </div>
     <div class="row width100">
         <div class="column sliders inlineBlock textSmall bold">Character Info</div>
