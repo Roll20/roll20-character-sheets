@@ -96,6 +96,7 @@
             <input id="skillsRadio" type="radio" class="tabInput" name="tab" />
             <label for="skillsRadio">Skills</label>
             <div id="skillsPanel" class="tabPanel scrollingY">
+                <input type='hidden' name='attr_skillsJSON' value="{}"/>
                 <h2>MIND Skills</h2>
                 <fieldset name="skillsMind" class="repeating_skillsMind">
                     <div>
@@ -130,7 +131,7 @@
                             <div>T</div>
                         </div>
                         <div class="rankBox improved" title="Improved">
-                            <input type="checkbox" name="attr_skillBI value="1"">
+                            <input type="checkbox" name="attr_skillBI" value="1">
                             <div>I</div>
                         </div>
                         <div class="rankBox greater" title="Greater">
@@ -184,6 +185,7 @@
                 <p>
                     This section is for all edges other than Skill Training. Those go over in the Skills section.
                 </p>
+                <input type='hidden' name='attr_edgesJSON' value="{}" />
                 <fieldset name="edges" class="repeating_edges">
                     Name: <input type="text" name="attr_edgeName" style="width: 100px;"/>
                     Effect: <input type="text" name="attr_edgeEffect" />
@@ -579,60 +581,130 @@
         });
     }
 
+
+    function tallySkillXp(attr, id, callback) {
+        var prefix = 'repeating_skills'
+        if(attr === 'mind')
+            prefix += 'Mind_' + id + '_skillM';
+        if(attr === 'body')
+            prefix += 'Body_' + id + '_skillB';
+        if(attr === 'heart')
+            prefix += 'Heart_' + id + '_skillH';
+
+        getAttrs([prefix, prefix + 'T', prefix + 'I', prefix + 'G', prefix + 'Misc', prefix + 'conditionals'], function(values) {
+            var name = values[prefix];
+            var trained = parseInt(values[prefix + 'T']) || 0;
+            var improved = parseInt(values[prefix + 'I']) || 0;
+            var greater = parseInt(values[prefix + 'G']) || 0;
+            var misc = parseInt(values[prefix + 'Misc']) || 0;
+            var notes = values[prefix + 'conditionals'];
+
+            var json = {
+                id: id,
+                name: name,
+                trained: !!trained,
+                improved: !!improved,
+                greater: !!greater,
+                attr: attr,
+                misc: misc,
+                notes: notes
+            };
+
+            var xpSpent = 5*trained + 10*improved + 15*greater;
+            callback(xpSpent, json);
+        });
+    }
+
+    function debugObj(obj) {
+        setAttrs({
+            debug: JSON.stringify(obj)
+        });
+    };
+
+    function tallyEdgeXp(id, callback) {
+        var prefix = 'repeating_edges_' + id + '_edge';
+
+        getAttrs([prefix + 'Name', prefix + 'Effect', prefix + 'T', prefix + 'I', prefix + 'G'], function(values) {
+            var name = values[prefix + 'Name'];
+            var trained = parseInt(values[prefix + 'T']) || 0;
+            var improved = parseInt(values[prefix + 'I']) || 0;
+            var greater = parseInt(values[prefix + 'G']) || 0;
+            var effect = values[prefix + 'Effect'];
+
+            var json = {
+                id: id,
+                name: name,
+                trained: !!trained,
+                improved: !!improved,
+                greater: !!greater,
+                effect: effect
+            };
+
+            debugObj(json);
+
+            var xpSpent = 5*trained + 10*improved + 15*greater;
+            callback(xpSpent, json);
+        });
+    }
+
+
     function updateXpSpent() {
         var xpSpent = 0;
+        var skillsJSON = {};
+        var edgesJSON = {};
 
         var asem = new Asem(1, function() {
             setAttrs({
+                edgesJSON: JSON.stringify(edgesJSON),
+                skillsJSON: JSON.stringify(skillsJSON),
                 xpSpent: xpSpent
             });
         });
 
-
         // Mind skill training
+        asem.wait();
         getSectionIDs('repeating_skillsMind', function(ids) {
             _.each(ids, function(id) {
-                var baseAttr = 'repeating_skillsMind_' + id +'_';
-                parseAttrs([baseAttr + 'skillMT', baseAttr + 'skillMI', baseAttr + 'skillMG'], function(values) {
-                    xpSpent += 5*values[baseAttr + 'skillMT'] + 10*values[baseAttr + 'skillMI'] + 15*values[baseAttr + 'skillMG'];
+                asem.wait();
+                tallySkillXp('mind', id, function(xp, json) {
+                    xpSpent += xp;
+                    skillsJSON[json.name] = json;
                     asem.signal();
                 });
-                asem.wait();
-            })
+            });
             asem.signal();
         });
-        asem.wait();
-
 
         // Body skill training
+        asem.wait();
         getSectionIDs('repeating_skillsBody', function(ids) {
             _.each(ids, function(id) {
-                var baseAttr = 'repeating_skillsBody_' + id +'_';
-                parseAttrs([baseAttr + 'skillBT', baseAttr + 'skillBI', baseAttr + 'skillBG'], function(values) {
-                    xpSpent += 5*values[baseAttr + 'skillBT'] + 10*values[baseAttr + 'skillBI'] + 15*values[baseAttr + 'skillBG'];
+                asem.wait();
+                tallySkillXp('body', id, function(xp, json) {
+                    xpSpent += xp;
+                    skillsJSON[json.name] = json;
                     asem.signal();
                 });
-                asem.wait();
             })
             asem.signal();
         });
-        asem.wait();
 
         // Heart skill training
         getSectionIDs('repeating_skillsHeart', function(ids) {
             _.each(ids, function(id) {
-                var baseAttr = 'repeating_skillsHeart_' + id +'_';
-                parseAttrs([baseAttr + 'skillHT', baseAttr + 'skillHI', baseAttr + 'skillHG'], function(values) {
-                    xpSpent += 5*values[baseAttr + 'skillHT'] + 10*values[baseAttr + 'skillHI'] + 15*values[baseAttr + 'skillHG'];
+                asem.wait();
+                tallySkillXp('heart', id, function(xp, json) {
+                    xpSpent += xp;
+                    skillsJSON[json.name] = json;
                     asem.signal();
                 });
-                asem.wait();
             })
             asem.signal();
         });
         asem.wait();
 
         // Built-in Edges
+        asem.wait();
         parseAttrs(['edgeDetermined', 'edgeDeterminedI', 'edgeDeterminedG',
                     'edgeVitality', 'edgeVitalityI', 'edgeVitalityG',
                     'edgeNobleSoul', 'edgeNobleSoulI', 'edgeNobleSoulG'], function(values) {
@@ -642,25 +714,22 @@
 
             asem.signal();
         });
-        asem.wait();
+
 
         // Custom edges
+        asem.wait();
         getSectionIDs('repeating_edges', function(ids) {
             _.each(ids, function(id) {
-                var baseAttr = 'repeating_edges_' + id + '_';
-                parseAttrs([baseAttr + 'edgeT', baseAttr + 'edgeI', baseAttr + 'edgeG'], function(values) {
-                    setAttrs({
-                        debug: JSON.stringify(values)
-                    });
-
-                    xpSpent += 5*values[baseAttr + 'edgeT'] + 10*values[baseAttr + 'edgeI'] + 15*values[baseAttr + 'edgeG'];
+                asem.wait();
+                tallyEdgeXp(id, function(xp, json) {
+                    xpSpent += xp;
+                    edgesJSON[json.name] = json;
                     asem.signal();
                 });
-                asem.wait();
             });
             asem.signal();
         });
-        asem.wait();
+
 
         asem.signal();
     }
@@ -678,9 +747,7 @@
     });
 
 
-    on('change:repeating_skillsMind:skillMT change:repeating_skillsMind:skillMI change:repeating_skillsMind:skillMG ' +
-        'change:repeating_skillsBody:skillBT change:repeating_skillsBody:skillBI change:repeating_skillsBody:skillBG ' +
-        'change:repeating_skillsHeart:skillHT change:repeating_skillsHeart:skillHI change:repeating_skillsHeart:skillHG ' +
+    on('change:repeating_skillsmind change:repeating_skillsbody change:repeating_skillsheart ' +
         'change:edgeDetermined change:edgeDeterminedI change:edgeDeterminedG ' +
         'change:edgeVitality change:edgeVitalityI change:edgeVitalityG ' +
         'change:edgeNobleSoul change:edgeNobleSoulI change:edgeNobleSoulG ' +
@@ -688,7 +755,6 @@
 
         updateXpSpent();
     });
-
 
     on('sheet:opened', function() {
         updateFortMax();
