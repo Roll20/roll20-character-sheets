@@ -11,6 +11,17 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 13.0.1
+
+### Bug Fixes
+
+* Fixed javascript errors that occur on new characters
+* [#488: Initiative modifier transferred incompletely on upgrade](https://bitbucket.org/mlenser/5eshaped/issues/488/initiative-modifier-transferred)
+* [#487: Upon upgrade, Light Armor loses its type](https://bitbucket.org/mlenser/5eshaped/issues/487/upon-upgrade-light-armor-loses-its-type)
+* [#486: Modifiers: Ability checks double bonus from ability for passive](https://bitbucket.org/mlenser/5eshaped/issues/486/modifiers-ability-checks-double-bonus-from)
+* Initiative second ability moved to Modifiers and upgraded
+* [#485: Skill modifier and initiative modifier dice does not apply](https://bitbucket.org/mlenser/5eshaped/issues/485/skill-modifier-and-initiative-modifier)
+
 ## 13.0.0
 
 ### Breaking Changes
