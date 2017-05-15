@@ -1807,7 +1807,7 @@
     </div>
     <div class="sheet-style_row">
         <div class="sheet-cell" data-i18n="final-value">Final</div>
-        <input type="number" class="sheet-longnum" name="attr_lp_max" class="sheet-longnum""
+        <input type="number" class="sheet-longnum" name="attr_lp_max" class="sheet-longnum"
         value="@{lp_base}+@{lp_multiples}*(@{con_final})+@{lp_class}+@{lp_special}+@{lp_temp}" disabled="true"/>
     </div>
     <div class="sheet-dark_row">
@@ -3590,7 +3590,7 @@
                         <input type="number" name="attr_ki_wp_temp" value="0" min="0"/>
                       </div>
                     </div>
-                </div>
+              </div>
                 <div class="sheet-dark_row">
                     <div class="sheet-cell" style="width:92px;" data-i18n="unified-pool">Unified</div>
                     <input type="number" class="sheet-longnum" name="attr_ki_total" disabled="true" value="@{ki_agi_max}+@{ki_con_max}+@{ki_dex_max}+@{ki_str_max}+@{ki_pow_max}+@{ki_wp_max}" min="0"/>
@@ -4103,23 +4103,23 @@
         </div>
         <div class="sheet-style_row"> 
             <select name="attr_weapon_primary" style="width:65px;">
-                <option value="0" data-i18n="cut">CUT</option>
-                <option value="2" data-i18n="impact">IMP</option>
-                <option value="1" data-i18n="thrust">THR</option>
-                <option value="3" data-i18n="heat">HEA</option>
-                <option value="4" data-i18n="cold">COL</option>
-                <option value="5" data-i18n="electricity">ELE</option>
-                <option value="6" data-i18n="energy">ENE</option>
+                <option value="cut" data-i18n="cut">CUT</option>
+                <option value="impact" data-i18n="impact">IMP</option>
+                <option value="thrust" data-i18n="thrust">THR</option>
+                <option value="heat" data-i18n="heat">HEA</option>
+                <option value="cold" data-i18n="cold">COL</option>
+                <option value="electricity" data-i18n="electricity">ELE</option>
+                <option value="energy" data-i18n="energy">ENE</option>
             </select>
             <select name="attr_weapon_secondary" style="width:65px;">
-                <option value="0" data-i18n="not-available">N/A</option>
-                <option value="1" data-i18n="cut">CUT</option>
-                <option value="3" data-i18n="impact">IMP</option>
-                <option value="2" data-i18n="thrust">THR</option>
-                <option value="4" data-i18n="heat">HEA</option>
-                <option value="5" data-i18n="cold">COL</option>
-                <option value="6" data-i18n="electricity">ELE</option>
-                <option value="7" data-i18n="energy">ENE</option>
+                <option value="not-available" data-i18n="not-available">N/A</option>
+                <option value="cut" data-i18n="cut">CUT</option>
+                <option value="impact" data-i18n="impact">IMP</option>
+                <option value="thrust" data-i18n="thrust">THR</option>
+                <option value="heat" data-i18n="heat">HEA</option>
+                <option value="cold" data-i18n="cold">COL</option>
+                <option value="electricity" data-i18n="electricity">ELE</option>
+                <option value="energy" data-i18n="energy">ENE</option>
             </select>
             <input type="number" name="attr_weapon_basedmg" value="0" min="0">
             <div class="sheet-cell" style="font-size:12pt;font-weight:bold;">+</div>
@@ -4306,7 +4306,7 @@
     <div class="sheet-title" style="margin-bottom:0px;"><span data-i18n="fumble-range">Fumble Range</span> <button type="roll" name="roll_fumble" class="sheet-d100-roll-button" value="@{wtype}[[?{Modifier|0}+?{Last Result|0}-1d100]]"></button></div>
     <div class="sheet-style_row">
       <div class="sheet-cell sheet-sidebubbled" data-i18n="base-value">Base</div>
-      <input type="number" name="attr_f_base" value="90"/>
+      <input type="number" name="attr_f_base" value="3"/>
     </div>
     <div class="sheet-style_row">
       <div class="sheet-cell sheet-sidebubbled" data-i18n="special-bonus">Spec.</div>
@@ -4718,10 +4718,10 @@
     </tr>
     <tr>
       <td>
-        <span data-i18n="primary">Primary</span>: {{primary}}
+        <span data-i18n="primary">Primary</span>: <span data-i18n-dynamic>{{primary}}</span>
       </td>
       <td>
-        <span data-i18n="secondary">Secondary</span>: {{secondary}}
+        <span data-i18n="secondary">Secondary</span>: <span data-i18n-dynamic>{{secondary}}</span>
       </td>
     </tr>
     <tr>
@@ -4738,7 +4738,7 @@
 <!-- Sheet Workers -->
 <script type="text/worker">
     var sheetName = 'Anima Beyond Fantasy';
-    var sheetVersion = '1.1.0';
+    var sheetVersion = '1.1.1';
 
     on('sheet:opened', function(){
         getAttrs(['character_sheet'],function(attrs){
@@ -4749,6 +4749,11 @@
             // do something with sheet_name and sheet_version, if you might be converting
             if(sheet_name == ""){  // Convert to Version 1.0.0
                 convert100();
+                sheet_version='1.0.0';
+            }
+            
+            if(sheet_version < '1.1.1'){  // Convert to Version 1.1.1
+                convert111();
             }
 
             if(sheet_name !== sheetName || (sheetVersion && (sheet_version !== sheetVersion))){
@@ -4810,6 +4815,71 @@
                         newrowattrs["repeating_weapons_" + newrowid + "_weapon_properties"] = x["repeating_rangedweapons_" + currentID + "_rangedweapon_properties"];
                         
                         setAttrs(newrowattrs);
+                    });
+                })
+            }
+        });
+    }
+    
+    var convert111 = function() {
+        getSectionIDs("repeating_weapons", function(idarray) {
+            if(idarray.length > 0) {
+                _.each(idarray, function(currentID, i) {
+                    getAttrs(["repeating_weapons_" + currentID + "_weapon_primary","repeating_weapons_" + currentID + "_weapon_secondary"], function(x) {
+                        var rowattrs = {};
+                        switch(x["repeating_weapons_" + currentID + "_weapon_primary"]) {
+                        	case 0:
+                        		rowattrs["repeating_weapons_" + currentID + "_weapon_primary"] = "cut";
+                        		break;
+                        	case 1:
+                        		rowattrs["repeating_weapons_" + currentID + "_weapon_primary"] = "impact";
+                        		break;
+                        	case 2:
+                        		rowattrs["repeating_weapons_" + currentID + "_weapon_primary"] = "thrust";
+                        		break;
+                        	case 3:
+                        		rowattrs["repeating_weapons_" + currentID + "_weapon_primary"] = "heat";
+                        		break;
+                        	case 4:
+                        		rowattrs["repeating_weapons_" + currentID + "_weapon_primary"] = "cold";
+                        		break;
+                        	case 5:
+                        		rowattrs["repeating_weapons_" + currentID + "_weapon_primary"] = "electricity";
+                        		break;
+                        	case 6:
+                        		rowattrs["repeating_weapons_" + currentID + "_weapon_primary"] = "energy";
+                        		break;
+                        }
+                        switch(x[["repeating_weapons_" + currentID + "_weapon_secondary"]) {
+                        	case 0:
+                        		rowattrs["repeating_weapons_" + currentID + "_weapon_secondary"] = "not-available";
+                        		break;
+                        	case 1:
+                        		rowattrs["repeating_weapons_" + currentID + "_weapon_secondary"] = "cut";
+                        		break;
+                        	case 2:
+                        		rowattrs["repeating_weapons_" + currentID + "_weapon_secondary"] = "impact";
+                        		break;
+                        	case 3:
+                        		rowattrs["repeating_weapons_" + currentID + "_weapon_secondary"] = "thrust";
+                        		break;
+                        	case 4:
+                        		rowattrs["repeating_weapons_" + currentID + "_weapon_secondary"] = "heat";
+                        		break;
+                        	case 5:
+                        		rowattrs["repeating_weapons_" + currentID + "_weapon_secondary"] = "cold";
+                        		break;
+                        	case 6:
+                        		rowattrs["repeating_weapons_" + currentID + "_weapon_secondary"] = "electricity";
+                        		break;
+                        	case 7:
+                        		rowattrs["repeating_weapons_" + currentID + "_weapon_secondary"] = "energy";
+                        		break;
+                        } 
+                        rowattrs["repeating_weapons_" + currentID + "_weapon_primary"] = x["repeating_rangedweapons_" + currentID + "_rangedweapon_name"];
+                        rowattrs["repeating_weapons_" + currentID + "_weapon_secondary"] = x["repeating_rangedweapons_" + currentID + "_rangedweapon_quality"];
+                        
+                        setAttrs(rowattrs);
                     });
                 })
             }
