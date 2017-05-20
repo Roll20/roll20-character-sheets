@@ -11,6 +11,13 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 14.0.1
+
+### Bug Fixes
+
+* [#491: Ammo missing from Offense items](https://bitbucket.org/mlenser/5eshaped/issues/491/ammo-missing-from-offense-items)
+* Completely revamped hit dice to handle an edge case of 3 or more classes including 7 different hit dice in one character while using the "Half" recovery default rule. Closes [#489: Long Rest button doesn't recover hit dice properly](https://bitbucket.org/mlenser/5eshaped/issues/489/long-rest-button-doesnt-recover-hit-dice)
+
 ## 14.0.0
 
 ### Breaking Changes
