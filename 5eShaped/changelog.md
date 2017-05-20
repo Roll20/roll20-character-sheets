@@ -11,6 +11,13 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 14.0.2
+
+### Bug Fixes
+
+* Healing now works for `Utility` items and Other Damage now works for `Offense`.
+* Potion of Healing and other items with a specific wording will now be parsed to heal.
+
 ## 14.0.1
 
 ### Bug Fixes
