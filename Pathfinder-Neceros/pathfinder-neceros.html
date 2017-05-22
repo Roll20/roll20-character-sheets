@@ -33,7 +33,7 @@
 				<li><strong style="font-size:1rem;font-weight:bold;">Fix to skills</strong> not rolling. </li>
 				<li>Armor, Shield, Natural Armor buffs hidden due to continued development in beta changing how they work.</li>
 				<li>Fix to initiative and size buffs</li>
-				<li>Fix to skill size adjustment not resetting.</li>
+				<li>Fix to skill size adjustment not resetting. Added @{size_display} back and translated</li>
 				<li>Fix to default encumbrance and font</li>
 				<li>Melee attack and damage properly split into cmb attack and ranged damage for existing buffs, to account for new buff types</li>
 				<li><strong>Attack row size</strong> dropdown corrected: now can implement <em>Strong Jaw</em> or <em>Improved Natural Attack</em> or change the size of any attack without changing the size of the character.</li>
@@ -660,7 +660,8 @@
 							<span data-i18n="size">Size</span>
 						</label>
 						<label class="sheet-small-label2 sheet-narrow-numbers">
-							<input title="@{size}" type="hidden" name="attr_old_size" value="x" >
+							<input type="hidden" name="attr_old_size" value="x" />
+							<input type="hidden" name="attr_size_display" value="medium" />
 							<input title="@{size}" type="number" name="attr_size" value="0" class="sheet-calc" readonly>
 							<span data-i18n="modifier-abbrv">Mod</span>
 						</label>
@@ -13053,7 +13054,7 @@
     </div>
 	<div data-i18n-aria-label="footer-aria" class="sheet-footer" aria-label="Help links and footer information">
 		<div class="sheet-table">
-			<span data-i18n="footer-info">Created by Samuel Marino w/contributions by Vince, Chris Buchholz, Magik, James W. | Last updated:</span> <i>Sun May 21 2017 20:34:28 GMT &nbsp;&nbsp;</i>v.<input type="text" style="width: 2.5em ; height: 1.4em ; vertical-align: top ; padding: 0px 2px 0 2px ; border: none" name="attr_PFSheet_Version" value="0" class="sheet-calc sheet-number" readonly="" title="A non-blank version indicates attributes have been successfully recalculated.">
+			<span data-i18n="footer-info">Created by Samuel Marino w/contributions by Vince, Chris Buchholz, Magik, James W. | Last updated:</span> <i>Mon May 22 2017 11:58:57 GMT &nbsp;&nbsp;</i>v.<input type="text" style="width: 2.5em ; height: 1.4em ; vertical-align: top ; padding: 0px 2px 0 2px ; border: none" name="attr_PFSheet_Version" value="0" class="sheet-calc sheet-number" readonly="" title="A non-blank version indicates attributes have been successfully recalculated.">
 		</div>
 		<div class="sheet-table" style="margin-top: -.5em;">
 			<span class="sheet-table-cell sheet-3col"><button type="roll" class="sheet-no-decoration" title="url will appear in chat" style="color: #0000ff" name="roll_blank" value="http://tinyurl.com/PF-Thread"><b style="font-size:.75em;" data-i18n="questions-feedback">Questions/Feedback?</b></button></span>
@@ -22298,7 +22299,7 @@ _PFLog.PFLog.modulecount++;
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
-exports.sizeNameMap = exports.skillSizeMap = exports.reverseSizeMap = exports.sizeModToEasySizeMap = undefined;
+exports.reverseSizeNameMap = exports.sizeNameMap = exports.skillSizeMap = exports.reverseSizeMap = exports.sizeModToEasySizeMap = undefined;
 exports.getSizeFromText = getSizeFromText;
 exports.getSizeLevelChange = getSizeLevelChange;
 exports.updateDamageDice = updateDamageDice;
@@ -22388,6 +22389,17 @@ var sizeModToEasySizeMap = exports.sizeModToEasySizeMap = {
 	'tiny': 2,
 	'diminutive': 4,
 	'fine': 8
+},
+    reverseSizeNameMap = exports.reverseSizeNameMap = {
+	'0': 'medium',
+	'1': 'small',
+	'2': 'tiny',
+	'-8': 'colossal',
+	'4': 'diminutive',
+	'-4': 'gargantuan',
+	'-2': 'huge',
+	'-1': 'large',
+	'8': 'fine'
 };
 
 /** getSizeFromText - returns size mod based on size display name
@@ -22542,7 +22554,8 @@ function updateSize(v, eventInfo, setter) {
 	    newlevel = 0,
 	    buffLevels = 0,
 	    skillSize = 0,
-	    changes = false;
+	    tempstr = '',
+	    sizeDisplay = '';
 	try {
 		setter = setter || {};
 		defaultSize = parseInt(v.default_char_size, 10) || 0;
@@ -22555,18 +22568,24 @@ function updateSize(v, eventInfo, setter) {
 			if (buffSize !== size) {
 				setter['size'] = buffSize;
 				size = buffSize;
-				changes = true;
 			}
 		} else if (eventInfo && eventInfo.sourceAttribute.toLowerCase() === 'buff_size-total') {
 			if (size !== defaultSize) {
 				setter['size'] = defaultSize;
 				size = defaultSize;
-				changes = true;
 			}
-		} else if (size !== defaultSize) {
-			changes = true;
 		}
-
+		try {
+			tempstr = reverseSizeMap[String(size)];
+			if (tempstr) {
+				sizeDisplay = getTranslationByKey(sizeDisplay);
+			}
+		} catch (err3) {
+			sizeDisplay = tempstr;
+		}
+		if (sizeDisplay && (sizeDisplay !== v.size_display || !v.size_display)) {
+			setter.size_display = sizeDisplay;
+		}
 		skillSize = skillSizeMap[String(size)];
 		setter.size_skill = skillSize;
 		setter["CMD-size"] = size * -1;
@@ -22585,7 +22604,7 @@ function updateSizeAsync(callback, silently, eventInfo) {
 			callback();
 		}
 	});
-	getAttrs(["size", "size_skill", "size_skill_double", "default_char_size", "CMD-size", "buff_size-total"], function (v) {
+	getAttrs(["size", "size_skill", "size_skill_double", "default_char_size", "CMD-size", "buff_size-total", "size_display"], function (v) {
 		var params = {},
 		    setter = {};
 		try {
@@ -27349,9 +27368,19 @@ function updateModifiedSpeed(callback) {
     });
 }
 function migrate(callback) {
-    if (typeof callback === "function") {
-        callback();
-    }
+    var done = function done() {
+        if (typeof callback === "function") {
+            callback();
+        }
+    };
+    getAttrs(['max-dex-source'], function (v) {
+        var val = parseInt(v['max-dex-source'], 10);
+        if (isNaN(val)) {
+            setAttrs({ 'max-dex-source': 0 }, _PFConst2.default.silentParams, done);
+        } else {
+            done();
+        }
+    });
 }
 function recalculate(callback, silently, oldversion) {
     var done = _underscore2.default.once(function () {
@@ -27370,7 +27399,7 @@ function recalculate(callback, silently, oldversion) {
         updateLoadsAndLift(setEncumbrance, silently);
     });
     try {
-        setLoadCapability();
+        migrate(setLoadCapability);
     } catch (err) {
         _exportsLoaderTASTheAaronSheet2.default.error("PFEncumbrance.recalculate", err);
         done();
