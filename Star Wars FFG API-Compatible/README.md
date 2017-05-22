@@ -20,3 +20,9 @@ Collapsible sections
 
 6.3.2 Updates
 Fixed broken images.
+
+6.4.0 Updates
+Implement translation tags for character vehicule and group sheet
+
+6.4.2 Updates
+Add rolls for NPC in vehicules and fix roll template typo for riding beasts weapons
