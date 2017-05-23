@@ -95,7 +95,7 @@ onChange(['body', 'mind', 'charm'], () => {
 
 on('sheet:opened', () => {
   setAttrs({
-    character_sheet: 'TailsOfEquestria v1.1.0'
+    character_sheet: 'TailsOfEquestria v1.1.1'
   });
   updateTalents();
 });
