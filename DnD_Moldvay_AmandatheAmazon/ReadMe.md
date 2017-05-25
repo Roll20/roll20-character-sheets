@@ -3,9 +3,14 @@
 This is a re-creation of the "green-sheet" for the D&D Basic Moldvay Red box game.  It was created for the Roll20 Moldvay Basic Contest.
 
 ## Current Version
-2.4
+2.5
 
 ### Changelog
+
+#### 2.5
+* Fix for Monster Tab Overlapping UI Error (#2565)
+* Monster Alignment is no longer a drop down box (#2332)
+* Cleaned up some no longer used code
 
 #### 2.4
 * Fix for Monster THAC0 being set to read-only (#2426)

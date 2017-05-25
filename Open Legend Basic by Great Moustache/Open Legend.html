@@ -7,7 +7,6 @@
 		calcToughness();
 		calcResolve();
 		calcHitPoints();
-		calcXPchanges();
 		calcHeavy();
 		calcBulky();
 		calcSpeed();
@@ -31,6 +30,13 @@
 		calcProtection();
 		calcAllActionRolls();
 	});
+	
+	// Function to combine the double columns in Feats, Perks, and Flaws
+	// **** To be removed after a few months, only needed for pre-existing characters
+	// **** Put in 7th of May, 2017
+//	function tempFixColumns() {
+//	    s
+//	};
 
     // Function to determine dice number :: takes in the attribute score :: outputs the dice number
     function calcAttributeDiceNumber(value) {
@@ -742,20 +748,32 @@
 	
     // Anytime XP is updated, recalculate Attribute Points and Feat Points and Level
     on("change:xp", function() {
-		calcXPchanges();
+        getAttrs(["xp"], function(values) {
+            setAttrs({
+                "level": Math.floor(values.xp/3) + 1
+            });
+		calcXPpoints(values.xp);
+        });
+    });
+    
+    on("change:level", function() {
+        getAttrs(["level"], function(values) {
+            setAttrs({
+                "xp": (values.level*1 - 1)*3
+            });
+        calcXPpoints((values.level*1 - 1)*3);
+        });
     });
 
 	// Function to run when XP is changed
-	function calcXPchanges() {
-        getAttrs(["xp"], function(values) {
-            setAttrs({
-                "level": Math.floor(values.xp/3) + 1,
-                "attribute_points": values.xp*3 + 40,
-                "feat_total_points": values.xp*1 + 6
-            });
+	function calcXPpoints(value) {
+        setAttrs({
+            "attribute_points": value*3 + 40,
+            "feat_total_points": value*1 + 6,
+            "xp": value*1
         });
 	};
-    
+
     // Anytime Agility score is changed, update cost and dice
     on("change:agility_score change:agility_dice_d20 change:agility_cost_modifier change:agility_dice_modifier", function() {
         calcAttributes();
@@ -764,8 +782,16 @@
 	// Function for calculating everything to do with Agility
 	function calcAgility() {
         getAttrs(["agility_score", "agility_substitution", "agility_dice_d20", "agility_cost_modifier", "agility_dice_modifier"], function(values) {
-            var score = values.agility_score*1 + values.agility_dice_modifier*1;
-            var scoreCost = values.agility_score*1 + values.agility_cost_modifier*1;
+            var score = values.agility_score*1;
+            if(score < 0) {
+                score = 0;
+                setAttrs({  "agility_score": 0    });
+            } else if(score > 9) {
+                score = 9;
+                setAttrs({  "agility_score": 9    });
+            }
+            var scoreCost = score + values.agility_cost_modifier*1;
+            score = score + values.agility_dice_modifier*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
@@ -803,8 +829,16 @@
 	// Function for calculating everything to do with Fortitude
 	function calcFortitude() {
         getAttrs(["fortitude_score", "fortitude_substitution", "fortitude_dice_d20", "fortitude_cost_modifier", "fortitude_dice_modifier"], function(values) {
-            var score = values.fortitude_score*1 + values.fortitude_dice_modifier*1;
-            var scoreCost = values.fortitude_score*1 + values.fortitude_cost_modifier*1;
+            var score = values.fortitude_score*1;
+            if(score < 0) {
+                score = 0;
+                setAttrs({  "fortitude_score": 0    });
+            } else if(score > 9) {
+                score = 9;
+                setAttrs({  "fortitude_score": 9    });
+            }
+            var scoreCost = score + values.fortitude_cost_modifier*1;
+            score = score + values.fortitude_dice_modifier*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
@@ -838,8 +872,16 @@
 	// Function for calculating everything to do with Might
 	function calcMight() {
         getAttrs(["might_score", "might_substitution", "might_dice_d20", "might_cost_modifier", "might_dice_modifier"], function(values) {
-            var score = values.might_score*1 + values.might_dice_modifier*1;
-            var scoreCost = values.might_score*1 + values.might_cost_modifier*1;
+            var score = values.might_score*1;
+            if(score < 0) {
+                score = 0;
+                setAttrs({  "might_score": 0    });
+            } else if(score > 9) {
+                score = 9;
+                setAttrs({  "might_score": 9    });
+            }
+            var scoreCost = score + values.might_cost_modifier*1;
+            score = score + values.might_dice_modifier*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
@@ -873,8 +915,16 @@
 	// Function for calculating everything to do with Deception
 	function calcDeception() {
         getAttrs(["deception_score", "deception_dice_d20", "deception_cost_modifier", "deception_dice_modifier"], function(values) {
-            var score = values.deception_score*1 + values.deception_dice_modifier*1;
-            var scoreCost = values.deception_score*1 + values.deception_cost_modifier*1;
+            var score = values.deception_score*1;
+            if(score < 0) {
+                score = 0;
+                setAttrs({  "deception_score": 0    });
+            } else if(score > 9) {
+                score = 9;
+                setAttrs({  "deception_score": 9    });
+            }
+            var scoreCost = score + values.deception_cost_modifier*1;
+            score = score + values.deception_dice_modifier*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
@@ -901,8 +951,16 @@
 	// Function for calculating everything to do with Presence
 	function calcPresence() {
         getAttrs(["presence_score", "presence_substitution", "presence_dice_d20", "presence_cost_modifier", "presence_dice_modifier"], function(values) {
-            var score = values.presence_score*1 + values.presence_dice_modifier*1;
-            var scoreCost = values.presence_score*1 + values.presence_cost_modifier*1;
+            var score = values.presence_score*1;
+            if(score < 0) {
+                score = 0;
+                setAttrs({  "presence_score": 0    });
+            } else if(score > 9) {
+                score = 9;
+                setAttrs({  "presence_score": 9    });
+            }
+            var scoreCost = score + values.presence_cost_modifier*1;
+            score = score + values.presence_dice_modifier*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
@@ -936,8 +994,16 @@
 	// Function for calculating everything to do with Persuasion
 	function calcPersuasion() {
         getAttrs(["persuasion_score", "persuasion_dice_d20", "persuasion_cost_modifier", "persuasion_dice_modifier"], function(values) {
-            var score = values.persuasion_score*1 + values.persuasion_dice_modifier*1;
-            var scoreCost = values.persuasion_score*1 + values.persuasion_cost_modifier*1;
+            var score = values.persuasion_score*1;
+            if(score < 0) {
+                score = 0;
+                setAttrs({  "persuasion_score": 0    });
+            } else if(score > 9) {
+                score = 9;
+                setAttrs({  "persuasion_score": 9    });
+            }
+            var scoreCost = score + values.persuasion_cost_modifier*1;
+            score = score + values.persuasion_dice_modifier*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
@@ -964,8 +1030,16 @@
 	// Function for calculating everything to do with Learning
 	function calcLearning() {
         getAttrs(["learning_score", "learning_dice_d20", "learning_cost_modifier", "learning_dice_modifier"], function(values) {
-            var score = values.learning_score*1 + values.learning_dice_modifier*1;
-            var scoreCost = values.learning_score*1 + values.learning_cost_modifier*1;
+            var score = values.learning_score*1;
+            if(score < 0) {
+                score = 0;
+                setAttrs({  "learning_score": 0    });
+            } else if(score > 9) {
+                score = 9;
+                setAttrs({  "learning_score": 9    });
+            }
+            var scoreCost = score + values.learning_cost_modifier*1;
+            score = score + values.learning_dice_modifier*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
@@ -992,8 +1066,16 @@
 	// Function for calculating everything to do with Logic
 	function calcLogic() {
         getAttrs(["logic_score", "logic_dice_d20", "logic_cost_modifier", "logic_dice_modifier"], function(values) {
-            var score = values.logic_score*1 + values.logic_dice_modifier*1;
-            var scoreCost = values.logic_score*1 + values.logic_cost_modifier*1;
+            var score = values.logic_score*1;
+            if(score < 0) {
+                score = 0;
+                setAttrs({  "logic_score": 0    });
+            } else if(score > 9) {
+                score = 9;
+                setAttrs({  "logic_score": 9    });
+            }
+            var scoreCost = score + values.logic_cost_modifier*1;
+            score = score + values.logic_dice_modifier*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
@@ -1020,8 +1102,16 @@
 	// Function for calculating everything to do with Perception
 	function calcPerception() {
         getAttrs(["perception_score", "perception_dice_d20", "perception_cost_modifier", "perception_dice_modifier"], function(values) {
-            var score = values.perception_score*1 + values.perception_dice_modifier*1;
-            var scoreCost = values.perception_score*1 + values.perception_cost_modifier*1;
+            var score = values.perception_score*1;
+            if(score < 0) {
+                score = 0;
+                setAttrs({  "perception_score": 0    });
+            } else if(score > 9) {
+                score = 9;
+                setAttrs({  "perception_score": 9    });
+            }
+            var scoreCost = score + values.perception_cost_modifier*1;
+            score = score + values.perception_dice_modifier*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
@@ -1048,8 +1138,16 @@
 	// Function for calculating everything to do with Will
 	function calcWill() {
         getAttrs(["will_score", "will_substitution", "will_dice_d20", "will_cost_modifier", "will_dice_modifier"], function(values) {
-            var score = values.will_score*1 + values.will_dice_modifier*1;
-            var scoreCost = values.will_score*1 + values.will_cost_modifier*1;
+            var score = values.will_score*1;
+            if(score < 0) {
+                score = 0;
+                setAttrs({  "will_score": 0    });
+            } else if(score > 9) {
+                score = 9;
+                setAttrs({  "will_score": 9    });
+            }
+            var scoreCost = score + values.will_cost_modifier*1;
+            score = score + values.will_dice_modifier*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
@@ -1083,8 +1181,16 @@
 	// Function for calculating everything to do with Alteration
 	function calcAlteration() {
         getAttrs(["alteration_score", "alteration_dice_d20", "alteration_cost_modifier", "alteration_dice_modifier"], function(values) {
-            var score = values.alteration_score*1 + values.alteration_dice_modifier*1;
-            var scoreCost = values.alteration_score*1 + values.alteration_cost_modifier*1;
+            var score = values.alteration_score*1;
+            if(score < 0) {
+                score = 0;
+                setAttrs({  "alteration_score": 0    });
+            } else if(score > 9) {
+                score = 9;
+                setAttrs({  "alteration_score": 9    });
+            }
+            var scoreCost = score + values.alteration_cost_modifier*1;
+            score = score + values.alteration_dice_modifier*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
@@ -1111,8 +1217,16 @@
 	// Function for calculating everything to do with Creation
 	function calcCreation() {
         getAttrs(["creation_score", "creation_dice_d20", "creation_cost_modifier", "creation_dice_modifier"], function(values) {
-            var score = values.creation_score*1 + values.creation_dice_modifier*1;
-            var scoreCost = values.creation_score*1 + values.creation_cost_modifier*1;
+            var score = values.creation_score*1;
+            if(score < 0) {
+                score = 0;
+                setAttrs({  "creation_score": 0    });
+            } else if(score > 9) {
+                score = 9;
+                setAttrs({  "creation_score": 9    });
+            }
+            var scoreCost = score + values.creation_cost_modifier*1;
+            score = score + values.creation_dice_modifier*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
@@ -1139,8 +1253,16 @@
 	// Function for calculating everything to do with Energy
 	function calcEnergy() {
         getAttrs(["energy_score", "energy_dice_d20", "energy_cost_modifier", "energy_dice_modifier"], function(values) {
-            var score = values.energy_score*1 + values.energy_dice_modifier*1;
-            var scoreCost = values.energy_score*1 + values.energy_cost_modifier*1;
+            var score = values.energy_score*1;
+            if(score < 0) {
+                score = 0;
+                setAttrs({  "energy_score": 0    });
+            } else if(score > 9) {
+                score = 9;
+                setAttrs({  "energy_score": 9    });
+            }
+            var scoreCost = score + values.energy_cost_modifier*1;
+            score = score + values.energy_dice_modifier*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
@@ -1167,8 +1289,16 @@
 	// Function for calculating everything to do with Entropy
 	function calcEntropy() {
         getAttrs(["entropy_score", "entropy_dice_d20", "entropy_cost_modifier", "entropy_dice_modifier"], function(values) {
-            var score = values.entropy_score*1 + values.entropy_dice_modifier*1;
-            var scoreCost = values.entropy_score*1 + values.entropy_cost_modifier*1;
+            var score = values.entropy_score*1;
+            if(score < 0) {
+                score = 0;
+                setAttrs({  "entropy_score": 0    });
+            } else if(score > 9) {
+                score = 9;
+                setAttrs({  "entropy_score": 9    });
+            }
+            var scoreCost = score + values.entropy_cost_modifier*1;
+            score = score + values.entropy_dice_modifier*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
@@ -1195,8 +1325,16 @@
 	// Function for calculating everything to do with Influence
 	function calcInfluence() {
         getAttrs(["influence_score", "influence_dice_d20", "influence_cost_modifier", "influence_dice_modifier"], function(values) {
-            var score = values.influence_score*1 + values.influence_dice_modifier*1;
-            var scoreCost = values.influence_score*1 + values.influence_cost_modifier*1;
+            var score = values.influence_score*1;
+            if(score < 0) {
+                score = 0;
+                setAttrs({  "influence_score": 0    });
+            } else if(score > 9) {
+                score = 9;
+                setAttrs({  "influence_score": 9    });
+            }
+            var scoreCost = score + values.influence_cost_modifier*1;
+            score = score + values.influence_dice_modifier*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
@@ -1223,8 +1361,16 @@
 	// Function for calculating everything to do with Movement
 	function calcMovement() {
         getAttrs(["movement_score", "movement_dice_d20", "movement_cost_modifier", "movement_dice_modifier"], function(values) {
-            var score = values.movement_score*1 + values.movement_dice_modifier*1;
-            var scoreCost = values.movement_score*1 + values.movement_cost_modifier*1;
+            var score = values.movement_score*1;
+            if(score < 0) {
+                score = 0;
+                setAttrs({  "movement_score": 0    });
+            } else if(score > 9) {
+                score = 9;
+                setAttrs({  "movement_score": 9    });
+            }
+            var scoreCost = score + values.movement_cost_modifier*1;
+            score = score + values.movement_dice_modifier*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
@@ -1251,8 +1397,16 @@
 	// Function for calculating everything to do with Protection
 	function calcPrescience() {
         getAttrs(["prescience_score", "prescience_dice_d20", "prescience_cost_modifier", "prescience_dice_modifier"], function(values) {
-            var score = values.prescience_score*1 + values.prescience_dice_modifier*1;
-            var scoreCost = values.prescience_score*1 + values.prescience_cost_modifier*1;
+            var score = values.prescience_score*1;
+            if(score < 0) {
+                score = 0;
+                setAttrs({  "prescience_score": 0    });
+            } else if(score > 9) {
+                score = 9;
+                setAttrs({  "prescience_score": 9    });
+            }
+            var scoreCost = score + values.prescience_cost_modifier*1;
+            score = score + values.prescience_dice_modifier*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
@@ -1279,8 +1433,16 @@
 	// Function for calculating everything to do with Protection
 	function calcProtection() {
         getAttrs(["protection_score", "protection_dice_d20", "protection_cost_modifier", "protection_dice_modifier"], function(values) {
-            var score = values.protection_score*1 + values.protection_dice_modifier*1;
-            var scoreCost = values.protection_score*1 + values.protection_cost_modifier*1;
+            var score = values.protection_score*1;
+            if(score < 0) {
+                score = 0;
+                setAttrs({  "protection_score": 0    });
+            } else if(score > 9) {
+                score = 9;
+                setAttrs({  "protection_score": 9    });
+            }
+            var scoreCost = score + values.protection_cost_modifier*1;
+            score = score + values.protection_dice_modifier*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
@@ -1546,6 +1708,13 @@
             });
         });
     });
+    on("change:repeating_legendary:settingsflag", function() {
+        getAttrs(["repeating_legendary_settingsFlag"], function(values) {
+            setAttrs({
+                "repeating_legendary_displaySettingsFlag": showHide(values.repeating_legendary_settingsFlag)
+            });
+        });
+    });
     on("change:repeating_featsLeft:settingsflag", function() {
         getAttrs(["repeating_featsLeft_settingsFlag"], function(values) {
             setAttrs({
@@ -1600,7 +1769,7 @@
         getSectionIDs("repeating_actions", function(actionsArray) {
          if(actionsArray.length > 0) {
             _.each(actionsArray, function(currentID, i) {
-                getAttrs(["repeating_actions_" + currentID + "_action_attribute", "repeating_actions_" + currentID + "_dice_d20", "repeating_actions_" + currentID + "_dice_modifier", "repeating_actions_" + currentID + "_use_power_level", "repeating_actions_" + currentID + "_power_level", "repeating_actions_" + currentID + "_power_level_max", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(v) {
+                getAttrs(["repeating_actions_" + currentID + "_action_attribute", "repeating_actions_" + currentID + "_dice_roll_d20", "repeating_actions_" + currentID + "_dice_modifier", "repeating_actions_" + currentID + "_use_power_level", "repeating_actions_" + currentID + "_power_level", "repeating_actions_" + currentID + "_power_level_max", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(v) {
                     var update = {};
                     var score = 0;
                     if(v["repeating_actions_" + currentID + "_action_attribute"] === "Agility") {
@@ -1651,7 +1820,12 @@
         			if(score === 0) {
         				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
         			} else {
-        				roll = "[[" + v["repeating_actions_" + currentID + "_dice_d20"] + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+        			    if(isNaN(v["repeating_actions_" + currentID + "_dice_roll_d20"])) {
+        			        update["repeating_actions_" + currentID + "_dice_roll_d20"] = "1d20!!";
+            				roll = "[[1d20!! + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+        			    } else {
+            				roll = "[[" + v["repeating_actions_" + currentID + "_dice_roll_d20"] + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+        			    }
         			}
                     if(v["repeating_actions_" + currentID + "_use_power_level"] === "Yes") {
                         update["repeating_actions_" + currentID + "_power_target"] = "[[10 + " + v["repeating_actions_" + currentID + "_power_level"]*2 + "]]";
@@ -1671,7 +1845,7 @@
         getSectionIDs("repeating_otheractions", function(actionsArray) {
          if(actionsArray.length > 0) {
             _.each(actionsArray, function(currentID, i) {
-                getAttrs(["repeating_otheractions_" + currentID + "_action_attribute", "repeating_otheractions_" + currentID + "_dice_d20", "repeating_otheractions_" + currentID + "_dice_modifier", "repeating_otheractions_" + currentID + "_use_power_level", "repeating_otheractions_" + currentID + "_power_level", "repeating_otheractions_" + currentID + "_power_level_max", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(v) {
+                getAttrs(["repeating_otheractions_" + currentID + "_action_attribute", "repeating_otheractions_" + currentID + "_dice_roll_d20", "repeating_otheractions_" + currentID + "_dice_modifier", "repeating_otheractions_" + currentID + "_use_power_level", "repeating_otheractions_" + currentID + "_power_level", "repeating_otheractions_" + currentID + "_power_level_max", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(v) {
                     var updateother = {};
                     var score = 0;
                     if(v["repeating_otheractions_" + currentID + "_action_attribute"] === "Agility") {
@@ -1712,7 +1886,7 @@
                         score = v.protection_score*1 + v.protection_dice_modifier*1;
                     }
                     if(isNaN(v["repeating_otheractions_" + currentID + "_dice_modifier"])) {
-                        update["repeating_otheractions_" + currentID + "_dice_modifier"] = 0;
+                        updateother["repeating_otheractions_" + currentID + "_dice_modifier"] = 0;
                     } else {
                         score = score*1 + v["repeating_otheractions_" + currentID + "_dice_modifier"]*1;
                     }
@@ -1722,7 +1896,12 @@
         			if(score === 0) {
         				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
         			} else {
-        				roll = "[[" + v["repeating_otheractions_" + currentID + "_dice_d20"] + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+        			    if(isNaN(v["repeating_otheractions_" + currentID + "_dice_roll_d20"])) {
+        			        updateother["repeating_otheractions_" + currentID + "_dice_roll_d20"] = "1d20!!";
+            				roll = "[[1d20!! + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+        			    } else {
+            				roll = "[[" + v["repeating_otheractions_" + currentID + "_dice_roll_d20"] + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+        			    }
         			}
                     if(v["repeating_otheractions_" + currentID + "_use_power_level"] === "Yes") {
                         updateother["repeating_otheractions_" + currentID + "_power_target"] = "[[10 + " + v["repeating_otheractions_" + currentID + "_power_level"]*2 + "]]";
@@ -1739,8 +1918,8 @@
 	};
 
 	// Function for calculating rolls for Legendary Items
-    on("change:repeating_legendary:dice_d20 change:repeating_legendary:dice_modifier", function() {
-        getAttrs(["repeating_legendary_dice_d20", "repeating_legendary_dice_modifier"], function(values) {
+    on("change:repeating_legendary:dice_roll_d20 change:repeating_legendary:dice_modifier", function() {
+        getAttrs(["repeating_legendary_dice_roll_d20", "repeating_legendary_dice_modifier"], function(values) {
             var score = values.repeating_legendary_dice_modifier*1;
             var number = 0;
             var type = "";
@@ -1794,7 +1973,12 @@
                 }
             }
 			var roll = "";
-			roll = "[[" + values.repeating_legendary_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+		    if(isNaN(values.repeating_legendary_dice_roll_d20)) {
+		        setAttrs({  "repeating_legendary_dice_roll_d20": "1d20!!"   });
+				roll = "[[1d20!! + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+		    } else {
+    			roll = "[[" + values.repeating_legendary_dice_roll_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+		    }
             setAttrs({
                 "repeating_legendary_dice_roll": roll
             });
@@ -1846,9 +2030,65 @@
             }
         });
     });
+
+    // On Change for d20 of favored actions
+    on("change:repeating_legendary:select_dice_d20", function() {
+        getAttrs(["repeating_legendary_select_dice_d20"], function(values) {
+            switch(values.repeating_legendary_select_dice_d20) {
+                case "Normal":
+                    setAttrs({  "repeating_legendary_dice_roll_d20": "1d20!!" });
+                    break;
+                case "Advantage":
+                    setAttrs({  "repeating_legendary_dice_roll_d20": "2d20!!kh1" });
+                    break;
+                case "Disadvantage":
+                    setAttrs({  "repeating_legendary_dice_roll_d20": "2d20!!kl1" });
+                    break;
+                default:
+                    setAttrs({  "repeating_legendary_dice_roll_d20": "1d20!!" });
+            }
+        });
+    });
+    // On Change for d20 of other actions
+    on("change:repeating_otheractions:select_dice_d20", function() {
+        getAttrs(["repeating_otheractions_select_dice_d20"], function(values) {
+            switch(values.repeating_otheractions_select_dice_d20) {
+                case "Normal":
+                    setAttrs({  "repeating_otheractions_dice_roll_d20": "1d20!!" });
+                    break;
+                case "Advantage":
+                    setAttrs({  "repeating_otheractions_dice_roll_d20": "2d20!!kh1" });
+                    break;
+                case "Disadvantage":
+                    setAttrs({  "repeating_otheractions_dice_roll_d20": "2d20!!kl1" });
+                    break;
+                default:
+                    setAttrs({  "repeating_otheractions_dice_roll_d20": "1d20!!" });
+            }
+        });
+    });
+    // On Change for d20 of favored actions
+    on("change:repeating_actions:select_dice_d20", function() {
+        getAttrs(["repeating_actions_select_dice_d20"], function(values) {
+            switch(values.repeating_actions_select_dice_d20) {
+                case "Normal":
+                    setAttrs({  "repeating_actions_dice_roll_d20": "1d20!!" });
+                    break;
+                case "Advantage":
+                    setAttrs({  "repeating_actions_dice_roll_d20": "2d20!!kh1" });
+                    break;
+                case "Disadvantage":
+                    setAttrs({  "repeating_actions_dice_roll_d20": "2d20!!kl1" });
+                    break;
+                default:
+                    setAttrs({  "repeating_actions_dice_roll_d20": "1d20!!" });
+            }
+        });
+    });
+
 	// On Change for calculating rolls for Actions
-    on("change:repeating_actions:action_attribute change:repeating_actions:dice_d20 change:repeating_actions:dice_modifier", function() {
-        getAttrs(["repeating_actions_action_attribute", "repeating_actions_dice_d20", "repeating_actions_dice_modifier", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(values) {
+    on("change:repeating_actions:action_attribute change:repeating_actions:dice_roll_d20 change:repeating_actions:dice_modifier", function() {
+        getAttrs(["repeating_actions_action_attribute", "repeating_actions_dice_roll_d20", "repeating_actions_dice_modifier", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(values) {
             var score = 0;
             if(values.repeating_actions_action_attribute === "Agility") {
                 score = values.agility_score*1 + values.agility_dice_modifier*1;
@@ -1898,7 +2138,7 @@
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
 			} else {
-				roll = "[[" + values.repeating_actions_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				roll = "[[" + values.repeating_actions_dice_roll_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
 			}
             setAttrs({
                 "repeating_actions_dice_roll": roll
@@ -1906,8 +2146,8 @@
         });
     });
 	// On Change for calculating rolls for Actions
-    on("change:repeating_otheractions:action_attribute change:repeating_otheractions:dice_d20 change:repeating_otheractions:dice_modifier", function() {
-        getAttrs(["repeating_otheractions_action_attribute", "repeating_otheractions_dice_d20", "repeating_otheractions_dice_modifier", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(values) {
+    on("change:repeating_otheractions:action_attribute change:repeating_otheractions:dice_roll_d20 change:repeating_otheractions:dice_modifier", function() {
+        getAttrs(["repeating_otheractions_action_attribute", "repeating_otheractions_dice_roll_d20", "repeating_otheractions_dice_modifier", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(values) {
             var score = 0;
             if(values.repeating_otheractions_action_attribute === "Agility") {
                 score = values.agility_score*1 + values.agility_dice_modifier*1;
@@ -1957,7 +2197,7 @@
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
 			} else {
-				roll = "[[" + values.repeating_otheractions_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				roll = "[[" + values.repeating_otheractions_dice_roll_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
 			}
             setAttrs({
                 "repeating_otheractions_dice_roll": roll
@@ -2624,7 +2864,7 @@ var TAS = TAS || (function(){
 <!-- Main body of Character Sheet -->
 <div class="container">     <!-- defines the width/height & behavior of the page -->
     <div class="row width100 padBottom">
-        <div class="column textSmall textRight padRight">Added Extraordinary/Legendary Items :: 2017.04.24 <span class="bold">Version 1.8.0 </span> <input class="settings" type="checkbox" name="attr_sheet_settings_flag" value="hide" /><span>y</span></div>
+        <div class="column textSmall textRight padRight">Fixed Pre-existing Actions not rolling & Can now modify Level & Min/Max Attribute Score enforced :: 2017.05.14 <span class="bold">Version 1.8.6 </span> <input class="settings" type="checkbox" name="attr_sheet_settings_flag" value="hide" /><span>y</span></div>
     </div>
     <div class="row width100">
         <div class="column sliders inlineBlock textSmall bold">Character Info</div>
@@ -4058,13 +4298,13 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                             <input type="hidden" name="attr_dice_roll" value=0 />
                             <div class="column width75 inlineBlock">Attribute Dice Bonus/Penalty:</div>
                             <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_dice_modifier" value=0 /></div>
+                            <input type="hidden" name="attr_dice_roll_d20" value='1d20!!' />
                             <div class="column width55 inlineBlock">d20 for this action is:</div>
-                            <input type="hidden" name="attr_dice_d20" value="1d20!!" />
                             <div class="column width45 inlineBlock inputSelect">
-                                <select name="attr_dice_d20">
-                                    <option value="1d20!!" selected="selected">Normal</option>
-                                    <option value="2d20!!kh1">Advantage</option>
-                                    <option value="2d20!!kl1">Disadvantage</option>
+                                <select name="attr_select_dice_d20">
+                                    <option value="Normal" selected="selected">Normal</option>
+                                    <option value="Advantage">Advantage</option>
+                                    <option value="Disadvantage">Disadvantage</option>
                                 </select>
                             </div>
                             <input type="hidden" name="attr_power_target" value="" />
@@ -4144,13 +4384,13 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                             <input type="hidden" name="attr_dice_roll" value=0 />
                             <div class="column width75 inlineBlock">Attribute Dice Bonus/Penalty:</div>
                             <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_dice_modifier" value=0 /></div>
+                            <input type="hidden" name="attr_dice_roll_d20" value='1d20!!' />
                             <div class="column width55 inlineBlock">d20 for this action is:</div>
-                            <input type="hidden" name="attr_dice_d20" value="1d20!!" />
                             <div class="column width45 inlineBlock inputSelect">
-                                <select name="attr_dice_d20">
-                                    <option value="1d20!!" selected="selected">Normal</option>
-                                    <option value="2d20!!kh1">Advantage</option>
-                                    <option value="2d20!!kl1">Disadvantage</option>
+                                <select name="attr_select_dice_d20">
+                                    <option value="Normal" selected="selected">Normal</option>
+                                    <option value="Advantage">Advantage</option>
+                                    <option value="Disadvantage">Disadvantage</option>
                                 </select>
                             </div>
                             <input type="hidden" name="attr_power_target" value="" />
@@ -4243,13 +4483,13 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                                     <option value="10">10 = 4d8</option>
                                 </select>
                             </div>
+                            <input type="hidden" name="attr_dice_roll_d20" value='1d20!!' />
                             <div class="column width55 inlineBlock">d20 for this action is:</div>
-                            <input type="hidden" name="attr_dice_d20" value="1d20!!" />
                             <div class="column width45 inlineBlock inputSelect">
-                                <select name="attr_dice_d20">
-                                    <option value="1d20!!" selected="selected">Normal</option>
-                                    <option value="2d20!!kh1">Advantage</option>
-                                    <option value="2d20!!kl1">Disadvantage</option>
+                                <select name="attr_select_dice_d20">
+                                    <option value="Normal" selected="selected">Normal</option>
+                                    <option value="Advantage">Advantage</option>
+                                    <option value="Disadvantage">Disadvantage</option>
                                 </select>
                             </div>
                             <input type="hidden" name="attr_power_target" value="" />
