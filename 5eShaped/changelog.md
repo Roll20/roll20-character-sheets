@@ -22,7 +22,7 @@ The sheet will always upgrade itself unless I specify otherwise, though some thi
 ### Bug Fixes
 
 * Weight for `Offense`, `Utility`, `Equipment`, and `Armor` will now update the total properly when an individual item is adjusted. Closes [#493: Weight Totals Incorrect](https://bitbucket.org/mlenser/5eshaped/issues/493/weight-totals-incorrect). An upgrade should force calculate the weight of each of these sections.
-* Any item with qty upgraded as part of 14.0.0 will have its `weight` transferred to `weight_per_use`. Existing characters will need to manually adjust the values (and remove `uses_max`). Closes [#495: Item quantity/weight after upgrade to 14.0.x](https://bitbucket.org/mlenser/5eshaped/issues/495/item-quantity-weight-after-upgrade-to-140x).
+* Any item with qty upgraded as part of 14.0.0 will no longer have its `weight` transferred to `weight_per_use`. Existing characters will need to manually adjust the values (and remove `uses_max`). Closes [#495: Item quantity/weight after upgrade to 14.0.x](https://bitbucket.org/mlenser/5eshaped/issues/495/item-quantity-weight-after-upgrade-to-140x).
 
 ## 14.0.2
 
