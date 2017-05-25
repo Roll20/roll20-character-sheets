@@ -11,6 +11,19 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 14.1.0
+
+### Features
+
+* `uses_max` will now only show if there is a recharge value. This makes items like potions and other consumables or even non-consumables much more logical sense. I have removed `uses_max` from all sections unless the recharge is set. This will capture the most common case of the `uses_max` being automatically added by me. The other case of an item being manually recharged will have its `uses_max` removed as well and that will need to be manually turned back on.
+* `weight_per_use` is a toggle, not a separate field. It has been upgraded.
+* Parsed ammo from SRD for all PHB weapons like Longbow, Dart, Net, Crossbow, Handaxe, Dagger, Javelin, etc. Weight is set appropriately. Closes [#8: Auto populate ammo when dragging ranged weapons from the SRD](https://bitbucket.org/mlenser/5eshaped/issues/8/auto-populate-ammo-when-dragging-ranged)
+
+### Bug Fixes
+
+* Weight for `Offense`, `Utility`, `Equipment`, and `Armor` will now update the total properly when an individual item is adjusted. Closes [#493: Weight Totals Incorrect](https://bitbucket.org/mlenser/5eshaped/issues/493/weight-totals-incorrect). An upgrade should force calculate the weight of each of these sections.
+* Any item with qty upgraded as part of 14.0.0 will have its `weight` transferred to `weight_per_use`. Existing characters will need to manually adjust the values (and remove `uses_max`). Closes [#495: Item quantity/weight after upgrade to 14.0.x](https://bitbucket.org/mlenser/5eshaped/issues/495/item-quantity-weight-after-upgrade-to-140x).
+
 ## 14.0.2
 
 ### Bug Fixes
