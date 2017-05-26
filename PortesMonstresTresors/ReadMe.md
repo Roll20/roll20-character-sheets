@@ -8,7 +8,7 @@ PMT est une adaptation de **Labyrinth Lord**, r&eacute;alis&eacute;e par [Arasmo
 Le jeu complet est disponible gratuitement en PDF sur le site du [Scriptorium](https://le-scriptorium.fr/jeux-de-role/portes-monstres-tresors/), et en version papier sur [Lulu](http://www.lulu.com/shop/daniel-proctor-and-james-manez/portes-monstres-tr%C3%A9sors/hardcover/product-22096059.html) ou [Amazon](http://www.amazon.fr/Portes-Monstres-Tresors-daventures-fantastiques/dp/1508659044).
 
 # Version courante
-4.3 [Screenshot](pmt_v4.jpg)
+4.4 [Screenshot](pmt_v4.jpg)
 
 # Script API de création de personnage
 Un [script API](pmt.js) est disponible pour créer des personnages rapidement (le taux de mortalité est élevé en OSR ;) ).
@@ -43,6 +43,9 @@ Si ces informations n'apparaissent pas, fermer la feuille et réouvrez la après
 Par défaut, le personnage créé est attribué au joueur qui a cliqué dans le chat (même s'il est visible par tous, seul ce joueur et le MJ pourront modifier le personnage).
 
 # Notes de version
+
+##v4.4 (18 Février 2017).
+Correction du calcul d'encombrement.
 
 ##v4.3 (18 Décembre 2016).
 Correction du calcul d'encombrement.
