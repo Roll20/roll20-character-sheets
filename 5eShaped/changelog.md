@@ -11,6 +11,14 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+
+## 14.1.1
+
+### Bug Fixes
+
+* `Offense` is included in the equipment tab again
+* [#499: Equipment weight does not recalculate](https://bitbucket.org/mlenser/5eshaped/issues/499/equipment-weight-does-not-recalculate)
+
 ## 14.1.0
 
 ### Features
