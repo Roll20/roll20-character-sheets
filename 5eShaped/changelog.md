@@ -11,6 +11,20 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 14.2.0
+
+### Features
+
+* Added a macro to output all resistances and immunities
+* Changing an attack type from melee to ranged or vice versa will now update the attack and damage abilities as appropriate. It can be changed afterwards if houserules are desired.
+* Changing an armor type will now update the dexterity as appropriate. It can be changed afterwards if houserules are desired. Closes [#468: Dex mod retained when upgrading armor to Plate Armor from Leather Armor](https://bitbucket.org/mlenser/5eshaped/issues/468/dex-mod-retained-when-upgrading-armor-to)
+* Acid, Alchemist's Fire, Antitoxin, Ball Bearings, Caltrops, Chalk, Healer's Kit, Holy Water, Ink, Oil, Perfume, Basic Poison, Rations, Iron Spikes, and Waterskin will be parsed to have uses when dragged from the SRD or typed in.
+* Items with charges (such as Wand of Magic Missiles) will be parsed to have uses and recharge manually
+* Added a "add common items" button to the equipment section to automatically add Backpack, Bedroll, Common Clothes, Rations, Waterskin, Mess Kit, Tinderbox, and a Healer's Kit
+
+### Bug Fixes
+
+* Armor is never calculated on a per repeating item basis to avoid any AC calculation issues. Closes [#502: Armor not adding in 14.1.1](https://bitbucket.org/mlenser/5eshaped/issues/502/armor-not-adding-in-1411)
 
 ## 14.1.1
 
