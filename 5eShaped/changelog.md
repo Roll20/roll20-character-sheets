@@ -20,7 +20,7 @@ The sheet will always upgrade itself unless I specify otherwise, though some thi
 * Changing an armor type will now update the dexterity as appropriate. It can be changed afterwards if houserules are desired. Closes [#468: Dex mod retained when upgrading armor to Plate Armor from Leather Armor](https://bitbucket.org/mlenser/5eshaped/issues/468/dex-mod-retained-when-upgrading-armor-to)
 * Acid, Alchemist's Fire, Antitoxin, Ball Bearings, Caltrops, Chalk, Healer's Kit, Holy Water, Ink, Oil, Perfume, Basic Poison, Rations, Iron Spikes, and Waterskin will be parsed to have uses when dragged from the SRD or typed in.
 * Items with charges (such as Wand of Magic Missiles) will be parsed to have uses and recharge manually
-* Added a "add common items" button to the equipment section to automatically add Backpack, Bedroll, Common Clothes, Rations, Waterskin, Mess Kit, Tinderbox, and a Healer's Kit
+* Added a "add common items" button to the equipment section to automatically add Backpack, Bedroll, Traveler's Clothes, Rations, Waterskin, Mess Kit, Tinderbox, and a Healer's Kit
 
 ### Bug Fixes
 
