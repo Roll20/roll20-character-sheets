@@ -528,15 +528,15 @@
     </div>
     <div class="sheet-3colrow sheet-saves">
       <div class="sheet-col">
-        <input type="number" min="0" name="attr_save_physical" class="sheet-stats-save">
+        <input readonly type="number" min="0" name="attr_save_physical" class="sheet-stats-save">
         <button name="roll_save_physical" type="roll" value="/me &{template:save} {{rollValue=[[1d20]]}} {{save=[[@{save_physical}]]}} {{characterName=@{name}}} {{type=Physical}}"></button>
       </div>
       <div class="sheet-col">
-        <input type="number" min="0" name="attr_save_mental" class="sheet-stats-save">
+        <input readonly type="number" min="0" name="attr_save_mental" class="sheet-stats-save">
         <button name="roll_save_mental" type="roll" value="/me &{template:save} {{rollValue=[[1d20]]}} {{save=[[@{save_mental}]]}} {{characterName=@{name}}} {{type=Mental}}"></button>
       </div>
       <div class="sheet-col">
-        <input type="number" min="0" name="attr_save_evasion" class="sheet-stats-save">
+        <input readonly type="number" min="0" name="attr_save_evasion" class="sheet-stats-save">
         <button name="roll_save_evasion" type="roll" value="/me &{template:save} {{rollValue=[[1d20]]}} {{save=[[@{save_evasion}]]}} {{characterName=@{name}}} {{type=Evasion}}"></button>
       </div>
     </div>
@@ -769,6 +769,16 @@
           </div>
         </div>
       </div>
+      <div class="sheet-col">
+        <div class="sheet-2colrow">
+          <div class="sheet-col">
+            <label for="attr_skill_points" class="sheet-skill-points-unspent">Unspent Skill Points</label>
+          </div>
+          <div class="sheet-col">
+            <input type="number" min="-1" name="attr_skill_points">
+          </div>
+        </div>
+      </div>
     </div>
     <div class="sheet-row">
       Cost to raise by 1: Class Skill = New Level +1, Other = New level + 2
@@ -845,7 +855,6 @@
           </div>
         </div>
       </div>
-    </div>
     <div class="sheet-2colrow">
       <div class="sheet-col">
         <div class="sheet-row sheet-psionics-power"><label>Psionic Techniques</label></div>
@@ -1660,13 +1669,11 @@ on("sheet:opened", function() {
   calculateMaxStrain();
   validateStrain();
   validateGear();
-  calculateSaves();
 });
 
 on("change:str change:int change:dex change:wis change:con change:cha", function(e) {
   var attr = e.sourceAttribute;
   calculateMod([attr]);
-  calculateSaves();
 
   console.log(attr);
   if (attr === 'con') {
@@ -1718,12 +1725,12 @@ on("change:repeating_gear", function() {
  * Calculations
  */
 calculateSaves = function() {
-  var updatedSaves = {};
-  getAttrs(["str_bonus", "con_bonus", "cha_bonus", "wis_bonus", "dex_bonus", "int_bonus" "level"], function (v) {
-    updatedSaves[save_physical] = 16 - v["level"] - Math.max(v["str_bonus"], v["con_bonus"]);
-    updatedSaves[save_mental] = 16 - v["level"] - Math.max(v["cha_bonus"], v["wis_bonus"]);
-    updatedSaves[save_evasion] = 16 - v["level"] - Math.max(v["int_bonus"], v["dex_bonus"]);
-    setAttrs(updatedSaves);
+  getAttrs(["str_bonus", "con_bonus", "cha_bonus", "wis_bonus", "dex_bonus", "int_bonus", "level"], function (v) {
+    setAttrs({
+      save_physical: 16 - v.level - Math.max(v.str_bonus, v.con_bonus),
+      save_mental: 16 - v.level - Math.max(v.cha_bonus, v.wis_bonus),
+      save_evasion: 16 - v.level - Math.max(v.int_bonus, v.dex_bonus)
+    });
   });
 }
 
@@ -1751,8 +1758,14 @@ calculateMod = function(attributes) {
         v[attrModMisc] = 0;
       }
       updatedVal[attrModName] += parseInt(v[attrModMisc]);
-
       setAttrs(updatedVal);
+      getAttrs(["str_bonus", "con_bonus", "cha_bonus", "wis_bonus", "dex_bonus", "int_bonus", "level"], function (v) {
+        setAttrs({
+        save_physical: 16 - v.level - Math.max(v.str_bonus, v.con_bonus),
+        save_mental: 16 - v.level - Math.max(v.cha_bonus, v.wis_bonus),
+        save_evasion: 16 - v.level - Math.max(v.int_bonus, v.dex_bonus)
+        });
+      });
     });
   });
 }
