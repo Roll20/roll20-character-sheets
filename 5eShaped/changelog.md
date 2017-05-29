@@ -11,6 +11,13 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 14.2.1
+
+### Bug Fixes
+
+* [#504: New spells are broken due to a Javascript error](https://bitbucket.org/mlenser/5eshaped/issues/504/new-spells-are-broken-due-to-a-javascript)
+* Cleaned up my release cycle so that the process is streamlined and another developer could pick it up if that ever happens
+
 ## 14.2.0
 
 ### Features
