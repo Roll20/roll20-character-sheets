@@ -855,6 +855,7 @@
           </div>
         </div>
       </div>
+    </div>
     <div class="sheet-2colrow">
       <div class="sheet-col">
         <div class="sheet-row sheet-psionics-power"><label>Psionic Techniques</label></div>
@@ -864,7 +865,7 @@
           <div class="sheet-col"><label>Uncommited Effort</label></div>
           <div class="sheet-col"><input type="number" min="0" name="attr_psionics_uncommited_effort"></div>
           <div class="sheet-col"><label>Total Effort</label></div>
-          <div class="sheet-col"><input type="number" min="0" name="attr_psionics_total_effort"></div>
+          <div class="sheet-col"><input readonly type="number" min="0" name="attr_psionics_total_effort"></div>
         </div>
       </div>
     </div>
@@ -1702,6 +1703,10 @@ on("change:level", function() {
   calculateSaves();
 });
 
+on("change:skill_biopsion change:skill_precognition change:skill_telepathy change:skill_teleportation, change:skill_telekinesis change:skill_metapsion, function() {
+  calculateEffort();
+})
+
 on("change:repeating_gear", function() {
   getAttrs(["gear_readied_current","gear_stowed_current"], function(v) {
     setAttrs({gear_readied_current: parseInt(0)});
@@ -1733,7 +1738,13 @@ calculateSaves = function() {
     });
   });
 }
-
+calculateEffort = function() {
+  getAttrs(["wis_bonus", "con_bonus", "skill_biopsion", "skill_precognition", "skill_telepathy", "skill_teleportation", "skill_telekinesis", "skill_metapsion"], function (v) {
+    setAttrs({
+      psionics_total_effort: 1 + Math.max(v.wis_bonus, v.con_bonus) + Math.max(v.skill_biopsion, v.skill_precognition, v.skill_telepathy, v.skill_teleportation, v.skill_telekinesis, v.skill_metapsion)
+    });
+  });
+}
 calculateMod = function(attributes) {
   attributes.map(function(attr) {
     var attrModMisc = attr + '_misc';
@@ -1761,9 +1772,14 @@ calculateMod = function(attributes) {
       setAttrs(updatedVal);
       getAttrs(["str_bonus", "con_bonus", "cha_bonus", "wis_bonus", "dex_bonus", "int_bonus", "level"], function (v) {
         setAttrs({
-        save_physical: 16 - v.level - Math.max(v.str_bonus, v.con_bonus),
-        save_mental: 16 - v.level - Math.max(v.cha_bonus, v.wis_bonus),
-        save_evasion: 16 - v.level - Math.max(v.int_bonus, v.dex_bonus)
+          save_physical: 16 - v.level - Math.max(v.str_bonus, v.con_bonus),
+          save_mental: 16 - v.level - Math.max(v.cha_bonus, v.wis_bonus),
+          save_evasion: 16 - v.level - Math.max(v.int_bonus, v.dex_bonus)
+        });
+      });
+      getAttrs(["wis_bonus", "con_bonus", "skill_biopsion", "skill_precognition", "skill_telepathy", "skill_teleportation", "skill_telekinesis", "skill_metapsion"], function (v) {
+        setAttrs({
+          psionics_total_effort: 1 + Math.max(v.wis_bonus, v.con_bonus) + Math.max(v.skill_biopsion, v.skill_precognition, v.skill_telepathy, v.skill_teleportation, v.skill_telekinesis, v.skill_metapsion)
         });
       });
     });
