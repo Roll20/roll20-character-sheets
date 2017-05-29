@@ -1660,11 +1660,13 @@ on("sheet:opened", function() {
   calculateMaxStrain();
   validateStrain();
   validateGear();
+  calculateSaves();
 });
 
 on("change:str change:int change:dex change:wis change:con change:cha", function(e) {
   var attr = e.sourceAttribute;
   calculateMod([attr]);
+  calculateSaves();
 
   console.log(attr);
   if (attr === 'con') {
@@ -1689,6 +1691,10 @@ on("change:gear_readied_max", function() {
   validateReadiedMax();
 });
 
+on("change:level", function() {
+  calculateSaves();
+});
+
 on("change:repeating_gear", function() {
   getAttrs(["gear_readied_current","gear_stowed_current"], function(v) {
     setAttrs({gear_readied_current: parseInt(0)});
@@ -1711,6 +1717,16 @@ on("change:repeating_gear", function() {
 /**
  * Calculations
  */
+calculateSaves = function() {
+  var updatedSaves {};
+  getAttrs(["str_bonus", "con_bonus", "cha_bonus", "wis_bonus", "dex_bonus", "int_bonus" "level"], function (v) {
+    updatedSaves[save_physical] = 16 - v.level - Math.max(v.str_bonus, v.con_bonus);
+    updatedSaves[save_mental] = 16 - v.level - Math.max(v.cha_bonus, v.wis_bonus);
+    updatedSaves[save_evasion] = 16 - v.level - Math.max(v.int_bonus, v.dex_bonus);
+    setAttrs(updatedSaves);
+  });
+}
+
 calculateMod = function(attributes) {
   attributes.map(function(attr) {
     var attrModMisc = attr + '_misc';
