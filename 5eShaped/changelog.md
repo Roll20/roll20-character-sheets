@@ -11,6 +11,13 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 14.2.2
+
+### Bug Fixes
+
+* [#506: Spells still broken and items in 14.2.1](https://bitbucket.org/mlenser/5eshaped/issues/506/spells-still-broken-and-items-in-1421)
+* [#507: Magical armor not adding the bonus to AC](https://bitbucket.org/mlenser/5eshaped/issues/507/magical-armor-not-adding-the-bonus-to-ac)
+
 ## 14.2.1
 
 ### Bug Fixes
