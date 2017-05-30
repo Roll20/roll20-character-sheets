@@ -34,6 +34,8 @@
 				<li>Fix to nonlethal hp resetting on level drain</li>
 				<li>Fix to @{size_display} stuck on medium</li>
 				<li>Fix to spell class calculations when spell class not set</li>
+				<li>Fix to spell-attack-type reference in spells</li>
+				<li>Fix to buffs writing NaN and undefined</li>
 			</ol>
 			<p>1.53:</p>
 			<ol>
@@ -13061,7 +13063,7 @@
     </div>
 	<div data-i18n-aria-label="footer-aria" class="sheet-footer" aria-label="Help links and footer information">
 		<div class="sheet-table">
-			<span data-i18n="footer-info">Created by Samuel Marino w/contributions by Vince, Chris Buchholz, Magik, James W. | Last updated:</span> <i>Mon May 29 2017 22:14:36 GMT &nbsp;&nbsp;</i>v.<input type="text" style="width: 2.5em ; height: 1.4em ; vertical-align: top ; padding: 0px 2px 0 2px ; border: none" name="attr_PFSheet_Version" value="0" class="sheet-calc sheet-number" readonly="" title="A non-blank version indicates attributes have been successfully recalculated.">
+			<span data-i18n="footer-info">Created by Samuel Marino w/contributions by Vince, Chris Buchholz, Magik, James W. | Last updated:</span> <i>Mon May 29 2017 23:07:02 GMT &nbsp;&nbsp;</i>v.<input type="text" style="width: 2.5em ; height: 1.4em ; vertical-align: top ; padding: 0px 2px 0 2px ; border: none" name="attr_PFSheet_Version" value="0" class="sheet-calc sheet-number" readonly="" title="A non-blank version indicates attributes have been successfully recalculated.">
 		</div>
 		<div class="sheet-table" style="margin-top: -.5em;">
 			<span class="sheet-table-cell sheet-3col"><button type="roll" class="sheet-no-decoration" title="url will appear in chat" style="color: #0000ff" name="roll_blank" value="http://tinyurl.com/PF-Thread"><b style="font-size:.75em;" data-i18n="questions-feedback">Questions/Feedback?</b></button></span>
@@ -25429,10 +25431,10 @@ function importFromCompendium(id, eventInfo) {
                 setSilent["repeating_spells_range"] = newRangeSettings.rangetext;
                 if (newRangeSettings.dropdown === 'touch') {
                     isAttack = true;
-                    setSilent["repeating_spells_attack-type"] = 'attk-melee';
+                    setSilent["repeating_spells_spell-attack-type"] = 'attk-melee';
                 } else if (/ranged touch|ray\s/i.test(v["repeating_spells_description"])) {
                     isAttack = true;
-                    setSilent["repeating_spells_attack-type"] = 'attk-ranged';
+                    setSilent["repeating_spells_spell-attack-type"] = 'attk-ranged';
                 }
             } catch (err2) {
                 _exportsLoaderTASTheAaronSheet2.default.error(err2);
@@ -25589,7 +25591,7 @@ function registerEventHandlers() {
         var attr;
         _exportsLoaderTASTheAaronSheet2.default.debug("caught " + eventInfo.sourceAttribute + " event" + eventInfo.sourceType);
         attr = SWUtils.getAttributeName(eventInfo.sourceAttribute);
-        if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api" || attr === 'attack-type') {
+        if (eventInfo.sourceType === "player" || eventInfo.sourceType === "api" || attr === 'spell-attack-type') {
             updateAssociatedAttack(null, null, null, eventInfo);
         }
     }));
