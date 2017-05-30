@@ -459,7 +459,7 @@
     <tr>
         <td class="statname" title="@{mortalwound}">Mortal Wound</td>
         <td>
-            <select class="box" name="attr_mortalwound_shade" title="@{mortalwound_shade}"><option value="4">B</option><option value="3">G</option><option value="2">W</option></select><input type="text" class="underline stat" name="attr_mortalwound" title="@{mortalwound}" disabled="disabled" value="floor((@{power}+@{forte})/2)+6">
+            <select class="box" name="attr_mortalwound_shade" title="@{mortalwound_shade}" disabled><option value="4">B</option><option value="3">G</option><option value="2">W</option></select><input type="text" class="underline stat" name="attr_mortalwound" disabled="disabled" value="floor((@{power}+@{forte})/2)+6">
         </td>
     </tr>
 </table>
@@ -2176,6 +2176,25 @@
 					setAttrs({
 						reflexes: avg.value,
 						reflexes_shade: avg.shade
+					});
+				}
+			}
+        });
+	}
+	
+	// Script for updating mortalwound
+    on("change:power change:power_shade change:forte change:forte_shade", function() {
+		getAttrs(['power', 'power_shade', 'forte', 'forte_shade'], function(v) {
+			if(v.power_shade && v.power && v.forte_shade && v.forte) {
+				var power = isNaN(parseInt(v.power, 10)) === false ? parseInt(v.power, 10) : 0;
+				var forte = isNaN(parseInt(v.forte, 10)) === false ? parseInt(v.forte, 10) : 0;
+				// Calculate the average of power and forte using complex shade math
+				var avg = averageStats(power, v.power_shade, forte, v.forte_shade);
+				//If successful, set the result
+				if(avg) {
+					setAttrs({
+						mortalwound: avg.value + 6, // Formula is (power+forte)/2 + 6
+						mortalwound_shade: avg.shade
 					});
 				}
 			}
