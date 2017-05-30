@@ -453,8 +453,12 @@
           <div class="sheet-col"><input type="number" name="attr_attack_bonus" class="sheet-stats-half" value="0"></div>
         </div>
         <div class="sheet-row">
+          <div class="sheet-col sheet-attribute-ext-label"><label for="attr_innate_ac">Innate AC</label></div>
+          <div class="sheet-col"><input type="number" name="attr_innate_ac" class="sheet-stats-half"></div>
+        </div>
+        <div class="sheet-row">
           <div class="sheet-col sheet-attribute-ext-label"><label for="attr_AC">AC</label></div>
-          <div class="sheet-col"><input type="number" name="attr_AC" class="sheet-stats-half"></div>
+          <div class="sheet-col"><input type="number" name="attr_AC" class="sheet-stats-half" readonly></div>
         </div>
       </div>
 
@@ -802,7 +806,7 @@
       </div>
     </div>
     <div class="sheet-row">
-      Cost to raise by 1: New Level + 1
+      Cost to raise by 1: New Level + 1. Min level 1 for lvl 0 and 1, 3 for lvl 2, 6 for lvl 3, and 9 for lvl 4.
     </div>
     <h3>Psychic Skills and Techniques</h3>
     <div class="sheet-2colrow sheet-skills">
@@ -925,6 +929,17 @@
           <div class="sheet-col"><input type="number" name="attr_gear_stowed_current" value="0" readonly></div>
           <div class="sheet-col"><label for="attr_gear_stowed_max">Max Stowed</label></div>
           <div class="sheet-col"><input type="number" name="attr_gear_stowed_max"></div>
+        </div>
+        <div class="sheet-row sheet-gear">
+          <div class="sheet-col"><label>Armor</label></div>
+        </div>
+        <div class="sheet-6colrow sheet-gear">
+          <div class="sheet-col"><label for="attr_armor_name">Name</label></div>
+          <div class="sheet-col"><input type="text" name="attr_armor_name" value=""></div>
+          <div class="sheet-col"><label for="attr_armor_ac">AC</label></div>
+          <div class="sheet-col"><input type="number" name="attr_armor_ac" value="0"></div>
+          <div class="sheet-col"><label for="attr_armor_enc">Encumberence</label></div>
+          <div class="sheet-col"><input type="number" name="attr_armor_enc" value="0"></div>
         </div>
         <div class="sheet-row sheet-gear" style="border-bottom: 1px solid black;">
           <div class="sheet-col" style="width: 210px;"><label for="attr_gear_readied_current">Item(s)</label></div>
@@ -1730,6 +1745,10 @@ on("change:skill_biopsion change:skill_precognition change:skill_telepathy chang
   calculateEffort();
 })
 
+on("change:armor_ac change:innate_ac", function() {
+  calculateAC();
+});
+
 on("change:repeating_gear", function() {
   getAttrs(["gear_readied_current","gear_stowed_current"], function(v) {
     setAttrs({gear_readied_current: parseInt(0)});
@@ -1768,6 +1787,16 @@ calculateEffort = function() {
     });
   });
 }
+calculateAC = function() {
+  getAttrs(["dex_bonus", "armor_ac", "innate_ac"], function (v) {
+    if (v.innate_ac === '' || v.innate_ac === undefined) {
+      v.innate_ac = 11;
+    }
+    setAttrs({
+      AC: 11 + (parseInt(v.innate_ac, 10) - 11) + (parseInt(v.armor_ac, 10) - 11) + parseInt(v.dex_bonus, 10)
+    });
+  });
+}
 calculateMod = function(attributes) {
   attributes.map(function(attr) {
     var attrModMisc = attr + '_misc';
@@ -1793,18 +1822,9 @@ calculateMod = function(attributes) {
       }
       updatedVal[attrModName] += parseInt(v[attrModMisc]);
       setAttrs(updatedVal);
-      getAttrs(["str_bonus", "con_bonus", "cha_bonus", "wis_bonus", "dex_bonus", "int_bonus", "level"], function (v) {
-        setAttrs({
-          save_physical: 16 - v.level - Math.max(v.str_bonus, v.con_bonus),
-          save_mental: 16 - v.level - Math.max(v.cha_bonus, v.wis_bonus),
-          save_evasion: 16 - v.level - Math.max(v.int_bonus, v.dex_bonus)
-        });
-      });
-      getAttrs(["wis_bonus", "con_bonus", "psionics_extra_effort", "skill_biopsion", "skill_precognition", "skill_telepathy", "skill_teleportation", "skill_telekinesis", "skill_metapsion"], function (v) {
-        setAttrs({
-          psionics_total_effort: 1 + Math.max(v.wis_bonus, v.con_bonus) + Math.max(v.skill_biopsion, v.skill_precognition, v.skill_telepathy, v.skill_teleportation, v.skill_telekinesis, v.skill_metapsion) + parseInt(v.psionics_extra_effort, 10)
-        });
-      });
+      calculateSaves();
+      calculateEffort();
+      calculateAC();
     });
   });
 }
