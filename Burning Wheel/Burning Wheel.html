@@ -462,6 +462,16 @@
             <select class="box" name="attr_mortalwound_shade" title="@{mortalwound_shade}" disabled><option value="4">B</option><option value="3">G</option><option value="2">W</option></select><input type="text" class="underline stat" name="attr_mortalwound" disabled="disabled" value="floor((@{power}+@{forte})/2)+6">
         </td>
     </tr>
+    <tr>
+        <td class="italic">Tough:</td>
+		<td style="float:right;">
+            <div class="opencontinaer">
+                <input type="radio" class="openended unchecked" name="attr_mortalwound_tough" value="0" checked="checked" />
+                <input type="radio" class="openended checked" name="attr_mortalwound_tough" value="1" />
+                <span class="openended"></span>
+            </div>
+		</td>
+    </tr>
 </table>
 
 <table class="page2">
@@ -2183,13 +2193,15 @@
 	}
 	
 	// Script for updating mortalwound
-    on("change:power change:power_shade change:forte change:forte_shade", function() {
-		getAttrs(['power', 'power_shade', 'forte', 'forte_shade'], function(v) {
+    on("change:power change:power_shade change:forte change:forte_shade change:mortalwound_tough", function() {
+		getAttrs(['power', 'power_shade', 'forte', 'forte_shade', 'mortalwound_tough'], function(v) {
 			if(v.power_shade && v.power && v.forte_shade && v.forte) {
 				var power = isNaN(parseInt(v.power, 10)) === false ? parseInt(v.power, 10) : 0;
 				var forte = isNaN(parseInt(v.forte, 10)) === false ? parseInt(v.forte, 10) : 0;
+				// If we have the Tough trait, we should use ceil instead of floor. BWG pg 351
+				var tough = (v.mortalwound_tough == "1");
 				// Calculate the average of power and forte using complex shade math
-				var avg = averageStats(power, v.power_shade, forte, v.forte_shade);
+				var avg = averageStats(power, v.power_shade, forte, v.forte_shade, null, null, tough);
 				//If successful, set the result
 				if(avg) {
 					setAttrs({
