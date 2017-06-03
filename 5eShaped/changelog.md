@@ -11,6 +11,14 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 14.2.3
+
+### Bug Fixes
+
+* The way that proficiency bonus updates all its dependencies has been changed. This should make it so that all of its dependencies only update when the proficiency bonus actually updates instead of it always updating when it could've possibly updated. Closes [#509: NPC prof bonus not updated when decreasing CR](https://bitbucket.org/mlenser/5eshaped/issues/509/npc-prof-bonus-not-updated-when-decreasing)
+* [#510: NPC caster level not being taken into account as appropriate without updates](https://bitbucket.org/mlenser/5eshaped/issues/510/npc-caster-level-not-being-taken-into)
+* [#508: Prepared spell highlighting on the sheet](https://bitbucket.org/mlenser/5eshaped/issues/508/prepared-spell-highlighting-on-the-sheet)
+
 ## 14.2.2
 
 ### Bug Fixes
