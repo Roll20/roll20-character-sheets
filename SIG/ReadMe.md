@@ -18,6 +18,6 @@ Click to enlarge:
 
 # Release notes
 
-##v1.0 (2017-06-04)
+## v1.0 (2017-06-04)
 
 Creation of the sheet.
