@@ -452,25 +452,15 @@
     <tr>
         <td class="statname" title="@{reflexes}">Reflexes</td>
         <td>
-            <select class="box" name="attr_reflexes_shade" title="@{reflexes_shade}" disabled><option value="4">B</option><option value="3">G</option><option value="2">W</option></select><input type="text" class="underline stat" name="attr_reflexes" disabled="disabled" value="floor((@{perception}+@{agility}+@{speed})/3)">
+            <select class="box" name="attr_reflexes_shade" title="@{reflexes_shade}"><option value="4">B</option><option value="3">G</option><option value="2">W</option></select><input type="text" class="underline stat" name="attr_reflexes" title="@{reflexes}" disabled="disabled" value="floor((@{perception}+@{agility}+@{speed})/3)">
         </td>
     </tr>
     <tr class="spacer"></tr>
     <tr>
         <td class="statname" title="@{mortalwound}">Mortal Wound</td>
         <td>
-            <select class="box" name="attr_mortalwound_shade" title="@{mortalwound_shade}" disabled><option value="4">B</option><option value="3">G</option><option value="2">W</option></select><input type="text" class="underline stat" name="attr_mortalwound" disabled="disabled" value="floor((@{power}+@{forte})/2)+6">
+            <select class="box" name="attr_mortalwound_shade" title="@{mortalwound_shade}"><option value="4">B</option><option value="3">G</option><option value="2">W</option></select><input type="text" class="underline stat" name="attr_mortalwound" title="@{mortalwound}" disabled="disabled" value="floor((@{power}+@{forte})/2)+6">
         </td>
-    </tr>
-    <tr>
-        <td class="italic">Tough:</td>
-		<td style="float:right;">
-            <div class="opencontinaer">
-                <input type="radio" class="openended unchecked" name="attr_mortalwound_tough" value="0" checked="checked" />
-                <input type="radio" class="openended checked" name="attr_mortalwound_tough" value="1" />
-                <span class="openended"></span>
-            </div>
-		</td>
     </tr>
 </table>
 
@@ -2170,144 +2160,6 @@
 				});
 			}
         });
-	}
-	
-	// Script for updating reflexes
-    on("change:perception change:perception_shade change:agility change:agility_shade change:speed change:speed_shade", function() {
-		getAttrs(['perception', 'perception_shade', 'agility', 'agility_shade', 'speed', 'speed_shade'], function(v) {
-			if(v.perception_shade && v.perception && v.agility_shade && v.agility && v.speed_shade && v.speed) {
-				var perception = isNaN(parseInt(v.perception, 10)) === false ? parseInt(v.perception, 10) : 0;
-				var agility = isNaN(parseInt(v.agility, 10)) === false ? parseInt(v.agility, 10) : 0;
-				var speed = isNaN(parseInt(v.speed, 10)) === false ? parseInt(v.speed, 10) : 0;
-				// Calculate the average of per,agi and speed using complex shade math
-				var avg = averageStats(perception, v.perception_shade, agility, v.agility_shade, speed, v.speed_shade);
-				//If successful, set the result
-				if(avg) {
-					setAttrs({
-						reflexes: avg.value,
-						reflexes_shade: avg.shade
-					});
-				}
-			}
-        });
-	}
-	
-	// Script for updating mortalwound
-    on("change:power change:power_shade change:forte change:forte_shade change:mortalwound_tough", function() {
-		getAttrs(['power', 'power_shade', 'forte', 'forte_shade', 'mortalwound_tough'], function(v) {
-			if(v.power_shade && v.power && v.forte_shade && v.forte) {
-				var power = isNaN(parseInt(v.power, 10)) === false ? parseInt(v.power, 10) : 0;
-				var forte = isNaN(parseInt(v.forte, 10)) === false ? parseInt(v.forte, 10) : 0;
-				// If we have the Tough trait, we should use ceil instead of floor. BWG pg 351
-				var tough = (v.mortalwound_tough == "1");
-				// Calculate the average of power and forte using complex shade math
-				var avg = averageStats(power, v.power_shade, forte, v.forte_shade, null, null, tough);
-				//If successful, set the result
-				if(avg) {
-					setAttrs({
-						mortalwound: avg.value + 6, // Formula is (power+forte)/2 + 6
-						mortalwound_shade: avg.shade
-					});
-				}
-			}
-        });
-	}
-	
-	var averageStats = function(stat1, shade1, stat2, shade2, stat3, shade3, use_ceil) {
-		// Shade checking. Logic is grabbed from the Monster Burner pg 367, the chapter on Gray and White Math
-		var shades = [0,0,0]; //B,G,W
-		if(shade1) {
-			if     (shade1 == "2") shades[2]++;
-			else if(shade1 == "3") shades[1]++;
-			else                   shades[0]++;
-		}
-		if(shade2) {
-			if     (shade2 == "2") shades[2]++;
-			else if(shade2 == "3") shades[1]++;
-			else                   shades[0]++;
-		}
-		if(shade3) {
-			if     (shade3 == "2") shades[2]++;
-			else if(shade3 == "3") shades[1]++;
-			else                   shades[0]++;
-		}
-		
-		// What shade is our base? Used for calculating bonus on avg later
-		var low_shade = "2";
-		if     (shades[0] != 0) low_shade = "4";
-		else if(shades[1] != 0) low_shade = "3";
-		
-		// Calculate what the final shade should be
-		var shade;
-		if(shades[2] > 0) {
-			if(shades[0] == 0 && shades[1] == 0) shade = "2"; //Only Whites = White
-			else if(shades[0] == 0) shade = "3"; //Only White+Gray = Gray
-			else if(shades[2] >= shades[1] + shades[0]) shade = "3"; //More white that darker = gray. Also covers Black+White=Gray
-			else shade = "4"; //More darker than White, with Black = Black
-		}
-		else if(shades[1] > 0) {
-			if(shades[0] == 0) shade = "3"; //Only Gray = Gray
-			else shade = "4"; //Gray mixed with Black = Black
-		}
-		else {
-			shade = "4"; //Only Black = Black
-		}
-		
-		// Check stat1
-		if(stat1 && shade1) {
-			var sum = stat1;
-			var num_stats = 1;
-			if(shade1 == "3" && low_shade == "4") {
-				sum += 2;
-			}
-			else if(shade1 == "2" && low_shade == "3") {
-				sum += 2;
-			}
-			else if(shade1 == "2" && low_shade == "4") {
-				sum += 3;
-			}
-			
-			// Check stat2
-			if(stat2 && shade2) {
-				sum += stat2;
-				num_stats = 2;
-				if(shade2 == "3" && low_shade == "4") {
-					sum += 2;
-				}
-				else if(shade2 == "2" && low_shade == "3") {
-					sum += 2;
-				}
-				else if(shade2 == "2" && low_shade == "4") {
-					sum += 3;
-				}
-				
-				// Check stat3
-				if(stat3 && shade3) {
-					sum += stat3;
-					num_stats = 3;
-					if(shade3 == "3" && low_shade == "4") {
-						sum += 2;
-					}
-					else if(shade3 == "2" && low_shade == "3") {
-						sum += 2;
-					}
-					else if(shade3 == "2" && low_shade == "4") {
-						sum += 3;
-					}
-				}
-			}
-			
-			// Calculate average
-			var avg = sum / num_stats;
-			return {
-				shade: shade,
-				value: use_ceil ? Math.ceil(avg) : Math.floor(avg)
-			};
-		}
-		else {
-			// No valid input, we fail
-			return null;
-		}
 	}
 
 </script>
