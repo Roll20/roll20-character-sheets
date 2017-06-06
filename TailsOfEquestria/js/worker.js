@@ -73,7 +73,7 @@ function _updateTalents(prefix) {
     else {
       var traitDice = values[trait];
       setAttrs({
-        [prefix + '_equation']: talentDice + ' + ' + traitDice
+        [prefix + '_equation']: `{${talentDice},${traitDice}}k1`
       });
     }
   });
@@ -95,7 +95,7 @@ onChange(['body', 'mind', 'charm'], () => {
 
 on('sheet:opened', () => {
   setAttrs({
-    character_sheet: 'TailsOfEquestria v1.0.0'
+    character_sheet: 'TailsOfEquestria v1.1.1'
   });
   updateTalents();
 });
