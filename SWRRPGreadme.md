@@ -1,0 +1,1 @@
+I hope you enjoy. The sheet should have rolls for everything except the weapons. You'll need to create macros for those but you can store the info in the character sheet.
