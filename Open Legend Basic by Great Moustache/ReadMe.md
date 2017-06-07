@@ -5,6 +5,10 @@
 
 ### Changelog
 
+### 1.8.6 on 2017 May 14th
+* Fixed an error with other actions variable not being updated on its name
+	- Caused it to not calculate roll syntax correctly when a value was updated in other actions
+
 ### 1.8.5 on 2017 May 6th
 * Fixed an error that caused actions to not roll because of 'undefined'
 	- Caused by previous fix to Advantage/Disadvantage to the d20 in 1.8.0

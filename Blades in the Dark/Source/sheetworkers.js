@@ -346,7 +346,7 @@ var crewData = {
 				'Rolan Wott, a magistrate',
 				'Laroze, a bluecoat',
 				'Lydra, a deal broker',
-				'Hosley, a smuggler',
+				'Hoxley, a smuggler',
 				'Anya, a dilettante',
 				'Marlo, a gang boss'
 			]
