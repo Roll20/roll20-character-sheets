@@ -671,17 +671,7 @@ var crewData = {
 				gatherinfo4: 'What do they intend to do?',
 				gatherinfo5: 'How can I get them to [X]?',
 				gatherinfo6: 'Are they telling the truth?',
-				item_1_desc: 'Fine heavy weapon',
-				item_2_desc: 'Fine hand weapon',
-				item_6_desc: 'Scary weapon or tool',
-				item_7_desc: 'Manacles & chain',
-				item_8_desc: 'Rage essence vial',
-				item_9_desc: 'Spiritbane charm',
 				playbook_description: 'A Dangerous &\nIntimidating\nFighter',
-				setting_showitem_0: '0',
-				setting_showitem_3: '0',
-				setting_showitem_4: '0',
-				setting_showitem_5: '0',
 				setting_traumata_set: 'normal',
 				setting_vice_type: 'normal',
 				skirmish1: '1',
@@ -694,6 +684,39 @@ var crewData = {
 				'Mercy, a cold killer',
 				'Grace, an extortionist',
 				'Sawtooth, a physicker'
+			],
+			items: [{
+					bold: 'on',
+					boxes_chosen: 'on',
+					name: 'Fine heavy weapon',
+					numboxes: '2'
+				},
+				{
+					bold: 'on',
+					boxes_chosen: 'on',
+					name: 'Fine hand weapon',
+					numboxes: '1'
+				},
+				{
+					boxes_chosen: 'on',
+					name: 'Scary weapon or tool',
+					numboxes: '1'
+				},
+				{
+					boxes_chosen: 'on',
+					name: 'Manacles & chain',
+					numboxes: '0'
+				},
+				{
+					boxes_chosen: 'on',
+					name: 'Rage essence vial',
+					numboxes: '0'
+				},
+				{
+					boxes_chosen: 'on',
+					name: 'Spiritbane charm',
+					numboxes: '0'
+				}
 			]
 		},
 		ghost: {
@@ -727,24 +750,15 @@ var crewData = {
 				gatherinfo5: 'Where\'s the weakness here?',
 				gatherinfo6: 'How can I find [X]?',
 				playbook_description: 'A spirit without a body',
-				setting_showitem_0: '0',
-				setting_showitem_1: '0',
-				setting_showitem_2: '0',
-				setting_showitem_3: '0',
-				setting_showitem_4: '0',
-				setting_showitem_5: '0',
-				setting_showitem_6: '0',
-				setting_showitem_7: '0',
-				setting_showitem_8: '0',
-				setting_showitem_9: '0',
-				setting_stress_name: 'Drain',
-				setting_trauma_name: 'Gloom',
+				setting_stress_label: 'Drain',
+				setting_trauma_label: 'Gloom',
 				setting_traumata_set: 'ghost',
 				setting_vice_type: 'ghost',
 				xp_condition: 'You exacted vengeance upon those whom you deem deserving.',
 				xp_condition2: 'You expressed your your outrage or anger, or settled scores from your heritage or background.',
 				xp_condition3: 'You struggled with issues from your need or glooms during the session.'
 			},
+			items: [],
 			friends: []
 		},
 		hound: {
@@ -787,17 +801,7 @@ var crewData = {
 				gatherinfo6: 'How can I find [X]?',
 				hunt1: '1',
 				hunt2: '1',
-				item_1_desc: 'Fine long rifle',
-				item_2_desc: 'Fine pair of pistols',
-				item_5_desc: 'Electroplasmic ammunition',
-				item_6_desc: 'Spyglass',
-				item_7_desc: 'A trained hunting pet',
-				item_8_desc: 'Spiritbane charm',
 				playbook_description: 'A Deadly\nSharpshooter\nand Tracker',
-				setting_showitem_0: '0',
-				setting_showitem_3: '0',
-				setting_showitem_4: '0',
-				setting_showitem_9: '0',
 				setting_traumata_set: 'normal',
 				setting_vice_type: 'normal',
 				survey1: '1',
@@ -809,6 +813,39 @@ var crewData = {
 				'Melvir, a physicker',
 				'Veleris, a spy',
 				'Casta, a bounty hunter'
+			],
+			items: [{
+					bold: 'on',
+					boxes_chosen: 'on',
+					name: 'Fine long rifle',
+					numboxes: '2'
+				},
+				{
+					bold: 'on',
+					boxes_chosen: 'on',
+					name: 'Fine pair of pistols',
+					numboxes: '1'
+				},
+				{
+					boxes_chosen: 'on',
+					name: 'Electroplasmic ammunition',
+					numboxes: '1'
+				},
+				{
+					boxes_chosen: 'on',
+					name: 'Spyglass',
+					numboxes: '1'
+				},
+				{
+					boxes_chosen: 'on',
+					name: 'A trained hunting pet',
+					numboxes: '0'
+				},
+				{
+					boxes_chosen: 'on',
+					name: 'Spiritbane charm',
+					numboxes: '0'
+				}
 			]
 		},
 		hull: {
@@ -851,24 +888,15 @@ var crewData = {
 				playbook_description: 'A spirit animating a clockwork frame',
 				setting_load_h: '7',
 				setting_show_frame: 'on',
-				setting_showitem_0: '0',
-				setting_showitem_1: '0',
-				setting_showitem_2: '0',
-				setting_showitem_3: '0',
-				setting_showitem_4: '0',
-				setting_showitem_5: '0',
-				setting_showitem_6: '0',
-				setting_showitem_7: '0',
-				setting_showitem_8: '0',
-				setting_showitem_9: '0',
-				setting_stress_name: 'Drain',
-				setting_trauma_name: 'Wear',
+				setting_stress_label: 'Drain',
+				setting_trauma_label: 'Wear',
 				setting_traumata_set: 'hull',
 				setting_vice_type: 'hull',
 				xp_condition: 'You fulfilled your functions despite difficulty or danger.',
 				xp_condition2: 'You suppressed or ignored your former human beliefs, drives, heritage, or background.',
 				xp_condition3: 'You struggled with issues from your wear during the session.'
 			},
+			items: [],
 			friends: []
 		},
 		leech: {
@@ -913,17 +941,7 @@ var crewData = {
 				gatherinfo4: 'What can I tinker with here?',
 				gatherinfo5: 'What might happen if I [X]?',
 				gatherinfo6: 'How can I find [X]?',
-				item_0_desc: 'Gadgets',
-				item_1_desc: 'Fine wrecker tools',
-				item_2_desc: 'Fine tinkering tools',
-				item_5_desc: 'Bandolier of alchemicals (3)',
-				item_6_desc: 'Bandolier of alchemicals (3)',
-				item_7_desc: 'Blowgun & darts, syringes',
 				playbook_description: 'A Saboteur and\nTechnician',
-				setting_showitem_3: '0',
-				setting_showitem_4: '0',
-				setting_showitem_8: '0',
-				setting_showitem_9: '0',
 				setting_traumata_set: 'normal',
 				setting_vice_type: 'normal',
 				tinker1: '1',
@@ -937,6 +955,39 @@ var crewData = {
 				'Eckerd, a corpse thief',
 				'Jul, a blood dealer',
 				'Malista, a priestess'
+			],
+			items: [{
+					bold: 'on',
+					boxes_chosen: 'on',
+					name: 'Fine wrecker tools',
+					numboxes: '2'
+				},
+				{
+					bold: 'on',
+					boxes_chosen: 'on',
+					name: 'Fine tinkering tools',
+					numboxes: '1'
+				},
+				{
+					boxes_chosen: 'on',
+					name: 'Bandolier of alchemicals (3)',
+					numboxes: '1'
+				},
+				{
+					boxes_chosen: 'on',
+					name: 'Bandolier of alchemicals (3)',
+					numboxes: '1'
+				},
+				{
+					boxes_chosen: 'on',
+					name: 'Blowgun & darts, syringes',
+					numboxes: '0'
+				},
+				{
+					boxes_chosen: 'on',
+					name: 'Gadget',
+					numboxes: '1'
+				}
 			]
 		},
 		lurk: {
@@ -982,19 +1033,9 @@ var crewData = {
 				gatherinfo4: 'What\'s the best way in?',
 				gatherinfo5: 'Where can I hide here?',
 				gatherinfo6: 'How can I find [X]?',
-				item_3_desc: 'Fine shadow cloak',
-				item_4_desc: 'Fine lockpicks',
-				item_5_desc: 'Light climbing gear',
-				item_6_desc: 'Dark-sight goggles',
-				item_7_desc: 'Silence potion vial',
-				item_8_desc: 'Spiritbane charm',
 				playbook_description: 'A Stealthy\nInfiltrator\nand Burglar',
 				prowl1: '1',
 				prowl2: '1',
-				setting_showitem_0: '0',
-				setting_showitem_1: '0',
-				setting_showitem_2: '0',
-				setting_showitem_9: '0',
 				setting_traumata_set: 'normal',
 				setting_vice_type: 'normal',
 				xp_condition: 'You addressed a challenge with stealth or evasion.'
@@ -1005,6 +1046,39 @@ var crewData = {
 				'Frake, a locksmith',
 				'Roslyn Kellis, a noble',
 				'Petra, a city clerk'
+			],
+			items: [{
+					bold: 'on',
+					boxes_chosen: 'on',
+					name: 'Fine shadow cloak',
+					numboxes: '1'
+				},
+				{
+					bold: 'on',
+					boxes_chosen: 'on',
+					name: 'Fine lockpicks',
+					numboxes: '0'
+				},
+				{
+					boxes_chosen: 'on',
+					name: 'Light climbing gear',
+					numboxes: '1'
+				},
+				{
+					boxes_chosen: 'on',
+					name: 'Dark-sight goggles',
+					numboxes: '1'
+				},
+				{
+					boxes_chosen: 'on',
+					name: 'Silence potion vial',
+					numboxes: '0'
+				},
+				{
+					boxes_chosen: 'on',
+					name: 'Spiritbane charm',
+					numboxes: '0'
+				}
 			]
 		},
 		slide: {
@@ -1050,17 +1124,7 @@ var crewData = {
 				gatherinfo4: 'What are they really feeling?',
 				gatherinfo5: 'What do they really care about?',
 				gatherinfo6: 'How can I blend in here?',
-				item_3_desc: 'Fine disguise kit',
-				item_4_desc: 'Fine clothes & jewelry',
-				item_6_desc: 'A cane-sword',
-				item_7_desc: 'Fine loaded dice, trick cards',
-				item_8_desc: 'Trance powder',
-				item_9_desc: 'Spiritbane charm',
 				playbook_description: 'A Subtle\nManipulator\nand Spy',
-				setting_showitem_0: '0',
-				setting_showitem_1: '0',
-				setting_showitem_2: '0',
-				setting_showitem_5: '0',
 				setting_traumata_set: 'normal',
 				setting_vice_type: 'normal',
 				sway1: '1',
@@ -1073,6 +1137,40 @@ var crewData = {
 				'Klyra, a tavern owner',
 				'Nyryx, a prostitute',
 				'Harker, a jail-bird'
+			],
+			items: [{
+					bold: 'on',
+					boxes_chosen: 'on',
+					name: 'Fine disguise kit',
+					numboxes: '1'
+				},
+				{
+					bold: 'on',
+					boxes_chosen: 'on',
+					name: 'Fine clothes & jewelry',
+					numboxes: '0'
+				},
+				{
+					boxes_chosen: 'on',
+					name: 'A cane-sword',
+					numboxes: '1'
+				},
+				{
+					bold: 'on',
+					boxes_chosen: 'on',
+					name: 'Fine loaded dice, trick cards',
+					numboxes: '0'
+				},
+				{
+					boxes_chosen: 'on',
+					name: 'Trance powder',
+					numboxes: '0'
+				},
+				{
+					boxes_chosen: 'on',
+					name: 'Spiritbane charm',
+					numboxes: '0'
+				}
 			]
 		},
 		spider: {
@@ -1119,17 +1217,7 @@ var crewData = {
 				gatherinfo4: 'How can I discover [X]?',
 				gatherinfo5: 'What do they intend to do?',
 				gatherinfo6: 'How can I get them to [X]?',
-				item_3_desc: 'Fine bottle of whiskey',
-				item_4_desc: 'Fine cover identity',
-				item_5_desc: 'Blueprints',
-				item_7_desc: 'Vial of slumber essence',
-				item_8_desc: 'Concealed palm pistol',
-				item_9_desc: 'Spiritbane charm',
 				playbook_description: 'A Devious\nMastermind',
-				setting_showitem_0: '0',
-				setting_showitem_1: '0',
-				setting_showitem_2: '0',
-				setting_showitem_6: '0',
 				setting_traumata_set: 'normal',
 				setting_vice_type: 'normal',
 				study1: '1',
@@ -1141,6 +1229,39 @@ var crewData = {
 				'Jennah, a servant',
 				'Riven, a chemist',
 				'Jeren, a bluecoat archivist'
+			],
+			items: [{
+					bold: 'on',
+					boxes_chosen: 'on',
+					name: 'Fine bottle of whiskey',
+					numboxes: '1'
+				},
+				{
+					bold: 'on',
+					boxes_chosen: 'on',
+					name: 'Fine cover identity',
+					numboxes: '0'
+				},
+				{
+					boxes_chosen: 'on',
+					name: 'Blueprints',
+					numboxes: '1'
+				},
+				{
+					boxes_chosen: 'on',
+					name: 'Vial of slumber essence',
+					numboxes: '0'
+				},
+				{
+					boxes_chosen: 'on',
+					name: 'Concealed palm pistol',
+					numboxes: '0'
+				},
+				{
+					boxes_chosen: 'on',
+					name: 'Spiritbane charm',
+					numboxes: '0'
+				}
 			]
 		},
 		whisper: {
@@ -1187,17 +1308,7 @@ var crewData = {
 				gatherinfo4: 'What do they intend to do?',
 				gatherinfo5: 'What drives them to do this?',
 				gatherinfo6: 'How can I reveal [X]?',
-				item_2_desc: 'Fine lightning hook',
-				item_3_desc: 'Fine spirit mask',
-				item_6_desc: 'Spirit bottles (2)',
-				item_7_desc: 'Electroplasm vials',
-				item_8_desc: 'Ghost key',
-				item_9_desc: 'Demonbane charm',
 				playbook_description: 'An Arcane\nAdept and\nChanneler',
-				setting_showitem_0: '0',
-				setting_showitem_1: '0',
-				setting_showitem_4: '0',
-				setting_showitem_5: '0',
 				setting_traumata_set: 'normal',
 				setting_vice_type: 'normal',
 				study1: '1',
@@ -1209,6 +1320,39 @@ var crewData = {
 				'Setarra, a demon',
 				'Quellyn, a witch',
 				'Flint, a spirit trafficker'
+			],
+			items: [{
+					bold: 'on',
+					boxes_chosen: 'on',
+					name: 'Fine lightning hook',
+					numboxes: '1'
+				},
+				{
+					bold: 'on',
+					boxes_chosen: 'on',
+					name: 'Fine spirit mask',
+					numboxes: '1'
+				},
+				{
+					boxes_chosen: 'on',
+					name: 'Spirit bottles (2)',
+					numboxes: '1'
+				},
+				{
+					boxes_chosen: 'on',
+					name: 'Electroplasm vials',
+					numboxes: '0'
+				},
+				{
+					boxes_chosen: 'on',
+					name: 'Ghost key',
+					numboxes: '0'
+				},
+				{
+					boxes_chosen: 'on',
+					name: 'Spiritbane charm',
+					numboxes: '0'
+				}
 			]
 		},
 		vampire: {
@@ -1245,24 +1389,9 @@ var crewData = {
 				gatherinfo4: 'What should I look out for?',
 				gatherinfo5: 'Where\'s the weakness here?',
 				gatherinfo6: 'How can I find [X]?',
-				item_3_desc: 'Fine shadow cloak',
-				item_4_desc: 'Fine clothes and accoutrements',
-				item_5_desc: 'Fine personal weapon',
-				item_7_desc: 'Demonbane charm',
-				item_8_desc: 'Spiritbane charm',
 				playbook_description: 'A spirit animating an undead body',
 				setting_extra_stress: '3',
 				setting_vampirexp: 'on',
-				setting_showitem_0: '0',
-				setting_showitem_1: '0',
-				setting_showitem_2: '0',
-				setting_showitem_3: 'on',
-				setting_showitem_4: 'on',
-				setting_showitem_5: 'on',
-				setting_showitem_6: '0',
-				setting_showitem_7: 'on',
-				setting_showitem_8: 'on',
-				setting_showitem_9: '0',
 				setting_show_strictures: 'on',
 				setting_traumata_set: 'normal',
 				setting_vice_type: 'vampire',
@@ -1277,6 +1406,32 @@ var crewData = {
 				'Kira, a bodyguard',
 				'Otto, a coachman',
 				'Edrik, an envoy'
+			],
+			items: [{
+					boxes_chosen: 'on',
+					name: 'Fine shadow cloak',
+					numboxes: '1'
+				},
+				{
+					boxes_chosen: 'on',
+					name: 'Fine clothes and accoutrements',
+					numboxes: '0'
+				},
+				{
+					boxes_chosen: 'on',
+					name: 'Fine personal weapon',
+					numboxes: '1'
+				},
+				{
+					boxes_chosen: 'on',
+					name: 'Demonbane charm',
+					numboxes: '0'
+				},
+				{
+					boxes_chosen: 'on',
+					name: 'Spiritbane charm',
+					numboxes: '0'
+				}
 			]
 		}
 	},
@@ -1669,19 +1824,28 @@ on('change:crew_type change:playbook', function (event) {
 	'use strict';
 	getAttrs(['crew_type', 'playbook', 'changed_attributes'], function (attrValues) {
 		let changedAttributes = (attrValues.changed_attributes || '').split(','),
-			data, baseData, sourceName;
+			data, baseData, sourceName, items;
 		switch (event.sourceAttribute) {
 		case 'crew_type':
 			sourceName = attrValues.crew_type.toLowerCase();
 			if (crewData.hasOwnProperty(sourceName)) {
 				data = crewData[sourceName].base;
 				baseData = crewAttributes;
+				emptyFirstRowIfUnnamed('contact');
+				emptyFirstRowIfUnnamed('crewability');
+				fillRepeatingSectionFromData('contact', playbookData[sourceName].contacts.map(n => ({name: n})));
+				fillRepeatingSectionFromData('crewability', playbookData[sourceName].abilities);
 			};
 			break;
 		case 'playbook':
 			sourceName = attrValues.playbook.toLowerCase();
 			if (playbookData.hasOwnProperty(sourceName)) {
 				data = playbookData[sourceName].base;
+				emptyFirstRowIfUnnamed('friend');
+				emptyFirstRowIfUnnamed('ability');
+				fillRepeatingSectionFromData('playbookitem', playbookData[sourceName].items);
+				fillRepeatingSectionFromData('friend', playbookData[sourceName].friends.map(n => ({name: n})));
+				fillRepeatingSectionFromData('ability', playbookData[sourceName].abilities);
 				baseData = playbookAttributes;
 			};
 		};
@@ -1874,7 +2038,6 @@ actionsFlat.forEach(handleFourBoxesFill);
 handleFourBoxesFill('crew_tier');
 /* Items/Upgrades */
 var itemChecks = [
-	'item_1_check',
 	'item_14_check',
 	'item_16_check',
 	'item_18_check',
@@ -2007,10 +2170,92 @@ on('sheet:opened', function () {
 			Object.keys(actionData).forEach(calculateResistance);
 			calculateVice();
 		};
+		// Upgrade to 1.4: Convert playbook items and repeating items
+		if (v.version && (parseInt(v.version.split('.')[0]) < 1 || (parseInt(v.version.split('.')[0]) === 1 && parseInt(v.version.split('.')[1]) < 4))) {
+			let indices = [...Array(10).keys()], // [0:9]
+				allAttrs = [
+					...indices.map(n => `item_${n}_check`),
+					...indices.map(n => `item_${n}_desc`),
+					'item_0_check_b',
+					'item_0_check_c',
+					'item_1_check_b'
+				];
+			getAttrs(allAttrs, function (values) {
+				let itemData = [];
+				if (values['item_0_desc']) {
+					itemData.push({
+						check_1: values['item_0_check'] || '0',
+						name: values['item_0_desc'],
+						numboxes: '1'
+					});
+					itemData.push({
+						check_1: values['item_0_check_b']|| '0',
+						name: values['item_0_desc'],
+						numboxes: '1'
+					});
+					itemData.push({
+						check_1: values['item_0_check_c']|| '0',
+						name: values['item_0_desc'],
+						numboxes: '1'
+					});
+				}
+				if (values['item_1_desc']) {
+					itemData.push({
+						bold: 'on',
+						check_1: values['item_1_check'] || '0',
+						check_2: values['item_1_check_b'] || '0',
+						name: values['item_1_desc'],
+						numboxes: '2'
+					});
+				}
+				['2', '3', '5', '6'].forEach(index => {
+					if (values[`item_${index}_desc`]) {
+						itemData.push({
+							bold: (['2', '3'].includes(index) ? 'on' : '0'),
+							check_1: values[`item_${index}_check`]|| '0',
+							name: values[`item_${index}_desc`],
+							numboxes: '1'
+						});
+					}
+				});
+				['4', '7', '8', '9'].forEach(index => {
+					if (values[`item_${index}_desc`]) {
+						itemData.push({
+							bold: ((index === '4') ? 'on' : '0'),
+							check_1: values[`item_${index}_check`]|| '0',
+							name: values[`item_${index}_desc`],
+							numboxes: '0'
+						});
+					}
+				});
+				itemData.forEach(obj => {
+					obj['boxes_chosen'] = 'on';
+				});
+				fillRepeatingSectionFromData('playbookitem', itemData);
+			});
+			getSectionIDs('repeating_item', idArray => {
+				let allAttrs = [
+					...idArray.map(id => `repeating_item_${id}_desc`),
+					...idArray.map(id => `repeating_item_${id}_check`),
+					...idArray.map(id => `repeating_item_${id}_check_b`)
+				];
+				getAttrs(allAttrs, values => {
+					let setting = {};
+					idArray.forEach(id => {
+						setting[`repeating_item_${id}_boxes_chosen`] = 'on';
+						setting[`repeating_item_${id}_numboxes`] = '2';
+						setting[`repeating_item_${id}_name`] = values[`repeating_item_${id}_desc`] || '';
+						setting[`repeating_item_${id}_check_1`] = values[`repeating_item_${id}_check`] || '0';
+						setting[`repeating_item_${id}_check_2`] = values[`repeating_item_${id}_check_b`] || '0';
+					});
+					setAttrs(setting);
+				});
+			});
+		};
 		// Set version number
 		setAttrs({
-			version: '1.3',
-			character_sheet: 'Blades in the Dark v1.3'
+			version: '1.4',
+			character_sheet: 'Blades in the Dark v1.4'
 		});
 	});
 });
