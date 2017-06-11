@@ -707,7 +707,7 @@
         <td>Severe</td><td>-3D</td>
     </tr>
     <tr>
-        <td>Tramatic</td><td>-4D</td>
+        <td>Traumatic</td><td>-4D</td>
     </tr>
 </table>
 <span>*The first Superficial wound gives a +1 Ob penalty. The second does not give another +1 Ob. If a third Superficial wound is suffered, the obstacle penalty is replaced with a -1D penalty.</span>
@@ -2128,3 +2128,38 @@
         {{/rollGreater() stat wounddice}}
     </div>
 </rolltemplate>
+
+
+<!-- WORKERS -->
+<script type="text/worker">
+
+	// Script for updating hesitation
+    on("change:will change:will_shade", function() {
+        updateHesitation();
+    });
+	
+	var updateHesitation = function() {
+		getAttrs(['will', 'will_shade'], function(v) {
+			if(v.will_shade && v.will) {
+				var will = isNaN(parseInt(v.will, 10)) === false ? parseInt(v.will, 10) : 0;
+				// See shade calculations for Will/Hesitation pg 545 of the BWG book
+				if(v.will_shade === "3") { //Gray Shade
+					hesitation = 8 - will;
+				}
+				else if(v.will_shade === "2") { //White Shade
+					hesitation = 7 - will;
+				}
+				else { //Black Shade
+					hesitation = 10 - will;
+				}
+				if(hesitation < 0) {
+					hesitation = 0;
+				}
+				setAttrs({
+					hesitation: hesitation
+				});
+			}
+        });
+	}
+
+</script>
