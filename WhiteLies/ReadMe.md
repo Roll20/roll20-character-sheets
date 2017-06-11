@@ -12,6 +12,6 @@ Attribute modifiers are automatically calculted.
 
 # Release notes
 
-##v1.0 (2016-10-30)
+## v1.0 (2016-10-30)
 
 Creation of the sheet.
