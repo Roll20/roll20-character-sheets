@@ -687,33 +687,27 @@ var crewData = {
 			],
 			items: [{
 					bold: 'on',
-					boxes_chosen: 'on',
-					name: 'Fine heavy weapon',
-					numboxes: '2'
-				},
-				{
-					bold: 'on',
-					boxes_chosen: 'on',
 					name: 'Fine hand weapon',
 					numboxes: '1'
 				},
 				{
-					boxes_chosen: 'on',
+					bold: 'on',
+					name: 'Fine heavy weapon',
+					numboxes: '2'
+				},
+				{
 					name: 'Scary weapon or tool',
 					numboxes: '1'
 				},
 				{
-					boxes_chosen: 'on',
 					name: 'Manacles & chain',
 					numboxes: '0'
 				},
 				{
-					boxes_chosen: 'on',
 					name: 'Rage essence vial',
 					numboxes: '0'
 				},
 				{
-					boxes_chosen: 'on',
 					name: 'Spiritbane charm',
 					numboxes: '0'
 				}
@@ -816,33 +810,27 @@ var crewData = {
 			],
 			items: [{
 					bold: 'on',
-					boxes_chosen: 'on',
-					name: 'Fine long rifle',
-					numboxes: '2'
-				},
-				{
-					bold: 'on',
-					boxes_chosen: 'on',
 					name: 'Fine pair of pistols',
 					numboxes: '1'
 				},
 				{
-					boxes_chosen: 'on',
+					bold: 'on',
+					name: 'Fine long rifle',
+					numboxes: '2'
+				},
+				{
 					name: 'Electroplasmic ammunition',
 					numboxes: '1'
 				},
 				{
-					boxes_chosen: 'on',
-					name: 'Spyglass',
-					numboxes: '1'
-				},
-				{
-					boxes_chosen: 'on',
 					name: 'A trained hunting pet',
 					numboxes: '0'
 				},
 				{
-					boxes_chosen: 'on',
+					name: 'Spyglass',
+					numboxes: '1'
+				},
+				{
 					name: 'Spiritbane charm',
 					numboxes: '0'
 				}
@@ -958,33 +946,27 @@ var crewData = {
 			],
 			items: [{
 					bold: 'on',
-					boxes_chosen: 'on',
-					name: 'Fine wrecker tools',
-					numboxes: '2'
-				},
-				{
-					bold: 'on',
-					boxes_chosen: 'on',
 					name: 'Fine tinkering tools',
 					numboxes: '1'
 				},
 				{
-					boxes_chosen: 'on',
-					name: 'Bandolier of alchemicals (3)',
-					numboxes: '1'
+					bold: 'on',
+					name: 'Fine wrecker tools',
+					numboxes: '2'
 				},
 				{
-					boxes_chosen: 'on',
-					name: 'Bandolier of alchemicals (3)',
-					numboxes: '1'
-				},
-				{
-					boxes_chosen: 'on',
 					name: 'Blowgun & darts, syringes',
 					numboxes: '0'
 				},
 				{
-					boxes_chosen: 'on',
+					name: 'Bandolier of alchemicals (3)',
+					numboxes: '1'
+				},
+				{
+					name: 'Bandolier of alchemicals (3)',
+					numboxes: '1'
+				},
+				{
 					name: 'Gadget',
 					numboxes: '1'
 				}
@@ -1049,33 +1031,27 @@ var crewData = {
 			],
 			items: [{
 					bold: 'on',
-					boxes_chosen: 'on',
-					name: 'Fine shadow cloak',
-					numboxes: '1'
-				},
-				{
-					bold: 'on',
-					boxes_chosen: 'on',
 					name: 'Fine lockpicks',
 					numboxes: '0'
 				},
 				{
-					boxes_chosen: 'on',
+					bold: 'on',
+					name: 'Fine shadow cloak',
+					numboxes: '1'
+				},
+				{
 					name: 'Light climbing gear',
 					numboxes: '1'
 				},
 				{
-					boxes_chosen: 'on',
-					name: 'Dark-sight goggles',
-					numboxes: '1'
-				},
-				{
-					boxes_chosen: 'on',
 					name: 'Silence potion vial',
 					numboxes: '0'
 				},
 				{
-					boxes_chosen: 'on',
+					name: 'Dark-sight goggles',
+					numboxes: '1'
+				},
+				{
 					name: 'Spiritbane charm',
 					numboxes: '0'
 				}
@@ -1140,34 +1116,28 @@ var crewData = {
 			],
 			items: [{
 					bold: 'on',
-					boxes_chosen: 'on',
+					name: 'Fine clothes & jewelry',
+					numboxes: '0'
+				},
+				{
+					bold: 'on',
 					name: 'Fine disguise kit',
 					numboxes: '1'
 				},
 				{
 					bold: 'on',
-					boxes_chosen: 'on',
-					name: 'Fine clothes & jewelry',
-					numboxes: '0'
-				},
-				{
-					boxes_chosen: 'on',
-					name: 'A cane-sword',
-					numboxes: '1'
-				},
-				{
-					bold: 'on',
-					boxes_chosen: 'on',
 					name: 'Fine loaded dice, trick cards',
 					numboxes: '0'
 				},
 				{
-					boxes_chosen: 'on',
 					name: 'Trance powder',
 					numboxes: '0'
 				},
 				{
-					boxes_chosen: 'on',
+					name: 'A cane-sword',
+					numboxes: '1'
+				},
+				{
 					name: 'Spiritbane charm',
 					numboxes: '0'
 				}
@@ -1232,33 +1202,27 @@ var crewData = {
 			],
 			items: [{
 					bold: 'on',
-					boxes_chosen: 'on',
-					name: 'Fine bottle of whiskey',
-					numboxes: '1'
-				},
-				{
-					bold: 'on',
-					boxes_chosen: 'on',
 					name: 'Fine cover identity',
 					numboxes: '0'
 				},
 				{
-					boxes_chosen: 'on',
+					bold: 'on',
+					name: 'Fine bottle of whiskey',
+					numboxes: '1'
+				},
+				{
 					name: 'Blueprints',
 					numboxes: '1'
 				},
 				{
-					boxes_chosen: 'on',
 					name: 'Vial of slumber essence',
 					numboxes: '0'
 				},
 				{
-					boxes_chosen: 'on',
 					name: 'Concealed palm pistol',
 					numboxes: '0'
 				},
 				{
-					boxes_chosen: 'on',
 					name: 'Spiritbane charm',
 					numboxes: '0'
 				}
@@ -1323,33 +1287,27 @@ var crewData = {
 			],
 			items: [{
 					bold: 'on',
-					boxes_chosen: 'on',
 					name: 'Fine lightning hook',
 					numboxes: '1'
 				},
 				{
 					bold: 'on',
-					boxes_chosen: 'on',
 					name: 'Fine spirit mask',
 					numboxes: '1'
 				},
 				{
-					boxes_chosen: 'on',
-					name: 'Spirit bottles (2)',
-					numboxes: '1'
-				},
-				{
-					boxes_chosen: 'on',
 					name: 'Electroplasm vials',
 					numboxes: '0'
 				},
 				{
-					boxes_chosen: 'on',
+					name: 'Spirit bottles (2)',
+					numboxes: '1'
+				},
+				{
 					name: 'Ghost key',
 					numboxes: '0'
 				},
 				{
-					boxes_chosen: 'on',
 					name: 'Spiritbane charm',
 					numboxes: '0'
 				}
@@ -1408,27 +1366,22 @@ var crewData = {
 				'Edrik, an envoy'
 			],
 			items: [{
-					boxes_chosen: 'on',
-					name: 'Fine shadow cloak',
-					numboxes: '1'
-				},
-				{
-					boxes_chosen: 'on',
 					name: 'Fine clothes and accoutrements',
 					numboxes: '0'
 				},
 				{
-					boxes_chosen: 'on',
 					name: 'Fine personal weapon',
 					numboxes: '1'
 				},
 				{
-					boxes_chosen: 'on',
+					name: 'Fine shadow cloak',
+					numboxes: '1'
+				},
+				{
 					name: 'Demonbane charm',
 					numboxes: '0'
 				},
 				{
-					boxes_chosen: 'on',
 					name: 'Spiritbane charm',
 					numboxes: '0'
 				}
@@ -1763,8 +1716,22 @@ var crewData = {
 		]
 	},
 	spiritPlaybooks = ['ghost', 'hull', 'vampire'];
+/* NECESSARY DATA TRANSFORMATION */
+Object.keys(playbookData).forEach(playbook => {
+	playbookData[playbook].items.forEach(item => {
+		item.boxes_chosen = 'on';
+	});
+	playbookData[playbook].friends = playbookData[playbook].friends.map(n => ({
+		name: n
+	}));
+});
+Object.keys(crewData).forEach(crew => {
+	crewData[crew].contacts = crewData[crew].contacts.map(n => ({
+		name: n
+	}));
+});
 /* UTILITY FUNCTIONS */
-var setDiceFromTotal = function (name, numDice, upToFive, value) {
+var setDiceFromTotal = (name, numDice, upToFive, value) => {
 		'use strict';
 		value = value || 1;
 		let setting = {};
@@ -1777,24 +1744,24 @@ var setDiceFromTotal = function (name, numDice, upToFive, value) {
 		};
 		setAttrs(setting);
 	},
-	fillRepeatingSectionFromData = function (sectionName, dataList) {
+	fillRepeatingSectionFromData = (sectionName, dataList) => {
 		'use strict';
-		getSectionIDs(`repeating_${sectionName}`, function (idList) {
+		getSectionIDs(`repeating_${sectionName}`, idList => {
 			let rowNameAttributes = idList.map(id => `repeating_${sectionName}_${id}_name`);
-			getAttrs(rowNameAttributes, function (attrs) {
-				let existingRows = Object.keys(attrs).map(x => attrs[x]),
+			getAttrs(rowNameAttributes, v => {
+				let existingRows = Object.keys(v).map(x => v[x]),
 					createdIDs = [];
 				let setting = dataList.filter(o => !existingRows.includes(o.name))
-					.map(function (o) {
+					.map(o => {
 						let rowID;
 						while (!rowID) {
 							let newID = generateRowID();
 							if (!createdIDs.includes(newID)) {
-							 rowID = newID;
-							 createdIDs.push(rowID);
+								rowID = newID;
+								createdIDs.push(rowID);
 							}
 						}
-						return Object.keys(o).reduce(function (m, key) {
+						return Object.keys(o).reduce((m, key) => {
 							m[`repeating_${sectionName}_${rowID}_${key}`] = o[key];
 							return m;
 						}, {});
@@ -1804,11 +1771,11 @@ var setDiceFromTotal = function (name, numDice, upToFive, value) {
 			});
 		});
 	},
-	emptyFirstRowIfUnnamed = function (sectionName) {
+	emptyFirstRowIfUnnamed = sectionName => {
 		'use strict';
-		getSectionIDs(`repeating_${sectionName}`, function (idList) {
+		getSectionIDs(`repeating_${sectionName}`, idList => {
 			let id = idList[0];
-			getAttrs([`repeating_${sectionName}_${id}_name`], function (v) {
+			getAttrs([`repeating_${sectionName}_${id}_name`], v => {
 				if (!v[`repeating_${sectionName}_${id}_name`]) {
 					removeRepeatingRow(`repeating_${sectionName}_${id}`);
 				};
@@ -1820,31 +1787,31 @@ var setDiceFromTotal = function (name, numDice, upToFive, value) {
 var crewAttributes = [...new Set([].concat(...Object.keys(crewData).map(x => Object.keys(crewData[x].base))))],
 	playbookAttributes = [...new Set([].concat(...Object.keys(playbookData).map(x => Object.keys(playbookData[x].base))))],
 	watchedAttributes = new Set([].concat(crewAttributes, playbookAttributes));
-on('change:crew_type change:playbook', function (event) {
+on('change:crew_type change:playbook', event => {
 	'use strict';
-	getAttrs(['crew_type', 'playbook', 'changed_attributes'], function (attrValues) {
-		let changedAttributes = (attrValues.changed_attributes || '').split(','),
-			data, baseData, sourceName, items;
+	getAttrs(['crew_type', 'playbook', 'changed_attributes'], v => {
+		let changedAttributes = (v.changed_attributes || '').split(','),
+			data, baseData, sourceName;
 		switch (event.sourceAttribute) {
 		case 'crew_type':
-			sourceName = attrValues.crew_type.toLowerCase();
+			sourceName = v.crew_type.toLowerCase();
 			if (crewData.hasOwnProperty(sourceName)) {
 				data = crewData[sourceName].base;
 				baseData = crewAttributes;
 				emptyFirstRowIfUnnamed('contact');
 				emptyFirstRowIfUnnamed('crewability');
-				fillRepeatingSectionFromData('contact', playbookData[sourceName].contacts.map(n => ({name: n})));
+				fillRepeatingSectionFromData('contact', playbookData[sourceName].contacts);
 				fillRepeatingSectionFromData('crewability', playbookData[sourceName].abilities);
 			};
 			break;
 		case 'playbook':
-			sourceName = attrValues.playbook.toLowerCase();
+			sourceName = v.playbook.toLowerCase();
 			if (playbookData.hasOwnProperty(sourceName)) {
 				data = playbookData[sourceName].base;
 				emptyFirstRowIfUnnamed('friend');
 				emptyFirstRowIfUnnamed('ability');
 				fillRepeatingSectionFromData('playbookitem', playbookData[sourceName].items);
-				fillRepeatingSectionFromData('friend', playbookData[sourceName].friends.map(n => ({name: n})));
+				fillRepeatingSectionFromData('friend', playbookData[sourceName].friends);
 				fillRepeatingSectionFromData('ability', playbookData[sourceName].abilities);
 				baseData = playbookAttributes;
 			};
@@ -1863,11 +1830,11 @@ on('change:crew_type change:playbook', function (event) {
 	});
 });
 /* Watch for changes in auto-set attributes */
-watchedAttributes.forEach(function (name) {
+watchedAttributes.forEach(name => {
 	'use strict';
-	on(`change:${name}`, function (eventInfo) {
+	on(`change:${name}`, eventInfo => {
 		if (eventInfo.sourceType === 'player') {
-			getAttrs(['changed_attributes'], function (v) {
+			getAttrs(['changed_attributes'], v => {
 				let changedAttributes = [...new Set(v.changed_attributes.split(',').concat(name))].filter(x => !!x).join(',');
 				setAttrs({
 					changed_attributes: changedAttributes
@@ -1877,47 +1844,47 @@ watchedAttributes.forEach(function (name) {
 	});
 });
 /* DERIVED DICE NUMBERS */
-var actions1 = Object.keys(actionData).reduce(function (m, k) {
+var actions1 = Object.keys(actionData).reduce((m, k) => {
 		m[k] = actionData[k].map(s => `${s}1`);
 		return m;
 	}, {}),
 	actionsFlat = [].concat(...Object.keys(actionData).map(x => actionData[x])),
 	actions1Flat = actionsFlat.map(str => str + '1'),
-	calculateResistance = function (name) {
+	calculateResistance = name => {
 		'use strict';
-		getAttrs(actions1[name], function (attrs) {
-			let numDice = Object.keys(attrs).map(x => attrs[x]).reduce((s, v) => s + parseInt(v || 0), 0);
+		getAttrs(actions1[name], v => {
+			let numDice = Object.keys(v).map(x => v[x]).reduce((s, c) => s + parseInt(c || 0), 0);
 			setDiceFromTotal(name, numDice);
 		});
 	},
-	calculateVice = function () {
+	calculateVice = () => {
 		'use strict';
-		getAttrs(actions1Flat, function (values) {
-			let numDice = Math.min(...Object.keys(actions1).map(function (name) {
-				return actions1[name].reduce((s, str) => s + parseInt(values[str] || 0), 0);
+		getAttrs(actions1Flat, v => {
+			let numDice = Math.min(...Object.keys(actions1).map(name => {
+				return actions1[name].reduce((s, str) => s + parseInt(v[str] || 0), 0);
 			}));
 			setDiceFromTotal('vice', numDice);
 		});
 	};
 /* Register attribute/action event handlers */
-Object.keys(actionData).forEach(function (attributeName) {
+Object.keys(actionData).forEach(attributeName => {
 	'use strict';
-	actionData[attributeName].forEach(function (actionName) {
+	actionData[attributeName].forEach(actionName => {
 		on(`change:${actionName}1`, () => calculateResistance(attributeName));
 	});
-	on(`change:${attributeName}1 change:${attributeName}2 change:${attributeName}3 change:${attributeName}4`, calculateVice);
+	on([1, 2, 3, 4].map(x => `change:${attributeName}${x}`).join(' '), calculateVice);
 });
 /* GENERATE FACTIONS */
-on('change:generate_factions', function (event) {
+on('change:generate_factions', () => {
 	'use strict';
 	Object.keys(factionsData).forEach(function (sectionName) {
 		fillRepeatingSectionFromData(sectionName, factionsData[sectionName]);
 	});
 });
 /* GENERATE ABILITIES */
-on('change:generate_abilities', function () {
+on('change:generate_abilities', () => {
 	'use strict';
-	getAttrs(['generate_source'], function (v) {
+	getAttrs(['generate_source'], v => {
 		let sectionName, dataList;
 		if (crewData.hasOwnProperty(v.generate_source)) {
 			sectionName = 'crewability';
@@ -1931,36 +1898,32 @@ on('change:generate_abilities', function () {
 	});
 });
 /* GENERATE FRIENDS */
-on('change:generate_friends', function () {
+on('change:generate_friends', () => {
 	'use strict';
-	getAttrs(['generate_source'], function (v) {
+	getAttrs(['generate_source'], v => {
 		let sectionName, dataList;
 		if (crewData.hasOwnProperty(v.generate_source)) {
 			sectionName = 'contact';
-			dataList = crewData[v.generate_source].contacts.map(n => ({
-				name: n
-			}));
+			dataList = crewData[v.generate_source].contacts;
 		} else if (playbookData.hasOwnProperty(v.generate_source)) {
 			sectionName = 'friend';
-			dataList = playbookData[v.generate_source].friends.map(n => ({
-				name: n
-			}));
+			dataList = playbookData[v.generate_source].friends;
 		};
 		emptyFirstRowIfUnnamed(sectionName);
 		fillRepeatingSectionFromData(sectionName, dataList);
 	});
 });
 /* CALCULATE WANTED */
-on('change:wanted', function () {
+on('change:wanted', () => {
 	'use strict';
-	getAttrs(['wanted'], function (v) {
+	getAttrs(['wanted'], v => {
 		setDiceFromTotal('wanted', parseInt(v.wanted));
 	});
 });
 /* EXTRA STRESS BOXES */
-on('change:setting_extra_stress', function () {
+on('change:setting_extra_stress', () => {
 	'use strict';
-	getAttrs(['setting_extra_stress'], function (v) {
+	getAttrs(['setting_extra_stress'], v => {
 		setDiceFromTotal('setting_extra_stress', parseInt(v.setting_extra_stress), true, 'on');
 	});
 });
@@ -1977,33 +1940,31 @@ var calculateCohortDots = function (t1, t2, t3, t4, imp, type, prefix) {
 		setDiceFromTotal(`${prefix}die`, numDots, true);
 	},
 	qualityAttrs = ['crew_tier1', 'crew_tier2', 'crew_tier3', 'crew_tier4', 'cohort1_impaired', 'cohort1_type'],
-	qualityEvent = qualityAttrs.map(str => `change:${str}`).join(' '),
-	calculateCohort1Dice = function () {
-		'use strict';
-		getAttrs(qualityAttrs, function (attrs) {
-			calculateCohortDots(attrs.crew_tier1, attrs.crew_tier2, attrs.crew_tier3, attrs.crew_tier4, attrs.cohort1_impaired, attrs.cohort1_type, 'cohort1_');
-		});
-	};
-on(qualityEvent, calculateCohort1Dice);
-var repeatingQualityAttrs = ['crew_tier1', 'crew_tier2', 'crew_tier3', 'crew_tier4', 'repeating_cohort:impaired', 'repeating_cohort:type'],
-	repeatingQualityEvent = repeatingQualityAttrs.map(str => `change:${str}`).join(' '),
-	calculateRepeatingCohortDice = function () {
-		'use strict';
-		getSectionIDs('repeating_cohort', function (list) {
-			list.forEach(function (id) {
-				let attrList = repeatingQualityAttrs.map(str => str.replace(':', `_${id}_`));
-				getAttrs(attrList, function (attrs) {
-					calculateCohortDots(attrs.crew_tier1, attrs.crew_tier2, attrs.crew_tier3, attrs.crew_tier4, attrs[attrList[4]], attrs[attrList[5]], `repeating_cohort_${id}_`);
-				});
+	qualityEvent = qualityAttrs.map(x => `change:${x}`).join(' '),
+	repeatingQualityAttrs = ['crew_tier1', 'crew_tier2', 'crew_tier3', 'crew_tier4', 'repeating_cohort:impaired', 'repeating_cohort:type'],
+	repeatingQualityEvent = repeatingQualityAttrs.map(x => `change:${x}`).join(' ');
+on(qualityEvent, () => {
+	'use strict';
+	getAttrs(qualityAttrs, attrs => {
+		calculateCohortDots(attrs.crew_tier1, attrs.crew_tier2, attrs.crew_tier3, attrs.crew_tier4, attrs.cohort1_impaired, attrs.cohort1_type, 'cohort1_');
+	});
+});
+on(repeatingQualityEvent + ' ' + ['name', 'subtype', 'edges', 'flaws', 'description'].map(x => `change:repeating_cohort:${x}`).join(' '), () => {
+	'use strict';
+	getSectionIDs('repeating_cohort', list => {
+		list.forEach(id => {
+			let attrList = repeatingQualityAttrs.map(str => str.replace(':', `_${id}_`));
+			getAttrs(attrList, v => {
+				calculateCohortDots(v.crew_tier1, v.crew_tier2, v.crew_tier3, v.crew_tier4, v[attrList[4]], v[attrList[5]], `repeating_cohort_${id}_`);
 			});
 		});
-	};
-on(repeatingQualityEvent + ' change:repeating_cohort:name change:repeating_cohort:subtype change:repeating_cohort:edges change:repeating_cohort:flaws change:repeating_cohort:description', calculateRepeatingCohortDice);
+	});
+});
 /* LEFT-FILL CHECKBOXES */
-var handleFourBoxesFill = function (name) {
+var handleFourBoxesFill = name => {
 	'use strict';
-	on(`change:${name}1 change:${name}2 change:${name}3 change:${name}4`, function (event) {
-		getAttrs([event.sourceAttribute], function (v) {
+	on(`change:${name}1 change:${name}2 change:${name}3 change:${name}4`, event => {
+		getAttrs([event.sourceAttribute], v => {
 			let rName = event.sourceAttribute.slice(0, -1);
 			if (v[event.sourceAttribute] === '1') {
 				let setting = {};
@@ -2047,10 +2008,10 @@ var itemChecks = [
 	'bandolier1_check',
 	'bandolier2_check'
 ];
-itemChecks.forEach(function (name) {
+itemChecks.forEach(name => {
 	'use strict';
-	on(`change:${name} change:${name}_b change:${name}_c change:${name}_d change:${name}_e`, function (event) {
-		getAttrs([event.sourceAttribute], function (v) {
+	on(['', '_b', '_c', '_d', '_e'].map(x => `change:${name}${x}`).join(' '), event => {
+		getAttrs([event.sourceAttribute], v => {
 			if (v[event.sourceAttribute] === 'on') {
 				let setting = {};
 				switch (event.sourceAttribute.slice('-1')) {
@@ -2083,7 +2044,7 @@ itemChecks.forEach(function (name) {
 	});
 });
 /* INITIALISATION AND UPGRADES */
-on('sheet:opened', function () {
+on('sheet:opened', () => {
 	'use strict';
 	let initialRows = [
 		'ability',
@@ -2092,18 +2053,18 @@ on('sheet:opened', function () {
 		'contact'
 	];
 	/* Make sure sheet_type is never 0 */
-	getAttrs(['sheet_type', 'changed_attributes'], function (v) {
+	getAttrs(['sheet_type', 'changed_attributes'], v => {
 		if (!['character', 'crew', 'faction'].includes(v.sheet_type)) {
 			setAttrs({
 				sheet_type: 'character'
 			});
 		}
 	});
-	/* Initial setup */
-	getAttrs(['version'], function (v) {
+	/* Setup and upgrades */
+	getAttrs(['version'], v => {
 		// Setup initial rows in repeating sections
 		if (!v.version) {
-			let setting = initialRows.reduce(function (memo, sectionName) {
+			let setting = initialRows.reduce((memo, sectionName) => {
 				memo[`repeating_${sectionName}_${generateRowID()}_dummy`] = 1;
 				return memo;
 			}, {});
@@ -2111,14 +2072,14 @@ on('sheet:opened', function () {
 		};
 		// Upgrade to 0.7: Convert legacy faction repeating section to text
 		if (v.version && v.version.split('.')[0] === '0' && parseInt(v.version.split('.')[1]) < 7) {
-			getSectionIDs('repeating_faction', function (list) {
+			getSectionIDs('repeating_faction', list => {
 				let sectionList = ['faction1', 'faction2'].concat(list.map(str => `repeating_faction_${str}`)),
 					attrList = [].concat(...sectionList.map(str => [`${str}_name`, `${str}_status`, `${str}_description`]));
-				getAttrs(attrList, function (attrs) {
-					let output = sectionList.map(function (str) {
-						return 'Name: ' + attrs[`${str}_name`] + '\n' +
-							'Status: ' + (attrs[`${str}_status`] || '') + '\n' +
-							'Notes: ' + (attrs[`${str}_description`] || '') + '\n';
+				getAttrs(attrList, v => {
+					let output = sectionList.map(str => {
+						return 'Name: ' + v[`${str}_name`] + '\n' +
+							'Status: ' + (v[`${str}_status`] || '') + '\n' +
+							'Notes: ' + (v[`${str}_description`] || '') + '\n';
 					}).join('\n');
 					setAttrs({
 						faction_notes: output
@@ -2144,24 +2105,24 @@ on('sheet:opened', function () {
 				'crew_ability1_check', 'crew_ability1_name', 'crew_ability1_description',
 				'contact1_check', 'contact1_name'
 			];
-			getAttrs(attrs, function (attrValues) {
+			getAttrs(attrs, v => {
 				fillRepeatingSectionFromData('ability', [{
-					check: attrValues.ability1_check,
-					description: attrValues.ability1_description,
-					name: attrValues.ability1_name
+					check: v.ability1_check,
+					description: v.ability1_description,
+					name: v.ability1_name
 				}]);
 				fillRepeatingSectionFromData('friend', [{
-					name: attrValues.friend1_name,
-					status: attrValues.friend1_status
+					name: v.friend1_name,
+					status: v.friend1_status
 				}]);
 				fillRepeatingSectionFromData('crewability', [{
-					check: attrValues.crew_ability1_check,
-					description: attrValues.crew_ability1_description,
-					name: attrValues.crew_ability1_name
+					check: v.crew_ability1_check,
+					description: v.crew_ability1_description,
+					name: v.crew_ability1_name
 				}]);
 				fillRepeatingSectionFromData('contact', [{
-					check: attrValues.contact1_check,
-					name: attrValues.contact1_name
+					check: v.contact1_check,
+					name: v.contact1_name
 				}]);
 			});
 		};
@@ -2180,50 +2141,50 @@ on('sheet:opened', function () {
 					'item_0_check_c',
 					'item_1_check_b'
 				];
-			getAttrs(allAttrs, function (values) {
+			getAttrs(allAttrs, v => {
 				let itemData = [];
-				if (values['item_0_desc']) {
+				if (v['item_0_desc']) {
 					itemData.push({
-						check_1: values['item_0_check'] || '0',
-						name: values['item_0_desc'],
+						check_1: v['item_0_check'] || '0',
+						name: v['item_0_desc'],
 						numboxes: '1'
 					});
 					itemData.push({
-						check_1: values['item_0_check_b']|| '0',
-						name: values['item_0_desc'],
+						check_1: v['item_0_check_b'] || '0',
+						name: v['item_0_desc'],
 						numboxes: '1'
 					});
 					itemData.push({
-						check_1: values['item_0_check_c']|| '0',
-						name: values['item_0_desc'],
+						check_1: v['item_0_check_c'] || '0',
+						name: v['item_0_desc'],
 						numboxes: '1'
 					});
 				}
-				if (values['item_1_desc']) {
+				if (v['item_1_desc']) {
 					itemData.push({
 						bold: 'on',
-						check_1: values['item_1_check'] || '0',
-						check_2: values['item_1_check_b'] || '0',
-						name: values['item_1_desc'],
+						check_1: v['item_1_check'] || '0',
+						check_2: v['item_1_check_b'] || '0',
+						name: v['item_1_desc'],
 						numboxes: '2'
 					});
 				}
 				['2', '3', '5', '6'].forEach(index => {
-					if (values[`item_${index}_desc`]) {
+					if (v[`item_${index}_desc`]) {
 						itemData.push({
 							bold: (['2', '3'].includes(index) ? 'on' : '0'),
-							check_1: values[`item_${index}_check`]|| '0',
-							name: values[`item_${index}_desc`],
+							check_1: v[`item_${index}_check`] || '0',
+							name: v[`item_${index}_desc`],
 							numboxes: '1'
 						});
 					}
 				});
 				['4', '7', '8', '9'].forEach(index => {
-					if (values[`item_${index}_desc`]) {
+					if (v[`item_${index}_desc`]) {
 						itemData.push({
 							bold: ((index === '4') ? 'on' : '0'),
-							check_1: values[`item_${index}_check`]|| '0',
-							name: values[`item_${index}_desc`],
+							check_1: v[`item_${index}_check`] || '0',
+							name: v[`item_${index}_desc`],
 							numboxes: '0'
 						});
 					}
@@ -2239,14 +2200,14 @@ on('sheet:opened', function () {
 					...idArray.map(id => `repeating_item_${id}_check`),
 					...idArray.map(id => `repeating_item_${id}_check_b`)
 				];
-				getAttrs(allAttrs, values => {
+				getAttrs(allAttrs, v => {
 					let setting = {};
 					idArray.forEach(id => {
 						setting[`repeating_item_${id}_boxes_chosen`] = 'on';
 						setting[`repeating_item_${id}_numboxes`] = '2';
-						setting[`repeating_item_${id}_name`] = values[`repeating_item_${id}_desc`] || '';
-						setting[`repeating_item_${id}_check_1`] = values[`repeating_item_${id}_check`] || '0';
-						setting[`repeating_item_${id}_check_2`] = values[`repeating_item_${id}_check_b`] || '0';
+						setting[`repeating_item_${id}_name`] = v[`repeating_item_${id}_desc`] || '';
+						setting[`repeating_item_${id}_check_1`] = v[`repeating_item_${id}_check`] || '0';
+						setting[`repeating_item_${id}_check_2`] = v[`repeating_item_${id}_check_b`] || '0';
 					});
 					setAttrs(setting);
 				});
