@@ -12,9 +12,13 @@ Ce jeu s’adresse à tous ceux qui recherchent :
 + Une magie qui use de formules magiques, où les rimes sont l’élément déclencheur de puissants sortilèges.
 
 # Version courante
-1.1 [Capture d'écran](brigandyne.jpg)
+1.2 [Capture d'écran](brigandyne.jpg)
 
 # Notes de version
+
+## v1.2 (2017-05-11)
+
+* Correction du libellé "Miracles de magie blanche"
 
 ## v1.1 (2017-04-05)
 
