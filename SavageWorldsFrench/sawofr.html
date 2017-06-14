@@ -4,11 +4,12 @@
 // Github:   https://github.com/shdwjk/TheAaronSheet/blob/master/TheAaronSheet.js
 // By:       The Aaron, Arcane Scriptomancer
 // Contact:  https://app.roll20.net/users/104025/the-aaron
+
 var TAS = TAS || (function(){
     'use strict';
 
-    var version = '0.2.1',
-        lastUpdate = 1453794214,
+    var version = '0.2.4',
+        lastUpdate = 1457098091,
 
         loggingSettings = {
             debug: {
@@ -176,7 +177,7 @@ var TAS = TAS || (function(){
 
         coloredLoggerFunction = function(message){
             console.log(
-                '%c '+label+': %c '+message,
+                '%c '+label+': %c '+message + ' ',
                 'background-color: '+lBGColor+';color: '+lTxtColor+'; font-weight:bold;',
                 'background-color: '+mBGColor+';color: '+mTxtColor+';'
             );
@@ -200,9 +201,9 @@ var TAS = TAS || (function(){
 
     registerCallstack = function(callstack,label){
         var idx=_.findIndex(callstackRegistry,function(o){
-            return (_.difference(o.stack,callstack).length === _.difference(callstack,o.stack).length)
-                && _.difference(o.stack,callstack).length === 0
-                && o.label === label;
+            return (_.difference(o.stack,callstack).length === _.difference(callstack,o.stack).length) &&
+                _.difference(o.stack,callstack).length === 0 &&
+                o.label === label;
         });
         if(-1 === idx){
             idx=callstackRegistry.length;
@@ -264,7 +265,7 @@ var TAS = TAS || (function(){
     },
 
 
-    wrapCallback = function (label, callback,context){
+    wrapCallback = function (label, callback, context){
         var callstack;
         if('function' === typeof label){
             context=callback;
@@ -284,12 +285,15 @@ var TAS = TAS || (function(){
 
         return (function(cb,ctx,cs,lbl){
             var ctxref=registerCallstack(cs,lbl);
+
+            /*jshint -W054 */
             return new Function('cb','ctx','TASlog',
                 "return function TAS_CALLSTACK_"+ctxref+"(){"+
                     "TASlog('Entering: '+(cb.name||'(anonymous function)'));"+
                     "cb.apply(ctx||{},arguments);"+
                     "TASlog('Exiting: '+(cb.name||'(anonymous function)'));"+
                 "};")(cb,ctx,log);
+            /*jshint +W054 */
         }(callback,context,callstack,label));
     },
 
@@ -360,8 +364,10 @@ var TAS = TAS || (function(){
             Object.defineProperty(obj, pname, {
                 enumerable: true,
                 set: function(v){
-                    pvalue=v;
-                    prepareUpdate(full_pname,v);
+                    if(v!==pvalue) {
+                        pvalue=v;
+                        prepareUpdate(full_pname,v);
+                    }
                 },
                 get: function(){
                     return pvalue;
@@ -373,8 +379,10 @@ var TAS = TAS || (function(){
                 enumerable: true,
                 set: function(v){
                     var val=v.toString();
-                    pvalue=val;
-                    prepareUpdate(full_pname,val);
+                    if(val !== pvalue) {
+                        pvalue=val;
+                        prepareUpdate(full_pname,val);
+                    }
                 },
                 get: function(){
                     return pvalue.toString();
@@ -386,8 +394,10 @@ var TAS = TAS || (function(){
                 enumerable: true,
                 set: function(v){
                     var val=parseInt(v,10) || 0;
-                    pvalue=val;
-                    prepareUpdate(full_pname,val);
+                    if(val !== pvalue){
+                        pvalue=val;
+                        prepareUpdate(full_pname,val);
+                    }
                 },
                 get: function(){
                     return parseInt(pvalue,10) || 0;
@@ -399,8 +409,10 @@ var TAS = TAS || (function(){
                 enumerable: true,
                 set: function(v){
                     var val=parseFloat(v) || 0;
-                    pvalue=val;
-                    prepareUpdate(full_pname,val);
+                    if(val !== pvalue) {
+                        pvalue=val;
+                        prepareUpdate(full_pname,val);
+                    }
                 },
                 get: function(){
                     return parseFloat(pvalue) || 0;
@@ -411,8 +423,10 @@ var TAS = TAS || (function(){
                     enumerable: true,
                     set: function(v){
                         var val=(parseFloat(v) || 0).toFixed(d);
-                        pvalue=val;
-                        prepareUpdate(full_pname,val);
+                        if(val !== pvalue){
+                            pvalue=val;
+                            prepareUpdate(full_pname,val);
+                        }
                     },
                     get: function(){
                         return (parseFloat(pvalue) || 0).toFixed(d);
@@ -600,7 +614,7 @@ var TAS = TAS || (function(){
             .reduce(function(m,r){
                 return m + (r.F[field]);
             },0,function(t,r,a){
-                a[destination]=t;
+                a.S[destination]=t;
             })
             .execute();
     };
@@ -1067,7 +1081,7 @@ on("change:atkcible", function () {
     <!-- onglets -->
     <input type="radio" name="attr_chkvie" value="0" class="sheet-onglmain" title="Feuille" checked /><span>Feuille</span>
     <input type="radio" name="attr_chkvie" value="1" class="sheet-onglconfig" title="Configuration" /><span>Configuration</span>
-    <span style="display:inline-block;width:150px;text-align: center;color: #888888;font-size: 0.9em;">v1.6 (30/07/2016)</span>
+    <span style="display:inline-block;width:150px;text-align: center;color: #888888;font-size: 0.9em;">v1.7 (18/12/2016)</span>
     <!-- Style FdP -->
     <input type="checkbox" name="attr_sheetDead" value="1" class="sheet-chkSheetDead" />
     <!-- paramètres cachés -->
@@ -2420,7 +2434,7 @@ Dégâts supplémentaires si relance : [[1d6!!]]"
    <div class="sheet-colblock"> <!-- ** NOTES/DIVERS ** -->
         <div class="sheet-redtitle1" style="display: inline-block;width: 220px;">NOTES</div>
         <textarea name="attr_divnotes" placeholder="Notes / Divers"></textarea>
-        
+
    </div> <!-- ** FIN NOTES/DIVERS ** -->
 </div> <!-- FIN MAIN -->
 <!-- CONFIGURATION -->

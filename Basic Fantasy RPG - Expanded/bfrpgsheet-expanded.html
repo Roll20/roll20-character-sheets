@@ -1,3 +1,52 @@
+<!-- The sheetworker is for transferring data from the oldsheet to the new sheet -->
+
+<script type=“text/worker”>
+on("sheet:opened", function() {
+  getAttrs(['list', 'of', 'attrs', 'on', 'the', 'old', 'sheet', 'already_transitioned'], function(attrs) {
+      if(attr.already_transitioned !== '1') {
+          var hasOldData = false;
+          var updates = {};
+          _.each(attrs, function(value, key) {
+              if(value) {
+                  hasOldData = true;
+              }
+          });
+          if(!hasOldData) {
+              updates.already_transitioned = '1';
+              setAttrs(updates);
+          }
+          else {
+              getAttrs(['list', 'of', 'all', 'attrs', 'on', 'the', 'old', 'sheet'], function(oldAttrs) {
+                  attr_character_name = attr_name;
+                  attr_strength = attr_STR;
+                  attr_intelligence = attr_INT;
+                  attr_wisdom = attr_WIS;
+                  attr_dexterity = attr_DEX;
+                  attr_constitution = attr_CON;
+                  attr_charisma = attr_CHA;
+                  attr_HP_max = attr_hp_max;
+                  attr_HP = attr_hp;
+                  attr_ab = attr_ab_normal;
+                  attr_move_encounter = attr_movement;
+                  attr_current_xp = attr_currentxp;
+                  attr_xp_next_level = attr_xpnextlevel;
+                  attr_save_death_ray = attr_deathrayorpoison;
+                  attr_save_magic_wand = attr_magicwands;
+                  attr_save_paralysis = attr_paralysispetrification;
+                  attr_save_dragons_breath = attr_dragonbreath;
+                  attr_save_rod_staff_spell = attr_rodsstavesspells;
+                  attr_lootnotes = attr_money;
+                  updates.already_transitioned = '1';
+                  setAttrs(updates);
+              });
+          }
+      }
+  });
+});
+</script>
+
+<!-- Sheet code -->
+
 <div class="sheet-overall-wrapper">
 <div class="sheet-character">
 <!--Main Header -->
@@ -42,7 +91,7 @@
 		</div>
 		<h4 class="sheet-center">Appearance, Vision, Languages and Alignment</h4>
 			<div class="sheet-row">
-				<div class="sheet-col-1-7 sheet-small-label sheet-center"><input class="sheet-underlined sheet-center" type="text" name="attr_gender"><br/>Gender</div>
+				<div class="sheet-col-1-7 sheet-small-label sheet-center"><input class="sheet-underlined sheet-center" type="text" name="attr_race"><br/>Race</div>
 				<div class="sheet-col-1-7 sheet-small-label sheet-center"><input class="sheet-underlined sheet-center" type="number" name="attr_age"><br/>Age</div>
 				<div class="sheet-col-1-7 sheet-small-label sheet-center"><input class="sheet-underlined sheet-center" type="text" name="attr_height"><br/>Height</div>
 				<div class="sheet-col-1-7 sheet-small-label sheet-center"><input class="sheet-underlined sheet-center" type="text" name="attr_weight"><br/>Weight</div>
@@ -73,7 +122,7 @@
 							<input type="number" name="attr_strength_mod" value="(round(@{strength}*@{strength}*@{strength}*0.002831-@{strength}*@{strength}*0.08918+1.164*@{strength}-5.667))" disabled="disabled" />
 						</div>
 						<div class="sheet-col-1-8 sheet-center">
-							<button type="roll" name="roll_Str" value="&{template:5eDefault} {{ability=1}} {{title=Strength Check}} {{subheader=@{character_name}}} {{rollname=Success: N(0)/Y(1))}} {{roll=[[{1d20+@{strength_mod}}>@{osr}]]}}"></button>
+							<button type="roll" name="roll_Str" value="&{template:5eDefault} {{ability=1}} {{title=Strength Check}} {{subheader=@{character_name}}} {{rollname=Success: N(0)/Y(1))}} {{roll=[[{1d20+[[@{strength_mod}]]}>@{osr}]]}}"></button>
 						</div>
 						<div class="sheet-col-1-4 sheet-tiny-note">Attack&nbsp;Dam.&nbsp;Open&nbsp;Doors</div>
 					</div>
@@ -84,7 +133,7 @@
 							<input type="number" name="attr_intelligence_mod" value="(round(@{intelligence}*@{intelligence}*@{intelligence}*0.002831-@{intelligence}*@{intelligence}*0.08918+1.164*@{intelligence}-5.667))" disabled="disabled" />
 						</div>
 						<div class="sheet-col-1-8 sheet-center">
-							<button type="roll" name="roll_Int" value="&{template:5eDefault} {{ability=1}} {{title=Intelligence Check}} {{subheader=@{character_name}}} {{rollname=Success: N(0)/Y(1))}} {{roll=[[{1d20+@{intelligence_mod}}>@{osr}]]}}"></button>
+							<button type="roll" name="roll_Int" value="&{template:5eDefault} {{ability=1}} {{title=Intelligence Check}} {{subheader=@{character_name}}} {{rollname=Success: N(0)/Y(1))}} {{roll=[[{1d20+[[@{intelligence_mod}]]}>@{osr}]]}}"></button>
 						</div>
 						<div class="sheet-col-1-4 sheet-tiny-note">Languages</div>
 					</div>
@@ -95,7 +144,7 @@
 							<input type="number" name="attr_wisdom_mod" value="(round(@{wisdom}*@{wisdom}*@{wisdom}*0.002831-@{wisdom}*@{wisdom}*0.08918+1.164*@{wisdom}-5.667))" disabled="disabled" />
 						</div>
 						<div class="sheet-col-1-8 sheet-center">
-							<button type="roll" name="roll_Wis" value="&{template:5eDefault} {{ability=1}} {{title=Wisdom Check}} {{subheader=@{character_name}}} {{rollname=Success: N(0)/Y(1))}} {{roll=[[{1d20+@{wisdom_mod}}>@{osr}]]}}"></button>
+							<button type="roll" name="roll_Wis" value="&{template:5eDefault} {{ability=1}} {{title=Wisdom Check}} {{subheader=@{character_name}}} {{rollname=Success: N(0)/Y(1))}} {{roll=[[{1d20+[[@{wisdom_mod}]]}>@{osr}]]}}"></button>
 						</div>
 						<div class="sheet-col-1-4 sheet-tiny-note">Save&nbsp;vs.&nbsp;Spells</div>
 					</div>
@@ -106,7 +155,7 @@
 							<input type="number" name="attr_dexterity_mod" value="(round(@{dexterity}*@{dexterity}*@{dexterity}*0.002831-@{dexterity}*@{dexterity}*0.08918+1.164*@{dexterity}-5.667))" disabled="disabled" />
 						</div>
 						<div class="sheet-col-1-8 sheet-center">
-							<button type="roll" name="roll_Dex" value="&{template:5eDefault} {{ability=1}} {{title=Dexterity Check}} {{subheader=@{character_name}}} {{rollname=Success: N(0)/Y(1))}} {{roll=[[{1d20+@{dexterity_mod}}>@{osr}]]}}"></button>
+							<button type="roll" name="roll_Dex" value="&{template:5eDefault} {{ability=1}} {{title=Dexterity Check}} {{subheader=@{character_name}}} {{rollname=Success: N(0)/Y(1))}} {{roll=[[{1d20+[[@{dexterity_mod}]]}>@{osr}]]}}"></button>
 						</div>
 						<div class="sheet-col-1-4 sheet-tiny-note">Missile&nbsp;Attack&nbsp;AC</div>
 					</div>
@@ -117,7 +166,7 @@
 							<input type="number" name="attr_constitution_mod" value="(round(@{constitution}*@{constitution}*@{constitution}*0.002831-@{constitution}*@{constitution}*0.08918+1.164*@{constitution}-5.667))" disabled="disabled" />
 						</div>
 						<div class="sheet-col-1-8 sheet-center">
-							<button type="roll" name="roll_Con" value="&{template:5eDefault} {{ability=1}} {{title=Constitution Check}} {{subheader=@{character_name}}} {{rollname=Success: N(0)/Y(1))}} {{roll=[[{1d20+@{constitution_mod}}>@{osr}]]}}"></button>
+							<button type="roll" name="roll_Con" value="&{template:5eDefault} {{ability=1}} {{title=Constitution Check}} {{subheader=@{character_name}}} {{rollname=Success: N(0)/Y(1))}} {{roll=[[{1d20+[[@{constitution_mod}]]}>@{osr}]]}}"></button>
 						</div>
 						<div class="sheet-col-1-4 sheet-tiny-note">Hit&nbsp;Points/Level</div>
 					</div>
@@ -128,16 +177,17 @@
 							<input type="number" name="attr_charisma_mod" value="(round(@{charisma}*@{charisma}*@{charisma}*0.002831-@{charisma}*@{charisma}*0.08918+1.164*@{charisma}-5.667))" disabled="disabled" />
 						</div>
 						<div class="sheet-col-1-8 sheet-center">
-							<button type="roll" name="roll_Cha" value="&{template:5eDefault} {{ability=1}} {{title=Charisma Check}} {{subheader=@{character_name}}} {{rollname=Success: N(0)/Y(1))}} {{roll=[[{1d20+@{charisma_mod}}>@{osr}]]}}"></button>
+							<button type="roll" name="roll_Cha" value="&{template:5eDefault} {{ability=1}} {{title=Charisma Check}} {{subheader=@{character_name}}} {{rollname=Success: N(0)/Y(1))}} {{roll=[[{1d20+[[@{charisma_mod}]]}>@{osr}]]}}"></button>
 						</div>
 						<div class="sheet-col-1-4 sheet-tiny-note">Reactions</div>
 					</div>
+					<!--OSR stands for Optional Skill/Stat(ability) roll page 153 in core rules-->
                    <div class="sheet-row">
-    					<div class="sheet-col-1-6"><input type="number" name="attr_osr" min="0" max="17" step="1" value="0"/></div>
+    					<div class="sheet-col-1-6"><input type="number" name="attr_osr" min="0" max="17" step="1" value="17"/></div>
                         <div class="sheet-col-1-6"></div>
                         <div class="sheet-col-1-6"></div>
 						<div class="sheet-col-1-8 sheet-center"></div>
-						<div class="sheet-col-1-4 sheet-tiny-note">Optional&nbsp;Ability&nbsp;Roll</div>
+						<div class="sheet-col-1-4 sheet-tiny-note">Optional&nbsp;Ability&nbsp;Check&nbsp;Score</div>
 					</div>
 				</div>
 				<!--Saving Throws and Experience-->
@@ -211,7 +261,7 @@
 							<div class="sheet-col-1-6 sheet-padr sheet-center">Stat</div>
 							<div class="sheet-col-1-6  sheet-center">Roll</div>
 						</div>
-						<fieldset class="repeating_generalskills">
+						<fieldset class="repeating_classability">
 							<div class="sheet-row">
 								<div class="sheet-col-1-3 sheet-padr sheet-left"><input type="text" name="attr_ability_name" value="name"></div>
                                 <div class="sheet-col-1-5 sheet-padr sheet-center"><input type="number" name="attr_ability_rank"></div>
@@ -227,7 +277,7 @@
 									</select>
 								</div>
 								<div class="sheet-col-1-8 sheet-padl sheet-center">
-									<button type='roll' class="sheet-roll" name='roll_skill_roll' value="&{template:5eDefault} {{ability=1}} {{title=@{character_name}'s}} {{subheader=@{ability_name} Skill Check}} {{rollname=Success N(0)/Y(1)}} {{roll=[[{1d100+@{ability_stat}}<@{ability_rank}]]}} "></button>
+									<button type='roll' class="sheet-roll" name='roll_skill_roll' value="&{template:5eDefault} {{ability=1}} {{title=@{character_name}'s}} {{subheader=@{ability_name} Skill Check}} {{rollname=Success N(0)/Y(1)}} {{roll=[[{1d100}<[[@{ability_rank}+@{ability_stat}]] ]]}} "></button>
 								</div>
 							</div>
 						</fieldset>
@@ -254,13 +304,14 @@
 							</select>
                         </div>
 						<div class="sheet-col-1-8 sheet-padl sheet-center">
-							<button type='roll' class="sheet-roll" name='roll_turnanimal' value="&{template:5eDefault} {{ability=1}} {{title=@{character_name}'s}} {{subheader=Calm / Befriend Animal less than 1 Hit Dice}} {{rollname=Success N(0)/Y(1)}} {{roll=[[{1d20}>@{turnanimalvalue}]] and affects [[2d6]]HD}} "></button>
+							<button type='roll' class="sheet-roll" name='roll_turnanimal' value="&{template:5eDefault} {{ability=1}} {{title=@{character_name}'s}} {{subheader=Calm / Befriend Animal less than 1 Hit Dice}} {{rollname=Success N(0)/Y(1)}} {{roll=[[{1d20}>@{turnanimalvalue}]] and could effect [[2d6]]HD}} "></button>
 						</div>
 					</div>
 					<div class="sheet-row">
 						<div class="sheet-col-1-2 sheet-padr sheet-small-label sheet-right">Skeleton / 1 HD</div>
 						<div class="sheet-col-1-4 sheet-padl sheet-center">
 							<select name="attr_turnskeletonvalue">
+							    <option value="100">No</option>
 								<option value="13">13</option>
 								<option value="11">11</option>
                                 <option value="9">9</option>
@@ -275,13 +326,14 @@
 							</select>
                         </div>
 						<div class="sheet-col-1-8 sheet-padl sheet-center">
-							<button type='roll' class="sheet-roll" name='roll_turnskeleton' value="&{template:5eDefault} {{ability=1}} {{title=@{character_name}'s}} {{subheader=Turn Skeleton / Befriend Animal of 1HD}} {{rollname=Success N(0)/Y(1)}} {{roll=[[{1d20}>@{turnskeletonvalue}]] and affects [[2d6]]HD}} "></button>
+							<button type='roll' class="sheet-roll" name='roll_turnskeleton' value="&{template:5eDefault} {{ability=1}} {{title=@{character_name}'s}} {{subheader=Turn Skeleton / Befriend Animal of 1HD}} {{rollname=Success N(0)/Y(1)}} {{roll=[[{1d20}>@{turnskeletonvalue}]] and could effect [[2d6]]HD}} "></button>
 						</div>
 					</div>
 					<div class="sheet-row">
     					<div class="sheet-col-1-2 sheet-padr sheet-small-label sheet-right">Zombie / 2 HD</div>
 						<div class="sheet-col-1-4 sheet-padl sheet-center">
 							<select name="attr_turnzombievalue">
+							    <option value="100">No</option>
                                 <option value="17">17</option>
                                 <option value="15">15</option>
 								<option value="13">13</option>
@@ -298,13 +350,14 @@
 							</select>
                         </div>
 						<div class="sheet-col-1-8 sheet-padl sheet-center">
-							<button type='roll' class="sheet-roll" name='roll_turnzombie' value="&{template:5eDefault} {{ability=1}} {{title=@{character_name}'s}} {{subheader=Turn Zombie / Befriend Animal of 2 HD}} {{rollname=Success N(0)/Y(1)}} {{roll=[[{1d20}>@{turnzombievalue}]] and affects [[2d6]]HD}} "></button>
+							<button type='roll' class="sheet-roll" name='roll_turnzombie' value="&{template:5eDefault} {{ability=1}} {{title=@{character_name}'s}} {{subheader=Turn Zombie / Befriend Animal of 2 HD}} {{rollname=Success N(0)/Y(1)}} {{roll=[[{1d20}>@{turnzombievalue}]] and could effect [[2d6]]HD}} "></button>
 						</div>
                     </div>
 					<div class="sheet-row">
         				<div class="sheet-col-1-2 sheet-padr sheet-small-label sheet-right">Ghoul / 3 HD</div>
 						<div class="sheet-col-1-4 sheet-padl sheet-center">
 							<select name="attr_turnghoulvalue">
+							    <option value="100">No</option>
                                 <option value="19">19</option>
                                 <option value="18">18</option>
                                 <option value="17">17</option>
@@ -323,14 +376,14 @@
 							</select>
                         </div>
 						<div class="sheet-col-1-8 sheet-padl sheet-center">
-							<button type='roll' class="sheet-roll" name='roll_turnghoul' value="&{template:5eDefault} {{ability=1}} {{title=@{character_name}'s}} {{subheader=Turn Ghoul / Befriend Animal of 3 HD}} {{rollname=Success N(0)/Y(1)}} {{roll=[[{1d20}>@{turnghoulvalue}]] and affects [[2d6]]HD}} "></button>
+							<button type='roll' class="sheet-roll" name='roll_turnghoul' value="&{template:5eDefault} {{ability=1}} {{title=@{character_name}'s}} {{subheader=Turn Ghoul / Befriend Animal of 3 HD}} {{rollname=Success N(0)/Y(1)}} {{roll=[[{1d20}>@{turnghoulvalue}]] and could effect [[2d6]]HD}} "></button>
 						</div>
                     </div>
 					<div class="sheet-row">
             			<div class="sheet-col-1-2 sheet-padr sheet-small-label sheet-right">Wight / 4 HD</div>
 						<div class="sheet-col-1-4 sheet-padl sheet-center">
 							<select name="attr_turnwightvalue">
-								<option value="25">No</option>
+								<option value="100">No</option>
                                 <option value="20">20</option>
                                 <option value="19">19</option>
                                 <option value="18">18</option>
@@ -350,14 +403,14 @@
 							</select>
                         </div>
 						<div class="sheet-col-1-8 sheet-padl sheet-center">
-							<button type='roll' class="sheet-roll" name='roll_turnwight' value="&{template:5eDefault} {{ability=1}} {{title=@{character_name}'s}} {{subheader=Turn Wraith / Befriend Animal of 5 HD}} {{rollname=Success N(0)/Y(1)}} {{roll=[[{1d20}>@{turnwightvalue}]] and affects [[2d6]]HD}} "></button>
+							<button type='roll' class="sheet-roll" name='roll_turnwight' value="&{template:5eDefault} {{ability=1}} {{title=@{character_name}'s}} {{subheader=Turn Wraith / Befriend Animal of 5 HD}} {{rollname=Success N(0)/Y(1)}} {{roll=[[{1d20}>@{turnwightvalue}]] and could effect [[2d6]]HD}} "></button>
 						</div>
 					</div>
 				<div class="sheet-row">
                 		<div class="sheet-col-1-2 sheet-padr sheet-small-label sheet-right">Wraith / 5 HD</div>
 						<div class="sheet-col-1-4 sheet-padl sheet-center">
 							<select name="attr_turnwraithvalue">
-								<option value="25">No</option>
+								<option value="100">No</option>
                                 <option value="20">20</option>
                                 <option value="19">19</option>
                                 <option value="18">18</option>
@@ -377,14 +430,14 @@
 							</select>
                         </div>
 						<div class="sheet-col-1-8 sheet-padl sheet-center">
-							<button type='roll' class="sheet-roll" name='roll_turnwraith' value="&{template:5eDefault} {{ability=1}} {{title=@{character_name}'s}} {{subheader=Turn Mummy / Befriend Animal of 6 HD}} {{rollname=Success N(0)/Y(1)}} {{roll=[[{1d20}>@{turnwraithvalue}]] and affects [[2d6]]HD}} "></button>
+							<button type='roll' class="sheet-roll" name='roll_turnwraith' value="&{template:5eDefault} {{ability=1}} {{title=@{character_name}'s}} {{subheader=Turn Mummy / Befriend Animal of 6 HD}} {{rollname=Success N(0)/Y(1)}} {{roll=[[{1d20}>@{turnwraithvalue}]] and could effect [[2d6]]HD}} "></button>
 						</div>
 					</div>
 					<div class="sheet-row">
                 		<div class="sheet-col-1-2 sheet-padr sheet-small-label sheet-right">Mummy / 6 HD</div>
 						<div class="sheet-col-1-4 sheet-padl sheet-center">
 							<select name="attr_turnmummyvalue">
-								<option value="25">No</option>
+								<option value="100">No</option>
                                 <option value="20">20</option>
                                 <option value="19">19</option>
                                 <option value="18">18</option>
@@ -404,14 +457,14 @@
 							</select>
                         </div>
 						<div class="sheet-col-1-8 sheet-padl sheet-center">
-							<button type='roll' class="sheet-roll" name='roll_turnmummy' value="&{template:5eDefault} {{ability=1}} {{title=@{character_name}'s}} {{subheader=Turn Sprectre / Befriend Animal of 7 HD}} {{rollname=Success N(0)/Y(1)}} {{roll=[[{1d20}>@{turnmummyvalue}]] and affects [[2d6]]HD}} "></button>
+							<button type='roll' class="sheet-roll" name='roll_turnmummy' value="&{template:5eDefault} {{ability=1}} {{title=@{character_name}'s}} {{subheader=Turn Sprectre / Befriend Animal of 7 HD}} {{rollname=Success N(0)/Y(1)}} {{roll=[[{1d20}>@{turnmummyvalue}]] and could effect [[2d6]]HD}} "></button>
 						</div>
 					</div>
 				<div class="sheet-row">
                 		<div class="sheet-col-1-2 sheet-padr sheet-small-label sheet-right">Spectre / 7 HD</div>
 						<div class="sheet-col-1-4 sheet-padl sheet-center">
 							<select name="attr_turnspectrevalue">
-								<option value="25">No</option>
+								<option value="100">No</option>
                                 <option value="20">20</option>
                                 <option value="19">19</option>
                                 <option value="18">18</option>
@@ -431,14 +484,14 @@
 							</select>
                         </div>
 						<div class="sheet-col-1-8 sheet-padl sheet-center">
-							<button type='roll' class="sheet-roll" name='roll_turnspectre' value="&{template:5eDefault} {{ability=1}} {{title=@{character_name}'s}} {{subheader=Turn Vampire / Befriend Animal of 8 HD}} {{rollname=Success N(0)/Y(1)}} {{roll=[[{1d20}>@{turnspectrevalue}]] and affects [[2d6]]HD}} "></button>
+							<button type='roll' class="sheet-roll" name='roll_turnspectre' value="&{template:5eDefault} {{ability=1}} {{title=@{character_name}'s}} {{subheader=Turn Vampire / Befriend Animal of 8 HD}} {{rollname=Success N(0)/Y(1)}} {{roll=[[{1d20}>@{turnspectrevalue}]] and could effect [[2d6]]HD}} "></button>
 						</div>
 					</div>
 					<div class="sheet-row">
                     	<div class="sheet-col-1-2 sheet-padr sheet-small-label sheet-right">Vampire / 8 HD</div>
 						<div class="sheet-col-1-4 sheet-padl sheet-center">
 							<select name="attr_turnvampirevalue">
-								<option value="25">No</option>
+								<option value="100">No</option>
                                 <option value="20">20</option>
                                 <option value="19">19</option>
                                 <option value="18">18</option>
@@ -454,14 +507,14 @@
 							</select>
                         </div>
 						<div class="sheet-col-1-8 sheet-padl sheet-center">
-							<button type='roll' class="sheet-roll" name='roll_turnvampire' value="&{template:5eDefault} {{ability=1}} {{title=@{character_name}'s}} {{subheader=Turn Ghost / Befriend Animal of 9 HD}} {{rollname=Success N(0)/Y(1)}} {{roll=[[{1d20}>@{turnvampirevalue}]] and affects [[2d6]]HD}} "></button>
+							<button type='roll' class="sheet-roll" name='roll_turnvampire' value="&{template:5eDefault} {{ability=1}} {{title=@{character_name}'s}} {{subheader=Turn Ghost / Befriend Animal of 9 HD}} {{rollname=Success N(0)/Y(1)}} {{roll=[[{1d20}>@{turnvampirevalue}]] and could effect [[2d6]]HD}} "></button>
 						</div>
 					</div>
 					<div class="sheet-row">
                     	<div class="sheet-col-1-2 sheet-padr sheet-small-label sheet-right">Ghost / 9 HD</div>
 						<div class="sheet-col-1-4 sheet-padl sheet-center">
 							<select name="attr_turnghostvalue">
-								<option value="25">No</option>
+								<option value="100">No</option>
                                 <option value="20">20</option>
                                 <option value="19">19</option>
                                 <option value="18">18</option>
@@ -477,14 +530,14 @@
 							</select>
                         </div>
 						<div class="sheet-col-1-8 sheet-padl sheet-center">
-							<button type='roll' class="sheet-roll" name='roll_turnghost' value="&{template:5eDefault} {{ability=1}} {{title=@{character_name}'s}} {{subheader=Befriend Animal of 10+ HD}} {{rollname=Success N(0)/Y(1)}} {{roll=[[{1d20}>@{turnghostvalue}]] and affects [[2d6]]HD}} "></button>
+							<button type='roll' class="sheet-roll" name='roll_turnghost' value="&{template:5eDefault} {{ability=1}} {{title=@{character_name}'s}} {{subheader=Befriend Animal of 10+ HD}} {{rollname=Success N(0)/Y(1)}} {{roll=[[{1d20}>@{turnghostvalue}]] and could effect [[2d6]]HD}} "></button>
 						</div>
 					</div>
 				<div class="sheet-row">
                     	<div class="sheet-col-1-2 sheet-padr sheet-small-label sheet-right">Animal 10 or greater HD</div>
 						<div class="sheet-col-1-4 sheet-padl sheet-center">
 							<select name="attr_turnanimal10hdvalue">
-								<option value="25">No</option>
+								<option value="100">No</option>
                                 <option value="20">20</option>
                                 <option value="19">19</option>
                                 <option value="18">18</option>
@@ -500,7 +553,7 @@
 							</select>
                         </div>
 						<div class="sheet-col-1-8 sheet-padl sheet-center">
-							<button type='roll' class="sheet-roll" name='roll_turnanimal10hd' value="&{template:5eDefault} {{ability=1}} {{title=@{character_name}'s}} {{subheader=Turn Undead / Befriend Animal}} {{rollname=Success N(0)/Y(1)}} {{roll=[[{1d20}>@{turnanimal10hdvalue}]] and affects [[2d6]]HD}} "></button>
+							<button type='roll' class="sheet-roll" name='roll_turnanimal10hd' value="&{template:5eDefault} {{ability=1}} {{title=@{character_name}'s}} {{subheader=Turn Undead / Befriend Animal}} {{rollname=Success N(0)/Y(1)}} {{roll=[[{1d20}>@{turnanimal10hdvalue}]] and could effect [[2d6]]HD}} "></button>
 						</div>
 					</div>
 			</div>
@@ -516,55 +569,64 @@
 					<div class="sheet-col-1-2 sheet-padr sheet-small-label sheet-right">Detect Stonework</div>
 					<div class="sheet-col-1-4 sheet-padl sheet-center"><input type="number" name="attr_detectstonework" value="0"></div>
 					<div class="sheet-col-1-8 sheet-padl sheet-center">
-						<button type='roll' class="sheet-roll" name='roll_detectstonework' value="&{template:5eDefault} {{ability=1}} {{title=@{character_name} wants to look for anything special about the stonework}} {{rollname=Success N(0)/Y(1)}} {{roll=[[{1d6}>@{detectstonework}]]}}> "></button>
+						<button type='roll' class="sheet-roll" name='roll_detectstonework' value="&{template:5eDefault} {{ability=1}} {{title=@{character_name} wants to look for anything special about the stonework}} {{rollname=Success N(0)/Y(1)}} {{roll=[[{1d6}<@{detectstonework}]]}}> "></button>
 					</div>
 				</div>
 				<div class="sheet-row">
 					<div class="sheet-col-1-2 sheet-padr sheet-small-label sheet-right">Finding Secret Doors</div>
 					<div class="sheet-col-1-4 sheet-padl sheet-center"><input type="number" name="attr_detectsecret" value="1"></div>
 					<div class="sheet-col-1-8 sheet-padl sheet-center">
-						<button type='roll' class="sheet-roll" name='roll_detectsecret' value="&{template:5eDefault} {{ability=1}} {{title=@{character_name} wants to look for secret doors}} {{rollname=Success N(0)/Y(1)}} {{roll=[[{1d6}>@{detectsecret}]]}}> "></button>
+						<button type='roll' class="sheet-roll" name='roll_detectsecret' value="&{template:5eDefault} {{ability=1}} {{title=@{character_name} wants to look for secret doors}} {{rollname=Success N(0)/Y(1)}} {{roll=[[{1d6}<@{detectsecret}]]}}> "></button>
 					</div>
 				</div>
 				<div class="sheet-row">
 					<div class="sheet-col-1-2 sheet-padr sheet-small-label sheet-right">Finding Traps</div>
 					<div class="sheet-col-1-4 sheet-padl sheet-center"><input type="number" name="attr_findingtraps" value="1"></div>
 					<div class="sheet-col-1-8 sheet-padl sheet-center">
-						<button type='roll' class="sheet-roll" name='roll_findingtraps' value="&{template:5eDefault} {{ability=1}} {{title=@{character_name} wants to look for traps}} {{rollname=Success N(0)/Y(1)}} {{roll=[[{1d6}>@{findingtraps}]]}}> "></button>
+						<button type='roll' class="sheet-roll" name='roll_findingtraps' value="&{template:5eDefault} {{ability=1}} {{title=@{character_name} wants to look for traps}} {{rollname=Success N(0)/Y(1)}} {{roll=[[{1d6}<@{findingtraps}]]}}> "></button>
 					</div>
 				</div>
 				<div class="sheet-row">
 					<div class="sheet-col-1-2 sheet-padr sheet-small-label sheet-right">Hearing Noise</div>
 					<div class="sheet-col-1-4 sheet-padl sheet-center"><input type="number" name="attr_hearingnoise" value="1"></div>
 					<div class="sheet-col-1-8 sheet-padl sheet-center">
-						<button type='roll' class="sheet-roll" name='roll_hearingnoise' value="&{template:5eDefault} {{ability=1}} {{title=@{character_name} wants to listen for noises}} {{rollname=Success N(0)/Y(1)}} {{roll=[[{1d6}>@{hearingnoise}]]}}> "></button>
+						<button type='roll' class="sheet-roll" name='roll_hearingnoise' value="&{template:5eDefault} {{ability=1}} {{title=@{character_name} wants to listen for noises}} {{rollname=Success N(0)/Y(1)}} {{roll=[[{1d6}<@{hearingnoise}]]}}> "></button>
 					</div>
 				</div>
 				<div class="sheet-row">
     				<div class="sheet-col-1-2 sheet-padr sheet-small-label sheet-right">Opening Doors</div>
 					<div class="sheet-col-1-4 sheet-padl sheet-center"><input type="number" name="attr_openingdoors" value="1"></div>
 					<div class="sheet-col-1-8 sheet-padl sheet-center">
-						<button type='roll' class="sheet-roll" name='roll_openingdoors' value="&{template:5eDefault} {{ability=1}} {{title=@{character_name} wants to force open a door}} {{rollname=Success N(0)/Y(1)}} {{roll=[[{1d6}>@{openingdoors}]]}}> "></button>
+						<button type='roll' class="sheet-roll" name='roll_openingdoors' value="&{template:5eDefault} {{ability=1}} {{title=@{character_name} wants to force open a door}} {{rollname=Success N(0)/Y(1)}} {{roll=[[{1d6}<@{openingdoors}]]}}> "></button>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 <!--Optionals-->
-     <!--General or Background skills-->
+     <!--Secondary or Background skills--><!--This section is based from the secondary skill supplement and uses the Optional Skill/Stat (Ability) roller-->
     <div class="sheet-section-skills">
             <div class="sheet-row">
     			<div class="sheet-col-1-2 sheet-padr">
-					<h4 class="sheet-center">General Skills </h4>
+					<h4 class="sheet-center">Secondary Skills </h4>
 						<div class="sheet-row sheet-sub-header sheet-small-label">
-							<div class="sheet-col-1-2 sheet-padl">Name</div>
-							<div class="sheet-col-1-6 sheet-center">Stat</div>
-							<div class="sheet-col-1-8 sheet-center">Roll</div>
+							<div class="sheet-col-1-4 sheet-padl">Name</div>
+							<div class="sheet-col-1-6 sheet-center">Modifier</div>
+							<div class="sheet-col-1-6 sheet-center">lists as</div>
+							<div class="sheet-col-1-4 sheet-center">Stat</div>
+							<div class="sheet-col-1-8 sheet-right">Roll</div>
 						</div>
 						<fieldset class="repeating_generalskills">
 							<div class="sheet-row" sheet-center>
-								<div class="sheet-col-1-2 sheet-padr sheet-left"><input type="text" name="attr_skillname" ></div>
-                                
+								<div class="sheet-col-1-4 sheet-padr sheet-left"><input type="text" name="attr_skillname" ></div>
+								<div class="sheet-col-1-6 sheet-padr sheet-center"><input type="number" name="attr_skillmod" value="0"></div>
+                                <div class="sheet-col-1-4 sheet-padr sheet-left">
+									<select name="attr_skilled">
+									    <option value="20">Non-class</option>
+									    <option value="17">General</option>
+                                        <option value="@{osr}">Class</option>
+									</select>
+								</div>
 								<div class="sheet-col-1-6 sheet-left">
 									<select name="attr_skill_stat">
                                         <option value="0">None</option>
@@ -576,35 +638,9 @@
 										<option value="@{charisma_mod}">Cha</option>
 									</select>
 								</div>
-								<div class="sheet-col-1-8 sheet-padl sheet-center">
-									<button type='roll' class="sheet-roll" name='roll_skill_roll' value="&{template:5eDefault} {{ability=1}} {{title=@{character_name}'s}} {{subheader=@{skillname} Skill Check}} {{rollname=Success N(0)/Y(0)}}} {{roll=[[{1d20+@{skill_stat}}>@{osr}]]}} "></button>
+								<div class="sheet-col-1-8 sheet-padl sheet-right">
+									<button type='roll' class="sheet-roll" name='roll_skill_roll' value="&{template:5eDefault} {{title=@{character_name}'s}} {{subheader=@{skillname} Skill Check}} {{rollname=Success N(0)/Y(1)}}} {{roll=[[{1d20+@{skillmod}+[[@{skill_stat}]]}>@{skilled}]]}} "></button>
 								</div>
-							</div>
-						</fieldset>
-				</div>
-    <!--Weapon Specialization-->
-				<div class="sheet-col-1-2 sheet-padr">
-					<h4 class="sheet-center">Weapon Specialization </h4>
-						<div class="sheet-row sheet-sub-header sheet-small-label">
-							<div class="sheet-col-1-2 sheet-padl sheet-padr">Weapon</div>
-							<div class="sheet-col-1-8 sheet-center">Rank</div>
-                            <div class="sheet-col-1-4 sheet-center">Mastery</div>
-						</div>
-						<fieldset class="repeating_weaponmastery">
-							<div class="sheet-row">
-								<div class="sheet-col-1-2 sheet-padr sheet-small-label sheet-left"><input type="text" name="attr_weaponmasteryname"></div>
-								<div class="sheet-col-1-6 sheet-padl sheet-padr ">
-									<select name="attr_masteryrank">
-                                        <option value="None">None</option>
-										<option value="Basic">1</option>
-                                        <option value="Trained">2</option>
-										<option value="Skilled">3</option>
-										<option value="Expert">4</option>
-										<option value="Master">5</option>
-										<option value="Grand Master">6</option>
-									</select>
-								</div>
-                                <div class="sheet-col-1-4 sheet-padl sheet-small-label sheet-center"><input type="text" name="attr_weaponmasteryrank" value="@{masteryrank}" disabled=true></div>
 							</div>
 						</fieldset>
 				</div>
@@ -652,11 +688,10 @@
                                 <option value="2d6">2d6</option>
                                 <option value="1d20">1d20</option>
 							</select>
-                            <!-- Still having problems with getting the die type, and roll button labeled properly -->
                             <div class-"sheet-col-1-8 sheet-center sheet-padr sheet-small-label sheet-vert-bottom">Type</div>
                             </div>
             				<div class="sheet-col-1-4 sheet-small-label sheet-center sheet-padl" title="Only enter additional bonuses to initiative here. Your Dex mod is already included in the macro button"><input class="sheet-underlined sheet-center" type="number" name="attr_initiative" value="0" step="1"><br/>Bonus</div>
-    						<input class="sheet-underlined" type="hidden" name="attr_initiative_overall" value="[[@{dexterity_mod}]] + @{initiative}" disabled="disabled">
+    						<input class="sheet-underlined" type="hidden" name="attr_initiative_overall" value="[[ [[@{dexterity_mod}]] ]] + @{initiative}" disabled="disabled">
     						<div class="sheet-col-1-3 sheet-left">
     							<button type="roll" class="sheet-roll" name="roll_Initiative" value="&{template:5eDefault} {{title=@{character_name}'s Initiative}} {{roll=[[ @{Initiativedice} + @{initiative_overall} &{tracker} ]]}}">Roll</button>
     						</div>
@@ -667,25 +702,35 @@
 		<h4 class="sheet-center">Melee Weapons / Unarmed Attacks </h4>
 			<div class="sheet-row sheet-sub-header">
 				<div class="sheet-col-1-6 sheet-center sheet-small-label sheet-vert-bottom">Weapon</div>
-				<div class="sheet-col-1-12 sheet-center sheet-small-label sheet-vert-bottom sheet-padr">Mastery To Hit Bonus</div>
-                <div class="sheet-col-1-12 sheet-center sheet-small-label sheet-vert-bottom sheet-padr">Mastery Damage Bonus</div>
-				<div class="sheet-col-1-12 sheet-center sheet-small-label sheet-vert-bottom sheet-padr">Magic Bonus</div>
-                <div class="sheet-col-1-12 sheet-center sheet-small-label sheet-vert-bottom sheet-padr">Strength bonus</div>
-                <div class="sheet-col-1-12 sheet-center sheet-small-label sheet-vert-bottom">Attack Bonus</div>
-				<div class="sheet-col-1-12 sheet-center sheet-small-label sheet-vert-bottom">Damage Dice</div>
-                <div class="sheet-col-1-6 sheet-center sheet-small-label sheet-vert-bottom">Notes</div>
-				<div class="sheet-col-1-24 sheet-center sheet-small-label sheet-vert-bottom sheet-padr">Attack</div>
+				<div class="sheet-col-1-6 sheet-center sheet-small-label sheet-vert-bottom">Mastery</div>
+				<div class="sheet-col-1-12 sheet-left sheet-small-label sheet-vert-bottom sheet-padr">Mastery To Hit bonus</div>
+                <div class="sheet-col-1-12 sheet-left sheet-small-label sheet-vert-bottom sheet-padr">Mastery Damage bonus</div>
+				<div class="sheet-col-1-12 sheet-left sheet-small-label sheet-vert-bottom sheet-padr">Magic Bonus</div>
+                <div class="sheet-col-1-12 sheet-left sheet-small-label sheet-vert-bottom sheet-padr">Attack bonus</div>
+                <div class="sheet-col-1-12 sheet-left sheet-small-label sheet-vert-bottom">Strength Bonus</div>
+				<div class="sheet-col-1-12 sheet-left sheet-small-label sheet-vert-bottom">Damage Dice</div>
+				<div class="sheet-col-1-24 sheet-center sheet-small-label sheet-vert-bottom sheet-padl">Roll</div>
 			</div>
 			<fieldset class="repeating_meleeattacks">
 				<div class="sheet-row">
-					
 					<div class="sheet-col-1-6 sheet-padr"><input type="text" name="attr_meleeweaponname"></div>
-					<div class="sheet-col-1-12 sheet-padr"><input type="number" name="attr_meleemasteryhit" value="0" step="1"></div>
-                    <div class="sheet-col-1-12 sheet-padr"><input type="number" name="attr_meleemasterydam" value="0" step="1"></div>
-					<div class="sheet-col-1-12 sheet-padr" title="The magic bonus will be added as a bonus to BOTH the attack and damage rolls"><input type="number" name="attr_meleemagic" value="0" step="1"></div>
-                    <div class="sheet-col-1-12 sheet-padr"><input type="number" name="attr_meleesab" value="@{ab}" disabled=true></div>
-                    <div class="sheet-col-1-12 sheet-padr"><input type="number" name="attr_meleestr" value="@{strength_mod}" disabled=true></div>
-					<div class="sheet-col-1-12 sheet-padr sheet-center">
+					<div class="sheet-col-1-7 sheet-padl sheet-padr ">
+									<select name="attr_masteryrank">
+                                        <option value="0">None</option>
+										<option value="1">Basic</option>
+                                        <option value="2">Trained</option>
+										<option value="3">Skilled</option>
+										<option value="4">Expert</option>
+										<option value="5">Master</option>
+										<option value="6">Grand Master</option>
+									</select>
+					</div>
+                    <div class="sheet-col-1-12 sheet-padl sheet-padr sheet-small-label sheet-center"><input type="text" name="attr_meleemasteryhit" value="{ceil(@{masteryrank}/2)}" disabled=true></div>
+                    <div class="sheet-col-1-12 sheet-padl sheet-padr sheet-small-label sheet-center"><input type="text" name="attr_meleemasterydam" value="{floor(@{masteryrank}/2)}" disabled=true></div>
+					<div class="sheet-col-1-12 sheet-padl sheet-padr" title="The magic bonus will be added as a bonus to BOTH the attack and damage rolls"><input type="number" name="attr_meleemagic" value="0" step="1"></div>
+                    <div class="sheet-col-1-12 sheet-padl sheet-padr"><input type="number" name="attr_meleeab" value="@{ab}" disabled=true></div>
+                    <div class="sheet-col-1-12 sheet-padl sheet-padr"><input type="number" name="attr_meleestr" value="[[@{strength_mod}]]" disabled=true></div>
+					<div class="sheet-col-1-10 sheet-padl sheet-padr sheet-center">
             				<select name="attr_meleedmg">
 								<option value="1d3">1d3</option>
                                 <option value="1d4">1d4</option>
@@ -694,9 +739,8 @@
                                 <option value="1d10">1d10</option>
 							</select>
                         </div>
-					<div class="sheet-col-1-6 sheet-padr"><input type="text" name="attr_meleeweaponnotes"></div>
-					<div class="sheet-col-1-24 sheet-center">
-						<button type="roll" class="sheet-roll" name="roll_MeleeAttack" value="&{template:5eDefault} {{weapon=1}} {{title=@{character_name} attacks with @{meleeweaponname}}} {{attack=[[{1d20+@{meleemasteryhit}+@{meleemagic}+@{ab}+@{strength_mod}}]]}} {{damage=[[@{meleedmg}+@{meleemasterydam}+@{meleemagic}+@{strength_mod}]]}}"></button>
+					<div class="sheet-col-1-24 sheet-right sheet-padl">
+						<button type="roll" class="sheet-roll" name="roll_MeleeAttack" value="&{template:5eDefault} {{weapon=1}} {{title=@{character_name} attacks with @{meleeweaponname}}} {{attack=[[{1d20+@{meleemasteryhit}+@{meleemagic}+@{ab}+[[@{strength_mod}]]}]]}} {{damage=[[@{meleedmg}+@{meleemasterydam}+@{meleemagic}+[[@{strength_mod}]] ]]}}"></button>
 					</div>
 				</div>
 			</fieldset>
@@ -704,30 +748,48 @@
 			<h4 class="sheet-center">Missile/Thrown Weapons </h4>
 			<div class="sheet-row sheet-sub-header">
 				<div class="sheet-col-1-6 sheet-center sheet-small-label sheet-vert-bottom">Weapon</div>
-				<div class="sheet-col-1-12 sheet-center sheet-small-label sheet-vert-bottom sheet-padr">Mastery To Hit Bonus</div>
-                <div class="sheet-col-1-12 sheet-center sheet-small-label sheet-vert-bottom sheet-padr">Mastery Damage Bonus</div>
-				<div class="sheet-col-1-12 sheet-center sheet-small-label sheet-vert-bottom sheet-padr">Magic Bonus</div>
-                <div class="sheet-col-1-12 sheet-center sheet-small-label sheet-vert-bottom sheet-padr">Dexterity bonus</div>
-                <div class="sheet-col-1-12 sheet-center sheet-small-label sheet-vert-bottom">Attack Bonus</div>
-				<div class="sheet-col-1-12 sheet-center sheet-small-label sheet-vert-bottom">Range</div>
-				<div class="sheet-col-1-12 sheet-center sheet-small-label sheet-vert-bottom">Damage Dice</div>
-                <div class="sheet-col-1-6 sheet-center sheet-small-label sheet-vert-bottom">Notes</div>
-				<div class="sheet-col-1-24 sheet-center sheet-small-label sheet-vert-bottom sheet-padr">Attack</div>
+				<div class="sheet-col-1-6 sheet-center sheet-small-label sheet-vert-bottom">Mastery</div>
+				<div class="sheet-col-1-12 sheet-left sheet-small-label sheet-vert-bottom sheet-padr">Mastery To Hit Bonus</div>
+                <div class="sheet-col-1-12 sheet-left sheet-small-label sheet-vert-bottom sheet-padr">Mastery Damage Bonus</div>
+				<div class="sheet-col-1-12 sheet-left sheet-small-label sheet-vert-bottom sheet-padr">Magic Bonus</div>
+                <div class="sheet-col-1-12 sheet-left sheet-small-label sheet-vert-bottom sheet-padr">Attack bonus</div>
+                <div class="sheet-col-1-12 sheet-left sheet-small-label sheet-vert-bottom">Ability Bonus</div>
+				<div class="sheet-col-1-12 sheet-left sheet-small-label sheet-vert-bottom">Range</div>
+				<div class="sheet-col-1-12 sheet-left sheet-padr sheet-small-label sheet-vert-bottom">Damage Dice</div>
+				<div class="sheet-col-1-24 sheet-right sheet=padl sheet-small-label sheet-vert-bottom sheet-padr">Roll</div>
 			</div>
 			<fieldset class="repeating_rangedattacks">
 				<div class="sheet-row">
 					
 					<div class="sheet-col-1-6 sheet-padr"><input type="text" name="attr_rangeweaponname"></div>
-					<div class="sheet-col-1-12 sheet-padr"><input type="number" name="attr_rangemasteryhit" value="0" step="1"></div>
-                    <div class="sheet-col-1-12 sheet-padr"><input type="number" name="attr_rangemasterydam" value="0" step="1"></div>
-					<div class="sheet-col-1-12 sheet-padr" title="The magic bonus will be added as a bonus to BOTH the attack and damage rolls"><input type="number" name="attr_rangemagic" value="0" step="1"></div>
-                    <div class="sheet-col-1-12 sheet-padr"><input type="number" name="attr_rangeab" value="@{ab}" disabled=true></div>
-                    <div class="sheet-col-1-12 sheet-padr"><input type="number" name="attr_rangedexteritymod" value="@{dexterity_mod}" disabled=true></div>
+					<div class="sheet-col-1-7 sheet-padl sheet-padr ">
+									<select name="attr_masteryrank">
+                                        <option value="0">None</option>
+										<option value="1">Basic</option>
+                                        <option value="2">Trained</option>
+										<option value="3">Skilled</option>
+										<option value="4">Expert</option>
+										<option value="5">Master</option>
+										<option value="6">Grand Master</option>
+									</select>
+					</div>
+					<div class="sheet-col-1-12 sheet-padl sheet-padr"><input type="number" name="attr_rangemasteryhit" value="{ceil(@{masteryrank}/2)}" disabled=true></div>
+                    <div class="sheet-col-1-12 sheet-padl sheet-padr"><input type="number" name="attr_rangemasterydam" value="{floor(@{masteryrank}/2)}" disabled=true></div>
+					<div class="sheet-col-1-12 sheet-padl sheet-padr" title="The magic bonus will be added as a bonus to BOTH the attack and damage rolls"><input type="number" name="attr_rangemagic" value="0" step="1"></div>
+                    <div class="sheet-col-1-12 sheet-padl sheet-padr"><input type="number" name="attr_rangeab" value="@{ab}" disabled=true></div>
+                    <div class="sheet-col-1-11 sheet-padl sheet-padr sheet-center">
+									<select name="attr_rangeabilitymod">
+                                        <option value="0">None</option>
+										<option value="[[@{strength_mod}]]">Str</option>
+										<option value="[[@{intelligence_mod}]]">Int</option>
+										<option value="[[@{dexterity_mod}]]">Dex</option>
+									</select>
+								</div>
                     <div class="sheet-col-1-12 sheet-padr sheet-center">
         					<select name="attr_rangerange">
-								<option value="2">Short</option>
+								<option value="1">Short</option>
                                 <option value="0">Medium</option>
-                                <option value="-1">long</option>
+                                <option value="-2">long</option>
 							</select>
                     </div>
 					<div class="sheet-col-1-12 sheet-padl sheet-center">
@@ -738,36 +800,20 @@
                                 <option value="1d8">1d8</option>
 							</select>
                     </div>
-                    <div class="sheet-col-1-6 sheet-padl"><input type="text" name="attr_rangeweaponnotes"></div>
-					<div class="sheet-col-1-24 sheet-padl sheet-center">
-						<button type="roll" class="sheet-roll" name="roll_RangeAttack" value="&{template:5eDefault} {{weapon=1}} {{title=@{character_name} attacks with a @{rangeweaponname}} {{attack=[[{1d20+@{rangemasteryhit}+@{rangemagic}+@{ab}+@{dexterity_mod}+@{rangerange}}]]}} {{damage=[[@{rangedmg}+@{rangemasterydam}+@{rangemagic}]]}} "></button>
+					<div class="sheet-col-1-24 sheet-padl sheet-right">
+						<button type="roll" class="sheet-roll" name="roll_RangeAttack" value="&{template:5eDefault} {{weapon=1}} {{title=@{character_name} attacks with @{rangeweaponname}}} {{attack=[[{1d20+@{rangemasteryhit}+@{rangemagic}+@{ab}+@{rangeabilitymod}+@{rangerange}}]]}} {{damage=[[@{rangedmg}+@{rangemasterydam}+@{rangemagic}]]}} "></button>
 					</div>
 				</div>
 			</fieldset>
-		<!-- All about Armour-->
+		<!-- All about Armor-->
 		<div class="sheet-row ">
-			<!--Armour Class -->
-			<div class="sheet-col-1-2 sheet-padr">
+			<div class="sheet-col-1 sheet-padr">
 				<h4 class="sheet-center">Armor Class </h4>
-					<div class="sheet-row"> 
-						<div class="sheet-col-1-4 sheet-small-label sheet-center"><input class="sheet-underlined" type="number" name="attr_AC_armor" step="1" value="@{eqarmor}+@{eqarmormagic}" disabled="true"><br/>Armor</div>
-						<div class="sheet-col-1-4 sheet-small-label sheet-center"><input class="sheet-underlined" type="number" name="attr_AC_shield" value="0" title="The total addition to AC for shields including weapon mastery and magical sources " step="1"><br/>Shield</div>
-						<div class="sheet-col-1-4 sheet-small-label sheet-center"><input class="sheet-underlined" type="number" name="attr_AC_magic"  value="0" title="All bonuses from rings of protection and other non shield and armour sources" step="1"><br/>Magic</div>
-						<div class="sheet-col-1-4 sheet-small-label sheet-center"><input class="sheet-underlined" type="number" name="attr_AC" value="(@{AC_armour} + @{AC_shield} + @{AC_magic} +  @{dexterity_mod})" disabled="true"><br/>Total</div>
-					</div>
-			</div>
-			<!-- Armour -->
-			<div class="sheet-col-1-2">
-				<h4 class="sheet-center">Equipped Armor </h4>
-					<div class="sheet-row sheet-sub-header sheet-small-label sheet-center">
-						<div class="sheet-col-1-2 sheet-center">Full Sets</div>
-					</div>
-					<div class="sheet-row">
-						<div class="sheet-col-1-3 sheet-small-label sheet-center">
+					<div class="sheet-row sheet-center"> 
+					    <div class="sheet-col-1-6 sheet-small-label sheet-center">
 							<select name="attr_eqarmor">
 								<option value="11" selected="selected">None</option>
                                 <option value="12">Padded or Quilted</option>
-                                <option value="13">Hide</option>
 								<option value="13">Leather</option>
                                 <option value="14">Studded Leather</option>
                                 <option value="14">Ring Mail</option>
@@ -781,10 +827,16 @@
                                 <option value="19">Full Plate Mail</option>
 							</select>
 						</div>
-						<div class="sheet-col-1-3 sheet-small-label sheet-center"><input class="sheet-underlined" type="number" name="attr_eqarmormagic" value="0" step="1"><br/>Magic Bonus</div>
-                        <div class="sheet-col-1-3 sheet-small-label sheet-center"><input class="sheet-underlined" type="text" name="attr_eqarmornote" title="This is where you put the special property of the magic such as magic resistance."><br/>Note</div>
+						<div class="sheet-col-1-8 sheet-small-label sheet-center"><input class="sheet-underlined" type="number" name="attr_AC_armor" step="1" value="@{eqarmor}+@{eqarmormagic}" disabled="true"><br/>Armor +</div>
+						<div class="sheet-col-1-8 sheet-small-label sheet-center"><input class="sheet-underlined" type="number" name="attr_AC_dex" step="1" value="[[@{dexterity_mod}]]" disabled="true"><br/>Dexterity Mod +</div>
+						<div class="sheet-col-1-8 sheet-small-label sheet-center"><input class="sheet-underlined" type="number" name="attr_eqarmormagic" value="0" title="Armor bonus" step="1"><br/>Magic Bonus +</div>
+						<div class="sheet-col-1-8 sheet-small-label sheet-center"><input class="sheet-underlined" type="number" name="attr_AC_shield" value="0" title="The total addition to AC for shields including weapon mastery and magical sources " step="1"><br/>Shield +</div>
+						<div class="sheet-col-1-8 sheet-small-label sheet-center"><input class="sheet-underlined" type="number" name="attr_AC_magic"  value="0" title="All bonuses from rings of protection and other non shield and armor sources" step="1"><br/>Misc. Magic =</div>
+						<div class="sheet-col-1-8 sheet-small-label sheet-center"><input class="sheet-underlined" type="number" name="attr_AC" value="(@{AC_armor} + @{AC_shield} + @{AC_magic} + [[@{dexterity_mod}]])" disabled="true"><br/>Armor Class</div>
+						<div class="sheet-col-1-2 sheet-small-label sheet-center"><input class="sheet-underlined" type="text" name="attr_eqarmornote" title="This is where you put the special property of the magic such as magic resistance."><br/>Note</div>
 					</div>
 			</div>
+			
 		</div>
 	</div>
     
@@ -887,7 +939,7 @@
 							<div class="sheet-col-1-12 sheet-center sheet-small-label">Description<br><input type="checkbox" name="attr_spellshowdesc" value="{{spellshowdesc=1}} {{spelldescription=@{spelldescription}}}" /></div>
 							<div class="sheet-col-1-8 sheet-center sheet-small-label">Saving throw<br/><input type="checkbox" name="attr_spellshowsavethrow" value="{{spellshowsavethrow=1}} {{spellsavestat=@{savestat}}} {{spellsavesuccess=@{savesuccess}}}" /></div>
 							<div class="sheet-col-1-12 sheet-center sheet-small-label">Healing<br/><input type="checkbox" name="attr_spellshowhealing" value="{{spellshowhealing=1}} {{spellhealing=[[@{spellhealamount} + @{healstatbonus}]]}}" /></div>
-							<div class="sheet-col-1-12 sheet-center sheet-small-label">Damage<br/><input type="checkbox" name="attr_spellshowdamage" value="{{spellshowdamage=1}} {{spelldamage=[[@{damage} + @{damagestatbonus} + @{damagemiscbonus} +) + 0d0]] @{damagetype}}}" /></div>
+							<div class="sheet-col-1-12 sheet-center sheet-small-label">Damage<br/><input type="checkbox" name="attr_spellshowdamage" value="{{spellshowdamage=1}} {{spelldamage=[[@{damage} + @{damagestatbonus} + @{damagemiscbonus}]] @{damagetype}}}" /></div>
 							<div class="sheet-col-1-12 sheet-center sheet-small-label">Effects<br/><input type="checkbox" name="attr_spellshoweffects" value="{{spellshoweffects=1}} {{spelleffect=@{spelleffect}}}" /></div>
 							<input type="hidden" name="attr_spellcastmacrooptions" value="@{spellshowinfoblock} @{spellshowdesc} @{spellshowsavethrow} @{spellshowhealing} @{spellshowdamage} @{spellshoweffects}" />
 						</div>
@@ -937,7 +989,7 @@
 								<div class="sheet-col-1-6 sheet-center">
 									<select name="attr_healstatbonus">
 										<option value="0">None</option>
-										<option value="@{wisdom_mod}">WIS mod</option>
+										<option value="[[@{wisdom_mod}]]">WIS mod</option>
 									</select>
 								</div>
 							</div>
@@ -955,8 +1007,8 @@
 								<div class="sheet-col-1-6">
 									<select name="attr_damagestatbonus">
 										<option value="0">None</option>
-										<option value="@{intelligence_mod}">INT mod</option>
-										<option value="@{wisdom_mod}">WIS mod</option>
+										<option value="[[@{intelligence_mod}]]">INT mod</option>
+										<option value="[[@{wisdom_mod}]]">WIS mod</option>
 									</select>
 								</div>
 								<div class="sheet-col-1-6 sheet-small-label sheet-center"><input type="number" class="sheet-center" name="attr_damagemiscbonus" value="0" step="1"></div>
@@ -1014,7 +1066,7 @@
 							<div class="sheet-col-1-12 sheet-center sheet-small-label">Description<br><input type="checkbox" name="attr_spellshowdesc" value="{{spellshowdesc=1}} {{spelldescription=@{spelldescription}}}" /></div>
 							<div class="sheet-col-1-8 sheet-center sheet-small-label">Saving throw<br/><input type="checkbox" name="attr_spellshowsavethrow" value="{{spellshowsavethrow=1}} {{spellsavestat=@{savestat}}} {{spellsavesuccess=@{savesuccess}}}" /></div>
 							<div class="sheet-col-1-12 sheet-center sheet-small-label">Healing<br/><input type="checkbox" name="attr_spellshowhealing" value="{{spellshowhealing=1}} {{spellhealing=[[@{spellhealamount} + @{healstatbonus}]]}}" /></div>
-							<div class="sheet-col-1-12 sheet-center sheet-small-label">Damage<br/><input type="checkbox" name="attr_spellshowdamage" value="{{spellshowdamage=1}} {{spelldamage=[[@{damage} + @{damagestatbonus} + @{damagemiscbonus} +) + 0d0]] @{damagetype}}}" /></div>
+							<div class="sheet-col-1-12 sheet-center sheet-small-label">Damage<br/><input type="checkbox" name="attr_spellshowdamage" value="{{spellshowdamage=1}} {{spelldamage=[[@{damage} + @{damagestatbonus} + @{damagemiscbonus}]] @{damagetype}}}" /></div>
 							<div class="sheet-col-1-12 sheet-center sheet-small-label">Effects<br/><input type="checkbox" name="attr_spellshoweffects" value="{{spellshoweffects=1}} {{spelleffect=@{spelleffect}}}" /></div>
 							<input type="hidden" name="attr_spellcastmacrooptions" value="@{spellshowinfoblock} @{spellshowdesc} @{spellshowsavethrow} @{spellshowhealing} @{spellshowdamage} @{spellshoweffects}" />
 						</div>
@@ -1064,7 +1116,7 @@
 								<div class="sheet-col-1-6 sheet-center">
 									<select name="attr_healstatbonus">
 										<option value="0">None</option>
-										<option value="@{wisdom_mod}">WIS mod</option>
+										<option value="[[@{wisdom_mod}]]">WIS mod</option>
 									</select>
 								</div>
 							</div>
@@ -1082,8 +1134,8 @@
 								<div class="sheet-col-1-6">
 									<select name="attr_damagestatbonus">
 										<option value="0">None</option>
-										<option value="@{intelligence_mod}">INT mod</option>
-										<option value="@{wisdom_mod}">WIS mod</option>
+										<option value="[[@{intelligence_mod}]]">INT mod</option>
+										<option value="[[@{wisdom_mod}]]">WIS mod</option>
 									</select>
 								</div>
 								<div class="sheet-col-1-6 sheet-small-label sheet-center"><input type="number" class="sheet-center" name="attr_damagemiscbonus" value="0" step="1"></div>
@@ -1141,7 +1193,7 @@
 							<div class="sheet-col-1-12 sheet-center sheet-small-label">Description<br><input type="checkbox" name="attr_spellshowdesc" value="{{spellshowdesc=1}} {{spelldescription=@{spelldescription}}}" /></div>
 							<div class="sheet-col-1-8 sheet-center sheet-small-label">Saving throw<br/><input type="checkbox" name="attr_spellshowsavethrow" value="{{spellshowsavethrow=1}} {{spellsavestat=@{savestat}}} {{spellsavesuccess=@{savesuccess}}}" /></div>
 							<div class="sheet-col-1-12 sheet-center sheet-small-label">Healing<br/><input type="checkbox" name="attr_spellshowhealing" value="{{spellshowhealing=1}} {{spellhealing=[[@{spellhealamount} + @{healstatbonus}]]}}" /></div>
-							<div class="sheet-col-1-12 sheet-center sheet-small-label">Damage<br/><input type="checkbox" name="attr_spellshowdamage" value="{{spellshowdamage=1}} {{spelldamage=[[@{damage} + @{damagestatbonus} + @{damagemiscbonus} +) + 0d0]] @{damagetype}}}" /></div>
+							<div class="sheet-col-1-12 sheet-center sheet-small-label">Damage<br/><input type="checkbox" name="attr_spellshowdamage" value="{{spellshowdamage=1}} {{spelldamage=[[@{damage} + @{damagestatbonus} + @{damagemiscbonus}]] @{damagetype}}}" /></div>
 							<div class="sheet-col-1-12 sheet-center sheet-small-label">Effects<br/><input type="checkbox" name="attr_spellshoweffects" value="{{spellshoweffects=1}} {{spelleffect=@{spelleffect}}}" /></div>
 							<input type="hidden" name="attr_spellcastmacrooptions" value="@{spellshowinfoblock} @{spellshowdesc} @{spellshowsavethrow} @{spellshowhealing} @{spellshowdamage} @{spellshoweffects}" />
 						</div>
@@ -1191,7 +1243,7 @@
 								<div class="sheet-col-1-6 sheet-center">
 									<select name="attr_healstatbonus">
 										<option value="0">None</option>
-										<option value="@{wisdom_mod}">WIS mod</option>
+										<option value="[[@{wisdom_mod}]]">WIS mod</option>
 									</select>
 								</div>
 							</div>
@@ -1209,8 +1261,8 @@
 								<div class="sheet-col-1-6">
 									<select name="attr_damagestatbonus">
 										<option value="0">None</option>
-										<option value="@{intelligence_mod}">INT mod</option>
-										<option value="@{wisdom_mod}">WIS mod</option>
+										<option value="[[@{intelligence_mod}]]">INT mod</option>
+										<option value="[[@{wisdom_mod}]]">WIS mod</option>
 									</select>
 								</div>
 								<div class="sheet-col-1-6 sheet-small-label sheet-center"><input type="number" class="sheet-center" name="attr_damagemiscbonus" value="0" step="1"></div>
@@ -1268,7 +1320,7 @@
 							<div class="sheet-col-1-12 sheet-center sheet-small-label">Description<br><input type="checkbox" name="attr_spellshowdesc" value="{{spellshowdesc=1}} {{spelldescription=@{spelldescription}}}" /></div>
 							<div class="sheet-col-1-8 sheet-center sheet-small-label">Saving throw<br/><input type="checkbox" name="attr_spellshowsavethrow" value="{{spellshowsavethrow=1}} {{spellsavestat=@{savestat}}} {{spellsavesuccess=@{savesuccess}}}" /></div>
 							<div class="sheet-col-1-12 sheet-center sheet-small-label">Healing<br/><input type="checkbox" name="attr_spellshowhealing" value="{{spellshowhealing=1}} {{spellhealing=[[@{spellhealamount} + @{healstatbonus}]]}}" /></div>
-							<div class="sheet-col-1-12 sheet-center sheet-small-label">Damage<br/><input type="checkbox" name="attr_spellshowdamage" value="{{spellshowdamage=1}} {{spelldamage=[[@{damage} + @{damagestatbonus} + @{damagemiscbonus} +) + 0d0]] @{damagetype}}}" /></div>
+							<div class="sheet-col-1-12 sheet-center sheet-small-label">Damage<br/><input type="checkbox" name="attr_spellshowdamage" value="{{spellshowdamage=1}} {{spelldamage=[[@{damage} + @{damagestatbonus} + @{damagemiscbonus}]] @{damagetype}}}" /></div>
 							<div class="sheet-col-1-12 sheet-center sheet-small-label">Effects<br/><input type="checkbox" name="attr_spellshoweffects" value="{{spellshoweffects=1}} {{spelleffect=@{spelleffect}}}" /></div>
 							<input type="hidden" name="attr_spellcastmacrooptions" value="@{spellshowinfoblock} @{spellshowdesc} @{spellshowsavethrow} @{spellshowhealing} @{spellshowdamage} @{spellshoweffects}" />
 						</div>
@@ -1318,7 +1370,7 @@
 								<div class="sheet-col-1-6 sheet-center">
 									<select name="attr_healstatbonus">
 										<option value="0">None</option>
-										<option value="@{wisdom_mod}">WIS mod</option>
+										<option value="[[@{wisdom_mod}]]">WIS mod</option>
 									</select>
 								</div>
 							</div>
@@ -1336,8 +1388,8 @@
 								<div class="sheet-col-1-6">
 									<select name="attr_damagestatbonus">
 										<option value="0">None</option>
-										<option value="@{intelligence_mod}">INT mod</option>
-										<option value="@{wisdom_mod}">WIS mod</option>
+										<option value="[[@{intelligence_mod}]]">INT mod</option>
+										<option value="[[@{wisdom_mod}]]">WIS mod</option>
 									</select>
 								</div>
 								<div class="sheet-col-1-6 sheet-small-label sheet-center"><input type="number" class="sheet-center" name="attr_damagemiscbonus" value="0" step="1"></div>
@@ -1395,7 +1447,7 @@
 							<div class="sheet-col-1-12 sheet-center sheet-small-label">Description<br><input type="checkbox" name="attr_spellshowdesc" value="{{spellshowdesc=1}} {{spelldescription=@{spelldescription}}}" /></div>
 							<div class="sheet-col-1-8 sheet-center sheet-small-label">Saving throw<br/><input type="checkbox" name="attr_spellshowsavethrow" value="{{spellshowsavethrow=1}} {{spellsavestat=@{savestat}}} {{spellsavesuccess=@{savesuccess}}}" /></div>
 							<div class="sheet-col-1-12 sheet-center sheet-small-label">Healing<br/><input type="checkbox" name="attr_spellshowhealing" value="{{spellshowhealing=1}} {{spellhealing=[[@{spellhealamount} + @{healstatbonus}]]}}" /></div>
-							<div class="sheet-col-1-12 sheet-center sheet-small-label">Damage<br/><input type="checkbox" name="attr_spellshowdamage" value="{{spellshowdamage=1}} {{spelldamage=[[@{damage} + @{damagestatbonus} + @{damagemiscbonus} +) + 0d0]] @{damagetype}}}" /></div>
+							<div class="sheet-col-1-12 sheet-center sheet-small-label">Damage<br/><input type="checkbox" name="attr_spellshowdamage" value="{{spellshowdamage=1}} {{spelldamage=[[@{damage} + @{damagestatbonus} + @{damagemiscbonus}]] @{damagetype}}}" /></div>
 							<div class="sheet-col-1-12 sheet-center sheet-small-label">Effects<br/><input type="checkbox" name="attr_spellshoweffects" value="{{spellshoweffects=1}} {{spelleffect=@{spelleffect}}}" /></div>
 							<input type="hidden" name="attr_spellcastmacrooptions" value="@{spellshowinfoblock} @{spellshowdesc} @{spellshowsavethrow} @{spellshowhealing} @{spellshowdamage} @{spellshoweffects}" />
 						</div>
@@ -1445,7 +1497,7 @@
 								<div class="sheet-col-1-6 sheet-center">
 									<select name="attr_healstatbonus">
 										<option value="0">None</option>
-										<option value="@{wisdom_mod}">WIS mod</option>
+										<option value="[[@{wisdom_mod}]]">WIS mod</option>
 									</select>
 								</div>
 							</div>
@@ -1463,8 +1515,8 @@
 								<div class="sheet-col-1-6">
 									<select name="attr_damagestatbonus">
 										<option value="0">None</option>
-										<option value="@{intelligence_mod}">INT mod</option>
-										<option value="@{wisdom_mod}">WIS mod</option>
+										<option value="[[@{intelligence_mod}]]">INT mod</option>
+										<option value="[[@{wisdom_mod}]]">WIS mod</option>
 									</select>
 								</div>
 								<div class="sheet-col-1-6 sheet-small-label sheet-center"><input type="number" class="sheet-center" name="attr_damagemiscbonus" value="0" step="1"></div>
@@ -1522,7 +1574,7 @@
 							<div class="sheet-col-1-12 sheet-center sheet-small-label">Description<br><input type="checkbox" name="attr_spellshowdesc" value="{{spellshowdesc=1}} {{spelldescription=@{spelldescription}}}" /></div>
 							<div class="sheet-col-1-8 sheet-center sheet-small-label">Saving throw<br/><input type="checkbox" name="attr_spellshowsavethrow" value="{{spellshowsavethrow=1}} {{spellsavestat=@{savestat}}} {{spellsavesuccess=@{savesuccess}}}" /></div>
 							<div class="sheet-col-1-12 sheet-center sheet-small-label">Healing<br/><input type="checkbox" name="attr_spellshowhealing" value="{{spellshowhealing=1}} {{spellhealing=[[@{spellhealamount} + @{healstatbonus}]]}}" /></div>
-							<div class="sheet-col-1-12 sheet-center sheet-small-label">Damage<br/><input type="checkbox" name="attr_spellshowdamage" value="{{spellshowdamage=1}} {{spelldamage=[[@{damage} + @{damagestatbonus} + @{damagemiscbonus} +) + 0d0]] @{damagetype}}}" /></div>
+							<div class="sheet-col-1-12 sheet-center sheet-small-label">Damage<br/><input type="checkbox" name="attr_spellshowdamage" value="{{spellshowdamage=1}} {{spelldamage=[[@{damage} + @{damagestatbonus} + @{damagemiscbonus}]] @{damagetype}}}" /></div>
 							<div class="sheet-col-1-12 sheet-center sheet-small-label">Effects<br/><input type="checkbox" name="attr_spellshoweffects" value="{{spellshoweffects=1}} {{spelleffect=@{spelleffect}}}" /></div>
 							<input type="hidden" name="attr_spellcastmacrooptions" value="@{spellshowinfoblock} @{spellshowdesc} @{spellshowsavethrow} @{spellshowhealing} @{spellshowdamage} @{spellshoweffects}" />
 						</div>
@@ -1572,7 +1624,7 @@
 								<div class="sheet-col-1-6 sheet-center">
 									<select name="attr_healstatbonus">
 										<option value="0">None</option>
-										<option value="@{wisdom_mod}">WIS mod</option>
+										<option value="[[@{wisdom_mod}]]">WIS mod</option>
 									</select>
 								</div>
 							</div>
@@ -1590,8 +1642,8 @@
 								<div class="sheet-col-1-6">
 									<select name="attr_damagestatbonus">
 										<option value="0">None</option>
-										<option value="@{intelligence_mod}">INT mod</option>
-										<option value="@{wisdom_mod}">WIS mod</option>
+										<option value="[[@{intelligence_mod}]]">INT mod</option>
+										<option value="[[@{wisdom_mod}]]">WIS mod</option>
 									</select>
 								</div>
 								<div class="sheet-col-1-6 sheet-small-label sheet-center"><input type="number" class="sheet-center" name="attr_damagemiscbonus" value="0" step="1"></div>
@@ -1649,7 +1701,7 @@
 							<div class="sheet-col-1-12 sheet-center sheet-small-label">Description<br><input type="checkbox" name="attr_spellshowdesc" value="{{spellshowdesc=1}} {{spelldescription=@{spelldescription}}}" /></div>
 							<div class="sheet-col-1-8 sheet-center sheet-small-label">Saving throw<br/><input type="checkbox" name="attr_spellshowsavethrow" value="{{spellshowsavethrow=1}} {{spellsavestat=@{savestat}}} {{spellsavesuccess=@{savesuccess}}}" /></div>
 							<div class="sheet-col-1-12 sheet-center sheet-small-label">Healing<br/><input type="checkbox" name="attr_spellshowhealing" value="{{spellshowhealing=1}} {{spellhealing=[[@{spellhealamount} + @{healstatbonus}]]}}" /></div>
-							<div class="sheet-col-1-12 sheet-center sheet-small-label">Damage<br/><input type="checkbox" name="attr_spellshowdamage" value="{{spellshowdamage=1}} {{spelldamage=[[@{damage} + @{damagestatbonus} + @{damagemiscbonus} +) + 0d0]] @{damagetype}}}" /></div>
+							<div class="sheet-col-1-12 sheet-center sheet-small-label">Damage<br/><input type="checkbox" name="attr_spellshowdamage" value="{{spellshowdamage=1}} {{spelldamage=[[@{damage} + @{damagestatbonus} + @{damagemiscbonus}]] @{damagetype}}}" /></div>
 							<div class="sheet-col-1-12 sheet-center sheet-small-label">Effects<br/><input type="checkbox" name="attr_spellshoweffects" value="{{spellshoweffects=1}} {{spelleffect=@{spelleffect}}}" /></div>
 							<input type="hidden" name="attr_spellcastmacrooptions" value="@{spellshowinfoblock} @{spellshowdesc} @{spellshowsavethrow} @{spellshowhealing} @{spellshowdamage} @{spellshoweffects}" />
 						</div>
@@ -1699,7 +1751,7 @@
 								<div class="sheet-col-1-6 sheet-center">
 									<select name="attr_healstatbonus">
 										<option value="0">None</option>
-										<option value="@{wisdom_mod}">WIS mod</option>
+										<option value="[[@{wisdom_mod}]]">WIS mod</option>
 									</select>
 								</div>
 							</div>
@@ -1717,8 +1769,8 @@
 								<div class="sheet-col-1-6">
 									<select name="attr_damagestatbonus">
 										<option value="0">None</option>
-										<option value="@{intelligence_mod}">INT mod</option>
-										<option value="@{wisdom_mod}">WIS mod</option>
+										<option value="[[@{intelligence_mod}]]">INT mod</option>
+										<option value="[[@{wisdom_mod}]]">WIS mod</option>
 									</select>
 								</div>
 								<div class="sheet-col-1-6 sheet-small-label sheet-center"><input type="number" class="sheet-center" name="attr_damagemiscbonus" value="0" step="1"></div>
@@ -1776,7 +1828,7 @@
 							<div class="sheet-col-1-12 sheet-center sheet-small-label">Description<br><input type="checkbox" name="attr_spellshowdesc" value="{{spellshowdesc=1}} {{spelldescription=@{spelldescription}}}" /></div>
 							<div class="sheet-col-1-8 sheet-center sheet-small-label">Saving throw<br/><input type="checkbox" name="attr_spellshowsavethrow" value="{{spellshowsavethrow=1}} {{spellsavestat=@{savestat}}} {{spellsavesuccess=@{savesuccess}}}" /></div>
 							<div class="sheet-col-1-12 sheet-center sheet-small-label">Healing<br/><input type="checkbox" name="attr_spellshowhealing" value="{{spellshowhealing=1}} {{spellhealing=[[@{spellhealamount} + @{healstatbonus}]]}}" /></div>
-							<div class="sheet-col-1-12 sheet-center sheet-small-label">Damage<br/><input type="checkbox" name="attr_spellshowdamage" value="{{spellshowdamage=1}} {{spelldamage=[[@{damage} + @{damagestatbonus} + @{damagemiscbonus} +) + 0d0]] @{damagetype}}}" /></div>
+							<div class="sheet-col-1-12 sheet-center sheet-small-label">Damage<br/><input type="checkbox" name="attr_spellshowdamage" value="{{spellshowdamage=1}} {{spelldamage=[[@{damage} + @{damagestatbonus} + @{damagemiscbonus}]] @{damagetype}}}" /></div>
 							<div class="sheet-col-1-12 sheet-center sheet-small-label">Effects<br/><input type="checkbox" name="attr_spellshoweffects" value="{{spellshoweffects=1}} {{spelleffect=@{spelleffect}}}" /></div>
 							<input type="hidden" name="attr_spellcastmacrooptions" value="@{spellshowinfoblock} @{spellshowdesc} @{spellshowsavethrow} @{spellshowhealing} @{spellshowdamage} @{spellshoweffects}" />
 						</div>
@@ -1826,7 +1878,7 @@
 								<div class="sheet-col-1-6 sheet-center">
 									<select name="attr_healstatbonus">
 										<option value="0">None</option>
-										<option value="@{wisdom_mod}">WIS mod</option>
+										<option value="[[@{wisdom_mod}]]">WIS mod</option>
 									</select>
 								</div>
 							</div>
@@ -1844,8 +1896,8 @@
 								<div class="sheet-col-1-6">
 									<select name="attr_damagestatbonus">
 										<option value="0">None</option>
-										<option value="@{intelligence_mod}">INT mod</option>
-										<option value="@{wisdom_mod}">WIS mod</option>
+										<option value="[[@{intelligence_mod}]]">INT mod</option>
+										<option value="[[@{wisdom_mod}]]">WIS mod</option>
 									</select>
 								</div>
 								<div class="sheet-col-1-6 sheet-small-label sheet-center"><input type="number" class="sheet-center" name="attr_damagemiscbonus" value="0" step="1"></div>
@@ -1894,12 +1946,12 @@
 				</div>
 				<div class="sheet-row">
 					<div class="sheet-col-1-4 sheet-center"><input type="number" name="attr_inventory_weight" value="0" title="Total up your equipment Worn and Carried then place amount here"></div>
-					<div class="sheet-col-1-4 sheet-center"><input type="number" name="attr_coin_weight" value="((@{CP} + @{SP} + @{GP}))" disabled="disabled"></div>
+					<div class="sheet-col-1-4 sheet-center"><input type="number" name="attr_coin_weight" value="((@{CP} + @{SP} + @{GP})/10)" disabled="disabled"></div>
 					<div class="sheet-col-1-4 sheet-center"><input type="number" name="attr_other_weight" value="0" min="0"></div>
 					<div class="sheet-col-1-4 sheet-center sheet-padr"><input type="number" name="attr_total_weight" value="@{inventory_weight} + @{coin_weight} + @{other_weight}" disabled="disabled"></div>
 				</div>
 			</div>
-			<!-- Inventory -->
+			<!-- Inventory tab -->
             <div class="sheet-col-1-2">
                 <h4 class="sheet-center">Treasure Notes </h4>
 				<textarea name="attr_lootnotes"></textarea>
