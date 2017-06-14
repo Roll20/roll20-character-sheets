@@ -1800,8 +1800,8 @@ on('change:crew_type change:playbook', event => {
 				baseData = crewAttributes;
 				emptyFirstRowIfUnnamed('contact');
 				emptyFirstRowIfUnnamed('crewability');
-				fillRepeatingSectionFromData('contact', playbookData[sourceName].contacts);
-				fillRepeatingSectionFromData('crewability', playbookData[sourceName].abilities);
+				fillRepeatingSectionFromData('contact', crewData[sourceName].contacts);
+				fillRepeatingSectionFromData('crewability', crewData[sourceName].abilities);
 			};
 			break;
 		case 'playbook':
