@@ -7,6 +7,9 @@ This is a re-creation of the "green-sheet" for the D&D Basic Moldvay Red box gam
 
 ### Changelog
 
+#### 2.6
+* Fix for Halfling Initiative to be set to on by default giving all characters the halfling initiative bonus
+
 #### 2.5
 * Fix for Monster Tab Overlapping UI Error (#2565)
 * Monster Alignment is no longer a drop down box (#2332)

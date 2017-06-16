@@ -13,10 +13,10 @@ Le jeu complet est paru dans le magazine [Casus Belli](http://www.black-book-edi
 
 # Notes de version
 
-##v1.1 (2016-07-13)
+## v1.1 (2016-07-13)
 
 * Ajout d'une section répétable de jets paramétrables (+description) dans la section Capacités (Voies)
 
-##v1.0 (2016-07-11)
+## v1.0 (2016-07-11)
 
-Création de la feuille.
+Création de la feuille.w
