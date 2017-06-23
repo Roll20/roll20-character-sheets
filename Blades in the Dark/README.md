@@ -4,6 +4,10 @@ This is a character sheet for Blades in the Dark for use on Roll20.
 
 ## Changelog
 
+### 1.6
+* Translation support for everything except fixed fields in roll templates
+* Crew-specific upgrades are now a repeating section, repeating upgrades moved to crew-specific upgrades, descriptions added to crew upgrades
+
 ### 1.5
 * All items are now repeating
 * Optional description field added for all items (via settings menu)
