@@ -11,6 +11,12 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 15.0.1
+
+### Bug Fixes
+
+* [#519: Ammo added to multiple items when trying to add it to 1 item](https://bitbucket.org/mlenser/5eshaped/issues/519/ammo-added-to-multiple-items-when-trying)
+
 ## 15.0.0
 
 ### Breaking Changes
