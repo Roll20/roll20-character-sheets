@@ -11,14 +11,14 @@ Every calculation can be overriden by manual input, if house rules are used. But
 
 # Release notes
 
-##v2.1 (2017-02-15)
+## v2.1 (2017-02-15)
 
 * Layout bug fix: Min/Max spell label was too long, and the corresponding field was hidden
 * New 'Total Weight' field (automatically calculated based on total treasure and gear weights, but can be overriden)
 * Treasure and Gear total weights calculation optimisation
 * Relocate logo from imgur to github
 
-##v2.0 (2017-02-04)
+## v2.0 (2017-02-04)
 
 Note : this new version of the sheet is compatible with previous versions and characters.
 

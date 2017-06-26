@@ -671,17 +671,7 @@ var crewData = {
 				gatherinfo4: 'What do they intend to do?',
 				gatherinfo5: 'How can I get them to [X]?',
 				gatherinfo6: 'Are they telling the truth?',
-				item_1_desc: 'Fine heavy weapon',
-				item_2_desc: 'Fine hand weapon',
-				item_6_desc: 'Scary weapon or tool',
-				item_7_desc: 'Manacles & chain',
-				item_8_desc: 'Rage essence vial',
-				item_9_desc: 'Spiritbane charm',
 				playbook_description: 'A Dangerous &\nIntimidating\nFighter',
-				setting_showitem_0: '0',
-				setting_showitem_3: '0',
-				setting_showitem_4: '0',
-				setting_showitem_5: '0',
 				setting_traumata_set: 'normal',
 				setting_vice_type: 'normal',
 				skirmish1: '1',
@@ -694,10 +684,38 @@ var crewData = {
 				'Mercy, a cold killer',
 				'Grace, an extortionist',
 				'Sawtooth, a physicker'
+			],
+			items: [{
+					bold: 'on',
+					name: 'Fine hand weapon',
+					numboxes: '1'
+				},
+				{
+					bold: 'on',
+					name: 'Fine heavy weapon',
+					numboxes: '2'
+				},
+				{
+					name: 'Scary weapon or tool',
+					numboxes: '1'
+				},
+				{
+					name: 'Manacles & chain',
+					numboxes: '0'
+				},
+				{
+					name: 'Rage essence vial',
+					numboxes: '0'
+				},
+				{
+					name: 'Spiritbane charm',
+					numboxes: '0'
+				}
 			]
 		},
 		ghost: {
 			abilities: [{
+					check: 'on',
 					name: 'Ghost Form',
 					description: 'You are now a concentration of electroplasmic vapor which resembles your living body and clothes. You may weakly interact with the physical world and vice versa. You\'re vulnerable to arcane powers and electroplasmic effects. You move about by floating and may fly swiftly without tiring. You may slowly flow through small openings as a vapor. You chill the area around you and are terrifying for the living to behold. You are affected by spiritbane charms (take 2 drain to overcome the repulsion). Whenever you would take stress, take drain instead. When you would take trauma, take gloom instead.'
 				},
@@ -727,24 +745,15 @@ var crewData = {
 				gatherinfo5: 'Where\'s the weakness here?',
 				gatherinfo6: 'How can I find [X]?',
 				playbook_description: 'A spirit without a body',
-				setting_showitem_0: '0',
-				setting_showitem_1: '0',
-				setting_showitem_2: '0',
-				setting_showitem_3: '0',
-				setting_showitem_4: '0',
-				setting_showitem_5: '0',
-				setting_showitem_6: '0',
-				setting_showitem_7: '0',
-				setting_showitem_8: '0',
-				setting_showitem_9: '0',
-				setting_stress_name: 'Drain',
-				setting_trauma_name: 'Gloom',
+				setting_stress_label: 'Drain',
+				setting_trauma_label: 'Gloom',
 				setting_traumata_set: 'ghost',
 				setting_vice_type: 'ghost',
 				xp_condition: 'You exacted vengeance upon those whom you deem deserving.',
 				xp_condition2: 'You expressed your your outrage or anger, or settled scores from your heritage or background.',
 				xp_condition3: 'You struggled with issues from your need or glooms during the session.'
 			},
+			items: [],
 			friends: []
 		},
 		hound: {
@@ -787,17 +796,7 @@ var crewData = {
 				gatherinfo6: 'How can I find [X]?',
 				hunt1: '1',
 				hunt2: '1',
-				item_1_desc: 'Fine long rifle',
-				item_2_desc: 'Fine pair of pistols',
-				item_5_desc: 'Electroplasmic ammunition',
-				item_6_desc: 'Spyglass',
-				item_7_desc: 'A trained hunting pet',
-				item_8_desc: 'Spiritbane charm',
 				playbook_description: 'A Deadly\nSharpshooter\nand Tracker',
-				setting_showitem_0: '0',
-				setting_showitem_3: '0',
-				setting_showitem_4: '0',
-				setting_showitem_9: '0',
 				setting_traumata_set: 'normal',
 				setting_vice_type: 'normal',
 				survey1: '1',
@@ -809,10 +808,38 @@ var crewData = {
 				'Melvir, a physicker',
 				'Veleris, a spy',
 				'Casta, a bounty hunter'
+			],
+			items: [{
+					bold: 'on',
+					name: 'Fine pair of pistols',
+					numboxes: '1'
+				},
+				{
+					bold: 'on',
+					name: 'Fine long rifle',
+					numboxes: '2'
+				},
+				{
+					name: 'Electroplasmic ammunition',
+					numboxes: '1'
+				},
+				{
+					name: 'A trained hunting pet',
+					numboxes: '0'
+				},
+				{
+					name: 'Spyglass',
+					numboxes: '1'
+				},
+				{
+					name: 'Spiritbane charm',
+					numboxes: '0'
+				}
 			]
 		},
 		hull: {
 			abilities: [{
+					check: 'on',
 					name: 'Automaton',
 					description: 'You are a spirit animating a clockwork body. You have human-like strength and senses, by default. Your hull has natural armor (this doesn\'t count for your load). Your former human feelings, interests, and connections are only dim memories. You now exist to fulfill your functions. Choose three. You may be rebuilt if damaged or destroyed. If your soul vessel is shattered, you are freed from servitude and become a Ghost. Whenever you would take stress, take drain instead.'
 				},
@@ -851,24 +878,15 @@ var crewData = {
 				playbook_description: 'A spirit animating a clockwork frame',
 				setting_load_h: '7',
 				setting_show_frame: 'on',
-				setting_showitem_0: '0',
-				setting_showitem_1: '0',
-				setting_showitem_2: '0',
-				setting_showitem_3: '0',
-				setting_showitem_4: '0',
-				setting_showitem_5: '0',
-				setting_showitem_6: '0',
-				setting_showitem_7: '0',
-				setting_showitem_8: '0',
-				setting_showitem_9: '0',
-				setting_stress_name: 'Drain',
-				setting_trauma_name: 'Wear',
+				setting_stress_label: 'Drain',
+				setting_trauma_label: 'Wear',
 				setting_traumata_set: 'hull',
 				setting_vice_type: 'hull',
 				xp_condition: 'You fulfilled your functions despite difficulty or danger.',
 				xp_condition2: 'You suppressed or ignored your former human beliefs, drives, heritage, or background.',
 				xp_condition3: 'You struggled with issues from your wear during the session.'
 			},
+			items: [],
 			friends: []
 		},
 		leech: {
@@ -913,17 +931,7 @@ var crewData = {
 				gatherinfo4: 'What can I tinker with here?',
 				gatherinfo5: 'What might happen if I [X]?',
 				gatherinfo6: 'How can I find [X]?',
-				item_0_desc: 'Gadgets',
-				item_1_desc: 'Fine wrecker tools',
-				item_2_desc: 'Fine tinkering tools',
-				item_5_desc: 'Bandolier of alchemicals (3)',
-				item_6_desc: 'Bandolier of alchemicals (3)',
-				item_7_desc: 'Blowgun & darts, syringes',
 				playbook_description: 'A Saboteur and\nTechnician',
-				setting_showitem_3: '0',
-				setting_showitem_4: '0',
-				setting_showitem_8: '0',
-				setting_showitem_9: '0',
 				setting_traumata_set: 'normal',
 				setting_vice_type: 'normal',
 				tinker1: '1',
@@ -937,12 +945,39 @@ var crewData = {
 				'Eckerd, a corpse thief',
 				'Jul, a blood dealer',
 				'Malista, a priestess'
+			],
+			items: [{
+					bold: 'on',
+					name: 'Fine tinkering tools',
+					numboxes: '1'
+				},
+				{
+					bold: 'on',
+					name: 'Fine wrecker tools',
+					numboxes: '2'
+				},
+				{
+					name: 'Blowgun & darts, syringes',
+					numboxes: '0'
+				},
+				{
+					name: 'Bandolier of alchemicals (3)',
+					numboxes: '1'
+				},
+				{
+					name: 'Bandolier of alchemicals (3)',
+					numboxes: '1'
+				},
+				{
+					name: 'Gadget',
+					numboxes: '1'
+				}
 			]
 		},
 		lurk: {
 			abilities: [{
 					name: 'Infiltrator',
-					description: 'You are not a ected by quality or Tier when you bypass security measures.'
+					description: 'You are not affected by quality or Tier when you bypass security measures.'
 				},
 				{
 					name: 'Ambush',
@@ -982,19 +1017,9 @@ var crewData = {
 				gatherinfo4: 'What\'s the best way in?',
 				gatherinfo5: 'Where can I hide here?',
 				gatherinfo6: 'How can I find [X]?',
-				item_3_desc: 'Fine shadow cloak',
-				item_4_desc: 'Fine lockpicks',
-				item_5_desc: 'Light climbing gear',
-				item_6_desc: 'Dark-sight goggles',
-				item_7_desc: 'Silence potion vial',
-				item_8_desc: 'Spiritbane charm',
 				playbook_description: 'A Stealthy\nInfiltrator\nand Burglar',
 				prowl1: '1',
 				prowl2: '1',
-				setting_showitem_0: '0',
-				setting_showitem_1: '0',
-				setting_showitem_2: '0',
-				setting_showitem_9: '0',
 				setting_traumata_set: 'normal',
 				setting_vice_type: 'normal',
 				xp_condition: 'You addressed a challenge with stealth or evasion.'
@@ -1005,6 +1030,33 @@ var crewData = {
 				'Frake, a locksmith',
 				'Roslyn Kellis, a noble',
 				'Petra, a city clerk'
+			],
+			items: [{
+					bold: 'on',
+					name: 'Fine lockpicks',
+					numboxes: '0'
+				},
+				{
+					bold: 'on',
+					name: 'Fine shadow cloak',
+					numboxes: '1'
+				},
+				{
+					name: 'Light climbing gear',
+					numboxes: '1'
+				},
+				{
+					name: 'Silence potion vial',
+					numboxes: '0'
+				},
+				{
+					name: 'Dark-sight goggles',
+					numboxes: '1'
+				},
+				{
+					name: 'Spiritbane charm',
+					numboxes: '0'
+				}
 			]
 		},
 		slide: {
@@ -1050,17 +1102,7 @@ var crewData = {
 				gatherinfo4: 'What are they really feeling?',
 				gatherinfo5: 'What do they really care about?',
 				gatherinfo6: 'How can I blend in here?',
-				item_3_desc: 'Fine disguise kit',
-				item_4_desc: 'Fine clothes & jewelry',
-				item_6_desc: 'A cane-sword',
-				item_7_desc: 'Fine loaded dice, trick cards',
-				item_8_desc: 'Trance powder',
-				item_9_desc: 'Spiritbane charm',
 				playbook_description: 'A Subtle\nManipulator\nand Spy',
-				setting_showitem_0: '0',
-				setting_showitem_1: '0',
-				setting_showitem_2: '0',
-				setting_showitem_5: '0',
 				setting_traumata_set: 'normal',
 				setting_vice_type: 'normal',
 				sway1: '1',
@@ -1073,6 +1115,34 @@ var crewData = {
 				'Klyra, a tavern owner',
 				'Nyryx, a prostitute',
 				'Harker, a jail-bird'
+			],
+			items: [{
+					bold: 'on',
+					name: 'Fine clothes & jewelry',
+					numboxes: '0'
+				},
+				{
+					bold: 'on',
+					name: 'Fine disguise kit',
+					numboxes: '1'
+				},
+				{
+					bold: 'on',
+					name: 'Fine loaded dice, trick cards',
+					numboxes: '0'
+				},
+				{
+					name: 'Trance powder',
+					numboxes: '0'
+				},
+				{
+					name: 'A cane-sword',
+					numboxes: '1'
+				},
+				{
+					name: 'Spiritbane charm',
+					numboxes: '0'
+				}
 			]
 		},
 		spider: {
@@ -1119,17 +1189,7 @@ var crewData = {
 				gatherinfo4: 'How can I discover [X]?',
 				gatherinfo5: 'What do they intend to do?',
 				gatherinfo6: 'How can I get them to [X]?',
-				item_3_desc: 'Fine bottle of whiskey',
-				item_4_desc: 'Fine cover identity',
-				item_5_desc: 'Blueprints',
-				item_7_desc: 'Vial of slumber essence',
-				item_8_desc: 'Concealed palm pistol',
-				item_9_desc: 'Spiritbane charm',
 				playbook_description: 'A Devious\nMastermind',
-				setting_showitem_0: '0',
-				setting_showitem_1: '0',
-				setting_showitem_2: '0',
-				setting_showitem_6: '0',
 				setting_traumata_set: 'normal',
 				setting_vice_type: 'normal',
 				study1: '1',
@@ -1141,6 +1201,33 @@ var crewData = {
 				'Jennah, a servant',
 				'Riven, a chemist',
 				'Jeren, a bluecoat archivist'
+			],
+			items: [{
+					bold: 'on',
+					name: 'Fine cover identity',
+					numboxes: '0'
+				},
+				{
+					bold: 'on',
+					name: 'Fine bottle of whiskey',
+					numboxes: '1'
+				},
+				{
+					name: 'Blueprints',
+					numboxes: '1'
+				},
+				{
+					name: 'Vial of slumber essence',
+					numboxes: '0'
+				},
+				{
+					name: 'Concealed palm pistol',
+					numboxes: '0'
+				},
+				{
+					name: 'Spiritbane charm',
+					numboxes: '0'
+				}
 			]
 		},
 		whisper: {
@@ -1187,17 +1274,7 @@ var crewData = {
 				gatherinfo4: 'What do they intend to do?',
 				gatherinfo5: 'What drives them to do this?',
 				gatherinfo6: 'How can I reveal [X]?',
-				item_2_desc: 'Fine lightning hook',
-				item_3_desc: 'Fine spirit mask',
-				item_6_desc: 'Spirit bottles (2)',
-				item_7_desc: 'Electroplasm vials',
-				item_8_desc: 'Ghost key',
-				item_9_desc: 'Demonbane charm',
 				playbook_description: 'An Arcane\nAdept and\nChanneler',
-				setting_showitem_0: '0',
-				setting_showitem_1: '0',
-				setting_showitem_4: '0',
-				setting_showitem_5: '0',
 				setting_traumata_set: 'normal',
 				setting_vice_type: 'normal',
 				study1: '1',
@@ -1209,10 +1286,38 @@ var crewData = {
 				'Setarra, a demon',
 				'Quellyn, a witch',
 				'Flint, a spirit trafficker'
+			],
+			items: [{
+					bold: 'on',
+					name: 'Fine lightning hook',
+					numboxes: '1'
+				},
+				{
+					bold: 'on',
+					name: 'Fine spirit mask',
+					numboxes: '1'
+				},
+				{
+					name: 'Electroplasm vials',
+					numboxes: '0'
+				},
+				{
+					name: 'Spirit bottles (2)',
+					numboxes: '1'
+				},
+				{
+					name: 'Ghost key',
+					numboxes: '0'
+				},
+				{
+					name: 'Demonbane charm',
+					numboxes: '0'
+				}
 			]
 		},
 		vampire: {
 			abilities: [{
+					check: 'on',
 					name: 'Undead',
 					description: 'You are a spirit which animates an undead body. Your trauma is maxed out. Choose four trauma conditions which reflect your vampiric nature. Arcane attacks are potent against you. If you suffer fatal harm or trauma, your undead spirit is overwhelmed. You take level 3 harm: "Incapacitated" until you feed enough to recover. If you suffer arcane harm while in this state, you are destroyed utterly. Your XP tracks are longer (you now advance more slowly). You have more stress boxes.'
 				},
@@ -1245,24 +1350,9 @@ var crewData = {
 				gatherinfo4: 'What should I look out for?',
 				gatherinfo5: 'Where\'s the weakness here?',
 				gatherinfo6: 'How can I find [X]?',
-				item_3_desc: 'Fine shadow cloak',
-				item_4_desc: 'Fine clothes and accoutrements',
-				item_5_desc: 'Fine personal weapon',
-				item_7_desc: 'Demonbane charm',
-				item_8_desc: 'Spiritbane charm',
 				playbook_description: 'A spirit animating an undead body',
 				setting_extra_stress: '3',
 				setting_vampirexp: 'on',
-				setting_showitem_0: '0',
-				setting_showitem_1: '0',
-				setting_showitem_2: '0',
-				setting_showitem_3: 'on',
-				setting_showitem_4: 'on',
-				setting_showitem_5: 'on',
-				setting_showitem_6: '0',
-				setting_showitem_7: 'on',
-				setting_showitem_8: 'on',
-				setting_showitem_9: '0',
 				setting_show_strictures: 'on',
 				setting_traumata_set: 'normal',
 				setting_vice_type: 'vampire',
@@ -1277,6 +1367,27 @@ var crewData = {
 				'Kira, a bodyguard',
 				'Otto, a coachman',
 				'Edrik, an envoy'
+			],
+			items: [{
+					name: 'Fine clothes and accoutrements',
+					numboxes: '0'
+				},
+				{
+					name: 'Fine personal weapon',
+					numboxes: '1'
+				},
+				{
+					name: 'Fine shadow cloak',
+					numboxes: '1'
+				},
+				{
+					name: 'Demonbane charm',
+					numboxes: '0'
+				},
+				{
+					name: 'Spiritbane charm',
+					numboxes: '0'
+				}
 			]
 		}
 	},
@@ -1607,9 +1718,95 @@ var crewData = {
 			'sway'
 		]
 	},
+	itemData = [{
+			name: 'A Blade or Two',
+			numboxes: '1'
+		},
+		{
+			name: 'Throwing Knives',
+			numboxes: '1'
+		},
+		{
+			name: 'A Pistol',
+			numboxes: '1',
+			short: 'on'
+		},
+		{
+			name: 'A 2nd Pistol',
+			numboxes: '1',
+			short: 'on'
+		},
+		{
+			name: 'A Large Weapon',
+			numboxes: '2'
+		},
+		{
+			name: 'An Unusual Weapon',
+			numboxes: '1'
+		},
+		{
+			name: 'Armor',
+			numboxes: '2',
+			short: 'on'
+		},
+		{
+			name: '+Heavy',
+			numboxes: '3',
+			short: 'on'
+		},
+		{
+			name: 'Burglary Gear',
+			numboxes: '1'
+		},
+		{
+			name: 'Climbing Gear',
+			numboxes: '2'
+		},
+		{
+			name: 'Arcane Implements',
+			numboxes: '1'
+		},
+		{
+			name: 'Documents',
+			numboxes: '1'
+		},
+		{
+			name: 'Subterfuge Supplies',
+			numboxes: '1'
+		},
+		{
+			name: 'Demolition Tools',
+			numboxes: '2'
+		},
+		{
+			name: 'Tinkering Tools',
+			numboxes: '1'
+		},
+		{
+			name: 'Lantern',
+			numboxes: '1'
+		}
+	],
 	spiritPlaybooks = ['ghost', 'hull', 'vampire'];
+/* NECESSARY DATA TRANSFORMATION */
+Object.keys(playbookData).forEach(playbook => {
+	playbookData[playbook].items.forEach(item => {
+		item.boxes_chosen = 'on';
+	});
+	playbookData[playbook].friends = playbookData[playbook].friends.map(n => ({
+		name: n
+	}));
+});
+Object.keys(crewData).forEach(crew => {
+	crewData[crew].contacts = crewData[crew].contacts.map(n => ({
+		name: n
+	}));
+});
+itemData.forEach(item => {
+	item.boxes_chosen = 'on';
+});
 /* UTILITY FUNCTIONS */
-var setDiceFromTotal = function (name, numDice, upToFive, value) {
+var setDiceFromTotal = (name, numDice, upToFive, value) => {
 		'use strict';
 		value = value || 1;
 		let setting = {};
@@ -1622,24 +1819,24 @@ var setDiceFromTotal = function (name, numDice, upToFive, value) {
 		};
 		setAttrs(setting);
 	},
-	fillRepeatingSectionFromData = function (sectionName, dataList) {
+	fillRepeatingSectionFromData = (sectionName, dataList) => {
 		'use strict';
-		getSectionIDs(`repeating_${sectionName}`, function (idList) {
+		getSectionIDs(`repeating_${sectionName}`, idList => {
 			let rowNameAttributes = idList.map(id => `repeating_${sectionName}_${id}_name`);
-			getAttrs(rowNameAttributes, function (attrs) {
-				let existingRows = Object.keys(attrs).map(x => attrs[x]),
+			getAttrs(rowNameAttributes, v => {
+				let existingRows = Object.keys(v).map(x => v[x]),
 					createdIDs = [];
 				let setting = dataList.filter(o => !existingRows.includes(o.name))
-					.map(function (o) {
+					.map(o => {
 						let rowID;
 						while (!rowID) {
 							let newID = generateRowID();
 							if (!createdIDs.includes(newID)) {
-							 rowID = newID;
-							 createdIDs.push(rowID);
+								rowID = newID;
+								createdIDs.push(rowID);
 							}
 						}
-						return Object.keys(o).reduce(function (m, key) {
+						return Object.keys(o).reduce((m, key) => {
 							m[`repeating_${sectionName}_${rowID}_${key}`] = o[key];
 							return m;
 						}, {});
@@ -1649,11 +1846,11 @@ var setDiceFromTotal = function (name, numDice, upToFive, value) {
 			});
 		});
 	},
-	emptyFirstRowIfUnnamed = function (sectionName) {
+	emptyFirstRowIfUnnamed = sectionName => {
 		'use strict';
-		getSectionIDs(`repeating_${sectionName}`, function (idList) {
+		getSectionIDs(`repeating_${sectionName}`, idList => {
 			let id = idList[0];
-			getAttrs([`repeating_${sectionName}_${id}_name`], function (v) {
+			getAttrs([`repeating_${sectionName}_${id}_name`], v => {
 				if (!v[`repeating_${sectionName}_${id}_name`]) {
 					removeRepeatingRow(`repeating_${sectionName}_${id}`);
 				};
@@ -1665,23 +1862,32 @@ var setDiceFromTotal = function (name, numDice, upToFive, value) {
 var crewAttributes = [...new Set([].concat(...Object.keys(crewData).map(x => Object.keys(crewData[x].base))))],
 	playbookAttributes = [...new Set([].concat(...Object.keys(playbookData).map(x => Object.keys(playbookData[x].base))))],
 	watchedAttributes = new Set([].concat(crewAttributes, playbookAttributes));
-on('change:crew_type change:playbook', function (event) {
+on('change:crew_type change:playbook', event => {
 	'use strict';
-	getAttrs(['crew_type', 'playbook', 'changed_attributes'], function (attrValues) {
-		let changedAttributes = (attrValues.changed_attributes || '').split(','),
+	getAttrs(['crew_type', 'playbook', 'changed_attributes'], v => {
+		let changedAttributes = (v.changed_attributes || '').split(','),
 			data, baseData, sourceName;
 		switch (event.sourceAttribute) {
 		case 'crew_type':
-			sourceName = attrValues.crew_type.toLowerCase();
+			sourceName = v.crew_type.toLowerCase();
 			if (crewData.hasOwnProperty(sourceName)) {
 				data = crewData[sourceName].base;
 				baseData = crewAttributes;
+				emptyFirstRowIfUnnamed('contact');
+				emptyFirstRowIfUnnamed('crewability');
+				fillRepeatingSectionFromData('contact', crewData[sourceName].contacts);
+				fillRepeatingSectionFromData('crewability', crewData[sourceName].abilities);
 			};
 			break;
 		case 'playbook':
-			sourceName = attrValues.playbook.toLowerCase();
+			sourceName = v.playbook.toLowerCase();
 			if (playbookData.hasOwnProperty(sourceName)) {
 				data = playbookData[sourceName].base;
+				emptyFirstRowIfUnnamed('friend');
+				emptyFirstRowIfUnnamed('ability');
+				fillRepeatingSectionFromData('playbookitem', playbookData[sourceName].items);
+				fillRepeatingSectionFromData('friend', playbookData[sourceName].friends);
+				fillRepeatingSectionFromData('ability', playbookData[sourceName].abilities);
 				baseData = playbookAttributes;
 			};
 		};
@@ -1699,11 +1905,11 @@ on('change:crew_type change:playbook', function (event) {
 	});
 });
 /* Watch for changes in auto-set attributes */
-watchedAttributes.forEach(function (name) {
+watchedAttributes.forEach(name => {
 	'use strict';
-	on(`change:${name}`, function (eventInfo) {
+	on(`change:${name}`, eventInfo => {
 		if (eventInfo.sourceType === 'player') {
-			getAttrs(['changed_attributes'], function (v) {
+			getAttrs(['changed_attributes'], v => {
 				let changedAttributes = [...new Set(v.changed_attributes.split(',').concat(name))].filter(x => !!x).join(',');
 				setAttrs({
 					changed_attributes: changedAttributes
@@ -1713,47 +1919,47 @@ watchedAttributes.forEach(function (name) {
 	});
 });
 /* DERIVED DICE NUMBERS */
-var actions1 = Object.keys(actionData).reduce(function (m, k) {
+var actions1 = Object.keys(actionData).reduce((m, k) => {
 		m[k] = actionData[k].map(s => `${s}1`);
 		return m;
 	}, {}),
 	actionsFlat = [].concat(...Object.keys(actionData).map(x => actionData[x])),
 	actions1Flat = actionsFlat.map(str => str + '1'),
-	calculateResistance = function (name) {
+	calculateResistance = name => {
 		'use strict';
-		getAttrs(actions1[name], function (attrs) {
-			let numDice = Object.keys(attrs).map(x => attrs[x]).reduce((s, v) => s + parseInt(v || 0), 0);
+		getAttrs(actions1[name], v => {
+			let numDice = Object.keys(v).map(x => v[x]).reduce((s, c) => s + parseInt(c || 0), 0);
 			setDiceFromTotal(name, numDice);
 		});
 	},
-	calculateVice = function () {
+	calculateVice = () => {
 		'use strict';
-		getAttrs(actions1Flat, function (values) {
-			let numDice = Math.min(...Object.keys(actions1).map(function (name) {
-				return actions1[name].reduce((s, str) => s + parseInt(values[str] || 0), 0);
+		getAttrs(actions1Flat, v => {
+			let numDice = Math.min(...Object.keys(actions1).map(name => {
+				return actions1[name].reduce((s, str) => s + parseInt(v[str] || 0), 0);
 			}));
 			setDiceFromTotal('vice', numDice);
 		});
 	};
 /* Register attribute/action event handlers */
-Object.keys(actionData).forEach(function (attributeName) {
+Object.keys(actionData).forEach(attributeName => {
 	'use strict';
-	actionData[attributeName].forEach(function (actionName) {
+	actionData[attributeName].forEach(actionName => {
 		on(`change:${actionName}1`, () => calculateResistance(attributeName));
 	});
-	on(`change:${attributeName}1 change:${attributeName}2 change:${attributeName}3 change:${attributeName}4`, calculateVice);
+	on([1, 2, 3, 4].map(x => `change:${attributeName}${x}`).join(' '), calculateVice);
 });
 /* GENERATE FACTIONS */
-on('change:generate_factions', function (event) {
+on('change:generate_factions', () => {
 	'use strict';
 	Object.keys(factionsData).forEach(function (sectionName) {
 		fillRepeatingSectionFromData(sectionName, factionsData[sectionName]);
 	});
 });
 /* GENERATE ABILITIES */
-on('change:generate_abilities', function () {
+on('change:generate_abilities', () => {
 	'use strict';
-	getAttrs(['generate_source'], function (v) {
+	getAttrs(['generate_source'], v => {
 		let sectionName, dataList;
 		if (crewData.hasOwnProperty(v.generate_source)) {
 			sectionName = 'crewability';
@@ -1767,36 +1973,32 @@ on('change:generate_abilities', function () {
 	});
 });
 /* GENERATE FRIENDS */
-on('change:generate_friends', function () {
+on('change:generate_friends', () => {
 	'use strict';
-	getAttrs(['generate_source'], function (v) {
+	getAttrs(['generate_source'], v => {
 		let sectionName, dataList;
 		if (crewData.hasOwnProperty(v.generate_source)) {
 			sectionName = 'contact';
-			dataList = crewData[v.generate_source].contacts.map(n => ({
-				name: n
-			}));
+			dataList = crewData[v.generate_source].contacts;
 		} else if (playbookData.hasOwnProperty(v.generate_source)) {
 			sectionName = 'friend';
-			dataList = playbookData[v.generate_source].friends.map(n => ({
-				name: n
-			}));
+			dataList = playbookData[v.generate_source].friends;
 		};
 		emptyFirstRowIfUnnamed(sectionName);
 		fillRepeatingSectionFromData(sectionName, dataList);
 	});
 });
 /* CALCULATE WANTED */
-on('change:wanted', function () {
+on('change:wanted', () => {
 	'use strict';
-	getAttrs(['wanted'], function (v) {
+	getAttrs(['wanted'], v => {
 		setDiceFromTotal('wanted', parseInt(v.wanted));
 	});
 });
 /* EXTRA STRESS BOXES */
-on('change:setting_extra_stress', function () {
+on('change:setting_extra_stress', () => {
 	'use strict';
-	getAttrs(['setting_extra_stress'], function (v) {
+	getAttrs(['setting_extra_stress'], v => {
 		setDiceFromTotal('setting_extra_stress', parseInt(v.setting_extra_stress), true, 'on');
 	});
 });
@@ -1813,33 +2015,31 @@ var calculateCohortDots = function (t1, t2, t3, t4, imp, type, prefix) {
 		setDiceFromTotal(`${prefix}die`, numDots, true);
 	},
 	qualityAttrs = ['crew_tier1', 'crew_tier2', 'crew_tier3', 'crew_tier4', 'cohort1_impaired', 'cohort1_type'],
-	qualityEvent = qualityAttrs.map(str => `change:${str}`).join(' '),
-	calculateCohort1Dice = function () {
-		'use strict';
-		getAttrs(qualityAttrs, function (attrs) {
-			calculateCohortDots(attrs.crew_tier1, attrs.crew_tier2, attrs.crew_tier3, attrs.crew_tier4, attrs.cohort1_impaired, attrs.cohort1_type, 'cohort1_');
-		});
-	};
-on(qualityEvent, calculateCohort1Dice);
-var repeatingQualityAttrs = ['crew_tier1', 'crew_tier2', 'crew_tier3', 'crew_tier4', 'repeating_cohort:impaired', 'repeating_cohort:type'],
-	repeatingQualityEvent = repeatingQualityAttrs.map(str => `change:${str}`).join(' '),
-	calculateRepeatingCohortDice = function () {
-		'use strict';
-		getSectionIDs('repeating_cohort', function (list) {
-			list.forEach(function (id) {
-				let attrList = repeatingQualityAttrs.map(str => str.replace(':', `_${id}_`));
-				getAttrs(attrList, function (attrs) {
-					calculateCohortDots(attrs.crew_tier1, attrs.crew_tier2, attrs.crew_tier3, attrs.crew_tier4, attrs[attrList[4]], attrs[attrList[5]], `repeating_cohort_${id}_`);
-				});
+	qualityEvent = qualityAttrs.map(x => `change:${x}`).join(' '),
+	repeatingQualityAttrs = ['crew_tier1', 'crew_tier2', 'crew_tier3', 'crew_tier4', 'repeating_cohort:impaired', 'repeating_cohort:type'],
+	repeatingQualityEvent = repeatingQualityAttrs.map(x => `change:${x}`).join(' ');
+on(qualityEvent, () => {
+	'use strict';
+	getAttrs(qualityAttrs, attrs => {
+		calculateCohortDots(attrs.crew_tier1, attrs.crew_tier2, attrs.crew_tier3, attrs.crew_tier4, attrs.cohort1_impaired, attrs.cohort1_type, 'cohort1_');
+	});
+});
+on(repeatingQualityEvent + ' ' + ['name', 'subtype', 'edges', 'flaws', 'description'].map(x => `change:repeating_cohort:${x}`).join(' '), () => {
+	'use strict';
+	getSectionIDs('repeating_cohort', list => {
+		list.forEach(id => {
+			let attrList = repeatingQualityAttrs.map(str => str.replace(':', `_${id}_`));
+			getAttrs(attrList, v => {
+				calculateCohortDots(v.crew_tier1, v.crew_tier2, v.crew_tier3, v.crew_tier4, v[attrList[4]], v[attrList[5]], `repeating_cohort_${id}_`);
 			});
 		});
-	};
-on(repeatingQualityEvent + ' change:repeating_cohort:name change:repeating_cohort:subtype change:repeating_cohort:edges change:repeating_cohort:flaws change:repeating_cohort:description', calculateRepeatingCohortDice);
+	});
+});
 /* LEFT-FILL CHECKBOXES */
-var handleFourBoxesFill = function (name) {
+var handleFourBoxesFill = name => {
 	'use strict';
-	on(`change:${name}1 change:${name}2 change:${name}3 change:${name}4`, function (event) {
-		getAttrs([event.sourceAttribute], function (v) {
+	on(`change:${name}1 change:${name}2 change:${name}3 change:${name}4`, event => {
+		getAttrs([event.sourceAttribute], v => {
 			let rName = event.sourceAttribute.slice(0, -1);
 			if (v[event.sourceAttribute] === '1') {
 				let setting = {};
@@ -1873,21 +2073,16 @@ actionsFlat.forEach(handleFourBoxesFill);
 /* Crew Tier */
 handleFourBoxesFill('crew_tier');
 /* Items/Upgrades */
-var itemChecks = [
-	'item_1_check',
-	'item_14_check',
-	'item_16_check',
-	'item_18_check',
-	'item_22_check',
+var legacyChecks = [
 	'upgrade_1_check',
 	'upgrade_24_check',
 	'bandolier1_check',
 	'bandolier2_check'
 ];
-itemChecks.forEach(function (name) {
+legacyChecks.forEach(name => {
 	'use strict';
-	on(`change:${name} change:${name}_b change:${name}_c change:${name}_d change:${name}_e`, function (event) {
-		getAttrs([event.sourceAttribute], function (v) {
+	on(['', '_b', '_c', '_d', '_e'].map(x => `change:${name}${x}`).join(' '), event => {
+		getAttrs([event.sourceAttribute], v => {
 			if (v[event.sourceAttribute] === 'on') {
 				let setting = {};
 				switch (event.sourceAttribute.slice('-1')) {
@@ -1919,8 +2114,33 @@ itemChecks.forEach(function (name) {
 		});
 	});
 });
+['item', 'playbookitem'].forEach(sectionName => {
+	on([1, 2, 3].map(x => `change:repeating_${sectionName}:check_${x}`).join(' '), event => {
+		getAttrs([event.sourceAttribute], v => {
+			let rName = event.sourceAttribute.slice(0, -1),
+				setting = {};
+			if (v[event.sourceAttribute] === 'on') {
+				switch (event.sourceAttribute.slice(-1)) {
+				case '3':
+					setting[`${rName}2`] = 'on';
+				case '2':
+					setting[`${rName}1`] = 'on';
+				};
+			};
+			if (v[event.sourceAttribute] === '0') {
+				switch (event.sourceAttribute.slice(-1)) {
+				case '1':
+					setting[`${rName}2`] = '0';
+				case '2':
+					setting[`${rName}3`] = '0';
+				};
+			};
+			setAttrs(setting);
+		});
+	});
+});
 /* INITIALISATION AND UPGRADES */
-on('sheet:opened', function () {
+on('sheet:opened', () => {
 	'use strict';
 	let initialRows = [
 		'ability',
@@ -1929,33 +2149,34 @@ on('sheet:opened', function () {
 		'contact'
 	];
 	/* Make sure sheet_type is never 0 */
-	getAttrs(['sheet_type', 'changed_attributes'], function (v) {
+	getAttrs(['sheet_type', 'changed_attributes'], v => {
 		if (!['character', 'crew', 'faction'].includes(v.sheet_type)) {
 			setAttrs({
 				sheet_type: 'character'
 			});
 		}
 	});
-	/* Initial setup */
-	getAttrs(['version'], function (v) {
-		// Setup initial rows in repeating sections
+	/* Setup and upgrades */
+	getAttrs(['version'], v => {
+		// Setup initial rows in repeating sections and generate standard items
 		if (!v.version) {
-			let setting = initialRows.reduce(function (memo, sectionName) {
+			let setting = initialRows.reduce((memo, sectionName) => {
 				memo[`repeating_${sectionName}_${generateRowID()}_dummy`] = 1;
 				return memo;
 			}, {});
 			setAttrs(setting);
+			fillRepeatingSectionFromData('item', itemData);
 		};
 		// Upgrade to 0.7: Convert legacy faction repeating section to text
 		if (v.version && v.version.split('.')[0] === '0' && parseInt(v.version.split('.')[1]) < 7) {
-			getSectionIDs('repeating_faction', function (list) {
+			getSectionIDs('repeating_faction', list => {
 				let sectionList = ['faction1', 'faction2'].concat(list.map(str => `repeating_faction_${str}`)),
 					attrList = [].concat(...sectionList.map(str => [`${str}_name`, `${str}_status`, `${str}_description`]));
-				getAttrs(attrList, function (attrs) {
-					let output = sectionList.map(function (str) {
-						return 'Name: ' + attrs[`${str}_name`] + '\n' +
-							'Status: ' + (attrs[`${str}_status`] || '') + '\n' +
-							'Notes: ' + (attrs[`${str}_description`] || '') + '\n';
+				getAttrs(attrList, v => {
+					let output = sectionList.map(str => {
+						return 'Name: ' + v[`${str}_name`] + '\n' +
+							'Status: ' + (v[`${str}_status`] || '') + '\n' +
+							'Notes: ' + (v[`${str}_description`] || '') + '\n';
 					}).join('\n');
 					setAttrs({
 						faction_notes: output
@@ -1981,24 +2202,24 @@ on('sheet:opened', function () {
 				'crew_ability1_check', 'crew_ability1_name', 'crew_ability1_description',
 				'contact1_check', 'contact1_name'
 			];
-			getAttrs(attrs, function (attrValues) {
+			getAttrs(attrs, v => {
 				fillRepeatingSectionFromData('ability', [{
-					check: attrValues.ability1_check,
-					description: attrValues.ability1_description,
-					name: attrValues.ability1_name
+					check: v.ability1_check,
+					description: v.ability1_description,
+					name: v.ability1_name
 				}]);
 				fillRepeatingSectionFromData('friend', [{
-					name: attrValues.friend1_name,
-					status: attrValues.friend1_status
+					name: v.friend1_name,
+					status: v.friend1_status
 				}]);
 				fillRepeatingSectionFromData('crewability', [{
-					check: attrValues.crew_ability1_check,
-					description: attrValues.crew_ability1_description,
-					name: attrValues.crew_ability1_name
+					check: v.crew_ability1_check,
+					description: v.crew_ability1_description,
+					name: v.crew_ability1_name
 				}]);
 				fillRepeatingSectionFromData('contact', [{
-					check: attrValues.contact1_check,
-					name: attrValues.contact1_name
+					check: v.contact1_check,
+					name: v.contact1_name
 				}]);
 			});
 		};
@@ -2007,10 +2228,203 @@ on('sheet:opened', function () {
 			Object.keys(actionData).forEach(calculateResistance);
 			calculateVice();
 		};
+		// Upgrade to 1.4: Convert playbook items and repeating items
+		if (v.version && (parseInt(v.version.split('.')[0]) < 1 || (parseInt(v.version.split('.')[0]) === 1 && parseInt(v.version.split('.')[1]) < 4))) {
+			let indices = [...Array(10).keys()], // [0:9]
+				allAttrs = [
+					...indices.map(n => `item_${n}_check`),
+					...indices.map(n => `item_${n}_desc`),
+					'item_0_check_b',
+					'item_0_check_c',
+					'item_1_check_b'
+				];
+			getAttrs(allAttrs, v => {
+				let items = [];
+				if (v['item_0_desc']) {
+					items.push({
+						check_1: v['item_0_check'] || '0',
+						name: v['item_0_desc'],
+						numboxes: '1'
+					});
+					items.push({
+						check_1: v['item_0_check_b'] || '0',
+						name: v['item_0_desc'],
+						numboxes: '1'
+					});
+					items.push({
+						check_1: v['item_0_check_c'] || '0',
+						name: v['item_0_desc'],
+						numboxes: '1'
+					});
+				}
+				if (v['item_1_desc']) {
+					items.push({
+						bold: 'on',
+						check_1: v['item_1_check'] || '0',
+						check_2: v['item_1_check_b'] || '0',
+						name: v['item_1_desc'],
+						numboxes: '2'
+					});
+				}
+				['2', '3', '5', '6'].forEach(index => {
+					if (v[`item_${index}_desc`]) {
+						items.push({
+							bold: (['2', '3'].includes(index) ? 'on' : '0'),
+							check_1: v[`item_${index}_check`] || '0',
+							name: v[`item_${index}_desc`],
+							numboxes: '1'
+						});
+					}
+				});
+				['4', '7', '8', '9'].forEach(index => {
+					if (v[`item_${index}_desc`]) {
+						items.push({
+							bold: ((index === '4') ? 'on' : '0'),
+							check_1: v[`item_${index}_check`] || '0',
+							name: v[`item_${index}_desc`],
+							numboxes: '0'
+						});
+					}
+				});
+				items.forEach(obj => {
+					obj['boxes_chosen'] = 'on';
+				});
+				fillRepeatingSectionFromData('playbookitem', items);
+			});
+			getSectionIDs('repeating_item', idArray => {
+				let allAttrs = [
+					...idArray.map(id => `repeating_item_${id}_desc`),
+					...idArray.map(id => `repeating_item_${id}_check`),
+					...idArray.map(id => `repeating_item_${id}_check_b`)
+				];
+				getAttrs(allAttrs, v => {
+					let setting = {};
+					idArray.forEach(id => {
+						setting[`repeating_item_${id}_boxes_chosen`] = 'on';
+						setting[`repeating_item_${id}_numboxes`] = '2';
+						setting[`repeating_item_${id}_name`] = v[`repeating_item_${id}_desc`] || '';
+						setting[`repeating_item_${id}_check_1`] = v[`repeating_item_${id}_check`] || '0';
+						setting[`repeating_item_${id}_check_2`] = v[`repeating_item_${id}_check_b`] || '0';
+					});
+					setAttrs(setting);
+				});
+			});
+		};
+		// Upgrade to 1.5: Convert items
+		if (v.version && (parseInt(v.version.split('.')[0]) < 1 || (parseInt(v.version.split('.')[0]) === 1 && parseInt(v.version.split('.')[1]) < 5))) {
+			let indices = [...Array(25).keys()].slice(10),
+				allAttrs = [
+					...indices.map(n => `item_${n}_check`),
+					...indices.map(n => `item_${n}_desc`),
+					'item_14_check_b',
+					'item_16_check_b',
+					'item_16_check_c',
+					'item_16_check_d',
+					'item_16_check_e',
+					'item_18_check_b',
+					'item_22_check_b'
+				];
+			getAttrs(allAttrs, v => {
+				let items = [{
+						check_1: (v['item_10_check'] || '0'),
+						name: (v['item_10_desc'] || 'A Blade or Two'),
+						numboxes: '1'
+					},
+					{
+						check_1: (v['item_11_check'] || '0'),
+						name: (v['item_11_desc'] || 'Throwing Knives'),
+						numboxes: '1'
+					},
+					{
+						check_1: (v['item_12_check'] || '0'),
+						name: (v['item_12_desc'] || 'A Pistol'),
+						numboxes: '1',
+						short: 'on'
+					},
+					{
+						check_1: (v['item_13_check'] || '0'),
+						name: (v['item_13_desc'] || 'A 2nd Pistol'),
+						numboxes: '1',
+						short: 'on'
+					},
+					{
+						check_1: (v['item_14_check'] || '0'),
+						check_2: (v['item_14_check_b'] || '0'),
+						name: (v['item_14_desc'] || 'A Large Weapon'),
+						numboxes: '2'
+					},
+					{
+						check_1: (v['item_15_check'] || '0'),
+						name: (v['item_15_desc'] || 'An Unusual Weapon'),
+						numboxes: '1'
+					},
+					{
+						check_1: (v['item_16_check'] || '0'),
+						check_2: (v['item_16_check_b'] || '0'),
+						name: (v['item_16_desc'] || 'Armor'),
+						numboxes: '2',
+						short: 'on'
+					},
+					{
+						check_1: (v['item_16_check_c'] || '0'),
+						check_2: (v['item_16_check_d'] || '0'),
+						check_3: (v['item_16_check_e'] || '0'),
+						name: (v['item_16_desc_b'] || '+Heavy'),
+						numboxes: '3',
+						short: 'on'
+					},
+					{
+						check_1: (v['item_17_check'] || '0'),
+						name: (v['item_17_desc'] || 'Burglary Gear'),
+						numboxes: '1'
+					},
+					{
+						check_1: (v['item_18_check'] || '0'),
+						name: (v['item_18_desc'] || 'Climbing Gear'),
+						numboxes: '2'
+					},
+					{
+						check_1: (v['item_19_check'] || '0'),
+						name: (v['item_19_desc'] || 'Arcane Implements'),
+						numboxes: '1'
+					},
+					{
+						check_1: (v['item_20_check'] || '0'),
+						name: (v['item_20_desc'] || 'Documents'),
+						numboxes: '1'
+					},
+					{
+						check_1: (v['item_21_check'] || '0'),
+						name: (v['item_21_desc'] || 'Subterfuge Supplies'),
+						numboxes: '1'
+					},
+					{
+						check_1: (v['item_22_check'] || '0'),
+						check_2: (v['item_22_check_b'] || '0'),
+						name: (v['item_22_desc'] || 'Demolition Tools'),
+						numboxes: '2'
+					},
+					{
+						check_1: (v['item_23_check'] || '0'),
+						name: (v['item_23_desc'] || 'Tinkering Tools'),
+						numboxes: '1'
+					},
+					{
+						check_1: (v['item_24_check'] || '0'),
+						name: (v['item_24_desc'] || 'Lantern'),
+						numboxes: '1'
+					}
+				];
+				items.forEach(obj => {
+					obj['boxes_chosen'] = 'on';
+				});
+				fillRepeatingSectionFromData('item', items);
+			});
+		};
 		// Set version number
 		setAttrs({
-			version: '1.3',
-			character_sheet: 'Blades in the Dark v1.3'
+			version: '1.5',
+			character_sheet: 'Blades in the Dark v1.5'
 		});
 	});
 });

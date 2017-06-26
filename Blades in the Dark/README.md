@@ -4,6 +4,15 @@ This is a character sheet for Blades in the Dark for use on Roll20.
 
 ## Changelog
 
+### 1.5
+* All items are now repeating
+* Optional description field added for all items (via settings menu)
+
+### 1.4
+* Changes for items; made playbook items a repeating section, and added options for non-playbook-items.
+* Entering a playbook or crew name will now automatically generate abilities and friends/contacts
+* Small fix for ghost/hull label for stress and trauma
+
 ### 1.3
 * Added Vigilantes data
 
