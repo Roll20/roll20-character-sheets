@@ -18,7 +18,7 @@ Au lieu de compter une Qualité sur des résultats pairs au D6, et deux qualité
 
 # Notes de version
 
-##v1.1 (2017-02-26)
+## v1.1 (2017-02-26)
 Merci au Grümph, à Xo de Vorcen et Nessir pour les retours, idées et suggestions.
 
 * Jet d'inititiative ajouté
@@ -43,6 +43,6 @@ Merci au Grümph, à Xo de Vorcen et Nessir pour les retours, idées et suggesti
 * Tableau des Qualités pour Roll20 enlevé
 * Interne : simplification de la formule de jet
 
-##v1.0 (2017-02-18)
+## v1.0 (2017-02-18)
 
 Création de la feuille.

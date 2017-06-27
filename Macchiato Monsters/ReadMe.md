@@ -15,6 +15,6 @@ The sheet has integrated rolls (with chat roll templates) for:
 
 # Release notes
 
-##v1.0 (2016-01-09)
+## v1.0 (2016-01-09)
 
 Creation of the sheet.
