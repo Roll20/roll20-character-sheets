@@ -12,7 +12,7 @@ La fortune sourit aux audacieux, la mort aussi !
 Feuille de personnage pour [Terra X](http://legrumph.org/Terrier/?Chibi/Terra-X), un jeu de rôle SF et post-apocalyptique de John Grümph, motorisé par une version spécifique de la Swords & Wizardry Whitebox.
 
 # Version courante
-1.1 [Capture d'écran](terrax.jpg)
+1.0 [Capture d'écran](terrax.jpg)
 
 La feuille permet de faire les jets de base : caractéristiques, initiative et attaques.
 Tous les jets de D20 sont doublés systématiquement pour gérer l'avantage / désavantage en un clic.
@@ -25,10 +25,6 @@ Le jet d'initiative ajoute le pion sélectionné au Turn Order, avec la valeur d
 
 # Notes de version
 
-##v1.1 (2016-10-16)
-
-Correction des jets d'attaque qui ne prenaient pas en compte le BAB (oups ...).
-
-##v1.0 (2016-10-06)
+## v1.0 (2016-10-06)
 
 Création de la feuille.

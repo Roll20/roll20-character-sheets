@@ -8,11 +8,11 @@ Basée sur la feuille VO de Willem den Besten (Morenim) et Devindra Payment (@Ar
 
 # Notes de version
 
-##v3.3 (2017-02-18)
+## v3.3 (2017-02-18)
 
 * Correction d'une anomalie occasionnelle dans la totalisation automatique de l'encombrement
 
-##v3.2 (2016-12-18)
+## v3.2 (2016-12-18)
 
 * Dans les actions appropriées, ajout d'un modificateur en saisie, à ajouter au jet de dégâts
 * Ajout d'une section "Divers"
@@ -21,13 +21,13 @@ Basée sur la feuille VO de Willem den Besten (Morenim) et Devindra Payment (@Ar
 * Correction d'une anomalie occasionnelle dans la totalisation automatique de l'encombrement
 * Correction technique interne sur la gestion des retours à la ligne dans les Actions
 
-##v3.1 (2016-11-21)
+## v3.1 (2016-11-21)
 
 * Ajout de 2 options, pour des bonus interactifs aux jets et dégâts
 * Ajout d'un onglet "Notes" ... pour noter des choses
 * Info-bulle plus détaillée des jets dans le roll template / chat
 
-##v3.0 (2016-08-12)
+## v3.0 (2016-08-12)
 
 Adaptation pour [Dungeon World VF V2](http://www.500nuancesdegeek.fr/dungeon-world-v2/) :
 
@@ -35,7 +35,7 @@ Adaptation pour [Dungeon World VF V2](http://www.500nuancesdegeek.fr/dungeon-wor
 * Ajout des nouvelles actions de base, spéciales et de départ
 * Toutes les actions avec jets gèrent désormais les résultats 12+, 10+, 7 à 9, 6-
 
-##v2.0 (2016-03-06)
+## v2.0 (2016-03-06)
 
 Merci à Acritarche, Antoine P., MaxiMax, Eric Nieudan et les autres pour leur aide, tests et retours.
 
@@ -62,14 +62,14 @@ Merci à Acritarche, Antoine P., MaxiMax, Eric Nieudan et les autres pour leur a
   * Ajout d'une coche et d'une zone de saisie pour un jet associé au sort (dégâts, soins etc.). Si cochée, jet effectué et résultat affiché dans le template de jet du sort
 * Ajout du copyright VO et VF des textes de Actions
 
-##v1.1 (2016-02-28)
+## v1.1 (2016-02-28)
 * Ajout du logo
 * Affichage légèrement plus compact
 * Ajout du nombre d'utilisations (courante et maximum) dans le matériel
 * Affichage direct de la base de PV et de la base de Charge
 * Reformatage des sorts sur la colonne de droite, sous les actions
 
-##v1.0 (2016-02-21)
+## v1.0 (2016-02-21)
 Création de la fiche.
 
 Différences par rapport à la feuille VO :
