@@ -2,6 +2,7 @@
 Versions have two numbers Major.Minor
 
 **Major**: Indicates that some form of compatibility has broken.  These versions should have notes indicating what broke and how to handle it.
+
 **Minor**: These are simple updates including new features and/or bugfixes
 
 ## 1.1
