@@ -31,11 +31,11 @@
 		calcAllActionRolls();
 	});
 	
-	// Function to combine the double columns in Feats, Perks, and Flaws
+	// Function to combine the double columns in Feats, Perks, Flaws, & Power Level for Actions
 	// **** To be removed after a few months, only needed for pre-existing characters
-	// **** Put in 7th of May, 2017
-//	function tempFixColumns() {
-//	    s
+	// **** Put in July 2017
+//    function tempFixColumns() {
+//	    stuff here
 //	};
 
     // Function to determine dice number :: takes in the attribute score :: outputs the dice number
@@ -1769,7 +1769,7 @@
         getSectionIDs("repeating_actions", function(actionsArray) {
          if(actionsArray.length > 0) {
             _.each(actionsArray, function(currentID, i) {
-                getAttrs(["repeating_actions_" + currentID + "_action_attribute", "repeating_actions_" + currentID + "_dice_roll_d20", "repeating_actions_" + currentID + "_dice_modifier", "repeating_actions_" + currentID + "_use_power_level", "repeating_actions_" + currentID + "_power_level", "repeating_actions_" + currentID + "_power_level_max", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(v) {
+                getAttrs(["repeating_actions_" + currentID + "_action_attribute", "repeating_actions_" + currentID + "_dice_roll_d20", "repeating_actions_" + currentID + "_dice_modifier", "repeating_actions_" + currentID + "_use_power_level", "repeating_actions_" + currentID + "_power_level", "repeating_actions_" + currentID + "_power_level_max", "repeating_actions_" + currentID + "_power_levelmax", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(v) {
                     var update = {};
                     var score = 0;
                     if(v["repeating_actions_" + currentID + "_action_attribute"] === "Agility") {
@@ -1817,6 +1817,17 @@
                     var number = calcAttributeDiceNumber(score);
                     var type = calcAttributeDiceType(score);
                     var roll = "";
+                    var powerLevelMax = 0;
+                    if(v["repeating_actions_" + currentID + "_power_levelmax"]*1 === 0) {
+                        if(isNaN(v["repeating_actions_" + currentID + "_power_level_max"])) {
+                            powerLevelMax = 0;
+                        } else {
+                            powerLevelMax = v["repeating_actions_" + currentID + "_power_level_max"]*1;
+                            update["repeating_actions_" + currentID + "_power_levelmax"] = powerLevelMax*1;
+                        }
+                    } else {
+                        powerLevelMax = v["repeating_actions_" + currentID + "_power_levelmax"]*1;
+                    }
         			if(score === 0) {
         				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
         			} else {
@@ -1829,7 +1840,7 @@
         			}
                     if(v["repeating_actions_" + currentID + "_use_power_level"] === "Yes") {
                         update["repeating_actions_" + currentID + "_power_target"] = "[[10 + " + v["repeating_actions_" + currentID + "_power_level"]*2 + "]]";
-                        update["repeating_actions_" + currentID + "_power_target_max"] = "[[10 + " + v["repeating_actions_" + currentID + "_power_level_max"]*2 + "]]";
+                        update["repeating_actions_" + currentID + "_power_targetmax"] = "[[10 + " + powerLevelMax*2 + "]]";
                     } else {
                         update["repeating_actions_" + currentID + "_power_target"] = "";
                     }
@@ -1845,7 +1856,7 @@
         getSectionIDs("repeating_otheractions", function(actionsArray) {
          if(actionsArray.length > 0) {
             _.each(actionsArray, function(currentID, i) {
-                getAttrs(["repeating_otheractions_" + currentID + "_action_attribute", "repeating_otheractions_" + currentID + "_dice_roll_d20", "repeating_otheractions_" + currentID + "_dice_modifier", "repeating_otheractions_" + currentID + "_use_power_level", "repeating_otheractions_" + currentID + "_power_level", "repeating_otheractions_" + currentID + "_power_level_max", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(v) {
+                getAttrs(["repeating_otheractions_" + currentID + "_action_attribute", "repeating_otheractions_" + currentID + "_dice_roll_d20", "repeating_otheractions_" + currentID + "_dice_modifier", "repeating_otheractions_" + currentID + "_use_power_level", "repeating_otheractions_" + currentID + "_power_level", "repeating_otheractions_" + currentID + "_power_levelmax", "repeating_otheractions_" + currentID + "_power_level_max", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(v) {
                     var updateother = {};
                     var score = 0;
                     if(v["repeating_otheractions_" + currentID + "_action_attribute"] === "Agility") {
@@ -1893,6 +1904,17 @@
                     var number = calcAttributeDiceNumber(score);
                     var type = calcAttributeDiceType(score);
                     var roll = "";
+                    var powerLevelMax = 0;
+                    if(v["repeating_otheractions_" + currentID + "_power_levelmax"]*1 === 0) {
+                        if(isNaN(v["repeating_otheractions_" + currentID + "_power_level_max"])) {
+                            powerLevelMax = 0;
+                        } else {
+                            powerLevelMax = v["repeating_otheractions_" + currentID + "_power_level_max"]*1;
+                            updateother["repeating_otheractions_" + currentID + "_power_levelmax"] = powerLevelMax*1;
+                        }
+                    } else {
+                        powerLevelMax = v["repeating_otheractions_" + currentID + "_power_levelmax"]*1;
+                    }
         			if(score === 0) {
         				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
         			} else {
@@ -1905,7 +1927,7 @@
         			}
                     if(v["repeating_otheractions_" + currentID + "_use_power_level"] === "Yes") {
                         updateother["repeating_otheractions_" + currentID + "_power_target"] = "[[10 + " + v["repeating_otheractions_" + currentID + "_power_level"]*2 + "]]";
-                        updateother["repeating_otheractions_" + currentID + "_power_target_max"] = "[[10 + " + v["repeating_otheractions_" + currentID + "_power_level_max"]*2 + "]]";
+                        updateother["repeating_otheractions_" + currentID + "_power_target_max"] = "[[10 + " + powerLevelMax*2 + "]]";
                     } else {
                         updateother["repeating_otheractions_" + currentID + "_power_target"] = "";
                     }
@@ -1986,12 +2008,12 @@
     });
 		
 	// On Change for Use Power Level in Legendary Items
-    on("change:repeating_legendary:use_power_level change:repeating_legendary:power_level change:repeating_legendary:power_level_max", function() {
-        getAttrs(["repeating_legendary_use_power_level", "repeating_legendary_power_level", "repeating_legendary_power_level_max"], function(values) {
+    on("change:repeating_legendary:use_power_level change:repeating_legendary:power_level change:repeating_legendary:power_levelmax", function() {
+        getAttrs(["repeating_legendary_use_power_level", "repeating_legendary_power_level", "repeating_legendary_power_levelmax"], function(values) {
             if(values.repeating_legendary_use_power_level === "Yes") {
                 setAttrs({
                     "repeating_legendary_power_target": "[[10 + " + values.repeating_legendary_power_level*2 + "]]",
-                    "repeating_legendary_power_target_max": "[[10 + " + values.repeating_legendary_power_level_max*2 + "]]"
+                    "repeating_legendary_power_targetmax": "[[10 + " + values.repeating_legendary_power_levelmax*2 + "]]"
                 });
             } else {
                setAttrs({
@@ -2001,12 +2023,12 @@
         });
     });		
 	// On Change for Use Power Level in actions
-    on("change:repeating_otheractions:use_power_level change:repeating_otheractions:power_level change:repeating_otheractions:power_level_max", function() {
-        getAttrs(["repeating_otheractions_use_power_level", "repeating_otheractions_power_level", "repeating_otheractions_power_level_max"], function(values) {
+    on("change:repeating_otheractions:use_power_level change:repeating_otheractions:power_level change:repeating_otheractions:power_levelmax", function() {
+        getAttrs(["repeating_otheractions_use_power_level", "repeating_otheractions_power_level", "repeating_otheractions_power_levelmax"], function(values) {
             if(values.repeating_otheractions_use_power_level === "Yes") {
                 setAttrs({
                     "repeating_otheractions_power_target": "[[10 + " + values.repeating_otheractions_power_level*2 + "]]",
-                    "repeating_otheractions_power_target_max": "[[10 + " + values.repeating_otheractions_power_level_max*2 + "]]"
+                    "repeating_otheractions_power_targetmax": "[[10 + " + values.repeating_otheractions_power_levelmax*2 + "]]"
                 });
             } else {
                setAttrs({
@@ -2016,12 +2038,12 @@
         });
     });
 	// On Change for Use Power Level in actions
-    on("change:repeating_actions:use_power_level change:repeating_actions:power_level change:repeating_actions:power_level_max", function() {
-        getAttrs(["repeating_actions_use_power_level", "repeating_actions_power_level", "repeating_actions_power_level_max"], function(values) {
+    on("change:repeating_actions:use_power_level change:repeating_actions:power_level change:repeating_actions:power_levelmax", function() {
+        getAttrs(["repeating_actions_use_power_level", "repeating_actions_power_level", "repeating_actions_power_levelmax"], function(values) {
             if(values.repeating_actions_use_power_level === "Yes") {
                 setAttrs({
                     "repeating_actions_power_target": "[[10 + " + values.repeating_actions_power_level*2 + "]]",
-                    "repeating_actions_power_target_max": "[[10 + " + values.repeating_actions_power_level_max*2 + "]]"
+                    "repeating_actions_power_targetmax": "[[10 + " + values.repeating_actions_power_levelmax*2 + "]]"
                 });
             } else {
                 setAttrs({
@@ -4085,10 +4107,11 @@ var TAS = TAS || (function(){
    <!-- Guard information -->
         <div class="width100 padAll">
             <div class="evasion vertTop padTop">
-                <div class="inlineBlock vertTop padTop" style="width: 155px;">
+                <div class="inlineBlock vertTop" style="width: 155px;">
                     <div class="column width100 textCenter resistButton">
                         <button type="roll" name="roll_resist_bane" value="&{template:openLegend} {{title= Resist Bane Roll}} {{subTitle= @{character_name}}} {{roll= [[1d20]]}} {{target= 10+ bane is removed}}">Guard</button>
                     </div>
+                    <div class="column width100 textCenter textSmall">Click to roll Resist Bane</div>
                     <div class="column width100 inputNumberLarge padTop"><input type="number" name="attr_evasion" value=0 /></div>
                 </div>
                 <div class="inlineBlock vertTop" style="width: 120px;">
@@ -4112,10 +4135,11 @@ var TAS = TAS || (function(){
    <!-- Toughness information -->
         <div class="width100 padAll">
             <div class="toughness vertTop padTop">
-                <div class="inlineBlock vertTop padTop" style="width: 155px;">
+                <div class="inlineBlock vertTop" style="width: 155px;">
                     <div class="column width100 textCenter resistButton">
                         <button type="roll" name="roll_resist_bane" value="&{template:openLegend} {{title= Resist Bane Roll}} {{subTitle= @{character_name}}} {{roll= [[1d20]]}} {{target= 10+ bane is removed}}">Toughness</button>
                     </div>
+                    <div class="column width100 textCenter textSmall">Click to roll Resist Bane</div>
                     <div class="column width100 inputNumberLarge padTop"><input type="number" name="attr_toughness" value=0 /></div>
                 </div>
                 <div class="inlineBlock vertTop" style="width: 120px;">
@@ -4136,10 +4160,11 @@ var TAS = TAS || (function(){
    <!-- Resolve information -->
         <div class="width100 padAll">
             <div class="resolve vertTop padTop">
-                <div class="inlineBlock vertTop padTop" style="width: 155px;">
+                <div class="inlineBlock vertTop" style="width: 155px;">
                     <div class="column width100 textCenter resistButton">
                         <button type="roll" name="roll_resist_bane" value="&{template:openLegend} {{title= Resist Bane Roll}} {{subTitle= @{character_name}}} {{roll= [[1d20]]}} {{target= 10+ bane is removed}}">Resolve</button>
                     </div>
+                    <div class="column width100 textCenter textSmall">Click to roll Resist Bane</div>
                     <div class="column width100 inputNumberLarge padTop"><input type="number" name="attr_resolve" value=0 /></div>
                 </div>
                 <div class="inlineBlock vertTop" style="width: 120px;">
@@ -4205,7 +4230,7 @@ var TAS = TAS || (function(){
             <div class="width50 inlineBlock vertTop">
                 <div class="column width100 height5"></div>
                 <input type="hidden" name="attr_agility_initiative" value=0 />
-                <div class="column width100 textCenter textLarge speedButton"><button type="roll" name="roll_initiative" value="&{template:openLegend} {{title= Initiative Roll}} {{subTitle= @{character_name}}} {{subTitleAdd= Agility}} {{roll= @{agility_initiative}}} {{description= Make sure to you selected your token to have it automatically added to the turn order.}}">Speed</span></button></div>
+                <div class="column width100 textCenter textLarge speedButton"><button type="roll" name="roll_initiative" value="&{template:openLegend} {{title= Initiative Roll}} {{subTitle= @{character_name}}} {{subTitleAdd= Agility}} {{roll= @{agility_initiative}}} {{description= Make sure you selected your token to have it automatically added to the turn order.}}">Speed</span></button></div>
                 <div class="column width100 textCenter textSmall" style="line-height: 10px;">Click to roll Initiative</div>
                 <div class="column width100 vertTop inputNumber30 textSmall bold">Base <input type="number" name="attr_base_speed" value=30 /></div>
                 <div class="column width100 inputNumberLarge"><input type="number" name="attr_speed" value=0 /></div>
@@ -4246,7 +4271,7 @@ var TAS = TAS || (function(){
                 <fieldset class="repeating_actions">
                     <div class="row">   <!-- Fix for Mozilla squishing +Add & Modify buttons -->
                         <div class="width15 inlineBlock vertTop padLeft"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>y</span></div>
-                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" name="roll_action" value="&{template:openLegend} {{title= @{action_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= @{action_attribute}}} {{target= @{action_target}}} {{roll= @{dice_roll}}} {{powertarget=@{power_target}}} {{powerlevel= @{power_level}}} {{powertargetmax= @{power_target_max}}} {{powerlevelmax= @{power_level_max}}} {{description= @{action_special}}}"><input type="text" style="text-align: center;" name="attr_action_name" /></button></div>
+                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" name="roll_action" value="&{template:openLegend} {{title= @{action_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= @{action_attribute}}} {{target= @{action_target}}} {{roll= @{dice_roll}}} {{powertarget=@{power_target}}} {{powerlevel= @{power_level}}} {{powertargetmax= @{power_targetmax}}} {{powerlevelmax= @{power_levelmax}}} {{description= @{action_special}}}"><input type="text" style="text-align: center;" name="attr_action_name" /></button></div>
                         <input type="hidden" class="displaySettingsFlag" name="attr_displaySettingsFlag" />
                         <div class="width100 displaySettings padLeft">
                             <div class="column width25 inlineBlock bold">Name: </div>
@@ -4301,13 +4326,13 @@ var TAS = TAS || (function(){
                                 </select>
                             </div>
                             <input type="hidden" name="attr_power_target" value="" />
-                            <input type="hidden" name="attr_power_target_max" value=0 />
+                            <input type="hidden" name="attr_power_targetmax" value="" />
                             <div class="column width50 inlineBlock textSmall bold">For a Boon</div>
                             <div class="column width25 inlineBlock textSmall bold">Minimum</div>
                             <div class="column width25 inlineBlock textSmall bold">Maximum</div>
                             <div class="column width50 inlineBlock"><input type="checkbox" class="checks25" name="attr_use_power_level" value="Yes" /> Use Power level</div>
                             <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_power_level" value=0 /></div>
-                            <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_power_level_max" value=0 /></div>
+                            <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_power_levelmax" value=0 /></div>
                             <div class="column width100 bold textSmall">Description/Special/Flavor Text</div>
                             <div class="column width100 resizeVert vertTop"><textarea class="height50" name="attr_action_special"></textarea></div>
                         </div>
@@ -4334,7 +4359,7 @@ var TAS = TAS || (function(){
                 <fieldset class="repeating_otheractions">
                     <div class="row">   <!-- Fix for Mozilla squishing +Add & Modify buttons -->
                         <div class="width15 inlineBlock vertTop padLeft"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>y</span></div>
-                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" name="roll_action_other" value="&{template:openLegend} {{title= @{action_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= @{action_attribute}}} {{target= @{action_target}}} {{roll= @{dice_roll}}} {{powertarget=@{power_target}}} {{powerlevel= @{power_level}}} {{powertargetmax= @{power_target_max}}} {{powerlevelmax= @{power_level_max}}} {{description= @{action_special}}}"><input type="text" style="text-align: center;" name="attr_action_name" /></button></div>
+                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" name="roll_action_other" value="&{template:openLegend} {{title= @{action_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= @{action_attribute}}} {{target= @{action_target}}} {{roll= @{dice_roll}}} {{powertarget=@{power_target}}} {{powerlevel= @{power_level}}} {{powertargetmax= @{power_targetmax}}} {{powerlevelmax= @{power_levelmax}}} {{description= @{action_special}}}"><input type="text" style="text-align: center;" name="attr_action_name" /></button></div>
                         <input type="hidden" class="displaySettingsFlag" name="attr_displaySettingsFlag" />
                         <div class="width100 displaySettings padLeft">
                             <div class="column width25 inlineBlock bold">Name: </div>
@@ -4387,13 +4412,13 @@ var TAS = TAS || (function(){
                                 </select>
                             </div>
                             <input type="hidden" name="attr_power_target" value="" />
-                            <input type="hidden" name="attr_power_target_max" value=0 />
+                            <input type="hidden" name="attr_power_targetmax" value=0 />
                             <div class="column width50 inlineBlock textSmall bold">For a Boon</div>
                             <div class="column width25 inlineBlock textSmall bold">Minimum</div>
                             <div class="column width25 inlineBlock textSmall bold">Maximum</div>
                             <div class="column width50 inlineBlock"><input type="checkbox" class="checks25" name="attr_use_power_level" value="Yes" /> Use Power level</div>
                             <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_power_level" value=0 /></div>
-                            <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_power_level_max" value=0 /></div>
+                            <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_power_levelmax" value=0 /></div>
                             <div class="column width100 bold textSmall">Description/Special/Flavor Text</div>
                             <div class="column width100 resizeVert vertTop"><textarea class="height50" name="attr_action_special"></textarea></div>
                         </div>
@@ -4420,7 +4445,7 @@ var TAS = TAS || (function(){
                 <fieldset class="repeating_legendary">
                     <div class="row">   <!-- Fix for Mozilla squishing +Add & Modify buttons -->
                         <div class="width15 inlineBlock vertTop padLeft"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>y</span></div>
-                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" name="roll_action" value="&{template:openLegend} {{title= @{action_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= @{action_attribute}}} {{target= @{action_target}}} {{roll= @{dice_roll}}} {{powertarget=@{power_target}}} {{powerlevel= @{power_level}}} {{powertargetmax= @{power_target_max}}} {{powerlevelmax= @{power_level_max}}} {{description= @{action_special}}}"><input type="text" style="text-align: center;" name="attr_action_name" /></button></div>
+                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" name="roll_action" value="&{template:openLegend} {{title= @{action_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= @{action_attribute}}} {{target= @{action_target}}} {{roll= @{dice_roll}}} {{powertarget=@{power_target}}} {{powerlevel= @{power_level}}} {{powertargetmax= @{power_targetmax}}} {{powerlevelmax= @{power_levelmax}}} {{description= @{action_special}}}"><input type="text" style="text-align: center;" name="attr_action_name" /></button></div>
                         <input type="hidden" class="displaySettingsFlag" name="attr_displaySettingsFlag" />
                         <div class="width100 displaySettings padLeft">
                             <div class="column width25 inlineBlock bold">Name: </div>
@@ -4486,13 +4511,13 @@ var TAS = TAS || (function(){
                                 </select>
                             </div>
                             <input type="hidden" name="attr_power_target" value="" />
-                            <input type="hidden" name="attr_power_target_max" value=0 />
+                            <input type="hidden" name="attr_power_targetmax" value=0 />
                             <div class="column width50 inlineBlock textSmall bold">For a Boon</div>
                             <div class="column width25 inlineBlock textSmall bold">Minimum</div>
                             <div class="column width25 inlineBlock textSmall bold">Maximum</div>
                             <div class="column width50 inlineBlock"><input type="checkbox" class="checks25" name="attr_use_power_level" value="Yes" /> Use Power level</div>
                             <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_power_level" value=0 /></div>
-                            <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_power_level_max" value=0 /></div>
+                            <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_power_levelmax" value=0 /></div>
                             <div class="column width100 bold textSmall">Description/Special/Flavor Text</div>
                             <div class="column width100 resizeVert vertTop"><textarea class="height50" name="attr_action_special"></textarea></div>
                         </div>
@@ -5088,7 +5113,7 @@ var TAS = TAS || (function(){
         {{#description}}
         <div class="row">
             <div class="column width100 textCenter bold borderBottom">Description/Flavor Text</div>
-            <div class="column width100 textCenter">{{description}}</div>
+            <div class="column width100 textCenter scroll" style="max-height: 80px;">{{description}}</div>
         </div>
         {{/description}}
     </div>
