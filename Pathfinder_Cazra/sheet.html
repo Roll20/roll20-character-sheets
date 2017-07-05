@@ -25,10 +25,16 @@
           <input type="text" name="attr_race"/>
         </div>
       </div>
-      <div class="labelledUnderlined" style="width: 2in">
+      <div class="labelledUnderlined" style="width: 1.5in">
         <label>Classes and levels</label>
         <div class="inner">
           <input type="text" name="attr_classes"/>
+        </div>
+      </div>
+      <div class="labelledUnderlined" style="width: 0.5in">
+        <label>Total Lv</label>
+        <div class="inner">
+          <input type="number" name="attr_level"/>
         </div>
       </div>
       <div class="labelledBoxH" style="float: right">
@@ -748,18 +754,17 @@
         </div>
         <div>
           <h3>Attacks</h3>
-          <div class="inlineBlock" style="margin-top: 1.5em; vertical-align: top; width: 1in">
-            <div class="labelledBoxV">
-              <label>Base Attack Bonus</label>
-              <div class="inner">
-                <input type="number" name="attr_bab" value="0"/>
-              </div>
+          <div class="labelledBoxH">
+            <label>Base Attack Bonus</label>
+            <div class="inner">
+              <input type="number" name="attr_bab" value="0"/>
             </div>
           </div>
-          <div class="inlineBlock" style="margin-bottom: 1em; vertical-align: top; width: 80%">
+          <!-- .inlineBlock(style='margin-top: 1.5em; vertical-align: top; width: 1in;'): +labelledBoxV('Base Attack Bonus'): +input('number', 'bab')(value=0)-->
+          <div class="inlineBlock" style="margin-bottom: 1em; vertical-align: top">
             <div class="attacks">
               <div class="head">
-                <label class="inlineBlock" style="padding-left: 1.5in; width: 0.55in">Total</label>
+                <label class="inlineBlock" style="padding-left: 3in; width: 0.55in">Total</label>
                 <label class="inlineBlock" style="width: 0.4in">BAB</label>
                 <label class="inlineBlock" style="width: 0.4in">Ability Mod</label>
                 <label class="inlineBlock" style="width: 0.4in">Size</label>
@@ -767,57 +772,104 @@
                 <label class="inlineBlock" style="width: 0.65in">Misc +/-</label>
                 <label class="inlineBlock">Temp +/-</label>
               </div>
-              <div class="body" style="width: 8in">
+              <div class="body" style="width: 8.5in">
                 <fieldset class="repeating_attacks">
-                        <div style="margin-bottom: 1em">
-                          <div class="inlineBlock blackBox">
-                            <div class="rollButton">
-                              <button type="roll" value="&amp;{template:pf} {{charName=@{character_name}}} {{attr=attack}} {{result=[[1d20 + @{attack}]]}}{{notes=@{attack_notes}}}"></button>
-                              <input type="text" name="attr_attack_name"/>
+                        <div class="inlineBlock blackBox" style="height: 0.5in; vertical-align: top; width: 0.5in">
+                          <div class="rollButton"><span>t</span>
+                            <button type="roll" value="&amp;{template:pf} {{charName=@{character_name}}} {{attr=@{attack_name}}} {{result=[[1d20cs&gt;@{attack_critRange} + @{attack}]]}} {{damage=[[@{attack_damage}]]}} {{critConfirm=[[1d20cs&gt;@{attack_critRange} + @{attack}]]}} {{critDamage=[[(@{attack_damage}) * @{attack_critMultiplier}]]}}{{isAttack=true}}{{notes=@{attack_notes}}}"></button>
+                          </div>
+                        </div>
+                        <div class="inlineBlock" style="margin-bottom: 1em; width: 7.8in">
+                          <div style="margin-bottom: 2px">
+                            <div class="inlineBlock blackBox">
+                              <input type="text" name="attr_attack_name" placeholder="Attack name"/>
+                            </div>
+                            <div class="readOnlyBox"><span name="attr_attack"></span></div>
+                            <input type="hidden" name="attr_attack"/>
+                            <div class="mathOperator">=</div>
+                            <div class="readOnlyBox" style="width: 0.25in"><span name="attr_attack_bab"></span></div>
+                            <input type="hidden" name="attr_attack_bab"/>
+                            <div class="mathOperator">+</div>
+                            <div class="atkAbility">
+                              <div class="readOnlyBox" style="width: 0.25in"><span name="attr_attack_ability_mod"></span></div>
+                              <input type="hidden" name="attr_attack_ability_mod"/>
                               <select name="attr_attack_ability">
                                 <option value="Choose One">Choose One</option>
-                                <option value="str">Strength</option>
-                                <option value="dex">Dexterity</option>
-                                <option value="con">Constitution</option>
-                                <option value="int">Intelligence</option>
-                                <option value="wis">Wisdom</option>
-                                <option value="cha">Charisma</option>
+                                <option value="str">STR</option>
+                                <option value="dex">DEX</option>
+                                <option value="con">CON</option>
+                                <option value="int">INT</option>
+                                <option value="wis">WIS</option>
+                                <option value="cha">CHA</option>
                               </select>
                             </div>
-                          </div>
-                          <div class="readOnlyBox"><span name="attr_attack"></span></div>
-                          <input type="hidden" name="attr_attack"/>
-                          <div class="mathOperator">=</div>
-                          <div class="readOnlyBox" style="width: 0.25in"><span name="attr_attack_bab"></span></div>
-                          <input type="hidden" name="attr_attack_bab"/>
-                          <div class="mathOperator">+</div>
-                          <div class="readOnlyBox" style="width: 0.25in"><span name="attr_attack_ability_mod"></span></div>
-                          <input type="hidden" name="attr_attack_ability_mod"/>
-                          <div class="mathOperator">+</div>
-                          <div class="readOnlyBox" style="width: 0.25in"><span name="attr_attack_size"></span></div>
-                          <input type="hidden" name="attr_attack_size"/>
-                          <div class="mathOperator">+</div>
-                          <div class="fieldBox">
-                            <div class="inner">
-                              <input type="number" name="attr_attack_equipment" value="0"/>
+                            <div class="mathOperator">+</div>
+                            <div class="readOnlyBox" style="width: 0.25in"><span name="attr_attack_size"></span></div>
+                            <input type="hidden" name="attr_attack_size"/>
+                            <div class="mathOperator">+</div>
+                            <div class="fieldBox">
+                              <div class="inner">
+                                <input type="number" name="attr_attack_equipment" value="0"/>
+                              </div>
+                            </div>
+                            <div class="mathOperator">+</div>
+                            <div class="fieldBox">
+                              <div class="inner">
+                                <input type="number" name="attr_attack_misc" value="0"/>
+                              </div>
+                            </div>
+                            <div class="mathOperator">+</div>
+                            <div class="fieldBox">
+                              <div class="inner">
+                                <input type="number" name="attr_attack_temp" value="0"/>
+                              </div>
                             </div>
                           </div>
-                          <div class="mathOperator">+</div>
-                          <div class="fieldBox">
-                            <div class="inner">
-                              <input type="number" name="attr_attack_misc" value="0"/>
+                          <div>
+                            <div class="labelledBoxH">
+                              <label>Damage</label>
+                              <div class="inner">
+                                <input type="text" name="attr_attack_damage" style="width: 1.5in" value="0"/>
+                              </div>
                             </div>
-                          </div>
-                          <div class="mathOperator">+</div>
-                          <div class="fieldBox">
-                            <div class="inner">
-                              <input type="number" name="attr_attack_temp" value="0"/>
+                            <div class="labelledUnderlined" style="width: 0.8in">
+                              <label>Crit Range</label>
+                              <div class="inner">
+                                <select name="attr_attack_critRange">
+                                  <option value="99" selected="selected">Choose One</option>
+                                  <option value="20">20</option>
+                                  <option value="19">19-20</option>
+                                  <option value="18">18-20</option>
+                                  <option value="17">17-20</option>
+                                  <option value="16">16-20</option>
+                                  <option value="15">15-20</option>
+                                  <option value="14">14-20</option>
+                                  <option value="13">13-20</option>
+                                  <option value="12">12-20</option>
+                                  <option value="11">11-20</option>
+                                  <option value="10">10-20</option>
+                                  <option value="9">9-20</option>
+                                  <option value="8">8-20</option>
+                                  <option value="7">7-20</option>
+                                  <option value="6">6-20</option>
+                                  <option value="5">5-20</option>
+                                  <option value="4">4-20</option>
+                                  <option value="3">3-20</option>
+                                  <option value="2">2-20</option>
+                                </select>
+                              </div>
                             </div>
-                          </div>
-                          <div class="labelledUnderlined" style="margin-left: 1em; width: 1.5in">
-                            <label>Conditional Modifiers</label>
-                            <div class="inner">
-                              <input type="text" name="attr_attack_notes"/>
+                            <div class="labelledUnderlined" style="width: 0.8in">
+                              <label>Crit Multiplier</label>
+                              <div class="inner">
+                                <input type="number" name="attr_attack_critMultiplier"/>
+                              </div>
+                            </div>
+                            <div class="labelledUnderlined" style="margin-left: 1em; width: 3in">
+                              <label>Conditional Modifiers</label>
+                              <div class="inner">
+                                <input type="text" name="attr_attack_notes"/>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -4906,16 +4958,47 @@ on('sheet:opened', () => {
         <th>{{charName}} &#x21D2; {{attr}}</th>
       </tr>
     </thead>
-    <tbody>
-      <tr>
-        <td>Result {{result}}</td>
-      </tr>{{#notes}}
-      <tr>
-        <td class="notes">
-          <div>Notes:</div>
-          <div>{{notes}}</div>
-        </td>
-      </tr>{{/notes}}
+    <tbody>{{#isAttack}}{{#rollWasCrit() result}}
+          <tr>
+            <td>
+              <h3 class="crit">Critical Hit! {{result}}</h3>
+            </td>
+          </tr>
+          <tr>
+            <td>Roll to Confirm {{critConfirm}}</td>
+          </tr>{{/rollWasCrit() result}}{{#^rollWasCrit() result}}
+          <tr>
+            <td>Attack {{result}}</td>
+          </tr>{{/^rollWasCrit() result}}
+        <tr>
+          <td>
+            <hr/>
+          </td>
+        </tr>{{#rollWasCrit() result}}
+          <tr>
+            <td class="crit">Crit Damage {{critDamage}}</td>
+          </tr>
+          <tr>
+            <td>Non-crit Damage {{damage}}</td>
+          </tr>{{/rollWasCrit() result}}{{#^rollWasCrit() result}}
+          <tr>
+            <td>Damage {{damage}}</td>
+          </tr>{{/^rollWasCrit() result}}{{#notes}}
+          <tr>
+            <td class="notes">
+              <div>Notes:</div>
+              <div>{{notes}}</div>
+            </td>
+          </tr>{{/notes}}{{/isAttack}}{{#^isAttack}}
+        <tr>
+          <td>Result {{result}}</td>
+        </tr>{{#notes}}
+          <tr>
+            <td class="notes">
+              <div>Notes:</div>
+              <div>{{notes}}</div>
+            </td>
+          </tr>{{/notes}}{{/^isAttack}}
     </tbody>
   </table>
 </rolltemplate>
