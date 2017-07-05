@@ -5,6 +5,12 @@
 
 ### Changelog
 
+### 1.8.8 on 2017 July 2nd
+* Fixed a typo in the Initiative output to chat (when clicking on Speed)
+* Made any Description output to the chat window from Actions be limited to 5 lines
+	- If over 5 lines, adds a scroll bar, so now it won't take up so much space when someone has lots of description/info
+* Added in text below "Guard", "Toughness", and "Resolve" that indicates you can click them to do resist rolls
+
 ### 1.8.6 on 2017 May 14th
 * Fixed an error with other actions variable not being updated on its name
 	- Caused it to not calculate roll syntax correctly when a value was updated in other actions
