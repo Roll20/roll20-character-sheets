@@ -11,6 +11,14 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 15.0.2
+
+### Bug Fixes
+
+* [#539: "extra on crit" doesn't work on secondary damage](https://bitbucket.org/mlenser/5eshaped/issues/539/extra-on-crit-doesnt-work-on-secondary)
+* [#541: Spell uses are not recharged on a rest](https://bitbucket.org/mlenser/5eshaped/issues/541/spell-uses-are-not-recharged-on-a-rest)
+* [#540: Inventory quantities do not convert when upgrading from 11.3.3 to 15.0.1](https://bitbucket.org/mlenser/5eshaped/issues/540/inventory-quantities-do-not-convert-when) fixed as part of the 14.0.0 upgrade
+
 ## 15.0.1
 
 ### Bug Fixes
