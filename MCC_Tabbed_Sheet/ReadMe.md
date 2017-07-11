@@ -3,9 +3,13 @@
 This is a MCC sheet that uses tabs and Roll Templates.  It also includes a 0-level sheet, and a Monster sheet.  It is based on my DCC sheet.
 
 ## Current Version
-1.0
+2.0
 
 ### Changelog
+
+#### 2.0
+* Fix for #2707
+* Updated Ability Score modifiers from quickstart values to Rulebook values
 
 #### 1.0
 * Based on my DCC Sheet
