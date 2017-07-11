@@ -5,6 +5,32 @@
 
 ### Changelog
 
+### 1.8.8 on 2017 July 2nd
+* Fixed a typo in the Initiative output to chat (when clicking on Speed)
+* Made any Description output to the chat window from Actions be limited to 5 lines
+	- If over 5 lines, adds a scroll bar, so now it won't take up so much space when someone has lots of description/info
+* Added in text below "Guard", "Toughness", and "Resolve" that indicates you can click them to do resist rolls
+
+### 1.8.6 on 2017 May 14th
+* Fixed an error with other actions variable not being updated on its name
+	- Caused it to not calculate roll syntax correctly when a value was updated in other actions
+
+### 1.8.5 on 2017 May 6th
+* Fixed an error that caused actions to not roll because of 'undefined'
+	- Caused by previous fix to Advantage/Disadvantage to the d20 in 1.8.0
+* Added support for modifying the "Level" to calculate XP, Feat Points, and Attribute Points
+	- Previously it was only if you modified XP, now works for both
+* If value higher than 9 or lower than 0 is entered for Attribute, changes it to 0 or 9 as needed
+	- Shouldn't be able to have values higher or lower than these
+	- If value of 10 needed for dice size, can be done via input field within attribute settings "Attribute Dice Bonus/Penalty
+
+### 1.8.0 on 2017 April 24th
+* Added in Extraordinary/Legendary Item section
+* Fixed an issue where Advantage/Disadvantage to the d20 wasn't working
+
+### 1.7.91 on 2017 March 25th
+* Re-arranged the attributes to match the website order
+
 ### 1.7.9 on 2017 March 10th
 * Added Goals, Beliefs, and Instincts section for characters to record each that might help them in roleplaying their characters better.
 * Added a "non-essential" inventory and notes section.

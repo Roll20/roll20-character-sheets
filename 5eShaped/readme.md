@@ -31,8 +31,8 @@ This is the redesigned Shaped character sheet for use on Roll20.net with the 5th
 
 ### [Changelog](https://github.com/mlenser/roll20-character-sheets/blob/master/5eShaped/changelog.md)
 
-### [Issue tracker](https://bitbucket.org/mlenser/5eshaped/issues)
-Please report any issues on the above issue tracker.
+### [Issue tracker](https://bitbucket.org/mlenser/5eshaped/issues?status=new&status=open&sort=-priority)
+Please report any issues on the issue tracker.
 
 If you're experiencing extreme lag please disable LastPass as it is known to cause problems with Roll20. This has nothing to do with the Shaped sheet.
 
