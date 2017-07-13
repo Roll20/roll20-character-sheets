@@ -1,11 +1,11 @@
 ## Versioning
 Versions have three numbers Major.Minor.Release
 
-**Major**: Indicates that some form of compatibility has broken.  These versions should have notes indicating what broke and how to handle it.
+**Major**: Indicates that some form of compatibility has broken.  These versions should have notes indicating what broke and how to handle it.  May include major UI changes to sheet layout and design.
 
-**Minor**: Indicates the addition of new features and/or 
+**Minor**: Indicates the addition of new features and/or bugfixes.
 
-**Release**: Indicates bugfixes only
+**Release**: Indicates bugfixes and minor UI changes only.
 
 ## 1.2.0
 ### New Features
