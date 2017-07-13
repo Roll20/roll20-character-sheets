@@ -18,6 +18,7 @@ Versions have three numbers Major.Minor.Release
 
 ### Bugfixes
 * Fixed typo Missle -> Missile
+* Fixed encumbered value in roll tmeplates of professional skills and custom standard skills
 
 ## 1.1
 ### Bugfixes
