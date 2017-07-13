@@ -11,6 +11,7 @@ This is a MCC sheet that uses tabs and Roll Templates.  It also includes a 0-lev
 * Fix for #2707
 * Updated Ability Score modifiers from quickstart values to Rulebook values
 * Added textbox to sheet for 0-level mutations #2725
+* Added Healer class
 
 #### 1.0
 * Based on my DCC Sheet
