@@ -11,6 +11,14 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 15.1.0
+
+### Features
+
+* Alternate dice system of 2d10 and 3d6 can be used in place of a d20 now
+* Saving throws can now have either 3 or 5 chances
+* Added styling necessary for the script's new `!shaped` command
+
 ## 15.0.2
 
 ### Bug Fixes
