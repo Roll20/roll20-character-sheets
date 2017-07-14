@@ -4,6 +4,11 @@ This is a character sheet for Blades in the Dark for use on Roll20.
 
 ## Changelog
 
+### 1.7
+* Change to auto-generated abilities/items/friends: they will now be deleted if you change playbook/crew type, unless they have been changed at some point
+* Small CSS adjustments
+* Change stash gained by crew advance to printed version
+
 ### 1.6
 * Translation support for everything except fixed fields in roll templates
 * Crew-specific upgrades are now a repeating section, repeating upgrades moved to crew-specific upgrades, descriptions added to crew upgrades
