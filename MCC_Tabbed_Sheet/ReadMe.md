@@ -15,6 +15,8 @@ This is a MCC sheet that uses tabs and Roll Templates.  It also includes a 0-lev
 * Updated Manimal
 * Updated Mutant
 * Updated Plantient
+* Added Show Information button to Mutation section - now you can show your mutations without rolling a die!
+* Added Rover
 
 #### 1.0
 * Based on my DCC Sheet
