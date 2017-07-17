@@ -1,22 +1,47 @@
 # Stars Without Number Character Sheet
 
-This sheet is created for use in Stars Without Number on Roll20. Based on the character sheet design by OneSevenDesign at http://www.onesevendesign.com/swn_charsheets_oneseven.pdf.
+This sheet is created for use in Stars Without Number on Roll20. Originally based on the [character sheet design](http://www.onesevendesign.com/swn_charsheets_oneseven.pdf) by OneSevenDesign.
 
 ### Feedback
 
-Report any problems, suggestions or features by sending a private message on Roll20 or submitting an issue on Github.
+Report any problems, suggestions, or features by [creating an issue](https://github.com/kevinsearle/roll20-character-sheets/issues) on Github.
 
-[Kevin Searle](https://app.roll20.net/users/565104/) on Roll20 or [@kevinsearle](https://twitter.com/kevinsearle) on Twitter
+### Author/Maintainer
+
+[Kevin Searle](https://app.roll20.net/users/565104/)
 
 ### Contributors
 
-[MankiGames](https://github.com/MankiGames)
-[Shadowriku](https://github.com/Shadowriku)
-[RonaldZ](https://github.com/RonaldZ)
-[jfredett](https://github.com/jfredett)
-[CoalPoweredPuppet](https://github.com/CoalPoweredPuppet)
+* [MankiGames](https://github.com/MankiGames)
+* [Shadowriku](https://github.com/Shadowriku)
+* [RonaldZ](https://github.com/RonaldZ)
+* [jfredett](https://github.com/jfredett)
+* [CoalPoweredPuppet](https://github.com/CoalPoweredPuppet)
 
 ### Changelog
+
+#### 0.1.5
+
+* Added misc bonus to attributes
+* Rearranged location of Hit Points and System Strain
+* Removed sheet version variable
+* Maximum strain auto-calculated on sheet open and when Con changes
+
+#### 0.1.4
+
+* Removed attribute auto-calculated values and replaced with sheet workers.
+* Added sheet version variable.
+
+#### 0.1.3
+
+* Added Sheet Worker to enforce System Strain constraints against Maximum Strain and Permanent Strain
+* Added Stowed and Other attribute to Gear in addition to Readied
+* Changed Readied/Stowed/Other to radio from checkbox
+* Added Sheet Worker to auto-calculate Current Readied and Current Stowed gear
+
+#### 0.1.2
+
+* Added ship weapon power field
 
 #### 0.1.1
 
