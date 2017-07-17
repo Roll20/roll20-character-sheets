@@ -4,6 +4,11 @@ This is a character sheet for Blades in the Dark for use on Roll20.
 
 ## Changelog
 
+### 1.8
+* Extra rows of claims can now be added
+* Corrected minor typos
+* Internal changes to the sheet upgrade process to make it more robust for ancient sheets
+
 ### 1.7
 * Change to auto-generated abilities/items/friends: they will now be deleted if you change playbook/crew type, unless they have been changed at some point
 * Small CSS adjustments
