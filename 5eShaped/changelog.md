@@ -11,6 +11,15 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 15.1.1
+
+### Bug Fixes
+
+* [#550: Modifier dice damage bugs critical damage](https://bitbucket.org/mlenser/5eshaped/issues/550/modifier-dice-damage-bugs-critical-damage)
+* [#549: Offense attacher displays on utility items](https://bitbucket.org/mlenser/5eshaped/issues/549/offense-attacher-displays-on-utility-items)
+* [#558: Stealth Disadvantage on Armour doesn't go away when not equipped](https://bitbucket.org/mlenser/5eshaped/issues/558/stealth-disadvantage-on-armour-doesnt-go)
+* [#555: Uses parsing of equipment has some bugs](https://bitbucket.org/mlenser/5eshaped/issues/555/uses-parsing-of-equipment-has-some-bugs)
+
 ## 15.1.0
 
 ### Features
