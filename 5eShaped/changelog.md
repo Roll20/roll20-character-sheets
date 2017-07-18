@@ -19,6 +19,7 @@ The sheet will always upgrade itself unless I specify otherwise, though some thi
 * [#549: Offense attacher displays on utility items](https://bitbucket.org/mlenser/5eshaped/issues/549/offense-attacher-displays-on-utility-items)
 * [#558: Stealth Disadvantage on Armour doesn't go away when not equipped](https://bitbucket.org/mlenser/5eshaped/issues/558/stealth-disadvantage-on-armour-doesnt-go)
 * [#555: Uses parsing of equipment has some bugs](https://bitbucket.org/mlenser/5eshaped/issues/555/uses-parsing-of-equipment-has-some-bugs)
+* Updated documentation link to the new wiki and added a link on the version (goes to changelog)
 
 ## 15.1.0
 
