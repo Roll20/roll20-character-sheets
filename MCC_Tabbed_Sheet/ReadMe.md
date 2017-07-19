@@ -17,6 +17,7 @@ This is a MCC sheet that uses tabs and Roll Templates.  It also includes a 0-lev
 * Updated Plantient
 * Added Show Information button to Mutation section - now you can show your mutations without rolling a die!
 * Added Rover
+* Fix for #2729 - Added Max Tech level box to Inv/Artifact tab and 0-level sheet.  This value is calculated automatically using sheetworkers.
 
 #### 1.0
 * Based on my DCC Sheet
