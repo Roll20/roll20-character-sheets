@@ -1,8 +1,6 @@
 # Sword & Scoundrel
 
 
-This is the feature complete Sword & Scoundrel character sheet. 
-
-I will be updating as often as I can with feedback from the community.
+Update 1.0.5 Fixed the order of skills to be alphabetical, added an Asset dice roller, and fixed the preview image
 
 Thanks, Barbarossa
