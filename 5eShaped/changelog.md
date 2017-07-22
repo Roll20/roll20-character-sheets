@@ -11,6 +11,12 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 15.3.0
+
+### Features
+
+* All repeating section rolling buttons should now use `roll` instead of words like `action`. For example: `%{repeating_action_ID_action}` is now `%{repeating_action_ID_roll}`. All old names will still work, but all documentaton will be updated to these new names so it is easier for users to understand.
+
 ## 15.2.0
 
 ### Features
