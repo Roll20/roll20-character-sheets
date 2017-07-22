@@ -11,6 +11,12 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 15.2.0
+
+### Features
+
+* Added some fields to the roll template to better support `!shaped-spells` and `!shaped-monsters` so that it sends less data.
+
 ## 15.1.1
 
 ### Bug Fixes
