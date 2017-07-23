@@ -749,7 +749,8 @@
                                 <button class="sheet-wp-button" type="roll" value="&{template:weaponAttack}{{name=@{character_name}}}{{weapon=@{wpNameMelee}}}{{AP=@{wpApMelee}}}{{target=@{target}}}{{dmg=[[ @{wpDmgMelee}+@{wpMc}+@{wpMartialArt}+@{meleeDmgBonus}]]}}{{loc=[[@{loc}]]}}{{dmgCrt=@{dmgCrt}}}" name="roll_wpAttackRollMelee">
                                     MEL: <span name="attr_wpNameMelee"></span>
                                     (<span  name="attr_wpAccMelee"></span>)&nbsp;
-                                    <span name="attr_wpApMelee"></span>
+                                    <span name="attr_wpApMelee"></span> -
+                                    <span name="attr_wpReliabilityMelee" ></span>
                                 </button>
                                 <span class="sheet-wpDescription" name="attr_wpDescriptionMelee"></span>
                             </div>
@@ -768,6 +769,8 @@
                                     <strong>AP:</strong>
                                     <input type="radio" value="AP" name="attr_wpApMelee" ><i>Yes</i></input>
                                     <input type="radio" value=" " name="attr_wpApMelee" ><i>No</i></input>
+                                    &nbsp;<strong>MC:</strong>
+                                    <input type="checkbox" value="@{mc}" name="attr_wpMc" checked />
                                 </div>
                                 <div>
                                     <strong>Concealment:</strong>
@@ -777,10 +780,14 @@
                                         <option value="L">Long coat</option>
                                         <option value="N">Can't be hidden</option>
                                     </select>
-                                    <strong>MC:</strong>
-                                    <input type="checkbox" value="@{mc}" name="attr_wpMc" checked />
+
                                     <strong>Martial Art:</strong>
                                     <input type="checkbox" value="@{wpSkillMelee}" name="attr_wpMartialArt" />
+                                    <select name="attr_wpReliabilityMelee" style="inline-block;">
+                                        <option value="VR">Very Reliable</option>
+                                        <option value="ST">Standard</option>
+                                        <option value="UR">Unreliable</option>
+                                    </select>
                                 </div>
                                 <div>
                                     <strong>Description:</strong>
@@ -828,7 +835,7 @@
                                     <input type="text"select name="attr_caliber" style="width:70px;" />
                                     <strong>AP:</strong>
                                     <input name="attr_wpAp" type="radio" value="AP" /><i>Yes</i></input>
-                                    <input name="attr_wpAp" type="radio" value=" " /><i>Yes</i></input>
+                                    <input name="attr_wpAp" type="radio" value=" " /><i>No</i></input>
                                     <strong>Damage(s):</strong>
                                     <input type="text"select name="attr_dmgEntry1" style="width:70px; border:1px solid black;" />
                                     <input type="text"select name="attr_dmgEntry2" style="width:70px;" />
@@ -840,10 +847,15 @@
                                     <input type="number" name="attr_wpAcc" max="5" min="-5" value="0" size="1"/>
                                     <strong>ROF/Clips:</strong>
                                     <input type="number" name="attr_wpRof" value="0" size="2"/>/<input type="number" name="attr_wpClip" value="0" size="4"/>
+                                    <select name="attr_wpReliability" style="inline-block;">
+                                        <option value="VR">Very Reliable</option>
+                                        <option value="ST">Standard</option>
+                                        <option value="UR">Unreliable</option>
+                                    </select>
                                 </div>
                                 <div>
                                     <strong>Range:</strong>/
-                                    <input type="number" name="attr_wpRange" value="0" size="6"/>
+                                    <input type="number" name="attr_wpRange" value="0" style="width:90px;" size="6"/>
                                     <strong>Concealment:</strong>
                                     <select name="attr_diss">
                                         <option value="N">Pocket</option>
@@ -3580,7 +3592,7 @@ var TAS = TAS || (function(){
 
     });
 
-    on("sheet:opened change:repeating_weapon:diss change:repeating_weapon:caliber change:repeating_weapon:wpName change:repeating_weapon:wpType change:repeating_weapon:wpAcc change:repeating_weapon:wpRof change:repeating_weapon:wpRange change:repeating_weapon:wpAp change:repeating_weapon:wpClip", function() {
+    on("sheet:opened change:repeating_weapon:diss change:repeating_weapon:caliber change:repeating_weapon:wpName change:repeating_weapon:wpType change:repeating_weapon:wpAcc change:repeating_weapon:wpRof change:repeating_weapon:wpRange change:repeating_weapon:wpAp change:repeating_weapon:wpClip change:repeating_weapon:wpReliability", function() {
         getAttrs([
             "repeating_weapon_wpName",
             "repeating_weapon_wpType",
@@ -3590,13 +3602,14 @@ var TAS = TAS || (function(){
             "repeating_weapon_wpRof",
             "repeating_weapon_wpClip",
             "repeating_weapon_wpRange",
-            'repeating_weapon_diss'
+            'repeating_weapon_diss',
+            "repeating_weapon_wpReliability"
         ], function(values) {
             var s = '';
             if (parseInt(values.repeating_weapon_wpAcc) > 0){
                 s ='+';
             }
-            var weapon = values.repeating_weapon_wpType+': '+values.repeating_weapon_wpName+' ('+s+values.repeating_weapon_wpAcc+') '+values.repeating_weapon_caliber+' '+values.repeating_weapon_wpAp+' [ '+values.repeating_weapon_wpRof+' / '+values.repeating_weapon_wpClip+' ] '+values.repeating_weapon_wpRange+'m.';
+            var weapon = values.repeating_weapon_wpType+': '+values.repeating_weapon_wpName+' ('+s+values.repeating_weapon_wpAcc+') '+values.repeating_weapon_caliber+' '+values.repeating_weapon_wpAp+' [ '+values.repeating_weapon_wpRof+' / '+values.repeating_weapon_wpClip+' ] '+values.repeating_weapon_wpReliability+' '+values.repeating_weapon_wpRange+'m.';
             console.log(weapon);
             setAttrs({
                 repeating_weapon_rangedweapon : weapon,
