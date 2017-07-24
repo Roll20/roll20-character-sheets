@@ -32,7 +32,7 @@ I regularly release new versions. If you'd like to be involved in the testing pe
 
 ## Contributors
 This sheet wouldn't be possible without the help of the following users:
-Rob - https://app.roll20.net/users/28243/rob 
+Randall Burt - https://app.roll20.net/users/99343/randall
 
 ---
 

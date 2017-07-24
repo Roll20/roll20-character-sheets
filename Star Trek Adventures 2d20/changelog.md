@@ -10,7 +10,7 @@ The sheet will always upgrade itself unless I specify otherwise, though some thi
 
 ### Bug Fixes
 
-* Rewrote CSS with help of Rob, assuring more clean function of the sheet that matches vendor sheet.
+* Rewrote CSS with help of Randall, assuring more clean function of the sheet that matches vendor sheet.
 
 ## 1.0
 
