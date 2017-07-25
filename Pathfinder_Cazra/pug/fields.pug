@@ -48,11 +48,23 @@ mixin repeating(name)
   fieldset(class='repeating_' + name)
     block
 
-mixin rollButton(attr, notes)
+mixin rollButton(attr, notes, options)
   -
-    var tpl = '&{template:pf} {{charName=@{character_name}}} {{attr=' + attr + '}} {{result=[[1d20 + @{' + attr + '}]]}}';
+    var tpl = '&{template:pf} {{charName=@{character_name}}} ';
+    if(options && options.isAttack) {
+      tpl += '{{attr=@{' + options.attackName + '}}} {{result=[[1d20cs>@{' + options.crit.range + '} + @{' + attr + '}]]}} ' + 
+        '{{damage=[[@{' + options.damage + '}]]}} ' + 
+        '{{critConfirm=[[1d20cs>@{' + options.crit.range + '} + @{' + attr + '}]]}} ' + 
+        '{{critDamage=[[(@{' + options.damage + '}) * @{' + options.crit.multiplier + '}]]}}' + 
+        '{{isAttack=true}}';
+    }
+    else
+      tpl += '{{attr=' + attr + '}} {{result=[[1d20 + @{' + attr + '}]]}}' +
+        '{{isNotAttack=true}}';
+    
     if(notes)
       tpl += '{{notes=@{' + notes + '}}}';
+      
   button(type='roll', value=tpl)
 
 mixin select(name)

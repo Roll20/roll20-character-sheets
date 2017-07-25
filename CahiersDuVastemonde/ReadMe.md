@@ -11,5 +11,5 @@ Soutenez le développement des Cahiers du Vastemonde sur [Tipee](https://www.tip
 
 # Notes de version
 
-##v1.0 (2016-02-20)
+## v1.0 (2016-02-20)
 Création de la fiche.

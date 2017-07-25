@@ -308,6 +308,10 @@ onChangeParse(['spell_dc_base'], values => {
 });
 
 on('sheet:opened', () => {
+  setAttrs({
+    character_sheet: 'Pathfinder_Simple v1.5.1'
+  });
+
   forceUpdate([
     'str', 'dex', 'con', 'int', 'wis', 'cha',
     'bab', 'size'
