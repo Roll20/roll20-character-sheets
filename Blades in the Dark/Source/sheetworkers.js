@@ -1194,23 +1194,41 @@ var crewData = {
 		setting_stress_label: 'stress',
 		setting_trauma_label: 'trauma',
 		upgrade_6_name: 'carriage',
+		upgrade_6_description: 'upgrade_carriage_description',
 		upgrade_7_name: 'documents',
+		upgrade_7_description: 'upgrade_documents_description',
 		upgrade_8_name: 'boat',
+		upgrade_8_description: 'upgrade_boat_description',
 		upgrade_9_name: 'gear',
+		upgrade_9_description: 'upgrade_gear_description',
 		upgrade_10_name: 'hidden',
+		upgrade_10_description: 'upgrade_hidden_description',
 		upgrade_11_name: 'implements',
+		upgrade_11_description: 'upgrade_implements_description',
 		upgrade_12_name: 'quarters',
+		upgrade_12_description: 'upgrade_quarters_description',
 		upgrade_13_name: 'supplies',
+		upgrade_13_description: 'upgrade_supplies_description',
 		upgrade_14_name: 'secure',
+		upgrade_14_description: 'upgrade_secure_description',
 		upgrade_15_name: 'tools',
+		upgrade_15_description: 'upgrade_tools_description',
 		upgrade_16_name: 'vault',
+		upgrade_16_description: 'upgrade_vault_description',
 		upgrade_17_name: 'weapons',
+		upgrade_17_description: 'upgrade_weapons_description',
 		upgrade_18_name: 'workshop',
+		upgrade_18_description: 'upgrade_workshop_description',
 		upgrade_20_name: 'insight',
+		upgrade_20_description: 'upgrade_insight_description',
 		upgrade_21_name: 'prowess',
+		upgrade_21_description: 'upgrade_prowess_description',
 		upgrade_22_name: 'resolve',
+		upgrade_22_description: 'upgrade_resolve_description',
 		upgrade_23_name: 'personal',
+		upgrade_23_description: 'upgrade_personal_description',
 		upgrade_24_name: 'mastery',
+		upgrade_24_description: 'upgrade_mastery_description',
 		xp_condition2: 'xp_beliefs',
 		xp_condition3: 'xp_vice'
 	};
@@ -1544,13 +1562,12 @@ on(repeatingQualityEvent + ' ' + ['name', 'subtype', 'edges', 'flaws', 'descript
 	});
 });
 /* LEFT-FILL CHECKBOXES */
-var handleFourBoxesFill = (name, activeValue) => {
-	activeValue = activeValue || '1';
+var handleBoxesFill = (name, activeValue, upToFour) => {
 	on(`change:${name}1 change:${name}2 change:${name}3 change:${name}4`, event => {
 		getAttrs([event.sourceAttribute], v => {
-			let rName = event.sourceAttribute.slice(0, -1);
+			let rName = event.sourceAttribute.slice(0, -1),
+				setting = {};
 			if (v[event.sourceAttribute] === activeValue) {
-				let setting = {};
 				switch (event.sourceAttribute.slice(-1)) {
 				case '4':
 					setting[`${rName}3`] = activeValue;
@@ -1559,71 +1576,6 @@ var handleFourBoxesFill = (name, activeValue) => {
 				case '2':
 					setting[`${rName}1`] = activeValue;
 				}
-				setAttrs(setting);
-			}
-			if (v[event.sourceAttribute] === '0') {
-				let setting = {};
-				switch (event.sourceAttribute.slice(-1)) {
-				case '1':
-					setting[`${rName}2`] = '0';
-				case '2':
-					setting[`${rName}3`] = '0';
-				case '3':
-					setting[`${rName}4`] = '0';
-				}
-				setAttrs(setting);
-			}
-		});
-	});
-};
-/* Action ratings */
-actionsFlat.forEach(action => handleFourBoxesFill(action, '1'));
-/* Crew Tier */
-handleFourBoxesFill('crew_tier');
-handleFourBoxesFill('upgrade_24_check_', 'on');
-/* Items/Upgrades */
-var legacyChecks = [
-	'bandolier1_check',
-	'bandolier2_check'
-];
-legacyChecks.forEach(name => {
-	on(['', '_b', '_c'].map(x => `change:${name}${x}`).join(' '), event => {
-		getAttrs([event.sourceAttribute], v => {
-			if (v[event.sourceAttribute] === 'on') {
-				let setting = {};
-				switch (event.sourceAttribute.slice('-1')) {
-				case 'c':
-					setting[`${name}_b`] = 'on';
-				case 'b':
-					setting[`${name}`] = 'on';
-				}
-				setAttrs(setting);
-			}
-			if (v[event.sourceAttribute] === '0') {
-				let setting = {};
-				switch (event.sourceAttribute.slice('-1')) {
-				case 'k':
-					setting[`${name}_b`] = 0;
-				case 'b':
-					setting[`${name}_c`] = 0;
-				}
-				setAttrs(setting);
-			}
-		});
-	});
-});
-['item', 'playbookitem', 'upgrade'].forEach(sectionName => {
-	on([1, 2, 3].map(x => `change:repeating_${sectionName}:check_${x}`).join(' '), event => {
-		getAttrs([event.sourceAttribute], v => {
-			let rName = event.sourceAttribute.slice(0, -1),
-				setting = {};
-			if (v[event.sourceAttribute] === 'on') {
-				switch (event.sourceAttribute.slice(-1)) {
-				case '3':
-					setting[`${rName}2`] = 'on';
-				case '2':
-					setting[`${rName}1`] = 'on';
-				}
 			}
 			if (v[event.sourceAttribute] === '0') {
 				switch (event.sourceAttribute.slice(-1)) {
@@ -1631,11 +1583,24 @@ legacyChecks.forEach(name => {
 					setting[`${rName}2`] = '0';
 				case '2':
 					setting[`${rName}3`] = '0';
+				case '3':
+					if (upToFour) setting[`${rName}4`] = '0';
 				}
 			}
 			setAttrs(setting);
 		});
 	});
+};
+/* Action ratings */
+actionsFlat.forEach(action => handleBoxesFill(action, '1', true));
+/* Crew Tier */
+handleBoxesFill('crew_tier', '1', true);
+handleBoxesFill('upgrade_24_check_', 'on', true);
+handleBoxesFill('bandolier1_check_', 'on');
+handleBoxesFill('bandolier2_check_', 'on');
+/* Items/Upgrades */
+['item', 'playbookitem', 'upgrade'].forEach(sectionName => {
+	handleBoxesFill(`repeating_${sectionName}:check_`, 'on');
 });
 /* INITIALISATION AND UPGRADES */
 on('sheet:opened', () => {
@@ -2007,18 +1972,45 @@ on('sheet:opened', () => {
 						setting[`upgrade_${index}_name`] = v[`upgrade_${index}_desc`] || '';
 						setting[`upgrade_${index}_check_1`] = v[`upgrade_${index}_check`] || '0';
 					});
-					setting[`upgrade_6_check_2`] = v[`upgrade_6_check_b`] || '0';
-					setting[`upgrade_8_check_2`] = v[`upgrade_8_check_b`] || '0';
-					setting[`upgrade_14_check_2`] = v[`upgrade_14_check_b`] || '0';
-					setting[`upgrade_16_check_2`] = v[`upgrade_16_check_b`] || '0';
-					setting[`upgrade_24_check_2`] = v[`upgrade_24_check_b`] || '0';
-					setting[`upgrade_24_check_3`] = v[`upgrade_24_check_c`] || '0';
-					setting[`upgrade_24_check_4`] = v[`upgrade_24_check_d`] || '0';
+					setting.upgrade_6_check_2 = v.upgrade_6_check_b || '0';
+					setting.upgrade_8_check_2 = v.upgrade_8_check_b || '0';
+					setting.upgrade_14_check_2 = v.upgrade_14_check_b || '0';
+					setting.upgrade_16_check_2 = v.upgrade_16_check_b || '0';
+					setting.upgrade_24_check_2 = v.upgrade_24_check_b || '0';
+					setting.upgrade_24_check_3 = v.upgrade_24_check_c || '0';
+					setting.upgrade_24_check_4 = v.upgrade_24_check_d || '0';
 					Object.keys(defaultValues).forEach(k => {
 						setting[k] = v[k] || setting[k] || defaultValues[k];
 					});
 					setAttrs(setting, {}, upgradeFunction);
 					console.log('Updating to 1.6');
+				});
+			}
+			else if (versionMajor === 1 && versionMinor < 9) {
+				let upgradeNums = [...Array(25).keys()].slice(1).filter(x => x !== 19).slice(5),
+					upgradeDescriptions = upgradeNums.map(x => `upgrade_${x}_description`),
+					attrs = [
+						...upgradeDescriptions,
+						'bandolier1_check',
+						'bandolier1_check_b',
+						'bandolier1_check_c',
+						'bandolier2_check',
+						'bandolier2_check_b',
+						'bandolier2_check_c'
+					];
+				getAttrs(attrs, v => {
+					let setting = {};
+					upgradeDescriptions.forEach(name => {
+						setting[name] = v[name] || defaultValues[name];
+					});
+					setting.bandolier1_check_1 = v.bandolier1_check || '0';
+					setting.bandolier1_check_2 = v.bandolier1_check_b || '0';
+					setting.bandolier1_check_3 = v.bandolier1_check_c || '0';
+					setting.bandolier2_check_1 = v.bandolier2_check || '0';
+					setting.bandolier2_check_2 = v.bandolier2_check_b || '0';
+					setting.bandolier2_check_3 = v.bandolier2_check_c || '0';
+					setAttrs(setting, {}, () => upgradeSheet('1.9'));
+					console.log('Updating to 1.9');
 				});
 			}
 		};
