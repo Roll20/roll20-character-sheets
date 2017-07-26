@@ -1525,6 +1525,13 @@ on('change:wanted', () => {
 		setDiceFromTotal('wanted', parseInt(v.wanted));
 	});
 });
+/* CALCULATE STASH */
+var calculateStash = () => {
+	getAttrs(['stash'], v => {
+		setDiceFromTotal('stash', Math.floor(parseInt(v.stash) / 10));
+	});
+};
+on('change:stash', calculateStash);
 /* EXTRA STRESS BOXES */
 on('change:setting_extra_stress', () => {
 	getAttrs(['setting_extra_stress'], v => {
@@ -2009,6 +2016,7 @@ on('sheet:opened', () => {
 					setting.bandolier2_check_1 = v.bandolier2_check || '0';
 					setting.bandolier2_check_2 = v.bandolier2_check_b || '0';
 					setting.bandolier2_check_3 = v.bandolier2_check_c || '0';
+					calculateStash();
 					setAttrs(setting, {}, () => upgradeSheet('1.9'));
 					console.log('Updating to 1.9');
 				});
