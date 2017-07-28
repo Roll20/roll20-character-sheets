@@ -20,6 +20,13 @@ This is a MCC sheet that uses tabs and Roll Templates.  It also includes a 0-lev
 * Fix for #2729 - Added Max Tech level box to Inv/Artifact tab and 0-level sheet.  This value is calculated automatically using sheetworkers.
 * Added Sentinel
 * Updated Shaman
+* Moved Player Crit Ranges into Melee and Ranged Attack
+* Fix for #2724: Removed Alignment for Monsters
+* Fix for #2722: Added AI Recognition Target for Monsters
+* Revamped Monster HP/AC to use space better
+* Moved Monster Crit Ranges into Melee and Ranged Attack
+* Fix for #2723: Removed unused Monster Crit Tables
+* Added d20 Fumble die for Powered Armors
 
 #### 1.0
 * Based on my DCC Sheet
