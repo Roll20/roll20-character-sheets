@@ -30,6 +30,7 @@ This is a MCC sheet that uses tabs and Roll Templates.  It also includes a 0-lev
 * Removed Magic Bonus field from Melee and Ranged Weapons - We use science dammit ;)
 * Made Known Languages text box smaller (from feedback)
 * Changed Axes combat background to something more science fiction
+* Minimum damage for a hit is 1.
 
 #### 1.0
 * Based on my DCC Sheet
