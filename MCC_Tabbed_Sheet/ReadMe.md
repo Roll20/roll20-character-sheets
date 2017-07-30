@@ -27,6 +27,9 @@ This is a MCC sheet that uses tabs and Roll Templates.  It also includes a 0-lev
 * Moved Monster Crit Ranges into Melee and Ranged Attack
 * Fix for #2723: Removed unused Monster Crit Tables
 * Added d20 Fumble die for Powered Armors
+* Removed Magic Bonus field from Melee and Ranged Weapons - We use science dammit ;)
+* Made Known Languages text box smaller (from feedback)
+* Changed Axes combat background to something more science fiction
 
 #### 1.0
 * Based on my DCC Sheet
