@@ -11,6 +11,36 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 15.3.0
+
+### Features
+
+* All repeating section rolling buttons should now use `roll` instead of words like `action`. For example: `%{repeating_action_ID_action}` is now `%{repeating_action_ID_roll}`. All old names will still work, but all documentaton will be updated to these new names so it is easier for users to understand.
+
+## 15.2.0
+
+### Features
+
+* Added some fields to the roll template to better support `!shaped-spells` and `!shaped-monsters` so that it sends less data.
+
+## 15.1.1
+
+### Bug Fixes
+
+* [#550: Modifier dice damage bugs critical damage](https://bitbucket.org/mlenser/5eshaped/issues/550/modifier-dice-damage-bugs-critical-damage)
+* [#549: Offense attacher displays on utility items](https://bitbucket.org/mlenser/5eshaped/issues/549/offense-attacher-displays-on-utility-items)
+* [#558: Stealth Disadvantage on Armour doesn't go away when not equipped](https://bitbucket.org/mlenser/5eshaped/issues/558/stealth-disadvantage-on-armour-doesnt-go)
+* [#555: Uses parsing of equipment has some bugs](https://bitbucket.org/mlenser/5eshaped/issues/555/uses-parsing-of-equipment-has-some-bugs)
+* Updated documentation link to the new wiki and added a link on the version (goes to changelog)
+
+## 15.1.0
+
+### Features
+
+* Alternate dice system of 2d10 and 3d6 can be used in place of a d20 now
+* Saving throws can now have either 3 or 5 chances
+* Added styling necessary for the script's new `!shaped` command
+
 ## 15.0.2
 
 ### Bug Fixes
