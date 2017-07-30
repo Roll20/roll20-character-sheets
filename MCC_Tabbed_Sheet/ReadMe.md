@@ -31,6 +31,7 @@ This is a MCC sheet that uses tabs and Roll Templates.  It also includes a 0-lev
 * Made Known Languages text box smaller (from feedback)
 * Changed Axes combat background to something more science fiction
 * Minimum damage for a hit is 1.
+* Removed Mercurial, Multi-die, Misifre and corruption from the Programs tab
 
 #### 1.0
 * Based on my DCC Sheet
