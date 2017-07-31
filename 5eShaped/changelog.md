@@ -11,6 +11,18 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 15.4.0
+
+### Features
+
+* Cleaned up the styling around the heart as users were often confused what it meant:
+
+![alt text](http://i.imgur.com/0f8z8k1.jpg "Heart")
+
+### Bug Fixes
+
+* [#566: Automatically roll damage should still show the "Hit" and "Saving throw failure" buttons](https://bitbucket.org/mlenser/5eshaped/issues/566/automatically-roll-damage-should-still)
+
 ## 15.3.0
 
 ### Features
