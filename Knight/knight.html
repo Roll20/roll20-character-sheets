@@ -1179,7 +1179,23 @@
 		TAS.repeatingSimpleSum("slotsDCLTorse", "slotsUDCLTorse", "slotsUDCLTorseTot");
 	});
 	
-	</script>
+	on('sheet:opened',function()
+	{
+		getAttrs(["sante", "santeMAJ"], function(values)
+		{
+			if(values.santeMAJ != 1)
+			{
+				setAttrs({
+					 santepj: values.sante,
+					 santePNJ: values.sante,
+					 santeMAJ: 1
+				});
+			}
+		});
+	});
+</script>
+
+<input type="hidden" name="attr_MAJ" value="0" />
 
 <input type="radio" name="attr_fichePNJ" class="fichePNJ" value="0" checked /><span title="PJ" class="fichePNJ" ></span><br/>
 <input type="radio" name="attr_fichePNJ" class="fichePNJ2" value="1" /><span title="PNJ" class="fichePNJ2" ></span>
@@ -1979,9 +1995,10 @@
 					</div>
 				</div>
 				<div class="Sante Separation">
-					<div class="Guardian">
-						<input type="checkbox" name="attr_armure" class="checkGuardian hidden" value="guardian" checked />
-						<table class="tableGuardian hidden">
+					<div class="Guardian Bard Drui Monk Barb Pala Prie Psio Rang Rogu Sorc Warm Warr Wiza">
+						<input type="checkbox" name="attr_armure" class="checkNecrEspoir hidden" value="necromancer" />
+						
+						<table class="tableSEH">
 							<tr>
 								<th class="tab-padding-left" style="width:25%"></th>
 								<th style="width:25%"><h4>Actuel</h4></th>
@@ -1990,16 +2007,21 @@
 							</tr>
 							<tr>
 								<th class="tab-padding-left left"><h4>Santé</h4></th>
-								<input type="hidden" name="attr_sante_calcul" value="(((((@{endurance} + (((@{deplacement}+@{force}) + abs(@{deplacement}-@{force})) / 2) ) + abs(@{endurance} - (((@{deplacement}+@{force}) + abs(@{deplacement}-@{force})) / 2) )) / 2)*6)+10)+@{santeModif}" />
-								<td><input type="number" name="attr_santePJ" min="0" value="0" class="center" style="width:100%" /></td>
-								<td><input type="number" name="attr_santePJ_max" min="0" class="center" style="width:100%" value="(@{sante_calcul})" disabled /></td>
+								<td><input type="number" name="attr_santepj" min="0" value="0" class="center" style="width:100%" /></td>
+								<td><input type="number" name="attr_santepj_max" min="0" class="center" style="width:100%" value="(((((@{endurance} + (((@{deplacement}+@{force}) + abs(@{deplacement}-@{force})) / 2) ) + abs(@{endurance} - (((@{deplacement}+@{force}) + abs(@{deplacement}-@{force})) / 2) )) / 2)*6)+10)+@{santeModif}" disabled /></td>
 								<td class="tab-padding-right" ><input type="number" name="attr_santeModif" min="0" value="0" class="center" style="width:100%" /></td>
 							</tr>
-							<tr>
+							<tr class="NotNecrEspoir">
 								<th class="tab-padding-left left"><h4>Espoir</h4></th>
 								<td><input type="number" name="attr_espoir" min="0" value="50" class="center" style="width:100%" /></td>
 								<td><input type="number" name="attr_espoir_max" min="0" value="50+@{espoirModif}" class="center" style="width:100%" disabled /></td>
 								<td class="tab-padding-right"><input type="number" name="attr_espoirModif" min="0" value="0" class="center" style="width:100%" /></td>
+							</tr>
+							<tr class="NecrEspoir">
+								<th class="tab-padding-left left"><h4>Espoir</h4></th>
+								<td><input type="number" name="attr_espoirNecr" min="0" value="10" class="center" style="width:100%" /></td>
+								<td><input type="number" name="attr_espoirNecr_max" min="0" value="10+@{espoirNecrModif}" class="center" style="width:100%" disabled /></td>
+								<td class="tab-padding-right"><input type="number" name="attr_espoirNecrModif" min="0" value="0" class="center" style="width:100%" /></td>
 							</tr>
 							<tr>
 								<th class="tab-padding-left tab-padding-bottom left"><h4>Héroisme</h4></th>
@@ -2009,78 +2031,6 @@
 							</tr>
 						</table>
 					</div>
-					<div class="Bard Drui Monk Barb Pala Prie Psio Rang Rogu Sorc Warm Warr Wiza">
-						<input type="checkbox" name="attr_armure" class="checkBard hidden" value="bard" />
-						<input type="checkbox" name="attr_armure" class="checkDrui hidden" value="druid" />
-						<input type="checkbox" name="attr_armure" class="checkMonk hidden" value="monk" />
-						<input type="checkbox" name="attr_armure" class="checkBarb hidden" value="barbarian" />
-						<input type="checkbox" name="attr_armure" class="checkPala hidden" value="paladin" />
-						<input type="checkbox" name="attr_armure" class="checkPrie hidden" value="priest" />
-						<input type="checkbox" name="attr_armure" class="checkPsio hidden" value="psion" />
-						<input type="checkbox" name="attr_armure" class="checkRang hidden" value="ranger" />
-						<input type="checkbox" name="attr_armure" class="checkRogu hidden" value="rogue" />
-						<input type="checkbox" name="attr_armure" class="checkSorc hidden" value="sorcerer" />
-						<input type="checkbox" name="attr_armure" class="checkWarm hidden" value="warmaster" />
-						<input type="checkbox" name="attr_armure" class="checkWarr hidden" value="warrior" />
-						<input type="checkbox" name="attr_armure" class="checkWiza hidden" value="wizard" />
-						<table class="tableBard tableDrui tableMonk tableBarb tablePala tablePrie tablePsio tableRang tableRogu tableSorc tableWarm tableWarr tableWiza hidden">
-							<tr>
-								<th class="tab-padding-left" style="width:25%"></th>
-								<th style="width:25%"><h4>Actuel</h4></th>
-								<th style="width:25%"><h4>Maximum</h4></th>
-								<th class="tab-padding-right" style="25%"><h4>Modif</h4></th>
-							</tr>
-							<tr>
-								<th class="tab-padding-left left"><h4>Santé</h4></th>
-								<input type="hidden" name="attr_sante_calcul" value="(((((@{endurance} + (((@{deplacement}+@{force}) + abs(@{deplacement}-@{force})) / 2) ) + abs(@{endurance} - (((@{deplacement}+@{force}) + abs(@{deplacement}-@{force})) / 2) )) / 2)*6)+10)+@{santeModif}" />
-								<td><input type="number" name="attr_santePJ" min="0" value="0" class="center" style="width:100%" /></td>
-								<td><input type="number" name="attr_santePJ_max" min="0" class="center" style="width:100%" value="(@{sante_calcul})" disabled /></td>
-								<td class="tab-padding-right" ><input type="number" name="attr_santeModif" min="0" value="0" class="center" style="width:100%" /></td>
-							</tr>
-							<tr>
-								<th class="tab-padding-left left"><h4>Espoir</h4></th>
-								<td><input type="number" name="attr_espoir" min="0" value="50" class="center" style="width:100%" /></td>
-								<td><input type="number" name="attr_espoir_max" min="0" value="50+@{espoirModif}" class="center" style="width:100%" disabled /></td>
-								<td class="tab-padding-right"><input type="number" name="attr_espoirModif" min="0" value="0" class="center" style="width:100%" /></td>
-							</tr>
-							<tr>
-								<th class="tab-padding-left tab-padding-bottom left"><h4>Héroisme</h4></th>
-								<td class="tab-padding-bottom"><input type="number" name="attr_heroisme" min="0" max="6" value="0" class="center" style="width:100%" /></td>
-								<td class="tab-padding-bottom"><input type="number" name="attr_heroisme_max" min="0" value="6+@{heroismeModif}" class="center" style="width:100%" disabled /></td>
-								<td class="tab-padding-bottom tab-padding-right"><input type="number" name="attr_heroismeModif" min="0" value="0" class="center" style="width:100%" /></td>
-							</tr>
-						</table>
-					</div>
-					<div class="Necr">
-					<input type="checkbox" name="attr_armure" class="checkNecr hidden" value="necromancer" />
-					<table class="tableNecr hidden">
-						<tr>
-							<th class="tab-padding-left" style="width:25%"></th>
-							<th style="width:25%"><h4>Actuel</h4></th>
-							<th style="width:25%"><h4>Maximum</h4></th>
-							<th class="tab-padding-right" style="25%"><h4>Modif</h4></th>
-						</tr>
-						<tr>
-							<th class="tab-padding-left left"><h4>Santé</h4></th>
-							<input type="hidden" name="attr_sante_calcul" value="(((((@{endurance} + (((@{deplacement}+@{force}) + abs(@{deplacement}-@{force})) / 2) ) + abs(@{endurance} - (((@{deplacement}+@{force}) + abs(@{deplacement}-@{force})) / 2) )) / 2)*6)+10)+@{santeModif}" />
-							<td><input type="number" name="attr_santePJ" min="0" value="0" class="center" style="width:100%" /></td>
-							<td><input type="number" name="attr_santePJ_max" min="0" class="center" style="width:100%" value="(@{sante_calcul})" disabled /></td>
-							<td class="tab-padding-right" ><input type="number" name="attr_santeModif" min="0" value="0" class="center" style="width:100%" /></td>
-						</tr>
-						<tr>
-							<th class="tab-padding-left left"><h4>Espoir</h4></th>
-							<td><input type="number" name="attr_espoirNecr" min="0" value="10" class="center" style="width:100%" /></td>
-							<td><input type="number" name="attr_espoirNecr_max" min="0" value="10+@{espoirNecrModif}" class="center" style="width:100%" disabled /></td>
-							<td class="tab-padding-right"><input type="number" name="attr_espoirNecrModif" min="0" value="0" class="center" style="width:100%" /></td>
-						</tr>
-						<tr>
-							<th class="tab-padding-left tab-padding-bottom left"><h4>Héroisme</h4></th>
-							<td class="tab-padding-bottom"><input type="number" name="attr_heroisme" min="0" max="6" value="0" class="center" style="width:100%" /></td>
-							<td class="tab-padding-bottom"><input type="number" name="attr_heroisme_max" min="0" value="6+@{heroismeModif}" class="center" style="width:100%" disabled /></td>
-							<td class="tab-padding-bottom tab-padding-right"><input type="number" name="attr_heroismeModif" min="0" value="0" class="center" style="width:100%" /></td>
-						</tr>
-					</table>
-				</div>
 				</div>
 				<div class="Initiative Separation">
 					<div class="All except Guardian et Warrior">
