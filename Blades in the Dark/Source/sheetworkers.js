@@ -1423,6 +1423,11 @@ on('change:crew_type change:playbook', event => {
 	getAttrs(['crew_type', 'playbook', 'changed_attributes'], v => {
 		const changedAttributes = (v.changed_attributes || '').split(',');
 		let data, baseData, sourceName;
+		if (v.playbook || v.crew_type) {
+			setAttrs({
+				show_playbook_reminder: '0'
+			});
+		}
 		switch (event.sourceAttribute) {
 		case 'crew_type':
 			sourceName = v.crew_type.toLowerCase();
@@ -1635,10 +1640,15 @@ on('sheet:opened', () => {
 		'contact'
 	];
 	/* Make sure sheet_type is never 0 */
-	getAttrs(['sheet_type', 'changed_attributes'], v => {
+	getAttrs(['sheet_type', 'changed_attributes', 'crew_type', 'playbook'], v => {
 		if (!['character', 'crew', 'faction'].includes(v.sheet_type)) {
 			setAttrs({
 				sheet_type: 'character'
+			});
+		}
+		if (v.playbook || v.crew_type) {
+			setAttrs({
+				show_playbook_reminder: '0'
 			});
 		}
 	});
