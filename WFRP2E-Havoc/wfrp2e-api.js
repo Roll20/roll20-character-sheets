@@ -19,7 +19,7 @@ var critFailCombat = 96; //set to 101 to turn off crit failure
 
 var attackSymbol = "http://i.imgur.com/ncLRrhy.png";
 var shootSymbol = "http://i.imgur.com/fhnbmUs.png";
-var ulfricSymbol = "http://i.imgur.com/Sbr3wLn.png";
+var ulricSymbol = "http://i.imgur.com/Sbr3wLn.png";
 
 var critSucParry = 1; //set to 0 to turn off crit success
 var critFailParry = 96; //set to 101 to turn off crit failure
@@ -95,19 +95,19 @@ var warhammerCombatHitTemplate = '<tr>'
             +'<td COLSPAN="2" style="text-align:center;"><span style="font-style:oblique;font-weight:bolder;color: #B31515;"><b>Damage :</b></span> <span style="color: <<DAMAGE_COLOR1>>;"><b><<DAMAGE1_TOTAL>></b> (<<ROLL_DAMAGE1>>)</span></td>'
     		                    +'<tr>'
                                 +'<<IMPACT>>'
-                                +'<<ULFRIC_FURY>>';
+                                +'<<ULRIC_FURY>>';
 var warhammerCombatImpactTemplate = '<tr>'
             +'<td COLSPAN="2" style="text-align:center;"><span style="font-style:oblique;font-weight:bolder;color: #B31515;"><b>Damage Impact :</b></span> <span style="color: <<DAMAGE_COLOR2>>;"><b><<DAMAGE2_TOTAL>></b> (<<ROLL_DAMAGE2>>)</span></td>'
         	                    +'<tr>';
-var warhammerCombatUlfricFuryTemplate = '<tr>'
+var warhammerCombatUlricFuryTemplate = '<tr>'
             +'<td COLSPAN="2" style="text-align:center;">'
                 +'<img class="sheet-imghr" style="width:95%;" src="'+combatLineImage+'" />'
             +'</td>'
             +'</tr>'  
 			
             + '<tr>'
-    		+'<td style="text-align:center; width:25%;padding-left:10px;"><img class="sheet-imghr" style="width:100%;" src="'+ ulfricSymbol +'" /></td>'
-			+"<td style='text-align:center;'><span style='font-style:oblique;font-weight:bolder;color: red;'><b>ULFRIC'S FURY!</b></td>"
+    		+'<td style="text-align:center; width:25%;padding-left:10px;"><img class="sheet-imghr" style="width:100%;" src="'+ ulricSymbol +'" /></td>'
+			+"<td style='text-align:center;'><span style='font-style:oblique;font-weight:bolder;color: red;'><b>ULRIC'S FURY!</b></td>"
             +'</tr>'
                                 + '<tr>'
             +'<td COLSPAN="2" style="text-align:center;"><span style="font-style:oblique;font-weight:bolder;color: #B31515;"><b>Crit Confirm :</b></span><span style="color: <<CONFIRM_COLOR>>"> <b><<CRIT_CONFIRM>></b></span></td>'
@@ -129,10 +129,10 @@ var warhammerCombatQualitiesTemplate = '<tr>'
     		                    +'<tr>';
 var warhammerCombatRetryTemplate = "<tr><td COLSPAN='2' style='text-align:center;font-style:oblique;font-weight:bolder;'><a href='<<RETRY>>' style='background-image:url("+fortunePointBackground+"); border:0px; background-repeat:no-repeat; background-size:100% 100%; background-color:transparent; background-position:center; color:black; padding:10px 20px 10px 30px'>Use Fortune Point!</a></td></tr>";
 
-var warhammerCombatUlfricRetryTableTemplate = "<table style='max-width: 250px; background-image:url("+combatBackgroundImage+"); background-size: 100% 100%; background-repeat: no-repeat;font-family: \"Century Gothic\", CenturyGothic, AppleGothic, sans-serif;'>"
+var warhammerCombatUlricRetryTableTemplate = "<table style='max-width: 250px; background-image:url("+combatBackgroundImage+"); background-size: 100% 100%; background-repeat: no-repeat;font-family: \"Century Gothic\", CenturyGothic, AppleGothic, sans-serif;'>"
             
 			
-			+"<tr><th COLSPAN='2' style='padding-top:15px;'>Ulfric's Fury Fortune Point</th></tr>"
+			+"<tr><th COLSPAN='2' style='padding-top:15px;'>Ulric's Fury Fortune Point</th></tr>"
 			
             +'<tr>'
             +'<td COLSPAN="2" style="text-align:center;">'
@@ -674,7 +674,7 @@ function WarhammerCombatDice(char, player, targetnum, mod, moddamage, impact, sy
 		
 		if (ulric == true)
 		{
-			tableCreation = tableCreation.replace("<<ULFRIC_FURY>>", warhammerCombatUlfricFuryTemplate);
+			tableCreation = tableCreation.replace("<<ULRIC_FURY>>", warhammerCombatUlricFuryTemplate);
 			
 			if(damage1 == 10) tableCreation = tableCreation.replace("<<DAMAGE_COLOR1>>", "green");
 			else  tableCreation = tableCreation.replace("<<DAMAGE_COLOR1>>", "black");
@@ -721,7 +721,7 @@ function WarhammerCombatDice(char, player, targetnum, mod, moddamage, impact, sy
 		}
 		else
 		{
-			tableCreation = tableCreation.replace("<<ULFRIC_FURY>>", "");
+			tableCreation = tableCreation.replace("<<ULRIC_FURY>>", "");
 			tableCreation = tableCreation.replace("<<DAMAGE_COLOR1>>", "black");
 			tableCreation = tableCreation.replace("<<DAMAGE_COLOR2>>", "black");
 		}
@@ -751,7 +751,7 @@ function WarhammerCombatDice(char, player, targetnum, mod, moddamage, impact, sy
 
 function WarhammerCombatDiceRetryCrit(char, player, targetNumber, main_damage, hidden, whoSent, title)
 {
-	var tableCreation = warhammerCombatUlfricRetryTableTemplate;
+	var tableCreation = warhammerCombatUlricRetryTableTemplate;
     var addTitle = false;
     if (title != null)
     {
@@ -768,7 +768,7 @@ function WarhammerCombatDiceRetryCrit(char, player, targetNumber, main_damage, h
     {
         tableCreation = tableCreation.replace("<<ATTACK_NAME>>", "Custom Attack");
     }
-        tableCreation = tableCreation.replace("<<ATTACK_SYMBOL>>", ulfricSymbol);
+        tableCreation = tableCreation.replace("<<ATTACK_SYMBOL>>", ulricSymbol);
 			tableCreation = tableCreation.replace("<<STAT_NUMBER>>", targetNumber);
 			var rollConfirmCrit = randomInteger(100);
 	main_damage = Number(main_damage);

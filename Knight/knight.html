@@ -1179,10 +1179,26 @@
 		TAS.repeatingSimpleSum("slotsDCLTorse", "slotsUDCLTorse", "slotsUDCLTorseTot");
 	});
 	
-	</script>
+	on('sheet:opened',function()
+	{
+		getAttrs(["sante", "santeMAJ"], function(values)
+		{
+			if(values.santeMAJ != 1)
+			{
+				setAttrs({
+					 santepj: values.sante,
+					 santePNJ: values.sante,
+					 santeMAJ: 1
+				});
+			}
+		});
+	});
+</script>
 
-<input type="radio" name="attr_fichePNJ" class="fichePNJ" value="0" /><span title="PJ" class="fichePNJ" ></span><br/>
-<input type="radio" name="attr_fichePNJ" class="fichePNJ2" value="1" checked /><span title="PNJ" class="fichePNJ2" ></span>
+<input type="hidden" name="attr_MAJ" value="0" />
+
+<input type="radio" name="attr_fichePNJ" class="fichePNJ" value="0" checked /><span title="PJ" class="fichePNJ" ></span><br/>
+<input type="radio" name="attr_fichePNJ" class="fichePNJ2" value="1" /><span title="PNJ" class="fichePNJ2" ></span>
 
 <input type="radio" name="attr_jetGM" class="jetGM" value="/w gm" /><span title="GM" class="jetGM" ></span><br/>
 <input type="radio" name="attr_jetGM" class="jetGM2" value="" checked /><span title="Public" class="jetGM2" ></span>
@@ -1220,7 +1236,7 @@
 	<div class='sheet-2colrow'>
 		<div class="sheet-col">
 			<div class="All Separation">
-				<input type="checkbox" name="attr_fichePNJ" class="fichePNJHidden fichePJH" value="0" />
+				<input type="checkbox" name="attr_fichePNJ" class="fichePNJHidden fichePJH" value="0" checked />
 				<input type="checkbox" name="attr_fichePNJ" class="fichePNJHidden fichePNJH" value="1" />
 				<table class="All">
 					<tr>
@@ -1303,7 +1319,7 @@
 					</table>
 				</div>
 			</div>
-			<input type="checkbox" name="attr_fichePNJ" class="fichePNJHidden fichePJH" value="0" />
+			<input type="checkbox" name="attr_fichePNJ" class="fichePNJHidden fichePJH" value="0" checked />
 			<input type="checkbox" name="attr_fichePNJ" class="fichePNJHidden fichePNJH" value="1" />
 			<div class="PJ">
 				<div class="Jet Separation">
@@ -1979,9 +1995,10 @@
 					</div>
 				</div>
 				<div class="Sante Separation">
-					<div class="Guardian">
-						<input type="checkbox" name="attr_armure" class="checkGuardian hidden" value="guardian" />
-						<table class="tableGuardian hidden">
+					<div class="Guardian Bard Drui Monk Barb Pala Prie Psio Rang Rogu Sorc Warm Warr Wiza">
+						<input type="checkbox" name="attr_armure" class="checkNecrEspoir hidden" value="necromancer" />
+						
+						<table class="tableSEH">
 							<tr>
 								<th class="tab-padding-left" style="width:25%"></th>
 								<th style="width:25%"><h4>Actuel</h4></th>
@@ -1990,15 +2007,21 @@
 							</tr>
 							<tr>
 								<th class="tab-padding-left left"><h4>Santé</h4></th>
-								<td><input type="number" name="attr_sante" min="0" value="0" class="center" style="width:100%" /></td>
-								<td><input type="number" name="attr_sante_max" min="0" class="center" style="width:100%" value="(((((@{endurance} + (((@{deplacement}+@{force}) + abs(@{deplacement}-@{force})) / 2) ) + abs(@{endurance} - (((@{deplacement}+@{force}) + abs(@{deplacement}-@{force})) / 2) )) / 2)*6)+10)+@{santeModif}" disabled /></td>
+								<td><input type="number" name="attr_santepj" min="0" value="0" class="center" style="width:100%" /></td>
+								<td><input type="number" name="attr_santepj_max" min="0" class="center" style="width:100%" value="(((((@{endurance} + (((@{deplacement}+@{force}) + abs(@{deplacement}-@{force})) / 2) ) + abs(@{endurance} - (((@{deplacement}+@{force}) + abs(@{deplacement}-@{force})) / 2) )) / 2)*6)+10)+@{santeModif}" disabled /></td>
 								<td class="tab-padding-right" ><input type="number" name="attr_santeModif" min="0" value="0" class="center" style="width:100%" /></td>
 							</tr>
-							<tr>
+							<tr class="NotNecrEspoir">
 								<th class="tab-padding-left left"><h4>Espoir</h4></th>
 								<td><input type="number" name="attr_espoir" min="0" value="50" class="center" style="width:100%" /></td>
 								<td><input type="number" name="attr_espoir_max" min="0" value="50+@{espoirModif}" class="center" style="width:100%" disabled /></td>
 								<td class="tab-padding-right"><input type="number" name="attr_espoirModif" min="0" value="0" class="center" style="width:100%" /></td>
+							</tr>
+							<tr class="NecrEspoir">
+								<th class="tab-padding-left left"><h4>Espoir</h4></th>
+								<td><input type="number" name="attr_espoirNecr" min="0" value="10" class="center" style="width:100%" /></td>
+								<td><input type="number" name="attr_espoirNecr_max" min="0" value="10+@{espoirNecrModif}" class="center" style="width:100%" disabled /></td>
+								<td class="tab-padding-right"><input type="number" name="attr_espoirNecrModif" min="0" value="0" class="center" style="width:100%" /></td>
 							</tr>
 							<tr>
 								<th class="tab-padding-left tab-padding-bottom left"><h4>Héroisme</h4></th>
@@ -2008,76 +2031,6 @@
 							</tr>
 						</table>
 					</div>
-					<div class="Bard Drui Monk Barb Pala Prie Psio Rang Rogu Sorc Warm Warr Wiza">
-						<input type="checkbox" name="attr_armure" class="checkBard hidden" value="bard" />
-						<input type="checkbox" name="attr_armure" class="checkDrui hidden" value="druid" />
-						<input type="checkbox" name="attr_armure" class="checkMonk hidden" value="monk" />
-						<input type="checkbox" name="attr_armure" class="checkBarb hidden" value="barbarian" />
-						<input type="checkbox" name="attr_armure" class="checkPala hidden" value="paladin" />
-						<input type="checkbox" name="attr_armure" class="checkPrie hidden" value="priest" />
-						<input type="checkbox" name="attr_armure" class="checkPsio hidden" value="psion" />
-						<input type="checkbox" name="attr_armure" class="checkRang hidden" value="ranger" />
-						<input type="checkbox" name="attr_armure" class="checkRogu hidden" value="rogue" />
-						<input type="checkbox" name="attr_armure" class="checkSorc hidden" value="sorcerer" />
-						<input type="checkbox" name="attr_armure" class="checkWarm hidden" value="warmaster" />
-						<input type="checkbox" name="attr_armure" class="checkWarr hidden" value="warrior" />
-						<input type="checkbox" name="attr_armure" class="checkWiza hidden" value="wizard" />
-						<table class="tableBard tableDrui tableMonk tableBarb tablePala tablePrie tablePsio tableRang tableRogu tableSorc tableWarm tableWarr tableWiza hidden">
-							<tr>
-								<th class="tab-padding-left" style="width:25%"></th>
-								<th style="width:25%"><h4>Actuel</h4></th>
-								<th style="width:25%"><h4>Maximum</h4></th>
-								<th class="tab-padding-right" style="25%"><h4>Modif</h4></th>
-							</tr>
-							<tr>
-								<th class="tab-padding-left left"><h4>Santé</h4></th>
-								<td><input type="number" name="attr_sante" min="0" value="0" class="center" style="width:100%" /></td>
-								<td><input type="number" name="attr_sante_max" min="0" class="center" style="width:100%" value="(((((@{endurance} + (((@{deplacement}+@{force}) + abs(@{deplacement}-@{force})) / 2) ) + abs(@{endurance} - (((@{deplacement}+@{force}) + abs(@{deplacement}-@{force})) / 2) )) / 2)*6)+10)+@{santeModif}" disabled /></td>
-								<td class="tab-padding-right" ><input type="number" name="attr_santeModif" min="0" value="0" class="center" style="width:100%" /></td>
-							</tr>
-							<tr>
-								<th class="tab-padding-left left"><h4>Espoir</h4></th>
-								<td><input type="number" name="attr_espoir" min="0" value="50" class="center" style="width:100%" /></td>
-								<td><input type="number" name="attr_espoir_max" min="0" value="50+@{espoirModif}" class="center" style="width:100%" disabled /></td>
-								<td class="tab-padding-right"><input type="number" name="attr_espoirModif" min="0" value="0" class="center" style="width:100%" /></td>
-							</tr>
-							<tr>
-								<th class="tab-padding-left tab-padding-bottom left"><h4>Héroisme</h4></th>
-								<td class="tab-padding-bottom"><input type="number" name="attr_heroisme" min="0" max="6" value="0" class="center" style="width:100%" /></td>
-								<td class="tab-padding-bottom"><input type="number" name="attr_heroisme_max" min="0" value="6+@{heroismeModif}" class="center" style="width:100%" disabled /></td>
-								<td class="tab-padding-bottom tab-padding-right"><input type="number" name="attr_heroismeModif" min="0" value="0" class="center" style="width:100%" /></td>
-							</tr>
-						</table>
-					</div>
-					<div class="Necr">
-					<input type="checkbox" name="attr_armure" class="checkNecr hidden" value="necromancer" />
-					<table class="tableNecr hidden">
-						<tr>
-							<th class="tab-padding-left" style="width:25%"></th>
-							<th style="width:25%"><h4>Actuel</h4></th>
-							<th style="width:25%"><h4>Maximum</h4></th>
-							<th class="tab-padding-right" style="25%"><h4>Modif</h4></th>
-						</tr>
-						<tr>
-							<th class="tab-padding-left left"><h4>Santé</h4></th>
-							<td><input type="number" name="attr_sante" min="0" value="0" class="center" style="width:100%" /></td>
-							<td><input type="number" name="attr_sante_max" min="0" class="center" style="width:100%" value="(((((@{endurance} + (((@{deplacement}+@{force}) + abs(@{deplacement}-@{force})) / 2) ) + abs(@{endurance} - (((@{deplacement}+@{force}) + abs(@{deplacement}-@{force})) / 2) )) / 2)*6)+10)+@{santeModif}" disabled /></td>
-							<td class="tab-padding-right" ><input type="number" name="attr_santeModif" min="0" value="0" class="center" style="width:100%" /></td>
-						</tr>
-						<tr>
-							<th class="tab-padding-left left"><h4>Espoir</h4></th>
-							<td><input type="number" name="attr_espoirNecr" min="0" value="10" class="center" style="width:100%" /></td>
-							<td><input type="number" name="attr_espoirNecr_max" min="0" value="10+@{espoirNecrModif}" class="center" style="width:100%" disabled /></td>
-							<td class="tab-padding-right"><input type="number" name="attr_espoirNecrModif" min="0" value="0" class="center" style="width:100%" /></td>
-						</tr>
-						<tr>
-							<th class="tab-padding-left tab-padding-bottom left"><h4>Héroisme</h4></th>
-							<td class="tab-padding-bottom"><input type="number" name="attr_heroisme" min="0" max="6" value="0" class="center" style="width:100%" /></td>
-							<td class="tab-padding-bottom"><input type="number" name="attr_heroisme_max" min="0" value="6+@{heroismeModif}" class="center" style="width:100%" disabled /></td>
-							<td class="tab-padding-bottom tab-padding-right"><input type="number" name="attr_heroismeModif" min="0" value="0" class="center" style="width:100%" /></td>
-						</tr>
-					</table>
-				</div>
 				</div>
 				<div class="Initiative Separation">
 					<div class="All except Guardian et Warrior">
@@ -2114,7 +2067,7 @@
 						</table>
 					</div>
 					<div class="Guardian">
-						<input type="checkbox" name="attr_armure" class="checkGuardian hidden" value="guardian" />			
+						<input type="checkbox" name="attr_armure" class="checkGuardian hidden" value="guardian" checked />			
 						
 						<input type="number" name="attr_discretionTotalGuardian" class="hidden" value="@{discretion}" disabled />
 						<input type="number" name="attr_perceptionTotalGuardian" class="hidden" value="@{perception}" disabled />
@@ -2158,7 +2111,7 @@
 				</div>
 				<div class="Defense Separation">
 					<div class="Guardian">
-						<input type="checkbox" name="attr_armure" class="checkGuardian hidden" value="guardian" />
+						<input type="checkbox" name="attr_armure" class="checkGuardian hidden" value="guardian" checked />
 						<input type="number" name="attr_hargneTotalGuardian" class="hidden" value="@{hargne}" disabled />
 						<input type="number" name="attr_combatTotalGuardian" class="hidden" value="@{combat}" disabled />
 						<input type="number" name="attr_instinctTotalGuardian" class="hidden" value="@{instinct}" disabled />
@@ -2512,8 +2465,8 @@
 						</tr>
 						<tr>
 							<th class="tab-padding-left left"><h4>Santé</h4></th>
-							<td><input type="number" name="attr_sante" min="0" value="0" class="center" style="width:100%" /></td>
-							<td class="tab-padding-right"><input type="number" name="attr_sante_max" min="0" class="center" style="width:100%" value="0" /></td>
+							<td><input type="number" name="attr_santePNJ" min="0" value="0" class="center" style="width:100%" /></td>
+							<td class="tab-padding-right"><input type="number" name="attr_santePNJ_max" min="0" class="center" style="width:100%" value="0" /></td>
 						</tr>
 						<tr>
 							<th class="tab-padding-left left tab-padding-bottom"><h4>Espoir</h4></th>
@@ -2568,7 +2521,7 @@
 			</div>
 		</div>
 		<div class="sheet-col">
-			<input type="checkbox" name="attr_fichePNJ" class="fichePNJHidden fichePJH" value="0" />
+			<input type="checkbox" name="attr_fichePNJ" class="fichePNJHidden fichePJH" value="0" checked />
 			<input type="checkbox" name="attr_fichePNJ" class="fichePNJHidden fichePNJH" value="1" />
 			<div class="PJ">
 				<div class="Aspects">
@@ -2878,7 +2831,7 @@
 <div class="tab-content tab2 Armures">
 	<div class="sheet-2colrow">
 		<div class="sheet-col">
-			<input type="checkbox" name="attr_fichePNJ" class="fichePNJHidden fichePJH" value="0" />
+			<input type="checkbox" name="attr_fichePNJ" class="fichePNJHidden fichePJH" value="0" checked />
 			<input type="checkbox" name="attr_fichePNJ" class="fichePNJHidden fichePNJH" value="1" />
 			<div class="PJ">
 				<div class="Barb">
@@ -4640,7 +4593,7 @@
 			</div>
 		</div>
 		<div class="sheet-col">
-			<input type="checkbox" name="attr_fichePNJ" class="fichePNJHidden fichePJH" value="0" />
+			<input type="checkbox" name="attr_fichePNJ" class="fichePNJHidden fichePJH" value="0" checked />
 			<input type="checkbox" name="attr_fichePNJ" class="fichePNJHidden fichePNJH" value="1" />
 			<div class="PJ">
 				<div class="Barb">
@@ -5569,7 +5522,7 @@
 												<span class="revealESpec hidden">Oblitération /</span>
 											</span>
 											<span class="Orfevrerie">
-												<input type="checkbox" name="attr_orfevrerie" class="hidden checkShowESpec" value="{{orfevrerie=[[@{dexterite}]]}}" />
+												<input type="checkbox" name="attr_orfevrerie" class="hidden checkShowESpec" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
 												<span class="revealESpec hidden">Orfévrerie /</span>
 											</span>
 											<span class="Penetrant">
@@ -5970,7 +5923,7 @@
 												</tr>
 												<tr style="height:31px;">
 													<td>
-														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}]]}}" />
+														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
 													</td>
 													<td colspan="2">
 														Orfévrerie
@@ -7470,7 +7423,7 @@
 					</div>
 					<input type="checkbox" name="attr_ranger50PG2" class="checkShow hidden" value="on" />
 					<div class="hidden">
-						<button name="attr_rangerJetArmeEvol" type="roll" value="@{jetGM} &{template:ranger} {{Nom=@{name}}} {{Arme=Fusil de Précision Longbow}} @{caracteristique1Combat} @{jetModifDes}@{atkBM}+ @{caracteristique2Combat} {{situationnel=[[@{jetModifDes}]]}} {{@{styleCombat}=@{styleCombat}}} {{style=@{styleCombat}}} {{styleDgtBM=[[(@{rangerArmeDegatEvol})d6]]}} {{styleViolBM=[[(floor(@{rangerArmeViolenceEvol}/2)d6]]}} {{Degats=[[@{rangerArmeDegatEvol}d6]]}} {{Violence=[[@{rangerArmeViolenceEvol}d6]]}} {{Portee=@{rangerArmePortee}}} @{ranger50PG3} @{rangerFureur} @{rangerUltraViolence} @{rangerAntiAnatheme} @{rangerAntiVehicule} {{assistanceAttaque=Assistance à l'attaque}} @{rangerArtillerie} @{rangerChoc} @{rangerDispersion} @{rangerDegatContinue} @{rangerDemoralisant} @{rangerDesignation} @{rangerEnChaine} @{rangerIgnoreArmure} {{lourd=Lourd}} @{rangerLumiere} @{rangerPenetrant} @{rangerPenetrant10} @{rangerPerceArmure} @{rangerPerceArmure60} @{rangerSilencieux} {{totalD=[[1]]}} {{totalV=[[1]]}}"/>
+						<button name="attr_rangerJetArmeEvol" type="roll" value="@{jetGM} &{template:ranger} {{Nom=@{name}}} {{Arme=Fusil de Précision Longbow}} @{caracteristique1Combat} @{jetModifDes}@{atkBM}+ @{caracteristique2Combat} {{situationnel=[[@{jetModifDes}]]}} {{@{styleCombat}=@{styleCombat}}} {{style=@{styleCombat}}} {{styleDgtBM=[[(@{rangerArmeDegatEvol})d6]]}} {{styleViolBM=[[(floor(@{rangerArmeViolenceEvol}/2))d6]]}} {{Degats=[[@{rangerArmeDegatEvol}d6]]}} {{Violence=[[@{rangerArmeViolenceEvol}d6]]}} {{Portee=@{rangerArmePortee}}} @{ranger50PG3} @{rangerFureur} @{rangerUltraViolence} @{rangerAntiAnatheme} @{rangerAntiVehicule} {{assistanceAttaque=Assistance à l'attaque}} @{rangerArtillerie} @{rangerChoc} @{rangerDispersion} @{rangerDegatContinue} @{rangerDemoralisant} @{rangerDesignation} @{rangerEnChaine} @{rangerIgnoreArmure} {{lourd=Lourd}} @{rangerLumiere} @{rangerPenetrant} @{rangerPenetrant10} @{rangerPerceArmure} @{rangerPerceArmure60} @{rangerSilencieux} {{totalD=[[1]]}} {{totalV=[[1]]}}"/>
 					</div>
 				</td>
 			</tr>
@@ -8002,7 +7955,7 @@
 											</tr>
 											<tr style="height:31px;">
 												<td>
-													<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}]]}}" />
+													<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
 												</td>
 												<td colspan="2">
 													Orfévrerie
@@ -8532,7 +8485,7 @@
 											</tr>
 											<tr style="height:31px;">
 												<td>
-													<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}]]}}" />
+													<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
 												</td>
 												<td colspan="2">
 													Orfévrerie
@@ -9002,7 +8955,7 @@
 	<br/>
 	<div class="sheet-2colrow">
 		<div class="sheet-col">
-			<input type="checkbox" name="attr_fichePNJ" class="fichePNJHidden fichePJH" value="0" />
+			<input type="checkbox" name="attr_fichePNJ" class="fichePNJHidden fichePJH" value="0" checked />
 			<input type="checkbox" name="attr_fichePNJ" class="fichePNJHidden fichePNJH" value="1" />
 			<div class="PJ">
 				<div class="All">
@@ -9033,7 +8986,7 @@
 				</div>
 				<br/>
 				<div class="Guardian">
-					<input type="checkbox" name="attr_armure" class="checkGuardian hidden" value="guardian" />
+					<input type="checkbox" name="attr_armure" class="checkGuardian hidden" value="guardian" checked />
 					<table class="tableGuardian hidden">
 						<tr>
 							<td class="tab-padding-left" style="width:40%"></td>
@@ -9659,13 +9612,13 @@
 			</div>
 		</div>
 	</div>
-	<input type="checkbox" name="attr_fichePNJ" class="fichePNJHidden fichePJH" value="0" />
+	<input type="checkbox" name="attr_fichePNJ" class="fichePNJHidden fichePJH" value="0" checked />
 	<input type="checkbox" name="attr_fichePNJ" class="fichePNJHidden fichePNJH" value="1" />
 	<div class="PJ Separation">
 		<input type="checkbox" name="attr_tabDistance" class="tabArmes tabDistance hidden" value="1" checked>
 		<div class="tabDistance hidden" style="margin-top:20px">
 			<div class="Guardian">
-				<input type="checkbox" name="attr_armure" class="checkGuardian hidden" value="guardian" />
+				<input type="checkbox" name="attr_armure" class="checkGuardian hidden" value="guardian" checked />
 				<table class="tableGuardian hidden">
 					<tr>
 						<th><h2>Armes à distances</h2></th>
@@ -9971,7 +9924,7 @@
 												</tr>
 												<tr style="height:31px;">
 													<td>
-														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}]]}}" />
+														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
 													</td>
 													<td colspan="2">
 														Orfévrerie
@@ -10500,7 +10453,7 @@
 												</tr>
 												<tr style="height:31px;">
 													<td>
-														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}]]}}" />
+														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
 													</td>
 													<td colspan="2">
 														Orfévrerie
@@ -11038,7 +10991,7 @@
 												</tr>
 												<tr style="height:31px;">
 													<td>
-														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}]]}}" />
+														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
 													</td>
 													<td colspan="2">
 														Orfévrerie
@@ -11567,7 +11520,7 @@
 												</tr>
 												<tr style="height:31px;">
 													<td>
-														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}]]}}" />
+														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
 													</td>
 													<td colspan="2">
 														Orfévrerie
@@ -12096,7 +12049,7 @@
 												</tr>
 												<tr style="height:31px;">
 													<td>
-														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}]]}}" />
+														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
 													</td>
 													<td colspan="2">
 														Orfévrerie
@@ -12625,7 +12578,7 @@
 												</tr>
 												<tr style="height:31px;">
 													<td>
-														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}]]}}" />
+														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
 													</td>
 													<td colspan="2">
 														Orfévrerie
@@ -12851,7 +12804,7 @@
 		<input type="checkbox" name="attr_tabMelee" class="tabArmes tabMelee hidden" value="2" checked>
 		<div class="tabMelee hidden" style="margin-top:20px">
 			<div class="Guardian">
-				<input type="checkbox" name="attr_armure" class="checkGuardian hidden" value="guardian" />
+				<input type="checkbox" name="attr_armure" class="checkGuardian hidden" value="guardian" checked />
 				<table class="tableGuardian hidden">
 					<tr>
 						<th><h2>Armes de mêlée</h2></th>
@@ -13157,7 +13110,7 @@
 												</tr>
 												<tr style="height:31px;">
 													<td>
-														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}]]}}" />
+														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
 													</td>
 													<td colspan="2">
 														Orfévrerie
@@ -13551,7 +13504,7 @@
 												</tr>
 												<tr style="height:31px;">
 													<td>
-														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}]]}}" />
+														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
 													</td>
 													<td colspan="2">
 														Orfévrerie
@@ -13955,7 +13908,7 @@
 												</tr>
 												<tr style="height:31px;">
 													<td>
-														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}]]}}" />
+														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
 													</td>
 													<td colspan="2">
 														Orfévrerie
@@ -14350,7 +14303,7 @@
 												</tr>
 												<tr style="height:31px;">
 													<td>
-														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}]]}}" />
+														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
 													</td>
 													<td colspan="2">
 														Orfévrerie
@@ -14745,7 +14698,7 @@
 												</tr>
 												<tr style="height:31px;">
 													<td>
-														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}]]}}" />
+														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
 													</td>
 													<td colspan="2">
 														Orfévrerie
@@ -15140,7 +15093,7 @@
 												</tr>
 												<tr style="height:31px;">
 													<td>
-														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}]]}}" />
+														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
 													</td>
 													<td colspan="2">
 														Orfévrerie
@@ -15506,7 +15459,7 @@
 												</tr>
 												<tr style="height:31px;">
 													<td>
-														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}]]}}" />
+														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
 													</td>
 													<td colspan="2">
 														Orfévrerie
@@ -17098,11 +17051,11 @@
 	</div>
 	<div class="sheet-2colrow">
 		<div class="sheet-col">
-			<input type="checkbox" name="attr_fichePNJ" class="fichePNJHidden fichePJH" value="0" />
+			<input type="checkbox" name="attr_fichePNJ" class="fichePNJHidden fichePJH" value="0" checked />
 			<input type="checkbox" name="attr_fichePNJ" class="fichePNJHidden fichePNJH" value="1" />
 			<div class="PJ">
 				<div class="Guardian">				
-					<input type="checkbox" name="attr_armure" class="checkGuardian hidden" value="guardian" />
+					<input type="checkbox" name="attr_armure" class="checkGuardian hidden" value="guardian" checked />
 					<table class="tableGuardian hidden">
 						<tr>
 							<th colspan="6"><h4>Grenades</h4></th>
@@ -17813,7 +17766,7 @@
 					</tr>
 				</table>
 			</div>
-			<input type="checkbox" name="attr_fichePNJ" class="fichePNJHidden fichePJH" value="0" />
+			<input type="checkbox" name="attr_fichePNJ" class="fichePNJHidden fichePJH" value="0" checked />
 			<input type="checkbox" name="attr_fichePNJ" class="fichePNJHidden fichePNJH" value="1" />
 			<div class="PJ">
 				<div class="All except Guardian">
@@ -23838,7 +23791,6 @@
 		</tr>
 		<tr>
 			<td style="height:20px;"></td>
-		</tr>
-		
+		</tr>		
 	</table>
 </rolltemplate>

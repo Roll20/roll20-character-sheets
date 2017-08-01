@@ -1,44 +1,81 @@
 h3 Attacks
-.inlineBlock(style='margin-top: 1.5em; vertical-align: top; width: 1in;'): +labelledBoxV('Base Attack Bonus'): +input('number', 'bab')(value=0)
++labelledBoxH('Base Attack Bonus'): +input('number', 'bab')(value='0')
+// .inlineBlock(style='margin-top: 1.5em; vertical-align: top; width: 1in;'): +labelledBoxV('Base Attack Bonus'): +input('number', 'bab')(value=0)
 
-.inlineBlock(style='margin-bottom: 1em; vertical-align: top; width: 80%;')
+.inlineBlock(style='margin-bottom: 1em; vertical-align: top;')
   mixin attack()
-    div(style='margin-bottom: 1em;')
-      .inlineBlock.blackBox: .rollButton
-        +rollButton('attack', 'attack_notes')
-        +input('text', 'attack_name')
-        +select('attack_ability')
-          +option('Choose One', '')
-          +option('Strength', 'str')
-          +option('Dexterity', 'dex')
-          +option('Constitution', 'con')
-          +option('Intelligence', 'int')
-          +option('Wisdom', 'wis')
-          +option('Charisma', 'cha')
-      +readOnlyBox('attack')
-      .mathOperator =
-      +readOnlyBox('attack_bab')(style='width: 0.25in;')
-      .mathOperator +
-      +readOnlyBox('attack_ability_mod')(style='width: 0.25in;')
-      .mathOperator +
-      +readOnlyBox('attack_size')(style='width: 0.25in;')
-      .mathOperator +
-      +fieldBox('number', 'attack_equipment')
-      .mathOperator +
-      +fieldBox('number', 'attack_misc')
-      .mathOperator +
-      +fieldBox('number', 'attack_temp')
-      +labelledUnderlined('Conditional Modifiers')(style='margin-left: 1em; width: 1.5in;'): +input('text', 'attack_notes')
+    .inlineBlock.blackBox(style='height: 0.5in; vertical-align: top; width: 0.5in;')
+      .rollButton
+        span t
+        +rollButton('attack', 'attack_notes', {
+          isAttack: true,
+          attackName: 'attack_name',
+          damage: 'attack_damage',
+          crit: {
+            range: 'attack_critRange',
+            multiplier: 'attack_critMultiplier'
+          }
+        })
+    .inlineBlock(style='margin-bottom: 1em; width: 7.8in;')
+      div(style='margin-bottom: 2px;')
+        .inlineBlock.blackBox: +input('text', 'attack_name')(placeholder="Attack name")
+        +readOnlyBox('attack')
+        .mathOperator =
+        +readOnlyBox('attack_bab')(style='width: 0.25in;')
+        .mathOperator +
+        .atkAbility
+          +readOnlyBox('attack_ability_mod')(style='width: 0.25in;')
+          +select('attack_ability')
+            +option('Choose One', '')
+            +option('STR', 'str')
+            +option('DEX', 'dex')
+            +option('CON', 'con')
+            +option('INT', 'int')
+            +option('WIS', 'wis')
+            +option('CHA', 'cha')
+        .mathOperator +
+        +readOnlyBox('attack_size')(style='width: 0.25in;')
+        .mathOperator +
+        +fieldBox('number', 'attack_equipment')
+        .mathOperator +
+        +fieldBox('number', 'attack_misc')
+        .mathOperator +
+        +fieldBox('number', 'attack_temp')
+      div
+        +labelledBoxH('Damage'): +input('text', 'attack_damage')(value='0', style='width: 1.5in;')
+        +labelledUnderlined('Crit Range')(style='width: 0.8in;'): +select('attack_critRange')(value='99')
+          +option('Choose One', '99', true)
+          +option('20', '20')
+          +option('19-20', '19')
+          +option('18-20', '18')
+          +option('17-20', '17')
+          +option('16-20', '16')
+          +option('15-20', '15')
+          +option('14-20', '14')
+          +option('13-20', '13')
+          +option('12-20', '12')
+          +option('11-20', '11')
+          +option('10-20', '10')
+          +option('9-20', '9')
+          +option('8-20', '8')
+          +option('7-20', '7')
+          +option('6-20', '6')
+          +option('5-20', '5')
+          +option('4-20', '4')
+          +option('3-20', '3')
+          +option('2-20', '2')
+        +labelledUnderlined('Crit Multiplier')(style='width: 0.8in;'): +input('number', 'attack_critMultiplier')
+        +labelledUnderlined('Conditional Modifiers')(style='margin-left: 1em; width: 3in;'): +input('text', 'attack_notes')
 
   .attacks
     .head
-      label.inlineBlock(style='padding-left: 1.5in; width: 0.55in') Total
+      label.inlineBlock(style='padding-left: 3in; width: 0.55in') Total
       label.inlineBlock(style='width: 0.4in;') BAB
       label.inlineBlock(style='width: 0.4in;') Ability Mod
       label.inlineBlock(style='width: 0.4in;') Size
       label.inlineBlock(style='width: 0.6in;') Equipment
       label.inlineBlock(style='width: 0.65in;') Misc +/-
       label.inlineBlock Temp +/-
-    .body(style='width: 8in;')
+    .body(style='width: 8.5in;')
       +repeating('attacks')
         +attack()
