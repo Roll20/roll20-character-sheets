@@ -4,6 +4,14 @@ This is a character sheet for Blades in the Dark for use on Roll20.
 
 ## Changelog
 
+### 1.9
+* Clock segments are now clickable
+* Moved the healing clock to the other column of the harm/armor/coin container
+* CSS cleanup
+* Added descriptions to upgrades and items
+* Added button to roll lifestyle, healing
+* Added more visible indicator that stuff happens when you fill in playbook or crew type
+
 ### 1.8
 * Extra rows of claims can now be added
 * Corrected minor typos
