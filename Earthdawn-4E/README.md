@@ -6,7 +6,7 @@ DISCLAIMER: This is NOT a Character Builder.  It does very little math for you.
 You will need a Pro account in order to use this Custom Character Sheet.
 
 This is written to work with the following API scripts:
-- ChatSetAttr version 1.2.1 (https://github.com/joesinghaus/roll20-api-scripts/blob/master/ChatSetAttr/ChatSetAttr.js)
+- ChatSetAttr version 1.3 (https://github.com/joesinghaus/roll20-api-scripts/blob/master/ChatSetAttr/ChatSetAttr.js)
 - Power Cards 3.4.4 (https://gist.github.com/Sky-Captain-13/452330a3d926b32da49c)
 
 Power Cards will require you to create a Handout named "PowerCard Formats" that is visible to all Players with the following information:
