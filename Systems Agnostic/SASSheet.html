@@ -1,0 +1,314 @@
+<script type="text/worker">
+    var sheetName = 'System Agnostic Sheet';
+    var sheetVersion = '1.0.00';
+
+    on('sheet:opened', function(){
+        getAttrs(['character_sheet'],function(attrs){
+            let cs=_.rest((attrs.character_sheet||'').match(/(.*?)(?:\s+v(.*))?$/)),
+                sheet_name=cs[0]||'',
+                sheet_version=cs[1]||'';
+
+            // do something with sheet_name and sheet_version, if you might be converting
+
+            if(sheet_name !== sheetName || (sheetVersion && (sheet_version !== sheetVersion))){
+                setAttrs({
+                    character_sheet: (sheetName||'System Agnostic Sheet')+(sheetVersion?(' v'+sheetVersion):'')
+                },{silent:true});
+            }
+        });
+    });
+</script>
+
+<br>
+<h4>
+    <b>
+        Character Name
+    </b>
+</h4>
+<input type="text" name="attr_character_name" title="@{character_name}" class="sheet-macro">
+<br><br>
+
+<input type="radio" name="attr_tab1" class="sheet-tab sheet-tab1" value="1" checked/><span class="sheet-tab sheet-tab1">Dice Sheet</span>&nbsp;
+    <input type="radio" name="attr_tab1" class="sheet-tab sheet-tab2" value="2"/><span class="sheet-tab sheet-tab2">Notes Sheet</span>
+<br><br>
+
+<div class="sheet-tab-content sheet-section-dice-page">
+    <div>
+        <input name="attr_infohide" type="checkbox" class="arrow" /><span></span><h4><b>Hide How To Use Sheet Information</b></h4>
+        <div class="body">
+            <textarea name="attr_info" class="sheet-squish" placeholder="To use this page, create dice rolls on the left by inputting the number of dice, the sides of the dice, and any modifiers. There is a greyed out display that can be called to utilize that roll in other fields. The center column allows you to create and store attributes to be called in other fields. These can be as simple as pieces of equipment to currency or even stats. The right column allows you to create a variety of macros by linking together attributes and dice rolls." readonly="true"></textarea><br>
+            <textarea name="attr_info2" class="sheet-squish" placeholder="This sheet functions off of the repeating field idea so you can have as many or as few as you need. If you are not sure how to call a given field, mouse over it for a second or two and its generic id will show up. You will need to replace the _$X_ with the number of the line created. This number is indicated to the left of each row, beginning at 0 thus, the first line's items could be called with _$0_ (Note: do not put the .[period] symbol.)" readonly="true"></textarea><br>
+            <textarea name="attr_info3" class="sheet-squish" placeholder="This sheet supports the use of a custom template marked &{template:SAS} available fields are name= subtitle= subtitle2= desc1= desc2= desc3= and you can additionally add any other fields you want. These can be set up in your macros section using a similar format &{tempalte:SAS} {{name=@{character_name}}} {{subtitle=Moves in for the kill}} {{Attack!=/roll @{repeating_dice_$0_dicetotal}!}} and so on." readonly="true"></textarea>
+        </div>
+    </div>
+    <div class="sheet-3colrow">
+        <div class="sheet-col">
+            <h4>
+                <b>
+                    Dice Pool
+                </b>
+            </h4>
+            <br>
+            <table>
+                <tr>
+                    <td style="background-color: #000; color: #FFF; font-family: Arial; font-weight: bold;">
+                        &nbsp;&nbsp;&nbsp;&nbsp;# of<br>&nbsp;&nbsp;&nbsp;&nbsp;Dice
+                    </td>
+                    <td style="background-color: #000; color: #FFF; font-family: Arial; font-weight: bold;">
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Die<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Type
+                    </td>
+                    <td style="background-color: #000; color: #FFF; font-family: Arial; font-weight: bold;">
+                        &nbsp;&nbsp;Die<br>&nbsp;&nbsp;Mod
+                    </td>
+                    <td style="background-color: #000; color: #FFF; font-family: Arial; font-weight: bold;">
+                        &nbsp;&nbsp;&nbsp;Die<br>&nbsp;&nbsp;Total
+                    </td>
+                    <td style="background-color: #000; color: #FFF; font-family: Arial; font-weight: bold;">
+                        &nbsp;&nbsp;&nbsp;Roll
+                    </td>
+                </tr>
+            </table>
+            <div class="sheet-repeating-fields">
+                <fieldset name="repeating_dice" class="repeating_dice">
+                    <table>
+                        <tr>
+                            <td>
+                                <span class="sheet-counter"></span>
+                            </td>
+                            <td>
+                                <input type="text" name="attr_numdice" title="@{repeating_dice_$X_numdice}" class="sheet-number" value="0">
+                            </td>
+                            <td>
+                                <h4>
+                                    <b>
+                                        &nbsp;d&nbsp;
+                                    </b>
+                                </h4>
+                            </td>
+                            <td>
+                                <input type="text" name="attr_typedice" title="@{repeating_dice_$X_typedice}" class="sheet-number" value="0">
+                            </td>
+                            <td>
+                                <input type="text" name="attr_moddice" title="@{repeating_dice_$X_moddice}" class="sheet-number" value="0">
+                            </td>
+                            <td>
+                                <input style="display: none;" type="text" name="attr_dicetotal" class="sheet-tally" value="@{numdice}d@{typedice}+(@{moddice})" disabled="true">&nbsp;&nbsp;<span title="@{repeating_dice_$X_dicetotal}"></span>
+                            </td>
+                            <td>
+                                &nbsp;&nbsp;<button type="roll" name="roll_thesedice" title="%{repeating_dice_$X_thesedice}" value="[[(@{numdice}d@{typedice})+(@{moddice})]]"></button>
+                            </td>
+                        </tr>
+                    </table>
+                </fieldset>
+            </div>
+        </div>
+        <div class="sheet-col">
+            <h4>
+                <b>
+                    Attributes
+                </b>
+            </h4>
+            <br>
+            <table>
+                <tr>
+                    <td style="background-color: #000; color: #FFF; font-family: Arial; font-weight: bold;">
+                        &nbsp;&nbsp;&nbsp;&nbsp;Name
+                    </td>
+                    <td style="background-color: #000; color: #FFF; font-family: Arial; font-weight: bold;">
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Score
+                    </td>
+                    <td style="background-color: #000; color: #FFF; font-family: Arial; font-weight: bold;">
+                        Mod<br>&nbsp;&nbsp;&nbsp;1
+                    </td>
+                    <td style="background-color: #000; color: #FFF; font-family: Arial; font-weight: bold;">
+                        Mod<br>&nbsp;&nbsp;&nbsp;2
+                    </td>
+                    <td style="background-color: #000; color: #FFF; font-family: Arial; font-weight: bold;">
+                        &nbsp;Mod<br>&nbsp;&nbsp;&nbsp;&nbsp;3
+                    </td>
+                </tr>
+            </table>
+            <div class="sheet-repeating-fields">
+                <fieldset name="repeating_attributes" class="repeating_attributes">
+                    <table>
+                        <tr>
+                            <td>
+                                <span class="sheet-counter"></span>
+                            </td>
+                            <td>
+                                <input type="text" name="attr_scorename" title="@{repeating_attributes_$X_scorename}" class="sheet-name">
+                            </td>
+                            <td>
+                                <input type="text" name="attr_score" title="@{repeating_attributes_$X_score}" class="sheet-number">
+                            </td>
+                            <td>
+                                &nbsp;<input type="text" name="attr_modscore1" title="@{repeating_attributes_$X_modscore1}" class="sheet-mod">
+                            </td>
+                            <td>
+                                &nbsp;<input type="text" name="attr_modscore2" title="@{repeating_attributes_$X_modscore2}" class="sheet-mod">
+                            </td>
+                            <td>
+                                &nbsp;<input type="text" name="attr_modscore3" title="@{repeating_attributes_$X_modscore3}" class="sheet-mod">
+                            </td>
+                        </tr>
+                    </table>
+                </fieldset>
+            </div>
+        </div>
+        <div class="sheet-col">
+            <h4>
+                <b>
+                    Macros
+                </b>
+            </h4>
+            <br>
+            <table style="width: 100%;">
+                <tr>
+                    <td style="background-color: #000; color: #FFF; font-family: Arial; font-weight: bold;">
+                        &nbsp;&nbsp;&nbsp;&nbsp;Macro Name and Effects
+                    </td>
+                </tr>
+            </table>
+            <div class="sheet-repeating-fields">
+                <fieldset name="repeating_macros" class="repeating_macros">
+                    <table>
+                        <tr>
+                            <td>
+                                <span class="sheet-counter"></span>
+                            </td>
+                            <td>
+                                <input type="text" name="attr_macroname" title="@{repeating_macros_$X_macroname}" class="sheet-name">
+                            </td>
+                        </tr>
+                    </table>
+                    <table>
+                        <tr>
+                            <td>
+                                <input type="text" name="attr_macro" title="@{repeating_macros_$X_macro}" class="sheet-macro">
+                            </td>
+                            <td>
+                            <button type="roll" name="roll_thismacro" title="%{repeating_macros_$X_thismacro}" value="@{macro}"></button>
+                            </td>
+                        </tr>
+                    </table>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="sheet-tab-content sheet-section-notes-page">
+    <h4>
+        <b>
+            Personal Bio:
+        </b>
+    </h4>
+    <br>
+    <textarea name="attr_personalbio" title="@{personalbio}"></textarea>
+    <br>
+    <h4>
+        <b>
+            Journals
+        </b>
+    </h4>
+    <div class="sheet-2colrow">
+        <div class="sheet-col">
+            <div class="sheet-repeating-fields">
+                <fieldset name="repeating_journal1" class="repeating_journal1">
+                    <table>
+                        <tr>
+                            <td>
+                                <span class="sheet-counter"></span>
+                            </td>
+                            <td>
+                                <input type="text" name="attr_journalentry1" title="@{repeating_journal1_$X_journalentry1}" class="sheet-entry">
+                            </td>
+                        </tr>
+                    </table>
+                    <table>
+                        <tr>
+                            <textarea name="attr_journaltext1" title="@{repeating_journal1_$X_journaltext1}"></textarea>
+                        </tr>
+                        </tr>
+                    </table>
+                    <hr>
+                </fieldset>
+            </div>
+        </div>
+        <div class="sheet-col">
+            <div class="sheet-repeating-fields">
+                <fieldset name="repeating_journal2" class="repeating_jounral2">
+                    <table>
+                        <tr>
+                            <td>
+                                <span class="sheet-counter"></span>
+                            </td>
+                            <td>
+                            <input type="text" name="attr_journalentry2" title="@{repeating_journal2_$X_journalentry2}" class="sheet-entry">
+                            </td>
+                        </tr>
+                    </table>
+                    <table>
+                        <tr>
+                            <textarea name="attr_journaltext2" title="@{repeating_journal2_$X_journaltext2}"></textarea>
+                        </tr>
+                        </tr>
+                    </table>
+                    <hr>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+</div>
+
+<rolltemplate class="sheet-rolltemplate-SAS">
+    <div class="sheet-template-container">
+        <div class="sheet-default-head">
+            <table>
+                <tr>
+                    <th class="sheet-template-title1">{{name}}
+                    </th>
+                </tr>
+				{{#subtitle}}
+				<tr>
+                    <th class="sheet-template-subtitle1">{{subtitle}}
+                    </th>
+				</tr>
+				<tr>
+				    <th class="sheet-template-subtitle2">{{subtitle2}}
+				    </th>
+				</tr>
+				{{/subtitle}}
+            </table>
+        </div>
+        <div class="sheet-template-body">
+		    <table>
+                {{#allprops() desc1 desc2 desc3 name subtitle subtitle2}}
+                <tr>
+                    <td class="default-c1">{{key}}
+                    </td>
+                    <td class="default-c2">{{value}}
+                    </td>
+                    {{/allprops() desc1 desc2 desc3 name subtitle subtitle2}}
+                </tr>
+                {{#desc1}}
+				<tr>
+                    <td class="default-c3" colspan="2">{{desc1}}
+                    </td>
+                </tr>
+                {{/desc1}}
+                {{#desc2}}
+				<tr>
+                    <td class="default-c3" colspan="2">{{desc2}}
+                    </td>
+                </tr>
+                {{/desc2}}
+                {{#desc3}}
+				<tr>
+                    <td class="default-c3" colspan="2">{{desc3}}
+                    </td>
+                </tr>
+                {{/desc3}}
+		    </table>
+        </div>
+    </div>
+</rolltemplate>
