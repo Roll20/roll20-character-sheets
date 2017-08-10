@@ -1179,7 +1179,23 @@
 		TAS.repeatingSimpleSum("slotsDCLTorse", "slotsUDCLTorse", "slotsUDCLTorseTot");
 	});
 	
-	</script>
+	on('sheet:opened',function()
+	{
+		getAttrs(["sante", "santeMAJ"], function(values)
+		{
+			if(values.santeMAJ != 1)
+			{
+				setAttrs({
+					 santepj: values.sante,
+					 santePNJ: values.sante,
+					 santeMAJ: 1
+				});
+			}
+		});
+	});
+</script>
+
+<input type="hidden" name="attr_MAJ" value="0" />
 
 <input type="radio" name="attr_fichePNJ" class="fichePNJ" value="0" checked /><span title="PJ" class="fichePNJ" ></span><br/>
 <input type="radio" name="attr_fichePNJ" class="fichePNJ2" value="1" /><span title="PNJ" class="fichePNJ2" ></span>
@@ -1979,9 +1995,10 @@
 					</div>
 				</div>
 				<div class="Sante Separation">
-					<div class="Guardian">
-						<input type="checkbox" name="attr_armure" class="checkGuardian hidden" value="guardian" />
-						<table class="tableGuardian hidden">
+					<div class="Guardian Bard Drui Monk Barb Pala Prie Psio Rang Rogu Sorc Warm Warr Wiza">
+						<input type="checkbox" name="attr_armure" class="checkNecrEspoir hidden" value="necromancer" />
+						
+						<table class="tableSEH">
 							<tr>
 								<th class="tab-padding-left" style="width:25%"></th>
 								<th style="width:25%"><h4>Actuel</h4></th>
@@ -1990,15 +2007,21 @@
 							</tr>
 							<tr>
 								<th class="tab-padding-left left"><h4>Santé</h4></th>
-								<td><input type="number" name="attr_sante" min="0" value="0" class="center" style="width:100%" /></td>
-								<td><input type="number" name="attr_sante_max" min="0" class="center" style="width:100%" value="(((((@{endurance} + (((@{deplacement}+@{force}) + abs(@{deplacement}-@{force})) / 2) ) + abs(@{endurance} - (((@{deplacement}+@{force}) + abs(@{deplacement}-@{force})) / 2) )) / 2)*6)+10)+@{santeModif}" disabled /></td>
+								<td><input type="number" name="attr_santepj" min="0" value="0" class="center" style="width:100%" /></td>
+								<td><input type="number" name="attr_santepj_max" min="0" class="center" style="width:100%" value="(((((@{endurance} + (((@{deplacement}+@{force}) + abs(@{deplacement}-@{force})) / 2) ) + abs(@{endurance} - (((@{deplacement}+@{force}) + abs(@{deplacement}-@{force})) / 2) )) / 2)*6)+10)+@{santeModif}" disabled /></td>
 								<td class="tab-padding-right" ><input type="number" name="attr_santeModif" min="0" value="0" class="center" style="width:100%" /></td>
 							</tr>
-							<tr>
+							<tr class="NotNecrEspoir">
 								<th class="tab-padding-left left"><h4>Espoir</h4></th>
 								<td><input type="number" name="attr_espoir" min="0" value="50" class="center" style="width:100%" /></td>
 								<td><input type="number" name="attr_espoir_max" min="0" value="50+@{espoirModif}" class="center" style="width:100%" disabled /></td>
 								<td class="tab-padding-right"><input type="number" name="attr_espoirModif" min="0" value="0" class="center" style="width:100%" /></td>
+							</tr>
+							<tr class="NecrEspoir">
+								<th class="tab-padding-left left"><h4>Espoir</h4></th>
+								<td><input type="number" name="attr_espoirNecr" min="0" value="10" class="center" style="width:100%" /></td>
+								<td><input type="number" name="attr_espoirNecr_max" min="0" value="10+@{espoirNecrModif}" class="center" style="width:100%" disabled /></td>
+								<td class="tab-padding-right"><input type="number" name="attr_espoirNecrModif" min="0" value="0" class="center" style="width:100%" /></td>
 							</tr>
 							<tr>
 								<th class="tab-padding-left tab-padding-bottom left"><h4>Héroisme</h4></th>
@@ -2008,76 +2031,6 @@
 							</tr>
 						</table>
 					</div>
-					<div class="Bard Drui Monk Barb Pala Prie Psio Rang Rogu Sorc Warm Warr Wiza">
-						<input type="checkbox" name="attr_armure" class="checkBard hidden" value="bard" />
-						<input type="checkbox" name="attr_armure" class="checkDrui hidden" value="druid" />
-						<input type="checkbox" name="attr_armure" class="checkMonk hidden" value="monk" />
-						<input type="checkbox" name="attr_armure" class="checkBarb hidden" value="barbarian" />
-						<input type="checkbox" name="attr_armure" class="checkPala hidden" value="paladin" />
-						<input type="checkbox" name="attr_armure" class="checkPrie hidden" value="priest" />
-						<input type="checkbox" name="attr_armure" class="checkPsio hidden" value="psion" />
-						<input type="checkbox" name="attr_armure" class="checkRang hidden" value="ranger" />
-						<input type="checkbox" name="attr_armure" class="checkRogu hidden" value="rogue" />
-						<input type="checkbox" name="attr_armure" class="checkSorc hidden" value="sorcerer" />
-						<input type="checkbox" name="attr_armure" class="checkWarm hidden" value="warmaster" />
-						<input type="checkbox" name="attr_armure" class="checkWarr hidden" value="warrior" />
-						<input type="checkbox" name="attr_armure" class="checkWiza hidden" value="wizard" />
-						<table class="tableBard tableDrui tableMonk tableBarb tablePala tablePrie tablePsio tableRang tableRogu tableSorc tableWarm tableWarr tableWiza hidden">
-							<tr>
-								<th class="tab-padding-left" style="width:25%"></th>
-								<th style="width:25%"><h4>Actuel</h4></th>
-								<th style="width:25%"><h4>Maximum</h4></th>
-								<th class="tab-padding-right" style="25%"><h4>Modif</h4></th>
-							</tr>
-							<tr>
-								<th class="tab-padding-left left"><h4>Santé</h4></th>
-								<td><input type="number" name="attr_sante" min="0" value="0" class="center" style="width:100%" /></td>
-								<td><input type="number" name="attr_sante_max" min="0" class="center" style="width:100%" value="(((((@{endurance} + (((@{deplacement}+@{force}) + abs(@{deplacement}-@{force})) / 2) ) + abs(@{endurance} - (((@{deplacement}+@{force}) + abs(@{deplacement}-@{force})) / 2) )) / 2)*6)+10)+@{santeModif}" disabled /></td>
-								<td class="tab-padding-right" ><input type="number" name="attr_santeModif" min="0" value="0" class="center" style="width:100%" /></td>
-							</tr>
-							<tr>
-								<th class="tab-padding-left left"><h4>Espoir</h4></th>
-								<td><input type="number" name="attr_espoir" min="0" value="50" class="center" style="width:100%" /></td>
-								<td><input type="number" name="attr_espoir_max" min="0" value="50+@{espoirModif}" class="center" style="width:100%" disabled /></td>
-								<td class="tab-padding-right"><input type="number" name="attr_espoirModif" min="0" value="0" class="center" style="width:100%" /></td>
-							</tr>
-							<tr>
-								<th class="tab-padding-left tab-padding-bottom left"><h4>Héroisme</h4></th>
-								<td class="tab-padding-bottom"><input type="number" name="attr_heroisme" min="0" max="6" value="0" class="center" style="width:100%" /></td>
-								<td class="tab-padding-bottom"><input type="number" name="attr_heroisme_max" min="0" value="6+@{heroismeModif}" class="center" style="width:100%" disabled /></td>
-								<td class="tab-padding-bottom tab-padding-right"><input type="number" name="attr_heroismeModif" min="0" value="0" class="center" style="width:100%" /></td>
-							</tr>
-						</table>
-					</div>
-					<div class="Necr">
-					<input type="checkbox" name="attr_armure" class="checkNecr hidden" value="necromancer" />
-					<table class="tableNecr hidden">
-						<tr>
-							<th class="tab-padding-left" style="width:25%"></th>
-							<th style="width:25%"><h4>Actuel</h4></th>
-							<th style="width:25%"><h4>Maximum</h4></th>
-							<th class="tab-padding-right" style="25%"><h4>Modif</h4></th>
-						</tr>
-						<tr>
-							<th class="tab-padding-left left"><h4>Santé</h4></th>
-							<td><input type="number" name="attr_sante" min="0" value="0" class="center" style="width:100%" /></td>
-							<td><input type="number" name="attr_sante_max" min="0" class="center" style="width:100%" value="(((((@{endurance} + (((@{deplacement}+@{force}) + abs(@{deplacement}-@{force})) / 2) ) + abs(@{endurance} - (((@{deplacement}+@{force}) + abs(@{deplacement}-@{force})) / 2) )) / 2)*6)+10)+@{santeModif}" disabled /></td>
-							<td class="tab-padding-right" ><input type="number" name="attr_santeModif" min="0" value="0" class="center" style="width:100%" /></td>
-						</tr>
-						<tr>
-							<th class="tab-padding-left left"><h4>Espoir</h4></th>
-							<td><input type="number" name="attr_espoirNecr" min="0" value="10" class="center" style="width:100%" /></td>
-							<td><input type="number" name="attr_espoirNecr_max" min="0" value="10+@{espoirNecrModif}" class="center" style="width:100%" disabled /></td>
-							<td class="tab-padding-right"><input type="number" name="attr_espoirNecrModif" min="0" value="0" class="center" style="width:100%" /></td>
-						</tr>
-						<tr>
-							<th class="tab-padding-left tab-padding-bottom left"><h4>Héroisme</h4></th>
-							<td class="tab-padding-bottom"><input type="number" name="attr_heroisme" min="0" max="6" value="0" class="center" style="width:100%" /></td>
-							<td class="tab-padding-bottom"><input type="number" name="attr_heroisme_max" min="0" value="6+@{heroismeModif}" class="center" style="width:100%" disabled /></td>
-							<td class="tab-padding-bottom tab-padding-right"><input type="number" name="attr_heroismeModif" min="0" value="0" class="center" style="width:100%" /></td>
-						</tr>
-					</table>
-				</div>
 				</div>
 				<div class="Initiative Separation">
 					<div class="All except Guardian et Warrior">
@@ -2114,7 +2067,7 @@
 						</table>
 					</div>
 					<div class="Guardian">
-						<input type="checkbox" name="attr_armure" class="checkGuardian hidden" value="guardian" />			
+						<input type="checkbox" name="attr_armure" class="checkGuardian hidden" value="guardian" checked />			
 						
 						<input type="number" name="attr_discretionTotalGuardian" class="hidden" value="@{discretion}" disabled />
 						<input type="number" name="attr_perceptionTotalGuardian" class="hidden" value="@{perception}" disabled />
@@ -2158,7 +2111,7 @@
 				</div>
 				<div class="Defense Separation">
 					<div class="Guardian">
-						<input type="checkbox" name="attr_armure" class="checkGuardian hidden" value="guardian" />
+						<input type="checkbox" name="attr_armure" class="checkGuardian hidden" value="guardian" checked />
 						<input type="number" name="attr_hargneTotalGuardian" class="hidden" value="@{hargne}" disabled />
 						<input type="number" name="attr_combatTotalGuardian" class="hidden" value="@{combat}" disabled />
 						<input type="number" name="attr_instinctTotalGuardian" class="hidden" value="@{instinct}" disabled />
@@ -2512,8 +2465,8 @@
 						</tr>
 						<tr>
 							<th class="tab-padding-left left"><h4>Santé</h4></th>
-							<td><input type="number" name="attr_sante" min="0" value="0" class="center" style="width:100%" /></td>
-							<td class="tab-padding-right"><input type="number" name="attr_sante_max" min="0" class="center" style="width:100%" value="0" /></td>
+							<td><input type="number" name="attr_santePNJ" min="0" value="0" class="center" style="width:100%" /></td>
+							<td class="tab-padding-right"><input type="number" name="attr_santePNJ_max" min="0" class="center" style="width:100%" value="0" /></td>
 						</tr>
 						<tr>
 							<th class="tab-padding-left left tab-padding-bottom"><h4>Espoir</h4></th>
@@ -2962,13 +2915,8 @@
 							<th class="tab-padding-top tab-padding-right tab-padding-left" colspan="3"><h4>Mod Companions</h4></th>
 						</tr>
 						<tr>
-							<td class="tab-padding-left center">PE</td>
-							<td class="center"><input type="radio" name="attr_choixCompanons" value="aucun"/></td>
-							<td><input type="radio" name="attr_choixCompanons" value="lion"/></td>
-						</tr>
-						<tr>
-							<td class="tab-padding-left center">
-								<select name="attr_druidEnergieCompanon" class="center" style="width:50%">
+							<td class="tab-padding-left center" rowspan="2">PE<br/>
+								<select name="attr_druidEnergieCompanon" class="center" style="width:100%">
 									<option value="10" selected>10</option>
 									<option value="20">20</option>
 									<option value="30">30</option>
@@ -2976,18 +2924,12 @@
 									<option value="50">50</option>
 								</select>
 							</td>
-							<td class="center">Aucun</td>
-							<td class="center">Lion</td>
+							<td class="center"><input type="radio" name="attr_choixCompanons" class="tabType" value="aucun" checked /><span title="Aucun" class="tabType tab1"></span></td>
+							<td><input type="radio" name="attr_choixCompanons" class="tabType" value="lion"/><span title="Lion" class="tabType tab1"></span></td>
 						</tr>
 						<tr>
-							<td></td>
-							<td class="center"><input type="radio" name="attr_choixCompanons" value="wolf" /></td>
-							<td class="center"><input type="radio" name="attr_choixCompanons" value="crow"/></td>
-						</tr>
-						<tr>
-							<td></td>
-							<td class="center">Wolf</td>
-							<td class="center">Crow</td>
+							<td class="center"><input type="radio" name="attr_choixCompanons" class="tabType" value="wolf" /><span title="Wolf" class="tabType tab1"></span></td>
+							<td><input type="radio" name="attr_choixCompanons" class="tabType" value="crow"/><span title="Crow" class="tabType tab1"></span></td>
 						</tr>
 					</table>
 					<input type="text" name="attr_atkCompBM" class="hidden" readonly />
@@ -5435,7 +5377,7 @@
 												<option value="{{portee=Longue}}">Longue</option>
 												<option value="{{portee=Lointaine}}">Lointaine</option>
 											</select>
-										<td style="width:20%" class="center"><button type="roll" name="attr_druidLionArme" value="@{jetGM} &{template:druidCombat} @{aspectDruidLion} {{BeteAE=[[@{druidLionBeteAE}]]}} {{Bete=[[@{druidLionBeteTot}]]}} {{Nom=Lion}} {{Special=@{name}}} {{@{styleCombatCompagnon}=@{styleCombatCompagnon}}} {{style=@{styleCombatCompagnon}}} {{Degats=[[[[@{degatDruidLion}+@{chargeurExplosives}-@{munitionsNonLetales}-@{chargeurGrappes}-@{munitionsIEM}+@{revetementOmega}]]D6+@{degatBonusDruidLion}]]}} {{styleDgtBM=[[[[@{degatDruidLion}+@{chargeurExplosives}-@{munitionsNonLetales}-@{chargeurGrappes}-@{munitionsIEM}+@{revetementOmega}]]D6]]}} {{Violence=[[[[@{violenceDruidLion}-@{chargeurExplosives}-@{munitionsNonLetales}-@{munitionsIEM}]]D6+@{violenceBonusDruidLion}]]}} {{styleViolBM=[[ [[@{violenceDruidLion}-@{chargeurExplosives}-@{munitionsNonLetales}-@{munitionsIEM}]]D6]]}} @{porteeDruidLion} @{destructeur} @{fureur} @{leste} @{meurtrier} @{orfevrerie} @{precision} @{tirSecurite} @{ultraViolence} @{antiAnatheme} @{antiVehicule} @{artillerie} @{assistanceAttaque} @{barrage} @{chargeur} @{choc} @{defense} @{deuxMains} @{dispersion} @{degatContinue} @{demoralisant} @{designation} @{enChaine} @{esperance} @{ignoreArmure} @{ignoreCdF} @{lourd} @{lumiere} @{obliteration} @{penetrant} @{perceArmure} @{reaction} @{silencieux} @{tenebricite} @{akimbo} @{ambidextrie} @{tirRafale} @{assassin} {{cadence=[[ceil(@{cadence})]]}} {{scoreCadence=@{cadenceValue}}} @{soumission} {{chargeurGrappes=[[1D6]]}} {{ballesGrappes=[[@{chargeurGrappes}]]}} {{chargeurExplosives=[[1D6]]}} {{ballesExplosives=[[@{chargeurExplosives}]]}} @{pointeurLaser} @{lunetteIntelligente} @{canonLong} @{munitionsSubsoniques} @{protectionArme} @{structureElement} @{munitionsHyperVelocite} @{munitionsDrone} {{munitionsNonLetales=[[@{munitionsNonLetales}]]}} {{munitionsIEM=[[@{munitionsIEM}]]}} @{interfaceGuidage} @{jumelage} {{chambreDouble=[[@{chambreDouble}]]}} {{chambreDoubleDegats=[[2D6]]}} {{chambreDoubleViolence=[[2D6]]}} @{systemeRefroidissement} {{revetementOmega=[[@{revetementOmega}D6]]}} {{totalD=[[@{degatDruidLion}+@{chargeurExplosives}-@{chargeurGrappes}-@{munitionsNonLetales}-@{munitionsIEM}+@{revetementOmega}]]}} {{totalV=[[@{violenceDruidLion}+@{chargeurGrappes}-@{chargeurExplosives}-@{munitionsNonLetales}-@{munitionsIEM}]]}} {{minimumD=[[1D6]]}} {{minimumV=[[1D6]]}} {{minimumSD=[[1D6]]}} {{minimumSV=[[1D6]]}} {{totalDCD=[[@{degatDruidLion}+@{chargeurExplosives}-@{chargeurGrappes}-@{munitionsNonLetales}-@{munitionsIEM}+@{revetementOmega}+2]]}} {{totalVCD=[[@{violenceDruidLion}+@{chargeurGrappes}-@{chargeurExplosives}-@{munitionsNonLetales}-@{munitionsIEM}+2]]} {{styleDgtBMCD=[[[[@{degatDruidLion}+@{chargeurExplosives}-@{munitionsNonLetales}-@{chargeurGrappes}-@{munitionsIEM}+@{revetementOmega}+2]]D6]]}} {{styleViolBMCD=[[ [[@{violenceDruidLion}-@{chargeurExplosives}-@{munitionsNonLetales}-@{munitionsIEM}+2]]D6]]}}" /></td>
+										<td style="width:20%" class="center"><button type="roll" name="attr_druidLionArme" value="@{jetGM} &{template:druidCombat} @{aspectDruidLion} {{BeteAE=[[@{druidLionBeteAE}]]}} {{Bete=[[@{druidLionBeteTot}]]}} {{Nom=Lion}} {{Special=@{name}}} {{@{styleCombatCompagnon}=@{styleCombatCompagnon}}} {{style=@{styleCombatCompagnon}}} {{Degats=[[[[@{degatDruidLion}+@{chargeurExplosives}-@{munitionsNonLetales}-@{chargeurGrappes}-@{munitionsIEM}+@{revetementOmega}]]D6+@{degatBonusDruidLion}]]}} {{styleDgtBM=[[[[@{degatDruidLion}+@{chargeurExplosives}-@{munitionsNonLetales}-@{chargeurGrappes}-@{munitionsIEM}+@{revetementOmega}]]D6]]}} {{Violence=[[[[@{violenceDruidLion}-@{chargeurExplosives}-@{munitionsNonLetales}-@{munitionsIEM}]]D6+@{violenceBonusDruidLion}]]}} {{styleViolBM=[[ [[@{violenceDruidLion}-@{chargeurExplosives}-@{munitionsNonLetales}-@{munitionsIEM}]]D6]]}} @{porteeDruidLion} @{destructeur} @{fureur} @{leste} @{meurtrier} @{orfevrerie} @{precision} @{tirSecurite} @{ultraViolence} @{antiAnatheme} @{antiVehicule} @{artillerie} @{assistanceAttaque} @{barrage} @{chargeur} @{choc} @{defense} @{deuxMains} @{dispersion} @{degatContinue} @{demoralisant} @{designation} @{enChaine} @{esperance} @{ignoreArmure} @{ignoreCdF} @{lourd} @{lumiere} @{obliteration} @{penetrant} @{perceArmure} @{reaction} @{silencieux} {{silencieuxD=[[floor((@{druidLionMasqueTot})/2)+@{druidLionMasqueAE}]]}} @{tenebricite} @{akimbo} @{ambidextrie} @{tirRafale} @{assassin} {{cadence=[[ceil(@{cadence})]]}} {{scoreCadence=@{cadenceValue}}} @{soumission} {{chargeurGrappes=[[1D6]]}} {{ballesGrappes=[[@{chargeurGrappes}]]}} {{chargeurExplosives=[[1D6]]}} {{ballesExplosives=[[@{chargeurExplosives}]]}} @{pointeurLaser} @{lunetteIntelligente} @{canonLong} @{munitionsSubsoniques} @{protectionArme} @{structureElement} @{munitionsHyperVelocite} @{munitionsDrone} {{munitionsNonLetales=[[@{munitionsNonLetales}]]}} {{munitionsIEM=[[@{munitionsIEM}]]}} @{interfaceGuidage} @{jumelage} {{chambreDouble=[[@{chambreDouble}]]}} {{chambreDoubleDegats=[[2D6]]}} {{chambreDoubleViolence=[[2D6]]}} @{systemeRefroidissement} {{revetementOmega=[[@{revetementOmega}D6]]}} {{totalD=[[@{degatDruidLion}+@{chargeurExplosives}-@{chargeurGrappes}-@{munitionsNonLetales}-@{munitionsIEM}+@{revetementOmega}]]}} {{totalV=[[@{violenceDruidLion}+@{chargeurGrappes}-@{chargeurExplosives}-@{munitionsNonLetales}-@{munitionsIEM}]]}} {{minimumD=[[1D6]]}} {{minimumV=[[1D6]]}} {{minimumSD=[[1D6]]}} {{minimumSV=[[1D6]]}} {{totalDCD=[[@{degatDruidLion}+@{chargeurExplosives}-@{chargeurGrappes}-@{munitionsNonLetales}-@{munitionsIEM}+@{revetementOmega}+2]]}} {{totalVCD=[[@{violenceDruidLion}+@{chargeurGrappes}-@{chargeurExplosives}-@{munitionsNonLetales}-@{munitionsIEM}+2]]} {{styleDgtBMCD=[[[[@{degatDruidLion}+@{chargeurExplosives}-@{munitionsNonLetales}-@{chargeurGrappes}-@{munitionsIEM}+@{revetementOmega}+2]]D6]]}} {{styleViolBMCD=[[ [[@{violenceDruidLion}-@{chargeurExplosives}-@{munitionsNonLetales}-@{munitionsIEM}+2]]D6]]}}" /></td>
 									</tr>
 									<tr>
 										<td class="tab-padding-left tab-padding-right" class="titreEffet" colspan="6" style="border:1px solid LightSteelBlue;background-color:LightSteelBlue;">
@@ -5548,7 +5490,7 @@
 												<span class="revealESpec hidden">Jumelé (Ambidextrie) /</span>
 											</span>
 											<span class="Leste">
-												<input type="checkbox" name="attr_leste" class="hidden checkShowESpec" value="{{leste=[[@{force}]]}}" />
+												<input type="checkbox" name="attr_leste" class="hidden checkShowESpec" value="{{leste=[[floor((@{druidLionChairTot})/2)]]}}" />
 												<span class="revealESpec hidden">Lesté /</span>
 											</span>
 											<span class="Lourd">
@@ -5569,7 +5511,7 @@
 												<span class="revealESpec hidden">Oblitération /</span>
 											</span>
 											<span class="Orfevrerie">
-												<input type="checkbox" name="attr_orfevrerie" class="hidden checkShowESpec" value="{{orfevrerie=[[@{dexterite}]]}}" />
+												<input type="checkbox" name="attr_orfevrerie" class="hidden checkShowESpec" value="{{orfevrerie=[[floor((@{druidLionMasqueTot})/2)+@{druidLionMasqueAE}]]}}" />
 												<span class="revealESpec hidden">Orfévrerie /</span>
 											</span>
 											<span class="Penetrant">
@@ -5583,7 +5525,7 @@
 												<span class="revealESpec hidden">Perce Armure <span name="attr_perceArmureValue"></span> /</span>
 											</span>
 											<span class="Precision">
-												<input type="checkbox" name="attr_precision" class="hidden checkShowESpec" value="{{precision=[[@{tir}+@{tirOD}]]}}" />
+												<input type="checkbox" name="attr_precision" class="hidden checkShowESpec" value="{{precision=[[floor((@{druidLionMachineTot})/2)+@{druidLionMachineAE}]]}}" />
 												<span class="revealESpec hidden">Précision /</span>
 											</span>
 											<span class="Reaction">
@@ -5592,7 +5534,7 @@
 												<span class="revealESpec hidden">Réaction <span name="attr_reactionValue"></span> /</span>
 											</span>
 											<span class="Silencieux">
-												<input type="checkbox" name="attr_silencieux" class="hidden checkShowESpec" value="{{silencieuxD=[[@{druidLionMasqueTot}/2]]}}" />
+												<input type="checkbox" name="attr_silencieux" class="hidden checkShowESpec" value="{{silencieux=Silencieux}}" />
 												<span class="revealESpec hidden">Silencieux /</span>
 											</span>
 											<span class="Soumssion">
@@ -5970,7 +5912,7 @@
 												</tr>
 												<tr style="height:31px;">
 													<td>
-														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}]]}}" />
+														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
 													</td>
 													<td colspan="2">
 														Orfévrerie
@@ -8002,7 +7944,7 @@
 											</tr>
 											<tr style="height:31px;">
 												<td>
-													<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}]]}}" />
+													<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
 												</td>
 												<td colspan="2">
 													Orfévrerie
@@ -8532,7 +8474,7 @@
 											</tr>
 											<tr style="height:31px;">
 												<td>
-													<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}]]}}" />
+													<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
 												</td>
 												<td colspan="2">
 													Orfévrerie
@@ -9033,7 +8975,7 @@
 				</div>
 				<br/>
 				<div class="Guardian">
-					<input type="checkbox" name="attr_armure" class="checkGuardian hidden" value="guardian" />
+					<input type="checkbox" name="attr_armure" class="checkGuardian hidden" value="guardian" checked />
 					<table class="tableGuardian hidden">
 						<tr>
 							<td class="tab-padding-left" style="width:40%"></td>
@@ -9665,7 +9607,7 @@
 		<input type="checkbox" name="attr_tabDistance" class="tabArmes tabDistance hidden" value="1" checked>
 		<div class="tabDistance hidden" style="margin-top:20px">
 			<div class="Guardian">
-				<input type="checkbox" name="attr_armure" class="checkGuardian hidden" value="guardian" />
+				<input type="checkbox" name="attr_armure" class="checkGuardian hidden" value="guardian" checked />
 				<table class="tableGuardian hidden">
 					<tr>
 						<th><h2>Armes à distances</h2></th>
@@ -9971,7 +9913,7 @@
 												</tr>
 												<tr style="height:31px;">
 													<td>
-														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}]]}}" />
+														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
 													</td>
 													<td colspan="2">
 														Orfévrerie
@@ -10500,7 +10442,7 @@
 												</tr>
 												<tr style="height:31px;">
 													<td>
-														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}]]}}" />
+														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
 													</td>
 													<td colspan="2">
 														Orfévrerie
@@ -11038,7 +10980,7 @@
 												</tr>
 												<tr style="height:31px;">
 													<td>
-														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}]]}}" />
+														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
 													</td>
 													<td colspan="2">
 														Orfévrerie
@@ -11567,7 +11509,7 @@
 												</tr>
 												<tr style="height:31px;">
 													<td>
-														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}]]}}" />
+														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
 													</td>
 													<td colspan="2">
 														Orfévrerie
@@ -12096,7 +12038,7 @@
 												</tr>
 												<tr style="height:31px;">
 													<td>
-														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}]]}}" />
+														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
 													</td>
 													<td colspan="2">
 														Orfévrerie
@@ -12625,7 +12567,7 @@
 												</tr>
 												<tr style="height:31px;">
 													<td>
-														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}]]}}" />
+														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
 													</td>
 													<td colspan="2">
 														Orfévrerie
@@ -12851,7 +12793,7 @@
 		<input type="checkbox" name="attr_tabMelee" class="tabArmes tabMelee hidden" value="2" checked>
 		<div class="tabMelee hidden" style="margin-top:20px">
 			<div class="Guardian">
-				<input type="checkbox" name="attr_armure" class="checkGuardian hidden" value="guardian" />
+				<input type="checkbox" name="attr_armure" class="checkGuardian hidden" value="guardian" checked />
 				<table class="tableGuardian hidden">
 					<tr>
 						<th><h2>Armes de mêlée</h2></th>
@@ -12933,7 +12875,7 @@
 											</select>
 										</td>
 										<td style="width:5%" class="tab-padding-right center">
-										<button type="roll" value="@{jetGM} &{template:contact} {{Nom=@{name}}} {{Arme=@{ArmeCaC}}} @{caracteristique1GuardianCombat} @{jetModifDes}-floor(@{cadence})@{atkBM}+ @{caracteristique2GuardianCombat} {{situationnel=[[@{jetModifDes}]]}} {{force=@{force}}} {{@{styleCombat}=@{styleCombat}}} {{style=@{styleCombat}}} {{styleDgtBM=[[ [[@{armeCaCDegat}]]d6]]}} {{styleViolBM=[[ (floor([[@{armeCaCViolence}]]/2))d6]]  }} {{BonusForce=[[@{forOD}*3]]}} {{Degats=[[ [[@{armeCaCDegat}]]d6+@{armeCaCBDegat}]]}} {{Violence=[[ [[@{armeCaCViolence}]]d6+@{armeCaCBViolence}]]}} {{Portee=@{armeCaCPortee}}} @{destructeur} @{fureur} @{leste} @{meurtrier} @{orfevrerie} @{precision} @{tirSecurite} @{ultraViolence} @{antiAnatheme} @{antiVehicule} @{artillerie} @{antiAnatheme} @{assistanceAttaque} @{barrage} @{chargeur} @{choc} @{defense} @{deuxMains} @{dispersion} @{degatContinue} @{demoralisant} @{designation} @{enChaine} @{esperance} @{ignoreArmure} @{ignoreCdF} @{lourd} @{lumiere} @{obliteration} @{penetrant} @{perceArmure} @{reaction} @{silencieux} {{silencieuxD=[[@{discretion}+@{dextOD}]]}} @{tenebricite}@{akimbo} @{ambidextrie} @{tirRafale} @{assassin} {{cadence=[[ceil(@{cadence})]]}} {{scoreCadence=@{cadenceValue}}} @{soumission}  {{totalD=[[1]]}} {{totalV=[[1]]}}" name="attr_jetCaCGuardian"/>
+										<button type="roll" value="@{jetGM} &{template:contact} {{Nom=@{name}}} {{Arme=@{ArmeCaC}}} @{caracteristique1GuardianCombat} @{jetModifDes}-floor(@{cadence})@{atkBM}+ @{caracteristique2GuardianCombat} {{situationnel=[[@{jetModifDes}]]}} {{force=[[@{force}]]}} {{@{styleCombat}=@{styleCombat}}} {{style=@{styleCombat}}} {{styleDgtBM=[[ [[@{armeCaCDegat}]]d6]]}} {{styleViolBM=[[ (floor([[@{armeCaCViolence}]]/2))d6]]  }} {{BonusForce=[[@{forOD}*3]]}} {{Degats=[[ [[@{armeCaCDegat}]]d6+@{armeCaCBDegat}]]}} {{Violence=[[ [[@{armeCaCViolence}]]d6+@{armeCaCBViolence}]]}} {{Portee=@{armeCaCPortee}}} @{destructeur} @{fureur} @{leste} @{meurtrier} @{orfevrerie} @{precision} @{tirSecurite} @{ultraViolence} @{antiAnatheme} @{antiVehicule} @{artillerie} @{antiAnatheme} @{assistanceAttaque} @{barrage} @{chargeur} @{choc} @{defense} @{deuxMains} @{dispersion} @{degatContinue} @{demoralisant} @{designation} @{enChaine} @{esperance} @{ignoreArmure} @{ignoreCdF} @{lourd} @{lumiere} @{obliteration} @{penetrant} @{perceArmure} @{reaction} @{silencieux} {{silencieuxD=[[@{discretion}+@{dextOD}]]}} @{tenebricite}@{akimbo} @{ambidextrie} @{tirRafale} @{assassin} {{cadence=[[ceil(@{cadence})]]}} {{scoreCadence=@{cadenceValue}}} @{soumission}  {{totalD=[[1]]}} {{totalV=[[1]]}}" name="attr_jetCaCGuardian"/>
 										</td>
 									</tr>
 									<tr>
@@ -13157,7 +13099,7 @@
 												</tr>
 												<tr style="height:31px;">
 													<td>
-														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}]]}}" />
+														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
 													</td>
 													<td colspan="2">
 														Orfévrerie
@@ -13328,7 +13270,7 @@
 											</select>
 										</td>
 										<td style="width:5%" class="tab-padding-right center">
-										<button type="roll" value="@{jetGM} &{template:contact} {{Nom=@{name}}} {{Arme=@{ArmeCaC}}} @{caracteristique1CombatBarb} @{jetModifDes}-floor(@{cadence})@{atkBM}+ @{caracteristique2CombatBarb} {{situationnel=[[@{jetModifDes}]]}} {{taille=[[@{barbarianGoliath}]]}} {{BonusForce=[[@{forOD}*3]]}} {{force=@{force}}} {{@{styleCombat}=@{styleCombat}}} {{style=@{styleCombat}}} {{styleDgtBM=[[ [[@{armeCaCDegat}]]d6]]}} {{styleViolBM=[[ (floor([[@{armeCaCViolence}]]/2))d6]]  }} {{Degats=[[ [[@{armeCaCDegat}]]d6+@{armeCaCBDegat}]]}} {{Violence=[[ [[@{armeCaCViolence}]]d6+@{armeCaCBViolence}]]}} {{Portee=@{armeCaCPortee}}} {{modeGoliathD=[[@{barbarianDegat}D6]] }} {{modeGoliathV=[[@{barbarianDegat}D6]] }} @{destructeur} @{fureur} @{leste} @{meurtrier} @{orfevrerie} @{precision} @{tirSecurite} @{ultraViolence} @{antiAnatheme} @{antiVehicule} @{artillerie} @{assistanceAttaque} @{barrage} @{chargeur} @{choc} @{defense} @{deuxMains} @{dispersion} @{degatContinue} @{demoralisant} @{designation} @{enChaine} @{esperance} @{ignoreArmure} @{ignoreCdF} @{lourd} @{lumiere} @{obliteration} @{penetrant} @{perceArmure} @{reaction} @{silencieux} {{silencieuxD=[[@{discretion}+@{discrOD}]]}} @{tenebricite} @{akimbo} @{ambidextrie} @{tirRafale} @{assassin} {{cadence=[[ceil(@{cadence})]]}} {{scoreCadence=@{cadenceValue}}} @{soumission} {{totalD=[[1]]}} {{totalV=[[1]]}}" name="attr_jetCaCBarbarian"/>								</td>
+										<button type="roll" value="@{jetGM} &{template:contact} {{Nom=@{name}}} {{Arme=@{ArmeCaC}}} @{caracteristique1CombatBarb} @{jetModifDes}-floor(@{cadence})@{atkBM}+ @{caracteristique2CombatBarb} {{situationnel=[[@{jetModifDes}]]}} {{taille=[[@{barbarianGoliath}]]}} {{BonusForce=[[@{forOD}*3]]}} {{force=[[@{force}]]}} {{@{styleCombat}=@{styleCombat}}} {{style=@{styleCombat}}} {{styleDgtBM=[[ [[@{armeCaCDegat}]]d6]]}} {{styleViolBM=[[ (floor([[@{armeCaCViolence}]]/2))d6]]  }} {{Degats=[[ [[@{armeCaCDegat}]]d6+@{armeCaCBDegat}]]}} {{Violence=[[ [[@{armeCaCViolence}]]d6+@{armeCaCBViolence}]]}} {{Portee=@{armeCaCPortee}}} {{modeGoliathD=[[@{barbarianDegat}D6]] }} {{modeGoliathV=[[@{barbarianDegat}D6]] }} @{destructeur} @{fureur} @{leste} @{meurtrier} @{orfevrerie} @{precision} @{tirSecurite} @{ultraViolence} @{antiAnatheme} @{antiVehicule} @{artillerie} @{assistanceAttaque} @{barrage} @{chargeur} @{choc} @{defense} @{deuxMains} @{dispersion} @{degatContinue} @{demoralisant} @{designation} @{enChaine} @{esperance} @{ignoreArmure} @{ignoreCdF} @{lourd} @{lumiere} @{obliteration} @{penetrant} @{perceArmure} @{reaction} @{silencieux} {{silencieuxD=[[@{discretion}+@{discrOD}]]}} @{tenebricite} @{akimbo} @{ambidextrie} @{tirRafale} @{assassin} {{cadence=[[ceil(@{cadence})]]}} {{scoreCadence=@{cadenceValue}}} @{soumission} {{totalD=[[1]]}} {{totalV=[[1]]}}" name="attr_jetCaCBarbarian"/>								</td>
 									</tr>
 									<tr>
 										<td class="tab-padding-left tab-padding-right" class="titreEffet" colspan="12" style="border:1px solid LightSteelBlue;background-color:LightSteelBlue;">
@@ -13551,7 +13493,7 @@
 												</tr>
 												<tr style="height:31px;">
 													<td>
-														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}]]}}" />
+														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
 													</td>
 													<td colspan="2">
 														Orfévrerie
@@ -13731,7 +13673,7 @@
 											</select>
 										</td>
 										<td style="width:5%" class="tab-padding-right center">
-										<button type="roll" value="@{jetGM} &{template:contact} {{Nom=@{name}}} {{Arme=@{ArmeCaC}}} @{caracteristique1Combat} @{jetModifDes}-floor(@{cadence})@{atkBM}+ @{caracteristique2Combat} {{situationnel=[[@{jetModifDes}]]}} {{force=@{force}}} {{@{styleCombat}=@{styleCombat}}} {{style=@{styleCombat}}} {{styleDgtBM=[[ [[@{armeCaCDegat}]]d6]]}} {{styleViolBM=[[ (floor([[@{armeCaCViolence}]]/2))d6]]  }} {{BonusForce=[[@{forOD}*3]]}} {{Degats=[[ [[@{armeCaCDegat}]]d6+@{armeCaCBDegat}]]}} {{Violence=[[ [[@{armeCaCViolence}]]d6+@{armeCaCBViolence}]]}} {{Portee=@{armeCaCPortee}}} @{destructeur} @{fureur} @{leste} @{meurtrier} @{orfevrerie} @{precision} @{tirSecurite} @{ultraViolence} @{antiAnatheme} @{antiVehicule} @{artillerie} @{antiAnatheme} @{assistanceAttaque} @{barrage} @{chargeur} @{choc} @{defense} @{deuxMains} @{dispersion} @{degatContinue} @{demoralisant} @{designation} @{enChaine} @{esperance} @{ignoreArmure} @{ignoreCdF} @{lourd} @{lumiere} @{obliteration} @{penetrant} @{perceArmure} @{reaction} @{silencieux} {{silencieuxD=[[@{discretion}+@{discrOD}]]}} @{tenebricite} @{akimbo} @{ambidextrie} @{tirRafale} @{assassin} {{cadence=[[ceil(@{cadence})]]}} {{scoreCadence=@{cadenceValue}}} @{soumission}  {{totalD=[[1]]}} {{totalV=[[1]]}}" name="attr_jetCaC"/>
+										<button type="roll" value="@{jetGM} &{template:contact} {{Nom=@{name}}} {{Arme=@{ArmeCaC}}} @{caracteristique1Combat} @{jetModifDes}-floor(@{cadence})@{atkBM}+ @{caracteristique2Combat} {{situationnel=[[@{jetModifDes}]]}} {{force=[[@{force}]]}} {{@{styleCombat}=@{styleCombat}}} {{style=@{styleCombat}}} {{styleDgtBM=[[ [[@{armeCaCDegat}]]d6]]}} {{styleViolBM=[[ (floor([[@{armeCaCViolence}]]/2))d6]]  }} {{BonusForce=[[@{forOD}*3]]}} {{Degats=[[ [[@{armeCaCDegat}]]d6+@{armeCaCBDegat}]]}} {{Violence=[[ [[@{armeCaCViolence}]]d6+@{armeCaCBViolence}]]}} {{Portee=@{armeCaCPortee}}} @{destructeur} @{fureur} @{leste} @{meurtrier} @{orfevrerie} @{precision} @{tirSecurite} @{ultraViolence} @{antiAnatheme} @{antiVehicule} @{artillerie} @{antiAnatheme} @{assistanceAttaque} @{barrage} @{chargeur} @{choc} @{defense} @{deuxMains} @{dispersion} @{degatContinue} @{demoralisant} @{designation} @{enChaine} @{esperance} @{ignoreArmure} @{ignoreCdF} @{lourd} @{lumiere} @{obliteration} @{penetrant} @{perceArmure} @{reaction} @{silencieux} {{silencieuxD=[[@{discretion}+@{discrOD}]]}} @{tenebricite} @{akimbo} @{ambidextrie} @{tirRafale} @{assassin} {{cadence=[[ceil(@{cadence})]]}} {{scoreCadence=@{cadenceValue}}} @{soumission}  {{totalD=[[1]]}} {{totalV=[[1]]}}" name="attr_jetCaC"/>
 										</td>
 									</tr>
 									<tr>
@@ -13955,7 +13897,7 @@
 												</tr>
 												<tr style="height:31px;">
 													<td>
-														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}]]}}" />
+														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
 													</td>
 													<td colspan="2">
 														Orfévrerie
@@ -14126,7 +14068,7 @@
 											</select>
 										</td>
 										<td style="width:5%" class="tab-padding-right center">
-											<button type="roll" value="@{jetGM} &{template:rogueContact} {{Nom=@{name}}} {{Arme=@{ArmeCaC}}} @{caracteristique1Combat} @{jetModifDes}-floor(@{cadence})@{atkBM}+ @{caracteristique2Combat} {{situationnel=[[@{jetModifDes}]]}} @{rogueGhost} {{BonusForce=[[@{forOD}*3]]}} {{force=@{force}}} {{@{styleCombat}=@{styleCombat}}} {{style=@{styleCombat}}} {{styleDgtBM=[[ [[@{armeCaCDegat}]]d6]]}} {{styleViolBM=[[ (floor([[@{armeCaCViolence}]]/2))d6]]  }} {{modeGhostOD=[[@{discrOD}]]}} {{modeGhostTotal=[[{[[@{discretion}]]d6cs2cs4cs6cf1cf3cf5s%2}=0+[[@{discrOD}}]] ]]}} {{Degats=[[ [[@{armeCaCDegat}]]d6+@{armeCaCBDegat}]]}} {{modeGhostDmg=[[@{discretion}+@{discrOD}]]}} {{Violence=[[ [[@{armeCaCViolence}]]d6+@{armeCaCBViolence}]]}} {{Portee=@{armeCaCPortee}}} @{destructeur} @{fureur} @{leste} @{meurtrier} @{orfevrerie} @{precision} @{tirSecurite} @{ultraViolence} @{antiAnatheme} @{antiVehicule} @{artillerie} @{assistanceAttaque} @{barrage} @{chargeur} @{choc} @{defense} @{deuxMains} @{dispersion} @{degatContinue} @{demoralisant} @{designation} @{enChaine} @{esperance} @{ignoreArmure} @{ignoreCdF} @{lourd} @{lumiere} @{obliteration} @{penetrant} @{perceArmure} @{reaction} @{silencieux} {{silencieuxD=[[@{discretion}+@{discrOD}]]}} @{tenebricite} @{akimbo} @{ambidextrie} @{tirRafale} @{assassin} {{cadence=[[ceil(@{cadence})]]}} {{scoreCadence=@{cadenceValue}}} @{soumission} {{totalD=[[1]]}} {{totalV=[[1]]}}" name="attr_jetCaCRogue"/>
+											<button type="roll" value="@{jetGM} &{template:rogueContact} {{Nom=@{name}}} {{Arme=@{ArmeCaC}}} @{caracteristique1Combat} @{jetModifDes}-floor(@{cadence})@{atkBM}+ @{caracteristique2Combat} {{situationnel=[[@{jetModifDes}]]}} @{rogueGhost} {{BonusForce=[[@{forOD}*3]]}} {{force=[[@{force}]]}} {{@{styleCombat}=@{styleCombat}}} {{style=@{styleCombat}}} {{styleDgtBM=[[ [[@{armeCaCDegat}]]d6]]}} {{styleViolBM=[[ (floor([[@{armeCaCViolence}]]/2))d6]]  }} {{modeGhostOD=[[@{discrOD}]]}} {{modeGhostTotal=[[{[[@{discretion}]]d6cs2cs4cs6cf1cf3cf5s%2}=0+[[@{discrOD}}]] ]]}} {{Degats=[[ [[@{armeCaCDegat}]]d6+@{armeCaCBDegat}]]}} {{modeGhostDmg=[[@{discretion}+@{discrOD}]]}} {{Violence=[[ [[@{armeCaCViolence}]]d6+@{armeCaCBViolence}]]}} {{Portee=@{armeCaCPortee}}} @{destructeur} @{fureur} @{leste} @{meurtrier} @{orfevrerie} @{precision} @{tirSecurite} @{ultraViolence} @{antiAnatheme} @{antiVehicule} @{artillerie} @{assistanceAttaque} @{barrage} @{chargeur} @{choc} @{defense} @{deuxMains} @{dispersion} @{degatContinue} @{demoralisant} @{designation} @{enChaine} @{esperance} @{ignoreArmure} @{ignoreCdF} @{lourd} @{lumiere} @{obliteration} @{penetrant} @{perceArmure} @{reaction} @{silencieux} {{silencieuxD=[[@{discretion}+@{discrOD}]]}} @{tenebricite} @{akimbo} @{ambidextrie} @{tirRafale} @{assassin} {{cadence=[[ceil(@{cadence})]]}} {{scoreCadence=@{cadenceValue}}} @{soumission} {{totalD=[[1]]}} {{totalV=[[1]]}}" name="attr_jetCaCRogue"/>
 										</td>
 									</tr>
 									<tr>
@@ -14350,7 +14292,7 @@
 												</tr>
 												<tr style="height:31px;">
 													<td>
-														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}]]}}" />
+														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
 													</td>
 													<td colspan="2">
 														Orfévrerie
@@ -14521,7 +14463,7 @@
 											</select>
 										</td>
 										<td style="width:5%" class="tab-padding-right center">
-										<button type="roll" value="@{jetGM} &{template:contact} {{Nom=@{name}}} {{Arme=@{ArmeCaC}}} @{caracteristique1Combat} @{jetModifDes}-floor(@{cadence})@{atkBM}+ @{caracteristique2Combat} {{situationnel=[[@{jetModifDes}]]}} {{force=@{force}}} {{@{styleCombat}=@{styleCombat}}} {{style=@{styleCombat}}} {{styleDgtBM=[[ [[@{armeCaCDegat}]]d6]]}} {{styleViolBM=[[ (floor([[@{armeCaCViolence}]]/2))d6]]  }} {{BonusForce=[[@{forOD}*3]]}} {{Degats=[[ [[@{armeCaCDegat}]]d6+@{armeCaCBDegat}]]}} {{Violence=[[ [[@{armeCaCViolence}]]d6+@{armeCaCBViolence}]]}} {{Portee=@{armeCaCPortee}}} @{destructeur} @{fureur} @{leste} @{meurtrier} @{orfevrerie} @{precision} @{tirSecurite} @{ultraViolence} @{antiAnatheme} @{antiVehicule} @{artillerie} @{assistanceAttaque} @{barrage} @{chargeur} @{choc} @{defense} @{deuxMains} @{dispersion} @{degatContinue} @{demoralisant} @{designation} @{enChaine} @{esperance} @{ignoreArmure} @{ignoreCdF} @{lourd} @{lumiere} @{obliteration} @{penetrant} @{perceArmure} @{reaction} @{silencieux} {{silencieuxD=[[@{discretion}+@{discrOD}]]}} @{tenebricite} @{akimbo} @{ambidextrie} @{tirRafale} @{assassin} {{cadence=[[ceil(@{cadence})]]}} {{scoreCadence=@{cadenceValue}}} @{soumission}  @{warmasterImpGPersonnel} {{totalD=[[1]]}} {{totalV=[[1]]}}" name="attr_jetCaCWarmaster"/>
+										<button type="roll" value="@{jetGM} &{template:contact} {{Nom=@{name}}} {{Arme=@{ArmeCaC}}} @{caracteristique1Combat} @{jetModifDes}-floor(@{cadence})@{atkBM}+ @{caracteristique2Combat} {{situationnel=[[@{jetModifDes}]]}} {{force=[[@{force}]]}} {{@{styleCombat}=@{styleCombat}}} {{style=@{styleCombat}}} {{styleDgtBM=[[ [[@{armeCaCDegat}]]d6]]}} {{styleViolBM=[[ (floor([[@{armeCaCViolence}]]/2))d6]]  }} {{BonusForce=[[@{forOD}*3]]}} {{Degats=[[ [[@{armeCaCDegat}]]d6+@{armeCaCBDegat}]]}} {{Violence=[[ [[@{armeCaCViolence}]]d6+@{armeCaCBViolence}]]}} {{Portee=@{armeCaCPortee}}} @{destructeur} @{fureur} @{leste} @{meurtrier} @{orfevrerie} @{precision} @{tirSecurite} @{ultraViolence} @{antiAnatheme} @{antiVehicule} @{artillerie} @{assistanceAttaque} @{barrage} @{chargeur} @{choc} @{defense} @{deuxMains} @{dispersion} @{degatContinue} @{demoralisant} @{designation} @{enChaine} @{esperance} @{ignoreArmure} @{ignoreCdF} @{lourd} @{lumiere} @{obliteration} @{penetrant} @{perceArmure} @{reaction} @{silencieux} {{silencieuxD=[[@{discretion}+@{discrOD}]]}} @{tenebricite} @{akimbo} @{ambidextrie} @{tirRafale} @{assassin} {{cadence=[[ceil(@{cadence})]]}} {{scoreCadence=@{cadenceValue}}} @{soumission}  @{warmasterImpGPersonnel} {{totalD=[[1]]}} {{totalV=[[1]]}}" name="attr_jetCaCWarmaster"/>
 										</td>
 									</tr>
 									<tr>
@@ -14745,7 +14687,7 @@
 												</tr>
 												<tr style="height:31px;">
 													<td>
-														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}]]}}" />
+														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
 													</td>
 													<td colspan="2">
 														Orfévrerie
@@ -14916,7 +14858,7 @@
 											</select>
 										</td>
 										<td style="width:5%" class="tab-padding-right center">
-										<button name="attr_jetCaCWarrior" type="roll" value="@{jetGM} &{template:contact} {{Nom=@{name}}} {{Arme=@{ArmeCaC}}} @{caracteristique1CombatWarr} @{jetModifDes}-floor(@{cadence})@{atkBM}+ @{caracteristique2CombatWarr} {{situationnel=[[@{jetModifDes}]]}} {{BonusForce=[[@{forOD}*3]]}} {{force=@{force}}} {{@{styleCombat}=@{styleCombat}}} {{style=@{styleCombat}}} {{styleDgtBM=[[ [[@{armeCaCDegat}]]d6]]}} {{styleViolBM=[[ (floor([[@{armeCaCViolence}]]/2))d6]]  }} {{Degats=[[ [[@{armeCaCDegat}]]d6+@{armeCaCBDegat}]]}} {{Violence=[[ [[@{armeCaCViolence}]]d6+@{armeCaCBViolence}]]}} {{Portee=@{armeCaCPortee}}} @{destructeur} @{fureur} @{leste} @{meurtrier} @{orfevrerie} @{precision} @{tirSecurite} @{ultraViolence} @{antiAnatheme} @{antiVehicule} @{artillerie} @{antiAnatheme} @{assistanceAttaque} @{barrage} @{chargeur} @{choc} @{defense} @{deuxMains} @{dispersion} @{degatContinue} @{demoralisant} @{designation} @{enChaine} @{esperance} @{ignoreArmure} @{ignoreCdF} @{lourd} @{lumiere} @{obliteration} @{penetrant} @{perceArmure} @{reaction} @{silencieux} {{silencieuxD=[[@{discretion}+@{discrOD}+@{warriorScoutA}]]}} @{tenebricite} @{akimbo} @{ambidextrie} @{tirRafale} @{assassin} {{cadence=[[ceil(@{cadence})]]}} {{scoreCadence=@{cadenceValue}}} @{soumission} {{totalD=[[1]]}} {{totalV=[[1]]}}" />
+										<button name="attr_jetCaCWarrior" type="roll" value="@{jetGM} &{template:contact} {{Nom=@{name}}} {{Arme=@{ArmeCaC}}} @{caracteristique1CombatWarr} @{jetModifDes}-floor(@{cadence})@{atkBM}+ @{caracteristique2CombatWarr} {{situationnel=[[@{jetModifDes}]]}} {{BonusForce=[[@{forOD}*3]]}} {{force=[[@{force}]]}} {{@{styleCombat}=@{styleCombat}}} {{style=@{styleCombat}}} {{styleDgtBM=[[ [[@{armeCaCDegat}]]d6]]}} {{styleViolBM=[[ (floor([[@{armeCaCViolence}]]/2))d6]]  }} {{Degats=[[ [[@{armeCaCDegat}]]d6+@{armeCaCBDegat}]]}} {{Violence=[[ [[@{armeCaCViolence}]]d6+@{armeCaCBViolence}]]}} {{Portee=@{armeCaCPortee}}} @{destructeur} @{fureur} @{leste} @{meurtrier} @{orfevrerie} @{precision} @{tirSecurite} @{ultraViolence} @{antiAnatheme} @{antiVehicule} @{artillerie} @{antiAnatheme} @{assistanceAttaque} @{barrage} @{chargeur} @{choc} @{defense} @{deuxMains} @{dispersion} @{degatContinue} @{demoralisant} @{designation} @{enChaine} @{esperance} @{ignoreArmure} @{ignoreCdF} @{lourd} @{lumiere} @{obliteration} @{penetrant} @{perceArmure} @{reaction} @{silencieux} {{silencieuxD=[[@{discretion}+@{discrOD}+@{warriorScoutA}]]}} @{tenebricite} @{akimbo} @{ambidextrie} @{tirRafale} @{assassin} {{cadence=[[ceil(@{cadence})]]}} {{scoreCadence=@{cadenceValue}}} @{soumission} {{totalD=[[1]]}} {{totalV=[[1]]}}" />
 										</td>
 									</tr>
 									<tr>
@@ -15140,7 +15082,7 @@
 												</tr>
 												<tr style="height:31px;">
 													<td>
-														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}]]}}" />
+														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
 													</td>
 													<td colspan="2">
 														Orfévrerie
@@ -15506,7 +15448,7 @@
 												</tr>
 												<tr style="height:31px;">
 													<td>
-														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}]]}}" />
+														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
 													</td>
 													<td colspan="2">
 														Orfévrerie
@@ -17102,7 +17044,7 @@
 			<input type="checkbox" name="attr_fichePNJ" class="fichePNJHidden fichePNJH" value="1" />
 			<div class="PJ">
 				<div class="Guardian">				
-					<input type="checkbox" name="attr_armure" class="checkGuardian hidden" value="guardian" />
+					<input type="checkbox" name="attr_armure" class="checkGuardian hidden" value="guardian" checked />
 					<table class="tableGuardian hidden">
 						<tr>
 							<th colspan="6"><h4>Grenades</h4></th>

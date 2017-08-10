@@ -5551,63 +5551,46 @@
             if(v.repeating_inventory_useasresource && v.repeating_inventory_useasresource === "1") {
                 if(v.repeating_inventory_itemresourceid && v.repeating_inventory_itemresourceid != "") {
                     if(sourcetype && sourcetype === "player") {
-                        if(v.repeating_inventory_itemresourceid === "other_resource") {
-                            update["other_resource"] = count;
-                            update["other_resource_name"] = name;
-                        }
-                        else {
-                            update["repeating_resource_" + v.repeating_inventory_itemresourceid] = count;
-                            update["repeating_resource_" + v.repeating_inventory_itemresourceid + "_name"] = name;
-                        }
+                        update["repeating_resource_" + v.repeating_inventory_itemresourceid] = count;
+                        update["repeating_resource_" + v.repeating_inventory_itemresourceid + "_name"] = name;
                         setAttrs(update, {silent: true});
                     }
                 }
                 else {
-                    getAttrs(["other_resource_name"], function(x) {
-                        if(x.other_resource_name && x.other_resource_name != "") {
-                            getSectionIDs("repeating_resource", function(idarray) {
-                                if(idarray.length > 0) {
-                                    var match = false;
-                                    _.each(idarray, function(currentID, i) {
-                                        getAttrs(["repeating_resource_" + currentID + "_resource_left_name","repeating_resource_" + currentID + "_resource_right_name"], function(y) {
-                                            if((!y["repeating_resource_" + currentID + "_resource_left_name"] || y["repeating_resource_" + currentID + "_resource_left_name"] === "") && match === false) {
-                                                match = true;
-                                                update["repeating_inventory_itemresourceid"] = currentID + "_resource_left";
-                                                update["repeating_resource_" + currentID + "_resource_left_itemid"] = itemid;
-                                                update["repeating_resource_" + currentID + "_resource_left"] = count;
-                                                update["repeating_resource_" + currentID + "_resource_left_name"] = name;
-                                            }
-                                            else if((!y["repeating_resource_" + currentID + "_resource_right_name"] || y["repeating_resource_" + currentID + "_resource_right_name"] === "") && match === false){
-                                                match = true;
-                                                update["repeating_inventory_itemresourceid"] = currentID + "_resource_right";
-                                                update["repeating_resource_" + currentID + "_resource_right_itemid"] = itemid;
-                                                update["repeating_resource_" + currentID + "_resource_right"] = count;
-                                                update["repeating_resource_" + currentID + "_resource_right_name"] = name;
-                                            }
-                                            if(i === idarray.length - 1 && match === false) {
-                                                update["repeating_inventory_itemresourceid"] = newrowid + "_resource_left";
-                                                update["repeating_resource_" + newrowid + "_resource_left_itemid"] = itemid;
-                                                update["repeating_resource_" + newrowid + "_resource_left"] = count;
-                                                update["repeating_resource_" + newrowid + "_resource_left_name"] = name;
-                                            }
-                                            setAttrs(update, {silent: true});
-                                        });
-                                    });
-                                }
-                                else {
-                                    update["repeating_inventory_itemresourceid"] = newrowid + "_resource_left";
-                                    update["repeating_resource_" + newrowid + "_resource_left_itemid"] = itemid;
-                                    update["repeating_resource_" + newrowid + "_resource_left"] = count;
-                                    update["repeating_resource_" + newrowid + "_resource_left_name"] = name;
+                    getSectionIDs("repeating_resource", function(idarray) {
+                        if(idarray.length > 0) {
+                            var match = false;
+                            _.each(idarray, function(currentID, i) {
+                                getAttrs(["repeating_resource_" + currentID + "_resource_left_name","repeating_resource_" + currentID + "_resource_right_name"], function(y) {
+                                    if((!y["repeating_resource_" + currentID + "_resource_left_name"] || y["repeating_resource_" + currentID + "_resource_left_name"] === "") && match === false) {
+                                        match = true;
+                                        update["repeating_inventory_itemresourceid"] = currentID + "_resource_left";
+                                        update["repeating_resource_" + currentID + "_resource_left_itemid"] = itemid;
+                                        update["repeating_resource_" + currentID + "_resource_left"] = count;
+                                        update["repeating_resource_" + currentID + "_resource_left_name"] = name;
+                                    }
+                                    else if((!y["repeating_resource_" + currentID + "_resource_right_name"] || y["repeating_resource_" + currentID + "_resource_right_name"] === "") && match === false){
+                                        match = true;
+                                        update["repeating_inventory_itemresourceid"] = currentID + "_resource_right";
+                                        update["repeating_resource_" + currentID + "_resource_right_itemid"] = itemid;
+                                        update["repeating_resource_" + currentID + "_resource_right"] = count;
+                                        update["repeating_resource_" + currentID + "_resource_right_name"] = name;
+                                    }
+                                    if(i === idarray.length - 1 && match === false) {
+                                        update["repeating_inventory_itemresourceid"] = newrowid + "_resource_left";
+                                        update["repeating_resource_" + newrowid + "_resource_left_itemid"] = itemid;
+                                        update["repeating_resource_" + newrowid + "_resource_left"] = count;
+                                        update["repeating_resource_" + newrowid + "_resource_left_name"] = name;
+                                    }
                                     setAttrs(update, {silent: true});
-                                }
+                                });
                             });
                         }
                         else {
-                            update["repeating_inventory_itemresourceid"] = "other_resource";
-                            update["other_resource_itemid"] = itemid;
-                            update["other_resource"] = count;
-                            update["other_resource_name"] = name;
+                            update["repeating_inventory_itemresourceid"] = newrowid + "_resource_left";
+                            update["repeating_resource_" + newrowid + "_resource_left_itemid"] = itemid;
+                            update["repeating_resource_" + newrowid + "_resource_left"] = count;
+                            update["repeating_resource_" + newrowid + "_resource_left_name"] = name;
                             setAttrs(update, {silent: true});
                         }
                     });
