@@ -3,9 +3,13 @@
 This is a re-creation of the "green-sheet" for the D&D Basic Moldvay Red box game.  It was created for the Roll20 Moldvay Basic Contest.
 
 ## Current Version
-2.5
+2.7
 
 ### Changelog
+
+#### 2.7
+* Adding in visible chance numbers to most "chance" rolls
+* Rolls that are supposed to be rolled by the DM for players will be sent to GM (Find secret doors, traps, etc)
 
 #### 2.6
 * Fix for Halfling Initiative to be set to on by default giving all characters the halfling initiative bonus
