@@ -1,3 +1,87 @@
+<rolltemplate class="sheet-rolltemplate-save">
+    <table cellpadding="10" style="border-radius: 25px;background: #7FB3D5;padding: 10px;width: 100%;height: 150px;">
+        <tr><td>
+        {{name}} 
+        {{#^rollLess() roll target}}
+            <span style="color:green;font-weight:bold;">
+                {{#rollWasCrit() roll}}
+                    critical
+                {{/rollWasCrit() roll}}
+                saves 
+            </span>
+        {{/^rollLess() roll target}}
+        {{#rollLess() roll target}}
+            <span style="color:red;font-weight:bold;">
+                {{#rollWasFumble() roll}}
+                    critical
+                {{/rollWasFumble() roll}}
+                fails
+            </span> to save 
+        {{/rollLess() roll target}}
+        on {{action}} 
+        </td></tr>
+        <tr><td>
+        {{roll}} vs {{target}}+
+        </td></tr>
+    </table>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-attack">
+    <table cellpadding="10" style="border-radius: 25px;background: #D98880;padding: 10px;width: 100%;height: 150px;">
+        <tr><td>
+        {{name}} {{verb}} 
+        {{#weapon}}
+            {{weapon}} 
+        {{/weapon}}
+        to attack 
+        {{#target}}
+            {{target}} 
+        {{/target}}
+        and 
+        {{#^rollLess() attack throw}}
+            <span style="color:green;font-weight:bold;">hits </span>
+            {{#damage}}
+                Dealing {{damage}} damage
+            {{/damage}}
+        {{/^rollLess() attack throw}}
+        {{#rollLess() attack throw}}
+            <span style="color:red;font-weight:bold;">misses</span>
+        {{/rollLess() attack throw}}
+        </td></tr>
+        <tr><td>
+        {{attack}} vs {{throw}}+
+        </td></tr>
+    </table>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-action">
+    <table cellpadding="10" style="border-radius: 25px;background: #A9DFBF;padding: 10px;width: 100%;height: 150px;">
+        <tr><td>
+        {{name}} 
+        {{#^rollLess() roll target}}
+            <span style="color:green;font-weight:bold;">
+                {{#rollWasCrit() roll}}
+                    critically 
+                {{/rollWasCrit() roll}}
+                succeeds 
+            </span>
+        {{/^rollLess() roll target}}
+        {{#rollLess() roll target}}
+            <span style="color:red;font-weight:bold;">
+                {{#rollWasFumble() roll}}
+                    critically 
+                {{/rollWasFumble() roll}}
+                fails 
+            </span>
+        {{/rollLess() roll target}}
+        to {{action}} 
+        </td></tr>
+        <tr><td>
+        {{roll}} vs {{target}}+
+        </td></tr>
+    </table>
+</rolltemplate>
+
 <script type="text/worker">
 
 var modVal = function(val) {
@@ -1255,7 +1339,7 @@ on("change:xp", function() {
 </div>
 <hr>
 <h3>Initiative</h3>
-<button type='roll' value="/me rolls Initiative for @{selected|name}:\n/roll (1d6)+(@{selected|dex_mod}+@{selected|init_bns}) &{tracker}" name='roll_initiative'></button>
+<button type='roll' value="/me rolls Initiative [[1d6+@{selected|dex_mod}+@{selected|init_bns}&{tracker}]] for @{selected|name}" name='roll_initiative'></button>
 Initiative: 1d6 + Dex Mod + <input type="number" name="attr_init_bns" value="0">
 <br>
 Current Initiative: 
@@ -1313,35 +1397,35 @@ Current Initiative:
         <table align="left">
             <tbody>
                 <tr>
-                    <td><button type='roll' value='/me saves vs Petrification & Paralysis on @{pet_par}+:\n/roll (1d20+@{pet_par_bns})' name='roll_petrification_paralysis_save'></button></td>
+                    <td><button type='roll' value='&{template:save} {{name=@{name}}} {{action=Petrification & Paralysis}} {{roll=[[1d20+@{pet_par_bns}]]}} {{target=[[@{pet_par}]]}}' name='roll_pet_par_save'></button></td>
                     <td>Petrification & Paralysis:</td>
                     <td><input type="number" name="attr_pet_par" value="10"></td>
                     <td>+</td>
                     <td><input type="number" name="attr_pet_par_bns" value="0"></td>
                 </tr>
                 <tr>
-                    <td><button type='roll' value='/me saves vs Poison & Death on @{psn_dth}+:\n/roll (1d20+@{psn_dth_bns})' name='roll_poison_death_save'></button></td>
+                    <td><button type='roll' value='&{template:save} {{name=@{name}}} {{action=Poison & Death}} {{roll=[[1d20+@{psn_dth_bns}]]}} {{target=[[@{psn_dth}]]}}' name='roll_psn_dth_save'></button></td>
                     <td>Poison & Death:</td>
                     <td><input type="number" name="attr_psn_dth" value="10"></td>
                     <td>+</td>
                     <td><input type="number" name="attr_psn_dth_bns" value="0"></td>
                 </tr>
                 <tr>
-                    <td><button type='roll' value='/me saves vs Blast & Breath on @{blst_brth}+:\n/roll (1d20+@{blst_brth_bns}+@{wis_mod})' name='roll_blast_breath_save'></button></td>
+                    <td><button type='roll' value='&{template:save} {{name=@{name}}} {{action=Blast & Breath}} {{roll=[[1d20+@{blst_brth_bns}+@{wis_mod}]]}} {{target=[[@{blst_brth}]]}}'  name='roll_blst_brth_save'></button></td>
                     <td>Blast & Breath:</td>
                     <td><input type="number" name="attr_blst_brth" value="10"></td>
                     <td>+</td>
                     <td><input type="number" name="attr_blst_brth_bns" value="0"></td>
                 </tr>
                 <tr>
-                    <td><button type='roll' value='/me saves vs Staves and Wands on @{stvs_wnds}+:\n/roll (1d20+@{stvs_wnds_bns}+@{wis_mod})' name='roll_staffs_wands_save'></button></td>
+                    <td><button type='roll' value='&{template:save} {{name=@{name}}} {{action=Staves and Wands}} {{roll=[[1d20+@{stvs_wnds_bns}+@{wis_mod}]]}} {{target=[[@{stvs_wnds}]]}}' name='roll_stvs_wnds_save'></button></td>
                     <td>Staffs & Wands:</td>
                     <td><input type="number" name="attr_stvs_wnds" value="10"></td>
                     <td>+</td>
                     <td><input type="number" name="attr_stvs_wnds_bns" value="0"></td>
                 </tr>
                 <tr>
-                    <td><button type='roll' value='/me saves vs Spells on @{spells}+:\n/roll (1d20+@{spells_bns}+@{wis_mod})' name='roll_spells_save'></button></td>
+                    <td><button type='roll' value='&{template:save} {{name=@{name}}} {{action=Spells}} {{roll=[[1d20+@{spells_bns}+@{wis_mod}]]}} {{target=[[@{spells}]]}}' name='roll_spells_save'></button></td>
                     <td>Spells:</td>
                     <td><input type="number" name="attr_spells" value="10"></td>
                     <td>+</td>
@@ -1358,14 +1442,28 @@ Current Initiative:
         <table align="left">
             <tbody>
                 <tr>
-                    <td><button type='roll' value="/me Melee Attacks @{target|name} on @{melee_throw}+:\n/roll (1d20+@{melee_bns}+@{str_mod}-@{target|ac})" name='roll_melee_attack'></button></td>
+                    <td></td>
+                    <td>General Attack Bonus:</td>
+                    <td><input type="number" name="attr_gen_att_bns" value="0"></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>General Damage Bonus:</td>
+                    <td><input type="number" name="attr_gen_dmg_bns" value="0"></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><button type='roll' value='&{template:attack} {{name=@{name}}} {{verb=swings}} {{target=@{target|character_name}}} {{attack=[[1d20+@{melee_bns}+@{gen_att_bns}+@{str_mod}-@{target|ac}]]}} {{throw=[[@{melee_throw}]]}}' name='roll_basic_melee_attack'></button></td>
                     <td>Basic Melee Attack:</td>
                     <td><input type="number" name="attr_melee_throw" value="10"></td>
                     <td>+</td>
                     <td><input type="number" name="attr_melee_bns" value="0"></td>
                 </tr>
                 <tr>
-                    <td><button type='roll' value="/me Ranged Attacks @{target|name} on @{ranged_throw}+:\n/roll (1d20+@{ranged_bns}+@{dex_mod}-@{target|ac}))" name='roll_ranged_attack'></button></td>
+                    <td><button type='roll' value='&{template:attack} {{name=@{name}}} {{verb=fires}} {{target=@{target|character_name}}} {{attack=[[1d20+@{ranged_bns}+@{gen_att_bns}+@{dex_mod}-@{target|ac}]]}} {{throw=[[@{ranged_throw}]]}}' name='roll_basic_ranged_attack'></button></td>
                     <td>Basic Ranged Attack:</td>
                     <td><input type="number" name="attr_ranged_throw" value="10"></td>
                     <td>+</td>
@@ -1395,8 +1493,7 @@ Current Initiative:
 <h4>Weapons</h4>
 <h5>Melee Weapons</h5>
 <fieldset class="repeating_meleeweapons">
-    <button type='roll' value="/me swings @{mweapon_name} at @{target|name} on @{melee_throw}+:\n/roll (1d20+@{melee_bns}+@{matt_mod}+@{str_mod}-@{target|ac})\nDealing Damage:\n/roll (((@{mnumd}@{mdtype})*@{md_mult})+@{md_bns}+@{str_mod})"
-        name='roll_melee_weapon_damage'></button>
+    <button type='roll' value='&{template:attack} {{name=@{name}}} {{weapon=@{mweapon_name}}} {{verb=swings}} {{target=@{target|character_name}}} {{attack=[[1d20+@{melee_bns}+@{matt_mod}+@{gen_att_bns}+@{str_mod}-@{target|ac}]]}} {{throw=[[@{melee_throw}]]}} {{damage=[[((@{mnumd}@{mdtype})*@{md_mult})+@{md_bns}+@{str_mod}+@{gen_dmg_bns}]]}}' name='roll_weapon_melee_attack'></button>
     <input type="text" name="attr_mweapon_name" placeholder="Weapon Name" />
     <br>
     Attack Throw Modifier:
@@ -1424,8 +1521,7 @@ Current Initiative:
 </fieldset>
 <h5>Ranged Weapons</h5>
 <fieldset class="repeating_rangedweapons">
-    <button type='roll' value="/me fires @{rweapon_name} at @{target|name} on @{ranged_throw}+:\n/roll (1d20+@{ranged_bns}+@{ratt_mod}+@{dex_mod}-@{target|ac}))\nDealing Damage:\n/roll (((@{rnumd}@{rdtype})*@{rd_mult})+@{rd_bns})"
-        name='roll_melee_weapon_damage'></button>
+    <button type='roll' value='&{template:attack} {{name=@{name}}} {{weapon=@{rweapon_name}}} {{verb=fires}} {{target=@{target|character_name}}} {{attack=[[1d20+@{ranged_bns}+@{ratt_mod}+@{gen_att_bns}+@{dex_mod}-@{target|ac}]]}} {{throw=[[@{ranged_throw}]]}} {{damage=[[((@{rnumd}@{rdtype})*@{rd_mult})+@{rd_bns}+@{gen_dmg_bns}]]}}' name='roll_weapon_ranged_attack'></button>
     <input type="text" name="attr_rweapon_name" placeholder="Weapon Name" />
     <br>
     Attack Throw Modifier:
@@ -1462,7 +1558,7 @@ Current Initiative:
         <option value="1">Spell</option>
         <option value="1">Proficiency</option>
     </select>
-    <button type='roll' value="/me attempts to @{action_name} on @{action_target}+:\n/roll (1d20+@{action_bonus})" name='roll_action'></button>
+    <button type='roll' value='&{template:action} {{name=@{name}}} {{action=@{action_name}}} {{roll=[[1d20+@{action_bonus}]]}} {{target=[[@{action_target}]]}}' name='roll_action'></button>
     <input type="text" name="attr_action_name" placeholder="Action Name" />
     Target Number:
     <input type="number" name="attr_action_target" value=18 />
