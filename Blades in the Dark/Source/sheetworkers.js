@@ -2068,6 +2068,44 @@ on('sheet:opened', () => {
 					});
 				});
 			}
+			// Upgrade to 1.10: Convert clocks
+			else if (versionMajor === 1 && versionMinor < 10) {
+				const upgradeFunction = _.after(2, () => upgradeSheet('1.10'));
+				['clock', 'crewclock'].forEach(sName => {
+					getSectionIDs(`repeating_${sName}`, idArray => {
+						const oldAttrs = [
+							...idArray.map(id => `repeating_${sName}_${id}_size`),
+							...idArray.map(id => `repeating_${sName}_${id}_clock1`),
+							...idArray.map(id => `repeating_${sName}_${id}_clock2`),
+							...idArray.map(id => `repeating_${sName}_${id}_clock4`),
+							...idArray.map(id => `repeating_${sName}_${id}_clock3`)
+						];
+						getAttrs(oldAttrs, v => {
+							let setting = {};
+							idArray.forEach(id => {
+								switch (v[`repeating_${sName}_${id}_size`]) {
+								case '6':
+									setting[`repeating_${sName}_${id}_progress`] = v[`repeating_${sName}_${id}_clock2`] || '0';
+									break;
+								case '8':
+									setting[`repeating_${sName}_${id}_progress`] = v[`repeating_${sName}_${id}_clock3`] || '0';
+									break;
+								case '12':
+									setting[`repeating_${sName}_${id}_progress`] = v[`repeating_${sName}_${id}_clock4`] || '0';
+									break;
+								default:
+								case 'none':
+								case '4':
+									setting[`repeating_${sName}_${id}_size`] = '4';
+									setting[`repeating_${sName}_${id}_progress`] = v[`repeating_${sName}_${id}_clock1`] || '0';
+									break;
+								}
+							});
+							setAttrs(setting, {}, upgradeFunction);
+						});
+					});
+				});
+			}
 		};
 		upgradeSheet(v.version);
 		// Set version number

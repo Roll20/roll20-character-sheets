@@ -6,6 +6,7 @@ This is a character sheet for Blades in the Dark for use on Roll20.
 
 ### 1.10
 * Revamped flexbox-based layout and CSS changes
+* New design for clocks area
 
 ### 1.9
 * Clock segments are now clickable
