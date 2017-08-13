@@ -126,6 +126,7 @@ on("change:armor_ac", function() {
 on("change:str", function() {
     getAttrs(["str"], function(values) {
         setAttrs({ str_mod: modVal(values.str)});
+        setAttrs({ carrying_capacity: 20+modVal(values.str)});
     });
 });
 
@@ -157,6 +158,32 @@ on("change:con", function() {
 on("change:chr", function() {
   getAttrs(["chr"], function(values) {
     setAttrs({ chr_mod: modVal(values.chr)});
+  });
+});
+
+on("change:total_encumberence", function() {
+  getAttrs(["total_encumberence","carrying_capacity"], function(values) {
+    if(values.total_encumberence > values.carrying_capacity) {
+        setAttrs({ ex_mvmt: 0});
+        setAttrs({ com_mvmt: 0});
+        setAttrs({ run_mvmt: 0});
+    } else if(values.total_encumberence > 10) {
+        setAttrs({ ex_mvmt: 30});
+        setAttrs({ com_mvmt: 10});
+        setAttrs({ run_mvmt: 30});
+    } else if(values.total_encumberence > 7) {
+        setAttrs({ ex_mvmt: 60});
+        setAttrs({ com_mvmt: 20});
+        setAttrs({ run_mvmt: 60});
+    } else if(values.total_encumberence > 5) {
+        setAttrs({ ex_mvmt: 90});
+        setAttrs({ com_mvmt: 30});
+        setAttrs({ run_mvmt: 90});
+    } else {
+        setAttrs({ ex_mvmt: 120});
+        setAttrs({ com_mvmt: 40});
+        setAttrs({ run_mvmt: 120});
+    }
   });
 });
 
@@ -1664,11 +1691,55 @@ Current Initiative:
     <input type="text" name="attr_item" placeholder="Item" />
     <input type="number" name="attr_item_count" placeholder="#" />
     <input type="number" name="attr_item_enc" placeholder="Enc" />
+    <input type="number" name="attr_item_value" placeholder="Value" />
     <input type="text" name="attr_item_notes" placeholder="Item Notes" />
 </fieldset>
 <hr>
+<h3>Movement</h3>
+<div class="sheet-1colrow">
+    <div style="width: 100%" class="sheet-col">
+        <table align="left">
+            <tbody>
+                <tr>
+                    <td>Total Encumberence</td>
+                    <td><input type="number" name="attr_total_encumberence" placeholder="0"/></td>
+                    <td>Stone</td>
+                </tr>
+                <tr>
+                    <td>Carrying Capacity</td>
+                    <td><input type="number" name="attr_carrying_capacity" placeholder="20"/></td>
+                    <td>Stone</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="sheet-1colrow">
+    <div style="width: 100%" class="sheet-col">
+        <table align="left">
+            <tbody>
+                <tr>
+                    <td>Exploration Movement</td>
+                    <td><input type="number" name="attr_ex_mvmt" value="120"/></td>
+                    <td>feet per turn</td>
+                </tr>
+                <tr>
+                    <td>Combat Movement</td>
+                    <td><input type="number" name="attr_com_mvmt" value="40"/></td>
+                    <td>feet per round</td>
+                </tr>
+                <tr>
+                    <td>Running Movement</td>
+                    <td><input type="number" name="attr_run_mvmt" value="120"/></td>
+                    <td>feet per round</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<hr>
 <h4>Notes</h4>
 <fieldset class="repeating_skills">
-    <textarea name="attr_character_notes" rows="2" cols="5" placeholder="Notes"></textarea>
+    <textarea name="attr_character_notes" rows="4" cols="5" placeholder="Notes"></textarea>
 </fieldset>
 <hr>
