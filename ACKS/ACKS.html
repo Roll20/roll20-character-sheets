@@ -161,7 +161,7 @@ on("change:chr", function() {
   });
 });
 
-on("change:total_encumberence", function() {
+on("change:total_encumberence change:carrying_capacity", function() {
   getAttrs(["total_encumberence","carrying_capacity"], function(values) {
     if(values.total_encumberence > values.carrying_capacity) {
         setAttrs({ ex_mvmt: 0});
@@ -1311,6 +1311,24 @@ on("change:xp", function() {
     });
 });
 
+on("change:repeating_items", function(eventInfo) {
+   getSectionIDs("repeating_items", function(idarray) {
+      search_ids = [];
+      for(var i=0; i < idarray.length; i++) {
+         search_ids.push("repeating_items_" + idarray[i] + "_item_enc");
+      }
+      getAttrs(search_ids, function(values) {
+         var t_enc = 0;
+         for(enc in values) {
+            if( values.hasOwnProperty( enc ) ) {
+               t_enc += parseFloat( values[enc] );
+            }
+         }
+         setAttrs({ total_encumberence: t_enc});
+      });
+   });
+});
+
 </script>
 
 <h3>Character Info</h3>
@@ -1702,12 +1720,12 @@ Current Initiative:
             <tbody>
                 <tr>
                     <td>Total Encumberence</td>
-                    <td><input type="number" name="attr_total_encumberence" placeholder="0"/></td>
+                    <td><input type="number" name="attr_total_encumberence" value="0"/></td>
                     <td>Stone</td>
                 </tr>
                 <tr>
                     <td>Carrying Capacity</td>
-                    <td><input type="number" name="attr_carrying_capacity" placeholder="20"/></td>
+                    <td><input type="number" name="attr_carrying_capacity" value="20"/></td>
                     <td>Stone</td>
                 </tr>
             </tbody>
