@@ -4,6 +4,41 @@ This is a character sheet for Blades in the Dark for use on Roll20.
 
 ## Changelog
 
+### 1.10
+* Revamped flexbox-based layout and CSS changes
+* New design for clocks area
+
+### 1.9
+* Clock segments are now clickable
+* Moved the healing clock to the other column of the harm/armor/coin container
+* CSS cleanup
+* Added descriptions to upgrades and items
+* Added button to roll lifestyle, healing
+* Added more visible indicator that stuff happens when you fill in playbook or crew type
+
+### 1.8
+* Extra rows of claims can now be added
+* Corrected minor typos
+* Internal changes to the sheet upgrade process to make it more robust for ancient sheets
+
+### 1.7
+* Change to auto-generated abilities/items/friends: they will now be deleted if you change playbook/crew type, unless they have been changed at some point
+* Small CSS adjustments
+* Change stash gained by crew advance to printed version
+
+### 1.6
+* Translation support for everything except fixed fields in roll templates
+* Crew-specific upgrades are now a repeating section, repeating upgrades moved to crew-specific upgrades, descriptions added to crew upgrades
+
+### 1.5
+* All items are now repeating
+* Optional description field added for all items (via settings menu)
+
+### 1.4
+* Changes for items; made playbook items a repeating section, and added options for non-playbook-items.
+* Entering a playbook or crew name will now automatically generate abilities and friends/contacts
+* Small fix for ghost/hull label for stress and trauma
+
 ### 1.3
 * Added Vigilantes data
 

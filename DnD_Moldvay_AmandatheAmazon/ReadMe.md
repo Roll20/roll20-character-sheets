@@ -7,6 +7,9 @@ This is a re-creation of the "green-sheet" for the D&D Basic Moldvay Red box gam
 
 ### Changelog
 
+#### 2.6
+* Fix for Halfling Initiative to be set to on by default giving all characters the halfling initiative bonus
+
 #### 2.5
 * Fix for Monster Tab Overlapping UI Error (#2565)
 * Monster Alignment is no longer a drop down box (#2332)
@@ -47,7 +50,6 @@ This is a re-creation of the "green-sheet" for the D&D Basic Moldvay Red box gam
 * Monsters now can have multiple damage dice per attack (Moldvay: Monster multiple monster attack die #1897)
 * Monsters now have abilities section for non-attack roll abilities (Moldvay: Add monster abilities #1896)
 * Fumbles no longer show damage done
-
 
 #### 1.16
 * Fixing sheet worker to calculate chance to open door on sheet open and STR mod change
