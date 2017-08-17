@@ -1,4 +1,5 @@
 <script type="text/worker">
+"use strict";
 /* DATA */
 const crewData = {
 		assassins: {
@@ -1403,8 +1404,8 @@ const setDiceFromTotal = (name, numDice, upToFive, value) => {
 	};
 /* DEFAULT FILLS FOR PLAYBOOKS AND CREWS */
 /* Watch repeating rows for changes and set autogen to false if change happens*/
-const RepeatingSectionsToWatchForAutogen = ['ability', 'crewability', 'friend', 'contact', 'playbookitem', 'upgrade'];
-RepeatingSectionsToWatchForAutogen.forEach(sectionName => {
+const repeatingSectionsToWatchForAutogen = ['ability', 'crewability', 'friend', 'contact', 'playbookitem', 'upgrade'];
+repeatingSectionsToWatchForAutogen.forEach(sectionName => {
 	on(`change:repeating_${sectionName}`, eventInfo => {
 		const idMatch = eventInfo.sourceAttribute.match(new RegExp(`^repeating_${sectionName}_(.*?)_`)),
 			id = idMatch && idMatch[1];
@@ -1503,9 +1504,22 @@ Object.keys(actionData).forEach(attributeName => {
 	});
 	on([1, 2, 3, 4].map(x => `change:${attributeName}${x}`).join(' '), calculateVice);
 });
+/* CALCULATE WANTED */
+on('change:wanted', () => {
+	getAttrs(['wanted'], v => {
+		setDiceFromTotal('wanted', parseInt(v.wanted));
+	});
+});
+/* CALCULATE STASH */
+const calculateStash = () => {
+	getAttrs(['stash'], v => {
+		setDiceFromTotal('stash', Math.floor(parseInt(v.stash) / 10));
+	});
+};
+on('change:stash', calculateStash);
 /* GENERATE FACTIONS */
 on('change:generate_factions', () => {
-	Object.keys(factionsData).forEach(function (sectionName) {
+	Object.keys(factionsData).forEach(sectionName => {
 		fillRepeatingSectionFromData(sectionName, factionsData[sectionName]);
 	});
 });
@@ -1541,19 +1555,6 @@ on('change:generate_friends', () => {
 		fillRepeatingSectionFromData(sectionName, dataList);
 	});
 });
-/* CALCULATE WANTED */
-on('change:wanted', () => {
-	getAttrs(['wanted'], v => {
-		setDiceFromTotal('wanted', parseInt(v.wanted));
-	});
-});
-/* CALCULATE STASH */
-const calculateStash = () => {
-	getAttrs(['stash'], v => {
-		setDiceFromTotal('stash', Math.floor(parseInt(v.stash) / 10));
-	});
-};
-on('change:stash', calculateStash);
 /* EXTRA STRESS BOXES */
 on('change:setting_extra_stress', () => {
 	getAttrs(['setting_extra_stress'], v => {
@@ -1561,7 +1562,7 @@ on('change:setting_extra_stress', () => {
 	});
 });
 /* CALCULATE COHORT QUALITY */
-const calculateCohortDots = function (t1, t2, t3, t4, imp, type, prefix) {
+const calculateCohortDots = (t1, t2, t3, t4, imp, type, prefix) => {
 		let numDots = parseInt(t1) + parseInt(t2) + parseInt(t3) + parseInt(t4);
 		if (imp === 'on') {
 			numDots = numDots - 1;
@@ -1576,8 +1577,8 @@ const calculateCohortDots = function (t1, t2, t3, t4, imp, type, prefix) {
 	repeatingQualityAttrs = ['crew_tier1', 'crew_tier2', 'crew_tier3', 'crew_tier4', 'repeating_cohort:impaired', 'repeating_cohort:type'],
 	repeatingQualityEvent = repeatingQualityAttrs.map(x => `change:${x}`).join(' ');
 on(qualityEvent, () => {
-	getAttrs(qualityAttrs, attrs => {
-		calculateCohortDots(attrs.crew_tier1, attrs.crew_tier2, attrs.crew_tier3, attrs.crew_tier4, attrs.cohort1_impaired, attrs.cohort1_type, 'cohort1_');
+	getAttrs(qualityAttrs, v => {
+		calculateCohortDots(v.crew_tier1, v.crew_tier2, v.crew_tier3, v.crew_tier4, v.cohort1_impaired, v.cohort1_type, 'cohort1_');
 	});
 });
 on(repeatingQualityEvent + ' ' + ['name', 'subtype', 'edges', 'flaws', 'description'].map(x => `change:repeating_cohort:${x}`).join(' '), () => {
@@ -1633,26 +1634,21 @@ handleBoxesFill('bandolier2_check_', 'on');
 });
 /* INITIALISATION AND UPGRADES */
 on('sheet:opened', () => {
-	const initialRows = [
-		'ability',
-		'friend',
-		'crewability',
-		'contact'
-	];
-	/* Make sure sheet_type is never 0 */
 	getAttrs(['sheet_type', 'changed_attributes', 'crew_type', 'playbook'], v => {
+		/* Make sure sheet_type is never 0 */
 		if (!['character', 'crew', 'faction'].includes(v.sheet_type)) {
 			setAttrs({
 				sheet_type: 'character'
 			});
 		}
+		/* Remove reminder box if we have playbook or crew name */
 		if (v.playbook || v.crew_type) {
 			setAttrs({
 				show_playbook_reminder: '0'
 			});
 		}
 	});
-	/* Set up queries */
+	/* Set up translated queries */
 	setAttrs({
 		bonusdice: `?{${getTranslationByKey('bonusdice')}}`,
 		bonusdice_long: `?{${getTranslationByKey('bonusdice')}|0|1|2|3|4|5|6|-1|-2|-3}`,
@@ -1660,21 +1656,27 @@ on('sheet:opened', () => {
 		notes_query: `?{${getTranslationByKey('notes')}|}`,
 		numberofdice: `?{${getTranslationByKey('numberofdice')}}`,
 		numberofdice_long: `?{${getTranslationByKey('numberofdice')}|0|1|2|3|4|5|6}`,
-		position_query: getTranslationByKey('position_query')
+		position_query: `?{${getTranslationByKey('position')}|` +
+			`${getTranslationByKey('risky')},position=${getTranslationByKey('risky')}|` +
+			`${getTranslationByKey('controlled')},position=${getTranslationByKey('controlled')}|` +
+			`${getTranslationByKey('desperate')},position=${getTranslationByKey('desperate')}|` +
+			`${getTranslationByKey('fortune_roll')},position=}`
 	});
 	/* Setup and upgrades */
 	getAttrs(['version'], v => {
 		const upgradeSheet = version => {
 			const versionMajor = version && parseInt(version.split('.')[0]),
 				versionMinor = version && parseInt(version.split('.')[1]);
-			// Setup initial rows in repeating sections and generate standard items
+			// Initialise a new sheet
 			if (!version) {
-				const setting = initialRows.reduce((memo, sectionName) => {
-					memo[`repeating_${sectionName}_${generateRowID()}_autogen`] = 1;
-					return memo;
-				}, {});
+				const setting = ['ability', 'friend', 'crewability', 'contact']
+					.reduce((memo, sectionName) => {
+						memo[`repeating_${sectionName}_${generateRowID()}_autogen`] = 1;
+						return memo;
+					}, {});
 				setAttrs(setting);
 				fillRepeatingSectionFromData('item', itemData);
+				/* Set translated default values */
 				setAttrs(defaultValues);
 				console.log('Initialising new sheet');
 			}
@@ -2066,12 +2068,50 @@ on('sheet:opened', () => {
 					});
 				});
 			}
+			// Upgrade to 1.10: Convert clocks
+			else if (versionMajor === 1 && versionMinor < 10) {
+				const upgradeFunction = _.after(2, () => upgradeSheet('1.10'));
+				['clock', 'crewclock'].forEach(sName => {
+					getSectionIDs(`repeating_${sName}`, idArray => {
+						const oldAttrs = [
+							...idArray.map(id => `repeating_${sName}_${id}_size`),
+							...idArray.map(id => `repeating_${sName}_${id}_clock1`),
+							...idArray.map(id => `repeating_${sName}_${id}_clock2`),
+							...idArray.map(id => `repeating_${sName}_${id}_clock4`),
+							...idArray.map(id => `repeating_${sName}_${id}_clock3`)
+						];
+						getAttrs(oldAttrs, v => {
+							let setting = {};
+							idArray.forEach(id => {
+								switch (v[`repeating_${sName}_${id}_size`]) {
+								case '6':
+									setting[`repeating_${sName}_${id}_progress`] = v[`repeating_${sName}_${id}_clock2`] || '0';
+									break;
+								case '8':
+									setting[`repeating_${sName}_${id}_progress`] = v[`repeating_${sName}_${id}_clock3`] || '0';
+									break;
+								case '12':
+									setting[`repeating_${sName}_${id}_progress`] = v[`repeating_${sName}_${id}_clock4`] || '0';
+									break;
+								default:
+								case 'none':
+								case '4':
+									setting[`repeating_${sName}_${id}_size`] = '4';
+									setting[`repeating_${sName}_${id}_progress`] = v[`repeating_${sName}_${id}_clock1`] || '0';
+									break;
+								}
+							});
+							setAttrs(setting, {}, upgradeFunction);
+						});
+					});
+				});
+			}
 		};
 		upgradeSheet(v.version);
 		// Set version number
 		setAttrs({
-			version: '1.9',
-			character_sheet: 'Blades in the Dark v1.9'
+			version: '1.10',
+			character_sheet: 'Blades in the Dark v1.10'
 		});
 	});
 });
