@@ -14322,6 +14322,23 @@ function FKWgetType(typeRaw)
 	return FKWtype;
 }
 
+function prettifyMod(uglyModifier) {
+	var prettyModifier;
+	if(isNaN(parseInt(uglyModifier)))
+	{
+		return uglyModifier;
+	}
+	if(uglyModifier < 0)
+	{
+		prettyModifier = "−" + String(Math.abs(uglyModifier));
+	} else if(uglyModifier === 0){
+		prettyModifier = "±" + String(uglyModifier);
+	} else {
+		prettyModifier = "+" + String(uglyModifier);
+	}
+	return prettyModifier;
+}
+
 on("change:nachteil_nachtblind",
 	function() {
 		getAttrs(
@@ -14658,7 +14675,7 @@ on("change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3 change:fkw_aktiv4 chan
 					if(FKR.groesse != "nd")
 					{
 						mod_gesamt.groesse = parseInt(FKR.groesse);
-						setAttrs({fkr_zielgroesse_final: FKR.groesse});
+						setAttrs({fkr_zielgroesse_final: prettifyMod(parseInt(FKR.groesse))});
 					} else {
 						mod_gesamt.groesse = "-";
 						setAttrs({fkr_zielgroesse_final: "-"});
@@ -14716,36 +14733,36 @@ on("change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3 change:fkw_aktiv4 chan
 						mod_gesamt.abstand = -2 + mods;
 						TP_gesamt.abstand = parseInt(FKW.TPRW1);
 						setAttrs({
-							fkr_entfernung_final: -2 + mods,
-							fkr_entfernung_final_TP: FKW.TPRW1
+							fkr_entfernung_final: prettifyMod(-2 + mods),
+							fkr_entfernung_final_TP: prettifyMod(FKW.TPRW1)
 						});
 					} else if(FKR.abstand <= FKW.RW2) {
 						mod_gesamt.abstand = 0 + mods;
 						TP_gesamt.abstand = parseInt(FKW.TPRW2);
 						setAttrs({
-							fkr_entfernung_final: 0 + mods,
-							fkr_entfernung_final_TP: FKW.TPRW2
+							fkr_entfernung_final: prettifyMod(0 + mods),
+							fkr_entfernung_final_TP: prettifyMod(FKW.TPRW2)
 						});
 					} else if(FKR.abstand <= FKW.RW3) {
 						mod_gesamt.abstand = 4 + mods;
 						TP_gesamt.abstand = parseInt(FKW.TPRW3);
 						setAttrs({
-							fkr_entfernung_final: 4 + mods,
-							fkr_entfernung_final_TP: FKW.TPRW3
+							fkr_entfernung_final: prettifyMod(4 + mods),
+							fkr_entfernung_final_TP: prettifyMod(FKW.TPRW3)
 						});
 					} else if(FKR.abstand <= FKW.RW4) {
 						mod_gesamt.abstand = 8 + mods;
 						TP_gesamt.abstand = parseInt(FKW.TPRW4);
 						setAttrs({
-							fkr_entfernung_final: 8 + mods,
-							fkr_entfernung_final_TP: FKW.TPRW4
+							fkr_entfernung_final: prettifyMod(8 + mods),
+							fkr_entfernung_final_TP: prettifyMod(FKW.TPRW4)
 						});
 					} else if(FKR.abstand <= FKW.RW5) {
 						mod_gesamt.abstand = 12 + mods;
 						TP_gesamt.abstand = parseInt(FKW.TPRW5);
 						setAttrs({
-							fkr_entfernung_final: 12 + mods,
-							fkr_entfernung_final_TP: FKW.TPRW5
+							fkr_entfernung_final: prettifyMod(12 + mods),
+							fkr_entfernung_final_TP: prettifyMod(FKW.TPRW5)
 						});
 					} else {
 						console.log("Ziel außerhalb der Reichweite. Berechnungen abgebrochen.");
@@ -14757,7 +14774,7 @@ on("change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3 change:fkw_aktiv4 chan
 					if(FKR.wetter != "nd")
 					{
 						mod_gesamt.wetter = parseInt(FKR.wetter);
-						setAttrs({fkr_wetterlage_final: FKR.wetter});
+						setAttrs({fkr_wetterlage_final: prettifyMod(parseInt(FKR.wetter))});
 					} else {
 						mod_gesamt.wetter = "-";
 						setAttrs({fkr_wetterlage_final: "-"});
@@ -14770,12 +14787,12 @@ on("change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3 change:fkw_aktiv4 chan
 						if(FKR.DS == "0" && FKR.NS == "0")
 						{
 							mod_gesamt.licht = parseInt(FKR.licht);
-							setAttrs({fkr_helligkeit_final: FKR.licht});
+							setAttrs({fkr_helligkeit_final: prettifyMod(parseInt(FKR.licht))});
 						} else if(FKR.DS != "0" && FKR.NS == "0") {
 							var licht = parseInt(FKR.licht) / 2;
 							if(licht == 4) { licht = 8; }
 							mod_gesamt.licht = parseInt(licht);
-							setAttrs({fkr_helligkeit_final: licht});
+							setAttrs({fkr_helligkeit_final: prettifyMod(licht)});
 						} else if(
 						(FKR.DS != "0" && FKR.NS != "0")
 						|| (FKR.DS == "0" && FKR.NS != "0")) {
@@ -14787,13 +14804,13 @@ on("change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3 change:fkw_aktiv4 chan
 								licht = Math.max((parseInt(FKR.licht) / 2) - 5, 0);
 							}
 							mod_gesamt.licht = parseInt(licht);
-							setAttrs({fkr_helligkeit_final: licht});
+							setAttrs({fkr_helligkeit_final: prettifyMod(licht)});
 						}
 						if(FKR.NB != "0")
 						{
 							var licht = Math.min(8, parseInt(FKR.licht) * 2);
 							mod_gesamt.licht = parseInt(licht);
-							setAttrs({fkr_helligkeit_final: licht});
+							setAttrs({fkr_helligkeit_final: prettifyMod(licht)});
 						}
 					} else {
 						mod_gesamt.licht = "-";
@@ -14804,7 +14821,7 @@ on("change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3 change:fkw_aktiv4 chan
 					if(FKR.deckung != "nd")
 					{
 						mod_gesamt.deckung = parseInt(FKR.deckung);
-						setAttrs({fkr_deckung_final: FKR.deckung});
+						setAttrs({fkr_deckung_final: prettifyMod(parseInt(FKR.deckung))});
 					} else {
 						mod_gesamt.deckung = "-";
 						setAttrs({fkr_deckung_final: "-"});
@@ -14966,9 +14983,9 @@ on("change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3 change:fkw_aktiv4 chan
 								fkr_schussart_gezielter_schuss_zweibeiner: GUIgezielt2b,
 								fkr_schussart_gezielter_schuss_vierbeiner: GUIgezielt4b,
 								fkr_schussart_gezielter_schuss_vierbeiner_variabel: GUIgezielt4bvar,
-								fkr_schussart_final: mods,
-								fkr_schussart_final_dauer: dauer,
-								fkr_schussart_final_TP: TP
+								fkr_schussart_final: prettifyMod(mods),
+								fkr_schussart_final_dauer: prettifyMod(dauer),
+								fkr_schussart_final_TP: prettifyMod(TP)
 						});
 					} else {
 						mod_gesamt.schuss = "-";
@@ -15007,8 +15024,8 @@ on("change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3 change:fkw_aktiv4 chan
 						mod_gesamt.zielen = parseInt(FKR.zielen);
 						dauer_gesamt.zielen = dauer;
 						setAttrs({
-								fkr_anvisieren_final: FKR.zielen,
-								fkr_anvisieren_final_dauer: dauer
+								fkr_anvisieren_final: prettifyMod(parseInt(FKR.zielen)),
+								fkr_anvisieren_final_dauer: prettifyMod(dauer)
 						});
 					} else {
 						mod_gesamt.zielen = "-";
@@ -15046,7 +15063,7 @@ on("change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3 change:fkw_aktiv4 chan
 							break;
 					}
 					mod_gesamt.nr = mods;
-					setAttrs({fkr_schussnummer_final: mods});
+					setAttrs({fkr_schussnummer_final: prettifyMod(mods)});
 
 					// Steilschüsse
 					// Danke an die Redaktion für die vielen teils unscharf formulierten Sonderregeln -.-°
@@ -15111,8 +15128,8 @@ on("change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3 change:fkw_aktiv4 chan
 					mod_gesamt.steil = mods;
 					TP_gesamt.steil = TP;
 					setAttrs({
-							fkr_steilschuss_final: mods,
-							fkr_steilschuss_final_TP: TP
+							fkr_steilschuss_final: prettifyMod(mods),
+							fkr_steilschuss_final_TP: prettifyMod(TP)
 					});
 
 					// Ort des Schützen
@@ -15143,17 +15160,17 @@ on("change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3 change:fkw_aktiv4 chan
 							mods = "-";
 					}
 					mod_gesamt.ort = mods;
-					setAttrs({fkr_ort_final: mods});
+					setAttrs({fkr_ort_final: prettifyMod(mods)});
 
 					// Zielbewegung
 					if(FKR.bewegung != "nd" && FKR.getuemmel.aktiv == "0")
 					{
 						mod_gesamt.bewegung = parseInt(FKR.bewegung);
-						setAttrs({fkr_bewegung_final: parseInt(FKR.bewegung)});
+						setAttrs({fkr_bewegung_final: prettifyMod(parseInt(FKR.bewegung))});
 					} else if(FKR.bewegung != "nd" && FKR.getuemmel.aktiv != "0") {
 						mod_gesamt.bewegung = 0;
 						setAttrs({
-								fkr_bewegung_final: 0,
+								fkr_bewegung_final: prettifyMod(0),
 								fkr_bewegung_raw: "0"
 						});
 					} else {
@@ -15188,7 +15205,7 @@ on("change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3 change:fkw_aktiv4 chan
 						}
 						var mods = (2 * parseInt(FKR.getuemmel.ziele_ns)) + (3 * parseInt(FKR.getuemmel.ziele_h))
 						mod_gesamt.getuemmel = mods;
-						setAttrs({fkr_kampfgetuemmel_final: mods});
+						setAttrs({fkr_kampfgetuemmel_final: prettifyMod(mods)});
 					} else {
 						mod_gesamt.getuemmel = "-";
 						setAttrs({fkr_kampfgetuemmel_final: "-"});
@@ -15201,7 +15218,7 @@ on("change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3 change:fkw_aktiv4 chan
 						return;
 					}
 					mod_gesamt.misc = parseInt(FKR.misc);
-					setAttrs({fkr_sonstiges_final: parseInt(FKR.misc)});
+					setAttrs({fkr_sonstiges_final: prettifyMod(parseInt(FKR.misc))});
 
 					// Ergebnisse anzeigen
 					console.log("mod_gesamt: ", JSON.stringify(mod_gesamt));
@@ -15251,8 +15268,8 @@ on("change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3 change:fkw_aktiv4 chan
 						"; ergebnis.tp.modsign: ", ergebnis.tp.modsign,
 						"; ergebnis.tp.mod: ", ergebnis.tp.mod);
 					setAttrs({
-							fkr_erschwernis_gesamt: ergebnis.mod,
-							fkr_erschwernis_ohne_kampfgetuemmel: ergebnis.mod_ohne_getuemmel,
+							fkr_erschwernis_gesamt: prettifyMod(ergebnis.mod),
+							fkr_erschwernis_ohne_kampfgetuemmel: prettifyMod(ergebnis.mod_ohne_getuemmel),
 							fkr_dauer: String(ergebnis.dauer) + " A",
 							fkr_tp: String(ergebnis.tp.w6) + "W6 " + String(ergebnis.tp.modsign) + " " + String(Math.abs(ergebnis.tp.mod)),
 							ftp_w_aktiv: ergebnis.tp.w6,
