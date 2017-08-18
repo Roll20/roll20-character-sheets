@@ -11745,7 +11745,7 @@
                             Beteiligte in <span class="sheet-abbr" title="Distanzklasse">DK</span> <span class="sheet-abbr" title="Handgemenge">H</span> <input type="number" name="attr_fkr_kampfgetuemmel_beteiligte_H">
                             </div>
                             <div>
-                            Beteiligte in <span class="sheet-abbr" title="Distanzklasse">DK</span> <span class="sheet-abbr" title="Nahkampf und Stangenwaffen">NS</span> <input type="number" name="attr_fkr_kampfgetuemmel_beteiligte_NS">
+                            Beteiligte in <span class="sheet-abbr" title="Distanzklasse">DK</span> <span class="sheet-abbr" title="Nahkampf">N</span> und <span class="sheet-abbr" title="Stangenwaffe">S</span> <input type="number" name="attr_fkr_kampfgetuemmel_beteiligte_NS">
                             </div>
                         </div>
                     </td>
@@ -15186,24 +15186,42 @@ on("change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3 change:fkw_aktiv4 chan
 						if(isNaN(parseInt(FKR.getuemmel.ziele_h)))
 						{
 							console.log("Anzahl Ziele auf DK H keine gültige Zahl. Berechnungen abgebrochen.");
+							setAttrs({fkr_kampfgetuemmel_final: "!"});
 							return;
 						}
 						if(isNaN(parseInt(FKR.getuemmel.ziele_ns)))
 						{
 							console.log("Anzahl Ziele auf DK NS keine gültige Zahl. Berechnungen abgebrochen.");
+							setAttrs({fkr_kampfgetuemmel_final: "!"});
 							return;
 						}
 						if(parseInt(FKR.getuemmel.ziele_h) < 0)
 						{
 							console.log("Anzahl Ziele auf DK H kleiner null. Berechnungen abgebrochen.");
+							setAttrs({fkr_kampfgetuemmel_final: "!"});
 							return;
 						}
 						if(parseInt(FKR.getuemmel.ziele_ns) < 0)
 						{
 							console.log("Anzahl Ziele auf DK NS kleiner null. Berechnungen abgebrochen.");
+							setAttrs({fkr_kampfgetuemmel_final: "!"});
 							return;
 						}
-						var mods = (2 * parseInt(FKR.getuemmel.ziele_ns)) + (3 * parseInt(FKR.getuemmel.ziele_h))
+						var dk_h = parseInt(FKR.getuemmel.ziele_h);
+						var dk_ns = parseInt(FKR.getuemmel.ziele_ns);
+						if((dk_ns + dk_h) < 2)
+						{
+							console.log("Kampfgetümmel setzt mindestens zwei Beteiligte voraus. Berechnungen abgebrochen.");
+							setAttrs({fkr_kampfgetuemmel_final: "!"});
+							return;
+						}
+						if(dk_ns < 2 && dk_h < 2)
+						{
+							console.log("Mindestens zwei Beteiligte eines Kampfgetümmels müssen in derselben Distanzklasse kämpfen. Berechnungen abgebrochen.");
+							setAttrs({fkr_kampfgetuemmel_final: "!"});
+							return;
+						}
+						var mods = (2 * dk_ns) + (3 * dk_h);
 						mod_gesamt.getuemmel = mods;
 						setAttrs({fkr_kampfgetuemmel_final: prettifyMod(mods)});
 					} else {
