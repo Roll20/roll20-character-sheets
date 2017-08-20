@@ -29,8 +29,15 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 ### Changelog
 
-#### 0.1.0
+#### 1.0.0
 
 * Initial Release (cloned from Stars Without Number 1st Ed. sheet v0.1.7).
 * All skills and features renamed and reworked to Revised Edition rules.
 * Auto-calculating AC, Saving Throws, and Effort through Sheet Worker.
+
+### 1.1.0
+
+* Reworked attack rolls to no longer ask for AC and to also have the roll number make sense.
+* Reworked the skill list. There are now options for rolling 2d6, 3d6kh2, and 4d6kh2 for the Specialist focus among others.
+* Reordered the skill list to be alphabetical by coloumn instead of by row.
+* Reordered the attributes to be in the usual order (STR, DEX, CON, INT, WIS, CHA)
