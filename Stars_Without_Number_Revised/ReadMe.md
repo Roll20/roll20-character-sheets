@@ -1,6 +1,6 @@
-# Stars Without Number Character Sheet
+# Stars Without Number Revised Edition Character Sheet
 
-This sheet is created for use in Stars Without Number on Roll20. Originally based on the [character sheet design](http://www.onesevendesign.com/swn_charsheets_oneseven.pdf) by OneSevenDesign.
+This sheet is created for use in Stars Without Number Revised Edition on Roll20.
 
 ### Author/Maintainer
 
@@ -10,7 +10,7 @@ This sheet is created for use in Stars Without Number on Roll20. Originally base
 
 * [MankiGames](https://github.com/MankiGames)
 * [Shadowriku](https://github.com/Shadowriku)
-* [RonaldZ](https://github.com/RonaldZ)
+* [RonaldZ](https://github.com/RonaldZ)/
 * [jfredett](https://github.com/jfredett)
 * [CoalPoweredPuppet](https://github.com/CoalPoweredPuppet)
 * [Karlinator](https://github.com/Karlinator)
@@ -21,13 +21,19 @@ This sheet is created for use in Stars Without Number on Roll20. Originally base
 
 ### Testing Help
 
-If you wish to test new features, fixes, and changes use the [development campaign](https://app.roll20dev.net/join/39986/aOV4kg). Use the command !charsheet to create a new character sheet before each feature/bug to test in order to start with a clean character sheet.
+If you wish to test new features, fixes, and changes use the [development campaign](https://app.roll20dev.net/join/40563/hYhXpA). Use the command !charsheet to create a new character sheet before each feature/bug to test in order to start with a clean character sheet.
 
 ### Feedback
 
 Report any problems, suggestions, or features by [creating an issue](https://github.com/kevinsearle/roll20-character-sheets/issues) on Github.
 
 ### Changelog
+
+#### 0.1.1
+
+* Removed target AC from attack calculation (1st Ed to Revised)
+* Attributes rearranged according to Revised Edition layout
+* Slight style tweaks
 
 #### 0.1.0
 
