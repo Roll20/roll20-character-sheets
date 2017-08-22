@@ -1646,33 +1646,20 @@ on('change:setting_extra_stress', () => {
 	});
 });
 /* CALCULATE COHORT QUALITY */
-const calculateCohortDice = (tier, imp, type, prefix) => {
+const calculateCohortDice = prefix => {
+	getAttrs(['crew_tier', `${prefix}_impaired`, `${prefix}_type`], v => {
 		const setting = {};
-		setting[`${prefix}dice`] = (parseInt(tier) || 0) - (parseInt(imp) || 0) +
-			((type === 'elite' || type === 'expert') ? 1 : 0);
+		setting[`${prefix}_dice`] = (parseInt(v.crew_tier) || 0) -
+			(parseInt(v[`${prefix}_impaired`]) || 0) +
+			((v[`${prefix}_type`] === 'elite' || v[`${prefix}_type`] === 'expert') ? 1 : 0);
 		setAttrs(setting);
+	});
 	},
-	qualityAttrs = ['crew_tier', 'cohort1_impaired', 'cohort1_type'],
-	qualityEvent = qualityAttrs.map(x => `change:${x}`).join(' '),
-	repeatingQualityAttrs = ['crew_tier', 'repeating_cohort:impaired', 'repeating_cohort:type'],
-	repeatingQualityEvent = [
-		...repeatingQualityAttrs,
-		...['name', 'subtype', 'edge', 'flaws', 'description'].map(x => `repeating_cohort:${x}`)
-	].map(x => `change:${x}`).join(' ');
-on(qualityEvent, () => {
-	getAttrs(qualityAttrs, v => {
-		calculateCohortDice(v.crew_tier, v.cohort1_impaired, v.cohort1_type, 'cohort1_');
-	});
-});
-on(repeatingQualityEvent, () => {
-	getSectionIDs('repeating_cohort', list => {
-		list.forEach(id => {
-			const attrList = repeatingQualityAttrs.map(str => str.replace(':', `_${id}_`));
-			getAttrs(attrList, v => {
-				calculateCohortDice(v.crew_tier, v[attrList[1]], v[attrList[2]], `repeating_cohort_${id}_`);
-			});
-		});
-	});
+	qualityEvent = ['crew_tier', 'cohort1_impaired', 'cohort1_type'].map(x => `change:${x}`).join(' ');
+on(qualityEvent, () => calculateCohortDice('cohort1'));
+on('change:repeating_cohort', () => calculateCohortDice('repeating_cohort'));
+on('change:crew_tier', () => {
+	getSectionIDs('repeating_cohort', a => a.forEach(id => calculateCohortDice(`repeating_cohort_${id}`)))
 });
 /* LEFT-FILL CHECKBOXES */
 const handleBoxesFill = (name, upToFour) => {
@@ -2247,23 +2234,16 @@ on('sheet:opened', () => {
 				else if (versionMajor === 1 && versionMinor < 12) {
 					Object.keys(actionData).forEach(name => calculateResistance(name));
 					calculateStashDice();
-					[...actionsFlat, 'crew_tier'].forEach(name => calcTotalFromBoxes(name));
+					[...actionsFlat].forEach(name => calcTotalFromBoxes(name));
 					getSectionIDs('repeating_cohort', idArray => {
-						const attrs = [
-							'crew_tier1', 'crew_tier2', 'crew_tier3', 'crew_tier4',
-							'cohort1_impaired', 'cohort1_type',
-							...idArray.map(id => `repeating_cohort_${id}_impaired`),
-							...idArray.map(id => `repeating_cohort_${id}_type`)
-						];
-						getAttrs(attrs, v => {
-							const tier = parseInt(v.crew_tier1) + parseInt(v.crew_tier2) +
-								parseInt(v.crew_tier3) + parseInt(v.crew_tier4);
-							calculateCohortDice(tier, v.cohort1_impaired, v.cohort1_type, 'cohort1_');
-							idArray.forEach(id => calculateCohortDice(tier,
-								v[`repeating_cohort_${id}_impaired`],
-								v[`repeating_cohort_${id}_type`],
-								`repeating_cohort_${id}_`));
-							upgradeSheet('1.12');
+						getAttrs(['crew_tier1', 'crew_tier2', 'crew_tier3', 'crew_tier4'], v => {
+							const tier = (parseInt(v.crew_tier1) || 0) + (parseInt(v.crew_tier2) || 0) +
+								(parseInt(v.crew_tier3) || 0) + (parseInt(v.crew_tier4) || 0);
+							setAttrs({crew_tier: tier}, {}, () => {
+								calculateCohortDice('cohort1');
+								idArray.forEach(id => calculateCohortDice(`repeating_cohort_${id}`));
+								upgradeSheet('1.12');
+							});
 						});
 					});
 				}
