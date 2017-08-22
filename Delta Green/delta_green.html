@@ -3,7 +3,69 @@
                                 // A full night of sleep cures exhaustion so if sedatives work, you are not exhausted anymore
                                 // the day after a full night of sleep and both exhaustion (they work mechanically the same)
                                 
-							
+const fillRepeatingSectionFromData = (sectionName, dataList) => {
+    const createdIDs = [];
+    const setting = dataList.map(o => {
+            let rowID;
+            while (!rowID) {
+                let newID = generateRowID();
+                if (!createdIDs.includes(newID)) {
+                    rowID = newID;
+                    createdIDs.push(rowID);
+                }
+            }
+            return Object.keys(o).reduce((m, key) => {
+                m[`${sectionName}_${rowID}_${key}`] = o[key];
+                return m;
+            }, {});
+        })
+        .reduce((m, o) => Object.assign(m, o), {});
+    setAttrs(setting);
+};                                
+                                
+
+on("sheet:opened", function() {
+  var updates = {};
+  getAttrs(['version','name','sex','v1','v2','v3','h1','h2','h3','special1','special2','special3','special4','special5','special6','special_skill1','special_skill2','special_skill3','special_skill4','special_skill5','special_skill6'], function(v) {
+    if(v.version != "1.2") {
+         //updates=[{'version': '1.2'} , {'gender': attrs['sex'] ||''}, {'violence_1': attrs['v1'] ||''}, {'violence_2': attrs['v2'] ||''}, {'violence_3': attrs['v3'] ||''}, {'helpness_1': attrs['h1'] ||''}, {'helpness_2': attrs['h2'] ||''}, {'helpness_3': attrs['h3'] ||''}, ]
+     
+      if(v.name) {
+        updates.character_name = v.name;
+      }
+      if(v.sex) {
+        updates.gender = v.sex;
+      }
+      if(v.v1) {
+        updates.violence_1 = v.v1;
+      }
+      if(v.v2) {
+        updates.violence_2 = v.v2;
+      }
+      if(v.v3) {
+        updates.violence_3 = v.v3;
+      }
+      
+      if(v.h1) {
+        updates.helpness_1 = v.h1;
+      }
+      if(v.h2) {
+        updates.helpness_2 = v.h2;
+      }
+      if(v.h3) {
+        updates.helpness_3 = v.h3;
+      }
+      updates.version = "1.2";
+
+      setAttrs(updates);
+      let data = [{newtraining: v.special1 ||'', skilltraining: v.special_skill1 ||''}, {newtraining: v.special2 ||'', skilltraining: v.special_skill2 ||''}, {newtraining: v.special3 ||'', skilltraining: v.special_skill3 ||''}, {newtraining: v.special4 ||'', skilltraining: v.special_skill4 ||''}, {newtraining: v.special5 ||'', skilltraining: v.special_skill5 ||''}, {newtraining: v.special6 ||'', skilltraining: v.special_skill6 ||''} ].filter(o => (o.newtraining || o.skilltraining));
+      fillRepeatingSectionFromData('repeating_training', data);
+      
+    }
+  });
+});
+
+
 let checkstim=['stim1_chk','stim2_chk','hardstim1_chk','hardstim2_chk','exhaustion_chk'];
 on(checkstim.map(str => `change:${str}`).join(' '),function(){
 										getAttrs(checkstim,function(v){
@@ -193,8 +255,8 @@ on(" change:headshot_chk", function(){
                                 });
                
 // Breaking points unconcious, stunned, incapacitated and death
-on('sheet:opened change:wp change:hp change:san change:wp_max change:hp_max change:san_max change:bp_san',function(){
-	getAttrs(["wp","lowwill_chk","wp_max","hp","unconscious_chk","death_chk","hp_max","san","bp","san_max" ],function(v){
+on('sheet:opened change:wp change:hp change:san change:wp_max change:hp_max change:san_max',function(){
+	getAttrs(["wp","lowwill_chk","wp_max","hp","unconscious_chk","death_chk","hp_max","san","bp","san_max","pow" ],function(v){
 	    // Set Up the value with its max if above limit
 		if(Math.floor(v.wp)>Math.floor(v.wp_max)){
 			setAttrs({wp: Math.floor(v.wp_max)});
@@ -228,7 +290,7 @@ on('sheet:opened change:wp change:hp change:san change:wp_max change:hp_max chan
 			setAttrs({wp: 0});
 		}
 		if(Math.floor(v.san)<=Math.floor(v.bp)){
-			setAttrs({bp: Math.max(Math.floor(v.san)-Math.floor(v.pow),0)});
+			setAttrs({bp: Math.max(Math.floor(v.san)-Math.floor(v.pow),0) });
 		}
 		if(Math.floor(v.san)<=0){
 			setAttrs({san: 0});
@@ -237,7 +299,7 @@ on('sheet:opened change:wp change:hp change:san change:wp_max change:hp_max chan
 	});
 });
 // stats and skills
-on("change:unnatural", function() {
+on("sheet:opened change:unnatural", function() {
    getAttrs(["unnatural"], function(values) {
       setAttrs({san_max: 99-Math.floor(values.unnatural)});
    });
@@ -248,13 +310,13 @@ on('sheet:opened',function(){
         setAttrs({pow_tmp: v.pow});
     });
 });
-on('change:bp_diff',function(){
+on('sheet:opened change:bp_diff',function(){
     getAttrs(['bp_diff','bp'],function(v){
         setAttrs({bp: Math.max(Math.floor(v.bp)+Math.floor(v.bp_diff),0)});
         setAttrs({bp_diff: 0});
     });
 });
-on('change:str change:con change:pow change:dex change:int', function() {
+on('sheet:opened change:str change:con change:pow change:dex change:int', function() {
    getAttrs(["str","con","pow","dex","int","cha","pow_tmp"], function(values) {
       setAttrs({strx5: Math.floor(values.str * 5)});
       setAttrs({conx5: Math.floor(values.con * 5)});
@@ -392,7 +454,7 @@ on("change:repeating_weapons:weapon_skill",function(){
             setAttrs({totalgeneralmod: sum});
         });
     });
-    on('change:hp',function(){
+    on('sheet:opened change:hp',function(){
         getAttrs(['hp','hptmp','firstaidattempted'],function(v){
            if (Math.floor(v.hp)<Math.floor(v.hptmp)){
                setAttrs({firstaidattempted:0});
@@ -438,7 +500,7 @@ on("change:repeating_weapons:weapon_skill",function(){
 				<!-- BEGIN CONFIGURATION STUFF -->
 				<!--                           -->
 			<div class="sheet-config" style='border-style: dotted; border-color: #dbc792; padding: 5px; background-color: white; background-image: none;'>
-				sheet version: 2 Apr 2017
+				sheet version: 1.2 <input type="hidden" name="attr_version"/>
 				<div class='sheet-row'><h2 class='sheet-sectionHeader'>CONFIGURATION</h2></div>
 				<div class='sheet-UITweaks' style="padding: 10px;">
 						<div class="sheet-row">
@@ -681,10 +743,10 @@ specialc=3 disarm
                                     <caption>Special Non Combat Modifiers</caption>
                                     <tr>
                                         <!-- First Aid Flag Handling -->
-                                        <td>hp_tmp: param for first aid flag <input  type="number"  style="width:20px" disabled="true" name="attr_hptmp" value="0"></td>
+                                        <td>hp_tmp: param for first aid flag <input  type="number"  style="width:20px"  name="attr_hptmp" value="0"></td>
                                             <!-- BP Handling -->
-                                        <td>pow_tmp: param for handle mod pow<input   type="number"  style="width:20px" disabled="true" name="attr_pow_tmp" value="0"></td>
-                                        <td>bp_diff: param for handle pow mode of BP<input   type="number"  style="width:20px" disabled="true" name="attr_bp_diff" style="width: 73px;"  value="0"></td>
+                                        <td>pow_tmp: param for handle mod pow<input   type="number"  style="width:20px" name="attr_pow_tmp" value="0"></td>
+                                        <td>bp_diff: param for handle pow mode of BP<input   type="number"  style="width:20px" name="attr_bp_diff" style="width: 73px;"  value="0"></td>
                                     </tr>
                                     <tr>
                                         <td>Antidote<input type="number"  style="width:25px" name="attr_antidote" value="20">/Antibiotics<input type="number"  style="width:20px" name="attr_antibiotics" value="20"></td>
@@ -1836,7 +1898,7 @@ specialc=3 disarm
                                             </tr> 
                                             </table>
                                          </fieldset>
-                                        <table>
+                                  <!--      <table>
                                             <tr>
                                                 <td class="attr-roll" >type0<button class='dg-roll'  type='roll' value='&{template:test}{{name=stat/skill}} {{normal=[[1d100]]}} {{commonmod=[[20]]}}  {{rolltype=[[0]]}}' name='roll_type0' /><td> 
                                                 <td class="attr-roll" >type1a<button class='dg-roll'  type='roll' value='&{template:test}{{name=combat}}{{rolllet=[[0]]}}{{damage=[[1d7]]}}{{lethscore=[[1d100]]}} {{normal=[[1d100]]}} {{commonmod=[[20]]}}  {{rolltype=[[1]]}}' name='roll_type1' /><td> 
@@ -1845,7 +1907,7 @@ specialc=3 disarm
                                                 <td class="attr-roll" >type2<button class='dg-roll'  type='roll' value='&{template:test}{{name=snc}} {{normal=[[1d100]]}} {{commonmod=[[20]]}}  {{rolltype=[[2]]}' name='roll_type2' /><td> 
                                                 <td class="attr-roll" >type3<button class='dg-roll'  type='roll' value='&{template:test}{{name=sc}} {{normal=[[1d100]]}} {{commonmod=[[20]]}}  {{rolltype=[[3]]}}' name='roll_type3' /><td> 
                                             </tr>
-                                        </table>
+                                        </table> -->
                                 </div>
                             </div>    
                     </div>
@@ -3027,3 +3089,4 @@ specialc=3 disarm
 		
     </table>
     </rolltemplate>
+
