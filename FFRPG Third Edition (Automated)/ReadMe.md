@@ -1,6 +1,6 @@
 # FFRPG Third Edition Character Sheet
 
-This sheet was written for use with the Returner's Final Fantasy RPG Third Edition. The original version of this sheet was designed by John Myles (Actoba on Roll20.net) for DnD_5e. It has been extensively modified and will continue to be updated as necessary. Optional rules for Map Combat and Limit Breaks are fully supported. Sheet help is available on roll20.net from Kiyomi N. The sheet is designed to be usable by all Roll20 users regardless of subscription level.
+This sheet was written for use with the Returner's Final Fantasy RPG Third Edition. The original version of this sheet was designed by John Myles (Actoba on Roll20.net) for DnD_5e. It has been extensively modified and will continue to be updated as necessary. This particular version is designed to automate as much of the combat calculations as possible. This will require all monsters and characters have a sheet in roll20. A non-automated version is available as well. Optional rules for Map Combat and Limit Breaks are fully supported. Sheet help is available on roll20.net from Kiyomi N. The sheet is designed to be usable by all Roll20 users regardless of subscription level.
 
 ### Changelog
 
@@ -12,7 +12,7 @@ I have made the decision to remove targeting from my FFRPG sheet. This means tha
 
 ### Other resources
 
-* Macros can be a little complex for this sheet, and token macros especially might seem daunting at first. I have sample macro templates available upon request. (https://www.dropbox.com/s/lt3nqi1spva2bxp/Macro%20Tutorial.docx?dl=0)
+* Macros can be a little complex for this sheet, and token macros especially might seem daunting at first. I have sample macro templates available upon request. ((https://www.dropbox.com/s/lt3nqi1spva2bxp/Macro%20Tutorial.docx?dl=0))
 
 ### Feedback
 
