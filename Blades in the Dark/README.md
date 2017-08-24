@@ -4,6 +4,20 @@ This is a character sheet for Blades in the Dark for use on Roll20.
 
 ## Changelog
 
+### 1.12
+* Calculate trauma automatically
+* Overhauled roll template internally, no more distinction between normal dice and bonus dice
+* Visual improvements to layout for some kinds of checkboxes
+* Overall transition eye-candy
+
+### 1.11
+* Internal change to how checkbox attributes are stored
+* Change how default values are set so that only necessary attributes are changed
+
+### 1.10
+* Revamped flexbox-based layout and CSS changes
+* New design for clocks area
+
 ### 1.9
 * Clock segments are now clickable
 * Moved the healing clock to the other column of the harm/armor/coin container
