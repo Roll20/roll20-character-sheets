@@ -1,9 +1,9 @@
 <script type="text/worker">
-    var version = 2.1,
+    var version = 2.2,
         TAS, damageWatch = [], damageAttrs = [], i;
-    
+
     function cleanAttrs(attrs) { return _.mapObject(attrs, function(e) { return e === undefined ? '' : e; }); }
-    
+
     for (i = 1; i <= 32; i++) {
         damageWatch.push('change:hl' + i + '-damage');
         damageWatch.push('change:hl' + i + '-penalty');
@@ -24,18 +24,18 @@
             var ma = Math.max(0, attrs.I['ma-snake'], attrs.I['ma-tiger'], attrs.I['ma-void'], attrs.I['ma-reaper'],
                 attrs.I['ma-ebon'], attrs.I['ma-crane'], attrs.I['ma-nightingale'], attrs.I['ma-devil'], attrs.I['ma-claw'],
                 attrs.I['ma-pearl'], attrs.I['ma-steel']);
-            
+
             TAS.debug('attrs', attrs, 'rows', rows);
             _.each(rows, function(v, k) {
                 ma = Math.max(ma, v.I.repmartialarts);
             });
-            
+
             TAS.debug('Max MA', ma);
-            
-            TAS.repeating('weapon').fields('repweapondef').attrs('dexterity', 'brawl', 'melee', 'parry', 'wound-penalty')
+
+            TAS.repeating('weapon').fields('repweapondef').attrs('dexterity', 'brawl', 'melee', 'parry', 'parry-specialty', 'wound-penalty')
                 .tap(TAS._fn(function getMaxWeaponDef(rows, attrs) {
                 var wep = 0;
-                
+
                 TAS.debug('attrs', attrs, 'rows', rows);
                 _.each(rows, function(v, k) {
                     wep = Math.max(wep, v.I.repweapondef);
@@ -43,6 +43,8 @@
                 TAS.debug('Max Weapon Defense', wep);
                 TAS.debug('Parry calc:', 'Math.ceil((' + attrs.I.dexterity + ' + Math.max(' + attrs.I.brawl + ', ' + ma + ', ' + attrs.I.melee + ')) / 2) + ' + wep + ' - ' + Math.abs(attrs.I['wound-penalty']));
                 attrs.I.parry = Math.max(0, Math.ceil((attrs.I.dexterity + Math.max(attrs.I.brawl, ma, attrs.I.melee)) / 2) + wep - Math.abs(attrs.I['wound-penalty']));
+                TAS.debug('Parry w/specialty calc:', 'Math.ceil((' + attrs.I.dexterity + ' + Math.max(' + attrs.I.brawl + ', ' + ma + ', ' + attrs.I.melee + ') + 1) / 2) + ' + wep + ' - ' + Math.abs(attrs.I['wound-penalty']));
+                attrs.I['parry-specialty'] = Math.max(0, Math.ceil((attrs.I.dexterity + Math.max(attrs.I.brawl, ma, attrs.I.melee) + 1) / 2) + wep - Math.abs(attrs.I['wound-penalty']));
             })).execute();
         })).execute();
     }));
@@ -51,38 +53,38 @@
         getAttrs(["caste"], TAS._fn(function determineMotePool(values){
             var periEquation = "0";
             var persEquation = "0";
-            if (values.caste == "Dawn" || 
-                values.caste == "Zenith" || 
-                values.caste == "Twilight" || 
-                values.caste == "Night" || 
-                values.caste == "Eclipse" || 
-                values.caste == "Dusk" || 
-                values.caste == "Midnight" || 
-                values.caste == "Daybreak" || 
-                values.caste == "Day" || 
+            if (values.caste == "Dawn" ||
+                values.caste == "Zenith" ||
+                values.caste == "Twilight" ||
+                values.caste == "Night" ||
+                values.caste == "Eclipse" ||
+                values.caste == "Dusk" ||
+                values.caste == "Midnight" ||
+                values.caste == "Daybreak" ||
+                values.caste == "Day" ||
                 values.caste == "Moonshadow"){
                 persEquation = "@{essence} * 3 + 10";
                 periEquation = "@{essence} * 7 + 26";
             } else if (
-                values.caste == "Air" || 
-                values.caste == "Earth" || 
-                values.caste == "Fire" || 
-                values.caste == "Water" || 
+                values.caste == "Air" ||
+                values.caste == "Earth" ||
+                values.caste == "Fire" ||
+                values.caste == "Water" ||
                 values.caste == "Wood"){
                 persEquation = "@{essence} * 1 + 11";
                 periEquation = "@{essence} * 4 + 23";
             } else if (
-                values.caste == "Full Moon" || 
+                values.caste == "Full Moon" ||
                 values.caste == "Changing Moon" ||
                 values.caste == "No Moon" ||
                 values.caste == "Casteless"){
                 persEquation = "@{essence} * 1 + 15";
                 periEquation = "@{essence} * 4 + 34";
             } else if (
-                values.caste == "Journeys" || 
-                values.caste == "Serenity" || 
-                values.caste == "Battles" || 
-                values.caste == "Secrets" || 
+                values.caste == "Journeys" ||
+                values.caste == "Serenity" ||
+                values.caste == "Battles" ||
+                values.caste == "Secrets" ||
                 values.caste == "Endings"){
                 persEquation = "@{essence} * 2 + 9";
                 periEquation = "@{essence} * 6 + 25";
@@ -90,7 +92,7 @@
                 values.caste == "Blood" ||
                 values.caste == "Breath" ||
                 values.caste == "Flesh" ||
-                values.caste == "Marrow" || 
+                values.caste == "Marrow" ||
                 values.caste == "Soil"){
                 persEquation = "@{essence} * 3 + 10";
                 periEquation = "@{essence} * 4 + 23";
@@ -98,7 +100,7 @@
             setAttrs({
                 "personal-equation": persEquation,
                 "peripheral-equation": periEquation
-                
+
             });
         }));
     }));
@@ -107,14 +109,14 @@
         TAS.debug('Updating wound penalty', e);
         getAttrs(damageAttrs, TAS._fn(function calcPenalty(values) {
             var pen;
-            
+
             for (i = 32; i >= 1; i--) {
                 if (values['hl' + i + '-damage'] && values['hl' + i + '-damage'] !== 'healthy') break;
             }
             TAS.debug('Wound penalty at index ' + i, values['hl' + i + '-penalty']);
             if (values['hl' + i + '-penalty']) pen = values['hl' + i + '-penalty'];
             else pen = 0;
-            
+
             if (pen === 'I') pen = -4;
             if (pen === '') pen = 0;
             pen = parseInt(pen);
@@ -122,13 +124,13 @@
             setAttrs({ 'wound-penalty': pen });
         }));
     }));
-    
+
     on('sheet:opened', TAS._fn(function initIntimacies(e) {
         TAS.debug('Initializing intimacies', e);
         getAttrs(['init-intimacies'], TAS._fn(function checkInitialized(values) {
             var attrs = {}, indexes = _.times(4, generateRowID);
             if (parseInt(values['init-intimacies']) !== 0) return;
-            
+
             TAS.debug('Creating new intimacies', indexes);
             _.each(indexes, function(id, k) {
                 var v;
@@ -141,12 +143,12 @@
             setAttrs(attrs);
         }));
     }));
-    
+
     on('sheet:opened', TAS._fn(function upgradeVersion(e) {
         TAS.debug('Checking version', e);
         getAttrs(['version', 'exalt-type'], TAS._fn(function versionCheck(values) {
             var v = parseFloat(values.version);
-            
+
             if (v !== version) {
                 switch (v) {
                     default:
@@ -156,16 +158,23 @@
                         } else {
                             // new character
                         }
+                        // fallthrough
+                    case 2:
+                        // upgrade v2 to v2.1
+                        // fallthrough
+                    case 2.1:
+                        // upgrade v2.1 to v2.2
+                        // fallthrough
                 }
             }
         }));
     }));
 
-    
+
 
     function upgradeV1toV2() {
         TAS.debug('Upgrading from version 1');
-        
+
         getAttrs(['specialty1', 'specialty2', 'specialty3', 'repflaws',
             'personalessencecurr', 'peripheralessencecurr', 'gear1', 'gear2',
             'gear3', 'gear4', 'gear5', 'gear6', 'gear7', 'gear8', 'gear9',
@@ -190,7 +199,7 @@
             'intimacy2type', 'intimacy3name', 'intimacy3type'], TAS._fn(function upgrade(values) {
             var attrs = {}, indexes = _.times(3, generateRowID),
                 penaltyIdx = 0, damageIdx = 0, i, tmp, major, superior, legendary;
-            
+
             TAS.debug('Copying specialties');
             _.each(indexes, function(id, k) {
                 var old = values['specialty' + (k + 1)];
@@ -206,14 +215,14 @@
                 row.repspecialty = '';
                 setAttrs(cleanAttrs(attrs));
             })).execute();
-            
+
             // Due to a bug in the old sheet, there is only one flaw, not a repeating section
             TAS.debug('Copying flaw');
             if (values.repflaws && values.repflaws.length > 0) {
                 attrs['repeating_merits_' + generateRowID() + '_repmerits-name'] = values.repflaws;
                 attrs.repflaws = '';
             }
-            
+
             TAS.debug('Copying current essence motes');
             if (isFinite(parseInt(values.personalessencecurr))) {
                 attrs['personal-essence'] = values.personalessencecurr;
@@ -223,7 +232,7 @@
                 attrs['peripheral-essence'] = values.peripheralessencecurr;
                 attrs.peripheralessencecurr = '';
             }
-            
+
             TAS.debug('Copying static gear');
             indexes = _.times(10, generateRowID);
             _.each(indexes, function(id, k) {
@@ -233,7 +242,7 @@
                     attrs['gear' + (k + 1)] = '';
                 }
             });
-            
+
             TAS.debug('Copying health data');
             indexes = _.times(32, function(n) { return 'hl' + (n + 1) + '-penalty'; });
             if (isFinite(parseInt(values['0hls']))) {
@@ -331,7 +340,7 @@
             for (i = 0; i < tmp; i++) {
                 attrs[indexes.shift()] = 'bashing';
             }
-            
+
             TAS.debug('Copying static intimacies');
             indexes = [values.intimacy1type || 'Minor', values.intimacy2type || 'Minor', values.intimacy3type || 'Minor'];
             _.each(indexes, function(oldType, i) {
@@ -340,7 +349,7 @@
                 if (name && name.length > 0) {
                     attrs['repeating_intimacies_' + id + '_intimacyrepeatingname'] = name;
                     attrs['repeating_intimacies_' + id + '_intimacyrepeatingtype'] = newType;
-                    
+
                     attrs['intimacy' + (i + 1) + 'name'] = '';
                     attrs['intimacy' + (i + 1) + 'type'] = '';
                 }
@@ -351,7 +360,7 @@
                     row.intimacyrepeatingtype = 'Minor';
                 }
             })).execute();
-            
+
             TAS.repeating('charms').fields('charm-name', 'charm-cost', 'charm-type', 'charm-duration', 'charm-effect', // new fields
                 'charm1name', 'charm1cost', 'charm1type', 'charm1dur', 'charm1effect', // old fields
                 'charm2name', 'charm2cost', 'charm2type', 'charm2dur', 'charm2effect',
@@ -367,7 +376,7 @@
                     r['charm-type'] = newType;
                     r['charm-duration'] = r.charm1dur;
                     r['charm-effect'] = r.charm1effect;
-                    
+
                     // charm2X and charm3X get new rows
                     indexes = _.times(2, generateRowID);
                     _.each(indexes, function(id, k) {
@@ -381,14 +390,14 @@
                             attrs['repeating_charms_' + id + '_charm-effect'] = r['charm' + (k + 2) + 'effect'];
                         }
                     });
-                    
+
                     for (i = 1; i <= 3; i++) {
                         r['charm' + i + 'name'] = '';
                         r['charm' + i + 'cost'] = '';
                         r['charm' + i + 'type'] = '';
                         r['charm' + i + 'dur'] = '';
                         r['charm' + i + 'effect'] = '';
-                    } 
+                    }
                 });
                 attrs = cleanAttrs(attrs);
                 if (_.size(attrs) > 0) {
@@ -396,7 +405,7 @@
                     setAttrs(cleanAttrs(attrs));
                 }
             })).execute();
-            
+
             TAS.repeating('spells').fields('repspell2-name', 'repspell2-circle', 'repspell2-control', 'repspell2-cost', 'repspell2-dur', 'repspell2-effect',
                 'repspell3-name', 'repspell3-circle', 'repspell3-control', 'repspell3-cost', 'repspell3-dur', 'repspell3-effect',
                 'repspell-control', 'repspell-name', 'repspell-circle').tap(TAS._fn(function copyingSpells(rows) {
@@ -415,7 +424,7 @@
                             attrs['repeating_spells_' + id + '_repspell-cost'] = r['repspell' + (k + 2) + '-cost'];
                             attrs['repeating_spells_' + id + '_repspell-dur'] = r['repspell' + (k + 2) + '-dur'];
                             attrs['repeating_spells_' + id + '_repspell-effect'] = r['repspell' + (k + 2) + '-effect'];
-                            
+
                             r['repspell' + (k + 2) + '-name'] = '';
                             r['repspell' + (k + 2) + '-circle'] = '';
                             r['repspell' + (k + 2) + '-control'] = '';
@@ -436,7 +445,7 @@
                     setAttrs(cleanAttrs(attrs));
                 }
             })).execute();
-            
+
             TAS.debug('Copying xp values');
             if (isFinite(parseInt(values.earnedxp))) {
                 attrs.xp = parseInt(values.earnedxp);
@@ -466,7 +475,7 @@
                 attrs['white-xp'] = parseInt(values.currentwhixp);
                 attrs.currentwhixp = '';
             }
-            
+
             TAS.debug('Copying crafting projects');
             major = parseInt(values.currentmajpro);
             superior = parseInt(values.currentsuppro);
@@ -489,7 +498,7 @@
                 });
                 attrs.currentlegpro = '';
             }
-            
+
             TAS.debug('Adjusting values');
             indexes = ['strengthfav', 'dexterityfav', 'staminafav', 'charismafav',
                 'manipulationfav', 'apperancefav', 'perceptionfav',
@@ -509,14 +518,14 @@
                 }
             });
             attrs.caste = values.caste.substr(0, 1).toUpperCase() + values.caste.substr(1).toLowerCase();
-            
+
             attrs.version = version;
             attrs = cleanAttrs(attrs);
             TAS.debug('Saving attributes!', attrs);
             setAttrs(cleanAttrs(attrs));
         }));
     }
-    
+
 /* ---- BEGIN: TheAaronSheet.js ---- */
 // Github:   https://github.com/shdwjk/TheAaronSheet/blob/master/TheAaronSheet.js
 // By:       The Aaron, Arcane Scriptomancer
@@ -672,7 +681,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                     </div><!-- /sheet-flexbox-h -->
                 </div><!-- /sheet-col concept, animal, supernal -->
             </div><!-- /sheet-3colrow bio -->
-            
+
             <h1><span data-i18n="attributes">Attributes</span></h1>
             <div class="sheet-3colrow">
                 <div class="sheet-col">
@@ -853,7 +862,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                     </div><!-- /sheet-trait wits -->
                 </div><!-- /sheet-col mental -->
             </div><!-- /sheet-3colrow attributes -->
-            
+
             <div class="sheet-3colrow">
                 <div class="sheet-col">
                     <h1><span data-i18n="abilities">Abilities</span></h1>
@@ -1089,7 +1098,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                                     </div>
                                 </div><!-- /sheet-trait tailoring -->
                                 <div class="sheet-trait">
-                                    <label data-i18n-"weapon-forging">Weapon Forging</label>
+                                    <label data-i18n="weapon-forging">Weapon Forging</label>
                                     <div class="sheet-dots">
                                         <input type="radio" class="sheet-dots0" name="attr_craft-forging" value="0" checked="checked"><span></span>
                                         <input type="radio" class="sheet-dots1" name="attr_craft-forging" value="1"><span></span>
@@ -1710,7 +1719,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                             </div>
                         </div>
                     </fieldset>
-                    
+
                     <h1><span data-i18n="specialties">Specialties</span></h1>
                     <fieldset class="repeating_specialty">
                         <div class="sheet-flexbox-h sheet-flexbox0">
@@ -1949,12 +1958,12 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                             <div class="sheet-table-cell"><input type="text" name="attr_repweapontags" data-i18n-placeholder="weapon-tags-place" placeholder="Lethal, Brawl, Piercing"></div>
                         </fieldset>
                     </div><!-- /sheet-table weapons-->
-                    
+
                     <div class="sheet-text-center sheet-txt-lg" style="margin-top:8px"><strong data-i18n="miscellaneous-items">Miscellaneous Items</strong></div>
                     <fieldset class="repeating_gear">
                         <input type="text" name="attr_repgear" style="width:100%" data-i18n-placeholder="miscellaneous-items-place" placeholder="Fancy scarf">
                     </fieldset>
-                    
+
                     <h1><span data-i18n="armor">Armor</span></h1>
                     <div class="sheet-table">
                         <div class="sheet-table-header">
@@ -1980,7 +1989,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                     </div><!-- /sheet-table armor -->
                 </div><!-- /sheet-2col -->
             </div><!-- /sheet-3colrow -->
-            
+
             <h1><span data-i18n="health-and-defense">Health & Defense</span></h1>
             <div class="sheet-table sheet-txt-lg sheet-center-table sheet-80pct">
                 <div class="sheet-table-body">
@@ -2005,12 +2014,15 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                     <div class="sheet-table-row">
                         <div class="sheet-table-cell sheet-text-right"><span data-i18n="parry">Parry</span>:</div>
                         <div class="sheet-table-cell">
-                            <input type="number" value="0" readonly="readonly" name="attr_parry">
+                            <input type="number" value="0" readonly="readonly" name="attr_parry" style="width:27px;margin-right:2px" data-i18n-title="parry-without-specialty" title="Parry without specialty"><input type="number" value="0" readonly="readonly" name="attr_parry-specialty" style="width:27px" data-i18n-title="parry-with-specialty" title="Parry with specialty">
                         </div>
                         <div class="sheet-table-cell sheet-text-right"><span data-i18n="evasion">Evasion</span>:</div>
                         <div class="sheet-table-cell">
-                            <input type="hidden" value="(ceil((@{dexterity} + @{dodge}) / 2) - abs(@{armor-mobility}) - abs(@{wound-penalty}))" disabled="disabled" name="attr_evasion-base">
-                            <input type="number" value="(@{evasion-base} + abs(@{evasion-base})) / 2" disabled="disabled" name="attr_evasion">
+                            <input type="hidden" value="(@{dexterity} + @{dodge})" disabled="disabled" name="attr_evasion-root">
+                            <input type="hidden" value="(@{evasion-root} + 1)" disabled="disabled" name="attr_evasion-root-s">
+                            <input type="hidden" value="(ceil(@{evasion-root} / 2) - abs(@{armor-mobility}) - abs(@{wound-penalty}))" disabled="disabled" name="attr_evasion-base">
+                            <input type="hidden" value="(ceil(@{evasion-root-s} / 2) - abs(@{armor-mobility}) - abc(@{wound-penalty}))" disabled="disabled" name="attr_evasion-base-s">
+                            <input type="number" value="(@{evasion-base} + abs(@{evasion-base})) / 2" disabled="disabled" style="width:27px;margin-right:2px" data-i18n-title="evasion-without-specialty" title="Evasion without specialty" name="attr_evasion"><input type="number" value="(@{evasion-base-s} + abs(@{evasion-base-s})) / 2" disabled="disabled" style="width:27px" data-i18n-title="evasion-with-specialty" title="Evasion with specialty" name="attr_evasion-specialty">
                         </div>
                         <div class="sheet-table-cell sheet-text-right"><span data-i18n="resolve">Resolve</span>:</div>
                         <div class="sheet-table-cell">
@@ -2062,7 +2074,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                         <option value=""></option>
                         <option value="0">-0</option>
                         <option value="-1" selected="selected">-1</option>
-                        <option value="-2">-2</option> 
+                        <option value="-2">-2</option>
                         <option value="-3">-3</option>
                         <option value="-4">-4</option>
                         <option data-i18n="incapacitated" value="I">Incapacitated</option>
@@ -2079,7 +2091,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                         <option value=""></option>
                         <option value="0">-0</option>
                         <option value="-1" selected="selected">-1</option>
-                        <option value="-2">-2</option> 
+                        <option value="-2">-2</option>
                         <option value="-3">-3</option>
                         <option value="-4">-4</option>
                         <option data-i18n="incapacitated" value="I">Incapacitated</option>
@@ -2096,7 +2108,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                         <option value=""></option>
                         <option value="0">-0</option>
                         <option value="-1">-1</option>
-                        <option value="-2" selected="selected">-2</option> 
+                        <option value="-2" selected="selected">-2</option>
                         <option value="-3">-3</option>
                         <option value="-4">-4</option>
                         <option data-i18n="incapacitated" value="I">Incapacitated</option>
@@ -2113,7 +2125,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                         <option value=""></option>
                         <option value="0">-0</option>
                         <option value="-1">-1</option>
-                        <option value="-2" selected="selected">-2</option> 
+                        <option value="-2" selected="selected">-2</option>
                         <option value="-3">-3</option>
                         <option value="-4">-4</option>
                         <option data-i18n="incapacitated" value="I">Incapacitated</option>
@@ -2130,7 +2142,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                         <option value=""></option>
                         <option value="0">-0</option>
                         <option value="-1">-1</option>
-                        <option value="-2">-2</option> 
+                        <option value="-2">-2</option>
                         <option value="-3">-3</option>
                         <option value="-4" selected="selected">-4</option>
                         <option data-i18n="incapacitated" value="I">Incapacitated</option>
@@ -2147,7 +2159,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                         <option value=""></option>
                         <option value="0">-0</option>
                         <option value="-1">-1</option>
-                        <option value="-2">-2</option> 
+                        <option value="-2">-2</option>
                         <option value="-3">-3</option>
                         <option value="-4">-4</option>
                         <option data-i18n="incapacitated" value="I" selected="selected">Incapacitated</option>
@@ -2164,7 +2176,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                         <option value=""></option>
                         <option value="0">-0</option>
                         <option value="-1">-1</option>
-                        <option value="-2">-2</option> 
+                        <option value="-2">-2</option>
                         <option value="-3">-3</option>
                         <option value="-4">-4</option>
                         <option data-i18n="incapacitated" value="I">Incapacitated</option>
@@ -2181,7 +2193,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                         <option value=""></option>
                         <option value="0">-0</option>
                         <option value="-1">-1</option>
-                        <option value="-2">-2</option> 
+                        <option value="-2">-2</option>
                         <option value="-3">-3</option>
                         <option value="-4">-4</option>
                         <option data-i18n="incapacitated" value="I">Incapacitated</option>
@@ -2198,7 +2210,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                         <option value=""></option>
                         <option value="0">-0</option>
                         <option value="-1">-1</option>
-                        <option value="-2">-2</option> 
+                        <option value="-2">-2</option>
                         <option value="-3">-3</option>
                         <option value="-4">-4</option>
                         <option data-i18n="incapacitated" value="I">Incapacitated</option>
@@ -2215,7 +2227,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                         <option value=""></option>
                         <option value="0">-0</option>
                         <option value="-1">-1</option>
-                        <option value="-2">-2</option> 
+                        <option value="-2">-2</option>
                         <option value="-3">-3</option>
                         <option value="-4">-4</option>
                         <option data-i18n="incapacitated" value="I">Incapacitated</option>
@@ -2232,7 +2244,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                         <option value=""></option>
                         <option value="0">-0</option>
                         <option value="-1">-1</option>
-                        <option value="-2">-2</option> 
+                        <option value="-2">-2</option>
                         <option value="-3">-3</option>
                         <option value="-4">-4</option>
                         <option data-i18n="incapacitated" value="I">Incapacitated</option>
@@ -2249,7 +2261,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                         <option value=""></option>
                         <option value="0">-0</option>
                         <option value="-1">-1</option>
-                        <option value="-2">-2</option> 
+                        <option value="-2">-2</option>
                         <option value="-3">-3</option>
                         <option value="-4">-4</option>
                         <option data-i18n="incapacitated" value="I">Incapacitated</option>
@@ -2266,7 +2278,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                         <option value=""></option>
                         <option value="0">-0</option>
                         <option value="-1">-1</option>
-                        <option value="-2">-2</option> 
+                        <option value="-2">-2</option>
                         <option value="-3">-3</option>
                         <option value="-4">-4</option>
                         <option data-i18n="incapacitated" value="I">Incapacitated</option>
@@ -2283,7 +2295,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                         <option value=""></option>
                         <option value="0">-0</option>
                         <option value="-1">-1</option>
-                        <option value="-2">-2</option> 
+                        <option value="-2">-2</option>
                         <option value="-3">-3</option>
                         <option value="-4">-4</option>
                         <option data-i18n="incapacitated" value="I">Incapacitated</option>
@@ -2300,7 +2312,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                         <option value=""></option>
                         <option value="0">-0</option>
                         <option value="-1">-1</option>
-                        <option value="-2">-2</option> 
+                        <option value="-2">-2</option>
                         <option value="-3">-3</option>
                         <option value="-4">-4</option>
                         <option data-i18n="incapacitated" value="I">Incapacitated</option>
@@ -2317,7 +2329,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                         <option value=""></option>
                         <option value="0">-0</option>
                         <option value="-1">-1</option>
-                        <option value="-2">-2</option> 
+                        <option value="-2">-2</option>
                         <option value="-3">-3</option>
                         <option value="-4">-4</option>
                         <option data-i18n="incapacitated" value="I">Incapacitated</option>
@@ -2334,7 +2346,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                         <option value=""></option>
                         <option value="0">-0</option>
                         <option value="-1">-1</option>
-                        <option value="-2">-2</option> 
+                        <option value="-2">-2</option>
                         <option value="-3">-3</option>
                         <option value="-4">-4</option>
                         <option data-i18n="incapacitated" value="I">Incapacitated</option>
@@ -2351,7 +2363,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                         <option value=""></option>
                         <option value="0">-0</option>
                         <option value="-1">-1</option>
-                        <option value="-2">-2</option> 
+                        <option value="-2">-2</option>
                         <option value="-3">-3</option>
                         <option value="-4">-4</option>
                         <option data-i18n="incapacitated" value="I">Incapacitated</option>
@@ -2368,7 +2380,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                         <option value=""></option>
                         <option value="0">-0</option>
                         <option value="-1">-1</option>
-                        <option value="-2">-2</option> 
+                        <option value="-2">-2</option>
                         <option value="-3">-3</option>
                         <option value="-4">-4</option>
                         <option data-i18n="incapacitated" value="I">Incapacitated</option>
@@ -2385,7 +2397,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                         <option value=""></option>
                         <option value="0">-0</option>
                         <option value="-1">-1</option>
-                        <option value="-2">-2</option> 
+                        <option value="-2">-2</option>
                         <option value="-3">-3</option>
                         <option value="-4">-4</option>
                         <option data-i18n="incapacitated" value="I">Incapacitated</option>
@@ -2402,7 +2414,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                         <option value=""></option>
                         <option value="0">-0</option>
                         <option value="-1">-1</option>
-                        <option value="-2">-2</option> 
+                        <option value="-2">-2</option>
                         <option value="-3">-3</option>
                         <option value="-4">-4</option>
                         <option data-i18n="incapacitated" value="I">Incapacitated</option>
@@ -2419,7 +2431,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                         <option value=""></option>
                         <option value="0">-0</option>
                         <option value="-1">-1</option>
-                        <option value="-2">-2</option> 
+                        <option value="-2">-2</option>
                         <option value="-3">-3</option>
                         <option value="-4">-4</option>
                         <option data-i18n="incapacitated" value="I">Incapacitated</option>
@@ -2436,7 +2448,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                         <option value=""></option>
                         <option value="0">-0</option>
                         <option value="-1">-1</option>
-                        <option value="-2">-2</option> 
+                        <option value="-2">-2</option>
                         <option value="-3">-3</option>
                         <option value="-4">-4</option>
                         <option data-i18n="incapacitated" value="I">Incapacitated</option>
@@ -2453,7 +2465,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                         <option value=""></option>
                         <option value="0">-0</option>
                         <option value="-1">-1</option>
-                        <option value="-2">-2</option> 
+                        <option value="-2">-2</option>
                         <option value="-3">-3</option>
                         <option value="-4">-4</option>
                         <option data-i18n="incapacitated" value="I">Incapacitated</option>
@@ -2470,7 +2482,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                         <option value=""></option>
                         <option value="0">-0</option>
                         <option value="-1">-1</option>
-                        <option value="-2">-2</option> 
+                        <option value="-2">-2</option>
                         <option value="-3">-3</option>
                         <option value="-4">-4</option>
                         <option data-i18n="incapacitated" value="I">Incapacitated</option>
@@ -2487,7 +2499,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                         <option value=""></option>
                         <option value="0">-0</option>
                         <option value="-1">-1</option>
-                        <option value="-2">-2</option> 
+                        <option value="-2">-2</option>
                         <option value="-3">-3</option>
                         <option value="-4">-4</option>
                         <option data-i18n="incapacitated" value="I">Incapacitated</option>
@@ -2504,7 +2516,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                         <option value=""></option>
                         <option value="0">-0</option>
                         <option value="-1">-1</option>
-                        <option value="-2">-2</option> 
+                        <option value="-2">-2</option>
                         <option value="-3">-3</option>
                         <option value="-4">-4</option>
                         <option data-i18n="incapacitated" value="I">Incapacitated</option>
@@ -2521,7 +2533,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                         <option value=""></option>
                         <option value="0">-0</option>
                         <option value="-1">-1</option>
-                        <option value="-2">-2</option> 
+                        <option value="-2">-2</option>
                         <option value="-3">-3</option>
                         <option value="-4">-4</option>
                         <option data-i18n="incapacitated" value="I">Incapacitated</option>
@@ -2538,7 +2550,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                         <option value=""></option>
                         <option value="0">-0</option>
                         <option value="-1">-1</option>
-                        <option value="-2">-2</option> 
+                        <option value="-2">-2</option>
                         <option value="-3">-3</option>
                         <option value="-4">-4</option>
                         <option data-i18n="incapacitated" value="I">Incapacitated</option>
@@ -2555,7 +2567,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                         <option value=""></option>
                         <option value="0">-0</option>
                         <option value="-1">-1</option>
-                        <option value="-2">-2</option> 
+                        <option value="-2">-2</option>
                         <option value="-3">-3</option>
                         <option value="-4">-4</option>
                         <option data-i18n="incapacitated" value="I">Incapacitated</option>
@@ -2572,14 +2584,15 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                         <option value=""></option>
                         <option value="0">-0</option>
                         <option value="-1">-1</option>
-                        <option value="-2">-2</option> 
+                        <option value="-2">-2</option>
                         <option value="-3">-3</option>
                         <option value="-4">-4</option>
                         <option data-i18n="incapacitated" value="I">Incapacitated</option>
                     </select>
                 </div>
             </div><!-- /sheet-health-track -->
-            
+
+
             <h1><span data-i18n="intimacies">Intimacies</span></h1>
             <input type="hidden" value="0" name="attr_init-intimacies">
             <div class="sheet-table">
@@ -2608,7 +2621,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
             <fieldset class="repeating_charms">
                 <div class="sheet-table sheet-body">
                     <div class="sheet-table-row" style="width:100%;">
-                        <input type="text" name="attr_charm-name" style="width:85%; color: #0095c6; font-weight:bold;" data-i18n-placeholder="charm-place" placeholder="Excellent Solar Larceny"><span> </span>
+                        <input type="text" name="attr_charm-name" style="width:79%; color: #0095c6; font-weight:bold;" data-i18n-placeholder="charm-place" placeholder="Excellent Solar Larceny"><span> </span>
                         <select name="attr_charm-type" style="width:109px">
                             <option value=""></option>
                             <option data-i18n="simple" value="Simple">Simple</option>
@@ -2616,6 +2629,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                             <option data-i18n="reflexive" value="Reflexive">Reflexive</option>
                             <option data-i18n="premanent" value="Permanent">Permanent</option>
                         </select>
+                        <button type="roll" class="sheet-roll" name="roll_CharmCast" value="&{template:exalted3e_cast} {{charm-name=@{charm-name}}} {{character-name=@{character_name}}} {{skill=@{charm-skill}}} {{keywords=@{charm-keywords}}} {{type=@{charm-type}}} {{cost=@{charm-cost}}} {{duration=@{charm-duration}}} {{description=@{charm-description}}} {{effect=@{charm-effect}}}">Cast</button>
                     </div> 
                     <div class="sheet-table-row sheet-charms-spells-trait" style="width:100%">
                         <span data-i18n="book">Book</span><span>: </span>
@@ -2634,7 +2648,10 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                         <input type="text" name="attr_charm-keywords" class="sheet-charms-spells-trait" style="width:90%" data-i18n-placeholder="charm-keywords-place" placeholder="Uniform, Psyche">
                     </div>
                     <div class="sheet-table-row" style="width:100%">
-                        <input type="checkbox" name="attr_charm-effect-display" class="sheet-charmeffect" value="1"/><span class="sheet-charmeffect" title="Show Effect"></span>
+                        <input type="checkbox" name="attr_charm-effect-display" class="sheet-charmeffect" value="1"/><span class="sheet-charmeffect" title="Show Description & Effect"></span>
+                        <div class="sheet-charm-effect">
+                            <textarea name="attr_charm-description" style="width:98%; height:50px;" data-i18n="charm-desc-place" placeholder="Harnessing the great power of The Unconquered Sun, Karal focuses his efforts!"></textarea>
+                        </div>
                         <div class="sheet-charm-effect">
                             <textarea name="attr_charm-effect" style="width:98%; height:100px;" data-i18n="charm-effect-place" placeholder="Add dice to a Larceny roll"></textarea>
                         </div>
@@ -2647,13 +2664,14 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
             <fieldset class="repeating_spells">
                 <div class="sheet-table sheet-body">
                     <div class="sheet-table-row" style="width:100%;">
-                        <input type="text" name="attr_repspell-name" style="width:85%; color: #9f0b10; font-weight:bold;" data-i18n-placeholder="spell-place" placeholder="Cirrus Skiff"><span> </span>
+                        <input type="text" name="attr_repspell-name" style="width:79%; color: #9f0b10; font-weight:bold;" data-i18n-placeholder="spell-place" placeholder="Cirrus Skiff"><span> </span>
                         <select name="attr_repspell-circle" style="width:109px">
                             <option value=""></option>
                             <option data-i18n="terrestrial" value="Terrestrial">Terrestrial</option>
                             <option data-i18n="celestial" value="Celestial">Celestial</option>
                             <option data-i18n="solar" value="Solar">Solar</option>
                         </select>
+                        <button type="roll" class="sheet-roll" name="roll_SpellCast" value="&{template:exalted3e_cast} {{spell-name=@{repspell-name}}} {{character-name=@{character_name}}} {{skill=Sorcery}} {{keywords=@{spell-keywords}}} {{circle=@{repspell-circle}}} {{cost=@{repspell-cost}}} {{duration=@{repspell-dur}}} {{description=@{spell-description}}} {{effect=@{repspell-effect}}}">Cast</button>
                     </div> 
                     <div class="sheet-table-row sheet-charms-spells-trait" style="width:100%"> 
                         <span data-i18n="book">Book</span><span>: </span>
@@ -2672,7 +2690,10 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                         <input type="text" name="attr_spell-keywords" class="sheet-charms-spells-trait" style="width:90%" data-i18n-placeholder="spell-keywords-place" placeholder="None">
                     </div>
                     <div class="sheet-table-row" style="width:100%">
-                        <input type="checkbox" name="attr_spell-effect-display" class="sheet-spelleffect" value="1"/><span class="sheet-spelleffect" title="Show Effect"></span>
+                        <input type="checkbox" name="attr_spell-effect-display" class="sheet-spelleffect" value="1"/><span class="sheet-spelleffect" title="Show Description & Effect"></span>
+                        <div class="sheet-spell-effect">
+                            <textarea name="attr_spell-description" style="width:98%; height:50px;" data-i18n="spell-desc-place" placeholder="Karal calls upon the winds to form a small cloud under his command!"></textarea>
+                        </div>
                         <div class="sheet-spell-effect">
                             <textarea name="attr_repspell-effect" style="width:98%; height:100px;" data-i18n="spell-effect-place" placeholder="Call a small cloud to ride on"></textarea>
                         </div>
@@ -2682,13 +2703,71 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
         </div><!-- /sheet-body -->
         <div class="sheet-body sheet-tab-content sheet-tab-settings-sheet">
             <h1><span data-i18n="mote-pool-equations">Mote Pool Equations</span></h1>
-            <label data-i18n="max-personal-motes">Max Personal Motes</label> 
+            <label data-i18n="max-personal-motes">Max Personal Motes</label>
             <input type="text" name="attr_personal-equation" value="@{essence} * 3 + 10"><span> </span>
-            <label data-i18n="max-peripheral-motes">Max Peripheral Motes</label> 
+            <label data-i18n="max-peripheral-motes">Max Peripheral Motes</label>
             <input type="text" name="attr_peripheral-equation" value="@{essence} * 7 + 26"><span></span>
         </div>
         <div class="sheet-footer">
-            <button type="roll" value="/w &quot;@{character_name}&quot; &{template:default} {{name=Ex3 Character Sheet}} {{Version:=2.1}} {{Wiki Article:=[Click for info](https://wiki.roll20.net/Ex3 Character Sheet)}}"><span data-i18n="version">Version</span> 2.1 &ndash; <span data-i18n="more-information">More Information</span></button>
+            <button type="roll" value="/w &quot;@{character_name}&quot; &{template:default} {{name=Ex3 Character Sheet}} {{Version:=2.3}} {{Wiki Article:=[Click for info](https://wiki.roll20.net/Ex3 Character Sheet)}}"><span data-i18n="version">Version</span> 2.3 &ndash; <span data-i18n="more-information">More Information</span></button>
         </div>
     </div>
 </div><!-- /sheet-content -->
+
+<rolltemplate class="sheet-rolltemplate-exalted3e_cast">
+    <table>
+        {{#charm-name}}
+        <tr>
+            <td class="charm-name" colspan="3">
+                {{charm-name}}
+            </td>
+        </tr>
+        {{/charm-name}}
+        {{#spell-name}}
+        <tr>
+            <td class="spell-name" colspan="3">
+                {{spell-name}}
+            </td>
+        </tr>
+        {{/spell-name}}
+        <tr>
+            <td class="subheader" colspan="3";>
+                {{character-name}}
+                <span>✴</span>
+                {{skill}}
+        </tr>
+        <tr>
+            <td class="subheader" colspan="3">
+                {{keywords}}
+            </td>
+        </tr>
+        <tr>
+            {{#type}}
+            <td class="info">
+                <span>Type</span><br>{{type}}
+            </td>
+            {{/type}}
+            {{#circle}}
+            <td class="info">
+                <span>Circle</span><br>{{circle}}
+            </td>
+            {{/circle}}
+            <td class="info">
+                <span>Cost</span><br>{{cost}}
+            </td>
+            <td class="info">
+                <span>Duration</span><br>{{duration}}
+            </td>
+        </tr>
+        <tr>
+            <td class="desc" colspan="3">
+                <span>Description</span><br>{{description}}
+            </td>
+        </tr>
+        <tr>
+            <td class="effect" colspan="3">
+                <span>Effect</span><br>{{effect}}
+            </td>
+        </tr>
+    </table>
+</rolltemplate>
