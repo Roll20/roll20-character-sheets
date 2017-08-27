@@ -7,7 +7,6 @@
 		calcToughness();
 		calcResolve();
 		calcHitPoints();
-		calcXPchanges();
 		calcHeavy();
 		calcBulky();
 		calcSpeed();
@@ -30,7 +29,65 @@
 		calcPrescience();
 		calcProtection();
 		calcAllActionRolls();
+		featsFixColumns();
+		perksFixColumns();
+		flawsFixColumns();
 	});
+	
+	// Function to combine the double columns in Feats, Perks, Flaws, & Power Level for Actions
+	// **** To be removed after a few months, only needed for pre-existing characters
+	// **** Put in August 2017
+    function featsFixColumns() {
+		getSectionIDs("repeating_featsRight", function(featsRightArray) {
+			if(featsRightArray.length > 0) {
+				_.each(featsRightArray, function(currentID, i) {
+				    getAttrs(["repeating_featsRight_" + currentID + "_feat_right_name", "repeating_featsRight_" + currentID + "_feat_right_cost", "repeating_featsRight_" + currentID + "_feat_right_description"], function(v) {
+    					var newRowID = generateRowID();
+    					var newRowUpdate = {};
+    					newRowUpdate["repeating_featsLeft_" + newRowID + "_feat_left_name"] = v["repeating_featsRight_" + currentID + "_feat_right_name"];
+    					newRowUpdate["repeating_featsLeft_" + newRowID + "_feat_left_cost"] = v["repeating_featsRight_" + currentID + "_feat_right_cost"];
+    					newRowUpdate["repeating_featsLeft_" + newRowID + "_feat_left_description"] = v["repeating_featsRight_" + currentID + "_feat_right_description"];
+    					removeRepeatingRow("repeating_featsRight_" + currentID);
+    					setAttrs(newRowUpdate);
+				    });
+				});
+			}
+		});
+	};
+
+    function perksFixColumns() {
+		getSectionIDs("repeating_perksRight", function(perksRightArray) {
+			if(perksRightArray.length > 0) {
+				_.each(perksRightArray, function(currentID, i) {
+				    getAttrs(["repeating_perksRight_" + currentID + "_perksRight_name", "repeating_perksRight_" + currentID + "_perksRight_description"], function(v) {
+    					var newRowID = generateRowID();
+    					var newRowUpdate = {};
+    					newRowUpdate["repeating_perks_" + newRowID + "_perks_name"] = v["repeating_perksRight_" + currentID + "_perksRight_name"];
+    					newRowUpdate["repeating_perks_" + newRowID + "_perks_description"] = v["repeating_perksRight_" + currentID + "_perksRight_description"];
+    					removeRepeatingRow("repeating_perksRight_" + currentID);
+    					setAttrs(newRowUpdate);
+				    });
+				});
+			}
+		});
+	};
+
+    function flawsFixColumns() {
+		getSectionIDs("repeating_flawsRight", function(flawsRightArray) {
+			if(flawsRightArray.length > 0) {
+				_.each(flawsRightArray, function(currentID, i) {
+				    getAttrs(["repeating_flawsRight_" + currentID + "_flawsRight_name", "repeating_flawsRight_" + currentID + "_flawsRight_description"], function(v) {
+    					var newRowID = generateRowID();
+    					var newRowUpdate = {};
+    					newRowUpdate["repeating_flaws_" + newRowID + "_flaws_name"] = v["repeating_flawsRight_" + currentID + "_flawsRight_name"];
+    					newRowUpdate["repeating_flaws_" + newRowID + "_flaws_description"] = v["repeating_flawsRight_" + currentID + "_flawsRight_description"];
+    					removeRepeatingRow("repeating_flawsRight_" + currentID);
+    					setAttrs(newRowUpdate);
+				    });
+				});
+			}
+		});
+	};
 
     // Function to determine dice number :: takes in the attribute score :: outputs the dice number
     function calcAttributeDiceNumber(value) {
@@ -552,7 +609,8 @@
                 score = score + values.might_substitution*1;
             }
             setAttrs({
-                "evasion": score + values.armor*1 + values.evasion_other*1 + 10
+                "evasion": score + values.armor*1 + values.evasion_other*1 + 10,
+                "Guard": score + values.armor*1 + values.evasion_other*1 + 10
             });
         });
     };
@@ -572,7 +630,9 @@
                 score += values.will_substitution*1;
             }
             setAttrs({
-                "toughness": score + values.toughness_other*1 + 10
+                "Toughness": score + values.toughness_other*1 + 10,
+                "Toughness4Token": score + values.toughness_other*1 + 10
+
             });
         });
     };
@@ -597,7 +657,8 @@
                 score += values.will_substitution*1;
             }
             setAttrs({
-                "resolve": score + values.resolve_other*1 + 10
+                "Resolve": score + values.resolve_other*1 + 10,
+                "Resolve4Token": score + values.resolve_other*1 + 10
             });
         });
     };
@@ -705,19 +766,45 @@
                 newSpeed = values.item_bulky_result*1;
             }
             setAttrs({
-                "speed": newSpeed
+                "Speed": newSpeed,
+                "Speed4Token": newSpeed
             });
         });
     };
 
     // If lethal damage changed, recalculate max HP
-    on("change:lethal_damage change:hit_point_feats change:hit_point_other change:fortitude_substitution change:fortitude_score change:presence_score change:will_score", function() {
+    on("change:lethaldamage change:hit_point_feats change:hit_point_other change:fortitude_substitution change:fortitude_score change:presence_score change:will_score", function() {
+		getAttrs(["LethalDamage"], function(values) {
+			setAttrs({	"lethal_damage": values.LethalDamage*1	});
+		});
         calcHitPoints();
     });
-    
+	
+	on("change:lethal_damage", function() {
+		getAttrs(["lethal_damage"], function(values) {
+			setAttrs({	"LethalDamage": values.lethal_damage*1	});
+		});
+	});
+	
+	on("change:HP", function() {
+		getAttrs(["HP"], function(values) {
+			setAttrs({
+				"hit_point": values.HP
+			});
+		});
+	});
+	
+	on("change:hit_point", function() {
+		getAttrs(["hit_point"], function(values) {
+			setAttrs({
+				"HP": values.hit_point
+			});
+		});
+	});
+
     // Function to calc HIt points, called when changes to fortitude, presence or will
     function calcHitPoints() {
-        getAttrs(["fortitude_score", "fortitude_substitution", "presence_score", "presence_substitution", "will_score", "will_substitution", "lethal_damage", "hit_point_feats", "hit_point_other"], function(values) {
+        getAttrs(["fortitude_score", "fortitude_substitution", "presence_score", "presence_substitution", "will_score", "will_substitution", "LethalDamage", "hit_point_feats", "hit_point_other"], function(values) {
             var score = 0;
             if(values.fortitude_score*1 >= values.fortitude_substitution*1) {
                 score = values.fortitude_score*1;
@@ -735,27 +822,40 @@
                 score += values.will_substitution*1;
             }
             setAttrs({
-                "hit_point_max": 2*(score) + 10 - values.lethal_damage*1 + values.hit_point_feats*1 + values.hit_point_other*1
+                "HP_max": 2*(score) + 10 - values.LethalDamage*1 + values.hit_point_feats*1 + values.hit_point_other*1,
+				"hit_point_max": 2*(score) + 10 - values.LethalDamage*1 + values.hit_point_feats*1 + values.hit_point_other*1
             });
         });
     };
 	
     // Anytime XP is updated, recalculate Attribute Points and Feat Points and Level
     on("change:xp", function() {
-		calcXPchanges();
+        getAttrs(["xp"], function(values) {
+            setAttrs({
+                "level": Math.floor(values.xp/3) + 1
+            });
+		calcXPpoints(values.xp);
+        });
+    });
+    
+    on("change:level", function() {
+        getAttrs(["level"], function(values) {
+            setAttrs({
+                "xp": (values.level*1 - 1)*3
+            });
+        calcXPpoints((values.level*1 - 1)*3);
+        });
     });
 
 	// Function to run when XP is changed
-	function calcXPchanges() {
-        getAttrs(["xp"], function(values) {
-            setAttrs({
-                "level": Math.floor(values.xp/3) + 1,
-                "attribute_points": values.xp*3 + 40,
-                "feat_total_points": values.xp*1 + 6
-            });
+	function calcXPpoints(value) {
+        setAttrs({
+            "attribute_points": value*3 + 40,
+            "feat_total_points": value*1 + 6,
+            "xp": value*1
         });
 	};
-    
+
     // Anytime Agility score is changed, update cost and dice
     on("change:agility_score change:agility_dice_d20 change:agility_cost_modifier change:agility_dice_modifier", function() {
         calcAttributes();
@@ -764,8 +864,16 @@
 	// Function for calculating everything to do with Agility
 	function calcAgility() {
         getAttrs(["agility_score", "agility_substitution", "agility_dice_d20", "agility_cost_modifier", "agility_dice_modifier"], function(values) {
-            var score = values.agility_score*1 + values.agility_dice_modifier*1;
-            var scoreCost = values.agility_score*1 + values.agility_cost_modifier*1;
+            var score = values.agility_score*1;
+            if(score < 0) {
+                score = 0;
+                setAttrs({  "agility_score": 0    });
+            } else if(score > 9) {
+                score = 9;
+                setAttrs({  "agility_score": 9    });
+            }
+            var scoreCost = score + values.agility_cost_modifier*1;
+            score = score + values.agility_dice_modifier*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
@@ -803,8 +911,16 @@
 	// Function for calculating everything to do with Fortitude
 	function calcFortitude() {
         getAttrs(["fortitude_score", "fortitude_substitution", "fortitude_dice_d20", "fortitude_cost_modifier", "fortitude_dice_modifier"], function(values) {
-            var score = values.fortitude_score*1 + values.fortitude_dice_modifier*1;
-            var scoreCost = values.fortitude_score*1 + values.fortitude_cost_modifier*1;
+            var score = values.fortitude_score*1;
+            if(score < 0) {
+                score = 0;
+                setAttrs({  "fortitude_score": 0    });
+            } else if(score > 9) {
+                score = 9;
+                setAttrs({  "fortitude_score": 9    });
+            }
+            var scoreCost = score + values.fortitude_cost_modifier*1;
+            score = score + values.fortitude_dice_modifier*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
@@ -838,8 +954,16 @@
 	// Function for calculating everything to do with Might
 	function calcMight() {
         getAttrs(["might_score", "might_substitution", "might_dice_d20", "might_cost_modifier", "might_dice_modifier"], function(values) {
-            var score = values.might_score*1 + values.might_dice_modifier*1;
-            var scoreCost = values.might_score*1 + values.might_cost_modifier*1;
+            var score = values.might_score*1;
+            if(score < 0) {
+                score = 0;
+                setAttrs({  "might_score": 0    });
+            } else if(score > 9) {
+                score = 9;
+                setAttrs({  "might_score": 9    });
+            }
+            var scoreCost = score + values.might_cost_modifier*1;
+            score = score + values.might_dice_modifier*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
@@ -873,8 +997,16 @@
 	// Function for calculating everything to do with Deception
 	function calcDeception() {
         getAttrs(["deception_score", "deception_dice_d20", "deception_cost_modifier", "deception_dice_modifier"], function(values) {
-            var score = values.deception_score*1 + values.deception_dice_modifier*1;
-            var scoreCost = values.deception_score*1 + values.deception_cost_modifier*1;
+            var score = values.deception_score*1;
+            if(score < 0) {
+                score = 0;
+                setAttrs({  "deception_score": 0    });
+            } else if(score > 9) {
+                score = 9;
+                setAttrs({  "deception_score": 9    });
+            }
+            var scoreCost = score + values.deception_cost_modifier*1;
+            score = score + values.deception_dice_modifier*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
@@ -901,8 +1033,16 @@
 	// Function for calculating everything to do with Presence
 	function calcPresence() {
         getAttrs(["presence_score", "presence_substitution", "presence_dice_d20", "presence_cost_modifier", "presence_dice_modifier"], function(values) {
-            var score = values.presence_score*1 + values.presence_dice_modifier*1;
-            var scoreCost = values.presence_score*1 + values.presence_cost_modifier*1;
+            var score = values.presence_score*1;
+            if(score < 0) {
+                score = 0;
+                setAttrs({  "presence_score": 0    });
+            } else if(score > 9) {
+                score = 9;
+                setAttrs({  "presence_score": 9    });
+            }
+            var scoreCost = score + values.presence_cost_modifier*1;
+            score = score + values.presence_dice_modifier*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
@@ -936,8 +1076,16 @@
 	// Function for calculating everything to do with Persuasion
 	function calcPersuasion() {
         getAttrs(["persuasion_score", "persuasion_dice_d20", "persuasion_cost_modifier", "persuasion_dice_modifier"], function(values) {
-            var score = values.persuasion_score*1 + values.persuasion_dice_modifier*1;
-            var scoreCost = values.persuasion_score*1 + values.persuasion_cost_modifier*1;
+            var score = values.persuasion_score*1;
+            if(score < 0) {
+                score = 0;
+                setAttrs({  "persuasion_score": 0    });
+            } else if(score > 9) {
+                score = 9;
+                setAttrs({  "persuasion_score": 9    });
+            }
+            var scoreCost = score + values.persuasion_cost_modifier*1;
+            score = score + values.persuasion_dice_modifier*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
@@ -964,8 +1112,16 @@
 	// Function for calculating everything to do with Learning
 	function calcLearning() {
         getAttrs(["learning_score", "learning_dice_d20", "learning_cost_modifier", "learning_dice_modifier"], function(values) {
-            var score = values.learning_score*1 + values.learning_dice_modifier*1;
-            var scoreCost = values.learning_score*1 + values.learning_cost_modifier*1;
+            var score = values.learning_score*1;
+            if(score < 0) {
+                score = 0;
+                setAttrs({  "learning_score": 0    });
+            } else if(score > 9) {
+                score = 9;
+                setAttrs({  "learning_score": 9    });
+            }
+            var scoreCost = score + values.learning_cost_modifier*1;
+            score = score + values.learning_dice_modifier*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
@@ -992,8 +1148,16 @@
 	// Function for calculating everything to do with Logic
 	function calcLogic() {
         getAttrs(["logic_score", "logic_dice_d20", "logic_cost_modifier", "logic_dice_modifier"], function(values) {
-            var score = values.logic_score*1 + values.logic_dice_modifier*1;
-            var scoreCost = values.logic_score*1 + values.logic_cost_modifier*1;
+            var score = values.logic_score*1;
+            if(score < 0) {
+                score = 0;
+                setAttrs({  "logic_score": 0    });
+            } else if(score > 9) {
+                score = 9;
+                setAttrs({  "logic_score": 9    });
+            }
+            var scoreCost = score + values.logic_cost_modifier*1;
+            score = score + values.logic_dice_modifier*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
@@ -1020,8 +1184,16 @@
 	// Function for calculating everything to do with Perception
 	function calcPerception() {
         getAttrs(["perception_score", "perception_dice_d20", "perception_cost_modifier", "perception_dice_modifier"], function(values) {
-            var score = values.perception_score*1 + values.perception_dice_modifier*1;
-            var scoreCost = values.perception_score*1 + values.perception_cost_modifier*1;
+            var score = values.perception_score*1;
+            if(score < 0) {
+                score = 0;
+                setAttrs({  "perception_score": 0    });
+            } else if(score > 9) {
+                score = 9;
+                setAttrs({  "perception_score": 9    });
+            }
+            var scoreCost = score + values.perception_cost_modifier*1;
+            score = score + values.perception_dice_modifier*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
@@ -1048,8 +1220,16 @@
 	// Function for calculating everything to do with Will
 	function calcWill() {
         getAttrs(["will_score", "will_substitution", "will_dice_d20", "will_cost_modifier", "will_dice_modifier"], function(values) {
-            var score = values.will_score*1 + values.will_dice_modifier*1;
-            var scoreCost = values.will_score*1 + values.will_cost_modifier*1;
+            var score = values.will_score*1;
+            if(score < 0) {
+                score = 0;
+                setAttrs({  "will_score": 0    });
+            } else if(score > 9) {
+                score = 9;
+                setAttrs({  "will_score": 9    });
+            }
+            var scoreCost = score + values.will_cost_modifier*1;
+            score = score + values.will_dice_modifier*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
@@ -1083,8 +1263,16 @@
 	// Function for calculating everything to do with Alteration
 	function calcAlteration() {
         getAttrs(["alteration_score", "alteration_dice_d20", "alteration_cost_modifier", "alteration_dice_modifier"], function(values) {
-            var score = values.alteration_score*1 + values.alteration_dice_modifier*1;
-            var scoreCost = values.alteration_score*1 + values.alteration_cost_modifier*1;
+            var score = values.alteration_score*1;
+            if(score < 0) {
+                score = 0;
+                setAttrs({  "alteration_score": 0    });
+            } else if(score > 9) {
+                score = 9;
+                setAttrs({  "alteration_score": 9    });
+            }
+            var scoreCost = score + values.alteration_cost_modifier*1;
+            score = score + values.alteration_dice_modifier*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
@@ -1111,8 +1299,16 @@
 	// Function for calculating everything to do with Creation
 	function calcCreation() {
         getAttrs(["creation_score", "creation_dice_d20", "creation_cost_modifier", "creation_dice_modifier"], function(values) {
-            var score = values.creation_score*1 + values.creation_dice_modifier*1;
-            var scoreCost = values.creation_score*1 + values.creation_cost_modifier*1;
+            var score = values.creation_score*1;
+            if(score < 0) {
+                score = 0;
+                setAttrs({  "creation_score": 0    });
+            } else if(score > 9) {
+                score = 9;
+                setAttrs({  "creation_score": 9    });
+            }
+            var scoreCost = score + values.creation_cost_modifier*1;
+            score = score + values.creation_dice_modifier*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
@@ -1139,8 +1335,16 @@
 	// Function for calculating everything to do with Energy
 	function calcEnergy() {
         getAttrs(["energy_score", "energy_dice_d20", "energy_cost_modifier", "energy_dice_modifier"], function(values) {
-            var score = values.energy_score*1 + values.energy_dice_modifier*1;
-            var scoreCost = values.energy_score*1 + values.energy_cost_modifier*1;
+            var score = values.energy_score*1;
+            if(score < 0) {
+                score = 0;
+                setAttrs({  "energy_score": 0    });
+            } else if(score > 9) {
+                score = 9;
+                setAttrs({  "energy_score": 9    });
+            }
+            var scoreCost = score + values.energy_cost_modifier*1;
+            score = score + values.energy_dice_modifier*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
@@ -1167,8 +1371,16 @@
 	// Function for calculating everything to do with Entropy
 	function calcEntropy() {
         getAttrs(["entropy_score", "entropy_dice_d20", "entropy_cost_modifier", "entropy_dice_modifier"], function(values) {
-            var score = values.entropy_score*1 + values.entropy_dice_modifier*1;
-            var scoreCost = values.entropy_score*1 + values.entropy_cost_modifier*1;
+            var score = values.entropy_score*1;
+            if(score < 0) {
+                score = 0;
+                setAttrs({  "entropy_score": 0    });
+            } else if(score > 9) {
+                score = 9;
+                setAttrs({  "entropy_score": 9    });
+            }
+            var scoreCost = score + values.entropy_cost_modifier*1;
+            score = score + values.entropy_dice_modifier*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
@@ -1195,8 +1407,16 @@
 	// Function for calculating everything to do with Influence
 	function calcInfluence() {
         getAttrs(["influence_score", "influence_dice_d20", "influence_cost_modifier", "influence_dice_modifier"], function(values) {
-            var score = values.influence_score*1 + values.influence_dice_modifier*1;
-            var scoreCost = values.influence_score*1 + values.influence_cost_modifier*1;
+            var score = values.influence_score*1;
+            if(score < 0) {
+                score = 0;
+                setAttrs({  "influence_score": 0    });
+            } else if(score > 9) {
+                score = 9;
+                setAttrs({  "influence_score": 9    });
+            }
+            var scoreCost = score + values.influence_cost_modifier*1;
+            score = score + values.influence_dice_modifier*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
@@ -1223,8 +1443,16 @@
 	// Function for calculating everything to do with Movement
 	function calcMovement() {
         getAttrs(["movement_score", "movement_dice_d20", "movement_cost_modifier", "movement_dice_modifier"], function(values) {
-            var score = values.movement_score*1 + values.movement_dice_modifier*1;
-            var scoreCost = values.movement_score*1 + values.movement_cost_modifier*1;
+            var score = values.movement_score*1;
+            if(score < 0) {
+                score = 0;
+                setAttrs({  "movement_score": 0    });
+            } else if(score > 9) {
+                score = 9;
+                setAttrs({  "movement_score": 9    });
+            }
+            var scoreCost = score + values.movement_cost_modifier*1;
+            score = score + values.movement_dice_modifier*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
@@ -1251,8 +1479,16 @@
 	// Function for calculating everything to do with Protection
 	function calcPrescience() {
         getAttrs(["prescience_score", "prescience_dice_d20", "prescience_cost_modifier", "prescience_dice_modifier"], function(values) {
-            var score = values.prescience_score*1 + values.prescience_dice_modifier*1;
-            var scoreCost = values.prescience_score*1 + values.prescience_cost_modifier*1;
+            var score = values.prescience_score*1;
+            if(score < 0) {
+                score = 0;
+                setAttrs({  "prescience_score": 0    });
+            } else if(score > 9) {
+                score = 9;
+                setAttrs({  "prescience_score": 9    });
+            }
+            var scoreCost = score + values.prescience_cost_modifier*1;
+            score = score + values.prescience_dice_modifier*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
@@ -1279,8 +1515,16 @@
 	// Function for calculating everything to do with Protection
 	function calcProtection() {
         getAttrs(["protection_score", "protection_dice_d20", "protection_cost_modifier", "protection_dice_modifier"], function(values) {
-            var score = values.protection_score*1 + values.protection_dice_modifier*1;
-            var scoreCost = values.protection_score*1 + values.protection_cost_modifier*1;
+            var score = values.protection_score*1;
+            if(score < 0) {
+                score = 0;
+                setAttrs({  "protection_score": 0    });
+            } else if(score > 9) {
+                score = 9;
+                setAttrs({  "protection_score": 9    });
+            }
+            var scoreCost = score + values.protection_cost_modifier*1;
+            score = score + values.protection_dice_modifier*1;
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
             var dice = number + type;
@@ -1546,6 +1790,13 @@
             });
         });
     });
+    on("change:repeating_legendary:settingsflag", function() {
+        getAttrs(["repeating_legendary_settingsFlag"], function(values) {
+            setAttrs({
+                "repeating_legendary_displaySettingsFlag": showHide(values.repeating_legendary_settingsFlag)
+            });
+        });
+    });
     on("change:repeating_featsLeft:settingsflag", function() {
         getAttrs(["repeating_featsLeft_settingsFlag"], function(values) {
             setAttrs({
@@ -1600,7 +1851,7 @@
         getSectionIDs("repeating_actions", function(actionsArray) {
          if(actionsArray.length > 0) {
             _.each(actionsArray, function(currentID, i) {
-                getAttrs(["repeating_actions_" + currentID + "_action_attribute", "repeating_actions_" + currentID + "_dice_d20", "repeating_actions_" + currentID + "_dice_modifier", "repeating_actions_" + currentID + "_use_power_level", "repeating_actions_" + currentID + "_power_level", "repeating_actions_" + currentID + "_power_level_max", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(v) {
+                getAttrs(["repeating_actions_" + currentID + "_action_attribute", "repeating_actions_" + currentID + "_dice_roll_d20", "repeating_actions_" + currentID + "_dice_modifier", "repeating_actions_" + currentID + "_use_power_level", "repeating_actions_" + currentID + "_power_level", "repeating_actions_" + currentID + "_power_level_max", "repeating_actions_" + currentID + "_power_levelmax", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(v) {
                     var update = {};
                     var score = 0;
                     if(v["repeating_actions_" + currentID + "_action_attribute"] === "Agility") {
@@ -1648,14 +1899,32 @@
                     var number = calcAttributeDiceNumber(score);
                     var type = calcAttributeDiceType(score);
                     var roll = "";
+                    var powerLevelMax = 0;
+                    if(!isNaN(v["repeating_actions_" + currentID + "_power_level_max"]) && v["repeating_actions_" + currentID + "_power_level_max"]*1 != 0) {
+                        powerLevelMax = v["repeating_actions_" + currentID + "_power_level_max"]*1;
+                        update["repeating_actions_" + currentID + "_power_levelmax"] = powerLevelMax*1;
+                        update["repeating_actions_" + currentID + "_power_level_max"] = 0;
+                    } else {
+                        update["repeating_actions_" + currentID + "_power_level_max"] = 0;
+                        if(!isNaN(v["repeating_actions_" + currentID + "_power_levelmax"])) {
+                            powerLevelMax = v["repeating_actions_" + currentID + "_power_levelmax"]*1;
+                        } else {
+                            update["repeating_actions_" + currentID + "_power_levelmax"] = 0;
+                        }
+                    }
         			if(score === 0) {
         				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
         			} else {
-        				roll = "[[" + v["repeating_actions_" + currentID + "_dice_d20"] + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+        			    if(isNaN(v["repeating_actions_" + currentID + "_dice_roll_d20"])) {
+        			        update["repeating_actions_" + currentID + "_dice_roll_d20"] = "1d20!!";
+            				roll = "[[1d20!! + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+        			    } else {
+            				roll = "[[" + v["repeating_actions_" + currentID + "_dice_roll_d20"] + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+        			    }
         			}
                     if(v["repeating_actions_" + currentID + "_use_power_level"] === "Yes") {
                         update["repeating_actions_" + currentID + "_power_target"] = "[[10 + " + v["repeating_actions_" + currentID + "_power_level"]*2 + "]]";
-                        update["repeating_actions_" + currentID + "_power_target_max"] = "[[10 + " + v["repeating_actions_" + currentID + "_power_level_max"]*2 + "]]";
+                        update["repeating_actions_" + currentID + "_power_targetmax"] = "[[10 + " + powerLevelMax*2 + "]]";
                     } else {
                         update["repeating_actions_" + currentID + "_power_target"] = "";
                     }
@@ -1671,7 +1940,7 @@
         getSectionIDs("repeating_otheractions", function(actionsArray) {
          if(actionsArray.length > 0) {
             _.each(actionsArray, function(currentID, i) {
-                getAttrs(["repeating_otheractions_" + currentID + "_action_attribute", "repeating_otheractions_" + currentID + "_dice_d20", "repeating_otheractions_" + currentID + "_dice_modifier", "repeating_otheractions_" + currentID + "_use_power_level", "repeating_otheractions_" + currentID + "_power_level", "repeating_otheractions_" + currentID + "_power_level_max", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(v) {
+                getAttrs(["repeating_otheractions_" + currentID + "_action_attribute", "repeating_otheractions_" + currentID + "_dice_roll_d20", "repeating_otheractions_" + currentID + "_dice_modifier", "repeating_otheractions_" + currentID + "_use_power_level", "repeating_otheractions_" + currentID + "_power_level", "repeating_otheractions_" + currentID + "_power_levelmax", "repeating_otheractions_" + currentID + "_power_level_max", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(v) {
                     var updateother = {};
                     var score = 0;
                     if(v["repeating_otheractions_" + currentID + "_action_attribute"] === "Agility") {
@@ -1712,21 +1981,39 @@
                         score = v.protection_score*1 + v.protection_dice_modifier*1;
                     }
                     if(isNaN(v["repeating_otheractions_" + currentID + "_dice_modifier"])) {
-                        update["repeating_otheractions_" + currentID + "_dice_modifier"] = 0;
+                        updateother["repeating_otheractions_" + currentID + "_dice_modifier"] = 0;
                     } else {
                         score = score*1 + v["repeating_otheractions_" + currentID + "_dice_modifier"]*1;
                     }
                     var number = calcAttributeDiceNumber(score);
                     var type = calcAttributeDiceType(score);
                     var roll = "";
+                    var powerLevelMax = 0;
+                    if(!isNaN(v["repeating_otheractions_" + currentID + "_power_level_max"]) && v["repeating_otheractions_" + currentID + "_power_level_max"]*1 != 0) {
+                        powerLevelMax = v["repeating_otheractions_" + currentID + "_power_level_max"]*1;
+                        updateother["repeating_otheractions_" + currentID + "_power_levelmax"] = powerLevelMax*1;
+                        updateother["repeating_otheractions_" + currentID + "_power_level_max"] = 0;
+                    } else {
+                        updateother["repeating_otheractions_" + currentID + "_power_level_max"] = 0;
+                        if(!isNaN(v["repeating_otheractions_" + currentID + "_power_levelmax"])) {
+                            powerLevelMax = v["repeating_otheractions_" + currentID + "_power_levelmax"]*1;
+                        } else {
+                            updateother["repeating_otheractions_" + currentID + "_power_levelmax"] = 0;
+                        }
+                    }
         			if(score === 0) {
         				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
         			} else {
-        				roll = "[[" + v["repeating_otheractions_" + currentID + "_dice_d20"] + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+        			    if(isNaN(v["repeating_otheractions_" + currentID + "_dice_roll_d20"])) {
+        			        updateother["repeating_otheractions_" + currentID + "_dice_roll_d20"] = "1d20!!";
+            				roll = "[[1d20!! + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+        			    } else {
+            				roll = "[[" + v["repeating_otheractions_" + currentID + "_dice_roll_d20"] + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+        			    }
         			}
                     if(v["repeating_otheractions_" + currentID + "_use_power_level"] === "Yes") {
                         updateother["repeating_otheractions_" + currentID + "_power_target"] = "[[10 + " + v["repeating_otheractions_" + currentID + "_power_level"]*2 + "]]";
-                        updateother["repeating_otheractions_" + currentID + "_power_target_max"] = "[[10 + " + v["repeating_otheractions_" + currentID + "_power_level_max"]*2 + "]]";
+                        updateother["repeating_otheractions_" + currentID + "_power_target_max"] = "[[10 + " + powerLevelMax*2 + "]]";
                     } else {
                         updateother["repeating_otheractions_" + currentID + "_power_target"] = "";
                     }
@@ -1739,8 +2026,8 @@
 	};
 
 	// Function for calculating rolls for Legendary Items
-    on("change:repeating_legendary:dice_d20 change:repeating_legendary:dice_modifier", function() {
-        getAttrs(["repeating_legendary_dice_d20", "repeating_legendary_dice_modifier"], function(values) {
+    on("change:repeating_legendary:dice_roll_d20 change:repeating_legendary:dice_modifier", function() {
+        getAttrs(["repeating_legendary_dice_roll_d20", "repeating_legendary_dice_modifier"], function(values) {
             var score = values.repeating_legendary_dice_modifier*1;
             var number = 0;
             var type = "";
@@ -1794,7 +2081,12 @@
                 }
             }
 			var roll = "";
-			roll = "[[" + values.repeating_legendary_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+		    if(isNaN(values.repeating_legendary_dice_roll_d20)) {
+		        setAttrs({  "repeating_legendary_dice_roll_d20": "1d20!!"   });
+				roll = "[[1d20!! + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+		    } else {
+    			roll = "[[" + values.repeating_legendary_dice_roll_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+		    }
             setAttrs({
                 "repeating_legendary_dice_roll": roll
             });
@@ -1802,12 +2094,12 @@
     });
 		
 	// On Change for Use Power Level in Legendary Items
-    on("change:repeating_legendary:use_power_level change:repeating_legendary:power_level change:repeating_legendary:power_level_max", function() {
-        getAttrs(["repeating_legendary_use_power_level", "repeating_legendary_power_level", "repeating_legendary_power_level_max"], function(values) {
+    on("change:repeating_legendary:use_power_level change:repeating_legendary:power_level change:repeating_legendary:power_levelmax", function() {
+        getAttrs(["repeating_legendary_use_power_level", "repeating_legendary_power_level", "repeating_legendary_power_levelmax"], function(values) {
             if(values.repeating_legendary_use_power_level === "Yes") {
                 setAttrs({
                     "repeating_legendary_power_target": "[[10 + " + values.repeating_legendary_power_level*2 + "]]",
-                    "repeating_legendary_power_target_max": "[[10 + " + values.repeating_legendary_power_level_max*2 + "]]"
+                    "repeating_legendary_power_targetmax": "[[10 + " + values.repeating_legendary_power_levelmax*2 + "]]"
                 });
             } else {
                setAttrs({
@@ -1817,12 +2109,12 @@
         });
     });		
 	// On Change for Use Power Level in actions
-    on("change:repeating_otheractions:use_power_level change:repeating_otheractions:power_level change:repeating_otheractions:power_level_max", function() {
-        getAttrs(["repeating_otheractions_use_power_level", "repeating_otheractions_power_level", "repeating_otheractions_power_level_max"], function(values) {
+    on("change:repeating_otheractions:use_power_level change:repeating_otheractions:power_level change:repeating_otheractions:power_levelmax", function() {
+        getAttrs(["repeating_otheractions_use_power_level", "repeating_otheractions_power_level", "repeating_otheractions_power_levelmax"], function(values) {
             if(values.repeating_otheractions_use_power_level === "Yes") {
                 setAttrs({
                     "repeating_otheractions_power_target": "[[10 + " + values.repeating_otheractions_power_level*2 + "]]",
-                    "repeating_otheractions_power_target_max": "[[10 + " + values.repeating_otheractions_power_level_max*2 + "]]"
+                    "repeating_otheractions_power_targetmax": "[[10 + " + values.repeating_otheractions_power_levelmax*2 + "]]"
                 });
             } else {
                setAttrs({
@@ -1832,12 +2124,12 @@
         });
     });
 	// On Change for Use Power Level in actions
-    on("change:repeating_actions:use_power_level change:repeating_actions:power_level change:repeating_actions:power_level_max", function() {
-        getAttrs(["repeating_actions_use_power_level", "repeating_actions_power_level", "repeating_actions_power_level_max"], function(values) {
+    on("change:repeating_actions:use_power_level change:repeating_actions:power_level change:repeating_actions:power_levelmax", function() {
+        getAttrs(["repeating_actions_use_power_level", "repeating_actions_power_level", "repeating_actions_power_levelmax"], function(values) {
             if(values.repeating_actions_use_power_level === "Yes") {
                 setAttrs({
                     "repeating_actions_power_target": "[[10 + " + values.repeating_actions_power_level*2 + "]]",
-                    "repeating_actions_power_target_max": "[[10 + " + values.repeating_actions_power_level_max*2 + "]]"
+                    "repeating_actions_power_targetmax": "[[10 + " + values.repeating_actions_power_levelmax*2 + "]]"
                 });
             } else {
                 setAttrs({
@@ -1846,9 +2138,65 @@
             }
         });
     });
+
+    // On Change for d20 of favored actions
+    on("change:repeating_legendary:select_dice_d20", function() {
+        getAttrs(["repeating_legendary_select_dice_d20"], function(values) {
+            switch(values.repeating_legendary_select_dice_d20) {
+                case "Normal":
+                    setAttrs({  "repeating_legendary_dice_roll_d20": "1d20!!" });
+                    break;
+                case "Advantage":
+                    setAttrs({  "repeating_legendary_dice_roll_d20": "2d20!!kh1" });
+                    break;
+                case "Disadvantage":
+                    setAttrs({  "repeating_legendary_dice_roll_d20": "2d20!!kl1" });
+                    break;
+                default:
+                    setAttrs({  "repeating_legendary_dice_roll_d20": "1d20!!" });
+            }
+        });
+    });
+    // On Change for d20 of other actions
+    on("change:repeating_otheractions:select_dice_d20", function() {
+        getAttrs(["repeating_otheractions_select_dice_d20"], function(values) {
+            switch(values.repeating_otheractions_select_dice_d20) {
+                case "Normal":
+                    setAttrs({  "repeating_otheractions_dice_roll_d20": "1d20!!" });
+                    break;
+                case "Advantage":
+                    setAttrs({  "repeating_otheractions_dice_roll_d20": "2d20!!kh1" });
+                    break;
+                case "Disadvantage":
+                    setAttrs({  "repeating_otheractions_dice_roll_d20": "2d20!!kl1" });
+                    break;
+                default:
+                    setAttrs({  "repeating_otheractions_dice_roll_d20": "1d20!!" });
+            }
+        });
+    });
+    // On Change for d20 of favored actions
+    on("change:repeating_actions:select_dice_d20", function() {
+        getAttrs(["repeating_actions_select_dice_d20"], function(values) {
+            switch(values.repeating_actions_select_dice_d20) {
+                case "Normal":
+                    setAttrs({  "repeating_actions_dice_roll_d20": "1d20!!" });
+                    break;
+                case "Advantage":
+                    setAttrs({  "repeating_actions_dice_roll_d20": "2d20!!kh1" });
+                    break;
+                case "Disadvantage":
+                    setAttrs({  "repeating_actions_dice_roll_d20": "2d20!!kl1" });
+                    break;
+                default:
+                    setAttrs({  "repeating_actions_dice_roll_d20": "1d20!!" });
+            }
+        });
+    });
+
 	// On Change for calculating rolls for Actions
-    on("change:repeating_actions:action_attribute change:repeating_actions:dice_d20 change:repeating_actions:dice_modifier", function() {
-        getAttrs(["repeating_actions_action_attribute", "repeating_actions_dice_d20", "repeating_actions_dice_modifier", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(values) {
+    on("change:repeating_actions:action_attribute change:repeating_actions:dice_roll_d20 change:repeating_actions:dice_modifier", function() {
+        getAttrs(["repeating_actions_action_attribute", "repeating_actions_dice_roll_d20", "repeating_actions_dice_modifier", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(values) {
             var score = 0;
             if(values.repeating_actions_action_attribute === "Agility") {
                 score = values.agility_score*1 + values.agility_dice_modifier*1;
@@ -1898,7 +2246,7 @@
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
 			} else {
-				roll = "[[" + values.repeating_actions_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				roll = "[[" + values.repeating_actions_dice_roll_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
 			}
             setAttrs({
                 "repeating_actions_dice_roll": roll
@@ -1906,8 +2254,8 @@
         });
     });
 	// On Change for calculating rolls for Actions
-    on("change:repeating_otheractions:action_attribute change:repeating_otheractions:dice_d20 change:repeating_otheractions:dice_modifier", function() {
-        getAttrs(["repeating_otheractions_action_attribute", "repeating_otheractions_dice_d20", "repeating_otheractions_dice_modifier", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(values) {
+    on("change:repeating_otheractions:action_attribute change:repeating_otheractions:dice_roll_d20 change:repeating_otheractions:dice_modifier", function() {
+        getAttrs(["repeating_otheractions_action_attribute", "repeating_otheractions_dice_roll_d20", "repeating_otheractions_dice_modifier", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(values) {
             var score = 0;
             if(values.repeating_otheractions_action_attribute === "Agility") {
                 score = values.agility_score*1 + values.agility_dice_modifier*1;
@@ -1957,674 +2305,38 @@
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
 			} else {
-				roll = "[[" + values.repeating_otheractions_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				roll = "[[" + values.repeating_otheractions_dice_roll_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
 			}
             setAttrs({
                 "repeating_otheractions_dice_roll": roll
             });
         });
     });
-    // Calculate the total of Feat Points spent with special code from The Aaron (below)
-    on("change:repeating_featsLeft", function() {
-        TAS.repeatingSimpleSum('featsLeft','feat_left_cost','featLeft_points_spent')
-    });
-    on("change:repeating_featsRight", function() {
-        TAS.repeatingSimpleSum('featsRight','feat_right_cost','featRight_points_spent')
-    });
-/* ---- BEGIN: TheAaronSheet.js ---- */
-// Github:   https://github.com/shdwjk/TheAaronSheet/blob/master/TheAaronSheet.js
-// By:       The Aaron, Arcane Scriptomancer
-// Contact:  https://app.roll20.net/users/104025/the-aaron
-
-var TAS = TAS || (function(){
-    'use strict';
-
-    var version = '0.2.4',
-        lastUpdate = 1457098091,
-
-        loggingSettings = {
-            debug: {
-                key:     'debug',
-                title:   'DEBUG',
-                color: {
-                    bgLabel: '#7732A2',
-                    label:   '#F2EF40',
-                    bgText:  '#FFFEB7',
-                    text:    '#7732A2'
-                }
-            },
-            error: {
-                key:     'error',
-                title:   'Error',
-                color: {
-                    bgLabel: '#C11713',
-                    label:   'white',
-                    bgText:  '#C11713',
-                    text:    'white'
-                }
-            },
-            warn: {
-                key:     'warn',
-                title:   'Warning',
-                color: {
-                    bgLabel: '#F29140',
-                    label:   'white',
-                    bgText:  '#FFD8B7',
-                    text:    'black'
-                }
-            },
-            info: {
-                key:     'info',
-                title:   'Info',
-                color: {
-                    bgLabel: '#413FA9',
-                    label:   'white',
-                    bgText:  '#B3B2EB',
-                    text:    'black'
-                }
-            },
-            notice: {
-                key:     'notice',
-                title:   'Notice',
-                color: {
-                    bgLabel: '#33C133',
-                    label:   'white',
-                    bgText:  '#ADF1AD',
-                    text:    'black'
-                }
-            },
-            log: {
-                key:     'log',
-                title:   'Log',
-                color: {
-                    bgLabel: '#f2f240',
-                    label:   'black',
-                    bgText:  '#ffff90',
-                    text:    'black'
-                }
-            },
-            callstack: {
-                key:     'TAS',
-                title:   'function',
-                color: {
-                    bgLabel: '#413FA9',
-                    label:   'white',
-                    bgText:  '#B3B2EB',
-                    text:    'black'
-                }
-            },
-            callstack_async: {
-                key:     'TAS',
-                title:   'ASYNC CALL',
-                color: {
-                    bgLabel: '#413FA9',
-                    label:   'white',
-                    bgText:  '#413FA9',
-                    text:    'white'
-                }
-            },
-            TAS: {
-                key:     'TAS',
-                title:   'TAS',
-                color: {
-                    bgLabel: 'grey',
-                    label:   'black;background:linear-gradient(#304352,#d7d2cc,#d7d2cc,#d7d2cc,#304352)',
-                    bgText:  'grey',
-                    text:    'black;background:linear-gradient(#304352,#d7d2cc,#d7d2cc,#d7d2cc,#304352)'
-                }
-            }
-        },
-
-
-        config = {
-            debugMode: false,
-            logging: {
-                log: true,
-                notice: true,
-                info: true,
-                warn: true,
-                error: true,
-                debug: false
-            }
-        },
-
-        callstackRegistry = [],
-		queuedUpdates = {}, //< Used for delaying saves till the last momment.
-
-    complexType = function(o){
-        switch(typeof o){
-            case 'string':
-                return 'string';
-            case 'boolean':
-                return 'boolean';
-            case 'number':
-                return (_.isNaN(o) ? 'NaN' : (o.toString().match(/\./) ? 'decimal' : 'integer'));
-            case 'function':
-                return 'function: '+(o.name ? o.name+'()' : '(anonymous)');
-            case 'object':
-                return (_.isArray(o) ? 'array' : (_.isArguments(o) ? 'arguments' : ( _.isNull(o) ? 'null' : 'object')));
-            default:
-                return typeof o;
-        }
-    },
-
-	dataLogger = function(primaryLogger,secondaryLogger,data){
-        _.each(data,function(m){
-            var type = complexType(m);
-            switch(type){
-                case 'string':
-                    primaryLogger(m);
-                    break;
-                case 'undefined':
-                case 'null':
-                case 'NaN':
-                    primaryLogger('['+type+']');
-                    break;
-                case 'number':
-                case 'not a number':
-                case 'integer':
-                case 'decimal':
-                case 'boolean':
-                    primaryLogger('['+type+']: '+m);
-                    break;
-                default:
-                    primaryLogger('['+type+']:=========================================');
-                    secondaryLogger(m);
-                    primaryLogger('=========================================================');
-                    break;
-            }
-        });
-	},
-
-
-    colorLog = function(options){
-        var coloredLoggerFunction,
-            key = options.key,
-            label = options.title || 'TAS',
-            lBGColor = (options.color && options.color.bgLabel) || 'blue',
-            lTxtColor = (options.color && options.color.label) || 'white',
-            mBGColor = (options.color && options.color.bgText) || 'blue',
-            mTxtColor = (options.color && options.color.text) || 'white';
-
-        coloredLoggerFunction = function(message){
-            console.log(
-                '%c '+label+': %c '+message + ' ',
-                'background-color: '+lBGColor+';color: '+lTxtColor+'; font-weight:bold;',
-                'background-color: '+mBGColor+';color: '+mTxtColor+';'
-            ); 
-        };
-        return function(){
-            if('TAS'===key || config.logging[key]){
-               dataLogger(coloredLoggerFunction,function(m){console.log(m);},_.toArray(arguments)); 
-            }
-        };
-    },
-
-    logDebug  = colorLog(loggingSettings.debug),
-    logError  = colorLog(loggingSettings.error),
-    logWarn   = colorLog(loggingSettings.warn),
-    logInfo   = colorLog(loggingSettings.info),
-    logNotice = colorLog(loggingSettings.notice),
-    logLog    = colorLog(loggingSettings.log),
-    log       = colorLog(loggingSettings.TAS),
-    logCS     = colorLog(loggingSettings.callstack),
-    logCSA    = colorLog(loggingSettings.callstack_async),
-
-    registerCallstack = function(callstack,label){
-        var idx=_.findIndex(callstackRegistry,function(o){
-            return (_.difference(o.stack,callstack).length === _.difference(callstack,o.stack).length) &&
-                _.difference(o.stack,callstack).length === 0 &&
-                o.label === label;
-        });
-        if(-1 === idx){
-            idx=callstackRegistry.length;
-            callstackRegistry.push({
-                stack: callstack,
-                label: label
-            });
-        }
-        return idx;
-    },
-
-    setConfigOption = function(options){
-        var newconf =_.defaults(options,config);
-        newconf.logging=_.defaults(
-            (options && options.logging)||{},
-            config.logging
-        );
-        config=newconf;
-    },
-    
-    debugMode = function(){
-        config.logging.debug=true;
-        config.debugMode = true;
-    },
-
-    getCallstack = function(){
-        var e = new Error('dummy'),
-            stack = _.map(_.rest(e.stack.replace(/^[^\(]+?[\n$]/gm, '')
-            .replace(/^\s+at\s+/gm, '')
-            .replace(/^Object.<anonymous>\s*\(/gm, '{anonymous}()@')
-            .split('\n')),function(l){
-                return l.replace(/\s+.*$/,'');
-            });
-        return stack;
-    },
-    logCallstackSub = function(cs){
-        var matches, csa;
-        _.find(cs,function(line){
-            matches = line.match(/TAS_CALLSTACK_(\d+)/);
-            if(matches){
-               csa=callstackRegistry[matches[1]];
-               logCSA( '===================='+(csa.label ? '> '+csa.label+' <' : '')+'====================');
-               logCallstackSub(csa.stack);
-               return true;
-            } 
-            logCS(line);
-            return false;
-        });
-    },
-    logCallstack = function(){
-        var cs;
-        if(config.debugMode){
-            cs = getCallstack();
-            cs.shift();
-            log('==============================> CALLSTACK <==============================');
-            logCallstackSub(cs);
-            log('=========================================================================');
-        }
-    },
-
-
-    wrapCallback = function (label, callback, context){
-        var callstack;
-        if('function' === typeof label){
-            context=callback;
-            callback=label;
-            label=undefined;
-        }
-        if(!config.debugMode){
-            return (function(cb,ctx){
-                return function(){
-                    cb.apply(ctx||{},arguments);
-                };
-            }(callback,context));
-        }
-        
-        callstack = getCallstack();
-        callstack.shift();
-        
-        return (function(cb,ctx,cs,lbl){
-            var ctxref=registerCallstack(cs,lbl);
-
-            /*jshint -W054 */
-            return new Function('cb','ctx','TASlog',
-                "return function TAS_CALLSTACK_"+ctxref+"(){"+
-                    "TASlog('Entering: '+(cb.name||'(anonymous function)'));"+
-                    "cb.apply(ctx||{},arguments);"+
-                    "TASlog('Exiting: '+(cb.name||'(anonymous function)'));"+
-                "};")(cb,ctx,log);
-            /*jshint +W054 */
-        }(callback,context,callstack,label));
-    },
-
-
-    prepareUpdate = function( attribute, value ){
-        queuedUpdates[attribute]=value;
-    },
-
-    applyQueuedUpdates = function() {
-      setAttrs(queuedUpdates);
-      queuedUpdates = {};
-    },
-
-	namesFromArgs = function(args,base){
-        return _.chain(args)
-            .reduce(function(memo,attr){
-                if('string' === typeof attr) {
-                    memo.push(attr);
-                } else if(_.isArray(args) || _.isArguments(args)){
-                    memo = namesFromArgs(attr,memo);
-                }
-                return memo;
-            },(_.isArray(base) && base) || [])
-            .uniq()
-            .value();
-	},
-
-	addId = function(obj,value){
-		Object.defineProperty(obj,'id',{
-			value: value,
-			writeable: false,
-			enumerable: false
-		});
-	},
-
-	addProp = function(obj,prop,value,fullname){
-		(function(){
-            var pname=(_.contains(['S','F','I','D'],prop) ? '_'+prop : prop),
-			    full_pname = fullname || prop,
-                pvalue=value;
-
-            _.each(['S','I','F'],function(p){
-                if( !_.has(obj,p)){
-                    Object.defineProperty(obj, p, {
-                        value: {},
-                        enumerable: false,
-                        readonly: true
-                    });
-                }
-            });
-            if( !_.has(obj,'D')){
-                Object.defineProperty(obj, 'D', {
-                    value: _.reduce(_.range(10),function(m,d){
-                            Object.defineProperty(m, d, {
-                                value: {},
-                                enumerable: true,
-                                readonly: true
-                            });
-                            return m;
-                        },{}),
-                    enumerable: false,
-                    readonly: true
-                });
-            }
-
-
-            // Raw value
-			Object.defineProperty(obj, pname, {
-                enumerable: true,
-				set: function(v){
-                    if(v!==pvalue) {
-                        pvalue=v;
-                        prepareUpdate(full_pname,v);
-                    }
-				},
-				get: function(){
-					return pvalue;
-				}
+// Calculate the total of Feat Points spent
+on("change:repeating_featsLeft", function() {
+	var featCost = 0;
+	getSectionIDs("repeating_featsLeft", function(featsArray) {
+		if(featsArray.length > 0) {
+			var names = _.map(featsArray, function(currentID) {
+				return 'repeating_featsLeft_'+currentID+'_feat_left_cost';
 			});
-            
-            // string value
-			Object.defineProperty(obj.S, pname, {
-                enumerable: true,
-				set: function(v){
-                    var val=v.toString();
-                    if(val !== pvalue) {
-                        pvalue=val;
-                        prepareUpdate(full_pname,val);
-                    }
-				},
-				get: function(){
-					return pvalue.toString();
-				}
-			});
-
-            // int value
-			Object.defineProperty(obj.I, pname, {
-                enumerable: true,
-				set: function(v){
-                    var val=parseInt(v,10) || 0;
-                    if(val !== pvalue){
-                        pvalue=val;
-                        prepareUpdate(full_pname,val);
-                    }
-				},
-				get: function(){
-					return parseInt(pvalue,10) || 0;
-				}
-			});
-
-            // float value
-			Object.defineProperty(obj.F, pname, {
-                enumerable: true,
-				set: function(v){
-                    var val=parseFloat(v) || 0;
-                    if(val !== pvalue) {
-                        pvalue=val;
-                        prepareUpdate(full_pname,val);
-                    }
-				},
-				get: function(){
-					return parseFloat(pvalue) || 0;
-				}
-			});
-            _.each(_.range(10),function(d){
-                Object.defineProperty(obj.D[d], pname, {
-                    enumerable: true,
-                    set: function(v){
-                        var val=(parseFloat(v) || 0).toFixed(d);
-                        if(val !== pvalue){
-                            pvalue=val;
-                            prepareUpdate(full_pname,val);
-                        }
-                    },
-                    get: function(){
-                        return (parseFloat(pvalue) || 0).toFixed(d);
-                    }
-                });
-            });
-
-		}());
-	},
-	
-	repeating = function( section ) {
-		return (function(s){
-			var sectionName = s,
-				attrNames = [],
-				fieldNames = [],
-				operations = [],
-                after = [],
-			
-			repAttrs = function TAS_Repeating_Attrs(){
-				attrNames = namesFromArgs(arguments,attrNames);
-				return this;
-			},
-			repFields = function TAS_Repeating_Fields(){
-				fieldNames = namesFromArgs(arguments,fieldNames);
-				return this;
-			},
-			repReduce = function TAS_Repeating_Reduce(func, initial, final, context) { 
-				operations.push({
-                    type: 'reduce',
-                    func: (func && _.isFunction(func) && func) || _.noop,
-                    memo: (_.isUndefined(initial) && 0) || initial,
-                    final: (final && _.isFunction(final) && final) || _.noop,
-                    context: context || {}
-                });
-				return this;
-			},
-			repMap = function TAS_Repeating_Map(func, final, context) {
-				operations.push({
-                    type: 'map',
-                    func: (func && _.isFunction(func) && func) || _.noop,
-                    final: (final && _.isFunction(final) && final) || _.noop,
-                    context: context || {}
-                });
-				return this;
-			},
-            repEach = function TAS_Repeating_Each(func, final, context) {
-				operations.push({
-                    type: 'each',
-                    func: (func && _.isFunction(func) && func) || _.noop,
-                    final: (final && _.isFunction(final) && final) || _.noop,
-                    context: context || {}
-                });
-				return this;
-            },
-            repTap = function TAS_Repeating_Tap(final, context) {
-				operations.push({
-                    type: 'tap',
-                    final: (final && _.isFunction(final) && final) || _.noop,
-                    context: context || {}
-                });
-				return this;
-            },
-            repAfter = function TAS_Repeating_After(callback,context) {
-				after.push({
-                    callback: (callback && _.isFunction(callback) && callback) || _.noop,
-                    context: context || {}
-                });
-				return this;
-            },
-			repExecute = function TAS_Repeating_Execute(callback,context){
-				var rowSet = {},
-					attrSet = {},
-					fieldIds = [],
-					fullFieldNames = [];
-
-                repAfter(callback,context);
-
-				// call each operation per row.
-				// call each operation's final
-				getSectionIDs("repeating_"+sectionName,function(ids){
-					fieldIds = ids;
-					fullFieldNames = _.reduce(fieldIds,function(memo,id){
-						return memo.concat(_.map(fieldNames,function(name){
-							return 'repeating_'+sectionName+'_'+id+'_'+name;  
-						}));
-					},[]);
-					getAttrs( _.uniq(attrNames.concat(fullFieldNames)), function(values){
-						_.each(attrNames,function(aname){
-							if(values.hasOwnProperty(aname)){
-								addProp(attrSet,aname,values[aname]);
-							}
-						});
-
-						rowSet = _.reduce(fieldIds,function(memo,id){
-							var r={};
-							addId(r,id);
-							_.each(fieldNames,function(name){
-								var fn = 'repeating_'+sectionName+'_'+id+'_'+name;  
-								addProp(r,name,values[fn],fn);
-							});
-
-							memo[id]=r;
-
-							return memo;
-						},{});
-
-                        _.each(operations,function(op){
-                            var res;
-                            switch(op.type){
-                                case 'tap':
-                                    _.bind(op.final,op.context,rowSet,attrSet)();
-                                    break;
-
-                                case 'each':
-                                    _.each(rowSet,function(r){
-                                        _.bind(op.func,op.context,r,attrSet,r.id,rowSet)();
-                                    });
-                                    _.bind(op.final,op.context,rowSet,attrSet)();
-                                    break;
-
-                                case 'map':
-                                    res = _.map(rowSet,function(r){
-                                        return _.bind(op.func,op.context,r,attrSet,r.id,rowSet)();
-                                    });
-                                    _.bind(op.final,op.context,res,rowSet,attrSet)();
-                                    break;
-
-                                case 'reduce':
-                                    res = op.memo;
-                                    _.each(rowSet,function(r){
-                                        res = _.bind(op.func,op.context,res,r,attrSet,r.id,rowSet)();
-                                    });
-                                    _.bind(op.final,op.context,res,rowSet,attrSet)();
-                                    break;
-                            }
-                        });
-
-                        // finalize attrs
-                        applyQueuedUpdates();
-                        _.each(after,function(op){
-                            _.bind(op.callback,op.context)();
-                        });
-					});
+			getAttrs(names,function(v){
+				var sum = _.reduce(v,function(m,a){
+					return m+parseInt(a,10);
+				},0);
+				setAttrs({
+					"featLeft_points_spent": sum
 				});
-			};
-				
-			return {
-				attrs: repAttrs,
-				attr: repAttrs,
-
-				column: repFields,
-				columns: repFields,
-				field: repFields,
-				fields: repFields,
-
-				reduce: repReduce,
-				inject: repReduce,
-				foldl: repReduce,
-
-				map: repMap,
-				collect: repMap,
-
-				each: repEach,
-                forEach: repEach,
-
-                tap: repTap,
-                'do': repTap,
-
-				after: repAfter,
-				last: repAfter,
-				done: repAfter,
-
-				execute: repExecute,
-				go: repExecute,
-				run: repExecute
-			};
-		}(section));
-	},
-
-
-    repeatingSimpleSum = function(section, field, destination){
-        repeating(section)
-            .attr(destination)
-            .field(field)
-            .reduce(function(m,r){
-                return m + (r.F[field]);
-            },0,function(t,r,a){
-                a.S[destination]=t;
-            })
-            .execute();
-    };
-
-	console.log('%c•.¸¸.•*´¨`*•.¸¸.•*´¨`*•.¸  The Aaron Sheet  v'+version+'  ¸.•*´¨`*•.¸¸.•*´¨`*•.¸¸.•','background: linear-gradient(to right,green,white,white,green); color:black;text-shadow: 0 0 8px white;');
-	console.log('%c•.¸¸.•*´¨`*•.¸¸.•*´¨`*•.¸  Last update: '+(new Date(lastUpdate*1000))+'  ¸.•*´¨`*•.¸¸.•*´¨`*•.¸¸.•','background: linear-gradient(to right,green,white,white,green); color:black;text-shadow: 0 0 8px white;');
-
-
-    return {
-        /* Repeating Sections */
-        repeatingSimpleSum: repeatingSimpleSum,
-		repeating: repeating,
-
-        /* Configuration */
-        config: setConfigOption,
-
-        /* Debugging */
-        callback: wrapCallback,
-        callstack: logCallstack,
-        debugMode: debugMode,
-        _fn: wrapCallback,
-
-        /* Logging */
-        debug: logDebug,
-        error: logError,
-        warn: logWarn,
-        info: logInfo,
-        notice: logNotice,
-        log: logLog
-    };
-}());
-
-/* ---- END: TheAaronSheet.js ---- */
+			});
+		}
+	});
+ });	
 </script>
 <!-- End Worker Scripts -->
 <!-- Main body of Character Sheet -->
 <div class="container">     <!-- defines the width/height & behavior of the page -->
     <div class="row width100 padBottom">
-        <div class="column textSmall textRight padRight">Added Extraordinary/Legendary Items :: 2017.04.24 <span class="bold">Version 1.8.0 </span> <input class="settings" type="checkbox" name="attr_sheet_settings_flag" value="hide" /><span>y</span></div>
+        <div class="column textSmall textRight padRight">Feats, Perks, & Flaws to 1 column; Quick Access to Stats for Token bubbles; Destructive Trance :: 2017.08.14 <span class="bold">Version 1.8.6 </span> <input class="settings" type="checkbox" name="attr_sheet_settings_flag" value="hide" /><span>y</span></div>
     </div>
     <div class="row width100">
         <div class="column sliders inlineBlock textSmall bold">Character Info</div>
@@ -3849,11 +3561,13 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
    <!-- Guard information -->
         <div class="width100 padAll">
             <div class="evasion vertTop padTop">
-                <div class="inlineBlock vertTop padTop" style="width: 155px;">
+                <div class="inlineBlock vertTop" style="width: 155px;">
                     <div class="column width100 textCenter resistButton">
                         <button type="roll" name="roll_resist_bane" value="&{template:openLegend} {{title= Resist Bane Roll}} {{subTitle= @{character_name}}} {{roll= [[1d20]]}} {{target= 10+ bane is removed}}">Guard</button>
                     </div>
-                    <div class="column width100 inputNumberLarge padTop"><input type="number" name="attr_evasion" value=0 /></div>
+                    <div class="column width100 textCenter textSmall">Click to roll Resist Bane</div>
+                    <div class="column width100 inputNumberLarge padTop"><input type="number" name="attr_Guard" value=0 /></div>
+					<input type="hidden" name="attr_evasion" value=0 />
                 </div>
                 <div class="inlineBlock vertTop" style="width: 120px;">
                     <div class="width100">
@@ -3876,11 +3590,13 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
    <!-- Toughness information -->
         <div class="width100 padAll">
             <div class="toughness vertTop padTop">
-                <div class="inlineBlock vertTop padTop" style="width: 155px;">
+                <div class="inlineBlock vertTop" style="width: 155px;">
                     <div class="column width100 textCenter resistButton">
                         <button type="roll" name="roll_resist_bane" value="&{template:openLegend} {{title= Resist Bane Roll}} {{subTitle= @{character_name}}} {{roll= [[1d20]]}} {{target= 10+ bane is removed}}">Toughness</button>
                     </div>
-                    <div class="column width100 inputNumberLarge padTop"><input type="number" name="attr_toughness" value=0 /></div>
+                    <div class="column width100 textCenter textSmall">Click to roll Resist Bane</div>
+                    <div class="column width100 inputNumberLarge padTop"><input type="number" name="attr_Toughness" value=0 /></div>
+					<input type="hidden" name="attr_Toughness4Token" value=0 />
                 </div>
                 <div class="inlineBlock vertTop" style="width: 120px;">
                     <div class="width100 padTop">
@@ -3900,11 +3616,13 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
    <!-- Resolve information -->
         <div class="width100 padAll">
             <div class="resolve vertTop padTop">
-                <div class="inlineBlock vertTop padTop" style="width: 155px;">
+                <div class="inlineBlock vertTop" style="width: 155px;">
                     <div class="column width100 textCenter resistButton">
                         <button type="roll" name="roll_resist_bane" value="&{template:openLegend} {{title= Resist Bane Roll}} {{subTitle= @{character_name}}} {{roll= [[1d20]]}} {{target= 10+ bane is removed}}">Resolve</button>
                     </div>
-                    <div class="column width100 inputNumberLarge padTop"><input type="number" name="attr_resolve" value=0 /></div>
+                    <div class="column width100 textCenter textSmall">Click to roll Resist Bane</div>
+                    <div class="column width100 inputNumberLarge padTop"><input type="number" name="attr_Resolve" value=0 /></div>
+					<input type="hidden" name="attr_Resolve4Token" value=0 />
                 </div>
                 <div class="inlineBlock vertTop" style="width: 120px;">
                     <div class="width100 padTop">
@@ -3933,8 +3651,9 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
             <div class="width100">
                 <div class="column width50 inlineBlock borderRight textLarge italic bold">Current</div>
                 <div class="column width50 inlineBlock borderLeft textLarge italic bold">Max</div>
-                <div class="column width50 inlineBlock borderRight inputNumberLarge"><input type="number" name="attr_hit_point" value=0 /></div>
-                <div class="column width50 inlineBlock borderLeft inputNumberLarge"><input type="number" name="attr_hit_point_max" value=0 /></div>
+                <div class="column width50 inlineBlock borderRight inputNumberLarge"><input type="number" name="attr_HP" value=0 /></div>
+                <div class="column width50 inlineBlock borderLeft inputNumberLarge"><input type="number" name="attr_HP_max" value=0 /></div>
+				<input type="hidden" name="attr_hit_point" value=0 /><input type="hidden" name="attr_hit_point_max" value=0 />
                 <div class="width25 inlineBlock"></div>
                 <div class="column width30 inlineBlock bold">From Feats</div>
                 <div class="column width10 inlineBlock inputNumber30"><input type="number" name="attr_hit_point_feats" value=0 /></div>
@@ -3972,10 +3691,11 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
             <div class="width50 inlineBlock vertTop">
                 <div class="column width100 height5"></div>
                 <input type="hidden" name="attr_agility_initiative" value=0 />
-                <div class="column width100 textCenter textLarge speedButton"><button type="roll" name="roll_initiative" value="&{template:openLegend} {{title= Initiative Roll}} {{subTitle= @{character_name}}} {{subTitleAdd= Agility}} {{roll= @{agility_initiative}}} {{description= Make sure to you selected your token to have it automatically added to the turn order.}}">Speed</span></button></div>
+                <div class="column width100 textCenter textLarge speedButton"><button type="roll" name="roll_initiative" value="&{template:openLegend} {{title= Initiative Roll}} {{subTitle= @{character_name}}} {{subTitleAdd= Agility}} {{roll= @{agility_initiative}}} {{description= Make sure you selected your token to have it automatically added to the turn order.}}">Speed</span></button></div>
                 <div class="column width100 textCenter textSmall" style="line-height: 10px;">Click to roll Initiative</div>
                 <div class="column width100 vertTop inputNumber30 textSmall bold">Base <input type="number" name="attr_base_speed" value=30 /></div>
-                <div class="column width100 inputNumberLarge"><input type="number" name="attr_speed" value=0 /></div>
+                <div class="column width100 inputNumberLarge"><input type="number" name="attr_Speed" value=0 /></div>
+				<input type="hidden" name="attr_Speed4Token" value=0 />
                 <div class="width100 column inputNumber30 textSmall bold">Armor Penalty(ft) <input type="number" name="attr_armor_penalty" value=0 /></div>
                 <div class="width100 column  inputNumber30 textSmall bold">Armor Feat(ft) <input type="number" name="attr_armor_training" value=0 /></div>
             </div>
@@ -3985,7 +3705,8 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column width90 inlineBlock textCenter bold textLarge black">Lethal Damage</div>
                 <div class="column width5 inlineBlock"></div>
                 <div class="column width100" style="height: 29px;"></div>
-                <div class="column width100 inlineBlock inputNumberLarge"><input type="number" name="attr_lethal_damage" value=0 /></div>
+                <div class="column width100 inlineBlock inputNumberLarge"><input type="number" name="attr_LethalDamage" value=0 /></div>
+				<input type="hidden" name="attr_lethal_damage" value=0 />
             </div>
         </div>
      <!-- End Legend Points & Speed Section -->
@@ -4013,7 +3734,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <fieldset class="repeating_actions">
                     <div class="row">   <!-- Fix for Mozilla squishing +Add & Modify buttons -->
                         <div class="width15 inlineBlock vertTop padLeft"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>y</span></div>
-                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" name="roll_action" value="&{template:openLegend} {{title= @{action_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= @{action_attribute}}} {{target= @{action_target}}} {{roll= @{dice_roll}}} {{powertarget=@{power_target}}} {{powerlevel= @{power_level}}} {{powertargetmax= @{power_target_max}}} {{powerlevelmax= @{power_level_max}}} {{description= @{action_special}}}"><input type="text" style="text-align: center;" name="attr_action_name" /></button></div>
+                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" name="roll_action" value="&{template:openLegend} {{title= @{action_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= @{action_attribute}}} {{target= @{action_target}}} {{roll= @{dice_roll}}} {{powertarget=@{power_target}}} {{powerlevel= @{power_level}}} {{powertargetmax= @{power_targetmax}}} {{powerlevelmax= @{power_levelmax}}} {{description= @{action_special}}}"><input type="text" style="text-align: center;" name="attr_action_name" /></button></div>
                         <input type="hidden" class="displaySettingsFlag" name="attr_displaySettingsFlag" />
                         <div class="width100 displaySettings padLeft">
                             <div class="column width25 inlineBlock bold">Name: </div>
@@ -4058,23 +3779,23 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                             <input type="hidden" name="attr_dice_roll" value=0 />
                             <div class="column width75 inlineBlock">Attribute Dice Bonus/Penalty:</div>
                             <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_dice_modifier" value=0 /></div>
+                            <input type="hidden" name="attr_dice_roll_d20" value='1d20!!' />
                             <div class="column width55 inlineBlock">d20 for this action is:</div>
-                            <input type="hidden" name="attr_dice_d20" value="1d20!!" />
                             <div class="column width45 inlineBlock inputSelect">
-                                <select name="attr_dice_d20">
-                                    <option value="1d20!!" selected="selected">Normal</option>
-                                    <option value="2d20!!kh1">Advantage</option>
-                                    <option value="2d20!!kl1">Disadvantage</option>
+                                <select name="attr_select_dice_d20">
+                                    <option value="Normal" selected="selected">Normal</option>
+                                    <option value="Advantage">Advantage</option>
+                                    <option value="Disadvantage">Disadvantage</option>
                                 </select>
                             </div>
                             <input type="hidden" name="attr_power_target" value="" />
-                            <input type="hidden" name="attr_power_target_max" value=0 />
+                            <input type="hidden" name="attr_power_targetmax" value="" />
                             <div class="column width50 inlineBlock textSmall bold">For a Boon</div>
                             <div class="column width25 inlineBlock textSmall bold">Minimum</div>
                             <div class="column width25 inlineBlock textSmall bold">Maximum</div>
                             <div class="column width50 inlineBlock"><input type="checkbox" class="checks25" name="attr_use_power_level" value="Yes" /> Use Power level</div>
                             <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_power_level" value=0 /></div>
-                            <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_power_level_max" value=0 /></div>
+                            <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_power_levelmax" value=0 /></div>
                             <div class="column width100 bold textSmall">Description/Special/Flavor Text</div>
                             <div class="column width100 resizeVert vertTop"><textarea class="height50" name="attr_action_special"></textarea></div>
                         </div>
@@ -4101,7 +3822,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <fieldset class="repeating_otheractions">
                     <div class="row">   <!-- Fix for Mozilla squishing +Add & Modify buttons -->
                         <div class="width15 inlineBlock vertTop padLeft"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>y</span></div>
-                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" name="roll_action_other" value="&{template:openLegend} {{title= @{action_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= @{action_attribute}}} {{target= @{action_target}}} {{roll= @{dice_roll}}} {{powertarget=@{power_target}}} {{powerlevel= @{power_level}}} {{powertargetmax= @{power_target_max}}} {{powerlevelmax= @{power_level_max}}} {{description= @{action_special}}}"><input type="text" style="text-align: center;" name="attr_action_name" /></button></div>
+                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" name="roll_action_other" value="&{template:openLegend} {{title= @{action_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= @{action_attribute}}} {{target= @{action_target}}} {{roll= @{dice_roll}}} {{powertarget=@{power_target}}} {{powerlevel= @{power_level}}} {{powertargetmax= @{power_targetmax}}} {{powerlevelmax= @{power_levelmax}}} {{description= @{action_special}}}"><input type="text" style="text-align: center;" name="attr_action_name" /></button></div>
                         <input type="hidden" class="displaySettingsFlag" name="attr_displaySettingsFlag" />
                         <div class="width100 displaySettings padLeft">
                             <div class="column width25 inlineBlock bold">Name: </div>
@@ -4144,23 +3865,23 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                             <input type="hidden" name="attr_dice_roll" value=0 />
                             <div class="column width75 inlineBlock">Attribute Dice Bonus/Penalty:</div>
                             <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_dice_modifier" value=0 /></div>
+                            <input type="hidden" name="attr_dice_roll_d20" value='1d20!!' />
                             <div class="column width55 inlineBlock">d20 for this action is:</div>
-                            <input type="hidden" name="attr_dice_d20" value="1d20!!" />
                             <div class="column width45 inlineBlock inputSelect">
-                                <select name="attr_dice_d20">
-                                    <option value="1d20!!" selected="selected">Normal</option>
-                                    <option value="2d20!!kh1">Advantage</option>
-                                    <option value="2d20!!kl1">Disadvantage</option>
+                                <select name="attr_select_dice_d20">
+                                    <option value="Normal" selected="selected">Normal</option>
+                                    <option value="Advantage">Advantage</option>
+                                    <option value="Disadvantage">Disadvantage</option>
                                 </select>
                             </div>
                             <input type="hidden" name="attr_power_target" value="" />
-                            <input type="hidden" name="attr_power_target_max" value=0 />
+                            <input type="hidden" name="attr_power_targetmax" value=0 />
                             <div class="column width50 inlineBlock textSmall bold">For a Boon</div>
                             <div class="column width25 inlineBlock textSmall bold">Minimum</div>
                             <div class="column width25 inlineBlock textSmall bold">Maximum</div>
                             <div class="column width50 inlineBlock"><input type="checkbox" class="checks25" name="attr_use_power_level" value="Yes" /> Use Power level</div>
                             <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_power_level" value=0 /></div>
-                            <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_power_level_max" value=0 /></div>
+                            <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_power_levelmax" value=0 /></div>
                             <div class="column width100 bold textSmall">Description/Special/Flavor Text</div>
                             <div class="column width100 resizeVert vertTop"><textarea class="height50" name="attr_action_special"></textarea></div>
                         </div>
@@ -4187,7 +3908,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <fieldset class="repeating_legendary">
                     <div class="row">   <!-- Fix for Mozilla squishing +Add & Modify buttons -->
                         <div class="width15 inlineBlock vertTop padLeft"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>y</span></div>
-                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" name="roll_action" value="&{template:openLegend} {{title= @{action_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= @{action_attribute}}} {{target= @{action_target}}} {{roll= @{dice_roll}}} {{powertarget=@{power_target}}} {{powerlevel= @{power_level}}} {{powertargetmax= @{power_target_max}}} {{powerlevelmax= @{power_level_max}}} {{description= @{action_special}}}"><input type="text" style="text-align: center;" name="attr_action_name" /></button></div>
+                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" name="roll_action" value="&{template:openLegend} {{title= @{action_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= @{action_attribute}}} {{target= @{action_target}}} {{roll= @{dice_roll}}} {{powertarget=@{power_target}}} {{powerlevel= @{power_level}}} {{powertargetmax= @{power_targetmax}}} {{powerlevelmax= @{power_levelmax}}} {{description= @{action_special}}}"><input type="text" style="text-align: center;" name="attr_action_name" /></button></div>
                         <input type="hidden" class="displaySettingsFlag" name="attr_displaySettingsFlag" />
                         <div class="width100 displaySettings padLeft">
                             <div class="column width25 inlineBlock bold">Name: </div>
@@ -4243,23 +3964,23 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                                     <option value="10">10 = 4d8</option>
                                 </select>
                             </div>
+                            <input type="hidden" name="attr_dice_roll_d20" value='1d20!!' />
                             <div class="column width55 inlineBlock">d20 for this action is:</div>
-                            <input type="hidden" name="attr_dice_d20" value="1d20!!" />
                             <div class="column width45 inlineBlock inputSelect">
-                                <select name="attr_dice_d20">
-                                    <option value="1d20!!" selected="selected">Normal</option>
-                                    <option value="2d20!!kh1">Advantage</option>
-                                    <option value="2d20!!kl1">Disadvantage</option>
+                                <select name="attr_select_dice_d20">
+                                    <option value="Normal" selected="selected">Normal</option>
+                                    <option value="Advantage">Advantage</option>
+                                    <option value="Disadvantage">Disadvantage</option>
                                 </select>
                             </div>
                             <input type="hidden" name="attr_power_target" value="" />
-                            <input type="hidden" name="attr_power_target_max" value=0 />
+                            <input type="hidden" name="attr_power_targetmax" value=0 />
                             <div class="column width50 inlineBlock textSmall bold">For a Boon</div>
                             <div class="column width25 inlineBlock textSmall bold">Minimum</div>
                             <div class="column width25 inlineBlock textSmall bold">Maximum</div>
                             <div class="column width50 inlineBlock"><input type="checkbox" class="checks25" name="attr_use_power_level" value="Yes" /> Use Power level</div>
                             <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_power_level" value=0 /></div>
-                            <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_power_level_max" value=0 /></div>
+                            <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_power_levelmax" value=0 /></div>
                             <div class="column width100 bold textSmall">Description/Special/Flavor Text</div>
                             <div class="column width100 resizeVert vertTop"><textarea class="height50" name="attr_action_special"></textarea></div>
                         </div>
@@ -4284,15 +4005,15 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column width2of3 inlineBlock textRight bold italic">Points Used</div>
                 <input type="hidden" name="attr_featLeft_points_spent" value=0 />
                 <input type="hidden" name="attr_featRight_points_spent" value=0 />
-                <div class="column width1of3 inlineBlock inputNumber"><input type="number" name="attr_feat_points_spent" value="@{featLeft_points_spent}+@{featRight_points_spent}" disabled="disabled" /></div>
+                <div class="column width1of3 inlineBlock inputNumber"><input type="number" name="attr_feat_points_spent" value="@{featLeft_points_spent}" disabled="disabled" /></div>
             </div>
         </div>
         <div class="actionsMiddle padTop padLeft padRight">
-            <div class="column width50 inlineBlock vertTop padTop">
+            <div class="column width95 vertTop padTop">
                 <fieldset class="repeating_featsLeft">
                     <div class="row">   <!-- Fix for Mozilla squishing the +Add & Modify button text -->
-                        <div class="width15 inlineBlock vertTop"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>y</span></div>
-                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" value="&{template:openLegend} {{title= @{feat_left_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= Feat}} {{description= @{feat_left_description}}}"><input type="text" style="text-align: center;" name="attr_feat_left_name" /></button></div>
+                        <div class="width10 inlineBlock vertTop"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>y</span></div>
+                        <div class="width90 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" value="&{template:openLegend} {{title= @{feat_left_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= Feat}} {{description= @{feat_left_description}}}"><input type="text" style="text-align: center;" name="attr_feat_left_name" /></button></div>
                         <input type="hidden" class="displaySettingsFlag" name="attr_displaySettingsFlag" />
                         <div class="width100 displaySettings">
                             <div class="column width75 inlineBlock bold textSmall">Name</div>
@@ -4305,7 +4026,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                     </div>
                 </fieldset>
             </div>
-            <div class="column width50 inlineBlock vertTop padTop">
+            <div class="column width50 inlineBlock vertTop padTop" style="display: none;">
                 <fieldset class="repeating_featsRight">
                     <div class="row">   <!-- Fix for Mozilla squishing the +Add & Modify button text -->
                         <div class="width15 inlineBlock vertTop"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>y</span></div>
@@ -4335,11 +4056,11 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
             <div class="column width100 textCenter bold textLargest textShadow vertTop padTop padBottom">Perks</div>
         </div>
         <div class="actionsMiddle padTop padLeft padRight">
-            <div class="column width50 inlineBlock vertTop">
+            <div class="column width95 vertTop">
                 <fieldset class="repeating_perks">
                     <div class="row">   <!-- Fix for Mozilla squishing the +Add & Modify button text -->
-                        <div class="width15 inlineBlock vertTop"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>y</span></div>
-                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" value="&{template:openLegend} {{title= @{perks_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= Perk}} {{description= @{perks_description}}}"><input type="text" style="text-align: center;" name="attr_perks_name" /></button></div>
+                        <div class="width10 inlineBlock vertTop"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>y</span></div>
+                        <div class="width90 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" value="&{template:openLegend} {{title= @{perks_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= Perk}} {{description= @{perks_description}}}"><input type="text" style="text-align: center;" name="attr_perks_name" /></button></div>
                         <input type="hidden" class="displaySettingsFlag" name="attr_displaySettingsFlag" />
                         <div class="width100 displaySettings">
                             <div class="column width100 bold textSmall">Name</div>
@@ -4350,7 +4071,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                     </div>
                 </fieldset>
             </div>
-            <div class="column width50 inlineBlock vertTop">
+            <div class="column width50 inlineBlock vertTop" style="display: none;">
                 <fieldset class="repeating_perksRight">
                     <div class="row">   <!-- Fix for Mozilla squishing the +Add & Modify button text -->
                         <div class="width15 inlineBlock vertTop"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>y</span></div>
@@ -4368,11 +4089,11 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
    <!-- end Column for Perks -->
    <!-- Column for Flaws -->
             <div class="column width100 textCenter bold textLargest textShadow vertTop padTop padBottom">Flaws</div>
-            <div class="column width50 inlineBlock vertTop">
+            <div class="column width95 vertTop">
                 <fieldset class="repeating_flaws">
                     <div class="row">   <!-- Fix for Mozilla squishing the +Add & Modify button text -->
-                        <div class="width15 inlineBlock vertTop"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>y</span></div>
-                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" value="&{template:openLegend} {{title= @{flaws_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= Flaw}} {{description= @{flaws_description}}}"><input type="text" style="text-align: center;" name="attr_flaws_name" /></button></div>
+                        <div class="width10 inlineBlock vertTop"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>y</span></div>
+                        <div class="width90 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" value="&{template:openLegend} {{title= @{flaws_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= Flaw}} {{description= @{flaws_description}}}"><input type="text" style="text-align: center;" name="attr_flaws_name" /></button></div>
                         <input type="hidden" class="displaySettingsFlag" name="attr_displaySettingsFlag" />
                         <div class="width100 displaySettings">
                             <div class="column width100 bold textSmall">Name</div>
@@ -4383,7 +4104,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                     </div>
                 </fieldset>
             </div>
-            <div class="column width50 inlineBlock vertTop">
+            <div class="column width50 inlineBlock vertTop" style="display: none;">
                 <fieldset class="repeating_flawsRight">
                     <div class="row">   <!-- Fix for Mozilla squishing the +Add & Modify button text -->
                         <div class="width15 inlineBlock vertTop"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>y</span></div>
@@ -4855,7 +4576,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
         {{#description}}
         <div class="row">
             <div class="column width100 textCenter bold borderBottom">Description/Flavor Text</div>
-            <div class="column width100 textCenter">{{description}}</div>
+            <div class="column width100 textCenter scroll" style="max-height: 80px;">{{description}}</div>
         </div>
         {{/description}}
     </div>

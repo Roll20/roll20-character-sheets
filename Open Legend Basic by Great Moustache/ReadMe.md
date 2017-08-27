@@ -5,6 +5,33 @@
 
 ### Changelog
 
+### 1.8.9 on 2017 August 14th
+* Made the 2 columns into just 1 column for Feats, Perks, & Flaws
+	- Code that auto combines the two columns into 1 new so no data lost
+* Added captialization to certain attribute names
+	- Causes them to show at the top of the list for selecting the bubbles for tokens
+	- Built in redundency, so new Characters will see a few doubles that have "4Token" on the end, as old sheets will still be lower case
+
+### 1.8.8 on 2017 July 2nd
+* Fixed a typo in the Initiative output to chat (when clicking on Speed)
+* Made any Description output to the chat window from Actions be limited to 5 lines
+	- If over 5 lines, adds a scroll bar, so now it won't take up so much space when someone has lots of description/info
+* Added in text below "Guard", "Toughness", and "Resolve" that indicates you can click them to do resist rolls
+* Also renamed "power level" variable that was causing error if you dragged an action to the quick bar that wouldn't display the "Max" power level info.
+
+### 1.8.6 on 2017 May 14th
+* Fixed an error with other actions variable not being updated on its name
+	- Caused it to not calculate roll syntax correctly when a value was updated in other actions
+
+### 1.8.5 on 2017 May 6th
+* Fixed an error that caused actions to not roll because of 'undefined'
+	- Caused by previous fix to Advantage/Disadvantage to the d20 in 1.8.0
+* Added support for modifying the "Level" to calculate XP, Feat Points, and Attribute Points
+	- Previously it was only if you modified XP, now works for both
+* If value higher than 9 or lower than 0 is entered for Attribute, changes it to 0 or 9 as needed
+	- Shouldn't be able to have values higher or lower than these
+	- If value of 10 needed for dice size, can be done via input field within attribute settings "Attribute Dice Bonus/Penalty
+
 ### 1.8.0 on 2017 April 24th
 * Added in Extraordinary/Legendary Item section
 * Fixed an issue where Advantage/Disadvantage to the d20 wasn't working
