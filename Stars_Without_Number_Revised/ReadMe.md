@@ -41,3 +41,7 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 * Reworked the skill list. There are now options for rolling 2d6, 3d6kh2, and 4d6kh2 for the Specialist focus among others.
 * Reordered the skill list to be alphabetical by coloumn instead of by row.
 * Reordered the attributes to be in the usual order (STR, DEX, CON, INT, WIS, CHA)
+
+### 1.2.0
+
+* Changed attack roll template to correctly apply a -2 unfamiliaruty malus when a skill is at -1, instead of a -1 malus.
