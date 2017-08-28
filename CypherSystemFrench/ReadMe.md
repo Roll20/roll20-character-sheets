@@ -53,10 +53,10 @@ Le script API permet que l'&eacute;tat du personnage soit automatiquement mis &a
 
 # Notes de version
 
-##Version 1.6 (21 Février 2016)
+## Version 1.6 (21 Février 2016)
 Changements esthétiques, pour faciliter l'accès au bouton de suppression de ligne répétable, et diminuer la hauteur des lignes répétables.
 
-##Version 1.5 (21 Décembre 2015)
+## Version 1.5 (21 Décembre 2015)
 
 * Nouvelles sections "Attaques" (1 par caractéristique) avec jets intégrés, prenant en compte le niveau de compétence, le coûts, les dégats etc.
 * Les jets de Caractéristiques et Compétences ne demandent plus/n'utilisent plus les efforts aux dégâts (utilisez les nouvelles sections Attaques en lieu et place)
@@ -66,20 +66,20 @@ Changements esthétiques, pour faciliter l'accès au bouton de suppression de li
 * Nouveaux boutons d'info pour l'équipement (divers et consommables)
 * Correction d'un bug : le calcul du coût des efforts prend désormais en compte correctement le Curseur de Dégâts du personnage
 
-##Version 1.4 (21 Novembre 2015)
+## Version 1.4 (21 Novembre 2015)
 [Voir le détail sur le forum Roll20](https://app.roll20.net/forum/post/2357046/cypher-system-core-rule-book-sheet/?pageforid=2645489#post-2645489)
 
 * Nouvelle option de la feuille pour choisir le type de paramétrage des jets : via la section Action ou via Questions (type macro)
 * Nouveaux boutons pour montrer dans le chat le détails des Aptitudes Spéciales, Cyphers et Artefacts
 
-##Version 1.3 (25 Octobre 2015)
+## Version 1.3 (25 Octobre 2015)
 
 * Correction des jets avec Difficult&eacute; et Incapacit&eacute; : la difficult&eacute; finale est correctement affich&eacute;e,
 * Action : champs de saisie remplac&eacute;s par des listes d&eacute;roulantes pour une meilleure prise en compte des mises &agrave; jour par Roll20,
 * Possibilit&eacute; de saisir des Avantages n&eacute;gatifs (handicaps),
 * Remplacement du mot-cl&eacute; "Target" dans le code HTML et template permettant l'utilisation de macros custom.
 
-##Version 1.2 (4 Octobre 2015)
+## Version 1.2 (4 Octobre 2015)
 Le script API doit &ecirc;tre mis &agrave; jour en version 1.2.
 
 * Possibilit&eacute; de changer le style / l'apparence de la feuille d'un PJ (en choisissant Cypher System, Numen&eacute;ra ou The Strange) ou en feuille de PNJ.
@@ -87,5 +87,5 @@ Le script API doit &ecirc;tre mis &agrave; jour en version 1.2.
 * Ajout d'une section pour la saisie des Art&eacute;facts, avec un bouton de jet d'&eacute;puisement.
 * Ajout d'un bouton API au template de Jet de Gu&eacute;rison pour mettre &agrave; jour l'&eacute;tape suivante sur la feuille de personnage.
 
-##Version 1.1 (Septembre 2015)
+## Version 1.1 (Septembre 2015)
 Cr&eacute;ation de la FdP VF.

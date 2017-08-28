@@ -44,20 +44,20 @@ Par défaut, le personnage créé est attribué au joueur qui a cliqué dans le 
 
 # Notes de version
 
-##v4.4 (18 Février 2017).
+## v4.4 (18 Février 2017).
 Correction du calcul d'encombrement.
 
-##v4.3 (18 Décembre 2016).
+## v4.3 (18 Décembre 2016).
 Correction du calcul d'encombrement.
 
-##v4.2 (28 Février 2016).
+## v4.2 (28 Février 2016).
 * Correction de l'infobulle de la case à cocher "R" dans les sorts : il s'agissait de "Sort Réversible"
 * Correction de l'affichage des sorts avec Firefox
 
-##v4.1 (22 Février 2016).
+## v4.1 (22 Février 2016).
 Possibilité d'agrandir/réduire le champ de description d'un sort.
 
-##v4.0 (29 Janvier 2016).
+## v4.0 (29 Janvier 2016).
 * Changement de la police des zones de saisie de 'Times' à 'Patrick Hand' (aspect plus 'manuscrit')
 * Quelques ajustements de mise en page
 * Élargissement du template de jet dans le chat
@@ -68,7 +68,7 @@ Possibilité d'agrandir/réduire le champ de description d'un sort.
   * Les sorts de niveau 1 et 2 d'elfe et magicien ont toutes les informations pré-renseignées
   * Tous les sorts de Clerc de niveau 1 ont toutes les informations pré-renseignées
 
-##v3.1 (17 Janvier 2016).
+## v3.1 (17 Janvier 2016).
 * Ajout du nom du personnage sur tous les templates de jet dans le chat (utile lorsqu'un joueur contrôle plusieurs personnages)
 * Ajout de champs de saisie pour le titre et les langues supplémentaires du personnage
 * Agrandissement de la zone du modificateur de DEX pour le calcul de la CA (une valeur négative n'était pas visible)
@@ -81,7 +81,7 @@ Possibilité d'agrandir/réduire le champ de description d'un sort.
   * Correction du nom des armures, en vertue de l'[errata de PMT du 03/01/2016](http://www.scriptorium.d100.fr/wp-content/uploads/2016/01/PMT-errata-3-01-16.pdf)
   * Les distances de mouvement se mettent correctement à jour à la création du personnage
 
-##v3.0 (Janvier 2016).
+## v3.0 (Janvier 2016).
 Les personnages existants ne sont malheureusement que partiellement rétro-compatibles.
 Il faudra reprendre certains éléments : classe, attaques et équipements notamment.
 
@@ -103,24 +103,24 @@ Nouveautés :
   * Info-bulle du détail des jets d'attaque et de dégâts clarifié
   * Ajout du jet de suprise dans les actions
 
-##v2.2 (Ao&ucirc;t 2015).
+## v2.2 (Ao&ucirc;t 2015).
 Am&eacute;lioration de l'affichage des r&eacute;sultats des jets de caract&eacute;ristiques, sauvegardes et talents avec indication de succ&egrave;s ou d'&eacute;chec.
 
-##v2.1 (Avril 2015).
+## v2.1 (Avril 2015).
 Correction d'une anomalie d'affichage du logo PMT avec Firefox.
 
-##v2.0 (Avril 2015).
+## v2.0 (Avril 2015).
 Des jets mieux mis en forme dans le chat, avec l'utilisation des nouveaux _templates_ Roll20.
 Ajout du bonus d'attaque pour l'option CA ascendante.
 Quelques ajustements visuels.
 Gestion des d&eacute;g&acirc;ts maximum en cas de _Coup de Ma&icirc;tre_ (critique). **Attention**, effet de bord : il faut re-s&eacute;lectionner tous les d&eacute;s dans les feuilles de personnage cr&eacute;&eacute;es en v1.x
 
-##v1.2 (2014-12-21).
+## v1.2 (2014-12-21).
 Affichage des jets plus compacts dans le chat.
 Enrichissement de l'&eacute;quipement : richesses (pi&egrave;ces), encombrement et vitesses de d&eacute;placement.
 
-##v1.1 (2014-12-16).
+## v1.1 (2014-12-16).
 Correction du HTML pour retirer les accents r&eacute;siduels et attributs inutiles.
 
-##v1.0 (2014-12-07).
+## v1.0 (2014-12-07).
 Cr&eacute;ation.
