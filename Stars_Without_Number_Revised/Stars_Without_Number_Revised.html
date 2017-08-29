@@ -1791,6 +1791,7 @@ on("sheet:opened", function() {
   calculateMaxStrain();
   validateStrain();
   validateGear();
+  migrateTechniques();
 });
 
 on("change:str change:int change:dex change:wis change:con change:cha", function(e) {
@@ -1972,5 +1973,37 @@ validateStowedMax = function() {
 
     setAttrs({gear_stowed_max: stowed_max});
   });
+}
+/**
+  * Migrations
+  */
+
+migrateTechniques = function () {
+    console.log("Migrate started");
+    var technique, i, newRow, newRowId, newRowAttrs = {};
+    getAttrs(['psionics_mastered_1', 'psionics_mastered_2', 'psionics_mastered_3', 'psionics_mastered_4', 'psionics_mastered_5', 'psionics_mastered_6', 'psionics_mastered_7', 'psionics_mastered_8'], function (values) {
+        console.log(values);
+        for (i = 1; i < 9; i++){
+            technique = values["psionics_mastered_" + i];
+            console.log(technique);
+            if (technique !== "" && typeof technique === 'string') {
+                console.log("In need of update");
+                newRowId = generateRowID();
+                console.log(newRowId);
+                newRow = "repeating_technique_" + newRowId + "_technique";
+                console.log(newRow);
+                newRowAttrs[newRow] = technique;
+                console.log(newRowAttrs);
+                setAttrs(newRowAttrs, function (values) {
+                    console.log("updated");
+                });
+                newRow = "psionics_mastered_" + i;
+                newRowAttrs[newRow] = "";
+                setAttrs(newRowAttrs);
+            } else {
+                console.log("no update");
+            }
+        }
+    });
 }
 </script>
