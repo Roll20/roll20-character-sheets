@@ -473,20 +473,48 @@
       </div>
 
     </div>
-    <h3>Common Rolls:</h3>
-    <div class="sheet-5colrow">
+    <h3>Combat</h3>
+    <div class="sheet-row">
       <div class="sheet-col">
         <label for="roll_initiative">Roll Initiative (Select your token first)</label>
         <button type="roll" name="roll_initiative" value="&{template:initiative} {{characterName=@{name}}} {{rollValue=[[1d8+@{dex_bonus} &{tracker}]]}}" ></button>
       </div>
-      <div class="sheet-col">
-        <label for="roll_basic_melee_attack">Basic Melee Attack Roll</label>
-        <button type="roll" name="roll_basic_melee_attack" value="&{template:basicattack} {{characterName=@{name}}} {{attackType=Melee}} {{rollValue=[[1d20 + ?{Combat Skill Bonus|0} + @{str_bonus} + @{attack_bonus}]]}}" ></button>
-      </div>
-      <div class="sheet-col">
-        <label for="roll_basic_ranged_attack">Basic Ranged Attack Roll</label>
-        <button type="roll" name="roll_basic_ranged_attack" value="&{template:basicattack} {{characterName=@{name}}} {{attackType=Ranged}} {{rollValue=[[1d20 + ?{Combat Skill Bonus|0} + @{dex_bonus} + @{attack_bonus}]]}}" ></button>
-      </div>
+    </div>
+    <div class="sheet-weapons-wrapper">
+        <label style="width: 125px">Weapon</label>
+        <label class="sheet-weapons-short" style="width: 65px">Weapon AB</label>
+        <label class="sheet-weapons-short" style="width: 95px">Skill</label>
+        <label class="sheet-weapons-short" style="width: 60px">Attribute</label>
+        <label class="sheet-weapons-short" style="width: 75px">Damage</label>
+        <label class="sheet-weapons-short" style="width: 100px">Add Skill to damage?</label>
+        <label style="width: 70px">Range</label>
+        <label class="sheet-weapons-short" style="width: 55px">Ammo</label>
+        <label class="sheet-weapons-short" style="width: 55px">Magazines</label>
+        <br>
+        <fieldset class="repeating_weapons">
+            <input type="text" name="attr_weapon_name" style="width: 125px">
+            <input type="number" name="attr_weapon_attack" value="0" style="width: 65px">
+            <select class="inputbox" name="attr_weapon_skill_bonus" style="width: 95px; height: 25px">
+                <option value="@{skill_shoot}">Shoot</option>
+                <option value="@{skill_punch}">Punch</option>
+                <option value="@{skill_stab}">Stab</option>
+                <option value="@{skill_telekinesis}">Telekinesis</option>
+            </select>
+            <select class="inputbox" name="attr_attribute_mod" style="width: 60px; height: 25px">
+                <option value="@{str_bonus}">STR</option>
+                <option value="@{dex_bonus}">DEX</option>
+                <option value="@{con_bonus}">CON</option>
+                <option value="@{int_bonus}">INT</option>
+                <option value="@{wis_bonus}">WIS</option>
+                <option value="@{cha_bonus}">CHA</option>
+            </select>
+            <input type="text" name="attr_weapon_damage" style="width: 75px">
+            <input type="checkbox" name="attr_add_skill" value="@{weapon_skill_bonus}" style="width: 100px;">
+            <input type="text" name="attr_weapon_range" style="width: 70px">
+            <input type="number" name="attr_weapon_ammo"  style="width: 55px">
+            <input type="number" name="attr_weapon_magazines"  style="width: 55px">
+            <button type="roll" name="roll_weapon_to_hit" value="/me &{template:attack} {{characterName=@{name}}} {{name=@{weapon_name}}} {{rollValue=[[1d20 + @{attack_bonus}[AB] + @{weapon_attack}[Weapon AB] + [[{{@{weapon_skill_bonus},-1}>0}*(@{weapon_skill_bonus}+2) - 2]][Skill] + @{attribute_mod}[Attribute] + ?{Burst|Yes, 2|No, 0}[Burst] + ?{Other Modifier|0}[Modifier]]]}} {{damage=[[@{weapon_damage} + @{attribute_mod}[Attribute] + @{add_skill}[Skill] + ?{Burst|Yes, 2|No, 0}[Burst]]]}}" ></button>
+        </fieldset>
     </div>
     <h3>Saving Throws</h3>
     <div class="sheet-3colrow sheet-saves">
@@ -1058,25 +1086,26 @@
     </div>
 
     <div class="sheet-weapons-wrapper">
-        <label style="width: 140px">Weapon</label>
-        <label class="sheet-weapons-short" style="width: 55px">Weapon AB</label>
+        <label style="width: 125px">Weapon</label>
+        <label class="sheet-weapons-short" style="width: 65px">Weapon AB</label>
         <label class="sheet-weapons-short" style="width: 95px">Skill</label>
-        <label class="sheet-weapons-short" style="width: 95px">Attribute</label>
-        <label class="sheet-weapons-short" style="width: 85px">Damage</label>
-        <label class="sheet-weapons-short" style="width: 50px">Unarmed</label>
-        <label style="width: 140px">Range</label>
+        <label class="sheet-weapons-short" style="width: 60px">Attribute</label>
+        <label class="sheet-weapons-short" style="width: 75px">Damage</label>
+        <label class="sheet-weapons-short" style="width: 100px">Add Skill to damage?</label>
+        <label style="width: 70px">Range</label>
         <label class="sheet-weapons-short" style="width: 55px">Ammo</label>
+        <label class="sheet-weapons-short" style="width: 55px">Magazines</label>
         <br>
         <fieldset class="repeating_weapons">
-            <input type="text" name="attr_weapon_name" style="width: 140px">
-            <input type="number" name="attr_weapon_attack" value="0" style="width: 55px">
+            <input type="text" name="attr_weapon_name" style="width: 125px">
+            <input type="number" name="attr_weapon_attack" value="0" style="width: 65px">
             <select class="inputbox" name="attr_weapon_skill_bonus" style="width: 95px; height: 25px">
                 <option value="@{skill_shoot}">Shoot</option>
                 <option value="@{skill_punch}">Punch</option>
                 <option value="@{skill_stab}">Stab</option>
                 <option value="@{skill_telekinesis}">Telekinesis</option>
             </select>
-            <select class="inputbox" name="attr_attribute_mod" style="width: 95px; height: 25px">
+            <select class="inputbox" name="attr_attribute_mod" style="width: 60px; height: 25px">
                 <option value="@{str_bonus}">STR</option>
                 <option value="@{dex_bonus}">DEX</option>
                 <option value="@{con_bonus}">CON</option>
@@ -1084,11 +1113,12 @@
                 <option value="@{wis_bonus}">WIS</option>
                 <option value="@{cha_bonus}">CHA</option>
             </select>
-            <input type="text" name="attr_weapon_damage" style="width: 85px">
-            <input type="checkbox" name="attr_is_unarmed" value="@{skill_punch}" style="width: 50px;">
-            <input type="text" name="attr_weapon_range" style="width: 140px">
+            <input type="text" name="attr_weapon_damage" style="width: 75px">
+            <input type="checkbox" name="attr_add_skill" value="@{weapon_skill_bonus}" style="width: 100px;">
+            <input type="text" name="attr_weapon_range" style="width: 70px">
             <input type="number" name="attr_weapon_ammo"  style="width: 55px">
-            <button type="roll" name="roll_weapon_to_hit" value="/me &{template:attack} {{characterName=@{name}}} {{name=@{weapon_name}}} {{rollValue=[[1d20 + @{attack_bonus}[AB] + @{weapon_attack}[Weapon AB] + [[{{@{weapon_skill_bonus},-1}>0}*(@{weapon_skill_bonus}+2) - 2]][Skill] + @{attribute_mod}[Attribute] + ?{Burst|Yes, 2|No, 0}[Burst] + ?{Other Modifier|0}[Modifier]]]}} {{damage=[[@{weapon_damage} + @{attribute_mod} + @{is_unarmed} + ?{Burst|Yes, 2|No, 0}[Burst]]]}}" ></button>
+            <input type="number" name="attr_weapon_magazines"  style="width: 55px">
+            <button type="roll" name="roll_weapon_to_hit" value="/me &{template:attack} {{characterName=@{name}}} {{name=@{weapon_name}}} {{rollValue=[[1d20 + @{attack_bonus}[AB] + @{weapon_attack}[Weapon AB] + [[{{@{weapon_skill_bonus},-1}>0}*(@{weapon_skill_bonus}+2) - 2]][Skill] + @{attribute_mod}[Attribute] + ?{Burst|Yes, 2|No, 0}[Burst] + ?{Other Modifier|0}[Modifier]]]}} {{damage=[[@{weapon_damage} + @{attribute_mod}[Attribute] + @{add_skill}[Skill] + ?{Burst|Yes, 2|No, 0}[Burst]]]}}" ></button>
         </fieldset>
     </div>
 
