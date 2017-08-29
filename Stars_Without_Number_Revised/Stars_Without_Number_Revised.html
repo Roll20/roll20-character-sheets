@@ -1043,19 +1043,11 @@
         <div class="sheet-row sheet-gear">
           <div class="sheet-col"><label>Cyberware</label></div>
         </div>
-        <div class="sheet-row sheet-gear-cyberware">
-          <div class="sheet-col"><input type="text" name="attr_cyberware_1"></div>
-        </div>
-        <div class="sheet-row sheet-gear-cyberware">
-          <div class="sheet-col"><input type="text" name="attr_cyberware_2"></div>
-        </div>
-        <div class="sheet-row sheet-gear-cyberware">
-          <div class="sheet-col"><input type="text" name="attr_cyberware_3"></div>
-        </div>
-        <div class="sheet-row sheet-gear-cyberware">
-          <div class="sheet-col"><input type="text" name="attr_cyberware_4"></div>
-        </div>
-
+        <fieldset class="repeating_cyberware">
+          <div class="sheet-row sheet-gear-cyberware">
+            <div class="sheet-col" style="width: 210px"><input type="text" name="attr_cyberware"></div>
+          </div>
+        </fieldset>
         <div class="sheet-row sheet-gear">
           <div class="sheet-col"><label>Other Equipment</label></div>
         </div>
@@ -1792,6 +1784,7 @@ on("sheet:opened", function() {
   validateStrain();
   validateGear();
   migrateTechniques();
+  migrateCyberware();
 });
 
 on("change:str change:int change:dex change:wis change:con change:cha", function(e) {
@@ -1998,6 +1991,35 @@ migrateTechniques = function () {
                     console.log("updated");
                 });
                 newRow = "psionics_mastered_" + i;
+                newRowAttrs[newRow] = "";
+                setAttrs(newRowAttrs);
+            } else {
+                console.log("no update");
+            }
+        }
+    });
+}
+
+migrateCyberware = function () {
+    console.log("Migrate started");
+    var cyberware, i, newRow, newRowId, newRowAttrs = {};
+    getAttrs(['cyberware_1', 'cyberware_2', 'cyberware_3', 'cyberware_4'], function (values) {
+        console.log(values);
+        for (i = 1; i < 5; i++){
+            cyberware = values["cyberware_" + i];
+            console.log(cyberware);
+            if (cyberware !== "" && typeof cyberware === 'string') {
+                console.log("In need of update");
+                newRowId = generateRowID();
+                console.log(newRowId);
+                newRow = "repeating_cyberware_" + newRowId + "_cyberware";
+                console.log(newRow);
+                newRowAttrs[newRow] = cyberware;
+                console.log(newRowAttrs);
+                setAttrs(newRowAttrs, function (values) {
+                    console.log("updated");
+                });
+                newRow = "cyberware_" + i;
                 newRowAttrs[newRow] = "";
                 setAttrs(newRowAttrs);
             } else {
