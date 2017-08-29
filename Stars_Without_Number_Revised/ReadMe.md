@@ -29,10 +29,10 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 ### Changelog
 
-### 1.1.2
+### 1.2.0
 
 * Changed attack roll template to correctly apply a -2 unfamiliaruty malus when a skill is at -1, instead of a -1 malus.
-* Changed Psychic Techniques to a repeating section, so people won't run out of fields.
+* Changed Psychic Techniques and Cyberware to a repeating section, so people won't run out of fields.
 
 #### 1.1.1
 
