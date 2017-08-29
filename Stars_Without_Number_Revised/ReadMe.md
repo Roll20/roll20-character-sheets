@@ -29,6 +29,12 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 ### Changelog
 
+### 1.3.0
+
+* Duplicated weapon rolls to new Combat section where Common Rolls used to be.
+* Added ability to add the skill bonus to the damage (Gunslinger etc).
+* Added field for remaining magazines next to ammo.
+
 ### 1.2.0
 
 * Changed attack roll template to correctly apply a -2 unfamiliaruty malus when a skill is at -1, instead of a -1 malus.
@@ -46,7 +52,7 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 * Reordered the skill list to be alphabetical by coloumn instead of by row.
 * Reordered the attributes to be in the usual order (STR, DEX, CON, INT, WIS, CHA)
 
-#### 1.0.0
+### 1.0.0
 
 * Initial Release (cloned from Stars Without Number 1st Ed. sheet v0.1.7).
 * All skills and features renamed and reworked to Revised Edition rules.
