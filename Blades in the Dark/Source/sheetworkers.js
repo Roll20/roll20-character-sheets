@@ -766,12 +766,15 @@ const crewData = {
 				xp_condition3: "playbook_vampire_xp_condition3"
 			},
 			items: [{
+				bold: "1",
 				name: "playbook_item_fine_clothes_and_accoutrements",
 				numboxes: "0"
 			}, {
+				bold: "1",
 				name: "playbook_item_fine_personal_weapon",
 				numboxes: "1"
 			}, {
+				bold: "1",
 				name: "playbook_item_fine_shadow_cloak",
 				numboxes: "1"
 			}, {
@@ -2315,8 +2318,8 @@ on('sheet:opened', () => {
 		v.version ? upgradeSheet(v.version) : initialiseSheet();
 		// Set version number
 		setAttrs({
-			version: '1.13',
-			character_sheet: 'Blades in the Dark v1.13'
+			version: '1.14',
+			character_sheet: 'Blades in the Dark v1.14'
 		});
 	});
 });
