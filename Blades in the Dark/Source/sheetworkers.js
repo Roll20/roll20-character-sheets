@@ -1,4 +1,3 @@
-<script type="text/worker">
 "use strict";
 /* DATA */
 const crewData = {
@@ -41,26 +40,26 @@ const crewData = {
 				crew_xp_condition: "crew_assassins_xp_condition",
 				hunting_grounds_type: "crew_assassins_hunting_grounds_type",
 				hunting_grounds_description: "crew_assassins_hunting_grounds_description",
-				upgrade_20_check_1: "on",
-				upgrade_21_check_1: "on"
+				upgrade_20_check_1: "1",
+				upgrade_21_check_1: "1"
 			},
 			upgrades: [{
-				name: 'crew_upgrade_hardened',
-				numboxes: '3'
+				name: "crew_upgrade_hardened",
+				numboxes: "3"
 			}, {
-				name: 'crew_upgrade_assassin_rigging',
-				numboxes: '1',
-				tall: 'on'
+				name: "crew_upgrade_assassin_rigging",
+				numboxes: "1",
+				tall: "1"
 			}, {
-				name: 'crew_upgrade_ironhook_contacts',
-				numboxes: '1',
-				tall: 'on'
+				name: "crew_upgrade_ironhook_contacts",
+				numboxes: "1",
+				tall: "1"
 			}, {
-				name: 'crew_upgrade_elite_skulks',
-				numboxes: '1'
+				name: "crew_upgrade_elite_skulks",
+				numboxes: "1"
 			}, {
-				name: 'crew_upgrade_elite_thugs',
-				numboxes: '1',
+				name: "crew_upgrade_elite_thugs",
+				numboxes: "1",
 			}]
 		},
 		bravos: {
@@ -98,25 +97,25 @@ const crewData = {
 				crew_xp_condition: "crew_bravos_xp_condition",
 				hunting_grounds_type: "crew_bravos_hunting_grounds_type",
 				hunting_grounds_description: "crew_bravos_hunting_grounds_description",
-				upgrade_21_check_1: "on"
+				upgrade_21_check_1: "1"
 			},
 			upgrades: [{
-				name: 'crew_upgrade_hardened',
-				numboxes: '3'
+				name: "crew_upgrade_hardened",
+				numboxes: "3"
 			}, {
-				name: 'crew_upgrade_bravos_rigging',
-				numboxes: '1',
-				tall: 'on'
+				name: "crew_upgrade_bravos_rigging",
+				numboxes: "1",
+				tall: "1"
 			}, {
-				name: 'crew_upgrade_ironhook_contacts',
-				numboxes: '1',
-				tall: 'on'
+				name: "crew_upgrade_ironhook_contacts",
+				numboxes: "1",
+				tall: "1"
 			}, {
-				name: 'crew_upgrade_elite_rovers',
-				numboxes: '1'
+				name: "crew_upgrade_elite_rovers",
+				numboxes: "1"
 			}, {
-				name: 'crew_upgrade_elite_thugs',
-				numboxes: '1',
+				name: "crew_upgrade_elite_thugs",
+				numboxes: "1",
 			}]
 		},
 		cult: {
@@ -156,25 +155,25 @@ const crewData = {
 				crew_xp_condition: "crew_cult_xp_condition",
 				hunting_grounds_type: "crew_cult_hunting_grounds_type",
 				hunting_grounds_description: "crew_cult_hunting_grounds_description",
-				setting_show_deity: "on",
-				upgrade_22_check_1: "on"
+				setting_show_deity: "1",
+				upgrade_22_check_1: "1"
 			},
 			upgrades: [{
-				name: 'crew_upgrade_ordained',
-				numboxes: '3'
+				name: "crew_upgrade_ordained",
+				numboxes: "3"
 			}, {
-				name: 'crew_upgrade_cult_rigging',
-				numboxes: '1',
-				tall: 'on'
+				name: "crew_upgrade_cult_rigging",
+				numboxes: "1",
+				tall: "1"
 			}, {
-				name: 'crew_upgrade_ritual_sanctum_in_lair',
-				numboxes: '1'
+				name: "crew_upgrade_ritual_sanctum_in_lair",
+				numboxes: "1"
 			}, {
-				name: 'crew_upgrade_elite_adepts',
-				numboxes: '1'
+				name: "crew_upgrade_elite_adepts",
+				numboxes: "1"
 			}, {
-				name: 'crew_upgrade_elite_thugs',
-				numboxes: '1',
+				name: "crew_upgrade_elite_thugs",
+				numboxes: "1",
 			}]
 		},
 		hawkers: {
@@ -214,26 +213,26 @@ const crewData = {
 				crew_xp_condition: "crew_hawkers_xp_condition",
 				hunting_grounds_type: "crew_hawkers_hunting_grounds_type",
 				hunting_grounds_description: "crew_hawkers_hunting_grounds_description",
-				upgrade_14_check_1: "on",
-				upgrade_22_check_1: "on"
+				upgrade_14_check_1: "1",
+				upgrade_22_check_1: "1"
 			},
 			upgrades: [{
-				name: 'crew_upgrade_composed',
-				numboxes: '3'
+				name: "crew_upgrade_composed",
+				numboxes: "3"
 			}, {
-				name: 'crew_upgrade_hawker\'s_rigging',
-				numboxes: '1',
-				tall: 'on'
+				name: "crew_upgrade_hawker's_rigging",
+				numboxes: "1",
+				tall: "1"
 			}, {
-				name: 'crew_upgrade_ironhook_contacts',
-				numboxes: '1',
-				tall: 'on'
+				name: "crew_upgrade_ironhook_contacts",
+				numboxes: "1",
+				tall: "1"
 			}, {
-				name: 'crew_upgrade_elite_rooks',
-				numboxes: '1'
+				name: "crew_upgrade_elite_rooks",
+				numboxes: "1"
 			}, {
-				name: 'crew_upgrade_elite_thugs',
-				numboxes: '1',
+				name: "crew_upgrade_elite_thugs",
+				numboxes: "1",
 			}]
 		},
 		shadows: {
@@ -272,25 +271,25 @@ const crewData = {
 				crew_xp_condition: "crew_shadows_xp_condition",
 				hunting_grounds_type: "crew_shadows_hunting_grounds_type",
 				hunting_grounds_description: "crew_shadows_hunting_grounds_description",
-				upgrade_10_check_1: "on",
-				upgrade_21_check_1: "on"
+				upgrade_10_check_1: "1",
+				upgrade_21_check_1: "1"
 			},
 			upgrades: [{
-				name: 'crew_upgrade_steady',
-				numboxes: '3'
+				name: "crew_upgrade_steady",
+				numboxes: "3"
 			}, {
-				name: 'crew_upgrade_thief_rigging',
-				numboxes: '1',
-				tall: 'on'
+				name: "crew_upgrade_thief_rigging",
+				numboxes: "1",
+				tall: "1"
 			}, {
-				name: 'crew_upgrade_underground_maps_&_passkeys',
-				numboxes: '1'
+				name: "crew_upgrade_underground_maps_&_passkeys",
+				numboxes: "1"
 			}, {
-				name: 'crew_upgrade_elite_rooks',
-				numboxes: '1'
+				name: "crew_upgrade_elite_rooks",
+				numboxes: "1"
 			}, {
-				name: 'crew_upgrade_elite_skulks',
-				numboxes: '1',
+				name: "crew_upgrade_elite_skulks",
+				numboxes: "1",
 			}]
 		},
 		smugglers: {
@@ -332,28 +331,28 @@ const crewData = {
 				crew_xp_condition: "crew_smugglers_xp_condition",
 				hunting_grounds_type: "crew_smugglers_hunting_grounds_type",
 				hunting_grounds_description: "crew_smugglers_hunting_grounds_description",
-				upgrade_6_check_1: "on",
+				upgrade_6_check_1: "1",
 				upgrade_6_name: "vehicle",
 				upgrade_8_name: "vehicle",
-				upgrade_21_check_1: "on"
+				upgrade_21_check_1: "1"
 			},
 			upgrades: [{
-				name: 'crew_upgrade_steady',
-				numboxes: '3'
+				name: "crew_upgrade_steady",
+				numboxes: "3"
 			}, {
-				name: 'crew_upgrade_smuggler\'s_rigging',
-				numboxes: '1',
-				tall: 'on'
+				name: "crew_upgrade_smuggler's_rigging",
+				numboxes: "1",
+				tall: "1"
 			}, {
-				name: 'crew_upgrade_camouflage',
-				numboxes: '1',
-				tall: 'on'
+				name: "crew_upgrade_camouflage",
+				numboxes: "1",
+				tall: "1"
 			}, {
-				name: 'crew_upgrade_elite_rovers',
-				numboxes: '1'
+				name: "crew_upgrade_elite_rovers",
+				numboxes: "1"
 			}, {
-				name: 'crew_upgrade_barge',
-				numboxes: '1',
+				name: "crew_upgrade_barge",
+				numboxes: "1",
 			}]
 		},
 		vigilantes: {
@@ -396,27 +395,27 @@ const crewData = {
 				crew_xp_condition: "crew_vigilantes_xp_condition",
 				hunting_grounds_type: "crew_vigilantes_hunting_grounds_type",
 				hunting_grounds_description: "crew_vigilantes_hunting_grounds_description",
-				setting_show_origin: "on",
-				upgrade_22_check_1: "on"
+				setting_show_origin: "1",
+				upgrade_22_check_1: "1"
 			},
 			upgrades: [{
-				name: 'crew_upgrade_unbroken',
-				numboxes: '3'
+				name: "crew_upgrade_unbroken",
+				numboxes: "3"
 			}, {
-				name: 'crew_upgrade_vigilantes_attire',
-				numboxes: '1',
-				tall: 'on'
+				name: "crew_upgrade_vigilantes_attire",
+				numboxes: "1",
+				tall: "1"
 			}, {
-				name: 'crew_upgrade_irregulars',
-				numboxes: '1',
-				tall: 'on'
+				name: "crew_upgrade_irregulars",
+				numboxes: "1",
+				tall: "1"
 			}, {
-				name: 'crew_upgrade_willing_to_fight',
-				numboxes: '1',
-				tall: 'on'
+				name: "crew_upgrade_willing_to_fight",
+				numboxes: "1",
+				tall: "1"
 			}, {
-				name: 'crew_upgrade_spark-craft_technology',
-				numboxes: '1',
+				name: "crew_upgrade_spark-craft_technology",
+				numboxes: "1",
 			}]
 		}
 	},
@@ -440,11 +439,11 @@ const crewData = {
 				xp_condition: "playbook_cutter_xp_condition"
 			},
 			items: [{
-				bold: "on",
+				bold: "1",
 				name: "playbook_item_fine_hand_weapon",
 				numboxes: "1"
 			}, {
-				bold: "on",
+				bold: "1",
 				name: "playbook_item_fine_heavy_weapon",
 				numboxes: "2"
 			}, {
@@ -501,11 +500,11 @@ const crewData = {
 				xp_condition: "playbook_hound_xp_condition"
 			},
 			items: [{
-				bold: "on",
+				bold: "1",
 				name: "playbook_item_fine_pair_of_pistols",
 				numboxes: "1"
 			}, {
-				bold: "on",
+				bold: "1",
 				name: "playbook_item_fine_long_rifle",
 				numboxes: "2"
 			}, {
@@ -533,7 +532,7 @@ const crewData = {
 				gatherinfo6: "gatherinfo_how_can_I_find",
 				playbook_description: "playbook_hull_description",
 				setting_load_h: "7",
-				setting_show_frame: "on",
+				setting_show_frame: "1",
 				setting_stress_label: "drain",
 				setting_trauma_label: "wear",
 				setting_traumata_set: "hull",
@@ -563,11 +562,11 @@ const crewData = {
 				xp_condition: "playbook_leech_xp_condition"
 			},
 			items: [{
-				bold: "on",
+				bold: "1",
 				name: "playbook_item_fine_tinkering_tools",
 				numboxes: "1"
 			}, {
-				bold: "on",
+				bold: "1",
 				name: "playbook_item_fine_wrecker_tools",
 				numboxes: "2"
 			}, {
@@ -603,11 +602,11 @@ const crewData = {
 				xp_condition: "playbook_lurk_xp_condition"
 			},
 			items: [{
-				bold: "on",
+				bold: "1",
 				name: "playbook_item_fine_lockpicks",
 				numboxes: "0"
 			}, {
-				bold: "on",
+				bold: "1",
 				name: "playbook_item_fine_shadow_cloak",
 				numboxes: "1"
 			}, {
@@ -643,15 +642,15 @@ const crewData = {
 				xp_condition: "playbook_slide_xp_condition"
 			},
 			items: [{
-				bold: "on",
+				bold: "1",
 				name: "playbook_item_fine_clothes_&_jewelry",
 				numboxes: "0"
 			}, {
-				bold: "on",
+				bold: "1",
 				name: "playbook_item_fine_disguise_kit",
 				numboxes: "1"
 			}, {
-				bold: "on",
+				bold: "1",
 				name: "playbook_item_fine_loaded_dice,_trick_cards",
 				numboxes: "0"
 			}, {
@@ -684,11 +683,11 @@ const crewData = {
 				xp_condition: "playbook_spider_xp_condition"
 			},
 			items: [{
-				bold: "on",
+				bold: "1",
 				name: "playbook_item_fine_cover_identity",
 				numboxes: "0"
 			}, {
-				bold: "on",
+				bold: "1",
 				name: "playbook_item_fine_bottle_of_whiskey",
 				numboxes: "1"
 			}, {
@@ -724,11 +723,11 @@ const crewData = {
 				xp_condition: "playbook_whisper_xp_condition"
 			},
 			items: [{
-				bold: "on",
+				bold: "1",
 				name: "playbook_item_fine_lightning_hook",
 				numboxes: "1"
 			}, {
-				bold: "on",
+				bold: "1",
 				name: "playbook_item_fine_spirit_mask",
 				numboxes: "1"
 			}, {
@@ -757,8 +756,8 @@ const crewData = {
 				gatherinfo6: "gatherinfo_how_can_I_find",
 				playbook_description: "playbook_vampire_description",
 				setting_extra_stress: "3",
-				setting_vampirexp: "on",
-				setting_show_strictures: "on",
+				setting_vampirexp: "1",
+				setting_show_strictures: "1",
 				setting_traumata_set: "normal",
 				setting_vice_type: "vampire",
 				trauma: "4",
@@ -786,468 +785,527 @@ const crewData = {
 	},
 	factionsData = {
 		factions1: [{
-				name: 'faction_the_unseen',
-				tier: 'IV',
-				hold: 'S'
+				name: "faction_the_unseen",
+				tier: "IV",
+				hold: "S"
 			},
 			{
-				name: 'faction_the_hive',
-				tier: 'IV',
-				hold: 'S'
+				name: "faction_the_hive",
+				tier: "IV",
+				hold: "S"
 			},
 			{
-				name: 'faction_the_circle_of_flame',
-				tier: 'III',
-				hold: 'S'
+				name: "faction_the_circle_of_flame",
+				tier: "III",
+				hold: "S"
 			},
 			{
-				name: 'faction_the_silver_nails',
-				tier: 'III',
-				hold: 'S'
+				name: "faction_the_silver_nails",
+				tier: "III",
+				hold: "S"
 			},
 			{
-				name: 'faction_lord_scurlock',
-				tier: 'III',
-				hold: 'S'
+				name: "faction_lord_scurlock",
+				tier: "III",
+				hold: "S"
 			},
 			{
-				name: 'faction_the_crows',
-				tier: 'II',
-				hold: 'W'
+				name: "faction_the_crows",
+				tier: "II",
+				hold: "W"
 			},
 			{
-				name: 'faction_the_lampblacks',
-				tier: 'II',
-				hold: 'W'
+				name: "faction_the_lampblacks",
+				tier: "II",
+				hold: "W"
 			},
 			{
-				name: 'faction_the_red_sashes',
-				tier: 'II',
-				hold: 'W'
+				name: "faction_the_red_sashes",
+				tier: "II",
+				hold: "W"
 			},
 			{
-				name: 'faction_the_dimmer_sisters',
-				tier: 'II',
-				hold: 'S'
+				name: "faction_the_dimmer_sisters",
+				tier: "II",
+				hold: "S"
 			},
 			{
-				name: 'faction_the_grinders',
-				tier: 'II',
-				hold: 'W'
+				name: "faction_the_grinders",
+				tier: "II",
+				hold: "W"
 			},
 			{
-				name: 'faction_the_billhooks',
-				tier: 'II',
-				hold: 'W'
+				name: "faction_the_billhooks",
+				tier: "II",
+				hold: "W"
 			},
 			{
-				name: 'faction_the_wraiths',
-				tier: 'II',
-				hold: 'W'
+				name: "faction_the_wraiths",
+				tier: "II",
+				hold: "W"
 			},
 			{
-				name: 'faction_the_gray_cloaks',
-				tier: 'II',
-				hold: 'S'
+				name: "faction_the_gray_cloaks",
+				tier: "II",
+				hold: "S"
 			},
 			{
-				name: 'faction_ulf_ironborn',
-				tier: 'I',
-				hold: 'S'
+				name: "faction_ulf_ironborn",
+				tier: "I",
+				hold: "S"
 			},
 			{
-				name: 'faction_the_foghounds',
-				tier: 'I',
-				hold: 'W'
+				name: "faction_the_foghounds",
+				tier: "I",
+				hold: "W"
 			},
 			{
-				name: 'faction_the_lost',
-				tier: 'I',
-				hold: 'W'
+				name: "faction_the_lost",
+				tier: "I",
+				hold: "W"
 			}
 		],
 		factions2: [{
-				name: 'faction_imperial_military',
-				tier: 'VI',
-				hold: 'S'
+				name: "faction_imperial_military",
+				tier: "VI",
+				hold: "S"
 			},
 			{
-				name: 'faction_city_council',
-				tier: 'V',
-				hold: 'S'
+				name: "faction_city_council",
+				tier: "V",
+				hold: "S"
 			},
 			{
-				name: 'faction_ministry_of_preservation',
-				tier: 'V',
-				hold: 'S'
+				name: "faction_ministry_of_preservation",
+				tier: "V",
+				hold: "S"
 			},
 			{
-				name: 'faction_leviathan_hunters',
-				tier: 'V',
-				hold: 'S'
+				name: "faction_leviathan_hunters",
+				tier: "V",
+				hold: "S"
 			},
 			{
-				name: 'faction_ironhook_prison',
-				tier: 'IV',
-				hold: 'S'
+				name: "faction_ironhook_prison",
+				tier: "IV",
+				hold: "S"
 			},
 			{
-				name: 'faction_sparkwrights',
-				tier: 'IV',
-				hold: 'S'
+				name: "faction_sparkwrights",
+				tier: "IV",
+				hold: "S"
 			},
 			{
-				name: 'faction_spirit_wardens',
-				tier: 'IV',
-				hold: 'S'
+				name: "faction_spirit_wardens",
+				tier: "IV",
+				hold: "S"
 			},
 			{
-				name: 'faction_bluecoats',
-				tier: 'III',
-				hold: 'S'
+				name: "faction_bluecoats",
+				tier: "III",
+				hold: "S"
 			},
 			{
-				name: 'faction_inspectors',
-				tier: 'III',
-				hold: 'S'
+				name: "faction_inspectors",
+				tier: "III",
+				hold: "S"
 			},
 			{
-				name: 'faction_iruvian_consulate',
-				tier: 'III',
-				hold: 'S'
+				name: "faction_iruvian_consulate",
+				tier: "III",
+				hold: "S"
 			},
 			{
-				name: 'faction_skovlan_consulate',
-				tier: 'III',
-				hold: 'W'
+				name: "faction_skovlan_consulate",
+				tier: "III",
+				hold: "W"
 			},
 			{
-				name: 'faction_the_brigade',
-				tier: 'II',
-				hold: 'S'
+				name: "faction_the_brigade",
+				tier: "II",
+				hold: "S"
 			},
 			{
-				name: 'faction_severosi_consulate',
-				tier: 'I',
-				hold: 'S'
+				name: "faction_severosi_consulate",
+				tier: "I",
+				hold: "S"
 			},
 			{
-				name: 'faction_dagger_isles_consulate',
-				tier: 'I',
-				hold: 'S'
+				name: "faction_dagger_isles_consulate",
+				tier: "I",
+				hold: "S"
 			}
 		],
 		factions3: [{
-				name: 'faction_the_foundation',
-				tier: 'IV',
-				hold: 'S'
+				name: "faction_the_foundation",
+				tier: "IV",
+				hold: "S"
 			},
 			{
-				name: 'faction_dockers',
-				tier: 'III',
-				hold: 'S'
+				name: "faction_dockers",
+				tier: "III",
+				hold: "S"
 			},
 			{
-				name: 'faction_gondoliers',
-				tier: 'III',
-				hold: 'S'
+				name: "faction_gondoliers",
+				tier: "III",
+				hold: "S"
 			},
 			{
-				name: 'faction_sailors',
-				tier: 'III',
-				hold: 'W'
+				name: "faction_sailors",
+				tier: "III",
+				hold: "W"
 			},
 			{
-				name: 'faction_laborers',
-				tier: 'III',
-				hold: 'W'
+				name: "faction_laborers",
+				tier: "III",
+				hold: "W"
 			},
 			{
-				name: 'faction_cabbies',
-				tier: 'II',
-				hold: 'W'
+				name: "faction_cabbies",
+				tier: "II",
+				hold: "W"
 			},
 			{
-				name: 'faction_cyphers',
-				tier: 'II',
-				hold: 'S'
+				name: "faction_cyphers",
+				tier: "II",
+				hold: "S"
 			},
 			{
-				name: 'faction_ink_rakes',
-				tier: 'II',
-				hold: 'W'
+				name: "faction_ink_rakes",
+				tier: "II",
+				hold: "W"
 			},
 			{
-				name: 'faction_rail_jacks',
-				tier: 'II',
-				hold: 'W'
+				name: "faction_rail_jacks",
+				tier: "II",
+				hold: "W"
 			},
 			{
-				name: 'faction_servants',
-				tier: 'II',
-				hold: 'W'
+				name: "faction_servants",
+				tier: "II",
+				hold: "W"
 			}
 		],
 		factions4: [{
-				name: 'faction_the_church_of_ecstasy',
-				tier: 'IV',
-				hold: 'S'
+				name: "faction_the_church_of_ecstasy",
+				tier: "IV",
+				hold: "S"
 			},
 			{
-				name: 'faction_the_horde',
-				tier: 'III',
-				hold: 'S'
+				name: "faction_the_horde",
+				tier: "III",
+				hold: "S"
 			},
 			{
-				name: 'faction_the_path_of_echoes',
-				tier: 'III',
-				hold: 'S'
+				name: "faction_the_path_of_echoes",
+				tier: "III",
+				hold: "S"
 			},
 			{
-				name: 'faction_the_forgotten_gods',
-				tier: 'III',
-				hold: 'W'
+				name: "faction_the_forgotten_gods",
+				tier: "III",
+				hold: "W"
 			},
 			{
-				name: 'faction_the_reconciled',
-				tier: 'III',
-				hold: 'S'
+				name: "faction_the_reconciled",
+				tier: "III",
+				hold: "S"
 			},
 			{
-				name: 'faction_skovlander_refugees',
-				tier: 'III',
-				hold: 'W'
+				name: "faction_skovlander_refugees",
+				tier: "III",
+				hold: "W"
 			},
 			{
-				name: 'faction_the_weeping_lady',
-				tier: 'II',
-				hold: 'S'
+				name: "faction_the_weeping_lady",
+				tier: "II",
+				hold: "S"
 			},
 			{
-				name: 'faction_deathlands_scavengers',
-				tier: 'II',
-				hold: 'W'
+				name: "faction_deathlands_scavengers",
+				tier: "II",
+				hold: "W"
 			}
 		],
 		factions5: [{
-				name: 'faction_whitecrown',
-				tier: 'V',
-				hold: 'S'
+				name: "faction_whitecrown",
+				tier: "V",
+				hold: "S"
 			},
 			{
-				name: 'faction_brightstone',
-				tier: 'IV',
-				hold: 'S'
+				name: "faction_brightstone",
+				tier: "IV",
+				hold: "S"
 			},
 			{
-				name: 'faction_charterhall',
-				tier: 'IV',
-				hold: 'S'
+				name: "faction_charterhall",
+				tier: "IV",
+				hold: "S"
 			},
 			{
-				name: 'faction_six_towers',
-				tier: 'III',
-				hold: 'W'
+				name: "faction_six_towers",
+				tier: "III",
+				hold: "W"
 			},
 			{
-				name: 'faction_silkshore',
-				tier: 'II',
-				hold: 'S'
+				name: "faction_silkshore",
+				tier: "II",
+				hold: "S"
 			},
 			{
-				name: 'faction_nightmarket',
-				tier: 'II',
-				hold: 'S'
+				name: "faction_nightmarket",
+				tier: "II",
+				hold: "S"
 			},
 			{
-				name: 'faction_crow\'s_foot',
-				tier: 'II',
-				hold: 'S'
+				name: "faction_crow's_foot",
+				tier: "II",
+				hold: "S"
 			},
 			{
-				name: 'faction_the_docks',
-				tier: 'II',
-				hold: 'S'
+				name: "faction_the_docks",
+				tier: "II",
+				hold: "S"
 			},
 			{
-				name: 'faction_barrowcleft',
-				tier: 'II',
-				hold: 'S'
+				name: "faction_barrowcleft",
+				tier: "II",
+				hold: "S"
 			},
 			{
-				name: 'faction_coalridge',
-				tier: 'II',
-				hold: 'W'
+				name: "faction_coalridge",
+				tier: "II",
+				hold: "W"
 			},
 			{
-				name: 'faction_charhollow',
-				tier: 'I',
-				hold: 'S'
+				name: "faction_charhollow",
+				tier: "I",
+				hold: "S"
 			},
 			{
-				name: 'faction_dunslough',
-				tier: 'I',
-				hold: 'W'
+				name: "faction_dunslough",
+				tier: "I",
+				hold: "W"
 			}
 		]
 	},
 	actionData = {
 		insight: [
-			'hunt',
-			'study',
-			'survey',
-			'tinker'
+			"hunt",
+			"study",
+			"survey",
+			"tinker"
 		],
 		prowess: [
-			'finesse',
-			'prowl',
-			'skirmish',
-			'wreck'
+			"finesse",
+			"prowl",
+			"skirmish",
+			"wreck"
 		],
 		resolve: [
-			'attune',
-			'command',
-			'consort',
-			'sway'
+			"attune",
+			"command",
+			"consort",
+			"sway"
 		]
 	},
 	itemData = [{
-			name: 'a_blade_or_two',
-			description: 'a_blade_or_two_description',
-			numboxes: '1'
+			name: "a_blade_or_two",
+			description: "a_blade_or_two_description",
+			numboxes: "1"
 		},
 		{
-			name: 'throwing_knives',
-			description: 'throwing_knives_description',
-			numboxes: '1'
+			name: "throwing_knives",
+			description: "throwing_knives_description",
+			numboxes: "1"
 		},
 		{
-			name: 'a_pistol',
-			description: 'a_pistol_description',
-			numboxes: '1',
-			short: 'on'
+			name: "a_pistol",
+			description: "a_pistol_description",
+			numboxes: "1",
+			short: "1"
 		},
 		{
-			name: 'a_2nd_pistol',
-			description: 'a_pistol_description',
-			numboxes: '1',
-			short: 'on'
+			name: "a_2nd_pistol",
+			description: "a_pistol_description",
+			numboxes: "1",
+			short: "1"
 		},
 		{
-			name: 'a_large_weapon',
-			description: 'a_large_weapon_description',
-			numboxes: '2'
+			name: "a_large_weapon",
+			description: "a_large_weapon_description",
+			numboxes: "2"
 		},
 		{
-			name: 'an_unusual_weapon',
-			description: 'an_unusual_weapon_description',
-			numboxes: '1'
+			name: "an_unusual_weapon",
+			description: "an_unusual_weapon_description",
+			numboxes: "1"
 		},
 		{
-			name: 'armor',
-			description: 'armor_description',
-			numboxes: '2',
-			short: 'on'
+			name: "armor",
+			description: "armor_description",
+			numboxes: "2",
+			short: "1"
 		},
 		{
-			name: '+heavy',
-			description: '+heavy_description',
-			numboxes: '3',
-			short: 'on'
+			name: "+heavy",
+			description: "+heavy_description",
+			numboxes: "3",
+			short: "1"
 		},
 		{
-			name: 'burglary_gear',
-			description: 'burglary_gear_description',
-			numboxes: '1'
+			name: "burglary_gear",
+			description: "burglary_gear_description",
+			numboxes: "1"
 		},
 		{
-			name: 'climbing_gear',
-			description: 'climbing_gear_description',
-			numboxes: '2'
+			name: "climbing_gear",
+			description: "climbing_gear_description",
+			numboxes: "2"
 		},
 		{
-			name: 'arcane_implements',
-			description: 'arcane_implements_description',
-			numboxes: '1'
+			name: "arcane_implements",
+			description: "arcane_implements_description",
+			numboxes: "1"
 		},
 		{
-			name: 'documents',
-			description: 'documents_description',
-			numboxes: '1'
+			name: "documents",
+			description: "documents_description",
+			numboxes: "1"
 		},
 		{
-			name: 'subterfuge_supplies',
-			description: 'subterfuge_supplies_description',
-			numboxes: '1'
+			name: "subterfuge_supplies",
+			description: "subterfuge_supplies_description",
+			numboxes: "1"
 		},
 		{
-			name: 'demolition_tools',
-			description: 'demolition_tools_description',
-			numboxes: '2'
+			name: "demolition_tools",
+			description: "demolition_tools_description",
+			numboxes: "2"
 		},
 		{
-			name: 'tinkering_tools',
-			description: 'tinkering_tools_description',
-			numboxes: '1'
+			name: "tinkering_tools",
+			description: "tinkering_tools_description",
+			numboxes: "1"
 		},
 		{
-			name: 'lantern',
-			description: 'lantern_description',
-			numboxes: '1'
+			name: "lantern",
+			description: "lantern_description",
+			numboxes: "1"
 		}
 	],
-	spiritPlaybooks = ['ghost', 'hull', 'vampire'],
-	defaultValues = {
-		cohort1_name: 'cohort',
-		contacts_title: 'contacts',
-		factions_title: 'factions_title',
-		factions1_header: 'factions1',
-		factions2_header: 'factions2',
-		factions3_header: 'factions3',
-		factions4_header: 'factions4',
-		factions5_header: 'factions5',
-		frame: 'frame',
-		friends_title: 'friends',
-		setting_stress_label: 'stress',
-		setting_trauma_label: 'trauma',
-		upgrade_6_name: 'carriage',
-		upgrade_6_description: 'upgrade_carriage_description',
-		upgrade_7_name: 'documents',
-		upgrade_7_description: 'upgrade_documents_description',
-		upgrade_8_name: 'boat',
-		upgrade_8_description: 'upgrade_boat_description',
-		upgrade_9_name: 'gear',
-		upgrade_9_description: 'upgrade_gear_description',
-		upgrade_10_name: 'hidden',
-		upgrade_10_description: 'upgrade_hidden_description',
-		upgrade_11_name: 'implements',
-		upgrade_11_description: 'upgrade_implements_description',
-		upgrade_12_name: 'quarters',
-		upgrade_12_description: 'upgrade_quarters_description',
-		upgrade_13_name: 'supplies',
-		upgrade_13_description: 'upgrade_supplies_description',
-		upgrade_14_name: 'secure',
-		upgrade_14_description: 'upgrade_secure_description',
-		upgrade_15_name: 'tools',
-		upgrade_15_description: 'upgrade_tools_description',
-		upgrade_16_name: 'vault',
-		upgrade_16_description: 'upgrade_vault_description',
-		upgrade_17_name: 'weapons',
-		upgrade_17_description: 'upgrade_weapons_description',
-		upgrade_18_name: 'workshop',
-		upgrade_18_description: 'upgrade_workshop_description',
-		upgrade_20_name: 'insight',
-		upgrade_20_description: 'upgrade_insight_description',
-		upgrade_21_name: 'prowess',
-		upgrade_21_description: 'upgrade_prowess_description',
-		upgrade_22_name: 'resolve',
-		upgrade_22_description: 'upgrade_resolve_description',
-		upgrade_23_name: 'personal',
-		upgrade_23_description: 'upgrade_personal_description',
-		upgrade_24_name: 'mastery',
-		upgrade_24_description: 'upgrade_mastery_description',
-		xp_condition2: 'xp_beliefs',
-		xp_condition3: 'xp_vice'
+	spiritPlaybooks = ["ghost", "hull", "vampire"],
+	translatedDefaults = {
+		cohort1_name: "cohort",
+		contacts_title: "contacts",
+		factions_title: "factions_title",
+		factions1_header: "factions1",
+		factions2_header: "factions2",
+		factions3_header: "factions3",
+		factions4_header: "factions4",
+		factions5_header: "factions5",
+		frame: "frame",
+		friends_title: "friends",
+		setting_stress_label: "stress",
+		setting_trauma_label: "trauma",
+		upgrade_6_name: "carriage",
+		upgrade_6_description: "upgrade_carriage_description",
+		upgrade_7_name: "documents",
+		upgrade_7_description: "upgrade_documents_description",
+		upgrade_8_name: "boat",
+		upgrade_8_description: "upgrade_boat_description",
+		upgrade_9_name: "gear",
+		upgrade_9_description: "upgrade_gear_description",
+		upgrade_10_name: "hidden",
+		upgrade_10_description: "upgrade_hidden_description",
+		upgrade_11_name: "implements",
+		upgrade_11_description: "upgrade_implements_description",
+		upgrade_12_name: "quarters",
+		upgrade_12_description: "upgrade_quarters_description",
+		upgrade_13_name: "supplies",
+		upgrade_13_description: "upgrade_supplies_description",
+		upgrade_14_name: "secure",
+		upgrade_14_description: "upgrade_secure_description",
+		upgrade_15_name: "tools",
+		upgrade_15_description: "upgrade_tools_description",
+		upgrade_16_name: "vault",
+		upgrade_16_description: "upgrade_vault_description",
+		upgrade_17_name: "weapons",
+		upgrade_17_description: "upgrade_weapons_description",
+		upgrade_18_name: "workshop",
+		upgrade_18_description: "upgrade_workshop_description",
+		upgrade_20_name: "insight",
+		upgrade_20_description: "upgrade_insight_description",
+		upgrade_21_name: "prowess",
+		upgrade_21_description: "upgrade_prowess_description",
+		upgrade_22_name: "resolve",
+		upgrade_22_description: "upgrade_resolve_description",
+		upgrade_23_name: "personal",
+		upgrade_23_description: "upgrade_personal_description",
+		upgrade_24_name: "mastery",
+		upgrade_24_description: "upgrade_mastery_description",
+		xp_condition2: "xp_beliefs",
+		xp_condition3: "xp_vice"
+	},
+	defaultsFromSheet = {
+		character: {
+			attune1: "0",
+			attune2: "0",
+			command1: "0",
+			consort1: "0",
+			consort2: "0",
+			finesse1: "0",
+			hunt1: "0",
+			hunt2: "0",
+			prowl1: "0",
+			prowl2: "0",
+			setting_extra_stress: "0",
+			setting_load_h: "6",
+			setting_show_frame: "0",
+			setting_show_strictures: "0",
+			setting_stress_label: "Stress",
+			setting_trauma_label: "Trauma",
+			setting_traumata_set: " normal",
+			setting_vampirexp: "0",
+			setting_vice_type: "normal",
+			skirmish1: "0",
+			skirmish2: "0",
+			study1: "0",
+			survey1: "0",
+			sway1: "0",
+			sway2: "0",
+			tinker1: "0",
+			tinker2: "0",
+			trauma: "0",
+			wreck1: "0",
+			xp_condition2: "You expressed your beliefs, drives, heritage, or background.",
+			xp_condition3: "You struggled with issues from your vice or traumas during the session."
+		},
+		crew: {
+			claim_bridge_2_3: "1",
+			claim_bridge_2_7: "1",
+			claim_bridge_3_4: "1",
+			claim_bridge_4_9: "1",
+			claim_bridge_6_7: "1",
+			claim_bridge_6_11: "1",
+			claim_bridge_9_14: "1",
+			claim_bridge_10_15: "1",
+			claim_bridge_12_13: "1",
+			claim_bridge_13_14: "1",
+			cohort1_subtype: "",
+			cohort1_type: "gang",
+			setting_show_deity: "0",
+			setting_show_origin: "0",
+			upgrade_6_check_1: "0",
+			upgrade_6_name: getTranslationByKey("carriage"),
+			upgrade_8_name: getTranslationByKey("boat"),
+			upgrade_10_check_1: "0",
+			upgrade_14_check_1: "0",
+			upgrade_20_check_1: "0",
+			upgrade_21_check_1: "0",
+			upgrade_22_check_1: "0"
+		}
 	};
 /* NECESSARY DATA TRANSFORMATION */
 /* Translate crewData */
@@ -1279,18 +1337,18 @@ Object.keys(crewData).forEach(crew => {
 	}));
 	crewData[crew].upgrades.forEach(upgrade => {
 		upgrade.name = getTranslationByKey(upgrade.name);
-		upgrade.boxes_chosen = 'on';
+		upgrade.boxes_chosen = '1';
 	});
 });
 /* Translate itemData */
 itemData.forEach(item => {
-	item.boxes_chosen = 'on';
+	item.boxes_chosen = '1';
 	item.name = getTranslationByKey(item.name);
 	item.description = getTranslationByKey(item.description);
 });
-/* Translate defaultValues */
-Object.keys(defaultValues).forEach(k => {
-	defaultValues[k] = getTranslationByKey(defaultValues[k]);
+/* Translate translatedDefaults */
+Object.keys(translatedDefaults).forEach(k => {
+	translatedDefaults[k] = getTranslationByKey(translatedDefaults[k]);
 });
 /* Translate factions */
 Object.keys(factionsData).forEach(x => {
@@ -1332,21 +1390,33 @@ Object.keys(playbookData).forEach(playbook => {
 	}));
 	playbookData[playbook].items.forEach(item => {
 		item.name = getTranslationByKey(item.name);
-		item.boxes_chosen = 'on';
+		item.boxes_chosen = '1';
 	});
 });
 /* UTILITY FUNCTIONS */
-const setDiceFromTotal = (name, numDice, upToFive, value) => {
-		value = value || 1;
+const setAttrIfNeeded = (name, value) => {
+		getAttrs([name], v => {
+			const setting = {};
+			if (v[name] !== String(value)) setting[name] = String(value);
+			setAttrs(setting);
+		});
+	},
+	setDiceFromTotal = (name, numDice, upToFive) => {
 		const setting = {};
-		setting[`${name}1`] = (numDice > 0) ? value : 0;
-		setting[`${name}2`] = (numDice > 1) ? value : 0;
-		setting[`${name}3`] = (numDice > 2) ? value : 0;
-		setting[`${name}4`] = (numDice > 3) ? value : 0;
+		setting[`${name}1`] = (numDice > 0) ? 1 : 0;
+		setting[`${name}2`] = (numDice > 1) ? 1 : 0;
+		setting[`${name}3`] = (numDice > 2) ? 1 : 0;
+		setting[`${name}4`] = (numDice > 3) ? 1 : 0;
 		if (upToFive) {
-			setting[`${name}5`] = (numDice > 4) ? value : 0;
+			setting[`${name}5`] = (numDice > 4) ? 1 : 0;
 		}
 		setAttrs(setting);
+	},
+	calcTotalFromBoxes = name => {
+		getAttrs([1, 2, 3, 4, 5].map(x => `${name}${x}`), v => {
+			const total = [1, 2, 3, 4, 5].reduce((m, x) => m + (parseInt(v[`${name}${x}`]) || 0), 0);
+			setAttrIfNeeded(name, total);
+		});
 	},
 	fillRepeatingSectionFromData = (sectionName, dataList, autoGenerated, callback) => {
 		callback = callback || (() => {});
@@ -1370,7 +1440,7 @@ const setDiceFromTotal = (name, numDice, upToFive, value) => {
 							newAttrs[`repeating_${sectionName}_${rowID}_autogen`] = '1';
 						}
 						return Object.keys(o).reduce((m, key) => {
-							m[`repeating_${sectionName}_${rowID}_${key}`] = o[key];
+							m[`repeating_${sectionName}_${rowID}_${key}`] = String(o[key]);
 							return m;
 						}, newAttrs);
 					})
@@ -1406,10 +1476,10 @@ const setDiceFromTotal = (name, numDice, upToFive, value) => {
 /* Watch repeating rows for changes and set autogen to false if change happens*/
 const repeatingSectionsToWatchForAutogen = ['ability', 'crewability', 'friend', 'contact', 'playbookitem', 'upgrade'];
 repeatingSectionsToWatchForAutogen.forEach(sectionName => {
-	on(`change:repeating_${sectionName}`, eventInfo => {
-		const idMatch = eventInfo.sourceAttribute.match(new RegExp(`^repeating_${sectionName}_(.*?)_`)),
+	on(`change:repeating_${sectionName}`, event => {
+		const idMatch = event.sourceAttribute.match(new RegExp(`^repeating_${sectionName}_(.*?)_`)),
 			id = idMatch && idMatch[1];
-		if (id && eventInfo.sourceType === 'player') {
+		if (id && event.sourceType === 'player') {
 			const setting = {};
 			setting[`repeating_${sectionName}_${id}_autogen`] = '';
 			setAttrs(setting);
@@ -1418,23 +1488,24 @@ repeatingSectionsToWatchForAutogen.forEach(sectionName => {
 });
 /* Set some default fields when setting crew type or playbook */
 const crewAttributes = [...new Set([].concat(...Object.keys(crewData).map(x => Object.keys(crewData[x].base))))],
-	playbookAttributes = [...new Set([].concat(...Object.keys(playbookData).map(x => Object.keys(playbookData[x].base))))],
-	watchedAttributes = new Set([].concat(crewAttributes, playbookAttributes));
+	playbookAttributes = [...new Set([].concat(...Object.keys(playbookData).map(x => Object.keys(playbookData[x].base))))];
 on('change:crew_type change:playbook', event => {
-	getAttrs(['crew_type', 'playbook', 'changed_attributes'], v => {
+	getAttrs(['crew_type', 'playbook', 'changed_attributes', 'setting_autofill', ...watchedAttributes], v => {
 		const changedAttributes = (v.changed_attributes || '').split(',');
-		let data, baseData, sourceName;
+		let data, baseData, defaults, sourceName;
 		if (v.playbook || v.crew_type) {
 			setAttrs({
 				show_playbook_reminder: '0'
 			});
 		}
+		if (v.setting_autofill !== '1') return;
 		switch (event.sourceAttribute) {
 		case 'crew_type':
 			sourceName = v.crew_type.toLowerCase();
 			if (crewData.hasOwnProperty(sourceName)) {
 				data = crewData[sourceName].base;
 				baseData = crewAttributes;
+				defaults = defaultsFromSheet.crew;
 				deleteAutogenRows('contact', () => fillRepeatingSectionFromData('contact', crewData[sourceName].contacts, true));
 				deleteAutogenRows('crewability', () => fillRepeatingSectionFromData('crewability', crewData[sourceName].abilities, true));
 				deleteAutogenRows('upgrade', () => fillRepeatingSectionFromData('upgrade', crewData[sourceName].upgrades, true));
@@ -1445,6 +1516,7 @@ on('change:crew_type change:playbook', event => {
 			if (playbookData.hasOwnProperty(sourceName)) {
 				data = playbookData[sourceName].base;
 				baseData = playbookAttributes;
+				defaults = defaultsFromSheet.character;
 				deleteAutogenRows('friend', () => fillRepeatingSectionFromData('friend', playbookData[sourceName].friends, true));
 				deleteAutogenRows('ability', () => fillRepeatingSectionFromData('ability', playbookData[sourceName].abilities, true));
 				deleteAutogenRows('playbookitem', () => fillRepeatingSectionFromData('playbookitem', playbookData[sourceName].items, true));
@@ -1455,24 +1527,12 @@ on('change:crew_type change:playbook', event => {
 			const finalSettings = {};
 			if (!spiritPlaybooks.includes(sourceName)) {
 				baseData.filter(name => !changedAttributes.includes(name))
-					.forEach(name => (finalSettings[name] = defaultValues[name] || ''));
+					.filter(name => v[name] !== (translatedDefaults[name] || defaults[name] || ''))
+					.forEach(name => (finalSettings[name] = translatedDefaults[name] || defaults[name] || ''));
 			}
 			Object.keys(data).filter(name => !changedAttributes.includes(name))
 				.forEach(name => (finalSettings[name] = data[name]));
 			setAttrs(finalSettings);
-		}
-	});
-});
-/* Watch for changes in auto-set attributes */
-watchedAttributes.forEach(name => {
-	on(`change:${name}`, eventInfo => {
-		if (eventInfo.sourceType === 'player') {
-			getAttrs(['changed_attributes'], v => {
-				const changedAttributes = [...new Set(v.changed_attributes.split(',').concat(name))].filter(x => !!x).join(',');
-				setAttrs({
-					changed_attributes: changedAttributes
-				});
-			});
 		}
 	});
 });
@@ -1484,39 +1544,83 @@ const actions1 = Object.keys(actionData).reduce((m, k) => {
 	actionsFlat = [].concat(...Object.keys(actionData).map(x => actionData[x])),
 	actions1Flat = actionsFlat.map(str => str + '1'),
 	calculateResistance = name => {
-		getAttrs(actions1[name], v => {
-			const numDice = Object.keys(v).map(x => v[x]).reduce((s, c) => s + parseInt(c || 0), 0);
-			setDiceFromTotal(name, numDice);
+		getAttrs([...actions1[name], `setting_resbonus_${name}`], v => {
+			const total = Object.keys(v).map(x => v[x]).reduce((s, c) => s + parseInt(c || 0), 0);
+			setAttrIfNeeded(name, total);
 		});
 	},
 	calculateVice = () => {
-		getAttrs(actions1Flat, v => {
-			const numDice = Math.min(...Object.keys(actions1).map(name => {
-				return actions1[name].reduce((s, str) => s + parseInt(v[str] || 0), 0);
-			}));
-			setDiceFromTotal('vice', numDice);
+		getAttrs(Object.keys(actionData), v => {
+			setAttrIfNeeded('vice', Math.min(...Object.keys(v).map(x => parseInt(v[x]) || 0)));
 		});
 	};
+/* Watch for changes in auto-set attributes */
+const watchedAttributes = actionsFlat.reduce((m, a) => {
+	return m.add(`${a}1`).add(`${a}2`).add(`${a}3`).add(`${a}4`).add(`${a}5`);
+	}, new Set(crewAttributes.concat(playbookAttributes)));
+watchedAttributes.forEach(name => {
+	on(`change:${name}`, event => {
+		if (event.sourceType === 'player') {
+			getAttrs(['changed_attributes'], v => {
+				if (actionsFlat.includes(name.slice(0, -1))) {
+					const base = name.slice(0, -1);
+					name = [`${base}1`, `${base}2`, `${base}3`, `${base}4`, `${base}5`];
+				}
+				const changedAttributes = [...new Set(v.changed_attributes.split(',').concat(name))].filter(x => !!x).join(',');
+				setAttrs({
+					changed_attributes: changedAttributes
+				});
+			});
+		}
+	});
+});
 /* Register attribute/action event handlers */
 Object.keys(actionData).forEach(attributeName => {
 	actionData[attributeName].forEach(actionName => {
 		on(`change:${actionName}1`, () => calculateResistance(attributeName));
 	});
-	on([1, 2, 3, 4].map(x => `change:${attributeName}${x}`).join(' '), calculateVice);
-});
-/* CALCULATE WANTED */
-on('change:wanted', () => {
-	getAttrs(['wanted'], v => {
-		setDiceFromTotal('wanted', parseInt(v.wanted));
+	on(`change:setting_resbonus_${attributeName}`, () => calculateResistance(attributeName));
+	on(`change:setting_dark_talent_${attributeName}`, () => {
+		getAttrs([`setting_dark_talent_${attributeName}`, `setting_resbonus_${attributeName}`], v => {
+			const setting = {}, r = `setting_resbonus_${attributeName}`;
+			setting[r] = parseInt(v[r]) || 0;
+			if (v[`setting_dark_talent_${attributeName}`] === '1') {
+				setting[r] = setting[r] + 1;
+			} else {
+				setting[r] = setting[r] - 1;
+			}
+			setAttrs(setting);
+		});
 	});
+	on(`change:${attributeName}`, calculateVice);
+});
+[...actionsFlat, 'crew_tier'].forEach(name => {
+	on([1, 2, 3, 4, 5].map(x => `change:${name}${x}`).join(' '), () => calcTotalFromBoxes(name));
 });
 /* CALCULATE STASH */
-const calculateStash = () => {
+const calculateStashDice = () => {
 	getAttrs(['stash'], v => {
-		setDiceFromTotal('stash', Math.floor(parseInt(v.stash) / 10));
+		setAttrIfNeeded('stash_dice', Math.floor(parseInt(v.stash) / 10));
 	});
 };
-on('change:stash', calculateStash);
+on('change:stash', calculateStashDice);
+/* CALCULATE TRAUMA */
+const traumata = {
+		normal: ['cold', 'haunted', 'obsessed', 'paranoid', 'reckless', 'soft', 'unstable', 'vicious'],
+		ghost: ['chaotic', 'destructive', 'furious', 'obsessive', 'territorial', 'savage'],
+		hull: ['clanking', 'leaking', 'fixated', 'smoking', 'sparking', 'unstable']
+	},
+	traumataFlat = Object.keys(traumata).reduce((m, k) => m.concat(traumata[k]), []);
+on('change:setting_traumata_set ' + traumataFlat.map(x => `change:${x}`).join(' '), event => {
+	getAttrs(['setting_traumata_set', ...traumataFlat], v => {
+		const traumaType = (v.setting_traumata_set === '0' ? 'normal' : v.setting_traumata_set);
+		if (traumata[traumaType] && event.sourceType === 'player') {
+			setAttrs({
+				trauma: traumata[traumaType].reduce((m, trauma) => m + (parseInt(v[trauma]) || 0), 0)
+			});
+		}
+	});
+});
 /* GENERATE FACTIONS */
 on('change:generate_factions', () => {
 	Object.keys(factionsData).forEach(sectionName => {
@@ -1558,53 +1662,40 @@ on('change:generate_friends', () => {
 /* EXTRA STRESS BOXES */
 on('change:setting_extra_stress', () => {
 	getAttrs(['setting_extra_stress'], v => {
-		setDiceFromTotal('setting_extra_stress', parseInt(v.setting_extra_stress), true, 'on');
+		setDiceFromTotal('setting_extra_stress', parseInt(v.setting_extra_stress), true);
 	});
 });
 /* CALCULATE COHORT QUALITY */
-const calculateCohortDots = (t1, t2, t3, t4, imp, type, prefix) => {
-		let numDots = parseInt(t1) + parseInt(t2) + parseInt(t3) + parseInt(t4);
-		if (imp === 'on') {
-			numDots = numDots - 1;
-		}
-		if (type === 'elite' || type === 'expert') {
-			numDots = numDots + 1;
-		}
-		setDiceFromTotal(`${prefix}die`, numDots, true);
+const calculateCohortDice = prefix => {
+	getAttrs(['crew_tier', `${prefix}_impaired`, `${prefix}_type`], v => {
+		const dice = (parseInt(v.crew_tier) || 0) - (parseInt(v[`${prefix}_impaired`]) || 0) +
+			((v[`${prefix}_type`] === 'elite' || v[`${prefix}_type`] === 'expert') ? 1 : 0);
+		setAttrIfNeeded(`${prefix}_dice`, dice);
+	});
 	},
-	qualityAttrs = ['crew_tier1', 'crew_tier2', 'crew_tier3', 'crew_tier4', 'cohort1_impaired', 'cohort1_type'],
-	qualityEvent = qualityAttrs.map(x => `change:${x}`).join(' '),
-	repeatingQualityAttrs = ['crew_tier1', 'crew_tier2', 'crew_tier3', 'crew_tier4', 'repeating_cohort:impaired', 'repeating_cohort:type'],
-	repeatingQualityEvent = repeatingQualityAttrs.map(x => `change:${x}`).join(' ');
-on(qualityEvent, () => {
-	getAttrs(qualityAttrs, v => {
-		calculateCohortDots(v.crew_tier1, v.crew_tier2, v.crew_tier3, v.crew_tier4, v.cohort1_impaired, v.cohort1_type, 'cohort1_');
-	});
-});
-on(repeatingQualityEvent + ' ' + ['name', 'subtype', 'edges', 'flaws', 'description'].map(x => `change:repeating_cohort:${x}`).join(' '), () => {
-	getSectionIDs('repeating_cohort', list => {
-		list.forEach(id => {
-			const attrList = repeatingQualityAttrs.map(str => str.replace(':', `_${id}_`));
-			getAttrs(attrList, v => {
-				calculateCohortDots(v.crew_tier1, v.crew_tier2, v.crew_tier3, v.crew_tier4, v[attrList[4]], v[attrList[5]], `repeating_cohort_${id}_`);
-			});
-		});
-	});
+	qualityEvent = ['crew_tier', 'cohort1_impaired', 'cohort1_type'].map(x => `change:${x}`).join(' ');
+on(qualityEvent, () => calculateCohortDice('cohort1'));
+on('change:repeating_cohort', () => calculateCohortDice('repeating_cohort'));
+on('change:crew_tier', () => {
+	getSectionIDs('repeating_cohort', a => a.forEach(id => calculateCohortDice(`repeating_cohort_${id}`)))
 });
 /* LEFT-FILL CHECKBOXES */
-const handleBoxesFill = (name, activeValue, upToFour) => {
-	on(`change:${name}1 change:${name}2 change:${name}3 change:${name}4`, event => {
+const handleBoxesFill = (name, upToFour, upToFive) => {
+	on(`change:${name}1 change:${name}2 change:${name}3 change:${name}4 change:${name}5`, event => {
+		if (event.sourceType !== 'player') return;
 		getAttrs([event.sourceAttribute], v => {
 			const rName = event.sourceAttribute.slice(0, -1),
 				setting = {};
-			if (v[event.sourceAttribute] === activeValue) {
+			if (v[event.sourceAttribute] === '1') {
 				switch (event.sourceAttribute.slice(-1)) {
+				case '5':
+					setting[`${rName}4`] = 1;
 				case '4':
-					setting[`${rName}3`] = activeValue;
+					setting[`${rName}3`] = 1;
 				case '3':
-					setting[`${rName}2`] = activeValue;
+					setting[`${rName}2`] = 1;
 				case '2':
-					setting[`${rName}1`] = activeValue;
+					setting[`${rName}1`] = 1;
 				}
 			}
 			if (v[event.sourceAttribute] === '0') {
@@ -1615,6 +1706,8 @@ const handleBoxesFill = (name, activeValue, upToFour) => {
 					setting[`${rName}3`] = '0';
 				case '3':
 					if (upToFour) setting[`${rName}4`] = '0';
+				case '4':
+					if (upToFive) setting[`${rName}5`] = '0';
 				}
 			}
 			setAttrs(setting);
@@ -1622,15 +1715,25 @@ const handleBoxesFill = (name, activeValue, upToFour) => {
 	});
 };
 /* Action ratings */
-actionsFlat.forEach(action => handleBoxesFill(action, '1', true));
+actionsFlat.forEach(action => handleBoxesFill(action, true, true));
 /* Crew Tier */
-handleBoxesFill('crew_tier', '1', true);
-handleBoxesFill('upgrade_24_check_', 'on', true);
-handleBoxesFill('bandolier1_check_', 'on');
-handleBoxesFill('bandolier2_check_', 'on');
+handleBoxesFill('crew_tier', true);
+handleBoxesFill('upgrade_24_check_', true);
+handleBoxesFill('bandolier1_check_');
+handleBoxesFill('bandolier2_check_');
 /* Items/Upgrades */
 ['item', 'playbookitem', 'upgrade'].forEach(sectionName => {
-	handleBoxesFill(`repeating_${sectionName}:check_`, 'on');
+	handleBoxesFill(`repeating_${sectionName}:check_`);
+});
+/* Handle showing options for heritage, background, and vice */
+['heritage', 'background', 'vice_purveyor', 'hull_functions', 'crew_deity_features'].forEach(name => {
+	on(`change:${name}`, () => {
+		getAttrs([name], v => {
+			const setting = [];
+			setting[`show_${name}_info`] = v[name] ? '0' : '1';
+			setAttrs(setting);
+		});
+	});
 });
 /* INITIALISATION AND UPGRADES */
 on('sheet:opened', () => {
@@ -1649,25 +1752,549 @@ on('sheet:opened', () => {
 		}
 	});
 	/* Set up translated queries */
-	setAttrs({
-		bonusdice: `?{${getTranslationByKey('bonusdice')}}`,
-		bonusdice_long: `?{${getTranslationByKey('bonusdice')}|0|1|2|3|4|5|6|-1|-2|-3}`,
+	const queries = {
+		bonusdice: `?{${getTranslationByKey('bonusdice')}|0|1|2|3|4|5|6|-1|-2|-3}`,
 		effect_query: getTranslationByKey('effect_query'),
 		notes_query: `?{${getTranslationByKey('notes')}|}`,
-		numberofdice: `?{${getTranslationByKey('numberofdice')}}`,
-		numberofdice_long: `?{${getTranslationByKey('numberofdice')}|0|1|2|3|4|5|6}`,
-		position_query: `?{Position|${getTranslationByKey('risky')},position=${getTranslationByKey('risky')}|` +
+		numberofdice: `?{${getTranslationByKey('numberofdice')}|0|1|2|3|4|5|6}`,
+		position_query: `?{${getTranslationByKey('position')}|` +
+			`${getTranslationByKey('risky')},position=${getTranslationByKey('risky')}|` +
 			`${getTranslationByKey('controlled')},position=${getTranslationByKey('controlled')}|` +
 			`${getTranslationByKey('desperate')},position=${getTranslationByKey('desperate')}|` +
 			`${getTranslationByKey('fortune_roll')},position=}`
+	};
+	getAttrs(Object.keys(queries), v => {
+		const setting = {};
+		Object.keys(queries).forEach(name => {
+			if (v[name] !== queries[name]) setting[name] = queries[name];
+		});
+		setAttrs(setting);
 	});
 	/* Setup and upgrades */
 	getAttrs(['version'], v => {
 		const upgradeSheet = version => {
-			const versionMajor = version && parseInt(version.split('.')[0]),
-				versionMinor = version && parseInt(version.split('.')[1]);
-			// Initialise a new sheet
-			if (!version) {
+				const versionMajor = version && parseInt(version.split('.')[0]),
+					versionMinor = version && parseInt(version.split('.')[1]);
+				// Upgrade to 0.7: Convert legacy faction repeating section to text
+				if (versionMajor === 0 && versionMinor < 7) {
+					getSectionIDs('repeating_faction', list => {
+						const sectionList = ['faction1', 'faction2'].concat(list.map(str => `repeating_faction_${str}`)),
+							attrList = [].concat(...sectionList.map(str => [`${str}_name`, `${str}_status`, `${str}_description`]));
+						getAttrs(attrList, v => {
+							const output = sectionList.map(str => {
+								return 'Name: ' + v[`${str}_name`] + '\n' +
+									'Status: ' + (v[`${str}_status`] || '') + '\n' +
+									'Notes: ' + (v[`${str}_description`] || '') + '\n';
+							}).join('\n');
+							setAttrs({
+								faction_notes: output
+							});
+							list.forEach(id => removeRepeatingRow(`repeating_faction_${id}`));
+							upgradeSheet('0.7');
+							console.log('Updating to 0.7');
+						});
+					});
+				}
+				// Upgrade to 0.9: Convert ability/friend/crewability/contact first row
+				else if (versionMajor === 0 && versionMinor < 9) {
+					const upgradeFunction = _.after(4, () => upgradeSheet('0.9')),
+						attrs = ['ability1_check', 'ability1_name', 'ability1_description',
+							'friend1_status', 'friend1_name',
+							'crew_ability1_check', 'crew_ability1_name', 'crew_ability1_description',
+							'contact1_check', 'contact1_name'
+						];
+					getAttrs(attrs, v => {
+						fillRepeatingSectionFromData('ability', [{
+							check: v.ability1_check || '0',
+							description: v.ability1_description || '',
+							name: v.ability1_name || ''
+						}], false, upgradeFunction);
+						fillRepeatingSectionFromData('friend', [{
+							name: v.friend1_name || '',
+							status: v.friend1_status || ''
+						}], false, upgradeFunction);
+						fillRepeatingSectionFromData('crewability', [{
+							check: v.crew_ability1_check || '0',
+							description: v.crew_ability1_description || '',
+							name: v.crew_ability1_name || ''
+						}], false, upgradeFunction);
+						fillRepeatingSectionFromData('contact', [{
+							check: v.contact1_check || '0',
+							name: v.contact1_name || ''
+						}], false, upgradeFunction);
+						console.log('Updating to 0.9');
+					});
+				}
+				// Upgrade to 1.0: Make sure that resistance values are calculated correctly.
+				else if (versionMajor === 0) {
+					Object.keys(actionData).forEach(calculateResistance);
+					calculateVice();
+					upgradeSheet('1.0');
+					console.log('Updating to 1.0');
+				}
+				// Upgrade to 1.4: Convert playbook items and repeating items
+				else if (versionMajor === 1 && versionMinor < 4) {
+					const upgradeFunction = _.after(2, () => upgradeSheet('1.4')),
+						indices = [...Array(10).keys()], // [0:9]
+						allAttrs = [
+							...indices.map(n => `item_${n}_check`),
+							...indices.map(n => `item_${n}_desc`),
+							'item_0_check_b',
+							'item_0_check_c',
+							'item_1_check_b'
+						];
+					getAttrs(allAttrs, v => {
+						const items = [];
+						if (v.item_0_desc) {
+							items.push({
+								check_1: v.item_0_check || '0',
+								name: v.item_0_desc,
+								numboxes: '1'
+							});
+							items.push({
+								check_1: v.item_0_check_b || '0',
+								name: v.item_0_desc,
+								numboxes: '1'
+							});
+							items.push({
+								check_1: v.item_0_check_c || '0',
+								name: v.item_0_desc,
+								numboxes: '1'
+							});
+						}
+						if (v.item_1_desc) {
+							items.push({
+								bold: 'on',
+								check_1: v.item_1_check || '0',
+								check_2: v.item_1_check_b || '0',
+								name: v.item_1_desc,
+								numboxes: '2'
+							});
+						}
+						['2', '3', '5', '6'].forEach(index => {
+							if (v[`item_${index}_desc`]) {
+								items.push({
+									bold: (['2', '3'].includes(index) ? 'on' : '0'),
+									check_1: v[`item_${index}_check`] || '0',
+									name: v[`item_${index}_desc`],
+									numboxes: '1'
+								});
+							}
+						});
+						['4', '7', '8', '9'].forEach(index => {
+							if (v[`item_${index}_desc`]) {
+								items.push({
+									bold: ((index === '4') ? 'on' : '0'),
+									check_1: v[`item_${index}_check`] || '0',
+									name: v[`item_${index}_desc`],
+									numboxes: '0'
+								});
+							}
+						});
+						items.forEach(obj => {
+							obj.boxes_chosen = 'on';
+						});
+						fillRepeatingSectionFromData('playbookitem', items, false, upgradeFunction);
+					});
+					getSectionIDs('repeating_item', idArray => {
+						const allAttrs = [
+							...idArray.map(id => `repeating_item_${id}_desc`),
+							...idArray.map(id => `repeating_item_${id}_check`),
+							...idArray.map(id => `repeating_item_${id}_check_b`)
+						];
+						getAttrs(allAttrs, v => {
+							const setting = {};
+							idArray.forEach(id => {
+								setting[`repeating_item_${id}_boxes_chosen`] = 'on';
+								setting[`repeating_item_${id}_numboxes`] = '2';
+								setting[`repeating_item_${id}_name`] = v[`repeating_item_${id}_desc`] || '';
+								setting[`repeating_item_${id}_check_1`] = v[`repeating_item_${id}_check`] || '0';
+								setting[`repeating_item_${id}_check_2`] = v[`repeating_item_${id}_check_b`] || '0';
+							});
+							setAttrs(setting, {}, upgradeFunction);
+							console.log('Updating to 1.4');
+						});
+					});
+				}
+				// Upgrade to 1.5: Convert items
+				else if (versionMajor === 1 && versionMinor < 5) {
+					const indices = [...Array(25).keys()].slice(10),
+						allAttrs = [
+							...indices.map(n => `item_${n}_check`),
+							...indices.map(n => `item_${n}_desc`),
+							'item_14_check_b',
+							'item_16_check_b',
+							'item_16_check_c',
+							'item_16_check_d',
+							'item_16_check_e',
+							'item_18_check_b',
+							'item_22_check_b'
+						];
+					getAttrs(allAttrs, v => {
+						const items = [{
+								check_1: (v.item_10_check || '0'),
+								name: (v.item_10_desc || 'A Blade or Two'),
+								numboxes: '1'
+							},
+							{
+								check_1: (v.item_11_check || '0'),
+								name: (v.item_11_desc || 'Throwing Knives'),
+								numboxes: '1'
+							},
+							{
+								check_1: (v.item_12_check || '0'),
+								name: (v.item_12_desc || 'A Pistol'),
+								numboxes: '1',
+								short: 'on'
+							},
+							{
+								check_1: (v.item_13_check || '0'),
+								name: (v.item_13_desc || 'A 2nd Pistol'),
+								numboxes: '1',
+								short: 'on'
+							},
+							{
+								check_1: (v.item_14_check || '0'),
+								check_2: (v.item_14_check_b || '0'),
+								name: (v.item_14_desc || 'A Large Weapon'),
+								numboxes: '2'
+							},
+							{
+								check_1: (v.item_15_check || '0'),
+								name: (v.item_15_desc || 'An Unusual Weapon'),
+								numboxes: '1'
+							},
+							{
+								check_1: (v.item_16_check || '0'),
+								check_2: (v.item_16_check_b || '0'),
+								name: (v.item_16_desc || 'Armor'),
+								numboxes: '2',
+								short: 'on'
+							},
+							{
+								check_1: (v.item_16_check_c || '0'),
+								check_2: (v.item_16_check_d || '0'),
+								check_3: (v.item_16_check_e || '0'),
+								name: (v.item_16_desc_b || '+Heavy'),
+								numboxes: '3',
+								short: 'on'
+							},
+							{
+								check_1: (v.item_17_check || '0'),
+								name: (v.item_17_desc || 'Burglary Gear'),
+								numboxes: '1'
+							},
+							{
+								check_1: (v.item_18_check || '0'),
+								name: (v.item_18_desc || 'Climbing Gear'),
+								numboxes: '2'
+							},
+							{
+								check_1: (v.item_19_check || '0'),
+								name: (v.item_19_desc || 'Arcane Implements'),
+								numboxes: '1'
+							},
+							{
+								check_1: (v.item_20_check || '0'),
+								name: (v.item_20_desc || 'Documents'),
+								numboxes: '1'
+							},
+							{
+								check_1: (v.item_21_check || '0'),
+								name: (v.item_21_desc || 'Subterfuge Supplies'),
+								numboxes: '1'
+							},
+							{
+								check_1: (v.item_22_check || '0'),
+								check_2: (v.item_22_check_b || '0'),
+								name: (v.item_22_desc || 'Demolition Tools'),
+								numboxes: '2'
+							},
+							{
+								check_1: (v.item_23_check || '0'),
+								name: (v.item_23_desc || 'Tinkering Tools'),
+								numboxes: '1'
+							},
+							{
+								check_1: (v.item_24_check || '0'),
+								name: (v.item_24_desc || 'Lantern'),
+								numboxes: '1'
+							}
+						];
+						items.forEach(obj => {
+							obj.boxes_chosen = 'on';
+						});
+						fillRepeatingSectionFromData('item', items, false, () => upgradeSheet('1.5'));
+						console.log('Updating to 1.5');
+					});
+				}
+				// Upgrade to 1.6: Set defaults, convert upgrade names
+				else if (versionMajor === 1 && versionMinor < 6) {
+					const upgradeFunction = _.after(3, () => upgradeSheet('1.6')),
+						upgradeNums = [...Array(25).keys()].slice(1).filter(x => x !== 19),
+						upgradeAttrs = [
+							...upgradeNums.map(x => `upgrade_${x}_desc`),
+							...upgradeNums.map(x => `upgrade_${x}_check`),
+							'upgrade_1_check_b',
+							'upgrade_1_check_c',
+							'upgrade_2_tall',
+							'upgrade_3_tall',
+							'upgrade_6_check_b',
+							'upgrade_8_check_b',
+							'upgrade_14_check_b',
+							'upgrade_16_check_b',
+							'upgrade_24_check_b',
+							'upgrade_24_check_c',
+							'upgrade_24_check_d',
+							...Object.keys(translatedDefaults)
+						];
+					getAttrs(upgradeAttrs, v => {
+						// Repeating / specific upgrades
+						const upgrades = [{
+							check_1: v.upgrade_1_check || '0',
+							check_2: v.upgrade_1_check_b || '0',
+							check_3: v.upgrade_1_check_c || '0',
+							name: v.upgrade_1_desc || '',
+							numboxes: '3'
+						}, {
+							check_1: v.upgrade_2_check || '0',
+							name: v.upgrade_2_desc || '',
+							numboxes: '1',
+							tall: v.upgrade_2_tall || '0'
+						}, {
+							check_1: v.upgrade_3_check || '0',
+							name: v.upgrade_3_desc || '',
+							numboxes: '1',
+							tall: v.upgrade_3_tall || '0'
+						}, {
+							check_1: v.upgrade_4_check || '0',
+							name: v.upgrade_4_desc || '',
+							numboxes: '1'
+						}, {
+							check_1: v.upgrade_5_check || '0',
+							name: v.upgrade_5_desc || '',
+							numboxes: '1'
+						}];
+						upgrades.forEach(obj => {
+							obj.boxes_chosen = 'on';
+						});
+						getSectionIDs('upgrade', idList => {
+							const allAttrs = [
+								...idList.map(x => `repeating_upgrade_${x}_desc`),
+								...idList.map(x => `repeating_upgrade_${x}_check`),
+								...idList.map(x => `repeating_upgrade_${x}_check_b`)
+							];
+							getAttrs(allAttrs, v => {
+								const setting = {};
+								idList.forEach(id => {
+									setting[`repeating_upgrade_${id}_name`] = v[`repeating_upgrade_${id}_desc`] || '';
+									setting[`repeating_upgrade_${id}_check_1`] = v[`repeating_upgrade_${id}_check`] || '';
+									setting[`repeating_upgrade_${id}_check_2`] = v[`repeating_upgrade_${id}_check_b`] || '';
+									setting[`repeating_upgrade_${id}_numboxes`] = '2';
+									setting[`repeating_upgrade_${id}_boxes_chosen`] = 'on';
+								});
+								setAttrs(setting, {}, upgradeFunction);
+								fillRepeatingSectionFromData('upgrade', upgrades, false, upgradeFunction);
+							});
+						});
+						// Common upgrades
+						const setting = {};
+						upgradeNums.slice(5).forEach(index => {
+							setting[`upgrade_${index}_name`] = v[`upgrade_${index}_desc`] || '';
+							setting[`upgrade_${index}_check_1`] = v[`upgrade_${index}_check`] || '0';
+						});
+						setting.upgrade_6_check_2 = v.upgrade_6_check_b || '0';
+						setting.upgrade_8_check_2 = v.upgrade_8_check_b || '0';
+						setting.upgrade_14_check_2 = v.upgrade_14_check_b || '0';
+						setting.upgrade_16_check_2 = v.upgrade_16_check_b || '0';
+						setting.upgrade_24_check_2 = v.upgrade_24_check_b || '0';
+						setting.upgrade_24_check_3 = v.upgrade_24_check_c || '0';
+						setting.upgrade_24_check_4 = v.upgrade_24_check_d || '0';
+						Object.keys(translatedDefaults).forEach(k => {
+							setting[k] = v[k] || setting[k] || translatedDefaults[k];
+						});
+						setAttrs(setting, {}, upgradeFunction);
+						console.log('Updating to 1.6');
+					});
+				}
+				// Upgrade to 1.9: Add missing upgrade descriptions, convert bandolier checks
+				else if (versionMajor === 1 && versionMinor < 9) {
+					const upgradeFunction = _.after(2, () => upgradeSheet('1.9')),
+						upgradeNums = [...Array(25).keys()].slice(1).filter(x => x !== 19).slice(5),
+						upgradeDescriptions = upgradeNums.map(x => `upgrade_${x}_description`),
+						attrs = [
+							...upgradeDescriptions,
+							'bandolier1_check',
+							'bandolier1_check_b',
+							'bandolier1_check_c',
+							'bandolier2_check',
+							'bandolier2_check_b',
+							'bandolier2_check_c'
+						];
+					getAttrs(attrs, v => {
+						const setting = {};
+						upgradeDescriptions.forEach(name => {
+							setting[name] = v[name] || translatedDefaults[name];
+						});
+						setting.bandolier1_check_1 = v.bandolier1_check || '0';
+						setting.bandolier1_check_2 = v.bandolier1_check_b || '0';
+						setting.bandolier1_check_3 = v.bandolier1_check_c || '0';
+						setting.bandolier2_check_1 = v.bandolier2_check || '0';
+						setting.bandolier2_check_2 = v.bandolier2_check_b || '0';
+						setting.bandolier2_check_3 = v.bandolier2_check_c || '0';
+						setAttrs(setting, {}, upgradeFunction);
+					});
+					getSectionIDs('item', idArray => {
+						const attrs = [
+							...idArray.map(id => `repeating_item_${id}_name`),
+							...idArray.map(id => `repeating_item_${id}_description`)
+						];
+						getAttrs(attrs, v => {
+							const setting = {};
+							idArray.forEach(id => {
+								const k = _.findIndex(itemData, item => item.name === v[`repeating_item_${id}_name`]);
+								if (k >= 0 && !v[`repeating_item_${id}_description`]) {
+									setting[`repeating_item_${id}_description`] = itemData[k].description;
+								}
+							});
+							setAttrs(setting, {}, upgradeFunction);
+							console.log('Updating to 1.9');
+						});
+					});
+				}
+				// Upgrade to 1.10: Convert clocks
+				else if (versionMajor === 1 && versionMinor < 10) {
+					console.log('Updating to 1.10');
+					const upgradeFunction = _.after(2, () => upgradeSheet('1.10'));
+					['clock', 'crewclock'].forEach(sName => {
+						getSectionIDs(`repeating_${sName}`, idArray => {
+							const oldAttrs = [
+								...idArray.map(id => `repeating_${sName}_${id}_size`),
+								...idArray.map(id => `repeating_${sName}_${id}_clock1`),
+								...idArray.map(id => `repeating_${sName}_${id}_clock2`),
+								...idArray.map(id => `repeating_${sName}_${id}_clock4`),
+								...idArray.map(id => `repeating_${sName}_${id}_clock3`)
+							];
+							getAttrs(oldAttrs, v => {
+								let setting = {};
+								idArray.forEach(id => {
+									switch (v[`repeating_${sName}_${id}_size`]) {
+									case '6':
+										setting[`repeating_${sName}_${id}_progress`] = v[`repeating_${sName}_${id}_clock2`] || '0';
+										break;
+									case '8':
+										setting[`repeating_${sName}_${id}_progress`] = v[`repeating_${sName}_${id}_clock3`] || '0';
+										break;
+									case '12':
+										setting[`repeating_${sName}_${id}_progress`] = v[`repeating_${sName}_${id}_clock4`] || '0';
+										break;
+									default:
+									case 'none':
+									case '4':
+										setting[`repeating_${sName}_${id}_size`] = '4';
+										setting[`repeating_${sName}_${id}_progress`] = v[`repeating_${sName}_${id}_clock1`] || '0';
+										break;
+									}
+								});
+								setAttrs(setting, {}, upgradeFunction);
+							});
+						});
+					});
+				}
+				// Upgrade to 1.11: Convert all checkboxes to value=1
+				else if (versionMajor === 1 && versionMinor < 11) {
+					console.log('Updating to 1.11');
+					const upgradeFunction = _.after(14, () => upgradeSheet('1.11')),
+						upgradeNums = [...Array(25).keys()].slice(1).filter(x => x !== 19).slice(5),
+						boxes = ['show_settings', 'setting_extra_trauma', 'setting_extra_xp', 'setting_vampirexp', 'setting_show_strictures',
+							'setting_show_frame', 'setting_show_itemdesc', 'setting_show_deity', 'setting_show_origin', 'setting_flexwidth',
+							'cold', 'haunted', 'obsessed', 'paranoid', 'reckless', 'soft', 'unstable', 'vicious',
+							'chaotic', 'destructive', 'furious', 'obsessive', 'territorial', 'savage',
+							'clanking', 'leaking', 'fixated', 'smoking', 'sparking', 'unstable',
+							'armor', 'armor_heavy', 'armor_special',
+							'stricture_slumber', 'stricture_forbidden', 'stricture_repelled', 'stricture_bestial', 'stricture_bound',
+							'show_alchemicals', 'bandolier1_check_1', 'bandolier1_check_2', 'bandolier1_check_3', 'bandolier2_check_1',
+							'bandolier2_check_2', 'bandolier2_check_3', 'upgrade_24_check_3', 'upgrade_24_check_4',
+							'cohort1_weak', 'cohort1_impaired', 'cohort1_broken', 'cohort1_armor',
+							...[...Array(6).keys()].slice(1).map(x => `frame_feature_${x}_check`),
+							...[...Array(6).keys()].slice(1).map(x => `setting_extra_stress${x}`),
+							...[...Array(16).keys()].map(x => `claim_${x}_check`),
+							...['1_2', '2_3', '3_4', '4_5', '1_6', '2_7', '3_8', '4_9', '5_10', '6_7', '7_8', '8_9', '9_10', '6_11',
+								'7_12', '8_13', '9_14', '10_15', '11_12', '12_13', '13_14', '14_15'
+							].map(x => `claim_bridge_${x}`),
+							...upgradeNums.map(x => `upgrade_${x}_check_1`),
+							...upgradeNums.map(x => `upgrade_${x}_check_2`),
+							...upgradeNums.map(x => `upgrade_${x}_expand`)
+						],
+						repeatingBoxes = {
+							ability: ['check'],
+							claim: [...[...Array(6).keys()].slice(1).map(x => `claim_bridge_top_${x}`),
+								...[...Array(6).keys()].slice(1).map(x => `claim_${x}_check`)
+							],
+							cohort: ['weak', 'impaired', 'broken', 'armor'],
+							contact: ['check'],
+							crewability: ['check'],
+							factions1: ['expand'],
+							factions2: ['expand'],
+							factions3: ['expand'],
+							factions4: ['expand'],
+							factions5: ['expand'],
+							item: ['boxes_chosen', 'check_1', 'check_2', 'check_3', 'expand', 'short'],
+							playbookitem: ['bold', 'boxes_chosen', 'check_1', 'check_2', 'check_3', 'expand'],
+							upgrade: ['boxes_chosen', 'check_1', 'check_2', 'check_3', 'expand', 'tall']
+						},
+						convertBoxes = attrNames => {
+							getAttrs(attrNames, v => {
+								const setting = {};
+								attrNames.forEach(name => {
+									if (v[name] === 'on') setting[name] = 1;
+								});
+								setAttrs(setting, {
+									silent: true
+								}, upgradeFunction);
+							});
+						};
+					convertBoxes(boxes);
+					Object.entries(repeatingBoxes).forEach(([sName, attrs]) => {
+						getSectionIDs(`repeating_${sName}`, idArray => {
+							const attrNames = idArray.reduce((m, id) => {
+								return m.concat(attrs.map(name => `repeating_${sName}_${id}_${name}`));
+							}, []);
+							convertBoxes(attrNames);
+						});
+					});
+				}
+				// Upgrade to 1.12: Update dice totals
+				else if (versionMajor === 1 && versionMinor < 12) {
+					Object.keys(actionData).forEach(name => calculateResistance(name));
+					calculateStashDice();
+					[...actionsFlat].forEach(name => calcTotalFromBoxes(name));
+					getSectionIDs('repeating_cohort', idArray => {
+						getAttrs(['crew_tier1', 'crew_tier2', 'crew_tier3', 'crew_tier4'], v => {
+							const tier = (parseInt(v.crew_tier1) || 0) + (parseInt(v.crew_tier2) || 0) +
+								(parseInt(v.crew_tier3) || 0) + (parseInt(v.crew_tier4) || 0);
+							setAttrs({crew_tier: tier}, {}, () => {
+								calculateCohortDice('cohort1');
+								idArray.forEach(id => calculateCohortDice(`repeating_cohort_${id}`));
+								upgradeSheet('1.12');
+								console.log('Updating to 1.12');
+							});
+						});
+					});
+				}
+				// Upgrade to 1.13: Header info
+				else if (versionMajor === 1 && versionMinor < 13) {
+					getAttrs(['heritage', 'background', 'vice_purveyor', 'hull_functions', 'crew_deity_features'], v => {
+						const setting = {};
+						Object.keys(v).forEach(name => {
+							if (v[name]) setting[`show_${name}_info`] = '0';
+						});
+						setAttrs(setting, {} , () => upgradeSheet('1.13'));
+						console.log('Updating to 1.13');
+					});
+				}
+			},
+			initialiseSheet = () => {
 				const setting = ['ability', 'friend', 'crewability', 'contact']
 					.reduce((memo, sectionName) => {
 						memo[`repeating_${sectionName}_${generateRowID()}_autogen`] = 1;
@@ -1676,404 +2303,20 @@ on('sheet:opened', () => {
 				setAttrs(setting);
 				fillRepeatingSectionFromData('item', itemData);
 				/* Set translated default values */
-				setAttrs(defaultValues);
+				getAttrs(Object.keys(translatedDefaults), v => {
+					let setting = {};
+					Object.keys(translatedDefaults).forEach(k => {
+						if (v[k] !== translatedDefaults[k]) setting[k] = translatedDefaults[k];
+					});
+					setAttrs(setting);
+				});
 				console.log('Initialising new sheet');
-			}
-			// Upgrade to 0.7: Convert legacy faction repeating section to text
-			else if (versionMajor === 0 && versionMinor < 7) {
-				getSectionIDs('repeating_faction', list => {
-					const sectionList = ['faction1', 'faction2'].concat(list.map(str => `repeating_faction_${str}`)),
-						attrList = [].concat(...sectionList.map(str => [`${str}_name`, `${str}_status`, `${str}_description`]));
-					getAttrs(attrList, v => {
-						const output = sectionList.map(str => {
-							return 'Name: ' + v[`${str}_name`] + '\n' +
-								'Status: ' + (v[`${str}_status`] || '') + '\n' +
-								'Notes: ' + (v[`${str}_description`] || '') + '\n';
-						}).join('\n');
-						setAttrs({
-							faction_notes: output
-						});
-						list.forEach(id => removeRepeatingRow(`repeating_faction_${id}`));
-						upgradeSheet('0.7');
-						console.log('Updating to 0.7');
-					});
-				});
-			}
-			// Upgrade to 0.9: Convert ability/friend/crewability/contact first row
-			else if (versionMajor === 0 && versionMinor < 9) {
-				const upgradeFunction = _.after(4, () => upgradeSheet('0.9')),
-					attrs = ['ability1_check', 'ability1_name', 'ability1_description',
-						'friend1_status', 'friend1_name',
-						'crew_ability1_check', 'crew_ability1_name', 'crew_ability1_description',
-						'contact1_check', 'contact1_name'
-					];
-				getAttrs(attrs, v => {
-					fillRepeatingSectionFromData('ability', [{
-						check: v.ability1_check || '0',
-						description: v.ability1_description || '',
-						name: v.ability1_name || ''
-					}], false, upgradeFunction);
-					fillRepeatingSectionFromData('friend', [{
-						name: v.friend1_name || '',
-						status: v.friend1_status || ''
-					}], false, upgradeFunction);
-					fillRepeatingSectionFromData('crewability', [{
-						check: v.crew_ability1_check || '0',
-						description: v.crew_ability1_description || '',
-						name: v.crew_ability1_name || ''
-					}], false, upgradeFunction);
-					fillRepeatingSectionFromData('contact', [{
-						check: v.contact1_check || '0',
-						name: v.contact1_name || ''
-					}], false, upgradeFunction);
-					console.log('Updating to 0.9');
-				});
-			}
-			// Upgrade to 1.0: Make sure that resistance values are calculated correctly.
-			else if (versionMajor === 0) {
-				Object.keys(actionData).forEach(calculateResistance);
-				calculateVice();
-				upgradeSheet('1.0');
-				console.log('Updating to 1.0');
-			}
-			// Upgrade to 1.4: Convert playbook items and repeating items
-			else if (versionMajor === 1 && versionMinor < 4) {
-				const upgradeFunction = _.after(2, () => upgradeSheet('1.4')),
-					indices = [...Array(10).keys()], // [0:9]
-					allAttrs = [
-						...indices.map(n => `item_${n}_check`),
-						...indices.map(n => `item_${n}_desc`),
-						'item_0_check_b',
-						'item_0_check_c',
-						'item_1_check_b'
-					];
-				getAttrs(allAttrs, v => {
-					const items = [];
-					if (v.item_0_desc) {
-						items.push({
-							check_1: v.item_0_check || '0',
-							name: v.item_0_desc,
-							numboxes: '1'
-						});
-						items.push({
-							check_1: v.item_0_check_b || '0',
-							name: v.item_0_desc,
-							numboxes: '1'
-						});
-						items.push({
-							check_1: v.item_0_check_c || '0',
-							name: v.item_0_desc,
-							numboxes: '1'
-						});
-					}
-					if (v.item_1_desc) {
-						items.push({
-							bold: 'on',
-							check_1: v.item_1_check || '0',
-							check_2: v.item_1_check_b || '0',
-							name: v.item_1_desc,
-							numboxes: '2'
-						});
-					}
-					['2', '3', '5', '6'].forEach(index => {
-						if (v[`item_${index}_desc`]) {
-							items.push({
-								bold: (['2', '3'].includes(index) ? 'on' : '0'),
-								check_1: v[`item_${index}_check`] || '0',
-								name: v[`item_${index}_desc`],
-								numboxes: '1'
-							});
-						}
-					});
-					['4', '7', '8', '9'].forEach(index => {
-						if (v[`item_${index}_desc`]) {
-							items.push({
-								bold: ((index === '4') ? 'on' : '0'),
-								check_1: v[`item_${index}_check`] || '0',
-								name: v[`item_${index}_desc`],
-								numboxes: '0'
-							});
-						}
-					});
-					items.forEach(obj => {
-						obj.boxes_chosen = 'on';
-					});
-					fillRepeatingSectionFromData('playbookitem', items, false, upgradeFunction);
-				});
-				getSectionIDs('repeating_item', idArray => {
-					const allAttrs = [
-						...idArray.map(id => `repeating_item_${id}_desc`),
-						...idArray.map(id => `repeating_item_${id}_check`),
-						...idArray.map(id => `repeating_item_${id}_check_b`)
-					];
-					getAttrs(allAttrs, v => {
-						const setting = {};
-						idArray.forEach(id => {
-							setting[`repeating_item_${id}_boxes_chosen`] = 'on';
-							setting[`repeating_item_${id}_numboxes`] = '2';
-							setting[`repeating_item_${id}_name`] = v[`repeating_item_${id}_desc`] || '';
-							setting[`repeating_item_${id}_check_1`] = v[`repeating_item_${id}_check`] || '0';
-							setting[`repeating_item_${id}_check_2`] = v[`repeating_item_${id}_check_b`] || '0';
-						});
-						setAttrs(setting, {}, upgradeFunction);
-						console.log('Updating to 1.4');
-					});
-				});
-			}
-			// Upgrade to 1.5: Convert items
-			else if (versionMajor === 1 && versionMinor < 5) {
-				const indices = [...Array(25).keys()].slice(10),
-					allAttrs = [
-						...indices.map(n => `item_${n}_check`),
-						...indices.map(n => `item_${n}_desc`),
-						'item_14_check_b',
-						'item_16_check_b',
-						'item_16_check_c',
-						'item_16_check_d',
-						'item_16_check_e',
-						'item_18_check_b',
-						'item_22_check_b'
-					];
-				getAttrs(allAttrs, v => {
-					const items = [{
-							check_1: (v.item_10_check || '0'),
-							name: (v.item_10_desc || 'A Blade or Two'),
-							numboxes: '1'
-						},
-						{
-							check_1: (v.item_11_check || '0'),
-							name: (v.item_11_desc || 'Throwing Knives'),
-							numboxes: '1'
-						},
-						{
-							check_1: (v.item_12_check || '0'),
-							name: (v.item_12_desc || 'A Pistol'),
-							numboxes: '1',
-							short: 'on'
-						},
-						{
-							check_1: (v.item_13_check || '0'),
-							name: (v.item_13_desc || 'A 2nd Pistol'),
-							numboxes: '1',
-							short: 'on'
-						},
-						{
-							check_1: (v.item_14_check || '0'),
-							check_2: (v.item_14_check_b || '0'),
-							name: (v.item_14_desc || 'A Large Weapon'),
-							numboxes: '2'
-						},
-						{
-							check_1: (v.item_15_check || '0'),
-							name: (v.item_15_desc || 'An Unusual Weapon'),
-							numboxes: '1'
-						},
-						{
-							check_1: (v.item_16_check || '0'),
-							check_2: (v.item_16_check_b || '0'),
-							name: (v.item_16_desc || 'Armor'),
-							numboxes: '2',
-							short: 'on'
-						},
-						{
-							check_1: (v.item_16_check_c || '0'),
-							check_2: (v.item_16_check_d || '0'),
-							check_3: (v.item_16_check_e || '0'),
-							name: (v.item_16_desc_b || '+Heavy'),
-							numboxes: '3',
-							short: 'on'
-						},
-						{
-							check_1: (v.item_17_check || '0'),
-							name: (v.item_17_desc || 'Burglary Gear'),
-							numboxes: '1'
-						},
-						{
-							check_1: (v.item_18_check || '0'),
-							name: (v.item_18_desc || 'Climbing Gear'),
-							numboxes: '2'
-						},
-						{
-							check_1: (v.item_19_check || '0'),
-							name: (v.item_19_desc || 'Arcane Implements'),
-							numboxes: '1'
-						},
-						{
-							check_1: (v.item_20_check || '0'),
-							name: (v.item_20_desc || 'Documents'),
-							numboxes: '1'
-						},
-						{
-							check_1: (v.item_21_check || '0'),
-							name: (v.item_21_desc || 'Subterfuge Supplies'),
-							numboxes: '1'
-						},
-						{
-							check_1: (v.item_22_check || '0'),
-							check_2: (v.item_22_check_b || '0'),
-							name: (v.item_22_desc || 'Demolition Tools'),
-							numboxes: '2'
-						},
-						{
-							check_1: (v.item_23_check || '0'),
-							name: (v.item_23_desc || 'Tinkering Tools'),
-							numboxes: '1'
-						},
-						{
-							check_1: (v.item_24_check || '0'),
-							name: (v.item_24_desc || 'Lantern'),
-							numboxes: '1'
-						}
-					];
-					items.forEach(obj => {
-						obj.boxes_chosen = 'on';
-					});
-					fillRepeatingSectionFromData('item', items, false, () => upgradeSheet('1.5'));
-					console.log('Updating to 1.5');
-				});
-			}
-			// Upgrade to 1.6: Set defaults, convert upgrade names
-			else if (versionMajor === 1 && versionMinor < 6) {
-				const upgradeFunction = _.after(3, () => upgradeSheet('1.6')),
-					upgradeNums = [...Array(25).keys()].slice(1).filter(x => x !== 19),
-					upgradeAttrs = [
-						...upgradeNums.map(x => `upgrade_${x}_desc`),
-						...upgradeNums.map(x => `upgrade_${x}_check`),
-						'upgrade_1_check_b',
-						'upgrade_1_check_c',
-						'upgrade_2_tall',
-						'upgrade_3_tall',
-						'upgrade_6_check_b',
-						'upgrade_8_check_b',
-						'upgrade_14_check_b',
-						'upgrade_16_check_b',
-						'upgrade_24_check_b',
-						'upgrade_24_check_c',
-						'upgrade_24_check_d',
-						...Object.keys(defaultValues)
-					];
-				getAttrs(upgradeAttrs, v => {
-					// Repeating / specific upgrades
-					const upgrades = [{
-						check_1: v.upgrade_1_check || '0',
-						check_2: v.upgrade_1_check_b || '0',
-						check_3: v.upgrade_1_check_c || '0',
-						name: v.upgrade_1_desc || '',
-						numboxes: '3'
-					}, {
-						check_1: v.upgrade_2_check || '0',
-						name: v.upgrade_2_desc || '',
-						numboxes: '1',
-						tall: v.upgrade_2_tall || '0'
-					}, {
-						check_1: v.upgrade_3_check || '0',
-						name: v.upgrade_3_desc || '',
-						numboxes: '1',
-						tall: v.upgrade_3_tall || '0'
-					}, {
-						check_1: v.upgrade_4_check || '0',
-						name: v.upgrade_4_desc || '',
-						numboxes: '1'
-					}, {
-						check_1: v.upgrade_5_check || '0',
-						name: v.upgrade_5_desc || '',
-						numboxes: '1'
-					}];
-					upgrades.forEach(obj => {
-						obj.boxes_chosen = 'on';
-					});
-					getSectionIDs('upgrade', idList => {
-						const allAttrs = [
-							...idList.map(x => `repeating_upgrade_${x}_desc`),
-							...idList.map(x => `repeating_upgrade_${x}_check`),
-							...idList.map(x => `repeating_upgrade_${x}_check_b`)
-						];
-						getAttrs(allAttrs, v => {
-							const setting = {};
-							idList.forEach(id => {
-								setting[`repeating_upgrade_${id}_name`] = v[`repeating_upgrade_${id}_desc`] || '';
-								setting[`repeating_upgrade_${id}_check_1`] = v[`repeating_upgrade_${id}_check`] || '';
-								setting[`repeating_upgrade_${id}_check_2`] = v[`repeating_upgrade_${id}_check_b`] || '';
-								setting[`repeating_upgrade_${id}_numboxes`] = '2';
-								setting[`repeating_upgrade_${id}_boxes_chosen`] = 'on';
-							});
-							setAttrs(setting, {}, upgradeFunction);
-							fillRepeatingSectionFromData('upgrade', upgrades, false, upgradeFunction);
-						});
-					});
-					// Common upgrades
-					const setting = {};
-					upgradeNums.slice(5).forEach(index => {
-						setting[`upgrade_${index}_name`] = v[`upgrade_${index}_desc`] || '';
-						setting[`upgrade_${index}_check_1`] = v[`upgrade_${index}_check`] || '0';
-					});
-					setting.upgrade_6_check_2 = v.upgrade_6_check_b || '0';
-					setting.upgrade_8_check_2 = v.upgrade_8_check_b || '0';
-					setting.upgrade_14_check_2 = v.upgrade_14_check_b || '0';
-					setting.upgrade_16_check_2 = v.upgrade_16_check_b || '0';
-					setting.upgrade_24_check_2 = v.upgrade_24_check_b || '0';
-					setting.upgrade_24_check_3 = v.upgrade_24_check_c || '0';
-					setting.upgrade_24_check_4 = v.upgrade_24_check_d || '0';
-					Object.keys(defaultValues).forEach(k => {
-						setting[k] = v[k] || setting[k] || defaultValues[k];
-					});
-					setAttrs(setting, {}, upgradeFunction);
-					console.log('Updating to 1.6');
-				});
-			}
-			// Upgrade to 1.9: Add missing upgrade descriptions, convert bandolier checks
-			else if (versionMajor === 1 && versionMinor < 9) {
-				const upgradeFunction = _.after(2, () => upgradeSheet('1.9')),
-					upgradeNums = [...Array(25).keys()].slice(1).filter(x => x !== 19).slice(5),
-					upgradeDescriptions = upgradeNums.map(x => `upgrade_${x}_description`),
-					attrs = [
-						...upgradeDescriptions,
-						'bandolier1_check',
-						'bandolier1_check_b',
-						'bandolier1_check_c',
-						'bandolier2_check',
-						'bandolier2_check_b',
-						'bandolier2_check_c'
-					];
-				getAttrs(attrs, v => {
-					const setting = {};
-					upgradeDescriptions.forEach(name => {
-						setting[name] = v[name] || defaultValues[name];
-					});
-					setting.bandolier1_check_1 = v.bandolier1_check || '0';
-					setting.bandolier1_check_2 = v.bandolier1_check_b || '0';
-					setting.bandolier1_check_3 = v.bandolier1_check_c || '0';
-					setting.bandolier2_check_1 = v.bandolier2_check || '0';
-					setting.bandolier2_check_2 = v.bandolier2_check_b || '0';
-					setting.bandolier2_check_3 = v.bandolier2_check_c || '0';
-					calculateStash();
-					setAttrs(setting, {}, upgradeFunction);
-				});
-				getSectionIDs('item', idArray => {
-					const attrs = [
-						...idArray.map(id => `repeating_item_${id}_name`),
-						...idArray.map(id => `repeating_item_${id}_description`)
-					];
-					getAttrs(attrs, v => {
-						const setting = {};
-						idArray.forEach(id => {
-							const k = _.findIndex(itemData, item => item.name === v[`repeating_item_${id}_name`]);
-							if (k >= 0 && !v[`repeating_item_${id}_description`]) {
-								setting[`repeating_item_${id}_description`] = itemData[k].description;
-							}
-						});
-						setAttrs(setting, {}, upgradeFunction);
-						console.log('Updating to 1.9');
-					});
-				});
-			}
-		};
-		upgradeSheet(v.version);
+			};
+		v.version ? upgradeSheet(v.version) : initialiseSheet();
 		// Set version number
 		setAttrs({
-			version: '1.9',
-			character_sheet: 'Blades in the Dark v1.9'
+			version: '1.13',
+			character_sheet: 'Blades in the Dark v1.13'
 		});
 	});
 });
-</script>
