@@ -29,6 +29,10 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 ### Changelog
 
+#### 1.1.2
+
+* Change base save from 15 to 16 (p 48 SWN Revised Edition Deluxe Beta v1.01)
+
 #### 1.1.1
 
 * Completely removed target AC (1.1.0 had 20 for AC) from attack calculation
@@ -46,5 +50,3 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 * Initial Release (cloned from Stars Without Number 1st Ed. sheet v0.1.7).
 * All skills and features renamed and reworked to Revised Edition rules.
 * Auto-calculating AC, Saving Throws, and Effort through Sheet Worker.
-
-
