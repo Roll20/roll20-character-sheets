@@ -31,7 +31,9 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 #### 1.1.2
 
-* Change base save from 15 to 16 (p 48 SWN Revised Edition Deluxe Beta v1.01)
+* Change base save from 16 to 15 (p 48 SWN Revised Edition Deluxe Beta v1.01)
+* Change "Attack Bonus" to "Base Attack Bonus" as referred to in rules
+* Reduced font sizes
 
 #### 1.1.1
 
