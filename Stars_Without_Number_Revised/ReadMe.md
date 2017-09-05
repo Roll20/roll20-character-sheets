@@ -30,6 +30,7 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 * Duplicated weapon rolls to new Combat section where Common Rolls used to be.
 * Added ability to add the skill bonus to the damage (Gunslinger etc).
 * Added field for remaining magazines next to ammo.
+* Added chackbox to make sheet only ask for Burst on weapons that can burst.
 
 ### 1.2.0
 
