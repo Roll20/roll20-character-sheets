@@ -11,6 +11,13 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 15.5.1
+
+### Bug Fixes
+
+* [#594: Ability Scores not updating and crashing the page.](https://bitbucket.org/mlenser/5eshaped/issues/594/ability-scores-not-updating-and-crashing)
+* A myriad of other bugs involved in the [Roll20 breaking change](https://app.roll20.net/forum/permalink/5498180/) in their API. The sheet is still very laggy and I could use significant help identifying issues.
+
 ## 15.5.0
 
 ### Features
