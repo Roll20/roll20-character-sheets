@@ -13,7 +13,7 @@ Le jeu complet, des suppl&eacute;ments et des t&eacute;l&eacute;chargements grat
 
 # Notes de version
 
-##v1.7 (2016-11-27)
+## v1.7 (2016-11-27)
 
 * Ajout de l'état Normal ou Affaibli : les D20 des Tests deviennent des D12 à l'état Affaibli (y compris pour les Attaques et les Jets de Capacités)
 * Ajout de zones de saisie des Malus d'Armure et Bouclier aux Tests de DEX
@@ -23,7 +23,7 @@ Le jeu complet, des suppl&eacute;ments et des t&eacute;l&eacute;chargements grat
   * S-Supérieure OU Héroïque : les Tests se font avec 2D20 dont on garde le meilleur
   * H-Supérieure ET Héroîque : les Tests se font avec 2D20 dont on garde le meilleur, et s'il est inférieur à 10, le jet "prend 10".
 
-##v1.6 (2016-11-01)
+## v1.6 (2016-11-01)
 
 * Légère refonte de la mise en page
 * Ajout d'un champ "Portée" pour les Armes/Attaques
@@ -31,27 +31,27 @@ Le jeu complet, des suppl&eacute;ments et des t&eacute;l&eacute;chargements grat
 * Ajout du nom du personnage sur le template de chat de tous les jets
 * Ajout d'une zone de notes/divers
 
-##v1.5 (2016-07-13)
+## v1.5 (2016-07-13)
 
 * Ajout d'une zone texte de saisie des RD (Réductions de dégâts) à titre indicatif (pas d'effet mécanique)
 * Ajout d'une section répétable de jets paramétrables (+description) dans la section Capacités (Voies)
 
-##v1.4 (2016-07-09)
+## v1.4 (2016-07-09)
 
 * Niveau renseigné par défaut à 1 sur un nouveau personnage, pour éviter les erreurs de jet de dés
 * Quelques austements visuels
 * Hébergement des images sur Github plutôt que G+
 
-##v1.3 (2015-11-06)
+## v1.3 (2015-11-06)
 
 * Gestion de la règle optionnelle des caractéristiques supérieures
 * Affichage des dégâts doublés sur attaque critique
 
-##v1.2 (2015-07-27)
+## v1.2 (2015-07-27)
 Am&eacute;lioration de la lisibilit&eacute; des infos-bulles des jets de d&eacute;.
 
-##v1.1 (2015-07-06)
+## v1.1 (2015-07-06)
 Correction du jet de Dext&eacute;rit&eacute; et de l'info-bulle "R&eacute;cup&eacute;ration".
 
-##v1.0 (2015-06-27).
+## v1.0 (2015-06-27).
 Cr&eacute;ation.
