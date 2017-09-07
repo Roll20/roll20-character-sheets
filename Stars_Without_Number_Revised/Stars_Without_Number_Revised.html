@@ -155,7 +155,7 @@
 <div class="sheet-logo">
   <img src="http://i.imgur.com/3U3Ibb7.png" alt="Stars Without Number">
 </div>
-<div class="sheet-version">Version 0.1.1</div>
+<div class="sheet-version">Version 1.2.0</div>
 
 <input type="radio" name="attr_tab" class="sheet-tab sheet-tab-character" value="1" title="Character" checked="checked" />
 <input type="radio" name="attr_tab" class="sheet-tab sheet-tab-ship" value="2" title="Ship" />
@@ -967,6 +967,11 @@
     <div class="sheet-2colrow">
       <div class="sheet-col">
         <div class="sheet-row sheet-psionics-power"><label>Psionic Techniques</label></div>
+        <div class="sheet-row">
+            <fieldset class="repeating_technique">
+                <input type="text" name="attr_technique">
+            </fieldset>
+        </div>
       </div>
       <div class="sheet-col">
         <div class="sheet-6colrow sheet-psionics-pp">
@@ -977,20 +982,6 @@
           <div class="sheet-col"><label>Total Effort</label></div>
           <div class="sheet-col"><input readonly type="number" min="0" name="attr_psionics_total_effort"></div>
         </div>
-      </div>
-    </div>
-    <div class="sheet-colrow">
-      <div class="sheet-col">
-        <div class="sheet-row sheet-psionics-mastered"><input type="text" name="attr_psionics_mastered_1"></div>
-        <div class="sheet-row sheet-psionics-mastered"><input type="text" name="attr_psionics_mastered_2"></div>
-        <div class="sheet-row sheet-psionics-mastered"><input type="text" name="attr_psionics_mastered_3"></div>
-        <div class="sheet-row sheet-psionics-mastered"><input type="text" name="attr_psionics_mastered_4"></div>
-      </div>
-      <div class="sheet-col">
-        <div class="sheet-row sheet-psionics-mastered"><input type="text" name="attr_psionics_mastered_5"></div>
-        <div class="sheet-row sheet-psionics-mastered"><input type="text" name="attr_psionics_mastered_6"></div>
-        <div class="sheet-row sheet-psionics-mastered"><input type="text" name="attr_psionics_mastered_7"></div>
-        <div class="sheet-row sheet-psionics-mastered"><input type="text" name="attr_psionics_mastered_8"></div>
       </div>
     </div>
     <h3>Foci</h3>
@@ -1052,19 +1043,11 @@
         <div class="sheet-row sheet-gear">
           <div class="sheet-col"><label>Cyberware</label></div>
         </div>
-        <div class="sheet-row sheet-gear-cyberware">
-          <div class="sheet-col"><input type="text" name="attr_cyberware_1"></div>
-        </div>
-        <div class="sheet-row sheet-gear-cyberware">
-          <div class="sheet-col"><input type="text" name="attr_cyberware_2"></div>
-        </div>
-        <div class="sheet-row sheet-gear-cyberware">
-          <div class="sheet-col"><input type="text" name="attr_cyberware_3"></div>
-        </div>
-        <div class="sheet-row sheet-gear-cyberware">
-          <div class="sheet-col"><input type="text" name="attr_cyberware_4"></div>
-        </div>
-
+        <fieldset class="repeating_cyberware">
+          <div class="sheet-row sheet-gear-cyberware">
+            <div class="sheet-col" style="width: 210px"><input type="text" name="attr_cyberware"></div>
+          </div>
+        </fieldset>
         <div class="sheet-row sheet-gear">
           <div class="sheet-col"><label>Other Equipment</label></div>
         </div>
@@ -1105,7 +1088,7 @@
             <input type="checkbox" name="attr_is_unarmed" value="@{skill_punch}" style="width: 50px;">
             <input type="text" name="attr_weapon_range" style="width: 140px">
             <input type="number" name="attr_weapon_ammo"  style="width: 55px">
-            <button type="roll" name="roll_weapon_to_hit" value="/me &{template:attack} {{characterName=@{name}}} {{name=@{weapon_name}}} {{rollValue=[[1d20 + @{attack_bonus}[AB] + @{weapon_attack}[Weapon AB] + @{weapon_skill_bonus}[Skill] + @{attribute_mod}[Attribute] + ?{Burst|Yes, 2|No, 0}[Burst] + ?{Other Modifier|0}[Modifier]]]}} {{damage=[[@{weapon_damage} + @{attribute_mod} + @{is_unarmed} + ?{Burst|Yes, 2|No, 0}[Burst]]]}}" ></button>
+            <button type="roll" name="roll_weapon_to_hit" value="/me &{template:attack} {{characterName=@{name}}} {{name=@{weapon_name}}} {{rollValue=[[1d20 + @{attack_bonus}[AB] + @{weapon_attack}[Weapon AB] + [[{{@{weapon_skill_bonus},-1}>0}*(@{weapon_skill_bonus}+2) - 2]][Skill] + @{attribute_mod}[Attribute] + ?{Burst|Yes, 2|No, 0}[Burst] + ?{Other Modifier|0}[Modifier]]]}} {{damage=[[@{weapon_damage} + @{attribute_mod} + @{is_unarmed} + ?{Burst|Yes, 2|No, 0}[Burst]]]}}" ></button>
         </fieldset>
     </div>
 
@@ -1800,6 +1783,8 @@ on("sheet:opened", function() {
   calculateMaxStrain();
   validateStrain();
   validateGear();
+  migrateTechniques();
+  migrateCyberware();
 });
 
 on("change:str change:int change:dex change:wis change:con change:cha", function(e) {
@@ -1981,5 +1966,66 @@ validateStowedMax = function() {
 
     setAttrs({gear_stowed_max: stowed_max});
   });
+}
+/**
+  * Migrations
+  */
+
+migrateTechniques = function () {
+    console.log("Migrate started");
+    var technique, i, newRow, newRowId, newRowAttrs = {};
+    getAttrs(['psionics_mastered_1', 'psionics_mastered_2', 'psionics_mastered_3', 'psionics_mastered_4', 'psionics_mastered_5', 'psionics_mastered_6', 'psionics_mastered_7', 'psionics_mastered_8'], function (values) {
+        console.log(values);
+        for (i = 1; i < 9; i++){
+            technique = values["psionics_mastered_" + i];
+            console.log(technique);
+            if (technique !== "" && typeof technique === 'string') {
+                console.log("In need of update");
+                newRowId = generateRowID();
+                console.log(newRowId);
+                newRow = "repeating_technique_" + newRowId + "_technique";
+                console.log(newRow);
+                newRowAttrs[newRow] = technique;
+                console.log(newRowAttrs);
+                setAttrs(newRowAttrs, function (values) {
+                    console.log("updated");
+                });
+                newRow = "psionics_mastered_" + i;
+                newRowAttrs[newRow] = "";
+                setAttrs(newRowAttrs);
+            } else {
+                console.log("no update");
+            }
+        }
+    });
+}
+
+migrateCyberware = function () {
+    console.log("Migrate started");
+    var cyberware, i, newRow, newRowId, newRowAttrs = {};
+    getAttrs(['cyberware_1', 'cyberware_2', 'cyberware_3', 'cyberware_4'], function (values) {
+        console.log(values);
+        for (i = 1; i < 5; i++){
+            cyberware = values["cyberware_" + i];
+            console.log(cyberware);
+            if (cyberware !== "" && typeof cyberware === 'string') {
+                console.log("In need of update");
+                newRowId = generateRowID();
+                console.log(newRowId);
+                newRow = "repeating_cyberware_" + newRowId + "_cyberware";
+                console.log(newRow);
+                newRowAttrs[newRow] = cyberware;
+                console.log(newRowAttrs);
+                setAttrs(newRowAttrs, function (values) {
+                    console.log("updated");
+                });
+                newRow = "cyberware_" + i;
+                newRowAttrs[newRow] = "";
+                setAttrs(newRowAttrs);
+            } else {
+                console.log("no update");
+            }
+        }
+    });
 }
 </script>
