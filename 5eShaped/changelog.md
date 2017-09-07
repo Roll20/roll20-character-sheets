@@ -11,6 +11,16 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 15.5.0
+
+### Features
+
+* [#578: Provide skill totals](https://bitbucket.org/mlenser/5eshaped/issues/578/provide-skill-totals) will now make the total of each skill available for other resources like scripts. The attribute will be named as the skill is, so `Perception`, `Athletics`, etc. It will be the total modifier (without any + or - sign).
+
+### Bug Fixes
+
+* [#579: Multiple erroring classes are added and cannot be deleted](https://bitbucket.org/mlenser/5eshaped/issues/579/multiple-erroring-classes-are-added-and). It should automatically populate spellcasting now as well. I remember reading something about a change to repeating sections from roll20. Perhaps that was the cause of this as this area hasn't been touched in a while - hard to say.
+
 ## 15.4.0
 
 ### Features
