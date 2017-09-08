@@ -6978,6 +6978,7 @@
             attack_attribs.push("repeating_attack_" + attackid + "_atkrange");
             attack_attribs.push("repeating_attack_" + attackid + "_itemid");
             attack_attribs.push("repeating_attack_" + attackid + "_ammo");
+            attack_attribs.push("repeating_attack_" + attackid + "_global_damage_mod_field")
         });
 
         getAttrs(attack_attribs, function(v) {
@@ -6993,6 +6994,8 @@
                 var rollbase = "";
                 var spellattack = false;
                 var magicattackmod = 0;
+                var pbd_safe = v["pbd_safe"] ? v["pbd_safe"] : "";
+                var global_crit = v["repeating_attack_" + attackid + "_global_damage_mod_field"] && v["repeating_attack_" + attackid + "_global_damage_mod_field"] != "" ? "@{global_damage_mod_crit}" : "";
                 var hldmgcrit = v["repeating_attack_" + attackid + "_hldmg"] && v["repeating_attack_" + attackid + "_hldmg"] != "" ? v["repeating_attack_" + attackid + "_hldmg"].slice(0, 7) + "crit" + v["repeating_attack_" + attackid + "_hldmg"].slice(7) : "";
                 if(v["repeating_attack_" + attackid + "_spellid"] && v["repeating_attack_" + attackid + "_spellid"] != "") {
                     spellattack = true; 
@@ -7093,7 +7096,7 @@
                 if(v["repeating_attack_" + attackid + "_atkflag"] && v["repeating_attack_" + attackid + "_atkflag"] != 0) {
                     if(magicattackmod != 0) {hbonus = " + " + magicattackmod + "[SPELLATK]" + hbonus};
                     if(atkmag != 0) {hbonus = " + " + atkmag + "[MAGIC]" + hbonus};
-                    if(pb != 0) {hbonus = " + " + pb + v["pbd_safe"] + "[PROF]" + hbonus};
+                    if(pb != 0) {hbonus = " + " + pb + pbd_safe + "[PROF]" + hbonus};
                     if(atkmod != 0) {hbonus = " + " + atkmod + "[MOD]" + hbonus};
                     if(atkattr_base != 0) {hbonus = " + " + atkattr_base + "[" + v["repeating_attack_" + attackid + "_atkattr_base"].substring(2, 5).toUpperCase() + "]" + hbonus};
                 }
@@ -7119,7 +7122,7 @@
                 }
                 if(v.dtype === "full") {
                     pickbase = "full";
-                    rollbase = "@{wtype}&{template:atkdmg} {{mod=@{atkbonus}}} {{rname=@{atkname}}} {{r1=[[" + r1 + "cs>@{atkcritrange}" + hbonus + "]]}} " + r2 + "cs>@{atkcritrange}" + hbonus + "]]}} @{atkflag} {{range=@{atkrange}}} @{dmgflag} {{dmg1=[[" + hdmg1 + "]]}} {{dmg1type=" + dmgtype + "}} @{dmg2flag} {{dmg2=[[" + hdmg2 + "]]}} {{dmg2type=" + dmg2type + "}} {{crit1=[[" + crit1 + "[CRIT]]]}} {{crit2=[[" + crit2 + "[CRIT]]]}} @{saveflag} {{desc=@{atk_desc}}} @{hldmg} " + hldmgcrit + " @{spelllevel} @{global_attack_mod} @{global_damage_mod} @{global_damage_mod_crit} {{globaldamagetype=@{global_damage_type}}} ammo=@{ammo} @{charname_output}";
+                    rollbase = "@{wtype}&{template:atkdmg} {{mod=@{atkbonus}}} {{rname=@{atkname}}} {{r1=[[" + r1 + "cs>@{atkcritrange}" + hbonus + "]]}} " + r2 + "cs>@{atkcritrange}" + hbonus + "]]}} @{atkflag} {{range=@{atkrange}}} @{dmgflag} {{dmg1=[[" + hdmg1 + "]]}} {{dmg1type=" + dmgtype + "}} @{dmg2flag} {{dmg2=[[" + hdmg2 + "]]}} {{dmg2type=" + dmg2type + "}} {{crit1=[[" + crit1 + "[CRIT]]]}} {{crit2=[[" + crit2 + "[CRIT]]]}} @{saveflag} {{desc=@{atk_desc}}} @{hldmg} " + hldmgcrit + " @{spelllevel} @{global_attack_mod} @{global_damage_mod} " + global_crit + " {{globaldamagetype=@{global_damage_type}}} ammo=@{ammo} @{charname_output}";
                 }
                 else if(v["repeating_attack_" + attackid + "_atkflag"] && v["repeating_attack_" + attackid + "_atkflag"] != 0) {
                     pickbase = "pick";
@@ -7134,7 +7137,7 @@
                     rollbase = "@{wtype}&{template:dmg} {{rname=@{atkname}}} @{atkflag} {{range=@{atkrange}}} @{saveflag} {{desc=@{atk_desc}}} @{spelllevel} ammo=@{ammo} @{charname_output}"
                 }
                 update["repeating_attack_" + attackid + "_rollbase_dmg"] = "@{wtype}&{template:dmg} {{rname=@{atkname}}} @{atkflag} {{range=@{atkrange}}} @{dmgflag} {{dmg1=[[" + hdmg1 + "]]}} {{dmg1type=" + dmgtype + "}} @{dmg2flag} {{dmg2=[[" + hdmg2 + "]]}} {{dmg2type=" + dmg2type + "}} @{saveflag} {{desc=@{atk_desc}}} @{hldmg} @{spelllevel} @{global_damage_mod} {{globaldamagetype=@{global_damage_type}}} @{charname_output}";
-                update["repeating_attack_" + attackid + "_rollbase_crit"] = "@{wtype}&{template:dmg} {{crit=1}} {{rname=@{atkname}}} @{atkflag} {{range=@{atkrange}}} @{dmgflag} {{dmg1=[[" + hdmg1 + "]]}} {{dmg1type=" + dmgtype + "}} @{dmg2flag} {{dmg2=[[" + hdmg2 + "]]}} {{dmg2type=" + dmg2type + "}} {{crit1=[[" + crit1 + "]]}} {{crit2=[[" + crit2 + "]]}} @{saveflag} {{desc=@{atk_desc}}} @{hldmg} " + hldmgcrit + " @{spelllevel} @{global_damage_mod} @{global_damage_mod_crit} {{globaldamagetype=@{global_damage_type}}} @{charname_output}"
+                update["repeating_attack_" + attackid + "_rollbase_crit"] = "@{wtype}&{template:dmg} {{crit=1}} {{rname=@{atkname}}} @{atkflag} {{range=@{atkrange}}} @{dmgflag} {{dmg1=[[" + hdmg1 + "]]}} {{dmg1type=" + dmgtype + "}} @{dmg2flag} {{dmg2=[[" + hdmg2 + "]]}} {{dmg2type=" + dmg2type + "}} {{crit1=[[" + crit1 + "]]}} {{crit2=[[" + crit2 + "]]}} @{saveflag} {{desc=@{atk_desc}}} @{hldmg} " + hldmgcrit + " @{spelllevel} @{global_damage_mod} " + global_crit + " {{globaldamagetype=@{global_damage_type}}} @{charname_output}"
                 update["repeating_attack_" + attackid + "_atkbonus"] = bonus;
                 update["repeating_attack_" + attackid + "_atkdmgtype"] = dmg + dmgspacer + dmg2 + dmgmag + " ";
                 update["repeating_attack_" + attackid + "_rollbase"] = rollbase;
