@@ -1,45 +1,42 @@
 <script type="text/worker">
+var DAMAGE_BONUS = {
+	table : [
+		{bonus: '-1d6', range: _.range( 0,  12)},
+		{bonus: '-1d4', range: _.range( 13, 16)},
+		{bonus:    '0', range: _.range( 17, 24)},
+		{bonus:  '1d4', range: _.range( 25, 32)},
+		{bonus:  '1d6', range: _.range( 33, 40)},
+		{bonus:  '2d6', range: _.range( 42, 56)},
+		{bonus:  '3d6', range: _.range( 57, 72)},
+		{bonus:  '4d6', range: _.range( 73, 88)},
+		{bonus:  '5d6', range: _.range( 89,104)},
+		{bonus:  '6d6', range: _.range(105,120)},
+		{bonus:  '7d6', range: _.range(121,136)},
+		{bonus:  '8d6', range: _.range(137,152)},
+		{bonus:  '9d6', range: _.range(153,168)},
+		{bonus: '10d6', range: _.range(169,184)},
+		{bonus: '11d6', range: _.range(185,200)},
+		{bonus: '12d6', range: _.range(201,216)},
+		{bonus: '13d6', range: _.range(217,232)},
+		{bonus: '14d6', range: _.range(233,248)},
+		{bonus: '21d6', range: _.range(249,999)},
+	],
+	
+	getBonusForValue : function(value) {
+		var checkRange = function(entry) { return entry.range.indexOf(parseInt(value||0)) !== -1 };
+		var tableEntry = _.find(this.table, checkRange);
+		return tableEntry.bonus;
+	}
+};
+
+
 on("change:FUE change:TAM", function() {
   getAttrs(["FUE","TAM"], function(values) {
-    if((parseInt(values.FUE)+parseInt(values.TAM))<13){
-      setAttrs({"Damage-Bonus": "-1d6"});
-    } else if((parseInt(values.FUE)+parseInt(values.TAM))<17){
-      setAttrs({"Damage-Bonus": "-1d4"});
-    } else if((parseInt(values.FUE)+parseInt(values.TAM))<25){
-      setAttrs({"Damage-Bonus": "0"});
-    } else if((parseInt(values.FUE)+parseInt(values.TAM))<33){
-      setAttrs({"Damage-Bonus": "-1d6"});
-    } else if((parseInt(values.FUE)+parseInt(values.TAM))<42){
-      setAttrs({"Damage-Bonus": "1d4"});
-    } else if((parseInt(values.FUE)+parseInt(values.TAM))<57){
-      setAttrs({"Damage-Bonus": "1d6"});
-    } else if((parseInt(values.FUE)+parseInt(values.TAM))<73){
-      setAttrs({"Damage-Bonus": "2d6"});
-    } else if((parseInt(values.FUE)+parseInt(values.TAM))<89){
-      setAttrs({"Damage-Bonus": "3d6"});
-    } else if((parseInt(values.FUE)+parseInt(values.TAM))<105){
-      setAttrs({"Damage-Bonus": "4d6"});
-    } else if((parseInt(values.FUE)+parseInt(values.TAM))<121){
-      setAttrs({"Damage-Bonus": "5d6"});
-    } else if((parseInt(values.FUE)+parseInt(values.TAM))<137){
-      setAttrs({"Damage-Bonus": "6d6"});
-    } else if((parseInt(values.FUE)+parseInt(values.TAM))<153){
-      setAttrs({"Damage-Bonus": "7d6"});
-    } else if((parseInt(values.FUE)+parseInt(values.TAM))<169){
-      setAttrs({"Damage-Bonus": "8d6"});
-    } else if((parseInt(values.FUE)+parseInt(values.TAM))<185){
-      setAttrs({"Damage-Bonus": "9d6"});
-    } else if((parseInt(values.FUE)+parseInt(values.TAM))<201){
-      setAttrs({"Damage-Bonus": "10d6"});
-    } else if((parseInt(values.FUE)+parseInt(values.TAM))<217){
-      setAttrs({"Damage-Bonus": "11d6"});
-    } else if((parseInt(values.FUE)+parseInt(values.TAM))<233){
-      setAttrs({"Damage-Bonus": "12d6"});
-    } else if((parseInt(values.FUE)+parseInt(values.TAM))<249){
-      setAttrs({"Damage-Bonus": "13d6"});
-    } else {
-      setAttrs({"Damage-Bonus": "21d6"});
-    }
+	var v = parseInt(values.FUE) + parseInt(values.TAM);
+	// LOG V to see if it is correct for the conditions
+	var damage_bonus = DAMAGE_BONUS.getBonusForValue(v);
+	// LOG damage bonus to see if it is correct
+	setAttrs({ "Damage-Bonus": damage_bonus});
   });
 });
 </script>
@@ -669,7 +666,7 @@ on("change:FUE change:TAM", function() {
                     <td><input type="checkbox" name="attr_Success-Medicine"  /></td>
                     <td data-i18n="medicine-u">Medicina (05%)</td>
                     <td><input type="number" name="attr_Medicine" value="5"  /></td>
-                    <td><button type="roll" name="roll_Medicine" value="&{template:default} {{name=^{medicine-u}}} {{^{roll-u}=[[1d100<@{Medicine}]]}} {{^{heal-u}=[[?{Tratamiento&#124;Urgencia, 1d3&#124;^{weekly-u}, 2d3}]]}}" /></td>
+                    <td><button type="roll" name="roll_Medicine" value="&{template:default} {{name=^{medicine-u}}} {{^{roll-u}=[[1d100<@{Medicine}]]}} {{^{heal-u}=[[?{Tratamiento|Urgencia, 1d3|^{weekly-u}, 2d3}]]}}" /></td>
                 </tr>
                 <tr data-i18n-list-item="cthulhu-mythos">
                     <td></td>
