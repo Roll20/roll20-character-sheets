@@ -11,6 +11,13 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 15.5.2
+
+### Bug Fixes
+
+* [#598: HP display is broken](https://bitbucket.org/mlenser/5eshaped/issues/598/hp-display-is-broken)
+* Some of [#597: Actions issues](https://bitbucket.org/mlenser/5eshaped/issues/597/actions-issues)
+
 ## 15.5.1
 
 ### Bug Fixes
