@@ -11,6 +11,16 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 15.5.3
+
+### Bug Fixes
+
+* Actions should now work, mostly. I've checked the following types:
+  * Actions with an attack (Guiding Bolt)
+  * Actions with a saving throw (Fireball)
+  * Actions without an attack or saving throw(Magic Missile)
+  * Actions with a heal (Cure Wounds)
+
 ## 15.5.2
 
 ### Bug Fixes
