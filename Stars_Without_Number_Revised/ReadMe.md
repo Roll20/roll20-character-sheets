@@ -10,7 +10,7 @@ This sheet is created for use in Stars Without Number Revised Edition on Roll20.
 
 * [MankiGames](https://github.com/MankiGames)
 * [Shadowriku](https://github.com/Shadowriku)
-* [RonaldZ](https://github.com/RonaldZ)/
+* [RonaldZ](https://github.com/RonaldZ)
 * [jfredett](https://github.com/jfredett)
 * [CoalPoweredPuppet](https://github.com/CoalPoweredPuppet)
 * [Karlinator](https://github.com/Karlinator)
@@ -29,6 +29,11 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 ### Changelog
 
+### 1.2.0
+
+* Changed attack roll template to correctly apply a -2 unfamiliaruty malus when a skill is at -1, instead of a -1 malus.
+* Changed Psychic Techniques and Cyberware to a repeating section, so people won't run out of fields.
+
 #### 1.1.1
 
 * Completely removed target AC (1.1.0 had 20 for AC) from attack calculation
@@ -46,5 +51,3 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 * Initial Release (cloned from Stars Without Number 1st Ed. sheet v0.1.7).
 * All skills and features renamed and reworked to Revised Edition rules.
 * Auto-calculating AC, Saving Throws, and Effort through Sheet Worker.
-
-
