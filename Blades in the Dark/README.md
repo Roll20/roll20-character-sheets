@@ -4,6 +4,16 @@ This is a character sheet for Blades in the Dark for use on Roll20.
 
 ## Changelog
 
+### 1.14
+* Changed font to Georgia for unified look on all platforms, and better alignment
+* Quality-of-life changes in several places
+
+### 1.13
+* Visual improvements
+* Labels now properly used to toggle some smaller checkboxes
+* Added option for vampires' Dark Gift and global resistance bonuses
+* The sheet now shows the options for heritage, background, and vice if they are empty
+
 ### 1.12
 * Calculate trauma automatically
 * Overhauled roll template internally, no more distinction between normal dice and bonus dice
