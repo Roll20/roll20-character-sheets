@@ -5,6 +5,10 @@
 
 ### Changelog
 
+### 1.8.9.5 on 2017 September 11th
+* Made Destructive Trance Checkbox for Actions, Other Actiosn, and Legendary Items
+	- Allows explosions on 1 less than max die size
+
 ### 1.8.9 on 2017 August 14th
 * Made the 2 columns into just 1 column for Feats, Perks, & Flaws
 	- Code that auto combines the two columns into 1 new so no data lost

@@ -109,6 +109,15 @@
         }
     };
     
+    // Function to determine 1 less of die size :: takes in the attribute score :: outputs the 1 less die size
+    function calcAttributeDiceDestructive(value) {
+        if(value*1 === 0 || value*1 <= 0) { return "";
+        } else if (value*1 === 1) {  return ">3";
+        } else if (value*1 === 2 || value*1 === 5) {  return ">5";
+        } else if (value*1 === 3 || value*1 === 6 || value*1 === 8 || value*1 >= 10) {  return ">7";
+        } else if (value*1 === 4 || value*1 === 7 || value*1 === 9) {  return ">9";
+        }
+    };
     // Function to calculate total cost of attributes based on numbers put in, to be called by each attriburte on change
     function calcAttributePointsSpent() {
         getAttrs(["agility_cost", "fortitude_cost", "might_cost", "deception_cost", "presence_cost", "persuasion_cost", "learning_cost", "logic_cost", "perception_cost", "will_cost", "alteration_cost", "creation_cost", "energy_cost", "entropy_cost", "influence_cost", "movement_cost", "prescience_cost", "protection_cost"], function(values) {
@@ -1851,7 +1860,7 @@
         getSectionIDs("repeating_actions", function(actionsArray) {
          if(actionsArray.length > 0) {
             _.each(actionsArray, function(currentID, i) {
-                getAttrs(["repeating_actions_" + currentID + "_action_attribute", "repeating_actions_" + currentID + "_dice_roll_d20", "repeating_actions_" + currentID + "_dice_modifier", "repeating_actions_" + currentID + "_use_power_level", "repeating_actions_" + currentID + "_power_level", "repeating_actions_" + currentID + "_power_level_max", "repeating_actions_" + currentID + "_power_levelmax", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(v) {
+                getAttrs(["repeating_actions_" + currentID + "_action_attribute", "repeating_actions_" + currentID + "_dice_roll_d20", "repeating_actions_" + currentID + "_dice_modifier", "repeating_actions_" + currentID + "_use_power_level", "repeating_actions_" + currentID + "_power_level", "repeating_actions_" + currentID + "_power_level_max", "repeating_actions_" + currentID + "_power_levelmax", "repeating_actions_" + currentID + "_use_destructive_trance", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(v) {
                     var update = {};
                     var score = 0;
                     if(v["repeating_actions_" + currentID + "_action_attribute"] === "Agility") {
@@ -1898,6 +1907,12 @@
                     }
                     var number = calcAttributeDiceNumber(score);
                     var type = calcAttributeDiceType(score);
+					var destructive = "";
+					var destructive20 = "";
+					if(v["repeating_actions" + currentID + "_use_destructive_trance"] === "Yes") {
+						destructive = calcAttributeDiceDestructive(score);
+						destructive20 = ">19";
+					}
                     var roll = "";
                     var powerLevelMax = 0;
                     if(!isNaN(v["repeating_actions_" + currentID + "_power_level_max"]) && v["repeating_actions_" + currentID + "_power_level_max"]*1 != 0) {
@@ -1913,13 +1928,13 @@
                         }
                     }
         			if(score === 0) {
-        				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+        				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!" + destructive20 + "|Advantage,2d20!!" + destructive20 + "kh1|Disadvantage,2d20!!" + destructive20 + "kl1}]]";
         			} else {
         			    if(isNaN(v["repeating_actions_" + currentID + "_dice_roll_d20"])) {
         			        update["repeating_actions_" + currentID + "_dice_roll_d20"] = "1d20!!";
-            				roll = "[[1d20!! + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+            				roll = "[[1d20!!" + destructive20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + destructive + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
         			    } else {
-            				roll = "[[" + v["repeating_actions_" + currentID + "_dice_roll_d20"] + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+            				roll = "[[" + v["repeating_actions_" + currentID + "_dice_roll_d20"] + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + destructive + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
         			    }
         			}
                     if(v["repeating_actions_" + currentID + "_use_power_level"] === "Yes") {
@@ -1940,7 +1955,7 @@
         getSectionIDs("repeating_otheractions", function(actionsArray) {
          if(actionsArray.length > 0) {
             _.each(actionsArray, function(currentID, i) {
-                getAttrs(["repeating_otheractions_" + currentID + "_action_attribute", "repeating_otheractions_" + currentID + "_dice_roll_d20", "repeating_otheractions_" + currentID + "_dice_modifier", "repeating_otheractions_" + currentID + "_use_power_level", "repeating_otheractions_" + currentID + "_power_level", "repeating_otheractions_" + currentID + "_power_levelmax", "repeating_otheractions_" + currentID + "_power_level_max", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(v) {
+                getAttrs(["repeating_otheractions_" + currentID + "_action_attribute", "repeating_otheractions_" + currentID + "_dice_roll_d20", "repeating_otheractions_" + currentID + "_dice_modifier", "repeating_otheractions_" + currentID + "_use_power_level", "repeating_otheractions_" + currentID + "_power_level", "repeating_otheractions_" + currentID + "_power_levelmax", "repeating_otheractions_" + currentID + "_power_level_max", "repeating_otheractions_" + currentID + "_use_destructive_trance", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(v) {
                     var updateother = {};
                     var score = 0;
                     if(v["repeating_otheractions_" + currentID + "_action_attribute"] === "Agility") {
@@ -1987,6 +2002,12 @@
                     }
                     var number = calcAttributeDiceNumber(score);
                     var type = calcAttributeDiceType(score);
+					var destructive = "";
+					var destructive20 = "";
+					if(v["repeating_otheractions" + currentID + "_use_destructive_trance"] === "Yes") {
+						destructive = calcAttributeDiceDestructive(score);
+						destructive20 = ">19";
+					}
                     var roll = "";
                     var powerLevelMax = 0;
                     if(!isNaN(v["repeating_otheractions_" + currentID + "_power_level_max"]) && v["repeating_otheractions_" + currentID + "_power_level_max"]*1 != 0) {
@@ -2002,13 +2023,13 @@
                         }
                     }
         			if(score === 0) {
-        				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+        				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!" + destructive20 + "|Advantage,2d20!!" + destructive20 + "kh1|Disadvantage,2d20!!" + destructive20 + "kl1}]]";
         			} else {
         			    if(isNaN(v["repeating_otheractions_" + currentID + "_dice_roll_d20"])) {
         			        updateother["repeating_otheractions_" + currentID + "_dice_roll_d20"] = "1d20!!";
-            				roll = "[[1d20!! + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+            				roll = "[[1d20!!" + destructive20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + destructive + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
         			    } else {
-            				roll = "[[" + v["repeating_otheractions_" + currentID + "_dice_roll_d20"] + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+            				roll = "[[" + v["repeating_otheractions_" + currentID + "_dice_roll_d20"] + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + destructive + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
         			    }
         			}
                     if(v["repeating_otheractions_" + currentID + "_use_power_level"] === "Yes") {
@@ -2026,11 +2047,13 @@
 	};
 
 	// Function for calculating rolls for Legendary Items
-    on("change:repeating_legendary:dice_roll_d20 change:repeating_legendary:dice_modifier", function() {
-        getAttrs(["repeating_legendary_dice_roll_d20", "repeating_legendary_dice_modifier"], function(values) {
+    on("change:repeating_legendary:dice_roll_d20 change:repeating_legendary:dice_modifier change:repeating_legendary:use_destructive_trance", function() {
+        getAttrs(["repeating_legendary_dice_roll_d20", "repeating_legendary_dice_modifier", "repeating_legendary_use_destructive_trance"], function(values) {
             var score = values.repeating_legendary_dice_modifier*1;
             var number = 0;
             var type = "";
+			var destructive = "";
+			var destructive20 = "";
             if(isNaN(values.repeating_legendary_dice_modifier)) {
                 setAttrs({  "repeating_legendary_dice_modifier": 0    });
             } else {
@@ -2038,54 +2061,70 @@
                     case 1:
                         number = 1;
                         type = "d4!!";
+						destructive = ">3";
                         break;
                     case 2:
                         number = 1;
                         type = "d6!!";
+						destructive = ">5";
                         break;
                     case 3:
                         number = 1;
                         type = "d8!!";
+						destructive = ">7";
                         break;
                     case 4:
                         number = 1;
                         type = "d10!!";
+						destructive = ">9";
                         break;
                     case 5:
                         number = 2;
                         type = "d6!!";
+						destructive = ">5";
                         break;
                     case 6:
                         number = 2;
                         type = "d8!!";
+						destructive = ">7";
                         break;
                     case 7:
                         number = 2;
                         type = "d10!!";
+						destructive = ">9";
                         break;
                     case 8:
                         number = 3;
                         type = "d8!!";
+						destructive = ">7";
                         break;
                     case 9:
                         number = 3;
                         type = "d10!!";
+						destructive = ">9";
                         break;
                     case 10:
                         number = 4;
                         type = "d8!!";
+						destructive = ">7";
                         break;
                     default:
                         number = 0;
                         type = "";
+						destructive = "";
                 }
             }
+			if(values.repeating_legendary_use_destructive_trance === "Yes") {
+				destructive20 = ">19";
+			} else {
+				destructive = "";
+			}
 			var roll = "";
 		    if(isNaN(values.repeating_legendary_dice_roll_d20)) {
 		        setAttrs({  "repeating_legendary_dice_roll_d20": "1d20!!"   });
-				roll = "[[1d20!! + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				roll = "[[1d20!!" + destructive20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + destructive + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
 		    } else {
-    			roll = "[[" + values.repeating_legendary_dice_roll_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+    			roll = "[[" + values.repeating_legendary_dice_roll_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + destructive + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
 		    }
             setAttrs({
                 "repeating_legendary_dice_roll": roll
@@ -2140,63 +2179,75 @@
     });
 
     // On Change for d20 of favored actions
-    on("change:repeating_legendary:select_dice_d20", function() {
-        getAttrs(["repeating_legendary_select_dice_d20"], function(values) {
+    on("change:repeating_legendary:select_dice_d20 change:repeating_legendary:use_destructive_trance", function() {
+        getAttrs(["repeating_legendary_select_dice_d20", "repeating_legendary_use_destructive_trance"], function(values) {
+			var destructive = "";
+			if(values.repeating_legendary_use_destructive_trance === "Yes") {
+				destructive = ">19";
+			}
             switch(values.repeating_legendary_select_dice_d20) {
                 case "Normal":
-                    setAttrs({  "repeating_legendary_dice_roll_d20": "1d20!!" });
+                    setAttrs({  "repeating_legendary_dice_roll_d20": "1d20!!" + destructive });
                     break;
                 case "Advantage":
-                    setAttrs({  "repeating_legendary_dice_roll_d20": "2d20!!kh1" });
+                    setAttrs({  "repeating_legendary_dice_roll_d20": "2d20!!" + destructive + "kh1" });
                     break;
                 case "Disadvantage":
-                    setAttrs({  "repeating_legendary_dice_roll_d20": "2d20!!kl1" });
+                    setAttrs({  "repeating_legendary_dice_roll_d20": "2d20!!" + destructive + "kl1" });
                     break;
                 default:
-                    setAttrs({  "repeating_legendary_dice_roll_d20": "1d20!!" });
+                    setAttrs({  "repeating_legendary_dice_roll_d20": "1d20!!" + destructive });
             }
         });
     });
     // On Change for d20 of other actions
-    on("change:repeating_otheractions:select_dice_d20", function() {
-        getAttrs(["repeating_otheractions_select_dice_d20"], function(values) {
+    on("change:repeating_otheractions:select_dice_d20 change:repeating_otheractions:use_destructive_trance", function() {
+        getAttrs(["repeating_otheractions_select_dice_d20", "repeating_otheractions_use_destructive_trance"], function(values) {
+			var destructive = "";
+			if(values.repeating_otheractions_use_destructive_trance === "Yes") {
+				destructive = ">19";
+			}
             switch(values.repeating_otheractions_select_dice_d20) {
                 case "Normal":
-                    setAttrs({  "repeating_otheractions_dice_roll_d20": "1d20!!" });
+                    setAttrs({  "repeating_otheractions_dice_roll_d20": "1d20!!" + destructive });
                     break;
                 case "Advantage":
-                    setAttrs({  "repeating_otheractions_dice_roll_d20": "2d20!!kh1" });
+                    setAttrs({  "repeating_otheractions_dice_roll_d20": "2d20!!" + destructive + "kh1" });
                     break;
                 case "Disadvantage":
-                    setAttrs({  "repeating_otheractions_dice_roll_d20": "2d20!!kl1" });
+                    setAttrs({  "repeating_otheractions_dice_roll_d20": "2d20!!" + destructive + "kl1" });
                     break;
                 default:
-                    setAttrs({  "repeating_otheractions_dice_roll_d20": "1d20!!" });
+                    setAttrs({  "repeating_otheractions_dice_roll_d20": "1d20!!" + destructive });
             }
         });
     });
     // On Change for d20 of favored actions
-    on("change:repeating_actions:select_dice_d20", function() {
-        getAttrs(["repeating_actions_select_dice_d20"], function(values) {
+    on("change:repeating_actions:select_dice_d20 change:repeating_actions:use_destructive_trance", function() {
+        getAttrs(["repeating_actions_select_dice_d20", "repeating_actions_use_destructive_trance"], function(values) {
+			var destructive = "";
+			if(values.repeating_actions_use_destructive_trance === "Yes") {
+				destructive = ">19";
+			}
             switch(values.repeating_actions_select_dice_d20) {
                 case "Normal":
-                    setAttrs({  "repeating_actions_dice_roll_d20": "1d20!!" });
+                    setAttrs({  "repeating_actions_dice_roll_d20": "1d20!!" + destructive });
                     break;
                 case "Advantage":
-                    setAttrs({  "repeating_actions_dice_roll_d20": "2d20!!kh1" });
+                    setAttrs({  "repeating_actions_dice_roll_d20": "2d20!!" + destructive + "kh1" });
                     break;
                 case "Disadvantage":
-                    setAttrs({  "repeating_actions_dice_roll_d20": "2d20!!kl1" });
+                    setAttrs({  "repeating_actions_dice_roll_d20": "2d20!!" + destructive + "kl1" });
                     break;
                 default:
-                    setAttrs({  "repeating_actions_dice_roll_d20": "1d20!!" });
+                    setAttrs({  "repeating_actions_dice_roll_d20": "1d20!!" + destructive });
             }
         });
     });
 
 	// On Change for calculating rolls for Actions
-    on("change:repeating_actions:action_attribute change:repeating_actions:dice_roll_d20 change:repeating_actions:dice_modifier", function() {
-        getAttrs(["repeating_actions_action_attribute", "repeating_actions_dice_roll_d20", "repeating_actions_dice_modifier", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(values) {
+    on("change:repeating_actions:action_attribute change:repeating_actions:dice_roll_d20 change:repeating_actions:dice_modifier change:repeating_actions:use_destructive_trance", function() {
+        getAttrs(["repeating_actions_action_attribute", "repeating_actions_dice_roll_d20", "repeating_actions_dice_modifier", "repeating_actions_use_destructive_trance", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(values) {
             var score = 0;
             if(values.repeating_actions_action_attribute === "Agility") {
                 score = values.agility_score*1 + values.agility_dice_modifier*1;
@@ -2242,11 +2293,17 @@
             }
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
+			var destructive = "";
+			var destructive20 = "";
+			if(values.repeating_actions_use_destructive_trance === "Yes") {
+				destructive = calcAttributeDiceDestructive(score);
+				destructive20 = ">19";
+			}
 			var roll = "";
 			if(score === 0) {
-				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!" + destructive20 + "|Advantage,2d20!!" + destructive20 + "kh1|Disadvantage,2d20!!" + destructive20 + "kl1}]]";
 			} else {
-				roll = "[[" + values.repeating_actions_dice_roll_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				roll = "[[" + values.repeating_actions_dice_roll_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + destructive + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
 			}
             setAttrs({
                 "repeating_actions_dice_roll": roll
@@ -2301,11 +2358,17 @@
             }
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
+			var destructive = "";
+			var destructive20 = "";
+			if(values.repeating_otheractions_use_destructive_trance === "Yes") {
+				destructive = calcAttributeDiceDestructive(score);
+				destructive20 = ">19";
+			}
 			var roll = "";
 			if(score === 0) {
-				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!" + destructive20 + "|Advantage,2d20!!" + destructive20 + "kh1|Disadvantage,2d20!!" + destructive20 + "kl1}]]";
 			} else {
-				roll = "[[" + values.repeating_otheractions_dice_roll_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				roll = "[[" + values.repeating_otheractions_dice_roll_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + destructive + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
 			}
             setAttrs({
                 "repeating_otheractions_dice_roll": roll
@@ -2336,7 +2399,7 @@ on("change:repeating_featsLeft", function() {
 <!-- Main body of Character Sheet -->
 <div class="container">     <!-- defines the width/height & behavior of the page -->
     <div class="row width100 padBottom">
-        <div class="column textSmall textRight padRight">Feats, Perks, & Flaws to 1 column; Quick Access to Stats for Token bubbles; Destructive Trance :: 2017.08.14 <span class="bold">Version 1.8.6 </span> <input class="settings" type="checkbox" name="attr_sheet_settings_flag" value="hide" /><span>y</span></div>
+        <div class="column textSmall textRight padRight">Destructive Trance :: 2017.09.11 <span class="bold">Version 1.8.9.1 </span> <input class="settings" type="checkbox" name="attr_sheet_settings_flag" value="hide" /><span>y</span></div>
     </div>
     <div class="row width100">
         <div class="column sliders inlineBlock textSmall bold">Character Info</div>
@@ -3779,6 +3842,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                             <input type="hidden" name="attr_dice_roll" value=0 />
                             <div class="column width75 inlineBlock">Attribute Dice Bonus/Penalty:</div>
                             <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_dice_modifier" value=0 /></div>
+                            <div class="column width100"><input type="checkbox" class="checks25" name="attr_use_destructive_trance" value="Yes" /> Use Destructive Trance</div>
                             <input type="hidden" name="attr_dice_roll_d20" value='1d20!!' />
                             <div class="column width55 inlineBlock">d20 for this action is:</div>
                             <div class="column width45 inlineBlock inputSelect">
@@ -3865,6 +3929,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                             <input type="hidden" name="attr_dice_roll" value=0 />
                             <div class="column width75 inlineBlock">Attribute Dice Bonus/Penalty:</div>
                             <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_dice_modifier" value=0 /></div>
+                            <div class="column width100"><input type="checkbox" class="checks25" name="attr_use_destructive_trance" value="Yes" /> Use Destructive Trance</div>
                             <input type="hidden" name="attr_dice_roll_d20" value='1d20!!' />
                             <div class="column width55 inlineBlock">d20 for this action is:</div>
                             <div class="column width45 inlineBlock inputSelect">
@@ -3964,6 +4029,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                                     <option value="10">10 = 4d8</option>
                                 </select>
                             </div>
+                            <div class="column width100"><input type="checkbox" class="checks25" name="attr_use_destructive_trance" value="Yes" /> Use Destructive Trance</div>
                             <input type="hidden" name="attr_dice_roll_d20" value='1d20!!' />
                             <div class="column width55 inlineBlock">d20 for this action is:</div>
                             <div class="column width45 inlineBlock inputSelect">
