@@ -30,7 +30,11 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 * Duplicated weapon rolls to new Combat section where Common Rolls used to be.
 * Added ability to add the skill bonus to the damage (Gunslinger etc).
 * Added field for remaining magazines next to ammo.
-* Added chackbox to make sheet only ask for Burst on weapons that can burst.
+* Added dropdown to chose No/ask/always on bursting when shooting.
+* Separated Committed Effort Day and Committed Effort Scene.
+* Added show/hide fields to add desciptions to class ability, psionic techniques, and foci.
+* Changed Attack Bonus to Base Attack Bonus.
+* style and text changes.
 
 ### 1.2.0
 
