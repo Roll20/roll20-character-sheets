@@ -1547,7 +1547,7 @@ const actions1 = Object.keys(actionData).reduce((m, k) => {
 	actionsFlat = [].concat(...Object.keys(actionData).map(x => actionData[x])),
 	actions1Flat = actionsFlat.map(str => str + '1'),
 	calculateResistance = name => {
-		getAttrs([...actions1[name], `setting_resbonus_${name}`], v => {
+		getAttrs(actions1[name], v => {
 			const total = Object.keys(v).map(x => v[x]).reduce((s, c) => s + parseInt(c || 0), 0);
 			setAttrIfNeeded(name, total);
 		});
@@ -1582,7 +1582,6 @@ Object.keys(actionData).forEach(attributeName => {
 	actionData[attributeName].forEach(actionName => {
 		on(`change:${actionName}1`, () => calculateResistance(attributeName));
 	});
-	on(`change:setting_resbonus_${attributeName}`, () => calculateResistance(attributeName));
 	on(`change:setting_dark_talent_${attributeName}`, () => {
 		getAttrs([`setting_dark_talent_${attributeName}`, `setting_resbonus_${attributeName}`], v => {
 			const setting = {}, r = `setting_resbonus_${attributeName}`;
@@ -1800,7 +1799,7 @@ on('sheet:opened', () => {
 				}
 				// Upgrade to 0.9: Convert ability/friend/crewability/contact first row
 				else if (versionMajor === 0 && versionMinor < 9) {
-					const upgradeFunction = _.after(4, () => upgradeSheet('0.9')),
+					const upgradeFunction = _.after(4, () => upgradeSheet('1.0')),
 						attrs = ['ability1_check', 'ability1_name', 'ability1_description',
 							'friend1_status', 'friend1_name',
 							'crew_ability1_check', 'crew_ability1_name', 'crew_ability1_description',
@@ -1827,13 +1826,6 @@ on('sheet:opened', () => {
 						}], false, upgradeFunction);
 						console.log('Updating to 0.9');
 					});
-				}
-				// Upgrade to 1.0: Make sure that resistance values are calculated correctly.
-				else if (versionMajor === 0) {
-					Object.keys(actionData).forEach(calculateResistance);
-					calculateVice();
-					upgradeSheet('1.0');
-					console.log('Updating to 1.0');
 				}
 				// Upgrade to 1.4: Convert playbook items and repeating items
 				else if (versionMajor === 1 && versionMinor < 4) {
@@ -2269,7 +2261,6 @@ on('sheet:opened', () => {
 				}
 				// Upgrade to 1.12: Update dice totals
 				else if (versionMajor === 1 && versionMinor < 12) {
-					Object.keys(actionData).forEach(name => calculateResistance(name));
 					calculateStashDice();
 					[...actionsFlat].forEach(name => calcTotalFromBoxes(name));
 					getSectionIDs('repeating_cohort', idArray => {
@@ -2296,6 +2287,12 @@ on('sheet:opened', () => {
 						console.log('Updating to 1.13');
 					});
 				}
+				// Upgrade to 1.15: Recalculate resistance
+				else if (versionMajor === 1 && versionMinor < 15) {
+					Object.keys(actionData).forEach(calculateResistance);
+					upgradeSheet('1.15');
+					console.log('Updating to 1.15');
+				}
 			},
 			initialiseSheet = () => {
 				const setting = ['ability', 'friend', 'crewability', 'contact']
@@ -2318,8 +2315,8 @@ on('sheet:opened', () => {
 		v.version ? upgradeSheet(v.version) : initialiseSheet();
 		// Set version number
 		setAttrs({
-			version: '1.14',
-			character_sheet: 'Blades in the Dark v1.14'
+			version: '1.15',
+			character_sheet: 'Blades in the Dark v1.15'
 		});
 	});
 });
