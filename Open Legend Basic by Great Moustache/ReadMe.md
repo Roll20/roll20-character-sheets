@@ -5,6 +5,12 @@
 
 ### Changelog
 
+### 1.8.9.5 on 2017 September 12th
+* Default (dis)advantage number for Actions & Attributes
+	- Can now enter a default (dis)advantage amount for all action & attributes
+	- The pop-up to ask you the number of (dis)advantage will be populated with this number now
+		- This allows you to still modify it if you have additional above or below your default
+
 ### 1.8.9.3 on 2017 September 11th
 * GUI update to HP & Speed
 	- Lethal Damage combined with Current & Max HP lines
