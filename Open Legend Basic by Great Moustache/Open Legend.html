@@ -109,6 +109,15 @@
         }
     };
     
+    // Function to determine 1 less of die size :: takes in the attribute score :: outputs the 1 less die size
+    function calcAttributeDiceDestructive(value) {
+        if(value*1 === 0 || value*1 <= 0) { return "";
+        } else if (value*1 === 1) {  return ">3";
+        } else if (value*1 === 2 || value*1 === 5) {  return ">5";
+        } else if (value*1 === 3 || value*1 === 6 || value*1 === 8 || value*1 >= 10) {  return ">7";
+        } else if (value*1 === 4 || value*1 === 7 || value*1 === 9) {  return ">9";
+        }
+    };
     // Function to calculate total cost of attributes based on numbers put in, to be called by each attriburte on change
     function calcAttributePointsSpent() {
         getAttrs(["agility_cost", "fortitude_cost", "might_cost", "deception_cost", "presence_cost", "persuasion_cost", "learning_cost", "logic_cost", "perception_cost", "will_cost", "alteration_cost", "creation_cost", "energy_cost", "entropy_cost", "influence_cost", "movement_cost", "prescience_cost", "protection_cost"], function(values) {
@@ -591,8 +600,83 @@
 		calcResolve();
 		calcHeavy();
 		calcHitPoints();
+		calcInitiative();
 		calcAllActionRolls();
 	};
+	
+	on("change:select_initiative change:initiative_advantage", function () {
+	    calcAttributes();
+	});
+	
+	// Function to calculate Initiative
+	function calcInitiative() {
+	    getAttrs([
+	        "select_initiative", "agility_initiative", "fortitude_initiative", "might_initiative",
+	        "learning_initiative", "logic_initiative", "perception_initiative", "will_initiative",
+	        "deception_initiative", "persuasion_initiative", "presence_initiative", "alteration_initiative",
+	        "creation_initiative", "energy_initiative", "entropy_initiative", "influence_initiative",
+	        "movement_initiative", "prescience_initiative", "protection_initiative"], function(values) {
+	        switch(values.select_initiative) {
+                case "Agility":
+                    setAttrs({  "initiative": values.agility_initiative });
+                    break;
+                case "Fortitude":
+                    setAttrs({  "initiative": values.fortitude_initiative });
+                    break;
+                case "Might":
+                    setAttrs({  "initiative": values.might_initiative });
+                    break;
+                case "Learning":
+                    setAttrs({  "initiative": values.learning_initiative });
+                    break;
+                case "Logic":
+                    setAttrs({  "initiative": values.logic_initiative });
+                    break;
+                case "Perception":
+                    setAttrs({  "initiative": values.perception_initiative });
+                    break;
+                case "Will":
+                    setAttrs({  "initiative": values.will_initiative });
+                    break;
+                case "Deception":
+                    setAttrs({  "initiative": values.deception_initiative });
+                    break;
+                case "Persuasion":
+                    setAttrs({  "initiative": values.persuasion_initiative });
+                    break;
+                case "Presence":
+                    setAttrs({  "initiative": values.presence_initiative });
+                    break;
+                case "Alteration":
+                    setAttrs({  "initiative": values.alteration_initiative });
+                    break;
+                case "Creation":
+                    setAttrs({  "initiative": values.creation_initiative });
+                    break;
+                case "Energy":
+                    setAttrs({  "initiative": values.energy_initiative });
+                    break;
+                case "Entropy":
+                    setAttrs({  "initiative": values.entropy_initiative });
+                    break;
+                case "Influence":
+                    setAttrs({  "initiative": values.influence_initiative });
+                    break;
+                case "Movement":
+                    setAttrs({  "initiative": values.movement_initiative });
+                    break;
+                case "Prescience":
+                    setAttrs({  "initiative": values.prescience_initiative });
+                    break;
+                case "Protection":
+                    setAttrs({  "initiative": values.protection_initiative });
+                    break;
+                default:
+                    setAttrs({  "initiative": values.agility_initiative });
+                    break;
+	        }
+	    });
+	}
 
     // Function to calculate Evasion, called when changes made to Armor, Shield, Agility, or evasion other
     function calcEvasion() {
@@ -863,7 +947,7 @@
 	
 	// Function for calculating everything to do with Agility
 	function calcAgility() {
-        getAttrs(["agility_score", "agility_substitution", "agility_dice_d20", "agility_cost_modifier", "agility_dice_modifier"], function(values) {
+        getAttrs(["agility_score", "agility_substitution", "agility_dice_d20", "agility_cost_modifier", "agility_dice_modifier", "initiative_advantage", "agility_default_advantage"], function(values) {
             var score = values.agility_score*1;
             if(score < 0) {
                 score = 0;
@@ -889,8 +973,8 @@
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
 				rollInitiative = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}&{tracker}]]";
 			} else {
-				roll = "[[" + values.agility_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
-				rollInitiative = "[[" + values.agility_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
+				roll = "[[" + values.agility_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.agility_default_advantage + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				rollInitiative = "[[" + values.agility_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.initiative_advantage*1 + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
 			}
             setAttrs({
                 "agility_cost": (scoreCost*1 * (scoreCost*1 + 1))/2,
@@ -910,7 +994,7 @@
 	
 	// Function for calculating everything to do with Fortitude
 	function calcFortitude() {
-        getAttrs(["fortitude_score", "fortitude_substitution", "fortitude_dice_d20", "fortitude_cost_modifier", "fortitude_dice_modifier"], function(values) {
+        getAttrs(["fortitude_score", "fortitude_substitution", "fortitude_dice_d20", "fortitude_cost_modifier", "fortitude_dice_modifier", "initiative_advantage", "fortitude_default_advantage"], function(values) {
             var score = values.fortitude_score*1;
             if(score < 0) {
                 score = 0;
@@ -925,6 +1009,7 @@
             var type = calcAttributeDiceType(score);
             var dice = number + type;
 			var roll = "";
+			var rollInitiative = "";
 			var display = 0;
 			if(values.fortitude_score*1 >= values.fortitude_substitution*1) {
 				display = values.fortitude_score*1;
@@ -933,12 +1018,15 @@
 			}
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				rollInitiative = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}&{tracker}]]";
 			} else {
-				roll = "[[" + values.fortitude_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				roll = "[[" + values.fortitude_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.fortitude_default_advantage + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				rollInitiative = "[[" + values.fortitude_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.initiative_advantage*1 + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
 			}
             setAttrs({
                 "fortitude_cost": (scoreCost*1 * (scoreCost*1 + 1))/2,
                 "fortitude_dice_roll": roll,
+                "fortitude_initiative": rollInitiative,
                 "fortitude_dice": dice,
 				"fortitude_display": display
             });
@@ -953,7 +1041,7 @@
 	
 	// Function for calculating everything to do with Might
 	function calcMight() {
-        getAttrs(["might_score", "might_substitution", "might_dice_d20", "might_cost_modifier", "might_dice_modifier"], function(values) {
+        getAttrs(["might_score", "might_substitution", "might_dice_d20", "might_cost_modifier", "might_dice_modifier", "initiative_advantage", "might_default_advantage"], function(values) {
             var score = values.might_score*1;
             if(score < 0) {
                 score = 0;
@@ -968,6 +1056,7 @@
             var type = calcAttributeDiceType(score);
             var dice = number + type;
 			var roll = "";
+			var rollInitiative = "";
 			var display = 0;
 			if(values.might_score*1 >= values.might_substitution*1) {
 				display = values.might_score*1;
@@ -976,12 +1065,15 @@
 			}
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				rollInitiative = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}&{tracker}]]";
 			} else {
-				roll = "[[" + values.might_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				roll = "[[" + values.might_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.might_default_advantage + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				rollInitiative = "[[" + values.might_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.initiative_advantage*1 + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
 			}
             setAttrs({
                 "might_cost": (scoreCost*1 * (scoreCost*1 + 1))/2,
                 "might_dice_roll": roll,
+                "might_initiative": rollInitiative,
                 "might_dice": dice,
 				"might_display": display
             });
@@ -996,7 +1088,7 @@
 	
 	// Function for calculating everything to do with Deception
 	function calcDeception() {
-        getAttrs(["deception_score", "deception_dice_d20", "deception_cost_modifier", "deception_dice_modifier"], function(values) {
+        getAttrs(["deception_score", "deception_dice_d20", "deception_cost_modifier", "deception_dice_modifier", "initiative_advantage", "deception_default_advantage"], function(values) {
             var score = values.deception_score*1;
             if(score < 0) {
                 score = 0;
@@ -1011,14 +1103,18 @@
             var type = calcAttributeDiceType(score);
             var dice = number + type;
 			var roll = "";
+			var rollInitiative = "";
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				rollInitiative = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}&{tracker}]]";
 			} else {
-				roll = "[[" + values.deception_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				roll = "[[" + values.deception_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.deception_default_advantage + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				rollInitiative = "[[" + values.deception_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.initiative_advantage*1 + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
 			}
             setAttrs({
                 "deception_cost": (scoreCost*1 * (scoreCost*1 + 1))/2,
                 "deception_dice_roll": roll,
+                "deception_initiative": rollInitiative,
                 "deception_dice": dice
             });
             calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
@@ -1032,7 +1128,7 @@
 	
 	// Function for calculating everything to do with Presence
 	function calcPresence() {
-        getAttrs(["presence_score", "presence_substitution", "presence_dice_d20", "presence_cost_modifier", "presence_dice_modifier"], function(values) {
+        getAttrs(["presence_score", "presence_substitution", "presence_dice_d20", "presence_cost_modifier", "presence_dice_modifier", "initiative_advantage", "presence_default_advantage"], function(values) {
             var score = values.presence_score*1;
             if(score < 0) {
                 score = 0;
@@ -1047,6 +1143,7 @@
             var type = calcAttributeDiceType(score);
             var dice = number + type;
 			var roll = "";
+			var rollInitiative = "";
 			var display = 0;
 			if(values.presence_score*1 >= values.presence_substitution*1) {
 				display = values.presence_score*1;
@@ -1055,12 +1152,15 @@
 			}
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				rollInitiative = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}&{tracker}]]";
 			} else {
-				roll = "[[" + values.presence_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				roll = "[[" + values.presence_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.presence_default_advantage + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				rollInitiative = "[[" + values.presence_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.initiative_advantage*1 + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
 			}
             setAttrs({
                 "presence_cost": (scoreCost*1 * (scoreCost*1 + 1))/2,
                 "presence_dice_roll": roll,
+                "presence_initiative": rollInitiative,
                 "presence_dice": dice,
 				"presence_display": display
             });
@@ -1075,7 +1175,7 @@
 	
 	// Function for calculating everything to do with Persuasion
 	function calcPersuasion() {
-        getAttrs(["persuasion_score", "persuasion_dice_d20", "persuasion_cost_modifier", "persuasion_dice_modifier"], function(values) {
+        getAttrs(["persuasion_score", "persuasion_dice_d20", "persuasion_cost_modifier", "persuasion_dice_modifier", "initiative_advantage", "persuasion_default_advantage"], function(values) {
             var score = values.persuasion_score*1;
             if(score < 0) {
                 score = 0;
@@ -1090,14 +1190,18 @@
             var type = calcAttributeDiceType(score);
             var dice = number + type;
 			var roll = "";
+			var rollInitiative = "";
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				rollInitiative = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}&{tracker}]]";
 			} else {
-				roll = "[[" + values.persuasion_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				roll = "[[" + values.persuasion_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.persuasion_default_advantage + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				rollInitiative = "[[" + values.persuasion_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.initiative_advantage*1 + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
 			}
             setAttrs({
                 "persuasion_cost": (scoreCost*1 * (scoreCost*1 + 1))/2,
                 "persuasion_dice_roll": roll,
+                "persuasion_initiative": rollInitiative,
                 "persuasion_dice": dice
             });
             calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
@@ -1111,7 +1215,7 @@
 	
 	// Function for calculating everything to do with Learning
 	function calcLearning() {
-        getAttrs(["learning_score", "learning_dice_d20", "learning_cost_modifier", "learning_dice_modifier"], function(values) {
+        getAttrs(["learning_score", "learning_dice_d20", "learning_cost_modifier", "learning_dice_modifier", "initiative_advantage", "learning_default_advantage"], function(values) {
             var score = values.learning_score*1;
             if(score < 0) {
                 score = 0;
@@ -1126,14 +1230,18 @@
             var type = calcAttributeDiceType(score);
             var dice = number + type;
 			var roll = "";
+			var rollInitiative = "";
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				rollInitiative = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}&{tracker}]]";
 			} else {
-				roll = "[[" + values.learning_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				roll = "[[" + values.learning_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.learning_default_advantage + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				rollInitiative = "[[" + values.learning_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.initiative_advantage*1 + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
 			}
             setAttrs({
                 "learning_cost": (scoreCost*1 * (scoreCost*1 + 1))/2,
                 "learning_dice_roll": roll,
+                "learning_initiative": rollInitiative,
                 "learning_dice": dice
             });
             calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
@@ -1147,7 +1255,7 @@
 	
 	// Function for calculating everything to do with Logic
 	function calcLogic() {
-        getAttrs(["logic_score", "logic_dice_d20", "logic_cost_modifier", "logic_dice_modifier"], function(values) {
+        getAttrs(["logic_score", "logic_dice_d20", "logic_cost_modifier", "logic_dice_modifier", "initiative_advantage", "logic_default_advantage"], function(values) {
             var score = values.logic_score*1;
             if(score < 0) {
                 score = 0;
@@ -1162,14 +1270,18 @@
             var type = calcAttributeDiceType(score);
             var dice = number + type;
 			var roll = "";
+			var rollInitiative = "";
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				rollInitiative = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}&{tracker}]]";
 			} else {
-				roll = "[[" + values.logic_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				roll = "[[" + values.logic_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.logic_default_advantage + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				rollInitiative = "[[" + values.logic_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.initiative_advantage*1 + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
 			}
             setAttrs({
                 "logic_cost": (scoreCost*1 * (scoreCost*1 + 1))/2,
                 "logic_dice_roll": roll,
+                "logic_initiative": rollInitiative,
                 "logic_dice": dice
             });
             calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
@@ -1183,7 +1295,7 @@
 	
 	// Function for calculating everything to do with Perception
 	function calcPerception() {
-        getAttrs(["perception_score", "perception_dice_d20", "perception_cost_modifier", "perception_dice_modifier"], function(values) {
+        getAttrs(["perception_score", "perception_dice_d20", "perception_cost_modifier", "perception_dice_modifier", "initiative_advantage", "perception_default_advantage"], function(values) {
             var score = values.perception_score*1;
             if(score < 0) {
                 score = 0;
@@ -1198,14 +1310,18 @@
             var type = calcAttributeDiceType(score);
             var dice = number + type;
 			var roll = "";
+			var rollInitiative = "";
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				rollInitiative = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}&{tracker}]]";
 			} else {
-				roll = "[[" + values.perception_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				roll = "[[" + values.perception_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.perception_default_advantage + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				rollInitiative = "[[" + values.perception_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.initiative_advantage*1 + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
 			}
             setAttrs({
                 "perception_cost": (scoreCost*1 * (scoreCost*1 + 1))/2,
                 "perception_dice_roll": roll,
+                "perception_initiative": rollInitiative,
                 "perception_dice": dice
             });
             calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
@@ -1219,7 +1335,7 @@
 	
 	// Function for calculating everything to do with Will
 	function calcWill() {
-        getAttrs(["will_score", "will_substitution", "will_dice_d20", "will_cost_modifier", "will_dice_modifier"], function(values) {
+        getAttrs(["will_score", "will_substitution", "will_dice_d20", "will_cost_modifier", "will_dice_modifier", "initiative_advantage", "will_default_advantage"], function(values) {
             var score = values.will_score*1;
             if(score < 0) {
                 score = 0;
@@ -1234,6 +1350,7 @@
             var type = calcAttributeDiceType(score);
             var dice = number + type;
 			var roll = "";
+			var rollInitiative = "";
 			var display = 0;
 			if(values.will_score*1 >= values.will_substitution*1) {
 				display = values.will_score*1;
@@ -1242,12 +1359,15 @@
 			}
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				rollInitiative = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}&{tracker}]]";
 			} else {
-				roll = "[[" + values.will_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				roll = "[[" + values.will_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.will_default_advantage + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				rollInitiative = "[[" + values.will_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.initiative_advantage*1 + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
 			}
             setAttrs({
                 "will_cost": (scoreCost*1 * (scoreCost*1 + 1))/2,
                 "will_dice_roll": roll,
+                "will_initiative": rollInitiative,
                 "will_dice": dice,
 				"will_display": display
             });
@@ -1262,7 +1382,7 @@
 	
 	// Function for calculating everything to do with Alteration
 	function calcAlteration() {
-        getAttrs(["alteration_score", "alteration_dice_d20", "alteration_cost_modifier", "alteration_dice_modifier"], function(values) {
+        getAttrs(["alteration_score", "alteration_dice_d20", "alteration_cost_modifier", "alteration_dice_modifier", "initiative_advantage", "alteration_default_advantage"], function(values) {
             var score = values.alteration_score*1;
             if(score < 0) {
                 score = 0;
@@ -1277,14 +1397,18 @@
             var type = calcAttributeDiceType(score);
             var dice = number + type;
 			var roll = "";
+			var rollInitiative = "";
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				rollInitiative = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}&{tracker}]]";
 			} else {
-				roll = "[[" + values.alteration_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				roll = "[[" + values.alteration_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.alteration_default_advantage + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				rollInitiative = "[[" + values.alteration_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.initiative_advantage*1 + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
 			}
             setAttrs({
                 "alteration_cost": (scoreCost*1 * (scoreCost*1 + 1))/2,
                 "alteration_dice_roll": roll,
+                "alteration_initiative": rollInitiative,
                 "alteration_dice": dice
             });
             calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
@@ -1298,7 +1422,7 @@
 	
 	// Function for calculating everything to do with Creation
 	function calcCreation() {
-        getAttrs(["creation_score", "creation_dice_d20", "creation_cost_modifier", "creation_dice_modifier"], function(values) {
+        getAttrs(["creation_score", "creation_dice_d20", "creation_cost_modifier", "creation_dice_modifier", "initiative_advantage", "creation_default_advantage"], function(values) {
             var score = values.creation_score*1;
             if(score < 0) {
                 score = 0;
@@ -1313,14 +1437,18 @@
             var type = calcAttributeDiceType(score);
             var dice = number + type;
 			var roll = "";
+			var rollInitiative = "";
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				rollInitiative = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}&{tracker}]]";
 			} else {
-				roll = "[[" + values.creation_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				roll = "[[" + values.creation_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.creation_default_advantage + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				rollInitiative = "[[" + values.creation_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.initiative_advantage*1 + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
 			}
             setAttrs({
                 "creation_cost": (scoreCost*1 * (scoreCost*1 + 1))/2,
                 "creation_dice_roll": roll,
+                "creation_initiative": rollInitiative,
                 "creation_dice": dice
             });
             calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
@@ -1334,7 +1462,7 @@
 	
 	// Function for calculating everything to do with Energy
 	function calcEnergy() {
-        getAttrs(["energy_score", "energy_dice_d20", "energy_cost_modifier", "energy_dice_modifier"], function(values) {
+        getAttrs(["energy_score", "energy_dice_d20", "energy_cost_modifier", "energy_dice_modifier", "initiative_advantage", "energy_default_advantage"], function(values) {
             var score = values.energy_score*1;
             if(score < 0) {
                 score = 0;
@@ -1349,14 +1477,18 @@
             var type = calcAttributeDiceType(score);
             var dice = number + type;
 			var roll = "";
+			var rollInitiative = "";
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				rollInitiative = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}&{tracker}]]";
 			} else {
-				roll = "[[" + values.energy_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				roll = "[[" + values.energy_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.energy_default_advantage + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				rollInitiative = "[[" + values.energy_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.initiative_advantage*1 + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
 			}
             setAttrs({
                 "energy_cost": (scoreCost*1 * (scoreCost*1 + 1))/2,
                 "energy_dice_roll": roll,
+                "energy_initiative": rollInitiative,
                 "energy_dice": dice
             });
             calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
@@ -1370,7 +1502,7 @@
 	
 	// Function for calculating everything to do with Entropy
 	function calcEntropy() {
-        getAttrs(["entropy_score", "entropy_dice_d20", "entropy_cost_modifier", "entropy_dice_modifier"], function(values) {
+        getAttrs(["entropy_score", "entropy_dice_d20", "entropy_cost_modifier", "entropy_dice_modifier", "initiative_advantage", "entropy_default_advantage"], function(values) {
             var score = values.entropy_score*1;
             if(score < 0) {
                 score = 0;
@@ -1385,14 +1517,18 @@
             var type = calcAttributeDiceType(score);
             var dice = number + type;
 			var roll = "";
+			var rollInitiative = "";
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				rollInitiative = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}&{tracker}]]";
 			} else {
-				roll = "[[" + values.entropy_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				roll = "[[" + values.entropy_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.entropy_default_advantage + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				rollInitiative = "[[" + values.entropy_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.initiative_advantage*1 + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
 			}
             setAttrs({
                 "entropy_cost": (scoreCost*1 * (scoreCost*1 + 1))/2,
                 "entropy_dice_roll": roll,
+                "entropy_initiative": rollInitiative,
                 "entropy_dice": dice
             });
             calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
@@ -1406,7 +1542,7 @@
 	
 	// Function for calculating everything to do with Influence
 	function calcInfluence() {
-        getAttrs(["influence_score", "influence_dice_d20", "influence_cost_modifier", "influence_dice_modifier"], function(values) {
+        getAttrs(["influence_score", "influence_dice_d20", "influence_cost_modifier", "influence_dice_modifier", "initiative_advantage", "influence_default_advantage"], function(values) {
             var score = values.influence_score*1;
             if(score < 0) {
                 score = 0;
@@ -1421,14 +1557,18 @@
             var type = calcAttributeDiceType(score);
             var dice = number + type;
 			var roll = "";
+			var rollInitiative = "";
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				rollInitiative = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}&{tracker}]]";
 			} else {
-				roll = "[[" + values.influence_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				roll = "[[" + values.influence_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.influence_default_advantage + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				rollInitiative = "[[" + values.influence_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.initiative_advantage*1 + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
 			}
             setAttrs({
                 "influence_cost": (scoreCost*1 * (scoreCost*1 + 1))/2,
                 "influence_dice_roll": roll,
+                "influence_initiative": rollInitiative,
                 "influence_dice": dice
             });
             calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
@@ -1442,7 +1582,7 @@
 	
 	// Function for calculating everything to do with Movement
 	function calcMovement() {
-        getAttrs(["movement_score", "movement_dice_d20", "movement_cost_modifier", "movement_dice_modifier"], function(values) {
+        getAttrs(["movement_score", "movement_dice_d20", "movement_cost_modifier", "movement_dice_modifier", "initiative_advantage", "movement_default_advantage"], function(values) {
             var score = values.movement_score*1;
             if(score < 0) {
                 score = 0;
@@ -1457,14 +1597,18 @@
             var type = calcAttributeDiceType(score);
             var dice = number + type;
 			var roll = "";
+			var rollInitiative = "";
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				rollInitiative = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}&{tracker}]]";
 			} else {
-				roll = "[[" + values.movement_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				roll = "[[" + values.movement_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.movement_default_advantage + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				rollInitiative = "[[" + values.movement_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.initiative_advantage*1 + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
 			}
             setAttrs({
                 "movement_cost": (scoreCost*1 * (scoreCost*1 + 1))/2,
                 "movement_dice_roll": roll,
+                "movement_initiative": rollInitiative,
                 "movement_dice": dice
             });
             calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
@@ -1478,7 +1622,7 @@
 	
 	// Function for calculating everything to do with Protection
 	function calcPrescience() {
-        getAttrs(["prescience_score", "prescience_dice_d20", "prescience_cost_modifier", "prescience_dice_modifier"], function(values) {
+        getAttrs(["prescience_score", "prescience_dice_d20", "prescience_cost_modifier", "prescience_dice_modifier", "initiative_advantage", "prescience_default_advantage"], function(values) {
             var score = values.prescience_score*1;
             if(score < 0) {
                 score = 0;
@@ -1493,14 +1637,18 @@
             var type = calcAttributeDiceType(score);
             var dice = number + type;
 			var roll = "";
+			var rollInitiative = "";
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				rollInitiative = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}&{tracker}]]";
 			} else {
-				roll = "[[" + values.prescience_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				roll = "[[" + values.prescience_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.prescience_default_advantage + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				rollInitiative = "[[" + values.prescience_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.initiative_advantage*1 + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
 			}
             setAttrs({
                 "prescience_cost": (scoreCost*1 * (scoreCost*1 + 1))/2,
                 "prescience_dice_roll": roll,
+                "prescience_initiative": rollInitiative,
                 "prescience_dice": dice
             });
             calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
@@ -1514,7 +1662,7 @@
 	
 	// Function for calculating everything to do with Protection
 	function calcProtection() {
-        getAttrs(["protection_score", "protection_dice_d20", "protection_cost_modifier", "protection_dice_modifier"], function(values) {
+        getAttrs(["protection_score", "protection_dice_d20", "protection_cost_modifier", "protection_dice_modifier", "initiative_advantage", "protection_default_advantage"], function(values) {
             var score = values.protection_score*1;
             if(score < 0) {
                 score = 0;
@@ -1529,14 +1677,18 @@
             var type = calcAttributeDiceType(score);
             var dice = number + type;
 			var roll = "";
+			var rollInitiative = "";
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				rollInitiative = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}&{tracker}]]";
 			} else {
-				roll = "[[" + values.protection_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				roll = "[[" + values.protection_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.protection_default_advantage + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				rollInitiative = "[[" + values.protection_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.initiative_advantage*1 + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
 			}
             setAttrs({
                 "protection_cost": (scoreCost*1 * (scoreCost*1 + 1))/2,
                 "protection_dice_roll": roll,
+                "protection_initiative": rollInitiative,
                 "protection_dice": dice
             });
             calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
@@ -1648,6 +1800,13 @@
             });
         });
     });
+	on("change:settingsFlagInitiative", function () {
+		getAttrs(["settingsFlagInitiative"], function(values) {
+			setAttrs({
+				"displaySettingsFlagInitiative": showHide(values.settingsFlagInitiative)
+			});
+		});
+	});
 
     on("change:agility_settings_flag", function() {
         getAttrs(["agility_settings_flag"], function(values) {
@@ -1851,7 +2010,7 @@
         getSectionIDs("repeating_actions", function(actionsArray) {
          if(actionsArray.length > 0) {
             _.each(actionsArray, function(currentID, i) {
-                getAttrs(["repeating_actions_" + currentID + "_action_attribute", "repeating_actions_" + currentID + "_dice_roll_d20", "repeating_actions_" + currentID + "_dice_modifier", "repeating_actions_" + currentID + "_use_power_level", "repeating_actions_" + currentID + "_power_level", "repeating_actions_" + currentID + "_power_level_max", "repeating_actions_" + currentID + "_power_levelmax", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(v) {
+                getAttrs(["repeating_actions_" + currentID + "_action_attribute", "repeating_actions_" + currentID + "_dice_roll_d20", "repeating_actions_" + currentID + "_dice_modifier", "repeating_actions_" + currentID + "_use_power_level", "repeating_actions_" + currentID + "_power_level", "repeating_actions_" + currentID + "_power_level_max", "repeating_actions_" + currentID + "_power_levelmax", "repeating_actions_" + currentID + "_use_destructive_trance", "repeating_actions_" + currentID + "_default_advantage", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(v) {
                     var update = {};
                     var score = 0;
                     if(v["repeating_actions_" + currentID + "_action_attribute"] === "Agility") {
@@ -1898,6 +2057,12 @@
                     }
                     var number = calcAttributeDiceNumber(score);
                     var type = calcAttributeDiceType(score);
+					var destructive = "";
+					var destructive20 = "";
+					if(v["repeating_actions" + currentID + "_use_destructive_trance"] === "Yes") {
+						destructive = calcAttributeDiceDestructive(score);
+						destructive20 = ">19";
+					}
                     var roll = "";
                     var powerLevelMax = 0;
                     if(!isNaN(v["repeating_actions_" + currentID + "_power_level_max"]) && v["repeating_actions_" + currentID + "_power_level_max"]*1 != 0) {
@@ -1913,13 +2078,13 @@
                         }
                     }
         			if(score === 0) {
-        				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+        				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!" + destructive20 + "|Advantage,2d20!!" + destructive20 + "kh1|Disadvantage,2d20!!" + destructive20 + "kl1}]]";
         			} else {
         			    if(isNaN(v["repeating_actions_" + currentID + "_dice_roll_d20"])) {
         			        update["repeating_actions_" + currentID + "_dice_roll_d20"] = "1d20!!";
-            				roll = "[[1d20!! + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+            				roll = "[[1d20!!" + destructive20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + destructive + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
         			    } else {
-            				roll = "[[" + v["repeating_actions_" + currentID + "_dice_roll_d20"] + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+            				roll = "[[" + v["repeating_actions_" + currentID + "_dice_roll_d20"] + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + v["repeating_actions_" + currentID + "_default_advantage"]*1 + "}]]" + type + destructive + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
         			    }
         			}
                     if(v["repeating_actions_" + currentID + "_use_power_level"] === "Yes") {
@@ -1940,7 +2105,7 @@
         getSectionIDs("repeating_otheractions", function(actionsArray) {
          if(actionsArray.length > 0) {
             _.each(actionsArray, function(currentID, i) {
-                getAttrs(["repeating_otheractions_" + currentID + "_action_attribute", "repeating_otheractions_" + currentID + "_dice_roll_d20", "repeating_otheractions_" + currentID + "_dice_modifier", "repeating_otheractions_" + currentID + "_use_power_level", "repeating_otheractions_" + currentID + "_power_level", "repeating_otheractions_" + currentID + "_power_levelmax", "repeating_otheractions_" + currentID + "_power_level_max", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(v) {
+                getAttrs(["repeating_otheractions_" + currentID + "_action_attribute", "repeating_otheractions_" + currentID + "_dice_roll_d20", "repeating_otheractions_" + currentID + "_dice_modifier", "repeating_otheractions_" + currentID + "_use_power_level", "repeating_otheractions_" + currentID + "_power_level", "repeating_otheractions_" + currentID + "_power_levelmax", "repeating_otheractions_" + currentID + "_power_level_max", "repeating_otheractions_" + currentID + "_use_destructive_trance", "repeating_otheractions_" + currentID + "_default_advantage", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(v) {
                     var updateother = {};
                     var score = 0;
                     if(v["repeating_otheractions_" + currentID + "_action_attribute"] === "Agility") {
@@ -1987,6 +2152,12 @@
                     }
                     var number = calcAttributeDiceNumber(score);
                     var type = calcAttributeDiceType(score);
+					var destructive = "";
+					var destructive20 = "";
+					if(v["repeating_otheractions" + currentID + "_use_destructive_trance"] === "Yes") {
+						destructive = calcAttributeDiceDestructive(score);
+						destructive20 = ">19";
+					}
                     var roll = "";
                     var powerLevelMax = 0;
                     if(!isNaN(v["repeating_otheractions_" + currentID + "_power_level_max"]) && v["repeating_otheractions_" + currentID + "_power_level_max"]*1 != 0) {
@@ -2002,13 +2173,13 @@
                         }
                     }
         			if(score === 0) {
-        				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+        				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!" + destructive20 + "|Advantage,2d20!!" + destructive20 + "kh1|Disadvantage,2d20!!" + destructive20 + "kl1}]]";
         			} else {
         			    if(isNaN(v["repeating_otheractions_" + currentID + "_dice_roll_d20"])) {
         			        updateother["repeating_otheractions_" + currentID + "_dice_roll_d20"] = "1d20!!";
-            				roll = "[[1d20!! + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+            				roll = "[[1d20!!" + destructive20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + destructive + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
         			    } else {
-            				roll = "[[" + v["repeating_otheractions_" + currentID + "_dice_roll_d20"] + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+            				roll = "[[" + v["repeating_otheractions_" + currentID + "_dice_roll_d20"] + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + v["repeating_otheractions_" + currentID + "_default_advantage"]*1 + "}]]" + type + destructive + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
         			    }
         			}
                     if(v["repeating_otheractions_" + currentID + "_use_power_level"] === "Yes") {
@@ -2026,11 +2197,13 @@
 	};
 
 	// Function for calculating rolls for Legendary Items
-    on("change:repeating_legendary:dice_roll_d20 change:repeating_legendary:dice_modifier", function() {
-        getAttrs(["repeating_legendary_dice_roll_d20", "repeating_legendary_dice_modifier"], function(values) {
+    on("change:repeating_legendary:dice_roll_d20 change:repeating_legendary:dice_modifier change:repeating_legendary:use_destructive_trance change:repeating_legendary:default_advantage", function() {
+        getAttrs(["repeating_legendary_dice_roll_d20", "repeating_legendary_dice_modifier", "repeating_legendary_use_destructive_trance", "repeating_legendary_default_advantage"], function(values) {
             var score = values.repeating_legendary_dice_modifier*1;
             var number = 0;
             var type = "";
+			var destructive = "";
+			var destructive20 = "";
             if(isNaN(values.repeating_legendary_dice_modifier)) {
                 setAttrs({  "repeating_legendary_dice_modifier": 0    });
             } else {
@@ -2038,55 +2211,65 @@
                     case 1:
                         number = 1;
                         type = "d4!!";
+						destructive = ">3";
                         break;
                     case 2:
                         number = 1;
                         type = "d6!!";
+						destructive = ">5";
                         break;
                     case 3:
                         number = 1;
                         type = "d8!!";
+						destructive = ">7";
                         break;
                     case 4:
                         number = 1;
                         type = "d10!!";
+						destructive = ">9";
                         break;
                     case 5:
                         number = 2;
                         type = "d6!!";
+						destructive = ">5";
                         break;
                     case 6:
                         number = 2;
                         type = "d8!!";
+						destructive = ">7";
                         break;
                     case 7:
                         number = 2;
                         type = "d10!!";
+						destructive = ">9";
                         break;
                     case 8:
                         number = 3;
                         type = "d8!!";
+						destructive = ">7";
                         break;
                     case 9:
                         number = 3;
                         type = "d10!!";
+						destructive = ">9";
                         break;
                     case 10:
                         number = 4;
                         type = "d8!!";
+						destructive = ">7";
                         break;
                     default:
                         number = 0;
                         type = "";
+						destructive = "";
                 }
             }
-			var roll = "";
-		    if(isNaN(values.repeating_legendary_dice_roll_d20)) {
-		        setAttrs({  "repeating_legendary_dice_roll_d20": "1d20!!"   });
-				roll = "[[1d20!! + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
-		    } else {
-    			roll = "[[" + values.repeating_legendary_dice_roll_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
-		    }
+			if(values.repeating_legendary_use_destructive_trance === "Yes") {
+				destructive20 = ">19";
+			} else {
+				destructive = "";
+			}
+    		var roll = "[[" + values.repeating_legendary_dice_roll_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.repeating_legendary_default_advantage*1 + "}]]" + type + destructive + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
             setAttrs({
                 "repeating_legendary_dice_roll": roll
             });
@@ -2140,63 +2323,75 @@
     });
 
     // On Change for d20 of favored actions
-    on("change:repeating_legendary:select_dice_d20", function() {
-        getAttrs(["repeating_legendary_select_dice_d20"], function(values) {
+    on("change:repeating_legendary:select_dice_d20 change:repeating_legendary:use_destructive_trance", function() {
+        getAttrs(["repeating_legendary_select_dice_d20", "repeating_legendary_use_destructive_trance"], function(values) {
+			var destructive = "";
+			if(values.repeating_legendary_use_destructive_trance === "Yes") {
+				destructive = ">19";
+			}
             switch(values.repeating_legendary_select_dice_d20) {
                 case "Normal":
-                    setAttrs({  "repeating_legendary_dice_roll_d20": "1d20!!" });
+                    setAttrs({  "repeating_legendary_dice_roll_d20": "1d20!!" + destructive });
                     break;
                 case "Advantage":
-                    setAttrs({  "repeating_legendary_dice_roll_d20": "2d20!!kh1" });
+                    setAttrs({  "repeating_legendary_dice_roll_d20": "2d20!!" + destructive + "kh1" });
                     break;
                 case "Disadvantage":
-                    setAttrs({  "repeating_legendary_dice_roll_d20": "2d20!!kl1" });
+                    setAttrs({  "repeating_legendary_dice_roll_d20": "2d20!!" + destructive + "kl1" });
                     break;
                 default:
-                    setAttrs({  "repeating_legendary_dice_roll_d20": "1d20!!" });
+                    setAttrs({  "repeating_legendary_dice_roll_d20": "1d20!!" + destructive });
             }
         });
     });
     // On Change for d20 of other actions
-    on("change:repeating_otheractions:select_dice_d20", function() {
-        getAttrs(["repeating_otheractions_select_dice_d20"], function(values) {
+    on("change:repeating_otheractions:select_dice_d20 change:repeating_otheractions:use_destructive_trance", function() {
+        getAttrs(["repeating_otheractions_select_dice_d20", "repeating_otheractions_use_destructive_trance"], function(values) {
+			var destructive = "";
+			if(values.repeating_otheractions_use_destructive_trance === "Yes") {
+				destructive = ">19";
+			}
             switch(values.repeating_otheractions_select_dice_d20) {
                 case "Normal":
-                    setAttrs({  "repeating_otheractions_dice_roll_d20": "1d20!!" });
+                    setAttrs({  "repeating_otheractions_dice_roll_d20": "1d20!!" + destructive });
                     break;
                 case "Advantage":
-                    setAttrs({  "repeating_otheractions_dice_roll_d20": "2d20!!kh1" });
+                    setAttrs({  "repeating_otheractions_dice_roll_d20": "2d20!!" + destructive + "kh1" });
                     break;
                 case "Disadvantage":
-                    setAttrs({  "repeating_otheractions_dice_roll_d20": "2d20!!kl1" });
+                    setAttrs({  "repeating_otheractions_dice_roll_d20": "2d20!!" + destructive + "kl1" });
                     break;
                 default:
-                    setAttrs({  "repeating_otheractions_dice_roll_d20": "1d20!!" });
+                    setAttrs({  "repeating_otheractions_dice_roll_d20": "1d20!!" + destructive });
             }
         });
     });
     // On Change for d20 of favored actions
-    on("change:repeating_actions:select_dice_d20", function() {
-        getAttrs(["repeating_actions_select_dice_d20"], function(values) {
+    on("change:repeating_actions:select_dice_d20 change:repeating_actions:use_destructive_trance", function() {
+        getAttrs(["repeating_actions_select_dice_d20", "repeating_actions_use_destructive_trance"], function(values) {
+			var destructive = "";
+			if(values.repeating_actions_use_destructive_trance === "Yes") {
+				destructive = ">19";
+			}
             switch(values.repeating_actions_select_dice_d20) {
                 case "Normal":
-                    setAttrs({  "repeating_actions_dice_roll_d20": "1d20!!" });
+                    setAttrs({  "repeating_actions_dice_roll_d20": "1d20!!" + destructive });
                     break;
                 case "Advantage":
-                    setAttrs({  "repeating_actions_dice_roll_d20": "2d20!!kh1" });
+                    setAttrs({  "repeating_actions_dice_roll_d20": "2d20!!" + destructive + "kh1" });
                     break;
                 case "Disadvantage":
-                    setAttrs({  "repeating_actions_dice_roll_d20": "2d20!!kl1" });
+                    setAttrs({  "repeating_actions_dice_roll_d20": "2d20!!" + destructive + "kl1" });
                     break;
                 default:
-                    setAttrs({  "repeating_actions_dice_roll_d20": "1d20!!" });
+                    setAttrs({  "repeating_actions_dice_roll_d20": "1d20!!" + destructive });
             }
         });
     });
 
 	// On Change for calculating rolls for Actions
-    on("change:repeating_actions:action_attribute change:repeating_actions:dice_roll_d20 change:repeating_actions:dice_modifier", function() {
-        getAttrs(["repeating_actions_action_attribute", "repeating_actions_dice_roll_d20", "repeating_actions_dice_modifier", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(values) {
+    on("change:repeating_actions:action_attribute change:repeating_actions:dice_roll_d20 change:repeating_actions:dice_modifier change:repeating_actions:use_destructive_trance change:repeating_actions:default_advantage", function() {
+        getAttrs(["repeating_actions_action_attribute", "repeating_actions_dice_roll_d20", "repeating_actions_dice_modifier", "repeating_actions_use_destructive_trance", "repeating_actions_default_advantage", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(values) {
             var score = 0;
             if(values.repeating_actions_action_attribute === "Agility") {
                 score = values.agility_score*1 + values.agility_dice_modifier*1;
@@ -2242,11 +2437,17 @@
             }
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
+			var destructive = "";
+			var destructive20 = "";
+			if(values.repeating_actions_use_destructive_trance === "Yes") {
+				destructive = calcAttributeDiceDestructive(score);
+				destructive20 = ">19";
+			}
 			var roll = "";
 			if(score === 0) {
-				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!" + destructive20 + "|Advantage,2d20!!" + destructive20 + "kh1|Disadvantage,2d20!!" + destructive20 + "kl1}]]";
 			} else {
-				roll = "[[" + values.repeating_actions_dice_roll_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				roll = "[[" + values.repeating_actions_dice_roll_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.repeating_actions_default_advantage*1 + "}]]" + type + destructive + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
 			}
             setAttrs({
                 "repeating_actions_dice_roll": roll
@@ -2254,8 +2455,8 @@
         });
     });
 	// On Change for calculating rolls for Actions
-    on("change:repeating_otheractions:action_attribute change:repeating_otheractions:dice_roll_d20 change:repeating_otheractions:dice_modifier", function() {
-        getAttrs(["repeating_otheractions_action_attribute", "repeating_otheractions_dice_roll_d20", "repeating_otheractions_dice_modifier", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(values) {
+    on("change:repeating_otheractions:action_attribute change:repeating_otheractions:dice_roll_d20 change:repeating_otheractions:dice_modifier change:repeating_otheractions:default_advantage", function() {
+        getAttrs(["repeating_otheractions_action_attribute", "repeating_otheractions_dice_roll_d20", "repeating_otheractions_dice_modifier", "repeating_otheractions_default_advantage", "agility_score", "agility_dice_modifier", "fortitude_score", "fortitude_dice_modifier", "might_score", "might_dice_modifier", "learning_score", "learning_dice_modifier", "logic_score", "logic_dice_modifier", "perception_score", "perception_dice_modifier", "will_score", "will_dice_modifier", "deception_score", "deception_dice_modifier", "persuasion_score", "persuasion_dice_modifier", "presence_score", "presence_dice_modifier", "alteration_score", "alteration_dice_modifier", "creation_score", "creation_dice_modifier", "energy_score", "energy_dice_modifier", "entropy_score", "entropy_dice_modifier", "influence_score", "influence_dice_modifier", "movement_score", "movement_dice_modifier", "prescience_score", "prescience_dice_modifier", "protection_score", "protection_dice_modifier"], function(values) {
             var score = 0;
             if(values.repeating_otheractions_action_attribute === "Agility") {
                 score = values.agility_score*1 + values.agility_dice_modifier*1;
@@ -2301,11 +2502,17 @@
             }
             var number = calcAttributeDiceNumber(score);
             var type = calcAttributeDiceType(score);
+			var destructive = "";
+			var destructive20 = "";
+			if(values.repeating_otheractions_use_destructive_trance === "Yes") {
+				destructive = calcAttributeDiceDestructive(score);
+				destructive20 = ">19";
+			}
 			var roll = "";
 			if(score === 0) {
-				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!" + destructive20 + "|Advantage,2d20!!" + destructive20 + "kh1|Disadvantage,2d20!!" + destructive20 + "kl1}]]";
 			} else {
-				roll = "[[" + values.repeating_otheractions_dice_roll_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				roll = "[[" + values.repeating_otheractions_dice_roll_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.repeating_otheractions_default_advantage*1 + "}]]" + type + destructive + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
 			}
             setAttrs({
                 "repeating_otheractions_dice_roll": roll
@@ -2336,7 +2543,7 @@ on("change:repeating_featsLeft", function() {
 <!-- Main body of Character Sheet -->
 <div class="container">     <!-- defines the width/height & behavior of the page -->
     <div class="row width100 padBottom">
-        <div class="column textSmall textRight padRight">Feats, Perks, & Flaws to 1 column; Quick Access to Stats for Token bubbles; Destructive Trance :: 2017.08.14 <span class="bold">Version 1.8.6 </span> <input class="settings" type="checkbox" name="attr_sheet_settings_flag" value="hide" /><span>y</span></div>
+        <div class="column textSmall textRight padRight">Destructive Trance, HP & Speed Revamp, Initiative, Default (Dis)Advantage :: 2017.09.11 <span class="bold">Version 1.8.9.3 </span> <input class="settings" type="checkbox" name="attr_sheet_settings_flag" value="hide" /><span>y</span></div>
     </div>
     <div class="row width100">
         <div class="column sliders inlineBlock textSmall bold">Character Info</div>
@@ -2525,6 +2732,8 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_agility_dice_modifier" value=0 /></div>
                 <div class="column width75 inlineBlock">Increase/Decrease cost in levels:</div>
                 <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_agility_cost_modifier" value=0 /></div>
+                <div class="column width75 inlineBlock">Default (Dis)Advantage:</div>
+                <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_agility_default_advantage" value=0 /></div>
                 <div class="column width60 inlineBlock">Your d20 (non-combat rolls):</div>
                 <div class="column width40 inlineBlock inputSelect">
                     <select name="attr_agility_dice_d20">
@@ -2536,24 +2745,35 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column width60 inlineBlock">Attribute Substitution:</div>
                 <div class="column width40 inlineBlock inputSelect">
                     <select name="attr_agility_substitution_select">
-                        <option value="None" selected="selected">None</option>
-                        <option value="Fortitude">Fortitude</option>
-                        <option value="Might">Might</option>
-                        <option value="Learning">Learning</option>
-                        <option value="Logic">Logic</option>
-                        <option value="Perception">Perception</option>
-                        <option value="Will">Will</option>
-                        <option value="Deception">Deception</option>
-                        <option value="Persuasion">Persuasion</option>
-                        <option value="Presence">Presence</option>
-                        <option value="Alteration">Alteration</option>
-                        <option value="Creation">Creation</option>
-                        <option value="Energy">Energy</option>
-                        <option value="Entropy">Entropy</option>
-                        <option value="Influence">Influence</option>
-                        <option value="Movement">Movement</option>
-                        <option value="Prescience">Prescience</option>
-                        <option value="Protection">Protection</option>
+						<optgroup label="Select Attribute">
+							<option value="None" selected="selected">No Substitution</option>
+						</optgroup>
+						<optgroup label="Physical">
+							<option value="Agility">Agility</option>
+							<option value="Fortitude">Fortitude</option>
+							<option value="Might">Might</option>
+						</optgroup>
+						<optgroup label="Mental">
+							<option value="Learning">Learning</option>
+							<option value="Logic">Logic</option>
+							<option value="Perception">Perception</option>
+							<option value="Will">Will</option>
+						</optgroup>
+						<optgroup label="Social">
+							<option value="Deception">Deception</option>
+							<option value="Persuasion">Persuasion</option>
+							<option value="Presence">Presence</option>
+						</optgroup>
+						<optgroup label="Extraordinary">
+							<option value="Alteration">Alteration</option>
+							<option value="Creation">Creation</option>
+							<option value="Energy">Energy</option>
+							<option value="Entropy">Entropy</option>
+							<option value="Influence">Influence</option>
+							<option value="Movement">Movement</option>
+							<option value="Prescience">Prescience</option>
+							<option value="Protection">Protection</option>
+						</optgroup>
                     </select>
                 </div>
                 <input type="hidden" name="attr_agility_substitution" value=0 />
@@ -2581,6 +2801,8 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_fortitude_dice_modifier" value=0 /></div>
                 <div class="column width75 inlineBlock">Increase/Decrease cost in levels:</div>
                 <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_fortitude_cost_modifier" value=0 /></div>
+                <div class="column width75 inlineBlock">Default (Dis)Advantage:</div>
+                <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_fortitude_default_advantage" value=0 /></div>
                 <div class="column width60 inlineBlock">Your d20 (non-combat rolls):</div>
                 <div class="column width40 inlineBlock inputSelect">
                     <select name="attr_fortitude_dice_d20">
@@ -2592,24 +2814,35 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column width60 inlineBlock">Attribute Substitution:</div>
                 <div class="column width40 inlineBlock inputSelect">
                     <select name="attr_fortitude_substitution_select">
-                        <option value="None" selected="selected">None</option>
-                        <option value="Agility">Agility</option>
-                        <option value="Might">Might</option>
-                        <option value="Learning">Learning</option>
-                        <option value="Logic">Logic</option>
-                        <option value="Perception">Perception</option>
-                        <option value="Will">Will</option>
-                        <option value="Deception">Deception</option>
-                        <option value="Persuasion">Persuasion</option>
-                        <option value="Presence">Presence</option>
-                        <option value="Alteration">Alteration</option>
-                        <option value="Creation">Creation</option>
-                        <option value="Energy">Energy</option>
-                        <option value="Entropy">Entropy</option>
-                        <option value="Influence">Influence</option>
-                        <option value="Movement">Movement</option>
-                        <option value="Prescience">Prescience</option>
-                        <option value="Protection">Protection</option>
+						<optgroup label="Select Attribute">
+							<option value="None" selected="selected">No Substitution</option>
+						</optgroup>
+						<optgroup label="Physical">
+							<option value="Agility">Agility</option>
+							<option value="Fortitude">Fortitude</option>
+							<option value="Might">Might</option>
+						</optgroup>
+						<optgroup label="Mental">
+							<option value="Learning">Learning</option>
+							<option value="Logic">Logic</option>
+							<option value="Perception">Perception</option>
+							<option value="Will">Will</option>
+						</optgroup>
+						<optgroup label="Social">
+							<option value="Deception">Deception</option>
+							<option value="Persuasion">Persuasion</option>
+							<option value="Presence">Presence</option>
+						</optgroup>
+						<optgroup label="Extraordinary">
+							<option value="Alteration">Alteration</option>
+							<option value="Creation">Creation</option>
+							<option value="Energy">Energy</option>
+							<option value="Entropy">Entropy</option>
+							<option value="Influence">Influence</option>
+							<option value="Movement">Movement</option>
+							<option value="Prescience">Prescience</option>
+							<option value="Protection">Protection</option>
+						</optgroup>
                     </select>
                 </div>
                 <input type="hidden" name="attr_fortitude_substitution" value=0 />
@@ -2637,6 +2870,8 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_might_dice_modifier" value=0 /></div>
                 <div class="column width75 inlineBlock">Increase/Decrease cost in levels:</div>
                 <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_might_cost_modifier" value=0 /></div>
+                <div class="column width75 inlineBlock">Default (Dis)Advantage:</div>
+                <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_might_default_advantage" value=0 /></div>
                 <div class="column width60 inlineBlock">Your d20 (non-combat rolls):</div>
                 <div class="column width40 inlineBlock inputSelect">
                     <select name="attr_might_dice_d20">
@@ -2648,24 +2883,35 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column width60 inlineBlock">Attribute Substitution:</div>
                 <div class="column width40 inlineBlock inputSelect">
                     <select name="attr_might_substitution_select">
-                        <option value="None" selected="selected">None</option>
-                        <option value="Agility">Agility</option>
-                        <option value="Fortitude">Fortitude</option>
-                        <option value="Learning">Learning</option>
-                        <option value="Logic">Logic</option>
-                        <option value="Perception">Perception</option>
-                        <option value="Will">Will</option>
-                        <option value="Deception">Deception</option>
-                        <option value="Persuasion">Persuasion</option>
-                        <option value="Presence">Presence</option>
-                        <option value="Alteration">Alteration</option>
-                        <option value="Creation">Creation</option>
-                        <option value="Energy">Energy</option>
-                        <option value="Entropy">Entropy</option>
-                        <option value="Influence">Influence</option>
-                        <option value="Movement">Movement</option>
-                        <option value="Prescience">Prescience</option>
-                        <option value="Protection">Protection</option>
+						<optgroup label="Select Attribute">
+							<option value="None" selected="selected">No Substitution</option>
+						</optgroup>
+						<optgroup label="Physical">
+							<option value="Agility">Agility</option>
+							<option value="Fortitude">Fortitude</option>
+							<option value="Might">Might</option>
+						</optgroup>
+						<optgroup label="Mental">
+							<option value="Learning">Learning</option>
+							<option value="Logic">Logic</option>
+							<option value="Perception">Perception</option>
+							<option value="Will">Will</option>
+						</optgroup>
+						<optgroup label="Social">
+							<option value="Deception">Deception</option>
+							<option value="Persuasion">Persuasion</option>
+							<option value="Presence">Presence</option>
+						</optgroup>
+						<optgroup label="Extraordinary">
+							<option value="Alteration">Alteration</option>
+							<option value="Creation">Creation</option>
+							<option value="Energy">Energy</option>
+							<option value="Entropy">Entropy</option>
+							<option value="Influence">Influence</option>
+							<option value="Movement">Movement</option>
+							<option value="Prescience">Prescience</option>
+							<option value="Protection">Protection</option>
+						</optgroup>
                     </select>
                 </div>
                 <input type="hidden" name="attr_might_substitution" value=0 />
@@ -2707,6 +2953,8 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_learning_dice_modifier" value=0 /></div>
                 <div class="column width75 inlineBlock">Increase/Decrease cost in levels:</div>
                 <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_learning_cost_modifier" value=0 /></div>
+                <div class="column width75 inlineBlock">Default (Dis)Advantage:</div>
+                <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_learning_default_advantage" value=0 /></div>
                 <div class="column width60 inlineBlock">Your d20 (non-combat rolls):</div>
                 <div class="column width40 inlineBlock inputSelect">
                     <select name="attr_learning_dice_d20">
@@ -2718,24 +2966,35 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column width60 inlineBlock">Attribute Substitution:</div>
                 <div class="column width40 inlineBlock inputSelect">
                     <select name="attr_learning_substitution_select">
-                        <option value="None" selected="selected">None</option>
-                        <option value="Agility">Agility</option>
-                        <option value="Fortitude">Fortitude</option>
-                        <option value="Might">Might</option>
-                        <option value="Logic">Logic</option>
-                        <option value="Perception">Perception</option>
-                        <option value="Will">Will</option>
-                        <option value="Deception">Deception</option>
-                        <option value="Persuasion">Persuasion</option>
-                        <option value="Presence">Presence</option>
-                        <option value="Alteration">Alteration</option>
-                        <option value="Creation">Creation</option>
-                        <option value="Energy">Energy</option>
-                        <option value="Entropy">Entropy</option>
-                        <option value="Influence">Influence</option>
-                        <option value="Movement">Movement</option>
-                        <option value="Prescience">Prescience</option>
-                        <option value="Protection">Protection</option>
+						<optgroup label="Select Attribute">
+							<option value="None" selected="selected">No Substitution</option>
+						</optgroup>
+						<optgroup label="Physical">
+							<option value="Agility">Agility</option>
+							<option value="Fortitude">Fortitude</option>
+							<option value="Might">Might</option>
+						</optgroup>
+						<optgroup label="Mental">
+							<option value="Learning">Learning</option>
+							<option value="Logic">Logic</option>
+							<option value="Perception">Perception</option>
+							<option value="Will">Will</option>
+						</optgroup>
+						<optgroup label="Social">
+							<option value="Deception">Deception</option>
+							<option value="Persuasion">Persuasion</option>
+							<option value="Presence">Presence</option>
+						</optgroup>
+						<optgroup label="Extraordinary">
+							<option value="Alteration">Alteration</option>
+							<option value="Creation">Creation</option>
+							<option value="Energy">Energy</option>
+							<option value="Entropy">Entropy</option>
+							<option value="Influence">Influence</option>
+							<option value="Movement">Movement</option>
+							<option value="Prescience">Prescience</option>
+							<option value="Protection">Protection</option>
+						</optgroup>
                     </select>
                 </div>
                 <input type="hidden" name="attr_learning_substitution" value=0 />
@@ -2763,6 +3022,8 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_logic_dice_modifier" value=0 /></div>
                 <div class="column width75 inlineBlock">Increase/Decrease cost in levels:</div>
                 <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_logic_cost_modifier" value=0 /></div>
+                <div class="column width75 inlineBlock">Default (Dis)Advantage:</div>
+                <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_logic_default_advantage" value=0 /></div>
                 <div class="column width60 inlineBlock">Your d20 (non-combat rolls):</div>
                 <div class="column width40 inlineBlock inputSelect">
                     <select name="attr_logic_dice_d20">
@@ -2774,24 +3035,35 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column width60 inlineBlock">Attribute Substitution:</div>
                 <div class="column width40 inlineBlock inputSelect">
                     <select name="attr_logic_substitution_select">
-                        <option value="None" selected="selected">None</option>
-                        <option value="Agility">Agility</option>
-                        <option value="Fortitude">Fortitude</option>
-                        <option value="Might">Might</option>
-                        <option value="Learning">Learning</option>
-                        <option value="Perception">Perception</option>
-                        <option value="Will">Will</option>
-                        <option value="Deception">Deception</option>
-                        <option value="Persuasion">Persuasion</option>
-                        <option value="Presence">Presence</option>
-                        <option value="Alteration">Alteration</option>
-                        <option value="Creation">Creation</option>
-                        <option value="Energy">Energy</option>
-                        <option value="Entropy">Entropy</option>
-                        <option value="Influence">Influence</option>
-                        <option value="Movement">Movement</option>
-                        <option value="Prescience">Prescience</option>
-                        <option value="Protection">Protection</option>
+						<optgroup label="Select Attribute">
+							<option value="None" selected="selected">No Substitution</option>
+						</optgroup>
+						<optgroup label="Physical">
+							<option value="Agility">Agility</option>
+							<option value="Fortitude">Fortitude</option>
+							<option value="Might">Might</option>
+						</optgroup>
+						<optgroup label="Mental">
+							<option value="Learning">Learning</option>
+							<option value="Logic">Logic</option>
+							<option value="Perception">Perception</option>
+							<option value="Will">Will</option>
+						</optgroup>
+						<optgroup label="Social">
+							<option value="Deception">Deception</option>
+							<option value="Persuasion">Persuasion</option>
+							<option value="Presence">Presence</option>
+						</optgroup>
+						<optgroup label="Extraordinary">
+							<option value="Alteration">Alteration</option>
+							<option value="Creation">Creation</option>
+							<option value="Energy">Energy</option>
+							<option value="Entropy">Entropy</option>
+							<option value="Influence">Influence</option>
+							<option value="Movement">Movement</option>
+							<option value="Prescience">Prescience</option>
+							<option value="Protection">Protection</option>
+						</optgroup>
                     </select>
                 </div>
                 <input type="hidden" name="attr_logic_substitution" value=0 />
@@ -2819,6 +3091,8 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_perception_dice_modifier" value=0 /></div>
                 <div class="column width75 inlineBlock">Increase/Decrease cost in levels:</div>
                 <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_perception_cost_modifier" value=0 /></div>
+                <div class="column width75 inlineBlock">Default (Dis)Advantage:</div>
+                <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_perception_default_advantage" value=0 /></div>
                 <div class="column width60 inlineBlock">Your d20 (non-combat rolls):</div>
                 <div class="column width40 inlineBlock inputSelect">
                     <select name="attr_perception_dice_d20">
@@ -2830,24 +3104,35 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column width60 inlineBlock">Attribute Substitution:</div>
                 <div class="column width40 inlineBlock inputSelect">
                     <select name="attr_perception_substitution_select">
-                        <option value="None" selected="selected">None</option>
-                        <option value="Agility">Agility</option>
-                        <option value="Fortitude">Fortitude</option>
-                        <option value="Might">Might</option>
-                        <option value="Learning">Learning</option>
-                        <option value="Logic">Logic</option>
-                        <option value="Will">Will</option>
-                        <option value="Deception">Deception</option>
-                        <option value="Persuasion">Persuasion</option>
-                        <option value="Presence">Presence</option>
-                        <option value="Alteration">Alteration</option>
-                        <option value="Creation">Creation</option>
-                        <option value="Energy">Energy</option>
-                        <option value="Entropy">Entropy</option>
-                        <option value="Influence">Influence</option>
-                        <option value="Movement">Movement</option>
-                        <option value="Prescience">Prescience</option>
-                        <option value="Protection">Protection</option>
+						<optgroup label="Select Attribute">
+							<option value="None" selected="selected">No Substitution</option>
+						</optgroup>
+						<optgroup label="Physical">
+							<option value="Agility">Agility</option>
+							<option value="Fortitude">Fortitude</option>
+							<option value="Might">Might</option>
+						</optgroup>
+						<optgroup label="Mental">
+							<option value="Learning">Learning</option>
+							<option value="Logic">Logic</option>
+							<option value="Perception">Perception</option>
+							<option value="Will">Will</option>
+						</optgroup>
+						<optgroup label="Social">
+							<option value="Deception">Deception</option>
+							<option value="Persuasion">Persuasion</option>
+							<option value="Presence">Presence</option>
+						</optgroup>
+						<optgroup label="Extraordinary">
+							<option value="Alteration">Alteration</option>
+							<option value="Creation">Creation</option>
+							<option value="Energy">Energy</option>
+							<option value="Entropy">Entropy</option>
+							<option value="Influence">Influence</option>
+							<option value="Movement">Movement</option>
+							<option value="Prescience">Prescience</option>
+							<option value="Protection">Protection</option>
+						</optgroup>
                     </select>
                 </div>
                 <input type="hidden" name="attr_perception_substitution" value=0 />
@@ -2875,6 +3160,8 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_will_dice_modifier" value=0 /></div>
                 <div class="column width75 inlineBlock">Increase/Decrease cost in levels:</div>
                 <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_will_cost_modifier" value=0 /></div>
+                <div class="column width75 inlineBlock">Default (Dis)Advantage:</div>
+                <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_will_default_advantage" value=0 /></div>
                 <div class="column width60 inlineBlock">Your d20 (non-combat rolls):</div>
                 <div class="column width40 inlineBlock inputSelect">
                     <select name="attr_will_dice_d20">
@@ -2886,24 +3173,35 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column width60 inlineBlock">Attribute Substitution:</div>
                 <div class="column width40 inlineBlock inputSelect">
                     <select name="attr_will_substitution_select">
-                        <option value="None" selected="selected">None</option>
-                        <option value="Agility">Agility</option>
-                        <option value="Fortitude">Fortitude</option>
-                        <option value="Might">Might</option>
-                        <option value="Learning">Learning</option>
-                        <option value="Logic">Logic</option>
-                        <option value="Perception">Perception</option>
-                        <option value="Deception">Deception</option>
-                        <option value="Persuasion">Persuasion</option>
-                        <option value="Presence">Presence</option>
-                        <option value="Alteration">Alteration</option>
-                        <option value="Creation">Creation</option>
-                        <option value="Energy">Energy</option>
-                        <option value="Entropy">Entropy</option>
-                        <option value="Influence">Influence</option>
-                        <option value="Movement">Movement</option>
-                        <option value="Prescience">Prescience</option>
-                        <option value="Protection">Protection</option>
+						<optgroup label="Select Attribute">
+							<option value="None" selected="selected">No Substitution</option>
+						</optgroup>
+						<optgroup label="Physical">
+							<option value="Agility">Agility</option>
+							<option value="Fortitude">Fortitude</option>
+							<option value="Might">Might</option>
+						</optgroup>
+						<optgroup label="Mental">
+							<option value="Learning">Learning</option>
+							<option value="Logic">Logic</option>
+							<option value="Perception">Perception</option>
+							<option value="Will">Will</option>
+						</optgroup>
+						<optgroup label="Social">
+							<option value="Deception">Deception</option>
+							<option value="Persuasion">Persuasion</option>
+							<option value="Presence">Presence</option>
+						</optgroup>
+						<optgroup label="Extraordinary">
+							<option value="Alteration">Alteration</option>
+							<option value="Creation">Creation</option>
+							<option value="Energy">Energy</option>
+							<option value="Entropy">Entropy</option>
+							<option value="Influence">Influence</option>
+							<option value="Movement">Movement</option>
+							<option value="Prescience">Prescience</option>
+							<option value="Protection">Protection</option>
+						</optgroup>
                     </select>
                 </div>
                 <input type="hidden" name="attr_will_substitution" value=0 />
@@ -2943,6 +3241,8 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_deception_dice_modifier" value=0 /></div>
                 <div class="column width75 inlineBlock">Increase/Decrease cost in levels:</div>
                 <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_deception_cost_modifier" value=0 /></div>
+                <div class="column width75 inlineBlock">Default (Dis)Advantage:</div>
+                <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_deception_default_advantage" value=0 /></div>
                 <div class="column width60 inlineBlock">Your d20 (non-combat rolls):</div>
                 <div class="column width40 inlineBlock inputSelect">
                     <select name="attr_deception_dice_d20">
@@ -2954,24 +3254,35 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column width60 inlineBlock">Attribute Substitution:</div>
                 <div class="column width40 inlineBlock inputSelect">
                     <select name="attr_deception_substitution_select">
-                        <option value="None" selected="selected">None</option>
-                        <option value="Agility">Agility</option>
-                        <option value="Fortitude">Fortitude</option>
-                        <option value="Might">Might</option>
-                        <option value="Learning">Learning</option>
-                        <option value="Logic">Logic</option>
-                        <option value="Perception">Perception</option>
-                        <option value="Will">Will</option>
-                        <option value="Persuasion">Persuasion</option>
-                        <option value="Presence">Presence</option>
-                        <option value="Alteration">Alteration</option>
-                        <option value="Creation">Creation</option>
-                        <option value="Energy">Energy</option>
-                        <option value="Entropy">Entropy</option>
-                        <option value="Influence">Influence</option>
-                        <option value="Movement">Movement</option>
-                        <option value="Prescience">Prescience</option>
-                        <option value="Protection">Protection</option>
+						<optgroup label="Select Attribute">
+							<option value="None" selected="selected">No Substitution</option>
+						</optgroup>
+						<optgroup label="Physical">
+							<option value="Agility">Agility</option>
+							<option value="Fortitude">Fortitude</option>
+							<option value="Might">Might</option>
+						</optgroup>
+						<optgroup label="Mental">
+							<option value="Learning">Learning</option>
+							<option value="Logic">Logic</option>
+							<option value="Perception">Perception</option>
+							<option value="Will">Will</option>
+						</optgroup>
+						<optgroup label="Social">
+							<option value="Deception">Deception</option>
+							<option value="Persuasion">Persuasion</option>
+							<option value="Presence">Presence</option>
+						</optgroup>
+						<optgroup label="Extraordinary">
+							<option value="Alteration">Alteration</option>
+							<option value="Creation">Creation</option>
+							<option value="Energy">Energy</option>
+							<option value="Entropy">Entropy</option>
+							<option value="Influence">Influence</option>
+							<option value="Movement">Movement</option>
+							<option value="Prescience">Prescience</option>
+							<option value="Protection">Protection</option>
+						</optgroup>
                     </select>
                 </div>
                 <input type="hidden" name="attr_deception_substitution" value=0 />
@@ -2999,6 +3310,8 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_persuasion_dice_modifier" value=0 /></div>
                 <div class="column width75 inlineBlock">Increase/Decrease cost in levels:</div>
                 <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_persuasion_cost_modifier" value=0 /></div>
+                <div class="column width75 inlineBlock">Default (Dis)Advantage:</div>
+                <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_persuasion_default_advantage" value=0 /></div>
                 <div class="column width60 inlineBlock">Your d20 (non-combat rolls):</div>
                 <div class="column width40 inlineBlock inputSelect">
                     <select name="attr_persuasion_dice_d20">
@@ -3010,24 +3323,35 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column width60 inlineBlock">Attribute Substitution:</div>
                 <div class="column width40 inlineBlock inputSelect">
                     <select name="attr_persuasion_substitution_select">
-                        <option value="None" selected="selected">None</option>
-                        <option value="Agility">Agility</option>
-                        <option value="Fortitude">Fortitude</option>
-                        <option value="Might">Might</option>
-                        <option value="Learning">Learning</option>
-                        <option value="Logic">Logic</option>
-                        <option value="Perception">Perception</option>
-                        <option value="Will">Will</option>
-                        <option value="Deception">Deception</option>
-                        <option value="Presence">Presence</option>
-                        <option value="Alteration">Alteration</option>
-                        <option value="Creation">Creation</option>
-                        <option value="Energy">Energy</option>
-                        <option value="Entropy">Entropy</option>
-                        <option value="Influence">Influence</option>
-                        <option value="Movement">Movement</option>
-                        <option value="Prescience">Prescience</option>
-                        <option value="Protection">Protection</option>
+						<optgroup label="Select Attribute">
+							<option value="None" selected="selected">No Substitution</option>
+						</optgroup>
+						<optgroup label="Physical">
+							<option value="Agility">Agility</option>
+							<option value="Fortitude">Fortitude</option>
+							<option value="Might">Might</option>
+						</optgroup>
+						<optgroup label="Mental">
+							<option value="Learning">Learning</option>
+							<option value="Logic">Logic</option>
+							<option value="Perception">Perception</option>
+							<option value="Will">Will</option>
+						</optgroup>
+						<optgroup label="Social">
+							<option value="Deception">Deception</option>
+							<option value="Persuasion">Persuasion</option>
+							<option value="Presence">Presence</option>
+						</optgroup>
+						<optgroup label="Extraordinary">
+							<option value="Alteration">Alteration</option>
+							<option value="Creation">Creation</option>
+							<option value="Energy">Energy</option>
+							<option value="Entropy">Entropy</option>
+							<option value="Influence">Influence</option>
+							<option value="Movement">Movement</option>
+							<option value="Prescience">Prescience</option>
+							<option value="Protection">Protection</option>
+						</optgroup>
                     </select>
                 </div>
                 <input type="hidden" name="attr_persuasion_substitution" value=0 />
@@ -3055,6 +3379,8 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_presence_dice_modifier" value=0 /></div>
                 <div class="column width75 inlineBlock">Increase/Decrease cost in levels:</div>
                 <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_presence_cost_modifier" value=0 /></div>
+                <div class="column width75 inlineBlock">Default (Dis)Advantage:</div>
+                <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_presence_default_advantage" value=0 /></div>
                 <div class="column width60 inlineBlock">Your d20 (non-combat rolls):</div>
                 <div class="column width40 inlineBlock inputSelect">
                     <select name="attr_presence_dice_d20">
@@ -3066,24 +3392,35 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column width60 inlineBlock">Attribute Substitution:</div>
                 <div class="column width40 inlineBlock inputSelect">
                     <select name="attr_presence_substitution_select">
-                        <option value="None" selected="selected">None</option>
-                        <option value="Agility">Agility</option>
-                        <option value="Fortitude">Fortitude</option>
-                        <option value="Might">Might</option>
-                        <option value="Learning">Learning</option>
-                        <option value="Logic">Logic</option>
-                        <option value="Perception">Perception</option>
-                        <option value="Will">Will</option>
-                        <option value="Deception">Deception</option>
-                        <option value="Persuasion">Persuasion</option>
-                        <option value="Alteration">Alteration</option>
-                        <option value="Creation">Creation</option>
-                        <option value="Energy">Energy</option>
-                        <option value="Entropy">Entropy</option>
-                        <option value="Influence">Influence</option>
-                        <option value="Movement">Movement</option>
-                        <option value="Prescience">Prescience</option>
-                        <option value="Protection">Protection</option>
+						<optgroup label="Select Attribute">
+							<option value="None" selected="selected">No Substitution</option>
+						</optgroup>
+						<optgroup label="Physical">
+							<option value="Agility">Agility</option>
+							<option value="Fortitude">Fortitude</option>
+							<option value="Might">Might</option>
+						</optgroup>
+						<optgroup label="Mental">
+							<option value="Learning">Learning</option>
+							<option value="Logic">Logic</option>
+							<option value="Perception">Perception</option>
+							<option value="Will">Will</option>
+						</optgroup>
+						<optgroup label="Social">
+							<option value="Deception">Deception</option>
+							<option value="Persuasion">Persuasion</option>
+							<option value="Presence">Presence</option>
+						</optgroup>
+						<optgroup label="Extraordinary">
+							<option value="Alteration">Alteration</option>
+							<option value="Creation">Creation</option>
+							<option value="Energy">Energy</option>
+							<option value="Entropy">Entropy</option>
+							<option value="Influence">Influence</option>
+							<option value="Movement">Movement</option>
+							<option value="Prescience">Prescience</option>
+							<option value="Protection">Protection</option>
+						</optgroup>
                     </select>
                 </div>
                 <input type="hidden" name="attr_presence_substitution" value=0 />
@@ -3123,6 +3460,8 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_alteration_dice_modifier" value=0 /></div>
                 <div class="column width75 inlineBlock">Increase/Decrease cost in levels:</div>
                 <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_alteration_cost_modifier" value=0 /></div>
+                <div class="column width75 inlineBlock">Default (Dis)Advantage:</div>
+                <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_alteration_default_advantage" value=0 /></div>
                 <div class="column width60 inlineBlock">Your d20 (non-combat rolls):</div>
                 <div class="column width40 inlineBlock inputSelect">
                     <select name="attr_alteration_dice_d20">
@@ -3134,24 +3473,35 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column width60 inlineBlock">Attribute Substitution:</div>
                 <div class="column width40 inlineBlock inputSelect">
                     <select name="attr_alteration_substitution_select">
-                        <option value="None" selected="selected">None</option>
-                        <option value="Agility">Agility</option>
-                        <option value="Fortitude">Fortitude</option>
-                        <option value="Might">Might</option>
-                        <option value="Learning">Learning</option>
-                        <option value="Logic">Logic</option>
-                        <option value="Perception">Perception</option>
-                        <option value="Will">Will</option>
-                        <option value="Deception">Deception</option>
-                        <option value="Persuasion">Persuasion</option>
-                        <option value="Presence">Presence</option>
-                        <option value="Creation">Creation</option>
-                        <option value="Energy">Energy</option>
-                        <option value="Entropy">Entropy</option>
-                        <option value="Influence">Influence</option>
-                        <option value="Movement">Movement</option>
-                        <option value="Prescience">Prescience</option>
-                        <option value="Protection">Protection</option>
+						<optgroup label="Select Attribute">
+							<option value="None" selected="selected">No Substitution</option>
+						</optgroup>
+						<optgroup label="Physical">
+							<option value="Agility">Agility</option>
+							<option value="Fortitude">Fortitude</option>
+							<option value="Might">Might</option>
+						</optgroup>
+						<optgroup label="Mental">
+							<option value="Learning">Learning</option>
+							<option value="Logic">Logic</option>
+							<option value="Perception">Perception</option>
+							<option value="Will">Will</option>
+						</optgroup>
+						<optgroup label="Social">
+							<option value="Deception">Deception</option>
+							<option value="Persuasion">Persuasion</option>
+							<option value="Presence">Presence</option>
+						</optgroup>
+						<optgroup label="Extraordinary">
+							<option value="Alteration">Alteration</option>
+							<option value="Creation">Creation</option>
+							<option value="Energy">Energy</option>
+							<option value="Entropy">Entropy</option>
+							<option value="Influence">Influence</option>
+							<option value="Movement">Movement</option>
+							<option value="Prescience">Prescience</option>
+							<option value="Protection">Protection</option>
+						</optgroup>
                     </select>
                 </div>
                 <input type="hidden" name="attr_alteration_substitution" value=0 />
@@ -3179,6 +3529,8 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_creation_dice_modifier" value=0 /></div>
                 <div class="column width75 inlineBlock">Increase/Decrease cost in levels:</div>
                 <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_creation_cost_modifier" value=0 /></div>
+                <div class="column width75 inlineBlock">Default (Dis)Advantage:</div>
+                <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_creation_default_advantage" value=0 /></div>
                 <div class="column width60 inlineBlock">Your d20 (non-combat rolls):</div>
                 <div class="column width40 inlineBlock inputSelect">
                     <select name="attr_creation_dice_d20">
@@ -3190,24 +3542,35 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column width60 inlineBlock">Attribute Substitution:</div>
                 <div class="column width40 inlineBlock inputSelect">
                     <select name="attr_creation_substitution_select">
-                        <option value="None" selected="selected">None</option>
-                        <option value="Agility">Agility</option>
-                        <option value="Fortitude">Fortitude</option>
-                        <option value="Might">Might</option>
-                        <option value="Learning">Learning</option>
-                        <option value="Logic">Logic</option>
-                        <option value="Perception">Perception</option>
-                        <option value="Will">Will</option>
-                        <option value="Deception">Deception</option>
-                        <option value="Persuasion">Persuasion</option>
-                        <option value="Presence">Presence</option>
-                        <option value="Alteration">Alteration</option>
-                        <option value="Energy">Energy</option>
-                        <option value="Entropy">Entropy</option>
-                        <option value="Influence">Influence</option>
-                        <option value="Movement">Movement</option>
-                        <option value="Prescience">Prescience</option>
-                        <option value="Protection">Protection</option>
+						<optgroup label="Select Attribute">
+							<option value="None" selected="selected">No Substitution</option>
+						</optgroup>
+						<optgroup label="Physical">
+							<option value="Agility">Agility</option>
+							<option value="Fortitude">Fortitude</option>
+							<option value="Might">Might</option>
+						</optgroup>
+						<optgroup label="Mental">
+							<option value="Learning">Learning</option>
+							<option value="Logic">Logic</option>
+							<option value="Perception">Perception</option>
+							<option value="Will">Will</option>
+						</optgroup>
+						<optgroup label="Social">
+							<option value="Deception">Deception</option>
+							<option value="Persuasion">Persuasion</option>
+							<option value="Presence">Presence</option>
+						</optgroup>
+						<optgroup label="Extraordinary">
+							<option value="Alteration">Alteration</option>
+							<option value="Creation">Creation</option>
+							<option value="Energy">Energy</option>
+							<option value="Entropy">Entropy</option>
+							<option value="Influence">Influence</option>
+							<option value="Movement">Movement</option>
+							<option value="Prescience">Prescience</option>
+							<option value="Protection">Protection</option>
+						</optgroup>
                     </select>
                 </div>
                 <input type="hidden" name="attr_creation_substitution" value=0 />
@@ -3235,6 +3598,8 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_energy_dice_modifier" value=0 /></div>
                 <div class="column width75 inlineBlock">Increase/Decrease cost in levels:</div>
                 <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_energy_cost_modifier" value=0 /></div>
+                <div class="column width75 inlineBlock">Default (Dis)Advantage:</div>
+                <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_energy_default_advantage" value=0 /></div>
                 <div class="column width60 inlineBlock">Your d20 (non-combat rolls):</div>
                 <div class="column width40 inlineBlock inputSelect">
                     <select name="attr_energy_dice_d20">
@@ -3246,24 +3611,35 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column width60 inlineBlock">Attribute Substitution:</div>
                 <div class="column width40 inlineBlock inputSelect">
                     <select name="attr_energy_substitution_select">
-                        <option value="None" selected="selected">None</option>
-                        <option value="Agility">Agility</option>
-                        <option value="Fortitude">Fortitude</option>
-                        <option value="Might">Might</option>
-                        <option value="Learning">Learning</option>
-                        <option value="Logic">Logic</option>
-                        <option value="Perception">Perception</option>
-                        <option value="Will">Will</option>
-                        <option value="Deception">Deception</option>
-                        <option value="Persuasion">Persuasion</option>
-                        <option value="Presence">Presence</option>
-                        <option value="Alteration">Alteration</option>
-                        <option value="Creation">Creation</option>
-                        <option value="Entropy">Entropy</option>
-                        <option value="Influence">Influence</option>
-                        <option value="Movement">Movement</option>
-                        <option value="Prescience">Prescience</option>
-                        <option value="Protection">Protection</option>
+						<optgroup label="Select Attribute">
+							<option value="None" selected="selected">No Substitution</option>
+						</optgroup>
+						<optgroup label="Physical">
+							<option value="Agility">Agility</option>
+							<option value="Fortitude">Fortitude</option>
+							<option value="Might">Might</option>
+						</optgroup>
+						<optgroup label="Mental">
+							<option value="Learning">Learning</option>
+							<option value="Logic">Logic</option>
+							<option value="Perception">Perception</option>
+							<option value="Will">Will</option>
+						</optgroup>
+						<optgroup label="Social">
+							<option value="Deception">Deception</option>
+							<option value="Persuasion">Persuasion</option>
+							<option value="Presence">Presence</option>
+						</optgroup>
+						<optgroup label="Extraordinary">
+							<option value="Alteration">Alteration</option>
+							<option value="Creation">Creation</option>
+							<option value="Energy">Energy</option>
+							<option value="Entropy">Entropy</option>
+							<option value="Influence">Influence</option>
+							<option value="Movement">Movement</option>
+							<option value="Prescience">Prescience</option>
+							<option value="Protection">Protection</option>
+						</optgroup>
                     </select>
                 </div>
                 <input type="hidden" name="attr_energy_substitution" value=0 />
@@ -3291,6 +3667,8 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_entropy_dice_modifier" value=0 /></div>
                 <div class="column width75 inlineBlock">Increase/Decrease cost in levels:</div>
                 <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_entropy_cost_modifier" value=0 /></div>
+                <div class="column width75 inlineBlock">Default (Dis)Advantage:</div>
+                <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_entropy_default_advantage" value=0 /></div>
                 <div class="column width60 inlineBlock">Your d20 (non-combat rolls):</div>
                 <div class="column width40 inlineBlock inputSelect">
                     <select name="attr_entropy_dice_d20">
@@ -3302,24 +3680,35 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column width60 inlineBlock">Attribute Substitution:</div>
                 <div class="column width40 inlineBlock inputSelect">
                     <select name="attr_entropy_substitution_select">
-                        <option value="None" selected="selected">None</option>
-                        <option value="Agility">Agility</option>
-                        <option value="Fortitude">Fortitude</option>
-                        <option value="Might">Might</option>
-                        <option value="Learning">Learning</option>
-                        <option value="Logic">Logic</option>
-                        <option value="Perception">Perception</option>
-                        <option value="Will">Will</option>
-                        <option value="Deception">Deception</option>
-                        <option value="Persuasion">Persuasion</option>
-                        <option value="Presence">Presence</option>
-                        <option value="Alteration">Alteration</option>
-                        <option value="Creation">Creation</option>
-                        <option value="Energy">Energy</option>
-                        <option value="Influence">Influence</option>
-                        <option value="Movement">Movement</option>
-                        <option value="Prescience">Prescience</option>
-                        <option value="Protection">Protection</option>
+						<optgroup label="Select Attribute">
+							<option value="None" selected="selected">No Substitution</option>
+						</optgroup>
+						<optgroup label="Physical">
+							<option value="Agility">Agility</option>
+							<option value="Fortitude">Fortitude</option>
+							<option value="Might">Might</option>
+						</optgroup>
+						<optgroup label="Mental">
+							<option value="Learning">Learning</option>
+							<option value="Logic">Logic</option>
+							<option value="Perception">Perception</option>
+							<option value="Will">Will</option>
+						</optgroup>
+						<optgroup label="Social">
+							<option value="Deception">Deception</option>
+							<option value="Persuasion">Persuasion</option>
+							<option value="Presence">Presence</option>
+						</optgroup>
+						<optgroup label="Extraordinary">
+							<option value="Alteration">Alteration</option>
+							<option value="Creation">Creation</option>
+							<option value="Energy">Energy</option>
+							<option value="Entropy">Entropy</option>
+							<option value="Influence">Influence</option>
+							<option value="Movement">Movement</option>
+							<option value="Prescience">Prescience</option>
+							<option value="Protection">Protection</option>
+						</optgroup>
                     </select>
                 </div>
                 <input type="hidden" name="attr_entropy_substitution" value=0 />
@@ -3347,6 +3736,8 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_influence_dice_modifier" value=0 /></div>
                 <div class="column width75 inlineBlock">Increase/Decrease cost in levels:</div>
                 <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_influence_cost_modifier" value=0 /></div>
+                <div class="column width75 inlineBlock">Default (Dis)Advantage:</div>
+                <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_influence_default_advantage" value=0 /></div>
                 <div class="column width60 inlineBlock">Your d20 (non-combat rolls):</div>
                 <div class="column width40 inlineBlock inputSelect">
                     <select name="attr_influence_dice_d20">
@@ -3358,24 +3749,35 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column width60 inlineBlock">Attribute Substitution:</div>
                 <div class="column width40 inlineBlock inputSelect">
                     <select name="attr_influence_substitution_select">
-                        <option value="None" selected="selected">None</option>
-                        <option value="Agility">Agility</option>
-                        <option value="Fortitude">Fortitude</option>
-                        <option value="Might">Might</option>
-                        <option value="Learning">Learning</option>
-                        <option value="Logic">Logic</option>
-                        <option value="Perception">Perception</option>
-                        <option value="Will">Will</option>
-                        <option value="Deception">Deception</option>
-                        <option value="Persuasion">Persuasion</option>
-                        <option value="Presence">Presence</option>
-                        <option value="Alteration">Alteration</option>
-                        <option value="Creation">Creation</option>
-                        <option value="Energy">Energy</option>
-                        <option value="Entropy">Entropy</option>
-                        <option value="Movement">Movement</option>
-                        <option value="Prescience">Prescience</option>
-                        <option value="Protection">Protection</option>
+						<optgroup label="Select Attribute">
+							<option value="None" selected="selected">No Substitution</option>
+						</optgroup>
+						<optgroup label="Physical">
+							<option value="Agility">Agility</option>
+							<option value="Fortitude">Fortitude</option>
+							<option value="Might">Might</option>
+						</optgroup>
+						<optgroup label="Mental">
+							<option value="Learning">Learning</option>
+							<option value="Logic">Logic</option>
+							<option value="Perception">Perception</option>
+							<option value="Will">Will</option>
+						</optgroup>
+						<optgroup label="Social">
+							<option value="Deception">Deception</option>
+							<option value="Persuasion">Persuasion</option>
+							<option value="Presence">Presence</option>
+						</optgroup>
+						<optgroup label="Extraordinary">
+							<option value="Alteration">Alteration</option>
+							<option value="Creation">Creation</option>
+							<option value="Energy">Energy</option>
+							<option value="Entropy">Entropy</option>
+							<option value="Influence">Influence</option>
+							<option value="Movement">Movement</option>
+							<option value="Prescience">Prescience</option>
+							<option value="Protection">Protection</option>
+						</optgroup>
                     </select>
                 </div>
                 <input type="hidden" name="attr_influence_substitution" value=0 />
@@ -3403,6 +3805,8 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_movement_dice_modifier" value=0 /></div>
                 <div class="column width75 inlineBlock">Increase/Decrease cost in levels:</div>
                 <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_movement_cost_modifier" value=0 /></div>
+                <div class="column width75 inlineBlock">Default (Dis)Advantage:</div>
+                <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_movement_default_advantage" value=0 /></div>
                 <div class="column width60 inlineBlock">Your d20 (non-combat rolls):</div>
                 <div class="column width40 inlineBlock inputSelect">
                     <select name="attr_movement_dice_d20">
@@ -3414,24 +3818,35 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column width60 inlineBlock">Attribute Substitution:</div>
                 <div class="column width40 inlineBlock inputSelect">
                     <select name="attr_movement_substitution_select">
-                        <option value="None" selected="selected">None</option>
-                        <option value="Agility">Agility</option>
-                        <option value="Fortitude">Fortitude</option>
-                        <option value="Might">Might</option>
-                        <option value="Learning">Learning</option>
-                        <option value="Logic">Logic</option>
-                        <option value="Perception">Perception</option>
-                        <option value="Will">Will</option>
-                        <option value="Deception">Deception</option>
-                        <option value="Persuasion">Persuasion</option>
-                        <option value="Presence">Presence</option>
-                        <option value="Alteration">Alteration</option>
-                        <option value="Creation">Creation</option>
-                        <option value="Energy">Energy</option>
-                        <option value="Entropy">Entropy</option>
-                        <option value="Influence">Influence</option>
-                        <option value="Prescience">Prescience</option>
-                        <option value="Protection">Protection</option>
+						<optgroup label="Select Attribute">
+							<option value="None" selected="selected">No Substitution</option>
+						</optgroup>
+						<optgroup label="Physical">
+							<option value="Agility">Agility</option>
+							<option value="Fortitude">Fortitude</option>
+							<option value="Might">Might</option>
+						</optgroup>
+						<optgroup label="Mental">
+							<option value="Learning">Learning</option>
+							<option value="Logic">Logic</option>
+							<option value="Perception">Perception</option>
+							<option value="Will">Will</option>
+						</optgroup>
+						<optgroup label="Social">
+							<option value="Deception">Deception</option>
+							<option value="Persuasion">Persuasion</option>
+							<option value="Presence">Presence</option>
+						</optgroup>
+						<optgroup label="Extraordinary">
+							<option value="Alteration">Alteration</option>
+							<option value="Creation">Creation</option>
+							<option value="Energy">Energy</option>
+							<option value="Entropy">Entropy</option>
+							<option value="Influence">Influence</option>
+							<option value="Movement">Movement</option>
+							<option value="Prescience">Prescience</option>
+							<option value="Protection">Protection</option>
+						</optgroup>
                     </select>
                 </div>
                 <input type="hidden" name="attr_movement_substitution" value=0 />
@@ -3459,6 +3874,8 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_prescience_dice_modifier" value=0 /></div>
                 <div class="column width75 inlineBlock">Increase/Decrease cost in levels:</div>
                 <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_prescience_cost_modifier" value=0 /></div>
+                <div class="column width75 inlineBlock">Default (Dis)Advantage:</div>
+                <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_prescience_default_advantage" value=0 /></div>
                 <div class="column width60 inlineBlock">Your d20 (non-combat rolls):</div>
                 <div class="column width40 inlineBlock inputSelect">
                     <select name="attr_prescience_dice_d20">
@@ -3470,24 +3887,35 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column width60 inlineBlock">Attribute Substitution:</div>
                 <div class="column width40 inlineBlock inputSelect">
                     <select name="attr_prescience_substitution_select">
-                        <option value="None" selected="selected">None</option>
-                        <option value="Agility">Agility</option>
-                        <option value="Fortitude">Fortitude</option>
-                        <option value="Might">Might</option>
-                        <option value="Learning">Learning</option>
-                        <option value="Logic">Logic</option>
-                        <option value="Perception">Perception</option>
-                        <option value="Will">Will</option>
-                        <option value="Deception">Deception</option>
-                        <option value="Persuasion">Persuasion</option>
-                        <option value="Presence">Presence</option>
-                        <option value="Alteration">Alteration</option>
-                        <option value="Creation">Creation</option>
-                        <option value="Energy">Energy</option>
-                        <option value="Entropy">Entropy</option>
-                        <option value="Influence">Influence</option>
-                        <option value="Movement">Movement</option>
-                        <option value="Protection">Protection</option>
+						<optgroup label="Select Attribute">
+							<option value="None" selected="selected">No Substitution</option>
+						</optgroup>
+						<optgroup label="Physical">
+							<option value="Agility">Agility</option>
+							<option value="Fortitude">Fortitude</option>
+							<option value="Might">Might</option>
+						</optgroup>
+						<optgroup label="Mental">
+							<option value="Learning">Learning</option>
+							<option value="Logic">Logic</option>
+							<option value="Perception">Perception</option>
+							<option value="Will">Will</option>
+						</optgroup>
+						<optgroup label="Social">
+							<option value="Deception">Deception</option>
+							<option value="Persuasion">Persuasion</option>
+							<option value="Presence">Presence</option>
+						</optgroup>
+						<optgroup label="Extraordinary">
+							<option value="Alteration">Alteration</option>
+							<option value="Creation">Creation</option>
+							<option value="Energy">Energy</option>
+							<option value="Entropy">Entropy</option>
+							<option value="Influence">Influence</option>
+							<option value="Movement">Movement</option>
+							<option value="Prescience">Prescience</option>
+							<option value="Protection">Protection</option>
+						</optgroup>
                     </select>
                 </div>
                 <input type="hidden" name="attr_prescience_substitution" value=0 />
@@ -3515,6 +3943,8 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_protection_dice_modifier" value=0 /></div>
                 <div class="column width75 inlineBlock">Increase/Decrease cost in levels:</div>
                 <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_protection_cost_modifier" value=0 /></div>
+                <div class="column width75 inlineBlock">Default (Dis)Advantage:</div>
+                <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_protection_default_advantage" value=0 /></div>
                 <div class="column width60 inlineBlock">Your d20 (non-combat rolls):</div>
                 <div class="column width40 inlineBlock inputSelect">
                     <select name="attr_protection_dice_d20">
@@ -3526,24 +3956,35 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column width60 inlineBlock">Attribute Substitution:</div>
                 <div class="column width40 inlineBlock inputSelect">
                     <select name="attr_protection_substitution_select">
-                        <option value="None" selected="selected">None</option>
-                        <option value="Agility">Agility</option>
-                        <option value="Fortitude">Fortitude</option>
-                        <option value="Might">Might</option>
-                        <option value="Learning">Learning</option>
-                        <option value="Logic">Logic</option>
-                        <option value="Perception">Perception</option>
-                        <option value="Will">Will</option>
-                        <option value="Deception">Deception</option>
-                        <option value="Persuasion">Persuasion</option>
-                        <option value="Presence">Presence</option>
-                        <option value="Alteration">Alteration</option>
-                        <option value="Creation">Creation</option>
-                        <option value="Energy">Energy</option>
-                        <option value="Entropy">Entropy</option>
-                        <option value="Influence">Influence</option>
-                        <option value="Movement">Movement</option>
-                        <option value="Prescience">Prescience</option>
+						<optgroup label="Select Attribute">
+							<option value="None" selected="selected">No Substitution</option>
+						</optgroup>
+						<optgroup label="Physical">
+							<option value="Agility">Agility</option>
+							<option value="Fortitude">Fortitude</option>
+							<option value="Might">Might</option>
+						</optgroup>
+						<optgroup label="Mental">
+							<option value="Learning">Learning</option>
+							<option value="Logic">Logic</option>
+							<option value="Perception">Perception</option>
+							<option value="Will">Will</option>
+						</optgroup>
+						<optgroup label="Social">
+							<option value="Deception">Deception</option>
+							<option value="Persuasion">Persuasion</option>
+							<option value="Presence">Presence</option>
+						</optgroup>
+						<optgroup label="Extraordinary">
+							<option value="Alteration">Alteration</option>
+							<option value="Creation">Creation</option>
+							<option value="Energy">Energy</option>
+							<option value="Entropy">Entropy</option>
+							<option value="Influence">Influence</option>
+							<option value="Movement">Movement</option>
+							<option value="Prescience">Prescience</option>
+							<option value="Protection">Protection</option>
+						</optgroup>
                     </select>
                 </div>
                 <input type="hidden" name="attr_protection_substitution" value=0 />
@@ -3649,10 +4090,13 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
             <div class="column width100 textLargest bold padTop">Hit Points</div>
             <div class="column width100 textSmall italic bold">Fortitude, Presence, & Will</div>
             <div class="width100">
-                <div class="column width50 inlineBlock borderRight textLarge italic bold">Current</div>
-                <div class="column width50 inlineBlock borderLeft textLarge italic bold">Max</div>
-                <div class="column width50 inlineBlock borderRight inputNumberLarge"><input type="number" name="attr_HP" value=0 /></div>
-                <div class="column width50 inlineBlock borderLeft inputNumberLarge"><input type="number" name="attr_HP_max" value=0 /></div>
+                <div class="column width30 inlineBlock textLarge italic bold">Current</div>
+                <div class="column width30 inlineBlock textLarge italic bold">Max</div>
+                <div class="column width20 inlineBlock textLarge italic bold">Lethal</div>
+                <div class="column width30 inlineBlock inputNumberLarge"><input type="number" name="attr_HP" value=0 /></div>
+                <div class="column width30 inlineBlock inputNumberLarge"><input type="number" name="attr_HP_max" value=0 /></div>
+                <div class="column width20 inlineBlock inputNumberLargeSkinny"><input type="number" name="attr_LethalDamage" value=0 /></div>
+				<input type="hidden" name="attr_lethal_damage" value=0 />
 				<input type="hidden" name="attr_hit_point" value=0 /><input type="hidden" name="attr_hit_point_max" value=0 />
                 <div class="width25 inlineBlock"></div>
                 <div class="column width30 inlineBlock bold">From Feats</div>
@@ -3687,28 +4131,52 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
 <!-- remove this to add Sanity back in (and corresponding 2 other areas)
         </div>
      <!-- Legend Points & Speed Section -->
-        <div class="speedLethalDamage">
-            <div class="width50 inlineBlock vertTop">
-                <div class="column width100 height5"></div>
-                <input type="hidden" name="attr_agility_initiative" value=0 />
-                <div class="column width100 textCenter textLarge speedButton"><button type="roll" name="roll_initiative" value="&{template:openLegend} {{title= Initiative Roll}} {{subTitle= @{character_name}}} {{subTitleAdd= Agility}} {{roll= @{agility_initiative}}} {{description= Make sure you selected your token to have it automatically added to the turn order.}}">Speed</span></button></div>
-                <div class="column width100 textCenter textSmall" style="line-height: 10px;">Click to roll Initiative</div>
-                <div class="column width100 vertTop inputNumber30 textSmall bold">Base <input type="number" name="attr_base_speed" value=30 /></div>
-                <div class="column width100 inputNumberLarge"><input type="number" name="attr_Speed" value=0 /></div>
-				<input type="hidden" name="attr_Speed4Token" value=0 />
-                <div class="width100 column inputNumber30 textSmall bold">Armor Penalty(ft) <input type="number" name="attr_armor_penalty" value=0 /></div>
-                <div class="width100 column  inputNumber30 textSmall bold">Armor Feat(ft) <input type="number" name="attr_armor_training" value=0 /></div>
-            </div>
-            <div class="width50 inlineBlock vertTop">
-                <div class="column width100 height10"></div>
-                <div class="column width5 inlineBlock"></div>
-                <div class="column width90 inlineBlock textCenter bold textLarge black">Lethal Damage</div>
-                <div class="column width5 inlineBlock"></div>
-                <div class="column width100" style="height: 29px;"></div>
-                <div class="column width100 inlineBlock inputNumberLarge"><input type="number" name="attr_LethalDamage" value=0 /></div>
-				<input type="hidden" name="attr_lethal_damage" value=0 />
-            </div>
+        <div class="column width100 textCenter textLargest bold padTop">Speed</div>
+        <div class="wealth">
+            <div class="width100 height15"></div>
+            <div class="column width100 inputNumber60 padTop"><input type="number" name="attr_Speed" value=30 /></div>
         </div>
+        <div class="column width100 vertTop inputNumber30 textSmall bold">Base <input type="number" name="attr_base_speed" value=30 /> Armor Penalty(ft) <input type="number" name="attr_armor_penalty" value=0 /> Feat(ft) <input type="number" name="attr_armor_training" value=0 /></div>
+		<input type="hidden" name="attr_Speed4Token" value=0 />
+        <div class="width15 inlineBlock vertTop padLeft"><input class="settings" type="checkbox" name="attr_settingsFlagInitiative" value="on" checked="checked" /><span>y</span></div>
+        <div class="column width35 inlineBlock textLarge speedButton"><button type="roll" name="roll_initiative" value="&{template:openLegend} {{title= Initiative Roll}} {{subTitle= @{character_name}}} {{subTitleAdd= @{select_initiative}}} {{roll= @{initiative}}} {{description= Make sure you selected your token to have it automatically added to the turn order.}}">Initiative</button></div>
+        <input type="hidden" class="displaySettingsFlagInitiative" name="attr_displaySettingsFlagInitiative" />
+        <div class="width100 displaySettingsInitiative padLeft">
+			<div class="column width50 inlineBlock textSmall bold">Attribute</div>
+			<div class="column width50 inlineBlock textSmall bold">Default (Dis)Advantage</div>
+            <input type="hidden" name="attr_initiative" value="@{agility_initiative}" />
+			<div class="column width50 inlineBlock inputSelect">
+				<select name="attr_select_initiative">
+                    <optgroup label="Physical">
+						<option value="Agility" selected="selected">Agility</option>
+						<option value="Fortitude">Fortitude</option>
+						<option value="Might">Might</option>
+					</optgroup>
+                    <optgroup label="Mental">
+						<option value="Learning">Learning</option>
+						<option value="Logic">Logic</option>
+						<option value="Perception">Perception</option>
+						<option value="Will">Will</option>
+					</optgroup>
+                    <optgroup label="Social">
+						<option value="Deception">Deception</option>
+						<option value="Persuasion">Persuasion</option>
+						<option value="Presence">Presence</option>
+					</optgroup>
+                    <optgroup label="Extraordinary">
+						<option value="Alteration">Alteration</option>
+						<option value="Creation">Creation</option>
+						<option value="Energy">Energy</option>
+						<option value="Entropy">Entropy</option>
+						<option value="Influence">Influence</option>
+						<option value="Movement">Movement</option>
+						<option value="Prescience">Prescience</option>
+						<option value="Protection">Protection</option>
+					</optgroup>
+				</select>
+			</div>
+			<div class="column width50 inlineBlock inputNumber30"><input type="number" name="attr_initiative_advantage" value=0 /></div>
+		</div>
      <!-- End Legend Points & Speed Section -->
      <!-- Wealth Level Information -->
         <div class="column width100 textLargest bold padTop">Wealth Level</div>
@@ -3746,25 +4214,35 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                             <div class="column width45 inlineBlock bold textSmall">Target</div>
                             <div class="column width45 inlineBlock inputSelect">
                                 <select name="attr_action_attribute">
-                                    <option value="None" selected="selected">None</option>
-                                    <option value="Agility">Agility</option>
-                                    <option value="Fortitude">Fortitude</option>
-                                    <option value="Might">Might</option>
-                                    <option value="Deception">Deception</option>
-                                    <option value="Presence">Presence</option>
-                                    <option value="Persuasion">Persuasion</option>
-                                    <option value="Learning">Learning</option>
-                                    <option value="Logic">Logic</option>
-                                    <option value="Perception">Perception</option>
-                                    <option value="Will">Will</option>
-                                    <option value="Alteration">Alteration</option>
-                                    <option value="Creation">Creation</option>
-                                    <option value="Energy">Energy</option>
-                                    <option value="Entropy">Entropy</option>
-                                    <option value="Influence">Influence</option>
-                                    <option value="Movement">Movement</option>
-                                    <option value="Prescience">Prescience</option>
-                                    <option value="Protection">Protection</option>
+									<optgroup label="Select Attribute">
+										<option value="None" selected="selected">Select Attribute</option>
+									</optgroup>
+									<optgroup label="Physical">
+										<option value="Agility">Agility</option>
+										<option value="Fortitude">Fortitude</option>
+										<option value="Might">Might</option>
+									</optgroup>
+									<optgroup label="Mental">
+										<option value="Learning">Learning</option>
+										<option value="Logic">Logic</option>
+										<option value="Perception">Perception</option>
+										<option value="Will">Will</option>
+									</optgroup>
+									<optgroup label="Social">
+										<option value="Deception">Deception</option>
+										<option value="Persuasion">Persuasion</option>
+										<option value="Presence">Presence</option>
+									</optgroup>
+									<optgroup label="Extraordinary">
+										<option value="Alteration">Alteration</option>
+										<option value="Creation">Creation</option>
+										<option value="Energy">Energy</option>
+										<option value="Entropy">Entropy</option>
+										<option value="Influence">Influence</option>
+										<option value="Movement">Movement</option>
+										<option value="Prescience">Prescience</option>
+										<option value="Protection">Protection</option>
+									</optgroup>
                                 </select>
                             </div>
                             <div class="column width10 inlineBlock bold italic textCenter">vs</div>
@@ -3779,8 +4257,10 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                             <input type="hidden" name="attr_dice_roll" value=0 />
                             <div class="column width75 inlineBlock">Attribute Dice Bonus/Penalty:</div>
                             <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_dice_modifier" value=0 /></div>
+                            <div class="column width100"><input type="checkbox" class="checks25" name="attr_use_destructive_trance" value="Yes" /> Use Destructive Trance</div>
                             <input type="hidden" name="attr_dice_roll_d20" value='1d20!!' />
-                            <div class="column width55 inlineBlock">d20 for this action is:</div>
+                            <div class="column width50 textSmall bold inlineBlock">d20 for this action is</div>
+							<div class="column width50 textSmall bold inlineBlock">Default (Dis)Advantage</div>
                             <div class="column width45 inlineBlock inputSelect">
                                 <select name="attr_select_dice_d20">
                                     <option value="Normal" selected="selected">Normal</option>
@@ -3788,6 +4268,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                                     <option value="Disadvantage">Disadvantage</option>
                                 </select>
                             </div>
+							<div class="column width50 inlineBlock inputNumber30"><input type="number" name="attr_default_advantage" value=0 /></div>
                             <input type="hidden" name="attr_power_target" value="" />
                             <input type="hidden" name="attr_power_targetmax" value="" />
                             <div class="column width50 inlineBlock textSmall bold">For a Boon</div>
@@ -3832,25 +4313,35 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                             <div class="column width45 inlineBlock bold textSmall">Target</div>
                             <div class="column width45 inlineBlock inputSelect">
                                 <select name="attr_action_attribute">
-                                    <option value="None" selected="selected">None</option>
-                                    <option value="Agility">Agility</option>
-                                    <option value="Fortitude">Fortitude</option>
-                                    <option value="Might">Might</option>
-                                    <option value="Deception">Deception</option>
-                                    <option value="Presence">Presence</option>
-                                    <option value="Persuasion">Persuasion</option>
-                                    <option value="Learning">Learning</option>
-                                    <option value="Logic">Logic</option>
-                                    <option value="Perception">Perception</option>
-                                    <option value="Will">Will</option>
-                                    <option value="Alteration">Alteration</option>
-                                    <option value="Creation">Creation</option>
-                                    <option value="Energy">Energy</option>
-                                    <option value="Entropy">Entropy</option>
-                                    <option value="Influence">Influence</option>
-                                    <option value="Movement">Movement</option>
-                                    <option value="Prescience">Prescience</option>
-                                    <option value="Protection">Protection</option>
+									<optgroup label="Select Attribute">
+										<option value="None" selected="selected">Select Attribute</option>
+									</optgroup>
+									<optgroup label="Physical">
+										<option value="Agility">Agility</option>
+										<option value="Fortitude">Fortitude</option>
+										<option value="Might">Might</option>
+									</optgroup>
+									<optgroup label="Mental">
+										<option value="Learning">Learning</option>
+										<option value="Logic">Logic</option>
+										<option value="Perception">Perception</option>
+										<option value="Will">Will</option>
+									</optgroup>
+									<optgroup label="Social">
+										<option value="Deception">Deception</option>
+										<option value="Persuasion">Persuasion</option>
+										<option value="Presence">Presence</option>
+									</optgroup>
+									<optgroup label="Extraordinary">
+										<option value="Alteration">Alteration</option>
+										<option value="Creation">Creation</option>
+										<option value="Energy">Energy</option>
+										<option value="Entropy">Entropy</option>
+										<option value="Influence">Influence</option>
+										<option value="Movement">Movement</option>
+										<option value="Prescience">Prescience</option>
+										<option value="Protection">Protection</option>
+									</optgroup>
                                 </select>
                             </div>
                             <div class="column width10 inlineBlock bold italic textCenter">vs</div>
@@ -3865,8 +4356,10 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                             <input type="hidden" name="attr_dice_roll" value=0 />
                             <div class="column width75 inlineBlock">Attribute Dice Bonus/Penalty:</div>
                             <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_dice_modifier" value=0 /></div>
+                            <div class="column width100"><input type="checkbox" class="checks25" name="attr_use_destructive_trance" value="Yes" /> Use Destructive Trance</div>
                             <input type="hidden" name="attr_dice_roll_d20" value='1d20!!' />
-                            <div class="column width55 inlineBlock">d20 for this action is:</div>
+                            <div class="column width50 textSmall bold inlineBlock">d20 for this action is</div>
+							<div class="column width50 textSmall bold inlineBlock">Default (Dis)Advantage</div>
                             <div class="column width45 inlineBlock inputSelect">
                                 <select name="attr_select_dice_d20">
                                     <option value="Normal" selected="selected">Normal</option>
@@ -3874,6 +4367,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                                     <option value="Disadvantage">Disadvantage</option>
                                 </select>
                             </div>
+							<div class="column width50 inlineBlock inputNumber30"><input type="number" name="attr_default_advantage" value=0 /></div>
                             <input type="hidden" name="attr_power_target" value="" />
                             <input type="hidden" name="attr_power_targetmax" value=0 />
                             <div class="column width50 inlineBlock textSmall bold">For a Boon</div>
@@ -3948,11 +4442,12 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                                     <option value="Resolve">Resolve</option>
                                 </select>
                             </div>
-                            <input type="hidden" name="attr_dice_roll" value=0 />
+                            <input type="hidden" name="attr_dice_roll" value="[[d20!! + 1d4!!]]" />
                             <div class="column width55 inlineBlock">Attribute Dice:</div>
                             <div class="column width45 inlineBlock inputSelect">
                                 <select name="attr_dice_modifier">
-                                    <option value="1" selected="selected">1 = 1d4</option>
+                                    <option value="1" selected="selected">Select Dice</option>
+                                    <option value="1">1 = 1d4</option>
                                     <option value="2">2 = 1d6</option>
                                     <option value="3">3 = 1d8</option>
                                     <option value="4">4 = 1d10</option>
@@ -3964,8 +4459,10 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                                     <option value="10">10 = 4d8</option>
                                 </select>
                             </div>
-                            <input type="hidden" name="attr_dice_roll_d20" value='1d20!!' />
-                            <div class="column width55 inlineBlock">d20 for this action is:</div>
+                            <div class="column width100"><input type="checkbox" class="checks25" name="attr_use_destructive_trance" value="Yes" /> Use Destructive Trance</div>
+                            <input type="hidden" name="attr_dice_roll_d20" value="1d20!!" />
+                            <div class="column width50 textSmall bold inlineBlock">d20 for this action is</div>
+							<div class="column width50 textSmall bold inlineBlock">Default (Dis)Advantage</div>
                             <div class="column width45 inlineBlock inputSelect">
                                 <select name="attr_select_dice_d20">
                                     <option value="Normal" selected="selected">Normal</option>
@@ -3973,6 +4470,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                                     <option value="Disadvantage">Disadvantage</option>
                                 </select>
                             </div>
+							<div class="column width50 inlineBlock inputNumber30"><input type="number" name="attr_default_advantage" value=0 /></div>
                             <input type="hidden" name="attr_power_target" value="" />
                             <input type="hidden" name="attr_power_targetmax" value=0 />
                             <div class="column width50 inlineBlock textSmall bold">For a Boon</div>
