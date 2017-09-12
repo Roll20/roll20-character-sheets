@@ -600,8 +600,83 @@
 		calcResolve();
 		calcHeavy();
 		calcHitPoints();
+		calcInitiative();
 		calcAllActionRolls();
 	};
+	
+	on("change:select_initiative change:initiative_advantage", function () {
+	    calcAttributes();
+	});
+	
+	// Function to calculate Initiative
+	function calcInitiative() {
+	    getAttrs([
+	        "select_initiative", "agility_initiative", "fortitude_initiative", "might_initiative",
+	        "learning_initiative", "logic_initiative", "perception_initiative", "will_initiative",
+	        "deception_initiative", "persuasion_initiative", "presence_initiative", "alteration_initiative",
+	        "creation_initiative", "energy_initiative", "entropy_initiative", "influence_initiative",
+	        "movement_initiative", "prescience_initiative", "protection_initiative"], function(values) {
+	        switch(values.select_initiative) {
+                case "Agility":
+                    setAttrs({  "initiative": values.agility_initiative });
+                    break;
+                case "Fortitude":
+                    setAttrs({  "initiative": values.fortitude_initiative });
+                    break;
+                case "Might":
+                    setAttrs({  "initiative": values.might_initiative });
+                    break;
+                case "Learning":
+                    setAttrs({  "initiative": values.learning_initiative });
+                    break;
+                case "Logic":
+                    setAttrs({  "initiative": values.logic_initiative });
+                    break;
+                case "Perception":
+                    setAttrs({  "initiative": values.perception_initiative });
+                    break;
+                case "Will":
+                    setAttrs({  "initiative": values.will_initiative });
+                    break;
+                case "Deception":
+                    setAttrs({  "initiative": values.deception_initiative });
+                    break;
+                case "Persuasion":
+                    setAttrs({  "initiative": values.persuasion_initiative });
+                    break;
+                case "Presence":
+                    setAttrs({  "initiative": values.presence_initiative });
+                    break;
+                case "Alteration":
+                    setAttrs({  "initiative": values.alteration_initiative });
+                    break;
+                case "Creation":
+                    setAttrs({  "initiative": values.creation_initiative });
+                    break;
+                case "Energy":
+                    setAttrs({  "initiative": values.energy_initiative });
+                    break;
+                case "Entropy":
+                    setAttrs({  "initiative": values.entropy_initiative });
+                    break;
+                case "Influence":
+                    setAttrs({  "initiative": values.influence_initiative });
+                    break;
+                case "Movement":
+                    setAttrs({  "initiative": values.movement_initiative });
+                    break;
+                case "Prescience":
+                    setAttrs({  "initiative": values.prescience_initiative });
+                    break;
+                case "Protection":
+                    setAttrs({  "initiative": values.protection_initiative });
+                    break;
+                default:
+                    setAttrs({  "initiative": values.agility_initiative });
+                    break;
+	        }
+	    });
+	}
 
     // Function to calculate Evasion, called when changes made to Armor, Shield, Agility, or evasion other
     function calcEvasion() {
@@ -872,7 +947,7 @@
 	
 	// Function for calculating everything to do with Agility
 	function calcAgility() {
-        getAttrs(["agility_score", "agility_substitution", "agility_dice_d20", "agility_cost_modifier", "agility_dice_modifier"], function(values) {
+        getAttrs(["agility_score", "agility_substitution", "agility_dice_d20", "agility_cost_modifier", "agility_dice_modifier", "initiative_advantage"], function(values) {
             var score = values.agility_score*1;
             if(score < 0) {
                 score = 0;
@@ -899,7 +974,7 @@
 				rollInitiative = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}&{tracker}]]";
 			} else {
 				roll = "[[" + values.agility_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
-				rollInitiative = "[[" + values.agility_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
+				rollInitiative = "[[" + values.agility_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.initiative_advantage*1 + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
 			}
             setAttrs({
                 "agility_cost": (scoreCost*1 * (scoreCost*1 + 1))/2,
@@ -919,7 +994,7 @@
 	
 	// Function for calculating everything to do with Fortitude
 	function calcFortitude() {
-        getAttrs(["fortitude_score", "fortitude_substitution", "fortitude_dice_d20", "fortitude_cost_modifier", "fortitude_dice_modifier"], function(values) {
+        getAttrs(["fortitude_score", "fortitude_substitution", "fortitude_dice_d20", "fortitude_cost_modifier", "fortitude_dice_modifier", "initiative_advantage"], function(values) {
             var score = values.fortitude_score*1;
             if(score < 0) {
                 score = 0;
@@ -934,6 +1009,7 @@
             var type = calcAttributeDiceType(score);
             var dice = number + type;
 			var roll = "";
+			var rollInitiative = "";
 			var display = 0;
 			if(values.fortitude_score*1 >= values.fortitude_substitution*1) {
 				display = values.fortitude_score*1;
@@ -942,12 +1018,15 @@
 			}
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				rollInitiative = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}&{tracker}]]";
 			} else {
 				roll = "[[" + values.fortitude_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				rollInitiative = "[[" + values.fortitude_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.initiative_advantage*1 + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
 			}
             setAttrs({
                 "fortitude_cost": (scoreCost*1 * (scoreCost*1 + 1))/2,
                 "fortitude_dice_roll": roll,
+                "fortitude_initiative": rollInitiative,
                 "fortitude_dice": dice,
 				"fortitude_display": display
             });
@@ -962,7 +1041,7 @@
 	
 	// Function for calculating everything to do with Might
 	function calcMight() {
-        getAttrs(["might_score", "might_substitution", "might_dice_d20", "might_cost_modifier", "might_dice_modifier"], function(values) {
+        getAttrs(["might_score", "might_substitution", "might_dice_d20", "might_cost_modifier", "might_dice_modifier", "initiative_advantage"], function(values) {
             var score = values.might_score*1;
             if(score < 0) {
                 score = 0;
@@ -977,6 +1056,7 @@
             var type = calcAttributeDiceType(score);
             var dice = number + type;
 			var roll = "";
+			var rollInitiative = "";
 			var display = 0;
 			if(values.might_score*1 >= values.might_substitution*1) {
 				display = values.might_score*1;
@@ -985,12 +1065,15 @@
 			}
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				rollInitiative = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}&{tracker}]]";
 			} else {
 				roll = "[[" + values.might_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				rollInitiative = "[[" + values.might_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.initiative_advantage*1 + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
 			}
             setAttrs({
                 "might_cost": (scoreCost*1 * (scoreCost*1 + 1))/2,
                 "might_dice_roll": roll,
+                "might_initiative": rollInitiative,
                 "might_dice": dice,
 				"might_display": display
             });
@@ -1005,7 +1088,7 @@
 	
 	// Function for calculating everything to do with Deception
 	function calcDeception() {
-        getAttrs(["deception_score", "deception_dice_d20", "deception_cost_modifier", "deception_dice_modifier"], function(values) {
+        getAttrs(["deception_score", "deception_dice_d20", "deception_cost_modifier", "deception_dice_modifier", "initiative_advantage"], function(values) {
             var score = values.deception_score*1;
             if(score < 0) {
                 score = 0;
@@ -1020,14 +1103,18 @@
             var type = calcAttributeDiceType(score);
             var dice = number + type;
 			var roll = "";
+			var rollInitiative = "";
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				rollInitiative = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}&{tracker}]]";
 			} else {
 				roll = "[[" + values.deception_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				rollInitiative = "[[" + values.deception_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.initiative_advantage*1 + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
 			}
             setAttrs({
                 "deception_cost": (scoreCost*1 * (scoreCost*1 + 1))/2,
                 "deception_dice_roll": roll,
+                "deception_initiative": rollInitiative,
                 "deception_dice": dice
             });
             calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
@@ -1041,7 +1128,7 @@
 	
 	// Function for calculating everything to do with Presence
 	function calcPresence() {
-        getAttrs(["presence_score", "presence_substitution", "presence_dice_d20", "presence_cost_modifier", "presence_dice_modifier"], function(values) {
+        getAttrs(["presence_score", "presence_substitution", "presence_dice_d20", "presence_cost_modifier", "presence_dice_modifier", "initiative_advantage"], function(values) {
             var score = values.presence_score*1;
             if(score < 0) {
                 score = 0;
@@ -1056,6 +1143,7 @@
             var type = calcAttributeDiceType(score);
             var dice = number + type;
 			var roll = "";
+			var rollInitiative = "";
 			var display = 0;
 			if(values.presence_score*1 >= values.presence_substitution*1) {
 				display = values.presence_score*1;
@@ -1064,12 +1152,15 @@
 			}
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				rollInitiative = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}&{tracker}]]";
 			} else {
 				roll = "[[" + values.presence_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				rollInitiative = "[[" + values.presence_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.initiative_advantage*1 + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
 			}
             setAttrs({
                 "presence_cost": (scoreCost*1 * (scoreCost*1 + 1))/2,
                 "presence_dice_roll": roll,
+                "presence_initiative": rollInitiative,
                 "presence_dice": dice,
 				"presence_display": display
             });
@@ -1084,7 +1175,7 @@
 	
 	// Function for calculating everything to do with Persuasion
 	function calcPersuasion() {
-        getAttrs(["persuasion_score", "persuasion_dice_d20", "persuasion_cost_modifier", "persuasion_dice_modifier"], function(values) {
+        getAttrs(["persuasion_score", "persuasion_dice_d20", "persuasion_cost_modifier", "persuasion_dice_modifier", "initiative_advantage"], function(values) {
             var score = values.persuasion_score*1;
             if(score < 0) {
                 score = 0;
@@ -1099,14 +1190,18 @@
             var type = calcAttributeDiceType(score);
             var dice = number + type;
 			var roll = "";
+			var rollInitiative = "";
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				rollInitiative = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}&{tracker}]]";
 			} else {
 				roll = "[[" + values.persuasion_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				rollInitiative = "[[" + values.persuasion_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.initiative_advantage*1 + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
 			}
             setAttrs({
                 "persuasion_cost": (scoreCost*1 * (scoreCost*1 + 1))/2,
                 "persuasion_dice_roll": roll,
+                "persuasion_initiative": rollInitiative,
                 "persuasion_dice": dice
             });
             calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
@@ -1120,7 +1215,7 @@
 	
 	// Function for calculating everything to do with Learning
 	function calcLearning() {
-        getAttrs(["learning_score", "learning_dice_d20", "learning_cost_modifier", "learning_dice_modifier"], function(values) {
+        getAttrs(["learning_score", "learning_dice_d20", "learning_cost_modifier", "learning_dice_modifier", "initiative_advantage"], function(values) {
             var score = values.learning_score*1;
             if(score < 0) {
                 score = 0;
@@ -1135,14 +1230,18 @@
             var type = calcAttributeDiceType(score);
             var dice = number + type;
 			var roll = "";
+			var rollInitiative = "";
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				rollInitiative = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}&{tracker}]]";
 			} else {
 				roll = "[[" + values.learning_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				rollInitiative = "[[" + values.learning_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.initiative_advantage*1 + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
 			}
             setAttrs({
                 "learning_cost": (scoreCost*1 * (scoreCost*1 + 1))/2,
                 "learning_dice_roll": roll,
+                "learning_initiative": rollInitiative,
                 "learning_dice": dice
             });
             calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
@@ -1156,7 +1255,7 @@
 	
 	// Function for calculating everything to do with Logic
 	function calcLogic() {
-        getAttrs(["logic_score", "logic_dice_d20", "logic_cost_modifier", "logic_dice_modifier"], function(values) {
+        getAttrs(["logic_score", "logic_dice_d20", "logic_cost_modifier", "logic_dice_modifier", "initiative_advantage"], function(values) {
             var score = values.logic_score*1;
             if(score < 0) {
                 score = 0;
@@ -1171,14 +1270,18 @@
             var type = calcAttributeDiceType(score);
             var dice = number + type;
 			var roll = "";
+			var rollInitiative = "";
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				rollInitiative = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}&{tracker}]]";
 			} else {
 				roll = "[[" + values.logic_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				rollInitiative = "[[" + values.logic_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.initiative_advantage*1 + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
 			}
             setAttrs({
                 "logic_cost": (scoreCost*1 * (scoreCost*1 + 1))/2,
                 "logic_dice_roll": roll,
+                "logic_initiative": rollInitiative,
                 "logic_dice": dice
             });
             calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
@@ -1192,7 +1295,7 @@
 	
 	// Function for calculating everything to do with Perception
 	function calcPerception() {
-        getAttrs(["perception_score", "perception_dice_d20", "perception_cost_modifier", "perception_dice_modifier"], function(values) {
+        getAttrs(["perception_score", "perception_dice_d20", "perception_cost_modifier", "perception_dice_modifier", "initiative_advantage"], function(values) {
             var score = values.perception_score*1;
             if(score < 0) {
                 score = 0;
@@ -1207,14 +1310,18 @@
             var type = calcAttributeDiceType(score);
             var dice = number + type;
 			var roll = "";
+			var rollInitiative = "";
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				rollInitiative = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}&{tracker}]]";
 			} else {
 				roll = "[[" + values.perception_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				rollInitiative = "[[" + values.perception_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.initiative_advantage*1 + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
 			}
             setAttrs({
                 "perception_cost": (scoreCost*1 * (scoreCost*1 + 1))/2,
                 "perception_dice_roll": roll,
+                "perception_initiative": rollInitiative,
                 "perception_dice": dice
             });
             calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
@@ -1228,7 +1335,7 @@
 	
 	// Function for calculating everything to do with Will
 	function calcWill() {
-        getAttrs(["will_score", "will_substitution", "will_dice_d20", "will_cost_modifier", "will_dice_modifier"], function(values) {
+        getAttrs(["will_score", "will_substitution", "will_dice_d20", "will_cost_modifier", "will_dice_modifier", "initiative_advantage"], function(values) {
             var score = values.will_score*1;
             if(score < 0) {
                 score = 0;
@@ -1243,6 +1350,7 @@
             var type = calcAttributeDiceType(score);
             var dice = number + type;
 			var roll = "";
+			var rollInitiative = "";
 			var display = 0;
 			if(values.will_score*1 >= values.will_substitution*1) {
 				display = values.will_score*1;
@@ -1251,12 +1359,15 @@
 			}
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				rollInitiative = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}&{tracker}]]";
 			} else {
 				roll = "[[" + values.will_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				rollInitiative = "[[" + values.will_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.initiative_advantage*1 + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
 			}
             setAttrs({
                 "will_cost": (scoreCost*1 * (scoreCost*1 + 1))/2,
                 "will_dice_roll": roll,
+                "will_initiative": rollInitiative,
                 "will_dice": dice,
 				"will_display": display
             });
@@ -1271,7 +1382,7 @@
 	
 	// Function for calculating everything to do with Alteration
 	function calcAlteration() {
-        getAttrs(["alteration_score", "alteration_dice_d20", "alteration_cost_modifier", "alteration_dice_modifier"], function(values) {
+        getAttrs(["alteration_score", "alteration_dice_d20", "alteration_cost_modifier", "alteration_dice_modifier", "initiative_advantage"], function(values) {
             var score = values.alteration_score*1;
             if(score < 0) {
                 score = 0;
@@ -1286,14 +1397,18 @@
             var type = calcAttributeDiceType(score);
             var dice = number + type;
 			var roll = "";
+			var rollInitiative = "";
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				rollInitiative = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}&{tracker}]]";
 			} else {
 				roll = "[[" + values.alteration_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				rollInitiative = "[[" + values.alteration_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.initiative_advantage*1 + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
 			}
             setAttrs({
                 "alteration_cost": (scoreCost*1 * (scoreCost*1 + 1))/2,
                 "alteration_dice_roll": roll,
+                "alteration_initiative": rollInitiative,
                 "alteration_dice": dice
             });
             calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
@@ -1307,7 +1422,7 @@
 	
 	// Function for calculating everything to do with Creation
 	function calcCreation() {
-        getAttrs(["creation_score", "creation_dice_d20", "creation_cost_modifier", "creation_dice_modifier"], function(values) {
+        getAttrs(["creation_score", "creation_dice_d20", "creation_cost_modifier", "creation_dice_modifier", "initiative_advantage"], function(values) {
             var score = values.creation_score*1;
             if(score < 0) {
                 score = 0;
@@ -1322,14 +1437,18 @@
             var type = calcAttributeDiceType(score);
             var dice = number + type;
 			var roll = "";
+			var rollInitiative = "";
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				rollInitiative = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}&{tracker}]]";
 			} else {
 				roll = "[[" + values.creation_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				rollInitiative = "[[" + values.creation_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.initiative_advantage*1 + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
 			}
             setAttrs({
                 "creation_cost": (scoreCost*1 * (scoreCost*1 + 1))/2,
                 "creation_dice_roll": roll,
+                "creation_initiative": rollInitiative,
                 "creation_dice": dice
             });
             calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
@@ -1343,7 +1462,7 @@
 	
 	// Function for calculating everything to do with Energy
 	function calcEnergy() {
-        getAttrs(["energy_score", "energy_dice_d20", "energy_cost_modifier", "energy_dice_modifier"], function(values) {
+        getAttrs(["energy_score", "energy_dice_d20", "energy_cost_modifier", "energy_dice_modifier", "initiative_advantage"], function(values) {
             var score = values.energy_score*1;
             if(score < 0) {
                 score = 0;
@@ -1358,14 +1477,18 @@
             var type = calcAttributeDiceType(score);
             var dice = number + type;
 			var roll = "";
+			var rollInitiative = "";
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				rollInitiative = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}&{tracker}]]";
 			} else {
 				roll = "[[" + values.energy_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				rollInitiative = "[[" + values.energy_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.initiative_advantage*1 + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
 			}
             setAttrs({
                 "energy_cost": (scoreCost*1 * (scoreCost*1 + 1))/2,
                 "energy_dice_roll": roll,
+                "energy_initiative": rollInitiative,
                 "energy_dice": dice
             });
             calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
@@ -1379,7 +1502,7 @@
 	
 	// Function for calculating everything to do with Entropy
 	function calcEntropy() {
-        getAttrs(["entropy_score", "entropy_dice_d20", "entropy_cost_modifier", "entropy_dice_modifier"], function(values) {
+        getAttrs(["entropy_score", "entropy_dice_d20", "entropy_cost_modifier", "entropy_dice_modifier", "initiative_advantage"], function(values) {
             var score = values.entropy_score*1;
             if(score < 0) {
                 score = 0;
@@ -1394,14 +1517,18 @@
             var type = calcAttributeDiceType(score);
             var dice = number + type;
 			var roll = "";
+			var rollInitiative = "";
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				rollInitiative = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}&{tracker}]]";
 			} else {
 				roll = "[[" + values.entropy_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				rollInitiative = "[[" + values.entropy_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.initiative_advantage*1 + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
 			}
             setAttrs({
                 "entropy_cost": (scoreCost*1 * (scoreCost*1 + 1))/2,
                 "entropy_dice_roll": roll,
+                "entropy_initiative": rollInitiative,
                 "entropy_dice": dice
             });
             calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
@@ -1415,7 +1542,7 @@
 	
 	// Function for calculating everything to do with Influence
 	function calcInfluence() {
-        getAttrs(["influence_score", "influence_dice_d20", "influence_cost_modifier", "influence_dice_modifier"], function(values) {
+        getAttrs(["influence_score", "influence_dice_d20", "influence_cost_modifier", "influence_dice_modifier", "initiative_advantage"], function(values) {
             var score = values.influence_score*1;
             if(score < 0) {
                 score = 0;
@@ -1430,14 +1557,18 @@
             var type = calcAttributeDiceType(score);
             var dice = number + type;
 			var roll = "";
+			var rollInitiative = "";
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				rollInitiative = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}&{tracker}]]";
 			} else {
 				roll = "[[" + values.influence_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				rollInitiative = "[[" + values.influence_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.initiative_advantage*1 + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
 			}
             setAttrs({
                 "influence_cost": (scoreCost*1 * (scoreCost*1 + 1))/2,
                 "influence_dice_roll": roll,
+                "influence_initiative": rollInitiative,
                 "influence_dice": dice
             });
             calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
@@ -1451,7 +1582,7 @@
 	
 	// Function for calculating everything to do with Movement
 	function calcMovement() {
-        getAttrs(["movement_score", "movement_dice_d20", "movement_cost_modifier", "movement_dice_modifier"], function(values) {
+        getAttrs(["movement_score", "movement_dice_d20", "movement_cost_modifier", "movement_dice_modifier", "initiative_advantage"], function(values) {
             var score = values.movement_score*1;
             if(score < 0) {
                 score = 0;
@@ -1466,14 +1597,18 @@
             var type = calcAttributeDiceType(score);
             var dice = number + type;
 			var roll = "";
+			var rollInitiative = "";
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				rollInitiative = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}&{tracker}]]";
 			} else {
 				roll = "[[" + values.movement_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				rollInitiative = "[[" + values.movement_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.initiative_advantage*1 + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
 			}
             setAttrs({
                 "movement_cost": (scoreCost*1 * (scoreCost*1 + 1))/2,
                 "movement_dice_roll": roll,
+                "movement_initiative": rollInitiative,
                 "movement_dice": dice
             });
             calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
@@ -1487,7 +1622,7 @@
 	
 	// Function for calculating everything to do with Protection
 	function calcPrescience() {
-        getAttrs(["prescience_score", "prescience_dice_d20", "prescience_cost_modifier", "prescience_dice_modifier"], function(values) {
+        getAttrs(["prescience_score", "prescience_dice_d20", "prescience_cost_modifier", "prescience_dice_modifier", "initiative_advantage"], function(values) {
             var score = values.prescience_score*1;
             if(score < 0) {
                 score = 0;
@@ -1502,14 +1637,18 @@
             var type = calcAttributeDiceType(score);
             var dice = number + type;
 			var roll = "";
+			var rollInitiative = "";
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				rollInitiative = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}&{tracker}]]";
 			} else {
 				roll = "[[" + values.prescience_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				rollInitiative = "[[" + values.prescience_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.initiative_advantage*1 + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
 			}
             setAttrs({
                 "prescience_cost": (scoreCost*1 * (scoreCost*1 + 1))/2,
                 "prescience_dice_roll": roll,
+                "prescience_initiative": rollInitiative,
                 "prescience_dice": dice
             });
             calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
@@ -1523,7 +1662,7 @@
 	
 	// Function for calculating everything to do with Protection
 	function calcProtection() {
-        getAttrs(["protection_score", "protection_dice_d20", "protection_cost_modifier", "protection_dice_modifier"], function(values) {
+        getAttrs(["protection_score", "protection_dice_d20", "protection_cost_modifier", "protection_dice_modifier", "initiative_advantage"], function(values) {
             var score = values.protection_score*1;
             if(score < 0) {
                 score = 0;
@@ -1538,14 +1677,18 @@
             var type = calcAttributeDiceType(score);
             var dice = number + type;
 			var roll = "";
+			var rollInitiative = "";
 			if(score === 0) {
 				roll = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}]]";
+				rollInitiative = "[[?{Do you have Advantage or Disadvantage?|Neither,1d20!!|Advantage,2d20!!kh1|Disadvantage,2d20!!kl1}&{tracker}]]";
 			} else {
 				roll = "[[" + values.protection_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|0}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "]]";
+				rollInitiative = "[[" + values.protection_dice_d20 + " + [[" + number + "+?{# of Advantage/Disadvantage Dice|" + values.initiative_advantage*1 + "}]]" + type + "k?{Do you have Advantage or Disadvantage?|Neither/Advantage,h|Disadvantage,l}" + number + "&{tracker}]]";
 			}
             setAttrs({
                 "protection_cost": (scoreCost*1 * (scoreCost*1 + 1))/2,
                 "protection_dice_roll": roll,
+                "protection_initiative": rollInitiative,
                 "protection_dice": dice
             });
             calcAttributePointsSpent();     // call to recalculate total costs, needs to be after new cost is set in setAttrs
@@ -1657,6 +1800,13 @@
             });
         });
     });
+	on("change:settingsFlagInitiative", function () {
+		getAttrs(["settingsFlagInitiative"], function(values) {
+			setAttrs({
+				"displaySettingsFlagInitiative": showHide(values.settingsFlagInitiative)
+			});
+		});
+	});
 
     on("change:agility_settings_flag", function() {
         getAttrs(["agility_settings_flag"], function(values) {
@@ -2399,7 +2549,7 @@ on("change:repeating_featsLeft", function() {
 <!-- Main body of Character Sheet -->
 <div class="container">     <!-- defines the width/height & behavior of the page -->
     <div class="row width100 padBottom">
-        <div class="column textSmall textRight padRight">Destructive Trance :: 2017.09.11 <span class="bold">Version 1.8.9.1 </span> <input class="settings" type="checkbox" name="attr_sheet_settings_flag" value="hide" /><span>y</span></div>
+        <div class="column textSmall textRight padRight">Destructive Trance, HP & Speed Revamp, Initiative, Default (Dis)Advantage :: 2017.09.11 <span class="bold">Version 1.8.9.3 </span> <input class="settings" type="checkbox" name="attr_sheet_settings_flag" value="hide" /><span>y</span></div>
     </div>
     <div class="row width100">
         <div class="column sliders inlineBlock textSmall bold">Character Info</div>
@@ -3712,10 +3862,13 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
             <div class="column width100 textLargest bold padTop">Hit Points</div>
             <div class="column width100 textSmall italic bold">Fortitude, Presence, & Will</div>
             <div class="width100">
-                <div class="column width50 inlineBlock borderRight textLarge italic bold">Current</div>
-                <div class="column width50 inlineBlock borderLeft textLarge italic bold">Max</div>
-                <div class="column width50 inlineBlock borderRight inputNumberLarge"><input type="number" name="attr_HP" value=0 /></div>
-                <div class="column width50 inlineBlock borderLeft inputNumberLarge"><input type="number" name="attr_HP_max" value=0 /></div>
+                <div class="column width30 inlineBlock textLarge italic bold">Current</div>
+                <div class="column width30 inlineBlock textLarge italic bold">Max</div>
+                <div class="column width20 inlineBlock textLarge italic bold">Lethal</div>
+                <div class="column width30 inlineBlock inputNumberLarge"><input type="number" name="attr_HP" value=0 /></div>
+                <div class="column width30 inlineBlock inputNumberLarge"><input type="number" name="attr_HP_max" value=0 /></div>
+                <div class="column width20 inlineBlock inputNumberLargeSkinny"><input type="number" name="attr_LethalDamage" value=0 /></div>
+				<input type="hidden" name="attr_lethal_damage" value=0 />
 				<input type="hidden" name="attr_hit_point" value=0 /><input type="hidden" name="attr_hit_point_max" value=0 />
                 <div class="width25 inlineBlock"></div>
                 <div class="column width30 inlineBlock bold">From Feats</div>
@@ -3750,28 +3903,52 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
 <!-- remove this to add Sanity back in (and corresponding 2 other areas)
         </div>
      <!-- Legend Points & Speed Section -->
-        <div class="speedLethalDamage">
-            <div class="width50 inlineBlock vertTop">
-                <div class="column width100 height5"></div>
-                <input type="hidden" name="attr_agility_initiative" value=0 />
-                <div class="column width100 textCenter textLarge speedButton"><button type="roll" name="roll_initiative" value="&{template:openLegend} {{title= Initiative Roll}} {{subTitle= @{character_name}}} {{subTitleAdd= Agility}} {{roll= @{agility_initiative}}} {{description= Make sure you selected your token to have it automatically added to the turn order.}}">Speed</span></button></div>
-                <div class="column width100 textCenter textSmall" style="line-height: 10px;">Click to roll Initiative</div>
-                <div class="column width100 vertTop inputNumber30 textSmall bold">Base <input type="number" name="attr_base_speed" value=30 /></div>
-                <div class="column width100 inputNumberLarge"><input type="number" name="attr_Speed" value=0 /></div>
-				<input type="hidden" name="attr_Speed4Token" value=0 />
-                <div class="width100 column inputNumber30 textSmall bold">Armor Penalty(ft) <input type="number" name="attr_armor_penalty" value=0 /></div>
-                <div class="width100 column  inputNumber30 textSmall bold">Armor Feat(ft) <input type="number" name="attr_armor_training" value=0 /></div>
-            </div>
-            <div class="width50 inlineBlock vertTop">
-                <div class="column width100 height10"></div>
-                <div class="column width5 inlineBlock"></div>
-                <div class="column width90 inlineBlock textCenter bold textLarge black">Lethal Damage</div>
-                <div class="column width5 inlineBlock"></div>
-                <div class="column width100" style="height: 29px;"></div>
-                <div class="column width100 inlineBlock inputNumberLarge"><input type="number" name="attr_LethalDamage" value=0 /></div>
-				<input type="hidden" name="attr_lethal_damage" value=0 />
-            </div>
+        <div class="column width100 textCenter textLargest bold padTop">Speed</div>
+        <div class="wealth">
+            <div class="width100 height15"></div>
+            <div class="column width100 inputNumber60 padTop"><input type="number" name="attr_Speed" value=30 /></div>
         </div>
+        <div class="column width100 vertTop inputNumber30 textSmall bold">Base <input type="number" name="attr_base_speed" value=30 /> Armor Penalty(ft) <input type="number" name="attr_armor_penalty" value=0 /> Feat(ft) <input type="number" name="attr_armor_training" value=0 /></div>
+		<input type="hidden" name="attr_Speed4Token" value=0 />
+        <div class="width15 inlineBlock vertTop padLeft"><input class="settings" type="checkbox" name="attr_settingsFlagInitiative" value="on" checked="checked" /><span>y</span></div>
+        <div class="column width35 inlineBlock textLarge speedButton"><button type="roll" name="roll_initiative" value="&{template:openLegend} {{title= Initiative Roll}} {{subTitle= @{character_name}}} {{subTitleAdd= @{select_initiative}}} {{roll= @{initiative}}} {{description= Make sure you selected your token to have it automatically added to the turn order.}}">Initiative</button></div>
+        <input type="hidden" class="displaySettingsFlagInitiative" name="attr_displaySettingsFlagInitiative" />
+        <div class="width100 displaySettingsInitiative padLeft">
+			<div class="column width50 inlineBlock textSmall bold">Attribute</div>
+			<div class="column width50 inlineBlock textSmall bold">Default (Dis)Advantage</div>
+            <input type="hidden" name="attr_initiative" value="@{agility_initiative}" />
+			<div class="column width50 inlineBlock inputSelect">
+				<select name="attr_select_initiative">
+                    <optgroup label="Physical">
+						<option value="Agility" selected="selected">Agility</option>
+						<option value="Fortitude">Fortitude</option>
+						<option value="Might">Might</option>
+					</optgroup>
+                    <optgroup label="Mental">
+						<option value="Learning">Learning</option>
+						<option value="Logic">Logic</option>
+						<option value="Perception">Perception</option>
+						<option value="Will">Will</option>
+					</optgroup>
+                    <optgroup label="Social">
+						<option value="Deception">Deception</option>
+						<option value="Persuasion">Persuasion</option>
+						<option value="Presence">Presence</option>
+					</optgroup>
+                    <optgroup label="Extraordinary">
+						<option value="Alteration">Alteration</option>
+						<option value="Creation">Creation</option>
+						<option value="Energy">Energy</option>
+						<option value="Entropy">Entropy</option>
+						<option value="Influence">Influence</option>
+						<option value="Movement">Movement</option>
+						<option value="Prescience">Prescience</option>
+						<option value="Protection">Protection</option>
+					</optgroup>
+				</select>
+			</div>
+			<div class="column width50 inlineBlock inputNumber30"><input type="number" name="attr_initiative_advantage" value=0 /></div>
+		</div>
      <!-- End Legend Points & Speed Section -->
      <!-- Wealth Level Information -->
         <div class="column width100 textLargest bold padTop">Wealth Level</div>
