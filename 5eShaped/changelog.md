@@ -11,6 +11,16 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 15.5.4
+
+### Bug Fixes
+
+* [#606: SRD Weapon drag incorrect](https://bitbucket.org/mlenser/5eshaped/issues/606/srd-weapon-drag-incorrect)
+* [#604: Actions issue upon monster import](https://bitbucket.org/mlenser/5eshaped/issues/604/actions-issue-upon-monster-import)
+* [#601: Racial Traits (Description and Slots Police)](https://bitbucket.org/mlenser/5eshaped/issues/601/racial-traits-description-and-slots-police)
+* [#602: When picking he psion spell components (Mental, Auditory, Visual etc.) the choice resets.](https://bitbucket.org/mlenser/5eshaped/issues/602/when-picking-he-psion-spell-components)
+* [#574: Every Monster Compendium Spear Multiplying](https://bitbucket.org/mlenser/5eshaped/issues/574/every-monster-compendium-spear-multiplying) NPC parsing of these has been turned off for now unless they come from the SRD. I'd like to have them work, but this is better than the sheet being overloaded. It looks like another change that roll20 made that steve mentioned. Blah.
+
 ## 15.5.3
 
 ### Bug Fixes
