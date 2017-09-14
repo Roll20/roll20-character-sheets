@@ -25,6 +25,10 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 ### Changelog
 
+### 1.3.1
+
+* Added "Weapons" subheader to combat section.
+
 ### 1.3.0
 
 * Duplicated weapon rolls to new Combat section where Common Rolls used to be.
