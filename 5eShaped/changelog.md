@@ -11,6 +11,40 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 15.5.3
+
+### Bug Fixes
+
+* Actions should now work, mostly. I've checked the following types:
+  * Actions with an attack (Guiding Bolt)
+  * Actions with a saving throw (Fireball)
+  * Actions without an attack or saving throw(Magic Missile)
+  * Actions with a heal (Cure Wounds)
+
+## 15.5.2
+
+### Bug Fixes
+
+* [#598: HP display is broken](https://bitbucket.org/mlenser/5eshaped/issues/598/hp-display-is-broken)
+* Some of [#597: Actions issues](https://bitbucket.org/mlenser/5eshaped/issues/597/actions-issues)
+
+## 15.5.1
+
+### Bug Fixes
+
+* [#594: Ability Scores not updating and crashing the page.](https://bitbucket.org/mlenser/5eshaped/issues/594/ability-scores-not-updating-and-crashing)
+* A myriad of other bugs involved in the [Roll20 breaking change](https://app.roll20.net/forum/permalink/5498180/) in their API. The sheet is still very laggy and I could use significant help identifying issues.
+
+## 15.5.0
+
+### Features
+
+* [#578: Provide skill totals](https://bitbucket.org/mlenser/5eshaped/issues/578/provide-skill-totals) will now make the total of each skill available for other resources like scripts. The attribute will be named as the skill is, so `Perception`, `Athletics`, etc. It will be the total modifier (without any + or - sign).
+
+### Bug Fixes
+
+* [#579: Multiple erroring classes are added and cannot be deleted](https://bitbucket.org/mlenser/5eshaped/issues/579/multiple-erroring-classes-are-added-and). It should automatically populate spellcasting now as well. I remember reading something about a change to repeating sections from roll20. Perhaps that was the cause of this as this area hasn't been touched in a while - hard to say.
+
 ## 15.4.0
 
 ### Features
