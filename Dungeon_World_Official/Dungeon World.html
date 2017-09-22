@@ -451,6 +451,14 @@
 						<input type="text" name="attr_gearname_base" value="" accept="Name" />
 						<span class="label">Gear Tags:</span>
 						<input type="text" name="attr_gear_tags" value="" accept="tags" />
+						<div class="flex-row">
+							<span>
+								<span class="label" data-i18n="value:">Value:</span><input type="number" name="attr_gear_value" value="0" accept="value" />
+							</span>
+							<span>
+								<span class="label" data-i18n="weight:">Weight:</span><input type="number" name="attr_gear_weight" accept="weight" \>
+							</span>
+						</div>
 						<div class="toggler flex-right">
 							<label>
 								<input type="checkbox" name="attr_gear_equipped" value="1" />
@@ -2359,29 +2367,6 @@ on("change:repeating_spells", function(eventInfo) {
 	});
 });
 
-	// setAttrs({levels_prepared:0}, null, function() {
-	// 	getSectionIDs("repeating_spells", function(ids) {
-	// 		var preparedLevels = [];
-	// 		for(var i=0; i < ids.length; i++) {
-	// 			preparedLevels.push("repeating_spells_" + ids[i] + "_calc_prepval");
-	// 		}
-	// 		getAttrs(preparedLevels, function(v) {
-	// 			_.each(v, function(prepval, attrName) {
-	// 				args = prepval.split("*");
-					
-	// 				newLevelsPrepared = newLevelsPrepared + args[0] * args[1];
-	// 			});
-
-	// 			setAttrs({
-	// 				levels_prepared: newLevelsPrepared
-	// 			});
-	// 		});
-	// 	});		
-	// });
-
-	//getAttrs(["repeating_spells_spell_prepared", "repeating_spells_spell_level", "levels_prepared"], null);
-
-
 
 on("change:repeating_spells:spell_prepared", function() {
 	getAttrs(["repeating_spells_spell_prepared","repeating_spells_spell_level"], function(v) {
@@ -2394,24 +2379,6 @@ on("change:repeating_spells:spell_prepared", function() {
 });
 
 
-/*
-on("change:repeating_spells:spell_prepared", function() {
-	getAttrs(["repeating_spells_spell_prepared","repeating_spells_spell_level","levels_prepared"], function(v) {
-		var finalPreparedSpells = v.levels_prepared;
-		if (v.repeating_spells_spell_prepared > 0 && v.repeating_spells_spell_level > 0) {
-			finalPreparedSpells++;
-		} else if (v.repeating_spells_spell_prepared == 0 && v.repeating_spells_spell_level > 0) {
-			if (finalPreparedSpells <= 1) {
-				finalPreparedSpells = 0;
-			} else {
-				finalPreparedSpells--;
-			}
-		}
-
-		setAttrs({levels_prepared: finalPreparedSpells});
-	});
-});
-*/
 
 on("change:repeating_spells:spell_level", function() {
 	getAttrs(["repeating_spells_spell_prepared", "repeating_spells_spell_level"], function(v) {
@@ -2483,9 +2450,6 @@ on("change:repeating_gear:gear_weight remove:repeating_gear", function() {
 				newLoad = newLoad + Number(weight);
 			});
 
-			// v.forEach( function(weight) {
-			// 	newLoad = newLoad + weight;
-			// });
 			setAttrs({
 				calc_load: newLoad
 			});
@@ -2538,6 +2502,7 @@ on("change:repeating_gear:gear_equipped change:repeating_gear:gear_type change:r
 	});
 });
 */
+
 // -------------------- //
 //   Global Mods Calcs  //
 // -------------------- //
@@ -2580,6 +2545,7 @@ on("change:repeating_gmods:enable_modifier change:repeating_gmods:dmg_on change:
 });
 
 // Set Armor Mod
+/*
 on("change:repeating_gmods:enable_modifier change:repeating_gmods:arm_on change:repeating_gmods:gmod_arm_mod", function() {
 	getAttrs(["repeating_gmods_enable_modifier", "repeating_gmods_arm_on", "repeating_gmods_gmod_arm_mod"], function(v) {
 		if (v.repeating_gmods_arm_on > 0 && v.repeating_gmods_enable_modifier > 0) {
@@ -2595,6 +2561,7 @@ on("change:repeating_gmods:enable_modifier change:repeating_gmods:arm_on change:
 		}
 	});
 });
+*/
 
 // Set global mods from all sections whenever one changes
 on("change:repeating_gmods", function(eventInfo) {
@@ -2673,29 +2640,28 @@ on("change:repeating_moves:comp_shortname", function(eventInfo) {
 // ------------------------------------------ //
 on("change:comp_name", function() {
 	getAttrs(["populate_moves", "comp_name", "comp_damagedie", "comp_classmoves", "comp_load", "strength_mod"], function(v) {
+		if (v.comp_name != "dropped") {
 		
-		// Populate all basic moves.
-		if (v.populate_moves == "all") {
-			addBasicMoves();
-			setAttrs({populate_moves: "classonly"});
-		}
-
-		// Populate the Class's starting moves
-		if (v.populate_moves == "all" || v.populate_moves == "classonly") {
-			var startingMoves = []
-			startingMoves = JSON.parse(v.comp_classmoves);
-
-			for (var i = 0, len = startingMoves.length; i < len; i++) {
-				log(shortName(startingMoves[i]));
-			  addMove(shortName(startingMoves[i]));
+			// Populate all basic moves.
+			if (v.populate_moves == "all") {
+				addBasicMoves();
+				setAttrs({populate_moves: "classonly"});
 			}
 
-			
-			setAttrs({
-				damagedie: v.comp_damagedie
-			});
-		}
+			// Populate the Class's starting moves
+			if (v.populate_moves == "all" || v.populate_moves == "classonly") {
+				var startingMoves = []
+				startingMoves = JSON.parse(v.comp_classmoves);
 
+				for (var i = 0, len = startingMoves.length; i < len; i++) {
+					addMove(shortName(startingMoves[i]));
+				}
+
+				setAttrs({
+					damagedie: v.comp_damagedie
+				});
+			}
+		}
 	});
 	setAttrs({comp_name: "dropped"}, "silent");
 });
