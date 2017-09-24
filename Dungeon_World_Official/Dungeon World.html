@@ -1,5 +1,6 @@
 <div class="container">
 
+<input type="hidden" name="attr_sheet_version" value="1.0.0">
 <input type="hidden" name="attr_populate_moves" value="all">
 <input type="hidden" name="attr_rolltype" value="2d6">
 <input type="hidden" name="attr_statmod_query" value="?{Stat|STR,@{strength_mod}[strength]|DEX, @{dexterity_mod}[dexterity]|CON, @{constitution_mod}[constitution]|INT, @{intelligence_mod}[intelligence]|WIS, @{wisdom_mod}[wisdom]|CHA, @{charisma_mod}[charisma]}">
@@ -10,6 +11,7 @@
 <input type="hidden" name="attr_equipment_dmg" value="0">
 <input type="hidden" name="attr_equipment_armor" value="0">
 <input type="hidden" name="attr_equipment_armormod" value="0">
+<input type="hidden" name="attr_equipment_totalarmor" value="0">
 
 <!-- 
 <input type="hidden" name="attr_level0_name" value="@{rotename}">
@@ -115,7 +117,7 @@
 			<button type="roll" name="roll_showarmor" value="&{template:dwgeneral} {{charname=@{character_name}}} {{infoname=^{armor}}} {{details=[[@{armor}]]}}">
 			<span class="label" data-i18n="armor-u">ARMOR</span>
 			</button>
-			<input type="number" name="attr_armor" value="0">
+			<input type="number" name="attr_armor" value="@{equipment_armor}+@{equipment_armormod}" disabled="true">
 		</div>
 		<div class="vital mid-header hp-container">
 			<button type="roll" name="roll_showhp" value="&{template:dwgeneral} {{charname=@{character_name}}} {{infoname=^{hitpoints}}} {{details=[[@{HP}]]&#47;[[@{HP|max}]]}}">
@@ -126,7 +128,7 @@
 			<input type="number" min="0" class="max-hitpoints" name="attr_HP_max" value="0">
 		</div>
 		<div class="vital mid-header damage-container">
-			<button type="roll" name="roll_damage" value="&{template:dwgeneral} {{charname=@{character_name}}} {{rollname=^{classdamage}}} {{result=[[@{damagedie} + @{global_dmg}]]}}">
+			<button type="roll" name="roll_damage" value="&{template:dwgeneral} {{charname=@{character_name}}} {{rollname=^{classdamage}}} {{result=[[@{damagedie} + @{equipment_dmg} + @{global_dmg}]]}}">
 			<span class="label" data-i18n="damage-u">DAMAGE</span>
 			</button>
 			<select name="attr_damagedie">
@@ -441,6 +443,7 @@
 					<button type="roll" name="roll_gear" value="&{template:dwgeneral} {{charname=@{character_name}}} {{infoname=@{gearname_base}}} {{details=@{geardetails}}}">
 					<span class="rolltext" name="attr_gear_name" value="@{gear_name}"></span>
 					</button>
+					<input type="hidden" name="attr_comp_gear_type" value="Item" accept="type">
 					<input type="hidden" name="attr_calc_gear_dmg" value="0">
 					<input type="hidden" name="attr_calc_gear_armor" value="0">
 					<input type="hidden" name="attr_calc_gear_armormod" value="0">
@@ -468,18 +471,18 @@
 						<br>
 						<div class="toggler gear-level-selector">
 							<label>
-								<input type="radio" class="gear-type-option" name="attr_gear_type" value="item" checked="checked"><span data-i18n="item">Item</span>
+								<input type="radio" class="gear-type-option" name="attr_gear_type" value="Item" checked="checked"><span data-i18n="item">Item</span>
 							</label>
 							<label>
-								<input type="radio" class="gear-type-option" name="attr_gear_type" value="weapon"><span data-i18n="weapon">Weapon</span>
+								<input type="radio" class="gear-type-option" name="attr_gear_type" value="Weapon"><span data-i18n="weapon">Weapon</span>
 							</label>
 							<label>
-								<input type="radio" class="gear-type-option" name="attr_gear_type" value="armor"><span data-i18n="armor">Armor</span>
+								<input type="radio" class="gear-type-option" name="attr_gear_type" value="Armor"><span data-i18n="armor">Armor</span>
 							</label>
 						</div>
-						<input type="radio" class="gear-item-expander invisible" name="attr_calc_gear_type" value="item" checked="checked">
-						<input type="radio" class="gear-weapon-expander invisible" name="attr_calc_gear_type" value="weapon">
-						<input type="radio" class="gear-armor-expander invisible" name="attr_calc_gear_type" value="armor">
+						<input type="radio" class="gear-item-expander invisible" name="attr_calc_gear_type" value="Item" checked="checked">
+						<input type="radio" class="gear-weapon-expander invisible" name="attr_calc_gear_type" value="Weapon">
+						<input type="radio" class="gear-armor-expander invisible" name="attr_calc_gear_type" value="Armor">
 						<div class="flex-row flex-right gear-item">
 							
 						</div>
@@ -2433,6 +2436,12 @@ on("change:repeating_gear:gearname_base", function() {
    });
 });
 
+on("change:repeating_gear:comp_gear_type", function() {
+	getAttrs(["repeating_gear_comp_gear_type"], function(v) {
+		setAttrs({repeating_gear_gear_type: v.repeating_gear_comp_gear_type});
+	});
+});
+
 on("change:repeating_gear:gear_type", function() {
 	getAttrs(["repeating_gear_gear_type"], function(v) {
 		setAttrs({repeating_gear_calc_gear_type: v.repeating_gear_gear_type});
@@ -2485,24 +2494,100 @@ on("change:subsection_priority_base", function() {
 });
 
 // --- Equipment Mods Calcs --- //
-// Set Armor
-/*
-on("change:repeating_gear:gear_equipped change:repeating_gear:gear_type change:repeating_gear:gear_base_armor change:repeating_gear:gear_add_armor", function() {
-	getAttrs(["repeating_gear_gear_equipped", "repeating_gear_gear_type", "repeating_gear_gear_base_armor", "repeating_gear_gear_add_armor"], function(v) {
-		if (v.repeating_gear_gear_type == "armor" && v.repeating_gear_gear_equipped > 0) {
-			var armor = v.repeating_gmods_gmod_ongoing_mod;
+// Set Mods within each repitem
+
+on("change:repeating_gear:gear_equipped change:repeating_gear:gear_type change:repeating_gear:gear_base_armor change:repeating_gear:gear_add_armor change:repeating_gear:gear_damage", function() {
+	getAttrs(["repeating_gear_gear_equipped", "repeating_gear_gear_type", "repeating_gear_gear_base_armor", "repeating_gear_gear_add_armor", "repeating_gear_gear_damage"], function(v) {
+		if (v.repeating_gear_gear_type == "Armor" && v.repeating_gear_gear_equipped > 0) {
+			var armor = v.repeating_gear_gear_base_armor;
 			if (armor === undefined || armor == "") armor = 0;
-			setAttrs({repeating_gmods_calc_ongoing: mod});
+			setAttrs({repeating_gear_calc_gear_armor: armor});
 		} else {
-			setAttrs({repeating_gmods_calc_ongoing: 0});
+			setAttrs({repeating_gear_calc_gear_armor: 0});
 		}
 
-		if (!v.repeating_gmods_enable_modifier > 0) {
-			setAttrs({repeating_gmods_calc_ongoing: 0});
+		if (v.repeating_gear_gear_type == "Armor" && v.repeating_gear_gear_equipped > 0) {
+			var armormod = v.repeating_gear_gear_add_armor;
+			if (armormod === undefined || armormod == "") armormod = 0;
+			setAttrs({repeating_gear_calc_gear_armormod: armormod});
+		} else {
+			setAttrs({repeating_gear_calc_gear_armormod: 0});
+		}
+
+		if (v.repeating_gear_gear_type == "Weapon" && v.repeating_gear_gear_equipped > 0) {
+			var damage = v.repeating_gear_gear_damage;
+			if (damage === undefined || damage == "") damage = 0;
+			setAttrs({repeating_gear_calc_gear_dmg: damage});
+		} else {
+			setAttrs({repeating_gear_calc_gear_dmg: 0});
 		}
 	});
 });
-*/
+
+
+// Set equipment mods from all sections whenever one changes
+on("change:repeating_gear", function(eventInfo) {
+	getSectionIDs("repeating_gear", function(ids) {
+		var dmgMods = [];
+		for(var i=0; i < ids.length; i++) {
+			var attr = "repeating_gear_" + ids[i] + "_calc_gear_dmg";
+			dmgMods.push(attr);
+		}
+		var armMods = [];
+		for(var i=0; i < ids.length; i++) {
+			var attr = "repeating_gear_" + ids[i] + "_calc_gear_armormod";
+			armMods.push(attr);
+		}
+		var armorVals = [];
+		for(var i=0; i < ids.length; i++) {
+			var attr = "repeating_gear_" + ids[i] + "_calc_gear_armor";
+			armorVals.push(attr);
+		}
+
+		getAttrs(armMods, function(v) {
+			var newGearArmorMod = "0";
+			_.each(v, function(val, attrName) {
+				newGearArmorMod = newGearArmorMod.concat("+").concat("(" + val + ")");
+			});
+
+			newGearArmorMod = "(" + newGearArmorMod + ")";
+			newGearArmorMod = newGearArmorMod.replace(/\+\(0\)/g, "");
+
+			console.log("Setting armormod to: " + newGearArmorMod)
+			setAttrs({
+				equipment_armormod: newGearArmorMod
+			});
+		});
+
+		getAttrs(dmgMods, function(v) {
+			var newGearDmg = "0";
+			_.each(v, function(val, attrName) {
+				if (+val > newGearDmg) newGearDmg = val;
+			});
+
+			newGearDmg = "(" + newGearDmg + ")[Equipped Weapon]";
+
+			setAttrs({
+				equipment_dmg: newGearDmg
+			});
+		});
+
+		getAttrs(armorVals, function(v) {
+			var newGearArmor = "0";
+			_.each(v, function(val, attrName) {
+				if (+val > newGearArmor) newGearArmor = val;
+			});
+
+			newGearArmor = "(" + newGearArmor + ")";
+
+			setAttrs({
+				equipment_armor: newGearArmor
+			});
+		});
+	});
+
+});
+
 
 // -------------------- //
 //   Global Mods Calcs  //
