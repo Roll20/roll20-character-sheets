@@ -11,6 +11,12 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 15.5.5
+
+### Bug Fixes
+
+* [#611: Ammo weight not being tracked](https://bitbucket.org/mlenser/5eshaped/issues/611/ammo-weight-not-being-tracked)
+
 ## 15.5.4
 
 ### Bug Fixes
