@@ -5,6 +5,25 @@
 
 ### Changelog
 
+### 1.8.9.5 on 2017 September 12th
+* Default (dis)advantage number for Actions & Attributes
+	- Can now enter a default (dis)advantage amount for all action & attributes
+	- The pop-up to ask you the number of (dis)advantage will be populated with this number now
+		- This allows you to still modify it if you have additional above or below your default
+
+### 1.8.9.3 on 2017 September 11th
+* GUI update to HP & Speed
+	- Lethal Damage combined with Current & Max HP lines
+	- Speed made with ribbon, and taking up less space
+	- Initiative made a seperate button
+* Initiative Advanced Options
+	- Drop down to pick which Attribute to use (from attribute Sub, etc)
+	- Ability to enter a default (dis)advantage number
+	
+### 1.8.9.1 on 2017 September 11th
+* Made Destructive Trance Checkbox for Actions, Other Actiosn, and Legendary Items
+	- Allows explosions on 1 less than max die size
+
 ### 1.8.9 on 2017 August 14th
 * Made the 2 columns into just 1 column for Feats, Perks, & Flaws
 	- Code that auto combines the two columns into 1 new so no data lost
