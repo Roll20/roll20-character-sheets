@@ -1,6 +1,6 @@
 <div class="container">
 
-<input type="hidden" name="attr_sheet_version" value="1.0.0">
+<input type="hidden" name="attr_sheet_version" value="110">
 <input type="hidden" name="attr_populate_moves" value="all">
 <input type="hidden" name="attr_rolltype" value="2d6">
 <input type="hidden" name="attr_statmod_query" value="?{Stat|STR,@{strength_mod}[strength]|DEX, @{dexterity_mod}[dexterity]|CON, @{constitution_mod}[constitution]|INT, @{intelligence_mod}[intelligence]|WIS, @{wisdom_mod}[wisdom]|CHA, @{charisma_mod}[charisma]}">
@@ -28,6 +28,58 @@
 <span class="invisible" tabindex="-1" data-i18n="cantrip">Cantrip</span>
 
 
+<input type="checkbox" class="invisible is-npc" tabindex="-1" name="attr_calc_isNPC" value="1" />
+
+<div class="npc-toggler">
+	<input type="checkbox" class="invisible is-npc-label-sib" name="attr_calc_isNPC" value="1" />
+	<label>
+		<input type="checkbox" value="1" class="npc-toggler-checkbox" name="attr_isNPC" />
+	</label>
+</div>
+
+<div class="npc-container">
+	<div class="npc-header">
+		<span class="flex-row">
+			<span><input type="text" class="npc-name" name="attr_character_name"></span>
+			<span><span data-i18n="tags:">Tags: </span><input type="text" class="npc-tags" name="attr_NPC_tags"></span>
+		</span>
+		<span class="flex-row">
+			<span>
+				<input type="text" class="npc-attack-name" name="attr_NPC_attack_name">
+				<input type="text" class="npc-attack-roll" name="attr_NPC_attack_roll">
+				<button type="roll" name="roll_NPC_attack" value="&{template:dwgeneral} {{charname=@{character_name}}} {{rollname=@{NPC_attack_name}}} {{result=[[@{NPC_attack_roll}]]}}">damage</button>
+				<input type="text" class="npc-attack-extrainfo">
+			</span>
+			<span>
+				<input type="number" class="npc-hp" name="attr_HP"> / <input type="number" class="npc-hp" name="attr_HP_max"><span data-i18n="hp-u">HP</span>
+				<input type="number" class="npc-armor" name="attr_NPC_armor"><span data-i18n="armor">Armor</span>
+			</span>
+		</span>
+		<span class="flex-row flex-left">
+			<input type="text" class="npc-tags" name="attr_NPC_weapontags">
+		</span>
+		<span class="flex-row flex-left">
+			<span data-i18n="special-qualities:"><em>Special Qualities: </em></span>
+			<input type="text" class="npc-qualities" name="attr_NPC_qualities">
+		</span>
+	</div>
+	<div class="npc-main">
+		<div>
+			<textarea class="npc-description" name="attr_NPC_description"></textarea>
+		</div>
+		<div class="npc-extras">
+			<span data-i18n="instinct:"><em>Instinct: </em></span>
+			<input type="text" class="npc-instinct" name="attr_NPC_instinct">
+			<br />
+			<span data-i18n="moves" class="label">Moves</span>
+			<fieldset class="repeating_NPCmoves">
+				<div class="npc-moves">
+					&bull; <input type="text" class="npc-move" name="attr_NPC_move" />
+				</div>
+			</fieldset>
+		</div>
+	</div>
+</div>
 <div class="top-container">
 	<div class="gamebanner">
 		<img src="http://i.imgur.com/xXoBzkm.png" alt="Dungeon World">
@@ -2218,6 +2270,12 @@ on("change:page", function() {
 		setAttrs({calc_page:v.page});
 	});
 });
+
+on("change:isNPC", function () {
+	getAttrs(["isNPC"], function(v) {
+		setAttrs({calc_isNPC: v.isNPC});
+	});
+})
 
 
 var calculateMod = function(attribute) {
