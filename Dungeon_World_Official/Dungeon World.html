@@ -493,13 +493,14 @@
 		<div class="mid-content gear">
 			<fieldset class="repeating_gear">
 				<div class="gear-main compendium-drop-target">
-					<button type="roll" name="roll_gear" value="&{template:dwgeneral} {{charname=@{character_name}}} {{infoname=@{gearname_base}}} {{details=@{geardetails}}}">
+					<button type="roll" name="roll_gear" value="&{template:dwgeneral} {{charname=@{character_name}}} {{infoname=@{gearname_base}}} {{tags=@{gear_tags}}} {{details=@{geardetails}}} {{doroll=[[@{gear_doroll}]]}} {{result=[[@{damagedie} + @{gear_damage} + @{global_dmg}]]}}">
 					<span class="rolltext" name="attr_gear_name" value="@{gear_name}"></span>
 					</button>
 					<input type="hidden" name="attr_comp_gear_type" value="Item" accept="type">
 					<input type="hidden" name="attr_calc_gear_dmg" value="0">
 					<input type="hidden" name="attr_calc_gear_armor" value="0">
 					<input type="hidden" name="attr_calc_gear_armormod" value="0">
+					<input type="hidden" name="attr_gear_doroll" value="0">
 					<input class="expander expand-gear" type="checkbox" name="attr_expand_gear" value="1" title="Details" checked="checked"  />
 					<span> </span>
 					<div class="gear-expansion">
@@ -806,13 +807,30 @@
 	{{#infoname}}
 	<div class="rt-header rt-header-minor">{{charname}} <span data-i18n="displays">displays</span> {{infoname}}</div>
 	{{/infoname}}
+	{{#tags}}
+	<div class="rt-header rt-header-minor"><em>{{tags}}</em></div>
+	{{/tags}}
 	<div class="rt-content">
-		{{#result}}
-		<div class="rt-row">
-			<span class="label rt-label" data-i18n="move-roll">Roll:</span>
-			<span class="rt-value rt-text">{{result}}</span>
-		</div>
-		{{/result}}
+		{{#doroll}}
+			{{#rollGreater() doroll 0}}
+			{{#result}}
+			<div class="rt-row">
+				<span class="label rt-label" data-i18n="move-roll">Roll:</span>
+				<span class="rt-value rt-text">{{result}}</span>
+			</div>
+			{{/result}}
+			{{/rollGreater() doroll 0}}
+		{{/doroll}}
+		{{^doroll}}
+			{{#rollGreater() doroll 0}}
+			{{#result}}
+			<div class="rt-row">
+				<span class="label rt-label" data-i18n="move-roll">Roll:</span>
+				<span class="rt-value rt-text">{{result}}</span>
+			</div>
+			{{/result}}
+			{{/rollGreater() doroll 0}}
+		{{/doroll}}
 		{{#details}}
 		<div class="rt-row">
 			<span class="rt-value rt-text">{{details}}</span>
@@ -2504,6 +2522,11 @@ on("change:repeating_gear:comp_gear_type", function() {
 on("change:repeating_gear:gear_type", function() {
 	getAttrs(["repeating_gear_gear_type"], function(v) {
 		setAttrs({repeating_gear_calc_gear_type: v.repeating_gear_gear_type});
+		if (v.repeating_gear_gear_type == "Weapon") {
+			setAttrs({repeating_gear_gear_doroll: 1});
+		} else {
+			setAttrs({repeating_gear_gear_doroll: 0});
+		}
 	});
 });
 
