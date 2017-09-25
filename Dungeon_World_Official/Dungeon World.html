@@ -170,7 +170,7 @@
 			<button type="roll" name="roll_showarmor" value="&{template:dwgeneral} {{charname=@{character_name}}} {{infoname=^{armor}}} {{details=[[@{armor}]]}}">
 			<span class="label" data-i18n="armor-u">ARMOR</span>
 			</button>
-			<input type="number" name="attr_armor" value="@{equipment_armor}+@{equipment_armormod}" disabled="true">
+			<input type="number" name="attr_armor" value="@{equipment_armor}+@{equipment_armormod}+@{global_arm}" disabled="true">
 		</div>
 		<div class="vital mid-header hp-container">
 			<button type="roll" name="roll_showhp" value="&{template:dwgeneral} {{charname=@{character_name}}} {{infoname=^{hitpoints}}} {{details=[[@{HP}]]&#47;[[@{HP|max}]]}}">
@@ -822,14 +822,12 @@
 			{{/rollGreater() doroll 0}}
 		{{/doroll}}
 		{{^doroll}}
-			{{#rollGreater() doroll 0}}
 			{{#result}}
 			<div class="rt-row">
 				<span class="label rt-label" data-i18n="move-roll">Roll:</span>
 				<span class="rt-value rt-text">{{result}}</span>
 			</div>
 			{{/result}}
-			{{/rollGreater() doroll 0}}
 		{{/doroll}}
 		{{#details}}
 		<div class="rt-row">
@@ -2697,9 +2695,15 @@ on("change:repeating_gmods:enable_modifier change:repeating_gmods:dmg_on change:
 		if (v.repeating_gmods_dmg_on > 0 && v.repeating_gmods_enable_modifier > 0) {
 			var dieCount = v.repeating_gmods_gmod_dmg_diecount;
 			var dmgMod = v.repeating_gmods_gmod_dmg_mod;
+			var dmgDie = v.repeating_gmods_gmod_dmg_die;
 			if (dieCount === undefined || dieCount == "") dieCount = 0;
+			if (Number(dieCount) == 0) dmgDie = 0;
 			if (dmgMod === undefined || dmgMod == "") dmgMod = 0;
-			dmgRoll = "".concat(dieCount).concat(v.repeating_gmods_gmod_dmg_die).concat("+").concat(dmgMod);
+			if (Number(dieCount) < 0) {
+				dmgRoll = "0".concat(dieCount).concat(dmgDie).concat("+").concat(dmgMod);
+			} else {
+				dmgRoll = "".concat(dieCount).concat(dmgDie).concat("+").concat(dmgMod);
+			}
 			setAttrs({repeating_gmods_calc_dmg: dmgRoll});
 		}
 		else {
