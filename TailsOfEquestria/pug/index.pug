@@ -20,6 +20,15 @@ include fields.pug
         +option('loyalty')
         +option('magic')
         +option('other')
+      //
+        div.colors
+          span.mane
+            label Mane Color:
+              +input('color', 'mane_color')
+          span.coat
+            label Coat Color:
+              +input('color', 'coat_color')
+        
     .friendshipTokens
       h1
         span F
@@ -77,24 +86,39 @@ include fields.pug
   
   div
     .talents
-      mixin talent(isCutieMark)
-        - var prefix = isCutieMark ? 'talent_cutieMark_' : '';
-        .talent(class=isCutieMark ? 'talentCutieMark' : '')
+      mixin talent(prefix)
+        - 
+          prefix = prefix || '';
+          var isCutieMark = prefix === 'talent_cutieMark_';
+          var isRacial = prefix === 'talent_racial_';
+        .talent(class=isCutieMark ? 'isCutieMark' : '')
           if(isCutieMark)
-            label CM:
+            label Cutie Mark:
+          else if(isRacial)
+            label Racial:
           else
             label T:
-          button(type='roll', value='&{template:toe} {{charName=@{character_name}}} {{attr=@{' + prefix + 'name}}} {{result=[[@{' + prefix + 'equation}]]}} {{notes=@{' + prefix + 'notes}}}')
+          // button(type='roll', value='&{template:toe} {{charName=@{character_name}}} {{maneColor=@{mane_color}}} {{coatColor=@{coat_color}}} {{attr=@{' + prefix + 'name}}} {{result=[[@{' + prefix + 'equation}]]}} {{notes=@{' + prefix + 'notes}}} {{upgrade=@{' + prefix + 'upgrade}}} {{downgrade=@{' + prefix + 'downgrade}}}')
+          +rollButton({
+            attr: '@{' + prefix + 'name}',
+            result: prefix + 'equation',
+            notes: prefix + 'notes',
+            upgrade: prefix + 'upgrade',
+            downgrade: prefix + 'downgrade'
+          })
           +labelledUnderlined(''): +input('text', prefix + 'name')
           +labelledUnderlined('Dice:'): +selectDice(prefix + 'dice')
           +labelledUnderlined('Trait'): +selectTrait(prefix + 'trait')
-          +labelledUnderlined('Notes:'): +input('text', prefix + 'notes')
+          +labelledUnderlined('Upgrade Steps')(style='width: 0.5in;'): +input('number', prefix + 'upgrade')
+          +labelledUnderlined('Downgrade Steps')(style='width: 0.6in;'): +input('number', prefix + 'downgrade')
+          +labelledUnderlined('Notes:')(style='width: 2in;'): +input('text', prefix + 'notes')
           +input('hidden', prefix + 'equation')
 
       h1 Talents:
-      +talent(true)
+      +talent('talent_cutieMark_')
+      +talent('talent_racial_')
       +repeating('talents')
-        +talent(false)      
+        +talent('')      
   div
     .quirks
       mixin quirk(isMain)

@@ -1,6 +1,6 @@
 # D&D 5e Shaped character sheet
 
-## [Issue tracker](https://bitbucket.org/mlenser/5eshaped/issues?status=new&status=open&sort=-priority)
+## [Issue tracker](https://bitbucket.org/mlenser/5eshaped/issues?sort=-updated_on)
 Please report any issues on the issue tracker.
 
 *If you're experiencing extreme lag please disable LastPass as it is known to cause problems with Roll20. This has nothing to do with the Shaped sheet.*
