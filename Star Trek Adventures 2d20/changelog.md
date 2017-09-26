@@ -2,6 +2,12 @@
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 1.2
+
+### Bug Fixes
+
+* Cleaner calculation, removal of restrictions on fields (was interfering with NPCs), changed number fields to text fields to correct numbers not changing behavior.
+
 ## 1.1
 
 ### Features
