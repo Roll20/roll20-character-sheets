@@ -500,6 +500,7 @@
 					<input type="hidden" name="attr_calc_gear_dmg" value="0">
 					<input type="hidden" name="attr_calc_gear_armor" value="0">
 					<input type="hidden" name="attr_calc_gear_armormod" value="0">
+					<input type="hidden" name="attr_calc_gear_weight" value="0">
 					<input type="hidden" name="attr_gear_doroll" value="0">
 					<input class="expander expand-gear" type="checkbox" name="attr_expand_gear" value="1" title="Details" checked="checked"  />
 					<span> </span>
@@ -511,6 +512,9 @@
 						<div class="flex-row">
 							<span>
 								<span class="label" data-i18n="value:">Value:</span><input type="number" name="attr_gear_value" value="0" accept="Value" />
+							</span>
+							<span>
+								<span class="label" data-i18n="qty:">Qty:</span><input type="number" name="attr_gear_quantity" value="1" />
 							</span>
 							<span>
 								<span class="label" data-i18n="weight:">Weight:</span><input type="number" name="attr_gear_weight" accept="Weight" \>
@@ -571,7 +575,7 @@
 		<div class="mid-content spells">
 			<fieldset class="repeating_spells">
 				<div class="spell-main compendium-drop-target">
-					<button type="roll" name="roll_spell" value="&{template:spell} {{charname=@{character_name}}} {{spellname=@{spellname_base}}} {{doroll=[[@{spell_doroll}]]}} {{result=[[@{spell_diecount}@{spell_die} + @{spellmod}]]}} {{level=[[@{spell_level}]]}} {{details=@{spelldetails}}}">
+					<button type="roll" name="roll_spell" value="&{template:spell} {{charname=@{character_name}}} {{spellname=@{spellname_base}}} {{doroll=[[@{spell_doroll}]]}} {{tags=@{spell_tags}}} {{result=[[@{spell_diecount}@{spell_die} + @{spellmod}]]}} {{level=[[@{spell_level}]]}} {{details=@{spelldetails}}}">
 					<span class="rolltext" name="attr_spell_name" value="@{spell_name}"></span>
 					</button>
 					<input type="hidden" name="attr_comp_spell_level" value="-1" accept="Level">
@@ -769,6 +773,9 @@
 	{{#rollGreater() level 0}}
 	<div class="rt-header rt-header-minor"><span class="rt-text" data-i18n="level:">Level: </span>{{level}}</div>
 	{{/rollGreater() level 0}}
+	{{#tags}}
+	<div class="rt-header rt-header-minor"><span class="rt-text">{{tags}}</span></div>
+	{{/tags}}
 	<div class="rt-content">
 		{{#modifiers}}
 		<div class="rt-row">
@@ -2529,11 +2536,23 @@ on("change:repeating_gear:gear_type", function() {
 	});
 });
 
-on("change:repeating_gear:gear_weight remove:repeating_gear", function() {
+on("change:repeating_gear:gear_weight change:repeating_gear:gear_quantity", function() {
+	getAttrs(["repeating_gear_gear_weight", "repeating_gear_gear_quantity"], function(v) {
+		var weight = v.repeating_gear_gear_weight;
+		var quantity = v.repeating_gear_gear_quantity;
+		if (isNaN(weight)) weight = 0;
+		if (isNaN(quantity)) quantity = 0;
+		setAttrs({
+			repeating_gear_calc_gear_weight: +weight * +quantity
+		});
+	})
+})
+
+on("change:repeating_gear:calc_gear_weight remove:repeating_gear", function() {
 	getSectionIDs("repeating_gear", function(ids) {
 		var gearWeights = [];
 		for(var i=0; i < ids.length; i++) {
-			gearWeights.push("repeating_gear_" + ids[i] + "_gear_weight");
+			gearWeights.push("repeating_gear_" + ids[i] + "_calc_gear_weight");
 		}
 		getAttrs(gearWeights, function(v) {
 			var newLoad = 0;
