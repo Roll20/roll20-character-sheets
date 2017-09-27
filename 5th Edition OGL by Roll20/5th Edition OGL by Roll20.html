@@ -1322,9 +1322,9 @@
                                         <option data-i18n="other-u">OTHER</option>
                                     </select>
                                 </div>
-                                <div class="row">
+                                <div class="row" style="margin-bottom: 3px;">
                                     <span data-i18n="proficency-u">PROFICIENCY</span><span>:</span>
-                                    <input type="text" name="attr_name" style="width: 120px;">
+                                    <input type="text" name="attr_name" style="width: 165px;" placeholder="Elven, Dwarven, and Common">
                                 </div>
                             </div>
                             <div class="display" style="margin-bottom: 2px;">
@@ -1633,7 +1633,7 @@
             </div>
         </div>
         <div class="col col3">
-            <div class="textbox">
+            <div class="textbox pibf">
                 <input class="options-flag" type="checkbox" name="attr_options-flag-personality" checked="checked"><span>y</span>
                 <div class="options">
                     <textarea name="attr_personality_traits" style="min-height: 50px; height: 50px;"></textarea>
@@ -1643,7 +1643,7 @@
                 </div>
                 <span class="label" data-i18n="personality-traits-u">PERSONALITY TRAITS</span>
             </div>
-            <div class="textbox">
+            <div class="textbox pibf">
                 <input class="options-flag" type="checkbox" name="attr_options-flag-ideals" checked="checked"><span>y</span>
                 <div class="options">
                     <textarea name="attr_ideals"></textarea>
@@ -1653,7 +1653,7 @@
                 </div>
                 <span class="label" data-i18n="ideals-u">IDEALS</span>
             </div>
-            <div class="textbox">
+            <div class="textbox pibf">
                 <input class="options-flag" type="checkbox" name="attr_options-flag-bonds" checked="checked"><span>y</span>
                 <div class="options">
                     <textarea name="attr_bonds"></textarea>
@@ -1663,7 +1663,7 @@
                 </div>
                 <span class="label" data-i18n="bonds-u">BONDS</span>
             </div>
-            <div class="textbox">
+            <div class="textbox pibf">
                 <input class="options-flag" type="checkbox" name="attr_options-flag-flaws" checked="checked"><span>y</span>
                 <div class="options">
                     <textarea name="attr_flaws" style="min-height: 46px; height: 46px;"></textarea>
@@ -1760,6 +1760,7 @@
                 </div>
                 <span class="label" data-i18n="feats-traits-u" style="margin-top: 0px; position: absolute; bottom: 0px;">FEATURES & TRAITS</span>
             </div>
+            <input type="hidden" class="missing-info-flag" name="attr_missing_info">
             <div class="missing-info">
                 <span><span class="info-popup pictos">i</span> Looking for missing data?</span>
                 <span class="missing-info-desc">Your data is in the simple version that can be re-enabled from the Settings(gear) tab of the character sheet. Under GENERAL OPTIONS and then FEATS & TRAITS. Set the section to be 'Simple'.</span>
@@ -4736,9 +4737,6 @@
                 <div class="desc">
                     <span>{{globaldamage}}{{#globaldamagecrit}}<span class="plus"> + </span>{{globaldamagecrit}}{{/globaldamagecrit}}</span>
                     <span class="sublabel">{{globaldamagetype}}</span>
-                    <div class="label">
-                        <span data-i18n="global-damage">Global Damage Modifier</span>
-                    </div>
                 </div>
             {{/^rollTotal() globaldamage 0}}
         {{/globaldamage}}
@@ -4944,10 +4942,7 @@
                             {{/disadvantage}}
                         {{/attack}}
                     </span>
-                    <span class="sublabel">{{dmg1type}}</span>
-                    <div class="label">
-                        <span data-i18n="global-damage">Global Damage Modifier</span>
-                    </div>
+                    <span class="sublabel">{{globaldamagetype}}</span>
                 </div>
             {{/^rollTotal() globaldamage 0}}
         {{/globaldamage}}
@@ -5440,7 +5435,7 @@
     on("sheet:opened", function() {
         cleanup_drop_fields();
         versioning();
-        check_old_npc_spells();
+        v2_old_values_check();
     });
 
     on("sheet:compendium-drop", function() {
@@ -5859,7 +5854,6 @@
     });
 
     on("change:repeating_inventory:itemmodifiers change:repeating_inventory:equipped", function(eventinfo) {
-        console.log(eventinfo);
         if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {
             return;
         }
@@ -7128,7 +7122,7 @@
         getAttrs([resourceid, resourceid + "_name"], function(v) {
             update["repeating_inventory_" + itemid + "_itemcount"] = v[resourceid];
             update["repeating_inventory_" + itemid + "_itemname"] = v[resourceid + "_name"];
-            setAttrs(update, {silent: true});
+            setAttrs(update, {silent: true}, update_weight());
         });
     };
 
@@ -7505,7 +7499,7 @@
                 }
                 if(v.dtype === "full") {
                     pickbase = "full";
-                    rollbase = "@{wtype}&{template:atkdmg} {{mod=@{atkbonus}}} {{rname=@{atkname}}} {{r1=[[" + r1 + "cs>@{atkcritrange}" + hbonus + "]]}} " + r2 + "cs>@{atkcritrange}" + hbonus + "]]}} @{atkflag} {{range=@{atkrange}}} @{dmgflag} {{dmg1=[[" + hdmg1 + "]]}} {{dmg1type=" + dmgtype + "}} @{dmg2flag} {{dmg2=[[" + hdmg2 + "]]}} {{dmg2type=" + dmg2type + "}} {{crit1=[[" + crit1 + "[CRIT]]]}} {{crit2=[[" + crit2 + "[CRIT]]]}} @{saveflag} {{desc=@{atk_desc}}} @{hldmg} " + hldmgcrit + " {{spelllevel=@{spelllevel}}} @{global_attack_mod} @{global_damage_mod} " + global_crit + " {{globaldamagetype=@{global_damage_type}}} ammo=@{ammo} @{charname_output}";
+                    rollbase = "@{wtype}&{template:atkdmg} {{mod=@{atkbonus}}} {{rname=@{atkname}}} {{r1=[[" + r1 + "cs>@{atkcritrange}" + hbonus + "]]}} " + r2 + "cs>@{atkcritrange}" + hbonus + "]]}} @{atkflag} {{range=@{atkrange}}} @{dmgflag} {{dmg1=[[" + hdmg1 + "]]}} {{dmg1type=" + dmgtype + "}} @{dmg2flag} {{dmg2=[[" + hdmg2 + "]]}} {{dmg2type=" + dmg2type + "}} {{crit1=[[" + crit1 + "[CRIT]]]}} {{crit2=[[" + crit2 + "[CRIT]]]}} @{saveflag} {{desc=@{atk_desc}}} @{hldmg} " + hldmgcrit + " {{spelllevel=@{spelllevel}}} @{global_attack_mod} @{global_damage_mod} @{global_damage_mod_crit} {{globaldamagetype=@{global_damage_type}}} ammo=@{ammo} @{charname_output}";
                 }
                 else if(v["repeating_attack_" + attackid + "_atkflag"] && v["repeating_attack_" + attackid + "_atkflag"] != 0) {
                     pickbase = "pick";
@@ -7520,7 +7514,7 @@
                     rollbase = "@{wtype}&{template:dmg} {{rname=@{atkname}}} @{atkflag} {{range=@{atkrange}}} @{saveflag} {{desc=@{atk_desc}}} {{spelllevel=@{spelllevel}}} ammo=@{ammo} @{charname_output}"
                 }
                 update["repeating_attack_" + attackid + "_rollbase_dmg"] = "@{wtype}&{template:dmg} {{rname=@{atkname}}} @{atkflag} {{range=@{atkrange}}} @{dmgflag} {{dmg1=[[" + hdmg1 + "]]}} {{dmg1type=" + dmgtype + "}} @{dmg2flag} {{dmg2=[[" + hdmg2 + "]]}} {{dmg2type=" + dmg2type + "}} @{saveflag} {{desc=@{atk_desc}}} @{hldmg} {{spelllevel=@{spelllevel}}} @{global_damage_mod} {{globaldamagetype=@{global_damage_type}}} @{charname_output}";
-                update["repeating_attack_" + attackid + "_rollbase_crit"] = "@{wtype}&{template:dmg} {{crit=1}} {{rname=@{atkname}}} @{atkflag} {{range=@{atkrange}}} @{dmgflag} {{dmg1=[[" + hdmg1 + "]]}} {{dmg1type=" + dmgtype + "}} @{dmg2flag} {{dmg2=[[" + hdmg2 + "]]}} {{dmg2type=" + dmg2type + "}} {{crit1=[[" + crit1 + "]]}} {{crit2=[[" + crit2 + "]]}} @{saveflag} {{desc=@{atk_desc}}} @{hldmg} " + hldmgcrit + " {{spelllevel=@{spelllevel}}} @{global_damage_mod} " + global_crit + " {{globaldamagetype=@{global_damage_type}}} @{charname_output}"
+                update["repeating_attack_" + attackid + "_rollbase_crit"] = "@{wtype}&{template:dmg} {{crit=1}} {{rname=@{atkname}}} @{atkflag} {{range=@{atkrange}}} @{dmgflag} {{dmg1=[[" + hdmg1 + "]]}} {{dmg1type=" + dmgtype + "}} @{dmg2flag} {{dmg2=[[" + hdmg2 + "]]}} {{dmg2type=" + dmg2type + "}} {{crit1=[[" + crit1 + "]]}} {{crit2=[[" + crit2 + "]]}} @{saveflag} {{desc=@{atk_desc}}} @{hldmg} " + hldmgcrit + " {{spelllevel=@{spelllevel}}} @{global_damage_mod} @{global_damage_mod_crit} {{globaldamagetype=@{global_damage_type}}} @{charname_output}"
                 update["repeating_attack_" + attackid + "_atkbonus"] = bonus;
                 update["repeating_attack_" + attackid + "_atkdmgtype"] = dmg + dmgspacer + dmg2 + dmgmag + " ";
                 update["repeating_attack_" + attackid + "_rollbase"] = rollbase;
@@ -8356,97 +8350,151 @@
 
     var update_challenge = function() {
         getAttrs(["npc_challenge"], function(v) {
+            var update = {};
             var xp = 0;
+            var pb = 0;
             switch(v.npc_challenge) {
                 case "0":
                     xp = "10";
+                    pb = 2;
                     break;
                 case "1/8":
                     xp = "25";
+                    pb = 2;
                     break;
                 case "1/4":
                     xp = "50";
+                    pb = 2;
                     break;
                 case "1/2":
                     xp = "100";
+                    pb = 2;
                     break;
                 case "1":
                     xp = "200";
+                    pb = 2;
                     break;
                 case "2":
                     xp = "450";
+                    pb = 2;
                     break;
                 case "3":
                     xp = "700";
+                    pb = 2;
                     break;
                 case "4":
                     xp = "1100";
+                    pb = 2;
                     break;
                 case "5":
                     xp = "1800";
+                    pb = 3;
                     break;
                 case "6":
                     xp = "2300";
+                    pb = 3;
                     break;
                 case "7":
                     xp = "2900";
+                    pb = 3;
                     break;
                 case "8":
                     xp = "3900";
+                    pb = 3;
                     break;
                 case "9":
                     xp = "5000";
+                    pb = 4;
                     break;
                 case "10":
                     xp = "5900";
+                    pb = 4;
                     break;
                 case "11":
                     xp = "7200";
+                    pb = 4;
                     break;
                 case "12":
                     xp = "8400";
+                    pb = 4;
                     break;
                 case "13":
                     xp = "10000";
+                    pb = 5;
                     break;
                 case "14":
                     xp = "11500";
+                    pb = 5;
                     break;
                 case "15":
                     xp = "13000";
+                    pb = 5;
                     break;
                 case "16":
                     xp = "15000";
+                    pb = 5;
                     break;
                 case "17":
                     xp = "18000";
+                    pb = 6;
                     break;
                 case "18":
                     xp = "20000";
+                    pb = 6;
                     break;
                 case "19":
                     xp = "22000";
+                    pb = 6;
                     break;
                 case "20":
                     xp = "25000";
+                    pb = 6;
                     break;
                 case "21":
                     xp = "33000";
+                    pb = 7;
                     break;
                 case "22":
                     xp = "41000";
+                    pb = 7;
                     break;
                 case "23":
                     xp = "50000";
+                    pb = 7;
                     break;
                 case "24":
                     xp = "62000";
+                    pb = 7;
+                    break;
+                case "25":
+                    xp = "75000";
+                    pb = 8;
+                    break;
+                case "26":
+                    xp = "90000";
+                    pb = 8;
+                    break;
+                case "27":
+                    xp = "105000";
+                    pb = 8;
+                    break;
+                case "28":
+                    xp = "120000";
+                    pb = 8;
+                    break;
+                case "29":
+                    xp = "";
+                    pb = 9;
                     break;
                 case "30":
                     xp = "155000";
+                    pb = 9;
                     break;
             }
-            setAttrs({npc_xp: xp}, {silent: true});
+            update["npc_xp"] = xp;
+            update["pb_custom"] = pb;
+            update["pb_type"] = "custom";
+            setAttrs(update, {silent: true}, update_pb());
         });
     };
 
@@ -8669,11 +8717,18 @@
         });
     };
 
-    var check_old_npc_spells = function() {
-        getSectionIDs("repeating_spell-npc", function(idarray) {
-            var spellflag = idarray && idarray.length > 0 ? 1 : 0;
-            setAttrs({npcspell_flag: spellflag});
+    var v2_old_values_check = function() {
+        getAttrs(["simpletraits","features_and_traits"], function(v) {
+            getSectionIDs("repeating_spell-npc", function(idarray) {
+                var spellflag = idarray && idarray.length > 0 ? 1 : 0;
+                var missing = v["features_and_traits"] && v["simpletraits"] === "complex" ? 1 : 0;
+                setAttrs({
+                    npcspell_flag: spellflag,
+                    missing_info: missing
+                });
+            });
         });
+
     };
 
     var upgrade_to_2_0 = function(doneupdating) {
@@ -8707,6 +8762,7 @@
                     update_npc_action("all");
                     update_npc_saves();
                     update_npc_skills();
+                    update_initiative();
                 }
             }
             else {
