@@ -2,15 +2,15 @@
 .charsheet {
 	color: #333;
 	font-size: 0;
-	position: relative;
-	top: -11px;
+	position: absolute;
+	margin-top: -11px;
+	left: 0;
 	cursor: default;
 	box-sizing: border-box;
-	min-width: 870px;
-	padding: 0 10px 0 0 !important;
+	padding: 0 10px 10px !important;
 	font-family: Georgia, "Bitstream Charter", "Times New Roman", serif;
 }
-div, span, textarea, input, ul, li, span, label {
+div, span, textarea, ul, li, span, label {
 	box-sizing: border-box;
 }
 button[type=roll] {
@@ -19,6 +19,7 @@ button[type=roll] {
 	box-shadow: none;
 	font-weight: bold;
 	font-family: inherit;
+	outline: none;
 	border-radius: 0;
 	transition: all 0.2s;
 }
@@ -38,7 +39,8 @@ label input[type=checkbox],
 label input[type=radio] {
 	position: absolute;
 }
-label:hover input + span {
+label:hover input[type=checkbox] + span,
+label:hover input[type=radio] + span {
 	opacity: 0.7;
 }
 input[type=text], textarea {
@@ -51,11 +53,20 @@ input[type=text], textarea {
 	margin: 0;
 	color: #333;
 	border-radius: 0;
-	transition: all 0.2s;
+	transition: all 0.2s, height 0.4s;
+}
+textarea:active {
+	transition: height 0s;
 }
 input[type=number] {
+	border-color: #ccc;
 	color: #333;
 	box-shadow: none;
+}
+input[name="attr_setting_focus_shadow"]:checked ~ div textarea:focus,
+input[name="attr_setting_focus_shadow"]:checked ~ div input[type=text]:focus,
+input[name="attr_setting_focus_shadow"]:checked ~ div input[type=number]:focus {
+	box-shadow: inset 0 0 1px 1px rgba(66,66,66,.3), 0 0 2px 1px rgba(66,66,66,.3);
 }
 textarea {
 	resize: vertical;
@@ -64,13 +75,11 @@ textarea {
 li {
 	position: relative;
 }
-li:after {
-	background: #333;
-	transform: rotate(45deg);
-	content: '';
-	display: block;
-	position: absolute;
+li:before {
+	transform: rotate(45deg) scale(0.9);
+	content: '■';
 	left: 0;
+	position: absolute;
 }
 ul {
 	list-style: none;
@@ -117,7 +126,8 @@ input[type=text].sheet-inherit {
 }
 .sheet-version-text {
 	color: #a8a8a8;
-	font-size: 12px;
+	font-size: 13px;
+	font-family: "Times New Roman", Times, serif;
 }
 .sheet-version-text span:first-child:after {
 	content: " ";
@@ -176,7 +186,6 @@ input[type=text].sheet-inherit {
 .sheet-settings > div {
 	min-width: 50%;
 	flex-grow: 1;
-	display: flex;
 	align-items: center;
 	padding: 2px;
 	font-size: 10px;
@@ -184,7 +193,10 @@ input[type=text].sheet-inherit {
 	line-height: 17px;
 	border-bottom: 1px solid #d3d3d3;
 }
-.sheet-settings > div:first-child {
+.sheet-settings label {
+	align-items: center;
+}
+.sheet-settings > div.sheet-generaterow {
 	line-height: 0;
 }
 .sheet-settings input.sheet-checkbox[type=checkbox] + span {
@@ -218,16 +230,22 @@ input[type=text].sheet-inherit {
 	padding: 0;
 	height: 18px;
 }
+.sheet-setting-char, .sheet-setting-crew, .sheet-setting-faction {
+	display: none;
+}
+input[name="attr_sheet_type"][value="character"]:checked ~ .sheet-setting-char,
+input[name="attr_sheet_type"][value="crew"]:checked ~ .sheet-setting-crew,
+input[name="attr_sheet_type"][value="faction"]:checked ~ .sheet-setting-faction {
+	display: flex;
+}
 /* SETTINGS FOR HIDING STUFF ON THE SHEET */
 input.sheet-toothhider:not(:checked) + input.sheet-tooth,
 input.sheet-toothhider:not(:checked) + input.sheet-tooth + span {
 	display: none;
 }
-input.sheet-xp-hider:not(:checked) + li {
-	display: none;
-}
-input.sheet-hidediv:not(:checked) + div,
-input.sheet-hidediv:not(:checked) + label {
+input.sheet-hider:not(:checked) + li,
+input.sheet-hider:not(:checked) + div,
+input.sheet-hider:not(:checked) + label {
 	display: none;
 }
 /* Sheet container */
@@ -235,15 +253,14 @@ input.sheet-hidediv:not(:checked) + label {
 	position: relative;
 }
 input:not(:checked) + .sheet-container {
-	width: 860px;
+	width: 870px;
 }
 input:checked + .sheet-container {
-	min-width: 860px;
+	min-width: 870px;
 	max-width: 1190px;
 }
 /* USEFUL GENERAL LAYOUT*/
-.sheet-rep .sheet-blackheader,
-.sheet-hold .sheet-blackheader {
+.sheet-rep-and-hold .sheet-blackheader:first-child {
 	padding-top: 3px;
 	line-height: 13px;
 }
@@ -259,7 +276,7 @@ input:checked + .sheet-container {
 	line-height: 15px;
 	padding: 1px 2px 0 4px;
 }
-.sheet-blackheader.sheet-narrow {
+.sheet-hold .sheet-blackheader {
 	padding-left: 2px;
 }
 .sheet-blackheader {
@@ -273,7 +290,8 @@ input:checked + .sheet-container {
 .sheet-black-on-grey {
 	text-align: center;
 	position: relative;
-	padding: 0 2px;
+	flex-grow: 1;
+	padding-left: 1px;
 	height: 13px;
 	line-height: 13px;
 	z-index: -1;
@@ -308,9 +326,10 @@ input:checked + .sheet-container {
 	background: #d6d8d9;
 	height: 16px;
 	width: 56px;
-	line-height: 0;
-	justify-content: space-evenly;
 	align-items: center;
+}
+.sheet-tier input[type=checkbox]:nth-child(2) {
+	margin-left: auto;
 }
 /* COLUMN LAYOUT */
 .sheet-flex {
@@ -320,6 +339,7 @@ input:checked + .sheet-container {
 	display: flex;
 	flex-wrap: wrap;
 	align-content: flex-start;
+	align-items: flex-start;
 }
 .sheet-flex-center {
 	text-align: center;
@@ -403,12 +423,6 @@ textarea.sheet-smallcaps {
 	font-size: 11px;
 	height: 17px;
 }
-.sheet-gatherinfo li:after {
-	height: 4px;
-	width: 4px;
-	top: calc(0.5em - 2px);
-	margin-top: 4px;
-}
 .sheet-teamworkbox {
 	width: 95%;
 	padding: 5px;
@@ -464,10 +478,11 @@ textarea.sheet-smallcaps {
 	background: #d6d8d9;
 }
 .sheet-item .sheet-itemname {
-	width: calc(100% - 20px);
+	width: calc(100% - 18px);
 	height: 18px;
 	font-size: 11px;
-	margin: 0 1px 0 4px;
+	margin: 0 1px 0 2px;
+	padding-left: 2px;
 }
 .sheet-item textarea.sheet-itemname {
 	resize: none;
@@ -479,14 +494,14 @@ textarea.sheet-smallcaps {
 }
 .sheet-item.sheet-item2box .sheet-itemname,
 .sheet-repeating-item input[type=checkbox][value="2"]:checked ~ .sheet-itemname {
-	width: calc(100% - 35px);
+	width: calc(100% - 33px);
 }
 .sheet-item.sheet-item3box .sheet-itemname,
 .sheet-repeating-item input[type=checkbox][value="3"]:checked ~ .sheet-itemname {
-	width: calc(100% - 50px);
+	width: calc(100% - 48px);
 }
 .sheet-item.sheet-item4box .sheet-itemname {
-	width: calc(100% - 65px);
+	width: calc(100% - 63px);
 }
 .sheet-repeating-item input[type=checkbox][name="attr_bold"]:checked ~ .sheet-itemname {
 	font-weight: bold;
@@ -608,24 +623,13 @@ input.sheet-expand + span {
 	background: #b3b4b6;
 	height: 20px;
 	font-size: 10px;
+	padding: 3px 2px 1px 4px;
+	align-items: center;
 }
-.sheet-loadheader {
-	padding: 3px 4px 1px;
-}
-.sheet-loadheader, .sheet-loadheader label {
+.sheet-loadheader label {
 	align-items: center;
 	line-height: 11px;
-	margin: auto;
-}
-.sheet-itemheader {
-	line-height: 18px;
-	padding: 1px 4px;
-}
-.sheet-itemheader .sheet-label,
-.sheet-loadheader .sheet-label {
-	margin-right: 4px;
-}
-.sheet-loadheader em {
+	margin-left: auto;
 	text-transform: lowercase;
 }
 .sheet-loadnumber {
@@ -633,6 +637,22 @@ input.sheet-expand + span {
 	font-family: "Times New Roman", Times, serif;
 	font-size: 12px;
 	margin: 0 3px 0 4px;
+}
+.sheet-itemheader > :first-child {
+	margin-right: 4px;
+}
+.sheet-itemheader:not(:hover) .sheet-text-button {
+	display: none;
+}
+.sheet-itemheader .sheet-text-button {
+	margin-left: auto;
+}
+.sheet-itemheader label.sheet-text-button input[type=checkbox] + span {
+	opacity: 1;
+	color: #333;
+}
+.sheet-itemheader label.sheet-text-button:hover input[type=checkbox] + span {
+	color: #ff4747;
 }
 /* ADVANCEMENT BOX*/
 .sheet-advancement-header  {
@@ -649,68 +669,74 @@ input.sheet-expand + span {
 .sheet-advancement-desc {
 	width: 99%;
 	background: #d6d8d9;
-	padding: 15px 20px 4px 16px;
+	padding: 15px 20px 4px 11px;
 }
 .sheet-advancement-desc li,
 .sheet-warblurb li {
 	font-size: 12px;
-	line-height: 15px;
+	line-height: 14px;
 	width: 100%;
 }
 .sheet-advancement-desc li {
 	font-style: italic;
 	margin-bottom: 1em;
-	padding-left: 1.5em;
+	padding-left: 1em;
 }
-.sheet-advancement-desc li:after,
-.sheet-warblurb li:after {
-	height: .4em;
-	width: .4em;
-	top: .3em;
+.sheet-advancement-desc input[type=text] {
+	margin: -2px 0;
+	padding: 2px 0;
+	width: calc(100% + 18px);
 }
 .sheet-advancement-desc li.sheet-nondot,
 .sheet-warblurb li.sheet-nondot {
 	padding-left: 0;
 	font-style: normal;
 }
-.sheet-advancement-desc li.sheet-nondot:after,
-.sheet-warblurb li.sheet-nondot:after {
+.sheet-advancement-desc li.sheet-nondot:before,
+.sheet-warblurb li.sheet-nondot:before {
 	display: none;
 }
 /* PLAYBOOK */
 .sheet-playbook {
-	padding-top: 5px;
+	align-items: center;
 	height: 50px;
+	position: relative;
 	background: #d6d8d9;
 }
-.sheet-playbook-title {
-	width: 70%;
-	height: 100%;
-	padding: 0 10px;
-}
-.sheet-playbook-desc {
-	width: 30%;
-	height: 100%;
-	padding-right: 3px;
-}
-.sheet-playbook-title input[type=text] {
-	letter-spacing: -2px;
+.sheet-playbook input[type=text] {
+	margin: 0 2px;
+	padding-left: 5px;
+	letter-spacing: -1px;
 	font-size: 35px;
 	line-height: 40px;
 }
-.sheet-playbook-desc textarea {
-	height: 100%;
+.sheet-playbook textarea {
+	height: 42px;
 	font-size: 10px;
+	margin-right: 3px;
+	padding-left: 3px;
 	letter-spacing: 1px;
 	color: #7f8184;
 	resize: none;
 	line-height: 14px;
 }
+.sheet-type-character .sheet-playbook input[type=text] {
+	flex: 0 0 calc(64% - 10px);
+}
+.sheet-type-crew .sheet-playbook input[type=text] {
+	flex: 0 0 calc(74% - 7px);
+}
+.sheet-type-character .sheet-playbook textarea {
+	flex: 0 0 calc(36% + 3px);
+}
+.sheet-type-crew .sheet-playbook textarea {
+	flex: 0 0 26%;
+}
 .sheet-playbook-reminder {
 	position: absolute;
-	border: 1px solid #000;
+	border: 1px solid #333;
 	background: #fff;
-	margin-top: 43px;
+	top: 48px;
 	z-index: 3;
 	border-radius: 5px;
 	width: 267px;
@@ -723,17 +749,20 @@ input.sheet-expand + span {
 	width: 100%;
 	border-bottom: 1px solid #000;
 	font-size: 14px;
-	padding: 3px 0 0;
+	padding: 3px 0 0 2px;
 	margin: 3px 0 0;
 	color: #c43c35;
 }
-.sheet-header > div .sheet-label {
+.sheet-header > div .sheet-label, .sheet-header > label .sheet-label {
 	font-size: 10px;
 	letter-spacing: 1px;
 	color: #222;
 	text-align: justify;
 	padding: 3px 0 2px;
 	line-height: 13px;
+}
+.sheet-header label {
+	flex-wrap: wrap;
 }
 .sheet-header-info {
 	letter-spacing: normal;
@@ -768,7 +797,7 @@ input.sheet-expand + span {
 }
 .sheet-clocks .repitem {
 	display: flex;
-	padding: 6px 2px 6px 6px;
+	padding: 4px 2px;
 	width: 49%;
 	margin: 4px 0;
 	background: #d6d8d9;
@@ -779,6 +808,7 @@ input.sheet-expand + span {
 }
 .sheet-clockpicture {
 	padding: 2px;
+	margin: 4px 0;
 	z-index: 1;
 	height: 44px;
 	width: 44px;
@@ -789,27 +819,40 @@ input.sheet-expand + span {
 .sheet-clocks textarea {
 	font-size: 11px;
 	letter-spacing: 1px;
+	padding: 2px 3px;
 	line-height: 12px;
 	flex: 1 1 auto;
-	margin-right: 4px;
-	height: 48px;
-	min-height: 48px;
+	margin-right: 2px;
+	height: 52px;
+	min-height: 52px;
 }
 .sheet-clocks .sheet-zeroholder {
-	margin-left: calc(100% - 53px);
-	margin-top: 38px;
+	margin-left: calc(100% - 49px);
+	margin-top: 40px;
 	z-index: 3;
 }
 .sheet-size-choice {
 	display: flex;
 	flex: 0 0 auto;
 	height: 48px;
+	margin: 2px 0;
 	width: 44px;
 	line-height: 12px;
 	font-size: 13px;
 	font-family: "Times New Roman", Times, serif;
 	align-content: space-evenly;
 	flex-wrap: wrap;
+}
+/* Faction clocks */
+.sheet-type-faction .sheet-clocks .repcontainer {
+	justify-content: flex-start;
+}
+.sheet-type-faction .sheet-clocks .repitem {
+	margin: 2px .8% 2px 0;
+	width: 32.8%;
+}
+.sheet-type-faction .sheet-clocks .repitem:nth-of-type(3n) {
+	margin-right: 0;
 }
 /* Positioning inputs on clocks */
 .sheet-clockpicture input[type=radio] {
@@ -1138,13 +1181,13 @@ input[name="attr_progress"][value="12"]:checked ~ .sheet-12clock.sheet-clockpict
 	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock12-12.png);
 }
 /* TEXT INPUTS FOR TRAUMA AND CLOCKS */
-label.sheet-text-button input:checked + span {
+.sheet-text-button input:checked + span {
 	color: #ff4747;
 }
-label.sheet-text-button {
+.sheet-text-button {
 	font-weight: bold;
 }
-.sheet-size-choice > label.sheet-text-button {
+.sheet-size-choice > .sheet-text-button {
 	height: 17px;
 	padding: 3px;
 	flex: 0 0 40%;
@@ -1276,12 +1319,14 @@ textarea.sheet-abilityname {
 	resize: none;
 	height: 52px;
 	margin: 0 5px;
+	padding: 1px 0 0;
 	line-height: 17px;
 }
 textarea.sheet-abilitydesc {
 	width: 69%;
-	height: 53px;
-	min-height: 53px;
+	height: 54px;
+	min-height: 54px;
+	padding: 2px 0 0;
 	font-size: 12px;
 	line-height: 13px;
 }
@@ -1544,8 +1589,10 @@ button.repcontrol_add:hover {
 }
 .sheet-itemholder .repcontrol_move,
 .sheet-itemholder .repcontrol_del {
-	padding-top: 0;
-	padding-bottom: 0;
+	padding: 0px 7px;
+}
+.sheet-factions .repcontrol_move, .sheet-factions .repcontrol_del {
+	padding: 1px 7px;
 }
 /* STRESS, REP, et cetera */
 .sheet-rep-and-hold,
@@ -1561,36 +1608,29 @@ button.repcontrol_add:hover {
 .sheet-heat {
 	height: 25px;
 }
+.sheet-stress1 {
+	flex: 1 0 auto;
+}
 .sheet-stress2 {
-	width: 143px;
+	flex: 2 0 136px;
 	position: relative;
 }
 .sheet-stress3 {
-	width: 68px;
+	flex: 1 0 68px;
 	text-align: center;
 }
 .sheet-stress4 {
-	width: 200px;
-}
-.sheet-stress4 > div {
-	padding: 1px 0 0 3px;
+	flex: 2 0 217px;
 	line-height: 13px;
+	font-size: 9px;
+	padding: 1px 0 0 2px;
 	text-transform: uppercase;
-	justify-content: space-between;
-	font-size: 8px;
 }
-.sheet-stress4 > div > span {
-	text-align: center;
-	flex: 1 0;
+.sheet-stress4 div {
+	justify-content: space-between;
 }
 .sheet-stress4 > div:not(:first-of-type) {
 	letter-spacing: 1px;
-}
-.sheet-stress4 > div > span {
-	min-width: 11.5px;
-}
-.sheet-stress4 > div:last-of-type > span {
-	min-width: calc((100% - 150px)/3);
 }
 .sheet-traumaholder,
 .sheet-wantedholder {
@@ -1601,7 +1641,7 @@ button.repcontrol_add:hover {
 	width: 33px;
 }
 .sheet-rep2 {
-	width: 135px;
+	width: 134px;
 	position: relative;
 }
 .sheet-turfbox {
@@ -1614,8 +1654,8 @@ button.repcontrol_add:hover {
 .sheet-rep3 :last-child {
 	margin-left: 2px;
 }
-.sheet-stress > div,
 .sheet-hold > div,
+.sheet-hold > label,
 .sheet-heat > div,
 .sheet-rep > div,
 .sheet-crewcoin2 {
@@ -1658,12 +1698,12 @@ input[name="attr_setting_extra_trauma"]:not(:checked) ~ .sheet-tooth[value="4"] 
 	margin-right: -11px;
 }
 /* NOTES */
-textarea.sheet-notes {
-	margin: 20px 0 0 1%;
+.sheet-notes {
+	margin-left: 1%;
 	font-family: "Shadows Into Light", cursive;
 	color: #c43c35;
 	font-size: 20px;
-	width: 97%;
+	width: 98%;
 	background-image: -webkit-linear-gradient(top, transparent, transparent 26px, #a7a7a7 0);
 	background-image: -moz-linear-gradient(top, transparent, transparent 26px, #a7a7a7 0);
 	background-image: -o-linear-gradient(top, transparent, transparent 26px, #a7a7a7 0);
@@ -1672,6 +1712,9 @@ textarea.sheet-notes {
 	line-height: 27px;
 	height: 378px;
 	min-height: 378px;
+}
+.sheet-type-character .sheet-notes, .sheet-type-crew .sheet-notes {
+	margin-top: 15px;
 }
 /* LOAD CHECKBOXES */
 .sheet-loadheader input.sheet-checkbox + span {
@@ -1696,8 +1739,8 @@ button[type=roll].sheet-rollbutton {
 }
 .sheet-action button[type=roll].sheet-rollbutton {
 	letter-spacing: 1px;
-	line-height: 9px;
-	width: 88px;
+	line-height: 13px;
+	flex: 0 0 86px;
 	font-size: 13px;
 }
 .sheet-coinrow button[type=roll].sheet-rollbutton {
@@ -1707,28 +1750,36 @@ button[type=roll].sheet-rollbutton {
 .sheet-blackheader button[type=roll].sheet-rollbutton {
 	margin:auto;
 }
-button[type=roll].sheet-vicebutton,
-button[type=roll].sheet-fortunebutton {
+button[type=roll].sheet-borderbutton {
 	color: #616161;
 	font-size: 13px;
 	border-color: #b3b4b6;
-	padding: 4px;
 }
 button[type=roll].sheet-vicebutton {
 	float: right;
 	margin: 5px 3px -5px auto;
 	line-height: 13px;
+	padding: 4px;
 }
 button[type=roll].sheet-fortunebutton {
 	width: 100%;
-	height: 38px;
+	height: 30px;
 	margin: 10px 0 0;
+}
+.sheet-type-faction button[type=roll].sheet-fortunebutton {
+	width: 100px;
+	margin: 0;
+}
+button[type=roll].sheet-engagementbutton {
+	width: calc(100% - 20px);
+	padding: 2px 5px;
+	height: 30px;
+	margin: 10px 10px 0;
 }
 button[type=roll].sheet-rollbutton:hover {
 	color: #ff4747;
 }
-button[type=roll].sheet-vicebutton:hover,
-button[type=roll].sheet-fortunebutton:hover {
+button[type=roll].sheet-borderbutton:hover {
 	color: #020202;
 	border-color: #020202;
 }
@@ -1766,23 +1817,21 @@ input.sheet-checkbox.sheet-squarebox + span {
 }
 input.sheet-checkbox.sheet-circlebox + span {
 	border-radius: 40px;
-	height: 10px;
-	width: 10px;
+	margin-right: auto;
 	background: #fff;
 }
 input.sheet-checkbox:checked + span {
 	background: #ff4747;
 }
 input.sheet-checkbox.sheet-claimbridge {
-	width: 12px;
-	height: 12px;
-	margin-right: -12px;
+	width: 100%;
+	margin-right: -100%;
+	vertical-align: top;
 }
 input.sheet-checkbox.sheet-claimbridge + span {
 	border: none;
 	vertical-align: top;
 	width: 100%;
-	height: 100%;
 	background: transparent;
 }
 input.sheet-checkbox.sheet-claimbridge:checked + span {
@@ -1801,22 +1850,53 @@ input.sheet-frienddown:checked ~ input[type=text],
 /* specific adjustments */
 .sheet-specialability input.sheet-checkbox,
 .sheet-specialability input.sheet-checkbox + span {
-	margin-top: 2px;
+	margin-top: 3px;
 }
 .sheet-specialability input.sheet-checkbox + span {
 	border-radius: 30px;
 	background: #fff;
 }
+.sheet-actions input.sheet-checkbox {
+	height: 20px;
+	width: 16px;
+	margin-right: -14px;
+}
 .sheet-actions input.sheet-checkbox + span {
 	border-radius: 50px;
-	background: #c6c7c9;
 	height: 11px;
 	width: 11px;
 	border: none;
+	margin-right: calc(7px + (100% - 173px)/8);
 }
-.sheet-specialability input.sheet-checkbox:checked + span,
-.sheet-actions input.sheet-checkbox:checked + span {
+.sheet-action input.sheet-checkbox + span:first-of-type {
+	margin-right: 6px;
+}
+.sheet-action .sheet-darktalent:checked ~ input.sheet-checkbox + span:first-of-type {
+	margin-right: 4px;
+}
+.sheet-actions .sheet-darktalent:checked ~ input.sheet-checkbox + span:not(:first-of-type) {
+	margin-right: calc(3px + (100% - 171px)/10);
+}
+.sheet-actions .sheet-darktalent:checked ~ input.sheet-checkbox + span:last-of-type {
+	margin-right: calc(4px + (100% - 171px)/10);
+}
+.sheet-specialability input.sheet-checkbox:checked + span {
 	background: #ff4747;
+}
+/* Fake radios */
+input.sheet-checkbox.sheet-fakeradio + span {
+	background: #ff4747;
+}
+.sheet-actions input.sheet-fakeradio:checked ~ input.sheet-checkbox.sheet-fakeradio + span {
+	background: #c6c7c9;
+}
+.sheet-tier input.sheet-fakeradio:checked ~ input.sheet-checkbox.sheet-fakeradio + span {
+	background: #fff;
+}
+/* HIDER*/
+input.sheet-darktalent:not(:checked) ~ input[type=checkbox]:last-of-type,
+input.sheet-darktalent:not(:checked) ~ input[type=checkbox]:last-of-type + span {
+	display: none;
 }
 /* Friend triangles */
 input.sheet-checkbox.sheet-friendup {
@@ -1882,26 +1962,24 @@ input.sheet-checkbox.sheet-frienddown {
 	padding-left: 2px;
 }
 .sheet-action {
-	width: 100%;
-	justify-content: space-between;
 	height: 22px;
+	align-items: center;
 }
 .sheet-action:first-child {
 	height: 34px;
-}
-.sheet-action:first-child > label,
-.sheet-action:first-child button[type=roll].sheet-rollbutton {
 	padding-top: 12px;
 }
-.sheet-action > label {
-	width: 20px;
-	align-items: center;
-	justify-content: center;
-}
-.sheet-action > label:first-child {
+.sheet-divider {
+	margin-right: calc(5px + (100% - 173px)/12);
 	border-right: 1px solid #000;
-	height: 100%;
-	justify-content: start;
+	height: inherit;
+}
+.sheet-darktalent:checked ~ .sheet-divider {
+	margin-right: calc(3px + (100% - 173px)/15)
+}
+.sheet-action:first-child .sheet-divider {
+	position: relative;
+	top: -6px;
 }
 /* COHORTS */
 .sheet-cohorts .repcontrol {
@@ -1960,17 +2038,19 @@ input.sheet-checkbox.sheet-frienddown {
 .sheet-cohort-edgeflaw {
 	font-size: 9px;
 	line-height: 10px;
-	margin: 5px 0;
+	margin: 2px 0;
 	align-items: baseline;
 }
 .sheet-cohort-edgeflaw .sheet-uppercase {
-	width: 38px;
+	width: 34px;
 }
 .sheet-cohort-edgeflaw input[type=text] {
-	width: calc(100% - 38px);
+	width: calc(100% - 34px);
+	padding: 2px 3px;
 }
 .sheet-cohort textarea {
 	font-size: 9px;
+	padding: 1px 0;
 	line-height: 12px;
 	height: 50px;
 	border-bottom: 1px solid #d3d3d3;
@@ -1981,6 +2061,9 @@ input.sheet-checkbox.sheet-frienddown {
 }
 .sheet-claimsrow {
 	align-items: center;
+}
+.sheet-claimsrow > div {
+	flex: 0 0 auto;
 }
 .sheet-claimbox {
 	background: #d6d8d9;
@@ -2004,13 +2087,11 @@ input.sheet-checkbox.sheet-frienddown {
 }
 .sheet-claims-horisep {
 	height: 12px;
-	line-height: 0;
-	flex: 1 1 auto;
+	width: 2%;
 }
 .sheet-claims-vertsep {
 	width: 12px;
-	line-height: 0;
-	margin: 0 calc(9% - 7px);
+	margin: 0 calc(9.2% - 6px);
 }
 .sheet-claimbox .sheet-label {
 	height: 30px;
@@ -2090,11 +2171,6 @@ input.sheet-title-checkbox:hover + span {
 	flex-flow: column wrap;
 	height: 115px;
 }
-.sheet-alchemicals li:after {
-	height: 4px;
-	width: 4px;
-	top: .7em;
-}
 .sheet-alchemicals li {
 	padding-left: 10px;
 	font-size: 11px;
@@ -2110,7 +2186,7 @@ input.sheet-title-checkbox:hover + span {
 .sheet-type-faction .repcontrol {
 	height: 38px;
 }
-.sheet-type-faction > .sheet-col100 {
+.sheet-factions {
 	justify-content: space-between;
 }
 .sheet-factiontitle {
@@ -2119,6 +2195,7 @@ input.sheet-title-checkbox:hover + span {
 }
 .sheet-factiontitle input[type=text] {
 	font-size: 26px;
+	margin-right: auto;
 	width: 60%;
 }
 .sheet-factions-header {
@@ -2127,7 +2204,6 @@ input.sheet-title-checkbox:hover + span {
 	align-items: center;
 	line-height: 14px;
 	background: #ccc;
-	padding: 5px 0;
 }
 .sheet-factions-header input[type=text] {
 	padding-left: 3px;
@@ -2199,7 +2275,7 @@ input.sheet-expand:not(:checked) ~ textarea {
 }
 /* War blurb */
 .sheet-warblurb {
-	margin-top: 30px;
+	text-align: justify;
 }
 .sheet-warblurb .sheet-label {
 	font-size: 14px;
@@ -2222,8 +2298,11 @@ label.sheet-generatebutton:hover input + span {
 }
 .sheet-type-faction label.sheet-generatebutton {
 	font-size: 13px;
-	padding: 3px;
-	line-height: 15px;
+	padding: 0 6px;
+	align-items: center;
+	margin: 0 6px;
+	font-weight: bold;
+	height: 30px;
 }
 .sheet-settings label.sheet-generatebutton {
 	padding: 2px;
