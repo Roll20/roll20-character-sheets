@@ -73,7 +73,7 @@
 			<input type="text" class="npc-instinct" name="attr_NPC_instinct" accept="Instinct">
 			<br />
 			<span data-i18n="moves" class="label">Moves</span>
-			<input type="hidden" name="attr_comp_moves" accept="data-Moves">
+			<input type="hidden" name="attr_comp_NPC_moves" accept="data-Moves">
 			<fieldset class="repeating_NPCmoves">
 				<div class="npc-moves">
 					&bull; <input type="text" class="npc-move" name="attr_NPC_move" />
@@ -480,7 +480,7 @@
 		<div class="mid-header coin-header">
 			<span class="label" data-i18n="coin-u">COIN</span>
 			<span class="coin-counter">
-				<input type="number" name="attr_coin" value="0" />
+				<input type="number" class="bigger-number" name="attr_coin" value="0" />
 			</span>
 		</div>
 		<div class="mid-header gear-header">
@@ -2825,6 +2825,20 @@ on("change:repeating_moves:comp_shortname", function(eventInfo) {
 	getAttrs(["repeating_moves_comp_shortname"], function(v) {
 		addMove(v.repeating_moves_comp_shortname, eventInfo.sourceAttribute.split("_")[2]);
 		setAttrs({repeating_moves_comp_shortname: "-1"}, "silent"); // Don't repropagate.
+	});
+});
+
+// NPC Drop
+on("change:comp_NPC_moves", function() {
+	getAttrs(["comp_NPC_moves"], function(v) {
+		var attrs = {};
+		movesList = JSON.parse(v.comp_NPC_moves);
+		for (i = 0; i < movesList.length; i++) {
+			var newid = generateRowID();
+			attrs["repeating_NPCmoves_" + newid + "_NPC_move"] = movesList[i];
+		}
+
+		setAttrs(attrs);
 	});
 });
 
