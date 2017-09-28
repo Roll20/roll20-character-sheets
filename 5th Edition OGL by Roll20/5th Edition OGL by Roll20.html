@@ -1547,7 +1547,7 @@
                 <input type="hidden" class="toggleflag" name="attr_global_damage_mod_flag">
                 <div class="hidden globalattack">
                     <input type="checkbox" name="attr_global_damage_mod" value="{{globaldamage=[[@{global_damage_mod_field}]]}}">
-                    <input type="hidden" name="attr_global_damage_mod_crit" value="{{globaldamagecrit=[[@{global_damage_mod_field}]]}}">
+                    <input type="hidden" name="attr_global_damage_mod_crit" value="0">
                     <textarea type="textarea" name="attr_global_damage_mod_field" placeholder="1d6[SNEAK ATTACK]"></textarea>
                     <span class="label" data-i18n="global-damage-u">GLOBAL DAMAGE MODIFIER</span>
                     <div class="row" style="margin-top: -8px; margin-bottom: 10px;">
@@ -6040,6 +6040,46 @@
             setAttrs(update);
         });
     });
+
+    on("change:global_attack_mod", function(eventinfo) {
+        console.log(eventinfo);
+        if(eventinfo.newValue) {
+            getAttrs(["global_attack_mod_field"], function(v) {
+                if(!v["global_attack_mod_field"] || v["global_attack_mod_field"] === "") {
+                    setAttrs({global_attack_mod_field: "1d4[BLESS]"})
+                }
+            });
+        };
+    });
+
+    on("change:global_damage_mod", function(eventinfo) {
+        if(eventinfo.newValue) {
+            getAttrs(["global_damage_mod_field"], function(v) {
+                if(!v["global_damage_mod_field"] || v["global_damage_mod_field"] === "") {
+                    setAttrs({global_damage_mod_field: "1d6[SNEAK ATTACK]"})
+                }
+            });
+        };
+    });
+
+    on("change:global_attack_mod_field", function(eventinfo) {
+        if(!eventinfo.newValue) {
+            setAttrs({global_attack_mod: 0});
+        };
+    });
+
+    on("change:global_damage_mod_field", function(eventinfo) {
+        var update = {};
+        if(!eventinfo.newValue) {
+            update["global_damage_mod"] = 0;
+            update["global_damage_mod_crit"] = 0;
+        }
+        else {
+            update["global_damage_mod_crit"] = "{{globaldamagecrit=[[@{global_damage_mod_field}]]}}";
+        }
+        setAttrs(update);
+    });
+
     
     on("remove:repeating_inventory", function(eventinfo) {
         var itemid = eventinfo.sourceAttribute.substring(20, 40);
