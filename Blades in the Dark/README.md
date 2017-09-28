@@ -4,6 +4,53 @@ This is a character sheet for Blades in the Dark for use on Roll20.
 
 ## Changelog
 
+### 2.0
+* Additions
+    * The names for heat, wanted, and deity can now be changed
+    * Settings are now filtered by sheet type
+    * Buttons for adding playbook items and crew-specific upgrades
+    * Option to make bonus dice a freeform input field
+    * Option to ask for a consequence name when resisting
+    * Fortune roll button added to factions sheet
+    * Engagement roll button added to crew sheet
+    * Added a clocks repeating section to the faction sheet, and a real notes field
+    * Box-shadow effect to focused input fields (can be disabled in settings)
+    * Button to reset items and load with one click
+* Changes
+    * New model for action and tier dots that gets rid of the need for extra attributes
+    * Refactored sheet workers and cleaned them up using new features
+    * Adjusted the width of crew type and playbook input
+    * Roll template header changed to have character name and text inline
+    * Disabled spell checking on all input fields
+    * Bypassed unnecessary extra padding around the sheet
+    * Veteran special ability added to all playbooks for clarity
+    * Frame features are now a repeating section, as they should be
+    * Improved spacing for action dots when expanding the sheet
+
+### 1.15
+* Added 10-clocks, courtesy of Chris McDonald
+* Fixed resistance bonuses erroneously applying to vice indulgence
+
+### 1.14
+* Changed font to Georgia for unified look on all platforms, and better alignment
+* Quality-of-life changes in several places
+
+### 1.13
+* Visual improvements
+* Labels now properly used to toggle some smaller checkboxes
+* Added option for vampires' Dark Gift and global resistance bonuses
+* The sheet now shows the options for heritage, background, and vice if they are empty
+
+### 1.12
+* Calculate trauma automatically
+* Overhauled roll template internally, no more distinction between normal dice and bonus dice
+* Visual improvements to layout for some kinds of checkboxes
+* Overall transition eye-candy
+
+### 1.11
+* Internal change to how checkbox attributes are stored
+* Change how default values are set so that only necessary attributes are changed
+
 ### 1.10
 * Revamped flexbox-based layout and CSS changes
 * New design for clocks area

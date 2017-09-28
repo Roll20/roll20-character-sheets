@@ -9,9 +9,13 @@ Cette feuilles de personnage inclue quelques jets et r&egrave;gles optionnelles.
 Le jeu complet, des suppl&eacute;ments et des t&eacute;l&eacute;chargements gratuits sont disponibles sur le site de l&apos;&eacute;diteur [Black Book Editions](http://www.black-book-editions.fr/catalogue.php?id=13).
 
 # Version courante
-1.7 [Screenshot](co_v2.png)
+1.8 [Screenshot](co_v2.png)
 
 # Notes de version
+
+## v1.8 (2017-09-17)
+
+* Correction : les caractéristiques au-dessus de 30 ne provoquent plus de message d'avertissement
 
 ## v1.7 (2016-11-27)
 
