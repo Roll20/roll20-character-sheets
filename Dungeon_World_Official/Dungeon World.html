@@ -37,42 +37,43 @@
 	</label>
 </div>
 
-<div class="npc-container">
+<div class="npc-container compendium-drop-target">
 	<div class="npc-header">
 		<span class="flex-row">
-			<span><input type="text" class="npc-name" name="attr_character_name"></span>
-			<span><span data-i18n="tags:">Tags: </span>
-			<input type="text" class="npc-tags" data-i18n-placeholder="tags" placeholder="Tags" name="attr_NPC_tags"></span>
+			<span><input type="text" class="npc-name" name="attr_character_name" accept="Name"></span>
+			<span><span data-i18n="tags:" accept="Tags">Tags: </span>
+			<input type="text" class="npc-tags" data-i18n-placeholder="tags" placeholder="Tags" name="attr_NPC_tags" accept="Tags"></span>
 		</span>
 		<span class="flex-row">
 			<span>
-				<input type="text" class="npc-attack-name" data-i18n-placeholder="attack-name" placeholder="Attack Name" name="attr_NPC_attack_name">
-				<input type="text" class="npc-attack-roll" data-i18n-placeholder="1d8+2" placeholder="1d8+2" name="attr_NPC_attack_roll">
+				<input type="text" class="npc-attack-name" data-i18n-placeholder="attack-name" placeholder="Attack Name" name="attr_NPC_attack_name" accept="Attack Name">
+				<input type="text" class="npc-attack-roll" data-i18n-placeholder="1d8+2" placeholder="1d8+2" name="attr_NPC_attack_roll" accept="Attack Roll">
 				<button type="roll" name="roll_NPC_attack" value="&{template:dwgeneral} {{charname=@{character_name}}} {{rollname=@{NPC_attack_name}}} {{result=[[@{NPC_attack_roll}]]}}">damage</button>
-				<input type="text" class="npc-attack-extrainfo" data-i18n-placeholder="pierces-armor" placeholder="pierces armor" name="attr_NPC_attack_extrainfo">
+				<input type="text" class="npc-attack-extrainfo" data-i18n-placeholder="pierces-armor" placeholder="pierces armor" name="attr_NPC_attack_extrainfo" accept="Attack Details">
 			</span>
 			<span>
-				<input type="number" class="npc-hp" name="attr_HP"> / <input type="number" class="npc-hp" name="attr_HP_max">&nbsp;<span data-i18n="hp-u">HP</span>
-				<input type="number" class="npc-armor" name="attr_NPC_armor">&nbsp;<span data-i18n="armor">Armor</span>
+				<input type="number" class="npc-hp" name="attr_HP" accept="HP"> / <input type="number" class="npc-hp" name="attr_HP_max" accept="HP">&nbsp;<span data-i18n="hp-u">HP</span>
+				<input type="number" class="npc-armor" name="attr_NPC_armor" accept="Armor">&nbsp;<span data-i18n="armor">Armor</span>
 			</span>
 		</span>
 		<span class="flex-row flex-left">
-			<input type="text" class="npc-tags" data-i18n-placeholder="attack-reach" placeholder="Attack Reach(es)" name="attr_NPC_weapontags">
+			<input type="text" class="npc-tags" data-i18n-placeholder="attack-reach" placeholder="Attack Reach(es)" name="attr_NPC_weapontags" accept="Weapon Tags">
 		</span>
 		<span class="flex-row flex-left">
 			<span data-i18n="special-qualities:"><em>Special Qualities:</em></span>&nbsp;
-			<input type="text" class="npc-qualities" name="attr_NPC_qualities">
+			<input type="text" class="npc-qualities" name="attr_NPC_qualities" accept="Special Qualities">
 		</span>
 	</div>
 	<div class="npc-main">
 		<div>
-			<textarea class="npc-description" name="attr_NPC_description"></textarea>
+			<textarea class="npc-description" name="attr_NPC_description" accept="Description"></textarea>
 		</div>
 		<div class="npc-extras">
 			<span data-i18n="instinct:"><em>Instinct: </em></span>&nbsp;
-			<input type="text" class="npc-instinct" name="attr_NPC_instinct">
+			<input type="text" class="npc-instinct" name="attr_NPC_instinct" accept="Instinct">
 			<br />
 			<span data-i18n="moves" class="label">Moves</span>
+			<input type="hidden" name="attr_comp_NPC_moves" accept="data-Moves">
 			<fieldset class="repeating_NPCmoves">
 				<div class="npc-moves">
 					&bull; <input type="text" class="npc-move" name="attr_NPC_move" />
@@ -479,7 +480,7 @@
 		<div class="mid-header coin-header">
 			<span class="label" data-i18n="coin-u">COIN</span>
 			<span class="coin-counter">
-				<input type="number" name="attr_coin" value="0" />
+				<input type="number" class="bigger-number" name="attr_coin" value="0" />
 			</span>
 		</div>
 		<div class="mid-header gear-header">
@@ -2824,6 +2825,20 @@ on("change:repeating_moves:comp_shortname", function(eventInfo) {
 	getAttrs(["repeating_moves_comp_shortname"], function(v) {
 		addMove(v.repeating_moves_comp_shortname, eventInfo.sourceAttribute.split("_")[2]);
 		setAttrs({repeating_moves_comp_shortname: "-1"}, "silent"); // Don't repropagate.
+	});
+});
+
+// NPC Drop
+on("change:comp_NPC_moves", function() {
+	getAttrs(["comp_NPC_moves"], function(v) {
+		var attrs = {};
+		movesList = JSON.parse(v.comp_NPC_moves);
+		for (i = 0; i < movesList.length; i++) {
+			var newid = generateRowID();
+			attrs["repeating_NPCmoves_" + newid + "_NPC_move"] = movesList[i];
+		}
+
+		setAttrs(attrs);
 	});
 });
 
