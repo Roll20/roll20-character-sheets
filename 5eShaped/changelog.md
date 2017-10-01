@@ -11,6 +11,13 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 15.5.7
+
+### Bug Fixes
+
+* [#27: Armor class does not import](https://bitbucket.org/mlenser/5eshapedscript/issues/27/armor-class-does-not-import)
+* Import of spells without an attack or save (Magic Missile) now properly sets the damage on by default. Closes [#618: Multiple NPC Spellcasting Issues](https://bitbucket.org/mlenser/5eshaped/issues/618/multiple-npc-spellcasting-issues)
+
 ## 15.5.6
 
 ### Bug Fixes
