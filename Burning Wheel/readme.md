@@ -7,7 +7,7 @@ This sheet is designed for use with the Burning Wheel system written by Luke Cra
 
 # Release notes
 
-## v2.0 (2017-09-30)
+## v2.0 (2017-10-02)
 
 Update designed by Jordan W. (806426) and coded by Natha (75857).
 
@@ -33,7 +33,6 @@ Update designed by Jordan W. (806426) and coded by Natha (75857).
 * Training sills : new Shade and special mark columns (Training Skill, Dwarven Magical Skill, Elven Spell or Skill Song, Wolf Song). Skill pool calculation takes shade and 
 * New "Tough" (trait) checkbox to round up when factoring Mortal Wound
 * Roll with Resources 0 is now possible
-* The Shade of Circles is equal to the shade of Will
 
 ## v1.0 - v1.x
 
