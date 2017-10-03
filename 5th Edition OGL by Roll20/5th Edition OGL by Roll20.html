@@ -8764,18 +8764,32 @@
 
     var v2_old_values_check = function() {
         update_attacks("all");
-        getAttrs(["simpletraits","features_and_traits","initiative_bonus","npc"], function(v) {
-            if(v["npc"] && v["npc"] == 1 && (!v["initiative_bonus"] || v["initiative_bonus"] == 0)) {
-                update_initiative();
-            }
-            getSectionIDs("repeating_spell-npc", function(idarray) {
+        var update = {};
+        var attrs = ["simpletraits","features_and_traits","initiative_bonus","npc","character_id"];
+        getSectionIDs("repeating_spell-npc", function(idarray) {
+            _.each(idarray, function(id) {
+                attrs.push("repeating_spell-npc_" + id + "_rollcontent");
+            });
+            getAttrs(attrs, function(v) {
+                if(v["npc"] && v["npc"] == 1 && (!v["initiative_bonus"] || v["initiative_bonus"] == 0)) {
+                    update_initiative();
+                }
                 var spellflag = idarray && idarray.length > 0 ? 1 : 0;
                 var missing = v["features_and_traits"] && v["simpletraits"] === "complex" ? 1 : 0;
-                setAttrs({
-                    npcspell_flag: spellflag,
-                    missing_info: missing
+                update["npcspell_flag"] = spellflag;
+                update["missing_info"] = missing;
+                _.each(idarray, function(id) {
+                    var content = v["repeating_spell-npc_" + id + "_rollcontent"];
+                    if(content.substring(0,3) === "%{-" && content.substring(22,41) === "|repeating_attack_-" && content.substring(60,68) === "_attack}") {
+                        var thisid = content.substring(2,21);
+                        if(thisid != v["character_id"]) {
+                            update["repeating_spell-npc_" + id + "_rollcontent"] = content.substring(0,2) + v["character_id"] + content.substring(22,68);
+                        }
+                    }
                 });
+                setAttrs(update);
             });
+
         });
 
     };
