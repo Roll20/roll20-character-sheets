@@ -7,9 +7,12 @@ Cette fiche pour Roll20 a été développée à la demande et avec la participat
 Soutenez le développement des Cahiers du Vastemonde sur [Tipee](https://www.tipeee.com/les-cahiers-du-vastemonde).
 
 # Version courante
-1.0 [Capture d'écran](vastemonde.png)
+1.1 [Capture d'écran](vastemonde.png)
 
 # Notes de version
+
+## v1.1 (2017-09-17)
+Optimisation technique.
 
 ## v1.0 (2016-02-20)
 Création de la fiche.
