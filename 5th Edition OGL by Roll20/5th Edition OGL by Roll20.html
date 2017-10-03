@@ -5440,7 +5440,7 @@
 
     on("sheet:compendium-drop", function() {
         getAttrs(["hp_max","npc_senses","token_size","cd_bar1_v","cd_bar1_m","cd_bar1_l","cd_bar2_v","cd_bar2_m","cd_bar2_l","cd_bar3_v","cd_bar3_m","cd_bar3_l"], function(v) {
-            var default_attr = {};
+            var default_attr = {}, second_get = [], second = {};
             default_attr["width"] = 70;
             default_attr["height"] = 70;
             if(v["npc_senses"].toLowerCase().match(/(darkvision|blindsight|tremorsense|truesight)/)) {
@@ -5460,50 +5460,48 @@
                 };
             }
 
-            if(v["cd_bar1_l"]) {
-                default_attr["bar1_link"] = v["cd_bar1_l"];
-            }
-            else if(v["cd_bar1_v"] || v["cd_bar1_m"]) {
-                if(v["cd_bar1_v"]) {
-                    default_attr["bar1_value"] = v["cd_bar1_v"];
+            for(let x = 0; x <= 3; x++) {
+                if(v["cd_bar" + x + "_l"]) {
+                    default_attr["bar" + x + "_link"] = v["cd_bar" + x + "_l"];
+                } else if(v["cd_bar" + x + "_v"] || v["cd_bar" + x + "_m"]) {
+                    if(v["cd_bar" + x + "_v"]) {
+                        if(!isNaN(v["cd_bar" + x + "_v"])) {
+                            default_attr["bar" + x + "_value"] = v["cd_bar" + x + "_v"];
+                        } else {
+                            second_get.push(v["cd_bar" + x + "_v"]);
+                            second["bar" + x + "_value"] = v["cd_bar" + x + "_v"];
+                        }
+                    }
+                    if(v["cd_bar" + x + "_m"]) {
+                        if(!isNaN(v["cd_bar" + x + "_m"])) {
+                            default_attr["bar" + x + "_max"] = v["cd_bar" + x + "_m"];
+                        } else {
+                            second_get.push(v["cd_bar" + x + "_m"]);
+                            second["bar" + x + "_max"] = v["cd_bar" + x + "_m"];
+                        }
+                    }
                 }
-                if(v["cd_bar1_m"]) {
-                    default_attr["bar1_max"] = v["cd_bar1_m"];
-                }
-            }
-            else {
-                default_attr["bar1_value"] = v["hp_max"];
-                default_attr["bar1_max"] = v["hp_max"];
-            }
-
-            if(v["cd_bar2_l"]) {
-                default_attr["bar2_link"] = v["cd_bar2_l"];
-            }
-            else if(v["cd_bar2_v"] || v["cd_bar2_m"]) {
-                if(v["cd_bar2_v"]) {
-                    default_attr["bar2_value"] = v["cd_bar2_v"];
-                }
-                if(v["cd_bar2_m"]) {
-                    default_attr["bar2_max"] = v["cd_bar2_m"];
-                }
-            }
-            else {
-                default_attr["bar2_link"] = "npc_ac";
-            }
-
-            if(v["cd_bar3_l"]) {
-                default_attr["bar3_link"] = v["cd_bar3_l"];
-            }
-            else if(v["cd_bar3_v"] || v["cd_bar3_m"]) {
-                if(v["cd_bar3_v"]) {
-                    default_attr["bar3_value"] = v["cd_bar3_v"];
-                }
-                if(v["cd_bar3_m"]) {
-                    default_attr["bar3_max"] = v["cd_bar3_m"];
+                else {
+                    if(x == 1) {
+                        default_attr["bar" + x + "_value"] = v["hp_max"];
+                        default_attr["bar" + x + "_max"] = v["hp_max"];
+                    } else if(x == 2) {
+                        default_attr["bar2_link"] = "npc_ac";
+                    }
                 }
             }
 
-            setDefaultToken(default_attr);
+            if(second_get.length > 0) {
+                getAttrs(second_get, function(vals) {
+                    console.log(vals);
+                    for(let prop in second) {
+                        default_attr[prop] = vals[second[prop]];
+                    }
+                    setDefaultToken(default_attr);
+                });
+            } else {
+                setDefaultToken(default_attr);
+            }
         });
     });
 
