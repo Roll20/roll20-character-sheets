@@ -4,7 +4,7 @@ Feuille de personnage (FdP) avec jets intégrés pour **Savage Worlds**, **Beast
 Basée sur les traductions éditées par [Black Book Editions](http://www.black-book-editions.fr/catalogue.php?id=58).
 
 # Version courante
-3.0 Captures d'écran :  
+3.1 Captures d'écran :  
 [Style Savage Worlds](sawofr_style_sawo.jpg)  
 [Style Beasts & Barbarians](sawofr_style_bnb.jpg)  
 [Style Deadlands](sawofr_style_deadlands.jpg)  
@@ -131,6 +131,11 @@ Les suggestions sont les bienvenues à ce sujet.
 NB : décrémenter les PP automatiquement au lancement d'un pouvoir nécessiterait l'utilisation d'un script API, donc d'un compte "Pro".
 
 # Notes de version
+
+## v3.1 (2017-09-17)
+
+* Correction de l'utilisation de la compétence Arcane pour les jets d'arme, en mode "Succès+Relance"
+* Optimisation technique
 
 ## v3.0 (2017-08-15)
 

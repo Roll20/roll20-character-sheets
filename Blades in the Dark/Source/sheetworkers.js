@@ -48,12 +48,10 @@ const crewData = {
 				numboxes: "3"
 			}, {
 				name: "crew_upgrade_assassin_rigging",
-				numboxes: "1",
-				tall: "1"
+				numboxes: "1"
 			}, {
 				name: "crew_upgrade_ironhook_contacts",
-				numboxes: "1",
-				tall: "1"
+				numboxes: "1"
 			}, {
 				name: "crew_upgrade_elite_skulks",
 				numboxes: "1"
@@ -104,12 +102,10 @@ const crewData = {
 				numboxes: "3"
 			}, {
 				name: "crew_upgrade_bravos_rigging",
-				numboxes: "1",
-				tall: "1"
+				numboxes: "1"
 			}, {
 				name: "crew_upgrade_ironhook_contacts",
-				numboxes: "1",
-				tall: "1"
+				numboxes: "1"
 			}, {
 				name: "crew_upgrade_elite_rovers",
 				numboxes: "1"
@@ -163,8 +159,7 @@ const crewData = {
 				numboxes: "3"
 			}, {
 				name: "crew_upgrade_cult_rigging",
-				numboxes: "1",
-				tall: "1"
+				numboxes: "1"
 			}, {
 				name: "crew_upgrade_ritual_sanctum_in_lair",
 				numboxes: "1"
@@ -221,12 +216,10 @@ const crewData = {
 				numboxes: "3"
 			}, {
 				name: "crew_upgrade_hawker's_rigging",
-				numboxes: "1",
-				tall: "1"
+				numboxes: "1"
 			}, {
 				name: "crew_upgrade_ironhook_contacts",
-				numboxes: "1",
-				tall: "1"
+				numboxes: "1"
 			}, {
 				name: "crew_upgrade_elite_rooks",
 				numboxes: "1"
@@ -279,8 +272,7 @@ const crewData = {
 				numboxes: "3"
 			}, {
 				name: "crew_upgrade_thief_rigging",
-				numboxes: "1",
-				tall: "1"
+				numboxes: "1"
 			}, {
 				name: "crew_upgrade_underground_maps_&_passkeys",
 				numboxes: "1"
@@ -341,12 +333,10 @@ const crewData = {
 				numboxes: "3"
 			}, {
 				name: "crew_upgrade_smuggler's_rigging",
-				numboxes: "1",
-				tall: "1"
+				numboxes: "1"
 			}, {
 				name: "crew_upgrade_camouflage",
-				numboxes: "1",
-				tall: "1"
+				numboxes: "1"
 			}, {
 				name: "crew_upgrade_elite_rovers",
 				numboxes: "1"
@@ -403,16 +393,13 @@ const crewData = {
 				numboxes: "3"
 			}, {
 				name: "crew_upgrade_vigilantes_attire",
-				numboxes: "1",
-				tall: "1"
+				numboxes: "1"
 			}, {
 				name: "crew_upgrade_irregulars",
-				numboxes: "1",
-				tall: "1"
+				numboxes: "1"
 			}, {
 				name: "crew_upgrade_willing_to_fight",
-				numboxes: "1",
-				tall: "1"
+				numboxes: "1"
 			}, {
 				name: "crew_upgrade_spark-craft_technology",
 				numboxes: "1",
@@ -432,8 +419,6 @@ const crewData = {
 				gatherinfo5: "gatherinfo_how_can_I_get_them",
 				gatherinfo6: "gatherinfo_are_they_telling",
 				playbook_description: "playbook_cutter_description",
-				setting_traumata_set: "normal",
-				setting_vice_type: "normal",
 				skirmish: "2",
 				xp_condition: "playbook_cutter_xp_condition"
 			},
@@ -492,8 +477,6 @@ const crewData = {
 				gatherinfo6: "gatherinfo_how_can_I_find",
 				hunt: "2",
 				playbook_description: "playbook_hound_description",
-				setting_traumata_set: "normal",
-				setting_vice_type: "normal",
 				survey: "1",
 				xp_condition: "playbook_hound_xp_condition"
 			},
@@ -553,8 +536,6 @@ const crewData = {
 				gatherinfo5: "gatherinfo_what_might_happen",
 				gatherinfo6: "gatherinfo_how_can_I_find",
 				playbook_description: "playbook_leech_description",
-				setting_traumata_set: "normal",
-				setting_vice_type: "normal",
 				tinker: "2",
 				wreck: "1",
 				xp_condition: "playbook_leech_xp_condition"
@@ -594,8 +575,6 @@ const crewData = {
 				gatherinfo6: "gatherinfo_how_can_I_find",
 				playbook_description: "playbook_lurk_description",
 				prowl: "2",
-				setting_traumata_set: "normal",
-				setting_vice_type: "normal",
 				xp_condition: "playbook_lurk_xp_condition"
 			},
 			playbookitem: [{
@@ -632,8 +611,6 @@ const crewData = {
 				gatherinfo5: "gatherinfo_what_do_they_really",
 				gatherinfo6: "gatherinfo_how_can_I_blend",
 				playbook_description: "playbook_slide_description",
-				setting_traumata_set: "normal",
-				setting_vice_type: "normal",
 				sway: "2",
 				xp_condition: "playbook_slide_xp_condition"
 			},
@@ -672,8 +649,6 @@ const crewData = {
 				gatherinfo5: "gatherinfo_what_do_they_intend",
 				gatherinfo6: "gatherinfo_how_can_I_get_them",
 				playbook_description: "playbook_spider_description",
-				setting_traumata_set: "normal",
-				setting_vice_type: "normal",
 				study: "1",
 				xp_condition: "playbook_spider_xp_condition"
 			},
@@ -711,8 +686,6 @@ const crewData = {
 				gatherinfo5: "gatherinfo_what_drives_them",
 				gatherinfo6: "gatherinfo_reveal",
 				playbook_description: "playbook_whisper_description",
-				setting_traumata_set: "normal",
-				setting_vice_type: "normal",
 				study: "1",
 				xp_condition: "playbook_whisper_xp_condition"
 			},
@@ -752,7 +725,6 @@ const crewData = {
 				setting_extra_stress: "3",
 				setting_vampirexp: "1",
 				setting_show_strictures: "1",
-				setting_traumata_set: "normal",
 				setting_vice_type: "vampire",
 				trauma: "4",
 				xp_condition: "playbook_vampire_xp_condition",
@@ -1197,7 +1169,6 @@ const crewData = {
 			numboxes: "1"
 		}
 	],
-	spiritPlaybooks = ["ghost", "hull", "vampire"],
 	translatedDefaults = {
 		cohort1_name: "cohort",
 		contacts_title: "contacts",
@@ -1253,51 +1224,47 @@ const crewData = {
 		xp_condition2: "xp_beliefs",
 		xp_condition3: "xp_vice"
 	},
-	defaultsFromSheet = {
-		character: {
-			attune: "0",
-			command: "0",
-			consort: "0",
-			finesse: "0",
-			hunt: "0",
-			prowl: "0",
-			setting_extra_stress: "0",
-			setting_load_h: "6",
-			setting_show_frame: "0",
-			setting_show_strictures: "0",
-			setting_traumata_set: "normal",
-			setting_vampirexp: "0",
-			setting_vice_type: "normal",
-			skirmish: "0",
-			study: "0",
-			survey: "0",
-			sway: "0",
-			tinker: "0",
-			trauma: "0",
-			wreck: "0",
-		},
-		crew: {
-			claim_bridge_2_3: "1",
-			claim_bridge_2_7: "1",
-			claim_bridge_3_4: "1",
-			claim_bridge_4_9: "1",
-			claim_bridge_6_7: "1",
-			claim_bridge_6_11: "1",
-			claim_bridge_9_14: "1",
-			claim_bridge_10_15: "1",
-			claim_bridge_12_13: "1",
-			claim_bridge_13_14: "1",
-			cohort1_subtype: "",
-			cohort1_type: "gang",
-			setting_show_deity: "0",
-			setting_show_origin: "0",
-			upgrade_6_check_1: "0",
-			upgrade_10_check_1: "0",
-			upgrade_14_check_1: "0",
-			upgrade_20_check_1: "0",
-			upgrade_21_check_1: "0",
-			upgrade_22_check_1: "0"
-		}
+	defaultValues = {
+		attune: "0",
+		claim_bridge_10_15: "1",
+		claim_bridge_12_13: "1",
+		claim_bridge_13_14: "1",
+		claim_bridge_2_3: "1",
+		claim_bridge_2_7: "1",
+		claim_bridge_3_4: "1",
+		claim_bridge_4_9: "1",
+		claim_bridge_6_11: "1",
+		claim_bridge_6_7: "1",
+		claim_bridge_9_14: "1",
+		cohort1_subtype: "",
+		cohort1_type: "gang",
+		command: "0",
+		consort: "0",
+		finesse: "0",
+		hunt: "0",
+		prowl: "0",
+		setting_extra_stress: "0",
+		setting_load_h: "6",
+		setting_show_deity: "0",
+		setting_show_frame: "0",
+		setting_show_origin: "0",
+		setting_show_strictures: "0",
+		setting_traumata_set: "normal",
+		setting_vampirexp: "0",
+		setting_vice_type: "normal",
+		skirmish: "0",
+		study: "0",
+		survey: "0",
+		sway: "0",
+		tinker: "0",
+		trauma: "0",
+		upgrade_10_check_1: "0",
+		upgrade_14_check_1: "0",
+		upgrade_20_check_1: "0",
+		upgrade_21_check_1: "0",
+		upgrade_22_check_1: "0",
+		upgrade_6_check_1: "0",
+		wreck: "0"
 	};
 /* Transform data once translations are known */
 Object.keys(crewData).forEach(crew => {
@@ -1339,6 +1306,7 @@ itemData.forEach(item => {
 Object.keys(translatedDefaults).forEach(k => {
 	translatedDefaults[k] = getTranslationByKey(translatedDefaults[k]);
 });
+Object.assign(defaultValues, translatedDefaults);
 Object.keys(factionsData).forEach(x => {
 	factionsData[x].forEach(faction => {
 		faction.name = getTranslationByKey(faction.name);
@@ -1366,11 +1334,14 @@ Object.keys(playbookData).forEach(playbook => {
 			base[attr] = getTranslationByKey(base[attr]);
 		}
 	});
-	playbookData[playbook].friend = [...Array(5).keys()]
-		.filter(i => getTranslationByKey(`playbook_${playbook}_friend_${i}`))
-		.map(i => ({
-			name: getTranslationByKey(`playbook_${playbook}_friend_${i}`)
-		}));
+	if (!['ghost', 'hull'].includes(playbook)) {
+		playbookData[playbook].friend = [...Array(5).keys()]
+			.map(i => ({
+				name: getTranslationByKey(`playbook_${playbook}_friend_${i}`)
+			}))
+			.filter(o => o.name);
+	}
+	else playbookData[playbook].friend = [];
 	playbookData[playbook].ability = playbookData[playbook].ability.map(name => ({
 		name: getTranslationByKey(`playbook_ability_${name}`),
 		description: getTranslationByKey(`playbook_ability_${name}_description`)
@@ -1388,7 +1359,7 @@ const setAttrIfNeeded = (name, value) => {
 			setAttrs(setting);
 		});
 	},
-	fillRepeatingSectionFromData = (sectionName, dataList, autoGenerated, deleteAutogen, callback) => {
+	fillRepeatingSectionFromData = (sectionName, dataList, autogen, callback) => {
 		callback = callback || (() => {});
 		getSectionIDs(`repeating_${sectionName}`, idList => {
 			const existingRowAttributes = [
@@ -1397,7 +1368,7 @@ const setAttrIfNeeded = (name, value) => {
 			];
 			getAttrs(existingRowAttributes, v => {
 				/* Delete auto-generated rows */
-				if (deleteAutogen) {
+				if (autogen) {
 					idList = idList.filter(id => {
 						if (v[`repeating_${sectionName}_${id}_autogen`]) {
 							removeRepeatingRow(`repeating_${sectionName}_${id}`);
@@ -1419,7 +1390,7 @@ const setAttrIfNeeded = (name, value) => {
 							}
 						}
 						const newAttrs = {};
-						if (autoGenerated) {
+						if (autogen) {
 							newAttrs[`repeating_${sectionName}_${rowID}_autogen`] = '1';
 						}
 						return Object.keys(o).reduce((m, key) => {
@@ -1502,16 +1473,21 @@ const crewAttributes = [...new Set([].concat(...Object.keys(crewData).map(x => O
 /* Set default fields when setting crew type or playbook */
 on('change:crew_type change:playbook', event => {
 	getAttrs(['changed_attributes', 'setting_autofill', ...watchedAttributes], v => {
-		const changedAttributes = (v.changed_attributes || '').split(','),
+		const spiritPlaybooks = ['ghost', 'hull', 'vampire'],
+			changedAttributes = (v.changed_attributes || '').split(','),
 			sourceName = event.newValue.toLowerCase(),
-			fillBaseData = (data, base, defaults) => {
+			fillBaseData = (data, defaultAttrNames) => {
 				if (data) {
-					const finalSettings = {};
-					if (!spiritPlaybooks.includes(sourceName)) {
-						base.filter(name => !changedAttributes.includes(name))
-							.filter(name => v[name] !== (translatedDefaults[name] || defaults[name] || ''))
-							.forEach(name => (finalSettings[name] = translatedDefaults[name] || defaults[name] || ''));
-					}
+					const finalSettings = defaultAttrNames.filter(name => !changedAttributes.includes(name))
+						// do not reset attributes which have been changed by the user
+						.filter(name => !spiritPlaybooks.includes(sourceName) || !actionsFlat.includes(name))
+						// do not reset action dots if changing to a spirit playbook
+						.filter(name => v[name] !== (defaultValues[name] || ''))
+						// do not set attributes if current value is equal to sheet defaults
+						.reduce((m, name) => {
+							m[name] = defaultValues[name] || '';
+							return m;
+						}, {});
 					Object.keys(data).filter(name => !changedAttributes.includes(name))
 						.forEach(name => (finalSettings[name] = data[name]));
 					setAttrs(finalSettings);
@@ -1524,16 +1500,16 @@ on('change:crew_type change:playbook', event => {
 		}
 		if (v.setting_autofill !== '1') return;
 		if (event.sourceAttribute === 'crew_type' && sourceName in crewData) {
-			fillRepeatingSectionFromData('contact', crewData[sourceName].contact, true, true);
-			fillRepeatingSectionFromData('crewability', crewData[sourceName].crewability, true, true);
-			fillRepeatingSectionFromData('upgrade', crewData[sourceName].upgrade, true, true);
-			fillBaseData(crewData[sourceName].base, crewAttributes, defaultsFromSheet.crew);
+			fillRepeatingSectionFromData('contact', crewData[sourceName].contact, true);
+			fillRepeatingSectionFromData('crewability', crewData[sourceName].crewability, true);
+			fillRepeatingSectionFromData('upgrade', crewData[sourceName].upgrade, true);
+			fillBaseData(crewData[sourceName].base, crewAttributes);
 		}
 		if (event.sourceAttribute === 'playbook' && sourceName in playbookData) {
-			fillRepeatingSectionFromData('friend', playbookData[sourceName].friend, true, true);
-			fillRepeatingSectionFromData('ability', playbookData[sourceName].ability, true, true);
-			fillRepeatingSectionFromData('playbookitem', playbookData[sourceName].playbookitem, true, true);
-			fillBaseData(playbookData[sourceName].base, playbookAttributes, defaultsFromSheet.character);
+			fillRepeatingSectionFromData('friend', playbookData[sourceName].friend, true);
+			fillRepeatingSectionFromData('ability', playbookData[sourceName].ability, true);
+			fillRepeatingSectionFromData('playbookitem', playbookData[sourceName].playbookitem, true);
+			fillBaseData(playbookData[sourceName].base, playbookAttributes);
 		}
 	});
 });
@@ -1778,20 +1754,20 @@ on('sheet:opened', () => {
 							check: v.ability1_check || '0',
 							description: v.ability1_description || '',
 							name: v.ability1_name || ''
-						}], false, false, upgradeFunction);
+						}], false, upgradeFunction);
 						fillRepeatingSectionFromData('friend', [{
 							name: v.friend1_name || '',
 							status: v.friend1_status || ''
-						}], false, false, upgradeFunction);
+						}], false, upgradeFunction);
 						fillRepeatingSectionFromData('crewability', [{
 							check: v.crew_ability1_check || '0',
 							description: v.crew_ability1_description || '',
 							name: v.crew_ability1_name || ''
-						}], false, false, upgradeFunction);
+						}], false, upgradeFunction);
 						fillRepeatingSectionFromData('contact', [{
 							check: v.contact1_check || '0',
 							name: v.contact1_name || ''
-						}], false, false, upgradeFunction);
+						}], false, upgradeFunction);
 						console.log('Updating to 0.9');
 					});
 				}
@@ -1857,7 +1833,7 @@ on('sheet:opened', () => {
 						items.forEach(obj => {
 							obj.boxes_chosen = 'on';
 						});
-						fillRepeatingSectionFromData('playbookitem', items, false, false, upgradeFunction);
+						fillRepeatingSectionFromData('playbookitem', items, false, upgradeFunction);
 					});
 					getSectionIDs('repeating_item', idArray => {
 						const allAttrs = [
@@ -1987,7 +1963,7 @@ on('sheet:opened', () => {
 						items.forEach(obj => {
 							obj.boxes_chosen = 'on';
 						});
-						fillRepeatingSectionFromData('item', items, false, false, () => upgradeSheet('1.5'));
+						fillRepeatingSectionFromData('item', items, false, () => upgradeSheet('1.5'));
 						console.log('Updating to 1.5');
 					});
 				}
@@ -2057,7 +2033,7 @@ on('sheet:opened', () => {
 									setting[`repeating_upgrade_${id}_boxes_chosen`] = 'on';
 								});
 								setAttrs(setting, {}, upgradeFunction);
-								fillRepeatingSectionFromData('upgrade', upgrades, false, false, upgradeFunction);
+								fillRepeatingSectionFromData('upgrade', upgrades, false, upgradeFunction);
 							});
 						});
 						// Common upgrades
@@ -2291,7 +2267,7 @@ on('sheet:opened', () => {
 							.forEach(name => changedAttrs.add(name));
 						setting.changed_attributes = [...changedAttrs].join(',');
 						console.log('Updating to 2.0');
-						fillRepeatingSectionFromData('framefeature', frameData, false, false, upgradeFunction);
+						fillRepeatingSectionFromData('framefeature', frameData, false, upgradeFunction);
 						setAttrs(setting, {}, upgradeFunction);
 					});
 				}
@@ -2317,8 +2293,8 @@ on('sheet:opened', () => {
 		v.version ? upgradeSheet(v.version) : initialiseSheet();
 		// Set version number
 		setAttrs({
-			version: '2.0',
-			character_sheet: 'Blades in the Dark v2.0'
+			version: '2.1',
+			character_sheet: 'Blades in the Dark v2.1'
 		});
 	});
 });
