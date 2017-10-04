@@ -3803,7 +3803,7 @@
                     <span data-i18n="spell-icons:-u">SPELL ICONS:</span>
                     <select name="attr_spellicon_flag">
                         <option value="all" data-i18n="show_all">Show All</option>
-                        <option value="cp" data-i18n="cp_only">C&P Only</option>
+                        <option value="cp" data-i18n="cr_only">C&R Only</option>
                         <option value="none" data-i18n="none">None</option>
                     </select>
                 </div>
@@ -5760,15 +5760,7 @@
     });
 
     on("change:drop_category", function(eventinfo) {
-        if(eventinfo.sourceType === "sheetworker") {
-            return;
-        }
-
-        getAttrs(["drop_category"], function(v) {
-            if(v.drop_category && v.drop_category != "") {
-                handle_drop(v.drop_category);
-            }
-        });
+        handle_drop(eventinfo.newValue);
     });
 
     on("change:repeating_inventory:hasattack", function(eventinfo) {
@@ -5971,9 +5963,7 @@
 
     on("change:caster_level", function(eventinfo) {
         getAttrs(["caster_level","npc"], function(v) {
-            console.log(v);
             var casterlvl = v["caster_level"] && !isNaN(parseInt(v["caster_level"], 10)) ? parseInt(v["caster_level"], 10) : 0;
-            console.log(casterlvl);
             if(v["npc"] && v["npc"] == 1 && casterlvl > 0) {
                 setAttrs({level: casterlvl})
             };
@@ -6909,7 +6899,6 @@
                     });
                 }
             };
-
 
             callbacks.push( function() {cleanup_drop_fields();} );
             setAttrs(update, {silent: true}, function() {callbacks.forEach(function(callback) {callback(); })} );
