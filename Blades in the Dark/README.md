@@ -4,6 +4,10 @@ This is a character sheet for Blades in the Dark for use on Roll20.
 
 ## Changelog
 
+### 2.1
+* New auto-expand technique allowing some fields to grow according to their contents
+* Sheet worker tweaks for better transition to spirit playbooks
+
 ### 2.0
 * Additions
     * The names for heat, wanted, and deity can now be changed
