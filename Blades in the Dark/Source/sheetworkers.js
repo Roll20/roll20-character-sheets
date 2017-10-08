@@ -1610,7 +1610,7 @@ on('change:setting_extra_trauma', event => {
 on(qualityEvent, () => calculateCohortDice('cohort1'));
 on('change:repeating_cohort', () => calculateCohortDice('repeating_cohort'));
 on('change:crew_tier', () => {
-	getSectionIDs('repeating_cohort', a => a.forEach(id => calculateCohortDice(`repeating_cohort_${id}`)))
+	getSectionIDs('repeating_cohort', a => a.forEach(id => calculateCohortDice(`repeating_cohort_${id}`)));
 });
 /* Left-fill checkboxes */
 handleBoxesFill('upgrade_24_check_', true);
@@ -2290,7 +2290,8 @@ on('sheet:opened', () => {
 				});
 				console.log('Initialising new sheet');
 			};
-		v.version ? upgradeSheet(v.version) : initialiseSheet();
+		if (v.version) upgradeSheet(v.version);
+		else initialiseSheet();
 		// Set version number
 		setAttrs({
 			version: '2.1',
