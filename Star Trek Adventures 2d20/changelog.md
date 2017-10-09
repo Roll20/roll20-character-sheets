@@ -8,7 +8,7 @@ The sheet will always upgrade itself unless I specify otherwise, though some thi
 	** Now rolls attack and damage
 
 * Cleaned up Attribute Rolls
-	** Asking Task Difficult slows down rolls so removed
+	** Asking Task Difficulty slows down rolls so removed
 	** Fixed non focus calculation cs<1 not cs<2
 
 * Cleaned up lcars rolltemplate
