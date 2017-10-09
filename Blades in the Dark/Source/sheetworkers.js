@@ -1655,6 +1655,16 @@ on('change:reset_items', () => {
 	});
 	['item', 'playbookitem'].forEach(clearChecks);
 });
+/* Default values in upgrades */
+on('change:repeating_upgrade', () => {
+	getAttrs(['repeating_upgrade_numboxes'], v => {
+		if (!['1', '2', '3'].includes(v.repeating_upgrade_numboxes)) {
+			setAttrs({
+				repeating_upgrade_numboxes: 1
+			});
+		}
+	});
+});
 /* Bonus dice via dropdown or text input */
 on('change:setting_text_bonus_query sheet:opened', () => {
 	getAttrs(['setting_text_bonus_query', 'bonusdice', 'numberofdice'], v => {
