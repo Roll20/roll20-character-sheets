@@ -1655,12 +1655,12 @@ on('change:reset_items', () => {
 	});
 	['item', 'playbookitem'].forEach(clearChecks);
 });
-/* Default values in upgrades */
+/* Default values for number of upgrades boxes */
 on('change:repeating_upgrade', () => {
 	getAttrs(['repeating_upgrade_numboxes'], v => {
 		if (!['1', '2', '3'].includes(v.repeating_upgrade_numboxes)) {
 			setAttrs({
-				repeating_upgrade_numboxes: 1
+				repeating_upgrade_numboxes: '1'
 			});
 		}
 	});
