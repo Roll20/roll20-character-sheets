@@ -468,6 +468,8 @@ const crewData = {
 		hound: {
 			ability: ["sharpshooter", "focused", "ghost_hunter", "scout", "survivor", "tough_as_nails", "vengeful", "veteran"],
 			base: {
+				char_cohort_name: "hunting_pet",
+				char_cohort_subtype: "hunter",
 				friends_title: "playbook_hound_friends_title",
 				gatherinfo1: "gatherinfo_what_do_they_intend",
 				gatherinfo2: "gatherinfo_how_can_I_get_them",
@@ -477,6 +479,7 @@ const crewData = {
 				gatherinfo6: "gatherinfo_how_can_I_find",
 				hunt: "2",
 				playbook_description: "playbook_hound_description",
+				setting_show_cohort: "1",
 				survey: "1",
 				xp_condition: "playbook_hound_xp_condition"
 			},
@@ -1315,6 +1318,8 @@ Object.keys(factionsData).forEach(x => {
 Object.keys(playbookData).forEach(playbook => {
 	const base = playbookData[playbook].base,
 		translatedBaseAttributes = [
+			'char_cohort_name',
+			'char_cohort_subtype',
 			'friends_title',
 			'gatherinfo1',
 			'gatherinfo2',
@@ -1468,7 +1473,29 @@ const crewAttributes = [...new Set([].concat(...Object.keys(crewData).map(x => O
 	watchedAttributes = new Set(crewAttributes.concat(playbookAttributes)),
 	actionsFlat = [].concat(...Object.keys(actionData).map(x => actionData[x])),
 	traumaDataFlat = Object.keys(traumaData).reduce((m, k) => m.concat(traumaData[k]), []),
-	qualityEvent = ['crew_tier', 'cohort1_impaired', 'cohort1_type'].map(x => `change:${x}`).join(' ');
+	autoExpandFields = [
+		'repeating_ability:name',
+		'repeating_ability:description',
+		'repeating_crewability:name',
+		'repeating_crewability:description',
+		'repeating_playbookitem:name',
+		'repeating_upgrade:name',
+		'repeating_friend:name',
+		'repeating_contact:name',
+		'repeating_clock:name',
+		'repeating_crewclock:name',
+		'repeating_factionclock:name',
+		'repeating_cohort:edges',
+		'repeating_cohort:flaws',
+		'xp_condition',
+		'xp_condition_extra',
+		'xp_condition2',
+		'xp_condition3',
+		'crew_xp_condition',
+		'hunting_grounds_description',
+		'cohort1_edges',
+		'cohort1_flaws',
+	];
 /* EVENT HANDLERS */
 /* Set default fields when setting crew type or playbook */
 on('change:crew_type change:playbook', event => {
@@ -1607,10 +1634,26 @@ on('change:setting_extra_trauma', event => {
 	});
 });
 /* Calculate cohort quality */
-on(qualityEvent, () => calculateCohortDice('cohort1'));
+on(['crew_tier', 'cohort1_impaired', 'cohort1_type'].map(x => `change:${x}`).join(' '), () => calculateCohortDice('cohort1'));
 on('change:repeating_cohort', () => calculateCohortDice('repeating_cohort'));
 on('change:crew_tier', () => {
 	getSectionIDs('repeating_cohort', a => a.forEach(id => calculateCohortDice(`repeating_cohort_${id}`)));
+});
+on('change:char_cohort_quality change:char_cohort_impaired', () => {
+	getAttrs(['char_cohort_quality', 'char_cohort_impaired'], v => {
+		const dice = (parseInt(v.char_cohort_quality) || 0) - (parseInt(v.char_cohort_impaired) || 0);
+		setAttrIfNeeded('char_cohort_dice', dice);
+	});
+});
+/* Set correct verb for cohort roll button */
+['char_cohort', 'cohort1', 'repeating_cohort'].forEach(prefix => {
+	const eventString = 'change:' + ((prefix === 'repeating_cohort') ? `${prefix}:type` : `${prefix}_type`);
+	on(eventString, event => {
+		const setting = {};
+		if (event.newValue === 'expert') setting[`${prefix}_verb`] = '^{rolls_their}';
+		else setting[`${prefix}_verb`] = '^{roll_their-l}';
+		setAttrs(setting);
+	});
 });
 /* Left-fill checkboxes */
 handleBoxesFill('upgrade_24_check_', true);
@@ -1691,6 +1734,16 @@ on('change:setting_consequence_query sheet:opened', () => {
 		};
 		if (v.consequence_query === setting.consequence_query) delete setting.consequence_query;
 		setAttrs(setting);
+	});
+});
+/* Trim whitespace in auto-expand fields */
+autoExpandFields.forEach(name => {
+	on(`change:${name}`, event => {
+		if (event.newValue.trim() !== event.newValue && event.sourceType === 'player') {
+			const setting = {};
+			setting[name.replace(':', '_')] = event.newValue.trim();
+			setAttrs(setting);
+		}
 	});
 });
 /* INITIALISATION AND UPGRADES */
@@ -2254,7 +2307,7 @@ on('sheet:opened', () => {
 					upgradeSheet('1.15');
 					console.log('Updating to 1.15');
 				}
-				// Upgrade to 2.0: Rename trauma attributes
+				// Upgrade to 2.0: Rename trauma attributes, frame feature migration
 				else if (versionMajor < 2) {
 					const attrs = [
 						...traumaDataFlat,
@@ -2281,6 +2334,18 @@ on('sheet:opened', () => {
 						setAttrs(setting, {}, upgradeFunction);
 					});
 				}
+				// Upgrade to 2.2: Enable pet for hounds
+				else if (versionMajor === 2 && versionMinor < 2) {
+					getAttrs(['playbook'], v => {
+						if (v.playbook.toLowerCase() === 'hound') {
+							setAttrs({
+								char_cohort_name: 'Hunting Pet',
+								char_cohort_subtype: 'Hunter',
+								setting_show_cohort: '1'
+							});
+						}
+					});
+				}
 			},
 			initialiseSheet = () => {
 				const setting = ['ability', 'friend', 'crewability', 'contact', 'playbookitem', 'upgrade', 'framefeature']
@@ -2304,8 +2369,8 @@ on('sheet:opened', () => {
 		else initialiseSheet();
 		// Set version number
 		setAttrs({
-			version: '2.1',
-			character_sheet: 'Blades in the Dark v2.1'
+			version: '2.2',
+			character_sheet: 'Blades in the Dark v2.2'
 		});
 	});
 });
