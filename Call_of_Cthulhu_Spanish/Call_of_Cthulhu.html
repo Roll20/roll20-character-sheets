@@ -1,45 +1,42 @@
 <script type="text/worker">
+var DAMAGE_BONUS = {
+	table : [
+		{bonus: '-1d6', range: _.range( 0,  12)},
+		{bonus: '-1d4', range: _.range( 13, 16)},
+		{bonus:    '0', range: _.range( 17, 24)},
+		{bonus:  '1d4', range: _.range( 25, 32)},
+		{bonus:  '1d6', range: _.range( 33, 40)},
+		{bonus:  '2d6', range: _.range( 42, 56)},
+		{bonus:  '3d6', range: _.range( 57, 72)},
+		{bonus:  '4d6', range: _.range( 73, 88)},
+		{bonus:  '5d6', range: _.range( 89,104)},
+		{bonus:  '6d6', range: _.range(105,120)},
+		{bonus:  '7d6', range: _.range(121,136)},
+		{bonus:  '8d6', range: _.range(137,152)},
+		{bonus:  '9d6', range: _.range(153,168)},
+		{bonus: '10d6', range: _.range(169,184)},
+		{bonus: '11d6', range: _.range(185,200)},
+		{bonus: '12d6', range: _.range(201,216)},
+		{bonus: '13d6', range: _.range(217,232)},
+		{bonus: '14d6', range: _.range(233,248)},
+		{bonus: '21d6', range: _.range(249,999)},
+	],
+	
+	getBonusForValue : function(value) {
+		var checkRange = function(entry) { return entry.range.indexOf(parseInt(value||0)) !== -1 };
+		var tableEntry = _.find(this.table, checkRange);
+		return tableEntry.bonus;
+	}
+};
+
+
 on("change:FUE change:TAM", function() {
   getAttrs(["FUE","TAM"], function(values) {
-    if((parseInt(values.FUE)+parseInt(values.TAM))<13){
-      setAttrs({"Damage-Bonus": "-1d6"});
-    } else if((parseInt(values.FUE)+parseInt(values.TAM))<17){
-      setAttrs({"Damage-Bonus": "-1d4"});
-    } else if((parseInt(values.FUE)+parseInt(values.TAM))<25){
-      setAttrs({"Damage-Bonus": "0"});
-    } else if((parseInt(values.FUE)+parseInt(values.TAM))<33){
-      setAttrs({"Damage-Bonus": "-1d6"});
-    } else if((parseInt(values.FUE)+parseInt(values.TAM))<42){
-      setAttrs({"Damage-Bonus": "1d4"});
-    } else if((parseInt(values.FUE)+parseInt(values.TAM))<57){
-      setAttrs({"Damage-Bonus": "1d6"});
-    } else if((parseInt(values.FUE)+parseInt(values.TAM))<73){
-      setAttrs({"Damage-Bonus": "2d6"});
-    } else if((parseInt(values.FUE)+parseInt(values.TAM))<89){
-      setAttrs({"Damage-Bonus": "3d6"});
-    } else if((parseInt(values.FUE)+parseInt(values.TAM))<105){
-      setAttrs({"Damage-Bonus": "4d6"});
-    } else if((parseInt(values.FUE)+parseInt(values.TAM))<121){
-      setAttrs({"Damage-Bonus": "5d6"});
-    } else if((parseInt(values.FUE)+parseInt(values.TAM))<137){
-      setAttrs({"Damage-Bonus": "6d6"});
-    } else if((parseInt(values.FUE)+parseInt(values.TAM))<153){
-      setAttrs({"Damage-Bonus": "7d6"});
-    } else if((parseInt(values.FUE)+parseInt(values.TAM))<169){
-      setAttrs({"Damage-Bonus": "8d6"});
-    } else if((parseInt(values.FUE)+parseInt(values.TAM))<185){
-      setAttrs({"Damage-Bonus": "9d6"});
-    } else if((parseInt(values.FUE)+parseInt(values.TAM))<201){
-      setAttrs({"Damage-Bonus": "10d6"});
-    } else if((parseInt(values.FUE)+parseInt(values.TAM))<217){
-      setAttrs({"Damage-Bonus": "11d6"});
-    } else if((parseInt(values.FUE)+parseInt(values.TAM))<233){
-      setAttrs({"Damage-Bonus": "12d6"});
-    } else if((parseInt(values.FUE)+parseInt(values.TAM))<249){
-      setAttrs({"Damage-Bonus": "13d6"});
-    } else {
-      setAttrs({"Damage-Bonus": "21d6"});
-    }
+	var v = parseInt(values.FUE) + parseInt(values.TAM);
+	// LOG V to see if it is correct for the conditions
+	var damage_bonus = DAMAGE_BONUS.getBonusForValue(v);
+	// LOG damage bonus to see if it is correct
+	setAttrs({ "Damage-Bonus": damage_bonus});
   });
 });
 </script>
@@ -47,25 +44,29 @@ on("change:FUE change:TAM", function() {
 <div class='sheet-2colrow'>
 	<div class='sheet-col'>
 		<img class="logo" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Call_of_Cthulhu_Spanish/Call_of_Cthulhu_Logo.png" />
-		<table style"width: 100%;">
+		<table>
 			<tr>
-				<td class="tdtitle" data-i18n="investigator-name-u" value="@{character_name}">Nombre del Investigador</td>
+				<td class="tdtitle"><span data-i18n="investigator-name-u" value="@{character_name}">Nombre del Investigador</span></td>
 				<td><input type="text" name="attr_Name" style="max-width: 300px" /></td>
 			</tr>
 			<tr>
-				<td class="tdtitle" data-i18n="occupation-u">Ocupaci&oacute;n</td>
+				<td class="tdtitle"><span data-i18n="occupation-u">Ocupaci&oacute;n</span></td>
 				<td><input type="text" name="attr_Occupation" style="max-width: 300px" /></td>
 			</tr>
 			<tr>
-				<td class="tdtitle" data-i18n="sex-u">>Sexo</td>
-				<td><input type="text" name="attr_Sex" style="max-width: 200px" /> <span class="tdtitle" data-i18n="age-u">Edad</span> <input type="number" name="attr_Age" style="width: 58px" /></td>
+				<td class="tdtitle" data-i18n="sex-u">Sexo</td>
+				<td>
+					<input type="text" name="attr_Sex" />
+					<span class="tdtitle" data-i18n="age-u">Edad</span>
+					<input type="number" name="attr_Age" style="width: 58px" />
+				</td>
 			</tr>
 			<tr>
 				<td class="tdtitle" data-i18n="degrees-u">T&iacute;tulos, licenciaturas</td>
 				<td><input type="text" name="attr_Degrees" style="max-width: 300px" /></td>
 			</tr>
 			<tr>
-				<td class="tdtitle" data-i18n="birthplace-u">Lugar de Nacimiento</td>
+				<td class="tdtitle"><span data-i18n="birthplace-u">Lugar de Nacimiento</span></td>
 				<td><input type="text" name="attr_Birthplace" style="max-width: 300px" /></td>
 			</tr>
 		</table>
@@ -181,7 +182,7 @@ on("change:FUE change:TAM", function() {
 		<table style="width: 100%;">
 			<tr>
 		<td><span class="tdtitle" data-i18n="max-san-u">Cordura m&aacute;xima</span> <input type="number" name="attr_Max-Sanity" value="99-@{Cthulhu-Mythos}" disabled="true" /></td>
-		<td><span data-i18n="dmg-bonus-u">Bonificaci&oacute;n al daño</span> <input type="text" name="attr_Damage-Bonus" style="width: 130px" readonly="true" /></td>
+		<td><span data-i18n="dmg-bonus-u">Bonificaci&oacute;n al daño</span> <input type="text" name="attr_Damage-Bonus" style="width: 130px" /></td>
 			</tr>
 		</table>
 	</div>
@@ -466,12 +467,12 @@ on("change:FUE change:TAM", function() {
 <hr/>
 <div>
     <h3 data-i18n="skills-u">Habilidades</h3>
-    <div class='sheet-3colrow'  data-i18n-list="skills-list">
+	<div class='sheet-3colrow'  data-i18n-list="skills-list">
         <div class='sheet-col'>
             <table style="width: 100%;">
                 <tr data-i18n-list-item="anthropology">
                     <td><input type="checkbox" name="attr_Success-Anthropology"  /></td>
-                    <td data-i18n="anthropology-u">Antropolog&iacute;a (01%)</td>
+                    <td> <span data-i18n="anthropology-u">Antropolog&iacute;a  (01%)</</span> <span name="attr_edition"></span></td>
                     <td><input type="number" name="attr_Anthropology" value="1"  /></td>
                     <td><button type="roll" name="roll_Anthropology" value="&{template:default} {{name=^{anthropology-u}}} {{^{roll-u}=[[1d100<@{Anthropology}]]}}" /></td>
                 </tr>
@@ -669,7 +670,7 @@ on("change:FUE change:TAM", function() {
                     <td><input type="checkbox" name="attr_Success-Medicine"  /></td>
                     <td data-i18n="medicine-u">Medicina (05%)</td>
                     <td><input type="number" name="attr_Medicine" value="5"  /></td>
-                    <td><button type="roll" name="roll_Medicine" value="&{template:default} {{name=^{medicine-u}}} {{^{roll-u}=[[1d100<@{Medicine}]]}} {{^{heal-u}=[[?{Tratamiento&#124;Urgencia, 1d3&#124;^{weekly-u}, 2d3}]]}}" /></td>
+                    <td><button type="roll" name="roll_Medicine" value="&{template:default} {{name=^{medicine-u}}} {{^{roll-u}=[[1d100<@{Medicine}]]}} {{^{heal-u}=[[?{Tratamiento|Urgencia, 1d3|Semanal, 2d3}]]}}" /></td>
                 </tr>
                 <tr data-i18n-list-item="cthulhu-mythos">
                     <td></td>
@@ -931,8 +932,8 @@ on("change:FUE change:TAM", function() {
                 <td><input type="text" name="attr_Grapple-Damage" style="width: 110px" value="0" /></td>
                 <td><input type="number" name="attr_Grapple-ApR" /></td>
                 <td><input type="text" name="attr_Grapple-HP" style="width: 50px" /></td>
-                <td><button type="roll" name="roll_Grapple" value="&{template:default} {{name=^{grapple-u}}} {{^{attack-u}=[[1d100<@{Grapple}]]}} {{^{damage-u}= ?{^{objective-u&#125;|Inmovilizar, [[1d100<((5*(@{STR}-@{target|STR})))+50]]|Derribar, [[1]]|Noquear, [[1]]|Desarmar, [[1d100<@{Grapple}]]}}} {{Desarmar= Requiere un turno para el agarre y otro para el desarme, además de que las dos tiradas acierten.}} {{Inovilizar= Requiere un turno para el agarre y otro para inmovilizar, además de que las dos tiradas acierten.}}" /></td>
-				<td><button type="roll" name="roll_wgm-Grapple" value="/w gm &{template:default} {{name=^{grapple-u}}} {{^{attack-u}=[[1d100<@{Grapple}]]}} {{^{damage-u}= ?{^{objective-u&#125;|Inmovilizar, [[1d100<((5*(@{STR}-@{target|STR})))+50]]|Derribar, [[1]]|Noquear, [[1]]|Desarmar, [[1d100<@{Grapple}]]}}} {{Desarmar= Requiere un turno para el agarre y otro para el desarme, además de que las dos tiradas acierten.}} {{Inovilizar= Requiere un turno para el agarre y otro para inmovilizar, además de que las dos tiradas acierten.}}" /></td>
+                <td><button type="roll" name="roll_Grapple" value="&{template:default} {{name=^{grapple-u}}} {{^{attack-u}=[[1d100<@{Grapple}]]}}" /></td>
+				<td><button type="roll" name="roll_wgm-Grapple" value="/w gm &{template:default} {{name=^{grapple-u}}} {{^{attack-u}=[[1d100<@{Grapple}]]}} {{^{damage-u}= ?{^{objective-u}|Inmovilizar, [[1d100<((5*(@{STR}-@{target|STR})))+50]]|Derribar, [[1]]|Noquear, [[1]]|Desarmar, [[1d100<@{Grapple}]]}}}" /></td>
             </tr>
         </tbody>
     </table>
