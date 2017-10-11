@@ -41,7 +41,7 @@
                 <input type="number" class="sheet-ability-value" name="attr_cha" value="10">
             </div>
             <div class="sheet-ability-column-modifier sheet-flex-between">
-                <input type="number" class="sheet-ability-modifier" name="attr_ChaMod" value="(round(@{cha}*@{cha}*@{cha}*0.002831-@{cha}*@{cha}*0.08918+1.164*@{cha}-5.667))" disabled="true">
+                <input type="number" class="sheet-ability-modifier" name="attr_ChaMod" value="0" readonly>
                 <span class="sheet-subtext">Ret. Recruitment, Loyalty</span>
             </div>
             <div class="sheet-ability-column-roll sheet-flex">
@@ -54,7 +54,7 @@
                 <input type="number" class="sheet-ability-value" name="attr_con" value="10">
             </div>
             <div class="sheet-ability-column-modifier sheet-flex-between">
-                <input type="number" class="sheet-ability-modifier" name="attr_ConMod" value="(round(@{con}*@{con}*@{con}*0.002831-@{con}*@{con}*0.08918+1.164*@{con}-5.667))" disabled="true">
+                <input type="number" class="sheet-ability-modifier" name="attr_ConMod" value="0" readonly>
                 <span class="sheet-subtext">Hit Points, Daily Travel Distance</span>
             </div>
             <div class="sheet-ability-column-roll sheet-flex">
@@ -67,7 +67,7 @@
                 <input type="number" class="sheet-ability-value" name="attr_dex" value="10">
             </div>
             <div class="sheet-ability-column-modifier sheet-flex-between">
-                <input type="number" class="sheet-ability-modifier" name="attr_DexMod" value="(round(@{dex}*@{dex}*@{dex}*0.002831-@{dex}*@{dex}*0.08918+1.164*@{dex}-5.667))" disabled="true">
+                <input type="number" class="sheet-ability-modifier" name="attr_DexMod" value="0" readonly>
                 <span class="sheet-subtext">AC, Ranged AB, Initiative</span>
             </div>
             <div class="sheet-ability-column-roll sheet-flex">
@@ -80,7 +80,7 @@
                 <input type="number" class="sheet-ability-value" name="attr_int" value="10">
             </div>
             <div class="sheet-ability-column-modifier sheet-flex-between">
-                <input type="number" class="sheet-ability-modifier" name="attr_IntMod" value="(round(@{int}*@{int}*@{int}*0.002831-@{int}*@{int}*0.08918+1.164*@{int}-5.667))" disabled="true">
+                <input type="number" class="sheet-ability-modifier" name="attr_IntMod" value="0" readonly>
                 <span class="sheet-subtext">Saves vs MU Spells, Languages</span>
             </div>
             <div class="sheet-ability-column-roll sheet-flex">
@@ -93,7 +93,7 @@
                 <input type="number" class="sheet-ability-value" name="attr_str" value="10">
             </div>
             <div class="sheet-ability-column-modifier sheet-flex-between">
-                <input type="number" class="sheet-ability-modifier" name="attr_StrMod" value="(round(@{str}*@{str}*@{str}*0.002831-@{str}*@{str}*0.08918+1.164*@{str}-5.667))" disabled="true">
+                <input type="number" class="sheet-ability-modifier" name="attr_StrMod" value="0" readonly>
                 <span class="sheet-subtext">Melee AB, Open Doors</span>
             </div>
             <div class="sheet-ability-column-roll sheet-flex">
@@ -106,7 +106,7 @@
                 <input type="number" class="sheet-ability-value" name="attr_wis" value="10">
             </div>
             <div class="sheet-ability-column-modifier sheet-flex-between">
-                <input type="number" class="sheet-ability-modifier" name="attr_WisMod" value="(round(@{wis}*@{wis}*@{wis}*0.002831-@{wis}*@{wis}*0.08918+1.164*@{wis}-5.667))" disabled="true">
+                <input type="number" class="sheet-ability-modifier" name="attr_WisMod" value="0" readonly>
                 <span class="sheet-subtext">Saves vs Cleric Spells</span>
             </div>
             <div class="sheet-ability-column-roll sheet-flex">
@@ -179,19 +179,19 @@
         <div class="sheet-thick-border sheet-flex">
             <div class="sheet-svblock">
                 <span class="sheet-svbtitle">Melee<br>AC</span>
-                <input type="number" class="sheet-savingthrow" name="attr_MeleeAC">
+                <input type="number" class="sheet-savingthrow" name="attr_MeleeAC" value="12">
             </div>
             <div class="sheet-svblock">
                 <span class="sheet-svbtitle">Ranged<br>AC</span>
-                <input type="number" class="sheet-savingthrow" name="attr_RangedAC">
+                <input type="number" class="sheet-savingthrow" name="attr_RangedAC" value="12">
             </div>
             <div class="sheet-svblock">
                 <span class="sheet-svbtitle">W.Shield<br>AC</span>
-                <input type="number" class="sheet-savingthrow" name="attr_WShieldAC">
+                <input type="number" class="sheet-savingthrow" name="attr_WShieldAC" value="12">
             </div>
             <div class="sheet-svblock">
                 <span class="sheet-svbtitle">Surpr.<br>AC</span>
-                <input type="number" class="sheet-savingthrow" name="attr_SurprisedAC">
+                <input type="number" class="sheet-savingthrow" name="attr_SurprisedAC" value="12">
             </div>
              <div class="sheet-svblock">
                 <span class="sheet-svbtitle">Encumb.</span>
@@ -419,5 +419,21 @@ on('change:repeating_equipment remove:repeating_equipment', () => {
       });
     });
   });
+});
+['Cha', 'Con', 'Dex', 'Int', 'Str', 'Wis'].forEach(ability => {
+	on(`sheet:opened change:${ability.toLowerCase()}`, () => {
+		getAttrs([ability.toLowerCase()], v => {
+			const value = parseInt(v[ability.toLowerCase()]) || 10,
+				setting = {};
+			if (value <= 3) setting[`${ability}Mod`] = -3;
+			else if (value <= 5) setting[`${ability}Mod`] = -2;
+			else if (value <= 8) setting[`${ability}Mod`] = -1;
+			else if (value <= 12) setting[`${ability}Mod`] = 0;
+			else if (value <= 15) setting[`${ability}Mod`] = 1;
+			else if (value <= 17) setting[`${ability}Mod`] = 2;
+			else setting[`${ability}Mod`] = 3;
+			setAttrs(setting);
+		});
+	});
 });
 </script>
