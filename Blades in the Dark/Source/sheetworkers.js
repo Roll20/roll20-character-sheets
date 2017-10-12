@@ -1450,7 +1450,7 @@ const setAttrIfNeeded = (name, value) => {
 	},
 	calculateResistance = name => {
 		getAttrs(actionData[name], v => {
-			const total = Object.keys(v).map(x => v[x]).reduce((s, c) => s + (c === '0' ? 0 : 1), 0);
+			const total = Object.keys(v).map(x => v[x]).reduce((s, c) => s + (String(c) === '0' ? 0 : 1), 0);
 			setAttrIfNeeded(name, total);
 		});
 	},
@@ -2301,12 +2301,6 @@ on('sheet:opened', () => {
 						console.log('Updating to 1.13');
 					});
 				}
-				// Upgrade to 1.15: Recalculate resistance
-				else if (versionMajor === 1 && versionMinor < 15) {
-					Object.keys(actionData).forEach(calculateResistance);
-					upgradeSheet('1.15');
-					console.log('Updating to 1.15');
-				}
 				// Upgrade to 2.0: Rename trauma attributes, frame feature migration
 				else if (versionMajor < 2) {
 					const attrs = [
@@ -2345,6 +2339,14 @@ on('sheet:opened', () => {
 							});
 						}
 					});
+					upgradeSheet('2.2');
+					console.log('Updating to 2.2');
+				}
+				// Upgrade to 2.3: Recalculate resistance, just to be safe
+				else if (versionMajor === 2 && versionMinor < 3) {
+					Object.keys(actionData).forEach(calculateResistance);
+					upgradeSheet('2.3');
+					console.log('Updating to 2.3');
 				}
 			},
 			initialiseSheet = () => {
@@ -2369,8 +2371,8 @@ on('sheet:opened', () => {
 		else initialiseSheet();
 		// Set version number
 		setAttrs({
-			version: '2.2',
-			character_sheet: 'Blades in the Dark v2.2'
+			version: '2.3',
+			character_sheet: 'Blades in the Dark v2.3'
 		});
 	});
 });
