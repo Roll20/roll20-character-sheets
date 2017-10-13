@@ -58,6 +58,7 @@ September - Updates to the sheet listed below
           Went from opening doors to Opening stuck doors, Opening locked doors, and bending bars. Each have their specific dice as per core rules.
           Adding more popup info on fields if hovered over. More will be added over time.
           Saving throws: Split Saving throw "Spells" off to it's own field due to some races and class options having a specific modifier for that save.
+          Discovered a non-bfrpg field placed in the sheet. Removed field.
           
 **Credit Where Credit is Due**
 The CSS and much of the layout is lifted from the work of allenmaher's BECMI sheet who lifted the excellent work of John Myles (@Actoba on roll20) and the 5e Dungeons and Dragons sheet.
