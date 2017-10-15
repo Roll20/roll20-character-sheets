@@ -2230,204 +2230,218 @@ var TAS = TAS || (function(){
  * Events
  */
 on("sheet:opened", function() {
-  validateAttrMods();
-  calculateMaxStrain();
-  validateStrain();
-  validateGear();
-  migrateTechniques();
-  migrateCyberware();
+    validateAttrMods();
+    calculateMaxStrain();
+    validateStrain();
+    validateGear();
+    migrateTechniques();
+    migrateCyberware();
 });
 
 on("change:str change:int change:dex change:wis change:con change:cha", function(e) {
-  var attr = e.sourceAttribute;
-  calculateMod([attr]);
+    var attr = e.sourceAttribute;
+    calculateMod([attr]);
 
-  console.log(attr);
-  if (attr === 'con') {
-    calculateMaxStrain();
-  }
+    console.log(attr);
+    if (attr === 'con') {
+        calculateMaxStrain();
+    }
 });
 
 on("change:str_misc change:int_misc change:dex_misc change:wis_misc change:con_misc change:cha_misc", function(e) {
-  var attr = e.sourceAttribute.substr(0,3);
-  calculateMod([attr]);
+    var attr = e.sourceAttribute.substr(0, 3);
+    calculateMod([attr]);
 });
 
 on("change:strain", function() {
-  validateStrain();
+    validateStrain();
 });
 
 on("change:strain_perm", function() {
-  validateStrain();
+    validateStrain();
 });
 
 on("change:gear_readied_max", function() {
-  validateReadiedMax();
+    validateReadiedMax();
 });
 
 on("change:level", function() {
-  calculateSaves();
+    calculateSaves();
 });
 
 on("change:skill_biopsion change:skill_precognition change:skill_telepathy change:skill_teleportation, change:skill_telekinesis change:skill_metapsion change:psionics_extra_effort", function() {
-  calculateEffort();
+    calculateEffort();
 })
 
 on("change:armor_ac change:innate_ac", function() {
-  calculateAC();
+    calculateAC();
 });
 
 on("change:repeating_gear", function() {
-  getAttrs(["gear_readied_current","gear_stowed_current"], function(v) {
-    setAttrs({gear_readied_current: parseInt(0)});
-    setAttrs({gear_stowed_current: parseInt(0)});
-  });
+    getAttrs(["gear_readied_current", "gear_stowed_current"], function(v) {
+        setAttrs({
+            gear_readied_current: parseInt(0)
+        });
+        setAttrs({
+            gear_stowed_current: parseInt(0)
+        });
+    });
 
-  TAS.repeating("gear")
-    .attrs("gear_readied_current", "gear_stowed_current")
-    .fields("gear_encumbrance", "gear_readied")
-    .map(function(row, attrSet, id, rowSet) {
-      if (parseInt(row.gear_readied) === 1) {
-        attrSet.gear_readied_current += parseInt(row.gear_encumbrance);
-      } else if (parseInt(row.gear_readied) === 2){
-        attrSet.gear_stowed_current += parseInt(row.gear_encumbrance);
-      }
-    })
-    .execute();
+    TAS.repeating("gear")
+        .attrs("gear_readied_current", "gear_stowed_current")
+        .fields("gear_encumbrance", "gear_readied")
+        .map(function(row, attrSet, id, rowSet) {
+            if (parseInt(row.gear_readied) === 1) {
+                attrSet.gear_readied_current += parseInt(row.gear_encumbrance);
+            } else if (parseInt(row.gear_readied) === 2) {
+                attrSet.gear_stowed_current += parseInt(row.gear_encumbrance);
+            }
+        })
+        .execute();
 });
 
 /**
  * Calculations
  */
 calculateSaves = function() {
-  getAttrs(["str_bonus", "con_bonus", "cha_bonus", "wis_bonus", "dex_bonus", "int_bonus", "level"], function (v) {
-    setAttrs({
-      save_physical: 16 - v.level - Math.max(v.str_bonus, v.con_bonus),
-      save_mental: 16 - v.level - Math.max(v.cha_bonus, v.wis_bonus),
-      save_evasion: 16 - v.level - Math.max(v.int_bonus, v.dex_bonus)
+    getAttrs(["str_bonus", "con_bonus", "cha_bonus", "wis_bonus", "dex_bonus", "int_bonus", "level"], function(v) {
+        setAttrs({
+            save_physical: 16 - v.level - Math.max(v.str_bonus, v.con_bonus),
+            save_mental: 16 - v.level - Math.max(v.cha_bonus, v.wis_bonus),
+            save_evasion: 16 - v.level - Math.max(v.int_bonus, v.dex_bonus)
+        });
     });
-  });
 }
 calculateEffort = function() {
-  getAttrs(["wis_bonus", "con_bonus", "psionics_extra_effort", "skill_biopsion", "skill_precognition", "skill_telepathy", "skill_teleportation", "skill_telekinesis", "skill_metapsion"], function (v) {
-    setAttrs({
-      psionics_total_effort: 1 + Math.max(v.wis_bonus, v.con_bonus) + Math.max(v.skill_biopsion, v.skill_precognition, v.skill_telepathy, v.skill_teleportation, v.skill_telekinesis, v.skill_metapsion) + parseInt(v.psionics_extra_effort, 10)
+    getAttrs(["wis_bonus", "con_bonus", "psionics_extra_effort", "skill_biopsion", "skill_precognition", "skill_telepathy", "skill_teleportation", "skill_telekinesis", "skill_metapsion"], function(v) {
+        setAttrs({
+            psionics_total_effort: 1 + Math.max(v.wis_bonus, v.con_bonus) + Math.max(v.skill_biopsion, v.skill_precognition, v.skill_telepathy, v.skill_teleportation, v.skill_telekinesis, v.skill_metapsion) + parseInt(v.psionics_extra_effort, 10)
+        });
     });
-  });
 }
 calculateAC = function() {
-  getAttrs(["dex_bonus", "armor_ac", "innate_ac"], function (v) {
-    if (v.innate_ac === '' || v.innate_ac === undefined) {
-      v.innate_ac = 10;
-    }
-    setAttrs({
-      AC: Math.max(10, parseInt(v.armor_ac, 10), parseInt(v.innate_ac, 10)) + parseInt(v.dex_bonus)
+    getAttrs(["dex_bonus", "armor_ac", "innate_ac"], function(v) {
+        if (v.innate_ac === '' || v.innate_ac === undefined) {
+            v.innate_ac = 10;
+        }
+        setAttrs({
+            AC: Math.max(10, parseInt(v.armor_ac, 10), parseInt(v.innate_ac, 10)) + parseInt(v.dex_bonus)
+        });
     });
-  });
 }
 calculateMod = function(attributes) {
-  attributes.map(function(attr) {
-    var attrModMisc = attr + '_misc';
+    attributes.map(function(attr) {
+        var attrModMisc = attr + '_misc';
 
-    getAttrs([attr, attrModMisc], function(v) {
-      var attrModName = attr + '_bonus';
-      var updatedVal  = {};
+        getAttrs([attr, attrModMisc], function(v) {
+            var attrModName = attr + '_bonus';
+            var updatedVal = {};
 
-      if (v[attr] >= 18) {
-        updatedVal[attrModName] = 2;
-      } else if (v[attr] >= 14 && v[attr] <= 17) {
-        updatedVal[attrModName] = 1;
-      } else if (v[attr] >= 4 && v[attr] <= 7) {
-        updatedVal[attrModName] = -1;
-      } else if (v[attr] <= 3) {
-        updatedVal[attrModName] = -2;
-      } else {
-        updatedVal[attrModName] = 0
-      }
+            if (v[attr] >= 18) {
+                updatedVal[attrModName] = 2;
+            } else if (v[attr] >= 14 && v[attr] <= 17) {
+                updatedVal[attrModName] = 1;
+            } else if (v[attr] >= 4 && v[attr] <= 7) {
+                updatedVal[attrModName] = -1;
+            } else if (v[attr] <= 3) {
+                updatedVal[attrModName] = -2;
+            } else {
+                updatedVal[attrModName] = 0
+            }
 
-      if (v[attrModMisc] === '' || v[attrModMisc] === undefined) {
-        v[attrModMisc] = 0;
-      }
-      updatedVal[attrModName] += parseInt(v[attrModMisc]);
-      setAttrs(updatedVal);
-      calculateSaves();
-      calculateEffort();
-      calculateAC();
+            if (v[attrModMisc] === '' || v[attrModMisc] === undefined) {
+                v[attrModMisc] = 0;
+            }
+            updatedVal[attrModName] += parseInt(v[attrModMisc]);
+            setAttrs(updatedVal);
+            calculateSaves();
+            calculateEffort();
+            calculateAC();
+        });
     });
-  });
 }
 
 calculateMaxStrain = function() {
-  getAttrs(['con'], function(v) {
-    setAttrs({strain_max: parseInt(v.con)});
-  });
+    getAttrs(['con'], function(v) {
+        setAttrs({
+            strain_max: parseInt(v.con)
+        });
+    });
 }
 
 /**
  * Validations
  */
 validateAttrMods = function() {
-  calculateMod(['str', 'int', 'dex', 'wis', 'con', 'cha']);
+    calculateMod(['str', 'int', 'dex', 'wis', 'con', 'cha']);
 }
 
 validateStrain = function() {
-  getAttrs(["strain", "strain_perm", "strain_max"], function(v) {
-    if (!v.strain || (!v.strain_perm && !v.strain_max)) return false;
+    getAttrs(["strain", "strain_perm", "strain_max"], function(v) {
+        if (!v.strain || (!v.strain_perm && !v.strain_max)) return false;
 
-    v.strain = +v.strain;
-    if (v.strain_perm) v.strain_perm = +v.strain_perm;
-    if (v.strain_max) v.strain_max = +v.strain_max;
+        v.strain = +v.strain;
+        if (v.strain_perm) v.strain_perm = +v.strain_perm;
+        if (v.strain_max) v.strain_max = +v.strain_max;
 
-    if (v.strain_perm && v.strain < v.strain_perm) {
-        setAttrs({strain: v.strain_perm});
-    } else if (v.strain_max && v.strain > v.strain_max) {
-        setAttrs({strain: v.strain_max});
-    }
-  });
+        if (v.strain_perm && v.strain < v.strain_perm) {
+            setAttrs({
+                strain: v.strain_perm
+            });
+        } else if (v.strain_max && v.strain > v.strain_max) {
+            setAttrs({
+                strain: v.strain_max
+            });
+        }
+    });
 }
 
 validateGear = function() {
-  validateReadiedMax();
-  validateStowedMax();
+    validateReadiedMax();
+    validateStowedMax();
 }
 
 validateReadiedMax = function() {
-  getAttrs(["str","gear_readied_max"], function(v) {
-    if (!v.str) return false;
+    getAttrs(["str", "gear_readied_max"], function(v) {
+        if (!v.str) return false;
 
-    v.str = +v.str;
-    if (v.gear_readied_max) v.gear_readied_max = +v.gear_readied_max;
+        v.str = +v.str;
+        if (v.gear_readied_max) v.gear_readied_max = +v.gear_readied_max;
 
-    readied_max = Math.floor(v.str / 2);
-    if (readied_max === v.gear_readied_max) return false;
+        readied_max = Math.floor(v.str / 2);
+        if (readied_max === v.gear_readied_max) return false;
 
-    setAttrs({gear_readied_max: readied_max});
-  });
+        setAttrs({
+            gear_readied_max: readied_max
+        });
+    });
 }
 
 validateStowedMax = function() {
-  getAttrs(["str","gear_stowed_max"], function(v) {
-    if (!v.str) return false;
+    getAttrs(["str", "gear_stowed_max"], function(v) {
+        if (!v.str) return false;
 
-    v.str = +v.str;
-    if (v.gear_stowed_max) v.gear_stowed_max = +v.gear_stowed_max;
+        v.str = +v.str;
+        if (v.gear_stowed_max) v.gear_stowed_max = +v.gear_stowed_max;
 
-    stowed_max = v.str;
-    if (stowed_max === v.gear_stowed_max) return false;
+        stowed_max = v.str;
+        if (stowed_max === v.gear_stowed_max) return false;
 
-    setAttrs({gear_stowed_max: stowed_max});
-  });
+        setAttrs({
+            gear_stowed_max: stowed_max
+        });
+    });
 }
 /**
-  * Migrations
-  */
+ * Migrations
+ */
 
-migrateTechniques = function () {
+migrateTechniques = function() {
     console.log("Migrate started");
     var technique, i, newRow, newRowId, newRowAttrs = {};
-    getAttrs(['psionics_mastered_1', 'psionics_mastered_2', 'psionics_mastered_3', 'psionics_mastered_4', 'psionics_mastered_5', 'psionics_mastered_6', 'psionics_mastered_7', 'psionics_mastered_8'], function (values) {
+    getAttrs(['psionics_mastered_1', 'psionics_mastered_2', 'psionics_mastered_3', 'psionics_mastered_4', 'psionics_mastered_5', 'psionics_mastered_6', 'psionics_mastered_7', 'psionics_mastered_8'], function(values) {
         console.log(values);
-        for (i = 1; i < 9; i++){
+        for (i = 1; i < 9; i++) {
             technique = values["psionics_mastered_" + i];
             console.log(technique);
             if (technique !== "" && typeof technique === 'string') {
@@ -2438,7 +2452,7 @@ migrateTechniques = function () {
                 console.log(newRow);
                 newRowAttrs[newRow] = technique;
                 console.log(newRowAttrs);
-                setAttrs(newRowAttrs, function (values) {
+                setAttrs(newRowAttrs, function(values) {
                     console.log("updated");
                 });
                 newRow = "psionics_mastered_" + i;
@@ -2451,12 +2465,12 @@ migrateTechniques = function () {
     });
 }
 
-migrateCyberware = function () {
+migrateCyberware = function() {
     console.log("Migrate started");
     var cyberware, i, newRow, newRowId, newRowAttrs = {};
-    getAttrs(['cyberware_1', 'cyberware_2', 'cyberware_3', 'cyberware_4'], function (values) {
+    getAttrs(['cyberware_1', 'cyberware_2', 'cyberware_3', 'cyberware_4'], function(values) {
         console.log(values);
-        for (i = 1; i < 5; i++){
+        for (i = 1; i < 5; i++) {
             cyberware = values["cyberware_" + i];
             console.log(cyberware);
             if (cyberware !== "" && typeof cyberware === 'string') {
@@ -2467,7 +2481,7 @@ migrateCyberware = function () {
                 console.log(newRow);
                 newRowAttrs[newRow] = cyberware;
                 console.log(newRowAttrs);
-                setAttrs(newRowAttrs, function (values) {
+                setAttrs(newRowAttrs, function(values) {
                     console.log("updated");
                 });
                 newRow = "cyberware_" + i;
