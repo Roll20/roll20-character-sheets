@@ -27,5 +27,9 @@ This sheet is designed for use with the Alternity core player book. Autocalculat
 
 *Resolved issue with negative steps on situation die roll macro.
 
+10/4/2017
+
+*Combined Situation Die and Control Die to automatically sum the value together.
+
 
 Sheet Author: [@Reikou](https://app.roll20.net/users/519959/reikou)

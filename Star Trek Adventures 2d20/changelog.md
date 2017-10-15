@@ -2,6 +2,20 @@
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 1.2.1
+### Bug Fixes
+* Fixed Combat Rolls
+	** Now rolls attack and damage
+
+* Cleaned up Attribute Rolls
+	** Asking Task Difficulty slows down rolls so removed
+	** Fixed non focus calculation cs<1 not cs<2
+
+* Cleaned up lcars rolltemplate
+
+### Features
+* Added Crew Bonus to settings
+
 ## 1.2
 
 ### Bug Fixes
