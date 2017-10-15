@@ -6,6 +6,7 @@ This is a character sheet for Blades in the Dark for use on Roll20.
 
 ### 2.3
 * Added broadcast button for sending information to chat for special abilities, clocks, and harm.
+* Image clocks have been replaced by a CSS version that looks sharper, especially in the roll template.
 
 ### 2.2
 * It is now possible to add a cohort to the character sheet. Automatic for Hounds.
