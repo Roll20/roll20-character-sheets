@@ -25,6 +25,15 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 ### Changelog
 
+### 1.4.0
+
+* Fixed bug where modifiers weren't applied to skill rolls if the "assist" popup was submitted empty.
+* Added explanation of skill roll modifiers
+* Added description fields to cyberware as well.
+* Added ability to print description fields to chat as a macro.
+* Made the skill list a little smaller by decreasing font size.
+* Clean up code intentation and formatting. It is now consistent.
+
 ### 1.3.1
 
 * Added "Weapons" subheader to combat section.
