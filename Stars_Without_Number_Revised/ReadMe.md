@@ -32,7 +32,7 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 * Added description fields to cyberware as well.
 * Added ability to print description fields to chat as a macro.
 * Made the skill list a little smaller by decreasing font size.
-* Clean up code intentation and formatting. It is now consistent.
+* Clean up code intentation and formatting. It is now consistent (and also in tabs).
 
 ### 1.3.1
 
