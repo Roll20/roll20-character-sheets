@@ -27,6 +27,7 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 ### 1.4.0
 
+* Added NPC tab which holds standard NPC stats, notes, and rolls such as Morale and Reaction.
 * Fixed bug where modifiers weren't applied to skill rolls if the "assist" popup was submitted empty.
 * Added explanation of skill roll modifiers
 * Added description fields to cyberware as well.
