@@ -5,6 +5,13 @@
 
 ### Changelog
 
+### 1.8.9.6 on 2017 October 16th
+* Fixed HP/Lethal Damage having odd error that locks up HP calculations on sheet
+* Outputs to chat show Attribute Score next to the Attribute now
+* Attributes can have a max value of 10
+	- Before only 9 has that is the highest a PC can have (changable through "dice modifer")
+	- Changed it to 10 so NPC charactersheets can have this value and to make it possibly easier for players
+
 ### 1.8.9.5 on 2017 September 12th
 * Default (dis)advantage number for Actions & Attributes
 	- Can now enter a default (dis)advantage amount for all action & attributes

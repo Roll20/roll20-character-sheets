@@ -1357,7 +1357,14 @@ Object.keys(playbookData).forEach(playbook => {
 	});
 });
 /* FUNCTIONS */
-const setAttrIfNeeded = (name, value) => {
+const mySetAttrs = (attrs, options, callback) => {
+		const finalAttrs = Object.keys(attrs).reduce((m, k) => {
+			m[k] = String(attrs[k]);
+			return m;
+		}, {});
+		setAttrs(finalAttrs, options, callback);
+	},
+	setAttr = (name, value) => {
 		getAttrs([name], v => {
 			const setting = {};
 			if (v[name] !== String(value)) setting[name] = String(value);
@@ -1399,12 +1406,12 @@ const setAttrIfNeeded = (name, value) => {
 							newAttrs[`repeating_${sectionName}_${rowID}_autogen`] = '1';
 						}
 						return Object.keys(o).reduce((m, key) => {
-							m[`repeating_${sectionName}_${rowID}_${key}`] = String(o[key]);
+							m[`repeating_${sectionName}_${rowID}_${key}`] = o[key];
 							return m;
 						}, newAttrs);
 					})
 					.reduce((m, o) => Object.assign(m, o), {});
-				setAttrs(setting, {}, callback);
+				mySetAttrs(setting, {}, callback);
 			});
 		});
 	},
@@ -1424,7 +1431,7 @@ const setAttrIfNeeded = (name, value) => {
 			getAttrs([event.sourceAttribute], v => {
 				const rName = event.sourceAttribute.slice(0, -1),
 					setting = {};
-				if (v[event.sourceAttribute] === '1') {
+				if (String(v[event.sourceAttribute]) === '1') {
 					switch (event.sourceAttribute.slice(-1)) {
 					case '4':
 						setting[`${rName}3`] = 1;
@@ -1434,37 +1441,38 @@ const setAttrIfNeeded = (name, value) => {
 						setting[`${rName}1`] = 1;
 					}
 				}
-				if (v[event.sourceAttribute] === '0') {
+				if (String(v[event.sourceAttribute]) === '0') {
 					switch (event.sourceAttribute.slice(-1)) {
 					case '1':
-						setting[`${rName}2`] = '0';
+						setting[`${rName}2`] = 0;
 					case '2':
-						setting[`${rName}3`] = '0';
+						setting[`${rName}3`] = 0;
 					case '3':
-						if (upToFour) setting[`${rName}4`] = '0';
+						if (upToFour) setting[`${rName}4`] = 0;
 					}
 				}
-				setAttrs(setting);
+				mySetAttrs(setting);
 			});
 		});
 	},
 	calculateResistance = name => {
 		getAttrs(actionData[name], v => {
-			const total = Object.keys(v).map(x => v[x]).reduce((s, c) => s + (c === '0' ? 0 : 1), 0);
-			setAttrIfNeeded(name, total);
+			const total = Object.keys(v).map(x => v[x])
+				.reduce((s, c) => s + (String(c) === '0' ? 0 : 1), 0);
+			setAttr(name, total);
 		});
 	},
 	calculateVice = () => {
 		getAttrs(Object.keys(actionData), v => {
-			setAttrIfNeeded('vice', Math.min(...Object.keys(v).map(x => parseInt(v[x]) || 0)));
+			setAttr('vice', Math.min(...Object.keys(v).map(x => parseInt(v[x]) || 0)));
 		});
 	},
-	calculateStashDice = stash => setAttrIfNeeded('stash_dice', Math.floor(parseInt(stash) / 10)),
+	calculateStashDice = stash => setAttr('stash_dice', Math.floor(parseInt(stash) / 10)),
 	calculateCohortDice = prefix => {
 		getAttrs(['crew_tier', `${prefix}_impaired`, `${prefix}_type`], v => {
 			const dice = (parseInt(v.crew_tier) || 0) - (parseInt(v[`${prefix}_impaired`]) || 0) +
 				((v[`${prefix}_type`] === 'elite' || v[`${prefix}_type`] === 'expert') ? 1 : 0);
-			setAttrIfNeeded(`${prefix}_dice`, dice);
+			setAttr(`${prefix}_dice`, dice);
 		});
 	};
 /* CONSTANTS */
@@ -1517,13 +1525,11 @@ on('change:crew_type change:playbook', event => {
 						}, {});
 					Object.keys(data).filter(name => !changedAttributes.includes(name))
 						.forEach(name => (finalSettings[name] = data[name]));
-					setAttrs(finalSettings);
+					mySetAttrs(finalSettings);
 				}
 			};
 		if (event.newValue) {
-			setAttrs({
-				show_playbook_reminder: '0'
-			});
+			setAttr('show_playbook_reminder', '0');
 		}
 		if (v.setting_autofill !== '1') return;
 		if (event.sourceAttribute === 'crew_type' && sourceName in crewData) {
@@ -1546,9 +1552,7 @@ on('change:crew_type change:playbook', event => {
 		const idMatch = event.sourceAttribute.match(new RegExp(`^repeating_${sectionName}_(.*?)_`)),
 			id = idMatch && idMatch[1];
 		if (id && event.sourceType === 'player') {
-			const setting = {};
-			setting[`repeating_${sectionName}_${id}_autogen`] = '';
-			setAttrs(setting);
+			setAttr(`repeating_${sectionName}_${id}_autogen`, '');
 		}
 	});
 });
@@ -1557,33 +1561,24 @@ watchedAttributes.forEach(name => {
 	on(`change:${name}`, event => {
 		if (event.sourceType === 'player') {
 			getAttrs(['changed_attributes'], v => {
-				const setting = {};
-				setting.changed_attributes = [...new Set(v.changed_attributes.split(',')).add(name)]
+				const changedAttributes = [...new Set(v.changed_attributes.split(',')).add(name)]
 					.filter(x => !!x).join(',');
-				setAttrs(setting);
+				setAttr('changed_attributes', changedAttributes);
 			});
 		}
 	});
 });
 /* Register attribute/action event handlers */
-Object.keys(actionData).forEach(attributeName => {
-	on(actionData[attributeName].map(x => `change:${x}`).join(' '),
-		() => calculateResistance(attributeName));
-	on(`change:setting_dark_talent_${attributeName}`, () => {
-		getAttrs([`setting_dark_talent_${attributeName}`, `setting_resbonus_${attributeName}`], v => {
-			const setting = {},
-				r = `setting_resbonus_${attributeName}`;
-			setting[r] = parseInt(v[r]) || 0;
-			if (v[`setting_dark_talent_${attributeName}`] === '1') {
-				setting[r] = setting[r] + 1;
-			}
-			else {
-				setting[r] = setting[r] - 1;
-			}
-			setAttrs(setting);
+Object.keys(actionData).forEach(attrName => {
+	on(actionData[attrName].map(x => `change:${x}`).join(' '), () => calculateResistance(attrName));
+	on(`change:setting_dark_talent_${attrName}`, () => {
+		getAttrs([`setting_dark_talent_${attrName}`, `setting_resbonus_${attrName}`], v => {
+			const resistanceBonus = (parseInt(v[`setting_resbonus_${attrName}`]) || 0) +
+				((String(v[`setting_dark_talent_${attrName}`]) === '1') ? 1 : -1);
+			setAttr(`setting_resbonus_${attrName}`, resistanceBonus);
 		});
 	});
-	on(`change:${attributeName}`, calculateVice);
+	on(`change:${attrName}`, calculateVice);
 });
 /* Calculate stash */
 on('change:stash', event => calculateStashDice(event.newValue));
@@ -1592,17 +1587,14 @@ on('change:setting_traumata_set ' + traumaDataFlat.map(x => `change:trauma_${x}`
 	getAttrs(['setting_traumata_set', ...traumaDataFlat.map(x => `trauma_${x}`)], v => {
 		const traumaType = (v.setting_traumata_set === '0' ? 'normal' : v.setting_traumata_set);
 		if (traumaData[traumaType] && event.sourceType === 'player') {
-			setAttrs({
-				trauma: traumaData[traumaType].reduce((m, name) => m + (parseInt(v[`trauma_${name}`]) || 0), 0)
-			});
+			const newTrauma = traumaData[traumaType].reduce((m, name) => m + (parseInt(v[`trauma_${name}`]) || 0), 0)
+			setAttr('trauma', newTrauma);
 		}
 	});
 });
 /* Generate buttons */
 on('change:generate_factions', () => {
-	setAttrs({
-		show_faction_generatebutton: '0'
-	});
+	setAttr('show_faction_generatebutton', '0');
 	Object.keys(factionsData).forEach(sectionName => {
 		fillRepeatingSectionFromData(sectionName, factionsData[sectionName]);
 	});
@@ -1626,13 +1618,9 @@ on('change:setting_extra_stress', event => {
 		return m;
 	}, {});
 	setting.stress_max = 9 + (parseInt(event.newValue) || 0);
-	setAttrs(setting);
+	mySetAttrs(setting);
 });
-on('change:setting_extra_trauma', event => {
-	setAttrs({
-		trauma_max: 4 + (parseInt(event.newValue) || 0)
-	});
-});
+on('change:setting_extra_trauma', event => setAttr('trauma_max', 4 + (parseInt(event.newValue) || 0)));
 /* Calculate cohort quality */
 on(['crew_tier', 'cohort1_impaired', 'cohort1_type'].map(x => `change:${x}`).join(' '), () => calculateCohortDice('cohort1'));
 on('change:repeating_cohort', () => calculateCohortDice('repeating_cohort'));
@@ -1642,17 +1630,15 @@ on('change:crew_tier', () => {
 on('change:char_cohort_quality change:char_cohort_impaired', () => {
 	getAttrs(['char_cohort_quality', 'char_cohort_impaired'], v => {
 		const dice = (parseInt(v.char_cohort_quality) || 0) - (parseInt(v.char_cohort_impaired) || 0);
-		setAttrIfNeeded('char_cohort_dice', dice);
+		setAttr('char_cohort_dice', dice);
 	});
 });
 /* Set correct verb for cohort roll button */
 ['char_cohort', 'cohort1', 'repeating_cohort'].forEach(prefix => {
 	const eventString = 'change:' + ((prefix === 'repeating_cohort') ? `${prefix}:type` : `${prefix}_type`);
 	on(eventString, event => {
-		const setting = {};
-		if (event.newValue === 'expert') setting[`${prefix}_verb`] = '^{rolls_their}';
-		else setting[`${prefix}_verb`] = '^{roll_their-l}';
-		setAttrs(setting);
+		const verb = (event.newValue === 'expert') ? '^{rolls_their}' : '^{roll_their-l}';
+		setAttr(`${prefix}_verb`, verb);
 	});
 });
 /* Left-fill checkboxes */
@@ -1662,20 +1648,12 @@ handleBoxesFill('bandolier2_check_');
 ['item', 'playbookitem', 'upgrade'].forEach(sName => handleBoxesFill(`repeating_${sName}:check_`));
 /* Handle showing options for heritage, background, and vice */
 ['heritage', 'background', 'vice_purveyor', 'hull_functions', 'crew_deity_features'].forEach(name => {
-	on(`change:${name}`, event => {
-		const setting = {};
-		setting[`show_${name}_info`] = event.newValue ? '0' : '1';
-		setAttrs(setting);
-	});
+	on(`change:${name}`, event => setAttr(`show_${name}_info`, event.newValue ? '0' : '1'));
 });
 /* Pseudo-radios */
 ['crew_tier', ...actionsFlat].forEach(name => {
 	on(`change:${name}`, event => {
-		if (event.newValue === '0') {
-			const setting = {};
-			setting[name] = (parseInt(event.previousValue) || 1) - 1;
-			setAttrs(setting);
-		}
+		if (String(event.newValue) === '0') setAttr(name, (parseInt(event.previousValue) || 1) - 1);
 	});
 });
 /* Item reset button */
@@ -1690,21 +1668,17 @@ on('change:reset_items', () => {
 				m[name] = 0;
 				return m;
 			}, {});
-			setAttrs(setting);
+			mySetAttrs(setting);
 		});
 	};
-	setAttrs({
-		load: 0
-	});
+	setAttr('load', 0);
 	['item', 'playbookitem'].forEach(clearChecks);
 });
 /* Default values for number of upgrades boxes */
-on('change:repeating_upgrade', () => {
+on('change:repeating_upgrade:boxes_chosen', () => {
 	getAttrs(['repeating_upgrade_numboxes'], v => {
 		if (!['1', '2', '3'].includes(v.repeating_upgrade_numboxes)) {
-			setAttrs({
-				repeating_upgrade_numboxes: '1'
-			});
+			setAttr('repeating_upgrade_numboxes', '1');
 		}
 	});
 });
@@ -1712,9 +1686,9 @@ on('change:repeating_upgrade', () => {
 on('change:setting_text_bonus_query sheet:opened', () => {
 	getAttrs(['setting_text_bonus_query', 'bonusdice', 'numberofdice'], v => {
 		const setting = {};
-		if (v.setting_text_bonus_query === '1') {
+		if (String(v.setting_text_bonus_query) === '1') {
 			setting.bonusdice = `(?{${getTranslationByKey('bonusdice')}|0})`;
-			setting.numberofdice = `(?{${getTranslationByKey('numberofdice')}})`;
+			setting.numberofdice = `(?{${getTranslationByKey('numberofdice')}|0})`;
 		}
 		else {
 			setting.bonusdice = `?{${getTranslationByKey('bonusdice')}|0|1|2|3|4|5|6|-1|-2|-3}`;
@@ -1722,27 +1696,23 @@ on('change:setting_text_bonus_query sheet:opened', () => {
 			if (setting.bonusdice === v.bonusdice) delete setting.bonusdice;
 			if (setting.numberofdice === v.numberofdice) delete setting.numberofdice;
 		}
-		setAttrs(setting);
+		mySetAttrs(setting);
 	});
 });
 /* Resistance query */
 on('change:setting_consequence_query sheet:opened', () => {
-	getAttrs(['setting_consequence_query', 'consequence_query'], v => {
-		const setting = {
-			consequence_query: (v.setting_consequence_query === '1') ?
-				`?{${getTranslationByKey('consequence')}|${getTranslationByKey('a_consequence')}}` : getTranslationByKey('a_consequence')
-		};
-		if (v.consequence_query === setting.consequence_query) delete setting.consequence_query;
-		setAttrs(setting);
+	getAttrs(['setting_consequence_query'], v => {
+		const consequenceQuery = (String(v.setting_consequence_query) === '1') ?
+			`?{${getTranslationByKey('consequence')}|${getTranslationByKey('a_consequence')}}` :
+			getTranslationByKey('a_consequence');
+		setAttr('consequence_query', consequenceQuery);
 	});
 });
 /* Trim whitespace in auto-expand fields */
 autoExpandFields.forEach(name => {
 	on(`change:${name}`, event => {
 		if (event.newValue.trim() !== event.newValue && event.sourceType === 'player') {
-			const setting = {};
-			setting[name.replace(':', '_')] = event.newValue.trim();
-			setAttrs(setting);
+			setAttr(name.replace(':', '_'), event.newValue.trim());
 		}
 	});
 });
@@ -1750,17 +1720,9 @@ autoExpandFields.forEach(name => {
 on('sheet:opened', () => {
 	getAttrs(['sheet_type', 'changed_attributes', 'crew_type', 'playbook'], v => {
 		/* Make sure sheet_type is never 0 */
-		if (!['character', 'crew', 'faction'].includes(v.sheet_type)) {
-			setAttrs({
-				sheet_type: 'character'
-			});
-		}
+		if (!['crew', 'faction'].includes(v.sheet_type)) setAttr('sheet_type', 'character');
 		/* Remove reminder box if we have playbook or crew name */
-		if (v.playbook || v.crew_type) {
-			setAttrs({
-				show_playbook_reminder: '0'
-			});
-		}
+		if (v.playbook || v.crew_type) setAttr('show_playbook_reminder', '0');
 	});
 	/* Set up translated queries */
 	const queries = {
@@ -1777,7 +1739,7 @@ on('sheet:opened', () => {
 		Object.keys(queries).forEach(name => {
 			if (v[name] !== queries[name]) setting[name] = queries[name];
 		});
-		setAttrs(setting);
+		mySetAttrs(setting);
 	});
 	/* Setup and upgrades */
 	getAttrs(['version'], v => {
@@ -1795,9 +1757,7 @@ on('sheet:opened', () => {
 									'Status: ' + (v[`${str}_status`] || '') + '\n' +
 									'Notes: ' + (v[`${str}_description`] || '') + '\n';
 							}).join('\n');
-							setAttrs({
-								faction_notes: output
-							});
+							setAttr('faction_notes', output);
 							list.forEach(id => removeRepeatingRow(`repeating_faction_${id}`));
 							upgradeSheet('0.7');
 							console.log('Updating to 0.7');
@@ -1913,7 +1873,7 @@ on('sheet:opened', () => {
 								setting[`repeating_item_${id}_check_1`] = v[`repeating_item_${id}_check`] || '0';
 								setting[`repeating_item_${id}_check_2`] = v[`repeating_item_${id}_check_b`] || '0';
 							});
-							setAttrs(setting, {}, upgradeFunction);
+							mySetAttrs(setting, {}, upgradeFunction);
 							console.log('Updating to 1.4');
 						});
 					});
@@ -2095,7 +2055,7 @@ on('sheet:opened', () => {
 									setting[`repeating_upgrade_${id}_numboxes`] = '2';
 									setting[`repeating_upgrade_${id}_boxes_chosen`] = 'on';
 								});
-								setAttrs(setting, {}, upgradeFunction);
+								mySetAttrs(setting, {}, upgradeFunction);
 								fillRepeatingSectionFromData('upgrade', upgrades, false, upgradeFunction);
 							});
 						});
@@ -2115,7 +2075,7 @@ on('sheet:opened', () => {
 						Object.keys(translatedDefaults).forEach(k => {
 							setting[k] = v[k] || setting[k] || translatedDefaults[k];
 						});
-						setAttrs(setting, {}, upgradeFunction);
+						mySetAttrs(setting, {}, upgradeFunction);
 						console.log('Updating to 1.6');
 					});
 				}
@@ -2144,7 +2104,7 @@ on('sheet:opened', () => {
 						setting.bandolier2_check_1 = v.bandolier2_check || '0';
 						setting.bandolier2_check_2 = v.bandolier2_check_b || '0';
 						setting.bandolier2_check_3 = v.bandolier2_check_c || '0';
-						setAttrs(setting, {}, upgradeFunction);
+						mySetAttrs(setting, {}, upgradeFunction);
 					});
 					getSectionIDs('item', idArray => {
 						const attrs = [
@@ -2159,7 +2119,7 @@ on('sheet:opened', () => {
 									setting[`repeating_item_${id}_description`] = itemData[k].description;
 								}
 							});
-							setAttrs(setting, {}, upgradeFunction);
+							mySetAttrs(setting, {}, upgradeFunction);
 							console.log('Updating to 1.9');
 						});
 					});
@@ -2198,7 +2158,7 @@ on('sheet:opened', () => {
 										break;
 									}
 								});
-								setAttrs(setting, {}, upgradeFunction);
+								mySetAttrs(setting, {}, upgradeFunction);
 							});
 						});
 					});
@@ -2251,7 +2211,7 @@ on('sheet:opened', () => {
 								attrNames.forEach(name => {
 									if (v[name] === 'on') setting[name] = 1;
 								});
-								setAttrs(setting, {
+								mySetAttrs(setting, {
 									silent: true
 								}, upgradeFunction);
 							});
@@ -2272,14 +2232,14 @@ on('sheet:opened', () => {
 					actionsFlat.forEach(name => {
 						getAttrs([1, 2, 3, 4, 5].map(x => `${name}${x}`), v => {
 							const total = [1, 2, 3, 4, 5].reduce((m, x) => m + (parseInt(v[`${name}${x}`]) || 0), 0);
-							setAttrIfNeeded(name, total);
+							setAttr(name, total);
 						});
 					});
 					getSectionIDs('repeating_cohort', idArray => {
 						getAttrs(['crew_tier1', 'crew_tier2', 'crew_tier3', 'crew_tier4'], v => {
 							const tier = (parseInt(v.crew_tier1) || 0) + (parseInt(v.crew_tier2) || 0) +
 								(parseInt(v.crew_tier3) || 0) + (parseInt(v.crew_tier4) || 0);
-							setAttrs({
+							mySetAttrs({
 								crew_tier: tier
 							}, {}, () => {
 								calculateCohortDice('cohort1');
@@ -2297,15 +2257,9 @@ on('sheet:opened', () => {
 						Object.keys(v).forEach(name => {
 							if (v[name]) setting[`show_${name}_info`] = '0';
 						});
-						setAttrs(setting, {}, () => upgradeSheet('1.13'));
+						mySetAttrs(setting, {}, () => upgradeSheet('1.13'));
 						console.log('Updating to 1.13');
 					});
-				}
-				// Upgrade to 1.15: Recalculate resistance
-				else if (versionMajor === 1 && versionMinor < 15) {
-					Object.keys(actionData).forEach(calculateResistance);
-					upgradeSheet('1.15');
-					console.log('Updating to 1.15');
 				}
 				// Upgrade to 2.0: Rename trauma attributes, frame feature migration
 				else if (versionMajor < 2) {
@@ -2331,20 +2285,28 @@ on('sheet:opened', () => {
 						setting.changed_attributes = [...changedAttrs].join(',');
 						console.log('Updating to 2.0');
 						fillRepeatingSectionFromData('framefeature', frameData, false, upgradeFunction);
-						setAttrs(setting, {}, upgradeFunction);
+						mySetAttrs(setting, {}, upgradeFunction);
 					});
 				}
 				// Upgrade to 2.2: Enable pet for hounds
 				else if (versionMajor === 2 && versionMinor < 2) {
 					getAttrs(['playbook'], v => {
 						if (v.playbook.toLowerCase() === 'hound') {
-							setAttrs({
+							mySetAttrs({
 								char_cohort_name: 'Hunting Pet',
 								char_cohort_subtype: 'Hunter',
 								setting_show_cohort: '1'
 							});
 						}
 					});
+					upgradeSheet('2.2');
+					console.log('Updating to 2.2');
+				}
+				// Upgrade to 2.3: Recalculate resistance, just to be safe
+				else if (versionMajor === 2 && versionMinor < 3) {
+					Object.keys(actionData).forEach(calculateResistance);
+					upgradeSheet('2.3');
+					console.log('Updating to 2.3');
 				}
 			},
 			initialiseSheet = () => {
@@ -2353,7 +2315,7 @@ on('sheet:opened', () => {
 						memo[`repeating_${sectionName}_${generateRowID()}_autogen`] = 1;
 						return memo;
 					}, {});
-				setAttrs(setting);
+				mySetAttrs(setting);
 				fillRepeatingSectionFromData('item', itemData);
 				/* Set translated default values */
 				getAttrs(Object.keys(translatedDefaults), v => {
@@ -2361,16 +2323,16 @@ on('sheet:opened', () => {
 					Object.keys(translatedDefaults).forEach(k => {
 						if (v[k] !== translatedDefaults[k]) setting[k] = translatedDefaults[k];
 					});
-					setAttrs(setting);
+					mySetAttrs(setting);
 				});
 				console.log('Initialising new sheet');
 			};
 		if (v.version) upgradeSheet(v.version);
 		else initialiseSheet();
 		// Set version number
-		setAttrs({
-			version: '2.2',
-			character_sheet: 'Blades in the Dark v2.2'
+		mySetAttrs({
+			version: '2.3',
+			character_sheet: 'Blades in the Dark v2.3'
 		});
 	});
 });
