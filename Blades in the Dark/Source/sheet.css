@@ -23,7 +23,7 @@ button[type=roll] {
 	border-radius: 0;
 	transition: all 0.2s;
 }
-button[type=roll].btn:before {
+button[type=roll].btn::before {
 	content: "";
 }
 label {
@@ -63,9 +63,9 @@ input[type=number] {
 	color: #333;
 	box-shadow: none;
 }
-input[name="attr_setting_focus_shadow"]:checked ~ div textarea:focus,
-input[name="attr_setting_focus_shadow"]:checked ~ div input[type=text]:focus,
-input[name="attr_setting_focus_shadow"]:checked ~ div input[type=number]:focus {
+.sheet-focus-shadow:checked ~ div textarea:focus,
+.sheet-focus-shadow:checked ~ div input[type=text]:focus,
+.sheet-focus-shadow:checked ~ div input[type=number]:focus {
 	box-shadow: inset 0 0 1px 1px rgba(66,66,66,.3), 0 0 2px 1px rgba(66,66,66,.3);
 }
 textarea {
@@ -75,7 +75,7 @@ textarea {
 li {
 	position: relative;
 }
-li:before {
+li::before {
 	transform: rotate(45deg) scale(0.9);
 	content: '■';
 	left: 0;
@@ -90,8 +90,6 @@ input[type=checkbox],
 input[type=radio] {
 	opacity: 0;
 	z-index: 1;
-	margin: 0;
-	padding: 0;
 	-moz-appearance: none;
 	position: relative;
 }
@@ -130,7 +128,7 @@ input[type=text].sheet-inherit {
 	font-size: 13px;
 	font-family: "Times New Roman", Times, serif;
 }
-.sheet-version-text:after {
+.sheet-version-text::after {
 	content: " ";
 }
 .sheet-settings-checkbox {
@@ -200,11 +198,10 @@ input[type=text].sheet-inherit {
 .sheet-settings > div.sheet-generaterow {
 	line-height: 0;
 }
-.sheet-settings input.sheet-checkbox[type=checkbox] + span {
-	flex-shrink: 0;
+.sheet-settings .sheet-checkbox + span {
 	margin-right: 6px;
 }
-.sheet-settings input.sheet-checkbox.sheet-squarebox:checked + span {
+.sheet-settings .sheet-checkbox:checked + span {
 	background: #000;
 }
 .sheet-settings :not(input) + span {
@@ -234,19 +231,19 @@ input[type=text].sheet-inherit {
 .sheet-setting-char, .sheet-setting-crew, .sheet-setting-faction {
 	display: none;
 }
-input[name="attr_sheet_type"][value="character"]:checked ~ .sheet-setting-char,
-input[name="attr_sheet_type"][value="crew"]:checked ~ .sheet-setting-crew,
-input[name="attr_sheet_type"][value="faction"]:checked ~ .sheet-setting-faction {
+.sheet-type-input[value="character"]:checked ~ .sheet-setting-char,
+.sheet-type-input[value="crew"]:checked ~ .sheet-setting-crew,
+.sheet-type-input[value="faction"]:checked ~ .sheet-setting-faction {
 	display: flex;
 }
 /* SETTINGS FOR HIDING STUFF ON THE SHEET */
-input.sheet-toothhider:not(:checked) + input.sheet-tooth,
-input.sheet-toothhider:not(:checked) + input.sheet-tooth + span {
+.sheet-toothhider:not(:checked) + .sheet-tooth,
+.sheet-toothhider:not(:checked) + .sheet-tooth + span {
 	display: none;
 }
-input.sheet-hider:not(:checked) + li,
-input.sheet-hider:not(:checked) + div,
-input.sheet-hider:not(:checked) + label {
+.sheet-hider:not(:checked) + li,
+.sheet-hider:not(:checked) + div,
+.sheet-hider:not(:checked) + label {
 	display: none;
 }
 /* Sheet container */
@@ -330,8 +327,11 @@ input:checked + .sheet-container {
 	width: 56px;
 	align-items: center;
 }
-.sheet-tier input[type=checkbox][value="1"] {
+.sheet-tier input[value="1"] {
 	margin-left: auto;
+}
+.sheet-tier .sheet-checkbox + span {
+	margin-right: auto;
 }
 /* COLUMN LAYOUT */
 .sheet-flex {
@@ -428,7 +428,7 @@ textarea.sheet-smallcaps {
 	font-size: 12px;
 	line-height: 15px;
 }
-.sheet-planning .sheet-teamworkbox strong:after {
+.sheet-planning .sheet-teamworkbox strong::after {
 	content: ": ";
 }
 .sheet-planningdesc {
@@ -439,20 +439,21 @@ textarea.sheet-smallcaps {
 }
 /* ITEMS/UPGRADES */
 .sheet-itemcolumn {
-	max-width: 251px;
+	max-width: 249px;
 }
 .sheet-itemholder > div {
-	padding: 7px;
+	padding: 5px;
 }
 .sheet-item {
-	width: 100%;
+	display: flex;
+	align-items: start;
 }
-.repcontainer[data-groupname="repeating_item"] {
+.sheet-regularitems .repcontainer {
 	display: flex;
 	flex-wrap: wrap;
 	align-content: flex-start;
 }
-.repcontainer[data-groupname="repeating_item"] .sheet-item {
+.sheet-item-container {
 	flex-grow: 1;
 }
 .sheet-regularitems button.repcontrol_edit {
@@ -465,46 +466,37 @@ textarea.sheet-smallcaps {
 .sheet-regularitems .repcontrol {
 	height: 38px;
 }
-.sheet-type-character .sheet-regularitems .repitem input[name="attr_short"]:checked ~ input[name="attr_expand"]:not(:checked) ~ .sheet-repeating-item {
-	width: 94px;
+.sheet-regularitems .sheet-input-short:checked + .sheet-input-expand:not(:checked) ~ .sheet-item-container  {
+	width: 96px;
 }
-.sheet-item.sheet-itemshort {
-	width: 50%;
+.sheet-regularitems .sheet-col50, .sheet-regularitems .sheet-col100 {
+	position: relative;
+}
+.sheet-regularitems .repitem {
+	display: flex;
+	flex-grow: 1;
 }
 .sheet-playbookitems {
 	background: #d6d8d9;
 }
 .sheet-item .sheet-itemname {
-	display: inline-block;
-	vertical-align: top;
-	width: calc(100% - 18px);
 	height: 18px;
 	font-size: 11px;
 	margin: 0 1px 0 2px;
 	padding-left: 2px;
+	flex: 1 1 auto;
 }
 .sheet-item .sheet-auto-expand.sheet-itemname {
 	min-height: 16px;
 	height: auto;
 	line-height: 16px;
-	margin-top: 1px;
+	margin: 1px 0;
 	padding: 0 7px 0 2px;
 }
-.sheet-item.sheet-item2box .sheet-itemname,
-.sheet-repeating-item input[type=checkbox][value="2"]:checked ~ .sheet-itemname {
-	width: calc(100% - 33px);
-}
-.sheet-item.sheet-item3box .sheet-itemname,
-.sheet-repeating-item input[type=checkbox][value="3"]:checked ~ .sheet-itemname {
-	width: calc(100% - 48px);
-}
-.sheet-item.sheet-item4box .sheet-itemname {
-	width: calc(100% - 63px);
-}
-.sheet-repeating-item input[type=checkbox][name="attr_bold"]:checked ~ .sheet-itemname {
+.sheet-item .sheet-input-bold:checked ~ .sheet-itemname {
 	font-weight: bold;
 }
-.sheet-repeating-item input[type=checkbox][value="0"]:checked ~ .sheet-itemname {
+.sheet-item .sheet-input-italic:checked ~ .sheet-itemname {
 	font-style: italic;
 }
 .sheet-item .sheet-label {
@@ -523,83 +515,70 @@ textarea.sheet-smallcaps {
 	margin-top: 3px;
 }
 .sheet-floatingbar {
-	display: inline-block;
 	width: 3px;
-	vertical-align: middle;
-	margin-left: -3px;
+	margin: 8px 0 0 -3px;
+	flex: 0 0 auto;
 	border: solid #838587;
 	border-width: 1px 0;
 }
+.sheet-item .sheet-checkbox,
+.sheet-item .sheet-checkbox + span {
+	margin-top: 3px;
+}
 /* Repeating items*/
-.sheet-repeating-item input[type=checkbox][name="attr_numboxes"][value="0"]:checked ~ .sheet-boxesgeq2,
-.sheet-repeating-item input[type=checkbox][name="attr_numboxes"][value="1"]:checked ~ .sheet-boxesgeq2,
-.sheet-repeating-item input[type=checkbox][name="attr_numboxes"][value="2"]:checked ~ .sheet-boxesgeq3 {
+.sheet-numboxes0:checked ~ .sheet-boxesgeq2,
+.sheet-numboxes1:checked ~ .sheet-boxesgeq2,
+.sheet-numboxes2:checked ~ .sheet-boxesgeq3 {
 	display: none;
 }
-.sheet-itemholder .repitem input[name="attr_boxes_chosen"]:checked + div,
-.sheet-itemholder .repitem input[name="attr_boxes_chosen"]:not(:checked) + div ~ div {
+.sheet-itemholder .repitem .sheet-boxes-chosen:checked + div,
+.sheet-itemholder .repitem .sheet-boxes-chosen:not(:checked) + div ~ div {
 	display: none;
 }
 .sheet-numboxes-chooser {
 	padding: 1px 0;
 	font-size: 11px;
 }
-.sheet-item input[type=number] {
-	margin: 0 auto;
+.sheet-numboxes-chooser input[type=number] {
+	margin-left: auto;
 	height: 18px;
 	padding: 0;
 	text-align: right;
 	width: 2.5em;
 	background: transparent;
 }
-.sheet-numboxes-chooser input {
-	width: 20px;
-	margin-right: -20px;
+.sheet-numboxes-chooser label {
 	height: 18px;
-}
-.sheet-numboxes-chooser input:checked + span,
-.sheet-numboxes-chooser input:checked + span {
-	font-weight: bold;
-}
-.sheet-numboxes-chooser input + span:not(.sheet-okbutton) {
-	margin-right: auto;
-}
-.sheet-numboxes-chooser input + span {
 	border: 1px solid #AAA;
+	margin-left: auto;
 	padding: 2px;
 	line-height: 12px;
 }
-.repcontainer[data-groupname="repeating_item"] .repitem {
-	display: flex;
-	flex-grow: 1;
+.sheet-numboxes-chooser input:checked + span {
+	font-weight: bold;
 }
-.sheet-itemholder input[name="attr_setting_show_itemdesc"]:not(:checked) ~ div input.sheet-expand,
-.sheet-itemholder input[name="attr_setting_show_itemdesc"]:not(:checked) ~ div input.sheet-expand + span,
-.sheet-itemholder input[name="attr_setting_show_itemdesc"]:not(:checked) ~ div input.sheet-expand ~ textarea {
+.sheet-show-itemdesc:not(:checked) ~ div .sheet-item-description {
 	display: none;
 }
-.sheet-itemholder input.sheet-expand {
-	width: 7px;
-	margin-top: 4px;
-	height: 9px;
+.sheet-itemholder .sheet-expand {
+	top: 4px;
+	right: 1px;
 }
-input.sheet-expand + span {
-	display: inline;
+.sheet-itemholder .sheet-expand + span {
+	top: 1px;
+	right: 1px;
 }
-.sheet-itemholder input.sheet-expand + span::before {
-	margin: 1px 0 0 -8px;
-}
-.sheet-itemholder input.sheet-expand + span::before {
+.sheet-itemholder .sheet-expand + span::before {
 	content: "◀";
 }
-.sheet-itemholder .sheet-playbookitems input.sheet-expand ~ textarea {
-	border-color: #a9a9a9;
-}
-.sheet-itemholder input.sheet-expand ~ textarea {
+.sheet-itemholder .sheet-expand ~ textarea {
 	border-top: 1px solid #d3d3d3;
 	line-height: 12px;
 	font-size: 10px;
 	height: 49px;
+}
+.sheet-itemholder .sheet-playbookitems .sheet-expand ~ textarea {
+	border-color: #a9a9a9;
 }
 /* LOGO */
 .sheet-bladeslogo {
@@ -645,11 +624,11 @@ input.sheet-expand + span {
 .sheet-itemheader .sheet-text-button {
 	margin-left: auto;
 }
-.sheet-itemheader label.sheet-text-button input[type=checkbox] + span {
+.sheet-itemheader .sheet-text-button input[type=checkbox] + span {
 	opacity: 1;
 	color: #333;
 }
-.sheet-itemheader label.sheet-text-button:hover input[type=checkbox] + span {
+.sheet-itemheader .sheet-text-button:hover input[type=checkbox] + span {
 	color: #ff4747;
 }
 /* ADVANCEMENT BOX*/
@@ -689,8 +668,8 @@ input.sheet-expand + span {
 	padding-left: 0;
 	font-style: normal;
 }
-.sheet-advancement-desc li.sheet-nondot:before,
-.sheet-warblurb li.sheet-nondot:before {
+.sheet-advancement-desc li.sheet-nondot::before,
+.sheet-warblurb li.sheet-nondot::before {
 	display: none;
 }
 /* PLAYBOOK */
@@ -769,7 +748,7 @@ input.sheet-expand + span {
 .sheet-header-info {
 	font-size: 8px;
 }
-.sheet-header input:checked + div > .sheet-header-title:after {
+.sheet-header input:checked + div > .sheet-header-title::after {
 	content: ": ";
 }
 .sheet-header input:not(:checked) + div > .sheet-header-info {
@@ -799,7 +778,7 @@ input.sheet-expand + span {
 	display: flex;
 	padding: 4px 2px;
 	width: 49%;
-	margin: 4px 0;
+	margin: 4px 0 0;
 	background: #d6d8d9;
 	align-items: start;
 }
@@ -807,15 +786,71 @@ input.sheet-expand + span {
 	top: 0;
 	left: 0;
 }
-.sheet-clockpicture {
+.sheet-clock-container {
+  position: relative;
 	padding: 2px;
-	margin: 4px 0;
+	margin: 0 0 4px;
 	z-index: 1;
 	height: 44px;
 	width: 44px;
 	cursor: pointer;
 	flex: 0 0 auto;
+}
+.sheet-clock {
+  border: 2px solid black;
+  border-radius: 50%;
 	transition: all 0.2s;
+	background: red;
+	width: 100%;
+	height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: -1;
+}
+[class^="sheet-spoke"] {
+  height: 44px;
+  width: 2px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: black;
+}
+.sheet-spoke-0 {
+  transform: translateX(21px);
+}
+.sheet-spoke-30 {
+  transform: translateX(21px) rotate(30deg);
+}
+.sheet-spoke-36 {
+  transform: translateX(21px) rotate(36deg);
+}
+.sheet-spoke-45 {
+  transform: translateX(21px) rotate(45deg);
+}
+.sheet-spoke-60 {
+  transform: translateX(21px) rotate(60deg);
+}
+.sheet-spoke-72 {
+  transform: translateX(21px) rotate(72deg);
+}
+.sheet-spoke-90 {
+  transform: translateX(21px) rotate(90deg);
+}
+.sheet-spoke-108 {
+  transform: translateX(21px) rotate(108deg);
+}
+.sheet-spoke-120 {
+  transform: translateX(21px) rotate(120deg);
+}
+.sheet-spoke-135 {
+  transform: translateX(21px) rotate(135deg);
+}
+.sheet-spoke-144 {
+  transform: translateX(21px) rotate(144deg);
+}
+.sheet-spoke-150 {
+  transform: translateX(21px) rotate(150deg);
 }
 .sheet-clocks .sheet-auto-expand {
 	font-size: 11px;
@@ -828,7 +863,7 @@ input.sheet-expand + span {
 }
 .sheet-clocks .sheet-zeroholder {
 	margin-left: calc(100% - 49px);
-	margin-top: 40px;
+	margin-top: 38px;
 	z-index: 3;
 }
 .sheet-size-choice {
@@ -855,330 +890,288 @@ input.sheet-expand + span {
 	margin-right: 0;
 }
 /* Positioning inputs on clocks */
-.sheet-clockpicture input[type=radio] {
+.sheet-clock-container input {
 	position: absolute;
 }
-.sheet-4clock.sheet-clockpicture input {
+.sheet-clock-container input:checked {
+	display: none;
+}
+.sheet-4clock input {
 	height: 20px;
 	width: 20px;
 }
-.sheet-4clock.sheet-clockpicture input[value="1"] {
+.sheet-4clock input[value="1"] {
 	margin-left: 20px;
 }
-.sheet-4clock.sheet-clockpicture input[value="2"] {
+.sheet-4clock input[value="2"] {
 	margin: 20px 0 0 20px;
 }
-.sheet-4clock.sheet-clockpicture input[value="3"] {
+.sheet-4clock input[value="3"] {
 	margin-top: 20px;
 }
-.sheet-6clock.sheet-clockpicture input {
+.sheet-6clock input {
 	height: 17px;
 	width: 12px;
 }
-.sheet-6clock.sheet-clockpicture input[value="1"] {
+.sheet-6clock input[value="1"] {
 	margin-left: 21px;
 	transform: rotate(30deg);
 }
-.sheet-6clock.sheet-clockpicture input[value="2"] {
+.sheet-6clock input[value="2"] {
 	margin: 12px 0 0 25px;
 	transform: rotate(90deg);
 }
-.sheet-6clock.sheet-clockpicture input[value="3"] {
+.sheet-6clock input[value="3"] {
 	margin: 22px 0 0 21px;
 	transform: rotate(150deg);
 }
-.sheet-6clock.sheet-clockpicture input[value="4"] {
+.sheet-6clock input[value="4"] {
 	margin: 22px 0 0 8px;
 	transform: rotate(210deg);
 }
-.sheet-6clock.sheet-clockpicture input[value="5"] {
+.sheet-6clock input[value="5"] {
 	margin: 12px 0 0 1px;
 	transform: rotate(270deg);
 }
-.sheet-6clock.sheet-clockpicture input[value="6"] {
+.sheet-6clock input[value="6"] {
 	margin-left: 8px;
 	transform: rotate(330deg);
 }
-.sheet-8clock.sheet-clockpicture input {
+.sheet-8clock input {
 	height: 14px;
 	width: 10px;
 }
-.sheet-8clock.sheet-clockpicture input[value="1"] {
+.sheet-8clock input[value="1"] {
 	margin-left: 20px;
 	transform: rotate(22.5deg);
 }
-.sheet-8clock.sheet-clockpicture input[value="2"] {
+.sheet-8clock input[value="2"] {
 	margin: 8px 0 0 26px;
 	transform: rotate(67.5deg);
 }
-.sheet-8clock.sheet-clockpicture input[value="3"] {
+.sheet-8clock input[value="3"] {
 	margin: 18px 0 0 26px;
 	transform: rotate(112.5deg);
 }
-.sheet-8clock.sheet-clockpicture input[value="4"] {
+.sheet-8clock input[value="4"] {
 	margin: 25px 0 0 20px;
 	transform: rotate(157.5deg);
 }
-.sheet-8clock.sheet-clockpicture input[value="5"] {
+.sheet-8clock input[value="5"] {
 	margin: 25px 0 0 9px;
 	transform: rotate(202.5deg);
 }
-.sheet-8clock.sheet-clockpicture input[value="6"] {
+.sheet-8clock input[value="6"] {
 	margin: 18px 0 0 2px;
 	transform: rotate(247.5deg);
 }
-.sheet-8clock.sheet-clockpicture input[value="7"] {
+.sheet-8clock input[value="7"] {
 	margin: 8px 0 0 2px;
 	transform: rotate(292.5deg);
 }
-.sheet-8clock.sheet-clockpicture input[value="8"] {
+.sheet-8clock input[value="8"] {
 	margin-left: 9px;
 	transform: rotate(337.5deg);
 }
-.sheet-10clock.sheet-clockpicture input {
+.sheet-10clock input {
 	height: 14px;
 	width: 9px;
 }
-.sheet-10clock.sheet-clockpicture input[value="1"] {
+.sheet-10clock input[value="1"] {
 	transform: rotate(18deg);
 	margin-left: 20px;
 }
-.sheet-10clock.sheet-clockpicture input[value="2"] {
+.sheet-10clock input[value="2"] {
 	transform: rotate(54deg);
 	margin: 5px 0 0 27px;
 }
-.sheet-10clock.sheet-clockpicture input[value="3"] {
+.sheet-10clock input[value="3"] {
 	transform: rotate(90deg);
 	margin: 13px 0 0 30px;
 }
-.sheet-10clock.sheet-clockpicture input[value="4"] {
+.sheet-10clock input[value="4"] {
 	transform: rotate(126deg);
 	margin: 21px 0 0 27px;
 }
-.sheet-10clock.sheet-clockpicture input[value="5"] {
+.sheet-10clock input[value="5"] {
 	transform: rotate(162deg);
 	margin: 26px 0 0 20px;
 }
-.sheet-10clock.sheet-clockpicture input[value="6"] {
+.sheet-10clock input[value="6"] {
 	transform: rotate(198deg);
 	margin: 26px 0 0 12px;
 }
-.sheet-10clock.sheet-clockpicture input[value="7"] {
+.sheet-10clock input[value="7"] {
 	transform: rotate(234deg);
 	margin: 21px 0 0 5px;
 }
-.sheet-10clock.sheet-clockpicture input[value="8"] {
+.sheet-10clock input[value="8"] {
 	transform: rotate(270deg);
 	margin: 13px 0 0 1px;
 }
-.sheet-10clock.sheet-clockpicture input[value="9"] {
+.sheet-10clock input[value="9"] {
 	transform: rotate(306deg);
 	margin: 5px 0 0 5px;
 }
-.sheet-10clock.sheet-clockpicture input[value="10"] {
+.sheet-10clock input[value="10"] {
 	transform: rotate(342deg);
 	margin-left: 12px;
 }
-.sheet-12clock.sheet-clockpicture input {
+.sheet-12clock input {
 	height: 12px;
 	width: 8px;
 }
-.sheet-12clock.sheet-clockpicture input[value="1"] {
+.sheet-12clock input[value="1"] {
 	margin-left: 20px;
 	transform: rotate(15deg);
 }
-.sheet-12clock.sheet-clockpicture input[value="2"] {
+.sheet-12clock input[value="2"] {
 	margin: 4px 0 0 26px;
 	transform: rotate(45deg);
 }
-.sheet-12clock.sheet-clockpicture input[value="3"] {
+.sheet-12clock input[value="3"] {
 	margin: 10px 0 0 29px;
 	transform: rotate(75deg);
 }
-.sheet-12clock.sheet-clockpicture input[value="4"] {
+.sheet-12clock input[value="4"] {
 	margin: 18px 0 0 29px;
 	transform: rotate(105deg);
 }
-.sheet-12clock.sheet-clockpicture input[value="5"] {
+.sheet-12clock input[value="5"] {
 	margin: 24px 0 0 26px;
 	transform: rotate(135deg);
 }
-.sheet-12clock.sheet-clockpicture input[value="6"] {
+.sheet-12clock input[value="6"] {
 	margin: 28px 0 0 20px;
 	transform: rotate(165deg);
 }
-.sheet-12clock.sheet-clockpicture input[value="7"] {
+.sheet-12clock input[value="7"] {
 	margin: 28px 0 0 12px;
 	transform: rotate(195deg);
 }
-.sheet-12clock.sheet-clockpicture input[value="8"] {
+.sheet-12clock input[value="8"] {
 	margin: 24px 0 0 6px;
 	transform: rotate(225deg);
 }
-.sheet-12clock.sheet-clockpicture input[value="9"] {
+.sheet-12clock input[value="9"] {
 	margin: 18px 0 0 3px;
 	transform: rotate(255deg);
 }
-.sheet-12clock.sheet-clockpicture input[value="10"] {
+.sheet-12clock input[value="10"] {
 	margin: 10px 0 0 3px;
 	transform: rotate(295deg);
 }
-.sheet-12clock.sheet-clockpicture input[value="11"] {
+.sheet-12clock input[value="11"] {
 	margin: 4px 0 0 6px;
 	transform: rotate(315deg);
 }
-.sheet-12clock.sheet-clockpicture input[value="12"] {
+.sheet-12clock input[value="12"] {
 	margin-left: 12px;
 	transform: rotate(345deg);
 }
 /* End positioning */
-input[name="attr_size"]:checked  ~ .sheet-size-choice,
-input[name="attr_size"][value="4"]:not(:checked) ~ .sheet-4clock,
-input[name="attr_size"][value="6"]:not(:checked) ~ .sheet-6clock,
-input[name="attr_size"][value="8"]:not(:checked) ~ .sheet-8clock,
-input[name="attr_size"][value="10"]:not(:checked) ~ .sheet-10clock,
-input[name="attr_size"][value="12"]:not(:checked) ~ .sheet-12clock {
+.sheet-input-size:checked  ~ .sheet-size-choice,
+.sheet-clocks .sheet-broadcast-button,
+.sheet-input-size[value="4"]:not(:checked) ~ .sheet-4clock,
+.sheet-input-size[value="6"]:not(:checked) ~ .sheet-6clock,
+.sheet-input-size[value="8"]:not(:checked) ~ .sheet-8clock,
+.sheet-input-size[value="10"]:not(:checked) ~ .sheet-10clock,
+.sheet-input-size[value="12"]:not(:checked) ~ .sheet-12clock {
 	display: none;
 }
-input[name="attr_progress"][value="0"]:checked ~ .sheet-4clock.sheet-clockpicture,
-input[name="attr_recovery"][value="0"]:checked ~ .sheet-4clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock4-0.png);
+.sheet-input-size:checked ~ .sheet-broadcast-button {
+	display: block;
 }
-input[name="attr_progress"][value="1"]:checked ~ .sheet-4clock.sheet-clockpicture,
-input[name="attr_recovery"][value="1"]:checked ~ .sheet-4clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock4-1.png);
+.sheet-clock-container .sheet-input-progress[value="0"]:checked ~ .sheet-clock {
+  background: white;
 }
-input[name="attr_progress"][value="2"]:checked ~ .sheet-4clock.sheet-clockpicture,
-input[name="attr_recovery"][value="2"]:checked ~ .sheet-4clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock4-2.png);
+.sheet-4clock .sheet-input-progress[value="1"]:checked ~ .sheet-clock,
+.sheet-8clock .sheet-input-progress[value="2"]:checked ~ .sheet-clock,
+.sheet-12clock .sheet-input-progress[value="3"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(180deg, transparent 50%, white 50%), linear-gradient(90deg, white 50%, red 50%);
 }
-input[name="attr_progress"][value="3"]:checked ~ .sheet-4clock.sheet-clockpicture,
-input[name="attr_recovery"][value="3"]:checked ~ .sheet-4clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock4-3.png);
+.sheet-4clock .sheet-input-progress[value="2"]:checked ~ .sheet-clock,
+.sheet-6clock .sheet-input-progress[value="3"]:checked ~ .sheet-clock,
+.sheet-8clock .sheet-input-progress[value="4"]:checked ~ .sheet-clock,
+.sheet-10clock .sheet-input-progress[value="5"]:checked ~ .sheet-clock
+.sheet-12clock .sheet-input-progress[value="6"]:checked ~ .sheet-clock {
+	background-image: linear-gradient(90deg, white 50%, red 50%);
 }
-input[name="attr_progress"][value="4"]:checked ~ .sheet-4clock.sheet-clockpicture,
-input[name="attr_recovery"][value="4"]:checked ~ .sheet-4clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock4-4.png);
+.sheet-4clock .sheet-input-progress[value="3"]:checked ~ .sheet-clock,
+.sheet-8clock .sheet-input-progress[value="6"]:checked ~ .sheet-clock,
+.sheet-12clock .sheet-input-progress[value="9"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(180deg, transparent 50%, red 50%), linear-gradient(90deg, white 50%, red 50%);
 }
-input[name="attr_progress"][value="0"]:checked ~ .sheet-6clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock6-0.png);
+.sheet-4clock .sheet-input-progress[value="4"]:checked ~ .sheet-clock,
+.sheet-6clock .sheet-input-progress[value="6"]:checked ~ .sheet-clock,
+.sheet-8clock .sheet-input-progress[value="8"]:checked ~ .sheet-clock,
+.sheet-10clock .sheet-input-progress[value="10"]:checked ~ .sheet-clock,
+.sheet-12clock .sheet-input-progress[value="12"]:checked ~ .sheet-clock {
+  background: red;
 }
-input[name="attr_progress"][value="1"]:checked ~ .sheet-6clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock6-1.png);
+.sheet-6clock .sheet-input-progress[value="1"]:checked ~ .sheet-clock,
+.sheet-12clock .sheet-input-progress[value="2"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(90deg, white 50%, transparent 50%), linear-gradient(150deg, red 50%, white 50%);
 }
-input[name="attr_progress"][value="2"]:checked ~ .sheet-6clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock6-2.png);
+.sheet-6clock .sheet-input-progress[value="2"]:checked ~ .sheet-clock,
+.sheet-12clock .sheet-input-progress[value="4"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(90deg, white 50%, transparent 50%), linear-gradient(210deg, red 50%, white 50%);
 }
-input[name="attr_progress"][value="3"]:checked ~ .sheet-6clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock6-3.png);
+.sheet-6clock .sheet-input-progress[value="4"]:checked ~ .sheet-clock,
+.sheet-12clock .sheet-input-progress[value="8"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(150deg, transparent 50%, red 50%), linear-gradient(90deg, white 50%, red 50%);
 }
-input[name="attr_progress"][value="4"]:checked ~ .sheet-6clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock6-4.png);
+.sheet-6clock .sheet-input-progress[value="5"]:checked ~ .sheet-clock,
+.sheet-12clock .sheet-input-progress[value="10"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(210deg, transparent 50%, red 50%), linear-gradient(90deg, white 50%, red 50%);
 }
-input[name="attr_progress"][value="5"]:checked ~ .sheet-6clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock6-5.png);
+.sheet-8clock .sheet-input-progress[value="1"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(90deg, white 50%, transparent 50%), linear-gradient(135deg, red 50%, white 50%);
 }
-input[name="attr_progress"][value="6"]:checked ~ .sheet-6clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock6-6.png);
+.sheet-8clock .sheet-input-progress[value="3"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(90deg, white 50%, transparent 50%), linear-gradient(225deg, red 50%, white 50%);
 }
-input[name="attr_progress"][value="0"]:checked ~ .sheet-8clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock8-0.png);
+.sheet-8clock .sheet-input-progress[value="5"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(135deg, transparent 50%, red 50%), linear-gradient(90deg, white 50%, red 50%);
 }
-input[name="attr_progress"][value="1"]:checked ~ .sheet-8clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock8-1.png);
+.sheet-8clock .sheet-input-progress[value="7"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(225deg, transparent 50%, red 50%), linear-gradient(90deg, white 50%, red 50%);
 }
-input[name="attr_progress"][value="2"]:checked ~ .sheet-8clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock8-2.png);
+.sheet-10clock .sheet-input-progress[value="1"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(90deg, white 50%, transparent 50%), linear-gradient(126deg, red 50%, white 50%);
 }
-input[name="attr_progress"][value="3"]:checked ~ .sheet-8clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock8-3.png);
+.sheet-10clock .sheet-input-progress[value="2"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(90deg, white 50%, transparent 50%), linear-gradient(162deg, red 50%, white 50%);
 }
-input[name="attr_progress"][value="4"]:checked ~ .sheet-8clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock8-4.png);
+.sheet-10clock .sheet-input-progress[value="3"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(90deg, white 50%, transparent 50%), linear-gradient(198deg, red 50%, white 50%);
 }
-input[name="attr_progress"][value="5"]:checked ~ .sheet-8clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock8-5.png);
+.sheet-10clock .sheet-input-progress[value="4"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(90deg, white 50%, transparent 50%), linear-gradient(234deg, red 50%, white 50%);
 }
-input[name="attr_progress"][value="6"]:checked ~ .sheet-8clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock8-6.png);
+.sheet-10clock .sheet-input-progress[value="6"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(126deg, transparent 50%, red 50%), linear-gradient(90deg, white 50%, red 50%);
 }
-input[name="attr_progress"][value="7"]:checked ~ .sheet-8clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock8-7.png);
+.sheet-10clock .sheet-input-progress[value="7"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(162deg, transparent 50%, red 50%), linear-gradient(90deg, white 50%, red 50%);
 }
-input[name="attr_progress"][value="8"]:checked ~ .sheet-8clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock8-8.png);
+.sheet-10clock .sheet-input-progress[value="8"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(198deg, transparent 50%, red 50%), linear-gradient(90deg, white 50%, red 50%);
 }
-input[name="attr_progress"][value="0"]:checked ~ .sheet-10clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock10-0.png);
+.sheet-10clock .sheet-input-progress[value="9"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(234deg, transparent 50%, red 50%), linear-gradient(90deg, white 50%, red 50%);
 }
-input[name="attr_progress"][value="1"]:checked ~ .sheet-10clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock10-1.png);
+.sheet-12clock .sheet-input-progress[value="1"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(90deg, white 50%, transparent 50%), linear-gradient(120deg, red 50%, white 50%);
 }
-input[name="attr_progress"][value="2"]:checked ~ .sheet-10clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock10-2.png);
+.sheet-12clock .sheet-input-progress[value="5"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(90deg, white 50%, transparent 50%), linear-gradient(240deg, red 50%, white 50%);
 }
-input[name="attr_progress"][value="3"]:checked ~ .sheet-10clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock10-3.png);
+.sheet-12clock .sheet-input-progress[value="7"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(120deg, transparent 50%, red 50%), linear-gradient(90deg, white 50%, red 50%);
 }
-input[name="attr_progress"][value="4"]:checked ~ .sheet-10clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock10-4.png);
-}
-input[name="attr_progress"][value="5"]:checked ~ .sheet-10clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock10-5.png);
-}
-input[name="attr_progress"][value="6"]:checked ~ .sheet-10clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock10-6.png);
-}
-input[name="attr_progress"][value="7"]:checked ~ .sheet-10clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock10-7.png);
-}
-input[name="attr_progress"][value="8"]:checked ~ .sheet-10clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock10-8.png);
-}
-input[name="attr_progress"][value="9"]:checked ~ .sheet-10clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock10-9.png);
-}
-input[name="attr_progress"][value="10"]:checked ~ .sheet-10clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock10-10.png);
-}
-input[name="attr_progress"][value="0"]:checked ~ .sheet-12clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock12-0.png);
-}
-input[name="attr_progress"][value="1"]:checked ~ .sheet-12clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock12-1.png);
-}
-input[name="attr_progress"][value="2"]:checked ~ .sheet-12clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock12-2.png);
-}
-input[name="attr_progress"][value="3"]:checked ~ .sheet-12clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock12-3.png);
-}
-input[name="attr_progress"][value="4"]:checked ~ .sheet-12clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock12-4.png);
-}
-input[name="attr_progress"][value="5"]:checked ~ .sheet-12clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock12-5.png);
-}
-input[name="attr_progress"][value="6"]:checked ~ .sheet-12clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock12-6.png);
-}
-input[name="attr_progress"][value="7"]:checked ~ .sheet-12clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock12-7.png);
-}
-input[name="attr_progress"][value="8"]:checked ~ .sheet-12clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock12-8.png);
-}
-input[name="attr_progress"][value="9"]:checked ~ .sheet-12clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock12-9.png);
-}
-input[name="attr_progress"][value="10"]:checked ~ .sheet-12clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock12-10.png);
-}
-input[name="attr_progress"][value="11"]:checked ~ .sheet-12clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock12-11.png);
-}
-input[name="attr_progress"][value="12"]:checked ~ .sheet-12clock.sheet-clockpicture {
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/clocks/clock12-12.png);
+.sheet-12clock .sheet-input-progress[value="11"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(240deg, transparent 50%, red 50%), linear-gradient(90deg, white 50%, red 50%);
 }
 /* TEXT INPUTS FOR TRAUMA AND CLOCKS */
 .sheet-text-button input:checked + span {
@@ -1198,53 +1191,53 @@ input[name="attr_progress"][value="12"]:checked ~ .sheet-12clock.sheet-clockpict
 input.sheet-stresstooth,
 input.sheet-xptooth,
 input.sheet-holdtooth,
-input.sheet-stresstooth + span,
-input.sheet-xptooth + span,
-input.sheet-holdtooth + span {
+.sheet-stresstooth + span,
+.sheet-xptooth + span,
+.sheet-holdtooth + span {
 	height: 25px;
 }
 input.sheet-regulartooth,
-input.sheet-regulartooth + span {
+.sheet-regulartooth + span {
 	height: 13px;
 }
 input.sheet-tooth {
 	width: 12px;
 	margin-right: -12px;
 }
-input.sheet-tooth + span {
+.sheet-tooth + span {
 	width: 8px;
 }
-input.sheet-tooth + span:last-child {
+.sheet-tooth + span:last-child {
 	margin-right: 0 !important;
 }
 input.sheet-tooth:last-of-type {
 	width: 8px;
 	margin-right: -8px;
 }
-input.sheet-tooth:hover + span {
+.sheet-tooth:hover + span {
 	opacity: 0.7;
 }
-input.sheet-xptooth + span {
+.sheet-xptooth + span {
 	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/teeth/xptooth-red.png);
 	margin-right: 4px;
 }
-input.sheet-tooth:checked ~ input.sheet-xptooth + span {
+.sheet-tooth:checked ~ .sheet-xptooth + span {
 	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/teeth/xptooth-white.png);
 }
-input.sheet-stresstooth[type=radio] + span,
-input.sheet-stresstooth[type=checkbox]:checked + span,
-input.sheet-holdtooth:checked + span {
+.sheet-stresstooth[type=radio] + span,
+.sheet-stresstooth[type=checkbox]:checked + span,
+.sheet-holdtooth:checked + span {
 	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/teeth/stresstooth-red.png);
 }
-input.sheet-stresstooth[type=checkbox] + span,
-input.sheet-tooth:checked ~ input.sheet-stresstooth[type=radio] + span,
-input.sheet-holdtooth + span {
+.sheet-stresstooth[type=checkbox] + span,
+.sheet-tooth:checked ~ .sheet-stresstooth[type=radio] + span,
+.sheet-holdtooth + span {
 	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/teeth/stresstooth-white.png);
 }
-input.sheet-regulartooth[type=radio] + span {
+.sheet-regulartooth + span {
 	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/teeth/shorttooth-red.png);
 }
-input.sheet-tooth:checked ~ input.sheet-regulartooth[type=radio] + span {
+.sheet-tooth:checked ~ .sheet-regulartooth + span {
 	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/teeth/shorttooth-grey.png);
 }
 input.sheet-zero {
@@ -1253,39 +1246,57 @@ input.sheet-zero {
 	margin-right: -13px;
 	vertical-align: top;
 }
-input.sheet-zero + span {
-	width: 10px;
-	height: 13px;
-	margin-right: 3px;
-	vertical-align: top;
-	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/teeth/zero.png);
+.sheet-zero + span {
+  height: 11px;
+  width: 11px;
+  margin-top: 1px;
+  margin-right: 3px;
+  vertical-align: top;
+  border: 1px solid #000;
+  background: #fff;
+  border-radius: 50%;
+  position: relative;
 }
-input.sheet-zero[type=radio]:checked + span {
+.sheet-zero + span::before, .sheet-zero + span::after {
+  position: absolute;
+  width: 1px;
+  content: "";
+  left: 0;
+  background: #000;
+  height: 11px;
+}
+.sheet-zero + span::after {
+  transform: translate(4px,-1px) rotate(135deg);
+}
+.sheet-zero + span::before {
+  transform: translate(4px,-1px) rotate(45deg);
+}
+.sheet-zero[type=radio]:checked + span {
 	opacity: 0;
 }
-.sheet-coin input.sheet-zero + span {
+.sheet-coin .sheet-zero + span {
 	position: relative;
 	bottom: 1px;
 	margin-right: auto;
 }
 .sheet-stash input.sheet-zero,
-.sheet-stash input.sheet-zero + span {
+.sheet-stash .sheet-zero + span {
 	position: absolute;
 	left: -6px;
 	top: 3px;
 }
 .sheet-crewcoin input.sheet-zero,
-.sheet-crewcoin input.sheet-zero + span {
+.sheet-crewcoin .sheet-zero + span {
 	position: absolute;
 	left: -9px;
 	top: 3px;
 }
 .sheet-stress2 input.sheet-zero,
-.sheet-stress2 input.sheet-zero + span,
+.sheet-stress2 .sheet-zero + span,
 .sheet-rep2 input.sheet-zero,
-.sheet-rep2 input.sheet-zero + span,
+.sheet-rep2 .sheet-zero + span,
 .sheet-heat2 input.sheet-zero,
-.sheet-heat2 input.sheet-zero + span {
+.sheet-heat2 .sheet-zero + span {
 	position: absolute;
 	left: -13px;
 	top: 13px;
@@ -1295,15 +1306,15 @@ input.sheet-zero[type=radio]:checked + span {
 	height: 12px;
 	width: calc(100%/12);
 }
-input[type=checkbox][name="attr_turf"][value="1"]:checked ~ input[type=radio].sheet-turf1 + span,
-input[type=checkbox][name="attr_turf"][value="2"]:checked ~ input[type=radio].sheet-turf2 + span,
-input[type=checkbox][name="attr_turf"][value="3"]:checked ~ input[type=radio].sheet-turf3 + span,
-input[type=checkbox][name="attr_turf"][value="4"]:checked ~ input[type=radio].sheet-turf4 + span,
-input[type=checkbox][name="attr_turf"][value="5"]:checked ~ input[type=radio].sheet-turf5 + span,
-input[type=checkbox][name="attr_turf"][value="6"]:checked ~ input[type=radio].sheet-turf6 + span {
+.sheet-turf-input[value="1"]:checked ~ input[type=radio].sheet-turf1 + span,
+.sheet-turf-input[value="2"]:checked ~ input[type=radio].sheet-turf2 + span,
+.sheet-turf-input[value="3"]:checked ~ input[type=radio].sheet-turf3 + span,
+.sheet-turf-input[value="4"]:checked ~ input[type=radio].sheet-turf4 + span,
+.sheet-turf-input[value="5"]:checked ~ input[type=radio].sheet-turf5 + span,
+.sheet-turf-input[value="6"]:checked ~ input[type=radio].sheet-turf6 + span {
 	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/teeth/stresstooth-black.png);
 }
-input.sheet-tooth:checked ~ input.sheet-stresstooth.sheet-turf6 + span {
+.sheet-tooth:checked ~ .sheet-stresstooth.sheet-turf6 + span {
 	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/teeth/stresstooth-halfgrey.png);
 }
 /* SPECIAL ABILITIES*/
@@ -1331,13 +1342,16 @@ input.sheet-tooth:checked ~ input.sheet-stresstooth.sheet-turf6 + span {
 }
 .sheet-abilitydesc {
 	width: 74%;
-	min-height: 18px;
+	min-height: 32px;
 	font-size: 12px;
 	line-height: 14px;
 	padding: 2px 1px;
 	text-align: justify;
 }
 /* HARM */
+.sheet-harm {
+	position: relative;
+}
 .sheet-harmrow {
 	border-bottom: 1px solid #000;
 }
@@ -1387,7 +1401,7 @@ input.sheet-tooth:checked ~ input.sheet-stresstooth.sheet-turf6 + span {
 	text-align: center;
 	font-size: 9px;
 }
-.sheet-healing .sheet-clockpicture {
+.sheet-healing .sheet-clock-container {
 	margin: 0 auto;
 }
 .sheet-healing .sheet-zeroholder {
@@ -1404,7 +1418,7 @@ input.sheet-tooth:checked ~ input.sheet-stresstooth.sheet-turf6 + span {
 .sheet-armor .sheet-label {
 	flex-grow: 1;
 }
-.sheet-armor input.sheet-checkbox + span {
+.sheet-armor .sheet-checkbox + span {
 	border: 1px solid #000;
 	margin: 3px;
 }
@@ -1469,41 +1483,41 @@ input.sheet-tooth:checked ~ input.sheet-stresstooth.sheet-turf6 + span {
 	vertical-align: top;
 	margin-right: -13px;
 }
-.sheet-crewcoin input.sheet-radiobox + span {
+.sheet-crewcoin .sheet-radiobox + span {
 	width: 11px;
 	height: 11px;
 	margin-right: auto;
 }
-.sheet-coin-and-stash input.sheet-radiobox + span {
+.sheet-coin-and-stash .sheet-radiobox + span {
 	width: 12px;
 	height: 12px;
 	vertical-align: top;
 }
-.sheet-coinrow input.sheet-radiobox + span {
+.sheet-coinrow .sheet-radiobox + span {
 	margin-right: auto;
 }
-.sheet-stash input.sheet-radiobox + span {
+.sheet-stash .sheet-radiobox + span {
 	margin-right: calc((100% - 126px)/9);
 }
-input.sheet-radiobox:hover + span {
+.sheet-radiobox:hover + span {
 	opacity: 0.7;
 }
-.sheet-coin input.sheet-radiobox + span,
-.sheet-crewcoin input.sheet-radiobox + span {
+.sheet-coin .sheet-radiobox + span,
+.sheet-crewcoin .sheet-radiobox + span {
 	background: #ff4747;
 	border: 1px solid #000;
 }
-.sheet-stash input.sheet-radiobox + span {
+.sheet-stash .sheet-radiobox + span {
 	background: #000;
 }
-.sheet-stash input:checked ~ input.sheet-radiobox + span {
+.sheet-stash input:checked ~ .sheet-radiobox + span {
 	background: #c6c7c9;
 }
-.sheet-coin input:checked ~ input.sheet-radiobox + span,
-.sheet-crewcoin input:checked ~ input.sheet-radiobox + span {
+.sheet-coin input:checked ~ .sheet-radiobox + span,
+.sheet-crewcoin input:checked ~ .sheet-radiobox + span {
 	background: #fff;
 }
-.sheet-crewcoin input:checked ~ input.sheet-radiobox.sheet-vaultcoin + span {
+.sheet-crewcoin input:checked ~ .sheet-radiobox.sheet-vaultcoin + span {
 	border-color: #c6c7c9;
 }
 .sheet-stash input.sheet-radiobox:nth-of-type(10n+1) {
@@ -1511,7 +1525,7 @@ input.sheet-radiobox:hover + span {
 	width: 15px;
 	height: 15px;
 }
-.sheet-stash input.sheet-radiobox:nth-of-type(10n+1) + span {
+.sheet-stash .sheet-radiobox:nth-of-type(10n+1) + span {
 	width: 14px;
 	height: 14px;
 	border: 1px solid #000;
@@ -1519,8 +1533,8 @@ input.sheet-radiobox:hover + span {
 	position:relative;
 	top: -2px;
 }
-.sheet-stash input.sheet-radiobox:nth-of-type(10n+1) + span,
-input.sheet-radiobox:last-of-type + span {
+.sheet-stash .sheet-radiobox:nth-of-type(10n+1) + span,
+.sheet-radiobox:last-of-type + span {
 	margin-right: 0;
 }
 /* HUNTING GROUNDS */
@@ -1620,7 +1634,7 @@ button.repcontrol_add:hover {
 	flex: 1 0 auto;
 }
 .sheet-stress2 {
-	flex: 2 0 136px;
+	flex: 2 1 136px;
 	position: relative;
 }
 .sheet-stress3 {
@@ -1680,24 +1694,24 @@ button.repcontrol_add:hover {
 	position: absolute;
 }
 .sheet-regulartooth + span,
-.sheet-rep input.sheet-tooth + span,
-.sheet-heat2 input.sheet-tooth + span,
-.sheet-stress2 input.sheet-tooth + span {
+.sheet-rep .sheet-tooth + span,
+.sheet-heat2 .sheet-tooth + span,
+.sheet-stress2 .sheet-tooth + span {
 	margin-right: auto;
 }
-input[name="attr_setting_extra_stress1"]:not(:checked) ~ input.sheet-tooth[value="9"] + span,
-input[name="attr_setting_extra_stress1"]:checked + input[name="attr_setting_extra_stress2"]:not(:checked) ~ input.sheet-tooth[value="10"] + span,
-input[name="attr_setting_extra_stress2"]:checked + input[name="attr_setting_extra_stress3"]:not(:checked) ~ input.sheet-tooth[value="11"] + span,
-input[name="attr_setting_extra_stress3"]:checked + input[name="attr_setting_extra_stress4"]:not(:checked) ~ input.sheet-tooth[value="12"] + span,
-input[name="attr_setting_extra_stress4"]:checked + input[name="attr_setting_extra_stress5"]:not(:checked) ~ input.sheet-tooth[value="13"] + span {
+input[name="attr_setting_extra_stress1"]:not(:checked) ~ .sheet-tooth[value="9"] + span,
+input[name="attr_setting_extra_stress1"]:checked + input[name="attr_setting_extra_stress2"]:not(:checked) ~ .sheet-tooth[value="10"] + span,
+input[name="attr_setting_extra_stress2"]:checked + input[name="attr_setting_extra_stress3"]:not(:checked) ~ .sheet-tooth[value="11"] + span,
+input[name="attr_setting_extra_stress3"]:checked + input[name="attr_setting_extra_stress4"]:not(:checked) ~ .sheet-tooth[value="12"] + span,
+input[name="attr_setting_extra_stress4"]:checked + input[name="attr_setting_extra_stress5"]:not(:checked) ~ .sheet-tooth[value="13"] + span {
 	margin-right: 0 !important;
 }
-input[name="attr_setting_vampirexp"]:checked ~ .sheet-xptooth + span {
+.sheet-vampirexp:checked ~ .sheet-xptooth + span {
 	margin-right: 2px;
 }
-input[name="attr_setting_extra_trauma"]:not(:checked) ~ .sheet-tooth[value="4"] + span,
-.sheet-advancement-xpholder input[name="attr_setting_vampirexp"]:not(:checked) ~ .sheet-tooth[value="8"] + span,
-.sheet-attribute-xp-box input[name="attr_setting_vampirexp"]:not(:checked) ~ .sheet-tooth[value="6"] + span {
+.sheet-extra-trauma:not(:checked) ~ .sheet-tooth[value="4"] + span,
+.sheet-advancement-xpholder .sheet-vampirexp:not(:checked) ~ .sheet-tooth[value="8"] + span,
+.sheet-attribute-xp-box .sheet-vampirexp:not(:checked) ~ .sheet-tooth[value="6"] + span {
 	margin-right: 0;
 }
 /* small fixes */
@@ -1725,7 +1739,7 @@ input[name="attr_setting_extra_trauma"]:not(:checked) ~ .sheet-tooth[value="4"] 
 	margin-top: 15px;
 }
 /* LOAD CHECKBOXES */
-.sheet-loadheader input.sheet-checkbox + span {
+.sheet-loadheader .sheet-checkbox + span {
 	border: 1px solid #000;
 	transform: rotate(45deg);
 	width: 10px;
@@ -1792,127 +1806,108 @@ button[type=roll].sheet-borderbutton:hover {
 	border-color: #020202;
 }
 /* CHECKBOXES */
-input.sheet-checkbox {
-	height: 12px;
-	width: 12px;
+.sheet-checkbox {
 	margin-right: -12px;
 }
-input.sheet-checkbox.sheet-squarebox-small {
-	height: 9px;
-	width: 9px;
-	margin-right: -9px;
-}
-input.sheet-checkbox.sheet-squarebox-small + span {
-	width: 9px;
-	height: 9px;
-}
-input.sheet-checkbox.sheet-squarebox-small:checked + span {
-	background: #000;
-	opacity: 0.7;
-}
-input.sheet-checkbox + span {
-	vertical-align: middle;
-	width: 12px;
+input.sheet-checkbox, .sheet-checkbox + span {
 	height: 12px;
+	width: 12px;
+	flex: 0 0 auto;
+}
+.sheet-checkbox + span {
 	border: 1px solid #838587;
 }
-input.sheet-checkbox:hover + span {
+.sheet-checkbox:checked + span {
+	background: #ff4747;
+}
+.sheet-checkbox:hover + span {
 	opacity: 0.7;
 }
-input.sheet-checkbox.sheet-squarebox + span {
+.sheet-squarebox + span {
 	background: transparent;
 	margin-right: 3px;
 }
-input.sheet-checkbox.sheet-circlebox + span {
-	border-radius: 40px;
-	margin-right: auto;
+.sheet-circlebox + span {
+	border-radius: 50%;
 	background: #fff;
 }
-input.sheet-checkbox:checked + span {
-	background: #ff4747;
+input.sheet-checkbox.sheet-squarebox-small, .sheet-checkbox.sheet-squarebox-small + span {
+	height: 9px;
+	width: 9px;
 }
-input.sheet-checkbox.sheet-claimbridge {
+.sheet-checkbox.sheet-squarebox-small:checked + span {
+	background: #000;
+}
+.sheet-claimbridge {
+	position: relative;
+}
+.sheet-claimbridge input, .sheet-claimbridge span {
 	width: 100%;
-	margin-right: -100%;
-	vertical-align: top;
+	height: 100%;
 }
-input.sheet-checkbox.sheet-claimbridge + span {
-	border: none;
-	vertical-align: top;
-	width: 100%;
-	background: transparent;
-}
-input.sheet-checkbox.sheet-claimbridge:checked + span {
+.sheet-claimbridge input:checked + span {
 	background: #d6d8d9;
 }
 /* Change text colour when boxes are checked*/
-.sheet-specialability input:checked ~ .sheet-abilityname,
-.sheet-item input.sheet-checkbox:checked ~ .sheet-itemname,
-.sheet-friend input[value="up"]:checked ~ textarea {
+.sheet-specialability :checked ~ .sheet-abilityname,
+.sheet-item .sheet-checkbox:checked ~ .sheet-itemname,
+.sheet-friend [value="up"]:checked ~ textarea {
 	color: #ff4747;
 }
-.sheet-friend input[value="down"]:checked ~ textarea,
-.sheet-contact input:checked ~ textarea  {
+.sheet-friend [value="down"]:checked ~ textarea,
+.sheet-contact :checked ~ textarea  {
 	color: #222;
 }
 /* specific adjustments */
-.sheet-specialability input.sheet-checkbox,
-.sheet-specialability input.sheet-checkbox + span {
+.sheet-specialability .sheet-checkbox,
+.sheet-specialability .sheet-checkbox + span {
 	margin-top: 3px;
-}
-.sheet-specialability input.sheet-checkbox + span {
-	border-radius: 30px;
-	background: #fff;
 }
 .sheet-actions input.sheet-checkbox {
 	height: 20px;
 	width: 16px;
 	margin-right: -14px;
 }
-.sheet-actions input.sheet-checkbox + span {
-	border-radius: 50px;
+.sheet-actions .sheet-checkbox + span {
 	height: 11px;
 	width: 11px;
 	border: none;
 	margin-right: calc(7px + (100% - 173px)/8);
 }
-.sheet-action input.sheet-checkbox + span:first-of-type {
+.sheet-action .sheet-checkbox + span:first-of-type {
 	margin-right: 6px;
 }
-.sheet-action .sheet-darktalent:checked ~ input.sheet-checkbox + span:first-of-type {
+.sheet-action .sheet-darktalent:checked ~ .sheet-checkbox + span:first-of-type {
 	margin-right: 4px;
 }
-.sheet-actions .sheet-darktalent:checked ~ input.sheet-checkbox + span:not(:first-of-type) {
+.sheet-action .sheet-darktalent:checked ~ .sheet-checkbox + span:not(:first-of-type) {
 	margin-right: calc(3px + (100% - 171px)/10);
 }
-.sheet-actions .sheet-darktalent:checked ~ input.sheet-checkbox + span:last-of-type {
+.sheet-action .sheet-darktalent:checked ~ .sheet-checkbox + span:last-of-type {
 	margin-right: calc(4px + (100% - 171px)/10);
 }
-.sheet-specialability input.sheet-checkbox:checked + span {
-	background: #ff4747;
-}
 /* Fake radios */
-input.sheet-checkbox.sheet-fakeradio + span {
+.sheet-checkbox.sheet-fakeradio + span {
 	background: #ff4747;
 }
-.sheet-actions input.sheet-fakeradio:checked ~ input.sheet-checkbox.sheet-fakeradio + span {
+.sheet-action .sheet-fakeradio:checked ~ .sheet-fakeradio + span {
 	background: #c6c7c9;
 }
-.sheet-tier input.sheet-fakeradio:checked ~ input.sheet-checkbox.sheet-fakeradio + span {
+.sheet-tier .sheet-fakeradio:checked ~ .sheet-fakeradio + span {
 	background: #fff;
 }
-/* HIDER*/
-input.sheet-darktalent:not(:checked) ~ input[type=checkbox]:last-of-type,
-input.sheet-darktalent:not(:checked) ~ input[type=checkbox]:last-of-type + span {
+/* HIDER */
+.sheet-darktalent:not(:checked) ~ input:last-of-type,
+.sheet-darktalent:not(:checked) ~ input:last-of-type + span {
 	display: none;
 }
 /* Friend triangles */
-.sheet-friend input.sheet-checkbox + span,
-.sheet-contact input.sheet-checkbox + span {
+.sheet-friend .sheet-checkbox + span,
+.sheet-contact .sheet-checkbox + span {
 	width: 0;
 	height: 0;
-	border-color: transparent;
 	background: transparent;
+	border-color: transparent;
 }
 .sheet-friend label,
 .sheet-contact label {
@@ -1926,25 +1921,25 @@ input.sheet-darktalent:not(:checked) ~ input[type=checkbox]:last-of-type + span 
 .sheet-friend label.sheet-down {
 	margin-top: 8px;
 }
-.sheet-friend input.sheet-checkbox[value="down"] + span {
+.sheet-friend .sheet-down .sheet-checkbox + span {
 	border-width: 10px 5px 0;
 	border-top-color: #fff;
 }
-.sheet-friend input.sheet-checkbox[value="up"] + span {
+.sheet-friend .sheet-up .sheet-checkbox + span {
 	border-width: 0 5px 10px;
 	border-bottom-color: #fff;
 }
-.sheet-friend input.sheet-checkbox[value="down"]:checked + span {
+.sheet-friend .sheet-down .sheet-checkbox:checked + span {
 	border-top-color: #000;
 }
-.sheet-friend input.sheet-checkbox[value="up"]:checked + span {
+.sheet-friend .sheet-up .sheet-checkbox:checked + span {
 	border-bottom-color: #ff4747;
 }
-.sheet-contact input.sheet-checkbox + span {
+.sheet-contact .sheet-checkbox + span {
 	border-width: 5px 0 5px 10px;
 	border-left-color: #fff;
 }
-.sheet-contact input.sheet-checkbox:checked + span {
+.sheet-contact .sheet-checkbox:checked + span {
 	border-left-color: #000;
 }
 /* ACTION RATINGS */
@@ -2011,7 +2006,6 @@ input.sheet-darktalent:not(:checked) ~ input[type=checkbox]:last-of-type + span 
 	line-height: 13px;
 }
 .sheet-cohort-info input[type=text] {
-	width: auto;
 	flex: 1 1 0;
 	padding: 0 3px;
 }
@@ -2099,12 +2093,13 @@ input.sheet-darktalent:not(:checked) ~ input[type=checkbox]:last-of-type + span 
 .sheet-claimsrow {
 	align-items: center;
 }
-.sheet-claimsrow > div {
+.sheet-claimsrow > div, .sheet-claimsrow > label {
 	flex: 0 0 auto;
 }
 .sheet-claimbox {
 	background: #d6d8d9;
 	width: 18.4%;
+	position: relative;
 	transition: all 0.2s;
 }
 .sheet-claimbox,
@@ -2124,9 +2119,11 @@ input.sheet-darktalent:not(:checked) ~ input[type=checkbox]:last-of-type + span 
 }
 .sheet-claims-horisep {
 	height: 12px;
+	display: flex;
 	width: 2%;
 }
 .sheet-claims-vertsep {
+	display: flex;
 	width: 12px;
 	margin: 0 calc(9.2% - 6px);
 }
@@ -2145,10 +2142,10 @@ input.sheet-darktalent:not(:checked) ~ input[type=checkbox]:last-of-type + span 
 	padding: 2px 2.5% 4px;
 	line-height: 10px;
 }
-.sheet-claimbox div {
+.sheet-claimbox label {
 	position: absolute;
-	margin: 56px 0 0 1px;
-	line-height: 0;
+	bottom: 1px;
+	left: 1px;
 }
 input:checked + .sheet-claimbox {
 	background: #c1c4c5;
@@ -2165,16 +2162,16 @@ input:checked + .sheet-claimbox {
 	vertical-align: top;
 	align-items: center;
 }
-.sheet-strictures span.sheet-label:after {
+.sheet-strictures span.sheet-label::after {
 	content: ":";
 }
 /* ALCHEMICALS */
-input.sheet-title-checkbox ~ div {
+.sheet-title-checkbox ~ div {
 	height: auto;
 	transition: all 0.2s;
 	overflow: hidden;
 }
-input.sheet-title-checkbox:not(:checked) ~ div {
+.sheet-title-checkbox:not(:checked) ~ div {
 	height: 0;
 }
 input.sheet-title-checkbox {
@@ -2183,7 +2180,7 @@ input.sheet-title-checkbox {
 	margin-right: -100%;
 	height: 24px;
 }
-input.sheet-title-checkbox:hover + span {
+.sheet-title-checkbox:hover + span {
 	color: #ff4747;
 }
 .sheet-alchemicals-content {
@@ -2198,7 +2195,7 @@ input.sheet-title-checkbox:hover + span {
 .sheet-bandoliers-name {
 	margin-right: 7px;
 	font-size: 12px;
-	vertical-align: middle;
+	line-height: 18px;
 }
 .sheet-bandolier input:nth-of-type(3) + span {
 	margin-right: 8px;
@@ -2248,22 +2245,24 @@ input.sheet-title-checkbox:hover + span {
 .sheet-factions-header span {
 	font-size: 7px;
 }
-input.sheet-expand {
-	width: 8px;
-	margin: 7px 0 0 -7px;
+input.sheet-expand, .sheet-expand + span {
 	position: absolute;
-	height: 8px;
-}
-input.sheet-expand + span::before {
-	margin-top: 3px;
-	margin-left: -7px;
-	position: absolute;
-	content: "▶";
+	width: 7px;
+	height: 10px;
 	font-size: 8px;
-	width: 12px;
-	height: 12px;
 }
-input.sheet-expand:checked + span::before {
+.sheet-type-faction .sheet-expand + span::before {
+	content: "▶";
+}
+.sheet-type-faction .sheet-expand {
+	left: -7px;
+	top: 6px;
+}
+.sheet-type-faction .sheet-expand + span {
+	top: 3px;
+	left: -7px;
+}
+.sheet-expand:checked + span::before {
 	content: "▼";
 }
 .sheet-faction {
@@ -2275,7 +2274,7 @@ input.sheet-expand:checked + span::before {
 	line-height: 1.5;
 	height: 51px;
 }
-input.sheet-expand:not(:checked) ~ textarea {
+.sheet-expand:not(:checked) ~ textarea {
 	height: 0 !important;
 	border-width: 0;
 }
@@ -2367,4 +2366,42 @@ label.sheet-generatebutton:hover input + span {
 	text-transform: inherit;
 	letter-spacing: inherit;
 	text-align: inherit;
+}
+/* Broadcast buttons */
+.sheet-input-show-broadcast:not(:checked) ~ div .sheet-broadcast-button {
+	display: none;
+}
+button[type=roll].sheet-broadcast-button {
+	font-family: pictos;
+	position: absolute;
+	border: none;
+	margin: 0;
+	padding: 0;
+	z-index: 3;
+}
+.sheet-specialability button[type=roll].sheet-broadcast-button {
+	font-size: 12px;
+	line-height: 14px;
+	height: 14px;
+	width: 14px;
+	color: #777;
+	left: 3px;
+	bottom: 7px;
+}
+.sheet-clocks button[type=roll].sheet-broadcast-button {
+	font-size: 11px;
+	line-height: 11px;
+	height: 12px;
+	width: 12px;
+	color: #777;
+	right: 0;
+	bottom: 2px;
+}
+.sheet-harm button[type=roll].sheet-broadcast-button {
+	color: #fff;
+	font-weight: normal;
+	font-size: 11px;
+	line-height: 11px;
+	right: 2px;
+	top: 1px;
 }
