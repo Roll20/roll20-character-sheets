@@ -1268,7 +1268,22 @@ const crewData = {
 		upgrade_22_check_1: "0",
 		upgrade_6_check_1: "0",
 		wreck: "0"
-	};
+	},
+	alchemicalData = [
+		"alcahest",
+		"binding_oil",
+		"drift_oil",
+		"drown_powder",
+		"eyeblind_poison",
+		"fire_oil",
+		"grenade",
+		"quicksilver",
+		"skullfire_poison",
+		"smoke_bomb",
+		"spark_drug",
+		"standstill_poison",
+		"trance_powder",
+	];
 /* Transform data once translations are known */
 Object.keys(crewData).forEach(crew => {
 	const base = crewData[crew].base,
@@ -1314,6 +1329,11 @@ Object.keys(factionsData).forEach(x => {
 	factionsData[x].forEach(faction => {
 		faction.name = getTranslationByKey(faction.name);
 	});
+});
+alchemicalData.forEach((v, k) => {
+	alchemicalData[k] = {
+		name: getTranslationByKey(v)
+	};
 });
 Object.keys(playbookData).forEach(playbook => {
 	const base = playbookData[playbook].base,
@@ -1543,6 +1563,7 @@ on('change:crew_type change:playbook', event => {
 			fillRepeatingSectionFromData('ability', playbookData[sourceName].ability, true);
 			fillRepeatingSectionFromData('playbookitem', playbookData[sourceName].playbookitem, true);
 			fillBaseData(playbookData[sourceName].base, playbookAttributes);
+			if (sourceName === 'leech') fillRepeatingSectionFromData('alchemical', alchemicalData);
 		}
 	});
 });
@@ -1653,7 +1674,9 @@ handleBoxesFill('bandolier2_check_');
 /* Pseudo-radios */
 ['crew_tier', ...actionsFlat].forEach(name => {
 	on(`change:${name}`, event => {
-		if (String(event.newValue) === '0') setAttr(name, (parseInt(event.previousValue) || 1) - 1);
+		if (String(event.newValue) === '0' && event.sourceType === 'player') {
+			setAttr(name, (parseInt(event.previousValue) || 1) - 1);
+		}
 	});
 });
 /* Item reset button */
@@ -2307,6 +2330,16 @@ on('sheet:opened', () => {
 					Object.keys(actionData).forEach(calculateResistance);
 					upgradeSheet('2.3');
 					console.log('Updating to 2.3');
+				}
+				// Upgrade to 2.4: Generate alchemicals for Leeches
+				else if (versionMajor === 2 && versionMinor < 4) {
+					getAttrs(['playbook'], v => {
+						if (v.playbook.toLowerCase() === 'leech') {
+							fillRepeatingSectionFromData('alchemical', alchemicalData);
+						}
+					});
+					upgradeSheet('2.4');
+					console.log('Updating to 2.4');
 				}
 			},
 			initialiseSheet = () => {
