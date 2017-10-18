@@ -4,6 +4,10 @@ This is a character sheet for Blades in the Dark for use on Roll20.
 
 ## Changelog
 
+### 2.4
+* Several bugfixes
+* New clocks-only mode for the faction page for those who want a character sheet just to store clocks
+
 ### 2.3
 * Added broadcast button for sending information to chat for special abilities, clocks, and harm.
 * Image clocks have been replaced by a CSS version that looks sharper, especially in the roll template.

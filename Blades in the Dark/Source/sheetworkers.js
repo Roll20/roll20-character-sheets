@@ -2331,8 +2331,8 @@ on('sheet:opened', () => {
 		else initialiseSheet();
 		// Set version number
 		mySetAttrs({
-			version: '2.3',
-			character_sheet: 'Blades in the Dark v2.3'
+			version: '2.4',
+			character_sheet: 'Blades in the Dark v2.4'
 		});
 	});
 });
