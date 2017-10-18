@@ -1805,9 +1805,9 @@
 		<div class="sheet-row">
 			<label for="attr_languages" class="sheet-languages">Languages</label>
 		</div>
-		<div class="sheet-row">
-			<textarea name="attr_languages" class="sheet-textarea-wide"></textarea>
-		</div>
+		<fieldset class="repeating_languages">
+			<input type="text" name="attr_languages">
+		</fieldset>
 		<div class="sheet-row">
 			<label for="attr_notes">Notes</label>
 		</div>
@@ -2476,6 +2476,7 @@ on("sheet:opened", function() {
 	validateGear();
 	migrateTechniques();
 	migrateCyberware();
+	migrateLanguages();
 });
 
 on("change:str change:int change:dex change:wis change:con change:cha", function(e) {
@@ -2677,7 +2678,7 @@ validateStowedMax = function() {
  */
 
 migrateTechniques = function() {
-	console.log("Migrate started");
+	console.log("Psychic migrate started");
 	var technique, i, newRow, newRowId, newRowAttrs = {};
 	getAttrs(['psionics_mastered_1', 'psionics_mastered_2', 'psionics_mastered_3', 'psionics_mastered_4', 'psionics_mastered_5', 'psionics_mastered_6', 'psionics_mastered_7', 'psionics_mastered_8'], function(values) {
 		console.log(values);
@@ -2706,7 +2707,7 @@ migrateTechniques = function() {
 }
 
 migrateCyberware = function() {
-	console.log("Migrate started");
+	console.log("Cyberware migrate started");
 	var cyberware, i, newRow, newRowId, newRowAttrs = {};
 	getAttrs(['cyberware_1', 'cyberware_2', 'cyberware_3', 'cyberware_4'], function(values) {
 		console.log(values);
@@ -2731,6 +2732,32 @@ migrateCyberware = function() {
 				console.log("no update");
 			}
 		}
+	});
+}
+
+migrateLanguages = function() {
+	//console.log("Languages migrate started");
+	var languages, i, newRow, newRowId, newRowAttrs = {};
+	getAttrs(["languages"], function(v) {
+		console.log("Languages retrieved");
+		languages = v["languages"].split(/\r?\n/);
+		for (i = 0; i < languages.length; i++) {
+			if (languages[i] !== "" && typeof languages[i] === 'string') {
+				console.log("In need of update");
+				newRowId = generateRowID();
+				console.log(newRowId);
+				newRow = "repeating_languages_" + newRowId + "_languages";
+				console.log(newRow);
+				newRowAttrs[newRow] = languages[i];
+				console.log(newRowAttrs);
+				setAttrs(newRowAttrs, function(values) {
+					console.log("updated");
+				});
+			} else {
+				console.log("no update");
+			}
+		}
+		setAttrs({languages: ""});
 	});
 }
 </script>
