@@ -403,6 +403,17 @@
 </rolltemplate>
 <!-- Sheet workers -->
 <script type="text/worker">
+const skills = [
+  'Architecture',
+  'Bushcraft',
+  'Climb',
+  'Languages',
+  'Search',
+  'Sleight of Hand',
+  'Sneak Attack',
+  'Stealth',
+  'Tinker'
+];
 const fillRepeatingSectionFromData = (sectionName, dataList) => {
   getSectionIDs(`repeating_${sectionName}`, idList => {
     const existingRowAttributes = idList.map(id => `repeating_${sectionName}_${id}_name`);
@@ -482,6 +493,18 @@ on('change:repeating_equipment remove:repeating_equipment', () => {
 });
 // Conversion
 on('sheet:opened', () => {
+  const generateSkills = () => {
+    getSectionIDs('repeating_skills', idArray => {
+      const skillNames = idArray.map(id => `repeating_skills_${id}_skillname`);
+      getAttrs(skillNames, v => {
+        const existingSkills = Object.values(v).map(name => (name || '').toLowerCase()),
+          newSkills = skills.filter(s => !existingSkills.includes(s.toLowerCase())).map(n => ({
+            skillname: n
+          }));
+        fillRepeatingSectionFromData('skills', newSkills);
+      });
+    });
+  }
   getAttrs(['version', 'MaxHP'], v => {
     if (!v.version) {
       if (v.MaxHP) {
@@ -507,9 +530,11 @@ on('sheet:opened', () => {
           fillRepeatingSectionFromData('weapons', data);
         });
       });
+      generateSkills();
     }
+    if (v.version === '1') generateSkills();
     setAttrs({
-      version: '1'
+      version: '2'
     });
   });
 });
