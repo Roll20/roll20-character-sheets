@@ -9,13 +9,13 @@ There are two distinct sheet types that come bundled with this character sheet: 
 
 #### Character Sheet Type
 
-The Character sheet type is meant for player characters and non player characters that call for a more details-oriented approach to character management. This entails your typical Roll20 sheet features: a multi-tab interface, automated calculations, sheet rolling macros, repeating sections, etc. 
+The Character sheet type is meant for player characters and non player characters that call for a more details-oriented approach to management. This entails your typical Roll20 sheet features: a multi-tab interface, automated calculations, sheet rolling macros, repeating sections, etc. 
 
 #### Monster Sheet Type
 
 The Monster sheet type is meant for monsters, to be used exclusively by the DM. It condenses everything down to one page (no tab interface), and removes autocalculations entirely in favor of giving more control to the DM with editing values. Utilizing this sheet type effectively will enable the DM to drag and drop monster tokens and keep track of their respective stats without having to wade through the tabular interface meant for more complex character types.
 
-#### Bugs and Suggestions
+#### Bugs and Feedback
 
-Report bugs or suggestions to the project’s [issue
+Report bugs or feedback to the project’s [issue
 tracker](https://github.com/Azurift/roll20-character-sheets/issues).
