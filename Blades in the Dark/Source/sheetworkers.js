@@ -1515,6 +1515,7 @@ const crewAttributes = [...new Set([].concat(...Object.keys(crewData).map(x => O
 		'repeating_factionclock:name',
 		'repeating_cohort:edges',
 		'repeating_cohort:flaws',
+		'repeating_alchemical:name',
 		'xp_condition',
 		'xp_condition_extra',
 		'xp_condition2',
@@ -1523,13 +1524,28 @@ const crewAttributes = [...new Set([].concat(...Object.keys(crewData).map(x => O
 		'hunting_grounds_description',
 		'cohort1_edges',
 		'cohort1_flaws',
-	];
+	],
+	autogenSections = [
+		'ability',
+		'crewability',
+		'friend',
+		'contact',
+		'playbookitem',
+		'upgrade'
+	],
+	headerInfoAttrs = [
+		'heritage',
+		'background',
+		'vice_purveyor',
+		'hull_functions',
+		'crew_deity_features'
+	],
+	spiritPlaybooks = ['ghost', 'hull', 'vampire'];
 /* EVENT HANDLERS */
 /* Set default fields when setting crew type or playbook */
 on('change:crew_type change:playbook', event => {
 	getAttrs(['changed_attributes', 'setting_autofill', ...watchedAttributes], v => {
-		const spiritPlaybooks = ['ghost', 'hull', 'vampire'],
-			changedAttributes = (v.changed_attributes || '').split(','),
+		const changedAttributes = (v.changed_attributes || '').split(','),
 			sourceName = event.newValue.toLowerCase(),
 			fillBaseData = (data, defaultAttrNames) => {
 				if (data) {
@@ -1568,13 +1584,13 @@ on('change:crew_type change:playbook', event => {
 	});
 });
 /* Watch repeating rows for changes and set autogen to false if change happens*/
-['ability', 'crewability', 'friend', 'contact', 'playbookitem', 'upgrade'].forEach(sectionName => {
+autogenSections.forEach(sectionName => {
 	on(`change:repeating_${sectionName}`, event => {
-		const idMatch = event.sourceAttribute.match(new RegExp(`^repeating_${sectionName}_(.*?)_`)),
-			id = idMatch && idMatch[1];
-		if (id && event.sourceType === 'player') {
-			setAttr(`repeating_${sectionName}_${id}_autogen`, '');
-		}
+		getAttrs([`repeating_${sectionName}_autogen`], v => {
+			if (v[`repeating_${sectionName}_autogen`] && event.sourceType === 'player') {
+				setAttr(`repeating_${sectionName}_autogen`, '');
+			}
+		});
 	});
 });
 /* Watch for changes in auto-set attributes and update changed_attributes*/
@@ -1620,7 +1636,7 @@ on('change:generate_factions', () => {
 		fillRepeatingSectionFromData(sectionName, factionsData[sectionName]);
 	});
 });
-['ability', 'crewability', 'playbookitem', 'upgrade', 'friend', 'contact'].forEach(sectionName => {
+autogenSections.forEach(sectionName => {
 	on(`change:generate_${sectionName}`, () => {
 		getAttrs(['generate_source_character', 'generate_source_crew', 'sheet_type'], v => {
 			const data = (v.sheet_type === 'character') ? playbookData : crewData,
@@ -1633,14 +1649,7 @@ on('change:generate_factions', () => {
 	});
 });
 /* Extra stress and trauma */
-on('change:setting_extra_stress', event => {
-	const setting = [1, 2, 3, 4, 5].reduce((m, k) => {
-		m[`setting_extra_stress${k}`] = ((parseInt(event.newValue) || 0) > k - 1) ? 1 : 0;
-		return m;
-	}, {});
-	setting.stress_max = 9 + (parseInt(event.newValue) || 0);
-	mySetAttrs(setting);
-});
+on('change:setting_extra_stress', event => setAttr('stress_max', 9 + (parseInt(event.newValue) || 0)));
 on('change:setting_extra_trauma', event => setAttr('trauma_max', 4 + (parseInt(event.newValue) || 0)));
 /* Calculate cohort quality */
 on(['crew_tier', 'cohort1_impaired', 'cohort1_type'].map(x => `change:${x}`).join(' '), () => calculateCohortDice('cohort1'));
@@ -1668,7 +1677,7 @@ handleBoxesFill('bandolier1_check_');
 handleBoxesFill('bandolier2_check_');
 ['item', 'playbookitem', 'upgrade'].forEach(sName => handleBoxesFill(`repeating_${sName}:check_`));
 /* Handle showing options for heritage, background, and vice */
-['heritage', 'background', 'vice_purveyor', 'hull_functions', 'crew_deity_features'].forEach(name => {
+headerInfoAttrs.forEach(name => {
 	on(`change:${name}`, event => setAttr(`show_${name}_info`, event.newValue ? '0' : '1'));
 });
 /* Pseudo-radios */
@@ -2333,13 +2342,14 @@ on('sheet:opened', () => {
 				}
 				// Upgrade to 2.4: Generate alchemicals for Leeches
 				else if (versionMajor === 2 && versionMinor < 4) {
-					getAttrs(['playbook'], v => {
+					getAttrs(['playbook', 'notes'], v => {
 						if (v.playbook.toLowerCase() === 'leech') {
 							fillRepeatingSectionFromData('alchemical', alchemicalData);
 						}
+						setAttr('crew_notes', v.notes || '');
 					});
 					upgradeSheet('2.4');
-					console.log('Updating to 2.4');
+					console.log('Updating to 2.4.');
 				}
 			},
 			initialiseSheet = () => {
@@ -2358,7 +2368,7 @@ on('sheet:opened', () => {
 					});
 					mySetAttrs(setting);
 				});
-				console.log('Initialising new sheet');
+				console.log('Initialising new sheet.');
 			};
 		if (v.version) upgradeSheet(v.version);
 		else initialiseSheet();
