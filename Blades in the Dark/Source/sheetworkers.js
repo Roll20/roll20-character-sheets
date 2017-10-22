@@ -1,6 +1,7 @@
 "use strict";
 /* DATA */
-const crewData = {
+const sheetVersion = "2.4",
+	crewData = {
 		assassins: {
 			base: {
 				claim_1_desc: "claim_training_rooms_description",
@@ -1778,6 +1779,8 @@ on('sheet:opened', () => {
 		const upgradeSheet = version => {
 				const versionMajor = version && parseInt(version.split('.')[0]),
 					versionMinor = version && parseInt(version.split('.')[1]);
+				console.log(`Found version ${version}.`);
+				if (version !== sheetVersion) console.log('Performing sheet upgrade.');
 				// Upgrade to 0.7: Convert legacy faction repeating section to text
 				if (versionMajor === 0 && versionMinor < 7) {
 					getSectionIDs('repeating_faction', list => {
@@ -1792,7 +1795,6 @@ on('sheet:opened', () => {
 							setAttr('faction_notes', output);
 							list.forEach(id => removeRepeatingRow(`repeating_faction_${id}`));
 							upgradeSheet('0.7');
-							console.log('Updating to 0.7');
 						});
 					});
 				}
@@ -1823,7 +1825,6 @@ on('sheet:opened', () => {
 							check: v.contact1_check || '0',
 							name: v.contact1_name || ''
 						}], false, upgradeFunction);
-						console.log('Updating to 0.9');
 					});
 				}
 				// Upgrade to 1.4: Convert playbook items and repeating items
@@ -1906,7 +1907,6 @@ on('sheet:opened', () => {
 								setting[`repeating_item_${id}_check_2`] = v[`repeating_item_${id}_check_b`] || '0';
 							});
 							mySetAttrs(setting, {}, upgradeFunction);
-							console.log('Updating to 1.4');
 						});
 					});
 				}
@@ -2019,7 +2019,6 @@ on('sheet:opened', () => {
 							obj.boxes_chosen = 'on';
 						});
 						fillRepeatingSectionFromData('item', items, false, () => upgradeSheet('1.5'));
-						console.log('Updating to 1.5');
 					});
 				}
 				// Upgrade to 1.6: Set defaults, convert upgrade names
@@ -2108,7 +2107,6 @@ on('sheet:opened', () => {
 							setting[k] = v[k] || setting[k] || translatedDefaults[k];
 						});
 						mySetAttrs(setting, {}, upgradeFunction);
-						console.log('Updating to 1.6');
 					});
 				}
 				// Upgrade to 1.9: Add missing upgrade descriptions, convert bandolier checks
@@ -2152,13 +2150,11 @@ on('sheet:opened', () => {
 								}
 							});
 							mySetAttrs(setting, {}, upgradeFunction);
-							console.log('Updating to 1.9');
 						});
 					});
 				}
 				// Upgrade to 1.10: Convert clocks
 				else if (versionMajor === 1 && versionMinor < 10) {
-					console.log('Updating to 1.10');
 					const upgradeFunction = _.after(2, () => upgradeSheet('1.10'));
 					['clock', 'crewclock'].forEach(sName => {
 						getSectionIDs(`repeating_${sName}`, idArray => {
@@ -2197,7 +2193,6 @@ on('sheet:opened', () => {
 				}
 				// Upgrade to 1.11: Convert all checkboxes to value=1
 				else if (versionMajor === 1 && versionMinor < 11) {
-					console.log('Updating to 1.11');
 					const upgradeFunction = _.after(14, () => upgradeSheet('1.11')),
 						upgradeNums = [...Array(25).keys()].slice(1).filter(x => x !== 19).slice(5),
 						boxes = ['show_settings', 'setting_extra_trauma', 'setting_extra_xp', 'setting_vampirexp', 'setting_show_strictures',
@@ -2277,7 +2272,6 @@ on('sheet:opened', () => {
 								calculateCohortDice('cohort1');
 								idArray.forEach(id => calculateCohortDice(`repeating_cohort_${id}`));
 								upgradeSheet('1.12');
-								console.log('Updating to 1.12');
 							});
 						});
 					});
@@ -2290,7 +2284,6 @@ on('sheet:opened', () => {
 							if (v[name]) setting[`show_${name}_info`] = '0';
 						});
 						mySetAttrs(setting, {}, () => upgradeSheet('1.13'));
-						console.log('Updating to 1.13');
 					});
 				}
 				// Upgrade to 2.0: Rename trauma attributes, frame feature migration
@@ -2315,7 +2308,6 @@ on('sheet:opened', () => {
 						actionsFlat.filter(n => changedAttrs.has(`${n}1`) || changedAttrs.has(`${n}2`))
 							.forEach(name => changedAttrs.add(name));
 						setting.changed_attributes = [...changedAttrs].join(',');
-						console.log('Updating to 2.0');
 						fillRepeatingSectionFromData('framefeature', frameData, false, upgradeFunction);
 						mySetAttrs(setting, {}, upgradeFunction);
 					});
@@ -2330,26 +2322,28 @@ on('sheet:opened', () => {
 								setting_show_cohort: '1'
 							});
 						}
+						upgradeSheet('2.2');
 					});
-					upgradeSheet('2.2');
-					console.log('Updating to 2.2');
 				}
-				// Upgrade to 2.3: Recalculate resistance, just to be safe
-				else if (versionMajor === 2 && versionMinor < 3) {
-					Object.keys(actionData).forEach(calculateResistance);
-					upgradeSheet('2.3');
-					console.log('Updating to 2.3');
-				}
-				// Upgrade to 2.4: Generate alchemicals for Leeches
+				// Upgrade to 2.4: Generate alchemicals for Leeches, recalculate resistance
 				else if (versionMajor === 2 && versionMinor < 4) {
-					getAttrs(['playbook', 'notes'], v => {
+					Object.keys(actionData).forEach(calculateResistance);
+					getAttrs(['playbook', 'notes', 'changed_attributes'], v => {
 						if (v.playbook.toLowerCase() === 'leech') {
 							fillRepeatingSectionFromData('alchemical', alchemicalData);
 						}
+						if (v.changed_attributes) {
+							const changedAttrs = v.changed_attributes.split(',');
+							actionsFlat.forEach(action => {
+								if (changedAttrs.some(x => x.indexOf(action) === 0)) {
+									changedAttrs.push(action);
+								}
+							});
+							setAttr('changed_attributes', [...new Set(changedAttrs)].join(','));
+						}
 						setAttr('crew_notes', v.notes || '');
+						upgradeSheet('2.4');
 					});
-					upgradeSheet('2.4');
-					console.log('Updating to 2.4.');
 				}
 			},
 			initialiseSheet = () => {
@@ -2374,8 +2368,8 @@ on('sheet:opened', () => {
 		else initialiseSheet();
 		// Set version number
 		mySetAttrs({
-			version: '2.4',
-			character_sheet: 'Blades in the Dark v2.4'
+			version: sheetVersion,
+			character_sheet: `Blades in the Dark v${sheetVersion}`
 		});
 	});
 });
