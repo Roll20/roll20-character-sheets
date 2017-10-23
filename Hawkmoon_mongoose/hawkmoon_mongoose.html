@@ -2,6 +2,7 @@
     <input type="hidden" name="attr_initSheet" value="1"/>
     <input type="hidden" name="attr_initHp" value="1"/>
     <input type="hidden" name="attr_initFate" value="1"/>
+
     <!--spacer so scrollbar does not disappear-->
     <div style="width:1px; height:600px; min-height:600px;position:absolute;left:1px;">&nbsp;</div>
 
@@ -1925,11 +1926,24 @@
 
             <section role="region" aria-label="Configuration" data-i18n-aria-label="page-config-aria">
                 <div class="sheet-section sheet-section-config">
+
+                    <div class="sheet-header sheet-text-center" style="width:100%;"><span data-i18n="rules">Rules</span></div>
+                    <br/>
+
+                    <input type="checkbox" class="sheet-noshow" name="attr_useArmorPenalty" value="1"><span data-i18n="use-armor-penalty">Use Armor Penalty?</span>
+
+                    <br/>
+                    <br/>
+                    <div class="sheet-header sheet-text-center" style="width:100%;"><span data-i18n="misc">Miscellaneous</span></div>
+                    <br/>
+
                     <span data-i18n="rolls-results">Rolls Results</span> :
                     <select name="attr_PC-whisper" style="width:150px">
                         <option value="&nbsp;" data-i18n="public" selected>Public</option>
                         <option value="/w gm" data-i18n="whisper-to-gm">Whisper to GM</option>
                     </select>
+
+                    <br/>
                     <br/>
                 </div>
             </section>
@@ -1941,7 +1955,7 @@
         <div class="sheet-footer">
             <div class="sheet-table">
                 <div class="sheet-table-row">
-                    <span class="sheet-table-cell"><span data-i18n="footer-created-by">Created By</span> PadRPG <span data-i18n="footer-inspired">(highly inspired by the Pathfinder Sheet)</span> | <span data-i18n="footer-last-update">Last Update</span>:<i>15.10.2017&nbsp;&nbsp;</i>v1.1</span>
+                    <span class="sheet-table-cell"><span data-i18n="footer-created-by">Created By</span> PadRPG <span data-i18n="footer-inspired">(highly inspired by the Pathfinder Sheet)</span> | <span data-i18n="footer-last-update">Last Update</span>:<i>23.10.2017&nbsp;&nbsp;</i>v1.2</span>
                 </div>
             </div>
         </div>
@@ -3223,8 +3237,8 @@
 /* Basic Skills Calculation */
 /****************************/
 
-        on("change:str change:con change:dex change:siz change:int change:pow change:cha change:total_armor_penalty", function () {
-	       getAttrs(["str", "con", "dex", "siz", "int", "pow", "cha", "total_armor_penalty"], function (values) {
+        on("change:str change:con change:dex change:siz change:int change:pow change:cha", function () {
+	       getAttrs(["str", "con", "dex", "siz", "int", "pow", "cha"], function (values) {
 
                 var strValue = parseInt(values.str);
                 var conValue = parseInt(values.con);
@@ -3233,13 +3247,12 @@
                 var intValue = parseInt(values.int);
                 var powValue = parseInt(values.pow);
                 var chaValue = parseInt(values.cha);
-                var penaltyMod = parseInt(values["total_armor_penalty"]);
 
                 setAttrs({
-                    'acrobatics-base': dexValue+penaltyMod,
-                    'athletics-base': strValue+dexValue+penaltyMod,
+                    'acrobatics-base': dexValue,
+                    'athletics-base': strValue+dexValue,
                     'boating-base': strValue,
-                    'dodge-base': 10+dexValue-sizValue+penaltyMod,
+                    'dodge-base': 10+dexValue-sizValue,
                     'driving-base': 10+powValue,
                     'evaluate-base': intValue,
                     'first-aid-base': intValue,
@@ -3250,14 +3263,14 @@
                     'perception-base': intValue+powValue,
                     'persistence-base': 40+chaValue+powValue,
                     'resilience-base': 40+conValue+powValue,
-                    'riding-base': dexValue+powValue+penaltyMod,
+                    'riding-base': dexValue+powValue,
                     'sing-base': chaValue,
-                    'sleight-base': dexValue+penaltyMod,
-                    'stealth-base': 10+dexValue-sizValue+penaltyMod,
-                    'throwing-base': dexValue+penaltyMod,
+                    'sleight-base': dexValue,
+                    'stealth-base': 10+dexValue-sizValue,
+                    'throwing-base': dexValue,
                     'unarmed-base': strValue,
-                    'basic-close-combat-base':strValue+dexValue+penaltyMod,
-                    'basic-ranged-base':dexValue+penaltyMod
+                    'basic-close-combat-base':strValue+dexValue,
+                    'basic-ranged-base':dexValue
                 });
 
             });
@@ -3267,17 +3280,31 @@
 /* Acrobatics Skill Calculation */
 /********************************/
 
-        on("change:acrobatics-base change:acrobatics-mod", function (eventinfo) {
-	        getAttrs(["acrobatics-base","acrobatics-mod"], function (values) {
+        on("change:acrobatics-base change:acrobatics-mod change:total_armor_penalty change:usearmorpenalty", function (eventinfo) {
+	        getAttrs(["acrobatics-base","acrobatics-mod","total_armor_penalty","useArmorPenalty"], function (values) {
 
                 var acrobaticsBase = parseInt(values["acrobatics-base"]);
                 var acrobaticsMod = parseInt(values["acrobatics-mod"]);
+                var penaltyVal = parseInt(values["total_armor_penalty"]);
+                var usePenalty = parseInt(values["useArmorPenalty"]);
 
-
-                setAttrs({
-                    'acrobatics': acrobaticsBase+acrobaticsMod
-                });
-
+                if(usePenalty==1){
+                    if((acrobaticsMod+penaltyVal)>=0){
+                        setAttrs({
+                            'acrobatics': acrobaticsBase+acrobaticsMod+penaltyVal
+                        });
+                    }
+                    else{
+                        setAttrs({
+                            'acrobatics': acrobaticsBase
+                        });
+                    }
+                }
+                else{
+                    setAttrs({
+                        'acrobatics': acrobaticsBase+acrobaticsMod
+                    });
+                }
             });
         });
 
@@ -3285,17 +3312,31 @@
 /* Athletics Skill Calculation */
 /*******************************/
 
-        on("change:athletics-base change:athletics-mod", function (eventinfo) {
-	        getAttrs(["athletics-base","athletics-mod"], function (values) {
+        on("change:athletics-base change:athletics-mod change:total_armor_penalty change:usearmorpenalty", function (eventinfo) {
+	        getAttrs(["athletics-base","athletics-mod","total_armor_penalty","useArmorPenalty"], function (values) {
 
                 var athleticsBase = parseInt(values["athletics-base"]);
                 var athleticsMod = parseInt(values["athletics-mod"]);
+                var penaltyVal = parseInt(values["total_armor_penalty"]);
+                var usePenalty = parseInt(values["useArmorPenalty"]);
 
-
-                setAttrs({
-                    'athletics': athleticsBase+athleticsMod
-                });
-
+                if(usePenalty==1){
+                    if((athleticsMod+penaltyVal)>=0){
+                        setAttrs({
+                            'athletics': athleticsBase+athleticsMod+penaltyVal
+                        });
+                    }
+                    else{
+                        setAttrs({
+                            'athletics': athleticsBase
+                        });
+                    }
+                }
+                else{
+                    setAttrs({
+                        'athletics': athleticsBase+athleticsMod
+                    });
+                }
             });
         });
 
@@ -3320,17 +3361,31 @@
 /* Dodge Skill Calculation */
 /***************************/
 
-        on("change:dodge-base change:dodge-mod", function (eventinfo) {
-	        getAttrs(["dodge-base","dodge-mod"], function (values) {
+        on("change:dodge-base change:dodge-mod change:total_armor_penalty change:usearmorpenalty", function (eventinfo) {
+	        getAttrs(["dodge-base","dodge-mod","total_armor_penalty","useArmorPenalty"], function (values) {
 
                 var dodgeBase = parseInt(values["dodge-base"]);
                 var dodgeMod = parseInt(values["dodge-mod"]);
+                var penaltyVal = parseInt(values["total_armor_penalty"]);
+                var usePenalty = parseInt(values["useArmorPenalty"]);
 
-
-                setAttrs({
-                    'dodge': dodgeBase+dodgeMod
-                });
-
+                if(usePenalty==1){
+                    if((dodgeMod+penaltyVal)>=0){
+                        setAttrs({
+                            'dodge': dodgeBase+dodgeMod+penaltyVal
+                        });
+                    }
+                    else{
+                        setAttrs({
+                            'dodge': dodgeBase
+                        });
+                    }
+                }
+                else {
+                    setAttrs({
+                        'dodge': dodgeBase+dodgeMod
+                    });
+                }
             });
         });
 
@@ -3508,17 +3563,31 @@
 /* Riding Skill Calculation */
 /****************************/
 
-        on("change:riding-base change:riding-mod", function (eventinfo) {
-	        getAttrs(["riding-base","riding-mod"], function (values) {
+        on("change:riding-base change:riding-mod change:total_armor_penalty change:usearmorpenalty", function (eventinfo) {
+	        getAttrs(["riding-base","riding-mod","total_armor_penalty","useArmorPenalty"], function (values) {
 
                 var ridingBase = parseInt(values["riding-base"]);
                 var ridingMod = parseInt(values["riding-mod"]);
+                var penaltyVal = parseInt(values["total_armor_penalty"]);
+                var usePenalty = parseInt(values["useArmorPenalty"]);
 
-
-                setAttrs({
-                    'riding': ridingBase+ridingMod
-                });
-
+                if(usePenalty==1){
+                    if((ridingMod+penaltyVal)>=0){
+                        setAttrs({
+                            'riding': ridingBase+ridingMod+penaltyVal
+                        });
+                    }
+                    else{
+                        setAttrs({
+                            'riding': ridingBase
+                        });
+                    }
+                }
+                else{
+                    setAttrs({
+                        'riding': ridingBase+ridingMod
+                    });
+                }
             });
         });
 
@@ -3542,17 +3611,31 @@
 /*****************************/
 /* Sleight Skill Calculation */
 /*****************************/
-        on("change:sleight-base change:sleight-mod", function (eventinfo) {
-	        getAttrs(["sleight-base","sleight-mod"], function (values) {
+        on("change:sleight-base change:sleight-mod change:total_armor_penalty change:usearmorpenalty", function (eventinfo) {
+	        getAttrs(["sleight-base","sleight-mod","total_armor_penalty","useArmorPenalty"], function (values) {
 
                 var sleightBase = parseInt(values["sleight-base"]);
                 var sleightMod = parseInt(values["sleight-mod"]);
+                var penaltyVal = parseInt(values["total_armor_penalty"]);
+                var usePenalty = parseInt(values["useArmorPenalty"]);
 
-
-                setAttrs({
-                    'sleight': sleightBase+sleightMod
-                });
-
+                if(usePenalty==1){
+                    if((sleightMod+penaltyVal)>=0){
+                        setAttrs({
+                            'sleight': sleightBase+sleightMod+penaltyVal
+                        });
+                    }
+                    else{
+                        setAttrs({
+                            'sleight': sleightBase
+                        });
+                    }
+                }
+                else{
+                    setAttrs({
+                        'sleight': sleightBase+sleightMod
+                    });
+                }
             });
         });
 
@@ -3560,17 +3643,31 @@
 /* Stealth Skill Calculation */
 /*****************************/
 
-        on("change:stealth-base change:stealth-mod", function (eventinfo) {
-	        getAttrs(["stealth-base","stealth-mod"], function (values) {
+        on("change:stealth-base change:stealth-mod change:total_armor_penalty change:usearmorpenalty", function (eventinfo) {
+	        getAttrs(["stealth-base","stealth-mod","total_armor_penalty","useArmorPenalty"], function (values) {
 
                 var stealthBase = parseInt(values["stealth-base"]);
                 var stealthMod = parseInt(values["stealth-mod"]);
+                var penaltyVal = parseInt(values["total_armor_penalty"]);
+                var usePenalty = parseInt(values["useArmorPenalty"]);
 
-
-                setAttrs({
-                    'stealth': stealthBase+stealthMod
-                });
-
+                if(usePenalty==1){
+                    if((stealthMod+penaltyVal)>=0){
+                        setAttrs({
+                            'stealth': stealthBase+stealthMod+penaltyVal
+                        });
+                    }
+                    else{
+                        setAttrs({
+                            'stealth': stealthBase
+                        });
+                    }
+                }
+                else{
+                    setAttrs({
+                        'stealth': stealthBase+stealthMod
+                    });
+                }
             });
         });
 
@@ -3578,17 +3675,31 @@
 /* Throwing Skill Calculation */
 /******************************/
 
-        on("change:throwing-base change:throwing-mod", function (eventinfo) {
-	        getAttrs(["throwing-base","throwing-mod"], function (values) {
+        on("change:throwing-base change:throwing-mod change:total_armor_penalty change:usearmorpenalty", function (eventinfo) {
+	        getAttrs(["throwing-base","throwing-mod","total_armor_penalty","useArmorPenalty"], function (values) {
 
                 var throwingBase = parseInt(values["throwing-base"]);
                 var throwingMod = parseInt(values["throwing-mod"]);
+                var penaltyVal = parseInt(values["total_armor_penalty"]);
+                var usePenalty = parseInt(values["useArmorPenalty"]);
 
-
-                setAttrs({
-                    'throwing': throwingBase+throwingMod
-                });
-
+                if(usePenalty==1){
+                    if((throwingMod+penaltyVal)>=0){
+                        setAttrs({
+                            'throwing': throwingBase+throwingMod+penaltyVal
+                        });
+                    }
+                    else{
+                        setAttrs({
+                            'throwing': throwingBase
+                        });
+                    }
+                }
+                else{
+                    setAttrs({
+                        'throwing': throwingBase+throwingMod
+                    });
+                }
             });
         });
 
@@ -3613,17 +3724,31 @@
 /* Basic Close Combat Skill Calculation */
 /****************************************/
 
-        on("change:basic-close-combat-base change:basic-close-combat-mod", function (eventinfo) {
-	        getAttrs(["basic-close-combat-base","basic-close-combat-mod"], function (values) {
+        on("change:basic-close-combat-base change:basic-close-combat-mod change:total_armor_penalty change:usearmorpenalty", function (eventinfo) {
+	        getAttrs(["basic-close-combat-base","basic-close-combat-mod","total_armor_penalty","useArmorPenalty"], function (values) {
 
                 var basicCloseCombatBase = parseInt(values["basic-close-combat-base"]);
                 var basicCloseCombatMod = parseInt(values["basic-close-combat-mod"]);
+                var penaltyVal = parseInt(values["total_armor_penalty"]);
+                var usePenalty = parseInt(values["useArmorPenalty"]);
 
-
-                setAttrs({
-                    'basic-close-combat': basicCloseCombatBase+basicCloseCombatMod
-                });
-
+                if(usePenalty==1){
+                    if((basicCloseCombatMod+penaltyVal)>=0){
+                        setAttrs({
+                            'basic-close-combat': basicCloseCombatBase+basicCloseCombatMod+penaltyVal
+                        });
+                    }
+                    else{
+                        setAttrs({
+                            'basic-close-combat': basicCloseCombatBase
+                        });
+                    }
+                }
+                else{
+                    setAttrs({
+                        'basic-close-combat': basicCloseCombatBase+basicCloseCombatMod
+                    });
+                }
             });
         });
 
@@ -3631,17 +3756,31 @@
 /* Basic Ranged Skill Calculation */
 /**********************************/
 
-        on("change:basic-ranged-base change:basic-ranged-mod", function (eventinfo) {
-	        getAttrs(["basic-ranged-base","basic-ranged-mod"], function (values) {
+        on("change:basic-ranged-base change:basic-ranged-mod change:total_armor_penalty change:usearmorpenalty", function (eventinfo) {
+	        getAttrs(["basic-ranged-base","basic-ranged-mod","total_armor_penalty","useArmorPenalty"], function (values) {
 
                 var basicRangedBase = parseInt(values["basic-ranged-base"]);
                 var basicRangedMod = parseInt(values["basic-ranged-mod"]);
+                var penaltyVal = parseInt(values["total_armor_penalty"]);
+                var usePenalty = parseInt(values["useArmorPenalty"]);
 
-
-                setAttrs({
-                    'basic-ranged': basicRangedBase+basicRangedMod
-                });
-
+                if(usePenalty==1){
+                    if((basicRangedMod+penaltyVal)>=0){
+                        setAttrs({
+                            'basic-ranged': basicRangedBase+basicRangedMod+penaltyVal
+                        });
+                    }
+                    else{
+                        setAttrs({
+                            'basic-ranged': basicRangedBase
+                        });
+                    }
+                }
+                else{
+                    setAttrs({
+                        'basic-ranged': basicRangedBase+basicRangedMod
+                    });
+                }
             });
         });
 
@@ -3807,13 +3946,14 @@
 /* Weapon Skills Calculation */
 /*****************************/
 
-        on("change:repeating_weaponskills:weaponSkillChar1 change:repeating_weaponskills:weaponSkillChar2 change:repeating_weaponskills:weaponSkillMod", function(){
+        on("change:repeating_weaponskills:weaponSkillChar1 change:repeating_weaponskills:weaponSkillChar2 change:repeating_weaponskills:weaponSkillMod change:total_armor_penalty change:usearmorpenalty", function(){
             getAttrs([
                 "repeating_weaponskills_weaponSkillName",
                 "repeating_weaponskills_weaponSkillChar1",
                 "repeating_weaponskills_weaponSkillChar2",
                 "repeating_weaponskills_weaponSkillMod",
                 "total_armor_penalty",
+                "useArmorPenalty",
                 "str",
                 "con",
                 "dex",
@@ -3826,11 +3966,26 @@
                 var modVal=parseInt(values.repeating_weaponskills_weaponSkillMod);
                 var penaltyVal=parseInt(values.total_armor_penalty);
 
+                var usePenalty = parseInt(values["useArmorPenalty"]);
+
                 var charVal1=parseInt(values[values.repeating_weaponskills_weaponSkillChar1])||0;
                 var charVal2=parseInt(values[values.repeating_weaponskills_weaponSkillChar2])||0;
 
-                var baseVal= charVal1 + charVal2 + penaltyVal
-                var scoreVal= baseVal + modVal;
+                var baseVal= charVal1 + charVal2;
+
+                var scoreVal= 0;
+
+                if(usePenalty==1){
+                    if((modVal + penaltyVal)>=0){
+                        scoreVal= baseVal + modVal + penaltyVal;
+                    }
+                    else{
+                        scoreVal= baseVal;
+                    }
+                }
+                else{
+                    scoreVal= baseVal + modVal;
+                }
 
                 setAttrs({
                     'repeating_weaponskills_weaponSkillBase': baseVal,
@@ -3880,12 +4035,13 @@
 /* Advanced Skills Calculation */
 /*******************************/
 
-        on("change:repeating_advancedskills:advancedSkillChar1 change:repeating_advancedskills:advancedSkillChar2 change:repeating_advancedskills:advancedSkillMod", function(){
+        on("change:repeating_advancedskills:advancedSkillChar1 change:repeating_advancedskills:advancedSkillChar2 change:repeating_advancedskills:advancedSkillMod change:total_armor_penalty change:usearmorpenalty", function(){
             getAttrs([
                 "repeating_advancedskills_advancedSkillChar1",
                 "repeating_advancedskills_advancedSkillChar2",
                 "repeating_advancedskills_advancedSkillMod",
                 "total_armor_penalty",
+                "useArmorPenalty",
                 "str",
                 "con",
                 "dex",
@@ -3898,12 +4054,31 @@
                 var modVal=parseInt(values.repeating_advancedskills_advancedSkillMod);
                 var penaltyVal=parseInt(values.total_armor_penalty);
 
+                var usePenalty = parseInt(values["useArmorPenalty"]);
+
                 var charVal1=parseInt(values[values.repeating_advancedskills_advancedSkillChar1])||0;
                 var charVal2=parseInt(values[values.repeating_advancedskills_advancedSkillChar2])||0;
 
+                var baseVal= charVal1 + charVal2;
+
+                var scoreVal= 0;
+
+                if(usePenalty==1){
+                    if((modVal + penaltyVal)>=0){
+                        scoreVal= baseVal + modVal + penaltyVal;
+                    }
+                    else{
+                        scoreVal= baseVal;
+                    }
+                }
+                else{
+                    scoreVal= baseVal + modVal;
+                }
+
+
                 setAttrs({
-                    'repeating_advancedskills_advancedSkillBase': charVal1 + charVal2 + penaltyVal,
-                    'repeating_advancedskills_advancedSkill':charVal1 + charVal2 + penaltyVal + modVal
+                    'repeating_advancedskills_advancedSkillBase': baseVal,
+                    'repeating_advancedskills_advancedSkill':scoreVal
                 });
 
             });
@@ -3913,39 +4088,79 @@
 /* Weapon & Advanced Skills ReCalculation after Characteristics change */
 /***********************************************************************/
 
-        on("change:str change:con change:dex change:siz change:int change:pow change:cha change:total_armor_penalty", function(){
+        on("change:str change:con change:dex change:siz change:int change:pow change:cha change:total_armor_penalty change:usearmorpenalty", function(){
 
             TAS.repeating('advancedSkills')
-                .attrs('str','con','dex','siz','int','pow','cha','total_armor_penalty')
+                .attrs('str','con','dex','siz','int','pow','cha','total_armor_penalty','useArmorPenalty')
                 .fields('advancedSkillChar1','advancedSkillChar2','advancedSkillMod','advancedSkillBase','advancedSkill')
                 .each(function(r,f){
                     var charVal1=f.I[r.advancedSkillChar1]||0;
                     var charVal2=f.I[r.advancedSkillChar2]||0;
 
+                    var modVal=r.I.advancedSkillMod;
+
                     var penaltyVal=0;
+
+                    var usePenalty=f.I['useArmorPenalty'];
 
                     if(r.advancedSkillChar1=='dex' || r.advancedSkillChar2=='dex')
                         penaltyVal=f.I['total_armor_penalty'];
 
-                    r.advancedSkillBase=charVal1 + charVal2 + penaltyVal;
-                    r.advancedSkill=charVal1 + charVal2 + r.I.advancedSkillMod + penaltyVal;
+                    var baseVal= charVal1 + charVal2;
+
+                    var scoreVal= 0;
+
+                    if(usePenalty==1){
+                        if((modVal + penaltyVal)>=0){
+                            scoreVal= baseVal + modVal + penaltyVal;
+                        }
+                        else{
+                            scoreVal= baseVal;
+                        }
+                    }
+                    else{
+                        scoreVal= baseVal + modVal;
+                    }
+
+                    r.advancedSkillBase=baseVal;
+                    r.advancedSkill=scoreVal;
                 })
                 .execute();
 
             TAS.repeating('weaponskills')
-                .attrs('str','con','dex','siz','int','pow','cha','total_armor_penalty')
+                .attrs('str','con','dex','siz','int','pow','cha','total_armor_penalty','useArmorPenalty')
                 .fields('weaponskillChar1','weaponskillChar2','weaponskillMod','weaponskillBase','weaponskill')
                 .each(function(r,f){
                     var charVal1=f.I[r.weaponskillChar1]||0;
                     var charVal2=f.I[r.weaponskillChar2]||0;
 
+                    var modVal=r.I.weaponskillMod;
+
                     var penaltyVal=0;
+
+                    var usePenalty=f.I['useArmorPenalty'];
 
                     if(r.weaponskillChar1=='dex' || r.weaponskillChar2=='dex')
                         penaltyVal=f.I['total_armor_penalty'];
 
-                    r.weaponskillBase=charVal1 + charVal2 + penaltyVal;
-                    r.weaponskill=charVal1 + charVal2 + r.I.weaponskillMod + penaltyVal;
+                    var baseVal= charVal1 + charVal2;
+
+                    var scoreVal= 0;
+
+                    if(usePenalty==1){
+                        if((modVal + penaltyVal)>=0){
+                            scoreVal= baseVal + modVal + penaltyVal;
+                        }
+                        else{
+                            scoreVal= baseVal;
+                        }
+                    }
+                    else{
+                        scoreVal= baseVal + modVal;
+                    }
+
+                    r.weaponskillBase=baseVal;
+                    r.weaponskill=scoreVal;
                 })
                 .execute();
         });
