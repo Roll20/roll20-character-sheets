@@ -27,6 +27,9 @@ Versions have three numbers Major.Minor.Release
 * Can now change the base characteristics of sorcery invocations.  Still defaults to INT+INT
 * Changed Magic sections to be a little more distinct from each other
 * Removed the spinners from the number fields
+* Can now adjust the roll used for initiative to anything you wish.  If you had the alacrity gift checked the roll is already updated for you.
+* Re-arranged the Movement section to be more readable and to make room for expanded hit locations.
+* Can enable/disable display of weapon sections like you can with magic sections now.
 
 ### Bugfixes
 * Fixed Concentration for spell roll templates
@@ -35,6 +38,7 @@ Versions have three numbers Major.Minor.Release
 * Set columns in the Background section to be equal width
 * Fixed rolling for Shaping giving a standard value of 0
 * Replace some terminology missed for Luther Arkwright support
+* Renamed Strike Rank to Initiative Bonus
 
 ## 1.2.0
 ### New Features
