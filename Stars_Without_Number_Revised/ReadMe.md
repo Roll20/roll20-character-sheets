@@ -25,6 +25,21 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 ### Changelog
 
+### 1.4.0
+
+* Added NPC tab which holds standard NPC stats, notes, and rolls such as Morale and Reaction.
+* Fixed bug where modifiers weren't applied to skill rolls if the "assist" popup was submitted empty.
+* Added explanation of skill roll modifiers
+* Added description fields to cyberware as well.
+* Added ability to print description fields to chat as a macro.
+* Made the skill list a little smaller by decreasing font size.
+* Clean up code intentation and formatting. It is now consistent (and also in tabs).
+* Added ability to hide Psychic section since not all characters need it.
+
+### 1.3.1
+
+* Added "Weapons" subheader to combat section.
+
 ### 1.3.0
 
 * Duplicated weapon rolls to new Combat section where Common Rolls used to be.
