@@ -1,18 +1,40 @@
-D6-StarWars-Character-Sheet
-===========================
+									D6-StarWars-Character-Sheet
+									===========================
 
-D6 Based Character sheet for WEG Star Wars and the new D6 Star Wars games.
-
-This is for D6 Star Wars not D20!
+This is the Character sheet for the D6-Based  WEG Star Wars and the new D6 Star Wars games.
 
 List your dice and pips next to the appropriate skills -  3pips equal another die.
-
 The text areas are expandable for additional info. 
 
-.
+
+
+Good source for all things D6 Star wars related, including fanmade conversions of campaign settings, forums and more:
+						--------------->http://www.d6holocron.com/<-------------
+
+						
+						
+
+Improvements 30.10.2017(Anduh):
+	-Added attributes for wound levels, and trackers for force emptiness and control pain/resist stun.
+	-All attributes roll using a template, taking wounds and wound-negating force powers in considerations, and the player can additionally choose to include MultipleActionPenalty, force concentration, force point
+	use and other modifiers(pip)
+	-Added armor section with simple soak rolls
+	-Added missing Star Wars logo
+	-Added a template roller to bottom of sheet for custom rolls
+	-Added a template roller to bottom of sheet for char point rolls
+
+Suggestions for improvement:
+	-complete dice rolling for skills with a template like attributes are now
+	-change dice icon to d6
+	-insert separate Initiative skill with roller that adds it to initiative tracker
+	-Tab for ship/droids with ability to roll from sheet
+	-streamline force power use, tracker for power, maybe own tab for them
+	-wiki page for sheet
+
 
 .
-
+-------------------------Legacy code below, old in 2017 already------------------------------
+_____________________________________________________________________________________________
 
 I'm sure that a skilled coder could do this far better, but This is my first attempt ever.
 
