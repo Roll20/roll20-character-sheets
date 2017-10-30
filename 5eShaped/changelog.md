@@ -11,6 +11,81 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 15.5.7
+
+### Bug Fixes
+
+* [#27: Armor class does not import](https://bitbucket.org/mlenser/5eshapedscript/issues/27/armor-class-does-not-import)
+* Import of spells without an attack or save (Magic Missile) now properly sets the damage on by default. Closes [#618: Multiple NPC Spellcasting Issues](https://bitbucket.org/mlenser/5eshaped/issues/618/multiple-npc-spellcasting-issues)
+
+## 15.5.6
+
+### Bug Fixes
+
+* Large testing and fixing process which resolves many script issues when using version 11.3.2 of the script: [#15: Issues with actions on character import](https://bitbucket.org/mlenser/5eshapedscript/issues/15/issues-with-actions-on-character-import), [#16: NPC - API Import](https://bitbucket.org/mlenser/5eshapedscript/issues/16/npc-api-import), [#17: !shaped-expand-spells --all not working](https://bitbucket.org/mlenser/5eshapedscript/issues/17/shaped-expand-spells-all-not-working), and [#20: OGL Conversion: !shaped-update-character](https://bitbucket.org/mlenser/5eshapedscript/issues/20/ogl-conversion-shaped-update-character).
+
+## 15.5.5
+
+### Bug Fixes
+
+* [#611: Ammo weight not being tracked](https://bitbucket.org/mlenser/5eshaped/issues/611/ammo-weight-not-being-tracked)
+
+## 15.5.4
+
+### Bug Fixes
+
+* [#606: SRD Weapon drag incorrect](https://bitbucket.org/mlenser/5eshaped/issues/606/srd-weapon-drag-incorrect)
+* [#604: Actions issue upon monster import](https://bitbucket.org/mlenser/5eshaped/issues/604/actions-issue-upon-monster-import)
+* [#601: Racial Traits (Description and Slots Police)](https://bitbucket.org/mlenser/5eshaped/issues/601/racial-traits-description-and-slots-police)
+* [#602: When picking he psion spell components (Mental, Auditory, Visual etc.) the choice resets.](https://bitbucket.org/mlenser/5eshaped/issues/602/when-picking-he-psion-spell-components)
+* [#574: Every Monster Compendium Spear Multiplying](https://bitbucket.org/mlenser/5eshaped/issues/574/every-monster-compendium-spear-multiplying) NPC parsing of these has been turned off for now unless they come from the SRD. I'd like to have them work, but this is better than the sheet being overloaded. It looks like another change that roll20 made that steve mentioned. Blah.
+
+## 15.5.3
+
+### Bug Fixes
+
+* Actions should now work, mostly. I've checked the following types:
+  * Actions with an attack (Guiding Bolt)
+  * Actions with a saving throw (Fireball)
+  * Actions without an attack or saving throw(Magic Missile)
+  * Actions with a heal (Cure Wounds)
+
+## 15.5.2
+
+### Bug Fixes
+
+* [#598: HP display is broken](https://bitbucket.org/mlenser/5eshaped/issues/598/hp-display-is-broken)
+* Some of [#597: Actions issues](https://bitbucket.org/mlenser/5eshaped/issues/597/actions-issues)
+
+## 15.5.1
+
+### Bug Fixes
+
+* [#594: Ability Scores not updating and crashing the page.](https://bitbucket.org/mlenser/5eshaped/issues/594/ability-scores-not-updating-and-crashing)
+* A myriad of other bugs involved in the [Roll20 breaking change](https://app.roll20.net/forum/permalink/5498180/) in their API. The sheet is still very laggy and I could use significant help identifying issues.
+
+## 15.5.0
+
+### Features
+
+* [#578: Provide skill totals](https://bitbucket.org/mlenser/5eshaped/issues/578/provide-skill-totals) will now make the total of each skill available for other resources like scripts. The attribute will be named as the skill is, so `Perception`, `Athletics`, etc. It will be the total modifier (without any + or - sign).
+
+### Bug Fixes
+
+* [#579: Multiple erroring classes are added and cannot be deleted](https://bitbucket.org/mlenser/5eshaped/issues/579/multiple-erroring-classes-are-added-and). It should automatically populate spellcasting now as well. I remember reading something about a change to repeating sections from roll20. Perhaps that was the cause of this as this area hasn't been touched in a while - hard to say.
+
+## 15.4.0
+
+### Features
+
+* Cleaned up the styling around the heart as users were often confused what it meant:
+
+![alt text](http://i.imgur.com/0f8z8k1.jpg "Heart")
+
+### Bug Fixes
+
+* [#566: Automatically roll damage should still show the "Hit" and "Saving throw failure" buttons](https://bitbucket.org/mlenser/5eshaped/issues/566/automatically-roll-damage-should-still)
+
 ## 15.3.0
 
 ### Features
