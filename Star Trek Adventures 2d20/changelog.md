@@ -2,6 +2,14 @@
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 1.2.2
+
+### Features
+* Added Complication Range (in sheet settings)
+* Added {{focus=TEXT}} to RollTemplate
+* Improved Identification of character in default Sheet Rolls
+* Defaulted all Ship assist rolls to 1d20
+
 ## 1.2.1
 ### Bug Fixes
 * Fixed Combat Rolls
