@@ -100,11 +100,11 @@ function updateTalents() {
 }
 
 function _updateTalents(prefix) {
-  parseAttrs([prefix + '_dice', prefix + '_trait', prefix + '_upgrade', prefix + '_downgrade', 'body', 'mind', 'charm'], values => {
+  parseAttrs([prefix + '_dice', prefix + '_trait', prefix + '_upgrade', prefix + '_downgrade', 'body_equation', 'mind_equation', 'charm_equation'], values => {
     var talentDice = values[prefix + '_dice'];
 
     var trait = values[prefix + '_trait'];
-    var traitDice = values[trait] || 'D0';
+    var traitDice = values[trait + '_equation'] || 'D0';
 
     var upgrade = values[prefix + '_upgrade'] || 0;
     var downgrade = values[prefix + '_downgrade'] || 0;
@@ -113,8 +113,6 @@ function _updateTalents(prefix) {
     // Apply upgrades/downgrades to talent dice.
     if(talentDice && updownSum)
       talentDice = getUpDowngradedRoll(talentDice, updownSum);
-    if(traitDice && traitDice !== '0' && updownSum)
-      traitDice = getUpDowngradedRoll(traitDice, updownSum);
 
     if(talentDice === 'null')
       setAttrs({
@@ -124,6 +122,60 @@ function _updateTalents(prefix) {
       //var traitDice = values[trait];
       setAttrs({
         [prefix + '_equation']: `{${talentDice},${traitDice}}k1`
+      });
+    }
+  });
+}
+
+function updateTraits(cb) {
+  _updateTrait('body', () => {
+    _updateTrait('mind', () => {
+      _updateTrait('charm', cb);
+    });
+  });
+}
+
+function _updateTrait(trait, cb) {
+  parseAttrs([trait, trait + '_updowngrade'], values => {
+    var traitDice = values[trait];
+    if(traitDice === 'null')
+      setAttrs({
+        [trait + '_equation']: 0
+      }, {}, cb);
+    else {
+      var updown = values[trait + '_updowngrade'] || 0;
+      if(updown)
+        traitDice = getUpDowngradedRoll(traitDice, updown);
+      setAttrs({
+        [trait + '_equation']: traitDice
+      }, {}, cb);
+    }
+  });
+}
+
+function _tickDowngrade(prefix) {
+  parseAttrs([prefix + '_tickdown', prefix + '_updowngrade'], values => {
+    let checked = !!values[prefix + '_tickdown'];
+    if(checked) {
+      updown = parseInt(values[prefix + '_updowngrade']) || 0;
+
+      setAttrs({
+        [prefix + '_updowngrade']: updown - 1,
+        [prefix + '_tickdown']: 0
+      });
+    }
+  });
+}
+
+function _tickUpgrade(prefix) {
+  parseAttrs([prefix + '_tickup', prefix + '_updowngrade'], values => {
+    let checked = !!values[prefix + '_tickup'];
+    if(checked) {
+      updown = parseInt(values[prefix + '_updowngrade']) || 0;
+
+      setAttrs({
+        [prefix + '_updowngrade']: updown + 1,
+        [prefix + '_tickup']: 0
       });
     }
   });
@@ -143,13 +195,52 @@ onChange(['talent_racial_dice', 'talent_racial_trait', 'talent_racial_upgrade', 
   updateRacialTalent();
 });
 
-onChange(['body', 'mind', 'charm'], () => {
+onChange(['body_equation', 'mind_equation', 'charm_equation'], () => {
   updateTalents();
 });
 
 on('sheet:opened', () => {
   setAttrs({
-    character_sheet: 'TailsOfEquestria v1.2'
+    character_sheet: 'TailsOfEquestria v1.3'
   });
-  updateTalents();
+  updateTraits(() => {
+    updateTalents();
+  });
+});
+
+// Up/downgrade tick events
+onChange(['body_tickup'], () => {
+  _tickUpgrade('body');
+});
+
+onChange(['body_tickdown'], () => {
+  _tickDowngrade('body');
+});
+
+onChange(['body', 'body_updowngrade'], () => {
+  _updateTrait('body');
+});
+
+onChange(['mind_tickup'], () => {
+  _tickUpgrade('mind');
+});
+
+onChange(['mind_tickdown'], () => {
+  _tickDowngrade('mind');
+});
+
+onChange(['mind', 'mind_updowngrade'], () => {
+  _updateTrait('mind');
+});
+
+onChange(['charm_tickup'], () => {
+  _tickUpgrade('charm');
+});
+
+onChange(['charm_tickdown'], () => {
+  _tickDowngrade('charm');
+});
+
+onChange(['charm', 'charm_updowngrade'], () => {
+  _updateTrait('charm');
 });
