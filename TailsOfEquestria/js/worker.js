@@ -100,19 +100,22 @@ function updateTalents() {
 }
 
 function _updateTalents(prefix) {
-  parseAttrs([prefix + '_dice', prefix + '_trait', prefix + '_upgrade', prefix + '_downgrade', 'body_equation', 'mind_equation', 'charm_equation'], values => {
+  // If we just up-ticked or down-ticked the up/downgrade, then quit early
+  // after handling that.
+  if(_tickDowngrade(prefix) || _tickUpgrade(prefix))
+    return;
+
+  parseAttrs([prefix + '_dice', prefix + '_trait', prefix + '_updowngrade', 'body_equation', 'mind_equation', 'charm_equation'], values => {
     var talentDice = values[prefix + '_dice'];
 
     var trait = values[prefix + '_trait'];
     var traitDice = values[trait + '_equation'] || 'D0';
 
-    var upgrade = values[prefix + '_upgrade'] || 0;
-    var downgrade = values[prefix + '_downgrade'] || 0;
-    var updownSum = parseInt(upgrade) - parseInt(downgrade);
+    var updown = parseInt(values[prefix + '_updowngrade']) || 0;
 
     // Apply upgrades/downgrades to talent dice.
-    if(talentDice && updownSum)
-      talentDice = getUpDowngradedRoll(talentDice, updownSum);
+    if(talentDice && updown)
+      talentDice = getUpDowngradedRoll(talentDice, updown);
 
     if(talentDice === 'null')
       setAttrs({
@@ -163,7 +166,9 @@ function _tickDowngrade(prefix) {
         [prefix + '_updowngrade']: updown - 1,
         [prefix + '_tickdown']: 0
       });
+      return true;
     }
+    return false;
   });
 }
 
@@ -177,7 +182,9 @@ function _tickUpgrade(prefix) {
         [prefix + '_updowngrade']: updown + 1,
         [prefix + '_tickup']: 0
       });
+      return true;
     }
+    return false;
   });
 }
 
@@ -187,11 +194,11 @@ on('change:repeating_talents', evt => {
   updateTalents();
 });
 
-onChange(['talent_cutieMark_dice', 'talent_cutieMark_trait', 'talent_cutieMark_upgrade', 'talent_cutieMark_upgrade', 'talent_cutieMark_downgrade'], () => {
+onChange(['talent_cutieMark_dice', 'talent_cutieMark_trait', 'talent_cutieMark_updowngrade', 'talent_cutieMark_tickup', 'talent_cutieMark_tickdown'], () => {
   updateCutieMarkTalent();
 });
 
-onChange(['talent_racial_dice', 'talent_racial_trait', 'talent_racial_upgrade', 'talent_racial_upgrade', 'talent_racial_downgrade'], () => {
+onChange(['talent_racial_dice', 'talent_racial_trait', 'talent_racial_updowngrade', 'talent_racial_tickup', 'talent_racial_tickdown'], () => {
   updateRacialTalent();
 });
 
