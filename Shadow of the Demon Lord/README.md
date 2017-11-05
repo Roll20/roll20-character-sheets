@@ -33,11 +33,8 @@
 This sheet uses a preprocessor for its CSS called SASS. When editing, make sure to edit the SCSS file, and compile to the style.css file.
 
 ## Roadmap / Wishlist
-* Spell filtering
-* More automation for afflictions
+* Filter spells by tradition
 * Defense section, possible Defense roll button
-* Replace core stat buttons by text buttons
-* Boons/banes for all types of rolls separately
+* Buff/Debuff section
 * Settings page (adjust background, layout, etc.)
-* Add Madness, Injured conditions
-* Responsive Sheet for mobile play (unrealistic)
+* Responsive version of main tab
