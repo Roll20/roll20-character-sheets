@@ -1,7 +1,7 @@
 # Roll20 Character sheet for 'Shadow of the Demon Lord' by [Robert Schwalb](http://schwalbentertainment.com)
 
 ## Change log
-### 2017-11-04: Version 2
+### 2017-11-05: Version 2
 * Added option to whisper rolls to GM or query for output
 * Added up/down arrows for talent uses and spell castings
 * Added query for sacrificing spells that can be sacrificed
@@ -13,6 +13,7 @@
 * Added background tab for adding rudimentary info about background and story developments
 * Added a button to restore talent uses, as with spells
 * Added house rule friendly option to change the dice used
+* Made all tabs except the main tab somewhat responsive
 * Several small style tweaks and bugfixes
 
 ### 2017-10-30: Version 1
