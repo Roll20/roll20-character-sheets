@@ -35,8 +35,7 @@ This sheet uses a preprocessor for its CSS called SASS. When editing, make sure 
 ## Roadmap / Wishlist
 * Spell filtering
 * More automation for afflictions
-* Defense section
-* Defense roll button
+* Defense section, possible Defense roll button
 * Replace core stat buttons by text buttons
 * Boons/banes for all types of rolls separately
 * Settings page (adjust background, layout, etc.)

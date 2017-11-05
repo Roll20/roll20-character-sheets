@@ -399,6 +399,7 @@
 					</label>
 					<div class="sheet-flex-row">
 						<input type="hidden" name="attr_weapon_mod" value="+0">
+						<input type="hidden" name="attr_weapon_against_display" value="">
 						<button type="roll" name="roll_Attack" value="@{output_option} &{template:sotdl} {{title=@{weapon_name}}} {{name=@{name}}} {{attack=1}} {{attackroll=[[@{die_attack} + (@{weapon_mod}) + [[@{boons_banes_query} + @{weapon_boons_banes} + @{global_attack_boons} + @{global_weapon_attack_boons} - @{banes_from_afflictions}]]@{die_boon}k1[boons/banes]]]}} {{damage=@{weapon_damage}}} {{damageroll=[[0 + @{weapon_damage} + @{global_damage_bonus}[global bonus]]]}} {{versus=@{weapon_against}}} {{roll20plus=@{weapon_roll20plus}}} {{description=@{weapon_description}}}"></button>
 						<input type="text" spellcheck="false" class="sheet-name" name="attr_weapon_name">
 						<select name="attr_weapon_attribute" class="sheet-mod">
@@ -439,6 +440,7 @@
 					<input type="checkbox" name="attr_weapon_has_boons_banes" class="sheet-hider sheet-hidden" value="1">
 					<span><span data-i18n="WITH">with</span> <span name="attr_weapon_boons_banes"></span> <span class="sheet-lower" data-i18n="BOONS">boons</span></span>
 					<span>(<span name="attr_weapon_damage"></span>)</span>
+					<span name="attr_weapon_against_display"></span>
 				</div>
 			</fieldset>
 		</div>
@@ -1085,6 +1087,7 @@
 				<div class="sheet-indent-container sheet-display">
 					<button type="roll" name="roll_Roll" class="sheet-invisible-button" value="@{output_option} &{template:sotdl} {{title=@{attack_name}}} {{subtitle=@{attack_range}}} {{name=@{name}}} {{attack=@{attack_range}}} {{attackroll=[[@{attack_formula}]]}} {{damage=@{attack_damage}}} {{damageroll=[[0 + @{attack_damage} + @{global_damage_bonus}[global bonus]]]}} {{damageplus=@{attack_plus}}} {{description=@{attack_description}}} {{versus=@{attack_against}}}"></button>
 					<input type="hidden" name="attr_attack_formula" value="0">
+					<input type="hidden" name="attr_attack_against_display" value="">
 					<span class="sheet-label" name="attr_attack_name"></span>
 					<input type="checkbox" name="attr_attack_has_range" class="sheet-hider sheet-hidden" value="1">
 					<span>(<span name="attr_attack_range"></span><input type="checkbox" name="attr_attack_has_reach" class="sheet-hider sheet-hidden" value="1"><span>;
@@ -1103,6 +1106,7 @@
 					<span data-i18n="PLUS">plus</span>
 					<span name="attr_attack_plus"></span></span>)
 					</span>
+					<span name="attr_attack_against_display"></span>
 					<span name="attr_attack_description"></span>
 				</div>
 			</fieldset>
@@ -1427,6 +1431,27 @@ const baneAfflictions = ['diseased', 'fatigued', 'frightened', 'impaired', 'pois
 on(baneAfflictions.map(x => `change:affliction_${x}`).join(' '), () => {
 	getAttrs(baneAfflictions.map(x => `affliction_${x}`), v => {
 		setAttr('banes_from_afflictions', Object.values(v).reduce((m, k) => (m + (parseInt(k) || 0)), 0));
+	});
+});
+
+// Weapon/attack against display
+['weapon', 'attack'].forEach(name => {
+	on(`change:repeating_${name}s:${name}_against`, event => {
+		const dName = `repeating_${name}s_${name}_against_display`,
+			newValue = event.newValue.toLowerCase();
+		if (newValue.indexOf('strength') >= 0) {
+			setAttr(dName, `${getTranslationByKey('VS')} ${getTranslationByKey('STRENGTH')}`);
+		} else if (newValue.indexOf('agility') >= 0) {
+			setAttr(dName, `${getTranslationByKey('VS')} ${getTranslationByKey('AGILITY')}`);
+		} else if (newValue.indexOf('intellect') >= 0) {
+			setAttr(dName, `${getTranslationByKey('VS')} ${getTranslationByKey('INTELLECT')}`);
+		} else if (newValue.indexOf('will') >= 0) {
+			setAttr(dName, `${getTranslationByKey('VS')} ${getTranslationByKey('WILL')}`);
+		} else if (newValue.indexOf('perception') >= 0) {
+			setAttr(dName, `${getTranslationByKey('VS')} ${getTranslationByKey('PERCEPTION')}`);
+		} else {
+			setAttr(dName, '');
+		}
 	});
 });
 
