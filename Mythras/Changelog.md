@@ -7,6 +7,39 @@ Versions have three numbers Major.Minor.Release
 
 **Release**: Indicates bugfixes and minor UI changes only.
 
+## 1.3.0
+### Compatibility Issues
+* Not a real compatibility issue but if you find a section of the sheet missing you may need to enable it in the new campaign options section.
+
+### New Features
+* Campaign Options:
+    * You can now enable/disable various components of the sheet like dependencies, firearms & magic systems(entirely remove them including the show/hide check-boxes).
+    * That's all tied to the setting option, select Luther Arkwright and it will automatically set the various individual sheet options to match Luther Arkwright RAW.  For example, it will enable dependencies, disable magic systems other than mysticism, enable firearms and change some of the terminology to be setting specific.
+    * Each of those options can be over-ridden.  So to take Luther Arkwright for example, you can set Folk Magic to "enabled" instead of "per setting".  In that case Folk Magic will show even if setting is configured for Luther Arkwright.  This will allow you to use systems from other settings in custom settings or as optional rules.
+    * These sheet options can be set by the GM in the campaign settings so the sheet/character comes pre-configured on creation, avoiding the need to switch each sheet/character to the appropriate settings.
+* Added setting support for: Classic Fantasy, Monster Island and Thennla
+    * Classic Fantasy: Some terminology changes, adds an Arcane and Divine magic section, and enables adding rank to luck points.
+    * Monster Island: Adds a Status skill under standard skills, disables Folk Magic and Mysticism
+    * Thennla: Relabels Folk Magic as Rites
+* Added a new tab with General Notes and renamed the existing Notes tab to Background
+* Added notes to the equipment section
+* Expanded hit locations to 11 fillable fields(most any creature in the rulebooks has).  The hit ranges are also broken into low and high values instead of one field(preparation for rollable hit tables).  You can also re-label the hit location names.
+* Can now change the base characteristics of sorcery invocations.  Still defaults to INT+INT
+* Changed Magic sections to be a little more distinct from each other
+* Removed the spinners from the number fields
+* Can now adjust the roll used for initiative to anything you wish.  If you had the alacrity gift checked the roll is already updated for you.
+* Re-arranged the Movement section to be more readable and to make room for expanded hit locations.
+* Can enable/disable display of weapon sections like you can with magic sections now.
+
+### Bugfixes
+* Fixed Concentration for spell roll templates
+* Fixed base value of Dance skill
+* Fixed the translation key for Stealth Base value
+* Set columns in the Background section to be equal width
+* Fixed rolling for Shaping giving a standard value of 0
+* Replace some terminology missed for Luther Arkwright support
+* Renamed Strike Rank to Initiative Bonus
+
 ## 1.2.0
 ### New Features
 * Switched to three number versioning.
