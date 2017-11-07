@@ -47,14 +47,12 @@ mixin rollButton(options)
     if(typeof options === 'string')
       options = { attr: options };
       
-    var tpl = '&{template:toe} {{charName=@{character_name}}} {{attr=' + options.attr + '}} {{result=[[@{' + (options.result || options.attr) + '}]]}} {{maneColor=@{mane_color}}} {{coatColor=@{coat_color}}}';
+    var tpl = '&{template:toe} {{charName=@{character_name}}} {{attr=' + options.attr + '}} {{result=[[@{' + (options.result || options.attr) + '}]]}}';
     if(options.notes)
       tpl += '{{notes=@{' + options.notes + '}}}';
-    if(options.upgrade)
-      tpl += '{{upgrade=@{' + options.upgrade + '}}}';
-    if(options.downgrade)
-      tpl += '{{downgrade=@{' + options.downgrade + '}}}';
-  button(type='roll', value=tpl)
+    if(options.updowngrade)
+      tpl += '{{updowngrade=@{' + options.updowngrade + '}}}';
+  button(type='roll', value=tpl, title='Click to roll!')
 
 mixin select(name)
   select(name='attr_' + name, style=attributes.style)
@@ -91,3 +89,19 @@ mixin selectTrait(name)
 
 mixin textarea(name)
   textarea(name='attr_' + name, style=attributes.style, placeholder=attributes.placeholder)
+
+mixin updowngrade(prefix)
+  -
+    if(prefix !== '' && !prefix.endsWith('_'))
+      prefix += '_';
+
+  .updowngrade(title="Upgrade/Downgrade")
+    span.arrows
+      .up
+        input(type='checkbox', name='attr_' + prefix + 'tickup', value='1', title="Upgrade 1 step")
+        span ▲
+      .down
+        input(type='checkbox', name='attr_' + prefix + 'tickdown', value='1', title="Downgrade 1 step")
+        span ▼
+    span
+      +labelledUnderlined('')(style='width: 0.3in;'): +input('number', prefix + 'updowngrade')
