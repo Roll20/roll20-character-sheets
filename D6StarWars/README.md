@@ -8,31 +8,27 @@ The text areas are expandable for additional info.
 
 
 
-Good source for all things D6 Star wars related, including fanmade conversions of campaign settings, forums and more:
-						--------------->http://www.d6holocron.com/<-------------
-
-						
-						
-
-Improvements 30.10.2017(Anduh):
-	-Added attributes for wound levels, and trackers for force emptiness and control pain/resist stun.
-	-All attributes roll using a template, taking wounds and wound-negating force powers in considerations, and the player can additionally choose to include MultipleActionPenalty, force concentration, force point
-	use and other modifiers(pip)
-	-Added armor section with simple soak rolls
-	-Added missing Star Wars logo
-	-Added a template roller to bottom of sheet for custom rolls
-	-Added a template roller to bottom of sheet for char point rolls
+Improvements 7.11.2017(Anduh):
+	-Added attributes for wound levels, and trackers for force emptiness, force powers active, and control pain/resist stun.
+	-All attributes roll using a template, taking wounds and wound-negating force powers in considerations, and the player can additionally choose to include Dice/pip mods
+	-Bunch of useful die rolls in character number section
+	-added trackerr for permanent initiative bonus(some races have that)
+	-Added repeation armor section with soak rolls
+	-Added missing Star Wars logo & black space background
+	-Checkbox to hide force section
+	-change dice icon to d6
 
 Suggestions for improvement:
-	-complete dice rolling for skills with a template like attributes are now
-	-change dice icon to d6
-	-insert separate Initiative skill with roller that adds it to initiative tracker
 	-Tab for ship/droids with ability to roll from sheet
 	-streamline force power use, tracker for power, maybe own tab for them
 	-wiki page for sheet
+	-Equipment section similar to weapons and armor that would add to some skills
 
 
-.
+Good source for all things D6 Star wars related, including fanmade conversions of campaign settings, forums and more:
+						--------------->http://www.d6holocron.com/<-------------
+						
+						
 -------------------------Legacy code below, old in 2017 already------------------------------
 _____________________________________________________________________________________________
 
