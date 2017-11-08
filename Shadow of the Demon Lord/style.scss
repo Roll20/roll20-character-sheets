@@ -1,519 +1,1827 @@
-$red : #ff0031;
+$red: #ff0031;
+$fadedred: #910318;
+$transparent1: rgba(242, 242, 242, 0.5);
+$transparent2: rgba(255, 255, 255, 0.4);
 
-$circle_xs : 39px;
-$circle_sm : 50px;
-$circle_lg : 67px;
+$circle_xs: 39px;
+$circle_sm: 50px;
+$circle_lg: 67px;
+
+$sheet_max_width: 1074px;
+$sheet_main_width: 880px;
+$sheet_min_width: 390px;
+$sheet_col_max_width: 520px;
+$sheet_col_min_width: 364px;
 
 // @import "http://fonts.googleapis.com/css?family=Metal+Mania|Roboto:500";
 
 .charsheet {
-	font-family: 'Roboto', Helvetica, sans-serif;
+	font-family: "Roboto", Helvetica, sans-serif;
+	padding: 0 6px 6px 0 !important;
+	position: absolute;
+	color: #000;
+	left: 6px;
+	width: calc(100% - 12px);
+	min-width: $sheet_min_width;
+	max-width: $sheet_max_width;
+	cursor: default;
 
-	.sheet-hidden {
-	
-	}
-	
-	div div.sheet-pane {
+	.sheet-hidden,
+	.sheet-hider:not(:checked) + div,
+	.sheet-hider:not(:checked) + span,
+	.sheet-hider:not(:checked) + label {
 		display: none;
 	}
-	
-	input.sheet-tab,
-	input.sheet-tab + span {
-		margin: 0 15px 15px 0;
-		display: inline-block;
-		vertical-align: middle;
-	}
-	
-	input.sheet-tab1:checked ~ .sheet-pane.sheet-maindiv,
-	input.sheet-tab2:checked ~ .sheet-pane.sheet-maindiv2
-	{
-	    display: block;
+
+	div {
+		box-sizing: border-box;
 	}
 
+	label {
+		padding: 0;
+		margin: 0;
+		font-size: 1em;
+		box-sizing: border-box;
+	}
+
+	select {
+		height: 22px;
+		line-height: 22px;
+	}
+
+	input[type="text"], input[type="number"], select, textarea {
+		padding: 2px 3px;
+		margin: 0;
+		color: #000;
+		border-radius: 2px;
+		box-sizing: border-box;
+	}
+
+	.sheet-tab-is-main:checked + .sheet-title {
+		max-width: $sheet_main_width;
+	}
+
+	// Tab control
+	.sheet-title {
+		display: flex;
+		align-items: center;
+		font-weight: bold;
+		position: relative;
+		margin-bottom: 5px;
+
+		.sheet-npc-toggle:checked ~ .sheet-tab-selector[data-i18n-title="MAIN"],
+		.sheet-npc-toggle:checked ~ .sheet-tab-selector[data-i18n-title="EQUIPMENT_TALENTS"],
+		.sheet-npc-toggle:checked ~ .sheet-tab-selector[data-i18n-title="BACKGROUND"],
+		.sheet-npc-toggle:not(:checked) ~ .sheet-tab-selector[data-i18n-title="NPC"] {
+			display: none;
+		}
+
+		.sheet-tab-selector {
+			margin: 0 5px 0 0;
+			width: auto;
+			cursor: pointer;
+			font-size: 1.1em;
+
+			input {
+				opacity: 0;
+				position: absolute;
+
+				&:checked + span {
+					color: $fadedred;
+				}
+			}
+
+			> span {
+				display: inline-block;
+				border: 2px solid black;
+				padding: 2px 10px;
+				border-radius: 5px;
+			}
+		}
+
+		.sheet-settings-checkbox {
+			width: 18px;
+			height: 18px;
+			font-size: 18px;
+			cursor: pointer;
+			font-family: pictos;
+
+			input {
+				position: absolute;
+				opacity: 0;
+
+				+ span {
+					opacity: 0.3;
+				}
+
+				&:checked + span {
+					opacity: 1;
+				}
+			}
+		}
+	}
+
+	.sheet-tab:not(:checked) + div {
+		display: none;
+	}
+
+	label.sheet-edit-button {
+		font-family: pictos;
+		width: auto;
+		cursor: pointer;
+		position: relative;
+		z-index: 2;
+		margin: 0 6px 0 auto;
+		font-size: 1.4em;
+
+		input {
+			opacity: 0;
+			position: absolute;
+
+			+ span {
+				opacity: 0.3;
+			}
+
+			&:checked + span {
+				color: $fadedred;
+				opacity: 1;
+			}
+		}
+	}
+
+	// Applying to all tabs
 	.sheet-pane {
-	// 	Remove when testing outside of Roll20	
-		margin-left: -24px;
-	    margin-right: -24px;
-	    margin-top: -10px;
-	// 	End Roll20 section
-	
-	    height: 1139px;
-		width: 880px;
-		
-		
+		max-width: $sheet_max_width;
+		min-width: $sheet_min_width;
+
+		.sheet-lower {
+			text-transform: lowercase;
+		}
+
+		.sheet-linebreak {
+			white-space: pre-wrap;
+		}
+
+		input[type="text"],
+		input[type="number"],
+		textarea,
+		select {
+			background: $transparent1;
+			border: none;
+		}
+
+		input[type="number"] {
+			text-align: center;
+		}
+
+		input[type="text"], select {
+			width: 100%;
+		}
+
+		.repcontrol {
+			height: 28px;
+			margin-top: 3px;
+
+			button.btn {
+				background: transparent;
+				font-weight: bold;
+				border: 1px solid #666;
+				color: #666;
+				transition: 0.2s;
+
+				&:hover {
+					color: #000;
+					border-color: #000;
+				}
+			}
+		}
+
+		.itemcontrol {
+			z-index: 100;
+
+			.btn {
+				padding: 1px 10px;
+			}
+		}
+
+		.sheet-header {
+			display: flex;
+			font-weight: bold;
+			align-items: center;
+			height: 20px;
+			justify-content: space-between;
+
+			:not(.sheet-name) {
+				text-align: center;
+			}
+		}
+
+		.sheet-pseudo-button {
+			width: auto;
+			font-weight: bold;
+			text-align: center;
+			font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+			text-shadow: 0 1px 1px rgba(255,255,255,0.75);
+			cursor: pointer;
+
+			input {
+				position: absolute;
+				opacity: 0;
+			}
+
+			input + span {
+				border: 1px solid;
+				color: #666;
+				padding: 4px 10px 4px;
+				border-radius: 4px;
+				box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 1px 2px rgba(0,0,0,0.05);
+				transition: 0.2s;
+			}
+
+			&:hover span {
+				color: #000;
+			}
+		}
+
+		.sheet-flex-row {
+			display: flex;
+			margin-bottom: 2px;
+			justify-content: space-between;
+			align-items: center;
+
+			button {
+				align-self: flex-end;
+			}
+		}
+
+		label.sheet-collapse {
+			font-family: pictos;
+			position: absolute;
+			right: 5px;
+			width: auto;
+			cursor: pointer;
+			font-size: 14px;
+
+			input {
+				position: absolute;
+				opacity: 0;
+
+				&:checked + span {
+					opacity: 1;
+				}
+			}
+
+			span {
+				opacity: 0.3
+			}
+		}
+
+		input[type="number"].sheet-no-spinners {
+			/* turn off number arrows/spinners*/
+			-moz-appearance: textfield;
+
+			&::-webkit-inner-spin-button,
+			&::-webkit-outer-spin-button {
+				-webkit-appearance: none;
+				margin: 0;
+			}
+		}
+	}
+
+	// Settings
+	.sheet-settings {
+		position: absolute;
+		right: 0;
+		top: 28px;
+		background: #fff;
+		border: 1px solid black;
+		border-radius: 5px;
+		z-index: 3;
+		font-size: 0.9em;
+		width: 400px;
+
 		label {
-			display: block;
-			float: none;
-			width: 100%;
-			margin-bottom: 5px;
+			padding: 4px;
+			font-weight: normal;
+
+			&:not(:last-child) {
+				border-bottom: 1px solid black;
+			}
 		}
-		
-		input, 
-		textarea {
-			background: rgba(242, 242, 242, .5);
-			border: none;
-			padding: 10px;
-			width: 100%;
-			border-radius: 3px;
-			
+
+		select {
+			width: 135px;
+			display: inline-block;
 		}
-		
-		textarea {
-		  box-sizing: border-box;
-		  width: 100%;
+
+		span {
+			vertical-align: middle;
 		}
-		
-		input.sheet-encircled {
-			position: absolute;
-			background: none;
-			font-size: 1.5em;
-			text-align: center;
-			width: $circle_sm;
-			height: $circle_sm;
-			border-radius: 25px;
-			border-style: solid;
-			border-width: 0;
-			border-color: $red;
-			
-			font-family: 'Metal Mania', Helvetica, sans-serif;
-			
-			&[type="number"] {
-				padding: 10px 1px 10px 15px;
+
+		input[type="text"], input[type="number"] {
+			width: 3.5em;
+		}
+	}
+
+	.sheet-show-core-spinners {
+		&:not(:checked) ~ .sheet-main .sheet-encircled:not(.sheet-damage) input[type="number"] {
+			-moz-appearance: textfield;
+
+			&::-webkit-inner-spin-button,
+			&::-webkit-outer-spin-button {
+				-webkit-appearance: none;
+				margin: 0;
+			}
+		}
+
+		&:checked ~ .sheet-main .sheet-encircled {
+			input[type="number"] {
+				padding-left: 12px;
 			}
 
-			&.sheet-lg {
-				border-radius: 35px;
-				height: $circle_lg;
-				width: $circle_lg;
-				
-				+ input + button[type="roll"] {
-					position: absolute;
-					border-radius: 20px;
-					height: $circle_xs;
-					width: $circle_xs;
+			&.sheet-healing-rate input[type="number"] {
+				padding-left: 0;
+			}
+		}
+	}
+
+	.sheet-basic-equipment:not(:checked) ~ .sheet-equipment-talents > div {
+		min-width: $sheet_col_min_width;
+		max-width: $sheet_col_max_width;
+		margin-right: 8px;
+		flex: 1 1 0;
+	}
+
+	.sheet-basic-equipment:checked {
+		~.sheet-title .sheet-equipment-label {
+			display: none;
+		}
+
+		~ .sheet-main .sheet-equipment-summary {
+			display: none;
+		}
+
+		~ .sheet-equipment-talents {
+			.sheet-equipment {
+				display: none;
+			}
+
+			.sheet-talents {
+
+				.repcontainer {
+					display: flex;
+					align-items: flex-start;
+					flex-wrap: wrap;
+
+					.repitem {
+						min-width: $sheet_col_min_width;
+						max-width: $sheet_col_max_width;
+						margin-right: 8px;
+						flex: 1 1 0;
+					}
 				}
 			}
-			
-			&.sheet-sm {
-				+ input + button[type="roll"] {
-					position: absolute;
-					border-radius: 15px;
-					height: 29px;
-					width: 29px;
-				}
-			}
-			
-			&:focus {
-				border-width: 2px;
-				background: rgba(255, 255, 255, .4);
-				box-shadow: inset 0px 0px 2px black;
-			}
 		}
-		
-		input.sheet-mod {
-			background: rgba(255, 255, 255, .4);
-			font-size: 1.25em;
-			text-align: center;
-			padding: 3px;
-			width: 25px;
-			border-radius: 10px;
-			position: absolute;
-			
-			/* turn off number arrows/spinners */
-			&::-webkit-inner-spin-button, 
-			&::-webkit-outer-spin-button { 
-			  -webkit-appearance: none; 
-			  margin: 0; 
-			}
+	}
+
+	.sheet-versus-freeform {
+		&:checked ~ div .sheet-versus select,
+		&:not(:checked) ~ div .sheet-versus input {
+			display: none !important;
 		}
-		
-		fieldset {
-			border: none;
-			padding: 0;
-		}
-	}	
-	
-	.sheet-maindiv {
-		background: url('http://s20.postimg.org/bozp7kxel/sheet_final.jpg') no-repeat center center transparent;
+	}
+
+	// Main Tab
+	.sheet-main {
+		background: url('https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Shadow%20of%20the%20Demon%20Lord/Assets/main_bg.jpg');
+		background-repeat: no-repeat;
+		background-position: center center;
 		background-size: cover;
-		.sheet-3colrow {
-			padding-top: 15px;
-			
-			.sheet-col {
-				box-sizing: border-box;
-			    margin: 0;
-			    padding: 15px 30px 0 30px;
-			    width: 33%;
-			}
-			
-			.sheet-col:nth-child(1) {
-			    padding-right: 0px;
-				
-				label {
-					text-align: left;
-				}
-			}
-			.sheet-col:nth-child(2) {
-				label {
-					text-align: center;
-				}
-			}
-			.sheet-col:nth-child(3) {
-			    padding-left: 0px;
-			    width: 32%;
+		height: 1139px;
+		width: $sheet_main_width;
 
-				label {
-					text-align: right;
+		textarea {
+			resize: none;
+		}
+
+		.sheet-encircled {
+			position: absolute;
+			width: auto;
+
+			span {
+				display: none;
+			}
+
+			input {
+				background: none;
+				font-size: 1.5em;
+				width: $circle_sm;
+				height: $circle_sm;
+				border-radius: 50%;
+				border-style: solid;
+				border-width: 2px;
+				border-color: transparent;
+				font-family: "Metal Mania", Helvetica, sans-serif;
+				padding: 0;
+
+				&.sheet-lg {
+					font-size: 2em;
+					height: $circle_lg;
+					width: $circle_lg;
+				}
+
+				&:focus {
+					border-color: $fadedred;
+					background: $transparent2;
+					box-shadow: inset 0px 0px 2px black;
+				}
+			}
+
+			+ button[type="roll"] {
+				position: absolute;
+				border-radius: 50%;
+				font-size: 1.25em;
+				box-shadow: none;
+				border: none;
+				transition: 0.2s;
+				background: transparent;
+				height: $circle_xs;
+				width: $circle_xs;
+				margin: 0;
+				padding: 0;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+
+				&:hover {
+					color: $red;
+				}
+
+				&::before {
+					content: "";
 				}
 			}
 		}
-	
-		
+
 		/* 1st Row */
 		.sheet-row-1 {
-			height: 275px;
+			padding: 30px 30px 0;
+			display: flex;
+			height: 290px;
 			position: relative;
-			
-			.sheet-ancestry-select {
-				width: 50%;
-			}
-			
-			.sheet-col {
-				&:nth-child(1) {
+
+			> div {
+				&.sheet-left-col {
+					width: 32%;
+
 					textarea {
-						height: 174px;
-					}
-				}				
-				
-				&:nth-child(2) {
-					input {
-						height: 40px;
-						margin-bottom: 4px;
+						height: 188px;
 					}
 				}
-				
-				&:nth-child(3) {
-					textarea {
-						height: 227px;
-					}
-				}	
-				
-				.sheet-box {
+
+				&.sheet-middle-col {
+					padding: 0 30px;
+					width: 35%;
 					position: relative;
+
 					label {
-						&.sheet-lvl {
-							display: none;	
-						}
-					}				
-					
-					input {
-						box-sizing: border-box;
-						width: 100%;
-	
-						&[name="attr_ancestry"] {
-							width: 75%;
-						}
-						
-						&[name="attr_lvl"] {
-							left: 186px;
-							top: -5px;
-							
-							width: $circle_sm;
-							height: $circle_sm;
-						}	
-					}	
-				}				
+						text-align: center;
+					}
+
+					input[type="text"] {
+						height: 40px;
+					}
+
+					.sheet-ancestry input {
+						width: 75%;
+					}
+
+					.sheet-lvl {
+						left: 218px;
+						top: -5px;
+					}
+				}
+
+				&.sheet-right-col {
+					width: 33%;
+
+					label {
+						text-align: right;
+					}
+
+					textarea {
+						height: 139px;
+					}
+				}
 			}
-			
+
+			label {
+				margin-bottom: 5px;
+			}
+
+			input[type="text"] {
+				display: block;
+				padding: 4px;
+			}
 		}
-		
+
 		/* 2nd Row */
 		.sheet-row-2 {
 			height: 620px;
+			padding: 15px 25px;
+			display: flex;
 			position: relative;
-			
-			.sheet-left-col,
-			.sheet-right-col {
-				width: 175px;
-				height: 580px;
-				padding: 15px 0 15px 25px;
-				position: absolute;
-				top: 0;
-				left: 0;
-				
+
+			.sheet-left-col, .sheet-right-col {
+				width: 170px;
+
 				label {
+					height: 100%;
+					display: flex;
+					flex-direction: column;
+					padding: 5px 0 10px;
+
+					div {
+						margin-bottom: 5px;
+					}
+
+					textarea {
+						flex-grow: 1;
+						position: relative;
+						z-index: 2;
+						min-width: 170px;
+						resize: horizontal;
+
+						&:active, &:focus {
+							background: rgba(242, 242, 242, 0.75);
+						}
+					}
+				}
+
+				.sheet-equipment-summary {
+					padding: 2px 3px;
+					border-radius: 2px;
+					margin-bottom: 4px;
+					font-weight: normal;
 					text-align: left;
+					background: $transparent1;
 				}
-				
+			}
+
+			.sheet-right-col label {
+				text-align: right;
+
 				textarea {
-					width: 100%;
-					height: 95%;
+					align-self: flex-end;
 				}
 			}
-			
-			.sheet-right-col {
-				padding: 15px 25px 15px 0;
-				right: 0;
-				left: auto;
-				
-				label {
-					text-align: right;
+
+			.sheet-middle-col {
+				width: 455px;
+				align-self: flex-end;
+				margin: 0 auto 10px;
+
+				> div:first-child {
+					font-weight: bold;
+					text-align: center;
+					margin: 5px 0 0;
+				}
+
+				.sheet-afflictions-bg {
+					background: $transparent1;
+					padding: 4px;
+					height: auto;
+					display: flex;
+					flex-wrap: wrap;
+					justify-content: center;
+					border-radius: 2px;
+
+					label {
+						width: auto;
+						position: relative;
+						cursor: pointer;
+						margin: 0 3px;
+						line-height: 18px;
+
+						input {
+							opacity: 0;
+							position: absolute;
+
+							&:checked + span {
+								color: $fadedred;
+								text-shadow: 0px 0px 1px #aaa;
+							}
+						}
+
+						&:not(:hover) div {
+							opacity: 0;
+						}
+
+						div {
+							position: absolute;
+							width: 196px;
+							z-index: 3;
+							padding: 3px;
+							top: 18px;
+							text-align: center;
+							cursor: default;
+							pointer-events: none;
+							font-weight: normal;
+							left: 50%;
+							transform: translateX(-50%);
+							background: #fffaee;
+							border: 1px solid black;
+							border-radius: 5px;
+							transition: all 0.4s;
+						}
+					}
 				}
 			}
-			
+
 			.sheet-attr-box {
-			
-				label {
-					display: none;
-					
-										
-					&.sheet-damage-max {
-						display: inline-block;
-						position: absolute;
-					    bottom: 300px;
-					    right: 430px;
-					    font-weight: normal;
-					    margin: 0;
-					    font-size: 1em;
-					    width: auto;
+				.sheet-strength {
+					left: 297px;
+					top: 100px;
+
+					+ button[type="roll"] {
+						left: 342px;
+						top: 155px;
 					}
 				}
-				input {
-					
-				    &.sheet-lg {
-				    
-					    &:not([name="attr_damage"]) {
-						    font-size: 2em;
-					    }
-				    	&:not([name="attr_health"]) {
-					    	padding-bottom: 18px;
-						}
-					}					
-					
-					/*	Begin positioning attributes */
-					&[name="attr_strength"] {
-					    left: 297px;
-					    top: 100px;
 
-						+ input + button[type="roll"] {
-						    left: 341px;
-						    top: 156px;
-						}
-						
-						+ .sheet-mod {
-						    left: 317px;
-						    top: 142px;
-						}
-					}
-					
-					
-					
-					&[name="attr_size"] {
-					    left: 235px;
-					    top: 152px;    
-					}
-	
-					&[name="attr_intellect"] {
-					    right: 303px;
-					    top: 100px;
-						
-						+ input + button[type="roll"] {
-							right: 351px;
-							top: 152px;
-						}
-						+ .sheet-mod {
-						    right: 323px;
-						    top: 143px;   
-						}
+				.sheet-size {
+					left: 235px;
+					top: 152px;
 
+					input {
+						text-align: center;
 					}
-					&[name="attr_perception"] {
-						right: 245px;
-						top: 93px;  
-						padding-bottom: 20px;
+				}
 
-						+ input + button[type="roll"] {
-							right: 270px;
-							top: 136px; 
-						}
-						+ .sheet-mod {
-							right: 259px;
-						    top: 122px;
-						    font-size: 1em;
-						    line-height: 1em;
-						    padding: 2px 0;
-						    width: 20px; 
-						}
-					}
-	
-					&[name="attr_agility"] {
-						left: 221px;
-						top: 280px;
+				.sheet-intellect {
+					right: 303px;
+					top: 100px;
 
-						+ input + button[type="roll"] {
-							left: 285px;
-							top: 286px;
-						}
-						+ .sheet-mod {
-							left: 240px;
-							top: 322px;  
-						}
+					+ button[type="roll"] {
+						right: 352px;
+						top: 151px;
 					}
-					&[name="attr_speed"] {
-						left: 198px;
-						top: 200px;
-					}
-	
-					&[name="attr_will"] {
-						right: 227px;
-						top: 280px;
+				}
 
-						+ input + button[type="roll"] {
-							right: 290px;
-							top: 285px;
-						}
-						+ .sheet-mod {
-							right: 248px;
-							top: 321px; 
-						}
-					}			
-					&[name="attr_insanity"] {
-						right: 241px;
-						top: 218px;
+				.sheet-perception {
+					right: 245px;
+					top: 93px;
+
+					+ button[type="roll"] {
+						font-size: 1em;
+						height: 29px;
+						width: 29px;
+						right: 273px;
+						top: 136px;
 					}
-	
-	
-					&[name="attr_health"] {
-						bottom: 118px;
-						left: 405px;
+				}
+
+				.sheet-agility {
+					left: 221px;
+					top: 280px;
+
+					+ button[type="roll"] {
+						left: 285px;
+						top: 286px;
 					}
-					&[name="attr_healing"] {
-						left: 416px;					
-						bottom: 196px;
+				}
+
+				.sheet-speed {
+					left: 198px;
+					top: 200px;
+				}
+
+				.sheet-will {
+					right: 227px;
+					top: 280px;
+
+					+ button[type="roll"] {
+						right: 290px;
+						top: 286px;
+					}
+				}
+
+				.sheet-insanity {
+					right: 239px;
+					top: 218px;
+				}
+
+				.sheet-health {
+					bottom: 118px;
+					left: 405px;
+				}
+
+				.sheet-healing-rate {
+					left: 417px;
+					bottom: 196px;
+
+					input {
 						height: 42px;
 						width: 42px;
-						
+						cursor: default;
 					}
-					&[name="attr_defense"] {
-						bottom: 155px;
-						left: 265px;
-					}
-					&[name="attr_corruption"] {
-						bottom: 155px;
-						right: 271px;
-					}			
-	
-					&[name="attr_power"] {
-						right: 246px;
-						top: 7px;
-					}	
-					&[name="attr_damage"] {
-					    bottom: 288px;
-					    right: 377px;
-					    
-					    width: 139px;
-					    height: 139px;
+				}
 
-						padding-bottom: 15px;
-						padding-left: 16px;					    
-					    border-radius: 70px;
-					    
-					    font-size: 3em;
-					    
-						color: $red;
+				.sheet-defense {
+					bottom: 155px;
+					left: 265px;
+				}
+
+				.sheet-corruption {
+					bottom: 155px;
+					right: 271px;
+				}
+
+				.sheet-power {
+					right: 246px;
+					top: 7px;
+				}
+
+				.sheet-damage {
+					bottom: 288px;
+					right: 377px;
+
+					input.sheet-lg {
+						width: 139px;
+						height: 139px;
+						padding-left: 14px;
+						font-size: 3em;
+						color: $fadedred;
 						text-shadow: 1px 1px 1px #000;
-	
-					}	
-					
-					&[name="attr_damage_max"] {
-					    bottom: 300px;
-					    right: 416px;
-					    background: none;
-					    box-shadow: none;
-					    padding: 0;
-					    margin-bottom: 0;
-					    font-size: 1em;
-					}	
+					}
+				}
+
+				.sheet-damage-max {
+					position: absolute;
+					bottom: 305px;
+					right: 377px;
+					width: 139px;
+					text-align: center;
+					font-weight: normal;
 				}
 			}
 		}
-		
-		.sheet-2colrow {
-			.sheet-col	{
-				box-sizing: border-box;
-				padding: 0 15px 0 30px;
-				width: 56.5%;
-				margin-right: 0;
-				
-				&.sheet-even {
-					width: 41.5%;
-					padding-left: 0;
-				}
-			
-				label {
-					text-align: left;
-				}
-			
-				textarea {
-					height: 180px;
-				}
-			}
-		}
-		
+
 		/* 3rd Row */
 		.sheet-row-3 {
-			label {
-				display: inline-block;
-				&:nth-child(1){
-					width: 38%;					
+			display: flex;
+			padding: 0 30px;
+
+			.sheet-weapons {
+				width: 80%;
+				position: relative;
+
+				.sheet-editmode:checked {
+					~ .sheet-display, ~ div .sheet-display {
+						display: none;
+					}
+
+					~ .repcontainer {
+						padding: 1px;
+						max-height: 152px;
+					}
 				}
-				&:nth-child(2){
-					width: 10%;					
+
+				.sheet-editmode:not(:checked) {
+					~ .sheet-edit, ~ div .sheet-edit, ~ .repcontrol {
+						display: none;
+					}
+
+					~ .repcontainer {
+						max-height: 180px;
+						display: flex;
+						flex-wrap: wrap;
+						line-height: 20px;
+
+						.repitem {
+							margin-right: 4px;
+
+							&:not(:last-child) {
+								.sheet-display > :last-child::after {
+									content: ","
+								}
+							}
+						}
+					}
 				}
-				&:nth-child(3){
+
+				.sheet-edit-button {
+					position: absolute;
+					right: 0;
+					font-size: 1.4em;
+					margin: 0;
+				}
+
+				.sheet-edit {
+					.sheet-name {
+						width: 130px;
+					}
+
+					.sheet-mod {
+						width: 90px;
+						margin-bottom: 0;
+					}
+
+					.sheet-damage {
+						width: 70px;
+						text-align: center;
+					}
+
+					.sheet-boons {
+						width: 94px;
+					}
+
+					.sheet-roll20plus {
+						width: 28%;
+					}
+
+					.sheet-description {
+						width: 48%;
+						resize: vertical;
+						height: 22px;
+						min-height: 22px;
+					}
+
+					.sheet-versus {
+						span {
+							margin-right: 4px;
+						}
+
+						select, input {
+							width: 100px;
+							display: inline-block;
+						}
+					}
+
+					.sheet-weapon-details {
+						align-items: flex-start;
+					}
+
+					.sheet-properties {
+						width: 220px;
+						margin-right: 15px;
+						text-align: center;
+					}
+
+					label.sheet-collapse {
+						right: 0;
+						top: 3px;
+					}
+
+					.sheet-fake-button {
+						width: 23px;
+					}
+				}
+
+				.repitem .sheet-display {
+					font-size: 1.1em;
+					line-height: 1.4;
+
+					.sheet-name {
+						font-weight: bold;
+					}
+				}
+
+				.repcontainer {
+					overflow: auto;
+
+					.sheet-boons {
+						width: 48px;
+						margin: 0 23px;
+					}
+				}
+			}
+
+			.sheet-right-col {
+				width: 20%;
+				padding-left: 20px;
+
+				.repcontainer {
+					max-height: 127px;
+					overflow: auto;
+					padding: 1px;
+
+					.repitem {
+						display: flex;
+						margin-bottom: 2px;
+						justify-content: space-between;
+						align-items: center;
+					}
+
+					.sheet-name {
+						width: 65%;
+					}
+				}
+
+				.sheet-fortunepoints {
+					display: flex;
+					align-items: center;
 					width: auto;
-				}
-			}
-			
-			.repeating_weapons + .repcontainer {
-				max-height: 185px;
-				overflow: scroll;
-			}
+					margin-bottom: 5px;
 
-			.attr_weapon_name {
-			  display: inline-block;
-			  width: 33%;
-			}
-			
-			select {
-				margin-bottom: 0;
-				
-				&.sheet-dtype {
-				    width: 55px;
-				}
-				
-				&.sheet-dnumber {
-				    width: 55px;
+					input[type="number"] {
+						padding: 1px 4px;
+						width: 3em;
+						margin-left: auto;
+					}
 				}
 			}
-						
-			.attr_weapon_desc {
-			  display: inline-block;
-// 			  width: 50%;
-			}
-
-		}		
+		}
 	}
-	.sheet-maindiv2 {
-		background: url('http://s20.postimg.org/p61pnke1p/sheet_final_bkg.jpg') no-repeat center center transparent;
-		background-size: cover;
-		
-		.sheet-row-1 {
-		    padding: 15px 30px 0 30px;
+
+	// Specialty Tabs
+	.sheet-secondary-tab {
+		background-image: url('https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Shadow%20of%20the%20Demon%20Lord/Assets/clean_bg.jpg');
+		background-repeat: repeat-y;
+		background-size: $sheet_max_width auto;
+		border: 3px solid black;
+		padding: 12px 2px 12px 10px;
+	}
+
+	.sheet-equipment-talents {
+		display: flex;
+		justify-content: flex-end;
+		align-items: flex-start;
+		flex-flow: row-reverse;
+		flex-wrap: wrap;
+		align-content: flex-start;
+
+		.sheet-editmode:checked ~ div {
+			.repitem {
+				border-bottom: 2px dotted black;
+			}
+		}
+	}
+
+	.sheet-background, .sheet-npc {
+		display: flex;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		align-items: flex-start;
+		align-content: flex-start;
+
+		.sheet-left-col, .sheet-right-col {
+			min-width: $sheet_col_min_width;
+			max-width: $sheet_col_max_width;
+			margin-right: 8px;
+			flex: 1 1 0;
+		}
+
+		.sheet-left-col {
+			margin-bottom: 5px;
+		}
+	}
+
+	.sheet-equipment {
+		order: 1;
+		display: flex;
+		flex-flow: column;
+		min-width: $sheet_col_min_width;
+		max-width: $sheet_col_max_width;
+		margin-right: 8px;
+		flex: 1 1 0;
+
+		.sheet-header {
+			order: 0;
+		}
+
+		.repcontainer {
+			order: 1;
+		}
+
+		.sheet-item-total {
+			order: 2;
+			font-weight: bold;
+			display: flex;
+			margin: 5px 0 2px;
+			padding-top: 3px;
+			border-top: 2px solid black;
+			justify-content: space-between;
+			align-items: center;
+
+			.sheet-amount {
+				font-weight: inherit;
+			}
+		}
+
+		.repcontrol {
+			order: 3;
+		}
+
+		.sheet-notes {
+			order: 4;
+			margin-top: 8px;
+			width: 100%;
+
+			textarea {
+				resize: vertical;
+				height: 200px;
+				min-height: 100px;
+			}
+		}
+
+		.repitem {
+			display: flex;
+			justify-content: space-between;
+			margin-bottom: 2px;
+		}
+
+		.sheet-name,
+		input[type="text"].sheet-name {
+			width: 84%;
+		}
+
+		.sheet-amount,
+		input[type="number"].sheet-amount {
+			width: 15%;
+		}
+
+		.sheet-coins {
+			display: flex;
+			align-items: center;
+			font-weight: bold;
+			justify-content: space-between;
+			margin-bottom: 2px;
 
 			label {
-				text-align: left;
+				width: auto;
+				line-height: 27px;
+
+				span {
+					vertical-align: middle;
+					margin-right: 8px;
+				}
 			}
+		}
+
+		.sheet-lifestyle {
+			display: flex;
+			align-items: center;
+			width: 36%;
+			justify-content: space-between;
+
+			input {
+				width: 58%;
+			}
+		}
+	}
+
+	.sheet-talents {
+		order: 0;
+
+		.sheet-name {
+			width: 72%;
+		}
+
+		.sheet-uses {
+			width: 10%;
+		}
+
+		.sheet-field-quarter {
+			width: 24%;
+		}
+
+		.sheet-reset-uses {
+			margin: 0 0 0 auto;
+		}
+	}
+
+	.sheet-secondary-tab, .sheet-weapons {
+		button[type="roll"] {
+			margin: 0;
+			padding: 1px 3px;
+			background: transparent;
+			border: 1px solid #444;
+			color: #444;
+
+			&:hover {
+				color: #000;
+				border-color: #000;
+			}
+
+			&.sheet-invisible-button {
+				position: absolute;
+				opacity: 0;
+				width: 100%;
+				height: 100%;
+				z-index: 1;
+
+				&:hover ~ div,
+				&:hover ~ span {
+					color: $fadedred;
+				}
+
+				&::before {
+					display: none;
+				}
+			}
+		}
+	}
+
+	.sheet-equipment-talents, .sheet-spells {
+		min-height: 1139px;
+
+		.sheet-editmode:checked ~ div {
+			.sheet-display {
+				display: none;
+			}
+		}
+
+		.sheet-editmode:not(:checked) ~ div {
+			.repcontrol .repcontrol_add,
+			.sheet-edit {
+				display: none !important;
+			}
+		}
+
+		.sheet-collapse:checked + .sheet-edit {
+			height: 44px;
+			overflow: hidden;
+		}
+
+		.sheet-display {
+			position: relative;
+			line-height: 1.3;
+			text-align: justify;
+
+			.sheet-display-header {
+				border-bottom: 2px solid black;
+				font-weight: bold;
+				display: flex;
+				color: $fadedred;
+				font-size: 1.1em;
+				padding-bottom: 3px;
+				align-items: center;
+				text-transform: uppercase;
+
+				span:first-child {
+					margin-right: auto;
+					font-size: 1.2em;
+				}
+
+				span:not(:last-child):not(:first-child) {
+					margin-right: 4px;
+				}
+
+				input[type="number"] {
+					position: relative;
+					z-index: 2;
+					width: 3em;
+					color: inherit;
+					font-weight: bold;
+					margin-right: 2px;
+					font-size: 1em;
+				}
+			}
+
+			.sheet-display-info {
+				border-bottom: 1px solid black;
+				padding: 3px;
+			}
+
+			.sheet-display-text {
+				.sheet-description {
+					margin: 3px 0 0;
+				}
+				:not(:first-child) {
+					margin: 1px 0;
+				}
+			}
+
+			.sheet-requirement:not(:checked) ~ div .sheet-requirement,
+			.sheet-target:not(:checked) ~ div .sheet-target,
+			.sheet-area:not(:checked) ~ div .sheet-area,
+			.sheet-duration:not(:checked) ~ div .sheet-duration,
+			.sheet-triggered:not(:checked) ~ div .sheet-triggered,
+			.sheet-roll20plus:not(:checked) ~ div .sheet-roll20plus,
+			.sheet-sacrifice:not(:checked) ~ div .sheet-sacrifice,
+			.sheet-permanence:not(:checked) ~ div .sheet-permanence,
+			.sheet-aftereffect:not(:checked) ~ div .sheet-aftereffect,
+			.sheet-special:not(:checked) ~ div .sheet-special,
+			.sheet-uses-check:not(:checked) ~ div .sheet-uses-display {
+				display: none;
+			}
+
+			.sheet-requirement:not(:checked) + .sheet-target:not(:checked) {
+				+ .sheet-area:not(:checked) + .sheet-duration:not(:checked) ~ .sheet-display-info {
+					display: none;
+				}
+			}
+		}
+	}
+
+	.sheet-talents, .sheet-spells, .sheet-npc {
+		label {
+			input[type="text"] {
+				display: block;
+			}
+
+			input[type="number"] {
+				display: block;
+				width: 100%;
+			}
+		}
+
+		textarea {
+			resize: vertical;
+			height: 22px;
+			min-height: 22px;
+		}
+	}
+
+	.sheet-talents,	.sheet-npc {
+		.repitem {
+			margin-bottom: 4px;
+			padding-bottom: 3px;
+		}
+	}
+
+	.sheet-spells {
+		.sheet-remove-filters {
+			width: auto;
+			cursor: pointer;
+			line-height: 27px;
+			margin-left: 10px;
+			font-weight: bold;
+
+			input {
+				position: absolute;
+				opacity: 0;
+			}
+
+			&:hover {
+				span {
+					color: $fadedred;
+				}
+			}
+		}
+
+		.sheet-traditions {
+			margin: 5px 8px 0 0;
+
+			.sheet-edit .sheet-name {
+				width: 15%;
+			}
+
+			.sheet-attribute {
+				width: 15%;
+			}
+
+			.sheet-description {
+				width: 61%;
+			}
+
+			.sheet-name {
+				font-weight: bold;
+			}
+
+			.sheet-filter-check {
+				width: 8%;
+
+				span {
+					vertical-align: middle;
+				}
+			}
+
+			.sheet-invisible-checkbox {
+				opacity: 0;
+				position: absolute;
+				width: 100%;
+				z-index: 1;
+				height: 100%;
+
+				&:hover ~ span {
+					opacity: 0.7;
+				}
+				&:checked ~ span {
+					color: $fadedred;
+				}
+			}
+		}
+
+		.sheet-spell-content {
+			.repcontainer {
+				display: flex;
+				flex-wrap: wrap;
+				justify-content: space-between;
+				align-items: flex-start;
+			}
+
+			.sheet-edit {
+				margin-bottom: 4px;
+				padding-bottom: 3px;
+				border-bottom: 2px dotted black;
+			}
+
+			.sheet-display {
+				margin-bottom: 7px;
+			}
+
+			.sheet-flex-row {
+				align-items: start;
+			}
+
+			.sheet-filter:checked ~ div {
+				display: none;
+			}
+		}
+
+		.sheet-editmode:checked ~ {
+			.sheet-traditions .repitem {
+				width: 100%;
+			}
+
+			.sheet-spell-content .repitem {
+				width: 100%;
+			}
+		}
+
+		.sheet-editmode:not(:checked) ~ {
+			.sheet-traditions {
+				.repcontainer {
+					display: flex;
+					flex-wrap: wrap;
+				}
+
+				.repitem {
+					padding: 0;
+					margin-right: 4px;
+
+					&:not(:last-child) .sheet-display::after {
+						content: ",";
+					}
+				}
+
+				.repcontrol {
+					display: none;
+				}
+			}
+
+			.sheet-spell-content .repitem {
+				min-width: $sheet_col_min_width;
+				max-width: $sheet_col_max_width;
+				margin-right: 8px;
+				flex: 1 1 0;
+			}
+		}
+
+		.sheet-field- {
+			&long {
+				width: 36.75%;
+			}
+
+			&short {
+				width: 12.25%;
+			}
+
+			&third {
+				width: 33%;
+			}
+
+			&number {
+				width: 6%;
+			}
+
+			&quarter {
+				width: 24.5%;
+
+				textarea {
+					height: 22px;
+					min-height: 22px;
+				}
+			}
+			&half {
+				width: 49.5%;
+
+				textarea {
+					height: 44px;
+					min-height: 44px;
+				}
+			}
+		}
+
+		.sheet-slash {
+			font-size: 16px;
+			font-weight: bold;
+			line-height: 22px;
+			align-self: flex-end;
+
+			+ label {
+				align-self: flex-end;
+			}
+		}
+
+		.sheet-reset-castings {
+			margin: 0 8px 0 auto;
+		}
+	}
+
+	.sheet-background {
+		min-height: 500px;
+
+		h3 {
+			width: 100%;
+		}
+
+		.sheet-editmode:checked ~ div .sheet-display {
+			display: none;
+		}
+
+		.sheet-editmode:not(:checked) ~ div {
+			.repcontrol, .sheet-edit {
+				display: none;
+			}
+		}
+
+		.sheet-name {
+			font-weight: bold;
+		}
+
+		.sheet-indent-container {
+			text-indent: -15px;
+			padding: 0 0 0 15px;
+		}
+
+		div.sheet-edit {
+			display: flex;
+			align-items: flex-start;
+			justify-content: space-between;
+			margin-bottom: 4px;
+			line-height: 22px;
+
+			input[type="text"] {
+				width: 35%;
+				min-width: 0;
+			}
+
+			textarea {
+				height: 22px;
+				resize: vertical;
+				min-height: 22px;
+				width: 64%;
+			}
+		}
+
+		div.sheet-display {
+			margin-bottom: 5px;
+		}
+
+		.sheet-notes {
+			font-weight: normal;
+
+			div {
+				margin-bottom: 5px;
+
+				.sheet-display {
+					white-space: pre-wrap;
+				}
+			}
+
+			textarea {
+				min-height: 100px;
+				height: 100px;
+				resize: vertical;
+			}
+		}
+	}
+
+	.sheet-npc {
+		position: relative;
+		min-height: 300px;
+
+		.sheet-indent-container {
+			text-indent: -15px;
+			word-wrap: break-word;
+			padding: 0 0 0 20px;
+		}
+
+		.sheet-editmode:checked {
+			~ div .sheet-display {
+				display: none;
+			}
+		}
+
+		.sheet-editmode:not(:checked) ~ div {
+			.sheet-display-hider:not(:checked) + div,
+			.sheet-edit,
+			.repcontrol {
+				display: none;
+			}
+
+			.repitem {
+				margin: 0;
+				padding: 0;
+			}
+		}
+
+		.sheet-monster-header {
+			width: 100%;
+			margin-bottom: 1px;
+
+			&.sheet-display {
+				background: #000;
+				font-family: Georgia, "Times New Roman", Times, serif;
+				text-transform: uppercase;
+				padding: 4px 5px;
+				display: flex;
+				align-items: center;
+				color: #fff;
+
+				.sheet-name {
+					margin-right: auto;
+					font-size: 1.5em;
+				}
+
+				.sheet-difficulty {
+					margin-left: 4px;
+				}
+			}
+		}
+
+		.sheet-button-holder {
+			position: relative;
+		}
+
+		.sheet-label {
+			font-weight: bold;
+		}
+
+		.sheet-italic {
+			font-style: italic;
+		}
+
+		input.sheet-inline-input {
+			padding: 0;
+			background: transparent;
+			box-shadow: none;
+			text-align: left;
+			-moz-appearance: textfield;
+			vertical-align: baseline;
+		}
+
+		.sheet-left-col {
+			.sheet-attr-check {
+				align-self: flex-end;
+				margin-bottom: 3px;
+			}
+
+			.sheet-field {
+				&-stat {
+					width: 17%;
+					text-align: center;
+				}
+
+				&-short {
+					width: 11%;
+					text-align: center;
+
+					input {
+						text-align: center;
+					}
+				}
+
+				&-tags {
+					width: 70%;
+				}
+
+				&-senses {
+					width: 33%;
+				}
+
+				&-armor {
+					width: 30%;
+				}
+
+				&-movement {
+					width: 81%;
+				}
+			}
+
+			.sheet-tags {
+				font-style: italic;
+				background: #9a0c1d;
+				padding: 0 5px;
+				color: #fff;
+				margin-bottom: 4px;
+			}
+		}
+
+		.sheet-right-col {
+			.sheet-power {
+				input[type="number"] {
+					display: inline-block;
+					width: 3.5em;
+				}
+			}
+
+			.sheet-attacks {
+				.sheet-npc-header {
+					margin-top: 0;
+				}
+
+				input {
+					padding: 1px 2px;
+				}
+
+				.sheet-flex-row {
+					font-weight: bold;
+				}
+
+				.sheet-name {
+					width: 29%;
+				}
+
+				.sheet-range {
+					width: 31%;
+				}
+
+				.sheet-reach {
+					width: 9%;
+				}
+
+				.sheet-mod, .sheet-boons {
+					width: 10%;
+				}
+
+				.sheet-damage {
+					width: 11%;
+				}
+				.sheet-extra {
+					width: 28%;
+				}
+
+				.sheet-versus {
+					display: flex;
+					width: 25%;
+					align-items: center;
+					justify-content: space-between;
+				}
+			}
+
+			.sheet-npcmagic {
+				.repitem {
+					border-bottom: none;
+					padding-bottom: 0;
+					margin-bottom: 0;
+				}
+
+				.sheet-flex-row {
+					margin-bottom: 2px;
+				}
+
+				.sheet-tradition-name {
+					width: 25%;
+				}
+
+				.sheet-tradition-spells {
+					width: 74%;
+				}
+			}
+
+			.repcontrol {
+				height: 28px;
+			}
+		}
+
+		.sheet-name {
+			font-weight: bold;
+		}
+
+		textarea {
+			margin-top: 4px;
+		}
+
+		.sheet-npc-header {
+			background: #bbb;
+			text-transform: uppercase;
+			font-weight: bold;
+			font-family: Georgia, "Times New Roman", sans-serif;
+			font-size: 1.2em;
+			color: #000;
+			padding: 0 6px;
+			line-height: 1.5;
+			margin: 3px 0;
+		}
+	}
+}
+
+.sheet-rolltemplate-sotdl {
+	background-color: #f5f5f5;
+	border: 2px solid black;
+	border-radius: 5px;
+	box-sizing: border-box;
+	margin: 0 -2px -5px -43px;
+	word-wrap: break-word;
+	font-size: 13px;
+	padding: 6px 10px;
+
+	.sheet-title {
+		color: $fadedred;
+		font-size: 1.5em;
+		font-weight: bold;
+		font-variant: small-caps;
+		border-bottom: 2px solid black;
+		line-height: 1.2;
+		margin-bottom: 4px;
+
+		.sheet-subtitle {
+			font-size: .8em;
+		}
+	}
+
+	.sheet-spell-info {
+		line-height: 1.3;
+		font-size: .9em;
+
+		div {
+			margin-bottom: 2px;
+
+			&:first-child {
+				border-top: 1px solid black;
+				padding-top: 3px;
+				margin-top: 2px;
+			}
+
+			&:last-child {
+				border-bottom: 1px solid black;
+				padding-bottom: 3px;
+			}
+		}
+	}
+
+	.sheet-name {
+		font-size: 1.2em;
+		font-variant: small-caps;
+		line-height: 1;
+		margin-bottom: 4px;
+	}
+
+	.sheet-content {
+		font-size: .9em;
+		line-height: 1.2;
+
+		div:not(:last-child) {
+			margin-bottom: 3px;
+		}
+	}
+
+	.sheet-rolls {
+		font-size: 0;
+
+		.sheet-attack, .sheet-damage {
+			display: inline-block;
+			vertical-align: top;
+		}
+
+		.sheet-attack, .sheet-damage, .sheet-roll {
+			line-height: 25px;
+		}
+
+		.sheet-attack, .sheet-damage, .sheet-roll, .sheet-damageplus {
+			font-size: 13px;
+
+			.sheet-vs span.inlinerollresult {
+				vertical-align: bottom;
+			}
+
+			span {
+				vertical-align: middle;
+
+				&.sheet-label {
+					font-weight: bold;
+				}
+			}
+		}
+
+		.sheet-attack {
+			width: 65%;
+		}
+
+		.sheet-damage {
+			width: 35%;
+		}
+	}
+
+	span.inlinerollresult {
+		background: transparent;
+		border: none;
+		font-size: 1.3em;
+
+		&.fullcrit {
+			border: 2px solid #3FB315;
+		}
+
+		&.fullfail {
+			border: 2px solid #B31515;
+		}
+
+		&.importantroll {
+			border: 2px solid #4A57ED;
 		}
 	}
 }

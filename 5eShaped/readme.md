@@ -1,22 +1,22 @@
-# D&D 5e Shaped Character Sheet
+# D&D 5e Shaped character sheet
 
-This is the redesigned Shaped character sheet for use on Roll20.net with the 5th edition of Dungeons & Dragons (5e). The sheet is designed to be usable by all Roll20 users regardless of subscription level.
+## [Issue tracker](https://bitbucket.org/mlenser/5eshaped/issues?sort=-updated_on)
+Please report any issues on the issue tracker.
 
-*If you are ever concerned about data loss I recommend you duplicate your campaign and use that to copy to see how it'll work.*
+*If you're experiencing extreme lag please disable LastPass as it is known to cause problems with Roll20. This has nothing to do with the Shaped sheet.*
 
-[Shaped Character Sheet Companion Script](https://github.com/symposion/roll20-api-scripts/tree/master/5eShapedCompanion/latest)
+## [Shaped Script](https://github.com/mlenser/roll20-api-scripts/tree/master/5eShapedScript)
 
-[Documentation](https://docs.google.com/document/d/1yPcIZ_bIc3JlnWsKZt2tAB0EQSIVEfeMtT0GifbpJIg)
+## [Changelog](https://github.com/mlenser/roll20-character-sheets/blob/master/5eShaped/changelog.md)
 
-[Changelog](https://github.com/mlenser/roll20-character-sheets/blob/master/5eShaped/changelog.md)
-
-### Please report any bugs in the [issues tab](https://bitbucket.org/mlenser/5eshaped/issues). Please include screenshots if appropriate and please provide a full reproduction path (on a clean character sheet if possible).
+## [Documentation](https://bitbucket.org/mlenser/5eshaped/wiki/Home)
 
 ## Features
 
 * **High performance** sheet without the lag of old versions (100% sheet workers)
 * Styling that matches the [5e paper sheet](http://i.imgur.com/87GaRhL.jpg)
 * **Compendium Integration** for NPCs, Spells, Weapons, Armor, Equipment
+* **OGL Module conversion** Modules like LMoP, Volo's Guide, and the Monster Manual are converted from the OGL format to the Shaped format.
 * **NPC actions and traits** are parsed and clickable. The text on the sheet and in the output macro will adjust if you adjust an ability score.
 * **Customizable skills** with the option to change the ability on the fly
 * **Spells** with the option to cast at a higher level
@@ -33,7 +33,10 @@ This is the redesigned Shaped character sheet for use on Roll20.net with the 5th
   * Optional bonuses to all skills, abilities, saving throws, etc.
 * Attachers can be used to remind yourself to add to saving throws while within 10 feet of your paladin
 
-![Sheet](http://i.cubeupload.com/RwfoVZ.jpg "Sheet")
+[![Sheet](http://i.cubeupload.com/peLpOm.jpg "5e Shaped Sheet")](http://i.cubeupload.com/RwfoVZ.jpg)
+
+## Sheet Releases
+When I release a new version it takes time to reach the public. Roll20 must merge my cost (typically Mondays/Tuesdays) and then release my code to the public (typically Tuesdays/Wednesdays). You can track [Roll20's pull requests on their github](https://github.com/Roll20/roll20-character-sheets/pulls). I have no control over when they release.
 
 ## How to Update the sheet yourself (as Pro):
 
@@ -47,10 +50,13 @@ This is the redesigned Shaped character sheet for use on Roll20.net with the 5th
 8. On Roll20 in the Translation tab paste the JSON from the appropriate file.
 9. Hit save.
 
+*If you are ever concerned about data loss I recommend you duplicate your campaign and use that to copy to see how it'll work.*
+
+## Testing new versions
+I regularly release new versions. If you'd like to be involved in the testing period follow this thread. You can also see the latest code on [my develop campaign](https://app.roll20.net/join/1206379/qP-T_Q)
+
+## Supported Versions
+I support the currently released version on Roll20 and on Github (they often differ as Pros can use a newer version). For upgrades I support a smooth upgrade for any version within the last 6 months.
+
 ## Contribute
 Since many have asked for it: If you appreciate what I do and want to compensate me for the countless hours that I have spent building this character sheet feel free to support me on [Patreon](https://www.patreon.com/mlenser) or Paypal (mlenser@gmail.com).
-Thanks so much for your support.
-
----
-
-Mark Lenser ([Kryx](https://app.roll20.net/users/277007/kryx) on roll20)

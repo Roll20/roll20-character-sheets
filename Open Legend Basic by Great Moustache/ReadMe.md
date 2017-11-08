@@ -5,6 +5,103 @@
 
 ### Changelog
 
+### 1.8.9.6 on 2017 October 16th
+* Fixed HP/Lethal Damage having odd error that locks up HP calculations on sheet
+* Outputs to chat show Attribute Score next to the Attribute now
+* Attributes can have a max value of 10
+	- Before only 9 has that is the highest a PC can have (changable through "dice modifer")
+	- Changed it to 10 so NPC charactersheets can have this value and to make it possibly easier for players
+
+### 1.8.9.5 on 2017 September 12th
+* Default (dis)advantage number for Actions & Attributes
+	- Can now enter a default (dis)advantage amount for all action & attributes
+	- The pop-up to ask you the number of (dis)advantage will be populated with this number now
+		- This allows you to still modify it if you have additional above or below your default
+
+### 1.8.9.3 on 2017 September 11th
+* GUI update to HP & Speed
+	- Lethal Damage combined with Current & Max HP lines
+	- Speed made with ribbon, and taking up less space
+	- Initiative made a seperate button
+* Initiative Advanced Options
+	- Drop down to pick which Attribute to use (from attribute Sub, etc)
+	- Ability to enter a default (dis)advantage number
+	
+### 1.8.9.1 on 2017 September 11th
+* Made Destructive Trance Checkbox for Actions, Other Actiosn, and Legendary Items
+	- Allows explosions on 1 less than max die size
+
+### 1.8.9 on 2017 August 14th
+* Made the 2 columns into just 1 column for Feats, Perks, & Flaws
+	- Code that auto combines the two columns into 1 new so no data lost
+* Added captialization to certain attribute names
+	- Causes them to show at the top of the list for selecting the bubbles for tokens
+	- Built in redundency, so new Characters will see a few doubles that have "4Token" on the end, as old sheets will still be lower case
+
+### 1.8.8 on 2017 July 2nd
+* Fixed a typo in the Initiative output to chat (when clicking on Speed)
+* Made any Description output to the chat window from Actions be limited to 5 lines
+	- If over 5 lines, adds a scroll bar, so now it won't take up so much space when someone has lots of description/info
+* Added in text below "Guard", "Toughness", and "Resolve" that indicates you can click them to do resist rolls
+* Also renamed "power level" variable that was causing error if you dragged an action to the quick bar that wouldn't display the "Max" power level info.
+
+### 1.8.6 on 2017 May 14th
+* Fixed an error with other actions variable not being updated on its name
+	- Caused it to not calculate roll syntax correctly when a value was updated in other actions
+
+### 1.8.5 on 2017 May 6th
+* Fixed an error that caused actions to not roll because of 'undefined'
+	- Caused by previous fix to Advantage/Disadvantage to the d20 in 1.8.0
+* Added support for modifying the "Level" to calculate XP, Feat Points, and Attribute Points
+	- Previously it was only if you modified XP, now works for both
+* If value higher than 9 or lower than 0 is entered for Attribute, changes it to 0 or 9 as needed
+	- Shouldn't be able to have values higher or lower than these
+	- If value of 10 needed for dice size, can be done via input field within attribute settings "Attribute Dice Bonus/Penalty
+
+### 1.8.0 on 2017 April 24th
+* Added in Extraordinary/Legendary Item section
+* Fixed an issue where Advantage/Disadvantage to the d20 wasn't working
+
+### 1.7.91 on 2017 March 25th
+* Re-arranged the attributes to match the website order
+
+### 1.7.9 on 2017 March 10th
+* Added Goals, Beliefs, and Instincts section for characters to record each that might help them in roleplaying their characters better.
+* Added a "non-essential" inventory and notes section.
+	- Players could potentially use this to add homebrew material for record keeping.
+
+### 1.7.8.5 on 2017 February 27th
+* Took out Sanity Points as this was not Core Rules.
+	- Just committed out, so can access it via custom sheets
+* Took out Attribute dice calculation for Attribute 11, highest meant to be 10.
+
+### 1.7.8 on 2017 February 20th
+* Added for future compatibility: Attributes able to go to level 11 with new dice
+	- This is mainly for Artifacts to be released soon
+* Added more sections to the sheet that can be soon or hidden:
+	- Goals & Beliefs [in progress]
+	- Sanity Points [complete]
+	- Other Inventory & Notes [in progress]
+	- Currently all three can be displayed, but nothing for the "in progress" ones but a place holder
+
+### 1.7.7.9 on 2017 February 19th
+* Fixed a missing call to output the Max power level for Other Actions
+
+### 1.7.7.5 on 2017 February 6th
+* Added "Size" field to character information.
+
+### 1.7.7 on 2017 January 27th
+* Added Attribute Substitution for all Attributes
+	- Fixed drop downs to have ALL attributes except for the current attribute being looked at
+* Updated all function calls to account for 1.7.6
+	- Including calculations to display prorperly if attribute subsitution was being used
+
+### 1.7.6 on 2017 January 24th
+* Added new universal function for determining attribute substitution values
+	- Reusable code so less lines of code
+* Updated drop down menus to reflect change of Evasion > Guard
+* Renames lines "Increase/Decrease Dice Size" to be "Attribute Dice Bonus/Penalty"
+
 ### 1.7.5 on 2017 January 4th
 * Updated for new calculation of evasion, and evasion's name changed to Guard
 	- Guard = 10 + Agility + Might + Armor + Other
