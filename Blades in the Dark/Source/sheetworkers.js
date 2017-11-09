@@ -1534,13 +1534,6 @@ const crewAttributes = [...new Set([].concat(...Object.keys(crewData).map(x => O
 		'playbookitem',
 		'upgrade'
 	],
-	headerInfoAttrs = [
-		'heritage',
-		'background',
-		'vice_purveyor',
-		'hull_functions',
-		'crew_deity_features'
-	],
 	spiritPlaybooks = ['ghost', 'hull', 'vampire'];
 /* EVENT HANDLERS */
 /* Set default fields when setting crew type or playbook */
@@ -1677,10 +1670,6 @@ handleBoxesFill('upgrade_24_check_', true);
 handleBoxesFill('bandolier1_check_');
 handleBoxesFill('bandolier2_check_');
 ['item', 'playbookitem', 'upgrade'].forEach(sName => handleBoxesFill(`repeating_${sName}:check_`));
-/* Handle showing options for heritage, background, and vice */
-headerInfoAttrs.forEach(name => {
-	on(`change:${name}`, event => setAttr(`show_${name}_info`, event.newValue ? '0' : '1'));
-});
 /* Pseudo-radios */
 ['crew_tier', ...actionsFlat].forEach(name => {
 	on(`change:${name}`, event => {
@@ -2274,16 +2263,6 @@ on('sheet:opened', () => {
 								upgradeSheet('1.12');
 							});
 						});
-					});
-				}
-				// Upgrade to 1.13: Header info
-				else if (versionMajor === 1 && versionMinor < 13) {
-					getAttrs(['heritage', 'background', 'vice_purveyor', 'hull_functions', 'crew_deity_features'], v => {
-						const setting = {};
-						Object.keys(v).forEach(name => {
-							if (v[name]) setting[`show_${name}_info`] = '0';
-						});
-						mySetAttrs(setting, {}, () => upgradeSheet('1.13'));
 					});
 				}
 				// Upgrade to 2.0: Rename trauma attributes, frame feature migration
