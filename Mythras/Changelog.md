@@ -7,6 +7,14 @@ Versions have three numbers Major.Minor.Release
 
 **Release**: Indicates bugfixes and minor UI changes only.
 
+## 1.3.2
+### Bugfixes
+* Patch to finish hit location data migrations for those who upgraded before the v1.3.1 patches were in.  Will copy old location data into new but only if the new fields are still undefined or empty.
+
+## 1.3.1
+### Bugfixes
+* Fixed a hit location data migration issue from v1.2.0 to v1.3.0
+
 ## 1.3.0
 ### Compatibility Issues
 * Not a real compatibility issue but if you find a section of the sheet missing you may need to enable it in the new campaign options section.
