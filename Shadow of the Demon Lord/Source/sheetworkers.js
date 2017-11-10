@@ -61,24 +61,26 @@ on('change:agility change:auto_defense change:repeating_defense remove:repeating
 		];
 		getAttrs(sourceAttrs, v => {
 			const autoDefense = (v.auto_defense === '1') && (v.npc === '0');
+			const attrs = idArray.reduce((m, id) => {
+				const base = (v[`repeating_defense_${id}_defense_base`] === 'AGILITY') ? (parseInt(v.agility) || 0) : 0;
+				const bonus = parseInt(v[`repeating_defense_${id}_defense_bonus`]) || 0;
+				m[`repeating_defense_${id}_defense_total`] = base + bonus;
+				return m;
+			}, {});
 			if (autoDefense && (v.affliction_defenseless === '1' || v.affliction_unconscious === '1')) {
-				setAttr('defense', '5');
+				attrs.defense = '5';
 			}
 			else if (autoDefense && idArray.filter(id => (v[`repeating_defense_${id}_defense_check`] === '1')).length === 0) {
-				setAttr('defense', v.agility);
+				attrs.defense = v.agility;
 			}
-			else {
-				let totalDefense = 0;
-				const attrs = idArray.reduce((m, id) => {
-					const base = (v[`repeating_defense_${id}_defense_base`] === 'AGILITY') ? (parseInt(v.agility) || 0) : 0;
-					const bonus = parseInt(v[`repeating_defense_${id}_defense_bonus`]) || 0;
-					if (v[`repeating_defense_${id}_defense_check`] === '1') totalDefense += base + bonus;
-					m[`repeating_defense_${id}_defense_total`] = base + bonus;
-					return m;
-				}, {});
-				if (autoDefense) attrs.defense = totalDefense;
-				setAttrs(attrs);
+			else if (autoDefense) {
+				const totalDefense = Math.min(idArray.reduce((m, id) => {
+						if (v[`repeating_defense_${id}_defense_check`] === '1') m += attrs[`repeating_defense_${id}_defense_total`];
+						return m;
+					}, 0), 25);
+				attrs.defense = String(totalDefense);
 			}
+			setAttrs(attrs);
 		});
 	});
 });
