@@ -9,11 +9,15 @@ Les personnages sont membres des services de sécurité d’une station spatiale
 Cette feuille de personnage Roll20 a été créée et est maintenue par [Natha](https://www.tipeee.com/natharoll20).
 
 # Version courante
-1.0 [Capture d'écran](cerbere.jpg)
+1.1 [Capture d'écran](cerbere.jpg)
 
 Tous les textes fixes de la feuille, entourés, précédés ou suivis d'un point rouge, peuvent être cliqués pour effectuer un jet approprié.
 
 # Notes de version
+
+## v1.1 (2017-10-17)
+
+Correction d'anomalies sur les jets d'Administration et Érudition
 
 ## v1.0 (2017-10-15)
 
