@@ -16,7 +16,7 @@ $sheet_col_min_width: 364px;
 // @import "http://fonts.googleapis.com/css?family=Metal+Mania|Roboto:500";
 
 .charsheet {
-	font-family: "Roboto", Helvetica, sans-serif;
+	font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
 	padding: 0 6px 6px 0 !important;
 	position: absolute;
 	color: #000;
@@ -26,11 +26,16 @@ $sheet_col_min_width: 364px;
 	max-width: $sheet_max_width;
 	cursor: default;
 
-	.sheet-hidden,
-	.sheet-hider:not(:checked) + div,
-	.sheet-hider:not(:checked) + span,
-	.sheet-hider:not(:checked) + label {
+	.sheet-hidden {
 		display: none;
+	}
+
+	input[type=checkbox].sheet-hider:not(:checked),
+	input[type=hidden].sheet-hider[value=""],
+	input[type=hidden].sheet-hider-numeric[value="0"] {
+		+ div, + span, + label, + button {
+			display: none;
+		}
 	}
 
 	div {
@@ -49,12 +54,20 @@ $sheet_col_min_width: 364px;
 		line-height: 22px;
 	}
 
+	.sheet-space-after::after {
+		content: " ";
+	}
+
 	input[type="text"], input[type="number"], select, textarea {
 		padding: 2px 3px;
 		margin: 0;
 		color: #000;
 		border-radius: 2px;
 		box-sizing: border-box;
+
+		&[readonly="readonly"] {
+			cursor: default;
+		}
 	}
 
 	.sheet-tab-is-main:checked + .sheet-title {
@@ -291,6 +304,8 @@ $sheet_col_min_width: 364px;
 	// Settings
 	.sheet-settings {
 		position: absolute;
+		display: flex;
+		flex-wrap: wrap;
 		right: 0;
 		top: 28px;
 		background: #fff;
@@ -309,6 +324,24 @@ $sheet_col_min_width: 364px;
 			}
 		}
 
+		div {
+			padding: 4px 0 0 4px;
+			width: 100%;
+		}
+
+		.sheet-50 {
+			width: 50%;
+		}
+		.sheet-40 {
+			width: 40%;
+		}
+		.sheet-60 {
+			width: 60%;
+		}
+		.sheet-alignright {
+			text-align: right;
+		}
+
 		select {
 			width: 135px;
 			display: inline-block;
@@ -316,6 +349,10 @@ $sheet_col_min_width: 364px;
 
 		span {
 			vertical-align: middle;
+
+			&::before, &::after {
+				content: " ";
+			}
 		}
 
 		input[type="text"], input[type="number"] {
@@ -348,7 +385,7 @@ $sheet_col_min_width: 364px;
 	.sheet-basic-equipment:not(:checked) ~ .sheet-equipment-talents > div {
 		min-width: $sheet_col_min_width;
 		max-width: $sheet_col_max_width;
-		margin-right: 8px;
+		margin: 0 8px 5px 0;
 		flex: 1 1 0;
 	}
 
@@ -391,6 +428,22 @@ $sheet_col_min_width: 364px;
 		}
 	}
 
+	.sheet-tabular-weapons:checked ~ .sheet-main .sheet-row-3 .sheet-weapons {
+		.repitem, .sheet-edit {
+			display: block !important;
+
+			&.sheet-header {
+				display: flex !important;
+			}
+		}
+		.repcontainer {
+			display: block !important;
+			line-height: 18px !important;
+		}
+		.sheet-display {
+			display: none;
+		}
+	}
 	// Main Tab
 	.sheet-main {
 		background: url('https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Shadow%20of%20the%20Demon%20Lord/Assets/main_bg.jpg');
@@ -421,7 +474,7 @@ $sheet_col_min_width: 364px;
 				border-style: solid;
 				border-width: 2px;
 				border-color: transparent;
-				font-family: "Metal Mania", Helvetica, sans-serif;
+				font-family: "Metal Mania", "Helvetica Neue", Helvetica, Arial, sans-serif;
 				padding: 0;
 
 				&.sheet-lg {
@@ -443,13 +496,14 @@ $sheet_col_min_width: 364px;
 				font-size: 1.25em;
 				box-shadow: none;
 				border: none;
-				transition: 0.2s;
+				transition: all 0.2s;
 				background: transparent;
 				height: $circle_xs;
 				width: $circle_xs;
 				margin: 0;
 				padding: 0;
 				display: flex;
+				font-family: "Metal Mania", "Helvetica Neue", Helvetica, Arial, sans-serif;
 				justify-content: center;
 				align-items: center;
 
@@ -639,6 +693,13 @@ $sheet_col_min_width: 364px;
 			}
 
 			.sheet-attr-box {
+				.sheet-readonly-toggle {
+					&:checked ~ .sheet-editable,
+					&:not(:checked) ~ .sheet-readonly {
+						display: none;
+					}
+				}
+
 				.sheet-strength {
 					left: 297px;
 					top: 100px;
@@ -723,7 +784,19 @@ $sheet_col_min_width: 364px;
 					input {
 						height: 42px;
 						width: 42px;
-						cursor: default;
+					}
+				}
+
+				button[type="roll"].sheet-defense {
+					margin: 0;
+					position: absolute;
+					z-index: 2;
+					width: 50px;
+					height: 50px;
+					opacity: 0;
+
+					&:hover + label input {
+						color: $fadedred;
 					}
 				}
 
@@ -740,6 +813,30 @@ $sheet_col_min_width: 364px;
 				.sheet-power {
 					right: 246px;
 					top: 7px;
+				}
+
+				button[type="roll"].sheet-fate-button {
+					position: absolute;
+					top: 340px;
+					left: 414px;
+					margin: 0;
+					padding: 0;
+					font-weight: 500;
+					border: none;
+					transition: all 0.2s;
+					box-shadow: none;
+					background: none;
+					font-size: 1em;
+
+					&::before {
+						font-family: "dicefontd6";
+						content: "f ";
+						font-size: 1.1em;
+					}
+
+					&:hover {
+						color: $red;
+					}
 				}
 
 				.sheet-damage {
@@ -764,6 +861,20 @@ $sheet_col_min_width: 364px;
 					text-align: center;
 					font-weight: normal;
 				}
+			}
+
+			.sheet-bonus-box {
+				position: absolute;
+				left: 212.5px;
+				top: 43px;
+				z-index: 2;
+				height: 469px;
+				width: 455px;
+				border: 2px solid black;
+				border-radius: 20px;
+				background-image: url(http://imgsrv.roll20.net/?src=raw.githubusercontent.com/Roll20/roll20-chara…sheets/master/Shadow%2520of%2520the%2520Demon%2520Lord/Assets/clean_bg.jpg);
+				background-position: center;
+				background-size: 880px auto;
 			}
 		}
 
@@ -943,154 +1054,6 @@ $sheet_col_min_width: 364px;
 		padding: 12px 2px 12px 10px;
 	}
 
-	.sheet-equipment-talents {
-		display: flex;
-		justify-content: flex-end;
-		align-items: flex-start;
-		flex-flow: row-reverse;
-		flex-wrap: wrap;
-		align-content: flex-start;
-
-		.sheet-editmode:checked ~ div {
-			.repitem {
-				border-bottom: 2px dotted black;
-			}
-		}
-	}
-
-	.sheet-background, .sheet-npc {
-		display: flex;
-		justify-content: space-between;
-		flex-wrap: wrap;
-		align-items: flex-start;
-		align-content: flex-start;
-
-		.sheet-left-col, .sheet-right-col {
-			min-width: $sheet_col_min_width;
-			max-width: $sheet_col_max_width;
-			margin-right: 8px;
-			flex: 1 1 0;
-		}
-
-		.sheet-left-col {
-			margin-bottom: 5px;
-		}
-	}
-
-	.sheet-equipment {
-		order: 1;
-		display: flex;
-		flex-flow: column;
-		min-width: $sheet_col_min_width;
-		max-width: $sheet_col_max_width;
-		margin-right: 8px;
-		flex: 1 1 0;
-
-		.sheet-header {
-			order: 0;
-		}
-
-		.repcontainer {
-			order: 1;
-		}
-
-		.sheet-item-total {
-			order: 2;
-			font-weight: bold;
-			display: flex;
-			margin: 5px 0 2px;
-			padding-top: 3px;
-			border-top: 2px solid black;
-			justify-content: space-between;
-			align-items: center;
-
-			.sheet-amount {
-				font-weight: inherit;
-			}
-		}
-
-		.repcontrol {
-			order: 3;
-		}
-
-		.sheet-notes {
-			order: 4;
-			margin-top: 8px;
-			width: 100%;
-
-			textarea {
-				resize: vertical;
-				height: 200px;
-				min-height: 100px;
-			}
-		}
-
-		.repitem {
-			display: flex;
-			justify-content: space-between;
-			margin-bottom: 2px;
-		}
-
-		.sheet-name,
-		input[type="text"].sheet-name {
-			width: 84%;
-		}
-
-		.sheet-amount,
-		input[type="number"].sheet-amount {
-			width: 15%;
-		}
-
-		.sheet-coins {
-			display: flex;
-			align-items: center;
-			font-weight: bold;
-			justify-content: space-between;
-			margin-bottom: 2px;
-
-			label {
-				width: auto;
-				line-height: 27px;
-
-				span {
-					vertical-align: middle;
-					margin-right: 8px;
-				}
-			}
-		}
-
-		.sheet-lifestyle {
-			display: flex;
-			align-items: center;
-			width: 36%;
-			justify-content: space-between;
-
-			input {
-				width: 58%;
-			}
-		}
-	}
-
-	.sheet-talents {
-		order: 0;
-
-		.sheet-name {
-			width: 72%;
-		}
-
-		.sheet-uses {
-			width: 10%;
-		}
-
-		.sheet-field-quarter {
-			width: 24%;
-		}
-
-		.sheet-reset-uses {
-			margin: 0 0 0 auto;
-		}
-	}
-
 	.sheet-secondary-tab, .sheet-weapons {
 		button[type="roll"] {
 			margin: 0;
@@ -1120,6 +1083,20 @@ $sheet_col_min_width: 364px;
 					display: none;
 				}
 			}
+		}
+	}
+
+	.sheet-equipment-talents {
+		display: flex;
+		justify-content: flex-end;
+		align-items: flex-start;
+		flex-flow: row-reverse;
+		flex-wrap: wrap;
+		align-content: flex-start;
+
+
+		.sheet-editmode:not(:checked) ~ div .repcontrol {
+			display: none;
 		}
 	}
 
@@ -1193,25 +1170,169 @@ $sheet_col_min_width: 364px;
 				}
 			}
 
-			.sheet-requirement:not(:checked) ~ div .sheet-requirement,
-			.sheet-target:not(:checked) ~ div .sheet-target,
-			.sheet-area:not(:checked) ~ div .sheet-area,
-			.sheet-duration:not(:checked) ~ div .sheet-duration,
-			.sheet-triggered:not(:checked) ~ div .sheet-triggered,
-			.sheet-roll20plus:not(:checked) ~ div .sheet-roll20plus,
-			.sheet-sacrifice:not(:checked) ~ div .sheet-sacrifice,
-			.sheet-permanence:not(:checked) ~ div .sheet-permanence,
-			.sheet-aftereffect:not(:checked) ~ div .sheet-aftereffect,
-			.sheet-special:not(:checked) ~ div .sheet-special,
-			.sheet-uses-check:not(:checked) ~ div .sheet-uses-display {
+			.sheet-requirement[value=""] ~ div .sheet-requirement,
+			.sheet-target[value=""] ~ div .sheet-target,
+			.sheet-area[value=""] ~ div .sheet-area,
+			.sheet-duration[value=""] ~ div .sheet-duration,
+			.sheet-uses-check[value="0"] ~ div .sheet-uses-display {
 				display: none;
 			}
 
-			.sheet-requirement:not(:checked) + .sheet-target:not(:checked) {
-				+ .sheet-area:not(:checked) + .sheet-duration:not(:checked) ~ .sheet-display-info {
-					display: none;
+			.sheet-requirement[value=""] + .sheet-target[value=""] + .sheet-area[value=""] + .sheet-duration[value=""] ~ .sheet-display-info {
+				display: none;
+			}
+		}
+	}
+
+	.sheet-equipment {
+		order: 1;
+		flex: 1 1 0;
+		min-width: $sheet_col_min_width;
+		max-width: $sheet_col_max_width;
+		margin-right: 8px;
+
+		.sheet-defense, .sheet-items {
+			display: flex;
+			flex-flow: column;
+
+			.repcontainer {
+				order: 0;
+			}
+
+			.sheet-summary {
+				order: 1;
+				font-weight: bold;
+				margin: 5px 0 2px;
+				padding-top: 3px;
+				border-top: 2px solid black;
+			}
+
+			.repcontrol {
+				order: 2;
+			}
+		}
+
+		.sheet-defense {
+			.sheet-check {
+				width: 13%;
+				text-align: center;
+			}
+
+			.sheet-name {
+				width: 43%;
+			}
+
+			.sheet-base {
+				width: 18%;
+				text-align: left;
+			}
+
+			.sheet-plus {
+				width: 2%;
+			}
+
+			.sheet-bonus {
+				width: 13%;
+			}
+
+			.sheet-total {
+				width: 10%;
+				font-weight: bold;
+				text-align: center;
+			}
+		}
+
+		.sheet-items {
+			.sheet-check {
+				width: 13%;
+				text-align: center;
+			}
+
+			input[type="text"], input[type="number"] {
+				line-height: 16px;
+				padding-top: 1px;
+				padding-bottom: 1px;
+			}
+
+			.sheet-name {
+				width: 70%;
+			}
+
+			.sheet-amount {
+				width: 15%;
+			}
+
+			.sheet-summary .sheet-amount {
+				font-weight: inherit;
+			}
+		}
+
+		.sheet-notes {
+			margin-top: 8px;
+			width: 100%;
+
+			textarea {
+				resize: vertical;
+				height: 200px;
+				min-height: 100px;
+			}
+		}
+
+		.sheet-coins {
+			display: flex;
+			align-items: center;
+			font-weight: bold;
+			justify-content: space-between;
+			margin-bottom: 2px;
+
+			label {
+				width: auto;
+				line-height: 27px;
+
+				span {
+					vertical-align: middle;
+					margin-right: 8px;
 				}
 			}
+		}
+
+		.sheet-lifestyle {
+			display: flex;
+			align-items: center;
+			width: 36%;
+			justify-content: space-between;
+
+			input {
+				width: 58%;
+			}
+		}
+	}
+
+	.sheet-talents {
+		order: 0;
+
+		.sheet-name {
+			width: 72%;
+		}
+
+		.sheet-uses {
+			width: 10%;
+		}
+
+		.sheet-field-quarter {
+			width: 24%;
+		}
+
+		.sheet-reset-uses {
+			margin: 0 0 0 auto;
+		}
+		.sheet-display {
+			margin-bottom: 5px;
+		}
+		.sheet-edit {
+			border-bottom: 2px dotted black;
+			padding-bottom: 4px;
+			margin-bottom: 3px;
 		}
 	}
 
@@ -1231,13 +1352,6 @@ $sheet_col_min_width: 364px;
 			resize: vertical;
 			height: 22px;
 			min-height: 22px;
-		}
-	}
-
-	.sheet-talents,	.sheet-npc {
-		.repitem {
-			margin-bottom: 4px;
-			padding-bottom: 3px;
 		}
 	}
 
@@ -1319,7 +1433,7 @@ $sheet_col_min_width: 364px;
 			}
 
 			.sheet-display {
-				margin-bottom: 7px;
+				margin-bottom: 5px;
 			}
 
 			.sheet-flex-row {
@@ -1490,6 +1604,25 @@ $sheet_col_min_width: 364px;
 		}
 	}
 
+	.sheet-background, .sheet-npc {
+		display: flex;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		align-items: flex-start;
+		align-content: flex-start;
+
+		.sheet-left-col, .sheet-right-col {
+			min-width: $sheet_col_min_width;
+			max-width: $sheet_col_max_width;
+			margin-right: 8px;
+			flex: 1 1 0;
+		}
+
+		.sheet-left-col {
+			margin-bottom: 5px;
+		}
+	}
+
 	.sheet-npc {
 		position: relative;
 		min-height: 300px;
@@ -1504,6 +1637,11 @@ $sheet_col_min_width: 364px;
 			~ div .sheet-display {
 				display: none;
 			}
+		}
+
+		.repitem {
+			margin-bottom: 4px;
+			padding-bottom: 3px;
 		}
 
 		.sheet-editmode:not(:checked) ~ div {
@@ -1652,7 +1790,7 @@ $sheet_col_min_width: 364px;
 					width: 11%;
 				}
 				.sheet-extra {
-					width: 28%;
+					width: 33%;
 				}
 
 				.sheet-versus {
@@ -1660,6 +1798,10 @@ $sheet_col_min_width: 364px;
 					width: 25%;
 					align-items: center;
 					justify-content: space-between;
+
+					select {
+						width: 81%;
+					}
 				}
 			}
 
@@ -1720,6 +1862,10 @@ $sheet_col_min_width: 364px;
 	font-size: 13px;
 	padding: 6px 10px;
 
+	.sheet-lower {
+		text-transform: lowercase;
+	}
+
 	.sheet-title {
 		color: $fadedred;
 		font-size: 1.5em;
@@ -1762,7 +1908,7 @@ $sheet_col_min_width: 364px;
 	}
 
 	.sheet-content {
-		font-size: .9em;
+		font-size: 12px;
 		line-height: 1.2;
 
 		div:not(:last-child) {
@@ -1773,19 +1919,16 @@ $sheet_col_min_width: 364px;
 	.sheet-rolls {
 		font-size: 0;
 
-		.sheet-attack, .sheet-damage {
+		.sheet-roll, .sheet-attack, .sheet-damage {
 			display: inline-block;
 			vertical-align: top;
-		}
-
-		.sheet-attack, .sheet-damage, .sheet-roll {
 			line-height: 25px;
+			font-size: 13px;
+			white-space: nowrap;
 		}
 
-		.sheet-attack, .sheet-damage, .sheet-roll, .sheet-damageplus {
-			font-size: 13px;
-
-			.sheet-vs span.inlinerollresult {
+		.sheet-roll, .sheet-attack, .sheet-damage, .sheet-damageplus {
+			.sheet-vs .inlinerollresult {
 				vertical-align: bottom;
 			}
 
@@ -1798,7 +1941,69 @@ $sheet_col_min_width: 364px;
 			}
 		}
 
-		.sheet-attack {
+		span.sheet-super {
+			vertical-align: super;
+			position: relative;
+			font-size: .8em;
+			line-height: 0;
+			font-weight: bold;
+
+			span {
+				vertical-align: baseline;
+			}
+
+			.inlinerollresult {
+				font-size: 1em;
+				padding: 0;
+			}
+
+			.sheet-info {
+				position: absolute;
+				text-align: center;
+				background: #f5f5f5;
+				border-radius: 4px;
+				padding: 2px;
+				border: 1px solid black;
+				left: -24px;
+				width: 65px;
+				top: 12px;
+				line-height: 1;
+			}
+
+			&::before {
+				position: absolute;
+				content: "";
+				width: 100%;
+				height: 130%;
+				z-index: 2;
+				background: transparent;
+			}
+
+			&.sheet-banes .sheet-info {
+				.inlinerollresult {
+					position: relative;
+
+					&::before {
+						content: " ";
+						position: absolute;
+						z-index: 1;
+						height: 100%;
+						width: 4px;
+						background: #f5f5f5;
+					}
+				}
+			}
+
+			&:not(:hover) .sheet-info {
+				display: none;
+			}
+		}
+
+		.sheet-damageplus {
+			font-size: 12px;
+		}
+
+		.sheet-roll, .sheet-attack {
 			width: 65%;
 		}
 

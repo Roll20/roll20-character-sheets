@@ -4,6 +4,10 @@ This is a character sheet for Blades in the Dark for use on Roll20.
 
 ## Changelog
 
+### 2.5
+* Added option to use Kirsty font if installed
+* Small graphical changes
+
 ### 2.4
 * Several bugfixes
 * New clocks-only mode for the faction page for those who want a character sheet just to store clocks
