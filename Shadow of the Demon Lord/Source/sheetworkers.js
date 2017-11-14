@@ -141,19 +141,37 @@ on('change:repeating_spells:spell_sacrifice', () => {
 });
 
 // Handle spell attack rolls
-const spellAttackFormula = '@{die_attack} + (@{spell_attack_mod}) + [[@{boons_banes_query} + @{spell_boons_banes} + @{global_attack_boons} + @{global_spell_attack_boons} - @{banes_from_afflictions}]]@{die_boon}k1[boons/banes]';
-on('change:repeating_spells:spell_attack_mod', event => {
-	getAttrs(['repeating_spells_spell_attack_mod'], v => {
-		setAttr('repeating_spells_spell_attack_formula', v.repeating_spells_spell_attack_mod ? spellAttackFormula : '0');
+const spellBoonFormula = '[[@{boons_banes_query} + @{spell_boons_banes} + @{global_attack_boons} + @{global_spell_attack_boons} - @{banes_from_afflictions}]]';
+const spellAttackFormula = '@{die_attack} + (@{spell_attack_mod}) + @{spell_boons_formula}@{die_boon}k1[boons/banes]';
+const updateSpellAttack = prefix => {
+	getAttrs([`${prefix}_attack_mod`], v => {
+		setAttr(`${prefix}_attack_formula`, v[`${prefix}_attack_mod`] ? spellAttackFormula : '0');
+		setAttr(`${prefix}_boons_formula`, v[`${prefix}_attack_mod`] ? spellBoonFormula : '');
 	});
-});
+};
+on('change:repeating_spells', () => updateSpellAttack('repeating_spells_spell'));
+
 // Handle talent attack rolls
-const talentAttackFormula = '@{die_attack} + (@{talent_attack_mod}) + [[@{boons_banes_query} + @{talent_boons_banes} + @{global_attack_boons} - @{banes_from_afflictions}]]@{die_boon}k1[boons/banes]';
-on('change:repeating_talents:talent_attack_mod', event => {
-	getAttrs(['repeating_talents_talent_attack_mod'], v => {
-		setAttr('repeating_talents_talent_attack_formula', v.repeating_talents_talent_attack_mod ? talentAttackFormula : '0');
+const talentBoonFormula = '[[@{boons_banes_query} + @{talent_boons_banes} + @{global_attack_boons} - @{banes_from_afflictions}]]';
+const talentAttackFormula = '@{die_attack} + (@{talent_attack_mod}) + @{talent_boons_formula}@{die_boon}k1[boons/banes]';
+const updateTalentAttack = prefix => {
+	getAttrs([`${prefix}_attack_mod`], v => {
+		setAttr(`${prefix}_attack_formula`, v[`${prefix}_attack_mod`] ? talentAttackFormula : '0');
+		setAttr(`${prefix}_boons_formula`, v[`${prefix}_attack_mod`] ? talentBoonFormula : '');
 	});
-});
+};
+on('change:repeating_talents', () => updateTalentAttack('repeating_talents_talent'));
+
+// Handle NPC attack rolls
+const npcBoonFormula = '[[@{boons_banes_query} + @{attack_boons} + @{global_attack_boons}]]';
+const npcAttackFormula = '@{die_attack} + (@{attack_mod}) + @{attack_boons_formula}@{die_boon}k1[boons/banes]';
+const updateNpcAttack = prefix => {
+	getAttrs([`${prefix}_range`], v => {
+		setAttr(`${prefix}_formula`, v[`${prefix}_range`] ? npcAttackFormula : '0');
+		setAttr(`${prefix}_boons_formula`, v[`${prefix}_range`] ? npcBoonFormula : '');
+	});
+};
+on('change:repeating_attacks', () => updateNpcAttack('repeating_attacks_attack'));
 
 // Calculate spell max castings
 const getSpellCastings = (rk, pwr, exp) => {
@@ -309,16 +327,6 @@ on('change:npc', () => getAttrs(['npc'], v => setAttr('tab', (v.npc === '1') ? '
 	});
 });
 
-// NPC attacks
-const npcAttackAttrs = ['range', 'mod', 'boons'];
-on(npcAttackAttrs.map(x => `change:repeating_attacks:attack_${x}`).join(' '), () => {
-	const prefix = 'repeating_attacks_attack';
-	getAttrs(npcAttackAttrs.map(x => `${prefix}_${x}`), v => {
-		setAttr(`${prefix}_formula`, v[`${prefix}_range`] ? `@{die_attack} + (${v[prefix + '_mod']}) + ` +
-			`[[@{boons_banes_query} + ${v[prefix + '_boons']} + @{global_attack_boons}]]@{die_boon}k1[boons/banes]` : '0');
-	});
-});
-
 // Basic equipment: turn off auto-defense
 on('change:setting_basic_equipment', () => {
 	getAttrs(['setting_basic_equipment', 'auto_defense'], v => {
@@ -413,7 +421,14 @@ const upgradeSheet = currentVersion => {
 				}, {});
 				setAttrs(attrs, {}, upgradeFunction);
 			});
+			idArray.forEach(id => updateNpcAttack(`repeating_attacks_${id}_attack`));
 		});
+		getSectionIDs('repeating_spells', idArray => {
+			idArray.forEach(id => updateSpellAttack(`repeating_spells_${id}_spell`));
+		});
+		getSectionIDs('repeating_talents'), idArray => {
+			idArray.forEach(id => updateTalentAttack(`repeating_talents_${id}_talent`));
+		}
 		getAttrs(['agility', 'defense', 'npc', 'setting_basic_equipment'], v => {
 			if (v.npc === '1' || v.setting_basic_equipment === '1' || v.agility === v.defense) upgradeFunction();
 			else {

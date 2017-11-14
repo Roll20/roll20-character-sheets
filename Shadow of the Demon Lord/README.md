@@ -8,6 +8,8 @@
 * Added affliction handling for speed
 * Added option for a defense roll button
 * Added a button for fate rolls
+* Added option not to display character name on roll template
+* Added display of number of boons/banes on the roll template
 * Minified the sheet
 
 ### 2017-11-07: Version 2
