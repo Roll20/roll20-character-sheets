@@ -1,6 +1,16 @@
 # Roll20 Character sheet for 'Shadow of the Demon Lord' by [Robert Schwalb](http://schwalbentertainment.com)
 
 ## Change log
+### 2017-11-09: Version 3
+* Improved technique for hiding sections in display mode, leading to attribute savings and less sheet worker code
+* Added defense section, automatically calculating defense; takes into account defenseless and unconscious afflictions
+* Added option not to count an item in the total
+* Added affliction handling for speed
+* Added option for a defense roll button
+* Added a button for fate rolls
+* Added option not to display character name on roll template
+* Added display of number of boons/banes on the roll template
+* Minified the sheet
 
 ### 2017-11-07: Version 2
 * Added option to whisper rolls to GM or query for output
@@ -33,10 +43,14 @@
 * Added translation capabilities to the sheet (except for the static text on the background of the first page)
 
 ## Developing this sheet
-This sheet uses a preprocessor for its CSS called SASS. When editing, make sure to edit the SCSS file, and compile to the style.css file.
+This sheet uses a preprocessor for its CSS called SASS. When editing, make sure to edit the SCSS file, and compile to the style.css file. The style.css file present in the main folder has also been minified. All line breaks and tabs must be removed from the HTML for it to work properly - the regular expression
 
-## Roadmap / Wishlist
-* Defense section
+    \n|\t|<!--.*?-->
+
+will do the trick. The sheet worker code has been minified as well, although this is not necessary for the functioning of the sheet.
+
+## Wishlist
+* Afflictions for NPCs
 * Buff/Debuff section
 * Settings page (adjust background, layout, etc.)
 * Responsive version of main tab
