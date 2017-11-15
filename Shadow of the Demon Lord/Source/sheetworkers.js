@@ -5,8 +5,37 @@ const setAttr = (attr, value) => {
 	attrs[attr] = value;
 	setAttrs(attrs);
 };
+const fillRepeatingSectionFromData = (sName, data, callback) => {
+	callback = callback || (() => {});
+	const createdIDs = [],
+		setting = data.map(o => {
+			let rowID;
+			while (!rowID) {
+				let newID = generateRowID();
+				if (!createdIDs.includes(newID)) {
+					rowID = newID;
+					createdIDs.push(rowID);
+				}
+			}
+			return Object.keys(o).reduce((m, key) => {
+				m[`repeating_${sName}_${rowID}_${key}`] = String(o[key]);
+				return m;
+			}, {});
+		})
+		.reduce((m, o) => Object.assign(m, o), {});
+	setAttrs(setting, {}, callback);
+};
 // Spell filters
-on('change:repeating_traditions:tradition_filter change:repeating_traditions:tradition_name change:repeating_spells:spell_tradition', () => {
+const removeSpellFilters = () => {
+	getSectionIDs('repeating_traditions', tradIDs => {
+		const attrs = tradIDs.reduce((m, id) => {
+			m[`repeating_traditions_${id}_tradition_filter`] = '0';
+			return m;
+		}, {});
+		setAttrs(attrs);
+	});
+};
+const calcSpellFilters = () => {
 	getSectionIDs('repeating_traditions', tradIDs => {
 		getSectionIDs('repeating_spells', spellIDs => {
 			const sourceAttrs = [
@@ -33,21 +62,14 @@ on('change:repeating_traditions:tradition_filter change:repeating_traditions:tra
 			});
 		});
 	});
-});
+};
+on('change:repeating_traditions:tradition_filter change:repeating_traditions:tradition_name change:repeating_spells:spell_tradition', calcSpellFilters);
 on('change:remove_spell_filters', event => {
-	if(event.newValue === '0') {
-		getSectionIDs('repeating_traditions', tradIDs => {
-			const attrs = tradIDs.reduce((m, id) => {
-				m[`repeating_traditions_${id}_tradition_filter`] = '0';
-				return m;
-			}, {});
-			setAttrs(attrs);
-		});
-	}
+	if (event.newValue === '0') removeSpellFilters();
 });
 
 // Calculate defense
-on('change:agility change:auto_defense change:repeating_defense remove:repeating_defense change:affliction_defenseless change:affliction_unconscious', () => {
+const calcDefense = () => {
 	getSectionIDs('repeating_defense', idArray => {
 		const sourceAttrs = [
 			'affliction_defenseless',
@@ -83,10 +105,11 @@ on('change:agility change:auto_defense change:repeating_defense remove:repeating
 			setAttrs(attrs);
 		});
 	});
-});
+};
+on('change:agility change:auto_defense change:repeating_defense remove:repeating_defense change:affliction_defenseless change:affliction_unconscious', calcDefense);
 
 // Calculate equipment totals, summary
-on('change:repeating_items remove:repeating_items', () => {
+const calcEquipment = () => {
 	getSectionIDs('repeating_items', idArray => {
 		const sectionAttrs = [
 			...idArray.map(id => `repeating_items_${id}_item_check`),
@@ -108,27 +131,38 @@ on('change:repeating_items remove:repeating_items', () => {
 			});
 		});
 	});
-});
+};
+on('change:repeating_items remove:repeating_items', calcEquipment);
 
 // Calculate stat mods
 const stats = ['strength', 'agility', 'intellect', 'perception', 'will'];
-const calculateStatBonus = stat => {
+const statMods = [...stats, 'finesse'].map(x => `${x}_mod`);
+const calcStatBonus = stat => {
 	getAttrs([stat], v => {
 		const mod = (parseInt(v[stat]) - 10) || 0;
 		setAttr(`${stat}_mod`, (mod >= 0) ? `+${mod}` : mod);
 	});
 };
-stats.forEach(stat => on(`change:${stat}`, () => calculateStatBonus(stat)));
+const calcFinesseBonus = () => {
+	getAttrs(['strength', 'agility'], v => {
+		const mod = (Math.max(parseInt(v.strength), parseInt(v.agility)) - 10) || 0;
+		setAttr('finesse_mod', (mod >= 0) ? `+${mod}` : mod);
+	});
+};
+stats.forEach(stat => on(`change:${stat}`, () => calcStatBonus(stat)));
+on('change:strength change:agility', calcFinesseBonus);
 
 // Handle display attributes for weapons
 const calcWeaponMod = prefix => {
-	getAttrs(['strength_mod', 'agility_mod', 'intellect_mod', 'will_mod', `${prefix}_weapon_attribute`], v => {
+	getAttrs([...statMods, `${prefix}_weapon_attribute`], v => {
 		setAttr(`${prefix}_weapon_mod`, v[v[`${prefix}_weapon_attribute`] + '_mod']);
 	});
 };
 on('change:repeating_weapons', () => calcWeaponMod('repeating_weapons'));
-on('change:strength_mod change:agility_mod change:intellect_mod change:will_mod', () => {
-	getSectionIDs('repeating_weapons', idArray => idArray.forEach(id => calcWeaponMod(`repeating_weapons_${id}`)));
+on(statMods.map(x => `change:${x}`).join(' '), () => {
+	getSectionIDs('repeating_weapons', idArray => {
+		idArray.forEach(id => calcWeaponMod(`repeating_weapons_${id}`));
+	});
 });
 
 // Sacrifice query
@@ -209,9 +243,7 @@ on('change:power change:setting_auto_spell_castings change:setting_spell_experti
 		idArray.forEach(id => calcSpellCastings(`repeating_spells_${id}_spell`));
 	});
 });
-on('change:repeating_spells:spell_rank', () => {
-	calcSpellCastings('repeating_spells_spell');
-});
+on('change:repeating_spells', () => calcSpellCastings('repeating_spells_spell'));
 
 // Handle reset of spell castings
 const resetSpellCastings = () => {
@@ -256,11 +288,12 @@ on('change:health change:setting_healing_rate_divisor', handleHealthChange);
 
 // Handle banes from afflictions
 const baneAfflictions = ['diseased', 'fatigued', 'frightened', 'impaired', 'poisoned'];
-on(baneAfflictions.map(x => `change:affliction_${x}`).join(' '), () => {
+const calcBaneAfflictions = () => {
 	getAttrs(baneAfflictions.map(x => `affliction_${x}`), v => {
 		setAttr('banes_from_afflictions', Object.values(v).reduce((m, k) => (m + (parseInt(k) || 0)), 0));
 	});
-});
+};
+on(baneAfflictions.map(x => `change:affliction_${x}`).join(' '), calcBaneAfflictions);
 // Asleep: set prone and unconscious
 on('change:affliction_asleep', event => {
 	if (event.newValue === '1') {
@@ -270,9 +303,10 @@ on('change:affliction_asleep', event => {
 		});
 	}
 });
+
 // Blinded, slowed, immobilized: modify speed
 const speedAttrs = ['speed', 'affliction_blinded', 'affliction_immobilized', 'affliction_slowed'];
-on(speedAttrs.map(x => `change:${x}`).join(' '), () => {
+const calcDisplaySpeed = () => {
 	getAttrs(speedAttrs, v => {
 		const attrs = {};
 		if (v.affliction_blinded === '1' || v.affliction_immobilized === '1' || v.affliction_slowed === '1') {
@@ -293,32 +327,35 @@ on(speedAttrs.map(x => `change:${x}`).join(' '), () => {
 		else attrs.speed_display = v.speed;
 		setAttrs(attrs);
 	});
-});
+};
+on(speedAttrs.map(x => `change:${x}`).join(' '), calcDisplaySpeed);
 
 // Weapon/attack against display
-['weapon', 'attack'].forEach(name => {
-	on(`change:repeating_${name}s:${name}_against`, event => {
-		const dName = `repeating_${name}s_${name}_against_display`,
-			newValue = event.newValue.toLowerCase(),
-			dot = (name === 'attack') ? "." : "";
-		if (newValue.indexOf('strength') >= 0) {
-			setAttr(dName, `${getTranslationByKey('VS')} ${getTranslationByKey('STRENGTH')}${dot}`);
-		} else if (newValue.indexOf('agility') >= 0) {
-			setAttr(dName, `${getTranslationByKey('VS')} ${getTranslationByKey('AGILITY')}${dot}`);
-		} else if (newValue.indexOf('intellect') >= 0) {
-			setAttr(dName, `${getTranslationByKey('VS')} ${getTranslationByKey('INTELLECT')}${dot}`);
-		} else if (newValue.indexOf('will') >= 0) {
-			setAttr(dName, `${getTranslationByKey('VS')} ${getTranslationByKey('WILL')}${dot}`);
-		} else if (newValue.indexOf('perception') >= 0) {
-			setAttr(dName, `${getTranslationByKey('VS')} ${getTranslationByKey('PERCEPTION')}${dot}`);
-		} else {
-			setAttr(dName, '');
-		}
-	});
+const updateAgainst = (sName, newValue) => {
+	const dName = `repeating_${sName}s_${sName}_against_display`;
+	if (newValue.toLowerCase().indexOf('strength') >= 0) {
+		setAttr(dName, `${getTranslationByKey('VS')} ${getTranslationByKey('STRENGTH')}`);
+	} else if (newValue.toLowerCase().indexOf('agility') >= 0) {
+		setAttr(dName, `${getTranslationByKey('VS')} ${getTranslationByKey('AGILITY')}`);
+	} else if (newValue.toLowerCase().indexOf('intellect') >= 0) {
+		setAttr(dName, `${getTranslationByKey('VS')} ${getTranslationByKey('INTELLECT')}`);
+	} else if (newValue.toLowerCase().indexOf('will') >= 0) {
+		setAttr(dName, `${getTranslationByKey('VS')} ${getTranslationByKey('WILL')}`);
+	} else if (newValue.toLowerCase().indexOf('perception') >= 0) {
+		setAttr(dName, `${getTranslationByKey('VS')} ${getTranslationByKey('PERCEPTION')}`);
+	} else {
+		setAttr(dName, '');
+	}
+};
+['weapon', 'attack'].forEach(sName => {
+	on(`change:repeating_${sName}s:${sName}_against`, event => updateAgainst(sName, event.newValue));
 });
 
 // NPC hiding/showing sections
-on('change:npc', () => getAttrs(['npc'], v => setAttr('tab', (v.npc === '1') ? 'npc' : 'main')));
+on('change:npc sheet:opened', () => getAttrs(['npc', 'tab'], v => {
+	if (v.npc === '1' && !['npc', 'spells'].includes(v.tab)) setAttr('tab', 'npc');
+	else if (v.npc === '0' && !['main', 'equipment_talents', 'spells', 'background'].includes(v.tab)) setAttr('tab', 'main');
+}));
 ['specialactions', 'specialattacks', 'npcmagic', 'endofround'].forEach(sName => {
 	on(`change:repeating_${sName} remove:repeating_${sName}`, () => {
 		getSectionIDs(`repeating_${sName}`, idArray => {
@@ -335,26 +372,6 @@ on('change:setting_basic_equipment', () => {
 });
 
 // Version upgrades
-const fillRepeatingSectionFromData = (sName, data, callback) => {
-	callback = callback || (() => {});
-	const createdIDs = [],
-		setting = data.map(o => {
-			let rowID;
-			while (!rowID) {
-				let newID = generateRowID();
-				if (!createdIDs.includes(newID)) {
-					rowID = newID;
-					createdIDs.push(rowID);
-				}
-			}
-			return Object.keys(o).reduce((m, key) => {
-				m[`repeating_${sName}_${rowID}_${key}`] = String(o[key]);
-				return m;
-			}, {});
-		})
-		.reduce((m, o) => Object.assign(m, o), {});
-	setAttrs(setting, {}, callback);
-};
 const upgradeSheet = currentVersion => {
 	// Upgradee to v2: convert different standards for spell attributes
 	if (currentVersion < 2) {
@@ -426,9 +443,6 @@ const upgradeSheet = currentVersion => {
 		getSectionIDs('repeating_spells', idArray => {
 			idArray.forEach(id => updateSpellAttack(`repeating_spells_${id}_spell`));
 		});
-		getSectionIDs('repeating_talents'), idArray => {
-			idArray.forEach(id => updateTalentAttack(`repeating_talents_${id}_talent`));
-		}
 		getAttrs(['agility', 'defense', 'npc', 'setting_basic_equipment'], v => {
 			if (v.npc === '1' || v.setting_basic_equipment === '1' || v.agility === v.defense) upgradeFunction();
 			else {
@@ -438,6 +452,19 @@ const upgradeSheet = currentVersion => {
 				}], upgradeFunction);
 			}
 		});
+	}
+	// Upgrade to v4: calculate finesse, recalculate talents, recalculate against
+	else if (currentVersion < 4) {
+		calcFinesseBonus();
+		getSectionIDs('repeating_talents', idArray => {
+			idArray.forEach(id => updateTalentAttack(`repeating_talents_${id}_talent`));
+		});
+		getSectionIDs('repeating_attacks', idArray => {
+			getAttrs(idArray.map(id => `repeating_attacks_${id}_attack_against`), v => {
+				idArray.forEach(id => updateAgainst('attack', v[`repeating_attacks_${id}_attack_against`]));
+			});
+		});
+		upgradeSheet(4);
 	}
 };
 const initialiseSheet = () => {
@@ -455,12 +482,11 @@ const initialiseSheet = () => {
 		equipment: "equipment_notes",
 		dboonsbanes: "fortune_points",
 	};
-	getAttrs(Object.keys(simpleConversion), v => {
+	getAttrs([...Object.keys(simpleConversion), 'tab'], v => {
 		const attrs = {};
 		Object.keys(simpleConversion).forEach(oldName => {
 			convert(attrs, v[oldName], simpleConversion[oldName]);
 		});
-		attrs.tab = 'main';
 		setAttrs(attrs, {}, upgradeFunction);
 	});
 	// Convert attributes in repeating sections
@@ -533,9 +559,10 @@ const initialiseSheet = () => {
 				row.spell_attack_formula = row.spell_attack_mod ? spellAttackFormula : '0';
 				return row;
 			});
-			setAttrs({
-				setting_auto_spell_castings: (hasOldMax) ? '0' : '1'
+			if (hasOldMax) setAttrs({
+				setting_auto_spell_castings: '0',
 			}, {}, () => fillRepeatingSectionFromData('spells', data, upgradeFunction));
+			else fillRepeatingSectionFromData('spells', data, upgradeFunction);
 			idArray.forEach(id => removeRepeatingRow(`repeating_magic_${id}`));
 		});
 	});
@@ -560,7 +587,7 @@ const initialiseSheet = () => {
 		});
 	});
 	// Re-calculate mods
-	stats.forEach(calculateStatBonus);
+	stats.forEach(calcStatBonus);
 	handleHealthChange();
 };
 const setBoonsBanesQuery = () => {
@@ -581,7 +608,7 @@ on('sheet:opened', () => {
 		const version = parseInt(v.version) || 0;
 		if (!version) initialiseSheet();
 		else upgradeSheet(version);
-		setAttr('version', '3');
+		setAttr('version', '4');
 	});
 	setBoonsBanesQuery();
 	setWhisperQuery();
