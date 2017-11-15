@@ -25,6 +25,12 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 ### Changelog
 
+### 1.5.0
+
+* Fixed Sneak skill showing as Program.
+* Added Beasts and Bots to NPC autofill.
+* Added Saving Throw to NPC sheet.
+
 ### 1.4.0
 
 * Added NPC tab which holds standard NPC stats, notes, and rolls such as Morale and Reaction.
