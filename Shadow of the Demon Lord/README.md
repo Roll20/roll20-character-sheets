@@ -3,6 +3,7 @@
 ## Change log
 ### Version 4
 * Added Finesse and Perception as attack stats
+* Weapons and attacks now correctly display "boon"/"bane"/"banes" instead of always displaying "boons"
 * Fix display of attack roll 20+
 
 ### 2017-11-09: Version 3
