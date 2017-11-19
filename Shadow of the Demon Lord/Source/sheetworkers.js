@@ -17,8 +17,8 @@ const fillRepeatingSectionFromData = (sName, data, callback) => {
 					createdIDs.push(rowID);
 				}
 			}
-			return Object.keys(o).reduce((m, key) => {
-				m[`repeating_${sName}_${rowID}_${key}`] = String(o[key]);
+			return Object.entries(o).reduce((m, [key, value]) => {
+				m[`repeating_${sName}_${rowID}_${key}`] = String(value);
 				return m;
 			}, {});
 		})
@@ -97,9 +97,9 @@ const calcDefense = () => {
 			}
 			else if (autoDefense) {
 				const totalDefense = Math.min(idArray.reduce((m, id) => {
-						if (v[`repeating_defense_${id}_defense_check`] === '1') m += attrs[`repeating_defense_${id}_defense_total`];
-						return m;
-					}, 0), 25);
+					if (v[`repeating_defense_${id}_defense_check`] === '1') m += attrs[`repeating_defense_${id}_defense_total`];
+					return m;
+				}, 0), 25);
 				attrs.defense = String(totalDefense);
 			}
 			setAttrs(attrs);
@@ -115,7 +115,7 @@ const calcEquipment = () => {
 			...idArray.map(id => `repeating_items_${id}_item_check`),
 			...idArray.map(id => `repeating_items_${id}_item_amount`),
 			...idArray.map(id => `repeating_items_${id}_item_name`),
-			];
+		];
 		getAttrs(sectionAttrs, v => {
 			const total = idArray.filter(id => (v[`repeating_items_${id}_item_check`] === '1'))
 				.map(id => `repeating_items_${id}_item_amount`)
@@ -208,11 +208,14 @@ const calcBoonsDisplay = prefix => {
 	getAttrs([`${prefix}_boons`], v => {
 		if (v[`${prefix}_boons`] === '1') {
 			setAttr(`${prefix}_boons_display`, '1 ' + getTranslationByKey('BOON').toLowerCase());
-		} else if (v[`${prefix}_boons`] === '-1') {
+		}
+		else if (v[`${prefix}_boons`] === '-1') {
 			setAttr(`${prefix}_boons_display`, '1 ' + getTranslationByKey('BANE').toLowerCase());
-		} else if (parseInt(v[`${prefix}_boons`]) <= -2) {
+		}
+		else if (parseInt(v[`${prefix}_boons`]) <= -2) {
 			setAttr(`${prefix}_boons_display`, -parseInt(v[`${prefix}_boons`]) + ' ' + getTranslationByKey('BANES').toLowerCase());
-		} else {
+		}
+		else {
 			setAttr(`${prefix}_boons_display`, v[`${prefix}_boons`] + ' ' + getTranslationByKey('BOONS').toLowerCase());
 		}
 	});
@@ -242,8 +245,8 @@ const getSpellCastings = (rk, pwr, exp) => {
 	}
 	else if (rank === 1) {
 		if (power >= 5) return String(3 + expertise);
-		else if (power >= 2) return  String(2 + expertise);
-		else return  String(1 + expertise);
+		else if (power >= 2) return String(2 + expertise);
+		else return String(1 + expertise);
 	}
 	else if (rank === 0) return String(power + expertise + 1);
 };
@@ -352,15 +355,20 @@ const updateAgainst = prefix => {
 		const dName = `${prefix}_against_display`;
 		if (v[`${prefix}_against`].toLowerCase().indexOf('strength') >= 0) {
 			setAttr(dName, `${getTranslationByKey('VS')} ${getTranslationByKey('STRENGTH')}`);
-		} else if (v[`${prefix}_against`].toLowerCase().indexOf('agility') >= 0) {
+		}
+		else if (v[`${prefix}_against`].toLowerCase().indexOf('agility') >= 0) {
 			setAttr(dName, `${getTranslationByKey('VS')} ${getTranslationByKey('AGILITY')}`);
-		} else if (v[`${prefix}_against`].toLowerCase().indexOf('intellect') >= 0) {
+		}
+		else if (v[`${prefix}_against`].toLowerCase().indexOf('intellect') >= 0) {
 			setAttr(dName, `${getTranslationByKey('VS')} ${getTranslationByKey('INTELLECT')}`);
-		} else if (v[`${prefix}_against`].toLowerCase().indexOf('will') >= 0) {
+		}
+		else if (v[`${prefix}_against`].toLowerCase().indexOf('will') >= 0) {
 			setAttr(dName, `${getTranslationByKey('VS')} ${getTranslationByKey('WILL')}`);
-		} else if (v[`${prefix}_against`].toLowerCase().indexOf('perception') >= 0) {
+		}
+		else if (v[`${prefix}_against`].toLowerCase().indexOf('perception') >= 0) {
 			setAttr(dName, `${getTranslationByKey('VS')} ${getTranslationByKey('PERCEPTION')}`);
-		} else {
+		}
+		else {
 			setAttr(dName, '');
 		}
 	});
@@ -406,7 +414,7 @@ const upgradeSheet = currentVersion => {
 			getAttrs(oldAttrs, v => {
 				const attrs = {};
 				idArray.forEach(id => {
-					switch(v[`repeating_spells_${id}_spell_attribute`]) {
+					switch (v[`repeating_spells_${id}_spell_attribute`]) {
 					case 'INTELLECT':
 						attrs[`repeating_spells_${id}_spell_attribute`] = ' (^{INTELLECT})';
 						break;
