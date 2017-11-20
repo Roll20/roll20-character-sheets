@@ -76,6 +76,7 @@ const calcDefense = () => {
 			'affliction_unconscious',
 			'agility',
 			'auto_defense',
+			'defense_input',
 			'npc',
 			...idArray.map(id => `repeating_defense_${id}_defense_check`),
 			...idArray.map(id => `repeating_defense_${id}_defense_base`),
@@ -89,7 +90,7 @@ const calcDefense = () => {
 				m[`repeating_defense_${id}_defense_total`] = base + bonus;
 				return m;
 			}, {});
-			if (autoDefense && (v.affliction_defenseless === '1' || v.affliction_unconscious === '1')) {
+			if (v.affliction_defenseless === '1' || v.affliction_unconscious === '1') {
 				attrs.defense = '5';
 			}
 			else if (autoDefense && idArray.filter(id => (v[`repeating_defense_${id}_defense_check`] === '1')).length === 0) {
@@ -102,11 +103,14 @@ const calcDefense = () => {
 				}, 0), 25);
 				attrs.defense = String(totalDefense);
 			}
+			else {
+				attrs.defense = v.defense_input;
+			}
 			setAttrs(attrs);
 		});
 	});
 };
-on('change:agility change:auto_defense change:repeating_defense remove:repeating_defense change:affliction_defenseless change:affliction_unconscious', calcDefense);
+on('change:agility change:auto_defense change:defense_input change:repeating_defense remove:repeating_defense change:affliction_defenseless change:affliction_unconscious', calcDefense);
 
 // Calculate equipment totals, summary
 const calcEquipment = () => {
@@ -193,7 +197,7 @@ const updateTalentAttack = prefix => {
 on('change:repeating_talents', () => updateTalentAttack('repeating_talents_talent'));
 
 // Handle NPC attack rolls
-const npcBoonFormula = '[[@{boons_banes_query} + @{attack_boons} + @{global_attack_boons}]]';
+const npcBoonFormula = '[[@{boons_banes_query} + @{attack_boons} + @{global_attack_boons} - @{banes_from_afflictions}]]';
 const npcAttackFormula = '@{die_attack} + @{attack_mod} + @{attack_boons_formula}@{die_boon}k1[boons/banes]';
 const updateNpcAttack = prefix => {
 	getAttrs([`${prefix}_range`], v => {
@@ -478,12 +482,13 @@ const upgradeSheet = currentVersion => {
 			}
 		};
 		const upgradeFunction = _.after(3, () => upgradeSheet(4));
-		getAttrs(stats, v => {
+		getAttrs([...stats, 'defense'], v => {
 			const attrs = stats.reduce((m, stat) => {
 				m[`${stat}_mod`] = (parseInt(v[stat]) - 10) || 0;
 				return m;
 			}, {});
 			attrs.finesse_mod = (Math.max(parseInt(v.strength), parseInt(v.agility)) - 10) || 0;
+			if (v.defense !== '10') attrs.defense_input = v.defense;
 			setAttrs(attrs, {}, () => {
 				getSectionIDs('repeating_talents', idArray => {
 					getAttrs(idArray.map(id => `repeating_talents_${id}_talent_boons_banes`), v => {

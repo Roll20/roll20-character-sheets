@@ -4,6 +4,7 @@
 ### Version 4
 * Added Finesse and Perception as attack stats
 * Weapons and attacks now correctly display "boon"/"bane"/"banes" instead of always displaying "boons"
+* Added NPC afflictions
 * Fix display of attack roll 20+
 
 ### 2017-11-09: Version 3
@@ -55,7 +56,5 @@ This sheet uses a preprocessor for its CSS called SASS. When editing, make sure 
 will do the trick. The sheet worker code has been minified as well, although this is not necessary for the functioning of the sheet.
 
 ## Wishlist
-* Afflictions for NPCs
 * Buff/Debuff section
-* Settings page (adjust background, layout, etc.)
 * Responsive version of main tab
