@@ -489,6 +489,7 @@ const upgradeSheet = currentVersion => {
 			}, {});
 			attrs.finesse_mod = (Math.max(parseInt(v.strength), parseInt(v.agility)) - 10) || 0;
 			if (v.defense !== '10') attrs.defense_input = v.defense;
+			calcDisplaySpeed();
 			setAttrs(attrs, {}, () => {
 				getSectionIDs('repeating_talents', idArray => {
 					getAttrs(idArray.map(id => `repeating_talents_${id}_talent_boons_banes`), v => {
