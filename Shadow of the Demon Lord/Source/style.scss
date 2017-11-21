@@ -54,8 +54,38 @@ $sheet_col_min_width: 364px;
 		line-height: 22px;
 	}
 
-	.sheet-space-after::after {
+	.sheet-space-after::after,
+	.sheet-space-before::before,
+	.sheet-space-before-nonempty:not(:empty)::before {
 		content: " ";
+	}
+
+	.sheet-semicolon-after::after,
+	.sheet-semicolon-before::before,
+	.sheet-semicolon-before-nonempty:not(:empty)::before {
+		content: "; ";
+	}
+
+	.sheet-comma::after {
+		content: ", ";
+	}
+
+	.sheet-bracketed {
+		&::before {
+			content: "(";
+		}
+		&::after {
+			content: ")";
+		}
+	}
+
+	.sheet-bracketed-space {
+		&::before {
+			content: " (";
+		}
+		&::after {
+			content: ") ";
+		}
 	}
 
 	input[type="text"], input[type="number"], select, textarea {
@@ -338,6 +368,12 @@ $sheet_col_min_width: 364px;
 		.sheet-60 {
 			width: 60%;
 		}
+		.sheet-70 {
+			width: 70%;
+		}
+		.sheet-30 {
+			width: 30%;
+		}
 		.sheet-alignright {
 			text-align: right;
 		}
@@ -490,7 +526,7 @@ $sheet_col_min_width: 364px;
 				}
 			}
 
-			+ button[type="roll"] {
+			+ .sheet-mod + button[type="roll"] {
 				position: absolute;
 				border-radius: 50%;
 				font-size: 1.25em;
@@ -514,6 +550,10 @@ $sheet_col_min_width: 364px;
 				&::before {
 					content: "";
 				}
+			}
+
+			+ .sheet-mod:not([value^="-"]) + button[type="roll"] span::before {
+				content: "+";
 			}
 		}
 
@@ -544,9 +584,11 @@ $sheet_col_min_width: 364px;
 
 					input[type="text"] {
 						height: 40px;
+						font-size: 1.15em;
+						text-align: center;
 					}
 
-					.sheet-ancestry input {
+					.sheet-ancestry {
 						width: 75%;
 					}
 
@@ -565,6 +607,9 @@ $sheet_col_min_width: 364px;
 
 					textarea {
 						height: 139px;
+					}
+					input[type="text"], textarea {
+						text-align: right;
 					}
 				}
 			}
@@ -618,6 +663,7 @@ $sheet_col_min_width: 364px;
 					margin-bottom: 4px;
 					font-weight: normal;
 					text-align: left;
+					overflow: hidden;
 					background: $transparent1;
 				}
 			}
@@ -694,8 +740,8 @@ $sheet_col_min_width: 364px;
 
 			.sheet-attr-box {
 				.sheet-readonly-toggle {
-					&:checked ~ .sheet-editable,
-					&:not(:checked) ~ .sheet-readonly {
+					&:checked + label .sheet-editable,
+					&:not(:checked) + label .sheet-readonly {
 						display: none;
 					}
 				}
@@ -704,7 +750,7 @@ $sheet_col_min_width: 364px;
 					left: 297px;
 					top: 100px;
 
-					+ button[type="roll"] {
+					+ .sheet-mod + button[type="roll"] {
 						left: 342px;
 						top: 155px;
 					}
@@ -723,7 +769,7 @@ $sheet_col_min_width: 364px;
 					right: 303px;
 					top: 100px;
 
-					+ button[type="roll"] {
+					+ .sheet-mod + button[type="roll"] {
 						right: 352px;
 						top: 151px;
 					}
@@ -733,7 +779,7 @@ $sheet_col_min_width: 364px;
 					right: 245px;
 					top: 93px;
 
-					+ button[type="roll"] {
+					+ .sheet-mod + button[type="roll"] {
 						font-size: 1em;
 						height: 29px;
 						width: 29px;
@@ -746,7 +792,7 @@ $sheet_col_min_width: 364px;
 					left: 221px;
 					top: 280px;
 
-					+ button[type="roll"] {
+					+ .sheet-mod + button[type="roll"] {
 						left: 285px;
 						top: 286px;
 					}
@@ -761,7 +807,7 @@ $sheet_col_min_width: 364px;
 					right: 227px;
 					top: 280px;
 
-					+ button[type="roll"] {
+					+ .sheet-mod + button[type="roll"] {
 						right: 290px;
 						top: 286px;
 					}
@@ -795,7 +841,7 @@ $sheet_col_min_width: 364px;
 					height: 50px;
 					opacity: 0;
 
-					&:hover + label input {
+					&:hover + input + label input {
 						color: $fadedred;
 					}
 				}
@@ -1084,6 +1130,10 @@ $sheet_col_min_width: 364px;
 				}
 			}
 		}
+
+		.sheet-mod:not([value^="-"]) + span::before {
+			content: "+";
+		}
 	}
 
 	.sheet-equipment-talents {
@@ -1119,6 +1169,10 @@ $sheet_col_min_width: 364px;
 		.sheet-collapse:checked + .sheet-edit {
 			height: 44px;
 			overflow: hidden;
+		}
+
+		.sheet-center, .sheet-center input[type="text"] {
+			text-align: center;
 		}
 
 		.sheet-display {
@@ -1239,6 +1293,10 @@ $sheet_col_min_width: 364px;
 				width: 10%;
 				font-weight: bold;
 				text-align: center;
+			}
+
+			.sheet-defense-base:not([value="0"]) ~ .sheet-defense-bonus:not([value="0"]):not([value^="-"]) + .sheet-defense-bonus::before {
+				content: "+ ";
 			}
 		}
 
@@ -1581,10 +1639,6 @@ $sheet_col_min_width: 364px;
 			}
 		}
 
-		div.sheet-display {
-			margin-bottom: 5px;
-		}
-
 		.sheet-notes {
 			font-weight: normal;
 
@@ -1747,6 +1801,54 @@ $sheet_col_min_width: 364px;
 				color: #fff;
 				margin-bottom: 4px;
 			}
+
+			.sheet-mod:not([value^="-"]) + .sheet-bracketed::before {
+				content: "(+";
+			}
+
+			.sheet-afflictions {
+				label {
+					display: inline;
+					position: relative;
+					font-weight: normal;
+					width: auto;
+					cursor: pointer;
+
+					&:not(:last-child)::after {
+						content: ", ";
+					}
+
+					input {
+						opacity: 0;
+						position: absolute;
+
+						&:checked + span {
+							color: $fadedred;
+						}
+					}
+
+					&:not(:hover) div {
+						opacity: 0;
+					}
+
+					div {
+						position: absolute;
+						text-indent: 0;
+						width: 196px;
+						z-index: 1;
+						padding: 3px;
+						top: 18px;
+						text-align: center;
+						cursor: default;
+						pointer-events: none;
+						left: 0;
+						background: #fffaee;
+						border: 1px solid black;
+						border-radius: 5px;
+						transition: all 0.4s;
+					}
+				}
+			}
 		}
 
 		.sheet-right-col {
@@ -1802,6 +1904,10 @@ $sheet_col_min_width: 364px;
 					select {
 						width: 81%;
 					}
+				}
+
+				.sheet-against-display:not(:empty)::after {
+					content: ". ";
 				}
 			}
 
@@ -1860,7 +1966,7 @@ $sheet_col_min_width: 364px;
 	margin: 0 -2px -5px -43px;
 	word-wrap: break-word;
 	font-size: 13px;
-	padding: 6px 10px;
+	padding: 6px;
 
 	.sheet-lower {
 		text-transform: lowercase;
@@ -1877,6 +1983,7 @@ $sheet_col_min_width: 364px;
 
 		.sheet-subtitle {
 			font-size: .8em;
+			text-transform: capitalize;
 		}
 	}
 
@@ -1890,12 +1997,13 @@ $sheet_col_min_width: 364px;
 			&:first-child {
 				border-top: 1px solid black;
 				padding-top: 3px;
-				margin-top: 2px;
+				margin-top: 3px;
 			}
 
 			&:last-child {
 				border-bottom: 1px solid black;
 				padding-bottom: 3px;
+				margin-bottom: 3px;
 			}
 		}
 	}
@@ -1904,7 +2012,6 @@ $sheet_col_min_width: 364px;
 		font-size: 1.2em;
 		font-variant: small-caps;
 		line-height: 1;
-		margin-bottom: 4px;
 	}
 
 	.sheet-content {
