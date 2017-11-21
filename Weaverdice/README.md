@@ -1,6 +1,7 @@
 Character sheet for Weaver Dice, based on the superhero webserial by John C. "Wildbow" McCrae,
 converted from the original sheet to Roll20 by Andreas J.
 
+This is the horrible first draft, only fr the truly desperate.
 
 Rulebook: 			https://docs.google.com/document/d/1e-H--GkPrbJq4WRNYndBnjjLjE7-2kOZkjwltkP1Ong/
 Online charsheet: 	https://docs.google.com/document/d/15peMSA3fdp9EK9urwvYps4Q0z06EQ6iJdVggD81a2bg/
