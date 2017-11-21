@@ -7,6 +7,13 @@ Versions have three numbers Major.Minor.Release
 
 **Release**: Indicates bugfixes and minor UI changes only.
 
+## 1.3.3
+### Bugfixes
+* Moved checkbox to left of labels/descriptors to more closely match most style guidelines
+* Added missing features needed for Luther Arkwright support; Conditions, and Psionics magic
+* Added hit location setting which will set the hit location table to the correct values.  Currently only supports Humanoid and Custom.  Can set default in Campaign options.
+* Some UI re-arranged for the addition of missing features
+
 ## 1.3.2
 ### Bugfixes
 * Patch to finish hit location data migrations for those who upgraded before the v1.3.1 patches were in.  Will copy old location data into new but only if the new fields are still undefined or empty.
