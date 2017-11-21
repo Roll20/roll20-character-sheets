@@ -1538,9 +1538,9 @@ const crewAttributes = [...new Set([].concat(...Object.keys(crewData).map(x => O
 /* EVENT HANDLERS */
 /* Set default fields when setting crew type or playbook */
 on('change:crew_type change:playbook', event => {
-	getAttrs(['changed_attributes', 'setting_autofill', ...watchedAttributes], v => {
+	getAttrs(['playbook', 'crew_type', 'changed_attributes', 'setting_autofill', ...watchedAttributes], v => {
 		const changedAttributes = (v.changed_attributes || '').split(','),
-			sourceName = event.newValue.toLowerCase(),
+			sourceName = (event.sourceAttribute === 'crew_type' ? v.crew_type : v.playbook).toLowerCase(),
 			fillBaseData = (data, defaultAttrNames) => {
 				if (data) {
 					const finalSettings = defaultAttrNames.filter(name => !changedAttributes.includes(name))
@@ -1558,7 +1558,7 @@ on('change:crew_type change:playbook', event => {
 					mySetAttrs(finalSettings);
 				}
 			};
-		if (event.newValue) {
+		if (sourceName) {
 			setAttr('show_playbook_reminder', '0');
 		}
 		if (v.setting_autofill !== '1') return;
@@ -1733,9 +1733,12 @@ on('change:setting_consequence_query sheet:opened', () => {
 /* Trim whitespace in auto-expand fields */
 autoExpandFields.forEach(name => {
 	on(`change:${name}`, event => {
-		if (event.newValue.trim() !== event.newValue && event.sourceType === 'player') {
-			setAttr(name.replace(':', '_'), event.newValue.trim());
-		}
+		const attrName = name.replace(':', '_');
+		getAttrs([attrName], v => {
+			if (v[attrName].trim() !== v[attrName] && event.sourceType === 'player') {
+				setAttr(attrName, v[attrName].trim());
+			}
+		});
 	});
 });
 /* INITIALISATION AND UPGRADES */
