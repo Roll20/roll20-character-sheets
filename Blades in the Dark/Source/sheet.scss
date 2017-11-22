@@ -1,0 +1,2563 @@
+/* GENERALITIES */
+.charsheet {
+	color: #333;
+	font-size: 0;
+	position: relative;
+	top: -11px;
+	cursor: default;
+	box-sizing: border-box;
+	padding: 0 !important;
+	font-family: Georgia, "Bitstream Charter", "Times New Roman", serif;
+}
+div, span, textarea, ul, li, span, label {
+	box-sizing: border-box;
+}
+button[type=roll] {
+	text-shadow: none;
+	background: transparent;
+	box-shadow: none;
+	font-weight: bold;
+	font-family: inherit;
+	outline: none;
+	border-radius: 0;
+	transition: all 0.2s;
+}
+button[type=roll].btn::before {
+	content: "";
+}
+label {
+	margin: 0;
+	padding: 0;
+	display: flex;
+	cursor: pointer;
+	width: auto;
+	color: #333;
+	font: inherit;
+}
+label {
+	input[type=checkbox], input[type=radio] {
+		position: absolute;
+	}
+
+	&:hover {
+		input[type=checkbox] + span, input[type=radio] + span {
+			opacity: 0.7;
+		}
+	}
+}
+input[type=text], textarea {
+	border: none;
+	font-family: inherit;
+	background: transparent;
+	box-shadow: none;
+	width: 100%;
+	padding: 0;
+	margin: 0;
+	color: #333;
+	border-radius: 0;
+	transition: all 0.2s, height 0.4s;
+}
+textarea:active {
+	transition: height 0s;
+}
+input[type=number] {
+	border-color: #ccc;
+	color: #333;
+	box-shadow: none;
+}
+.sheet-focus-shadow:checked ~ .sheet-container {
+	textarea, input[type=text], input[type=number] {
+		&:focus {
+			box-shadow: inset 0 0 1px 1px rgba(66,66,66,.3), 0 0 2px 1px rgba(66,66,66,.3);
+		}
+	}
+}
+textarea {
+	resize: vertical;
+	display: block;
+}
+li {
+	position: relative;
+
+	&::before {
+		transform: rotate(45deg) scale(0.9);
+		content: '■';
+		left: 0;
+		top: -.1em;
+		position: absolute;
+	}
+}
+ul {
+	list-style: none;
+	margin: 0;
+}
+input[type=checkbox], input[type=radio] {
+	opacity: 0;
+	z-index: 1;
+	-moz-appearance: none;
+	position: relative;
+	+ span {
+		cursor: pointer;
+		display: inline-block;
+		transition: all 0.2s, opacity 0s;
+	}
+}
+.sheet-hidden {
+	display: none !important;
+}
+button[type=roll].sheet-inherit, input[type=text].sheet-inherit {
+	font: inherit;
+	color: inherit;
+	text-transform: inherit;
+	letter-spacing: inherit;
+}
+/* Preloading graphics*/
+.sheet-preload {
+	opacity: 0;
+	position: absolute;
+	img {
+		width: 1px;
+		height: 1px;
+	}
+}
+/* Version text */
+.sheet-topholder {
+	line-height: 22px;
+	margin: 0 0 7px calc(55% + 5px);
+}
+.sheet-version {
+	color: #a8a8a8;
+	font-size: 13px;
+	font-family: "Times New Roman", Times, serif;
+}
+.sheet-version-text::after {
+	content: " ";
+}
+.sheet-settings-checkbox {
+	margin-right: 10px;
+	width: 20px;
+	height: 20px;
+	font-size: 16px;
+	font-family: pictos;
+	input {
+		+ span {
+			opacity: 0.3;
+		}
+		&:checked + span {
+			opacity: 1;
+		}
+	}
+}
+/* Type Selector */
+.sheet-type-selector {
+	display: flex;
+	margin-right: auto;
+	background: #ccc;
+	border: 1px solid #a7a7a7;
+	letter-spacing: 1px;
+	line-height: 20px;
+	justify-content: center;
+	width: 170px;
+	font-size: 11px;
+	color: #3f3f3f;
+	input {
+		position: absolute;
+		width: 170px;
+		height: 20px;
+	}
+	&:hover {
+		color: #f00;
+	}
+}
+.sheet-3waybox:not(:checked) + .sheet-3waybox,
+.sheet-type-selector input[value="character"]:not(:checked) ~ span[data-i18n="character_mode"],
+.sheet-type-selector input[value="crew"]:not(:checked) ~ span[data-i18n="crew_mode"],
+.sheet-type-selector input[value="faction"][type=radio]:not(:checked) ~ span[data-i18n="faction_mode"] {
+	display: none;
+}
+/* SETTINGS */
+.sheet-settings {
+	position: absolute;
+	right: 0;
+	width: 350px;
+	border: 1px solid #000;
+	background: #fff;
+	z-index: 100;
+	padding: 5px;
+	border-radius: 5px;
+
+	> div {
+		min-width: 50%;
+		display: flex;
+		flex-grow: 1;
+		align-items: center;
+		padding: 2px;
+		font-size: 10px;
+		min-height: 24px;
+		line-height: 17px;
+		border-bottom: 1px solid #d3d3d3;
+
+		&.sheet-generaterow {
+			line-height: 0;
+		}
+	}
+	label {
+		align-items: center;
+	}
+	.sheet-checkbox + span {
+		margin-right: 6px;
+	}
+	.sheet-checkbox:checked + span {
+		background: #000;
+	}
+	:not(input) + span {
+		padding-right: 4px;
+	}
+	input[type=number] {
+		padding: 0 2px;
+		margin: 0 3px 0 8px;
+		width: 30px;
+		font-size: 12px;
+	}
+	input[type=text] {
+		width: 45px;
+		font-size: 10px;
+		margin-right: 3px;
+		padding-left: 1px;
+		line-height: 16px;
+		border-radius: 3px;
+		border: 1px solid #d3d3d3;
+	}
+	select {
+		width: 80px;
+		margin: 0 7px 0 0;
+		padding: 0;
+		height: 18px;
+	}
+}
+.sheet-type {
+	&[value="character"] ~ :not(.sheet-setting-char),
+	&[value="crew"] ~ :not(.sheet-setting-crew),
+	&[value="faction"] ~ :not(.sheet-setting-faction) {
+		display: none;
+	}
+}
+/* SETTINGS FOR HIDING STUFF ON THE SHEET */
+.sheet-toothhider:not(:checked) + {
+	.sheet-tooth, .sheet-tooth + span {
+		display: none;
+	}
+}
+.sheet-hider:not(:checked) + {
+	li, div, label {
+		display: none;
+	}
+}
+/* Sheet container */
+.sheet-container {
+	position: relative;
+}
+.sheet-flexwidth:not(:checked) + .sheet-container {
+	width: 860px;
+}
+.sheet-flexwidth:checked + .sheet-container {
+	min-width: 860px;
+	max-width: 1190px;
+}
+/* USEFUL GENERAL LAYOUT*/
+.sheet-blackheader {
+	background: #000;
+	color: #fff;
+	.sheet-rep1, .sheet-hold1 {
+		padding-top: 3px;
+		line-height: 13px;
+	}
+}
+.sheet-blackheader, .sheet-black-on-grey, .sheet-greyheader {
+	font-size: 11px;
+	letter-spacing: 1px;
+}
+.sheet-blackheader, .sheet-greyheader {
+	height: 16px;
+	line-height: 15px;
+	padding: 1px 2px 0 4px;
+}
+.sheet-hold .sheet-blackheader {
+	padding-left: 2px;
+}
+.sheet-black-on-grey,
+.sheet-greyheader {
+	background: #b3b4b6;
+}
+.sheet-black-on-grey {
+	text-align: center;
+	position: relative;
+	flex-grow: 1;
+	padding-left: 1px;
+	height: 13px;
+	line-height: 13px;
+	z-index: -1;
+}
+.sheet-plainheader {
+	width: 100%;
+	border-top: 2px solid #000;
+	font-size: 12px;
+	line-height: 22px;
+}
+.sheet-specialheader {
+	background: #b3b4b6;
+	height: 20px;
+	font-size: 11px;
+	line-height: 20px;
+	letter-spacing: 1px;
+	padding: 0 5px;
+	input[type=text] {
+		margin: 0 -5px;
+		padding: 0 5px;
+		width: calc(100% + 10px);
+	}
+}
+.sheet-greyholder {
+	background: #d6d8d9;
+}
+.sheet-def-margin {
+	margin-top: 10px;
+}
+.sheet-small-margin {
+	margin-top: 5px;
+}
+.sheet-blackborder {
+	border-top: 3px solid #000;
+}
+.sheet-tier {
+	background: #d6d8d9;
+	height: 16px;
+	width: 56px;
+	align-items: center;
+	input[value="1"] {
+		margin-left: auto;
+	}
+	.sheet-checkbox + span {
+		margin-right: auto;
+	}
+}
+/* COLUMN LAYOUT */
+.sheet-flex {
+	display: flex;
+}
+.sheet-flex-wrap {
+	display: flex;
+	flex-wrap: wrap;
+	align-content: flex-start;
+	align-items: flex-start;
+}
+.sheet-flex-center {
+	text-align: center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.sheet-right-column {
+	padding-left: 5px;
+}
+.sheet-col47 {
+	width: 47%
+}
+.sheet-col53 {
+	width: 53%;
+}
+.sheet-col37 {
+	width: 37%;
+}
+.sheet-col24b {
+	width: 24.25%;
+}
+.sheet-col50 {
+	width: 50%;
+}
+.sheet-col52b {
+	width: 52%;
+}
+.sheet-col55 {
+	width: 55%;
+}
+.sheet-col45{
+	width: 45%;
+}
+.sheet-col63 {
+	width: 63%;
+}
+.sheet-col100 {
+	width: 100%;
+}
+/* FONT STYLES */
+.sheet-label,
+input[type=text].sheet-label,
+textarea.sheet-label,
+button[type=roll].sheet-label {
+	text-transform: uppercase;
+	font-weight: bold;
+}
+.sheet-uppercase {
+	text-transform: uppercase;
+}
+.sheet-smallcaps,
+input[type=text].sheet-smallcaps,
+textarea.sheet-smallcaps {
+	font-variant: small-caps;
+	font-weight: bold;
+}
+/* INFO BOXES */
+.sheet-gatherinfo {
+	ul {
+		padding: 0;
+	}
+	li {
+		margin-bottom: 1px;
+		font-style: italic;
+		padding-left: 11px;
+		font-size: 11px;
+		height: 17px;
+	}
+}
+.sheet-teamworkbox {
+	width: 95%;
+	padding: 5px;
+	margin-bottom: 5px;
+	background: #d6d8d9;
+	font-size: 12px;
+	line-height: 15px;
+}
+.sheet-planning .sheet-teamworkbox strong::after {
+	content: ": ";
+}
+.sheet-planningdesc {
+	font-size: 12px;
+	line-height: 15px;
+	text-align: justify;
+	margin: 0 5% 5px 0;
+}
+/* ITEMS/UPGRADES */
+.sheet-itemcolumn {
+	max-width: 249px;
+}
+.sheet-itemholder > div {
+	padding: 5px;
+}
+.sheet-item-container {
+	flex-grow: 1;
+}
+.sheet-playbookitems {
+	background: #d6d8d9;
+}
+.sheet-playbookitems, .sheet-regularitems {
+	.repcontrol {
+		height: 29px;
+	}
+}
+.sheet-regularitems {
+	.repcontainer {
+		display: flex;
+		flex-wrap: wrap;
+		align-content: flex-start;
+	}
+	.repitem {
+		display: flex;
+		flex-grow: 1;
+	}
+	.sheet-input-short:checked + .sheet-input-expand:not(:checked) ~ .sheet-item-container  {
+		width: 96px;
+	}
+	.sheet-col50, .sheet-col100 {
+		position: relative;
+	}
+}
+.sheet-item {
+	display: flex;
+	align-items: start;
+
+	.sheet-itemname {
+		height: 18px;
+		font-size: 11px;
+		margin: 0 1px 0 2px;
+		padding-left: 2px;
+		flex: auto;
+		min-width: 0;
+
+		&.sheet-auto-expand {
+			min-height: 16px;
+			height: auto;
+			line-height: 16px;
+			margin: 1px 0;
+			padding: 0 7px 0 2px;
+		}
+	}
+
+	.sheet-checkbox, .sheet-checkbox + span {
+		margin-top: 3px;
+	}
+
+	.sheet-input-bold:checked ~ .sheet-itemname {
+		font-weight: bold;
+	}
+	.sheet-input-italic:checked ~ .sheet-itemname {
+		font-style: italic;
+	}
+	.sheet-label {
+		font-size: 11px;
+		vertical-align: top;
+		letter-spacing: 1px;
+
+		&.sheet-upgradecosts {
+			font-size: 8px;
+		}
+	}
+	.sheet-upgradecosts {
+		font-size: 11px;
+		padding-left: 3px;
+	}
+	.sheet-upgradecaption {
+		margin-top: 3px;
+	}
+}
+.sheet-floatingbar {
+	width: 3px;
+	height: 2px;
+	margin: 8px 0 0 -3px;
+	flex: 0 0 auto;
+	background: #838587;
+}
+/* Repeating items*/
+.sheet-numboxes0:checked ~ .sheet-boxesgeq2,
+.sheet-numboxes1:checked ~ .sheet-boxesgeq2,
+.sheet-numboxes2:checked ~ .sheet-boxesgeq3 {
+	display: none;
+}
+.sheet-itemholder .repitem .sheet-boxes-chosen:checked + div,
+.sheet-itemholder .repitem .sheet-boxes-chosen:not(:checked) + div ~ div {
+	display: none;
+}
+.sheet-numboxes-chooser {
+	padding: 1px 0;
+	font-size: 11px;
+
+	input[type=number] {
+		margin-left: auto;
+		height: 18px;
+		padding: 0;
+		text-align: right;
+		width: 2.5em;
+		background: transparent;
+	}
+	label {
+		height: 18px;
+		border: 1px solid #AAA;
+		margin-left: auto;
+		padding: 2px;
+		line-height: 12px;
+	}
+	input:checked + span {
+		font-weight: bold;
+	}
+}
+.sheet-show-itemdesc:not(:checked) ~ div .sheet-item-description {
+	display: none;
+}
+.sheet-itemholder .sheet-expand {
+	top: 4px;
+	right: 1px;
+
+	+ span {
+		top: 1px;
+		right: 1px;
+		&::before {
+			content: "◀";
+		}
+	}
+	~ textarea {
+		border-top: 1px solid #d3d3d3;
+		line-height: 12px;
+		font-size: 10px;
+		height: 49px;
+	}
+}
+.sheet-itemholder .sheet-playbookitems .sheet-expand ~ textarea {
+	border-color: #a9a9a9;
+}
+/* LOGO */
+.sheet-bladeslogo {
+	border-right: 12px solid transparent;
+	height: 43px;
+	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/logo.png);
+	background-size: 102% auto;
+	background-repeat: no-repeat;
+}
+.sheet-crewheader {
+	color: #7f8184;
+	font-size: 28px;
+	letter-spacing: -2px;
+	line-height: 31px;
+}
+/* LOAD */
+.sheet-itemheader,
+.sheet-loadheader {
+	background: #b3b4b6;
+	height: 20px;
+	font-size: 10px;
+	padding: 3px 2px 1px 4px;
+	align-items: center;
+}
+.sheet-loadheader label {
+	align-items: center;
+	line-height: 11px;
+	margin-left: auto;
+	text-transform: lowercase;
+}
+.sheet-loadnumber {
+	font-weight: bold;
+	font-family: "Times New Roman", Times, serif;
+	font-size: 12px;
+	margin: 0 3px 0 4px;
+}
+.sheet-itemheader > .sheet-label {
+	margin-right: 4px;
+}
+.sheet-itemheader:not(:hover) .sheet-text-button {
+	display: none;
+}
+.sheet-itemheader .sheet-text-button {
+	margin-left: auto;
+}
+.sheet-itemheader .sheet-text-button input[type=checkbox] + span {
+	opacity: 1;
+	color: #333;
+}
+.sheet-itemheader .sheet-text-button:hover input[type=checkbox] + span {
+	color: #f00;
+}
+/* ADVANCEMENT BOX*/
+.sheet-advancement-header  {
+	letter-spacing: 2px;
+}
+.sheet-markxp {
+	margin-right: auto;
+}
+.sheet-advancement-xpholder {
+	letter-spacing: 0;
+	font-size: 0;
+	margin-left: 8px;
+}
+.sheet-advancement-desc {
+	width: 99%;
+	background: #d6d8d9;
+	padding: 15px 20px 4px 11px;
+}
+.sheet-advancement-desc li,
+.sheet-warblurb li {
+	font-size: 12px;
+	line-height: 15px;
+	width: 100%;
+}
+.sheet-advancement-desc li {
+	font-style: italic;
+	margin-bottom: 1em;
+	padding-left: 1em;
+}
+.sheet-advancement-desc .sheet-auto-expand {
+	min-height: 15px;
+	padding: 0 2px;
+}
+.sheet-advancement-desc li.sheet-nondot,
+.sheet-warblurb li.sheet-nondot {
+	padding-left: 0;
+	font-style: normal;
+}
+.sheet-advancement-desc li.sheet-nondot::before,
+.sheet-warblurb li.sheet-nondot::before {
+	display: none;
+}
+/* PLAYBOOK */
+.sheet-playbook {
+	align-items: center;
+	height: 50px;
+	position: relative;
+	background: #d6d8d9;
+}
+.sheet-playbook input[type=text] {
+	margin: 0 2px;
+	padding-left: 5px;
+	letter-spacing: -1px;
+	font-size: 35px;
+	line-height: 40px;
+}
+.sheet-playbook textarea {
+	height: 42px;
+	font-size: 10px;
+	padding-left: 3px;
+	letter-spacing: 1px;
+	color: #7f8184;
+	resize: none;
+	line-height: 14px;
+}
+.sheet-type-character .sheet-playbook input[type=text] {
+	flex: 0 0 auto;
+	width: calc(64% - 10px);
+}
+.sheet-type-crew .sheet-playbook input[type=text] {
+	flex: 0 0 auto;
+	width: calc(74% - 7px);
+}
+.sheet-type-character .sheet-playbook textarea {
+	flex: 0 0 auto;
+	width: calc(36% + 6px);
+}
+.sheet-type-crew .sheet-playbook textarea {
+	flex: 0 0 auto;
+	width: calc(26% + 3px);
+}
+.sheet-playbook-reminder {
+	position: absolute;
+	border: 1px solid #333;
+	background: #fff;
+	top: 48px;
+	z-index: 3;
+	border-radius: 5px;
+	width: 267px;
+	font-size: 12px;
+	text-align: center;
+	padding: 3px;
+}
+/* HEADER */
+.sheet-header input[type=text] {
+	width: 100%;
+	border-bottom: 1px solid #000;
+	font-size: 14px;
+	padding: 3px 0 0 2px;
+	margin: 3px 0 0;
+	color: #c43c35;
+}
+.sheet-header-text {
+	color: #222;
+	text-align: justify;
+	padding: 3px 0 2px;
+	line-height: 13px;
+}
+.sheet-header label {
+	flex-wrap: wrap;
+}
+.sheet-header-title {
+	font-size: 10px;
+	letter-spacing: 1px;
+}
+.sheet-header-info {
+	font-size: 8px;
+}
+.sheet-header input[type="hidden"][value=""] + div > .sheet-header-title::after {
+	content: ": ";
+}
+.sheet-header input[type="hidden"]:not([value=""]) + div > .sheet-header-info {
+	display: none;
+}
+.sheet-header .sheet-col55:not(:first-child) {
+	padding-right: 2.5%;
+}
+.sheet-vice {
+	justify-content: space-between;
+	text-align: justify;
+	line-height: 1.6;
+	font-size: 11px;
+}
+.sheet-vice .sheet-smallcaps {
+	font-size: 130%;
+	line-height: 0;
+}
+/* CLOCKS */
+.sheet-clocks {
+	.repcontainer {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: flex-start;
+		justify-content: space-between;
+	}
+	.repitem {
+		display: flex;
+		padding: 4px 2px;
+		width: 49.5%;
+		margin: 4px 0 0;
+		background: #d6d8d9;
+		align-items: start;
+	}
+	.itemcontrol {
+		top: 0;
+		left: 0;
+	}
+	.sheet-auto-expand {
+		font-size: 11px;
+		letter-spacing: 1px;
+		padding: 2px 3px;
+		line-height: 12px;
+		flex: auto;
+		min-width: 0;
+		margin-right: 2px;
+		min-height: 28px;
+	}
+}
+.sheet-clock-container {
+  position: relative;
+	padding: 2px;
+	margin: 0 0 5px;
+	z-index: 1;
+	height: 44px;
+	width: 44px;
+	cursor: pointer;
+	flex: 0 0 auto;
+	input {
+		position: absolute;
+		display: none;
+	}
+	.sheet-zero {
+		z-index: 3;
+	}
+	.sheet-zero, .sheet-zero + span {
+		position: absolute;
+		top: 37px;
+		left: -5px;
+	}
+	.sheet-all, .sheet-zero {
+		display: block;
+	}
+}
+.sheet-clock {
+  border: 2px solid black;
+  border-radius: 50%;
+	transition: all 0.2s;
+	background: red;
+	width: 100%;
+	height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: -1;
+}
+[class^="sheet-spoke"] {
+  height: 44px;
+  width: 2px;
+  position: absolute;
+  display: none;
+  left: 0;
+  top: 0;
+  background: black;
+}
+.sheet-spoke-0 {
+  transform: translateX(21px);
+}
+.sheet-spoke-30 {
+  transform: translateX(21px) rotate(30deg);
+}
+.sheet-spoke-36 {
+  transform: translateX(21px) rotate(36deg);
+}
+.sheet-spoke-45 {
+  transform: translateX(21px) rotate(45deg);
+}
+.sheet-spoke-60 {
+  transform: translateX(21px) rotate(60deg);
+}
+.sheet-spoke-72 {
+  transform: translateX(21px) rotate(72deg);
+}
+.sheet-spoke-90 {
+  transform: translateX(21px) rotate(90deg);
+}
+.sheet-spoke-108 {
+  transform: translateX(21px) rotate(108deg);
+}
+.sheet-spoke-120 {
+  transform: translateX(21px) rotate(120deg);
+}
+.sheet-spoke-135 {
+  transform: translateX(21px) rotate(135deg);
+}
+.sheet-spoke-144 {
+  transform: translateX(21px) rotate(144deg);
+}
+.sheet-spoke-150 {
+  transform: translateX(21px) rotate(150deg);
+}
+.sheet-size-choice {
+	display: flex;
+	flex: 0 0 auto;
+	height: 45px;
+	margin: 2px 0;
+	width: 44px;
+	line-height: 12px;
+	font-size: 13px;
+	font-family: "Times New Roman", Times, serif;
+	align-content: space-evenly;
+	flex-wrap: wrap;
+}
+/* Faction clocks */
+.sheet-type-faction .sheet-clocks {
+	.repcontainer {
+		justify-content: flex-start;
+	}
+	.repitem {
+		margin: 4px .8% 0 0;
+		width: 32.8%;
+	}
+}
+.sheet-input-clocks-only:not(:checked) ~ .sheet-clocks .repitem:nth-of-type(3n),
+.sheet-input-clocks-only:checked ~ .sheet-clocks .repitem:nth-of-type(4n) {
+	margin-right: 0;
+}
+.sheet-input-clocks-only:checked {
+	~ .sheet-clocks {
+		width: 100%;
+		.repitem {
+			margin: 4px .4% 0 0;
+			width: 24.7%;
+		}
+	}
+	~ .sheet-factiontitle, ~ .sheet-factions, ~ .sheet-right-column {
+		display: none;
+	}
+}
+.sheet-size[value="4"] ~ .sheet-clock-container {
+	input:not(.sheet-zero) {
+		height: 20px;
+		width: 20px;
+	}
+	input[value="1"] {
+		margin-left: 20px;
+	}
+	input[value="2"] {
+		margin: 20px 0 0 20px;
+	}
+	input[value="3"] {
+		margin-top: 20px;
+	}
+}
+.sheet-size[value="6"] ~ .sheet-clock-container {
+	input:not(.sheet-zero) {
+		height: 17px;
+		width: 12px;
+	}
+	input[value="1"] {
+		margin-left: 21px;
+		transform: rotate(30deg);
+	}
+	input[value="2"] {
+		margin: 12px 0 0 25px;
+		transform: rotate(90deg);
+	}
+	input[value="3"] {
+		margin: 22px 0 0 21px;
+		transform: rotate(150deg);
+	}
+	input[value="4"] {
+		margin: 22px 0 0 8px;
+		transform: rotate(210deg);
+	}
+	input[value="5"] {
+		margin: 12px 0 0 1px;
+		transform: rotate(270deg);
+	}
+	input[value="6"] {
+		margin-left: 8px;
+		transform: rotate(330deg);
+	}
+}
+.sheet-size[value="8"] ~ .sheet-clock-container {
+	input:not(.sheet-zero) {
+		height: 14px;
+		width: 10px;
+	}
+	input[value="1"] {
+		margin-left: 20px;
+		transform: rotate(22.5deg);
+	}
+	input[value="2"] {
+		margin: 8px 0 0 26px;
+		transform: rotate(67.5deg);
+	}
+	input[value="3"] {
+		margin: 18px 0 0 26px;
+		transform: rotate(112.5deg);
+	}
+	input[value="4"] {
+		margin: 25px 0 0 20px;
+		transform: rotate(157.5deg);
+	}
+	input[value="5"] {
+		margin: 25px 0 0 9px;
+		transform: rotate(202.5deg);
+	}
+	input[value="6"] {
+		margin: 18px 0 0 2px;
+		transform: rotate(247.5deg);
+	}
+	input[value="7"] {
+		margin: 8px 0 0 2px;
+		transform: rotate(292.5deg);
+	}
+	input[value="8"] {
+		margin-left: 9px;
+		transform: rotate(337.5deg);
+	}
+}
+.sheet-size[value="10"] ~ .sheet-clock-container {
+	input:not(.sheet-zero) {
+		height: 14px;
+		width: 9px;
+	}
+	input[value="1"] {
+		transform: rotate(18deg);
+		margin-left: 20px;
+	}
+	input[value="2"] {
+		transform: rotate(54deg);
+		margin: 5px 0 0 27px;
+	}
+	input[value="3"] {
+		transform: rotate(90deg);
+		margin: 13px 0 0 30px;
+	}
+	input[value="4"] {
+		transform: rotate(126deg);
+		margin: 21px 0 0 27px;
+	}
+	input[value="5"] {
+		transform: rotate(162deg);
+		margin: 26px 0 0 20px;
+	}
+	input[value="6"] {
+		transform: rotate(198deg);
+		margin: 26px 0 0 12px;
+	}
+	input[value="7"] {
+		transform: rotate(234deg);
+		margin: 21px 0 0 5px;
+	}
+	input[value="8"] {
+		transform: rotate(270deg);
+		margin: 13px 0 0 1px;
+	}
+	input[value="9"] {
+		transform: rotate(306deg);
+		margin: 5px 0 0 5px;
+	}
+	input[value="10"] {
+		transform: rotate(342deg);
+		margin-left: 12px;
+	}
+}
+.sheet-size[value="12"] ~ .sheet-clock-container {
+	input:not(.sheet-zero) {
+		height: 12px;
+		width: 8px;
+	}
+	input[value="1"] {
+		margin-left: 20px;
+		transform: rotate(15deg);
+	}
+	input[value="2"] {
+		margin: 4px 0 0 26px;
+		transform: rotate(45deg);
+	}
+	input[value="3"] {
+		margin: 10px 0 0 29px;
+		transform: rotate(75deg);
+	}
+	input[value="4"] {
+		margin: 18px 0 0 29px;
+		transform: rotate(105deg);
+	}
+	input[value="5"] {
+		margin: 24px 0 0 26px;
+		transform: rotate(135deg);
+	}
+	input[value="6"] {
+		margin: 28px 0 0 20px;
+		transform: rotate(165deg);
+	}
+	input[value="7"] {
+		margin: 28px 0 0 12px;
+		transform: rotate(195deg);
+	}
+	input[value="8"] {
+		margin: 24px 0 0 6px;
+		transform: rotate(225deg);
+	}
+	input[value="9"] {
+		margin: 18px 0 0 3px;
+		transform: rotate(255deg);
+	}
+	input[value="10"] {
+		margin: 10px 0 0 3px;
+		transform: rotate(295deg);
+	}
+	input[value="11"] {
+		margin: 4px 0 0 6px;
+		transform: rotate(315deg);
+	}
+	input[value="12"] {
+		margin-left: 12px;
+		transform: rotate(345deg);
+	}
+}
+/* End positioning */
+.sheet-size[value="4"] ~ .sheet-clock-container .sheet-4clock,
+.sheet-size[value="6"] ~ .sheet-clock-container .sheet-6clock,
+.sheet-size[value="8"] ~ .sheet-clock-container .sheet-8clock,
+.sheet-size[value="10"] ~ .sheet-clock-container .sheet-10clock,
+.sheet-size[value="12"] ~ .sheet-clock-container .sheet-12clock {
+	display: block;
+}
+.sheet-size:not([value=""])  ~ .sheet-size-choice,
+.sheet-clocks .sheet-size[value=""] ~ .sheet-broadcast-button,
+.sheet-size[value=""] ~ .sheet-clock-container{
+	display: none;
+}
+.sheet-clock-container .sheet-input-progress[value="0"]:checked ~ .sheet-clock {
+  background: white;
+}
+.sheet-size[value="4"] ~ .sheet-clock-container .sheet-input-progress[value="1"]:checked ~ .sheet-clock,
+.sheet-size[value="8"] ~ .sheet-clock-container .sheet-input-progress[value="2"]:checked ~ .sheet-clock,
+.sheet-size[value="12"] ~ .sheet-clock-container .sheet-input-progress[value="3"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(180deg, transparent 50%, white 50%), linear-gradient(90deg, white 50%, red 50%);
+}
+.sheet-size[value="4"] ~ .sheet-clock-container .sheet-input-progress[value="2"]:checked ~ .sheet-clock,
+.sheet-size[value="6"] ~ .sheet-clock-container .sheet-input-progress[value="3"]:checked ~ .sheet-clock,
+.sheet-size[value="8"] ~ .sheet-clock-container .sheet-input-progress[value="4"]:checked ~ .sheet-clock,
+.sheet-size[value="10"] ~ .sheet-clock-container .sheet-input-progress[value="5"]:checked ~ .sheet-clock,
+.sheet-size[value="12"] ~ .sheet-clock-container .sheet-input-progress[value="6"]:checked ~ .sheet-clock {
+	background-image: linear-gradient(90deg, white 50%, red 50%);
+}
+.sheet-size[value="4"] ~ .sheet-clock-container .sheet-input-progress[value="3"]:checked ~ .sheet-clock,
+.sheet-size[value="8"] ~ .sheet-clock-container .sheet-input-progress[value="6"]:checked ~ .sheet-clock,
+.sheet-size[value="12"] ~ .sheet-clock-container .sheet-input-progress[value="9"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(180deg, transparent 50%, red 50%), linear-gradient(90deg, white 50%, red 50%);
+}
+.sheet-size[value="4"] ~ .sheet-clock-container .sheet-input-progress[value="4"]:checked ~ .sheet-clock,
+.sheet-size[value="6"] ~ .sheet-clock-container .sheet-input-progress[value="6"]:checked ~ .sheet-clock,
+.sheet-size[value="8"] ~ .sheet-clock-container .sheet-input-progress[value="8"]:checked ~ .sheet-clock,
+.sheet-size[value="10"] ~ .sheet-clock-container .sheet-input-progress[value="10"]:checked ~ .sheet-clock,
+.sheet-size[value="12"] ~ .sheet-clock-container .sheet-input-progress[value="12"]:checked ~ .sheet-clock {
+  background: red;
+}
+.sheet-size[value="6"] ~ .sheet-clock-container .sheet-input-progress[value="1"]:checked ~ .sheet-clock,
+.sheet-size[value="12"] ~ .sheet-clock-container .sheet-input-progress[value="2"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(90deg, white 50%, transparent 50%), linear-gradient(150deg, red 50%, white 50%);
+}
+.sheet-size[value="6"] ~ .sheet-clock-container .sheet-input-progress[value="2"]:checked ~ .sheet-clock,
+.sheet-size[value="12"] ~ .sheet-clock-container .sheet-input-progress[value="4"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(90deg, white 50%, transparent 50%), linear-gradient(210deg, red 50%, white 50%);
+}
+.sheet-size[value="6"] ~ .sheet-clock-container .sheet-input-progress[value="4"]:checked ~ .sheet-clock,
+.sheet-size[value="12"] ~ .sheet-clock-container .sheet-input-progress[value="8"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(150deg, transparent 50%, red 50%), linear-gradient(90deg, white 50%, red 50%);
+}
+.sheet-size[value="6"] ~ .sheet-clock-container .sheet-input-progress[value="5"]:checked ~ .sheet-clock,
+.sheet-size[value="12"] ~ .sheet-clock-container .sheet-input-progress[value="10"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(210deg, transparent 50%, red 50%), linear-gradient(90deg, white 50%, red 50%);
+}
+.sheet-size[value="8"] ~ .sheet-clock-container .sheet-input-progress[value="1"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(90deg, white 50%, transparent 50%), linear-gradient(135deg, red 50%, white 50%);
+}
+.sheet-size[value="8"] ~ .sheet-clock-container .sheet-input-progress[value="3"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(90deg, white 50%, transparent 50%), linear-gradient(225deg, red 50%, white 50%);
+}
+.sheet-size[value="8"] ~ .sheet-clock-container .sheet-input-progress[value="5"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(135deg, transparent 50%, red 50%), linear-gradient(90deg, white 50%, red 50%);
+}
+.sheet-size[value="8"] ~ .sheet-clock-container .sheet-input-progress[value="7"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(225deg, transparent 50%, red 50%), linear-gradient(90deg, white 50%, red 50%);
+}
+.sheet-size[value="10"] ~ .sheet-clock-container .sheet-input-progress[value="1"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(90deg, white 50%, transparent 50%), linear-gradient(126deg, red 50%, white 50%);
+}
+.sheet-size[value="10"] ~ .sheet-clock-container .sheet-input-progress[value="2"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(90deg, white 50%, transparent 50%), linear-gradient(162deg, red 50%, white 50%);
+}
+.sheet-size[value="10"] ~ .sheet-clock-container .sheet-input-progress[value="3"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(90deg, white 50%, transparent 50%), linear-gradient(198deg, red 50%, white 50%);
+}
+.sheet-size[value="10"] ~ .sheet-clock-container .sheet-input-progress[value="4"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(90deg, white 50%, transparent 50%), linear-gradient(234deg, red 50%, white 50%);
+}
+.sheet-size[value="10"] ~ .sheet-clock-container .sheet-input-progress[value="6"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(126deg, transparent 50%, red 50%), linear-gradient(90deg, white 50%, red 50%);
+}
+.sheet-size[value="10"] ~ .sheet-clock-container .sheet-input-progress[value="7"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(162deg, transparent 50%, red 50%), linear-gradient(90deg, white 50%, red 50%);
+}
+.sheet-size[value="10"] ~ .sheet-clock-container .sheet-input-progress[value="8"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(198deg, transparent 50%, red 50%), linear-gradient(90deg, white 50%, red 50%);
+}
+.sheet-size[value="10"] ~ .sheet-clock-container .sheet-input-progress[value="9"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(234deg, transparent 50%, red 50%), linear-gradient(90deg, white 50%, red 50%);
+}
+.sheet-size[value="12"] ~ .sheet-clock-container .sheet-input-progress[value="1"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(90deg, white 50%, transparent 50%), linear-gradient(120deg, red 50%, white 50%);
+}
+.sheet-size[value="12"] ~ .sheet-clock-container .sheet-input-progress[value="5"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(90deg, white 50%, transparent 50%), linear-gradient(240deg, red 50%, white 50%);
+}
+.sheet-size[value="12"] ~ .sheet-clock-container .sheet-input-progress[value="7"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(120deg, transparent 50%, red 50%), linear-gradient(90deg, white 50%, red 50%);
+}
+.sheet-size[value="12"] ~ .sheet-clock-container .sheet-input-progress[value="11"]:checked ~ .sheet-clock {
+  background-image: linear-gradient(240deg, transparent 50%, red 50%), linear-gradient(90deg, white 50%, red 50%);
+}
+/* TEXT INPUTS FOR TRAUMA AND CLOCKS */
+.sheet-text-button {
+	font-weight: bold;
+	input:checked + span {
+		color: #f00;
+	}
+}
+.sheet-size-choice > .sheet-text-button {
+	height: 17px;
+	padding: 3px;
+	flex: 0 0 40%;
+	margin: auto;
+	justify-content: center;
+}
+/* TEETH */
+input.sheet-stresstooth,
+input.sheet-xptooth,
+input.sheet-holdtooth,
+.sheet-stresstooth + span,
+.sheet-xptooth + span,
+.sheet-holdtooth + span {
+	height: 25px;
+}
+input.sheet-regulartooth,
+.sheet-regulartooth + span {
+	height: 13px;
+}
+input.sheet-tooth {
+	width: 12px;
+	margin-right: -12px;
+	&:last-of-type {
+		width: 8px;
+		margin-right: -8px;
+	}
+}
+.sheet-tooth + span {
+	width: 8px;
+	background-size: cover;
+	background-repeat: no-repeat;
+	&:last-child {
+		margin-right: 0 !important;
+	}
+}
+.sheet-tooth:hover + span {
+	opacity: 0.7;
+}
+.sheet-xptooth + span {
+	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/teeth/xptooth-red.png);
+	margin-right: 4px;
+}
+.sheet-tooth:checked ~ .sheet-xptooth + span {
+	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/teeth/xptooth-white.png);
+}
+.sheet-stresstooth[type=radio] + span,
+.sheet-stresstooth[type=checkbox]:checked + span,
+.sheet-holdtooth:checked + span {
+	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/teeth/stresstooth-red.png);
+}
+.sheet-stresstooth[type=checkbox] + span,
+.sheet-tooth:checked ~ .sheet-stresstooth[type=radio] + span,
+.sheet-holdtooth + span {
+	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/teeth/stresstooth-white.png);
+}
+.sheet-regulartooth + span {
+	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/teeth/shorttooth-red.png);
+}
+.sheet-tooth:checked ~ .sheet-regulartooth + span {
+	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/teeth/shorttooth-grey.png);
+}
+input.sheet-zero {
+	width: 13px;
+	height: 13px;
+	margin-right: -13px;
+	vertical-align: top;
+}
+.sheet-zero + span {
+  height: 11px;
+  width: 11px;
+  margin-top: 1px;
+  margin-right: 2px;
+  vertical-align: top;
+  border: 1px solid #000;
+  background: #fff;
+  border-radius: 50%;
+  position: relative;
+}
+.sheet-zero + span::before, .sheet-zero + span::after {
+  position: absolute;
+  width: 1px;
+  content: "";
+  left: 0;
+  background: #000;
+  height: 11px;
+}
+.sheet-zero + span::after {
+  transform: translate(4px,-1px) rotate(135deg);
+}
+.sheet-zero + span::before {
+  transform: translate(4px,-1px) rotate(45deg);
+}
+.sheet-zero:checked + span {
+	visibility: hidden;
+}
+.sheet-coin .sheet-zero + span {
+	position: relative;
+	bottom: 1px;
+	margin-right: auto;
+}
+.sheet-stash {
+	input.sheet-zero, .sheet-zero + span {
+		position: absolute;
+		left: -6px;
+		top: 3px;
+	}
+}
+.sheet-crewcoin {
+	input.sheet-zero, .sheet-zero + span {
+		position: absolute;
+		left: -9px;
+		top: 3px;
+	}
+}
+.sheet-stress2, .sheet-rep2, .sheet-heat2 {
+	input.sheet-zero, .sheet-zero + span {
+		position: absolute;
+		left: -13px;
+		top: 13px;
+	}
+}
+/* TURF RADIOS */
+.sheet-turfbox input[type=radio] {
+	height: 12px;
+	width: calc(100%/12);
+}
+.sheet-turf-input[value="1"]:checked ~ input[type=radio].sheet-turf1 + span,
+.sheet-turf-input[value="2"]:checked ~ input[type=radio].sheet-turf2 + span,
+.sheet-turf-input[value="3"]:checked ~ input[type=radio].sheet-turf3 + span,
+.sheet-turf-input[value="4"]:checked ~ input[type=radio].sheet-turf4 + span,
+.sheet-turf-input[value="5"]:checked ~ input[type=radio].sheet-turf5 + span,
+.sheet-turf-input[value="6"]:checked ~ input[type=radio].sheet-turf6 + span {
+	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/teeth/stresstooth-black.png);
+}
+.sheet-tooth:checked ~ .sheet-stresstooth.sheet-turf6 + span {
+	background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Blades%20in%20the%20Dark/Assets/teeth/stresstooth-halfgrey.png);
+}
+/* SPECIAL ABILITIES*/
+.sheet-specialability,
+.sheet-friend-contact {
+	border-bottom: 1px solid #b3b4b6;
+	width: 100%;
+	align-items: start;
+}
+.sheet-specialability {
+	padding: 4px;
+}
+.sheet-friend-contact {
+	padding: 6px 4px;
+	align-items: center;
+}
+.sheet-abilityname {
+	width: calc(26% - 22px);
+	font-size: 13px;
+	min-height: 17px;
+	margin: 0 auto;
+	line-height: 17px;
+	padding: 0 1px;
+}
+.sheet-abilitydesc {
+	width: 74%;
+	min-height: 32px;
+	font-size: 12px;
+	line-height: 14px;
+	padding: 2px 1px;
+	text-align: justify;
+}
+/* FRIENDS/CONTACTS */
+.sheet-friend-contact .sheet-auto-expand {
+	font-size: 12px;
+	color: #6c6c6c;
+	min-height: 20px;
+	line-height: 16px;
+	flex: 1 1 0;
+	padding: 2px 0 2px 3px;
+}
+/* HARM */
+.sheet-harm {
+	position: relative;
+}
+.sheet-harmrow {
+	border-bottom: 1px solid #000;
+	> div {
+		background: #d6d8d9;
+		height: 52px;
+	}
+	textarea {
+		height: 52px;
+		font-size: 12px;
+		padding: 10px 4px 3px;
+		color: #c43c35;
+		width: 0;
+		flex-grow: 1;
+		resize: none;
+		line-height: 16px;
+		text-align: center;
+
+		&:nth-of-type(2) {
+			border-left: 1px solid #d6d8d9;
+		}
+	}
+	.sheet-harmnumber {
+		width: 12px;
+		line-height: 1;
+		font-size: 13px;
+	}
+	.sheet-harmeffect {
+		width: 59px;
+		color: #575859;
+		font-size: 10px;
+		letter-spacing: 1px;
+		line-height: 1.4;
+	}
+}
+/* HEALING AND ARMOR */
+.sheet-armor, .sheet-healing {
+	.sheet-blackheader {
+		text-align: center;
+		padding: 1px 0 0;
+	}
+}
+.sheet-healing {
+	position: relative;
+	.sheet-healing-progress {
+		line-height: 14px;
+		text-align: center;
+		font-size: 9px;
+	}
+	.sheet-clock-container {
+		margin: 0 auto;
+	}
+}
+.sheet-armor {
+	label {
+		margin: 3px 0 3px 10px;
+		height: 18px;
+		font-size: 11px;
+		text-align: center;
+		line-height: 18px;
+	}
+	.sheet-label {
+		flex-grow: 1;
+		order: 1;
+	}
+	input:checked ~ span {
+		color: #f00;
+	}
+	.sheet-checkbox + span {
+		border: 1px solid #000;
+		margin: 3px;
+		order: 2;
+	}
+}
+/* COIN */
+.sheet-coin-and-stash {
+	width: 96%;
+	margin: 1px 0 0 4%;
+}
+.sheet-coinrow .sheet-label {
+	font-size: 11px;
+	margin-right: auto;
+}
+.sheet-coin {
+	border-bottom: 1px solid #8c8c8c;
+	border-right: 1px solid #8c8c8c;
+	width: 70%;
+	height: 19px;
+	padding: 1px 3px 0 0;
+	align-items: center;
+}
+.sheet-stashbutton-holder {
+	border-top: 1px solid #8c8c8c;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 30%;
+	height: 19px;
+	padding-bottom: 1px;
+}
+/* STASH */
+.sheet-stash {
+	padding: 4px 0 0 6px;
+	line-height: 19px;
+	margin-bottom: -10px;
+	position: relative;
+}
+/* CREW COIN */
+.sheet-crewcoin-coins {
+	padding: 4px 0 0 3px;
+	position: relative;
+}
+.sheet-crewcoin-desc {
+	font-size: 9px;
+	line-height: 14px;
+	padding-left: 3px;
+}
+.sheet-crewcoinbar {
+	border-left: 1px solid #c6c7c9;
+	height: 15px;
+	width: 3px;
+	margin: -1px auto 0;
+}
+/* LEFT-FILLED RADIO BOXES */
+.sheet-crewcoin {
+	input.sheet-radiobox {
+		width: 12px;
+		height: 12px;
+		margin-right: -12px;
+	}
+	.sheet-radiobox + span {
+		width: 11px;
+		height: 11px;
+		margin-right: auto;
+	}
+	input:checked ~ .sheet-radiobox.sheet-vaultcoin + span {
+		border-color: #c6c7c9;
+	}
+}
+.sheet-coin-and-stash {
+	input.sheet-radiobox {
+		width: 13px;
+		height: 13px;
+		vertical-align: top;
+		margin-right: -13px;
+	}
+	.sheet-radiobox + span {
+		width: 12px;
+		height: 12px;
+		vertical-align: top;
+	}
+}
+.sheet-coinrow .sheet-radiobox + span {
+	margin-right: auto;
+}
+.sheet-radiobox:hover + span {
+	opacity: 0.7;
+}
+.sheet-radiobox:last-of-type + span {
+	margin-right: 0;
+}
+.sheet-coin, .sheet-crewcoin {
+	.sheet-radiobox + span {
+		background: #f00;
+		border: 1px solid #000;
+	}
+	input:checked ~ .sheet-radiobox + span {
+		background: #fff;
+	}
+}
+.sheet-stash {
+	.sheet-radiobox + span {
+		background: #000;
+		margin-right: calc((100% - 126px)/9);
+	}
+	input:checked ~ .sheet-radiobox + span {
+		background: #c6c7c9;
+	}
+	input.sheet-radiobox:nth-of-type(10n+1) {
+		margin: -2px -17px 0 3px;
+		width: 15px;
+		height: 15px;
+	}
+	.sheet-radiobox:nth-of-type(10n+1) + span {
+		width: 14px;
+		height: 14px;
+		border: 1px solid #000;
+		margin-left: 3px;
+		margin-right: 0;
+		position:relative;
+		top: -2px;
+	}
+}
+/* HUNTING GROUNDS */
+.sheet-hunting-grounds {
+	input[type=text] {
+		line-height: 22px;
+	}
+	.sheet-auto-expand {
+		font-size: 12px;
+		min-height: 32px;
+		line-height: 16px;
+	}
+}
+/* BONUS DIE SECTION */
+.sheet-bonusdie .sheet-label {
+	font-size: 12px;
+}
+.sheet-bonusdieplus {
+	width: 10%;
+	background: #000;
+	color: #fff;
+	font-size: 13px;
+	line-height: 1;
+	font-weight: bold;
+}
+.sheet-bonusdietext {
+	background: #d6d8d9;
+	width: 90%;
+	padding: 3px;
+	font-size: 11px;
+	line-height: 14px;
+	text-align: center;
+}
+/* REPEATING SECTION CONTROLS */
+.repcontrol button {
+	padding: 6px;
+	background-image: none;
+	background: #d6d8d9;
+	color: #616161;
+	border-radius: 0;
+	border-color: #b3b4b6;
+	transition: all 0.2s;
+	font-family: inherit;
+	font-variant: small-caps;
+	font-weight: bold;
+	&:hover {
+		color: #020202;
+		border-color: #020202;
+		background: #ccc;
+	}
+}
+
+.sheet-white-repcontrol .repcontrol button.btn {
+	background: #fff;
+}
+.sheet-small-repcontrol .repcontrol button,
+.sheet-white-repcontrol .repcontrol button {
+	margin-top: 5px;
+	font-size: 12px;
+	padding: 2px;
+}
+.sheet-cohorts.sheet-white-repcontrol .repcontrol button {
+	margin-top: 0;
+}
+.itemcontrol {
+	z-index: 20;
+}
+.sheet-itemholder .itemcontrol .btn {
+	padding: 0px 7px;
+	line-height: 16px;
+}
+.sheet-factions .itemcontrol .btn {
+	padding: 1px 7px;
+}
+/* STRESS, REP, et cetera */
+.sheet-rep-and-hold, .sheet-heat-and-vault {
+	justify-content: space-between;
+}
+.sheet-hold {
+	width: 53%;
+}
+.sheet-stress, .sheet-rep, .sheet-hold, .sheet-heat {
+	height: 25px;
+}
+.sheet-stress1 {
+	flex: 1 0 auto;
+}
+.sheet-stress2 {
+	flex: 2 1 136px;
+	position: relative;
+}
+.sheet-stress3 {
+	flex: 1 0 68px;
+	text-align: center;
+}
+.sheet-stress4 {
+	flex: 2 0 217px;
+	line-height: 13px;
+	font-size: 9px;
+	padding: 1px 0 0 2px;
+	text-transform: uppercase;
+	div {
+		justify-content: space-between;
+	}
+}
+.sheet-traumata-spaced {
+	letter-spacing: 1px;
+}
+.sheet-traumaholder, .sheet-wantedholder {
+	height: 13px;
+	padding-left: 2px;
+}
+.sheet-rep1 {
+	width: 33px;
+}
+.sheet-rep2 {
+	width: 134px;
+	position: relative;
+}
+.sheet-turfbox {
+	display: flex;
+	position: absolute;
+	flex-flow	: row-reverse;
+	z-index: 2;
+	width: 100%;
+}
+.sheet-turfzero-holder {
+	margin-left: 2px;
+}
+.sheet-hold > div,
+.sheet-hold > label,
+.sheet-heat > div,
+.sheet-rep > div,
+.sheet-crewcoin2 {
+	flex-grow: 1;
+}
+.sheet-heat2 {
+	width: 107px;
+	position: relative;
+}
+.sheet-crewcoin1 {
+	width: 26%;
+}
+.sheet-regulartooth + span,
+.sheet-rep .sheet-tooth + span,
+.sheet-heat2 .sheet-tooth + span,
+.sheet-stress2 .sheet-tooth + span {
+	margin-right: auto;
+}
+.sheet-extra-teeth:checked + .sheet-tooth {
+	+ span {
+		margin-right: 0;
+	}
+	~ .sheet-tooth, + span ~ span {
+		display: none;
+	}
+}
+.sheet-vampirexp:checked ~ .sheet-xptooth + span {
+	margin-right: 2px;
+}
+.sheet-advancement-xpholder .sheet-vampirexp:not(:checked) ~ .sheet-tooth[value="8"] + span,
+.sheet-attribute-xp-box .sheet-vampirexp:not(:checked) ~ .sheet-tooth[value="6"] + span {
+	margin-right: 0;
+}
+/* small fixes */
+.sheet-rep input.sheet-tooth {
+	width: 11px;
+	margin-right: -11px;
+}
+/* NOTES */
+.sheet-notes {
+	margin-left: 1%;
+	font-family: "Shadows Into Light", cursive;
+	color: #c43c35;
+	font-size: 20px;
+	width: 98%;
+	background-image: linear-gradient(transparent 26px, #a7a7a7 0);
+	background-size: 100% 27px;
+	line-height: 27px;
+	height: 378px;
+	min-height: 378px;
+}
+.sheet-type-character, .sheet-type-crew {
+	.sheet-notes {
+	margin-top: 15px;
+	}
+}
+/* LOAD CHECKBOXES */
+.sheet-loadheader .sheet-checkbox + span {
+	border: 1px solid #000;
+	transform: rotate(45deg);
+	width: 10px;
+	height: 10px;
+	background: #fff;
+}
+/* ROLL BUTTONS */
+button[type=roll].sheet-rollbutton {
+	display: flex;
+	border: none;
+	margin: 0;
+	padding: 0;
+}
+.sheet-attribute-title button[type=roll].sheet-rollbutton {
+	max-width: calc(100% - 97px);
+	line-height: inherit;
+	color: inherit;
+	font-size: 13px;
+}
+.sheet-action button[type=roll].sheet-rollbutton {
+	letter-spacing: 1px;
+	line-height: 13px;
+	flex: 0 0 86px;
+	font-size: 13px;
+}
+.sheet-coinrow button[type=roll].sheet-rollbutton {
+	font-size: 11px;
+	color: #717275;
+}
+.sheet-blackheader button[type=roll].sheet-rollbutton {
+	margin:auto;
+}
+button[type=roll].sheet-borderbutton {
+	color: #616161;
+	font-size: 13px;
+	border-color: #b3b4b6;
+}
+button[type=roll].sheet-vicebutton {
+	float: right;
+	margin: 5px 3px -5px auto;
+	line-height: 13px;
+	padding: 4px;
+}
+button[type=roll].sheet-fortunebutton {
+	width: 100%;
+	height: 30px;
+	margin: 10px 0 0;
+}
+.sheet-type-faction button[type=roll].sheet-fortunebutton {
+	width: 100px;
+	margin: 0;
+}
+button[type=roll].sheet-engagementbutton {
+	width: calc(100% - 20px);
+	padding: 2px 5px;
+	height: 30px;
+	margin: 10px 10px 0;
+}
+button[type=roll].sheet-rollbutton:hover {
+	color: #f00;
+}
+button[type=roll].sheet-borderbutton:hover {
+	color: #020202;
+	border-color: #020202;
+}
+/* CHECKBOXES */
+.sheet-checkbox {
+	margin-right: -12px;
+}
+input.sheet-checkbox, .sheet-checkbox + span {
+	height: 12px;
+	width: 12px;
+	flex: 0 0 auto;
+}
+.sheet-checkbox + span {
+	border: 1px solid #838587;
+}
+.sheet-checkbox:checked + span {
+	background: #f00;
+}
+.sheet-checkbox:hover + span {
+	opacity: 0.7;
+}
+.sheet-squarebox + span {
+	background: transparent;
+	margin-right: 3px;
+}
+.sheet-circlebox + span {
+	border-radius: 50%;
+	background: #fff;
+}
+input.sheet-checkbox.sheet-squarebox-small, .sheet-checkbox.sheet-squarebox-small + span {
+	height: 9px;
+	width: 9px;
+}
+.sheet-checkbox.sheet-squarebox-small:checked + span {
+	background: #000;
+}
+.sheet-claimbridge {
+	position: relative;
+}
+.sheet-claimbridge input, .sheet-claimbridge span {
+	width: 100%;
+	height: 100%;
+}
+.sheet-claimbridge input:checked + span {
+	background: #d6d8d9;
+}
+/* Change text colour when boxes are checked*/
+.sheet-specialability :checked ~ .sheet-abilityname,
+.sheet-item .sheet-checkbox:checked ~ .sheet-itemname,
+.sheet-friend .sheet-friendup:checked ~ .sheet-auto-expand {
+	color: #f00;
+}
+.sheet-friend-contact :checked ~ .sheet-auto-expand {
+	font-weight: bold;
+}
+.sheet-friend .sheet-frienddown:checked ~ .sheet-auto-expand,
+.sheet-contact .sheet-contact-check:checked ~ .sheet-auto-expand  {
+	color: #222;
+}
+/* specific adjustments */
+.sheet-specialability .sheet-checkbox,
+.sheet-specialability .sheet-checkbox + span {
+	margin-top: 3px;
+}
+.sheet-actions input.sheet-checkbox {
+	height: 20px;
+	width: 16px;
+	margin-right: -14px;
+}
+.sheet-actions .sheet-checkbox + span {
+	height: 11px;
+	width: 11px;
+	border: none;
+	margin-right: calc(7px + (100% - 173px)/8);
+}
+.sheet-action .sheet-checkbox + span:first-of-type {
+	margin-right: 6px;
+}
+.sheet-action .sheet-darktalent:checked ~ .sheet-checkbox + span:first-of-type {
+	margin-right: 4px;
+}
+.sheet-action .sheet-darktalent:checked ~ .sheet-checkbox + span:not(:first-of-type) {
+	margin-right: calc(3px + (100% - 171px)/10);
+}
+.sheet-action .sheet-darktalent:checked ~ .sheet-checkbox + span:last-of-type {
+	margin-right: calc(4px + (100% - 171px)/10);
+}
+/* Fake radios */
+.sheet-checkbox.sheet-fakeradio + span {
+	background: #f00;
+}
+.sheet-action .sheet-fakeradio:checked ~ .sheet-fakeradio + span {
+	background: #c6c7c9;
+}
+.sheet-tier .sheet-fakeradio:checked ~ .sheet-fakeradio + span {
+	background: #fff;
+}
+/* HIDER */
+.sheet-darktalent:not(:checked) ~ input:last-of-type,
+.sheet-darktalent:not(:checked) ~ input:last-of-type + span {
+	display: none;
+}
+/* Friend triangles */
+.sheet-friend-contact {
+	.sheet-checkbox + span {
+		width: 0;
+		height: 0;
+		background: transparent;
+		border-color: transparent;
+	}
+	label {
+		width: 12px;
+		height: 12px;
+		position: relative;
+	}
+}
+.sheet-friend label {
+	&.sheet-up {
+		margin-right: 1px;
+		top: -1px;
+		.sheet-checkbox + span {
+			border-width: 0 5px 10px;
+			border-bottom-color: #fff;
+		}
+		.sheet-checkbox:checked + span {
+			border-bottom-color: #f00;
+		}
+	}
+	&.sheet-down {
+		top: 5px;
+		.sheet-checkbox + span {
+			border-width: 10px 5px 0;
+			border-top-color: #fff;
+		}
+		.sheet-checkbox:checked + span {
+			border-top-color: #000;
+		}
+	}
+}
+.sheet-contact label {
+	top: 1px;
+	.sheet-checkbox + span {
+		border-width: 5px 0 5px 10px;
+		border-left-color: #fff;
+	}
+	.sheet-checkbox:checked + span {
+		border-left-color: #000;
+	}
+}
+/* ACTION RATINGS */
+.sheet-attribute,
+.sheet-cohort {
+	margin-bottom: 10px;
+}
+.sheet-attribute-title,
+.sheet-cohort-title {
+	height: 21px;
+	line-height: 21px;
+	color: #fff;
+	background: #000;
+	padding: 0 3px;
+	align-items: center;
+	justify-content: space-between;
+}
+.sheet-attribute-xp-box {
+	width: 97px;
+	justify-content: flex-end;
+	height: 100%;
+}
+.sheet-actioncolumn {
+	flex-grow: 1;
+}
+.sheet-actions {
+	padding-left: 2px;
+}
+.sheet-action {
+	height: 22px;
+	align-items: center;
+}
+.sheet-action:first-child {
+	height: 34px;
+	padding-top: 12px;
+}
+.sheet-divider {
+	margin-right: calc(5px + (100% - 173px)/12);
+	border-right: 1px solid #000;
+	height: inherit;
+}
+.sheet-darktalent:checked ~ .sheet-divider {
+	margin-right: calc(3px + (100% - 173px)/15)
+}
+.sheet-action:first-child .sheet-divider {
+	position: relative;
+	top: -6px;
+}
+/* COHORTS */
+.sheet-cohorts .repcontrol {
+	height: 28px;
+}
+.sheet-cohort-title {
+	font-size: 11px;
+	input[type=text] {
+		width: calc(100% - 40px);
+	}
+}
+.sheet-cohort-info {
+	background: #000;
+	height: 13px;
+	font-size: 9px;
+	color: #fff;
+	line-height: 13px;
+	input[type=text] {
+		flex: 1 1 0;
+		padding: 0 3px;
+	}
+	input[type=number] {
+		flex: 0 0 auto;
+		color: inherit;
+		background: transparent;
+		border: none;
+		border-radius: 0;
+		padding: 0 0 0 4px;
+		line-height: inherit;
+		width: 13px;
+		-moz-appearance: textfield;
+		font-size: 11px;
+		font-family: "Times New Roman", Times, serif;
+		&::-webkit-outer-spin-button, &::-webkit-inner-spin-button {
+			margin: 0;
+			-webkit-appearance: none;
+		}
+	}
+}
+.sheet-cohort-quality-label {
+	flex: 0 0 auto;
+}
+.sheet-cohort-condition {
+	justify-content: space-between;
+}
+.sheet-cohort-condition-name {
+	font-size: 7.5px;
+	margin-right: 2px;
+	z-index: -1;
+}
+.sheet-cohort-dropdown {
+	background: #000;
+	position: relative;
+	z-index: 1;
+	width: 41px;
+	height: 13px;
+	padding-left: 3px;
+	flex: 0 0 auto;
+	overflow: hidden;
+	transition: all 0.2s;
+	&:hover {
+		height: 39px;
+		> div:first-child {
+			display: none;
+		}
+	}
+	input[type=radio] {
+		width: 39px;
+		margin-right: -39px;
+		vertical-align: top;
+		height: 13px;
+		z-index: 10;
+		&:checked + span {
+			color: #f00;
+		}
+	}
+}
+.sheet-cohort-edgeflaw {
+	font-size: 9px;
+	line-height: 10px;
+	margin: 2px 0;
+	align-items: start;
+	.sheet-uppercase {
+		width: 34px;
+		padding: 2px 0;
+	}
+	.sheet-auto-expand {
+		width: calc(100% - 34px);
+		min-height: 14px;
+		padding: 2px 3px;
+	}
+}
+.sheet-cohort-description {
+	font-size: 9px;
+	padding: 1px 0;
+	line-height: 12px;
+	height: 50px;
+	border-bottom: 1px solid #d3d3d3;
+}
+/* CLAIMS */
+.sheet-claims {
+	margin-top: 15px;
+}
+.sheet-claimsrow {
+	align-items: center;
+}
+.sheet-claimsrow > div, .sheet-claimsrow > label {
+	flex: 0 0 auto;
+}
+.sheet-claimbox {
+	background: #d6d8d9;
+	width: 18.4%;
+	position: relative;
+	transition: all 0.2s;
+}
+.sheet-claimbox,
+.sheet-lairbox {
+	height: 66px;
+}
+.sheet-claims-seprow {
+	height: 12px;
+	justify-content: space-between;
+}
+.sheet-lairbox {
+	background: #808080;
+	width: 18.4%;
+	font-size: 13px;
+	color: #fff;
+	letter-spacing: 1px;
+}
+.sheet-claims-horisep {
+	height: 12px;
+	display: flex;
+	width: 2%;
+}
+.sheet-claims-vertsep {
+	display: flex;
+	width: 12px;
+	margin: 0 calc(9.2% - 6px);
+}
+.sheet-claimbox .sheet-label {
+	height: 30px;
+	padding: 4px 0 2px;
+	line-height: 12px;
+}
+.sheet-claimbox textarea {
+	text-align: center;
+	font-size: 9px;
+	resize: none;
+}
+.sheet-claimbox textarea.sheet-claim-desc {
+	height: 36px;
+	padding: 2px 2.5% 4px;
+	line-height: 10px;
+}
+.sheet-claimbox label {
+	position: absolute;
+	bottom: 1px;
+	left: 1px;
+}
+input:checked + .sheet-claimbox {
+	background: #c1c4c5;
+}
+/* STRICTURES */
+.sheet-strictures {
+	font-size: 11px;
+	line-height: 1.6;
+	text-align: justify;
+}
+.sheet-strictures label {
+	margin-right: 3px;
+	display: inline-flex;
+	vertical-align: top;
+	align-items: center;
+}
+.sheet-strictures span.sheet-label::after {
+	content: ":";
+}
+/* ALCHEMICALS */
+.sheet-title-checkbox ~ div {
+	height: auto;
+	transition: all 0.2s;
+	overflow: hidden;
+}
+.sheet-title-checkbox:not(:checked) ~ div {
+	height: 0;
+}
+input.sheet-title-checkbox {
+	width: 100%;
+	vertical-align: top;
+	margin-right: -100%;
+	height: 24px;
+}
+.sheet-title-checkbox:hover + span {
+	color: #f00;
+}
+.sheet-alchemicals {
+	padding: 0 5px;
+	line-height: 16px;
+}
+.sheet-bandolier-desc {
+	line-height: 12px;
+	margin-top: 2px;
+	font-size: 10px;
+}
+.sheet-bandoliers-name {
+	margin-right: 7px;
+	font-size: 12px;
+	line-height: 18px;
+}
+.sheet-bandolier input:nth-of-type(3) + span {
+	margin-right: 8px;
+}
+.sheet-alchemicals .repcontainer {
+	display: flex;
+	flex-flow: row wrap;
+}
+.sheet-alchemicals .repitem {
+	font-size: 11px;
+	width: 50%;
+}
+.sheet-alchemicals .sheet-auto-expand {
+	margin: 0 1px 0 7px;
+	padding: 1px;
+	min-height: 16px;
+	line-height: 14px;
+	width: calc(100% - 8px);
+}
+input.sheet-alchemicals-expand {
+	width: 10px;
+	position: absolute;
+	height: 16px;
+}
+.sheet-alchemicals-expand + span {
+	transform: rotate(45deg) scale(0.9);
+	position: absolute;
+}
+.sheet-alchemicals-expand:not(:checked) ~ .sheet-alchemicals-info {
+	display: none;
+}
+.sheet-alchemicals-info {
+	position: relative;
+	font-size: 9px;
+	z-index: 2;
+	background: white;
+	line-height: 1.3;
+	height: 64px;
+	width: 200%;
+	padding: 2px;
+	border: 1px solid #d3d3d3;
+}
+.sheet-alchemicals .repitem:nth-child(even) .sheet-alchemicals-info {
+	left: -100%;
+}
+.sheet-alchemicals-expand + span::before {
+	content: '■';
+}
+.sheet-alchemicals-expand:checked + span {
+	color: #f00;
+}
+.sheet-alchemicals .itemcontrol .btn {
+	padding: 0 4px;
+	font-size: 9px;
+	line-height: 14px;
+}
+.sheet-alchemicals .repcontrol_del {
+	order: 1;
+}
+.sheet-alchemicals .repcontainer.editmode .repitem .itemcontrol {
+	display: flex;
+	justify-content: space-between;
+	align-items: start;
+}
+/* FRAME */
+.sheet-frame textarea {
+	font-size: 11px;
+	height: 40px;
+}
+/* FACTIONS PAGE */
+.sheet-type-faction .repcontrol {
+	height: 38px;
+}
+.sheet-factions {
+	justify-content: space-between;
+}
+.sheet-factiontitle {
+	margin-bottom: 10px;
+	align-items: center;
+}
+.sheet-factiontitle input[type=text] {
+	font-size: 26px;
+	margin-right: auto;
+	width: 60%;
+}
+.sheet-factions-header {
+	width: 100%;
+	height: 24px;
+	align-items: center;
+	line-height: 14px;
+	background: #ccc;
+}
+.sheet-factions-header input[type=text] {
+	padding-left: 3px;
+}
+.sheet-factions-header span {
+	font-size: 7px;
+}
+input.sheet-expand, .sheet-expand + span {
+	position: absolute;
+	width: 7px;
+	height: 10px;
+	font-size: 8px;
+}
+.sheet-type-faction .sheet-expand + span::before {
+	content: "▶";
+}
+.sheet-type-faction .sheet-expand {
+	left: -7px;
+	top: 6px;
+}
+.sheet-type-faction .sheet-expand + span {
+	top: 3px;
+	left: -7px;
+}
+.sheet-expand:checked + span::before {
+	content: "▼";
+}
+.sheet-faction {
+	border-bottom: 1px solid #d3d3d3;
+}
+.sheet-faction textarea {
+	border-top: 1px solid #d3d3d3;
+	font-size: 11px;
+	line-height: 1.5;
+	height: 51px;
+}
+.sheet-expand:not(:checked) ~ textarea {
+	height: 0 !important;
+	border-width: 0;
+}
+.sheet-faction input[type=number] {
+	border: none;
+	background: transparent;
+	padding: 0;
+	font-size: 12px;
+}
+.sheet-faction input[type=text] {
+	border-right: 1px solid #d3d3d3;
+	font-size: 12px;
+	padding: 2px 1px;
+}
+/* Column widths */
+.sheet-faction-name, input[type=text].sheet-faction-name {
+	width: 65%;
+}
+.sheet-faction-tier, input[type=text].sheet-faction-tier {
+	width: 10%;
+	text-align: center;
+}
+.sheet-faction-hold, input[type=text].sheet-faction-hold {
+	width: 10%;
+	text-align: center;
+}
+.sheet-faction-status, input[type=number].sheet-faction-status {
+	width: 15%;
+	text-align: center;
+}
+/* War blurb */
+.sheet-warblurb {
+	text-align: justify;
+}
+.sheet-warblurb .sheet-label {
+	font-size: 14px;
+}
+.sheet-warblurb li {
+	margin-bottom: .5em;
+	padding-left: 1em;
+}
+/* Generate button */
+label.sheet-generatebutton {
+	color: #616161;
+	border: 1px solid #b3b4b6;
+}
+label.sheet-generatebutton:hover {
+	color: #000;
+	border-color: #000;
+}
+label.sheet-generatebutton:hover input + span {
+	opacity: 1;
+}
+.sheet-type-faction label.sheet-generatebutton {
+	font-size: 13px;
+	padding: 0 6px;
+	align-items: center;
+	margin: 0 6px;
+	font-weight: bold;
+	height: 30px;
+}
+.sheet-settings label.sheet-generatebutton {
+	padding: 2px;
+	line-height: 12px;
+	margin: 0 4px;
+	font-size: 11px;
+}
+/* Auto-expand textareas */
+.sheet-auto-expand {
+	position: relative;
+	cursor: text;
+	word-wrap: break-word;
+	span {
+		visibility: hidden;
+		white-space: pre-wrap;
+		display: block;
+	}
+	textarea {
+		position: absolute;
+		overflow: hidden;
+		z-index: 1;
+		top: 0;
+		left: 0;
+		resize: none;
+		height: 100%;
+		word-wrap: break-word;
+		padding: inherit;
+		font: inherit;
+		color: inherit;
+		text-transform: inherit;
+		letter-spacing: inherit;
+		text-align: inherit;
+	}
+}
+/* Broadcast buttons */
+.sheet-input-show-broadcast:not(:checked) ~ .sheet-container .sheet-broadcast-button {
+	display: none;
+}
+button[type=roll].sheet-broadcast-button {
+	font-family: pictos;
+	position: absolute;
+	border: none;
+	margin: 0;
+	padding: 0;
+	z-index: 3;
+}
+.sheet-specialability button[type=roll].sheet-broadcast-button {
+	font-size: 12px;
+	line-height: 14px;
+	height: 14px;
+	width: 14px;
+	color: #777;
+	left: 3px;
+	bottom: 7px;
+}
+.sheet-clocks button[type=roll].sheet-broadcast-button {
+	font-size: 11px;
+	line-height: 11px;
+	height: 12px;
+	width: 12px;
+	color: #777;
+	right: 0;
+	bottom: 2px;
+}
+.sheet-harm button[type=roll].sheet-broadcast-button {
+	color: #fff;
+	font-weight: normal;
+	font-size: 11px;
+	line-height: 11px;
+	right: 2px;
+	top: 1px;
+}
+
+/* Kirsty */
+.sheet-use-kirsty:checked ~ .sheet-container {
+	.sheet-specialheader,
+	.sheet-blackheader,
+	.sheet-greyheader,
+	.sheet-black-on-grey,
+	.sheet-playbook input[type="text"],
+	.sheet-plainheader,
+	.sheet-itemheader :first-child,
+	.sheet-loadheader :first-child,
+	.sheet-attribute-title button[type=roll].sheet-rollbutton,
+	.sheet-bonusdie > .sheet-label:first-child,
+	.sheet-cohort-title,
+	.sheet-claimbox .sheet-label,
+	.sheet-lairbox,
+	.sheet-crewheader,
+	.sheet-factiontitle input[type="text"],
+	.sheet-factions-header input[type="text"] {
+		font-family: Kirsty, Georgia, serif;
+	}
+	.sheet-claimbox .sheet-label {
+		font-size: 10px;
+		font-weight: 400;
+	}
+	.sheet-specialheader, .sheet-itemheader :first-child, .sheet-loadheader :first-child {
+		font-size: 12px;
+		font-weight: 400;
+	}
+	.sheet-plainheader, .sheet-cohort-title {
+		font-size: 13px;
+		font-weight: 400;
+	}
+	.sheet-factions-header input[type="text"],
+	.sheet-bonusdie > .sheet-label:first-child {
+		font-size: 14px;
+		font-weight: 400;
+	}
+	.sheet-attribute-title button[type=roll].sheet-rollbutton, .sheet-lairbox {
+		font-size: 15px;
+		font-weight: 400;
+	}
+	.sheet-crewheader {
+		font-size: 29px;
+		letter-spacing: 0;
+	}
+	.sheet-factiontitle input[type="text"] {
+		font-size: 32px;
+	}
+	.sheet-playbook input[type="text"] {
+		font-size: 40px;
+		letter-spacing: 0;
+	}
+	.sheet-blackheader, .sheet-greyheader, .sheet-black-on-grey {
+		.sheet-label, button[type="roll"].sheet-label {
+			font-size: 12px;
+			font-weight: 400;
+		}
+	}
+}
