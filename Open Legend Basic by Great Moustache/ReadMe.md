@@ -5,6 +5,11 @@
 
 ### Changelog
 
+### 1.8.9.91 on 2017 November 27th
+* Inventory, Notes, Goals, Beliefs, & Instincts can now be sent to chat
+* Inventory Area Re-worked
+
+
 ### 1.8.9.9 on 2017 November 18th
 * Fixed Default (Dis)Advantage not always popping up correctly
 * Updated Attribute description text
