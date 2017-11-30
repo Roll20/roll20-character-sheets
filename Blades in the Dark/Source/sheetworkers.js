@@ -1,6 +1,6 @@
 "use strict";
 /* DATA */
-const sheetVersion = "2.4",
+const sheetVersion = "2.5",
 	crewData = {
 		assassins: {
 			base: {
@@ -1534,20 +1534,13 @@ const crewAttributes = [...new Set([].concat(...Object.keys(crewData).map(x => O
 		'playbookitem',
 		'upgrade'
 	],
-	headerInfoAttrs = [
-		'heritage',
-		'background',
-		'vice_purveyor',
-		'hull_functions',
-		'crew_deity_features'
-	],
 	spiritPlaybooks = ['ghost', 'hull', 'vampire'];
 /* EVENT HANDLERS */
 /* Set default fields when setting crew type or playbook */
 on('change:crew_type change:playbook', event => {
-	getAttrs(['changed_attributes', 'setting_autofill', ...watchedAttributes], v => {
+	getAttrs(['playbook', 'crew_type', 'changed_attributes', 'setting_autofill', ...watchedAttributes], v => {
 		const changedAttributes = (v.changed_attributes || '').split(','),
-			sourceName = event.newValue.toLowerCase(),
+			sourceName = (event.sourceAttribute === 'crew_type' ? v.crew_type : v.playbook).toLowerCase(),
 			fillBaseData = (data, defaultAttrNames) => {
 				if (data) {
 					const finalSettings = defaultAttrNames.filter(name => !changedAttributes.includes(name))
@@ -1565,7 +1558,7 @@ on('change:crew_type change:playbook', event => {
 					mySetAttrs(finalSettings);
 				}
 			};
-		if (event.newValue) {
+		if (sourceName) {
 			setAttr('show_playbook_reminder', '0');
 		}
 		if (v.setting_autofill !== '1') return;
@@ -1677,10 +1670,6 @@ handleBoxesFill('upgrade_24_check_', true);
 handleBoxesFill('bandolier1_check_');
 handleBoxesFill('bandolier2_check_');
 ['item', 'playbookitem', 'upgrade'].forEach(sName => handleBoxesFill(`repeating_${sName}:check_`));
-/* Handle showing options for heritage, background, and vice */
-headerInfoAttrs.forEach(name => {
-	on(`change:${name}`, event => setAttr(`show_${name}_info`, event.newValue ? '0' : '1'));
-});
 /* Pseudo-radios */
 ['crew_tier', ...actionsFlat].forEach(name => {
 	on(`change:${name}`, event => {
@@ -1744,9 +1733,12 @@ on('change:setting_consequence_query sheet:opened', () => {
 /* Trim whitespace in auto-expand fields */
 autoExpandFields.forEach(name => {
 	on(`change:${name}`, event => {
-		if (event.newValue.trim() !== event.newValue && event.sourceType === 'player') {
-			setAttr(name.replace(':', '_'), event.newValue.trim());
-		}
+		const attrName = name.replace(':', '_');
+		getAttrs([attrName], v => {
+			if (v[attrName].trim() !== v[attrName] && event.sourceType === 'player') {
+				setAttr(attrName, v[attrName].trim());
+			}
+		});
 	});
 });
 /* INITIALISATION AND UPGRADES */
@@ -2274,16 +2266,6 @@ on('sheet:opened', () => {
 								upgradeSheet('1.12');
 							});
 						});
-					});
-				}
-				// Upgrade to 1.13: Header info
-				else if (versionMajor === 1 && versionMinor < 13) {
-					getAttrs(['heritage', 'background', 'vice_purveyor', 'hull_functions', 'crew_deity_features'], v => {
-						const setting = {};
-						Object.keys(v).forEach(name => {
-							if (v[name]) setting[`show_${name}_info`] = '0';
-						});
-						mySetAttrs(setting, {}, () => upgradeSheet('1.13'));
 					});
 				}
 				// Upgrade to 2.0: Rename trauma attributes, frame feature migration
