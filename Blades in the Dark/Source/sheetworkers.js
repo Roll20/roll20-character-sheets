@@ -1,6 +1,7 @@
 "use strict";
 /* DATA */
-const crewData = {
+const sheetVersion = "2.5",
+	crewData = {
 		assassins: {
 			base: {
 				claim_1_desc: "claim_training_rooms_description",
@@ -1268,7 +1269,22 @@ const crewData = {
 		upgrade_22_check_1: "0",
 		upgrade_6_check_1: "0",
 		wreck: "0"
-	};
+	},
+	alchemicalData = [
+		"alcahest",
+		"binding_oil",
+		"drift_oil",
+		"drown_powder",
+		"eyeblind_poison",
+		"fire_oil",
+		"grenade",
+		"quicksilver",
+		"skullfire_poison",
+		"smoke_bomb",
+		"spark_drug",
+		"standstill_poison",
+		"trance_powder",
+	];
 /* Transform data once translations are known */
 Object.keys(crewData).forEach(crew => {
 	const base = crewData[crew].base,
@@ -1314,6 +1330,11 @@ Object.keys(factionsData).forEach(x => {
 	factionsData[x].forEach(faction => {
 		faction.name = getTranslationByKey(faction.name);
 	});
+});
+alchemicalData.forEach((v, k) => {
+	alchemicalData[k] = {
+		name: getTranslationByKey(v)
+	};
 });
 Object.keys(playbookData).forEach(playbook => {
 	const base = playbookData[playbook].base,
@@ -1495,6 +1516,7 @@ const crewAttributes = [...new Set([].concat(...Object.keys(crewData).map(x => O
 		'repeating_factionclock:name',
 		'repeating_cohort:edges',
 		'repeating_cohort:flaws',
+		'repeating_alchemical:name',
 		'xp_condition',
 		'xp_condition_extra',
 		'xp_condition2',
@@ -1503,14 +1525,22 @@ const crewAttributes = [...new Set([].concat(...Object.keys(crewData).map(x => O
 		'hunting_grounds_description',
 		'cohort1_edges',
 		'cohort1_flaws',
-	];
+	],
+	autogenSections = [
+		'ability',
+		'crewability',
+		'friend',
+		'contact',
+		'playbookitem',
+		'upgrade'
+	],
+	spiritPlaybooks = ['ghost', 'hull', 'vampire'];
 /* EVENT HANDLERS */
 /* Set default fields when setting crew type or playbook */
 on('change:crew_type change:playbook', event => {
-	getAttrs(['changed_attributes', 'setting_autofill', ...watchedAttributes], v => {
-		const spiritPlaybooks = ['ghost', 'hull', 'vampire'],
-			changedAttributes = (v.changed_attributes || '').split(','),
-			sourceName = event.newValue.toLowerCase(),
+	getAttrs(['playbook', 'crew_type', 'changed_attributes', 'setting_autofill', ...watchedAttributes], v => {
+		const changedAttributes = (v.changed_attributes || '').split(','),
+			sourceName = (event.sourceAttribute === 'crew_type' ? v.crew_type : v.playbook).toLowerCase(),
 			fillBaseData = (data, defaultAttrNames) => {
 				if (data) {
 					const finalSettings = defaultAttrNames.filter(name => !changedAttributes.includes(name))
@@ -1528,7 +1558,7 @@ on('change:crew_type change:playbook', event => {
 					mySetAttrs(finalSettings);
 				}
 			};
-		if (event.newValue) {
+		if (sourceName) {
 			setAttr('show_playbook_reminder', '0');
 		}
 		if (v.setting_autofill !== '1') return;
@@ -1543,17 +1573,18 @@ on('change:crew_type change:playbook', event => {
 			fillRepeatingSectionFromData('ability', playbookData[sourceName].ability, true);
 			fillRepeatingSectionFromData('playbookitem', playbookData[sourceName].playbookitem, true);
 			fillBaseData(playbookData[sourceName].base, playbookAttributes);
+			if (sourceName === 'leech') fillRepeatingSectionFromData('alchemical', alchemicalData);
 		}
 	});
 });
 /* Watch repeating rows for changes and set autogen to false if change happens*/
-['ability', 'crewability', 'friend', 'contact', 'playbookitem', 'upgrade'].forEach(sectionName => {
+autogenSections.forEach(sectionName => {
 	on(`change:repeating_${sectionName}`, event => {
-		const idMatch = event.sourceAttribute.match(new RegExp(`^repeating_${sectionName}_(.*?)_`)),
-			id = idMatch && idMatch[1];
-		if (id && event.sourceType === 'player') {
-			setAttr(`repeating_${sectionName}_${id}_autogen`, '');
-		}
+		getAttrs([`repeating_${sectionName}_autogen`], v => {
+			if (v[`repeating_${sectionName}_autogen`] && event.sourceType === 'player') {
+				setAttr(`repeating_${sectionName}_autogen`, '');
+			}
+		});
 	});
 });
 /* Watch for changes in auto-set attributes and update changed_attributes*/
@@ -1599,7 +1630,7 @@ on('change:generate_factions', () => {
 		fillRepeatingSectionFromData(sectionName, factionsData[sectionName]);
 	});
 });
-['ability', 'crewability', 'playbookitem', 'upgrade', 'friend', 'contact'].forEach(sectionName => {
+autogenSections.forEach(sectionName => {
 	on(`change:generate_${sectionName}`, () => {
 		getAttrs(['generate_source_character', 'generate_source_crew', 'sheet_type'], v => {
 			const data = (v.sheet_type === 'character') ? playbookData : crewData,
@@ -1612,14 +1643,7 @@ on('change:generate_factions', () => {
 	});
 });
 /* Extra stress and trauma */
-on('change:setting_extra_stress', event => {
-	const setting = [1, 2, 3, 4, 5].reduce((m, k) => {
-		m[`setting_extra_stress${k}`] = ((parseInt(event.newValue) || 0) > k - 1) ? 1 : 0;
-		return m;
-	}, {});
-	setting.stress_max = 9 + (parseInt(event.newValue) || 0);
-	mySetAttrs(setting);
-});
+on('change:setting_extra_stress', event => setAttr('stress_max', 9 + (parseInt(event.newValue) || 0)));
 on('change:setting_extra_trauma', event => setAttr('trauma_max', 4 + (parseInt(event.newValue) || 0)));
 /* Calculate cohort quality */
 on(['crew_tier', 'cohort1_impaired', 'cohort1_type'].map(x => `change:${x}`).join(' '), () => calculateCohortDice('cohort1'));
@@ -1646,14 +1670,12 @@ handleBoxesFill('upgrade_24_check_', true);
 handleBoxesFill('bandolier1_check_');
 handleBoxesFill('bandolier2_check_');
 ['item', 'playbookitem', 'upgrade'].forEach(sName => handleBoxesFill(`repeating_${sName}:check_`));
-/* Handle showing options for heritage, background, and vice */
-['heritage', 'background', 'vice_purveyor', 'hull_functions', 'crew_deity_features'].forEach(name => {
-	on(`change:${name}`, event => setAttr(`show_${name}_info`, event.newValue ? '0' : '1'));
-});
 /* Pseudo-radios */
 ['crew_tier', ...actionsFlat].forEach(name => {
 	on(`change:${name}`, event => {
-		if (String(event.newValue) === '0') setAttr(name, (parseInt(event.previousValue) || 1) - 1);
+		if (String(event.newValue) === '0' && event.sourceType === 'player') {
+			setAttr(name, (parseInt(event.previousValue) || 1) - 1);
+		}
 	});
 });
 /* Item reset button */
@@ -1711,9 +1733,12 @@ on('change:setting_consequence_query sheet:opened', () => {
 /* Trim whitespace in auto-expand fields */
 autoExpandFields.forEach(name => {
 	on(`change:${name}`, event => {
-		if (event.newValue.trim() !== event.newValue && event.sourceType === 'player') {
-			setAttr(name.replace(':', '_'), event.newValue.trim());
-		}
+		const attrName = name.replace(':', '_');
+		getAttrs([attrName], v => {
+			if (v[attrName].trim() !== v[attrName] && event.sourceType === 'player') {
+				setAttr(attrName, v[attrName].trim());
+			}
+		});
 	});
 });
 /* INITIALISATION AND UPGRADES */
@@ -1746,6 +1771,8 @@ on('sheet:opened', () => {
 		const upgradeSheet = version => {
 				const versionMajor = version && parseInt(version.split('.')[0]),
 					versionMinor = version && parseInt(version.split('.')[1]);
+				console.log(`Found version ${version}.`);
+				if (version !== sheetVersion) console.log('Performing sheet upgrade.');
 				// Upgrade to 0.7: Convert legacy faction repeating section to text
 				if (versionMajor === 0 && versionMinor < 7) {
 					getSectionIDs('repeating_faction', list => {
@@ -1760,7 +1787,6 @@ on('sheet:opened', () => {
 							setAttr('faction_notes', output);
 							list.forEach(id => removeRepeatingRow(`repeating_faction_${id}`));
 							upgradeSheet('0.7');
-							console.log('Updating to 0.7');
 						});
 					});
 				}
@@ -1791,7 +1817,6 @@ on('sheet:opened', () => {
 							check: v.contact1_check || '0',
 							name: v.contact1_name || ''
 						}], false, upgradeFunction);
-						console.log('Updating to 0.9');
 					});
 				}
 				// Upgrade to 1.4: Convert playbook items and repeating items
@@ -1874,7 +1899,6 @@ on('sheet:opened', () => {
 								setting[`repeating_item_${id}_check_2`] = v[`repeating_item_${id}_check_b`] || '0';
 							});
 							mySetAttrs(setting, {}, upgradeFunction);
-							console.log('Updating to 1.4');
 						});
 					});
 				}
@@ -1987,7 +2011,6 @@ on('sheet:opened', () => {
 							obj.boxes_chosen = 'on';
 						});
 						fillRepeatingSectionFromData('item', items, false, () => upgradeSheet('1.5'));
-						console.log('Updating to 1.5');
 					});
 				}
 				// Upgrade to 1.6: Set defaults, convert upgrade names
@@ -2076,7 +2099,6 @@ on('sheet:opened', () => {
 							setting[k] = v[k] || setting[k] || translatedDefaults[k];
 						});
 						mySetAttrs(setting, {}, upgradeFunction);
-						console.log('Updating to 1.6');
 					});
 				}
 				// Upgrade to 1.9: Add missing upgrade descriptions, convert bandolier checks
@@ -2120,13 +2142,11 @@ on('sheet:opened', () => {
 								}
 							});
 							mySetAttrs(setting, {}, upgradeFunction);
-							console.log('Updating to 1.9');
 						});
 					});
 				}
 				// Upgrade to 1.10: Convert clocks
 				else if (versionMajor === 1 && versionMinor < 10) {
-					console.log('Updating to 1.10');
 					const upgradeFunction = _.after(2, () => upgradeSheet('1.10'));
 					['clock', 'crewclock'].forEach(sName => {
 						getSectionIDs(`repeating_${sName}`, idArray => {
@@ -2165,7 +2185,6 @@ on('sheet:opened', () => {
 				}
 				// Upgrade to 1.11: Convert all checkboxes to value=1
 				else if (versionMajor === 1 && versionMinor < 11) {
-					console.log('Updating to 1.11');
 					const upgradeFunction = _.after(14, () => upgradeSheet('1.11')),
 						upgradeNums = [...Array(25).keys()].slice(1).filter(x => x !== 19).slice(5),
 						boxes = ['show_settings', 'setting_extra_trauma', 'setting_extra_xp', 'setting_vampirexp', 'setting_show_strictures',
@@ -2245,20 +2264,8 @@ on('sheet:opened', () => {
 								calculateCohortDice('cohort1');
 								idArray.forEach(id => calculateCohortDice(`repeating_cohort_${id}`));
 								upgradeSheet('1.12');
-								console.log('Updating to 1.12');
 							});
 						});
-					});
-				}
-				// Upgrade to 1.13: Header info
-				else if (versionMajor === 1 && versionMinor < 13) {
-					getAttrs(['heritage', 'background', 'vice_purveyor', 'hull_functions', 'crew_deity_features'], v => {
-						const setting = {};
-						Object.keys(v).forEach(name => {
-							if (v[name]) setting[`show_${name}_info`] = '0';
-						});
-						mySetAttrs(setting, {}, () => upgradeSheet('1.13'));
-						console.log('Updating to 1.13');
 					});
 				}
 				// Upgrade to 2.0: Rename trauma attributes, frame feature migration
@@ -2283,7 +2290,6 @@ on('sheet:opened', () => {
 						actionsFlat.filter(n => changedAttrs.has(`${n}1`) || changedAttrs.has(`${n}2`))
 							.forEach(name => changedAttrs.add(name));
 						setting.changed_attributes = [...changedAttrs].join(',');
-						console.log('Updating to 2.0');
 						fillRepeatingSectionFromData('framefeature', frameData, false, upgradeFunction);
 						mySetAttrs(setting, {}, upgradeFunction);
 					});
@@ -2298,15 +2304,28 @@ on('sheet:opened', () => {
 								setting_show_cohort: '1'
 							});
 						}
+						upgradeSheet('2.2');
 					});
-					upgradeSheet('2.2');
-					console.log('Updating to 2.2');
 				}
-				// Upgrade to 2.3: Recalculate resistance, just to be safe
-				else if (versionMajor === 2 && versionMinor < 3) {
+				// Upgrade to 2.4: Generate alchemicals for Leeches, recalculate resistance
+				else if (versionMajor === 2 && versionMinor < 4) {
 					Object.keys(actionData).forEach(calculateResistance);
-					upgradeSheet('2.3');
-					console.log('Updating to 2.3');
+					getAttrs(['playbook', 'notes', 'changed_attributes'], v => {
+						if (v.playbook.toLowerCase() === 'leech') {
+							fillRepeatingSectionFromData('alchemical', alchemicalData);
+						}
+						if (v.changed_attributes) {
+							const changedAttrs = v.changed_attributes.split(',');
+							actionsFlat.forEach(action => {
+								if (changedAttrs.some(x => x.indexOf(action) === 0)) {
+									changedAttrs.push(action);
+								}
+							});
+							setAttr('changed_attributes', [...new Set(changedAttrs)].join(','));
+						}
+						setAttr('crew_notes', v.notes || '');
+						upgradeSheet('2.4');
+					});
 				}
 			},
 			initialiseSheet = () => {
@@ -2325,14 +2344,14 @@ on('sheet:opened', () => {
 					});
 					mySetAttrs(setting);
 				});
-				console.log('Initialising new sheet');
+				console.log('Initialising new sheet.');
 			};
 		if (v.version) upgradeSheet(v.version);
 		else initialiseSheet();
 		// Set version number
 		mySetAttrs({
-			version: '2.3',
-			character_sheet: 'Blades in the Dark v2.3'
+			version: sheetVersion,
+			character_sheet: `Blades in the Dark v${sheetVersion}`
 		});
 	});
 });
