@@ -7,6 +7,13 @@ Versions have three numbers Major.Minor.Release
 
 **Release**: Indicates bugfixes and minor UI changes only.
 
+## 1.4 0
+### New Features
+* Added M-Space support.  New sheet options include extended conflict resolution, simplified combat(M-Space optional rule) and M-Space style Psionics
+* Added Mythic Rome suppor.  New sheet options include Roman Magic
+* Added one more hit location for crab styled creatures
+* Added option to not display the 101+ reduced result in roll templates
+
 ## 1.3.3
 ### Bugfixes
 * Moved checkbox to left of labels/descriptors to more closely match most style guidelines
