@@ -2,6 +2,11 @@
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 1.2.4
+### Features
+* Default sheet is missing milestone tracking, added this to the settings screen (attr_norm-mile, attr_spot-mile, attr_arc-mile, attr_rep).
+* Default sheet is missing resistance tracking, added this to the settings screen (auto calculates for ships based on scale, players 0, bonus allows wearing armor or altering for NPCs - attr_resist, attr_resist_bonus)  
+
 ## 1.2.3
 ### Features
 * Massive improvements to the inline sheet rolls
@@ -13,7 +18,6 @@ The sheet will always upgrade itself unless I specify otherwise, though some thi
 	** Improved CSS formatting to cleanly show new fields
 ### Bug Fixes
 * Removed ship rolls beyond 1d20 (ships can only ever assist a character) - this also speeds ship rolls.
-
 
 ## 1.2.2
 ### Features
