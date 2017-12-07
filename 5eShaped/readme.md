@@ -1,5 +1,15 @@
-# D&D 5e Shaped Character Sheet
-This is the redesigned Shaped character sheet for use on Roll20.net with the 5th edition of Dungeons & Dragons (5e). The sheet is designed to be usable by all Roll20 users regardless of subscription level.
+# D&D 5e Shaped character sheet
+
+## [Issue tracker](https://bitbucket.org/mlenser/5eshaped/issues?sort=-updated_on)
+Please report any issues on the issue tracker.
+
+*If you're experiencing extreme lag please disable LastPass as it is known to cause problems with Roll20. This has nothing to do with the Shaped sheet.*
+
+## [Shaped Script](https://github.com/mlenser/roll20-api-scripts/tree/master/5eShapedScript)
+
+## [Changelog](https://github.com/mlenser/roll20-character-sheets/blob/master/5eShaped/changelog.md)
+
+## [Documentation](https://bitbucket.org/mlenser/5eshaped/wiki/Home)
 
 ## Features
 
@@ -25,17 +35,6 @@ This is the redesigned Shaped character sheet for use on Roll20.net with the 5th
 
 [![Sheet](http://i.cubeupload.com/peLpOm.jpg "5e Shaped Sheet")](http://i.cubeupload.com/RwfoVZ.jpg)
 
-### [Shaped Character Sheet Companion Script](https://github.com/symposion/roll20-api-scripts/tree/master/5eShapedCompanion/latest)
-
-### [Documentation](https://docs.google.com/document/d/1yPcIZ_bIc3JlnWsKZt2tAB0EQSIVEfeMtT0GifbpJIg)
-
-### [Changelog](https://github.com/mlenser/roll20-character-sheets/blob/master/5eShaped/changelog.md)
-
-### [Issue tracker](https://bitbucket.org/mlenser/5eshaped/issues?status=new&status=open&sort=-priority)
-Please report any issues on the issue tracker.
-
-If you're experiencing extreme lag please disable LastPass as it is known to cause problems with Roll20. This has nothing to do with the Shaped sheet.
-
 ## Sheet Releases
 When I release a new version it takes time to reach the public. Roll20 must merge my cost (typically Mondays/Tuesdays) and then release my code to the public (typically Tuesdays/Wednesdays). You can track [Roll20's pull requests on their github](https://github.com/Roll20/roll20-character-sheets/pulls). I have no control over when they release.
 
@@ -54,17 +53,10 @@ When I release a new version it takes time to reach the public. Roll20 must merg
 *If you are ever concerned about data loss I recommend you duplicate your campaign and use that to copy to see how it'll work.*
 
 ## Testing new versions
-I regularly release new versions. If you'd like to be involved in the testing period follow this thread. You can also see t he latest code on [my test campaign](https://app.roll20.net/join/1206379/qP-T_Q)
+I regularly release new versions. If you'd like to be involved in the testing period follow this thread. You can also see the latest code on [my develop campaign](https://app.roll20.net/join/1206379/qP-T_Q)
 
 ## Supported Versions
-I support the currently released version on Roll20 and on Github (they often differ as Pros can use a newer version).
-
-For upgrades I support a smooth upgrade for any version within the last 6 months. Currently that is version 6.1.0.
+I support the currently released version on Roll20 and on Github (they often differ as Pros can use a newer version). For upgrades I support a smooth upgrade for any version within the last 6 months.
 
 ## Contribute
 Since many have asked for it: If you appreciate what I do and want to compensate me for the countless hours that I have spent building this character sheet feel free to support me on [Patreon](https://www.patreon.com/mlenser) or Paypal (mlenser@gmail.com).
-Thanks so much for your support.
-
----
-
-Mark Lenser ([Kryx](https://app.roll20.net/users/277007/kryx) on roll20)

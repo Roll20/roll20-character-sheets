@@ -1,216 +1,282 @@
 <!-- **** SCRIPTS / SHEET WORKERS -->
 <script type="text/worker">
-// === JOKER / PNJ / EXTRA
-on("change:joker_de", function() {
-    getAttrs(["joker_de","pnj","chkPossessions","templateetat"], function(values) {
-        var extra = 0;
-        var pnj = 0;
-        var possessions = 1;
-        var templateetat = 1;
-        if (values.joker_de == "0d4") {
-            extra = 1;
-            pnj = 1;
-            possessions = 0;
-            templateetat = 0;
-        } else {
-            extra = 0;
-            pnj = values.pnj;
-            possessions = values.chkPossessions;
-            templateetat = values.templateetat;
-        }
-        setAttrs({
-            extra: extra,
-            pnj: pnj,
-            chkPossessions: possessions,
-            templateetat: templateetat
+    // Changement de version
+    on("sheet:opened",function(){
+        getAttrs(["sheetVersion"], function(values) {
+            var vers = parseFloat(values.sheetVersion) || 0;
+            if (vers < 3.0) {
+                // Gestion du type de personnage
+                getAttrs(["pnjtype","extra","pnj"], function(values) {
+                    var pnjtyp = parseInt(values.pnjtype) || 0;
+                    var pnjval = ((parseInt(values.extra) || 0)*3) + (parseInt(values.pnj) || 0);
+                    if ( (pnjtyp == 0) && (pnjval>0) ) {
+                        setAttrs({
+                            "pnjtype": pnjval,
+                            "sheetVersion": 3.0
+                        });
+                    } else { setAttrs({"sheetVersion": 3.0}); }
+                });
+            }
         });
     });
-});
-on("change:pnj", function(){
-    getAttrs(["pnj"], function(values) {
-        if (values.pnj == 1) {
-            setAttrs({
-                chkPossessions: 0,
-                templateetat: 0
-            });
+    // === JOKER / PNJ / EXTRA
+    on("change:pnjtype", function(eventinfo){
+        var pjtype = parseInt(eventinfo.newValue) || 0;
+        var ispnj = 1;
+        var isextra = 0;
+        var possessions = 1;
+        var disposs = 1;
+        var tpletat = 1;
+        var joker = "1d6";
+        var nbbless = 3;
+        var logo=1;
+        var lib="";
+        switch(pjtype) {
+            case 0:
+                ispnj = 0;
+                isextra = 0;
+                possessions = 1;
+                disposs = 1;
+                tpletat = 1;
+                joker = "1d6";
+                nbbless = 3;
+                logo = 1;
+                lib = "Personnage";
+                break;
+            case 1: //PNJ Joker
+                ispnj = 1;
+                isextra = 0;
+                possessions = 1;
+                disposs = 0;
+                tpletat = 0;
+                joker = "1d6";
+                nbbless = 3;
+                logo = 0;
+                lib = "Joker (PNJ)";
+                break;
+            case 2: //Sous-fifre
+                ispnj = 1;
+                isextra = 0;
+                possessions = 1;
+                disposs = 0;
+                tpletat = 0;
+                joker = "0d4";
+                nbbless = 3;
+                logo = 0;
+                lib = "Sous-fifre (PNJ)";
+                break;
+            case 3: //Bras droit
+                ispnj = 1;
+                isextra = 0;
+                possessions = 1;
+                disposs = 0;
+                tpletat = 0;
+                joker = "1d6";
+                nbbless = 0;
+                logo = 0;
+                lib = "Bras droit (PNJ)";
+                break;
+            case 4: //Extra
+                ispnj = 1;
+                isextra = 1;
+                possessions = 0;
+                disposs = 0;
+                tpletat = 0;
+                joker = "0d4";
+                nbbless = 0;
+                logo = 0;
+                lib = "Extra (PNJ)";
+                break;
+            default: //Personnalisé
+                ispnj = 1;
+                isextra = 0;
+                possessions = 1;
+                disposs = 0;
+                tpletat = 0;
+                joker = "1d6";
+                nbbless = 3;
+                logo = 0;
+                lib = "PNJ personnalisé";
         }
+        setAttrs({
+            "pnj": ispnj,
+            "extra": isextra,
+            "chkPossessions": possessions,
+            "dispPossessions": disposs,
+            "templateetat": tpletat,
+            "joker_de": joker,
+            "confBlessures": nbbless,
+            "sheetLogo": logo,
+            "pnjtypelib": lib
+        });
     });
-});
-// === BLESSURES et Malus blessure
-on("change:blessures", function() {
-    getAttrs(["blessures"], function(values) {
+    // === BLESSURES et Malus blessure
+    // TODO conf blessures
+    on("change:confBlessures", function(eventinfo){
+        var conf = parseInt(eventinfo.newValue) || 0;
+        setAttrs({
+            bless1: parseInt(+(conf>0)) || 0,
+            bless2: parseInt(+(conf>1)) || 0,
+            bless3: parseInt(+(conf>2)) || 0
+        });
+    });
+    on("change:blessures", function(eventinfo) {
         var malusblessures = 0;
-        if (values.blessures > 3) {
+        if (eventinfo.newValue > 3) {
             malusblessures = 3;
         } else {
-            malusblessures = values.blessures;
+            malusblessures = eventinfo.newValue;
         }
         setAttrs({
             malusblessures: malusblessures
         });
     });
-});
-// === FATIGUE et Malus blessure
-on("change:fatigue", function() {
-    getAttrs(["fatigue"], function(values) {
+    // === FATIGUE et Malus blessure
+    on("change:fatigue", function(eventinfo) {
         var malusfatigue = 0;
-        if (values.fatigue > 2) {
+        if (eventinfo.newValue > 2) {
             malusfatigue = 2;
         } else {
-            malusfatigue = values.fatigue;
+            malusfatigue = eventinfo.newValue;
         }
         setAttrs({
             malusfatigue: malusfatigue
         });
     });
-});
-// === ARMES FIXES
-on("change:arme1_comp", function() {
-    getAttrs(["arme1_comp"], function(values) {
+    // === ARMES FIXES
+    on("change:arme1_comp", function(eventinfo) {
         setAttrs({
-            arme1_comp_rel: "@{relRollBast" + values.arme1_comp + "}",
-            arme1_comp_jet: "@{jetRollBast" + values.arme1_comp + "}",
-            arme1_comp_brut: "@{RollBast" + values.arme1_comp + "}"
+            arme1_comp_rel: "@{relRollBast" + eventinfo.newValue + "}",
+            arme1_comp_jet: "@{jetRollBast" + eventinfo.newValue + "}",
+            arme1_comp_brut: "@{RollBast" + eventinfo.newValue + "}"
         });
     });
-});
-on("change:arme2_comp", function() {
-    getAttrs(["arme2_comp"], function(values) {
+    on("change:arme2_comp", function(eventinfo) {
         setAttrs({
-            arme2_comp_rel: "@{relRollBast" + values.arme2_comp + "}",
-            arme2_comp_jet: "@{jetRollBast" + values.arme2_comp + "}",
-            arme2_comp_brut: "@{RollBast" + values.arme2_comp + "}"
+            arme2_comp_rel: "@{relRollBast" + eventinfo.newValue + "}",
+            arme2_comp_jet: "@{jetRollBast" + eventinfo.newValue + "}",
+            arme2_comp_brut: "@{RollBast" + eventinfo.newValue + "}"
         });
     });
-});
-on("change:arme3_comp", function() {
-    getAttrs(["arme3_comp"], function(values) {
+    on("change:arme3_comp", function(eventinfo) {
         setAttrs({
-            arme3_comp_rel: "@{relRollBast" + values.arme3_comp + "}",
-            arme3_comp_jet: "@{jetRollBast" + values.arme3_comp + "}",
-            arme3_comp_brut: "@{RollBast" + values.arme3_comp + "}"
+            arme3_comp_rel: "@{relRollBast" + eventinfo.newValue + "}",
+            arme3_comp_jet: "@{jetRollBast" + eventinfo.newValue + "}",
+            arme3_comp_brut: "@{RollBast" + eventinfo.newValue + "}"
         });
     });
-});
-// === ARMES DYNAMIQUES
-on("change:repeating_armes:armed_comp", function() {
-    getAttrs(["repeating_armes_armeD_comp"], function(values) {
+    // === ARMES DYNAMIQUES
+    on("change:repeating_armes:armed_comp", function(eventinfo) {
         setAttrs({
-            repeating_armes_armeD_comp_rel: "@{relRollBast" + values.repeating_armes_armeD_comp + "}",
-            repeating_armes_armeD_comp_jet: "@{jetRollBast" + values.repeating_armes_armeD_comp + "}"
-            ,repeating_armes_armeD_comp_brut: "@{RollBast" + values.repeating_armes_armeD_comp + "}"
+            repeating_armes_armeD_comp_rel: "@{relRollBast" + eventinfo.newValue + "}",
+            repeating_armes_armeD_comp_jet: "@{jetRollBast" + eventinfo.newValue + "}"
+            ,repeating_armes_armeD_comp_brut: "@{RollBast" + eventinfo.newValue + "}"
         });
     });
-});
-// === CARACS DÉRIVÉES
-//    Charisme
-on("change:charisme_base change:charisme_bonus", function() {
-    getAttrs(["charisme_base","charisme_bonus"], function(values) {
-        setAttrs({
-            charisme: parseInt(values.charisme_base) + parseInt(values.charisme_bonus)
-        });
-    });
-});
-// Parade
-on("change:combat_de change:combat_bonus change:parade_bonus", function() {
-    getAttrs(["combat_de","combat_bonus","parade_bonus"], function(values) {
-        setAttrs({
-            parade_base: 2 + Math.floor( (parseInt(values.combat_de) + parseInt(values.combat_bonus)) / 2),
-            parade: parseInt(values.parade_bonus) + 2 + Math.floor( (parseInt(values.combat_de) + parseInt(values.combat_bonus)) / 2)
-        });
-    });
-});
-// Résistance
-on("change:vigueur_de change:vigueur_bonus change:resistance_bonus", function() {
-    getAttrs(["vigueur_de","vigueur_bonus","resistance_bonus"], function(values) {
-        setAttrs({
-            resistance_base: 2 + Math.floor( (parseInt(values.vigueur_de) + parseInt(values.vigueur_bonus)) / 2),
-            resistance: parseInt(values.resistance_bonus) + 2 + Math.floor( (parseInt(values.vigueur_de) + parseInt(values.vigueur_bonus)) / 2)
-        });
-    });
-});
-// Affichage / Masquage toutes compétences
-on("change:chkAllComp", function() {
-    getAttrs(["chkAllComp"], function(values) {
-        setAttrs({
-            chkArcane: values.chkAllComp,
-            chkCombat: values.chkAllComp,
-            chkConduite: values.chkAllComp,
-            chkConnaissance: values.chkAllComp,
-            chkCrochetage: values.chkAllComp,
-            chkDiscretion: values.chkAllComp,
-            chkEquitation: values.chkAllComp,
-            chkEscalade: values.chkAllComp,
-            chkIntimidation: values.chkAllComp,
-            chkJeu: values.chkAllComp,
-            chkLancer: values.chkAllComp,
-            chkNatation: values.chkAllComp,
-            chkNavigation: values.chkAllComp,
-            chkPerception: values.chkAllComp,
-            chkPersuasion: values.chkAllComp,
-            chkPilotage: values.chkAllComp,
-            chkPistage: values.chkAllComp,
-            chkRecherche: values.chkAllComp,
-            chkReparation: values.chkAllComp,
-            chkReseaux: values.chkAllComp,
-            chkSarcasme: values.chkAllComp,
-            chkSoins: values.chkAllComp,
-            chkSurvie: values.chkAllComp,
-            chkTir: values.chkAllComp
-        });
-    });
-});
-// === Inventaire et encombrement
-on("change:force_de", function() {
-    getAttrs(["force_de"], function(values) {
-        setAttrs({
-            encombmax: parseInt(values.force_de)*2.5
-        });
-    });
-});
-on("change:repeating_equipements:equipqte change:repeating_equipements:equippdsunit", function() {
-    getAttrs(["repeating_equipements_equipqte", "repeating_equipements_equippdsunit"], function(values) {
-        var qte = parseFloat(values.repeating_equipements_equipqte) || 1.0;
-        var pds = parseFloat(values.repeating_equipements_equippdsunit) || 0.0;
-        setAttrs({
-            repeating_equipements_equippoids: qte*pds
-        });
-   });
-});
- on("remove:repeating_equipements change:repeating_equipements:equippoids",function(){
-    getSectionIDs("repeating_equipements", function(idws) {
-        var totwght = 0.0;
-        idws.forEach(function(idw,index,arr){
-            var uwght = "repeating_equipements_" + idw + "_equippoids";
-            var lng = parseInt(arr.length) || 0;
-            getAttrs([uwght], function(val) {
-                totwght = totwght + parseFloat(val[uwght]) || 0.0;
-                if ( (index+1) == lng ){
-                    setAttrs({
-                        encombpoids: totwght
-                    });
-                }
+    // === CARACS DÉRIVÉES
+    //    Charisme
+    on("change:charisme_base change:charisme_bonus", function() {
+        getAttrs(["charisme_base","charisme_bonus"], function(values) {
+            setAttrs({
+                charisme: parseInt(values.charisme_base) + parseInt(values.charisme_bonus)
             });
         });
     });
-});
-on("change:encombpoids change:encombmax", function() {
-    getAttrs(["encombmax","encombpoids"], function(values) {
-        var lemax = parseInt(values.encombmax) || 1;
-        var lepoids = parseInt(values.encombpoids) || 0;
-        setAttrs({
-            encombrement: Math.floor(lepoids/lemax)
+    // Parade
+    on("change:combat_de change:combat_bonus change:parade_bonus", function() {
+        getAttrs(["combat_de","combat_bonus","parade_bonus"], function(values) {
+            setAttrs({
+                parade_base: 2 + Math.floor( (parseInt(values.combat_de) + parseInt(values.combat_bonus)) / 2),
+                parade: parseInt(values.parade_bonus) + 2 + Math.floor( (parseInt(values.combat_de) + parseInt(values.combat_bonus)) / 2)
+            });
         });
     });
-});
-// === Attaques
-on("change:atkcible", function () {
-    getAttrs(["atkcible"], function(values){
+    // Résistance
+    on("change:vigueur_de change:vigueur_bonus change:resistance_bonus", function() {
+        getAttrs(["vigueur_de","vigueur_bonus","resistance_bonus"], function(values) {
+            setAttrs({
+                resistance_base: 2 + Math.floor( (parseInt(values.vigueur_de) + parseInt(values.vigueur_bonus)) / 2),
+                resistance: parseInt(values.resistance_bonus) + 2 + Math.floor( (parseInt(values.vigueur_de) + parseInt(values.vigueur_bonus)) / 2)
+            });
+        });
+    });
+    // Affichage / Masquage toutes compétences
+    on("change:chkAllComp", function(eventinfo) {
+        setAttrs({
+            chkArcane: eventinfo.newValue,
+            chkCombat: eventinfo.newValue,
+            chkConduite: eventinfo.newValue,
+            chkConnaissance: eventinfo.newValue,
+            chkCrochetage: eventinfo.newValue,
+            chkDiscretion: eventinfo.newValue,
+            chkEquitation: eventinfo.newValue,
+            chkEscalade: eventinfo.newValue,
+            chkIntimidation: eventinfo.newValue,
+            chkJeu: eventinfo.newValue,
+            chkLancer: eventinfo.newValue,
+            chkNatation: eventinfo.newValue,
+            chkNavigation: eventinfo.newValue,
+            chkPerception: eventinfo.newValue,
+            chkPersuasion: eventinfo.newValue,
+            chkPilotage: eventinfo.newValue,
+            chkPistage: eventinfo.newValue,
+            chkRecherche: eventinfo.newValue,
+            chkReparation: eventinfo.newValue,
+            chkReseaux: eventinfo.newValue,
+            chkSarcasme: eventinfo.newValue,
+            chkSoins: eventinfo.newValue,
+            chkSurvie: eventinfo.newValue,
+            chkTir: eventinfo.newValue
+        });
+    });
+    // === Inventaire et encombrement
+    on("change:force_de", function(eventinfo) {
+        setAttrs({
+            encombmax: parseInt(eventinfo.newValue)*2.5
+        });
+    });
+    on("change:repeating_equipements:equipqte change:repeating_equipements:equippdsunit", function() {
+        getAttrs(["repeating_equipements_equipqte", "repeating_equipements_equippdsunit"], function(values) {
+            var qte = parseFloat(values.repeating_equipements_equipqte) || 1.0;
+            var pds = parseFloat(values.repeating_equipements_equippdsunit) || 0.0;
+            setAttrs({
+                repeating_equipements_equippoids: qte*pds
+            });
+       });
+    });
+     on("remove:repeating_equipements change:repeating_equipements:equippoids",function(){
+        getSectionIDs("repeating_equipements", function(idws) {
+            var totwght = 0.0;
+            idws.forEach(function(idw,index,arr){
+                var uwght = "repeating_equipements_" + idw + "_equippoids";
+                var lng = parseInt(arr.length) || 0;
+                getAttrs([uwght], function(val) {
+                    totwght = totwght + parseFloat(val[uwght]) || 0.0;
+                    if ( (index+1) == lng ){
+                        setAttrs({
+                            encombpoids: totwght
+                        });
+                    }
+                });
+            });
+        });
+    });
+    on("change:encombpoids change:encombmax", function() {
+        getAttrs(["encombmax","encombpoids"], function(values) {
+            var lemax = parseInt(values.encombmax) || 1;
+            var lepoids = parseInt(values.encombpoids) || 0;
+            setAttrs({
+                encombrement: Math.floor(lepoids/lemax)
+            });
+        });
+    });
+    // === Attaques
+    on("change:atkcible", function (eventinfo) {
         var cibleparade = "",
         cibleresistance = "",
         ciblearcane = "",
         atknom = "";
-        if ( values.atkcible == 1) {
+        if (eventinfo.newValue == 1) {
             cibleparade = "@{target|parade}";
             cibleresistance = "@{target|resistance}";
             ciblearcane = "?{Difficulté|4}";
@@ -228,12 +294,13 @@ on("change:atkcible", function () {
             atknom: atknom
         });
     });
-});
 </script>
 <!-- *** HIDDEN ROLLS ** -->
 <div style="display: none;">
     <!-- Gestion de la feuille -->
+    <input type="number" hidden name="attr_sheetVersion" value="2" />
     <input type="number" hidden name="attr_sheetArmeCtrl" value="0" /> <!-- Transition pour compétences d'arme et jets bruts -->
+    <input type="text" hidden name="attr_pnjtypelib" value="Joker" />
     <!-- ETAT du Personnage -->
     <input type="number" name="attr_malusblessures" value="0" />
     <input type="number" name="attr_malusfatigue" value="0" />
@@ -277,7 +344,7 @@ on("change:atkcible", function () {
     <input type="text" disabled hidden name="attr_jetRollBastTir" value="@{RollBastTir}" />
 
     <input type="text" disabled hidden name="attr_RollBastArcane" value="{ 1d@{arcane_de}!![Arcane],?{Dé joker ?|Oui,@{joker_de}!|Non,0d4}[Joker]}kh1 + (@{arcane_bonus})[Bonus] - @{malusblessures}[Blessures] - @{malusfatigue}[Fatigue] + (?{Modificateur|0})[Modificateur]" />
-    <input type="text" disabled hidden name="attr_relRollBastArcane" value="{ floor( ( { @{RollBastCombat} } ) / ( @{ciblearcane})[Difficulté] ), 0d0 }kh1 " />
+    <input type="text" disabled hidden name="attr_relRollBastArcane" value="{ floor( ( { @{RollBastArcane} } ) / ( @{ciblearcane})[Difficulté] ), 0d0 }kh1 " />
     <input type="text" disabled hidden name="attr_jetRollBastArcane" value="@{RollBastArcane}" />
 
     <input type="text" disabled hidden name="attr_RollBastForce" value="1d@{force_de}!!+(@{force_bonus})[Dégâts : Force]" />
@@ -408,9 +475,12 @@ on("change:atkcible", function () {
     <!-- onglets -->
     <input type="radio" name="attr_chkvie" value="0" class="onglmain" title="Feuille" checked /><span>Feuille</span>
     <input type="radio" name="attr_chkvie" value="1" class="onglconfig" title="Configuration" /><span>Configuration</span>
-    <span style="display:inline-block;width:150px;text-align: center;color: #888888;font-size: 0.9em;">v2.0 (09/04/2017)</span>
+    <span style="display:inline-block;width:150px;text-align: center;color: #888888;font-size: 0.9em;">v3.1 (17/09/2017)</span>
     <!-- Style FdP -->
-    <input type="checkbox" name="attr_sheetDead" value="1" class="chkSheetDead" />
+    <input type="radio" name="attr_sheetDead" value="0" class="chkSheetSaWo" checked />  <!-- Savage Worlds -->
+    <input type="radio" name="attr_sheetDead" value="1" class="chkSheetDead" /> <!-- Deadlands -->
+    <input type="radio" name="attr_sheetDead" value="2" class="chkSheetLankh" /> <!-- Lankhmar -->
+    <input type="radio" name="attr_sheetDead" value="3" class="chkSheetBnB" /> <!-- Beast & Barbarian -->
     <!-- paramètres cachés -->
     <input type="checkbox" name="attr_sheetStyle" value="0" class="chkRolrel" checked />
     <input type="checkbox" name="attr_sheetStyle" value="1" class="chkRoljet" />
@@ -419,6 +489,9 @@ on("change:atkcible", function () {
     <input type="checkbox" name="attr_pnj" value="1" class="persoPnj" />
     <input type="checkbox" name="attr_chkPossessions" value="1" class="chkPossessions" checked />
     <input type="checkbox" name="attr_sheetLogo" value="1" class="dispLogo" checked />
+    <input type="checkbox" name="attr_bless1" value="1" class="persoBless1" checked />
+    <input type="checkbox" name="attr_bless2" value="1" class="persoBless2" checked />
+    <input type="checkbox" name="attr_bless3" value="1" class="persoBless3" checked />
     <!-- Checks pour affichage compétences -->
     <input type="checkbox" name="attr_chkArcane" class="chkArcane" value="1" checked />
     <input type="checkbox" name="attr_chkCombat" class="chkCombat" value="1" checked />
@@ -454,7 +527,7 @@ on("change:atkcible", function () {
                         &nbsp;
                         <div class="blacktext2">Dé Joker</div>
                         <SELECT name="attr_joker_de" class="selde joker">
-                            <OPTION value="0d4">&nbsp;- Extra (PNJ)</OPTION>
+                            <OPTION value="0d4">&nbsp;-</OPTION>
                             <OPTION value="1d4">&nbsp;d4</OPTION>
                             <OPTION value="1d6" SELECTED>&nbsp;d6</OPTION>
                             <OPTION value="1d8">&nbsp;d8</OPTION>
@@ -1316,10 +1389,16 @@ on("change:atkcible", function () {
         <div class="mycol"> <!-- ** COL2 ** -->
             <div class="logo">
                 <div class="SheetSaWo" style="text-align:center;">
-                    <img style="width: 200px;" src="https://www.peginc.com/wp-content/uploads/2013/02/SW_LOGO_24bit.png" />
+                    <img style="width: 200px;" src="https://raw.githubusercontent.com/NathaTerrien/roll20-wip/master/SavageWorldsFrench/sawofr_logo_sawo.png" />
                 </div>
                 <div class="SheetDead" style="text-align:center;">
-                    <img style="width: 265px;" src="https://www.peginc.com/wp-content/uploads/2013/02/DL.png" />
+                    <img style="width: 372px;" src="https://raw.githubusercontent.com/NathaTerrien/roll20-wip/master/SavageWorldsFrench/sawofr_logo_deadlands.png" />
+                </div>
+                <div class="SheetLankh" style="text-align:center;">
+                    <img style="width: 372px;" src="https://raw.githubusercontent.com/NathaTerrien/roll20-wip/master/SavageWorldsFrench/sawofr_logo_lankhmar.png" />
+                </div>
+                <div class="SheetBnB" style="text-align:center;">
+                    <img style="width: 372px;" src="https://raw.githubusercontent.com/NathaTerrien/roll20-wip/master/SavageWorldsFrench/sawofr_logo_bnb.png" />
                 </div>
             </div>
             <div class="colblock"> <!-- DEGATS -->
@@ -1331,17 +1410,17 @@ on("change:atkcible", function () {
                 <div style="height: 30px;">
                     <div class="redtitle3" style="width:80px;">BLESSURES</div>
                     <input type="radio" class="blessure" name="attr_blessures" value="0" title="Pas de blessure" checked /><span>0</span>
-                    <input type="radio" class="blessure" name="attr_blessures" value="1" title="Une blessure" /><span>1</span>
-                    <input type="radio" class="blessure noextra" name="attr_blessures" value="2" title="Deux blessures" /><span class="noextra">2</span>
-                    <input type="radio" class="blessure noextra" name="attr_blessures" value="3" title="Trois blessures" /><span class="noextra">3</span>
-                    <input type="radio" class="blessure noextra" name="attr_blessures" value="4" title="État critique" /><span  class="noextra" style="font-family: pictos;font-weight:bold;font-size:2em;">Y</span>
+                    <input type="radio" class="blessure bless1" name="attr_blessures" value="1" title="Une blessure" /><span class="blessure bless1">1</span>
+                    <input type="radio" class="blessure bless2" name="attr_blessures" value="2" title="Deux blessures" /><span class="blessure bless2">2</span>
+                    <input type="radio" class="blessure bless3" name="attr_blessures" value="3" title="Trois blessures" /><span class="blessure bless3">3</span>
+                    <input type="radio" class="blessure" name="attr_blessures" value="4" title="État critique" /><span style="font-family: pictos;font-weight:bold;">Y</span>
                 </div>
                 <div style="height: 30px;">
                     <div class="redtitle3" style="width:80px;">FATIGUE</div>
                     <input type="radio" class="blessure" name="attr_fatigue" value="0" title="Pas de de fatigue" checked /><span>0</span>
                     <input type="radio" class="blessure" name="attr_fatigue" value="1" title="Un niveau de Fatigue" /><span>1</span>
                     <input type="radio" class="blessure" name="attr_fatigue" value="2" title="Deux niveaux de Fatigue" /><span>2</span>
-                    <input type="radio" class="blessure" name="attr_fatigue" value="3" title="État critique" /><span style="font-family: pictos;font-weight:bold;font-size:2em;">Y</span>
+                    <input type="radio" class="blessure" name="attr_fatigue" value="3" title="État critique" /><span style="font-family: pictos;font-weight:bold;">Y</span>
                 </div>
             </div> <!-- FIN DEGATS -->
             <div class="colblock"> <!-- Carac dérivées -->
@@ -1388,10 +1467,10 @@ on("change:atkcible", function () {
             </div> <!-- FIN Carac dérivées -->
             <div class="colblock chkPossessions"> <!-- EQUIPEMENT -->
                 <div class="redtitle1 disp">POSSESSIONS</div>
-                <input type="checkbox" name="attr_dispPossessions" class="dispchk" title="Afficher/masquer le contenu" checked /><span class="dispchk">E</span>
+                <input type="checkbox" name="attr_dispPossessions" value="1" class="dispchk" title="Afficher/masquer le contenu" checked /><span class="dispchk">E</span>
                 <div class="dispchk">
                     <div class="redtitle2 disp">ARGENT</div>
-                    <input type="checkbox" name="attr_argentdisplay" class="dispcheck" title="Agrandir/Réduire la description" /><span>s</span>
+                    <input type="checkbox" name="attr_argentdisplay" class="loupe" title="Agrandir/Réduire la description" /><span>s</span>
                     <textarea name="attr_argent" class="textdesc" style="width: 175px;" placeholder="Argent & Richesses" title="Argent & Richesses"></textarea>
                     <div class="input">
                         <div class="blacktext2">Encombrement maximum :&nbsp;</div>
@@ -1439,13 +1518,13 @@ on("change:atkcible", function () {
                     </div>
                     <div class="blacktext1">Signes particuliers : </div>
                     <div class="input">
-                        <input type="checkbox" name="attr_signedisplay" class="dispcheck" title="Agrandir/Réduire la description" /><span>s</span>
+                        <input type="checkbox" name="attr_signedisplay" class="loupe" title="Agrandir/Réduire la description" /><span>s</span>
                         <textarea name="attr_signe" class="textdesc" style="width: 246px;" placeholder="Signes particuliers" title="Signes particuliers"></textarea>
                     </div>
                 </div>
             </div>
             <div class="colblock pnj">
-                <div class="redtitle1 disp"><div class="extra">PNJ (Extra)</div><div class="noextra">PNJ (Joker)</div></div>
+                <div class="redtitle1 disp"><span name="attr_pnjtypelib"></span></div>
                 <input type="checkbox" name="attr_dispPerso" class="dispchk" title="Afficher/masquer le contenu" checked /><span class="dispchk">E</span>
                 <div class="dispchk">
                     <div class="input"><input type="text" name="attr_character_name" class="charname" placeholder="Nom" /></div>
@@ -1462,7 +1541,7 @@ on("change:atkcible", function () {
                         <div class="redtitle2"><div class="nopnj">ATOUTS</div><div class="pnj">APTITUDES (+)</div></div>
                         <fieldset class="repeating_atouts"> <!-- ATOUTS -->
                             <div class="input">
-                                <input type="checkbox" name="attr_atoutdisplay" class="dispcheck" title="Agrandir/Réduire la description" /><span>s</span>
+                                <input type="checkbox" name="attr_atoutdisplay" class="loupe" title="Agrandir/Réduire la description" /><span>s</span>
                                 <textarea name="attr_atout" class="textdesc" style="width: 244px;" placeholder="Atout" title="Atout"></textarea>
                             </div>
                         </fieldset>
@@ -1471,7 +1550,7 @@ on("change:atkcible", function () {
                         <div class="redtitle2"><div class="nopnj">HANDICAPS</div><div class="pnj">APTITUDES (-)</div></div>
                         <fieldset class="repeating_handicaps"> <!-- ATOUTS -->
                             <div class="input">
-                                <input type="checkbox" name="attr_handicapdisplay" class="dispcheck" title="Agrandir/Réduire la description" /><span>s</span>
+                                <input type="checkbox" name="attr_handicapdisplay" class="loupe" title="Agrandir/Réduire la description" /><span>s</span>
                                 <textarea name="attr_handicap" class="textdesc" style="width: 244px;" placeholder="Handicap" title="Handicap"></textarea>
                             </div>
                         </fieldset>
@@ -1559,7 +1638,7 @@ on("change:atkcible", function () {
                 <input name="attr_arme1_cdt" type="number" style="width:30px;margin-right:3px;" value="0" min="0" title="Cadence de Tir" />
                 <input name="attr_arme1_mun" type="number" style="width:40px;" value="0" min="0" title="Munitions courantes" />/<input name="attr_arme1_mun_max" type="number" style="width:40px;margin-right:3px;" value="0" min="0" title="Munitions maximum" />
                 <input name="attr_arme1_pa" type="number" style="width:30px;margin-right:3px;" value="0" min="0" title="Pénétration d'Armure" />
-                <input type="checkbox" name="attr_arme1display" class="dispcheck" title="Agrandir/Réduire la description" /><span>s</span>
+                <input type="checkbox" name="attr_arme1display" class="loupe" title="Agrandir/Réduire la description" /><span>s</span>
                 <textarea name="attr_arme1_notes" class="textdesc" style="width: 171px;" placeholder="Notes" title="Notes sur l'arme"></textarea>
             </div> <!-- FIN ARME FIXE 1 -->
             <div class="input"> <!-- ARME FIXE 2 -->
@@ -1607,7 +1686,7 @@ on("change:atkcible", function () {
                 <input name="attr_arme2_cdt" type="number" style="width:30px;margin-right:3px;" value="0" min="0" title="Cadence de Tir" />
                 <input name="attr_arme2_mun" type="number" style="width:40px;" value="0" min="0" title="Munitions courantes" />/<input name="attr_arme2_mun_max" type="number" style="width:40px;margin-right:3px;" value="0" min="0" title="Munitions maximum" />
                 <input name="attr_arme2_pa" type="number" style="width:30px;margin-right:3px;" value="0" min="0" title="Pénétration d'Armure" />
-                <input type="checkbox" name="attr_arme2display" class="dispcheck" title="Agrandir/Réduire la description" /><span>s</span>
+                <input type="checkbox" name="attr_arme2display" class="loupe" title="Agrandir/Réduire la description" /><span>s</span>
                 <textarea name="attr_arme2_notes" class="textdesc" style="width: 171px;" placeholder="Notes" title="Notes sur l'arme"></textarea>
             </div> <!-- FIN ARME FIXE 2 -->
             <div class="input"> <!-- ARME FIXE 3 -->
@@ -1655,7 +1734,7 @@ on("change:atkcible", function () {
                 <input name="attr_arme3_cdt" type="number" style="width:30px;margin-right:3px;" value="0" min="0" title="Cadence de Tir" />
                 <input name="attr_arme3_mun" type="number" style="width:40px;" value="0" min="0" title="Munitions courantes" />/<input name="attr_arme3_mun_max" type="number" style="width:40px;margin-right:3px;" value="0" min="0" title="Munitions maximum" />
                 <input name="attr_arme3_pa" type="number" style="width:30px;margin-right:3px;" value="0" min="0" title="Pénétration d'Armure" />
-                <input type="checkbox" name="attr_arme3display" class="dispcheck" title="Agrandir/Réduire la description" /><span>s</span>
+                <input type="checkbox" name="attr_arme3display" class="loupe" title="Agrandir/Réduire la description" /><span>s</span>
                 <textarea name="attr_arme3_notes" class="textdesc" style="width: 171px;" placeholder="Notes" title="Notes sur l'arme"></textarea>
             </div> <!-- FIN ARME FIXE 3 -->
             <fieldset class="repeating_armes">
@@ -1704,7 +1783,7 @@ on("change:atkcible", function () {
                     <input name="attr_armeD_cdt" type="number" style="width:30px;margin-right:3px;" value="0" min="0" title="Cadence de Tir" />
                     <input name="attr_armeD_mun" type="number" style="width:40px;" value="0" min="0" title="Munitions courantes" />/<input name="attr_armeD_mun_max" type="number" style="width:40px;margin-right:3px;" value="0" min="0" title="Munitions maximum" />
                     <input name="attr_armeD_pa" type="number" style="width:30px;margin-right:3px;" value="0" min="0" title="Pénétration d'Armure" />
-                    <input type="checkbox" name="attr_armeDdisplay" class="dispcheck" title="Agrandir/Réduire la description" /><span>s</span>
+                    <input type="checkbox" name="attr_armeDdisplay" class="loupe" title="Agrandir/Réduire la description" /><span>s</span>
                     <textarea name="attr_armeD_notes" class="textdesc" style="width: 171px;" placeholder="Notes" title="Notes sur l'arme"></textarea>
                 </div> <!-- FIN ARME DYNAMIQUE -->
             </fieldset>
@@ -1734,7 +1813,7 @@ on("change:atkcible", function () {
                     <input name="attr_pouv_pp" type="number" style="width:30px;" value="0" min="0" title="Coût en Points de Pouvoir" />
                     <input name="attr_pouv_portee" type="text" style="width:100px;margin-right:3px;" placeholder="Portée" title="Portée de l'arme" />
                     <input name="attr_pouv_duree" type="text" style="width:100px;margin-right:3px;" placeholder="Durée" title="Durée du pouvoir" />
-                    <input type="checkbox" name="attr_pouvoirdisplay" class="dispcheck" title="Agrandir/Réduire la description" /><span>s</span>
+                    <input type="checkbox" name="attr_pouvoirdisplay" class="loupe" title="Agrandir/Réduire la description" /><span>s</span>
                     <textarea name="attr_pouv_effets" class="textdesc" style="width: 300px;" placeholder="Effets du pouvoir" title="Effets du pouvoir"></textarea>
                 </div> <!-- FIN POUVOIR DYNAMIQUE -->
             </fieldset>
@@ -1749,16 +1828,65 @@ on("change:atkcible", function () {
     <div class="configuration">
         <div class="2colrow">
             <div class="col">
-                <div class="conftitre">STYLE VISUEL</div>
+                <div class="conftitre">PERSONNAGE</div>
                 <div class="row">
-                    <input type="checkbox" name="attr_pnj" value="1" class="chkSkill" title="Ce personnage est un PNJ. Pour en faire un Extra (et donc automatiquement un PNJ), sélectionnez le dé Joker à '- Extra (PNJ)'" /><span>Personnage Non Joueur</span>
-                    <input type="checkbox" name="attr_chkPossessions" value="1" class="chkSkill" title="Afficher ou masquer la section 'Possessions' : richesse, équipement etc." checked /><span>Afficher les possessions</span>
+                    <div class="confcat">Type de personnage :
+                        <SELECT name="attr_pnjtype">
+                            <OPTION value="0" selected >PJ (3 blessures, avec dé joker)</OPTION>
+                            <OPTION value="1" >Joker (PNJ, 3 blessures, avec dé joker)</OPTION>
+                            <OPTION value="2" >Sous-fifre (PNJ, 3 blessures, pas de dé joker)</OPTION>
+                            <OPTION value="3" >Bras droit (PNJ, 0 blessure, avec dé joker)</OPTION>
+                            <OPTION value="4" >Extra (PNJ, 0 blessure, pas de dé joker)</OPTION>
+                            <OPTION value="5" >Personnalisé</OPTION>
+                        </SELECT>
+                    </div>
+                </div>
+                <input type="hidden" name="attr_pnjtype" class="persocustom" />
+                <div class="row persocustom">
+                    <input type="checkbox" name="attr_pnj" value="1" class="chkSkill" title="Ce personnage est un PNJ." /><span>Personnage Non Joueur</span>
+                </div>
+                <div class="row persocustom">
+                    <div class="confcat">Blessures :
+                        <SELECT name="attr_confBlessures">
+                            <OPTION value="0" >0 : la 1re blessure met hors combat</OPTION>
+                            <OPTION value="1" >1 : la 2de blessure met hors combat</OPTION>
+                            <OPTION value="2" >2 : la 3e blessure met hors combat</OPTION>
+                            <OPTION value="3" selected >3 : la 4e blessure met hors combat</OPTION>
+                        </SELECT>
+                    </div>
+                </div>
+                <div class="row persocustom">
+                    <div class="confcat">Dé Joker
+                        <SELECT name="attr_joker_de">
+                            <OPTION value="0d4">Aucun</OPTION>
+                            <OPTION value="1d4">&nbsp;d4</OPTION>
+                            <OPTION value="1d6" SELECTED>&nbsp;d6</OPTION>
+                            <OPTION value="1d8">&nbsp;d8</OPTION>
+                            <OPTION value="1d10">d10</OPTION>
+                            <OPTION value="1d12">d12</OPTION>
+                        </SELECT>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="conftitre">VISUEL</div>
+                <div class="row">
+                    <div class="confcat">Style :
+                        <SELECT name="attr_sheetDead" title="Choisir le style graphique de la feuille, et l'affichage de certaines caractéristiques spécifiques.">
+                            <OPTION value="0" selected>Savage Worlds</OPTION>
+                            <OPTION value="1" >Deadlands Reloaded</OPTION>
+                            <OPTION value="2" >Lankhmar</OPTION>
+                            <OPTION value="3" >Beasts & Barbarians</OPTION>
+                        </SELECT>
+                    </div>
                 </div>
                 <div class="row">
+                    <input type="checkbox" name="attr_chkPossessions" value="1" class="chkSkill" title="Afficher ou masquer la section 'Possessions' : richesse, équipement etc." checked /><span>Afficher les possessions</span>
                     <input type="checkbox" name="attr_sheetLogo" value="1" class="chkSkill" title="Afficher ou masquer le logo" checked /><span>Afficher le logo</span>
-                    <input type="checkbox" name="attr_sheetDead" value="1" class="chkSkill" title="Couleurs et logo Deadlands Reloaded" /><span>Deadlands Reloaded</span>
-               </div>
+                </div>
             </div>
+        </div>
+        <div class="2colrow">
             <div class="col">
                 <div class="conftitre">JETS</div>
                 <div class="confcat">Niveau de détail :</div>
@@ -1770,8 +1898,6 @@ on("change:atkcible", function () {
                 <div class="optionCible">Attaques :</div>
                 <input type="checkbox" name="attr_atkcible"  class="optionCible" value="1" title="Utiliser les pions cibles lors des attaques pour déterminer le seuil de réussite via la résistance de la cible etc." checked /><span class="optionCible">Cible</span>
             </div>
-        </div>
-        <div class="2colrow">
             <div class="col">
                 <div class="conftitre">AFFICHAGE DES COMPETENCES</div>
                 <div class="row" style="text-align: center;"><input type="checkbox" name="attr_chkAllComp" value="1" class="chkSkill" title="Afficher/Masquer toutes les compétence" checked /><span>Toutes</span></div>
@@ -1799,9 +1925,6 @@ on("change:atkcible", function () {
                 <input type="checkbox" name="attr_chkSoins" value="1" class="chkSkill" checked /><span>Soins</span>
                 <input type="checkbox" name="attr_chkSurvie" value="1" class="chkSkill" checked /><span>Survie</span>
                 <input type="checkbox" name="attr_chkTir" value="1" class="chkSkill" checked /><span>Tir</span>
-            </div>
-            <div class="col">
-
             </div>
         </div>
     </div>
