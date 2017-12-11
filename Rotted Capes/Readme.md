@@ -4,7 +4,7 @@
 This is a character sheet for use on Roll20.net with Rotted Capes. The sheet is designed to be usable by all Roll20 users regardless of subscription level.
 
 ### Current Version
-Version 1.0 (December 2nd, 2017) 
+Version 1.01 (December 11th, 2017) 
 
 ### Many Thanks	
 This sheet came into being through my experimentation in adapting sheets for my various games.  A big influence was Nathas's Numenera multi-tabs character sheet!
@@ -26,6 +26,11 @@ Long term:
 * Add a tab for managing global settings for further automation (such as reducing avoidance based on being larger)
 	
 ### Changelog
+** December 11, 2017: version 1.01 ** 
+* Multiple fixes to variable names
+* Layout fixes
+* Added information icon and minus icon for managing tooltips
+* Added hover over field for managed tooltips
 
 ** December 2, 2017: version 1.0 submitted to Roll20** 
 
