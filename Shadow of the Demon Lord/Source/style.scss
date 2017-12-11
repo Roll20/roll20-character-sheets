@@ -54,8 +54,38 @@ $sheet_col_min_width: 364px;
 		line-height: 22px;
 	}
 
-	.sheet-space-after::after {
+	.sheet-space-after::after,
+	.sheet-space-before::before,
+	.sheet-space-before-nonempty:not(:empty)::before {
 		content: " ";
+	}
+
+	.sheet-semicolon-after::after,
+	.sheet-semicolon-before::before,
+	.sheet-semicolon-before-nonempty:not(:empty)::before {
+		content: "; ";
+	}
+
+	.sheet-comma::after {
+		content: ", ";
+	}
+
+	.sheet-bracketed {
+		&::before {
+			content: "(";
+		}
+		&::after {
+			content: ")";
+		}
+	}
+
+	.sheet-bracketed-space {
+		&::before {
+			content: " (";
+		}
+		&::after {
+			content: ") ";
+		}
 	}
 
 	input[type="text"], input[type="number"], select, textarea {
@@ -338,6 +368,12 @@ $sheet_col_min_width: 364px;
 		.sheet-60 {
 			width: 60%;
 		}
+		.sheet-70 {
+			width: 70%;
+		}
+		.sheet-30 {
+			width: 30%;
+		}
 		.sheet-alignright {
 			text-align: right;
 		}
@@ -415,6 +451,10 @@ $sheet_col_min_width: 364px;
 						max-width: $sheet_col_max_width;
 						margin-right: 8px;
 						flex: 1 1 0;
+
+						&:nth-child(odd):last-child {
+							margin-right: calc(50% + 8px);
+						}
 					}
 				}
 			}
@@ -490,7 +530,7 @@ $sheet_col_min_width: 364px;
 				}
 			}
 
-			+ button[type="roll"] {
+			+ .sheet-mod + button[type="roll"] {
 				position: absolute;
 				border-radius: 50%;
 				font-size: 1.25em;
@@ -515,6 +555,10 @@ $sheet_col_min_width: 364px;
 					content: "";
 				}
 			}
+
+			+ .sheet-mod:not([value^="-"]) + button[type="roll"] span::before {
+				content: "+";
+			}
 		}
 
 		/* 1st Row */
@@ -538,15 +582,12 @@ $sheet_col_min_width: 364px;
 					width: 35%;
 					position: relative;
 
-					label {
-						text-align: center;
-					}
-
 					input[type="text"] {
 						height: 40px;
+						font-size: 1.1em;
 					}
 
-					.sheet-ancestry input {
+					.sheet-ancestry {
 						width: 75%;
 					}
 
@@ -558,10 +599,6 @@ $sheet_col_min_width: 364px;
 
 				&.sheet-right-col {
 					width: 33%;
-
-					label {
-						text-align: right;
-					}
 
 					textarea {
 						height: 139px;
@@ -618,16 +655,13 @@ $sheet_col_min_width: 364px;
 					margin-bottom: 4px;
 					font-weight: normal;
 					text-align: left;
+					overflow: hidden;
 					background: $transparent1;
 				}
 			}
 
-			.sheet-right-col label {
-				text-align: right;
-
-				textarea {
-					align-self: flex-end;
-				}
+			.sheet-right-col label textarea {
+				align-self: flex-end;
 			}
 
 			.sheet-middle-col {
@@ -694,8 +728,8 @@ $sheet_col_min_width: 364px;
 
 			.sheet-attr-box {
 				.sheet-readonly-toggle {
-					&:checked ~ .sheet-editable,
-					&:not(:checked) ~ .sheet-readonly {
+					&:checked + label .sheet-editable,
+					&:not(:checked) + label .sheet-readonly {
 						display: none;
 					}
 				}
@@ -704,7 +738,7 @@ $sheet_col_min_width: 364px;
 					left: 297px;
 					top: 100px;
 
-					+ button[type="roll"] {
+					+ .sheet-mod + button[type="roll"] {
 						left: 342px;
 						top: 155px;
 					}
@@ -723,7 +757,7 @@ $sheet_col_min_width: 364px;
 					right: 303px;
 					top: 100px;
 
-					+ button[type="roll"] {
+					+ .sheet-mod + button[type="roll"] {
 						right: 352px;
 						top: 151px;
 					}
@@ -733,7 +767,7 @@ $sheet_col_min_width: 364px;
 					right: 245px;
 					top: 93px;
 
-					+ button[type="roll"] {
+					+ .sheet-mod + button[type="roll"] {
 						font-size: 1em;
 						height: 29px;
 						width: 29px;
@@ -746,7 +780,7 @@ $sheet_col_min_width: 364px;
 					left: 221px;
 					top: 280px;
 
-					+ button[type="roll"] {
+					+ .sheet-mod + button[type="roll"] {
 						left: 285px;
 						top: 286px;
 					}
@@ -761,7 +795,7 @@ $sheet_col_min_width: 364px;
 					right: 227px;
 					top: 280px;
 
-					+ button[type="roll"] {
+					+ .sheet-mod + button[type="roll"] {
 						right: 290px;
 						top: 286px;
 					}
@@ -795,7 +829,7 @@ $sheet_col_min_width: 364px;
 					height: 50px;
 					opacity: 0;
 
-					&:hover + label input {
+					&:hover + input + label input {
 						color: $fadedred;
 					}
 				}
@@ -872,7 +906,7 @@ $sheet_col_min_width: 364px;
 				width: 455px;
 				border: 2px solid black;
 				border-radius: 20px;
-				background-image: url(http://imgsrv.roll20.net/?src=raw.githubusercontent.com/Roll20/roll20-chara…sheets/master/Shadow%2520of%2520the%2520Demon%2520Lord/Assets/clean_bg.jpg);
+				background-image: url('http://imgsrv.roll20.net/?src=raw.githubusercontent.com/Roll20/roll20-chara…sheets/master/Shadow%2520of%2520the%2520Demon%2520Lord/Assets/clean_bg.jpg');
 				background-position: center;
 				background-size: 880px auto;
 			}
@@ -1083,6 +1117,26 @@ $sheet_col_min_width: 364px;
 					display: none;
 				}
 			}
+			&.sheet-header-button {
+				padding: 0;
+				border: none;
+				box-shadow: none;
+				text-transform: inherit;
+				color: inherit;
+				text-shadow: none;
+				font: inherit;
+
+				&::before {
+					content: "";
+				}
+				&:hover {
+					color: $fadedred;
+				}
+			}
+		}
+
+		.sheet-mod:not([value^="-"]) + span::before {
+			content: "+";
 		}
 	}
 
@@ -1119,6 +1173,10 @@ $sheet_col_min_width: 364px;
 		.sheet-collapse:checked + .sheet-edit {
 			height: 44px;
 			overflow: hidden;
+		}
+
+		.sheet-center, .sheet-center input[type="text"] {
+			text-align: center;
 		}
 
 		.sheet-display {
@@ -1239,6 +1297,10 @@ $sheet_col_min_width: 364px;
 				width: 10%;
 				font-weight: bold;
 				text-align: center;
+			}
+
+			.sheet-defense-base:not([value="0"]) ~ .sheet-defense-bonus:not([value="0"]):not([value^="-"]) + .sheet-defense-bonus::before {
+				content: "+ ";
 			}
 		}
 
@@ -1481,6 +1543,10 @@ $sheet_col_min_width: 364px;
 				max-width: $sheet_col_max_width;
 				margin-right: 8px;
 				flex: 1 1 0;
+
+				&:nth-child(odd):last-child {
+					margin-right: calc(50% + 8px);
+				}
 			}
 		}
 
@@ -1579,10 +1645,6 @@ $sheet_col_min_width: 364px;
 				min-height: 22px;
 				width: 64%;
 			}
-		}
-
-		div.sheet-display {
-			margin-bottom: 5px;
 		}
 
 		.sheet-notes {
@@ -1747,6 +1809,54 @@ $sheet_col_min_width: 364px;
 				color: #fff;
 				margin-bottom: 4px;
 			}
+
+			.sheet-mod:not([value^="-"]) + .sheet-bracketed::before {
+				content: "(+";
+			}
+
+			.sheet-afflictions {
+				label {
+					display: inline;
+					position: relative;
+					font-weight: normal;
+					width: auto;
+					cursor: pointer;
+
+					&:not(:last-child)::after {
+						content: ", ";
+					}
+
+					input {
+						opacity: 0;
+						position: absolute;
+
+						&:checked + span {
+							color: $fadedred;
+						}
+					}
+
+					&:not(:hover) div {
+						opacity: 0;
+					}
+
+					div {
+						position: absolute;
+						text-indent: 0;
+						width: 196px;
+						z-index: 1;
+						padding: 3px;
+						top: 18px;
+						text-align: center;
+						cursor: default;
+						pointer-events: none;
+						left: 0;
+						background: #fffaee;
+						border: 1px solid black;
+						border-radius: 5px;
+						transition: all 0.4s;
+					}
+				}
+			}
 		}
 
 		.sheet-right-col {
@@ -1802,6 +1912,10 @@ $sheet_col_min_width: 364px;
 					select {
 						width: 81%;
 					}
+				}
+
+				.sheet-against-display:not(:empty)::after {
+					content: ". ";
 				}
 			}
 
@@ -1860,7 +1974,7 @@ $sheet_col_min_width: 364px;
 	margin: 0 -2px -5px -43px;
 	word-wrap: break-word;
 	font-size: 13px;
-	padding: 6px 10px;
+	padding: 6px;
 
 	.sheet-lower {
 		text-transform: lowercase;
@@ -1877,6 +1991,7 @@ $sheet_col_min_width: 364px;
 
 		.sheet-subtitle {
 			font-size: .8em;
+			text-transform: capitalize;
 		}
 	}
 
@@ -1890,12 +2005,13 @@ $sheet_col_min_width: 364px;
 			&:first-child {
 				border-top: 1px solid black;
 				padding-top: 3px;
-				margin-top: 2px;
+				margin-top: 3px;
 			}
 
 			&:last-child {
 				border-bottom: 1px solid black;
 				padding-bottom: 3px;
+				margin-bottom: 3px;
 			}
 		}
 	}
@@ -1904,12 +2020,12 @@ $sheet_col_min_width: 364px;
 		font-size: 1.2em;
 		font-variant: small-caps;
 		line-height: 1;
-		margin-bottom: 4px;
 	}
 
 	.sheet-content {
 		font-size: 12px;
-		line-height: 1.2;
+		line-height: 1.3;
+		margin-top: 4px;
 
 		div:not(:last-child) {
 			margin-bottom: 3px;
@@ -1965,7 +2081,7 @@ $sheet_col_min_width: 364px;
 				padding: 2px;
 				border: 1px solid black;
 				left: -24px;
-				width: 65px;
+				width: auto;
 				top: 12px;
 				line-height: 1;
 			}
@@ -2028,5 +2144,12 @@ $sheet_col_min_width: 364px;
 		&.importantroll {
 			border: 2px solid #4A57ED;
 		}
+	}
+
+	a[href^="~"] {
+		background: transparent;
+		color: #910318;
+		padding: 0;
+		border: none;
 	}
 }
