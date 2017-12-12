@@ -1,10 +1,10 @@
 <!-- RoleMaster Standard System Character Sheet -->
 <!-- by Diana P. -->
 <!-- I borrowed some code/equations from Brian. And Sam. And Aaron I. And others -->
-<!-- Version 2.3.12 (full nested calculations; sheet helpers; npc import.) dated 10/08/2017 -->
+<!-- Version 2.3.13 (full nested calculations; sheet helpers; xp calculation.) dated 12/11/2017 -->
 <input type="hidden" name="attr_character_sheet" title="character-sheet" value="RMSS-FullCalcs"/>
-<input type="hidden" name="attr_currentsheetversion" title="currentsheetversion" value="3.12" />
-<p style="font-size: 0.6em;">V2.<span name="attr_sheetversion" title="sheetversion" ></span> 10/8/17 by Diana P.</p>
+<input type="hidden" name="attr_currentsheetversion" title="currentsheetversion" value="3.13" />
+<p style="font-size: 0.6em;">V2.<span name="attr_sheetversion" title="sheetversion" ></span> 12/11/17 by Diana P.</p>
 <input type="radio" class="sheet-switch-pc-show sheet-switch" title="npc-show" name="attr_npc-show" value="1" checked="checked" /><span style="text-align: left;"><span data-i18n="pc">PC</span> &nbsp; &nbsp; </span>
 <input type="radio" class="sheet-switch-npc-show sheet-switch" title="npc-show" name="attr_npc-show" value="2" /><span style="text-align: left;"><span data-i18n="npc">NPC</span> &nbsp; &nbsp; </span>
 <input type="radio" class="sheet-switch-rtmplt-show sheet-switch" title="npc-show" name="attr_npc-show" value="3" /><span style="text-align: left;" data-i18n="roll-templates">Roll Templates</span>
@@ -286,7 +286,7 @@
 								</div>
 								<div class="sheet-table-row"> 
 									<span class="sheet-table-data-center"><span data-i18n="apparent-age">Apparent Age</span>:</span>
-									<span class="sheet-table-data-center"><input type="text" name="attr_appage" title="apage" /></span>
+									<span class="sheet-table-data-center"><input type="text" name="attr_appage" title="appage" /></span>
 									<span class="sheet-table-data-center"> <span data-i18n="actual-age">Actual Age</span>:</span>
 									<span class="sheet-table-data-center"><input type="text" name="attr_age" title="age" /></span> 
 								</div>
@@ -9051,6 +9051,10 @@
 					<td style="text-align:left; border-bottom: thin solid silver;"><span data-i18n="auto-calculate-rank-bonus-information">Auto calculate Skill and Spell rank bonuses.  These include PPDev and BodyDev and use the values in the Progression set-up table below.</span> </td>
 				</tr>
 				<tr>
+					<td style="width: 30px; border-bottom: thin solid silver;"><input type="checkbox" name="attr_levelexpcalc" title="levelexpcalc" value="1" /> </td>
+					<td style="text-align:left; border-bottom: thin solid silver;"><span data-i18n="auto-calculate-experience-for-next-level">Auto calculate experience needed for next level (using RMSS std scale where level 1 is at 10000 xp).</span> </td>
+				</tr>
+				<tr>
 					<td style="width: 30px; border-bottom: thin solid silver;"><input type="checkbox" name="attr_racialcalc" title="racialcalc" value="1" /> </td>
 					<td style="text-align:left; border-bottom: thin solid silver;"><span data-i18n="auto-populate-racial-information">Auto populate Racial bonuses for Stats, Resistances, Soul Departure, Race Type for stat loss, Recovery Multiplier, and PPDev/BodyDev skill progression, for races in the Rolemaster Standard Rules book.  Does not autopopulate racial skill bonuses.</span>  <br><span data-i18n="supported">Supported</span>: Common Man, Mixed Man, High Man, Half-elf, Wood Elf, Grey Elf, High Elf, Dwarf, Halfling, Half-orc, Common Orc, Greater Orc.  <span data-i18n="racial-box-additional-information">If this box is checked and the Race field does not match the spelling of one of the above races, no bonuses will be populated.  To clear the racial bonuses, enter the keyword</span>: None . </td>
 				</tr>
@@ -11514,7 +11518,42 @@ on("change:strength change:statcalc", function() {
 			}
 		});
 	});
-
+	
+//  <!---- Calc experience for next level if level or levelexpcalc changes ------->
+	on("change:levelexpcalc change:level", function() {
+		getAttrs(["expcurrent_max", "totalexperience_max", "level", "levelexpcalc"], function(values) {
+			if (parseInt(values.levelexpcalc) == 1){
+				let xpnext = 0;
+				let lvlnext = parseInt(values.level,10) + 1;
+				if (lvlnext == 1) {xpnext = 10000;} //lvl 1=10000 xp;
+				else if (lvlnext == 2) {xpnext = 20000;} //lvl 2=20000 xp;
+				else if (lvlnext == 3) {xpnext = 30000;} //lvl 3=30000 xp;
+				else if (lvlnext == 4) {xpnext = 40000;} //lvl 4=40000 xp;
+				else if (lvlnext == 5) {xpnext = 50000;} //lvl 5=50000 xp;
+				else if (lvlnext == 6) {xpnext = 70000;} //lvl 6=70000 xp;
+				else if (lvlnext == 7) {xpnext = 90000;} //lvl 7=90000 xp;
+				else if (lvlnext == 8) {xpnext = 110000;} //lvl 8=110000 xp;
+				else if (lvlnext == 9) {xpnext = 130000;} //lvl 9=130000 xp;
+				else if (lvlnext == 10) {xpnext = 150000;} //lvl 10=150000 xp
+				else if (lvlnext == 11) {xpnext = 180000;} //lvl 11=180000 xp
+				else if (lvlnext == 12) {xpnext = 210000;} //lvl 12=210000 xp
+				else if (lvlnext == 13) {xpnext = 240000;} //lvl 13=240000 xp
+				else if (lvlnext == 14) {xpnext = 270000;} //lvl 14=270000 xp
+				else if (lvlnext == 15) {xpnext = 300000;} //lvl 15=300000 xp
+				else if (lvlnext == 16) {xpnext = 340000;} //lvl 16=340000 xp
+				else if (lvlnext == 17) {xpnext = 380000;} //lvl 17=380000 xp
+				else if (lvlnext == 18) {xpnext = 420000;} //lvl 18=420000 xp
+				else if (lvlnext == 19) {xpnext = 460000;} //lvl 19=460000 xp
+				else if (lvlnext == 20) {xpnext = 500000;} //lvl 20=500000 xp
+				else {xpnext = 500000 + (50000 * (lvlnext - 20));} //lvl 21+=500000+50000*(level-20)
+				setAttrs({
+					"totalexperience_max": xpnext,
+					"expcurrent_max": xpnext
+				});
+			}
+		});
+	});
+	
 //	<!---- Update Body Dev progression,Racial bonuses for RR's and Stats etc when racialindex changes.---->	
 on("change:racialindex change:racialcalc", function() {
 	getAttrs(["racialindex", "bodydevprog0", "bodydevprog10", "bodydevprog20", "bodydevprog30", "bodydevprog31", "agracial", "coracial", "meracial", "reracial", "sdracial", "emracial", "inracial", "prracial", "quracial", "stracial", "esssaverace", "chansaverace", "mentsaverace", "poisonsaverace", "diseasesaverace", "souldepart", "recoverymult", "racialnotes", "racialcalc", "racetypeforstatloss", "exhaustmiscbonus"], function(values) {
@@ -11701,7 +11740,7 @@ on("change:repeating_langs", function() {
 });
 
 //  <!---- If repeating_langs_* changes, make a nice summary for the front page for me ---->
-on("change:repeating_langs", function () {
+on("change:repeating_langs remove:repeating_langs", function () {
 console.log('/*----------- create rep-languages summary------*/');
   getAttrs(["cat-communications-rankbonus", "rebonus", "mebonus", "embonus", "cat-communications-profbonus", "cat-communications-specialbonus", "cat-communications-itembonus"], function (values) {
     let catbonus = parseInt(values["cat-communications-rankbonus"], 10) + parseInt(values.rebonus, 10) + parseInt(values.mebonus, 10) + parseInt(values["cat-communications-profbonus"], 10) + parseInt(values["cat-communications-specialbonus"], 10) + parseInt(values["cat-communications-itembonus"], 10);
@@ -11773,7 +11812,7 @@ console.log("end langs?");
 });
 
 // <!---- Calculate total experience ---->
-    on("change:repeating_exp", function(){
+    on("change:repeating_exp remove:repeating_exp", function(){
 //        console.log("Changing exp")
 	  
 	    getAttrs(["totalexperience"], function(values){
@@ -11818,7 +11857,7 @@ on("change:totalexperience change:xpcopy", function() {
 
 
 // <!----Calculates the total weight/row and total weight for each weight category. ---->
-    on("change:repeating_equipment", function(){
+    on("change:repeating_equipment remove:repeating_equipment", function(){
 //        console.log("Changing equipment weight")
 	  
 	    getAttrs(["weightcarried", "weightbackpack", "weightstored", "repeating_equipment_worn", "repeating_equipment_pack", "repeating_equipment_stash", "repeating_equipment_equipmentquantity", "repeating_equipment_equipmentweight", "repeating_equipment_equipmentweighttotal", "repeating_equipment_equipmentlocationtype"], function(values){
@@ -12137,13 +12176,14 @@ on("sheet:opened change:skillcalc", function() {
   });
 });
 
-// <!---- Change checkboxes for statcalc, skillcalc, racialcalc, and professioncalc if allcalc is changed. ---->
+// <!---- Change checkboxes for statcalc, skillcalc, levelexpcalc, racialcalc, and professioncalc if allcalc is changed. ---->
 on("change:allcalc", function() {
-    getAttrs(["allcalc", "statcalc", "skillcalc", "racialcalc", "professioncalc"], function(values) {
+    getAttrs(["allcalc", "statcalc", "levelexpcalc", "skillcalc", "racialcalc", "professioncalc"], function(values) {
 		if (parseInt(values.allcalc, 10) == 0) {
 		    setAttrs({
 			    statcalc: 0,
 				devpointcalc: 0,
+				levelexpcalc: 0,
 				skillcalc: 0,
 				racialcalc: 0,
 				professioncalc: 0
@@ -12152,6 +12192,7 @@ on("change:allcalc", function() {
 		    setAttrs({
 			    statcalc: 1,
 				devpointcalc: 1,
+				levelexpcalc: 1,
 				skillcalc: 1,
 				racialcalc: 1,
 				professioncalc: 1
