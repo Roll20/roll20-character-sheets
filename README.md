@@ -16,6 +16,8 @@ When you are ready to submit your template for **public use**, create a `sheet.j
 * `css`: The name of the CSS file for the sheet (e.g. `kitchensink.css`)
 * `authors`: A simple string telling who contributed toward the sheet (e.g. `Riley Dutton`)
 * `roll20userid`: A simple string telling the Roll20 User ID's of the authors (e.g. `1` or `45672,145678`). Just used so we know who to credit internally, won't be shown publicly on the site.
+* `patreon`: Place the URL for a Patreon campaign here, and it will appear under your sheet's description when selected.  (e.g. `"https://www.patreon.com/<name>"`)
+* `tipeee`: Place the URL for a Tipeee here, and it will appear under your sheet's description when selected.  (e.g. `"https://www.tipeee.com/<name>"`)
 * `preview`: The name of an image file which should be included in your sheet folder showing a preview/screenshot of the sheet (will be displayed in-app at 500x500 resolution) (e.g. `kitchensink.png`)
 * `instructions`: Markdown-formatted instructions for using the sheet. If there are any particular setup steps, special rolls you want to make the player aware of, etc., this is the place to put that info. Try to be succinct.
 
@@ -30,7 +32,7 @@ Here are a few guidelines that you should follow when contributing sheets for th
 
 **Make it Familiar**
 
-The sheet for each game type should be familiar to players who are used to seeing the paper version of that sheet. It shouldn't be identical or violate any copyright, but it also shouldn't be laid out in such a crazy way that players will have a hard time understanding how to use it. **Design for ease of us first and foremost.** Along those lines, keep your UI changes simple -- please don't change the basic functionality of how a checkbox works, for example.
+The sheet for each game type should be familiar to players who are used to seeing the paper version of that sheet. It shouldn't be identical or violate any copyright, but it also shouldn't be laid out in such a crazy way that players will have a hard time understanding how to use it. **Design for ease of use first and foremost.** Along those lines, keep your UI changes simple -- please don't change the basic functionality of how a checkbox works, for example.
 
 **Add Rolls**
 
