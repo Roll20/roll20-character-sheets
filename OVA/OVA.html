@@ -685,6 +685,42 @@
 	});
 	//End Rank
 	
+	/* ---- START: Build Dice Roll for OVA Template ATK Repeating Section ----*/
+	//First ATK Field (non-repeating)
+	on("sheet:opened change:roll1", function () {
+		'use strict';
+		getAttrs(["roll1"], function (value) {
+			console.log("Number of Dice to Roll: " + value.roll1);
+			var dice = parseInt(value.roll1);
+			console.log("Number of Dice Type = " + typeof dice);
+			var newFormula = " ";
+			var i = 0;
+			for (i = 1; i <= dice; i += 1) {
+				console.log("i = " + i);
+				newFormula += "[[1d6]] ";
+				console.log("Roll Formula = " + newFormula);
+			}
+			setAttrs({atk1: newFormula});
+		});
+	});
+	
+	//Other ATK Fields (repeating section)
+	on("change:repeating_attacks:roll2", function (eventInfo) {
+		'use strict';
+		getAttrs(["repeating_attacks_roll2","repeating_attacks_atk"], function (value) {
+			console.log("Number of Dice to Roll: " + value.repeating_attacks_roll2);
+			var dice = parseInt(value.repeating_attacks_roll2);
+			var newFormula = " ";
+			var i = 0;
+			for (i = 1; i <= dice; i += 1) {
+				console.log("i = " + i);
+				newFormula += "[[1d6]] ";
+				console.log("Roll Formula = " + newFormula);
+			}
+			setAttrs({repeating_attacks_atk: newFormula});
+		});
+	});
+	
 	/* ---- END: Build Dice Roll for OVA Template ---- */
 	
 </script>
@@ -739,6 +775,24 @@
 					</div>
 				</div>				
 			</div>
+			<!-- Release Notes Info for New Buttons -->
+			<input type='checkbox' class='sheet-Dismiss' style='display: none;' name='attr_dismissRN' value='1' />
+			<div class='sheet-row sheet-CSRelease' style='width: 100%; padding-top: 5px; padding-bottom: 5px;'>
+			    <div class='sheet-col' style='width: 80px;'>&nbsp;</div>
+			    <div class='sheet-col' style='width: 240px; text-align: right;'>Combat Stats Release Notes</div>
+			    <div class='sheet-col' style='width: 400px;'>
+			        <input type='checkbox' class='sheet-releasenotes' name='attr_releasenotes' value='1' checked /><span class='sheet-releasenotes'></span>
+			        <div class='sheet-row sheet-releasenotes' style='width: 100%; padding: 0px; margin: 0px'>
+			            <input type='checkbox' class='sheet-Dismiss' name='attr_dismissRN' value='1' /><span class='sheet-Dismiss'>&nbsp;&nbsp;Dismiss</span>
+			            
+			            <p>
+			                In order to get the Combat Stats roll buttons to work for existing characters with existing Stats, each stat will need to be changed so the sheet worker gets triggered. To accomplish this, you will need to change the number in each of the Roll boxes to a different number and hit enter, then you'll need to change it back and hit enter a second time.  After that, each roll button should work.  You should not need to do this when creating a new a character, nor when adding a new Combat Stat.<br /><br />
+			                To hide this message, simply click on the downward pointing triangle above this message.
+			            </p>
+			        </div>
+			    </div>
+			</div>
+			<!-- End Release Notes Info for New Buttons -->
 			<div class='sheet-row' style='width: 100%; padding-top: 25px;'>
 				<div class='sheet-row' style='width: 100%;'>
 					<div class='sheet-col' style='width:80px; margin-right: -5px;'> &nbsp;</div>
@@ -754,12 +808,14 @@
 						<div class='sheet-row sheet-combatstatsmain'>
 							<div class='sheet-row' style='width: 100%; padding: 5px; vertical-align: top;'>
 								<div class='sheet-combatstat' style='width:198px; text-align: left; height: 85px;'>
-									<input type='text' name='attr_mode1' placeholder="Attack" style="width:145px; border: none; color: #801421; width: 100%; font-weight: bold; margin: 0px; padding: 0px;" /><br />
+									<input type='text' name='attr_mode1' placeholder="Attack" style="width:146px; border: none; color: #801421; font-weight: bold; margin: 0px; padding: 0px;" /><button class="sheet-templatebutton" type='roll' name='roll_attack-roll1' title="@{attack-roll}" value='@{bv1}'></button><button class="sheet-GM-button" type='roll' name='roll_attack-roll1' title="@{attack-roll}" value='/w gm @{bv1}'></button><br />
 									<textarea name="attr_modedesc1" placeholder="description" class="sheet-combattext"></textarea>
+								    <input type='text' style='display:none;' name='attr_bv1' value='&{template:ova} {{name=@{character_name}}} {{attack=@{mode1}}} {{ATK (@{roll1})=@{atk1}}} {{DX=@{dx1}}} {{END=@{end1}}} {{desc=@{modedesc1}}}' />
 								</div>
 								<div class='sheet-combatstat' style='width:50px; margin-left: -7px; vertical-align: top; height: 85px;'>
 									ROLL
 									<input type="number" class="sheet-combatnum" style='width: 47px; height: 70px;' name="attr_roll1" /><br />
+									<input type="text" name='attr_atk1' style='display:none;' />
 								</div>
 								<div class='sheet-combatstat' style='width:45px; margin-left: -7px; height: 85px;'>
 									DX
@@ -773,13 +829,15 @@
 							<fieldset class="repeating_attacks" style='font-size: 1em;'>
 								<div class='sheet-row' style='width: 100%; padding: 5px; padding-top: 0px; vertical-align: top; margin-top: -5px;'>
 									<div class='sheet-combatstat' style='width:198px; text-align: left; height: 85px;'>
-										<input type='text' name='attr_mode' placeholder="Attack" style="width:145px; border: none; color: #801421; width: 100%; font-weight: bold; margin: 0px; padding: 0px;" /><br />
+										<input type='text' name='attr_mode' placeholder="Attack" style="width:146px; border: none; color: #801421; font-weight: bold; margin: 0px; padding: 0px;" /><button class="sheet-templatebutton" type='roll' name='roll_attack-roll' title="@{attack-roll}" value='@{bv}'></button><button class="sheet-GM-button" type='roll' name='roll_attack-roll1' title="@{attack-roll}" value='/w gm @{bv}'></button><br />
 										<!--<span style="color: black;">Affinity: </span><input type="text" name="attr_affinity2" style="width:150px; border: none; color: black;"/><br />-->
 										<textarea name="attr_modedesc2" placeholder="description" class="sheet-combattext"></textarea>
+										<input type='text' style='display:none;' name='attr_bv' value='&{template:ova} {{name=@{character_name}}} {{attack=@{mode}}} {{ATK (@{roll2})=@{atk}}} {{DX=@{dx2}}} {{END=@{end2}}} {{desc=@{modedesc2}}}' />
 									</div>
 									<div class='sheet-combatstat' style='width:50px; margin-left: -7px; vertical-align: top; height: 85px;'>
 										ROLL
 										<input type="number" class="sheet-combatnum" style='width: 47px; height: 70px;' name="attr_roll2" /><br />
+										<input type="text" name='attr_atk' style='display:none;' />
 									</div>
 									<div class='sheet-combatstat' style='width:45px; margin-left: -7px; height: 85px;'>
 										DX
@@ -896,17 +954,27 @@
 		<!--<h2 class="sheet-caption">{{name}}</h2>-->
 		<div class="sheet-rtcard">
 			<table>
+			    {{#name}}
 				<caption>{{name}}</caption>
+				{{/name}}
+				{{#attack}}
 				<tbody>
-					<tr class="sheet-rth">
-						<th colspan="2">Roll Results</th>
+				    <tr class="sheet-rth">
+						<th colspan="2">{{attack}}</th>
 					</tr>
-					{{#allprops()}}
-						<tr>
-							<td class="sheet-rresults">{{key}}</td>
-							<td class="sheet-rollresults" style='text-align: right;'>{{value}}</td>
-						</tr>
-					{{/allprops()}}
+				
+				{{/attack}}
+				{{#allprops() attack desc}}
+					<tr>
+						<td class="sheet-rresults">{{key}}</td>
+						<td class="sheet-rollresults" style='text-align: right;'>{{value}}</td>
+					</tr>
+				{{/allprops() attack desc}}
+				{{#desc}}
+				    <tr>
+						<td colspan=2 class="sheet-rollresults">{{desc}}</td>
+					</tr>
+				{{/desc}}
 				</tbody>
 			</table>
 		</div>

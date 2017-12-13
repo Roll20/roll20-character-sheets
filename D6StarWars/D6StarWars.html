@@ -1,10 +1,10 @@
 <div class="sheet-sheet" style=" position:relative;">
-    <div name="header" style="text-align: Center;">
-        <img src="http://www.hkgsi.com/test/crystal.dice.red.big.jpg" style="max-height: 50px;" />
-        <img src="http://www.milanricoul.com/starwars/img/starwars-logo.png" style="max-height: 50px;" />
-        <img src="http://www.hkgsi.com/test/crystal.dice.blue.big.jpg" style="max-height: 50px;" />
+    <div style="text-align: Center;"> <!-- id="header"-->
+        <img src="http://rs8.pbsrc.com/albums/a35/VPP3/d62_zpstllyo5ds.png?w=480&h=480&fit=clip" style="max-height: 60px;" />
+        <img src="http://a.dilcdn.com/bl/wp-content/uploads/sites/6/2012/11/sw_logo_lg_default-small.jpg" style="max-height: 90px;" />
+        <img src="http://rs8.pbsrc.com/albums/a35/VPP3/d61_zps5ef1qprz.png?w=480&h=480&fit=clip" style="max-height: 60px;" />
     </div>
-    <div name="characterinfo" class="sheet-section">
+    <div class="sheet-section"> <!-- id="Characterinfo"-->
         <div class="sheet-2colrow">
             <div class="sheet-col" style="display:inline-block;">
                 <label class="sheet-toppad">Character Name <input class="sheet-right sheet-shorttext" type="text" name="attr_charactername" style="width:65%"/></label>
@@ -26,195 +26,214 @@
             </div>
             <div class="sheet-col">
                 <label>Credits <input type="number" min="0" class="sheet-credits" name="attr_credits" /></label>
-                <label>Physical Description
-                <textarea style="height:55px; padding-top:2px; padding-bottom:2px;" name="attr_Physical_Description"></textarea></label>
+                <label>Physical Description</label>
+                <textarea rows="4" name="attr_Physical_Description"></textarea>
             </div>
         </div>
     </div>
-    <div name="characternumbers" class="sheet-section">
+    <div class="sheet-section"> <!-- id="Characternumbers" -->
         <div class='sheet-3colrow'>
             <div class='sheet-col'>
                 <label class="sheet-areaLabel">Special Abilities</label>
-                <textarea name="attr_specialAbilities" style="height:100px; width:200px;"></textarea>
-            </div>
-            
+                <textarea name="attr_specialAbilities" style="width:230px;" rows="7"></textarea>
+            </div>            
             <div class='sheet-col' >
                 <label>Move <input type="number" name="attr_move" class="sheet-smallshortnumber" min="0" value="10"/></label>
-                <label for="isForceSensitive">
-                    Force Sensitive? <select name="attr_forceSensitive" class="sheet-smallselect" id="isForceSensitive">
-                      <option value="true">Yes</option>
-                      <option value="false" selected="selected">No</option>
+                <label>
+                    Force Sensitive? <select name="attr_forceSensitive" class="sheet-smallselect">
+                      <option value="1">Yes</option>
+                      <option value="0" selected="selected">No</option>
                     </select> 
                 </label>
-                <label>Force Points <input type="number" name="attr_forcePoints" class="sheet-smallshortnumber" min="0" value="0"/></label>
+                <label>Force Points <input type="number" name="attr_forcePoints" class="sheet-smallshortnumber" min="0" value="0"/></label> <!---On char creation everyone starts with 1 FP --->
                 <label>Dark Side Points <input type="number" name="attr_darkSidePoints" class="sheet-smallshortnumber" min="0" value="0"/></label>
-                <label>Character Points <input type="number" name="attr_characterPoints" class="sheet-smallshortnumber" min="0" value="0"/></label>
-            </div>
-            
+                <label>Character Points <input type="number" name="attr_characterPoints" class="sheet-smallshortnumber" min="0" value="0"/></label> <!---On char creation everyone starts with 5 CP --->
+            </div>          
             <div class='sheet-col'>
-                <Label style="text-decoration:underline;">Wound Status</Label>
-                <form >                    
-                    <label><input type="checkbox" name="attr_stunned" style="margin-left:18px;"> Stunned</label>
-                    <label><input type="checkbox" name="attr_wounded"style="margin-right:0px;">
-                    <input type="checkbox" name="attr_wounded2" style="margin-left:0px;"> Wounded </label>
-                    <label><input type="checkbox" name="attr_incapacitated" class="sheet-singlecheck" style="margin-left:18px;"> Incapacitated </label>
-                    <label><input type="checkbox" name="attr_mortallywounded" class="sheet-singlecheck" style="margin-left:18px;"> Mortally Wounded </label>                                            
-                </form> 
+                <label style="text-decoration:underline;">
+					Wound Level
+					<select name="attr_WoundLevel" class="sheet-mediumselect" class="sheet-left" >
+					  <option value="0" selected="selected">Healthy</option>
+					  <option value="-1">Stunned</option>
+					  <option value="-1">Wounded</option>
+					  <option value="-2">Wounded Twice</option>
+					  <option value="-10">Incapacitated</option> <!--You shouldn't even be able to make checks while incapacitated or Mortally wounded, hence -15. Later will include option to ignore wound penalties -->
+					  <option value="-15">Mortally Wounded</option>
+					</select> 
+				</label>
+				
+				<label>
+					Initiative bonus
+					<input type="number" name="attr_initiative" class="sheet-smallnumber sheet-shortnumber" min="0" value="0"/>D+<input type="number" name="attr_initiativepip" class="sheet-pipnumber sheet-shortnumber" min="0" max="2" value="0"/>
+				</label>
+				<button class="sheet-d6-dice" type="roll" value="&{template:default} {{name=Initiative}} {{Roll=[[(@{perception} + @{initiative} + @{WoundLevel} +@{Force_ControlPain_ResistStun} + @{Force_Up} + ?{Dice mods|0} -1)d6cf0cs7 + @{perceptionpip} + @{initiativepip} + ?{Other Mods(pip)|0} + 1d6!cf1cs6 &{tracker}]]}}">Initiative(select you token first)</button>
+				<button class="sheet-d6-dice" type="roll" value="&{template:default} {{name=?{Roll Name}}} {{Roll=[[{(?{Number of dice|0} - 1)d6cf0cs7 + ?{Number of pip|0},1d6!cf1cs6}]]}}">Custom Roll(no modifiers)</button>
+				<button class="sheet-d6-dice" type="roll" value="&{template:default} {{name=Extra Dice}} {{Roll=[[{?{Number of  extra dice|0}d6cf0cs7}]]}}">Extra Dice(no wild die)</button>
+				<button class="sheet-d6-dice" type="roll" value="&{template:default} {{name=Character points roll}} {{Roll=[[?{Number of char points to spend on roll|1|2|3|4|5}d6!cf0cs6]]}}">Character points roll</button>
             </div>
         </div>
     </div>
-    <div name"attributes" class="sheet-section">
+    <div class="sheet-section"> <!-- id="Attributes" -->
         <table>
             <tr>
-                <td class="sheet-tdborder">
-                    <div class="sheet-bold">
-                    
-                        <button type='roll' class="astext" value='/roll (@{perception} - 1)d6 + 1d6! + @{perceptionpip}' >Perception</button>
+                <td class="sheet-tdborder"><div class="sheet-bold"><!---Perc Attribute --->
+                        <button class="sheet-d6-dice" type='roll' class="astext" value='&{template:default} {{name=Perception}} {{Roll=[[(@{perception} -1 +@{WoundLevel} +@{Force_ControlPain_ResistStun} + @{Force_Up} + ?{Dice mods|0})d6cf0cs7 + @{perceptionpip} + ?{Other Mods(pip)|0} + 1d6!cf1cs6]]}}' >Perception</button>
                         <div style="float:right;">
-                            <input type="number" name="attr_perception" class="sheet-smallnumber"  min="1" value="3"/>D 
-                            +<input type="number" name="attr_perceptionpip" class="sheet-smallnumber" min="0" max="2" value="0"/>
+                            <input type="number" name="attr_perception" class="sheet-smallnumber"  min="1" value="3"/>D
+							+<input type="number" name="attr_perceptionpip" class="sheet-pipnumber" min="0" max="2" value="0"/>
                         </div>
                     </div>
-                    <fieldset class="repeating_perckills">
-                        <button  type="roll" value="/r (@{perckilldice} - 1)d6 + 1d6! + @{perckillpip}"></button>
-                          <input class="sheet-skilltext" type="text" name="attr_perckillname"/> 
+					<fieldset class="repeating_perckills"> <!---Perc Skills --->
+						<button class="sheet-d6-dice"  type="roll" value="&{template:default} {{name=@{perckillname}}} {{Roll=[[(@{perckilldice} -1 +@{WoundLevel} +@{Force_ControlPain_ResistStun} + @{Force_Up} + ?{Dice mods|0})d6cf0cs7 + @{perckillpip} + ?{Other Mods(pip)|0} + 1d6!cf1cs6]]}}"></button>
+                          <input class="sheet-skilltext" type="text" name="attr_perckillname"/> <!-- Misspelled attr name iis to be left as it is, otherwise it wipes char sheets from perseption skills-->
                           <div class="sheet-right">
                           <input type="number" name="attr_perckilldice" class="sheet-smallnumber sheet-shortnumber" min="1" value="3"/>D 
-                          +<input type="number" name="attr_perckillpip" class="sheet-smallnumber sheet-shortnumber" min="0" max="2" value="0"/> 
+                          +<input type="number" name="attr_perckillpip" class="sheet-pipnumber sheet-shortnumber" min="0" max="2" value="0"/> 
                           </div>
                     </fieldset>
                 </td>
-                <td class="sheet-tdborder">
-                    <div class="sheet-bold">
-                        <button type='roll' class="astext" value='/roll (@{strength} - 1)d6 + 1d6! + @{strengthpip}' >Strength</button>
+                <td class="sheet-tdborder"><div class="sheet-bold"><!---Str Attribute --->
+                        <button class="sheet-d6-dice" type='roll' class="astext" value='&{template:default} {{name=Strength}} {{Roll=[[(@{strength} -1 +@{WoundLevel} +@{Force_ControlPain_ResistStun} + @{Force_Up} + ?{Dice mods|0})d6cf0cs7 + @{strengthpip} + ?{Other Mods(pip)|0} + 1d6!cf1cs6]]}}' >Strength</button>
                         <div style="float:right;">
                             <input type="number" name="attr_strength" class="sheet-smallnumber" min="1" value="3"/>D
-                            +<input type="number" name="attr_strengthpip" class="sheet-smallnumber" min="0" max="2" value="0"/>  
+							+<input type="number" name="attr_strengthpip" class="sheet-pipnumber" min="0" max="2" value="0"/>  
                         </div>
                     </div>
-                    <fieldset class="repeating_strskills">
-                        <button  type="roll" value="/r (@{strskilldice} - 1)d6 + 1d6! + @{strskillpip}"></button>
+                    <fieldset class="repeating_strskills"> <!---Str Skills --->
+                        <button class="sheet-d6-dice" type="roll" value="&{template:default} {{name=@{strskillname}}} {{Roll=[[(@{strskilldice} -1 +@{WoundLevel} +@{Force_ControlPain_ResistStun} + @{Force_Up} + ?{Dice mods|0})d6cf0cs7 + @{strskillpip} + ?{Other Mods(pip)|0} + 1d6!cf1cs6]]}}"></button>
                           <input class="sheet-skilltext" type="text" name="attr_strskillname"/> 
                           <div class="sheet-right">
-                          <input type="number" name="attr_strskilldice" class="sheet-smallnumber sheet-shortnumber" min="1" value="3"/>D 
-                          +<input type="number" name="attr_strskillpip" class="sheet-smallnumber sheet-shortnumber" min="0" max="2" value="0"/> 
+							<input type="number" name="attr_strskilldice" class="sheet-smallnumber sheet-shortnumber" min="1" value="0"/>D
+							+<input type="number" name="attr_strskillpip" class="sheet-pipnumber sheet-shortnumber" min="0" max="2" value="0"/> 
                           </div>
-                    </fieldset>
+                    </fieldset>			
                 </td> 
-                <td class="sheet-tdborder">
-                    <div class="sheet-bold">
-                        <button type='roll' class="astext" value='/roll (@{technical} - 1)d6 + 1d6! + @{technicalpip}' >Technical</button>
+                <td class="sheet-tdborder"><div class="sheet-bold"><!---Tech Attribute --->
+                        <button class="sheet-d6-dice" type='roll' class="astext" value='&{template:default} {{name=Technical}} {{Roll=[[(@{technical} -1 +@{WoundLevel} +@{Force_ControlPain_ResistStun} + @{Force_Up} + ?{Dice mods|0})d6cf0cs7 + @{technicalpip} + ?{Other Mods(pip)|0} + 1d6!cf1cs6]]}}' >Technical</button>
                         <div style="float:right;">
-                            <input type="number" name="attr_technical" class="sheet-smallnumber" min="1" value="3"/>D 
-                            +<input type="number" name="attr_technicalpip" class="sheet-smallnumber" min="0" max="2" value="0"/>    
+                            <input type="number" name="attr_technical" class="sheet-smallnumber" min="1" value="3"/>D
+							+<input type="number" name="attr_technicalpip" class="sheet-pipnumber" min="0" max="2" value="0"/>    
                         </div>
                     </div>
-                    <fieldset class="repeating_techskills">   
-                        <button  type="roll" value="/r (@{techskilldice} - 1)d6 + 1d6! + @{techskillpip}"></button>
+                    <fieldset class="repeating_techskills">  <!---Tech Skills --->
+                        <button class="sheet-d6-dice"  type="roll" value="&{template:default} {{name=@{techskillname}}} {{Roll=[[(@{techskilldice} -1 +@{WoundLevel} +@{Force_ControlPain_ResistStun} + @{Force_Up} + ?{Dice mods|0})d6cf0cs7 + @{techskillpip} + ?{Other Mods(pip)|0} + 1d6!cf1cs6]]}}"></button>
                           <input class="sheet-skilltext" type="text" name="attr_techskillname"/> 
                           <div class="sheet-right">
-                          <input type="number" name="attr_techskilldice" class="sheet-smallnumber sheet-shortnumber" min="1" value="3"/>D 
-                          +<input type="number" name="attr_techskillpip" class="sheet-smallnumber sheet-shortnumber" min="0" max="2" value="0"/> 
+                          <input type="number" name="attr_techskilldice" class="sheet-smallnumber sheet-shortnumber" min="1"/>D
+						  +<input type="number" name="attr_techskillpip" class="sheet-pipnumber sheet-shortnumber" min="0" max="2"/> 
                           </div>
                     </fieldset>
                 </td class="sheet-tdborder"> 
             </tr>
             <tr>
-                <td class="sheet-tdborder">
-                    <div class="sheet-bold">
-                        <button type='roll'value='/roll (@{dexterity} - 1)d6 + 1d6! + @{dexteritypip}' >Dexterity</button>
+                <td class="sheet-tdborder"><div class="sheet-bold"> <!---Dex Attribute --->
+                        <button class="sheet-d6-dice" type='roll'value='&{template:default} {{name=Dexterity}} {{Roll=[[(@{dexterity} -1 +@{WoundLevel} +@{Force_ControlPain_ResistStun} + @{Force_Up} + ?{Dice mods|0})d6cf0cs7 + @{dexteritypip} + ?{Other Mods(pip)|0} + 1d6!cf1cs6]]}}' >Dexterity</button>
                         <div style="float:right;">
                             <input type="number" name="attr_dexterity" class="sheet-smallnumber" min="1" value="3"/>D
-                            +<input type="number" name="attr_dexteritypip" class="sheet-smallnumber" min="0" max="2" value="0"/>
+							+<input type="number" name="attr_dexteritypip" class="sheet-pipnumber" min="0" max="2" value="0"/>
                         </div>
                     </div>
-                    <fieldset class="repeating_dexskills">
-                        <button  type="roll" value="/r (@{dexskilldice} - 1)d6 + 1d6! + @{dexskillpip}"></button>
-                          <input class="sheet-skilltext" type="text" name="attr_dexskillname"/> 
-                          <div class="sheet-right">
-                          <input type="number" name="attr_dexskilldice" class="sheet-smallnumber sheet-shortnumber" min="1" value="3"/>D 
-                          +<input type="number" name="attr_dexskillpip" class="sheet-smallnumber sheet-shortnumber" min="0" max="2" value="0"/> 
+                    <fieldset class="repeating_dexskills"> <!---Dex Skills --->
+                        <button class="sheet-d6-dice"  type="roll" value="&{template:default} {{name=@{dexskillname}}} {{Roll=[[(@{dexskilldice} -1 +@{WoundLevel} +@{Force_ControlPain_ResistStun} + @{Force_Up} + ?{Dice mods|0})d6cf0cs7 + @{dexskillpip} + ?{Other Mods(pip)|0} + 1d6!cf1cs6]]}}"></button>
+                          <input class="sheet-skilltext" type="text" name="attr_dexskillname"/>
+                          <div class="sheet-right">		
+                          <input type="number" name="attr_dexskilldice" class="sheet-smallnumber sheet-shortnumber" min="1"/>D
+						  +<input type="number" name="attr_dexskillpip" class="sheet-pipnumber sheet-shortnumber" min="0" max="2"/>
                           </div>
                     </fieldset>
                 </td>
-                <td class="sheet-tdborder">
-                    <div class="sheet-bold">
-                        <button type='roll' value='/roll (@{knowledge} - 1)d6 + 1d6! + @{knowledgepip}' >Knowledge</button>
+                <td class="sheet-tdborder"><div class="sheet-bold"> <!---Know Attribute ---> 
+                        <button class="sheet-d6-dice" type='roll' value='&{template:default} {{name=Knowledge}} {{Roll=[[(@{knowledge} -1 +@{WoundLevel} +@{Force_ControlPain_ResistStun} + @{Force_Up} + ?{Dice mods|0})d6cf0cs7 + @{knowledgepip} + ?{Other Mods(pip)|0} + 1d6!cf1cs6]]}}' >Knowledge</button>
                         <div style="float:right;">
-                            <input type="number" name="attr_knowledge" class="sheet-smallnumber" min="1" value="3"/>D 
-                            +<input type="number" name="attr_knowledgepip" class="sheet-smallnumber" min="0" max="2" value="0"/>
+                            <input type="number" name="attr_knowledge" class="sheet-smallnumber" min="1" value="3"/>D
+							+<input type="number" name="attr_knowledgepip" class="sheet-pipnumber" min="0" max="2" value="0"/>
                         </div>
                     </div>
-                    <fieldset class="repeating_knowskills">  
-                        <button  type="roll" value="/r (@{knowskilldice} - 1)d6 + 1d6! + @{knowskillpip}"></button>
+                    <fieldset class="repeating_knowskills">  <!---Know Skills --->
+                        <button class="sheet-d6-dice"  type="roll" value="&{template:default} {{name=@{knowskillname}}} {{Roll=[[(@{knowskilldice} -1 +@{WoundLevel} +@{Force_ControlPain_ResistStun} + @{Force_Up} + ?{Dice mods|0})d6cf0cs7 + @{knowskillpip} + ?{Other Mods(pip)|0} + 1d6!cf1cs6]]}}"></button>
                           <input class="sheet-skilltext" type="text" name="attr_knowskillname"/> 
                           <div class="sheet-right">
-                          <input type="number" name="attr_knowskilldice" class="sheet-smallnumber sheet-shortnumber" min="1" value="3"/>D 
-                          +<input type="number" name="attr_knowskillpip" class="sheet-smallnumber sheet-shortnumber" min="0" max="2" value="0"/> 
+                          <input type="number" name="attr_knowskilldice" class="sheet-smallnumber sheet-shortnumber" min="1"/>D
+						  +<input type="number" name="attr_knowskillpip" class="sheet-pipnumber sheet-shortnumber" min="0" max="2"/> 
                           </div>
                     </fieldset>
                 </td> 
-                <td class="sheet-tdborder">
-                    <div class="sheet-bold">
-                        <button  type='roll' value='/roll (@{mechanical} - 1)d6 + 1d6! + @{mechanicalpip}' >Mechanical</button>
+                <td class="sheet-tdborder"><div class="sheet-bold"><!---Mech Attribute --->
+                        <button class="sheet-d6-dice"  type='roll' value='&{template:default} {{name=Mechanical}} {{Roll=[[(@{mechanical} -1 +@{WoundLevel} +@{Force_ControlPain_ResistStun} + @{Force_Up} + ?{Dice mods|0})d6cf0cs7 + @{mechanicalpip} + ?{Other Mods(pip)|0} + 1d6!cf1cs6]]}}' >Mechanical</button>
                         <div style="float:right;">
                             <input type="number" name="attr_mechanical" class="sheet-smallnumber" min="1" value="3"/>D
-                            +<input type="number" name="attr_mechanicalpip" class="sheet-smallnumber" min="0" max="2" value="0"/>
+							+<input type="number" name="attr_mechanicalpip" class="sheet-pipnumber" min="0" max="2" value="0"/>
                         </div>
                     </div>
-                    <fieldset class="repeating_mechskills">         
-                        <button  type="roll" value="/r (@{mechskilldice} - 1)d6 + 1d6! + @{mechskillpip}"></button>
-                          <input class="sheet-skilltext" type="text" name="attr_mechskillname"/> 
-                          <div class="sheet-right">
-                          <input type="number" name="attr_mechskilldice" class="sheet-smallnumber sheet-shortnumber" min="1" value="3"/>D 
-                          +<input type="number" name="attr_mechskillpip" class="sheet-smallnumber sheet-shortnumber" min="0" max="2" value="0"/> 
-                          </div>
+                    <fieldset class="repeating_mechskills">  <!---Mech Skills --->      
+                        <button class="sheet-d6-dice"  type="roll" value="&{template:default} {{name=@{mechskillname}}} {{Roll=[[(@{mechskilldice} -1 +@{WoundLevel} +@{Force_ControlPain_ResistStun} + @{Force_Up} + ?{Dice mods|0})d6cf0cs7 + @{mechskillpip} + ?{Other Mods(pip)|0} + 1d6!cf1cs6]]}}"></button>
+                         <input class="sheet-skilltext" type="text" name="attr_mechskillname"/> 
+                         <div class="sheet-right">
+                         <input type="number" name="attr_mechskilldice" class="sheet-smallnumber sheet-shortnumber" min="1"/>D
+						 +<input type="number" name="attr_mechskillpip" class="sheet-pipnumber sheet-shortnumber" min="0" max="2"/> 
+                         </div>
                     </fieldset>
-                    <!---
-                    <div>
-                        <textarea name="attr_mechSkills"></textarea>
-                    </div>
-                    --->
                 </td> 
             </tr>
         </table>    
-    </div>
-	
-	<div name"Weapons" class="sheet-section">
+    </div>	
+	<div class="sheet-section"> <!-- id="Weapons" -->
+		<label style="text-align: center">Weapon Section</label>
 		<table>
 			<tr>
-				<td style="width:200px"><label>Weapon</label></td>
+				<td style="width:200px">Name</td>
 				<td style="width:80px">Damage</td>
 				<td style="width:35px">Short</td>
 				<td style="width:30px">Med</td>
 				<td style="width:35px">Long</td>
-				<td style="width:30px">ROF</td>
-				<td style="width:30px">Ammo</td>
+				<td style="width:40px">ROF</td>
+				<td style="width:35px">Ammo</td>
+				<td style="width:70px;text-align:center;">Skill</td>
 			</tr>
 		</table>	
-		<fieldset class="repeating_weapons">
-            <input class="sheet-skilltext" type="text"  style="width:200px" name="attr_weapon"/>
-			<input type="number" name="attr_damagedice" class="sheet-smallnumber sheet-shortnumber" min="1" value="1"/>D 
-                          +<input type="number" name="attr_damagepip" class="sheet-smallnumber sheet-shortnumber" min="0" max="2" value="0"/>
-			<input class="sheet-smallnumber sheet-shortnumber" type="number" name="attr_shortrange"/>
-			<input class="sheet-smallnumber sheet-shortnumber" type="number" name="attr_medrange"/>
-			<input class="sheet-smallnumber sheet-shortnumber" type="number" name="attr_longrange"/>
-			<input class="sheet-smallnumber sheet-shortnumber" type="number" name="attr_ROF"/>
-			<input class="sheet-smallnumber sheet-shortnumber" type="number" name="attr_Ammo"/>
-						<button  type="roll" value="/r (@{damagedice} - 1)d6 + 1d6! + @{damagepip}">Damage</button>
-                          
-                          
-                    </fieldset>		  
+			<fieldset class="repeating_weapons">
+				<input class="sheet-skilltext" type="text"  style="width:200px" name="attr_weapon"/>
+				<input type="number" name="attr_damagedice" class="sheet-smallnumber sheet-shortnumber" min="1" value="1"/>D+<input type="number" name="attr_damagepip" class="sheet-pipnumber sheet-shortnumber" min="0" max="2" value="0"/>
+				<input class="sheet-smallnumber sheet-shortnumber" type="number" name="attr_shortrange"/>
+				<input class="sheet-smallnumber sheet-shortnumber" type="number" name="attr_medrange"/>
+				<input class="sheet-mediumnumber" type="number" name="attr_longrange"/>
+				<input class="sheet-smallnumber sheet-shortnumber" type="number" name="attr_ROF"/>
+				<input class="sheet-mediumnumber" type="number" name="attr_Ammo"/>
+				<input class="sheet-skilltext" type="text"  style="width:150px" name="attr_skill"/>
+				<button class="sheet-d6-dice"  type="roll" value="&{template:default} {{name=@{weapon} damage}} {{Roll=[[(@{damagedice}- 1)d6cf0cs7 + @{damagepip} + (1d6!cf1cs6)]]}}">Damage</button>
+			</fieldset>
+					  
     </div>
-    <div name="theforce" class="sheet-section" style="text-align: Left; position:relative;">
-        <div class='sheet-2colrow'>
-            <div class='sheet-col'>
-                <table>
-                    <th><label>Force Skills</label></th>
-                    <tr>
+	<div class="sheet-section"> <!--  id="Armor"-->
+		<table>
+			<tr>
+				<td style="width:200px"><label>Armor</label></td>
+				<td style="width:80px">Physical</td>
+				<td style="width:80px">Energy</td>
+				<td style="width:180px">Other</td>
+				<td style="width:180px">Damage Soak Rolls</td>
+			</tr>
+		</table>
+			<fieldset class="repeating_armors">
+				<input class="sheet-skilltext" type="text"  style="width:200px" name="attr_armorname"/>
+				<input type="number" name="attr_armorPhDice" class="sheet-smallnumber sheet-shortnumber" min="0" value="1"/>D+<input type="number" name="attr_armorPhPip" class="sheet-pipnumber sheet-shortnumber" min="0" max="2" value="0"/>
+				<input type="number" name="attr_armorEnDice" class="sheet-smallnumber sheet-shortnumber" min="0" value="1"/>D+<input type="number" name="attr_armorEnPip" class="sheet-pipnumber sheet-shortnumber" min="0" max="2" value="0"/>
+				<input class="sheet-skilltext" type="text" name="attr_armor_other"/>
+				<button class="sheet-d6-dice"  type="roll" value="&{template:default} {{name=Damage Soak(Physical)}} {{Roll=[[(@{strength} + @{armorPhDice} +@{WoundLevel} +@{Force_ControlPain_ResistStun} - 1)d6cf0cs7 + @{armorPhPip} + 1d6!cf1cs6]]}}">Physical</button>
+				<button class="sheet-d6-dice"  type="roll" value="&{template:default} {{name=Damage Soak(Energy)}} {{Roll=[[(@{strength} + @{armorEnDice} +@{WoundLevel} +@{Force_ControlPain_ResistStun} - 1)d6cf0cs7 + @{armorEnPip} + 1d6!cf1cs6]]}}">Energy</button>
+				<button class="sheet-d6-dice"  type="roll" value="&{template:default} {{name=Damage Soak(Strength only)}} {{Roll=[[(@{strength} +@{WoundLevel} +@{Force_ControlPain_ResistStun} - 1)d6cf0cs7 + 1d6!cf1cs6]]}}">Str only</button>	  
+			</fieldset>
+	</div>
+    <div class="sheet-section"> <!-- id="Force" -->
+		<input type="checkbox" class="sheet-hide"><!-- Checkbox to hide force section -->
+		<label style="text-align: center">Force Section</label>
+		<div class='sheet-2colrow sheet-body-to-hide'>
+			<div class='sheet-col'>
+                <table><th><label>Force Skills</label></th>
+                    <tr><!--Control -->
                         <td style="width:260px;">
                             <div class="sheet-bold">
-                                <button class="sheet-forcebutton" type='roll' class="astext" value='/roll (@{control} - 1)d6 + 1d6! + @{controlpip}' > Control</button>
+                                <button class="sheet-d6-dice" class="sheet-forcebutton" type='roll' class="astext" value='&{template:default} {{name=Force: Control}} {{Roll=[[(@{control} -1 +@{WoundLevel} +@{Force_ControlPain_ResistStun} + @{Force_Up} + ?{Dice mods|0})d6cf0cs7 + @{controlpip} + @{Force_Emptiness}+ ?{Other Mods(pip)|0} + 1d6!cf1cs6]]}}' > Control</button>
                                 <div style="float:right;">
                                     <input type="number" name="attr_control" class="sheet-smallnumber"  min="0" value="0"/>D 
                                     +<input type="number" name="attr_controlpip" class="sheet-smallnumber" min="0" max="2" value="0"/>
@@ -222,10 +241,10 @@
                             </div>
                         </td>
                     </tr>
-                    <tr>
+                    <tr><!-- Sense -->
                         <td style="width:260px;">
                             <div class="sheet-bold">
-                                <button class="sheet-forcebutton" type='roll' class="astext" value='/roll (@{sense} - 1)d6 + 1d6! + @{sensepip}' > Sense</button>
+                                <button class="sheet-d6-dice" class="sheet-forcebutton" type='roll' class="astext" value='&{template:default} {{name=Force: Sense}} {{Roll=[[(@{sense} -1 +@{WoundLevel} +@{Force_ControlPain_ResistStun} + @{Force_Up} + ?{Dice mods|0})d6cf0cs7 + @{sensepip} + @{Force_Emptiness}+ ?{Other Mods(pip)|0} + 1d6!cf1cs6]]}}' > Sense</button>
                                 <div style="float:right;">
                                     <input type="number" name="attr_sense" class="sheet-smallnumber" style="margin-left=100px;"  min="0" value="0"/>D
                                     +<input type="number" name="attr_sensepip" class="sheet-smallnumber" min="0" max="2" value="0"/>  
@@ -233,10 +252,10 @@
                             </div>
                         </td> 
                     </tr>
-                    <tr>    
+                    <tr><!-- Alter -->
                         <td style="width:260px;">
                             <div class="sheet-bold">
-                                <button class="sheet-forcebutton" type='roll' class="astext" value='/roll (@{alter} - 1)d6 + 1d6! + @{alterpip}' > Alter</button>
+                                <button class="sheet-d6-dice" class="sheet-forcebutton" type='roll' class="astext" value='&{template:default} {{name=Force: Alter}} {{Roll=[[(@{alter} -1 +@{WoundLevel} +@{Force_ControlPain_ResistStun} + @{Force_Up} + ?{Dice mods|0})d6cf0cs7 + @{alterpip} + @{Force_Emptiness}+ ?{Other Mods(pip)|0} + 1d6!cf1cs6]]}}' > Alter</button>
                                 <div style="float:right;">
                                     <input type="number" name="attr_alter" class="sheet-smallnumber" min="0" value="0"/>D 
                                     +<input type="number" name="attr_alterpip" class="sheet-smallnumber" min="0" max="2" value="0"/>    
@@ -245,60 +264,100 @@
                         </td> 
                     </tr>
                 </table>
-            </div>
-            <div class='sheet-col'>
-                <label style="padding-top:8px; padding-bottom:12px;">Force Powers </label>
-                <textarea name="attr_forcePowers" style="height:120px;"></textarea>
-            </div>
-        </div>
-    </div>
-    <div name="extendedinfo" class="sheet-section">
-        <table>
-            <tr>
-                <td style="width:33.33%;"><label>Background</label>
-                    <div>
-                        <textarea name="attr_background"></textarea>
-                    </div>
-                </td>
-                <td style="width:33.33%;">
-                    <label>Personality</label>
-                    <div>
-                        <textarea name="attr_personality"></textarea>
-                    </div>
-                </td>
-                <td style="width:33.33%;">
-                    <label>Objectives</label>
-                    <div>
-                        <textarea name="attr_objectives"></textarea>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <label>Quotes</label>
-                    <div>
-                        <textarea name="attr_quotes"></textarea>
-                    </div>
-                </td>
-                <td>
-                    <label>Connections to other characters</label>
-                    <div>
-                        <textarea name="attr_connections"></textarea>
-                    </div>
-                </td>
-                <td>
-                    <label>Additional Notes</label>
-                    <div>
-                        <textarea name="attr_connections"></textarea>
-                    </div>
-                </td>
-            </tr>
-        </table>
-    </div>
-    <div name="equipment" class="sheet-section">
+				<table><th><label>Force Powers Active</label></th>
+					
+					<tr><td><!---Force Emptiness --->
+							<span style="padding-top:8px; padding-bottom:12px;" title="Force Emptiness adds +6 pips to all force skill rolls when active">Force Emptiness active?</span><!---Force Emptiness adds +6 pips to all force skill rolls when active --->
+								<select name="attr_Force_Emptiness" class="sheet-smallselect">
+								  <option value="0" selected="selected">No</option>
+								  <option value="6">Yes</option>
+								</select>
+					</td></tr>
+					<tr><td><!---Force Powers active --->
+						<span>Number of powers active?<!---gives penalty to all rolls thanks to concentration/distraction --->
+							<select name="attr_Force_Up" class="sheet-smallselect" title="The number of power active is subtracted from all roll as a MultiActionPenalty">
+							  <option value="0" selected="selected">0</option>
+							  <option value="-1">1</option>
+							  <option value="-2">2</option>
+							  <option value="-3">3</option>
+							  <option value="-4">4</option>
+							  <option value="-5">5</option>
+							</select>
+						</span>
+					</td></tr>
+					<!---Force Control pain/ resist stun , could not make it work, thanks to order of precedence https://wiki.roll20.net/Dice_Reference#Math_Operators_and_Functions
+						This version result in abs(-1) being put into the roll, where the -1 is replaced by char's woundlevel.
+						If a way to get the attr_Force_ControlPain_ResistStun be equal to a positive value of attr_WoundLevel
+						this check could be added back. -Andreas.J 2017-12-3 
+						--->
+					<tr><td>
+							<span style="padding-top:8px; padding-bottom:12px;" title="Negates any WoundLevel penalties to rolls if active" >Control Pain/Resist Stun active?(deactivated, not working)</span>
+								<select name="attr_Force_ControlPain_ResistStun" class="sheet-smallselect">
+								  <option value="0" selected="selected">No</option>
+								  <option value="0">Yes</option>
+								</select>
+					</td></tr>					
+				</table>				
+			</div>
+			<div class='sheet-col'>
+				<div><!-- Force Power list -->
+					<label style="padding-top:8px; padding-bottom:12px;" >Force Powers </label>
+					<textarea name="attr_forcePowers" style="width:260px;height:500px"></textarea>
+				</div>				
+			</div>		
+		</div>
+	</div>
+	<div class="sheet-section"> <!--id="Extendedinfo" -->
+		<input type="checkbox" class="sheet-hide"><!-- Checkbox to hide extended info section -->
+		<label style="text-align: center">Background and extended info</label>
+        <div class='sheet-body-to-hide'>
+			<table>
+				<tr>
+					<td style="width:33.33%;"><label>Background</label>
+						<div>
+							<textarea name="attr_background"></textarea>
+						</div>
+					</td>
+					<td style="width:33.33%;">
+						<label>Personality</label>
+						<div>
+							<textarea name="attr_personality"></textarea>
+						</div>
+					</td>
+					<td style="width:33.33%;">
+						<label>Objectives</label>
+						<div>
+							<textarea name="attr_objectives"></textarea>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label>Quotes</label>
+						<div>
+							<textarea name="attr_quotes"></textarea>
+						</div>
+					</td>
+					<td>
+						<label>Connections to other characters</label>
+						<div>
+							<textarea name="attr_connections"></textarea>
+						</div>
+					</td>
+					<td>
+						<label>Additional Notes</label>
+						<div>
+							<textarea name="attr_notes"></textarea>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+	<div class="sheet-section"> <!-- id="Equipment"-->
             <table>
                 <th></th>
-                <th>Equipment</th>
+                <th><label>Equipment</label></th>
                 <th></th>
                 <tr>
                     <td style="text-align: right;">
@@ -315,8 +374,9 @@
                     </td>
                 </tr>
             </table>
-    </div>
-    <div name="footer" class="sheet-section" style="text-align: Center; padding-top:10px;">
-        <img src="http://www.milanricoul.com/starwars/img/starwars-logo.png" style="max-height: 100px;" />
-    </div>
+	</div>
+	<div class="sheet-section" style="text-align: Center; padding-top:10px;"> <!-- id="footer"-->
+    <img src="http://a.dilcdn.com/bl/wp-content/uploads/sites/6/2012/11/sw_logo_lg_default-small.jpg" style="max-height: 100px;" />
+	<p style="text-align: center;" ><small>Author: Timothy O'Driscoll | Editor: Andreas J. (Roll20user: 1223200)</small></p>
+</div>
 </div>

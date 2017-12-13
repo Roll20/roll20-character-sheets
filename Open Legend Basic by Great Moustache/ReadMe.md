@@ -5,6 +5,64 @@
 
 ### Changelog
 
+### 1.8.9.92 on 2017 December 4th
+* 3 Inventory sections outputing wrong "name" to chat.
+
+### 1.8.9.91 on 2017 November 27th
+* Inventory, Notes, Goals, Beliefs, & Instincts can now be sent to chat
+* Inventory Area Re-worked
+
+
+### 1.8.9.9 on 2017 November 18th
+* Fixed Default (Dis)Advantage not always popping up correctly
+* Updated Attribute description text
+* GUI update to chat window rolls
+	- Rolled Value much larger
+	- Power Level display changed
+		- No shows you the Achieved Power Level based on your roll
+		- Shows the Min Needed to Succeed as well as the Max Allowed (based on what is entered in Actions)
+	- Increased the Description areas to display a max of 7 lines (mouse scroll wheels jump 6-7 lines at a time)
+
+### 1.8.9.6 on 2017 October 16th
+* Fixed HP/Lethal Damage having odd error that locks up HP calculations on sheet
+* Outputs to chat show Attribute Score next to the Attribute now
+* Attributes can have a max value of 10
+	- Before only 9 has that is the highest a PC can have (changable through "dice modifer")
+	- Changed it to 10 so NPC charactersheets can have this value and to make it possibly easier for players
+
+### 1.8.9.5 on 2017 September 12th
+* Default (dis)advantage number for Actions & Attributes
+	- Can now enter a default (dis)advantage amount for all action & attributes
+	- The pop-up to ask you the number of (dis)advantage will be populated with this number now
+		- This allows you to still modify it if you have additional above or below your default
+
+### 1.8.9.3 on 2017 September 11th
+* GUI update to HP & Speed
+	- Lethal Damage combined with Current & Max HP lines
+	- Speed made with ribbon, and taking up less space
+	- Initiative made a seperate button
+* Initiative Advanced Options
+	- Drop down to pick which Attribute to use (from attribute Sub, etc)
+	- Ability to enter a default (dis)advantage number
+	
+### 1.8.9.1 on 2017 September 11th
+* Made Destructive Trance Checkbox for Actions, Other Actiosn, and Legendary Items
+	- Allows explosions on 1 less than max die size
+
+### 1.8.9 on 2017 August 14th
+* Made the 2 columns into just 1 column for Feats, Perks, & Flaws
+	- Code that auto combines the two columns into 1 new so no data lost
+* Added captialization to certain attribute names
+	- Causes them to show at the top of the list for selecting the bubbles for tokens
+	- Built in redundency, so new Characters will see a few doubles that have "4Token" on the end, as old sheets will still be lower case
+
+### 1.8.8 on 2017 July 2nd
+* Fixed a typo in the Initiative output to chat (when clicking on Speed)
+* Made any Description output to the chat window from Actions be limited to 5 lines
+	- If over 5 lines, adds a scroll bar, so now it won't take up so much space when someone has lots of description/info
+* Added in text below "Guard", "Toughness", and "Resolve" that indicates you can click them to do resist rolls
+* Also renamed "power level" variable that was causing error if you dragged an action to the quick bar that wouldn't display the "Max" power level info.
+
 ### 1.8.6 on 2017 May 14th
 * Fixed an error with other actions variable not being updated on its name
 	- Caused it to not calculate roll syntax correctly when a value was updated in other actions

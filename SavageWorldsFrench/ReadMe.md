@@ -1,19 +1,69 @@
 # Savage Worlds (french)
 
-Feuille de personnage (FdP) avec jets intégrés pour **Savage Worlds** et **Deadlands Reloaded**, basée sur le Livre de Base (LdB) de la version éditée en français par [Black Book Editions](http://www.black-book-editions.fr/catalogue.php?id=58).
+Feuille de personnage (FdP) avec jets intégrés pour **Savage Worlds**, **Beasts & Barbarians**, **Deadlands Reloaded** et **Lankhmar**.  
+Basée sur les traductions éditées par [Black Book Editions](http://www.black-book-editions.fr/catalogue.php?id=58).
 
 # Version courante
-2.0 [Capture d'écran](sawofr.jpg)  
-[Style Deadlands](sawofr_style_deadlands.png)
+3.1 Captures d'écran :  
+[Style Savage Worlds](sawofr_style_sawo.jpg)  
+[Style Beasts & Barbarians](sawofr_style_bnb.jpg)  
+[Style Deadlands](sawofr_style_deadlands.jpg)  
+[Style Lankhmar](sawofr_style_lankhmar.jpg)  
+
+# Configuration
+
+## Configuration:Généralités
+
+L'onglet "Configuration" de la feuille de personnage permet de paramétrer le personnage : style visuel, type de personnage, compétences affichées etc.  
+**Attention** : les modifications apportées ne sont valables **que** pour le personnage courant.
+![Onglet configuration](sawofr_conf01.jpg)
+
+## Configuration:Personnage
+
+Une liste déroulante permet de choisir le type de personnage : ![Type perso](sawofr_conf10_typeperso.jpg).  
+**Attention** : cela n'a aucun effet sur les droits Roll20 des joueurs d'accéder à une fiche de personnage. Ces droits doivent être assignés par le MJ classiquement, via l'interface de Roll20. Cela n'a d'influence que sur le comportement de la feuille de personnage.
+
+A part le choix "Personnalisé", les différentes entrées dans la liste vont modifier :
+* l'affichage "PNJ" ou "PJ" (affichage de la progression par exemple)
+* l'affichage du nombre de blessures disposibles
+* la valeur par défaut du dé joker (qui peut être "Aucun" et lance alors 0d4)
+* l'affichage par défaut des possessions
+* l'affichage par défaut du logo
+
+Le choix "Personnalisé" va permettre de définir manuellement chaque élément :
+![Personnalise](sawofr_conf11_personnalise.jpg)
+
+## Configuration:Visuel
+
+Les différents paramètres permettent de définir : 
+* le style visuel / le jeu : ![style](sawofr_conf21_style.jpg)
+* l'affichage ou non du de la section "Possessions"  (pour gagner de la place écran)
+* l'affichage ou non du logo (pour gagner de la place écran)
+
+**Attention** : le choix du style peut avoir un effet sur le fonctionnement de la feuille de personnage (par exemple, la présence d'une compétence "Tripes" et d'une caractéristique dérivée "Trempe" pour Deadlands).
+
+## Configuration:Jets
+
+Voir **Notes sur les Jets** ci-dessous.
+
+## Configuration:Compétences
+
+Les compétences peuvent être affichées/masquées individuellement : ceci est utile pour se conformer aux particularités du setting de la campagne, et/ou pour gagner de la place à l'écran, en masquant les compétences non entraînées, et en utilisant le bouton "Non entraîné" à la place : ![Non entraîné](sawofr_conf40_nonentraine.jpg).  
+
+La case à cocher "Toutes" permet de décocher ou cocher tous les compétences en un clic. ![Comp toutes](sawofr_conf41_toutes.jpg)  
+
+Les compétences décochées ne seront pas affichées sur la feuille, mais si leur valeur (dé) a été modifiée, elles sont conservées.  
+
+Les compétences spécifiques à un setting (comme "Tripes" pour Deadlands) ne sont pas concernées par ce paramétrage et sont toujours affichées, si le style visuel correspondant a été choisi.  
 
 # Notes sur les Jets
 
-## Pénalités
+## Jets:Pénalités
 Les pénalités de jet dues aux Blessures, à la Fatigue et à l'Encombrement sont automatiquement prises en compte dans les 3 modes de jet (voir ci-dessous).  
 Dans les 2 modes d'affichages par template, l'état du personnage peut être optionnellement affiché (activé par défaut), rappelant ces éventuelles pénalités :  
 ![Affichage des pénalités dans les jets avec template](sawofr_template_penalistes.png)
 
-## Modes d'affichage des jets
+## Jets:Modes d'affichage des jets
 La feuille permet 3 modes d'affichage des jets :  
 ![Choix du type de jet](sawofr_choixjet.png)  
 Ces options sont détaillées ci-dessous.
@@ -30,7 +80,7 @@ Dans le cas des Jets de Lancer, de Tir, ou d'armes/attaques utilisant une de ces
 Pour les jets de Tir, l'utilisation du Dé Joket est optionnelle (pour gérer les Cadences de Tir supérieures à 1) et son utilisation doit être confirmée :  
 ![Utilisation Dé Joker](sawofr_dejokerutil.png)
 
-### Option 1 : Succès + Relances
+### Jets:Option 1 : Succès + Relances
 Les jets demande une difficulté, ou une cible pour les jets d'attaques et dégâts si l'option est activée, avant de lancer les dés.  
 ![Demande d'une difficulté](sawofr_difficulte.png)  
 Une cible dans Roll20 est un autre pion, lequel doit être associé à une feuille de personnage dont les caractéristiques ont été renseignées.  
@@ -52,7 +102,7 @@ Dans le cas des attaques, en cas de relance, 1d6 explosif est automatiquement aj
 ![Template option 1](sawofr_templateoption1.png)  
 NB : techniquement, aboutir à ce résultat contraint à lancer 2 fois le jet de dégâts (une fois avec, une fois sans le +1d6!!) et d'afficher l'un ou l'autre en fonction de la réussite de l'attaque (si relance donc). De fait, avec les dés 3D activés, cela peut apparaître un peu ... confus (beaucoup de dés sont lancés).
 
-### Option 2 : Total des jets
+### Jets:Option 2 : Total des jets
 La feuille ne demande pas d'autre renseignement que les éventuels Modificateurs circonstanciels (cf. ci-dessus), effectue le jet demandé (y compris dégâts s'il s'agit d'une arme/attaque) et affiche un template avec le total de chaque jet.  
 Le détail du calcul (et du résultat individuel des dés) est visible dans l'info-bulle du jet.  
 ![Jet total et détail des calculs](sawofr_infobulleoption2.png)  
@@ -61,7 +111,7 @@ Au MJ et/ou aux joueurs de calculer la réussite ou l'échec, les relances éven
 Dans le cas d'attaque, le d6 explosif de dégâts supplémentaires en cas de relance est directement lancé, et affiché à part (au MJ et/ou aux joueurs de le prendre en compte si nécessaire) :  
 ![Template option 2](sawofr_templateoption2.png)
 
-### Option 3 : Jets bruts
+### Jets:Option 3 : Jets bruts
 La feuille ne demande pas d'autre renseignement que les éventuels Modificateurs circonstanciels (cf. ci-dessus), effectue le jet demandé (y compris dégâts s'il s'agit d'une arme/attaque) et l'affiche entièrement détaillé dans le chat, façon "macro", sans template.  
 Dans le cas d'attaque, le d6 explosif de dégâts supplémentaires en cas de relance est directement lancé, et affiché à part (au MJ et/ou aux joueurs de le prendre en compte si nécessaire).  
 ![Jet option 3](sawofr_jetoption3.png)
@@ -82,6 +132,20 @@ NB : décrémenter les PP automatiquement au lancement d'un pouvoir nécessitera
 
 # Notes de version
 
+## v3.1 (2017-09-17)
+
+* Correction de l'utilisation de la compétence Arcane pour les jets d'arme, en mode "Succès+Relance"
+* Optimisation technique
+
+## v3.0 (2017-08-15)
+
+* Nouveaux choix de styles visuels pour **Beasts & Barbarians** et **Lankhmar**
+* Gestion des types de PJ/PNJ modifié (pour BnB) : possibilité de définir le personange comme un PJ, un PNJ type Joker, un PNJ type Sous-fifre, un PNJ type Bras droit, un PNJ type Extra ou Personnalisé (cf. ci-après)
+* En type de personnage "Personnalisé", possibilité de définir de 0 à 3 blessures et l'utilisation d'un dé Joker ou non
+* Modification de la mise en page de l'onglet de configuration de la feuille
+* Possibilité de définir les propriétés par défaut des nouveaux personnages, sur la page de paramétrage de la partie Roll20
+* Correction de l'affichage des Blessures pour les Extras (1 seule blessure met le PNJ hors de combat) : l'icone "critique" remplace le chiffre "1"
+
 ## v2.0 (2017-04-09)
 
 * Correction du jet de dégâts en jet brut, pour les armes dynamiques
@@ -89,7 +153,6 @@ NB : décrémenter les PP automatiquement au lancement d'un pouvoir nécessitera
 * Nouvelles options (boutons "oeil") pour afficher/masquer des contenus de blocs de la fiche
 * Nouvelle option de configuration pour masquer le logo
 * Légers ajustements de mise en page
-* Refonte de la mise en page des templates de jet
 
 ## v1.8 (2017-02-18)
 Nouvelle correction d'un bug occasionnel de calcul de l'encombrement.

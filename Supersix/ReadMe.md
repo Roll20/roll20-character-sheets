@@ -8,5 +8,5 @@ La feuille comporte des jets intégrés.
 
 # Notes de version
 
-##v1.0 (24 Janvier 2016).
+## v1.0 (24 Janvier 2016).
 Création de la fiche.

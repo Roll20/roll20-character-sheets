@@ -5,7 +5,7 @@ mixin fraction(name)
     input(type='number', name='attr_' + name + '_max')
 
 mixin input(type, name)
-  input(type=type, name='attr_' + name, placeholder=attributes.placeholder, style=attributes.style, value=attributes.value)
+  input(type=type, name='attr_' + name, placeholder=attributes.placeholder, style=attributes.style, value=attributes.value, min=attributes.min, max=attributes.max)
 
 mixin labelledAbove(label)
   .labelledAbove(style=attributes.style)
@@ -42,12 +42,17 @@ mixin repeating(name)
   fieldset(class='repeating_' + name)
     block
 
-mixin rollButton(attr, notes)
+mixin rollButton(options)
   -
-    var tpl = '&{template:toe} {{charName=@{character_name}}} {{attr=' + attr + '}} {{result=[[@{' + attr + '}]]}}';
-    if(notes)
-      tpl += '{{notes=@{' + notes + '}}}';
-  button(type='roll', value=tpl)
+    if(typeof options === 'string')
+      options = { attr: options };
+      
+    var tpl = '&{template:toe} {{charName=@{character_name}}} {{attr=' + options.attr + '}} {{result=[[@{' + (options.result || options.attr) + '}]]}}';
+    if(options.notes)
+      tpl += '{{notes=@{' + options.notes + '}}}';
+    if(options.updowngrade)
+      tpl += '{{updowngrade=@{' + options.updowngrade + '}}}';
+  button(type='roll', value=tpl, title='Click to roll!')
 
 mixin select(name)
   select(name='attr_' + name, style=attributes.style)
@@ -55,13 +60,25 @@ mixin select(name)
 
 mixin selectDice(name)
   +select(name)(style=attributes.style)
-    +option('none', 'null', true)
-    +option('d4')
-    +option('d6')
-    +option('d8')
-    +option('d10')
-    +option('d12')
-    +option('d20')
+    +option('Pick One', 'null', true)
+    +option('D4')
+    +option('D6')
+    +option('D8')
+    +option('D10')
+    +option('D12')
+    +option('D20')
+    +option('D20/D4', '{D20,D4}k1')
+    +option('D20/D6', '{D20,D6}k1')
+    +option('D20/D8', '{D20,D8}k1')
+    +option('D20/D10', '{D20,D10}k1')
+    +option('D20/D12', '{D20,D12}k1')
+    +option('D20x2', '{D20,D20}k1')
+    +option('D20x2/D4', '{D20,D20,D4}k1')
+    +option('D20x2/D6', '{D20,D20,D6}k1')
+    +option('D20x2/D8', '{D20,D20,D8}k1')
+    +option('D20x2/D10', '{D20,D20,D10}k1')
+    +option('D20x2/D12', '{D20,D20,D12}k1')
+    +option('D20x3', '{D20,D20,D20}k1')
     
 mixin selectTrait(name)
   +select(name)(style=attributes.style)
@@ -72,3 +89,19 @@ mixin selectTrait(name)
 
 mixin textarea(name)
   textarea(name='attr_' + name, style=attributes.style, placeholder=attributes.placeholder)
+
+mixin updowngrade(prefix)
+  -
+    if(prefix !== '' && !prefix.endsWith('_'))
+      prefix += '_';
+
+  .updowngrade(title="Upgrade/Downgrade")
+    span.arrows
+      .up
+        input(type='checkbox', name='attr_' + prefix + 'tickup', value='1', title="Upgrade 1 step")
+        span ▲
+      .down
+        input(type='checkbox', name='attr_' + prefix + 'tickdown', value='1', title="Downgrade 1 step")
+        span ▼
+    span
+      +labelledUnderlined('')(style='width: 0.3in;'): +input('number', prefix + 'updowngrade')

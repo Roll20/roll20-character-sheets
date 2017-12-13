@@ -6,7 +6,7 @@ Graphic design is based on the french edition.
 Background image courtesy of [Emmanuel Roudier](http://roudier-neandertal.blogspot.fr/), lead artist on BoL:Mythic, french edition.
 
 # Current version
-1.3 [Screenshot](bolm.jpg)
+1.4 [Screenshot](bolm.jpg)
 
 The sheet has integrated rolls (with chat roll templates).
 Every roll as a PC or NPC asks for, at least, a modifier (default 0).
@@ -23,11 +23,15 @@ Due to some temporary technical translation limitations of Roll20, the french ve
 
 # Release notes
 
-##v1.3 (2017-01-13)
+## v1.4 (2017-06-06)
 
-* Added (unofficial) German translation, by Marc M. (id 4134)
+* Updated (official) German translation, by Marc M. (Roll20 Id 4134)
 
-##v1.2 (2017-01-02)
+## v1.3 (2017-01-13)
+
+* Added (unofficial) German translation, by Marc M. (Roll20 Id 4134)
+
+## v1.2 (2017-01-02)
 
 * Added an NPC mode and a Beast mode (NPC) to the sheet :
   * in NPC mode, the sheet is identical to the PC sheet but all rolls are whispered to the gm.
@@ -39,11 +43,11 @@ Due to some temporary technical translation limitations of Roll20, the french ve
 * Fix design overlays
 * Correct french translation in the weapons damage list
 
-##v1.1 (2016-12-20)
+## v1.1 (2016-12-20)
 
 * Bug fix: Agility penalty due to Armour and/or Shield was not applied to attack rolls using Agility (Melee or Ranged)
 * Bug fix: Damage rolls using Half Strength were not properly calculated with negative Strength
 
-##v1.0 (2016-12-08)
+## v1.0 (2016-12-08)
 
 Creation of the sheet.

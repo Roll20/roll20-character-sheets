@@ -4,6 +4,109 @@ This is a character sheet for Blades in the Dark for use on Roll20.
 
 ## Changelog
 
+### 2.5
+* Added option to use Kirsty font if installed
+* Small graphical changes
+
+### 2.4
+* Several bugfixes
+* New clocks-only mode for the faction page for those who want a character sheet just to store clocks
+* Alchemicals repeating section
+
+### 2.3
+* Added broadcast button for sending information to chat for special abilities, clocks, and harm.
+* Image clocks have been replaced by a CSS version that looks sharper, especially in the roll template.
+
+### 2.2
+* It is now possible to add a cohort to the character sheet. Automatic for Hounds.
+* Various small bugfixes
+
+### 2.1
+* New auto-expand technique allowing some fields to grow according to their contents
+* Sheet worker tweaks for better transition to spirit playbooks
+
+### 2.0
+* Additions
+    * The names for heat, wanted, and deity can now be changed
+    * Settings are now filtered by sheet type
+    * Buttons for adding playbook items and crew-specific upgrades
+    * Option to make bonus dice a freeform input field
+    * Option to ask for a consequence name when resisting
+    * Fortune roll button added to factions sheet
+    * Engagement roll button added to crew sheet
+    * Added a clocks repeating section to the faction sheet, and a real notes field
+    * Box-shadow effect to focused input fields (can be disabled in settings)
+    * Button to reset items and load with one click
+* Changes
+    * New model for action and tier dots that gets rid of the need for extra attributes
+    * Refactored sheet workers and cleaned them up using new features
+    * Adjusted the width of crew type and playbook input
+    * Roll template header changed to have character name and text inline
+    * Disabled spell checking on all input fields
+    * Bypassed unnecessary extra padding around the sheet
+    * Veteran special ability added to all playbooks for clarity
+    * Frame features are now a repeating section, as they should be
+    * Improved spacing for action dots when expanding the sheet
+
+### 1.15
+* Added 10-clocks, courtesy of Chris McDonald
+* Fixed resistance bonuses erroneously applying to vice indulgence
+
+### 1.14
+* Changed font to Georgia for unified look on all platforms, and better alignment
+* Quality-of-life changes in several places
+
+### 1.13
+* Visual improvements
+* Labels now properly used to toggle some smaller checkboxes
+* Added option for vampires' Dark Gift and global resistance bonuses
+* The sheet now shows the options for heritage, background, and vice if they are empty
+
+### 1.12
+* Calculate trauma automatically
+* Overhauled roll template internally, no more distinction between normal dice and bonus dice
+* Visual improvements to layout for some kinds of checkboxes
+* Overall transition eye-candy
+
+### 1.11
+* Internal change to how checkbox attributes are stored
+* Change how default values are set so that only necessary attributes are changed
+
+### 1.10
+* Revamped flexbox-based layout and CSS changes
+* New design for clocks area
+
+### 1.9
+* Clock segments are now clickable
+* Moved the healing clock to the other column of the harm/armor/coin container
+* CSS cleanup
+* Added descriptions to upgrades and items
+* Added button to roll lifestyle, healing
+* Added more visible indicator that stuff happens when you fill in playbook or crew type
+
+### 1.8
+* Extra rows of claims can now be added
+* Corrected minor typos
+* Internal changes to the sheet upgrade process to make it more robust for ancient sheets
+
+### 1.7
+* Change to auto-generated abilities/items/friends: they will now be deleted if you change playbook/crew type, unless they have been changed at some point
+* Small CSS adjustments
+* Change stash gained by crew advance to printed version
+
+### 1.6
+* Translation support for everything except fixed fields in roll templates
+* Crew-specific upgrades are now a repeating section, repeating upgrades moved to crew-specific upgrades, descriptions added to crew upgrades
+
+### 1.5
+* All items are now repeating
+* Optional description field added for all items (via settings menu)
+
+### 1.4
+* Changes for items; made playbook items a repeating section, and added options for non-playbook-items.
+* Entering a playbook or crew name will now automatically generate abilities and friends/contacts
+* Small fix for ghost/hull label for stress and trauma
+
 ### 1.3
 * Added Vigilantes data
 

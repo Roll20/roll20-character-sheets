@@ -1,2017 +1,2357 @@
-<script type="text/worker">
+"use strict";
 /* DATA */
-var crewData = {
+const sheetVersion = "2.5",
+	crewData = {
 		assassins: {
-			abilities: [{
-					name: 'Deadly',
-					description: 'Each PC may add +1 action rating to Hunt, Prowl, or Skirmish (up to a max rating of 3).'
-				},
-				{
-					name: 'Crow\'s Veil',
-					description: 'Due to hard-won experience or occult ritual, your activities are hidden from the notice of the death-seeker crows. You don\'t take extra heat when killing is involved on a score.'
-				},
-				{
-					name: 'Emberdeath',
-					description: 'Due to hard-won experience or occult ritual, you know the arcane method to destroy a living victim\'s spirit at the moment you kill them. Take 3 stress to channel electroplasmic energy from the ghost field to disintegrate the spirit and dead body in a shower of sparking embers.'
-				},
-				{
-					name: 'No Traces',
-					description: 'When you keep an operation quiet or make it look like an accident, you get half the rep value of the target (round up) instead of zero. When you end downtime with zero heat, take +1 rep.'
-				},
-				{
-					name: 'Patron',
-					description: 'When you advance your Tier, it costs half the coin it normally would. Who is your patron? Why do they help you?'
-				},
-				{
-					name: 'Predators',
-					description: 'When you use stealth or subterfuge to commit murder, take +1d to the engagement roll.'
-				},
-				{
-					name: 'Vipers',
-					description: 'When you acquire or craft poisons, you get +1 result level to your roll. When you employ a poison, you are specially prepared to be immune to its effects.'
-				}
-			],
 			base: {
-				claim_1_desc: '+1 scale for your\nSkulks cohorts',
-				claim_1_name: 'Training\nRooms',
-				claim_2_desc: '(Tier roll) - Heat =\ncoin in downtime',
-				claim_2_name: 'Vice Den',
-				claim_3_desc: '+2 coin for lower-\nclass targets',
-				claim_3_name: 'Fixer',
-				claim_4_desc: '+1d gather info\nfor scores',
-				claim_4_name: 'Informants',
-				claim_5_desc: 'Body disposal,\n+1d to reduce heat\nafter killing',
-				claim_5_name: 'Hagfish Farm',
-				claim_6_desc: '+1 rep per score',
-				claim_6_name: 'Victim\nTrophies',
-				claim_7_desc: '',
-				claim_7_name: '\nTurf',
-				claim_9_desc: '',
-				claim_9_name: '\nTurf',
-				claim_10_desc: '-2 heat per score',
-				claim_10_name: 'Cover\nOperation',
-				claim_11_desc: '(Tier roll) - Heat =\ncoin in downtime',
-				claim_11_name: 'Protection\nRacket',
-				claim_12_desc: '+1d to healing\nrolls',
-				claim_12_name: 'Infirmary',
-				claim_13_desc: '+2 coin for high-\nclass targets',
-				claim_13_name: 'Envoy',
-				claim_14_desc: '+1d engagement\nfor deception and\n social plans',
-				claim_14_name: 'Cover Identities',
-				claim_15_desc: '+1d engagement\nfor stealth plans',
-				claim_15_name: 'City Records',
+				claim_1_desc: "claim_training_rooms_description",
+				claim_1_name: "claim_training_rooms",
+				claim_2_desc: "claim_vice_den_description",
+				claim_2_name: "claim_vice_den",
+				claim_3_desc: "claim_fixer_description",
+				claim_3_name: "claim_fixer",
+				claim_4_desc: "claim_informants_description",
+				claim_4_name: "claim_informants",
+				claim_5_desc: "claim_hagfish_farm_description",
+				claim_5_name: "claim_hagfish_farm",
+				claim_6_desc: "claim_victim_trophies_description",
+				claim_6_name: "claim_victim_trophies",
+				claim_7_name: "claim_turf",
+				claim_9_name: "claim_turf",
+				claim_10_desc: "claim_cover_operation_description",
+				claim_10_name: "claim_cover_operation",
+				claim_11_desc: "claim_protection_racket_description",
+				claim_11_name: "claim_protection_racket",
+				claim_12_desc: "claim_infirmary_description",
+				claim_12_name: "claim_infirmary",
+				claim_13_desc: "claim_envoy_description",
+				claim_13_name: "claim_envoy",
+				claim_14_desc: "claim_cover_identities_description",
+				claim_14_name: "claim_cover_identities",
+				claim_15_desc: "claim_city_records_description",
+				claim_15_name: "claim_city_records",
 				claim_bridge_2_3: 0,
 				claim_bridge_3_4: 0,
 				claim_bridge_6_7: 0,
 				claim_bridge_9_14: 0,
 				claim_bridge_12_13: 0,
 				claim_bridge_13_14: 0,
-				crew_description: 'Murderers\nfor Hire',
-				crew_xp_condition: 'Execute a successful accident, disappearance, murder, or ransom operation.',
-				hunting_grounds_type: 'Hunting Grounds:',
-				hunting_grounds_description: 'Accident - Disappearance - Murder - Ransom',
-				upgrade_1_desc: 'Hardened (+1 trauma box)',
-				upgrade_2_desc: 'Assassin rigging (2 free load of weapons or gear)',
-				upgrade_2_tall: 'on',
-				upgrade_3_desc: 'Ironhook Contacts (+1 Tier in prison)',
-				upgrade_3_tall: 'on',
-				upgrade_4_desc: 'Elite Skulks',
-				upgrade_5_desc: 'Elite Thugs',
-				upgrade_20_check: 'on',
-				/* Insight */
-				upgrade_21_check: 'on' /* Prowess */
+				crew_description: "crew_assassins_description",
+				crew_xp_condition: "crew_assassins_xp_condition",
+				hunting_grounds_type: "crew_assassins_hunting_grounds_type",
+				hunting_grounds_description: "crew_assassins_hunting_grounds_description",
+				upgrade_20_check_1: "1",
+				upgrade_21_check_1: "1"
 			},
-			contacts: [
-				'Trev, a gang boss',
-				'Lydra, a deal broker',
-				'Irimina, a vicious noble',
-				'Karlos, a bounty hunter',
-				'Exeter, a spirit warden',
-				'Sevoy, a merchant lord'
-			]
+			crewability: ["deadly", "crow's_veil", "emberdeath", "no_traces", "patron", "predators", "vipers", "veteran"],
+			upgrade: [{
+				name: "crew_upgrade_hardened",
+				numboxes: "3"
+			}, {
+				name: "crew_upgrade_assassin_rigging",
+				numboxes: "1"
+			}, {
+				name: "crew_upgrade_ironhook_contacts",
+				numboxes: "1"
+			}, {
+				name: "crew_upgrade_elite_skulks",
+				numboxes: "1"
+			}, {
+				name: "crew_upgrade_elite_thugs",
+				numboxes: "1",
+			}]
 		},
 		bravos: {
-			abilities: [{
-					name: 'Dangerous',
-					description: 'Each PC may add +1 action rating to Hunt, Skirmish, or Wreck (up to a max rating of 3).'
-				},
-				{
-					name: 'Blood Brothers',
-					description: 'When you fight alongside your cohorts in combat, they get +1d for teamwork rolls (setup and group actions). All of your cohorts get the thugs type for free (if they\'re already thugs, add another type).'
-				},
-				{
-					name: 'Door Kickers',
-					description: 'When you execute an assault plan, take +1d to the engagement roll.'
-				},
-				{
-					name: 'Fiends',
-					description: 'Fear is as good as respect. You may count each wanted level as if it was turf.'
-				},
-				{
-					name: 'Forged in the Fire',
-					description: 'Each PC has been toughened by cruel experience. You get +1d to resistance rolls.'
-				},
-				{
-					name: 'Patron',
-					description: 'When you advance your Tier, it costs half the coin it normally would. Who is your patron? Why do they help you?'
-				},
-				{
-					name: 'War Dogs',
-					description: 'When you’re at war (-3 faction status), your crew does not suffer -1 hold and PCs still get two downtime activities, instead of just one.'
-				}
-			],
 			base: {
-				claim_1_desc: '+1 scale for your\nThugs cohorts',
-				claim_1_name: 'Barracks',
-				claim_2_desc: '',
-				claim_2_name: '\nTurf',
-				claim_3_desc: '+2 coin for battle\nor extortion',
-				claim_3_name: 'Terrorized\nCitizens',
-				claim_4_desc: '+1d gather info\nfor scores',
-				claim_4_name: 'Informants',
-				claim_5_desc: '(Tier roll) - Heat =\ncoin in downtime',
-				claim_5_name: 'Protection\nRacket',
-				claim_6_desc: '(Tier roll) - Heat =\ncoin in downtime',
-				claim_6_name: 'Fighting Pits',
-				claim_7_desc: '',
-				claim_7_name: '\nTurf',
-				claim_9_desc: '',
-				claim_9_name: '\nTurf',
-				claim_10_desc: '',
-				claim_10_name: '\nTurf',
-				claim_11_desc: '+1d to healing\nrolls',
-				claim_11_name: 'Infirmary',
-				claim_12_desc: '-2 heat per score',
-				claim_12_name: 'Bluecoat\nIntimidation',
-				claim_13_desc: '+2 coin for lower-\nclass targets',
-				claim_13_name: 'Street Fence',
-				claim_14_desc: 'Stockpiles give you\n+1d to acquire\nassets',
-				claim_14_name: 'Warehouses',
-				claim_15_desc: '+1d engagement\nfor assault plans',
-				claim_15_name: 'Bluecoat\nConfederates',
+				claim_1_desc: "claim_barracks_description",
+				claim_1_name: "claim_barracks",
+				claim_2_name: "claim_turf",
+				claim_3_desc: "claim_terrorized_citizens_description",
+				claim_3_name: "claim_terrorized_citizens",
+				claim_4_desc: "claim_informants_description",
+				claim_4_name: "claim_informants",
+				claim_5_desc: "claim_protection_racket_description",
+				claim_5_name: "claim_protection_racket",
+				claim_6_desc: "claim_fighting_pits_description",
+				claim_6_name: "claim_fighting_pits",
+				claim_7_name: "claim_turf",
+				claim_9_name: "claim_turf",
+				claim_10_name: "claim_turf",
+				claim_11_desc: "claim_infirmary_description",
+				claim_11_name: "claim_infirmary",
+				claim_12_desc: "claim_bluecoat_intimidation_description",
+				claim_12_name: "claim_bluecoat_intimidation",
+				claim_13_desc: "claim_street_fence_description",
+				claim_13_name: "claim_street_fence",
+				claim_14_desc: "claim_warehouses_description",
+				claim_14_name: "claim_warehouses",
+				claim_15_desc: "claim_bluecoat_confederates_description",
+				claim_15_name: "claim_bluecoat_confederates",
 				claim_bridge_3_4: 0,
 				claim_bridge_2_7: 0,
 				claim_bridge_12_13: 0,
-				cohort1_subtype: 'Thugs',
-				crew_description: 'Mercenaries,\nThugs &\nKillers',
-				crew_xp_condition: 'Execute a successful battle, extortion, sabotage, or smash & grab operation.',
-				hunting_grounds_type: 'Hunting Grounds:',
-				hunting_grounds_description: 'Battle - Extortion - Sabotage - Smash & Grab',
-				upgrade_1_desc: 'Hardened (+1 trauma box)',
-				upgrade_2_desc: 'Bravos rigging (2 free load of weapons or armor)',
-				upgrade_2_tall: 'on',
-				upgrade_3_desc: 'Ironhook Contacts (+1 Tier in prison)',
-				upgrade_3_tall: 'on',
-				upgrade_4_desc: 'Elite Rovers',
-				upgrade_5_desc: 'Elite Thugs',
-				upgrade_21_check: 'on' /* Prowess */
+				cohort1_subtype: "thugs",
+				crew_description: "crew_bravos_description",
+				crew_xp_condition: "crew_bravos_xp_condition",
+				hunting_grounds_type: "crew_bravos_hunting_grounds_type",
+				hunting_grounds_description: "crew_bravos_hunting_grounds_description",
+				upgrade_21_check_1: "1"
 			},
-			contacts: [
-				'Meg, a pit-fighter',
-				'Conway, a bluecoat',
-				'Keller, a blacksmith',
-				'Tomas, a physicker',
-				'Walker, a ward boss',
-				'Lutes, a tavern owner'
-			]
+			crewability: ["dangerous", "blood_brothers", "door_kickers", "fiends", "forged_in_the_fire", "patron", "war_dogs", "veteran"],
+			upgrade: [{
+				name: "crew_upgrade_hardened",
+				numboxes: "3"
+			}, {
+				name: "crew_upgrade_bravos_rigging",
+				numboxes: "1"
+			}, {
+				name: "crew_upgrade_ironhook_contacts",
+				numboxes: "1"
+			}, {
+				name: "crew_upgrade_elite_rovers",
+				numboxes: "1"
+			}, {
+				name: "crew_upgrade_elite_thugs",
+				numboxes: "1",
+			}]
 		},
 		cult: {
-			abilities: [{
-					name: 'Chosen',
-					description: 'Each PC may add +1 action rating to Attune, Study, or Sway (up to a max rating of 3).'
-				},
-				{
-					name: 'Anointed',
-					description: 'You get +1d to resistance rolls against supernatural threats. You get +1d to healing rolls when you have supernatural harm.'
-				},
-				{
-					name: 'Bound in Darkness',
-					description: 'You may use teamwork with any cult member, regardless of the distance separating you. By taking 1 stress, your whispered message is heard by every cultist.'
-				},
-				{
-					name: 'Conviction',
-					description: 'Each PC gains an additional Vice: Worship. When you indulge this vice and bring a pleasing sacrifice, you don\'t overindulge if you clear excess stress. In addition, your deity will assist any one action roll you make—from now until you indulge this vice again.'
-				},
-				{
-					name: 'Glory Incarnate',
-					description: 'Your deity sometimes manifests in the physical world. This can be a great boon, but the priorities and values of a god are not those of mortals. You have been warned.'
-				},
-				{
-					name: 'Sealed in Blood',
-					description: 'Each human sacrifice yields -3 stress cost for any ritual you perform.'
-				},
-				{
-					name: 'Zealotry',
-					description: 'Your cohorts have abandoned their reason to devote themselves to the cult. They will undertake any service, no matter how dangerous or strange. They gain +1d to rolls against enemies of the faith.'
-				}
-			],
 			base: {
-				claim_1_desc: '+1 scale for your\nAdepts cohorts',
-				claim_1_name: 'Cloister',
-				claim_2_desc: '(Tier roll) - Heat =\ncoin in downtime',
-				claim_2_name: 'Vice Den',
-				claim_3_desc: '+2 coin for occult\noperations',
-				claim_3_name: 'Offertory',
-				claim_4_desc: '-1 stress cost for\nall arcane powers\nand rituals',
-				claim_4_name: 'Ancient Obelisk',
-				claim_5_desc: '+1d to Consort\nw/ arcane entities\non site',
-				claim_5_name: 'Ancient\nTower',
-				claim_6_desc: '',
-				claim_6_name: '\nTurf',
-				claim_7_desc: '',
-				claim_7_name: '\nTurf',
-				claim_9_desc: '',
-				claim_9_name: '\nTurf',
-				claim_10_desc: '',
-				claim_10_name: '\nTurf',
-				claim_11_desc: '+1d to Attune\non site',
-				claim_11_name: 'Spirit Well',
-				claim_12_desc: 'Safe passage in\nthe Deathlands',
-				claim_12_name: 'Ancient Gate',
-				claim_13_desc: '+1d to Command\nand Sway on site',
-				claim_13_name: 'Sanctuary',
-				claim_14_desc: '+1d to healing\nrolls',
-				claim_14_name: 'Sacred Nexus',
-				claim_15_desc: '+1d engagement\nfor occult plans',
-				claim_15_name: 'Ancient Altar',
+				claim_1_desc: "claim_cloister_description",
+				claim_1_name: "claim_cloister",
+				claim_2_desc: "claim_vice_den_description",
+				claim_2_name: "claim_vice_den",
+				claim_3_desc: "claim_offertory_description",
+				claim_3_name: "claim_offertory",
+				claim_4_desc: "claim_ancient_obelisk_description",
+				claim_4_name: "claim_ancient_obelisk",
+				claim_5_desc: "claim_ancient_tower_description",
+				claim_5_name: "claim_ancient_tower",
+				claim_6_name: "claim_turf",
+				claim_7_name: "claim_turf",
+				claim_9_name: "claim_turf",
+				claim_10_name: "claim_turf",
+				claim_11_desc: "claim_spirit_well_description",
+				claim_11_name: "claim_spirit_well",
+				claim_12_desc: "claim_ancient_gate_description",
+				claim_12_name: "claim_ancient_gate",
+				claim_13_desc: "claim_sanctuary_description",
+				claim_13_name: "claim_sanctuary",
+				claim_14_desc: "claim_sacred_nexus_description",
+				claim_14_name: "claim_sacred_nexus",
+				claim_15_desc: "claim_ancient_altar_description",
+				claim_15_name: "claim_ancient_altar",
 				claim_bridge_3_4: 0,
 				claim_bridge_4_9: 0,
 				claim_bridge_6_11: 0,
 				claim_bridge_12_13: 0,
 				claim_bridge_13_14: 0,
-				cohort1_subtype: 'Adepts',
-				crew_description: 'Acolytes\nof a Deity',
-				crew_xp_condition: 'Advance the agenda of your deity or embody its precepts in action.',
-				hunting_grounds_type: 'Sacred Sites:',
-				hunting_grounds_description: 'Acquisition - Augury - Consecration - Sacrifice',
-				setting_show_deity: 'on',
-				upgrade_1_desc: 'Ordained (+1 trauma box)',
-				upgrade_2_desc: 'Cult rigging (2 free load of documents or implements)',
-				upgrade_2_tall: 'on',
-				upgrade_3_desc: 'Ritual sanctum in lair',
-				upgrade_4_desc: 'Elite Adepts',
-				upgrade_5_desc: 'Elite Thugs',
-				upgrade_22_check: 'on' /* Resolve */
+				cohort1_subtype: "adepts",
+				crew_description: "crew_cult_description",
+				crew_xp_condition: "crew_cult_xp_condition",
+				hunting_grounds_type: "crew_cult_hunting_grounds_type",
+				hunting_grounds_description: "crew_cult_hunting_grounds_description",
+				setting_show_deity: "1",
+				upgrade_22_check_1: "1"
 			},
-			contacts: [
-				'Gagan, an academic',
-				'Adikin, an occultist',
-				'Hutchins, an antiquarian',
-				'Moriya, a spirit trafficker',
-				'Mateas Kline, a noble',
-				'Bennett, an astronomer'
-			]
+			crewability: ["chosen", "anointed", "bound_in_darkness", "conviction", "glory_incarnate", "sealed_in_blood", "zealotry", "veteran"],
+			upgrade: [{
+				name: "crew_upgrade_ordained",
+				numboxes: "3"
+			}, {
+				name: "crew_upgrade_cult_rigging",
+				numboxes: "1"
+			}, {
+				name: "crew_upgrade_ritual_sanctum_in_lair",
+				numboxes: "1"
+			}, {
+				name: "crew_upgrade_elite_adepts",
+				numboxes: "1"
+			}, {
+				name: "crew_upgrade_elite_thugs",
+				numboxes: "1",
+			}]
 		},
 		hawkers: {
-			abilities: [{
-					name: 'Silver Tongues',
-					description: 'Each PC may add +1 action rating to Command, Consort, or Sway (up to a max rating of 3).'
-				},
-				{
-					name: 'Accord',
-					description: 'Sometimes friends are as good as territory. You may count up to three +3 faction statuses you hold as if they are turf.'
-				},
-				{
-					name: 'The Good Stuff',
-					description: 'Your merchandise is exquisite. The product quality is equal to your Tier+2. When you deal with a crew or faction, the GM will tell you who among them is hooked on your product (one, a few, many, or all).'
-				},
-				{
-					name: 'Ghost Market',
-					description: 'Through arcane ritual or hard-won experience, you have discovered how to prepare your product for sale to ghosts and/or demons. They do not pay in coin. What do they pay with?'
-				},
-				{
-					name: 'High Society',
-					description: 'It\'s all about who you know. Take -1 heat during downtime and +1d to gather info about the city\'s elite.'
-				},
-				{
-					name: 'Hooked',
-					description: 'Your gang members use your product. Add the savage, unreliable, or wild flaw to your gangs to give them +1 quality.'
-				},
-				{
-					name: 'Patron',
-					description: 'When you advance your Tier, it costs half the coin it normally would. Who is your patron? Why do they help you?'
-				}
-			],
 			base: {
-				claim_1_desc: '',
-				claim_1_name: '\nTurf',
-				claim_2_desc: '+1d engagement\nroll for social plans',
-				claim_2_name: 'Personal\nClothier',
-				claim_3_desc: '+2 coin for\nshow of force or\nsocialize',
-				claim_3_name: 'Local Graft',
-				claim_4_desc: '+1d to Survery or\nHunt on your turf',
-				claim_4_name: 'Lookouts',
-				claim_5_desc: '+1d gather info\nfor scores',
-				claim_5_name: 'Informants',
-				claim_6_desc: '',
-				claim_6_name: '\nTurf',
-				claim_7_desc: '',
-				claim_7_name: '\nTurf',
-				claim_9_desc: '',
-				claim_9_name: '\nTurf',
-				claim_10_desc: '+1d to Consort\nand Sway on site',
-				claim_10_name: 'Luxury Venue',
-				claim_11_desc: '(Tier roll) - Heat =\ncoin in downtime',
-				claim_11_name: 'Foreign Market',
-				claim_12_desc: '(Tier roll) - Heat =\ncoin in downtime',
-				claim_12_name: 'Vice Den',
-				claim_13_desc: '+2 coin for product\nsale or supply',
-				claim_13_name: 'Surplus Caches',
-				claim_14_desc: '-2 heat per score',
-				claim_14_name: 'Cover\nOperation',
-				claim_15_desc: '+1d engagement\nfor deception and\ntransport plans',
-				claim_15_name: 'Cover Identities',
+				claim_1_name: "claim_turf",
+				claim_2_desc: "claim_personal_clothier_description",
+				claim_2_name: "claim_personal_clothier",
+				claim_3_desc: "claim_local_graft_description",
+				claim_3_name: "claim_local_graft",
+				claim_4_desc: "claim_lookouts_description",
+				claim_4_name: "claim_lookouts",
+				claim_5_desc: "claim_informants_description",
+				claim_5_name: "claim_informants",
+				claim_6_name: "claim_turf",
+				claim_7_name: "claim_turf",
+				claim_9_name: "claim_turf",
+				claim_10_desc: "claim_luxury_venue_description",
+				claim_10_name: "claim_luxury_venue",
+				claim_11_desc: "claim_foreign_market_description",
+				claim_11_name: "claim_foreign_market",
+				claim_12_desc: "claim_vice_den_description",
+				claim_12_name: "claim_vice_den",
+				claim_13_desc: "claim_surplus_caches_description",
+				claim_13_name: "claim_surplus_caches",
+				claim_14_desc: "claim_cover_operation_description",
+				claim_14_name: "claim_cover_operation",
+				claim_15_desc: "claim_cover_identities_description",
+				claim_15_name: "claim_cover_identities",
 				claim_bridge_2_3: 0,
 				claim_bridge_3_4: 0,
 				claim_bridge_6_7: 0,
 				claim_bridge_10_15: 0,
 				claim_bridge_12_13: 0,
 				claim_bridge_13_14: 0,
-				crew_description: 'Vice\nDealers',
-				crew_xp_condition: 'Acquire product supply, execute clandestine/covert sales, or secure new territory.',
-				hunting_grounds_type: 'Sales Territory:',
-				hunting_grounds_description: 'Sale - Supply - Show of Force - Socialize',
-				upgrade_1_desc: 'Composed (+1 stress box)',
-				upgrade_2_desc: 'Hawker\'s rigging (1 carried item is concealed and has no load)',
-				upgrade_2_tall: 'on',
-				upgrade_3_desc: 'Ironhook Contacts (+1 Tier in prison)',
-				upgrade_3_tall: 'on',
-				upgrade_4_desc: 'Elite Rooks',
-				upgrade_5_desc: 'Elite Thugs',
-				upgrade_14_check: 'on',
-				/* Secure */
-				upgrade_22_check: 'on' /* Resolve */
+				crew_description: "crew_hawkers_description",
+				crew_xp_condition: "crew_hawkers_xp_condition",
+				hunting_grounds_type: "crew_hawkers_hunting_grounds_type",
+				hunting_grounds_description: "crew_hawkers_hunting_grounds_description",
+				upgrade_14_check_1: "1",
+				upgrade_22_check_1: "1"
 			},
-			contacts: [
-				'Rolan Wott, a magistrate',
-				'Laroze, a bluecoat',
-				'Lydra, a deal broker',
-				'Hoxley, a smuggler',
-				'Anya, a dilettante',
-				'Marlo, a gang boss'
-			]
+			crewability: ["silver_tongues", "accord", "the_good_stuff", "ghost_market", "high_society", "hooked", "patron", "veteran"],
+			upgrade: [{
+				name: "crew_upgrade_composed",
+				numboxes: "3"
+			}, {
+				name: "crew_upgrade_hawker's_rigging",
+				numboxes: "1"
+			}, {
+				name: "crew_upgrade_ironhook_contacts",
+				numboxes: "1"
+			}, {
+				name: "crew_upgrade_elite_rooks",
+				numboxes: "1"
+			}, {
+				name: "crew_upgrade_elite_thugs",
+				numboxes: "1",
+			}]
 		},
 		shadows: {
-			abilities: [{
-					name: 'Everyone Steals',
-					description: 'Each PC may add +1 action rating to Prowl, Finesse, or Tinker (up to a max rating of 3).'
-				},
-				{
-					name: 'Ghost Echoes',
-					description: 'From weird experience or occult ritual, all crew members gain the ability to see and interact with the ghostly structures, streets, and objects within the echo of Doskvol that exists in the ghost field.'
-				},
-				{
-					name: 'Pack Rats',
-					description: 'Your lair is a jumble of stolen items. When you roll to acquire an asset, take +1d.'
-				},
-				{
-					name: 'Patron',
-					description: 'When you advance your Tier, it costs half the coin it normally would. Who is your patron? Why do they help you?'
-				},
-				{
-					name: 'Second Story',
-					description: 'When you execute a clandestine infiltration, you get +1d to the engagement roll.'
-				},
-				{
-					name: 'Slippery',
-					description: 'When you roll entanglements, roll twice and keep the one you want. When you reduce heat on the crew, take +1d.'
-				},
-				{
-					name: 'Synchronized',
-					description: 'When you perform a group action, you may count multiple 6s from different rolls as a critical success.'
-				}
-			],
 			base: {
-				claim_1_desc: '+1d to Command\nand Sway on site',
-				claim_1_name: 'Interrogation\nChamber',
-				claim_2_desc: '',
-				claim_2_name: '\nTurf',
-				claim_3_desc: '+2 coin for burglary\nor robbery',
-				claim_3_name: 'Loyal Fence',
-				claim_4_desc: '(Tier roll) - Heat =\ncoin in downtime',
-				claim_4_name: 'Gambling Den',
-				claim_5_desc: '+1d to Consort\nand Sway on site',
-				claim_5_name: 'Tavern',
-				claim_6_desc: '(Tier roll) - Heat =\ncoin in downtime',
-				claim_6_name: 'Drug Den',
-				claim_7_desc: '+1d gather info\nfor scores',
-				claim_7_name: 'Informants',
-				claim_9_desc: '',
-				claim_9_name: '\nTurf',
-				claim_10_desc: '+1d to Survey or\nHunt on your turf',
-				claim_10_name: 'Lookouts',
-				claim_11_desc: 'Body disposal,\n+1d to reduce heat\nafter killing',
-				claim_11_name: 'Hagfish Farm',
-				claim_12_desc: '+1d to healing\nrolls',
-				claim_12_name: 'Infirmary',
-				claim_13_desc: '+2 coin for espionage\nor sabotage',
-				claim_13_name: 'Covert Drops',
-				claim_14_desc: '',
-				claim_14_name: '\nTurf',
-				claim_15_desc: '+1d engagement\nfor stealth plans',
-				claim_15_name: 'Secret\nPathways',
+				claim_1_desc: "claim_interrogation_chamber_description",
+				claim_1_name: "claim_interrogation_chamber",
+				claim_2_name: "claim_turf",
+				claim_3_desc: "claim_loyal_fence_description",
+				claim_3_name: "claim_loyal_fence",
+				claim_4_desc: "claim_gambling_den_description",
+				claim_4_name: "claim_gambling_den",
+				claim_5_desc: "claim_tavern_description",
+				claim_5_name: "claim_tavern",
+				claim_6_desc: "claim_drug_den_description",
+				claim_6_name: "claim_drug_den",
+				claim_7_desc: "claim_informants_description",
+				claim_7_name: "claim_informants",
+				claim_9_name: "claim_turf",
+				claim_10_desc: "claim_lookouts_description",
+				claim_10_name: "claim_lookouts",
+				claim_11_desc: "claim_hagfish_farm_description",
+				claim_11_name: "claim_hagfish_farm",
+				claim_12_desc: "claim_infirmary_description",
+				claim_12_name: "claim_infirmary",
+				claim_13_desc: "claim_covert_drops_description",
+				claim_13_name: "claim_covert_drops",
+				claim_14_name: "claim_turf",
+				claim_15_desc: "claim_secret_pathways_description",
+				claim_15_name: "claim_secret_pathways",
 				claim_bridge_3_4: 0,
 				claim_bridge_2_7: 0,
 				claim_bridge_9_14: 0,
 				claim_bridge_12_13: 0,
-				crew_description: 'Thieves,\nSpies, and\nSaboteurs',
-				crew_xp_condition: 'Execute a successful espionage, sabotage, or theft operation.',
-				hunting_grounds_type: 'Hunting Grounds:',
-				hunting_grounds_description: 'Burglary - Espionage - Robbery - Sabotage',
-				upgrade_1_desc: 'Steady (+1 stress box)',
-				upgrade_2_desc: 'Thief Rigging (2 free load of tools or gear)',
-				upgrade_2_tall: 'on',
-				upgrade_3_desc: 'Underground maps & passkeys',
-				upgrade_4_desc: 'Elite Rooks',
-				upgrade_5_desc: 'Elite Skulks',
-				upgrade_10_check: 'on',
-				/* Hidden */
-				upgrade_21_check: 'on' /* Prowess */
+				crew_description: "crew_shadows_description",
+				crew_xp_condition: "crew_shadows_xp_condition",
+				hunting_grounds_type: "crew_shadows_hunting_grounds_type",
+				hunting_grounds_description: "crew_shadows_hunting_grounds_description",
+				upgrade_10_check_1: "1",
+				upgrade_21_check_1: "1"
 			},
-			contacts: [
-				'Dowler, an explorer',
-				'Laroze, a bluecoat',
-				'Amancio, a deal broker',
-				'Fitz, a collector',
-				'Adelaide Phroaig, a noble',
-				'Rigney, a tavern owner'
-			]
+			crewability: ["everyone_steals", "ghost_echoes", "pack_rats", "patron", "second_story", "slippery", "synchronized", "veteran"],
+			upgrade: [{
+				name: "crew_upgrade_steady",
+				numboxes: "3"
+			}, {
+				name: "crew_upgrade_thief_rigging",
+				numboxes: "1"
+			}, {
+				name: "crew_upgrade_underground_maps_&_passkeys",
+				numboxes: "1"
+			}, {
+				name: "crew_upgrade_elite_rooks",
+				numboxes: "1"
+			}, {
+				name: "crew_upgrade_elite_skulks",
+				numboxes: "1",
+			}]
 		},
 		smugglers: {
-			abilities: [{
-					name: 'Like Part of the Family',
-					description: 'Create one of your vehicles as a cohort (use the vehicle edges and flaws, below). Its quality is equal to your Tier +1.'
-				},
-				{
-					name: 'All Hands',
-					description: 'During downtime, one of your cohorts may perform a downtime activity for the crew to acquire an asset, reduce heat, or work on a long-term project.'
-				},
-				{
-					name: 'Ghost Passage',
-					description: 'From harsh experience or occult ritual, all crew members become immune to possession by spirits, but may choose to "carry" a second ghost as a passenger within their body.'
-				},
-				{
-					name: 'Just Passing Through',
-					description: 'During downtime, take -1 heat. When your heat is 4 or less, you get +1d to deceive people when you pass yourselves off as ordinary citizens.'
-				},
-				{
-					name: 'Leverage',
-					description: 'Your crew supplies contraband for other factions. Your success is good for them. Whenever you gain rep, gain +1 rep.'
-				},
-				{
-					name: 'Reavers',
-					description: 'When you go into conflict aboard a vehicle, you gain +1 effect for vehicle damage and speed. Your vehicle gains armor.'
-				},
-				{
-					name: 'Renegades',
-					description: 'Each PC may add +1 action rating to Finesse, Prowl, or Skirmish (up to a max rating of 3).'
-				}
-			],
 			base: {
-				claim_1_desc: '',
-				claim_1_name: '\nTurf',
-				claim_2_desc: '(Tier roll) - Heat =\ncoin in downtime',
-				claim_2_name: 'Side Business',
-				claim_3_desc: '+2 coin for high-\nclass targets',
-				claim_3_name: 'Luxury Fence',
-				claim_4_desc: '(Tier roll) - Heat =\ncoin in downtime',
-				claim_4_name: 'Vice Den',
-				claim_5_desc: '+1d to Consort\nand Sway on site',
-				claim_5_name: 'Tavern',
-				claim_6_desc: 'Safe passage in\nthe Deathlands',
-				claim_6_name: 'Ancient Gate',
-				claim_7_desc: '',
-				claim_7_name: '\nTurf',
-				claim_9_desc: '',
-				claim_9_name: '\nTurf',
-				claim_10_desc: '',
-				claim_10_name: '\nTurf',
-				claim_11_desc: '+1d engagement\nfor transport plans',
-				claim_11_name: 'Secret Routes',
-				claim_12_desc: '+1d gather info\nfor scores',
-				claim_12_name: 'Informants',
-				claim_13_desc: 'Your cohorts have\ntheir own vehicles',
-				claim_13_name: 'Fleet',
-				claim_14_desc: '-2 heat per score',
-				claim_14_name: 'Cover\nOperation',
-				claim_15_desc: 'Stockpiles give you\n+1d to acquire\nassets',
-				claim_15_name: 'Warehouse',
+				claim_1_name: "claim_turf",
+				claim_2_desc: "claim_side_business_description",
+				claim_2_name: "claim_side_business",
+				claim_3_desc: "claim_luxury_fence_description",
+				claim_3_name: "claim_luxury_fence",
+				claim_4_desc: "claim_vice_den_description",
+				claim_4_name: "claim_vice_den",
+				claim_5_desc: "claim_tavern_description",
+				claim_5_name: "claim_tavern",
+				claim_6_desc: "claim_ancient_gate_description",
+				claim_6_name: "claim_ancient_gate",
+				claim_7_name: "claim_turf",
+				claim_9_name: "claim_turf",
+				claim_10_name: "claim_turf",
+				claim_11_desc: "claim_secret_routes_description",
+				claim_11_name: "claim_secret_routes",
+				claim_12_desc: "claim_informants_description",
+				claim_12_name: "claim_informants",
+				claim_13_desc: "claim_fleet_description",
+				claim_13_name: "claim_fleet",
+				claim_14_desc: "claim_cover_operation_description",
+				claim_14_name: "claim_cover_operation",
+				claim_15_desc: "claim_warehouse_description",
+				claim_15_name: "claim_warehouse",
 				claim_bridge_2_3: 0,
 				claim_bridge_3_4: 0,
 				claim_bridge_6_7: 0,
 				claim_bridge_12_13: 0,
 				claim_bridge_13_14: 0,
-				cohort1_name: 'Vehicle',
-				cohort1_subtype: 'Boat - Carriage - Other',
-				cohort1_type: 'expert',
-				crew_description: 'Suppliers\nof Illicit\nGoods',
-				crew_xp_condition: 'Execute a successful smuggling or acquire new clients or contraband sources.',
-				hunting_grounds_type: 'Cargo Types:',
-				hunting_grounds_description: 'Arcane/Weird - Arms - Contraband - Passengers',
-				upgrade_1_desc: 'Steady (+1 stress box)',
-				upgrade_2_desc: 'Smuggler\'s rigging (2 items carried are perfectly concealed)',
-				upgrade_2_tall: 'on',
-				upgrade_3_desc: 'Camouflage (vehicles are perfectly concealed at rest)',
-				upgrade_3_tall: 'on',
-				upgrade_4_desc: 'Elite Rovers',
-				upgrade_5_desc: 'Barge (+mobility for lair)',
-				upgrade_6_check: 'on',
-				/* Vehicle */
-				upgrade_6_desc: 'Vehicle',
-				/* change Carriage to Vehicle */
-				upgrade_8_desc: 'Vehicle',
-				/* change Boat to Vehicle */
-				upgrade_21_check: 'on' /* Prowess */
+				cohort1_name: "vehicle",
+				cohort1_subtype: "boat_carriage_other",
+				cohort1_type: "expert",
+				crew_description: "crew_smugglers_description",
+				crew_xp_condition: "crew_smugglers_xp_condition",
+				hunting_grounds_type: "crew_smugglers_hunting_grounds_type",
+				hunting_grounds_description: "crew_smugglers_hunting_grounds_description",
+				upgrade_6_check_1: "1",
+				upgrade_6_name: "vehicle",
+				upgrade_8_name: "vehicle",
+				upgrade_21_check_1: "1"
 			},
-			contacts: [
-				'Elynn, a dock worker',
-				'Rolan, a drug dealer',
-				'Sera, an arms dealer',
-				'Nyelle, a spirit trafficker',
-				'Decker, an anarchist',
-				'Esme, a tavern owner'
-			]
+			crewability: ["like_part_of_the_family", "all_hands", "ghost_passage", "just_passing_through", "leverage", "reavers", "renegades", "veteran"],
+			upgrade: [{
+				name: "crew_upgrade_steady",
+				numboxes: "3"
+			}, {
+				name: "crew_upgrade_smuggler's_rigging",
+				numboxes: "1"
+			}, {
+				name: "crew_upgrade_camouflage",
+				numboxes: "1"
+			}, {
+				name: "crew_upgrade_elite_rovers",
+				numboxes: "1"
+			}, {
+				name: "crew_upgrade_barge",
+				numboxes: "1",
+			}]
 		},
 		vigilantes: {
-			abilities: [{
-					check: 'on',
-					name: 'As Good as Your Word',
-					description: 'You may spend rep as coin in downtime actions. Vigilantes gain Obligation as a second vice.'
-				},
-				{
-					name: 'Avengers',
-					description: 'Each PC may add +1 action rating to Hunt, Prowl,or Command (up to a max rating of 3).'
-				},
-				{
-					name: 'Thorn in your Side',
-					description: 'When you use Stealth or Assault plans against a higher Tier faction, your Tier counts as +1.'
-				},
-				{
-					name: 'Misdirection',
-					description: 'At the end of a score, you may sacrifice half the rep gained to make another faction lose status with your target instead of your crew. How do you pin it on someone else?'
-				},
-				{
-					name: 'Uncanny Preparation',
-					description: 'Twice per session during a Desperate action, improve your effect or position. Describe a flashback that gives you the advantage now (setup action).'
-				},
-				{
-					name: 'Moral Compass',
-					description: 'Each PC gains an additional xp trigger: You fulfilled an obligation at a cost to you or the crew.'
-				},
-				{
-					name: 'Favors',
-					description: 'Spend one rep and describe how one of your contacts is put out to help you. Everyone in your crew gets one dot in an action your contact is skilled in for this score.'
-				},
-				{
-					name: 'Roots',
-					description: 'During downtime one of your contacts or cohorts may take a downtime action to acquire an asset, reduce heat, or recover.'
-				}
-			],
 			base: {
-				claim_1_desc: 'All your experts\nare loyal',
-				claim_1_name: '\nFierce Allies',
-				claim_2_desc: '+1d to indulge\nvice',
-				claim_2_name: '\nLocal Heroes',
-				claim_3_desc: '+2 rep on\ntakedown scores',
-				claim_3_name: '\nPublicity',
-				claim_4_desc: '+1d to Prowl back\nto your lair',
-				claim_4_name: '\nHidden Paths',
-				claim_5_desc: '+1d to Study or\nTinker on site',
-				claim_5_name: '\nCatacombs',
-				claim_6_desc: 'Large gang who\nwill fight for you',
-				claim_6_name: 'Defiant\nCitizens',
-				claim_7_desc: '',
-				claim_7_name: '\nTurf',
-				claim_9_desc: '',
-				claim_9_name: '\nTurf',
-				claim_10_desc: '+1d to healing\nrolls',
-				claim_10_name: '\nInfirmary',
-				claim_11_desc: '-1 Wanted Level\nif Citizens faction\nstatus is +3',
-				claim_11_name: 'Above\nthe Law',
-				claim_12_desc: '-2 heat per score',
-				claim_12_name: 'Bluecoat\nConfidants',
-				claim_13_desc: '+1d to Survey or\nHunt on your turf',
-				claim_13_name: 'Lookouts',
-				claim_14_desc: 'Smugglers, +1d to\nacquire asets',
-				claim_14_name: 'The Hookup',
-				claim_15_desc: '+2 rep on scores\nagainst the law',
-				claim_15_name: 'Doskvol\'s\nMost Wanted',
+				claim_1_desc: "claim_fierce_allies_description",
+				claim_1_name: "claim_fierce_allies",
+				claim_2_desc: "claim_local_heroes_description",
+				claim_2_name: "claim_local_heroes",
+				claim_3_desc: "claim_publicity_description",
+				claim_3_name: "claim_publicity",
+				claim_4_desc: "claim_hidden_paths_description",
+				claim_4_name: "claim_hidden_paths",
+				claim_5_desc: "claim_catacombs_description",
+				claim_5_name: "claim_catacombs",
+				claim_6_desc: "claim_defiant_citizens_description",
+				claim_6_name: "claim_defiant_citizens",
+				claim_7_name: "claim_turf",
+				claim_9_name: "claim_turf",
+				claim_10_desc: "claim_infirmary_description",
+				claim_10_name: "claim_infirmary",
+				claim_11_desc: "claim_above_the_law_description",
+				claim_11_name: "claim_above_the_law",
+				claim_12_desc: "claim_bluecoat_confidants_description",
+				claim_12_name: "claim_bluecoat_confidants",
+				claim_13_desc: "claim_lookouts_description",
+				claim_13_name: "claim_lookouts",
+				claim_14_desc: "claim_the_hookup_description",
+				claim_14_name: "claim_the_hookup",
+				claim_15_desc: "claim_doskvol's_most_wanted_description",
+				claim_15_name: "claim_doskvol's_most_wanted",
 				claim_bridge_2_3: 0,
 				claim_bridge_3_4: 0,
 				claim_bridge_6_11: 0,
 				claim_bridge_10_15: 0,
 				claim_bridge_12_13: 0,
 				claim_bridge_13_14: 0,
-				cohort1_type: 'expert',
-				crew_description: 'Deluded\nAvengers',
-				crew_xp_condition: 'Interfere with criminal scores, protect citizens, or antagonize the law.',
-				hunting_grounds_type: 'Protected Grounds:',
-				hunting_grounds_description: 'Uniting - Interference - Resistance - Terror',
-				setting_show_origin: 'on',
-				upgrade_1_desc: 'Unbroken (+1 trauma box)',
-				upgrade_2_desc: 'Vigilantes attire (2 free load of weapons or supplies)',
-				upgrade_2_tall: 'on',
-				upgrade_3_desc: 'Irregulars (Experts gain +1d to Gather Information)',
-				upgrade_3_tall: 'on',
-				upgrade_4_desc: 'Willing to Fight (Experts are braves)',
-				upgrade_5_desc: 'Spark-craft Technology',
-				upgrade_22_check: 'on' /* Resolve */
+				cohort1_type: "expert",
+				crew_description: "crew_vigilantes_description",
+				crew_xp_condition: "crew_vigilantes_xp_condition",
+				hunting_grounds_type: "crew_vigilantes_hunting_grounds_type",
+				hunting_grounds_description: "crew_vigilantes_hunting_grounds_description",
+				setting_show_origin: "1",
+				upgrade_22_check_1: "1"
 			},
-			contacts: [
-				'Mara, a chief inspector',
-				'Twelves, a Leviathan Hunter',
-				'Soren, a restless ghost',
-				'Poriso, famous opera singer',
-				'Anis, a Spirit Warden',
-				'Badger, a brilliant inventor'
-			]
+			crewability: ["as_good_as_your_word", "avengers", "thorn_in_your_side", "misdirection", "uncanny_preparation", "moral_compass", "favors", "roots", "veteran"],
+			upgrade: [{
+				name: "crew_upgrade_unbroken",
+				numboxes: "3"
+			}, {
+				name: "crew_upgrade_vigilantes_attire",
+				numboxes: "1"
+			}, {
+				name: "crew_upgrade_irregulars",
+				numboxes: "1"
+			}, {
+				name: "crew_upgrade_willing_to_fight",
+				numboxes: "1"
+			}, {
+				name: "crew_upgrade_spark-craft_technology",
+				numboxes: "1",
+			}]
 		}
 	},
 	playbookData = {
 		cutter: {
-			abilities: [{
-					name: 'Battleborn',
-					description: 'You may expend your special armor to reduce harm from an attack in combat or to push yourself during a fight.'
-				},
-				{
-					name: 'Bodyguard',
-					description: 'When you protect a teammate, take +1d to your resistance roll. When you gather info to anticipate possible threats in the current situation, you get +1 effect.'
-				},
-				{
-					name: 'Ghost Fighter',
-					description: 'You may imbue your hands, melee weapons, or tools with spirit energy. You gain potency in combat vs. the supernatural. You may grapple with spirits to restrain and capture them.'
-				},
-				{
-					name: 'Leader',
-					description: 'When you Command a cohort in combat, they continue to fight when they would otherwise break (they\'re not taken out when they suffer level 3 harm). They gain +1 effect and 1 armor.'
-				},
-				{
-					name: 'Mule',
-					description: 'Your load limits are higher. Light: 5. Normal: 7. Heavy: 8.'
-				},
-				{
-					name: 'Not to be Trifled With',
-					description: 'You can push yourself to do one of the following: perform a feat of physical force that verges on the superhuman — engage a small gang on equal footing in close combat.'
-				},
-				{
-					name: 'Savage',
-					description: 'When you unleash physical violence, it\'s especially frightening. When you Command a frightened target, take +1d.'
-				},
-				{
-					name: 'Vigorous',
-					description: 'You recover from harm faster. Permanently fill in one of your healing clock segments. Take +1d to healing treatment rolls.'
-				}
-			],
+			ability: ["battleborn", "bodyguard", "ghost_fighter", "leader", "mule", "not_to_be_trifled_with", "savage", "vigorous", "veteran"],
 			base: {
-				command1: '1',
-				friends_title: 'Dangerous Friends',
-				gatherinfo1: 'How can I hurt them?',
-				gatherinfo2: 'Who\'s most afraid of me?',
-				gatherinfo3: 'Who\'s most dangerous here?',
-				gatherinfo4: 'What do they intend to do?',
-				gatherinfo5: 'How can I get them to [X]?',
-				gatherinfo6: 'Are they telling the truth?',
-				item_1_desc: 'Fine heavy weapon',
-				item_2_desc: 'Fine hand weapon',
-				item_6_desc: 'Scary weapon or tool',
-				item_7_desc: 'Manacles & chain',
-				item_8_desc: 'Rage essence vial',
-				item_9_desc: 'Spiritbane charm',
-				playbook_description: 'A Dangerous &\nIntimidating\nFighter',
-				setting_showitem_0: '0',
-				setting_showitem_3: '0',
-				setting_showitem_4: '0',
-				setting_showitem_5: '0',
-				setting_traumata_set: 'normal',
-				setting_vice_type: 'normal',
-				skirmish1: '1',
-				skirmish2: '1',
-				xp_condition: 'You addressed a challenge with violence or coercion.'
+				command: "1",
+				friends_title: "playbook_cutter_friends_title",
+				gatherinfo1: "gatherinfo_how_can_I_hurt",
+				gatherinfo2: "gatherinfo_whos_most_afraid",
+				gatherinfo3: "gatherinfo_whos_most_dangerous",
+				gatherinfo4: "gatherinfo_what_do_they_intend",
+				gatherinfo5: "gatherinfo_how_can_I_get_them",
+				gatherinfo6: "gatherinfo_are_they_telling",
+				playbook_description: "playbook_cutter_description",
+				skirmish: "2",
+				xp_condition: "playbook_cutter_xp_condition"
 			},
-			friends: [
-				'Marlane, a pugilist',
-				'Chael, a vicious thug',
-				'Mercy, a cold killer',
-				'Grace, an extortionist',
-				'Sawtooth, a physicker'
-			]
+			playbookitem: [{
+				bold: "1",
+				name: "playbook_item_fine_hand_weapon",
+				numboxes: "1"
+			}, {
+				bold: "1",
+				name: "playbook_item_fine_heavy_weapon",
+				numboxes: "2"
+			}, {
+				name: "playbook_item_scary_weapon_or_tool",
+				numboxes: "1"
+			}, {
+				name: "playbook_item_manacles_&_chain",
+				numboxes: "0"
+			}, {
+				name: "playbook_item_rage_essence_vial",
+				numboxes: "0"
+			}, {
+				name: "playbook_item_spiritbane_charm",
+				numboxes: "0"
+			}]
 		},
 		ghost: {
-			abilities: [{
-					name: 'Ghost Form',
-					description: 'You are now a concentration of electroplasmic vapor which resembles your living body and clothes. You may weakly interact with the physical world and vice versa. You\'re vulnerable to arcane powers and electroplasmic effects. You move about by floating and may fly swiftly without tiring. You may slowly flow through small openings as a vapor. You chill the area around you and are terrifying for the living to behold. You are affected by spiritbane charms (take 2 drain to overcome the repulsion). Whenever you would take stress, take drain instead. When you would take trauma, take gloom instead.'
-				},
-				{
-					name: 'Dissipate',
-					description: 'You can disperse the electroplasmic vapor of your ghostly form in order to pass through solid objects for a moment. Take 1 drain when you dissipate, plus 1 drain for each feature: It lasts longer (a minute — an hour — a day) — you also become invisible — anything that passes through your form becomes dangerously electrified or frozen.'
-				},
-				{
-					name: 'Manifest',
-					description: 'Take 1 drain to flow through the electroplasmic pathways of the ghost field in order to instantly travel to any place you knew intimately in life, or to answer the summoning call of a compel.'
-				},
-				{
-					name: 'Poltergeist',
-					description: 'Take 1 drain to strongly interact with the physical world for a few moments (as if you had a normal body). Extend the reach and magnitude of your interaction to include telekinetic force and electroplasmic discharges by taking more drain (2-6).'
-				},
-				{
-					name: 'Possess',
-					description: 'You may attune to the ghost field in order to take control of a living body. When your control is challenged, you must re-attune (risking electroplasmic harm) or leave the body. Your control is challenged when: you consume spirit energy from the host — when arcane powers act against you — when the host\'s will is driven to desperation. You may easily and indefinitely possess a hull or hollow which has been ritually prepared for you (change your playbook to Hull or Vampire, respectively).'
-				}
-			],
+			ability: ["ghost_form", "dissipate", "manifest", "poltergeist", "possess", "veteran"],
 			base: {
-				friends_title: 'Enemies & Rivals',
-				gatherinfo1: 'What do they intend to do?',
-				gatherinfo2: 'How can I get them to [X]?',
-				gatherinfo3: 'What are they really feeling?',
-				gatherinfo4: 'What should I look out for?',
-				gatherinfo5: 'Where\'s the weakness here?',
-				gatherinfo6: 'How can I find [X]?',
-				playbook_description: 'A spirit without a body',
-				setting_showitem_0: '0',
-				setting_showitem_1: '0',
-				setting_showitem_2: '0',
-				setting_showitem_3: '0',
-				setting_showitem_4: '0',
-				setting_showitem_5: '0',
-				setting_showitem_6: '0',
-				setting_showitem_7: '0',
-				setting_showitem_8: '0',
-				setting_showitem_9: '0',
-				setting_stress_name: 'Drain',
-				setting_trauma_name: 'Gloom',
-				setting_traumata_set: 'ghost',
-				setting_vice_type: 'ghost',
-				xp_condition: 'You exacted vengeance upon those whom you deem deserving.',
-				xp_condition2: 'You expressed your your outrage or anger, or settled scores from your heritage or background.',
-				xp_condition3: 'You struggled with issues from your need or glooms during the session.'
+				friends_title: "playbook_ghost_friends_title",
+				gatherinfo1: "gatherinfo_what_do_they_intend",
+				gatherinfo2: "gatherinfo_how_can_I_get_them",
+				gatherinfo3: "gatherinfo_what_are_they_really",
+				gatherinfo4: "gatherinfo_what_should_I_look",
+				gatherinfo5: "gatherinfo_wheres_the_weakness",
+				gatherinfo6: "gatherinfo_how_can_I_find",
+				playbook_description: "playbook_ghost_description",
+				setting_stress_label: "drain",
+				setting_trauma_label: "gloom",
+				setting_traumata_set: "ghost",
+				setting_vice_type: "ghost",
+				xp_condition: "playbook_ghost_xp_condition",
+				xp_condition2: "playbook_ghost_xp_condition2",
+				xp_condition3: "playbook_ghost_xp_condition3"
 			},
-			friends: []
+			playbookitem: []
 		},
 		hound: {
-			abilities: [{
-					name: 'Sharpshooter',
-					description: 'You can push yourself to do one of the following: make a ranged attack at extreme distance beyond what’s normal for the weapon — unleash a barrage of rapid fire to suppress the enemy.'
-				},
-				{
-					name: 'Focused',
-					description: 'You may expend your special armor to resist a consequence of surprise or mental harm (fear, confusion, losing track of someone) or to push yourself for ranged combat or tracking.'
-				},
-				{
-					name: 'Ghost Hunter',
-					description: 'Your hunting pet is imbued with spirit energy. It gains potency when tracking or fighting the supernatural, and gains an arcane ability: ghost-form, mind-link, or arrow-swift. Take this ability again to choose an additional arcane ability for your pet.'
-				},
-				{
-					name: 'Scout',
-					description: 'When you gather info to locate a target, you get +1 effect. When you hide in a prepared position or use camou age, you get +1d to rolls to avoid detection.'
-				},
-				{
-					name: 'Survivor',
-					description: 'From hard won experience or occult ritual, you are immune to the poisonous miasma of the deathlands and are able to subsist on the strange flora and fauna there. You get +1 stress box.'
-				},
-				{
-					name: 'Tough as Nails',
-					description: 'Penalties from harm are one level less severe (though level 4 harm is still fatal).'
-				},
-				{
-					name: 'Vengeful',
-					description: 'You gain an additional xp trigger: You got payback against someone who harmed you or someone you care about. If your crew helped you get payback, also mark crew xp.'
-				}
-			],
+			ability: ["sharpshooter", "focused", "ghost_hunter", "scout", "survivor", "tough_as_nails", "vengeful", "veteran"],
 			base: {
-				friends_title: 'Deadly Friends',
-				gatherinfo1: 'What do they intend to do?',
-				gatherinfo2: 'How can I get them to [X]?',
-				gatherinfo3: 'What are they really feeling?',
-				gatherinfo4: 'Where are they vulnerable?',
-				gatherinfo5: 'Where did [X] go?',
-				gatherinfo6: 'How can I find [X]?',
-				hunt1: '1',
-				hunt2: '1',
-				item_1_desc: 'Fine long rifle',
-				item_2_desc: 'Fine pair of pistols',
-				item_5_desc: 'Electroplasmic ammunition',
-				item_6_desc: 'Spyglass',
-				item_7_desc: 'A trained hunting pet',
-				item_8_desc: 'Spiritbane charm',
-				playbook_description: 'A Deadly\nSharpshooter\nand Tracker',
-				setting_showitem_0: '0',
-				setting_showitem_3: '0',
-				setting_showitem_4: '0',
-				setting_showitem_9: '0',
-				setting_traumata_set: 'normal',
-				setting_vice_type: 'normal',
-				survey1: '1',
-				xp_condition: 'You addressed a challenge with tracking or violence.'
+				char_cohort_name: "hunting_pet",
+				char_cohort_subtype: "hunter",
+				friends_title: "playbook_hound_friends_title",
+				gatherinfo1: "gatherinfo_what_do_they_intend",
+				gatherinfo2: "gatherinfo_how_can_I_get_them",
+				gatherinfo3: "gatherinfo_what_are_they_really",
+				gatherinfo4: "gatherinfo_where_they_vulnerable",
+				gatherinfo5: "gatherinfo_where_did_x_go",
+				gatherinfo6: "gatherinfo_how_can_I_find",
+				hunt: "2",
+				playbook_description: "playbook_hound_description",
+				setting_show_cohort: "1",
+				survey: "1",
+				xp_condition: "playbook_hound_xp_condition"
 			},
-			friends: [
-				'Steiner, an assassin',
-				'Celene, a sentinel',
-				'Melvir, a physicker',
-				'Veleris, a spy',
-				'Casta, a bounty hunter'
-			]
+			playbookitem: [{
+				bold: "1",
+				name: "playbook_item_fine_pair_of_pistols",
+				numboxes: "1"
+			}, {
+				bold: "1",
+				name: "playbook_item_fine_long_rifle",
+				numboxes: "2"
+			}, {
+				name: "playbook_item_electroplasmic_ammunition",
+				numboxes: "1"
+			}, {
+				name: "playbook_item_a_trained_hunting_pet",
+				numboxes: "0"
+			}, {
+				name: "playbook_item_spyglass",
+				numboxes: "1"
+			}, {
+				name: "playbook_item_spiritbane_charm",
+				numboxes: "0"
+			}]
 		},
 		hull: {
-			abilities: [{
-					name: 'Automaton',
-					description: 'You are a spirit animating a clockwork body. You have human-like strength and senses, by default. Your hull has natural armor (this doesn\'t count for your load). Your former human feelings, interests, and connections are only dim memories. You now exist to fulfill your functions. Choose three. You may be rebuilt if damaged or destroyed. If your soul vessel is shattered, you are freed from servitude and become a Ghost. Whenever you would take stress, take drain instead.'
-				},
-				{
-					name: 'Overcharge',
-					description: 'Take 1 drain to perform a feat of extreme strength or speed (run faster than a horse, rend metal with bare hands, etc.). This factors into effect.'
-				},
-				{
-					name: 'Compartments',
-					description: 'Your items are built-in to your frame and may recess beneath panels out of sight. Your frame can now carry +2 load.'
-				},
-				{
-					name: 'Electroplasmic Projectors',
-					description: 'You may release some of your plasmic energy as an electrical shock around you or as a directed beam. You may also use this ability to create a lightning barrier to repel or trap a spirit. Take 1 drain for each level of magnitude.'
-				},
-				{
-					name: 'Interface',
-					description: 'You may attune to the local electroplasmic power field to control it or something connected to it (including another hull).'
-				},
-				{
-					name: 'Secondary Hull',
-					description: 'Choose an additional frame and its starting feature. You may transfer your consciousness between your frames at will.'
-				},
-				{
-					name: 'Frame Upgrade',
-					description: 'Choose an additional frame feature. This upgrade may be taken up to four times.'
-				}
-			],
+			ability: ["automaton", "overcharge", "compartments", "electroplasmic_projectors", "interface", "secondary_hull", "frame_upgrade"],
 			base: {
-				gatherinfo1: 'What do they intend to do?',
-				gatherinfo2: 'How can I get them to [X]?',
-				gatherinfo3: 'What are they really feeling?',
-				gatherinfo4: 'What should I look out for?',
-				gatherinfo5: 'Where\'s the weakness here?',
-				gatherinfo6: 'How can I find [X]?',
-				playbook_description: 'A spirit animating a clockwork frame',
-				setting_load_h: '7',
-				setting_show_frame: 'on',
-				setting_showitem_0: '0',
-				setting_showitem_1: '0',
-				setting_showitem_2: '0',
-				setting_showitem_3: '0',
-				setting_showitem_4: '0',
-				setting_showitem_5: '0',
-				setting_showitem_6: '0',
-				setting_showitem_7: '0',
-				setting_showitem_8: '0',
-				setting_showitem_9: '0',
-				setting_stress_name: 'Drain',
-				setting_trauma_name: 'Wear',
-				setting_traumata_set: 'hull',
-				setting_vice_type: 'hull',
-				xp_condition: 'You fulfilled your functions despite difficulty or danger.',
-				xp_condition2: 'You suppressed or ignored your former human beliefs, drives, heritage, or background.',
-				xp_condition3: 'You struggled with issues from your wear during the session.'
+				gatherinfo1: "gatherinfo_what_do_they_intend",
+				gatherinfo2: "gatherinfo_how_can_I_get_them",
+				gatherinfo3: "gatherinfo_what_are_they_really",
+				gatherinfo4: "gatherinfo_what_should_I_look",
+				gatherinfo5: "gatherinfo_wheres_the_weakness",
+				gatherinfo6: "gatherinfo_how_can_I_find",
+				playbook_description: "playbook_hull_description",
+				setting_load_h: "7",
+				setting_extra_stress: "1",
+				setting_show_frame: "1",
+				setting_stress_label: "drain",
+				setting_trauma_label: "wear",
+				setting_traumata_set: "hull",
+				setting_vice_type: "hull",
+				xp_condition: "playbook_hull_xp_condition",
+				xp_condition2: "playbook_hull_xp_condition2",
+				xp_condition3: "playbook_hull_xp_condition3"
 			},
-			friends: []
+			playbookitem: []
 		},
 		leech: {
-			abilities: [{
-					name: 'Alchemist',
-					description: 'When you invent or craft a creation with alchemical features, take +1 result level to your roll. You begin with one special formula already known.'
-				},
-				{
-					name: 'Analyst',
-					description: 'During downtime, you get two ticks to distribute among any long term project clocks that involve investigation or learning a new formula or design plan.'
-				},
-				{
-					name: 'Artificer',
-					description: 'When you invent or craft a creation with spark-craft features, take +1 result level to your roll. You begin with one special design already known.'
-				},
-				{
-					name: 'Fortitude',
-					description: 'You may expend your special armor to resist a consequence of fatigue, weakness, or chemical effects, or to push yourself when working with technical skill or handling alchemicals.'
-				},
-				{
-					name: 'Ghost Ward',
-					description: 'You know how to Wreck an area with arcane substances and methods so it is either anathema or enticing to spirits (your choice).'
-				},
-				{
-					name: 'Physicker',
-					description: 'You can Tinker with bones, blood, and bodily humours to treat wounds or stabilize the dying. You may study a malady or corpse. Everyone in your crew gets +1d to their healing treatment rolls.'
-				},
-				{
-					name: 'Saboteur',
-					description: 'When you Wreck, the work is much quieter than it should be and the damage is hidden from casual inspection.'
-				},
-				{
-					name: 'Venomous',
-					description: 'Choose a drug or poison (from your bandolier stock) to which you have become immune. You can push yourself to secrete it through your skin or saliva or exhale it as a vapor.'
-				}
-			],
+			ability: ["alchemist", "analyst", "artificer", "fortitude", "ghost_ward", "physicker", "saboteur", "venomous", "veteran"],
 			base: {
-				friends_title: 'Clever Friends',
-				gatherinfo1: 'What do they intend to do?',
-				gatherinfo2: 'How can I get them to [X]?',
-				gatherinfo3: 'Are they telling the truth?',
-				gatherinfo4: 'What can I tinker with here?',
-				gatherinfo5: 'What might happen if I [X]?',
-				gatherinfo6: 'How can I find [X]?',
-				item_0_desc: 'Gadgets',
-				item_1_desc: 'Fine wrecker tools',
-				item_2_desc: 'Fine tinkering tools',
-				item_5_desc: 'Bandolier of alchemicals (3)',
-				item_6_desc: 'Bandolier of alchemicals (3)',
-				item_7_desc: 'Blowgun & darts, syringes',
-				playbook_description: 'A Saboteur and\nTechnician',
-				setting_showitem_3: '0',
-				setting_showitem_4: '0',
-				setting_showitem_8: '0',
-				setting_showitem_9: '0',
-				setting_traumata_set: 'normal',
-				setting_vice_type: 'normal',
-				tinker1: '1',
-				tinker2: '1',
-				wreck1: '1',
-				xp_condition: 'You addressed a challenge with technical skill or mayhem.'
+				friends_title: "playbook_leech_friends_title",
+				gatherinfo1: "gatherinfo_what_do_they_intend",
+				gatherinfo2: "gatherinfo_how_can_I_get_them",
+				gatherinfo3: "gatherinfo_are_they_telling",
+				gatherinfo4: "gatherinfo_what_can_I_tinker",
+				gatherinfo5: "gatherinfo_what_might_happen",
+				gatherinfo6: "gatherinfo_how_can_I_find",
+				playbook_description: "playbook_leech_description",
+				tinker: "2",
+				wreck: "1",
+				xp_condition: "playbook_leech_xp_condition"
 			},
-			friends: [
-				'Stazia, an apothecary',
-				'Veldren, a psychonaut',
-				'Eckerd, a corpse thief',
-				'Jul, a blood dealer',
-				'Malista, a priestess'
-			]
+			playbookitem: [{
+				bold: "1",
+				name: "playbook_item_fine_tinkering_tools",
+				numboxes: "1"
+			}, {
+				bold: "1",
+				name: "playbook_item_fine_wrecker_tools",
+				numboxes: "2"
+			}, {
+				name: "playbook_item_blowgun_&_darts,_syringes",
+				numboxes: "0"
+			}, {
+				name: "playbook_item_bandolier_of_alchemicals_(3)",
+				numboxes: "1"
+			}, {
+				name: "playbook_item_bandolier_of_alchemicals_(3)",
+				numboxes: "1"
+			}, {
+				name: "playbook_item_gadget",
+				numboxes: "1"
+			}]
 		},
 		lurk: {
-			abilities: [{
-					name: 'Infiltrator',
-					description: 'You are not a ected by quality or Tier when you bypass security measures.'
-				},
-				{
-					name: 'Ambush',
-					description: 'When you attack from hiding or spring a trap, you get +1d.'
-				},
-				{
-					name: 'Daredevil',
-					description: 'When you roll a desperate action, you get +1d to your roll if you also take -1d to any resistance rolls against consequences from your action.'
-				},
-				{
-					name: 'The Devil\'s Footsteps',
-					description: 'When you push yourself, choose one of the following additional benefits: perform a feat of athletics that verges on the superhuman — maneuver to confuse your enemies so they mistakenly attack each other.'
-				},
-				{
-					name: 'Expertise',
-					description: 'Choose one of your action ratings. When you lead a group action using that action, you can suffer only 1 stress at most regardless of the number of failed rolls.'
-				},
-				{
-					name: 'Ghost Veil',
-					description: 'You may shift partially into the ghost field, becoming shadowy and insubstantial for a few moments. Take 2 stress when you shift, plus 1 stress for each extra feature: It lasts for a few minutes rather than moments — you are invisible rather than shadowy — you may float through the air like a ghost'
-				},
-				{
-					name: 'Reflexes',
-					description: 'When there\'s a question about who acts first, the answer is you (two characters with Reflexes act simultaneously).'
-				},
-				{
-					name: 'Shadow',
-					description: 'You may expend your special armor to resist a consequence from detection or security measures, or to push yourself for a feat of athletics or stealth.'
-				}
-			],
+			ability: ["infiltrator", "ambush", "daredevil", "the_devil's_footsteps", "expertise", "ghost_veil", "reflexes", "shadow", "veteran"],
 			base: {
-				friends_title: 'Shady Friends',
-				finesse1: '1',
-				gatherinfo1: 'What do they intend to do?',
-				gatherinfo2: 'How can I get them to [X]?',
-				gatherinfo3: 'What should I look out for?',
-				gatherinfo4: 'What\'s the best way in?',
-				gatherinfo5: 'Where can I hide here?',
-				gatherinfo6: 'How can I find [X]?',
-				item_3_desc: 'Fine shadow cloak',
-				item_4_desc: 'Fine lockpicks',
-				item_5_desc: 'Light climbing gear',
-				item_6_desc: 'Dark-sight goggles',
-				item_7_desc: 'Silence potion vial',
-				item_8_desc: 'Spiritbane charm',
-				playbook_description: 'A Stealthy\nInfiltrator\nand Burglar',
-				prowl1: '1',
-				prowl2: '1',
-				setting_showitem_0: '0',
-				setting_showitem_1: '0',
-				setting_showitem_2: '0',
-				setting_showitem_9: '0',
-				setting_traumata_set: 'normal',
-				setting_vice_type: 'normal',
-				xp_condition: 'You addressed a challenge with stealth or evasion.'
+				friends_title: "playbook_lurk_friends_title",
+				finesse: "1",
+				gatherinfo1: "gatherinfo_what_do_they_intend",
+				gatherinfo2: "gatherinfo_how_can_I_get_them",
+				gatherinfo3: "gatherinfo_what_should_I_look",
+				gatherinfo4: "gatherinfo_whats_the_best_way",
+				gatherinfo5: "gatherinfo_where_can_I_hide",
+				gatherinfo6: "gatherinfo_how_can_I_find",
+				playbook_description: "playbook_lurk_description",
+				prowl: "2",
+				xp_condition: "playbook_lurk_xp_condition"
 			},
-			friends: [
-				'Telda, a beggar',
-				'Darmot, a bluecoat',
-				'Frake, a locksmith',
-				'Roslyn Kellis, a noble',
-				'Petra, a city clerk'
-			]
+			playbookitem: [{
+				bold: "1",
+				name: "playbook_item_fine_lockpicks",
+				numboxes: "0"
+			}, {
+				bold: "1",
+				name: "playbook_item_fine_shadow_cloak",
+				numboxes: "1"
+			}, {
+				name: "playbook_item_light_climbing_gear",
+				numboxes: "1"
+			}, {
+				name: "playbook_item_silence_potion_vial",
+				numboxes: "0"
+			}, {
+				name: "playbook_item_dark-sight_goggles",
+				numboxes: "1"
+			}, {
+				name: "playbook_item_spiritbane_charm",
+				numboxes: "0"
+			}]
 		},
 		slide: {
-			abilities: [{
-					name: 'Rook\'s Gambit',
-					description: 'Take 2 stress to roll your best action rating while performing a different action. Say how you adapt your skill to this use.'
-				},
-				{
-					name: 'Cloak & Dagger',
-					description: 'When you use a disguise or other form of covert misdirection, you get +1d to rolls to confuse or deflect suspicion. When you throw off your disguise, the resulting surprise gives you the initiative in the situation.'
-				},
-				{
-					name: 'Ghost Voice',
-					description: 'You know the secret method to interact with a ghost or demon as if it was a normal human, regardless of how wild or feral it appears. You gain potency when communicating with the supernatural.'
-				},
-				{
-					name: 'Like Looking into a Mirror',
-					description: 'You can always tell when someone is lying to you.'
-				},
-				{
-					name: 'A Little Something on the Side',
-					description: 'At the end of each downtime phase, you earn +2 stash.'
-				},
-				{
-					name: 'Mesmerism',
-					description: 'When you Sway someone, you may cause them to forget that it\'s happened until they next interact with you.'
-				},
-				{
-					name: 'Subterfuge',
-					description: 'You may expend your special armor to resist a consequence from suspicion or persuasion, or to push yourself for subterfuge.'
-				},
-				{
-					name: 'Trust in Me',
-					description: 'You get +1d vs. a target with whom you have an intimate relationship.'
-				}
-			],
+			ability: ["rook's_gambit", "cloak_&_dagger", "ghost_voice", "like_looking_into_a_mirror", "a_little_something_on_the_side", "mesmerism", "subterfuge", "trust_in_me", "veteran"],
 			base: {
-				friends_title: 'Sly Friends',
-				consort1: '1',
-				gatherinfo1: 'What do they intend to do?',
-				gatherinfo2: 'How can I get them to [X]?',
-				gatherinfo3: 'Are they telling the truth?',
-				gatherinfo4: 'What are they really feeling?',
-				gatherinfo5: 'What do they really care about?',
-				gatherinfo6: 'How can I blend in here?',
-				item_3_desc: 'Fine disguise kit',
-				item_4_desc: 'Fine clothes & jewelry',
-				item_6_desc: 'A cane-sword',
-				item_7_desc: 'Fine loaded dice, trick cards',
-				item_8_desc: 'Trance powder',
-				item_9_desc: 'Spiritbane charm',
-				playbook_description: 'A Subtle\nManipulator\nand Spy',
-				setting_showitem_0: '0',
-				setting_showitem_1: '0',
-				setting_showitem_2: '0',
-				setting_showitem_5: '0',
-				setting_traumata_set: 'normal',
-				setting_vice_type: 'normal',
-				sway1: '1',
-				sway2: '1',
-				xp_condition: 'You addressed a challenge with deception or in influence.'
+				friends_title: "playbook_slide_friends_title",
+				consort: "1",
+				gatherinfo1: "gatherinfo_what_do_they_intend",
+				gatherinfo2: "gatherinfo_how_can_I_get_them",
+				gatherinfo3: "gatherinfo_are_they_telling",
+				gatherinfo4: "gatherinfo_what_are_they_really",
+				gatherinfo5: "gatherinfo_what_do_they_really",
+				gatherinfo6: "gatherinfo_how_can_I_blend",
+				playbook_description: "playbook_slide_description",
+				sway: "2",
+				xp_condition: "playbook_slide_xp_condition"
 			},
-			friends: [
-				'Bryl, a drug dealer',
-				'Bazso Baz, a gang leader',
-				'Klyra, a tavern owner',
-				'Nyryx, a prostitute',
-				'Harker, a jail-bird'
-			]
+			playbookitem: [{
+				bold: "1",
+				name: "playbook_item_fine_clothes_&_jewelry",
+				numboxes: "0"
+			}, {
+				bold: "1",
+				name: "playbook_item_fine_disguise_kit",
+				numboxes: "1"
+			}, {
+				bold: "1",
+				name: "playbook_item_fine_loaded_dice,_trick_cards",
+				numboxes: "0"
+			}, {
+				name: "playbook_item_trance_powder",
+				numboxes: "0"
+			}, {
+				name: "playbook_item_a_cane-sword",
+				numboxes: "1"
+			}, {
+				name: "playbook_item_spiritbane_charm",
+				numboxes: "0"
+			}]
 		},
 		spider: {
-			abilities: [{
-					name: 'Foresight',
-					description: 'Two times per score you can assist a teammate without paying stress. Tell us how you prepared for this.'
-				},
-				{
-					name: 'Calculating',
-					description: 'Due to your careful planning, during downtime, you may give yourself or another crew member +1 downtime action.'
-				},
-				{
-					name: 'Connected',
-					description: 'During downtime, you get +1 result level when you acquire an asset or reduce heat.'
-				},
-				{
-					name: 'Functioning Vice',
-					description: 'When you indulge your vice, you may adjust the dice outcome by 1 or 2 (up or down). An ally who joins in your vice may do the same.'
-				},
-				{
-					name: 'Ghost Contract',
-					description: 'When you shake on a deal, you and your partner — human or otherwise — both bear a mark of your oath. If either breaks the contract, they take level 3 harm, "Cursed".'
-				},
-				{
-					name: 'Jail Bird',
-					description: 'When incarcerated, your wanted level counts as 1 less, your Tier as 1 more, and you gain +1 faction status with a faction you help on the inside (in addition to your incarceration roll).'
-				},
-				{
-					name: 'Mastermind',
-					description: 'You may expend your special armor to protect a teammate, or to push yourself when you gather information or work on a long-term project.'
-				},
-				{
-					name: 'Weaving the Web',
-					description: 'You gain +1d to Consort when you gather information on a target for a score. You get +1d to the engagement roll for that operation.'
-				}
-			],
+			ability: ["foresight", "calculating", "connected", "functioning_vice", "ghost_contract", "jail_bird", "mastermind", "weaving_the_web", "veteran"],
 			base: {
-				consort1: '1',
-				consort2: '1',
-				friends_title: 'Shrewd Friends',
-				gatherinfo1: 'What do they want most?',
-				gatherinfo2: 'What should I look out for?',
-				gatherinfo3: 'Where\'s the leverage here?',
-				gatherinfo4: 'How can I discover [X]?',
-				gatherinfo5: 'What do they intend to do?',
-				gatherinfo6: 'How can I get them to [X]?',
-				item_3_desc: 'Fine bottle of whiskey',
-				item_4_desc: 'Fine cover identity',
-				item_5_desc: 'Blueprints',
-				item_7_desc: 'Vial of slumber essence',
-				item_8_desc: 'Concealed palm pistol',
-				item_9_desc: 'Spiritbane charm',
-				playbook_description: 'A Devious\nMastermind',
-				setting_showitem_0: '0',
-				setting_showitem_1: '0',
-				setting_showitem_2: '0',
-				setting_showitem_6: '0',
-				setting_traumata_set: 'normal',
-				setting_vice_type: 'normal',
-				study1: '1',
-				xp_condition: 'You addressed a challenge with calculation or conspiracy.'
+				consort: "2",
+				friends_title: "playbook_spider_friends_title",
+				gatherinfo1: "gatherinfo_what_do_they_want",
+				gatherinfo2: "gatherinfo_what_should_I_look",
+				gatherinfo3: "gatherinfo_wheres_the_leverage",
+				gatherinfo4: "gatherinfo_how_can_I_discover",
+				gatherinfo5: "gatherinfo_what_do_they_intend",
+				gatherinfo6: "gatherinfo_how_can_I_get_them",
+				playbook_description: "playbook_spider_description",
+				study: "1",
+				xp_condition: "playbook_spider_xp_condition"
 			},
-			friends: [
-				'Salia, an information broker',
-				'Augus, a master architect',
-				'Jennah, a servant',
-				'Riven, a chemist',
-				'Jeren, a bluecoat archivist'
-			]
+			playbookitem: [{
+				bold: "1",
+				name: "playbook_item_fine_cover_identity",
+				numboxes: "0"
+			}, {
+				bold: "1",
+				name: "playbook_item_fine_bottle_of_whiskey",
+				numboxes: "1"
+			}, {
+				name: "playbook_item_blueprints",
+				numboxes: "1"
+			}, {
+				name: "playbook_item_vial_of_slumber_essence",
+				numboxes: "0"
+			}, {
+				name: "playbook_item_concealed_palm_pistol",
+				numboxes: "0"
+			}, {
+				name: "playbook_item_spiritbane_charm",
+				numboxes: "0"
+			}]
 		},
 		whisper: {
-			abilities: [{
-					name: 'Compel',
-					description: 'You can Attune to the ghost field to force a nearby ghost to appear and obey a command you give it. You are not supernaturally terrified by a ghost you summon or compel (though your allies may be).'
-				},
-				{
-					name: 'Ghost Mind',
-					description: 'You’re always aware of supernatural entities in your presence. Take +1d when you gather info about the supernatural.'
-				},
-				{
-					name: 'Iron Will',
-					description: ' You\'re immune to the terror that some supernatural entities inflict on sight. Take +1d to resistance rolls with Resolve.'
-				},
-				{
-					name: 'Occultist',
-					description: 'You know the secret ways to Consort with ancient powers, forgotten gods or demons. Once you\'ve consorted with one, you get +1d to command cultists who worship it.'
-				},
-				{
-					name: 'Ritual',
-					description: 'You can Study an occult ritual (or create a new one) to summon a supernatural effect or being. You know the arcane methods to perform ritual sorcery. You begin with one ritual already learned.'
-				},
-				{
-					name: 'Strange Methods',
-					description: 'When you invent or craft a creation with arcane features, take +1 result level to your roll. You begin with one arcane design already known.'
-				},
-				{
-					name: 'Tempest',
-					description: 'You can push yourself to do one of the following: unleash a stroke of lightning as a weapon — summon a storm in your immediate vicinity (torrential rain, roaring winds, heavy fog, chilling frost/snow, etc.).'
-				},
-				{
-					name: 'Warded',
-					description: 'You may expend your special armor to resist a supernatural consequence, or to push yourself when you deal with arcane forces.'
-				}
-			],
+			ability: ["compel", "ghost_mind", "iron_will", "occultist", "ritual", "strange_methods", "tempest", "warded"],
 			base: {
-				attune1: '1',
-				attune2: '1',
-				friends_title: 'Strange Friends',
-				gatherinfo1: 'What is arcane or weird here?',
-				gatherinfo2: 'What echoes in the ghost field?',
-				gatherinfo3: 'What is hidden or lost here?',
-				gatherinfo4: 'What do they intend to do?',
-				gatherinfo5: 'What drives them to do this?',
-				gatherinfo6: 'How can I reveal [X]?',
-				item_2_desc: 'Fine lightning hook',
-				item_3_desc: 'Fine spirit mask',
-				item_6_desc: 'Spirit bottles (2)',
-				item_7_desc: 'Electroplasm vials',
-				item_8_desc: 'Ghost key',
-				item_9_desc: 'Demonbane charm',
-				playbook_description: 'An Arcane\nAdept and\nChanneler',
-				setting_showitem_0: '0',
-				setting_showitem_1: '0',
-				setting_showitem_4: '0',
-				setting_showitem_5: '0',
-				setting_traumata_set: 'normal',
-				setting_vice_type: 'normal',
-				study1: '1',
-				xp_condition: 'You addressed a challenge with knowledge or arcane power.'
+				attune: "2",
+				friends_title: "playbook_whisper_friends_title",
+				gatherinfo1: "gatherinfo_what_is_arcane",
+				gatherinfo2: "gatherinfo_what_echoes",
+				gatherinfo3: "gatherinfo_what_is_hidden",
+				gatherinfo4: "gatherinfo_what_do_they_intend",
+				gatherinfo5: "gatherinfo_what_drives_them",
+				gatherinfo6: "gatherinfo_reveal",
+				playbook_description: "playbook_whisper_description",
+				study: "1",
+				xp_condition: "playbook_whisper_xp_condition"
 			},
-			friends: [
-				'Nyryx, a possessor ghost',
-				'Scurlock, a vampire',
-				'Setarra, a demon',
-				'Quellyn, a witch',
-				'Flint, a spirit trafficker'
-			]
+			playbookitem: [{
+				bold: "1",
+				name: "playbook_item_fine_lightning_hook",
+				numboxes: "1"
+			}, {
+				bold: "1",
+				name: "playbook_item_fine_spirit_mask",
+				numboxes: "1"
+			}, {
+				name: "playbook_item_electroplasm_vials",
+				numboxes: "0"
+			}, {
+				name: "playbook_item_spirit_bottles_(2)",
+				numboxes: "1"
+			}, {
+				name: "playbook_item_ghost_key",
+				numboxes: "0"
+			}, {
+				name: "playbook_item_demonbane_charm",
+				numboxes: "0"
+			}]
 		},
 		vampire: {
-			abilities: [{
-					name: 'Undead',
-					description: 'You are a spirit which animates an undead body. Your trauma is maxed out. Choose four trauma conditions which reflect your vampiric nature. Arcane attacks are potent against you. If you suffer fatal harm or trauma, your undead spirit is overwhelmed. You take level 3 harm: "Incapacitated" until you feed enough to recover. If you suffer arcane harm while in this state, you are destroyed utterly. Your XP tracks are longer (you now advance more slowly). You have more stress boxes.'
-				},
-				{
-					name: 'Terrible Power',
-					description: 'Take 1 stress to perform a feat of superhuman strength or speed (run faster than a carriage, break stone with bare hands, leap onto the roof of a building, etc.). This factors into effect.'
-				},
-				{
-					name: 'Arcane Sight',
-					description: 'Take 1 stress to sense beyond human limits. "Hear" a subject\'s true thoughts or feelings, see in pitch darkness, sense the presence of invisible things, intuit the location of a hidden object, etc.'
-				},
-				{
-					name: 'A Void in the Echo',
-					description: 'You are invisible to spirits and may not be harmed by them. Take 2 stress to cause living things to avert their gaze and fail to observe you for a few moments.'
-				},
-				{
-					name: 'Dark Talent',
-					description: 'Choose Insight, Prowess, or Resolve.Your max rating for actions under that attribute becomes 5. When you take this ability, add +1 dot to the resistance rating of the attribute you\'ve chosen.'
-				},
-				{
-					name: 'Sinister Guile',
-					description: 'During downtime, choose one: Get a free additional downtime activity, or take +1d to all downtime activity rolls.'
-				}
-			],
+			ability: ["undead", "terrible_power", "arcane_sight", "a_void_in_the_echo", "dark_talent", "sinister_guile", "veteran"],
 			base: {
-				friends_title: 'Dark Servants',
-				gatherinfo1: 'What do they intend to do?',
-				gatherinfo2: 'How can I get them to [X]?',
-				gatherinfo3: 'What are they really feeling?',
-				gatherinfo4: 'What should I look out for?',
-				gatherinfo5: 'Where\'s the weakness here?',
-				gatherinfo6: 'How can I find [X]?',
-				item_3_desc: 'Fine shadow cloak',
-				item_4_desc: 'Fine clothes and accoutrements',
-				item_5_desc: 'Fine personal weapon',
-				item_7_desc: 'Demonbane charm',
-				item_8_desc: 'Spiritbane charm',
-				playbook_description: 'A spirit animating an undead body',
-				setting_extra_stress: '3',
-				setting_vampirexp: 'on',
-				setting_showitem_0: '0',
-				setting_showitem_1: '0',
-				setting_showitem_2: '0',
-				setting_showitem_3: 'on',
-				setting_showitem_4: 'on',
-				setting_showitem_5: 'on',
-				setting_showitem_6: '0',
-				setting_showitem_7: 'on',
-				setting_showitem_8: 'on',
-				setting_showitem_9: '0',
-				setting_show_strictures: 'on',
-				setting_traumata_set: 'normal',
-				setting_vice_type: 'vampire',
-				trauma: '4',
-				xp_condition: 'You displayed your dominance or slayed without mercy.',
-				xp_condition2: 'You expressed your beliefs, drives, heritage, or background.',
-				xp_condition3: 'You struggled with issues from your vice, traumas, or strictures during the session.'
+				friends_title: "playbook_vampire_friends_title",
+				gatherinfo1: "gatherinfo_what_do_they_intend",
+				gatherinfo2: "gatherinfo_how_can_I_get_them",
+				gatherinfo3: "gatherinfo_what_are_they_really",
+				gatherinfo4: "gatherinfo_what_should_I_look",
+				gatherinfo5: "gatherinfo_wheres_the_weakness",
+				gatherinfo6: "gatherinfo_how_can_I_find",
+				playbook_description: "playbook_vampire_description",
+				setting_extra_stress: "3",
+				setting_vampirexp: "1",
+				setting_show_strictures: "1",
+				setting_vice_type: "vampire",
+				trauma: "4",
+				xp_condition: "playbook_vampire_xp_condition",
+				xp_condition2: "playbook_vampire_xp_condition2",
+				xp_condition3: "playbook_vampire_xp_condition3"
 			},
-			friends: [
-				'Rutherford, a butler',
-				'Lylandra, a consort',
-				'Kira, a bodyguard',
-				'Otto, a coachman',
-				'Edrik, an envoy'
-			]
+			playbookitem: [{
+				bold: "1",
+				name: "playbook_item_fine_clothes_and_accoutrements",
+				numboxes: "0"
+			}, {
+				bold: "1",
+				name: "playbook_item_fine_personal_weapon",
+				numboxes: "1"
+			}, {
+				bold: "1",
+				name: "playbook_item_fine_shadow_cloak",
+				numboxes: "1"
+			}, {
+				name: "playbook_item_demonbane_charm",
+				numboxes: "0"
+			}, {
+				name: "playbook_item_spiritbane_charm",
+				numboxes: "0"
+			}]
 		}
 	},
 	factionsData = {
 		factions1: [{
-				name: 'The Unseen',
-				tier: 'IV',
-				hold: 'S'
+				name: "faction_the_unseen",
+				tier: "IV",
+				hold: "S"
 			},
 			{
-				name: 'The Hive',
-				tier: 'IV',
-				hold: 'S'
+				name: "faction_the_hive",
+				tier: "IV",
+				hold: "S"
 			},
 			{
-				name: 'The Circle of Flame',
-				tier: 'III',
-				hold: 'S'
+				name: "faction_the_circle_of_flame",
+				tier: "III",
+				hold: "S"
 			},
 			{
-				name: 'The Silver Nails',
-				tier: 'III',
-				hold: 'S'
+				name: "faction_the_silver_nails",
+				tier: "III",
+				hold: "S"
 			},
 			{
-				name: 'Lord Scurlock',
-				tier: 'III',
-				hold: 'S'
+				name: "faction_lord_scurlock",
+				tier: "III",
+				hold: "S"
 			},
 			{
-				name: 'The Crows',
-				tier: 'II',
-				hold: 'W'
+				name: "faction_the_crows",
+				tier: "II",
+				hold: "W"
 			},
 			{
-				name: 'The Lampblacks',
-				tier: 'II',
-				hold: 'W'
+				name: "faction_the_lampblacks",
+				tier: "II",
+				hold: "W"
 			},
 			{
-				name: 'The Red Sashes',
-				tier: 'II',
-				hold: 'W'
+				name: "faction_the_red_sashes",
+				tier: "II",
+				hold: "W"
 			},
 			{
-				name: 'The Dimmer Sisters',
-				tier: 'II',
-				hold: 'S'
+				name: "faction_the_dimmer_sisters",
+				tier: "II",
+				hold: "S"
 			},
 			{
-				name: 'The Grinders',
-				tier: 'II',
-				hold: 'W'
+				name: "faction_the_grinders",
+				tier: "II",
+				hold: "W"
 			},
 			{
-				name: 'The Billhooks',
-				tier: 'II',
-				hold: 'W'
+				name: "faction_the_billhooks",
+				tier: "II",
+				hold: "W"
 			},
 			{
-				name: 'The Wraiths',
-				tier: 'II',
-				hold: 'W'
+				name: "faction_the_wraiths",
+				tier: "II",
+				hold: "W"
 			},
 			{
-				name: 'The Gray Cloaks',
-				tier: 'II',
-				hold: 'S'
+				name: "faction_the_gray_cloaks",
+				tier: "II",
+				hold: "S"
 			},
 			{
-				name: 'Ulf Ironborn',
-				tier: 'I',
-				hold: 'S'
+				name: "faction_ulf_ironborn",
+				tier: "I",
+				hold: "S"
 			},
 			{
-				name: 'The Foghounds',
-				tier: 'I',
-				hold: 'W'
+				name: "faction_the_foghounds",
+				tier: "I",
+				hold: "W"
 			},
 			{
-				name: 'The Lost',
-				tier: 'I',
-				hold: 'W'
+				name: "faction_the_lost",
+				tier: "I",
+				hold: "W"
 			}
 		],
 		factions2: [{
-				name: 'Imperial Military',
-				tier: 'VI',
-				hold: 'S'
+				name: "faction_imperial_military",
+				tier: "VI",
+				hold: "S"
 			},
 			{
-				name: 'City Council',
-				tier: 'V',
-				hold: 'S'
+				name: "faction_city_council",
+				tier: "V",
+				hold: "S"
 			},
 			{
-				name: 'Ministry of Preservation',
-				tier: 'V',
-				hold: 'S'
+				name: "faction_ministry_of_preservation",
+				tier: "V",
+				hold: "S"
 			},
 			{
-				name: 'Leviathan Hunters',
-				tier: 'V',
-				hold: 'S'
+				name: "faction_leviathan_hunters",
+				tier: "V",
+				hold: "S"
 			},
 			{
-				name: 'Ironhook Prison',
-				tier: 'IV',
-				hold: 'S'
+				name: "faction_ironhook_prison",
+				tier: "IV",
+				hold: "S"
 			},
 			{
-				name: 'Sparkwrights',
-				tier: 'IV',
-				hold: 'S'
+				name: "faction_sparkwrights",
+				tier: "IV",
+				hold: "S"
 			},
 			{
-				name: 'Spirit Wardens',
-				tier: 'IV',
-				hold: 'S'
+				name: "faction_spirit_wardens",
+				tier: "IV",
+				hold: "S"
 			},
 			{
-				name: 'Bluecoats',
-				tier: 'III',
-				hold: 'S'
+				name: "faction_bluecoats",
+				tier: "III",
+				hold: "S"
 			},
 			{
-				name: 'Inspectors',
-				tier: 'III',
-				hold: 'S'
+				name: "faction_inspectors",
+				tier: "III",
+				hold: "S"
 			},
 			{
-				name: 'Iruvian Consulate',
-				tier: 'III',
-				hold: 'S'
+				name: "faction_iruvian_consulate",
+				tier: "III",
+				hold: "S"
 			},
 			{
-				name: 'Skovlan Consulate',
-				tier: 'III',
-				hold: 'W'
+				name: "faction_skovlan_consulate",
+				tier: "III",
+				hold: "W"
 			},
 			{
-				name: 'The Brigade',
-				tier: 'II',
-				hold: 'S'
+				name: "faction_the_brigade",
+				tier: "II",
+				hold: "S"
 			},
 			{
-				name: 'Severosi Consulate',
-				tier: 'I',
-				hold: 'S'
+				name: "faction_severosi_consulate",
+				tier: "I",
+				hold: "S"
 			},
 			{
-				name: 'Dagger Isles Consulate',
-				tier: 'I',
-				hold: 'S'
+				name: "faction_dagger_isles_consulate",
+				tier: "I",
+				hold: "S"
 			}
 		],
 		factions3: [{
-				name: 'The Foundation',
-				tier: 'IV',
-				hold: 'S'
+				name: "faction_the_foundation",
+				tier: "IV",
+				hold: "S"
 			},
 			{
-				name: 'Dockers',
-				tier: 'III',
-				hold: 'S'
+				name: "faction_dockers",
+				tier: "III",
+				hold: "S"
 			},
 			{
-				name: 'Gondoliers',
-				tier: 'III',
-				hold: 'S'
+				name: "faction_gondoliers",
+				tier: "III",
+				hold: "S"
 			},
 			{
-				name: 'Sailors',
-				tier: 'III',
-				hold: 'W'
+				name: "faction_sailors",
+				tier: "III",
+				hold: "W"
 			},
 			{
-				name: 'Laborers',
-				tier: 'III',
-				hold: 'W'
+				name: "faction_laborers",
+				tier: "III",
+				hold: "W"
 			},
 			{
-				name: 'Cabbies',
-				tier: 'II',
-				hold: 'W'
+				name: "faction_cabbies",
+				tier: "II",
+				hold: "W"
 			},
 			{
-				name: 'Cyphers',
-				tier: 'II',
-				hold: 'S'
+				name: "faction_cyphers",
+				tier: "II",
+				hold: "S"
 			},
 			{
-				name: 'Ink Rakes',
-				tier: 'II',
-				hold: 'W'
+				name: "faction_ink_rakes",
+				tier: "II",
+				hold: "W"
 			},
 			{
-				name: 'Rail Jacks',
-				tier: 'II',
-				hold: 'W'
+				name: "faction_rail_jacks",
+				tier: "II",
+				hold: "W"
 			},
 			{
-				name: 'Servants',
-				tier: 'II',
-				hold: 'W'
+				name: "faction_servants",
+				tier: "II",
+				hold: "W"
 			}
 		],
 		factions4: [{
-				name: 'The Church of Ecstasy',
-				tier: 'IV',
-				hold: 'S'
+				name: "faction_the_church_of_ecstasy",
+				tier: "IV",
+				hold: "S"
 			},
 			{
-				name: 'The Horde',
-				tier: 'III',
-				hold: 'S'
+				name: "faction_the_horde",
+				tier: "III",
+				hold: "S"
 			},
 			{
-				name: 'The Path of Echoes',
-				tier: 'III',
-				hold: 'S'
+				name: "faction_the_path_of_echoes",
+				tier: "III",
+				hold: "S"
 			},
 			{
-				name: 'The Forgotten Gods',
-				tier: 'III',
-				hold: 'W'
+				name: "faction_the_forgotten_gods",
+				tier: "III",
+				hold: "W"
 			},
 			{
-				name: 'The Reconciled',
-				tier: 'III',
-				hold: 'S'
+				name: "faction_the_reconciled",
+				tier: "III",
+				hold: "S"
 			},
 			{
-				name: 'Skovlander Refugees',
-				tier: 'III',
-				hold: 'W'
+				name: "faction_skovlander_refugees",
+				tier: "III",
+				hold: "W"
 			},
 			{
-				name: 'The Weeping Lady',
-				tier: 'II',
-				hold: 'S'
+				name: "faction_the_weeping_lady",
+				tier: "II",
+				hold: "S"
 			},
 			{
-				name: 'Deathlands Scavengers',
-				tier: 'II',
-				hold: 'W'
+				name: "faction_deathlands_scavengers",
+				tier: "II",
+				hold: "W"
 			}
 		],
 		factions5: [{
-				name: 'Whitecrown',
-				tier: 'V',
-				hold: 'S'
+				name: "faction_whitecrown",
+				tier: "V",
+				hold: "S"
 			},
 			{
-				name: 'Brightstone',
-				tier: 'IV',
-				hold: 'S'
+				name: "faction_brightstone",
+				tier: "IV",
+				hold: "S"
 			},
 			{
-				name: 'Charterhall',
-				tier: 'IV',
-				hold: 'S'
+				name: "faction_charterhall",
+				tier: "IV",
+				hold: "S"
 			},
 			{
-				name: 'Six Towers',
-				tier: 'III',
-				hold: 'W'
+				name: "faction_six_towers",
+				tier: "III",
+				hold: "W"
 			},
 			{
-				name: 'Silkshore',
-				tier: 'II',
-				hold: 'S'
+				name: "faction_silkshore",
+				tier: "II",
+				hold: "S"
 			},
 			{
-				name: 'Nightmarket',
-				tier: 'II',
-				hold: 'S'
+				name: "faction_nightmarket",
+				tier: "II",
+				hold: "S"
 			},
 			{
-				name: 'Crow\'s Foot',
-				tier: 'II',
-				hold: 'S'
+				name: "faction_crow's_foot",
+				tier: "II",
+				hold: "S"
 			},
 			{
-				name: 'The Docks',
-				tier: 'II',
-				hold: 'S'
+				name: "faction_the_docks",
+				tier: "II",
+				hold: "S"
 			},
 			{
-				name: 'Barrowcleft',
-				tier: 'II',
-				hold: 'S'
+				name: "faction_barrowcleft",
+				tier: "II",
+				hold: "S"
 			},
 			{
-				name: 'Coalridge',
-				tier: 'II',
-				hold: 'W'
+				name: "faction_coalridge",
+				tier: "II",
+				hold: "W"
 			},
 			{
-				name: 'Charhollow',
-				tier: 'I',
-				hold: 'S'
+				name: "faction_charhollow",
+				tier: "I",
+				hold: "S"
 			},
 			{
-				name: 'Dunslough',
-				tier: 'I',
-				hold: 'W'
+				name: "faction_dunslough",
+				tier: "I",
+				hold: "W"
 			}
 		]
 	},
 	actionData = {
 		insight: [
-			'hunt',
-			'study',
-			'survey',
-			'tinker'
+			"hunt",
+			"study",
+			"survey",
+			"tinker"
 		],
 		prowess: [
-			'finesse',
-			'prowl',
-			'skirmish',
-			'wreck'
+			"finesse",
+			"prowl",
+			"skirmish",
+			"wreck"
 		],
 		resolve: [
-			'attune',
-			'command',
-			'consort',
-			'sway'
+			"attune",
+			"command",
+			"consort",
+			"sway"
 		]
 	},
-	spiritPlaybooks = ['ghost', 'hull', 'vampire'];
-/* UTILITY FUNCTIONS */
-var setDiceFromTotal = function (name, numDice, upToFive, value) {
-		'use strict';
-		value = value || 1;
-		let setting = {};
-		setting[`${name}1`] = (numDice > 0) ? value : 0;
-		setting[`${name}2`] = (numDice > 1) ? value : 0;
-		setting[`${name}3`] = (numDice > 2) ? value : 0;
-		setting[`${name}4`] = (numDice > 3) ? value : 0;
-		if (upToFive) {
-			setting[`${name}5`] = (numDice > 4) ? value : 0;
-		};
-		setAttrs(setting);
+	traumaData = {
+		normal: ['cold', 'haunted', 'obsessed', 'paranoid', 'reckless', 'soft', 'unstable', 'vicious'],
+		ghost: ['chaotic', 'destructive', 'furious', 'obsessive', 'territorial', 'savage'],
+		hull: ['clanking', 'leaking', 'fixated', 'smoking', 'sparking', 'unstable']
 	},
-	fillRepeatingSectionFromData = function (sectionName, dataList) {
-		'use strict';
-		getSectionIDs(`repeating_${sectionName}`, function (idList) {
-			let rowNameAttributes = idList.map(id => `repeating_${sectionName}_${id}_name`);
-			getAttrs(rowNameAttributes, function (attrs) {
-				let existingRows = Object.keys(attrs).map(x => attrs[x]),
-					createdIDs = [];
-				let setting = dataList.filter(o => !existingRows.includes(o.name))
-					.map(function (o) {
+	itemData = [{
+			name: "a_blade_or_two",
+			description: "a_blade_or_two_description",
+			numboxes: "1"
+		},
+		{
+			name: "throwing_knives",
+			description: "throwing_knives_description",
+			numboxes: "1"
+		},
+		{
+			name: "a_pistol",
+			description: "a_pistol_description",
+			numboxes: "1",
+			short: "1"
+		},
+		{
+			name: "a_2nd_pistol",
+			description: "a_pistol_description",
+			numboxes: "1",
+			short: "1"
+		},
+		{
+			name: "a_large_weapon",
+			description: "a_large_weapon_description",
+			numboxes: "2"
+		},
+		{
+			name: "an_unusual_weapon",
+			description: "an_unusual_weapon_description",
+			numboxes: "1"
+		},
+		{
+			name: "armor",
+			description: "armor_description",
+			numboxes: "2",
+			short: "1"
+		},
+		{
+			name: "+heavy",
+			description: "+heavy_description",
+			numboxes: "3",
+			short: "1"
+		},
+		{
+			name: "burglary_gear",
+			description: "burglary_gear_description",
+			numboxes: "1"
+		},
+		{
+			name: "climbing_gear",
+			description: "climbing_gear_description",
+			numboxes: "2"
+		},
+		{
+			name: "arcane_implements",
+			description: "arcane_implements_description",
+			numboxes: "1"
+		},
+		{
+			name: "documents",
+			description: "documents_description",
+			numboxes: "1"
+		},
+		{
+			name: "subterfuge_supplies",
+			description: "subterfuge_supplies_description",
+			numboxes: "1"
+		},
+		{
+			name: "demolition_tools",
+			description: "demolition_tools_description",
+			numboxes: "2"
+		},
+		{
+			name: "tinkering_tools",
+			description: "tinkering_tools_description",
+			numboxes: "1"
+		},
+		{
+			name: "lantern",
+			description: "lantern_description",
+			numboxes: "1"
+		}
+	],
+	translatedDefaults = {
+		cohort1_name: "cohort",
+		contacts_title: "contacts",
+		factions_title: "factions_title",
+		factions1_header: "factions1",
+		factions2_header: "factions2",
+		factions3_header: "factions3",
+		factions4_header: "factions4",
+		factions5_header: "factions5",
+		frame: "frame",
+		friends_title: "friends",
+		setting_deity_label: "deity",
+		setting_heat_label: "heat",
+		setting_stress_label: "stress",
+		setting_trauma_label: "trauma",
+		setting_wanted_label: "wanted",
+		upgrade_6_name: "carriage",
+		upgrade_6_description: "upgrade_carriage_description",
+		upgrade_7_name: "documents",
+		upgrade_7_description: "upgrade_documents_description",
+		upgrade_8_name: "boat",
+		upgrade_8_description: "upgrade_boat_description",
+		upgrade_9_name: "gear",
+		upgrade_9_description: "upgrade_gear_description",
+		upgrade_10_name: "hidden",
+		upgrade_10_description: "upgrade_hidden_description",
+		upgrade_11_name: "implements",
+		upgrade_11_description: "upgrade_implements_description",
+		upgrade_12_name: "quarters",
+		upgrade_12_description: "upgrade_quarters_description",
+		upgrade_13_name: "supplies",
+		upgrade_13_description: "upgrade_supplies_description",
+		upgrade_14_name: "secure",
+		upgrade_14_description: "upgrade_secure_description",
+		upgrade_15_name: "tools",
+		upgrade_15_description: "upgrade_tools_description",
+		upgrade_16_name: "vault",
+		upgrade_16_description: "upgrade_vault_description",
+		upgrade_17_name: "weapons",
+		upgrade_17_description: "upgrade_weapons_description",
+		upgrade_18_name: "workshop",
+		upgrade_18_description: "upgrade_workshop_description",
+		upgrade_20_name: "insight",
+		upgrade_20_description: "upgrade_insight_description",
+		upgrade_21_name: "prowess",
+		upgrade_21_description: "upgrade_prowess_description",
+		upgrade_22_name: "resolve",
+		upgrade_22_description: "upgrade_resolve_description",
+		upgrade_23_name: "personal",
+		upgrade_23_description: "upgrade_personal_description",
+		upgrade_24_name: "mastery",
+		upgrade_24_description: "upgrade_mastery_description",
+		xp_condition2: "xp_beliefs",
+		xp_condition3: "xp_vice"
+	},
+	defaultValues = {
+		attune: "0",
+		claim_bridge_10_15: "1",
+		claim_bridge_12_13: "1",
+		claim_bridge_13_14: "1",
+		claim_bridge_2_3: "1",
+		claim_bridge_2_7: "1",
+		claim_bridge_3_4: "1",
+		claim_bridge_4_9: "1",
+		claim_bridge_6_11: "1",
+		claim_bridge_6_7: "1",
+		claim_bridge_9_14: "1",
+		cohort1_subtype: "",
+		cohort1_type: "gang",
+		command: "0",
+		consort: "0",
+		finesse: "0",
+		hunt: "0",
+		prowl: "0",
+		setting_extra_stress: "0",
+		setting_load_h: "6",
+		setting_show_deity: "0",
+		setting_show_frame: "0",
+		setting_show_origin: "0",
+		setting_show_strictures: "0",
+		setting_traumata_set: "normal",
+		setting_vampirexp: "0",
+		setting_vice_type: "normal",
+		skirmish: "0",
+		study: "0",
+		survey: "0",
+		sway: "0",
+		tinker: "0",
+		trauma: "0",
+		upgrade_10_check_1: "0",
+		upgrade_14_check_1: "0",
+		upgrade_20_check_1: "0",
+		upgrade_21_check_1: "0",
+		upgrade_22_check_1: "0",
+		upgrade_6_check_1: "0",
+		wreck: "0"
+	},
+	alchemicalData = [
+		"alcahest",
+		"binding_oil",
+		"drift_oil",
+		"drown_powder",
+		"eyeblind_poison",
+		"fire_oil",
+		"grenade",
+		"quicksilver",
+		"skullfire_poison",
+		"smoke_bomb",
+		"spark_drug",
+		"standstill_poison",
+		"trance_powder",
+	];
+/* Transform data once translations are known */
+Object.keys(crewData).forEach(crew => {
+	const base = crewData[crew].base,
+		translatedBaseAttributes = [
+			...[...Array(16).keys()].slice(1).map(i => `claim_${i}_name`),
+			...[...Array(16).keys()].slice(1).map(i => `claim_${i}_desc`),
+			'cohort1_name',
+			'cohort1_subtype',
+			'crew_description',
+			'crew_xp_condition',
+			'hunting_grounds_type',
+			'hunting_grounds_description',
+			'upgrade_6_name',
+			'upgrade_8_name'
+		];
+	Object.keys(base).forEach(attr => {
+		if (translatedBaseAttributes.includes(attr)) {
+			base[attr] = getTranslationByKey(base[attr]);
+		}
+	});
+	crewData[crew].contact = [...Array(6).keys()].map(i => ({
+		name: getTranslationByKey(`crew_${crew}_contact_${i}`)
+	}));
+	crewData[crew].crewability = crewData[crew].crewability.map(name => ({
+		name: getTranslationByKey(`crew_ability_${name}`),
+		description: getTranslationByKey(`crew_ability_${name}_description`)
+	}));
+	crewData[crew].upgrade.forEach(upgrade => {
+		upgrade.name = getTranslationByKey(upgrade.name);
+		upgrade.boxes_chosen = '1';
+	});
+});
+itemData.forEach(item => {
+	item.boxes_chosen = '1';
+	item.name = getTranslationByKey(item.name);
+	item.description = getTranslationByKey(item.description);
+});
+Object.keys(translatedDefaults).forEach(k => {
+	translatedDefaults[k] = getTranslationByKey(translatedDefaults[k]);
+});
+Object.assign(defaultValues, translatedDefaults);
+Object.keys(factionsData).forEach(x => {
+	factionsData[x].forEach(faction => {
+		faction.name = getTranslationByKey(faction.name);
+	});
+});
+alchemicalData.forEach((v, k) => {
+	alchemicalData[k] = {
+		name: getTranslationByKey(v)
+	};
+});
+Object.keys(playbookData).forEach(playbook => {
+	const base = playbookData[playbook].base,
+		translatedBaseAttributes = [
+			'char_cohort_name',
+			'char_cohort_subtype',
+			'friends_title',
+			'gatherinfo1',
+			'gatherinfo2',
+			'gatherinfo3',
+			'gatherinfo4',
+			'gatherinfo5',
+			'gatherinfo6',
+			'playbook_description',
+			'setting_stress_label',
+			'setting_trauma_label',
+			'xp_condition',
+			'xp_condition2',
+			'xp_condition3'
+		];
+	Object.keys(base).forEach(attr => {
+		if (translatedBaseAttributes.includes(attr)) {
+			base[attr] = getTranslationByKey(base[attr]);
+		}
+	});
+	if (!['ghost', 'hull'].includes(playbook)) {
+		playbookData[playbook].friend = [...Array(5).keys()]
+			.map(i => ({
+				name: getTranslationByKey(`playbook_${playbook}_friend_${i}`)
+			}))
+			.filter(o => o.name);
+	}
+	else playbookData[playbook].friend = [];
+	playbookData[playbook].ability = playbookData[playbook].ability.map(name => ({
+		name: getTranslationByKey(`playbook_ability_${name}`),
+		description: getTranslationByKey(`playbook_ability_${name}_description`)
+	}));
+	playbookData[playbook].playbookitem.forEach(item => {
+		item.name = getTranslationByKey(item.name);
+		item.boxes_chosen = '1';
+	});
+});
+/* FUNCTIONS */
+const mySetAttrs = (attrs, options, callback) => {
+		const finalAttrs = Object.keys(attrs).reduce((m, k) => {
+			m[k] = String(attrs[k]);
+			return m;
+		}, {});
+		setAttrs(finalAttrs, options, callback);
+	},
+	setAttr = (name, value) => {
+		getAttrs([name], v => {
+			const setting = {};
+			if (v[name] !== String(value)) setting[name] = String(value);
+			setAttrs(setting);
+		});
+	},
+	fillRepeatingSectionFromData = (sectionName, dataList, autogen, callback) => {
+		callback = callback || (() => {});
+		getSectionIDs(`repeating_${sectionName}`, idList => {
+			const existingRowAttributes = [
+				...idList.map(id => `repeating_${sectionName}_${id}_name`),
+				...idList.map(id => `repeating_${sectionName}_${id}_autogen`)
+			];
+			getAttrs(existingRowAttributes, v => {
+				/* Delete auto-generated rows */
+				if (autogen) {
+					idList = idList.filter(id => {
+						if (v[`repeating_${sectionName}_${id}_autogen`]) {
+							removeRepeatingRow(`repeating_${sectionName}_${id}`);
+							return false;
+						}
+						else return true;
+					});
+				}
+				const existingRowNames = idList.map(id => v[`repeating_${sectionName}_${id}_name`]),
+					createdIDs = [],
+					setting = dataList.filter(o => !existingRowNames.includes(o.name))
+					.map(o => {
 						let rowID;
 						while (!rowID) {
 							let newID = generateRowID();
 							if (!createdIDs.includes(newID)) {
-							 rowID = newID;
-							 createdIDs.push(rowID);
+								rowID = newID;
+								createdIDs.push(rowID);
 							}
 						}
-						return Object.keys(o).reduce(function (m, key) {
+						const newAttrs = {};
+						if (autogen) {
+							newAttrs[`repeating_${sectionName}_${rowID}_autogen`] = '1';
+						}
+						return Object.keys(o).reduce((m, key) => {
 							m[`repeating_${sectionName}_${rowID}_${key}`] = o[key];
 							return m;
-						}, {});
+						}, newAttrs);
 					})
 					.reduce((m, o) => Object.assign(m, o), {});
-				setAttrs(setting);
+				mySetAttrs(setting, {}, callback);
 			});
 		});
 	},
-	emptyFirstRowIfUnnamed = function (sectionName) {
-		'use strict';
-		getSectionIDs(`repeating_${sectionName}`, function (idList) {
-			let id = idList[0];
-			getAttrs([`repeating_${sectionName}_${id}_name`], function (v) {
+	emptyFirstRowIfUnnamed = sectionName => {
+		getSectionIDs(`repeating_${sectionName}`, idList => {
+			const id = idList[0];
+			getAttrs([`repeating_${sectionName}_${id}_name`], v => {
 				if (!v[`repeating_${sectionName}_${id}_name`]) {
 					removeRepeatingRow(`repeating_${sectionName}_${id}`);
-				};
+				}
 			});
 		});
+	},
+	handleBoxesFill = (name, upToFour) => {
+		on(`change:${name}1 change:${name}2 change:${name}3 change:${name}4`, event => {
+			if (event.sourceType !== 'player') return;
+			getAttrs([event.sourceAttribute], v => {
+				const rName = event.sourceAttribute.slice(0, -1),
+					setting = {};
+				if (String(v[event.sourceAttribute]) === '1') {
+					switch (event.sourceAttribute.slice(-1)) {
+					case '4':
+						setting[`${rName}3`] = 1;
+					case '3':
+						setting[`${rName}2`] = 1;
+					case '2':
+						setting[`${rName}1`] = 1;
+					}
+				}
+				if (String(v[event.sourceAttribute]) === '0') {
+					switch (event.sourceAttribute.slice(-1)) {
+					case '1':
+						setting[`${rName}2`] = 0;
+					case '2':
+						setting[`${rName}3`] = 0;
+					case '3':
+						if (upToFour) setting[`${rName}4`] = 0;
+					}
+				}
+				mySetAttrs(setting);
+			});
+		});
+	},
+	calculateResistance = name => {
+		getAttrs(actionData[name], v => {
+			const total = Object.keys(v).map(x => v[x])
+				.reduce((s, c) => s + (String(c) === '0' ? 0 : 1), 0);
+			setAttr(name, total);
+		});
+	},
+	calculateVice = () => {
+		getAttrs(Object.keys(actionData), v => {
+			setAttr('vice', Math.min(...Object.keys(v).map(x => parseInt(v[x]) || 0)));
+		});
+	},
+	calculateStashDice = stash => setAttr('stash_dice', Math.floor(parseInt(stash) / 10)),
+	calculateCohortDice = prefix => {
+		getAttrs(['crew_tier', `${prefix}_impaired`, `${prefix}_type`], v => {
+			const dice = (parseInt(v.crew_tier) || 0) - (parseInt(v[`${prefix}_impaired`]) || 0) +
+				((v[`${prefix}_type`] === 'elite' || v[`${prefix}_type`] === 'expert') ? 1 : 0);
+			setAttr(`${prefix}_dice`, dice);
+		});
 	};
-/* DEFAULT FILLS FOR PLAYBOOKS AND CREWS */
-/* Set some default fields when setting crew type or playbook */
-var crewAttributes = [...new Set([].concat(...Object.keys(crewData).map(x => Object.keys(crewData[x].base))))],
+/* CONSTANTS */
+const crewAttributes = [...new Set([].concat(...Object.keys(crewData).map(x => Object.keys(crewData[x].base))))],
 	playbookAttributes = [...new Set([].concat(...Object.keys(playbookData).map(x => Object.keys(playbookData[x].base))))],
-	watchedAttributes = new Set([].concat(crewAttributes, playbookAttributes));
-on('change:crew_type change:playbook', function (event) {
-	'use strict';
-	getAttrs(['crew_type', 'playbook', 'changed_attributes'], function (attrValues) {
-		let changedAttributes = (attrValues.changed_attributes || '').split(','),
-			data, baseData, sourceName;
-		switch (event.sourceAttribute) {
-		case 'crew_type':
-			sourceName = attrValues.crew_type.toLowerCase();
-			if (crewData.hasOwnProperty(sourceName)) {
-				data = crewData[sourceName].base;
-				baseData = crewAttributes;
+	watchedAttributes = new Set(crewAttributes.concat(playbookAttributes)),
+	actionsFlat = [].concat(...Object.keys(actionData).map(x => actionData[x])),
+	traumaDataFlat = Object.keys(traumaData).reduce((m, k) => m.concat(traumaData[k]), []),
+	autoExpandFields = [
+		'repeating_ability:name',
+		'repeating_ability:description',
+		'repeating_crewability:name',
+		'repeating_crewability:description',
+		'repeating_playbookitem:name',
+		'repeating_upgrade:name',
+		'repeating_friend:name',
+		'repeating_contact:name',
+		'repeating_clock:name',
+		'repeating_crewclock:name',
+		'repeating_factionclock:name',
+		'repeating_cohort:edges',
+		'repeating_cohort:flaws',
+		'repeating_alchemical:name',
+		'xp_condition',
+		'xp_condition_extra',
+		'xp_condition2',
+		'xp_condition3',
+		'crew_xp_condition',
+		'hunting_grounds_description',
+		'cohort1_edges',
+		'cohort1_flaws',
+	],
+	autogenSections = [
+		'ability',
+		'crewability',
+		'friend',
+		'contact',
+		'playbookitem',
+		'upgrade'
+	],
+	spiritPlaybooks = ['ghost', 'hull', 'vampire'];
+/* EVENT HANDLERS */
+/* Set default fields when setting crew type or playbook */
+on('change:crew_type change:playbook', event => {
+	getAttrs(['playbook', 'crew_type', 'changed_attributes', 'setting_autofill', ...watchedAttributes], v => {
+		const changedAttributes = (v.changed_attributes || '').split(','),
+			sourceName = (event.sourceAttribute === 'crew_type' ? v.crew_type : v.playbook).toLowerCase(),
+			fillBaseData = (data, defaultAttrNames) => {
+				if (data) {
+					const finalSettings = defaultAttrNames.filter(name => !changedAttributes.includes(name))
+						// do not reset attributes which have been changed by the user
+						.filter(name => !spiritPlaybooks.includes(sourceName) || !actionsFlat.includes(name))
+						// do not reset action dots if changing to a spirit playbook
+						.filter(name => v[name] !== (defaultValues[name] || ''))
+						// do not set attributes if current value is equal to sheet defaults
+						.reduce((m, name) => {
+							m[name] = defaultValues[name] || '';
+							return m;
+						}, {});
+					Object.keys(data).filter(name => !changedAttributes.includes(name))
+						.forEach(name => (finalSettings[name] = data[name]));
+					mySetAttrs(finalSettings);
+				}
 			};
-			break;
-		case 'playbook':
-			sourceName = attrValues.playbook.toLowerCase();
-			if (playbookData.hasOwnProperty(sourceName)) {
-				data = playbookData[sourceName].base;
-				baseData = playbookAttributes;
-			};
-		};
-		/* Change unset attributes to default */
-		if (data) {
-			let finalSettings = {};
-			if (!spiritPlaybooks.includes(sourceName)) {
-				baseData.filter(name => !changedAttributes.includes(name))
-					.forEach(name => (finalSettings[name] = ''));
-			};
-			Object.keys(data).filter(name => !changedAttributes.includes(name))
-				.forEach(name => (finalSettings[name] = data[name]));
-			setAttrs(finalSettings);
-		};
+		if (sourceName) {
+			setAttr('show_playbook_reminder', '0');
+		}
+		if (v.setting_autofill !== '1') return;
+		if (event.sourceAttribute === 'crew_type' && sourceName in crewData) {
+			fillRepeatingSectionFromData('contact', crewData[sourceName].contact, true);
+			fillRepeatingSectionFromData('crewability', crewData[sourceName].crewability, true);
+			fillRepeatingSectionFromData('upgrade', crewData[sourceName].upgrade, true);
+			fillBaseData(crewData[sourceName].base, crewAttributes);
+		}
+		if (event.sourceAttribute === 'playbook' && sourceName in playbookData) {
+			fillRepeatingSectionFromData('friend', playbookData[sourceName].friend, true);
+			fillRepeatingSectionFromData('ability', playbookData[sourceName].ability, true);
+			fillRepeatingSectionFromData('playbookitem', playbookData[sourceName].playbookitem, true);
+			fillBaseData(playbookData[sourceName].base, playbookAttributes);
+			if (sourceName === 'leech') fillRepeatingSectionFromData('alchemical', alchemicalData);
+		}
 	});
 });
-/* Watch for changes in auto-set attributes */
-watchedAttributes.forEach(function (name) {
-	'use strict';
-	on(`change:${name}`, function (eventInfo) {
-		if (eventInfo.sourceType === 'player') {
-			getAttrs(['changed_attributes'], function (v) {
-				let changedAttributes = [...new Set(v.changed_attributes.split(',').concat(name))].filter(x => !!x).join(',');
-				setAttrs({
-					changed_attributes: changedAttributes
-				});
+/* Watch repeating rows for changes and set autogen to false if change happens*/
+autogenSections.forEach(sectionName => {
+	on(`change:repeating_${sectionName}`, event => {
+		getAttrs([`repeating_${sectionName}_autogen`], v => {
+			if (v[`repeating_${sectionName}_autogen`] && event.sourceType === 'player') {
+				setAttr(`repeating_${sectionName}_autogen`, '');
+			}
+		});
+	});
+});
+/* Watch for changes in auto-set attributes and update changed_attributes*/
+watchedAttributes.forEach(name => {
+	on(`change:${name}`, event => {
+		if (event.sourceType === 'player') {
+			getAttrs(['changed_attributes'], v => {
+				const changedAttributes = [...new Set(v.changed_attributes.split(',')).add(name)]
+					.filter(x => !!x).join(',');
+				setAttr('changed_attributes', changedAttributes);
 			});
 		}
 	});
 });
-/* DERIVED DICE NUMBERS */
-var actions1 = Object.keys(actionData).reduce(function (m, k) {
-		m[k] = actionData[k].map(s => `${s}1`);
-		return m;
-	}, {}),
-	actionsFlat = [].concat(...Object.keys(actionData).map(x => actionData[x])),
-	actions1Flat = actionsFlat.map(str => str + '1'),
-	calculateResistance = function (name) {
-		'use strict';
-		getAttrs(actions1[name], function (attrs) {
-			let numDice = Object.keys(attrs).map(x => attrs[x]).reduce((s, v) => s + parseInt(v || 0), 0);
-			setDiceFromTotal(name, numDice);
-		});
-	},
-	calculateVice = function () {
-		'use strict';
-		getAttrs(actions1Flat, function (values) {
-			let numDice = Math.min(...Object.keys(actions1).map(function (name) {
-				return actions1[name].reduce((s, str) => s + parseInt(values[str] || 0), 0);
-			}));
-			setDiceFromTotal('vice', numDice);
-		});
-	};
 /* Register attribute/action event handlers */
-Object.keys(actionData).forEach(function (attributeName) {
-	'use strict';
-	actionData[attributeName].forEach(function (actionName) {
-		on(`change:${actionName}1`, () => calculateResistance(attributeName));
+Object.keys(actionData).forEach(attrName => {
+	on(actionData[attrName].map(x => `change:${x}`).join(' '), () => calculateResistance(attrName));
+	on(`change:setting_dark_talent_${attrName}`, () => {
+		getAttrs([`setting_dark_talent_${attrName}`, `setting_resbonus_${attrName}`], v => {
+			const resistanceBonus = (parseInt(v[`setting_resbonus_${attrName}`]) || 0) +
+				((String(v[`setting_dark_talent_${attrName}`]) === '1') ? 1 : -1);
+			setAttr(`setting_resbonus_${attrName}`, resistanceBonus);
+		});
 	});
-	on(`change:${attributeName}1 change:${attributeName}2 change:${attributeName}3 change:${attributeName}4`, calculateVice);
+	on(`change:${attrName}`, calculateVice);
 });
-/* GENERATE FACTIONS */
-on('change:generate_factions', function (event) {
-	'use strict';
-	Object.keys(factionsData).forEach(function (sectionName) {
+/* Calculate stash */
+on('change:stash', event => calculateStashDice(event.newValue));
+/* Calculate trauma */
+on('change:setting_traumata_set ' + traumaDataFlat.map(x => `change:trauma_${x}`).join(' '), event => {
+	getAttrs(['setting_traumata_set', ...traumaDataFlat.map(x => `trauma_${x}`)], v => {
+		const traumaType = (v.setting_traumata_set === '0' ? 'normal' : v.setting_traumata_set);
+		if (traumaData[traumaType] && event.sourceType === 'player') {
+			const newTrauma = traumaData[traumaType].reduce((m, name) => m + (parseInt(v[`trauma_${name}`]) || 0), 0)
+			setAttr('trauma', newTrauma);
+		}
+	});
+});
+/* Generate buttons */
+on('change:generate_factions', () => {
+	setAttr('show_faction_generatebutton', '0');
+	Object.keys(factionsData).forEach(sectionName => {
 		fillRepeatingSectionFromData(sectionName, factionsData[sectionName]);
 	});
 });
-/* GENERATE ABILITIES */
-on('change:generate_abilities', function () {
-	'use strict';
-	getAttrs(['generate_source'], function (v) {
-		let sectionName, dataList;
-		if (crewData.hasOwnProperty(v.generate_source)) {
-			sectionName = 'crewability';
-			dataList = crewData[v.generate_source].abilities;
-		} else if (playbookData.hasOwnProperty(v.generate_source)) {
-			sectionName = 'ability';
-			dataList = playbookData[v.generate_source].abilities;
-		};
-		emptyFirstRowIfUnnamed(sectionName);
-		fillRepeatingSectionFromData(sectionName, dataList);
+autogenSections.forEach(sectionName => {
+	on(`change:generate_${sectionName}`, () => {
+		getAttrs(['generate_source_character', 'generate_source_crew', 'sheet_type'], v => {
+			const data = (v.sheet_type === 'character') ? playbookData : crewData,
+				genSource = v[`generate_source_${v.sheet_type}`];
+			if (genSource in data) {
+				emptyFirstRowIfUnnamed(sectionName);
+				fillRepeatingSectionFromData(sectionName, data[genSource][sectionName]);
+			}
+		});
 	});
 });
-/* GENERATE FRIENDS */
-on('change:generate_friends', function () {
-	'use strict';
-	getAttrs(['generate_source'], function (v) {
-		let sectionName, dataList;
-		if (crewData.hasOwnProperty(v.generate_source)) {
-			sectionName = 'contact';
-			dataList = crewData[v.generate_source].contacts.map(n => ({
-				name: n
-			}));
-		} else if (playbookData.hasOwnProperty(v.generate_source)) {
-			sectionName = 'friend';
-			dataList = playbookData[v.generate_source].friends.map(n => ({
-				name: n
-			}));
-		};
-		emptyFirstRowIfUnnamed(sectionName);
-		fillRepeatingSectionFromData(sectionName, dataList);
+/* Extra stress and trauma */
+on('change:setting_extra_stress', event => setAttr('stress_max', 9 + (parseInt(event.newValue) || 0)));
+on('change:setting_extra_trauma', event => setAttr('trauma_max', 4 + (parseInt(event.newValue) || 0)));
+/* Calculate cohort quality */
+on(['crew_tier', 'cohort1_impaired', 'cohort1_type'].map(x => `change:${x}`).join(' '), () => calculateCohortDice('cohort1'));
+on('change:repeating_cohort', () => calculateCohortDice('repeating_cohort'));
+on('change:crew_tier', () => {
+	getSectionIDs('repeating_cohort', a => a.forEach(id => calculateCohortDice(`repeating_cohort_${id}`)));
+});
+on('change:char_cohort_quality change:char_cohort_impaired', () => {
+	getAttrs(['char_cohort_quality', 'char_cohort_impaired'], v => {
+		const dice = (parseInt(v.char_cohort_quality) || 0) - (parseInt(v.char_cohort_impaired) || 0);
+		setAttr('char_cohort_dice', dice);
 	});
 });
-/* CALCULATE WANTED */
-on('change:wanted', function () {
-	'use strict';
-	getAttrs(['wanted'], function (v) {
-		setDiceFromTotal('wanted', parseInt(v.wanted));
+/* Set correct verb for cohort roll button */
+['char_cohort', 'cohort1', 'repeating_cohort'].forEach(prefix => {
+	const eventString = 'change:' + ((prefix === 'repeating_cohort') ? `${prefix}:type` : `${prefix}_type`);
+	on(eventString, event => {
+		const verb = (event.newValue === 'expert') ? '^{rolls_their}' : '^{roll_their-l}';
+		setAttr(`${prefix}_verb`, verb);
 	});
 });
-/* EXTRA STRESS BOXES */
-on('change:setting_extra_stress', function () {
-	'use strict';
-	getAttrs(['setting_extra_stress'], function (v) {
-		setDiceFromTotal('setting_extra_stress', parseInt(v.setting_extra_stress), true, 'on');
+/* Left-fill checkboxes */
+handleBoxesFill('upgrade_24_check_', true);
+handleBoxesFill('bandolier1_check_');
+handleBoxesFill('bandolier2_check_');
+['item', 'playbookitem', 'upgrade'].forEach(sName => handleBoxesFill(`repeating_${sName}:check_`));
+/* Pseudo-radios */
+['crew_tier', ...actionsFlat].forEach(name => {
+	on(`change:${name}`, event => {
+		if (String(event.newValue) === '0' && event.sourceType === 'player') {
+			setAttr(name, (parseInt(event.previousValue) || 1) - 1);
+		}
 	});
 });
-/* CALCULATE COHORT QUALITY */
-var calculateCohortDots = function (t1, t2, t3, t4, imp, type, prefix) {
-		'use strict';
-		let numDots = parseInt(t1) + parseInt(t2) + parseInt(t3) + parseInt(t4);
-		if (imp === 'on') {
-			numDots = numDots - 1;
-		};
-		if (type === 'elite' || type === 'expert') {
-			numDots = numDots + 1;
-		};
-		setDiceFromTotal(`${prefix}die`, numDots, true);
-	},
-	qualityAttrs = ['crew_tier1', 'crew_tier2', 'crew_tier3', 'crew_tier4', 'cohort1_impaired', 'cohort1_type'],
-	qualityEvent = qualityAttrs.map(str => `change:${str}`).join(' '),
-	calculateCohort1Dice = function () {
-		'use strict';
-		getAttrs(qualityAttrs, function (attrs) {
-			calculateCohortDots(attrs.crew_tier1, attrs.crew_tier2, attrs.crew_tier3, attrs.crew_tier4, attrs.cohort1_impaired, attrs.cohort1_type, 'cohort1_');
+/* Item reset button */
+on('change:reset_items', () => {
+	const clearChecks = sectionName => {
+		getSectionIDs(`repeating_${sectionName}`, idArray => {
+			const setting = [
+				...idArray.map(id => `repeating_${sectionName}_${id}_check_1`),
+				...idArray.map(id => `repeating_${sectionName}_${id}_check_2`),
+				...idArray.map(id => `repeating_${sectionName}_${id}_check_3`)
+			].reduce((m, name) => {
+				m[name] = 0;
+				return m;
+			}, {});
+			mySetAttrs(setting);
 		});
 	};
-on(qualityEvent, calculateCohort1Dice);
-var repeatingQualityAttrs = ['crew_tier1', 'crew_tier2', 'crew_tier3', 'crew_tier4', 'repeating_cohort:impaired', 'repeating_cohort:type'],
-	repeatingQualityEvent = repeatingQualityAttrs.map(str => `change:${str}`).join(' '),
-	calculateRepeatingCohortDice = function () {
-		'use strict';
-		getSectionIDs('repeating_cohort', function (list) {
-			list.forEach(function (id) {
-				let attrList = repeatingQualityAttrs.map(str => str.replace(':', `_${id}_`));
-				getAttrs(attrList, function (attrs) {
-					calculateCohortDots(attrs.crew_tier1, attrs.crew_tier2, attrs.crew_tier3, attrs.crew_tier4, attrs[attrList[4]], attrs[attrList[5]], `repeating_cohort_${id}_`);
-				});
-			});
-		});
-	};
-on(repeatingQualityEvent + ' change:repeating_cohort:name change:repeating_cohort:subtype change:repeating_cohort:edges change:repeating_cohort:flaws change:repeating_cohort:description', calculateRepeatingCohortDice);
-/* LEFT-FILL CHECKBOXES */
-var handleFourBoxesFill = function (name) {
-	'use strict';
-	on(`change:${name}1 change:${name}2 change:${name}3 change:${name}4`, function (event) {
-		getAttrs([event.sourceAttribute], function (v) {
-			let rName = event.sourceAttribute.slice(0, -1);
-			if (v[event.sourceAttribute] === '1') {
-				let setting = {};
-				switch (event.sourceAttribute.slice(-1)) {
-				case '4':
-					setting[`${rName}3`] = '1';
-				case '3':
-					setting[`${rName}2`] = '1';
-				case '2':
-					setting[`${rName}1`] = '1';
-				};
-				setAttrs(setting);
-			};
-			if (v[event.sourceAttribute] === '0') {
-				let setting = {};
-				switch (event.sourceAttribute.slice(-1)) {
-				case '1':
-					setting[`${rName}2`] = '0';
-				case '2':
-					setting[`${rName}3`] = '0';
-				case '3':
-					setting[`${rName}4`] = '0';
-				};
-				setAttrs(setting);
-			};
-		});
+	setAttr('load', 0);
+	['item', 'playbookitem'].forEach(clearChecks);
+});
+/* Default values for number of upgrades boxes */
+on('change:repeating_upgrade:boxes_chosen', () => {
+	getAttrs(['repeating_upgrade_numboxes'], v => {
+		if (!['1', '2', '3'].includes(v.repeating_upgrade_numboxes)) {
+			setAttr('repeating_upgrade_numboxes', '1');
+		}
 	});
-};
-/* Action ratings */
-actionsFlat.forEach(handleFourBoxesFill);
-/* Crew Tier */
-handleFourBoxesFill('crew_tier');
-/* Items/Upgrades */
-var itemChecks = [
-	'item_1_check',
-	'item_14_check',
-	'item_16_check',
-	'item_18_check',
-	'item_22_check',
-	'upgrade_1_check',
-	'upgrade_24_check',
-	'bandolier1_check',
-	'bandolier2_check'
-];
-itemChecks.forEach(function (name) {
-	'use strict';
-	on(`change:${name} change:${name}_b change:${name}_c change:${name}_d change:${name}_e`, function (event) {
-		getAttrs([event.sourceAttribute], function (v) {
-			if (v[event.sourceAttribute] === 'on') {
-				let setting = {};
-				switch (event.sourceAttribute.slice('-1')) {
-				case 'e':
-					setting[`${name}_d`] = 'on';
-				case 'd':
-					setting[`${name}_c`] = 'on';
-				case 'c':
-					setting[`${name}_b`] = 'on';
-				case 'b':
-					setting[`${name}`] = 'on';
-				};
-				setAttrs(setting);
-			};
-			if (v[event.sourceAttribute] === '0') {
-				let setting = {};
-				switch (event.sourceAttribute.slice('-1')) {
-				case 'k':
-					setting[`${name}_b`] = 0;
-				case 'b':
-					setting[`${name}_c`] = 0;
-				case 'c':
-					setting[`${name}_d`] = 0;
-				case 'd':
-					setting[`${name}_e`] = 0;
-				};
-				setAttrs(setting);
-			};
+});
+/* Bonus dice via dropdown or text input */
+on('change:setting_text_bonus_query sheet:opened', () => {
+	getAttrs(['setting_text_bonus_query', 'bonusdice', 'numberofdice'], v => {
+		const setting = {};
+		if (String(v.setting_text_bonus_query) === '1') {
+			setting.bonusdice = `(?{${getTranslationByKey('bonusdice')}|0})`;
+			setting.numberofdice = `(?{${getTranslationByKey('numberofdice')}|0})`;
+		}
+		else {
+			setting.bonusdice = `?{${getTranslationByKey('bonusdice')}|0|1|2|3|4|5|6|-1|-2|-3}`;
+			setting.numberofdice = `?{${getTranslationByKey('numberofdice')}|0|1|2|3|4|5|6}`;
+			if (setting.bonusdice === v.bonusdice) delete setting.bonusdice;
+			if (setting.numberofdice === v.numberofdice) delete setting.numberofdice;
+		}
+		mySetAttrs(setting);
+	});
+});
+/* Resistance query */
+on('change:setting_consequence_query sheet:opened', () => {
+	getAttrs(['setting_consequence_query'], v => {
+		const consequenceQuery = (String(v.setting_consequence_query) === '1') ?
+			`?{${getTranslationByKey('consequence')}|${getTranslationByKey('a_consequence')}}` :
+			getTranslationByKey('a_consequence');
+		setAttr('consequence_query', consequenceQuery);
+	});
+});
+/* Trim whitespace in auto-expand fields */
+autoExpandFields.forEach(name => {
+	on(`change:${name}`, event => {
+		const attrName = name.replace(':', '_');
+		getAttrs([attrName], v => {
+			if (v[attrName].trim() !== v[attrName] && event.sourceType === 'player') {
+				setAttr(attrName, v[attrName].trim());
+			}
 		});
 	});
 });
 /* INITIALISATION AND UPGRADES */
-on('sheet:opened', function () {
-	'use strict';
-	let initialRows = [
-		'ability',
-		'friend',
-		'crewability',
-		'contact'
-	];
-	/* Make sure sheet_type is never 0 */
-	getAttrs(['sheet_type', 'changed_attributes'], function (v) {
-		if (!['character', 'crew', 'faction'].includes(v.sheet_type)) {
-			setAttrs({
-				sheet_type: 'character'
-			});
-		}
+on('sheet:opened', () => {
+	getAttrs(['sheet_type', 'changed_attributes', 'crew_type', 'playbook'], v => {
+		/* Make sure sheet_type is never 0 */
+		if (!['crew', 'faction'].includes(v.sheet_type)) setAttr('sheet_type', 'character');
+		/* Remove reminder box if we have playbook or crew name */
+		if (v.playbook || v.crew_type) setAttr('show_playbook_reminder', '0');
 	});
-	/* Initial setup */
-	getAttrs(['version'], function (v) {
-		// Setup initial rows in repeating sections
-		if (!v.version) {
-			let setting = initialRows.reduce(function (memo, sectionName) {
-				memo[`repeating_${sectionName}_${generateRowID()}_dummy`] = 1;
-				return memo;
-			}, {});
-			setAttrs(setting);
-		};
-		// Upgrade to 0.7: Convert legacy faction repeating section to text
-		if (v.version && v.version.split('.')[0] === '0' && parseInt(v.version.split('.')[1]) < 7) {
-			getSectionIDs('repeating_faction', function (list) {
-				let sectionList = ['faction1', 'faction2'].concat(list.map(str => `repeating_faction_${str}`)),
-					attrList = [].concat(...sectionList.map(str => [`${str}_name`, `${str}_status`, `${str}_description`]));
-				getAttrs(attrList, function (attrs) {
-					let output = sectionList.map(function (str) {
-						return 'Name: ' + attrs[`${str}_name`] + '\n' +
-							'Status: ' + (attrs[`${str}_status`] || '') + '\n' +
-							'Notes: ' + (attrs[`${str}_description`] || '') + '\n';
-					}).join('\n');
-					setAttrs({
-						faction_notes: output
+	/* Set up translated queries */
+	const queries = {
+		effect_query: getTranslationByKey('effect_query'),
+		notes_query: `?{${getTranslationByKey('notes')}}`,
+		position_query: `?{${getTranslationByKey('position')}|` +
+			`${getTranslationByKey('risky')},position=${getTranslationByKey('risky')}|` +
+			`${getTranslationByKey('controlled')},position=${getTranslationByKey('controlled')}|` +
+			`${getTranslationByKey('desperate')},position=${getTranslationByKey('desperate')}|` +
+			`${getTranslationByKey('fortune_roll')},position=}`
+	};
+	getAttrs(Object.keys(queries), v => {
+		const setting = {};
+		Object.keys(queries).forEach(name => {
+			if (v[name] !== queries[name]) setting[name] = queries[name];
+		});
+		mySetAttrs(setting);
+	});
+	/* Setup and upgrades */
+	getAttrs(['version'], v => {
+		const upgradeSheet = version => {
+				const versionMajor = version && parseInt(version.split('.')[0]),
+					versionMinor = version && parseInt(version.split('.')[1]);
+				console.log(`Found version ${version}.`);
+				if (version !== sheetVersion) console.log('Performing sheet upgrade.');
+				// Upgrade to 0.7: Convert legacy faction repeating section to text
+				if (versionMajor === 0 && versionMinor < 7) {
+					getSectionIDs('repeating_faction', list => {
+						const sectionList = ['faction1', 'faction2'].concat(list.map(str => `repeating_faction_${str}`)),
+							attrList = [].concat(...sectionList.map(str => [`${str}_name`, `${str}_status`, `${str}_description`]));
+						getAttrs(attrList, v => {
+							const output = sectionList.map(str => {
+								return 'Name: ' + v[`${str}_name`] + '\n' +
+									'Status: ' + (v[`${str}_status`] || '') + '\n' +
+									'Notes: ' + (v[`${str}_description`] || '') + '\n';
+							}).join('\n');
+							setAttr('faction_notes', output);
+							list.forEach(id => removeRepeatingRow(`repeating_faction_${id}`));
+							upgradeSheet('0.7');
+						});
 					});
-					setAttrs({
-						faction1_name: '',
-						faction1_status: '',
-						faction1_description: '',
-						faction1_expand: '',
-						faction2_name: '',
-						faction2_status: '',
-						faction2_description: '',
-						faction2_expand: ''
+				}
+				// Upgrade to 0.9: Convert ability/friend/crewability/contact first row
+				else if (versionMajor === 0 && versionMinor < 9) {
+					const upgradeFunction = _.after(4, () => upgradeSheet('1.0')),
+						attrs = ['ability1_check', 'ability1_name', 'ability1_description',
+							'friend1_status', 'friend1_name',
+							'crew_ability1_check', 'crew_ability1_name', 'crew_ability1_description',
+							'contact1_check', 'contact1_name'
+						];
+					getAttrs(attrs, v => {
+						fillRepeatingSectionFromData('ability', [{
+							check: v.ability1_check || '0',
+							description: v.ability1_description || '',
+							name: v.ability1_name || ''
+						}], false, upgradeFunction);
+						fillRepeatingSectionFromData('friend', [{
+							name: v.friend1_name || '',
+							status: v.friend1_status || ''
+						}], false, upgradeFunction);
+						fillRepeatingSectionFromData('crewability', [{
+							check: v.crew_ability1_check || '0',
+							description: v.crew_ability1_description || '',
+							name: v.crew_ability1_name || ''
+						}], false, upgradeFunction);
+						fillRepeatingSectionFromData('contact', [{
+							check: v.contact1_check || '0',
+							name: v.contact1_name || ''
+						}], false, upgradeFunction);
 					});
-					list.forEach(id => removeRepeatingRow(`repeating_faction_${id}`));
+				}
+				// Upgrade to 1.4: Convert playbook items and repeating items
+				else if (versionMajor === 1 && versionMinor < 4) {
+					const upgradeFunction = _.after(2, () => upgradeSheet('1.4')),
+						indices = [...Array(10).keys()], // [0:9]
+						allAttrs = [
+							...indices.map(n => `item_${n}_check`),
+							...indices.map(n => `item_${n}_desc`),
+							'item_0_check_b',
+							'item_0_check_c',
+							'item_1_check_b'
+						];
+					getAttrs(allAttrs, v => {
+						const items = [];
+						if (v.item_0_desc) {
+							items.push({
+								check_1: v.item_0_check || '0',
+								name: v.item_0_desc,
+								numboxes: '1'
+							});
+							items.push({
+								check_1: v.item_0_check_b || '0',
+								name: v.item_0_desc,
+								numboxes: '1'
+							});
+							items.push({
+								check_1: v.item_0_check_c || '0',
+								name: v.item_0_desc,
+								numboxes: '1'
+							});
+						}
+						if (v.item_1_desc) {
+							items.push({
+								bold: 'on',
+								check_1: v.item_1_check || '0',
+								check_2: v.item_1_check_b || '0',
+								name: v.item_1_desc,
+								numboxes: '2'
+							});
+						}
+						['2', '3', '5', '6'].forEach(index => {
+							if (v[`item_${index}_desc`]) {
+								items.push({
+									bold: (['2', '3'].includes(index) ? 'on' : '0'),
+									check_1: v[`item_${index}_check`] || '0',
+									name: v[`item_${index}_desc`],
+									numboxes: '1'
+								});
+							}
+						});
+						['4', '7', '8', '9'].forEach(index => {
+							if (v[`item_${index}_desc`]) {
+								items.push({
+									bold: ((index === '4') ? 'on' : '0'),
+									check_1: v[`item_${index}_check`] || '0',
+									name: v[`item_${index}_desc`],
+									numboxes: '0'
+								});
+							}
+						});
+						items.forEach(obj => {
+							obj.boxes_chosen = 'on';
+						});
+						fillRepeatingSectionFromData('playbookitem', items, false, upgradeFunction);
+					});
+					getSectionIDs('repeating_item', idArray => {
+						const allAttrs = [
+							...idArray.map(id => `repeating_item_${id}_desc`),
+							...idArray.map(id => `repeating_item_${id}_check`),
+							...idArray.map(id => `repeating_item_${id}_check_b`)
+						];
+						getAttrs(allAttrs, v => {
+							const setting = {};
+							idArray.forEach(id => {
+								setting[`repeating_item_${id}_boxes_chosen`] = 'on';
+								setting[`repeating_item_${id}_numboxes`] = '2';
+								setting[`repeating_item_${id}_name`] = v[`repeating_item_${id}_desc`] || '';
+								setting[`repeating_item_${id}_check_1`] = v[`repeating_item_${id}_check`] || '0';
+								setting[`repeating_item_${id}_check_2`] = v[`repeating_item_${id}_check_b`] || '0';
+							});
+							mySetAttrs(setting, {}, upgradeFunction);
+						});
+					});
+				}
+				// Upgrade to 1.5: Convert items
+				else if (versionMajor === 1 && versionMinor < 5) {
+					const indices = [...Array(25).keys()].slice(10),
+						allAttrs = [
+							...indices.map(n => `item_${n}_check`),
+							...indices.map(n => `item_${n}_desc`),
+							'item_14_check_b',
+							'item_16_check_b',
+							'item_16_check_c',
+							'item_16_check_d',
+							'item_16_check_e',
+							'item_18_check_b',
+							'item_22_check_b'
+						];
+					getAttrs(allAttrs, v => {
+						const items = [{
+								check_1: (v.item_10_check || '0'),
+								name: (v.item_10_desc || 'A Blade or Two'),
+								numboxes: '1'
+							},
+							{
+								check_1: (v.item_11_check || '0'),
+								name: (v.item_11_desc || 'Throwing Knives'),
+								numboxes: '1'
+							},
+							{
+								check_1: (v.item_12_check || '0'),
+								name: (v.item_12_desc || 'A Pistol'),
+								numboxes: '1',
+								short: 'on'
+							},
+							{
+								check_1: (v.item_13_check || '0'),
+								name: (v.item_13_desc || 'A 2nd Pistol'),
+								numboxes: '1',
+								short: 'on'
+							},
+							{
+								check_1: (v.item_14_check || '0'),
+								check_2: (v.item_14_check_b || '0'),
+								name: (v.item_14_desc || 'A Large Weapon'),
+								numboxes: '2'
+							},
+							{
+								check_1: (v.item_15_check || '0'),
+								name: (v.item_15_desc || 'An Unusual Weapon'),
+								numboxes: '1'
+							},
+							{
+								check_1: (v.item_16_check || '0'),
+								check_2: (v.item_16_check_b || '0'),
+								name: (v.item_16_desc || 'Armor'),
+								numboxes: '2',
+								short: 'on'
+							},
+							{
+								check_1: (v.item_16_check_c || '0'),
+								check_2: (v.item_16_check_d || '0'),
+								check_3: (v.item_16_check_e || '0'),
+								name: (v.item_16_desc_b || '+Heavy'),
+								numboxes: '3',
+								short: 'on'
+							},
+							{
+								check_1: (v.item_17_check || '0'),
+								name: (v.item_17_desc || 'Burglary Gear'),
+								numboxes: '1'
+							},
+							{
+								check_1: (v.item_18_check || '0'),
+								name: (v.item_18_desc || 'Climbing Gear'),
+								numboxes: '2'
+							},
+							{
+								check_1: (v.item_19_check || '0'),
+								name: (v.item_19_desc || 'Arcane Implements'),
+								numboxes: '1'
+							},
+							{
+								check_1: (v.item_20_check || '0'),
+								name: (v.item_20_desc || 'Documents'),
+								numboxes: '1'
+							},
+							{
+								check_1: (v.item_21_check || '0'),
+								name: (v.item_21_desc || 'Subterfuge Supplies'),
+								numboxes: '1'
+							},
+							{
+								check_1: (v.item_22_check || '0'),
+								check_2: (v.item_22_check_b || '0'),
+								name: (v.item_22_desc || 'Demolition Tools'),
+								numboxes: '2'
+							},
+							{
+								check_1: (v.item_23_check || '0'),
+								name: (v.item_23_desc || 'Tinkering Tools'),
+								numboxes: '1'
+							},
+							{
+								check_1: (v.item_24_check || '0'),
+								name: (v.item_24_desc || 'Lantern'),
+								numboxes: '1'
+							}
+						];
+						items.forEach(obj => {
+							obj.boxes_chosen = 'on';
+						});
+						fillRepeatingSectionFromData('item', items, false, () => upgradeSheet('1.5'));
+					});
+				}
+				// Upgrade to 1.6: Set defaults, convert upgrade names
+				else if (versionMajor === 1 && versionMinor < 6) {
+					const upgradeFunction = _.after(3, () => upgradeSheet('1.6')),
+						upgradeNums = [...Array(25).keys()].slice(1).filter(x => x !== 19),
+						upgradeAttrs = [
+							...upgradeNums.map(x => `upgrade_${x}_desc`),
+							...upgradeNums.map(x => `upgrade_${x}_check`),
+							'upgrade_1_check_b',
+							'upgrade_1_check_c',
+							'upgrade_2_tall',
+							'upgrade_3_tall',
+							'upgrade_6_check_b',
+							'upgrade_8_check_b',
+							'upgrade_14_check_b',
+							'upgrade_16_check_b',
+							'upgrade_24_check_b',
+							'upgrade_24_check_c',
+							'upgrade_24_check_d',
+							...Object.keys(translatedDefaults)
+						];
+					getAttrs(upgradeAttrs, v => {
+						// Repeating / specific upgrades
+						const upgrades = [{
+							check_1: v.upgrade_1_check || '0',
+							check_2: v.upgrade_1_check_b || '0',
+							check_3: v.upgrade_1_check_c || '0',
+							name: v.upgrade_1_desc || '',
+							numboxes: '3'
+						}, {
+							check_1: v.upgrade_2_check || '0',
+							name: v.upgrade_2_desc || '',
+							numboxes: '1',
+							tall: v.upgrade_2_tall || '0'
+						}, {
+							check_1: v.upgrade_3_check || '0',
+							name: v.upgrade_3_desc || '',
+							numboxes: '1',
+							tall: v.upgrade_3_tall || '0'
+						}, {
+							check_1: v.upgrade_4_check || '0',
+							name: v.upgrade_4_desc || '',
+							numboxes: '1'
+						}, {
+							check_1: v.upgrade_5_check || '0',
+							name: v.upgrade_5_desc || '',
+							numboxes: '1'
+						}];
+						upgrades.forEach(obj => {
+							obj.boxes_chosen = 'on';
+						});
+						getSectionIDs('upgrade', idList => {
+							const allAttrs = [
+								...idList.map(x => `repeating_upgrade_${x}_desc`),
+								...idList.map(x => `repeating_upgrade_${x}_check`),
+								...idList.map(x => `repeating_upgrade_${x}_check_b`)
+							];
+							getAttrs(allAttrs, v => {
+								const setting = {};
+								idList.forEach(id => {
+									setting[`repeating_upgrade_${id}_name`] = v[`repeating_upgrade_${id}_desc`] || '';
+									setting[`repeating_upgrade_${id}_check_1`] = v[`repeating_upgrade_${id}_check`] || '';
+									setting[`repeating_upgrade_${id}_check_2`] = v[`repeating_upgrade_${id}_check_b`] || '';
+									setting[`repeating_upgrade_${id}_numboxes`] = '2';
+									setting[`repeating_upgrade_${id}_boxes_chosen`] = 'on';
+								});
+								mySetAttrs(setting, {}, upgradeFunction);
+								fillRepeatingSectionFromData('upgrade', upgrades, false, upgradeFunction);
+							});
+						});
+						// Common upgrades
+						const setting = {};
+						upgradeNums.slice(5).forEach(index => {
+							setting[`upgrade_${index}_name`] = v[`upgrade_${index}_desc`] || '';
+							setting[`upgrade_${index}_check_1`] = v[`upgrade_${index}_check`] || '0';
+						});
+						setting.upgrade_6_check_2 = v.upgrade_6_check_b || '0';
+						setting.upgrade_8_check_2 = v.upgrade_8_check_b || '0';
+						setting.upgrade_14_check_2 = v.upgrade_14_check_b || '0';
+						setting.upgrade_16_check_2 = v.upgrade_16_check_b || '0';
+						setting.upgrade_24_check_2 = v.upgrade_24_check_b || '0';
+						setting.upgrade_24_check_3 = v.upgrade_24_check_c || '0';
+						setting.upgrade_24_check_4 = v.upgrade_24_check_d || '0';
+						Object.keys(translatedDefaults).forEach(k => {
+							setting[k] = v[k] || setting[k] || translatedDefaults[k];
+						});
+						mySetAttrs(setting, {}, upgradeFunction);
+					});
+				}
+				// Upgrade to 1.9: Add missing upgrade descriptions, convert bandolier checks
+				else if (versionMajor === 1 && versionMinor < 9) {
+					const upgradeFunction = _.after(2, () => upgradeSheet('1.9')),
+						upgradeNums = [...Array(25).keys()].slice(1).filter(x => x !== 19).slice(5),
+						upgradeDescriptions = upgradeNums.map(x => `upgrade_${x}_description`),
+						attrs = [
+							...upgradeDescriptions,
+							'bandolier1_check',
+							'bandolier1_check_b',
+							'bandolier1_check_c',
+							'bandolier2_check',
+							'bandolier2_check_b',
+							'bandolier2_check_c'
+						];
+					getAttrs(attrs, v => {
+						const setting = {};
+						upgradeDescriptions.forEach(name => {
+							setting[name] = v[name] || translatedDefaults[name];
+						});
+						setting.bandolier1_check_1 = v.bandolier1_check || '0';
+						setting.bandolier1_check_2 = v.bandolier1_check_b || '0';
+						setting.bandolier1_check_3 = v.bandolier1_check_c || '0';
+						setting.bandolier2_check_1 = v.bandolier2_check || '0';
+						setting.bandolier2_check_2 = v.bandolier2_check_b || '0';
+						setting.bandolier2_check_3 = v.bandolier2_check_c || '0';
+						mySetAttrs(setting, {}, upgradeFunction);
+					});
+					getSectionIDs('item', idArray => {
+						const attrs = [
+							...idArray.map(id => `repeating_item_${id}_name`),
+							...idArray.map(id => `repeating_item_${id}_description`)
+						];
+						getAttrs(attrs, v => {
+							const setting = {};
+							idArray.forEach(id => {
+								const k = _.findIndex(itemData, item => item.name === v[`repeating_item_${id}_name`]);
+								if (k >= 0 && !v[`repeating_item_${id}_description`]) {
+									setting[`repeating_item_${id}_description`] = itemData[k].description;
+								}
+							});
+							mySetAttrs(setting, {}, upgradeFunction);
+						});
+					});
+				}
+				// Upgrade to 1.10: Convert clocks
+				else if (versionMajor === 1 && versionMinor < 10) {
+					const upgradeFunction = _.after(2, () => upgradeSheet('1.10'));
+					['clock', 'crewclock'].forEach(sName => {
+						getSectionIDs(`repeating_${sName}`, idArray => {
+							const oldAttrs = [
+								...idArray.map(id => `repeating_${sName}_${id}_size`),
+								...idArray.map(id => `repeating_${sName}_${id}_clock1`),
+								...idArray.map(id => `repeating_${sName}_${id}_clock2`),
+								...idArray.map(id => `repeating_${sName}_${id}_clock3`),
+								...idArray.map(id => `repeating_${sName}_${id}_clock4`)
+							];
+							getAttrs(oldAttrs, v => {
+								const setting = {};
+								idArray.forEach(id => {
+									switch (v[`repeating_${sName}_${id}_size`]) {
+									case '6':
+										setting[`repeating_${sName}_${id}_progress`] = v[`repeating_${sName}_${id}_clock2`] || '0';
+										break;
+									case '8':
+										setting[`repeating_${sName}_${id}_progress`] = v[`repeating_${sName}_${id}_clock3`] || '0';
+										break;
+									case '12':
+										setting[`repeating_${sName}_${id}_progress`] = v[`repeating_${sName}_${id}_clock4`] || '0';
+										break;
+									default:
+									case 'none':
+									case '4':
+										setting[`repeating_${sName}_${id}_size`] = '4';
+										setting[`repeating_${sName}_${id}_progress`] = v[`repeating_${sName}_${id}_clock1`] || '0';
+										break;
+									}
+								});
+								mySetAttrs(setting, {}, upgradeFunction);
+							});
+						});
+					});
+				}
+				// Upgrade to 1.11: Convert all checkboxes to value=1
+				else if (versionMajor === 1 && versionMinor < 11) {
+					const upgradeFunction = _.after(14, () => upgradeSheet('1.11')),
+						upgradeNums = [...Array(25).keys()].slice(1).filter(x => x !== 19).slice(5),
+						boxes = ['show_settings', 'setting_extra_trauma', 'setting_extra_xp', 'setting_vampirexp', 'setting_show_strictures',
+							'setting_show_frame', 'setting_show_itemdesc', 'setting_show_deity', 'setting_show_origin', 'setting_flexwidth',
+							'cold', 'haunted', 'obsessed', 'paranoid', 'reckless', 'soft', 'unstable', 'vicious',
+							'chaotic', 'destructive', 'furious', 'obsessive', 'territorial', 'savage',
+							'clanking', 'leaking', 'fixated', 'smoking', 'sparking', 'unstable',
+							'armor', 'armor_heavy', 'armor_special',
+							'stricture_slumber', 'stricture_forbidden', 'stricture_repelled', 'stricture_bestial', 'stricture_bound',
+							'show_alchemicals', 'bandolier1_check_1', 'bandolier1_check_2', 'bandolier1_check_3', 'bandolier2_check_1',
+							'bandolier2_check_2', 'bandolier2_check_3', 'upgrade_24_check_3', 'upgrade_24_check_4',
+							'cohort1_weak', 'cohort1_impaired', 'cohort1_broken', 'cohort1_armor',
+							...[...Array(6).keys()].slice(1).map(x => `frame_feature_${x}_check`),
+							...[...Array(6).keys()].slice(1).map(x => `setting_extra_stress${x}`),
+							...[...Array(16).keys()].map(x => `claim_${x}_check`),
+							...['1_2', '2_3', '3_4', '4_5', '1_6', '2_7', '3_8', '4_9', '5_10', '6_7', '7_8', '8_9', '9_10', '6_11',
+								'7_12', '8_13', '9_14', '10_15', '11_12', '12_13', '13_14', '14_15'
+							].map(x => `claim_bridge_${x}`),
+							...upgradeNums.map(x => `upgrade_${x}_check_1`),
+							...upgradeNums.map(x => `upgrade_${x}_check_2`),
+							...upgradeNums.map(x => `upgrade_${x}_expand`)
+						],
+						repeatingBoxes = {
+							ability: ['check'],
+							claim: [...[...Array(6).keys()].slice(1).map(x => `claim_bridge_top_${x}`),
+								...[...Array(6).keys()].slice(1).map(x => `claim_${x}_check`)
+							],
+							cohort: ['weak', 'impaired', 'broken', 'armor'],
+							contact: ['check'],
+							crewability: ['check'],
+							factions1: ['expand'],
+							factions2: ['expand'],
+							factions3: ['expand'],
+							factions4: ['expand'],
+							factions5: ['expand'],
+							item: ['boxes_chosen', 'check_1', 'check_2', 'check_3', 'expand', 'short'],
+							playbookitem: ['bold', 'boxes_chosen', 'check_1', 'check_2', 'check_3', 'expand'],
+							upgrade: ['boxes_chosen', 'check_1', 'check_2', 'check_3', 'expand', 'tall']
+						},
+						convertBoxes = attrNames => {
+							getAttrs(attrNames, v => {
+								const setting = {};
+								attrNames.forEach(name => {
+									if (v[name] === 'on') setting[name] = 1;
+								});
+								mySetAttrs(setting, {
+									silent: true
+								}, upgradeFunction);
+							});
+						};
+					convertBoxes(boxes);
+					Object.entries(repeatingBoxes).forEach(([sName, attrs]) => {
+						getSectionIDs(`repeating_${sName}`, idArray => {
+							const attrNames = idArray.reduce((m, id) => {
+								return m.concat(attrs.map(name => `repeating_${sName}_${id}_${name}`));
+							}, []);
+							convertBoxes(attrNames);
+						});
+					});
+				}
+				// Upgrade to 1.12: Update dice totals
+				else if (versionMajor === 1 && versionMinor < 12) {
+					getAttrs(['stash'], v => calculateStashDice(v.stash));
+					actionsFlat.forEach(name => {
+						getAttrs([1, 2, 3, 4, 5].map(x => `${name}${x}`), v => {
+							const total = [1, 2, 3, 4, 5].reduce((m, x) => m + (parseInt(v[`${name}${x}`]) || 0), 0);
+							setAttr(name, total);
+						});
+					});
+					getSectionIDs('repeating_cohort', idArray => {
+						getAttrs(['crew_tier1', 'crew_tier2', 'crew_tier3', 'crew_tier4'], v => {
+							const tier = (parseInt(v.crew_tier1) || 0) + (parseInt(v.crew_tier2) || 0) +
+								(parseInt(v.crew_tier3) || 0) + (parseInt(v.crew_tier4) || 0);
+							mySetAttrs({
+								crew_tier: tier
+							}, {}, () => {
+								calculateCohortDice('cohort1');
+								idArray.forEach(id => calculateCohortDice(`repeating_cohort_${id}`));
+								upgradeSheet('1.12');
+							});
+						});
+					});
+				}
+				// Upgrade to 2.0: Rename trauma attributes, frame feature migration
+				else if (versionMajor < 2) {
+					const attrs = [
+						...traumaDataFlat,
+						'changed_attributes',
+						...[1, 2, 3, 4, 5].map(x => `frame_feature_${x}_check`),
+						...[1, 2, 3, 4, 5].map(x => `frame_feature_${x}_desc`)
+					];
+					getAttrs(attrs, v => {
+						const upgradeFunction = _.after(2, () => upgradeSheet('2.0')),
+							frameData = [1, 2, 3, 4, 5].map(k => ({
+								check: v[`frame_feature_${k}_check`] || '',
+								name: v[`frame_feature_${k}_desc`] || ''
+							})).filter(o => o.check || o.name),
+							changedAttrs = new Set(v.changed_attributes.split(',')),
+							setting = traumaDataFlat.reduce((m, name) => {
+								if (String(v[name]) === '1') m[`trauma_${name}`] = '1';
+								return m;
+							}, {});
+						actionsFlat.filter(n => changedAttrs.has(`${n}1`) || changedAttrs.has(`${n}2`))
+							.forEach(name => changedAttrs.add(name));
+						setting.changed_attributes = [...changedAttrs].join(',');
+						fillRepeatingSectionFromData('framefeature', frameData, false, upgradeFunction);
+						mySetAttrs(setting, {}, upgradeFunction);
+					});
+				}
+				// Upgrade to 2.2: Enable pet for hounds
+				else if (versionMajor === 2 && versionMinor < 2) {
+					getAttrs(['playbook'], v => {
+						if (v.playbook.toLowerCase() === 'hound') {
+							mySetAttrs({
+								char_cohort_name: 'Hunting Pet',
+								char_cohort_subtype: 'Hunter',
+								setting_show_cohort: '1'
+							});
+						}
+						upgradeSheet('2.2');
+					});
+				}
+				// Upgrade to 2.4: Generate alchemicals for Leeches, recalculate resistance
+				else if (versionMajor === 2 && versionMinor < 4) {
+					Object.keys(actionData).forEach(calculateResistance);
+					getAttrs(['playbook', 'notes', 'changed_attributes'], v => {
+						if (v.playbook.toLowerCase() === 'leech') {
+							fillRepeatingSectionFromData('alchemical', alchemicalData);
+						}
+						if (v.changed_attributes) {
+							const changedAttrs = v.changed_attributes.split(',');
+							actionsFlat.forEach(action => {
+								if (changedAttrs.some(x => x.indexOf(action) === 0)) {
+									changedAttrs.push(action);
+								}
+							});
+							setAttr('changed_attributes', [...new Set(changedAttrs)].join(','));
+						}
+						setAttr('crew_notes', v.notes || '');
+						upgradeSheet('2.4');
+					});
+				}
+			},
+			initialiseSheet = () => {
+				const setting = ['ability', 'friend', 'crewability', 'contact', 'playbookitem', 'upgrade', 'framefeature']
+					.reduce((memo, sectionName) => {
+						memo[`repeating_${sectionName}_${generateRowID()}_autogen`] = 1;
+						return memo;
+					}, {});
+				mySetAttrs(setting);
+				fillRepeatingSectionFromData('item', itemData);
+				/* Set translated default values */
+				getAttrs(Object.keys(translatedDefaults), v => {
+					const setting = {};
+					Object.keys(translatedDefaults).forEach(k => {
+						if (v[k] !== translatedDefaults[k]) setting[k] = translatedDefaults[k];
+					});
+					mySetAttrs(setting);
 				});
-			});
-		};
-		// Upgrade to 0.9: Convert ability/friend/crewability/contact first row
-		if (v.version && v.version.split('.')[0] === '0' && parseInt(v.version.split('.')[1]) < 9) {
-			let attrs = ['ability1_check', 'ability1_name', 'ability1_description',
-				'friend1_status', 'friend1_name',
-				'crew_ability1_check', 'crew_ability1_name', 'crew_ability1_description',
-				'contact1_check', 'contact1_name'
-			];
-			getAttrs(attrs, function (attrValues) {
-				fillRepeatingSectionFromData('ability', [{
-					check: attrValues.ability1_check,
-					description: attrValues.ability1_description,
-					name: attrValues.ability1_name
-				}]);
-				fillRepeatingSectionFromData('friend', [{
-					name: attrValues.friend1_name,
-					status: attrValues.friend1_status
-				}]);
-				fillRepeatingSectionFromData('crewability', [{
-					check: attrValues.crew_ability1_check,
-					description: attrValues.crew_ability1_description,
-					name: attrValues.crew_ability1_name
-				}]);
-				fillRepeatingSectionFromData('contact', [{
-					check: attrValues.contact1_check,
-					name: attrValues.contact1_name
-				}]);
-			});
-		};
-		// Upgrade to 1.0: Make sure that resistance values are calculated correctly.
-		if (v.version && parseInt(v.version.split('.')[0]) < 1) {
-			Object.keys(actionData).forEach(calculateResistance);
-			calculateVice();
-		};
+				console.log('Initialising new sheet.');
+			};
+		if (v.version) upgradeSheet(v.version);
+		else initialiseSheet();
 		// Set version number
-		setAttrs({
-			version: '1.3',
-			character_sheet: 'Blades in the Dark v1.3'
+		mySetAttrs({
+			version: sheetVersion,
+			character_sheet: `Blades in the Dark v${sheetVersion}`
 		});
 	});
 });
-</script>

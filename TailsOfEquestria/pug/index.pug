@@ -20,6 +20,15 @@ include fields.pug
         +option('loyalty')
         +option('magic')
         +option('other')
+      //
+        div.colors
+          span.mane
+            label Mane Color:
+              +input('color', 'mane_color')
+          span.coat
+            label Coat Color:
+              +input('color', 'coat_color')
+        
     .friendshipTokens
       h1
         span F
@@ -35,21 +44,42 @@ include fields.pug
       +input('number', 'friendshipTokens')(value='0')
   div
     .stamina
-      h1 Stamina:
-      +fraction('stamina')
+      div
+        h1 Stamina:
+        +fraction('stamina')
+      div
+        +labelledUnderlined('Damage Reduction:'): +input('text', 'damageReduction')
     .traits
       .trait.body
-        label Body
-        +rollButton('body')
+        label.traitName Body
+        +rollButton({
+          attr: 'Body',
+          result: 'body_equation',
+          updowngrade: 'body_updowngrade'
+        })
         +selectDice('body')
+        +updowngrade("body")
+        +input('hidden', 'body_equation')
       .trait.mind 
-        label Mind
-        +rollButton('mind')
+        label.traitName Mind
+        +rollButton({
+          attr: 'Mind',
+          result: 'mind_equation',
+          updowngrade: 'mind_updowngrade'
+        })
         +selectDice('mind')
+        +updowngrade("mind")
+        +input('hidden', 'mind_equation')
       .trait.charm
-        label Charm
-        +rollButton('charm')
+        label.traitName Charm
+        +rollButton({
+          attr: 'Charm',
+          result: 'charm_equation',
+          updowngrade: 'charm_updowngrade'
+        })
         +selectDice('charm')
+        +updowngrade("charm")
+        +input('hidden', 'charm_equation')
         
   div.explodingHooves
     h1 Exploding Hoof Dice:
@@ -77,24 +107,36 @@ include fields.pug
   
   div
     .talents
-      mixin talent(isCutieMark)
-        - var prefix = isCutieMark ? 'talent_cutieMark_' : '';
-        .talent(class=isCutieMark ? 'talentCutieMark' : '')
+      mixin talent(prefix)
+        - 
+          prefix = prefix || '';
+          var isCutieMark = prefix === 'talent_cutieMark_';
+          var isRacial = prefix === 'talent_racial_';
+        .talent(class=isCutieMark ? 'isCutieMark' : '')
           if(isCutieMark)
-            label CM:
+            label Cutie Mark:
+          else if(isRacial)
+            label Racial:
           else
             label T:
-          button(type='roll', value='&{template:toe} {{charName=@{character_name}}} {{attr=@{' + prefix + 'name}}} {{result=[[@{' + prefix + 'equation}]]}} {{notes=@{' + prefix + 'notes}}}')
+          +rollButton({
+            attr: '@{' + prefix + 'name}',
+            result: prefix + 'equation',
+            notes: prefix + 'notes',
+            updowngrade: prefix + 'updowngrade'
+          })
           +labelledUnderlined(''): +input('text', prefix + 'name')
           +labelledUnderlined('Dice:'): +selectDice(prefix + 'dice')
+          +updowngrade(prefix)
           +labelledUnderlined('Trait'): +selectTrait(prefix + 'trait')
-          +labelledUnderlined('Notes:'): +input('text', prefix + 'notes')
+          +labelledUnderlined('Notes:')(style='width: 2in;'): +input('text', prefix + 'notes')
           +input('hidden', prefix + 'equation')
 
       h1 Talents:
-      +talent(true)
+      +talent('talent_cutieMark_')
+      +talent('talent_racial_')
       +repeating('talents')
-        +talent(false)      
+        +talent('')      
   div
     .quirks
       mixin quirk(isMain)
