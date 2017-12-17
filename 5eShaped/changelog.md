@@ -11,6 +11,13 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 15.5.9
+
+### Bug Fixes
+
+* [#633: Hit dice and level field not displaying properly for sheets from versions before 15.5.5](https://bitbucket.org/mlenser/5eshaped/issues/633/hit-dice-and-level-field-not-displaying)
+* [#631: Delay/No Response to using Short and Long Rest buttons](https://bitbucket.org/mlenser/5eshaped/issues/631/delay-no-response-to-using-short-and-long)
+
 ## 15.5.8
 
 ### Bug Fixes

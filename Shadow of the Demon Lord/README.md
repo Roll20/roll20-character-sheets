@@ -1,6 +1,12 @@
 # Roll20 Character sheet for 'Shadow of the Demon Lord' by [Robert Schwalb](http://schwalbentertainment.com)
 
 ## Change log
+### Version 5
+* Align everything left on main tab
+* Alleviate some display issues with odd number of spells
+* Added spellbook macro
+* Moved description field in roll template to the end
+
 ### Version 4
 * Added Finesse and Perception as attack stats
 * Weapons and attacks now correctly display "boon"/"bane"/"banes" instead of always displaying "boons"
