@@ -1456,8 +1456,10 @@ const mySetAttrs = (attrs, options, callback) => {
 					switch (event.sourceAttribute.slice(-1)) {
 					case '4':
 						setting[`${rName}3`] = 1;
+						/* falls through */
 					case '3':
 						setting[`${rName}2`] = 1;
+						/* falls through */
 					case '2':
 						setting[`${rName}1`] = 1;
 					}
@@ -1466,8 +1468,10 @@ const mySetAttrs = (attrs, options, callback) => {
 					switch (event.sourceAttribute.slice(-1)) {
 					case '1':
 						setting[`${rName}2`] = 0;
+						/* falls through */
 					case '2':
 						setting[`${rName}3`] = 0;
+						/* falls through */
 					case '3':
 						if (upToFour) setting[`${rName}4`] = 0;
 					}
@@ -1522,6 +1526,7 @@ const crewAttributes = [...new Set([].concat(...Object.keys(crewData).map(x => O
 		'xp_condition2',
 		'xp_condition3',
 		'crew_xp_condition',
+		'hunting_grounds_type',
 		'hunting_grounds_description',
 		'cohort1_edges',
 		'cohort1_flaws',
@@ -1618,7 +1623,7 @@ on('change:setting_traumata_set ' + traumaDataFlat.map(x => `change:trauma_${x}`
 	getAttrs(['setting_traumata_set', ...traumaDataFlat.map(x => `trauma_${x}`)], v => {
 		const traumaType = (v.setting_traumata_set === '0' ? 'normal' : v.setting_traumata_set);
 		if (traumaData[traumaType] && event.sourceType === 'player') {
-			const newTrauma = traumaData[traumaType].reduce((m, name) => m + (parseInt(v[`trauma_${name}`]) || 0), 0)
+			const newTrauma = traumaData[traumaType].reduce((m, name) => m + (parseInt(v[`trauma_${name}`]) || 0), 0);
 			setAttr('trauma', newTrauma);
 		}
 	});
