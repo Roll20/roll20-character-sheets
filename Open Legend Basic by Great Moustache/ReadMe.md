@@ -5,6 +5,9 @@
 
 ### Changelog
 
+### 1.8.9.92 on 2017 December 4th
+* 3 Inventory sections outputing wrong "name" to chat.
+
 ### 1.8.9.91 on 2017 November 27th
 * Inventory, Notes, Goals, Beliefs, & Instincts can now be sent to chat
 * Inventory Area Re-worked
