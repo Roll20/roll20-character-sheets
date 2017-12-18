@@ -30,7 +30,7 @@
 	<input type="radio" name="attr_page" class="sheet-tab sheet-tab2" value="2"  /><span class="sheet-tab sheet-tab2">Attributes & Skills</span>
 	<input type="radio" name="attr_page" class="sheet-tab sheet-tab3" value="3"  /><span class="sheet-tab sheet-tab3">Combat Actions</span>
 	<input type="radio" name="attr_page" class="sheet-tab sheet-tab4" value="4"  /><span class="sheet-tab sheet-tab4">Powers & Gear</span>
-	<input type="radio" name="attr_page" class="sheet-tab sheet-tab5" value="5"  /><span class="sheet-tab sheet-tab5">Advancements</span>
+	<input type="radio" name="attr_page" class="sheet-tab sheet-tab5" value="5"  /><span class="sheet-tab sheet-tab5">Advancement & Mods</span>
 
 	<hr class="sheet-two" width="100%"/>
 	
@@ -93,7 +93,7 @@
 							<td class="sheet-width-W7 sheet-center"><input class="sheet-width-W100 sheet-spin-button" type="number" name="attr_GMscMod"  value="0" title="If applicable, enter other modifiers."/></td>						
 							<td class="sheet-width-W5 sheet-center"><button class="sheet-diebutton" type="roll" 
 								title="All Purpose Action Roller" 
-								value="&{template:general_roll} {{name=@{Hero_Name} Rolls: @{GRoll_Name}}} {{Action=@{GAction}}} {{Rolled=@{GRDice}}} {{Rank=@{GRank}}} {{APARMod=[[@{GFociMod}} + @{GPowMod} + @{GAdvMod} + @{GMscMod}]]}} {{GeneralRoll=[[ 2d10cs>2cf<9 + @{GRank} + @{GFociMod} + @{GPowMod}+ @{GAdvMod}+ @{GMscMod} + @{GRDice}cs0cf0]] }}"
+								value="&{template:general_roll} {{name=@{Hero_Name} @{GRoll_Name}}} {{Action=@{GAction}}} {{Rolled=@{GRDice}}} {{wndpen=@{hiddenWoundPenalty}}} {{Rank=@{GRank}}} {{APARMod=[[@{GFociMod} + @{GPowMod} + @{GAdvMod} + @{GMscMod}]]}} {{GeneralRoll=[[ 2d10cs>2cf<9 + @{GRank} + @{GFociMod} + @{GPowMod}+ @{GAdvMod}+ @{GMscMod} + @{hiddenWoundPenalty} + @{GRDice}cs0cf0]] }}"
 								name="roll_MakeAGeneralRoll">										
 							</button></td>																																																							
 						</tr>				
@@ -203,15 +203,16 @@ title="spend  to Ignore wound penalties,
 						</tbody>
 						<tbody>
 						<tr>
-							<td class="sheet-width-W15"><span class="sheet-background">Stamina:</span></td>
-							<td class="sheet-width-W10 sheet-center"><span class="sheet-circle"><input type="number" name="attr_Stamina" disabled="true" value="((@{Avoidance} + @{Fortitude} + @{Discipline}))"/></span></td>
-							<td class="sheet-width-W15 sheet-center"><input class="sheet-width-W100 sheet-bigspin-button" type="number" name="attr_CurrentStamina" value="((@{Avoidance} + @{Fortitude} + @{Discipline}))"/></td>
+							<td class="sheet-width-W15"><span class="sheet-background" >Stamina:</span></td>
+							<td class="sheet-width-W10 sheet-center"><span class="sheet-circle"><input type="number" name="attr_Stamina" disabled="true" title="Value: Avoidance + Fortitude + Discipline." value="((@{Avoidance} + @{Fortitude} + @{Discipline} + @{StaminaMod}))"/></span></td>
+							<td class="sheet-width-W15 sheet-center"><input class="sheet-width-W100 sheet-bigspin-button" type="number" name="attr_CurrentStamina"/></td>
 							<td><input class="sheet-width-W95" type="text" name="attr_StaminaNotes" /></td>
 						</tr>
 						<tr>
 							<td class="sheet-width-W15"><span class="sheet-background">Wounds:</span></td>
-							<td class="sheet-width-W10 sheet-center"><span class="sheet-circle"><input type="number" name="attr_Wounds" disabled="true" 	value="((@{VigorModifier} + 1))" /></span></td>
-							<td class="sheet-width-W15 sheet-center"><input class="sheet-width-W100 sheet-bigspin-button" type="number" name="attr_CurrentWounds" value="((@{VigorModifier} + 1))" />  </td>
+							<!-- Note: A Sheetworker duplicates generation of WOUNDS; changes in this formula will have to be duplicated in the sheet worker -->
+							<td class="sheet-width-W10 sheet-center"><span class="sheet-circle"><input type="number" name="attr_Wounds" disabled="true" title="Value: 1 + Vigor Passive Modifier." value="((@{VigorModifier} + @{WoundsMod} + 1))" /></span></td>
+							<td class="sheet-width-W15 sheet-center"><input class="sheet-width-W100 sheet-bigspin-button" type="number" name="attr_CurrentWounds"/></td>
 							<td><input class="sheet-width-W95" type="text" name="attr_WoundNotes"/></td>
 						</tr>
 						<tr>
@@ -221,8 +222,8 @@ title="spend  to Ignore wound penalties,
 							<th><H3 class="sheet-header-override">In Breakdown?</H3></th>
 						</tr>
 						<tr>
-							<td class="sheet-width-W20"><span class="sheet-background" title="Apply #Horror Points as penalty to all resolve rolls; if points > than Resolve Score, character breaks.">Horror Points:</span></td>
-							<td class="sheet-width-W10 sheet-center"><span class="sheet-circle"><input type="number" name="attr_HorrorBreakPoint" disabled="true" 	value="((@{ResolveScore}))" title="This is the breakingpoint for horror; make a test after exceeding resolve."/></span></td>
+							<td class="sheet-width-W20"><span class="sheet-background" title="Apply #Horror Points as penalty to all resolve rolls; if points > than Resolve Score, character breaks.">Horror Pnts:</span></td>
+							<td class="sheet-width-W10 sheet-center"><span class="sheet-circle"><input type="number" name="attr_HorrorBreakPoint" disabled="true" title="Value: Resolve score + Horror Modifiers." value="((@{ResolveScore} + @{HorrorMod}))" title="This is the breakingpoint for horror; make a test after exceeding resolve."/></span></td>
 							<td class="sheet-width-W15 sheet-center"><input type="number" class="sheet-width-W100 sheet-spin-button" name="attr_CurrentHorror" value="0" title="Track current horror points."/></td>
 							<td><span class="sheet-background">Breakdown?&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="sheet-background">&nbsp;Yes&nbsp;</span><input type="checkbox" name="attr_breakdown"/></td>
 						</tr>
@@ -237,8 +238,8 @@ title="spend  to Ignore wound penalties,
 							<tbody>
 								<tr>
 									<td><span class="sheet-background">Pace</span></td>
-									<td><span class="sheet-circle"><input type="number" name="attr_BasePace" disabled="true" value="((@{QuicknessModifier}))"/>&nbsp;Areas</span></td>
-									<td><span class="sheet-background" style="margin-left:3em;"/>Top MPH</span></td>
+									<td><span class="sheet-circle"><input type="number" name="attr_BasePace" disabled="true" value="((@{QuicknessModifier} + @{PaceMod}))"/>&nbsp;Areas</span></td>
+									<td><span class="sheet-background" style="margin-left: 2em;"/>Top MPH</span></td>
 									<td><input type="Text" name="attr_TopMPH"/></span></td>
 								</tr>
 							</tbody>
@@ -382,7 +383,7 @@ title="spend  to Ignore wound penalties,
 								<td class="sheet-center"><input class="sheet-spin-button" type="number" name="attr_MightRollMod"  value="0" /></td>						
 								<td class="sheet-center"><button class="sheet-diebutton" type="roll" 
 									title="Might Roll" 
-									value="&{template:action_roll} {{name=@{Hero_Name} rolls Might}} {{attribute=Might}} {{rolldice=@{MightDie}}} {{rollmod=@{MightRollMod}}} {{AttributeRoll=[[ 2d10cs>2cf<9 + @{MightDie}cs0cf0 + @{MightRollMod} ]]}}"
+									value="&{template:action_roll} {{name=@{Hero_Name} rolls Might}} {{attribute=Might}} {{rolldice=@{MightDie}}} {{wndpen=@{hiddenWoundPenalty}}} {{rollmod=@{MightRollMod}}} {{AttributeRoll=[[ 2d10cs>2cf<9 + @{MightDie}cs0cf0 + @{MightRollMod} + @{hiddenWoundPenalty} ]]}}"
 									name="roll_MightRoll" style="font-size: 175%;">
 									</button>
 								</td>
@@ -413,7 +414,7 @@ title="spend  to Ignore wound penalties,
 								<td class="sheet-center"><input class="sheet-spin-button" type="number" name="attr_ProwessRollMod"  value="0" /></td>						
 								<td class="sheet-center"><button class="sheet-diebutton" type="roll" 
 									title="Prowess Roll" 
-									value="&{template:action_roll} {{name=@{Hero_Name} rolls Prowess}} {{attribute=Prowess}} {{rolldice=@{ProwessDie}}} {{rollmod=@{ProwessRollMod}}} {{AttributeRoll=[[ 2d10cs>2cf<9 + @{ProwessDie}cs0cf0 + @{ProwessRollMod} ]]}}"
+									value="&{template:action_roll} {{name=@{Hero_Name} rolls Prowess}} {{attribute=Prowess}} {{wndpen=@{hiddenWoundPenalty}}} {{rolldice=@{ProwessDie}}} {{rollmod=@{ProwessRollMod}}} {{AttributeRoll=[[ 2d10cs>2cf<9 + @{ProwessDie}cs0cf0 + @{ProwessRollMod} + @{hiddenWoundPenalty} ]]}}"
 									name="roll_ProwessRoll" style="font-size: 175%;">
 									</button>
 								</td>	
@@ -444,7 +445,7 @@ title="spend  to Ignore wound penalties,
 								<td class="sheet-center"><input class="sheet-spin-button" type="number" name="attr_QuicknessRollMod"  value="0" /></td>						
 								<td class="sheet-center"><button class="sheet-diebutton" type="roll" 
 									title="Quickness Roll" 
-									value="&{template:action_roll} {{name=@{Hero_Name} rolls Quickness}} {{attribute=Quickness}} {{rolldice=@{QuicknessDie}}} {{rollmod=@{QuicknessRollMod}}} {{AttributeRoll=[[ 2d10cs>2cf<9 + @{QuicknessDie}cs0cf0 + @{QuicknessRollMod} ]]}}"
+									value="&{template:action_roll} {{name=@{Hero_Name} rolls Quickness}} {{attribute=Quickness}} {{wndpen=@{hiddenWoundPenalty}}} {{rolldice=@{QuicknessDie}}} {{rollmod=@{QuicknessRollMod}}} {{AttributeRoll=[[ 2d10cs>2cf<9 + @{QuicknessDie}cs0cf0 + @{QuicknessRollMod} + @{hiddenWoundPenalty} ]]}}"
 									name="roll_QuicknessRoll" style="font-size: 175%;">
 									</button>
 								</td>	
@@ -475,7 +476,7 @@ title="spend  to Ignore wound penalties,
 								<td class="sheet-center"><input class="sheet-spin-button" type="number" name="attr_VigorRollMod"  value="0" /></td>						
 								<td class="sheet-center"><button class="sheet-diebutton" type="roll" 
 									title="Vigor Roll" 
-									value="&{template:action_roll} {{name=@{Hero_Name} rolls Vigor}} {{attribute=Vigor}} {{rolldice=@{VigorDie}}} {{rollmod=@{VigorRollMod}}} {{AttributeRoll=[[ 2d10cs>2cf<9 + @{VigorDie}cs0cf0 + @{VigorRollMod} ]]}}"
+									value="&{template:action_roll} {{name=@{Hero_Name} rolls Vigor}} {{attribute=Vigor}} {{wndpen=@{hiddenWoundPenalty}}} {{rolldice=@{VigorDie}}} {{rollmod=@{VigorRollMod}}} {{AttributeRoll=[[ 2d10cs>2cf<9 + @{VigorDie}cs0cf0 + @{VigorRollMod} + @{hiddenWoundPenalty} ]]}}"
 									name="roll_VigorRoll" style="font-size: 175%;">
 									</button>
 								</td>	
@@ -527,7 +528,7 @@ title="spend  to Ignore wound penalties,
 								<td class="sheet-center"><input class="sheet-spin-button" type="number" name="attr_CharismaRollMod"  value="0" /></td>						
 								<td class="sheet-center"><button class="sheet-diebutton" type="roll" 
 									title="Charisma Roll" 
-									value="&{template:action_roll} {{name=@{Hero_Name} rolls Charisma}} {{attribute=Charisma}} {{rolldice=@{CharismaDie}}} {{rollmod=@{CharismaRollMod}}} {{AttributeRoll=[[ 2d10cs>2cf<9 + @{CharismaDie}cs0cf0 + @{CharismaRollMod} ]]}}"
+									value="&{template:action_roll} {{name=@{Hero_Name} rolls Charisma}} {{attribute=Charisma}} {{wndpen=@{hiddenWoundPenalty}}} {{rolldice=@{CharismaDie}}} {{rollmod=@{CharismaRollMod}}} {{AttributeRoll=[[ 2d10cs>2cf<9 + @{CharismaDie}cs0cf0 + @{CharismaRollMod} + @{hiddenWoundPenalty} ]]}}"
 									name="roll_CharismaRoll" style="font-size: 175%;">
 									</button>
 								</td>	
@@ -558,7 +559,7 @@ title="spend  to Ignore wound penalties,
 								<td class="sheet-center"><input class="sheet-spin-button" type="number" name="attr_InsightRollMod"  value="0" /></td>						
 								<td class="sheet-center"><button class="sheet-diebutton" type="roll" 
 									title="Insight Roll" 
-									value="&{template:action_roll} {{name=@{Hero_Name} rolls Insight}} {{attribute=Insight}} {{rolldice=@{InsightDie}}} {{rollmod=@{InsightRollMod}}} {{AttributeRoll=[[ 2d10cs>2cf<9 + @{InsightDie}cs0cf0 + @{InsightRollMod} ]]}}"
+									value="&{template:action_roll} {{name=@{Hero_Name} rolls Insight}} {{attribute=Insight}} {{wndpen=@{hiddenWoundPenalty}}} {{rolldice=@{InsightDie}}} {{rollmod=@{InsightRollMod}}} {{AttributeRoll=[[ 2d10cs>2cf<9 + @{InsightDie}cs0cf0 + @{InsightRollMod} + @{hiddenWoundPenalty} ]]}}"
 									name="roll_InsightRoll" style="font-size: 175%;">
 									</button>
 								</td>	
@@ -589,7 +590,7 @@ title="spend  to Ignore wound penalties,
 								<td class="sheet-center"><input class="sheet-spin-button" type="number" name="attr_LogicRollMod"  value="0" /></td>						
 								<td class="sheet-center"><button class="sheet-diebutton" type="roll" 
 									title="Logic Roll" 
-									value="&{template:action_roll} {{name=@{Hero_Name} rolls Logic}} {{attribute=Logic}} {{rolldice=@{LogicDie}}} {{rollmod=@{LogicRollMod}}} {{AttributeRoll=[[ 2d10cs>2cf<9 + @{LogicDie}cs0cf0 + @{LogicRollMod} ]]}}"
+									value="&{template:action_roll} {{name=@{Hero_Name} rolls Logic}} {{attribute=Logic}} {{wndpen=@{hiddenWoundPenalty}}} {{rolldice=@{LogicDie}}} {{rollmod=@{LogicRollMod}}} {{AttributeRoll=[[ 2d10cs>2cf<9 + @{LogicDie}cs0cf0 + @{LogicRollMod} + @{hiddenWoundPenalty} ]]}}"
 									name="roll_LogicRoll" style="font-size: 175%;">
 									</button>
 								</td>	
@@ -620,7 +621,7 @@ title="spend  to Ignore wound penalties,
 								<td class="sheet-center"><input class="sheet-spin-button" type="number" name="attr_ResolveRollMod"  value="0" /></td>						
 								<td class="sheet-center"><button class="sheet-diebutton" type="roll" 
 									title="Resolve Roll" 
-									value="&{template:action_roll} {{name=@{Hero_Name} rolls Resolve}} {{attribute=Resolve}} {{rolldice=@{ResolveDie}}} {{rollmod=@{ResolveRollMod}}} {{AttributeRoll=[[ 2d10cs>2cf<9 + @{ResolveDie}cs0cf0 + @{ResolveRollMod} ]]}}"
+									value="&{template:action_roll} {{name=@{Hero_Name} rolls Resolve}} {{attribute=Resolve}} {{wndpen=@{hiddenWoundPenalty}}} {{rolldice=@{ResolveDie}}} {{rollmod=@{ResolveRollMod}}} {{AttributeRoll=[[ 2d10cs>2cf<9 + @{ResolveDie}cs0cf0 + @{ResolveRollMod} + @{hiddenWoundPenalty} ]]}}"
 									name="roll_ResolveRoll" style="font-size: 175%;">
 									</button>
 								</td>	
@@ -701,7 +702,7 @@ title="spend  to Ignore wound penalties,
 					<td class="sheet-width-W7 sheet-center"><input class="sheet-width-W100 sheet-spin-button" type="number" name="attr_SkillA_MscMod"  value="0" /></td>						
 					<td class="sheet-width-W5 sheet-center"><button class="sheet-diebutton" type="roll" 
 							title="Skill Roll" 
-							value="&{template:skill_roll} {{name=@{Hero_Name} makes a skill roll}} {{Rolled=@{SkillA_Name}}} {{Rank=@{SkillA_Rank}}} {{rolldice=@{SkillA_AttrToRoll}}} {{rollmod=[[@{SkillA_FociMod} + @{SkillA_PowMod} + @{SkillA_AdvMod} + @{attr_SkillA_MscMod} + @{SkillA_AttrToRoll}]]}} {{roll=[[ 2d10cs>2cf<9 + @{SkillA_AttrToRoll}cs0cf0 + @{SkillA_Rank} + @{SkillA_FociMod} + @{SkillA_PowMod}+ @{SkillA_AdvMod}+ @{SkillA_MscMod}]]}}" 
+							value="&{template:skill_roll} {{name=@{Hero_Name} makes a skill roll}} {{Rolled=@{SkillA_Name}}} {{Rank=@{SkillA_Rank}}} {{wndpen=@{hiddenWoundPenalty}}} {{rolldice=@{SkillA_AttrToRoll}}} {{rollmod=[[@{SkillA_FociMod} + @{SkillA_PowMod} + @{SkillA_AdvMod} + @{SkillA_MscMod}]]}} {{roll=[[ 2d10cs>2cf<9 + @{SkillA_AttrToRoll}cs0cf0 + @{SkillA_Rank} + @{SkillA_FociMod} + @{SkillA_PowMod}+ @{SkillA_AdvMod}+ @{SkillA_MscMod} + @{hiddenWoundPenalty}]]}}" 
 							name="roll_MakeASkillRoll">
 						</button>
 					</td>				
@@ -756,11 +757,11 @@ title="spend  to Ignore wound penalties,
 						<tbody>
 						<tr>
 							<td class="sheet-right"><span class="sheet-background">Avoidance:&nbsp;&nbsp;</span></td>
-							<td><input class="sheet-width-W100 sheet-spin-button" type="number" title="= Prowess Passive + Insight Passive + 12" name="attr_Avoidance" /></td>
+							<td><span class="sheet-circle"><input type="number" disabled="true" value="((@{ProwessModifier} + @{InsightModifier} + @{AvoidanceMod} + 12))"  title="Value: Prowess Passive + Insight Passive + 12" name="attr_Avoidance" /></span></td>
 							<td class="sheet-right"><span class="sheet-background">Fortitude:&nbsp;&nbsp;</span></td>
-							<td><input class="sheet-width-W100 sheet-spin-button" type="number" title="= Might Passive + Vigor Passive + 12" name="attr_Fortitude" /></td>
+							<td><span class="sheet-circle"><input class="sheet-circle" type="number" disabled="true" value="((@{MightModifier} + @{VigorModifier} + @{FortitudeMod} + 12))"  title="Value: Might Passive + Vigor Passive + 12" name="attr_Fortitude" /></span></td>
 							<td class="sheet-right"><span class="sheet-background">Discipline:&nbsp;&nbsp;</span></td>
-							<td><input class="sheet-width-W100 sheet-spin-button" type="number" title="= Charisma Passive + Resolve Passive + 12" name="attr_Discipline" /></td>
+							<td><span class="sheet-circle"><input class="sheet-circle" type="number" disabled="true" value="((@{CharismaModifier} + @{ResolveModifier} + @{DisciplineMod} + 12))" title="Value: Charisma Passive + Resolve Passive + 12" name="attr_Discipline" /></span></td>
 						</tr>	
 						<tr>
 							<td class="sheet-right"><span>Ballistic:&nbsp;&nbsp;</span></td>	
@@ -777,6 +778,13 @@ title="spend  to Ignore wound penalties,
 			<!-- COLUMN 2 - General Combat Details -->	
 			<div class="sheet-col">	
 				<div class="sheet-header">Common Circumstance Mods</div>
+					<table>
+							<tr>
+								<td class="sheet-width-w15"><span style="color: red;">Wound Penalty:&nbsp;
+								<td class="sheet-width-w5"class="sheet-left"><span class="sheet-noborder"><input type="number" value="((@{hiddenWoundPenalty}))" disabled="true" name="attr_WoundPenalty" style="color: red;"></span></td>	
+								<td class="sheet-left sheet-width-w80" ><span style="color: red;"><input type="radio" value="apply" checked="true" name="attr_WndPenToUse"/>&nbsp;apply&nbsp; <input type="radio" value="ignore" name="attr_WndPenToUse"/>&nbsp;ignore</span></td>
+							</tr>
+					</table>
 				<div class="sheet-subsection">	
 					<table class="sheet-smallfont">
 						<tbody>
@@ -787,7 +795,7 @@ title="spend  to Ignore wound penalties,
 								<td class="sheet-left"><span>+2</span></td>								
 							</tr>
 							<tr>
-								<td><span>Burst, Dbl Tap, Spray</td>
+								<td><span>Burst, Dbl Tap, Spray, Fire into melee</td>
 								<td class="sheet-left"><span></span><span>-3</span></td>
 								<td><span>Cover (Part/hlf/full)</td>
 								<td class="sheet-left"><span>-2/-4/-6</span></td>							
@@ -812,14 +820,8 @@ title="spend  to Ignore wound penalties,
 							<tr>
 								<td><span>Beyond Range</td>
 								<td class="sheet-left"><span>-1/a</span></td>
-								<td><span>Range vs Melee</td>
-								<td class="sheet-left"><span>-3</span></td>		
-							</tr>
-							<tr>
-								<td><span style="color: red;">Wounded (applied to all actions)</td>
-								<td class="sheet-left"><span style="color: red;">-1/wnd</span></td>
-								<td><span>Attacking from a Vehicle</td>
-								<td class="sheet-left"><span>-1/5a</span></td>								
+								<td><span>Attacking from a Vehicle</td>													
+								<td class="sheet-left"><span>-1/5a</span></td>		
 							</tr>
 						</tbody>
 					</table>
@@ -835,11 +837,11 @@ title="spend  to Ignore wound penalties,
 						<th class="sheet-width-W25"><h3 class="sheet-header-override" title="Name of the attack" >Attack</h3></th>		
 						<th class="sheet-width-W5">	<h3 title="Click to expand notes section for capturing additional details." >+Info</h3></th>			
 						<th class="sheet-width-W15"><h3 class="sheet-header-override" title="Maneuver being used">Maneuver</h3></th>
-						<th class="sheet-width-W5">	<h3 title="Maneuver Modifier" >MM</h3></th>
+						<th class="sheet-width-W5">	<h3 title="Maneuver Modifier" >Man M</h3></th>
 						<th class="sheet-width-W10"><h3 title="Attribute dice rolled for the attack" >Attribute Dice</h3></th>
 						<th class="sheet-width-W5">	<h3 title="Defense: A(Avoidance), F(Fortitude), D(Discipline),a skill name, or attribute name." >vs Def</h3></th>	
 						<th class="sheet-width-W7">	<h3 title="Speed of the attack (reference Maneuvers)" >Ticks</h3></th>
-						<th class="sheet-width-W5">	<h3 title="Rank of a skill or power applied to the roll." >Rank</h3></th>
+						<th class="sheet-width-W5">	<h3 title="Total of all ranks (if any) applied to the roll." >Ranks</h3></th>
 						<th class="sheet-width-W7">	<h3 title="Total of Foci, Power, and Advantage modifiers.">ATK M</h3></th>
 						<th class="sheet-width-W7">	<h3 title="Total of circumstance modifiers.">Circ M</h3></th>
 						<th class="sheet-width-W5">	<h3 title="Button for making the roll." >Roll</h3></th>
@@ -909,7 +911,7 @@ title="spend  to Ignore wound penalties,
 							<td class="sheet-width-W7 sheet-center"><input class="sheet-width-W100 sheet-spin-button" type="number" name="attr_CircMod" value="0" title="Total of all Circumstance Mods; leave 0 if none." /></td>
 							<td class="sheet-width-W5 sheet-center"><button class="sheet-diebutton" type="roll" 
 								title="Click to roll the attack" 
-								value="&{template:attack_roll} {{name=@{Hero_Name} Attacks}} {{AttackName=@{AttackName}}} {{Maneuver=@{AttackManeuver}}} {{ManMod=@{AttackMnvMod}}} {{Dice=@{AttackAttrDice}}} {{Defense=@{AttackDefense}}} {{Ticks=@{AttackSpeed}}} {{Rank=@{AttackRank}}} {{AttkMod=@{AttackMod}}} {{CircMod=@{CircMod}}} {{roll=[[ 2d10cs>2cf<9  + @{AttackRank} + @{AttackMnvMod} + @{AttackMod} + @{CircMod} + @{AttackAttrDice}cs0cf0}]]}}"
+								value="&{template:attack_roll} {{name=@{Hero_Name} Attacks}} {{AttackName=@{AttackName}}} {{Maneuver=@{AttackManeuver}}} {{wndpen=@{hiddenWoundPenalty}}} {{ManMod=@{AttackMnvMod}}} {{Dice=@{AttackAttrDice}}} {{Defense=@{AttackDefense}}} {{Ticks=@{AttackSpeed}}} {{Rank=@{AttackRank}}} {{RollMod=[[@{AttackMod} + @{CircMod}]]}} {{roll=[[ 2d10cs>2cf<9  + @{AttackRank} + @{AttackMnvMod} + @{AttackMod} + @{CircMod} + @{hiddenWoundPenalty} + @{AttackAttrDice}cs0cf0}]]}}"
 								name="roll_Attack" >
 								</button>
 							</td>			
@@ -929,9 +931,10 @@ title="spend  to Ignore wound penalties,
 							<tr>
 								<th class="sheet-width-W30"><H3 class="sheet-header-override">Attack</H3></th>
 								<th class="sheet-width-W10"><H3 class="sheet-header-override">+Info</H3></th>
-								<th class="sheet-width-W20" title="Base Weapon Damage Die"><H3 class="sheet-header-override">Dmg Die</H3></th>
+								<th class="sheet-width-W15" title="Base Weapon Damage Die"><H3 class="sheet-header-override">Dmg Die</H3></th>
 								<th class="sheet-width-W20"><H3 class="sheet-header-override">Attr Dice</H3></th>
-								<th class="sheet-width-W10"><H3 class="sheet-header-override" title="Damage Modifier">Dmg</H3></th>
+								<th class="sheet-width-W10"><H3 class="sheet-header-override" title="Damage Modifier">Dmg M</H3></th>
+								<th class="sheet-width-W5"><H3>Impct</H3></th>								
 								<th class="sheet-width-W10"><H3>Roll</H3></th>
 							</tr>
 						</tbody>
@@ -945,7 +948,7 @@ title="spend  to Ignore wound penalties,
 										<input type="checkbox" class="sheet-hover-hidden" title="click to show or hide attack details" /><span></span>
 										<textarea placeholder="Enter the details of the attack here for reference." class="sheet-tooltip sheet-width-W75" name="attr_FirstAttack-tooltip"></textarea>
 									</td>
-									<td class="sheet-width-W20"><select class="sheet-dropdown sheet-width-W95" name="attr_BaseDamageDie" value="1d6">
+									<td class="sheet-width-W15"><select class="sheet-dropdown sheet-width-W95 sheet-smaller-text" name="attr_BaseDamageDie" value="1d6" style="font-size: 75%;">
 												<option value="1d0">None</option>
 												<option value="1D4">1D4</option>
 												<option value="1D6" selected="true">1D6</option>
@@ -984,9 +987,10 @@ title="spend  to Ignore wound penalties,
 										</select>
 									</td>
 									<td class="sheet-width-W10"><input class="sheet-width-w95" type="number" name="attr_DamageMod"  value="0"/></td>
+									<td class="sheet-width-W5 sheet-center"><span class="sheet-circle"><input class="sheet-width-w95" type="number" name="attr_DmgRollImpact"  value="0"/></span></td>
 									<td class="sheet-width-W10 sheet-center"><button class="sheet-diebutton" type="roll" 
 												title="Damage Roll" 
-												value="&{template:damage_roll} {{name=@{Hero_Name} rolls Damage}} {{AttName=@{FirstAttack}}} {{basedmgdice=@{BaseDamageDie}}} {{attributedmgdice=@{DmgAttr}}} {{rollmod=@{DamageMod}}} {{DamageRoll=[[ {@{BaseDamageDie}cs0cf0 + @{DmgAttr}cs0cf0 + @{DamageMod}, 1d1}kh1 ]]}}"
+												value="&{template:damage_roll} {{name=@{Hero_Name} rolls Damage}} {{AttName=@{FirstAttack}}} {{basedmgdice=@{BaseDamageDie}}} {{attributedmgdice=@{DmgAttr}}} {{Impact=@{DmgRollImpact}}} {{rollmod=@{DamageMod}}} {{DamageRoll=[[ {@{BaseDamageDie}cs0cf0 + @{DmgAttr}cs0cf0 + @{DamageMod}, 1d1}kh1 ]]}}"
 												name="roll_DamageRoll">
 										</button>
 									</td>
@@ -1022,7 +1026,7 @@ title="spend  to Ignore wound penalties,
 										<input type="checkbox" class="sheet-hover-hidden" title="click to show or hide attack details" /><span></span>
 										<textarea placeholder="Enter the details of the weapon such as ammo details, qualities, and ammo tracking." class="sheet-tooltip sheet-width-W75" name="attr_Attack-tooltip"></textarea>
 									</td>
-									<td class="sheet-width-W10 sheet-center"><select class="sheet-width-W100 sheet-dropdown" name="attr_Cartridge" value="0"  title="For guns, identify the type of cartridge being used with the gun.">
+									<td class="sheet-width-W10 sheet-center"><select class="sheet-width-W100 sheet-dropdown" name="attr_Cartridge" value="0"  title="For guns, identify the type of cartridge being used with the gun." style="font-size: 75%;">
 										<option value="0" selected="true" ></option>
 										<option value="1">L</option>
 										<option value="2">M</option>
@@ -1032,7 +1036,7 @@ title="spend  to Ignore wound penalties,
 										</select>
 									</td>	
 									<td class="sheet-width-W10 sheet-center"><span class="sheet-circle"><input type="text" name="attr_AttackRange"  value="0" title="The range of the attack; enter M for melee."/></span></td>
-									<td class="sheet-width-W15"><select class="sheet-dropdown sheet-width-W95" name="attr_DamageDie" value="1d6">
+									<td class="sheet-width-W15 sheet-smaller-text"><select class="sheet-dropdown sheet-width-W95 sheet-smaller-text" name="attr_DamageDie" value="1d6"  style="font-size: 75%;">
 												<option value="1d0">None</option>
 												<option value="1D4">1D4</option>
 												<option value="1D6" selected="true">1D6</option>
@@ -1063,37 +1067,45 @@ title="spend  to Ignore wound penalties,
 	</div>
 
 <!-- Tab 4: Powers & Gear-->
-	<div class="sheet-section sheet-section-pc4">
-		<div class="sheet-header">Burnout</div>
-		<div class="sheet-subsection">	
-			<table>
-				<tbody>	
-					<tr>
-						<td class="sheet-width-W7"><span class="sheet-background">Threshold:</span></td>
-						<td class="sheet-width-W5 sheet-left"><span class="sheet-circle"><input type="number" name="attr_BOThreshold" title="Equal to Discipline or Fortitude plus any modifiers"/></span></td>
-						<td class="sheet-width-W7 sheet-right"><span class="sheet-background">Current:</span></td>
-						<td class="sheet-width-W7 sheet-center"><input class="sheet-width-W95 sheet-spin-button" type="number" name="attr_CurrentBO" title="The total of all modifications to Burnout Threshold."/></span></td>
-						<td class="sheet-width-W5 sheet-right"><span class="sheet-background">Roll:</span></td>							
-						<td class="sheet-width-W5 sheet-center"><button class="sheet-diebutton" type="roll"
-							title="Burnout Check" 
-							value="&{template:burnout_roll} {{name=@{Hero_Name} rolls Burnout}} {{Text= Burnout on 1-2}}{{BORoll=[[ 1d6cf<2 ]]}}"
-							name="roll_Burnout">
-							</button>
-						</td>
-						<td class="sheet-width-W7 sheet-right"><span class="sheet-large-textblocksheet-spin-button" >Modifiers:</span></td>
-						<td class="sheet-width-W7 sheet-center"><input  class="sheet-width-W95 sheet-large-textblock sheet-spin-button" type="number" name="attr_BOMod" title="The total of all modifications to Burnout Threshold."/></span></td>
-						<td class="sheet-width-W5 sheet-right"><span class="sheet-background">Base:</span></td>
-						<td class="sheet-width-W10 sheet-center"><select class="sheet-dropdown sheet-select-attr sheet-width-w95"name="attr_BODefense" value="0" title="This sets the characters Burnout; once selected it cannot be changed.">
-							<option value="0" selected="true"></option>
-							<option value="@{Discipline}">Discipline</option>
-							<option value="@{Fortitude}">Fortitude</option>
-							</select>
-						</td>
-						<td class="sheet-width-W10 sheet-right"><span>Mod Sources:</span></td>
-						<td class="sheet-width-W15"><input class="sheet-width-W95" type="text" name="attr_BOModSources" title="List of what changed a BO and amount"/></td>
-					</tr>								
-				</tbody>
-			</table>
+	<div class="sheet-section sheet-section-pc4">		
+		<div class="sheet-2colrow" width="100%"> 	
+			<div class="sheet-col">
+				<div class="sheet-header">Burnout</div>
+				<div class="sheet-subsection">	
+					<table> <tbody>	
+						<tr>
+							<td class="sheet-width-W20"><span class="sheet-background">BO Threshold:</span></td>
+							<td class="sheet-width-W10 sheet-left"><span class="sheet-circle"><input type="number" name="attr_BOThreshold"  disabled="true" value="((@{BODefense} + @{BOMod}))" title="Value: Discipline or Fortitude + any modifiers"/></span></td>
+							<td class="sheet-width-W10 sheet-right"><span class="sheet-background">Current:</span></td>
+							<td class="sheet-width-W10 sheet-left"><input class="sheet-width-W95 sheet-spin-button" type="number" name="attr_CurrentBO" title="The total of all modifications to Burnout Threshold."/></span></td>
+							<td class="sheet-width-W10 sheet-right"><span class="sheet-background">Roll:</span></td>							
+							<td class="sheet-width-W10"><button class="sheet-diebutton" type="roll"
+								title="Burnout Check" 
+								value="&{template:burnout_roll} {{name=@{Hero_Name} rolls Burnout}} {{Text= Burnout on 1-2}}{{BORoll=[[ 1d6cf<2 ]]}}"
+								name="roll_Burnout">
+								</button>
+							</td>	
+						</tr>	
+						<tr>
+							<td class="sheet-width-W10 sheet-right"><span class="sheet-background">Defense:</span></td>
+							<td class="sheet-width-W10 sheet-left"><select class="sheet-dropdown sheet-select-attr sheet-width-w95"name="attr_BODefense" value="0" title="This sets the characters Burnout; once selected it cannot be changed.">
+								<option value="0" selected="true"></option>
+								<option value="@{Discipline}">Discipline</option>
+								<option value="@{Fortitude}">Fortitude</option>
+								</select>
+							</td>
+							<td class="sheet-width-W10 sheet-right"><span class="sheet-background">Value:</span></td>
+							<td class="sheet-width-W10"><span class="sheet-circle"><input type="number" name="attr_BaseBOThreshold"  disabled="true" value="((@{BODefense}))" title="Base value of the selected defense."/></span></td>
+						</tr>								
+				</tbody></table>
+				</div>	
+			</div>	
+			<div class="sheet-col">
+				<div class="sheet-header">Built Item Quick Reference</div>
+				<div class="sheet-subsection">	
+					<textarea name="attr_BuiltItem" placeholder="Enter description and list of powers, flaws, perks, etc. for built items here."></textarea>
+				</div>
+			</div>
 		</div>
 			
 	<!-- FULL PAGE LAYOUT - POWERS -->
@@ -1138,9 +1150,9 @@ title="spend  to Ignore wound penalties,
 							<option value="@{ResolveModifier}">Re</option>
 						</select>
 					</td>						
-					<td class="sheet-width-W5 sheet-center"><span class="sheet-circle"><input type="number" name="attr_PowerRankR"/></span></td>
-					<td class="sheet-width-W5 sheet-center"><span class="sheet-circle"><input type="text" name="attr_PowerRangeR"></span></td>
-					<td class="sheet-width-W5 sheet-center"><span class="sheet-circle"><input type="text" name="attr_PowerSpeedR"/></span></td>
+					<td class="sheet-width-W5 sheet-center"><span class="sheet-circle"><input type="number" name="attr_PowerRankR"value="0" /></span></td>
+					<td class="sheet-width-W5 sheet-center"><span class="sheet-circle"><input type="text" name="attr_PowerRangeR"value="0" ></span></td>
+					<td class="sheet-width-W5 sheet-center"><span class="sheet-circle"><input type="text" name="attr_PowerSpeedR"value="0" /></span></td>
 					<td class="sheet-width-W5 sheet-center"><span class="sheet-circle"><input type="number" disabled="true" name="attr_PowerPVR" value="((@{PowerRankR} + abs(12) + @{PowerPrimAttr}))" /></span></td>
 					<td class="sheet-width-W5 sheet-center"><span class="sheet-circle"><input type="number" name="attr_PowerBOR" value="0" title="Power Burnout"/></span></td>
 					<td class="sheet-width-W10"><select  class="sheet-select-attr" name="attr_PowerAttrDice" value="0"  
@@ -1163,11 +1175,11 @@ title="spend  to Ignore wound penalties,
 								<option value="3D12!">3D12</option>
 						</select>
 					</td>						
-					<td class="sheet-width-W7 sheet-center" ><input class="sheet-spin-button" type="number" name="attr_PowerModifier" title="Total modifiers from Skill Foci, Advantages, and Power mods applicable to the power roll"/></td>						
-					<td class="sheet-width-W7 sheet-center" ><input class="sheet-spin-button" type="number" name="attr_PowerCircumstancesMod"  title="Circumstance modifiers applicable to the power roll"/></td>				
+					<td class="sheet-width-W7 sheet-center" ><input class="sheet-spin-button" type="number" name="attr_PowerModifier" value="0" title="Total modifiers from Skill Foci, Advantages, and Power mods applicable to the power roll"/></td>						
+					<td class="sheet-width-W7 sheet-center" ><input class="sheet-spin-button" type="number" name="attr_PowerCircumstancesMod"  value="0" title="Circumstance modifiers applicable to the power roll"/></td>				
 					<td class="sheet-width-W5 sheet-center"><button class="sheet-diebutton" type="roll" 
 							title="Power Roll" 
-							value="&{template:power_roll} {{name=@{Hero_Name} makes a power roll}} {{Rolled=@{PowerNameR}}} {{Rank=@{PowerRankR}}} {{rolldice=@{PowerAttrDice}}} {{RollMod=[[@{PowerRankR} + @{PowerModifier} + @{PowerCircumstancesMod}]]}} {{roll=[[ 2d10cs>2cf<9 + @{PowerAttrDice}cs0cf0 + @{PowerRankR} + @{PowerModifier} + @{PowerCircumstancesMod} ]]}}" 
+							value="&{template:power_roll} {{name=@{Hero_Name} makes a power roll}} {{Rolled=@{PowerNameR}}} {{Rank=@{PowerRankR}}} {{wndpen=@{hiddenWoundPenalty}}} {{rolldice=@{PowerAttrDice}}} {{RollMod=[[@{PowerModifier} + @{PowerCircumstancesMod}]]}} {{roll=[[ 2d10cs>2cf<9 + @{PowerAttrDice}cs0cf0 + @{PowerRankR} + @{PowerModifier} + @{PowerCircumstancesMod} + @{hiddenWoundPenalty} ]]}}" 
 							name="roll_MakeAPowerRoll">
 						</button>
 					</td>
@@ -1185,7 +1197,7 @@ title="spend  to Ignore wound penalties,
 					<tr>				
 						<th class="sheet-width-W30"><h3 class="sheet-header-override" title="Name of the Piece of Gear">Gear Name</h3></th>
 						<th class="sheet-width-W10"><h3 title="Gear description in detail.">+Info</h3></th>
-						<th class="sheet-width-W55"><h3 class="sheet-header-override" title="Brief Description">Quick Reference for Game Stats and Effects</h3></th>
+						<th class="sheet-width-W60"><h3 class="sheet-header-override" title="Brief Description">Quick Reference for Game Stats and Effects</h3></th>
 					</tr>
 				</tbody>
 			</table>
@@ -1228,47 +1240,91 @@ title="spend  to Ignore wound penalties,
 						</tr>
 						<tr>
 							<td class="sheet-width-w15"><h3 class="sheet-header-override">XP Available:</h3></td>
-							<td  class="sheet-width-w85 sheet-left"><input class="sheet-bigspin-button" type="number" disabled="true" name="attr_XPAvailable" value="((@{XPEarned} - @{XPSpent}))"/></td>				
+							<td  class="sheet-width-w85 sheet-left"><span class="sheet-circle"><input type="number" disabled="true" name="attr_XPAvailable" value="((@{XPEarned} - @{XPSpent}))"/></span></td>				
 						</tr>
 					</table>	
 				</div>
 			</div>
 			<div class="sheet-col">	
-				<div class="sheet-header">XP Expenditure Options</div>
-				<div class="sheet-subsection sheet-smallfont">	
-						<span class="sheet-margin">1. New Power = 10xp</span><br>
-						<span class="sheet-margin">2. New Skill/New Advantage/Power Exploit/Emulated Power = 5xp</span><br>
-						<span class="sheet-margin">3. New Power Perk = treat each perk mod as a new rank in xp/rank</span><br>
-						<span class="sheet-margin">4. + Rank (attr, skill, power) = new rank in xp/rank; preferred power = current rank/xp</span><br>
-						<span class="sheet-margin">5. Build Things (see page 39)</span>
-				</div>
+				<div class="sheet-header" title="Use this section to apply permanent modifiers to calculated values.">Fixed Modifiers</div>
+				<div class="sheet-subsection">	
+					<table> 
+						<tbody>	
+							<tr>
+								<td class="sheet-width-W7 sheet-right"><span class="sheet-large-textblocksheet-spin-button" >Avoidance:</span></td>
+								<td class="sheet-width-W7 sheet-center"><input  class="sheet-width-W95 sheet-large-textblock sheet-spin-button" type="number" value="0" name="attr_AvoidanceMod" title="The total of all modifications to Avoidance."/></span></td>
+								<td class="sheet-width-W7 sheet-right"><span class="sheet-large-textblocksheet-spin-button" >Fortitude:</span></td>
+								<td class="sheet-width-W7 sheet-center"><input  class="sheet-width-W95 sheet-large-textblock sheet-spin-button" type="number" value="0"  name="attr_FortitudeMod" title="The total of all modifications to Fortitude."/></span></td>
+								<td class="sheet-width-W7 sheet-right"><span class="sheet-large-textblocksheet-spin-button" >Discipline:</span></td>
+								<td class="sheet-width-W7 sheet-center"><input  class="sheet-width-W95 sheet-large-textblock sheet-spin-button" type="number" value="0"  name="attr_DisciplineMod" title="The total of all modifications to Discipline."/></span></td>	
+							</tr>	
+							<tr>
+								<td class="sheet-width-W7 sheet-right"><span class="sheet-large-textblocksheet-spin-button" >Stamina:</span></td>
+								<td class="sheet-width-W7 sheet-center"><input  class="sheet-width-W95 sheet-large-textblock sheet-spin-button" type="number" value="0"  name="attr_StaminaMod" title="The total of all modifications to Stamina."/></span></td>
+								<td class="sheet-width-W7 sheet-right"><span class="sheet-large-textblocksheet-spin-button" >Wounds:</span></td>
+								<td class="sheet-width-W7 sheet-center"><input  class="sheet-width-W95 sheet-large-textblock sheet-spin-button" type="number" value="0"  name="attr_WoundsMod" title="The total of all modifications to Wounds."/></span></td>
+								<td class="sheet-width-W7 sheet-right"><span class="sheet-large-textblocksheet-spin-button" >Pace:</span></td>
+								<td class="sheet-width-W7 sheet-center"><input  class="sheet-width-W95 sheet-large-textblock sheet-spin-button" type="number" value="0"  name="attr_PaceMod" title="The total of all modifications to Pace."/></span></td>	
+							</tr>
+							<tr>
+								<td class="sheet-width-W7 sheet-right"><span class="sheet-large-textblocksheet-spin-button" >Burnout:</span></td>
+								<td class="sheet-width-W7 sheet-center"><input  class="sheet-width-W95 sheet-large-textblock sheet-spin-button" type="number" value="0"  name="attr_BOMod" title="The total of all modifications to Burnout Threshold."/></span></td>		
+								<td class="sheet-width-W7 sheet-right"><span class="sheet-large-textblocksheet-spin-button" >Horror:</span></td>
+								<td class="sheet-width-W7 sheet-center"><input  class="sheet-width-W95 sheet-large-textblock sheet-spin-button" type="number" value="0"  name="attr_HorrorMod" title="The total of all modifications to Horror Points."/></span></td>												
+							</tr>
+						</tbody>
+					</table>
+				</div>	
 			</div>
 		</div>
 			
 		<div class="sheet-header">Advancements Log</div>	
 		<div class="sheet-subsection">
-			<table>
+			<table><tbody>
 				<tr>
-					<td style="width: 10em;" ><span class="sheet-background">Advancement</span></td>
-					<td><span class="sheet-background">Brief Description</span></td>
-					<td style="width: 4em;"><span class="sheet-background">XP Spent</span></td></b>				
+					<td class="sheet-width-w95"><h3 class="sheet-header-override">Advancement</h3></td>
+					<td class="sheet-small-textblock "><h3>XP Spent</h3></td>				
 				</tr>
 				<tr>
-			  		<td style="width: 10em;" ><input type="text" name="attr_Advancement1"/></td>
-					<td><input type="text" name="attr_AdvancementDescription1" style="width: 100%;" /></td>
-					<td><span class="sheet-circle"><input type="number" name="attr_XPSpent1" value="0" /></span></td>
-				</tr>
+			  		<td class="sheet-width-w95"><input class="sheet-width-W100" type="text" name="attr_Advancement1"/></td>
+					<td class="sheet-small-textblock sheet-center"><span class="sheet-circle"><input type="number" name="attr_XPSpent1" value="0" /></span></td>
+				</tr></tbody>
 			</table>
 			<fieldset class="repeating_advancements"> 
-				<table>
+				<table><tbody>
 					<tr>		
-						<td style="width: 10em;" ><input type="text" name="attr_AdvancementR"/></td>
-						<td><input type="text" name="attr_AdvancementDescriptionR" style="width: 100%;" /></td>
-						<td style="width: 4em;"><span class="sheet-circle"><input type="number" name="attr_XPSpentR" value="0" /></span></td>						
-					</tr>
+						<td class="sheet-width-w95"><input class="sheet-width-W100" type="text" name="attr_AdvancementR"/></td>
+						<td class="sheet-small-textblock sheet-center"><span class="sheet-circle"><input type="number" name="attr_XPSpentR" value="0" /></span></td>						
+					</tr></tbody>
 				</table>
 			</fieldset>
 		</div>  
+		<div class="sheet-header">Serial Log (Serial Details and XP Awarded)</div>	
+		<div class="sheet-subsection">
+			<table><tbody>
+				<tr>
+					<td class="sheet-verylarge-textblock"><h3 class="sheet-header-override" >Serial Name</H3></td>
+					<td class="sheet-med-textblock"><H3 class="sheet-header-override" >Award Date</H3></td>
+					<td class="sheet-width-w60"><H3 class="sheet-header-override" >Brief Highlight</H3></td>
+					<td class="sheet-small-textblock "><H3>XP Award</H3></td>
+				</tr></tbody>
+			</table>
+			<fieldset class="repeating_Serial"> 
+				<table><tbody>
+					<tr>		
+						<td class="sheet-verylarge-textblock"><input class="sheet-width-W100" type="text" name="attr_SerialName"/></td>
+						<td class="sheet-med-textblock"><input class="sheet-width-W100" type="text" name="attr_SerialDate"/></td>
+						<td class="sheet-width-w95">
+							<input class="sheet-hover sheet-width-W95" type="text" name="attr_SerialHighlight" />
+							<span name="attr_SerialDetail-tooltip" class="sheet-tooltip"></span>
+							<input type="checkbox" class="sheet-hover-hidden" title="click to show or hide more details on the Serial." /><span></span>
+							<textarea placeholder="Enter more details on the Serial here for reference." class="sheet-tooltip sheet-width-W75" name="attr_SerialDetail-tooltip"></textarea>
+						</td>			
+						<td class="sheet-small-textblock sheet-center"><span class="sheet-circle"><input type="number" name="attr_SerialXPEarned" value="0" /></span></td>			
+					</tr></tbody>
+				</table>
+			</fieldset>
+		</div>  		
 	</div>
   </div>
   
@@ -1412,7 +1468,7 @@ title="spend  to Ignore wound penalties,
 								<td class="sheet-center"><input class="sheet-spin-button" type="number" name="attr_MightRollMod"  value="0" /></td>						
 								<td class="sheet-center"><button class="sheet-diebutton" type="roll" 
 									title="Cast Member Might Roll" 
-									value="&{template:cast_action_roll} {{name=@{Hero_Name} rolls Might}} {{attribute=Might}} {{rolldice=@{MightDie}}} {{rollmod=@{MightRollMod}}} {{roll=[[ 2d10cs>2cf<9 + @{MightDie}cs0cf0 + @{MightRollMod} ]]}}"
+									value="&{template:cast_action_roll} {{name=@{Hero_Name} rolls Might}} {{attribute=Might}} {{wndpen=@{cmvhiddenWoundPenalty}}} {{rolldice=@{MightDie}}} {{rollmod=@{MightRollMod}}} {{roll=[[0 + 0]}} {{roll=[[ 2d10cs>2cf<9 + @{MightDie}cs0cf0 + @{MightRollMod} + @{cmvhiddenWoundPenalty} ]]}}"
 									name="roll_MightRoll" style="font-size: 175%;">
 									</button>
 								</td>
@@ -1443,7 +1499,7 @@ title="spend  to Ignore wound penalties,
 								<td class="sheet-center"><input class="sheet-spin-button" type="number" name="attr_ProwessRollMod"  value="0" /></td>						
 								<td class="sheet-center"><button class="sheet-diebutton" type="roll" 
 									title="Cast Member Prowess Roll" 
-									value="&{template:cast_action_roll} {{name=@{Hero_Name} rolls Prowess}} {{attribute=Prowess}} {{rolldice=@{ProwessDie}}} {{rollmod=@{ProwessRollMod}}} {{roll=[[ 2d10cs>2cf<9 + @{ProwessDie}cs0cf0 + @{ProwessRollMod} ]]}}"
+									value="&{template:cast_action_roll} {{name=@{Hero_Name} rolls Prowess}} {{attribute=Prowess}} {{wndpen=@{cmvhiddenWoundPenalty}}} {{rolldice=@{ProwessDie}}} {{rollmod=@{ProwessRollMod}}} {{roll=[[0 + 0]}} {{roll=[[ 2d10cs>2cf<9 + @{ProwessDie}cs0cf0 + @{ProwessRollMod} + @{cmvhiddenWoundPenalty} ]]}}"
 									name="roll_ProwessRoll" style="font-size: 175%;">
 									</button>
 								</td>	
@@ -1474,7 +1530,7 @@ title="spend  to Ignore wound penalties,
 								<td class="sheet-center"><input class="sheet-spin-button" type="number" name="attr_QuicknessRollMod"  value="0" /></td>						
 								<td class="sheet-center"><button class="sheet-diebutton" type="roll" 
 									title="Cast Member Quickness Roll" 
-									value="&{template:cast_action_roll} {{name=@{Hero_Name} rolls Quickness}} {{attribute=Quickness}} {{rolldice=@{QuicknessDie}}} {{rollmod=@{QuicknessRollMod}}} {{roll=[[ 2d10cs>2cf<9 + @{QuicknessDie}cs0cf0 + @{QuicknessRollMod} ]]}}"
+									value="&{template:cast_action_roll} {{name=@{Hero_Name} rolls Quickness}} {{attribute=Quickness}} {{wndpen=@{cmvhiddenWoundPenalty}}} {{rolldice=@{QuicknessDie}}} {{rollmod=@{QuicknessRollMod}}} {{roll=[[0 + 0]}} {{roll=[[ 2d10cs>2cf<9 + @{QuicknessDie}cs0cf0 + @{QuicknessRollMod} + @{cmvhiddenWoundPenalty} ]]}}"
 									name="roll_QuicknessRoll" style="font-size: 175%;">
 									</button>
 								</td>	
@@ -1505,7 +1561,7 @@ title="spend  to Ignore wound penalties,
 								<td class="sheet-center"><input class="sheet-spin-button" type="number" name="attr_VigorRollMod"  value="0" /></td>						
 								<td class="sheet-center"><button class="sheet-diebutton" type="roll" 
 									title="Cast Member Vigor Roll" 
-									value="&{template:cast_action_roll} {{name=@{Hero_Name} rolls Vigor}} {{attribute=Vigor}} {{rolldice=@{VigorDie}}} {{rollmod=@{VigorRollMod}}} {{roll=[[ 2d10cs>2cf<9 + @{VigorDie}cs0cf0 + @{VigorRollMod} ]]}}"
+									value="&{template:cast_action_roll} {{name=@{Hero_Name} rolls Vigor}} {{attribute=Vigor}} {{wndpen=@{cmvhiddenWoundPenalty}}} {{rolldice=@{VigorDie}}} {{rollmod=@{VigorRollMod}}} {{roll=[[0 + 0]}} {{roll=[[ 2d10cs>2cf<9 + @{VigorDie}cs0cf0 + @{VigorRollMod} + @{cmvhiddenWoundPenalty} ]]}}"
 									name="roll_VigorRoll" style="font-size: 175%;">
 									</button>
 								</td>	
@@ -1536,7 +1592,7 @@ title="spend  to Ignore wound penalties,
 								<td class="sheet-center"><input class="sheet-spin-button" type="number" name="attr_CharismaRollMod"  value="0" /></td>						
 								<td class="sheet-center"><button class="sheet-diebutton" type="roll" 
 									title="Cast Member Charisma Roll" 
-									value="&{template:cast_action_roll} {{name=@{Hero_Name} rolls Charisma}} {{attribute=Charisma}} {{rolldice=@{CharismaDie}}} {{rollmod=@{CharismaRollMod}}} {{roll=[[ 2d10cs>2cf<9 + @{CharismaDie}cs0cf0 + @{CharismaRollMod} ]]}}"
+									value="&{template:cast_action_roll} {{name=@{Hero_Name} rolls Charisma}} {{attribute=Charisma}} {{wndpen=@{cmvhiddenWoundPenalty}}} {{rolldice=@{CharismaDie}}} {{rollmod=@{CharismaRollMod}}} {{roll=[[0 + 0]}} {{roll=[[ 2d10cs>2cf<9 + @{CharismaDie}cs0cf0 + @{CharismaRollMod} + @{cmvhiddenWoundPenalty} ]]}}"
 									name="roll_CharismaRoll" style="font-size: 175%;">
 									</button>
 								</td>	
@@ -1567,7 +1623,7 @@ title="spend  to Ignore wound penalties,
 								<td class="sheet-center"><input class="sheet-spin-button" type="number" name="attr_InsightRollMod"  value="0" /></td>						
 								<td class="sheet-center"><button class="sheet-diebutton" type="roll" 
 									title="Cast Member Insight Roll" 
-									value="&{template:cast_action_roll} {{name=@{Hero_Name} rolls Insight}} {{attribute=Insight}} {{rolldice=@{InsightDie}}} {{rollmod=@{InsightRollMod}}} {{roll=[[ 2d10cs>2cf<9 + @{InsightDie}cs0cf0 + @{InsightRollMod} ]]}}"
+									value="&{template:cast_action_roll} {{name=@{Hero_Name} rolls Insight}} {{attribute=Insight}} {{wndpen=@{cmvhiddenWoundPenalty}}} {{rolldice=@{InsightDie}}} {{rollmod=@{InsightRollMod}}} {{roll=[[0 + 0]}} {{roll=[[ 2d10cs>2cf<9 + @{InsightDie}cs0cf0 + @{InsightRollMod} + @{cmvhiddenWoundPenalty} ]]}}"
 									name="roll_InsightRoll" style="font-size: 175%;">
 									</button>
 								</td>	
@@ -1598,7 +1654,7 @@ title="spend  to Ignore wound penalties,
 								<td class="sheet-center"><input class="sheet-spin-button" type="number" name="attr_LogicRollMod"  value="0" /></td>						
 								<td class="sheet-center"><button class="sheet-diebutton" type="roll" 
 									title="Cast Member Logic Roll" 
-									value="&{template:cast_action_roll} {{name=@{Hero_Name} rolls Logic}} {{attribute=Logic}} {{rolldice=@{LogicDie}}} {{rollmod=@{LogicRollMod}}} {{roll=[[ 2d10cs>2cf<9 + @{LogicDie}cs0cf0 + @{LogicRollMod} ]]}}"
+									value="&{template:cast_action_roll} {{name=@{Hero_Name} rolls Logic}} {{attribute=Logic}} {{wndpen=@{cmvhiddenWoundPenalty}}} {{rolldice=@{LogicDie}}} {{rollmod=@{LogicRollMod}}} {{roll=[[0 + 0]}} {{roll=[[ 2d10cs>2cf<9 + @{LogicDie}cs0cf0 + @{LogicRollMod} + @{cmvhiddenWoundPenalty} ]]}}"
 									name="roll_LogicRoll" style="font-size: 175%;">
 									</button>
 								</td>	
@@ -1629,7 +1685,7 @@ title="spend  to Ignore wound penalties,
 								<td class="sheet-center"><input class="sheet-spin-button" type="number" name="attr_ResolveRollMod"  value="0" /></td>						
 								<td class="sheet-center"><button class="sheet-diebutton" type="roll" 
 									title="Cast Member Resolve Roll" 
-									value="&{template:cast_action_roll} {{name=@{Hero_Name} rolls Resolve}} {{attribute=Resolve}} {{rolldice=@{ResolveDie}}} {{rollmod=@{ResolveRollMod}}} {{roll=[[ 2d10cs>2cf<9 + @{ResolveDie}cs0cf0 + @{ResolveRollMod} ]]}}"
+									value="&{template:cast_action_roll} {{name=@{Hero_Name} rolls Resolve}} {{attribute=Resolve}} {{wndpen=@{cmvhiddenWoundPenalty}}} {{rolldice=@{ResolveDie}}} {{rollmod=@{ResolveRollMod}}} {{roll=[[0 + 0]}} {{roll=[[ 2d10cs>2cf<9 + @{ResolveDie}cs0cf0 + @{ResolveRollMod} + @{cmvhiddenWoundPenalty} ]]}}"
 									name="roll_ResolveRoll" style="font-size: 175%;">
 									</button>
 								</td>	
@@ -1702,11 +1758,11 @@ title="spend  to Ignore wound penalties,
 						<tbody>
 						<tr>
 							<td class="sheet-width-W10"><span class="sheet-background">Stamina:</span></td>
-							<td class="sheet-width-W10 sheet-left"><span class="sheet-circle"><input type="number" name="attr_Stamina" title="use this field to track starting wounds."/></span></td>
+							<td class="sheet-width-W10 sheet-left"><span class="sheet-circle"><input type="number" name="attr_Stamina" title="use this field to track starting stamina."/></span></td>
 							<td class="sheet-width-W15 sheet-center"><input class="sheet-width-W100 sheet-bigspin-button" type="number" name="attr_CurrentStamina" title="use this field to track current stamina."/></td>
 							<td class="sheet-width-W10 sheet-right"><span class="sheet-background">Wounds:</span></td>
-							<td class="sheet-width-W10 sheet-left"><span class="sheet-circle"><input type="number" name="attr_Wounds" title="use this field to track starting wounds."/></span></td>
-							<td class="sheet-width-W15 sheet-center"><input class="sheet-width-W100 sheet-bigspin-button" type="number" name="attr_CurrentWounds" title="use this field to track current wounds."/>  </td>
+							<td class="sheet-width-W10 sheet-left"><span class="sheet-circle"><input type="number" name="attr_cmvWounds" title="use this field to track starting wounds."/></span></td>
+							<td class="sheet-width-W15 sheet-center"><input class="sheet-width-W100 sheet-bigspin-button" type="number" name="attr_cmvCurrentWounds" title="use this field to track current wounds."/>  </td>
 						</tr>						
 						</tbody>
 					</table>
@@ -1714,21 +1770,21 @@ title="spend  to Ignore wound penalties,
 							
 				<div class="sheet-header">Other Details</div>	
 				<div class="sheet-subsection">	
-					<table>
+					<table class="sheet-width-W100">
 						<tr>
-							<td class="sheet-width-W15 sheet-left"><span class="sheet-background">BO Threshold:</span></td>
+							<td class="sheet-width-W20 sheet-left"><span class="sheet-background">BO Threshold:</span></td>
 							<td class="sheet-width-W5 sheet-left"><span class="sheet-circle"><input type="number" name="attr_BOThreshold" 
-							title="The threshold at which point the character may burnout when using a power."/></span></td>
-							<td class="sheet-width-W20 sheet-right"><span class="sheet-background">Curr. BO:</span></td>
-							<td class="sheet-width-W7 sheet-left"><input class="sheet-width-W95 sheet-spin-button" type="number" name="attr_CurrentBO" title="The total of all modifications to Burnout Threshold."/></span></td>
-							<td class="sheet-width-W7 sheet-right"><span class="sheet-background">Roll:</span></td>							
-							<td class="sheet-width-W7 sheet-center">
+							title="Value: Fortitude or Discipline Defense value"/></span></td>
+							<td class="sheet-width-W15 sheet-right"><span class="sheet-background">Curr. BO:</span></td>
+							<td class="sheet-width-W10 sheet-left"><input class="sheet-width-W95 sheet-spin-button" type="number" name="attr_CurrentBO" title="The total of all modifications to Burnout Threshold."/></span></td>
+							<td class="sheet-width-W15 sheet-right"><span class="sheet-background">BO Roll:</span></td>							
+							<td class="sheet-width-W10 sheet-center">
 								<button class="sheet-diebutton" type="roll"
 									title="Cast Member Burnout Check" 
 									value="&{template:cast_burnout_roll} {{name=@{Hero_Name} rolls Burnout}} {{Text= Burnout on 1-2}}{{roll=[[ 1d6cf<2 ]]}}"
 									name="roll_Burnout">
 								</button>
-							</td>						
+							</td>	
 						</tr>
 					</table>
 					<table style="margin-top: 5px;margin-bottom: 2px;">					
@@ -1762,10 +1818,21 @@ title="spend  to Ignore wound penalties,
 				</div>	
 			</div>	
 		</div>
-	
+		<!-- Cast Member Attacks and Damage -->
 		<div class="sheet-header" >Attacks and Damage </div>
 		<div class="sheet-subsection">
 			<!-- Attacks -->
+			<table>
+				<tr>
+					<td class="sheet-smallfont" style="width:11em;"><span style="color: red;" title="Wound Penalty">Wound Penalty:&nbsp;
+						<span class="sheet-noborder"><input type="number" value="((@{cmvHiddenWoundPenalty}))" disabled="true" name="attr_cmvWoundPenalty" style="color: red;"></span></td>
+					<td class="sheet-smallfont sheet-left"  style="width: 10em; color: red;">
+				 		<input type="radio" value="apply" checked="true" name="attr_cmvWndPenToUse"/>&nbsp;apply&nbsp;  
+						<input type="radio" value="ignore" name="attr_cmvWndPenToUse"/>&nbsp;ignore
+					</td>
+					<td></td>
+				</tr>
+			</table>
 			<table> 
 				<tbody>
 					<tr>					
@@ -1777,9 +1844,10 @@ title="spend  to Ignore wound penalties,
 						<th class="sheet-width-W7">	<h3 title="Total of Rank, Foci, Power, and Advantage modifiers.">ATK Mod</h3></th>
 						<th class="sheet-width-W7">	<h3 title="Total of maneuver and circumstance modifiers.">Circ Mod</h3></th>
 						<th class="sheet-width-W5">	<h3 title="Button for making the roll." >ATK</h3></th>
-						<th class="sheet-width-W10"><h3 class="sheet-header-override" title="Base damage dice rolled for damage" >Dmg Dice</h3></th>
+						<th class="sheet-width-W7"><h3 class="sheet-header-override" title="Base damage dice rolled for damage" >Dmg Dice</h3></th>
 						<th class="sheet-width-W10"><h3 class="sheet-header-override" title="Attribute dice rolled for the damage" >Attr Dmg Dice</h3></th>
 						<th class="sheet-width-W7"> <H3 title="total of all modifiers to damage." >Dmg Mod</H3></th>
+						<th class="sheet-width-W5"> <H3 title="total of all modifiers to damage." >Impct</H3></th>
 						<th class="sheet-width-W5">	<h3 title="Button for making the roll." >Dmg</h3></th>		
 					</tr>
 				</tbody>
@@ -1820,12 +1888,12 @@ title="spend  to Ignore wound penalties,
 							<td class="sheet-width-W7 sheet-center"><input class="sheet-width-W100 sheet-spin-button" type="number" name="attr_CastCircMod" value="0" title="Total of all Circumstance Mods; leave 0 if none." /></td>
 							<td class="sheet-width-W5 sheet-center"><button class="sheet-diebutton" type="roll" 
 									title="Click to roll Cast  Member  attack" 
-									value="&{template:cast_attack_roll} {{name=@{Hero_Name} makes an Attack}} {{AttName=@{CastAttackName}}} {{Dice=@{CastAttackAttrDice}}} {{Range=@{CastAttackRange}}} {{Ticks=@{CastAttackSpeed}}} {{roll=[[@{CastAttackMod} + @{CastCircMod}}} {{roll=[[ 2d10cs>2cf<9  + @{CastAttackMod} + @{CastCircMod} + @{CastAttackAttrDice}cs0cf0}]]}}"
+									value="&{template:cast_attack_roll} {{name=@{Hero_Name} makes an Attack}} {{AttName=@{CastAttackName}}} {{wndpen=@{cmvHiddenWoundPenalty}}} {{Dice=@{CastAttackAttrDice}}} {{Range=@{CastAttackRange}}} {{Ticks=@{CastAttackSpeed}}} {{roll=[[0 + 0]}} {{roll=[[ 2d10cs>2cf<9  + @{CastAttackMod} + @{CastCircMod} + @{cmvHiddenWoundPenalty} + @{CastAttackAttrDice}cs0cf0}]]}}"
 									name="roll_CastAttack" >
 								</button>
 							</td>
-													
-							<td class="sheet-width-W10"><select class="sheet-dropdown sheet-width-W95" name="attr_CastBaseDamageDie" value="1d6">
+	
+							<td class="sheet-width-W7"><select class="sheet-dropdown sheet-width-W95" name="attr_CastBaseDamageDie" value="1d6" style="font-size: 75%;">
 									<option value="1d0">None</option>
 									<option value="1D4">1D4</option>
 									<option value="1D6" selected="true">1D6</option>
@@ -1844,7 +1912,7 @@ title="spend  to Ignore wound penalties,
 								</select>
 							</td>				
 							<td class="sheet-width-W10 sheet-center"><select class="sheet-select-attr"  name="attr_CastDmgAttr" value="0"   
-									title="Defaults to 0; select the dice according to the attribute plus any die bumps.">
+									title="Defaults to 0; select the dice according to the attribute plus any die bumps." style="font-size:75%;">
 									<option value="1d0" selected="true">None</option>
 									<option value="1D4!">1d4</option> 
 									<option value="1D6!" >1D6</option>
@@ -1864,10 +1932,11 @@ title="spend  to Ignore wound penalties,
 								</select>
 							</td>
 							<td class="sheet-width-W7 sheet-center"><input class="sheet-width-W100 sheet-spin-button" type="number" name="attr_DamageMod" value="0" title="Total of all Damage modifiers; leave 0 if none."/></td>
+							<td class="sheet-width-W5 sheet-center"><span class="sheet-circle"><input type="text" name="attr_CastDmgRollImpact"  value="0" title="Impact Value of the attack."/></span></td>
 							<td class="sheet-width-W5 sheet-center">
 								<button class="sheet-diebutton" type="roll" 
 										title="Cast Member Damage Roll" 
-										value="&{template:cast_damage_roll} {{name=@{Hero_Name} rolls Damage}} {{AttName=@{CastAttackName}}} {{basedmgdice=@{CastBaseDamageDie}}} {{DmgAttr=@{CastDmgAttr}}} {{rollmod=@{DamageMod}}} {{roll=[[ {@{CastBaseDamageDie}cs0cf0 + @{CastDmgAttr}cs0cf0 + @{DamageMod}, 1d1}kh1 ]]}}"
+										value="&{template:cast_damage_roll} {{name=@{Hero_Name} rolls Damage}} {{AttName=@{CastAttackName}}} {{basedmgdice=@{CastBaseDamageDie}}} {{DmgAttr=@{CastDmgAttr}}}  {{Impact=@{CastDmgRollImpact}}} {{rollmod=@{DamageMod}}} {{roll=[[0 + 0]}} {{roll=[[ {@{CastBaseDamageDie}cs0cf0 + @{CastDmgAttr}cs0cf0 + @{DamageMod}, 1d1}kh1 ]]}}"
 										name="roll_CastDamageRoll">
 								</button>
 							</td>			
@@ -1928,7 +1997,7 @@ title="spend  to Ignore wound penalties,
 									></td>				
 									<td class="sheet-width-W10 sheet-center"><button class="sheet-diebutton" type="roll" 
 										title="Cast Member Skill Roll" 
-										value="&{template:cast_powerskill_roll} {{name=@{Hero_Name} makes a Skill roll}} {{SkillPowerName=@{CastSkillName}}} {{Type=Skill}} {{rolldice=@{CastSkillAttr}}} {{roll=[[ 2d10cs>2cf<9 + @{CastSkillAttr}cs0cf0 + @{CastSkillMod} ]]}}" 
+										value="&{template:cast_powerskill_roll} {{name=@{Hero_Name} makes a Skill roll}} {{SkillPowerName=@{CastSkillName}}} {{wndpen=@{cmvHiddenWoundPenalty}}} {{Type=Skill}} {{rolldice=@{CastSkillAttr}}} {{roll=[[0 + 0]}} {{roll=[[ 2d10cs>2cf<9 + @{CastSkillAttr}cs0cf0 + @{CastSkillMod} + @{cmvHiddenWoundPenalty} ]]}}" 
 										name="roll_CastSkillRoll">
 										</button>								
 									</td>
@@ -1988,7 +2057,7 @@ title="spend  to Ignore wound penalties,
 									</td>									
 									<td class="sheet-width-W10 sheet-center"><button class="sheet-diebutton" type="roll" 
 											title="Cast Member Power Roll" 
-											value="&{template:cast_powerskill_roll} {{name=@{Hero_Name} makes a Power roll}} {{SkillPowerName=@{CastPowerName}}} {{Type=Power}} {{rolldice=@{CastPowerAttr}}} {{roll=[[ 2d10cs>2cf<9 + @{CastPowerAttr}cs0cf0 + @{CastPowerMod}]]}}" 
+											value="&{template:cast_powerskill_roll} {{name=@{Hero_Name} makes a Power roll}} {{SkillPowerName=@{CastPowerName}}} {{wndpen=@{cmvHiddenWoundPenalty}}} {{Type=Power}} {{rolldice=@{CastPowerAttr}}} {{roll=[[0 + 0]}} {{roll=[[ 2d10cs>2cf<9 + @{CastPowerAttr}cs0cf0 + @{CastPowerMod} + @{cmvHiddenWoundPenalty} ]]}}" 
 											name="roll_CastPowerRollR">
 									</button>
 									</td>			
@@ -2000,6 +2069,20 @@ title="spend  to Ignore wound penalties,
 			</div>
 		</div>	
   </div>
+  <!-- ************************************** Hidden Fields for Sheet Workers ************************************** -->
+  
+	<!-- FOR COMPLETE CHARACTER: -->
+		<!-- seperate field for capturing radio button output due to use of multiple radio buttons (fix for need to double click the radio button) -->
+		<input type="hidden" name="attr_hiddenWoundPenalty" value="((@{WndPenToUse}))"/></td> 
+		<!-- captures wound penalty as a sheet worker changing a disabled field value enables it -->
+		<input type="hidden" name="attr_hiddenWoundPenalty" value="0"/></td>
+		
+	<!-- FOR CAST Member View CHARACTER: -->
+		<!-- seperate field for capturing radio button output due to use of multiple radio buttons (Having the same radio button for cmv and full character resulted in odd behavior with radio button) -->
+		<input type="hidden" name="attr_cmvWoundPenaltyOption" value="((@{cmvWndPenToUse}))"/></td> 
+		<!-- captures wound penalty as a sheet worker changing a disabled field value enables it -->
+		<input type="hidden" name="attr_cmvHiddenWoundPenalty" value="0"/></td>
+	
 </div>
 
   <!-- ************************************** ROLL TEMPLATES ************************************** -->
@@ -2011,6 +2094,7 @@ title="spend  to Ignore wound penalties,
         <tr><td><span class="tcat">Attribute: </span></td><td><span style="text-align:left">{{attribute}}</span></td></tr>
         <tr><td><span class="tcat">Attribute Dice: </span></td><td><span style="text-align:left">{{rolldice}}</span></td></tr>
 		<tr><td><span class="tcat">Modifier: </span></td><td><span style="text-align:left">{{rollmod}}</span></td></tr>
+		<tr><td><span class="tcat">Wnd Pen: </span></td><td><span style="text-align:left">{{wndpen}}</span></td></tr>
         <tr><td><span class="tcat">Roll: </span></td><td><span style="text-align:left">{{AttributeRoll}}</span></td></tr>
     </table>
 </rolltemplate>
@@ -2023,6 +2107,7 @@ title="spend  to Ignore wound penalties,
         <tr><td><span class="tcat">Attribute: </span></td><td><span style="text-align:left">{{attributedmgdice}}</span></td></tr>		
 		<tr><td><span class="tcat">Modifier: </span></td><td><span style="text-align:left">{{rollmod}}</span></td></tr>
         <tr><td><span class="tcat">Damage Roll: </span></td><td><span style="text-align:left">{{DamageRoll}}</span></td></tr>
+        <tr><td><span class="tcat">Impact Mod: </span></td><td><span style="text-align:left">{{Impact}}</span></td></tr>
     </table>
 </rolltemplate>
 
@@ -2033,6 +2118,7 @@ title="spend  to Ignore wound penalties,
         <tr><td><span class="tcat">Rank: </span></td><td><span style="text-align:left">{{Rank}}</span></td></tr>
         <tr><td><span class="tcat">Dice: </span></td><td><span style="text-align:left">{{rolldice}}</span></td></tr>
         <tr><td><span class="tcat">Modifier: </span></td><td><span style="text-align:left">{{rollmod}}</span></td></tr>
+		<tr><td><span class="tcat">Wnd Pen: </span></td><td><span style="text-align:left">{{wndpen}}</span></td></tr>
         <tr><td><span class="tcat">Roll: </span></td><td><span style="text-align:left">{{roll}}</span></td></tr>
     </table>
 </rolltemplate>
@@ -2044,6 +2130,7 @@ title="spend  to Ignore wound penalties,
         <tr><td><span class="tcat">Rank: </span></td><td><span style="text-align:left">{{Rank}}</span></td></tr>
         <tr><td><span class="tcat">Dice: </span></td><td><span style="text-align:left">{{rolldice}}</span></td></tr>
         <tr><td><span class="tcat">Modifier: </span></td><td><span style="text-align:left">{{RollMod}}</span></td></tr>
+		<tr><td><span class="tcat">Wnd Pen: </span></td><td><span style="text-align:left">{{wndpen}}</span></td></tr>
         <tr><td><span class="tcat">Roll: </span></td><td><span style="text-align:left">{{roll}}</span></td></tr>
     </table>
 </rolltemplate>
@@ -2058,8 +2145,8 @@ title="spend  to Ignore wound penalties,
 		<tr><td><span class="tcat">Defense: </span></td><td><span style="text-align:left">{{Defense}}</span></td></tr>
 		<tr><td><span class="tcat">Speed: </span></td><td><span style="text-align:left">{{Ticks}} Ticks</span></td></tr>
         <tr><td><span class="tcat">Rank: </span></td><td><span style="text-align:left">{{Rank}}</span></td></tr>
-        <tr><td><span class="tcat">Attack Mod: </span></td><td><span style="text-align:left">{{AttkMod}}</span></td></tr>
-        <tr><td><span class="tcat">Circumstance: </span></td><td><span style="text-align:left">{{CircMod}}</span></td></tr>
+        <tr><td><span class="tcat">Attack Mod: </span></td><td><span style="text-align:left">{{RollMod}}</span></td></tr>
+		<tr><td><span class="tcat">Wnd Pen: </span></td><td><span style="text-align:left">{{wndpen}}</span></td></tr>
         <tr><td><span class="tcat">Roll: </span></td><td><span style="text-align:left">{{roll}}</span></td></tr>
     </table>
 </rolltemplate>
@@ -2071,6 +2158,7 @@ title="spend  to Ignore wound penalties,
         <tr><td><span class="tcat">Dice: </span></td><td><span style="text-align:left">{{Rolled}}</span></td></tr>
         <tr><td><span class="tcat">Rank: </span></td><td><span style="text-align:left">{{Rank}}</span></td></tr>
         <tr><td><span class="tcat">Modifier: </span></td><td><span style="text-align:left">{{APARMod}}</span></td></tr>
+		<tr><td><span class="tcat">Wnd Pen: </span></td><td><span style="text-align:left">{{wndpen}}</span></td></tr>
         <tr><td><span class="tcat">Roll: </span></td><td><span style="text-align:left">{{GeneralRoll}}</span></td></tr>
     </table>
 </rolltemplate>
@@ -2115,6 +2203,7 @@ title="spend  to Ignore wound penalties,
         <tr><td><span class="tcat">Skill: </span></td><td><span style="text-align:left">{{SkillPowerName}}</span></td></tr>
         <tr><td><span class="tcat">Type: </span></td><td><span style="text-align:left">{{Type}}</span></td></tr>
         <tr><td><span class="tcat">Dice: </span></td><td><span style="text-align:left">{{rolldice}}</span></td></tr>
+		<tr><td><span class="tcat">Wnd Pen: </span></td><td><span style="text-align:left">{{wndpen}}</span></td></tr>
         <tr><td><span class="tcat">Roll: </span></td><td><span style="text-align:left">{{roll}}</span></td></tr>
     </table>
 </rolltemplate>
@@ -2132,7 +2221,7 @@ title="spend  to Ignore wound penalties,
         <tr><th colspan="2">{{name}}</th></tr>
         <tr><td><span class="tcat">Attribute: </span></td><td><span style="text-align:left">{{attribute}}</span></td></tr>
         <tr><td><span class="tcat">Attribute Dice: </span></td><td><span style="text-align:left">{{rolldice}}</span></td></tr>
-		<!-- <tr><td><span class="tcat">Modifier: </span></td><td><span style="text-align:left">{{rollmod}}</span></td></tr>-->  <!-- Commenting out modifiers by CAST till after the sheet has gone through play -->
+		<tr><td><span class="tcat">Wnd Pen: </span></td><td><span style="text-align:left">{{wndpen}}</span></td></tr>
         <tr><td><span class="tcat">Roll: </span></td><td><span style="text-align:left">{{roll}}</span></td></tr>
     </table>
 </rolltemplate>
@@ -2144,7 +2233,7 @@ title="spend  to Ignore wound penalties,
         <tr><td><span class="tcat">Dice: </span></td><td><span style="text-align:left">{{Dice}}</span></td></tr>
 		<tr><td><span class="tcat">Range: </span></td><td><span style="text-align:left">{{Range}}</span></td></tr>
 		<tr><td><span class="tcat">Speed: </span></td><td><span style="text-align:left">{{Ticks}} Ticks</span></td></tr>
-       <!--  <tr><td><span class="tcat">Attack Mod: </span></td><td><span style="text-align:left">{{ATKMod}}</span></td></tr>-->   <!-- Commenting out modifiers by CAST till after the sheet has gone through play -->
+		<tr><td><span class="tcat">Wnd Pen: </span></td><td><span style="text-align:left">{{wndpen}}</span></td></tr>
         <tr><td><span class="tcat">Roll: </span></td><td><span style="text-align:left">{{roll}}</span></td></tr>
     </table>
 </rolltemplate>
@@ -2154,9 +2243,9 @@ title="spend  to Ignore wound penalties,
         <tr><th colspan="2">{{name}}</th></tr>
         <tr><td><span class="tcat">Attack: </span></td><td><span style="text-align:left">{{AttName}}</span></td></tr>
         <tr><td><span class="tcat">Base Dice: </span></td><td><span style="text-align:left">{{basedmgdice}}</span></td></tr>
-        <tr><td><span class="tcat">Attribute: </span></td><td><span style="text-align:left">{{DmgAttr}}</span></td></tr>		
-		<!-- <tr><td><span class="tcat">Modifier: </span></td><td><span style="text-align:left">{{rollmod}}</span></td></tr> -->   <!-- Commenting out modifiers by CAST till after the sheet has gone through play -->
+        <tr><td><span class="tcat">Attribute: </span></td><td><span style="text-align:left">{{DmgAttr}}</span></td></tr>	
         <tr><td><span class="tcat">Damage Roll: </span></td><td><span style="text-align:left">{{roll}}</span></td></tr>
+        <tr><td><span class="tcat">Impact Mod: </span></td><td><span style="text-align:left">{{Impact}}</span></td></tr>
     </table>
 </rolltemplate>
 
@@ -2167,3 +2256,36 @@ title="spend  to Ignore wound penalties,
         <tr><td><span class="tcat">Roll: </span></td><td><span style="text-align:left">{{roll}}</span></td></tr>
     </table>
 </rolltemplate>
+
+<script type="text/worker">
+
+	// Calculate WoundPenalty for Characters capping it at 0
+	// VigorModifier is referenced here for calculating Wounds; if this somehow changes will need to work that in as well.
+	// When radio button (wndpentouse) changes, set Wound Penalty (hiddenWoundPenalty input value) to the value from wndpentouse; there are instances when wndpentouse can be positive... in that situation it needs to be 0
+	on("change:wndpentouse change:currentwounds change:vigormodifier change:woundsmod", function() { 
+		getAttrs(["wndpentouse","currentwounds","vigormodifier", "woundsmod"], function(values) { 
+			var tempwnds = (values.vigormodifier*1);
+			tempwnds = tempwnds + 1 + (values.woundsmod*1);
+			if(values.wndpentouse == "ignore") {
+				setAttrs({hiddenwoundpenalty: 0});
+			}
+			else {
+				setAttrs({hiddenwoundpenalty: Math.min(0,((values.currentwounds*1) - tempwnds))});
+			}
+		});
+	});
+
+	// Calculate WoundPenalty for Cast Member View capping it at 0
+	// When radio button (cmvwndpentouse) changes, set Wound Penalty (cmvhiddenWoundPenalty input value) to the value from wndpentouse; there are instances when wndpentouse can be positive... in that situation it needs to be 0
+	on("change:cmvwndpentouse change:cmvcurrentwounds change:cmvwounds", function() { 
+		getAttrs(["cmvwndpentouse","cmvcurrentwounds","cmvwounds"], function(values) { 
+			if(values.cmvwndpentouse == "ignore") {
+				setAttrs({cmvhiddenwoundpenalty: 0});
+			}
+			else {
+				setAttrs({cmvhiddenwoundpenalty: Math.min(0,((values.cmvcurrentwounds*1) - (values.cmvwounds*1)))});
+			}
+		});
+	});	
+	
+</script>
