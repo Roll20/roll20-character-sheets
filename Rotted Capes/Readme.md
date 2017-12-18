@@ -12,7 +12,7 @@ This sheet came into being through my experimentation in adapting sheets for my 
 
 Short Term:
 
-* Shake-out sheet in play (targeted next updates will be January 2018)
+* Shake-out sheet in play (target stable state by mid to end of January)
 * Expand Tagging
 * Further refinement of layout and coloration of the sheet and inline messages
 
@@ -25,6 +25,19 @@ Long term:
 * Add a tab for managing global settings for further automation (such as reducing avoidance based on being larger)
 	
 ### Changelog
+** December 18, 2017: version 1.02 ** 
+* updated icon for tooltips
+* added hover ability for entered tooltips (hover over the field in front of the icon)
+* Implemented auto-calculation of Pace, Avoidance, Fortitude, Discipline, BO Threshold, Wounds, and Stamina with modifier
+* Added two new sections to Advancements: Fixed Modifications and XP Earned (serial log)
+* Can now set fixed modifier values for Pace, Avoidance, Fortitude, Discipline, BO Threshold, Wounds, Stamina, and Horror Points
+* Wound penalty is automatically added to all action rolls if apply is toggled; it becomes zero if the ignore option is toggled
+* Added option to apply (default) or ignore wound penalty
+* CSM inline rolls will not show the roll value (purposefully hidden)
+* Added Impact to the Attack Details Damage Roll so it appears in the inline results for ease of reference
+* Added text block for capturing Built Items
+* Misc Fixes: die roll embeded in modifiers for skills, attack roll mods are now merged, layout to Gear table, layout to Advancements, layout tweaks to Cast member view
+
 ** December 11, 2017: version 1.01 ** 
 * Multiple fixes to variable names
 * Layout fixes
