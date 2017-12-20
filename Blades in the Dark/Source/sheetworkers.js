@@ -1,6 +1,6 @@
 "use strict";
 /* DATA */
-const sheetVersion = "2.5",
+const sheetVersion = "2.6",
 	crewData = {
 		assassins: {
 			base: {
@@ -316,6 +316,7 @@ const sheetVersion = "2.5",
 				claim_bridge_6_7: 0,
 				claim_bridge_12_13: 0,
 				claim_bridge_13_14: 0,
+				cohort1_description: "vehicle_edges_flaws",
 				cohort1_name: "vehicle",
 				cohort1_subtype: "boat_carriage_other",
 				cohort1_type: "expert",
@@ -688,7 +689,7 @@ const sheetVersion = "2.5",
 				gatherinfo3: "gatherinfo_what_is_hidden",
 				gatherinfo4: "gatherinfo_what_do_they_intend",
 				gatherinfo5: "gatherinfo_what_drives_them",
-				gatherinfo6: "gatherinfo_reveal",
+				gatherinfo6: "gatherinfo_how_can_I_reveal",
 				playbook_description: "playbook_whisper_description",
 				study: "1",
 				xp_condition: "playbook_whisper_xp_condition"
@@ -1291,6 +1292,7 @@ Object.keys(crewData).forEach(crew => {
 		translatedBaseAttributes = [
 			...[...Array(16).keys()].slice(1).map(i => `claim_${i}_name`),
 			...[...Array(16).keys()].slice(1).map(i => `claim_${i}_desc`),
+			'cohort1_description',
 			'cohort1_name',
 			'cohort1_subtype',
 			'crew_description',
@@ -1539,13 +1541,17 @@ const crewAttributes = [...new Set([].concat(...Object.keys(crewData).map(x => O
 		'playbookitem',
 		'upgrade'
 	],
-	spiritPlaybooks = ['ghost', 'hull', 'vampire'];
+	spiritPlaybooks = ['ghost', 'hull', 'vampire'],
+	translatedNames = [...Object.keys(playbookData), ...Object.keys(crewData)].reduce((m, keyName) => {
+		if (getTranslationByKey(keyName)) m[getTranslationByKey(keyName).toLowerCase()] = keyName;
+		return m;
+	}, {});
 /* EVENT HANDLERS */
 /* Set default fields when setting crew type or playbook */
 on('change:crew_type change:playbook', event => {
 	getAttrs(['playbook', 'crew_type', 'changed_attributes', 'setting_autofill', ...watchedAttributes], v => {
 		const changedAttributes = (v.changed_attributes || '').split(','),
-			sourceName = (event.sourceAttribute === 'crew_type' ? v.crew_type : v.playbook).toLowerCase(),
+			sourceName = translatedNames[(event.sourceAttribute === 'crew_type' ? v.crew_type : v.playbook).toLowerCase()],
 			fillBaseData = (data, defaultAttrNames) => {
 				if (data) {
 					const finalSettings = defaultAttrNames.filter(name => !changedAttributes.includes(name))
@@ -1563,7 +1569,7 @@ on('change:crew_type change:playbook', event => {
 					mySetAttrs(finalSettings);
 				}
 			};
-		if (sourceName) {
+		if (event.sourceAttribute === 'crew_type' ? v.crew_type : v.playbook) {
 			setAttr('show_playbook_reminder', '0');
 		}
 		if (v.setting_autofill !== '1') return;
@@ -1731,7 +1737,7 @@ on('change:setting_consequence_query sheet:opened', () => {
 	getAttrs(['setting_consequence_query'], v => {
 		const consequenceQuery = (String(v.setting_consequence_query) === '1') ?
 			`?{${getTranslationByKey('consequence')}|${getTranslationByKey('a_consequence')}}` :
-			getTranslationByKey('a_consequence');
+			'^{a_consequence}';
 		setAttr('consequence_query', consequenceQuery);
 	});
 });
@@ -1771,6 +1777,9 @@ on('sheet:opened', () => {
 		});
 		mySetAttrs(setting);
 	});
+	/* Translated title text */
+	if (getTranslationLanguage() === 'ko') setAttr('title_text', '{{title-text=1}} {{korean=1}}');
+	else setAttr('title_text', '');
 	/* Setup and upgrades */
 	getAttrs(['version'], v => {
 		const upgradeSheet = version => {
