@@ -22,6 +22,8 @@ Features:
 * Weapon Quality Checks
 * Attack/Defense rolls with adjustments.
 * Spell/Ritual/Psionic checks.
+* EMLs for in sheet rolls are capped at 5/95 respectively as per rules.
+* Checkbox under load toggles correct Fatigue and Encumberance for Mounted players.
 
 NOTE
 ====
