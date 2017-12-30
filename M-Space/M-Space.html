@@ -418,6 +418,10 @@
                             <div class="npc-attribute-label-long"><span class="bold" data-i18n="damage-modifier-u">Damage Mod</span>:</div>
                             <input type="text" class="number-width total disabled" name="attr_npc_damage_mod" value="+0">
                         </div>
+                        <div class="spirit-attr">
+                            <div class="npc-attribute-label-long"><button type="roll" class="reduced-size" name="roll_npc_spirit_damage_roll" value="@{roll_display}&{template:weapon} {{name=Spirit Damage}} {{character=@{name}}} {{damage=[[@{npc_spirit_damage}]]}}"><span class="bold" data-i18n="spirit-damage-u">Spirit Damage</span></button>:</div>
+                            <input type="text" class="number-width total" name="attr_npc_spirit_damage" value="0">
+                        </div>
                         <div class="nonspirit-attr">
                             <div class="npc-attribute-label-short"><button type="roll" class="reduced-size" name="roll_npc_initiative" value="@{roll_display}&{template:default} {{name=^{initiative-u}}} @{name_display} {{^{rolled-u}=[[@{npc_init_dice} + @{npc_initiative_bonus} &{tracker}]]}}"><span class="bold" data-i18n="initiative-u">Initative</span></button>:</div>
                             <input type="text" class="text-align-center number-width" name="attr_npc_init_dice" value="1d10">
@@ -430,6 +434,10 @@
                             <input type="text" class="text-align-center number-width" name="attr_npc_spirit_init_dice" value="1d10">
                             <div class="npc-attribute-symbol">+</div>
                             <input type="number" class="number-width total" name="attr_npc_spirit_init" value="ceil((@{npc_int}+@{npc_cha})/2)" disabled>
+                        </div>
+                        <div class="spirit-attr">
+                            <div class="npc-attribute-label-long"><span class="bold" data-i18n="intensity-u">Intensity</span>:</div>
+                            <input type="number" class="number-width total" name="attr_npc_spirit_intensity" value="0">
                         </div>
                         <div class="default-style thennla-style classic-fantasy-style">
                             <div class="npc-attribute-label-short"><span class="bold" data-i18n="magic-points-u">Magic Points</span>:</div>
@@ -6015,6 +6023,12 @@
 	        if (typeof characterData["attributes"]["tenacity"] !== 'undefined') {
 	            setAttrs({npc_tenacity: characterData["attributes"]["tenacity"]});
 	        }
+	        if (typeof characterData["attributes"]["spirit_damage"] !== 'undefined') {
+	            setAttrs({npc_spirit_damage: characterData["attributes"]["spirit_damage"]});
+	        }
+	        if (typeof characterData["attributes"]["spirit_intensity"] !== 'undefined') {
+	            setAttrs({npc_spirit_intensity: characterData["attributes"]["spirit_intensity"]});
+	        }
 	        
 	        // Import Traits
 	        if (typeof characterData["features"] !== 'undefined') {
@@ -6349,6 +6363,119 @@
 	            }
                 setAttrs({ npc_theism: theism_spells});
             }
+            
+            //Import Spirits
+	        if (typeof characterData["spirits"] !== 'undefined') {
+	            for (var i=0; i < characterData["spirits"].length; i++) {
+	                var spirit = characterData["spirits"][i];
+	                var spiritid = generateRowID();
+	                var spiritattrs = {};
+	                
+	                // Import spirit name
+	                spiritattrs["repeating_npcfetish_" + spiritid + "_name"] = spirit["name"];
+	                
+	                //Import spirit Stats
+	                for (var j=0; j < spirit["stats"].length; j++) {
+	                    var spiritstat = spirit["stats"][j];
+	                    var spiritstatKey = Object.keys(spiritstat)[0];
+	                    var spiritstatValue = spiritstat[spiritstatKey];
+                
+                        if ( spiritstatKey == "INT" ) {
+                            spiritattrs["repeating_npcfetish_" + spiritid + "_int_type"] = spiritstatKey;
+                            spiritattrs["repeating_npcfetish_" + spiritid + "_fetish_int"] = spiritstatValue;
+                        }
+                        if ( spiritstatKey == "INS" ) { 
+                            spiritattrs["repeating_npcfetish_" + spiritid + "_int_type"] = spiritstatKey;
+                            spiritattrs["repeating_npcfetish_" + spiritid + "_fetish_int"] = spiritstatValue;
+                        }
+                        if ( spiritstatKey == "POW" ) { spiritattrs["repeating_npcfetish_" + spiritid + "_fetish_pow"] = spiritstatValue;}
+                        if ( spiritstatKey == "CHA" ) { spiritattrs["repeating_npcfetish_" + spiritid + "_fetish_cha"] = spiritstatValue;}
+	                }
+	                
+	                //Import spirit attributes
+	                if (typeof spirit["attributes"]["magic_points"] !== 'undefined') {
+	                    spiritattrs["repeating_npcfetish_" + spiritid + "_fetish_magic_points"] = spirit["attributes"]["magic_points"];
+	                    spiritattrs["repeating_npcfetish_" + spiritid + "_fetish_tenacity"] = spirit["attributes"]["magic_points"];
+	                }
+	                if (typeof spirit["attributes"]["spirit_intensity"] !== 'undefined') {
+	                    spiritattrs["repeating_npcfetish_" + spiritid + "_fetish_intensity"] = spirit["attributes"]["spirit_intensity"];
+	                }
+	                
+	                //Import spirit abilities
+	                if (typeof spirit["features"] !== 'undefined') {
+	                    var spiritabilities = "";
+	                    for (var j=0; j < spirit["features"].length; j++) {
+	                        spiritabilities = spiritabilities + " * " + spirit["features"][j] + "\r\n";
+	                    }
+	                    spiritattrs["repeating_npcfetish_" + spiritid + "_fetish_spirit_abilities"] = spiritabilities;
+	                }
+	                
+	                //Import spirit skills
+	                if (typeof spirit["skills"] !== 'undefined') {
+	                    var spirit_other_skills = "";
+	                    for (var j=0; j < spirit["skills"].length; j++) {
+	                        var spiritskill = spirit["skills"][j];
+	                        var spiritskillKey = Object.keys(spiritskill)[0];
+	                        var spiritskillValue = spiritskill[spiritskillKey];
+	                        
+                            if (spiritskillKey.toLowerCase() == "spectral combat") {
+                                spiritattrs["repeating_npcfetish_" + spiritid + "_fetish_spectral_combat"] = spiritskillValue;
+                            } else  if (spiritskillKey.toLowerCase() == "willpower") {
+                                spiritattrs["repeating_npcfetish_" + spiritid + "_fetish_willpower"] = spiritskillValue;
+                            } else  if (spiritskillKey.toLowerCase() == "folk magic") {
+                                spiritattrs["repeating_npcfetish_" + spiritid + "_fetish_folk_magic"] = spiritskillValue;
+                            } else  if (spiritskillKey.toLowerCase() == "shaping") {
+                                spiritattrs["repeating_npcfetish_" + spiritid + "_fetish_shaping"] = spiritskillValue;
+                            } else  if (spiritskillKey.toLowerCase() == "invocation") {
+                                spiritattrs["repeating_npcfetish_" + spiritid + "_fetish_invocation"] = spiritskillValue;
+                            } else  if (spiritskillKey.toLowerCase() == "exhort") {
+                                spiritattrs["repeating_npcfetish_" + spiritid + "_fetish_exhort"] = spiritskillValue;
+                            } else  if (spiritskillKey.toLowerCase() == "devotion") {
+                                spiritattrs["repeating_npcfetish_" + spiritid + "_fetish_devotion"] = spiritskillValue;
+                            } else {
+                                spirit_other_skills = spirit_other_skills + spiritskillKey + " " + spiritskillValue + "%, "
+                            }
+	                    }
+	                    spiritattrs["repeating_npcfetish_" + spiritid + "_fetish_other_skills"] = spirit_other_skills;
+	                }
+	                
+	                //Import spirit spells
+	                var spiritspells = "";
+                    if (typeof spirit["folk_spells"] !== 'undefined') {
+                        var spirit_folk_spells = "";
+                        for (var j=0; j < spirit["folk_spells"].length; j++) {
+	                        spirit_folk_spells = spirit_folk_spells + spirit["folk_spells"][j] + ", ";
+	                    }
+	                    if (spirit_folk_spells != "") {
+                            spiritspells = spiritspells + "Folk Magic: " + spirit_folk_spells + "\r\n";
+	                    }
+                    }
+            
+                    if (typeof spirit["sorcery_spells"] !== 'undefined') {
+                        var spirit_sorcery_spells = "";
+                        for (var j=0; j < spirit["sorcery_spells"].length; j++) {
+	                        spirit_sorcery_spells = spirit_sorcery_spells + spirit["sorcery_spells"][j] + ", ";
+	                    }
+	                    if (spirit_sorcery_spells != "") {
+                            spiritspells = spiritspells + "Sorcery: " + spirit_sorcery_spells + "\r\n";
+	                    }
+                    }
+            
+                    if (typeof spirit["theism_spells"] !== 'undefined') {
+                        var spirit_theism_spells = "";
+                        for (var j=0; j < spirit["theism_spells"].length; j++) {
+	                        spirit_theism_spells = spirit_theism_spells + spirit["theism_spells"][j] + ", ";
+	                    }
+	                    if (spirit_theism_spells != "") {
+                            spiritspells = spiritspells + "Theism: " + spirit_theism_spells + "\r\n";
+	                    }
+                    }
+                    spiritattrs["repeating_npcfetish_" + spiritid + "_fetish_powers"] = spiritspells;
+	                
+	                //Set spirit values
+	                setAttrs(spiritattrs);
+	            }
+	        }
 	    });
 	});
 	
