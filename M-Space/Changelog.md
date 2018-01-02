@@ -11,6 +11,7 @@ Versions have three numbers Major.Minor.Release
 ### New Features
 * Added NPC sheet with JSON importer
 * Added Battle Unit sheet
+* Added Ship sheet
 * Added penalty fields to the spirit repeating section in Animism
 
 ### Bugfixes
