@@ -7,6 +7,20 @@ Versions have three numbers Major.Minor.Release
 
 **Release**: Indicates bugfixes and minor UI changes only.
 
+## 1.5.0
+### New Features
+* Added NPC sheet with JSON importer
+* Added Battle Unit sheet
+* Added Ship sheet
+* Added penalty fields to the spirit repeating section in Animism
+
+### Bugfixes
+* Fixed issue with Background tab which caused it not highlight when selected.
+
+## 1.4.1
+### Bugfixes
+* Fixed missing translation key for the option to not show 101+ reductions
+
 ## 1.4 0
 ### New Features
 * Added M-Space support.  New sheet options include extended conflict resolution, simplified combat(M-Space optional rule) and M-Space style Psionics
