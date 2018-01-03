@@ -96,7 +96,7 @@
                 <td> </td>
                 <td class="attr-label"><strong data-i18n="Move rate-u">速度等級</strong></td>
                 <td><input class="attr-input" type="text" name="attr_mov"/></td>
-                <td class="attr-roll" ></td>
+                <td class="attr-roll" >	<button class='new-roll' type='roll' value='&{template:coc-2} {{mov=[[@{mov}]]}}{{movfail=[[@{mov}-1]]}}{{movsucc=[[@{mov}+1]]}}{{name=追逐戰檢定}} {{success=[[@{con}]]}} {{hard=[[floor(@{con}/2)]]}} {{extreme=[[floor(@{con}/5)]]}} {{roll1=[[1d100]]}}' name='roll_mov_check' /></td>
             </tr>
         </table>
         </div>
@@ -3656,6 +3656,69 @@
         </tr>
     </table>
 </rolltemplate>
+
+
+<rolltemplate class="sheet-rolltemplate-coc-2">
+    <table>
+        <caption>{{name}}</caption>
+        <tr>
+            <td class="template_label">數值:</td>
+            <td class="template_value">{{success}}/{{hard}}/{{extreme}}</td>
+        </tr>
+        <tr>
+            <td class="template_label">擲出:</td>
+            <td class="template_value">{{roll1}}</td>
+        </tr>
+        <tr style="background:#BEBEBE;">
+		    <td class="template_label">結果:</td>
+                <!-- Is Success -->
+                {{#rollBetween() roll1 2 success}}
+                  <!-- Is Standard -->
+                  {{#rollGreater() roll1 hard}}
+                    <td style="background:#D3D3D3;" class="template_value">{{mov}}</td>
+                  {{/rollGreater() roll1 hard}}
+                  <!-- Is Hard or Extreme -->
+                  {{#rollBetween() roll1 2 hard}}
+                    <!-- Is Hard -->
+                    {{#rollGreater() roll1 extreme}}
+                      <td style="background:#D9EDF7;" class="template_value">{{mov}}</td>
+                    {{/rollGreater() roll1 extreme}}
+                    <!-- Is Extreme -->
+                    {{#rollBetween() roll1 2 extreme}}
+                      <td style="background:#FCF8E3;" class="template_value"><b>{{movsucc}}</b></td>
+                    {{/rollBetween() roll1 2 extreme}}
+                  {{/rollBetween() roll1 2 hard}}
+                {{/rollBetween() roll1 2 success}}
+                <!-- Is Not Success -->
+                {{#rollGreater() roll1 success}}
+                  <!-- Is skill >= 50 -->
+                  {{#rollGreater() success 49}}
+                    <!-- Is Fumble -->
+                    {{#rollTotal() roll1 100}} 
+                      <td style="background:Red;" class="template_value"><b>{{movfail}}</b></td>
+                    {{/rollTotal() roll1 100}} 
+                    <!-- Is Fail -->
+                    {{#rollLess() roll1 100}}
+                      <td style="background:#F2DEDE;" class="template_value">{{movfail}}</td>
+                    {{/rollLess() roll1 100}}
+                  {{/rollGreater() success 49}}
+                  <!-- Is skill < 50 -->
+                  {{#rollLess() success 50}}
+                    <!-- Is Fumble -->
+                    {{#rollGreater() roll1 95}}
+                      <td style="background:Red;" class="template_value"><b>{{movfail}}</b></td>
+                    {{/rollGreater() roll1 95}}
+                    <!-- Is Fail -->
+                    {{#rollLess() roll1 96}}
+                      <td style="background:#F2DEDE;" class="template_value">{{movfail}}</td>
+                    {{/rollLess() roll1 96}}
+                  {{/rollLess() success 50}}
+                {{/rollGreater() roll1 success}}
+			</td>
+        </tr>
+    </table>
+</rolltemplate>
+
 
 <rolltemplate class="sheet-rolltemplate-coc-attack-1">
     <table>
