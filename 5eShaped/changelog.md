@@ -11,6 +11,12 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 15.6.0
+
+### Features
+
+* Death saving throw output now supports `death_saving_throw_chances` by outputting X / 3 or X / 5. All custom death saving throw macros must include `{{death_saving_throw_chances=@{death_saving_throw_chances}}}`.
+
 ## 15.5.9
 
 ### Bug Fixes
