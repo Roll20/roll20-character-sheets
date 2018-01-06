@@ -11,6 +11,13 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 15.7.0
+
+### Features
+
+* `Mana` setting now replaces `Spell points` wording with `Mana`
+* `Advantage+` and `Disadvantage-` have been added to handle cases of rolling an extra dice for all the possible dice systems. With d20 for example `Advantage+` would be `3d20kh1`
+
 ## 15.6.0
 
 ### Features
