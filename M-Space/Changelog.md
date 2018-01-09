@@ -7,6 +7,12 @@ Versions have three numbers Major.Minor.Release
 
 **Release**: Indicates bugfixes and minor UI changes only.
 
+## 1.5.2
+### Bugfixes
+* Delete button will now be easier to click on repeating sections.
+* Magic show/hide toggles now work again.
+* Fixed Battle Unit Formation field from reverting back to Broken.
+
 ## 1.5.1
 ### Bugfixes
 * Minor re-arrangement of fields
