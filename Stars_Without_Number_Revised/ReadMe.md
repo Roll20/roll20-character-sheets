@@ -29,6 +29,9 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 * Fixed bug where the AC and AB on NPC sheets was reset to the PC sheet value when the sheet was opened.
 * Updated image.
+* Spelling corrections.
+* Added shock damage to weapons, only shows if a stat is entered.
+* Removed field for magazines in weapons.
 
 ### 1.5.0
 
