@@ -7,6 +7,11 @@ Versions have three numbers Major.Minor.Release
 
 **Release**: Indicates bugfixes and minor UI changes only.
 
+## 1.5.1
+### Bugfixes
+* Minor re-arrangement of fields
+* Fixed rounding error in NPC rolls
+
 ## 1.5.0
 ### New Features
 * Added NPC sheet with JSON importer
