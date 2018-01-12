@@ -32,7 +32,6 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 * Spelling corrections.
 * Added shock damage to weapons, only shows if a stat is entered.
 * Removed field for magazines in weapons.
-
 ### 1.5.0
 
 * Fixed Sneak skill showing as Program.
