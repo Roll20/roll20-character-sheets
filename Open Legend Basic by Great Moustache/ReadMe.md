@@ -5,6 +5,10 @@
 
 ### Changelog
 
+### 1.8.9.95 on 2017 December 31st
+* Removed the temporary warning that old inventory not moved over would be lost
+* Completely removed the old inventory section
+
 ### 1.8.9.92 on 2017 December 4th
 * 3 Inventory sections outputing wrong "name" to chat.
 
