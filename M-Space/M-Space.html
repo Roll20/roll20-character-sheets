@@ -3,7 +3,7 @@
 <div class="wrapper">
     <!-- Header -->
     <div class="logo float-right">
-        <span class="float-right"><span class="bold" data-i18n="sheet-version-u">Sheet Version</span>: <input type="text" class="disabled number-width text-align-center" name="attr_version" value="1.6.0"></span>
+        <span class="float-right"><span class="bold" data-i18n="sheet-version-u">Sheet Version</span>: <input type="text" class="disabled number-width text-align-center" name="attr_version" value="1.7.0"></span>
         <img class="mythras-variant" src="http://i.imgur.com/Sm3ilMW.png">
         <img class="mspace-variant" src="https://i.imgur.com/5uPy3QU.jpg">
     </div>
@@ -18,6 +18,7 @@
     
     <input type="checkbox" class="hidden" name="attr_luck_points_rank" value="1">
     <input type="checkbox" class="tenacity-enabled-toggle hidden" name="attr_tenacity_enabled" value="1">
+    <input type="checkbox" class="affiliations-enabled-toggle hidden" name="attr_affiliations_enabled" value="1">
     <input type="checkbox" class="extended-conflict-toggle hidden" name="attr_extended_conflict_enabled" value="1">
     <input type="checkbox" class="simplified-combat-toggle hidden" name="attr_simplified_combat_enabled" value="1">
     <input type="checkbox" class="firearms-enabled-toggle hidden" name="attr_firearms_enabled" value="1" checked>
@@ -36,7 +37,10 @@
     <input type="checkbox" class="la-psionics-enabled-toggle hidden" name="attr_la_psionics_enabled" value="1">
     <input type="checkbox" class="sorcery-enabled-toggle hidden" name="attr_sorcery_enabled" value="1" checked>
     <input type="checkbox" class="theism-enabled-toggle hidden" name="attr_theism_enabled" value="1" checked>
-    
+    <select class="hidden" name="attr_max_devotional_pool_based_on">
+        <option value="@{rank_devotion_pool_limit}" selected><span data-i18n="cult-rank-u">Cult Rank</span></option>
+        <option value="@{pow}"><span data-i18n="pow-u">POW</span></option>
+    </select>
     
     <div style="float:left;">
         <span class="bold" data-i18n="sheet-type-u">Sheet Type</span>: <br>
@@ -88,6 +92,7 @@
                 <option value="m-space"><span data-i18n="m-space-u">M-Space</span></option>
                 <option value="monster_island"><span data-i18n="monster-island-u">Monster Island</span></option>
                 <option value="mythic_britain"><span data-i18n="mythic-britain-u">Mythic Britain</span></option>
+                <option value="mythic_constantinople"><span data-i18n="mythic-constantinople-u">Mythic Constantinople</span></option>
                 <option value="mythic_rome"><span data-i18n="mythic-rome-u">Mythic Rome</span></option>
                 <option value="thennla"><span data-i18n="thennla-u">Thennla</span></option>
             </select>
@@ -96,6 +101,14 @@
             <br>
             <h4><span data-i18n="system-u">System</span></h4>
             <hr>
+            <span i18n-data="affiliations-enabled-u">Affiliations Enabled</span>:
+            <select name="attr_affiliations_enabled_option">
+                <option value="default" selected><span data-i18n="use-setting-default-u">Use Setting Default</span></option>
+                <option value="0"><span data-i18n="no-u">No</span></option>
+                <option value="1"><span data-i18n="yes-u">Yes</span></option>
+            </select>
+            <br>
+            
             <span i18n-data="extended-conflict-resolution-enabled-u">Extended Conflict Resolution Enabled</span>:
             <select name="attr_extended_conflict_enabled_option">
                 <option value="default" selected><span data-i18n="use-setting-default-u">Use Setting Default</span></option>
@@ -268,6 +281,14 @@
                 <option value="default" selected><span data-i18n="use-setting-default-u">Use Setting Default</span></option>
                 <option value="0"><span data-i18n="no-u">No</span></option>
                 <option value="1"><span data-i18n="yes-u">Yes</span></option>
+            </select>
+            <br>
+            
+            <span i18n-data="max-devotional-pool-based-on-u">Max Devotional Pool Based On</span>:
+            <select name="attr_max_devotional_pool_based_on_option">
+                <option value="default" selected><span data-i18n="use-setting-default-u">Use Setting Default</span></option>
+                <option value="@{rank_devotion_pool_limit}"><span data-i18n="cult-rank-u">Cult Rank</span></option>
+                <option value="@{pow}"><span data-i18n="pow-u">POW</span></option>
             </select>
             <br>
         </div>
@@ -4234,7 +4255,7 @@
 				                        <option value="@{pow}"><span data-i18n="high-priest-u">High Priest</span></option>
 				                    </select>
 				                </div>
-				                <div class="devotion-number header"><input type="number" class="number-width" name="attr_devotional_pool" value="0"> / <input type="number" class="number-width" name="attr_devotional_pool_max" value="@{rank_devotion_pool_limit}" disabled></div>
+				                <div class="devotion-number header"><input type="number" class="number-width" name="attr_devotional_pool" value="0"> / <input type="number" class="number-width" name="attr_devotional_pool_max" value="@{max_devotional_pool_based_on}" disabled></div>
 					        </div> <input type="checkbox" class="details-toggle" name="attr_details" checked><span class="details-toggle"></span>
 					        <div class="details">
 						        <div><span data-i18n="base-value-u">Base Value</span>: (<span data-i18n="pow-u">POW</span>+<span data-i18n="cha-u">CHA</span>) <input type="number" class="text-align-center number-width" name="attr_base" value="(@{pow}+@{cha})" disabled> <span data-i18n="training-and-experience-u">Training & Experience</span>: <input type="number" class="text-align-center number-width" name="attr_experience" value="0"> <span data-i18n="other-u">Other</span>: <input type="number" class="text-align-center number-width" name="attr_other" value="0"></div>
@@ -4385,7 +4406,43 @@
 			<div class="clear-float"></div>
 		</div>
 
+        <!-- Background -->
 		<div class="page page-background">
+		    <!-- Affiliations -->
+			<div class="affiliations section affiliations-enabled">
+			    <h3><span data-i18n="affiliations-u">Affiliations</span></h3>
+			    <div class="affiliations-row ">
+			        <div class="affiliations-name header"><span data-i18n="affiliation-u">Affiliation</span></div>
+			        <div class="affiliations-checkbox header">&#9875;</div>
+			        <div class="affiliations-checkbox header">!</div>
+			        <div class="affiliations-checkbox header">&#10004;</div>
+			        <div class="affiliations-number header"><span data-i18n="temp-u">Temp</span></div>
+			        <div class="affiliations-number header"><span data-i18n="penalty-u">Penalty</span></div>
+			        <div class="affiliations-number header">%</div>
+			        <div class="affiliations-button"></div>
+			        <div class="affiliations-notes header"><span data-i18n="notes-u">Notes</span></div>
+			    </div>
+			    <fieldset class="repeating_affiliation">
+			        <div class="rep-row">
+			            <div class="affiliations-row ">
+			                <div class="affiliations-name"><input type="text" class="full-width" name="attr_name"></div>
+			                <div class="affiliations-checkbox"><input type="checkbox" name="attr_encumbered" value="1" disabled></div>
+			                <div class="affiliations-checkbox"><input type="checkbox" name="attr_fumbled" value="1"></div>
+			                <div class="affiliations-checkbox"><input type="checkbox" name="attr_trained" value="1"></div>
+			                <div class="affiliations-number"><input type="number" class="text-align-center full-width" name="attr_augment" value="0"></div>
+			                <div class="affiliations-number"><input type="number" max="0" class="text-align-center full-width" name="attr_penalty" max="0" value="0"></div>
+			                <div class="affiliations-number"><input type="number" class="text-align-center full-width bold" name="attr_total" value="(@{base}+@{experience}+@{other}+@{augment}+@{penalty})" disabled></div>
+			                <div class="affiliations-button"><button type="roll" class="reduced-size full-width" name="roll_affiliation" value="@{roll_display}&{template:skill} {{show_reduced=[[@{show_reduced}]]}}{{name=@{name}}} @{name_display} {{very_easy=[[@{very_easy}]]}} {{very_easy_crit=[[ceil(@{very_easy}*.1)]]}}  {{easy=[[@{easy}]]}} {{easy_crit=[[ceil(@{easy}*.1)]]}}  {{standard=[[@{total} ]]}} {{standard_crit=[[ceil(@{total}*.1)]]}}  {{hard=[[@{hard}]]}} {{hard_crit=[[ceil(@{hard}*.1)]]}}  {{formidable=[[@{formidable}]]}} {{formidable_crit=[[ceil(@{formidable}*.1)]]}}  {{herculean=[[@{herculean}]]}} {{herculean_crit=[[ceil(@{herculean}*.1)]]}}  {{rolled=[[1d100]]}}  {{encumbered=[[1+@{encumbered}]]}} {{encumbrance_skills=[[@{encumbrance_skills}]]}} {{fatigue_skills=[[@{fatigue_skills}]]}}"></div>
+			                <div class="affiliations-notes"><input type="text" class="full-width" name="attr_notes"></div>
+			            </div> <input type="checkbox" class="details-toggle" name="attr_details" checked><span class="details-toggle"></span>
+			            <div class="details">
+			                <span data-i18n="base-value-u">Base Value</span>: <input type="number" class="text-align-center number-width" name="attr_base" value="40"> <span data-i18n="training-and-experience-u">Training & Experience</span>: <input type="number" class="text-align-center number-width" name="attr_experience" value="0"> <span data-i18n="other-u">Other</span>: <input type="number" class="text-align-center number-width" name="attr_other" value="0">
+						    <div><span data-i18n="very-easy-u">Very Easy</span>: <input type="number" class="text-align-center number-width background-green" name="attr_very_easy" value="((@{base}+@{experience}+@{other}+@{augment})*2)+@{penalty}" disabled> <span data-i18n="easy-u">Easy</span>: <input type="number" class="text-align-center number-width background-blue" name="attr_easy" value="ceil((@{base}+@{experience}+@{other}+@{augment})*1.5)+@{penalty}" disabled> <span data-i18n="hard-u">Hard</span>: <input type="number" class="text-align-center number-width background-yellow" name="attr_hard" value="(ceil((@{base}+@{experience}+@{other}+@{augment})*.67)+@{penalty})" disabled> <span data-i18n="formidable-u">Formidable</span>: <input type="number" class="text-align-center number-width background-orange" name="attr_formidable" value="(ceil((@{base}+@{experience}+@{other}+@{augment})*.5)+@{penalty})" disabled> <span data-i18n="herculean-u">Herculean</span>: <input type="number" class="text-align-center number-width background-red" name="attr_herculean" value="(ceil((@{base}+@{experience}+@{other}+@{augment})*.1)+@{penalty})" disabled></div>
+					    </div>
+			        </div>
+			    </fieldset>
+			</div>
+			
 		    <div class="background section">
 		        <h3><span data-i18n="background-u">Background</span></h3>
 				<div class="background-column1">
@@ -4886,6 +4943,11 @@
                 setAttrs({version: "1.6.0"});
                 versioning();
             }
+            else if(v["version"] === "1.6.0") {
+                console.log("upgrading to v1.7.0");
+                setAttrs({version: "1.7.0"});
+                versioning();
+            }
             else {
                 console.log("Sheet fully updated");
             }
@@ -4893,7 +4955,7 @@
     }
     
     var campaign_options = function() {
-        getAttrs(["setting_option", "luck_points_rank_option", "extended_conflict_enabled_option", "simplified_combat_enabled_option", "tenacity_enabled_option", "spirit_tenacity_option", "luther_arkwright_style_option", "m_space_style_option", "boating_standard_option", "status_standard_option", "superstition_standard_option", "dependencies_enabled_option", "firearms_enabled_option", "ms_psionics_enabled_option", "roman_magic_enabled_option", "arcane_magic_enabled_option", "divine_magic_enabled_option", "folk_magic_enabled_option", "animism_enabled_option", "mysticism_enabled_option", "la_psionics_enabled_option", "sorcery_enabled_option", "theism_enabled_option"], function(v) {
+        getAttrs(["setting_option", "luck_points_rank_option", "extended_conflict_enabled_option", "simplified_combat_enabled_option", "tenacity_enabled_option", "spirit_tenacity_option", "luther_arkwright_style_option", "m_space_style_option", "boating_standard_option", "status_standard_option", "superstition_standard_option", "dependencies_enabled_option", "firearms_enabled_option", "affiliations_enabled_option", "ms_psionics_enabled_option", "roman_magic_enabled_option", "arcane_magic_enabled_option", "divine_magic_enabled_option", "folk_magic_enabled_option", "animism_enabled_option", "mysticism_enabled_option", "la_psionics_enabled_option", "sorcery_enabled_option", "theism_enabled_option", "max_devotional_pool_based_on_option"], function(v) {
             var newoptions = {};
             // Default Setting Configs
             var setting_configs = {
@@ -4918,6 +4980,9 @@
                 la_psionics_enabled: "0",
                 sorcery_enabled: "1",
                 theism_enabled: "1",
+                affiliations_enabled: "0",
+                max_devotional_pool_based_on: "@{rank_devotion_pool_limit}",
+                
             };
             // Setting Overrides
             if(v["setting_option"] === "luther_arkwright") {
@@ -4961,6 +5026,9 @@
                 setting_configs["sorcery_enabled"] = "0";
             } else if(v["setting_option"] === "thennla") {
                 setting_configs["sheet_style"] = "thennla";
+            } else if(v["setting_option"] === "mythic_constantinople") {
+                setting_configs["affiliations_enabled"] = "1";
+                setting_configs["max_devotional_pool_based_on"] = "@{pow}";
             } else if(v["setting_option"] === "mythic_rome") {
                 setting_configs["status_standard"] = "1";
                 setting_configs["roman_magic_enabled"] = "1";
@@ -5112,6 +5180,20 @@
                 newoptions["theism_enabled"] = setting_configs["theism_enabled"];
             } else {
                 newoptions["theism_enabled"] = v["theism_enabled_option"];
+            }
+            
+             // Max Devotional Pool Based On
+            if(v["max_devotional_pool_based_on_option"] === "default") {
+                newoptions["max_devotional_pool_based_on"] = setting_configs["max_devotional_pool_based_on"];
+            } else {
+                newoptions["max_devotional_pool_based_on"] = v["max_devotional_pool_based_on_option"];
+            }
+            
+            // Affiliations Enabled
+            if(v["affiliations_enabled_option"] === "default") {
+                newoptions["affiliations_enabled"] = setting_configs["affiliations_enabled"];
+            } else {
+                newoptions["affiliations_enabled"] = v["affiliations_enabled_option"];
             }
             
             setAttrs(newoptions);
@@ -7068,6 +7150,8 @@
 	                    skillattrs["evade_experience"] = skillValue - dex - dex;
 	                } else if (skillKey.toLowerCase() == "first aid") {
 	                    skillattrs["first_aid_experience"] = skillValue - int - dex;
+	                } else if (skillKey.toLowerCase() == "home parallel") {
+	                    skillattrs["home parallel_experience"] = skillValue - int - int;
 	                } else if (skillKey.toLowerCase() == "influence") {
 	                    skillattrs["influence_experience"] = skillValue - cha - cha;
 	                } else if (skillKey.toLowerCase() == "insight") {
@@ -7080,8 +7164,12 @@
 	                    skillattrs["ride_experience"] = skillValue - dex - pow;
 	                } else if (skillKey.toLowerCase() == "sing") {
 	                    skillattrs["sing_experience"] = skillValue - cha - pow;
+	                } else if (skillKey.toLowerCase() == "status") {
+	                    skillattrs["status_experience"] = skillValue;
 	                } else if (skillKey.toLowerCase() == "stealth") {
 	                    skillattrs["stealth_experience"] = skillValue - dex - int;
+	                } else if (skillKey.toLowerCase() == "superstition") {
+	                    skillattrs["superstition_experience"] = skillValue - ((21 - int) + pow);
 	                } else if (skillKey.toLowerCase() == "swim") {
 	                    skillattrs["swim_experience"] = skillValue - str - con;
 	                } else if (skillKey.toLowerCase() == "unarmed") {
@@ -7100,6 +7188,10 @@
 	                    skillattrs["repeating_dependency_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_dependency_" + skillid + "_score"] = skillValue;
 	                    skillattrs["repeating_dependency_" + skillid + "_details"] = 0;
+	                } else if (skillKey.toLowerCase().indexOf("affiliation") !== -1) {
+	                    skillattrs["repeating_affiliation_" + skillid + "_name"] = skillKey;
+	                    skillattrs["repeating_affiliation_" + skillid + "_experience"] = skillValue - 40;
+	                    skillattrs["repeating_affiliation_" + skillid + "_details"] = 0;
 	                } else {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue;
@@ -7333,7 +7425,7 @@
     });
     
     //Set campaign options if any change
-    on("change:setting_option change:extended_conflict_enabled_option change:simplified_combat_enabled_option change:luck_points_rank_option change:tenacity_enabled_option change:spirit_tenacity_option change:status_standard_option change:superstition_standard_option change:boating_standard_option change:dependencies_enabled_option change:firearms_enabled_option change:roman_magic_enabled_option change:arcane_magic_enabled_option change:divine_magic_enabled_option change:folk_magic_enabled_option change:animism_enabled_option change:mysticism_enabled_option change:la_psionics_enabled_option change:ms_psionics_enabled_option change:sorcery_enabled_option change:theism_enabled_option", function() {
+    on("change:setting_option change:extended_conflict_enabled_option change:simplified_combat_enabled_option change:luck_points_rank_option change:tenacity_enabled_option change:spirit_tenacity_option change:status_standard_option change:superstition_standard_option change:boating_standard_option change:dependencies_enabled_option change:firearms_enabled_option change:affiliations_enabled_option change:roman_magic_enabled_option change:arcane_magic_enabled_option change:divine_magic_enabled_option change:folk_magic_enabled_option change:animism_enabled_option change:mysticism_enabled_option change:la_psionics_enabled_option change:ms_psionics_enabled_option change:sorcery_enabled_option change:theism_enabled_option change:max_devotional_pool_based_on_option", function() {
         console.log("Setting campaign options")
         campaign_options();
     });
