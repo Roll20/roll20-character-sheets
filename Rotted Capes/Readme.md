@@ -3,7 +3,7 @@
 This is a character sheet for use on Roll20.net with Rotted Capes. The sheet is designed to be usable by all Roll20 users regardless of subscription level.
 
 ### Current Version
-Version 1.3 (December 31st, 2017) "The Automation Release"
+Version 1.3.1 (January 15th, 2018) Minor Fixes
 
 ### Many Thanks	
 This sheet came into being through my experimentation in adapting sheets for my various games.  A big influence was Nathas's Numenera multi-tabs character sheet!
@@ -11,7 +11,6 @@ This sheet came into being through my experimentation in adapting sheets for my 
 ### TODO
 
 Short Term:
-
 * Shake-out sheet in play (target stable state by mid to end of January)
 * Further refinement of layout and coloration of the sheet and inline messages
 * Automation for Cast Member View
@@ -24,6 +23,13 @@ Long term:
 * New View: Data sheet for Enclaves and supporting cast
 	
 ### Changelog
+** January 15th 2018 ** 
+* Cast Member View Attributes auto-calculate (was broken with last fix)
+* Update Damage dice drop downs to include the attribute die list (some powers use attribute dice for damage)
+* Change Built Item Quick Reference to Primary Powers List
+* Fixes: Fixed overlap of Gear Info tooltip into field, fixed offset of info icon on power, and Fixed xp calculation
+
+
 ** December 31, 2017: version 1.3 "The Automation Release" ** 
 * Autoset Max Lift, Throw, and Max Drag/Push based on Might score
 * Autoset MPH based on Quickness score
