@@ -27,7 +27,7 @@ Long term:
 * Cast Member View Attributes auto-calculate (was broken with last fix)
 * Update Damage dice drop downs to include the attribute die list (some powers use attribute dice for damage)
 * Change Built Item Quick Reference to Primary Powers List
-* Fixes: Fixed overlap of Gear Info tooltip into field before and after and fixed offset of info icon on power
+* Fixes: Fixed overlap of Gear Info tooltip into field, fixed offset of info icon on power, and Fixed xp calculation
 
 
 ** December 31, 2017: version 1.3 "The Automation Release" ** 
