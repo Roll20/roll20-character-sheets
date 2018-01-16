@@ -1,3 +1,3 @@
-Character sheet for Vampire The Maquerade, 20th Anniversary Edition, by White Wolf Publishing.
+Character sheet for Changeling, 20th Anniversary Edition, by White Wolf Publishing.
 
-A big thanks goes out to Brian Shields and Benjamin Bandelow. I used the exalted sheet they made as a starting point and as such much, maybe most, of this code it theirs.
+Horribly speedful hackjob, made by request. Will try to improve it, but without pro-account, it's slow. Any improvements welcome.
