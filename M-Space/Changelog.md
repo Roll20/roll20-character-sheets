@@ -7,8 +7,12 @@ Versions have three numbers Major.Minor.Release
 
 **Release**: Indicates bugfixes and minor UI changes only.
 
+## 1.7.0
+### New Features
+* Added support for Mythic Constantinople.  This adds Affiliations and option to base max devotional pool on POW instead of Cult Rank.
+
 ## 1.6.0
-### New Fetures
+### New Features
 * Made Unarmed and Native Tongue static objects, Unarmed co-exists as a Combat Style and Skill.
 * Merged Weapon Combat Effects and Traits into a single Notes field for cleaner JSON Importing and to provide a larger space for weapons with more effects and/or traits.
 * Professional Skills and custom skills can now set no characteristic for base value.
