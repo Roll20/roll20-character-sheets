@@ -7,6 +7,32 @@ Versions have three numbers Major.Minor.Release
 
 **Release**: Indicates bugfixes and minor UI changes only.
 
+## 1.7.0
+### New Features
+* Added support for Mythic Constantinople.  This adds Affiliations and option to base max devotional pool on POW instead of Cult Rank.
+
+## 1.6.0
+### New Features
+* Made Unarmed and Native Tongue static objects, Unarmed co-exists as a Combat Style and Skill.
+* Merged Weapon Combat Effects and Traits into a single Notes field for cleaner JSON Importing and to provide a larger space for weapons with more effects and/or traits.
+* Professional Skills and custom skills can now set no characteristic for base value.
+* Re-arranged extended conflict fields, conflict pool moved to attributes and details toggle will show current pools for characterists there.  NPC pools removed as they aren't needed for temporary characters anyway.
+* Moved Conditions into its own textarea.
+* Merged the Initiative roll and Initiative bonus attribute.
+* Expanded Traits into a repeating field and moved it inside the character info details.
+* Moved robust gift inside a Health & Armor detail section which also contains a new temp armor and hp mod which applies to all locations.
+* Added Quick Stats tab to the PC sheet with JSON Importer.
+* JSON Import for PC sheets will automatically hide unused weapon and magic types.
+* Spirit Damage will now consider half willpower when calculating its value.
+* Toggle provided to switch between spirit attributes and normal attributes.  This re-calculats ap and init so the same macros can be used regardless of current spirit state.
+* Added toggle to switch INT to INS.
+
+## 1.5.2
+### Bugfixes
+* Delete button will now be easier to click on repeating sections.
+* Magic show/hide toggles now work again.
+* Fixed Battle Unit Formation field from reverting back to Broken.
+
 ## 1.5.1
 ### Bugfixes
 * Minor re-arrangement of fields
