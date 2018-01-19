@@ -11,6 +11,11 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 15.7.2
+
+### Bug Fixes
+* Fix attack and damage components caused by a rename of `attackTypeChanged`
+
 ## 15.7.1
 
 ### Bug Fixes
