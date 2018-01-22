@@ -397,14 +397,14 @@ const sheetVersion = "2.6",
 				name: "crew_upgrade_vigilantes_attire",
 				numboxes: "1"
 			}, {
+				name: "crew_upgrade_dedicated_crafters",
+				numboxes: "1",
+			}, {
 				name: "crew_upgrade_irregulars",
 				numboxes: "1"
 			}, {
 				name: "crew_upgrade_willing_to_fight",
 				numboxes: "1"
-			}, {
-				name: "crew_upgrade_spark-craft_technology",
-				numboxes: "1",
 			}]
 		}
 	},
@@ -551,7 +551,7 @@ const sheetVersion = "2.6",
 				numboxes: "1"
 			}, {
 				bold: "1",
-				name: "playbook_item_fine_wrecker_tools",
+				name: "playbook_item_fine_wrecking_tools",
 				numboxes: "2"
 			}, {
 				name: "playbook_item_blowgun_&_darts,_syringes",
