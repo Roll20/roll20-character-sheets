@@ -1495,11 +1495,20 @@ const mySetAttrs = (attrs, options, callback) => {
 		});
 	},
 	calculateStashDice = stash => setAttr('stash_dice', Math.floor(parseInt(stash) / 10)),
-	calculateCohortDice = prefix => {
-		getAttrs(['crew_tier', `${prefix}_impaired`, `${prefix}_type`], v => {
-			const dice = (parseInt(v.crew_tier) || 0) - (parseInt(v[`${prefix}_impaired`]) || 0) +
-				((v[`${prefix}_type`] === 'elite' || v[`${prefix}_type`] === 'expert') ? 1 : 0);
-			setAttr(`${prefix}_dice`, dice);
+	calculateCohortDice = prefixes => {
+		const sourceAttrs = [
+			'crew_tier',
+			...prefixes.map(p => `${p}_impaired`),
+			...prefixes.map(p => `${p}_type`),
+		];
+		getAttrs(sourceAttrs, v => {
+			const setting = {};
+			prefixes.forEach(prefix => {
+				const dice = (parseInt(v.crew_tier) || 0) - (parseInt(v[`${prefix}_impaired`]) || 0) +
+					((v[`${prefix}_type`] === 'elite' || v[`${prefix}_type`] === 'expert') ? 1 : 0);
+				setting[`${prefix}_dice`] = dice;
+			});
+			setAttrs(setting);
 		});
 	};
 /* CONSTANTS */
@@ -1657,10 +1666,10 @@ autogenSections.forEach(sectionName => {
 on('change:setting_extra_stress', event => setAttr('stress_max', 9 + (parseInt(event.newValue) || 0)));
 on('change:setting_extra_trauma', event => setAttr('trauma_max', 4 + (parseInt(event.newValue) || 0)));
 /* Calculate cohort quality */
-on(['crew_tier', 'cohort1_impaired', 'cohort1_type'].map(x => `change:${x}`).join(' '), () => calculateCohortDice('cohort1'));
-on('change:repeating_cohort', () => calculateCohortDice('repeating_cohort'));
+on(['crew_tier', 'cohort1_impaired', 'cohort1_type'].map(x => `change:${x}`).join(' '), () => calculateCohortDice(['cohort1']));
+on('change:repeating_cohort', () => calculateCohortDice(['repeating_cohort']));
 on('change:crew_tier', () => {
-	getSectionIDs('repeating_cohort', a => a.forEach(id => calculateCohortDice(`repeating_cohort_${id}`)));
+	getSectionIDs('repeating_cohort', a => calculateCohortDice(a.map(id => `repeating_cohort_${id}`)));
 });
 on('change:char_cohort_quality change:char_cohort_impaired', () => {
 	getAttrs(['char_cohort_quality', 'char_cohort_impaired'], v => {
@@ -2275,8 +2284,8 @@ on('sheet:opened', () => {
 							mySetAttrs({
 								crew_tier: tier
 							}, {}, () => {
-								calculateCohortDice('cohort1');
-								idArray.forEach(id => calculateCohortDice(`repeating_cohort_${id}`));
+								calculateCohortDice(['cohort1']);
+								calculateCohortDice(idArray.map(id => `repeating_cohort_${id}`));
 								upgradeSheet('1.12');
 							});
 						});
@@ -2365,7 +2374,7 @@ on('sheet:opened', () => {
 		// Set version number
 		mySetAttrs({
 			version: sheetVersion,
-			character_sheet: `Blades in the Dark v${sheetVersion}`
+			character_sheet: `Blades in the Dark v${sheetVersion}`,
 		});
 	});
 });
