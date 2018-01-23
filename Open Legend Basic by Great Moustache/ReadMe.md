@@ -5,6 +5,10 @@
 
 ### Changelog
 
+### 1.8.9.96 on 2018 January 21st
+* XP Feat & Attribute Points calculate for 0
+* Default (Dis)Adv updates for straight Attributes
+
 ### 1.8.9.95 on 2017 December 31st
 * Removed the temporary warning that old inventory not moved over would be lost
 * Completely removed the old inventory section
