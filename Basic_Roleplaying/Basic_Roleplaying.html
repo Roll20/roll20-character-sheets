@@ -88,7 +88,7 @@
 						</td>
 						<td><p>Dmg. Bonus</p></td>
 						<td colspan="3">	
-							<input type="text" name="attr_Damage_Bonus" style="margin-bottom: 0px;height: 24px ; width: 75px">
+							<input type="text" name="attr_Damage_Bonus" value="0" style="margin-bottom: 0px;height: 24px ; width: 75px">
 					</tr>
 					
 					<tr>
@@ -726,6 +726,12 @@
                     <td><input type="number" style="width:105%" value="5" name="attr_Etiquette"  /></td>
 					<td><button type="roll" value="&{template:skillRoll}   {{skillvalue=@{Etiquette}}}  {{fumble=[[ceil(95+((@{Etiquette}+@{Communication})*?{Multiplier|Normal - 1, 1|Easy - 2, 2|Difficult - 1/2, 1/2|1/3|1/4|1/5|1/6|1/8|1/10|1/20}+?{Mods|0})/20)]]}} {{crit=[[ceil(((@{Etiquette}+@{Communication})*?{Multiplier|Normal - 1, 1|Easy - 2, 2|Difficult - 1/2, 1/2|1/3|1/4|1/5|1/6|1/8|1/10|1/20}+?{Mods|0})/20)+1]]}} {{special=[[ceil(((@{Etiquette}+@{Communication})*?{Multiplier|Normal - 1, 1|Easy - 2, 2|Difficult - 1/2, 1/2|1/3|1/4|1/5|1/6|1/8|1/10|1/20}+?{Mods|0})/5)+1]]}}    {{1/2success=[[ceil(((@{Etiquette}+@{Communication})*?{Multiplier|Normal - 1, 1|Easy - 2, 2|Difficult - 1/2, 1/2|1/3|1/4|1/5|1/6|1/8|1/10|1/20}+?{Mods|0})/2)+1]]}}     {{success=[[(@{Etiquette}+@{Communication})*?{Multiplier|Normal - 1, 1|Easy - 2, 2|Difficult - 1/2, 1/2|1/3|1/4|1/5|1/6|1/8|1/10|1/20}+?{Mods|0}]]}} {{roll=[[1d100]]}} {{skillname=Etiquette}}"/></td>
                 </tr>
+                <tr>
+                    <td><input type="checkbox" name="attr_Success-FastTalk"  /></td>
+                    <td class="sheet-skillname">Fast Talk (05)</td>
+                    <td><input type="number" style="width:105%" value="5" name="attr_FastTalk"  /></td>
+					<td><button type="roll" value="&{template:skillRoll}   {{skillvalue=@{FastTalk}}}  {{fumble=[[ceil(95+((@{FastTalk}+@{Communication})*?{Multiplier|Normal - 1, 1|Easy - 2, 2|Difficult - 1/2, 1/2|1/3|1/4|1/5|1/6|1/8|1/10|1/20}+?{Mods|0})/20)]]}} {{crit=[[ceil(((@{FastTalk}+@{Communication})*?{Multiplier|Normal - 1, 1|Easy - 2, 2|Difficult - 1/2, 1/2|1/3|1/4|1/5|1/6|1/8|1/10|1/20}+?{Mods|0})/20)+1]]}} {{special=[[ceil(((@{FastTalk}+@{Communication})*?{Multiplier|Normal - 1, 1|Easy - 2, 2|Difficult - 1/2, 1/2|1/3|1/4|1/5|1/6|1/8|1/10|1/20}+?{Mods|0})/5)+1]]}}    {{1/2success=[[ceil(((@{FastTalk}+@{Communication})*?{Multiplier|Normal - 1, 1|Easy - 2, 2|Difficult - 1/2, 1/2|1/3|1/4|1/5|1/6|1/8|1/10|1/20}+?{Mods|0})/2)+1]]}}     {{success=[[(@{FastTalk}+@{Communication})*?{Multiplier|Normal - 1, 1|Easy - 2, 2|Difficult - 1/2, 1/2|1/3|1/4|1/5|1/6|1/8|1/10|1/20}+?{Mods|0}]]}} {{roll=[[1d100]]}} {{skillname=Fast Talk}}"/></td>
+                </tr>                
                 <tr>
                     <td><input type="checkbox" name="attr_Success-ownLang"  /></td>
                     <td class="sheet-skillname">Language, Own (INT/EDUx5%)</td>
@@ -1996,3 +2002,36 @@
 				</tr>
 		</table>
 	</rolltemplate>
+<!-- SHEET WORKERS -->
+<script type="text/worker">
+
+on("change:str change:siz", function() {  // stat names must use lower case here
+	    getAttrs(["STR", "SIZ"], function(pvalue) {  // from here on, use the actual case of the stat names. 
+		    var curStrength = parseInt(pvalue.STR);
+		    var curSize = parseInt(pvalue.SIZ);
+		    var STRplusSIZ = curStrength + curSize;
+		    var DBonus;
+		                
+            //Determine Bonus
+            if (STRplusSIZ < 13) {
+            	DBonus = "-1d6";
+            }
+            else if (STRplusSIZ < 18) {
+            	DBonus = "-1d4";
+            }
+            else if (STRplusSIZ < 25) {
+            	DBonus = "0";
+            }
+            else if (STRplusSIZ < 32) {
+            	DBonus = "1d4";
+            }
+            else { 
+		var damageFactor = Math.ceil((STRplusSIZ-24)/16);
+            	DBonus = damageFactor + "d6";
+            }            
+	    setAttrs({ 
+               Damage_Bonus: DBonus // change the DMG attribute name here to whatever your damage bonus attribute is called
+            });
+    });
+});
+</script>
