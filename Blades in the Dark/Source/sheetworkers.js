@@ -1,6 +1,7 @@
 "use strict";
 /* DATA */
-const crewData = {
+const sheetVersion = "2.6",
+	crewData = {
 		assassins: {
 			base: {
 				claim_1_desc: "claim_training_rooms_description",
@@ -37,8 +38,8 @@ const crewData = {
 				claim_bridge_13_14: 0,
 				crew_description: "crew_assassins_description",
 				crew_xp_condition: "crew_assassins_xp_condition",
-				hunting_grounds_type: "crew_assassins_hunting_grounds_type",
-				hunting_grounds_description: "crew_assassins_hunting_grounds_description",
+				hunting_grounds_type: "crew_assassins_hunting_grounds_type-N",
+				hunting_grounds_description: "crew_assassins_hunting_grounds_description-N",
 				upgrade_20_check_1: "1",
 				upgrade_21_check_1: "1"
 			},
@@ -92,8 +93,8 @@ const crewData = {
 				cohort1_subtype: "thugs",
 				crew_description: "crew_bravos_description",
 				crew_xp_condition: "crew_bravos_xp_condition",
-				hunting_grounds_type: "crew_bravos_hunting_grounds_type",
-				hunting_grounds_description: "crew_bravos_hunting_grounds_description",
+				hunting_grounds_type: "crew_bravos_hunting_grounds_type-N",
+				hunting_grounds_description: "crew_bravos_hunting_grounds_description-N",
 				upgrade_21_check_1: "1"
 			},
 			crewability: ["dangerous", "blood_brothers", "door_kickers", "fiends", "forged_in_the_fire", "patron", "war_dogs", "veteran"],
@@ -148,12 +149,12 @@ const crewData = {
 				cohort1_subtype: "adepts",
 				crew_description: "crew_cult_description",
 				crew_xp_condition: "crew_cult_xp_condition",
-				hunting_grounds_type: "crew_cult_hunting_grounds_type",
-				hunting_grounds_description: "crew_cult_hunting_grounds_description",
+				hunting_grounds_type: "crew_cult_hunting_grounds_type-N",
+				hunting_grounds_description: "crew_cult_hunting_grounds_description-N",
 				setting_show_deity: "1",
 				upgrade_22_check_1: "1"
 			},
-			crewability: ["chosen", "anointed", "bound_in_darkness", "conviction", "glory_incarnate", "sealed_in_blood", "zealotry", "veteran"],
+			crewability: ["chosen", "anointed", "bound_in_darkness", "conviction-N", "glory_incarnate", "sealed_in_blood", "zealotry", "veteran"],
 			upgrade: [{
 				name: "crew_upgrade_ordained",
 				numboxes: "3"
@@ -205,8 +206,8 @@ const crewData = {
 				claim_bridge_13_14: 0,
 				crew_description: "crew_hawkers_description",
 				crew_xp_condition: "crew_hawkers_xp_condition",
-				hunting_grounds_type: "crew_hawkers_hunting_grounds_type",
-				hunting_grounds_description: "crew_hawkers_hunting_grounds_description",
+				hunting_grounds_type: "crew_hawkers_hunting_grounds_type-N",
+				hunting_grounds_description: "crew_hawkers_hunting_grounds_description-N",
 				upgrade_14_check_1: "1",
 				upgrade_22_check_1: "1"
 			},
@@ -261,8 +262,8 @@ const crewData = {
 				claim_bridge_12_13: 0,
 				crew_description: "crew_shadows_description",
 				crew_xp_condition: "crew_shadows_xp_condition",
-				hunting_grounds_type: "crew_shadows_hunting_grounds_type",
-				hunting_grounds_description: "crew_shadows_hunting_grounds_description",
+				hunting_grounds_type: "crew_shadows_hunting_grounds_type-N",
+				hunting_grounds_description: "crew_shadows_hunting_grounds_description-N",
 				upgrade_10_check_1: "1",
 				upgrade_21_check_1: "1"
 			},
@@ -315,13 +316,14 @@ const crewData = {
 				claim_bridge_6_7: 0,
 				claim_bridge_12_13: 0,
 				claim_bridge_13_14: 0,
+				cohort1_description: "vehicle_edges_flaws",
 				cohort1_name: "vehicle",
-				cohort1_subtype: "boat_carriage_other",
+				cohort1_subtype: "boat_carriage_other-N",
 				cohort1_type: "expert",
 				crew_description: "crew_smugglers_description",
 				crew_xp_condition: "crew_smugglers_xp_condition",
-				hunting_grounds_type: "crew_smugglers_hunting_grounds_type",
-				hunting_grounds_description: "crew_smugglers_hunting_grounds_description",
+				hunting_grounds_type: "crew_smugglers_hunting_grounds_type-N",
+				hunting_grounds_description: "crew_smugglers_hunting_grounds_description-N",
 				upgrade_6_check_1: "1",
 				upgrade_6_name: "vehicle",
 				upgrade_8_name: "vehicle",
@@ -382,8 +384,8 @@ const crewData = {
 				cohort1_type: "expert",
 				crew_description: "crew_vigilantes_description",
 				crew_xp_condition: "crew_vigilantes_xp_condition",
-				hunting_grounds_type: "crew_vigilantes_hunting_grounds_type",
-				hunting_grounds_description: "crew_vigilantes_hunting_grounds_description",
+				hunting_grounds_type: "crew_vigilantes_hunting_grounds_type-N",
+				hunting_grounds_description: "crew_vigilantes_hunting_grounds_description-N",
 				setting_show_origin: "1",
 				upgrade_22_check_1: "1"
 			},
@@ -466,7 +468,7 @@ const crewData = {
 			playbookitem: []
 		},
 		hound: {
-			ability: ["sharpshooter", "focused", "ghost_hunter", "scout", "survivor", "tough_as_nails", "vengeful", "veteran"],
+			ability: ["sharpshooter", "focused", "ghost_hunter", "scout-N", "survivor", "tough_as_nails", "vengeful", "veteran"],
 			base: {
 				char_cohort_name: "hunting_pet",
 				char_cohort_subtype: "hunter",
@@ -687,7 +689,7 @@ const crewData = {
 				gatherinfo3: "gatherinfo_what_is_hidden",
 				gatherinfo4: "gatherinfo_what_do_they_intend",
 				gatherinfo5: "gatherinfo_what_drives_them",
-				gatherinfo6: "gatherinfo_reveal",
+				gatherinfo6: "gatherinfo_how_can_I_reveal",
 				playbook_description: "playbook_whisper_description",
 				study: "1",
 				xp_condition: "playbook_whisper_xp_condition"
@@ -715,7 +717,7 @@ const crewData = {
 			}]
 		},
 		vampire: {
-			ability: ["undead", "terrible_power", "arcane_sight", "a_void_in_the_echo", "dark_talent", "sinister_guile", "veteran"],
+			ability: ["undead", "terrible_power", "arcane_sight", "a_void_in_the_echo", "dark_talent-N", "sinister_guile", "veteran"],
 			base: {
 				friends_title: "playbook_vampire_friends_title",
 				gatherinfo1: "gatherinfo_what_do_they_intend",
@@ -1268,13 +1270,29 @@ const crewData = {
 		upgrade_22_check_1: "0",
 		upgrade_6_check_1: "0",
 		wreck: "0"
-	};
+	},
+	alchemicalData = [
+		"alcahest",
+		"binding_oil",
+		"drift_oil",
+		"drown_powder",
+		"eyeblind_poison",
+		"fire_oil",
+		"grenade",
+		"quicksilver",
+		"skullfire_poison",
+		"smoke_bomb",
+		"spark_drug",
+		"standstill_poison",
+		"trance_powder",
+	];
 /* Transform data once translations are known */
 Object.keys(crewData).forEach(crew => {
 	const base = crewData[crew].base,
 		translatedBaseAttributes = [
 			...[...Array(16).keys()].slice(1).map(i => `claim_${i}_name`),
 			...[...Array(16).keys()].slice(1).map(i => `claim_${i}_desc`),
+			'cohort1_description',
 			'cohort1_name',
 			'cohort1_subtype',
 			'crew_description',
@@ -1314,6 +1332,11 @@ Object.keys(factionsData).forEach(x => {
 	factionsData[x].forEach(faction => {
 		faction.name = getTranslationByKey(faction.name);
 	});
+});
+alchemicalData.forEach((v, k) => {
+	alchemicalData[k] = {
+		name: getTranslationByKey(v)
+	};
 });
 Object.keys(playbookData).forEach(playbook => {
 	const base = playbookData[playbook].base,
@@ -1357,7 +1380,14 @@ Object.keys(playbookData).forEach(playbook => {
 	});
 });
 /* FUNCTIONS */
-const setAttrIfNeeded = (name, value) => {
+const mySetAttrs = (attrs, options, callback) => {
+		const finalAttrs = Object.keys(attrs).reduce((m, k) => {
+			m[k] = String(attrs[k]);
+			return m;
+		}, {});
+		setAttrs(finalAttrs, options, callback);
+	},
+	setAttr = (name, value) => {
 		getAttrs([name], v => {
 			const setting = {};
 			if (v[name] !== String(value)) setting[name] = String(value);
@@ -1399,12 +1429,12 @@ const setAttrIfNeeded = (name, value) => {
 							newAttrs[`repeating_${sectionName}_${rowID}_autogen`] = '1';
 						}
 						return Object.keys(o).reduce((m, key) => {
-							m[`repeating_${sectionName}_${rowID}_${key}`] = String(o[key]);
+							m[`repeating_${sectionName}_${rowID}_${key}`] = o[key];
 							return m;
 						}, newAttrs);
 					})
 					.reduce((m, o) => Object.assign(m, o), {});
-				setAttrs(setting, {}, callback);
+				mySetAttrs(setting, {}, callback);
 			});
 		});
 	},
@@ -1424,47 +1454,52 @@ const setAttrIfNeeded = (name, value) => {
 			getAttrs([event.sourceAttribute], v => {
 				const rName = event.sourceAttribute.slice(0, -1),
 					setting = {};
-				if (v[event.sourceAttribute] === '1') {
+				if (String(v[event.sourceAttribute]) === '1') {
 					switch (event.sourceAttribute.slice(-1)) {
 					case '4':
 						setting[`${rName}3`] = 1;
+						/* falls through */
 					case '3':
 						setting[`${rName}2`] = 1;
+						/* falls through */
 					case '2':
 						setting[`${rName}1`] = 1;
 					}
 				}
-				if (v[event.sourceAttribute] === '0') {
+				if (String(v[event.sourceAttribute]) === '0') {
 					switch (event.sourceAttribute.slice(-1)) {
 					case '1':
-						setting[`${rName}2`] = '0';
+						setting[`${rName}2`] = 0;
+						/* falls through */
 					case '2':
-						setting[`${rName}3`] = '0';
+						setting[`${rName}3`] = 0;
+						/* falls through */
 					case '3':
-						if (upToFour) setting[`${rName}4`] = '0';
+						if (upToFour) setting[`${rName}4`] = 0;
 					}
 				}
-				setAttrs(setting);
+				mySetAttrs(setting);
 			});
 		});
 	},
 	calculateResistance = name => {
 		getAttrs(actionData[name], v => {
-			const total = Object.keys(v).map(x => v[x]).reduce((s, c) => s + (c === '0' ? 0 : 1), 0);
-			setAttrIfNeeded(name, total);
+			const total = Object.keys(v).map(x => v[x])
+				.reduce((s, c) => s + (String(c) === '0' ? 0 : 1), 0);
+			setAttr(name, total);
 		});
 	},
 	calculateVice = () => {
 		getAttrs(Object.keys(actionData), v => {
-			setAttrIfNeeded('vice', Math.min(...Object.keys(v).map(x => parseInt(v[x]) || 0)));
+			setAttr('vice', Math.min(...Object.keys(v).map(x => parseInt(v[x]) || 0)));
 		});
 	},
-	calculateStashDice = stash => setAttrIfNeeded('stash_dice', Math.floor(parseInt(stash) / 10)),
+	calculateStashDice = stash => setAttr('stash_dice', Math.floor(parseInt(stash) / 10)),
 	calculateCohortDice = prefix => {
 		getAttrs(['crew_tier', `${prefix}_impaired`, `${prefix}_type`], v => {
 			const dice = (parseInt(v.crew_tier) || 0) - (parseInt(v[`${prefix}_impaired`]) || 0) +
 				((v[`${prefix}_type`] === 'elite' || v[`${prefix}_type`] === 'expert') ? 1 : 0);
-			setAttrIfNeeded(`${prefix}_dice`, dice);
+			setAttr(`${prefix}_dice`, dice);
 		});
 	};
 /* CONSTANTS */
@@ -1487,22 +1522,36 @@ const crewAttributes = [...new Set([].concat(...Object.keys(crewData).map(x => O
 		'repeating_factionclock:name',
 		'repeating_cohort:edges',
 		'repeating_cohort:flaws',
+		'repeating_alchemical:name',
 		'xp_condition',
 		'xp_condition_extra',
 		'xp_condition2',
 		'xp_condition3',
 		'crew_xp_condition',
+		'hunting_grounds_type',
 		'hunting_grounds_description',
 		'cohort1_edges',
 		'cohort1_flaws',
-	];
+	],
+	autogenSections = [
+		'ability',
+		'crewability',
+		'friend',
+		'contact',
+		'playbookitem',
+		'upgrade'
+	],
+	spiritPlaybooks = ['ghost', 'hull', 'vampire'],
+	translatedNames = [...Object.keys(playbookData), ...Object.keys(crewData)].reduce((m, keyName) => {
+		if (getTranslationByKey(keyName)) m[getTranslationByKey(keyName).toLowerCase()] = keyName;
+		return m;
+	}, {});
 /* EVENT HANDLERS */
 /* Set default fields when setting crew type or playbook */
 on('change:crew_type change:playbook', event => {
-	getAttrs(['changed_attributes', 'setting_autofill', ...watchedAttributes], v => {
-		const spiritPlaybooks = ['ghost', 'hull', 'vampire'],
-			changedAttributes = (v.changed_attributes || '').split(','),
-			sourceName = event.newValue.toLowerCase(),
+	getAttrs(['playbook', 'crew_type', 'changed_attributes', 'setting_autofill', ...watchedAttributes], v => {
+		const changedAttributes = (v.changed_attributes || '').split(','),
+			sourceName = translatedNames[(event.sourceAttribute === 'crew_type' ? v.crew_type : v.playbook).toLowerCase()],
 			fillBaseData = (data, defaultAttrNames) => {
 				if (data) {
 					const finalSettings = defaultAttrNames.filter(name => !changedAttributes.includes(name))
@@ -1517,13 +1566,11 @@ on('change:crew_type change:playbook', event => {
 						}, {});
 					Object.keys(data).filter(name => !changedAttributes.includes(name))
 						.forEach(name => (finalSettings[name] = data[name]));
-					setAttrs(finalSettings);
+					mySetAttrs(finalSettings);
 				}
 			};
-		if (event.newValue) {
-			setAttrs({
-				show_playbook_reminder: '0'
-			});
+		if (event.sourceAttribute === 'crew_type' ? v.crew_type : v.playbook) {
+			setAttr('show_playbook_reminder', '0');
 		}
 		if (v.setting_autofill !== '1') return;
 		if (event.sourceAttribute === 'crew_type' && sourceName in crewData) {
@@ -1537,19 +1584,18 @@ on('change:crew_type change:playbook', event => {
 			fillRepeatingSectionFromData('ability', playbookData[sourceName].ability, true);
 			fillRepeatingSectionFromData('playbookitem', playbookData[sourceName].playbookitem, true);
 			fillBaseData(playbookData[sourceName].base, playbookAttributes);
+			if (sourceName === 'leech') fillRepeatingSectionFromData('alchemical', alchemicalData);
 		}
 	});
 });
 /* Watch repeating rows for changes and set autogen to false if change happens*/
-['ability', 'crewability', 'friend', 'contact', 'playbookitem', 'upgrade'].forEach(sectionName => {
+autogenSections.forEach(sectionName => {
 	on(`change:repeating_${sectionName}`, event => {
-		const idMatch = event.sourceAttribute.match(new RegExp(`^repeating_${sectionName}_(.*?)_`)),
-			id = idMatch && idMatch[1];
-		if (id && event.sourceType === 'player') {
-			const setting = {};
-			setting[`repeating_${sectionName}_${id}_autogen`] = '';
-			setAttrs(setting);
-		}
+		getAttrs([`repeating_${sectionName}_autogen`], v => {
+			if (v[`repeating_${sectionName}_autogen`] && event.sourceType === 'player') {
+				setAttr(`repeating_${sectionName}_autogen`, '');
+			}
+		});
 	});
 });
 /* Watch for changes in auto-set attributes and update changed_attributes*/
@@ -1557,33 +1603,24 @@ watchedAttributes.forEach(name => {
 	on(`change:${name}`, event => {
 		if (event.sourceType === 'player') {
 			getAttrs(['changed_attributes'], v => {
-				const setting = {};
-				setting.changed_attributes = [...new Set(v.changed_attributes.split(',')).add(name)]
+				const changedAttributes = [...new Set(v.changed_attributes.split(',')).add(name)]
 					.filter(x => !!x).join(',');
-				setAttrs(setting);
+				setAttr('changed_attributes', changedAttributes);
 			});
 		}
 	});
 });
 /* Register attribute/action event handlers */
-Object.keys(actionData).forEach(attributeName => {
-	on(actionData[attributeName].map(x => `change:${x}`).join(' '),
-		() => calculateResistance(attributeName));
-	on(`change:setting_dark_talent_${attributeName}`, () => {
-		getAttrs([`setting_dark_talent_${attributeName}`, `setting_resbonus_${attributeName}`], v => {
-			const setting = {},
-				r = `setting_resbonus_${attributeName}`;
-			setting[r] = parseInt(v[r]) || 0;
-			if (v[`setting_dark_talent_${attributeName}`] === '1') {
-				setting[r] = setting[r] + 1;
-			}
-			else {
-				setting[r] = setting[r] - 1;
-			}
-			setAttrs(setting);
+Object.keys(actionData).forEach(attrName => {
+	on(actionData[attrName].map(x => `change:${x}`).join(' '), () => calculateResistance(attrName));
+	on(`change:setting_dark_talent_${attrName}`, () => {
+		getAttrs([`setting_dark_talent_${attrName}`, `setting_resbonus_${attrName}`], v => {
+			const resistanceBonus = (parseInt(v[`setting_resbonus_${attrName}`]) || 0) +
+				((String(v[`setting_dark_talent_${attrName}`]) === '1') ? 1 : -1);
+			setAttr(`setting_resbonus_${attrName}`, resistanceBonus);
 		});
 	});
-	on(`change:${attributeName}`, calculateVice);
+	on(`change:${attrName}`, calculateVice);
 });
 /* Calculate stash */
 on('change:stash', event => calculateStashDice(event.newValue));
@@ -1592,22 +1629,19 @@ on('change:setting_traumata_set ' + traumaDataFlat.map(x => `change:trauma_${x}`
 	getAttrs(['setting_traumata_set', ...traumaDataFlat.map(x => `trauma_${x}`)], v => {
 		const traumaType = (v.setting_traumata_set === '0' ? 'normal' : v.setting_traumata_set);
 		if (traumaData[traumaType] && event.sourceType === 'player') {
-			setAttrs({
-				trauma: traumaData[traumaType].reduce((m, name) => m + (parseInt(v[`trauma_${name}`]) || 0), 0)
-			});
+			const newTrauma = traumaData[traumaType].reduce((m, name) => m + (parseInt(v[`trauma_${name}`]) || 0), 0);
+			setAttr('trauma', newTrauma);
 		}
 	});
 });
 /* Generate buttons */
 on('change:generate_factions', () => {
-	setAttrs({
-		show_faction_generatebutton: '0'
-	});
+	setAttr('show_faction_generatebutton', '0');
 	Object.keys(factionsData).forEach(sectionName => {
 		fillRepeatingSectionFromData(sectionName, factionsData[sectionName]);
 	});
 });
-['ability', 'crewability', 'playbookitem', 'upgrade', 'friend', 'contact'].forEach(sectionName => {
+autogenSections.forEach(sectionName => {
 	on(`change:generate_${sectionName}`, () => {
 		getAttrs(['generate_source_character', 'generate_source_crew', 'sheet_type'], v => {
 			const data = (v.sheet_type === 'character') ? playbookData : crewData,
@@ -1620,19 +1654,8 @@ on('change:generate_factions', () => {
 	});
 });
 /* Extra stress and trauma */
-on('change:setting_extra_stress', event => {
-	const setting = [1, 2, 3, 4, 5].reduce((m, k) => {
-		m[`setting_extra_stress${k}`] = ((parseInt(event.newValue) || 0) > k - 1) ? 1 : 0;
-		return m;
-	}, {});
-	setting.stress_max = 9 + (parseInt(event.newValue) || 0);
-	setAttrs(setting);
-});
-on('change:setting_extra_trauma', event => {
-	setAttrs({
-		trauma_max: 4 + (parseInt(event.newValue) || 0)
-	});
-});
+on('change:setting_extra_stress', event => setAttr('stress_max', 9 + (parseInt(event.newValue) || 0)));
+on('change:setting_extra_trauma', event => setAttr('trauma_max', 4 + (parseInt(event.newValue) || 0)));
 /* Calculate cohort quality */
 on(['crew_tier', 'cohort1_impaired', 'cohort1_type'].map(x => `change:${x}`).join(' '), () => calculateCohortDice('cohort1'));
 on('change:repeating_cohort', () => calculateCohortDice('repeating_cohort'));
@@ -1642,17 +1665,15 @@ on('change:crew_tier', () => {
 on('change:char_cohort_quality change:char_cohort_impaired', () => {
 	getAttrs(['char_cohort_quality', 'char_cohort_impaired'], v => {
 		const dice = (parseInt(v.char_cohort_quality) || 0) - (parseInt(v.char_cohort_impaired) || 0);
-		setAttrIfNeeded('char_cohort_dice', dice);
+		setAttr('char_cohort_dice', dice);
 	});
 });
 /* Set correct verb for cohort roll button */
 ['char_cohort', 'cohort1', 'repeating_cohort'].forEach(prefix => {
 	const eventString = 'change:' + ((prefix === 'repeating_cohort') ? `${prefix}:type` : `${prefix}_type`);
 	on(eventString, event => {
-		const setting = {};
-		if (event.newValue === 'expert') setting[`${prefix}_verb`] = '^{rolls_their}';
-		else setting[`${prefix}_verb`] = '^{roll_their-l}';
-		setAttrs(setting);
+		const verb = (event.newValue === 'expert') ? '^{rolls_their}' : '^{roll_their-l}';
+		setAttr(`${prefix}_verb`, verb);
 	});
 });
 /* Left-fill checkboxes */
@@ -1660,21 +1681,11 @@ handleBoxesFill('upgrade_24_check_', true);
 handleBoxesFill('bandolier1_check_');
 handleBoxesFill('bandolier2_check_');
 ['item', 'playbookitem', 'upgrade'].forEach(sName => handleBoxesFill(`repeating_${sName}:check_`));
-/* Handle showing options for heritage, background, and vice */
-['heritage', 'background', 'vice_purveyor', 'hull_functions', 'crew_deity_features'].forEach(name => {
-	on(`change:${name}`, event => {
-		const setting = {};
-		setting[`show_${name}_info`] = event.newValue ? '0' : '1';
-		setAttrs(setting);
-	});
-});
 /* Pseudo-radios */
 ['crew_tier', ...actionsFlat].forEach(name => {
 	on(`change:${name}`, event => {
-		if (event.newValue === '0') {
-			const setting = {};
-			setting[name] = (parseInt(event.previousValue) || 1) - 1;
-			setAttrs(setting);
+		if (String(event.newValue) === '0' && event.sourceType === 'player') {
+			setAttr(name, (parseInt(event.previousValue) || 1) - 1);
 		}
 	});
 });
@@ -1690,21 +1701,17 @@ on('change:reset_items', () => {
 				m[name] = 0;
 				return m;
 			}, {});
-			setAttrs(setting);
+			mySetAttrs(setting);
 		});
 	};
-	setAttrs({
-		load: 0
-	});
+	setAttr('load', 0);
 	['item', 'playbookitem'].forEach(clearChecks);
 });
 /* Default values for number of upgrades boxes */
-on('change:repeating_upgrade', () => {
+on('change:repeating_upgrade:boxes_chosen', () => {
 	getAttrs(['repeating_upgrade_numboxes'], v => {
 		if (!['1', '2', '3'].includes(v.repeating_upgrade_numboxes)) {
-			setAttrs({
-				repeating_upgrade_numboxes: '1'
-			});
+			setAttr('repeating_upgrade_numboxes', '1');
 		}
 	});
 });
@@ -1712,9 +1719,9 @@ on('change:repeating_upgrade', () => {
 on('change:setting_text_bonus_query sheet:opened', () => {
 	getAttrs(['setting_text_bonus_query', 'bonusdice', 'numberofdice'], v => {
 		const setting = {};
-		if (v.setting_text_bonus_query === '1') {
+		if (String(v.setting_text_bonus_query) === '1') {
 			setting.bonusdice = `(?{${getTranslationByKey('bonusdice')}|0})`;
-			setting.numberofdice = `(?{${getTranslationByKey('numberofdice')}})`;
+			setting.numberofdice = `(?{${getTranslationByKey('numberofdice')}|0})`;
 		}
 		else {
 			setting.bonusdice = `?{${getTranslationByKey('bonusdice')}|0|1|2|3|4|5|6|-1|-2|-3}`;
@@ -1722,45 +1729,36 @@ on('change:setting_text_bonus_query sheet:opened', () => {
 			if (setting.bonusdice === v.bonusdice) delete setting.bonusdice;
 			if (setting.numberofdice === v.numberofdice) delete setting.numberofdice;
 		}
-		setAttrs(setting);
+		mySetAttrs(setting);
 	});
 });
 /* Resistance query */
 on('change:setting_consequence_query sheet:opened', () => {
-	getAttrs(['setting_consequence_query', 'consequence_query'], v => {
-		const setting = {
-			consequence_query: (v.setting_consequence_query === '1') ?
-				`?{${getTranslationByKey('consequence')}|${getTranslationByKey('a_consequence')}}` : getTranslationByKey('a_consequence')
-		};
-		if (v.consequence_query === setting.consequence_query) delete setting.consequence_query;
-		setAttrs(setting);
+	getAttrs(['setting_consequence_query'], v => {
+		const consequenceQuery = (String(v.setting_consequence_query) === '1') ?
+			`?{${getTranslationByKey('consequence')}|${getTranslationByKey('a_consequence')}}` :
+			'^{a_consequence}';
+		setAttr('consequence_query', consequenceQuery);
 	});
 });
 /* Trim whitespace in auto-expand fields */
 autoExpandFields.forEach(name => {
 	on(`change:${name}`, event => {
-		if (event.newValue.trim() !== event.newValue && event.sourceType === 'player') {
-			const setting = {};
-			setting[name.replace(':', '_')] = event.newValue.trim();
-			setAttrs(setting);
-		}
+		const attrName = name.replace(':', '_');
+		getAttrs([attrName], v => {
+			if (v[attrName].trim() !== v[attrName] && event.sourceType === 'player') {
+				setAttr(attrName, v[attrName].trim());
+			}
+		});
 	});
 });
 /* INITIALISATION AND UPGRADES */
 on('sheet:opened', () => {
 	getAttrs(['sheet_type', 'changed_attributes', 'crew_type', 'playbook'], v => {
 		/* Make sure sheet_type is never 0 */
-		if (!['character', 'crew', 'faction'].includes(v.sheet_type)) {
-			setAttrs({
-				sheet_type: 'character'
-			});
-		}
+		if (!['crew', 'faction'].includes(v.sheet_type)) setAttr('sheet_type', 'character');
 		/* Remove reminder box if we have playbook or crew name */
-		if (v.playbook || v.crew_type) {
-			setAttrs({
-				show_playbook_reminder: '0'
-			});
-		}
+		if (v.playbook || v.crew_type) setAttr('show_playbook_reminder', '0');
 	});
 	/* Set up translated queries */
 	const queries = {
@@ -1777,13 +1775,18 @@ on('sheet:opened', () => {
 		Object.keys(queries).forEach(name => {
 			if (v[name] !== queries[name]) setting[name] = queries[name];
 		});
-		setAttrs(setting);
+		mySetAttrs(setting);
 	});
+	/* Translated title text */
+	if (getTranslationLanguage() === 'ko') setAttr('title_text', '{{title-text=1}} {{korean=1}}');
+	else setAttr('title_text', '');
 	/* Setup and upgrades */
 	getAttrs(['version'], v => {
 		const upgradeSheet = version => {
 				const versionMajor = version && parseInt(version.split('.')[0]),
 					versionMinor = version && parseInt(version.split('.')[1]);
+				console.log(`Found version ${version}.`);
+				if (version !== sheetVersion) console.log('Performing sheet upgrade.');
 				// Upgrade to 0.7: Convert legacy faction repeating section to text
 				if (versionMajor === 0 && versionMinor < 7) {
 					getSectionIDs('repeating_faction', list => {
@@ -1795,12 +1798,9 @@ on('sheet:opened', () => {
 									'Status: ' + (v[`${str}_status`] || '') + '\n' +
 									'Notes: ' + (v[`${str}_description`] || '') + '\n';
 							}).join('\n');
-							setAttrs({
-								faction_notes: output
-							});
+							setAttr('faction_notes', output);
 							list.forEach(id => removeRepeatingRow(`repeating_faction_${id}`));
 							upgradeSheet('0.7');
-							console.log('Updating to 0.7');
 						});
 					});
 				}
@@ -1831,7 +1831,6 @@ on('sheet:opened', () => {
 							check: v.contact1_check || '0',
 							name: v.contact1_name || ''
 						}], false, upgradeFunction);
-						console.log('Updating to 0.9');
 					});
 				}
 				// Upgrade to 1.4: Convert playbook items and repeating items
@@ -1913,8 +1912,7 @@ on('sheet:opened', () => {
 								setting[`repeating_item_${id}_check_1`] = v[`repeating_item_${id}_check`] || '0';
 								setting[`repeating_item_${id}_check_2`] = v[`repeating_item_${id}_check_b`] || '0';
 							});
-							setAttrs(setting, {}, upgradeFunction);
-							console.log('Updating to 1.4');
+							mySetAttrs(setting, {}, upgradeFunction);
 						});
 					});
 				}
@@ -2027,7 +2025,6 @@ on('sheet:opened', () => {
 							obj.boxes_chosen = 'on';
 						});
 						fillRepeatingSectionFromData('item', items, false, () => upgradeSheet('1.5'));
-						console.log('Updating to 1.5');
 					});
 				}
 				// Upgrade to 1.6: Set defaults, convert upgrade names
@@ -2095,7 +2092,7 @@ on('sheet:opened', () => {
 									setting[`repeating_upgrade_${id}_numboxes`] = '2';
 									setting[`repeating_upgrade_${id}_boxes_chosen`] = 'on';
 								});
-								setAttrs(setting, {}, upgradeFunction);
+								mySetAttrs(setting, {}, upgradeFunction);
 								fillRepeatingSectionFromData('upgrade', upgrades, false, upgradeFunction);
 							});
 						});
@@ -2115,8 +2112,7 @@ on('sheet:opened', () => {
 						Object.keys(translatedDefaults).forEach(k => {
 							setting[k] = v[k] || setting[k] || translatedDefaults[k];
 						});
-						setAttrs(setting, {}, upgradeFunction);
-						console.log('Updating to 1.6');
+						mySetAttrs(setting, {}, upgradeFunction);
 					});
 				}
 				// Upgrade to 1.9: Add missing upgrade descriptions, convert bandolier checks
@@ -2144,7 +2140,7 @@ on('sheet:opened', () => {
 						setting.bandolier2_check_1 = v.bandolier2_check || '0';
 						setting.bandolier2_check_2 = v.bandolier2_check_b || '0';
 						setting.bandolier2_check_3 = v.bandolier2_check_c || '0';
-						setAttrs(setting, {}, upgradeFunction);
+						mySetAttrs(setting, {}, upgradeFunction);
 					});
 					getSectionIDs('item', idArray => {
 						const attrs = [
@@ -2159,14 +2155,12 @@ on('sheet:opened', () => {
 									setting[`repeating_item_${id}_description`] = itemData[k].description;
 								}
 							});
-							setAttrs(setting, {}, upgradeFunction);
-							console.log('Updating to 1.9');
+							mySetAttrs(setting, {}, upgradeFunction);
 						});
 					});
 				}
 				// Upgrade to 1.10: Convert clocks
 				else if (versionMajor === 1 && versionMinor < 10) {
-					console.log('Updating to 1.10');
 					const upgradeFunction = _.after(2, () => upgradeSheet('1.10'));
 					['clock', 'crewclock'].forEach(sName => {
 						getSectionIDs(`repeating_${sName}`, idArray => {
@@ -2198,14 +2192,13 @@ on('sheet:opened', () => {
 										break;
 									}
 								});
-								setAttrs(setting, {}, upgradeFunction);
+								mySetAttrs(setting, {}, upgradeFunction);
 							});
 						});
 					});
 				}
 				// Upgrade to 1.11: Convert all checkboxes to value=1
 				else if (versionMajor === 1 && versionMinor < 11) {
-					console.log('Updating to 1.11');
 					const upgradeFunction = _.after(14, () => upgradeSheet('1.11')),
 						upgradeNums = [...Array(25).keys()].slice(1).filter(x => x !== 19).slice(5),
 						boxes = ['show_settings', 'setting_extra_trauma', 'setting_extra_xp', 'setting_vampirexp', 'setting_show_strictures',
@@ -2251,7 +2244,7 @@ on('sheet:opened', () => {
 								attrNames.forEach(name => {
 									if (v[name] === 'on') setting[name] = 1;
 								});
-								setAttrs(setting, {
+								mySetAttrs(setting, {
 									silent: true
 								}, upgradeFunction);
 							});
@@ -2272,40 +2265,22 @@ on('sheet:opened', () => {
 					actionsFlat.forEach(name => {
 						getAttrs([1, 2, 3, 4, 5].map(x => `${name}${x}`), v => {
 							const total = [1, 2, 3, 4, 5].reduce((m, x) => m + (parseInt(v[`${name}${x}`]) || 0), 0);
-							setAttrIfNeeded(name, total);
+							setAttr(name, total);
 						});
 					});
 					getSectionIDs('repeating_cohort', idArray => {
 						getAttrs(['crew_tier1', 'crew_tier2', 'crew_tier3', 'crew_tier4'], v => {
 							const tier = (parseInt(v.crew_tier1) || 0) + (parseInt(v.crew_tier2) || 0) +
 								(parseInt(v.crew_tier3) || 0) + (parseInt(v.crew_tier4) || 0);
-							setAttrs({
+							mySetAttrs({
 								crew_tier: tier
 							}, {}, () => {
 								calculateCohortDice('cohort1');
 								idArray.forEach(id => calculateCohortDice(`repeating_cohort_${id}`));
 								upgradeSheet('1.12');
-								console.log('Updating to 1.12');
 							});
 						});
 					});
-				}
-				// Upgrade to 1.13: Header info
-				else if (versionMajor === 1 && versionMinor < 13) {
-					getAttrs(['heritage', 'background', 'vice_purveyor', 'hull_functions', 'crew_deity_features'], v => {
-						const setting = {};
-						Object.keys(v).forEach(name => {
-							if (v[name]) setting[`show_${name}_info`] = '0';
-						});
-						setAttrs(setting, {}, () => upgradeSheet('1.13'));
-						console.log('Updating to 1.13');
-					});
-				}
-				// Upgrade to 1.15: Recalculate resistance
-				else if (versionMajor === 1 && versionMinor < 15) {
-					Object.keys(actionData).forEach(calculateResistance);
-					upgradeSheet('1.15');
-					console.log('Updating to 1.15');
 				}
 				// Upgrade to 2.0: Rename trauma attributes, frame feature migration
 				else if (versionMajor < 2) {
@@ -2329,21 +2304,41 @@ on('sheet:opened', () => {
 						actionsFlat.filter(n => changedAttrs.has(`${n}1`) || changedAttrs.has(`${n}2`))
 							.forEach(name => changedAttrs.add(name));
 						setting.changed_attributes = [...changedAttrs].join(',');
-						console.log('Updating to 2.0');
 						fillRepeatingSectionFromData('framefeature', frameData, false, upgradeFunction);
-						setAttrs(setting, {}, upgradeFunction);
+						mySetAttrs(setting, {}, upgradeFunction);
 					});
 				}
 				// Upgrade to 2.2: Enable pet for hounds
 				else if (versionMajor === 2 && versionMinor < 2) {
 					getAttrs(['playbook'], v => {
 						if (v.playbook.toLowerCase() === 'hound') {
-							setAttrs({
+							mySetAttrs({
 								char_cohort_name: 'Hunting Pet',
 								char_cohort_subtype: 'Hunter',
 								setting_show_cohort: '1'
 							});
 						}
+						upgradeSheet('2.2');
+					});
+				}
+				// Upgrade to 2.4: Generate alchemicals for Leeches, recalculate resistance
+				else if (versionMajor === 2 && versionMinor < 4) {
+					Object.keys(actionData).forEach(calculateResistance);
+					getAttrs(['playbook', 'notes', 'changed_attributes'], v => {
+						if (v.playbook.toLowerCase() === 'leech') {
+							fillRepeatingSectionFromData('alchemical', alchemicalData);
+						}
+						if (v.changed_attributes) {
+							const changedAttrs = v.changed_attributes.split(',');
+							actionsFlat.forEach(action => {
+								if (changedAttrs.some(x => x.indexOf(action) === 0)) {
+									changedAttrs.push(action);
+								}
+							});
+							setAttr('changed_attributes', [...new Set(changedAttrs)].join(','));
+						}
+						setAttr('crew_notes', v.notes || '');
+						upgradeSheet('2.4');
 					});
 				}
 			},
@@ -2353,7 +2348,7 @@ on('sheet:opened', () => {
 						memo[`repeating_${sectionName}_${generateRowID()}_autogen`] = 1;
 						return memo;
 					}, {});
-				setAttrs(setting);
+				mySetAttrs(setting);
 				fillRepeatingSectionFromData('item', itemData);
 				/* Set translated default values */
 				getAttrs(Object.keys(translatedDefaults), v => {
@@ -2361,16 +2356,16 @@ on('sheet:opened', () => {
 					Object.keys(translatedDefaults).forEach(k => {
 						if (v[k] !== translatedDefaults[k]) setting[k] = translatedDefaults[k];
 					});
-					setAttrs(setting);
+					mySetAttrs(setting);
 				});
-				console.log('Initialising new sheet');
+				console.log('Initialising new sheet.');
 			};
 		if (v.version) upgradeSheet(v.version);
 		else initialiseSheet();
 		// Set version number
-		setAttrs({
-			version: '2.2',
-			character_sheet: 'Blades in the Dark v2.2'
+		mySetAttrs({
+			version: sheetVersion,
+			character_sheet: `Blades in the Dark v${sheetVersion}`
 		});
 	});
 });
