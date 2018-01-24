@@ -1,6 +1,6 @@
 "use strict";
 /* DATA */
-const sheetVersion = "2.5",
+const sheetVersion = "2.6",
 	crewData = {
 		assassins: {
 			base: {
@@ -38,8 +38,8 @@ const sheetVersion = "2.5",
 				claim_bridge_13_14: 0,
 				crew_description: "crew_assassins_description",
 				crew_xp_condition: "crew_assassins_xp_condition",
-				hunting_grounds_type: "crew_assassins_hunting_grounds_type",
-				hunting_grounds_description: "crew_assassins_hunting_grounds_description",
+				hunting_grounds_type: "crew_assassins_hunting_grounds_type-N",
+				hunting_grounds_description: "crew_assassins_hunting_grounds_description-N",
 				upgrade_20_check_1: "1",
 				upgrade_21_check_1: "1"
 			},
@@ -93,8 +93,8 @@ const sheetVersion = "2.5",
 				cohort1_subtype: "thugs",
 				crew_description: "crew_bravos_description",
 				crew_xp_condition: "crew_bravos_xp_condition",
-				hunting_grounds_type: "crew_bravos_hunting_grounds_type",
-				hunting_grounds_description: "crew_bravos_hunting_grounds_description",
+				hunting_grounds_type: "crew_bravos_hunting_grounds_type-N",
+				hunting_grounds_description: "crew_bravos_hunting_grounds_description-N",
 				upgrade_21_check_1: "1"
 			},
 			crewability: ["dangerous", "blood_brothers", "door_kickers", "fiends", "forged_in_the_fire", "patron", "war_dogs", "veteran"],
@@ -149,12 +149,12 @@ const sheetVersion = "2.5",
 				cohort1_subtype: "adepts",
 				crew_description: "crew_cult_description",
 				crew_xp_condition: "crew_cult_xp_condition",
-				hunting_grounds_type: "crew_cult_hunting_grounds_type",
-				hunting_grounds_description: "crew_cult_hunting_grounds_description",
+				hunting_grounds_type: "crew_cult_hunting_grounds_type-N",
+				hunting_grounds_description: "crew_cult_hunting_grounds_description-N",
 				setting_show_deity: "1",
 				upgrade_22_check_1: "1"
 			},
-			crewability: ["chosen", "anointed", "bound_in_darkness", "conviction", "glory_incarnate", "sealed_in_blood", "zealotry", "veteran"],
+			crewability: ["chosen", "anointed", "bound_in_darkness", "conviction-N", "glory_incarnate", "sealed_in_blood", "zealotry", "veteran"],
 			upgrade: [{
 				name: "crew_upgrade_ordained",
 				numboxes: "3"
@@ -206,8 +206,8 @@ const sheetVersion = "2.5",
 				claim_bridge_13_14: 0,
 				crew_description: "crew_hawkers_description",
 				crew_xp_condition: "crew_hawkers_xp_condition",
-				hunting_grounds_type: "crew_hawkers_hunting_grounds_type",
-				hunting_grounds_description: "crew_hawkers_hunting_grounds_description",
+				hunting_grounds_type: "crew_hawkers_hunting_grounds_type-N",
+				hunting_grounds_description: "crew_hawkers_hunting_grounds_description-N",
 				upgrade_14_check_1: "1",
 				upgrade_22_check_1: "1"
 			},
@@ -262,8 +262,8 @@ const sheetVersion = "2.5",
 				claim_bridge_12_13: 0,
 				crew_description: "crew_shadows_description",
 				crew_xp_condition: "crew_shadows_xp_condition",
-				hunting_grounds_type: "crew_shadows_hunting_grounds_type",
-				hunting_grounds_description: "crew_shadows_hunting_grounds_description",
+				hunting_grounds_type: "crew_shadows_hunting_grounds_type-N",
+				hunting_grounds_description: "crew_shadows_hunting_grounds_description-N",
 				upgrade_10_check_1: "1",
 				upgrade_21_check_1: "1"
 			},
@@ -316,13 +316,14 @@ const sheetVersion = "2.5",
 				claim_bridge_6_7: 0,
 				claim_bridge_12_13: 0,
 				claim_bridge_13_14: 0,
+				cohort1_description: "vehicle_edges_flaws",
 				cohort1_name: "vehicle",
-				cohort1_subtype: "boat_carriage_other",
+				cohort1_subtype: "boat_carriage_other-N",
 				cohort1_type: "expert",
 				crew_description: "crew_smugglers_description",
 				crew_xp_condition: "crew_smugglers_xp_condition",
-				hunting_grounds_type: "crew_smugglers_hunting_grounds_type",
-				hunting_grounds_description: "crew_smugglers_hunting_grounds_description",
+				hunting_grounds_type: "crew_smugglers_hunting_grounds_type-N",
+				hunting_grounds_description: "crew_smugglers_hunting_grounds_description-N",
 				upgrade_6_check_1: "1",
 				upgrade_6_name: "vehicle",
 				upgrade_8_name: "vehicle",
@@ -383,8 +384,8 @@ const sheetVersion = "2.5",
 				cohort1_type: "expert",
 				crew_description: "crew_vigilantes_description",
 				crew_xp_condition: "crew_vigilantes_xp_condition",
-				hunting_grounds_type: "crew_vigilantes_hunting_grounds_type",
-				hunting_grounds_description: "crew_vigilantes_hunting_grounds_description",
+				hunting_grounds_type: "crew_vigilantes_hunting_grounds_type-N",
+				hunting_grounds_description: "crew_vigilantes_hunting_grounds_description-N",
 				setting_show_origin: "1",
 				upgrade_22_check_1: "1"
 			},
@@ -396,14 +397,14 @@ const sheetVersion = "2.5",
 				name: "crew_upgrade_vigilantes_attire",
 				numboxes: "1"
 			}, {
+				name: "crew_upgrade_dedicated_crafters",
+				numboxes: "1",
+			}, {
 				name: "crew_upgrade_irregulars",
 				numboxes: "1"
 			}, {
 				name: "crew_upgrade_willing_to_fight",
 				numboxes: "1"
-			}, {
-				name: "crew_upgrade_spark-craft_technology",
-				numboxes: "1",
 			}]
 		}
 	},
@@ -467,7 +468,7 @@ const sheetVersion = "2.5",
 			playbookitem: []
 		},
 		hound: {
-			ability: ["sharpshooter", "focused", "ghost_hunter", "scout", "survivor", "tough_as_nails", "vengeful", "veteran"],
+			ability: ["sharpshooter", "focused", "ghost_hunter", "scout-N", "survivor", "tough_as_nails", "vengeful", "veteran"],
 			base: {
 				char_cohort_name: "hunting_pet",
 				char_cohort_subtype: "hunter",
@@ -550,7 +551,7 @@ const sheetVersion = "2.5",
 				numboxes: "1"
 			}, {
 				bold: "1",
-				name: "playbook_item_fine_wrecker_tools",
+				name: "playbook_item_fine_wrecking_tools",
 				numboxes: "2"
 			}, {
 				name: "playbook_item_blowgun_&_darts,_syringes",
@@ -688,7 +689,7 @@ const sheetVersion = "2.5",
 				gatherinfo3: "gatherinfo_what_is_hidden",
 				gatherinfo4: "gatherinfo_what_do_they_intend",
 				gatherinfo5: "gatherinfo_what_drives_them",
-				gatherinfo6: "gatherinfo_reveal",
+				gatherinfo6: "gatherinfo_how_can_I_reveal",
 				playbook_description: "playbook_whisper_description",
 				study: "1",
 				xp_condition: "playbook_whisper_xp_condition"
@@ -716,7 +717,7 @@ const sheetVersion = "2.5",
 			}]
 		},
 		vampire: {
-			ability: ["undead", "terrible_power", "arcane_sight", "a_void_in_the_echo", "dark_talent", "sinister_guile", "veteran"],
+			ability: ["undead", "terrible_power", "arcane_sight", "a_void_in_the_echo", "dark_talent-N", "sinister_guile", "veteran"],
 			base: {
 				friends_title: "playbook_vampire_friends_title",
 				gatherinfo1: "gatherinfo_what_do_they_intend",
@@ -1291,6 +1292,7 @@ Object.keys(crewData).forEach(crew => {
 		translatedBaseAttributes = [
 			...[...Array(16).keys()].slice(1).map(i => `claim_${i}_name`),
 			...[...Array(16).keys()].slice(1).map(i => `claim_${i}_desc`),
+			'cohort1_description',
 			'cohort1_name',
 			'cohort1_subtype',
 			'crew_description',
@@ -1456,8 +1458,10 @@ const mySetAttrs = (attrs, options, callback) => {
 					switch (event.sourceAttribute.slice(-1)) {
 					case '4':
 						setting[`${rName}3`] = 1;
+						/* falls through */
 					case '3':
 						setting[`${rName}2`] = 1;
+						/* falls through */
 					case '2':
 						setting[`${rName}1`] = 1;
 					}
@@ -1466,8 +1470,10 @@ const mySetAttrs = (attrs, options, callback) => {
 					switch (event.sourceAttribute.slice(-1)) {
 					case '1':
 						setting[`${rName}2`] = 0;
+						/* falls through */
 					case '2':
 						setting[`${rName}3`] = 0;
+						/* falls through */
 					case '3':
 						if (upToFour) setting[`${rName}4`] = 0;
 					}
@@ -1489,11 +1495,20 @@ const mySetAttrs = (attrs, options, callback) => {
 		});
 	},
 	calculateStashDice = stash => setAttr('stash_dice', Math.floor(parseInt(stash) / 10)),
-	calculateCohortDice = prefix => {
-		getAttrs(['crew_tier', `${prefix}_impaired`, `${prefix}_type`], v => {
-			const dice = (parseInt(v.crew_tier) || 0) - (parseInt(v[`${prefix}_impaired`]) || 0) +
-				((v[`${prefix}_type`] === 'elite' || v[`${prefix}_type`] === 'expert') ? 1 : 0);
-			setAttr(`${prefix}_dice`, dice);
+	calculateCohortDice = prefixes => {
+		const sourceAttrs = [
+			'crew_tier',
+			...prefixes.map(p => `${p}_impaired`),
+			...prefixes.map(p => `${p}_type`),
+		];
+		getAttrs(sourceAttrs, v => {
+			const setting = {};
+			prefixes.forEach(prefix => {
+				const dice = (parseInt(v.crew_tier) || 0) - (parseInt(v[`${prefix}_impaired`]) || 0) +
+					((v[`${prefix}_type`] === 'elite' || v[`${prefix}_type`] === 'expert') ? 1 : 0);
+				setting[`${prefix}_dice`] = dice;
+			});
+			setAttrs(setting);
 		});
 	};
 /* CONSTANTS */
@@ -1522,6 +1537,7 @@ const crewAttributes = [...new Set([].concat(...Object.keys(crewData).map(x => O
 		'xp_condition2',
 		'xp_condition3',
 		'crew_xp_condition',
+		'hunting_grounds_type',
 		'hunting_grounds_description',
 		'cohort1_edges',
 		'cohort1_flaws',
@@ -1534,13 +1550,17 @@ const crewAttributes = [...new Set([].concat(...Object.keys(crewData).map(x => O
 		'playbookitem',
 		'upgrade'
 	],
-	spiritPlaybooks = ['ghost', 'hull', 'vampire'];
+	spiritPlaybooks = ['ghost', 'hull', 'vampire'],
+	translatedNames = [...Object.keys(playbookData), ...Object.keys(crewData)].reduce((m, keyName) => {
+		if (getTranslationByKey(keyName)) m[getTranslationByKey(keyName).toLowerCase()] = keyName;
+		return m;
+	}, {});
 /* EVENT HANDLERS */
 /* Set default fields when setting crew type or playbook */
 on('change:crew_type change:playbook', event => {
 	getAttrs(['playbook', 'crew_type', 'changed_attributes', 'setting_autofill', ...watchedAttributes], v => {
 		const changedAttributes = (v.changed_attributes || '').split(','),
-			sourceName = (event.sourceAttribute === 'crew_type' ? v.crew_type : v.playbook).toLowerCase(),
+			sourceName = translatedNames[(event.sourceAttribute === 'crew_type' ? v.crew_type : v.playbook).toLowerCase()],
 			fillBaseData = (data, defaultAttrNames) => {
 				if (data) {
 					const finalSettings = defaultAttrNames.filter(name => !changedAttributes.includes(name))
@@ -1558,7 +1578,7 @@ on('change:crew_type change:playbook', event => {
 					mySetAttrs(finalSettings);
 				}
 			};
-		if (sourceName) {
+		if (event.sourceAttribute === 'crew_type' ? v.crew_type : v.playbook) {
 			setAttr('show_playbook_reminder', '0');
 		}
 		if (v.setting_autofill !== '1') return;
@@ -1618,7 +1638,7 @@ on('change:setting_traumata_set ' + traumaDataFlat.map(x => `change:trauma_${x}`
 	getAttrs(['setting_traumata_set', ...traumaDataFlat.map(x => `trauma_${x}`)], v => {
 		const traumaType = (v.setting_traumata_set === '0' ? 'normal' : v.setting_traumata_set);
 		if (traumaData[traumaType] && event.sourceType === 'player') {
-			const newTrauma = traumaData[traumaType].reduce((m, name) => m + (parseInt(v[`trauma_${name}`]) || 0), 0)
+			const newTrauma = traumaData[traumaType].reduce((m, name) => m + (parseInt(v[`trauma_${name}`]) || 0), 0);
 			setAttr('trauma', newTrauma);
 		}
 	});
@@ -1646,10 +1666,10 @@ autogenSections.forEach(sectionName => {
 on('change:setting_extra_stress', event => setAttr('stress_max', 9 + (parseInt(event.newValue) || 0)));
 on('change:setting_extra_trauma', event => setAttr('trauma_max', 4 + (parseInt(event.newValue) || 0)));
 /* Calculate cohort quality */
-on(['crew_tier', 'cohort1_impaired', 'cohort1_type'].map(x => `change:${x}`).join(' '), () => calculateCohortDice('cohort1'));
-on('change:repeating_cohort', () => calculateCohortDice('repeating_cohort'));
+on(['crew_tier', 'cohort1_impaired', 'cohort1_type'].map(x => `change:${x}`).join(' '), () => calculateCohortDice(['cohort1']));
+on('change:repeating_cohort', () => calculateCohortDice(['repeating_cohort']));
 on('change:crew_tier', () => {
-	getSectionIDs('repeating_cohort', a => a.forEach(id => calculateCohortDice(`repeating_cohort_${id}`)));
+	getSectionIDs('repeating_cohort', a => calculateCohortDice(a.map(id => `repeating_cohort_${id}`)));
 });
 on('change:char_cohort_quality change:char_cohort_impaired', () => {
 	getAttrs(['char_cohort_quality', 'char_cohort_impaired'], v => {
@@ -1726,7 +1746,7 @@ on('change:setting_consequence_query sheet:opened', () => {
 	getAttrs(['setting_consequence_query'], v => {
 		const consequenceQuery = (String(v.setting_consequence_query) === '1') ?
 			`?{${getTranslationByKey('consequence')}|${getTranslationByKey('a_consequence')}}` :
-			getTranslationByKey('a_consequence');
+			'^{a_consequence}';
 		setAttr('consequence_query', consequenceQuery);
 	});
 });
@@ -1766,6 +1786,9 @@ on('sheet:opened', () => {
 		});
 		mySetAttrs(setting);
 	});
+	/* Translated title text */
+	if (getTranslationLanguage() === 'ko') setAttr('title_text', '{{title-text=1}} {{korean=1}}');
+	else setAttr('title_text', '');
 	/* Setup and upgrades */
 	getAttrs(['version'], v => {
 		const upgradeSheet = version => {
@@ -2261,8 +2284,8 @@ on('sheet:opened', () => {
 							mySetAttrs({
 								crew_tier: tier
 							}, {}, () => {
-								calculateCohortDice('cohort1');
-								idArray.forEach(id => calculateCohortDice(`repeating_cohort_${id}`));
+								calculateCohortDice(['cohort1']);
+								calculateCohortDice(idArray.map(id => `repeating_cohort_${id}`));
 								upgradeSheet('1.12');
 							});
 						});
@@ -2351,7 +2374,7 @@ on('sheet:opened', () => {
 		// Set version number
 		mySetAttrs({
 			version: sheetVersion,
-			character_sheet: `Blades in the Dark v${sheetVersion}`
+			character_sheet: `Blades in the Dark v${sheetVersion}`,
 		});
 	});
 });
