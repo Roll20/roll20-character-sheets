@@ -15,6 +15,8 @@ This character sheet is intended for use with the [Open Legend](http://www.openl
 
 ## Revision History
 
+January 29, 2018 - The notes in the Actions section are now added to the roll and text areas are now resizable. (Thanks to Great Moustache for helping with the code for the scrolling notes)
+
 January 22, 2018 - Changed the style of the Advantage menu to allow up to 12 Advantage and Disadvantage. Also fixed a small bug where the Power Level for Boons in the Actions section did not update correctly.
 
 July 1, 2017 - Initial public draft
