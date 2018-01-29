@@ -29,9 +29,8 @@
 		calcPrescience();
 		calcProtection();
 		calcAllActionRolls();
-		featsFixColumns();
-		perksFixColumns();
-		flawsFixColumns();
+		otherInventoryFixColumns1();
+		otherInventoryFixColumns2();
         getAttrs(["xp"], function(values) {
             setAttrs({
                 "level": Math.floor(values.xp/3) + 1,
@@ -42,54 +41,35 @@
         });
 	});
 	
-	// Function to combine the double columns in Feats, Perks, Flaws, & Power Level for Actions
+	// Function to combine the Non-Essential Inventory & Notes sections (3 into 1)
 	// **** To be removed after a few months, only needed for pre-existing characters
-	// **** Put in August 2017
-    function featsFixColumns() {
-		getSectionIDs("repeating_featsRight", function(featsRightArray) {
-			if(featsRightArray.length > 0) {
-				_.each(featsRightArray, function(currentID, i) {
-				    getAttrs(["repeating_featsRight_" + currentID + "_feat_right_name", "repeating_featsRight_" + currentID + "_feat_right_cost", "repeating_featsRight_" + currentID + "_feat_right_description"], function(v) {
+	// **** Put in January 2018
+    function otherInventoryFixColumns1() {
+		getSectionIDs("repeating_OtherTwo", function(otherArray) {
+			if(otherArray.length > 0) {
+				_.each(otherArray, function(currentID, i) {
+				    getAttrs(["repeating_OtherTwo_" + currentID + "_other_title", "repeating_OtherTwo_" + currentID + "_other_contents"], function(v) {
     					var newRowID = generateRowID();
     					var newRowUpdate = {};
-    					newRowUpdate["repeating_featsLeft_" + newRowID + "_feat_left_name"] = v["repeating_featsRight_" + currentID + "_feat_right_name"];
-    					newRowUpdate["repeating_featsLeft_" + newRowID + "_feat_left_cost"] = v["repeating_featsRight_" + currentID + "_feat_right_cost"];
-    					newRowUpdate["repeating_featsLeft_" + newRowID + "_feat_left_description"] = v["repeating_featsRight_" + currentID + "_feat_right_description"];
-    					removeRepeatingRow("repeating_featsRight_" + currentID);
+    					newRowUpdate["repeating_OtherOne_" + newRowID + "_other_title"] = v["repeating_OtherTwo_" + currentID + "_other_title"];
+    					newRowUpdate["repeating_OtherOne_" + newRowID + "_other_contents"] = v["repeating_OtherTwo_" + currentID + "_other_contents"];
+    					removeRepeatingRow("repeating_OtherTwo_" + currentID);
     					setAttrs(newRowUpdate);
 				    });
 				});
 			}
 		});
 	};
-
-    function perksFixColumns() {
-		getSectionIDs("repeating_perksRight", function(perksRightArray) {
-			if(perksRightArray.length > 0) {
-				_.each(perksRightArray, function(currentID, i) {
-				    getAttrs(["repeating_perksRight_" + currentID + "_perksRight_name", "repeating_perksRight_" + currentID + "_perksRight_description"], function(v) {
+    function otherInventoryFixColumns2() {
+		getSectionIDs("repeating_OtherThree", function(otherArray) {
+			if(otherArray.length > 0) {
+				_.each(otherArray, function(currentID, i) {
+				    getAttrs(["repeating_OtherThree_" + currentID + "_other_title", "repeating_OtherThree_" + currentID + "_other_contents"], function(v) {
     					var newRowID = generateRowID();
     					var newRowUpdate = {};
-    					newRowUpdate["repeating_perks_" + newRowID + "_perks_name"] = v["repeating_perksRight_" + currentID + "_perksRight_name"];
-    					newRowUpdate["repeating_perks_" + newRowID + "_perks_description"] = v["repeating_perksRight_" + currentID + "_perksRight_description"];
-    					removeRepeatingRow("repeating_perksRight_" + currentID);
-    					setAttrs(newRowUpdate);
-				    });
-				});
-			}
-		});
-	};
-
-    function flawsFixColumns() {
-		getSectionIDs("repeating_flawsRight", function(flawsRightArray) {
-			if(flawsRightArray.length > 0) {
-				_.each(flawsRightArray, function(currentID, i) {
-				    getAttrs(["repeating_flawsRight_" + currentID + "_flawsRight_name", "repeating_flawsRight_" + currentID + "_flawsRight_description"], function(v) {
-    					var newRowID = generateRowID();
-    					var newRowUpdate = {};
-    					newRowUpdate["repeating_flaws_" + newRowID + "_flaws_name"] = v["repeating_flawsRight_" + currentID + "_flawsRight_name"];
-    					newRowUpdate["repeating_flaws_" + newRowID + "_flaws_description"] = v["repeating_flawsRight_" + currentID + "_flawsRight_description"];
-    					removeRepeatingRow("repeating_flawsRight_" + currentID);
+    					newRowUpdate["repeating_OtherOne_" + newRowID + "_other_title"] = v["repeating_OtherThree_" + currentID + "_other_title"];
+    					newRowUpdate["repeating_OtherOne_" + newRowID + "_other_contents"] = v["repeating_OtherThree_" + currentID + "_other_contents"];
+    					removeRepeatingRow("repeating_OtherThree_" + currentID);
     					setAttrs(newRowUpdate);
 				    });
 				});
@@ -2084,7 +2064,13 @@
             });
         });
     });
-    
+    on("change:repeating_OtherOne:settingsflag", function() {
+        getAttrs(["repeating_OtherOne_settingsFlag"], function(values) {
+            setAttrs({
+                "repeating_OtherOne_displaySettingsFlag": showHide(values.repeating_OtherOne_settingsFlag)
+            });
+        });
+    });
     on("change:repeating_actions:settingsflag", function() {
         getAttrs(["repeating_actions_settingsFlag"], function(values) {
             setAttrs({
@@ -2766,7 +2752,7 @@ on("change:repeating_featsLeft", function() {
     <input type="hidden" name="attr_h" value="Advantage" />
     <input type="hidden" name="attr_l" value="Disadvantage" />
     <div class="row width100 padBottom">
-        <div class="column textSmall textRight padRight">GUI Update | Additional Inventory/Notes a little strange for now, next update will fix :: 2018.01.29 <span class="bold">Version 1.8.9.97 </span> <input class="settings" type="checkbox" name="attr_sheet_settings_flag" value="hide" /><span>y</span></div>
+        <div class="column textSmall textRight padRight">GUI Update :: 2018.01.29 <span class="bold">Version 1.8.9.97a </span> <input class="settings" type="checkbox" name="attr_sheet_settings_flag" value="hide" /><span>y</span></div>
     </div>
     <div class="row width100">
         <div class="column sliders inlineBlock textSmall bold">Character Info</div>
@@ -4768,23 +4754,6 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                     </div>
                 </fieldset>
             </div>
-            <div class="column width50 inlineBlock vertTop padTop" style="display: none;">
-                <fieldset class="repeating_featsRight">
-                    <div class="row">   <!-- Fix for Mozilla squishing the +Add & Modify button text -->
-                        <div class="width15 inlineBlock vertTop"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>y</span></div>
-                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" value="&{template:openLegend} {{title= @{feat_right_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= Feat}} {{description= @{feat_right_description}}}"><input type="text" style="text-align: center;" name="attr_feat_right_name" /></button></div>
-                        <input type="hidden" class="displaySettingsFlag" name="attr_displaySettingsFlag" />
-                        <div class="width100 displaySettings">
-                            <div class="column width75 inlineBlock bold textSmall">Name</div>
-                            <div class="column width25 inlineBlock bold textSmall">Cost</div>
-                            <div class="column width75 inlineBlock inputNameShort"><input type="text" name="attr_feat_right_name" /></div>
-                            <div class="column width25 inlineBlock inputNumber30"><input type="number" name="attr_feat_right_cost" /></div>
-                            <div class="column width100 bold textSmall">Description</div>
-                            <div class="column width95 resizeVert vertTop"><textarea class="height50" name="attr_feat_right_description"></textarea></div>
-                        </div>
-                    </div>
-                </fieldset>
-            </div>
    <!-- End Columns of Feats -->
         </div>
         <div class="actionsBottom"></div>
@@ -4816,21 +4785,6 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                     </div>
                 </fieldset>
             </div>
-            <div class="column width50 inlineBlock vertTop" style="display: none;">
-                <fieldset class="repeating_perksRight">
-                    <div class="row">   <!-- Fix for Mozilla squishing the +Add & Modify button text -->
-                        <div class="width15 inlineBlock vertTop"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>y</span></div>
-                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" value="&{template:openLegend} {{title= @{perksRight_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= Perk}} {{description= @{perksRight_description}}}"><input type="text" style="text-align: center;" name="attr_perksRight_name" /></button></div>
-                        <input type="hidden" class="displaySettingsFlag" name="attr_displaySettingsFlag" />
-                        <div class="width100 displaySettings">
-                            <div class="column width100 bold textSmall">Name</div>
-                            <div class="column width100 inputNameShort"><input type="text" name="attr_perksRight_name" /></div>
-                            <div class="column width100 bold textSmall">Description</div>
-                            <div class="column width95 resizeVert vertTop"><textarea class="height50" name="attr_perksRight_description"></textarea></div>
-                        </div>
-                    </div>
-                </fieldset>
-            </div>
    <!-- end Column for Perks -->
    <!-- Column for Flaws -->
             <div class="column width100 textCenter bold textLargest textShadow vertTop padTop padBottom">Flaws</div>
@@ -4849,21 +4803,6 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                     </div>
                 </fieldset>
             </div>
-            <div class="column width50 inlineBlock vertTop" style="display: none;">
-                <fieldset class="repeating_flawsRight">
-                    <div class="row">   <!-- Fix for Mozilla squishing the +Add & Modify button text -->
-                        <div class="width15 inlineBlock vertTop"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>y</span></div>
-                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" value="&{template:openLegend} {{title= @{flawsRight_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= Flaw}} {{description= @{flawsRight_description}}}"><input type="text" style="text-align: center;" name="attr_flawsRight_name" /></button></div>
-                        <input type="hidden" class="displaySettingsFlag" name="attr_displaySettingsFlag" />
-                        <div class="width100 displaySettings">
-                            <div class="column width100 bold textSmall">Name</div>
-                            <div class="column width100 inputNameShort"><input type="text" name="attr_flawsRight_name" /></div>
-                            <div class="column width100 bold textSmall">Description</div>
-                            <div class="column width95 resizeVert vertTop"><textarea class="height50" name="attr_flawsRight_description"></textarea></div>
-                        </div>
-                    </div>
-                </fieldset>
-            </div>
    <!-- end Column for Flaws -->
         </div>
         <div class="actionsBottom"></div>
@@ -4878,14 +4817,24 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
             <div class="column bold textLarge padTop">Non-Essential Inventory or Notes</div>
         </div>
 		<div class="actionsMiddle padLeft">
-    		<fieldset class="repeating_OtherOne">
-			<!-- Headings for the actions -->
-    			<div class="column width100 bold textSmall textCenter inventoryButton"><button type="roll" value="&{template:openLegend} {{title= @{other_title}}} {{subTitle= @{character_name}}} {{subTitleAdd= Notes}} {{description= @{other_contents}}}">Send Notes to Chat</button></div>
-				<div class="column width100 textCenter padLeft inputName"><input type="text" name="attr_other_title" /></div>
-			<!-- Add actions as needed Section (repeating fields) -->
-				<div class="column width100 bold italic textCenter">Content/Description</div>
-                <div class="column width90 resizeVert vertTop padLeft"><textarea class="height100" name="attr_other_contents"></textarea></div>
-    		</fieldset>
+		    <div class="column width95 vertTop">
+        		<fieldset class="repeating_OtherOne">
+        		    <div class="row">
+        			<!-- Roll to Chat & Expand -->
+                        <div class="width15 inlineBlock vertTop padLeft"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>i</span></div>
+                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton teal"><button type="roll" value="&{template:openLegend} {{title= @{other_title}}} {{subTitle= @{character_name}}} {{subTitleAdd= Notes}} {{description= @{other_contents}}}"><input type="text" style="text-align: center;" name="attr_other_title" /></button></div>
+        			<!-- Hidden area -->
+                        <input type="hidden" class="displaySettingsFlag" name="attr_displaySettingsFlag" />
+                        <div class="width100 displaySettings">
+                            <div class="column width25 inlineBlock bold">Name: </div>
+            				<div class="column width70 inlineBlock padLeft inputName"><input type="text" name="attr_other_title" /></div>
+            				<div class="column width100 bold italic textCenter">Content/Description</div>
+                            <div class="column width90 resizeVert vertTop padLeft"><textarea class="height100" name="attr_other_contents"></textarea></div>
+                        </div>
+                    </div>
+        		</fieldset>
+        	</div>
+    	<div style="display: none;">	
     		<fieldset class="repeating_OtherTwo">
     			<!-- Headings for the actions -->
     			<div class="column width100 bold textSmall textCenter inventoryButton"><button type="roll" value="&{template:openLegend} {{title= @{other_title}}} {{subTitle= @{character_name}}} {{subTitleAdd= Notes}} {{description= @{other_contents}}}">Send Notes to Chat</button></div>
@@ -4902,6 +4851,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
 				<div class="column width100 bold italic textCenter">Content/Description</div>
                 <div class="column width90 resizeVert vertTop padLeft"><textarea class="height100" name="attr_other_contents"></textarea></div>
     		</fieldset>
+    	</div>
 		</div>
 		<div class="actionsBottom"></div>
 	</div>
