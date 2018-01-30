@@ -5,9 +5,6 @@
 
 ### Changelog
 
-### 1.8.9.97a on 2018 January 28th
-* Finished improvements to GUI with the Non-essential Notes section.
-
 ### 1.8.9.97 on 2018 January 28th
 * GUI improvements on layout
 	- Inventory made into nicer section that can be expanded
