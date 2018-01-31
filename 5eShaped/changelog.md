@@ -11,6 +11,11 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 15.7.3
+
+### Bug Fixes
+* [#652: Tome of Beasts characters have errors on import](https://bitbucket.org/mlenser/5eshaped/issues/652/tome-of-beasts-characters-have-errors-on). Tome of Beast format variations parsed away to the expected format.
+
 ## 15.7.2
 
 ### Bug Fixes
