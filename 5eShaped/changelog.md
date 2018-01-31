@@ -11,6 +11,11 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 15.7.4
+
+### Bug Fixes
+* Fix parsing of single quotes that I broke as part of 15.7.3
+
 ## 15.7.3
 
 ### Bug Fixes
