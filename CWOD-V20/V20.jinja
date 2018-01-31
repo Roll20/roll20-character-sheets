@@ -1,0 +1,369 @@
+<h1>Vampire the Masquerade</h1>
+<h4>20th Anniversary Edition</h4>
+
+<div class="sheet-3colrow">
+    <div class="sheet-col">
+        <label>Name:</label><input type="text" name="attr_name"/><br/>
+        <label>Player:</label><input type="text" name="attr_player"/><br/>
+        <label>Chronicle:</label><input type="text" name="attr_chronicle"/><br/>
+    </div>
+    <div class="sheet-col">
+        <label>Nature:</label><input type="text" name="attr_nature"/><br/>
+        <label>Demeanor:</label><input type="text" name="attr_demeanor"/><br/>
+        <label>Concept:</label><input type="text" name="attr_concept"/><br/>
+    </div>
+    <div class="sheet-col">
+        <label>Clan:</label><input type="text" name="attr_clan"/><br/>
+        <label>Generation:</label><input type="number" value="13" min="1" max="15" name="attr_generation"/><br/>
+        <label>Sire:</label><input type="text" name="attr_sire"/><br/>
+    </div>
+</div>
+
+<hr/>
+<div class="sheet-3colrow">
+    <div class="sheet-col">
+    </div>
+
+    <div class="sheet-col">
+        <div class="sheet-2colrow">
+            <div class="sheet-col">
+                <table>
+                    <tr>
+                        <th>Attributes</th>
+                        <th>7/5/3</th>
+                    </tr>
+        {%- for attr_type in d.attributes %}
+                    <tr>
+                        <th>{{ attr_type|title }}</th>
+                        <td><input name="attr_base_{{ attr_type }}" type="number" value="{{ d.base_math[attr_type] }} - 3" class="sheet-short" disabled="true"></td>
+                    </tr>
+        {%- endfor %}
+                </table>
+            </div>
+            <div class="sheet-col">
+                <table>
+                    <tr>
+                        <th>Abilities</th>
+                        <th>13/9/5</th>
+                    </tr>
+        {%- for abil_type in d.abilities %}
+                    <tr>
+                        <th>{{ abil_type|title }}</th>
+                        <td><input name="attr_base_{{ abil_type }}" type="number" value="{{ d.base_math[abil_type] }}" class="sheet-short" disabled="true"></td>
+                    </tr>
+        {%- endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="sheet-col">
+        <table>
+            <tr>
+                <th></th>
+                <th>Avail</th>
+                <th>Spent</th>
+                <th>Left</th>
+            </tr>
+            <tr>
+                <th>Free</th>
+                <input name="attr_free_spent" type="hidden" value="0">
+                <td><input name="attr_free_avail" type="number" value="15" class="sheet-short" disabled="true"></td>
+                <td><input name="attr_free_spent_disp" type="number" value="@{free_spent}" class="sheet-short" disabled="true"></td>
+                <td><input name="attr_free_left" type="number" value="(@{free_avail} - @{free_spent})" class="sheet-short" disabled="true"></td>
+            </tr>
+            <tr>
+                <th>Experience</th>
+                <input name="attr_xp_spent" type="hidden" value="0">
+                <td><input name="attr_xp_avail" type="number" value="50" class="sheet-short"</td>
+                <td><input name="attr_xp_spent_disp" type="number" value="@{xp_spent}" class="sheet-short" disabled="true"></td>
+                <td><input name="attr_xp_left" type="number" value="(@{xp_avail} - @{xp_spent})" class="sheet-short" disabled="true"></td>
+            </tr>
+        </table> 
+    </div>
+</div>
+
+<hr/>
+<h2>Attributes</h2>
+<div class="sheet-3colrow">
+{% for attr_type in d.attributes %}
+    <div class="sheet-col">
+        <table>
+            <tr>
+                <th><h5>{{ attr_type|title }}</h5></th>
+                <th>Base</th>
+                <th>Free</th>
+                <th>Xp</th>
+                <th>Tot</th>
+            </tr>
+    {%- for name in d.attributes[attr_type] %}
+            <tr>
+                <th>{{ name|title }}</th>
+                <td><input name="attr_{{ name }}_base" type="number" value="1" min="1" max="10" title="{{ name }}_base" class="sheet-short"></td>
+                <td><input name="attr_{{ name }}_free" type="number" value="0" min="0" max="10" title="{{ name }}_free" class="sheet-short"></td>
+                <td><input name="attr_{{ name }}_xp" type="number" value="0" min="0" max="10" title="{{ name }}_xp" class="sheet-short"></td>
+                <td><input name="attr_{{ name }}" type="number" value="@{{'{'}}{{ name }}_base{{'}'}} + @{{'{'}}{{ name }}_free{{'}'}} + @{{'{'}}{{ name }}_xp{{'}'}}" title="{{ name }}" class="sheet-short" disabled="true"></td>
+            </tr>
+    {%- endfor %}
+        </table>
+    </div>
+{%- endfor %}
+</div>
+
+<hr/>
+<h2>Abilities</h2>
+<div class="sheet-3colrow">
+{% for abil_type in d.abilities %}
+    <div class="sheet-col">
+        <table>
+            <tr>
+                <th><h5>{{ abil_type|title }}</h5></th>
+                <th>Base</th>
+                <th>Free</th>
+                <th>Xp</th>
+                <th>Tot</th>
+            </tr>
+    {%- for name in d.abilities[abil_type] %}
+            <tr>
+                <th>{{ name|title }}</th>
+                <td><input name="attr_{{ name }}_base" type="number" value="0" min="0" max="10" class="sheet-short"></td>
+                <td><input name="attr_{{ name }}_free" type="number" value="0" min="0" max="10" class="sheet-short"></td>
+                <td><input name="attr_{{ name }}_xp" type="number" value="0" min="0" max="10" class="sheet-short"></td>
+                <td><input name="attr_{{ name }}" type="number" value="@{{'{'}}{{ name }}_base{{'}'}} + @{{'{'}}{{ name }}_free{{'}'}} + @{{'{'}}{{ name }}_xp{{'}'}}" min="0" max="10" title="total" class="sheet-short" disabled="true"></td>
+            </tr>
+    {%- endfor %}
+        </table>
+    </div>
+{%- endfor %}
+</div>
+
+<hr/>
+<h2>Advantages</h2>
+<div class="sheet-3colrow">
+    <div class="sheet-col">
+        <h3>Disciplines</h3>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Base</th>
+                <th>Free</th>
+                <th>Xp</th>
+                <th>Tot</th>
+            </tr>
+    {%- for i in range(6) %}
+            {% set name = "discipline_%s"|format(i) %}
+            <tr>
+                <th><input name="attr_{{ name }}_name" type="text" value="" class="sheet-namebox"></th>
+                <td><input name="attr_{{ name }}_base" type="number" value="0" min="0" max="10" class="sheet-short"></td>
+                <td><input name="attr_{{ name }}_free" type="number" value="0" min="0" max="10" class="sheet-short"></td>
+                <td><input name="attr_{{ name }}_xp" type="number" value="0" min="0" max="10" class="sheet-short"></td>
+                <td><input name="attr_{{ name }}" type="number" value="@{{'{'}}{{ name }}_base{{'}'}} + @{{'{'}}{{ name }}_free{{'}'}} + @{{'{'}}{{ name }}_xp{{'}'}}" min="0" max="10" title="total" class="sheet-short" disabled="true"></td>
+            </tr>
+    {%- endfor %}
+        </table>
+    </div>
+    <div class="sheet-col">
+        <h3>Backgrounds</h3>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Base</th>
+                <th>Free</th>
+                <th>Xp</th>
+                <th>Tot</th>
+            </tr>
+    {%- for i in range(6) %}
+        {% set name = "background_%s"|format(i) %}
+            <tr>
+                <th><input name="attr_{{ name }}_name" type="text" value="" class="sheet-namebox"></th>
+                <td><input name="attr_{{ name }}_base" type="number" value="0" min="0" max="10" class="sheet-short"></td>
+                <td><input name="attr_{{ name }}_free" type="number" value="0" min="0" max="10" class="sheet-short"></td>
+                <td><input name="attr_{{ name }}_xp" type="number" value="0" min="0" max="10" class="sheet-short"></td>
+                <td><input name="attr_{{ name }}" type="number" value="@{{'{'}}{{ name }}_base{{'}'}} + @{{'{'}}{{ name }}_free{{'}'}} + @{{'{'}}{{ name }}_xp{{'}'}}" min="0" max="10" title="total" class="sheet-short" disabled="true"></td>
+            </tr>
+    {%- endfor %}
+        </table>
+    </div>
+    <div class="sheet-col">
+        <h3>Virtues</h3>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Base</th>
+                <th>Free</th>
+                <th>Xp</th>
+                <th>Tot</th>
+            </tr>
+    {%- for name in ["conscience", "self_control", "courage"] %}
+            <tr>
+                <th>{{ name|title }}</th>
+                <td><input name="attr_{{ name }}_base" type="number" value="0" min="0" max="5" class="sheet-short"></td>
+                <td><input name="attr_{{ name }}_free" type="number" value="0" min="0" max="5" class="sheet-short"></td>
+                <td><input name="attr_{{ name }}_xp" type="number" value="0" min="0" max="5" class="sheet-short"></td>
+                <td><input name="attr_{{ name }}" type="number" value="@{{'{'}}{{ name }}_base{{'}'}} + @{{'{'}}{{ name }}_free{{'}'}} + @{{'{'}}{{ name }}_xp{{'}'}}" min="0" max="5" title="total" class="sheet-short" disabled="true"></td>
+            </tr>
+    {%- endfor %}
+        </table>
+
+    </div>
+</div>
+
+
+<script type="text/worker">
+
+    const attributes = [{{ d.attributes_quoted|join(", ") }}];
+    const abilities = [{{ d.abilities_quoted|join(", ") }}];
+    const postfixes = ["base", "free", "xp"];
+    const properties = attributes.concat(abilities)
+    const prop_base = properties.map(x => x + "_base");
+    const prop_free = properties.map(x => x + "_free");
+    const prop_xp = properties.map(x => x + "_xp");
+    const xp_deps = [].concat(prop_base, prop_free, prop_xp);
+
+    // change arg lists
+    const free_change = prop_free.map(x => "change:" + x).join(" ");
+    const base_change = prop_base.map(x => "change:" + x).join(" ");
+    const xp_change = prop_xp.map(x => "change:" + x).join(" ");
+    const xp_deps_change = xp_deps.map(x => "change:" + x).join(" ");
+
+    // data
+    const free_cost = {
+        attribute: 5,
+        ability: 2,
+        discipline: 7,
+        background: 1,
+        virtue: 2,
+        path: 2,
+        willpoer: 1
+    };
+
+    const new_xp_cost = {
+        attribute: 0,
+        ability: 3,
+        discipline: 10,
+        secondary_path: 7
+    };
+
+    const mult_xp_cost = {
+        attribute: 4,
+        ability: 2,
+        clan_discipline: 5,
+        discipline: 7,
+        secondary_path: 4,
+        virtue: 2,
+        humanity: 2,
+        willpower: 1
+    };
+
+    // add property handlers
+    for (x in properties) {
+        addPropertyHandler(properties[x]);
+    };
+
+    function addPropertyHandler(prop) {
+        var props = postfixes.map(x => prop + "_" + x);
+        var change_str = postfixes.map(x => "change:" + prop + "_" + x).join(" ");
+        on(change_str, function() {
+            //console.log(prop, "calc changed");
+        });
+    };
+
+    function xpCost(b, f, xp, type) {
+        var k = mult_xp_cost[type];
+        if (k == undefined) {
+            console.error("undefined k for type", type);
+            return 0;
+        };
+        var new_cost = new_xp_cost[type];
+        if (new_cost == undefined) {
+            console.error("undefined new_cost for type", type);
+            return 0;
+        };
+        var cost = 0;
+
+        // xp contribution
+        if (xp > 0) {
+            var xp_cost = k*(b + f - 1)*xp + k*xp*(xp + 1)/2;
+            if ((b + f) == 0) {
+                xp_cost += new_cost;
+                //console.log('adding new cost to xp_cost', new_cost);
+            }
+            cost += xp_cost;
+            //console.log('adding xp cost', xp_cost)
+        }
+        return cost;
+    };
+
+    function update_free_spent() {
+        getAttrs(xp_deps, function(v) {
+            var cost = 0;
+            for (x in attributes) { 
+                a = attributes[x];
+                f = parseInt(v[a + "_free"], 10);
+                cost += f*free_cost["attribute"];
+            };
+            for (x in abilities) { 
+                a = abilities[x];
+                f = parseInt(v[a + "_free"], 10);
+                cost += f*free_cost["ability"];;
+            };
+            setAttrs({
+                free_spent: cost
+            });
+        });
+    }
+
+    function update_xp_spent() {
+        getAttrs(xp_deps, function(v) {
+            //console.log("updating xp spent");
+            var cost = 0;
+            for (x in attributes) { 
+                a = attributes[x]
+                b = parseInt(v[a + "_base"], 10);
+                f = parseInt(v[a + "_free"], 10);
+                xp = parseInt(v[a + "_xp"], 10);
+                //console.log('\n', a, 'b', b, 'f', f, 'xp', xp);
+                var delta_cost = xpCost(b, f, xp, "attribute");
+                //console.log('cost', a, delta_cost);
+                cost += delta_cost
+            };
+            for (x in abilities) { 
+                a = abilities[x]
+                b = parseInt(v[a + "_base"], 10);
+                f = parseInt(v[a + "_free"], 10);
+                xp = parseInt(v[a + "_xp"], 10);
+                //console.log('\n', a, 'b', b, 'f', f, 'xp', xp);
+                var delta_cost = xpCost(b, f, xp, "ability");
+                //console.log('cost', a, delta_cost);
+                cost += delta_cost
+            };
+            setAttrs({
+                xp_spent: cost
+            });
+        });
+    };
+
+    on('sheet:opened',function() {
+    });
+
+    on(free_change, function(){
+        //console.log("free change");
+        update_free_spent();
+    });
+
+    on(xp_change, function(){
+        //console.log("xp change");
+    });
+
+    on(base_change, function(){
+        //console.log("base change");
+    });
+
+    on(xp_deps_change, function(){
+        //console.log("xp deps change");
+        update_xp_spent();
+    });
+
+</script>
+
+<!-- vim: set et fenc=utf-8 ff=unix sts=0 sw=4 ts=4 ft=html nowrap: -->
