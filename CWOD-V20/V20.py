@@ -18,12 +18,20 @@ abilities = OrderedDict([
         'law', 'medicine', 'occult', 'politics', 'science', 'technology'])
 ])
 
+clans = ['assamite', 'brujah', 'followers_of_set',
+    'gangrel', 'giovanni', 'lasombra',
+    'malkavian', 'nosferatu', 'ravnos',
+    'toreador', 'tremere', 'tzimisce', 'ventrue',
+    'caitiff', 'werewolf', 'human', 'mage', 'fairy', 'ghost', 'demon'
+    ]
+
+disciplines = ["discipline_{:d}".format(i + 1) for i in range(7)]
+backgrounds = ["background_{:d}".format(i + 1) for i in range(7)]
+virtues = ["conscience", "self_control", "courage"]
+postfixes = ["base", "free", "xp"]
+
 attributes_flat = [attr for attr_type in attributes.keys() for attr in attributes[attr_type]]
 abilities_flat = [abil for abil_type in abilities.keys() for abil in abilities[abil_type]]
-
-# declaration
-attributes_quoted = ['"{:s}"'.format(attr) for attr in attributes_flat]
-abilities_quoted = ['"{:s}"'.format(abil) for abil in abilities_flat]
 
 # base
 base_math = {}
