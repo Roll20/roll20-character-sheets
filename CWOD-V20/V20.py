@@ -22,7 +22,7 @@ clans = ['assamite', 'brujah', 'followers_of_set',
     'gangrel', 'giovanni', 'lasombra',
     'malkavian', 'nosferatu', 'ravnos',
     'toreador', 'tremere', 'tzimisce', 'ventrue',
-    'caitiff', 'werewolf', 'human', 'mage', 'fairy', 'ghost', 'demon'
+    'caitiff', 'werewolf', 'human', 'mage', 'faerie', 'ghost', 'demon'
     ]
 
 disciplines = ["discipline_{:d}".format(i + 1) for i in range(7)]
