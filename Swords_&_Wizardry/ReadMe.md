@@ -4,21 +4,25 @@ Character sheet for Swords & Wizardry, in english and french.
 Initially created by Jacob Vann and overhauled by [Natha](https://github.com/NathaTerrien/roll20-wip/blob/master/README.md) (design, translation data, automated calcultations and rolls/roll template).
 
 # Current version
-2.1, Screenshots: [english](SWSheet.png), [french](SWSheet_fr.png)
+2.2, Screenshots: [english](SWSheet.png), [french](SWSheet_fr.png)
 
 The sheet and its automated calculations (modifiers etc.) are based on the Complete version of the rules.
 Every calculation can be overriden by manual input, if house rules are used. But modifying certain fields will fire again the associated automated calcultion. For example, modifying DEX will compute again the AC modifier, Total AC etc. and any custom value previously entered has to be set again.
 
 # Release notes
 
-##v2.1 (2017-02-15)
+## v2.2 (2017-09-17)
+
+* Technical optimisation
+
+## v2.1 (2017-02-15)
 
 * Layout bug fix: Min/Max spell label was too long, and the corresponding field was hidden
 * New 'Total Weight' field (automatically calculated based on total treasure and gear weights, but can be overriden)
 * Treasure and Gear total weights calculation optimisation
 * Relocate logo from imgur to github
 
-##v2.0 (2017-02-04)
+## v2.0 (2017-02-04)
 
 Note : this new version of the sheet is compatible with previous versions and characters.
 
