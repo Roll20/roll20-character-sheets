@@ -25,6 +25,20 @@
     </div>
 </div>
 
+{%- macro bar(name, name_editable, value, min, max, default_name, base_disabled) -%}
+    <tr>
+    {%- if (name_editable) %}
+        <th><input name="attr_{{ name }}_name" type="text" value="{{ default_name }}" class="sheet-namebox"></th>
+    {%- else %}
+        <th>{{ name|title }}</th>
+    {%- endif %}
+        <td><input name="attr_{{ name }}_base" type="number" value="{{ value[0] }}" min="{{ min[0] }}" max="{{ max[0] }}" title="{{ name }}_base" disabled="{{ base_disabled }}" class="sheet-short"></td>
+        <td><input name="attr_{{ name }}_free" type="number" value="{{ value[1] }}" min="{{ min[1] }}" max="{{ max[1] }}" title="{{ name }}_free" class="sheet-short"></td>
+        <td><input name="attr_{{ name }}_xp" type="number" value="{{ value[2] }}" min="{{ min[2] }}" max="{{ max[2] }}" title="{{ name }}_xp" class="sheet-short"></td>
+        <td><input name="attr_{{ name }}" type="number" value="@{{'{'}}{{ name }}_base{{'}'}} + @{{'{'}}{{ name }}_free{{'}'}} + @{{'{'}}{{ name }}_xp{{'}'}}" title="{{ name }}" class="sheet-short" disabled="true"></td>
+    </tr>
+{%- endmacro %}
+
 <h2>Attributes</h2>
 <div class="sheet-3colrow">
 {% for attr_type in d.attribute_types %}
@@ -37,15 +51,9 @@
                 <th>Xp</th>
                 <th>Tot</th>
             </tr>
-    {%- for name in d[attr_type] %}
-            <tr>
-                <th>{{ name|title }}</th>
-                <td><input name="attr_{{ name }}_base" type="number" value="1" min="1" max="10" title="{{ name }}_base" class="sheet-short"></td>
-                <td><input name="attr_{{ name }}_free" type="number" value="0" min="0" max="10" title="{{ name }}_free" class="sheet-short"></td>
-                <td><input name="attr_{{ name }}_xp" type="number" value="0" min="0" max="10" title="{{ name }}_xp" class="sheet-short"></td>
-                <td><input name="attr_{{ name }}" type="number" value="@{{'{'}}{{ name }}_base{{'}'}} + @{{'{'}}{{ name }}_free{{'}'}} + @{{'{'}}{{ name }}_xp{{'}'}}" title="{{ name }}" class="sheet-short" disabled="true"></td>
-            </tr>
-    {%- endfor %}
+        {%- for name in d[attr_type] %}
+            {{ bar(name, false, [1, 0, 0], [1, 0, 0], [10, 10, 10], "", false)|indent(8) }}
+        {%- endfor %}
         </table>
     </div>
 {%- endfor %}
@@ -63,15 +71,9 @@
                 <th>Xp</th>
                 <th>Tot</th>
             </tr>
-    {%- for name in d[abil_type] %}
-            <tr>
-                <th>{{ name|title }}</th>
-                <td><input name="attr_{{ name }}_base" type="number" value="0" min="0" max="10" class="sheet-short"></td>
-                <td><input name="attr_{{ name }}_free" type="number" value="0" min="0" max="10" class="sheet-short"></td>
-                <td><input name="attr_{{ name }}_xp" type="number" value="0" min="0" max="10" class="sheet-short"></td>
-                <td><input name="attr_{{ name }}" type="number" value="@{{'{'}}{{ name }}_base{{'}'}} + @{{'{'}}{{ name }}_free{{'}'}} + @{{'{'}}{{ name }}_xp{{'}'}}" min="0" max="10" title="total" class="sheet-short" disabled="true"></td>
-            </tr>
-    {%- endfor %}
+        {%- for name in d[abil_type] %}
+            {{ bar(name, false, [0, 0, 0], [0, 0, 0], [10, 10, 10], "", false)|indent(8) }}
+        {%- endfor %}
         </table>
     </div>
 {%- endfor %}
@@ -88,15 +90,9 @@
                 <th>Xp</th>
                 <th>Tot</th>
             </tr>
-    {%- for name in d.disciplines %}
-            <tr>
-                <th><input name="attr_{{ name }}_name" type="text" value="" class="sheet-namebox"></th>
-                <td><input name="attr_{{ name }}_base" type="number" value="0" min="0" max="10" class="sheet-short"></td>
-                <td><input name="attr_{{ name }}_free" type="number" value="0" min="0" max="10" class="sheet-short"></td>
-                <td><input name="attr_{{ name }}_xp" type="number" value="0" min="0" max="10" class="sheet-short"></td>
-                <td><input name="attr_{{ name }}" type="number" value="@{{'{'}}{{ name }}_base{{'}'}} + @{{'{'}}{{ name }}_free{{'}'}} + @{{'{'}}{{ name }}_xp{{'}'}}" min="0" max="10" title="total" class="sheet-short" disabled="true"></td>
-            </tr>
-    {%- endfor %}
+        {%- for name in d.disciplines %}
+            {{ bar(name, true, [0, 0, 0], [0, 0, 0], [10, 10, 10], "", false)|indent(8) }}
+        {%- endfor %}
         </table>
     </div>
     <div class="sheet-col">
@@ -108,15 +104,9 @@
                 <th>Xp</th>
                 <th>Tot</th>
             </tr>
-    {%- for name in d.backgrounds %}
-            <tr>
-                <th><input name="attr_{{ name }}_name" type="text" value="" class="sheet-namebox"></th>
-                <td><input name="attr_{{ name }}_base" type="number" value="0" min="0" max="10" class="sheet-short"></td>
-                <td><input name="attr_{{ name }}_free" type="number" value="0" min="0" max="10" class="sheet-short"></td>
-                <td><input name="attr_{{ name }}_xp" type="number" value="0" min="0" max="10" class="sheet-short"></td>
-                <td><input name="attr_{{ name }}" type="number" value="@{{'{'}}{{ name }}_base{{'}'}} + @{{'{'}}{{ name }}_free{{'}'}} + @{{'{'}}{{ name }}_xp{{'}'}}" min="0" max="10" title="total" class="sheet-short" disabled="true"></td>
-            </tr>
-    {%- endfor %}
+        {%- for name in d.backgrounds %}
+            {{ bar(name, true, [0, 0, 0], [0, 0, 0], [10, 10, 10], "", false)|indent(8) }}
+        {%- endfor %}
         </table>
     </div>
     <div class="sheet-col">
@@ -128,19 +118,54 @@
                 <th>Xp</th>
                 <th>Tot</th>
             </tr>
-    {%- for name in d.virtues %}
-            <tr>
-                <th>{{ name|title }}</th>
-                <td><input name="attr_{{ name }}_base" type="number" value="1" min="1" max="5" class="sheet-short"></td>
-                <td><input name="attr_{{ name }}_free" type="number" value="0" min="0" max="5" class="sheet-short"></td>
-                <td><input name="attr_{{ name }}_xp" type="number" value="0" min="0" max="5" class="sheet-short"></td>
-                <td><input name="attr_{{ name }}" type="number" value="@{{'{'}}{{ name }}_base{{'}'}} + @{{'{'}}{{ name }}_free{{'}'}} + @{{'{'}}{{ name }}_xp{{'}'}}" min="0" max="5" title="total" class="sheet-short" disabled="true"></td>
-            </tr>
-    {%- endfor %}
+        {%- for name in d.virtues %}
+            {{ bar(name, false, [1, 0, 0], [1, 0, 0], [5, 5, 5], "", false)|indent(8) }}
+        {%- endfor %}
         </table>
 
     </div>
 </div>
+
+<hr />
+<table>
+    <tr>
+    {%- for type in ["merit", "flaw"] %}
+        <td>
+            <table>
+                <tr>
+                    <th><h4>{{ type|title }}</h4></th>
+                    <th>Cost</th>
+                </tr>
+        {%- for i in range(6) %}
+            {%- set name="{{ type }}_{{ i }}" %}
+                <tr>
+                    <th><input name="attr_{{ name }}_name" type="text" value="" class="sheet-namebox"></th>
+                    <td><input name="attr_{{ name }}_free" type="number" value="0" class="sheet-short" disabled="true"></td>
+                </tr>
+        {%- endfor %}
+            </table>
+        </td>
+    {%- endfor %}
+        <td>
+            <table>
+                <tr>
+                    <ht><h4>Path</h4></th>
+                </tr>
+                {{ bar("path", true, ["@{conscience_base} + @{self_control_base}", 0, 0], [0, 0, 0], [10, 10, 10], "humanity", true)|indent(8) }}
+                <tr>
+                    <th><h4>Willpower</h4></th>
+                    <td><input name="attr_willpower_pool" type="number" value="0" class="sheet-short"></td>
+                </tr>
+                {{ bar("willpower", false, ["@{courage_base}", 0, 0], [0, 0, 0], [10, 10, 10], "", true)|indent(8) }}
+                <tr>
+                    <th><h4>Blood Pool</h4></th>
+                    <td><input name="attr_blood_pool" type="number" value="0" class="sheet-short"></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+ 
 
 <h2>Calculations</h2>
 <table>
