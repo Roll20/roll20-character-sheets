@@ -1,3 +1,4 @@
+<!-- DO NOT EDIT V20.html, generated from V20.py -->
 <h1>Vampire the Masquerade</h1>
 <h4>20th Anniversary Edition</h4>
 
@@ -37,10 +38,10 @@
                         <th>Attributes</th>
                         <th>7/5/3</th>
                     </tr>
-        {%- for attr_type in d.attributes %}
+        {%- for attr_type in d.attribute_types %}
                     <tr>
                         <th>{{ attr_type|title }}</th>
-                        <td><input name="attr_base_{{ attr_type }}" type="number" value="{{ d.base_math[attr_type] }} - 3" class="sheet-short" disabled="true"></td>
+                        <td><input name="attr_base_{{ attr_type }}" type="number" value="" class="sheet-short" disabled="true"></td>
                     </tr>
         {%- endfor %}
                 </table>
@@ -51,10 +52,10 @@
                         <th>Abilities</th>
                         <th>13/9/5</th>
                     </tr>
-        {%- for abil_type in d.abilities %}
+        {%- for abil_type in d.ability_types %}
                     <tr>
                         <th>{{ abil_type|title }}</th>
-                        <td><input name="attr_base_{{ abil_type }}" type="number" value="{{ d.base_math[abil_type] }}" class="sheet-short" disabled="true"></td>
+                        <td><input name="attr_base_{{ abil_type }}" type="number" value="" class="sheet-short" disabled="true"></td>
                     </tr>
         {%- endfor %}
                 </table>
@@ -91,7 +92,7 @@
 <hr/>
 <h2>Attributes</h2>
 <div class="sheet-3colrow">
-{% for attr_type in d.attributes %}
+{% for attr_type in d.attribute_types %}
     <div class="sheet-col">
         <table>
             <tr>
@@ -101,7 +102,7 @@
                 <th>Xp</th>
                 <th>Tot</th>
             </tr>
-    {%- for name in d.attributes[attr_type] %}
+    {%- for name in d[attr_type] %}
             <tr>
                 <th>{{ name|title }}</th>
                 <td><input name="attr_{{ name }}_base" type="number" value="1" min="1" max="10" title="{{ name }}_base" class="sheet-short"></td>
@@ -118,7 +119,7 @@
 <hr/>
 <h2>Abilities</h2>
 <div class="sheet-3colrow">
-{% for abil_type in d.abilities %}
+{% for abil_type in d.ability_types %}
     <div class="sheet-col">
         <table>
             <tr>
@@ -128,7 +129,7 @@
                 <th>Xp</th>
                 <th>Tot</th>
             </tr>
-    {%- for name in d.abilities[abil_type] %}
+    {%- for name in d[abil_type] %}
             <tr>
                 <th>{{ name|title }}</th>
                 <td><input name="attr_{{ name }}_base" type="number" value="0" min="0" max="10" class="sheet-short"></td>
@@ -216,207 +217,8 @@
 {%- endmacro %}
 
 <script type="text/worker">
-
-    const attributes = {{ list_decl(d.attributes_flat) }};
-    const abilities = {{ list_decl(d.abilities_flat) }};
-    const disciplines = {{ list_decl(d.disciplines) }};
-    const backgrounds = {{ list_decl(d.backgrounds) }};
-    const virtues = {{ list_decl(d.virtues) }};
-    const postfixes = {{ list_decl(d.postfixes) }};
-    const properties = [].concat(attributes, abilities, disciplines, backgrounds, virtues);
-    const discipline_names = disciplines.map(x => x + "_name");
-    const prop_base = properties.map(x => x + "_base");
-    const prop_free = properties.map(x => x + "_free");
-    const prop_xp = properties.map(x => x + "_xp");
-    const xp_deps = [].concat(prop_base, prop_free, prop_xp, ["clan"]);
-
-    // change arg lists
-    function list_changed(l) {
-        var out = l.map(x => "change:" + x).join(" ");
-        return out;
-    }
-
-    // data
-    const free_cost = {
-        attribute: 5,
-        ability: 2,
-        discipline: 7,
-        background: 1,
-        virtue: 2,
-        path: 2,
-        willpoer: 1
-    };
-
-    const new_xp_cost = {
-        attribute: 0,
-        virtue: 0,
-        background: 0,
-        ability: 3,
-        discipline: 10,
-        secondary_path: 7
-    };
-
-    const mult_xp_cost = {
-        attribute: 4,
-        ability: 2,
-        background: 0,
-        clan_discipline: 5,
-        caitiff_discipline: 6,
-        discipline: 7,
-        secondary_path: 4,
-        virtue: 2,
-        humanity: 2,
-        willpower: 1
-    };
-
-    // these disciplines can be upgraded at lower cost
-    const clan_disciplines = {
-        assamite: ['celerity', 'obfuscate', 'quietus', '', '', '', ''],
-        brujah: ['celerity', 'potence', 'presence', '', '', '', ''],
-        followers_of_set: ['obfuscate', 'presence', 'serpentis', '', '', '', ''],
-        gangrel: ['animalism', 'fortitude', 'protean', '', '', '', ''],
-        giovanni: ['dominate', 'necromancy', 'potence', '', '', '', ''],
-        lasombra: ['dominate', 'obtenebration', 'potence', '', '', '' ,''],
-        malkavian: ['auspex', 'dementation', 'obfuscate', '', '', '', ''],
-        nosferatu: ['animalism', 'obfuscate', 'potence', '', '', '', ''],
-        ravnos: ['animalism', 'chimerstry', 'fortitude', '', '', '', ''],
-        toreador: ['auspex', 'celerity', 'presence', '', '', '', ''],
-        tremere: ['auspex', 'dominate', 'thaumaturgy', '', '', '', ''],
-        tzimisce: ['animalism', 'auspex', 'vicissitude', '', '', '', ''],
-        ventrue: ['dominate', 'fortitude', 'presence', '', '', '', ''],
-        caitiff: ['', '', '', '', '', '', ''],
-        human: ['', '', '', '', '', '', ''],
-        werewolf: ['celerity', 'potence', 'protean', '', '', '', ''],
-        mage: ['auspex', 'chimerstry', 'dominate', 'fortitude', 'presence', 'thaumaturgy', ''],
-        faerie: ['animalism', 'auspex', 'chimerstry', 'celerity', 'obfuscate', 'protean', ''],
-        ghost: ['auspex', 'chimerstry', 'dementation', 'dominate', 'presence', 'vicissitude', ''],
-        demon: ['dominate', 'potence', 'fortitude', 'daimoinon', 'vicissitude', '']
-    };
-
-    // generation table
-    const gen_hdr = {
-        trait_max: 0,
-        blood_pool_max: 1,
-        blood_per_turn: 2
-    };
-    const gen_table = {
-        3: [10, 100, 20],
-        4: [9, 50, 10],
-        5: [8, 40, 8],
-        6: [7, 30, 6],
-        7: [6, 20, 4],
-        8: [5, 15, 3],
-        9: [5, 14, 2],
-        10: [5, 13, 1],
-        11: [5, 12, 1],
-        12: [5, 11, 1],
-        13: [5, 10, 1]
-    };
-
-    function xpCost(b, f, xp, k, new_cost) {
-        var cost = 0;
-        if (xp > 0) {
-            cost += k*(b + f - 1)*xp + k*xp*(xp + 1)/2;
-            if ((b + f) == 0) {
-                cost += new_cost;
-            }
-        }
-        return cost;
-    };
-
-    function update_free_spent() {
-        getAttrs(xp_deps, function(v) {
-            var cost = 0;
-            var lists = [attributes, abilities, disciplines, backgrounds, virtues];
-            var types = ["attribute", "ability", "discipline", "background", "virtue"];
-            for (l in lists) {
-                for (x in lists[l]) { 
-                    var name = lists[l][x];
-                    var type = types[l];
-                    var f = parseInt(v[name + "_free"], 10);
-                    cost += f*free_cost[type];
-                };
-            };
-            setAttrs({
-                free_spent: cost
-            });
-        });
-    }
-
-    function update_xp_spent() {
-        getAttrs(xp_deps, function(v) {
-            //console.log("updating xp spent");
-            var cost = 0;
-            var lists = [attributes, abilities, disciplines, backgrounds, virtues];
-            var types = ["attribute", "ability", "discipline", "background", "virtue"];
-            for (l in lists) {
-                for (x in lists[l]) { 
-                    var name = lists[l][x];
-                    var b = parseInt(v[name + "_base"], 10);
-                    var f = parseInt(v[name + "_free"], 10);
-                    var xp = parseInt(v[name + "_xp"], 10);
-
-                    // get parameters
-                    var type = types[l];
-                    var k = mult_xp_cost[type];
-                    if (k == undefined) {
-                        console.error("undefined k for type", type);
-                        return 0;
-                    };
-                    var new_cost = new_xp_cost[type];
-                    if (new_cost == undefined) {
-                        console.error("undefined new_cost for type", type);
-                        return 0;
-                    };
-
-                    var delta_cost = xpCost(b, f, xp, k, new_cost);
-                    cost += delta_cost
-                };
-            };
-            setAttrs({
-                xp_spent: cost
-            });
-        });
-    };
-
-    on('sheet:opened',function() {
-    });
-
-    on(list_changed(prop_free), function(){
-        console.log("free change");
-        update_free_spent();
-    });
-
-    on(list_changed(prop_xp), function(){
-        console.log("xp change");
-    });
-
-    on(list_changed(prop_base), function(){
-        console.log("base change");
-    });
-
-    on(list_changed(xp_deps), function(){
-        console.log("xp deps change");
-        update_xp_spent();
-    });
-
-    on("change:clan", function(){
-        console.log("clan change");
-        // initialize to clan disciplines
-        getAttrs([].concat(discipline_names, ["clan"]), function(v) {
-            d_set = {}
-            for(d in discipline_names) {
-                var discipline_name = v[discipline_names[d]]
-                console.log("discipline name", discipline_names[d], discipline_name);
-                if (d < clan_disciplines[v.clan].length) {
-                    clan_discipline = clan_disciplines[v.clan][d];
-                    d_set[discipline_names[d]] = clan_discipline;
-                }
-            }
-            setAttrs(d_set);
-        });
-    });
-
+const data = JSON.parse('{{ d.json_txt|trim }}')
+{{ d.worker_js }}
 </script>
 
 <!-- vim: set et fenc=utf-8 ff=unix sts=0 sw=4 ts=4 ft=javascript nowrap: -->
