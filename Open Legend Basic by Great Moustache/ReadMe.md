@@ -5,6 +5,19 @@
 
 ### Changelog
 
+### 1.8.9.97a on 2018 January 28th
+* Finished improvements to GUI with the Non-essential Notes section.
+
+### 1.8.9.97 on 2018 January 28th
+* GUI improvements on layout
+	- Inventory made into nicer section that can be expanded
+	- Legendary Items through Inventory will expand across
+	- Different symbol for Feats/Perks/Flaws/Inventory to expand
+	- Output to Chat made to take up slightly less space w/ different background
+* Other Inventory/Notes section not finished
+	- Will be made to be like the inventory section
+	- Might be updated before merge, maybe not
+
 ### 1.8.9.96 on 2018 January 21st
 * XP Feat & Attribute Points calculate for 0
 * Default (Dis)Adv updates for straight Attributes
