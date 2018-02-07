@@ -11,6 +11,29 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 16.0.0-beta
+
+### Breaking Changes
+* Importing data from the compendium, script, or OGL content has been completely revamped to use the same system for as much as possible.
+  * Importing data from the script and converting from OGL are completely broken. Do not try it. I will fix it as part of the 16.0.0 full release. They will hopefully use nearly all of the same processes as compendium
+
+### Features
+* [#656: Missing comma in Modifiers -> Saving throw](https://bitbucket.org/mlenser/5eshaped/issues/656/missing-comma-in-modifiers-saving-throw)
+
+### Bug Fixes
+* [#654: Magic Missile](https://bitbucket.org/mlenser/5eshaped/issues/654/magic-missile)
+* New characters sheets will be created with edit mode enabled
+
+### UI Adjustments
+* Tabs renamed to "Character"/"NPC", "Spells", "Equipment", "Features", cog
+* "Character" tab for PCs will now show the appearance and backstory details below the normal sheet
+* "All" option removed as it is now only useful for showing settings below other sheets which doesn't have much value
+* Repeating buttons restyled a bit
+* PC Core page column widths adjusted a bit
+* Font size will now adjust if the user adjusts their browser's font size
+* Font sizes adjusted down
+* Passive skills moved to the core page
+
 ## 15.7.4
 
 ### Bug Fixes
