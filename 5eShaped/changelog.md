@@ -11,7 +11,7 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
-## 16.0.0-beta
+## 16.0.0-alpha-1
 
 ### Breaking Changes
 * Importing data from the compendium, script, or OGL content has been completely revamped to use the same system for as much as possible.
