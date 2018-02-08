@@ -11,6 +11,11 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 16.0.0-beta-1
+
+### Bug Fixes
+* The sheet now handles OGL conversion and partially supports script import (update the script to 12.0.0-beta.1). Monsters should import without issue, but spells aren't 100% yet.
+
 ## 16.0.0-alpha-1
 
 ### Breaking Changes
@@ -23,6 +28,7 @@ The sheet will always upgrade itself unless I specify otherwise, though some thi
 ### Bug Fixes
 * [#654: Magic Missile](https://bitbucket.org/mlenser/5eshaped/issues/654/magic-missile)
 * New characters sheets will be created with edit mode enabled
+* [#655: OGL skills do not convert](https://bitbucket.org/mlenser/5eshaped/issues/655/ogl-skills-do-not-convert)
 
 ### UI Adjustments
 * Tabs renamed to "Character"/"NPC", "Spells", "Equipment", "Features", cog
