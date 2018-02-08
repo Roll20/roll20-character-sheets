@@ -3,7 +3,7 @@
 This is a character sheet for use on Roll20.net with Rotted Capes. The sheet is designed to be usable by all Roll20 users regardless of subscription level.
 
 ### Current Version
-Version 1.3.1 (January 15th, 2018) Minor Fixes
+Version 1.4 (February 4th, 2018) Power Exploit Management & Automated Bulk Penalty
 
 ### Many Thanks	
 This sheet came into being through my experimentation in adapting sheets for my various games.  A big influence was Nathas's Numenera multi-tabs character sheet!
@@ -23,6 +23,18 @@ Long term:
 * New View: Data sheet for Enclaves and supporting cast
 	
 ### Changelog
+
+** February 4th 2018 **
+* Armor section added with automation so that Bulk is applied as a penalty to Action Rolls (Attribute, Skill, Power, Attacks) based on Qu & Mi
+* Created a new tab (Gear & Mods) to centralize equipment
+* Added Exploits section to Powers tab so players can track their Tricks and Powers
+* Reworked Character roll messages (Cast Member Views next)
+* Fixes: 
+  - Corrected calculation of top mph (was based on Qu vs pace)
+  - Fixed display of plot die in chat message (hide the ! sign)
+  - set min window width for issue occuring with chrome users
+  - when attribute on damage is set to blank the die roll threw an error.
+
 ** January 15th 2018 ** 
 * Cast Member View Attributes auto-calculate (was broken with last fix)
 * Update Damage dice drop downs to include the attribute die list (some powers use attribute dice for damage)
