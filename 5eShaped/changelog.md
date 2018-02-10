@@ -11,6 +11,14 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 16.0.0-rc-1
+
+### Bug Fixes
+* OGL conversion, Compendium drop, and Script import of monsters, spells, and items should be fully working (update the script to 12.0.0-rc.1)
+  * A processing notification now shows while these items are processing, regardless of origin
+* [#38: Spell Save DC Not calculating properly in !shaped-spells](https://bitbucket.org/mlenser/5eshapedscript/issues/38/spell-save-dc-not-calculating-properly-in)
+* Weapons dropped on a NPC sheet are added as actions
+
 ## 16.0.0-beta-1
 
 ### Bug Fixes
