@@ -11,6 +11,11 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 16.0.0-rc-2
+
+### Code Changed
+* Clean up fields that are no longer used with the new import method
+
 ## 16.0.0-rc-1
 
 ### Bug Fixes
