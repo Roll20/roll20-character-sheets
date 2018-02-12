@@ -11,6 +11,44 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 15.7.4
+
+### Bug Fixes
+* Fix parsing of single quotes that I broke as part of 15.7.3
+
+## 15.7.3
+
+### Bug Fixes
+* [#652: Tome of Beasts characters have errors on import](https://bitbucket.org/mlenser/5eshaped/issues/652/tome-of-beasts-characters-have-errors-on). Tome of Beast format variations parsed away to the expected format.
+
+## 15.7.2
+
+### Bug Fixes
+* Fix attack and damage components caused by a rename of `attackTypeChanged`
+
+## 15.7.1
+
+### Bug Fixes
+* [#640: Carrying Capacity Not displayed](https://bitbucket.org/mlenser/5eshaped/issues/640/carrying-capacity-not-displayed). Also fixes carrying capacity not being updated when Strength changes and hit dice not updating on Constitution changes.
+* [#648: Spell Macro not showing Cantrips in chat](https://bitbucket.org/mlenser/5eshaped/issues/648/spell-macro-not-showing-cantrips-in-chat)
+* [#645: Modify state should revert when character sheet editing is turned off](https://bitbucket.org/mlenser/5eshaped/issues/645/modify-state-should-revert-when-character)
+* [#646: Unable to change Casting Stat for Compendium Imported Spells](https://bitbucket.org/mlenser/5eshaped/issues/646/unable-to-change-casting-stat-for)
+* Attacks will default to having the correct attack and damage ability modifier selected based on the section they are created from (Offense, Spell, etc).
+* A spell’s saving throw ability modifier can now be set to use no ability modifier.
+
+## 15.7.0
+
+### Features
+
+* `Mana` setting now replaces `Spell points` wording with `Mana`
+* `Advantage+` and `Disadvantage-` have been added to handle cases of rolling an extra dice for all the possible dice systems. With d20 for example `Advantage+` would be `3d20kh1`
+
+## 15.6.0
+
+### Features
+
+* Death saving throw output now supports `death_saving_throw_chances` by outputting X / 3 or X / 5. All custom death saving throw macros must include `{{death_saving_throw_chances=@{death_saving_throw_chances}}}`.
+
 ## 15.5.9
 
 ### Bug Fixes
