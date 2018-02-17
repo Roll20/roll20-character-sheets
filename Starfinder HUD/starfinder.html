@@ -13038,6 +13038,7 @@
                         return memo;
                     },{})
                     .value();
+                    TAS.log('buffFields: '+JSON.stringify(buffFields));
             return buffFields;
         },
         
@@ -13051,13 +13052,29 @@
         
         calcBuffs = function(attributes,bonus,setObj){
             var tObj,evalBuff, redAttr = _.reduce(_.keys(bonus),(memo,t)=>{
+                if(t==='acp'){
+                    TAS.log('bonus: '+JSON.stringify(bonus));
+                    TAS.log('t: '+t);
+                    TAS.log('bonus[t]: '+JSON.stringify(bonus[t]));
+                }
                 tObj = _.reduce(bonus[t],(m,b)=>{
+                    if(t==='acp'){
+                        TAS.log('b: '+b)
+                    }
                     evalBuff=(b+'').replace(/(floor|ceil|abs|round|abs)\(/,'Math.$1(').replace(/@{([^}]+)}/,(match,p1)=>{
                         return setObj[p1.toLowerCase()]*1 || attributes[p1.toLowerCase()]*1||'@{'+p1+'}';
                     });
+                    if(t==='acp'){
+                        TAS.log('evalBuff: '+evalBuff)
+                    }
                     try{
                         evalBuff=eval(evalBuff);
-                        if(evalBuff>=0){
+                        if(t==='acp'){
+                            TAS.log('acp calculations:');
+                            TAS.log('prev m.acp: '+m.acp);
+                            m.acp=starfinderMax(true,m.acp,evalBuff);
+                            TAS.log('post m.acp: '+m.acp);
+                        }else if(evalBuff>=0){
                             if(t==='armor'){
                                 m.armor=starfinderMax(false,m.armor,evalBuff);
                             }else if(t==='max_dex'){
@@ -13068,11 +13085,7 @@
                                 m.buff=starfinderMax(false,m.buff,evalBuff);
                             }
                         }else if(evalBuff<0){
-                            if(t==='acp'){
-                                m.acp=starfinderMax(true,m.acp,evalBuff);
-                            }else{
-                                m.pen+=evalBuff;
-                            }
+                            m.pen+=evalBuff;
                         }
                     }catch(err){}
                     if(_.contains((attributes.stackable_buffs.toLowerCase()+',untyped').split(/\s*(?:,|\n+)\s*/),t.toLowerCase())){
@@ -13251,7 +13264,7 @@
                                 }
                             });
                             if(attributes[id+(obj.repeating ?'acp' : obj.attr+'_acp')]*1===1){
-                                specificBonus.acp=bonus.acp;
+                                specificBonus.acp=bonus.acp.acp;
                             }
                             specificBonus = calcBuffs(attributes,specificBonus,setObj);
                             if(obj.rollTime){
