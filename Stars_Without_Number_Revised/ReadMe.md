@@ -31,6 +31,7 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 * Changed the header toggles to work slightly better/faster.
 * You can now enter arbitrary dice rolls for shock damage!
 * Toggling to add skill to damage will now also add it to shock damage.
+* Added field for shock AC
 
 ### 1.5.1
 
