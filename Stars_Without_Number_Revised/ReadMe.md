@@ -27,6 +27,8 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 ### 1.6.0
 
+* Added new tab "Settings", for now primarily for toggling homebrew options.
+* Luck save can now be added in settings.
 * Fixed formatting of an NPC stat block.
 * Changed the header toggles to work slightly better/faster.
 * You can now enter arbitrary dice rolls for shock damage!
