@@ -29,6 +29,7 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 * Fixed formatting of an NPC stat block.
 * Changed the header toggles to work slightly better/faster.
+* You can now enter arbitrary dice rolls for shock damage!
 
 ### 1.5.1
 
