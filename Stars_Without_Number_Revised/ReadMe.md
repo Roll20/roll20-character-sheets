@@ -25,6 +25,11 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 ### Changelog
 
+### 1.6.0
+
+* Fixed formatting of an NPC stat block.
+* Changed the header toggles to work slightly better/faster.
+
 ### 1.5.1
 
 * Fixed bug where the AC and AB on NPC sheets was reset to the PC sheet value when the sheet was opened.
