@@ -288,7 +288,7 @@
 				</div>
 				<div class="sheet-row">
 					<label>XP scheme</label>
-					<select name="attr_xp_scheme">
+					<select name="attr_setting_xp_scheme">
 						<option value="xp">Normal XP</option>
 						<option value="money">Money</option>
 						<option value="custom">Custom amounts</option>
@@ -3436,6 +3436,7 @@ on("sheet:opened", function() {
 	migrateTechniques();
 	migrateCyberware();
 	migrateLanguages();
+	setNextLevelXP();
 });
 
 on("change:str change:int change:dex change:wis change:con change:cha", function(e) {
@@ -3467,6 +3468,7 @@ on("change:gear_readied_max", function() {
 
 on("change:level", function() {
 	calculateSaves();
+	setNextLevelXP();
 });
 
 on("change:skill_biopsion change:skill_precognition change:skill_telepathy change:skill_teleportation, change:skill_telekinesis change:skill_metapsion change:psionics_extra_effort", function() {
@@ -3504,6 +3506,9 @@ on("change:stat_block", function() {
 	fillNpc();
 })
 
+on("change:setting_xp_scheme, function() {
+	setNextLevelXP();
+})
 /**
  * Calculations
  */
@@ -3574,6 +3579,20 @@ calculateMaxStrain = function() {
 	});
 }
 
+setNextLevelXP = function() {
+	var xp = [0, 3, 6, 12, 18, 27, 39, 54, 72, 93];
+	getAttrs(['level', 'setting_xp_scheme'], function(v) {
+		if (v.xp_scheme === 'xp') {
+			if (v.level < 10) {
+				setAttrs({xp_max: xp[v.level]});
+			} else {
+				setAttrs({xp_max: 93 + ((v.level - 9) * 24)});
+			}
+		} else if (v.xp_scheme === 'money') {
+			setAttrs({xp_max: 2500 * (2 ** v.level)});
+		}
+	});
+}
 /**
  * Validations
  */
