@@ -35,6 +35,7 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 * Autofilling the "Next level xp" (with options).
 * Toggleable custom counters for whatever you heart desires.
 * Option to remove psionics completely.
+* New section for Space Magic, a Deluxe edition set of rules for importing magic into SWN.
 * Fixed formatting of an NPC stat block.
 * Changed the header toggles to work slightly better/faster.
 * You can now enter arbitrary dice rolls for shock damage!
