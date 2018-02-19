@@ -32,6 +32,7 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 * Option to play with 1st Edition skills if you prefer those.
 * Also option to add your own skills in addition/instead.
 * Autofilling the "Next level xp" (with options).
+* Toggleable custom counters for whatever you heart desires.
 * Fixed formatting of an NPC stat block.
 * Changed the header toggles to work slightly better/faster.
 * You can now enter arbitrary dice rolls for shock damage!

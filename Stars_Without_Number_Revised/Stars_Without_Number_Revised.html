@@ -303,6 +303,13 @@
 					<label>Add extra skills: <input type="checkbox" name="attr_homebrew_extra_skills"></label>
 					<p>Adds an extendable extra skill list for custom skills.</p>
 				</div>
+				<div class="sheet-row">
+					<label>Add custom counters: <input type="checkbox" name="attr_homebrew_custom_counter"></label>
+					<input type="checkbox" name="attr_homebrew_custom_counter" class="sheet-homebrew-toggle">
+					<div class="sheet-homebrew-hide">
+						Number of counters: <input type="number" name="attr_homebrew_custom_counter_number" min="1" max="4"></div>
+					<p>Useful for counting things like Plot Points, Inspiration, Light side/Dark side points etc. Max 4 counters.</p>
+				</div>
 			</div>
 			<div class="sheet-col">
 				<label class="sheet-subhead">Sheet options</label>
@@ -1090,8 +1097,59 @@
 						</tbody>
 					</table>
 				</div>
+				<input type="checkbox" name="attr_homebrew_custom_counter" class="sheet-homebrew-toggle">
+				<div class="sheet-homebrew-hide">
+					<div class="sheet-row">
+						<label class="sheet-subhead">Custom counters</label>
+					</div>
+					<div class="sheet-row">
+						<table>
+							<tbody>
+								<tr>
+									<td>
+										<input type="checkbox" name="attr_homebrew_custom_counter_1" class="sheet-homebrew-toggle">
+										<input type="text" name="attr_homebrew_custom_counter_1_name" class="sheet-stats-input sheet-homebrew-hide">
+									</td>
+									<td>
+										<input type="checkbox" name="attr_homebrew_custom_counter_1" class="sheet-homebrew-toggle">
+										<input type="number" name="attr_homebrew_custom_counter_1_counter" class="sheet-stats-half sheet-homebrew-hide">
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<input type="checkbox" name="attr_homebrew_custom_counter_2" class="sheet-homebrew-toggle">
+										<input type="text" name="attr_homebrew_custom_counter_2_name" class="sheet-stats-input sheet-homebrew-hide">
+									</td>
+									<td>
+										<input type="checkbox" name="attr_homebrew_custom_counter_2" class="sheet-homebrew-toggle">
+										<input type="number" name="attr_homebrew_custom_counter_2_counter" class="sheet-stats-half sheet-homebrew-hide">
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<input type="checkbox" name="attr_homebrew_custom_counter_3" class="sheet-homebrew-toggle">
+										<input type="text" name="attr_homebrew_custom_counter_3_name" class="sheet-stats-input sheet-homebrew-hide">
+									</td>
+									<td>
+										<input type="checkbox" name="attr_homebrew_custom_counter_3" class="sheet-homebrew-toggle">
+										<input type="number" name="attr_homebrew_custom_counter_3_counter" class="sheet-stats-half sheet-homebrew-hide">
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<input type="checkbox" name="attr_homebrew_custom_counter_4" class="sheet-homebrew-toggle">
+										<input type="text" name="attr_homebrew_custom_counter_4_name" class="sheet-stats-input sheet-homebrew-hide">
+									</td>
+									<td>
+										<input type="checkbox" name="attr_homebrew_custom_counter_4" class="sheet-homebrew-toggle">
+										<input type="number" name="attr_homebrew_custom_counter_4_counter" class="sheet-stats-half sheet-homebrew-hide">
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
 			</div>
-
 		</div>
 		<input checked type="checkbox" title="show/hide" class="sheet-section-toggle" name="attr_combat_show">
 		<label class="sheet-section-toggle-header-label">
@@ -3496,6 +3554,8 @@ on("sheet:opened", function() {
 	migrateCyberware();
 	migrateLanguages();
 	setNextLevelXP();
+	showHideCounters();
+	defaultSettingCounters();
 });
 
 on("change:str change:int change:dex change:wis change:con change:cha", function(e) {
@@ -3563,11 +3623,21 @@ on("change:repeating_gear", function() {
 
 on("change:stat_block", function() {
 	fillNpc();
-})
+});
 
-on("change:setting_xp_scheme, function() {
+on("change:setting_xp_scheme", function() {
 	setNextLevelXP();
-})
+});
+
+on("change:homebrew_custom_counter_number", function() {
+	console.log("1");
+	showHideCounters();
+	console.log("2");
+});
+
+on("change:homebrew_custom_counter_number_default", function() {
+	defaultSettingCounters();
+});
 /**
  * Calculations
  */
@@ -3813,4 +3883,36 @@ fillNpc = function() {
 	});
 }
 
+/**
+ * Other
+ */
+showHideCounters = function() {
+	getAttrs(["homebrew_custom_counter_number"], function(v) {
+		if (v.homebrew_custom_counter_number == 1) {
+			setAttrs({homebrew_custom_counter_1: "on"});
+		} else if (v.homebrew_custom_counter_number == 2) {
+			setAttrs({homebrew_custom_counter_1: "on", homebrew_custom_counter_2: "on"});
+		} else if (v.homebrew_custom_counter_number == 3) {
+			setAttrs({homebrew_custom_counter_1: "on", homebrew_custom_counter_2: "on", homebrew_custom_counter_3: "on"});
+		} else if (v.homebrew_custom_counter_number == 4) {
+			setAttrs({homebrew_custom_counter_1: "on", homebrew_custom_counter_2: "on", homebrew_custom_counter_3: "on", homebrew_custom_counter_4: "on"});
+		}
+	});
+}
+
+defaultSettingCounters = function() {
+	getAttrs(["homebrew_custom_counter_number_default"], function(v) {
+		if (v.homebrew_custom_counter_number_default == "0") {
+			setAttrs({homebrew_custom_counter: "0"});
+		} else if (v.homebrew_custom_counter_number_default == "1") {
+			setAttrs({homebrew_custom_counter: "on", homebrew_custom_counter_number: "1"});
+		} else if (v.homebrew_custom_counter_number_default == "2") {
+			setAttrs({homebrew_custom_counter: "on", homebrew_custom_counter_number: "2"});
+		} else if (v.homebrew_custom_counter_number_default == "3") {
+			setAttrs({homebrew_custom_counter: "on", homebrew_custom_counter_number: "3"});
+		} else if (v.homebrew_custom_counter_number_default == "4") {
+			setAttrs({homebrew_custom_counter: "on", homebrew_custom_counter_number: "4"});
+		}
+	});
+}
 </script>
