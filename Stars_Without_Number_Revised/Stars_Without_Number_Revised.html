@@ -295,7 +295,7 @@
 					<select name="attr_homebrew_skill_list">
 						<option selected value="1">Revised Edition</option>
 						<option value="2">First Edition</option>
-						<option value="">Neither</option>
+						<option value="0">Neither</option>
 					</select>
 					<p>Chose whether to change to the skill list from First Edition SWN, or use neither (In that case you should probably enable custom skills).</p>
 				</div>
@@ -1184,12 +1184,27 @@
 				<fieldset class="repeating_weapons">
 					<input type="text" name="attr_weapon_name" style="width: 105px">
 					<input type="number" name="attr_weapon_attack" value="0" style="width: 65px">
-					<select class="inputbox" name="attr_weapon_skill_bonus" style="width: 95px; height: 25px">
+					<input type="radio" name="attr_homebrew_skill_list" class="sheet-homebrew-toggle" value="1">
+					<select class="inputbox sheet-homebrew-hide" name="attr_weapon_skill_bonus" style="width: 95px; height: 25px">
+						<option value="@{skill_combat_energy}">Combat/Energy Weapons</option>
+						<option value="@{skill_combat_gunnery}">Combat/Gunnery</option>
+						<option value="@{skill_combat_primitive}">Combat/Primitive Weapons</option>
+						<option value="@{skill_combat_projectile}">Combat/Projectile Weapons</option>
+						<option value="@{skill_combat_psitech}">Combat/Psitech</option>
+						<option value="@{skill_combat_unarmed}">Combat/Unarmed</option>
+						<option value="@{skill_telekinesis}">Telekinesis</option>
+						<option value="0">None</option>
+					</select>
+					<input type="radio" name="attr_homebrew_skill_list" class="sheet-homebrew-toggle" value="2">
+					<select class="inputbox sheet-homebrew-hide" name="attr_weapon_skill_bonus" style="width: 95px; height: 25px">
 						<option value="@{skill_shoot}">Shoot</option>
 						<option value="@{skill_punch}">Punch</option>
 						<option value="@{skill_stab}">Stab</option>
 						<option value="@{skill_telekinesis}">Telekinesis</option>
+						<option value="0">None</option>
 					</select>
+					<input type="radio" name="attr_homebrew_skill_list" class="sheet-homebrew-toggle" value="0">
+					<input class="sheet-homebrew-hide" type="number" name="attr_weapon_skill_bonus" style="width: 95px">
 					<select class="inputbox" name="attr_attribute_mod" style="width: 60px; height: 25px">
 						<option value="@{str_bonus}">STR</option>
 						<option value="@{dex_bonus}">DEX</option>
@@ -2461,6 +2476,7 @@
 				  </div>
 				</div>
 			</div>
+			<input type="radio" name="attr_homebrew_skill_list" class="sheet-homebrew-toggle" value="0">
 			<input type="checkbox" name="attr_homebrew_extra_skills" class="sheet-homebrew-toggle">
 			<div class="sheet-homebrew-hide">
 				<fieldset class="repeating_skills">
@@ -2816,12 +2832,27 @@
 				<fieldset class="repeating_weapons">
 					<input type="text" name="attr_weapon_name" style="width: 105px">
 					<input type="number" name="attr_weapon_attack" value="0" style="width: 65px">
-					<select class="inputbox" name="attr_weapon_skill_bonus" style="width: 95px; height: 25px">
+					<input type="radio" name="attr_homebrew_skill_list" class="sheet-homebrew-toggle" value="1">
+					<select class="inputbox sheet-homebrew-hide" name="attr_weapon_skill_bonus" style="width: 95px; height: 25px">
+						<option value="@{skill_combat_energy}">Combat/Energy Weapons</option>
+						<option value="@{skill_combat_gunnery}">Combat/Gunnery</option>
+						<option value="@{skill_combat_primitive}">Combat/Primitive Weapons</option>
+						<option value="@{skill_combat_projectile}">Combat/Projectile Weapons</option>
+						<option value="@{skill_combat_psitech}">Combat/Psitech</option>
+						<option value="@{skill_combat_unarmed}">Combat/Unarmed</option>
+						<option value="@{skill_telekinesis}">Telekinesis</option>
+						<option value="0">None</option>
+					</select>
+					<input type="radio" name="attr_homebrew_skill_list" class="sheet-homebrew-toggle" value="2">
+					<select class="inputbox sheet-homebrew-hide" name="attr_weapon_skill_bonus" style="width: 95px; height: 25px">
 						<option value="@{skill_shoot}">Shoot</option>
 						<option value="@{skill_punch}">Punch</option>
 						<option value="@{skill_stab}">Stab</option>
 						<option value="@{skill_telekinesis}">Telekinesis</option>
+						<option value="0">None</option>
 					</select>
+					<input type="radio" name="attr_homebrew_skill_list" class="sheet-homebrew-toggle" value="0">
+					<input class="sheet-homebrew-hide" type="number" name="attr_weapon_skill_bonus" style="width: 95px">
 					<select class="inputbox" name="attr_attribute_mod" style="width: 60px; height: 25px">
 						<option value="@{str_bonus}">STR</option>
 						<option value="@{dex_bonus}">DEX</option>
@@ -3556,6 +3587,7 @@ on("sheet:opened", function() {
 	setNextLevelXP();
 	showHideCounters();
 	defaultSettingCounters();
+	changeWeaponSkillDropdown();
 });
 
 on("change:str change:int change:dex change:wis change:con change:cha", function(e) {
@@ -3637,6 +3669,10 @@ on("change:homebrew_custom_counter_number", function() {
 
 on("change:homebrew_custom_counter_number_default", function() {
 	defaultSettingCounters();
+});
+
+on("change:homebrew_skill_list", function() {
+	changeWeaponSkillDropdown();
 });
 /**
  * Calculations
@@ -3884,7 +3920,7 @@ fillNpc = function() {
 }
 
 /**
- * Other
+ * Settings
  */
 showHideCounters = function() {
 	getAttrs(["homebrew_custom_counter_number"], function(v) {
@@ -3914,5 +3950,15 @@ defaultSettingCounters = function() {
 			setAttrs({homebrew_custom_counter: "on", homebrew_custom_counter_number: "4"});
 		}
 	});
+}
+
+changeWeaponSkillDropdown = function() {
+	TAS.repeating("weapons")
+		.attr("homebrew_skill_list")
+		.fields("homebrew_skill_list")
+		.each(function(attrSet, a) {
+			attrSet.homebrew_skill_list = a.homebrew_skill_list;
+		})
+		.execute();
 }
 </script>
