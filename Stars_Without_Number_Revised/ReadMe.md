@@ -25,6 +25,10 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 ### Changelog
 
+### 1.6.1
+
+* Fix the sheet default settings to actually work.
+
 ### 1.6.0
 
 * Added new tab "Settings", for now primarily for toggling homebrew options.
