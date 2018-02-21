@@ -15,7 +15,6 @@ The sheet will always upgrade itself unless I specify otherwise, though some thi
 
 ### Breaking Changes
 * Importing data from the compendium, script, or OGL content has been completely revamped to use the same system for as much as possible.
-  * Importing data from the script and converting from OGL are completely broken. Do not try it. I will fix it as part of the 16.0.0 full release. They will hopefully use nearly all of the same processes as compendium
 
 ### Features
 * [#656: Missing comma in Modifiers -> Saving throw](https://bitbucket.org/mlenser/5eshaped/issues/656/missing-comma-in-modifiers-saving-throw)
