@@ -2962,9 +2962,9 @@
                 },"Tiara Of Translocation Mk 4":{
                 "bulk":"l","cost":"875000","level":"20","sourcepage":"p.224","name":"Tiara Of Translocation Mk 4","category":"Magic Items"
                 },"Backpack (Consumer)":{
-                "bulk":"-","cost":"3","info":"1 bulk when not worn.","level":"1","sourcepage":"p.230","name":"Backpack (Consumer)","category":"Personal Items"
+                "bulk":"-","cost":"3","info":"1 bulk when not worn.","mods":"+1 to overburden bulk","level":"1","sourcepage":"p.230","name":"Backpack (Consumer)","category":"Personal Items"
                 },"Backpack (Industrial)":{
-                "bulk":"-","cost":"25","info":"1 bulk when not worn.","level":"1","sourcepage":"p.230","name":"Backpack (Industrial)","category":"Personal Items"
+                "bulk":"-","cost":"25","info":"1 bulk when not worn.","mods":"+1 to encumber bulk\n+2 to overburden bulk","level":"1","sourcepage":"p.230","name":"Backpack (Industrial)","category":"Personal Items"
                 },"Bonding Epoxy":{
                 "bulk":"l","cost":"400","level":"1","sourcepage":"p.230","name":"Bonding Epoxy","category":"Personal Items"
                 },"Clothing (Environmental/Cold Climate)":{
@@ -5104,6 +5104,9 @@
                     [itemID+'show_options']:0,
                     item_compendium:'no-selection'
                 };
+                if(item.mods){
+                    setObj[itemID+'mods']+=item.mods+'\n';
+                }
                 if(item.eac){
                     setObj[itemID+'mods']+='+'+item.eac+' armor to eac\n';
                 }
@@ -5116,7 +5119,6 @@
                 if(item.maxdex){
                     setObj[itemID+'mods']+=item.maxdex+' max dex to armor';
                 }
-                TAS.log('item: '+JSON.stringify(equipment[item]));
                 if(_.indexOf(weaponry,item.category)>-1){
                     weaponID ='repeating_attack_'+generateRowID()+'_';
                     _.each(['crit','damage_dice','special','category','type','level','name'],(field)=>{
@@ -5135,7 +5137,6 @@
                         }
                         return elementSwitch[p1];
                     });
-                    TAS.log('here');
                     setObj[weaponID+'ability']=(item.category.match(/small arms|longarms|heavy weapons|sniper/i) || (item.special+'').match(/operative/i)) ?'@{dexterity_mod}' :'@{strength_mod}';
                     if(item.category.match(/melee/i)){
                         setObj[weaponID+'damage_ability']='@{strength_mod}';
@@ -5770,14 +5771,21 @@
             }
         },
         
-        calcBuffs = function(attributes,bonus,setObj){
+        calcBuffs = function(attributes,bonus,setObj,output){
             var tObj,evalBuff, redAttr = _.reduce(_.keys(bonus),(memo,t)=>{
+                if(output){
+                    TAS.log(t);
+                    TAS.log('bonus[t]: '+JSON.stringify(bonus[t]));
+                }
                 tObj = _.reduce(bonus[t],(m,b)=>{
                     evalBuff=(b+'').replace(/(floor|ceil|abs|round|abs)\(/,'Math.$1(').replace(/@{([^}]+)}/,(match,p1)=>{
                         return setObj[p1.toLowerCase()]*1 || attributes[p1.toLowerCase()]*1||'@{'+p1+'}';
                     });
                     try{
                         evalBuff=eval(evalBuff);
+                        if(output){
+                            TAS.log('evalBuff: '+evalBuff);
+                        }
                         if(t==='acp'){
                             m.acp=starfinderMax(true,m.acp,evalBuff);
                         }else if(evalBuff>=0){
@@ -5799,10 +5807,16 @@
                     }else if((b+'').length>0){
                         m.misc+=(m.misc==='' ?'' :',')+'[['+(b+'').replace(/^\+/,'')+']]'
                     }
+                        if(output){
+                            TAS.log('m: '+JSON.stringify(m));
+                        }
                     return m;
                 },{buff:0,pen:0,misc:'',armor:0,acp:0});
                 memo.total+=tObj.buff+tObj.pen+tObj.acp;
-                if(_.contains((attributes.stackable_buffs.toLowerCase()+',untyped').split(/\s*(?:,|\n+)\s*/),t.toLowerCase())&&tObj.misc.length>1){
+                        if(output){
+                            TAS.log(tObj.misc);
+                        }
+                if(_.contains((attributes.stackable_buffs.toLowerCase()+',untyped').split(/\s*(?:,|\n+)\s*/),t.toLowerCase())&&tObj.misc.length>0){
                     memo.misc+='+[['+tObj.misc+']]['+t+']';
                 }else{
                     if(tObj.misc.length>1){
@@ -5951,6 +5965,9 @@
                         let attributeMod=setObj[(setObj[id+obj.ability]+'').replace(/@{|}/g,'')]*1||setObj[(attributes[id+obj.ability]+'').replace(/@{|}/g,'')]*1||attributes[(attributes[id+obj.ability]+'').replace(/@{|}/g,'')]*1||rpAbility*1;
                         if(obj.moddable){
                             specificBonus = bonus[obj.attr] || {};
+                            if(obj.attr==='acrobatics'){
+                                TAS.log('specificBonus: '+JSON.stringify(specificBonus));
+                            }
                             _.each(bonusKeys,(k)=>{
                                 if(k.startsWith(obj.attr+'|')||(k.startsWith('attack')&&obj.attr.match(/(?:attack_|^)total/))||(k.startsWith('damage')&&obj.attr.match(/damage_total/))){
                                     let kSplit = k.replace(/[^|]+\|/,'').split(/\s*,\s*/g);
@@ -5972,7 +5989,14 @@
                             if(attributes[id+(obj.repeating ?'acp' : obj.attr+'_acp')]*1===1){
                                 specificBonus.acp=bonus.acp.acp;
                             }
-                            specificBonus = calcBuffs(attributes,specificBonus,setObj);
+                            if(obj.attr==='acrobatics'){
+                                TAS.log('specificBonus - final: '+JSON.stringify(specificBonus));
+                            }
+                            specificBonus = calcBuffs(attributes,specificBonus,setObj,obj.attr==='acrobatics' ? true : false);
+                            if(obj.attr==='acrobatics'){
+                                TAS.log('specificBonus calculated: '+JSON.stringify(specificBonus));
+                                TAS.log(obj.rollTime);
+                            }
                             if(obj.rollTime){
                                 memo[id+obj.attr.replace(/total|profession|_npc/,'')+obj.rollTime]=specificBonus.misc||'';
                             }
