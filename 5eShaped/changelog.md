@@ -11,25 +11,7 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
-## 16.0.0-rc-2
-
-### Code Changed
-* Clean up fields that are no longer used with the new import method
-
-## 16.0.0-rc-1
-
-### Bug Fixes
-* OGL conversion, Compendium drop, and Script import of monsters, spells, and items should be fully working (update the script to 12.0.0-rc.1)
-  * A processing notification now shows while these items are processing, regardless of origin
-* [#38: Spell Save DC Not calculating properly in !shaped-spells](https://bitbucket.org/mlenser/5eshapedscript/issues/38/spell-save-dc-not-calculating-properly-in)
-* Weapons dropped on a NPC sheet are added as actions
-
-## 16.0.0-beta-1
-
-### Bug Fixes
-* The sheet now handles OGL conversion and partially supports script import (update the script to 12.0.0-beta.1). Monsters should import without issue, but spells aren't 100% yet.
-
-## 16.0.0-alpha-1
+## 16.0.0
 
 ### Breaking Changes
 * Importing data from the compendium, script, or OGL content has been completely revamped to use the same system for as much as possible.
@@ -37,21 +19,26 @@ The sheet will always upgrade itself unless I specify otherwise, though some thi
 
 ### Features
 * [#656: Missing comma in Modifiers -> Saving throw](https://bitbucket.org/mlenser/5eshaped/issues/656/missing-comma-in-modifiers-saving-throw)
+* Conditions have been added.
 
 ### Bug Fixes
 * [#654: Magic Missile](https://bitbucket.org/mlenser/5eshaped/issues/654/magic-missile)
 * New characters sheets will be created with edit mode enabled
 * [#655: OGL skills do not convert](https://bitbucket.org/mlenser/5eshaped/issues/655/ogl-skills-do-not-convert)
+* OGL conversion, Compendium drop, and Script import of monsters, spells, and items should be fully working (update the script to 12.0.0)
+  * A processing notification now shows while these items are processing, regardless of origin
+* [#38: Spell Save DC Not calculating properly in !shaped-spells](https://bitbucket.org/mlenser/5eshapedscript/issues/38/spell-save-dc-not-calculating-properly-in)
+* Weapons dropped on a NPC sheet are added as actions
 
 ### UI Adjustments
-* Tabs renamed to "Character"/"NPC", "Spells", "Equipment", "Features", cog
+* Styled boxes have been added
+* Tabs renamed to "Character"/"NPC", "Spells", and the cog.
 * "Character" tab for PCs will now show the appearance and backstory details below the normal sheet
 * "All" option removed as it is now only useful for showing settings below other sheets which doesn't have much value
 * Repeating buttons restyled a bit
 * PC Core page column widths adjusted a bit
-* Font size will now adjust if the user adjusts their browser's font size
-* Font sizes adjusted down
-* Passive skills moved to the core page
+* Font sizes adjusted to match the new UI
+* Passive skills moved to the core page and restyled
 
 ## 15.7.4
 
