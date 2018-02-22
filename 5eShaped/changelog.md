@@ -11,6 +11,15 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 16.1.0
+
+### Features
+* Shaped sheet can now process OGL spells from PC sheets or NPC sheets (only NPC sheets from the Curse of Strahd module and newer use this format for spells). Closes [#659: NPC Spells not converting from OGL to Shaped](https://bitbucket.org/mlenser/5eshaped/issues/659/npc-spells-not-converting-from-ogl-to)
+
+### UI Adjustments
+* The sheet is a bit wider now and no longer assumes my stylish CSS so it should fit on the default width (~888px depending on browser) without a horizontal scrollbar.
+* Firefox UI cleaned up. Closes [#661: Tie bar behind exhastion states not centered](https://bitbucket.org/mlenser/5eshaped/issues/661/tie-bar-behind-exhastion-states-not)
+
 ## 16.0.0
 
 ### Breaking Changes
