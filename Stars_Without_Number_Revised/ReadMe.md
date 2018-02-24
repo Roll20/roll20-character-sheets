@@ -28,6 +28,7 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 ### 1.6.1
 
 * Fix the sheet default settings to actually work.
+* Spelling and text fixes.
 
 ### 1.6.0
 
