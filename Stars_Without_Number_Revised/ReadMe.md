@@ -29,6 +29,7 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 * Fix the sheet default settings to actually work.
 * Spelling and text fixes.
+* Added field for number of attacks to NPCs.
 
 ### 1.6.0
 
