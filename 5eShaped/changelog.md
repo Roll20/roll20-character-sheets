@@ -11,6 +11,13 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 16.1.1
+
+### Bug Fixes
+* [#664: Spelling errors in translation.json](https://bitbucket.org/mlenser/5eshaped/issues/664/spelling-errors-in-translationjson)
+* [#663: Saving Throw Bonus Formatting Error](https://bitbucket.org/mlenser/5eshaped/issues/663/saving-throw-bonus-formatting-error)
+* Crit range is shown by default as turning it on wasn’t intuitive enough.
+
 ## 16.1.0
 
 ### Features
