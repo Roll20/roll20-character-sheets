@@ -11,6 +11,11 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 16.1.2
+
+### Bug Fixes
+* [#572: Modifiers adding a second time on critical damage](https://bitbucket.org/mlenser/5eshaped/issues/572/modifiers-adding-a-second-time-on-critical)
+
 ## 16.1.1
 
 ### Bug Fixes
