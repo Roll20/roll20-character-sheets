@@ -11,6 +11,23 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 17.0.0
+
+### Breaking Changes
+* Spells now track the number of slots expended instead of the remaining slots. This aligns with the paper and OGL sheets. Upgrades should handle this change for you.
+* NPC saving throws and skills will only show proficient/expertise items while in presentation mode. Closes [#669: Don't generate skills by default that have no proficiency or expertise on NPC sheets](https://bitbucket.org/mlenser/5eshaped/issues/669/dont-generate-skills-by-default-that-have)
+
+### Features
+* Spell UI has been updated with bubbles for spell slots and new UI wrappers.
+* Spells now have tooltips to display the full contents of the spell. Closes [#374: Enable 'condense' toggling for spells on a more granular basis](https://bitbucket.org/mlenser/5eshaped/issues/374/enable-condense-toggling-for-spells-on-a)
+* NPC skills will now show in a grid layout in edit mode.
+* Falling to 0 hp now sets the unconscious condition. Gaining HP removes it. Closes [#3: Conditions](https://bitbucket.org/mlenser/5eshaped/issues/3/conditions)
+* Cleaned up the Stablock macro to translate the size of PCs/NPCs. Race will now show instead of type for PCs. Offense and utility added for PCs as well.
+* Settings page reorganized.
+
+### Bug Fixes
+* [#670: Not assigning a weight value to equipment completely breaks weight calculations](https://bitbucket.org/mlenser/5eshaped/issues/670/not-assigning-a-weight-value-to-equipment)
+
 ## 16.1.2
 
 ### Bug Fixes
