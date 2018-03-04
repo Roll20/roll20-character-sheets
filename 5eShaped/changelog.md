@@ -11,6 +11,13 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 17.0.1
+
+### Bug Fixes
+* `Roll 2` now indicates to the user that it is a legacy feature that does not work with all sheet features.
+* [#672: coin weight calculation resulting in high decimal values](https://bitbucket.org/mlenser/5eshaped/issues/672/coin-weight-calculation-resulting-in-high)
+* Spells manually changed in any way resulted in an error which prevented the scripts from running properly. This has been fixed. Closes [#674: Adding custom spells does not output description to chat or use spell slot](https://bitbucket.org/mlenser/5eshaped/issues/674/adding-custom-spells-does-not-output)
+
 ## 17.0.0
 
 ### Breaking Changes
