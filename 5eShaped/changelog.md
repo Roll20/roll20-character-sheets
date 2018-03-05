@@ -11,6 +11,12 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 17.0.2
+
+### Bug Fixes
+* [#675: Warlock slots not generating](https://bitbucket.org/mlenser/5eshaped/issues/675/warlock-slots-not-generating-v-1701)
+* Spells known and spells chat macro now update when dragging a spell from the SRD. Closes [#677: Spells Macro Not Updating](https://bitbucket.org/mlenser/5eshaped/issues/677/spells-macro-not-updating)
+
 ## 17.0.1
 
 ### Bug Fixes
