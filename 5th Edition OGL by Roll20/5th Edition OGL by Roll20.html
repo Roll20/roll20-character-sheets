@@ -5986,12 +5986,20 @@
             return;
         }
         var repeating_source = eventinfo.sourceAttribute.substring(0, eventinfo.sourceAttribute.lastIndexOf('_'));
-        getAttrs([repeating_source + "_spellattackid", repeating_source + "_spelllevel"], function(v) {
+        getAttrs([repeating_source + "_spellattackid", repeating_source + "_spelllevel", repeating_source + "_spelloutput", repeating_source + "_spellprepared", "character_id"], function(v) {
             var spellid = repeating_source.slice(-20);
             var attackid = v[repeating_source + "_spellattackid"];
             var lvl = v[repeating_source + "_spelllevel"];
-            if(attackid && lvl && spellid) {
+            var spelloutput = v[repeating_source + "_spelloutput"];
+            var prepared = v[repeating_source + "_spellprepared"];
+            if(attackid && lvl && spellid && prepared) {
                 update_attack_from_spell(lvl, spellid, attackid)
+            }
+            if (attackid && attackid != "" && !prepared) {
+                remove_attack(attackid);
+            }
+            if (!attackid && spelloutput && spelloutput === "ATTACK" && prepared) {
+                create_attack_from_spell(lvl, spellid, v["character_id"]);
             }
         });
     });
