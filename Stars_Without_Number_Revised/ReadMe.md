@@ -25,6 +25,23 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 ### Changelog
 
+### 1.6.0
+
+* Added new tab "Settings", for now primarily for toggling homebrew options.
+* Sheet default settings for everything in the settings page.
+* Luck save can now be added in settings.
+* Option to play with 1st Edition skills if you prefer those.
+* Also option to add your own skills in addition/instead.
+* Autofilling the "Next level xp" (with options).
+* Toggleable custom counters for whatever you heart desires.
+* Option to remove psionics completely.
+* New section for Space Magic, a Deluxe edition set of rules for importing magic into SWN.
+* Fixed formatting of an NPC stat block.
+* Changed the header toggles to work slightly better/faster.
+* You can now enter arbitrary dice rolls for shock damage!
+* Toggling to add skill to damage will now also add it to shock damage.
+* Added field for shock AC
+
 ### 1.5.1
 
 * Fixed bug where the AC and AB on NPC sheets was reset to the PC sheet value when the sheet was opened.
