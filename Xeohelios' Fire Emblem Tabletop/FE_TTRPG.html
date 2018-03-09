@@ -272,7 +272,7 @@
                 <td><span name = "attr_Hit">0</span></td>
                 <td><span name = "attr_Crit">0</span></td>
                 <td><span name = "attr_Avo">0</span></td>
-                <td><span name = "attr_Lck_total"></span></td>
+                <td><span name = "attr_Ddg">0</span></td>
             </tr>
         </table>
     </div>
@@ -695,22 +695,33 @@
                 <td><input type = "number" name = "attr_Range1" value = "0" class = "sheet-range"/><input type = "number" name = "attr_Range2" value = "0" class = "sheet-range"/></td>
             </tr>
         </table>
-        <label>
-            Strong against:
-            <select class = "sheet-strengths" name = "attr_Strengths">
-                <option> </option>
-                <option>Beast</option>
-                <option>Flier</option>
-                <option>Dragon</option>
-                <option>Armor</option>
-                <option>Beast, Flier</option>
-                <option>Beast, Armor</option>
-                <option>Beast, Dragon</option>
-                <option>Dragon, Flier</option>
-                <option>Dragon, Armor</option>
-                <option>Armor, Flier</option>
-            </select>
-        </label>
+        <table>
+            <tr>
+                <th>Strong against:</th>
+                <th>AOE</th>
+            </tr>
+            <tr>
+                <td>
+                    <select class="sheet-strengths" name="attr_Strengths">
+                        <option> </option>
+                        <option>Beast</option>
+                        <option>Flier</option>
+                        <option>Dragon</option>
+                        <option>Armor</option>
+                        <option>Beast, Flier</option>
+                        <option>Beast, Armor</option>
+                        <option>Beast, Dragon</option>
+                        <option>Dragon, Flier</option>
+                        <option>Dragon, Armor</option>
+                        <option>Armor, Flier</option>
+                    </select>
+                </td>
+                <td>
+                    <input type="number">
+                </td>
+            </tr>
+        </table>
+
     </fieldset>
 </div>
 
@@ -815,7 +826,7 @@
     <input name="attr_Avo" value = "0" hidden>
     <!--Firstmost weapon values, excludes hit/crit because that's already calculated-->
     <input name= "attr_f_WName" value = "" hidden>
-    <input name= "attr_f_WType" value = "0\" hidden>
+    <input name= "attr_f_WType" value = "" hidden>
     <input name= "attr_f_Wt" value = "0" hidden>
     <input name= "attr_f_Mt" value = "0" hidden>
     <input name= "attr_f_Range1" value = "0" hidden>
@@ -827,7 +838,10 @@
    <input type = "checkbox" value="1" name = "attr_isPromo"/>
    <input name= "attr_fid" value = "" hidden>
    <input name = "attr_f_WRank" value = "" hidden>
-</div>
+   <input name = "attr_Hitmod" value = "0" hidden>
+   <input name = "attr_Critmod" value = "0" hidden>
+   <input name = "attr_Avomod" value = "0" hidden>
+   <input name = "attr_Ddgmod" value = "0" hidden>
 
 
 <script type="text/worker">
@@ -1776,10 +1790,10 @@ on("change:Mov_total",function(eventInfo){
 });
 
 //Hit
-on("change:Skl_total change:Lck_total change:repeating_weapons change:_reporder_repeating_weapons remove:repeating_weapons", function() {
+on("change:Skl_total change:Lck_total change:Hitmod change:repeating_weapons change:_reporder_repeating_weapons remove:repeating_weapons", function() {
    getSectionIDsOrdered("repeating_weapons", function(idarray) {
        fID = idarray[0];
-       getAttrs(["Skl_total","Lck_total","repeating_weapons_"+fID+"_hit"], function(v) {
+       getAttrs(["Skl_total","Lck_total","Hitmod","repeating_weapons_"+fID+"_hit"], function(v) {
            let wHit = Number(v["repeating_weapons_"+fID+"_hit"]);
            if (wHit == undefined){
                wHit = 0;
@@ -1787,19 +1801,21 @@ on("change:Skl_total change:Lck_total change:repeating_weapons change:_reporder_
            }
            let Skl = v.Skl_total;
            let Lck = v.Skl_total;
+           let Mod = v.Hitmod
            setAttrs({
-               Hit: Math.round((Skl * 3) + wHit + (Lck / 2))
+               Hit: Math.round((Skl * 3) + wHit + (Lck / 2)) + Number(Mod)
            });
            console.log(Math.round((Skl * 3) + wHit + (Lck / 2)));
+           console.log("Hitmod is" + Mod)
        });
    });
 });
 
 //Crit
-on("change:Skl_total change:repeating_weapons change:_reporder_repeating_weapons remove:repeating_weapons", function() {
+on("change:Skl_total change:Critmod change:repeating_weapons change:_reporder_repeating_weapons remove:repeating_weapons", function() {
    getSectionIDsOrdered("repeating_weapons", function(idarray) {
        fID = idarray[0];
-       getAttrs(["Skl_total","repeating_weapons_"+fID+"_crit"], function(v) {
+       getAttrs(["Skl_total","Critmod","repeating_weapons_"+fID+"_crit"], function(v) {
            let wCrit = Number(v["repeating_weapons_"+fID+"_crit"]);
            if (wCrit == undefined){
                wHit = 0;
@@ -1807,7 +1823,7 @@ on("change:Skl_total change:repeating_weapons change:_reporder_repeating_weapons
            }
            let SklC = v.Skl_total;
            setAttrs({
-               Crit: Math.round((SklC / 2) + wCrit)
+               Crit: Math.round((SklC / 2) + wCrit) + Number(v.Critmod)
            });
            console.log(Math.round((SklC / 2) + wCrit));
        });
@@ -1815,11 +1831,20 @@ on("change:Skl_total change:repeating_weapons change:_reporder_repeating_weapons
 });
 //Avo
 on("change:Spd_total change:Lck_total", function() {
-   getAttrs(["Spd_total", "Lck_total"], function(v) {
+   getAttrs(["Spd_total", "Lck_total","Avomod"], function(v) {
        Spd = v.Spd_total;
        LckA = v.Lck_total;
       setAttrs({
-          Avo: Math.round(((Spd * 3) + LckA) / 2)
+          Avo: Math.round(((Spd * 3) + LckA) / 2) + Number(v.Avomod)
+      });
+   });
+});
+//Dodge
+on("change:Lck_total change:Ddgmod", function() {
+   getAttrs(["Lck_total", "Avomod"], function(v) {
+       Lck = v.Lck_total;
+      setAttrs({
+          Ddg: Number(Lck) + Number(v.Avomod)
       });
    });
 });
@@ -1835,9 +1860,9 @@ on("change:repeating_weapons", function() {
 //Check for NaNs
 on("change:hit", function(eventInfo) {
     if (isNaN(eventInfo.newValue)){
-        getAttrs(["Lck_total","Skl_total"], function(v){
+        getAttrs(["Lck_total","Skl_total","Hitmod"], function(v){
             setAttrs({
-                Hit: Math.round((v.Skl_total * 3) + (v.Lck_total / 2))
+                Hit: Math.round((v.Skl_total * 3) + (v.Lck_total / 2)) + Number(v.Hitmod)
             });
         });
         console.log(":( NaN exception");
@@ -1845,9 +1870,9 @@ on("change:hit", function(eventInfo) {
 });
 on("change:crit", function(eventInfo) {
     if (isNaN(eventInfo.newValue)){
-        getAttrs(["Skl_total"], function(v){
+        getAttrs(["Skl_total","Critmod"], function(v){
             setAttrs({
-                Crit: Math.round((v.Skl_total / 2))
+                Crit: Math.round((v.Skl_total / 2)) + Number(v.Critmod)
             });
         });
         console.log(":( NaN exception");
@@ -1935,7 +1960,7 @@ on("change:Species change:Class", function(eventInfo) {
 
 //Initialize values for API, because ded
 on("sheet:opened", function(){
-    getAttrs(["EXP","SwordEXP","LanceEXP","AxeEXP","BowEXP","DaggerEXP","GunEXP","AnimaEXP","DarkEXP","LightEXP","StoneEXP","StaffEXP","Level","HP_i","Str_i","Mag_i","Skl_i","Spd_i","Lck_i","Def_i","Res_i","Mov_i","HP_bd","Str_bd","Mag_bd","Skl_bd","Spd_bd","Lck_bd","Def_bd","Res_bd","Mov_bd","item_uses0","item_uses1","item_uses2","Swordrank","Lancerank","Axerank","Bowrank","Daggerrank","Gunrank","Animarank","Lightrank","Darkrank","Staffrank","Stonerank"], function(v){
+    getAttrs(["EXP","SwordEXP","LanceEXP","AxeEXP","BowEXP","DaggerEXP","GunEXP","AnimaEXP","DarkEXP","LightEXP","StoneEXP","StaffEXP","Level","HP_i","Str_i","Mag_i","Skl_i","Spd_i","Lck_i","Def_i","Res_i","Mov_i","HP_bd","Str_bd","Mag_bd","Skl_bd","Spd_bd","Lck_bd","Def_bd","Res_bd","Mov_bd","item_uses0","item_uses1","item_uses2","Swordrank","Lancerank","Axerank","Bowrank","Daggerrank","Gunrank","Animarank","Lightrank","Darkrank","Staffrank","Stonerank","Hitmod","Critmod","Avomod","Ddgmod"], function(v){
         setAttrs({
             EXP: v.EXP,
             SwordEXP: v.SwordEXP,
@@ -1982,23 +2007,24 @@ on("sheet:opened", function(){
             item_uses0: v.item_uses0,
             item_uses1: v.item_uses1,
             item_uses2: v.item_uses2,
+            Hitmod: v.Hitmod,
+            Critmod: v.Critmod,
+            Avomod: v.Avomod,
+            Ddgmod: v.Ddgmod
         });
         console.log("Initializing values...")
     });
 });
 //Broken item script! Because of the way fists are handled, they should never be able to reach zero, so I think it'll be ok
-on("change:repeating_weapons:Uses", function(eventInfo) {
+on("change:repeating_weapons:uses", function(eventInfo) {
     console.log(eventInfo.newValue);
-	setObj = {};//create an empty object
     if (eventInfo.newValue === "0"){
-        console.log("Broken")
-        let RID = eventInfo.sourceAttribute.slice(18,38) //This gets the repeating row ID of the changed attribute
-        getAttrs(["repeating_weapons_"+RID+"_WName"], function(v){
-            setObj["repeating_weapons_"+RID+"_WRank"]="UU";
-            setObj["repeating_weapons_"+RID+"_WName"]="Broken " + v["repeating_weapons_"+RID+"_WName"];
-            log(v)
-            setAttrs(setObj);
-            log(setObj)
+        console.log("Broken");
+        getAttrs(["repeating_weapons_WName"], function(v){
+            setAttrs({
+                "repeating_weapons_WRank": "UU",
+                "repeating_weapons_WName": "Broken " + v["repeating_weapons_WName"]
+            });
         });
     }
 });
