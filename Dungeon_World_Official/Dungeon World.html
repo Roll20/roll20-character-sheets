@@ -12,6 +12,7 @@
 <input type="hidden" name="attr_equipment_armor" value="0">
 <input type="hidden" name="attr_equipment_armormod" value="0">
 <input type="hidden" name="attr_equipment_totalarmor" value="0">
+<input type="hidden" name="attr_bond_query" value="(0)[Other Bond]">
 
 <!-- 
 <input type="hidden" name="attr_level0_name" value="@{rotename}">
@@ -455,6 +456,7 @@
 								<option value="@{wisdom_mod}[wisdom]" data-i18n="wis-u">WIS</option>
 								<option value="@{charisma_mod}[charisma]" data-i18n="cha-u">CHA</option>
 								<option value="@{statmod_query}" data-i18n="ask-u">ASK</option>
+								<option value="@{bond_query}" data-i18n="bond-u">BOND</option>
 							</select>
 							<span class="label moveroll"> + </span>
 							<input class="moveroll" type="number" name="attr_movemod" value="0" />
@@ -2847,6 +2849,45 @@ on("change:repeating_gmods", function(eventInfo) {
 		});
 	});
 
+});
+
+on("change:repeating_bonds", function(eventInfo) {
+	getSectionIDs("repeating_bonds", function(ids) {
+	    if (ids.length == 0){
+	        setAttrs({
+	            bond_query: "(0)[Other Bond]"
+	        });
+	        return;
+	    }
+	    
+	    var attrs = [];
+	    for(var i=0; i < ids.length; i++) {
+	        var attr = "repeating_bonds_" + ids[i] + "_bond_simple";
+			attrs.push(attr);
+	    }
+	    console.log(ids);
+	    
+	    getAttrs(attrs, function(v) {
+	        var bonds = {};
+	        _.each(v, function(val, attrName) {
+	            if (val in bonds){
+	                bonds[val] += 1;
+	            }else{
+	                bonds[val] = 1;
+	            }
+	        });
+	        
+	        var query = "?{Bond";
+	        _.each(bonds, function(count, name) {
+	            query = query.concat(`|${name}, (${count})[Bonds with ${name}]`);
+	        });
+	        query = query.concat("|Other, (0)[Other Bond]}");
+	        
+	        setAttrs({
+	            bond_query: query
+	        });
+	    });
+	});
 });
 
 // Move Drop
