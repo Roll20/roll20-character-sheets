@@ -11,6 +11,12 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 17.0.3
+
+### Bug Fixes
+* Monsters imported from the script now correctly output their content. Closes [#682: Imported Actions/Traits don't send content to chat](https://bitbucket.org/mlenser/5eshaped/issues/682/imported-actions-traits-dont-send-content)
+* Skill rows that run out of room now cause the name to shrink better, primarily on firefox. Closes [#684: Formatting Skills error](https://bitbucket.org/mlenser/5eshaped/issues/684/formatting-skills-error)
+
 ## 17.0.2
 
 ### Bug Fixes
