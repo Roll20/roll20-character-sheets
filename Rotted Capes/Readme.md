@@ -1,9 +1,10 @@
+
 # Rotted Capes Sheet
 
 This is a character sheet for use on Roll20.net with Rotted Capes. The sheet is designed to be usable by all Roll20 users regardless of subscription level.
 
 ### Current Version
-Version 1.3 (December 31st, 2017) "The Automation Release"
+Version 1.5 (March 4th, 2018) Hidden Rolls, Master Table Lookup & Fixes
 
 ### Many Thanks	
 This sheet came into being through my experimentation in adapting sheets for my various games.  A big influence was Nathas's Numenera multi-tabs character sheet!
@@ -11,9 +12,6 @@ This sheet came into being through my experimentation in adapting sheets for my 
 ### TODO
 
 Short Term:
-
-* Shake-out sheet in play (target stable state by mid to end of January)
-* Further refinement of layout and coloration of the sheet and inline messages
 * Automation for Cast Member View
 
 Long term:
@@ -24,6 +22,39 @@ Long term:
 * New View: Data sheet for Enclaves and supporting cast
 	
 ### Changelog
+** March 4th 2018 **
+* Added roll details are hidden so modifiers and ranks are not displayed when dice are rolled
+  - When the "Hide roll details" is checked, the underlying modifiers and details will not show in the roll macro in chat
+  - All modifiers are also removed
+* Replaced All Purpase Action Roller (no longer needed due to automation) with a master table lookup (placed at bottom of each tab)
+* Added capability to enhance attribute score (while retaining original score)
+  - There is now a base value and score on attributes; score is readonly and is the score all data points are based off of 
+  - Modify the base score via a fixed modifier on the Gear & Mods tab
+  - Changes to score will cascade to skills, powers, and attacks that use the attribute
+* Added Page load to auto set scores for existing character sheets
+* Fixes: 
+  - synchronized sheet name with hero name
+  - Change all references to Passive Mod to P Mod and all references to Passive to P Value to better align with the wording in the rules
+  - Headshot modifier was displaying 0 vs -6; corrected
+
+** February 4th 2018 **
+* Armor section added with automation so that Bulk is applied as a penalty to Action Rolls (Attribute, Skill, Power, Attacks) based on Qu & Mi
+* Created a new tab (Gear & Mods) to centralize equipment
+* Added Exploits section to Powers tab so players can track their Tricks and Powers
+* Reworked Character roll messages (Cast Member Views next)
+* Fixes: 
+  - Corrected calculation of top mph (was based on Qu vs pace)
+  - Fixed display of plot die in chat message (hide the ! sign)
+  - set min window width for issue occuring with chrome users
+  - when attribute on damage is set to blank the die roll threw an error.
+
+** January 15th 2018 ** 
+* Cast Member View Attributes auto-calculate (was broken with last fix)
+* Update Damage dice drop downs to include the attribute die list (some powers use attribute dice for damage)
+* Change Built Item Quick Reference to Primary Powers List
+* Fixes: Fixed overlap of Gear Info tooltip into field, fixed offset of info icon on power, and Fixed xp calculation
+
+
 ** December 31, 2017: version 1.3 "The Automation Release" ** 
 * Autoset Max Lift, Throw, and Max Drag/Push based on Might score
 * Autoset MPH based on Quickness score
