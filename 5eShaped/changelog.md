@@ -11,6 +11,12 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 17.0.4
+
+### Bug Fixes
+* [#686: Spell tooltips do not respect newlines in the spell's description](https://bitbucket.org/mlenser/5eshaped/issues/686/spell-tooltips-do-not-respect-newlines-in)
+* [#687: Attacks and Traits are blank when](https://bitbucket.org/mlenser/5eshaped/issues/687/attacks-and-traits-are-blank-when)
+
 ## 17.0.3
 
 ### Bug Fixes
