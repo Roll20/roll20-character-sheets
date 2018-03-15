@@ -1,10 +1,62 @@
 rolltemplate.sheet-rolltemplate-pf
+  
+  mixin isAttack()
+    | {{#isAttack}}
+    block
+    | {{/isAttack}}
+  
+  mixin isCrit()
+    | {{#rollWasCrit() result}}
+    block
+    | {{/rollWasCrit() result}}
+  
+  mixin notAttack()
+    | {{#isNotAttack}}
+    block
+    | {{/isNotAttack}}
+  
+  mixin notCrit()
+    | {{#^rollWasCrit() result}}
+    block
+    | {{/^rollWasCrit() result}}
+  
+  mixin attackNotes()
+    | {{#notes}}
+    tr: td.notes
+      div Attack Notes:
+      div {{notes}}
+    | {{/notes}}
+  
+  mixin notes()
+    | {{#notes}}
+    tr: td.notes
+      div Notes:
+      div {{notes}}
+    | {{/notes}}
+  
+  
   table
     thead: tr: th {{charName}} &#x21D2; {{attr}}
     tbody
-      tr: td Result {{result}}
-      | {{#notes}}
-      tr: td.notes
-        div Notes:
-        div {{notes}}
-      | {{/notes}}
+      +isAttack()
+        +isCrit()
+          tr: td: h3.crit Critical Hit! {{result}}
+          tr: td Roll to Confirm {{critConfirm}}
+        +notCrit()
+          tr: td Attack {{result}}
+        
+        tr: td: hr
+          
+        +isCrit()
+          tr: td.crit Crit Damage {{critDamage}}
+          tr: td Non-crit Damage {{damage}}
+        +notCrit()
+          tr: td Damage {{damage}}
+          
+        +notes()
+      
+      +notAttack()
+        tr: td Result {{result}}
+        +notes()
+      
+      
