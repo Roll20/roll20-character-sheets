@@ -1,6 +1,8 @@
-
+﻿
 Fiche de personnage pour le jeu de rôle papier "Le Donjon de Naheulbeuk" de Pen of Chaos.
+
 La fiche reprend les éléments de la feuille de personnage officielle réorganisés dans des onglets :
+
 - Caractéristiques
 	* Permet de gérer les caractéristiques usuelles (Force, Courage, Intelligence, Points de vie, Points de mana, Niveau, XP...)
 	* Permet de réaliser des jets d'épreuves à l'aide des boutons macros
@@ -13,11 +15,11 @@ La fiche reprend les éléments de la feuille de personnage officielle réorgani
 	* Permet de gérer son score de protection (calculé en partie par l'équipement)
 - Magie
 	* Permet d'enregistrer ses sorts et de lancer les épreuves / dégâts correspondants
-	° Soutien : Tous les sorts inoffensifs, de protection, d'examens, de soins...
-	° Attaque : Tous les sorts à dégâts
-	° Rituel : Tous les rituels (de soutien ou d'attaque)
-	° Invocation : Pour enregistrer les créatures de l'invocateur et réaliser les épreuves d'appel, de control, de révocation
-	° Nécromancie : Idem mais pour les nécromanciens
+	* Soutien : Tous les sorts inoffensifs, de protection, d'examens, de soins...
+	* Attaque : Tous les sorts à dégâts
+	* Rituel : Tous les rituels (de soutien ou d'attaque)
+	* Invocation : Pour enregistrer les créatures de l'invocateur et réaliser les épreuves d'appel, de control, de révocation
+	* Nécromancie : Idem mais pour les nécromanciens
 - Inventaire
 	* Permet de gérer ses richesses (Or, Lingots, Billets)
 	* Permet de gérer ses sacs et bourses avec leurs capacités de stockage
@@ -28,7 +30,7 @@ La fiche reprend les éléments de la feuille de personnage officielle réorgani
 
 Merci à tous, et bonne aventure !
 
-Auteur de la fiche 1.0 : BlackyB
-Auteur de la fiche 2.0 : Kaias
+> Auteur de la fiche 1.0 : BlackyB
+> Auteur de la fiche 2.0 : Kaias
 
-Remarques, Critiques, Bugs : Voir le forum Naheulbeuk Online.
+*_Remarques, Critiques, Bugs_* : Voir le forum Naheulbeuk Online.
