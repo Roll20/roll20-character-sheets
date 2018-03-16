@@ -23,6 +23,10 @@
 	    remove: [ "repeating_sacs", "repeating_bourses" ]
 	}
 	
+	var levelAndXP = [ 0, 100, 300, 600, 1000, 1500, 2100, 2800, 3600, 4500, 
+					   5500, 6600, 7800, 9100, 10500, 12000, 13600, 15300, 17100, 19000,
+					   21000, 24000, 29000, 35000, 45000, 60000 ];
+	
 	/*---------
 	    EVENTS
 	----------*/	
@@ -45,6 +49,10 @@
 	// Equive
 	on("change:adressetotal change:prphy change:esquivemod change:charsurcharge", function() {
 	    updateEsquive();
+	});
+	// Level
+	on("change:characterlevel", function() {
+		updateXP();
 	});
 
 	// Total golds
@@ -242,6 +250,16 @@
 				"esquivetotal": esquive + v[ "esquivemod" ]
 			}, "silent");			
 		});	
+	}
+	
+	function updateXP() {
+		getAttrs( [ "characterlevel" ], function( v ) {	
+			var level = safeInt( v[ "characterlevel" ] );
+			
+			setAttrs({
+				"characterexperience_max": safeInt( levelAndXP[ level ] )
+			});	
+		});
 	}
 	
 	function updatePR() {	
@@ -691,7 +709,7 @@
 			<div class="sheet-col-float" style="width:160px;">
 				<div class="sheet-energie">
 					<h2>Energie</h2>
-					<table>
+					<table style="margin:auto;">
 						<tr>
 							<th colspan="3">Energie Vitale (EV) :</th>
 						</tr>
@@ -722,14 +740,16 @@
 					</div>					
 					<br clear="all" />
 					<h2>Expérience (xp)</h2>
-					<table style="width:100%;">
+					<table style="margin:auto;">
 						<tr>
-							<td style="text-align:center;"><input type="number" name="attr_CharacterExperience" value="0"></td>					
+							<td><input type="number" name="attr_CharacterExperience" value="0"></td>		
+							<td>/</td>
+							<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_characterexperience_max" value="100"></td>			
 						</tr>
 					</table>
 					<br />	
 					<h2>Points de destin</h2>
-					<table style="width:100%;">
+					<table style="margin:auto;">
 						<tr>
 							<td style="text-align:center;"><input type="number" name="attr_CharacterPointDestin" value="0"></td>
 						</tr>
