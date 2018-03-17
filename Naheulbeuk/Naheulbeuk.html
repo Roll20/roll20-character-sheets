@@ -86,14 +86,19 @@
 	        updateRSSum( "repeating_bourses", "boursecharge_max", "boursescharge_max" );
 	    }
 	});
+	// change magic school tab
+	on("change:repeating_magiecircles:magiecircleselected", function( e ) {
+		if( e[ "sourceType"] === "player" ) { 
+			updateMagicSchoolTab( e );
+		}
+	});
+	// change magic school name
+	on("change:tab_magiecircle change:magiecircleselectall change:tab_magielevel", function() {
+		displayMagicSpells();
+	});
 	// register magie level and circle
-	on("change:repeating_magies", function() {
-		getAttrs( ["tab_magiecircle", "tab_magielevel"], function( sValues ) {
-			setAttrs({
-         		"repeating_magies_magiecircle": sValues[ "tab_magiecircle" ],
-         		"repeating_magies_magielevel": sValues[ "tab_magielevel" ]
-      		});
-		});
+	on("change:repeating_spells", function() {
+		changeSpellMagicSchool();
 	});
 
 	/*------------
@@ -358,6 +363,56 @@
 		    });
 		});
 	}
+	
+	function updateMagicSchoolTab( eventInfo ) {
+		var sTabs = {};
+		var selected = "all";
+		
+		getSectionIDs( "repeating_magiecircles", function(idarray) { 			
+			for( var i in idarray ) {
+				 sTabs[ `repeating_magiecircles_${idarray[ i ]}_magiecircleselected` ] = 0;
+			}
+			
+			selected = eventInfo[ "sourceAttribute" ].split("_")[2];
+			sTabs[ eventInfo[ "sourceAttribute" ] ] = 1;
+			
+			setAttrs( {"tab_magiecircle": selected} );			
+			setAttrs( sTabs, { silent: true } );
+		});
+	}
+	
+	function displayMagicSpells( eventInfo ) {		
+		var sDisplay = {};
+		
+		getSectionIDs( "repeating_spells", function(idarray) {
+			getAttrs( [ "tab_magiecircle", "tab_magieLevel", "magiecircleselectall", 
+						...idarray.map(id => `repeating_spells_${id}_spellcircle`),
+						...idarray.map(id => `repeating_spells_${id}_spelllevel`) ], function( v ) {
+				var cur_circle = v[ "tab_magiecircle" ];
+				var cur_level = v[ "tab_magieLevel" ];
+								
+				for( var i in idarray ) {	
+					if( ( v[ `repeating_spells_${idarray[ i ]}_spellcircle` ] ===  cur_circle && v[ `repeating_spells_${idarray[ i ]}_spelllevel` ] ===  cur_level ) || v[ "magiecircleselectall" ] === "1" ) {
+						sDisplay[ `repeating_spells_${idarray[ i ]}_spellfilter` ] = 1;
+					} else {
+						sDisplay[ `repeating_spells_${idarray[ i ]}_spellfilter` ] = 0;
+					}
+				}
+				setAttrs( sDisplay, { silent: true } );
+			});
+		});
+	}
+	
+	function changeSpellMagicSchool() {
+			getAttrs( [ "tab_magiecircle", "tab_magielevel"], function( v ) {
+			setAttrs({
+				"repeating_spells_spellcircle": v[ "tab_magiecircle" ],
+				"repeating_spells_spelllevel": v[ "tab_magielevel" ],
+				"repeating_spells_spellfilter": 1
+			});
+		});
+	}
+
 	
 	
 	/*----------------
@@ -1096,42 +1151,59 @@
 				
 		<!-- TAB Magie --> 
 		<div class="sheet-tab_magie">
-			<input type="radio" name="attr_tab_magieCircle" class="sheet-tab sheet-tab_magieCircle_gen" value="generaliste" checked="checked" /><span class="sheet-tab">Généraliste</span>
-			<input type="radio" name="attr_tab_magieCircle" class="sheet-tab sheet-tab_magieCircle_1" value="1" /><span class="sheet-tab" name="attr_Magie_Circle1">&nbsp;</span>
-			<input type="radio" name="attr_tab_magieCircle" class="sheet-tab sheet-tab_magieCircle_2" value="2" /><span class="sheet-tab" name="attr_Magie_Circle2">&nbsp;</span>
-			<input type="radio" name="attr_tab_magieCircle" class="sheet-tab sheet-tab_magieCircle_3" value="3" /><span class="sheet-tab" name="attr_Magie_Circle3">&nbsp;</span>
-			<br />
-			<br />
-			<input type="radio" name="attr_tab_magieLevel" class="sheet-rounded-tab sheet-tab_magieLevel_0" value="0" checked="checked" /><span class="sheet-rounded-tab">0</span>
-			<input type="radio" name="attr_tab_magieLevel" class="sheet-rounded-tab sheet-tab_magieLevel_1" value="1" /><span class="sheet-rounded-tab">1</span>
-			<input type="radio" name="attr_tab_magieLevel" class="sheet-rounded-tab sheet-tab_magieLevel_2" value="2" /><span class="sheet-rounded-tab">2</span>
-			<input type="radio" name="attr_tab_magieLevel" class="sheet-rounded-tab sheet-tab_magieLevel_3" value="3" /><span class="sheet-rounded-tab">3</span>
-			<input type="radio" name="attr_tab_magieLevel" class="sheet-rounded-tab sheet-tab_magieLevel_4" value="4" /><span class="sheet-rounded-tab">4</span>
-			<input type="radio" name="attr_tab_magieLevel" class="sheet-rounded-tab sheet-tab_magieLevel_5" value="5" /><span class="sheet-rounded-tab">5</span>
-			<input type="radio" name="attr_tab_magieLevel" class="sheet-rounded-tab sheet-tab_magieLevel_6" value="6" /><span class="sheet-rounded-tab">6</span>
-			<input type="radio" name="attr_tab_magieLevel" class="sheet-rounded-tab sheet-tab_magieLevel_7" value="7" /><span class="sheet-rounded-tab">7</span>
-			<input type="radio" name="attr_tab_magieLevel" class="sheet-rounded-tab sheet-tab_magieLevel_8" value="8" /><span class="sheet-rounded-tab">8</span>
-			<input type="radio" name="attr_tab_magieLevel" class="sheet-rounded-tab sheet-tab_magieLevel_9" value="9" /><span class="sheet-rounded-tab">9</span>
-			<input type="radio" name="attr_tab_magieLevel" class="sheet-rounded-tab sheet-tab_magieLevel_10" value="10" /><span class="sheet-rounded-tab">10</span>
-			<input type="radio" name="attr_tab_magieLevel" class="sheet-rounded-tab sheet-tab_magieLevel_11" value="11" /><span class="sheet-rounded-tab">11</span>
-			<input type="radio" name="attr_tab_magieLevel" class="sheet-rounded-tab sheet-tab_magieLevel_12" value="12" /><span class="sheet-rounded-tab">12</span>
-			<input type="radio" name="attr_tab_magieLevel" class="sheet-rounded-tab sheet-tab_magieLevel_13" value="13" /><span class="sheet-rounded-tab">13</span>
-			<input type="radio" name="attr_tab_magieLevel" class="sheet-rounded-tab sheet-tab_magieLevel_14" value="14" /><span class="sheet-rounded-tab">14</span>
-			<input type="radio" name="attr_tab_magieLevel" class="sheet-rounded-tab sheet-tab_magieLevel_15" value="15" /><span class="sheet-rounded-tab">15</span>
-			<br />
-			<br />
-		
-			<div class="sheet-section sheet-section-sp-list">
-				<fieldset class="repeating_magies">					
-					<input type="hidden" class="sheet-tab_magieCircle" name="attr_MagieCircle" value="new" />
-					<input type="hidden" class="sheet-tab_magieLevel" name="attr_MagieLevel" value="new" />
-					
-					<div class="sheet-filtered-magie_level">
-						<div class="sheet-filtered-magie_circle">
+			<div class="sheet-col-float" style="width:120px;">
+				<div class="sheet-tableth" style="padding: 4px; font-size: 11px;"> v Ecoles / Niveaux > </div>	
+				<input type="checkbox" name="attr_magieCircleSelectALL" value="1" checked="checked" /><span> Réassigner</span>
+				<br /><br />	
+				<fieldset class="repeating_magieCircles">
+					<input type="checkbox" name="attr_magieCircleSelected" class="sheet-tab" value="1" /><span class="sheet-tab" name="attr_MagieCircle">&nbsp;</span>
+					<input type="checkbox" name="attr_magieCircleModal" class="sheet-modal" value="1" /><span class="sheet-cog">y</span>
+					<div class="sheet-modal-wrapper">
+						<div class="sheet-modal">
+							<div class="sheet-modal_header">
+								<h2>Ecole de magie : <span class="sheet-close">*</span><input type="checkbox" class="sheet-modal" name="attr_magieCircleModal" value="1" /></h2>
+							</div>
+							<input type="text" class="sheet-noBorder" name="attr_MagieCircle" value="Généraliste" />
+						</div>
+					</div>
+					<br />
+					<br />
+				</fieldset>
+				<br clear="all" />
+				<input type="hidden" name="attr_tab_magieCircle" class="sheet-tab" value="" />
+			</div>
+			<div class="sheet-col-float" style="width:680px; text-align:center;">
+				<input type="radio" name="attr_tab_magieLevel" class="sheet-rounded-tab sheet-tab_magieLevel_0" value="0" checked="checked" /><span class="sheet-rounded-tab">0</span>
+				<input type="radio" name="attr_tab_magieLevel" class="sheet-rounded-tab sheet-tab_magieLevel_1" value="1" /><span class="sheet-rounded-tab">1</span>
+				<input type="radio" name="attr_tab_magieLevel" class="sheet-rounded-tab sheet-tab_magieLevel_2" value="2" /><span class="sheet-rounded-tab">2</span>
+				<input type="radio" name="attr_tab_magieLevel" class="sheet-rounded-tab sheet-tab_magieLevel_3" value="3" /><span class="sheet-rounded-tab">3</span>
+				<input type="radio" name="attr_tab_magieLevel" class="sheet-rounded-tab sheet-tab_magieLevel_4" value="4" /><span class="sheet-rounded-tab">4</span>
+				<input type="radio" name="attr_tab_magieLevel" class="sheet-rounded-tab sheet-tab_magieLevel_5" value="5" /><span class="sheet-rounded-tab">5</span>
+				<input type="radio" name="attr_tab_magieLevel" class="sheet-rounded-tab sheet-tab_magieLevel_6" value="6" /><span class="sheet-rounded-tab">6</span>
+				<input type="radio" name="attr_tab_magieLevel" class="sheet-rounded-tab sheet-tab_magieLevel_7" value="7" /><span class="sheet-rounded-tab">7</span>
+				<input type="radio" name="attr_tab_magieLevel" class="sheet-rounded-tab sheet-tab_magieLevel_8" value="8" /><span class="sheet-rounded-tab">8</span>
+				<input type="radio" name="attr_tab_magieLevel" class="sheet-rounded-tab sheet-tab_magieLevel_9" value="9" /><span class="sheet-rounded-tab">9</span>
+				<input type="radio" name="attr_tab_magieLevel" class="sheet-rounded-tab sheet-tab_magieLevel_10" value="10" /><span class="sheet-rounded-tab">10</span>
+				<input type="radio" name="attr_tab_magieLevel" class="sheet-rounded-tab sheet-tab_magieLevel_11" value="11" /><span class="sheet-rounded-tab">11</span>
+				<input type="radio" name="attr_tab_magieLevel" class="sheet-rounded-tab sheet-tab_magieLevel_12" value="12" /><span class="sheet-rounded-tab">12</span>
+				<input type="radio" name="attr_tab_magieLevel" class="sheet-rounded-tab sheet-tab_magieLevel_13" value="13" /><span class="sheet-rounded-tab">13</span>
+				<input type="radio" name="attr_tab_magieLevel" class="sheet-rounded-tab sheet-tab_magieLevel_14" value="14" /><span class="sheet-rounded-tab">14</span>
+				<input type="radio" name="attr_tab_magieLevel" class="sheet-rounded-tab sheet-tab_magieLevel_15" value="15" /><span class="sheet-rounded-tab">15</span>
+				<br />
+				<br />
+			
+				<div class="sheet-section sheet-section-sp-list">
+					<fieldset class="repeating_spells">					
+						<input type="hidden" class="sheet-hidden sheet-tab_magieCircle" name="attr_SpellCircle" value="" />
+						<input type="hidden" class="sheet-hidden sheet-tab_magieLevel" name="attr_SpellLevel" value="new" />
+						<input type="checkbox" class="sheet-hidden sheet-spellfilter" name="attr_SpellFilter" checked="checked" value="1" />
+						
+						<div class="sheet-filtered-spell">
 							<div class="sheet-col" style="width: 200px;">
 								<input type="text" class="sheet-noBorder" name="attr_MagieNom" value="" />							
 							</div>
 							<br clear="all" />
+							<br />
 							<div>
 								<input type="checkbox" class="sheet-display-magie sheet-display-magie-incantation"  name="attr_MagieDisplayIncantation" value="1" /> <span class="sheet-displayMagie">Incantation</span> 
 								<input type="checkbox" class="sheet-display-magie sheet-display-magie-epreuve"  name="attr_MagieDisplayEpreuve" value="1" /> <span class="sheet-displayMagie">Épreuves</span> 
@@ -1340,8 +1412,9 @@
 								</div>
 							</div>
 						</div>
-					</div>
-				</fieldset>
+					</fieldset>
+				</div>
+				<br clear="all" />
 			</div>
 		</div>
 		
