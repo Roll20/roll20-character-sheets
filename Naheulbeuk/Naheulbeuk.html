@@ -425,18 +425,27 @@
 	function detect_version() {
 	    getAttrs( [ "version" ], function( v ) {
 	        var vrs = parseFloat( v[ "version" ] ) || 1.0;
+			console.log("Détection de la version : " + vrs );
 	        if( vrs == 2.0 ) {
 				// uptodate
 				return;
 			} else if( vrs < 2.0 ) {
-			    getAttrs( [ "pointdestin" ], function( v ) {
-					if( v[ "pointdestin" ] != undefined ) {
+			    getAttrs( [ "level", "valattaque", "valparade", "class", "race", "experience" ], function( v ) {
+					if( v[ "level" ] != undefined || v[ "valattaque" ] != undefined || v[ "valparade" ] != undefined || v[ "class" ] != undefined || v[ "race" ] != undefined || v[ "experience" ] != undefined  ) {
+						console.log( "Début du process d'import..." );
                         update_process();
 					}
+					console.log( "Mise à jour des statistiques primaires..." );
+					for( i in primaryStats ) {
+						updatePrimaryStat( primaryStats[ i ] );
+					}
+					console.log( "Mise à jour des statistiques secondaires..." );
 					updateSecondaryStats();
+					console.log( "Mise à jour de la version..." );
 					setAttrs( { "version" : 2.0 } );
 				});
 			}
+			console.log( "ok" );
 		});
 	}
 	
