@@ -1,6 +1,6 @@
 # Blades in the Dark Character Sheet
 
-This is the (compiled) source code for the Blades in the Dark character sheet on Roll20. The pug/sass source used to generate the sheets can be found [here](https://github.com/joesinghaus/Blades-in-the-Dark). If you want to hack the sheet for your Blades hack, a more hackable version and instructions for hacking can be found [here](https://github.com/joesinghaus/Blades-template) (use this instead!).
+This is the (compressed) source code for the Blades in the Dark character sheet on Roll20. The pug/sass code used to generate it can be found [here](https://github.com/joesinghaus/Blades-in-the-Dark). If you want to hack the sheet for your own Blades hack, a more hackable version and instructions for hacking can be found [here](https://github.com/joesinghaus/Blades-template).
 
 ## Changelog
 
