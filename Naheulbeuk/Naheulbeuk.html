@@ -100,6 +100,18 @@
 	on("change:repeating_magies", function() {
 		changeSpellMagicSchool();
 	});
+	on("change:export_start", function() {
+		start_export();
+	});
+	on("change:import_start", function( e ) {
+		start_import();
+	});
+	on("change:modal_export", function() {
+		setAttrs( { 
+			"json_export" : '',
+			"export_start": 0
+		}, { "silent":true } );
+	});
 
 	/*------------
 	    FUNCTIONS
@@ -412,8 +424,161 @@
 			}, { silent: true });
 		});
 	}
-
 	
+	function start_export() {
+		var sJson = {};
+		var dataBase = {
+			"simple": [ "personnage_nom", "personnage_origine", "personnage_metiers", "personnage_sex", "personnage_age", "personnage_poids",
+						"ev", "ev_max", "ea", "ea_max", "personnage_niveau", "personnage_xp", "personnage_pointdestin", 
+						"personnage_langue", "personnage_vision", "personnage_nyctalopie", "personnage_ouie", "personnage_odorat", "personnage_charge_max", 
+						"pr_tete", "pr_bras", "pr_torse", "pr_bouclier", "pr_jambes", "pr_pieds", "prnat", 
+						"bivouac_couverture", "bivouac_couverture_recup", "couverture_poids", "bivouac_matelas", "bivouac_matelas_recup", "bivouac_matelas_poids", "bivouac_tente", "bivouac_tente_recup", "bivouac_tente_poids", 
+						"stats_courage", "stats_courage_mod", "stats_intelligence", "stats_intelligence_mod", "stats_charisme", "stats_charisme_mod", "stats_adresse", "stats_adresse_mod", "stats_force", "stats_force_mod", 
+						"stats_attaque", "stats_attaque_mod", "stats_parade", "stats_parade_mod", "stats_jet_mod", "stats_esquive_mod", "stats_fouille_mod", "stats_magiephy_mod", "stats_magiepsy_mod", "stats_resimagie_mod", 
+						"richesse_or", "richesse_argent", "richesse_cuivre", "richesse_berylium", "richesse_thritil", "richesse_billet10", "richesse_billet50", "richesse_billet100", "richesse_billet500", "richesse_billet1000"
+			],
+			"repeating": [
+				{ zone:"competences", attr: ["competence_nom", "competence_effet", "competence_epreuve", "competence_jet", "competence_mod"] },
+				{ zone:"armes", attr: ["arme_nom", "arme_jet", "arme_at", "arme_prd", "arme_degats", "arme_rup"] },
+				{ zone:"armures", attr: ["armure_nom", "armure_prphy", "armure_prmag", "armure_rup"] },
+				{ zone:"sacs", attr: ["sac_nom", "sac_charge_max"] },
+				{ zone:"materiels", attr: ["materiel_nom", "materiel_poids"] },
+				{ zone:"gemmes", attr: ["gemme_nom", "gemme_ug"] },
+				{ zone:"potions", attr: ["conso_nom", "conso_count", "conso_effet"] },
+				{ zone:"coupsspeciaux", attr: ["coupspecial_nom", "coupspecial_jet", "coupspecial_mod", "coupspecial_degats"] },
+				{ zone:"munitions", attr: ["munition_nom", "munition_count", "munition_degats", "munition_rup"] },
+				{ zone:"vetements", attr: ["vetement_nom", "vetement_effet"] },
+				{ zone:"bourses", attr: ["bourse_nom", "bourse_charge_max"] },
+				{ zone:"butins", attr: ["butin_nom", "butin_poids"] },
+				{ zone:"quetes", attr: ["quete_nom"] },
+				{ zone:"poisons", attr: ["conso_nom", "conso_count", "conso_effet"] },
+				{ zone:"bagues", attr: ["bague_nom", "bague_count", "bague_bonus"] },
+				{ zone:"ecolesmagie", attr: ["ecolemagie"] },
+				{ zone:"reliques", attr: ["relique_nom", "relique_effet"] },
+				{ zone:"bouffes", attr: ["bouffe_nom", "bouffe_poids"] },
+				{ zone:"livres", attr: ["livre_nom"] },
+				{ zone:"antidotes", attr: ["conso_nom", "conso_count", "conso_effet"] },
+				{ zone:"magies", attr: ["magie_ecole", "magie_niveau", "magie_nom", "magie_incantation", "magie_duree", "magie_cout", "magie_portee", "magie_aireeffet", "magie_epreuvelanceur_jet", "magie_epreuvelanceur_mod", "magie_epreuvecible_jet", "magie_epreuvecible_mod", "magie_soin", "magie_degats", "magiebonusint", "magie_effet", "magie_ingre", "creature_ev", "creature_int", "creature_at", "creature_def", "creature_cou", "creature_pr", "creature_xp", "creature_resimagie", "creature_degats", "magie_epreuveappel_mod", "magie_epreuvecontrol_mod", "magie_epreuverevocation_mod"] },
+				{ zone:"ingre", attr: ["ingre_nom", "ingre_count"] },
+				{ zone:"compagnons", attr: ["compagnon_nom", "compagnon_type", "compagnon_ev", "compagnon_ev_max", "compagnon_cou", "compagnon_at", "compagnon_esquive", "compagnon_prd", "compagnon_charge", "compagnon_charge", "compagnon_pr", "compagnon_resimagie", "compagnon_deplacement_assaut_sol", "compagnon_deplacement_assaut_air", "compagnon_deplacement_charge_sol", "compagnon_deplacement_charge_air", "compagnon_deplacement_voyage_sol", "compagnon_deplacement_voyage_air", "compagnon_deplacement_jour_sol", "compagnon_deplacement_jour_air", "compagnon_combat", "compagnon_entretien", "compagnon_autres", "compagnon_materiel1_nom", "compagnon_materiel2_nom", "compagnon_materiel3_nom"] }
+			]
+		};
+		// get all simple values
+		getAttrs( dataBase.simple, function( v ) {
+			sJson = v;
+			// Get repeating values with recursive function to avoid asynch problems		
+			getRepeatingFields( dataBase.repeating, 0, sJson );
+		});
+	}
+	
+	function getRepeatingFields( dataBase, i, sJson ) {
+		var _aAttr = [];
+		var zone = dataBase[ i ][ "zone" ];
+		var attr = dataBase[ i ][ "attr" ];
+		var i = i + 1;
+		
+		// get sections ids
+		getSectionIDs( `repeating_${zone}`, function( idarray ) {
+			if ( idarray.length > 0 ) {			
+				for( var j in attr ) {
+					_aAttr.push( ...idarray.map(id => `repeating_${zone}_${id}_${attr[ j ]}`) );
+				}	
+				// get all attrs for all sections ids		
+				getAttrs( _aAttr, function ( v ) {
+					var sSection = {};
+					// reassemble attrs by id
+					for( var key in v ) {
+						var id = key.split( '_' )[2];
+						// replace the id by a placeholder "rowID" cause we can't import existing ids
+						var attr_name = key.replace( id, 'rowID' );
+						
+						if( sSection[ id ] === undefined ) {
+							sSection[ id ] = {};
+						}
+						sSection[ id ][ attr_name ] = v[ key ];
+					}
+					// add an array with all attrs for each sections 
+					sJson[ zone ] = [];
+					for( var id in sSection) {
+						sJson[ zone ].push( sSection[ id ] );
+					}
+					if( dataBase.length > i ) {
+						// call recursively getRepeatingFields depending on dataBase.repeating.length
+						getRepeatingFields( dataBase, i, sJson);
+					} else if( dataBase.length === i ) {
+						// or call finish function
+						udpateExportJson( sJson );
+					}
+				});
+			} else {
+				if( dataBase.length > i ) {
+					getRepeatingFields( dataBase, i, sJson);
+				} else if( dataBase.length === i ) {
+					udpateExportJson( sJson );
+				}
+			}
+		});
+	}
+	
+	function udpateExportJson( sJson ) {
+		// stringify all our simple and repeating attrs / values					
+		setAttrs( { 
+			"json_export" : JSON.stringify( sJson ),
+			"export_start": 0
+		}, { "silent":true } );
+	}
+
+	function start_import() {
+		var err = "";
+		getAttrs( [ "json_import" ], function ( v ) {
+			// open json
+			try {
+				var sJson = JSON.parse( v[ "json_import" ] );
+			} catch(e) {
+				err = "Données non valides";
+			}
+			
+			if( err === "" ) {
+				// reset sheet repeating section
+				var aSections = [ "competences","armes","armures","sacs","materiels","gemmes","potions","coupsspeciaux","munitions","vetements","bourses",
+								  "butins", "quetes","poisons","bagues","ecolesmagie","reliques","bouffes","livres","antidotes","magies","ingre","compagnons" ];
+				for( var i in aSections ) {
+					var section = `repeating_${aSections[ i ]}`;
+					(function( section ) {
+						 getSectionIDs( section, function(idarray) {
+							for( var j in idarray ) {
+								removeRepeatingRow( `${section}_${idarray[ j ]}` );
+								console.log( `${section}_${idarray[ j ]}` );
+							}
+						});
+					})(section);
+				}
+				
+				var sAttrs = {};
+				for( var i in sJson ) {
+					if( sJson[ i ] instanceof Array ) {
+						// import repeating values 
+						for( var j in sJson[ i ] ) {
+							var newid = generateRowID();
+							for( var k in sJson[ i ][ j ] ) {
+								// replace placeholder 'rowid' by a new generatedID to create rows      	
+								sAttrs[ k.replace( 'rowID', newid ) ] = sJson[ i ][ j ][ k ];
+							}
+						}
+					} else {
+						// Import simple values
+						sAttrs[ i ] = sJson[ i ];
+					}
+				}
+				//setAttrs( sAttrs );		
+			}
+		
+			setAttrs( {
+				"json_import": err,
+				"import_start": 0
+			}, { "silent":true } );
+		});
+	}
 	
 	/*----------------
 	 Version handling
@@ -670,7 +835,40 @@
 				<td><input type="text" name="attr_Personnage_Poids" class="sheet-noBorder"></td>
 			</tr>
 		</table>
-		<input type="checkbox" name="attr_displayJet" value="/w gm"> <span class="sheet-hint">Envoyer les jets au MJ uniquement</span>
+		<div class="sheet-col-float" style="width:400px;">
+			<input type="checkbox" name="attr_displayJet" value="/w gm"> <span class="sheet-hint">Envoyer les jets au MJ uniquement</span>
+		</div>
+		<div class="sheet-col-float" style="width:100px;">
+			<input type="checkbox" name="attr_modal_Export" class="sheet-modal" value="1" /><span class="sheet-cog">{</span> Exporter
+			<div class="sheet-modal-wrapper">
+				<div class="sheet-modal" style="height:200px;">
+					<div class="sheet-modal_header">
+						<h2>Export <span class="sheet-close">*</span><input type="checkbox" class="sheet-modal" name="attr_modal_Export" value="1" /></h2>
+					</div>
+					<div class="sheet-modal_body" style="text-align:center;">
+						<textarea name="attr_json_export"></textarea>
+						<br>
+						<input type="checkbox" class="sheet-tab" name="attr_export_start" value="1"><span class="sheet-tab">Démarrer</span>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="sheet-col-float" style="width:100px;">
+			<input type="checkbox" name="attr_modal_Import" class="sheet-modal" value="1" /><span class="sheet-cog">}</span> Importer
+			<div class="sheet-modal-wrapper">
+				<div class="sheet-modal" style="height:200px;">
+					<div class="sheet-modal_header">
+						<h2>Importer <span class="sheet-close">*</span><input type="checkbox" class="sheet-modal" name="attr_modal_Import" value="1" /></h2>
+					</div>
+					<div class="sheet-modal_body" style="text-align:center;">
+						<textarea name="attr_json_import"></textarea>
+						<br>
+						<input type="checkbox" class="sheet-tab" name="attr_import_start" value="1"><span class="sheet-tab">Démarrer</span><br>
+						<span class="sheet-hint"><span style="color:#F00;">Attention</span>, toutes les données de la fiche seront écrasées</span>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 	<br clear="all" />
 	<div class="sheet-body sheet-pj">
