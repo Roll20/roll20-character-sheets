@@ -1,174 +1,40 @@
 									D6-StarWars-Character-Sheet
 									===========================
 
-This is the Character sheet for the D6-Based  WEG Star Wars and the new D6 Star Wars games.
+This is the Character sheet for the D6-Based  WEG Star Wars and the new D6 Star Wars games. The sheet is geared to 2E and REUP as the rolls use wild die, but the option to disable wild die and others are on the top upcoming improvement.
 
 List your dice and pips next to the appropriate skills -  3pips equal another die.
 The text areas are expandable for additional info. 
 
+Wiki page for the sheet:
+		--------------->https://wiki.roll20.net/Star_Wars_WEG_D6_character_sheet<-------------
 
 
-Improvements 7.11.2017(Anduh):
-	-Added attributes for wound levels, and trackers for force emptiness, force powers active, and control pain/resist stun.
-	-All attributes roll using a template, taking wounds and wound-negating force powers in considerations, and the player can additionally choose to include Dice/pip mods
-	-Bunch of useful die rolls in character number section
-	-added trackerr for permanent initiative bonus(some races have that)
-	-Added repeation armor section with soak rolls
-	-Added missing Star Wars logo & black space background
-	-Checkbox to hide force section
-	-change dice icon to d6
+Recent improvements (2017-2018):
 
-Suggestions for improvement:
-	-Tab for ship/droids with ability to roll from sheet
-	-streamline force power use, tracker for power, maybe own tab for them
-	-wiki page for sheet
-	-Equipment section similar to weapons and armor that would add to some skills
-
+	-Weapon section roll fixed (2018-02)
+	-Vehicle/Ship text blocks have been added to the bottom of the sheet(2018-02)
+	-"Lightsaber Combat" option added to the Force section so you can have your attack and damage rolls preset for "Lightsaber Combat" (2018-02)
+	-Unused Resist Pain attribute removed (2018-02)
+	-Added a Skill Section and Attack Button (weapon section) (2018-01-15)
+	-Increased the Size of the Medium Range to take triple digit numbers (weapon section) (2018-01-15)
+	-Weapon name is properly showed when damage is rolled from the sheet (2017-11)
+	-Perception skills and old weapons are back! (2017-11)
+	-All skills and attributes now rolls with a template and dice/pip mod can be given (2017-11)
+	-Armor section is working, rolls and all (2017-11)
+	-added tracker for permanent initiative bonus(some races have that) (2017-11)
+	-A initiative skill have been added to second section next to char points, with a roll that sends to tracker (2017-11)
+	-Custom rollers, with and without wild die have been added to same section (2017-11)
+	-Roller for char points have been added next to char point attribute (2017-11)
+	-Force and Background section can now be hidden with a checkbox each (2017-11)
+	-Resist pain in force section have been disabled for not working properly (2017-11)
+	-Duplicating text fields "character connections" <-> "other notes" is fixed (2017-11)
+	-Added attributes for wound levels, and trackers for force emptiness, number of force powers active and Resist Pain (2017-11-15)
+	-Added repeating armor section with soak rolls (2017-11)
+	-All attributes & skill roll using a template, taking wounds  in considerations, and the player can additionally choose to include Dice/pip mods for the rolls (2017-11-15)
+	-Added missing Star Wars logo & black space background (2017-11-15)
+	-Checkbox to hide force section (2017-11-15)
+	-Change dice icon to d6	(2017-11-15)
 
 Good source for all things D6 Star wars related, including fanmade conversions of campaign settings, forums and more:
 						--------------->http://www.d6holocron.com/<-------------
-						
-						
--------------------------Legacy code below, old in 2017 already------------------------------
-_____________________________________________________________________________________________
-
-I'm sure that a skilled coder could do this far better, but This is my first attempt ever.
-
-below you will find all of the relevant info for altering the sheet
-
-                        Player:
-                            <input type="text" name="attrplayer" />
-                        Character Type:
-                            <input type="text" name="attrcharactertype" />
-                        Name:
-                            <input type="text" name="attrcharactername" /> 
-
-                                Age:
-                                    <input type="text" name="attrage" />
-                                Height:
-                                    <input type="text" name="attrheight" />
-                                Sex:
-                                    <input type="text" name="attrsex" />
-                                Weight:
-                                    <input type="text" name="attrweight" />
-                                Race:
-                                    <input type="text" name="attrrace" />
-                                Credits:
-                                    <input type="number" name="attrcredits" />
-                        Physical Description / Notes:
-                            <textarea name="attr_physicaldescription"></textarea>
-                            <textarea name="attr_notes"></textarea>
-
-                        DEXTERITY:
-                            <input type="text" name="attrdexterity" />
-
-                                <input type="text" name="attrblaster" />         Blaster
-                                <input type="text" name="attrbrawlingparry" />   Brawling Parry
-                                <input type="text" name="attrdodge" />           Dodge
-                                <input type="text" name="attrgrenade" />         Grenade
-                                <input type="text" name="attrheavyweapons" />    Heavy Weapons
-                                <input type="text" name="attrmeleeparry" />      Melee Parry
-                                <input type="text" name="attrmelee" />           Melee
-                                <input type="text" name="attrdexblank1" />       ---
-                                <input type="text" name="attrdexblank2" />       ---
-
-                        MECHANICAL
-                            <input type="text" name="attrmechanical" />
-                            
-                                 <input type="text" name="attrastrogation" />        Astrogation
-                                 <input type="text" name="attrbeastriding" />        Beast Riding
-                                 <input type="text" name="attrrepulsorliftop" />     Repulsorlift Op
-                                 <input type="text" name="attrstarshipgunnery" />    Starship Gunnery
-                                 <input type="text" name="attrstarshippiloting" />   Starship Piloting
-                                 <input type="text" name="attrstarshipshields" />    Starship Shields
-                                 <input type="text" name="attrmechblank1" />         ---
-                                 <input type="text" name="attrmechblank2" />         ---
-                        
-                        TECHNICAL
-                            <input type="text" name="attrtechnical" />
-                             
-                                  <input type="text" name="attrcompprogrepair" />       Comp Prog/Repair
-                                  <input type="text" name="attrdemolition" />           Demolition
-                                  <input type="text" name="attrdroidprogrepair" />      Droid Prog/Repair
-                                  <input type="text" name="attrmedicine" />             Medicine
-                                  <input type="text" name="attrrepulsorliftrepair" />   Repulsorlift Repair
-                                  <input type="text" name="attrsecurity" />             Security
-                                  <input type="text" name="attrstarship Repair" />      Starship Repair
-                                  <input type="text" name="attrtechblank1" />           ---
-                                  <input type="text" name="attrtechblank2" />           ---
-                  
-                        PERCEPTION:
-                            <input type="text" name="attrperception" />
-                        
-                                 <input type="text" name="attrbargain" />      Bargain
-                                 <input type="text" name="attrcommand" />      Command
-                                 <input type="text" name="attrcon" />          Con
-                                 <input type="text" name="attrgambling" />     Gambling
-                                 <input type="text" name="attrhidesneak" />    Hide/Sneak
-                                 <input type="text" name="attrsearch" />       Search
-                                 <input type="text" name="attrperblank1" />    ---
-                                 <input type="text" name="attrperblank2" />    ---
-                        
-                        STRENGTH
-                            <input type="text" name="attrstrength" />
-                           
-                                <input type="text" name="attrbrawling" />          Brawling
-                                <input type="text" name="attrclimingjumping" />    Climbing/Jumping
-                                <input type="text" name="attrlifting" />           Lifting
-                                <input type="text" name="attrstamina" />           Stamina
-                                <input type="text" name="attrswimming" />          Swimming
-                                <input type="text" name="attrstrengthblank1" />    ---
-                                <input type="text" name="attrstrengthblank2" />    ---
-                           
-                            KNOWLEDGE:
-                                <input type="text" name="attrknowledge" />
-                                
-                                    <input type="text" name="attralienraces" />         Alien Races
-                                    <input type="text" name="attrbureaucracy" />        Bureaucracy
-                                    <input type="text" name="attrcultures" />           Cultures
-                                    <input type="text" name="attrlanguages" />          Languages
-                                    <input type="text" name="attrplanetarysystems" />   Planetary Systems
-                                    <input type="text" name="attrstreetwise" />         Streetwise
-                                    <input type="text" name="attrsurvival" />           Survival
-                                    <input type="text" name="attrtechnology" />         Technology
-                                    <input type="text" name="attrknowblank1" />         ---
-                                    <input type="text" name="attrknowblank2" />         ---
-                                    <input type="text" name="attrknowblank3" />         ---
-                
-                
-                        FORCE POWERS
-                            <input type="text" name="attrcontrol" />   CONTROL
-                            <input type="text" name="attrsense" />     SENSE
-                            <input type="text" name="attralter" />     ALTER
-
-                        Force Points
-                            <input type="number" name="attrforcepoint" />
-                             
-                        Dark Side Points
-                            <input type="number" name="attrdarkside" />
-                                
-                            
-                        
-                        Wound Status
-                            <input type="number" name="attrwoundstatus" />
-                                
-                        Skill Points
-                            <input type="number" name="attrskillpoints" />
-                            
-                        Background
-                            <textarea name="attrbackground"></textarea>
-                        
-                        Personality
-                            <textarea name="attrpersonality"></textarea>
-                        
-                        Some quotes:
-                            <textarea name="attrquotes"></textarea>
-                        
-                        Connections to other characters
-                            <textarea name="attrconnections"></textarea>
-                        
-                        Equipment
-                            <textarea name="attrgeartext1"></textarea>
-                            <textarea name="attrgeartext2"></textarea>
-                            <textarea name="attrgeartext3"></textarea>
-                            <textarea name="attrgeartext4"></textarea>
