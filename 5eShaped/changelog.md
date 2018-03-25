@@ -11,6 +11,13 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 17.0.5
+
+### Bug Fixes
+* [#693: Tooltips for carry capacity and push/drag cut off at default sheet size](https://bitbucket.org/mlenser/5eshaped/issues/693/tooltips-for-carry-capacity-and-push-drag)
+* [#691: Feature uses tied to modifiers aren't being read](https://bitbucket.org/mlenser/5eshaped/issues/691/feature-uses-tied-to-modifiers-arent-being)
+* [#692: Repeat attack / damage needs some point of reference](https://bitbucket.org/mlenser/5eshaped/issues/692/repeat-attack-damage-needs-some-point-of)
+
 ## 17.0.4
 
 ### Bug Fixes
