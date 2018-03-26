@@ -1,8 +1,13 @@
 # Blades in the Dark Character Sheet
 
-This is a character sheet for Blades in the Dark for use on Roll20.
+This is the (compressed) source code for the Blades in the Dark character sheet on Roll20. The pug/sass code used to generate it can be found [here](https://github.com/joesinghaus/Blades-in-the-Dark). If you want to hack the sheet for your own Blades hack, a more hackable version and instructions for hacking can be found [here](https://github.com/joesinghaus/Blades-template).
 
 ## Changelog
+
+### 3.0
+* Large internal refactoring and cleanup: the sheet is now generated from pug code. There should be no functionality change from this, but it has probably introduced a few new bugs
+* Unofficial Iruvian playbooks by Johnstone Metzger added
+* Ancient upgrade code (pre-2.0) removed
 
 ### 2.6
 * Updates to the sheet to make the Korean translation work

@@ -7,6 +7,17 @@ Versions have three numbers Major.Minor.Release
 
 **Release**: Indicates bugfixes and minor UI changes only.
 
+## 1.8.0
+### Bug Fixes
+* Fixed JSON Import when importing hit tables with a range of 1 on one of the locations.  Will now also remove leading 0's from imported hit tables.
+
+### New Features
+* Added support for After the Vampire Wars.  No new mechanics for this setting just a selection of existing rules.
+* Renamed Luther Arkwright Psionics to Mythras Psionics
+* Added Vehicle Sheets for both Mythras and M-Space.  New campaign option allows you to select betweeh Mythras, M-Space and Ships & Shield Walls mechanics.
+* Added locations to the equipment list.  Also added a checkbox to equip or unequip a pack allowing a character to drop all ENC in a pack.
+* Added description field to the equipment list.
+
 ## 1.7.0
 ### New Features
 * Added support for Mythic Constantinople.  This adds Affiliations and option to base max devotional pool on POW instead of Cult Rank.
