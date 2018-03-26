@@ -5527,6 +5527,7 @@
 
     on("sheet:compendium-drop", function() {
         getAttrs(["hp_max","npc_senses","token_size","cd_bar1_v","cd_bar1_m","cd_bar1_l","cd_bar2_v","cd_bar2_m","cd_bar2_l","cd_bar3_v","cd_bar3_m","cd_bar3_l"], function(v) {
+
             var default_attr = {};
             default_attr["width"] = 70;
             default_attr["height"] = 70;
@@ -5547,50 +5548,66 @@
                 };
             }
 
-            if(v["cd_bar1_l"]) {
-                default_attr["bar1_link"] = v["cd_bar1_l"];
-            }
-            else if(v["cd_bar1_v"] || v["cd_bar1_m"]) {
-                if(v["cd_bar1_v"]) {
-                    default_attr["bar1_value"] = v["cd_bar1_v"];
-                }
-                if(v["cd_bar1_m"]) {
-                    default_attr["bar1_max"] = v["cd_bar1_m"];
-                }
-            }
-            else {
-                default_attr["bar1_value"] = v["hp_max"];
-                default_attr["bar1_max"] = v["hp_max"];
+            var getList = {};
+            for(x = 1; x<=3; x++) {
+                _.each(["v", "m"], function(letter) {
+                    var keyname = "cd_bar" + x + "_" + letter;
+                    if(v[keyname] != undefined && isNaN(v[keyname])) {
+                        getList[keyname] = v[keyname];
+                    }
+                });
             }
 
-            if(v["cd_bar2_l"]) {
-                default_attr["bar2_link"] = v["cd_bar2_l"];
-            }
-            else if(v["cd_bar2_v"] || v["cd_bar2_m"]) {
-                if(v["cd_bar2_v"]) {
-                    default_attr["bar2_value"] = v["cd_bar2_v"];
-                }
-                if(v["cd_bar2_m"]) {
-                    default_attr["bar2_max"] = v["cd_bar2_m"];
-                }
-            }
-            else {
-                default_attr["bar2_link"] = "npc_ac";
-            }
+            getAttrs(_.values(getList), function(values) {
+                _.each(_.keys(getList), function(keyname) {
+                    v[keyname] = values[getList[keyname]] == undefined ? "" : values[getList[keyname]];
+                });
 
-            if(v["cd_bar3_l"]) {
-                default_attr["bar3_link"] = v["cd_bar3_l"];
-            }
-            else if(v["cd_bar3_v"] || v["cd_bar3_m"]) {
-                if(v["cd_bar3_v"]) {
-                    default_attr["bar3_value"] = v["cd_bar3_v"];
+                if(v["cd_bar1_l"]) {
+                    default_attr["bar1_link"] = v["cd_bar1_l"];
                 }
-                if(v["cd_bar3_m"]) {
-                    default_attr["bar3_max"] = v["cd_bar3_m"];
+                else if(v["cd_bar1_v"] || v["cd_bar1_m"]) {
+                    if(v["cd_bar1_v"]) {
+                        default_attr["bar1_value"] = v["cd_bar1_v"];
+                    }
+                    if(v["cd_bar1_m"]) {
+                        default_attr["bar1_max"] = v["cd_bar1_m"];
+                    }
                 }
-            }
+                else {
+                    default_attr["bar1_value"] = v["hp_max"];
+                    default_attr["bar1_max"] = v["hp_max"];
+                }
 
-            setDefaultToken(default_attr);
+                if(v["cd_bar2_l"]) {
+                    default_attr["bar2_link"] = v["cd_bar2_l"];
+                }
+                else if(v["cd_bar2_v"] || v["cd_bar2_m"]) {
+                    if(v["cd_bar2_v"]) {
+                        default_attr["bar2_value"] = v["cd_bar2_v"];
+                    }
+                    if(v["cd_bar2_m"]) {
+                        default_attr["bar2_max"] = v["cd_bar2_m"];
+                    }
+                }
+                else {
+                    default_attr["bar2_link"] = "npc_ac";
+                }
+
+                if(v["cd_bar3_l"]) {
+                    default_attr["bar3_link"] = v["cd_bar3_l"];
+                }
+                else if(v["cd_bar3_v"] || v["cd_bar3_m"]) {
+                    if(v["cd_bar3_v"]) {
+                        default_attr["bar3_value"] = v["cd_bar3_v"];
+                    }
+                    if(v["cd_bar3_m"]) {
+                        default_attr["bar3_max"] = v["cd_bar3_m"];
+                    }
+                }
+
+                setDefaultToken(default_attr);
+            });
         });
     });
 

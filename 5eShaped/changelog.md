@@ -11,6 +11,50 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 15.7.2
+
+### Bug Fixes
+* Fix attack and damage components caused by a rename of `attackTypeChanged`
+
+## 15.7.1
+
+### Bug Fixes
+* [#640: Carrying Capacity Not displayed](https://bitbucket.org/mlenser/5eshaped/issues/640/carrying-capacity-not-displayed). Also fixes carrying capacity not being updated when Strength changes and hit dice not updating on Constitution changes.
+* [#648: Spell Macro not showing Cantrips in chat](https://bitbucket.org/mlenser/5eshaped/issues/648/spell-macro-not-showing-cantrips-in-chat)
+* [#645: Modify state should revert when character sheet editing is turned off](https://bitbucket.org/mlenser/5eshaped/issues/645/modify-state-should-revert-when-character)
+* [#646: Unable to change Casting Stat for Compendium Imported Spells](https://bitbucket.org/mlenser/5eshaped/issues/646/unable-to-change-casting-stat-for)
+* Attacks will default to having the correct attack and damage ability modifier selected based on the section they are created from (Offense, Spell, etc).
+* A spell’s saving throw ability modifier can now be set to use no ability modifier.
+
+## 15.7.0
+
+### Features
+
+* `Mana` setting now replaces `Spell points` wording with `Mana`
+* `Advantage+` and `Disadvantage-` have been added to handle cases of rolling an extra dice for all the possible dice systems. With d20 for example `Advantage+` would be `3d20kh1`
+
+## 15.6.0
+
+### Features
+
+* Death saving throw output now supports `death_saving_throw_chances` by outputting X / 3 or X / 5. All custom death saving throw macros must include `{{death_saving_throw_chances=@{death_saving_throw_chances}}}`.
+
+## 15.5.9
+
+### Bug Fixes
+
+* [#633: Hit dice and level field not displaying properly for sheets from versions before 15.5.5](https://bitbucket.org/mlenser/5eshaped/issues/633/hit-dice-and-level-field-not-displaying)
+* [#631: Delay/No Response to using Short and Long Rest buttons](https://bitbucket.org/mlenser/5eshaped/issues/631/delay-no-response-to-using-short-and-long)
+
+## 15.5.8
+
+### Bug Fixes
+
+* [#621: Suggestion to add a blank magic school.](https://bitbucket.org/mlenser/5eshaped/issues/621/suggestion-to-add-a-blank-magic-school)
+* [#625: Changing caster type (full/half, etc) has no effect.](https://bitbucket.org/mlenser/5eshaped/issues/625/changing-caster-type-full-half-etc-has-no)
+* [#624: Spell Save DC Not Calculating Properly](https://bitbucket.org/mlenser/5eshaped/issues/624/spell-save-dc-not-calculating-properly)
+* Adjusted Hit dice to use the current amount for the query instead of the maximum. Along with solving the `base_dc` issues elsewhere it seems [#626: Monk HD not updating correctly](https://bitbucket.org/mlenser/5eshaped/issues/626/monk-hd-not-updating-correctly) is solved, but I'm unsure.
+
 ## 15.5.7
 
 ### Bug Fixes

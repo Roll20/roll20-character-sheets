@@ -1,4 +1,4 @@
-# FFD20 Character Sheet
+# Final Fantasy d20 Character Sheet
 
 ### Usage
 
@@ -15,7 +15,19 @@ The Character sheet type is meant for player characters and non player character
 
 The Monster sheet type is meant for monsters, to be used exclusively by the DM. It condenses everything down to one page (no tab interface), and removes autocalculations entirely in favor of giving more control to the DM with editing values. Utilizing this sheet type effectively will enable the DM to drag and drop monster tokens and keep track of their respective stats without having to wade through the tabular interface meant for more complex character types.
 
-#### Bugs and Feedback
+### Changelog
+
+__Version 1.1 (released 11/06/2017)__
+
+Small update. Changes were:
+*	Fixed CMB and CMD autocalculations
+*	Added a d4 option for class HD
+*	Added a quantity/charges (wands) field for inventory items
+*	Changed gil, monster XP and CR, to text fields to accomodate for commas
+*	Added craft, perform, and profession skills to the monster skills section
+*	Fixed the formatting for the monster skills section -- should look better for Firefox users
+
+### Bugs and Feedback
 
 Report bugs or feedback to the project’s [issue
 tracker](https://github.com/Azurift/roll20-character-sheets/issues).

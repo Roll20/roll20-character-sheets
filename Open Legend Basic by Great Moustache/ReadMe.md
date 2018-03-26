@@ -5,6 +5,32 @@
 
 ### Changelog
 
+### 1.8.9.96 on 2018 January 21st
+* XP Feat & Attribute Points calculate for 0
+* Default (Dis)Adv updates for straight Attributes
+
+### 1.8.9.95 on 2017 December 31st
+* Removed the temporary warning that old inventory not moved over would be lost
+* Completely removed the old inventory section
+
+### 1.8.9.92 on 2017 December 4th
+* 3 Inventory sections outputing wrong "name" to chat.
+
+### 1.8.9.91 on 2017 November 27th
+* Inventory, Notes, Goals, Beliefs, & Instincts can now be sent to chat
+* Inventory Area Re-worked
+
+
+### 1.8.9.9 on 2017 November 18th
+* Fixed Default (Dis)Advantage not always popping up correctly
+* Updated Attribute description text
+* GUI update to chat window rolls
+	- Rolled Value much larger
+	- Power Level display changed
+		- No shows you the Achieved Power Level based on your roll
+		- Shows the Min Needed to Succeed as well as the Max Allowed (based on what is entered in Actions)
+	- Increased the Description areas to display a max of 7 lines (mouse scroll wheels jump 6-7 lines at a time)
+
 ### 1.8.9.6 on 2017 October 16th
 * Fixed HP/Lethal Damage having odd error that locks up HP calculations on sheet
 * Outputs to chat show Attribute Score next to the Attribute now
