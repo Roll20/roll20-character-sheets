@@ -6112,8 +6112,7 @@
             return;
         }
         update_jack_attr();
-        update_initiative();
-        update_skills(["athletics", "acrobatics", "sleight_of_hand", "stealth", "arcana", "history", "investigation", "nature", "religion", "animal_handling", "insight", "medicine", "perception", "survival","deception", "intimidation", "performance", "persuasion"]);
+        update_all_ability_checks();
     });
 
     on("change:initmod change:init_tiebreaker", function(eventinfo) {
@@ -6396,6 +6395,11 @@
         update_save("charisma");
         update_save("death");
     };
+    
+    var update_all_ability_checks = function(){
+        update_initiative();
+        update_skills(["athletics", "acrobatics", "sleight_of_hand", "stealth", "arcana", "history", "investigation", "nature", "religion", "animal_handling", "insight", "medicine", "perception", "survival","deception", "intimidation", "performance", "persuasion"]);
+    };
 
     var update_skills = function (skills_array) {
         var skill_parent = {athletics: "strength", acrobatics: "dexterity", sleight_of_hand: "dexterity", stealth: "dexterity", arcana: "intelligence", history: "intelligence", investigation: "intelligence", nature: "intelligence", religion: "intelligence", animal_handling: "wisdom", insight: "wisdom", medicine: "wisdom", perception: "wisdom", survival: "wisdom", deception: "charisma", intimidation: "charisma", performance: "charisma", persuasion: "charisma"};
@@ -6431,10 +6435,10 @@
                     var item_bonus = 0;
 
                     _.each(idarray, function(currentID) {
-                        if(v["repeating_inventory_" + currentID + "_equipped"] && v["repeating_inventory_" + currentID + "_equipped"] === "1" && v["repeating_inventory_" + currentID + "_itemmodifiers"] && v["repeating_inventory_" + currentID + "_itemmodifiers"].toLowerCase().replace(/ /g,"_").indexOf(s) > -1) {
+                        if(v["repeating_inventory_" + currentID + "_equipped"] && v["repeating_inventory_" + currentID + "_equipped"] === "1" && v["repeating_inventory_" + currentID + "_itemmodifiers"] && (v["repeating_inventory_" + currentID + "_itemmodifiers"].toLowerCase().replace(/ /g,"_").indexOf(s) > -1 || v["repeating_inventory_" + currentID + "_itemmodifiers"].toLowerCase().indexOf("ability checks") > -1)) {
                             var mods = v["repeating_inventory_" + currentID + "_itemmodifiers"].toLowerCase().split(",");
                             _.each(mods, function(mod) {
-                                if(mod.replace(/ /g,"_").indexOf(s) > -1) {
+                                if(mod.replace(/ /g,"_").indexOf(s) > -1 || mod.indexOf("ability checks") > -1) {
                                     if(mod.indexOf("-") > -1) {
                                         var new_mod = !isNaN(parseInt(mod.replace(/[^0-9]/g, ""), 10)) ? parseInt(mod.replace(/[^0-9]/g, ""), 10) : false;
                                         item_bonus = new_mod ? item_bonus - new_mod : item_bonus;
@@ -7232,6 +7236,7 @@
             if(mod.indexOf("intelligence save") > -1) {update_save("intelligence");} else if(mod.indexOf("intelligence") > -1) {update_attr("intelligence");};
             if(mod.indexOf("wisdom save") > -1) {update_save("wisdom");} else if(mod.indexOf("wisdom") > -1) {update_attr("wisdom");};
             if(mod.indexOf("charisma save") > -1) {update_save("charisma");} else if(mod.indexOf("charisma") > -1) {update_attr("charisma");};
+            if(mod.indexOf("ability checks") > -1) {update_all_ability_checks();};
             if(mod.indexOf("acrobatics") > -1) {update_skills(["acrobatics"]);};
             if(mod.indexOf("animal handling") > -1) {update_skills(["animal_handling"]);};
             if(mod.indexOf("arcana") > -1) {update_skills(["arcana"]);};
@@ -8240,29 +8245,53 @@
     };  
 
     var update_initiative = function() {
-        getAttrs(["dexterity","dexterity_mod","initmod","jack_of_all_trades","jack","init_tiebreaker","pb_type"], function(v) {
-            var update = {};
-            var final_init = parseInt(v["dexterity_mod"], 10);
-            if(v["initmod"] && !isNaN(parseInt(v["initmod"], 10))) {
-                final_init = final_init + parseInt(v["initmod"], 10);
-            }
-            if(v["init_tiebreaker"] && v["init_tiebreaker"] != 0) {
-                final_init = final_init + (parseInt(v["dexterity"], 10)/100);
-            }
-            if(v["jack_of_all_trades"] && v["jack_of_all_trades"] != 0) {
-                if(v["pb_type"] && v["pb_type"] === "die" && v["jack"]) {
-                    // final_init = final_init + Math.floor(parseInt(v["jack"].substring(1),10)/2);
-                    final_init = final_init + "+" + v["jack"];
+        var attrs_to_get = ["dexterity","dexterity_mod","initmod","jack_of_all_trades","jack","init_tiebreaker","pb_type"];
+        getSectionIDs("repeating_inventory", function(idarray){
+            _.each(idarray, function(currentID, i) {
+                attrs_to_get.push("repeating_inventory_" + currentID + "_equipped");
+                attrs_to_get.push("repeating_inventory_" + currentID + "_itemmodifiers");
+            });
+            getAttrs(attrs_to_get, function(v) {
+                var update = {};
+                var final_init = parseInt(v["dexterity_mod"], 10);
+                if(v["initmod"] && !isNaN(parseInt(v["initmod"], 10))) {
+                    final_init = final_init + parseInt(v["initmod"], 10);
                 }
-                else if(v["jack"] && !isNaN(parseInt(v["jack"], 10))) {
-                    final_init = final_init + parseInt(v["jack"], 10);
+                if(v["init_tiebreaker"] && v["init_tiebreaker"] != 0) {
+                    final_init = final_init + (parseInt(v["dexterity"], 10)/100);
                 }
-            }
-            if(final_init % 1 != 0) { 
-                final_init = parseFloat(final_init.toPrecision(12)); // ROUNDING ERROR BUGFIX
-            }
-            update["initiative_bonus"] = final_init;
-            setAttrs(update, {silent: true});
+                if(v["jack_of_all_trades"] && v["jack_of_all_trades"] != 0) {
+                    if(v["pb_type"] && v["pb_type"] === "die" && v["jack"]) {
+                        // final_init = final_init + Math.floor(parseInt(v["jack"].substring(1),10)/2);
+                        final_init = final_init + "+" + v["jack"];
+                    }
+                    else if(v["jack"] && !isNaN(parseInt(v["jack"], 10))) {
+                        final_init = final_init + parseInt(v["jack"], 10);
+                    }
+                }
+                _.each(idarray, function(currentID){
+                    if(v["repeating_inventory_" + currentID + "_equipped"] && v["repeating_inventory_" + currentID + "_equipped"] === "1" && v["repeating_inventory_" + currentID + "_itemmodifiers"] && v["repeating_inventory_" + currentID + "_itemmodifiers"].toLowerCase().indexOf("ability checks") > -1) {
+                        var mods = v["repeating_inventory_" + currentID + "_itemmodifiers"].toLowerCase().split(",");
+                        _.each(mods, function(mod) {
+                            if(mod.indexOf("ability checks") > -1) {
+                                if(mod.indexOf("-") > -1) {
+                                    var new_mod = !isNaN(parseInt(mod.replace(/[^0-9]/g, ""), 10)) ? parseInt(mod.replace(/[^0-9]/g, ""), 10) : false;
+                                    final_init = new_mod ? final_init - new_mod : final_init;
+                                }
+                                else {
+                                    var new_mod = !isNaN(parseInt(mod.replace(/[^0-9]/g, ""), 10)) ? parseInt(mod.replace(/[^0-9]/g, ""), 10) : false;
+                                    final_init = new_mod ? final_init + new_mod : final_init;
+                                }
+                            }
+                        });
+                    }
+                });
+                if(final_init % 1 != 0) {
+                    final_init = parseFloat(final_init.toPrecision(12)); // ROUNDING ERROR BUGFIX
+                }
+                update["initiative_bonus"] = final_init;
+                setAttrs(update, {silent: true});
+            });
         });
     };
 
