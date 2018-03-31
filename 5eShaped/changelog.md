@@ -11,6 +11,149 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 17.0.5
+
+### Bug Fixes
+* [#693: Tooltips for carry capacity and push/drag cut off at default sheet size](https://bitbucket.org/mlenser/5eshaped/issues/693/tooltips-for-carry-capacity-and-push-drag)
+* [#691: Feature uses tied to modifiers aren't being read](https://bitbucket.org/mlenser/5eshaped/issues/691/feature-uses-tied-to-modifiers-arent-being)
+* [#692: Repeat attack / damage needs some point of reference](https://bitbucket.org/mlenser/5eshaped/issues/692/repeat-attack-damage-needs-some-point-of)
+
+## 17.0.4
+
+### Bug Fixes
+* [#686: Spell tooltips do not respect newlines in the spell's description](https://bitbucket.org/mlenser/5eshaped/issues/686/spell-tooltips-do-not-respect-newlines-in)
+* [#687: Attacks and Traits are blank when](https://bitbucket.org/mlenser/5eshaped/issues/687/attacks-and-traits-are-blank-when)
+
+## 17.0.3
+
+### Bug Fixes
+* Monsters imported from the script now correctly output their content. Closes [#682: Imported Actions/Traits don't send content to chat](https://bitbucket.org/mlenser/5eshaped/issues/682/imported-actions-traits-dont-send-content)
+* Skill rows that run out of room now cause the name to shrink better, primarily on firefox. Closes [#684: Formatting Skills error](https://bitbucket.org/mlenser/5eshaped/issues/684/formatting-skills-error)
+
+## 17.0.2
+
+### Bug Fixes
+* [#675: Warlock slots not generating](https://bitbucket.org/mlenser/5eshaped/issues/675/warlock-slots-not-generating-v-1701)
+* Spells known and spells chat macro now update when dragging a spell from the SRD. Closes [#677: Spells Macro Not Updating](https://bitbucket.org/mlenser/5eshaped/issues/677/spells-macro-not-updating)
+
+## 17.0.1
+
+### Bug Fixes
+* `Roll 2` now indicates to the user that it is a legacy feature that does not work with all sheet features.
+* [#672: coin weight calculation resulting in high decimal values](https://bitbucket.org/mlenser/5eshaped/issues/672/coin-weight-calculation-resulting-in-high)
+* Spells manually changed in any way resulted in an error which prevented the scripts from running properly. This has been fixed. Closes [#674: Adding custom spells does not output description to chat or use spell slot](https://bitbucket.org/mlenser/5eshaped/issues/674/adding-custom-spells-does-not-output)
+
+## 17.0.0
+
+### Breaking Changes
+* Spells now track the number of slots expended instead of the remaining slots. This aligns with the paper and OGL sheets. Upgrades should handle this change for you.
+* NPC saving throws and skills will only show proficient/expertise items while in presentation mode. Closes [#669: Don't generate skills by default that have no proficiency or expertise on NPC sheets](https://bitbucket.org/mlenser/5eshaped/issues/669/dont-generate-skills-by-default-that-have)
+
+### Features
+* Spell UI has been updated with bubbles for spell slots and new UI wrappers.
+* Spells now have tooltips to display the full contents of the spell. Closes [#374: Enable 'condense' toggling for spells on a more granular basis](https://bitbucket.org/mlenser/5eshaped/issues/374/enable-condense-toggling-for-spells-on-a)
+* NPC skills will now show in a grid layout in edit mode.
+* Falling to 0 hp now sets the unconscious condition. Gaining HP removes it. Closes [#3: Conditions](https://bitbucket.org/mlenser/5eshaped/issues/3/conditions)
+* Cleaned up the Stablock macro to translate the size of PCs/NPCs. Race will now show instead of type for PCs. Offense and utility added for PCs as well.
+* Settings page reorganized.
+
+### Bug Fixes
+* [#670: Not assigning a weight value to equipment completely breaks weight calculations](https://bitbucket.org/mlenser/5eshaped/issues/670/not-assigning-a-weight-value-to-equipment)
+
+## 16.1.2
+
+### Bug Fixes
+* [#572: Modifiers adding a second time on critical damage](https://bitbucket.org/mlenser/5eshaped/issues/572/modifiers-adding-a-second-time-on-critical)
+
+## 16.1.1
+
+### Bug Fixes
+* [#664: Spelling errors in translation.json](https://bitbucket.org/mlenser/5eshaped/issues/664/spelling-errors-in-translationjson)
+* [#663: Saving Throw Bonus Formatting Error](https://bitbucket.org/mlenser/5eshaped/issues/663/saving-throw-bonus-formatting-error)
+* Crit range is shown by default as turning it on wasn’t intuitive enough.
+
+## 16.1.0
+
+### Features
+* Shaped sheet can now process OGL spells from PC sheets or NPC sheets (only NPC sheets from the Curse of Strahd module and newer use this format for spells). Closes [#659: NPC Spells not converting from OGL to Shaped](https://bitbucket.org/mlenser/5eshaped/issues/659/npc-spells-not-converting-from-ogl-to)
+
+### UI Adjustments
+* The sheet is a bit wider now and no longer assumes my stylish CSS so it should fit on the default width (~888px depending on browser) without a horizontal scrollbar.
+* Firefox UI cleaned up. Closes [#661: Tie bar behind exhastion states not centered](https://bitbucket.org/mlenser/5eshaped/issues/661/tie-bar-behind-exhastion-states-not)
+
+## 16.0.0
+
+### Breaking Changes
+* Importing data from the compendium, script, or OGL content has been completely revamped to use the same system for as much as possible.
+
+### Features
+* [#656: Missing comma in Modifiers -> Saving throw](https://bitbucket.org/mlenser/5eshaped/issues/656/missing-comma-in-modifiers-saving-throw)
+* Conditions have been added.
+
+### Bug Fixes
+* [#654: Magic Missile](https://bitbucket.org/mlenser/5eshaped/issues/654/magic-missile)
+* New characters sheets will be created with edit mode enabled
+* [#655: OGL skills do not convert](https://bitbucket.org/mlenser/5eshaped/issues/655/ogl-skills-do-not-convert)
+* OGL conversion, Compendium drop, and Script import of monsters, spells, and items should be fully working (update the script to 12.0.0)
+  * A processing notification now shows while these items are processing, regardless of origin
+* [#38: Spell Save DC Not calculating properly in !shaped-spells](https://bitbucket.org/mlenser/5eshapedscript/issues/38/spell-save-dc-not-calculating-properly-in)
+* Weapons dropped on a NPC sheet are added as actions
+
+### UI Adjustments
+* Styled boxes have been added
+* Tabs renamed to "Character"/"NPC", "Spells", and the cog.
+* "Character" tab for PCs will now show the appearance and backstory details below the normal sheet
+* "All" option removed as it is now only useful for showing settings below other sheets which doesn't have much value
+* Repeating buttons restyled a bit
+* PC Core page column widths adjusted a bit
+* Font sizes adjusted to match the new UI
+* Passive skills moved to the core page and restyled
+
+## 15.7.4
+
+### Bug Fixes
+* Fix parsing of single quotes that I broke as part of 15.7.3
+
+## 15.7.3
+
+### Bug Fixes
+* [#652: Tome of Beasts characters have errors on import](https://bitbucket.org/mlenser/5eshaped/issues/652/tome-of-beasts-characters-have-errors-on). Tome of Beast format variations parsed away to the expected format.
+
+## 15.7.2
+
+### Bug Fixes
+* Fix attack and damage components caused by a rename of `attackTypeChanged`
+
+## 15.7.1
+
+### Bug Fixes
+* [#640: Carrying Capacity Not displayed](https://bitbucket.org/mlenser/5eshaped/issues/640/carrying-capacity-not-displayed). Also fixes carrying capacity not being updated when Strength changes and hit dice not updating on Constitution changes.
+* [#648: Spell Macro not showing Cantrips in chat](https://bitbucket.org/mlenser/5eshaped/issues/648/spell-macro-not-showing-cantrips-in-chat)
+* [#645: Modify state should revert when character sheet editing is turned off](https://bitbucket.org/mlenser/5eshaped/issues/645/modify-state-should-revert-when-character)
+* [#646: Unable to change Casting Stat for Compendium Imported Spells](https://bitbucket.org/mlenser/5eshaped/issues/646/unable-to-change-casting-stat-for)
+* Attacks will default to having the correct attack and damage ability modifier selected based on the section they are created from (Offense, Spell, etc).
+* A spell’s saving throw ability modifier can now be set to use no ability modifier.
+
+## 15.7.0
+
+### Features
+
+* `Mana` setting now replaces `Spell points` wording with `Mana`
+* `Advantage+` and `Disadvantage-` have been added to handle cases of rolling an extra dice for all the possible dice systems. With d20 for example `Advantage+` would be `3d20kh1`
+
+## 15.6.0
+
+### Features
+
+* Death saving throw output now supports `death_saving_throw_chances` by outputting X / 3 or X / 5. All custom death saving throw macros must include `{{death_saving_throw_chances=@{death_saving_throw_chances}}}`.
+
+## 15.5.9
+
+### Bug Fixes
+
+* [#633: Hit dice and level field not displaying properly for sheets from versions before 15.5.5](https://bitbucket.org/mlenser/5eshaped/issues/633/hit-dice-and-level-field-not-displaying)
+* [#631: Delay/No Response to using Short and Long Rest buttons](https://bitbucket.org/mlenser/5eshaped/issues/631/delay-no-response-to-using-short-and-long)
+
 ## 15.5.8
 
 ### Bug Fixes
