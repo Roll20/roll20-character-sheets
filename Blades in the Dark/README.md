@@ -4,6 +4,15 @@ This is the (compressed) source code for the Blades in the Dark character sheet 
 
 ## Changelog
 
+### 3.2
+* Added proper vampire traumas (thanks Jeffrey Lamb)
+
+### 3.1
+* Fixed font for the Korean localization
+* Alchemicals now have a renameable title, and bandoliers can be hidden
+* Restyled repeating section controls to use symbols instead of text
+* Use CSS grid for large-scale sheet layout, fixing some weird margins along the way
+
 ### 3.0
 * Large internal refactoring and cleanup: the sheet is now generated from pug code. There should be no functionality change from this, but it has probably introduced a few new bugs
 * Unofficial Iruvian playbooks by Johnstone Metzger added
