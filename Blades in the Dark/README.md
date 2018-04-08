@@ -1,8 +1,77 @@
 # Blades in the Dark Character Sheet
 
-This is a character sheet for Blades in the Dark for use on Roll20.
+This is the (compressed) source code for the Blades in the Dark character sheet on Roll20. The pug/sass code used to generate it can be found [here](https://github.com/joesinghaus/Blades-in-the-Dark). If you want to hack the sheet for your own Blades hack, a more hackable version and instructions for hacking can be found [here](https://github.com/joesinghaus/Blades-template).
 
 ## Changelog
+
+### 3.2
+* Added proper vampire traumas (thanks Jeffrey Lamb)
+
+### 3.1
+* Fixed font for the Korean localization
+* Alchemicals now have a renameable title, and bandoliers can be hidden
+* Restyled repeating section controls to use symbols instead of text
+* Use CSS grid for large-scale sheet layout, fixing some weird margins along the way
+
+### 3.0
+* Large internal refactoring and cleanup: the sheet is now generated from pug code. There should be no functionality change from this, but it has probably introduced a few new bugs
+* Unofficial Iruvian playbooks by Johnstone Metzger added
+* Ancient upgrade code (pre-2.0) removed
+
+### 2.6
+* Updates to the sheet to make the Korean translation work
+
+### 2.5
+* Added option to use Kirsty font if installed
+* Small graphical changes
+
+### 2.4
+* Several bugfixes
+* New clocks-only mode for the faction page for those who want a character sheet just to store clocks
+* Alchemicals repeating section
+
+### 2.3
+* Added broadcast button for sending information to chat for special abilities, clocks, and harm.
+* Image clocks have been replaced by a CSS version that looks sharper, especially in the roll template.
+
+### 2.2
+* It is now possible to add a cohort to the character sheet. Automatic for Hounds.
+* Various small bugfixes
+
+### 2.1
+* New auto-expand technique allowing some fields to grow according to their contents
+* Sheet worker tweaks for better transition to spirit playbooks
+
+### 2.0
+* Additions
+    * The names for heat, wanted, and deity can now be changed
+    * Settings are now filtered by sheet type
+    * Buttons for adding playbook items and crew-specific upgrades
+    * Option to make bonus dice a freeform input field
+    * Option to ask for a consequence name when resisting
+    * Fortune roll button added to factions sheet
+    * Engagement roll button added to crew sheet
+    * Added a clocks repeating section to the faction sheet, and a real notes field
+    * Box-shadow effect to focused input fields (can be disabled in settings)
+    * Button to reset items and load with one click
+* Changes
+    * New model for action and tier dots that gets rid of the need for extra attributes
+    * Refactored sheet workers and cleaned them up using new features
+    * Adjusted the width of crew type and playbook input
+    * Roll template header changed to have character name and text inline
+    * Disabled spell checking on all input fields
+    * Bypassed unnecessary extra padding around the sheet
+    * Veteran special ability added to all playbooks for clarity
+    * Frame features are now a repeating section, as they should be
+    * Improved spacing for action dots when expanding the sheet
+
+### 1.15
+* Added 10-clocks, courtesy of Chris McDonald
+* Fixed resistance bonuses erroneously applying to vice indulgence
+
+### 1.14
+* Changed font to Georgia for unified look on all platforms, and better alignment
+* Quality-of-life changes in several places
 
 ### 1.13
 * Visual improvements

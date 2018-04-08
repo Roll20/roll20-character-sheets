@@ -37,5 +37,29 @@ April 9 - Added additional modifier fields and tweaked the UI some.
 
 April 18 - updated the preview image and the jason file to reflect it.
 
+August - various updates listed below
+          Added Game note field
+          Combined inventory tabs Worn and Carried into one tab
+          Modified the Ranged combat section to include the option to add the ability hit modifier. This is to allowed the use of dex modifiers instead of str mods on range attacks.
+          Modified the melee weapon section to support the use of the optional Light weapon rule which allows the dex mod to be used to hit instead of the str modifier.
+          Added sheet workers to enable the inventory to add up the weight of items listed and display them in the encumbrance section.
+          Separated the Saving throw "Spells" into it's own field due to some races have a specific racial modifier along with some supplements allow a specific modifier to be applied to it for being a magic-user.
+          Hardcoded thieves skills into the sheet for beginning players but left those fields open to being edited (fields are not removable but locked in place).
+          Moved the optional tab to the right of the Equipment tab.
+          Moved the Saving throw section to combat tab (adjustments are a work in progress)
+          Moved the class/race notes to the main tab
+          
+September - Updates to the sheet listed below
+          Trimmed Spell section down: Remove the Cast time, damage type, and Description fields from the all spell books
+          Drop down fields have been altered. Any non or none text has been changed to "--" to fit the field better.
+          Combat section: Damage fields for melee and ranged attacks have be reverted back to text fields to allow customized dice amounts.
+          Initiative field: Drop down menu has be removed and text field has been added. This is to allow customized dice amounts.
+          Basic Abilities: Combed the rulebook and added some additional fields and changed some text output to reflect the rolls.
+          Went from opening doors to Opening stuck doors, Opening locked doors, and bending bars. Each have their specific dice as per core rules.
+          Adding more popup info on fields if hovered over. More will be added over time.
+          Saving throws: Split Saving throw "Spells" off to it's own field due to some races and class options having a specific modifier for that save.
+          
+October - Fixed various errors in the spellbook code and removed non-bfrpg fields in the saving throw section.
+          
 **Credit Where Credit is Due**
 The CSS and much of the layout is lifted from the work of allenmaher's BECMI sheet who lifted the excellent work of John Myles (@Actoba on roll20) and the 5e Dungeons and Dragons sheet.
