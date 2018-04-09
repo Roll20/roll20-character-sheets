@@ -1,10 +1,10 @@
 <!-- RoleMaster Standard System Character Sheet -->
 <!-- by Diana P. -->
 <!-- I borrowed some code/equations from Brian. And Sam. And Aaron I. And others -->
-<!-- Version 2.3.13 (full nested calculations; sheet helpers; xp calculation.) dated 12/11/2017 -->
+<!-- Version 2.3.15 (full nested calculations; sheet helpers; xp calculation.) dated 04/09/2018 -->
 <input type="hidden" name="attr_character_sheet" title="character-sheet" value="RMSS-FullCalcs"/>
-<input type="hidden" name="attr_currentsheetversion" title="currentsheetversion" value="3.13" />
-<p style="font-size: 0.6em;">V2.<span name="attr_sheetversion" title="sheetversion" ></span> 12/11/17 by Diana P.</p>
+<input type="hidden" name="attr_currentsheetversion" title="currentsheetversion" value="3.15" />
+<p style="font-size: 0.6em;">V2.<span name="attr_sheetversion" title="sheetversion" ></span> 04/09/18 by Diana P.</p>
 <input type="radio" class="sheet-switch-pc-show sheet-switch" title="npc-show" name="attr_npc-show" value="1" checked="checked" /><span style="text-align: left;"><span data-i18n="pc">PC</span> &nbsp; &nbsp; </span>
 <input type="radio" class="sheet-switch-npc-show sheet-switch" title="npc-show" name="attr_npc-show" value="2" /><span style="text-align: left;"><span data-i18n="npc">NPC</span> &nbsp; &nbsp; </span>
 <input type="radio" class="sheet-switch-rtmplt-show sheet-switch" title="npc-show" name="attr_npc-show" value="3" /><span style="text-align: left;" data-i18n="roll-templates">Roll Templates</span>
@@ -391,6 +391,22 @@
 									<span class="sheet-table-data-center"><input type="text" style="width: 50px;" name="attr_hpp3hactive" title="hpp3hactive" value="1" disabled="true" /></span>
 									<span class="sheet-table-data-center"> &nbsp; &nbsp; <span data-i18n="power-points-per-3-hours-active">Power Points / 3 hrs active</span>: </span>
 									<span class="sheet-table-data-center"><input type="text" style="width: 50px;" name="attr_ppp3hactive" title="ppp3hactive" value="1" disabled="true" /></span>
+								</div>
+							</td>
+						</tr>
+						<tr> 
+							<td>
+								<div class="sheet-table-row"> 
+									<span class="sheet-table-data-center"><span data-i18n="exhaustion-points-per-minute-resting">Exhaustion Points / min resting</span>: </span>
+									<span class="sheet-table-data-center"><input type="text" style="width: 50px;" name="attr_eppmrest" title="eppmrest" value="(((ceil((@{cobonus}+0.5)/2) + 1) + abs(ceil((@{cobonus}+0.5)/2) - 1)) / 2)" disabled="true" /></span>
+								</div>
+								<div class="sheet-table-row"> 
+									<span class="sheet-table-data-center"><span data-i18n="exhaustion-points-per-half-hour-sleeping">Exhaustion Points / .5 hrs sleep</span>: </span>
+									<span class="sheet-table-data-center"><input type="text" style="width: 50px;" name="attr_epphhsleep" title="epphhsleep" value="(@{exhaustionpoints})" disabled="true" /></span>
+								</div>
+								<div class="sheet-table-row"> 
+									<span class="sheet-table-data-center"><span data-i18n="exhaustion-points-per-3-minutes-active">Exhaustion Points / 3 mins active</span>: </span>
+									<span class="sheet-table-data-center"><input type="text" style="width: 50px;" name="attr_epp3mactive" title="epp3mactive" value="1" disabled="true" /></span>
 								</div>
 							</td>
 						</tr>
@@ -8785,6 +8801,12 @@
 					<td rowspan="9"><b><span data-i18n="gems-and-jewelry">Gems & Jewelry</span></b><br><textarea rows="12" cols="55" style="width: 500px;" name="attr_gems" title="gems"></textarea></td>
 				</tr>
 				<tr>
+					<td><span> </span></td>
+					<td><input type="text" style="width: 80px;" name="attr_coinlabel1" title="coinlabel1" /></td>
+					<td><input type="text" style="width: 80px;" name="attr_coinlabel2" title="coinlabel2" /></td>
+					<td><input type="text" style="width: 80px;" name="attr_coinlabel3" title="coinlabel3" /></td>
+				</tr>
+				<tr>
 					<td><span data-i18n="mithril">Mithril</span></td>
 					<td><input type="text" style="width: 80px;" name="attr_mithril1" title="mithril1" /></td>
 					<td><input type="text" style="width: 80px;" name="attr_mithril2" title="mithril2" /></td>
@@ -9348,7 +9370,7 @@
 				<td><span data-i18n="demon-type-or-undead-class">Demon Type or Undead Class</span>:</td>
 				<td><input type="text" name="attr_class" title="class" /></td> 
 			</tr>
-			<tr> <td><span data-i18n="level">Level</span>:</td><td><input type="text" name="attr_level" title="level" /></td> 
+			<tr> <td><span data-i18n="level">Level</span>:</td><td><input type="text" name="attr_npclevel" title="npclevel" /></td> 
 				<td><span data-i18n="level-code">Level Code</span>:<input type="text" name="attr_levelcode" title="levelcode" style="width: 3em;" /></td> 
 			</tr>
 		  </tbody>
@@ -11980,10 +12002,15 @@ on("change:weightcarried change:weightcarriedcopy change:weightbackpack change:w
 function StartingSetup(version, cversion, calc, langsmoved) {
 	mod = version;
 	console.log('/* ----------entering StartingSetup; sheetversion:' + version + '  cversion:' + cversion + '  calc:' + calc + '------------ */' + langsmoved);
-	if ((version < cversion) || (isNaN(version)) || (calc == 0)) {
+	if (version < cversion) {mod = cversion;}
+	if ((version < 3.14) || (isNaN(version))) {
 		mod = cversion;
+		if (version < 3.14) {
+			getAttrs(["level"], function(values) {
+				setAttrs({ "npclevel": values.level }); 	// fix npclevel to be the same as level if this is the first time run
+			});
+		}
 		if ((isNaN(version)) || (calc == 0)) {
-//			setAttrs({ "variablestatbonuscalc": 1 });
 //				copy repeating_skills_skillranksbonus to repeating_skills_skillrankbonus to fix typo so that the calc function works on these.
 			getSectionIDs("repeating_skills", function(idarray){
 				if (idarray.length>0) {
@@ -12229,7 +12256,8 @@ on("change:skillcalc", function() {
 //  <!---- Run the setup to fix the npc Base Hits Code based on npchitscode (depreciated) once when the sheet is first opened ---->
 on("sheet:opened", function() {
   getAttrs(["sheetversion", "currentsheetversion", "npcbasehitscode", "npchitscode", "npcexhaustmiscbonus", "npchitsperleveldiff", "npcstaminabonus"], function(values) {
-	if (parseFloat(values.sheetversion) < parseFloat(values.currentsheetversion)){
+	if (parseFloat(values.sheetversion) < 3.13){
+// 	 if (parseFloat(values.sheetversion) < parseFloat(values.currentsheetversion)){
 		if (parseFloat(values.npchitscode) == .01){		//-
 			setAttrs({
 				npcbasehitscode: 0 
@@ -12632,7 +12660,7 @@ on("change:npcimportcheckbox", function(){
                     if(npcinputfile.class!=null)
                         attributes.class=npcinputfile.class;
                     if(npcinputfile.level!=null)
-                        attributes.level=npcinputfile.level;
+                        attributes.npclevel=npcinputfile.level;
                     if(npcinputfile.levelcode!=null)
                         attributes.levelcode=npcinputfile.levelcode;
                     if(npcinputfile.carrycapacity!=null)
@@ -13290,7 +13318,7 @@ on("change:npcimportcheckbox", function(){
 						
                     if(npcinputfile.creature!=null){
                         attributes.npcname=npcinputfile.creature;
- //                       attributes.character_name=npcinputfile.creature;	// this is not working......
+                        attributes.character_name=npcinputfile.creature;	
 					}
 					
 					attributes.npcimportcheckbox="0";
