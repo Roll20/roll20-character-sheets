@@ -101,11 +101,14 @@
                 <td rowspan="3" class="rollcontainer">
                     <button type="roll" name="roll_check" value="@{rollstyle}@{rolltype}"></button>
                 </td>
+                <td rowspan="3">
+                    <button type="roll" name="roll_initiative" value="&{template:wod-initiative} {{name=@{character_name}}} {{dexterity=@{dexterity}}} {{composure=@{composure}}} {{fastReflexes=@{fast_reflexes}}} {{initiativePenalty=@{initiative_penalty}}} {{result=[[1d10 + @{dexterity} + @{composure} + @{fast_reflexes} + @{initiative_penalty} &{tracker}]]}}">Roll Initiative</button>
+                </td>
                 <td>
                     <input type="radio" class="sheet-attr" name="attr_rollstyle" value="@{roll_base}" title="Sheet Roll" checked="checked" />
                     <span class="sheet-attr">Sheet Roll</span>
                 </td>
-            </tr>    
+            </tr>   
             <tr>
                 <td>
                     <input type="radio" class="sheet-attr" name="attr_rollstyle" value="@{rollattack}" />
@@ -180,6 +183,7 @@
     <span>Species Factor: </span><input type="number" name="attr_species_factor" value="5" />
     <span>Fleet of Foot: </span><input type="number" name="attr_fleet_of_foot" value="0" /><br><br>
     <span>Fast Reflexes: </span><input type="number" name="attr_fast_reflexes" value="0" />
+    <span>Iron Stamina: </span><input type="number" name="attr_iron_stamina" value="0" />
 </div>    
 
 <!-- CHARACTER INFO FIELDS -->
@@ -2175,7 +2179,30 @@
             </td>
         </tr>
     </table>
-</rolltemplate> 
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-wod-initiative">
+    <table>
+        <tr><th>{{name}} rolls initiative</th></tr>
+        <tr><td class="attr">
+            {{#dexterity}}
+                Dexterity({{dexterity}})<br>
+            {{/dexterity}}
+            {{#composure}}
+                Composure({{composure}})<br>
+            {{/composure}}
+            {{#fastReflexes}}
+                Fast Reflexes({{fastReflexes}})<br>
+            {{/fastReflexes}}
+            {{#initiativePenalty}}
+                Initiative Penalty({{initiativePenalty}})<br>
+            {{/initiativePenalty}}
+        </td></tr>
+        <tr>
+            <td class="result">Initiative {{result}}</td>        
+        </tr>
+    </table>
+</rolltemplate>
 
 <rolltemplate class="sheet-rolltemplate-wod-attack">
     <table>
@@ -2893,6 +2920,10 @@
     on("change:bonus_moralhealth", function() {
         updateMoralHealth();
     });
+    
+    on("change:bonus_moralhealth", function() {
+        updateMoralHealth();
+    });
 
     var updateRolls = function(stat) {
         var type;
@@ -3056,7 +3087,7 @@
     }
 
     var updateAttacks = function() {
-        getAttrs(["strength","attack","attack_initiative0","attack_initiative1","attack_initiative2","attack_initiative3","attack_initiative4","attack_strength0","attack_strength1","attack_strength2","attack_strength3","attack_strength4","armor_flag0","armor_flag1","armor_flag2","armor_strength0","armor_strength1","armor_strength2","health","healthbox_1","healthbox_2","healthbox_3","healthbox_4","healthbox_5","healthbox_6","healthbox_7","healthbox_8","healthbox_9","healthbox_10","healthbox_11","healthbox_12","healthbox_13","healthbox_14","healthbox_15","healthbox_16"], function(v) {
+        getAttrs(["strength","attack","iron_stamina","attack_initiative0","attack_initiative1","attack_initiative2","attack_initiative3","attack_initiative4","attack_strength0","attack_strength1","attack_strength2","attack_strength3","attack_strength4","armor_flag0","armor_flag1","armor_flag2","armor_strength0","armor_strength1","armor_strength2","health","healthbox_1","healthbox_2","healthbox_3","healthbox_4","healthbox_5","healthbox_6","healthbox_7","healthbox_8","healthbox_9","healthbox_10","healthbox_11","healthbox_12","healthbox_13","healthbox_14","healthbox_15","healthbox_16"], function(v) {
             var str = parseInt(v.strength, 10);
             var regex = /attack_type(.)/;
             var atknum = v.attack.match(regex)[1];
@@ -3067,14 +3098,15 @@
             if(v.armor_flag1 != 0 && str < parseInt(v.armor_strength1)) {apen = apen + (str - parseInt(v.armor_strength1));};
             if(v.armor_flag2 != 0 && str < parseInt(v.armor_strength2)) {apen = apen + (str - parseInt(v.armor_strength2));};
             var wound_penalty = 0;
+            var ironStamina = parseInt(v.iron_stamina, 10);
             if(v["healthbox_" + v.health] != 0) {
-                wound_penalty = -3;
+                wound_penalty = -3 + Math.min(ironStamina, 3);
             }
             else if(v["healthbox_" + (v.health - 1)] != 0) {
-                wound_penalty = -2;
+                wound_penalty = -2 + Math.min(ironStamina, 2);
             }
             else if(v["healthbox_" + (v.health - 2)] != 0) {
-                wound_penalty = -1;
+                wound_penalty = -1 + Math.min(ironStamina, 1);
             }
             setAttrs({
                 weapon_penalty: wpen,
