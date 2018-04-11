@@ -100,22 +100,21 @@ function updateTalents() {
 }
 
 function _updateTalents(prefix) {
-  // If we just up-ticked or down-ticked the up/downgrade, then quit early
-  // after handling that.
-  if(_tickDowngrade(prefix) || _tickUpgrade(prefix))
-    return;
-
-  parseAttrs([prefix + '_dice', prefix + '_trait', prefix + '_updowngrade', 'body_equation', 'mind_equation', 'charm_equation'], values => {
+  parseAttrs([prefix + '_dice', prefix + '_trait', prefix + '_upgrade', prefix + '_downgrade', 'body', 'mind', 'charm'], values => {
     var talentDice = values[prefix + '_dice'];
 
     var trait = values[prefix + '_trait'];
-    var traitDice = values[trait + '_equation'] || 'D0';
+    var traitDice = values[trait] || 'D0';
 
-    var updown = parseInt(values[prefix + '_updowngrade']) || 0;
+    var upgrade = values[prefix + '_upgrade'] || 0;
+    var downgrade = values[prefix + '_downgrade'] || 0;
+    var updownSum = parseInt(upgrade) - parseInt(downgrade);
 
     // Apply upgrades/downgrades to talent dice.
-    if(talentDice && updown)
-      talentDice = getUpDowngradedRoll(talentDice, updown);
+    if(talentDice && updownSum)
+      talentDice = getUpDowngradedRoll(talentDice, updownSum);
+    if(traitDice && traitDice !== '0' && updownSum)
+      traitDice = getUpDowngradedRoll(traitDice, updownSum);
 
     if(talentDice === 'null')
       setAttrs({
@@ -130,124 +129,27 @@ function _updateTalents(prefix) {
   });
 }
 
-function updateTraits(cb) {
-  _updateTrait('body', () => {
-    _updateTrait('mind', () => {
-      _updateTrait('charm', cb);
-    });
-  });
-}
-
-function _updateTrait(trait, cb) {
-  parseAttrs([trait, trait + '_updowngrade'], values => {
-    var traitDice = values[trait];
-    if(traitDice === 'null')
-      setAttrs({
-        [trait + '_equation']: 0
-      }, {}, cb);
-    else {
-      var updown = values[trait + '_updowngrade'] || 0;
-      if(updown)
-        traitDice = getUpDowngradedRoll(traitDice, updown);
-      setAttrs({
-        [trait + '_equation']: traitDice
-      }, {}, cb);
-    }
-  });
-}
-
-function _tickDowngrade(prefix) {
-  parseAttrs([prefix + '_tickdown', prefix + '_updowngrade'], values => {
-    let checked = !!values[prefix + '_tickdown'];
-    if(checked) {
-      updown = parseInt(values[prefix + '_updowngrade']) || 0;
-
-      setAttrs({
-        [prefix + '_updowngrade']: updown - 1,
-        [prefix + '_tickdown']: 0
-      });
-      return true;
-    }
-    return false;
-  });
-}
-
-function _tickUpgrade(prefix) {
-  parseAttrs([prefix + '_tickup', prefix + '_updowngrade'], values => {
-    let checked = !!values[prefix + '_tickup'];
-    if(checked) {
-      updown = parseInt(values[prefix + '_updowngrade']) || 0;
-
-      setAttrs({
-        [prefix + '_updowngrade']: updown + 1,
-        [prefix + '_tickup']: 0
-      });
-      return true;
-    }
-    return false;
-  });
-}
-
 // Change events
 
 on('change:repeating_talents', evt => {
   updateTalents();
 });
 
-onChange(['talent_cutieMark_dice', 'talent_cutieMark_trait', 'talent_cutieMark_updowngrade', 'talent_cutieMark_tickup', 'talent_cutieMark_tickdown'], () => {
+onChange(['talent_cutieMark_dice', 'talent_cutieMark_trait', 'talent_cutieMark_upgrade', 'talent_cutieMark_upgrade', 'talent_cutieMark_downgrade'], () => {
   updateCutieMarkTalent();
 });
 
-onChange(['talent_racial_dice', 'talent_racial_trait', 'talent_racial_updowngrade', 'talent_racial_tickup', 'talent_racial_tickdown'], () => {
+onChange(['talent_racial_dice', 'talent_racial_trait', 'talent_racial_upgrade', 'talent_racial_upgrade', 'talent_racial_downgrade'], () => {
   updateRacialTalent();
 });
 
-onChange(['body_equation', 'mind_equation', 'charm_equation'], () => {
+onChange(['body', 'mind', 'charm'], () => {
   updateTalents();
 });
 
 on('sheet:opened', () => {
   setAttrs({
-    character_sheet: 'TailsOfEquestria v1.3'
+    character_sheet: 'TailsOfEquestria v1.2'
   });
-  updateTraits(() => {
-    updateTalents();
-  });
-});
-
-// Up/downgrade tick events
-onChange(['body_tickup'], () => {
-  _tickUpgrade('body');
-});
-
-onChange(['body_tickdown'], () => {
-  _tickDowngrade('body');
-});
-
-onChange(['body', 'body_updowngrade'], () => {
-  _updateTrait('body');
-});
-
-onChange(['mind_tickup'], () => {
-  _tickUpgrade('mind');
-});
-
-onChange(['mind_tickdown'], () => {
-  _tickDowngrade('mind');
-});
-
-onChange(['mind', 'mind_updowngrade'], () => {
-  _updateTrait('mind');
-});
-
-onChange(['charm_tickup'], () => {
-  _tickUpgrade('charm');
-});
-
-onChange(['charm_tickdown'], () => {
-  _tickDowngrade('charm');
-});
-
-onChange(['charm', 'charm_updowngrade'], () => {
-  _updateTrait('charm');
+  updateTalents();
 });

@@ -4,22 +4,6 @@ This is a character sheet for Blades in the Dark for use on Roll20.
 
 ## Changelog
 
-### 2.6
-* Updates to the sheet to make the Korean translation work
-
-### 2.5
-* Added option to use Kirsty font if installed
-* Small graphical changes
-
-### 2.4
-* Several bugfixes
-* New clocks-only mode for the faction page for those who want a character sheet just to store clocks
-* Alchemicals repeating section
-
-### 2.3
-* Added broadcast button for sending information to chat for special abilities, clocks, and harm.
-* Image clocks have been replaced by a CSS version that looks sharper, especially in the roll template.
-
 ### 2.2
 * It is now possible to add a cohort to the character sheet. Automatic for Hounds.
 * Various small bugfixes
