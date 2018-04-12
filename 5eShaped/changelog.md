@@ -11,6 +11,12 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 17.0.6
+
+### Bug Fixes
+* [#697: NPC right column overlaps left column in edit mode](https://bitbucket.org/mlenser/5eshaped/issues/697/npc-right-column-overlaps-left-column-in)
+* [#704: Princes of the Apocalypse Module fails to convert creature attacks actions](https://bitbucket.org/mlenser/5eshaped/issues/704/princes-of-the-apocalypse-module-fails-to)
+
 ## 17.0.5
 
 ### Bug Fixes
@@ -312,7 +318,7 @@ The sheet will always upgrade itself unless I specify otherwise, though some thi
 
 * Fixed a bug where prepared_matters_var was not set on new character. Old characters can re-toggle that value on the spells section to have the chat output correct. Closes. [#513: Spell preparation still bugged?](https://bitbucket.org/mlenser/5eshaped/issues/513/spell-preparation-still-bugged)
 * Rests will now output a message even if they have not recharged anything: "Nothing recharged". Closes [#514: Short rest doesn't output anything if there's nothing to recharge](https://bitbucket.org/mlenser/5eshaped/issues/514/short-rest-doesnt-output-anything-if)
-* [#512: Companion script-imported spell issues](https://bitbucket.org/mlenser/5eshaped/issues/512/companion-script-imported-spell-issues)
+* [#512: Script-imported spell issues](https://bitbucket.org/mlenser/5eshaped/issues/512/companion-script-imported-spell-issues)
 
 ## 14.2.3
 
