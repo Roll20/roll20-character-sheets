@@ -5,6 +5,10 @@
 
 ### Changelog
 
+### 1.8.9.98a on 2018 March 10th
+* Fixed Speed Calculations if Mighty is 0
+    - Was halving speed even if no heavy items
+
 ### 1.8.9.98 on 2018 March 4th
 * Fixed a new character sheet not auto calculating Feat & Attribute Point Totals
 * Fixed Speed changes based on Max Heavy amount
