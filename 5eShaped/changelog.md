@@ -11,6 +11,14 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 17.1.0
+
+### Features
+* Added a myriad of attachers. Closes [#708: Add attacher functionality to NPC Actions](https://bitbucket.org/mlenser/5eshaped/issues/708/add-attacher-functionality-to-npc-actions)
+
+### Bug Fixes
+* [#707: D&D 5e (5eShaped) Brutal Critical error](https://bitbucket.org/mlenser/5eshaped/issues/707/d-d-5e-5eshaped-brutal-critical-error)
+
 ## 17.0.6
 
 ### Bug Fixes
