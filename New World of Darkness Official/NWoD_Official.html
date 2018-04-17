@@ -1915,7 +1915,7 @@
 <input type="hidden" name="attr_attack_base_damage" value="((@{attack_damage0}+0)*@{attack_flag0})+((@{attack_damage1}+0)*@{attack_flag1})+((@{attack_damage2}+0)*@{attack_flag2})+((@{attack_damage3}+0)*@{attack_flag3})+((@{attack_damage4}+0)*@{attack_flag4})" />
 <input type="hidden" name="attr_roll_array" />
 <input type="hidden" name="attr_roll_base" />
-
+<input type="hidden" name="attr_potency_name" />
     
 </div>
 
@@ -2284,7 +2284,8 @@
     var skills = ["academics","computer","crafts","investigation","medicine","occult","politics","science","athletics","brawl","drive","firearms","larceny","stealth","survival","weaponry","animalken","empathy","expression","intimidation","persuasion","socialize","streetwise","subterfuge"];
     var normalStats = ["intelligence","wits","resolve","strength","dexterity","stamina","presence","manipulation","composure","academics","computer","crafts","investigation","medicine","occult","politics","science","athletics","brawl","drive","firearms","larceny","stealth","survival","weaponry","animalken","empathy","expression","intimidation","persuasion","socialize","streetwise","subterfuge"];
     var powers = ["animalism","auspex","celerity","dominate","majesty","nightmare","obfuscate","protean","resilience","vigor","crúac","thebansorcery","death","fate","forces","life","matter","mind","prime","spirit","space","time"];
-    var allStats = ["intelligence","wits","resolve","strength","dexterity","stamina","presence","manipulation","composure","academics","computer","crafts","investigation","medicine","occult","politics","science","athletics","brawl","drive","firearms","larceny","stealth","survival","weaponry","animalken","empathy","expression","intimidation","persuasion","socialize","streetwise","subterfuge","animalism","auspex","celerity","dominate","majesty","nightmare","obfuscate","protean","resilience","vigor","crúac","thebansorcery","death","fate","forces","life","matter","mind","prime","spirit","space","time"];
+    var allStats = ["intelligence","wits","resolve","strength","dexterity","stamina","presence","manipulation","composure","academics","computer","crafts","investigation","medicine","occult","politics","science","athletics","brawl","drive","firearms","larceny","stealth","survival","weaponry","animalken","empathy","expression","intimidation","persuasion","socialize","streetwise","subterfuge","animalism","auspex","celerity","dominate","majesty","nightmare","obfuscate","protean","resilience","vigor","crúac","thebansorcery","death","fate","forces","life","matter","mind","prime","spirit","space","time","potency"];
+    var potencyNames = { mortal1:"", mortal2:"", vampire1:"Blood Potency", vampire2:"Blood Potency", werewolf1:"Primal Urge", werewolf2:"Primal Urge", mage1:"Gnosis", mage2:"Gnosis", promethean1:"Azoth", promethean2:"Azoth", changeling1:"Wyrd", changeling2:"Wyrd", demon:"Primum", beast:"Lair", hunter:"", geist1:"Psyche", mummy1:"Sekhem" };
 
     on("change:intelligence_flag", function() {
         updateRolls("intelligence");
@@ -2910,6 +2911,7 @@
 
     on("change:sheettype", function() {
         updateHealth();
+        updatePotencyName();
     });
 
     on("change:resilience", function() {
@@ -2927,16 +2929,24 @@
     on("change:bonus_moralhealth", function() {
         updateMoralHealth();
     });
-    
+
     on("change:iron_stamina", function() {
         updateWoundPenalties();
+
+    on("change:potency change:potency_flag", function() {
+       updateRolls("potency"); 
+    });
+    
+    on("sheet:opened", function() {
+        updatePotencyName();
+
     });
 
     var updateRolls = function(stat) {
         var type;
         var stat_flag = stat + "_flag";
         var rarray = [];
-        getAttrs(["attack","rollstyle","roll_array","attack_type0","attack_type1","attack_type2","attack_type3","attack_type4","intelligence_flag","wits_flag","resolve_flag","strength_flag","dexterity_flag","stamina_flag","presence_flag","manipulation_flag","composure_flag","academics_flag","computer_flag","crafts_flag","investigation_flag","medicine_flag","occult_flag","politics_flag","science_flag","athletics_flag","brawl_flag","drive_flag","firearms_flag","larceny_flag","stealth_flag","survival_flag","weaponry_flag","animalken_flag","empathy_flag","expression_flag","intimidation_flag","persuasion_flag","socialize_flag","streetwise_flag","subterfuge_flag","intelligence","wits","resolve","strength","dexterity","stamina","presence","manipulation","composure","academics","computer","crafts","investigation","medicine","occult","politics","science","athletics","brawl","drive","firearms","larceny","stealth","survival","weaponry","animalken","empathy","expression","intimidation","persuasion","socialize","streetwise","subterfuge","animalism","animalism_flag","auspex","auspex_flag","celerity","celerity_flag","dominate","dominate_flag","majesty","majesty_flag","nightmare","nightmare_flag","obfuscate","obfuscate_flag","protean","protean_flag","resilience","resilience_flag","vigor","vigor_flag","crúac","crúac_flag","thebansorcery","thebansorcery_flag","death","death_flag","fate","fate_flag","forces","forces_flag","life","life_flag","matter","matter_flag","mind","mind_flag","prime","prime_flag","spirit","spirit_flag","space","space_flag","time","time_flag"], function(v) {
+        getAttrs(["attack","rollstyle","roll_array","attack_type0","attack_type1","attack_type2","attack_type3","attack_type4","intelligence_flag","wits_flag","resolve_flag","strength_flag","dexterity_flag","stamina_flag","presence_flag","manipulation_flag","composure_flag","academics_flag","computer_flag","crafts_flag","investigation_flag","medicine_flag","occult_flag","politics_flag","science_flag","athletics_flag","brawl_flag","drive_flag","firearms_flag","larceny_flag","stealth_flag","survival_flag","weaponry_flag","animalken_flag","empathy_flag","expression_flag","intimidation_flag","persuasion_flag","socialize_flag","streetwise_flag","subterfuge_flag","intelligence","wits","resolve","strength","dexterity","stamina","presence","manipulation","composure","academics","computer","crafts","investigation","medicine","occult","politics","science","athletics","brawl","drive","firearms","larceny","stealth","survival","weaponry","animalken","empathy","expression","intimidation","persuasion","socialize","streetwise","subterfuge","animalism","animalism_flag","auspex","auspex_flag","celerity","celerity_flag","dominate","dominate_flag","majesty","majesty_flag","nightmare","nightmare_flag","obfuscate","obfuscate_flag","protean","protean_flag","resilience","resilience_flag","vigor","vigor_flag","crúac","crúac_flag","thebansorcery","thebansorcery_flag","death","death_flag","fate","fate_flag","forces","forces_flag","life","life_flag","matter","matter_flag","mind","mind_flag","prime","prime_flag","spirit","spirit_flag","space","space_flag","time","time_flag","potency","potency_flag", "potency_name"], function(v) {
             allStats.forEach(function(x) {
                 var flagname = x + "_flag";
                 if(parseInt(v[flagname], 10) != 0) {
@@ -2950,7 +2960,7 @@
                         rarray.splice(rarray.indexOf(stat), 1);
                     }
                 }
-                else {
+                else if (stat != "potency") {
                     if(attributes.indexOf(stat) > -1) {
                         type = "attribute";
                     }
@@ -3002,17 +3012,26 @@
             var order = [];
             rarray.filter(function(x){return attributes.indexOf(x) > -1}).forEach(function(x) {order.push(x);});
             rarray.filter(function(x){return skills.indexOf(x) > -1}).forEach(function(x) {order.push(x);});
-            rarray.filter(function(x){return normalStats.indexOf(x) === -1}).forEach(function(x) {order.push(x);});
+            if (rarray.indexOf("potency") > -1) {order.push("potency");}
+            rarray.filter(function(x){return normalStats.indexOf(x) === -1 && x != "potency"}).forEach(function(x) {order.push(x);});
+            
+            var names = order.map(function(x) {
+                if (x == "potency"){
+                    return v.potency_name;
+                }
+                return x.charAt(0).toUpperCase() + x.slice(1);
+            })
+            
             var base = "&{template:wod-simple} {{name=@{character_name}}} {{option=?{Dice Pool|0}}} {{result=[[{(?{Dice Pool|1}@{rolltype}";
             if(order.length > 0) {
-                base = "&{template:wod-3part} {{name=@{character_name}}} {{mod=[[?{Modifiers|0}]]}} {{woundpenalty=[[@{wound_penalty}]]}} {{part1=" + order[0].charAt(0).toUpperCase() + order[0].slice(1) + "}} {{part1pool=" + v[order[0]] + "}}";
+                base = "&{template:wod-3part} {{name=@{character_name}}} {{mod=[[?{Modifiers|0}]]}} {{woundpenalty=[[@{wound_penalty}]]}} {{part1=" + names[0] + "}} {{part1pool=" + v[order[0]] + "}}";
                 var result = " {{result=[[{((?{Modifiers|0}+@{wound_penalty}+" + v[order[0]];
                 if(order.length > 1) {
-                    base = base + " {{part2=" + order[1].charAt(0).toUpperCase() + order[1].slice(1) + "}} {{part2pool=" + v[order[1]] + "}}";
+                    base = base + " {{part2=" + names[1] + "}} {{part2pool=" + v[order[1]] + "}}";
                     result = result + "+" + v[order[1]];
                 }
                 if(order.length > 2) {
-                    base = base + " {{part3=" + order[2].charAt(0).toUpperCase() + order[2].slice(1) + "}} {{part3pool=" + v[order[2]] + "}}";
+                    base = base + " {{part3=" + names[2] + "}} {{part3pool=" + v[order[2]] + "}}";
                     result = result + "+" + v[order[2]];
                 }
                 base = base + result + ")@{rolltype}"
@@ -3023,8 +3042,9 @@
                     display = "Simple Roll";
                 }
                 else {
-                    display = order.join(" +\n");
-                    display = display.replace(/\b./g, function(x){ return x.toUpperCase(); });
+                    //display = order.join(" +\n");
+                    //display = display.replace(/\b./g, function(x){ return x.toUpperCase(); });
+                    display = names.join(" +\n");
                 }
             }
             else if(v.rollstyle === "@{rollattack}") {
@@ -3157,5 +3177,12 @@
             });
         });
     }
-
+    
+    var updatePotencyName = function() {
+        getAttrs(["sheettype"], function(v){
+            setAttrs({
+                potency_name: potencyNames[v.sheettype]
+            });
+        });
+    }
 </script>
