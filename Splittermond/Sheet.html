@@ -121,6 +121,7 @@
                         <tr bgcolor="#81BEF7">
                             <td colspan=3>Schadensmodifikator</td>
                             <td align="center"><input type="number" name="attr_schadensmodnsc" value=0 readonly="true" style="text-align: center; background-color:#81BEF7;" /></td>
+                            <td><table><tr><td>Schmerzimmun?</td><td>&nbsp;</td><td align="center"><input type='checkbox' value='1' name="attr_schmerzimmunnsc" /></td></tr></table></td>
                         </tr>
                         <tr>
                             <td>Fokus &nbsp;</td>
@@ -3212,55 +3213,61 @@ on("change:rasse", function(f) {
     });
 });
 
-on("change:lpnscgesamt", function(f) {
-    getAttrs(["lpnscgesamt", "lebenspunktensc", "nschealth"], function(v) {
-        var mod;
-        var row = Math.ceil( ((+v.lebenspunktensc * +v.nschealth) - +v.lpnscgesamt) / +v.lebenspunktensc );
-        if (row < 0) { row = 0; }
-        if (+v.nschealth == 1) {
-            mod = 0;
-        } else if (+v.nschealth == 3) {
-            switch(row) {
-                case 0:
-                case 1:
-                    mod = 0;
-                    break;
-                case 2:
-                    mod = 2;
-                    break;
-                case 3:
-                    mod = 8;
-                    break;
-                default:
-                    mod = 99;
-                    break;
+on("change:lpnscgesamt change:schmerzimmunnsc", function(f) {
+    getAttrs(["lpnscgesamt", "lebenspunktensc", "nschealth", "schmerzimmunnsc"], function(v) {
+        if (+v.schmerzimmunnsc == 0) {
+            var mod;
+            var row = Math.ceil( ((+v.lebenspunktensc * +v.nschealth) - +v.lpnscgesamt) / +v.lebenspunktensc );
+            if (row < 0) { row = 0; }
+            if (+v.nschealth == 1) {
+                mod = 0;
+            } else if (+v.nschealth == 3) {
+                switch(row) {
+                    case 0:
+                    case 1:
+                        mod = 0;
+                        break;
+                    case 2:
+                        mod = 2;
+                        break;
+                    case 3:
+                        mod = 8;
+                        break;
+                    default:
+                        mod = 99;
+                        break;
+                }
+            } else if (+v.nschealth == 5) {
+                switch(row) {
+                    case 0:
+                    case 1:
+                        mod = 0;
+                        break;
+                    case 2:
+                        mod = 1;
+                        break;
+                    case 3:
+                        mod = 2;
+                        break;
+                    case 4:
+                        mod = 4;
+                        break;
+                    case 5:
+                        mod = 8;
+                        break;
+                    default:
+                        mod = 99;
+                        break;
+                }
             }
-        } else if (+v.nschealth == 5) {
-            switch(row) {
-                case 0:
-                case 1:
-                    mod = 0;
-                    break;
-                case 2:
-                    mod = 1;
-                    break;
-                case 3:
-                    mod = 2;
-                    break;
-                case 4:
-                    mod = 4;
-                    break;
-                case 5:
-                    mod = 8;
-                    break;
-                default:
-                    mod = 99;
-                    break;
-            }
+            setAttrs({
+                schadensmodnsc: mod
+            });
+        } else if (+v.schmerzimmunnsc == 1) {
+            setAttrs({
+                schadensmodnsc: 0
+            });
         }
-        setAttrs({
-            schadensmodnsc: mod
-        });
     });
 });
 
