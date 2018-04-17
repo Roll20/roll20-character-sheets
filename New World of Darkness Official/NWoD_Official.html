@@ -171,12 +171,13 @@
 <div class="header settings">
     <span class="subheader">Customizable Attribute Settings</span>
     <br>
-    <span>Defense Trait: </span><select name="attr_defense_base" />
-        <option value="(((@{dexterity} + @{wits}) - abs(@{dexterity} - @{wits})) / 2)" checked="checked">Lowest</option>
-        <option value="(((@{dexterity} + @{wits}) + abs(@{dexterity} - @{wits})) / 2)">Highest</option>
-        <option value="@{wits}">Wits</option>
-        <option value="@{dexterity}">Dexterity</option>
-        <option value="((((@{dexterity} + @{wits}) - abs(@{dexterity} - @{wits})) / 2) + (((@{Athletics} + 0) + abs(@{Athletics} - 0)) / 2))">Lowest + Athletics</option>
+    <span>Defense Trait: </span><select name="attr_defense_select" />
+        <option value="" disabled selected hidden>Defense?</option>
+        <option value="lowest">Lowest</option>
+        <option value="highest">Highest</option>
+        <option value="wits">Wits</option>
+        <option value="dexterity">Dexterity</option>
+        <option value="lowest_plus_athletics">Lowest + Athletics</option>
     </select><br><br>
     <span>Base Size: </span><input type="number" name="attr_base_size" value="5" />
     <input type="checkbox" class="sheet-normal" name="attr_giant" value="1" /><span></span><span> Giant</span>
@@ -1916,6 +1917,7 @@
 <input type="hidden" name="attr_attack_base_damage" value="((@{attack_damage0}+0)*@{attack_flag0})+((@{attack_damage1}+0)*@{attack_flag1})+((@{attack_damage2}+0)*@{attack_flag2})+((@{attack_damage3}+0)*@{attack_flag3})+((@{attack_damage4}+0)*@{attack_flag4})" />
 <input type="hidden" name="attr_roll_array" />
 <input type="hidden" name="attr_roll_base" />
+<input type="hidden" name="attr_defense_base" />
 <input type="hidden" name="attr_potency_name" />
     
 </div>
@@ -2912,6 +2914,7 @@
 
     on("change:sheettype", function() {
         updateHealth();
+        updateDefaultDefense();
         updatePotencyName();
     });
 
@@ -2931,6 +2934,13 @@
         updateMoralHealth();
     });
 
+    on("change:defense_select", function(eventInfo) {
+        updateDefense(eventInfo);
+    });
+    
+    on("sheet:opened", function() {
+        updateDefaultDefense();
+
     on("change:iron_stamina", function() {
         updateWoundPenalties();
 
@@ -2940,7 +2950,6 @@
     
     on("sheet:opened", function() {
         updatePotencyName();
-
     });
 
     var updateRolls = function(stat) {
@@ -3142,6 +3151,53 @@
                 initiative_penalty: init,
                 wound_penalty: wound_penalty
             });
+        });
+    }
+
+    var updateDefense = function(eventInfo) {
+        getAttrs(["athletics", "dexterity", "wits"], function(v) {
+            var athletics = parseInt(v.athletics, 10);
+            var dexterity = parseInt(v.dexterity, 10);
+            var wits = parseInt(v.wits, 10);
+            var defense;
+            switch (eventInfo.newValue) {
+                case "lowest": 
+                    defense = Math.min(dexterity, wits); 
+                    break;
+                case "highest": 
+                    defense = Math.max(dexterity, wits); 
+                    break;
+                case "wits": 
+                    defense = wits; 
+                    break;
+                case "dexterity": 
+                    defense = dexterity; 
+                    break;
+                case "lowest_plus_athletics": 
+                    defense = Math.min(dexterity, wits) + athletics; 
+                    break;
+            }
+            setAttrs({defense_base: defense});
+        });
+    }
+
+    var updateDefaultDefense = function() {
+        getAttrs(["sheettype"], function(v) {
+            var defense;
+            if (v.sheettype === "mortal2" ||
+                v.sheettype === "vampire2" ||
+                v.sheettype === "werewolf2" ||
+                v.sheettype === "mage2" ||
+                v.sheettype === "promethean2" ||
+                v.sheettype === "changeling2" ||
+                v.sheettype === "demon" ||
+                v.sheettype === "beast") {
+                defense = "lowest_plus_athletics";
+            }
+            else {
+                defense = "lowest";
+            }
+            setAttrs({defense_select: defense});
         });
     }
 
