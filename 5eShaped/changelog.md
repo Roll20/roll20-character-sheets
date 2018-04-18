@@ -11,6 +11,11 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 17.1.1
+
+### Bug Fixes
+* Added parsing to fix poor formatting of some Tome of Beasts creatures. Closes [#709: Tome of Beasts Monster imports not importing correctly](https://bitbucket.org/mlenser/5eshaped/issues/709/tome-of-beasts-monster-imports-not)
+
 ## 17.1.0
 
 ### Features
