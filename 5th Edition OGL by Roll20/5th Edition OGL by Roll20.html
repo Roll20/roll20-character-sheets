@@ -1400,6 +1400,19 @@
                     <button type="roll" name="roll_death_save" style="margin-top: 6px;" value="@{wtype}&{template:simple} {{rname=^{death-save-u}}} {{mod=@{death_save_bonus}}} {{r1=[[@{d20}+@{death_save_bonus}[MOD]@{globalsavingthrowbonus}]]}} {{normal=1}} @{global_save_mod} @{charname_output}" data-i18n="death-saves-u">DEATH SAVES</button> 
                 </div>
             </div>
+            <input type="hidden" class="exhaustion-toggle" name="attr_exhaustion_toggle" value="0">
+            <div class="exhaustion" style="position: relative;">
+                <input type="number" name="attr_exhaustion_level" step="1" value="0" min="0" max="6">
+                <div class="ex-descriptions">
+                    <span class="ex-description" name="attr_exhaustion_1"></span>
+                    <span class="ex-description" name="attr_exhaustion_2"></span>
+                    <span class="ex-description" name="attr_exhaustion_3"></span>
+                    <span class="ex-description" name="attr_exhaustion_4"></span>
+                    <span class="ex-description" name="attr_exhaustion_5"></span>
+                    <span class="ex-description" name="attr_exhaustion_6"></span>
+                </div>
+                <span class="label" data-i18n="exhaustion-u">EXHAUSTION LEVEL</span>
+            </div>
             <input type="hidden" class="ammoflag" name="attr_ammotracking">
             <div class="attacks" style="position: relative;">
                 <div class="top">
@@ -4419,6 +4432,13 @@
                     </select>
                     <span data-i18n-title="api-required-title" data-i18n="api-required-u" title="Try it now with easy one click API installation available with your Pro subscription." style="color:#666; cursor:help;">(API REQUIRED)</span>
                 </div>
+                <div class="row">
+                    <span data-i18n="exhaustion-setting-u">EXHAUSTION:</span>
+                    <select name="attr_exhaustion_toggle">
+                        <option value="1" data-i18n="on">On</option>
+                        <option value="0" data-i18n="off" selected="selected">Off</option>
+                    </select>
+                </div>
                 <div class="row title">
                     <span data-i18n="general-opts-u">GENERAL OPTIONS</span>
                 </div>
@@ -4523,6 +4543,12 @@
 <input type="hidden" name="attr_spell_attack_bonus" value="0">
 <input type="hidden" name="attr_spell_attack_mod" value="0">
 <input type="hidden" name="attr_npc_legendary_actions_desc" value="">
+<input type="hidden" name="attr_exhaustion_1" value="">
+<input type="hidden" name="attr_exhaustion_2" value="">
+<input type="hidden" name="attr_exhaustion_3" value="">
+<input type="hidden" name="attr_exhaustion_4" value="">
+<input type="hidden" name="attr_exhaustion_5" value="">
+<input type="hidden" name="attr_exhaustion_6" value="">
 
 <input type="hidden" name="attr_strength_mod" value="0">
 <input type="hidden" name="attr_dexterity_mod" value="0">
@@ -5867,6 +5893,40 @@
 
         var attackid = eventinfo.sourceAttribute.substring(17, 37);
         update_attacks(attackid);
+    });
+
+    on("change:exhaustion_level", function() {
+        var update = {
+            "exhaustion_1": "",
+            "exhaustion_2": "",
+            "exhaustion_3": "",
+            "exhaustion_4": "",
+            "exhaustion_5": "",
+            "exhaustion_6": ""
+        };
+
+        getAttrs(["exhaustion_level"], function(attrs) {
+            switch(+attrs["exhaustion_level"]) {
+                case 6:
+                    update["exhaustion_6"] = "• " + getTranslationByKey("exhaustion-6-u");
+                case 5:
+                    update["exhaustion_5"] = "• " + getTranslationByKey("exhaustion-5-u");
+                case 4:
+                    update["exhaustion_4"] = "• " + getTranslationByKey("exhaustion-4-u");
+                case 3:
+                    update["exhaustion_3"] = "• " + getTranslationByKey("exhaustion-3-u");
+                case 2:
+                    update["exhaustion_2"] = "• " + getTranslationByKey("exhaustion-2-u");
+                case 1:
+                    update["exhaustion_1"] = "• " + getTranslationByKey("exhaustion-1-u");
+                    break;
+                case 0:
+                    update["exhaustion_1"] = "• " + getTranslationByKey("exhaustion-0-u");
+                    break;
+            }
+
+            setAttrs(update, {silent: true});
+        });
     });
 
     on("change:drop_category", function(eventinfo) {
