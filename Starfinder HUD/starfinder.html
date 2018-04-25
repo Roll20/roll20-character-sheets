@@ -1,4 +1,4 @@
-﻿<!-- Note that currently the sheet's html/javascript is too long to be used by the repo to generate a sheet. I use the following regex on regexr.com
+<!-- Note that currently the sheet's html/javascript is too long to be used by the repo to generate a sheet. I use the following regex on regexr.com
 to easily shrink the line count to what the repo can handle:
 Look for: >\n\s*
 Replace with: >This pattern can be found at https://regexr.com/3mi9v
@@ -3240,7 +3240,6 @@ Replace with: >This pattern can be found at https://regexr.com/3mi9v
         //Function that acts as a traffic switch to determine how to react to many of the attribute changes.
         //This function needs some serious clean up which was on my to do list for the next version release once I had the release bugs handled.
         accessStarfinder = function (event){
-            TAS.log(event);
             var attribute = event.sourceAttribute,
                 repeatSec = event.sourceAttribute.match(/repeating_([^_]+)/) ? event.sourceAttribute.match(/repeating_([^_]+)/)[1] : false,
                 cloneRepAttr = JSON.parse(JSON.stringify(repeatingAttributes)),
@@ -3468,8 +3467,8 @@ Replace with: >This pattern can be found at https://regexr.com/3mi9v
         
         //Finds the item selected in the item compendium attribute and then creates the item and attack if necessary
         itemCompendium = function(item,itemID){
-            var setObj,weaponID;
-            item = equipment[item];
+            let setObj,weaponID;
+            item = equipment[item.toUpperCase()];
             if(item){
                 setObj={
                     [itemID+'bulk']:item.bulk,
@@ -3689,7 +3688,6 @@ Replace with: >This pattern can be found at https://regexr.com/3mi9v
 
         //Handles changes to current health that cause the reactive styling of the health container to change.
         healthHandler = function(attributes,event){
-            TAS.log('event: '+JSON.stringify(event));
             const setObj = _.reduce(['sp','hp','rp'],(memo,h)=>{
                 if(h==='sp'){
                     /*if(event.sourceAttribute==='sp'&&attributes.temp_hp*1>0&&event.newValue*1<event.previousValue*1){
@@ -3714,7 +3712,6 @@ Replace with: >This pattern can be found at https://regexr.com/3mi9v
                 return memo;
             },{health_status:0});
             setObj.health_status=Math.min(setObj.health_status,3);
-            TAS.log('setObj: '+JSON.stringify(setObj));
             setAttrs(setObj,{silent:true});
             return undefined;
         },
@@ -4420,14 +4417,11 @@ Replace with: >This pattern can be found at https://regexr.com/3mi9v
                             abilityMax = attributeMod;//abilityMax defaults to attributeMod if not moddable
                         }
                         if(attributes.sheet_type==='npc'&&obj.isSkill){
-                            TAS.log('obj.attr: '+obj.attr);
-                            TAS.log('base attr: '+attributes[obj[obj.attr.replace(/_ranks/,'')]]);
                             if(!attributes[obj[obj.attr.replace(/_ranks/,'')]]||attributes[obj[obj.attr.replace(/_ranks/,'')]]===''){
                                 abilityMax=0;
                             }else{
                                 abilityMax=abilityMax*-1;//counterbalances the fact that the NPCs use different settings
                             }
-                            TAS.log('abilityMax: '+abilityMax);
                         }
                         //assemble the numerical values of the attribute
                         let memoNum = _.reduce(obj.repeatParseField,(m,add)=>{//Handles fields that will have macro syntax in them
@@ -4478,6 +4472,9 @@ Replace with: >This pattern can be found at https://regexr.com/3mi9v
                                 +_.reduce(obj.addlBonus,(m,add)=>{//add any additional bonuses to the attribute (bonuses not specifically called out to this attribute)
                                     return m+(specificBonus[add]*1||0);
                                 },0);
+                        if(obj.attr==='initiative_npc'){
+                            TAS.log('memoNum: '+memoNum);
+                        }
                         //assembles the text values of the attribute
                         let memoText=_.reduce(obj.repeatTextAdds,(m,add)=>{//iterate through all of the attributes within the repeating item that should hold text
                                 return m+(setObj[id+add]||attributes[id+add]||'')
@@ -4516,7 +4513,10 @@ Replace with: >This pattern can be found at https://regexr.com/3mi9v
                         }
                         memoNum=memoNum || 0;
                         memoText=memoText || '';
-                        memo[id+obj.attr]=(memoText+' +'+memoNum).replace(/\s+\+\s*0/,'');
+                        memo[id+obj.attr]=(memoText+' +'+memoNum).replace(/(.+)\s+\+\s*0/,'$1');
+                        if(obj.attr==='initiative_npc'){
+                            TAS.log('memo[obj.attr]: '+memo[id+obj.attr]);
+                        }
                         if(obj.attr!=='total'||obj.repeating!=='attack'){
                             memo[id+obj.attr]=memo[id+obj.attr].replace(/^\s*\+/,'');
                         }
@@ -4565,17 +4565,17 @@ Replace with: >This pattern can be found at https://regexr.com/3mi9v
             }
         },
         
-        removeRows = function(rows){
+        removeRows = function(rows){//removes all repeating rows
             _.each(rows,(r)=>{
                 _.each(r.id,(id)=>{
                     removeRepeatingRow('repeating_'+r.section+'_'+id);
                 });
             });
-            beginImport();
+            beginImport();//then begins the import of a statblock
         },
         
         beginImport = function(){
-            const convertSize = {
+            const convertSize = {//convert text size to numerical value for the sheet
                     'fine':-4,
                     'diminutive':-3,
                     'tiny':-2,
@@ -4586,7 +4586,7 @@ Replace with: >This pattern can be found at https://regexr.com/3mi9v
                     'gargantuan':3,
                     'colossal':4
                 },
-                skillAbilities={
+                skillAbilities={//what it says on the tin
                    'acrobatics':'dexterity_mod',
                    'athletics':'strength_mod',
                    'bluff':'charisma_mod',
@@ -4608,11 +4608,11 @@ Replace with: >This pattern can be found at https://regexr.com/3mi9v
                    'survival':'wisdom_mod'
                 };
             getAttrs(['statblock','statblock_source'],(objs)=>{
-                objs.statblock=objs.statblock.replace(/\s+\n/g,'\n').replace(/[\-–—―−]/g,'-');
-                let lines = objs.statblock.split(/\n+/);
-                let section = 'header';
+                objs.statblock=objs.statblock.replace(/\s+\n/g,'\n').replace(/[\-–—―−]/g,'-');//replace any blank lines with just a single return. Also replace the various characters that can be used for "-" with a "-".
+                let lines = objs.statblock.split(/\n+/);//Split the statblock into discrete lines
+                let section = 'header';//All imports start at the header
                 
-                const Parsers = {
+                const Parsers = {//regex as strings for matching against each line to determine if we continue with the current recursive parse, or move onto a new section
                     "^\\s*DEFEN[Sc]E\\s*hp\\s+\\d+": defenseParser,
                     "^\\s*OFFEN[cS]E\\s*$": offenseParser,
                     "^\\s*STATISTICS\\s*$": statisticsParser,
@@ -4621,13 +4621,13 @@ Replace with: >This pattern can be found at https://regexr.com/3mi9v
                     "^environment":environmentParser,
                     "^organization":organizationParser
                 },
-                setParser = (lines) => {
+                setParser = (lines) => {//Tests the line and changes the parser if necessary
                     return !!Object.keys(Parsers).find( (regexp) => {
                         if(new RegExp(regexp,"i").test(lines[0])){
                             section = regexp;
                             parser = Parsers[regexp];
-                            if(/offen[sc]e|statistics|ecology|special\\s\+abilities|tactics/i.test(section)){
-                                lines.shift();
+                            if(/offen[sc]e|statistics|ecology|special\\s\+abilities|tactics/i.test(section)){//if the section is one of these, then jump to the next line (shift it out of the array)
+                                lines.shift(); 
                             }
                             return true;
                         }
@@ -4635,24 +4635,21 @@ Replace with: >This pattern can be found at https://regexr.com/3mi9v
                     });
                 };
                 
-                let parser = headerParser;
+                let parser = headerParser;//parser starts being assigned to headerParser
                 
-                let setObj = {};
-                while(lines.length){
-                    setParser(lines);
-                    [setObj,lines] = parser(setObj,lines);
+                let setObj = {};//initialize setObj
+                while(lines.length){//while there are lines do
+                    setParser(lines);//check the line and see if the parser needs to be changed
+                    [setObj,lines] = parser(setObj,lines);//call the parser in question, and modify setObj and lines to be what the parser returns
                 };
-                setObj['initiative_ability']=0;
-                if(setObj.initiative){
-                    setObj['npc_init']='+'+setObj['initiative'];
-                }
-                if(setObj.xp){
+                setObj['initiative_ability']=0;//npc initiative ability is set to none (aka 0);
+                if(setObj.xp){//the xp attribute is number type, so remove any commas.
                     setObj.xp=setObj.xp.replace(/,/g,'');
                 }
-                if(setObj.size){
+                if(setObj.size){//convert the size
                     setObj.size = convertSize[setObj.size.toLowerCase()];
                 }
-                _.each(_.keys(skillAbilities),(s)=>{
+                _.each(_.keys(skillAbilities),(s)=>{//iterate throught the skills and set the ranks accordingly
                     if(setObj[s]){
                         setObj[s+'_ranks']=(setObj[s]*1||0)-(setObj[skillAbilities[s]]*1||0);
                     }else{
@@ -4660,15 +4657,15 @@ Replace with: >This pattern can be found at https://regexr.com/3mi9v
                         setObj[s]='';
                     }
                 });
-                setObj.import=0;
+                setObj.import=0;//flip the import checkbox back to default so that it's styling returns to not being clicked.
                 setAttrs(setObj,{silent:true},(obj)=>{
-                    accessStarfinder({sourceAttribute:'bypass'});
+                    accessStarfinder({sourceAttribute:'bypass'});//run a full calc of the sheet to catch anything that was missed.
                 });
             });
         },
         
         headerParser = function(setObj, lines){
-            const regexs = {
+            const regexs = {//regexs as strings for matching against lines. the properties are arrays of what attributes (in a sub array) receive the value from each matching group
                 "(.*?) \\(?CR\\s*(\\d[\\/\\d]*)\\)?":[['character_name'],['cr']],//name and cr
                 'XP\\s*(.*)$':[['xp']],//xp
                 '(?:^|\\s+)(LG|NG|CG|LN|N|CE|LE|NE|CN)\\s+([^\\s]+)\\s+(.*)$':[['alignment'],['size'],['type_subtype']],//alignment, size, type/subtype
@@ -4676,9 +4673,9 @@ Replace with: >This pattern can be found at https://regexr.com/3mi9v
                 'aura\\s+(.+)':[['aura']],//aura
                 '(.*)':[['race']]//Race/Class Grafts
             };
-            const currLine = lines.shift();
+            const currLine = lines.shift();//remove the first line in the lines array and store it as currLine
             _.keys(regexs).find((r)=>{
-                if(new RegExp(r,'i').test(currLine)){
+                if(new RegExp(r,'i').test(currLine)){//when the line matches a regex, set the attributes to the values of the matching groups
                     let objMatch = currLine.match(new RegExp(r,'i'));
                     _.each(_.range(regexs[r].length),(l)=>{
                         _.each(regexs[r][l],(o)=>{
@@ -4689,9 +4686,9 @@ Replace with: >This pattern can be found at https://regexr.com/3mi9v
                 }
                 return false;
             });
-            return [setObj,lines];
+            return [setObj,lines];//return setObj and lines
         },
-        defenseParser = function(setObj, lines){
+        defenseParser = function(setObj, lines){//works as in headerParser
             const regexs = {
                 'defen[sc]e\\s+hp\\s*(\\d+)(?:\\s+rp\\s*(\\d+))?':[['hp','hp_max'],['rp','rp_max']],//name and cr
                 'eac\\s*(\\d+);\\s*kac\\s*(\\d+)(?:;\\s*(.+))?':[['eac'],['kac'],['ac_notes']],//xp
@@ -4714,7 +4711,7 @@ Replace with: >This pattern can be found at https://regexr.com/3mi9v
             });
             return [setObj,lines];
         },
-        offenseParser = function(setObj, lines){
+        offenseParser = function(setObj, lines){//mostly works as in headerParser
             const regexs = {
                 'speed\\s*(.+)':[['speed']],//name and cr
                 '(?:space\\s*([^;]+))?(?:;\\s*reach\\s*(.+))?':[['space'],['reach']],//initiative, senses, perception
@@ -4725,28 +4722,28 @@ Replace with: >This pattern can be found at https://regexr.com/3mi9v
             spelllikeRegex = /spell(?:-|\s+)like abilities/i,
             offensiveAbilityRegex = '([^\\(,;]+)(?:\\s*\\((.+?)\\))?';
             let currLine = lines.shift();
-            if(/^(?:melee|ranged)\s+/i.test(currLine)){
+            if(/^(?:melee|ranged)\s+/i.test(currLine)){//if the line contains melee or ranged attacks
                 let range = '';
-                currLine=currLine.replace(/(melee|ranged)\s+/i,(match,p1)=>{
+                currLine=currLine.replace(/(melee|ranged)\s+/i,(match,p1)=>{//remove the melee/ranged wording, and store what it was in range
                     range=p1;
                     return '';
                 });
-                let weapons = currLine.match(/.+?\s+\+?-?\d+\s+\(.+?\)/g);
+                let weapons = currLine.match(/.+?\s+\+?-?\d+\s+\(.+?\)/g);//separate out each of the weapons
                 if(weapons){
-                    weapons = _.map(weapons,(w)=>{
+                    weapons = _.map(weapons,(w)=>{//make an array of all the matches, including their capturing groups
                         return w.replace(/^(?:\s*,\s*|\s*or|\s*,\s*or)\s+/i,'').match(/(.+?)\s+\+?(-?\d+)\s+\((.+?)\)/);
                     });
-                    _.each(weapons,(w)=>{
+                    _.each(weapons,(w)=>{//parse each weapon
                         setObj=attackParser(setObj,_.rest(w),range);
                     });
                 }
-            }else if(skRegex.test(currLine)){
+            }else if(skRegex.test(currLine)){//if the line is the start of the spells known section, begin the spellparser
                 lines.unshift(currLine);
                 [setObj,lines]=spellParser(setObj,lines);
-            }else if(spelllikeRegex.test(currLine)){
+            }else if(spelllikeRegex.test(currLine)){//if the line is the start of the spell like section, bregin the spelllikeparser
                 lines.unshift(currLine);
                 [setObj,lines]=spellLikeParser(setObj,lines);
-            }else if(/^offensive\s+abilities/i.test(currLine)){
+            }else if(/^offensive\s+abilities/i.test(currLine)){//if the line contains offensive abilities, iterate through each ability
                 let abilities = currLine.replace(/^offensive\s+abilities\s*/i,'').match(new RegExp(offensiveAbilityRegex,'gi'));
                 _.each(abilities,(a)=>{
                     let rowID = 'repeating_ability_'+generateRowID()+'_',
@@ -4789,7 +4786,7 @@ Replace with: >This pattern can be found at https://regexr.com/3mi9v
                         });
                     }
                 });
-            }else{
+            }else{//otherwise, function as in headerParser
                 _.keys(regexs).find((r)=>{
                     if(new RegExp(r,'i').test(currLine)){
                         let objMatch = currLine.match(new RegExp(r,'i'));
@@ -4805,7 +4802,7 @@ Replace with: >This pattern can be found at https://regexr.com/3mi9v
             }
             return [setObj,lines];
         },
-        attackParser = function(setObj,weapon,range){
+        attackParser = function(setObj,weapon,range){//parses the values in an attack entry to make a repeating attack
             let rowID ='repeating_attack_'+generateRowID()+'_',
                 details,special,specialone,specialtwo,damage,type,damage2,specialsix;
             [setObj[rowID+'name'],setObj[rowID+'base_attack_bonus'],details]=weapon;
@@ -4833,7 +4830,7 @@ Replace with: >This pattern can be found at https://regexr.com/3mi9v
             setObj[rowID+'damage_total']=setObj[rowID+'damage_dice'];
             return setObj;
         },
-        spellParser = function(setObj,lines){
+        spellParser = function(setObj,lines){//parse the spells
             let currLine = lines.shift(),
                 source,caster_level,ranged,melee,per_day,spell_level,spells,spellDC;
             [,source,setObj['caster_level'],ranged,melee]=currLine.match(/(?:(.+?)\s+)?spells\s+(?:known|prepared)\s*\(cl\s*(\d+)\w{2}(?:[;,](?:\s*melee\s*\+?(\-?\d+))?[;,]?(?:\s*ranged\s*\+?(\-?\d+))?)?\)/i);
@@ -4864,7 +4861,7 @@ Replace with: >This pattern can be found at https://regexr.com/3mi9v
             }
             return [setObj,lines];
         },
-        spellLikeParser = function(setObj,lines){
+        spellLikeParser = function(setObj,lines){//parse the spell likes
             let currLine = lines.shift(),
                 source,ranged,melee,frequency,spells,spellDC;
             [,source,ranged,melee]=currLine.match(/(?:(.+?)\s+)?spell(?:\-|\s+)like\s+abilities\s*\(cl\s*\d+\w{2}(?:[;,](?:\s*melee\s*\+?(\-?\d+))?[;,]?(?:\s*ranged\s*\+?(\-?\d+))?)?\)/i);
@@ -4909,7 +4906,7 @@ Replace with: >This pattern can be found at https://regexr.com/3mi9v
             }
             return [setObj,lines];
         },
-        statisticsParser = function(setObj, lines){
+        statisticsParser = function(setObj, lines){//parse the statistics section
             const regexs = {
                     'str\\s*\\+?([\\-]?\\d+|[\\-]);\\s*dex\\s*\\+?([\\-]?\\d+|[\\-]);\\s*con\\s*\\+?([\\-]?\\d+|[\\-]);\\s*int\\s*\\+?([\\-]?\\d+|[\\-]);\\s*wis\\s*\\+?([\\-]?\\d+|[\\-]);\\s*cha\\s*\\+?([\\-]?\\d+|[\\-])':[['strength_mod'],['dexterity_mod'],['constitution_mod'],['intelligence_mod'],['wisdom_mod'],['charisma_mod']],//name and cr
                     'feats?\\s*(.+)':[['feats']],//Race/Class Grafts
@@ -4924,19 +4921,20 @@ Replace with: >This pattern can be found at https://regexr.com/3mi9v
                     p1=p1.toLowerCase().trim().replace(/\s+/g,'_');
                     setObj[p1]=p2;
                 });
-            }
-            _.keys(regexs).find((r)=>{
-                if(new RegExp(r,'i').test(currLine)){
-                    let objMatch = currLine.match(new RegExp(r,'i'));
-                    _.each(_.range(regexs[r].length),(l)=>{
-                        _.each(regexs[r][l],(o)=>{
-                            setObj[o]=objMatch[l + 1]||'';
+            }else{
+                _.keys(regexs).find((r)=>{
+                    if(new RegExp(r,'i').test(currLine)){
+                        let objMatch = currLine.match(new RegExp(r,'i'));
+                        _.each(_.range(regexs[r].length),(l)=>{
+                            _.each(regexs[r][l],(o)=>{
+                                setObj[o]=objMatch[l + 1]||'';
+                            });
                         });
-                    });
-                    return true;
-                }
-                return false;
-            });
+                        return true;
+                    }
+                    return false;
+                });
+            }
             return [setObj,lines];
         },
         environmentParser = function(setObj, lines){
@@ -4951,11 +4949,11 @@ Replace with: >This pattern can be found at https://regexr.com/3mi9v
             setObj['tactics'] = (setObj['tactics'] ? setObj.tactics+'\n' : '')+lines.shift();
             return [setObj,lines];
         },
-        specialAbilitiesAccumulator=[],
+        specialAbilitiesAccumulator=[],//holds what specialabilities have been worked on, abilities are added to the start of the array for easy finding.
         specialAbilitiesParser = function(setObj, lines){
             let currLine = lines.shift();
             const abilityRegex = /^(.+?)\s*\((su|sp|ex)\)\s*(.+)/i;
-            if(abilityRegex.test(currLine)){
+            if(abilityRegex.test(currLine)){//if the line is the start of a new ability search for abilities with the same name and add to that description, otherwise make a new ability
                 let name,type,description;
                 [,name,type,description] = currLine.match(abilityRegex);
                 let rowID = _.find(_.keys(setObj),(k)=>{
@@ -4967,8 +4965,8 @@ Replace with: >This pattern can be found at https://regexr.com/3mi9v
                 setObj[rowID.replace(/name/,'save_checkbox')]=0;
                 setObj[rowID.replace(/name/,'show_options')]=0;
                 setObj[rowID.replace(/name/,'mods_checkbox')]=0;
-                specialAbilitiesAccumulator.unshift(rowID.replace(/name/,'description'));
-            }else if(specialAbilitiesAccumulator[0]){
+                specialAbilitiesAccumulator.unshift(rowID.replace(/name/,'description'));//store the name of the ability's description attribute in the accumulator
+            }else if(specialAbilitiesAccumulator[0]){//otherwise, if there is something in the accumulator at position 0, add to that description attribute.
                 setObj[specialAbilitiesAccumulator[0]]+='\n'+currLine;
             }
             return [setObj,lines];
