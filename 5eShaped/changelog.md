@@ -11,6 +11,15 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 18.0.0
+
+### Breaking Changes
+This breaking change should be fully handled with the upgrade, but custom scripts may break as the roll template has changed. This will only impact existing roll template outputs and should only matter for those who want a well preserved chat record and for those who make custom macros (not recommended as the sheet should provide all that are needed).
+
+### Features
+- Added support for `spell points` to be called `sorcery`, `psi`, and `ki`. `mana` is already supported. Closes [#295](https://bitbucket.org/mlenser/5eshaped/issues/295/psi-points)
+- Spell points can be customized for each spell level. This will allow each player to set the cost of each level. This supports the UA mystic, allowing them to set level 1 spells to 1 psi, level 2 spells to 2 psi, and so forth.
+
 ## 17.1.1
 
 ### Bug Fixes
