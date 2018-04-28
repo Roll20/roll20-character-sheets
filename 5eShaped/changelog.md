@@ -11,6 +11,11 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 18.1.0
+
+### Features
+- `Currency` (previously `coins` or `coinage`) is now a repeating section. It defaults to having the 5 currencies of 5e, but their name, acronym, weight, value, and border style can be changed as desired. Additionally more currencies (gems, rocks, or any other currency) can be added as desired. The currency macro now outputs how much of each currency and a total value. Gold is the standard currency as it is in 5e, but that can be changed by changing the values of each currency. So for example the Silver Standard can be used by making Silver's value 1 and the other values as desired. Closes [#689: Silver Standard support](https://bitbucket.org/mlenser/5eshaped/issues/689/silver-standard-support)
+
 ## 18.0.0
 
 ### Breaking Changes
