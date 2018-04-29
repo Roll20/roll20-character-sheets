@@ -11,6 +11,11 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 18.1.1
+
+### Bug fixes
+- `Currency` is now generated on upgrade for existing characters and current quantities, weight per coin, and gold equivalent values are upgraded.
+
 ## 18.1.0
 
 ### Features
