@@ -11,6 +11,11 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 18.1.2
+
+### Bug fixes
+- The spell macro now shows spells from spell level 1 and above.
+
 ## 18.1.1
 
 ### Bug fixes
