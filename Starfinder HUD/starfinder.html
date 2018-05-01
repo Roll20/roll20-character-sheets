@@ -1,4 +1,4 @@
-<!-- Note that currently the sheet's html/javascript is too long to be used by the repo to generate a sheet. I use the following regex on regexr.com
+﻿<!-- Note that currently the sheet's html/javascript is too long to be used by the repo to generate a sheet. I use the following regex on regexr.com
 to easily shrink the line count to what the repo can handle:
 Look for: >\n\s*
 Replace with: >This pattern can be found at https://regexr.com/3mi9v
@@ -784,7 +784,7 @@ Replace with: >This pattern can be found at https://regexr.com/3mi9v
     /*start starfinder.js*/
     var starfinder = starfinder || (function(){
        'use strict';
-        const version = 0.041524210160,//The sheet's current version. This is put into the character_sheet attribute when a sheet is opened. I've been doing version numbering as 0.0Xyyyyyyyyyy where X represents the state of the sheet (currently in stage 4, or open beta) and y is the UNIX epoch timestamp for when I finished that build
+        const version = 0.041525149110,//The sheet's current version. This is put into the character_sheet attribute when a sheet is opened. I've been doing version numbering as 0.0Xyyyyyyyyyy where X represents the state of the sheet (currently in stage 4, or open beta) and y is the UNIX epoch timestamp for when I finished that build
             sheetAttributes = [/*An array of all the non-repeating sheet attributes that could potentially be used in the calculations performed by the script
                                 This array is used in the getAttrs call in accessStarfinder()*/
                 /*Class & Character attributes*/
@@ -3105,7 +3105,7 @@ Replace with: >This pattern can be found at https://regexr.com/3mi9v
             +'change:intelligence_penalty change:intelligence_drain change:wisdom_base change:wisdom_enhance change:wisdom_penalty change:wisdom_drain '
             +'change:charisma_base change:charisma_enhance change:charisma_penalty change:charisma_drain change:eac_ability change:kac_ability '
             +'change:dexterity_mod change:strength_mod change:constitution_mod change:intelligence_mod change:wisdom_mod change:charisma_mod '
-            +'change:fort_ability change:fort change:ref_ability change:ref change:will_ability change:will change:initiative_ability change:initiative change:sp change:hp change:rp '
+            +'change:fort_ability change:fort change:ref_ability change:ref change:will_ability change:will change:initiative_ability change:initiative change:sp change:hp change:rp change:temp_hp '
             +'change:acrobatics change:athletics change:bluff change:computers change:culture change:diplomacy change:disguise change:engineering change:intimidate change:life_science change:medicine change:mysticism change:profession change:perception change:physical_science change:piloting change:sense_motive change:sleight_of_hand change:stealth change:survival '
             +'change:acrobatics_ranks change:acrobatics_class_skill change:acrobatics_ability change:acrobatics_acp '
             +'change:athletics_ranks change:athletics_class_skill change:athletics_ability change:athletics_acp '
@@ -3257,7 +3257,7 @@ Replace with: >This pattern can be found at https://regexr.com/3mi9v
                     });
                     attributes = attributes.concat(sheetAttributes);
                     getAttrs(attributes,(objs)=>{
-                        if(attribute.match(/^(?:rp|hp|sp)$/)){
+                        if(attribute.match(/^(?:rp|hp|sp|temp_hp)$/)){
                             healthHandler(objs,event);
                         }else{
                             if(attribute.match(/frequency/)){
@@ -3688,30 +3688,23 @@ Replace with: >This pattern can be found at https://regexr.com/3mi9v
 
         //Handles changes to current health that cause the reactive styling of the health container to change.
         healthHandler = function(attributes,event){
-            const setObj = _.reduce(['sp','hp','rp'],(memo,h)=>{
-                if(h==='sp'){
-                    /*if(event.sourceAttribute==='sp'&&attributes.temp_hp*1>0&&event.newValue*1<event.previousValue*1){
-                        memo.temp_hp=attributes.temp_hp*1+(event.newValue*1-event.previousValue*1);
-                        attributes.sp=event.previousValue;
-                        if(memo.temp_hp<0){
-                            attributes.sp=attributes.sp*1+memo.temp_hp;
-                            memo.temp_hp=0;
-                        }
-                        memo.sp=attributes.sp;
-                    }*/
-                    if(attributes[h]*1<0){
+            const setObj = _.reduce(['temp_hp','sp','hp','rp'],(memo,h)=>{
+                if(attributes[h]*1<0){
+                    if(h==='sp'){
                         memo.hp=attributes.hp*1 + attributes.sp*1;
                         attributes.hp=memo.hp;
+                    }else if(h==='temp_hp'){
+                        memo.sp=attributes.sp*1 + attributes.temp_hp*1;
+                        attributes.sp=memo.sp;
                     }
-                }
-                if(attributes[h]*1<0){
                     memo[h]=0;
                     attributes[h]=memo[h];
                 }
-                memo.health_status+=((attributes[h]*1 <= 0 && attributes[h]*1!==attributes[h+'_max']*1) ? 1 : 0);
+                if(h!=='temp_hp'){
+                    memo.health_status+=((attributes[h]*1 <= 0 && attributes[h]*1!==attributes[h+'_max']*1) ? 1 : 0);
+                }
                 return memo;
             },{health_status:0});
-            setObj.health_status=Math.min(setObj.health_status,3);
             setAttrs(setObj,{silent:true});
             return undefined;
         },
@@ -4472,9 +4465,6 @@ Replace with: >This pattern can be found at https://regexr.com/3mi9v
                                 +_.reduce(obj.addlBonus,(m,add)=>{//add any additional bonuses to the attribute (bonuses not specifically called out to this attribute)
                                     return m+(specificBonus[add]*1||0);
                                 },0);
-                        if(obj.attr==='initiative_npc'){
-                            TAS.log('memoNum: '+memoNum);
-                        }
                         //assembles the text values of the attribute
                         let memoText=_.reduce(obj.repeatTextAdds,(m,add)=>{//iterate through all of the attributes within the repeating item that should hold text
                                 return m+(setObj[id+add]||attributes[id+add]||'')
@@ -4514,9 +4504,6 @@ Replace with: >This pattern can be found at https://regexr.com/3mi9v
                         memoNum=memoNum || 0;
                         memoText=memoText || '';
                         memo[id+obj.attr]=(memoText+' +'+memoNum).replace(/(.+)\s+\+\s*0/,'$1');
-                        if(obj.attr==='initiative_npc'){
-                            TAS.log('memo[obj.attr]: '+memo[id+obj.attr]);
-                        }
                         if(obj.attr!=='total'||obj.repeating!=='attack'){
                             memo[id+obj.attr]=memo[id+obj.attr].replace(/^\s*\+/,'');
                         }
@@ -4546,10 +4533,16 @@ Replace with: >This pattern can be found at https://regexr.com/3mi9v
                 }else{
                     setObj.rp_max=Math.max((setObj.rp_max*1+Math.max(Math.floor((setObj.character_level*1||attributes.character_level*1||0)/2),1)),1);
                 }
-                setObj.sp=(attributes.sp*1||0)+((setObj.sp_max*1-attributes.sp_max*1)*1||0);
-                setObj.hp=(attributes.hp*1||0)+((setObj.hp_max*1-attributes.hp_max*1)*1||0);
-                setObj.rp=(attributes.rp*1||0)+((setObj.rp_max*1-attributes.rp_max*1)*1||0);
-                setObj.temp_hp=(attributes.temp_hp*1||0)+(setObj.temp_hp_max*1-attributes.temp_hp_max*1);
+                let negHold = 0;
+                _.each(['sp','hp','rp','temp_hp'],(p)=>{
+                    setObj[p]=(attributes[p]*1||0)+((setObj[p+'_max']*1||0)-(attributes[p+'_max']||0))+(/sp|hp/.test(negHold) ? negHold : 0);
+                    if(setObj[p]<0){
+                        negHold = setObj[p]*1;
+                        setObj[p]=0;
+                    }else{
+                        negHold = 0;
+                    }
+                });
             }
             setObj=buildMenus(attributes,setObj);//build the menus
             setAttrs(setObj,{silent:true});
