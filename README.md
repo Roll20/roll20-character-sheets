@@ -12,7 +12,7 @@ If you want to help improve an existing sheet, just clone this repository, make 
 
 When you are ready to submit your template for **public use**, create a `sheet.json` file in your sheet's folder (see the kitchensink folder for an example sheet.json file). The file has the following fields:
 
-* `html`: The name of the HTML file for the sheet (e.g. `kitchensink.html`)
+* `html`: The name of the HTML file for the sheet (e.g. `kitchensink.html`) 
 * `css`: The name of the CSS file for the sheet (e.g. `kitchensink.css`)
 * `authors`: A simple string telling who contributed toward the sheet (e.g. `Riley Dutton`)
 * `roll20userid`: A simple string telling the Roll20 User ID's of the authors (e.g. `1` or `45672,145678`). Just used so we know who to credit internally, won't be shown publicly on the site.
@@ -50,6 +50,10 @@ Whenever possible, use standard names for attributes, spelled out. For example, 
 **No Character Creation or Advancement**
 
 Due to copyright restrctions, please don't attempt to include functionality for advancing a character automatically to the next level or creating a new character from scratch automatically. It's fine to have attributes that auto-calculate based on other attributes (including the current level). We'll let you know if your submitted sheet violates this rule.
+
+
+**Don't Use Reserved HTML**
+Your HTML file must **not** have a <head> or <body> tag, or your character sheet may not load in the virtual tabletop.
 
 License
 =======

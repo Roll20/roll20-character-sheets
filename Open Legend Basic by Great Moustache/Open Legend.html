@@ -2135,6 +2135,26 @@
             });
         });
     });
+    
+    // MESSING WITH BORDERS RIGHT NOW - TOP
+    on("change:display_alternate_border", function() {
+        getAttrs(["display_alternate_border"], function(values) {
+            var temp = showHide(values.display_alternate_border);
+            var border = "Normal";
+            if(temp === "hide") {
+                border = "Normal";
+            } else {
+                border = "Modern";
+            }
+            setAttrs({
+                "display_alternate_border_flag": temp,
+                "template_border": border
+            });
+        });
+    });
+    
+    
+    // MESSING WITH BORDERS RIGHT NOW - BOTTOM
 
     function calcAllActionRolls () {
         calcFavoredActionRolls();
@@ -2748,10 +2768,11 @@ on("change:repeating_featsLeft", function() {
 <!-- End Worker Scripts -->
 <!-- Main body of Character Sheet -->
 <div class="container">     <!-- defines the width/height & behavior of the page -->
+    <input type="hidden" name="attr_template_border" value="Normal" />
     <input type="hidden" name="attr_h" value="Advantage" />
     <input type="hidden" name="attr_l" value="Disadvantage" />
     <div class="row width100 padBottom">
-        <div class="column textSmall textRight padRight">Feat/Attribute Points at character sheet creation :: 2018.03.04 <span class="bold">Version 1.8.9.98 </span> <input class="settings" type="checkbox" name="attr_sheet_settings_flag" value="hide" /><span>y</span></div>
+        <div class="column textSmall textRight padRight">Preview & Test of upcoming Border Changes :: 2018.04.08 <span class="bold">Version 1.8.9.99 </span> <input class="settings" type="checkbox" name="attr_sheet_settings_flag" value="hide" /><span>y</span></div>
     </div>
     <div class="row width100">
         <div class="column sliders inlineBlock textSmall bold">Character Info</div>
@@ -2768,6 +2789,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
         <div class="column sliders inlineBlock textSmall bold">Feats, Perks & Flaws</div>
         <div class="column sliders inlineBlock textSmall bold">Inventory</div>
         <div class="column sliders inlineBlock textSmall bold">Other Inv/Notes</div>
+        <div class="column sliders inlineBlock textSmall bold">Borders</div>
     </div>
     <div class="row width100">
         <div class="column sliders inlineBlock">
@@ -2808,17 +2830,21 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
         <div class="column sliders inlineBlock">
             <div class="checkboxSlider"><input type="checkbox" class="checkboxSliderInvis" name="attr_output_otherinventory" value="on" /><label></label></div>   
         </div>
+        <div class="column sliders inlineBlock">
+            <div class="checkboxSlider"><input type="checkbox" class="checkboxSliderInvis" name="attr_display_alternate_border" value="on" /><label></label></div>   
+        </div>
     </div>
  <!-- section for basic Character information -->
     <input type="hidden" class="display_character_flag" name="attr_display_character_flag" value="show" />
-    <div class="row width100 marginBottom displayCharacter">
-        <div class="third inlineBlock">      <!-- Left Third of 2/3 rows for info (Name & Player) -->
+    <input type="hidden" class="display_alternate_border_flag" name="attr_display_alternate_border_flag" value="hide" />
+    <div class="row width100 marginBottom displayCharacter normalBorder">
+        <div class="inlineBlock" style="width: 268px;">      <!-- Left Third of 2/3 rows for info (Name & Player) -->
             <div class="column width100 textCenter bold vertBottom">Character Name</div>
             <div class="column width100 textCenter inputName"><input type="text" name="attr_character_name" /></div>
             <div class="column width100 textCenter bold vertBottom">Player Name</div>
             <div class="column width100 textCenter inputName"><input type="text" name="attr_player_name" /></div>
         </div>
-        <div class="third inlineBlock">      <!-- Middle Third of 2/3 rows for info (Archetype, Level, XP) -->
+        <div class="inlineBlock" style="width: 268px;">      <!-- Middle Third of 2/3 rows for info (Archetype, Level, XP) -->
             <div class="column width100 textCenter bold vertBottom">Archetype</div>
             <div class="column width100 textCenter inputName"><input type="text" name="attr_archetype" /></div>
             <div class="column width1of3 inlineBlock textCenter bold vertBottom">Size</div>
@@ -2834,7 +2860,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
             </div>
             <div class="column width1of3 inlineBlock textCenter inputNumber60"><input type="number" name="attr_legend_points" value=0 /></div>
         </div>
-        <div class="third inlineBlock">      <!-- Right Third of 2/3 rows for info (Open Legend Logo) -->
+        <div class="inlineBlock" style="width: 268px;">      <!-- Right Third of 2/3 rows for info (Open Legend Logo) -->
             <div class="column width100 textCenter vertBottom"><img src="http://www.openlegendrpg.com/assets/img/open_legend_lg_logo.png" alt="Open Legend Open source roleplaying game" /></div>
         </div>
         <div class="width100">                   <!-- Bottom 1/3 of rows for Description of Character -->
@@ -2860,7 +2886,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column actionsMiddle padTop">
                     <div class="height10"></div> <!-- Spacer -->
                     <fieldset class="repeating_goals">
-            			<div class="column width100 bold textSmall textCenter inventoryButton"><button type="roll" value="&{template:openLegend} {{title= Goal}} {{subTitle= @{character_name}}} {{description= @{goal}}}">Send Goal to Chat</button></div>
+            			<div class="column width100 bold textSmall textCenter inventoryButton"><button type="roll" value="&{template:openLegend@{template_border}} {{title= Goal}} {{subTitle= @{character_name}}} {{description= @{goal}}}">Send Goal to Chat</button></div>
                         <div class="column width100 resizeVert">
                             <textarea class="height75 width85" name="attr_goal"></textarea>
                         </div>
@@ -2876,7 +2902,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column actionsMiddle padTop">
                     <div class="height10"></div> <!-- Spacer -->
                     <fieldset class="repeating_beliefs">
-            			<div class="column width100 bold textSmall textCenter inventoryButton"><button type="roll" value="&{template:openLegend} {{title= Belief}} {{subTitle= @{character_name}}} {{description= @{belief}}}">Send Belief to Chat</button></div>
+            			<div class="column width100 bold textSmall textCenter inventoryButton"><button type="roll" value="&{template:openLegend@{template_border}} {{title= Belief}} {{subTitle= @{character_name}}} {{description= @{belief}}}">Send Belief to Chat</button></div>
                         <div class="column width100 resizeVert">
                             <textarea class="height75 width85" name="attr_belief"></textarea>
                         </div>
@@ -2892,7 +2918,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <div class="column actionsMiddle padTop">
                     <div class="height10"></div> <!-- Spacer -->
                     <fieldset class="repeating_instincts">
-            			<div class="column width100 bold textSmall textCenter inventoryButton"><button type="roll" value="&{template:openLegend} {{title= Instinct}} {{subTitle= @{character_name}}} {{description= @{instinct}}}">Send Instinct to Chat</button></div>
+            			<div class="column width100 bold textSmall textCenter inventoryButton"><button type="roll" value="&{template:openLegend@{template_border}} {{title= Instinct}} {{subTitle= @{character_name}}} {{description= @{instinct}}}">Send Instinct to Chat</button></div>
                         <div class="column width100 resizeVert">
                             <textarea class="height75 width85" name="attr_instinct"></textarea>
                         </div>
@@ -2934,7 +2960,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_agility_settings_flag" value="on" /><span>y</span></div>
             <input type="hidden" class="agility_display_sub_flag" name="attr_agility_display_sub_flag" value="hide" />
             <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton sub">
-                <button type="roll" value="&{template:openLegend} {{title= Agility Roll}} {{subTitle= @{character_name}}} {{roll= @{agility_dice_roll}}}">Agility</button>
+                <button type="roll" value="&{template:openLegend@{template_border}} {{title= Agility Roll}} {{subTitle= @{character_name}}} {{roll= @{agility_dice_roll}}}">Agility</button>
             </div>
             <div class="width55 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_agility_score" value=0 /></div>
@@ -3003,7 +3029,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_fortitude_settings_flag" value="on" /><span>y</span></div>
             <input type="hidden" class="agility_display_sub_flag" name="attr_fortitude_display_sub_flag" value="hide" />
             <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton sub">
-                <button type="roll" value="&{template:openLegend} {{title= Fortitude Roll}} {{subTitle= @{character_name}}} {{roll= @{fortitude_dice_roll}}}">Fortitude</button>
+                <button type="roll" value="&{template:openLegend@{template_border}} {{title= Fortitude Roll}} {{subTitle= @{character_name}}} {{roll= @{fortitude_dice_roll}}}">Fortitude</button>
             </div>
             <div class="width55 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_fortitude_score" value=0 /></div>
@@ -3072,7 +3098,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_might_settings_flag" value="on" /><span>y</span></div>
             <input type="hidden" class="agility_display_sub_flag" name="attr_might_display_sub_flag" value="hide" />
             <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton sub">
-                <button type="roll" value="&{template:openLegend} {{title= Might Roll}} {{subTitle= @{character_name}}} {{roll= @{might_dice_roll}}}">Might</button>
+                <button type="roll" value="&{template:openLegend@{template_border}} {{title= Might Roll}} {{subTitle= @{character_name}}} {{roll= @{might_dice_roll}}}">Might</button>
             </div>
             <div class="width55 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_might_score" value=0 /></div>
@@ -3155,7 +3181,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_learning_settings_flag" value="on" /><span>y</span></div>
             <input type="hidden" class="learning_display_sub_flag" name="attr_learning_display_sub_flag" value="hide" />
             <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton sub">
-                <button type="roll" value="&{template:openLegend} {{title= Learning Roll}} {{subTitle= @{character_name}}} {{roll= @{learning_dice_roll}}}">Learning</button>
+                <button type="roll" value="&{template:openLegend@{template_border}} {{title= Learning Roll}} {{subTitle= @{character_name}}} {{roll= @{learning_dice_roll}}}">Learning</button>
             </div>
             <div class="width55 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_learning_score" value=0 /></div>
@@ -3224,7 +3250,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_logic_settings_flag" value="on" /><span>y</span></div>
             <input type="hidden" class="logic_display_sub_flag" name="attr_logic_display_sub_flag" value="hide" />
             <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton sub">
-                <button type="roll" value="&{template:openLegend} {{title= Logic Roll}} {{subTitle= @{character_name}}} {{roll= @{logic_dice_roll}}}">Logic</button>
+                <button type="roll" value="&{template:openLegend@{template_border}} {{title= Logic Roll}} {{subTitle= @{character_name}}} {{roll= @{logic_dice_roll}}}">Logic</button>
             </div>
             <div class="width55 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_logic_score" value=0 /></div>
@@ -3293,7 +3319,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_perception_settings_flag" value="on" /><span>y</span></div>
             <input type="hidden" class="perception_display_sub_flag" name="attr_perception_display_sub_flag" value="hide" />
             <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton sub">
-                <button type="roll" value="&{template:openLegend} {{title= Perception Roll}} {{subTitle= @{character_name}}} {{roll= @{perception_dice_roll}}}">Perception</button>
+                <button type="roll" value="&{template:openLegend@{template_border}} {{title= Perception Roll}} {{subTitle= @{character_name}}} {{roll= @{perception_dice_roll}}}">Perception</button>
             </div>
             <div class="width55 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_perception_score" value=0 /></div>
@@ -3362,7 +3388,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_will_settings_flag" value="on" /><span>y</span></div>
             <input type="hidden" class="will_display_sub_flag" name="attr_will_display_sub_flag" value="hide" />
             <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton sub">
-                <button type="roll" value="&{template:openLegend} {{title= Will Roll}} {{subTitle= @{character_name}}} {{roll= @{will_dice_roll}}}">Will</button>
+                <button type="roll" value="&{template:openLegend@{template_border}} {{title= Will Roll}} {{subTitle= @{character_name}}} {{roll= @{will_dice_roll}}}">Will</button>
             </div>
             <div class="width55 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_will_score" value=0 /></div>
@@ -3443,7 +3469,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_deception_settings_flag" value="on" /><span>y</span></div>
             <input type="hidden" class="deception_display_sub_flag" name="attr_deception_display_sub_flag" value="hide" />
             <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton sub">
-                <button type="roll" value="&{template:openLegend} {{title= Deception Roll}} {{subTitle= @{character_name}}} {{roll= @{deception_dice_roll}}}">Deception</button>
+                <button type="roll" value="&{template:openLegend@{template_border}} {{title= Deception Roll}} {{subTitle= @{character_name}}} {{roll= @{deception_dice_roll}}}">Deception</button>
             </div>
             <div class="width55 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_deception_score" value=0 /></div>
@@ -3512,7 +3538,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_persuasion_settings_flag" value="on" /><span>y</span></div>
             <input type="hidden" class="persuasion_display_sub_flag" name="attr_persuasion_display_sub_flag" value="hide" />
             <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton sub">
-                <button type="roll" value="&{template:openLegend} {{title= Persuasion Roll}} {{subTitle= @{character_name}}} {{roll= @{persuasion_dice_roll}}}">Persuasion</button>
+                <button type="roll" value="&{template:openLegend@{template_border}} {{title= Persuasion Roll}} {{subTitle= @{character_name}}} {{roll= @{persuasion_dice_roll}}}">Persuasion</button>
             </div>
             <div class="width55 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_persuasion_score" value=0 /></div>
@@ -3581,7 +3607,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_presence_settings_flag" value="on" /><span>y</span></div>
             <input type="hidden" class="presence_display_sub_flag" name="attr_presence_display_sub_flag" value="hide" />
             <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton sub">
-                <button type="roll" value="&{template:openLegend} {{title= Presence Roll}} {{subTitle= @{character_name}}} {{roll= @{presence_dice_roll}}}">Presence</button>
+                <button type="roll" value="&{template:openLegend@{template_border}} {{title= Presence Roll}} {{subTitle= @{character_name}}} {{roll= @{presence_dice_roll}}}">Presence</button>
             </div>
             <div class="width55 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_presence_score" value=0 /></div>
@@ -3662,7 +3688,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_alteration_settings_flag" value="on" /><span>y</span></div>
             <input type="hidden" class="alteration_display_sub_flag" name="attr_alteration_display_sub_flag" value="hide" />
             <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton sub">
-                <button type="roll" value="&{template:openLegend} {{title= Alteration Roll}} {{subTitle= @{character_name}}} {{roll= @{alteration_dice_roll}}}">Alteration</button>
+                <button type="roll" value="&{template:openLegend@{template_border}} {{title= Alteration Roll}} {{subTitle= @{character_name}}} {{roll= @{alteration_dice_roll}}}">Alteration</button>
             </div>
             <div class="width55 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_alteration_score" value=0 /></div>
@@ -3731,7 +3757,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_creation_settings_flag" value="on" /><span>y</span></div>
             <input type="hidden" class="creation_display_sub_flag" name="attr_creation_display_sub_flag" value="hide" />
             <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton sub">
-                <button type="roll" value="&{template:openLegend} {{title= Creation Roll}} {{subTitle= @{character_name}}} {{roll= @{creation_dice_roll}}}">Creation</button>
+                <button type="roll" value="&{template:openLegend@{template_border}} {{title= Creation Roll}} {{subTitle= @{character_name}}} {{roll= @{creation_dice_roll}}}">Creation</button>
             </div>
             <div class="width55 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_creation_score" value=0 /></div>
@@ -3800,7 +3826,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_energy_settings_flag" value="on" /><span>y</span></div>
             <input type="hidden" class="energy_display_sub_flag" name="attr_energy_display_sub_flag" value="hide" />
             <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton sub">
-                <button type="roll" value="&{template:openLegend} {{title= Energy Roll}} {{subTitle= @{character_name}}} {{roll= @{energy_dice_roll}}}">Energy</button>
+                <button type="roll" value="&{template:openLegend@{template_border}} {{title= Energy Roll}} {{subTitle= @{character_name}}} {{roll= @{energy_dice_roll}}}">Energy</button>
             </div>
             <div class="width55 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_energy_score" value=0 /></div>
@@ -3869,7 +3895,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_entropy_settings_flag" value="on" /><span>y</span></div>
             <input type="hidden" class="entropy_display_sub_flag" name="attr_entropy_display_sub_flag" value="hide" />
             <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton sub">
-                <button type="roll" value="&{template:openLegend} {{title= Entropy Roll}} {{subTitle= @{character_name}}} {{roll= @{entropy_dice_roll}}}">Entropy</button>
+                <button type="roll" value="&{template:openLegend@{template_border}} {{title= Entropy Roll}} {{subTitle= @{character_name}}} {{roll= @{entropy_dice_roll}}}">Entropy</button>
             </div>
             <div class="width55 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_entropy_score" value=0 /></div>
@@ -3938,7 +3964,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_influence_settings_flag" value="on" /><span>y</span></div>
             <input type="hidden" class="influence_display_sub_flag" name="attr_influence_display_sub_flag" value="hide" />
             <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton sub">
-                <button type="roll" value="&{template:openLegend} {{title= Influence Roll}} {{subTitle= @{character_name}}} {{roll= @{influence_dice_roll}}}">Influence</button>
+                <button type="roll" value="&{template:openLegend@{template_border}} {{title= Influence Roll}} {{subTitle= @{character_name}}} {{roll= @{influence_dice_roll}}}">Influence</button>
             </div>
             <div class="width55 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_influence_score" value=0 /></div>
@@ -4007,7 +4033,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_movement_settings_flag" value="on" /><span>y</span></div>
             <input type="hidden" class="movement_display_sub_flag" name="attr_movement_display_sub_flag" value="hide" />
             <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton sub">
-                <button type="roll" value="&{template:openLegend} {{title= Movement Roll}} {{subTitle= @{character_name}}} {{roll= @{movement_dice_roll}}}">Movement</button>
+                <button type="roll" value="&{template:openLegend@{template_border}} {{title= Movement Roll}} {{subTitle= @{character_name}}} {{roll= @{movement_dice_roll}}}">Movement</button>
             </div>
             <div class="width55 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_movement_score" value=0 /></div>
@@ -4076,7 +4102,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_prescience_settings_flag" value="on" /><span>y</span></div>
             <input type="hidden" class="prescience_display_sub_flag" name="attr_prescience_display_sub_flag" value="hide" />
             <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton sub">
-                <button type="roll" value="&{template:openLegend} {{title= Prescience Roll}} {{subTitle= @{character_name}}} {{roll= @{prescience_dice_roll}}}">Prescience</button>
+                <button type="roll" value="&{template:openLegend@{template_border}} {{title= Prescience Roll}} {{subTitle= @{character_name}}} {{roll= @{prescience_dice_roll}}}">Prescience</button>
             </div>
             <div class="width55 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_prescience_score" value=0 /></div>
@@ -4145,7 +4171,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
             <div class="width6 inlineBlock vertBottom"><input class="settings" type="checkbox" name="attr_protection_settings_flag" value="on" /><span>y</span></div>
             <input type="hidden" class="protection_display_sub_flag" name="attr_protection_display_sub_flag" value="hide" />
             <div class="column width39 inlineBlock textLeft textLarge bold italic attributeButton sub">
-                <button type="roll" value="&{template:openLegend} {{title= Protection Roll}} {{subTitle= @{character_name}}} {{roll= @{protection_dice_roll}}}">Protection</button>
+                <button type="roll" value="&{template:openLegend@{template_border}} {{title= Protection Roll}} {{subTitle= @{character_name}}} {{roll= @{protection_dice_roll}}}">Protection</button>
             </div>
             <div class="width55 inlineBlock">
                 <div class="column width1of3 inlineBlock textCenter inputNumber"><input type="number" name="attr_protection_score" value=0 /></div>
@@ -4221,7 +4247,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
             <div class="evasion vertTop padTop">
                 <div class="inlineBlock vertTop" style="width: 155px;">
                     <div class="column width100 textCenter resistButton">
-                        <button type="roll" name="roll_resist_bane" value="&{template:openLegend} {{title= Resist Bane Roll}} {{subTitle= @{character_name}}} {{roll= [[1d20]]}} {{target= 10+ bane is removed}}">Guard</button>
+                        <button type="roll" name="roll_resist_bane" value="&{template:openLegend@{template_border}} {{title= Resist Bane Roll}} {{subTitle= @{character_name}}} {{roll= [[1d20]]}} {{target= 10+ bane is removed}}">Guard</button>
                     </div>
                     <div class="column width100 textCenter textSmall">Click to roll Resist Bane</div>
                     <div class="column width100 inputNumberLarge padTop"><input type="number" name="attr_Guard" value=0 /></div>
@@ -4250,7 +4276,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
             <div class="toughness vertTop padTop">
                 <div class="inlineBlock vertTop" style="width: 155px;">
                     <div class="column width100 textCenter resistButton">
-                        <button type="roll" name="roll_resist_bane" value="&{template:openLegend} {{title= Resist Bane Roll}} {{subTitle= @{character_name}}} {{roll= [[1d20]]}} {{target= 10+ bane is removed}}">Toughness</button>
+                        <button type="roll" name="roll_resist_bane" value="&{template:openLegend@{template_border}} {{title= Resist Bane Roll}} {{subTitle= @{character_name}}} {{roll= [[1d20]]}} {{target= 10+ bane is removed}}">Toughness</button>
                     </div>
                     <div class="column width100 textCenter textSmall">Click to roll Resist Bane</div>
                     <div class="column width100 inputNumberLarge padTop"><input type="number" name="attr_Toughness" value=0 /></div>
@@ -4276,7 +4302,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
             <div class="resolve vertTop padTop">
                 <div class="inlineBlock vertTop" style="width: 155px;">
                     <div class="column width100 textCenter resistButton">
-                        <button type="roll" name="roll_resist_bane" value="&{template:openLegend} {{title= Resist Bane Roll}} {{subTitle= @{character_name}}} {{roll= [[1d20]]}} {{target= 10+ bane is removed}}">Resolve</button>
+                        <button type="roll" name="roll_resist_bane" value="&{template:openLegend@{template_border}} {{title= Resist Bane Roll}} {{subTitle= @{character_name}}} {{roll= [[1d20]]}} {{target= 10+ bane is removed}}">Resolve</button>
                     </div>
                     <div class="column width100 textCenter textSmall">Click to roll Resist Bane</div>
                     <div class="column width100 inputNumberLarge padTop"><input type="number" name="attr_Resolve" value=0 /></div>
@@ -4356,7 +4382,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
         <div class="column width100 vertTop inputNumber30 textSmall bold">Base <input type="number" name="attr_base_speed" value=30 /> Armor Penalty(ft) <input type="number" name="attr_armor_penalty" value=0 /> Feat(ft) <input type="number" name="attr_armor_training" value=0 /></div>
 		<input type="hidden" name="attr_Speed4Token" value=0 />
         <div class="width15 inlineBlock vertTop padLeft"><input class="settings" type="checkbox" name="attr_settingsFlagInitiative" value="on" checked="checked" /><span>y</span></div>
-        <div class="column width35 inlineBlock textLarge speedButton"><button type="roll" name="roll_initiative" value="&{template:openLegend} {{title= Initiative Roll}} {{subTitle= @{character_name}}} {{subTitleAdd= @{select_initiative}}} {{roll= @{initiative}}} {{description= Make sure you selected your token to have it automatically added to the turn order.}}">Initiative</button></div>
+        <div class="column width35 inlineBlock textLarge speedButton"><button type="roll" name="roll_initiative" value="&{template:openLegend@{template_border}} {{title= Initiative Roll}} {{subTitle= @{character_name}}} {{subTitleAdd= @{select_initiative}}} {{roll= @{initiative}}} {{description= Make sure you selected your token to have it automatically added to the turn order.}}">Initiative</button></div>
         <input type="hidden" class="displaySettingsFlagInitiative" name="attr_displaySettingsFlagInitiative" />
         <div class="width100 displaySettingsInitiative padLeft">
 			<div class="column width50 inlineBlock textSmall bold">Attribute</div>
@@ -4419,7 +4445,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <fieldset class="repeating_actions">
                     <div class="row">   <!-- Fix for Mozilla squishing +Add & Modify buttons -->
                         <div class="width15 inlineBlock vertTop padLeft"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>y</span></div>
-                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" name="roll_action" value="&{template:openLegend} {{title= @{action_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= @{action_attribute} @{attribute_score}}} {{target= @{action_target}}} {{roll= @{dice_roll}}} {{powertarget=@{power_target}}} {{powerlevel= @{power_level}}} {{powertargetmax= @{power_targetmax}}} {{powerlevelmax= @{power_levelmax}}} {{description= @{action_special}}}"><input type="text" style="text-align: center;" name="attr_action_name" /></button></div>
+                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" name="roll_action" value="&{template:openLegend@{template_border}} {{title= @{action_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= @{action_attribute} @{attribute_score}}} {{target= @{action_target}}} {{roll= @{dice_roll}}} {{powertarget=@{power_target}}} {{powerlevel= @{power_level}}} {{powertargetmax= @{power_targetmax}}} {{powerlevelmax= @{power_levelmax}}} {{description= @{action_special}}}"><input type="text" style="text-align: center;" name="attr_action_name" /></button></div>
                         <input type="hidden" class="displaySettingsFlag" name="attr_displaySettingsFlag" />
                         <div class="width100 displaySettings padLeft">
                             <div class="column width25 inlineBlock bold">Name: </div>
@@ -4519,7 +4545,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <fieldset class="repeating_otheractions">
                     <div class="row">   <!-- Fix for Mozilla squishing +Add & Modify buttons -->
                         <div class="width15 inlineBlock vertTop padLeft"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>y</span></div>
-                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" name="roll_action_other" value="&{template:openLegend} {{title= @{action_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= @{action_attribute} @{attribute_score}}} {{target= @{action_target}}} {{roll= @{dice_roll}}} {{powertarget=@{power_target}}} {{powerlevel= @{power_level}}} {{powertargetmax= @{power_targetmax}}} {{powerlevelmax= @{power_levelmax}}} {{description= @{action_special}}}"><input type="text" style="text-align: center;" name="attr_action_name" /></button></div>
+                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" name="roll_action_other" value="&{template:openLegend@{template_border}} {{title= @{action_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= @{action_attribute} @{attribute_score}}} {{target= @{action_target}}} {{roll= @{dice_roll}}} {{powertarget=@{power_target}}} {{powerlevel= @{power_level}}} {{powertargetmax= @{power_targetmax}}} {{powerlevelmax= @{power_levelmax}}} {{description= @{action_special}}}"><input type="text" style="text-align: center;" name="attr_action_name" /></button></div>
                         <input type="hidden" class="displaySettingsFlag" name="attr_displaySettingsFlag" />
                         <div class="width100 displaySettings padLeft">
                             <div class="column width25 inlineBlock bold">Name: </div>
@@ -4630,7 +4656,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <fieldset class="repeating_legendary">
                     <div class="row">   <!-- Fix for Mozilla squishing +Add & Modify buttons -->
                         <div class="width15 inlineBlock vertTop padLeft"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>y</span></div>
-                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" name="roll_action" value="&{template:openLegend} {{title= @{action_name}}} {{subTitle=@{character_name}}} {{subTitleAdd= @{action_attribute} @{dice_modifier}}} {{target= @{action_target}}} {{roll= @{dice_roll}}} {{numberadvantage= ?{# of Advantage/Disadvantage Dice}}} {{advantagedis=?{Do you have Advantage or Disadvantage?}}} {{powertarget=@{power_target}}} {{powerlevel= @{power_level}}} {{powertargetmax= @{power_targetmax}}} {{powerlevelmax= @{power_levelmax}}} {{description= @{action_special}}}"><input type="text" style="text-align: center;" name="attr_action_name" /></button></div>
+                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" name="roll_action" value="&{template:openLegend@{template_border}} {{title= @{action_name}}} {{subTitle=@{character_name}}} {{subTitleAdd= @{action_attribute} @{dice_modifier}}} {{target= @{action_target}}} {{roll= @{dice_roll}}} {{numberadvantage= ?{# of Advantage/Disadvantage Dice}}} {{advantagedis=?{Do you have Advantage or Disadvantage?}}} {{powertarget=@{power_target}}} {{powerlevel= @{power_level}}} {{powertargetmax= @{power_targetmax}}} {{powerlevelmax= @{power_levelmax}}} {{description= @{action_special}}}"><input type="text" style="text-align: center;" name="attr_action_name" /></button></div>
                         <input type="hidden" class="displaySettingsFlag" name="attr_displaySettingsFlag" />
                         <div class="width100 displaySettings padLeft">
                             <div class="column width25 inlineBlock bold">Name: </div>
@@ -4740,7 +4766,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <fieldset class="repeating_featsLeft">
                     <div class="row">   <!-- Fix for Mozilla squishing the +Add & Modify button text -->
                         <div class="width10 inlineBlock vertTop"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>i</span></div>
-                        <div class="width90 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend} {{title= @{feat_left_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= Feat}} {{description= @{feat_left_description}}}"><input type="text" style="text-align: center;" name="attr_feat_left_name" /></button></div>
+                        <div class="width90 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend@{template_border}} {{title= @{feat_left_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= Feat}} {{description= @{feat_left_description}}}"><input type="text" style="text-align: center;" name="attr_feat_left_name" /></button></div>
                         <input type="hidden" class="displaySettingsFlag" name="attr_displaySettingsFlag" />
                         <div class="width100 displaySettings">
                             <div class="column width75 inlineBlock bold textSmall">Name</div>
@@ -4773,7 +4799,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <fieldset class="repeating_perks">
                     <div class="row">   <!-- Fix for Mozilla squishing the +Add & Modify button text -->
                         <div class="width10 inlineBlock vertTop"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>i</span></div>
-                        <div class="width90 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend} {{title= @{perks_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= Perk}} {{description= @{perks_description}}}"><input type="text" style="text-align: center;" name="attr_perks_name" /></button></div>
+                        <div class="width90 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend@{template_border}} {{title= @{perks_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= Perk}} {{description= @{perks_description}}}"><input type="text" style="text-align: center;" name="attr_perks_name" /></button></div>
                         <input type="hidden" class="displaySettingsFlag" name="attr_displaySettingsFlag" />
                         <div class="width100 displaySettings">
                             <div class="column width100 bold textSmall">Name</div>
@@ -4791,7 +4817,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
                 <fieldset class="repeating_flaws">
                     <div class="row">   <!-- Fix for Mozilla squishing the +Add & Modify button text -->
                         <div class="width10 inlineBlock vertTop"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>i</span></div>
-                        <div class="width90 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend} {{title= @{flaws_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= Flaw}} {{description= @{flaws_description}}}"><input type="text" style="text-align: center;" name="attr_flaws_name" /></button></div>
+                        <div class="width90 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend@{template_border}} {{title= @{flaws_name}}} {{subTitle= @{character_name}}} {{subTitleAdd= Flaw}} {{description= @{flaws_description}}}"><input type="text" style="text-align: center;" name="attr_flaws_name" /></button></div>
                         <input type="hidden" class="displaySettingsFlag" name="attr_displaySettingsFlag" />
                         <div class="width100 displaySettings">
                             <div class="column width100 bold textSmall">Name</div>
@@ -4821,7 +4847,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
         		    <div class="row">
         			<!-- Roll to Chat & Expand -->
                         <div class="width15 inlineBlock vertTop padLeft"><input class="settings" type="checkbox" name="attr_settingsFlag" value="on" checked="checked" /><span>i</span></div>
-                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend} {{title= @{other_title}}} {{subTitle= @{character_name}}} {{subTitleAdd= Notes}} {{description= @{other_contents}}}"><input type="text" style="text-align: center;" name="attr_other_title" /></button></div>
+                        <div class="width85 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend@{template_border}} {{title= @{other_title}}} {{subTitle= @{character_name}}} {{subTitleAdd= Notes}} {{description= @{other_contents}}}"><input type="text" style="text-align: center;" name="attr_other_title" /></button></div>
         			<!-- Hidden area -->
                         <input type="hidden" class="displaySettingsFlag" name="attr_displaySettingsFlag" />
                         <div class="width100 displaySettings">
@@ -4836,7 +4862,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
     	<div style="display: none;">	
     		<fieldset class="repeating_OtherTwo">
     			<!-- Headings for the actions -->
-    			<div class="column width100 bold textSmall textCenter inventoryButton"><button type="roll" value="&{template:openLegend} {{title= @{other_title}}} {{subTitle= @{character_name}}} {{subTitleAdd= Notes}} {{description= @{other_contents}}}">Send Notes to Chat</button></div>
+    			<div class="column width100 bold textSmall textCenter inventoryButton"><button type="roll" value="&{template:openLegend@{template_border}} {{title= @{other_title}}} {{subTitle= @{character_name}}} {{subTitleAdd= Notes}} {{description= @{other_contents}}}">Send Notes to Chat</button></div>
 				<div class="column width100 textCenter padLeft inputName"><input type="text" name="attr_other_title" /></div>
     			<!-- Add actions as needed Section (repeating fields) -->
 				<div class="column width100 bold italic textCenter">Content/Description</div>
@@ -4844,7 +4870,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
     		</fieldset>
     		<fieldset class="repeating_OtherThree">
 			<!-- Headings for the actions -->
-    			<div class="column width100 bold textSmall textCenter inventoryButton"><button type="roll" value="&{template:openLegend} {{title= @{other_title}}} {{subTitle= @{character_name}}} {{subTitleAdd= Notes}} {{description= @{other_contents}}}">Send Notes to Chat</button></div>
+    			<div class="column width100 bold textSmall textCenter inventoryButton"><button type="roll" value="&{template:openLegend@{template_border}} {{title= @{other_title}}} {{subTitle= @{character_name}}} {{subTitleAdd= Notes}} {{description= @{other_contents}}}">Send Notes to Chat</button></div>
 				<div class="column width100 textCenter padLeft inputName"><input type="text" name="attr_other_title" /></div>
 			<!-- Add actions as needed Section (repeating fields) -->
 				<div class="column width100 bold italic textCenter">Content/Description</div>
@@ -4867,7 +4893,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
 		<div class="actionsMiddle padLeft padRight">
     <!-- start item_1 -->
             <div class="width15 inlineBlock vertTop padLeft"><input class="settings" type="checkbox" name="attr_settingsFlag_item1" value="on" checked="checked" /><span>i</span></div>
-            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend} {{title= @{item_1}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_1_contents}}}"><input type="text" style="text-align: center;" name="attr_item_1" /></button></div>
+            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend@{template_border}} {{title= @{item_1}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_1_contents}}}"><input type="text" style="text-align: center;" name="attr_item_1" /></button></div>
             <input type="hidden" class="displaySettingsFlagItem1" name="attr_displaySettingsFlagItem1" />
             <div class="width100 displaySettings">
                 <div class="column width25 inlineBlock bold">Name: </div>
@@ -4882,7 +4908,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
     <!-- end item_1 -->
     <!-- start item_2 -->
             <div class="width15 inlineBlock vertTop padLeft"><input class="settings" type="checkbox" name="attr_settingsFlag_item2" value="on" /><span>i</span></div>
-            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend} {{title= @{item_2}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_2_contents}}}"><input type="text" style="text-align: center;" name="attr_item_2" /></button></div>
+            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend@{template_border}} {{title= @{item_2}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_2_contents}}}"><input type="text" style="text-align: center;" name="attr_item_2" /></button></div>
             <input type="hidden" class="displaySettingsFlagItem2" name="attr_displaySettingsFlagItem2" value="hide" />
             <div class="width100 displaySettings">
                 <div class="column width25 inlineBlock bold">Name: </div>
@@ -4897,7 +4923,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
     <!-- end item_2 -->
     <!-- start item_3 -->
             <div class="width15 inlineBlock vertTop padLeft"><input class="settings" type="checkbox" name="attr_settingsFlag_item3" value="on" /><span>i</span></div>
-            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend} {{title= @{item_3}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_3_contents}}}"><input type="text" style="text-align: center;" name="attr_item_3" /></button></div>
+            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend@{template_border}} {{title= @{item_3}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_3_contents}}}"><input type="text" style="text-align: center;" name="attr_item_3" /></button></div>
             <input type="hidden" class="displaySettingsFlagItem3" name="attr_displaySettingsFlagItem3" value="hide" />
             <div class="width100 displaySettings">
                 <div class="column width25 inlineBlock bold">Name: </div>
@@ -4912,7 +4938,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
     <!-- end item_3 -->
     <!-- start item_4 -->
             <div class="width15 inlineBlock vertTop padLeft"><input class="settings" type="checkbox" name="attr_settingsFlag_item4" value="on" /><span>i</span></div>
-            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend} {{title= @{item_4}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_4_contents}}}"><input type="text" style="text-align: center;" name="attr_item_4" /></button></div>
+            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend@{template_border}} {{title= @{item_4}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_4_contents}}}"><input type="text" style="text-align: center;" name="attr_item_4" /></button></div>
             <input type="hidden" class="displaySettingsFlagItem4" name="attr_displaySettingsFlagItem4" value="hide" />
             <div class="width100 displaySettings">
                 <div class="column width25 inlineBlock bold">Name: </div>
@@ -4927,7 +4953,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
     <!-- end item_4 -->
     <!-- start item_5 -->
             <div class="width15 inlineBlock vertTop padLeft"><input class="settings" type="checkbox" name="attr_settingsFlag_item5" value="on" /><span>i</span></div>
-            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend} {{title= @{item_5}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_5_contents}}}"><input type="text" style="text-align: center;" name="attr_item_5" /></button></div>
+            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend@{template_border}} {{title= @{item_5}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_5_contents}}}"><input type="text" style="text-align: center;" name="attr_item_5" /></button></div>
             <input type="hidden" class="displaySettingsFlagItem5" name="attr_displaySettingsFlagItem5" value="hide" />
             <div class="width100 displaySettings">
                 <div class="column width25 inlineBlock bold">Name: </div>
@@ -4942,7 +4968,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
     <!-- end item_5 -->
     <!-- start item_6 -->
             <div class="width15 inlineBlock vertTop padLeft"><input class="settings" type="checkbox" name="attr_settingsFlag_item6" value="on" /><span>i</span></div>
-            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend} {{title= @{item_6}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_6_contents}}}"><input type="text" style="text-align: center;" name="attr_item_6" /></button></div>
+            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend@{template_border}} {{title= @{item_6}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_6_contents}}}"><input type="text" style="text-align: center;" name="attr_item_6" /></button></div>
             <input type="hidden" class="displaySettingsFlagItem6" name="attr_displaySettingsFlagItem6" value="hide" />
             <div class="width100 displaySettings">
                 <div class="column width25 inlineBlock bold">Name: </div>
@@ -4957,7 +4983,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
     <!-- end item_6 -->
     <!-- start item_7 -->
             <div class="width15 inlineBlock vertTop padLeft"><input class="settings" type="checkbox" name="attr_settingsFlag_item7" value="on" /><span>i</span></div>
-            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend} {{title= @{item_7}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_7_contents}}}"><input type="text" style="text-align: center;" name="attr_item_7" /></button></div>
+            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend@{template_border}} {{title= @{item_7}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_7_contents}}}"><input type="text" style="text-align: center;" name="attr_item_7" /></button></div>
             <input type="hidden" class="displaySettingsFlagItem7" name="attr_displaySettingsFlagItem7" value="hide" />
             <div class="width100 displaySettings">
                 <div class="column width25 inlineBlock bold">Name: </div>
@@ -4972,7 +4998,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
     <!-- end item_7 -->
     <!-- start item_8 -->
             <div class="width15 inlineBlock vertTop padLeft"><input class="settings" type="checkbox" name="attr_settingsFlag_item8" value="on" /><span>i</span></div>
-            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend} {{title= @{item_8}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_8_contents}}}"><input type="text" style="text-align: center;" name="attr_item_8" /></button></div>
+            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend@{template_border}} {{title= @{item_8}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_8_contents}}}"><input type="text" style="text-align: center;" name="attr_item_8" /></button></div>
             <input type="hidden" class="displaySettingsFlagItem8" name="attr_displaySettingsFlagItem8" value="hide" />
             <div class="width100 displaySettings">
                 <div class="column width25 inlineBlock bold">Name: </div>
@@ -4987,7 +5013,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
     <!-- end item_8 -->
     <!-- start item_9 -->
             <div class="width15 inlineBlock vertTop padLeft"><input class="settings" type="checkbox" name="attr_settingsFlag_item9" value="on" /><span>i</span></div>
-            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend} {{title= @{item_9}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_9_contents}}}"><input type="text" style="text-align: center;" name="attr_item_9" /></button></div>
+            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend@{template_border}} {{title= @{item_9}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_9_contents}}}"><input type="text" style="text-align: center;" name="attr_item_9" /></button></div>
             <input type="hidden" class="displaySettingsFlagItem9" name="attr_displaySettingsFlagItem9" value="hide" />
             <div class="width100 displaySettings">
                 <div class="column width25 inlineBlock bold">Name: </div>
@@ -5002,7 +5028,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
     <!-- end item_9 -->
     <!-- start item_10 -->
             <div class="width15 inlineBlock vertTop padLeft"><input class="settings" type="checkbox" name="attr_settingsFlag_item10" value="on" /><span>i</span></div>
-            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend} {{title= @{item_10}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_10_contents}}}"><input type="text" style="text-align: center;" name="attr_item_10" /></button></div>
+            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend@{template_border}} {{title= @{item_10}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_10_contents}}}"><input type="text" style="text-align: center;" name="attr_item_10" /></button></div>
             <input type="hidden" class="displaySettingsFlagItem10" name="attr_displaySettingsFlagItem10" value="hide" />
             <div class="width100 displaySettings">
                 <div class="column width25 inlineBlock bold">Name: </div>
@@ -5028,7 +5054,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
 		<div class="actionsMiddle padLeft padRight">
     <!-- start item_11 -->
             <div class="width15 inlineBlock vertTop padLeft"><input class="settings" type="checkbox" name="attr_settingsFlag_item11" value="on" /><span>i</span></div>
-            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend} {{title= @{item_11}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_11_contents}}}"><input type="text" style="text-align: center;" name="attr_item_11" /></button></div>
+            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend@{template_border}} {{title= @{item_11}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_11_contents}}}"><input type="text" style="text-align: center;" name="attr_item_11" /></button></div>
             <input type="hidden" class="displaySettingsFlagItem11" name="attr_displaySettingsFlagItem11" value="hide" />
             <div class="width100 displaySettings">
                 <div class="column width25 inlineBlock bold">Name: </div>
@@ -5043,7 +5069,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
     <!-- end item_11 -->
     <!-- start item_12 -->
             <div class="width15 inlineBlock vertTop padLeft"><input class="settings" type="checkbox" name="attr_settingsFlag_item12" value="on" /><span>i</span></div>
-            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend} {{title= @{item_12}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_12_contents}}}"><input type="text" style="text-align: center;" name="attr_item_12" /></button></div>
+            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend@{template_border}} {{title= @{item_12}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_12_contents}}}"><input type="text" style="text-align: center;" name="attr_item_12" /></button></div>
             <input type="hidden" class="displaySettingsFlagItem12" name="attr_displaySettingsFlagItem12" value="hide" />
             <div class="width100 displaySettings">
                 <div class="column width25 inlineBlock bold">Name: </div>
@@ -5058,7 +5084,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
     <!-- end item_12 -->
     <!-- start item_13 -->
             <div class="width15 inlineBlock vertTop padLeft"><input class="settings" type="checkbox" name="attr_settingsFlag_item13" value="on" /><span>i</span></div>
-            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend} {{title= @{item_13}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_13_contents}}}"><input type="text" style="text-align: center;" name="attr_item_13" /></button></div>
+            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend@{template_border}} {{title= @{item_13}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_13_contents}}}"><input type="text" style="text-align: center;" name="attr_item_13" /></button></div>
             <input type="hidden" class="displaySettingsFlagItem13" name="attr_displaySettingsFlagItem13" value="hide" />
             <div class="width100 displaySettings">
                 <div class="column width25 inlineBlock bold">Name: </div>
@@ -5073,7 +5099,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
     <!-- end item_13 -->
     <!-- start item_14 -->
             <div class="width15 inlineBlock vertTop padLeft"><input class="settings" type="checkbox" name="attr_settingsFlag_item14" value="on" /><span>i</span></div>
-            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend} {{title= @{item_14}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_14_contents}}}"><input type="text" style="text-align: center;" name="attr_item_14" /></button></div>
+            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend@{template_border}} {{title= @{item_14}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_14_contents}}}"><input type="text" style="text-align: center;" name="attr_item_14" /></button></div>
             <input type="hidden" class="displaySettingsFlagItem14" name="attr_displaySettingsFlagItem14" value="hide" />
             <div class="width100 displaySettings">
                 <div class="column width25 inlineBlock bold">Name: </div>
@@ -5088,7 +5114,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
     <!-- end item_14 -->
     <!-- start item_15 -->
             <div class="width15 inlineBlock vertTop padLeft"><input class="settings" type="checkbox" name="attr_settingsFlag_item15" value="on" /><span>i</span></div>
-            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend} {{title= @{item_15}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_15_contents}}}"><input type="text" style="text-align: center;" name="attr_item_15" /></button></div>
+            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend@{template_border}} {{title= @{item_15}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_15_contents}}}"><input type="text" style="text-align: center;" name="attr_item_15" /></button></div>
             <input type="hidden" class="displaySettingsFlagItem15" name="attr_displaySettingsFlagItem15" value="hide" />
             <div class="width100 displaySettings">
                 <div class="column width25 inlineBlock bold">Name: </div>
@@ -5103,7 +5129,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
     <!-- end item_15 -->
     <!-- start item_16 -->
             <div class="width15 inlineBlock vertTop padLeft"><input class="settings" type="checkbox" name="attr_settingsFlag_item16" value="on" /><span>i</span></div>
-            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend} {{title= @{item_16}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_16_contents}}}"><input type="text" style="text-align: center;" name="attr_item_16" /></button></div>
+            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend@{template_border}} {{title= @{item_16}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_16_contents}}}"><input type="text" style="text-align: center;" name="attr_item_16" /></button></div>
             <input type="hidden" class="displaySettingsFlagItem16" name="attr_displaySettingsFlagItem16" value="hide" />
             <div class="width100 displaySettings">
                 <div class="column width25 inlineBlock bold">Name: </div>
@@ -5118,7 +5144,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
     <!-- end item_16 -->
     <!-- start item_17 -->
             <div class="width15 inlineBlock vertTop padLeft"><input class="settings" type="checkbox" name="attr_settingsFlag_item17" value="on" /><span>i</span></div>
-            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend} {{title= @{item_17}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_17_contents}}}"><input type="text" style="text-align: center;" name="attr_item_17" /></button></div>
+            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend@{template_border}} {{title= @{item_17}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_17_contents}}}"><input type="text" style="text-align: center;" name="attr_item_17" /></button></div>
             <input type="hidden" class="displaySettingsFlagItem17" name="attr_displaySettingsFlagItem17" value="hide" />
             <div class="width100 displaySettings">
                 <div class="column width25 inlineBlock bold">Name: </div>
@@ -5133,7 +5159,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
     <!-- end item_17 -->
     <!-- start item_18 -->
             <div class="width15 inlineBlock vertTop padLeft"><input class="settings" type="checkbox" name="attr_settingsFlag_item18" value="on" /><span>i</span></div>
-            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend} {{title= @{item_18}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_18_contents}}}"><input type="text" style="text-align: center;" name="attr_item_18" /></button></div>
+            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend@{template_border}} {{title= @{item_18}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_18_contents}}}"><input type="text" style="text-align: center;" name="attr_item_18" /></button></div>
             <input type="hidden" class="displaySettingsFlagItem18" name="attr_displaySettingsFlagItem18" value="hide" />
             <div class="width100 displaySettings">
                 <div class="column width25 inlineBlock bold">Name: </div>
@@ -5148,7 +5174,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
     <!-- end item_18 -->
     <!-- start item_19 -->
             <div class="width15 inlineBlock vertTop padLeft"><input class="settings" type="checkbox" name="attr_settingsFlag_item19" value="on" /><span>i</span></div>
-            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend} {{title= @{item_19}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_19_contents}}}"><input type="text" style="text-align: center;" name="attr_item_19" /></button></div>
+            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend@{template_border}} {{title= @{item_19}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_19_contents}}}"><input type="text" style="text-align: center;" name="attr_item_19" /></button></div>
             <input type="hidden" class="displaySettingsFlagItem19" name="attr_displaySettingsFlagItem19" value="hide" />
             <div class="width100 displaySettings">
                 <div class="column width25 inlineBlock bold">Name: </div>
@@ -5163,7 +5189,7 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
     <!-- end item_19 -->
     <!-- start item_20 -->
             <div class="width15 inlineBlock vertTop padLeft"><input class="settings" type="checkbox" name="attr_settingsFlag_item20" value="on" /><span>i</span></div>
-            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend} {{title= @{item_20}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_20_contents}}}"><input type="text" style="text-align: center;" name="attr_item_20" /></button></div>
+            <div class="width80 inlineBlock vertTop inputNameShort attributeButton gray"><button type="roll" value="&{template:openLegend@{template_border}} {{title= @{item_20}}} {{subTitle= @{character_name}}} {{subTitleAdd= Inventory Item}} {{description= @{item_20_contents}}}"><input type="text" style="text-align: center;" name="attr_item_20" /></button></div>
             <input type="hidden" class="displaySettingsFlagItem20" name="attr_displaySettingsFlagItem20" value="hide" />
             <div class="width100 displaySettings">
                 <div class="column width25 inlineBlock bold">Name: </div>
@@ -5185,14 +5211,15 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
 <!-- Roll Templates Area -->
 <rolltemplate class="sheet-rolltemplate-openLegend">
   <!-- Top of scroll graphic -->
-    <div class="rollTop padTop padLeft">
+    <div class="normalBorder width90">
+<!--    <div class="rollTop padTop padLeft">
       <!-- Display the title given -->
         <div class="row padTop">
             <div class="column width100 textCenter textLarger bolder">{{title}}</div>
         </div>
-    </div>
+<!--    </div>
   <!-- Middle of scroll graphic -->
-    <div class="rollMiddle padTop padLeft padRight">
+<!--    <div class="rollMiddle padTop padLeft padRight">
       <!-- Display the title given -->
         <div class="row">
             {{#subTitle}}
@@ -5283,8 +5310,227 @@ remove this line to add Sanity back in (and corresponding 2 other areas) -->
             <div class="column width100 textCenter scroll" style="max-height: 120px;">{{description}}</div>
         </div>
         {{/description}}
-    </div>
+<!--    </div>
   <!-- Bottom of scroll graphic -->
-    <div class="rollBottom"></div>
+<!--    <div class="rollBottom"></div> -->
+    </div>
+</rolltemplate>
+<!-- End Roll Templates Area -->
+
+<!-- Roll Templates Area -->
+<rolltemplate class="sheet-rolltemplate-openLegendNormal">
+  <!-- Top of scroll graphic -->
+    <div class="normalBorder width90">
+<!--    <div class="rollTop padTop padLeft">
+      <!-- Display the title given -->
+        <div class="row padTop">
+            <div class="column width100 textCenter textLarger bolder">{{title}}</div>
+        </div>
+<!--    </div>
+  <!-- Middle of scroll graphic -->
+<!--    <div class="rollMiddle padTop padLeft padRight">
+      <!-- Display the title given -->
+        <div class="row">
+            {{#subTitle}}
+            <div class="column width100 textCenter textLarge italic">{{subTitle}}{{#subTitleAdd}} &bullet; {{subTitleAdd}}{{/subTitleAdd}}</div>
+            {{/subTitle}}
+          <!-- Display any sub title given -->
+            {{#subTitle2}}
+            <div class="column width100 textCenter textLarge italic">{{subTitle2}}{{#subTitle2Add}} &bullet; {{subTitle2Add}}{{/subTitle2Add}}</div>
+            {{/subTitle2}}
+        </div>
+      <!-- Display emote if provided -->
+        {{#emote}}
+        <div class="row">
+            <div class="column width95 inlineBlock textCenter borderAllDotted borderRound">{{emote}}</div>
+        </div>
+        {{/emote}}
+      <!-- Display target plus the roll if target given -->
+        {{#target}}
+        <div class="row">
+            <div class="column textCenter width100 roll">{{roll}}</div>
+            <div class="column textCenter width100 bold">{{#numberadvantage}}Adv/Disadv {{numberadvantage}}{{/numberadvantage}} vs {{target}}</div>
+        </div>
+        {{/target}}
+      <!-- Display just the roll if no target given -->
+        {{^target}}{{#roll}}
+        <div class="row">
+            <div class="column textCenter width100 roll">{{roll}}</div>
+            <div class="column textCenter width100">Total Roll</div>
+        </div>
+        {{/roll}}{{/target}}
+      <!-- Display power level if provided -->
+        {{#powertarget}}
+        <div class="row textCenter">
+            <div class="column width90 inlineBlock textCenter textLarge bold borderBottom">Boon Power Level</div>
+            <div class="column width30 textCenter inlineBlock bold textSmall">Min Needed</div>
+            <div class="column width30 textCenter inlineBlock bold textSmall">Achieved</div>
+            <div class="column width30 textCenter inlineBlock bold textSmall">Max Allowed</div>
+            <div class="width30 inlineBlock textCenter">
+                <div class="column width100 textCenter">PL <span class="bold">{{powerlevel}}</span></div>
+                <div class="column width100 textCenter">CR {{powertarget}}</div>
+            </div>
+            {{#rollLess() roll 12}}
+            <div class="column width30 inlineBlock textCenter powerLevel textRed">0</div>
+            {{/rollLess() roll 12}}
+            {{#rollBetween() roll 12 13}}
+            <div class="column width30 inlineBlock textCenter powerLevel">1</div>
+            {{/rollBetween() roll 12 13}}
+            {{#rollBetween() roll 14 15}}
+            <div class="column width30 inlineBlock textCenter powerLevel">2</div>
+            {{/rollBetween() roll 14 15}}
+            {{#rollBetween() roll 16 17}}
+            <div class="column width30 inlineBlock textCenter powerLevel">3</div>
+            {{/rollBetween() roll 16 17}}
+            {{#rollBetween() roll 18 19}}
+            <div class="column width30 inlineBlock textCenter powerLevel">4</div>
+            {{/rollBetween() roll 18 19}}
+            {{#rollBetween() roll 20 21}}
+            <div class="column width30 inlineBlock textCenter powerLevel">5</div>
+            {{/rollBetween() roll 20 21}}
+            {{#rollBetween() roll 22 23}}
+            <div class="column width30 inlineBlock textCenter powerLevel">6</div>
+            {{/rollBetween() roll 22 23}}
+            {{#rollBetween() roll 24 25}}
+            <div class="column width30 inlineBlock textCenter powerLevel">7</div>
+            {{/rollBetween() roll 24 25}}
+            {{#rollBetween() roll 26 27}}
+            <div class="column width30 inlineBlock textCenter powerLevel">8</div>
+            {{/rollBetween() roll 26 27}}
+            {{#rollGreater() roll 27}}
+            <div class="column width30 inlineBlock textCenter powerLevel">9</div>
+            {{/rollGreater() roll 27}}
+            <div class="width30 inlineBlock textCenter">
+                <div class="column width100 textCenter">PL <span class="bold">{{powerlevelmax}}</span></div>
+                <div class="column width100 textCenter">CR {{powertargetmax}}</div>
+            </div>
+            {{#rollLess() roll powertarget}}
+            <div class="column width90 inlineBlock red textLarge bold">Success with Twist<br />or Failure</div>
+            {{/rollLess() roll powertarget}}
+            {{#^rollLess() roll powertarget}}
+            <div class="column width90 inlineBlock green textLarge bold">Success</div>
+            {{/^rollLess() roll powertarget}}
+        </div>
+        {{/powertarget}}
+      <!-- Display description if provided -->
+        {{#description}}
+        <div class="row">
+            <div class="column width100 textCenter bold borderBottom">Description/Flavor Text</div>
+            <div class="column width100 textCenter scroll" style="max-height: 120px;">{{description}}</div>
+        </div>
+        {{/description}}
+<!--    </div>
+  <!-- Bottom of scroll graphic -->
+<!--    <div class="rollBottom"></div> -->
+    </div>
+</rolltemplate>
+<!-- End Roll Templates Area -->
+
+
+<rolltemplate class="sheet-rolltemplate-openLegendModern">
+  <!-- Top of scroll graphic -->
+    <div class="modernBorder width90">
+<!--    <div class="rollTop padTop padLeft">
+      <!-- Display the title given -->
+        <div class="row padTop">
+            <div class="column width100 textCenter textLarger bolder">{{title}}</div>
+        </div>
+<!--    </div>
+  <!-- Middle of scroll graphic -->
+<!--    <div class="rollMiddle padTop padLeft padRight">
+      <!-- Display the title given -->
+        <div class="row">
+            {{#subTitle}}
+            <div class="column width100 textCenter textLarge italic">{{subTitle}}{{#subTitleAdd}} &bullet; {{subTitleAdd}}{{/subTitleAdd}}</div>
+            {{/subTitle}}
+          <!-- Display any sub title given -->
+            {{#subTitle2}}
+            <div class="column width100 textCenter textLarge italic">{{subTitle2}}{{#subTitle2Add}} &bullet; {{subTitle2Add}}{{/subTitle2Add}}</div>
+            {{/subTitle2}}
+        </div>
+      <!-- Display emote if provided -->
+        {{#emote}}
+        <div class="row">
+            <div class="column width95 inlineBlock textCenter borderAllDotted borderRound">{{emote}}</div>
+        </div>
+        {{/emote}}
+      <!-- Display target plus the roll if target given -->
+        {{#target}}
+        <div class="row">
+            <div class="column textCenter width100 roll">{{roll}}</div>
+            <div class="column textCenter width100 bold">{{#numberadvantage}}Adv/Disadv {{numberadvantage}}{{/numberadvantage}} vs {{target}}</div>
+        </div>
+        {{/target}}
+      <!-- Display just the roll if no target given -->
+        {{^target}}{{#roll}}
+        <div class="row">
+            <div class="column textCenter width100 roll">{{roll}}</div>
+            <div class="column textCenter width100">Total Roll</div>
+        </div>
+        {{/roll}}{{/target}}
+      <!-- Display power level if provided -->
+        {{#powertarget}}
+        <div class="row textCenter">
+            <div class="column width90 inlineBlock textCenter textLarge bold borderBottom">Boon Power Level</div>
+            <div class="column width30 textCenter inlineBlock bold textSmall">Min Needed</div>
+            <div class="column width30 textCenter inlineBlock bold textSmall">Achieved</div>
+            <div class="column width30 textCenter inlineBlock bold textSmall">Max Allowed</div>
+            <div class="width30 inlineBlock textCenter">
+                <div class="column width100 textCenter">PL <span class="bold">{{powerlevel}}</span></div>
+                <div class="column width100 textCenter">CR {{powertarget}}</div>
+            </div>
+            {{#rollLess() roll 12}}
+            <div class="column width30 inlineBlock textCenter powerLevel textRed">0</div>
+            {{/rollLess() roll 12}}
+            {{#rollBetween() roll 12 13}}
+            <div class="column width30 inlineBlock textCenter powerLevel">1</div>
+            {{/rollBetween() roll 12 13}}
+            {{#rollBetween() roll 14 15}}
+            <div class="column width30 inlineBlock textCenter powerLevel">2</div>
+            {{/rollBetween() roll 14 15}}
+            {{#rollBetween() roll 16 17}}
+            <div class="column width30 inlineBlock textCenter powerLevel">3</div>
+            {{/rollBetween() roll 16 17}}
+            {{#rollBetween() roll 18 19}}
+            <div class="column width30 inlineBlock textCenter powerLevel">4</div>
+            {{/rollBetween() roll 18 19}}
+            {{#rollBetween() roll 20 21}}
+            <div class="column width30 inlineBlock textCenter powerLevel">5</div>
+            {{/rollBetween() roll 20 21}}
+            {{#rollBetween() roll 22 23}}
+            <div class="column width30 inlineBlock textCenter powerLevel">6</div>
+            {{/rollBetween() roll 22 23}}
+            {{#rollBetween() roll 24 25}}
+            <div class="column width30 inlineBlock textCenter powerLevel">7</div>
+            {{/rollBetween() roll 24 25}}
+            {{#rollBetween() roll 26 27}}
+            <div class="column width30 inlineBlock textCenter powerLevel">8</div>
+            {{/rollBetween() roll 26 27}}
+            {{#rollGreater() roll 27}}
+            <div class="column width30 inlineBlock textCenter powerLevel">9</div>
+            {{/rollGreater() roll 27}}
+            <div class="width30 inlineBlock textCenter">
+                <div class="column width100 textCenter">PL <span class="bold">{{powerlevelmax}}</span></div>
+                <div class="column width100 textCenter">CR {{powertargetmax}}</div>
+            </div>
+            {{#rollLess() roll powertarget}}
+            <div class="column width90 inlineBlock red textLarge bold">Success with Twist<br />or Failure</div>
+            {{/rollLess() roll powertarget}}
+            {{#^rollLess() roll powertarget}}
+            <div class="column width90 inlineBlock green textLarge bold">Success</div>
+            {{/^rollLess() roll powertarget}}
+        </div>
+        {{/powertarget}}
+      <!-- Display description if provided -->
+        {{#description}}
+        <div class="row">
+            <div class="column width100 textCenter bold borderBottom">Description/Flavor Text</div>
+            <div class="column width100 textCenter scroll" style="max-height: 120px;">{{description}}</div>
+        </div>
+        {{/description}}
+<!--    </div>
+  <!-- Bottom of scroll graphic -->
+<!--    <div class="rollBottom"></div> -->
+    </div>
 </rolltemplate>
 <!-- End Roll Templates Area -->
