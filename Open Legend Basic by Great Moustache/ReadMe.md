@@ -5,10 +5,6 @@
 
 ### Changelog
 
-### 1.8.9.99 on 2018 April 8th
-* Preview and testing of alternate borders
-	- Will be implemented further in the next release
-
 ### 1.8.9.98a on 2018 March 10th
 * Fixed Speed Calculations if Mighty is 0
     - Was halving speed even if no heavy items
