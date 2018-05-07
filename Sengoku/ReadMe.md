@@ -4,5 +4,6 @@ A sheet for the Fuzion version of Sengoku.  This is not a character generator so
 
 Some packages have options for skills and equipment so any unwanted options should be deleted, e.g the Bushi package has choices for Samurai or Ashigaru armour.
 
-Under weapons there is a skill name drop down, this is not connected to the skill and is for note purposes only the skill score needs to be added manually.   Weapon Strength requirements need to be filled in so the sheet can calculate skill and damage penalties for bonuses or penalties. Impairment from wounds will automatically applied. 
+Under weapons there is a skill name drop down, this is not connected to the skill and is for note purposes only the skill score needs to be added manually.   Weapon Strength requirements need to be filled in so the sheet can calculate skill and damage penalties or bonuses. Impairment from wounds will automatically applied. 
+ 
  
