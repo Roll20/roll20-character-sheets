@@ -25,6 +25,11 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 ### Changelog
 
+### 1.6.2
+
+* Fixed weapons rolling with Shoot when First Edition skills was selected.
+* Add attribute to Shock damage.
+
 ### 1.6.1
 
 * Fix the sheet default settings to actually work.
