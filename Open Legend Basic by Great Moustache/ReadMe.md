@@ -5,6 +5,15 @@
 
 ### Changelog
 
+### 1.9.0 on 2018 May 7th
+* Massive update to Favored & Other Actions sections
+	- Select if action is an Attack (Damaging or Bane), Boon, or Effect
+	- Effect isn't quite fully functional yet in that there is a pop-up that doesn't do anything, but will still roll the dice you choose
+* Backgrounds for the borders updated
+	- Also white background for things sent to chat
+* Prep work for NPC/Alt Form/Companion tabs
+	- Nothing functioning on the user side yet
+
 ### 1.8.9.99 on 2018 April 8th
 * Preview and testing of alternate borders
 	- Will be implemented further in the next release
