@@ -13,6 +13,9 @@
 	- Also white background for things sent to chat
 * Prep work for NPC/Alt Form/Companion tabs
 	- Nothing functioning on the user side yet
+* Options Tab added
+	- Just information for now, functionality added in next update
+* Note added to Effects in Actions to clarify what it is and about the pop-up
 
 ### 1.8.9.99 on 2018 April 8th
 * Preview and testing of alternate borders
