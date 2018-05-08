@@ -5,6 +5,15 @@
 
 ### Changelog
 
+### 1.9.1 on 2018 May 8th
+* Made Background Tab for the sheet
+	- Moved Character Info & Beliefs, Goals, Instincts Sections
+	- Added more data fields for the Character Info section
+* GUI Display at Top
+	- Added what type of sheet it is for future updates
+	- Moved OL logo up and smaller along with version
+	- Hidden groundwork for a tab button for whispering rolls to the GM
+
 ### 1.9.0 on 2018 May 7th
 * Massive update to Favored & Other Actions sections
 	- Select if action is an Attack (Damaging or Bane), Boon, or Effect
