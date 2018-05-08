@@ -8,6 +8,7 @@
 ### 1.9.2 on 2018 May 8th
 * Added Whisper to GM option
 	- Global button to make any roll on the sheet go to the GM only
+	- Public to send to public
 
 ### 1.9.1 on 2018 May 8th
 * Made Background Tab for the sheet
