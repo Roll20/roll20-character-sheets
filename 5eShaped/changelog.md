@@ -11,6 +11,25 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 17.1.1
+
+### Bug Fixes
+* Added parsing to fix poor formatting of some Tome of Beasts creatures. Closes [#709: Tome of Beasts Monster imports not importing correctly](https://bitbucket.org/mlenser/5eshaped/issues/709/tome-of-beasts-monster-imports-not)
+
+## 17.1.0
+
+### Features
+* Added a myriad of attachers. Closes [#708: Add attacher functionality to NPC Actions](https://bitbucket.org/mlenser/5eshaped/issues/708/add-attacher-functionality-to-npc-actions)
+
+### Bug Fixes
+* [#707: D&D 5e (5eShaped) Brutal Critical error](https://bitbucket.org/mlenser/5eshaped/issues/707/d-d-5e-5eshaped-brutal-critical-error)
+
+## 17.0.6
+
+### Bug Fixes
+* [#697: NPC right column overlaps left column in edit mode](https://bitbucket.org/mlenser/5eshaped/issues/697/npc-right-column-overlaps-left-column-in)
+* [#704: Princes of the Apocalypse Module fails to convert creature attacks actions](https://bitbucket.org/mlenser/5eshaped/issues/704/princes-of-the-apocalypse-module-fails-to)
+
 ## 17.0.5
 
 ### Bug Fixes
@@ -312,7 +331,7 @@ The sheet will always upgrade itself unless I specify otherwise, though some thi
 
 * Fixed a bug where prepared_matters_var was not set on new character. Old characters can re-toggle that value on the spells section to have the chat output correct. Closes. [#513: Spell preparation still bugged?](https://bitbucket.org/mlenser/5eshaped/issues/513/spell-preparation-still-bugged)
 * Rests will now output a message even if they have not recharged anything: "Nothing recharged". Closes [#514: Short rest doesn't output anything if there's nothing to recharge](https://bitbucket.org/mlenser/5eshaped/issues/514/short-rest-doesnt-output-anything-if)
-* [#512: Companion script-imported spell issues](https://bitbucket.org/mlenser/5eshaped/issues/512/companion-script-imported-spell-issues)
+* [#512: Script-imported spell issues](https://bitbucket.org/mlenser/5eshaped/issues/512/companion-script-imported-spell-issues)
 
 ## 14.2.3
 
