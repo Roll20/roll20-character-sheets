@@ -5,6 +5,49 @@
 
 ### Changelog
 
+### 1.9.2 on 2018 May 8th
+* Added Whisper to GM option
+	- Global button to make any roll on the sheet go to the GM only
+
+### 1.9.1 on 2018 May 8th
+* Made Background Tab for the sheet
+	- Moved Character Info & Beliefs, Goals, Instincts Sections
+	- Added more data fields for the Character Info section
+* GUI Display at Top
+	- Added what type of sheet it is for future updates
+	- Moved OL logo up and smaller along with version
+	- Hidden groundwork for a tab button for whispering rolls to the GM
+
+### 1.9.0 on 2018 May 7th
+* Massive update to Favored & Other Actions sections
+	- Select if action is an Attack (Damaging or Bane), Boon, or Effect
+	- Effect isn't quite fully functional yet in that there is a pop-up that doesn't do anything, but will still roll the dice you choose
+* Backgrounds for the borders updated
+	- Also white background for things sent to chat
+* Prep work for NPC/Alt Form/Companion tabs
+	- Nothing functioning on the user side yet
+* Options Tab added
+	- Just information for now, functionality added in next update
+* Note added to Effects in Actions to clarify what it is and about the pop-up
+
+### 1.8.9.99 on 2018 April 8th
+* Preview and testing of alternate borders
+	- Will be implemented further in the next release
+
+### 1.8.9.98a on 2018 March 10th
+* Fixed Speed Calculations if Mighty is 0
+    - Was halving speed even if no heavy items
+
+### 1.8.9.98 on 2018 March 4th
+* Fixed a new character sheet not auto calculating Feat & Attribute Point Totals
+* Fixed Speed changes based on Max Heavy amount
+	- Based on Might Score
+* Fixed Speed not calculating when you entered amounts from Feats
+* Changed GUI for Actions, Inventory, etc to be Gray lines instead of Teal
+
+### 1.8.9.97a on 2018 January 28th
+* Finished improvements to GUI with the Non-essential Notes section.
+
 ### 1.8.9.97 on 2018 January 28th
 * GUI improvements on layout
 	- Inventory made into nicer section that can be expanded
