@@ -564,10 +564,9 @@
 	const buildStatblock = () => {
 		const sourceAttrs = [
 			"npc",
-			"npc_armor_type",
+			"macro_npc_abilities",
 			"macro_npc_attacks",
 			"macro_statblock",
-			"macro_npc_abilities",
 		];
 		getAttrs(sourceAttrs, v => {
 			if (v.npc !== '1') return;
