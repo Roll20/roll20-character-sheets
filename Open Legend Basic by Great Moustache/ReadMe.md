@@ -4,6 +4,11 @@
 ## Tell YOUR story
 
 ### Changelog
+### 1.9.6 on 2018 May 14th
+* Resist Rolls Updated
+	- Made Resist Roll buttons next to Speed (to match what was on NPC section)
+	- Updated look of Speed section on character sheet
+
 ### 1.9.5 on 2018 May 13th
 * Sheet Type Selection added (and lots of backend coding)
 	- Pick between: Primary Character, NPC/Summons, Alternate Form Tier 1 or 2, Companion Tier 1, 2, or 3
