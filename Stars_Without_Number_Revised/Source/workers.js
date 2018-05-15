@@ -243,9 +243,12 @@
 				...prefixes.map(prefix => `${prefix}_weapon_shock_damage`),
 				...prefixes.map(prefix => `${prefix}_weapon_shock_ac`),
 				...prefixes.map(prefix => `${prefix}_weapon_skill_to_damage`),
+				...prefixes.map(prefix => `${prefix}_weapon_attack_display`),
+				...prefixes.map(prefix => `${prefix}_weapon_damage_display`),
 				...attributes.map(attr => `${attr}_mod`),
 				...weaponSkills,
-				"attack_bonus"
+				"attack_bonus",
+				"macro_weapons"
 			];
 			getAttrs(sourceAttrs, v => {
 				const setting = {};
@@ -276,7 +279,7 @@
 					const label = `${v[`${prefix}_weapon_name`]} (${setting[`${prefix}_weapon_attack_display`]})`;
 					return buildLink(label, `${prefix}_attack`, index === prefixes.length - 1);
 				}).join(" ");
-				setAttrs(setting, {
+				mySetAttrs(setting, v, {
 					silent: true
 				});
 			});
@@ -407,12 +410,12 @@
 
 	/* Menu builder */
 	const buildSaveMenu = () => {
-		getAttrs(["save_physical", "save_mental", "save_evasion", "save_luck", "homebrew_luck_save", "macro_saves"], v => {
-			const macro_saves = buildLink(`${translate("PHYSICAL")} (v${v.save_physical})`, ("save_physical")) + " " +
-				buildLink(`${translate("MENTAL")} (v${v.save_mental})`, ("save_mental")) + " " +
-				buildLink(`${translate("EVASION")} (v${v.save_evasion})`, ("save_evasion"), v.homebrew_luck_save !== "1") +
+		getAttrs(["homebrew_luck_save", "macro_saves"], v => {
+			const macro_saves = buildLink(`^{PHYSICAL} (v@{save_physical})`, ("save_physical")) + " " +
+				buildLink(`^{MENTAL} (v@{save_mental})`, ("save_mental")) + " " +
+				buildLink(`^{EVASION} (v@{save_evasion})`, ("save_evasion"), v.homebrew_luck_save !== "1") +
 				((v.homebrew_luck_save === "1") ?
-					(" " + buildLink(`${translate("LUCK")} (v${v.save_luck})`, ("save_luck"), true)) : "");
+					(" " + buildLink(`^{LUCK} (v@{save_luck})`, ("save_luck"), true)) : "");
 			mySetAttrs({ macro_saves }, v);
 		});
 	};
@@ -430,7 +433,6 @@
 				...skills.first.map(sk => `skill_${sk}`),
 				"homebrew_skill_list",
 				"macro_skills",
-				...namedSkills.map(x => `skill_${x}_name`),
 				...idArray.map(id => `repeating_skills_${id}_skill_name`),
 				...idArray.map(id => `repeating_skills_${id}_skill`),
 			];
@@ -441,8 +443,8 @@
 				const macro_skills = [
 					...skillList.map((skill, index) => {
 						if (namedSkills.includes(skill))
-							return buildLink(`${v[`skill_${skill}_name`]} (${sign(v[`skill_${skill}`])})`, `skill_${skill}`);
-						else return buildLink(`${translate(skill.toUpperCase())} (${sign(v[`skill_${skill}`])})`,
+							return buildLink(`@{skill_${skill}_name} (${sign(v[`skill_${skill}`])})`, `skill_${skill}`);
+						else return buildLink(`^{${skill.toUpperCase()}} (${sign(v[`skill_${skill}`])})`,
 							`skill_${skill}`, (index + 1 === skillList.length) && idArray.length === 0);
 					}),
 					...idArray.map((id, index) => {
@@ -469,13 +471,13 @@
 					if (v.setting_super_type == "magic" || v.setting_super_type == "neither") return;
 					const macro_psionics = [
 							...skills.psionic.map((skill, index) => {
-								return buildLink(`${translate(skill.toUpperCase())} (${sign(v[`skill_${skill}`])})`, `skill_${skill}`, index === 5 && skillIDs.length === 0);
+								return buildLink(`^{${skill.toUpperCase()}} (${sign(v[`skill_${skill}`])})`, `skill_${skill}`, index === 5 && skillIDs.length === 0);
 							}),
 							...skillIDs.map(id => {
 								const prefix = `repeating_psychic-skills_${id}_skill`;
 								return buildLink(`${v[`${prefix}_name`]} (${sign(v[prefix])})`, prefix);
 							})
-						].join(" ") + "\n\n" +
+						].join(" ") + (techniqueIDs.length ? "\n\n" : "") +
 						techniqueIDs.map(id => buildLink(v[`repeating_techniques_${id}_technique_name`],
 							`repeating_techniques_${id}_technique`)).join(" ");
 					mySetAttrs({ macro_psionics }, v);
@@ -496,13 +498,13 @@
 				getAttrs(sourceAttrs, v => {
 					if (v.setting_super_type == "psionics" || v.setting_super_type == "neither") return;
 					const macro_magic = [
-							buildLink(`${translate("MAGIC")} (${v.skill_magic})`, ("skill_magic"), skillIDs.length === 0 && !v.skill_magic2_name),
-							(v.skill_magic2_name ? buildLink(`${v.skill_magic2_name} (${v.skill_magic2})`, ("skill_magic2"), skillIDs.length === 0) : ""),
+							buildLink(`^{MAGIC} (${sign(v.skill_magic)})`, ("skill_magic"), skillIDs.length === 0 && !v.skill_magic2_name),
+							(v.skill_magic2_name ? buildLink(`@{skill_magic2_name} (${sign(v.skill_magic2)})`, ("skill_magic2"), skillIDs.length === 0) : ""),
 							...skillIDs.map(id => {
 								const prefix = `repeating_magic-skills_${id}_skill`;
 								return buildLink(`${v[`${prefix}_name`]} (${sign(v[prefix])})`, prefix);
 							})
-						].join(" ") + "\n\n" +
+						].join(" ") + (spellIDs.length ? "\n\n" : "") +
 						spellIDs.map(id => buildLink(v[`repeating_spells_${id}_spell_name`], `repeating_spells_${id}_spell`)).join(" ");
 					mySetAttrs({ macro_magic }, v);
 				});
@@ -574,7 +576,7 @@
 				`[**^{SAVES}** v@{npc_saves},](~npc_save) [**^{SKILLS}** +@{npc_skills},](~npc_skill) `,
 				`[**^{MORALE}** v@{npc_morale}](~npc_morale)\n`,
 				`[**^{INITIATIVE}** d8,](~npc_initiative) [**^{REACTION}** 2d6,](~npc_reaction) `,
-				`**Move**\xa0@{npc_move}\n`
+				`**Move** @{npc_move}\n`
 			];
 		if (v.macro_npc_attacks) macroList.push("\n**Attacks:** @{macro_npc_attacks}");
 		if (v.macro_npc_abilities) macroList.push("\n**Abilities:** @{macro_npc_abilities}");
@@ -717,7 +719,7 @@
 	const upgradeFrom162 = () => {
 		console.log("Upgrading from versionless sheet (assumed to be fresh or v1.6.2).");
 		const upgradeFunction = _.after(13, () => {
-			buildSaveMenu();
+			generateWeaponDisplay();
 			upgradeSheet("2.0.0");
 		});
 
@@ -1149,7 +1151,7 @@
 	on("change:npc_rolls_hidden", handleNPCRollHide);
 
 	/* Chat macros */
-	on("change:homebrew_luck_save change:save_physical change:save_mental change:save_evasion", buildSaveMenu);
+	on("change:homebrew_luck_save", buildSaveMenu);
 
 	on([
 		...skills.revised.map(x => `change:skill_${x}`),
@@ -1157,15 +1159,10 @@
 		"change:homebrew_skill_list",
 		"change:repeating_skills",
 		"remove:repeating_skills",
-		"change:skill_culture_one_name",
-		"change:skill_culture_two_name",
-		"change:skill_culture_three_name",
-		"change:skill_culture_alien_name",
-		"change:skill_profession_name",
 	].join(" "), buildSkillMenu);
 
 	on([...skills.psionic.map(x => `change:skill_${x}`),
-		"change:setting_super_type change:repeating_techniques remove:repeating_techniques " +
+		"change:setting_super_type change:repeating_techniques remove:repeating_techniques",
 		"change:repeating_psychic-skills remove:repeating_psychic-skills"
 	].join(" "), buildPsionicsMenu);
 
