@@ -1,19 +1,28 @@
-mixin sectionheader(attrName, label)
+mixin sectionheader(name, label)
+	//- Creates one of the toggleable headers
+		Parameters
+			name: underlying attribute name (without "attr_")
+			label: i18n code for the text appearing on the header
+				(block is inserted if no label is specified)
 	.section-toggle-header
-		input(type="checkbox", name=`attr_${attrName}`, value="1", data-i18n-title="SHOW_HIDE", checked)
+		input(type="checkbox", name=`attr_${name}`, value="1", data-i18n-title="SHOW_HIDE", checked)
 		h1
 			if (label)
 				span(data-i18n=label)
 			else
 				block
-	input.hider(type="hidden", name=`attr_${attrName}`, value="1")
-
-mixin stats-input(attrName, label)
-	label(class=["stats-input", attributes.class])
-		span=label
-		input(type=attributes.type || "text", name=`attr_${attrName}`, min=attributes.min, value=attributes.value, readonly= attributes.readonly)
+	input.hider(type="hidden", name=`attr_${name}`, value="1")
 
 mixin text-input(name, label, extraclass)
+	//- Creates one of the standard underlined text inputs
+		Defaults to a input of type text
+		Parameters
+			name: underlying attribute name (without "attr_")
+			label: i18n code for the label (block is inserted if no label is specified)
+			extraclass: if present, will be the class of the input
+		Attributes
+			All attributes except class are passed on to the input. class is passed on
+			to the containing label.
 	- classes = attributes.class;
 	- delete attributes.class;
 	label(class=["text-input", classes])
@@ -25,6 +34,16 @@ mixin text-input(name, label, extraclass)
 				block
 
 mixin text-input-duo(name1, name2, label, attributes2)
+	//- Creates a pair of underlined inputs with a slash inbetween
+		Defaults to number inputs
+		Parameters
+			name1: underlying attribute name of first input (without "attr_")
+			name2: underlying attribute name of second input (without "attr_")
+			label: i18n code for the label (block is inserted if no label is specified)
+			attributes2: will be passed on as the attributes of the second input
+		Attributes
+			All attributes except class are passed on to the first input.
+			class is passed on to the containing label.
 	- classes = attributes.class;
 	- delete attributes.class;
 	.text-input.duo(class=classes)
@@ -38,11 +57,21 @@ mixin text-input-duo(name1, name2, label, attributes2)
 				block
 
 mixin fake-text-input(label)
+	//- Creates a label container that looks like one of the underlined text inputs.
+		block is inserted where the input would normally be
+		Parameters
+			label: i18n code for the text appearing underneath
+		Attributes
+			class is passed on to the containing label
 	label(class=["text-input", attributes.class])
 		block
 		div(data-i18n=label)
 
 mixin makeSave(name)
+	//- Creates a saving throw button
+		Parameters
+			name: underlying attribute name (without "attr_"). Also used as
+				button name, and for translation keys.
 	.blue-button
 		input(type="hidden", name=`attr_save_${name}`, value="15")
 		button(name=`roll_save_${name}`, type="roll", value=`&{template:swn-save} {{charname=@{name}}} {{title=^{${name.toUpperCase()}_SAVE}}} {{dice=[[1d20]]}} {{save=[[@{save_${name}}]]}}`)
@@ -50,11 +79,19 @@ mixin makeSave(name)
 		div(data-i18n=name.toUpperCase())
 
 mixin makeSkill(skillName, custom, label)
+	//- Creates a skill container
+		Parameters
+			skillName: Name of the skill. Used for attribute name, button name, and
+				translation keys. Leave empty for a generic version (for repeating sections).
+				If skillName === "dummy", an empty div is created instead.
+			custom: set to true if the skill name should be editable.
+			label: if custom is true, this will be the default value for the skill name.
+				Has no effect otherwise.
 	if (skillName === "dummy")
-		.dummy
+		.dummy(data-i18n-list-item="dummy")
 	else
 		- skillPrefix = skillName ? `skill_${skillName}` : "skill";
-		.skill
+		.skill(data-i18n-list-item=skillName)
 			button(type="roll", name=`roll_${skillPrefix}`, value=`&{template:swn-skill} {{title=${custom ? `@{${skillPrefix}_name}` : `^{${skillName.toUpperCase()}}`}}} {{charname=@{name}}} {{mod=[[@{modifier_query}]]}} {{dice=[[@{${skillPrefix}_specialist} + @{${skillPrefix}}[Skill] + @{modifier_query} @{${skillPrefix}_query}`).invisible-button.display
 			.display.flex-center
 				input(type="hidden", name=`attr_${skillPrefix}_specialist`, value="2d6").dice

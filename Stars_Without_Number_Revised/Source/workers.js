@@ -71,21 +71,20 @@
 	};
 	const sum = (list) => list.reduce((m, c) => m + (parseInt(c) || 0), 0);
 	const buildLink = (caption, ability, last) => `[${caption}${!last ? "," : ""}](~${ability})`;
-	const safeGetAttrs = (attrs, callback) => {
-		getAttrs(attrs, v => {
-			callback(Object.entries(v).reduce((m, [key, value]) => {
-				m[key] = String(value);
-				return m;
-			}, {}));
-		});
-	};
 	const mySetAttrs = (setting, values, ...rest) => {
+		// This is a version of setAttrs that expects an extra values parameter
+		// (as received from getAttrs). It will only set values in setting that differ
+		// from their current value on the sheet.
 		Object.keys(setting).forEach(k => {
 			if (values[k] === setting[k]) delete setting[k];
 		});
 		setAttrs(setting, ...rest);
 	};
 	const fillRepeatingSectionFromData = (sName, data, callback) => {
+		// Populates the repeating section repeating_${SName} with new
+		// rows from the data array. Every entry of the array is expected
+		// to be an object, and its key/value pairs will be written into
+		// the repeating section as a new row.
 		callback = callback || (() => {});
 		const createdIDs = [],
 			getRowID = () => {
@@ -231,6 +230,8 @@
 	};
 
 	const generateWeaponDisplay = () => {
+		// Generates the weapon menu and sets the display of weapons
+		// in display mode in one go.
 		getSectionIDs("repeating_weapons", idArray => {
 			const prefixes = idArray.map(id => `repeating_weapons_${id}`);
 			const sourceAttrs = [
@@ -306,12 +307,11 @@
 				permanentStrain = parseInt(v.strain_permanent) || 0,
 				strain = Math.min(parseInt(v.strain_max), Math.max(currentStrain, permanentStrain));
 
-			if (strain !== currentStrain) setAttrs({
-				strain
-			});
+			if (strain !== currentStrain) setAttrs({ strain });
 		});
 	};
 	const validateWeaponSkills = (ids) => {
+		// Makes sure that the select for the weapon skill is never in an invalid state.
 		const prefixes = (ids && ids.map(id => `repeating_weapons_${id}`)) || ["repeating_weapons"];
 		getAttrs(["homebrew_skill_list", ...prefixes.map(p => `${p}_weapon_skill_bonus`)], v => {
 			const revisedList = ["@{skill_shoot}", "@{skill_punch}", "@{skill_stab}", "@{skill_telekinesis}", "0"],
@@ -603,6 +603,8 @@
 		});
 	};
 	const handleAttributeQueries = () => {
+		// Attribute query magic to set the global query variables according to
+		// translations and the state of the setting_skill_query attribute.
 		const attrQueries = attributes.map(attr => {
 			const translated = translate(attr.toUpperCase());
 			return `${translated},+ @{${attr}_mod}[${translated}]]]&#125;&#125; ` +
@@ -638,7 +640,6 @@
 		});
 	};
 	const setTranslatedQueries = () => {
-
 		getAttrs(["burst_query", "translation_numdice",
 			"modifier_query", "proficient_query", "skill_name_query"], v => {
 			const setting = {
@@ -654,6 +655,7 @@
 
 	/* Ship Code */
 	const calculateShipStats = () => {
+		// Calculates power, mass, and hardpoints remaining.
 		const doCalc = (weaponIDs, fittingIDs, defenseIDs) => {
 			const oldAttrs = [
 				...weaponIDs.map(id => `repeating_ship-weapons_${id}_weapon_power`),
@@ -704,14 +706,14 @@
 		});
 	};
 
-	/* nothing to do so far */
 	const upgradeSheet = () => {
+		// Any version upgrade code should go here and set a new sheetVersion
 		setAttrs({
 			character_sheet: `Stars Without Number (revised) v${sheetVersion}`
 		});
 	};
 
-	/* Main upgrade from pre-worker versions */
+	/* Main upgrade from pre-worker versioning */
 	const upgradeFrom162 = () => {
 		console.log("Upgrading from versionless sheet (assumed to be fresh or v1.6.2).");
 		const upgradeFunction = _.after(13, () => {
