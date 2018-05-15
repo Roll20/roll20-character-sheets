@@ -870,11 +870,11 @@
 
 			// NPC attack
 			if (v.damage) {
-				const newAttack = {
+				const newAttack = [{
 					attack_damage: v.damage,
 					attack_name: translate("ATTACK"),
 					attack_number: v.npc_attacks || "1"
-				};
+				}];
 				fillRepeatingSectionFromData("npc-attacks", newAttack, upgradeFunction);
 			} else upgradeFunction();
 
