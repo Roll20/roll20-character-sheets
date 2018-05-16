@@ -87,19 +87,16 @@
 		}
 	});
 	// change magic school tab
-	on("change:repeating_ecolesmagie:ecolemagie_selected", function( e ) {
+	on("change:repeating_ecolesmagie:ecolemagie_selected change:ecolemagie_selectall", function( e ) {
 		if( e[ "sourceType"] === "player" ) {
 			updateMagicSchoolTab( e );
 		}
 	});
-	// change magic school name
-	on("change:tab_ecolemagie change:ecolemagie_selectall change:tab_niveaumagie", function() {
+	// change magic Filter
+	on("change:tab_ecolemagie change:tab_niveaumagie", function() {
 		displayMagicSpells();
 	});
-	// register magie level and ecole
-	on("change:repeating_magies", function() {
-		changeSpellMagicSchool();
-	});
+	// export
 	on("change:export_start", function() {
 		start_export();
 	});
@@ -391,10 +388,22 @@
 				sTabs[ `repeating_ecolesmagie_${idarray[ i ]}_ecolemagie_selected` ] = 0;
 			}
 
-			selected = eventInfo[ "sourceAttribute" ].split("_")[2];
-			sTabs[ eventInfo[ "sourceAttribute" ] ] = 1;
+			if( eventInfo[ "sourceAttribute" ] === "ecolemagie_selectall" )
+			{
+				setAttrs( {"tab_ecolemagie": "all" } );
+				sTabs[ "ecolemagie_selectall" ] = 1;
+			}
+			else
+			{
+				var field = eventInfo[ "sourceAttribute" ].replace( "_selected", "" );
+				getAttrs( [ field ], function( v ) {
+					setAttrs( { "tab_ecolemagie": v[ field ] } );
+				});
 
-			setAttrs( {"tab_ecolemagie": selected} );
+				sTabs[ eventInfo[ "sourceAttribute" ] ] = 1;
+				sTabs[ "ecolemagie_selectall" ] = 0;
+			}
+
 			setAttrs( sTabs, { silent: true } );
 		});
 	}
@@ -403,14 +412,14 @@
 		var sDisplay = {};
 
 		getSectionIDs( "repeating_magies", function(idarray) {
-			getAttrs( [ "tab_ecolemagie", "tab_niveaumagie", "ecolemagie_selectall",
+			getAttrs( [ "tab_ecolemagie", "tab_niveaumagie",
 						...idarray.map(id => `repeating_magies_${id}_magie_ecole`),
 						...idarray.map(id => `repeating_magies_${id}_magie_niveau`) ], function( v ) {
 				var cur_ecole = v[ "tab_ecolemagie" ];
 				var cur_level = v[ "tab_niveaumagie" ];
 
 				for( var i in idarray ) {
-					if( ( v[ `repeating_magies_${idarray[ i ]}_magie_ecole` ] ===  cur_ecole && v[ `repeating_magies_${idarray[ i ]}_magie_niveau` ] ===  cur_level ) || v[ "ecolemagie_selectall" ] === "1" ) {
+					if( ( v[ `repeating_magies_${idarray[ i ]}_magie_ecole` ] ===  cur_ecole || cur_ecole === "all" ) && v[ `repeating_magies_${idarray[ i ]}_magie_niveau` ] ===  cur_level ) {
 						sDisplay[ `repeating_magies_${idarray[ i ]}_magie_filtre` ] = 1;
 					} else {
 						sDisplay[ `repeating_magies_${idarray[ i ]}_magie_filtre` ] = 0;
@@ -418,16 +427,6 @@
 				}
 				setAttrs( sDisplay, { silent: true } );
 			});
-		});
-	}
-
-	function changeSpellMagicSchool() {
-		getAttrs( [ "tab_ecolemagie", "tab_niveaumagie"], function( v ) {
-			setAttrs({
-				"repeating_magies_magie_ecole": v[ "tab_ecolemagie" ],
-				"repeating_magies_magie_niveau": v[ "tab_niveaumagie" ],
-				"repeating_magies_magie_filtre": 1
-			}, { silent: true });
 		});
 	}
 
@@ -1451,7 +1450,7 @@
 		<div class="sheet-tab_magie">
 			<div class="sheet-col-float" style="width:120px;">
 				<div class="sheet-tableth" style="padding: 4px; font-size: 11px;"> v Ecoles / Niveaux > </div>
-				<input type="checkbox" name="attr_ecoleMagie_SelectALL" value="1" checked="checked" /><span> Réassigner</span>
+				<input type="checkbox" name="attr_ecoleMagie_SelectALL" class="sheet-tab" value="1" checked="checked" /><span class="sheet-tab">Toutes</span>
 				<br /><br />
 				<fieldset class="repeating_EcolesMagie">
 					<input type="checkbox" name="attr_EcoleMagie_Selected" class="sheet-tab" value="1" /><span class="sheet-tab" name="attr_EcoleMagie">&nbsp;</span>
@@ -1486,18 +1485,16 @@
 							<br />
 							<b>Ajouter un sort :</b><br />
 							<ol>
-								<li>Sélectionnez l'école de magie du sort</li>
+								<li>Créez un nouveau sort</li>
+								<li>Inscrivez l'école de magie du sort (attention l'école de magie doit éxister dans la liste de gauche !)</li>
 								<li>Sélectionnez le niveau du sort</li>
-								<li>Ajoutez un sort</li>
-								<li>Configurez votre sort, il sera automatiquement associé à l'école et au niveau séléctionnés.</li>
+								<li>Configurez votre sort (portée, épreuve, dégats...), il sera automatiquement associé à l'école et au niveau séléctionnés en cas de filtre.</li>
 							</ol>
 							<br />
-							<b>Changer l'école ou le niveau d'un sort :</b><br />
+							<b>Mon sort a disparu ? :</b><br />
 							<ol>
-
-								<li>Cochez la case "Réassigner"</li>
-								<li>Sélectionnez l'école et/ou le niveau à changer</li>
-								<li>Mettez à jour n'importe quelle information du sort pour que l'école et la magie soient réassigné</li>
+								<li>Cochez la case "Toutes les écoles de magies"</li>
+								<li>Vérifiez que l'école du sort est bien <b><u>strictement identique</u></b> à une des écoles de magies</li>
 							</ol>
 						</div>
 					</div>
@@ -1525,13 +1522,37 @@
 
 				<div class="sheet-section sheet-section-sp-list">
 					<fieldset class="repeating_magies">
-						<input type="hidden" class="sheet-hidden" name="attr_Magie_Ecole" value="" />
-						<input type="hidden" class="sheet-hidden" name="attr_Magie_Niveau" value="new" />
 						<input type="checkbox" class="sheet-hidden sheet-magie-filtre" name="attr_Magie_Filtre" checked="checked" value="1" />
 
 						<div class="sheet-magie-filtre">
 							<div class="sheet-col" style="width: 200px;">
 								<input type="text" class="sheet-noBorder" name="attr_Magie_Nom" value="" />
+							</div>
+							<div class="sheet-col" style="width: 70px; padding-top: 5px; text-align:right;">
+								<b>Ecole </b>
+							</div>
+							<div class="sheet-col" style="width: 130px;">
+								<input type="text" class="sheet-noBorder" name="attr_Magie_Ecole" value="" />
+							</div>
+							<div class="sheet-col" style="width: 130px;">
+								<b>Niveau </b><select name="attr_Magie_Niveau">
+									<option value="0">Multi</option>
+									<option value="1">1</option>
+									<option value="2">2</option>
+									<option value="3">3</option>
+									<option value="4">4</option>
+									<option value="5">5</option>
+									<option value="6">6</option>
+									<option value="7">7</option>
+									<option value="8">8</option>
+									<option value="9">9</option>
+									<option value="10">10</option>
+									<option value="11">11</option>
+									<option value="12">12</option>
+									<option value="13">13</option>
+									<option value="14">14</option>
+									<option value="15">15</option>
+								</select>
 							</div>
 							<br clear="all" />
 							<br />
