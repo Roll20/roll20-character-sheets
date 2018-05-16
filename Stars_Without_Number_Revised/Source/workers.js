@@ -1,6 +1,6 @@
 /* global getAttrs, setAttrs, getSectionIDs, generateRowID, on ,removeRepeatingRow, _, getTranslationByKey */
 (function () {
-	const sheetVersion = "2.0.0";
+	const sheetVersion = "2.0.1";
 	const attributes = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"];
 	const effortAttributes = ["wisdom_mod", "constitution_mod", "psionics_extra_effort",
 		"skill_biopsionics", "skill_precognition", "skill_telepathy", "skill_teleportation",
@@ -720,7 +720,7 @@
 		console.log("Upgrading from versionless sheet (assumed to be fresh or v1.6.2).");
 		const upgradeFunction = _.after(13, () => {
 			generateWeaponDisplay();
-			upgradeSheet("2.0.0");
+			upgradeSheet("2.0.1");
 		});
 
 		// Legacy migration
