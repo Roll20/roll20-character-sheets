@@ -544,53 +544,56 @@
 
 	function start_import() {
 		var err = "";
-		getAttrs( [ "json_import" ], function ( v ) {
-			// open json
-			try {
-				var sJson = JSON.parse( v[ "json_import" ] );
-			} catch(e) {
-				err = "Données non valides";
-			}
 
-			if( err === "" ) {
-				// reset sheet repeating section
-				var aSections = [	"competences","armes","armures","sacs","materiels","gemmes","potions","coupsspeciaux","munitions","vetements","bourses",
-									"butins", "quetes","poisons","bagues","ecolesmagie","reliques","bouffes","livres","antidotes","magies","ingre","compagnons" ];
-				for( var i in aSections ) {
-					var section = `repeating_${aSections[ i ]}`;
-					(function( section ) {
-						getSectionIDs( section, function(idarray) {
-							for( var j in idarray ) {
-								removeRepeatingRow( `${section}_${idarray[ j ]}` );
-								console.log( `${section}_${idarray[ j ]}` );
-							}
-						});
-					})(section);
+		getAttrs( [ "json_import", "import_start" ], function ( v ) {
+			if( v[ "import_start" ] === "1" )
+			{
+				// open json
+				try {
+					var sJson = JSON.parse( v[ "json_import" ] );
+				} catch(e) {
+					err = "Données non valides";
 				}
 
-				var sAttrs = {};
-				for( var i in sJson ) {
-					if( sJson[ i ] instanceof Array ) {
-						// import repeating values
-						for( var j in sJson[ i ] ) {
-							var newid = generateRowID();
-							for( var k in sJson[ i ][ j ] ) {
-								// replace placeholder 'rowid' by a new generatedID to create rows
-								sAttrs[ k.replace( 'rowID', newid ) ] = sJson[ i ][ j ][ k ];
-							}
-						}
-					} else {
-						// Import simple values
-						sAttrs[ i ] = sJson[ i ];
+				if( err === "" ) {
+					// reset sheet repeating section
+					var aSections = [	"competences","armes","armures","sacs","materiels","gemmes","potions","coupsspeciaux","munitions","vetements","bourses",
+										"butins", "quetes","poisons","bagues","ecolesmagie","reliques","bouffes","livres","antidotes","magies","ingre","compagnons" ];
+					for( var i in aSections ) {
+						var section = `repeating_${aSections[ i ]}`;
+						(function( section ) {
+							getSectionIDs( section, function(idarray) {
+								for( var j in idarray ) {
+									removeRepeatingRow( `${section}_${idarray[ j ]}` );
+								}
+							});
+						})(section);
 					}
-				}
-				setAttrs( sAttrs );
-			}
 
-			setAttrs( {
-				"json_import": err,
-				"import_start": 0
-			}, { "silent":true } );
+					var sAttrs = {};
+					for( var i in sJson ) {
+						if( sJson[ i ] instanceof Array ) {
+							// import repeating values
+							for( var j in sJson[ i ] ) {
+								var newid = generateRowID();
+								for( var k in sJson[ i ][ j ] ) {
+									// replace placeholder 'rowid' by a new generatedID to create rows
+									sAttrs[ k.replace( 'rowID', newid ) ] = sJson[ i ][ j ][ k ];
+								}
+							}
+						} else {
+							// Import simple values
+							sAttrs[ i ] = sJson[ i ];
+						}
+					}
+					setAttrs( sAttrs );
+				}
+
+				setAttrs( {
+					"json_import": err,
+					"import_start": 0
+				}, { "silent":true } );
+			}
 		});
 	}
 
