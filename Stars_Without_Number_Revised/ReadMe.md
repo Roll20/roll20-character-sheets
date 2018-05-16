@@ -27,6 +27,11 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 ## Changelog
 
+### 2.0.1
+
+* Fixed a bug preventing successful conversion of NPC sheets.
+* Fixed a bug that prevented extra effort from taking effect.
+
 ### 2.0.0
 
 * New, overhauled version of the sheet (rewritten in pug and sass)
