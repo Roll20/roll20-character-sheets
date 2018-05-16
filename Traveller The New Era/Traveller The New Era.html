@@ -1,11 +1,11 @@
 <script type="text/worker">
-	//homeworldedu
+	//Homeworld effects on Education
     on("change:techlevel", function() {
 	    getAttrs(["techlevel", "edumod"
 				], function(pvalue) {
 			console.log("************ start capacities caclulation ************");
 			var techlevel =  parseInt(pvalue.techlevel);
-			var cashbasevalue =parseInt(pvalue.edumod) ;
+			var edumod =parseInt(pvalue.edumod) ;
 	if (techlevel < 4) {
         edumod = "-2";
     } else if (techlevel < 9) {
@@ -16,6 +16,111 @@
         edumod = "2";
     }
 			setAttrs({edumod});
+	    });
+    });
+	
+	//Homeworld effects on Charisma
+    on("change:population", function() {
+	    getAttrs(["population", "chamod"
+				], function(pvalue) {
+			console.log("************ start capacities caclulation ************");
+			var population =  parseInt(pvalue.population);
+			var chamod =parseInt(pvalue.chamod) ;
+	if (population < 6) {
+        chamod = "-1";
+    } else if (population < 9) {
+        chamod = "0";
+ 	} else {
+        chamod = "1";
+    }
+			setAttrs({chamod});
+	    });
+    });
+
+	//Homeworld effects on Agility
+    on("change:atmosphere", function() {
+	    getAttrs(["atmosphere", "aglmod"
+				], function(pvalue) {
+			console.log("************ start capacities caclulation ************");
+			var atmosphere =  parseInt(pvalue.atmosphere);
+			var aglmod =parseInt(pvalue.aglmod) ;
+	if (atmosphere < 2) {
+        aglmod = "1";
+    } else {
+        aglmod = "0";
+    }
+			setAttrs({aglmod});
+	    });
+    });
+
+    //Homeworldeffects on Strength
+    on("change:planetsize", function() {
+	    getAttrs(["planetsize", "strmod"
+				], function(pvalue) {
+			console.log("************ start capacities caclulation ************");
+			var planetsize =  parseInt(pvalue.planetsize);
+			var strmod =parseInt(pvalue.strmod) ;
+	if (planetsize < 3) {
+        strmod = "-2";
+    } else if (planetsize < 5) {
+        strmod = "-1";
+    } else if (planetsize < 12) {
+        strmod = "0";
+    } else if (planetsize < 16) {
+        strmod = "1";
+    } else {
+        strmod = "2";
+    }
+			setAttrs({strmod});
+	    });
+    });
+
+    
+    //Homeworld effects on Constitution
+    on("change:planetsize change:atmosphere change:techlevel", function() {
+	    getAttrs(["planetsize", "conmod", "atmosphere", "techlevel"
+				], function(pvalue) {
+			console.log("************ start capacities caclulation ************");
+			var planetsize =  parseInt(pvalue.planetsize);
+			var atmosphere =  parseInt(pvalue.atmosphere);
+			var techlevel =  parseInt(pvalue.techlevel);
+			var conmod = parseInt(pvalue.conmod) ;
+			var consizemod;
+			var conatmosmod;
+			var contechmod;
+	if (planetsize < 3) {
+        consizemod = -2;
+    } else if (planetsize < 5) {
+        consizemod = -1;
+    } else if (planetsize < 12) {
+        consizemod = 0;
+    } else if (planetsize < 16) {
+        consizemod = -1;
+    } else {
+        consizemod = -2;
+    }
+	
+	if (atmosphere < 2) {
+        conatmosmod = 0;
+    } else if (atmosphere  < 3) {
+        conatmosmod = -1;
+    } else if (atmosphere  < 4) {
+        conatmosmod = 0;
+    } else if (atmosphere  < 5) {
+        conatmosmod = -1;
+    } else if (atmosphere  < 9) {
+        conatmosmod = 0;
+    } else if (atmosphere  < 10) {
+        conatmosmod = -1;
+    } else {
+        conatmosmod = 0;
+    }
+	if (techlevel < 4) {
+        contechmod = 1;
+    } else {
+        contechmod = 0;
+    }
+			setAttrs({conmod:(contechmod+consizemod+conatmosmod)});
 	    });
     });
 
@@ -118,7 +223,7 @@
     });
 
 	//weight
-    on("change:strength change:agility", function() {
+    on("change:strength change:agility change:baseweight", function() {
 	    getAttrs(["strength", "agility", "baseweight","weight"
 				], function(pvalue) {
 			console.log("************ start capacities caclulation ************");
@@ -158,7 +263,7 @@
 	});    
 
 	//constitution
-    on("change:conbase change:conmod change:age_con_mod" function() {
+    on("change:conbase change:conmod change:age_con_mod", function() {
 	    getAttrs(["constitution", "conmod", "conbase", "age_con_mod"
 				], function(pvalue) {
 			console.log("************ start capacities caclulation ************");
@@ -712,20 +817,16 @@
 		</div> <!-- end of 3 column setup -->	
 	</div> <!-- end of combat tab -->	
 	<div class="sheet-section-equipment"><!-- Equpiment tab -->
-		<div class=sheet-col> <!-- Credits and ship dms -->
-			<TABLE>
-				<td>Credits</td><td><input type="number" name="attr_Credits" style="width: 100px"></td><td>Ship DMs</td><td><input type="number" name="attr_ShipDMs"></td>
-			</TABLE>
-		</div> <!-- End of credits and ship dms -->
-		<div class=sheet-col> <!--- equipment -->
-			<h3>Equipment</h3>
-				<textarea style="width: 90%; height: 380px;"  name="attr_Equipment" ></textarea>
-		</div> <!-- End of equpiment -->
+				<TABLE>
+					<td>Credits</td><td><input type="number" name="attr_Credits" style="width: 100px"></td><td>Ship DMs</td><td><input type="number" name="attr_ShipDMs"></td>
+				</TABLE>
+				<h3>Equipment</h3>
+					<textarea style="width: 90%; height: 380px;"  name="attr_Equipment" ></textarea>	
 	</div> <!-- End of equpiment tab -->
 	<div class="sheet-section-worksheet"><!-- Character Creation Worksheet -->
 		<div class="sheet-col"> <!-- Names and instructions -->
 			<p>This page is a tool for creating your character, it will try to guide you through the various stages of the process. You will need acces to a copy of the rulebook for most of this.</p>
-			<p>For convenience the various sections of the sheet are hidden unless you check the checkboxes.</p>
+			<p>Use the checkboxes to display adittional information.</p>
 			<br>
 			<h2>1. Name</h2>
 			<p>Character name:</p><input type="text" name="attr_Name">
@@ -739,7 +840,6 @@
 						<p>Your GM will tell you which worlds are appropriate for your campagin, enter the name of the world below.</p>
 							<p><i>Velg verdener fra "People of the Coalition" handouten</i></p>
 						<br>
-						<input type="text" name="attr_Homeworld">
 						<br>
 						<p>Second find the UWP (Universal World Profile) of the world. You can use travellermap.com and/or check with your GM. Enter the data belov. Note that Traveller uses and "extended hexadecimal" numbersystem where two digit numbers are represented with letters. A=10, B=11 etc. This form is not able to decifer these letters so enter 12 if the UWP states C etc. This does not apply for the first digit, "Starport", which is a letter-code and should entered as a letter.</p>
 							<p><i>Dere finner UWP for verdenen dere har valgt i handoutene Oriflamme Subsector eller Aubaine Subsector. Velg en av de under får å få opp datasheet for den akutelle subsecotren og finn koden i liten skrift - det er den nederste av de to som er akutell. Merk at enkelte systemer har skiftet navn, for eksempel het Aubaine Vras under det tredje imperiet.</i></p>
@@ -758,6 +858,7 @@
 								</div>
 						</div> <!-- End of hidden image -->
 					</div> <!-- End of  hidable Homeworld section -->	
+				<p>Homeworld:<input type="text" name="attr_Homeworld"></p>			
 				<table> <!-- Homeworld attributes -->
 					<tr><td><input type="text" name="attr_Starport" style="width: 50px"></td><td><input type="number" name="attr_Planetsize"></td><td><input type="number" name="attr_Atmosphere"></td><td><input type="number" name="attr_Hydrosphere"></td><td><input type="number" name="attr_Population"></td><td><input type="number" name="attr_govlevel"></td><td><input type="number" name="attr_Lawlevel"></td><td><input type="number" name="attr_Techlevel"></td></tr>
 					<tr><th>Starport</th><th>Size</th><th>Atmosphere</th><th>Hydrosphere</th><th>Population</th><th>Government</th><th>Law Level</th><th>Tech Level</th></tr>
@@ -774,6 +875,7 @@
 						<input type="checkbox" class="sheet-arrow">
     						<h4>Homeworld effects</h4>
     							<div class="sheet-body"> <!-- Hidden homeworld effects text -->
+									<p> The sheet automatically adjusts attributes according to the following rules:<p>
 									<p>If Homeworld size is 2 or less - subtract 2 from Strenght and Constitution (< 0.3 G)</p>
 									<p>If Homeworld size is 3 or 4 - subrtact 1 from Strenght and Constitution (> 0.3 G < 0.5 G)</p>
 									<p>If Homeworld size is C (12) to F (15) add 1 to Strenght and subtract 1 from Constitution (> 1.5 G < </p>
@@ -835,12 +937,14 @@
 						</div> <!-- End of hidden text on default skills -->			
 					</div> <!-- End of hidden text on backround skills -->
 					<h4>Background and default skills</h4>
-						<input type="textarea" name="attr_background_default_skills">
+						<input type="textarea" name="attr_background_default_skills" style="height: 400px">
+			<div> <!-- start of careers text section -->			
 			<input type="checkbox" class="sheet-arrow">
     			<h3>Choosing careers</h3>
     				<div class="sheet-body"> <!-- Hidden careers text -->
 						<p>Choosing careers is the main part of Traveller: The New Era character creation. Each career term represent four years.</p>
 						<p>Details for each career is found in the core book. First term skills are detalied in the career description. For special adventure/duty and for subsequent terms the number of skillpoints recieved is based on the term number.</p>
+						<div> <!-- start of term/skills section -->
 						<input type="checkbox" class="sheet-arrow">
     						<h4>Skill points pr term</h4>
     							<div class="sheet-body"> <!-- Hidden term/skills table -->
@@ -855,9 +959,11 @@
 									</table>
 									<p>And so on.</p>
 								</div> <!-- End of hidden term/skills table -->
+						</div> <!-- End of term/skills section -->
 						<p>Chance for and results of Special Adventure/Duty, Comission and Promotion is detailed in the career descpription. Note that some careers have entry requirements.</p>
 						<p>Ship DMs are described in "other effects" if relevant.</p>
 						<p>Credits should be calculated for each career. Cash Base Values are multiplied with either SOC or gambling skill and is  determined based on Homeworld Tech Level.</p>
+						<div> <!-- start of cash base value section --> 
 						<input type="checkbox" class="sheet-arrow">
     						<h4>Cash base value</h4>
     							<div class="sheet-body"> <!-- Hidden cash base value table -->
@@ -869,12 +975,13 @@
 										<tr><td>9-A(10)</td><td>Cr1000</td></tr>
 										<tr><td>B(11)+</td><td>Cr5000</td></tr>
 									</table>
-								</div> <!-- End of hidden cash base value table -->		
-						<p>Cash Base Value:</p><input type="number" value="0" name="attr_cashbase" style="width: 150px">
+								</div> <!-- End of hidden cash base value table -->
+							</div> <!-- End of cash base value section -->			
 						<br>
 						<p>If the GM allows character generation ends when the player decides to. Alternatively it may end on a roll of <button type="roll" value="/gmroll 2D6">2D6</button> and subtracting 1 for every first term in a new career. If the roll is less than the current number of terms character generation ends.</p>
 					</div> <!-- End of hidden choosing careers text -->
-				<div> <!-- start of individual careers section -->
+					<p>Cash Base Value:</p><input type="number" value="0" name="attr_cashbase" style="width: 150px">		
+				<div> <!-- start of individual careers section --> <!-- Calculate number of terms, calculate credtis pr term, choose careers from list, choose skills from repeating section and add them to the skills section -->
 				    <input type="checkbox" class="sheet-arrow">
     					<h4>Careers</h4>
    						 	<div class="sheet-body"> <!-- Hidden careers section -->
@@ -905,7 +1012,6 @@
     			<h2>5. Age</h2>
     				<div class="sheet-body"> <!-- Hidden age text -->
     					<p>Characters start choosing careers at 17 and each term lasts 4 years. Starting age is the number of careers multiplied by 4 pluss 17.</p>
-						<p>Age:<input type="number" name="attr_Age"></p>
 						<br>
 						<p>As the characters age certain ablities might be affected. <button type="roll" value="/gmroll 1d15">Roll 1D15</button>. If the roll is lower than the attribute being checked one point is lost. Use the table below to see which ablities are affected.</p>
 						<p>Effects of age might be combated using physical development and/or Anagathics. These are detailed in the core book.</p>
@@ -927,26 +1033,31 @@
 									<p>And so on.</p>
 								</div> <!-- End of hidden age effects table -->
 						<br>
+					</div> <!-- End of hidden age section -->
+							<p>Age:<input type="number" name="attr_Age"></p>
+							<br>
 							<p>Age modifiers</p>
 							<table>
 								<tr><th>Str</th><th>Agl</th><th>Con</th><th>Int</th></tr>
 								<tr><td><input type="number" value="0" name="attr_Age_Str_Mod"></td><td><input type="number" value="0" name="attr_Age_Agl_Mod"></td><td><input type="number" value="0" name="attr_Age_Con_Mod"></td><td><input type="number" value="0" name="attr_Age_Int_Mod"></td></tr>
 							</table>
-					</div> <!-- End of hidden age section -->
-		</div><!-- End of Age section-->					
+				</div><!-- End of Age section-->					
 		<div> <!-- Final section -->
     		<input type="checkbox" class="sheet-arrow">
 				<h2>6. A few more things</h2>
 					<div class="sheet-body"> <!-- Hidden final section -->
 					<p>Initative is determined once, depending on a roll and the types of careers you have. If you have any military careers you can roll <button type="roll" value="/gmroll 1D6">1D6</button>, if not roll <button type="roll" value="/gmroll 1d6/2">1D6/2</button> rounded down, but counting 0.5 as 1. Add initive bonuses from "other effects", but civilian bonues only apply for the civillian roll option.</p>
-					<p>Enter your initative rating here: <input type="number" name="attr_Initative"></p>
 					<br>
 					<p>To find your weight and unarmed combat damage we need to ask to simple questions.</p>
-					<p>Do you have a skill level in "Unarmed Martial Arts"? Enter the value here, if not leave it at <input type="number" value="0" name="attr_unarmed_martial_arts">. Remember to adjust if you gain skill levels in play.</p>
+					<p>Do you have a skill level in "Unarmed Martial Arts"? Enter the value here, if not leave it at 0. . Remember to adjust if you gain skill levels in play.</p>
 					<br>
-					<p>What do you want as a base weight? The Core book uses 65kg for women and 80kg for men, but you are free to choose whatever you feel like. This number will be adjustet by your strength and agility. <input type="number" name="attr_baseweight"> </p>
+					<p>Choose a base weight. The Core book uses 65kg for women and 80kg for men, but you are free to choose whatever you feel like. This number will be adjustet by your strength and agility.</p>
 					<br>
 					<p>And that's it! Congratulations. Skills must be manually recorded on the "Skills" section of the character sheet.</p>
+					</div><!-- End of hidden section -->	
+			<p>Initative:<input type="number" name="attr_Initative"></p>
+			<p>Unarmed martial arts skill:<input type="number" value="0" name="attr_unarmed_martial_arts"></p>
+			<p>Base weight:<input type="number" name="attr_baseweight"></p>		
 		</div><!-- End of final section -->
 	</div> <!-- End of worksheet tab -->
 </div> <!-- End of tabs section -->
