@@ -381,7 +381,7 @@
 	};
 	const addNPCAttackBonus = () => {
 		getAttrs(["repeating_npc-attacks_attack_ab", "npc_attack_bonus"], v => {
-			if (!String(v["repeating_npc-attacks_attack_ab"])) {
+			if (String(v["repeating_npc-attacks_attack_ab"]) === "0") {
 				setAttrs({
 					["repeating_npc-attacks_attack_ab"]: v.npc_attack_bonus
 				});
@@ -1240,7 +1240,7 @@
 	/* NPC sheet */
 	on("change:npc_stat_block", fillNPC);
 	on("change:repeating_npc-abilities", buildAbilitiesMenu);
-	on("change:repeating_npc-attacks", () => {
+	on("change:repeating_npc-attacks:attack_name", () => {
 		addNPCAttackBonus();
 		buildAttacksMenu();
 	});

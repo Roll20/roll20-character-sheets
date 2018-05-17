@@ -31,6 +31,7 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 * Added option to disable modifier queries.
 * Added weapon encumbrance.
+* Fixed a bug where new NPC attacks would not receive the correct attack bonus.
 
 ### 2.0.1
 
