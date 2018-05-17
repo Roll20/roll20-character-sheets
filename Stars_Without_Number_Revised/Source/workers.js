@@ -1,6 +1,8 @@
 /* global getAttrs, setAttrs, getSectionIDs, generateRowID, on ,removeRepeatingRow, _, getTranslationByKey */
 (function () {
-	const sheetVersion = "2.0.1";
+	// Data constants
+	const sheetName = "Stars Without Number (revised)";
+	const sheetVersion = "2.1.0-beta2";
 	const attributes = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"];
 	const effortAttributes = ["wisdom_mod", "constitution_mod", "psionics_extra_effort",
 		"skill_biopsionics", "skill_precognition", "skill_telepathy", "skill_teleportation",
@@ -62,7 +64,8 @@
 		"veteran_fighter": ["2", "14", "2", "Weapon+1", "1", "10m", "9", "1", "14"],
 		"warrior_tyrant": ["8", "20", "10", "Weapon+3", "1", "10m", "11", "3", "11", "POWERED"]
 	};
-	/* Utility */
+
+	/* Utility functions */
 	const translate = getTranslationByKey;
 	const sign = (value) => {
 		const val = parseInt(value) || 0;
@@ -74,7 +77,9 @@
 	const mySetAttrs = (setting, values, ...rest) => {
 		// This is a version of setAttrs that expects an extra values parameter
 		// (as received from getAttrs). It will only set values in setting that differ
-		// from their current value on the sheet.
+		// from their current value on the sheet. The intention is to not
+		// set values unnecessarily (it's expensive) and to reduce bloat
+		// in the Attributes & Abilities tab.
 		Object.keys(setting).forEach(k => {
 			if (values[k] === setting[k]) delete setting[k];
 		});
@@ -194,32 +199,42 @@
 	};
 
 	const calculateGearReadiedStowed = () => {
-		getSectionIDs("repeating_gear", (idArray) => {
-			const attrs = [
-				...idArray.map(id => `repeating_gear_${id}_gear_encumbrance`),
-				...idArray.map(id => `repeating_gear_${id}_gear_status`),
-				"armor_encumbrance",
-				"gear_readied", "gear_readied_max", "gear_readied_over",
-				"gear_stowed", "gear_stowed_max", "gear_stowed_over",
-			];
-			getAttrs(attrs, v => {
-				const [gear_readied, gear_stowed] = idArray.reduce((m, id) => {
-					if (v[`repeating_gear_${id}_gear_status`] === "readied")
-						m[0] += parseInt(v[`repeating_gear_${id}_gear_encumbrance`]) || 0;
-					else if (v[`repeating_gear_${id}_gear_status`] === "stowed")
-						m[1] += parseInt(v[`repeating_gear_${id}_gear_encumbrance`]) || 0;
-					return m;
-				}, [parseInt(v.armor_encumbrance) || 0, 0]);
-				const gear_readied_over = (gear_readied > parseInt(v.gear_readied_max)) ? "1" : "0";
-				const gear_stowed_over = (gear_stowed > parseInt(v.gear_stowed_max)) ? "1" : "0";
-				const setting = {gear_readied, gear_stowed, gear_readied_over, gear_stowed_over};
+		getSectionIDs("repeating_gear", gearIDs => {
+			getSectionIDs("repeating_weapons", weaponIDs => {
+				const attrs = [
+					...gearIDs.map(id => `repeating_gear_${id}_gear_encumbrance`),
+					...gearIDs.map(id => `repeating_gear_${id}_gear_status`),
+					...weaponIDs.map(id => `repeating_weapons_${id}_weapon_encumbrance`),
+					...weaponIDs.map(id => `repeating_weapons_${id}_weapon_status`),
+					"armor_encumbrance",
+					"gear_readied", "gear_readied_max", "gear_readied_over",
+					"gear_stowed", "gear_stowed_max", "gear_stowed_over",
+				];
+				getAttrs(attrs, v => {
+					const [gear_readied, gear_stowed] = weaponIDs.reduce((m, id) => {
+						if (v[`repeating_weapons_${id}_weapon_status`] === "READIED")
+							m[0] += parseInt(v[`repeating_weapons_${id}_weapon_encumbrance`]) || 0;
+						else if (v[`repeating_weapons_${id}_weapon_status`] === "STOWED")
+							m[1] += parseInt(v[`repeating_weapons_${id}_weapon_encumbrance`]) || 0;
+						return m;
+					}, gearIDs.reduce((m, id) => {
+						if (v[`repeating_gear_${id}_gear_status`] === "READIED")
+							m[0] += parseInt(v[`repeating_gear_${id}_gear_encumbrance`]) || 0;
+						else if (v[`repeating_gear_${id}_gear_status`] === "STOWED")
+							m[1] += parseInt(v[`repeating_gear_${id}_gear_encumbrance`]) || 0;
+						return m;
+					}, [parseInt(v.armor_encumbrance) || 0, 0]));
+					const gear_readied_over = (gear_readied > parseInt(v.gear_readied_max)) ? "1" : "0";
+					const gear_stowed_over = (gear_stowed > parseInt(v.gear_stowed_max)) ? "1" : "0";
+					const setting = {gear_readied, gear_stowed, gear_readied_over, gear_stowed_over};
 
-				mySetAttrs(setting, v, {silent: true});
+					mySetAttrs(setting, v, {silent: true});
+				});
 			});
 		});
 	};
 
-	const calculateStowedReadiedMax = () => {
+	const calculateGearReadiedStowedMax = () => {
 		getAttrs(["strength", "gear_readied_max", "gear_stowed_max"], v => {
 			if (v.strength)
 				mySetAttrs({
@@ -286,15 +301,6 @@
 		});
 	};
 
-	const handleSuperChange = () => {
-		getAttrs(["setting_super_type", "tab_super"], v => {
-			const setting = {};
-			if (v.setting_super_type === "magic") setting.tab_super = "magic";
-			if (v.setting_super_type === "psionics") setting.tab_super = "psionics";
-			mySetAttrs(setting, v);
-		});
-	};
-
 	/**
 	 * Validations
 	 */
@@ -304,6 +310,16 @@
 			if (v.tab === "npc" && v.npc === "0") setAttrs({tab: "character"});
 		});
 	};
+
+	const validateSuperTab = () => {
+		getAttrs(["setting_super_type", "tab_super"], v => {
+			const setting = {};
+			if (v.setting_super_type === "magic") setting.tab_super = "magic";
+			if (v.setting_super_type === "psionics") setting.tab_super = "psionics";
+			mySetAttrs(setting, v);
+		});
+	};
+
 	const validateStrain = () => {
 		getAttrs(["strain", "strain_permanent", "strain_max"], v => {
 			const currentStrain = parseInt(v.strain) || 0,
@@ -313,6 +329,7 @@
 			if (strain !== currentStrain) setAttrs({ strain });
 		});
 	};
+
 	const validateWeaponSkills = (ids) => {
 		// Makes sure that the select for the weapon skill is never in an invalid state.
 		const prefixes = (ids && ids.map(id => `repeating_weapons_${id}`)) || ["repeating_weapons"];
@@ -383,8 +400,8 @@
 						const num = parseInt(v[`repeating_npc-attacks_${id}_attack_number`]) || 1;
 						const macro = [2,3,4].map(n => {
 							if (n <= num)
-								return `{{attack${n}=[[1d20 + @{attack_ab} + @{attack_burst} + @{modifier_query}]]}} ` +
-									`{{damage${n}=[[@{attack_damage} + @{attack_burst}]]}} `;
+								return `{{attack${n}=[[1d20 + @{attack_ab} @{attack_burst} @{modifier_query}]]}} ` +
+									`{{damage${n}=[[@{attack_damage} @{attack_burst}]]}} `;
 							else return "";
 						}).join("");
 						m[`repeating_npc-attacks_${id}_attack_extra_macro`] = macro;
@@ -571,7 +588,7 @@
 			"macro_statblock",
 		];
 		getAttrs(sourceAttrs, v => {
-			if (v.npc !== '1') return;
+			if (v.npc !== "1") return;
 			const macroList = [
 				`[**^{SAVES}** v@{npc_saves},](~npc_save) [**^{SKILLS}** +@{npc_skills},](~npc_skill) `,
 				`[**^{MORALE}** v@{npc_morale}](~npc_morale)\n`,
@@ -641,12 +658,20 @@
 
 		});
 	};
+	const handleModifierQuery = () => {
+		getAttrs(["modifier_query", "setting_modifier_query"], v => {
+			if (String(v.setting_modifier_query) === "1") {
+				mySetAttrs({
+					modifier_query: `+ ?{${translate("MODIFIER")}|0}[${translate("MODIFIER_SHORT")}]`,
+				}, v);
+			}
+			else mySetAttrs({modifier_query: " "}, v);
+		});
+	};
 	const setTranslatedQueries = () => {
-		getAttrs(["burst_query", "translation_numdice",
-			"modifier_query", "proficient_query", "skill_name_query"], v => {
+		getAttrs(["burst_query", "translation_numdice", "proficient_query", "skill_name_query"], v => {
 			const setting = {
-				burst_query: `?{${translate("BURST")}|${translate("YES")}, 2|${translate("NO")}, 0}[${translate("BURST")}]`,
-				modifier_query: `?{${translate("MODIFIER")}|0}[${translate("MODIFIER")}]`,
+				burst_query: `?{${translate("BURST")}|${translate("YES")},+ 2[${translate("BURST")}]|${translate("NO")},&#32;}`,
 				proficient_query: `?{${translate("PROFICIENT")}|${translate("YES")}, @{npc_skills}|${translate("NO")}, 0}[${translate("SKILL")}]`,
 				skill_name_query: `?{${translate("SKILL_NAME")}|${translate("SKILL")}}`,
 				translation_numdice: translate("NUMBER_OF_DICE")
@@ -700,18 +725,67 @@
 	/**
 	 * Migrations
 	 */
-	const handleVersioning = () => {
+	const handleUpgrade = () => {
 		getAttrs(["character_sheet"], v => {
-			if (!v.character_sheet ||
-				v.character_sheet.indexOf("Stars Without Number (revised)") !== 0) upgradeFrom162();
-			else upgradeSheet(v.character_sheet.slice(32));
+			if (!v.character_sheet || v.character_sheet.indexOf(sheetName) !== 0)
+				upgradeFrom162();
+			else upgradeSheet(v.character_sheet.slice(32), true);
 		});
 	};
 
-	const upgradeSheet = () => {
-		// Any version upgrade code should go here and set a new sheetVersion
-		setAttrs({
-			character_sheet: `Stars Without Number (revised) v${sheetVersion}`
+	const upgradeSheet = (version, firstTime = false, finalTime = false) => {
+		// Any version upgrade code should go here
+		const performUpgrade = (version) => {
+			const [major, minor] = version.split(".").map(x => parseInt(x));
+
+			/** v2.1.0
+			 *  convert old format for burst settings for weapons and attacks
+			 *  convert old format for gear readied/stowed
+			**/
+			if (major == 2 && minor < 1) {
+				const upgradeFunction = _.after(3, () => upgradeSheet(sheetVersion));
+				getSectionIDs("repeating_weapons", idArray => {
+					getAttrs(idArray.map(id => `repeating_weapons_${id}_weapon_burst`), v => {
+						const setting = idArray.reduce((m, id) => {
+							if (v[`repeating_weapons_${id}_weapon_burst`] === "0")
+								m[`repeating_weapons_${id}_weapon_burst`] = "";
+							else if (v[`repeating_weapons_${id}_weapon_burst`] === "2")
+								m[`repeating_weapons_${id}_weapon_burst`] = "+ 2[Burst]";
+							return m;
+						}, {});
+						setAttrs(setting, {}, upgradeFunction);
+					});
+				});
+				getSectionIDs("repeating_npc-attacks", idArray => {
+					getAttrs(idArray.map(id => `repeating_npc-attacks_${id}_attack_burst`), v => {
+						const setting = idArray.reduce((m, id) => {
+							if (v[`repeating_npc-attacks_${id}_attack_burst`] === "0")
+								m[`repeating_npc-attacks_${id}_attack_burst`] = "";
+							else if (v[`repeating_npc-attacks_${id}_attack_burst`] === "2")
+								m[`repeating_npc-attacks_${id}_attack_burst`] = "+ 2[Burst]";
+							return m;
+						}, {});
+						setAttrs(setting, {}, upgradeFunction);
+					});
+				});
+				getSectionIDs("repeating_gear", idArray => {
+					getAttrs(idArray.map(id => `repeating_gear_${id}_gear_status`), v => {
+						const setting = idArray.reduce((m, id) => {
+							m[`repeating_gear_${id}_gear_status`] =
+								(v[`repeating_gear_${id}_gear_status`] || "").toUpperCase();
+							return m;
+						}, {});
+						mySetAttrs(setting, v, {}, upgradeFunction);
+					});
+				});
+			} else upgradeSheet(sheetVersion, false, true);
+		};
+
+		if (firstTime) performUpgrade(version);
+		else setAttrs({
+			character_sheet: `${sheetName} v${version}`,
+		}, {}, () => {
+			if (!finalTime) performUpgrade(version);
 		});
 	};
 
@@ -1099,12 +1173,14 @@
 	/**
 	 * Register Event handlers
 	 */
+
+	on("sheet:opened", handleUpgrade);
+
 	on("sheet:opened change:npc", validateTab);
 	on("sheet:opened", setTranslatedQueries);
 	on("sheet:opened change:setting_skill_query", handleAttributeQueries);
+	on("sheet:opened change:setting_modifier_query", handleModifierQuery);
 	on("change:homebrew_skill_list", setTranslatedDefaults);
-
-	on("sheet:opened", handleVersioning);
 
 	/* Character sheet */
 	attributes.forEach(attr => on(`change:${attr} change:${attr}_bonus`, () => calculateMod(attr)));
@@ -1126,31 +1202,15 @@
 
 	on("change:armor_ac change:innate_ac", calculateAC);
 
-	on("change:strength", calculateStowedReadiedMax);
-	on("change:repeating_gear remove:repeating_gear change:armor_encumbrance " +
-		"change:gear_readied change:gear_stowed", calculateGearReadiedStowed);
+	on("change:strength", calculateGearReadiedStowedMax);
+	on("change:repeating_gear remove:repeating_gear change:armor_encumbrance change:repeating_weapons" +
+		" remove:repeating_weapons change:gear_readied change:gear_stowed", calculateGearReadiedStowed);
 
 	on("change:level change:setting_xp_scheme", calculateNextLevelXP);
 
-	on("change:setting_super_type", handleSuperChange);
+	on("change:setting_super_type", validateSuperTab);
 
-	/* Ship sheet */
-	on("change:repeating_ship-weapons change:repeating_ship-defenses change:repeating_ship-fittings " +
-		"change:ship_power change:ship_mass change:ship_hardpoints", calculateShipStats);
-	on("change:repeating_ship-weapons", buildShipWeaponsMenu);
-
-	/* NPC sheet */
-	on("change:npc_stat_block", fillNPC);
-	on("change:repeating_npc-abilities", buildAbilitiesMenu);
-	on("change:repeating_npc-attacks", () => {
-		addNPCAttackBonus();
-		buildAttacksMenu();
-	});
-	on("change:npc_roll_full_attack change:repeating_npc-attacks:attack_number", setNPCMultiAttacks);
-	on("change:npc change:npc_armor_type change:macro_npc_attacks change:macro_npc_abilities", buildStatblock);
-	on("change:npc_rolls_hidden", handleNPCRollHide);
-
-	/* Chat macros */
+	/* Character chat macros */
 	on("change:homebrew_luck_save", buildSaveMenu);
 
 	on([
@@ -1169,4 +1229,23 @@
 	on("change:setting_super_type change:repeating_spells remove:repeating_spells " +
 		"change:repeating_magic-skills remove:repeating_magic-skills " +
 		"change:skill_magic change:skill_magic2_name change:skill_magic2", buildMagicMenu);
+
+
+	/* Ship sheet */
+	on("change:repeating_ship-weapons change:repeating_ship-defenses change:repeating_ship-fittings " +
+		"change:ship_power change:ship_mass change:ship_hardpoints", calculateShipStats);
+	on("change:repeating_ship-weapons", buildShipWeaponsMenu);
+
+
+	/* NPC sheet */
+	on("change:npc_stat_block", fillNPC);
+	on("change:repeating_npc-abilities", buildAbilitiesMenu);
+	on("change:repeating_npc-attacks", () => {
+		addNPCAttackBonus();
+		buildAttacksMenu();
+	});
+	on("change:npc_roll_full_attack change:repeating_npc-attacks:attack_number", setNPCMultiAttacks);
+	on("change:npc change:npc_armor_type change:macro_npc_attacks change:macro_npc_abilities", buildStatblock);
+	on("change:npc_rolls_hidden", handleNPCRollHide);
+
 })();

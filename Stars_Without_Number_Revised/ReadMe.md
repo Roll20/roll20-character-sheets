@@ -27,6 +27,11 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 ## Changelog
 
+### 2.1.0
+
+* Added option to disable modifier queries.
+* Added weapon encumbrance.
+
 ### 2.0.1
 
 * Fixed a bug preventing successful conversion of NPC sheets.
