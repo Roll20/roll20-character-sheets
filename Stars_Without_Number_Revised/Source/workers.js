@@ -2,7 +2,7 @@
 (function () {
 	// Data constants
 	const sheetName = "Stars Without Number (revised)";
-	const sheetVersion = "2.1.0-beta2";
+	const sheetVersion = "2.1.0-beta3";
 	const attributes = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"];
 	const effortAttributes = ["wisdom_mod", "constitution_mod", "psionics_extra_effort",
 		"skill_biopsionics", "skill_precognition", "skill_telepathy", "skill_teleportation",
@@ -669,9 +669,10 @@
 		});
 	};
 	const setTranslatedQueries = () => {
-		getAttrs(["burst_query", "translation_numdice", "proficient_query", "skill_name_query"], v => {
+		getAttrs(["burst_query", "extra_hp_query", "translation_numdice", "proficient_query", "skill_name_query"], v => {
 			const setting = {
-				burst_query: `?{${translate("BURST")}|${translate("YES")},+ 2[${translate("BURST")}]|${translate("NO")},&#32;}`,
+				burst_query: `?{${translate("BURST")}|${translate("YES")},+ 2[${translate("BURST")}]|${translate("NO")},&` + `#` + `32;}`,
+				extra_hp_query: `?{${translate("EXTRA_HP_QUERY")}|0}[${translate("BONUS")}]`,
 				proficient_query: `?{${translate("PROFICIENT")}|${translate("YES")}, @{npc_skills}|${translate("NO")}, 0}[${translate("SKILL")}]`,
 				skill_name_query: `?{${translate("SKILL_NAME")}|${translate("SKILL")}}`,
 				translation_numdice: translate("NUMBER_OF_DICE")
@@ -744,6 +745,9 @@
 			**/
 			if (major == 2 && minor < 1) {
 				const upgradeFunction = _.after(3, () => upgradeSheet(sheetVersion));
+
+				buildShipWeaponsMenu();
+
 				getSectionIDs("repeating_weapons", idArray => {
 					getAttrs(idArray.map(id => `repeating_weapons_${id}_weapon_burst`), v => {
 						const setting = idArray.reduce((m, id) => {
