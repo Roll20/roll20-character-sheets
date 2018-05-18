@@ -29,14 +29,18 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 ### 2.1.0
 
-* Added option to disable modifier queries.
-* Added weapon encumbrance.
-* Fixed a bug where new NPC attacks would not receive the correct attack bonus.
+* Additions
+	* Added option to disable modifier queries globally.
+	* Added button to roll hit points.
+	* Added weapon encumbrance tracking.
+* Bugfixes
+	* Roll templates are no longer cut off when chat avatars are disabled.
+	* New NPC attacks should now receive the correct attack bonus.
 
 ### 2.0.1
 
 * Fixed a bug preventing successful conversion of NPC sheets.
-* Fixed a bug that prevented extra effort from taking effect.
+* Fixed a bug preventing extra effort from taking effect.
 
 ### 2.0.0
 
