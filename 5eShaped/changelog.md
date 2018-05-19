@@ -11,6 +11,12 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 18.1.3
+
+### Bug fixes
+
+- [#714: Mordenkainen's Tome of Foes, seems like monster imports fail to get actions](https://bitbucket.org/mlenser/5eshaped/issues/714/mordenkainens-tome-of-foes-seems-like)
+
 ## 18.1.2
 
 ### Bug fixes
