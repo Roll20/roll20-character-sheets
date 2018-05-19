@@ -2712,15 +2712,15 @@ var _server = __webpack_require__(1);
 
 var _utilities = __webpack_require__(0);
 
-/* global on:false, getTranslationByKey:false, removeRepeatingRow:false */
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } } /* global on:false, getTranslationByKey:false, removeRepeatingRow:false */
 
 var updateAbilityChecksMacro = exports.updateAbilityChecksMacro = function updateAbilityChecksMacro() {
   (0, _server.getSetItems)('abilityChecks.updateMacro', {
-    collectionArray: _constants.FIELDS.d20.concat(['ability_checks_query_var', 'ability_checks_macro_var']).concat(['skills_macro_var']).concat(['honor_toggle', 'sanity_toggle']).concat(_constants.ABILITIES.map(function (ability) {
+    collectionArray: [].concat(_toConsumableArray(_constants.FIELDS.d20), ['ability_checks_query_var', 'ability_checks_macro_var', 'honor_toggle', 'is_npc', 'sanity_toggle', 'skills_macro_var'], _toConsumableArray(_constants.ABILITIES.map(function (ability) {
       return ability + '_check_formula';
-    })).concat(_constants.ABILITIES.map(function (ability) {
+    })), _toConsumableArray(_constants.ABILITIES.map(function (ability) {
       return ability + '_check_mod_with_sign';
-    })),
+    }))),
     collectionArrayRepeatingSections: [{
       collectionArrayAddItems: ['ability', 'formula', 'name', 'show', 'total_with_sign'],
       name: 'repeating_skill'
@@ -2741,7 +2741,7 @@ var updateAbilityChecksMacro = exports.updateAbilityChecksMacro = function updat
         }
       });
       repStrings.forEach(function (repString) {
-        if (data[repString + '_show']) {
+        if (!(0, _utilities.exists)(data.is_npc) || data[repString + '_show']) {
           var total = data[repString + '_total_with_sign'] || '+0';
           var skillButton = '[' + data[repString + '_name'] + ' ' + total + '](~' + repString + '_skill)';
           var skillFormula = data[repString + '_formula'] ? data[repString + '_formula'].replace(/}}/g, '&#125;&#125;') : '';
@@ -2869,7 +2869,7 @@ var updateAbilityChecks = exports.updateAbilityChecks = function updateAbilityCh
 };
 
 var updateSkill = exports.updateSkill = function updateSkill() {
-  var collectionArray = _constants.FIELDS.pb.concat(_constants.FIELDS.abilityScores).concat(_constants.FIELDS.d20).concat(_constants.FIELDS.abilityCheckModifier).concat(['class_feature_bard_jack_of_all_trades_toggle', 'class_feature_fighter_champion_remarkable_athlete_toggle', 'class_feature_rogue_reliable_talent_toggle', 'show_passive_skills', 'is_npc']).concat(_constants.ABILITIES.map(function (ability) {
+  var collectionArray = _constants.FIELDS.pb.concat(_constants.FIELDS.abilityScores).concat(_constants.FIELDS.d20).concat(_constants.FIELDS.abilityCheckModifier).concat(['class_feature_bard_jack_of_all_trades_toggle', 'class_feature_fighter_champion_remarkable_athlete_toggle', 'class_feature_rogue_reliable_talent_toggle', 'show_passive_skills']).concat(_constants.ABILITIES.map(function (ability) {
     return ability + '_check_modifier';
   })).concat(_constants.ABILITIES.map(function (ability) {
     return ability + '_check_modifier_dice';
@@ -3872,7 +3872,7 @@ var updateSavingThrowsMacro = function updateSavingThrowsMacro(data) {
     _constants.ABILITIES.forEach(function (ability) {
       if ((ability !== 'honor' || ability === 'honor' && (0, _utilities.exists)(data.honor_toggle)) && (ability !== 'sanity' || ability === 'sanity' && (0, _utilities.exists)(data.sanity_toggle))) {
         var _total = data[ability + '_saving_throw_mod_with_sign'] || '+0';
-        if (data[ability + '_saving_throw_show']) {
+        if (!(0, _utilities.exists)(data.is_npc) || data[ability + '_saving_throw_show']) {
           macroArray.push('[^{' + ability.toUpperCase() + '} ' + _total + '](~shaped_' + ability + '_saving_throw)');
           var _savingThrowQuery = (0, _utilities.capitalize)(ability) + ' ' + _total + ',{{title=' + getTranslationByKey(ability.toUpperCase()) + ' ' + getTranslationByKey('SAVING_THROW') + '&#125;&#125; ' + data[ability + '_saving_throw_formula'].replace(/}}/g, '&#125;&#125;');
           queryArray.push(_savingThrowQuery);
@@ -3889,7 +3889,7 @@ var updateSavingThrowsMacro = function updateSavingThrowsMacro(data) {
 };
 
 var updateSavingThrows = exports.updateSavingThrows = function updateSavingThrows() {
-  var collectionArray = [].concat(_toConsumableArray(_constants.FIELDS.pb), _toConsumableArray(_constants.FIELDS.d20), _toConsumableArray(_constants.FIELDS.abilityScores), ['average_of_abilities', 'honor_toggle', 'sanity_toggle', 'saving_throw_macro_var', 'saving_throw_modifier', 'saving_throw_modifier_dice', 'saving_throw_query_var', 'saving_throws_half_proficiency', 'show_saving_throws', 'use_custom_saving_throws'], _toConsumableArray(_constants.ALL_SAVING_THROWS.map(function (savingThrow) {
+  var collectionArray = [].concat(_toConsumableArray(_constants.FIELDS.pb), _toConsumableArray(_constants.FIELDS.d20), _toConsumableArray(_constants.FIELDS.abilityScores), ['average_of_abilities', 'honor_toggle', 'is_npc', 'sanity_toggle', 'saving_throw_macro_var', 'saving_throw_modifier', 'saving_throw_modifier_dice', 'saving_throw_query_var', 'saving_throws_half_proficiency', 'show_saving_throws', 'use_custom_saving_throws'], _toConsumableArray(_constants.ALL_SAVING_THROWS.map(function (savingThrow) {
     return savingThrow + '_saving_throw_proficient';
   })), _toConsumableArray(_constants.ALL_SAVING_THROWS.map(function (savingThrow) {
     return savingThrow + '_saving_throw_modifier';
