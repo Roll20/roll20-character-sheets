@@ -12,6 +12,8 @@ Bugs fall into the patch category.
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
 ## 18.1.6
+
+### Bug fixes
 - Fixed error when modifying anything with a melee weapon caused by refactoring from yesterday.
 
 ## 18.1.5
