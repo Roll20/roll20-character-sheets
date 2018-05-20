@@ -33,9 +33,12 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 	* Added option to disable modifier queries globally.
 	* Added button to roll hit points.
 	* Added weapon encumbrance tracking.
+	* Added option for automatic ammo reduction (requires ChatSetAttr).
 * Bugfixes
+	* Attribute modifiers are now recalculated upon conversion from v1.6.2.
 	* Roll templates are no longer cut off when chat avatars are disabled.
 	* New NPC attacks should now receive the correct attack bonus.
+	* Line breaks in foci/technique/spell/cyberware descriptions now render correctly.
 
 ### 2.0.1
 

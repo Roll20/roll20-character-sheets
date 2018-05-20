@@ -1018,7 +1018,7 @@
 				], v => {
 				const setting = idArray.reduce((m, id) => {
 					m[`repeating_${sName}_${id}_weapon_api`] =
-						(v.setting_use_ammo === "1" && v[`repeating_${sName}_${id}_weapon_use_ammo`] === "1") ?
+						(v.setting_use_ammo === "1" && v[`repeating_${sName}_${id}_weapon_use_ammo`] !== "0") ?
 						`\n!modattr --mute --charid @{character_id} --repeating_${sName}_${id}_weapon_ammo|${formula}`
 						: "";
 					return m;
