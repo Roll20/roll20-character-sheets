@@ -33,6 +33,7 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 	* Added option to disable modifier queries globally.
 	* Added button to roll hit points.
 	* Added weapon encumbrance tracking.
+	* Weapon shock damage can now be toggled independent of base being 0 (for Unarmed Combatant).
 	* Added option for automatic ammo reduction (requires ChatSetAttr).
 * Bugfixes
 	* Attribute modifiers are now recalculated upon conversion from v1.6.2.

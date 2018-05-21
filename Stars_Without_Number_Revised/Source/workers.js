@@ -963,6 +963,7 @@
 				...prefixes.map(prefix => `${prefix}_weapon_skill_bonus`),
 				...prefixes.map(prefix => `${prefix}_weapon_attribute_mod`),
 				...prefixes.map(prefix => `${prefix}_weapon_damage`),
+				...prefixes.map(prefix => `${prefix}_weapon_shock`),
 				...prefixes.map(prefix => `${prefix}_weapon_shock_damage`),
 				...prefixes.map(prefix => `${prefix}_weapon_shock_ac`),
 				...prefixes.map(prefix => `${prefix}_weapon_skill_to_damage`),
@@ -983,7 +984,7 @@
 					const damageBonus = attrBonus +
 						((v[`${prefix}_weapon_skill_to_damage`] === "@{weapon_skill_bonus}") ? skillBonus : 0);
 					const weaponDamage = (v[`${prefix}_weapon_damage`] === "0") ? "" : v[`${prefix}_weapon_damage`];
-					const shockString = (v[`${prefix}_weapon_shock_damage`] !== "0") ? `, ${
+					const shockString = (v[`${prefix}_weapon_shock`] !== "0") ? `, ${
 						(parseInt(v[`${prefix}_weapon_shock_damage`])||0) + damageBonus
 						}\xa0${translate("SHOCK").toLowerCase()}${
 							v[`${prefix}_weapon_shock_ac`] ? ` ${translate("VS_AC_LEQ")} ${v[`${prefix}_weapon_shock_ac`]}` : ""
@@ -1479,12 +1480,22 @@
 				attributes.forEach(calculateMod);
 
 				getSectionIDs("repeating_weapons", idArray => {
-					getAttrs(idArray.map(id => `repeating_weapons_${id}_weapon_burst`), v => {
+					const sourceAttrs = [
+						...idArray.map(id => `repeating_weapons_${id}_weapon_burst`),
+						...idArray.map(id => `repeating_weapons_${id}_weapon_shock_damage`),
+						...idArray.map(id => `repeating_weapons_${id}_weapon_ammo`)
+					];
+					getAttrs(sourceAttrs, v => {
 						const setting = idArray.reduce((m, id) => {
 							if (v[`repeating_weapons_${id}_weapon_burst`] === "0")
 								m[`repeating_weapons_${id}_weapon_burst`] = "";
 							else if (v[`repeating_weapons_${id}_weapon_burst`] === "2")
 								m[`repeating_weapons_${id}_weapon_burst`] = "+ 2[Burst]";
+							if (v[`repeating_weapons_${id}_weapon_shock_damage`] !== "0")
+								m[`repeating_weapons_${id}_weapon_shock`] = "{{shock=[[@{weapon_shock_damage} + @{weapon_attribute_mod}[Attribute] + @{weapon_skill_to_damage}[Skill]]] ^{SHOCK_DAMAGE_AGAINST_AC_LEQ} @{weapon_shock_ac}!}}";
+							if (v[`repeating_weapons_${id}_weapon_shock_ammo`] &&
+									v[`repeating_weapons_${id}_weapon_shock_ammo`] !== "0")
+								m[`repeating_weapons_${id}_weapon_use_ammo`] = "{{ammo=[[0@{weapon_ammo} - (1 @{weapon_burst})]]}}";
 							return m;
 						}, {});
 						setAttrs(setting, {}, upgradeFunction);
