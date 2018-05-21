@@ -1,19 +1,34 @@
 /* global getAttrs, setAttrs, getSectionIDs, generateRowID, on ,removeRepeatingRow, _, getTranslationByKey */
 (function () {
+	"use strict";
 	// Data constants
 	const sheetName = "Stars Without Number (revised)";
-	const sheetVersion = "2.1.0-beta4";
+	const sheetVersion = "2.1.0";
 	const translate = getTranslationByKey;
 	const attributes = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"];
 	const effortAttributes = ["wisdom_mod", "constitution_mod", "psionics_extra_effort",
 		"skill_biopsionics", "skill_precognition", "skill_telepathy", "skill_teleportation",
 		"skill_telekinesis", "skill_metapsionics"
 	];
+	const shipStatEvent = [
+		...["hardpoints", "power", "mass"].map(x => `change:repeating_ship-weapons:weapon_${x}`),
+		...["power", "mass"].map(x => `change:repeating_ship-defenses:defense_${x}`),
+		...["power", "mass"].map(x => `change:repeating_ship-fittings:fitting_${x}`),
+		"change:ship_power", "change:ship_mass", "change:ship_hardpoints",
+		"remove:repeating_ship-weapons", "remove:repeating_ship-defenses",
+		"remove:repeating_ship-fittings"
+	].join(" ");
 	const weaponSkills = [
 		"skill_shoot", "skill_punch", "skill_stab", "skill_combat_energy",
 		"skill_combat_gunnery", "skill_combat_primitive", "skill_combat_projectile",
 		"skill_combat_psitech", "skill_combat_unarmed", "skill_telekinesis"
 	];
+	const weaponDisplayEvent = [
+		...["attack", "name", "skill_bonus", "attribute_mod", "damage", "shock","shock_damage",
+		"shock_ac", "skill_to_damage"].map(x => `change:repeating_weapons:weapon_${x}`),
+		"remove:repeating_weapons", "change:attack_bonus",
+		...weaponSkills.map(name => `change:${name}`),
+	].join(" ");
 	const skills = {
 		revised: ["administer", "connect", "exert", "fix", "heal", "know", "lead",
 			"notice", "perform", "pilot", "program", "punch", "shoot", "sneak", "stab",
@@ -789,7 +804,7 @@
 		// set values unnecessarily (it's expensive) and to reduce bloat
 		// in the Attributes & Abilities tab.
 		Object.keys(setting).forEach(k => {
-			if (values[k] === setting[k]) delete setting[k];
+			if (String(values[k]) === String(setting[k])) delete setting[k];
 		});
 		setAttrs(setting, ...rest);
 	};
@@ -1458,7 +1473,8 @@
 		getAttrs(["character_sheet"], v => {
 			if (!v.character_sheet || v.character_sheet.indexOf(sheetName) !== 0)
 				upgradeFrom162();
-			else upgradeSheet(v.character_sheet.slice(32), true);
+			else if (v.character_sheet.slice(32) !== sheetVersion)
+				upgradeSheet(v.character_sheet.slice(32), true);
 		});
 	};
 
@@ -1466,13 +1482,15 @@
 		// Any version upgrade code should go here
 		const performUpgrade = (version) => {
 			const [major, minor] = version.split(".").map(x => parseInt(x));
+			console.log(`Upgrading from version ${version}.`);
 
 			/** v2.1.0
 			 *  convert old format for burst settings for weapons and attacks
+			 *  set ammo and shock checkboxes to reasonable values
 			 *  convert old format for gear readied/stowed
 			**/
 			if (major == 2 && minor < 1) {
-				const upgradeFunction = _.after(3, () => upgradeSheet(sheetVersion));
+				const upgradeFunction = _.after(4, () => upgradeSheet("2.1.0"));
 
 				// recalculate these things just to be sure, in case the v1.6.2 update
 				// missed them.
@@ -1493,9 +1511,23 @@
 								m[`repeating_weapons_${id}_weapon_burst`] = "+ 2[Burst]";
 							if (v[`repeating_weapons_${id}_weapon_shock_damage`] !== "0")
 								m[`repeating_weapons_${id}_weapon_shock`] = "{{shock=[[@{weapon_shock_damage} + @{weapon_attribute_mod}[Attribute] + @{weapon_skill_to_damage}[Skill]]] ^{SHOCK_DAMAGE_AGAINST_AC_LEQ} @{weapon_shock_ac}!}}";
-							if (v[`repeating_weapons_${id}_weapon_shock_ammo`] &&
-									v[`repeating_weapons_${id}_weapon_shock_ammo`] !== "0")
+							if (v[`repeating_weapons_${id}_weapon_ammo`] &&
+									v[`repeating_weapons_${id}_weapon_ammo`] !== "0")
 								m[`repeating_weapons_${id}_weapon_use_ammo`] = "{{ammo=[[0@{weapon_ammo} - (1 @{weapon_burst})]]}}";
+							return m;
+						}, {});
+						setAttrs(setting, {}, upgradeFunction);
+					});
+				});
+				getSectionIDs("repeating_ship-weapons", idArray => {
+					getAttrs(idArray.map(id => `repeating_ship-weapons_${id}_weapon_ammo_max`), v => {
+						console.log("SHIP WEAPONS");
+						console.log(v);
+						const setting = idArray.reduce((m, id) => {
+							if (v[`repeating_ship-weapons_${id}_weapon_ammo_max`] &&
+								v[`repeating_ship-weapons_${id}_weapon_ammo_max`] !== "0")
+								m[`repeating_ship-weapons_${id}_weapon_use_ammo`] =
+									"{{ammo=[[@{weapon_ammo} - 1]] / @{weapon_ammo_max}}}";
 							return m;
 						}, {});
 						setAttrs(setting, {}, upgradeFunction);
@@ -1523,7 +1555,9 @@
 						mySetAttrs(setting, v, {}, upgradeFunction);
 					});
 				});
-			} else upgradeSheet(sheetVersion, false, true);
+			}
+			/** Final upgrade clause, always leave this around */
+			else upgradeSheet(sheetVersion, false, true);
 		};
 
 		if (firstTime) performUpgrade(version);
@@ -1927,6 +1961,7 @@
 	on("sheet:opened change:setting_modifier_query", handleModifierQuery);
 	on("change:homebrew_skill_list", setTranslatedDefaults);
 
+	/* API use ammo boilerplate */
 	["weapons", "ship-weapons"].forEach(sName => {
 		on(`change:repeating_${sName}:weapon_use_ammo`, () => handleAmmoAPI(sName));
 	});
@@ -1938,12 +1973,9 @@
 	/* Character sheet */
 	attributes.forEach(attr => on(`change:${attr} change:${attr}_bonus`, () => calculateMod(attr)));
 
-	on("change:repeating_weapons", () => {
-		validateWeaponSkills();
-		generateWeaponDisplay();
-	});
-	on(["attack_bonus", ...weaponSkills].map(name => `change:${name}`).join(" "), generateWeaponDisplay);
+	on(weaponDisplayEvent, generateWeaponDisplay);
 
+	on("change:repeating_weapons:weapon_name", () => validateWeaponSkills());
 	on("change:homebrew_skill_list", () => getSectionIDs("repeating_weapons", validateWeaponSkills));
 
 	on("change:strain change:strain_perm", validateStrain);
@@ -1985,20 +2017,20 @@
 
 
 	/* Ship sheet */
-	on("change:repeating_ship-weapons change:repeating_ship-defenses change:repeating_ship-fittings " +
-		"change:ship_power change:ship_mass change:ship_hardpoints", calculateShipStats);
-	on("change:repeating_ship-weapons", buildShipWeaponsMenu);
+	on(shipStatEvent, calculateShipStats);
+	on("change:repeating_ship-weapons:weapon_name change:repeating_ship-weapons:weapon_attack_bonus " +
+		"remove:repeating_ship-weapons", buildShipWeaponsMenu);
 
 
 	/* NPC sheet */
 	on("change:npc_stat_block", fillNPC);
-	on("change:repeating_npc-abilities", buildAbilitiesMenu);
-	on("change:repeating_npc-attacks:attack_name", () => {
-		addNPCAttackBonus();
-		buildAttacksMenu();
-	});
-	on("change:npc_roll_full_attack change:repeating_npc-attacks:attack_number", setNPCMultiAttacks);
-	on("change:npc change:npc_armor_type change:macro_npc_attacks change:macro_npc_abilities", buildStatblock);
 	on("change:npc_rolls_hidden", handleNPCRollHide);
+	on("change:repeating_npc-attacks:attack_name", addNPCAttackBonus);
+	on("change:npc_roll_full_attack change:repeating_npc-attacks:attack_number", setNPCMultiAttacks);
+
+	on("change:repeating_npc-abilities:ability_name remove:repeating_npc-abilities", buildAbilitiesMenu);
+	on("change:repeating_npc-attacks:attack_name change:repeating_npc-attacks:attack_ab " +
+		"change:repeating_npc-attacks:attack_number remove:repeating_npc-attacks", buildAttacksMenu);
+	on("change:npc change:npc_armor_type change:macro_npc_attacks change:macro_npc_abilities", buildStatblock);
 
 })();
