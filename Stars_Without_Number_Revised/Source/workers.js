@@ -1520,7 +1520,7 @@
 								m[`repeating_weapons_${id}_weapon_shock`] = "{{shock=[[@{weapon_shock_damage} + @{weapon_attribute_mod}[Attribute] + @{weapon_skill_to_damage}[Skill]]] ^{SHOCK_DAMAGE_AGAINST_AC_LEQ} @{weapon_shock_ac}!}}";
 							if (v[`repeating_weapons_${id}_weapon_ammo`] &&
 									v[`repeating_weapons_${id}_weapon_ammo`] !== "0")
-								m[`repeating_weapons_${id}_weapon_use_ammo`] = "{{ammo=[[0@{weapon_ammo} - (1 @{weapon_burst})]]}}";
+								m[`repeating_weapons_${id}_weapon_use_ammo`] = "{{ammo=[[0@{weapon_ammo} - (1 @{weapon_burst})]] / @{weapon_ammo|max}}}";
 							return m;
 						}, {});
 						setAttrs(setting, {}, upgradeFunction);
