@@ -694,7 +694,7 @@
                 <span class="title red" data-i18n="leg-actions">Legendary Actions</span>
             </div>
             <div class="row">
-                <div class="legendaryactions" data-i18n="leg-actions-desc">The <span name="attr_npc_name"></span> can take <span name="attr_npc_legendary_actions"></span> legendary actions, choosing from the options below. Only one legendary option can be used at a time and only at the end of another creature's turn. The <span name="attr_npc_name"></span> regains spent legendary actions at the start of its turn.</div>
+                <div class="legendaryactions" data-i18n="leg-actions-desc"><span name="attr_npc_legendary_actions_desc"></span></div>
             </div>
             <fieldset class="repeating_npcaction-l">
                 <div class="action">
@@ -4453,6 +4453,11 @@
 <input type="hidden" name="attr_drop_damagetype" accept="Damage Type">
 <input type="hidden" name="attr_drop_range" accept="Range">
 <input type="hidden" name="attr_drop_ac" accept="AC">
+<input type="hidden" name="attr_drop_actions" accept="data-Actions">
+<input type="hidden" name="attr_drop_legendary_actions" accept="data-Legendary Actions">
+<input type="hidden" name="attr_drop_legendary_actions_desc" accept="Legendary Actions Desc">
+<input type="hidden" name="attr_drop_reactions" accept="data-Reactions">
+<input type="hidden" name="attr_drop_traits" accept="data-Traits">
 
 <input type="hidden" name="attr_drop_attack_type" accept="Spell Attack">
 <input type="hidden" name="attr_drop_damage2" accept="Secondary Damage">
@@ -4517,6 +4522,7 @@
 <input type="hidden" name="attr_spell_save_dc" value="0">
 <input type="hidden" name="attr_spell_attack_bonus" value="0">
 <input type="hidden" name="attr_spell_attack_mod" value="0">
+<input type="hidden" name="attr_npc_legendary_actions_desc" value="">
 
 <input type="hidden" name="attr_strength_mod" value="0">
 <input type="hidden" name="attr_dexterity_mod" value="0">
@@ -6563,7 +6569,7 @@
         var update = {};
         var id = generateRowID();
         
-        getAttrs(["drop_name","drop_weight","drop_properties","drop_modifiers","drop_content","drop_itemtype","drop_damage","drop_damagetype","drop_damage2","drop_damagetype2","drop_range","drop_ac","drop_spellritualflag", "drop_spellschool", "drop_spellcastingtime", "drop_spelltarget", "drop_spellcomp", "drop_spellcomp_materials", "drop_spellconcentrationflag", "drop_spellduration", "drop_spellhealing", "drop_spelldmgmod", "drop_spellsave", "drop_spellsavesuccess", "drop_spellhldie", "drop_spellhldietype", "drop_spellhlbonus", "drop_spelllevel", "drop_spell_damage_progression", "drop_attack_type", "drop_speed", "drop_str", "drop_dex", "drop_con", "drop_int", "drop_wis", "drop_cha", "drop_vulnerabilities", "drop_resistances", "drop_immunities", "drop_condition_immunities", "drop_languages", "drop_challenge_rating", "drop_size", "drop_type", "drop_alignment", "drop_hp", "drop_saving_throws", "drop_senses", "drop_passive_perception", "drop_skills", "drop_token_size", "character_id"], function(v) {
+        getAttrs(["drop_name","drop_weight","drop_properties","drop_modifiers","drop_content","drop_itemtype","drop_damage","drop_damagetype","drop_damage2","drop_damagetype2","drop_range","drop_ac","drop_spellritualflag", "drop_spellschool", "drop_spellcastingtime", "drop_spelltarget", "drop_spellcomp", "drop_spellcomp_materials", "drop_spellconcentrationflag", "drop_spellduration", "drop_spellhealing", "drop_spelldmgmod", "drop_spellsave", "drop_spellsavesuccess", "drop_spellhldie", "drop_spellhldietype", "drop_spellhlbonus", "drop_spelllevel", "drop_spell_damage_progression", "drop_attack_type", "drop_speed", "drop_str", "drop_dex", "drop_con", "drop_int", "drop_wis", "drop_cha", "drop_vulnerabilities", "drop_resistances", "drop_immunities", "drop_condition_immunities", "drop_languages", "drop_challenge_rating", "drop_size", "drop_type", "drop_alignment", "drop_hp", "drop_saving_throws", "drop_senses", "drop_passive_perception", "drop_skills", "drop_token_size", "character_id", "drop_actions", "drop_legendary_actions", "drop_legendary_actions_desc", "drop_reactions", "drop_traits", "npc_legendary_actions"], function(v) {
             if(category === "Items") {
                 update["tab"] = "core";
                 if(v.drop_name) {update["repeating_inventory_" + id + "_itemname"] = v.drop_name};
@@ -6822,7 +6828,20 @@
                 });     
 
                 var contentarray = v["drop_content"];
-                if(contentarray && contentarray.indexOf("Legendary Actions") > -1) {
+                if(v.drop_legendary_actions) {
+                    var legendaryactionsarray = JSON.parse(v.drop_legendary_actions);
+                    update["npc_legendary_actions"] = 1;
+                    if(v.drop_legendary_actions_desc) {
+                        update["npc_legendary_actions_desc"] = v.drop_legendary_actions_desc;
+                    }
+                    else if(v.npc_legendary_actions > 0){
+                        update["npc_legendary_actions_desc"] = `The ${v.drop_name} can take ${v.npc_legendary_actions}, choosing from the options below. Only one legendary option can be used at a time and only at the end of another creature's turn. The ${v.drop_name} regains spent legendary actions at the start of its turn.`;
+                    }
+                    else {
+                        update["npc_legendary_actions_desc"] = "";
+                    }
+                }
+                else if(contentarray && contentarray.indexOf("Legendary Actions") > -1) {
                     if(contentarray.indexOf(/\n Legendary Actions\n/) > -1) {
                         temp = contentarray.split(/\n Legendary Actions\n/)
                     }
@@ -6832,7 +6851,11 @@
                     var legendaryactionsarray = temp[1];
                     contentarray = temp[0];
                 }
-                if(contentarray && contentarray.indexOf("Reactions") > -1) {
+
+                if(v.drop_reactions) {
+                    var reactionsarray = JSON.parse(v.drop_reactions);
+                }
+                else if(contentarray && contentarray.indexOf("Reactions") > -1) {
                     if(contentarray.indexOf(/\n Reactions\n/) > -1) {
                         temp = contentarray.split(/\n Reactions\n/)
                     }
@@ -6842,7 +6865,11 @@
                     var reactionsarray = temp[1];
                     contentarray = temp[0];
                 }
-                if(contentarray && contentarray.indexOf("Actions") > -1) {
+
+                if(v.drop_actions) {
+                    var actionsarray = JSON.parse(v.drop_actions);
+                }
+                else if(contentarray && contentarray.indexOf("Actions") > -1) {
                     if(contentarray.indexOf("Lair Actions") > -1) {
                         contentarray = contentarray.replace("Lair Actions","Lair Action");
                     }
@@ -6855,7 +6882,11 @@
                     var actionsarray = temp[1];
                     contentarray = temp[0];
                 }
-                if(contentarray && contentarray.indexOf("Traits") > -1) {
+
+                if(v.drop_traits) {
+                    var traitsarray = JSON.parse(v.drop_traits);
+                }
+                else if(contentarray && contentarray.indexOf("Traits") > -1) {
                     if(contentarray.indexOf("Lair Traits") > -1) {
                         contentarray = contentarray.replace("Lair Traits","Lair Trait");
                     }
@@ -6870,13 +6901,19 @@
                 }
 
                 if(traitsarray) {
-                    traitsarray = traitsarray.split("**");
-                    traitsarray.shift();
-                    var traitsobj = {};
-                    traitsarray.forEach(function(val, i) {
-                        if (i % 2 === 1) return;
-                        traitsobj[val] = traitsarray[i + 1];
-                    });
+                    if(v.drop_traits) {
+                        var traitsobj = {};
+                        traitsarray.forEach(val => traitsobj[val.Name] = val.Desc);
+                    }
+                    else {
+                        traitsarray = traitsarray.split("**");
+                        traitsarray.shift();
+                        var traitsobj = {};
+                        traitsarray.forEach(function(val, i) {
+                            if (i % 2 === 1) return;
+                            traitsobj[val] = traitsarray[i + 1];
+                        });
+                    }
                     _.each(traitsobj, function(desc, name) {
                         newrowid = generateRowID();
                         update["repeating_npctrait_" + newrowid + "_name"] = name + ".";
@@ -6903,83 +6940,121 @@
                     });
                 }
                 if(actionsarray) {
-                    actionsarray = actionsarray.split("**");
-                    actionsarray.shift();
-                    var actionsobj = {};
-                    actionsarray.forEach(function(val, i) {
-                        if (i % 2 === 1) return;
-                        actionsobj[val] = actionsarray[i + 1];
-                    });
-                    _.each(actionsobj, function(desc, name) {
-                        newrowid = generateRowID();
-                        update["repeating_npcaction_" + newrowid + "_npc_options-flag"] = "0";
-                        update["repeating_npcaction_" + newrowid + "_name"] = name;
-                        if(desc.substring(0,2) === ": " || encodeURI(desc.substring(0,2)) === ":%C2%A0") {
-                            desc = desc.substring(2);
-                        }
-                        if(desc.indexOf(" Attack:") > -1) {
-                            update["repeating_npcaction_" + newrowid + "_attack_flag"] = "on";
-                            update["repeating_npcaction_" + newrowid + "_attack_display_flag"] = "{{attack=1}}";
-                            update["repeating_npcaction_" + newrowid + "_attack_options"] = "{{attack=1}}";
-                            if(desc.indexOf(" Weapon Attack:") > -1) {
-                                attacktype = desc.split(" Weapon Attack:")[0];
-                            }
-                            else if(desc.indexOf(" Spell Attack:") > -1) {
-                                attacktype = desc.split(" Spell Attack:")[0];
-                            }
-                            else {
-                                console.log("FAILED TO IMPORT ATTACK - NO ATTACK TYPE FOUND (Weapon Attack/Spell Attack)");
-                                return;
-                            }
-                            
-                            update["repeating_npcaction_" + newrowid + "_attack_type"] = attacktype;
-                            if(attacktype === "Melee") {
-                                update["repeating_npcaction_" + newrowid + "_attack_range"] = (desc.match(/reach (.*?),/) || ["",""])[1];
-                            }
-                            else {
-                                update["repeating_npcaction_" + newrowid + "_attack_range"] = (desc.match(/range (.*?),/) || ["",""])[1];
-                            }
-                            update["repeating_npcaction_" + newrowid + "_attack_tohit"] = (desc.match(/\+(.*) to hit/) || ["",""])[1];
-                            update["repeating_npcaction_" + newrowid + "_attack_target"] = (desc.match(/\.,(?!.*\.,)(.*)\. Hit:/) || ["",""])[1];
-                            if(desc.toLowerCase().indexOf("damage") > -1) {
-                                update["repeating_npcaction_" + newrowid + "_attack_damage"] = (desc.match(/\(([^)]+)\)/) || ["",""])[1];
-                                update["repeating_npcaction_" + newrowid + "_attack_damagetype"] = (desc.match(/\) (.*?) damage/) || ["",""])[1];
-                                if((desc.match(/\(/g) || []).length > 1 && desc.match(/\((?!.*\()([^)]+)\)/)) {
-                                    var second_match = desc.match(/\((?!.*\()([^)]+)\)/);
-                                    if(second_match[1] && second_match[1].indexOf(" DC") === -1) {
-                                        update["repeating_npcaction_" + newrowid + "_attack_damage2"] = (desc.match(/\((?!.*\()([^)]+)\)/) || ["",""])[1];
-                                        update["repeating_npcaction_" + newrowid + "_attack_damagetype2"] = (desc.match(/\)(?!.*\)) (.*?) damage/) || ["",""])[1];
-                                    };
-                                };
-                                ctest1 = desc.split("damage.")[1];
-                                ctest2 = desc.split("damage, ")[1];
-                                if(ctest1 && ctest1.length > 0) {
-                                    update["repeating_npcaction_" + newrowid + "_description"] = ctest1.trim();
-                                }
-                                else if(ctest2 && ctest2.length > 0) {
-                                    update["repeating_npcaction_" + newrowid + "_description"] = ctest2.trim();
-                                }
-                            }
-                            else {
-                                update["repeating_npcaction_" + newrowid + "_description"] = desc.split("Hit:")[1].trim();
-                            }
-                        }
-                        else {
-                            update["repeating_npcaction_" + newrowid + "_description"] = desc;
-                        }
+                    if(v.drop_actions) {
+                        var actionsobj = {};
+                        actionsarray.forEach(val => actionsobj[val.Name] = val);
 
-                    });
+                        _.each(actionsobj, function(data, name) {
+                            newrowid = generateRowID();
+                            update["repeating_npcaction_" + newrowid + "_npc_options-flag"] = "0";
+                            update["repeating_npcaction_" + newrowid + "_name"] = name;
+                            if(data["Desc"]) {
+                                update["repeating_npcaction_" + newrowid + "_description"] = data["Desc"];
+                            }
+
+                            if(data["Type Attack"]) {
+                                update["repeating_npcaction_" + newrowid + "_attack_flag"] = "on";
+                                update["repeating_npcaction_" + newrowid + "_attack_display_flag"] = "{{attack=1}}";
+                                update["repeating_npcaction_" + newrowid + "_attack_options"] = "{{attack=1}}";
+                                if(data["Type"]) { update["repeating_npcaction_" + newrowid + "_attack_type"] = data["Type"]; }
+                                if(data["Reach"]) { update["repeating_npcaction_" + newrowid + "_attack_range"] = data["Reach"]; }
+                                if(data["Hit Bonus"]) { update["repeating_npcaction_" + newrowid + "_attack_tohit"] = data["Hit Bonus"]; }
+                                if(data["Target"]) { update["repeating_npcaction_" + newrowid + "_attack_target"] = data["Target"]; }
+                                if(data["Damage"]) { update["repeating_npcaction_" + newrowid + "_attack_damage"] = data["Damage"]; }
+                                if(data["Damage Type"]) { update["repeating_npcaction_" + newrowid + "_attack_damagetype"] = data["Damage Type"]; }
+
+                                if(data["Damage 2"] && data["Damage 2 Type"]) {
+                                    update["repeating_npcaction_" + newrowid + "_attack_damage2"] = data["Damage 2"];
+                                    update["repeating_npcaction_" + newrowid + "_attack_damagetype2"] = data["Damage 2 Type"];
+                                }
+                            }
+                        })
+                    }
+                    else {
+                        actionsarray = actionsarray.split("**");
+                        actionsarray.shift();
+                        var actionsobj = {};
+                        actionsarray.forEach(function(val, i) {
+                            if (i % 2 === 1) return;
+                            actionsobj[val] = actionsarray[i + 1];
+                        });
+                        _.each(actionsobj, function(desc, name) {
+                            newrowid = generateRowID();
+                            update["repeating_npcaction_" + newrowid + "_npc_options-flag"] = "0";
+                            update["repeating_npcaction_" + newrowid + "_name"] = name;
+                            if(desc.substring(0,2) === ": " || encodeURI(desc.substring(0,2)) === ":%C2%A0") {
+                                desc = desc.substring(2);
+                            }
+                            if(desc.indexOf(" Attack:") > -1) {
+                                update["repeating_npcaction_" + newrowid + "_attack_flag"] = "on";
+                                update["repeating_npcaction_" + newrowid + "_attack_display_flag"] = "{{attack=1}}";
+                                update["repeating_npcaction_" + newrowid + "_attack_options"] = "{{attack=1}}";
+                                if(desc.indexOf(" Weapon Attack:") > -1) {
+                                    attacktype = desc.split(" Weapon Attack:")[0];
+                                }
+                                else if(desc.indexOf(" Spell Attack:") > -1) {
+                                    attacktype = desc.split(" Spell Attack:")[0];
+                                }
+                                else {
+                                    console.log("FAILED TO IMPORT ATTACK - NO ATTACK TYPE FOUND (Weapon Attack/Spell Attack)");
+                                    return;
+                                }
+                                
+                                update["repeating_npcaction_" + newrowid + "_attack_type"] = attacktype;
+                                if(attacktype === "Melee") {
+                                    update["repeating_npcaction_" + newrowid + "_attack_range"] = (desc.match(/reach (.*?),/) || ["",""])[1];
+                                }
+                                else {
+                                    update["repeating_npcaction_" + newrowid + "_attack_range"] = (desc.match(/range (.*?),/) || ["",""])[1];
+                                }
+                                update["repeating_npcaction_" + newrowid + "_attack_tohit"] = (desc.match(/\+(.*) to hit/) || ["",""])[1];
+                                update["repeating_npcaction_" + newrowid + "_attack_target"] = (desc.match(/\.,(?!.*\.,)(.*)\. Hit:/) || ["",""])[1];
+                                if(desc.toLowerCase().indexOf("damage") > -1) {
+                                    update["repeating_npcaction_" + newrowid + "_attack_damage"] = (desc.match(/\(([^)]+)\)/) || ["",""])[1];
+                                    update["repeating_npcaction_" + newrowid + "_attack_damagetype"] = (desc.match(/\) (.*?) damage/) || ["",""])[1];
+                                    if((desc.match(/\(/g) || []).length > 1 && desc.match(/\((?!.*\()([^)]+)\)/)) {
+                                        var second_match = desc.match(/\((?!.*\()([^)]+)\)/);
+                                        if(second_match[1] && second_match[1].indexOf(" DC") === -1) {
+                                            update["repeating_npcaction_" + newrowid + "_attack_damage2"] = (desc.match(/\((?!.*\()([^)]+)\)/) || ["",""])[1];
+                                            update["repeating_npcaction_" + newrowid + "_attack_damagetype2"] = (desc.match(/\)(?!.*\)) (.*?) damage/) || ["",""])[1];
+                                        };
+                                    };
+                                    ctest1 = desc.split("damage.")[1];
+                                    ctest2 = desc.split("damage, ")[1];
+                                    if(ctest1 && ctest1.length > 0) {
+                                        update["repeating_npcaction_" + newrowid + "_description"] = ctest1.trim();
+                                    }
+                                    else if(ctest2 && ctest2.length > 0) {
+                                        update["repeating_npcaction_" + newrowid + "_description"] = ctest2.trim();
+                                    }
+                                }
+                                else {
+                                    update["repeating_npcaction_" + newrowid + "_description"] = desc.split("Hit:")[1].trim();
+                                }
+                            }
+                            else {
+                                update["repeating_npcaction_" + newrowid + "_description"] = desc;
+                            }
+    
+                        });
+                    }
                     callbacks.push( function() {update_npc_action("all");} );
                 }
                 if(reactionsarray) {
                     update["npcreactionsflag"] = 1;
-                    reactionsarray = reactionsarray.split("**");
-                    reactionsarray.shift();
-                    var reactionsobj = {};
-                    reactionsarray.forEach(function(val, i) {
-                        if (i % 2 === 1) return;
-                        reactionsobj[val] = reactionsarray[i + 1];
-                    });
+                    if(v.drop_reactions) {
+                        var reactionsobj = {};
+                        reactionsarray.forEach(val => reactionsobj[val.Name] = val.Desc);
+                    }
+                    else {
+                        reactionsarray = reactionsarray.split("**");
+                        reactionsarray.shift();
+                        var reactionsobj = {};
+                        reactionsarray.forEach(function(val, i) {
+                            if (i % 2 === 1) return;
+                            reactionsobj[val] = reactionsarray[i + 1];
+                        });
+                    }
                     _.each(reactionsobj, function(desc, name) {
                         newrowid = generateRowID();
                         update["repeating_npcreaction_" + newrowid + "_name"] = name + ".";
@@ -6990,55 +7065,87 @@
                     });
                 }
                 if(legendaryactionsarray) {
-                    update["npc_legendary_actions"] = (legendaryactionsarray.match(/\d+/) || [""])[0];
-                    legendaryactionsarray = legendaryactionsarray.split("**");
-                    legendaryactionsarray.shift();
-                    var actionsobj = {};
-                    legendaryactionsarray.forEach(function(val, i) {
-                        if (i % 2 === 1) return;
-                        actionsobj[val] = legendaryactionsarray[i + 1];
-                    });
-                    _.each(actionsobj, function(desc, name) {
-                        newrowid = generateRowID();
-                        update["repeating_npcaction-l_" + newrowid + "_npc_options-flag"] = "0";
-                        update["repeating_npcaction-l_" + newrowid + "_name"] = name;
-                        if(desc.substring(0,2) === ": " || encodeURI(desc.substring(0,2)) === ":%C2%A0") {
-                            desc = desc.substring(2);
-                        }
-                        if(desc.indexOf(" Attack:") > -1) {
-                            update["repeating_npcaction-l_" + newrowid + "_attack_flag"] = "on";
-                            update["repeating_npcaction-l_" + newrowid + "_attack_display_flag"] = "{{attack=1}}";
-                            update["repeating_npcaction-l_" + newrowid + "_attack_options"] = "{{attack=1}}";
-                            if(desc.indexOf(" Weapon Attack:") > -1) {
-                                attacktype = desc.split(" Weapon Attack:")[0];
+                    if(v.drop_legendary_actions) {
+                        var actionsobj = {};
+                        legendaryactionsarray.forEach(val => actionsobj[val.Name] = val);
+                        _.each(actionsobj, function(data, name) {
+                            newrowid = generateRowID();
+                            update["repeating_npcaction-l_" + newrowid + "_npc_options-flag"] = "0";
+                            update["repeating_npcaction-l_" + newrowid + "_name"] = name;
+                            update["repeating_npcaction-l_" + newrowid + "_description"] = data["Desc"];
+
+                            if(data["Type Attack"]) {
+                                update["repeating_npcaction-l_" + newrowid + "_attack_flag"] = "on";
+                                update["repeating_npcaction-l_" + newrowid + "_attack_display_flag"] = "{{attack=1}}";
+                                update["repeating_npcaction-l_" + newrowid + "_attack_options"] = "{{attack=1}}";
+                                update["repeating_npcaction-l_" + newrowid + "_attack_type"] = data["Type Attack"];
+                                update["repeating_npcaction-l_" + newrowid + "_attack_range"] = data["Reach"];
+                                update["repeating_npcaction-l_" + newrowid + "_attack_tohit"] = data["Hit Bonus"];
+                                update["repeating_npcaction-l_" + newrowid + "_attack_target"] = data["Target"];
+                                update["repeating_npcaction-l_" + newrowid + "_attack_damage"] = data["Damage"];
+                                update["repeating_npcaction-l_" + newrowid + "_attack_damagetype"] = data["Damage Type"];
+
+                                if(data["Damage 2"] && data["Damage 2 Type"]) {
+                                    update["repeating_npcaction-l_" + newrowid + "_attack_damage2"] = data["Damage 2"];
+                                    update["repeating_npcaction-l_" + newrowid + "_attack_damagetype2"] = data["Damage 2 Type"];
+                                }
                             }
-                            else if(desc.indexOf(" Spell Attack:") > -1) {
-                                attacktype = desc.split(" Spell Attack:")[0];
+                        });
+                    }
+                    else {
+                        var numlegendaryactions = (legendaryactionsarray.match(/\d+/) || [""])[0];
+                        update["npc_legendary_actions"] = numlegendaryactions;
+                        update["npc_legendary_actions_desc"] = `The ${v.drop_name} can take ${numlegendaryactions}, choosing from the options below. Only one legendary option can be used at a time and only at the end of another creature's turn. The ${v.drop_name} regains spent legendary actions at the start of its turn.`;
+                        legendaryactionsarray = legendaryactionsarray.split("**");
+                        legendaryactionsarray.shift();
+                        var actionsobj = {};
+                        legendaryactionsarray.forEach(function(val, i) {
+                            if (i % 2 === 1) return;
+                            actionsobj[val] = legendaryactionsarray[i + 1];
+                        });
+                        _.each(actionsobj, function(desc, name) {
+                            newrowid = generateRowID();
+                            update["repeating_npcaction-l_" + newrowid + "_npc_options-flag"] = "0";
+                            update["repeating_npcaction-l_" + newrowid + "_name"] = name;
+                            if(desc.substring(0,2) === ": " || encodeURI(desc.substring(0,2)) === ":%C2%A0") {
+                                desc = desc.substring(2);
+                            }
+                            if(desc.indexOf(" Attack:") > -1) {
+                                update["repeating_npcaction-l_" + newrowid + "_attack_flag"] = "on";
+                                update["repeating_npcaction-l_" + newrowid + "_attack_display_flag"] = "{{attack=1}}";
+                                update["repeating_npcaction-l_" + newrowid + "_attack_options"] = "{{attack=1}}";
+                                if(desc.indexOf(" Weapon Attack:") > -1) {
+                                    attacktype = desc.split(" Weapon Attack:")[0];
+                                }
+                                else if(desc.indexOf(" Spell Attack:") > -1) {
+                                    attacktype = desc.split(" Spell Attack:")[0];
+                                }
+                                else {
+                                    console.log("FAILED TO IMPORT ATTACK - NO ATTACK TYPE FOUND (Weapon Attack/Spell Attack)");
+                                    return;
+                                }
+                                update["repeating_npcaction-l_" + newrowid + "_attack_type"] = attacktype;
+                                if(attacktype === "Melee") {
+                                    update["repeating_npcaction-l_" + newrowid + "_attack_range"] = (desc.match(/reach (.*?),/) || ["",""])[1];
+                                }
+                                else {
+                                    update["repeating_npcaction-l_" + newrowid + "_attack_range"] = (desc.match(/range (.*?),/) || ["",""])[1];
+                                }
+                                update["repeating_npcaction-l_" + newrowid + "_attack_tohit"] = (desc.match(/\+(.*) to hit/) || ["",""])[1];
+                                update["repeating_npcaction-l_" + newrowid + "_attack_target"] = (desc.match(/\.,(?!.*\.,)(.*)\. Hit:/) || ["",""])[1];
+                                update["repeating_npcaction-l_" + newrowid + "_attack_damage"] = (desc.match(/\(([^)]+)\)/) || ["",""])[1];
+                                update["repeating_npcaction-l_" + newrowid + "_attack_damagetype"] = (desc.match(/\) (.*?) damage/) || ["",""])[1];
+                                if((desc.match(/\(/g) || []).length > 1 && (!desc.match(/\((?!.*\()([^)]+)\)/).indexOf(" DC")[1] || desc.match(/\((?!.*\()([^)]+)\)/).indexOf(" DC")[1] === -1)) {
+                                    update["repeating_npcaction-l_" + newrowid + "_attack_damage2"] = (desc.match(/\((?!.*\()([^)]+)\)/) || ["",""])[1];
+                                    update["repeating_npcaction-l_" + newrowid + "_attack_damagetype2"] = (desc.match(/\)(?!.*\)) (.*?) damage/) || ["",""])[1];
+                                }
                             }
                             else {
-                                console.log("FAILED TO IMPORT ATTACK - NO ATTACK TYPE FOUND (Weapon Attack/Spell Attack)");
-                                return;
+                                update["repeating_npcaction-l_" + newrowid + "_description"] = desc;
                             }
-                            update["repeating_npcaction-l_" + newrowid + "_attack_type"] = attacktype;
-                            if(attacktype === "Melee") {
-                                update["repeating_npcaction-l_" + newrowid + "_attack_range"] = (desc.match(/reach (.*?),/) || ["",""])[1];
-                            }
-                            else {
-                                update["repeating_npcaction-l_" + newrowid + "_attack_range"] = (desc.match(/range (.*?),/) || ["",""])[1];
-                            }
-                            update["repeating_npcaction-l_" + newrowid + "_attack_tohit"] = (desc.match(/\+(.*) to hit/) || ["",""])[1];
-                            update["repeating_npcaction-l_" + newrowid + "_attack_target"] = (desc.match(/\.,(?!.*\.,)(.*)\. Hit:/) || ["",""])[1];
-                            update["repeating_npcaction-l_" + newrowid + "_attack_damage"] = (desc.match(/\(([^)]+)\)/) || ["",""])[1];
-                            update["repeating_npcaction-l_" + newrowid + "_attack_damagetype"] = (desc.match(/\) (.*?) damage/) || ["",""])[1];
-                            if((desc.match(/\(/g) || []).length > 1 && (!desc.match(/\((?!.*\()([^)]+)\)/).indexOf(" DC")[1] || desc.match(/\((?!.*\()([^)]+)\)/).indexOf(" DC")[1] === -1)) {
-                                update["repeating_npcaction-l_" + newrowid + "_attack_damage2"] = (desc.match(/\((?!.*\()([^)]+)\)/) || ["",""])[1];
-                                update["repeating_npcaction-l_" + newrowid + "_attack_damagetype2"] = (desc.match(/\)(?!.*\)) (.*?) damage/) || ["",""])[1];
-                            }
-                        }
-                        else {
-                            update["repeating_npcaction-l_" + newrowid + "_description"] = desc;
-                        }
-                    });
+                        });
+                    }
+                    
                 }
             };
 
@@ -7061,6 +7168,11 @@
         update["drop_damagetype"] = "";
         update["drop_range"] = "";
         update["drop_ac"] = "";
+        update["drop_actions"] = "";
+        update["drop_legendary_actions"] = "";
+        update["drop_legendary_actions_desc"] = "";
+        update["drop_reactions"] = "";
+        update["drop_traits"] = "";
         update["drop_attack_type"] = "";
         update["drop_damage2"] = "";
         update["drop_damagetype2"] = "";
@@ -8047,7 +8159,7 @@
                     });
                     getAttrs(ac_attrs, function(b) {
                         var globalacmod = isNaN(parseInt(b.globalacmod, 10)) === false ? parseInt(b.globalacmod, 10) : 0;
-                        var dexmod = b["dexterity_mod"];
+                        var dexmod = +b["dexterity_mod"];
                         var total = 10 + dexmod;
                         var armorcount = 0; 
                         var shieldcount = 0;
@@ -8115,6 +8227,7 @@
                             update["armorwarningflag"] = "hide";
                             update["armorwarning"] = "0";
                         }
+                        console.log("total: " + total);
                         update["ac"] = total + globalacmod;
                         setAttrs(update, {silent: true});
                     });
@@ -8213,155 +8326,132 @@
                     case "Barbarian":
                         update["hitdietype"] = 12;
                         update["spellcasting_ability"] = "0*";
-                        if(!v.strength_save_prof || v.strength_save_prof != "(@{pb})" || !v.constitution_save_prof || v.constitution_save_prof != "(@{pb})") {
-                            update["strength_save_prof"] = "(@{pb})";
-                            update["dexterity_save_prof"] = 0;
-                            update["constitution_save_prof"] = "(@{pb})";
-                            update["intelligence_save_prof"] = 0;
-                            update["wisdom_save_prof"] = 0;
-                            update["charisma_save_prof"] = 0;
-                            update["class_resource_name"] = "Rage";
-                        }
+                        update["strength_save_prof"] = "(@{pb})";
+                        update["dexterity_save_prof"] = 0;
+                        update["constitution_save_prof"] = "(@{pb})";
+                        update["intelligence_save_prof"] = 0;
+                        update["wisdom_save_prof"] = 0;
+                        update["charisma_save_prof"] = 0;
+                        update["class_resource_name"] = "Rage";
                         break;
                     case "Bard":
                         update["hitdietype"] = 8;
                         update["spellcasting_ability"] = "@{charisma_mod}+";
-                        if(!v.dexterity_save_prof || v.dexterity_save_prof != "(@{pb})" || !v.charisma_save_prof || v.charisma_save_prof != "(@{pb})") {
-                            update["strength_save_prof"] = 0;
-                            update["dexterity_save_prof"] = "(@{pb})";
-                            update["constitution_save_prof"] = 0;
-                            update["intelligence_save_prof"] = 0;
-                            update["wisdom_save_prof"] = 0;
-                            update["charisma_save_prof"] = "(@{pb})";
-                            update["class_resource_name"] = "Bardic Inspiration";
-                        }
+                        update["strength_save_prof"] = 0;
+                        update["dexterity_save_prof"] = "(@{pb})";
+                        update["constitution_save_prof"] = 0;
+                        update["intelligence_save_prof"] = 0;
+                        update["wisdom_save_prof"] = 0;
+                        update["charisma_save_prof"] = "(@{pb})";
+                        update["class_resource_name"] = "Bardic Inspiration";
                         break;
                     case "Cleric":
                         update["hitdietype"] = 8;
                         update["spellcasting_ability"] = "@{wisdom_mod}+";
-                        if(!v.wisdom_save_prof || v.wisdom_save_prof != "(@{pb})" || !v.charisma_save_prof || v.charisma_save_prof != "(@{pb})") {
-                            update["strength_save_prof"] = 0;
-                            update["dexterity_save_prof"] = 0;
-                            update["constitution_save_prof"] = 0;
-                            update["intelligence_save_prof"] = 0;
-                            update["wisdom_save_prof"] = "(@{pb})";
-                            update["charisma_save_prof"] = "(@{pb})";
-                            update["class_resource_name"] = "Channel Divinity";
-                        }
+                        update["strength_save_prof"] = 0;
+                        update["dexterity_save_prof"] = 0;
+                        update["constitution_save_prof"] = 0;
+                        update["intelligence_save_prof"] = 0;
+                        update["wisdom_save_prof"] = "(@{pb})";
+                        update["charisma_save_prof"] = "(@{pb})";
+                        update["class_resource_name"] = "Channel Divinity";
                         break;
                     case "Druid":
                         update["hitdietype"] = 8;
                         update["spellcasting_ability"] = "@{wisdom_mod}+";
-                        if(!v.wisdom_save_prof || v.wisdom_save_prof != "(@{pb})" || !v.intelligence_save_prof || v.intelligence_save_prof != "(@{pb})") {
-                            update["strength_save_prof"] = 0;
-                            update["dexterity_save_prof"] = 0;
-                            update["constitution_save_prof"] = 0;
-                            update["intelligence_save_prof"] = "(@{pb})";
-                            update["wisdom_save_prof"] = "(@{pb})";
-                            update["charisma_save_prof"] = 0;
-                            update["class_resource_name"] = "Wild Shape";
-                        }
+                        update["strength_save_prof"] = 0;
+                        update["dexterity_save_prof"] = 0;
+                        update["constitution_save_prof"] = 0;
+                        update["intelligence_save_prof"] = "(@{pb})";
+                        update["wisdom_save_prof"] = "(@{pb})";
+                        update["charisma_save_prof"] = 0;
+                        update["class_resource_name"] = "Wild Shape";
                         break;
                     case "Fighter":
                         update["hitdietype"] = 10;
                         update["spellcasting_ability"] = "0*";
-                        if(!v.strength_save_prof || v.strength_save_prof != "(@{pb})" || !v.constitution_save_prof || v.constitution_save_prof != "(@{pb})") {
-                            update["strength_save_prof"] = "(@{pb})";
-                            update["dexterity_save_prof"] = 0;
-                            update["constitution_save_prof"] = "(@{pb})";
-                            update["intelligence_save_prof"] = 0;
-                            update["wisdom_save_prof"] = 0;
-                            update["charisma_save_prof"] = 0;
-                            update["class_resource_name"] = "Second Wind";
-                        }
+                        update["strength_save_prof"] = "(@{pb})";
+                        update["dexterity_save_prof"] = 0;
+                        update["constitution_save_prof"] = "(@{pb})";
+                        update["intelligence_save_prof"] = 0;
+                        update["wisdom_save_prof"] = 0;
+                        update["charisma_save_prof"] = 0;
+                        update["class_resource_name"] = "Second Wind";
                         break;
                     case "Monk":
                         update["hitdietype"] = 8;
                         update["spellcasting_ability"] = "0*";
-                        if(!v.strength_save_prof || v.strength_save_prof != "(@{pb})" || !v.dexterity_save_prof || v.dexterity_save_prof != "(@{pb})") {
-                            update["strength_save_prof"] = "(@{pb})";
-                            update["dexterity_save_prof"] = "(@{pb})";
-                            update["constitution_save_prof"] = 0;
-                            update["intelligence_save_prof"] = 0;
-                            update["wisdom_save_prof"] = 0;
-                            update["charisma_save_prof"] = 0;
-                            update["class_resource_name"] = "Ki";
-                        }
+                        update["strength_save_prof"] = "(@{pb})";
+                        update["dexterity_save_prof"] = "(@{pb})";
+                        update["constitution_save_prof"] = 0;
+                        update["intelligence_save_prof"] = 0;
+                        update["wisdom_save_prof"] = 0;
+                        update["charisma_save_prof"] = 0;
+                        update["class_resource_name"] = "Ki";
                         break;
                     case "Paladin":
                         update["hitdietype"] = 10;
                         update["spellcasting_ability"] = "@{charisma_mod}+";
-                        if(!v.wisdom_save_prof || v.wisdom_save_prof != "(@{pb})" || !v.charisma_save_prof || v.charisma_save_prof != "(@{pb})") {
-                            update["strength_save_prof"] = 0;
-                            update["dexterity_save_prof"] = 0;
-                            update["constitution_save_prof"] = 0;
-                            update["intelligence_save_prof"] = 0;
-                            update["wisdom_save_prof"] = "(@{pb})";
-                            update["charisma_save_prof"] = "(@{pb})";
-                            update["class_resource_name"] = "Channel Divinity";
-                        }
+                        update["strength_save_prof"] = 0;
+                        update["dexterity_save_prof"] = 0;
+                        update["constitution_save_prof"] = 0;
+                        update["intelligence_save_prof"] = 0;
+                        update["wisdom_save_prof"] = "(@{pb})";
+                        update["charisma_save_prof"] = "(@{pb})";
+                        update["class_resource_name"] = "Channel Divinity";
                         break;
                     case "Ranger":
                         update["hitdietype"] = 10;
                         update["spellcasting_ability"] = "@{wisdom_mod}+";
-                        if(!v.strength_save_prof || v.strength_save_prof != "(@{pb})" || !v.dexterity_save_prof || v.dexterity_save_prof != "(@{pb})") {
-                            update["strength_save_prof"] = "(@{pb})";
-                            update["dexterity_save_prof"] = "(@{pb})";
-                            update["constitution_save_prof"] = 0;
-                            update["intelligence_save_prof"] = 0;
-                            update["wisdom_save_prof"] = 0;
-                            update["charisma_save_prof"] = 0;
-                        }
+                        update["strength_save_prof"] = "(@{pb})";
+                        update["dexterity_save_prof"] = "(@{pb})";
+                        update["constitution_save_prof"] = 0;
+                        update["intelligence_save_prof"] = 0;
+                        update["wisdom_save_prof"] = 0;
+                        update["charisma_save_prof"] = 0;
+                        update["class_resource_name"] = "";
                         break;
                     case "Rogue":
                         update["hitdietype"] = 8;
                         update["spellcasting_ability"] = "0*";
-                        if(!v.intelligence_save_prof || v.intelligence_save_prof != "(@{pb})" || !v.dexterity_save_prof || v.dexterity_save_prof != "(@{pb})") {
-                            update["strength_save_prof"] = 0;
-                            update["dexterity_save_prof"] = "(@{pb})";
-                            update["constitution_save_prof"] = 0;
-                            update["intelligence_save_prof"] = "(@{pb})";
-                            update["wisdom_save_prof"] = 0;
-                            update["charisma_save_prof"] = 0;
-                        }
+                        update["strength_save_prof"] = 0;
+                        update["dexterity_save_prof"] = "(@{pb})";
+                        update["constitution_save_prof"] = 0;
+                        update["intelligence_save_prof"] = "(@{pb})";
+                        update["wisdom_save_prof"] = 0;
+                        update["charisma_save_prof"] = 0;
                         break;
                     case "Sorcerer":
                         update["hitdietype"] = 6;
                         update["spellcasting_ability"] = "@{charisma_mod}+";
-                        if(!v.constitution_save_prof || v.constitution_save_prof != "(@{pb})" || !v.charisma_save_prof || v.charisma_save_prof != "(@{pb})") {
-                            update["strength_save_prof"] = 0;
-                            update["dexterity_save_prof"] = 0;
-                            update["constitution_save_prof"] = "(@{pb})";
-                            update["intelligence_save_prof"] = 0;
-                            update["wisdom_save_prof"] = 0;
-                            update["charisma_save_prof"] = "(@{pb})";
-                            update["class_resource_name"] = "Sorcery Points";
-                        }
+                        update["strength_save_prof"] = 0;
+                        update["dexterity_save_prof"] = 0;
+                        update["constitution_save_prof"] = "(@{pb})";
+                        update["intelligence_save_prof"] = 0;
+                        update["wisdom_save_prof"] = 0;
+                        update["charisma_save_prof"] = "(@{pb})";
+                        update["class_resource_name"] = "Sorcery Points";
                         break;
                     case "Warlock":
                         update["hitdietype"] = 8;
                         update["spellcasting_ability"] = "@{charisma_mod}+";
-                        if(!v.wisdom_save_prof || v.wisdom_save_prof != "(@{pb})" || !v.charisma_save_prof || v.charisma_save_prof != "(@{pb})") {
-                            update["strength_save_prof"] = 0;
-                            update["dexterity_save_prof"] = 0;
-                            update["constitution_save_prof"] = 0;
-                            update["intelligence_save_prof"] = 0;
-                            update["wisdom_save_prof"] = "(@{pb})";
-                            update["charisma_save_prof"] = "(@{pb})";
-                            update["class_resource_name"] = "Spell Slots";
-                        }
+                        update["strength_save_prof"] = 0;
+                        update["dexterity_save_prof"] = 0;
+                        update["constitution_save_prof"] = 0;
+                        update["intelligence_save_prof"] = 0;
+                        update["wisdom_save_prof"] = "(@{pb})";
+                        update["charisma_save_prof"] = "(@{pb})";
+                        update["class_resource_name"] = "Spell Slots";
                         break;
                     case "Wizard":
                         update["hitdietype"] = 6;
                         update["spellcasting_ability"] = "@{intelligence_mod}+";
-                        if(!v.wisdom_save_prof || v.wisdom_save_prof != "(@{pb})" || !v.intelligence_save_prof || v.intelligence_save_prof != "(@{pb})") {
-                            update["strength_save_prof"] = 0;
-                            update["dexterity_save_prof"] = 0;
-                            update["constitution_save_prof"] = 0;
-                            update["intelligence_save_prof"] = "(@{pb})";
-                            update["wisdom_save_prof"] = "(@{pb})";
-                            update["charisma_save_prof"] = 0;
-                        }
+                        update["strength_save_prof"] = 0;
+                        update["dexterity_save_prof"] = 0;
+                        update["constitution_save_prof"] = 0;
+                        update["intelligence_save_prof"] = "(@{pb})";
+                        update["wisdom_save_prof"] = "(@{pb})";
+                        update["charisma_save_prof"] = 0;
                         break;
                 }
                 setAttrs(update, {silent: true});
