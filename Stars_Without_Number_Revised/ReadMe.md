@@ -6,10 +6,10 @@ This sheet is created for use in Stars Without Number Revised Edition on Roll20.
 
 * [Karlinator](https://github.com/Karlinator)
 * [Jakob](https://github.com/joesinghaus)
+* [Panzer](https://app.roll20.net/users/2223776/panzer)
 
 ### Contributors
 
-* UI Design by [Panzer](https://app.roll20.net/users/2223776/panzer)
 * [MankiGames](https://github.com/MankiGames)
 * [Shadowriku](https://github.com/Shadowriku)
 * [RonaldZ](https://github.com/RonaldZ)
