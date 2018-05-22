@@ -1490,12 +1490,19 @@
 			 *  convert old format for gear readied/stowed
 			**/
 			if (major == 2 && minor < 1) {
-				const upgradeFunction = _.after(4, () => upgradeSheet("2.1.0"));
+				const upgradeFunction = _.after(4, () => {
+					// recalculate these things just to be sure, in case the v1.6.2 update
+					// missed them.
+					buildShipWeaponsMenu();
+					buildSkillMenu();
+					buildPsionicsMenu();
+					buildAttacksMenu();
+					buildMagicMenu();
+					generateWeaponDisplay();
+					attributes.forEach(calculateMod);
 
-				// recalculate these things just to be sure, in case the v1.6.2 update
-				// missed them.
-				buildShipWeaponsMenu();
-				attributes.forEach(calculateMod);
+					upgradeSheet("2.1.0");
+				});
 
 				getSectionIDs("repeating_weapons", idArray => {
 					const sourceAttrs = [
@@ -1521,8 +1528,6 @@
 				});
 				getSectionIDs("repeating_ship-weapons", idArray => {
 					getAttrs(idArray.map(id => `repeating_ship-weapons_${id}_weapon_ammo_max`), v => {
-						console.log("SHIP WEAPONS");
-						console.log(v);
 						const setting = idArray.reduce((m, id) => {
 							if (v[`repeating_ship-weapons_${id}_weapon_ammo_max`] &&
 								v[`repeating_ship-weapons_${id}_weapon_ammo_max`] !== "0")
@@ -1572,7 +1577,6 @@
 	const upgradeFrom162 = () => {
 		console.log("Upgrading from versionless sheet (assumed to be fresh or v1.6.2).");
 		const upgradeFunction = _.after(13, () => {
-			generateWeaponDisplay();
 			upgradeSheet("2.0.1");
 		});
 
