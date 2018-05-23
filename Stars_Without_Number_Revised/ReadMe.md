@@ -27,6 +27,26 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 ## Changelog
 
+### 2.1.0
+
+* Additions
+	* Added option to disable modifier queries globally.
+	* Added button to roll hit points.
+	* Added weapon encumbrance tracking.
+	* Added ammo maximum for weapons.
+	* Weapon shock damage can now be toggled independent of base being 0 (for Unarmed Combatant).
+	* Added option for automatic ammo reduction (requires ChatSetAttr).
+* Bugfixes
+	* Attribute modifiers are now recalculated upon conversion from v1.6.2.
+	* Roll templates are no longer cut off when chat avatars are disabled.
+	* New NPC attacks should now receive the correct attack bonus.
+	* Line breaks in foci/technique/spell/cyberware descriptions now render correctly.
+
+### 2.0.1
+
+* Fixed a bug preventing successful conversion of NPC sheets.
+* Fixed a bug preventing extra effort from taking effect.
+
 ### 2.0.0
 
 * New, overhauled version of the sheet (rewritten in pug and sass)
