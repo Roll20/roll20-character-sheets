@@ -11,6 +11,11 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 18.1.8
+
+### Bug fixes
+- [#717: Custom Coin Text Alignment](https://bitbucket.org/mlenser/5eshaped/issues/717/custom-coin-text-alignment)
+
 ## 18.1.7
 
 ### Bug fixes
