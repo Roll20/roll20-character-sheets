@@ -1,9 +1,9 @@
 /* global getAttrs, setAttrs, getSectionIDs, generateRowID, on ,removeRepeatingRow, _, getTranslationByKey */
 (function () {
 	"use strict";
-	// Data constants
+	/* Data constants */
 	const sheetName = "Stars Without Number (revised)";
-	const sheetVersion = "2.1.0";
+	const sheetVersion = "2.2.0-beta1";
 	const translate = getTranslationByKey;
 	const attributes = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"];
 	const effortAttributes = ["wisdom_mod", "constitution_mod", "psionics_extra_effort",
@@ -44,6 +44,7 @@
 		psionic: ["biopsionics", "metapsionics", "precognition", "telekinesis", "telepathy", "teleportation"],
 	};
 	// HD AC AB Damage #attacks move morale skills saves armor_type
+	// TODO: Clean this up into a maintainable format
 	const statblockData = {
 		barbarian_hero: ["6", "16", "8", "Weapon+3", "1", "10m", "11", "3", "12", "PRIMITIVE"],
 		barbarian_tribal: ["1", "12", "2", "Weapon", "1", "10m", "8", "1", "15", "PRIMITIVE"],
@@ -80,398 +81,33 @@
 		veteran_fighter: ["2", "14", "2", "Weapon+1", "1", "10m", "9", "1", "14"],
 		warrior_tyrant: ["8", "20", "10", "Weapon+3", "1", "10m", "11", "3", "11", "POWERED"]
 	};
-	const shipData = {
-		defenses: {
-			ablative_hull_compartments: {
-				class: "CAPITAL",
-				effect: `+1 ${translate("AC")}, +20 ${translate("MAXIMUM_HIT_POINTS").toLowerCase()}.`,
-				mass: "2#",
-				name: translate("ABLATIVE_HULL_COMPARTMENTS"),
-				power: "5",
-			},
-			augmented_plating: {
-				class: "FIGHTER",
-				effect: `+2 ${translate("AC")}, -1 ${translate("SPEED")}.`,
-				mass: "1#",
-				name: translate("AUGMENTED_PLATING"),
-				power: "0",
-			},
-			boarding_countermeasures: {
-				class: "FRIGATE",
-				effect: translate("BOARDING_COUNTERMEASURES_DESC"),
-				mass: "1#",
-				name: translate("BOARDING_COUNTERMEASURES"),
-				power: "2",
-			},
-			burst_ecm_generator: {
-				class: "FRIGATE",
-				effect: translate("BURST_ECM_GENERATOR_DESC"),
-				mass: "1#",
-				name: translate("BURST_ECM_GENERATOR"),
-				power: "2",
-			},
-			foxer_drones: {
-				class: "CRUISER",
-				effect: translate("FOXER_DRONES_DESC"),
-				mass: "1#",
-				name: translate("FOXER_DRONES"),
-				power: "2",
-			},
-			grav_eddy_displacer: {
-				class: "FRIGATE",
-				effect: translate("GRAV_EDDY_DISPLACER_DESC"),
-				mass: "2#",
-				name: translate("GRAV_EDDY_DISPLACER"),
-				power: "5",
-			},
-			hardened_polyceramic_overlay: {
-				class: "FIGHTER",
-				effect: translate("HARDENED_POLYCERAMIC_OVERLAY_DESC"),
-				mass: "1#",
-				name: translate("HARDENED_POLYCERAMIC_OVERLAY"),
-				power: "0",
-			},
-			planetary_defense_array: {
-				class: "FRIGATE",
-				effect: translate("PLANETARY_DEFENSE_ARRAY_DESC"),
-				mass: "2#",
-				name: translate("PLANETARY_DEFENSE_ARRAY"),
-				power: "4",
-			},
-			point_defense_lasers: {
-				class: "FRIGATE",
-				effect: translate("POINT_DEFENSE_LASERS_DESC"),
-				mass: "2#",
-				name: translate("POINT_DEFENSE_LASERS"),
-				power: "3",
-			},
-		},
-		fittings: {
-			advanced_lab: {
-				class: "FRIGATE",
-				effect: translate("ADVANCED_LAB_DESC"),
-				mass: "2",
-				name: translate("ADVANCED_LAB"),
-				power: "1#",
-			},
-			advanced_nav_computer: {
-				class: "FRIGATE",
-				effect: translate("ADVANCED_NAV_COMPUTER_DESC"),
-				mass: "0",
-				name: translate("ADVANCED_NAV_COMPUTER"),
-				power: "1#",
-			},
-			amphibious_operation: {
-				class: "FIGHTER",
-				effect: translate("AMPHIBIOUS_OPERATION_DESC"),
-				mass: "1#",
-				name: translate("AMPHIBIOUS_OPERATION"),
-				power: "1",
-			},
-			armory: {
-				class: "FRIGATE",
-				effect: translate("ARMORY_DESC"),
-				mass: "0",
-				name: translate("ARMORY"),
-				power: "0",
-			},
-			atmospheric_configuration: {
-				class: "FIGHTER",
-				effect: translate("ATMOSPHERIC_CONFIGURATION_DESC"),
-				mass: "1#",
-				name: translate("ATMOSPHERIC_CONFIGURATION"),
-				power: "0",
-			},
-			auto_targeting_system: {
-				class: "FIGHTER",
-				effect: translate("AUTO_TARGETING_SYSTEM_DESC"),
-				mass: "0",
-				name: translate("AUTO_TARGETING_SYSTEM"),
-				power: "1",
-			},
-			automation_support: {
-				class: "FIGHTER",
-				effect: translate("AUTOMATION_SUPPORT_DESC"),
-				mass: "1",
-				name: translate("AUTOMATION_SUPPORT"),
-				power: "2",
-			},
-			boarding_tubes: {
-				class: "FRIGATE",
-				effect: translate("BOARDING_TUBES_DESC"),
-				mass: "1",
-				name: translate("BOARDING_TUBES"),
-				power: "0",
-			},
-			cargo_lighter: {
-				class: "FRIGATE",
-				effect: translate("CARGO_LIGHTER_DESC"),
-				mass: "2",
-				name: translate("CARGO_LIGHTER"),
-				power: "0",
-			},
-			cargo_space: {
-				class: "FIGHTER",
-				effect: translate("CARGO_SPACE_DESC"),
-				mass: "1",
-				name: translate("CARGO_SPACE"),
-				power: "0",
-			},
-			cold_sleep_pods: {
-				class: "FRIGATE",
-				effect: translate("COLD_SLEEP_PODS_DESC"),
-				mass: "1",
-				name: translate("COLD_SLEEP_PODS"),
-				power: "1",
-			},
-			colony_core: {
-				class: "FRIGATE",
-				effect: translate("COLONY_CORE_DESC"),
-				mass: "2#",
-				name: translate("COLONY_CORE"),
-				power: "4",
-			},
-			drill_course_regulator: {
-				class: "FRIGATE",
-				effect: translate("DRILL_COURSE_REGULATOR_DESC"),
-				mass: "1",
-				name: translate("DRILL_COURSE_REGULATOR"),
-				power: "1#",
-			},
-			spike_drive_2: {
-				class: "FIGHTER",
-				effect: translate("SPIKE_DRIVE_2_DESC"),
-				mass: "1#",
-				name: translate("SPIKE_DRIVE_2"),
-				power: "1#",
-			},
-			spike_drive_3: {
-				class: "FIGHTER",
-				effect: translate("SPIKE_DRIVE_3_DESC"),
-				mass: "2#",
-				name: translate("SPIKE_DRIVE_3"),
-				power: "2#",
-			},
-			spike_drive_4: {
-				class: "FRIGATE",
-				effect: translate("SPIKE_DRIVE_4_DESC"),
-				mass: "3#",
-				name: translate("SPIKE_DRIVE_4"),
-				power: "2#",
-			},
-			spike_drive_5: {
-				class: "FRIGATE",
-				effect: translate("SPIKE_DRIVE_5_DESC"),
-				mass: "3#",
-				name: translate("SPIKE_DRIVE_5"),
-				power: "3#",
-			},
-			spike_drive_6: {
-				class: "CRUISER",
-				effect: translate("SPIKE_DRIVE_6_DESC"),
-				mass: "4#",
-				name: translate("SPIKE_DRIVE_6"),
-				power: "3#",
-			},
-			drop_pod: {
-				class: "FRIGATE",
-				effect: translate("DROP_POD_DESC"),
-				mass: "2",
-				name: translate("DROP_POD"),
-				power: "0",
-			},
-			emissions_dampers: {
-				class: "FIGHTER",
-				effect: translate("EMISSIONS_DAMPERS_DESC"),
-				mass: "1#",
-				name: translate("EMISSIONS_DAMPERS"),
-				power: "1#",
-			},
-			exodus_bay: {
-				class: "CRUISER",
-				effect: translate("EXODUS_BAY_DESC"),
-				mass: "2#",
-				name: translate("EXODUS_BAY"),
-				power: "1#",
-			},
-			extended_life_support: {
-				class: "FIGHTER",
-				effect: translate("EXTENDED_LIFE_SUPPORT_DESC"),
-				mass: "1#",
-				name: translate("EXTENDED_LIFE_SUPPORT"),
-				power: "1#",
-			},
-			extended_medbay: {
-				class: "FRIGATE",
-				effect: translate("EXTENDED_MEDBAY_DESC"),
-				mass: "1",
-				name: translate("EXTENDED_MEDBAY"),
-				power: "1",
-			},
-			extended_store: {
-				class: "FIGHTER",
-				effect: translate("EXTENDED_STORE_DESC"),
-				mass: "1#",
-				name: translate("EXTENDED_STORE"),
-				power: "0",
-			},
-			fuel_bunkers: {
-				class: "FIGHTER",
-				effect: translate("FUEL_BUNKERS_DESC"),
-				mass: "1",
-				name: translate("FUEL_BUNKERS"),
-				power: "0",
-			},
-			fuel_scoops: {
-				class: "FRIGATE",
-				effect: translate("FUEL_SCOOPS_DESC"),
-				mass: "1#",
-				name: translate("FUEL_SCOOPS"),
-				power: "2",
-			},
-			hydroponic_production: {
-				class: "CRUISER",
-				effect: translate("HYDROPONIC_PRODUCTION_DESC"),
-				mass: "2#",
-				name: translate("HYDROPONIC_PRODUCTION"),
-				power: "1#",
-			},
-			lifeboats: {
-				class: "FRIGATE",
-				effect: translate("LIFEBOATS_DESC"),
-				mass: "1",
-				name: translate("LIFEBOATS"),
-				power: "0",
-			},
-			luxury_cabins: {
-				class: "FRIGATE",
-				effect: translate("LUXURY_CABINS_DESC"),
-				mass: "1#",
-				name: translate("LUXURY_CABINS"),
-				power: "1",
-			},
-			mobile_extractor: {
-				class: "FRIGATE",
-				effect: translate("MOBILE_EXTRACTOR_DESC"),
-				mass: "1",
-				name: translate("MOBILE_EXTRACTOR"),
-				power: "2",
-			},
-			mobile_factory: {
-				class: "CRUISER",
-				effect: translate("MOBILE_FACTORY_DESC"),
-				mass: "2#",
-				name: translate("MOBILE_FACTORY"),
-				power: "3",
-			},
-			precognitive_nav_chamber: {
-				class: "FRIGATE",
-				effect: translate("PRECOGNITIVE_NAV_CHAMBER_DESC"),
-				mass: "0",
-				name: translate("PRECOGNITIVE_NAV_CHAMBER"),
-				power: "1",
-			},
-			psionic_anchorpoint: {
-				class: "FRIGATE",
-				effect: translate("PSIONIC_ANCHORPOINT_DESC"),
-				mass: "0",
-				name: translate("PSIONIC_ANCHORPOINT"),
-				power: "3",
-			},
-			sensor_mask: {
-				class: "FRIGATE",
-				effect: translate("SENSOR_MASK_DESC"),
-				mass: "0",
-				name: translate("SENSOR_MASK"),
-				power: "1#",
-			},
-			ship_bay_fighter: {
-				class: "CRUISER",
-				effect: translate("SHIP_BAY_FIGHTER_DESC"),
-				mass: "2",
-				name: translate("SHIP_BAY_FIGHTER"),
-				power: "0",
-			},
-			ship_bay_frigate: {
-				class: "CAPITAL",
-				effect: translate("SHIP_BAY_FRIGATE_DESC"),
-				mass: "4",
-				name: translate("SHIP_BAY_FRIGATE"),
-				power: "1",
-			},
-			ships_locker: {
-				class: "FRIGATE",
-				effect: translate("SHIPS_LOCKER_DESC"),
-				mass: "0",
-				name: translate("SHIPS_LOCKER"),
-				power: "0",
-			},
-			shiptender_mount: {
-				class: "FRIGATE",
-				effect: translate("SHIPTENDER_MOUNT_DESC"),
-				mass: "1",
-				name: translate("SHIPTENDER_MOUNT"),
-				power: "1",
-			},
-			smugglers_hold: {
-				class: "FIGHTER",
-				effect: translate("SMUGGLERS_HOLD_DESC"),
-				mass: "1",
-				name: translate("SMUGGLERS_HOLD"),
-				power: "0",
-			},
-			survey_sensor_array: {
-				class: "FRIGATE",
-				effect: translate("SURVEY_SENSOR_ARRAY_DESC"),
-				mass: "1",
-				name: translate("SURVEY_SENSOR_ARRAY"),
-				power: "2",
-			},
-			system_drive: {
-				class: "FIGHTER",
-				effect: translate("SYSTEM_DRIVE_DESC"),
-				mass: "-2#",
-				name: translate("SYSTEM_DRIVE"),
-				power: "-1#",
-			},
-			teleportation_pads: {
-				class: "FRIGATE",
-				effect: translate("TELEPORTATION_PADS_DESC"),
-				mass: "1",
-				name: translate("TELEPORTATION_PADS"),
-				power: "1",
-			},
-			tractor_beams: {
-				class: "FRIGATE",
-				effect: translate("TRACTOR_BEAMS_DESC"),
-				mass: "1",
-				name: translate("TRACTOR_BEAMS"),
-				power: "2",
-			},
-			vehicle_transport_fittings: {
-				class: "FRIGATE",
-				effect: translate("VEHICLE_TRANSPORT_FITTINGS_DESC"),
-				mass: "1#",
-				name: translate("VEHICLE_TRANSPORT_FITTINGS"),
-				power: "0",
-			},
-			workshop: {
-				class: "FRIGATE",
-				effect: translate("WORKSHOP_DESC"),
-				mass: "0.5#",
-				name: translate("WORKSHOP"),
-				power: "1",
-			},
-		},
-		hulltypes: {
+	const shipStats = ["ship_ac", "ship_armor", "ship_class", "ship_crew_max", "ship_crew_min",
+	"ship_hardpoints_max", "ship_hp", "ship_hp_max", "ship_mass_max", "ship_power_max", "ship_speed"];
+	const reverseHullTypes = {
+		[translate("BATTLESHIP").toLowerCase()]: "battleship",
+		[translate("BULK_FREIGHTER").toLowerCase()]: "bulk_freighter",
+		[translate("CARRIER").toLowerCase()]: "carrier",
+		[translate("CORVETTE").toLowerCase()]: "corvette",
+		[translate("FLEET_CRUISER").toLowerCase()]: "fleet_cruiser",
+		[translate("FREE_MERCHANT").toLowerCase()]: "free_merchant",
+		[translate("HEAVY_FRIGATE").toLowerCase()]: "heavy_frigate",
+		[translate("LARGE_STATION").toLowerCase()]: "large_station",
+		[translate("PATROL_BOAT").toLowerCase()]: "patrol_boat",
+		[translate("SMALL_STATION").toLowerCase()]: "small station",
+		[translate("STRIKE_FIGHTER").toLowerCase()]: "strike_fighter",
+		[translate("SHUTTLE").toLowerCase()]: "shuttle",
+	};
+	const autofillSections = ["ship-defenses", "ship-fittings", "ship-weapons", "weapons"];
+	const autofillData = {
+		"hulltypes": {
 			battleship: {
 				ship_ac: "16",
 				ship_armor: "20",
-				ship_class: "CAPITAL",
+				ship_class: translate("CAPITAL"),
 				ship_crew_max: "1000",
 				ship_crew_min: "200",
 				ship_hardpoints_max: "15",
-				ship_hp_max: "100",
+				ship_hp: "100",
 				ship_mass_max: "50",
 				ship_power_max: "75",
 				ship_speed: "0",
@@ -479,11 +115,11 @@
 			bulk_freighter: {
 				ship_ac: "11",
 				ship_armor: "0",
-				ship_class: "CRUISER",
+				ship_class: translate("CRUISER"),
 				ship_crew_max: "40",
 				ship_crew_min: "10",
 				ship_hardpoints_max: "2",
-				ship_hp_max: "40",
+				ship_hp: "40",
 				ship_mass_max: "25",
 				ship_power_max: "15",
 				ship_speed: "0",
@@ -491,11 +127,11 @@
 			carrier: {
 				ship_ac: "14",
 				ship_armor: "10",
-				ship_class: "CAPITAL",
+				ship_class: translate("CAPITAL"),
 				ship_crew_max: "1500",
 				ship_crew_min: "300",
 				ship_hardpoints_max: "4",
-				ship_hp_max: "75",
+				ship_hp: "75",
 				ship_mass_max: "100",
 				ship_power_max: "50",
 				ship_speed: "0",
@@ -503,11 +139,11 @@
 			corvette: {
 				ship_ac: "13",
 				ship_armor: "10",
-				ship_class: "FRIGATE",
+				ship_class: translate("FRIGATE"),
 				ship_crew_max: "40",
 				ship_crew_min: "10",
 				ship_hardpoints_max: "6",
-				ship_hp_max: "40",
+				ship_hp: "40",
 				ship_mass_max: "15",
 				ship_power_max: "15",
 				ship_speed: "2",
@@ -515,11 +151,11 @@
 			fleet_cruiser: {
 				ship_ac: "14",
 				ship_armor: "15",
-				ship_class: "CRUISER",
+				ship_class: translate("CRUISER"),
 				ship_crew_max: "200",
 				ship_crew_min: "50",
 				ship_hardpoints_max: "10",
-				ship_hp_max: "60",
+				ship_hp: "60",
 				ship_mass_max: "30",
 				ship_power_max: "50",
 				ship_speed: "1",
@@ -527,11 +163,11 @@
 			free_merchant: {
 				ship_ac: "14",
 				ship_armor: "2",
-				ship_class: "FRIGATE",
+				ship_class: translate("FRIGATE"),
 				ship_crew_max: "6",
 				ship_crew_min: "1",
 				ship_hardpoints_max: "2",
-				ship_hp_max: "20",
+				ship_hp: "20",
 				ship_mass_max: "15",
 				ship_power_max: "10",
 				ship_speed: "3",
@@ -539,11 +175,11 @@
 			heavy_frigate: {
 				ship_ac: "15",
 				ship_armor: "10",
-				ship_class: "FRIGATE",
+				ship_class: translate("FRIGATE"),
 				ship_crew_max: "120",
 				ship_crew_min: "30",
 				ship_hardpoints_max: "8",
-				ship_hp_max: "50",
+				ship_hp: "50",
 				ship_mass_max: "20",
 				ship_power_max: "25",
 				ship_speed: "1",
@@ -551,11 +187,11 @@
 			large_station: {
 				ship_ac: "17",
 				ship_armor: "20",
-				ship_class: "CAPITAL",
+				ship_class: translate("CAPITAL"),
 				ship_crew_max: "1000",
 				ship_crew_min: "100",
 				ship_hardpoints_max: "30",
-				ship_hp_max: "120",
+				ship_hp: "120",
 				ship_mass_max: "75",
 				ship_power_max: "125",
 				ship_speed: "",
@@ -563,11 +199,11 @@
 			patrol_boat: {
 				ship_ac: "14",
 				ship_armor: "5",
-				ship_class: "FRIGATE",
+				ship_class: translate("FRIGATE"),
 				ship_crew_max: "20",
 				ship_crew_min: "5",
 				ship_hardpoints_max: "4",
-				ship_hp_max: "25",
+				ship_hp: "25",
 				ship_mass_max: "10",
 				ship_power_max: "15",
 				ship_speed: "4",
@@ -575,11 +211,11 @@
 			small_station: {
 				ship_ac: "11",
 				ship_armor: "5",
-				ship_class: "CRUISER",
+				ship_class: translate("CRUISER"),
 				ship_crew_max: "200",
 				ship_crew_min: "20",
 				ship_hardpoints_max: "10",
-				ship_hp_max: "120",
+				ship_hp: "120",
 				ship_mass_max: "40",
 				ship_power_max: "50",
 				ship_speed: "",
@@ -587,11 +223,11 @@
 			strike_fighter: {
 				ship_ac: "16",
 				ship_armor: "5",
-				ship_class: "FIGHTER",
+				ship_class: translate("FIGHTER"),
 				ship_crew_max: "1",
 				ship_crew_min: "1",
 				ship_hardpoints_max: "1",
-				ship_hp_max: "8",
+				ship_hp: "8",
 				ship_mass_max: "2",
 				ship_power_max: "5",
 				ship_speed: "5",
@@ -599,192 +235,764 @@
 			shuttle: {
 				ship_ac: "11",
 				ship_armor: "0",
-				ship_class: "FIGHTER",
+				ship_class: translate("FIGHTER"),
 				ship_crew_max: "10",
 				ship_crew_min: "1",
 				ship_hardpoints_max: "1",
-				ship_hp_max: "15",
+				ship_hp: "15",
 				ship_mass_max: "5",
 				ship_power_max: "3",
 				ship_speed: "3",
 			},
 		},
-		weapons: {
+		"ship-defenses": {
+			ablative_hull_compartments: {
+				class: "CAPITAL",
+				defense_effect: `+1 ${translate("AC")}, +20 ${translate("MAXIMUM_HIT_POINTS").toLowerCase()}.`,
+				defense_mass: "2#",
+				defense_power: "5",
+			},
+			augmented_plating: {
+				class: "FIGHTER",
+				defense_effect: `+2 ${translate("AC")}, -1 ${translate("SPEED")}.`,
+				defense_mass: "1#",
+				defense_power: "0",
+			},
+			boarding_countermeasures: {
+				class: "FRIGATE",
+				defense_effect: translate("BOARDING_COUNTERMEASURES_DESC"),
+				defense_mass: "1#",
+				defense_power: "2",
+			},
+			burst_ecm_generator: {
+				class: "FRIGATE",
+				defense_effect: translate("BURST_ECM_GENERATOR_DESC"),
+				defense_mass: "1#",
+				defense_power: "2",
+			},
+			foxer_drones: {
+				class: "CRUISER",
+				defense_effect: translate("FOXER_DRONES_DESC"),
+				defense_mass: "1#",
+				defense_power: "2",
+			},
+			grav_eddy_displacer: {
+				class: "FRIGATE",
+				defense_effect: translate("GRAV_EDDY_DISPLACER_DESC"),
+				defense_mass: "2#",
+				defense_power: "5",
+			},
+			hardened_polyceramic_overlay: {
+				class: "FIGHTER",
+				defense_effect: translate("HARDENED_POLYCERAMIC_OVERLAY_DESC"),
+				defense_mass: "1#",
+				defense_power: "0",
+			},
+			planetary_defense_array: {
+				class: "FRIGATE",
+				defense_effect: translate("PLANETARY_DEFENSE_ARRAY_DESC"),
+				defense_mass: "2#",
+				defense_power: "4",
+			},
+			point_defense_lasers: {
+				class: "FRIGATE",
+				defense_effect: translate("POINT_DEFENSE_LASERS_DESC"),
+				defense_mass: "2#",
+				defense_power: "3",
+			},
+		},
+		"ship-fittings": {
+			advanced_lab: {
+				class: "FRIGATE",
+				fitting_effect: translate("ADVANCED_LAB_DESC"),
+				fitting_mass: "2",
+				fitting_power: "1#",
+			},
+			advanced_nav_computer: {
+				class: "FRIGATE",
+				fitting_effect: translate("ADVANCED_NAV_COMPUTER_DESC"),
+				fitting_mass: "0",
+				fitting_power: "1#",
+			},
+			amphibious_operation: {
+				class: "FIGHTER",
+				fitting_effect: translate("AMPHIBIOUS_OPERATION_DESC"),
+				fitting_mass: "1#",
+				fitting_power: "1",
+			},
+			armory: {
+				class: "FRIGATE",
+				fitting_effect: translate("ARMORY_DESC"),
+				fitting_mass: "0",
+				fitting_power: "0",
+			},
+			atmospheric_configuration: {
+				class: "FIGHTER",
+				fitting_effect: translate("ATMOSPHERIC_CONFIGURATION_DESC"),
+				fitting_mass: "1#",
+				fitting_power: "0",
+			},
+			auto_targeting_system: {
+				class: "FIGHTER",
+				fitting_effect: translate("AUTO_TARGETING_SYSTEM_DESC"),
+				fitting_mass: "0",
+				fitting_power: "1",
+			},
+			automation_support: {
+				class: "FIGHTER",
+				fitting_effect: translate("AUTOMATION_SUPPORT_DESC"),
+				fitting_mass: "1",
+				fitting_power: "2",
+			},
+			boarding_tubes: {
+				class: "FRIGATE",
+				fitting_effect: translate("BOARDING_TUBES_DESC"),
+				fitting_mass: "1",
+				fitting_power: "0",
+			},
+			cargo_lighter: {
+				class: "FRIGATE",
+				fitting_effect: translate("CARGO_LIGHTER_DESC"),
+				fitting_mass: "2",
+				fitting_power: "0",
+			},
+			cargo_space: {
+				class: "FIGHTER",
+				fitting_effect: translate("CARGO_SPACE_DESC"),
+				fitting_mass: "1",
+				fitting_power: "0",
+			},
+			cold_sleep_pods: {
+				class: "FRIGATE",
+				fitting_effect: translate("COLD_SLEEP_PODS_DESC"),
+				fitting_mass: "1",
+				fitting_power: "1",
+			},
+			colony_core: {
+				class: "FRIGATE",
+				fitting_effect: translate("COLONY_CORE_DESC"),
+				fitting_mass: "2#",
+				fitting_power: "4",
+			},
+			drill_course_regulator: {
+				class: "FRIGATE",
+				fitting_effect: translate("DRILL_COURSE_REGULATOR_DESC"),
+				fitting_mass: "1",
+				fitting_power: "1#",
+			},
+			spike_drive_2: {
+				class: "FIGHTER",
+				fitting_effect: translate("SPIKE_DRIVE_2_DESC"),
+				fitting_mass: "1#",
+				fitting_power: "1#",
+			},
+			spike_drive_3: {
+				class: "FIGHTER",
+				fitting_effect: translate("SPIKE_DRIVE_3_DESC"),
+				fitting_mass: "2#",
+				fitting_power: "2#",
+			},
+			spike_drive_4: {
+				class: "FRIGATE",
+				fitting_effect: translate("SPIKE_DRIVE_4_DESC"),
+				fitting_mass: "3#",
+				fitting_power: "2#",
+			},
+			spike_drive_5: {
+				class: "FRIGATE",
+				fitting_effect: translate("SPIKE_DRIVE_5_DESC"),
+				fitting_mass: "3#",
+				fitting_power: "3#",
+			},
+			spike_drive_6: {
+				class: "CRUISER",
+				fitting_effect: translate("SPIKE_DRIVE_6_DESC"),
+				fitting_mass: "4#",
+				fitting_power: "3#",
+			},
+			drop_pod: {
+				class: "FRIGATE",
+				fitting_effect: translate("DROP_POD_DESC"),
+				fitting_mass: "2",
+				fitting_power: "0",
+			},
+			emissions_dampers: {
+				class: "FIGHTER",
+				fitting_effect: translate("EMISSIONS_DAMPERS_DESC"),
+				fitting_mass: "1#",
+				fitting_power: "1#",
+			},
+			exodus_bay: {
+				class: "CRUISER",
+				fitting_effect: translate("EXODUS_BAY_DESC"),
+				fitting_mass: "2#",
+				fitting_power: "1#",
+			},
+			extended_life_support: {
+				class: "FIGHTER",
+				fitting_effect: translate("EXTENDED_LIFE_SUPPORT_DESC"),
+				fitting_mass: "1#",
+				fitting_power: "1#",
+			},
+			extended_medbay: {
+				class: "FRIGATE",
+				fitting_effect: translate("EXTENDED_MEDBAY_DESC"),
+				fitting_mass: "1",
+				fitting_power: "1",
+			},
+			extended_store: {
+				class: "FIGHTER",
+				fitting_effect: translate("EXTENDED_STORE_DESC"),
+				fitting_mass: "1#",
+				fitting_power: "0",
+			},
+			fuel_bunkers: {
+				class: "FIGHTER",
+				fitting_effect: translate("FUEL_BUNKERS_DESC"),
+				fitting_mass: "1",
+				fitting_power: "0",
+			},
+			fuel_scoops: {
+				class: "FRIGATE",
+				fitting_effect: translate("FUEL_SCOOPS_DESC"),
+				fitting_mass: "1#",
+				fitting_power: "2",
+			},
+			hydroponic_production: {
+				class: "CRUISER",
+				fitting_effect: translate("HYDROPONIC_PRODUCTION_DESC"),
+				fitting_mass: "2#",
+				fitting_power: "1#",
+			},
+			lifeboats: {
+				class: "FRIGATE",
+				fitting_effect: translate("LIFEBOATS_DESC"),
+				fitting_mass: "1",
+				fitting_power: "0",
+			},
+			luxury_cabins: {
+				class: "FRIGATE",
+				fitting_effect: translate("LUXURY_CABINS_DESC"),
+				fitting_mass: "1#",
+				fitting_power: "1",
+			},
+			mobile_extractor: {
+				class: "FRIGATE",
+				fitting_effect: translate("MOBILE_EXTRACTOR_DESC"),
+				fitting_mass: "1",
+				fitting_power: "2",
+			},
+			mobile_factory: {
+				class: "CRUISER",
+				fitting_effect: translate("MOBILE_FACTORY_DESC"),
+				fitting_mass: "2#",
+				fitting_power: "3",
+			},
+			precognitive_nav_chamber: {
+				class: "FRIGATE",
+				fitting_effect: translate("PRECOGNITIVE_NAV_CHAMBER_DESC"),
+				fitting_mass: "0",
+				fitting_power: "1",
+			},
+			psionic_anchorpoint: {
+				class: "FRIGATE",
+				fitting_effect: translate("PSIONIC_ANCHORPOINT_DESC"),
+				fitting_mass: "0",
+				fitting_power: "3",
+			},
+			sensor_mask: {
+				class: "FRIGATE",
+				fitting_effect: translate("SENSOR_MASK_DESC"),
+				fitting_mass: "0",
+				fitting_power: "1#",
+			},
+			ship_bay_fighter: {
+				class: "CRUISER",
+				fitting_effect: translate("SHIP_BAY_FIGHTER_DESC"),
+				fitting_mass: "2",
+				fitting_power: "0",
+			},
+			ship_bay_frigate: {
+				class: "CAPITAL",
+				fitting_effect: translate("SHIP_BAY_FRIGATE_DESC"),
+				fitting_mass: "4",
+				fitting_power: "1",
+			},
+			ships_locker: {
+				class: "FRIGATE",
+				fitting_effect: translate("SHIPS_LOCKER_DESC"),
+				fitting_mass: "0",
+				fitting_power: "0",
+			},
+			shiptender_mount: {
+				class: "FRIGATE",
+				fitting_effect: translate("SHIPTENDER_MOUNT_DESC"),
+				fitting_mass: "1",
+				fitting_power: "1",
+			},
+			smugglers_hold: {
+				class: "FIGHTER",
+				fitting_effect: translate("SMUGGLERS_HOLD_DESC"),
+				fitting_mass: "1",
+				fitting_power: "0",
+			},
+			survey_sensor_array: {
+				class: "FRIGATE",
+				fitting_effect: translate("SURVEY_SENSOR_ARRAY_DESC"),
+				fitting_mass: "1",
+				fitting_power: "2",
+			},
+			system_drive: {
+				class: "FIGHTER",
+				fitting_effect: translate("SYSTEM_DRIVE_DESC"),
+				fitting_mass: "-2#",
+				fitting_power: "-1#",
+			},
+			teleportation_pads: {
+				class: "FRIGATE",
+				fitting_effect: translate("TELEPORTATION_PADS_DESC"),
+				fitting_mass: "1",
+				fitting_power: "1",
+			},
+			tractor_beams: {
+				class: "FRIGATE",
+				fitting_effect: translate("TRACTOR_BEAMS_DESC"),
+				fitting_mass: "1",
+				fitting_power: "2",
+			},
+			vehicle_transport_fittings: {
+				class: "FRIGATE",
+				fitting_effect: translate("VEHICLE_TRANSPORT_FITTINGS_DESC"),
+				fitting_mass: "1#",
+				fitting_power: "0",
+			},
+			workshop: {
+				class: "FRIGATE",
+				fitting_effect: translate("WORKSHOP_DESC"),
+				fitting_mass: "0.5#",
+				fitting_power: "1",
+			},
+		},
+		"ship-weapons": {
 			charged_particle_caster: {
 				class: "FRIGATE",
-				damage: "3d6",
-				hardpoints: "2",
-				name: translate("CHARGED_PARTICLE_CASTER"),
-				mass: "1",
-				power: "10",
-				qualities: `${translate("AP")} 15, ${translate("CLUMSY")}`,
+				weapon_damage: "3d6",
+				weapon_hardpoints: "2",
+				weapon_mass: "1",
+				weapon_power: "10",
+				weapon_qualities: `${translate("AP")} 15, ${translate("CLUMSY")}`,
 			},
 			flak_emitter_battery: {
 				class: "FRIGATE",
-				damage: "2d6",
-				hardpoints: "1",
-				name: translate("FLAK_EMITTER_BATTERY"),
-				mass: "3",
-				power: "5",
-				qualities: `${translate("AP")} 10, ${translate("FLAK")}`,
+				weapon_damage: "2d6",
+				weapon_hardpoints: "1",
+				weapon_mass: "3",
+				weapon_power: "5",
+				weapon_qualities: `${translate("AP")} 10, ${translate("FLAK")}`,
 			},
 			fractal_impact_charge: {
-				ammo: "4",
+				weapon_ammo: "4",
 				class: "FIGHTER",
-				damage: "2d6",
-				hardpoints: "1",
-				name: translate("FRACTAL_IMPACT_CHARGE"),
-				mass: "1",
-				power: "5",
-				qualities: `${translate("AP")} 15`,
+				weapon_damage: "2d6",
+				weapon_hardpoints: "1",
+				weapon_mass: "1",
+				weapon_power: "5",
+				weapon_qualities: `${translate("AP")} 15`,
 			},
 			gravcannon: {
 				class: "CRUISER",
-				damage: "4d6",
-				hardpoints: "3",
-				name: translate("GRAVCANNON"),
-				mass: "4",
-				power: "15",
-				qualities: `${translate("AP")} 20`,
+				weapon_damage: "4d6",
+				weapon_hardpoints: "3",
+				weapon_mass: "4",
+				weapon_power: "15",
+				weapon_qualities: `${translate("AP")} 20`,
 			},
 			lightning_charge_mantle: {
 				class: "CAPITAL",
-				damage: "1d20",
-				hardpoints: "2",
-				name: translate("LIGHTNING_CHARGE_MANTLE"),
-				mass: "5",
-				power: "15",
-				qualities: `${translate("AP")} 5, ${translate("CLOUD")}`,
+				weapon_damage: "1d20",
+				weapon_hardpoints: "2",
+				weapon_mass: "5",
+				weapon_power: "15",
+				weapon_qualities: `${translate("AP")} 5, ${translate("CLOUD")}`,
 			},
 			mag_spike_array: {
-				ammo: "5",
+				weapon_ammo: "5",
 				class: "FRIGATE",
-				damage: "2d6+2",
-				hardpoints: "2",
-				name: translate("MAG_SPIKE_ARRAY"),
-				mass: "2",
-				power: "5",
-				qualities: `${translate("AP")} 10, ${translate("FLAK")}`,
+				weapon_damage: "2d6+2",
+				weapon_hardpoints: "2",
+				weapon_mass: "2",
+				weapon_power: "5",
+				weapon_qualities: `${translate("AP")} 10, ${translate("FLAK")}`,
 			},
 			mass_cannon: {
-				ammo: "4",
+				weapon_ammo: "4",
 				class: "CAPITAL",
-				damage: "2d20",
-				hardpoints: "4",
-				name: translate("MASS_CANNON"),
-				mass: "5",
-				power: "10",
-				qualities: `${translate("AP")} 20`,
+				weapon_damage: "2d20",
+				weapon_hardpoints: "4",
+				weapon_mass: "5",
+				weapon_power: "10",
+				weapon_qualities: `${translate("AP")} 20`,
 			},
 			multifocal_laser: {
 				class: "FIGHTER",
-				damage: "1d4",
-				hardpoints: "1",
-				name: translate("MULTIFOCAL_LASER"),
-				mass: "1",
-				power: "5",
-				qualities: `${translate("AP")} 20`,
+				weapon_damage: "1d4",
+				weapon_hardpoints: "1",
+				weapon_mass: "1",
+				weapon_power: "5",
+				weapon_qualities: `${translate("AP")} 20`,
 			},
 			nuclear_missiles: {
-				ammo: "5",
+				weapon_ammo: "5",
 				class: "FRIGATE",
-				damage: "",
-				hardpoints: "2",
-				name: translate("NUCLEAR_MISSILES"),
-				mass: "1",
-				power: "5",
-				qualities: "",
+				weapon_damage: "",
+				weapon_hardpoints: "2",
+				weapon_mass: "1",
+				weapon_power: "5",
+				weapon_qualities: "",
 			},
 			plasma_beam: {
 				class: "FRIGATE",
-				damage: "3d6",
-				hardpoints: "2",
-				name: translate("PLASMA_BEAM"),
-				mass: "2",
-				power: "5",
-				qualities: `${translate("AP")} 10`,
+				weapon_damage: "3d6",
+				weapon_hardpoints: "2",
+				weapon_mass: "2",
+				weapon_power: "5",
+				weapon_qualities: `${translate("AP")} 10`,
 			},
 			polyspectral_mes_beam: {
 				class: "FIGHTER",
-				damage: "2d4",
-				hardpoints: "1",
-				name: translate("POLYSPECTRAL_MES_BEAM"),
-				mass: "1",
-				power: "5",
-				qualities: `${translate("AP")} 25`,
+				weapon_damage: "2d4",
+				weapon_hardpoints: "1",
+				weapon_mass: "1",
+				weapon_power: "5",
+				weapon_qualities: `${translate("AP")} 25`,
 			},
 			reaper_battery: {
 				class: "FIGHTER",
-				damage: "3d4",
-				hardpoints: "1",
-				name: translate("REAPER_BATTERY"),
-				mass: "1",
-				power: "4",
-				qualities: translate("CLUMSY"),
+				weapon_damage: "3d4",
+				weapon_hardpoints: "1",
+				weapon_mass: "1",
+				weapon_power: "4",
+				weapon_qualities: translate("CLUMSY"),
 			},
 			sandthrower: {
 				class: "FIGHTER",
-				damage: "2d4",
-				hardpoints: "1",
-				name: translate("SANDTHROWER"),
-				mass: "1",
-				power: "3",
-				qualities: translate("FLAK"),
+				weapon_damage: "2d4",
+				weapon_hardpoints: "1",
+				weapon_mass: "1",
+				weapon_power: "3",
+				weapon_qualities: translate("FLAK"),
 			},
 			singularity_gun: {
 				class: "CAPITAL",
-				damage: "5d20",
-				hardpoints: "5",
-				name: translate("SINGULARITY_GUN"),
-				mass: "10",
-				power: "25",
-				qualities: `${translate("AP")} 25`,
+				weapon_damage: "5d20",
+				weapon_hardpoints: "5",
+				weapon_mass: "10",
+				weapon_power: "25",
+				weapon_qualities: `${translate("AP")} 25`,
 			},
 			smart_cloud: {
 				class: "CRUISER",
-				damage: "3d10",
-				hardpoints: "2",
-				name: translate("SMART_CLOUD"),
-				mass: "5",
-				power: "10",
-				qualities: `${translate("CLOUD")}, ${translate("CLUMSY")}`,
+				weapon_damage: "3d10",
+				weapon_hardpoints: "2",
+				weapon_mass: "5",
+				weapon_power: "10",
+				weapon_qualities: `${translate("CLOUD")}, ${translate("CLUMSY")}`,
 			},
 			spike_inversion_projector: {
 				class: "CRUISER",
-				damage: "3d8",
-				hardpoints: "3",
-				name: translate("SPIKE_INVERSION_PROJECTOR"),
-				mass: "3",
-				power: "10",
-				qualities: `${translate("AP")} 15`,
+				weapon_damage: "3d8",
+				weapon_hardpoints: "3",
+				weapon_mass: "3",
+				weapon_power: "10",
+				weapon_qualities: `${translate("AP")} 15`,
 			},
 			spinal_beam_cannon: {
 				class: "CRUISER",
-				damage: "3d10",
-				hardpoints: "3",
-				name: translate("SPINAL_BEAM_CANNON"),
-				mass: "5",
-				power: "10",
-				qualities: `${translate("AP")} 15, ${translate("CLUMSY")}`,
+				weapon_damage: "3d10",
+				weapon_hardpoints: "3",
+				weapon_mass: "5",
+				weapon_power: "10",
+				weapon_qualities: `${translate("AP")} 15, ${translate("CLUMSY")}`,
 			},
 			torpedo_launcher: {
-				ammo: "4",
+				weapon_ammo: "4",
 				class: "FRIGATE",
-				damage: "3d8",
-				hardpoints: "1",
-				name: translate("TORPEDO_LAUNCHER"),
-				mass: "3",
-				power: "10",
-				qualities: `${translate("AP")} 20`,
+				weapon_damage: "3d8",
+				weapon_hardpoints: "1",
+				weapon_mass: "3",
+				weapon_power: "10",
+				weapon_qualities: `${translate("AP")} 20`,
 			},
 			vortex_tunnel_inductor: {
 				class: "CAPITAL",
-				damage: "3d20",
-				hardpoints: "4",
-				name: translate("VORTEX_TUNNEL_INDUCTOR"),
-				mass: "10",
-				power: "20",
-				qualities: `${translate("AP")} 20, ${translate("CLUMSY")}`,
+				weapon_damage: "3d20",
+				weapon_hardpoints: "4",
+				weapon_mass: "10",
+				weapon_power: "20",
+				weapon_qualities: `${translate("AP")} 20, ${translate("CLUMSY")}`,
+			},
+		},
+		"weapons": {
+			advanced_bow: {
+				weapon_ammo: "1",
+				weapon_damage: "1d6",
+				weapon_encumbrance: "2",
+				weapon_range: "100/150",
+			},
+			anti_vehicle_laser: {
+				weapon_ammo: "15",
+				weapon_damage: "3d10",
+				weapon_range: "2000/4000",
+			},
+			combat_rifle: {
+				weapon_ammo: "30",
+				weapon_burst: true,
+				weapon_damage: "1d12",
+				weapon_encumbrance: "2",
+				weapon_range: "100/300",
+			},
+			combat_shotgun: {
+				weapon_ammo: "12",
+				weapon_burst: true,
+				weapon_damage: "3d4",
+				weapon_encumbrance: "2",
+				weapon_range: "10/30",
+			},
+			conversion_bow: {
+				weapon_ammo: "1",
+				weapon_damage: "1d8",
+				weapon_encumbrance: "2",
+				weapon_range: "150/300",
+			},
+			crude_pistol: {
+				weapon_ammo: "1",
+				weapon_damage: "1d6",
+				weapon_encumbrance: "1",
+				weapon_range: "5/15",
+			},
+			distortion_cannon: {
+				weapon_attack: "1",
+				weapon_ammo: "6",
+				weapon_damage: "2d12",
+				weapon_encumbrance: "2",
+				weapon_range: "100/300",
+			},
+			grenade: {
+				weapon_damage: "2d6",
+				weapon_encumbrance: "1",
+				weapon_range: "10/30",
+			},
+			heavy_machine_gun: {
+				weapon_ammo: "10",
+				weapon_damage: "3d6",
+				weapon_encumbrance: "3",
+				weapon_range: "500/2000",
+			},
+			hydra_array: {
+				weapon_ammo: "10",
+				weapon_damage: "3d6",
+				weapon_range: "4000/8000",
+			},
+			large_advanced_weapon: {
+				weapon_attribute_mod: "@{strength_mod}",
+				weapon_damage: "1d10+1",
+				weapon_encumbrance: "2",
+				weapon_shock_ac: "15",
+				weapon_shock_damage: "2",
+				weapon_skill_bonus: "@{skill_stab}",
+			},
+			large_primitive_weapon: {
+				weapon_attribute_mod: "@{strength_mod}",
+				weapon_damage: "1d8+1",
+				weapon_encumbrance: "2",
+				weapon_shock_ac: "15",
+				weapon_shock_damage: "2",
+				weapon_skill_bonus: "@{skill_stab}",
+			},
+			laser_pistol: {
+				weapon_attack: "1",
+				weapon_ammo: "10",
+				weapon_damage: "1d6",
+				weapon_encumbrance: "1",
+				weapon_range: "100/300",
+			},
+			laser_rifle: {
+				weapon_attack: "1",
+				weapon_ammo: "20",
+				weapon_burst: true,
+				weapon_damage: "1d10",
+				weapon_encumbrance: "2",
+				weapon_range: "300/500",
+			},
+			mag_pistol: {
+				weapon_ammo: "6",
+				weapon_damage: "2d6+2",
+				weapon_encumbrance: "1",
+				weapon_range: "100/300",
+			},
+			mag_rifle: {
+				weapon_ammo: "10",
+				weapon_damage: "2d8+2",
+				weapon_encumbrance: "2",
+				weapon_range: "300/600",
+			},
+			medium_advanced_weapon: {
+				weapon_attribute_mod: "@{str_dex_mod}",
+				weapon_damage: "1d8+1",
+				weapon_encumbrance: "1",
+				weapon_shock_ac: "13",
+				weapon_shock_damage: "2",
+				weapon_skill_bonus: "@{skill_stab}",
+			},
+			medium_primitive_weapon: {
+				weapon_attribute_mod: "@{str_dex_mod}",
+				weapon_damage: "1d6+1",
+				weapon_encumbrance: "1",
+				weapon_shock_ac: "13",
+				weapon_shock_damage: "2",
+				weapon_skill_bonus: "@{skill_stab}",
+			},
+			musket: {
+				weapon_ammo: "1",
+				weapon_damage: "1d12",
+				weapon_encumbrance: "2",
+				weapon_range: "25/50",
+			},
+			plasma_projector: {
+				weapon_attack: "1",
+				weapon_ammo: "6",
+				weapon_damage: "2d8",
+				weapon_encumbrance: "2",
+				weapon_range: "50/100",
+			},
+			primitive_bow: {
+				weapon_ammo: "1",
+				weapon_damage: "1d6",
+				weapon_encumbrance: "2",
+				weapon_range: "50/75",
+			},
+			punch: {
+				weapon_attribute_mod: "@{str_dex_mod}",
+				weapon_damage: "1d2",
+				weapon_skill_bonus: "@{skill_punch}",
+			},
+			railgun: {
+				weapon_ammo: "20",
+				weapon_damage: "3d8",
+				weapon_range: "4000/8000",
+			},
+			revolver: {
+				weapon_ammo: "6",
+				weapon_damage: "1d8",
+				weapon_encumbrance: "1",
+				weapon_range: "30/100",
+			},
+			rifle: {
+				weapon_ammo: "6",
+				weapon_damage: "1d10+2",
+				weapon_encumbrance: "2",
+				weapon_range: "200/400",
+			},
+			rocket_launcher: {
+				weapon_ammo: "1",
+				weapon_damage: "3d10",
+				weapon_encumbrance: "2",
+				weapon_range: "2000/4000",
+			},
+			semi_auto_pistol: {
+				weapon_ammo: "12",
+				weapon_damage: "1d6+1",
+				weapon_encumbrance: "1",
+				weapon_range: "30/100",
+			},
+			shear_rifle: {
+				weapon_attack: "1",
+				weapon_ammo: "10",
+				weapon_burst: true,
+				weapon_damage: "2d8",
+				weapon_encumbrance: "2",
+				weapon_range: "100/300",
+			},
+			shotgun: {
+				weapon_ammo: "2",
+				weapon_damage: "3d4",
+				weapon_encumbrance: "2",
+				weapon_range: "10/30",
+			},
+			small_advanced_weapon: {
+				weapon_attribute_mod: "@{str_dex_mod}",
+				weapon_damage: "1d6",
+				weapon_encumbrance: "1",
+				weapon_shock_ac: "15",
+				weapon_shock_damage: "1",
+				weapon_skill_bonus: "@{skill_stab}",
+			},
+			small_primitive_weapon: {
+				weapon_attribute_mod: "@{str_dex_mod}",
+				weapon_damage: "1d4",
+				weapon_encumbrance: "1",
+				weapon_shock_ac: "15",
+				weapon_shock_damage: "1",
+				weapon_skill_bonus: "@{skill_stab}",
+			},
+			sniper_rifle: {
+				weapon_ammo: "1",
+				weapon_damage: "2d8",
+				weapon_encumbrance: "2",
+				weapon_range: "1000/2000",
+			},
+			spike_thrower: {
+				weapon_ammo: "15",
+				weapon_burst: true,
+				weapon_damage: "3d8",
+				weapon_encumbrance: "2",
+				weapon_range: "20/40",
+			},
+			stun_baton: {
+				weapon_attribute_mod: "@{str_dex_mod}",
+				weapon_damage: "1d8",
+				weapon_encumbrance: "1",
+				weapon_shock_ac: "15",
+				weapon_shock_damage: "1",
+				weapon_skill_bonus: "@{skill_stab}",
+			},
+			submachine_gun: {
+				weapon_ammo: "20",
+				weapon_burst: true,
+				weapon_damage: "1d8",
+				weapon_encumbrance: "1",
+				weapon_range: "30/100",
+			},
+			suit_ripper: {
+				weapon_attribute_mod: "@{str_dex_mod}",
+				weapon_damage: "1d6",
+				weapon_encumbrance: "1",
+				weapon_skill_bonus: "@{skill_stab}",
+			},
+			thermal_pistol: {
+				weapon_attack: "1",
+				weapon_ammo: "5",
+				weapon_damage: "2d6",
+				weapon_encumbrance: "1",
+				weapon_range: "25/50",
+			},
+			thunder_gun: {
+				weapon_attack: "1",
+				weapon_ammo: "6",
+				weapon_damage: "2d10",
+				weapon_encumbrance: "2",
+				weapon_range: "100/300",
+			},
+			void_carbine: {
+				weapon_ammo: "10",
+				weapon_damage: "2d6",
+				weapon_encumbrance: "2",
+				weapon_range: "100/300",
+			},
+			vortex_cannon: {
+				weapon_ammo: "5",
+				weapon_damage: "5d12",
+				weapon_range: "1000/2000",
 			},
 		},
 	};
@@ -893,8 +1101,15 @@
 			}, () => {
 				calculateSaves();
 				generateWeaponDisplay();
+				calculateStrDexMod();
 				if (attr === "dexterity") calculateAC();
 			});
+		});
+	};
+	const calculateStrDexMod = () => {
+		getAttrs(["str_dex_mod", "strength_mod", "dexterity_mod"], v => {
+			const str_dex_mod = Math.max(parseInt(v.strength_mod), parseInt(v.dexterity_mod));
+			mySetAttrs({str_dex_mod}, v);
 		});
 	};
 
@@ -1024,6 +1239,7 @@
 			});
 		});
 	};
+
 	const handleAmmoAPI = (sName) => {
 		const formula = (sName === "weapons") ? "[[-1 - @{weapon_burst}]]" : "-1" ;
 		getSectionIDs(`repeating_${sName}`, idArray => {
@@ -1053,7 +1269,6 @@
 			if (v.tab === "npc" && v.npc === "0") setAttrs({tab: "character"});
 		});
 	};
-
 	const validateSuperTab = () => {
 		getAttrs(["setting_super_type", "tab_super"], v => {
 			const setting = {};
@@ -1062,7 +1277,6 @@
 			mySetAttrs(setting, v);
 		});
 	};
-
 	const validateStrain = () => {
 		getAttrs(["strain", "strain_permanent", "strain_max"], v => {
 			const currentStrain = parseInt(v.strain) || 0,
@@ -1072,7 +1286,6 @@
 			if (strain !== currentStrain) setAttrs({ strain });
 		});
 	};
-
 	const validateWeaponSkills = (ids) => {
 		// Makes sure that the select for the weapon skill is never in an invalid state.
 		const prefixes = (ids && ids.map(id => `repeating_weapons_${id}`)) || ["repeating_weapons"];
@@ -1168,7 +1381,7 @@
 		});
 	};
 
-	/* Menu builder */
+	/* Menu builders */
 	const buildSaveMenu = () => {
 		getAttrs(["homebrew_luck_save", "macro_saves"], v => {
 			const macro_saves = buildLink(`^{PHYSICAL} (v@{save_physical})`, ("save_physical")) + " " +
@@ -1344,6 +1557,116 @@
 		});
 	};
 
+	/* Autofill stuff */
+	const getShipMultiplier = (shipClass) => {
+		if ((shipClass || "").toLowerCase() === "frigate") return 2;
+		else if ((shipClass || "").toLowerCase() === "cruiser") return 3;
+		else if ((shipClass || "").toLowerCase() === "capital") return 4;
+		else return 1;
+	};
+	const getAutofillData = (sName, v, data, label) => {
+		// Transforms the stored data to be suitable for
+		// inclusion into the sheet.
+		const output = Object.assign({}, data);
+		if (sName === "ship-defenses") {
+			if (label) output.defense_name = translate(label.toUpperCase());
+			if (output.defense_mass.includes("#")) {
+				output.defense_mass = String(parseInt(output.defense_mass) * v.ship_multiplier);
+			}
+		}
+		if (sName === "ship-fittings") {
+			if (label) output.fitting_name = translate(label.toUpperCase());
+			if (output.fitting_mass.includes("#")) {
+				output.fitting_mass = String(Math.round(parseFloat(output.fitting_mass) * v.ship_multiplier));
+			}
+			if (output.fitting_power.includes("#")) {
+				output.fitting_power = String(parseInt(output.fitting_power) * v.ship_multiplier);
+			}
+		}
+		if (sName === "ship-weapons") {
+			if (label) output.weapon_name = translate(label.toUpperCase());
+			if (output.weapon_ammo) {
+				output.weapon_ammo_max = output.weapon_ammo;
+				output.weapon_use_ammo = "{{ammo=[[@{weapon_ammo} - 1]] / @{weapon_ammo_max}}}";
+			}
+		}
+		if (sName === "weapons") {
+			if (label) output.weapon_name = translate(label.toUpperCase());
+			if (output.weapon_ammo) {
+				output.weapon_ammo_max = output.weapon_ammo;
+				output.weapon_use_ammo = "{{ammo=[[0@{weapon_ammo} - (1 @{weapon_burst})]] / @{weapon_ammo|max}}}";
+			}
+			if (output.weapon_shock_damage) {
+				output.weapon_shock = "{{shock=[[@{weapon_shock_damage} + @{weapon_attribute_mod}[Attribute] + @{weapon_skill_to_damage}[Skill]]] ^{SHOCK_DAMAGE_AGAINST_AC_LEQ} @{weapon_shock_ac}!}}";
+			}
+			if (output.weapon_burst) {
+				output.weapon_burst = "@{burst_query}";
+			}
+			if (!output.weapon_attribute_mod) {
+				output.weapon_attribute_mod = "@{dexterity_mod}";
+			}
+		}
+		return output;
+	};
+	const getAutofillInfo = (sName, v, inputData) => {
+		const data = getAutofillData(sName, v, inputData);
+		// Generates info text from the stored data
+		if (sName === "ship-defenses") {
+			return `${translate(data.class)}+. ${translate("POWER_INIT")}: ${data.defense_power}, ` +
+				`${translate("MASS_INIT")}: ${data.defense_mass}. ${data.defense_effect}`;
+		}
+		if (sName === "ship-fittings") {
+			return `${translate(data.class)}+. ${translate("POWER_INIT")}: ${data.fitting_power}, ` +
+				`${translate("MASS_INIT")}: ${data.fitting_mass}. ${data.fitting_effect}`;
+		}
+		if (sName === "ship-weapons") {
+			return `${translate(data.class)}+. ` +
+				`${translate("POWER_INIT")}: ${data.weapon_power}, ` +
+				`${translate("MASS_INIT")}: ${data.weapon_mass}, ` +
+				`${translate("HARDPOINTS_INIT")}: ${data.weapon_hardpoints}. ` +
+				`${translate("DAMAGE_SHORT")} ${data.weapon_damage}. ` +
+				`${data.weapon_qualities}${(data.weapon_ammo ? `, ${translate("AMMO")}: ${data.weapon_ammo}`: "")}.`;
+		}
+		if (sName === "weapons") {
+			const getNamedAttrMod = expr => {
+				if (expr === "@{dexterity_mod}") return translate("DEXTERITY_SHORT");
+				else if (expr === "@{strength_mod}") return translate("STRENGTH_SHORT");
+				else if (expr === "@{str_dex_mod}") return translate("STR_DEX");
+			};
+			return `${translate("DAMAGE_SHORT")} ${data.weapon_damage}${data.weapon_burst ? ` (${translate("BURST")})` : ""}` +
+				(data.weapon_ab ? `, ${translate("ATTACK_BONUS_SHORT")} +${data.weapon_ab}`: "") +
+				(data.weapon_range ? `, ${translate("RANGE")} ${data.weapon_range}`: "") +
+				(data.weapon_ammo ? `, ${translate("AMMO")} ${data.weapon_ammo}`: "") +
+				(data.weapon_shock ? `, ${data.weapon_shock_damage} ${translate("SHOCK_DAMAGE_AGAINST_AC_LEQ")} ${data.weapon_shock_ac}` : "") +
+				`, +${getNamedAttrMod(data.weapon_attribute_mod)}` +
+				(data.weapon_encumbrance ? `, ${translate("ENCUMBRANCE_SHORT")} ${data.weapon_encumbrance}` : "") + ".";
+		}
+	};
+	const generateAutofillRow = (sName) => {
+		// Event handler for generating a new row when button is pressed
+		getAttrs([`generate_${sName}_source`, "ship_class"], v => {
+			const label = v[`generate_${sName}_source`];
+			v.ship_multiplier = getShipMultiplier(v.ship_class);
+			if (label && autofillData[sName].hasOwnProperty(label)) {
+				const data = getAutofillData(sName, v, autofillData[sName][label], label);
+				delete data.class;
+				fillRepeatingSectionFromData(sName, [data]);
+			}
+		});
+	};
+	const generateAutofillInfo = (sName) => {
+		// Event handler for showing info about the selected item
+		getAttrs([`generate_${sName}_source`, "ship_class"], v => {
+			const label = v[`generate_${sName}_source`];
+			v.ship_multiplier = getShipMultiplier(v.ship_class);
+			if (label && autofillData[sName].hasOwnProperty(label)) {
+				setAttrs({
+					[`generate_${sName}_info`]: getAutofillInfo(sName, v, autofillData[sName][label])
+				});
+			}
+			else setAttrs({[`generate_${sName}_info`]: " "});
+		});
+	};
 
 	/* Translations */
 	const setTranslatedDefaults = () => {
@@ -1425,6 +1748,32 @@
 	};
 
 	/* Ship Code */
+	const fillShipStats = () => {
+		getAttrs(["ship_hulltype", ...shipStats], v => {
+			const label = v.ship_hulltype && reverseHullTypes[v.ship_hulltype.toLowerCase()];
+			if (label && autofillData.hulltypes.hasOwnProperty(label)) {
+				const data = Object.assign({}, autofillData.hulltypes[label]);
+				data.ship_hp_max = data.ship_hp;
+				Object.keys(data).forEach(key => {
+					if (!(["", 0, "0"].includes(v[key]))) delete data[key];
+				});
+				mySetAttrs(data, v);
+			}
+		});
+	};
+	const setShipClass = () => {
+		// Sets the internal ship_class_normalised attribute responsible
+		// for filtering ship modules according to class.
+		getAttrs(["ship_class", "ship_class_normalised"], v => {
+			if (["fighter", translate("FIGHTER").toLowerCase()].includes(v.ship_class.toLowerCase()))
+				setAttrs({ship_class_normalised: "fighter"});
+			else if (["frigate", translate("FRIGATE").toLowerCase()].includes(v.ship_class.toLowerCase()))
+				setAttrs({ship_class_normalised: "frigate"});
+			else if (["cruiser", translate("CRUISER").toLowerCase()].includes(v.ship_class.toLowerCase()))
+				setAttrs({ship_class_normalised: "cruiser"});
+			else mySetAttrs({ship_class_normalised: ""}, v);
+		});
+	};
 	const calculateShipStats = () => {
 		// Calculates power, mass, and hardpoints remaining.
 		const doCalc = (weaponIDs, fittingIDs, defenseIDs) => {
@@ -1469,6 +1818,7 @@
 	/**
 	 * Migrations
 	 */
+	/* Upgrade event handler */
 	const handleUpgrade = () => {
 		getAttrs(["character_sheet"], v => {
 			if (!v.character_sheet || v.character_sheet.indexOf(sheetName) !== 0)
@@ -1478,6 +1828,7 @@
 		});
 	};
 
+	/* Versioned upgrade */
 	const upgradeSheet = (version, firstTime = false, finalTime = false) => {
 		// Any version upgrade code should go here
 		const performUpgrade = (version) => {
@@ -1561,6 +1912,10 @@
 					});
 				});
 			}
+			else if (major == 2 && minor < 2) {
+				calculateStrDexMod();
+				upgradeSheet(sheetVersion);
+			}
 			/** Final upgrade clause, always leave this around */
 			else upgradeSheet(sheetVersion, false, true);
 		};
@@ -1572,7 +1927,6 @@
 			if (!finalTime) performUpgrade(version);
 		});
 	};
-
 	/* Main upgrade from pre-worker versioning */
 	const upgradeFrom162 = () => {
 		console.log("Upgrading from versionless sheet (assumed to be fresh or v1.6.2).");
@@ -1588,7 +1942,6 @@
 				if (technique) {
 					const newRowId = generateRowID();
 					setting[`repeating_techniques_${newRowId}_technique_name`] = technique;
-					console.log(`Migrating psionic technique #${i}: ${technique}.`);
 				}
 			}
 			setAttrs(setting);
@@ -1600,20 +1953,17 @@
 				if (cyberware) {
 					const newRowId = generateRowID();
 					setting[`repeating_cyberware_${newRowId}_cyberware_name`] = cyberware;
-					console.log(`Migrating cyberware #${i}: ${cyberware}.`);
 				}
 			}
 			setAttrs(setting);
 		});
 		getAttrs(["languages"], v => {
 			if (v.languages) {
-				console.log("Language migration started.");
 				const setting = {};
 
 				v.languages.split(/\r?\n/).filter(l => !!l).forEach(language => {
 					const newRowId = generateRowID();
 					setting[`repeating_languages_${newRowId}_language`] = language;
-					console.log(`Language migrated: ${language}.`);
 				});
 				setAttrs(setting);
 			}
@@ -1992,8 +2342,8 @@
 	on("change:armor_ac change:innate_ac", calculateAC);
 
 	on("change:strength", calculateGearReadiedStowedMax);
-	on("change:repeating_gear remove:repeating_gear change:armor_encumbrance change:repeating_weapons" +
-		" remove:repeating_weapons change:gear_readied change:gear_stowed", calculateGearReadiedStowed);
+	on("change:repeating_gear remove:repeating_gear change:armor_encumbrance change:repeating_weapons " +
+		"remove:repeating_weapons change:gear_readied change:gear_stowed", calculateGearReadiedStowed);
 
 	on("change:level change:setting_xp_scheme", calculateNextLevelXP);
 
@@ -2010,7 +2360,8 @@
 		"remove:repeating_skills",
 	].join(" "), buildSkillMenu);
 
-	on([...skills.psionic.map(x => `change:skill_${x}`),
+	on([
+		...skills.psionic.map(x => `change:skill_${x}`),
 		"change:setting_super_type change:repeating_techniques remove:repeating_techniques",
 		"change:repeating_psychic-skills remove:repeating_psychic-skills"
 	].join(" "), buildPsionicsMenu);
@@ -2021,10 +2372,16 @@
 
 
 	/* Ship sheet */
+	on("change:ship_hulltype", fillShipStats);
+	on("change:ship_class", setShipClass);
 	on(shipStatEvent, calculateShipStats);
 	on("change:repeating_ship-weapons:weapon_name change:repeating_ship-weapons:weapon_attack_bonus " +
 		"remove:repeating_ship-weapons", buildShipWeaponsMenu);
 
+	autofillSections.forEach(sName => {
+		on(`change:generate_${sName}_source`, () => generateAutofillInfo(sName));
+		on(`change:generate_${sName}_button`, () => generateAutofillRow(sName));
+	});
 
 	/* NPC sheet */
 	on("change:npc_stat_block", fillNPC);

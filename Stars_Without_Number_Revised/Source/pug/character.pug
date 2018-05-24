@@ -102,7 +102,8 @@ input(type="hidden", name="attr_setting_skill_query", value="hover").skills-quer
 		h3(data-i18n="CORE_STATISTICS")
 		.main-content
 			+text-input-duo("HP", "HP_max", false, {value: "0"}).important
-				button.unstyled-button(type="roll", name="roll_HP", data-i18n="HIT_POINTS" value!="&{template:swn-default} {{charname=@{name}}} {{title=^{HIT_POINTS}}} {{ =[[{@{level}d6 + @{level}*@{constitution_mod}[CON] + @{level}*@{extra_hp_query}, @{hp|max} + 1d1}kh1 ]]}} {{info=^{MAXIMUM_HP_1} @{level}d6 + @{level}&ast;[[@{constitution_mod}[CON] + @{extra_hp_query}]] ^{MAXIMUM_HP_2} [[@{hp|max} + 1]]}}")
+				.sheet-label
+					button.unstyled-button(type="roll", name="roll_HP", data-i18n="HIT_POINTS" value!="&{template:swn-default} {{charname=@{name}}} {{title=^{HIT_POINTS}}} {{ =[[{@{level}d6 + @{level}*@{constitution_mod}[CON] + @{level}*@{extra_hp_query}, @{hp|max} + 1d1}kh1 ]]}} {{info=^{MAXIMUM_HP_1} @{level}d6 + @{level}&ast;[[@{constitution_mod}[CON] + @{extra_hp_query}]] ^{MAXIMUM_HP_2} [[@{hp|max} + 1]]}}")
 			+text-input-duo("strain", "strain_max", "SYSTEM_STRAIN", {value: "10", readonly: true, "data-i18n-title": "CONSTITUTION"})(min="0", value="0")
 			+text-input("strain_permanent", "PERMANENT_STRAIN")(type="number", min="0", value="0").center
 			+text-input-duo("xp", "xp_next", "XP_NEXT_LEVEL", {min: "0", value: "3"})(min="0", value="0")
@@ -120,6 +121,7 @@ input(type="hidden", name="attr_setting_skill_query", value="hover").skills-quer
 					th(data-i18n="BONUS")
 					th(data-i18n="MODIFIER")
 			tbody
+				input(type="hidden", name="attr_str_dex_mod", value="0")
 				each attr in attributes
 					tr
 						td(data-i18n=attr.toUpperCase(), data-i18n-title=`${attr.toUpperCase()}_DESC`)
@@ -138,7 +140,8 @@ input(type="hidden", name="attr_setting_skill_query", value="hover").skills-quer
 			+text-input("credits", "CREDITS")(type="number", value="0").credits.center.col50
 		fieldset.repeating_resources
 			+text-input-duo("resource_count", "resource_count_max", "").display
-				span(name="attr_resource_name")
+				.label
+					span(name="attr_resource_name")
 			.flex-center.edit
 				input(type="text", name="attr_resource_name")
 				input(type="number", name="attr_resource_count")
@@ -150,6 +153,56 @@ input(type="hidden", name="attr_setting_skill_query", value="hover").skills-quer
 	.section
 		+sectionheader("show_weapons", "WEAPONS")
 		.weapons
+			.generate.flex-start.edit
+				select(name="attr_generate_weapons_source").generate-source
+					option(value="", selected) —
+					optgroup(data-i18n-label="RANGED_WEAPONS")
+						option(value="primitive_bow", data-i18n="PRIMITIVE_BOW")
+						option(value="advanced_bow", data-i18n="ADVANCED_BOW")
+						option(value="conversion_bow", data-i18n="CONVERSION_BOW")
+						option(value="grenade", data-i18n="GRENADE")
+						option(value="crude_pistol", data-i18n="CRUDE_PISTOL")
+						option(value="musket", data-i18n="MUSKET")
+						option(value="revolver", data-i18n="REVOLVER")
+						option(value="rifle", data-i18n="RIFLE")
+						option(value="shotgun", data-i18n="SHOTGUN")
+						option(value="semi_auto_pistol", data-i18n="SEMI_AUTO_PISTOL")
+						option(value="submachine_gun", data-i18n="SUBMACHINE_GUN")
+						option(value="combat_rifle", data-i18n="COMBAT_RIFLE")
+						option(value="combat_shotgun", data-i18n="COMBAT_SHOTGUN")
+						option(value="sniper_rifle", data-i18n="SNIPER_RIFLE")
+						option(value="void_carbine", data-i18n="VOID_CARBINE")
+						option(value="mag_pistol", data-i18n="MAG_PISTOL")
+						option(value="mag_rifle", data-i18n="MAG_RIFLE")
+						option(value="spike_thrower", data-i18n="SPIKE_THROWER")
+						option(value="laser_pistol", data-i18n="LASER_PISTOL")
+						option(value="laser_rifle", data-i18n="LASER_RIFLE")
+						option(value="thermal_pistol", data-i18n="THERMAL_PISTOL")
+						option(value="plasma_projector", data-i18n="PLASMA_PROJECTOR")
+						option(value="shear_rifle", data-i18n="SHEAR_RIFLE")
+						option(value="thunder_gun", data-i18n="THUNDER_GUN")
+						option(value="distortion_cannon", data-i18n="DISTORTION_CANNON")
+					optgroup(data-i18n-label="MELEE_WEAPONS")
+						option(value="small_primitive_weapon", data-i18n="SMALL_PRIMITIVE_WEAPON")
+						option(value="medium_primitive_weapon", data-i18n="MEDIUM_PRIMITIVE_WEAPON")
+						option(value="large_primitive_weapon", data-i18n="LARGE_PRIMITIVE_WEAPON")
+						option(value="small_advanced_weapon", data-i18n="SMALL_ADVANCED_WEAPON")
+						option(value="medium_advanced_weapon", data-i18n="MEDIUM_ADVANCED_WEAPON")
+						option(value="large_advanced_weapon", data-i18n="LARGE_ADVANCED_WEAPON")
+						option(value="stun_baton", data-i18n="STUN_BATON")
+						option(value="suit_ripper", data-i18n="SUIT_RIPPER")
+						option(value="punch", data-i18n="PUNCH")
+					optgroup(data-i18n-label="HEAVY_WEAPONS")
+						option(value="heavy_machine_gun", data-i18n="HEAVY_MACHINE_GUN")
+						option(value="rocket_launcher", data-i18n="ROCKET_LAUNCHER")
+						option(value="railgun", data-i18n="RAILGUN")
+						option(value="anti_vehicle_laser", data-i18n="ANTI_VEHICLE_LASER")
+						option(value="hydra_array", data-i18n="HYDRA_ARRAY")
+						option(value="vortex_cannon", data-i18n="VORTEX_CANNON")
+				span(name="attr_generate_weapons_info").generate-info
+				label.generate-button
+					input(type="checkbox", name="attr_generate_weapons_button")
+					span(data-i18n="ADD")
 			fieldset.repeating_weapons
 				input(type="hidden", name="attr_weapon_api", value="")
 				input(type="hidden", name="attr_weapon_attack_display", value="")
@@ -192,6 +245,7 @@ input(type="hidden", name="attr_setting_skill_query", value="hover").skills-quer
 						select(name="attr_weapon_attribute_mod")
 							each attr in attributes
 								option(value=`@{${attr}_mod}`, data-i18n=`${attr.toUpperCase()}_SHORT`)
+							option(value=`@{str_dex_mod}`, data-i18n=`STR_DEX`)
 					+fake-text-input("BURST").burst.center
 						select(name="attr_weapon_burst")
 							option(value="", data-i18n="NO", selected)
@@ -200,14 +254,17 @@ input(type="hidden", name="attr_setting_skill_query", value="hover").skills-quer
 					+text-input("weapon_damage", "DAMAGE")(value="0").damage.center
 					+fake-text-input("+SKILL").skill-to-damage.center
 						input(type="checkbox", name="attr_weapon_skill_to_damage", value="@{weapon_skill_bonus}")
-					+text-input("weapon_shock_damage")(value="0").shock-damage.center
-						input(type="checkbox", name="attr_weapon_shock", value!="{{shock=[[@{weapon_shock_damage} + @{weapon_attribute_mod}[Attribute] + @{weapon_skill_to_damage}[Skill]]] ^{SHOCK_DAMAGE_AGAINST_AC_LEQ} @{weapon_shock_ac}!}}")
-						span(data-i18n="SHOCK")
+					.text-input.shock-damage.center
+						input(type="text", name="attr_weapon_shock_damage", value="0")
+						label.label
+							input(type="checkbox", name="attr_weapon_shock", value!="{{shock=[[@{weapon_shock_damage} + @{weapon_attribute_mod}[Attribute] + @{weapon_skill_to_damage}[Skill]]] ^{SHOCK_DAMAGE_AGAINST_AC_LEQ} @{weapon_shock_ac}!}}")
+							span(data-i18n="SHOCK")
 					+text-input("weapon_shock_ac", "SHOCK_AC")(type="number", value="10").shock-ac.center
 					+text-input("weapon_range", "RANGE").range.center
 					+text-input-duo("weapon_ammo", "weapon_ammo_max", "", {value: "0"}).ammo.center
-						input(type="checkbox", name="attr_weapon_use_ammo", value!="{{ammo=[[0@{weapon_ammo} - (1 @{weapon_burst})]] / @{weapon_ammo|max}}}")
-						span(data-i18n="AMMO")
+						label.label
+							input(type="checkbox", name="attr_weapon_use_ammo", value!="{{ammo=[[0@{weapon_ammo} - (1 @{weapon_burst})]] / @{weapon_ammo|max}}}")
+							span(data-i18n="AMMO")
 
 	//- Foci
 	.section.foci-left

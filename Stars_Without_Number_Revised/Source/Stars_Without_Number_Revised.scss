@@ -221,6 +221,10 @@ h3 {
 .sheet-flex {
 	display: flex;
 }
+.sheet-flex-start {
+	display: flex;
+	align-items: flex-start;
+}
 .sheet-flex-center {
 	display: flex;
 	align-items: center;
@@ -299,8 +303,9 @@ input[type=number].sheet-inline-input {
 	color: #666;
 	padding-right: 5px;
 	line-height: 1;
-	div {
+	.sheet-label {
 		font-size: .9em;
+		text-align: inherit;
 		line-height: 14px;
 		border-top: 1px solid #AAA;
 
@@ -353,7 +358,7 @@ input[type=number].sheet-inline-input {
 			font-size: 16px;
 			color: #333;
 		}
-		div { grid-column: 1/4 }
+		.sheet-label { grid-column: 1/4 }
 	}
 	button[type=roll].btn {
 		width: 100%;
@@ -478,6 +483,38 @@ input[type=number].sheet-inline-input {
 		width: 120px;
 		display: inline-block;
 		&.sheet-wide { width : 170px }
+	}
+}
+
+/* generate buttons */
+.sheet-generate {
+	margin-bottom: 5px;
+	.sheet-generate-source {
+		height: 20px;
+		width: 170px;
+	}
+	.sheet-generate-info {
+		margin: 0 5px;
+		min-height: 20px;
+		flex-grow: 1;
+		background: $lightbox;
+		border-radius: 4px;
+		padding: 1px 4px;
+	}
+	.sheet-generate-button {
+		padding: 1px 8px;
+		border-radius: 4px;
+		cursor: pointer;
+		background: #223297;
+		color: #FFF;
+		input[type=checkbox] {
+			position: absolute;
+			visibility: hidden;
+		}
+		&:active {
+			outline: 5px auto;
+			outline-offset: -2px;
+		}
 	}
 }
 
@@ -862,6 +899,17 @@ input[type=number].sheet-inline-input {
 .sheet-notes { margin: 10px 0 }
 
 /* Ship tab */
+.sheet-ship-class {
+	&[value="fighter"] ~ .sheet-section .sheet-generate-source {
+		.sheet-frigate, .sheet-cruiser, .sheet-capital { display: none }
+	}
+	&[value="frigate"] ~ .sheet-section .sheet-generate-source {
+		.sheet-cruiser, .sheet-capital { display: none }
+	}
+	&[value="cruiser"] ~ .sheet-section .sheet-generate-source {
+		.sheet-capital { display: none }
+	}
+}
 .sheet-ship {
 	margin-top: -20px;
 	grid: auto/ repeat(4, 1fr);
@@ -881,6 +929,26 @@ input[type=number].sheet-inline-input {
 	.sheet-stats {
 		display: grid;
 		grid: auto / 1fr 1fr;
+	}
+	.sheet-hulltype {
+		position: relative;
+		.sheet-details {
+			position: absolute;
+			z-index: 1;
+			opacity: 1;
+			width: 250px;
+			top: 22px;
+			left: -63px;
+			transition: all 0.3s;
+			background: #FFF;
+			border: 1px solid #777;
+			border-radius: 8px;
+			padding: 5px;
+		}
+		input:not(:focus) ~ .sheet-details {
+			visibility: hidden;
+			opacity: 0;
+		}
 	}
 	.sheet-input-color-negative[value^="-"] + .sheet-text-input input:first-child { color: red }
 	.repcontainer {

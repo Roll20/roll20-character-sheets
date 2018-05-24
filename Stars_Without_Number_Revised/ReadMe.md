@@ -38,6 +38,11 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 ## Changelog
 
+### 2.2.0
+
+* Added autofill functionality for ship hulls.
+* Added autofill buttons for weapons and ship modules.
+
 ### 2.1.0
 
 * Additions
